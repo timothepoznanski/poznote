@@ -137,7 +137,7 @@ window.addEventListener('resize', function() {
     };
 
     window.loadPoznoteI18n = function() {
-        return fetch('api_i18n.php', { credentials: 'same-origin' })
+        return fetch('api/v1/system/i18n', { credentials: 'same-origin' })
             .then(function(r) { return r.json(); })
             .then(function(j) {
                 if (j && j.success && j.strings) {

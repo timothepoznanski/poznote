@@ -426,7 +426,7 @@
                 
                 // Try to resolve the note reference
                 try {
-                    const response = await fetch(`api_resolve_note_reference.php?reference=${encodeURIComponent(rep.title)}&workspace=${encodeURIComponent(workspace)}`);
+                    const response = await fetch(`/api/v1/notes/resolve?reference=${encodeURIComponent(rep.title)}&workspace=${encodeURIComponent(workspace)}`);
                     const data = await response.json();
                     
                     if (data.success && data.id) {

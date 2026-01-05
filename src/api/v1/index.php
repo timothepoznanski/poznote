@@ -51,6 +51,7 @@ require_once __DIR__ . '/controllers/AttachmentsController.php';
 require_once __DIR__ . '/controllers/ShareController.php';
 require_once __DIR__ . '/controllers/SettingsController.php';
 require_once __DIR__ . '/controllers/BackupController.php';
+require_once __DIR__ . '/controllers/SystemController.php';
 
 /**
  * Simple Router class for handling RESTful routes
@@ -189,10 +190,21 @@ $attachmentsController = new AttachmentsController($con);
 $shareController = new ShareController($con);
 $settingsController = new SettingsController($con);
 $backupController = new BackupController($con);
+$systemController = new SystemController($con);
 
 // ======================
 // Notes Routes
 // ======================
+
+// Resolve a note reference (must come before /notes/{id})
+$router->get('/notes/resolve', function($params) use ($notesController) {
+    $notesController->resolveReference();
+});
+
+// List notes with attachments
+$router->get('/notes/with-attachments', function($params) use ($notesController) {
+    $notesController->listWithAttachments();
+});
 
 // List all notes
 $router->get('/notes', function($params) use ($notesController) {
@@ -237,6 +249,21 @@ $router->put('/notes/{id}/tags', function($params) use ($notesController) {
 // Toggle favorite status for a note
 $router->post('/notes/{id}/favorite', function($params) use ($notesController) {
     $notesController->toggleFavorite($params['id']);
+});
+
+// Duplicate a note
+$router->post('/notes/{id}/duplicate', function($params) use ($notesController) {
+    $notesController->duplicate($params['id']);
+});
+
+// Convert note type (markdown <-> html)
+$router->post('/notes/{id}/convert', function($params) use ($notesController) {
+    $notesController->convert($params['id']);
+});
+
+// Update note subheading
+$router->patch('/notes/{id}/subheading', function($params) use ($notesController) {
+    $notesController->updateSubheading($params['id']);
 });
 
 // Get share status for a note
@@ -465,6 +492,35 @@ $router->post('/backups/restore/assemble', function($params) use ($backupControl
 // Chunked restore - cleanup
 $router->post('/backups/restore/cleanup', function($params) use ($backupController) {
     echo json_encode($backupController->cleanupChunks());
+});
+
+// ======================
+// System Routes
+// ======================
+
+// Get version info
+$router->get('/system/version', function($params) use ($systemController) {
+    echo json_encode($systemController->version());
+});
+
+// Check for updates
+$router->get('/system/updates', function($params) use ($systemController) {
+    echo json_encode($systemController->checkUpdates());
+});
+
+// Get translations
+$router->get('/system/i18n', function($params) use ($systemController) {
+    echo json_encode($systemController->i18n());
+});
+
+// Verify settings password
+$router->post('/system/verify-password', function($params) use ($systemController) {
+    echo json_encode($systemController->verifyPassword());
+});
+
+// List shared notes
+$router->get('/shared', function($params) use ($systemController) {
+    echo json_encode($systemController->listShared());
 });
 
 // Dispatch the request

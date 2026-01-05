@@ -748,7 +748,7 @@ function startChunkedRestore() {
     });
 
     // Start upload
-    chunkedUploader.uploadFile(file, 'api_chunked_restore.php');
+    chunkedUploader.uploadFile(file, 'api/v1/backups/restore');
 }
 
 // Load workspaces for individual notes import

@@ -97,7 +97,7 @@
             params.append('workspace', config.workspace);
         }
         
-        fetch('api_list_shared.php?' + params.toString())
+        fetch('api/v1/shared?' + params.toString())
             .then(function(response) {
                 if (!response.ok) {
                     throw new Error('HTTP error! status: ' + response.status);

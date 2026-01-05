@@ -542,11 +542,11 @@
         var input = document.getElementById('subheading-input-' + noteId);
         if (!disp || !input) return;
         var newVal = input.value.trim();
-        var body = 'note_id=' + encodeURIComponent(noteId) + '&subheading=' + encodeURIComponent(newVal);
-        fetch('api_update_subheading.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: body
+        fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/subheading', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ subheading: newVal })
         }).then(function(r) { return r.json(); }).then(function(data) {
             if (data && data.success) {
                 disp.textContent = newVal || '';

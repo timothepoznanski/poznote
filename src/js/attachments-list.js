@@ -57,7 +57,7 @@ async function loadAttachments() {
     const workspace = getPageWorkspace();
     
     try {
-        const response = await fetch('api_list_notes_with_attachments.php' + (workspace ? '?workspace=' + encodeURIComponent(workspace) : ''), {
+        const response = await fetch('/api/v1/notes/with-attachments' + (workspace ? '?workspace=' + encodeURIComponent(workspace) : ''), {
             credentials: 'same-origin'
         });
         

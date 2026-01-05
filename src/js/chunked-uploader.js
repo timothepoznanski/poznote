@@ -12,7 +12,7 @@ class ChunkedUploader {
         this.onError = options.onError || (() => {});
     }
 
-    async uploadFile(file, endpoint = '/api_chunked_restore.php') {
+    async uploadFile(file, endpoint = '/api/v1/backups/restore') {
         if (!file) {
             const msg = (window.t ? window.t('restore_import.chunked.errors.no_file_provided', null, 'No file provided') : 'No file provided');
             throw new Error(msg);

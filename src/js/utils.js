@@ -90,11 +90,10 @@ function performFavoriteToggle(noteId) {
 }
 
 function duplicateNote(noteId) {
-    fetch('api_duplicate_note.php', {
+    fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/duplicate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        body: JSON.stringify({ note_id: noteId })
+        credentials: 'same-origin'
     })
     .then(function(response) {
         return response.json();
@@ -574,7 +573,7 @@ function checkForUpdates() {
     // Show checking modal
     showUpdateCheckModal();
     
-    fetch('api_check_updates.php')
+    fetch('api/v1/system/updates')
         .then(function(response) { 
             if (!response.ok) {
                 throw new Error('HTTP Error: ' + response.status);
@@ -620,7 +619,7 @@ function checkForUpdatesAutomatic() {
     localStorage.setItem('poznote_last_update_check', now.toString());
     
     // Perform silent check (no modals, only badge if update available)
-    fetch('api_check_updates.php')
+    fetch('api/v1/system/updates')
         .then(function(response) { 
             if (!response.ok) {
                 throw new Error('HTTP Error: ' + response.status);
@@ -715,7 +714,7 @@ function showUpdateInstructions(hasUpdate = false) {
         if (availableVersionEl) availableVersionEl.textContent = 'Loading...';
         
         // Fetch update information
-        fetch('api_check_updates.php')
+        fetch('api/v1/system/updates')
             .then(function(response) { 
                 if (!response.ok) {
                     throw new Error('HTTP Error: ' + response.status);
@@ -2143,11 +2142,10 @@ function showConvertNoteModal(noteId, target) {
     if (duplicateBtn) {
         duplicateBtn.onclick = function() {
             // Duplicate the note without reloading the page
-            fetch('api_duplicate_note.php', {
+            fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/duplicate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                credentials: 'same-origin',
-                body: JSON.stringify({ note_id: noteId })
+                credentials: 'same-origin'
             })
             .then(function(response) {
                 return response.json();
@@ -2178,13 +2176,11 @@ function executeNoteConversion() {
     
     closeModal('convertNoteModal');
     
-    var formData = new FormData();
-    formData.append('id', convertNoteId);
-    formData.append('target', convertNoteTarget);
-    
-    fetch('api_convert_note.php', {
+    fetch('/api/v1/notes/' + encodeURIComponent(convertNoteId) + '/convert', {
         method: 'POST',
-        body: formData
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ target: convertNoteTarget })
     })
     .then(function(response) {
         return response.json();

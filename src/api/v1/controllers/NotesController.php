@@ -1002,6 +1002,368 @@ class NotesController {
     }
     
     /**
+     * POST /api/v1/notes/{id}/duplicate
+     * Duplicate a note
+     */
+    public function duplicate(string $id): void {
+        try {
+            // Get the original note
+            $stmt = $this->con->prepare("SELECT heading, entry, tags, folder, folder_id, workspace, type, attachments FROM entries WHERE id = ? AND trash = 0");
+            $stmt->execute([$id]);
+            $originalNote = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$originalNote) {
+                $this->sendError(404, 'Note not found');
+                return;
+            }
+            
+            // Generate unique heading
+            $originalHeading = $originalNote['heading'] ?: t('index.note.new_note', [], 'New note');
+            $newHeading = generateUniqueTitle($originalHeading, null, $originalNote['workspace'], $originalNote['folder_id']);
+            
+            // Duplicate attachments
+            $newAttachments = null;
+            $attachmentIdMapping = [];
+            $originalAttachments = $originalNote['attachments'] ? json_decode($originalNote['attachments'], true) : [];
+            
+            if (!empty($originalAttachments)) {
+                $attachmentsDir = getAttachmentsPath();
+                $duplicatedAttachments = [];
+                
+                foreach ($originalAttachments as $attachment) {
+                    $originalFilePath = $attachmentsDir . '/' . $attachment['filename'];
+                    
+                    if (file_exists($originalFilePath)) {
+                        $fileExtension = pathinfo($attachment['filename'], PATHINFO_EXTENSION);
+                        $newFilename = uniqid() . '_' . time() . '.' . $fileExtension;
+                        $newFilePath = $attachmentsDir . '/' . $newFilename;
+                        $oldAttachmentId = $attachment['id'];
+                        $newAttachmentId = uniqid();
+                        
+                        if (copy($originalFilePath, $newFilePath)) {
+                            chmod($newFilePath, 0644);
+                            $attachmentIdMapping[$oldAttachmentId] = $newAttachmentId;
+                            
+                            $duplicatedAttachments[] = [
+                                'id' => $newAttachmentId,
+                                'filename' => $newFilename,
+                                'original_filename' => $attachment['original_filename'],
+                                'file_size' => $attachment['file_size'],
+                                'file_type' => $attachment['file_type'],
+                                'uploaded_at' => date('Y-m-d H:i:s')
+                            ];
+                        }
+                    }
+                }
+                
+                $newAttachments = !empty($duplicatedAttachments) ? json_encode($duplicatedAttachments) : null;
+            }
+            
+            // Read original content and update attachment references
+            $originalFilename = getEntryFilename($id, $originalNote['type']);
+            $content = '';
+            if (file_exists($originalFilename)) {
+                $content = file_get_contents($originalFilename);
+                foreach ($attachmentIdMapping as $oldId => $newId) {
+                    $content = str_replace($oldId, $newId, $content);
+                }
+            }
+            
+            // Insert new note
+            $insertStmt = $this->con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, attachments, created, updated, trash, favorite) VALUES (?, '', ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0, 0)");
+            $insertStmt->execute([
+                $newHeading,
+                $originalNote['tags'],
+                $originalNote['folder'],
+                $originalNote['folder_id'],
+                $originalNote['workspace'],
+                $originalNote['type'],
+                $newAttachments
+            ]);
+            
+            $newId = $this->con->lastInsertId();
+            
+            // Create new file
+            $newFilename = getEntryFilename($newId, $originalNote['type']);
+            file_put_contents($newFilename, $content);
+            chmod($newFilename, 0644);
+            
+            http_response_code(201);
+            $this->sendSuccess([
+                'id' => $newId,
+                'heading' => $newHeading,
+                'message' => 'Note duplicated successfully'
+            ]);
+            
+        } catch (Exception $e) {
+            $this->sendError(500, 'Error duplicating note: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * POST /api/v1/notes/{id}/convert
+     * Convert note between markdown and HTML
+     */
+    public function convert(string $id): void {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $targetType = isset($input['target']) ? strtolower(trim($input['target'])) : '';
+        
+        if (!in_array($targetType, ['html', 'markdown'], true)) {
+            $this->sendError(400, 'Invalid target type. Use "html" or "markdown"');
+            return;
+        }
+        
+        try {
+            $stmt = $this->con->prepare('SELECT id, heading, type, attachments, folder_id FROM entries WHERE id = ? AND trash = 0');
+            $stmt->execute([$id]);
+            $note = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$note) {
+                $this->sendError(404, 'Note not found');
+                return;
+            }
+            
+            $currentType = $note['type'] ?? 'note';
+            
+            // Validate conversion
+            if ($targetType === 'html' && $currentType !== 'markdown') {
+                $this->sendError(400, 'Only markdown notes can be converted to HTML');
+                return;
+            }
+            
+            if ($targetType === 'markdown' && !in_array($currentType, ['note', 'html'], true)) {
+                $this->sendError(400, 'Only HTML notes can be converted to markdown');
+                return;
+            }
+            
+            $currentFilePath = getEntryFilename($id, $currentType);
+            
+            if (!file_exists($currentFilePath) || !is_readable($currentFilePath)) {
+                $this->sendError(404, 'Note file not found');
+                return;
+            }
+            
+            $content = file_get_contents($currentFilePath);
+            
+            // Convert content
+            if ($targetType === 'markdown') {
+                $convertedContent = $this->htmlToMarkdown($content);
+                $newType = 'markdown';
+            } else {
+                require_once __DIR__ . '/../../../markdown_parser.php';
+                $convertedContent = parseMarkdownToHtml($content);
+                $newType = 'note';
+            }
+            
+            // Create new file with converted content
+            $newFilePath = getEntryFilename($id, $newType);
+            if (file_put_contents($newFilePath, $convertedContent) === false) {
+                $this->sendError(500, 'Failed to save converted note');
+                return;
+            }
+            chmod($newFilePath, 0644);
+            
+            // Update database
+            $updateStmt = $this->con->prepare("UPDATE entries SET type = ?, updated = datetime('now') WHERE id = ?");
+            $updateStmt->execute([$newType, $id]);
+            
+            // Delete old file if extension changed
+            if ($currentFilePath !== $newFilePath && file_exists($currentFilePath)) {
+                unlink($currentFilePath);
+            }
+            
+            $this->sendSuccess([
+                'id' => $id,
+                'type' => $newType,
+                'message' => 'Note converted successfully'
+            ]);
+            
+        } catch (Exception $e) {
+            $this->sendError(500, 'Error converting note: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * PATCH /api/v1/notes/{id}/subheading
+     * Update note subheading
+     */
+    public function updateSubheading(string $id): void {
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        // Support both JSON body and form data
+        $subheading = $input['subheading'] ?? ($_POST['subheading'] ?? '');
+        $subheading = trim($subheading);
+        
+        try {
+            $stmt = $this->con->prepare("UPDATE entries SET subheading = ?, updated = datetime('now') WHERE id = ?");
+            $result = $stmt->execute([$subheading, $id]);
+            
+            if ($result) {
+                $this->sendSuccess(['subheading' => $subheading]);
+            } else {
+                $this->sendError(500, 'Failed to update subheading');
+            }
+        } catch (Exception $e) {
+            $this->sendError(500, 'Database error: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * GET /api/v1/notes/resolve
+     * Resolve a note reference by ID or heading
+     */
+    public function resolveReference(): void {
+        $reference = $_GET['reference'] ?? null;
+        $workspace = $_GET['workspace'] ?? null;
+        
+        if (!$reference) {
+            $this->sendError(400, 'No reference provided');
+            return;
+        }
+        
+        try {
+            if (is_numeric($reference)) {
+                $noteId = intval($reference);
+                if ($workspace) {
+                    $stmt = $this->con->prepare("SELECT id, heading FROM entries WHERE trash = 0 AND id = ? AND workspace = ?");
+                    $stmt->execute([$noteId, $workspace]);
+                } else {
+                    $stmt = $this->con->prepare("SELECT id, heading FROM entries WHERE trash = 0 AND id = ?");
+                    $stmt->execute([$noteId]);
+                }
+            } else {
+                if ($workspace) {
+                    $stmt = $this->con->prepare("SELECT id, heading FROM entries WHERE trash = 0 AND heading LIKE ? AND workspace = ? ORDER BY updated DESC LIMIT 1");
+                    $stmt->execute(['%' . $reference . '%', $workspace]);
+                } else {
+                    $stmt = $this->con->prepare("SELECT id, heading FROM entries WHERE trash = 0 AND heading LIKE ? ORDER BY updated DESC LIMIT 1");
+                    $stmt->execute(['%' . $reference . '%']);
+                }
+            }
+            
+            $note = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($note) {
+                $this->sendSuccess([
+                    'id' => $note['id'],
+                    'heading' => $note['heading']
+                ]);
+            } else {
+                $this->sendError(404, 'Note not found');
+            }
+        } catch (Exception $e) {
+            $this->sendError(500, 'Database error: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * GET /api/v1/notes/with-attachments
+     * List notes that have attachments
+     */
+    public function listWithAttachments(): void {
+        $workspace = $_GET['workspace'] ?? null;
+        
+        try {
+            $query = "SELECT id, heading, attachments, updated 
+                      FROM entries 
+                      WHERE trash = 0 
+                      AND attachments IS NOT NULL 
+                      AND attachments != '' 
+                      AND attachments != '[]'";
+            
+            $params = [];
+            
+            if ($workspace !== null && $workspace !== '') {
+                $query .= " AND workspace = ?";
+                $params[] = $workspace;
+            }
+            
+            $query .= " ORDER BY updated DESC";
+            
+            $stmt = $this->con->prepare($query);
+            $stmt->execute($params);
+            
+            $notes = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $attachments = json_decode($row['attachments'], true);
+                if (is_array($attachments) && count($attachments) > 0) {
+                    $notes[] = [
+                        'id' => $row['id'],
+                        'heading' => $row['heading'],
+                        'attachments' => $attachments,
+                        'updated' => $row['updated']
+                    ];
+                }
+            }
+            
+            $this->sendSuccess([
+                'notes' => $notes,
+                'count' => count($notes)
+            ]);
+        } catch (Exception $e) {
+            $this->sendError(500, 'Database error: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Convert HTML to Markdown (basic implementation)
+     */
+    private function htmlToMarkdown(string $html): string {
+        // Basic HTML to Markdown conversion
+        $md = $html;
+        
+        // Headers
+        $md = preg_replace('/<h1[^>]*>(.*?)<\/h1>/is', "# $1\n\n", $md);
+        $md = preg_replace('/<h2[^>]*>(.*?)<\/h2>/is', "## $1\n\n", $md);
+        $md = preg_replace('/<h3[^>]*>(.*?)<\/h3>/is', "### $1\n\n", $md);
+        $md = preg_replace('/<h4[^>]*>(.*?)<\/h4>/is', "#### $1\n\n", $md);
+        $md = preg_replace('/<h5[^>]*>(.*?)<\/h5>/is', "##### $1\n\n", $md);
+        $md = preg_replace('/<h6[^>]*>(.*?)<\/h6>/is', "###### $1\n\n", $md);
+        
+        // Bold and italic
+        $md = preg_replace('/<strong[^>]*>(.*?)<\/strong>/is', "**$1**", $md);
+        $md = preg_replace('/<b[^>]*>(.*?)<\/b>/is', "**$1**", $md);
+        $md = preg_replace('/<em[^>]*>(.*?)<\/em>/is', "*$1*", $md);
+        $md = preg_replace('/<i[^>]*>(.*?)<\/i>/is', "*$1*", $md);
+        
+        // Links
+        $md = preg_replace('/<a[^>]*href=["\']([^"\']*)["\'][^>]*>(.*?)<\/a>/is', "[$2]($1)", $md);
+        
+        // Images
+        $md = preg_replace('/<img[^>]*src=["\']([^"\']*)["\'][^>]*alt=["\']([^"\']*)["\'][^>]*\/?>/is', "![$2]($1)", $md);
+        $md = preg_replace('/<img[^>]*src=["\']([^"\']*)["\'][^>]*\/?>/is', "![]($1)", $md);
+        
+        // Line breaks
+        $md = preg_replace('/<br\s*\/?>/i', "\n", $md);
+        
+        // Paragraphs
+        $md = preg_replace('/<p[^>]*>(.*?)<\/p>/is', "$1\n\n", $md);
+        
+        // Lists
+        $md = preg_replace('/<li[^>]*>(.*?)<\/li>/is', "- $1\n", $md);
+        $md = preg_replace('/<\/?[ou]l[^>]*>/i', "\n", $md);
+        
+        // Code
+        $md = preg_replace('/<code[^>]*>(.*?)<\/code>/is', "`$1`", $md);
+        $md = preg_replace('/<pre[^>]*>(.*?)<\/pre>/is', "```\n$1\n```\n", $md);
+        
+        // Blockquote
+        $md = preg_replace('/<blockquote[^>]*>(.*?)<\/blockquote>/is', "> $1\n", $md);
+        
+        // Horizontal rule
+        $md = preg_replace('/<hr\s*\/?>/i', "\n---\n", $md);
+        
+        // Remove remaining HTML tags
+        $md = strip_tags($md);
+        
+        // Clean up whitespace
+        $md = preg_replace('/\n{3,}/', "\n\n", $md);
+        $md = trim($md);
+        
+        return $md;
+    }
+    
+    /**
      * Send a success response
      */
     private function sendSuccess(array $data): void {
