@@ -3432,6 +3432,137 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-video::before { content: "\f03d"; }
 .fa-file-alt::before { content: "\f15c"; }
 .fa-paint-brush::before { content: "\f1fc"; }
+.fa-anchor::before { content: "\f13d"; }
+.fa-apple-alt::before { content: "\f5d1"; }
+.fa-award::before { content: "\f559"; }
+.fa-bell::before { content: "\f0f3"; }
+.fa-binoculars::before { content: "\f1e5"; }
+.fa-book-open::before { content: "\f518"; }
+.fa-briefcase-medical::before { content: "\f469"; }
+.fa-brush::before { content: "\f55d"; }
+.fa-building::before { content: "\f1ad"; }
+.fa-bus::before { content: "\f207"; }
+.fa-calculator::before { content: "\f1ec"; }
+.fa-candy-cane::before { content: "\f786"; }
+.fa-car::before { content: "\f1b9"; }
+.fa-certificate::before { content: "\f0a3"; }
+.fa-chart-network::before { content: "\f78a"; }
+.fa-chart-pie::before { content: "\f200"; }
+.fa-chess::before { content: "\f439"; }
+.fa-clipboard-list::before { content: "\f46d"; }
+.fa-cloud-sun::before { content: "\f6c4"; }
+.fa-coins::before { content: "\f51e"; }
+.fa-comment::before { content: "\f075"; }
+.fa-compass::before { content: "\f14e"; }
+.fa-crown::before { content: "\f521"; }
+.fa-cube::before { content: "\f1b2"; }
+.fa-cubes::before { content: "\f1b3"; }
+.fa-desktop::before { content: "\f108"; }
+.fa-diploma::before { content: "\f5ea"; }
+.fa-dna::before { content: "\f471"; }
+.fa-dollar-sign::before { content: "\f155"; }
+.fa-dragon::before { content: "\f6d5"; }
+.fa-drum::before { content: "\f569"; }
+.fa-elephant::before { content: "\f6da"; }
+.fa-euro-sign::before { content: "\f153"; }
+.fa-feather::before { content: "\f52d"; }
+.fa-file-contract::before { content: "\f56c"; }
+.fa-file-invoice::before { content: "\f570"; }
+.fa-film::before { content: "\f008"; }
+.fa-fingerprint::before { content: "\f577"; }
+.fa-folder-tree::before { content: "\f802"; }
+.fa-gem::before { content: "\f3a5"; }
+.fa-glasses::before { content: "\f530"; }
+.fa-globe-americas::before { content: "\f57d"; }
+.fa-globe-asia::before { content: "\f57e"; }
+.fa-globe-europe::before { content: "\f7a2"; }
+.fa-guitar::before { content: "\f7a6"; }
+.fa-hamburger::before { content: "\f805"; }
+.fa-hammer::before { content: "\f6e3"; }
+.fa-hard-hat::before { content: "\f807"; }
+.fa-headphones::before { content: "\f025"; }
+.fa-headset::before { content: "\f590"; }
+.fa-hiking::before { content: "\f6ec"; }
+.fa-hospital::before { content: "\f0f8"; }
+.fa-icons::before { content: "\f86d"; }
+.fa-id-badge::before { content: "\f2c1"; }
+.fa-id-card::before { content: "\f2c2"; }
+.fa-industry::before { content: "\f275"; }
+.fa-infinity::before { content: "\f534"; }
+.fa-jedi::before { content: "\f669"; }
+.fa-laptop::before { content: "\f109"; }
+.fa-laptop-code::before { content: "\f5fc"; }
+.fa-lightbulb-dollar::before { content: "\f670"; }
+.fa-map::before { content: "\f279"; }
+.fa-medal::before { content: "\f5a2"; }
+.fa-microphone::before { content: "\f130"; }
+.fa-microscope::before { content: "\f610"; }
+.fa-money-bill::before { content: "\f0d6"; }
+.fa-mountain::before { content: "\f6fc"; }
+.fa-mug-hot::before { content: "\f7b6"; }
+.fa-network-wired::before { content: "\f6ff"; }
+.fa-passport::before { content: "\f5ab"; }
+.fa-pen::before { content: "\f304"; }
+.fa-pencil-alt::before { content: "\f303"; }
+.fa-pepper-hot::before { content: "\f816"; }
+.fa-phone::before { content: "\f095"; }
+.fa-piggy-bank::before { content: "\f4d3"; }
+.fa-plane-alt::before { content: "\f3de"; }
+.fa-plane-departure::before { content: "\f5b0"; }
+.fa-plug::before { content: "\f1e6"; }
+.fa-print::before { content: "\f02f"; }
+.fa-project-diagram::before { content: "\f542"; }
+.fa-puzzle-piece::before { content: "\f12e"; }
+.fa-receipt::before { content: "\f543"; }
+.fa-robot::before { content: "\f544"; }
+.fa-running::before { content: "\f70c"; }
+.fa-satellite::before { content: "\f7bf"; }
+.fa-satellite-dish::before { content: "\f7c0"; }
+.fa-school::before { content: "\f549"; }
+.fa-screwdriver::before { content: "\f54a"; }
+.fa-scroll::before { content: "\f70e"; }
+.fa-shield-alt::before { content: "\f3ed"; }
+.fa-shopping-bag::before { content: "\f290"; }
+.fa-sign::before { content: "\f4d9"; }
+.fa-sitemap::before { content: "\f0e8"; }
+.fa-snowman::before { content: "\f7d0"; }
+.fa-solar-panel::before { content: "\f5ba"; }
+.fa-spa::before { content: "\f5bb"; }
+.fa-space-shuttle::before { content: "\f197"; }
+.fa-stamp::before { content: "\f5bf"; }
+.fa-stethoscope::before { content: "\f0f1"; }
+.fa-store::before { content: "\f54e"; }
+.fa-store-alt::before { content: "\f54f"; }
+.fa-suitcase::before { content: "\f0f2"; }
+.fa-sun-cloud::before { content: "\f763"; }
+.fa-swimmer::before { content: "\f5c4"; }
+.fa-sync::before { content: "\f021"; }
+.fa-syringe::before { content: "\f48e"; }
+.fa-tablet::before { content: "\f3fb"; }
+.fa-tachometer-alt::before { content: "\f3fd"; }
+.fa-theater-masks::before { content: "\f630"; }
+.fa-toilet-paper::before { content: "\f71e"; }
+.fa-toolbox::before { content: "\f552"; }
+.fa-tooth::before { content: "\f5c9"; }
+.fa-tools::before { content: "\f7d9"; }
+.fa-tractor::before { content: "\f722"; }
+.fa-trash-alt::before { content: "\f2ed"; }
+.fa-tree-alt::before { content: "\f400"; }
+.fa-truck::before { content: "\f0d1"; }
+.fa-tv::before { content: "\f26c"; }
+.fa-umbrella-beach::before { content: "\f5ca"; }
+.fa-university::before { content: "\f19c"; }
+.fa-user-graduate::before { content: "\f501"; }
+.fa-utensil-spoon::before { content: "\f2e5"; }
+.fa-vial::before { content: "\f492"; }
+.fa-walking::before { content: "\f554"; }
+.fa-wallet::before { content: "\f555"; }
+.fa-warehouse::before { content: "\f494"; }
+.fa-water::before { content: "\f773"; }
+.fa-weight::before { content: "\f496"; }
+.fa-wifi::before { content: "\f1eb"; }
+.fa-wind::before { content: "\f72e"; }
+.fa-yen-sign::before { content: "\f157"; }
 
 .fa-question-circle,
 .fa-times-circle,
@@ -3567,7 +3698,138 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-bolt,
 .fa-flag,
 .fa-bookmark,
-.fa-thumbs-up {
+.fa-thumbs-up,
+.fa-anchor,
+.fa-apple-alt,
+.fa-award,
+.fa-bell,
+.fa-binoculars,
+.fa-book-open,
+.fa-briefcase-medical,
+.fa-brush,
+.fa-building,
+.fa-bus,
+.fa-calculator,
+.fa-candy-cane,
+.fa-car,
+.fa-certificate,
+.fa-chart-network,
+.fa-chart-pie,
+.fa-chess,
+.fa-clipboard-list,
+.fa-cloud-sun,
+.fa-coins,
+.fa-comment,
+.fa-compass,
+.fa-crown,
+.fa-cube,
+.fa-cubes,
+.fa-desktop,
+.fa-diploma,
+.fa-dna,
+.fa-dollar-sign,
+.fa-dragon,
+.fa-drum,
+.fa-elephant,
+.fa-euro-sign,
+.fa-feather,
+.fa-file-contract,
+.fa-file-invoice,
+.fa-film,
+.fa-fingerprint,
+.fa-folder-tree,
+.fa-gem,
+.fa-glasses,
+.fa-globe-americas,
+.fa-globe-asia,
+.fa-globe-europe,
+.fa-guitar,
+.fa-hamburger,
+.fa-hammer,
+.fa-hard-hat,
+.fa-headphones,
+.fa-headset,
+.fa-hiking,
+.fa-hospital,
+.fa-icons,
+.fa-id-badge,
+.fa-id-card,
+.fa-industry,
+.fa-infinity,
+.fa-jedi,
+.fa-laptop,
+.fa-laptop-code,
+.fa-lightbulb-dollar,
+.fa-map,
+.fa-medal,
+.fa-microphone,
+.fa-microscope,
+.fa-money-bill,
+.fa-mountain,
+.fa-mug-hot,
+.fa-network-wired,
+.fa-passport,
+.fa-pen,
+.fa-pencil-alt,
+.fa-pepper-hot,
+.fa-phone,
+.fa-piggy-bank,
+.fa-plane-alt,
+.fa-plane-departure,
+.fa-plug,
+.fa-print,
+.fa-project-diagram,
+.fa-puzzle-piece,
+.fa-receipt,
+.fa-robot,
+.fa-running,
+.fa-satellite,
+.fa-satellite-dish,
+.fa-school,
+.fa-screwdriver,
+.fa-scroll,
+.fa-shield-alt,
+.fa-shopping-bag,
+.fa-sign,
+.fa-sitemap,
+.fa-snowman,
+.fa-solar-panel,
+.fa-spa,
+.fa-space-shuttle,
+.fa-stamp,
+.fa-stethoscope,
+.fa-store,
+.fa-store-alt,
+.fa-suitcase,
+.fa-sun-cloud,
+.fa-swimmer,
+.fa-sync,
+.fa-syringe,
+.fa-tablet,
+.fa-tachometer-alt,
+.fa-theater-masks,
+.fa-toilet-paper,
+.fa-toolbox,
+.fa-tooth,
+.fa-tools,
+.fa-tractor,
+.fa-trash-alt,
+.fa-tree-alt,
+.fa-truck,
+.fa-tv,
+.fa-umbrella-beach,
+.fa-university,
+.fa-user-graduate,
+.fa-utensil-spoon,
+.fa-vial,
+.fa-walking,
+.fa-wallet,
+.fa-warehouse,
+.fa-water,
+.fa-weight,
+.fa-wifi,
+.fa-wind,
+.fa-yen-sign {
   font-family: "Font Awesome 5 Pro";
   font-weight: 300;
   font-style: normal;

@@ -3,7 +3,7 @@
  * Handles changing custom folder icons
  */
 
-// Available icons from Font Awesome
+// Available icons from Font Awesome with their translation keys
 const FOLDER_ICONS = [
     'fa-briefcase',
     'fa-home',
@@ -83,12 +83,156 @@ const FOLDER_ICONS = [
     'fa-hashtag',
     'fa-question-circle',
     'fa-times-circle',
-    'fa-eye'
+    'fa-eye',
+    'fa-anchor',
+    'fa-apple-alt',
+    'fa-award',
+    'fa-bell',
+    'fa-binoculars',
+    'fa-book-open',
+    'fa-briefcase-medical',
+    'fa-brush',
+    'fa-building',
+    'fa-bus',
+    'fa-calculator',
+    'fa-candy-cane',
+    'fa-car',
+    'fa-certificate',
+    'fa-chart-network',
+    'fa-chart-pie',
+    'fa-chess',
+    'fa-clipboard-list',
+    'fa-cloud-sun',
+    'fa-coins',
+    'fa-comment',
+    'fa-compass',
+    'fa-crown',
+    'fa-cube',
+    'fa-cubes',
+    'fa-desktop',
+    'fa-diploma',
+    'fa-dna',
+    'fa-dollar-sign',
+    'fa-dragon',
+    'fa-drum',
+    'fa-elephant',
+    'fa-euro-sign',
+    'fa-feather',
+    'fa-file-code',
+    'fa-file-contract',
+    'fa-file-invoice',
+    'fa-film',
+    'fa-fingerprint',
+    'fa-folder-tree',
+    'fa-gem',
+    'fa-glasses',
+    'fa-globe-americas',
+    'fa-globe-asia',
+    'fa-globe-europe',
+    'fa-guitar',
+    'fa-hamburger',
+    'fa-hammer',
+    'fa-hard-hat',
+    'fa-headphones',
+    'fa-headset',
+    'fa-hiking',
+    'fa-hospital',
+    'fa-icons',
+    'fa-id-badge',
+    'fa-id-card',
+    'fa-industry',
+    'fa-infinity',
+    'fa-jedi',
+    'fa-laptop',
+    'fa-laptop-code',
+    'fa-lightbulb-dollar',
+    'fa-map',
+    'fa-medal',
+    'fa-microphone',
+    'fa-microscope',
+    'fa-money-bill',
+    'fa-mountain',
+    'fa-mug-hot',
+    'fa-network-wired',
+    'fa-passport',
+    'fa-pen',
+    'fa-pencil-alt',
+    'fa-pepper-hot',
+    'fa-phone',
+    'fa-piggy-bank',
+    'fa-plane-alt',
+    'fa-plane-departure',
+    'fa-plug',
+    'fa-print',
+    'fa-project-diagram',
+    'fa-puzzle-piece',
+    'fa-receipt',
+    'fa-robot',
+    'fa-running',
+    'fa-satellite',
+    'fa-satellite-dish',
+    'fa-school',
+    'fa-screwdriver',
+    'fa-scroll',
+    'fa-shield-alt',
+    'fa-shopping-bag',
+    'fa-sign',
+    'fa-sitemap',
+    'fa-snowman',
+    'fa-solar-panel',
+    'fa-spa',
+    'fa-space-shuttle',
+    'fa-stamp',
+    'fa-stethoscope',
+    'fa-store',
+    'fa-store-alt',
+    'fa-suitcase',
+    'fa-sun-cloud',
+    'fa-swimmer',
+    'fa-sync',
+    'fa-syringe',
+    'fa-tablet',
+    'fa-tachometer-alt',
+    'fa-tag',
+    'fa-tags',
+    'fa-theater-masks',
+    'fa-toilet-paper',
+    'fa-toolbox',
+    'fa-tooth',
+    'fa-tools',
+    'fa-tractor',
+    'fa-trash-alt',
+    'fa-tree-alt',
+    'fa-truck',
+    'fa-tv',
+    'fa-umbrella-beach',
+    'fa-university',
+    'fa-user-graduate',
+    'fa-utensil-spoon',
+    'fa-vial',
+    'fa-video',
+    'fa-walking',
+    'fa-wallet',
+    'fa-warehouse',
+    'fa-water',
+    'fa-weight',
+    'fa-wifi',
+    'fa-wind',
+    'fa-yen-sign'
 ];
 
 let currentFolderIdForIcon = null;
 let currentFolderNameForIcon = null;
 let selectedIconClass = null;
+
+/**
+ * Get translated name for an icon
+ */
+function getIconTranslation(iconClass) {
+    const iconKey = iconClass.replace('fa-', '');
+    const translationKey = `icon_names.${iconKey}`;
+    return window.t ? window.t(translationKey, null, iconKey.replace(/-/g, ' ')) : iconKey.replace(/-/g, ' ');
+}
 
 /**
  * Show the folder icon selection modal
@@ -124,6 +268,10 @@ function showChangeFolderIconModal(folderId, folderName) {
     FOLDER_ICONS.forEach(iconClass => {
         const iconItem = document.createElement('div');
         iconItem.className = 'folder-icon-item';
+        iconItem.dataset.iconClass = iconClass;
+        iconItem.dataset.iconName = getIconTranslation(iconClass);
+        iconItem.title = getIconTranslation(iconClass);
+        
         if (iconClass === currentIcon) {
             iconItem.classList.add('selected');
             selectedIconClass = iconClass;
@@ -149,8 +297,47 @@ function showChangeFolderIconModal(folderId, folderName) {
         iconGrid.appendChild(iconItem);
     });
     
+    // Setup search functionality
+    const searchInput = document.getElementById('folderIconSearchInput');
+    if (searchInput) {
+        // Clear previous value
+        searchInput.value = '';
+        
+        // Remove previous event listeners by cloning the element
+        const newSearchInput = searchInput.cloneNode(true);
+        searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+        
+        // Add new event listener
+        newSearchInput.addEventListener('input', function(e) {
+            filterIcons(e.target.value);
+        });
+        
+        // Focus on search input
+        setTimeout(() => newSearchInput.focus(), 100);
+    }
+    
     // Show modal
     modal.style.display = 'block';
+}
+
+/**
+ * Filter icons based on search query
+ */
+function filterIcons(searchQuery) {
+    const query = searchQuery.toLowerCase().trim();
+    const iconItems = document.querySelectorAll('.folder-icon-item');
+    
+    iconItems.forEach(item => {
+        const iconName = item.dataset.iconName.toLowerCase();
+        const iconClass = item.dataset.iconClass.toLowerCase();
+        
+        // Show if query matches icon name or icon class
+        if (iconName.includes(query) || iconClass.includes(query)) {
+            item.classList.remove('hidden');
+        } else {
+            item.classList.add('hidden');
+        }
+    });
 }
 
 /**
