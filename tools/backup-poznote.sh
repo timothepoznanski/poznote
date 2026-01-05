@@ -74,10 +74,10 @@ log "Using credentials: $USERNAME"
 log "Backup directory: $BACKUP_DIR"
 log "Maximum backups to keep: $MAX_BACKUPS"
 
-# Call API to create backup
-RESPONSE=$(curl -s -u "$USERNAME:$PASSWORD" -X POST "$BASE_URL/api_backup.php")
+# Call API to create backup using REST API v1
+RESPONSE=$(curl -s -u "$USERNAME:$PASSWORD" -X POST "$BASE_URL/api/v1/backups")
 
-# Extract filename from response (API returns "backup_file" not "filename")
+# Extract filename from response
 FILENAME=$(echo "$RESPONSE" | jq -r '.backup_file')
 
 if [ "$FILENAME" = "null" ] || [ -z "$FILENAME" ]; then
@@ -92,8 +92,8 @@ SIZE_MB=$(echo "$RESPONSE" | jq -r '.backup_size_mb')
 
 log "Backup created: $FILENAME ($SIZE_MB MB)"
 
-# Download the backup
-DOWNLOAD_URL="$BASE_URL/api_download_backup.php?filename=$FILENAME"
+# Download the backup using REST API v1
+DOWNLOAD_URL="$BASE_URL/api/v1/backups/$FILENAME"
 OUTPUT_FILE="$BACKUP_DIR/$FILENAME"
 
 if curl -s -u "$USERNAME:$PASSWORD" -o "$OUTPUT_FILE" "$DOWNLOAD_URL"; then
@@ -130,9 +130,9 @@ if [ -d "$BACKUP_DIR" ]; then
     done
 fi
 
-# Clean old backups on server (via API)
+# Clean old backups on server (via REST API v1)
 log "Cleaning old backups on server..."
-SERVER_BACKUPS=$(curl -s -u "$USERNAME:$PASSWORD" "$BASE_URL/api_list_backups.php" | jq -r '.backups[] | .filename' | sort)
+SERVER_BACKUPS=$(curl -s -u "$USERNAME:$PASSWORD" "$BASE_URL/api/v1/backups" | jq -r '.backups[] | .filename' | sort)
 SERVER_COUNT=$(echo "$SERVER_BACKUPS" | grep -c "poznote_backup_")
 
 if [ "$SERVER_COUNT" -gt "$MAX_BACKUPS" ]; then
@@ -142,9 +142,7 @@ if [ "$SERVER_COUNT" -gt "$MAX_BACKUPS" ]; then
     # Get oldest backups to remove
     echo "$SERVER_BACKUPS" | head -n "$REMOVE_COUNT" | while read -r OLD_BACKUP; do
         if [ -n "$OLD_BACKUP" ]; then
-            DELETE_RESPONSE=$(curl -s -u "$USERNAME:$PASSWORD" -X POST "$BASE_URL/api_delete_backup.php" \
-                -H "Content-Type: application/json" \
-                -d "{\"filename\": \"$OLD_BACKUP\"}")
+            DELETE_RESPONSE=$(curl -s -u "$USERNAME:$PASSWORD" -X DELETE "$BASE_URL/api/v1/backups/$OLD_BACKUP")
             
             if echo "$DELETE_RESPONSE" | jq -e '.success' > /dev/null 2>&1; then
                 log "Deleted from server: $OLD_BACKUP"

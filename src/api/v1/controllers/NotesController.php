@@ -1144,15 +1144,188 @@ class NotesController {
             }
             
             $content = file_get_contents($currentFilePath);
+            $attachments = $note['attachments'] ? json_decode($note['attachments'], true) : [];
+            $attachmentsToRemove = [];
+            $attachmentsDir = getAttachmentsPath();
             
             // Convert content
             if ($targetType === 'markdown') {
+                // Converting HTML to markdown: extract base64 images and save as attachments
+                
+                // Find all base64 images in HTML: <img src="data:image/...;base64,...">
+                $content = preg_replace_callback(
+                    '/<img[^>]*src=["\']data:image\/([a-zA-Z0-9+]+);base64,([^"\']+)["\'][^>]*(?:alt=["\']([^"\']*)["\'])?[^>]*\/?>/is',
+                    function($matches) use ($id, $attachmentsDir, &$attachments) {
+                        $imageType = strtolower($matches[1]);
+                        $base64Data = $matches[2];
+                        $altText = isset($matches[3]) ? $matches[3] : '';
+                        
+                        // Determine file extension
+                        $extensionMap = [
+                            'jpeg' => 'jpg',
+                            'png' => 'png',
+                            'gif' => 'gif',
+                            'webp' => 'webp',
+                            'svg+xml' => 'svg',
+                            'bmp' => 'bmp'
+                        ];
+                        $extension = $extensionMap[$imageType] ?? 'png';
+                        $mimeType = 'image/' . ($imageType === 'svg+xml' ? 'svg+xml' : $imageType);
+                        
+                        // Decode base64 data
+                        $imageData = base64_decode($base64Data);
+                        if ($imageData === false) {
+                            // If decoding fails, keep original
+                            return $matches[0];
+                        }
+                        
+                        // Generate unique filename
+                        $attachmentId = uniqid();
+                        $filename = $attachmentId . '_' . time() . '.' . $extension;
+                        $filePath = $attachmentsDir . '/' . $filename;
+                        
+                        // Save the image file
+                        if (file_put_contents($filePath, $imageData) === false) {
+                            // If saving fails, keep original
+                            return $matches[0];
+                        }
+                        chmod($filePath, 0644);
+                        
+                        // Create attachment entry
+                        $originalFilename = !empty($altText) ? $altText . '.' . $extension : $filename;
+                        $newAttachment = [
+                            'id' => $attachmentId,
+                            'filename' => $filename,
+                            'original_filename' => $originalFilename,
+                            'file_size' => strlen($imageData),
+                            'file_type' => $mimeType,
+                            'uploaded_at' => date('Y-m-d H:i:s')
+                        ];
+                        $attachments[] = $newAttachment;
+                        
+                        // Return img tag with attachment reference for htmlToMarkdown to convert
+                        return '<img src="/api/v1/notes/' . $id . '/attachments/' . $attachmentId . '" alt="' . htmlspecialchars($altText) . '">';
+                    },
+                    $content
+                );
+                
+                // Also handle case where alt comes before src
+                $content = preg_replace_callback(
+                    '/<img[^>]*alt=["\']([^"\']*)["\'][^>]*src=["\']data:image\/([a-zA-Z0-9+]+);base64,([^"\']+)["\'][^>]*\/?>/is',
+                    function($matches) use ($id, $attachmentsDir, &$attachments) {
+                        $altText = $matches[1];
+                        $imageType = strtolower($matches[2]);
+                        $base64Data = $matches[3];
+                        
+                        // Determine file extension
+                        $extensionMap = [
+                            'jpeg' => 'jpg',
+                            'png' => 'png',
+                            'gif' => 'gif',
+                            'webp' => 'webp',
+                            'svg+xml' => 'svg',
+                            'bmp' => 'bmp'
+                        ];
+                        $extension = $extensionMap[$imageType] ?? 'png';
+                        $mimeType = 'image/' . ($imageType === 'svg+xml' ? 'svg+xml' : $imageType);
+                        
+                        // Decode base64 data
+                        $imageData = base64_decode($base64Data);
+                        if ($imageData === false) {
+                            return $matches[0];
+                        }
+                        
+                        // Generate unique filename
+                        $attachmentId = uniqid();
+                        $filename = $attachmentId . '_' . time() . '.' . $extension;
+                        $filePath = $attachmentsDir . '/' . $filename;
+                        
+                        // Save the image file
+                        if (file_put_contents($filePath, $imageData) === false) {
+                            return $matches[0];
+                        }
+                        chmod($filePath, 0644);
+                        
+                        // Create attachment entry
+                        $originalFilename = !empty($altText) ? $altText . '.' . $extension : $filename;
+                        $newAttachment = [
+                            'id' => $attachmentId,
+                            'filename' => $filename,
+                            'original_filename' => $originalFilename,
+                            'file_size' => strlen($imageData),
+                            'file_type' => $mimeType,
+                            'uploaded_at' => date('Y-m-d H:i:s')
+                        ];
+                        $attachments[] = $newAttachment;
+                        
+                        return '<img src="/api/v1/notes/' . $id . '/attachments/' . $attachmentId . '" alt="' . htmlspecialchars($altText) . '">';
+                    },
+                    $content
+                );
+                
                 $convertedContent = $this->htmlToMarkdown($content);
                 $newType = 'markdown';
             } else {
+                // Converting markdown to HTML: embed image attachments as base64
+                
+                // Find all markdown image references to attachments: ![...](/api/v1/notes/{id}/attachments/{attachmentId})
+                $content = preg_replace_callback(
+                    '/!\[([^\]]*)\]\(\/api\/v1\/notes\/' . preg_quote($id, '/') . '\/attachments\/([a-zA-Z0-9]+)\)/',
+                    function($matches) use ($attachments, $attachmentsDir, &$attachmentsToRemove) {
+                        $altText = $matches[1];
+                        $attachmentId = $matches[2];
+                        
+                        // Find the attachment in the list
+                        foreach ($attachments as $attachment) {
+                            if (isset($attachment['id']) && $attachment['id'] === $attachmentId) {
+                                $filePath = $attachmentsDir . '/' . $attachment['filename'];
+                                
+                                if (file_exists($filePath) && is_readable($filePath)) {
+                                    // Check if it's an image
+                                    $mimeType = $attachment['file_type'] ?? '';
+                                    if (strpos($mimeType, 'image/') === 0) {
+                                        // Read file and convert to base64
+                                        $fileContent = file_get_contents($filePath);
+                                        $base64 = base64_encode($fileContent);
+                                        $dataUri = 'data:' . $mimeType . ';base64,' . $base64;
+                                        
+                                        // Mark this attachment for removal
+                                        $attachmentsToRemove[] = $attachmentId;
+                                        
+                                        // Return markdown with base64 data URI
+                                        return '![' . $altText . '](' . $dataUri . ')';
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                        
+                        // If attachment not found or not an image, keep original reference
+                        return $matches[0];
+                    },
+                    $content
+                );
+                
                 require_once __DIR__ . '/../../../markdown_parser.php';
                 $convertedContent = parseMarkdown($content);
                 $newType = 'note';
+                
+                // Remove embedded image attachments from the note and delete files
+                if (!empty($attachmentsToRemove)) {
+                    $remainingAttachments = [];
+                    foreach ($attachments as $attachment) {
+                        if (in_array($attachment['id'], $attachmentsToRemove)) {
+                            // Delete the attachment file
+                            $filePath = $attachmentsDir . '/' . $attachment['filename'];
+                            if (file_exists($filePath)) {
+                                unlink($filePath);
+                            }
+                        } else {
+                            $remainingAttachments[] = $attachment;
+                        }
+                    }
+                    $attachments = $remainingAttachments;
+                }
             }
             
             // Create new file with converted content
@@ -1163,9 +1336,10 @@ class NotesController {
             }
             chmod($newFilePath, 0644);
             
-            // Update database
-            $updateStmt = $this->con->prepare("UPDATE entries SET type = ?, updated = datetime('now') WHERE id = ?");
-            $updateStmt->execute([$newType, $id]);
+            // Update database (including attachments if any were removed)
+            $attachmentsJson = !empty($attachments) ? json_encode($attachments) : null;
+            $updateStmt = $this->con->prepare("UPDATE entries SET type = ?, attachments = ?, updated = datetime('now') WHERE id = ?");
+            $updateStmt->execute([$newType, $attachmentsJson, $id]);
             
             // Delete old file if extension changed
             if ($currentFilePath !== $newFilePath && file_exists($currentFilePath)) {
@@ -1343,9 +1517,33 @@ class NotesController {
         $md = preg_replace('/<li[^>]*>(.*?)<\/li>/is', "- $1\n", $md);
         $md = preg_replace('/<\/?[ou]l[^>]*>/i', "\n", $md);
         
-        // Code
-        $md = preg_replace('/<code[^>]*>(.*?)<\/code>/is', "`$1`", $md);
-        $md = preg_replace('/<pre[^>]*>(.*?)<\/pre>/is', "```\n$1\n```\n", $md);
+        // Remove copy buttons from code blocks first
+        $md = preg_replace('/<button[^>]*class="[^"]*code-block-copy-btn[^"]*"[^>]*>.*?<\/button>/is', '', $md);
+        
+        // Code blocks (must be processed before inline code)
+        // Handle <pre><code>...</code></pre> with any attributes and whitespace
+        $md = preg_replace_callback('/<pre[^>]*>\s*<code[^>]*>(.*?)<\/code>\s*<\/pre>/is', function($matches) {
+            $code = html_entity_decode($matches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            return "\n```\n" . trim($code) . "\n```\n";
+        }, $md);
+        
+        // Handle <pre>...</pre> without <code> tag
+        $md = preg_replace_callback('/<pre[^>]*>(.*?)<\/pre>/is', function($matches) {
+            $code = html_entity_decode($matches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            return "\n```\n" . trim($code) . "\n```\n";
+        }, $md);
+        
+        // Handle standalone <code> blocks that might contain newlines (multi-line code without pre)
+        $md = preg_replace_callback('/<code[^>]*>(.*?)<\/code>/is', function($matches) {
+            $code = $matches[1];
+            // If the code contains newlines, treat it as a code block
+            if (strpos($code, "\n") !== false || strlen($code) > 80) {
+                $code = html_entity_decode($code, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                return "\n```\n" . trim($code) . "\n```\n";
+            }
+            // Otherwise, inline code with single backticks
+            return "`" . $code . "`";
+        }, $md);
         
         // Blockquote
         $md = preg_replace('/<blockquote[^>]*>(.*?)<\/blockquote>/is', "> $1\n", $md);
@@ -1355,6 +1553,15 @@ class NotesController {
         
         // Remove remaining HTML tags
         $md = strip_tags($md);
+        
+        // Convert HTML entities to normal characters
+        $md = html_entity_decode($md, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        
+        // Replace non-breaking spaces with regular spaces
+        $md = str_replace("\xC2\xA0", ' ', $md);  // UTF-8 non-breaking space
+        
+        // Clean up lines that are only whitespace
+        $md = preg_replace('/^[ \t]+$/m', '', $md);
         
         // Clean up whitespace
         $md = preg_replace('/\n{3,}/', "\n\n", $md);
