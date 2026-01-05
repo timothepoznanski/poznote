@@ -660,9 +660,9 @@ updated: 2024-01-20 15:45:00
 <summary><strong>Automated Backups with Bash Script</strong></summary>
 <br>
 
-For automated scheduled backups, you can use the included `backup-poznote.sh` script. This script creates complete backups via the Poznote API and automatically manages retention.
+For automated scheduled backups, you can use the included `backup-poznote.sh` script. This script creates complete backups via the Poznote REST API v1 and automatically manages retention.
 
-**Script location:** `backup-poznote.sh` in the folder tools in the Poznote repository
+**Script location:** `backup-poznote.sh` in the `tools` folder of the Poznote repository
 
 **Usage:**
 ```bash
@@ -686,10 +686,10 @@ To schedule automatic backups twice daily (at midnight and noon), add this line 
 
 **How the backup process works:**
 
-1. The script calls the Poznote API to create a backup at 00:00 (midnight) and 12:00 (noon) every day
+1. The script calls the Poznote REST API v1 (`POST /api/v1/backups`) to create a backup at 00:00 (midnight) and 12:00 (noon) every day
 2. The API generates a backup ZIP in the Poznote container: `/var/www/html/data/backups/`
-3. The script downloads this backup locally to: `/root/poznote/backups-poznote/`
-4. Old backups are automatically deleted from both locations to keep only the most recent ones based on retention count
+3. The script downloads this backup locally (`GET /api/v1/backups/{filename}`) to: `/root/poznote/backups-poznote/`
+4. Old backups are automatically deleted from both locations (`DELETE /api/v1/backups/{filename}`) to keep only the most recent ones based on retention count
 
 </details>
 
