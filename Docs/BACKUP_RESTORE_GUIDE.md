@@ -26,9 +26,9 @@ Poznote supports multiple methods for restoring backups of different sizes:
 **Best for**: Most users, quick restores
 
 1. Go to Settings → Restore/Import
-2. Select "Complete Restore"
+2. Select "Complete Restore from Poznote zip backup"
 3. Choose your backup ZIP file
-4. Click "Complete Restore"
+4. Click "Complete Restore from Poznote zip backup"
 
 **Limitations**: Files >500MB will be rejected with warning
 

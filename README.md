@@ -521,6 +521,20 @@ Single ZIP containing database, all notes, and attachments for all workspaces:
 
 </details>
 
+<a id="complete-restore"></a>
+<details>
+<summary><strong>Complete Restore from Poznote zip backup</strong></summary>
+<br>
+
+Upload the complete backup ZIP to restore everything:
+
+  - Replaces database, restores all notes, and attachments
+  - Works for all workspaces at once
+
+For more information about the different restore methods, see the [Backup & Restore Guide](https://github.com/timothepoznanski/poznote/blob/main/Docs/BACKUP_RESTORE_GUIDE.md).
+
+</details>
+
 <a id="import-individual-notes"></a>
 <details>
 <summary><strong>Import Individual Notes</strong></summary>
@@ -584,20 +598,6 @@ created: 2024-01-15 10:30:00
 updated: 2024-01-20 15:45:00
 ---
 ```
-
-</details>
-
-<a id="complete-restore"></a>
-<details>
-<summary><strong>Complete Restore</strong></summary>
-<br>
-
-Upload the complete backup ZIP to restore everything:
-
-  - Replaces database, restores all notes, and attachments
-  - Works for all workspaces at once
-
-For more information about the different restore methods, see the [Backup & Restore Guide](https://github.com/timothepoznanski/poznote/blob/main/Docs/BACKUP_RESTORE_GUIDE.md).
 
 </details>
 
