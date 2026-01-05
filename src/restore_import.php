@@ -271,6 +271,60 @@ function parseFrontMatter($content) {
     ];
 }
 
+/**
+ * Extract Obsidian-style inline tags from markdown content
+ * Obsidian tags are formatted as #tag (no space after #)
+ * This function looks for tags on the first line(s) of the content
+ * Returns array with 'tags' (array of tag strings) and 'content' (content with tag line removed)
+ */
+function extractObsidianTags($content) {
+    $tags = [];
+    $lines = explode("\n", $content);
+    $linesToRemove = 0;
+    
+    // Check each line from the beginning
+    foreach ($lines as $index => $line) {
+        $trimmedLine = trim($line);
+        
+        // Skip empty lines at the beginning
+        if (empty($trimmedLine)) {
+            $linesToRemove = $index + 1;
+            continue;
+        }
+        
+        // Check if this line contains only hashtags (Obsidian tags)
+        // Pattern: line starts with #word and contains only #word separated by spaces
+        // Make sure it's not a markdown heading (# followed by space then text)
+        if (preg_match('/^#[^\s#]/', $trimmedLine)) {
+            // This line starts with a hashtag (not a heading)
+            // Extract all hashtags from this line
+            if (preg_match_all('/#([^\s#]+)/', $trimmedLine, $matches)) {
+                $tags = array_merge($tags, $matches[1]);
+            }
+            $linesToRemove = $index + 1;
+            
+            // Continue to check next line for more tags
+            continue;
+        }
+        
+        // If we reach here, this line is not a tag line, stop looking
+        break;
+    }
+    
+    // Remove the tag lines from content
+    if ($linesToRemove > 0 && !empty($tags)) {
+        $lines = array_slice($lines, $linesToRemove);
+        $content = implode("\n", $lines);
+        // Trim leading whitespace/newlines
+        $content = ltrim($content, "\n\r");
+    }
+    
+    return [
+        'tags' => $tags,
+        'content' => $content
+    ];
+}
+
 function importNotesZip($uploadedFile) {
     global $con;
     
@@ -1274,11 +1328,17 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         $favorite = 0;
         $created = null;
         $updated = null;
+        $obsidianTags = [];
         
         if ($noteType === 'markdown') {
             $parsed = parseFrontMatter($content);
             $frontMatterData = $parsed['metadata'];
             $content = $parsed['content']; // Remove front matter from content
+            
+            // Also extract Obsidian-style inline tags (#tag) from the beginning of content
+            $obsidianTagsResult = extractObsidianTags($content);
+            $obsidianTags = $obsidianTagsResult['tags'];
+            $content = $obsidianTagsResult['content'];
         }
         
         // Extract title - prioritize front matter, then filename
@@ -1291,13 +1351,27 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
             $title = pathinfo($fileName, PATHINFO_FILENAME);
         }
         
-        // Extract tags from front matter
+        // Extract tags from front matter and Obsidian inline tags
+        $allTags = [];
+        
+        // First, get tags from front matter
         if ($frontMatterData && isset($frontMatterData['tags'])) {
             if (is_array($frontMatterData['tags'])) {
-                $tags = implode(', ', $frontMatterData['tags']);
+                $allTags = array_merge($allTags, $frontMatterData['tags']);
             } else if (is_string($frontMatterData['tags'])) {
-                $tags = $frontMatterData['tags'];
+                $allTags[] = $frontMatterData['tags'];
             }
+        }
+        
+        // Then, add Obsidian inline tags
+        if (!empty($obsidianTags)) {
+            $allTags = array_merge($allTags, $obsidianTags);
+        }
+        
+        // Remove duplicates and format tags
+        if (!empty($allTags)) {
+            $allTags = array_unique($allTags);
+            $tags = implode(', ', $allTags);
         }
         
         // Validate tags format - replace spaces with underscores
@@ -1604,6 +1678,11 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             $parsed = parseFrontMatter($content);
             $frontMatterData = $parsed['metadata'];
             $content = $parsed['content']; // Remove front matter from content
+            
+            // Also extract Obsidian-style inline tags (#tag) from the beginning of content
+            $obsidianTagsResult = extractObsidianTags($content);
+            $obsidianTags = $obsidianTagsResult['tags'];
+            $content = $obsidianTagsResult['content'];
         }
         
         // Extract title - prioritize front matter, then filename
@@ -1616,10 +1695,24 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             $title = pathinfo($fileName, PATHINFO_FILENAME);
         }
         
-        // Extract tags from front matter
+        // Extract tags from front matter and Obsidian inline tags
         $tags = '';
+        $allTags = [];
+        
+        // First, get tags from front matter
         if ($frontMatterData && isset($frontMatterData['tags']) && is_array($frontMatterData['tags'])) {
-            $tags = implode(', ', $frontMatterData['tags']);
+            $allTags = array_merge($allTags, $frontMatterData['tags']);
+        }
+        
+        // Then, add Obsidian inline tags
+        if (isset($obsidianTags) && !empty($obsidianTags)) {
+            $allTags = array_merge($allTags, $obsidianTags);
+        }
+        
+        // Remove duplicates and format tags
+        if (!empty($allTags)) {
+            $allTags = array_unique($allTags);
+            $tags = implode(', ', $allTags);
         }
         
         // Validate tags format - replace spaces with underscores
