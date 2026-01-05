@@ -537,30 +537,32 @@ For more information about the different restore methods, see the [Backup & Rest
 
 <a id="import-individual-notes"></a>
 <details>
-<summary><strong>Import Individual Notes</strong></summary>
+<summary><strong>Import Individual files</strong></summary>
 <br>
 
-Import one or more HTML, Markdown or text notes directly, or upload a ZIP archive containing multiple notes:
+Import one or more HTML, Markdown or text notes directly:
 
-  - Support `.html`, `.md`, `.markdown`, `.txt`, or `.zip` file types
-  - ZIP archives can contain up to 300 files, configurable via `POZNOTE_IMPORT_MAX_ZIP_FILES` in your `.env`
+  - Support `.html`, `.md`, `.markdown` or `.txt` files types
   - Up to 50 files can be selected at once, configurable via `POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES` in your `.env`
 
 </details>
+
+<a id="import-zip-notes"></a>
 <details>
-<summary><strong>Folder Structure in ZIP Archives</strong></summary>
+<summary><strong>Import ZIP file</strong></summary>
 <br>
 
-When importing a ZIP archive, Poznote automatically detects and recreates the folder structure:
+Import a ZIP archive containing multiple notes:
 
-  - **Folders in ZIP become Folders in Poznote**: If your ZIP contains directories, they will be automatically created as folders, preserving the full hierarchy including subfolders
-  - **Example**: A ZIP with `Projects/2024/Notes/note.md` will create the folders `Projects` → `2024` → `Notes` and place the note in `Notes`
-  - **Compatible with any note-taking app**: Export from any app that supports folder structures
-  - **Multiple root folders**: If your ZIP has `folder1/note.md` and `folder2/note.md`, both `folder1` and `folder2` will be created
+  - Support `.html`, `.md`, `.markdown` or `.txt` files types
+  - ZIP archives can contain up to 300 files, configurable via `POZNOTE_IMPORT_MAX_ZIP_FILES` in your `.env`
+  - When importing a ZIP archive, Poznote automatically detects and recreates the folder structure
 
 </details>
 
-**Markdown Front Matter Support**
+<details>
+<summary><strong>Markdown Front Matter Support</strong></summary>
+<br>
 
 Markdown files can include YAML front matter to specify note metadata. The following keys are supported:
 
