@@ -510,7 +510,7 @@ Poznote includes built-in Backup / Export and Restoration / Import functionality
 
 <a id="complete-backup"></a>
 <details>
-<summary><strong>Complete Backup</strong></summary>
+<summary><strong>Complete Backup to Poznote zip</strong></summary>
 <br>
 
 Single ZIP containing database, all notes, and attachments for all workspaces:
@@ -557,6 +557,20 @@ Import a ZIP archive containing multiple notes:
   - Support `.html`, `.md`, `.markdown` or `.txt` files types
   - ZIP archives can contain up to 300 files, configurable via `POZNOTE_IMPORT_MAX_ZIP_FILES` in your `.env`
   - When importing a ZIP archive, Poznote automatically detects and recreates the folder structure
+
+</details>
+
+<a id="import-obsidian-notes"></a>
+<details>
+<summary><strong>Import Obsidian Notes</strong></summary>
+<br>
+
+Import a ZIP archive containing multiple notes from Obsidian:
+
+  - ZIP archives can contain up to 300 files, configurable via `POZNOTE_IMPORT_MAX_ZIP_FILES` in your `.env`
+  - Poznote automatically detects and recreates the folder structure
+  - Poznote automatically detects existing tags to create
+  - Poznote automatically imports images if they are at the zip file root
 
 </details>
 
