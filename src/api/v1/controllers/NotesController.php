@@ -1343,9 +1343,15 @@ class NotesController {
         $md = preg_replace('/<li[^>]*>(.*?)<\/li>/is', "- $1\n", $md);
         $md = preg_replace('/<\/?[ou]l[^>]*>/i', "\n", $md);
         
-        // Code
-        $md = preg_replace('/<code[^>]*>(.*?)<\/code>/is', "`$1`", $md);
+        // Remove copy buttons from code blocks first
+        $md = preg_replace('/<button[^>]*class="[^"]*code-block-copy-btn[^"]*"[^>]*>.*?<\/button>/is', '', $md);
+        
+        // Code blocks (must be processed before inline code)
+        // Handle <pre><code>...</code></pre> and <pre><code>...</code>...</pre> (with extra content after code)
+        $md = preg_replace('/<pre[^>]*>\s*<code[^>]*>(.*?)<\/code>\s*<\/pre>/is', "```\n$1\n```\n", $md);
         $md = preg_replace('/<pre[^>]*>(.*?)<\/pre>/is', "```\n$1\n```\n", $md);
+        // Inline code
+        $md = preg_replace('/<code[^>]*>(.*?)<\/code>/is', "`$1`", $md);
         
         // Blockquote
         $md = preg_replace('/<blockquote[^>]*>(.*?)<\/blockquote>/is', "> $1\n", $md);
