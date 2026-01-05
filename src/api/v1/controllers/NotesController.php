@@ -1151,7 +1151,7 @@ class NotesController {
                 $newType = 'markdown';
             } else {
                 require_once __DIR__ . '/../../../markdown_parser.php';
-                $convertedContent = parseMarkdownToHtml($content);
+                $convertedContent = parseMarkdown($content);
                 $newType = 'note';
             }
             
