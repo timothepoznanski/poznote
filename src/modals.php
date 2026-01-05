@@ -551,12 +551,15 @@
 <!-- Folder Icon Modal -->
 <div id="folderIconModal" class="modal">
     <div class="modal-content folder-icon-modal-content">
+        <div class="folder-icon-search-wrapper">
+            <input type="text" id="folderIconSearchInput" placeholder="<?php echo t_h('modals.folder_icon.search_placeholder', [], 'Search icons...'); ?>" autocomplete="off">
+        </div>
         <div class="folder-icon-grid" id="folderIconGrid">
             <!-- Icons will be populated here -->
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-folder-icon-modal"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-secondary" id="resetFolderIconBtn"><?php echo t_h('modals.folder_icon.reset', [], 'Restore default behavior'); ?> <i class="fa-folder-open"></i> / <i class="fa-folder"></i></button>
+            <button type="button" class="btn-secondary" id="resetFolderIconBtn"><i class="fa-folder-open"></i> / <i class="fa-folder"></i></button>
         </div>
     </div>
 </div>

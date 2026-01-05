@@ -57,7 +57,7 @@ async function loadAttachments() {
     const workspace = getPageWorkspace();
     
     try {
-        const response = await fetch('api_list_notes_with_attachments.php' + (workspace ? '?workspace=' + encodeURIComponent(workspace) : ''), {
+        const response = await fetch('/api/v1/notes/with-attachments' + (workspace ? '?workspace=' + encodeURIComponent(workspace) : ''), {
             credentials: 'same-origin'
         });
         
@@ -182,5 +182,5 @@ function downloadAttachment(attachmentId, noteId) {
         console.error('Missing noteId or attachmentId');
         return;
     }
-    window.open('api_attachments.php?action=download&note_id=' + noteId + '&attachment_id=' + attachmentId, '_blank');
+    window.open('/api/v1/notes/' + noteId + '/attachments/' + attachmentId, '_blank');
 }

@@ -45,12 +45,13 @@ function saveSubheading(noteId) {
     var newSub = input.value.trim();
     
     // Send update request
-    fetch('api_update_subheading.php', {
-        method: 'POST',
+    fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/subheading', {
+        method: 'PATCH',
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json',
         },
-        body: 'note_id=' + encodeURIComponent(noteId) + '&subheading=' + encodeURIComponent(newSub)
+        credentials: 'same-origin',
+        body: JSON.stringify({ subheading: newSub })
     })
     .then(function(response) { return response.json(); })
     .then(function(data) {

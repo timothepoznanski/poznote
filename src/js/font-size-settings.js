@@ -90,11 +90,9 @@ function updateFontSizePreview() {
 // Function to load current font size settings
 function loadCurrentFontSizes() {
     // Load font size
-    fetch('api_settings.php', { 
-        method: 'POST', 
-        credentials: 'same-origin', 
-        headers: { 'Content-Type':'application/x-www-form-urlencoded' }, 
-        body: 'action=get&key=note_font_size' 
+    fetch('/api/v1/settings/note_font_size', { 
+        method: 'GET', 
+        credentials: 'same-origin'
     })
     .then(function(response) {
         if (!response.ok) {
@@ -137,11 +135,11 @@ function saveFontSize() {
     }
     
     // Save setting to server
-    fetch('api_settings.php', { 
-        method: 'POST', 
+    fetch('/api/v1/settings/note_font_size', { 
+        method: 'PUT', 
         credentials: 'same-origin', 
-        headers: { 'Content-Type':'application/x-www-form-urlencoded' }, 
-        body: `action=set&key=note_font_size&value=${fontSize}` 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ value: fontSize })
     })
     .then(function(response) {
         if (!response.ok) {
@@ -179,11 +177,9 @@ function applyFontSizeToNotes() {
     }
     
     // Get the font size from settings
-    fetch('api_settings.php', { 
-        method: 'POST', 
-        credentials: 'same-origin', 
-        headers: { 'Content-Type':'application/x-www-form-urlencoded' }, 
-        body: 'action=get&key=note_font_size' 
+    fetch('/api/v1/settings/note_font_size', { 
+        method: 'GET', 
+        credentials: 'same-origin'
     })
     .then(function(response) {
         if (!response.ok) {

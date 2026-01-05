@@ -29,9 +29,9 @@ function refreshTagsCount() {
     const urlParams = new URLSearchParams(window.location.search);
     const workspace = urlParams.get('workspace') || '';
     
-    const url = 'api_list_tags.php' + (workspace ? ('?workspace=' + encodeURIComponent(workspace)) : '');
+    const url = '/api/v1/tags' + (workspace ? ('?workspace=' + encodeURIComponent(workspace)) : '');
     
-    fetch(url, { credentials: 'same-origin' })
+    fetch(url, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
         .then(r => r.json())
         .then(data => {
             if (data && data.success && Array.isArray(data.tags)) {
@@ -180,8 +180,8 @@ function fetchAllTags(workspace) {
             return;
         }
 
-        const url = 'api_list_tags.php' + (workspace ? ('?workspace=' + encodeURIComponent(workspace)) : '');
-        fetch(url, { credentials: 'same-origin' })
+        const url = '/api/v1/tags' + (workspace ? ('?workspace=' + encodeURIComponent(workspace)) : '');
+        fetch(url, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
             .then(r => r.json())
             .then(data => {
                 if (data && data.success && Array.isArray(data.tags)) {

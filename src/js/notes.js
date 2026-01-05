@@ -12,30 +12,26 @@ function getNoteElements(noteId) {
 }
 
 function createNewNote() {
-    var params = new URLSearchParams({
-        now: (new Date().getTime()/1000) - new Date().getTimezoneOffset()*60,
-        folder_id: selectedFolderId,
-        workspace: selectedWorkspace || getSelectedWorkspace()
-    });
+    var noteData = {
+        folder_id: selectedFolderId || null,
+        workspace: selectedWorkspace || getSelectedWorkspace(),
+        type: 'note'
+    };
     
-    fetch("api_insert_new.php", {
+    // Use RESTful API: POST /api/v1/notes
+    fetch("/api/v1/notes", {
         method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest' },
-        body: params.toString()
+        headers: { "Content-Type": "application/json", 'X-Requested-With': 'XMLHttpRequest' },
+        body: JSON.stringify(noteData)
     })
-    .then(function(response) { return response.text(); })
+    .then(function(response) { return response.json(); })
     .then(function(data) {
-        try {
-            var res = JSON.parse(data);
-            if(res.status === 1) {
-                window.scrollTo(0, 0);
-                var ws = encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
-                window.location.href = "index.php?workspace=" + ws + "&note=" + res.id + "&scroll=1";
-            } else {
-                showNotificationPopup(res.error || 'Error creating note', 'error');
-            }
-        } catch(e) {
-            showNotificationPopup('Error creating note: ' + data, 'error');
+        if(data.success && data.note) {
+            window.scrollTo(0, 0);
+            var ws = encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
+            window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
+        } else {
+            showNotificationPopup(data.error || 'Error creating note', 'error');
         }
     })
     .catch(function(error) {
@@ -44,31 +40,26 @@ function createNewNote() {
 }
 
 function createTaskListNote() {
-    var params = new URLSearchParams({
-        now: (new Date().getTime()/1000) - new Date().getTimezoneOffset()*60,
-        folder_id: selectedFolderId,
+    var noteData = {
+        folder_id: selectedFolderId || null,
         workspace: selectedWorkspace || getSelectedWorkspace(),
         type: 'tasklist'
-    });
+    };
     
-    fetch("api_insert_new.php", {
+    // Use RESTful API: POST /api/v1/notes
+    fetch("/api/v1/notes", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest' },
-        body: params.toString()
+        headers: { "Content-Type": "application/json", 'X-Requested-With': 'XMLHttpRequest' },
+        body: JSON.stringify(noteData)
     })
-    .then(function(response) { return response.text(); })
+    .then(function(response) { return response.json(); })
     .then(function(data) {
-        try {
-            var res = JSON.parse(data);
-            if(res.status === 1) {
-                window.scrollTo(0, 0);
-                var ws = encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
-                window.location.href = "index.php?workspace=" + ws + "&note=" + res.id + "&scroll=1";
-            } else {
-                showNotificationPopup(res.error || 'Error creating tasklist', 'error');
-            }
-        } catch(e) {
-            showNotificationPopup('Error creating tasklist: ' + data, 'error');
+        if(data.success && data.note) {
+            window.scrollTo(0, 0);
+            var ws = encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
+            window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
+        } else {
+            showNotificationPopup(data.error || 'Error creating tasklist', 'error');
         }
     })
     .catch(function(error) {
@@ -77,31 +68,26 @@ function createTaskListNote() {
 }
 
 function createMarkdownNote() {
-    var params = new URLSearchParams({
-        now: (new Date().getTime()/1000) - new Date().getTimezoneOffset()*60,
-        folder_id: selectedFolderId,
+    var noteData = {
+        folder_id: selectedFolderId || null,
         workspace: selectedWorkspace || getSelectedWorkspace(),
         type: 'markdown'
-    });
+    };
     
-    fetch("api_insert_new.php", {
+    // Use RESTful API: POST /api/v1/notes
+    fetch("/api/v1/notes", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest' },
-        body: params.toString()
+        headers: { "Content-Type": "application/json", 'X-Requested-With': 'XMLHttpRequest' },
+        body: JSON.stringify(noteData)
     })
-    .then(function(response) { return response.text(); })
+    .then(function(response) { return response.json(); })
     .then(function(data) {
-        try {
-            var res = JSON.parse(data);
-            if(res.status === 1) {
-                window.scrollTo(0, 0);
-                var ws = encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
-                window.location.href = "index.php?workspace=" + ws + "&note=" + res.id + "&scroll=1";
-            } else {
-                showNotificationPopup(res.error || 'Error creating markdown note', 'error');
-            }
-        } catch(e) {
-            showNotificationPopup('Error creating markdown note: ' + data, 'error');
+        if(data.success && data.note) {
+            window.scrollTo(0, 0);
+            var ws = encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
+            window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
+        } else {
+            showNotificationPopup(data.error || 'Error creating markdown note', 'error');
         }
     })
     .catch(function(error) {
@@ -198,22 +184,22 @@ function saveNoteToServer() {
         }
     }
 
-    var params = {
-        id: noteid,
+    var updates = {
         heading: headi,
-        entry: ent,
+        content: ent,
         tags: tags,
         folder_id: folderId,
         workspace: selectedWorkspace || getSelectedWorkspace()
     };
     
-    fetch("api_update_note.php", {
-        method: "POST",
+    // Use RESTful API: PATCH /api/v1/notes/{id}
+    fetch("/api/v1/notes/" + noteid, {
+        method: "PATCH",
         headers: { 
             "Content-Type": "application/json",
             'X-Requested-With': 'XMLHttpRequest'
         },
-        body: JSON.stringify(params)
+        body: JSON.stringify(updates)
     })
     .then(function(response) { return response.json(); })
     .then(function(data) {
@@ -227,7 +213,7 @@ function saveNoteToServer() {
         } else {
             // Show user-visible error notification
             if (typeof showNotificationPopup === 'function') {
-                showNotificationPopup(data.message || 'Error saving note', 'error');
+                showNotificationPopup(data.error || data.message || 'Error saving note', 'error');
             }
         }
     })
@@ -332,19 +318,17 @@ function handleSaveResponse(data) {
 
 function deleteNote(noteId) {
     const workspace = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? pageWorkspace : null;
-    const requestBody = {
-        note_id: noteId,
-        permanent: false
-    };
     
+    // Build query params for RESTful API
+    let url = "/api/v1/notes/" + noteId + "?permanent=false";
     if (workspace) {
-        requestBody.workspace = workspace;
+        url += "&workspace=" + encodeURIComponent(workspace);
     }
     
-    fetch("api_delete_note.php", {
+    // Use RESTful API: DELETE /api/v1/notes/{id}
+    fetch(url, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody)
+        headers: { "Content-Type": "application/json" }
     })
     .then(function(response) { return response.json(); })
     .then(function(data) {
@@ -353,8 +337,8 @@ function deleteNote(noteId) {
             return;
         }
         
-        if (data && data.message) {
-            showNotificationPopup('Deletion error: ' + data.message, 'error');
+        if (data && (data.error || data.message)) {
+            showNotificationPopup('Deletion error: ' + (data.error || data.message), 'error');
         } else {
             showNotificationPopup('Deletion error: Unknown error', 'error');
         }

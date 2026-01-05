@@ -58,7 +58,26 @@ try {
         type TEXT DEFAULT "note"
     )');
 
+    // Add 'folder_id' column to entries if it doesn't exist (migration for old backups)
+    try {
+        $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
+        $hasFolderId = false;
+        foreach ($cols as $c) {
+            if (isset($c['name']) && $c['name'] === 'folder_id') {
+                $hasFolderId = true;
+                break;
+            }
+        }
+        if (!$hasFolderId) {
+            $con->exec("ALTER TABLE entries ADD COLUMN folder_id INTEGER REFERENCES folders(id) ON DELETE SET NULL");
+        }
+    } catch (Exception $e) {
+        error_log('Could not add folder_id column to entries: ' . $e->getMessage());
+    }
+
     // Create folders table for empty folders (scoped by workspace)
+    // Note: For new installations this creates the full schema.
+    // For old backups, this does nothing since table exists (migrations below handle missing columns)
     $con->exec('CREATE TABLE IF NOT EXISTS folders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -68,16 +87,25 @@ try {
         FOREIGN KEY (parent_id) REFERENCES folders(id) ON DELETE CASCADE
     )');
 
-    // Ensure unique folder names per workspace and parent
-    // For subfolders (parent_id IS NOT NULL): same name allowed in different parents
-    $con->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_folders_name_workspace_parent_notnull 
-                ON folders(name, workspace, parent_id) 
-                WHERE parent_id IS NOT NULL');
+    // === MIGRATIONS FOR OLD BACKUPS ===
+    // These MUST run BEFORE any indexes that use these columns
     
-    // For root folders (parent_id IS NULL): same name NOT allowed
-    $con->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_folders_name_workspace_root 
-                ON folders(name, workspace) 
-                WHERE parent_id IS NULL');
+    // Add 'parent_id' column to folders if it doesn't exist (for subfolder support - migration for old backups)
+    try {
+        $cols = $con->query("PRAGMA table_info(folders)")->fetchAll(PDO::FETCH_ASSOC);
+        $hasParentId = false;
+        foreach ($cols as $c) {
+            if (isset($c['name']) && $c['name'] === 'parent_id') {
+                $hasParentId = true;
+                break;
+            }
+        }
+        if (!$hasParentId) {
+            $con->exec("ALTER TABLE folders ADD COLUMN parent_id INTEGER DEFAULT NULL");
+        }
+    } catch (Exception $e) {
+        error_log('Could not add parent_id column to folders: ' . $e->getMessage());
+    }
 
     // Add 'icon' column to folders if it doesn't exist (for custom folder icons)
     try {
@@ -93,9 +121,22 @@ try {
             $con->exec("ALTER TABLE folders ADD COLUMN icon TEXT");
         }
     } catch (Exception $e) {
-        // Non-fatal: if this fails, continue without icon support
         error_log('Could not add icon column to folders: ' . $e->getMessage());
     }
+
+    // === END MIGRATIONS ===
+
+    // Ensure unique folder names per workspace and parent
+    // These indexes use parent_id, so they MUST come AFTER the migration above
+    // For subfolders (parent_id IS NOT NULL): same name allowed in different parents
+    $con->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_folders_name_workspace_parent_notnull 
+                ON folders(name, workspace, parent_id) 
+                WHERE parent_id IS NOT NULL');
+    
+    // For root folders (parent_id IS NULL): same name NOT allowed
+    $con->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_folders_name_workspace_root 
+                ON folders(name, workspace) 
+                WHERE parent_id IS NULL');
 
     // Create workspaces table
     $con->exec('CREATE TABLE IF NOT EXISTS workspaces (

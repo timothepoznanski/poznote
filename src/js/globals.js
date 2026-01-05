@@ -41,10 +41,10 @@ function getSelectedWorkspace() {
 // Apply global preferences on load
 document.addEventListener('DOMContentLoaded', function() {
     try {
-        var form = new FormData();
-        form.append('action', 'get');
-        form.append('key', 'emoji_icons_enabled');
-        fetch('api_settings.php', { method: 'POST', body: form })
+        fetch('/api/v1/settings/emoji_icons_enabled', {
+            method: 'GET',
+            credentials: 'same-origin'
+        })
         .then(function(r) { return r.json(); })
         .then(function(j) {
             var enabled = j && j.success && (j.value === '1' || j.value === 'true');
@@ -137,7 +137,7 @@ window.addEventListener('resize', function() {
     };
 
     window.loadPoznoteI18n = function() {
-        return fetch('api_i18n.php', { credentials: 'same-origin' })
+        return fetch('api/v1/system/i18n', { credentials: 'same-origin' })
             .then(function(r) { return r.json(); })
             .then(function(j) {
                 if (j && j.success && j.strings) {
