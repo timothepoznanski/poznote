@@ -1362,6 +1362,15 @@ class NotesController {
         // Remove remaining HTML tags
         $md = strip_tags($md);
         
+        // Convert HTML entities to normal characters
+        $md = html_entity_decode($md, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        
+        // Replace non-breaking spaces with regular spaces
+        $md = str_replace("\xC2\xA0", ' ', $md);  // UTF-8 non-breaking space
+        
+        // Clean up lines that are only whitespace
+        $md = preg_replace('/^[ \t]+$/m', '', $md);
+        
         // Clean up whitespace
         $md = preg_replace('/\n{3,}/', "\n\n", $md);
         $md = trim($md);
