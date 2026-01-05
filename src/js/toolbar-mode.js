@@ -33,11 +33,10 @@
 
     function loadToolbarMode() {
         try {
-            const form = new FormData();
-            form.append('action', 'get');
-            form.append('key', 'toolbar_mode');
-
-            fetch('api_settings.php', { method: 'POST', body: form })
+            fetch('/api/v1/settings/toolbar_mode', {
+                method: 'GET',
+                credentials: 'same-origin'
+            })
                 .then(r => r.json())
                 .then(j => {
                     const mode = (j && j.success && j.value) ? j.value : 'both';

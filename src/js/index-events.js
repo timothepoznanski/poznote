@@ -448,31 +448,26 @@
 
     // Task list creation function
     window.createTaskListNote = function() {
-        var params = new URLSearchParams({
-            now: (new Date().getTime() / 1000) - new Date().getTimezoneOffset() * 60,
-            folder: window.selectedFolder || '',
+        var noteData = {
+            folder_id: window.selectedFolderId || null,
             workspace: window.selectedWorkspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : ''),
             type: 'tasklist'
-        });
+        };
 
-        fetch("api_insert_new.php", {
+        // Use RESTful API: POST /api/v1/notes
+        fetch("/api/v1/notes", {
             method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest' },
-            body: params.toString()
+            headers: { "Content-Type": "application/json", 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify(noteData)
         })
-        .then(function(response) { return response.text(); })
+        .then(function(response) { return response.json(); })
         .then(function(data) {
-            try {
-                var res = JSON.parse(data);
-                if (res.status === 1) {
-                    window.scrollTo(0, 0);
-                    var ws = encodeURIComponent(window.selectedWorkspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : ''));
-                    window.location.href = "index.php?workspace=" + ws + "&note=" + res.id + "&scroll=1";
-                } else {
-                    showNotificationPopup(res.error || (window.t ? window.t('index.errors.create_task_list', null, 'Error creating task list') : 'Error creating task list'), 'error');
-                }
-            } catch (e) {
-                showNotificationPopup((window.t ? window.t('index.errors.create_task_list_prefix', null, 'Error creating task list: ') : 'Error creating task list: ') + data, 'error');
+            if (data.success && data.note) {
+                window.scrollTo(0, 0);
+                var ws = encodeURIComponent(window.selectedWorkspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : ''));
+                window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
+            } else {
+                showNotificationPopup(data.error || (window.t ? window.t('index.errors.create_task_list', null, 'Error creating task list') : 'Error creating task list'), 'error');
             }
         })
         .catch(function(error) {
@@ -482,31 +477,26 @@
 
     // Markdown note creation function
     window.createMarkdownNote = function() {
-        var params = new URLSearchParams({
-            now: (new Date().getTime() / 1000) - new Date().getTimezoneOffset() * 60,
-            folder: window.selectedFolder || '',
+        var noteData = {
+            folder_id: window.selectedFolderId || null,
             workspace: window.selectedWorkspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : ''),
             type: 'markdown'
-        });
+        };
 
-        fetch("api_insert_new.php", {
+        // Use RESTful API: POST /api/v1/notes
+        fetch("/api/v1/notes", {
             method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest' },
-            body: params.toString()
+            headers: { "Content-Type": "application/json", 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify(noteData)
         })
-        .then(function(response) { return response.text(); })
+        .then(function(response) { return response.json(); })
         .then(function(data) {
-            try {
-                var res = JSON.parse(data);
-                if (res.status === 1) {
-                    window.scrollTo(0, 0);
-                    var ws = encodeURIComponent(window.selectedWorkspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : ''));
-                    window.location.href = "index.php?workspace=" + ws + "&note=" + res.id + "&scroll=1";
-                } else {
-                    showNotificationPopup(res.error || (window.t ? window.t('index.errors.create_markdown_note', null, 'Error creating markdown note') : 'Error creating markdown note'), 'error');
-                }
-            } catch (e) {
-                showNotificationPopup((window.t ? window.t('index.errors.create_markdown_note_prefix', null, 'Error creating markdown note: ') : 'Error creating markdown note: ') + data, 'error');
+            if (data.success && data.note) {
+                window.scrollTo(0, 0);
+                var ws = encodeURIComponent(window.selectedWorkspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : ''));
+                window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
+            } else {
+                showNotificationPopup(data.error || (window.t ? window.t('index.errors.create_markdown_note', null, 'Error creating markdown note') : 'Error creating markdown note'), 'error');
             }
         })
         .catch(function(error) {
@@ -552,11 +542,11 @@
         var input = document.getElementById('subheading-input-' + noteId);
         if (!disp || !input) return;
         var newVal = input.value.trim();
-        var body = 'note_id=' + encodeURIComponent(noteId) + '&subheading=' + encodeURIComponent(newVal);
-        fetch('api_update_subheading.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: body
+        fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/subheading', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ subheading: newVal })
         }).then(function(r) { return r.json(); }).then(function(data) {
             if (data && data.success) {
                 disp.textContent = newVal || '';

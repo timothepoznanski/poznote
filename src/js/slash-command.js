@@ -563,21 +563,20 @@
                         
                         // Upload the file
                         const formData = new FormData();
-                        formData.append('action', 'upload');
                         formData.append('note_id', noteId);
                         formData.append('file', file);
                         if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) {
                             formData.append('workspace', selectedWorkspace);
                         }
                         
-                        fetch('api_attachments.php', {
+                        fetch('/api/v1/notes/' + noteId + '/attachments', {
                             method: 'POST',
                             body: formData
                         })
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                const imageMarkdown = '![' + file.name + '](api_attachments.php?action=download&note_id=' + noteId + '&attachment_id=' + data.attachment_id + ')';
+                                const imageMarkdown = '![' + file.name + '](/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id + ')';
                                 
                                 // Replace loading text
                                 const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null);

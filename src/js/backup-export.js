@@ -57,9 +57,10 @@ function loadWorkspacesForStructuredExport() {
     var select = document.getElementById('structuredExportWorkspaceSelect');
     if (!select) return;
     
-    fetch('api_workspaces.php?action=list', {
+    fetch('/api/v1/workspaces', {
         method: 'GET',
-        headers: { 'Accept': 'application/json' }
+        headers: { 'Accept': 'application/json' },
+        credentials: 'same-origin'
     })
     .then(function(response) { return response.json(); })
     .then(function(data) {

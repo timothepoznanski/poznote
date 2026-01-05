@@ -38,10 +38,11 @@
     
     // Generic function to get setting value from API
     function getSetting(key, callback) {
-        var form = new FormData();
-        form.append('action', 'get');
-        form.append('key', key);
-        fetch('api_settings.php', {method: 'POST', body: form})
+        fetch('/api/v1/settings/' + encodeURIComponent(key), {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' },
+            credentials: 'same-origin'
+        })
             .then(function(r) { return r.json(); })
             .then(function(j) {
                 if (j && j.success) {
@@ -55,11 +56,12 @@
     
     // Generic function to set setting value via API
     function setSetting(key, value, callback) {
-        var form = new FormData();
-        form.append('action', 'set');
-        form.append('key', key);
-        form.append('value', value);
-        fetch('api_settings.php', {method: 'POST', body: form})
+        fetch('/api/v1/settings/' + encodeURIComponent(key), {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ value: value })
+        })
             .then(function(r) { return r.json(); })
             .then(function(result) {
                 if (callback) callback(result && result.success);

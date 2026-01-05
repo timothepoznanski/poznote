@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
         
         try {
-            const response = await fetch('api_verify_settings_password.php', {
+            const response = await fetch('api/v1/system/verify-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

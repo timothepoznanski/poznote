@@ -155,7 +155,6 @@
         document.getElementById('uploadBtn').disabled = true;
 
         var formData = new FormData();
-        formData.append('action', 'upload');
         formData.append('note_id', noteId);
         if (noteWorkspace) {
             formData.append('workspace', noteWorkspace);
@@ -201,18 +200,22 @@
             document.getElementById('uploadBtn').disabled = false;
         });
 
-        xhr.open('POST', 'api_attachments.php');
+        xhr.open('POST', '/api/v1/notes/' + noteId + '/attachments');
         xhr.send(formData);
     }
 
     // Load attachments list
     function loadAttachments() {
-        var url = 'api_attachments.php?action=list&note_id=' + noteId;
+        var url = '/api/v1/notes/' + noteId + '/attachments';
         if (noteWorkspace) {
-            url += '&workspace=' + encodeURIComponent(noteWorkspace);
+            url += '?workspace=' + encodeURIComponent(noteWorkspace);
         }
         
-        fetch(url)
+        fetch(url, {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' },
+            credentials: 'same-origin'
+        })
             .then(function(response) { return response.json(); })
             .then(function(data) {
                 if (data.success) {
@@ -246,9 +249,9 @@
             
             var isImage = attachment.file_type && attachment.file_type.startsWith('image/');
             var isPDF = attachment.file_type && attachment.file_type === 'application/pdf';
-            var fileUrl = 'api_attachments.php?action=download&note_id=' + noteId + '&attachment_id=' + attachment.id;
+            var fileUrl = '/api/v1/notes/' + noteId + '/attachments/' + attachment.id;
             if (noteWorkspace) {
-                fileUrl += '&workspace=' + encodeURIComponent(noteWorkspace);
+                fileUrl += '?workspace=' + encodeURIComponent(noteWorkspace);
             }
             
             var previewContent = '';
@@ -338,26 +341,26 @@
 
     // Download/view attachment
     function downloadAttachment(attachmentId) {
-        var url = 'api_attachments.php?action=download&note_id=' + noteId + '&attachment_id=' + attachmentId;
+        var url = '/api/v1/notes/' + noteId + '/attachments/' + attachmentId;
         if (noteWorkspace) {
-            url += '&workspace=' + encodeURIComponent(noteWorkspace);
+            url += '?workspace=' + encodeURIComponent(noteWorkspace);
         }
         window.open(url, '_blank');
     }
 
     // Delete attachment
     function deleteAttachment(attachmentId) {
-        var body = 'action=delete&note_id=' + noteId + '&attachment_id=' + attachmentId;
+        var url = '/api/v1/notes/' + noteId + '/attachments/' + attachmentId;
         if (noteWorkspace) {
-            body += '&workspace=' + encodeURIComponent(noteWorkspace);
+            url += '?workspace=' + encodeURIComponent(noteWorkspace);
         }
         
-        fetch('api_attachments.php', {
-            method: 'POST',
+        fetch(url, {
+            method: 'DELETE',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': 'application/json'
             },
-            body: body
+            credentials: 'same-origin'
         })
         .then(function(response) { return response.json(); })
         .then(function(data) {

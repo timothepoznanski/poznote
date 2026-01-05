@@ -748,7 +748,7 @@ function startChunkedRestore() {
     });
 
     // Start upload
-    chunkedUploader.uploadFile(file, 'api_chunked_restore.php');
+    chunkedUploader.uploadFile(file, 'api/v1/backups/restore');
 }
 
 // Load workspaces for individual notes import
@@ -756,7 +756,11 @@ function loadWorkspacesForImport() {
     const workspaceSelect = document.getElementById('target_workspace_select');
     if (!workspaceSelect) return;
     
-    fetch('api_workspaces.php?action=list')
+    fetch('/api/v1/workspaces', {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        credentials: 'same-origin'
+    })
         .then(response => response.json())
         .then(data => {
             if (data.success && data.workspaces) {
@@ -818,16 +822,12 @@ function loadFoldersForImport(workspace) {
     }
     
     // Fetch folders for the selected workspace
-    fetch('api_folders.php', {
-        method: 'POST',
+    fetch('/api/v1/folders?workspace=' + encodeURIComponent(workspace) + '&hierarchical=true', {
+        method: 'GET',
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/json',
         },
-        body: new URLSearchParams({
-            action: 'list',
-            workspace: workspace,
-            hierarchical: 'true'
-        })
+        credentials: 'same-origin'
     })
         .then(response => response.json())
         .then(data => {

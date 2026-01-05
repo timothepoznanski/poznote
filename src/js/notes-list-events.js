@@ -301,8 +301,22 @@
         if (searchContainer) {
             var isVisible = localStorage.getItem('searchBarVisible');
             
+            // Read isSearchMode directly from page config JSON (in case window.isSearchMode is not yet set)
+            var isSearchMode = window.isSearchMode;
+            if (typeof isSearchMode === 'undefined') {
+                var configElement = document.getElementById('page-config-data');
+                if (configElement) {
+                    try {
+                        var config = JSON.parse(configElement.textContent);
+                        isSearchMode = config.isSearchMode || false;
+                    } catch (e) {
+                        isSearchMode = false;
+                    }
+                }
+            }
+            
             // Force display if search is active
-            if (window.isSearchMode) {
+            if (isSearchMode) {
                 searchContainer.style.display = 'block';
                 localStorage.setItem('searchBarVisible', 'true');
             }
