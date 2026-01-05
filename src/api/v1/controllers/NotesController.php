@@ -1521,11 +1521,29 @@ class NotesController {
         $md = preg_replace('/<button[^>]*class="[^"]*code-block-copy-btn[^"]*"[^>]*>.*?<\/button>/is', '', $md);
         
         // Code blocks (must be processed before inline code)
-        // Handle <pre><code>...</code></pre> and <pre><code>...</code>...</pre> (with extra content after code)
-        $md = preg_replace('/<pre[^>]*>\s*<code[^>]*>(.*?)<\/code>\s*<\/pre>/is', "```\n$1\n```\n", $md);
-        $md = preg_replace('/<pre[^>]*>(.*?)<\/pre>/is', "```\n$1\n```\n", $md);
-        // Inline code
-        $md = preg_replace('/<code[^>]*>(.*?)<\/code>/is', "`$1`", $md);
+        // Handle <pre><code>...</code></pre> with any attributes and whitespace
+        $md = preg_replace_callback('/<pre[^>]*>\s*<code[^>]*>(.*?)<\/code>\s*<\/pre>/is', function($matches) {
+            $code = html_entity_decode($matches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            return "\n```\n" . trim($code) . "\n```\n";
+        }, $md);
+        
+        // Handle <pre>...</pre> without <code> tag
+        $md = preg_replace_callback('/<pre[^>]*>(.*?)<\/pre>/is', function($matches) {
+            $code = html_entity_decode($matches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            return "\n```\n" . trim($code) . "\n```\n";
+        }, $md);
+        
+        // Handle standalone <code> blocks that might contain newlines (multi-line code without pre)
+        $md = preg_replace_callback('/<code[^>]*>(.*?)<\/code>/is', function($matches) {
+            $code = $matches[1];
+            // If the code contains newlines, treat it as a code block
+            if (strpos($code, "\n") !== false || strlen($code) > 80) {
+                $code = html_entity_decode($code, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                return "\n```\n" . trim($code) . "\n```\n";
+            }
+            // Otherwise, inline code with single backticks
+            return "`" . $code . "`";
+        }, $md);
         
         // Blockquote
         $md = preg_replace('/<blockquote[^>]*>(.*?)<\/blockquote>/is', "> $1\n", $md);
