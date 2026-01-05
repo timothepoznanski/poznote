@@ -574,6 +574,46 @@ Import a ZIP archive containing multiple notes from Obsidian:
 
 </details>
 
+<a id="import-standard-notes"></a>
+<details>
+<summary><strong>Import from Standard Notes</strong></summary>
+<br>
+
+Convert and import your Standard Notes export to Poznote using the included conversion script:
+
+**Script location:** `standard-notes-to-poznote.sh` in the `tools` folder of the Poznote repository
+
+**Prerequisites:**
+- `jq`, `unzip`, `zip`, and `find` utilities must be installed
+
+**Usage:**
+```bash
+bash standard-notes-to-poznote.sh <standard_notes_export.zip>
+```
+
+**How it works:**
+
+1. Export your notes from Standard Notes (this creates a ZIP file)
+2. Run the conversion script with your Standard Notes export ZIP as parameter
+3. The script generates a `poznote_export.zip` file compatible with Poznote
+4. Import the generated ZIP into Poznote using the "Import ZIP file" feature
+
+**What gets converted:**
+- All notes are converted to Markdown format with front matter
+- Note creation dates are preserved
+- Tags are automatically extracted and included in the front matter
+- Note content is preserved from the Standard Notes export
+
+**Example:**
+```bash
+bash tools/standard-notes-to-poznote.sh my_standard_notes_backup.zip
+# This creates: poznote_export.zip
+```
+
+After conversion, import the generated `poznote_export.zip` file into Poznote.
+
+</details>
+
 <details>
 <summary><strong>Markdown Front Matter Support</strong></summary>
 <br>
