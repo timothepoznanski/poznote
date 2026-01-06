@@ -27,7 +27,8 @@
             txtYesterday: body.getAttribute('data-txt-yesterday') || 'Yesterday',
             txtDaysAgo: body.getAttribute('data-txt-days-ago') || 'days ago',
             txtCancel: body.getAttribute('data-txt-cancel') || 'Cancel',
-            txtSave: body.getAttribute('data-txt-save') || 'Save'
+            txtSave: body.getAttribute('data-txt-save') || 'Save',
+            txtViaFolder: body.getAttribute('data-txt-via-folder') || 'Shared via folder'
         };
     }
     
@@ -414,12 +415,29 @@
             item.className = 'shared-note-item';
             item.dataset.noteId = note.note_id;
             
+            // Note name container (for name + folder badge)
+            var noteNameContainer = document.createElement('div');
+            noteNameContainer.className = 'note-name-container';
+            
             // Note name (clickable)
             var noteLink = document.createElement('a');
             noteLink.href = 'index.php?note=' + note.note_id + (config.workspace ? '&workspace=' + encodeURIComponent(config.workspace) : '');
             noteLink.textContent = note.heading || config.txtUntitled;
             noteLink.className = 'note-name';
-            item.appendChild(noteLink);
+            noteNameContainer.appendChild(noteLink);
+            
+            // Folder badge if shared via folder
+            if (note.shared_via_folder) {
+                var folderBadge = document.createElement('a');
+                folderBadge.className = 'folder-badge';
+                folderBadge.href = note.shared_folder_url || '#';
+                folderBadge.target = '_blank';
+                folderBadge.title = config.txtViaFolder + ': ' + (note.shared_folder_name || '');
+                folderBadge.textContent = note.shared_folder_name || '';
+                noteNameContainer.appendChild(folderBadge);
+            }
+            
+            item.appendChild(noteNameContainer);
             
             // Token (editable)
             var tokenSpan = document.createElement('span');

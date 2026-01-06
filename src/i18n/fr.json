@@ -763,7 +763,8 @@
       "rename_folder": "Renommer le dossier",
       "delete_folder": "Supprimer le dossier",
       "download_folder": "Télécharger le dossier",
-      "change_icon": "Changer l'icône"
+      "change_icon": "Changer l'icône",
+      "share_folder": "Rendre public"
     }
   },
   "update": {

@@ -46,7 +46,8 @@ $currentLang = getUserLanguage();
       data-txt-yesterday="<?php echo t_h('common.date.yesterday', [], 'Yesterday'); ?>"
       data-txt-days-ago="<?php echo t_h('common.date.days_ago', [], 'days ago'); ?>"
       data-txt-cancel="<?php echo t_h('common.cancel', [], 'Cancel'); ?>"
-      data-txt-save="<?php echo t_h('common.save', [], 'Save'); ?>">
+      data-txt-save="<?php echo t_h('common.save', [], 'Save'); ?>"
+      data-txt-via-folder="<?php echo t_h('public.via_folder', [], 'Shared via folder'); ?>">
 	<div class="shared-container">
 		<h2 class="shared-header"><?php echo t_h('public.page.title', [], 'Public Notes'); ?></h2>
 		

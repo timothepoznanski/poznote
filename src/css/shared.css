@@ -171,10 +171,16 @@ body.shared-page {
     border-bottom: 1px solid var(--border-color, #e0e0e0);
 }
 
-.note-name {
+.note-name-container {
     flex: 0 0 auto;
     min-width: 200px;
-    max-width: 300px;
+    max-width: 350px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.note-name {
     font-weight: 500;
     color: var(--link-color, #007bff);
     text-decoration: none;
@@ -185,6 +191,29 @@ body.shared-page {
 
 .note-name:hover {
     text-decoration: underline;
+}
+
+.folder-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: #6c757d;
+    background-color: rgba(108, 117, 125, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-decoration: none;
+    max-width: fit-content;
+    transition: all 0.2s ease;
+}
+
+.folder-badge:hover {
+    background-color: rgba(108, 117, 125, 0.2);
+    color: #495057;
+}
+
+.folder-badge i {
+    font-size: 10px;
 }
 
 .note-token {
@@ -621,6 +650,16 @@ body.shared-page {
 
 [data-theme="dark"] .note-token {
     color: #a0a0a0;
+}
+
+[data-theme="dark"] .folder-badge {
+    color: #a0a0a0;
+    background-color: rgba(160, 160, 160, 0.15);
+}
+
+[data-theme="dark"] .folder-badge:hover {
+    background-color: rgba(160, 160, 160, 0.25);
+    color: #c0c0c0;
 }
 
 @media (max-width: 800px) {

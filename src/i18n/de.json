@@ -761,7 +761,8 @@
       "delete_folder": "Ordner löschen",
       "move_folder": "Ordner in Unterordner verschieben",
       "download_folder": "Ordner herunterladen",
-      "change_icon": "Symbol ändern"
+      "change_icon": "Symbol ändern",
+      "share_folder": "Öffentlich machen"
     }
   },
   "update": {

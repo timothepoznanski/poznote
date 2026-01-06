@@ -759,7 +759,8 @@
       "rename_folder": "Renomear pasta",
       "delete_folder": "Excluir pasta",
       "move_folder": "Mover pasta para subpasta",
-      "download_folder": "Baixar pasta"
+      "download_folder": "Baixar pasta",
+      "share_folder": "Tornar público"
     }
   },
   "update": {

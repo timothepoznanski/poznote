@@ -761,7 +761,8 @@
       "delete_folder": "Eliminar carpeta",
       "move_folder": "Mover carpeta a subcarpeta",
       "change_icon": "Cambiar icono",
-      "download_folder": "Descargar carpeta"
+      "download_folder": "Descargar carpeta",
+      "share_folder": "Hacer público"
     }
   },
   "update": {

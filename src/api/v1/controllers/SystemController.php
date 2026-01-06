@@ -180,6 +180,7 @@ class SystemController {
                 sn.created as shared_date,
                 e.heading,
                 e.folder,
+                e.folder_id,
                 e.workspace,
                 e.updated
             FROM shared_notes sn
@@ -198,6 +199,23 @@ class SystemController {
             $stmt->execute($params);
             $shared_notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
+            // Get all shared folders to check if notes are shared via folder
+            $sharedFoldersQuery = "SELECT sf.folder_id, sf.token, f.name as folder_name 
+                FROM shared_folders sf 
+                INNER JOIN folders f ON sf.folder_id = f.id";
+            $sfStmt = $this->con->prepare($sharedFoldersQuery);
+            $sfStmt->execute();
+            $sharedFolders = $sfStmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Create a map of folder_id => folder info
+            $sharedFolderMap = [];
+            foreach ($sharedFolders as $sf) {
+                $sharedFolderMap[$sf['folder_id']] = [
+                    'token' => $sf['token'],
+                    'name' => $sf['folder_name']
+                ];
+            }
+            
             // Build URLs for each shared note
             $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
             $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
@@ -215,6 +233,17 @@ class SystemController {
                 $note['url'] = $base . '/' . rawurlencode($token);
                 $note['url_query'] = $base . '/public_note.php?token=' . rawurlencode($token);
                 $note['url_workspace'] = $base . '/workspace/' . rawurlencode($token);
+                
+                // Check if this note is in a shared folder
+                $folderId = $note['folder_id'] ?? null;
+                if ($folderId && isset($sharedFolderMap[$folderId])) {
+                    $note['shared_via_folder'] = true;
+                    $note['shared_folder_name'] = $sharedFolderMap[$folderId]['name'];
+                    $note['shared_folder_token'] = $sharedFolderMap[$folderId]['token'];
+                    $note['shared_folder_url'] = $base . '/folder/' . rawurlencode($sharedFolderMap[$folderId]['token']);
+                } else {
+                    $note['shared_via_folder'] = false;
+                }
             }
             
             return [

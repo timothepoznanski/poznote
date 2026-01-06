@@ -763,7 +763,8 @@
       "rename_folder": "Rename folder",
       "delete_folder": "Delete folder",
       "download_folder": "Download folder",
-      "change_icon": "Change icon"
+      "change_icon": "Change icon",
+      "share_folder": "Make public"
     }
   },
   "update": {

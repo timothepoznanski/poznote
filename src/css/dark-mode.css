@@ -438,6 +438,21 @@ body.dark-mode .folder-actions-menu-item.danger i {
     color: #ff6b6b;
 }
 
+html[data-theme='dark'] .folder-actions-menu-item.shared,
+body.dark-mode .folder-actions-menu-item.shared {
+    color: #ff6b6b;
+}
+
+html[data-theme='dark'] .folder-actions-menu-item.shared:hover,
+body.dark-mode .folder-actions-menu-item.shared:hover {
+    background-color: rgba(220, 38, 38, 0.15);
+}
+
+html[data-theme='dark'] .folder-actions-menu-item.shared i,
+body.dark-mode .folder-actions-menu-item.shared i {
+    color: #ff6b6b;
+}
+
 html[data-theme='dark'] .folder-actions-menu-separator,
 body.dark-mode .folder-actions-menu-separator {
     background: #404040;

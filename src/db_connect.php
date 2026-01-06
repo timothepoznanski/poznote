@@ -179,6 +179,19 @@ try {
         error_log('Could not add missing columns to shared_notes: ' . $e->getMessage());
     }
 
+    // Table for public shared folders (token based)
+    $con->exec('CREATE TABLE IF NOT EXISTS shared_folders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        folder_id INTEGER NOT NULL,
+        token TEXT UNIQUE NOT NULL,
+        created DATETIME DEFAULT CURRENT_TIMESTAMP,
+        expires DATETIME,
+        theme TEXT,
+        indexable INTEGER DEFAULT 0,
+        password TEXT,
+        FOREIGN KEY(folder_id) REFERENCES folders(id) ON DELETE CASCADE
+    )');
+
     // Set default settings
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_font_size', '15')");
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('emoji_icons_enabled', '1')");
