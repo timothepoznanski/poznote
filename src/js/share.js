@@ -46,6 +46,11 @@ function refreshNotesListAfterFolderAction() {
                 if (typeof window.initializeNoteClickHandlers === 'function') {
                     window.initializeNoteClickHandlers();
                 }
+                
+                // Reinitialize drag and drop events for notes
+                if (typeof setupNoteDragDropEvents === 'function') {
+                    setupNoteDragDropEvents();
+                }
             } catch (error) {
                 console.error('Error reinitializing after folder action:', error);
             }
