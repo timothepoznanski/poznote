@@ -263,7 +263,7 @@
                 if (remainingItems.length === 0) {
                     var container = document.getElementById('sharedFoldersList');
                     if (container) {
-                        container.innerHTML = '<div class="empty-message"><i class="fa-folder"></i><p>No shared folders found.</p></div>';
+                        container.innerHTML = '<div class="empty-message"><p>No shared folders found.</p></div>';
                     }
                 }
             }

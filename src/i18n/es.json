@@ -748,7 +748,7 @@
       "trash": "Papelera",
       "tags": "Etiquetas",
       "favorites": "Favoritos",
-      "public": "Públicas",
+      "public": "Compartidas",
       "attachments": "Archivos adjuntos"
     },
     "drop_zone": {
@@ -862,12 +862,12 @@
     "toolbar": {
       "favorite_add": "Agregar a favoritos",
       "favorite_remove": "Eliminar de favoritos",
-      "public_note": "Hacer nota pública",
+      "public_note": "Compartir nota",
       "attachments_with_count": "Adjuntos ({{count}})",
       "menu_actions": "Acciones del menú"
     },
     "public_modal": {
-      "title": "URL pública",
+      "title": "URL de compartir",
       "close": "Cerrar",
       "open": "Abrir",
       "copy": "Copiar",
@@ -916,7 +916,7 @@
     "link_modal": {
       "title_add": "Añadir enlace a la imagen",
       "title_edit": "Editar enlace de la imagen",
-      "description": "Este enlace hará que la imagen sea clickable cuando la nota se establezca como pública.",
+      "description": "Este enlace hará que la imagen sea clickable cuando la nota esté compartida.",
       "url_label": "Introduce la URL:",
       "url_placeholder": "https://www.ejemplo.com",
       "cancel": "Cancelar",
@@ -1300,16 +1300,18 @@
     }
   },
   "public": {
+    "button": "Notas Compartidas",
+    "view_public_notes": "Ver notas compartidas",
     "page": {
-      "title": "Notas Compartidas Públicamente",
+      "title": "Notas Compartidas",
       "no_public_notes": "Aún no hay notas compartidas.",
-      "public_hint": "Haga pública una nota haciendo clic en el botón de nube en la barra de herramientas."
+      "public_hint": "Comparte una nota haciendo clic en el botón de nube en la barra de herramientas."
     },
     "filter_placeholder": "Filtrar por título, token o nombre de carpeta...",
     "no_filter_results": "Ninguna nota coincide con su búsqueda.",
     "table": {
       "note": "Nota",
-      "url": "URL Pública"
+      "url": "URL Compartida"
     },
     "actions": {
       "open": "Abrir",
@@ -1536,5 +1538,15 @@
     "wifi": "wifi",
     "wind": "viento",
     "yen-sign": "yen"
+  },
+  "shared_folders": {
+    "page": {
+      "title": "Carpetas Compartidas"
+    },
+    "button": "Carpetas Compartidas",
+    "view_shared_folders": "Ver carpetas compartidas",
+    "filter_placeholder": "Filtrar por nombre de carpeta o token...",
+    "empty": "No se encontraron carpetas compartidas.",
+    "confirm_revoke": "¿Está seguro de que desea revocar el uso compartido de esta carpeta? Todas las notas de esta carpeta también dejarán de estar compartidas."
   }
 }

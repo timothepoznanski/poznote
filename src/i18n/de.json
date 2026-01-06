@@ -748,7 +748,7 @@
       "trash": "Papierkorb",
       "tags": "Tags",
       "favorites": "Favoriten",
-      "public": "Öffentliche",
+      "public": "Geteilte",
       "attachments": "Anhänge"
     },
     "drop_zone": {
@@ -862,12 +862,12 @@
     "toolbar": {
       "favorite_add": "Zu Favoriten hinzufügen",
       "favorite_remove": "Aus Favoriten entfernen",
-      "public_note": "Notiz öffentlich machen",
+      "public_note": "Notiz teilen",
       "attachments_with_count": "Anhänge ({{count}})",
       "menu_actions": "Menüaktionen"
     },
     "public_modal": {
-      "title": "Öffentliche URL",
+      "title": "Freigabe-URL",
       "close": "Schließen",
       "open": "Öffnen",
       "copy": "Kopieren",
@@ -916,7 +916,7 @@
     "link_modal": {
       "title_add": "Link zum Bild hinzufügen",
       "title_edit": "Bildlink bearbeiten",
-      "description": "Dieser Link macht das Bild anklickbar, wenn die Notiz als öffentlich festgelegt wird.",
+      "description": "Dieser Link macht das Bild anklickbar, wenn die Notiz geteilt wird.",
       "url_label": "URL eingeben:",
       "url_placeholder": "https://www.beispiel.de",
       "cancel": "Abbrechen",
@@ -1300,16 +1300,18 @@
     }
   },
   "public": {
+    "button": "Geteilte Notizen",
+    "view_public_notes": "Geteilte Notizen anzeigen",
     "page": {
-      "title": "Öffentliche Notizen",
-      "no_public_notes": "Noch keine öffentlichen Notizen.",
-      "public_hint": "Machen Sie eine Notiz öffentlich, indem Sie auf die Wolken-Schaltfläche in der Symbolleiste klicken."
+      "title": "Geteilte Notizen",
+      "no_public_notes": "Noch keine geteilten Notizen.",
+      "public_hint": "Teilen Sie eine Notiz, indem Sie auf die Wolken-Schaltfläche in der Symbolleiste klicken."
     },
     "filter_placeholder": "Nach Titel, Token oder Ordnername filtern...",
     "no_filter_results": "Keine Notizen entsprechen Ihrer Suche.",
     "table": {
       "note": "Notiz",
-      "url": "Öffentliche URL"
+      "url": "Geteilte URL"
     },
     "actions": {
       "open": "Öffnen",
@@ -1536,5 +1538,15 @@
     "wifi": "WiFi",
     "wind": "Wind",
     "yen-sign": "Yen"
+  },
+  "shared_folders": {
+    "page": {
+      "title": "Geteilte Ordner"
+    },
+    "button": "Geteilte Ordner",
+    "view_shared_folders": "Geteilte Ordner anzeigen",
+    "filter_placeholder": "Nach Ordnername oder Token filtern...",
+    "empty": "Keine geteilten Ordner gefunden.",
+    "confirm_revoke": "Sind Sie sicher, dass Sie die Freigabe für diesen Ordner widerrufen möchten? Alle Notizen in diesem Ordner werden ebenfalls nicht mehr geteilt."
   }
 }

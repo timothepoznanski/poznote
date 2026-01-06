@@ -87,8 +87,8 @@ $currentLang = getUserLanguage();
 			<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
 				<?php echo t_h('common.back_to_notes'); ?>
 			</button>
-			<button id="publicNotesBtn" class="btn btn-secondary" title="<?php echo t_h('public.view_public_notes', [], 'View public notes'); ?>">
-				<?php echo t_h('public.button', [], 'Public Notes'); ?>
+			<button id="publicNotesBtn" class="btn btn-secondary" title="<?php echo t_h('public.view_public_notes', [], 'View shared notes'); ?>">
+				<?php echo t_h('public.button', [], 'Shared Notes'); ?>
 			</button>
 		</div>
 		

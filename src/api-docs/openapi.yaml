@@ -35,7 +35,7 @@ tags:
   - name: Attachments
     description: File attachments
   - name: Share
-    description: Public note sharing
+    description: Note and folder sharing
   - name: Settings
     description: Application settings
   - name: Backups
@@ -724,6 +724,98 @@ paths:
       responses:
         '200':
           description: List of shared notes
+
+  /folders/{folderId}/share:
+    get:
+      tags: [Share]
+      summary: Get folder share status
+      parameters:
+        - name: folderId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Folder share status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  public:
+                    type: boolean
+                  url:
+                    type: string
+                  indexable:
+                    type: integer
+                  hasPassword:
+                    type: boolean
+    post:
+      tags: [Share]
+      summary: Create or renew folder share link
+      parameters:
+        - name: folderId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                custom_token:
+                  type: string
+                theme:
+                  type: string
+                  enum: [light, dark]
+                indexable:
+                  type: integer
+                password:
+                  type: string
+      responses:
+        '201':
+          description: Folder share link created
+    patch:
+      tags: [Share]
+      summary: Update folder share settings
+      parameters:
+        - name: folderId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                indexable:
+                  type: integer
+                password:
+                  type: string
+                custom_token:
+                  type: string
+      responses:
+        '200':
+          description: Folder share settings updated
+    delete:
+      tags: [Share]
+      summary: Revoke folder share link
+      parameters:
+        - name: folderId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Folder share link revoked
 
   # ==================
   # Attachments Endpoints

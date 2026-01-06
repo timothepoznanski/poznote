@@ -32,7 +32,7 @@ Poznote is a lightweight, open-source personal note-taking and documentation pla
 | Mermaid Diagrams | File Attachments | Built-in Backup |
 | Mathematics Support | Folders | Trash System |
 | Tasklist | Favorites | OpenID Connect |
-| Dark Mode | Public Sharing | Responsive Design |
+| Dark Mode | Note Sharing | Responsive Design |
 
 </div>
 
@@ -941,7 +941,7 @@ curl -X POST -u 'username:password' \
 </details>
 
 <details>
-<summary><strong>🔗 Public Sharing</strong></summary>
+<summary><strong>🔗 Note Sharing</strong></summary>
 <br>
 
 **Get Share Status**
@@ -954,7 +954,7 @@ curl -u 'username:password' \
 
 **Create Share Link**
 
-Create a public share link for a note:
+Create a share link for a note:
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
@@ -978,7 +978,7 @@ curl -X PATCH -u 'username:password' \
 
 **Revoke Share Link**
 
-Remove public access:
+Remove sharing access:
 ```bash
 curl -X DELETE -u 'username:password' \
   http://YOUR_SERVER/api/v1/notes/123/share
@@ -986,7 +986,7 @@ curl -X DELETE -u 'username:password' \
 
 **List All Shared Notes**
 
-Get list of all publicly shared notes:
+Get list of all shared notes:
 ```bash
 curl -u 'username:password' \
   http://YOUR_SERVER/api/v1/shared
@@ -1001,7 +1001,63 @@ curl -u 'username:password' \
 </details>
 
 <details>
-<summary><strong>🗑️ Trash Management</strong></summary>
+<summary><strong>📂 Folder Sharing</strong></summary>
+<br>
+
+**Get Folder Share Status**
+
+Check if a folder is shared:
+```bash
+curl -u 'username:password' \
+  http://YOUR_SERVER/api/v1/folders/5/share
+```
+
+**Create Folder Share Link**
+
+Share a folder (all notes in the folder will also be shared):
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "theme": "light",
+    "indexable": 0,
+    "password": "optional-password"
+  }' \
+  http://YOUR_SERVER/api/v1/folders/5/share
+```
+
+With custom token:
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "custom_token": "my-shared-folder"
+  }' \
+  http://YOUR_SERVER/api/v1/folders/5/share
+```
+
+**Update Folder Share Settings**
+
+Update share settings:
+```bash
+curl -X PATCH -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"indexable": 1, "password": "new-password"}' \
+  http://YOUR_SERVER/api/v1/folders/5/share
+```
+
+**Revoke Folder Share Link**
+
+Revoke folder sharing (all notes in the folder will also be unshared):
+```bash
+curl -X DELETE -u 'username:password' \
+  http://YOUR_SERVER/api/v1/folders/5/share
+```
+
+</details>
+
+<details>
+<summary><strong>���🗑️ Trash Management</strong></summary>
 <br>
 
 **List Trash**

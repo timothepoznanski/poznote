@@ -747,7 +747,7 @@
       "trash": "Lixeira",
       "tags": "Etiquetas",
       "favorites": "Favoritos",
-      "public": "Públicas",
+      "public": "Compartilhadas",
       "attachments": "Anexos"
     },
     "drop_zone": {
@@ -865,12 +865,12 @@
     "toolbar": {
       "favorite_add": "Adicionar aos favoritos",
       "favorite_remove": "Remover dos favoritos",
-      "public_note": "Tornar nota pública",
+      "public_note": "Compartilhar nota",
       "attachments_with_count": "Anexos ({{count}})",
       "menu_actions": "Ações do menu"
     },
     "public_modal": {
-      "title": "URL Pública",
+      "title": "URL de Compartilhamento",
       "close": "Fechar",
       "open": "Abrir",
       "copy": "Copiar",
@@ -916,7 +916,7 @@
     "link_modal": {
       "title_add": "Adicionar Link à Imagem",
       "title_edit": "Editar Link da Imagem",
-      "description": "Este link tornará a imagem clicável quando a nota for definida como pública.",
+      "description": "Este link tornará a imagem clicável quando a nota for compartilhada.",
       "url_label": "Digite a URL:",
       "url_placeholder": "https://www.exemplo.com",
       "cancel": "Cancelar",
@@ -1300,16 +1300,18 @@
     }
   },
   "public": {
+    "button": "Notas Compartilhadas",
+    "view_public_notes": "Ver notas compartilhadas",
     "page": {
-      "title": "Notas Compartilhadas Publicamente",
+      "title": "Notas Compartilhadas",
       "no_public_notes": "Ainda não há notas compartilhadas.",
-      "public_hint": "Torne uma nota pública clicando no botão de nuvem na barra de ferramentas."
+      "public_hint": "Compartilhe uma nota clicando no botão de nuvem na barra de ferramentas."
     },
     "filter_placeholder": "Filtrar por título, token ou nome da pasta...",
     "no_filter_results": "Nenhuma nota corresponde à sua pesquisa.",
     "table": {
       "note": "Nota",
-      "url": "URL Pública"
+      "url": "URL Compartilhada"
     },
     "actions": {
       "open": "Abrir",
@@ -1536,5 +1538,15 @@
     "wifi": "wifi",
     "wind": "vento",
     "yen-sign": "iene"
+  },
+  "shared_folders": {
+    "page": {
+      "title": "Pastas Compartilhadas"
+    },
+    "button": "Pastas Compartilhadas",
+    "view_shared_folders": "Ver pastas compartilhadas",
+    "filter_placeholder": "Filtrar por nome da pasta ou token...",
+    "empty": "Nenhuma pasta compartilhada encontrada.",
+    "confirm_revoke": "Tem certeza de que deseja revogar o compartilhamento desta pasta? Todas as notas nesta pasta também deixarão de ser compartilhadas."
   }
 }
