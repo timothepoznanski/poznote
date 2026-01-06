@@ -419,14 +419,7 @@
             var noteNameContainer = document.createElement('div');
             noteNameContainer.className = 'note-name-container';
             
-            // Note name (clickable)
-            var noteLink = document.createElement('a');
-            noteLink.href = 'index.php?note=' + note.note_id + (config.workspace ? '&workspace=' + encodeURIComponent(config.workspace) : '');
-            noteLink.textContent = note.heading || config.txtUntitled;
-            noteLink.className = 'note-name';
-            noteNameContainer.appendChild(noteLink);
-            
-            // Folder badge if shared via folder
+            // Folder badge if shared via folder (before title)
             if (note.shared_via_folder) {
                 var folderBadge = document.createElement('a');
                 folderBadge.className = 'folder-badge';
@@ -436,6 +429,13 @@
                 folderBadge.textContent = note.shared_folder_name || '';
                 noteNameContainer.appendChild(folderBadge);
             }
+            
+            // Note name (clickable)
+            var noteLink = document.createElement('a');
+            noteLink.href = 'index.php?note=' + note.note_id + (config.workspace ? '&workspace=' + encodeURIComponent(config.workspace) : '');
+            noteLink.textContent = note.heading || config.txtUntitled;
+            noteLink.className = 'note-name';
+            noteNameContainer.appendChild(noteLink);
             
             item.appendChild(noteNameContainer);
             

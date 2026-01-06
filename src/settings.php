@@ -56,9 +56,6 @@ if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
         <body>
             <div class="login-container">
                 <div class="login-header">
-                    <div class="logo">
-                        <img src="favicon.ico" alt="Poznote" class="logo-favicon">
-                    </div>
                     <h1 class="login-title">Poznote</h1>
                     <p class="settings-subtitle"><?php echo t_h('settings.password.heading', [], 'Settings Protected', $currentLang); ?></p>
                 </div>

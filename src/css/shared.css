@@ -176,8 +176,9 @@ body.shared-page {
     min-width: 200px;
     max-width: 350px;
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
 }
 
 .note-name {
@@ -476,6 +477,7 @@ body.shared-page {
         min-width: auto;
         max-width: 100%;
         font-size: 16px;
+        white-space: normal;
     }
     
     .note-token {
