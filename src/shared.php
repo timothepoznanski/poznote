@@ -63,7 +63,7 @@ $currentLang = getUserLanguage();
 					type="text" 
 					id="filterInput" 
 					class="filter-input" 
-					placeholder="<?php echo t_h('public.filter_placeholder', [], 'Filter by title or token...'); ?>"
+					placeholder="<?php echo t_h('public.filter_placeholder', [], 'Filter by title, token or folder name...'); ?>"
 				/>
 				<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
 					<i class="fa-times"></i>

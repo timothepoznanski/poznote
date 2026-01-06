@@ -1305,7 +1305,7 @@
       "no_public_notes": "Ainda não há notas compartilhadas.",
       "public_hint": "Torne uma nota pública clicando no botão de nuvem na barra de ferramentas."
     },
-    "filter_placeholder": "Filtrar por título ou token...",
+    "filter_placeholder": "Filtrar por título, token ou nome da pasta...",
     "no_filter_results": "Nenhuma nota corresponde à sua pesquisa.",
     "table": {
       "note": "Nota",

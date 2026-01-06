@@ -1305,7 +1305,7 @@
       "no_public_notes": "Noch keine öffentlichen Notizen.",
       "public_hint": "Machen Sie eine Notiz öffentlich, indem Sie auf die Wolken-Schaltfläche in der Symbolleiste klicken."
     },
-    "filter_placeholder": "Nach Titel oder Token filtern...",
+    "filter_placeholder": "Nach Titel, Token oder Ordnername filtern...",
     "no_filter_results": "Keine Notizen entsprechen Ihrer Suche.",
     "table": {
       "note": "Notiz",

@@ -63,7 +63,8 @@
             filteredNotes = sharedNotes.filter(function(note) {
                 var heading = (note.heading || '').toLowerCase();
                 var token = (note.token || '').toLowerCase();
-                return heading.includes(filterText) || token.includes(filterText);
+                var folderName = (note.shared_folder_name || '').toLowerCase();
+                return heading.includes(filterText) || token.includes(filterText) || folderName.includes(filterText);
             });
         }
         renderSharedNotes();
