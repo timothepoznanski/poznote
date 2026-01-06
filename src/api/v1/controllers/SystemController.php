@@ -155,7 +155,7 @@ class SystemController {
         
         if ($password === $configuredPassword) {
             // Set session flag
-            $_SESSION['settings_password_verified'] = true;
+            $_SESSION['settings_authenticated'] = true;
             return ['success' => true, 'valid' => true];
         } else {
             http_response_code(401);
