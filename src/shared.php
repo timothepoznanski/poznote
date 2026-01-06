@@ -55,6 +55,9 @@ $currentLang = getUserLanguage();
 			<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
 				<?php echo t_h('common.back_to_notes'); ?>
 			</button>
+			<button id="sharedFoldersBtn" class="btn btn-secondary" title="<?php echo t_h('shared_folders.view_shared_folders', [], 'View shared folders'); ?>">
+				<?php echo t_h('shared_folders.button', [], 'Shared Folders'); ?>
+			</button>
 		</div>
 		
 		<div class="shared-filter-bar">

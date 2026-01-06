@@ -553,6 +553,18 @@
             backBtn.addEventListener('click', goBackToNotes);
         }
         
+        // Shared folders button
+        var sharedFoldersBtn = document.getElementById('sharedFoldersBtn');
+        if (sharedFoldersBtn) {
+            sharedFoldersBtn.addEventListener('click', function() {
+                var params = new URLSearchParams();
+                if (config.workspace) {
+                    params.append('workspace', config.workspace);
+                }
+                window.location.href = 'list_shared_folders.php' + (params.toString() ? '?' + params.toString() : '');
+            });
+        }
+        
         // Filter input
         var filterInput = document.getElementById('filterInput');
         var clearFilterBtn = document.getElementById('clearFilterBtn');

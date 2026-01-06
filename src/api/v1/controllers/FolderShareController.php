@@ -98,22 +98,13 @@ class FolderShareController {
                     return;
                 }
                 
-                // Check uniqueness across both shared_notes and shared_folders
+                // Check uniqueness within shared_folders only (notes have different URL path)
                 $stmt = $this->con->prepare('SELECT folder_id FROM shared_folders WHERE token = ? LIMIT 1');
                 $stmt->execute([$custom]);
                 $existing = $stmt->fetchColumn();
                 if ($existing && intval($existing) !== (int)$folderId) {
                     http_response_code(409);
-                    echo json_encode(['success' => false, 'error' => 'Token already in use']);
-                    return;
-                }
-                
-                // Also check in shared_notes
-                $stmt = $this->con->prepare('SELECT note_id FROM shared_notes WHERE token = ? LIMIT 1');
-                $stmt->execute([$custom]);
-                if ($stmt->fetchColumn()) {
-                    http_response_code(409);
-                    echo json_encode(['success' => false, 'error' => 'Token already in use by a note']);
+                    echo json_encode(['success' => false, 'error' => 'Token already in use by another folder']);
                     return;
                 }
                 
@@ -194,8 +185,8 @@ class FolderShareController {
     
     /**
      * PATCH /api/v1/folders/{folderId}/share
-     * Update share settings (indexable, password)
-     * Body: { indexable?, password? }
+     * Update share settings (indexable, password, token)
+     * Body: { indexable?, password?, custom_token? }
      */
     public function update($folderId) {
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
@@ -212,6 +203,31 @@ class FolderShareController {
             
             $updates = [];
             $params = [];
+            
+            // Handle custom token update
+            if (isset($input['custom_token'])) {
+                $custom = trim($input['custom_token']);
+                if ($custom !== '') {
+                    if (!preg_match('/^[A-Za-z0-9\-_.]{4,128}$/', $custom)) {
+                        http_response_code(400);
+                        echo json_encode(['success' => false, 'error' => 'Invalid custom token. Allowed: letters, numbers, -, _, . (4-128 chars)']);
+                        return;
+                    }
+                    
+                    // Check uniqueness across both shared_notes and shared_folders
+                    $stmt = $this->con->prepare('SELECT folder_id FROM shared_folders WHERE token = ? LIMIT 1');
+                    $stmt->execute([$custom]);
+                    $existing = $stmt->fetchColumn();
+                    if ($existing && intval($existing) !== (int)$folderId) {
+                        http_response_code(409);
+                        echo json_encode(['success' => false, 'error' => 'Token already in use by another folder']);
+                        return;
+                    }
+                    
+                    $updates[] = 'token = ?';
+                    $params[] = $custom;
+                }
+            }
             
             if (isset($input['indexable'])) {
                 $updates[] = 'indexable = ?';
@@ -236,6 +252,9 @@ class FolderShareController {
             $stmt->execute($params);
             
             $response = ['success' => true];
+            if (isset($input['custom_token'])) {
+                $response['token'] = trim($input['custom_token']);
+            }
             if (isset($input['indexable'])) {
                 $response['indexable'] = (int)$input['indexable'];
             }
