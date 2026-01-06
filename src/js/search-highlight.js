@@ -2,6 +2,29 @@
 // Manages highlighting of search terms in note content
 
 /**
+ * Parse search terms with support for quoted phrases
+ * @param {string} search - The search string
+ * @returns {Array<string>} Array of search terms (phrases kept as single strings)
+ */
+function parseSearchTerms(search) {
+    var terms = [];
+    var pattern = /"([^"]+)"|\S+/g;
+    var match;
+    
+    while ((match = pattern.exec(search)) !== null) {
+        // If match[1] exists, it's a quoted phrase
+        if (match[1]) {
+            terms.push(match[1]);
+        } else {
+            // Otherwise it's a single word
+            terms.push(match[0]);
+        }
+    }
+    
+    return terms;
+}
+
+/**
  * Highlight search terms in all note content areas
  */
 function highlightSearchTerms() {
@@ -58,8 +81,8 @@ function highlightSearchTerms() {
     // Clear existing highlights first
     clearSearchHighlights();
     
-    // Split search term into words and filter out empty ones
-    var searchWords = searchTerm.split(/\s+/).filter(function(word) { return word.length > 0; });
+    // Parse search terms with support for quoted phrases
+    var searchWords = parseSearchTerms(searchTerm);
     
     if (searchWords.length === 0) return;
     
@@ -257,7 +280,7 @@ function createInputOverlay(inputElement, word, startIndex) {
                 // Re-run highlighting for this specific input
                 var searchInput = document.getElementById('unified-search') || document.getElementById('unified-search-mobile');
                 if (searchInput && searchInput.value.trim()) {
-                    var searchWords = searchInput.value.trim().split(/\s+/).filter(function(word) { return word.length > 0; });
+                    var searchWords = parseSearchTerms(searchInput.value.trim());
                     if (searchWords.length > 0) {
                         highlightInElement(inputElement, searchWords);
                     }

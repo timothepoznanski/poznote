@@ -44,7 +44,7 @@ if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
         <head>
             <meta charset="utf-8"/>
             <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-            <title><?php echo t_h('settings.password.title', [], 'Settings Access', $currentLang); ?> - PozNote</title>
+            <title><?php echo t_h('settings.password.title', [], 'Settings Access', $currentLang); ?> - Poznote</title>
             <meta name="color-scheme" content="dark light">
             <script src="js/theme-init.js"></script>
             <link rel="stylesheet" href="css/fontawesome.min.css">
@@ -57,9 +57,9 @@ if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
             <div class="login-container">
                 <div class="login-header">
                     <div class="logo">
-                        <img src="favicon.ico" alt="PozNote" class="logo-favicon">
+                        <img src="favicon.ico" alt="Poznote" class="logo-favicon">
                     </div>
-                    <h1 class="login-title">PozNote</h1>
+                    <h1 class="login-title">Poznote</h1>
                     <p class="settings-subtitle"><?php echo t_h('settings.password.heading', [], 'Settings Protected', $currentLang); ?></p>
                 </div>
                 
