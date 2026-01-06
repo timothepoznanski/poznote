@@ -58,21 +58,29 @@ try {
         type TEXT DEFAULT "note"
     )');
 
-    // Add 'folder_id' column to entries if it doesn't exist (migration for old backups)
+    // Add missing columns to entries if they don't exist (migration for old backups)
     try {
         $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
-        $hasFolderId = false;
-        foreach ($cols as $c) {
-            if (isset($c['name']) && $c['name'] === 'folder_id') {
-                $hasFolderId = true;
-                break;
-            }
-        }
-        if (!$hasFolderId) {
+        $existingColumns = array_column($cols, 'name');
+        
+        // Add 'folder_id' column if missing
+        if (!in_array('folder_id', $existingColumns)) {
             $con->exec("ALTER TABLE entries ADD COLUMN folder_id INTEGER REFERENCES folders(id) ON DELETE SET NULL");
         }
+        // Add 'location' column if missing
+        if (!in_array('location', $existingColumns)) {
+            $con->exec("ALTER TABLE entries ADD COLUMN location TEXT");
+        }
+        // Add 'subheading' column if missing
+        if (!in_array('subheading', $existingColumns)) {
+            $con->exec("ALTER TABLE entries ADD COLUMN subheading TEXT");
+        }
+        // Add 'type' column if missing
+        if (!in_array('type', $existingColumns)) {
+            $con->exec("ALTER TABLE entries ADD COLUMN type TEXT DEFAULT 'note'");
+        }
     } catch (Exception $e) {
-        error_log('Could not add folder_id column to entries: ' . $e->getMessage());
+        error_log('Could not add missing columns to entries: ' . $e->getMessage());
     }
 
     // Create folders table for empty folders (scoped by workspace)
@@ -90,38 +98,21 @@ try {
     // === MIGRATIONS FOR OLD BACKUPS ===
     // These MUST run BEFORE any indexes that use these columns
     
-    // Add 'parent_id' column to folders if it doesn't exist (for subfolder support - migration for old backups)
+    // Add missing columns to folders if they don't exist (migration for old backups)
     try {
         $cols = $con->query("PRAGMA table_info(folders)")->fetchAll(PDO::FETCH_ASSOC);
-        $hasParentId = false;
-        foreach ($cols as $c) {
-            if (isset($c['name']) && $c['name'] === 'parent_id') {
-                $hasParentId = true;
-                break;
-            }
-        }
-        if (!$hasParentId) {
+        $existingColumns = array_column($cols, 'name');
+        
+        // Add 'parent_id' column if missing (for subfolder support)
+        if (!in_array('parent_id', $existingColumns)) {
             $con->exec("ALTER TABLE folders ADD COLUMN parent_id INTEGER DEFAULT NULL");
         }
-    } catch (Exception $e) {
-        error_log('Could not add parent_id column to folders: ' . $e->getMessage());
-    }
-
-    // Add 'icon' column to folders if it doesn't exist (for custom folder icons)
-    try {
-        $cols = $con->query("PRAGMA table_info(folders)")->fetchAll(PDO::FETCH_ASSOC);
-        $hasIcon = false;
-        foreach ($cols as $c) {
-            if (isset($c['name']) && $c['name'] === 'icon') {
-                $hasIcon = true;
-                break;
-            }
-        }
-        if (!$hasIcon) {
+        // Add 'icon' column if missing (for custom folder icons)
+        if (!in_array('icon', $existingColumns)) {
             $con->exec("ALTER TABLE folders ADD COLUMN icon TEXT");
         }
     } catch (Exception $e) {
-        error_log('Could not add icon column to folders: ' . $e->getMessage());
+        error_log('Could not add missing columns to folders: ' . $e->getMessage());
     }
 
     // === END MIGRATIONS ===
@@ -167,58 +158,25 @@ try {
         FOREIGN KEY(note_id) REFERENCES entries(id) ON DELETE CASCADE
     )');
 
-    // Add 'theme' column to shared_notes if it doesn't exist (for storing chosen display mode)
+    // Add missing columns to shared_notes if they don't exist (migration for old backups)
     try {
         $cols = $con->query("PRAGMA table_info(shared_notes)")->fetchAll(PDO::FETCH_ASSOC);
-        $hasTheme = false;
-        foreach ($cols as $c) {
-            if (isset($c['name']) && $c['name'] === 'theme') {
-                $hasTheme = true;
-                break;
-            }
-        }
-        if (!$hasTheme) {
+        $existingColumns = array_column($cols, 'name');
+        
+        // Add 'theme' column if missing (for storing chosen display mode)
+        if (!in_array('theme', $existingColumns)) {
             $con->exec("ALTER TABLE shared_notes ADD COLUMN theme TEXT");
         }
-    } catch (Exception $e) {
-        // Non-fatal: if this fails, continue without theme support
-        error_log('Could not add theme column to shared_notes: ' . $e->getMessage());
-    }
-
-    // Add 'indexable' column to shared_notes if it doesn't exist (controls whether the page can be indexed by search engines)
-    try {
-        $cols = $con->query("PRAGMA table_info(shared_notes)")->fetchAll(PDO::FETCH_ASSOC);
-        $hasIndexable = false;
-        foreach ($cols as $c) {
-            if (isset($c['name']) && $c['name'] === 'indexable') {
-                $hasIndexable = true;
-                break;
-            }
-        }
-        if (!$hasIndexable) {
+        // Add 'indexable' column if missing (controls whether the page can be indexed by search engines)
+        if (!in_array('indexable', $existingColumns)) {
             $con->exec("ALTER TABLE shared_notes ADD COLUMN indexable INTEGER DEFAULT 0");
         }
-    } catch (Exception $e) {
-        // Non-fatal: if this fails, continue without indexable support
-        error_log('Could not add indexable column to shared_notes: ' . $e->getMessage());
-    }
-
-    // Add 'password' column to shared_notes if it doesn't exist (optional password protection for shared notes)
-    try {
-        $cols = $con->query("PRAGMA table_info(shared_notes)")->fetchAll(PDO::FETCH_ASSOC);
-        $hasPassword = false;
-        foreach ($cols as $c) {
-            if (isset($c['name']) && $c['name'] === 'password') {
-                $hasPassword = true;
-                break;
-            }
-        }
-        if (!$hasPassword) {
+        // Add 'password' column if missing (optional password protection for shared notes)
+        if (!in_array('password', $existingColumns)) {
             $con->exec("ALTER TABLE shared_notes ADD COLUMN password TEXT");
         }
     } catch (Exception $e) {
-        // Non-fatal: if this fails, continue without password support
-        error_log('Could not add password column to shared_notes: ' . $e->getMessage());
+        error_log('Could not add missing columns to shared_notes: ' . $e->getMessage());
     }
 
     // Set default settings
