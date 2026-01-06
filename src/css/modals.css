@@ -1821,8 +1821,8 @@ html[data-theme='dark'] input:checked + .toggle-slider {
     -moz-user-select: text;
     cursor: text;
     border-radius: 6px;
-    margin-top: 12px;
-    margin-bottom: 12px;
+    margin-top: 30px;
+    margin-bottom: 30px;
     color: #333;
 }
 

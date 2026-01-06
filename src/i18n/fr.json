@@ -764,7 +764,7 @@
       "delete_folder": "Supprimer le dossier",
       "download_folder": "Télécharger le dossier",
       "change_icon": "Changer l'icône",
-      "share_folder": "Rendre public"
+      "share_folder": "Partager"
     }
   },
   "update": {
@@ -1315,7 +1315,7 @@
     "page": {
       "title": "Notes partagées",
       "no_public_notes": "Aucune note partagée pour le moment.",
-      "public_hint": "Partagez une note en cliquant sur le bouton de nuage dans la barre d'outils."
+      "public_hint": "Partagez une note en cliquant sur le bouton de nuage dans la barre d'outils de la note."
     },
     "filter_placeholder": "Filtrer par titre, token ou nom de dossier...",
     "no_filter_results": "Aucune note ne correspond à votre recherche.",
@@ -1551,7 +1551,9 @@
   },
   "shared_folders": {
     "page": {
-      "title": "Dossiers partagés"
+      "title": "Dossiers partagés",
+      "no_shared_folders": "Aucun dossier partagé pour le moment.",
+      "shared_folders_hint": "Partagez un dossier en cliquant sur le bouton de nuage dans le menu du dossier."
     },
     "button": "Dossiers partagés",
     "view_shared_folders": "Voir les dossiers partagés",

@@ -762,7 +762,7 @@
       "move_folder": "Ordner in Unterordner verschieben",
       "download_folder": "Ordner herunterladen",
       "change_icon": "Symbol ändern",
-      "share_folder": "Öffentlich machen"
+      "share_folder": "Teilen"
     }
   },
   "update": {
@@ -1305,7 +1305,7 @@
     "page": {
       "title": "Geteilte Notizen",
       "no_public_notes": "Noch keine geteilten Notizen.",
-      "public_hint": "Teilen Sie eine Notiz, indem Sie auf die Wolken-Schaltfläche in der Symbolleiste klicken."
+      "public_hint": "Teilen Sie eine Notiz, indem Sie auf die Wolken-Schaltfläche in der Notiz-Symbolleiste klicken."
     },
     "filter_placeholder": "Nach Titel, Token oder Ordnername filtern...",
     "no_filter_results": "Keine Notizen entsprechen Ihrer Suche.",
@@ -1541,7 +1541,9 @@
   },
   "shared_folders": {
     "page": {
-      "title": "Geteilte Ordner"
+      "title": "Geteilte Ordner",
+      "no_shared_folders": "Noch keine geteilten Ordner.",
+      "shared_folders_hint": "Teilen Sie einen Ordner, indem Sie auf die Wolken-Schaltfläche im Ordnermenü klicken."
     },
     "button": "Geteilte Ordner",
     "view_shared_folders": "Geteilte Ordner anzeigen",

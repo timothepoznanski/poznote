@@ -72,7 +72,7 @@ $currentLang = getUserLanguage();
 					<i class="fa-times"></i>
 				</button>
 			</div>
-			<div id="filterStats" class="filter-stats"></div>
+			<div id="filterStats" class="filter-stats initially-hidden"></div>
 		</div>
 		
 		<div class="shared-content">
@@ -82,7 +82,6 @@ $currentLang = getUserLanguage();
 			</div>
 			<div id="sharedNotesContainer"></div>
 			<div id="emptyMessage" class="empty-message initially-hidden">
-			<i class="fa-cloud"></i>
 			<p><?php echo t_h('public.page.no_public_notes', [], 'No shared notes yet.'); ?></p>
 				<p class="empty-hint"><?php echo t_h('public.page.public_hint', [], 'Share a note by clicking the cloud button in the note toolbar.'); ?></p>
 			</div>

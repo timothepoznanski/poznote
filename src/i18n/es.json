@@ -762,7 +762,7 @@
       "move_folder": "Mover carpeta a subcarpeta",
       "change_icon": "Cambiar icono",
       "download_folder": "Descargar carpeta",
-      "share_folder": "Hacer público"
+      "share_folder": "Compartir"
     }
   },
   "update": {
@@ -1305,7 +1305,7 @@
     "page": {
       "title": "Notas Compartidas",
       "no_public_notes": "Aún no hay notas compartidas.",
-      "public_hint": "Comparte una nota haciendo clic en el botón de nube en la barra de herramientas."
+      "public_hint": "Comparte una nota haciendo clic en el botón de nube en la barra de herramientas de la nota."
     },
     "filter_placeholder": "Filtrar por título, token o nombre de carpeta...",
     "no_filter_results": "Ninguna nota coincide con su búsqueda.",
@@ -1541,7 +1541,9 @@
   },
   "shared_folders": {
     "page": {
-      "title": "Carpetas Compartidas"
+      "title": "Carpetas Compartidas",
+      "no_shared_folders": "Aún no hay carpetas compartidas.",
+      "shared_folders_hint": "Comparte una carpeta haciendo clic en el botón de nube en el menú de la carpeta."
     },
     "button": "Carpetas Compartidas",
     "view_shared_folders": "Ver carpetas compartidas",

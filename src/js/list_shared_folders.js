@@ -69,6 +69,14 @@
             updateClearButton();
             updateFilterStats();
         });
+
+        // Check for initial filter from URL (after listener is attached)
+        var urlParams = new URLSearchParams(window.location.search);
+        var initialFilter = urlParams.get('filter');
+        if (initialFilter) {
+            filterInput.value = initialFilter;
+            filterInput.dispatchEvent(new Event('input'));
+        }
     }
 
     // Clear filter button

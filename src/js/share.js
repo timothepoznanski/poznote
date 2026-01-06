@@ -1089,6 +1089,27 @@ function showFolderShareModal(url, options) {
         };
         buttonsDiv.appendChild(copyBtn);
 
+        // Add Edit button to open list_shared_folders.php filtered by this token
+        if (folderId) {
+            const manageBtn = document.createElement('button');
+            manageBtn.type = 'button';
+            manageBtn.className = 'btn-primary';
+            manageBtn.textContent = window.t ? window.t('index.public_modal.manage', null, 'Edit') : 'Edit';
+            manageBtn.onclick = function(ev) {
+                try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
+                // Extract token from URL (last part after /)
+                const token = url.split('/').pop();
+                if (token) {
+                    let sharedUrl = 'list_shared_folders.php?filter=' + encodeURIComponent(token);
+                    if (folderWorkspace) {
+                        sharedUrl += '&workspace=' + encodeURIComponent(folderWorkspace);
+                    }
+                    window.open(sharedUrl, '_blank');
+                }
+            };
+            buttonsDiv.appendChild(manageBtn);
+        }
+
         // Revoke button
         if (folderId) {
             const revokeBtn = document.createElement('button');

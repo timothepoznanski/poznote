@@ -112,8 +112,8 @@ $currentLang = getUserLanguage();
 			<?php
 			if (empty($shared_folders)) {
 				echo '<div class="empty-message">';
-				echo '<i class="fa-folder"></i>';
-				echo '<p>' . t_h('shared_folders.empty', [], 'No shared folders found.') . '</p>';
+				echo '<p>' . t_h('shared_folders.page.no_shared_folders', [], 'No shared folders yet.') . '</p>';
+				echo '<p class="empty-hint">' . t_h('shared_folders.page.shared_folders_hint', [], 'Share a folder by clicking the cloud button in the folder toolbar.') . '</p>';
 				echo '</div>';
 			} else {
 			foreach($shared_folders as $folder) {

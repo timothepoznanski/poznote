@@ -764,7 +764,7 @@
       "delete_folder": "Delete folder",
       "download_folder": "Download folder",
       "change_icon": "Change icon",
-      "share_folder": "Make public"
+      "share_folder": "Share"
     }
   },
   "update": {
@@ -1554,7 +1554,9 @@
   },
   "shared_folders": {
     "page": {
-      "title": "Shared Folders"
+      "title": "Shared Folders",
+      "no_shared_folders": "No shared folders yet.",
+      "shared_folders_hint": "Share a folder by clicking the cloud button in the folder menu."
     },
     "button": "Shared Folders",
     "view_shared_folders": "View shared folders",

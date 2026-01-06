@@ -760,7 +760,7 @@
       "delete_folder": "Excluir pasta",
       "move_folder": "Mover pasta para subpasta",
       "download_folder": "Baixar pasta",
-      "share_folder": "Tornar público"
+      "share_folder": "Compartilhar"
     }
   },
   "update": {
@@ -1305,7 +1305,7 @@
     "page": {
       "title": "Notas Compartilhadas",
       "no_public_notes": "Ainda não há notas compartilhadas.",
-      "public_hint": "Compartilhe uma nota clicando no botão de nuvem na barra de ferramentas."
+      "public_hint": "Compartilhe uma nota clicando no botão de nuvem na barra de ferramentas da nota."
     },
     "filter_placeholder": "Filtrar por título, token ou nome da pasta...",
     "no_filter_results": "Nenhuma nota corresponde à sua pesquisa.",
@@ -1541,7 +1541,9 @@
   },
   "shared_folders": {
     "page": {
-      "title": "Pastas Compartilhadas"
+      "title": "Pastas Compartilhadas",
+      "no_shared_folders": "Ainda não há pastas compartilhadas.",
+      "shared_folders_hint": "Compartilhe uma pasta clicando no botão de nuvem no menu da pasta."
     },
     "button": "Pastas Compartilhadas",
     "view_shared_folders": "Ver pastas compartilhadas",
