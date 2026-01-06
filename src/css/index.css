@@ -727,6 +727,18 @@ body {
     color: #dc2626;
 }
 
+.folder-actions-menu-item.shared {
+    color: #dc2626;
+}
+
+.folder-actions-menu-item.shared:hover {
+    background-color: #fee2e2;
+}
+
+.folder-actions-menu-item.shared i {
+    color: #dc2626;
+}
+
 /* Separator in menu */
 .folder-actions-menu-separator {
     height: 1px;

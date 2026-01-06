@@ -16,7 +16,7 @@ $currentLang = getUserLanguage();
 	<meta charset="utf-8"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-	<title><?php echo t_h('public.page.title', [], 'Public Notes'); ?> - <?php echo t_h('app.name'); ?></title>
+	<title><?php echo t_h('public.page.title', [], 'Shared Notes'); ?> - <?php echo t_h('app.name'); ?></title>
 	<meta name="color-scheme" content="dark light">
 	<script src="js/theme-init.js"></script>
 	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
@@ -46,13 +46,17 @@ $currentLang = getUserLanguage();
       data-txt-yesterday="<?php echo t_h('common.date.yesterday', [], 'Yesterday'); ?>"
       data-txt-days-ago="<?php echo t_h('common.date.days_ago', [], 'days ago'); ?>"
       data-txt-cancel="<?php echo t_h('common.cancel', [], 'Cancel'); ?>"
-      data-txt-save="<?php echo t_h('common.save', [], 'Save'); ?>">
+      data-txt-save="<?php echo t_h('common.save', [], 'Save'); ?>"
+      data-txt-via-folder="<?php echo t_h('public.via_folder', [], 'Shared via folder'); ?>">
 	<div class="shared-container">
-		<h2 class="shared-header"><?php echo t_h('public.page.title', [], 'Public Notes'); ?></h2>
+		<h2 class="shared-header"><?php echo t_h('public.page.title', [], 'Shared Notes'); ?></h2>
 		
 		<div class="shared-buttons-container">
 			<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
 				<?php echo t_h('common.back_to_notes'); ?>
+			</button>
+			<button id="sharedFoldersBtn" class="btn btn-secondary" title="<?php echo t_h('shared_folders.view_shared_folders', [], 'View shared folders'); ?>">
+				<?php echo t_h('shared_folders.button', [], 'Shared Folders'); ?>
 			</button>
 		</div>
 		
@@ -62,13 +66,13 @@ $currentLang = getUserLanguage();
 					type="text" 
 					id="filterInput" 
 					class="filter-input" 
-					placeholder="<?php echo t_h('public.filter_placeholder', [], 'Filter by title or token...'); ?>"
+					placeholder="<?php echo t_h('public.filter_placeholder', [], 'Filter by title, token or folder name...'); ?>"
 				/>
 				<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
 					<i class="fa-times"></i>
 				</button>
 			</div>
-			<div id="filterStats" class="filter-stats"></div>
+			<div id="filterStats" class="filter-stats initially-hidden"></div>
 		</div>
 		
 		<div class="shared-content">
@@ -78,9 +82,8 @@ $currentLang = getUserLanguage();
 			</div>
 			<div id="sharedNotesContainer"></div>
 			<div id="emptyMessage" class="empty-message initially-hidden">
-			<i class="fa-cloud"></i>
-			<p><?php echo t_h('public.page.no_public_notes', [], 'No public notes yet.'); ?></p>
-				<p class="empty-hint"><?php echo t_h('public.page.public_hint', [], 'Make a note public by clicking the cloud button in the note toolbar.'); ?></p>
+			<p><?php echo t_h('public.page.no_public_notes', [], 'No shared notes yet.'); ?></p>
+				<p class="empty-hint"><?php echo t_h('public.page.public_hint', [], 'Share a note by clicking the cloud button in the note toolbar.'); ?></p>
 			</div>
 		</div>
 	</div>

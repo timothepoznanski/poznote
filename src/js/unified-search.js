@@ -292,7 +292,7 @@ class SearchManager {
         const activeType = this.getActiveSearchType(isMobile);
 
         const placeholders = {
-            notes: (window.t ? window.t('search.placeholder_notes', null, 'Search for one or more words...') : 'Search for one or more words...'),
+            notes: (window.t ? window.t('search.placeholder_notes', null, 'Search for one or more words (use "quotes" for exact phrases)...') : 'Search for one or more words (use "quotes" for exact phrases)...'),
             tags: (window.t ? window.t('search.placeholder_tags', null, 'Search for one or more tags...') : 'Search for one or more tags...')
         };
         
@@ -687,10 +687,10 @@ class SearchManager {
             return true;
         }
 
-        // Split search string into individual terms (whitespace separated)
-        const searchTerms = searchValue.split(/\s+/).filter(term => term.trim().length > 0);
+        // Parse search terms with support for quoted phrases
+        const searchTerms = this.parseSearchTermsForValidation(searchValue);
         
-        // Check if all terms are single characters
+        // Check if all terms are single characters (excluding quoted phrases)
         const allSingleChar = searchTerms.every(term => term.length === 1);
         
         if (allSingleChar && searchTerms.length > 0) {
@@ -704,6 +704,27 @@ class SearchManager {
         }
         
         return true;
+    }
+
+    /**
+     * Parse search terms for validation (similar to parseSearchTerms but for validation)
+     */
+    parseSearchTermsForValidation(search) {
+        const terms = [];
+        const pattern = /"([^"]+)"|\S+/g;
+        let match;
+        
+        while ((match = pattern.exec(search)) !== null) {
+            // If match[1] exists, it's a quoted phrase (consider it as valid term)
+            if (match[1]) {
+                terms.push(match[1]);
+            } else {
+                // Otherwise it's a single word
+                terms.push(match[0]);
+            }
+        }
+        
+        return terms;
     }
 
     /**

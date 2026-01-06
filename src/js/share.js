@@ -13,6 +13,54 @@ function updateSharedCount(delta) {
     }
 }
 
+// Refresh notes list after folder action (share/revoke)
+function refreshNotesListAfterFolderAction() {
+    const url = new URL(window.location.href);
+    
+    fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+    .then(function(response) { return response.text(); })
+    .then(function(html) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const newLeftCol = doc.getElementById('left_col');
+        const currentLeftCol = document.getElementById('left_col');
+        
+        if (newLeftCol && currentLeftCol) {
+            currentLeftCol.innerHTML = newLeftCol.innerHTML;
+            
+            // Reinitialize components
+            try {
+                if (typeof initializeWorkspaceMenu === 'function') {
+                    initializeWorkspaceMenu();
+                }
+                
+                if (window.searchManager) {
+                    window.searchManager.initializeSearch();
+                    window.searchManager.ensureAtLeastOneButtonActive();
+                }
+                
+                if (typeof reinitializeClickableTagsAfterAjax === 'function') {
+                    reinitializeClickableTagsAfterAjax();
+                }
+                
+                if (typeof window.initializeNoteClickHandlers === 'function') {
+                    window.initializeNoteClickHandlers();
+                }
+                
+                // Reinitialize drag and drop events for notes
+                if (typeof setupNoteDragDropEvents === 'function') {
+                    setupNoteDragDropEvents();
+                }
+            } catch (error) {
+                console.error('Error reinitializing after folder action:', error);
+            }
+        }
+    })
+    .catch(function(err) {
+        console.log('Error during refresh:', err);
+    });
+}
+
 function toggleShareMenu(event, noteId, filename, titleJson) {
     if (event) event.stopPropagation();
     currentShareMenuNoteId = noteId;
@@ -819,3 +867,357 @@ function closeActionsMenu() {
 
 window.toggleActionsMenu = toggleActionsMenu;
 window.closeActionsMenu = closeActionsMenu;
+
+// ===========================
+// Folder Sharing Functions
+// ===========================
+
+// Create a public share for a folder
+async function createPublicFolderShare(folderId) {
+    if (!folderId) return;
+
+    try {
+        // Get custom token if provided
+        let customToken = '';
+        try {
+            const el = document.getElementById('shareFolderCustomToken');
+            if (el && el.value) customToken = el.value.trim();
+        } catch (e) {}
+
+        // Get indexable checkbox value
+        let indexable = 0;
+        try {
+            const indexableEl = document.getElementById('shareFolderIndexable');
+            if (indexableEl && indexableEl.checked) indexable = 1;
+        } catch (e) {}
+
+        // Get password value
+        let password = '';
+        try {
+            const passwordEl = document.getElementById('shareFolderPassword');
+            if (passwordEl && passwordEl.value) password = passwordEl.value.trim();
+        } catch (e) {}
+
+        const theme = localStorage.getItem('poznote-theme') || 'light';
+        const body = { theme: theme, indexable: indexable };
+        if (customToken) body.custom_token = customToken;
+        if (password) body.password = password;
+
+        const resp = await fetch('/api/v1/folders/' + folderId + '/share', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(body)
+        });
+
+        if (!resp.ok) {
+            const ct = resp.headers.get('content-type') || '';
+            if (ct.indexOf('application/json') !== -1) {
+                const errBody = await resp.json();
+                throw new Error(errBody.error || ('Network response not ok: ' + resp.status));
+            }
+            throw new Error('Network response not ok: ' + resp.status);
+        }
+
+        const ct2 = resp.headers.get('content-type') || '';
+        let data = null;
+        if (ct2.indexOf('application/json') !== -1) {
+            data = await resp.json();
+        } else {
+            const text = await resp.text();
+            throw new Error('Unexpected response from server: ' + text);
+        }
+
+        if (data && data.url) {
+            // Show success modal with URL
+            if (typeof showFolderShareModal === 'function') {
+                showFolderShareModal(data.url, { folderId: folderId, shared: true, workspace: data.workspace || '' });
+            }
+            
+            // Update shared count in sidebar
+            if (data.shared_notes_count && data.shared_notes_count > 0) {
+                updateSharedCount(data.shared_notes_count);
+            }
+            
+            // Close folder actions menu
+            if (typeof closeFolderActionsMenu === 'function') {
+                closeFolderActionsMenu(folderId);
+            }
+            
+            // Refresh notes list to update folder actions menu item
+            refreshNotesListAfterFolderAction(folderId);
+        }
+
+    } catch (err) {
+        console.error('Failed to create folder share:', err);
+        alert('Failed to create public folder link: ' + err.message);
+    }
+}
+
+// Get existing public share for a folder
+async function getPublicFolderShare(folderId) {
+    try {
+        const resp = await fetch('/api/v1/folders/' + folderId + '/share', {
+            credentials: 'same-origin',
+            headers: { 'Accept': 'application/json' }
+        });
+        
+        if (!resp.ok) return { shared: false };
+        
+        const data = await resp.json();
+        if (data.success && data.public) {
+            const preferredProtocol = getPreferredPublicUrlProtocol();
+            return {
+                shared: true,
+                url: applyProtocolToPublicUrl(data.url, preferredProtocol),
+                workspace: data.workspace
+            };
+        }
+        return { shared: false };
+    } catch (err) {
+        console.error('Failed to get folder share status:', err);
+        return { shared: false };
+    }
+}
+
+// Open the share modal for a folder
+async function openPublicFolderShareModal(folderId) {
+    if (!folderId) return;
+    
+    const info = await getPublicFolderShare(folderId);
+    if (info.shared && info.url) {
+        showFolderShareModal(info.url, { folderId: folderId, shared: true, workspace: info.workspace });
+    } else {
+        showFolderShareModal('', { folderId: folderId, shared: false });
+    }
+}
+
+// Show folder share modal (similar to note share modal)
+function showFolderShareModal(url, options) {
+    const existing = document.getElementById('folderShareModal');
+    if (existing) existing.parentNode.removeChild(existing);
+
+    const modal = document.createElement('div');
+    modal.id = 'folderShareModal';
+    modal.className = 'modal share-modal';
+    modal.style.display = 'flex';
+
+    const content = document.createElement('div');
+    content.className = 'modal-content share-modal-content';
+
+    const h3 = document.createElement('h3');
+    h3.textContent = window.t ? window.t('index.folder_share_modal.title', null, 'Public Folder URL') : 'Public Folder URL';
+    content.appendChild(h3);
+
+    const p = document.createElement('p');
+    p.textContent = window.t ? window.t('index.folder_share_modal.description', null, 'Anyone with this link can view all notes in this folder.') : 'Anyone with this link can view all notes in this folder.';
+    content.appendChild(p);
+
+    const folderId = options && options.folderId ? options.folderId : null;
+    const shared = options && options.shared;
+    const folderWorkspace = options && options.workspace ? options.workspace : '';
+
+    // Show the full URL as plain text
+    const urlDiv = document.createElement('div');
+    urlDiv.id = 'folderShareModalUrl';
+    urlDiv.className = 'share-url';
+    const preferredProto = getPreferredPublicUrlProtocol();
+    if (url) {
+        urlDiv.textContent = applyProtocolToPublicUrl(url, preferredProto);
+    }
+    content.appendChild(urlDiv);
+
+    const buttonsDiv = document.createElement('div');
+    buttonsDiv.className = 'modal-buttons share-modal-buttons';
+
+    if (shared && url) {
+        // Protocol toggle for shared folders
+        const protocolWrap = document.createElement('div');
+        protocolWrap.className = 'share-protocol-wrap';
+        const protocolLabel = document.createElement('label');
+        protocolLabel.className = 'share-indexable-label';
+        const protocolText = document.createElement('span');
+        protocolText.className = 'indexable-label-text';
+        protocolText.textContent = 'Use HTTPS';
+        const toggleSwitch = document.createElement('label');
+        toggleSwitch.className = 'toggle-switch';
+        const protocolCheckbox = document.createElement('input');
+        protocolCheckbox.type = 'checkbox';
+        protocolCheckbox.id = 'folderProtocolToggle';
+        protocolCheckbox.checked = preferredProto === 'https';
+        const slider = document.createElement('span');
+        slider.className = 'toggle-slider';
+        toggleSwitch.appendChild(protocolCheckbox);
+        toggleSwitch.appendChild(slider);
+        protocolLabel.appendChild(protocolText);
+        protocolLabel.appendChild(toggleSwitch);
+        protocolWrap.appendChild(protocolLabel);
+        content.insertBefore(protocolWrap, urlDiv);
+
+        protocolCheckbox.addEventListener('change', function () {
+            const nextProto = protocolCheckbox.checked ? 'https' : 'http';
+            setPreferredPublicUrlProtocol(nextProto);
+            urlDiv.textContent = applyProtocolToPublicUrl(urlDiv.textContent, nextProto);
+        });
+
+        // Open button
+        const openBtn = document.createElement('button');
+        openBtn.type = 'button';
+        openBtn.className = 'btn-open';
+        openBtn.textContent = window.t ? window.t('index.public_modal.open', null, 'Open') : 'Open';
+        openBtn.onclick = function() {
+            const currentUrl = urlDiv.textContent;
+            if (currentUrl) window.open(currentUrl, '_blank', 'noopener');
+        };
+        buttonsDiv.appendChild(openBtn);
+
+        // Copy button
+        const copyBtn = document.createElement('button');
+        copyBtn.type = 'button';
+        copyBtn.className = 'btn-primary';
+        copyBtn.textContent = window.t ? window.t('index.public_modal.copy', null, 'Copy') : 'Copy';
+        copyBtn.onclick = async function(ev) {
+            try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
+            try {
+                await navigator.clipboard.writeText(urlDiv.textContent);
+            } catch (e) {
+                console.error('Failed to copy:', e);
+            }
+        };
+        buttonsDiv.appendChild(copyBtn);
+
+        // Add Edit button to open list_shared_folders.php filtered by this token
+        if (folderId) {
+            const manageBtn = document.createElement('button');
+            manageBtn.type = 'button';
+            manageBtn.className = 'btn-primary';
+            manageBtn.textContent = window.t ? window.t('index.public_modal.manage', null, 'Edit') : 'Edit';
+            manageBtn.onclick = function(ev) {
+                try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
+                // Extract token from URL (last part after /)
+                const token = url.split('/').pop();
+                if (token) {
+                    let sharedUrl = 'list_shared_folders.php?filter=' + encodeURIComponent(token);
+                    if (folderWorkspace) {
+                        sharedUrl += '&workspace=' + encodeURIComponent(folderWorkspace);
+                    }
+                    window.open(sharedUrl, '_blank');
+                }
+            };
+            buttonsDiv.appendChild(manageBtn);
+        }
+
+        // Revoke button
+        if (folderId) {
+            const revokeBtn = document.createElement('button');
+            revokeBtn.type = 'button';
+            revokeBtn.className = 'btn-cancel';
+            revokeBtn.textContent = window.t ? window.t('index.public_modal.revoke', null, 'Revoke') : 'Revoke';
+            revokeBtn.onclick = async function(ev) {
+                try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
+                try {
+                    const resp = await fetch('/api/v1/folders/' + folderId + '/share', {
+                        method: 'DELETE',
+                        credentials: 'same-origin',
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    if (resp.ok) {
+                        const data = await resp.json();
+                        // Update shared count (negative delta for unshared notes)
+                        if (data.unshared_notes_count && typeof updateSharedCount === 'function') {
+                            updateSharedCount(-data.unshared_notes_count);
+                        }
+                        // Refresh the notes list to update folder actions menu
+                        refreshNotesListAfterFolderAction();
+                        closeModal('folderShareModal');
+                    } else {
+                        alert('Failed to revoke folder share');
+                    }
+                } catch (e) {
+                    console.error('Failed to revoke:', e);
+                    alert('Failed to revoke folder share');
+                }
+            };
+            buttonsDiv.appendChild(revokeBtn);
+        }
+
+        // Close button
+        const closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'btn-secondary';
+        closeBtn.textContent = window.t ? window.t('index.public_modal.close', null, 'Close') : 'Close';
+        closeBtn.onclick = function() { closeModal('folderShareModal'); };
+        buttonsDiv.appendChild(closeBtn);
+        
+        content.appendChild(buttonsDiv);
+    } else {
+        // Not shared - show create button
+        const inputWrap = document.createElement('div');
+        inputWrap.className = 'share-custom-wrap';
+        const label = document.createElement('label');
+        const labelText = window.t ? window.t('index.share_modal.custom_token', null, 'Custom token (optional)') : 'Custom token (optional)';
+        label.innerHTML = labelText.replace('(optional)', '<span class="optional-red">(optional)</span>');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = 'shareFolderCustomToken';
+        input.placeholder = 'my-folder-link';
+        inputWrap.appendChild(label);
+        inputWrap.appendChild(input);
+        content.appendChild(inputWrap);
+
+        // Indexable checkbox
+        const indexableWrap = document.createElement('div');
+        indexableWrap.className = 'share-indexable-wrap';
+        const indexableLabel = document.createElement('label');
+        const indexableCheckbox = document.createElement('input');
+        indexableCheckbox.type = 'checkbox';
+        indexableCheckbox.id = 'shareFolderIndexable';
+        indexableLabel.appendChild(indexableCheckbox);
+        const indexableText = document.createTextNode(' ' + (window.t ? window.t('index.share_modal.indexable', null, 'Allow search engines') : 'Allow search engines'));
+        indexableLabel.appendChild(indexableText);
+        indexableWrap.appendChild(indexableLabel);
+        content.appendChild(indexableWrap);
+
+        // Password field
+        const passwordWrap = document.createElement('div');
+        passwordWrap.className = 'share-password-wrap';
+        const passwordLabel = document.createElement('label');
+        passwordLabel.textContent = window.t ? window.t('index.share_modal.password', null, 'Password (optional)') : 'Password (optional)';
+        const passwordInput = document.createElement('input');
+        passwordInput.type = 'password';
+        passwordInput.id = 'shareFolderPassword';
+        passwordInput.placeholder = window.t ? window.t('index.share_modal.password_placeholder', null, 'Enter password') : 'Enter password';
+        passwordWrap.appendChild(passwordLabel);
+        passwordWrap.appendChild(passwordInput);
+        content.appendChild(passwordWrap);
+
+        // Create button
+        const createBtn = document.createElement('button');
+        createBtn.type = 'button';
+        createBtn.className = 'btn-primary';
+        createBtn.textContent = window.t ? window.t('index.share_modal.create_url', null, 'Create url') : 'Create url';
+        createBtn.onclick = function() { createPublicFolderShare(folderId); };
+        buttonsDiv.appendChild(createBtn);
+
+        // Cancel button
+        const cancelBtn = document.createElement('button');
+        cancelBtn.type = 'button';
+        cancelBtn.className = 'btn-cancel';
+        cancelBtn.textContent = window.t ? window.t('index.share_modal.close', null, 'Close') : 'Close';
+        cancelBtn.onclick = function() { closeModal('folderShareModal'); };
+        buttonsDiv.appendChild(cancelBtn);
+
+        content.appendChild(buttonsDiv);
+    }
+
+    modal.appendChild(content);
+    document.body.appendChild(modal);
+}
+
+window.createPublicFolderShare = createPublicFolderShare;
+window.getPublicFolderShare = getPublicFolderShare;
+window.openPublicFolderShareModal = openPublicFolderShareModal;
+window.showFolderShareModal = showFolderShareModal;

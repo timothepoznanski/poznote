@@ -49,6 +49,7 @@ require_once __DIR__ . '/controllers/WorkspacesController.php';
 require_once __DIR__ . '/controllers/TagsController.php';
 require_once __DIR__ . '/controllers/AttachmentsController.php';
 require_once __DIR__ . '/controllers/ShareController.php';
+require_once __DIR__ . '/controllers/FolderShareController.php';
 require_once __DIR__ . '/controllers/SettingsController.php';
 require_once __DIR__ . '/controllers/BackupController.php';
 require_once __DIR__ . '/controllers/SystemController.php';
@@ -188,6 +189,7 @@ $workspacesController = new WorkspacesController($con);
 $tagsController = new TagsController($con);
 $attachmentsController = new AttachmentsController($con);
 $shareController = new ShareController($con);
+$folderShareController = new FolderShareController($con);
 $settingsController = new SettingsController($con);
 $backupController = new BackupController($con);
 $systemController = new SystemController($con);
@@ -363,6 +365,26 @@ $router->get('/folders/{id}/notes', function($params) use ($foldersController) {
 // Get folder path
 $router->get('/folders/{id}/path', function($params) use ($foldersController) {
     $foldersController->path($params['id']);
+});
+
+// Get share status for a folder
+$router->get('/folders/{id}/share', function($params) use ($folderShareController) {
+    $folderShareController->show($params['id']);
+});
+
+// Create/renew folder share link
+$router->post('/folders/{id}/share', function($params) use ($folderShareController) {
+    $folderShareController->store($params['id']);
+});
+
+// Update folder share settings
+$router->patch('/folders/{id}/share', function($params) use ($folderShareController) {
+    $folderShareController->update($params['id']);
+});
+
+// Revoke folder share link
+$router->delete('/folders/{id}/share', function($params) use ($folderShareController) {
+    $folderShareController->destroy($params['id']);
 });
 
 // ======================

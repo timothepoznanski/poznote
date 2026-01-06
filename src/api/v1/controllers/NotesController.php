@@ -376,6 +376,21 @@ class NotesController {
             if ($stmt->execute([$heading, $entrycontent, $tags, $folder, $folder_id, $workspace, $type, $now_utc, $now_utc])) {
                 $id = $this->con->lastInsertId();
                 
+                // If folder is shared, auto-share the new note
+                $wasShared = false;
+                if ($folder_id) {
+                    $sharedFolderStmt = $this->con->prepare("SELECT id, theme, indexable FROM shared_folders WHERE folder_id = ? LIMIT 1");
+                    $sharedFolderStmt->execute([$folder_id]);
+                    $sharedFolder = $sharedFolderStmt->fetch(PDO::FETCH_ASSOC);
+                    
+                    if ($sharedFolder) {
+                        $noteToken = bin2hex(random_bytes(16));
+                        $insertShareStmt = $this->con->prepare("INSERT INTO shared_notes (note_id, token, theme, indexable) VALUES (?, ?, ?, ?)");
+                        $insertShareStmt->execute([$id, $noteToken, $sharedFolder['theme'], $sharedFolder['indexable']]);
+                        $wasShared = true;
+                    }
+                }
+                
                 // Create the file
                 $filename = getEntryFilename($id, $type);
                 $entriesDir = dirname($filename);
@@ -400,7 +415,8 @@ class NotesController {
                         'type' => $type,
                         'folder_id' => $folder_id,
                         'created' => $now_utc
-                    ]
+                    ],
+                    'share_delta' => $wasShared ? 1 : 0
                 ]);
             } else {
                 $this->sendError(500, 'Error while creating the note');
@@ -1083,6 +1099,21 @@ class NotesController {
             
             $newId = $this->con->lastInsertId();
             
+            // If folder is shared, auto-share the duplicated note
+            $wasShared = false;
+            if ($originalNote['folder_id']) {
+                $sharedFolderStmt = $this->con->prepare("SELECT id, theme, indexable FROM shared_folders WHERE folder_id = ? LIMIT 1");
+                $sharedFolderStmt->execute([$originalNote['folder_id']]);
+                $sharedFolder = $sharedFolderStmt->fetch(PDO::FETCH_ASSOC);
+                
+                if ($sharedFolder) {
+                    $noteToken = bin2hex(random_bytes(16));
+                    $insertShareStmt = $this->con->prepare("INSERT INTO shared_notes (note_id, token, theme, indexable) VALUES (?, ?, ?, ?)");
+                    $insertShareStmt->execute([$newId, $noteToken, $sharedFolder['theme'], $sharedFolder['indexable']]);
+                    $wasShared = true;
+                }
+            }
+            
             // Create new file
             $newFilename = getEntryFilename($newId, $originalNote['type']);
             file_put_contents($newFilename, $content);
@@ -1092,7 +1123,8 @@ class NotesController {
             $this->sendSuccess([
                 'id' => $newId,
                 'heading' => $newHeading,
-                'message' => 'Note duplicated successfully'
+                'message' => 'Note duplicated successfully',
+                'share_delta' => $wasShared ? 1 : 0
             ]);
             
         } catch (Exception $e) {

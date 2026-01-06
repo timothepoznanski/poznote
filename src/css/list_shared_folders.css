@@ -1,0 +1,222 @@
+/* Shared Folders List Page */
+.shared-folders-page {
+    background: var(--background-primary);
+    color: var(--text-primary);
+}
+
+.shared-folders-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.shared-folders-buttons-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.shared-folders-header {
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+
+.btn-secondary {
+    background-color: var(--button-secondary-background);
+    color: var(--button-secondary-text);
+}
+
+.btn-secondary:hover {
+    background-color: var(--button-secondary-background-hover);
+}
+
+.shared-folders-search-form {
+    margin-bottom: 1.5rem;
+}
+
+.shared-folders-search-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--background-secondary);
+    color: var(--text-primary);
+    transition: border-color 0.2s;
+}
+
+.shared-folders-search-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.shared-folders-info {
+    margin-bottom: 1.5rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.shared-folders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1rem;
+}
+
+.shared-folder-item {
+    background-color: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.25rem;
+    transition: all 0.2s;
+    cursor: pointer;
+    display: flex;
+    gap: 1rem;
+}
+
+.shared-folder-item:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.shared-folder-item.hidden {
+    display: none;
+}
+
+.shared-folder-icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--accent-color-light);
+    color: var(--accent-color);
+    border-radius: 8px;
+    font-size: 1.5rem;
+}
+
+.shared-folder-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.shared-folder-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.shared-folder-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+}
+
+.shared-folder-token {
+    font-family: monospace;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    background-color: var(--background-tertiary);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+.shared-folder-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.password-badge {
+    background-color: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+}
+
+.indexable-badge {
+    background-color: rgba(76, 175, 80, 0.2);
+    color: #4caf50;
+}
+
+.shared-folder-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-action {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--background-primary);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: all 0.2s;
+}
+
+.btn-action:hover {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+.btn-action i {
+    font-size: 0.875rem;
+}
+
+.no-shared-folders {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-secondary);
+    font-size: 1.125rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .shared-folders-container {
+        padding: 1rem;
+    }
+
+    .shared-folders-buttons-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .shared-folders-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .shared-folder-actions {
+        flex-direction: column;
+    }
+
+    .btn-action {
+        width: 100%;
+        justify-content: center;
+    }
+}

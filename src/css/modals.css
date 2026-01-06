@@ -108,7 +108,7 @@
 }
 
 .modal-content input, .modal-content select {
-    width: 100%;
+    /* width: 100%; */
     padding: 8px 12px;
     margin-bottom: 15px;
     border: 1px solid #ddd;
@@ -116,6 +116,7 @@
     font-size: 14px;
     font-family: 'Inter', sans-serif;
     box-sizing: border-box;
+    margin-top: 10px;
 }
 
 .modal-content input:focus, .modal-content select:focus {
@@ -1636,18 +1637,18 @@
 }
 
 #shareModal .share-indexable-wrap {
-    margin: 15px 0 20px 0;
+    margin: 0 0 20px 0;
 }
 
 #shareModal .share-indexable-label {
     display: flex !important;
     align-items: center !important;
-    justify-content: space-between !important;
+    justify-content: flex-start !important;
     font-size: 14px;
     color: #333;
     cursor: pointer;
     user-select: none;
-    gap: 15px;
+    gap: 10px;
 }
 
 #shareModal .indexable-label-text {
@@ -1797,6 +1798,126 @@ html[data-theme='dark'] .toggle-slider {
 html[data-theme='dark'] #shareModal input:checked + .toggle-slider,
 html[data-theme='dark'] input:checked + .toggle-slider {
     background-color: #28a745 !important;
+}
+
+/* ===========================================
+   Folder Share Modal (same styles as #shareModal)
+   =========================================== */
+
+#folderShareModal .modal-content {
+    max-width: 790px;
+}
+
+#folderShareModal .share-url {
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: transparent;
+    box-sizing: border-box;
+    white-space: normal;
+    word-break: break-all;
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    cursor: text;
+    border-radius: 6px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+#folderShareModal .share-modal-buttons {
+    border-top: none;
+    display: flex;
+    gap: 12px;
+    margin-top: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#folderShareModal .share-modal-buttons button {
+    white-space: nowrap;
+    padding: 8px 16px;
+    min-width: fit-content;
+}
+
+#folderShareModal .share-protocol-wrap {
+    margin: 0 0 8px 0;
+}
+
+#folderShareModal .share-protocol-wrap .share-indexable-label {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 10px;
+}
+
+#folderShareModal .share-protocol-wrap .indexable-label-text {
+    flex: 0 0 auto;
+}
+
+#folderShareModal .btn-cancel {
+    background: #dc3545;
+    color: #ffffff;
+    border: none;
+}
+
+#folderShareModal .btn-open {
+    background: #28a745;
+    color: #ffffff;
+    border: none;
+}
+
+#folderShareModal .btn-primary {
+    background: #007DB8;
+    color: #ffffff;
+    border: none;
+}
+
+#folderShareModal .btn-secondary {
+    background: #6c757d;
+    color: #ffffff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+#folderShareModal .share-close-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+#folderShareModal .share-close-wrap button {
+    white-space: nowrap;
+    padding: 8px 16px;
+    min-width: fit-content;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.2s;
+}
+
+/* Dark mode for folder share modal */
+html[data-theme='dark'] #folderShareModal .modal-content {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] #folderShareModal h3 {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] #folderShareModal .share-url {
+    background: transparent;
+    border: none;
+    color: #e0e0e0;
+    padding: 0;
+}
+
+html[data-theme='dark'] #folderShareModal .share-indexable-label {
+    color: #e0e0e0;
 }
 
 /* ===========================================

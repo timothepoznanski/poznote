@@ -362,6 +362,19 @@ function createNote($con, $heading, $content, $folder = 'Default', $workspace = 
         
         $noteId = $con->lastInsertId();
         
+        // If folder is shared, auto-share the new note
+        if ($folder_id) {
+            $sharedFolderStmt = $con->prepare("SELECT id, theme, indexable FROM shared_folders WHERE folder_id = ? LIMIT 1");
+            $sharedFolderStmt->execute([$folder_id]);
+            $sharedFolder = $sharedFolderStmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($sharedFolder) {
+                $noteToken = bin2hex(random_bytes(16));
+                $insertShareStmt = $con->prepare("INSERT INTO shared_notes (note_id, token, theme, indexable) VALUES (?, ?, ?, ?)");
+                $insertShareStmt->execute([$noteId, $noteToken, $sharedFolder['theme'], $sharedFolder['indexable']]);
+            }
+        }
+        
         // Create the file for the note content with appropriate extension
         $filename = getEntryFilename($noteId, $type);
         

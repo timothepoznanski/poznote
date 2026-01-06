@@ -1,0 +1,395 @@
+/* Public Folder Styles */
+
+/* Password protection page */
+.password-page-body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    background: #f5f5f5;
+}
+
+.password-container {
+    padding: 40px;
+    border-radius: 8px;
+    justify-items: center;
+    max-width: 400px;
+    width: 90%;
+}
+
+.password-container h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+.password-container p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.password-container input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.password-container button {
+    width: 100%;
+    padding: 12px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.password-container button:hover {
+    background: #0056b3;
+}
+
+.password-container .error {
+    color: #dc3545;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.lock-icon {
+    font-size: 48px;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #007bff;
+}
+
+/* Main folder page */
+.public-folder-body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: var(--bg-color, #ffffff);
+    color: var(--text-color, #333);
+}
+
+[data-theme="dark"] .public-folder-body,
+[data-theme="dark"].public-folder-html {
+    --bg-color: #1a1a1a;
+    --text-color: #e0e0e0;
+    --link-color: #6db3f2;
+    --border-color: #333;
+}
+
+[data-theme="light"] .public-folder-body,
+[data-theme="light"].public-folder-html {
+    --bg-color: #ffffff;
+    --text-color: #333;
+    --link-color: rgb(49, 130, 206);
+    --border-color: #ddd;
+}
+
+.public-folder-body h1 {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.public-folder-body h1 i {
+    color: var(--link-color);
+}
+
+.notes-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.notes-list li {
+    padding: 15px 0;
+    /* border-bottom: 1px solid var(--border-color); */
+}
+
+.notes-list li:last-child {
+    border-bottom: none;
+}
+
+.notes-list a {
+    color: var(--link-color);
+    text-decoration: none;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.notes-list a:hover {
+    text-decoration: underline;
+}
+
+.notes-list .note-meta {
+    font-size: 0.85rem;
+    color: var(--text-color);
+    opacity: 0.6;
+    margin-top: 5px;
+    margin-left: 26px;
+}
+
+.empty-folder {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-color);
+    opacity: 0.6;
+}
+
+.empty-folder i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--border-color);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text-color);
+}
+
+/* Alternate styles for card layout */
+.public-folder {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+.public-folder-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.public-folder-header h1 {
+    font-size: 2rem;
+    margin: 0;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.public-folder-header h1 i {
+    color: var(--primary-color);
+}
+
+.folder-notes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.note-item {
+    background: var(--note-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    transition: box-shadow 0.2s;
+}
+
+.note-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.note-item h2 {
+    margin: 0 0 10px 0;
+    color: var(--text-color);
+    font-size: 1.5rem;
+}
+
+.note-meta {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.note-meta i {
+    margin-right: 5px;
+}
+
+.note-type {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    background: var(--tag-bg);
+    border-radius: 4px;
+}
+
+.note-preview {
+    margin-bottom: 15px;
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.note-preview p {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.note-full-content {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+}
+
+.expand-note-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s;
+}
+
+.expand-note-btn:hover {
+    background: var(--primary-hover);
+}
+
+.expand-note-btn i {
+    font-size: 0.85rem;
+}
+
+.empty-folder {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+}
+
+.empty-folder i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-folder p {
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+/* Theme toggle button */
+.theme-toggle-btn {
+    background: var(--button-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1.2rem;
+}
+
+.theme-toggle-btn:hover {
+    background: var(--button-hover-bg);
+}
+
+/* Dark mode support */
+[data-theme="dark"] {
+    --note-bg: #2a2a2a;
+    --text-color: #e0e0e0;
+    --text-muted: #999;
+    --border-color: #444;
+    --primary-color: #4a9eff;
+    --primary-hover: #3a8eef;
+    --button-bg: #3a3a3a;
+    --button-hover-bg: #4a4a4a;
+    --tag-bg: #3a3a3a;
+}
+
+[data-theme="light"] {
+    --note-bg: #ffffff;
+    --text-color: #333;
+    --text-muted: #666;
+    --border-color: #ddd;
+    --primary-color: #007bff;
+    --primary-hover: #0056b3;
+    --button-bg: #f5f5f5;
+    --button-hover-bg: #e0e0e0;
+    --tag-bg: #f0f0f0;
+}
+
+/* Task list styling for public folder */
+.note-item .task-list-container {
+    margin: 10px 0;
+}
+
+.note-item .task-item {
+    padding: 8px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.note-item .task-item.completed .task-text {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+.note-item .task-item.important {
+    font-weight: bold;
+}
+
+.note-item .task-text {
+    flex: 1;
+    color: var(--text-color);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .public-folder {
+        padding: 15px;
+    }
+
+    .public-folder-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .public-folder-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .note-item {
+        padding: 15px;
+    }
+
+    .note-item h2 {
+        font-size: 1.25rem;
+    }
+
+    .note-meta {
+        flex-direction: column;
+        gap: 8px;
+    }
+}

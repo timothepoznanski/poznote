@@ -179,11 +179,20 @@ function shouldFolderBeOpen($con, $folderId, $folderName, $is_search_mode, $fold
  * Génère les actions disponibles pour un dossier
  */
 function generateFolderActions($folderId, $folderName, $workspace_filter, $noteCount = 0) {
+    global $con;
     $actions = "";
     
     // Escape folder name for use in JavaScript strings
     $escapedFolderName = addslashes($folderName);
     $htmlEscapedFolderName = htmlspecialchars($folderName, ENT_QUOTES);
+    
+    // Check if folder is shared
+    $isShared = false;
+    if ($folderId) {
+        $stmt = $con->prepare('SELECT id FROM shared_folders WHERE folder_id = ? LIMIT 1');
+        $stmt->execute([$folderId]);
+        $isShared = $stmt->fetchColumn() !== false;
+    }
     
     if ($folderName === 'Favorites') {
         // No actions for Favorites folder
@@ -221,6 +230,19 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
             $actions .= "<div class='folder-actions-menu-item' data-action='download-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
             $actions .= "<i class='fa-download'></i>";
             $actions .= "<span>" . t_h('notes_list.folder_actions.download_folder', [], 'Download folder') . "</span>";
+            $actions .= "</div>";
+        }
+        
+        // Share folder action
+        if ($isShared) {
+            $actions .= "<div class='folder-actions-menu-item shared' data-action='share-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
+            $actions .= "<i class='fa-cloud'></i>";
+            $actions .= "<span>" . t_h('notes_list.folder_actions.is_public', [], 'Is public') . "</span>";
+            $actions .= "</div>";
+        } else {
+            $actions .= "<div class='folder-actions-menu-item' data-action='share-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
+            $actions .= "<i class='fa-cloud'></i>";
+            $actions .= "<span>" . t_h('notes_list.folder_actions.share_folder', [], 'Make public') . "</span>";
             $actions .= "</div>";
         }
         

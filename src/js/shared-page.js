@@ -27,7 +27,8 @@
             txtYesterday: body.getAttribute('data-txt-yesterday') || 'Yesterday',
             txtDaysAgo: body.getAttribute('data-txt-days-ago') || 'days ago',
             txtCancel: body.getAttribute('data-txt-cancel') || 'Cancel',
-            txtSave: body.getAttribute('data-txt-save') || 'Save'
+            txtSave: body.getAttribute('data-txt-save') || 'Save',
+            txtViaFolder: body.getAttribute('data-txt-via-folder') || 'Shared via folder'
         };
     }
     
@@ -62,7 +63,8 @@
             filteredNotes = sharedNotes.filter(function(note) {
                 var heading = (note.heading || '').toLowerCase();
                 var token = (note.token || '').toLowerCase();
-                return heading.includes(filterText) || token.includes(filterText);
+                var folderName = (note.shared_folder_name || '').toLowerCase();
+                return heading.includes(filterText) || token.includes(filterText) || folderName.includes(filterText);
             });
         }
         renderSharedNotes();
@@ -414,12 +416,29 @@
             item.className = 'shared-note-item';
             item.dataset.noteId = note.note_id;
             
+            // Note name container (for name + folder badge)
+            var noteNameContainer = document.createElement('div');
+            noteNameContainer.className = 'note-name-container';
+            
+            // Folder badge if shared via folder (before title)
+            if (note.shared_via_folder) {
+                var folderBadge = document.createElement('a');
+                folderBadge.className = 'folder-badge';
+                folderBadge.href = note.shared_folder_url || '#';
+                folderBadge.target = '_blank';
+                folderBadge.title = config.txtViaFolder + ': ' + (note.shared_folder_name || '');
+                folderBadge.textContent = note.shared_folder_name || '';
+                noteNameContainer.appendChild(folderBadge);
+            }
+            
             // Note name (clickable)
             var noteLink = document.createElement('a');
             noteLink.href = 'index.php?note=' + note.note_id + (config.workspace ? '&workspace=' + encodeURIComponent(config.workspace) : '');
             noteLink.textContent = note.heading || config.txtUntitled;
             noteLink.className = 'note-name';
-            item.appendChild(noteLink);
+            noteNameContainer.appendChild(noteLink);
+            
+            item.appendChild(noteNameContainer);
             
             // Token (editable)
             var tokenSpan = document.createElement('span');
@@ -532,6 +551,18 @@
         var backBtn = document.getElementById('backToNotesBtn');
         if (backBtn) {
             backBtn.addEventListener('click', goBackToNotes);
+        }
+        
+        // Shared folders button
+        var sharedFoldersBtn = document.getElementById('sharedFoldersBtn');
+        if (sharedFoldersBtn) {
+            sharedFoldersBtn.addEventListener('click', function() {
+                var params = new URLSearchParams();
+                if (config.workspace) {
+                    params.append('workspace', config.workspace);
+                }
+                window.location.href = 'list_shared_folders.php' + (params.toString() ? '?' + params.toString() : '');
+            });
         }
         
         // Filter input

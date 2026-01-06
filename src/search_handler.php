@@ -34,7 +34,29 @@ function handleUnifiedSearch() {
 }
 
 /**
- * Construit les conditions de recherche sécurisées
+ * Parse search terms with support for quoted phrases
+ */
+function parseSearchTerms($search) {
+    $terms = [];
+    $pattern = '/"([^"]+)"|\S+/';
+    
+    preg_match_all($pattern, $search, $matches);
+    
+    foreach ($matches[0] as $match) {
+        // If the match starts and ends with quotes, it's an exact phrase
+        if (preg_match('/^"(.+)"$/', $match, $phrase_match)) {
+            $terms[] = ['type' => 'phrase', 'value' => $phrase_match[1]];
+        } else {
+            // Otherwise it's a simple word
+            $terms[] = ['type' => 'word', 'value' => $match];
+        }
+    }
+    
+    return $terms;
+}
+
+/**
+ * Build secure search conditions
  */
 function buildSearchConditions($search, $tags_search, $folder_filter, $workspace_filter) {
     $where_conditions = ["trash = 0"];
@@ -42,21 +64,21 @@ function buildSearchConditions($search, $tags_search, $folder_filter, $workspace
     
     // Intelligent search that excludes Excalidraw content
     if (!empty($search)) {
-        // Split search string into individual terms (whitespace separated)
-        $search_terms = array_filter(array_map('trim', preg_split('/\s+/', $search)));
+        // Parse search terms with support for quoted phrases
+        $parsed_terms = parseSearchTerms($search);
 
-        if (count($search_terms) <= 1) {
-            // Single term: search in heading or clean entry content
+        if (count($parsed_terms) <= 1 && $parsed_terms[0]['type'] === 'word') {
+            // Single word: search in heading or clean entry content
             $where_conditions[] = "(heading LIKE ? OR search_clean_entry(entry) LIKE ?)";
-            $search_params[] = '%' . $search . '%';
-            $search_params[] = '%' . $search . '%';
+            $search_params[] = '%' . $parsed_terms[0]['value'] . '%';
+            $search_params[] = '%' . $parsed_terms[0]['value'] . '%';
         } else {
-            // Multiple terms: require ALL terms to appear (AND)
+            // Multiple terms or phrase: require ALL terms to appear (AND)
             $term_conditions = [];
-            foreach ($search_terms as $t) {
+            foreach ($parsed_terms as $term) {
                 $term_conditions[] = "(heading LIKE ? OR search_clean_entry(entry) LIKE ?)";
-                $search_params[] = '%' . $t . '%';
-                $search_params[] = '%' . $t . '%';
+                $search_params[] = '%' . $term['value'] . '%';
+                $search_params[] = '%' . $term['value'] . '%';
             }
             $where_conditions[] = "(" . implode(" AND ", $term_conditions) . ")";
         }

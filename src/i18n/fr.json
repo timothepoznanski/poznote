@@ -750,7 +750,7 @@
       "trash": "Corbeille",
       "tags": "Tags",
       "favorites": "Favoris",
-      "public": "Publiques",
+      "public": "Partagées",
       "attachments": "Pièces jointes"
     },
     "drop_zone": {
@@ -763,7 +763,8 @@
       "rename_folder": "Renommer le dossier",
       "delete_folder": "Supprimer le dossier",
       "download_folder": "Télécharger le dossier",
-      "change_icon": "Changer l'icône"
+      "change_icon": "Changer l'icône",
+      "share_folder": "Partager"
     }
   },
   "update": {
@@ -868,7 +869,7 @@
     "toolbar": {
       "favorite_add": "Ajouter aux favoris",
       "favorite_remove": "Retirer des favoris",
-      "public_note": "Rendre la note publique",
+      "public_note": "Partager la note",
       "attachments_with_count": "Pièces jointes ({{count}})",
       "menu_actions": "Actions du menu",
       "convert_to_html": "Convertir en HTML",
@@ -876,7 +877,7 @@
       "share_note": "Partager la note"
     },
     "public_modal": {
-      "title": "URL publique",
+      "title": "URL de partage",
       "close": "Fermer",
       "open": "Ouvrir",
       "copy": "Copier",
@@ -922,7 +923,7 @@
     "link_modal": {
       "title_add": "Ajouter un lien à l'image",
       "title_edit": "Modifier le lien de l'image",
-      "description": "Ce lien rendra l'image clickable lorsque la note sera définie comme publique.",
+      "description": "Ce lien rendra l'image clickable lorsque la note sera partagée.",
       "url_label": "Entrez l'URL du lien :",
       "url_placeholder": "https://www.exemple.com",
       "cancel": "Annuler",
@@ -1309,16 +1310,18 @@
     }
   },
   "public": {
+    "button": "Notes partagées",
+    "view_public_notes": "Voir les notes partagées",
     "page": {
-      "title": "Notes publiques",
-      "no_public_notes": "Aucune note publique pour le moment.",
-      "public_hint": "Rendez une note publique en cliquant sur le bouton de nuage dans la barre d'outils."
+      "title": "Notes partagées",
+      "no_public_notes": "Aucune note partagée pour le moment.",
+      "public_hint": "Partagez une note en cliquant sur le bouton de nuage dans la barre d'outils de la note."
     },
-    "filter_placeholder": "Filtrer par titre ou token...",
+    "filter_placeholder": "Filtrer par titre, token ou nom de dossier...",
     "no_filter_results": "Aucune note ne correspond à votre recherche.",
     "table": {
       "note": "Note",
-      "url": "URL publique"
+      "url": "URL partagée"
     },
     "actions": {
       "open": "Ouvrir",
@@ -1545,5 +1548,17 @@
     "wifi": "wifi",
     "wind": "vent",
     "yen-sign": "yen"
+  },
+  "shared_folders": {
+    "page": {
+      "title": "Dossiers partagés",
+      "no_shared_folders": "Aucun dossier partagé pour le moment.",
+      "shared_folders_hint": "Partagez un dossier en cliquant sur le bouton de nuage dans le menu du dossier."
+    },
+    "button": "Dossiers partagés",
+    "view_shared_folders": "Voir les dossiers partagés",
+    "filter_placeholder": "Filtrer par nom de dossier ou token...",
+    "empty": "Aucun dossier partagé trouvé.",
+    "confirm_revoke": "Êtes-vous sûr de vouloir révoquer le partage de ce dossier ? Toutes les notes de ce dossier seront également départagées."
   }
 }

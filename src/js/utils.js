@@ -100,6 +100,10 @@ function duplicateNote(noteId) {
     })
     .then(function(data) {
         if (data.success && data.id) {
+            // Update shared count if note was auto-shared
+            if (data.share_delta && typeof updateSharedCount === 'function') {
+                updateSharedCount(data.share_delta);
+            }
             // Stay on current note - just reload the page to refresh the list
             window.location.reload();
         } else {
@@ -1012,6 +1016,10 @@ function executeMoveAllFiles() {
     })
     .then(function(data) {
         if (data.success) {
+            // Update shared count if notes were shared/unshared
+            if (data.share_delta && typeof updateSharedCount === 'function') {
+                updateSharedCount(data.share_delta);
+            }
             // Successfully moved files - no notification needed
             closeModal('moveFolderFilesModal');
             // Refresh the page to reflect changes
@@ -1607,6 +1615,10 @@ function moveNoteToFolder() {
     .then(function(response) { return response.json(); })
     .then(function(data) {
         if (data && data.success) {
+            // Update shared count if notes were shared/unshared
+            if (data.share_delta && typeof updateSharedCount === 'function') {
+                updateSharedCount(data.share_delta);
+            }
             try { closeModal('moveNoteFolderModal'); } catch(e) {}
             location.reload();
         } else {
@@ -2152,6 +2164,10 @@ function showConvertNoteModal(noteId, target) {
             })
             .then(function(data) {
                 if (data.success) {
+                    // Update shared count if note was auto-shared
+                    if (data.share_delta && typeof updateSharedCount === 'function') {
+                        updateSharedCount(data.share_delta);
+                    }
                     // Hide the warning message and disable the duplicate button
                     if (warningEl) warningEl.style.display = 'none';
                     duplicateBtn.disabled = true;

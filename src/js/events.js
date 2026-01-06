@@ -1663,6 +1663,10 @@ function moveNoteToTargetFolder(noteId, targetFolderIdOrName) {
     .then(function(response) { return response.json(); })
     .then(function(data) {
         if (data && data.success) {
+            // Update shared count if notes were shared/unshared
+            if (data.share_delta && typeof updateSharedCount === 'function') {
+                updateSharedCount(data.share_delta);
+            }
             // Note moved successfully - no notification needed
             // Reload the page to reflect changes
             setTimeout(function() {

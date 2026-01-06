@@ -3,6 +3,7 @@ require 'auth.php';
 requireAuth();
 
 require_once 'config.php';
+require_once 'functions.php';
 
 // Check if settings access is completely disabled
 if (defined('DISABLE_SETTINGS_ACCESS') && DISABLE_SETTINGS_ACCESS === true) {
@@ -36,33 +37,42 @@ if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
     
     // Check if user has already authenticated for settings
     if (!isset($_SESSION['settings_authenticated']) || $_SESSION['settings_authenticated'] !== true) {
+        $currentLang = getUserLanguage();
         ?>
         <!DOCTYPE html>
-        <html>
+        <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
         <head>
             <meta charset="utf-8"/>
-            <title>Settings Access</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
+            <title><?php echo t_h('settings.password.title', [], 'Settings Access', $currentLang); ?> - Poznote</title>
+            <meta name="color-scheme" content="dark light">
+            <script src="js/theme-init.js"></script>
             <link rel="stylesheet" href="css/fontawesome.min.css">
-            <link rel="stylesheet" href="css/all.css">
+            <link rel="stylesheet" href="css/light.min.css">
             <link rel="stylesheet" href="css/settings-password.css">
+            <link rel="stylesheet" href="css/dark-mode.css">
+            <link rel="icon" href="favicon.ico" type="image/x-icon">
         </head>
-        <body class="settings-password-page">
-            <div class="settings-password-modal">
-                <i class="fas fa-lock"></i>
-                <h1>Settings Protected</h1>
-                <p>Please enter the password to access settings.</p>
-                <div class="settings-password-form">
-                    <input type="password" id="settings-password-input" placeholder="Enter password" autocomplete="off">
-                    <div id="settings-password-error" class="error-message"></div>
-                    <div class="settings-password-buttons">
-                        <button id="settings-password-submit" class="btn-primary">
-                            <i class="fas fa-check"></i> Submit
-                        </button>
-                        <button id="settings-password-cancel" class="btn-secondary">
-                            <i class="fas fa-times"></i> Cancel
-                        </button>
-                    </div>
+        <body>
+            <div class="login-container">
+                <div class="login-header">
+                    <h1 class="login-title">Poznote</h1>
+                    <p class="settings-subtitle"><?php echo t_h('settings.password.heading', [], 'Settings Protected', $currentLang); ?></p>
                 </div>
+                
+                <form id="settings-password-form">
+                    <div class="form-group">
+                        <input type="password" id="settings-password-input" placeholder="<?php echo t_h('settings.password.placeholder', [], 'Enter password', $currentLang); ?>" required autofocus autocomplete="off">
+                        <div id="settings-password-error" class="error"></div>
+                    </div>
+                    
+                    <button type="submit" id="settings-password-submit" class="login-button">
+                        <?php echo t_h('settings.password.submit', [], 'Access Settings', $currentLang); ?>
+                    </button>
+                    <button type="button" id="settings-password-cancel" class="login-button cancel-button">
+                        <?php echo t_h('settings.password.cancel', [], 'Back to Home', $currentLang); ?>
+                    </button>
+                </form>
             </div>
             <script src="js/settings-password.js"></script>
         </body>
@@ -73,7 +83,6 @@ if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
 }
 
 include 'db_connect.php';
-include 'functions.php';
 
 // Include page initialization
 require_once 'page_init.php';

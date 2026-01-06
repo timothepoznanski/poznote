@@ -750,7 +750,7 @@
       "trash": "Trash",
       "tags": "Tags",
       "favorites": "Favorites",
-      "public": "Public",
+      "public": "Shared",
       "attachments": "Attachments"
     },
     "drop_zone": {
@@ -763,7 +763,8 @@
       "rename_folder": "Rename folder",
       "delete_folder": "Delete folder",
       "download_folder": "Download folder",
-      "change_icon": "Change icon"
+      "change_icon": "Change icon",
+      "share_folder": "Share"
     }
   },
   "update": {
@@ -868,7 +869,7 @@
     "toolbar": {
       "favorite_add": "Add to favorites",
       "favorite_remove": "Remove from favorites",
-      "public_note": "Make note public",
+      "public_note": "Share note",
       "attachments_with_count": "Attachments ({{count}})",
       "menu_actions": "Menu actions",
       "convert_to_html": "Convert to HTML",
@@ -876,7 +877,7 @@
       "share_note": "Share note"
     },
     "public_modal": {
-      "title": "Public URL",
+      "title": "Share URL",
       "close": "Close",
       "open": "Open",
       "copy": "Copy",
@@ -925,7 +926,7 @@
     "link_modal": {
       "title_add": "Add Link to Image",
       "title_edit": "Edit Image Link",
-      "description": "This link will make the image clickable when the note is set as public.",
+      "description": "This link will make the image clickable when the note is shared.",
       "url_label": "Enter the URL:",
       "url_placeholder": "https://www.example.com",
       "cancel": "Cancel",
@@ -1312,16 +1313,18 @@
     }
   },
   "public": {
+    "button": "Shared Notes",
+    "view_public_notes": "View shared notes",
     "page": {
-      "title": "Public Notes",
-      "no_public_notes": "No public notes yet.",
-      "public_hint": "Make a note public by clicking the cloud button in the note toolbar."
+      "title": "Shared Notes",
+      "no_public_notes": "No shared notes yet.",
+      "public_hint": "Share a note by clicking the cloud button in the note toolbar."
     },
-    "filter_placeholder": "Filter by title or token...",
+    "filter_placeholder": "Filter by title, token or folder name...",
     "no_filter_results": "No notes match your search.",
     "table": {
       "note": "Note",
-      "url": "Public URL"
+      "url": "Shared URL"
     },
     "actions": {
       "open": "Open",
@@ -1548,5 +1551,17 @@
     "wifi": "wifi",
     "wind": "wind",
     "yen-sign": "yen"
+  },
+  "shared_folders": {
+    "page": {
+      "title": "Shared Folders",
+      "no_shared_folders": "No shared folders yet.",
+      "shared_folders_hint": "Share a folder by clicking the cloud button in the folder menu."
+    },
+    "button": "Shared Folders",
+    "view_shared_folders": "View shared folders",
+    "filter_placeholder": "Filter by folder name or token...",
+    "empty": "No shared folders found.",
+    "confirm_revoke": "Are you sure you want to revoke sharing for this folder? All notes in this folder will also be unshared."
   }
 }

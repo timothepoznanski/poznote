@@ -268,6 +268,19 @@
                     window.showChangeFolderIconModal(folderId, folderName);
                 }
                 break;
+                
+            case 'share-folder':
+                event.preventDefault();
+                event.stopPropagation();
+                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
+                var folderName = actionElement.getAttribute('data-folder-name');
+                if (typeof window.closeFolderActionsMenu === 'function') {
+                    window.closeFolderActionsMenu(folderId);
+                }
+                if (folderId && typeof window.openPublicFolderShareModal === 'function') {
+                    window.openPublicFolderShareModal(folderId);
+                }
+                break;
         }
     }
 

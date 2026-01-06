@@ -6,7 +6,7 @@ TMP_DIR="tmp_sn_export"
 OUTPUT_DIR="poznote_export"
 
 # --- Check prerequisites ---
-required_tools=(jq unzip zip find)
+required_tools=(jq unzip zip find date)
 for tool in "${required_tools[@]}"; do
   if ! command -v "$tool" >/dev/null 2>&1; then
     echo "Error: $tool is not installed. Please install it and try again."
@@ -35,6 +35,7 @@ fi
 # --- Process each note ---
 jq -c '.items[] | select(.content_type=="Note")' "$SN_JSON" | while read -r note; do
   note_created=$(echo "$note" | jq -r '.created_at')
+  note_created_formatted=$(date -d "$note_created" +"%Y-%m-%d %H:%M:%S")
   note_uuid=$(echo "$note" | jq -r '.uuid')
   note_title=$(echo "$note" | jq -r '.content.title')
 
@@ -67,7 +68,7 @@ jq -c '.items[] | select(.content_type=="Note")' "$SN_JSON" | while read -r note
   # Create Markdown file with front matter
   {
     echo "---"
-    echo "created: \"$note_created\""
+    echo "created: \"$note_created_formatted\""
     echo "tags:"
     for t in "${tags_array[@]}"; do
       echo "  - \"$t\""
