@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+    const passwordForm = document.getElementById('settings-password-form');
     const passwordInput = document.getElementById('settings-password-input');
     const submitBtn = document.getElementById('settings-password-submit');
     const cancelBtn = document.getElementById('settings-password-cancel');
@@ -8,7 +9,9 @@ document.addEventListener('DOMContentLoaded', function() {
     passwordInput.focus();
     
     // Handle submit
-    async function handleSubmit() {
+    async function handleSubmit(e) {
+        e.preventDefault();
+        
         const password = passwordInput.value.trim();
         
         if (!password) {
@@ -18,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Disable button during verification
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+        submitBtn.innerHTML = 'Verifying...';
         
         try {
             const response = await fetch('api/v1/system/verify-password', {
@@ -37,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 showError(data.error || 'Invalid password');
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-check"></i> Submit';
+                submitBtn.innerHTML = 'Access Settings';
                 passwordInput.value = '';
                 passwordInput.focus();
             }
@@ -45,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error:', error);
             showError('An error occurred. Please try again.');
             submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fas fa-check"></i> Submit';
+            submitBtn.innerHTML = 'Access Settings';
         }
     }
     
@@ -63,12 +66,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Event listeners
-    submitBtn.addEventListener('click', handleSubmit);
+    passwordForm.addEventListener('submit', handleSubmit);
     cancelBtn.addEventListener('click', handleCancel);
-    
-    passwordInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            handleSubmit();
-        }
-    });
 });

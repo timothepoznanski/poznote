@@ -52,7 +52,8 @@ Password: `poznote`
 - [Change Settings](#change-settings)
 - [Authentication](#authentication)
 - [Update application](#update-application)
-- [Backup / Export and Restore / Import](#backup--export-and-restore--import)
+- [Backup / Export](#backup--export)
+- [Restore / Import](#restore--import)
 - [Offline View](#offline-view)
 - [Multiple Instances](#multiple-instances)
 - [Tech Stack](#tech-stack)
@@ -504,9 +505,9 @@ You can install beta versions by modifying your `docker-compose.yml` to use a sp
 
 </details>
 
-## Backup / Export and Restore / Import
+## Backup / Export
 
-Poznote includes built-in Backup / Export and Restoration / Import functionality accessible through Settings.
+Poznote includes built-in Backup / Export functionality accessible through Settings.
 
 <a id="complete-backup"></a>
 <details>
@@ -520,6 +521,60 @@ Single ZIP containing database, all notes, and attachments for all workspaces:
   - Attachments are accessible via clickable links
 
 </details>
+
+<a id="export-individual-notes"></a>
+<details>
+<summary><strong>Export Individual Notes</strong></summary>
+<br>
+
+Export individual notes using the **Export** button in the note toolbar:
+
+  - **HTML notes:** Export to HTML or PDF format
+  - **Markdown notes:** Export to HTML, Markdown or PDF format
+
+</details>
+
+<a id="automated-backups-with-bash-script"></a>
+<details>
+<summary><strong>Automated Backups with Bash Script</strong></summary>
+<br>
+
+For automated scheduled backups, you can use the included `backup-poznote.sh` script. This script creates complete backups via the Poznote REST API v1 and automatically manages retention.
+
+**Script location:** `backup-poznote.sh` in the `tools` folder of the Poznote repository
+
+**Usage:**
+```bash
+bash backup-poznote.sh '<poznote_url>' '<username>' '<password>' '<backup_directory>' '<retention_count>'
+```
+
+**Example with crontab:**
+
+To schedule automatic backups twice daily (at midnight and noon), add this line to your crontab:
+
+```bash
+0 0,12 * * * bash /root/backup-poznote.sh 'https://poznote.xxxxx.com' 'admin' 'xxxxx' '/root/poznote' '30'
+```
+
+**Parameters explained:**
+- `'https://poznote.xxxxx.com'` - Your Poznote instance URL
+- `'admin'` - Your Poznote username
+- `'xxxxx'` - Your Poznote password
+- `'/root/poznote'` - Parent directory where backups will be stored (the script creates a `backups-poznote` folder inside this path)
+- `'30'` - Number of backups to keep (older ones are automatically deleted)
+
+**How the backup process works:**
+
+1. The script calls the Poznote REST API v1 (`POST /api/v1/backups`) to create a backup at 00:00 (midnight) and 12:00 (noon) every day
+2. The API generates a backup ZIP in the Poznote container: `/var/www/html/data/backups/`
+3. The script downloads this backup locally (`GET /api/v1/backups/{filename}`) to: `/root/poznote/backups-poznote/`
+4. Old backups are automatically deleted from both locations (`DELETE /api/v1/backups/{filename}`) to keep only the most recent ones based on retention count
+
+</details>
+
+## Restore / Import
+
+Poznote includes built-in Restoration / Import functionality accessible through Settings.
 
 <a id="complete-restore"></a>
 <details>
@@ -655,44 +710,6 @@ updated: 2024-01-20 15:45:00
 
 </details>
 
-<a id="automated-backups-with-bash-script"></a>
-<details>
-<summary><strong>Automated Backups with Bash Script</strong></summary>
-<br>
-
-For automated scheduled backups, you can use the included `backup-poznote.sh` script. This script creates complete backups via the Poznote REST API v1 and automatically manages retention.
-
-**Script location:** `backup-poznote.sh` in the `tools` folder of the Poznote repository
-
-**Usage:**
-```bash
-bash backup-poznote.sh '<poznote_url>' '<username>' '<password>' '<backup_directory>' '<retention_count>'
-```
-
-**Example with crontab:**
-
-To schedule automatic backups twice daily (at midnight and noon), add this line to your crontab:
-
-```bash
-0 0,12 * * * bash /root/backup-poznote.sh 'https://poznote.xxxxx.com' 'admin' 'xxxxx' '/root/poznote' '30'
-```
-
-**Parameters explained:**
-- `'https://poznote.xxxxx.com'` - Your Poznote instance URL
-- `'admin'` - Your Poznote username
-- `'xxxxx'` - Your Poznote password
-- `'/root/poznote'` - Parent directory where backups will be stored (the script creates a `backups-poznote` folder inside this path)
-- `'30'` - Number of backups to keep (older ones are automatically deleted)
-
-**How the backup process works:**
-
-1. The script calls the Poznote REST API v1 (`POST /api/v1/backups`) to create a backup at 00:00 (midnight) and 12:00 (noon) every day
-2. The API generates a backup ZIP in the Poznote container: `/var/www/html/data/backups/`
-3. The script downloads this backup locally (`GET /api/v1/backups/{filename}`) to: `/root/poznote/backups-poznote/`
-4. Old backups are automatically deleted from both locations (`DELETE /api/v1/backups/{filename}`) to keep only the most recent ones based on retention count
-
-</details>
-
 ## Offline View
 
 The **📦 Complete Backup** creates a standalone offline version of your notes. Simply extract the ZIP and open `index.html` in any web browser.
@@ -701,11 +718,11 @@ The **📦 Complete Backup** creates a standalone offline version of your notes.
 
 You can run multiple isolated Poznote instances on the same server. Each instance has its own data, port, and credentials.
 
-### Why Multiple Instances?
-
 Perfect for:
 - Hosting for different users on the same server, each with their own separate instance and account
 - Testing new features without affecting your production instance
+
+Simply repeat the installation steps in different directories with different ports.
 
 ### Example: Tom and Alice instances on the same server
 
@@ -723,17 +740,6 @@ Server: my-server.com
     ├── Container: poznote-alice-webserver-1
     └── Data: ./poznote-alice/data/
 ```
-
-### How to Deploy Multiple Instances
-
-Simply repeat the installation steps in different directories with different ports.
-
-And then you will have two completely isolated instances, for example:
-
-- Tom's Poznote: http://localhost:8040
-- Alice's Poznote: http://localhost:8041
-
-> 💡 **Tip:** Make sure each instance uses a different port number to avoid conflicts!
 
 ## Tech Stack
 
