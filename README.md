@@ -843,7 +843,7 @@ curl -X POST -u 'username:password' \
     "heading": "My New Note",
     "content": "This is the content of my note",
     "tags": "work,important",
-    "folder": "Projects",
+    "folder_id": 12,
     "workspace": "Personal",
     "type": "markdown"
   }' \
