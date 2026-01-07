@@ -1556,8 +1556,8 @@
     -moz-user-select: text;
     cursor: text;
     border-radius: 6px;
-    margin-top: 12px;
-    margin-bottom: 30px; /* 30px spacing between URL and buttons */
+    margin-top: 24px;
+    margin-bottom: 36px; /* spacing between URL and buttons */
     color: #333;
 }
 
@@ -1578,7 +1578,7 @@
 
 /* Protocol toggle row (keep switch next to the HTTPS label) */
 #shareModal .share-protocol-wrap {
-    margin: 0 0 8px 0;
+    margin: 20px 0 8px 0;
 }
 
 #shareModal .share-protocol-wrap .share-indexable-label {

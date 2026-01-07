@@ -755,6 +755,7 @@
       "remove_from_folder": "Suelta aquí para eliminar de la carpeta"
     },
     "folder_actions": {
+      "menu": "Acciones",
       "create": "Crear",
       "move_all_files": "Mover todos los archivos a otra carpeta",
       "rename_folder": "Renombrar carpeta",
@@ -762,6 +763,7 @@
       "move_folder": "Mover carpeta a subcarpeta",
       "change_icon": "Cambiar icono",
       "download_folder": "Descargar carpeta",
+      "is_public": "Es compartida",
       "share_folder": "Compartir"
     }
   },
@@ -866,8 +868,20 @@
       "attachments_with_count": "Adjuntos ({{count}})",
       "menu_actions": "Acciones del menú"
     },
+    "share_modal": {
+      "custom_token": "Token personalizado (opcional)",
+      "custom_token_placeholder": "mi_token_personalizado-1",
+      "password": "Contraseña (opcional)",
+      "password_placeholder": "Ingrese una contraseña",
+      "indexable": "Permitir indexación por motores de búsqueda",
+      "create_url": "Crear URL",
+      "close": "Cerrar",
+      "error_prefix": "Error: ",
+      "unknown_error": "Error desconocido al crear el enlace público",
+      "error_creating": "Error al crear el enlace público: "
+    },
     "public_modal": {
-      "title": "URL de compartir",
+      "title": "URL compartida",
       "close": "Cerrar",
       "open": "Abrir",
       "copy": "Copiar",
@@ -884,6 +898,14 @@
       "error_prefix": "Error: ",
       "unknown_error": "Error desconocido al crear el enlace público",
       "error_creating": "Error al crear el enlace público: "
+    },
+    "folder_share_modal": {
+      "title": "URL de carpeta compartida",
+      "description": "Cualquiera con este enlace puede ver todas las notas de esta carpeta (a menos que esté protegida con contraseña).",
+      "use_https": "HTTPS",
+      "renewed": "Enlace de carpeta compartida renovado",
+      "failed_renew": "Error al renovar el enlace de la carpeta",
+      "failed_revoke": "Error al revocar el enlace de la carpeta"
     },
     "note": {
       "new_note": "Nueva nota",

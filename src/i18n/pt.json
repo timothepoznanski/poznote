@@ -754,12 +754,15 @@
       "remove_from_folder": "Solte aqui para remover da pasta"
     },
     "folder_actions": {
+      "menu": "Ações",
       "create": "Criar",
       "move_all_files": "Mover todos os arquivos para outra pasta",
       "rename_folder": "Renomear pasta",
       "delete_folder": "Excluir pasta",
       "move_folder": "Mover pasta para subpasta",
       "download_folder": "Baixar pasta",
+      "change_icon": "Alterar ícone",
+      "is_public": "É compartilhada",
       "share_folder": "Compartilhar"
     }
   },
@@ -869,8 +872,20 @@
       "attachments_with_count": "Anexos ({{count}})",
       "menu_actions": "Ações do menu"
     },
+    "share_modal": {
+      "custom_token": "Token personalizado (opcional)",
+      "custom_token_placeholder": "meu_token_personalizado-1",
+      "password": "Senha (opcional)",
+      "password_placeholder": "Digite uma senha",
+      "indexable": "Permitir indexação por motores de busca",
+      "create_url": "Criar URL",
+      "close": "Fechar",
+      "error_prefix": "Erro: ",
+      "unknown_error": "Erro desconhecido ao criar compartilhamento público",
+      "error_creating": "Erro ao criar compartilhamento público: "
+    },
     "public_modal": {
-      "title": "URL de Compartilhamento",
+      "title": "URL compartilhada",
       "close": "Fechar",
       "open": "Abrir",
       "copy": "Copiar",
@@ -883,7 +898,18 @@
       "custom_token_placeholder": "my_custom_token-1",
       "indexable": "Permitir indexação por motores de busca",
       "password": "Senha (opcional)",
-      "password_placeholder": "Digite uma senha"
+      "password_placeholder": "Digite uma senha",
+      "error_prefix": "Erro: ",
+      "unknown_error": "Erro desconhecido ao criar compartilhamento público",
+      "error_creating": "Erro ao criar compartilhamento público: "
+    },
+    "folder_share_modal": {
+      "title": "URL da pasta compartilhada",
+      "description": "Qualquer pessoa com este link pode ver todas as notas desta pasta (exceto se protegida por senha).",
+      "use_https": "HTTPS",
+      "renewed": "Link de compartilhamento da pasta renovado",
+      "failed_renew": "Falha ao renovar o compartilhamento da pasta",
+      "failed_revoke": "Falha ao revogar o compartilhamento da pasta"
     },
     "note": {
       "new_note": "Nova nota",

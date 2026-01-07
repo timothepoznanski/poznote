@@ -757,6 +757,7 @@
       "remove_from_folder": "Drop here to remove from folder"
     },
     "folder_actions": {
+      "menu": "Actions",
       "create": "Create",
       "move_all_files": "Move all files to another folder",
       "move_folder": "Move folder to subfolder",
@@ -764,6 +765,7 @@
       "delete_folder": "Delete folder",
       "download_folder": "Download folder",
       "change_icon": "Change icon",
+      "is_public": "Is shared",
       "share_folder": "Share"
     }
   },
@@ -876,8 +878,20 @@
       "convert_to_markdown": "Convert to Markdown",
       "share_note": "Share note"
     },
+    "share_modal": {
+      "custom_token": "Custom token (optional)",
+      "custom_token_placeholder": "my_custom_token-1",
+      "password": "Password (optional)",
+      "password_placeholder": "Enter a password",
+      "indexable": "Allow search engine indexing",
+      "create_url": "Create url",
+      "close": "Close",
+      "error_prefix": "Error: ",
+      "unknown_error": "Unknown error creating public share",
+      "error_creating": "Error creating public share: "
+    },
     "public_modal": {
-      "title": "Share URL",
+      "title": "Shared URL",
       "close": "Close",
       "open": "Open",
       "copy": "Copy",
@@ -894,6 +908,14 @@
       "error_prefix": "Error: ",
       "unknown_error": "Unknown error creating public share",
       "error_creating": "Error creating public share: "
+    },
+    "folder_share_modal": {
+      "title": "Shared Folder URL",
+      "description": "Anyone with this link can view all notes in this folder (unless password protected).",
+      "use_https": "HTTPS",
+      "renewed": "Folder share link renewed",
+      "failed_renew": "Failed to renew folder share",
+      "failed_revoke": "Failed to revoke folder share"
     },
     "note": {
       "new_note": "New note",

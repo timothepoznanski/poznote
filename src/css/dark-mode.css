@@ -913,6 +913,18 @@ body.dark-mode .btn-secondary:hover {
     background-color: #333;
 }
 
+html[data-theme='dark'] .btn-shared,
+body.dark-mode .btn-shared {
+    background-color: #4a9eff;
+    color: #ffffff;
+    border-color: #4a9eff;
+}
+
+html[data-theme='dark'] .btn-shared:hover,
+body.dark-mode .btn-shared:hover {
+    background-color: #3182ce;
+}
+
 /* Specific button types for dark mode */
 html[data-theme='dark'] .btn-primary,
 body.dark-mode .btn-primary {

@@ -755,6 +755,7 @@
       "remove_from_folder": "Hier ablegen, um aus Ordner zu entfernen"
     },
     "folder_actions": {
+      "menu": "Aktionen",
       "create": "Erstellen",
       "move_all_files": "Alle Dateien in einen anderen Ordner verschieben",
       "rename_folder": "Ordner umbenennen",
@@ -762,6 +763,7 @@
       "move_folder": "Ordner in Unterordner verschieben",
       "download_folder": "Ordner herunterladen",
       "change_icon": "Symbol ändern",
+      "is_public": "Ist geteilt",
       "share_folder": "Teilen"
     }
   },
@@ -866,8 +868,20 @@
       "attachments_with_count": "Anhänge ({{count}})",
       "menu_actions": "Menüaktionen"
     },
+    "share_modal": {
+      "custom_token": "Benutzerdefiniertes Token (optional)",
+      "custom_token_placeholder": "mein_benutzerdefiniertes_token-1",
+      "password": "Passwort (optional)",
+      "password_placeholder": "Geben Sie ein Passwort ein",
+      "indexable": "Suchmaschinenindizierung zulassen",
+      "create_url": "URL erstellen",
+      "close": "Schließen",
+      "error_prefix": "Fehler: ",
+      "unknown_error": "Unbekannter Fehler beim Erstellen des öffentlichen Links",
+      "error_creating": "Fehler beim Erstellen des öffentlichen Links: "
+    },
     "public_modal": {
-      "title": "Freigabe-URL",
+      "title": "Geteilte URL",
       "close": "Schließen",
       "open": "Öffnen",
       "copy": "Kopieren",
@@ -884,6 +898,14 @@
       "error_prefix": "Fehler: ",
       "unknown_error": "Unbekannter Fehler beim Erstellen des öffentlichen Links",
       "error_creating": "Fehler beim Erstellen des öffentlichen Links: "
+    },
+    "folder_share_modal": {
+      "title": "Geteilter Ordner URL",
+      "description": "Jeder mit diesem Link kann alle Notizen in diesem Ordner ansehen (außer wenn passwortgeschützt).",
+      "use_https": "HTTPS",
+      "renewed": "Ordner-Freigabelink erneuert",
+      "failed_renew": "Fehler beim Erneuern der Ordnerfreigabe",
+      "failed_revoke": "Fehler beim Widerrufen der Ordnerfreigabe"
     },
     "note": {
       "new_note": "Neue Notiz",
