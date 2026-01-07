@@ -868,6 +868,18 @@
       "attachments_with_count": "Anhänge ({{count}})",
       "menu_actions": "Menüaktionen"
     },
+    "share_modal": {
+      "custom_token": "Benutzerdefiniertes Token (optional)",
+      "custom_token_placeholder": "mein_benutzerdefiniertes_token-1",
+      "password": "Passwort (optional)",
+      "password_placeholder": "Geben Sie ein Passwort ein",
+      "indexable": "Suchmaschinenindizierung zulassen",
+      "create_url": "URL erstellen",
+      "close": "Schließen",
+      "error_prefix": "Fehler: ",
+      "unknown_error": "Unbekannter Fehler beim Erstellen des öffentlichen Links",
+      "error_creating": "Fehler beim Erstellen des öffentlichen Links: "
+    },
     "public_modal": {
       "title": "Geteilte URL",
       "close": "Schließen",
@@ -889,7 +901,7 @@
     },
     "folder_share_modal": {
       "title": "Geteilter Ordner URL",
-      "description": "Jeder mit diesem Link kann alle Notizen in diesem Ordner ansehen.",
+      "description": "Jeder mit diesem Link kann alle Notizen in diesem Ordner ansehen (außer wenn passwortgeschützt).",
       "use_https": "HTTPS",
       "renewed": "Ordner-Freigabelink erneuert",
       "failed_renew": "Fehler beim Erneuern der Ordnerfreigabe",

@@ -868,6 +868,18 @@
       "attachments_with_count": "Adjuntos ({{count}})",
       "menu_actions": "Acciones del menú"
     },
+    "share_modal": {
+      "custom_token": "Token personalizado (opcional)",
+      "custom_token_placeholder": "mi_token_personalizado-1",
+      "password": "Contraseña (opcional)",
+      "password_placeholder": "Ingrese una contraseña",
+      "indexable": "Permitir indexación por motores de búsqueda",
+      "create_url": "Crear URL",
+      "close": "Cerrar",
+      "error_prefix": "Error: ",
+      "unknown_error": "Error desconocido al crear el enlace público",
+      "error_creating": "Error al crear el enlace público: "
+    },
     "public_modal": {
       "title": "URL compartida",
       "close": "Cerrar",
@@ -889,7 +901,7 @@
     },
     "folder_share_modal": {
       "title": "URL de carpeta compartida",
-      "description": "Cualquiera con este enlace puede ver todas las notas de esta carpeta.",
+      "description": "Cualquiera con este enlace puede ver todas las notas de esta carpeta (a menos que esté protegida con contraseña).",
       "use_https": "HTTPS",
       "renewed": "Enlace de carpeta compartida renovado",
       "failed_renew": "Error al renovar el enlace de la carpeta",

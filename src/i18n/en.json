@@ -878,6 +878,18 @@
       "convert_to_markdown": "Convert to Markdown",
       "share_note": "Share note"
     },
+    "share_modal": {
+      "custom_token": "Custom token (optional)",
+      "custom_token_placeholder": "my_custom_token-1",
+      "password": "Password (optional)",
+      "password_placeholder": "Enter a password",
+      "indexable": "Allow search engine indexing",
+      "create_url": "Create url",
+      "close": "Close",
+      "error_prefix": "Error: ",
+      "unknown_error": "Unknown error creating public share",
+      "error_creating": "Error creating public share: "
+    },
     "public_modal": {
       "title": "Shared URL",
       "close": "Close",
@@ -899,7 +911,7 @@
     },
     "folder_share_modal": {
       "title": "Shared Folder URL",
-      "description": "Anyone with this link can view all notes in this folder.",
+      "description": "Anyone with this link can view all notes in this folder (unless password protected).",
       "use_https": "HTTPS",
       "renewed": "Folder share link renewed",
       "failed_renew": "Failed to renew folder share",

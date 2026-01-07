@@ -327,6 +327,17 @@ body.shared-page {
     text-decoration: none;
 }
 
+.btn-shared {
+    background: #007bff;
+    color: white;
+}
+
+.btn-shared:hover {
+    background: #0056b3;
+    color: white;
+    text-decoration: none;
+}
+
 .btn-danger {
     background: #e04b4b;
     color: #fff;

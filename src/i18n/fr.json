@@ -878,6 +878,18 @@
       "convert_to_markdown": "Convertir en Markdown",
       "share_note": "Partager la note"
     },
+    "share_modal": {
+      "custom_token": "Jeton personnalisé (optionnel)",
+      "custom_token_placeholder": "mon_jeton_personnalise-1",
+      "password": "Mot de passe (optionnel)",
+      "password_placeholder": "Saisir un mot de passe",
+      "indexable": "Autoriser l'indexation par les moteurs de recherche",
+      "create_url": "Créer l'URL",
+      "close": "Fermer",
+      "error_prefix": "Erreur : ",
+      "unknown_error": "Erreur inconnue lors de la création du partage public",
+      "error_creating": "Erreur lors de la création du partage public : "
+    },
     "public_modal": {
       "title": "URL partagée",
       "close": "Fermer",
@@ -896,7 +908,7 @@
     },
     "folder_share_modal": {
       "title": "URL du dossier partagé",
-      "description": "Toute personne avec ce lien peut voir toutes les notes de ce dossier.",
+      "description": "Toute personne avec ce lien peut voir toutes les notes de ce dossier (sauf si un mot de passe a été configuré).",
       "use_https": "HTTPS",
       "renewed": "Lien de partage du dossier renouvelé",
       "failed_renew": "Échec du renouvellement du partage du dossier",
