@@ -754,12 +754,15 @@
       "remove_from_folder": "Solte aqui para remover da pasta"
     },
     "folder_actions": {
+      "menu": "Ações",
       "create": "Criar",
       "move_all_files": "Mover todos os arquivos para outra pasta",
       "rename_folder": "Renomear pasta",
       "delete_folder": "Excluir pasta",
       "move_folder": "Mover pasta para subpasta",
       "download_folder": "Baixar pasta",
+      "change_icon": "Alterar ícone",
+      "is_public": "É compartilhada",
       "share_folder": "Compartilhar"
     }
   },
@@ -870,7 +873,7 @@
       "menu_actions": "Ações do menu"
     },
     "public_modal": {
-      "title": "URL de Compartilhamento",
+      "title": "URL compartilhada",
       "close": "Fechar",
       "open": "Abrir",
       "copy": "Copiar",

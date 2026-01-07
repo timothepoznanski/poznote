@@ -757,6 +757,7 @@
       "remove_from_folder": "Drop here to remove from folder"
     },
     "folder_actions": {
+      "menu": "Actions",
       "create": "Create",
       "move_all_files": "Move all files to another folder",
       "move_folder": "Move folder to subfolder",
@@ -764,6 +765,7 @@
       "delete_folder": "Delete folder",
       "download_folder": "Download folder",
       "change_icon": "Change icon",
+      "is_public": "Is shared",
       "share_folder": "Share"
     }
   },
@@ -877,7 +879,7 @@
       "share_note": "Share note"
     },
     "public_modal": {
-      "title": "Share URL",
+      "title": "Shared URL",
       "close": "Close",
       "open": "Open",
       "copy": "Copy",

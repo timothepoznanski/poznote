@@ -266,7 +266,7 @@ async function createPublicShare(noteId) {
                 showLinkModal(data.url, data.url, function(){});
             } else {
                 // Fallback: prompt
-                window.prompt('Public URL (read-only):', data.url);
+                window.prompt('Shared URL (read-only):', data.url);
             }
         } else if (data && data.error) {
             showNotificationPopup && showNotificationPopup((window.t ? window.t('index.share_modal.error_prefix', null, 'Error: ') : 'Error: ') + data.error, 'error');
@@ -346,7 +346,7 @@ function showShareModal(url, options) {
     // No close (×) icon for the share modal per UX request
 
     const h3 = document.createElement('h3');
-    h3.textContent = window.t ? window.t('index.share_modal.title', null, 'Public URL') : 'Public URL';
+    h3.textContent = window.t ? window.t('index.share_modal.title', null, 'Shared URL') : 'Shared URL';
     content.appendChild(h3);
 
     const p = document.createElement('p');
@@ -651,11 +651,6 @@ function showShareModal(url, options) {
         cancelBtn.textContent = window.t ? window.t('index.share_modal.close', null, 'Close') : 'Close';
         cancelBtn.onclick = function() { closeModal('shareModal'); };
         buttonsDiv.appendChild(cancelBtn);
-    }
-
-    // If there's no URL provided, show placeholder text
-    if (!url) {
-        urlDiv.textContent = window.t ? window.t('index.share_modal.no_link_yet', null, 'No public link yet') : 'No public link yet';
     }
 
     content.appendChild(buttonsDiv);

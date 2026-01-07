@@ -757,6 +757,7 @@
       "remove_from_folder": "Déposez ici pour retirer du dossier"
     },
     "folder_actions": {
+      "menu": "Actions",
       "create": "Créer",
       "move_all_files": "Déplacer tous les fichiers vers un autre dossier",
       "move_folder": "Déplacer le dossier en sous-dossier",
@@ -764,6 +765,7 @@
       "delete_folder": "Supprimer le dossier",
       "download_folder": "Télécharger le dossier",
       "change_icon": "Changer l'icône",
+      "is_public": "Est partagé",
       "share_folder": "Partager"
     }
   },
@@ -877,7 +879,7 @@
       "share_note": "Partager la note"
     },
     "public_modal": {
-      "title": "URL de partage",
+      "title": "URL partagée",
       "close": "Fermer",
       "open": "Ouvrir",
       "copy": "Copier",

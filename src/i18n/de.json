@@ -755,6 +755,7 @@
       "remove_from_folder": "Hier ablegen, um aus Ordner zu entfernen"
     },
     "folder_actions": {
+      "menu": "Aktionen",
       "create": "Erstellen",
       "move_all_files": "Alle Dateien in einen anderen Ordner verschieben",
       "rename_folder": "Ordner umbenennen",
@@ -762,6 +763,7 @@
       "move_folder": "Ordner in Unterordner verschieben",
       "download_folder": "Ordner herunterladen",
       "change_icon": "Symbol ändern",
+      "is_public": "Ist geteilt",
       "share_folder": "Teilen"
     }
   },
@@ -867,7 +869,7 @@
       "menu_actions": "Menüaktionen"
     },
     "public_modal": {
-      "title": "Freigabe-URL",
+      "title": "Geteilte URL",
       "close": "Schließen",
       "open": "Öffnen",
       "copy": "Kopieren",
