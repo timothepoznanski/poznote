@@ -887,6 +887,14 @@
       "unknown_error": "Error desconocido al crear el enlace público",
       "error_creating": "Error al crear el enlace público: "
     },
+    "folder_share_modal": {
+      "title": "URL de carpeta compartida",
+      "description": "Cualquiera con este enlace puede ver todas las notas de esta carpeta.",
+      "use_https": "HTTPS",
+      "renewed": "Enlace de carpeta compartida renovado",
+      "failed_renew": "Error al renovar el enlace de la carpeta",
+      "failed_revoke": "Error al revocar el enlace de la carpeta"
+    },
     "note": {
       "new_note": "Nueva nota",
       "new_note_numbered": "Nueva nota ({{number}})",

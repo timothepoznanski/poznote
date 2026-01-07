@@ -887,6 +887,14 @@
       "unknown_error": "Unbekannter Fehler beim Erstellen des öffentlichen Links",
       "error_creating": "Fehler beim Erstellen des öffentlichen Links: "
     },
+    "folder_share_modal": {
+      "title": "Geteilter Ordner URL",
+      "description": "Jeder mit diesem Link kann alle Notizen in diesem Ordner ansehen.",
+      "use_https": "HTTPS",
+      "renewed": "Ordner-Freigabelink erneuert",
+      "failed_renew": "Fehler beim Erneuern der Ordnerfreigabe",
+      "failed_revoke": "Fehler beim Widerrufen der Ordnerfreigabe"
+    },
     "note": {
       "new_note": "Neue Notiz",
       "new_note_numbered": "Neue Notiz ({{number}})",

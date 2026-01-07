@@ -346,7 +346,7 @@ function showShareModal(url, options) {
     // No close (×) icon for the share modal per UX request
 
     const h3 = document.createElement('h3');
-    h3.textContent = window.t ? window.t('index.share_modal.title', null, 'Shared URL') : 'Shared URL';
+    h3.textContent = window.t ? window.t('index.public_modal.title', null, 'Shared URL') : 'Shared URL';
     content.appendChild(h3);
 
     const p = document.createElement('p');
@@ -1036,7 +1036,7 @@ function showFolderShareModal(url, options) {
         protocolLabel.className = 'share-indexable-label';
         const protocolText = document.createElement('span');
         protocolText.className = 'indexable-label-text';
-        protocolText.textContent = 'Use HTTPS';
+        protocolText.textContent = window.t ? window.t('index.folder_share_modal.use_https', null, 'HTTPS') : 'HTTPS';
         const toggleSwitch = document.createElement('label');
         toggleSwitch.className = 'toggle-switch';
         const protocolCheckbox = document.createElement('input');
@@ -1105,6 +1105,56 @@ function showFolderShareModal(url, options) {
             buttonsDiv.appendChild(manageBtn);
         }
 
+        // Renew button
+        if (folderId) {
+            const renewBtn = document.createElement('button');
+            renewBtn.type = 'button';
+            renewBtn.className = 'btn-primary';
+            renewBtn.textContent = window.t ? window.t('index.public_modal.renew', null, 'Renew') : 'Renew';
+            renewBtn.onclick = async function(ev) {
+                try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
+                try {
+                    const resp = await fetch('/api/v1/folders/' + folderId + '/share', {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify({})
+                    });
+                    if (resp.ok) {
+                        const data = await resp.json();
+                        if (data && data.url) {
+                            const nextDisplayUrl = applyProtocolToPublicUrl(data.url, getPreferredPublicUrlProtocol());
+                            // Update displayed URL
+                            const urlDivEl = document.getElementById('folderShareModalUrl');
+                            if (urlDivEl) urlDivEl.textContent = nextDisplayUrl;
+                            // Update the workspace if needed
+                            if (data.workspace !== undefined) {
+                                // Recreate the modal with updated workspace
+                                closeModal('folderShareModal');
+                                showFolderShareModal(data.url, { folderId: folderId, shared: true, workspace: data.workspace });
+                            }
+                        }
+                    } else {
+                        const msg = window.t ? window.t('index.folder_share_modal.failed_renew', null, 'Failed to renew folder share') : 'Failed to renew folder share';
+                        if (typeof showNotificationPopup === 'function') {
+                            showNotificationPopup(msg, 'error');
+                        } else {
+                            alert(msg);
+                        }
+                    }
+                } catch (e) {
+                    console.error('Failed to renew folder share:', e);
+                    const msg = window.t ? window.t('index.folder_share_modal.failed_renew', null, 'Failed to renew folder share') : 'Failed to renew folder share';
+                    if (typeof showNotificationPopup === 'function') {
+                        showNotificationPopup('Network error: ' + e.message, 'error');
+                    } else {
+                        alert(msg);
+                    }
+                }
+            };
+            buttonsDiv.appendChild(renewBtn);
+        }
+
         // Revoke button
         if (folderId) {
             const revokeBtn = document.createElement('button');
@@ -1129,11 +1179,13 @@ function showFolderShareModal(url, options) {
                         refreshNotesListAfterFolderAction();
                         closeModal('folderShareModal');
                     } else {
-                        alert('Failed to revoke folder share');
+                        const msg = window.t ? window.t('index.folder_share_modal.failed_revoke', null, 'Failed to revoke folder share') : 'Failed to revoke folder share';
+                        alert(msg);
                     }
                 } catch (e) {
                     console.error('Failed to revoke:', e);
-                    alert('Failed to revoke folder share');
+                    const msg = window.t ? window.t('index.folder_share_modal.failed_revoke', null, 'Failed to revoke folder share') : 'Failed to revoke folder share';
+                    alert(msg);
                 }
             };
             buttonsDiv.appendChild(revokeBtn);

@@ -894,6 +894,14 @@
       "unknown_error": "Erreur inconnue lors de la création du partage public",
       "error_creating": "Erreur lors de la création du partage public : "
     },
+    "folder_share_modal": {
+      "title": "URL du dossier partagé",
+      "description": "Toute personne avec ce lien peut voir toutes les notes de ce dossier.",
+      "use_https": "HTTPS",
+      "renewed": "Lien de partage du dossier renouvelé",
+      "failed_renew": "Échec du renouvellement du partage du dossier",
+      "failed_revoke": "Échec de la révocation du partage du dossier"
+    },
     "note": {
       "new_note": "Nouvelle note",
       "new_note_numbered": "Nouvelle note ({{number}})",

@@ -897,6 +897,14 @@
       "unknown_error": "Unknown error creating public share",
       "error_creating": "Error creating public share: "
     },
+    "folder_share_modal": {
+      "title": "Shared Folder URL",
+      "description": "Anyone with this link can view all notes in this folder.",
+      "use_https": "HTTPS",
+      "renewed": "Folder share link renewed",
+      "failed_renew": "Failed to renew folder share",
+      "failed_revoke": "Failed to revoke folder share"
+    },
     "note": {
       "new_note": "New note",
       "new_note_numbered": "New note ({{number}})",

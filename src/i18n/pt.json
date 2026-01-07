@@ -888,6 +888,14 @@
       "password": "Senha (opcional)",
       "password_placeholder": "Digite uma senha"
     },
+    "folder_share_modal": {
+      "title": "URL da pasta compartilhada",
+      "description": "Qualquer pessoa com este link pode ver todas as notas desta pasta.",
+      "use_https": "HTTPS",
+      "renewed": "Link de compartilhamento da pasta renovado",
+      "failed_renew": "Falha ao renovar o compartilhamento da pasta",
+      "failed_revoke": "Falha ao revogar o compartilhamento da pasta"
+    },
     "note": {
       "new_note": "Nova nota",
       "new_note_numbered": "Nova nota ({{number}})",
