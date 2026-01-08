@@ -5,6 +5,10 @@ SN_ZIP="$1"
 TMP_DIR="tmp_sn_export"
 OUTPUT_DIR="poznote_export"
 
+# Set UTF-8 locale
+export LC_ALL=C.UTF-8
+export LANG=C.UTF-8
+
 # --- Check prerequisites ---
 required_tools=(jq unzip zip find date)
 for tool in "${required_tools[@]}"; do
@@ -65,17 +69,27 @@ jq -c '.items[] | select(.content_type=="Note")' "$SN_JSON" | while read -r note
     safe_filename="note_$note_uuid"
   fi
 
+  # Escape YAML special characters in title and tags
+  yaml_escape() {
+    local str="$1"
+    # Escape backslashes first, then quotes
+    str="${str//\\/\\\\}"
+    str="${str//\"/\\\"}"
+    echo "$str"
+  }
+
   # Create Markdown file with front matter
   {
     echo "---"
     echo "created: \"$note_created_formatted\""
     echo "tags:"
     for t in "${tags_array[@]}"; do
-      echo "  - \"$t\""
+      escaped_tag=$(yaml_escape "$t")
+      echo "  - \"$escaped_tag\""
     done
     echo "---"
     echo ""
-    echo "$note_content"
+    printf '%s\n' "$note_content"
   } > "$OUTPUT_DIR/$safe_filename.md"
 done
 

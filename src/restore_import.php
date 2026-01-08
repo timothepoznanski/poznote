@@ -482,6 +482,9 @@ function importNotesZip($uploadedFile) {
         }
         chmod($targetFile, 0644);
         
+        // Clean content for search (remove base64 images, excalidraw data, etc.)
+        $cleanedContent = cleanContentForSearch($content);
+        
         try {
             // Check if entry exists in database and get current type
             $checkStmt = $con->prepare("SELECT id, type FROM entries WHERE id = ?");
@@ -502,7 +505,7 @@ function importNotesZip($uploadedFile) {
                 
                 // Update existing entry
                 $updateStmt = $con->prepare("UPDATE entries SET heading = ?, entry = ?, type = ?, updated = datetime('now') WHERE id = ?");
-                $updateStmt->execute([$title, $content, $noteType, $noteId]);
+                $updateStmt->execute([$title, $cleanedContent, $noteType, $noteId]);
                 $updatedCount++;
             } else {
                 // Insert new entry with specific ID
@@ -510,7 +513,7 @@ function importNotesZip($uploadedFile) {
                 $wsStmt = $con->query("SELECT name FROM workspaces ORDER BY name LIMIT 1");
                 $defaultWs = $wsStmt->fetchColumn() ?: 'Default';
                 $insertStmt = $con->prepare("INSERT INTO entries (id, heading, entry, folder, folder_id, workspace, type, created, updated, trash, favorite) VALUES (?, ?, ?, NULL, NULL, ?, ?, datetime('now'), datetime('now'), 0, 0)");
-                $insertStmt->execute([$noteId, $title, $content, $defaultWs, $noteType]);
+                $insertStmt->execute([$noteId, $title, $cleanedContent, $defaultWs, $noteType]);
                 $importedCount++;
             }
         } catch (Exception $e) {
