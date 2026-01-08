@@ -1420,18 +1420,19 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         
         try {
             // Insert note into database with metadata from front matter
+            // Store content in entry column for search functionality
             if ($created && $updated) {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, ?, ?, 0)");
-                $stmt->execute([$title, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite, $created, $updated]);
+                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
+                $stmt->execute([$title, $content, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite, $created, $updated]);
             } elseif ($created) {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, ?, datetime('now'), 0)");
-                $stmt->execute([$title, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite, $created]);
+                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), 0)");
+                $stmt->execute([$title, $content, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite, $created]);
             } elseif ($updated) {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, datetime('now'), ?, 0)");
-                $stmt->execute([$title, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite, $updated]);
+                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), ?, 0)");
+                $stmt->execute([$title, $content, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite, $updated]);
             } else {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0)");
-                $stmt->execute([$title, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite]);
+                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0)");
+                $stmt->execute([$title, $content, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite]);
             }
             $noteId = $con->lastInsertId();
             
@@ -1768,18 +1769,19 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             }
             
             // Insert note into database with metadata from front matter
+            // Store content in entry column for search functionality
             if ($created && $updated) {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, ?, ?, 0)");
-                $stmt->execute([$title, $folder, $folder_id, $workspace, $noteType, $tags, $favorite, $created, $updated]);
+                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
+                $stmt->execute([$title, $content, $folder, $folder_id, $workspace, $noteType, $tags, $favorite, $created, $updated]);
             } elseif ($created) {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, ?, datetime('now'), 0)");
-                $stmt->execute([$title, $folder, $folder_id, $workspace, $noteType, $tags, $favorite, $created]);
+                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), 0)");
+                $stmt->execute([$title, $content, $folder, $folder_id, $workspace, $noteType, $tags, $favorite, $created]);
             } elseif ($updated) {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, datetime('now'), ?, 0)");
-                $stmt->execute([$title, $folder, $folder_id, $workspace, $noteType, $tags, $favorite, $updated]);
+                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), ?, 0)");
+                $stmt->execute([$title, $content, $folder, $folder_id, $workspace, $noteType, $tags, $favorite, $updated]);
             } else {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0)");
-                $stmt->execute([$title, $folder, $folder_id, $workspace, $noteType, $tags, $favorite]);
+                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0)");
+                $stmt->execute([$title, $content, $folder, $folder_id, $workspace, $noteType, $tags, $favorite]);
             }
             $noteId = $con->lastInsertId();
             
