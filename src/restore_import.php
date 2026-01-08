@@ -1315,6 +1315,14 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
             $content = removeStyleTags($content);
         }
         
+        // Convert plain text to HTML with preserved line breaks for .txt files
+        if ($noteType === 'note' && $fileExtension === 'txt') {
+            // Escape HTML special characters first
+            $content = htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
+            // Convert line breaks to <br> tags
+            $content = nl2br($content, true);
+        }
+        
         // Determine folder from ZIP structure (if hasSubfolders is true)
         $targetFolderId = null;
         $targetFolderName = $folder; // Use provided folder as default
@@ -1714,6 +1722,14 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         // Remove <style> tags from HTML files
         if ($noteType === 'note' && $fileExtension === 'html') {
             $content = removeStyleTags($content);
+        }
+        
+        // Convert plain text to HTML with preserved line breaks for .txt files
+        if ($noteType === 'note' && $fileExtension === 'txt') {
+            // Escape HTML special characters first
+            $content = htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
+            // Convert line breaks to <br> tags
+            $content = nl2br($content, true);
         }
         
         // Parse front matter if it's a markdown file
