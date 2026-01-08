@@ -501,6 +501,27 @@ $router->delete('/backups/{filename}', function($params) use ($backupController)
     echo json_encode($backupController->destroy($params['filename']));
 });
 
+// Chunked restore - unified endpoint (handles upload_chunk, assemble_chunks, cleanup_chunks)
+$router->post('/backups/restore', function($params) use ($backupController) {
+    $action = $_POST['action'] ?? '';
+    
+    switch ($action) {
+        case 'upload_chunk':
+            echo json_encode($backupController->uploadChunk());
+            break;
+        case 'assemble_chunks':
+            echo json_encode($backupController->assembleChunks());
+            break;
+        case 'cleanup_chunks':
+            echo json_encode($backupController->cleanupChunks());
+            break;
+        default:
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Invalid action']);
+            break;
+    }
+});
+
 // Chunked restore - upload chunk
 $router->post('/backups/restore/chunk', function($params) use ($backupController) {
     echo json_encode($backupController->uploadChunk());

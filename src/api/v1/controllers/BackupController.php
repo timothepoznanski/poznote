@@ -7,6 +7,7 @@
  *   POST   /api/v1/backups           - Create a new backup
  *   GET    /api/v1/backups/{filename} - Download a backup file
  *   DELETE /api/v1/backups/{filename} - Delete a backup file
+ *   POST   /api/v1/backups/restore   - Chunked restore (action: upload_chunk, assemble_chunks, cleanup_chunks)
  *   POST   /api/v1/backups/restore/chunk - Upload a chunk for restore
  *   POST   /api/v1/backups/restore/assemble - Assemble chunks
  *   POST   /api/v1/backups/restore/cleanup - Cleanup chunks
