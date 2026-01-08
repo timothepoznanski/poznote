@@ -290,9 +290,11 @@ paths:
                 workspace:
                   type: string
                   example: "Personal"
-                folder:
-                  type: string
+                folder_id:
+                  type: integer
                   nullable: true
+                  description: ID of the folder (optional)
+                  example: 12
                 type:
                   type: string
                   enum: [note, markdown, tasklist]
@@ -404,9 +406,10 @@ paths:
                   type: string
                 tags:
                   type: string
-                folder:
-                  type: string
+                folder_id:
+                  type: integer
                   nullable: true
+                  description: ID of the folder (optional)
       responses:
         '200':
           description: Note updated
