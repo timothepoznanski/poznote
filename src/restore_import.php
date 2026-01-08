@@ -1445,8 +1445,7 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
             $updated = $frontMatterData['updated'];
         }
         
-        // Sanitize title
-        $title = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+        // Validate title is not empty
         if (empty($title)) {
             $title = t('restore_import.individual_notes.default_title_with_date', ['date' => date('Y-m-d H:i:s')]);
         }
@@ -1809,8 +1808,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             $updated = $frontMatterData['updated'];
         }
         
-        // Sanitize title
-        $title = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+        // Validate title is not empty
         if (empty($title)) {
             $title = t('restore_import.individual_notes.default_title_with_date', ['date' => date('Y-m-d H:i:s')]);
         }
