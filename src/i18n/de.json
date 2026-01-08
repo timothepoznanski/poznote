@@ -1064,7 +1064,7 @@
       "status_completed": "Wiederherstellung erfolgreich abgeschlossen!",
       "status_error": "Fehler: {{message}}",
       "retry": "Erneut versuchen",
-      "success_html": "<strong>Erfolg!</strong> Ihre Sicherung wurde wiederhergestellt. <button class=\"btn btn-primary btn-sm\" onclick=\"location.reload()\" style=\"margin-left: 10px;\">Seite neu laden</button>"
+      "success_html": "<strong>Erfolg!</strong> Ihre Sicherung wurde wiederhergestellt."
     },
     "units": {
       "bytes": "Bytes",

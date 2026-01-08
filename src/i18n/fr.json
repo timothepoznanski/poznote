@@ -1074,7 +1074,7 @@
       "status_completed": "Restauration terminée avec succès !",
       "status_error": "Erreur : {{message}}",
       "retry": "Réessayer",
-      "success_html": "<strong>Succès !</strong> Votre sauvegarde a été restaurée. <button class=\"btn btn-primary btn-sm\" onclick=\"location.reload()\" style=\"margin-left: 10px;\">Rafraîchir la page</button>"
+      "success_html": "<strong>Succès !</strong> Votre sauvegarde a été restaurée."
     },
     "units": {
       "bytes": "octets",
