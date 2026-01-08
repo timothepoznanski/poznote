@@ -1064,7 +1064,7 @@
       "status_completed": "Restauración completada exitosamente!",
       "status_error": "Error: {{message}}",
       "retry": "Reintentar",
-      "success_html": "<strong>Éxito!</strong> Tu copia de seguridad ha sido restaurada. <button class=\"btn btn-primary btn-sm\" onclick=\"location.reload()\" style=\"margin-left: 10px;\">Actualizar página</button>"
+      "success_html": "<strong>Éxito!</strong> Tu copia de seguridad ha sido restaurada."
     },
     "units": {
       "bytes": "Bytes",

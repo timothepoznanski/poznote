@@ -137,32 +137,21 @@ echo "<span class='folder-name'>" . t_h('notes_list.system_folders.public', [], 
 echo "<span class='folder-note-count' id='count-shared'>" . $shared_count . "</span>";
 echo "</div></div>";
 
-// Menu trois points verticaux (DERNIER élément - tout à droite)
-echo "<div class='folder-header system-folder system-menu-container' data-folder='SystemMenu'>";
-echo "<div class='folder-toggle' data-action='toggle-system-menu' title='Menu'>";
-echo "<i class='fa-ellipsis-v folder-icon'></i>";
-echo "<span class='folder-name'>Menu</span>";
-echo "</div>";
+// Trash icon in the bar
+echo "<div class='folder-header system-folder' data-folder='Trash'>";
+echo "<div class='folder-toggle' data-action='navigate-trash' data-url='trash.php?workspace=" . urlencode($workspace_filter) . "' title='" . t_h('notes_list.system_folders.trash', [], 'Trash') . "'>";
+echo "<i class='fa-trash folder-icon'></i>";
+echo "<span class='folder-name'>" . t_h('notes_list.system_folders.trash', [], 'Trash') . "</span>";
+echo "<span class='folder-note-count' id='count-trash'>" . $trash_count . "</span>";
+echo "</div></div>";
 
-// Menu déroulant
-echo "<div class='system-menu-dropdown' id='system-menu-dropdown' style='display: none;'>";
-
-// Trash
-echo "<div class='system-menu-item' data-action='navigate-trash' data-url='trash.php?workspace=" . urlencode($workspace_filter) . "'>";
-echo "<i class='fa-trash'></i>";
-echo "<span>" . t_h('notes_list.system_folders.trash', [], 'Trash') . "</span>";
-echo "<span class='menu-item-count' id='count-trash'>" . $trash_count . "</span>";
-echo "</div>";
-
-// Attachments
-echo "<div class='system-menu-item' data-action='navigate-attachments' data-url='attachments_list.php?workspace=" . urlencode($workspace_filter) . "'>";
-echo "<i class='fa-paperclip'></i>";
-echo "<span>" . t_h('notes_list.system_folders.attachments', [], 'Attachments') . "</span>";
-echo "<span class='menu-item-count' id='count-attachments'>" . $attachments_count . "</span>";
-echo "</div>";
-
-echo "</div>"; // Fin du menu dropdown
-echo "</div>"; // Fin du container menu
+// Attachments icon in the bar
+echo "<div class='folder-header system-folder' data-folder='Attachments'>";
+echo "<div class='folder-toggle' data-action='navigate-attachments' data-url='attachments_list.php?workspace=" . urlencode($workspace_filter) . "' title='" . t_h('notes_list.system_folders.attachments', [], 'Attachments') . "'>";
+echo "<i class='fa-paperclip folder-icon'></i>";
+echo "<span class='folder-name'>" . t_h('notes_list.system_folders.attachments', [], 'Attachments') . "</span>";
+echo "<span class='folder-note-count' id='count-attachments'>" . $attachments_count . "</span>";
+echo "</div></div>";
 
 echo "</div>"; // Fin du container system-folders
 ?>

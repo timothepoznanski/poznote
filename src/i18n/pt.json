@@ -1068,7 +1068,7 @@
       "status_completed": "Restauração concluída com sucesso!",
       "status_error": "Erro: {{message}}",
       "retry": "Tentar novamente",
-      "success_html": "<strong>Sucesso!</strong> Seu backup foi restaurado. <button class=\"btn btn-primary btn-sm\" onclick=\"location.reload()\" style=\"margin-left: 10px;\">Atualizar Página</button>"
+      "success_html": "<strong>Sucesso!</strong> Seu backup foi restaurado."
     },
     "units": {
       "bytes": "Bytes",

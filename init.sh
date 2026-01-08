@@ -25,3 +25,7 @@ if [ -f "$DB_PATH" ]; then
     chmod 664 "$DB_PATH"
 fi
 
+# Auto-fix empty entry columns (runs once)
+echo "Running entry column fix check..."
+php /var/www/html/tools/auto-fix-entries.php || true
+

@@ -1057,7 +1057,7 @@ curl -X DELETE -u 'username:password' \
 </details>
 
 <details>
-<summary><strong>���🗑️ Trash Management</strong></summary>
+<summary><strong>🗑️ Trash Management</strong></summary>
 <br>
 
 **List Trash**

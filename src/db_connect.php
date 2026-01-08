@@ -249,7 +249,7 @@ try {
             // Insert the welcome note
             $now_utc = gmdate('Y-m-d H:i:s', time());
             $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute(['👋 Welcome to Poznote', '', 'Getting Started', $folderId, 'Poznote', 'note', $now_utc, $now_utc]);
+            $stmt->execute(['Welcome to Poznote', '', 'Getting Started', $folderId, 'Poznote', 'note', $now_utc, $now_utc]);
             
             $welcomeNoteId = $con->lastInsertId();
             

@@ -2,6 +2,20 @@
 date_default_timezone_set('UTC');
 
 /**
+ * Clean content for search by removing base64 images and other heavy data
+ * This is used to keep the database entry column lightweight for search functionality
+ */
+function cleanContentForSearch($content) {
+    // Remove base64 images (data:image/...)
+    $content = preg_replace('/data:image\/[^;]+;base64,[A-Za-z0-9+\/=]+/', '[image]', $content);
+    
+    // Remove Excalidraw containers with embedded data
+    $content = preg_replace('/<div[^>]*class="excalidraw-container"[^>]*>.*?<\/div>/s', '[Excalidraw diagram]', $content);
+    
+    return $content;
+}
+
+/**
  * Internationalization (i18n)
  * - Uses JSON dictionaries in src/i18n/{lang}.json
  * - Active language stored in settings table key: 'language'
@@ -573,7 +587,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         
         return [
             'success' => !$hasErrors,
-            'message' => implode('; ', $results),
+            'message' => implode("\n", $results),
             'error' => $hasErrors ? 'Some components failed to restore' : ''
         ];
         

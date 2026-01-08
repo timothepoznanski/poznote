@@ -482,6 +482,9 @@ function importNotesZip($uploadedFile) {
         }
         chmod($targetFile, 0644);
         
+        // Clean content for search (remove base64 images, excalidraw data, etc.)
+        $cleanedContent = cleanContentForSearch($content);
+        
         try {
             // Check if entry exists in database and get current type
             $checkStmt = $con->prepare("SELECT id, type FROM entries WHERE id = ?");
@@ -502,7 +505,7 @@ function importNotesZip($uploadedFile) {
                 
                 // Update existing entry
                 $updateStmt = $con->prepare("UPDATE entries SET heading = ?, entry = ?, type = ?, updated = datetime('now') WHERE id = ?");
-                $updateStmt->execute([$title, $content, $noteType, $noteId]);
+                $updateStmt->execute([$title, $cleanedContent, $noteType, $noteId]);
                 $updatedCount++;
             } else {
                 // Insert new entry with specific ID
@@ -510,7 +513,7 @@ function importNotesZip($uploadedFile) {
                 $wsStmt = $con->query("SELECT name FROM workspaces ORDER BY name LIMIT 1");
                 $defaultWs = $wsStmt->fetchColumn() ?: 'Default';
                 $insertStmt = $con->prepare("INSERT INTO entries (id, heading, entry, folder, folder_id, workspace, type, created, updated, trash, favorite) VALUES (?, ?, ?, NULL, NULL, ?, ?, datetime('now'), datetime('now'), 0, 0)");
-                $insertStmt->execute([$noteId, $title, $content, $defaultWs, $noteType]);
+                $insertStmt->execute([$noteId, $title, $cleanedContent, $defaultWs, $noteType]);
                 $importedCount++;
             }
         } catch (Exception $e) {
@@ -1015,6 +1018,9 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
     
     $maxFiles = (int)(getenv('POZNOTE_IMPORT_MAX_ZIP_FILES') ?: 300);
     
+    // Track if we started a transaction for cleanup purposes
+    $transactionStarted = false;
+    
     // Detect if ZIP contains folder structure and find common root
     $hasSubfolders = false;
     $hasFilesAtRoot = false;
@@ -1256,6 +1262,25 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         return $parentId;
     };
     
+    // Configure SQLite for better performance and reduce locking
+    try {
+        $con->exec("PRAGMA journal_mode=WAL");
+        $con->exec("PRAGMA synchronous=NORMAL");
+        $con->exec("PRAGMA busy_timeout=10000"); // 10 seconds timeout
+    } catch (PDOException $e) {
+        error_log("Warning: Could not set SQLite pragmas: " . $e->getMessage());
+    }
+    
+    // Start a transaction for all imports to improve performance
+    try {
+        $con->beginTransaction();
+        $transactionStarted = true;
+    } catch (PDOException $e) {
+        $zip->close();
+        unlink($tempFile);
+        return ['success' => false, 'error' => 'Cannot start database transaction: ' . $e->getMessage()];
+    }
+    
     // Second pass: actually import the files
     for ($i = 0; $i < $zip->numFiles; $i++) {
         $stat = $zip->statIndex($i);
@@ -1288,6 +1313,14 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         // Remove <style> tags from HTML files
         if ($noteType === 'note' && $fileExtension === 'html') {
             $content = removeStyleTags($content);
+        }
+        
+        // Convert plain text to HTML with preserved line breaks for .txt files
+        if ($noteType === 'note' && $fileExtension === 'txt') {
+            // Escape HTML special characters first
+            $content = htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
+            // Convert line breaks to <br> tags
+            $content = nl2br($content, true);
         }
         
         // Determine folder from ZIP structure (if hasSubfolders is true)
@@ -1412,26 +1445,26 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
             $updated = $frontMatterData['updated'];
         }
         
-        // Sanitize title
-        $title = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+        // Validate title is not empty
         if (empty($title)) {
             $title = t('restore_import.individual_notes.default_title_with_date', ['date' => date('Y-m-d H:i:s')]);
         }
         
         try {
             // Insert note into database with metadata from front matter
+            // Store content in entry column for search functionality
             if ($created && $updated) {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, ?, ?, 0)");
-                $stmt->execute([$title, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite, $created, $updated]);
+                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
+                $stmt->execute([$title, $content, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite, $created, $updated]);
             } elseif ($created) {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, ?, datetime('now'), 0)");
-                $stmt->execute([$title, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite, $created]);
+                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), 0)");
+                $stmt->execute([$title, $content, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite, $created]);
             } elseif ($updated) {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, datetime('now'), ?, 0)");
-                $stmt->execute([$title, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite, $updated]);
+                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), ?, 0)");
+                $stmt->execute([$title, $content, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite, $updated]);
             } else {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0)");
-                $stmt->execute([$title, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite]);
+                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0)");
+                $stmt->execute([$title, $content, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite]);
             }
             $noteId = $con->lastInsertId();
             
@@ -1572,25 +1605,43 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         }
     }
     
+    // Commit the transaction
+    try {
+        if ($transactionStarted) {
+            $con->commit();
+        }
+    } catch (PDOException $e) {
+        if ($transactionStarted) {
+            $con->rollBack();
+        }
+        $zip->close();
+        unlink($tempFile);
+        return ['success' => false, 'error' => 'Database transaction failed: ' . $e->getMessage()];
+    }
+    
     $zip->close();
     unlink($tempFile);
     
     // Build result message
+    $messageParts = [];
+    
     if ($hasSubfolders && $createdFolders > 0) {
-        $message = t('restore_import.messages.notes_imported_with_folders', ['count' => $importedCount, 'folders' => $createdFolders, 'workspace' => $workspace], 'Imported {{count}} note(s) and created {{folders}} folder(s) in workspace "{{workspace}}".');
+        $messageParts[] = t('restore_import.messages.notes_imported_with_folders', ['count' => $importedCount, 'folders' => $createdFolders, 'workspace' => $workspace], 'Imported {{count}} note(s) and created {{folders}} folder(s) in workspace "{{workspace}}".');
     } else {
         $folderDisplay = empty($folder) ? t('restore_import.sections.individual_notes.no_folder', [], 'No folder (root level)') : $folder;
-        $message = t('restore_import.messages.notes_imported_zip', ['count' => $importedCount, 'workspace' => $workspace, 'folder' => $folderDisplay], 'Imported {{count}} note(s) from ZIP into workspace "{{workspace}}", folder "{{folder}}".');
+        $messageParts[] = t('restore_import.messages.notes_imported_zip', ['count' => $importedCount, 'workspace' => $workspace, 'folder' => $folderDisplay], 'Imported {{count}} note(s) from ZIP into workspace "{{workspace}}", folder "{{folder}}".');
     }
     
     // Add info about imported images
     if ($importedImagesCount > 0) {
-        $message .= ' ' . $importedImagesCount . ' image(s) imported as attachments.';
+        $messageParts[] = $importedImagesCount . ' image(s) imported as attachments';
     }
     
     if ($errorCount > 0) {
-        $message .= " {$errorCount} error(s): " . implode('; ', array_slice($errors, 0, 5));
+        $messageParts[] = "{$errorCount} error(s): " . implode('; ', array_slice($errors, 0, 5));
     }
+    
+    $message = implode("\n", $messageParts);
     
     return ['success' => true, 'message' => $message];
 }
@@ -1672,6 +1723,14 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             $content = removeStyleTags($content);
         }
         
+        // Convert plain text to HTML with preserved line breaks for .txt files
+        if ($noteType === 'note' && $fileExtension === 'txt') {
+            // Escape HTML special characters first
+            $content = htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
+            // Convert line breaks to <br> tags
+            $content = nl2br($content, true);
+        }
+        
         // Parse front matter if it's a markdown file
         $frontMatterData = null;
         if ($noteType === 'markdown') {
@@ -1749,8 +1808,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             $updated = $frontMatterData['updated'];
         }
         
-        // Sanitize title
-        $title = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+        // Validate title is not empty
         if (empty($title)) {
             $title = t('restore_import.individual_notes.default_title_with_date', ['date' => date('Y-m-d H:i:s')]);
         }
@@ -1768,18 +1826,19 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             }
             
             // Insert note into database with metadata from front matter
+            // Store content in entry column for search functionality
             if ($created && $updated) {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, ?, ?, 0)");
-                $stmt->execute([$title, $folder, $folder_id, $workspace, $noteType, $tags, $favorite, $created, $updated]);
+                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
+                $stmt->execute([$title, $content, $folder, $folder_id, $workspace, $noteType, $tags, $favorite, $created, $updated]);
             } elseif ($created) {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, ?, datetime('now'), 0)");
-                $stmt->execute([$title, $folder, $folder_id, $workspace, $noteType, $tags, $favorite, $created]);
+                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), 0)");
+                $stmt->execute([$title, $content, $folder, $folder_id, $workspace, $noteType, $tags, $favorite, $created]);
             } elseif ($updated) {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, datetime('now'), ?, 0)");
-                $stmt->execute([$title, $folder, $folder_id, $workspace, $noteType, $tags, $favorite, $updated]);
+                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), ?, 0)");
+                $stmt->execute([$title, $content, $folder, $folder_id, $workspace, $noteType, $tags, $favorite, $updated]);
             } else {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0)");
-                $stmt->execute([$title, $folder, $folder_id, $workspace, $noteType, $tags, $favorite]);
+                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0)");
+                $stmt->execute([$title, $content, $folder, $folder_id, $workspace, $noteType, $tags, $favorite]);
             }
             $noteId = $con->lastInsertId();
             
@@ -1861,7 +1920,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         <!-- Global Messages Section - Always visible at the top -->
         <?php if ($restore_message): ?>
             <div class="alert alert-success">
-                <?php echo htmlspecialchars($restore_message); ?>
+                <?php echo nl2br(htmlspecialchars($restore_message)); ?>
             </div>
         <?php endif; ?>
         
@@ -1873,7 +1932,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         
         <?php if ($import_notes_message): ?>
             <div class="alert alert-success">
-                <?php echo htmlspecialchars($import_notes_message); ?>
+                <?php echo nl2br(htmlspecialchars($import_notes_message)); ?>
             </div>
         <?php endif; ?>
         
@@ -1885,7 +1944,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         
         <?php if ($import_attachments_message): ?>
             <div class="alert alert-success">
-                <?php echo htmlspecialchars($import_attachments_message); ?>
+                <?php echo nl2br(htmlspecialchars($import_attachments_message)); ?>
             </div>
         <?php endif; ?>
         
@@ -1897,7 +1956,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         
         <?php if ($import_individual_notes_message): ?>
             <div class="alert alert-success">
-                <?php echo htmlspecialchars($import_individual_notes_message); ?>
+                <?php echo nl2br(htmlspecialchars($import_individual_notes_message)); ?>
             </div>
         <?php endif; ?>
         
@@ -2026,7 +2085,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                 if (file_exists($cliBackupPath)) {
                     $result = restoreCompleteBackup(['tmp_name' => $cliBackupPath, 'name' => 'cli_backup.zip'], true);
                     if ($result['success']) {
-                        echo "<div class='alert alert-success'>" . t_h('restore_import.direct_copy.completed_successfully_prefix') . " " . htmlspecialchars($result['message']) . "</div>";
+                        echo "<div class='alert alert-success'>" . t_h('restore_import.direct_copy.completed_successfully_prefix') . " " . nl2br(htmlspecialchars($result['message'])) . "</div>";
                         // Clean up the file after successful restore
                         unlink($cliBackupPath);
                     } else {
