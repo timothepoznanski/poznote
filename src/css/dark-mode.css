@@ -2256,3 +2256,4 @@ body.dark-mode .folder-icon-grid::-webkit-scrollbar-thumb {
 html[data-theme='dark'] .folder-icon-grid::-webkit-scrollbar-thumb:hover,
 body.dark-mode .folder-icon-grid::-webkit-scrollbar-thumb:hover {
     background: #6b7280;
+}
