@@ -587,7 +587,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         
         return [
             'success' => !$hasErrors,
-            'message' => implode('; ', $results),
+            'message' => implode("\n", $results),
             'error' => $hasErrors ? 'Some components failed to restore' : ''
         ];
         
