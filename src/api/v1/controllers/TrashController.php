@@ -98,7 +98,7 @@ class TrashController {
             $search = $_GET['search'] ?? null;
             
             // Base query - only trash notes
-            $sql = "SELECT id, heading, subheading, tags, folder, folder_id, workspace, type, updated, created 
+            $sql = "SELECT id, heading, tags, folder, folder_id, workspace, type, updated, created 
                     FROM entries WHERE trash = 1";
             
             $params = [];
@@ -111,9 +111,8 @@ class TrashController {
             
             // Add search filter
             if ($search) {
-                $sql .= " AND (heading LIKE ? OR subheading LIKE ? OR tags LIKE ?)";
+                $sql .= " AND (heading LIKE ? OR tags LIKE ?)";
                 $searchTerm = "%$search%";
-                $params[] = $searchTerm;
                 $params[] = $searchTerm;
                 $params[] = $searchTerm;
             }

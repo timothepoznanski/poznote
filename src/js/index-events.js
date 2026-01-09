@@ -237,19 +237,13 @@
                     downloadAttachment(attachmentId, noteId);
                 }
                 break;
-            case 'open-note-info-edit':
-                if (noteId && typeof openNoteInfoEdit === 'function') {
-                    openNoteInfoEdit(noteId);
-                }
-                break;
-            case 'save-subheading-inline':
-                if (noteId && typeof saveSubheadingInline === 'function') {
-                    saveSubheadingInline(noteId);
-                }
-                break;
-            case 'cancel-subheading-inline':
-                if (noteId && typeof cancelSubheadingInline === 'function') {
-                    cancelSubheadingInline(noteId);
+            case 'open-note-info':
+                if (noteId) {
+                    var url = 'info.php?note_id=' + encodeURIComponent(noteId);
+                    if (window.selectedWorkspace) {
+                        url += '&workspace=' + encodeURIComponent(window.selectedWorkspace);
+                    }
+                    window.location.href = url;
                 }
                 break;
         }
@@ -502,70 +496,6 @@
         .catch(function(error) {
             showNotificationPopup((window.t ? window.t('ui.alerts.network_error', null, 'Network error') : 'Network error') + ': ' + error.message, 'error');
         });
-    };
-
-    // Subheading functions
-    window.startEditSubheading = function(noteId) {
-        var disp = document.getElementById('subheading-display-' + noteId);
-        var input = document.getElementById('subheading-input-' + noteId);
-        var editBtn = document.getElementById('edit-subheading-' + noteId);
-        var saveBtn = document.getElementById('save-subheading-' + noteId);
-        var cancelBtn = document.getElementById('cancel-subheading-' + noteId);
-        if (!disp || !input) return;
-        disp.style.display = 'none';
-        editBtn.style.display = 'none';
-        input.style.display = 'inline-block';
-        saveBtn.style.display = 'inline-block';
-        cancelBtn.style.display = 'inline-block';
-        input.focus();
-        input.select();
-    };
-
-    window.cancelSubheadingInline = function(noteId) {
-        var disp = document.getElementById('subheading-display-' + noteId);
-        var input = document.getElementById('subheading-input-' + noteId);
-        var editBtn = document.getElementById('edit-subheading-' + noteId);
-        var saveBtn = document.getElementById('save-subheading-' + noteId);
-        var cancelBtn = document.getElementById('cancel-subheading-' + noteId);
-        if (!disp || !input) return;
-        input.style.display = 'none';
-        saveBtn.style.display = 'none';
-        cancelBtn.style.display = 'none';
-        disp.style.display = 'inline';
-        editBtn.style.display = 'inline-block';
-        // restore original value
-        input.value = disp.textContent.trim();
-    };
-
-    window.saveSubheadingInline = function(noteId) {
-        var disp = document.getElementById('subheading-display-' + noteId);
-        var input = document.getElementById('subheading-input-' + noteId);
-        if (!disp || !input) return;
-        var newVal = input.value.trim();
-        fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/subheading', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'same-origin',
-            body: JSON.stringify({ subheading: newVal })
-        }).then(function(r) { return r.json(); }).then(function(data) {
-            if (data && data.success) {
-                disp.textContent = newVal || '';
-                cancelSubheadingInline(noteId);
-            } else {
-                alert(window.t ? window.t('index.errors.failed_to_save_subheading', null, 'Failed to save heading') : 'Failed to save heading');
-            }
-        }).catch(function(e) {
-            console.error(e);
-            alert(window.t ? window.t('ui.alerts.network_error', null, 'Network error') : 'Network error');
-        });
-    };
-
-    window.openNoteInfoEdit = function(noteId) {
-        var url = 'info.php?note_id=' + encodeURIComponent(noteId) + '&edit_subheading=1';
-        if (window.selectedWorkspace) {
-            url += '&workspace=' + encodeURIComponent(window.selectedWorkspace);
-        }
-        window.location.href = url;
     };
 
     // Navigate to settings.php with current workspace and note parameters

@@ -1390,31 +1390,6 @@ class NotesController {
     }
     
     /**
-     * PATCH /api/v1/notes/{id}/subheading
-     * Update note subheading
-     */
-    public function updateSubheading(string $id): void {
-        $input = json_decode(file_get_contents('php://input'), true);
-        
-        // Support both JSON body and form data
-        $subheading = $input['subheading'] ?? ($_POST['subheading'] ?? '');
-        $subheading = trim($subheading);
-        
-        try {
-            $stmt = $this->con->prepare("UPDATE entries SET subheading = ?, updated = datetime('now') WHERE id = ?");
-            $result = $stmt->execute([$subheading, $id]);
-            
-            if ($result) {
-                $this->sendSuccess(['subheading' => $subheading]);
-            } else {
-                $this->sendError(500, 'Failed to update subheading');
-            }
-        } catch (Exception $e) {
-            $this->sendError(500, 'Database error: ' . $e->getMessage());
-        }
-    }
-    
-    /**
      * GET /api/v1/notes/resolve
      * Resolve a note reference by ID or heading
      */

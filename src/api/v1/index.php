@@ -263,11 +263,6 @@ $router->post('/notes/{id}/convert', function($params) use ($notesController) {
     $notesController->convert($params['id']);
 });
 
-// Update note subheading
-$router->patch('/notes/{id}/subheading', function($params) use ($notesController) {
-    $notesController->updateSubheading($params['id']);
-});
-
 // Get share status for a note
 $router->get('/notes/{id}/share', function($params) use ($shareController) {
     $shareController->show($params['id']);

@@ -21,10 +21,10 @@ if (!$note_id) {
 // Get note details from database
 try {
     if ($workspace) {
-        $stmt = $con->prepare("SELECT heading, folder, folder_id, created, updated, favorite, tags, attachments, location, subheading, type FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
+        $stmt = $con->prepare("SELECT heading, folder, folder_id, created, updated, favorite, tags, attachments, type FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
         $stmt->execute([$note_id, $workspace]);
     } else {
-        $stmt = $con->prepare("SELECT heading, folder, folder_id, created, updated, favorite, tags, attachments, location, subheading, type FROM entries WHERE id = ? AND trash = 0");
+        $stmt = $con->prepare("SELECT heading, folder, folder_id, created, updated, favorite, tags, attachments, type FROM entries WHERE id = ? AND trash = 0");
         $stmt->execute([$note_id]);
     }
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -127,7 +127,7 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
     }
 }
 
-$subheadingText = $note['subheading'] ?: ($note['location'] ?: t('common.not_specified', [], 'Not specified'));
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -144,7 +144,7 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: t('common.not_spe
     <link rel="stylesheet" href="css/dark-mode.css">
     <script src="js/theme-manager.js"></script>
 </head>
-<body data-note-id="<?php echo $note_id; ?>" data-workspace="<?php echo htmlspecialchars($workspace ?? '', ENT_QUOTES, 'UTF-8'); ?>" data-current-subheading="<?php echo htmlspecialchars($note['subheading'] ?? ($note['location'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>"<?php if (isset($_GET['edit_subheading']) && $_GET['edit_subheading'] == '1'): ?> data-auto-edit-subheading="1"<?php endif; ?>>
+<body data-note-id="<?php echo $note_id; ?>" data-workspace="<?php echo htmlspecialchars($workspace ?? '', ENT_QUOTES, 'UTF-8'); ?>">
     
     <div class="info-page">
         <div class="info-buttons-back-container">
@@ -177,18 +177,6 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: t('common.not_spe
             <div class="info-row">
                 <div class="info-label"><?php echo t_h('info.labels.last_modified', [], 'Last Modified:'); ?></div>
                 <div class="info-value"><?php echo htmlspecialchars($updatedText); ?></div>
-            </div>
-
-            <div class="info-row">
-                <div class="info-label"><?php echo t_h('info.labels.subheading', [], 'Subheading:'); ?></div>
-                <div class="info-value">
-                    <span id="subheading-display" class="cursor-pointer" role="button" tabindex="0"><?php echo htmlspecialchars($subheadingText); ?></span>
-                    <input type="text" id="subheading-input" class="initially-hidden" />
-                    <div id="subheading-buttons" class="subheading-buttons-container">
-                        <button type="button" class="btn-save"><?php echo t_h('common.save', [], 'Save'); ?></button>
-                        <button type="button" class="btn-cancel"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
-                    </div>
-                </div>
             </div>
 
             <div class="info-row">
