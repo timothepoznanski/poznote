@@ -351,7 +351,7 @@ class NotesController {
             
             // Generate unique heading if needed
             if ($originalHeading === '') {
-                $heading = generateUniqueTitle('New note', null, $workspace, $folder_id);
+                $heading = generateUniqueTitle(t('index.note.new_note', [], 'New note'), null, $workspace, $folder_id);
             } else {
                 // Check uniqueness
                 if ($folder_id !== null) {
