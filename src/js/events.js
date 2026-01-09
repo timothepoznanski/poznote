@@ -173,8 +173,8 @@ function setupNoteEditingEvents() {
             return;
         }
         
-        // Handle arrow up/down navigation between noteentry and checklists
-        if (e.key === 'ArrowUp' || e.key === 'Up' || e.key === 'Delete') {
+        // Handle arrow up/down navigation, Enter, and delete between noteentry and checklists
+        if (e.key === 'ArrowUp' || e.key === 'Up' || e.key === 'Delete' || e.key === 'Enter') {
             var noteentry = e.target.closest('.noteentry');
             if (noteentry && noteentry.isContentEditable) {
                 handleNoteentryKeydown(e);
@@ -509,15 +509,75 @@ function handleChecklistKeydown(e) {
 }
 
 function handleNoteentryKeydown(e) {
-    var target = e.target;
-    
-    // Only handle ArrowUp and Delete when we're in a noteentry (contenteditable)
-    if (!target.classList.contains('noteentry')) return;
+    var originalTarget = e.target;
+    var target = originalTarget.nodeType === 3 ? originalTarget.parentNode : originalTarget;
+    // Find the containing .noteentry ancestor
+    while (target && !target.classList.contains('noteentry')) {
+        target = target.parentNode;
+    }
+    if (!target) return;
     
     var sel = window.getSelection();
     if (!sel.rangeCount) return;
     
     var range = sel.getRangeAt(0);
+    
+    // Handle Enter in blockquote/callout - exit on empty line
+    if (e.key === 'Enter') {
+        var node = range.startContainer;
+        var currentElement = node.nodeType === 3 ? node.parentNode : node;
+        
+        // Find if we're in a blockquote or callout
+        var blockquote = currentElement;
+        var calloutBody = null;
+        
+        while (blockquote && blockquote !== target) {
+            // Check for callout-body div
+            if (blockquote.classList && blockquote.classList.contains('callout-body')) {
+                calloutBody = blockquote;
+            }
+            
+            if (blockquote.tagName === 'BLOCKQUOTE' || 
+                (blockquote.tagName === 'ASIDE' && blockquote.classList.contains('callout'))) {
+                break;
+            }
+            blockquote = blockquote.parentNode;
+        }
+        
+        if (blockquote && blockquote !== target) {
+            // For callouts, check if callout-body is empty
+            // For plain blockquotes, check if the blockquote itself is empty
+            var contentToCheck = calloutBody || blockquote;
+            var textContent = contentToCheck.textContent || '';
+            
+            // Remove zero-width spaces and check if empty
+            var isEmpty = textContent.replace(/\u200B/g, '').trim() === '';
+            
+            if (isEmpty) {
+                e.preventDefault();
+                
+                // Create a new paragraph after the blockquote/callout
+                var newP = document.createElement('p');
+                newP.innerHTML = '<br>';
+                
+                // Insert after the blockquote/callout
+                if (blockquote.nextSibling) {
+                    blockquote.parentNode.insertBefore(newP, blockquote.nextSibling);
+                } else {
+                    blockquote.parentNode.appendChild(newP);
+                }
+                
+                // Move cursor to the new paragraph
+                range = document.createRange();
+                range.setStart(newP, 0);
+                range.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(range);
+                
+                return;
+            }
+        }
+    }
     
     // Handle ArrowUp - navigate to previous checklist
     if (e.key === 'ArrowUp' || e.key === 'Up') {
