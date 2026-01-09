@@ -194,11 +194,11 @@
 }
 
 .task-delete-btn i {
-    font-size: 14px;
+    font-size: 16px !important;
 }
 
 .task-important-btn i {
-    font-size: 14px;
+    font-size: 16px !important;
 }
 
 .task-delete-btn i,
@@ -206,9 +206,8 @@
 .task-drag-handle i {
     color: #999;
     font-family: "Font Awesome 5 Pro" !important;
-    font-weight: 300 !important;
     font-style: normal !important;
-    display: inline-block !important;
+    display: inline-block;
 }
 
 .task-delete-btn:hover i {
@@ -258,17 +257,16 @@
 
 .task-icon-trash,
 .task-icon-star {
-  font-family: "Font Awesome 5 Pro";
-  font-weight: 300;
-  font-style: normal;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  display: inline-block;
-  font-variant: normal;
-  text-rendering: auto;
-  line-height: 1;
-  font-size: 0.875em;
-  vertical-align: middle;
+    font-family: "Font Awesome 5 Pro";
+    font-style: normal;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    font-size: 0.875em;
+    vertical-align: middle;
 }
 
 /* Red star icon for important tasks */
@@ -282,6 +280,17 @@
 
 .task-important-btn.is-favorite i {
   color: #ff0000 !important;
+}
+
+/* Ensure Font Awesome glyphs render correctly inside tasklist notes
+     even when `.noteentry` applies a global font-family (e.g. Inter). */
+.noteentry[data-note-type="tasklist"] .task-item i,
+.noteentry[data-note-type="tasklist"] .task-item i::before {
+    font-family: "Font Awesome 5 Pro" !important;
+    font-style: normal !important;
+    font-variant: normal;
+    text-transform: none;
+    /* Do not force font-weight here; let Font Awesome CSS decide the correct variant */
 }
 
 /* Tasklist note styles - Hide separator and table buttons for tasklist notes */
