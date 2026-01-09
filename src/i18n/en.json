@@ -811,6 +811,14 @@
     "link": "Link",
     "cancel": "Cancel",
     "back": "Back"
+    ,
+    "quote": "Quote",
+    "blockquote": "Blockquote",
+    "callout_note": "Note",
+    "callout_tip": "Tip",
+    "callout_important": "Important",
+    "callout_warning": "Warning",
+    "callout_caution": "Caution"
   },
   "api": {
     "settings": {

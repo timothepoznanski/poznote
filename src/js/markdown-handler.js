@@ -600,7 +600,8 @@ function parseMarkdown(text) {
                     bodyLines.push(blockquoteLines[bi]);
                 }
                 
-                let titleHtml = calloutType.charAt(0).toUpperCase() + calloutType.slice(1);
+                let defaultTitle = calloutType.charAt(0).toUpperCase() + calloutType.slice(1);
+                let titleHtml = (window.t ? window.t('slash_menu.callout_' + calloutType, null, defaultTitle) : defaultTitle);
                 let bodyHtml = bodyLines.map(l => applyInlineStyles(l)).join('<br>');
                 
                 // GitHub-style callout icons
