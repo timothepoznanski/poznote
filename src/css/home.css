@@ -96,29 +96,17 @@
     font-style: normal;
 }
 
-/* Special icon colors */
-.home-card-icon-favorites {
-    background: rgba(245, 158, 11, 0.1);
-}
-
-.home-card-icon-favorites i {
-    color: #f59e0b;
-}
-
-.home-card-icon-trash {
-    background: rgba(239, 68, 68, 0.1);
-}
-
-.home-card-icon-trash i {
-    color: #ef4444;
-}
-
+/* Special icon colors — unified to Poznote blue */
+.home-card-icon-favorites,
+.home-card-icon-trash,
 .home-card-icon-shared {
-    background: rgba(16, 185, 129, 0.1);
+    background: rgba(0, 125, 184, 0.1);
 }
 
+.home-card-icon-favorites i,
+.home-card-icon-trash i,
 .home-card-icon-shared i {
-    color: #10b981;
+    color: #007DB8;
 }
 
 .home-card-content {
@@ -237,18 +225,12 @@ body.dark-mode .home-card-icon {
 }
 
 html[data-theme='dark'] .home-card-icon-favorites,
-body.dark-mode .home-card-icon-favorites {
-    background: rgba(245, 158, 11, 0.2);
-}
-
+body.dark-mode .home-card-icon-favorites,
 html[data-theme='dark'] .home-card-icon-trash,
-body.dark-mode .home-card-icon-trash {
-    background: rgba(239, 68, 68, 0.2);
-}
-
+body.dark-mode .home-card-icon-trash,
 html[data-theme='dark'] .home-card-icon-shared,
 body.dark-mode .home-card-icon-shared {
-    background: rgba(16, 185, 129, 0.2);
+    background: rgba(0, 125, 184, 0.2);
 }
 
 /* Responsive */
