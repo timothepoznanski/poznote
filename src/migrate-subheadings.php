@@ -13,8 +13,9 @@ if (php_sapi_name() !== 'cli') {
     die('This script can only be run from the command line.');
 }
 
-$dbPath = '/var/www/html/data/database/poznote.db';
-$entriesDir = '/var/www/html/data/entries';
+// Use same database path logic as config.php
+$dbPath = $_ENV['SQLITE_DATABASE'] ?? dirname(__DIR__) . '/data/database/poznote.db';
+$entriesDir = dirname($dbPath) . '/../entries';
 
 if (!file_exists($dbPath)) {
     echo "Database not found at $dbPath - skipping subheading migration\n";
