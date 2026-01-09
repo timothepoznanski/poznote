@@ -391,8 +391,16 @@
   },
   "sidebar": {
     "display": "Display",
+    "home": "Home",
     "settings": "Settings",
     "create": "Create"
+  },
+  "home": {
+    "title": "Home",
+    "shared_notes": "Shared Notes",
+    "shared_folders": "Shared Folders",
+    "note": "note",
+    "notes": "notes"
   },
   "search": {
     "placeholder": "Search...",

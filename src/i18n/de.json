@@ -389,8 +389,16 @@
   },
   "sidebar": {
     "display": "Anzeige",
+    "home": "Startseite",
     "settings": "Einstellungen",
     "create": "Erstellen"
+  },
+  "home": {
+    "title": "Startseite",
+    "shared_notes": "Geteilte Notizen",
+    "shared_folders": "Geteilte Ordner",
+    "note": "Notiz",
+    "notes": "Notizen"
   },
   "search": {
     "placeholder": "Suchen...",

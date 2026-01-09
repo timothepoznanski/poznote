@@ -389,8 +389,16 @@
   },
   "sidebar": {
     "display": "Pantalla",
+    "home": "Inicio",
     "settings": "Configuración",
     "create": "Crear"
+  },
+  "home": {
+    "title": "Inicio",
+    "shared_notes": "Notas compartidas",
+    "shared_folders": "Carpetas compartidas",
+    "note": "nota",
+    "notes": "notas"
   },
   "search": {
     "placeholder": "Buscar...",

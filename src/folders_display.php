@@ -145,6 +145,11 @@ function sortFolders($folders) {
  * Now accepts both folder ID and name
  */
 function shouldFolderBeOpen($con, $folderId, $folderName, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes) {
+    // Favorites folder is always open
+    if ($folderName === 'Favorites') {
+        return true;
+    }
+    
     // Check if this folder was explicitly requested to be opened (e.g., after creating a subfolder)
     if (isset($_GET['open_folder'])) {
         $openFolderKey = $_GET['open_folder'];
@@ -160,12 +165,9 @@ function shouldFolderBeOpen($con, $folderId, $folderName, $is_search_mode, $fold
         // In search mode: open folders that have results
         return isset($folders_with_results[$folderName]);
     } else if($note != '') {
-        // If a note is selected: open the folder of the current note AND Favoris if note is favorite
+        // If a note is selected: open the folder of the current note
         if ($folderName === $current_note_folder) {
             return true;
-        } else if ($folderName === 'Favorites') {
-            // Open Favoris folder if the current note is favorite
-            return isNoteFavorite($con, $note, $workspace_filter);
         }
     } else if($default_note_folder) {
         // If no specific note selected but default note loaded: open its folder

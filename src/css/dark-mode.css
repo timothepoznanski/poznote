@@ -160,11 +160,70 @@ body.dark-mode .searchbar-icon {
     color: #e0e0e0;
 }
 
-/* System folders container - same background as search bar */
+/* Search type buttons */
+html[data-theme='dark'] .searchbar-type-btn,
+body.dark-mode .searchbar-type-btn {
+    color: #808080;
+}
+
+html[data-theme='dark'] .searchbar-type-btn:hover,
+body.dark-mode .searchbar-type-btn:hover {
+    color: #5cb3e9;
+}
+
+html[data-theme='dark'] .searchbar-type-btn:hover i,
+body.dark-mode .searchbar-type-btn:hover i {
+    color: #5cb3e9;
+}
+
+html[data-theme='dark'] .searchbar-type-btn:hover i::before,
+body.dark-mode .searchbar-type-btn:hover i::before {
+    color: #5cb3e9;
+}
+
+html[data-theme='dark'] .searchbar-type-btn.active,
+body.dark-mode .searchbar-type-btn.active {
+    color: #5cb3e9 !important;
+}
+
+html[data-theme='dark'] .searchbar-type-btn.active i,
+body.dark-mode .searchbar-type-btn.active i,
+html[data-theme='dark'] .searchbar-type-btn.active i.fa,
+body.dark-mode .searchbar-type-btn.active i.fa,
+html[data-theme='dark'] .searchbar-type-btn.active i.fa-file-alt,
+body.dark-mode .searchbar-type-btn.active i.fa-file-alt,
+html[data-theme='dark'] .searchbar-type-btn.active i.fa-tag,
+body.dark-mode .searchbar-type-btn.active i.fa-tag {
+    color: #5cb3e9 !important;
+}
+
+html[data-theme='dark'] .searchbar-type-btn.active i::before,
+body.dark-mode .searchbar-type-btn.active i::before,
+html[data-theme='dark'] .searchbar-type-btn.active i.fa::before,
+body.dark-mode .searchbar-type-btn.active i.fa::before,
+html[data-theme='dark'] .searchbar-type-btn.active i.fa-file-alt::before,
+body.dark-mode .searchbar-type-btn.active i.fa-file-alt::before,
+html[data-theme='dark'] .searchbar-type-btn.active i.fa-tag::before,
+body.dark-mode .searchbar-type-btn.active i.fa-tag::before {
+    color: #5cb3e9 !important;
+}
+
+/* Also ensure filters don't desaturate search type icons in dark mode */
+html[data-theme='dark'] .searchbar-type-btn i,
+body.dark-mode .searchbar-type-btn i,
+html[data-theme='dark'] .searchbar-type-btn i::before,
+body.dark-mode .searchbar-type-btn i::before,
+html[data-theme='dark'] .searchbar-type-btn.active i,
+body.dark-mode .searchbar-type-btn.active i,
+html[data-theme='dark'] .searchbar-type-btn.active i::before,
+body.dark-mode .searchbar-type-btn.active i::before {
+    filter: none !important;
+}
+
+/* System folders container - hidden (replaced by Home page) */
 html[data-theme='dark'] .system-folders-container,
 body.dark-mode .system-folders-container {
-    background-color: #2a2a2a;
-    border-color: #404040;
+    display: none !important;
 }
 
 /* Menu déroulant du système en mode sombre */
@@ -196,11 +255,9 @@ body.dark-mode .favorites-separator {
     border-bottom-color: #404040;
 }
 
-/* Separator after favorites when displayed */
-html[data-theme='dark'] #folder-favorites[style*="display: block"],
-html[data-theme='dark'] #folder-favorites:not([style*="display: none"]),
-body.dark-mode #folder-favorites[style*="display: block"],
-body.dark-mode #folder-favorites:not([style*="display: none"]) {
+/* Separator after favorites - always visible now */
+html[data-theme='dark'] #folder-favorites,
+body.dark-mode #folder-favorites {
     border-bottom-color: #404040;
 }
 

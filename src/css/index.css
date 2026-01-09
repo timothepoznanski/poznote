@@ -471,15 +471,18 @@ body {
 .sidebar-title-actions { display: flex; align-items: center; gap: 6px; position: relative; }
 .sidebar-gear { display: none; }
 .sidebar-display { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; }
+.sidebar-home { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; }
 .sidebar-settings { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; position: relative; }
 .sidebar-plus { background: transparent; border: none; color: #6c757d !important; font-size: 1.2rem; cursor: pointer; padding: 6px; border-radius: 6px; }
 
 /* Hover and focus states for sidebar buttons */
 .sidebar-display:hover,
+.sidebar-home:hover,
 .sidebar-settings:hover,
 .sidebar-plus:hover { background: rgba(0, 125, 184, 0.1); }
 
 .sidebar-display:focus,
+.sidebar-home:focus,
 .sidebar-settings:focus,
 .sidebar-plus:focus { outline: 2px solid #007DB8; outline-offset: 2px; }
 
@@ -488,6 +491,8 @@ body {
 .sidebar-title-actions [class*="fa-"],
 .sidebar-display i,
 .sidebar-display [class*="fa-"],
+.sidebar-home i,
+.sidebar-home [class*="fa-"],
 .sidebar-settings i,
 .sidebar-settings [class*="fa-"] {
     font-size: 0.7em !important;
@@ -1251,7 +1256,7 @@ a.links_arbo_left.selected-note {
 }
 
 .searchbar-input {
-    padding: 10px 12px 10px 44px;
+    padding: 10px 12px 10px 80px;
     border-radius: 8px;
     border: 1px solid #d3d6db;
     background: #ffffff;
@@ -1291,6 +1296,75 @@ a.links_arbo_left.selected-note {
     flex: 1;
     display: flex;
     align-items: center;
+}
+
+/* Search type toggle buttons */
+.searchbar-type-icons {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 2px;
+    z-index: 2;
+}
+
+.searchbar-type-btn {
+    background: transparent;
+    border: none;
+    padding: 6px 8px;
+    cursor: pointer;
+    color: #9aa3a8;
+    font-size: 16px;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.searchbar-type-btn:hover {
+    color: #007DB8;
+}
+
+.searchbar-type-btn:hover i {
+    color: #007DB8;
+}
+
+.searchbar-type-btn:hover i::before {
+    color: #007DB8;
+}
+
+.searchbar-type-btn.active {
+    color: #007DB8 !important;
+}
+
+.searchbar-type-btn.active i,
+.searchbar-type-btn.active i.fa,
+.searchbar-type-btn.active i.fa-file-alt,
+.searchbar-type-btn.active i.fa-tag {
+    color: #007DB8 !important;
+}
+
+.searchbar-type-btn.active i::before,
+.searchbar-type-btn.active i.fa::before,
+.searchbar-type-btn.active i.fa-file-alt::before,
+.searchbar-type-btn.active i.fa-tag::before {
+    color: #007DB8 !important;
+}
+
+.searchbar-type-btn i {
+    font-style: normal;
+    color: inherit;
+}
+
+.searchbar-type-btn i::before {
+    color: inherit;
+}
+
+.searchbar-type-btn i.fa,
+.searchbar-type-btn i.fa-file-alt,
+.searchbar-type-btn i.fa-tag {
+    color: inherit;
 }
 
 .searchbar-icon {
@@ -2744,26 +2818,9 @@ body.dark-mode .folder-header.folder-drop-target {
     align-content: center;
 }
 
-/* Container pour les dossiers système (Trash, Tags, Public, Favorites) */
+/* Container pour les dossiers système - maintenant masqué (remplacé par page Home) */
 .system-folders-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 35px;
-    margin: 0px 0px 15px 0px;
-    /* padding: 5px 0; */
-    border: 1px solid #d3d6db;
-    border-radius: 8px;
-    background: #ffffff;
-    padding: 10px 4px;
-    overflow: visible;
-    height: 40px;
-    box-sizing: border-box;
-}
-
-/* Réduire l'écart entre la loupe et la corbeille */
-.system-folders-container > .folder-header:first-child {
-    margin-right: -10px;
+    display: none !important;
 }
 
 /* Conteneur du menu système avec menu déroulant */
@@ -2902,14 +2959,14 @@ body.dark-mode .folder-header.folder-drop-target {
 }
 
 /* S'assurer que le contenu des favoris reste visible et aligné à gauche */
-/* Retirer !important pour permettre au toggle JavaScript de fonctionner */
+/* Favoris toujours visible */
 #folder-favorites {
     margin-left: 0 !important;
+    display: block !important;
 }
 
 /* Ajouter une bordure de séparation en bas quand les favoris sont affichés */
-#folder-favorites[style*="display: block"],
-#folder-favorites:not([style*="display: none"]) {
+#folder-favorites {
     border-bottom: 1px solid #e5e7eb;
     padding-bottom: 15px;
     margin-bottom: 15px;
@@ -4380,6 +4437,16 @@ input[type="search"]::-webkit-search-results-decoration {
 [class*="fa-"]:hover {
   transform: scale(1.18);
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
+}
+
+/* Ensure search type button icons are not recolored by the global fa filter */
+.searchbar-type-btn i,
+.searchbar-type-btn i::before,
+.searchbar-type-btn.active i,
+.searchbar-type-btn.active i::before,
+.searchbar-type-btn:hover i,
+.searchbar-type-btn:hover i::before {
+    filter: none !important;
 }
 
 /* Exception: Remove filter for save button when modified (to show red color) */

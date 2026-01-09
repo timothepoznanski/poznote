@@ -41,6 +41,51 @@
     window.toggleSearchBar = toggleSearchBar;
 
     /**
+     * Handle search type toggle (notes vs tags)
+     */
+    function handleSearchTypeToggle(event) {
+        var button = event.target.closest('.searchbar-type-btn');
+        if (!button) return;
+        
+        var searchType = button.getAttribute('data-search-type');
+        if (!searchType) return;
+        
+        // Delegate to SearchManager if available (handles both button state and search execution)
+        if (window.searchManager && typeof window.searchManager.handleButtonClick === 'function') {
+            window.searchManager.handleButtonClick(searchType, false); // false = desktop
+            return;
+        }
+        
+        // Fallback: manual update if SearchManager not available
+        // Update button states
+        var allButtons = document.querySelectorAll('.searchbar-type-btn');
+        allButtons.forEach(function(btn) {
+            btn.classList.remove('active');
+        });
+        button.classList.add('active');
+        
+        // Update hidden fields
+        var searchInNotes = document.getElementById('search-in-notes');
+        var searchInTags = document.getElementById('search-in-tags');
+        var searchInput = document.getElementById('unified-search');
+        
+        if (searchType === 'notes') {
+            if (searchInNotes) searchInNotes.value = '1';
+            if (searchInTags) searchInTags.value = '';
+            if (searchInput) searchInput.placeholder = (window.t ? window.t('search.placeholder_notes', null, 'Search for one or more words...') : 'Search for one or more words...');
+        } else if (searchType === 'tags') {
+            if (searchInNotes) searchInNotes.value = '';
+            if (searchInTags) searchInTags.value = '1';
+            if (searchInput) searchInput.placeholder = (window.t ? window.t('search.placeholder_tags', null, 'Search for one or more tags...') : 'Search for one or more tags...');
+        }
+        
+        // Focus the input
+        if (searchInput) {
+            searchInput.focus();
+        }
+    }
+
+    /**
      * Handle all click events in the notes list using delegation
      */
     function handleNotesListClick(event) {
@@ -309,34 +354,37 @@
      * Initialize event delegation
      */
     function initNotesListEvents() {
-        // Restore search bar state
+        // Search bar is now always visible - no need to toggle or restore state
         var searchContainer = document.getElementById('search-bar-container');
         if (searchContainer) {
-            var isVisible = localStorage.getItem('searchBarVisible');
-            
-            // Read isSearchMode directly from page config JSON (in case window.isSearchMode is not yet set)
-            var isSearchMode = window.isSearchMode;
-            if (typeof isSearchMode === 'undefined') {
-                var configElement = document.getElementById('page-config-data');
-                if (configElement) {
-                    try {
-                        var config = JSON.parse(configElement.textContent);
-                        isSearchMode = config.isSearchMode || false;
-                    } catch (e) {
-                        isSearchMode = false;
-                    }
-                }
-            }
-            
-            // Force display if search is active
-            if (isSearchMode) {
-                searchContainer.style.display = 'block';
-                localStorage.setItem('searchBarVisible', 'true');
-            }
-            // By default, hide if no active search
-            else if (isVisible !== 'true') {
-                searchContainer.style.display = 'none';
-            }
+            searchContainer.style.display = 'block';
+        }
+        
+        // Initialize search type buttons state
+        var searchInNotes = document.getElementById('search-in-notes');
+        var searchInTags = document.getElementById('search-in-tags');
+        var notesBtn = document.querySelector('.searchbar-type-notes');
+        var tagsBtn = document.querySelector('.searchbar-type-tags');
+        
+        if (searchInTags && searchInTags.value === '1') {
+            if (notesBtn) notesBtn.classList.remove('active');
+            if (tagsBtn) tagsBtn.classList.add('active');
+        } else {
+            if (notesBtn) notesBtn.classList.add('active');
+            if (tagsBtn) tagsBtn.classList.remove('active');
+        }
+        
+        // Add event listener for search type buttons
+        var typeButtons = document.querySelectorAll('.searchbar-type-btn');
+        typeButtons.forEach(function(btn) {
+            btn.addEventListener('click', handleSearchTypeToggle);
+        });
+        
+        // Favorites are now always visible - force them open
+        var favoritesFolder = document.getElementById('folder-favorites');
+        if (favoritesFolder) {
+            favoritesFolder.style.display = 'block';
+            localStorage.setItem('folder_folder-favorites', 'open');
         }
         
         // Add click event listener with delegation

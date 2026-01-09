@@ -49,6 +49,11 @@
                     toggleWorkspaceMenu(e);
                 }
                 break;
+            case 'navigate-to-home':
+                if (typeof navigateToDisplayOrSettings === 'function') {
+                    navigateToDisplayOrSettings('home.php');
+                }
+                break;
             case 'navigate-to-settings':
                 if (typeof navigateToDisplayOrSettings === 'function') {
                     navigateToDisplayOrSettings('settings.php');

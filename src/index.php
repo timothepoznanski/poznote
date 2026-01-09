@@ -252,6 +252,7 @@ $body_classes = trim($extra_body_classes);
                 <i class="fa-caret-down workspace-dropdown-icon"></i>
             </div>
             <div class="sidebar-title-actions">
+                <button class="sidebar-home" data-action="navigate-to-home" title="<?php echo t_h('sidebar.home', [], 'Home'); ?>"><i class="fa-home"></i></button>
                 <button class="sidebar-settings" data-action="navigate-to-settings" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>"><i class="fa-cog"></i><span class="update-badge update-badge-hidden"></span></button>
                 <button class="sidebar-plus" data-action="toggle-create-menu" title="<?php echo t_h('sidebar.create'); ?>"><i class="fa-plus-circle"></i></button>
             </div>

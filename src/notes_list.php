@@ -3,105 +3,8 @@
  * Template for the notes list (left column) of index.php
  * Expected variables: $folders, $is_search_mode, $folder_filter, $workspace_filter, etc.
  */
-?>
 
-<!-- Notes list display -->
-<?php
-// Container pour les icônes système en mode icônes centrées
-echo "<div class='system-folders-container'>";
-
-// Icône toggle pour la barre de recherche
-echo "<div class='folder-header system-folder' data-action='toggle-search-bar' title='Recherche'>";
-echo "<div class='folder-toggle'>";
-echo "<i class='fa-search folder-icon'></i>";
-echo "<span class='folder-name'>Recherche</span>";
-echo "</div></div>";
-
-// Count for Tags folder
-$tag_count = 0;
-$unique_tags = [];
-try {
-    if (isset($con)) {
-        $query = "SELECT tags FROM entries WHERE trash = 0";
-        $params = [];
-        if (!empty($workspace_filter)) {
-            $query .= " AND workspace = ?";
-            $params[] = $workspace_filter;
-        }
-        $stmtTags = $con->prepare($query);
-        $stmtTags->execute($params);
-        while ($r = $stmtTags->fetch(PDO::FETCH_ASSOC)) {
-        $parts = explode(',', $r['tags'] ?? '');
-            foreach ($parts as $p) {
-                $t = trim($p);
-                if ($t !== '' && !in_array($t, $unique_tags)) {
-                    $unique_tags[] = $t;
-                }
-            }
-        }
-        $tag_count = count($unique_tags);
-    }
-} catch (Exception $e) {
-    $tag_count = 0;
-}
-
-// Render a dedicated "Tags" folder
-echo "<div class='folder-header system-folder' data-folder='Tags'>";
-echo "<div class='folder-toggle' data-action='navigate-tags' data-url='list_tags.php?workspace=" . urlencode($workspace_filter) . "' title='" . t_h('notes_list.system_folders.tags', [], 'Tags') . "'>";
-echo "<i class='fa-tags folder-icon'></i>";
-echo "<span class='folder-name'>" . t_h('notes_list.system_folders.tags', [], 'Tags') . "</span>";
-echo "<span class='folder-note-count' id='count-tags'>" . $tag_count . "</span>";
-echo "</div></div>";
-
-// Count for Trash
-try {
-    $trash_count = 0;
-    if (isset($con)) {
-        $stmtTrash = $con->prepare("SELECT COUNT(*) as cnt FROM entries WHERE trash = 1 AND workspace = ?");
-        $stmtTrash->execute([ $workspace_filter ]);
-        $trash_count = (int)$stmtTrash->fetchColumn();
-    }
-} catch (Exception $e) {
-    $trash_count = 0;
-}
-
-// Count for Public/Shared notes
-$shared_count = 0;
-try {
-    if (isset($con)) {
-        $query = "SELECT COUNT(*) as cnt FROM shared_notes sn INNER JOIN entries e ON sn.note_id = e.id WHERE e.trash = 0";
-        $params = [];
-        if (!empty($workspace_filter)) {
-            $query .= " AND e.workspace = ?";
-            $params[] = $workspace_filter;
-        }
-        $stmtShared = $con->prepare($query);
-        $stmtShared->execute($params);
-        $shared_count = (int)$stmtShared->fetchColumn();
-    }
-} catch (Exception $e) {
-    $shared_count = 0;
-}
-
-// Count for Attachments
-$attachments_count = 0;
-try {
-    if (isset($con)) {
-        $query = "SELECT COUNT(*) as cnt FROM entries WHERE trash = 0 AND attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
-        $params = [];
-        if (!empty($workspace_filter)) {
-            $query .= " AND workspace = ?";
-            $params[] = $workspace_filter;
-        }
-        $stmtAttachments = $con->prepare($query);
-        $stmtAttachments->execute($params);
-        $attachments_count = (int)$stmtAttachments->fetchColumn();
-    }
-} catch (Exception $e) {
-    $attachments_count = 0;
-}
-
-// Count favorites for the current workspace
+// Count favorites for the current workspace (needed for display)
 $favorites_count = 0;
 try {
     if (isset($con)) {
@@ -118,52 +21,25 @@ try {
 } catch (Exception $e) {
     $favorites_count = 0;
 }
-
-// Add Favorites icon BEFORE the menu (only if there are favorites)
-if ($favorites_count > 0) {
-    echo "<div class='folder-header system-folder system-folder-favorites' data-folder='Favorites' data-folder-id='folder-favorites' data-folder-key='folder_folder-favorites'>";
-    echo "<div class='folder-toggle' data-action='toggle-favorites' data-folder-id='folder-favorites' title='" . t_h('notes_list.system_folders.favorites', [], 'Favorites') . "'>";
-    echo "<i class='fa-star-light folder-icon'></i>";
-    echo "<span class='folder-name'>" . t_h('notes_list.system_folders.favorites', [], 'Favorites') . "</span>";
-    echo "<span class='folder-note-count' id='count-favorites'>" . $favorites_count . "</span>";
-    echo "</div></div>";
-}
-
-// Public/Shared notes icon in the bar
-echo "<div class='folder-header system-folder' data-folder='Shared'>";
-echo "<div class='folder-toggle' data-action='navigate-shared' data-url='shared.php?workspace=" . urlencode($workspace_filter) . "' title='" . t_h('notes_list.system_folders.public', [], 'Public') . "'>";
-echo "<i class='fa-cloud folder-icon'></i>";
-echo "<span class='folder-name'>" . t_h('notes_list.system_folders.public', [], 'Public') . "</span>";
-echo "<span class='folder-note-count' id='count-shared'>" . $shared_count . "</span>";
-echo "</div></div>";
-
-// Trash icon in the bar
-echo "<div class='folder-header system-folder' data-folder='Trash'>";
-echo "<div class='folder-toggle' data-action='navigate-trash' data-url='trash.php?workspace=" . urlencode($workspace_filter) . "' title='" . t_h('notes_list.system_folders.trash', [], 'Trash') . "'>";
-echo "<i class='fa-trash folder-icon'></i>";
-echo "<span class='folder-name'>" . t_h('notes_list.system_folders.trash', [], 'Trash') . "</span>";
-echo "<span class='folder-note-count' id='count-trash'>" . $trash_count . "</span>";
-echo "</div></div>";
-
-// Attachments icon in the bar
-echo "<div class='folder-header system-folder' data-folder='Attachments'>";
-echo "<div class='folder-toggle' data-action='navigate-attachments' data-url='attachments_list.php?workspace=" . urlencode($workspace_filter) . "' title='" . t_h('notes_list.system_folders.attachments', [], 'Attachments') . "'>";
-echo "<i class='fa-paperclip folder-icon'></i>";
-echo "<span class='folder-name'>" . t_h('notes_list.system_folders.attachments', [], 'Attachments') . "</span>";
-echo "<span class='folder-note-count' id='count-attachments'>" . $attachments_count . "</span>";
-echo "</div></div>";
-
-echo "</div>"; // Fin du container system-folders
 ?>
 
-<!-- Search bar container - appears below the system icons when toggled -->
-<div class="contains_forms_search" id="search-bar-container">
+<!-- Notes list display -->
+
+<!-- Search bar container - always visible -->
+<div class="contains_forms_search" id="search-bar-container" style="display: block;">
     <form id="unified-search-form" action="index.php" method="POST">
         <div class="unified-search-container">
             <div class="searchbar-row searchbar-icon-row">
+                <div class="searchbar-type-icons">
+                    <button type="button" id="search-notes-btn" class="searchbar-type-btn searchbar-type-notes active" data-search-type="notes" title="<?php echo t_h('search.search_in_notes', [], 'Search in notes'); ?>">
+                        <i class="fa fa-file-alt"></i>
+                    </button>
+                    <button type="button" id="search-tags-btn" class="searchbar-type-btn searchbar-type-tags" data-search-type="tags" title="<?php echo t_h('search.search_in_tags', [], 'Search in tags'); ?>">
+                        <i class="fa fa-tag"></i>
+                    </button>
+                </div>
                 <div class="searchbar-input-wrapper">
                     <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="<?php echo t_h('search.placeholder_notes'); ?>" value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
-                    <span class="searchbar-icon"><span class="fa-search"></span></span>
                     <?php if (!empty($search) || !empty($tags_search)): ?>
                         <button type="button" class="searchbar-clear" title="<?php echo t_h('search.clear'); ?>" data-action="clear-search"><span class="clear-icon">×</span></button>
                     <?php endif; ?>
