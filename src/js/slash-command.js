@@ -528,7 +528,8 @@
             
             const titleSpan = document.createElement('span');
             titleSpan.className = 'callout-title-text';
-            titleSpan.textContent = type.charAt(0).toUpperCase() + type.slice(1);
+            const defaultTitle = type.charAt(0).toUpperCase() + type.slice(1);
+            titleSpan.textContent = (window.t ? window.t('slash_menu.callout_' + type, null, defaultTitle) : defaultTitle);
             titleDiv.appendChild(titleSpan);
             
             // Create body div

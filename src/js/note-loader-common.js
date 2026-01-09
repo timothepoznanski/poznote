@@ -1179,6 +1179,56 @@ function downloadImage(imageSrc) {
 }
 
 /**
+ * Translate callout titles in HTML content
+ * This function finds all callout elements and translates their titles to the current language
+ */
+function translateCalloutTitles() {
+    try {
+        const callouts = document.querySelectorAll('.callout');
+        callouts.forEach(function(callout) {
+            // Get callout type from class name
+            let calloutType = null;
+            const classList = callout.className.split(' ');
+            for (let i = 0; i < classList.length; i++) {
+                if (classList[i].startsWith('callout-')) {
+                    calloutType = classList[i].replace('callout-', '');
+                    break;
+                }
+            }
+            
+            if (!calloutType) return;
+            
+            // Find the title text element
+            const titleTextElement = callout.querySelector('.callout-title-text');
+            if (!titleTextElement) return;
+            
+            // Get current text
+            const currentText = titleTextElement.textContent.trim();
+            
+            // List of possible English titles (in case the content is in English)
+            const englishTitles = {
+                'note': 'Note',
+                'tip': 'Tip',
+                'important': 'Important',
+                'warning': 'Warning',
+                'caution': 'Caution'
+            };
+            
+            // Only translate if it's the default title (not a custom title)
+            const expectedEnglishTitle = englishTitles[calloutType];
+            if (expectedEnglishTitle && currentText === expectedEnglishTitle) {
+                // Translate using the translation function
+                const defaultTitle = calloutType.charAt(0).toUpperCase() + calloutType.slice(1);
+                const translatedTitle = (window.t ? window.t('slash_menu.callout_' + calloutType, null, defaultTitle) : defaultTitle);
+                titleTextElement.textContent = translatedTitle;
+            }
+        });
+    } catch (e) {
+        console.error('Error translating callout titles:', e);
+    }
+}
+
+/**
  * Re-initialize note content after AJAX load
  */
 function reinitializeNoteContent() {
@@ -1279,6 +1329,9 @@ function reinitializeNoteContent() {
     if (typeof window.reinitializeCodeCopyButtons === 'function') {
         window.reinitializeCodeCopyButtons();
     }
+    
+    // Translate callout titles to the current language
+    translateCalloutTitles();
     
     // On mobile, ensure the right column is properly displayed only when a specific note is selected
     if (isMobileDevice()) {
