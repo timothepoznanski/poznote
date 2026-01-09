@@ -185,6 +185,7 @@
 .fa-arrow-left::before { content: "\f060"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
 .fa-share-alt::before { content: "\f1e0"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
 .fa-folder-open::before { content: "\f07c"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
+.fa-layer-group::before { content: "\f5fd"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
 
 /* Dark mode */
 html[data-theme='dark'] .home-page,

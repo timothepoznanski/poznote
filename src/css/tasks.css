@@ -194,11 +194,11 @@
 }
 
 .task-delete-btn i {
-    font-size: 14px;
+    font-size: 16px !important;
 }
 
 .task-important-btn i {
-    font-size: 14px;
+    font-size: 16px !important;
 }
 
 .task-delete-btn i,
@@ -206,9 +206,8 @@
 .task-drag-handle i {
     color: #999;
     font-family: "Font Awesome 5 Pro" !important;
-    font-weight: 300 !important;
     font-style: normal !important;
-    display: inline-block !important;
+    display: inline-block;
 }
 
 .task-delete-btn:hover i {
@@ -258,17 +257,16 @@
 
 .task-icon-trash,
 .task-icon-star {
-  font-family: "Font Awesome 5 Pro";
-  font-weight: 300;
-  font-style: normal;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  display: inline-block;
-  font-variant: normal;
-  text-rendering: auto;
-  line-height: 1;
-  font-size: 0.875em;
-  vertical-align: middle;
+    font-family: "Font Awesome 5 Pro";
+    font-style: normal;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    font-size: 0.875em;
+    vertical-align: middle;
 }
 
 /* Red star icon for important tasks */
@@ -282,6 +280,17 @@
 
 .task-important-btn.is-favorite i {
   color: #ff0000 !important;
+}
+
+/* Ensure Font Awesome glyphs render correctly inside tasklist notes
+     even when `.noteentry` applies a global font-family (e.g. Inter). */
+.noteentry[data-note-type="tasklist"] .task-item i,
+.noteentry[data-note-type="tasklist"] .task-item i::before {
+    font-family: "Font Awesome 5 Pro" !important;
+    font-style: normal !important;
+    font-variant: normal;
+    text-transform: none;
+    /* Do not force font-weight here; let Font Awesome CSS decide the correct variant */
 }
 
 /* Tasklist note styles - Hide separator and table buttons for tasklist notes */
@@ -308,4 +317,89 @@
 
 .btn-task-order.active:hover {
     background-color: rgba(0, 125, 184, 0.15);
+}
+
+/* Callout / alert styles (Note, Tip, Important, Warning, Caution) */
+.callout {
+    display: block;
+    border-left: 3px solid #ccc;
+    padding: 8px 0 8px 12px;
+    margin: 12px 0;
+}
+.callout .callout-title {
+    font-weight: 700;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.callout .callout-body {
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+/* Ensure callouts look good inside notes (inherit text color) */
+.noteentry .callout, .innernote .callout {
+    color: inherit;
+}
+
+/* Icon and title tuning */
+.callout .callout-icon-svg {
+    display: inline-block;
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    vertical-align: middle;
+    opacity: 0.75; /* lighten icons so they're not too dark */
+}
+.callout .callout-title-text {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* Callout colors - border, icon and title */
+.callout-note {
+    border-left-color: #0969da;
+}
+.callout-note .callout-icon-svg,
+.callout-note .callout-title-text { 
+    color: #0969da;
+    fill: #0969da;
+}
+
+.callout-tip {
+    border-left-color: #1a7f37;
+}
+.callout-tip .callout-icon-svg,
+.callout-tip .callout-title-text { 
+    color: #1a7f37;
+    fill: #1a7f37;
+}
+
+.callout-important {
+    border-left-color: #8250df;
+}
+.callout-important .callout-icon-svg,
+.callout-important .callout-title-text { 
+    color: #8250df;
+    fill: #8250df;
+}
+
+.callout-warning {
+    border-left-color: #9a6700;
+}
+.callout-warning .callout-icon-svg,
+.callout-warning .callout-title-text { 
+    color: #9a6700;
+    fill: #9a6700;
+}
+
+.callout-caution {
+    border-left-color: #d1242f;
+}
+.callout-caution .callout-icon-svg,
+.callout-caution .callout-title-text { 
+    color: #d1242f;
+    fill: #d1242f;
 }

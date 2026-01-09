@@ -173,8 +173,8 @@ function setupNoteEditingEvents() {
             return;
         }
         
-        // Handle arrow up/down navigation between noteentry and checklists
-        if (e.key === 'ArrowUp' || e.key === 'Up' || e.key === 'Delete') {
+        // Handle arrow up/down navigation, Enter, and delete between noteentry and checklists
+        if (e.key === 'ArrowUp' || e.key === 'Up' || e.key === 'Delete' || e.key === 'Enter') {
             var noteentry = e.target.closest('.noteentry');
             if (noteentry && noteentry.isContentEditable) {
                 handleNoteentryKeydown(e);
@@ -433,15 +433,16 @@ function handleChecklistKeydown(e) {
                 var checklist = checklistItem.closest('.checklist');
                 if (checklist && checklist.nextElementSibling) {
                     var nextElement = checklist.nextElementSibling;
-                    // Focus next editable element
+                    // Focus next editable element if possible
                     if (nextElement.isContentEditable) {
                         nextElement.focus();
                         var range = document.createRange();
                         range.selectNodeContents(nextElement);
-                        range.collapse(true);
+                        range.collapse(true); // start of content
                         var sel = window.getSelection();
                         sel.removeAllRanges();
                         sel.addRange(range);
+                        return;
                     }
                 }
             }
@@ -509,15 +510,75 @@ function handleChecklistKeydown(e) {
 }
 
 function handleNoteentryKeydown(e) {
-    var target = e.target;
-    
-    // Only handle ArrowUp and Delete when we're in a noteentry (contenteditable)
-    if (!target.classList.contains('noteentry')) return;
+    var originalTarget = e.target;
+    var target = originalTarget.nodeType === 3 ? originalTarget.parentNode : originalTarget;
+    // Find the containing .noteentry ancestor
+    while (target && !target.classList.contains('noteentry')) {
+        target = target.parentNode;
+    }
+    if (!target) return;
     
     var sel = window.getSelection();
     if (!sel.rangeCount) return;
     
     var range = sel.getRangeAt(0);
+    
+    // Handle Enter in blockquote/callout - exit on empty line
+    if (e.key === 'Enter') {
+        var node = range.startContainer;
+        var currentElement = node.nodeType === 3 ? node.parentNode : node;
+        
+        // Find if we're in a blockquote or callout
+        var blockquote = currentElement;
+        var calloutBody = null;
+        
+        while (blockquote && blockquote !== target) {
+            // Check for callout-body div
+            if (blockquote.classList && blockquote.classList.contains('callout-body')) {
+                calloutBody = blockquote;
+            }
+            
+            if (blockquote.tagName === 'BLOCKQUOTE' || 
+                (blockquote.tagName === 'ASIDE' && blockquote.classList.contains('callout'))) {
+                break;
+            }
+            blockquote = blockquote.parentNode;
+        }
+        
+        if (blockquote && blockquote !== target) {
+            // For callouts, check if callout-body is empty
+            // For plain blockquotes, check if the blockquote itself is empty
+            var contentToCheck = calloutBody || blockquote;
+            var textContent = contentToCheck.textContent || '';
+            
+            // Remove zero-width spaces and check if empty
+            var isEmpty = textContent.replace(/\u200B/g, '').trim() === '';
+            
+            if (isEmpty) {
+                e.preventDefault();
+                
+                // Create a new paragraph after the blockquote/callout
+                var newP = document.createElement('p');
+                newP.innerHTML = '<br>';
+                
+                // Insert after the blockquote/callout
+                if (blockquote.nextSibling) {
+                    blockquote.parentNode.insertBefore(newP, blockquote.nextSibling);
+                } else {
+                    blockquote.parentNode.appendChild(newP);
+                }
+                
+                // Move cursor to the new paragraph
+                range = document.createRange();
+                range.setStart(newP, 0);
+                range.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(range);
+                
+                return;
+            }
+        }
+    }
     
     // Handle ArrowUp - navigate to previous checklist
     if (e.key === 'ArrowUp' || e.key === 'Up') {
@@ -1355,6 +1416,9 @@ function handleNoteDragStart(e) {
         return;
     }
     
+    // Stop propagation to prevent the folder-toggle from also starting a drag
+    e.stopPropagation();
+    
     var noteId = noteLink.getAttribute('data-note-db-id');
     var currentFolder = noteLink.getAttribute('data-folder');
     var currentFolderId = noteLink.getAttribute('data-folder-id');
@@ -1799,26 +1863,27 @@ function moveNoteToRoot(noteId) {
 function setupFolderDragDropEvents() {
     var isMobile = window.innerWidth <= 800;
     
-    // Get all folder headers (excluding system folders)
-    var folderHeaders = document.querySelectorAll('.folder-header:not(.system-folder)');
+    // Get all folder toggle elements (excluding system folders)
+    // We target folder-toggle instead of folder-header to avoid capturing note drag events
+    var folderToggles = document.querySelectorAll('.folder-header:not(.system-folder) > .folder-toggle');
     
-    folderHeaders.forEach(function(header) {
+    folderToggles.forEach(function(toggle) {
         // Remove existing listeners
-        header.removeEventListener('dragstart', handleFolderDragStart);
-        header.removeEventListener('dragend', handleFolderDragEnd);
+        toggle.removeEventListener('dragstart', handleFolderDragStart);
+        toggle.removeEventListener('dragend', handleFolderDragEnd);
         
         if (!isMobile) {
             // Ensure draggable is set
-            header.setAttribute('draggable', 'true');
-            header.draggable = true;
+            toggle.setAttribute('draggable', 'true');
+            toggle.draggable = true;
             
             // Add drag event listeners
-            header.addEventListener('dragstart', handleFolderDragStart, false);
-            header.addEventListener('dragend', handleFolderDragEnd, false);
+            toggle.addEventListener('dragstart', handleFolderDragStart, false);
+            toggle.addEventListener('dragend', handleFolderDragEnd, false);
         } else {
             // Disable dragging on mobile
-            header.removeAttribute('draggable');
-            header.draggable = false;
+            toggle.removeAttribute('draggable');
+            toggle.draggable = false;
         }
     });
 }
@@ -1827,8 +1892,10 @@ function setupFolderDragDropEvents() {
  * Handle folder drag start
  */
 function handleFolderDragStart(e) {
+    // Get the folder-toggle element (the draggable element)
+    var folderToggle = e.target.closest('.folder-toggle');
     var folderHeader = e.target.closest('.folder-header');
-    if (!folderHeader) {
+    if (!folderToggle || !folderHeader) {
         return;
     }
     
@@ -1838,8 +1905,9 @@ function handleFolderDragStart(e) {
         return;
     }
     
-    var folderId = folderHeader.getAttribute('data-folder-id');
-    var folderName = folderHeader.getAttribute('data-folder');
+    // Get folder data from folder-toggle first, then fallback to folder-header
+    var folderId = folderToggle.getAttribute('data-folder-id') || folderHeader.getAttribute('data-folder-id');
+    var folderName = folderToggle.getAttribute('data-folder') || folderHeader.getAttribute('data-folder');
     
     if (!folderId) {
         return;
@@ -1876,19 +1944,30 @@ function handleFolderDragStart(e) {
         }
     }, 0);
     
-    // Add visual feedback to the folder being dragged
-    folderHeader.classList.add('folder-dragging');
-    folderHeader.style.setProperty('opacity', '0.6', 'important');
-    folderHeader.style.setProperty('background-color', 'rgba(0, 123, 255, 0.08)', 'important');
-    folderHeader.style.setProperty('border', '2px dashed rgba(0, 123, 255, 0.4)', 'important');
-    folderHeader.style.setProperty('transform', 'scale(0.98)', 'important');
+    // Add visual feedback to the folder-toggle being dragged
+    folderToggle.classList.add('folder-dragging');
+    folderToggle.style.setProperty('opacity', '0.6', 'important');
+    folderToggle.style.setProperty('background-color', 'rgba(0, 123, 255, 0.08)', 'important');
+    folderToggle.style.setProperty('border', '2px dashed rgba(0, 123, 255, 0.4)', 'important');
+    folderToggle.style.setProperty('transform', 'scale(0.98)', 'important');
 }
 
 /**
  * Handle folder drag end
  */
 function handleFolderDragEnd(e) {
+    var folderToggle = e.target.closest('.folder-toggle');
     var folderHeader = e.target.closest('.folder-header');
+    
+    // Clean up styles on folder-toggle (the draggable element)
+    if (folderToggle) {
+        folderToggle.classList.remove('folder-dragging');
+        folderToggle.style.opacity = '';
+        folderToggle.style.backgroundColor = '';
+        folderToggle.style.border = '';
+        folderToggle.style.transform = '';
+    }
+    // Also clean up folder-header styles if any were applied
     if (folderHeader) {
         folderHeader.classList.remove('folder-dragging');
         folderHeader.style.opacity = '';

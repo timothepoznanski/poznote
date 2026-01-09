@@ -493,6 +493,89 @@
         }
     }
 
+    function insertCallout(type) {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+
+        let element;
+        
+        if (!type || type === 'plain') {
+            // Plain blockquote
+            element = document.createElement('blockquote');
+            const textNode = document.createTextNode('\u200B');
+            element.appendChild(textNode);
+        } else {
+            // Callout with icon and title
+            element = document.createElement('aside');
+            element.className = 'callout callout-' + type;
+            
+            // Create title div
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'callout-title';
+            
+            // Add icon SVG
+            const iconSvgs = {
+                'note': '<svg class="callout-icon-svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>',
+                'tip': '<svg class="callout-icon-svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>',
+                'important': '<svg class="callout-icon-svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM7.25 4.75v4.5a.75.75 0 0 0 1.5 0v-4.5a.75.75 0 0 0-1.5 0ZM8 12a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"></path></svg>',
+                'warning': '<svg class="callout-icon-svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>',
+                'caution': '<svg class="callout-icon-svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4.47.22A.75.75 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.75.75 0 0 1-.22.53l-4.25 4.25A.75.75 0 0 1 11 16H5a.75.75 0 0 1-.53-.22L.22 11.53A.75.75 0 0 1 0 11V5a.75.75 0 0 1 .22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>'
+            };
+            
+            titleDiv.innerHTML = iconSvgs[type] || iconSvgs['note'];
+            
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'callout-title-text';
+            titleSpan.textContent = type.charAt(0).toUpperCase() + type.slice(1);
+            titleDiv.appendChild(titleSpan);
+            
+            // Create body div
+            const bodyDiv = document.createElement('div');
+            bodyDiv.className = 'callout-body';
+            const textNode = document.createTextNode('\u200B');
+            bodyDiv.appendChild(textNode);
+            
+            element.appendChild(titleDiv);
+            element.appendChild(bodyDiv);
+        }
+
+        // Insert at cursor position
+        range.deleteContents();
+        range.insertNode(element);
+
+        // Prepare the desired selection inside the element but don't apply it yet
+        const newRange = document.createRange();
+        const targetNode = type && type !== 'plain' ? element.querySelector('.callout-body') : element;
+        const textNode = targetNode.firstChild || targetNode;
+
+        if (textNode.nodeType === 3) {
+            newRange.setStart(textNode, 1);
+        } else {
+            newRange.setStart(textNode, 0);
+        }
+        newRange.collapse(true);
+
+        // Ensure the containing noteentry is focused so the caret stays inside.
+        // Apply the selection after focusing (short timeout) to avoid focus stealing.
+        const noteEntry = element.closest('.noteentry');
+        if (noteEntry) {
+            try { noteEntry.focus(); } catch (err) {}
+            setTimeout(function() {
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(newRange);
+                // Trigger input event for autosave
+                noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+            }, 10);
+        } else {
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(newRange);
+        }
+    }
+
     function insertList(ordered) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -787,6 +870,19 @@
                 ]
             },
             {
+                id: 'quote',
+                icon: 'fa-info-circle',
+                label: t('slash_menu.quote', null, 'Quote'),
+                submenu: [
+                    { id: 'plain', label: t('slash_menu.blockquote', null, 'Blockquote'), action: () => insertCallout('plain') },
+                    { id: 'note', label: t('slash_menu.callout_note', null, 'Note'), action: () => insertCallout('note') },
+                    { id: 'tip', label: t('slash_menu.callout_tip', null, 'Tip'), action: () => insertCallout('tip') },
+                    { id: 'important', label: t('slash_menu.callout_important', null, 'Important'), action: () => insertCallout('important') },
+                    { id: 'warning', label: t('slash_menu.callout_warning', null, 'Warning'), action: () => insertCallout('warning') },
+                    { id: 'caution', label: t('slash_menu.callout_caution', null, 'Caution'), action: () => insertCallout('caution') }
+                ]
+            },
+            {
                 id: 'image',
                 icon: 'fa-image',
                 label: t('slash_menu.image', null, 'Image'),
@@ -995,6 +1091,19 @@
                     { id: 'bullets', icon: 'fa-list-ul', label: t('slash_menu.bullet_list', null, 'Bullet list'), action: () => insertMarkdownPrefixAtLineStart('- ') },
                     { id: 'numbers', icon: 'fa-list-ol', label: t('slash_menu.numbered_list', null, 'Numbered list'), action: () => insertMarkdownPrefixAtLineStart('1. ') },
                     { id: 'checklist', icon: 'fa-list-check', label: t('slash_menu.checklist', null, 'Checklist'), action: () => insertMarkdownPrefixAtLineStart('- [ ] ') }
+                ]
+            },
+            {
+                id: 'quote',
+                icon: 'fa-info-circle',
+                label: t('slash_menu.quote', null, 'Quote'),
+                submenu: [
+                    { id: 'plain', label: t('slash_menu.blockquote', null, 'Blockquote'), action: () => insertMarkdownAtCursor('> ', 0) },
+                    { id: 'note', label: t('slash_menu.callout_note', null, 'Note'), action: () => insertMarkdownAtCursor('> Note\n> ', 0) },
+                    { id: 'tip', label: t('slash_menu.callout_tip', null, 'Tip'), action: () => insertMarkdownAtCursor('> Tip\n> ', 0) },
+                    { id: 'important', label: t('slash_menu.callout_important', null, 'Important'), action: () => insertMarkdownAtCursor('> Important\n> ', 0) },
+                    { id: 'warning', label: t('slash_menu.callout_warning', null, 'Warning'), action: () => insertMarkdownAtCursor('> Warning\n> ', 0) },
+                    { id: 'caution', label: t('slash_menu.callout_caution', null, 'Caution'), action: () => insertMarkdownAtCursor('> Caution\n> ', 0) }
                 ]
             },
             {

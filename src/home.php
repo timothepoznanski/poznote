@@ -143,6 +143,18 @@ try {
 } catch (Exception $e) {
     $total_notes_count = 0;
 }
+
+// Count workspaces
+$workspaces_count = 0;
+try {
+    if (isset($con)) {
+        $stmtWs = $con->prepare("SELECT COUNT(*) as cnt FROM workspaces");
+        $stmtWs->execute();
+        $workspaces_count = (int)$stmtWs->fetchColumn();
+    }
+} catch (Exception $e) {
+    $workspaces_count = 0;
+}
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
@@ -241,6 +253,17 @@ try {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?></span>
                     <span class="home-card-count"><?php echo $attachments_count; ?></span>
+                </div>
+            </a>
+
+            <!-- Workspaces -->
+            <a href="workspaces.php" class="home-card" title="<?php echo t_h('home.workspaces', [], 'Workspaces'); ?>">
+                <div class="home-card-icon">
+                    <i class="fa-layer-group"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('home.workspaces', [], 'Workspaces'); ?></span>
+                    <span class="home-card-count"><?php echo $workspaces_count; ?></span>
                 </div>
             </a>
         </div>

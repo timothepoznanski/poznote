@@ -2752,8 +2752,8 @@ hr {
     box-shadow: 0 0 8px rgba(0, 125, 184, 0.3);
 }
 
-/* Folder dragging styles */
-.folder-header:not(.system-folder)[draggable="true"] {
+/* Folder dragging styles - target folder-toggle instead of folder-header */
+.folder-header:not(.system-folder) > .folder-toggle[draggable="true"] {
     cursor: grab;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -2761,10 +2761,11 @@ hr {
     user-select: none;
 }
 
-.folder-header:not(.system-folder)[draggable="true"]:active {
+.folder-header:not(.system-folder) > .folder-toggle[draggable="true"]:active {
     cursor: grabbing;
 }
 
+.folder-toggle.folder-dragging,
 .folder-header.folder-dragging {
     opacity: 0.6 !important;
     background-color: rgba(0, 123, 255, 0.08) !important;

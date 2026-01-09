@@ -124,9 +124,11 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         $isSystemFolder = in_array($folderName, $systemFolders);
         $draggableAttr = $isSystemFolder ? '' : " draggable='true'";
         
-        echo "<div class='$folderClass' data-folder-id='$folderId' data-folder='$folderName' data-folder-key='folder_$folderId' data-action='select-folder'$draggableAttr>";
+        // Note: draggable is set on folder-toggle, not folder-header, to avoid conflicts with note dragging
+        echo "<div class='$folderClass' data-folder-id='$folderId' data-folder='$folderName' data-folder-key='folder_$folderId' data-action='select-folder'>";
         // Make the entire folder toggle area clickable to open/close the folder
-        echo "<div class='folder-toggle' data-action='toggle-folder' data-folder-dom-id='$folderDomId'>";
+        // draggable is set here to avoid capturing note drag events from folder-content
+        echo "<div class='folder-toggle' data-action='toggle-folder' data-folder-dom-id='$folderDomId' data-folder-id='$folderId' data-folder='$folderName'$draggableAttr>";
         
         // Use an empty star icon for the Favorites pseudo-folder
         if ($folderName === 'Favorites') {
