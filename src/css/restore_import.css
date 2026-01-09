@@ -31,25 +31,185 @@ body {
     /* box-shadow: 0 2px 10px rgba(0,0,0,0.1); */
 }
 
-/* Sections de sauvegarde */
+/* Navigation buttons container */
+.navigation-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+/* Sections de sauvegarde - Modern Cards */
 .backup-section {
-    padding: 20px;
-    border: 1px solid #ffffff;
-    border-radius: 6px;
+    padding: 0;
+    margin-top: 20px;
+    margin-bottom: 24px;
+    border: none;
+    border-radius: 12px;
 }
 
-.backup-section h3 {
+/* Card Container */
+.card-container {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.card-container:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    border-color: #007cba;
+    transform: translateY(-2px);
+}
+
+/* Card Header */
+.card-header {
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s ease;
+}
+
+.card-header:hover {
+    background: linear-gradient(135deg, #f0f4f8 0%, #f8f9fa 100%);
+}
+
+.card-header h3 {
+    margin: 0;
+    color: #1a1a1a;
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.card-header h3 i.card-icon {
+    color: #007cba;
+    font-size: 20px;
+}
+
+.card-header h3 i.chevron {
+    margin-left: auto;
+    font-size: 16px;
+    color: #666;
+    transition: transform 0.3s ease;
+}
+
+.card-header h3 i.chevron.open {
+    transform: rotate(180deg);
+}
+
+.card-header p {
+    margin: 8px 0 0 32px;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Card Content */
+.card-content {
+    background: #ffffff;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out, padding 0.3s ease;
+    padding: 0 24px;
+    visibility: hidden;
+}
+
+.card-content.open {
+    max-height: 5000px;
+    padding: 24px;
+    transition: max-height 0.5s ease-in, padding 0.3s ease;
+    visibility: visible;
+}
+
+.card-content > p:first-child {
     margin-top: 0;
-    color: #333;
-    border-bottom: none;
-    padding-bottom: 10px;
 }
 
+.card-content > *:last-child {
+    margin-bottom: 0;
+}
+
+/* Sub-cards (for nested sections) */
+.sub-card {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.sub-card:last-child {
+    margin-bottom: 0;
+}
+
+.sub-card-header {
+    padding: 16px 20px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s ease;
+}
+
+.sub-card-header:hover {
+    background: #eef2f5;
+}
+
+.sub-card h4 {
+    margin: 0;
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sub-card h4 i.sub-card-icon {
+    color: #007cba;
+    font-size: 16px;
+}
+
+.sub-card h4 i.chevron {
+    margin-left: auto;
+    font-size: 14px;
+    color: #666;
+    transition: transform 0.3s ease;
+}
+
+.sub-card h4 i.chevron.open {
+    transform: rotate(180deg);
+}
+
+.sub-card-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out, padding 0.3s ease;
+    padding: 0 20px;
+    visibility: hidden;
+}
+
+.sub-card-content.open {
+    max-height: 3000px;
+    padding: 0 20px 20px 20px;
+    transition: max-height 0.5s ease-in, padding 0.3s ease;
+    visibility: visible;
+}
+
+.sub-card-content > *:first-child {
+    margin-top: 12px;
+}
+
+/* Legacy accordion support (kept for JavaScript compatibility) */
 .backup-section.child-section h3 {
     font-weight: 400;
 }
 
-/* Accordion styles */
 .accordion-header {
     cursor: pointer;
     user-select: none;
@@ -63,26 +223,19 @@ body {
 }
 
 .accordion-icon {
-    display: inline-block;
-    width: 20px;
-    margin-right: 10px;
-    font-size: 14px;
-    transition: transform 0.2s;
+    display: none; /* Hide accordion icons in card mode */
 }
 
 .accordion-content {
-    /* padding-top: 15px; */
-    animation: slideDown 0.3s ease-out;
+    animation: fadeIn 0.3s ease-out;
 }
 
-@keyframes slideDown {
+@keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(-10px);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
     }
 }
 
@@ -518,6 +671,231 @@ body {
     margin-bottom: 0.5rem;
     font-weight: 600;
     color: #333;
+}
+
+/* Alert styles for cards */
+.alert {
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    border-left: 4px solid;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #28a745;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #dc3545;
+    color: #721c24;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #17a2b8;
+    color: #0c5460;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffc107;
+    color: #856404;
+}
+
+/* Section bottom spacer */
+.section-bottom-spacer {
+    height: 40px;
+}
+
+/* Form file input */
+.form-file-input {
+    width: 100%;
+    padding: 10px;
+    border: 2px dashed #d0d0d0;
+    border-radius: 8px;
+    background: #fafafa;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.form-file-input:hover {
+    border-color: #007cba;
+    background: #f0f8ff;
+}
+
+/* Form select styled */
+.form-select-styled {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    background: white;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.form-select-styled:focus {
+    outline: none;
+    border-color: #007cba;
+    box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.1);
+}
+
+/* Form text styles */
+.form-text {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+}
+
+.form-text-block {
+    margin-bottom: 8px;
+}
+
+.form-text-danger {
+    color: #dc3545;
+    font-weight: 500;
+}
+
+.form-text-info {
+    color: #17a2b8;
+}
+
+.form-text-muted-block {
+    color: #6c757d;
+    line-height: 1.5;
+}
+
+.text-danger {
+    color: #dc3545;
+}
+
+/* Button with margin top */
+.btn-with-margin-top {
+    margin-top: 16px;
+}
+
+/* Spinner with margin top */
+.spinner-with-margin-top {
+    margin-top: 16px;
+}
+
+/* Form with margin top */
+.form-with-margin-top {
+    margin-top: 16px;
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN FOR CARDS
+   ========================================== */
+
+@media (max-width: 768px) {
+    .backup-container {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    .card-header {
+        padding: 16px 20px;
+    }
+
+    .card-header h3 {
+        font-size: 16px;
+    }
+
+    .card-header p {
+        font-size: 13px;
+        margin-left: 28px;
+    }
+
+    .card-content {
+        padding: 20px;
+    }
+    
+    .card-content.open {
+        padding: 20px;
+    }
+
+    .sub-card-header {
+        padding: 14px 16px;
+    }
+
+    .sub-card h4 {
+        font-size: 15px;
+    }
+    
+    .sub-card-content.open {
+        padding: 0 16px 16px 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .backup-container {
+        margin: 5px;
+        padding: 10px;
+    }
+
+    .navigation-buttons {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .navigation-buttons .btn {
+        margin-bottom: 0;
+        text-align: center;
+        box-sizing: border-box;
+        display: block;
+        width: 100%;
+    }
+
+    .card-header {
+        padding: 12px 16px;
+    }
+
+    .card-header h3 {
+        font-size: 15px;
+        gap: 8px;
+    }
+    
+    .card-header h3 i.card-icon {
+        font-size: 18px;
+    }
+    
+    .card-header h3 i.chevron {
+        font-size: 14px;
+    }
+
+    .card-header p {
+        font-size: 12px;
+        margin-left: 26px;
+    }
+
+    .card-content.open {
+        padding: 16px;
+    }
+
+    .sub-card-header {
+        padding: 12px;
+    }
+    
+    .sub-card h4 {
+        font-size: 14px;
+    }
+    
+    .sub-card h4 i.sub-card-icon {
+        font-size: 14px;
+    }
+    
+    .sub-card-content.open {
+        padding: 0 12px 12px 12px;
+    }
+
+    .btn {
+        width: 100%;
+        margin-right: 0;
+    }
 }
 
 /* Form select styles */

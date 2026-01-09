@@ -1111,7 +1111,8 @@
     },
     "sections": {
       "restore_from_backup": {
-        "title": "Möchten Sie von einer Poznote-ZIP-Sicherungsdatei wiederherstellen?"
+        "title": "Möchten Sie von einer Poznote-ZIP-Sicherungsdatei wiederherstellen?",
+        "description": "Stellen Sie Ihre Poznote-Datenbank aus einer vollständigen Sicherung wieder her"
       },
       "standard_restore": {
         "title": "Ist Ihre Sicherungsdatei kleiner als 500MB?",
@@ -1129,6 +1130,8 @@
         "description_link": "Siehe Dokumentation für Details"
       },
       "individual_notes": {
+        "title": "Möchten Sie HTML-, Markdown-, Textdateien oder ZIP-Archive importieren?",
+        "description": "Importieren Sie einzelne Notizen (HTML, Markdown oder ZIP) in einen bestimmten Arbeitsbereich und Ordner",
         "workspace": "Ziel-Arbeitsbereich",
         "loading": "Laden...",
         "folder": "Zielordner",

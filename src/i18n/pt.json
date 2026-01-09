@@ -1115,7 +1115,8 @@
     },
     "sections": {
       "restore_from_backup": {
-        "title": "Quer restaurar de um arquivo de backup ZIP do Poznote?"
+        "title": "Quer restaurar de um arquivo de backup ZIP do Poznote?",
+        "description": "Restaure seu banco de dados Poznote a partir de um backup completo"
       },
       "standard_restore": {
         "title": "Seu arquivo de backup tem menos de 500MB?",
@@ -1133,6 +1134,8 @@
         "description_link": "Veja a documentação para detalhes"
       },
       "individual_notes": {
+        "title": "Quer importar arquivos HTML, Markdown, de texto ou arquivos ZIP?",
+        "description": "Importe notas individuais (HTML, Markdown ou ZIP) para um workspace e pasta específicos",
         "workspace": "Espaço de trabalho destino",
         "loading": "Carregando...",
         "folder": "Pasta destino",
