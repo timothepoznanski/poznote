@@ -583,9 +583,55 @@ function parseMarkdown(text) {
                 blockquoteLines.push(nextContent);
             }
             
-            // Join lines with <br> for proper multi-line rendering
-            let content = blockquoteLines.map(l => applyInlineStyles(l)).join('<br>');
-            result.push('<blockquote>' + content + '</blockquote>');
+            // Detect GitHub-style callouts (Note, Tip, Important, Warning, Caution)
+            let firstLine = blockquoteLines.length > 0 ? blockquoteLines[0].trim() : '';
+            let calloutMatch = firstLine.match(/^\s*(?:\*\*|__)?(Note|Tip|Important|Warning|Caution)(?:\*\*|__)?(?:[:\s\-]+(.*))?$/i);
+            
+            if (calloutMatch) {
+                let calloutType = calloutMatch[1].toLowerCase();
+                let calloutRemainder = calloutMatch[2] ? calloutMatch[2].trim() : '';
+                
+                // Build body lines
+                let bodyLines = [];
+                if (calloutRemainder) {
+                    bodyLines.push(calloutRemainder);
+                }
+                for (let bi = 1; bi < blockquoteLines.length; bi++) {
+                    bodyLines.push(blockquoteLines[bi]);
+                }
+                
+                let titleHtml = calloutType.charAt(0).toUpperCase() + calloutType.slice(1);
+                let bodyHtml = bodyLines.map(l => applyInlineStyles(l)).join('<br>');
+                
+                // GitHub-style callout icons
+                let iconSvg = '';
+                switch (calloutType) {
+                    case 'note':
+                        iconSvg = '<svg class="callout-icon-svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>';
+                        break;
+                    case 'tip':
+                        iconSvg = '<svg class="callout-icon-svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>';
+                        break;
+                    case 'important':
+                        iconSvg = '<svg class="callout-icon-svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM7.25 4.75v4.5a.75.75 0 0 0 1.5 0v-4.5a.75.75 0 0 0-1.5 0ZM8 12a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"></path></svg>';
+                        break;
+                    case 'warning':
+                        iconSvg = '<svg class="callout-icon-svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>';
+                        break;
+                    case 'caution':
+                        iconSvg = '<svg class="callout-icon-svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4.47.22A.75.75 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.75.75 0 0 1-.22.53l-4.25 4.25A.75.75 0 0 1 11 16H5a.75.75 0 0 1-.53-.22L.22 11.53A.75.75 0 0 1 0 11V5a.75.75 0 0 1 .22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>';
+                        break;
+                }
+                
+                result.push('<aside class="callout callout-' + calloutType + '">' +
+                           '<div class="callout-title">' + iconSvg + '<span class="callout-title-text">' + applyInlineStyles(titleHtml) + '</span></div>' +
+                           '<div class="callout-body">' + bodyHtml + '</div>' +
+                           '</aside>');
+            } else {
+                // Regular blockquote
+                let content = blockquoteLines.map(l => applyInlineStyles(l)).join('<br>');
+                result.push('<blockquote>' + content + '</blockquote>');
+            }
             continue;
         }
         
