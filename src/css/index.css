@@ -2307,7 +2307,7 @@ pre.code-block,
     white-space: pre-wrap;
     word-wrap: break-word;
     overflow-x: auto;
-    font-size: inherit; /* inherit font size from parent (.noteentry) */
+    font-size: var(--note-font-size, 15px) !important; /* same font size as note text */
     position: relative;
 }
 
@@ -2497,7 +2497,7 @@ code *[style*="color"],
 .noteentry div[style*='monospace'] b,
 .noteentry div[style*='monospace'] strong {
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
-    font-size: inherit; /* inherit font size from parent */
+    font-size: var(--note-font-size, 15px) !important; /* same font size as note text */
     font-style: normal !important;
     font-weight: normal !important;
 }
