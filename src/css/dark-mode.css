@@ -160,11 +160,70 @@ body.dark-mode .searchbar-icon {
     color: #e0e0e0;
 }
 
-/* System folders container - same background as search bar */
+/* Search type buttons */
+html[data-theme='dark'] .searchbar-type-btn,
+body.dark-mode .searchbar-type-btn {
+    color: #808080;
+}
+
+html[data-theme='dark'] .searchbar-type-btn:hover,
+body.dark-mode .searchbar-type-btn:hover {
+    color: #5cb3e9;
+}
+
+html[data-theme='dark'] .searchbar-type-btn:hover i,
+body.dark-mode .searchbar-type-btn:hover i {
+    color: #5cb3e9;
+}
+
+html[data-theme='dark'] .searchbar-type-btn:hover i::before,
+body.dark-mode .searchbar-type-btn:hover i::before {
+    color: #5cb3e9;
+}
+
+html[data-theme='dark'] .searchbar-type-btn.active,
+body.dark-mode .searchbar-type-btn.active {
+    color: #5cb3e9 !important;
+}
+
+html[data-theme='dark'] .searchbar-type-btn.active i,
+body.dark-mode .searchbar-type-btn.active i,
+html[data-theme='dark'] .searchbar-type-btn.active i.fa,
+body.dark-mode .searchbar-type-btn.active i.fa,
+html[data-theme='dark'] .searchbar-type-btn.active i.fa-file-alt,
+body.dark-mode .searchbar-type-btn.active i.fa-file-alt,
+html[data-theme='dark'] .searchbar-type-btn.active i.fa-tag,
+body.dark-mode .searchbar-type-btn.active i.fa-tag {
+    color: #5cb3e9 !important;
+}
+
+html[data-theme='dark'] .searchbar-type-btn.active i::before,
+body.dark-mode .searchbar-type-btn.active i::before,
+html[data-theme='dark'] .searchbar-type-btn.active i.fa::before,
+body.dark-mode .searchbar-type-btn.active i.fa::before,
+html[data-theme='dark'] .searchbar-type-btn.active i.fa-file-alt::before,
+body.dark-mode .searchbar-type-btn.active i.fa-file-alt::before,
+html[data-theme='dark'] .searchbar-type-btn.active i.fa-tag::before,
+body.dark-mode .searchbar-type-btn.active i.fa-tag::before {
+    color: #5cb3e9 !important;
+}
+
+/* Also ensure filters don't desaturate search type icons in dark mode */
+html[data-theme='dark'] .searchbar-type-btn i,
+body.dark-mode .searchbar-type-btn i,
+html[data-theme='dark'] .searchbar-type-btn i::before,
+body.dark-mode .searchbar-type-btn i::before,
+html[data-theme='dark'] .searchbar-type-btn.active i,
+body.dark-mode .searchbar-type-btn.active i,
+html[data-theme='dark'] .searchbar-type-btn.active i::before,
+body.dark-mode .searchbar-type-btn.active i::before {
+    filter: none !important;
+}
+
+/* System folders container - hidden (replaced by Home page) */
 html[data-theme='dark'] .system-folders-container,
 body.dark-mode .system-folders-container {
-    background-color: #2a2a2a;
-    border-color: #404040;
+    display: none !important;
 }
 
 /* Menu déroulant du système en mode sombre */
@@ -196,11 +255,9 @@ body.dark-mode .favorites-separator {
     border-bottom-color: #404040;
 }
 
-/* Separator after favorites when displayed */
-html[data-theme='dark'] #folder-favorites[style*="display: block"],
-html[data-theme='dark'] #folder-favorites:not([style*="display: none"]),
-body.dark-mode #folder-favorites[style*="display: block"],
-body.dark-mode #folder-favorites:not([style*="display: none"]) {
+/* Separator after favorites - always visible now */
+html[data-theme='dark'] #folder-favorites,
+body.dark-mode #folder-favorites {
     border-bottom-color: #404040;
 }
 
@@ -1901,6 +1958,90 @@ body.dark-mode .backup-section {
     color: #e0e0e0;
 }
 
+/* Dark mode for card container */
+html[data-theme='dark'] .card-container,
+body.dark-mode .card-container {
+    background-color: #1e1e1e;
+    border-color: #404040;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme='dark'] .card-container:hover,
+body.dark-mode .card-container:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    border-color: #007cba;
+}
+
+/* Dark mode for card header */
+html[data-theme='dark'] .card-header,
+body.dark-mode .card-header {
+    background: linear-gradient(135deg, #242424 0%, #1e1e1e 100%);
+    border-bottom-color: #404040;
+}
+
+html[data-theme='dark'] .card-header:hover,
+body.dark-mode .card-header:hover {
+    background: linear-gradient(135deg, #2a2a2a 0%, #242424 100%);
+}
+
+html[data-theme='dark'] .card-header h3,
+body.dark-mode .card-header h3 {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .card-header h3 i.card-icon,
+body.dark-mode .card-header h3 i.card-icon {
+    color: #4a9eff;
+}
+
+html[data-theme='dark'] .card-header h3 i.chevron,
+body.dark-mode .card-header h3 i.chevron {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .card-header p,
+body.dark-mode .card-header p {
+    color: #b0b0b0;
+}
+
+/* Dark mode for card content */
+html[data-theme='dark'] .card-content,
+body.dark-mode .card-content {
+    background-color: #1e1e1e;
+}
+
+/* Dark mode for sub-cards */
+html[data-theme='dark'] .sub-card,
+body.dark-mode .sub-card {
+    background-color: #242424;
+    border-color: #404040;
+}
+
+html[data-theme='dark'] .sub-card-header,
+body.dark-mode .sub-card-header {
+    background-color: transparent;
+}
+
+html[data-theme='dark'] .sub-card-header:hover,
+body.dark-mode .sub-card-header:hover {
+    background-color: #2a2a2a;
+}
+
+html[data-theme='dark'] .sub-card h4,
+body.dark-mode .sub-card h4 {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .sub-card h4 i.sub-card-icon,
+body.dark-mode .sub-card h4 i.sub-card-icon {
+    color: #4a9eff;
+}
+
+html[data-theme='dark'] .sub-card h4 i.chevron,
+body.dark-mode .sub-card h4 i.chevron {
+    color: #b0b0b0;
+}
+
 html[data-theme='dark'] .backup-section h3,
 body.dark-mode .backup-section h3 {
     /* background-color: #242424; */
@@ -1927,6 +2068,32 @@ body.dark-mode .backup-section select {
     background-color: #2a2a2a;
     color: #e0e0e0;
     border-color: #555;
+}
+
+html[data-theme='dark'] .form-select-styled,
+body.dark-mode .form-select-styled {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #555;
+}
+
+html[data-theme='dark'] .form-select-styled:focus,
+body.dark-mode .form-select-styled:focus {
+    border-color: #4a9eff;
+    box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.2);
+}
+
+html[data-theme='dark'] .form-file-input,
+body.dark-mode .form-file-input {
+    background-color: #2a2a2a;
+    border-color: #555;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .form-file-input:hover,
+body.dark-mode .form-file-input:hover {
+    border-color: #4a9eff;
+    background-color: #1e3a4a;
 }
 
 html[data-theme='dark'] .backup-section select option,

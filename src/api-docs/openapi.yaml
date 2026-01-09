@@ -69,9 +69,6 @@ components:
         heading:
           type: string
           example: "My Note Title"
-        subheading:
-          type: string
-          example: "A brief description"
         entrycontent:
           type: string
           example: "# Hello World\n\nThis is my note content."
@@ -539,28 +536,6 @@ paths:
       responses:
         '200':
           description: Note converted
-
-  /notes/{id}/subheading:
-    patch:
-      tags: [Notes]
-      summary: Update note subheading
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                subheading:
-                  type: string
-      responses:
-        '200':
-          description: Subheading updated
 
   /notes/{id}/folder:
     post:

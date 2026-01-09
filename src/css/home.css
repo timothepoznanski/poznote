@@ -1,0 +1,270 @@
+/**
+ * Home page styles
+ */
+
+/* Base layout */
+.home-page {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: #f8f9fa;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+.home-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.home-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: #1f2937;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 40px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.home-workspace-name {
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.home-notes-count {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 4px 10px;
+    border-radius: 12px;
+    margin-left: auto;
+}
+
+.home-logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+/* Grid layout for cards */
+.home-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+/* Card styles */
+.home-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.home-card:hover {
+    border-color: #007DB8;
+    box-shadow: 0 4px 12px rgba(0, 125, 184, 0.15);
+    transform: translateY(-2px);
+}
+
+.home-card-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 125, 184, 0.1);
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+.home-card-icon i {
+    font-size: 22px;
+    color: #007DB8;
+    font-style: normal;
+}
+
+/* Special icon colors */
+.home-card-icon-favorites {
+    background: rgba(245, 158, 11, 0.1);
+}
+
+.home-card-icon-favorites i {
+    color: #f59e0b;
+}
+
+.home-card-icon-trash {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.home-card-icon-trash i {
+    color: #ef4444;
+}
+
+.home-card-icon-shared {
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.home-card-icon-shared i {
+    color: #10b981;
+}
+
+.home-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.home-card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.home-card-count {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+/* Buttons container */
+.home-buttons-container {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.home-buttons-top {
+    margin-bottom: 20px;
+}
+
+.home-buttons-container .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.home-buttons-container .btn-primary {
+    background: #007DB8;
+    color: white;
+}
+
+.home-buttons-container .btn-primary:hover {
+    background: #005a8a;
+}
+
+.home-buttons-container .btn-primary i {
+    font-size: 14px;
+}
+
+/* Font Awesome icon definitions */
+.fa-tags::before { content: "\f02c"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
+.fa-star::before { content: "\f005"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
+.fa-cloud::before { content: "\f0c2"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
+.fa-trash::before { content: "\f1f8"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
+.fa-paperclip::before { content: "\f0c6"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
+.fa-arrow-left::before { content: "\f060"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
+.fa-share-alt::before { content: "\f1e0"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
+.fa-folder-open::before { content: "\f07c"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
+
+/* Dark mode */
+html[data-theme='dark'] .home-page,
+body.dark-mode .home-page {
+    background: #1a1a1a;
+}
+
+html[data-theme='dark'] .home-header,
+body.dark-mode .home-header {
+    color: #e5e7eb;
+    border-bottom-color: #374151;
+}
+
+html[data-theme='dark'] .home-workspace-name,
+body.dark-mode .home-workspace-name {
+    color: #e5e7eb;
+}
+
+html[data-theme='dark'] .home-notes-count,
+body.dark-mode .home-notes-count {
+    color: #9ca3af;
+    background: #374151;
+}
+
+html[data-theme='dark'] .home-card,
+body.dark-mode .home-card {
+    background: #2d2d2d;
+    border-color: #374151;
+}
+
+html[data-theme='dark'] .home-card:hover,
+body.dark-mode .home-card:hover {
+    border-color: #007DB8;
+}
+
+html[data-theme='dark'] .home-card-title,
+body.dark-mode .home-card-title {
+    color: #e5e7eb;
+}
+
+html[data-theme='dark'] .home-card-count,
+body.dark-mode .home-card-count {
+    color: #9ca3af;
+}
+
+html[data-theme='dark'] .home-card-icon,
+body.dark-mode .home-card-icon {
+    background: rgba(0, 125, 184, 0.2);
+}
+
+html[data-theme='dark'] .home-card-icon-favorites,
+body.dark-mode .home-card-icon-favorites {
+    background: rgba(245, 158, 11, 0.2);
+}
+
+html[data-theme='dark'] .home-card-icon-trash,
+body.dark-mode .home-card-icon-trash {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+html[data-theme='dark'] .home-card-icon-shared,
+body.dark-mode .home-card-icon-shared {
+    background: rgba(16, 185, 129, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .home-container {
+        padding: 20px 15px;
+    }
+    
+    .home-header {
+        font-size: 1.4rem;
+    }
+    
+    .home-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .home-card {
+        padding: 16px;
+    }
+}

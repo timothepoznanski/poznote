@@ -569,11 +569,23 @@ function parseMarkdown(text) {
             continue;
         }
         
-        // Blockquotes - handle both escaped and unescaped
+        // Blockquotes - collect multi-line blockquotes
         if (line.match(/^(&gt;|>)\s*(.*)$/)) {
             flushParagraph();
+            let blockquoteLines = [];
             let quoteContent = line.replace(/^(&gt;|>)\s*(.*)$/, '$2');
-            result.push('<blockquote>' + applyInlineStyles(quoteContent) + '</blockquote>');
+            blockquoteLines.push(quoteContent);
+            
+            // Continue collecting consecutive blockquote lines
+            while (i + 1 < lines.length && lines[i + 1].match(/^(&gt;|>)\s*(.*)$/)) {
+                i++;
+                let nextContent = lines[i].replace(/^(&gt;|>)\s*(.*)$/, '$2');
+                blockquoteLines.push(nextContent);
+            }
+            
+            // Join lines with <br> for proper multi-line rendering
+            let content = blockquoteLines.map(l => applyInlineStyles(l)).join('<br>');
+            result.push('<blockquote>' + content + '</blockquote>');
             continue;
         }
         
@@ -581,16 +593,25 @@ function parseMarkdown(text) {
         function parseNestedList(startIndex, isTaskList = false) {
             let listItems = [];
             let currentIndex = startIndex;
+            let baseIndent = null;
+            let baseMarkerType = null; // 'bullet' or 'number'
             
             while (currentIndex < lines.length) {
                 let currentLine = lines[currentIndex];
                 
                 // Check if this is a list item
                 let listMatch;
+                let marker = null;
+                let markerType = null;
+                
                 if (isTaskList) {
                     listMatch = currentLine.match(/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/);
                 } else {
                     listMatch = currentLine.match(/^(\s*)([\*\-\+]|\d+\.)\s+(.+)$/);
+                    if (listMatch) {
+                        marker = listMatch[2];
+                        markerType = marker.match(/\d+\./) ? 'number' : 'bullet';
+                    }
                 }
                 
                 if (!listMatch) {
@@ -600,9 +621,52 @@ function parseMarkdown(text) {
                 let indent = listMatch[1].length;
                 let content = isTaskList ? listMatch[3] : listMatch[3];
                 
-                // If this is the first item, set the base indentation
-                if (listItems.length === 0) {
-                    var baseIndent = indent;
+                // If this is the first item, set the base indentation and marker type
+                if (baseIndent === null) {
+                    baseIndent = indent;
+                    baseMarkerType = markerType;
+                }
+                
+                // If marker type changed at SAME indentation level at root (indent=0),
+                // treat it as nested under the last item (Poznote-specific behavior)
+                if (!isTaskList && indent === 0 && baseIndent === 0 && 
+                    markerType !== baseMarkerType && listItems.length > 0) {
+                    // Collect all consecutive items with this different marker type
+                    let nestedItems = [];
+                    let nestedListTag = (markerType === 'number') ? 'ol' : 'ul';
+                    let tempIndex = currentIndex;
+                    
+                    while (tempIndex < lines.length) {
+                        let tempLine = lines[tempIndex];
+                        let tempMatch = tempLine.match(/^(\s*)([\*\-\+]|\d+\.)\s+(.+)$/);
+                        if (!tempMatch) break;
+                        
+                        let tempIndent = tempMatch[1].length;
+                        let tempMarker = tempMatch[2];
+                        let tempMarkerType = tempMarker.match(/\d+\./) ? 'number' : 'bullet';
+                        
+                        // Stop if we're back to the base marker type or different indentation
+                        if (tempIndent !== 0 || tempMarkerType !== markerType) {
+                            break;
+                        }
+                        
+                        nestedItems.push('<li>' + applyInlineStyles(tempMatch[3]) + '</li>');
+                        tempIndex++;
+                    }
+                    
+                    // Add nested list to last item
+                    if (nestedItems.length > 0) {
+                        let lastIdx = listItems.length - 1;
+                        listItems[lastIdx] = listItems[lastIdx].replace(/<\/li>$/, '');
+                        listItems[lastIdx] += '<' + nestedListTag + '>' + nestedItems.join('') + '</' + nestedListTag + '></li>';
+                        currentIndex = tempIndex;
+                        continue;
+                    }
+                }
+                
+                // If marker type changed at SAME indentation level (non-root), this is a different list
+                if (!isTaskList && indent === baseIndent && markerType !== baseMarkerType) {
+                    break; // Different list type at same level
                 }
                 
                 if (indent === baseIndent) {

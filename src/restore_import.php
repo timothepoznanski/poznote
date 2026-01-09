@@ -1908,14 +1908,14 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
 <body>
     <div class="backup-container">
         <h1><?php echo t_h('restore_import.page.title'); ?></h1>
-        <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
-            <?php echo t_h('common.back_to_notes'); ?>
-        </a>
-        <a href="settings.php" class="btn btn-secondary">
-            <?php echo t_h('common.back_to_settings'); ?>
-        </a>
-
-        <br><br>
+        <div class="navigation-buttons">
+            <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
+                <?php echo t_h('common.back_to_notes'); ?>
+            </a>
+            <a href="settings.php" class="btn btn-secondary">
+                <?php echo t_h('common.back_to_settings'); ?>
+            </a>
+        </div>
         
         <!-- Global Messages Section - Always visible at the top -->
         <?php if ($restore_message): ?>
@@ -1966,22 +1966,25 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             </div>
         <?php endif; ?>
         
-        <!-- Parent Restore Section -->
-        <div class="backup-section parent-section">
-            <h3 class="accordion-header" data-action="toggle-accordion" data-section="restoreBackup">
-                <span class="accordion-icon" id="restoreBackupIcon">▶</span>
-                <?php echo t_h('restore_import.sections.restore_from_backup.title'); ?>
-            </h3>
-            <div id="restoreBackup" class="accordion-content initially-hidden">
+        <!-- Restore From Backup Card -->
+        <div class="backup-section">
+            <div class="card-container">
+                <div class="card-header" data-action="toggle-card" data-target="restoreBackupContent">
+                    <h3>
+                        <?php echo t_h('restore_import.sections.restore_from_backup.title'); ?>
+                    </h3>
+                </div>
+                <div class="card-content" id="restoreBackupContent">
             
         <!-- Standard Complete Restore Section -->
-        <div class="backup-section child-section">
-            <h3 class="accordion-header" data-action="toggle-accordion" data-section="standardRestore">
-                <span class="accordion-icon" id="standardRestoreIcon">▶</span>
-                <?php echo t_h('restore_import.sections.standard_restore.title'); ?>
-            </h3>
-            <div id="standardRestore" class="accordion-content initially-hidden">
-            <p><?php echo t_h('restore_import.sections.standard_restore.description'); ?></p>
+        <div class="sub-card">
+            <div class="sub-card-header" data-action="toggle-sub-card" data-target="standardRestoreContent">
+                <h4>
+                    <?php echo t_h('restore_import.sections.standard_restore.title'); ?>
+                </h4>
+            </div>
+            <div class="sub-card-content" id="standardRestoreContent">
+                <p><?php echo t_h('restore_import.sections.standard_restore.description'); ?></p>
 
             <form method="post" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="complete_restore">
@@ -2004,14 +2007,15 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         </div>
 
         <!-- Chunked Complete Restore Section -->
-        <div class="backup-section child-section">
-            <h3 class="accordion-header" data-action="toggle-accordion" data-section="chunkedRestore">
-                <span class="accordion-icon" id="chunkedRestoreIcon">▶</span>
-                <?php echo t_h('restore_import.sections.chunked_restore.title'); ?>
-            </h3>
-            <div id="chunkedRestore" class="accordion-content initially-hidden">
-            <p><?php echo t_h('restore_import.sections.chunked_restore.description'); ?></p>
-            <div id="chunkedUploadStatus" class="initially-hidden">
+        <div class="sub-card">
+            <div class="sub-card-header" data-action="toggle-sub-card" data-target="chunkedRestoreContent">
+                <h4>
+                    <?php echo t_h('restore_import.sections.chunked_restore.title'); ?>
+                </h4>
+            </div>
+            <div class="sub-card-content" id="chunkedRestoreContent">
+                <p><?php echo t_h('restore_import.sections.chunked_restore.description'); ?></p>
+                <div id="chunkedUploadStatus" class="initially-hidden">
                 <div class="progress-bar">
                     <div id="chunkedProgress" class="progress-fill progress-fill-initial">0%</div>
                 </div>
@@ -2032,13 +2036,14 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         </div>
 
         <!-- Direct Copy Restore Section -->
-        <div class="backup-section child-section">
-            <h3 class="accordion-header" data-action="toggle-accordion" data-section="directCopyRestore">
-                <span class="accordion-icon" id="directCopyRestoreIcon">▶</span>
-                <?php echo t_h('restore_import.sections.direct_copy_restore.title'); ?>
-            </h3>
-            <div id="directCopyRestore" class="accordion-content initially-hidden">
-            <p>
+        <div class="sub-card">
+            <div class="sub-card-header" data-action="toggle-sub-card" data-target="directCopyRestoreContent">
+                <h4>
+                    <?php echo t_h('restore_import.sections.direct_copy_restore.title'); ?>
+                </h4>
+            </div>
+            <div class="sub-card-content" id="directCopyRestoreContent">
+                <p>
                 <?php echo t_h('restore_import.sections.direct_copy_restore.description_prefix'); ?>
                 <a href="https://github.com/timothepoznanski/poznote/blob/main/Docs/BACKUP_RESTORE_GUIDE.md" target="_blank" class="link-primary">
                     <?php echo t_h('restore_import.sections.direct_copy_restore.description_link'); ?>
@@ -2102,13 +2107,15 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             </div>
         </div>
         
-        <!-- Individual Notes Import Section -->
+        <!-- Individual Notes Import Card -->
         <div class="backup-section">
-            <h3 class="accordion-header" data-action="toggle-accordion" data-section="individualNotes">
-                <span class="accordion-icon" id="individualNotesIcon">▶</span>
-                <?php echo t_h('restore_import.sections.individual_notes.title'); ?>
-            </h3>
-            <div id="individualNotes" class="accordion-content initially-hidden">
+            <div class="card-container">
+                <div class="card-header" data-action="toggle-card" data-target="individualNotesContent">
+                    <h3>
+                        <?php echo t_h('restore_import.sections.individual_notes.title'); ?>
+                    </h3>
+                </div>
+                <div class="card-content" id="individualNotesContent">
 
             <form method="post" enctype="multipart/form-data" id="individualNotesForm">
                 <input type="hidden" name="action" value="import_individual_notes">
@@ -2168,6 +2175,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                     <span class="restore-spinner-text"><?php echo t_h('restore_import.spinner.importing_notes', 'Importation des notes en cours...'); ?></span>
                 </div>
             </form>
+                </div>
             </div>
         </div>
         

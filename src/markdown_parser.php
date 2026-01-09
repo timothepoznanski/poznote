@@ -235,19 +235,33 @@ function parseMarkdown($text) {
             continue;
         }
         
-        // Blockquotes
-        if (preg_match('/^&gt;\s+(.+)$/', $line, $matches)) {
+        // Blockquotes - collect multi-line blockquotes
+        if (preg_match('/^&gt;\s*(.*)$/', $line, $matches)) {
             $flushParagraph();
-            $content = $applyInlineStyles($matches[1]);
+            $blockquoteLines = [];
+            $blockquoteLines[] = $matches[1];
+            
+            // Continue collecting consecutive blockquote lines
+            while ($i + 1 < count($lines) && preg_match('/^&gt;\s*(.*)$/', $lines[$i + 1], $nextMatch)) {
+                $i++;
+                $blockquoteLines[] = $nextMatch[1];
+            }
+            
+            // Join lines with <br> for proper multi-line rendering
+            $content = implode('<br>', array_map(function($line) use ($applyInlineStyles) {
+                return $applyInlineStyles($line);
+            }, $blockquoteLines));
+            
             $result[] = '<blockquote>' . $content . '</blockquote>';
             continue;
         }
         
         // Helper function to parse nested lists
-        $parseNestedList = function($startIndex, $isTaskList = false) use (&$lines, $applyInlineStyles, &$parseNestedList) {
+        $parseNestedList = function($startIndex, $isTaskList = false, $expectedMarker = null) use (&$lines, $applyInlineStyles, &$parseNestedList) {
             $listItems = [];
             $currentIndex = $startIndex;
             $baseIndent = null;
+            $baseMarkerType = null; // 'bullet' or 'number'
             
             while ($currentIndex < count($lines)) {
                 $currentLine = $lines[$currentIndex];
@@ -255,8 +269,13 @@ function parseMarkdown($text) {
                 // Check if this is a list item
                 if ($isTaskList) {
                     $listMatch = preg_match('/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/', $currentLine, $matches);
+                    $marker = null;
+                    $markerType = null;
                 } else {
                     $listMatch = preg_match('/^(\s*)([\*\-\+]|\d+\.)\s+(.+)$/', $currentLine, $matches);
+                    $marker = isset($matches[2]) ? $matches[2] : null;
+                    // Determine marker type: number (1.) or bullet (-, *, +)
+                    $markerType = ($marker && preg_match('/\d+\./', $marker)) ? 'number' : 'bullet';
                 }
                 
                 if (!$listMatch) {
@@ -266,9 +285,52 @@ function parseMarkdown($text) {
                 $indent = strlen($matches[1]);
                 $content = $isTaskList ? $matches[3] : $matches[3];
                 
-                // If this is the first item, set the base indentation
+                // If this is the first item, set the base indentation and marker type
                 if ($baseIndent === null) {
                     $baseIndent = $indent;
+                    $baseMarkerType = $markerType;
+                }
+                
+                // If marker type changed at SAME indentation level at root (indent=0),
+                // treat it as nested under the last item (Poznote-specific behavior)
+                if (!$isTaskList && $indent === 0 && $baseIndent === 0 && 
+                    $markerType !== $baseMarkerType && count($listItems) > 0) {
+                    // Collect all consecutive items with this different marker type
+                    $nestedItems = [];
+                    $nestedListTag = ($markerType === 'number') ? 'ol' : 'ul';
+                    $tempIndex = $currentIndex;
+                    
+                    while ($tempIndex < count($lines)) {
+                        $tempLine = $lines[$tempIndex];
+                        if (!preg_match('/^(\s*)([\*\-\+]|\d+\.)\s+(.+)$/', $tempLine, $tempMatches)) {
+                            break;
+                        }
+                        $tempIndent = strlen($tempMatches[1]);
+                        $tempMarker = $tempMatches[2];
+                        $tempMarkerType = preg_match('/\d+\./', $tempMarker) ? 'number' : 'bullet';
+                        
+                        // Stop if we're back to the base marker type or different indentation
+                        if ($tempIndent !== 0 || $tempMarkerType !== $markerType) {
+                            break;
+                        }
+                        
+                        $nestedItems[] = '<li>' . $applyInlineStyles($tempMatches[3]) . '</li>';
+                        $tempIndex++;
+                    }
+                    
+                    // Add nested list to last item
+                    if (count($nestedItems) > 0) {
+                        $lastIdx = count($listItems) - 1;
+                        $listItems[$lastIdx] = preg_replace('/<\/li>$/', '', $listItems[$lastIdx]);
+                        $listItems[$lastIdx] .= '<' . $nestedListTag . '>' . implode('', $nestedItems) . '</' . $nestedListTag . '></li>';
+                        $currentIndex = $tempIndex;
+                        continue;
+                    }
+                }
+                
+                // If marker type changed at SAME indentation level (non-root), this is a different list
+                if (!$isTaskList && $indent === $baseIndent && $markerType !== $baseMarkerType) {
+                    break; // Different list type at same level
                 }
                 
                 if ($indent === $baseIndent) {

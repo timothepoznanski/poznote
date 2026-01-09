@@ -471,15 +471,18 @@ body {
 .sidebar-title-actions { display: flex; align-items: center; gap: 6px; position: relative; }
 .sidebar-gear { display: none; }
 .sidebar-display { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; }
+.sidebar-home { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; }
 .sidebar-settings { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; position: relative; }
 .sidebar-plus { background: transparent; border: none; color: #6c757d !important; font-size: 1.2rem; cursor: pointer; padding: 6px; border-radius: 6px; }
 
 /* Hover and focus states for sidebar buttons */
 .sidebar-display:hover,
+.sidebar-home:hover,
 .sidebar-settings:hover,
 .sidebar-plus:hover { background: rgba(0, 125, 184, 0.1); }
 
 .sidebar-display:focus,
+.sidebar-home:focus,
 .sidebar-settings:focus,
 .sidebar-plus:focus { outline: 2px solid #007DB8; outline-offset: 2px; }
 
@@ -488,6 +491,8 @@ body {
 .sidebar-title-actions [class*="fa-"],
 .sidebar-display i,
 .sidebar-display [class*="fa-"],
+.sidebar-home i,
+.sidebar-home [class*="fa-"],
 .sidebar-settings i,
 .sidebar-settings [class*="fa-"] {
     font-size: 0.7em !important;
@@ -1251,7 +1256,7 @@ a.links_arbo_left.selected-note {
 }
 
 .searchbar-input {
-    padding: 10px 12px 10px 44px;
+    padding: 10px 12px 10px 80px;
     border-radius: 8px;
     border: 1px solid #d3d6db;
     background: #ffffff;
@@ -1291,6 +1296,75 @@ a.links_arbo_left.selected-note {
     flex: 1;
     display: flex;
     align-items: center;
+}
+
+/* Search type toggle buttons */
+.searchbar-type-icons {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 2px;
+    z-index: 2;
+}
+
+.searchbar-type-btn {
+    background: transparent;
+    border: none;
+    padding: 6px 8px;
+    cursor: pointer;
+    color: #9aa3a8;
+    font-size: 16px;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.searchbar-type-btn:hover {
+    color: #007DB8;
+}
+
+.searchbar-type-btn:hover i {
+    color: #007DB8;
+}
+
+.searchbar-type-btn:hover i::before {
+    color: #007DB8;
+}
+
+.searchbar-type-btn.active {
+    color: #007DB8 !important;
+}
+
+.searchbar-type-btn.active i,
+.searchbar-type-btn.active i.fa,
+.searchbar-type-btn.active i.fa-file-alt,
+.searchbar-type-btn.active i.fa-tag {
+    color: #007DB8 !important;
+}
+
+.searchbar-type-btn.active i::before,
+.searchbar-type-btn.active i.fa::before,
+.searchbar-type-btn.active i.fa-file-alt::before,
+.searchbar-type-btn.active i.fa-tag::before {
+    color: #007DB8 !important;
+}
+
+.searchbar-type-btn i {
+    font-style: normal;
+    color: inherit;
+}
+
+.searchbar-type-btn i::before {
+    color: inherit;
+}
+
+.searchbar-type-btn i.fa,
+.searchbar-type-btn i.fa-file-alt,
+.searchbar-type-btn i.fa-tag {
+    color: inherit;
 }
 
 .searchbar-icon {
@@ -2269,20 +2343,20 @@ textarea:focus{
     font-size: var(--note-font-size, 15px);
 }
 
-/* Apply Inter to text elements, except in code blocks */
-.noteentry p,
-.noteentry div,
-.noteentry ul,
-.noteentry ol,
-.noteentry li,
-.noteentry b,
-.noteentry strong,
-.noteentry i,
-.noteentry em,
-.noteentry u,
-.noteentry s,
-.noteentry a,
-.noteentry span:not(.code-block span) {
+/* Apply Inter to text elements, except in code blocks and monospace elements */
+.noteentry p:not([style*='Consolas']):not([style*='Monaco']):not([style*='Courier']):not([style*='monospace']):not([style*='Segoe UI Mono']),
+.noteentry div:not([style*='Consolas']):not([style*='Monaco']):not([style*='Courier']):not([style*='monospace']):not([style*='Segoe UI Mono']),
+.noteentry ul:not([style*='Consolas']):not([style*='Monaco']):not([style*='Courier']):not([style*='monospace']):not([style*='Segoe UI Mono']),
+.noteentry ol:not([style*='Consolas']):not([style*='Monaco']):not([style*='Courier']):not([style*='monospace']):not([style*='Segoe UI Mono']),
+.noteentry li:not([style*='Consolas']):not([style*='Monaco']):not([style*='Courier']):not([style*='monospace']):not([style*='Segoe UI Mono']),
+.noteentry b:not([style*='Consolas']):not([style*='Monaco']):not([style*='Courier']):not([style*='monospace']):not([style*='Segoe UI Mono']),
+.noteentry strong:not([style*='Consolas']):not([style*='Monaco']):not([style*='Courier']):not([style*='monospace']):not([style*='Segoe UI Mono']),
+.noteentry i:not([style*='Consolas']):not([style*='Monaco']):not([style*='Courier']):not([style*='monospace']):not([style*='Segoe UI Mono']),
+.noteentry em:not([style*='Consolas']):not([style*='Monaco']):not([style*='Courier']):not([style*='monospace']):not([style*='Segoe UI Mono']),
+.noteentry u:not([style*='Consolas']):not([style*='Monaco']):not([style*='Courier']):not([style*='monospace']):not([style*='Segoe UI Mono']),
+.noteentry s:not([style*='Consolas']):not([style*='Monaco']):not([style*='Courier']):not([style*='monospace']):not([style*='Segoe UI Mono']),
+.noteentry a:not([style*='Consolas']):not([style*='Monaco']):not([style*='Courier']):not([style*='monospace']):not([style*='Segoe UI Mono']),
+.noteentry span:not(.code-block span):not([style*='Consolas']):not([style*='Monaco']):not([style*='Courier']):not([style*='monospace']):not([style*='Segoe UI Mono']) {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
 }
 
@@ -2304,11 +2378,13 @@ pre.code-block,
     padding: 20px 20px;
     margin: 0;
     color: #333;
-    white-space: pre-wrap;
-    word-wrap: break-word;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
     overflow-x: auto;
-    font-size: inherit; /* inherit font size from parent (.noteentry) */
+    font-size: var(--note-font-size, 15px) !important; /* same font size as note text */
     position: relative;
+    max-width: 100%;
 }
 
 /* Ensure code blocks have the correct margins even without a wrapper */
@@ -2437,20 +2513,73 @@ code *[style*="color"],
     font-size: inherit; /* inherit font size from parent */
 }
 
-/* Style plugin code block (optionnel, garder la taille et couleur si besoin) */
+/* Style plugin code block and pasted code from editors (monospace font detection) */
+.noteentry span[style*='Segoe UI Mono'],
+.noteentry div[style*='Segoe UI Mono'],
+.noteentry p[style*='Segoe UI Mono'],
 .noteentry span[style*='Consolas'],
+.noteentry div[style*='Consolas'],
+.noteentry p[style*='Consolas'],
+.noteentry span[style*='Monaco'],
+.noteentry div[style*='Monaco'],
+.noteentry p[style*='Monaco'],
+.noteentry span[style*='Courier New'],
+.noteentry div[style*='Courier New'],
+.noteentry p[style*='Courier New'],
+.noteentry span[style*='monospace'],
+.noteentry div[style*='monospace'],
+.noteentry p[style*='monospace'],
+.noteentry span[style*='Segoe UI Mono'] *,
+.noteentry div[style*='Segoe UI Mono'] *,
+.noteentry p[style*='Segoe UI Mono'] *,
 .noteentry span[style*='Consolas'] *,
+.noteentry div[style*='Consolas'] *,
+.noteentry p[style*='Consolas'] *,
+.noteentry span[style*='Monaco'] *,
+.noteentry div[style*='Monaco'] *,
+.noteentry p[style*='Monaco'] *,
+.noteentry span[style*='Courier New'] *,
+.noteentry div[style*='Courier New'] *,
+.noteentry p[style*='Courier New'] *,
+.noteentry span[style*='monospace'] *,
+.noteentry div[style*='monospace'] *,
+.noteentry p[style*='monospace'] *,
+.noteentry span[style*='Segoe UI Mono'] b,
+.noteentry span[style*='Segoe UI Mono'] strong,
+.noteentry div[style*='Segoe UI Mono'] b,
+.noteentry div[style*='Segoe UI Mono'] strong,
 .noteentry span[style*='Consolas'] b,
 .noteentry span[style*='Consolas'] strong,
 .noteentry span[style*='Consolas'] i,
 .noteentry span[style*='Consolas'] em,
 .noteentry span[style*='Consolas'] u,
-.noteentry span[style*='Consolas'] s {
+.noteentry span[style*='Consolas'] s,
+.noteentry div[style*='Consolas'] b,
+.noteentry div[style*='Consolas'] strong,
+.noteentry div[style*='Consolas'] i,
+.noteentry div[style*='Consolas'] em,
+.noteentry div[style*='Consolas'] u,
+.noteentry div[style*='Consolas'] s,
+.noteentry span[style*='Monaco'] b,
+.noteentry span[style*='Monaco'] strong,
+.noteentry div[style*='Monaco'] b,
+.noteentry div[style*='Monaco'] strong,
+.noteentry span[style*='Courier New'] b,
+.noteentry span[style*='Courier New'] strong,
+.noteentry div[style*='Courier New'] b,
+.noteentry div[style*='Courier New'] strong,
+.noteentry span[style*='monospace'] b,
+.noteentry span[style*='monospace'] strong,
+.noteentry div[style*='monospace'] b,
+.noteentry div[style*='monospace'] strong {
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
-    font-size: inherit; /* inherit font size from parent */
+    font-size: var(--note-font-size, 15px) !important; /* same font size as note text */
     font-style: normal !important;
     font-weight: normal !important;
-    color: #333 !important;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    max-width: 100%;
 }
 
 /* OTHERS */
@@ -2623,6 +2752,48 @@ hr {
     box-shadow: 0 0 8px rgba(0, 125, 184, 0.3);
 }
 
+/* Folder dragging styles */
+.folder-header:not(.system-folder)[draggable="true"] {
+    cursor: grab;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.folder-header:not(.system-folder)[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+.folder-header.folder-dragging {
+    opacity: 0.6 !important;
+    background-color: rgba(0, 123, 255, 0.08) !important;
+    border: 2px dashed rgba(0, 123, 255, 0.4) !important;
+    transform: scale(0.98) !important;
+}
+
+.folder-header.folder-drop-target {
+    background-color: rgba(0, 123, 255, 0.15) !important;
+    border: 2px dashed #007bff !important;
+    box-shadow: 0 0 12px rgba(0, 123, 255, 0.4) !important;
+    transform: scale(1.02);
+    transition: all 0.2s ease;
+}
+
+/* Dark mode folder dragging */
+html[data-theme='dark'] .folder-header.folder-dragging,
+body.dark-mode .folder-header.folder-dragging {
+    background-color: rgba(74, 144, 226, 0.15) !important;
+    border-color: rgba(74, 144, 226, 0.5) !important;
+}
+
+html[data-theme='dark'] .folder-header.folder-drop-target,
+body.dark-mode .folder-header.folder-drop-target {
+    background-color: rgba(74, 144, 226, 0.2) !important;
+    border-color: #4a90e2 !important;
+    box-shadow: 0 0 12px rgba(74, 144, 226, 0.5) !important;
+}
+
 .folder-toggle {
     display: flex;
     align-items: center;
@@ -2647,26 +2818,9 @@ hr {
     align-content: center;
 }
 
-/* Container pour les dossiers système (Trash, Tags, Public, Favorites) */
+/* Container pour les dossiers système - maintenant masqué (remplacé par page Home) */
 .system-folders-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 35px;
-    margin: 0px 0px 15px 0px;
-    /* padding: 5px 0; */
-    border: 1px solid #d3d6db;
-    border-radius: 8px;
-    background: #ffffff;
-    padding: 10px 4px;
-    overflow: visible;
-    height: 40px;
-    box-sizing: border-box;
-}
-
-/* Réduire l'écart entre la loupe et la corbeille */
-.system-folders-container > .folder-header:first-child {
-    margin-right: -10px;
+    display: none !important;
 }
 
 /* Conteneur du menu système avec menu déroulant */
@@ -2805,14 +2959,14 @@ hr {
 }
 
 /* S'assurer que le contenu des favoris reste visible et aligné à gauche */
-/* Retirer !important pour permettre au toggle JavaScript de fonctionner */
+/* Favoris toujours visible */
 #folder-favorites {
     margin-left: 0 !important;
+    display: block !important;
 }
 
 /* Ajouter une bordure de séparation en bas quand les favoris sont affichés */
-#folder-favorites[style*="display: block"],
-#folder-favorites:not([style*="display: none"]) {
+#folder-favorites {
     border-bottom: 1px solid #e5e7eb;
     padding-bottom: 15px;
     margin-bottom: 15px;
@@ -4283,6 +4437,16 @@ input[type="search"]::-webkit-search-results-decoration {
 [class*="fa-"]:hover {
   transform: scale(1.18);
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
+}
+
+/* Ensure search type button icons are not recolored by the global fa filter */
+.searchbar-type-btn i,
+.searchbar-type-btn i::before,
+.searchbar-type-btn.active i,
+.searchbar-type-btn.active i::before,
+.searchbar-type-btn:hover i,
+.searchbar-type-btn:hover i::before {
+    filter: none !important;
 }
 
 /* Exception: Remove filter for save button when modified (to show red color) */

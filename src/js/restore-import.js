@@ -37,20 +37,6 @@ if (typeof window.hideCustomAlert !== 'function') {
     };
 }
 
-// Accordion toggle function
-function toggleAccordion(sectionId) {
-    const content = document.getElementById(sectionId);
-    const icon = document.getElementById(sectionId + 'Icon');
-
-    if (content.style.display === 'none' || content.style.display === '') {
-        content.style.display = 'block';
-        icon.textContent = '▼';
-    } else {
-        content.style.display = 'none';
-        icon.textContent = '▶';
-    }
-}
-
 // Format file size for display
 function formatFileSize(bytes) {
     if (bytes === 0) return '0 ' + tr('restore_import.units.bytes', 'Bytes');
@@ -65,6 +51,40 @@ function formatFileSize(bytes) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
+// Toggle card collapse/expand
+function toggleCard(targetId) {
+    const content = document.getElementById(targetId);
+    const header = document.querySelector(`[data-target="${targetId}"]`);
+    const chevron = header?.querySelector('.chevron');
+    
+    if (!content) return;
+    
+    if (content.classList.contains('open')) {
+        content.classList.remove('open');
+        chevron?.classList.remove('open');
+    } else {
+        content.classList.add('open');
+        chevron?.classList.add('open');
+    }
+}
+
+// Toggle sub-card collapse/expand
+function toggleSubCard(targetId) {
+    const content = document.getElementById(targetId);
+    const header = document.querySelector(`[data-target="${targetId}"]`);
+    const chevron = header?.querySelector('.chevron');
+    
+    if (!content) return;
+    
+    if (content.classList.contains('open')) {
+        content.classList.remove('open');
+        chevron?.classList.remove('open');
+    } else {
+        content.classList.add('open');
+        chevron?.classList.add('open');
+    }
+}
+
 // Event delegation handler for all click actions
 function handleRestoreImportClick(e) {
     const target = e.target.closest('[data-action]');
@@ -74,9 +94,16 @@ function handleRestoreImportClick(e) {
     const section = target.dataset.section;
 
     switch (action) {
-        // Accordion toggles
-        case 'toggle-accordion':
-            if (section) toggleAccordion(section);
+        // Card toggles
+        case 'toggle-card':
+            const cardTarget = target.dataset.target;
+            if (cardTarget) toggleCard(cardTarget);
+            break;
+        
+        // Sub-card toggles
+        case 'toggle-sub-card':
+            const subCardTarget = target.dataset.target;
+            if (subCardTarget) toggleSubCard(subCardTarget);
             break;
 
         // Complete restore actions
@@ -170,6 +197,9 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Failed to parse restore-import config:', e);
         }
     }
+
+    // Initialize cards state (open first card by default)
+    initializeCardsState();
 
     // Event delegation for all click actions
     document.addEventListener('click', handleRestoreImportClick);
@@ -949,4 +979,10 @@ function setupDragAndDrop() {
 function preventDefaults(e) {
     e.preventDefault();
     e.stopPropagation();
+}
+
+// Initialize cards state on page load
+function initializeCardsState() {
+    // All sections are closed by default
+    // Users can manually open the sections they need
 }

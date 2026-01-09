@@ -162,10 +162,6 @@ try {
     $v1 = $stmt->fetchColumn();
     if ($v1 === '1' || $v1 === 'true') $extra_body_classes .= ' show-note-created';
 
-    $stmt->execute(['show_note_subheading']);
-    $v2 = $stmt->fetchColumn();
-    if ($v2 === '1' || $v2 === 'true') $extra_body_classes .= ' show-note-subheading';
-
     $stmt->execute(['hide_folder_actions']);
     $v3 = $stmt->fetchColumn();
     if ($v3 === '1' || $v3 === 'true' || $v3 === null) $extra_body_classes .= ' folder-actions-always-visible';
@@ -242,7 +238,7 @@ $body_classes = trim($extra_body_classes);
     $search_params = $search_conditions['search_params'];
     
     // Secure prepared queries
-    $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, created, updated, location, subheading, type FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
+    $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, created, updated, type FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
     $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
     ?>
 
@@ -256,6 +252,7 @@ $body_classes = trim($extra_body_classes);
                 <i class="fa-caret-down workspace-dropdown-icon"></i>
             </div>
             <div class="sidebar-title-actions">
+                <button class="sidebar-home" data-action="navigate-to-home" title="<?php echo t_h('sidebar.home', [], 'Home'); ?>"><i class="fa-home"></i></button>
                 <button class="sidebar-settings" data-action="navigate-to-settings" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>"><i class="fa-cog"></i><span class="update-badge update-badge-hidden"></span></button>
                 <button class="sidebar-plus" data-action="toggle-create-menu" title="<?php echo t_h('sidebar.create'); ?>"><i class="fa-plus-circle"></i></button>
             </div>
@@ -653,45 +650,23 @@ $body_classes = trim($extra_body_classes);
                         }
                     }
                 
-                    // Prepare subheading/location display (prefer explicit subheading, fallback to location)
-                    $subheading_display = htmlspecialchars($row['subheading'] ?? ($row['location'] ?? ''), ENT_QUOTES, 'UTF-8');
-
-                    // Determine whether we actually need to render the subline block.
+                    // Determine whether we need to render the created date subline
                     $show_created_setting = false;
-                    $show_subheading_setting = false;
                     try {
                         $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
                         $stmt->execute(['show_note_created']);
                         $v1 = $stmt->fetchColumn();
                         if ($v1 === '1' || $v1 === 'true') $show_created_setting = true;
-
-                        $stmt->execute(['show_note_subheading']);
-                        $v2 = $stmt->fetchColumn();
-                        if ($v2 === '1' || $v2 === 'true') $show_subheading_setting = true;
                     } catch (Exception $e) {
                         // keep defaults (false) on error
                     }
 
                     $has_created = !empty($created_display) && $show_created_setting;
-                    $has_subheading = !empty($subheading_display) && $show_subheading_setting;
 
-                    // Show the subline if either setting is enabled, even if data is empty
-                    if ($show_created_setting || $show_subheading_setting) {
+                    // Show the subline if created date setting is enabled
+                    if ($show_created_setting && $has_created) {
                         echo '<div class="note-subline">';
-                        echo '<span class="note-sub-created">' . ($has_created ? htmlspecialchars($created_display, ENT_QUOTES) : '') . '</span>';
-                        if ($has_created && $show_subheading_setting) echo ' <span class="note-sub-sep">-</span> ';
-                        // Subheading display with inline editing elements
-                        // Render subheading as plain text (clickable, but not styled as a blue link)
-                        if ($show_subheading_setting) {
-                            if ($has_subheading) {
-                                echo '<span class="subheading-link" id="subheading-display-'.$row['id'].'" data-action="open-note-info-edit" data-note-id="'.$row['id'].'">' . $subheading_display . '</span>';
-                            } else {
-                                echo '<span class="subheading-link subheading-placeholder" id="subheading-display-'.$row['id'].'" data-action="open-note-info-edit" data-note-id="'.$row['id'].'"><em>'.t_h('index.subheading.placeholder', [], 'Add subheading here').'</em></span>';
-                            }
-                        }
-                        echo '<input type="text" id="subheading-input-'.$row['id'].'" class="inline-subheading-input initially-hidden" value="'.htmlspecialchars($subheading_display, ENT_QUOTES, 'UTF-8').'" />';
-                        echo '<button class="btn-inline-save initially-hidden" id="save-subheading-'.$row['id'].'" data-action="save-subheading-inline" data-note-id="'.$row['id'].'">'.t_h('common.save', [], 'Save').'</button>';
-                        echo '<button class="btn-inline-cancel initially-hidden" id="cancel-subheading-'.$row['id'].'" data-action="cancel-subheading-inline" data-note-id="'.$row['id'].'">'.t_h('common.cancel', [], 'Cancel').'</button>';
+                        echo '<span class="note-sub-created">' . htmlspecialchars($created_display, ENT_QUOTES) . '</span>';
                         echo '</div>';
                     }
                     

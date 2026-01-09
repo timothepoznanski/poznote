@@ -2,6 +2,40 @@
 date_default_timezone_set('UTC');
 
 /**
+ * Global settings cache - loads all settings in one query and caches them
+ * This dramatically reduces database queries when settings are accessed multiple times
+ */
+function getSetting($key, $default = null) {
+    static $cache = null;
+    
+    // Load all settings on first call
+    if ($cache === null) {
+        $cache = [];
+        global $con;
+        if (isset($con)) {
+            try {
+                $stmt = $con->query("SELECT key, value FROM settings");
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $cache[$row['key']] = $row['value'];
+                }
+            } catch (Exception $e) {
+                // Ignore errors, cache remains empty
+            }
+        }
+    }
+    
+    return isset($cache[$key]) ? $cache[$key] : $default;
+}
+
+/**
+ * Clear settings cache (call after updating settings)
+ */
+function clearSettingsCache() {
+    static $cache = null;
+    $cache = null;
+}
+
+/**
  * Clean content for search by removing base64 images and other heavy data
  * This is used to keep the database entry column lightweight for search functionality
  */
@@ -23,24 +57,24 @@ function cleanContentForSearch($content) {
  */
 
 function getUserLanguage() {
-    global $con;
-    try {
-        if (isset($con)) {
-            $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
-            $stmt->execute(['language']);
-            $lang = $stmt->fetchColumn();
-            if ($lang && is_string($lang)) {
-                $lang = strtolower(trim($lang));
-                // Basic allowlist: keep it simple and safe
-                if (preg_match('/^[a-z]{2}(-[a-z]{2})?$/', $lang)) {
-                    return $lang;
-                }
-            }
-        }
-    } catch (Exception $e) {
-        // Ignore errors
+    static $cached = null;
+    if ($cached !== null) {
+        return $cached;
     }
-    return 'en';
+    
+    // Use the global settings cache
+    $lang = getSetting('language', 'en');
+    if ($lang && is_string($lang)) {
+        $lang = strtolower(trim($lang));
+        // Basic allowlist: keep it simple and safe
+        if (preg_match('/^[a-z]{2}(-[a-z]{2})?$/', $lang)) {
+            $cached = $lang;
+            return $cached;
+        }
+    }
+    
+    $cached = 'en';
+    return $cached;
 }
 
 function loadI18nDictionary($lang) {
@@ -104,20 +138,20 @@ function t_h($key, $vars = [], $default = null, $lang = null) {
  * @return string The timezone identifier (e.g., 'Europe/Paris')
  */
 function getUserTimezone() {
-    global $con;
-    try {
-        if (isset($con)) {
-            $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
-            $stmt->execute(['timezone']);
-            $timezone = $stmt->fetchColumn();
-            if ($timezone && $timezone !== '') {
-                return $timezone;
-            }
-        }
-    } catch (Exception $e) {
-        // Ignore errors
+    static $cached = null;
+    if ($cached !== null) {
+        return $cached;
     }
-    return defined('DEFAULT_TIMEZONE') ? DEFAULT_TIMEZONE : 'UTC';
+    
+    // Use the global settings cache
+    $timezone = getSetting('timezone', '');
+    if ($timezone && $timezone !== '') {
+        $cached = $timezone;
+        return $cached;
+    }
+    
+    $cached = defined('DEFAULT_TIMEZONE') ? DEFAULT_TIMEZONE : 'UTC';
+    return $cached;
 }
 
 /**
@@ -214,12 +248,20 @@ function getFirstWorkspaceName() {
  * @return string The workspace name
  */
 function getWorkspaceFilter() {
+    static $cached = null;
+    
     // First check URL parameters - but ignore if empty
+    // These are dynamic, so don't cache if found
     if (isset($_GET['workspace']) && $_GET['workspace'] !== '') {
         return $_GET['workspace'];
     }
     if (isset($_POST['workspace']) && $_POST['workspace'] !== '') {
         return $_POST['workspace'];
+    }
+    
+    // Return cached value if we already computed it
+    if ($cached !== null) {
+        return $cached;
     }
     
     // If no parameter or empty parameter, check for default workspace setting in database
@@ -235,7 +277,8 @@ function getWorkspaceFilter() {
                 $checkStmt = $con->prepare('SELECT COUNT(*) FROM workspaces WHERE name = ?');
                 $checkStmt->execute([$defaultWorkspace]);
                 if ((int)$checkStmt->fetchColumn() > 0) {
-                    return $defaultWorkspace;
+                    $cached = $defaultWorkspace;
+                    return $cached;
                 }
             }
             
@@ -248,7 +291,8 @@ function getWorkspaceFilter() {
                 $checkStmt = $con->prepare('SELECT COUNT(*) FROM workspaces WHERE name = ?');
                 $checkStmt->execute([$lastOpened]);
                 if ((int)$checkStmt->fetchColumn() > 0) {
-                    return $lastOpened;
+                    $cached = $lastOpened;
+                    return $cached;
                 }
             }
         } catch (Exception $e) {
@@ -257,7 +301,8 @@ function getWorkspaceFilter() {
     }
     
     // Final fallback: get first available workspace
-    return getFirstWorkspaceName();
+    $cached = getFirstWorkspaceName();
+    return $cached;
 }
 
 /**
@@ -765,23 +810,41 @@ function ensureDataPermissions() {
  * @return string The complete folder path (e.g., "Parent/Child")
  */
 function getFolderPath($folder_id, $con) {
+    static $cache = [];
+    static $folderData = null;
+    
     if ($folder_id === null || $folder_id === 0) {
         return 'Default';
     }
     
+    // Return cached path if available
+    if (isset($cache[$folder_id])) {
+        return $cache[$folder_id];
+    }
+    
+    // Pre-load ALL folders on first call to avoid N+1 queries
+    if ($folderData === null) {
+        $folderData = [];
+        try {
+            $stmt = $con->query("SELECT id, name, parent_id FROM folders");
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $folderData[(int)$row['id']] = [
+                    'name' => $row['name'],
+                    'parent_id' => $row['parent_id'] !== null ? (int)$row['parent_id'] : null
+                ];
+            }
+        } catch (Exception $e) {
+            $folderData = [];
+        }
+    }
+    
     $path = [];
-    $currentId = $folder_id;
+    $currentId = (int)$folder_id;
     $maxDepth = 50; // Prevent infinite loops
     $depth = 0;
     
-    while ($currentId !== null && $depth < $maxDepth) {
-        $stmt = $con->prepare("SELECT name, parent_id FROM folders WHERE id = ?");
-        $stmt->execute([$currentId]);
-        $folder = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if (!$folder) {
-            break;
-        }
+    while ($currentId !== null && isset($folderData[$currentId]) && $depth < $maxDepth) {
+        $folder = $folderData[$currentId];
         
         // Add folder name to the beginning of the path
         array_unshift($path, $folder['name']);
@@ -791,6 +854,8 @@ function getFolderPath($folder_id, $con) {
         $depth++;
     }
     
-    return !empty($path) ? implode('/', $path) : 'Default';
+    $result = !empty($path) ? implode('/', $path) : 'Default';
+    $cache[$folder_id] = $result;
+    return $result;
 }
 ?>

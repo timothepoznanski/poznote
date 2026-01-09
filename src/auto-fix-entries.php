@@ -5,9 +5,9 @@
  * This script runs at container startup to fix any notes with empty entry columns
  */
 
-$projectRoot = dirname(__DIR__);
-$dbPath = $projectRoot . '/data/database/poznote.db';
-$entriesPath = $projectRoot . '/data/entries';
+// Use same database path logic as config.php
+$dbPath = $_ENV['SQLITE_DATABASE'] ?? dirname(__DIR__) . '/data/database/poznote.db';
+$entriesPath = dirname($dbPath) . '/../entries';
 
 echo "[Poznote] Checking for notes with empty entry columns...\n";
 

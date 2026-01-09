@@ -309,14 +309,6 @@ $currentLang = getUserLanguage();
                     </div>
                 </div>
 
-                <!-- Show Note Subheading -->
-                <div class="settings-card" id="show-subheading-card">
-                    <div class="settings-card-icon"><i class="fa-map-marker-alt"></i></div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.show_note_subheading'); ?> <span id="show-subheading-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span></h3>
-                    </div>
-                </div>
-
                 <!-- Show Folder Counts -->
                 <div class="settings-card" id="folder-counts-card">
                     <div class="settings-card-icon"><i class="fa-hashtag"></i></div>

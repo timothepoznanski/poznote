@@ -6,11 +6,29 @@
 /**
  * Organize notes by folder
  * Now returns array with 'folders' and 'uncategorized_notes' keys
+ * OPTIMIZED: Pre-load all folder data to avoid N+1 queries
  */
 function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
     $folders = [];
     $uncategorized_notes = []; // Notes without folder
     $folders_with_results = [];
+    
+    // PRE-LOAD all folders in one query to avoid N+1 problem
+    $folders_cache = [];
+    $folders_query = "SELECT id, name, icon FROM folders";
+    if ($workspace_filter) {
+        $folders_query .= " WHERE workspace = ?";
+        $folders_stmt = $con->prepare($folders_query);
+        $folders_stmt->execute([$workspace_filter]);
+    } else {
+        $folders_stmt = $con->query($folders_query);
+    }
+    while ($folder_row = $folders_stmt->fetch(PDO::FETCH_ASSOC)) {
+        $folders_cache[(int)$folder_row['id']] = [
+            'name' => $folder_row['name'],
+            'icon' => $folder_row['icon'] ?? null
+        ];
+    }
     
     while($row1 = $stmt_left->fetch(PDO::FETCH_ASSOC)) {
         $folderId = isset($row1["folder_id"]) && $row1["folder_id"] ? (int)$row1["folder_id"] : null;
@@ -23,25 +41,10 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
             continue;
         }
         
-        // If we already have this folder_id registered, use its name
-        if (isset($folders[$folderId])) {
-            $folderName = $folders[$folderId]['name'];
-        } else {
-            // First time seeing this folder_id - get the canonical name and icon from folders table
-            $canonicalQuery = "SELECT name, icon FROM folders WHERE id = ?";
-            if ($workspace_filter) {
-                $canonicalQuery .= " AND workspace = ?";
-                $canonicalStmt = $con->prepare($canonicalQuery);
-                $canonicalStmt->execute([$folderId, $workspace_filter]);
-            } else {
-                $canonicalStmt = $con->prepare($canonicalQuery);
-                $canonicalStmt->execute([$folderId]);
-            }
-            $canonicalData = $canonicalStmt->fetch(PDO::FETCH_ASSOC);
-            if ($canonicalData) {
-                $folderName = $canonicalData['name'];
-                $folderIcon = $canonicalData['icon'] ?? null;
-            }
+        // Use pre-loaded folder data (FAST - no DB query)
+        if (isset($folders_cache[$folderId])) {
+            $folderName = $folders_cache[$folderId]['name'];
+            $folderIcon = $folders_cache[$folderId]['icon'];
         }
         
         if (!isset($folders[$folderId])) {
@@ -145,6 +148,11 @@ function sortFolders($folders) {
  * Now accepts both folder ID and name
  */
 function shouldFolderBeOpen($con, $folderId, $folderName, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes) {
+    // Favorites folder is always open
+    if ($folderName === 'Favorites') {
+        return true;
+    }
+    
     // Check if this folder was explicitly requested to be opened (e.g., after creating a subfolder)
     if (isset($_GET['open_folder'])) {
         $openFolderKey = $_GET['open_folder'];
@@ -160,12 +168,9 @@ function shouldFolderBeOpen($con, $folderId, $folderName, $is_search_mode, $fold
         // In search mode: open folders that have results
         return isset($folders_with_results[$folderName]);
     } else if($note != '') {
-        // If a note is selected: open the folder of the current note AND Favoris if note is favorite
+        // If a note is selected: open the folder of the current note
         if ($folderName === $current_note_folder) {
             return true;
-        } else if ($folderName === 'Favorites') {
-            // Open Favoris folder if the current note is favorite
-            return isNoteFavorite($con, $note, $workspace_filter);
         }
     } else if($default_note_folder) {
         // If no specific note selected but default note loaded: open its folder
@@ -177,22 +182,33 @@ function shouldFolderBeOpen($con, $folderId, $folderName, $is_search_mode, $fold
 
 /**
  * Génère les actions disponibles pour un dossier
+ * OPTIMIZED: Uses cached shared folders data to avoid N+1 queries
  */
 function generateFolderActions($folderId, $folderName, $workspace_filter, $noteCount = 0) {
     global $con;
+    static $sharedFoldersCache = null;
+    
     $actions = "";
     
     // Escape folder name for use in JavaScript strings
     $escapedFolderName = addslashes($folderName);
     $htmlEscapedFolderName = htmlspecialchars($folderName, ENT_QUOTES);
     
-    // Check if folder is shared
-    $isShared = false;
-    if ($folderId) {
-        $stmt = $con->prepare('SELECT id FROM shared_folders WHERE folder_id = ? LIMIT 1');
-        $stmt->execute([$folderId]);
-        $isShared = $stmt->fetchColumn() !== false;
+    // Pre-load all shared folders on first call to avoid N+1 queries
+    if ($sharedFoldersCache === null) {
+        $sharedFoldersCache = [];
+        try {
+            $stmt = $con->query('SELECT folder_id FROM shared_folders');
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $sharedFoldersCache[(int)$row['folder_id']] = true;
+            }
+        } catch (Exception $e) {
+            $sharedFoldersCache = [];
+        }
     }
+    
+    // Check if folder is shared using cache
+    $isShared = isset($sharedFoldersCache[(int)$folderId]);
     
     if ($folderName === 'Favorites') {
         // No actions for Favorites folder
@@ -288,14 +304,26 @@ function generateNoteLink($search, $tags_search, $folder_filter, $workspace_filt
 
 /**
  * Compte le nombre total de notes pour déterminer si on ouvre tous les dossiers
+ * OPTIMIZED: Uses prepared statement for security
  */
 function getTotalNotesCount($con, $workspace_filter) {
-    $total_notes_query = "SELECT COUNT(*) as total FROM entries WHERE trash = 0";
-    if (isset($workspace_filter) && $workspace_filter !== '') {
-        $total_notes_query .= " AND workspace = '" . addslashes($workspace_filter) . "'";
+    static $cache = null;
+    
+    // Return cached value if available
+    if ($cache !== null) {
+        return $cache;
     }
-    $total_notes_result = $con->query($total_notes_query);
-    return $total_notes_result->fetch(PDO::FETCH_ASSOC)['total'];
+    
+    $total_notes_query = "SELECT COUNT(*) as total FROM entries WHERE trash = 0";
+    $params = [];
+    if (isset($workspace_filter) && $workspace_filter !== '') {
+        $total_notes_query .= " AND workspace = ?";
+        $params[] = $workspace_filter;
+    }
+    $stmt = $con->prepare($total_notes_query);
+    $stmt->execute($params);
+    $cache = (int)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    return $cache;
 }
 
 /**
@@ -330,25 +358,34 @@ function buildFolderHierarchy($folders) {
 
 /**
  * Get parent_id for folders from database
+ * OPTIMIZED: Uses a single query to fetch all parent_ids at once
  */
 function enrichFoldersWithParentId($folders, $con, $workspace_filter) {
-    foreach ($folders as $folderId => &$folderData) {
-        $query = "SELECT parent_id FROM folders WHERE id = ?";
-        $params = [$folderId];
+    if (empty($folders)) {
+        return $folders;
+    }
+    
+    // Pre-load all folder parent_ids in one query
+    $parentIdCache = [];
+    try {
+        $query = "SELECT id, parent_id FROM folders";
         if ($workspace_filter) {
-            $query .= " AND workspace = ?";
-            $params[] = $workspace_filter;
-        }
-        
-        $stmt = $con->prepare($query);
-        $stmt->execute($params);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if ($result) {
-            $folderData['parent_id'] = $result['parent_id'] ? (int)$result['parent_id'] : null;
+            $query .= " WHERE workspace = ?";
+            $stmt = $con->prepare($query);
+            $stmt->execute([$workspace_filter]);
         } else {
-            $folderData['parent_id'] = null;
+            $stmt = $con->query($query);
         }
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $parentIdCache[(int)$row['id']] = $row['parent_id'] !== null ? (int)$row['parent_id'] : null;
+        }
+    } catch (Exception $e) {
+        // On error, leave parent_id as null
+    }
+    
+    // Enrich folders with cached parent_ids
+    foreach ($folders as $folderId => &$folderData) {
+        $folderData['parent_id'] = isset($parentIdCache[(int)$folderId]) ? $parentIdCache[(int)$folderId] : null;
     }
     
     return $folders;

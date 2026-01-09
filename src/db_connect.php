@@ -128,6 +128,36 @@ try {
     $con->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_folders_name_workspace_root 
                 ON folders(name, workspace) 
                 WHERE parent_id IS NULL');
+    
+    // Performance indexes for folders table
+    $con->exec('CREATE INDEX IF NOT EXISTS idx_folders_workspace ON folders(workspace)');
+    $con->exec('CREATE INDEX IF NOT EXISTS idx_folders_parent_id ON folders(parent_id)');
+    $con->exec('CREATE INDEX IF NOT EXISTS idx_folders_name ON folders(name COLLATE NOCASE)');
+
+    // Create indexes on entries table for performance
+    // Index for main queries (trash + workspace filtering)
+    $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_trash_workspace ON entries(trash, workspace)');
+    
+    // Index for ordering by updated date
+    $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_updated ON entries(updated DESC)');
+    
+    // Index for ordering by created date
+    $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_created ON entries(created DESC)');
+    
+    // Index for folder-based queries
+    $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_folder_id ON entries(folder_id)');
+    
+    // Index for favorites filtering
+    $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_favorite ON entries(favorite)');
+    
+    // Index for tags search
+    $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_tags ON entries(tags)');
+    
+    // Composite index for common query pattern (trash + workspace + updated)
+    $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_trash_workspace_updated ON entries(trash, workspace, updated DESC)');
+    
+    // Index for heading searches (text search optimization)
+    $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_heading ON entries(heading COLLATE NOCASE)');
 
     // Create workspaces table
     $con->exec('CREATE TABLE IF NOT EXISTS workspaces (
@@ -157,6 +187,10 @@ try {
         expires DATETIME,
         FOREIGN KEY(note_id) REFERENCES entries(id) ON DELETE CASCADE
     )');
+    
+    // Performance indexes for shared_notes table
+    $con->exec('CREATE INDEX IF NOT EXISTS idx_shared_notes_note_id ON shared_notes(note_id)');
+    $con->exec('CREATE INDEX IF NOT EXISTS idx_shared_notes_token ON shared_notes(token)');
 
     // Add missing columns to shared_notes if they don't exist (migration for old backups)
     try {
@@ -191,6 +225,10 @@ try {
         password TEXT,
         FOREIGN KEY(folder_id) REFERENCES folders(id) ON DELETE CASCADE
     )');
+    
+    // Performance indexes for shared_folders table
+    $con->exec('CREATE INDEX IF NOT EXISTS idx_shared_folders_folder_id ON shared_folders(folder_id)');
+    $con->exec('CREATE INDEX IF NOT EXISTS idx_shared_folders_token ON shared_folders(token)');
 
     // Set default settings
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_font_size', '15')");
@@ -199,8 +237,6 @@ try {
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('language', 'en')");
     // Controls to show/hide metadata under note title in notes list (enabled by default)
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_created', '1')");
-    // Renamed setting: show_note_subheading (was show_note_location)
-    $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_subheading', '1')");
     // Folder counts hidden by default
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('hide_folder_counts', '0')");
 
