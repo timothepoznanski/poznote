@@ -433,15 +433,16 @@ function handleChecklistKeydown(e) {
                 var checklist = checklistItem.closest('.checklist');
                 if (checklist && checklist.nextElementSibling) {
                     var nextElement = checklist.nextElementSibling;
-                    // Focus next editable element
+                    // Focus next editable element if possible
                     if (nextElement.isContentEditable) {
                         nextElement.focus();
                         var range = document.createRange();
                         range.selectNodeContents(nextElement);
-                        range.collapse(true);
+                        range.collapse(true); // start of content
                         var sel = window.getSelection();
                         sel.removeAllRanges();
                         sel.addRange(range);
+                        return;
                     }
                 }
             }
