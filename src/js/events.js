@@ -2210,8 +2210,75 @@ function setupLinkEvents() {
                 var htmlData = e.clipboardData.getData('text/html');
                 var plainText = e.clipboardData.getData('text/plain');
                 
-                // Code block auto-creation has been removed
-                // Text will paste normally without automatic formatting
+                // Detect if pasted content is code from VS Code or similar editors
+                // VS Code uses Consolas, Monaco, Courier New, or monospace fonts
+                if (htmlData && (
+                    htmlData.includes('Consolas') || 
+                    htmlData.includes('Monaco') || 
+                    htmlData.includes('Courier New') || 
+                    htmlData.includes('monospace') ||
+                    htmlData.includes('Segoe UI Mono') ||
+                    htmlData.includes('vscode') ||
+                    htmlData.includes('monaco-editor')
+                )) {
+                    e.preventDefault();
+                    
+                    // Create a temporary container to parse and transform the HTML
+                    var tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = htmlData;
+                    
+                    // Apply monospace font to all elements
+                    var allElements = tempDiv.querySelectorAll('*');
+                    allElements.forEach(function(el) {
+                        el.style.fontFamily = '"Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace';
+                    });
+                    
+                    // Also set font on the container itself
+                    tempDiv.style.fontFamily = '"Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace';
+                    
+                    // Insert at cursor position
+                    var selection = window.getSelection();
+                    if (selection.rangeCount > 0) {
+                        var range = selection.getRangeAt(0);
+                        range.deleteContents();
+                        
+                        // Create fragment with line breaks before and after
+                        var fragment = document.createDocumentFragment();
+                        
+                        // Add empty line before the code block
+                        var lineBefore = document.createElement('div');
+                        lineBefore.innerHTML = '<br>';
+                        fragment.appendChild(lineBefore);
+                        
+                        // Insert each child node
+                        while (tempDiv.firstChild) {
+                            var child = tempDiv.firstChild;
+                            // Apply font directly to first-level children
+                            if (child.nodeType === 1) { // Element node
+                                child.style.fontFamily = '"Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace';
+                            }
+                            fragment.appendChild(child);
+                        }
+                        
+                        // Add empty line after the code block
+                        var lineAfter = document.createElement('div');
+                        lineAfter.innerHTML = '<br>';
+                        fragment.appendChild(lineAfter);
+                        
+                        range.insertNode(fragment);
+                        
+                        // Move cursor to end (after the line break)
+                        range.collapse(false);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    }
+                    
+                    // Trigger update
+                    if (typeof window.markNoteAsModified === 'function') {
+                        window.markNoteAsModified();
+                    }
+                    return;
+                }
                 
                 // Detect if this is a URL being pasted
                 if (plainText && !htmlData) {
