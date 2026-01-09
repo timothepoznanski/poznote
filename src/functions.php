@@ -337,7 +337,7 @@ function generateUniqueTitle($originalTitle, $excludeId = null, $workspace = nul
     // Clean the original title
     $title = trim($originalTitle);
     if (empty($title)) {
-        $title = 'New note';
+        $title = t('index.note.new_note', [], 'New note');
     }
     
     // Check if title already exists (excluding the current note if updating)

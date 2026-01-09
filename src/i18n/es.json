@@ -808,7 +808,14 @@
     "link_to_note": "Enlace a nota",
     "link": "Enlace",
     "cancel": "Cancelar",
-    "back": "Volver"
+    "back": "Volver",
+    "quote": "Cita",
+    "blockquote": "Bloque de cita",
+    "callout_note": "Nota",
+    "callout_tip": "Consejo",
+    "callout_important": "Importante",
+    "callout_warning": "Advertencia",
+    "callout_caution": "Precaución"
   },
   "api": {
     "settings": {

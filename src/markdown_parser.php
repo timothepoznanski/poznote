@@ -269,7 +269,13 @@ function parseMarkdown($text) {
                     $bodyLines[] = $blockquoteLines[$bi];
                 }
 
-                $titleHtml = ucfirst($calloutType);
+                // Use translation if available
+                $defaultTitle = ucfirst($calloutType);
+                if (function_exists('t')) {
+                    $titleHtml = t('slash_menu.callout_' . $calloutType, [], $defaultTitle);
+                } else {
+                    $titleHtml = $defaultTitle;
+                }
                 $bodyHtml = implode('<br>', array_map(function($l) use ($applyInlineStyles) { return $applyInlineStyles($l); }, $bodyLines));
 
                 // GitHub-style callout icons (matching the screenshot)

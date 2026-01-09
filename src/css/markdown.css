@@ -117,7 +117,8 @@
     border-radius: 0;
 }
 
-.markdown-preview blockquote {
+.markdown-preview blockquote,
+.noteentry blockquote {
     border-left: 4px solid #ddd;
     padding-left: 16px;
     margin: 1em 0;
