@@ -125,7 +125,8 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         $draggableAttr = $isSystemFolder ? '' : " draggable='true'";
         
         echo "<div class='$folderClass' data-folder-id='$folderId' data-folder='$folderName' data-folder-key='folder_$folderId' data-action='select-folder'$draggableAttr>";
-        echo "<div class='folder-toggle'>";
+        // Make the entire folder toggle area clickable to open/close the folder
+        echo "<div class='folder-toggle' data-action='toggle-folder' data-folder-dom-id='$folderDomId'>";
         
         // Use an empty star icon for the Favorites pseudo-folder
         if ($folderName === 'Favorites') {
