@@ -27,8 +27,8 @@ fi
 
 # Auto-fix empty entry columns (runs once)
 echo "Running entry column fix check..."
-php /var/www/html/tools/auto-fix-entries.php || true
+php /var/www/html/src/auto-fix-entries.php || true
 
 # Migrate subheadings to note content (moves non-empty subheadings to first line of notes)
 echo "Running subheading migration check..."
-php /var/www/html/tools/migrate-subheadings.php || true
+php /var/www/html/src/migrate-subheadings.php || true

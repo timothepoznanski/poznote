@@ -34,6 +34,8 @@ RUN echo "Build timestamp: ${BUILD_DATE:-$(date +%s)}" > /tmp/build_timestamp.tx
 # Copy application source
 COPY ./src /var/www/html
 
+# Copy tools scripts (auto-fix, migrations) so init can run them at container startup
+
 # Copy initialization script
 COPY init.sh /usr/local/bin/init.sh
 
