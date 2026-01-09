@@ -1875,7 +1875,9 @@ body.dark-mode .markdown-preview pre {
 }
 
 html[data-theme='dark'] .markdown-preview blockquote,
-body.dark-mode .markdown-preview blockquote {
+html[data-theme='dark'] .noteentry blockquote,
+body.dark-mode .markdown-preview blockquote,
+body.dark-mode .noteentry blockquote {
     border-left-color: #404040;
     color: #b0b0b0;
 }
