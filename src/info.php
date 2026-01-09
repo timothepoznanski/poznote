@@ -61,7 +61,42 @@ function formatDateString($dateStr) {
 
 $createdText = formatDateString($note['created']);
 $updatedText = formatDateString($note['updated']);
-$folderText = $note['folder'] ?: t('modals.folder.no_folder', [], 'No folder');
+
+// Build full folder path (including parent folders)
+$folderText = t('modals.folder.no_folder', [], 'No folder');
+if (!empty($note['folder_id'])) {
+    try {
+        $folderPath = [];
+        $currentFolderId = (int)$note['folder_id'];
+        $maxDepth = 50; // Prevent infinite loops
+        $depth = 0;
+        
+        while ($currentFolderId && $depth < $maxDepth) {
+            $folderStmt = $con->prepare("SELECT id, name, parent_id FROM folders WHERE id = ?");
+            $folderStmt->execute([$currentFolderId]);
+            $folderData = $folderStmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($folderData) {
+                array_unshift($folderPath, $folderData['name']);
+                $currentFolderId = $folderData['parent_id'] ? (int)$folderData['parent_id'] : null;
+            } else {
+                break;
+            }
+            $depth++;
+        }
+        
+        if (!empty($folderPath)) {
+            $folderText = implode(' / ', $folderPath);
+        }
+    } catch (PDOException $e) {
+        // Fallback to simple folder name if path building fails
+        $folderText = $note['folder'] ?: t('modals.folder.no_folder', [], 'No folder');
+    }
+} elseif (!empty($note['folder'])) {
+    // Fallback for old data that might not have folder_id
+    $folderText = $note['folder'];
+}
+
 $isFavorite = (int)$note['favorite'] === 1;
 
 // Build full path of the note with appropriate extension

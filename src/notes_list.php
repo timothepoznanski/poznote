@@ -243,7 +243,12 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         // Escape folder name for use in JavaScript
         $escapedFolderName = addslashes($folderName);
         
-        echo "<div class='$folderClass' data-folder-id='$folderId' data-folder='$folderName' data-folder-key='folder_$folderId' data-action='select-folder'>";
+        // Check if this is a system folder (not draggable)
+        $systemFolders = ['Favorites', 'Tags', 'Trash', 'Public'];
+        $isSystemFolder = in_array($folderName, $systemFolders);
+        $draggableAttr = $isSystemFolder ? '' : " draggable='true'";
+        
+        echo "<div class='$folderClass' data-folder-id='$folderId' data-folder='$folderName' data-folder-key='folder_$folderId' data-action='select-folder'$draggableAttr>";
         echo "<div class='folder-toggle'>";
         
         // Use an empty star icon for the Favorites pseudo-folder
@@ -255,9 +260,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         }
         
         // Workspace-aware folder handling in UI
-        // Disable double-click rename for system folders
-        $systemFolders = ['Favorites', 'Tags', 'Trash', 'Public'];
-        $isSystemFolder = in_array($folderName, $systemFolders);
+        // Disable double-click rename for system folders (already defined above)
         $folderDisplayName = $folderName;
         if ($folderName === 'Favorites') {
             $folderDisplayName = t('notes_list.system_folders.favorites', [], 'Favorites');

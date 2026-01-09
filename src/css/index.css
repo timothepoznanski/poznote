@@ -2623,6 +2623,48 @@ hr {
     box-shadow: 0 0 8px rgba(0, 125, 184, 0.3);
 }
 
+/* Folder dragging styles */
+.folder-header:not(.system-folder)[draggable="true"] {
+    cursor: grab;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.folder-header:not(.system-folder)[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+.folder-header.folder-dragging {
+    opacity: 0.6 !important;
+    background-color: rgba(0, 123, 255, 0.08) !important;
+    border: 2px dashed rgba(0, 123, 255, 0.4) !important;
+    transform: scale(0.98) !important;
+}
+
+.folder-header.folder-drop-target {
+    background-color: rgba(0, 123, 255, 0.15) !important;
+    border: 2px dashed #007bff !important;
+    box-shadow: 0 0 12px rgba(0, 123, 255, 0.4) !important;
+    transform: scale(1.02);
+    transition: all 0.2s ease;
+}
+
+/* Dark mode folder dragging */
+html[data-theme='dark'] .folder-header.folder-dragging,
+body.dark-mode .folder-header.folder-dragging {
+    background-color: rgba(74, 144, 226, 0.15) !important;
+    border-color: rgba(74, 144, 226, 0.5) !important;
+}
+
+html[data-theme='dark'] .folder-header.folder-drop-target,
+body.dark-mode .folder-header.folder-drop-target {
+    background-color: rgba(74, 144, 226, 0.2) !important;
+    border-color: #4a90e2 !important;
+    box-shadow: 0 0 12px rgba(74, 144, 226, 0.5) !important;
+}
+
 .folder-toggle {
     display: flex;
     align-items: center;

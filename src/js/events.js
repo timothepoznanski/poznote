@@ -1132,7 +1132,14 @@ function setupNoteDragDropEvents() {
         header.removeEventListener('dragover', handleFolderDragOver);
         header.removeEventListener('drop', handleFolderDrop);
         header.removeEventListener('dragleave', handleFolderDragLeave);
+        // Also remove enhanced handlers
+        header.removeEventListener('dragover', handleFolderDragOverEnhanced);
+        header.removeEventListener('drop', handleFolderDropEnhanced);
+        header.removeEventListener('dragleave', handleFolderDragLeaveEnhanced);
     });
+    
+    // Setup folder drag and drop
+    setupFolderDragDropEvents();
     
     // Add drag events to all note links (both in folders and without folder)
     var noteLinks = document.querySelectorAll('.links_arbo_left');
@@ -1280,32 +1287,48 @@ function setupNoteDragDropEvents() {
         }
     });
     
-    // Add drop events to folder headers
+    // Add drop events to folder headers (using enhanced handlers for folder+note support)
     var folderHeaders = document.querySelectorAll('.folder-header');
     folderHeaders.forEach(function(header) {
-        header.addEventListener('dragover', handleFolderDragOver);
-        header.addEventListener('drop', handleFolderDrop);
-        header.addEventListener('dragleave', handleFolderDragLeave);
+        header.addEventListener('dragover', handleFolderDragOverEnhanced);
+        header.addEventListener('drop', handleFolderDropEnhanced);
+        header.addEventListener('dragleave', handleFolderDragLeaveEnhanced);
     });
     
-    // Add global drop handler for dropping outside folders (move to no folder)
+    // Add global drop handler for dropping outside folders (move to no folder or move folder to root)
     var notesListContainer = document.querySelector('.notes_list, #notes-list, body');
     if (notesListContainer) {
         notesListContainer.addEventListener('dragover', function(e) {
             // Check if we're not over a folder header
             var isOverFolder = e.target.closest('.folder-header');
-            if (!isOverFolder && window.currentDragData && window.currentDragData.currentFolderId) {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
+            if (!isOverFolder && window.currentDragData) {
+                // For notes: allow drop if note is in a folder
+                if (window.currentDragData.currentFolderId) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                }
+                // For folders: allow drop to move to root (only for subfolders)
+                if (window.currentDragData.type === 'folder') {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                }
             }
         });
         
         notesListContainer.addEventListener('drop', function(e) {
             // Check if we're not over a folder header
             var isOverFolder = e.target.closest('.folder-header');
-            if (!isOverFolder && window.currentDragData && window.currentDragData.currentFolderId) {
-                e.preventDefault();
-                moveNoteToRoot(window.currentDragData.noteId);
+            if (!isOverFolder && window.currentDragData) {
+                // Handle note drop to root
+                if (window.currentDragData.noteId && window.currentDragData.currentFolderId) {
+                    e.preventDefault();
+                    moveNoteToRoot(window.currentDragData.noteId);
+                }
+                // Handle folder drop to root
+                if (window.currentDragData.type === 'folder' && window.currentDragData.folderId) {
+                    e.preventDefault();
+                    moveFolderToRoot(window.currentDragData.folderId);
+                }
             }
         });
     }
@@ -1762,6 +1785,338 @@ function moveNoteToRoot(noteId) {
     })
     .catch(function(error) {
         showNotificationPopup('Error removing note from folder: ' + error.message, 'error');
+    });
+}
+
+// =====================================================
+// FOLDER DRAG AND DROP FUNCTIONALITY
+// =====================================================
+
+/**
+ * Setup drag and drop events for folders
+ * Called from setupNoteDragDropEvents to initialize folder dragging
+ */
+function setupFolderDragDropEvents() {
+    var isMobile = window.innerWidth <= 800;
+    
+    // Get all folder headers (excluding system folders)
+    var folderHeaders = document.querySelectorAll('.folder-header:not(.system-folder)');
+    
+    folderHeaders.forEach(function(header) {
+        // Remove existing listeners
+        header.removeEventListener('dragstart', handleFolderDragStart);
+        header.removeEventListener('dragend', handleFolderDragEnd);
+        
+        if (!isMobile) {
+            // Ensure draggable is set
+            header.setAttribute('draggable', 'true');
+            header.draggable = true;
+            
+            // Add drag event listeners
+            header.addEventListener('dragstart', handleFolderDragStart, false);
+            header.addEventListener('dragend', handleFolderDragEnd, false);
+        } else {
+            // Disable dragging on mobile
+            header.removeAttribute('draggable');
+            header.draggable = false;
+        }
+    });
+}
+
+/**
+ * Handle folder drag start
+ */
+function handleFolderDragStart(e) {
+    var folderHeader = e.target.closest('.folder-header');
+    if (!folderHeader) {
+        return;
+    }
+    
+    // Don't allow dragging system folders
+    if (folderHeader.classList.contains('system-folder')) {
+        e.preventDefault();
+        return;
+    }
+    
+    var folderId = folderHeader.getAttribute('data-folder-id');
+    var folderName = folderHeader.getAttribute('data-folder');
+    
+    if (!folderId) {
+        return;
+    }
+    
+    var dragData = {
+        type: 'folder',
+        folderId: folderId,
+        folderName: folderName || ''
+    };
+    
+    e.dataTransfer.setData('text/plain', JSON.stringify(dragData));
+    e.dataTransfer.effectAllowed = 'move';
+    
+    // Store drag data globally for fallback
+    window.currentDragData = dragData;
+    
+    // Create a custom drag image
+    var dragImage = document.createElement('div');
+    dragImage.style.cssText = 'position: absolute; top: -1000px; padding: 10px 15px; background: rgba(0, 123, 255, 0.15); border: 2px solid rgba(0, 123, 255, 0.4); border-radius: 8px; font-weight: 500; color: #007bff; display: flex; align-items: center; gap: 8px;';
+    dragImage.innerHTML = '<i class="fa-folder"></i> ' + (folderName || 'Folder');
+    document.body.appendChild(dragImage);
+    
+    try {
+        e.dataTransfer.setDragImage(dragImage, 50, 20);
+    } catch (err) {
+        // Silently fail if browser doesn't support custom drag images
+    }
+    
+    // Remove the drag image after a short delay
+    setTimeout(function() {
+        if (dragImage && dragImage.parentNode) {
+            dragImage.parentNode.removeChild(dragImage);
+        }
+    }, 0);
+    
+    // Add visual feedback to the folder being dragged
+    folderHeader.classList.add('folder-dragging');
+    folderHeader.style.setProperty('opacity', '0.6', 'important');
+    folderHeader.style.setProperty('background-color', 'rgba(0, 123, 255, 0.08)', 'important');
+    folderHeader.style.setProperty('border', '2px dashed rgba(0, 123, 255, 0.4)', 'important');
+    folderHeader.style.setProperty('transform', 'scale(0.98)', 'important');
+}
+
+/**
+ * Handle folder drag end
+ */
+function handleFolderDragEnd(e) {
+    var folderHeader = e.target.closest('.folder-header');
+    if (folderHeader) {
+        folderHeader.classList.remove('folder-dragging');
+        folderHeader.style.opacity = '';
+        folderHeader.style.backgroundColor = '';
+        folderHeader.style.border = '';
+        folderHeader.style.transform = '';
+    }
+    
+    // Clean up all folder drag-over states
+    document.querySelectorAll('.folder-header.folder-drop-target').forEach(function(header) {
+        header.classList.remove('folder-drop-target');
+    });
+    
+    // Clean up global drag data
+    setTimeout(function() {
+        if (window.currentDragData && window.currentDragData.type === 'folder') {
+            window.currentDragData = null;
+        }
+    }, 100);
+}
+
+/**
+ * Enhanced folder drag over handler that supports both notes and folders
+ */
+function handleFolderDragOverEnhanced(e) {
+    e.preventDefault();
+    
+    var folderHeader = e.target.closest('.folder-header');
+    if (!folderHeader) return;
+    
+    var targetFolder = folderHeader.getAttribute('data-folder');
+    var targetFolderId = folderHeader.getAttribute('data-folder-id');
+    
+    // Check what we're dragging
+    var dragData = window.currentDragData;
+    
+    // If dragging a folder
+    if (dragData && dragData.type === 'folder') {
+        // Prevent dropping folder on itself
+        if (dragData.folderId === targetFolderId) {
+            e.dataTransfer.dropEffect = 'none';
+            return;
+        }
+        
+        // Prevent dropping on system folders
+        if (folderHeader.classList.contains('system-folder')) {
+            e.dataTransfer.dropEffect = 'none';
+            return;
+        }
+        
+        e.dataTransfer.dropEffect = 'move';
+        folderHeader.classList.add('folder-drop-target');
+        folderHeader.classList.add('drag-over');
+        return;
+    }
+    
+    // If dragging a note (existing behavior)
+    // Prevent drag-over effect for Tags folder
+    if (targetFolder === 'Tags') {
+        e.dataTransfer.dropEffect = 'none';
+        return;
+    }
+    
+    // Allow drag-over for all other folders including Favorites
+    e.dataTransfer.dropEffect = 'move';
+    folderHeader.classList.add('drag-over');
+}
+
+/**
+ * Enhanced folder drag leave handler
+ */
+function handleFolderDragLeaveEnhanced(e) {
+    var folderHeader = e.target.closest('.folder-header');
+    if (folderHeader) {
+        folderHeader.classList.remove('drag-over');
+        folderHeader.classList.remove('folder-drop-target');
+    }
+}
+
+/**
+ * Enhanced folder drop handler that supports both notes and folders
+ */
+function handleFolderDropEnhanced(e) {
+    e.preventDefault();
+    
+    var folderHeader = e.target.closest('.folder-header');
+    if (!folderHeader) return;
+    
+    folderHeader.classList.remove('drag-over');
+    folderHeader.classList.remove('folder-drop-target');
+    
+    try {
+        var data = JSON.parse(e.dataTransfer.getData('text/plain'));
+        var targetFolder = folderHeader.getAttribute('data-folder');
+        var targetFolderId = folderHeader.getAttribute('data-folder-id');
+        
+        // Handle folder drop
+        if (data.type === 'folder') {
+            // Remove dragging class from the source folder
+            document.querySelectorAll('.folder-header.folder-dragging').forEach(function(header) {
+                header.classList.remove('folder-dragging');
+                header.style.opacity = '';
+                header.style.backgroundColor = '';
+                header.style.border = '';
+                header.style.transform = '';
+            });
+            
+            // Prevent dropping folder on itself
+            if (data.folderId === targetFolderId) {
+                return;
+            }
+            
+            // Prevent dropping on system folders
+            if (folderHeader.classList.contains('system-folder')) {
+                return;
+            }
+            
+            // Move folder to new parent
+            moveFolderToParent(data.folderId, targetFolderId);
+            return;
+        }
+        
+        // Handle note drop (existing behavior)
+        // Remove dragging class from all notes
+        document.querySelectorAll('.links_arbo_left.dragging').forEach(function(link) {
+            link.classList.remove('dragging');
+        });
+        
+        // Prevent dropping notes into the Tags folder
+        if (targetFolder === 'Tags') {
+            return;
+        }
+        
+        // Special handling for Public folder
+        if (targetFolder === 'Public') {
+            if (typeof openPublicShareModal === 'function') {
+                openPublicShareModal(data.noteId);
+            }
+            return;
+        }
+        
+        // Special handling for Favorites folder
+        if (targetFolder === 'Favorites') {
+            toggleFavorite(data.noteId);
+            return;
+        }
+        
+        // Special handling for Trash folder
+        if (targetFolder === 'Trash') {
+            deleteNote(data.noteId);
+            return;
+        }
+        
+        // Compare folder IDs to handle subfolders with same names
+        var currentFolderId = data.currentFolderId ? String(data.currentFolderId) : null;
+        var targetFolderIdStr = targetFolderId ? String(targetFolderId) : null;
+        
+        if (data.noteId && targetFolderId && currentFolderId !== targetFolderIdStr) {
+            moveNoteToTargetFolder(data.noteId, targetFolderId);
+        }
+    } catch (err) {
+        console.error('Error handling folder drop:', err);
+    }
+}
+
+/**
+ * Move folder to a new parent folder
+ */
+function moveFolderToParent(folderId, newParentFolderId) {
+    var requestData = {
+        workspace: selectedWorkspace || getSelectedWorkspace(),
+        new_parent_folder_id: newParentFolderId
+    };
+    
+    fetch('/api/v1/folders/' + folderId + '/move', {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json', 
+            'Accept': 'application/json' 
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify(requestData)
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data && data.success) {
+            // Folder moved successfully - reload page
+            location.reload();
+        } else {
+            var err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';
+            showNotificationPopup('Error moving folder: ' + err, 'error');
+        }
+    })
+    .catch(function(error) {
+        showNotificationPopup('Error moving folder: ' + error.message, 'error');
+    });
+}
+
+/**
+ * Move folder to root (remove from parent folder)
+ */
+function moveFolderToRoot(folderId) {
+    var requestData = {
+        workspace: selectedWorkspace || getSelectedWorkspace(),
+        new_parent_folder_id: null
+    };
+    
+    fetch('/api/v1/folders/' + folderId + '/move', {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json', 
+            'Accept': 'application/json' 
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify(requestData)
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data && data.success) {
+            // Folder moved to root successfully - reload page
+            location.reload();
+        } else {
+            var err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';
+            showNotificationPopup('Error moving folder: ' + err, 'error');
+        }
+    })
+    .catch(function(error) {
+        showNotificationPopup('Error moving folder: ' + error.message, 'error');
     });
 }
 
