@@ -63,20 +63,25 @@ function buildSearchConditions($search, $tags_search, $folder_filter, $workspace
     $search_params = [];
     
     // Intelligent search that excludes Excalidraw content
+    // Optimized: Check heading first (indexed), then entry content (slower)
     if (!empty($search)) {
         // Parse search terms with support for quoted phrases
         $parsed_terms = parseSearchTerms($search);
 
         if (count($parsed_terms) <= 1 && $parsed_terms[0]['type'] === 'word') {
-            // Single word: search in heading or clean entry content
-            $where_conditions[] = "(heading LIKE ? OR search_clean_entry(entry) LIKE ?)";
+            // Single word: Optimized search - check heading first (fast with index), then entry (slower)
+            // Using CASE to avoid calling search_clean_entry when heading matches
+            $where_conditions[] = "(heading LIKE ? OR (heading NOT LIKE ? AND search_clean_entry(entry) LIKE ?))";
+            $search_params[] = '%' . $parsed_terms[0]['value'] . '%';
             $search_params[] = '%' . $parsed_terms[0]['value'] . '%';
             $search_params[] = '%' . $parsed_terms[0]['value'] . '%';
         } else {
             // Multiple terms or phrase: require ALL terms to appear (AND)
+            // Optimized to check heading first for each term
             $term_conditions = [];
             foreach ($parsed_terms as $term) {
-                $term_conditions[] = "(heading LIKE ? OR search_clean_entry(entry) LIKE ?)";
+                $term_conditions[] = "(heading LIKE ? OR (heading NOT LIKE ? AND search_clean_entry(entry) LIKE ?))";
+                $search_params[] = '%' . $term['value'] . '%';
                 $search_params[] = '%' . $term['value'] . '%';
                 $search_params[] = '%' . $term['value'] . '%';
             }

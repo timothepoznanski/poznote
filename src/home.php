@@ -13,12 +13,13 @@ include 'db_connect.php';
 $pageWorkspace = trim(getWorkspaceFilter());
 $currentLang = getUserLanguage();
 
-// Count for Tags folder
+// Count for Tags folder - OPTIMIZED: only fetch tags when needed
 $tag_count = 0;
 $unique_tags = [];
 try {
     if (isset($con)) {
-        $query = "SELECT tags FROM entries WHERE trash = 0";
+        // Optimized: Only fetch rows with non-empty tags to reduce processing
+        $query = "SELECT tags FROM entries WHERE trash = 0 AND tags IS NOT NULL AND tags != ''";
         $params = [];
         if (!empty($pageWorkspace)) {
             $query .= " AND workspace = ?";
