@@ -351,6 +351,7 @@
     height: 16px;
     margin-right: 8px;
     vertical-align: middle;
+    opacity: 0.75; /* lighten icons so they're not too dark */
 }
 .callout .callout-title-text {
     font-weight: 600;

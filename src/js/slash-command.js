@@ -998,6 +998,19 @@
                 ]
             },
             {
+                id: 'quote',
+                icon: 'fa-info-circle',
+                label: t('slash_menu.quote', null, 'Quote'),
+                submenu: [
+                    { id: 'plain', label: t('slash_menu.blockquote', null, 'Blockquote'), action: () => insertMarkdownAtCursor('> ', 0) },
+                    { id: 'note', label: t('slash_menu.callout_note', null, 'Note'), action: () => insertMarkdownAtCursor('> Note\n> ', 0) },
+                    { id: 'tip', label: t('slash_menu.callout_tip', null, 'Tip'), action: () => insertMarkdownAtCursor('> Tip\n> ', 0) },
+                    { id: 'important', label: t('slash_menu.callout_important', null, 'Important'), action: () => insertMarkdownAtCursor('> Important\n> ', 0) },
+                    { id: 'warning', label: t('slash_menu.callout_warning', null, 'Warning'), action: () => insertMarkdownAtCursor('> Warning\n> ', 0) },
+                    { id: 'caution', label: t('slash_menu.callout_caution', null, 'Caution'), action: () => insertMarkdownAtCursor('> Caution\n> ', 0) }
+                ]
+            },
+            {
                 id: 'image',
                 icon: 'fa-image',
                 label: t('slash_menu.image', null, 'Image'),
