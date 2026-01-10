@@ -135,6 +135,7 @@ try {
     <link type="text/css" rel="stylesheet" href="css/excalidraw.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/excalidraw-unified.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/note-reference.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/search-replace.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/folder-icon-modal.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="js/katex/katex.min.css?v=<?php echo $v; ?>"/>
@@ -146,6 +147,7 @@ try {
     <script src="js/bulletlist.js?v=<?php echo $v; ?>"></script>
     <script src="js/note-loader-common.js?v=<?php echo $v; ?>"></script>
     <script src="js/note-reference.js?v=<?php echo $v; ?>"></script>
+    <script src="js/search-replace.js?v=<?php echo $v; ?>"></script>
     <script src="js/markdown-handler.js?v=<?php echo $v; ?>"></script>
     <script src="js/mermaid/mermaid.min.js?v=<?php echo $v; ?>"></script>
     <script src="js/katex/katex.min.js?v=<?php echo $v; ?>"></script>
@@ -423,6 +425,11 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="toolbar-btn btn-code text-format-btn" title="' . t_h('editor.toolbar.code_block') . '" data-action="toggle-code-block"><i class="fa-code"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-inline-code text-format-btn" title="' . t_h('editor.toolbar.inline_code') . '" data-action="toggle-inline-code"><i class="fa-terminal"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-eraser text-format-btn" title="' . t_h('editor.toolbar.clear_formatting') . '" data-action="exec-remove-format"><i class="fa-eraser"></i></button>';
+                    
+                    // Search and replace button (for note and markdown types)
+                    if ($note_type === 'note' || $note_type === 'markdown') {
+                        echo '<button type="button" class="toolbar-btn btn-search-replace note-action-btn" title="' . t_h('editor.toolbar.search_replace', [], 'Search and replace') . '" data-action="open-search-replace-modal" data-note-id="'.$row['id'].'"><i class="fa-search"></i></button>';
+                    }
                 
                     // Task list order button (only visible for tasklist notes)
                     if ($note_type === 'tasklist') {
@@ -581,6 +588,32 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="toolbar-btn btn-info note-action-btn" title="'.t_h('common.information', [], 'Information').'" data-action="show-note-info" data-note-id="'.$row['id'].'" data-created="'.htmlspecialchars($final_created, ENT_QUOTES).'" data-updated="'.htmlspecialchars($final_updated, ENT_QUOTES).'" data-folder="'.htmlspecialchars($folder_name, ENT_QUOTES).'" data-favorite="'.$is_favorite.'" data-tags="'.htmlspecialchars($tags_data, ENT_QUOTES).'" data-attachments-count="'.$attachments_count.'"><i class="fa-info-circle"></i></button>';
                 
                     echo '</div>';
+                    
+                    // Search and replace bar (hidden by default) - inside note-header
+                    if ($note_type === 'note' || $note_type === 'markdown') {
+                        echo '<div class="search-replace-bar" id="searchReplaceBar'.$row['id'].'" style="display: none;">';
+                        echo '<div class="search-replace-controls">';
+                        echo '<div class="search-replace-input-group">';
+                        echo '<input type="text" class="search-replace-input" id="searchInput'.$row['id'].'" placeholder="'.t_h('search_replace.search_placeholder', [], 'Find...').'" autocomplete="off">';
+                        echo '<span class="search-replace-count" id="searchCount'.$row['id'].'"></span>';
+                        echo '</div>';
+                        echo '<div class="search-replace-buttons">';
+                        echo '<button type="button" class="search-replace-btn search-replace-toggle-btn" id="searchToggleReplaceBtn'.$row['id'].'" title="'.t_h('search_replace.toggle_replace', [], 'Toggle replace').'"><i class="fa-chevron-right"></i></button>';
+                        echo '<button type="button" class="search-replace-btn search-replace-close-btn" id="searchCloseBtn'.$row['id'].'" title="'.t_h('search_replace.close', [], 'Close').'"><i class="fa-times"></i></button>';
+                        echo '</div>';
+                        echo '</div>';
+                        echo '<div class="search-replace-replace-row" id="searchReplaceRow'.$row['id'].'" style="display: none;">';
+                        echo '<div class="search-replace-input-group">';
+                        echo '<input type="text" class="search-replace-input" id="replaceInput'.$row['id'].'" placeholder="'.t_h('search_replace.replace_placeholder', [], 'Replace...').'" autocomplete="off">';
+                        echo '</div>';
+                        echo '<div class="search-replace-buttons">';
+                        echo '<button type="button" class="search-replace-btn" id="replaceBtn'.$row['id'].'" title="'.t_h('search_replace.replace_one', [], 'Replace').'">'.t_h('search_replace.replace', [], 'Replace').'</button>';
+                        echo '<button type="button" class="search-replace-btn" id="replaceAllBtn'.$row['id'].'" title="'.t_h('search_replace.replace_all', [], 'Replace All').'">'.t_h('search_replace.replace_all', [], 'All').'</button>';
+                        echo '</div>';
+                        echo '</div>';
+                        echo '</div>';
+                    }
+                    
                     echo '</div>';
                 
                     // Tags container with folder: keep a hidden input for JS but remove the visible icon/input.

@@ -3543,6 +3543,8 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-grip-vertical::before { content: "\f58e"; }
 .fa-grip-lines-vertical::before { content: "\f7a5"; }
 .fa-times-circle::before { content: "\f057"; }
+.fa-times::before { content: "\f00d"; }
+.fa-chevron-right::before { content: "\f054"; }
 .fa-arrow-up::before { content: "\f062"; }
 .fa-arrow-down::before { content: "\f063"; }
 .fa-briefcase::before { content: "\f0b1"; }
@@ -3733,6 +3735,8 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 
 .fa-question-circle,
 .fa-times-circle,
+.fa-times,
+.fa-chevron-right,
 .fa-eye,
 .fa-clock,
 .fa-cloud,
