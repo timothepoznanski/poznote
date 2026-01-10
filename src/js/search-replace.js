@@ -295,10 +295,20 @@
 
         const replaceText = replaceInput.value;
         const currentMatch = state.matches[state.currentIndex];
+        const noteEntry = getNoteEntry(noteId);
 
-        if (currentMatch && currentMatch.parentNode) {
-            const textNode = document.createTextNode(replaceText);
-            currentMatch.parentNode.replaceChild(textNode, currentMatch);
+        if (currentMatch && currentMatch.parentNode && noteEntry) {
+            // Create a range and select the match
+            const range = document.createRange();
+            range.selectNodeContents(currentMatch);
+            
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            // Use execCommand to make the replacement undoable
+            noteEntry.focus();
+            document.execCommand('insertText', false, replaceText);
 
             // Remove from matches array
             state.matches.splice(state.currentIndex, 1);
@@ -339,14 +349,27 @@
 
         const replaceText = replaceInput.value;
         const count = state.matches.length;
+        const noteEntry = getNoteEntry(noteId);
 
-        // Replace all matches
-        state.matches.forEach(match => {
+        if (!noteEntry) return;
+
+        // Focus the note to enable execCommand
+        noteEntry.focus();
+
+        // Replace all matches in reverse order to maintain correct positions
+        for (let i = state.matches.length - 1; i >= 0; i--) {
+            const match = state.matches[i];
             if (match && match.parentNode) {
-                const textNode = document.createTextNode(replaceText);
-                match.parentNode.replaceChild(textNode, match);
+                const range = document.createRange();
+                range.selectNodeContents(match);
+                
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+                
+                document.execCommand('insertText', false, replaceText);
             }
-        });
+        }
 
         // Clear matches
         state.matches = [];
@@ -381,6 +404,18 @@
             closeBtn.addEventListener('click', () => closeSearchBar(noteId));
         }
 
+        // Previous button
+        const prevBtn = document.getElementById('searchPrevBtn' + noteId);
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => prevMatch(noteId));
+        }
+
+        // Next button
+        const nextBtn = document.getElementById('searchNextBtn' + noteId);
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => nextMatch(noteId));
+        }
+
         // Toggle replace button
         const toggleBtn = document.getElementById('searchToggleReplaceBtn' + noteId);
         if (toggleBtn) {
@@ -406,6 +441,13 @@
             searchInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     closeSearchBar(noteId);
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (e.shiftKey) {
+                        prevMatch(noteId);
+                    } else {
+                        nextMatch(noteId);
+                    }
                 }
             });
         }
