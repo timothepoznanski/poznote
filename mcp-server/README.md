@@ -17,9 +17,27 @@ Allows an AI to **read**, **search** and **write** notes.
 
 ## Installation
 
+### Option 1: Using pipx (recommended for system-wide installation)
+
 ```bash
 cd mcp-server
+pipx install -e .
+```
+
+### Option 2: Using a virtual environment
+
+```bash
+cd mcp-server
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -e .
+```
+
+### Option 3: Using uv (fastest)
+
+```bash
+cd mcp-server
+uv pip install -e .
 ```
 
 ## Configuration
@@ -45,7 +63,14 @@ POZNOTE_DEBUG=1
 
 ### Starting the server
 
+If installed with pipx:
 ```bash
+poznote-mcp
+```
+
+If using a virtual environment:
+```bash
+source venv/bin/activate  # Activate venv first
 poznote-mcp
 # or
 python -m poznote_mcp.server
