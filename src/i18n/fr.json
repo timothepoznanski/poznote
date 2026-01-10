@@ -206,10 +206,10 @@
     "page": {
       "title": "Gérer les pièces jointes",
       "subtitle": "Gérer les pièces jointes de la note :",
-      "upload_section_title": "Téléverser une nouvelle pièce jointe",
+      "upload_section_title": "Choisissez une nouvelle pièce jointe",
       "drag_drop_info": "Vous pouvez glisser-déposer votre fichier ci-dessous :",
       "all_types_accepted": "Tous types de fichiers acceptés (max 200 Mo)",
-      "upload_button": "Téléverser le fichier",
+      "upload_button": "Choisissez le fichier",
       "current_attachments": "Pièces jointes actuelles",
       "loading_attachments": "Chargement des pièces jointes...",
       "preview_alt": "Aperçu",
@@ -1078,20 +1078,6 @@
       "processing_long": "Restauration en cours... Cela peut prendre quelques instants.",
       "importing_notes": "Importation des notes en cours..."
     },
-    "chunked": {
-      "preparing_upload": "Préparation du téléversement...",
-      "errors": {
-        "no_file_provided": "Aucun fichier fourni",
-        "upload_failed": "Échec du téléversement",
-        "assembly_failed": "Échec de l’assemblage",
-        "cleanup_failed_prefix": "Échec du nettoyage :"
-      },
-      "status_uploading": "Téléversement... {{percent}} % terminé",
-      "status_completed": "Restauration terminée avec succès !",
-      "status_error": "Erreur : {{message}}",
-      "retry": "Réessayer",
-      "success_html": "<strong>Succès !</strong> Votre sauvegarde a été restaurée."
-    },
     "units": {
       "bytes": "octets",
       "kb": "Ko",
@@ -1133,19 +1119,15 @@
         "description": "Restaurez votre base de données Poznote à partir d'une sauvegarde complète"
       },
       "standard_restore": {
-        "title": "Votre fichier de sauvegarde fait-il moins de 500 Mo ?",
-        "description": "Téléversez une sauvegarde complète au format ZIP. Cette méthode est rapide et simple.",
-        "helper": "Taille maximale recommandée : 500 Mo. Pour les fichiers plus volumineux, utilisez le téléversement par blocs ci-dessous."
-      },
-      "chunked_restore": {
-        "title": "Votre fichier de sauvegarde fait-il entre 500 Mo et 800 Mo ?",
-        "description": "Téléversez une sauvegarde complète au format ZIP. Utilisez cette méthode pour éviter les timeouts HTTP et les problèmes de mémoire.",
-        "helper": "Recommandé pour les fichiers de 500 Mo à 800 Mo. Les fichiers sont téléversés par blocs de 5 Mo."
+        "title": "Restauration classique",
+        "description": "Choisissez une sauvegarde complète au format ZIP.",
+        "helper": "Taille maximale recommandée : 500 Mo."
       },
       "direct_copy_restore": {
-        "title": "Votre fichier de sauvegarde fait-il plus de 800 Mo ?",
-        "description_prefix": "Pour les sauvegardes très volumineuses, utilisez cette méthode simple de copie directe.",
-        "description_link": "Voir la documentation pour plus de détails"
+        "title": "Restauration quand la sauvegarde classique ne fonctionne pas (timeout si le fichier zip est trop gros)",
+        "step1": "1. Copiez le fichier dans le conteneur :",
+        "docker_command": "docker cp /chemin/vers/backup.zip poznote-webserver-1:/tmp/backup_restore.zip",
+        "step2": "2. Cliquez ci-dessous pour restaurer"
       },
       "individual_notes": {
         "title": "Vous voulez importer des fichiers HTML, Markdown, texte ou des archives ZIP ?",
@@ -1179,17 +1161,8 @@
       },
       "complete_restore": {
         "title": "Restauration complète ?",
-        "warning_large_html": "<strong>Avertissement :</strong> Ce fichier fait {{size}} Mo. Le téléversement standard peut être lent ou échouer pour les fichiers volumineux. Envisagez plutôt le téléversement par blocs.<br><br><strong>Cela remplacera votre base de données, restaurera toutes les notes et pièces jointes pour <span style=\"color: #dc3545; font-weight: bold;\">tous les espaces de travail</span>.</strong>",
+        "warning_large_html": "<strong>Avertissement :</strong> Ce fichier fait {{size}} Mo. Le téléversement standard peut être lent ou échouer pour les fichiers volumineux.<br><br><strong>Cela remplacera votre base de données, restaurera toutes les notes et pièces jointes pour <span style=\"color: #dc3545; font-weight: bold;\">tous les espaces de travail</span>.</strong>",
         "warning_html": "<strong>Avertissement :</strong> Cela remplacera votre base de données, restaurera toutes les notes et pièces jointes pour <span style=\"color: #dc3545; font-weight: bold;\">tous les espaces de travail</span>.",
-        "body_html": "Cela remplacera votre base de données, restaurera toutes les notes et pièces jointes pour <span style=\"color: #dc3545; font-weight: bold;\">tous les espaces de travail</span>.",
-        "confirm": "Oui, restauration complète"
-      },
-      "chunked_restore": {
-        "note_small_html": "<strong>Note :</strong> Ce fichier fait {{size}} Mo. Le téléversement standard est généralement plus rapide pour les petits fichiers, mais le téléversement par blocs fonctionnera aussi.<br><br><strong>Cela remplacera votre base de données, restaurera toutes les notes et pièces jointes pour <span style=\"color: #dc3545; font-weight: bold;\">tous les espaces de travail</span>.</strong>",
-        "warning_html": "<strong>Avertissement :</strong> Cela remplacera votre base de données, restaurera toutes les notes et pièces jointes pour <span style=\"color: #dc3545; font-weight: bold;\">tous les espaces de travail</span>."
-      },
-      "complete_restore_chunked": {
-        "title": "Restauration complète (par blocs) ?",
         "body_html": "Cela remplacera votre base de données, restaurera toutes les notes et pièces jointes pour <span style=\"color: #dc3545; font-weight: bold;\">tous les espaces de travail</span>.",
         "confirm": "Oui, restauration complète"
       },
@@ -1220,7 +1193,6 @@
       "no_zip_selected_restore": "Veuillez sélectionner une sauvegarde complète au format ZIP avant de lancer la restauration.",
       "no_zip_selected_notes": "Veuillez sélectionner un fichier ZIP contenant des notes HTML avant de lancer l’import.",
       "no_zip_selected_attachments": "Veuillez sélectionner un fichier ZIP contenant des pièces jointes avant de lancer l’import.",
-      "no_zip_selected_chunked": "Veuillez sélectionner une sauvegarde complète au format ZIP avant de lancer la restauration par blocs.",
       "no_sql_selected_title": "Aucun fichier SQL sélectionné",
       "no_sql_selected_body": "Veuillez sélectionner un fichier SQL avant de lancer l’import de la base de données.",
       "no_files_selected_title": "Aucun fichier sélectionné",
@@ -1237,11 +1209,7 @@
     "inline": {
       "standard": {
         "button": "Démarrer la restauration complète (standard)",
-        "too_large": "⚠️ Le fichier fait {{size}} Mo. Le téléversement standard peut être lent ou échouer — envisagez le téléversement par blocs ci-dessous."
-      },
-      "chunked": {
-        "button_prefix": "Démarrer la restauration par blocs",
-        "small_file_note": "Note : pour les petits fichiers, le téléversement standard est généralement plus rapide. Mais vous pouvez quand même utiliser le téléversement par blocs si vous le souhaitez."
+        "too_large": "⚠️ Le fichier fait {{size}} Mo. Le téléversement standard peut être lent ou échouer."
       }
     },
     "drag_drop": {
@@ -1249,8 +1217,7 @@
       "complete_backup": "Déposer le ZIP de sauvegarde ici",
       "database": "Déposer le fichier SQL ici",
       "notes": "Déposer le ZIP de notes ici",
-      "attachments": "Déposer le ZIP de pièces jointes ici",
-      "chunked_backup": "Déposer le ZIP de sauvegarde ici"
+      "attachments": "Déposer le ZIP de pièces jointes ici"
     }
   },
   "markdown_guide": {

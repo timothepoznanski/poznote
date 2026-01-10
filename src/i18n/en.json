@@ -1081,20 +1081,6 @@
       "processing_long": "Processing restore... This may take a few moments.",
       "importing_notes": "Importing notes..."
     },
-    "chunked": {
-      "preparing_upload": "Preparing upload...",
-      "errors": {
-        "no_file_provided": "No file provided",
-        "upload_failed": "Upload failed",
-        "assembly_failed": "Assembly failed",
-        "cleanup_failed_prefix": "Cleanup failed:"
-      },
-      "status_uploading": "Uploading... {{percent}}% complete",
-      "status_completed": "Restoration completed successfully!",
-      "status_error": "Error: {{message}}",
-      "retry": "Retry",
-      "success_html": "<strong>Success!</strong> Your backup has been restored."
-    },
     "units": {
       "bytes": "Bytes",
       "kb": "KB",
@@ -1136,19 +1122,15 @@
         "description": "Restore your Poznote database from a complete backup"
       },
       "standard_restore": {
-        "title": "Is your backup file less than 500MB?",
-        "description": "Upload a complete backup ZIP file. This method is fast and simple.",
-        "helper": "Maximum recommended size: 500MB. For larger files, use chunked upload below."
-      },
-      "chunked_restore": {
-        "title": "Is your backup file between 500MB and 800MB?",
-        "description": "Upload a complete backup ZIP file. Use this method to avoid HTTP timeouts and memory issues.",
-        "helper": "Recommended for files over 500MB to 800MB. Files are uploaded in 5MB chunks."
+        "title": "Standard Restore",
+        "description": "Choose a complete backup ZIP file.",
+        "helper": "Maximum recommended size: 500MB."
       },
       "direct_copy_restore": {
-        "title": "Is your backup file over 800MB?",
-        "description_prefix": "For very large backup files, use this simple direct file copy method.",
-        "description_link": "See documentation for details"
+        "title": "Restore when standard restore doesn't work (timeout if zip file is too large)",
+        "step1": "1. Copy the file to container:",
+        "docker_command": "docker cp /path/to/backup.zip poznote-webserver-1:/tmp/backup_restore.zip",
+        "step2": "2. Click below to restore"
       },
       "individual_notes": {
         "title": "Want to import HTML, Markdown, text files or ZIP archives?",
@@ -1179,8 +1161,7 @@
       "complete_backup": "Drop backup ZIP here",
       "database": "Drop SQL file here",
       "notes": "Drop notes ZIP here",
-      "attachments": "Drop attachments ZIP here",
-      "chunked_backup": "Drop backup ZIP here"
+      "attachments": "Drop attachments ZIP here"
     },
     "modals": {
       "import_confirm": {
@@ -1190,17 +1171,8 @@
       },
       "complete_restore": {
         "title": "Complete Restore?",
-        "warning_large_html": "<strong>Warning:</strong> This file is {{size}}MB. Standard upload may be slow or fail for large files. Consider using chunked upload instead.<br><br><strong>This will replace your database, restore all notes, and attachments for <span style=\"color: #dc3545; font-weight: bold;\">all workspaces</span>.</strong>",
+        "warning_large_html": "<strong>Warning:</strong> This file is {{size}}MB. Standard upload may be slow or fail for large files.<br><br><strong>This will replace your database, restore all notes, and attachments for <span style=\"color: #dc3545; font-weight: bold;\">all workspaces</span>.</strong>",
         "warning_html": "<strong>Warning:</strong> This will replace your database, restore all notes, and attachments for <span style=\"color: #dc3545; font-weight: bold;\">all workspaces</span>.",
-        "body_html": "This will replace your database, restore all notes, and attachments for <span style=\"color: #dc3545; font-weight: bold;\">all workspaces</span>.",
-        "confirm": "Yes, Complete Restore"
-      },
-      "chunked_restore": {
-        "note_small_html": "<strong>Note:</strong> This file is {{size}}MB. Standard upload is usually faster for small files, but chunked upload will work too.<br><br><strong>This will replace your database, restore all notes, and attachments for <span style=\"color: #dc3545; font-weight: bold;\">all workspaces</span>.</strong>",
-        "warning_html": "<strong>Warning:</strong> This will replace your database, restore all notes, and attachments for <span style=\"color: #dc3545; font-weight: bold;\">all workspaces</span>."
-      },
-      "complete_restore_chunked": {
-        "title": "Complete Restore (Chunked)?",
         "body_html": "This will replace your database, restore all notes, and attachments for <span style=\"color: #dc3545; font-weight: bold;\">all workspaces</span>.",
         "confirm": "Yes, Complete Restore"
       },
@@ -1231,7 +1203,6 @@
       "no_zip_selected_restore": "Please select a complete backup ZIP file before proceeding with the restore.",
       "no_zip_selected_notes": "Please select a ZIP file containing HTML notes before proceeding with the import.",
       "no_zip_selected_attachments": "Please select a ZIP file containing attachments before proceeding with the import.",
-      "no_zip_selected_chunked": "Please select a complete backup ZIP file before proceeding with the chunked restore.",
       "no_sql_selected_title": "No SQL File Selected",
       "no_sql_selected_body": "Please select a SQL file before proceeding with the database import.",
       "no_files_selected_title": "No Files Selected",
@@ -1248,11 +1219,7 @@
     "inline": {
       "standard": {
         "button": "Start Complete Restore (Standard)",
-        "too_large": "⚠️ File is {{size}}MB. Standard upload may be slow or fail - consider using chunked upload below."
-      },
-      "chunked": {
-        "button_prefix": "Start Chunked Restore",
-        "small_file_note": "Note: For small files, standard upload is usually faster. But you can still use chunked upload if preferred."
+        "too_large": "⚠️ File is {{size}}MB. Standard upload may be slow or fail."
       }
     }
   },

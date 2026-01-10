@@ -117,20 +117,6 @@ function handleRestoreImportClick(e) {
             proceedWithCompleteRestore();
             break;
 
-        // Chunked restore actions
-        case 'start-chunked-restore':
-            startChunkedRestore();
-            break;
-        case 'show-chunked-restore-confirmation':
-            showChunkedRestoreConfirmation();
-            break;
-        case 'hide-chunked-restore-confirmation':
-            hideChunkedRestoreConfirmation();
-            break;
-        case 'proceed-chunked-restore':
-            proceedWithChunkedRestore();
-            break;
-
         // Direct copy restore actions
         case 'show-direct-copy-restore-confirmation':
             showDirectCopyRestoreConfirmation();
@@ -219,7 +205,6 @@ document.addEventListener('DOMContentLoaded', function() {
             hideAttachmentsImportConfirmation();
             hideIndividualNotesImportConfirmation();
             hideCompleteRestoreConfirmation();
-            hideChunkedRestoreConfirmation();
             hideDirectCopyRestoreConfirmation();
             hideCustomAlert();
         }
@@ -253,10 +238,9 @@ document.addEventListener('DOMContentLoaded', function() {
     } catch (e) { /* ignore */ }
 });
 
-// Setup file input change listeners for standard and chunked restore
+// Setup file input change listeners for standard restore
 function setupFileInputListeners() {
     const completeFileInput = document.getElementById('complete_backup_file');
-    const chunkedFileInput = document.getElementById('chunked_backup_file');
 
     if (completeFileInput) {
         completeFileInput.addEventListener('change', function(e) {
@@ -274,14 +258,14 @@ function setupFileInputListeners() {
                     if (sizeMB > 500) {
                         sizeText.textContent = tr(
                             'restore_import.inline.standard.too_large',
-                            '⚠️ File is ' + sizeMB.toFixed(1) + 'MB. Standard upload may be slow or fail - consider using chunked upload below.',
+                            '⚠️ File is ' + sizeMB.toFixed(1) + 'MB. Standard upload may be slow or fail for large files.',
                             { size: sizeMB.toFixed(1) }
                         );
                         sizeText.style.color = '#dc3545';
                     } else {
                         sizeText.textContent = tr(
                             'restore_import.sections.standard_restore.helper',
-                            'Maximum recommended size: 500MB. For larger files, use chunked upload below.'
+                            'Maximum recommended size: 500MB.'
                         );
                         sizeText.style.color = '#6c757d';
                     }
@@ -289,55 +273,7 @@ function setupFileInputListeners() {
             }
         });
     }
-
-    if (chunkedFileInput) {
-        chunkedFileInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const button = document.getElementById('chunkedRestoreBtn');
-            const sizeText = document.querySelector('#chunkedUploadForm small');
-            
-            if (file && file.name.toLowerCase().endsWith('.zip')) {
-                const sizeMB = file.size / (1024 * 1024);
-                
-                button.disabled = false;
-                button.textContent = tr('restore_import.inline.chunked.button_prefix', 'Start Chunked Restore') + ' (' + formatFileSize(file.size) + ')';
-                
-                if (sizeText) {
-                    if (sizeMB < 500) {
-                        sizeText.textContent = tr(
-                            'restore_import.inline.chunked.small_file_note',
-                            'Note: For small files, standard upload is usually faster. But you can still use chunked upload if preferred.'
-                        );
-                    } else {
-                        sizeText.textContent = tr(
-                            'restore_import.sections.chunked_restore.helper',
-                            'Recommended for files over 500MB to 800MB. Files are uploaded in 5MB chunks.'
-                        );
-                    }
-                }
-            } else {
-                button.disabled = true;
-                button.textContent = tr('restore_import.inline.chunked.button_prefix', 'Start Chunked Restore');
-                if (sizeText) {
-                    sizeText.textContent = tr(
-                        'restore_import.sections.chunked_restore.helper',
-                        'Recommended for files over 500MB to 800MB. Files are uploaded in 5MB chunks.'
-                    );
-                }
-            }
-        });
-    }
 }
-
-// Chunked uploader reference for cleanup
-let chunkedUploader = null;
-
-// Cleanup on page unload
-window.addEventListener('beforeunload', function() {
-    if (chunkedUploader) {
-        chunkedUploader.cleanup();
-    }
-});
 
 // Complete Restore Functions
 function showCompleteRestoreConfirmation() {
@@ -361,7 +297,7 @@ function showCompleteRestoreConfirmation() {
     if (sizeMB > 500) {
         warningText.innerHTML = tr(
             'restore_import.modals.complete_restore.warning_large_html',
-            '<strong>Warning:</strong> This file is {{size}}MB. Standard upload may be slow or fail for large files. Consider using chunked upload instead.<br><br><strong>This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.</strong>',
+            '<strong>Warning:</strong> This file is {{size}}MB. Standard upload may be slow or fail for large files.<br><br><strong>This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.</strong>',
             { size: sizeMB.toFixed(1) }
         );
     } else {
@@ -609,52 +545,6 @@ function hideIndividualNotesImportSpinner() {
     } catch (e) { /* ignore */ }
 }
 
-// Chunked Restore Functions
-function showChunkedRestoreConfirmation() {
-    const fileInput = document.getElementById('chunked_backup_file');
-    if (!fileInput.files.length) {
-        showCustomAlert(
-            tr('restore_import.alerts.no_zip_selected_title', 'No ZIP File Selected'),
-            tr('restore_import.alerts.no_zip_selected_chunked', 'Please select a complete backup ZIP file before proceeding with the chunked restore.')
-        );
-        return;
-    }
-    
-    const file = fileInput.files[0];
-    const sizeMB = file.size / (1024 * 1024);
-    
-    // Update modal content based on file size
-    const modal = document.getElementById('chunkedRestoreConfirmModal');
-    const modalContent = modal.querySelector('.import-confirm-modal-content');
-    const warningText = modalContent.querySelector('p');
-    
-    if (sizeMB < 500) {
-        warningText.innerHTML = tr(
-            'restore_import.modals.chunked_restore.note_small_html',
-            '<strong>Note:</strong> This file is {{size}}MB. Standard upload is usually faster for small files, but chunked upload will work too.<br><br><strong>This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.</strong>',
-            { size: sizeMB.toFixed(1) }
-        );
-    } else {
-        warningText.innerHTML = tr(
-            'restore_import.modals.chunked_restore.warning_html',
-            '<strong>Warning:</strong> This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.',
-            null
-        );
-    }
-    
-    modal.style.display = 'flex';
-}
-
-function hideChunkedRestoreConfirmation() {
-    document.getElementById('chunkedRestoreConfirmModal').style.display = 'none';
-}
-
-function proceedWithChunkedRestore() {
-    hideChunkedRestoreConfirmation();
-    // Call the actual chunked restore function
-    startChunkedRestore();
-}
-
 // Direct Copy Restore Functions
 function showDirectCopyRestoreConfirmation() {
     document.getElementById('directCopyRestoreConfirmModal').style.display = 'flex';
@@ -715,70 +605,6 @@ function hideRestoreSpinner() {
             btn.setAttribute('aria-disabled', 'false');
         }
     } catch (e) { /* ignore */ }
-}
-
-// Chunked restore function (called after confirmation)
-function startChunkedRestore() {
-    const fileInput = document.getElementById('chunked_backup_file');
-    const file = fileInput.files[0];
-    
-    if (!file) {
-        alert(tr('restore_import.errors.select_backup_first', 'Please select a backup file first.'));
-        return;
-    }
-
-    // Show progress UI
-    document.getElementById('chunkedUploadForm').style.display = 'none';
-    document.getElementById('chunkedUploadStatus').style.display = 'block';
-    
-    const progressBar = document.getElementById('chunkedProgress');
-    const statusText = document.getElementById('chunkedStatusText');
-    
-    // Initialize uploader
-    chunkedUploader = new ChunkedUploader({
-        chunkSize: 5 * 1024 * 1024, // 5MB chunks
-        onProgress: (percent) => {
-            progressBar.style.width = percent + '%';
-            progressBar.textContent = Math.round(percent) + '%';
-            statusText.textContent = tr(
-                'restore_import.chunked.status_uploading',
-                'Uploading... {{percent}}% complete',
-                { percent: Math.round(percent) }
-            );
-        },
-        onComplete: () => {
-            progressBar.style.width = '100%';
-            progressBar.textContent = '100%';
-            statusText.textContent = '';
-            
-            // Add a success message
-            setTimeout(() => {
-                const successMsg = document.createElement('div');
-                successMsg.className = 'alert alert-success';
-                successMsg.innerHTML = tr(
-                    'restore_import.chunked.success_html',
-                    '<strong>Success!</strong> Your backup has been restored.'
-                );
-                document.getElementById('chunkedUploadStatus').appendChild(successMsg);
-            }, 500);
-        },
-        onError: (error) => {
-            statusText.textContent = tr('restore_import.chunked.status_error', 'Error: {{message}}', { message: error.message });
-            progressBar.style.backgroundColor = '#dc3545';
-            
-            // Show retry option
-            const retryBtn = document.createElement('button');
-            retryBtn.className = 'btn btn-secondary';
-            retryBtn.textContent = tr('restore_import.chunked.retry', 'Retry');
-            retryBtn.onclick = () => {
-                location.reload();
-            };
-            document.getElementById('chunkedUploadStatus').appendChild(retryBtn);
-        }
-    });
-
-    // Start upload
-    chunkedUploader.uploadFile(file, 'api/v1/backups/restore');
 }
 
 // Load workspaces for individual notes import
@@ -899,8 +725,7 @@ function setupDragAndDrop() {
         { id: 'complete_backup_file', key: 'restore_import.drag_drop.complete_backup', fallback: 'Drop backup ZIP here' },
         { id: 'backup_file', key: 'restore_import.drag_drop.database', fallback: 'Drop SQL file here' },
         { id: 'notes_file', key: 'restore_import.drag_drop.notes', fallback: 'Drop notes ZIP here' },
-        { id: 'attachments_file', key: 'restore_import.drag_drop.attachments', fallback: 'Drop attachments ZIP here' },
-        { id: 'chunked_backup_file', key: 'restore_import.drag_drop.chunked_backup', fallback: 'Drop backup ZIP here' }
+        { id: 'attachments_file', key: 'restore_import.drag_drop.attachments', fallback: 'Drop attachments ZIP here' }
     ];
     
     fileInputs.forEach(config => {

@@ -486,7 +486,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
     try {
         // Move/copy uploaded file
         if ($isLocalFile) {
-            // For locally created files (like from chunked upload)
+            // For locally created files
             if (!copy($uploadedFile['tmp_name'], $tempFile)) {
                 return ['success' => false, 'error' => 'Error copying local file'];
             }

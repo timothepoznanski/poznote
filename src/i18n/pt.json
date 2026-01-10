@@ -1071,20 +1071,6 @@
       "processing_long": "Processando restauração... Isso pode levar alguns momentos.",
       "importing_notes": "Importando notas..."
     },
-    "chunked": {
-      "preparing_upload": "Preparando upload...",
-      "errors": {
-        "no_file_provided": "Nenhum arquivo fornecido",
-        "upload_failed": "Falha no upload",
-        "assembly_failed": "Falha na montagem",
-        "cleanup_failed_prefix": "Falha na limpeza:"
-      },
-      "status_uploading": "Enviando... {{percent}}% concluído",
-      "status_completed": "Restauração concluída com sucesso!",
-      "status_error": "Erro: {{message}}",
-      "retry": "Tentar novamente",
-      "success_html": "<strong>Sucesso!</strong> Seu backup foi restaurado."
-    },
     "units": {
       "bytes": "Bytes",
       "kb": "KB",
@@ -1126,19 +1112,15 @@
         "description": "Restaure seu banco de dados Poznote a partir de um backup completo"
       },
       "standard_restore": {
-        "title": "Seu arquivo de backup tem menos de 500MB?",
-        "description": "Envie um arquivo de backup ZIP completo. Este método é rápido e simples.",
-        "helper": "Tamanho recomendado máximo: 500MB. Para arquivos maiores, use upload em partes abaixo."
-      },
-      "chunked_restore": {
-        "title": "Seu arquivo de backup tem entre 500MB e 800MB?",
-        "description": "Envie um arquivo de backup ZIP completo. Use este método para evitar tempos limite de HTTP e problemas de memória.",
-        "helper": "Recomendado para arquivos com mais de 500MB a 800MB. Os arquivos são enviados em pedaços de 5MB."
+        "title": "Restauração padrão",
+        "description": "Escolha um arquivo de backup ZIP completo.",
+        "helper": "Tamanho recomendado máximo: 500MB."
       },
       "direct_copy_restore": {
-        "title": "Seu arquivo de backup tem mais de 800MB?",
-        "description_prefix": "Para arquivos de backup muito grandes, use este método simples de cópia direta de arquivo.",
-        "description_link": "Veja a documentação para detalhes"
+        "title": "Restauração quando a restauração padrão não funciona (timeout se o arquivo zip for muito grande)",
+        "step1": "1. Copie o arquivo para o contêiner:",
+        "docker_command": "docker cp /caminho/para/backup.zip poznote-webserver-1:/tmp/backup_restore.zip",
+        "step2": "2. Clique abaixo para restaurar"
       },
       "individual_notes": {
         "title": "Quer importar arquivos HTML, Markdown, de texto ou arquivos ZIP?",
@@ -1169,8 +1151,7 @@
       "complete_backup": "Soltar ZIP de backup aqui",
       "database": "Soltar arquivo SQL aqui",
       "notes": "Soltar ZIP de notas aqui",
-      "attachments": "Soltar ZIP de anexos aqui",
-      "chunked_backup": "Soltar ZIP de backup aqui"
+      "attachments": "Soltar ZIP de anexos aqui"
     },
     "modals": {
       "import_confirm": {
@@ -1180,17 +1161,8 @@
       },
       "complete_restore": {
         "title": "Restaurar Completamente?",
-        "warning_large_html": "<strong>Aviso:</strong> Este arquivo tem {{size}}MB. O upload padrão pode ser lento ou falhar para arquivos grandes. Considere usar upload em partes.<br><br><strong>Isso substituirá seu banco de dados, restaurará todas as notas e anexos para <span style=\"color: #dc3545; font-weight: bold;\">todos os espaços de trabalho</span>.</strong>",
+        "warning_large_html": "<strong>Aviso:</strong> Este arquivo tem {{size}}MB. O upload padrão pode ser lento ou falhar para arquivos grandes.<br><br><strong>Isso substituirá seu banco de dados, restaurará todas as notas e anexos para <span style=\"color: #dc3545; font-weight: bold;\">todos os espaços de trabalho</span>.</strong>",
         "warning_html": "<strong>Aviso:</strong> Isso substituirá seu banco de dados, restaurará todas as notas e anexos para <span style=\"color: #dc3545; font-weight: bold;\">todos os espaços de trabalho</span>.",
-        "body_html": "Isso substituirá seu banco de dados, restaurará todas as notas e anexos para <span style=\"color: #dc3545; font-weight: bold;\">todos os espaços de trabalho</span>.",
-        "confirm": "Sim, Restauração Completa"
-      },
-      "chunked_restore": {
-        "note_small_html": "<strong>Nota:</strong> Este arquivo tem {{size}}MB. O upload padrão geralmente é mais rápido para arquivos pequenos, mas o upload em partes funcionará também.<br><br><strong>Isso substituirá seu banco de dados, restaurará todas as notas e anexos para <span style=\"color: #dc3545; font-weight: bold;\">todos os espaços de trabalho</span>.</strong>",
-        "warning_html": "<strong>Aviso:</strong> Isso substituirá seu banco de dados, restaurará todas as notas e anexos para <span style=\"color: #dc3545; font-weight: bold;\">todos os espaços de trabalho</span>."
-      },
-      "complete_restore_chunked": {
-        "title": "Restauração Completa (Em Partes)?",
         "body_html": "Isso substituirá seu banco de dados, restaurará todas as notas e anexos para <span style=\"color: #dc3545; font-weight: bold;\">todos os espaços de trabalho</span>.",
         "confirm": "Sim, Restauração Completa"
       },
@@ -1221,7 +1193,6 @@
       "no_zip_selected_restore": "Por favor, selecione um arquivo de backup ZIP completo antes de prosseguir.",
       "no_zip_selected_notes": "Por favor, selecione um arquivo ZIP contendo notas HTML antes de prosseguir com a importação.",
       "no_zip_selected_attachments": "Por favor, selecione um arquivo ZIP contendo anexos antes de prosseguir com a importação.",
-      "no_zip_selected_chunked": "Por favor, selecione um arquivo de backup ZIP completo antes de prosseguir com a restauração em partes.",
       "no_sql_selected_title": "Nenhum Arquivo SQL Selecionado",
       "no_sql_selected_body": "Por favor, selecione um arquivo SQL antes de prosseguir com a importação do banco de dados.",
       "no_files_selected_title": "Nenhum Arquivo Selecionado",
@@ -1238,11 +1209,7 @@
     "inline": {
       "standard": {
         "button": "Iniciar Restauração Completa (Padrão)",
-        "too_large": "⚠️ Arquivo tem {{size}}MB. O upload padrão pode ser lento ou falhar - considere usar upload em partes abaixo."
-      },
-      "chunked": {
-        "button_prefix": "Iniciar Restauração em Partes",
-        "small_file_note": "Nota: Para arquivos pequenos, o upload padrão geralmente é mais rápido. Mas você ainda pode usar restauração em partes se preferir."
+        "too_large": "⚠️ Arquivo tem {{size}}MB. O upload padrão pode ser lento ou falhar."
       }
     }
   },

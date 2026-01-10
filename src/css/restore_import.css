@@ -501,37 +501,6 @@ body {
     to { transform: rotate(360deg); }
 }
 
-/* Chunked upload progress bar */
-.progress-bar {
-    width: 100%;
-    height: 24px;
-    background-color: #f0f0f0;
-    border-radius: 12px;
-    overflow: hidden;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-}
-
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #007cba 0%, #005a8a 100%);
-    border-radius: 12px;
-    text-align: center;
-    color: white;
-    font-weight: bold;
-    font-size: 12px;
-    line-height: 24px;
-    transition: width 0.3s ease;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
-}
-
-#chunkedStatusText {
-    font-size: 14px;
-    color: #555;
-    margin-top: 8px;
-    font-weight: 500;
-}
-
 /* Backup list styles */
 .backup-list {
     margin-top: 15px;
