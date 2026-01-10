@@ -270,6 +270,9 @@
      * Go to next match
      */
     function nextMatch(noteId) {
+        // Relancer la recherche pour avoir les résultats à jour
+        findMatches(noteId);
+        
         const state = getNoteState(noteId);
         if (state.matches.length === 0) return;
 
@@ -281,6 +284,9 @@
      * Go to previous match
      */
     function prevMatch(noteId) {
+        // Relancer la recherche pour avoir les résultats à jour
+        findMatches(noteId);
+        
         const state = getNoteState(noteId);
         if (state.matches.length === 0) return;
 
