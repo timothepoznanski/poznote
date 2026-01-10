@@ -1363,69 +1363,6 @@ paths:
         '200':
           description: Backup deleted
 
-  /backups/restore/chunk:
-    post:
-      tags: [Backups]
-      summary: Upload a backup chunk for restore
-      description: Used for large file uploads via chunked transfer
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                action:
-                  type: string
-                  enum: [upload_chunk]
-                file_id:
-                  type: string
-                chunk_index:
-                  type: integer
-                total_chunks:
-                  type: integer
-                file_name:
-                  type: string
-                chunk:
-                  type: string
-                  format: binary
-      responses:
-        '200':
-          description: Chunk uploaded
-
-  /backups/restore/assemble:
-    post:
-      tags: [Backups]
-      summary: Assemble uploaded chunks and restore
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                file_id:
-                  type: string
-                file_name:
-                  type: string
-      responses:
-        '200':
-          description: Backup restored
-
-  /backups/restore/cleanup:
-    post:
-      tags: [Backups]
-      summary: Cleanup temporary chunk files
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                file_id:
-                  type: string
-      responses:
-        '200':
-          description: Cleanup completed
-
   # ==================
   # System Endpoints
   # ==================

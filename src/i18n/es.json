@@ -1067,20 +1067,6 @@
       "processing_long": "Procesando restauración... Esto puede tomar unos momentos.",
       "importing_notes": "Importando notas..."
     },
-    "chunked": {
-      "preparing_upload": "Preparando subida...",
-      "errors": {
-        "no_file_provided": "No se proporcionó archivo",
-        "upload_failed": "Subida fallida",
-        "assembly_failed": "Ensamblaje fallido",
-        "cleanup_failed_prefix": "Limpieza fallida:"
-      },
-      "status_uploading": "Subiendo... {{percent}}% completado",
-      "status_completed": "Restauración completada exitosamente!",
-      "status_error": "Error: {{message}}",
-      "retry": "Reintentar",
-      "success_html": "<strong>Éxito!</strong> Tu copia de seguridad ha sido restaurada."
-    },
     "units": {
       "bytes": "Bytes",
       "kb": "KB",
@@ -1122,19 +1108,15 @@
         "description": "Restaure su base de datos Poznote desde una copia de seguridad completa"
       },
       "standard_restore": {
-        "title": "¿Tu archivo de copia de seguridad es menor a 500MB?",
-        "description": "Sube un archivo de copia de seguridad completa ZIP. Este método es rápido y simple.",
-        "helper": "Tamaño recomendado máximo: 500MB. Para archivos más grandes, usa subida por chunks a continuación."
-      },
-      "chunked_restore": {
-        "title": "¿Tu archivo de copia de seguridad está entre 500MB y 800MB?",
-        "description": "Sube un archivo de copia de seguridad completa ZIP. Usa este método para evitar timeouts HTTP y problemas de memoria.",
-        "helper": "Recomendado para archivos sobre 500MB a 800MB. Los archivos se suben en chunks de 5MB."
+        "title": "Restauración estándar",
+        "description": "Elige un archivo de copia de seguridad completa ZIP.",
+        "helper": "Tamaño recomendado máximo: 500MB."
       },
       "direct_copy_restore": {
-        "title": "¿Tu archivo de copia de seguridad es mayor a 800MB?",
-        "description_prefix": "Para archivos de copia de seguridad muy grandes, usa este método simple de copia directa de archivo.",
-        "description_link": "Ver documentación para detalles"
+        "title": "Restauración cuando la restauración estándar no funciona (timeout si el archivo zip es demasiado grande)",
+        "step1": "1. Copia el archivo al contenedor:",
+        "docker_command": "docker cp /ruta/al/backup.zip poznote-webserver-1:/tmp/backup_restore.zip",
+        "step2": "2. Haz clic a continuación para restaurar"
       },
       "individual_notes": {
         "title": "¿Quieres importar archivos HTML, Markdown, de texto o archivos ZIP?",
@@ -1151,7 +1133,6 @@
         "files_info": "Varios archivos (máx {{maxIndividualFiles}}) o archivo ZIP único (máx {{maxZipFiles}} archivos). Estos límites se pueden cambiar,",
         "files_info_link": "consulte la documentación",
         "supported_formats": "Soportados: .html, .md, .markdown, .txt, .zip",
-        "title": "¿Quieres importar archivos HTML, Markdown, de texto o archivos ZIP?",
         "description_html": "Importe archivos HTML, Markdown o de texto individuales, o un archivo ZIP que contenga varios archivos.<br><br>El título será creado automáticamente desde el nombre del archivo (sin la extensión), a menos que se defina una clave title en un front matter para archivos MD.",
         "helper": "Puedes seleccionar múltiples archivos a la vez (máximo 50 archivos). Formatos soportados: .html, .md, .markdown, .txt"
       }
@@ -1165,8 +1146,7 @@
       "complete_backup": "Soltar ZIP de respaldo aquí",
       "database": "Soltar archivo SQL aquí",
       "notes": "Soltar ZIP de notas aquí",
-      "attachments": "Soltar ZIP de adjuntos aquí",
-      "chunked_backup": "Soltar ZIP de respaldo aquí"
+      "attachments": "Soltar ZIP de adjuntos aquí"
     },
     "modals": {
       "import_confirm": {
@@ -1176,17 +1156,8 @@
       },
       "complete_restore": {
         "title": "¿Restaurar completamente?",
-        "warning_large_html": "<strong>Advertencia:</strong> Este archivo es {{size}}MB. La subida estándar puede ser lenta o fallar para archivos grandes. Considera usar subida por chunks en su lugar.<br><br><strong>Esto reemplazará tu base de datos, restaurará todas las notas y adjuntos para <span style=\"color: #dc3545; font-weight: bold;\">todos los espacios de trabajo</span>.</strong>",
+        "warning_large_html": "<strong>Advertencia:</strong> Este archivo es {{size}}MB. La subida estándar puede ser lenta o fallar para archivos grandes.<br><br><strong>Esto reemplazará tu base de datos, restaurará todas las notas y adjuntos para <span style=\"color: #dc3545; font-weight: bold;\">todos los espacios de trabajo</span>.</strong>",
         "warning_html": "<strong>Advertencia:</strong> Esto reemplazará tu base de datos, restaurará todas las notas y adjuntos para <span style=\"color: #dc3545; font-weight: bold;\">todos los espacios de trabajo</span>.",
-        "body_html": "Esto reemplazará tu base de datos, restaurará todas las notas y adjuntos para <span style=\"color: #dc3545; font-weight: bold;\">todos los espacios de trabajo</span>.",
-        "confirm": "Sí, Restaurar completamente"
-      },
-      "chunked_restore": {
-        "note_small_html": "<strong>Nota:</strong> Este archivo es {{size}}MB. La subida estándar es generalmente más rápida para archivos pequeños, pero la subida por chunks funcionará también.<br><br><strong>Esto reemplazará tu base de datos, restaurará todas las notas y adjuntos para <span style=\"color: #dc3545; font-weight: bold;\">todos los espacios de trabajo</span>.</strong>",
-        "warning_html": "<strong>Advertencia:</strong> Esto reemplazará tu base de datos, restaurará todas las notas y adjuntos para <span style=\"color: #dc3545; font-weight: bold;\">todos los espacios de trabajo</span>."
-      },
-      "complete_restore_chunked": {
-        "title": "¿Restaurar completamente (por chunks)?",
         "body_html": "Esto reemplazará tu base de datos, restaurará todas las notas y adjuntos para <span style=\"color: #dc3545; font-weight: bold;\">todos los espacios de trabajo</span>.",
         "confirm": "Sí, Restaurar completamente"
       },
@@ -1217,7 +1188,6 @@
       "no_zip_selected_restore": "Por favor selecciona un archivo de copia de seguridad completa ZIP antes de proceder con la restauración.",
       "no_zip_selected_notes": "Por favor selecciona un archivo ZIP que contenga notas HTML antes de proceder con la importación.",
       "no_zip_selected_attachments": "Por favor selecciona un archivo ZIP que contenga adjuntos antes de proceder con la importación.",
-      "no_zip_selected_chunked": "Por favor selecciona un archivo de copia de seguridad completa ZIP antes de proceder con la restauración por chunks.",
       "no_sql_selected_title": "No se seleccionó archivo SQL",
       "no_sql_selected_body": "Por favor selecciona un archivo SQL antes de proceder con la importación de base de datos.",
       "no_files_selected_title": "No se seleccionaron archivos",
@@ -1234,11 +1204,7 @@
     "inline": {
       "standard": {
         "button": "Iniciar restauración completa (Estándar)",
-        "too_large": "⚠️ El archivo es {{size}}MB. La subida estándar puede ser lenta o fallar - considera usar subida por chunks a continuación."
-      },
-      "chunked": {
-        "button_prefix": "Iniciar restauración por chunks",
-        "small_file_note": "Nota: Para archivos pequeños, la subida estándar es generalmente más rápida. Pero puedes usar subida por chunks si lo prefieres."
+        "too_large": "⚠️ El archivo es {{size}}MB. La subida estándar puede ser lenta o fallar."
       }
     }
   },
@@ -1590,5 +1556,20 @@
     "filter_placeholder": "Filtrar por nombre de carpeta o token...",
     "empty": "No se encontraron carpetas compartidas.",
     "confirm_revoke": "¿Está seguro de que desea revocar el uso compartido de esta carpeta? Todas las notas de esta carpeta también dejarán de estar compartidas."
+  },
+  "search_replace": {
+    "search_placeholder": "Buscar...",
+    "replace_placeholder": "Reemplazar...",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "toggle_replace": "Mostrar/Ocultar reemplazar",
+    "close": "Cerrar",
+    "replace": "Reemplazar",
+    "replace_one": "Reemplazar",
+    "replace_all": "Reemplazar todo",
+    "result": "resultado",
+    "results": "resultados",
+    "no_matches": "Sin resultados",
+    "replaced_all": "{{count}} reemplazo(s) realizado(s)"
   }
 }

@@ -1067,20 +1067,6 @@
       "processing_long": "Wiederherstellung wird verarbeitet... Dies kann einige Momente dauern.",
       "importing_notes": "Notizen werden importiert..."
     },
-    "chunked": {
-      "preparing_upload": "Upload wird vorbereitet...",
-      "errors": {
-        "no_file_provided": "Keine Datei bereitgestellt",
-        "upload_failed": "Upload fehlgeschlagen",
-        "assembly_failed": "Zusammenstellung fehlgeschlagen",
-        "cleanup_failed_prefix": "Bereinigung fehlgeschlagen:"
-      },
-      "status_uploading": "Wird hochgeladen... {{percent}}% abgeschlossen",
-      "status_completed": "Wiederherstellung erfolgreich abgeschlossen!",
-      "status_error": "Fehler: {{message}}",
-      "retry": "Erneut versuchen",
-      "success_html": "<strong>Erfolg!</strong> Ihre Sicherung wurde wiederhergestellt."
-    },
     "units": {
       "bytes": "Bytes",
       "kb": "KB",
@@ -1122,19 +1108,15 @@
         "description": "Stellen Sie Ihre Poznote-Datenbank aus einer vollständigen Sicherung wieder her"
       },
       "standard_restore": {
-        "title": "Ist Ihre Sicherungsdatei kleiner als 500MB?",
-        "description": "Laden Sie eine vollständige ZIP-Sicherungsdatei hoch. Diese Methode ist schnell und einfach.",
-        "helper": "Empfohlene maximale Größe: 500MB. Für größere Dateien verwenden Sie den Chunk-Upload unten."
-      },
-      "chunked_restore": {
-        "title": "Ist Ihre Sicherungsdatei zwischen 500MB und 800MB?",
-        "description": "Laden Sie eine vollständige ZIP-Sicherungsdatei hoch. Verwenden Sie diese Methode, um HTTP-Timeouts und Speicherprobleme zu vermeiden.",
-        "helper": "Empfohlen für Dateien über 500MB bis 800MB. Dateien werden in 5MB-Chunks hochgeladen."
+        "title": "Standardwiederherstellung",
+        "description": "Wählen Sie eine vollständige ZIP-Sicherungsdatei.",
+        "helper": "Empfohlene maximale Größe: 500MB."
       },
       "direct_copy_restore": {
-        "title": "Ist Ihre Sicherungsdatei über 800MB?",
-        "description_prefix": "Für sehr große Sicherungsdateien verwenden Sie diese einfache direkte Dateikopiermethode.",
-        "description_link": "Siehe Dokumentation für Details"
+        "title": "Wiederherstellung, wenn die Standardwiederherstellung nicht funktioniert (Timeout, wenn die ZIP-Datei zu groß ist)",
+        "step1": "1. Kopieren Sie die Datei in den Container:",
+        "docker_command": "docker cp /pfad/zur/backup.zip poznote-webserver-1:/tmp/backup_restore.zip",
+        "step2": "2. Klicken Sie unten, um wiederherzustellen"
       },
       "individual_notes": {
         "title": "Möchten Sie HTML-, Markdown-, Textdateien oder ZIP-Archive importieren?",
@@ -1151,7 +1133,6 @@
         "files_info": "Mehrere Dateien (max {{maxIndividualFiles}}) oder einzelnes ZIP-Archiv (max {{maxZipFiles}} Dateien). Diese Limits können geändert werden,",
         "files_info_link": "siehe Dokumentation",
         "supported_formats": "Unterstützt: .html, .md, .markdown, .txt, .zip",
-        "title": "Möchten Sie HTML-, Markdown-, Textdateien oder ZIP-Archive importieren?",
         "description_html": "Importieren Sie einzelne HTML-, Markdown- oder Textdateien oder ein ZIP-Archiv mit mehreren Dateien.<br><br>Der Titel wird automatisch aus dem Dateinamen erstellt (ohne Erweiterung), es sei denn, ein Titelschlüssel ist in einem Front-Matter für MD-Dateien definiert.",
         "helper": "Sie können mehrere Dateien auf einmal auswählen (Maximum 50 Dateien). Unterstützte Formate: .html, .md, .markdown, .txt"
       }
@@ -1165,8 +1146,7 @@
       "complete_backup": "Sicherungs-ZIP hier ablegen",
       "database": "SQL-Datei hier ablegen",
       "notes": "Notizen-ZIP hier ablegen",
-      "attachments": "Anhänge-ZIP hier ablegen",
-      "chunked_backup": "Sicherungs-ZIP hier ablegen"
+      "attachments": "Anhänge-ZIP hier ablegen"
     },
     "modals": {
       "import_confirm": {
@@ -1176,17 +1156,8 @@
       },
       "complete_restore": {
         "title": "Vollständige Wiederherstellung?",
-        "warning_large_html": "<strong>Warnung:</strong> Diese Datei ist {{size}}MB. Standard-Upload kann langsam sein oder fehlschlagen für große Dateien. Erwägen Sie Chunk-Upload stattdessen.<br><br><strong>Dies ersetzt Ihre Datenbank, stellt alle Notizen und Anhänge für <span style=\"color: #dc3545; font-weight: bold;\">alle Arbeitsbereiche</span> wieder her.</strong>",
+        "warning_large_html": "<strong>Warnung:</strong> Diese Datei ist {{size}}MB. Standard-Upload kann langsam sein oder fehlschlagen für große Dateien.<br><br><strong>Dies ersetzt Ihre Datenbank, stellt alle Notizen und Anhänge für <span style=\"color: #dc3545; font-weight: bold;\">alle Arbeitsbereiche</span> wieder her.</strong>",
         "warning_html": "<strong>Warnung:</strong> Dies ersetzt Ihre Datenbank, stellt alle Notizen und Anhänge für <span style=\"color: #dc3545; font-weight: bold;\">alle Arbeitsbereiche</span> wieder her.",
-        "body_html": "Dies ersetzt Ihre Datenbank, stellt alle Notizen und Anhänge für <span style=\"color: #dc3545; font-weight: bold;\">alle Arbeitsbereiche</span> wieder her.",
-        "confirm": "Ja, Vollständige Wiederherstellung"
-      },
-      "chunked_restore": {
-        "note_small_html": "<strong>Hinweis:</strong> Diese Datei ist {{size}}MB. Standard-Upload ist normalerweise schneller für kleine Dateien, aber Chunk-Upload funktioniert auch.<br><br><strong>Dies ersetzt Ihre Datenbank, stellt alle Notizen und Anhänge für <span style=\"color: #dc3545; font-weight: bold;\">alle Arbeitsbereiche</span> wieder her.</strong>",
-        "warning_html": "<strong>Warnung:</strong> Dies ersetzt Ihre Datenbank, stellt alle Notizen und Anhänge für <span style=\"color: #dc3545; font-weight: bold;\">alle Arbeitsbereiche</span> wieder her."
-      },
-      "complete_restore_chunked": {
-        "title": "Vollständige Wiederherstellung (Chunked)?",
         "body_html": "Dies ersetzt Ihre Datenbank, stellt alle Notizen und Anhänge für <span style=\"color: #dc3545; font-weight: bold;\">alle Arbeitsbereiche</span> wieder her.",
         "confirm": "Ja, Vollständige Wiederherstellung"
       },
@@ -1217,7 +1188,6 @@
       "no_zip_selected_restore": "Bitte wählen Sie eine vollständige ZIP-Sicherungsdatei aus, bevor Sie fortfahren.",
       "no_zip_selected_notes": "Bitte wählen Sie eine ZIP-Datei mit HTML-Notizen aus, bevor Sie mit dem Import fortfahren.",
       "no_zip_selected_attachments": "Bitte wählen Sie eine ZIP-Datei mit Anhängen aus, bevor Sie mit dem Import fortfahren.",
-      "no_zip_selected_chunked": "Bitte wählen Sie eine vollständige ZIP-Sicherungsdatei aus, bevor Sie mit der Chunk-Wiederherstellung fortfahren.",
       "no_sql_selected_title": "Keine SQL-Datei ausgewählt",
       "no_sql_selected_body": "Bitte wählen Sie eine SQL-Datei aus, bevor Sie mit dem Datenbankimport fortfahren.",
       "no_files_selected_title": "Keine Dateien ausgewählt",
@@ -1234,11 +1204,7 @@
     "inline": {
       "standard": {
         "button": "Vollständige Wiederherstellung starten (Standard)",
-        "too_large": "⚠️ Datei ist {{size}}MB. Standard-Upload kann langsam sein oder fehlschlagen - erwägen Sie Chunk-Upload stattdessen."
-      },
-      "chunked": {
-        "button_prefix": "Chunk-Wiederherstellung starten",
-        "small_file_note": "Hinweis: Für kleine Dateien ist Standard-Upload normalerweise schneller. Aber Sie können Chunk-Upload trotzdem verwenden, falls bevorzugt."
+        "too_large": "⚠️ Datei ist {{size}}MB. Standard-Upload kann langsam sein oder fehlschlagen."
       }
     }
   },
@@ -1590,5 +1556,20 @@
     "filter_placeholder": "Nach Ordnername oder Token filtern...",
     "empty": "Keine geteilten Ordner gefunden.",
     "confirm_revoke": "Sind Sie sicher, dass Sie die Freigabe für diesen Ordner widerrufen möchten? Alle Notizen in diesem Ordner werden ebenfalls nicht mehr geteilt."
+  },
+  "search_replace": {
+    "search_placeholder": "Suchen...",
+    "replace_placeholder": "Ersetzen...",
+    "previous": "Vorherige",
+    "next": "Nächste",
+    "toggle_replace": "Ersetzen ein-/ausblenden",
+    "close": "Schließen",
+    "replace": "Ersetzen",
+    "replace_one": "Ersetzen",
+    "replace_all": "Alle ersetzen",
+    "result": "Ergebnis",
+    "results": "Ergebnisse",
+    "no_matches": "Keine Ergebnisse",
+    "replaced_all": "{{count}} Ersetzung(en) durchgeführt"
   }
 }

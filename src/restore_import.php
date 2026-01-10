@@ -2006,35 +2006,6 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             </div>
         </div>
 
-        <!-- Chunked Complete Restore Section -->
-        <div class="sub-card">
-            <div class="sub-card-header" data-action="toggle-sub-card" data-target="chunkedRestoreContent">
-                <h4>
-                    <?php echo t_h('restore_import.sections.chunked_restore.title'); ?>
-                </h4>
-            </div>
-            <div class="sub-card-content" id="chunkedRestoreContent">
-                <p><?php echo t_h('restore_import.sections.chunked_restore.description'); ?></p>
-                <div id="chunkedUploadStatus" class="initially-hidden">
-                <div class="progress-bar">
-                    <div id="chunkedProgress" class="progress-fill progress-fill-initial">0%</div>
-                </div>
-                <div id="chunkedStatusText"><?php echo t_h('restore_import.chunked.preparing_upload'); ?></div>
-            </div>
-
-            <div id="chunkedUploadForm">
-                <div class="form-group">
-                    <input type="file" id="chunked_backup_file" accept=".zip">
-                    <small class="form-text text-muted"><?php echo t_h('restore_import.sections.chunked_restore.helper'); ?></small>
-                </div>
-                
-                <button type="button" id="chunkedRestoreBtn" class="btn btn-primary" data-action="show-chunked-restore-confirmation" disabled>
-                    <?php echo t_h('restore_import.buttons.start_restore'); ?>
-                </button>
-            </div>
-            </div>
-        </div>
-
         <!-- Direct Copy Restore Section -->
         <div class="sub-card">
             <div class="sub-card-header" data-action="toggle-sub-card" data-target="directCopyRestoreContent">
@@ -2044,10 +2015,11 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             </div>
             <div class="sub-card-content" id="directCopyRestoreContent">
                 <p>
-                <?php echo t_h('restore_import.sections.direct_copy_restore.description_prefix'); ?>
-                <a href="https://github.com/timothepoznanski/poznote/blob/main/Docs/BACKUP_RESTORE_GUIDE.md" target="_blank" class="link-primary">
-                    <?php echo t_h('restore_import.sections.direct_copy_restore.description_link'); ?>
-                </a>.
+                <?php echo t_h('restore_import.sections.direct_copy_restore.step1'); ?>
+            </p>
+            <pre style="background-color: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto;"><code style="font-family: 'Consolas', 'Monaco', 'Courier New', monospace;"><?php echo t_h('restore_import.sections.direct_copy_restore.docker_command'); ?></code></pre>
+            <p>
+                <?php echo t_h('restore_import.sections.direct_copy_restore.step2'); ?>
             </p>
 
             <form method="post">
@@ -2217,23 +2189,6 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         </div>
     </div>
 
-    <!-- Chunked Restore Confirmation Modal -->
-    <div id="chunkedRestoreConfirmModal" class="import-confirm-modal">
-        <div class="import-confirm-modal-content">
-            <h3><?php echo t_h('restore_import.modals.complete_restore_chunked.title'); ?></h3>
-            <p id="chunkedRestoreWarning"><strong><?php echo t_h('common.warning'); ?>:</strong> <?php echo t('restore_import.modals.complete_restore_chunked.body_html'); ?></p>
-            
-            <div class="import-confirm-buttons">
-                <button type="button" class="btn-cancel" data-action="hide-chunked-restore-confirmation">
-                    <?php echo t_h('common.cancel'); ?>
-                </button>
-                <button type="button" class="btn-confirm" data-action="proceed-chunked-restore">
-                    <?php echo t_h('restore_import.modals.complete_restore_chunked.confirm'); ?>
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- Notes Import Confirmation Modal -->
     <div id="notesImportConfirmModal" class="import-confirm-modal">
         <div class="import-confirm-modal-content">
@@ -2319,6 +2274,5 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         ]);
     ?></script>
     <script src="js/restore-import.js"></script>
-    <script src="js/chunked-uploader.js"></script>
 </body>
 </html>
