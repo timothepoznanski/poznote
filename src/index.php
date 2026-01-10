@@ -499,6 +499,11 @@ $body_classes = trim($extra_body_classes);
                     // Mobile dropdown menu (actions moved here on mobile)
                     echo '<div class="dropdown-menu mobile-toolbar-menu" hidden role="menu" aria-label="'.t_h('index.toolbar.menu_actions', [], 'Menu actions').'">';
 
+                    // Search and replace button (only for note and markdown types, shown in mobile menu)
+                    if ($note_type === 'note' || $note_type === 'markdown') {
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-search-replace"><i class="fa-search"></i> '.t_h('editor.toolbar.search_replace', [], 'Search and replace').'</button>';
+                    }
+                    
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-duplicate"><i class="fa-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-move"><i class="fa-folder-open"></i> '.t_h('common.move', [], 'Move').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-download"><i class="fa-download"></i> '.t_h('common.download', [], 'Download').'</button>';
