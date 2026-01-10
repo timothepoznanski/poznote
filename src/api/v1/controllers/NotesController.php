@@ -1578,6 +1578,84 @@ class NotesController {
     }
     
     /**
+     * GET /api/v1/notes/search
+     * Search notes by text query
+     * 
+     * Query params:
+     *   - q: Search query (required)
+     *   - limit: Maximum number of results (default: 10)
+     *   - workspace: Filter by workspace
+     */
+    public function search(): void {
+        $query = $_GET['q'] ?? '';
+        $limit = isset($_GET['limit']) ? max(1, min(100, (int)$_GET['limit'])) : 10;
+        $workspace = $_GET['workspace'] ?? null;
+        
+        if (empty($query)) {
+            $this->sendError(400, 'Search query (q) is required');
+            return;
+        }
+        
+        try {
+            // Build search query using accent-insensitive search
+            $sql = "SELECT id, heading, tags, folder, folder_id, workspace, updated, created, 
+                           SUBSTR(search_clean_entry(entry), 1, 300) as excerpt
+                    FROM entries 
+                    WHERE trash = 0 
+                    AND (remove_accents(heading) LIKE remove_accents(?) 
+                         OR remove_accents(search_clean_entry(entry)) LIKE remove_accents(?))";
+            
+            $params = ['%' . $query . '%', '%' . $query . '%'];
+            
+            if ($workspace) {
+                $sql .= " AND workspace = ?";
+                $params[] = $workspace;
+            }
+            
+            $sql .= " ORDER BY 
+                        CASE WHEN remove_accents(heading) LIKE remove_accents(?) THEN 0 ELSE 1 END,
+                        updated DESC
+                      LIMIT ?";
+            $params[] = '%' . $query . '%';
+            $params[] = $limit;
+            
+            $stmt = $this->con->prepare($sql);
+            $stmt->execute($params);
+            
+            $results = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                // Highlight query in excerpt
+                $excerpt = $row['excerpt'] ?? '';
+                if (!empty($excerpt) && strlen($excerpt) >= 300) {
+                    $excerpt .= '...';
+                }
+                
+                $results[] = [
+                    'id' => (int)$row['id'],
+                    'heading' => $row['heading'] ?? 'Untitled',
+                    'tags' => $row['tags'] ?? '',
+                    'folder' => $row['folder'],
+                    'folder_id' => $row['folder_id'] ? (int)$row['folder_id'] : null,
+                    'workspace' => $row['workspace'],
+                    'excerpt' => $excerpt,
+                    'updated' => $row['updated'],
+                    'created' => $row['created'],
+                ];
+            }
+            
+            $this->sendSuccess([
+                'query' => $query,
+                'count' => count($results),
+                'results' => $results
+            ]);
+            
+        } catch (Exception $e) {
+            error_log('Error in NotesController::search: ' . $e->getMessage());
+            $this->sendError(500, 'Search error occurred');
+        }
+    }
+    
+    /**
      * Send a success response
      */
     private function sendSuccess(array $data): void {
