@@ -181,7 +181,7 @@ function displayWorkspaceMenu(menu, workspaces) {
         var currentClass = isCurrent ? ' current-workspace' : '';
         var icon = isCurrent ? 'fa-check-light-full' : 'fa-layer-group';
         
-        menuHtml += '<div class="workspace-menu-item' + currentClass + '" onclick="switchToWorkspace(\'' + workspace.name + '\')">';
+        menuHtml += '<div class="workspace-menu-item' + currentClass + '" data-workspace-name="' + workspace.name + '">';
         menuHtml += '<i class="' + icon + '"></i>';
         menuHtml += '<span>' + workspace.name + '</span>';
         menuHtml += '</div>';
@@ -189,17 +189,38 @@ function displayWorkspaceMenu(menu, workspaces) {
     
     // Add management link
     menuHtml += '<div class="workspace-menu-divider"></div>';
-    menuHtml += '<div class="workspace-menu-item" onclick="window.location.href=\'workspaces.php\';">';
+    menuHtml += '<div class="workspace-menu-item" data-action="manage-workspaces">';
     menuHtml += '<i class="fa-cog"></i>';
     menuHtml += '<span>' + tr('settings.cards.workspaces', {}, 'Workspaces') + '</span>';
     menuHtml += '</div>';
     // Add Logout right after Settings
-    menuHtml += '<div class="workspace-menu-item" onclick="window.location.href=\'logout.php\';">';
+    menuHtml += '<div class="workspace-menu-item" data-action="logout">';
     menuHtml += '<i class="fa-sign-out-alt"></i>';
     menuHtml += '<span>' + tr('workspaces.menu.logout', {}, 'Logout') + '</span>';
     menuHtml += '</div>';
     
     menu.innerHTML = menuHtml;
+    
+    // Add event listeners using delegation
+    menu.querySelectorAll('.workspace-menu-item[data-workspace-name]').forEach(function(item) {
+        item.addEventListener('click', function() {
+            switchToWorkspace(this.getAttribute('data-workspace-name'));
+        });
+    });
+    
+    var manageItem = menu.querySelector('[data-action="manage-workspaces"]');
+    if (manageItem) {
+        manageItem.addEventListener('click', function() {
+            window.location.href = 'workspaces.php';
+        });
+    }
+    
+    var logoutItem = menu.querySelector('[data-action="logout"]');
+    if (logoutItem) {
+        logoutItem.addEventListener('click', function() {
+            window.location.href = 'logout.php';
+        });
+    }
 }
 
 function switchToWorkspace(workspaceName) {
