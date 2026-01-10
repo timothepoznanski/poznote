@@ -88,7 +88,12 @@
         const bar = getSearchBar(noteId);
         
         // Clear highlights first
-        clearHighlights(noteId);
+        const hadHighlights = clearHighlights(noteId);
+        
+        // Save the note if highlights were removed (to persist the cleanup)
+        if (hadHighlights && typeof window.saveNote === 'function') {
+            window.saveNote(noteId);
+        }
         
         // Clear state
         const state = getNoteState(noteId);
@@ -145,9 +150,11 @@
      */
     function clearHighlights(noteId) {
         const noteEntry = getNoteEntry(noteId);
-        if (!noteEntry) return;
+        if (!noteEntry) return false;
 
         const highlights = noteEntry.querySelectorAll('.search-replace-highlight');
+        const hadHighlights = highlights.length > 0;
+        
         highlights.forEach(highlight => {
             const parent = highlight.parentNode;
             if (parent) {
@@ -155,6 +162,8 @@
                 parent.normalize();
             }
         });
+        
+        return hadHighlights;
     }
 
     /**
@@ -313,17 +322,38 @@
         const noteEntry = getNoteEntry(noteId);
 
         if (currentMatch && currentMatch.parentNode && noteEntry) {
-            // Create a range and select the match
-            const range = document.createRange();
-            range.selectNodeContents(currentMatch);
+            // Replace the highlight span with a text node first
+            const matchText = currentMatch.textContent;
+            const textNode = document.createTextNode(matchText);
+            const parent = currentMatch.parentNode;
+            parent.replaceChild(textNode, currentMatch);
+            parent.normalize();
             
-            const selection = window.getSelection();
-            selection.removeAllRanges();
-            selection.addRange(range);
+            // Now select the text node and replace with new text
+            const range = document.createRange();
+            range.selectNodeContents(parent);
+            // Find the text we just inserted
+            const walker = document.createTreeWalker(parent, NodeFilter.SHOW_TEXT);
+            let targetNode = null;
+            while (walker.nextNode()) {
+                if (walker.currentNode.textContent.includes(matchText)) {
+                    targetNode = walker.currentNode;
+                    const startIndex = walker.currentNode.textContent.indexOf(matchText);
+                    range.setStart(walker.currentNode, startIndex);
+                    range.setEnd(walker.currentNode, startIndex + matchText.length);
+                    break;
+                }
+            }
+            
+            if (targetNode) {
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
 
-            // Use execCommand to make the replacement undoable
-            noteEntry.focus();
-            document.execCommand('insertText', false, replaceText);
+                // Use execCommand to make the replacement undoable
+                noteEntry.focus();
+                document.execCommand('insertText', false, replaceText);
+            }
 
             // Remove from matches array
             state.matches.splice(state.currentIndex, 1);
@@ -341,8 +371,15 @@
                 }
                 scrollToMatch(noteId, state.currentIndex);
             } else {
+                // No more matches - clear any remaining highlights
+                clearHighlights(noteId);
                 if (countEl) countEl.textContent = tr('search_replace.no_matches', {}, 'No results');
                 state.currentIndex = -1;
+                
+                // Save the note to persist the cleanup
+                if (typeof window.saveNote === 'function') {
+                    setTimeout(() => window.saveNote(noteId), 100);
+                }
             }
 
             // Mark note as modified
@@ -375,17 +412,33 @@
         for (let i = state.matches.length - 1; i >= 0; i--) {
             const match = state.matches[i];
             if (match && match.parentNode) {
+                // Replace the highlight span with text node first
+                const matchText = match.textContent;
+                const textNode = document.createTextNode(matchText);
+                const parent = match.parentNode;
+                parent.replaceChild(textNode, match);
+                parent.normalize();
+                
+                // Find and select the text we just inserted
                 const range = document.createRange();
-                range.selectNodeContents(match);
-                
-                const selection = window.getSelection();
-                selection.removeAllRanges();
-                selection.addRange(range);
-                
-                document.execCommand('insertText', false, replaceText);
+                const walker = document.createTreeWalker(parent, NodeFilter.SHOW_TEXT);
+                while (walker.nextNode()) {
+                    if (walker.currentNode.textContent.includes(matchText)) {
+                        const startIndex = walker.currentNode.textContent.indexOf(matchText);
+                        range.setStart(walker.currentNode, startIndex);
+                        range.setEnd(walker.currentNode, startIndex + matchText.length);
+                        
+                        const selection = window.getSelection();
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                        
+                        document.execCommand('insertText', false, replaceText);
+                        break;
+                    }
+                }
             }
         }
-
+        
         // Clear matches
         state.matches = [];
         state.currentIndex = -1;
@@ -400,6 +453,11 @@
         // Mark note as modified
         if (typeof window.markNoteAsModified === 'function') {
             window.markNoteAsModified();
+        }
+        
+        // Save the note
+        if (typeof window.saveNote === 'function') {
+            setTimeout(() => window.saveNote(noteId), 100);
         }
     }
 
@@ -478,6 +536,33 @@
                     closeSearchBar(noteId);
                 }
             });
+        }
+
+        // Listen to note edits - clear highlights when user starts editing
+        const noteEntry = getNoteEntry(noteId);
+        if (noteEntry) {
+            const clearHighlightsOnEdit = function() {
+                const state = getNoteState(noteId);
+                // Only clear if there are active matches
+                if (state.matches.length > 0) {
+                    clearHighlights(noteId);
+                    state.matches = [];
+                    state.currentIndex = -1;
+                    
+                    // Update count display
+                    const countEl = document.getElementById('searchCount' + noteId);
+                    if (countEl) countEl.textContent = '';
+                    
+                    // Save the note to persist the cleanup
+                    if (typeof window.saveNote === 'function') {
+                        setTimeout(() => window.saveNote(noteId), 100);
+                    }
+                }
+            };
+            
+            // Attach listeners for user input
+            noteEntry.addEventListener('input', clearHighlightsOnEdit);
+            noteEntry.addEventListener('paste', clearHighlightsOnEdit);
         }
 
         // Mark as initialized

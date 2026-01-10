@@ -1594,5 +1594,20 @@
     "filter_placeholder": "Filtrar por nome da pasta ou token...",
     "empty": "Nenhuma pasta compartilhada encontrada.",
     "confirm_revoke": "Tem certeza de que deseja revogar o compartilhamento desta pasta? Todas as notas nesta pasta também deixarão de ser compartilhadas."
+  },
+  "search_replace": {
+    "search_placeholder": "Procurar...",
+    "replace_placeholder": "Substituir...",
+    "previous": "Anterior",
+    "next": "Próximo",
+    "toggle_replace": "Mostrar/Ocultar substituir",
+    "close": "Fechar",
+    "replace": "Substituir",
+    "replace_one": "Substituir",
+    "replace_all": "Substituir tudo",
+    "result": "resultado",
+    "results": "resultados",
+    "no_matches": "Sem resultados",
+    "replaced_all": "{{count}} substituição(ões) realizada(s)"
   }
 }

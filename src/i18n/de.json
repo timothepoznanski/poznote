@@ -1590,5 +1590,20 @@
     "filter_placeholder": "Nach Ordnername oder Token filtern...",
     "empty": "Keine geteilten Ordner gefunden.",
     "confirm_revoke": "Sind Sie sicher, dass Sie die Freigabe für diesen Ordner widerrufen möchten? Alle Notizen in diesem Ordner werden ebenfalls nicht mehr geteilt."
+  },
+  "search_replace": {
+    "search_placeholder": "Suchen...",
+    "replace_placeholder": "Ersetzen...",
+    "previous": "Vorherige",
+    "next": "Nächste",
+    "toggle_replace": "Ersetzen ein-/ausblenden",
+    "close": "Schließen",
+    "replace": "Ersetzen",
+    "replace_one": "Ersetzen",
+    "replace_all": "Alle ersetzen",
+    "result": "Ergebnis",
+    "results": "Ergebnisse",
+    "no_matches": "Keine Ergebnisse",
+    "replaced_all": "{{count}} Ersetzung(en) durchgeführt"
   }
 }

@@ -1601,5 +1601,20 @@
     "filter_placeholder": "Filtrer par nom de dossier ou token...",
     "empty": "Aucun dossier partagé trouvé.",
     "confirm_revoke": "Êtes-vous sûr de vouloir révoquer le partage de ce dossier ? Toutes les notes de ce dossier seront également départagées."
+  },
+  "search_replace": {
+    "search_placeholder": "Rechercher...",
+    "replace_placeholder": "Remplacer...",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "toggle_replace": "Afficher/Masquer remplacer",
+    "close": "Fermer",
+    "replace": "Remplacer",
+    "replace_one": "Remplacer",
+    "replace_all": "Tout remplacer",
+    "result": "résultat",
+    "results": "résultats",
+    "no_matches": "Aucun résultat",
+    "replaced_all": "{{count}} remplacement(s) effectué(s)"
   }
 }

@@ -1590,5 +1590,20 @@
     "filter_placeholder": "Filtrar por nombre de carpeta o token...",
     "empty": "No se encontraron carpetas compartidas.",
     "confirm_revoke": "¿Está seguro de que desea revocar el uso compartido de esta carpeta? Todas las notas de esta carpeta también dejarán de estar compartidas."
+  },
+  "search_replace": {
+    "search_placeholder": "Buscar...",
+    "replace_placeholder": "Reemplazar...",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "toggle_replace": "Mostrar/Ocultar reemplazar",
+    "close": "Cerrar",
+    "replace": "Reemplazar",
+    "replace_one": "Reemplazar",
+    "replace_all": "Reemplazar todo",
+    "result": "resultado",
+    "results": "resultados",
+    "no_matches": "Sin resultados",
+    "replaced_all": "{{count}} reemplazo(s) realizado(s)"
   }
 }

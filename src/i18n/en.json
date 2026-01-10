@@ -1604,5 +1604,20 @@
     "filter_placeholder": "Filter by folder name or token...",
     "empty": "No shared folders found.",
     "confirm_revoke": "Are you sure you want to revoke sharing for this folder? All notes in this folder will also be unshared."
+  },
+  "search_replace": {
+    "search_placeholder": "Find...",
+    "replace_placeholder": "Replace...",
+    "previous": "Previous",
+    "next": "Next",
+    "toggle_replace": "Toggle replace",
+    "close": "Close",
+    "replace": "Replace",
+    "replace_one": "Replace",
+    "replace_all": "Replace All",
+    "result": "result",
+    "results": "results",
+    "no_matches": "No results",
+    "replaced_all": "Replaced {{count}} match(es)"
   }
 }
