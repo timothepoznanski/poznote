@@ -86,13 +86,28 @@
      */
     function closeSearchBar(noteId) {
         const bar = getSearchBar(noteId);
-        if (bar) {
-            bar.style.display = 'none';
-        }
+        
+        // Clear highlights first
         clearHighlights(noteId);
+        
+        // Clear state
         const state = getNoteState(noteId);
         state.matches = [];
         state.currentIndex = -1;
+        
+        // Hide bar
+        if (bar) {
+            bar.style.display = 'none';
+        }
+        
+        // Clear inputs
+        const searchInput = document.getElementById('searchInput' + noteId);
+        const replaceInput = document.getElementById('replaceInput' + noteId);
+        const countEl = document.getElementById('searchCount' + noteId);
+        
+        if (searchInput) searchInput.value = '';
+        if (replaceInput) replaceInput.value = '';
+        if (countEl) countEl.textContent = '';
     }
 
     /**
