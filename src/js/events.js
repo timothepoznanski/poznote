@@ -554,8 +554,125 @@ function handleNoteentryKeydown(e) {
             // Remove zero-width spaces and check if empty
             var isEmpty = textContent.replace(/\u200B/g, '').trim() === '';
             
-            if (isEmpty) {
+            // Check for empty line at the end of the quote (to exit)
+            var isLineEmpty = false;
+            var nodeToRemove = null;
+            
+            if (!isEmpty && range.collapsed) {
+                var node = range.startContainer;
+                // Check if inside a block element in the quote (P or DIV)
+                var currentBlock = node.nodeType === 3 ? node.parentNode : node;
+                while (currentBlock && currentBlock !== contentToCheck && 
+                       !['P', 'DIV'].includes(currentBlock.tagName)) {
+                    currentBlock = currentBlock.parentNode;
+                }
+                
+                if (currentBlock && currentBlock !== contentToCheck && contentToCheck.contains(currentBlock)) {
+                     // Inside a block element
+                     if (currentBlock.textContent.trim() === '' && currentBlock.querySelectorAll('img').length === 0) {
+                         isLineEmpty = true;
+                         nodeToRemove = currentBlock;
+                     }
+                } else {
+                    // Check logic for naked BR at the end
+                    var parent = node.nodeType === 3 ? node.parentNode : node;
+                    
+                    if (parent === contentToCheck) {
+                         var offset = range.startOffset;
+                         
+                         if (node === contentToCheck) {
+                             // Cursor is directly in the container
+                             if (offset > 0) {
+                                 var prev = node.childNodes[offset-1];
+                                 // Check if prev is BR and we are at the end (no visible content after)
+                                 var hasContentAfter = false;
+                                 for(var i=offset; i<node.childNodes.length; i++) {
+                                     var n = node.childNodes[i];
+                                     if (n.nodeType === 1 || (n.nodeType === 3 && n.textContent.trim() !== '')) {
+                                         hasContentAfter = true;
+                                         break;
+                                     }
+                                 }
+                                 
+                                 if (prev && prev.tagName === 'BR' && !hasContentAfter) {
+                                     isLineEmpty = true;
+                                     nodeToRemove = prev;
+                                 }
+                             }
+                         } else if (node.nodeType === 3) {
+                             // Inside text node
+                             if (node.textContent.trim() === '') {
+                                 // Empty text node. Check previous sibling of this text node
+                                 var prev = node.previousSibling;
+                                 var next = node.nextSibling;
+                                 
+                                 // If prev is BR and no next sibling (or empty next)
+                                 var hasContentAfter = false;
+                                 var sibling = next;
+                                 while(sibling) {
+                                     if (sibling.nodeType === 1 || (sibling.nodeType === 3 && sibling.textContent.trim() !== '')) {
+                                         hasContentAfter = true;
+                                         break;
+                                     }
+                                     sibling = sibling.nextSibling;
+                                 }
+                                 
+                                 if (prev && prev.tagName === 'BR' && !hasContentAfter) {
+                                      isLineEmpty = true;
+                                      nodeToRemove = prev;
+                                 }
+                             }
+                         }
+                    }
+                }
+            }
+            
+            if (isEmpty || isLineEmpty) {
                 e.preventDefault();
+                
+                // Remove the empty line generating element (BR or P/DIV)
+                if (nodeToRemove) {
+                    nodeToRemove.remove();
+                } else if (isEmpty && contentToCheck && contentToCheck.nodeType === 1) {
+                    // When the quote/callout is empty, browsers often keep the caret alive by inserting
+                    // a placeholder <br> (or an empty <p><br></p>). Clean those up so we don't leave
+                    // a visible empty line inside the quote after exiting.
+                    try {
+                        // Remove direct placeholder BRs
+                        Array.prototype.slice.call(contentToCheck.childNodes).forEach(function(n) {
+                            if (n && n.nodeType === 1 && n.tagName === 'BR') {
+                                n.remove();
+                            }
+                        });
+
+                        // Remove empty block wrappers that only contain a BR/whitespace
+                        Array.prototype.slice.call(contentToCheck.querySelectorAll('p, div')).forEach(function(el) {
+                            if (!el) return;
+                            var onlyBr = el.childNodes.length === 1 && el.firstChild && el.firstChild.nodeType === 1 && el.firstChild.tagName === 'BR';
+                            var onlyWhitespace = (el.textContent || '').replace(/\u200B/g, '').trim() === '';
+                            if (onlyWhitespace && (onlyBr || el.querySelectorAll('img').length === 0) && el.querySelectorAll('pre, code, table, ul, ol, blockquote, aside').length === 0) {
+                                // If it's truly an empty wrapper, remove it
+                                if (onlyBr || el.innerHTML.trim() === '' || el.innerHTML.trim() === '<br>') {
+                                    el.remove();
+                                }
+                            }
+                        });
+
+                        // If this is an extra empty callout-body (duplicate), remove it entirely
+                        if (contentToCheck.classList && contentToCheck.classList.contains('callout-body')) {
+                            var isNowEmpty = (contentToCheck.textContent || '').replace(/\u200B/g, '').trim() === '';
+                            var hasNoElements = contentToCheck.querySelectorAll('*').length === 0;
+                            if (isNowEmpty && hasNoElements) {
+                                var prev = contentToCheck.previousElementSibling;
+                                if (prev && prev.classList && prev.classList.contains('callout-body')) {
+                                    contentToCheck.remove();
+                                }
+                            }
+                        }
+                    } catch (err) {
+                        // Best-effort cleanup only
+                    }
+                }
                 
                 // Create a new paragraph after the blockquote/callout
                 var newP = document.createElement('p');
