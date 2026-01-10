@@ -13,6 +13,34 @@ try {
     $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $con->exec('PRAGMA foreign_keys = ON');
         
+    // Register custom SQLite function to remove accents for accent-insensitive search
+    $con->sqliteCreateFunction('remove_accents', function($text) {
+        if (empty($text)) {
+            return '';
+        }
+        
+        // Convert to lowercase for case-insensitive comparison
+        $text = mb_strtolower($text, 'UTF-8');
+        
+        // Replace accented characters with their non-accented equivalents
+        $accents = [
+            'á' => 'a', 'à' => 'a', 'â' => 'a', 'ä' => 'a', 'ã' => 'a', 'å' => 'a', 'ā' => 'a',
+            'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e', 'ē' => 'e', 'ė' => 'e', 'ę' => 'e',
+            'í' => 'i', 'ì' => 'i', 'î' => 'i', 'ï' => 'i', 'ī' => 'i', 'į' => 'i',
+            'ó' => 'o', 'ò' => 'o', 'ô' => 'o', 'ö' => 'o', 'õ' => 'o', 'ø' => 'o', 'ō' => 'o',
+            'ú' => 'u', 'ù' => 'u', 'û' => 'u', 'ü' => 'u', 'ū' => 'u', 'ų' => 'u',
+            'ý' => 'y', 'ÿ' => 'y',
+            'ñ' => 'n', 'ń' => 'n',
+            'ç' => 'c', 'ć' => 'c', 'č' => 'c',
+            'ş' => 's', 'š' => 's', 'ś' => 's',
+            'ž' => 'z', 'ź' => 'z', 'ż' => 'z',
+            'ł' => 'l',
+            'æ' => 'ae', 'œ' => 'oe'
+        ];
+        
+        return strtr($text, $accents);
+    }, 1);
+    
     // Register custom SQLite function to clean HTML content for search
     $con->sqliteCreateFunction('search_clean_entry', function($html) {
         if (empty($html)) {
