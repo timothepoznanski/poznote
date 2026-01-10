@@ -1137,7 +1137,6 @@
         "files_info": "Vários arquivos (máx {{maxIndividualFiles}}) ou arquivo ZIP único (máx {{maxZipFiles}} arquivos). Esses limites podem ser alterados,",
         "files_info_link": "consulte a documentação",
         "supported_formats": "Suportados: .html, .md, .markdown, .txt, .zip",
-        "title": "Quer importar arquivos HTML, Markdown, de texto ou arquivos ZIP?",
         "description_html": "Importe arquivos HTML, Markdown ou de texto individuais, ou um arquivo ZIP contendo vários arquivos.<br><br>O título será criado automaticamente a partir do nome do arquivo (sem a extensão), a menos que uma chave title seja definida em um front matter para arquivos MD.",
         "helper": "Você pode selecionar vários arquivos de uma vez (máximo 50 arquivos). Formatos suportados: .html, .md, .markdown, .txt"
       }

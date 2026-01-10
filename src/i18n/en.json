@@ -1147,7 +1147,6 @@
         "files_info": "Multiple files (max {{maxIndividualFiles}}) or single ZIP archive (max {{maxZipFiles}} files). These limits can be changed,",
         "files_info_link": "see documentation",
         "supported_formats": "Supported: .html, .md, .markdown, .txt, .zip",
-        "title": "Want to import HTML, Markdown, text files or ZIP archives?",
         "description_html": "Import individual HTML, Markdown or text files, or a ZIP archive containing multiple files.<br><br>The title will be automatically created from the file name (without the extension), unless a title key is defined in a front matter for MD files.",
         "helper": "You can select multiple files at once (maximum 50 files). Supported formats: .html, .md, .markdown, .txt"
       }

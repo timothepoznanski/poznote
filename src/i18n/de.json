@@ -1133,7 +1133,6 @@
         "files_info": "Mehrere Dateien (max {{maxIndividualFiles}}) oder einzelnes ZIP-Archiv (max {{maxZipFiles}} Dateien). Diese Limits können geändert werden,",
         "files_info_link": "siehe Dokumentation",
         "supported_formats": "Unterstützt: .html, .md, .markdown, .txt, .zip",
-        "title": "Möchten Sie HTML-, Markdown-, Textdateien oder ZIP-Archive importieren?",
         "description_html": "Importieren Sie einzelne HTML-, Markdown- oder Textdateien oder ein ZIP-Archiv mit mehreren Dateien.<br><br>Der Titel wird automatisch aus dem Dateinamen erstellt (ohne Erweiterung), es sei denn, ein Titelschlüssel ist in einem Front-Matter für MD-Dateien definiert.",
         "helper": "Sie können mehrere Dateien auf einmal auswählen (Maximum 50 Dateien). Unterstützte Formate: .html, .md, .markdown, .txt"
       }
