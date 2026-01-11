@@ -207,6 +207,10 @@ async def list_tools() -> ListToolsResult:
                             "description": "Maximum number of results (default: 10)",
                             "default": 10,
                         },
+                        "workspace": {
+                            "type": "string",
+                            "description": "Workspace name (optional, uses default workspace if not specified)",
+                        },
                     },
                     "required": ["query"],
                 },
@@ -232,6 +236,10 @@ async def list_tools() -> ListToolsResult:
                         "folder": {
                             "type": "string",
                             "description": "Folder name to place the note in",
+                        },
+                        "workspace": {
+                            "type": "string",
+                            "description": "Workspace name (optional, uses default workspace if not specified)",
                         },
                     },
                     "required": ["title", "content"],
@@ -259,6 +267,10 @@ async def list_tools() -> ListToolsResult:
                             "type": "string",
                             "description": "New tags (comma-separated)",
                         },
+                        "workspace": {
+                            "type": "string",
+                            "description": "Workspace name (optional, uses default workspace if not specified)",
+                        },
                     },
                     "required": ["id"],
                 },
@@ -277,13 +289,14 @@ async def call_tool(name: str, arguments: dict) -> CallToolResult:
         if name == "search_notes":
             query = arguments.get("query", "")
             limit = arguments.get("limit", 10)
+            workspace = arguments.get("workspace")
             
             if not query:
                 return CallToolResult(
                     content=[TextContent(type="text", text="Error: query is required")]
                 )
             
-            results = client.search_notes(query, limit=limit)
+            results = client.search_notes(query, limit=limit, workspace=workspace)
             
             # Format results
             formatted = []
@@ -314,12 +327,14 @@ async def call_tool(name: str, arguments: dict) -> CallToolResult:
             content = arguments.get("content", "")
             tags = arguments.get("tags")
             folder = arguments.get("folder")
+            workspace = arguments.get("workspace")
             
             result = client.create_note(
                 title=title,
                 content=content,
                 tags=tags,
                 folder_name=folder,
+                workspace=workspace,
             )
             
             if result:
@@ -342,6 +357,7 @@ async def call_tool(name: str, arguments: dict) -> CallToolResult:
         
         elif name == "update_note":
             note_id = arguments.get("id")
+            workspace = arguments.get("workspace")
             
             if not note_id:
                 return CallToolResult(
@@ -353,6 +369,7 @@ async def call_tool(name: str, arguments: dict) -> CallToolResult:
                 content=arguments.get("content"),
                 title=arguments.get("title"),
                 tags=arguments.get("tags"),
+                workspace=workspace,
             )
             
             if result:

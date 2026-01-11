@@ -138,6 +138,7 @@ class PoznoteClient:
         content: str | None = None,
         title: str | None = None,
         tags: str | None = None,
+        workspace: str | None = None,
     ) -> dict | None:
         """
         Update an existing note
@@ -156,7 +157,12 @@ class PoznoteClient:
         if not payload:
             return None
         
-        response = self.client.patch(f"/notes/{note_id}", json=payload)
+        params = {}
+        ws = workspace or self.default_workspace
+        if ws:
+            params["workspace"] = ws
+        
+        response = self.client.patch(f"/notes/{note_id}", json=payload, params=params)
         
         if response.status_code == 404:
             return None
