@@ -1,32 +1,78 @@
-# Ignore data directories (Docker volumes for database, entries, attachments)
-data/
+# Combined .gitignore (merged from root and mcp-server/.gitignore)
 
-# Environment files (these should not be committed)
-.env
-
-# Docker volumes and temporary files
-.docker/
-docker-data/
-
-# Node.js dependencies
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# PHP dependencies
-src/vendor/
-
-# IDE files
-.vscode/
-.idea/
-
-# System files
+# OS files
 .DS_Store
 Thumbs.db
 
 # Logs
 *.log
+pip-log.txt
+pip-delete-this-directory.txt
 
-# Scripts with sensitive credentials
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker / Data
+.docker/
+docker-data/
+data/
+
+# PHP
+src/vendor/
+
+# Python byte-compiled / caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+venv.bak/
+venv*/
+
+# Build / packaging
+.Python
+build/
+dist/
+downloads/
+eggs/
+.eggs/
+parts/
+sdist/
+var/
+*.egg-info/
+installdir/
+
+# Test / coverage / cache
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+.mypy_cache/
+.pyre/
+
+# IDE
+.vscode/
+.idea/
+
+# Environment variables / secrets
+.env
+.env*
+
+# Misc scripts
 clear_all_except_poznote.sh
+
+# Poznote MCP specific
+src/poznote_mcp/__pycache__/

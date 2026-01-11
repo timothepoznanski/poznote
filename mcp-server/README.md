@@ -17,28 +17,52 @@ Allows an AI to **read**, **search** and **write** notes.
 
 ## Installation
 
-### Option 1: Using pipx (recommended for system-wide installation)
+### Powershell
 
-```bash
-cd mcp-server
-pipx install -e .
+```
+git clone https://github.com/timothepoznanski/poznote.git
+cd poznote/mcp-server
+winget install python3
+Get-ChildItem 'C:\Users\XXXX\AppData\Local\Programs\Python','C:\Program Files' -Recurse -Filter 'python.exe' -ErrorAction SilentlyContinue | Select-Object FullName
+& 'C:\Users\XXXX\AppData\Local\Programs\Python\Python314\python.exe' -m venv .venv
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+. .\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -e .
+python -c "import poznote_mcp; print('poznote_mcp OK')"
+$env:POZNOTE_DEBUG = "1"  # Optional: Run server in debug mode
+python -m poznote_mcp.server
+CTRL + C
 ```
 
-### Option 2: Using a virtual environment
+### VS Code Configuration
 
-```bash
-cd mcp-server
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -e .
+Create a `C:\Users\XXXX\AppData\Roaming\Code\User\mcp.json` config file:
+
+```json
+{
+  "mcp": {
+    "servers": {
+      "poznote": {
+        "command": "C:\\Users\\XXXX\\Desktop\\mcp-server\\.venv\\Scripts\\python.exe",
+        "args": ["-m", "poznote_mcp.server"],
+        "env": {
+          "POZNOTE_API_URL": "http://localhost/api/v1",
+          "POZNOTE_USERNAME": "admin",
+          "POZNOTE_PASSWORD": "your-poznote-password"
+        }
+      }
+    }
+  }
+}
 ```
 
-### Option 3: Using uv (fastest)
+Restart VS Code.
+Check if your MCP server appears in CTRL + SHIFT + P > MCP: List Servers
 
-```bash
-cd mcp-server
-uv pip install -e .
-```
+Note: 
+
+Choose your AI model with "CTRL + SHIFT + P > MCP: List Servers > poznote > Configure model
 
 ## Configuration
 
@@ -59,70 +83,9 @@ POZNOTE_DEFAULT_WORKSPACE=Poznote
 POZNOTE_DEBUG=1
 ```
 
-## Usage
-
-### Starting the server
-
-If installed with pipx:
-```bash
-poznote-mcp
-```
-
-If using a virtual environment:
-```bash
-source venv/bin/activate  # Activate venv first
-poznote-mcp
-# or
-python -m poznote_mcp.server
-```
-
-### VS Code Configuration (GitHub Copilot)
-
-Add to your `settings.json`:
-
-```json
-{
-  "mcp": {
-    "servers": {
-      "poznote": {
-        "command": "python",
-        "args": ["-m", "poznote_mcp.server"],
-        "env": {
-          "POZNOTE_API_URL": "http://localhost/api/v1",
-          "POZNOTE_USERNAME": "admin",
-          "POZNOTE_PASSWORD": "your-password"
-        }
-      }
-    }
-  }
-}
-```
-
 ## Example Prompts
 
-Once configured, you can ask your AI:
+Once configured, you can ask in VS Code Copilot chat:
 
-- "List all my notes"
-- "Read the note about Docker"
-- "Search for notes about Docker"
-- "Create a new note about Git installation"
-- "Update note 1042 with this new content..."
-- "Read all notes related to Docker, then update the documentation by fixing inconsistencies"
-
-## Permissions
-
-| Resource/Tool    | Permission |
-|------------------|------------|
-| `notes`          | read       |
-| `note/{id}`      | read       |
-| `search_notes`   | read       |
-| `update_note`    | write      |
-| `create_note`    | write      |
-
-## 🐛 Debug
-
-To see MCP server logs:
-
-```bash
-POZNOTE_DEBUG=1 poznote-mcp
-```
+- Display the content of note ID XXXXXX.
+- Create a note "XXXXX" in poznote.
