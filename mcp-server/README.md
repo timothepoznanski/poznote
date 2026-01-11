@@ -57,8 +57,8 @@ Create a `C:\Users\XXXX\AppData\Roaming\Code\User\mcp.json` config file:
 }
 ```
 
-Restart VS Code.
-Check if your MCP server appears in CTRL + SHIFT + P > MCP: List Servers
+- Restart VS Code.
+- Check if your MCP server appears in CTRL + SHIFT + P > MCP: List Servers
 
 Note: 
 
