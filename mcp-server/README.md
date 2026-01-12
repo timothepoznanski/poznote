@@ -81,10 +81,32 @@ The MCP server consists of two main modules:
 
 ### Linux / Remote Server
 
-```bash
+Install Python (if not already installed):
+
+```
+sudo apt update
+sudo apt install python3 python3-venv python3-pip
+```
+
+Download the mcp-server folder:
+
+```
+git clone --depth 1 --filter=blob:none --sparse https://github.com/timothepoznanski/poznote.git
+cd poznote
+git sparse-checkout set mcp-server
 cd mcp-server
+```
+
+Create and activate the venv:
+
+```
 python3 -m venv venv
 source venv/bin/activate
+```
+
+Install the MCP server in your venv:
+
+```
 pip install --upgrade pip
 pip install -e .
 ```
@@ -103,16 +125,23 @@ List existing Python installations and get the full path of your python.exe:
 Get-ChildItem 'C:\Users\YOUR-USERNAME\AppData\Local\Programs\Python','C:\Program Files' -Recurse -Filter 'python.exe' -ErrorAction SilentlyContinue | Select-Object FullName
 ```
 
+Download the mcp-server folder:
+
+```
+git clone --depth 1 --filter=blob:none --sparse https://github.com/timothepoznanski/poznote.git
+cd poznote
+git sparse-checkout set mcp-server
+cd mcp-server
+```
+
 Create and activate the venv:
 
 ```
-git clone https://github.com/timothepoznanski/poznote.git
-cd poznote/mcp-server
-
 & 'C:\Users\YOUR-USERNAME\AppData\Local\Programs\Python\Python314\python.exe' -m venv .venv
 
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 . .\.venv\Scripts\Activate.ps1
+```
 ```
 
 Install the MCP server in your venv:
@@ -139,8 +168,8 @@ For remote development, VS Code launches the MCP server via SSH:
 
 **VS Code mcp.json** 
 
-`C:\Users\YOUR-USERNAME\AppData\Roaming\Code\User\mcp.json` on Windows,
-`~/.config/Code/User/mcp.json` on Linux :
+**On Windows**: `C:\Users\YOUR-USERNAME\AppData\Roaming\Code\User\mcp.json`
+**On Linux**:`~/.config/Code/User/mcp.json`
 
 ```json
 {
