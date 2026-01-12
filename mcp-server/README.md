@@ -109,6 +109,15 @@ pip install --upgrade pip
 pip install -e .
 ```
 
+Run it to test it:
+
+```
+python -c "import poznote_mcp; print('poznote_mcp OK')"
+python -m poznote_mcp.server
+```
+
+When configured in VS Code, the MCP server is automatically started by VS Code and invoked on-demand when you make requests in Copilot Chat. Therefore use "CTRL + C" to stop it.
+
 ### Windows Local
 
 Install Python:
@@ -138,7 +147,6 @@ Create and activate the venv:
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 . .\.venv\Scripts\Activate.ps1
 ```
-```
 
 Install the MCP server in your venv:
 
@@ -157,6 +165,11 @@ python -m poznote_mcp.server
 When configured in VS Code, the MCP server is automatically started by VS Code and invoked on-demand when you make requests in Copilot Chat. Therefore use "CTRL + C" to stop it.
 
 ## VS Code Configuration
+
+There are two primary methods to configure the Poznote MCP server in VS Code, depending on your setup:
+
+- **Remote (SSH)**: For accessing a Poznote instance on a remote Linux server. VS Code uses SSH tunneling to launch and communicate with the MCP server on the remote machine.
+- **Local (Windows)**: For local development on Windows, where the MCP server runs directly on your machine using stdio communication.
 
 ### Option 1: SSH Command Wrapper (Remote Linux Server)
 
@@ -205,7 +218,7 @@ For local development without SSH:
 
 ## After configuring, restart the MCP server
 
-Once configured, VS Code automatically starts and manages the MCP server on-demand when you use Copilot Chat. You can manually restart it via the command palette if needed.
+Once configured, VS Code automatically starts and manages the MCP server on-demand when you use Copilot Chat. You can manually restart it via the command palette if needed, for example, after making changes to the server code.
 
 - Check if your MCP server appears in `CTRL + SHIFT + P` > `MCP: List Servers` > `poznote` > `Restart` 
 
