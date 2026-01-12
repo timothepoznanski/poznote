@@ -30,6 +30,7 @@ import asyncio
 import json
 import logging
 import os
+import secrets
 import sys
 from datetime import datetime
 
@@ -433,21 +434,52 @@ async def run_stdio_server():
         )
 
 
-async def run_sse_server(host: str, port: int):
+async def run_sse_server(host: str, port: int, token: str | None = None):
     """Run the MCP server in SSE mode (remote HTTP)"""
     from mcp.server.sse import SseServerTransport
     from starlette.applications import Starlette
     from starlette.routing import Route, Mount
     from starlette.responses import JSONResponse
+    from starlette.middleware import Middleware
+    from starlette.middleware.base import BaseHTTPMiddleware
     import uvicorn
 
+    # Get token from parameter, env, or generate one
+    auth_token = token or os.getenv("MCP_AUTH_TOKEN")
+    auth_enabled = auth_token is not None
+    
+    if not auth_enabled:
+        # Generate a random token and display it
+        auth_token = secrets.token_urlsafe(32)
+        logger.warning("="*60)
+        logger.warning("⚠️  No MCP_AUTH_TOKEN set - generated temporary token:")
+        logger.warning(f"   {auth_token}")
+        logger.warning("   Set MCP_AUTH_TOKEN env var for a persistent token")
+        logger.warning("="*60)
+    
     logger.info(f"Starting Poznote MCP Server (SSE mode) on {host}:{port}...")
+    logger.info(f"Authentication: {'enabled' if auth_enabled else 'enabled (auto-generated)'}")
     
     # Create SSE transport
     sse = SseServerTransport("/messages/")
     
+    def verify_token(request) -> bool:
+        """Verify the Bearer token from Authorization header"""
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            provided_token = auth_header[7:]  # Remove "Bearer " prefix
+            return secrets.compare_digest(provided_token, auth_token)
+        return False
+    
     async def handle_sse(request):
         """Handle SSE connection from client"""
+        # Verify authentication
+        if not verify_token(request):
+            return JSONResponse(
+                {"error": "Unauthorized", "message": "Invalid or missing Bearer token"},
+                status_code=401
+            )
+        
         async with sse.connect_sse(
             request.scope, request.receive, request._send
         ) as streams:
@@ -459,15 +491,23 @@ async def run_sse_server(host: str, port: int):
     
     async def handle_messages(request):
         """Handle POST messages from client"""
+        # Verify authentication
+        if not verify_token(request):
+            return JSONResponse(
+                {"error": "Unauthorized", "message": "Invalid or missing Bearer token"},
+                status_code=401
+            )
+        
         await sse.handle_post_message(request.scope, request.receive, request._send)
     
     async def health_check(request):
-        """Health check endpoint"""
+        """Health check endpoint (no auth required)"""
         return JSONResponse({
             "status": "ok",
             "server": "poznote-mcp",
             "version": "1.0.0",
-            "mode": "sse"
+            "mode": "sse",
+            "auth": "required"
         })
     
     # Create Starlette app with routes

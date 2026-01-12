@@ -84,7 +84,7 @@ CTRL + C to stop it.
 ### stdio Mode (Local - Default)
 
 ```bash
-python -m poznote_mcp.server
+python3 -m poznote_mcp.server
 ```
 
 ### SSE Mode (Remote HTTP Server) ⭐
@@ -93,16 +93,19 @@ This is the recommended mode when using **VS Code Remote SSH**.
 
 ```bash
 # Start on localhost only (secure, use with SSH tunnel)
-python -m poznote_mcp.server --sse --port 3333
+export MCP_AUTH_TOKEN="your-secret-token"  # Optional: set a persistent token
+python3 -m poznote_mcp.server --sse --port 3333
 
 # Or bind to all interfaces (if behind firewall/VPN)
-python -m poznote_mcp.server --sse --host 0.0.0.0 --port 3333
+python3 -m poznote_mcp.server --sse --host 0.0.0.0 --port 3333
 ```
 
 Options:
 - `--sse`: Enable HTTP/SSE mode
 - `--host`: Bind address (default: `127.0.0.1`)
 - `--port`: Port number (default: `3333`)
+
+**Security:** SSE mode requires Bearer token authentication. If `MCP_AUTH_TOKEN` is not set, a temporary token is generated and displayed at startup.
 
 ## VS Code Configuration
 
@@ -117,7 +120,8 @@ source venv/bin/activate
 export POZNOTE_API_URL="http://localhost/api/v1"
 export POZNOTE_USERNAME="admin"
 export POZNOTE_PASSWORD="your-password"
-python -m poznote_mcp.server --sse --port 3333
+export MCP_AUTH_TOKEN="your-secret-token"  # Generate with: python3 -c "import secrets; print(secrets.token_urlsafe(32))"
+python3 -m poznote_mcp.server --sse --port 3333 --host 0.0.0.0
 ```
 
 **On your Windows machine**, create an SSH tunnel:
@@ -127,13 +131,6 @@ ssh -L 3333:localhost:3333 user@your-server
 
 **VS Code mcp.json** (`C:\Users\YOUR-USERNAME\AppData\Roaming\Code\User\mcp.json`):
 ```json
-{
-  "servers": {
-    "poznote": {
-      "url": "http://localhost:3333/sse"
-    }
-  }
-}
 ```
 
 ### Option 2: SSH Command Wrapper (Alternative)
@@ -200,6 +197,7 @@ WorkingDirectory=/home/your-username/poznote/mcp-server
 Environment="POZNOTE_API_URL=http://localhost/api/v1"
 Environment="POZNOTE_USERNAME=admin"
 Environment="POZNOTE_PASSWORD=your-password"
+Environment="MCP_AUTH_TOKEN=your-secret-token"
 ExecStart=/home/your-username/poznote/mcp-server/venv/bin/python -m poznote_mcp.server --sse --port 3333
 Restart=always
 RestartSec=5
@@ -231,6 +229,10 @@ POZNOTE_PASSWORD=your-password
 # Default workspace (optional)
 POZNOTE_DEFAULT_WORKSPACE=Poznote
 
+# MCP SSE authentication token (required for SSE mode)
+# Generate with: python -c "import secrets; print(secrets.token_urlsafe(32))"
+MCP_AUTH_TOKEN=your-secret-token
+
 # Debug mode (optional)
 POZNOTE_DEBUG=1
 ```
@@ -245,7 +247,7 @@ curl http://localhost:3333/health
 
 Response:
 ```json
-{"status": "ok", "server": "poznote-mcp", "version": "1.0.0", "mode": "sse"}
+{"status": "ok", "server": "poznote-mcp", "version": "1.0.0", "mode": "sse", "auth": "required"}
 ```
 
 ## Example Prompts
