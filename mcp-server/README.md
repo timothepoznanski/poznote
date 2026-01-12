@@ -2,8 +2,6 @@
 
 Minimal MCP (Model Context Protocol) server for Poznote.
 
-Allows an AI to **read**, **search** and **write** notes.
-
 ## How It Works
 
 The MCP server consists of two main modules:
@@ -32,6 +30,34 @@ The MCP server consists of two main modules:
 3. The MCP server runs on the Linux server
 4. The HTTP client calls the Poznote API on the same server (`http://localhost/api/v1`)
 5. Responses flow back through the SSH tunnel to VS Code
+
+```
+  +---------------------+
+  |   VS Code / AI      |
+  +---------------------+
+     ^   |
+     |   v
+   (stdin/stdout, bidirectional)
+  +---------------------+
+  |   MCP server.py     |
+  +---------------------+
+     ^   |
+     |   v
+   (calls PoznoteClient)
+  +---------------------+
+  |   client.py         |
+  +---------------------+
+     ^   |
+     |   v
+   (HTTP, bidirectional)
+  +---------------------+
+  |   Poznote API       |
+  |   (REST, port 80)   |
+  +---------------------+
+```
+
+Local: everything runs on the same machine. 
+Remote: VS Code communicates via SSH, MCP runs on the server, Poznote API is local to the server.
 
 ## Features
 
@@ -103,11 +129,15 @@ CTRL + C to stop it.
 
 ## VS Code Configuration
 
-### Option 1: SSH Command Wrapper (Remote Server)
+### Option 1: SSH Command Wrapper (Remote Linux Server)
 
 For remote development, VS Code launches the MCP server via SSH:
 
-**VS Code mcp.json** (`C:\Users\YOUR-USERNAME\AppData\Roaming\Code\User\mcp.json` on Windows or `~/.config/Code/User/mcp.json` on Linux):
+**VS Code mcp.json** 
+
+`C:\Users\YOUR-USERNAME\AppData\Roaming\Code\User\mcp.json` on Windows,
+`~/.config/Code/User/mcp.json` on Linux :
+
 ```json
 {
   "servers": {
@@ -115,7 +145,7 @@ For remote development, VS Code launches the MCP server via SSH:
       "command": "ssh",
       "args": [
         "user@your-server",
-        "cd ~/poznote/mcp-server && source venv/bin/activate && POZNOTE_API_URL=http://localhost/api/v1 POZNOTE_USERNAME=admin POZNOTE_PASSWORD=your-password python -m poznote_mcp.server"
+        "cd ~/poznote/mcp-server && source venv/bin/activate && POZNOTE_API_URL=http://localhost:PORT/api/v1 POZNOTE_USERNAME=YOUR-LOGIN POZNOTE_PASSWORD=YOUR-PASSWORD POZNOTE_DEBUG=1 python3 -m poznote_mcp.server"
       ]
     }
   }
@@ -134,47 +164,32 @@ For local development without SSH:
       "command": "C:\\Users\\YOUR-USERNAME\\Desktop\\mcp-server\\.venv\\Scripts\\python.exe",
       "args": ["-m", "poznote_mcp.server"],
       "env": {
-        "POZNOTE_API_URL": "http://localhost/api/v1",
-        "POZNOTE_USERNAME": "admin",
-        "POZNOTE_PASSWORD": "your-password"
+        "POZNOTE_API_URL": "http://localhost:PORT/api/v1",
+        "POZNOTE_USERNAME": "YOUR-LOGIN",
+        "POZNOTE_PASSWORD": "YOUR-PASSWORD",
+        "POZNOTE_DEBUG": "1"
       }
     }
   }
 }
 ```
 
-After configuring:
-- Restart VS Code
-- Check if your MCP server appears in `CTRL + SHIFT + P` > `MCP: List Servers`
+## After configuring, restart the MCP server
 
-## Configuration
+- Check if your MCP server appears in `CTRL + SHIFT + P` > `MCP: List Servers` > `poznote` > `Restart` 
 
-Environment variables:
-
-```env
-# Poznote API base URL
-POZNOTE_API_URL=http://localhost/api/v1
-
-# HTTP Basic authentication credentials
-POZNOTE_USERNAME=admin
-POZNOTE_PASSWORD=your-password
-
-# Default workspace (optional)
-POZNOTE_DEFAULT_WORKSPACE=Poznote
-
-# Debug mode (optional)
-POZNOTE_DEBUG=1
-```
 
 ## Example Prompts
 
 Once configured, you can ask in VS Code Copilot chat:
 
-- Get the content of note ID 12345
-- Display the content of note ID XXXXXX
-- Search for notes about "project ideas"
-- Create a note "XXXXX" in poznote
-- Update note 12345 with new content
-- Delete note 12345
+- Get the content of note ID 100034
+- Display the content of note ID 100034
+- Search for notes about "docker"
+- Create a note "Test" in poznote workspace
+- Update note 100034 with new content
+
 - Create a folder "My Projects"
 - Create a folder "Subfolder" inside folder ID 5
+
+- Delete note 100034
