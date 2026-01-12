@@ -237,3 +237,7 @@ Once configured, you can ask in VS Code Copilot chat:
 - Create a folder "My Projects" in the namespace "MCP"
 - Create a folder "Subfolder" inside folder "My Projects"
 - Delete note 100034
+
+## Evolution
+
+This is currently a minimal implementation of the Poznote MCP server. It is expected to expand with additional features, improved error handling, and more comprehensive tool support in future updates.
