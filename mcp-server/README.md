@@ -91,8 +91,8 @@ sudo apt install python3 python3-venv python3-pip
 Clone the repository:
 
 ```
-git clone https://github.com/timothepoznanski/poznote.git
-cd poznote/mcp-server
+git clone https://github.com/timothepoznanski/poznote.git poznote-mcp-server
+cd poznote-mcp-server/mcp-server
 ```
 
 Create and activate the venv:
@@ -135,8 +135,8 @@ Get-ChildItem 'C:\Users\YOUR-USERNAME\AppData\Local\Programs\Python','C:\Program
 Clone the repository:
 
 ```
-git clone https://github.com/timothepoznanski/poznote.git
-cd poznote/mcp-server
+git clone https://github.com/timothepoznanski/poznote.git poznote-mcp-server
+cd poznote-mcp-server/mcp-server
 ```
 
 Create and activate the venv:
@@ -187,7 +187,7 @@ For remote development, VS Code launches the MCP server via SSH:
       "command": "ssh",
       "args": [
         "user@your-server",
-        "cd ~/poznote/mcp-server && source venv/bin/activate && POZNOTE_API_URL=http://localhost:PORT/api/v1 POZNOTE_USERNAME=YOUR-LOGIN POZNOTE_PASSWORD=YOUR-PASSWORD POZNOTE_DEBUG=1 python3 -m poznote_mcp.server"
+        "cd poznote-mcp-server/mcp-server && source venv/bin/activate && POZNOTE_API_URL=http://localhost:PORT/api/v1 POZNOTE_USERNAME=YOUR-LOGIN POZNOTE_PASSWORD=YOUR-PASSWORD POZNOTE_DEBUG=1 python3 -m poznote_mcp.server"
       ]
     }
   }
