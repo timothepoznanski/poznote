@@ -129,7 +129,7 @@ python -c "import poznote_mcp; print('poznote_mcp OK')"
 python -m poznote_mcp.server
 ```
 
-CTRL + C to stop it.
+When configured in VS Code, the MCP server is automatically started by VS Code and invoked on-demand when you make requests in Copilot Chat. Therefore use "CTRL + C" to stop it.
 
 ## VS Code Configuration
 
@@ -179,6 +179,8 @@ For local development without SSH:
 ```
 
 ## After configuring, restart the MCP server
+
+Once configured, VS Code automatically starts and manages the MCP server on-demand when you use Copilot Chat. You can manually restart it via the command palette if needed.
 
 - Check if your MCP server appears in `CTRL + SHIFT + P` > `MCP: List Servers` > `poznote` > `Restart` 
 
