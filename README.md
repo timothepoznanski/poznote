@@ -56,9 +56,10 @@ Password: `poznote`
 - [Restore / Import](#restore--import)
 - [Offline View](#offline-view)
 - [Multiple Instances](#multiple-instances)
-- [Tech Stack](#tech-stack)
+- [MCP Server](#mcp-server)
 - [API Documentation](#api-documentation)
 - [Use Poznote in the Cloud](#use-poznote-in-the-cloud)
+- [Tech Stack](#tech-stack)
 - [Star History](#star-history)
 
 
@@ -739,43 +740,11 @@ Server: my-server.com
     └── Data: ./poznote-alice/data/
 ```
 
-## Tech Stack
+## MCP Server
 
-Poznote prioritizes simplicity and portability - no complex frameworks, no heavy dependencies. Just straightforward, reliable web technologies that ensure your notes remain accessible and under your control.
+Poznote includes a Model Context Protocol (MCP) server that enables integration with AI assistants like GitHub Copilot, allowing you to interact with your notes directly from your development environment.
 
-**Privacy-First Architecture:** Poznote operates entirely locally with no external connections required for functionality. All libraries (Excalidraw, Mermaid, KaTeX) are bundled and served from your own instance. The only outbound connection is a daily update check.
-
-<details>
-<summary>If you are interested in the tech stack on which Poznote is built, <strong>have a look here.</strong></summary>
-
-### Backend
-- **PHP 8.x** - Server-side scripting language
-- **SQLite 3** - Lightweight, file-based relational database
-
-### Frontend
-- **HTML5** - Markup and structure
-- **CSS3** - Styling and responsive design
-- **JavaScript (Vanilla)** - Interactive features and dynamic content
-- **React + Vite** - Build toolchain for Excalidraw component (bundled as IIFE)
-- **AJAX** - Asynchronous data loading
-
-### Libraries
-- **Excalidraw** - Virtual whiteboard for sketching diagrams and drawings
-- **Mermaid** - Client-side JavaScript library for diagram and flowchart generation from text
-- **KaTeX** - Client-side JavaScript library for fast math typesetting and rendering mathematical equations
-- **Sortable.js** - JavaScript library for drag-and-drop sorting
-- **Swagger UI** - Interactive API documentation and testing interface
-
-### Storage
-- **HTML/Markdown files** - Notes are stored as plain HTML or Markdown files in the filesystem
-- **SQLite database** - Metadata, tags, relationships, and user data
-- **File attachments** - Stored directly in the filesystem
-
-### Infrastructure
-- **Nginx + PHP-FPM** - High-performance web server with FastCGI Process Manager
-- **Alpine Linux** - Secure, lightweight base image
-- **Docker** - Containerization for easy deployment and portability
-</details>
+For detailed setup and usage instructions, see the [MCP Server README](mcp-server/README.md).
 
 ## API Documentation
 
@@ -1460,6 +1429,44 @@ If you:
 - Are okay with approximately $5/month (Cloud provider fees)
 
 **👉 [View Poznote Cloud Install and Manage Guide](Docs/POZNOTE-CLOUD.md)**
+
+## Tech Stack
+
+Poznote prioritizes simplicity and portability - no complex frameworks, no heavy dependencies. Just straightforward, reliable web technologies that ensure your notes remain accessible and under your control.
+
+**Privacy-First Architecture:** Poznote operates entirely locally with no external connections required for functionality. All libraries (Excalidraw, Mermaid, KaTeX) are bundled and served from your own instance. The only outbound connection is a daily update check.
+
+<details>
+<summary>If you are interested in the tech stack on which Poznote is built, <strong>have a look here.</strong></summary>
+
+### Backend
+- **PHP 8.x** - Server-side scripting language
+- **SQLite 3** - Lightweight, file-based relational database
+
+### Frontend
+- **HTML5** - Markup and structure
+- **CSS3** - Styling and responsive design
+- **JavaScript (Vanilla)** - Interactive features and dynamic content
+- **React + Vite** - Build toolchain for Excalidraw component (bundled as IIFE)
+- **AJAX** - Asynchronous data loading
+
+### Libraries
+- **Excalidraw** - Virtual whiteboard for sketching diagrams and drawings
+- **Mermaid** - Client-side JavaScript library for diagram and flowchart generation from text
+- **KaTeX** - Client-side JavaScript library for fast math typesetting and rendering mathematical equations
+- **Sortable.js** - JavaScript library for drag-and-drop sorting
+- **Swagger UI** - Interactive API documentation and testing interface
+
+### Storage
+- **HTML/Markdown files** - Notes are stored as plain HTML or Markdown files in the filesystem
+- **SQLite database** - Metadata, tags, relationships, and user data
+- **File attachments** - Stored directly in the filesystem
+
+### Infrastructure
+- **Nginx + PHP-FPM** - High-performance web server with FastCGI Process Manager
+- **Alpine Linux** - Secure, lightweight base image
+- **Docker** - Containerization for easy deployment and portability
+</details>
 
 ## Star History
 
