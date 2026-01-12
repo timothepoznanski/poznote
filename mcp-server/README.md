@@ -1,4 +1,7 @@
+
 # Poznote MCP Server
+
+> **Note:** The Poznote MCP server has mainly been tested with Visual Studio Code. For more details and advanced customization options, see the official VS Code MCP documentation: [https://code.visualstudio.com/docs/copilot/customization/mcp-servers](https://code.visualstudio.com/docs/copilot/customization/mcp-servers)
 
 Minimal MCP (Model Context Protocol) server for Poznote.
 
