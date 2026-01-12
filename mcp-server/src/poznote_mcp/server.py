@@ -297,6 +297,46 @@ async def list_tools() -> ListToolsResult:
                     "required": ["id"],
                 },
             ),
+            Tool(
+                name="delete_note",
+                description="Delete a note by its ID",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "integer",
+                            "description": "ID of the note to delete",
+                        },
+                        "workspace": {
+                            "type": "string",
+                            "description": "Workspace name (optional, uses default workspace if not specified)",
+                        },
+                    },
+                    "required": ["id"],
+                },
+            ),
+            Tool(
+                name="create_folder",
+                description="Create a new folder in Poznote",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "folder_name": {
+                            "type": "string",
+                            "description": "Name of the new folder",
+                        },
+                        "parent_folder_id": {
+                            "type": "integer",
+                            "description": "ID of the parent folder (optional, creates folder at root if not specified)",
+                        },
+                        "workspace": {
+                            "type": "string",
+                            "description": "Workspace name (optional, uses default workspace if not specified)",
+                        },
+                    },
+                    "required": ["folder_name"],
+                },
+            ),
         ]
     )
 
@@ -450,6 +490,68 @@ async def call_tool(name: str, arguments: dict) -> CallToolResult:
             else:
                 return CallToolResult(
                     content=[TextContent(type="text", text=f"Error: Note {note_id} not found or update failed")]
+                )
+        
+        elif name == "delete_note":
+            note_id = arguments.get("id")
+            workspace = arguments.get("workspace")
+            
+            if not note_id:
+                return CallToolResult(
+                    content=[TextContent(type="text", text="Error: id is required")]
+                )
+            
+            success = client.delete_note(int(note_id), workspace=workspace)
+            
+            if success:
+                return CallToolResult(
+                    content=[
+                        TextContent(
+                            type="text",
+                            text=json.dumps({
+                                "success": True,
+                                "message": f"Note {note_id} deleted successfully",
+                            }, indent=2, ensure_ascii=False),
+                        )
+                    ]
+                )
+            else:
+                return CallToolResult(
+                    content=[TextContent(type="text", text=f"Error: Note {note_id} not found or deletion failed")]
+                )
+        
+        elif name == "create_folder":
+            folder_name = arguments.get("folder_name")
+            parent_folder_id = arguments.get("parent_folder_id")
+            workspace = arguments.get("workspace")
+            
+            if not folder_name:
+                return CallToolResult(
+                    content=[TextContent(type="text", text="Error: folder_name is required")]
+                )
+            
+            result = client.create_folder(
+                folder_name=folder_name,
+                parent_folder_id=parent_folder_id,
+                workspace=workspace,
+            )
+            
+            if result:
+                return CallToolResult(
+                    content=[
+                        TextContent(
+                            type="text",
+                            text=json.dumps({
+                                "success": True,
+                                "message": f"Folder '{folder_name}' created successfully",
+                                "folder": result,
+                            }, indent=2, ensure_ascii=False),
+                        )
+                    ]
+                )
+            else:
+                return CallToolResult(
+                    content=[TextContent(type="text", text="Error: Failed to create folder")]
                 )
         
         else:

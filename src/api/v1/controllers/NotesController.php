@@ -307,11 +307,11 @@ class NotesController {
         $folder = isset($input['folder_name']) ? trim($input['folder_name']) : null;
         
         // Handle workspace - use provided value or fallback to first workspace
-        // $workspace = isset($input['workspace']) && trim($input['workspace']) !== '' 
-        //     ? trim($input['workspace']) 
-        //     : getFirstWorkspaceName();
+        $workspace = isset($input['workspace']) && trim($input['workspace']) !== '' 
+            ? trim($input['workspace']) 
+            : getFirstWorkspaceName();
         
-        // error_log("NotesController::create - workspace after processing: " . $workspace);
+        error_log("NotesController::create - workspace after processing: " . $workspace);
         $entry = $input['content'] ?? $input['entry'] ?? '';
         $entrycontent = $input['entrycontent'] ?? $entry;
         $type = isset($input['type']) ? trim($input['type']) : 'note';

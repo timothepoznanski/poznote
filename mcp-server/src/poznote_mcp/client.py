@@ -192,6 +192,65 @@ class PoznoteClient:
             return data.get("note", {"id": note_id})
         return None
     
+    def delete_note(
+        self,
+        note_id: int,
+        workspace: str | None = None,
+    ) -> bool:
+        """
+        Delete a note
+        
+        Returns True if successful, False otherwise
+        """
+        params = {}
+        ws = workspace or self.default_workspace
+        if ws:
+            params["workspace"] = ws
+        
+        response = self.client.delete(f"/notes/{note_id}", params=params)
+        
+        if response.status_code == 404:
+            return False
+        
+        response.raise_for_status()
+        data = response.json()
+        
+        return data.get("success", False)
+    
+    def create_folder(
+        self,
+        folder_name: str,
+        parent_folder_id: int | None = None,
+        workspace: str | None = None,
+    ) -> dict | None:
+        """
+        Create a new folder
+        
+        Returns the created folder with its ID
+        """
+        ws = workspace or self.default_workspace
+        
+        payload = {
+            "folder_name": folder_name,
+            "workspace": ws,
+        }
+        
+        if parent_folder_id is not None:
+            payload["parent_folder_id"] = parent_folder_id
+        
+        logger.info(f"Creating folder with payload: {payload}")
+        logger.info(f"API URL: {self.base_url}/folders")
+        
+        response = self.client.post("/folders", json=payload)
+        response.raise_for_status()
+        data = response.json()
+        
+        logger.info(f"API response: {data}")
+        
+        if data.get("success"):
+            return data.get("folder")
+        return None
+    
     def close(self):
         """Close the HTTP client"""
         self.client.close()
