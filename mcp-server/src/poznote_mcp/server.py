@@ -316,6 +316,25 @@ async def list_tools() -> ListToolsResult:
                 },
             ),
             Tool(
+                name="list_notes",
+                description="List all notes from a specific workspace",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "workspace": {
+                            "type": "string",
+                            "description": "Workspace name (optional, uses default workspace if not specified)",
+                        },
+                        "limit": {
+                            "type": "integer",
+                            "description": "Maximum number of results (default: 50)",
+                            "default": 50,
+                        },
+                    },
+                    "required": [],
+                },
+            ),
+            Tool(
                 name="create_folder",
                 description="Create a new folder in Poznote",
                 inputSchema={
@@ -519,6 +538,42 @@ async def call_tool(name: str, arguments: dict) -> CallToolResult:
                 return CallToolResult(
                     content=[TextContent(type="text", text=f"Error: Note {note_id} not found or deletion failed")]
                 )
+        
+        elif name == "list_notes":
+            workspace = arguments.get("workspace")
+            limit = arguments.get("limit", 50)
+            
+            notes = client.list_notes(workspace=workspace)
+            
+            # Limit results if specified
+            if limit and len(notes) > limit:
+                notes = notes[:limit]
+            
+            # Format for AI consumption
+            formatted = []
+            for note in notes:
+                formatted.append({
+                    "id": note.get("id"),
+                    "title": note.get("heading", "Untitled"),
+                    "tags": note.get("tags", ""),
+                    "folder": note.get("folder"),
+                    "workspace": note.get("workspace"),
+                    "updatedAt": note.get("updated"),
+                    "createdAt": note.get("created"),
+                })
+            
+            return CallToolResult(
+                content=[
+                    TextContent(
+                        type="text",
+                        text=json.dumps({
+                            "workspace": workspace or client.default_workspace,
+                            "count": len(formatted),
+                            "notes": formatted,
+                        }, indent=2, ensure_ascii=False),
+                    )
+                ]
+            )
         
         elif name == "create_folder":
             folder_name = arguments.get("folder_name")

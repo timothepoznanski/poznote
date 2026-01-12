@@ -67,6 +67,7 @@ The MCP server consists of two main modules:
 
 ### Tools (actions)
 - `get_note` - Get a specific note by ID with full content
+- `list_notes` - List all notes from a specific workspace
 - `search_notes` - Text search in notes
 - `create_note` - Create a new note
 - `update_note` - Update an existing note
@@ -184,12 +185,12 @@ For local development without SSH:
 Once configured, you can ask in VS Code Copilot chat:
 
 - Get the content of note ID 100034
+- Get the content of note "Test Reload MCP"
 - Display the content of note ID 100034
-- Search for notes about "docker"
-- Create a note "Test" in poznote workspace
-- Update note 100034 with new content
-
-- Create a folder "My Projects"
-- Create a folder "Subfolder" inside folder ID 5
-
+- List all notes in workspace MCP
+- Search for notes about "MCP"
+- Create a note "MCP" in the MCP workspace
+- Update note 100041 with new content
+- Create a folder "My Projects" in the namespace "MCP"
+- Create a folder "Subfolder" inside folder "My Projects"
 - Delete note 100034
