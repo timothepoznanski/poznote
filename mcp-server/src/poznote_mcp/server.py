@@ -4,9 +4,7 @@ Poznote MCP Server
 
 Minimal MCP server enabling AI assistants to read, search and write notes.
 
-Supports two transport modes:
-  - stdio (default): For local execution, VS Code launches the process
-  - sse: HTTP server mode for remote execution (VS Code connects via HTTP)
+Runs in stdio mode for local execution or remote SSH execution.
 
 Resources:
   - notes: List all notes
@@ -18,21 +16,14 @@ Tools:
   - update_note: Update an existing note
 
 Usage:
-  # stdio mode (default)
   python -m poznote_mcp.server
-
-  # SSE mode (remote server)
-  python -m poznote_mcp.server --sse --host 0.0.0.0 --port 3333
 """
 
-import argparse
 import asyncio
 import json
 import logging
 import os
-import secrets
 import sys
-from datetime import datetime
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
@@ -422,8 +413,8 @@ async def call_tool(name: str, arguments: dict) -> CallToolResult:
 # MAIN
 # =============================================================================
 
-async def run_stdio_server():
-    """Run the MCP server in stdio mode (local)"""
+async def main_async():
+    """Run the MCP server in stdio mode"""
     logger.info("Starting Poznote MCP Server (stdio mode)...")
     
     async with stdio_server() as (read_stream, write_stream):
@@ -434,139 +425,10 @@ async def run_stdio_server():
         )
 
 
-async def run_sse_server(host: str, port: int, token: str | None = None):
-    """Run the MCP server in SSE mode (remote HTTP)"""
-    from mcp.server.sse import SseServerTransport
-    from starlette.applications import Starlette
-    from starlette.routing import Route, Mount
-    from starlette.responses import JSONResponse
-    from starlette.middleware import Middleware
-    from starlette.middleware.base import BaseHTTPMiddleware
-    import uvicorn
-
-    # Get token from parameter, env, or generate one
-    auth_token = token or os.getenv("MCP_AUTH_TOKEN")
-    auth_enabled = auth_token is not None
-    
-    if not auth_enabled:
-        # Generate a random token and display it
-        auth_token = secrets.token_urlsafe(32)
-        logger.warning("="*60)
-        logger.warning("⚠️  No MCP_AUTH_TOKEN set - generated temporary token:")
-        logger.warning(f"   {auth_token}")
-        logger.warning("   Set MCP_AUTH_TOKEN env var for a persistent token")
-        logger.warning("="*60)
-    
-    logger.info(f"Starting Poznote MCP Server (SSE mode) on {host}:{port}...")
-    logger.info(f"Authentication: {'enabled' if auth_enabled else 'enabled (auto-generated)'}")
-    
-    # Create SSE transport
-    sse = SseServerTransport("/messages/")
-    
-    def verify_token(request) -> bool:
-        """Verify the Bearer token from Authorization header"""
-        auth_header = request.headers.get("Authorization", "")
-        if auth_header.startswith("Bearer "):
-            provided_token = auth_header[7:]  # Remove "Bearer " prefix
-            return secrets.compare_digest(provided_token, auth_token)
-        return False
-    
-    async def handle_sse(request):
-        """Handle SSE connection from client"""
-        # Verify authentication
-        if not verify_token(request):
-            return JSONResponse(
-                {"error": "Unauthorized", "message": "Invalid or missing Bearer token"},
-                status_code=401
-            )
-        
-        async with sse.connect_sse(
-            request.scope, request.receive, request._send
-        ) as streams:
-            await server.run(
-                streams[0],
-                streams[1],
-                server.create_initialization_options(),
-            )
-    
-    async def handle_messages(request):
-        """Handle POST messages from client"""
-        # Verify authentication
-        if not verify_token(request):
-            return JSONResponse(
-                {"error": "Unauthorized", "message": "Invalid or missing Bearer token"},
-                status_code=401
-            )
-        
-        await sse.handle_post_message(request.scope, request.receive, request._send)
-    
-    async def health_check(request):
-        """Health check endpoint (no auth required)"""
-        return JSONResponse({
-            "status": "ok",
-            "server": "poznote-mcp",
-            "version": "1.0.0",
-            "mode": "sse",
-            "auth": "required"
-        })
-    
-    # Create Starlette app with routes
-    app = Starlette(
-        debug=os.getenv("POZNOTE_DEBUG", "").lower() in ("1", "true"),
-        routes=[
-            Route("/health", health_check, methods=["GET"]),
-            Route("/sse", handle_sse, methods=["GET"]),
-            Mount("/messages/", routes=[
-                Route("/", handle_messages, methods=["POST"]),
-            ]),
-        ],
-    )
-    
-    # Run with uvicorn
-    config = uvicorn.Config(
-        app,
-        host=host,
-        port=port,
-        log_level="debug" if os.getenv("POZNOTE_DEBUG") else "info",
-    )
-    server_instance = uvicorn.Server(config)
-    await server_instance.serve()
-
-
-def parse_args():
-    """Parse command line arguments"""
-    parser = argparse.ArgumentParser(
-        description="Poznote MCP Server - AI assistant integration for notes"
-    )
-    parser.add_argument(
-        "--sse",
-        action="store_true",
-        help="Run in SSE (HTTP) mode instead of stdio mode"
-    )
-    parser.add_argument(
-        "--host",
-        type=str,
-        default="127.0.0.1",
-        help="Host to bind to in SSE mode (default: 127.0.0.1)"
-    )
-    parser.add_argument(
-        "--port",
-        type=int,
-        default=3333,
-        help="Port to bind to in SSE mode (default: 3333)"
-    )
-    return parser.parse_args()
-
-
 def main():
     """Entry point"""
-    args = parse_args()
-    
     try:
-        if args.sse:
-            asyncio.run(run_sse_server(args.host, args.port))
-        else:
-            asyncio.run(run_stdio_server())
+        asyncio.run(main_async())
     except KeyboardInterrupt:
         logger.info("Server stopped by user")
     except Exception as e:

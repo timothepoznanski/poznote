@@ -4,15 +4,6 @@ Minimal MCP (Model Context Protocol) server for Poznote.
 
 Allows an AI to **read**, **search** and **write** notes.
 
-## Transport Modes
-
-The server supports two transport modes:
-
-| Mode | Usage | Best For |
-|------|-------|----------|
-| **stdio** | Local process (default) | Local development, Windows native |
-| **SSE** | HTTP server | Remote development, VS Code Remote SSH |
-
 ## Features
 
 ### Resources (read-only)
@@ -26,7 +17,7 @@ The server supports two transport modes:
 
 ## Installation
 
-### Linux / Remote Server (Recommended for Remote SSH)
+### Linux / Remote Server
 
 ```bash
 cd mcp-server
@@ -36,7 +27,7 @@ pip install --upgrade pip
 pip install -e .
 ```
 
-### Powershell (Windows Local)
+### Windows Local
 
 Install Python:
 
@@ -73,71 +64,18 @@ Run it to test it:
 
 ```
 python -c "import poznote_mcp; print('poznote_mcp OK')"
-$env:POZNOTE_DEBUG = "1"  # Optional: Run server in debug mode
 python -m poznote_mcp.server
 ```
 
 CTRL + C to stop it.
 
-## Running the Server
-
-### stdio Mode (Local - Default)
-
-```bash
-python3 -m poznote_mcp.server
-```
-
-### SSE Mode (Remote HTTP Server) ⭐
-
-This is the recommended mode when using **VS Code Remote SSH**.
-
-```bash
-# Start on localhost only (secure, use with SSH tunnel)
-export MCP_AUTH_TOKEN="your-secret-token"  # Optional: set a persistent token
-python3 -m poznote_mcp.server --sse --port 3333
-
-# Or bind to all interfaces (if behind firewall/VPN)
-python3 -m poznote_mcp.server --sse --host 0.0.0.0 --port 3333
-```
-
-Options:
-- `--sse`: Enable HTTP/SSE mode
-- `--host`: Bind address (default: `127.0.0.1`)
-- `--port`: Port number (default: `3333`)
-
-**Security:** SSE mode requires Bearer token authentication. If `MCP_AUTH_TOKEN` is not set, a temporary token is generated and displayed at startup.
-
 ## VS Code Configuration
 
-### Option 1: Remote SSH with SSE Mode (Recommended) ⭐
+### Option 1: SSH Command Wrapper (Remote Server)
 
-When you're connected to a remote server via VS Code Remote SSH, run the MCP server on the remote:
+For remote development, VS Code launches the MCP server via SSH:
 
-**On the remote server:**
-```bash
-cd ~/poznote/mcp-server
-source venv/bin/activate
-export POZNOTE_API_URL="http://localhost/api/v1"
-export POZNOTE_USERNAME="admin"
-export POZNOTE_PASSWORD="your-password"
-export MCP_AUTH_TOKEN="your-secret-token"  # Generate with: python3 -c "import secrets; print(secrets.token_urlsafe(32))"
-python3 -m poznote_mcp.server --sse --port 3333 --host 0.0.0.0
-```
-
-**On your Windows machine**, create an SSH tunnel:
-```powershell
-ssh -L 3333:localhost:3333 user@your-server
-```
-
-**VS Code mcp.json** (`C:\Users\YOUR-USERNAME\AppData\Roaming\Code\User\mcp.json`):
-```json
-```
-
-### Option 2: SSH Command Wrapper (Alternative)
-
-If you prefer not to run a persistent server, VS Code can launch the MCP via SSH:
-
-**VS Code mcp.json:**
+**VS Code mcp.json** (`C:\Users\YOUR-USERNAME\AppData\Roaming\Code\User\mcp.json` on Windows or `~/.config/Code/User/mcp.json` on Linux):
 ```json
 {
   "servers": {
@@ -152,7 +90,7 @@ If you prefer not to run a persistent server, VS Code can launch the MCP via SSH
 }
 ```
 
-### Option 3: Local stdio Mode (Windows Native)
+### Option 2: Local stdio Mode (Windows Native)
 
 For local development without SSH:
 
@@ -177,43 +115,6 @@ After configuring:
 - Restart VS Code
 - Check if your MCP server appears in `CTRL + SHIFT + P` > `MCP: List Servers`
 
-## Running as a Service (Linux)
-
-To keep the MCP server running permanently on your VPS:
-
-### Using systemd
-
-Create `/etc/systemd/system/poznote-mcp.service`:
-
-```ini
-[Unit]
-Description=Poznote MCP Server
-After=network.target
-
-[Service]
-Type=simple
-User=your-username
-WorkingDirectory=/home/your-username/poznote/mcp-server
-Environment="POZNOTE_API_URL=http://localhost/api/v1"
-Environment="POZNOTE_USERNAME=admin"
-Environment="POZNOTE_PASSWORD=your-password"
-Environment="MCP_AUTH_TOKEN=your-secret-token"
-ExecStart=/home/your-username/poznote/mcp-server/venv/bin/python -m poznote_mcp.server --sse --port 3333
-Restart=always
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-```
-
-Then:
-```bash
-sudo systemctl daemon-reload
-sudo systemctl enable poznote-mcp
-sudo systemctl start poznote-mcp
-sudo systemctl status poznote-mcp
-```
-
 ## Configuration
 
 Environment variables:
@@ -229,25 +130,8 @@ POZNOTE_PASSWORD=your-password
 # Default workspace (optional)
 POZNOTE_DEFAULT_WORKSPACE=Poznote
 
-# MCP SSE authentication token (required for SSE mode)
-# Generate with: python -c "import secrets; print(secrets.token_urlsafe(32))"
-MCP_AUTH_TOKEN=your-secret-token
-
 # Debug mode (optional)
 POZNOTE_DEBUG=1
-```
-
-## Health Check
-
-When running in SSE mode, you can verify the server is running:
-
-```bash
-curl http://localhost:3333/health
-```
-
-Response:
-```json
-{"status": "ok", "server": "poznote-mcp", "version": "1.0.0", "mode": "sse", "auth": "required"}
 ```
 
 ## Example Prompts
