@@ -109,9 +109,9 @@ class TrashController {
                 $params[] = $workspace;
             }
             
-            // Add search filter
+            // Add search filter with accent-insensitive search
             if ($search) {
-                $sql .= " AND (heading LIKE ? OR tags LIKE ?)";
+                $sql .= " AND (remove_accents(heading) LIKE remove_accents(?) OR remove_accents(tags) LIKE remove_accents(?))";
                 $searchTerm = "%$search%";
                 $params[] = $searchTerm;
                 $params[] = $searchTerm;

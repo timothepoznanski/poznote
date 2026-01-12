@@ -2,6 +2,42 @@
 // Manages highlighting of search terms in note content
 
 /**
+ * Remove accents from text for accent-insensitive search
+ * @param {string} text - The text to normalize
+ * @returns {string} Text without accents
+ */
+function removeAccents(text) {
+    if (!text) return '';
+    
+    // Convert to lowercase for case-insensitive comparison
+    text = text.toLowerCase();
+    
+    // Replace accented characters with their non-accented equivalents
+    var accents = {
+        'á': 'a', 'à': 'a', 'â': 'a', 'ä': 'a', 'ã': 'a', 'å': 'a', 'ā': 'a',
+        'é': 'e', 'è': 'e', 'ê': 'e', 'ë': 'e', 'ē': 'e', 'ė': 'e', 'ę': 'e',
+        'í': 'i', 'ì': 'i', 'î': 'i', 'ï': 'i', 'ī': 'i', 'į': 'i',
+        'ó': 'o', 'ò': 'o', 'ô': 'o', 'ö': 'o', 'õ': 'o', 'ø': 'o', 'ō': 'o',
+        'ú': 'u', 'ù': 'u', 'û': 'u', 'ü': 'u', 'ū': 'u', 'ų': 'u',
+        'ý': 'y', 'ÿ': 'y',
+        'ñ': 'n', 'ń': 'n',
+        'ç': 'c', 'ć': 'c', 'č': 'c',
+        'ş': 's', 'š': 's', 'ś': 's',
+        'ž': 'z', 'ź': 'z', 'ż': 'z',
+        'ł': 'l',
+        'æ': 'ae', 'œ': 'oe'
+    };
+    
+    var result = '';
+    for (var i = 0; i < text.length; i++) {
+        var char = text[i];
+        result += accents[char] || char;
+    }
+    
+    return result;
+}
+
+/**
  * Parse search terms with support for quoted phrases
  * @param {string} search - The search string
  * @returns {Array<string>} Array of search terms (phrases kept as single strings)
@@ -116,54 +152,111 @@ function highlightInElement(element, searchWords) {
             return 0; // no overlays for hidden inputs (visible heading will be highlighted instead)
         }
         var inputValue = element.value;
-        
-        // Create a combined regex pattern for all search words
-        var escapedWords = [];
-        for (var i = 0; i < searchWords.length; i++) {
-            escapedWords.push(escapeRegExp(searchWords[i]));
-        }
-        var pattern = escapedWords.join('|');
-        var regex = new RegExp('(' + pattern + ')', 'gi');
+        var normalizedInputValue = removeAccents(inputValue);
         
         // Clear any existing overlays for this input
         clearInputOverlays(element);
         
-        // Find matches and create overlay highlights
-        var matches;
-        var index = 0;
-        while ((matches = regex.exec(inputValue)) !== null) {
-            createInputOverlay(element, matches[0], matches.index);
-            highlightCount++;
-            // Prevent infinite loop with global regex
-            if (regex.lastIndex === matches.index) {
-                regex.lastIndex++;
+        // Find matches for each search word with accent-insensitive matching
+        for (var i = 0; i < searchWords.length; i++) {
+            var searchWord = searchWords[i];
+            var normalizedSearchWord = removeAccents(searchWord);
+            var startPos = 0;
+            
+            while (startPos < normalizedInputValue.length) {
+                var foundPos = normalizedInputValue.indexOf(normalizedSearchWord, startPos);
+                if (foundPos === -1) break;
+                
+                // Get the actual word from the original input (with accents)
+                var actualWord = inputValue.substring(foundPos, foundPos + searchWord.length);
+                createInputOverlay(element, actualWord, foundPos);
+                highlightCount++;
+                startPos = foundPos + 1;
             }
         }
         
         return highlightCount;
     }
     
-    // Create a combined regex pattern for all search words
-    var escapedWords = [];
-    for (var i = 0; i < searchWords.length; i++) {
-        escapedWords.push(escapeRegExp(searchWords[i]));
-    }
-    var pattern = escapedWords.join('|');
-    var regex = new RegExp('(' + pattern + ')', 'gi');
-    
-    // Function to recursively process text nodes
+    // Function to recursively process text nodes with accent-insensitive matching
     function processTextNodes(node) {
         if (node.nodeType === 3) { // Node.TEXT_NODE
             var text = node.textContent;
-            if (regex.test(text)) {
-                // Replace the text node with highlighted content
-                var highlightedHTML = text.replace(regex, '<span class="search-highlight" style="background-color: #ffff00 !important; color: #000 !important; font-weight: normal !important; font-family: inherit !important;">$1</span>');
-                var tempDiv = document.createElement('div');
-                tempDiv.innerHTML = highlightedHTML;
+            var normalizedText = removeAccents(text);
+            var hasMatch = false;
+            
+            // Check if any search word matches (accent-insensitive)
+            for (var i = 0; i < searchWords.length; i++) {
+                var normalizedSearchWord = removeAccents(searchWords[i]);
+                if (normalizedText.indexOf(normalizedSearchWord) !== -1) {
+                    hasMatch = true;
+                    break;
+                }
+            }
+            
+            if (hasMatch) {
+                // Build highlighted HTML by finding all matches
+                var fragments = [];
+                var lastIndex = 0;
                 
-                // Count highlights
-                var highlights = tempDiv.querySelectorAll('.search-highlight');
-                highlightCount += highlights.length;
+                // Find all positions where search words match (accent-insensitive)
+                var matches = [];
+                for (var i = 0; i < searchWords.length; i++) {
+                    var normalizedSearchWord = removeAccents(searchWords[i]);
+                    var startPos = 0;
+                    
+                    while (startPos < normalizedText.length) {
+                        var foundPos = normalizedText.indexOf(normalizedSearchWord, startPos);
+                        if (foundPos === -1) break;
+                        
+                        matches.push({
+                            start: foundPos,
+                            end: foundPos + searchWords[i].length,
+                            length: searchWords[i].length
+                        });
+                        startPos = foundPos + 1;
+                    }
+                }
+                
+                // Sort matches by position and remove overlaps
+                matches.sort(function(a, b) { return a.start - b.start; });
+                var cleanedMatches = [];
+                for (var i = 0; i < matches.length; i++) {
+                    var match = matches[i];
+                    var overlap = false;
+                    for (var j = 0; j < cleanedMatches.length; j++) {
+                        if (match.start < cleanedMatches[j].end && match.end > cleanedMatches[j].start) {
+                            overlap = true;
+                            break;
+                        }
+                    }
+                    if (!overlap) {
+                        cleanedMatches.push(match);
+                    }
+                }
+                
+                // Build the highlighted HTML
+                var tempDiv = document.createElement('div');
+                lastIndex = 0;
+                for (var i = 0; i < cleanedMatches.length; i++) {
+                    var match = cleanedMatches[i];
+                    // Add text before match
+                    if (match.start > lastIndex) {
+                        tempDiv.appendChild(document.createTextNode(text.substring(lastIndex, match.start)));
+                    }
+                    // Add highlighted match
+                    var span = document.createElement('span');
+                    span.className = 'search-highlight';
+                    span.style.cssText = 'background-color: #ffff00 !important; color: #000 !important; font-weight: normal !important; font-family: inherit !important;';
+                    span.textContent = text.substring(match.start, match.end);
+                    tempDiv.appendChild(span);
+                    highlightCount++;
+                    lastIndex = match.end;
+                }
+                // Add remaining text
+                if (lastIndex < text.length) {
+                    tempDiv.appendChild(document.createTextNode(text.substring(lastIndex)));
+                }
                 
                 // Replace the text node with highlighted nodes
                 var parent = node.parentNode;

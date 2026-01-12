@@ -280,7 +280,7 @@ body::-webkit-scrollbar {
 .editable-tags-container {
     flex-wrap: nowrap !important;
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: visible;
     max-height: 40px;
     scrollbar-width: none;
     -ms-overflow-style: none;

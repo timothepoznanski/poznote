@@ -222,7 +222,7 @@ class NotesController {
                     $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
                     $stmt->execute([$refId, $workspace]);
                 } else {
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated FROM entries WHERE trash = 0 AND heading LIKE ? AND workspace = ? ORDER BY updated DESC LIMIT 1");
+                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ? ORDER BY updated DESC LIMIT 1");
                     $stmt->execute(['%' . $reference . '%', $workspace]);
                 }
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -299,10 +299,19 @@ class NotesController {
             return;
         }
         
+        // DEBUG logging
+        error_log("NotesController::create - Input received: " . json_encode($input));
+        
         $originalHeading = isset($input['heading']) ? trim($input['heading']) : '';
         $tags = isset($input['tags']) ? trim($input['tags']) : '';
         $folder = isset($input['folder_name']) ? trim($input['folder_name']) : null;
-        $workspace = isset($input['workspace']) ? trim($input['workspace']) : getFirstWorkspaceName();
+        
+        // Handle workspace - use provided value or fallback to first workspace
+        $workspace = isset($input['workspace']) && trim($input['workspace']) !== '' 
+            ? trim($input['workspace']) 
+            : getFirstWorkspaceName();
+        
+        error_log("NotesController::create - workspace after processing: " . $workspace);
         $entry = $input['content'] ?? $input['entry'] ?? '';
         $entrycontent = $input['entrycontent'] ?? $entry;
         $type = isset($input['type']) ? trim($input['type']) : 'note';
@@ -1414,10 +1423,10 @@ class NotesController {
                 }
             } else {
                 if ($workspace) {
-                    $stmt = $this->con->prepare("SELECT id, heading FROM entries WHERE trash = 0 AND heading LIKE ? AND workspace = ? ORDER BY updated DESC LIMIT 1");
+                    $stmt = $this->con->prepare("SELECT id, heading FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ? ORDER BY updated DESC LIMIT 1");
                     $stmt->execute(['%' . $reference . '%', $workspace]);
                 } else {
-                    $stmt = $this->con->prepare("SELECT id, heading FROM entries WHERE trash = 0 AND heading LIKE ? ORDER BY updated DESC LIMIT 1");
+                    $stmt = $this->con->prepare("SELECT id, heading FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) ORDER BY updated DESC LIMIT 1");
                     $stmt->execute(['%' . $reference . '%']);
                 }
             }
@@ -1575,6 +1584,84 @@ class NotesController {
         $md = trim($md);
         
         return $md;
+    }
+    
+    /**
+     * GET /api/v1/notes/search
+     * Search notes by text query
+     * 
+     * Query params:
+     *   - q: Search query (required)
+     *   - limit: Maximum number of results (default: 10)
+     *   - workspace: Filter by workspace
+     */
+    public function search(): void {
+        $query = $_GET['q'] ?? '';
+        $limit = isset($_GET['limit']) ? max(1, min(100, (int)$_GET['limit'])) : 10;
+        $workspace = $_GET['workspace'] ?? null;
+        
+        if (empty($query)) {
+            $this->sendError(400, 'Search query (q) is required');
+            return;
+        }
+        
+        try {
+            // Build search query using accent-insensitive search
+            $sql = "SELECT id, heading, tags, folder, folder_id, workspace, updated, created, 
+                           SUBSTR(search_clean_entry(entry), 1, 300) as excerpt
+                    FROM entries 
+                    WHERE trash = 0 
+                    AND (remove_accents(heading) LIKE remove_accents(?) 
+                         OR remove_accents(search_clean_entry(entry)) LIKE remove_accents(?))";
+            
+            $params = ['%' . $query . '%', '%' . $query . '%'];
+            
+            if ($workspace) {
+                $sql .= " AND workspace = ?";
+                $params[] = $workspace;
+            }
+            
+            $sql .= " ORDER BY 
+                        CASE WHEN remove_accents(heading) LIKE remove_accents(?) THEN 0 ELSE 1 END,
+                        updated DESC
+                      LIMIT ?";
+            $params[] = '%' . $query . '%';
+            $params[] = $limit;
+            
+            $stmt = $this->con->prepare($sql);
+            $stmt->execute($params);
+            
+            $results = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                // Highlight query in excerpt
+                $excerpt = $row['excerpt'] ?? '';
+                if (!empty($excerpt) && strlen($excerpt) >= 300) {
+                    $excerpt .= '...';
+                }
+                
+                $results[] = [
+                    'id' => (int)$row['id'],
+                    'heading' => $row['heading'] ?? 'Untitled',
+                    'tags' => $row['tags'] ?? '',
+                    'folder' => $row['folder'],
+                    'folder_id' => $row['folder_id'] ? (int)$row['folder_id'] : null,
+                    'workspace' => $row['workspace'],
+                    'excerpt' => $excerpt,
+                    'updated' => $row['updated'],
+                    'created' => $row['created'],
+                ];
+            }
+            
+            $this->sendSuccess([
+                'query' => $query,
+                'count' => count($results),
+                'results' => $results
+            ]);
+            
+        } catch (Exception $e) {
+            error_log('Error in NotesController::search: ' . $e->getMessage());
+            $this->sendError(500, 'Search error occurred');
+        }
     }
     
     /**

@@ -201,26 +201,28 @@
 
 /* Responsive design for mobile */
 @media (max-width: 768px) {
-    .search-replace-controls {
-        flex-wrap: wrap;
+    .search-replace-bar {
+        padding: 6px 8px;
     }
     
-    .search-replace-input-group {
-        flex: 1 1 100%;
+    .search-replace-input {
+        font-size: 12px;
+        padding: 5px 8px;
     }
     
-    .search-replace-buttons {
-        flex: 1 1 100%;
-        justify-content: flex-end;
-    }
-    
-    .search-replace-replace-row {
-        flex-wrap: wrap;
+    .search-replace-count {
+        font-size: 11px;
+        min-width: 50px;
     }
     
     .search-replace-btn {
         min-width: 28px;
-        padding: 6px 8px;
+        padding: 5px 8px;
+        font-size: 11px;
+    }
+    
+    .search-replace-btn i {
+        font-size: 11px;
     }
 }
 

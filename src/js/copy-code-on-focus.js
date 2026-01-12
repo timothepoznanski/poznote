@@ -1,30 +1,8 @@
 /* copy-code-on-focus.js
-   Listens for focus/click events inside code blocks (<pre>, <code>, .code-block)
-   and copies their textual content to the clipboard when the user focuses/clicks inside.
-   Non-intrusive: only triggers on user interaction, respects navigator.clipboard availability,
-   and shows a short visual feedback by adding a `copied` class to the element for 600ms.
+   Adds copy buttons to code blocks and provides clipboard functionality.
 */
 (function () {
     'use strict';
-
-    // long-press copy script (no debug logs)
-
-    // CSS class added for feedback. The project likely has global CSS; keep class name minimal.
-    var FEEDBACK_CLASS = 'copied-by-focus';
-    var FEEDBACK_TIMEOUT = 600;
-
-    function getCodeContainer(target) {
-        // Walk up until we find a code/pre element or an element with class code-block
-        var el = target;
-        while (el) {
-            if (!el.tagName) return null;
-            var tag = el.tagName.toLowerCase();
-            if (tag === 'code' || tag === 'pre') return el;
-            if (el.classList && el.classList.contains('code-block')) return el;
-            el = el.parentElement;
-        }
-        return null;
-    }
 
     async function copyText(text) {
         // Prefer navigator.clipboard when available
@@ -63,14 +41,6 @@
         } catch (e) {
             return false;
         }
-    }
-
-    function showFeedback(el) {
-        if (!el) return;
-        el.classList.add(FEEDBACK_CLASS);
-        setTimeout(function () {
-            el.classList.remove(FEEDBACK_CLASS);
-        }, FEEDBACK_TIMEOUT);
     }
 
     // Lightweight accessible toast helper
@@ -161,132 +131,6 @@
         text = text.trim();
         
         return text;
-    }
-
-    // (No direct click handler.) Long-press handling below will perform copy.
-
-    // Long-press handling: start timer on pointerdown, cancel on pointerup/pointercancel/leave
-    var longPressTimer = null;
-    var longPressElement = null;
-    var LONG_PRESS_MS = 1000;
-    var pointerStartX = 0;
-    var pointerStartY = 0;
-    var isSelecting = false;
-
-    function startLongPress(e) {
-        if (e.button && e.button !== 0) return; // ignore non-primary
-        var target = e.target || e.srcElement;
-        var codeEl = getCodeContainer(target);
-        if (!codeEl) return;
-        
-        // Check if there's already text selected in the code block
-        var selection = window.getSelection();
-        if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
-            var range = selection.getRangeAt(0);
-            var selectionContainer = range.commonAncestorContainer;
-            // Check if the selection is within our code element
-            var selectionElement = selectionContainer.nodeType === 3 ? selectionContainer.parentElement : selectionContainer;
-            if (codeEl.contains(selectionElement)) {
-                return; // Don't start long press if there's already a selection in the code block
-            }
-        }
-        
-        // Store pointer position to detect movement (selection)
-        pointerStartX = e.clientX;
-        pointerStartY = e.clientY;
-        isSelecting = false;
-        
-        // store element and start timer
-        longPressElement = codeEl;
-        if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
-        longPressTimer = setTimeout(function () {
-            // Only perform copy if we're not in the middle of selecting text
-            if (isSelecting) {
-                longPressElement = null;
-                longPressTimer = null;
-                return;
-            }
-            
-            // Double-check if a text selection has been made during the long press
-            var selection = window.getSelection();
-            if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
-                var range = selection.getRangeAt(0);
-                var selectionContainer = range.commonAncestorContainer;
-                var selectionElement = selectionContainer.nodeType === 3 ? selectionContainer.parentElement : selectionContainer;
-                if (longPressElement.contains(selectionElement)) {
-                    // User has selected text in the code block, don't copy the whole block
-                    longPressElement = null;
-                    longPressTimer = null;
-                    return;
-                }
-            }
-            
-            // perform copy
-            var text = normalizeCodeText(longPressElement);
-            if (!text) { longPressElement = null; longPressTimer = null; return; }
-            copyText(text).then(function (ok) {
-                if (ok) {
-                    showFeedback(longPressElement);
-                    showToast('Copied to clipboard!');
-                } else {
-                    showToast('Copy failed — select the code and press Ctrl+C');
-                }
-                longPressElement = null;
-                longPressTimer = null;
-            }).catch(function () {
-                showToast('Copy failed — select the code and press Ctrl+C');
-                longPressElement = null;
-                longPressTimer = null;
-            });
-        }, LONG_PRESS_MS);
-    }
-
-    function handlePointerMove(e) {
-        if (!longPressTimer || !longPressElement) return;
-        
-        // Calculate movement distance
-        var deltaX = Math.abs(e.clientX - pointerStartX);
-        var deltaY = Math.abs(e.clientY - pointerStartY);
-        
-        // If there's significant movement, consider it a selection gesture
-        if (deltaX > 5 || deltaY > 5) {
-            isSelecting = true;
-            // Cancel the long press timer since user is selecting text
-            cancelLongPress();
-        }
-    }
-
-    function cancelLongPress() {
-        if (longPressTimer) {
-            clearTimeout(longPressTimer);
-            longPressTimer = null;
-            longPressElement = null;
-        }
-        isSelecting = false;
-    }
-
-    document.addEventListener('pointerdown', startLongPress, true);
-    document.addEventListener('pointermove', handlePointerMove, true);
-    document.addEventListener('pointerup', cancelLongPress, true);
-    document.addEventListener('pointercancel', cancelLongPress, true);
-    document.addEventListener('pointerleave', cancelLongPress, true);
-
-    // Add a tiny style for feedback if possible
-    function injectStyle() {
-        try {
-            var css = '.' + FEEDBACK_CLASS + ' { outline: 2px solid #007DB8; transition: outline .15s ease-in-out; }';
-            var head = document.head || document.getElementsByTagName('head')[0];
-            var style = document.createElement('style');
-            style.type = 'text/css';
-            if (style.styleSheet) {
-                style.styleSheet.cssText = css;
-            } else {
-                style.appendChild(document.createTextNode(css));
-            }
-            head.appendChild(style);
-        } catch (e) {
-            // Ignore
-        }
     }
 
     // Add copy button to code blocks
@@ -402,13 +246,11 @@
     // Initialize when DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function () { 
-            injectStyle(); 
             try { ensureToastContainer(); } catch(e){} 
             addCopyButtonToCodeBlocks();
             observeCodeBlocks();
         });
     } else {
-        injectStyle();
         try { ensureToastContainer(); } catch(e){}
         addCopyButtonToCodeBlocks();
         observeCodeBlocks();

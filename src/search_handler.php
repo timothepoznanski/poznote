@@ -71,16 +71,18 @@ function buildSearchConditions($search, $tags_search, $folder_filter, $workspace
         if (count($parsed_terms) <= 1 && $parsed_terms[0]['type'] === 'word') {
             // Single word: Optimized search - check heading first (fast with index), then entry (slower)
             // Using CASE to avoid calling search_clean_entry when heading matches
-            $where_conditions[] = "(heading LIKE ? OR (heading NOT LIKE ? AND search_clean_entry(entry) LIKE ?))";
+            // Accent-insensitive search using remove_accents function
+            $where_conditions[] = "(remove_accents(heading) LIKE remove_accents(?) OR (remove_accents(heading) NOT LIKE remove_accents(?) AND remove_accents(search_clean_entry(entry)) LIKE remove_accents(?)))";
             $search_params[] = '%' . $parsed_terms[0]['value'] . '%';
             $search_params[] = '%' . $parsed_terms[0]['value'] . '%';
             $search_params[] = '%' . $parsed_terms[0]['value'] . '%';
         } else {
             // Multiple terms or phrase: require ALL terms to appear (AND)
             // Optimized to check heading first for each term
+            // Accent-insensitive search using remove_accents function
             $term_conditions = [];
             foreach ($parsed_terms as $term) {
-                $term_conditions[] = "(heading LIKE ? OR (heading NOT LIKE ? AND search_clean_entry(entry) LIKE ?))";
+                $term_conditions[] = "(remove_accents(heading) LIKE remove_accents(?) OR (remove_accents(heading) NOT LIKE remove_accents(?) AND remove_accents(search_clean_entry(entry)) LIKE remove_accents(?)))";
                 $search_params[] = '%' . $term['value'] . '%';
                 $search_params[] = '%' . $term['value'] . '%';
                 $search_params[] = '%' . $term['value'] . '%';
@@ -94,14 +96,14 @@ function buildSearchConditions($search, $tags_search, $folder_filter, $workspace
         $search_tags = array_filter(array_map('trim', preg_split('/[,\s]+/', $tags_search)));
         
         if (count($search_tags) == 1) {
-            // Single tag search
-            $where_conditions[] = "tags LIKE ?";
+            // Single tag search - accent-insensitive
+            $where_conditions[] = "remove_accents(tags) LIKE remove_accents(?)";
             $search_params[] = '%' . $search_tags[0] . '%';
         } else {
-            // Multiple tags search - all tags must be present
+            // Multiple tags search - all tags must be present - accent-insensitive
             $tag_conditions = [];
             foreach ($search_tags as $tag) {
-                $tag_conditions[] = "tags LIKE ?";
+                $tag_conditions[] = "remove_accents(tags) LIKE remove_accents(?)";
                 $search_params[] = '%' . $tag . '%';
             }
             $where_conditions[] = "(" . implode(" AND ", $tag_conditions) . ")";

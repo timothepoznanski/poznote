@@ -203,6 +203,11 @@ $router->get('/notes/resolve', function($params) use ($notesController) {
     $notesController->resolveReference();
 });
 
+// Search notes (must come before /notes/{id})
+$router->get('/notes/search', function($params) use ($notesController) {
+    $notesController->search();
+});
+
 // List notes with attachments
 $router->get('/notes/with-attachments', function($params) use ($notesController) {
     $notesController->listWithAttachments();

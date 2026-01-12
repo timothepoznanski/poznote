@@ -34,8 +34,6 @@ RUN echo "Build timestamp: ${BUILD_DATE:-$(date +%s)}" > /tmp/build_timestamp.tx
 # Copy application source
 COPY ./src /var/www/html
 
-# Copy tools scripts (auto-fix, migrations) so init can run them at container startup
-
 # Copy initialization script
 COPY init.sh /usr/local/bin/init.sh
 
@@ -49,7 +47,7 @@ RUN chmod +x /usr/local/bin/init.sh \
 
 # Add OCI standard labels
 LABEL org.opencontainers.image.title="Poznote"
-LABEL org.opencontainers.image.description="Self-hosted, open-source note-taking app with full control and privacy over your data"
+LABEL org.opencontainers.image.description="Poznote is a lightweight, open-source personal note-taking and documentation platform."
 LABEL org.opencontainers.image.authors="Timothé Poznanski"
 LABEL org.opencontainers.image.url="https://github.com/timothepoznanski/poznote"
 LABEL org.opencontainers.image.source="https://github.com/timothepoznanski/poznote"

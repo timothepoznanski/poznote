@@ -330,6 +330,56 @@ function parseMarkdown($text) {
             while ($currentIndex < count($lines)) {
                 $currentLine = $lines[$currentIndex];
                 
+                // Skip blank lines within lists - they should not break the list
+                if (trim($currentLine) === '' && $baseIndent !== null) {
+                    // Only skip blank lines if we've already started a list
+                    // Look ahead to see if there's another list item of the same type
+                    $lookAheadIndex = $currentIndex + 1;
+                    $foundContinuation = false;
+                    
+                    while ($lookAheadIndex < count($lines)) {
+                        $lookAheadLine = $lines[$lookAheadIndex];
+                        
+                        // If we hit another blank line, keep looking
+                        if (trim($lookAheadLine) === '') {
+                            $lookAheadIndex++;
+                            continue;
+                        }
+                        
+                        // Check if this is a list item that continues our list
+                        if ($isTaskList) {
+                            $lookMatch = preg_match('/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/', $lookAheadLine, $lookMatches);
+                            $lookMarkerType = null;
+                        } else {
+                            $lookMatch = preg_match('/^(\s*)([\*\-\+]|\d+\.)\s+(.+)$/', $lookAheadLine, $lookMatches);
+                            if ($lookMatch) {
+                                $lookMarker = $lookMatches[2];
+                                $lookMarkerType = preg_match('/\d+\./', $lookMarker) ? 'number' : 'bullet';
+                            } else {
+                                $lookMarkerType = null;
+                            }
+                        }
+                        
+                        // If we found a list item of the same type and indentation (baseIndent)
+                        if ($lookMatch && $baseIndent !== null && strlen($lookMatches[1]) === $baseIndent && 
+                            ($isTaskList || $lookMarkerType === $baseMarkerType)) {
+                            $foundContinuation = true;
+                        }
+                        
+                        // Stop looking after we find non-blank content
+                        break;
+                    }
+                    
+                    if ($foundContinuation) {
+                        // Skip this blank line and continue parsing
+                        $currentIndex++;
+                        continue;
+                    } else {
+                        // No continuation found, end the list
+                        break;
+                    }
+                }
+                
                 // Check if this is a list item
                 if ($isTaskList) {
                     $listMatch = preg_match('/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/', $currentLine, $matches);

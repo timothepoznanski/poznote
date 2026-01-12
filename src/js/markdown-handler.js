@@ -646,6 +646,56 @@ function parseMarkdown(text) {
             while (currentIndex < lines.length) {
                 let currentLine = lines[currentIndex];
                 
+                // Skip blank lines within lists - they should not break the list
+                if (currentLine.trim() === '' && baseIndent !== null) {
+                    // Only skip blank lines if we've already started a list
+                    // Look ahead to see if there's another list item of the same type
+                    let lookAheadIndex = currentIndex + 1;
+                    let foundContinuation = false;
+                    
+                    while (lookAheadIndex < lines.length) {
+                        let lookAheadLine = lines[lookAheadIndex];
+                        
+                        // If we hit another blank line, keep looking
+                        if (lookAheadLine.trim() === '') {
+                            lookAheadIndex++;
+                            continue;
+                        }
+                        
+                        // Check if this is a list item that continues our list
+                        let lookMatch;
+                        let lookMarkerType = null;
+                        
+                        if (isTaskList) {
+                            lookMatch = lookAheadLine.match(/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/);
+                        } else {
+                            lookMatch = lookAheadLine.match(/^(\s*)([\*\-\+]|\d+\.)\s+(.+)$/);
+                            if (lookMatch) {
+                                let lookMarker = lookMatch[2];
+                                lookMarkerType = lookMarker.match(/\d+\./) ? 'number' : 'bullet';
+                            }
+                        }
+                        
+                        // If we found a list item of the same type and indentation (baseIndent)
+                        if (lookMatch && baseIndent !== null && lookMatch[1].length === baseIndent &&
+                            (isTaskList || lookMarkerType === baseMarkerType)) {
+                            foundContinuation = true;
+                        }
+                        
+                        // Stop looking after we find non-blank content
+                        break;
+                    }
+                    
+                    if (foundContinuation) {
+                        // Skip this blank line and continue parsing
+                        currentIndex++;
+                        continue;
+                    } else {
+                        // No continuation found, end the list
+                        break;
+                    }
+                }
+                
                 // Check if this is a list item
                 let listMatch;
                 let marker = null;

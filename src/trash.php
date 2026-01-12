@@ -80,19 +80,19 @@ $currentLang = getUserLanguage();
 		
 		<div class="trash-content">
 		<?php
-	// Build search condition supporting multiple terms (AND)
+	// Build search condition supporting multiple terms (AND) with accent-insensitive search
 	$search_params = [];
 	$search_condition = '';
 	if ($search) {
 		$terms = array_filter(array_map('trim', preg_split('/\s+/', $search)));
 		if (count($terms) <= 1) {
-			$search_condition = " AND (heading LIKE ? OR entry LIKE ?)";
+			$search_condition = " AND (remove_accents(heading) LIKE remove_accents(?) OR remove_accents(entry) LIKE remove_accents(?))";
 			$search_params[] = "%{$search}%";
 			$search_params[] = "%{$search}%";
 		} else {
 			$parts = [];
 			foreach ($terms as $t) {
-				$parts[] = "(heading LIKE ? OR entry LIKE ?)";
+				$parts[] = "(remove_accents(heading) LIKE remove_accents(?) OR remove_accents(entry) LIKE remove_accents(?))";
 				$search_params[] = "%{$t}%";
 				$search_params[] = "%{$t}%";
 			}
