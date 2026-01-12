@@ -56,8 +56,8 @@ The MCP server consists of two main modules:
   +---------------------+
 ```
 
-Local: everything runs on the same machine. 
-Remote: VS Code communicates via SSH, MCP runs on the server, Poznote API is local to the server.
+**Local**: everything runs on the same machine. <br>
+**Remote**: VS Code communicates via SSH, MCP runs on the server, Poznote API is local to the server.
 
 ## Features
 
