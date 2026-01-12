@@ -22,19 +22,11 @@ Poznote is a lightweight, open-source personal note-taking and documentation pla
 
 ## Features
 
-<div align="center">
+Discover all the [powerful features](https://poznote.com/index.html#features) that make Poznote your perfect note-taking companion!
 
-| 📝 **Editor** | 🔍 **Organization** | 🔧 **Technical** |
-|:---:|:---:|:---:|
-| Rich Text Editor | Powerful Search | Self-Hosted |
-| Markdown Notes | Tag System | REST API |
-| Excalidraw Integration | Workspaces | Multi-instance |
-| Mermaid Diagrams | File Attachments | Built-in Backup |
-| Mathematics Support | Folders | Trash System |
-| Tasklist | Favorites | OpenID Connect |
-| Dark Mode | Note Sharing | Responsive Design |
-
-</div>
+<p align="center">
+  <img src="images/poznote-features.png" alt="Poznote Features" width="100%">
+</p>
 
 ## Try the Poznote demo
 

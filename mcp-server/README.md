@@ -91,8 +91,8 @@ sudo apt install python3 python3-venv python3-pip
 Clone the repository:
 
 ```
-git clone https://github.com/timothepoznanski/poznote.git
-cd poznote/mcp-server
+git clone https://github.com/timothepoznanski/poznote.git poznote-mcp-server
+cd poznote-mcp-server/mcp-server
 ```
 
 Create and activate the venv:
@@ -135,8 +135,8 @@ Get-ChildItem 'C:\Users\YOUR-USERNAME\AppData\Local\Programs\Python','C:\Program
 Clone the repository:
 
 ```
-git clone https://github.com/timothepoznanski/poznote.git
-cd poznote/mcp-server
+git clone https://github.com/timothepoznanski/poznote.git poznote-mcp-server
+cd poznote-mcp-server/mcp-server
 ```
 
 Create and activate the venv:
@@ -171,14 +171,19 @@ There are two primary methods to configure the Poznote MCP server in VS Code, de
 - **Remote (SSH)**: For accessing a Poznote instance on a remote Linux server. VS Code uses SSH tunneling to launch and communicate with the MCP server on the remote machine.
 - **Local (Windows)**: For local development on Windows, where the MCP server runs directly on your machine using stdio communication.
 
+Create the following file on the computer where your VS Code is located: 
+
+`C:\Users\YOUR-USERNAME\AppData\Roaming\Code\User\mcp.json`
+
+and add to it one of the following configuration depending on your case :
+
 ### Option 1: SSH Command Wrapper (Remote Linux Server)
 
 For remote development, VS Code launches the MCP server via SSH:
 
 **VS Code mcp.json** 
 
-**On Windows**: `C:\Users\YOUR-USERNAME\AppData\Roaming\Code\User\mcp.json`
-**On Linux**:`~/.config/Code/User/mcp.json`
+If poznote-mcp-server has been cloned on /root for example :
 
 ```json
 {
@@ -187,7 +192,7 @@ For remote development, VS Code launches the MCP server via SSH:
       "command": "ssh",
       "args": [
         "user@your-server",
-        "cd ~/poznote/mcp-server && source venv/bin/activate && POZNOTE_API_URL=http://localhost:PORT/api/v1 POZNOTE_USERNAME=YOUR-LOGIN POZNOTE_PASSWORD=YOUR-PASSWORD POZNOTE_DEBUG=1 python3 -m poznote_mcp.server"
+        "cd /root/poznote-mcp-server/mcp-server && source venv/bin/activate && POZNOTE_API_URL=http://localhost:PORT/api/v1 POZNOTE_USERNAME=YOUR-LOGIN POZNOTE_PASSWORD=YOUR-PASSWORD POZNOTE_DEBUG=1 python3 -m poznote_mcp.server"
       ]
     }
   }
@@ -198,7 +203,8 @@ For remote development, VS Code launches the MCP server via SSH:
 
 For local development without SSH:
 
-**VS Code mcp.json:**
+**VS Code mcp.json** 
+
 ```json
 {
   "servers": {
