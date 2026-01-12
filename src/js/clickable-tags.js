@@ -315,10 +315,21 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
 
         // Position the dropdown under the input
         dd.style.display = 'block';
-        const containerRect = container.getBoundingClientRect();
-        const inputRect = inputEl.getBoundingClientRect();
-        dd.style.left = (inputRect.left - containerRect.left + container.scrollLeft) + 'px';
-        dd.style.top = (inputRect.bottom - containerRect.top + container.scrollTop + 4) + 'px';
+        
+        // Check if we're in mobile view (horizontal scrolling container)
+        const isMobile = window.innerWidth <= 800;
+        
+        if (isMobile) {
+            // Mobile: calculate position relative to container with scroll offset
+            const containerRect = container.getBoundingClientRect();
+            const inputRect = inputEl.getBoundingClientRect();
+            dd.style.left = (inputRect.left - containerRect.left + container.scrollLeft) + 'px';
+            dd.style.top = (inputRect.bottom - containerRect.top + container.scrollTop + 4) + 'px';
+        } else {
+            // Desktop: use simple offset positioning
+            dd.style.left = inputEl.offsetLeft + 'px';
+            dd.style.top = (inputEl.offsetTop + inputEl.offsetHeight + 4) + 'px';
+        }
         // Note: No item is highlighted by default, user must use arrow keys to highlight
         
         // Only add navigation handler once per input element
