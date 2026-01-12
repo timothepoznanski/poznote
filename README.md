@@ -24,11 +24,11 @@ Poznote is a lightweight, open-source personal note-taking and documentation pla
 
 Discover all the powerful features that make Poznote your perfect note-taking companion!
 
+[View detailed features](https://poznote.com/index.html#features)
+
 <p align="center">
   <img src="images/poznote-features.png" alt="Poznote Features" width="100%">
 </p>
-
-[View detailed features](https://poznote.com/index.html#features)
 
 ## Try the Poznote demo
 
