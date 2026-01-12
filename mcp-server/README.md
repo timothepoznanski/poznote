@@ -11,6 +11,7 @@ Allows an AI to **read**, **search** and **write** notes.
 - `poznote://note/{id}` - Content of a specific note
 
 ### Tools (actions)
+- `get_note` - Get a specific note by ID with full content
 - `search_notes` - Text search in notes
 - `create_note` - Create a new note
 - `update_note` - Update an existing note
@@ -138,7 +139,8 @@ POZNOTE_DEBUG=1
 
 Once configured, you can ask in VS Code Copilot chat:
 
-- Display the content of note ID XXXXXX.
-- Create a note "XXXXX" in poznote.
+- Get the content of note ID 12345
+- Display the content of note ID XXXXXX
 - Search for notes about "project ideas"
+- Create a note "XXXXX" in poznote
 - Update note 12345 with new content

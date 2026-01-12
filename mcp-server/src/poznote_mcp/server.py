@@ -197,6 +197,24 @@ async def list_tools() -> ListToolsResult:
     return ListToolsResult(
         tools=[
             Tool(
+                name="get_note",
+                description="Get a specific note by its ID with full content",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "integer",
+                            "description": "ID of the note to retrieve",
+                        },
+                        "workspace": {
+                            "type": "string",
+                            "description": "Workspace name (optional, uses default workspace if not specified)",
+                        },
+                    },
+                    "required": ["id"],
+                },
+            ),
+            Tool(
                 name="search_notes",
                 description="Search notes by text query. Returns matching notes with excerpts.",
                 inputSchema={
@@ -290,7 +308,44 @@ async def call_tool(name: str, arguments: dict) -> CallToolResult:
     client = get_client()
     
     try:
-        if name == "search_notes":
+        if name == "get_note":
+            note_id = arguments.get("id")
+            workspace = arguments.get("workspace")
+            
+            if not note_id:
+                return CallToolResult(
+                    content=[TextContent(type="text", text="Error: id is required")]
+                )
+            
+            note = client.get_note(int(note_id), workspace=workspace)
+            
+            if note is None:
+                return CallToolResult(
+                    content=[TextContent(type="text", text=f"Error: Note {note_id} not found")]
+                )
+            
+            # Format for AI consumption
+            result = {
+                "id": note.get("id"),
+                "title": note.get("heading", "Untitled"),
+                "content": note.get("content", ""),
+                "tags": [t.strip() for t in (note.get("tags") or "").split(",") if t.strip()],
+                "folder": note.get("folder"),
+                "workspace": note.get("workspace"),
+                "updatedAt": note.get("updated"),
+                "createdAt": note.get("created"),
+            }
+            
+            return CallToolResult(
+                content=[
+                    TextContent(
+                        type="text",
+                        text=json.dumps(result, indent=2, ensure_ascii=False),
+                    )
+                ]
+            )
+        
+        elif name == "search_notes":
             query = arguments.get("query", "")
             limit = arguments.get("limit", 10)
             workspace = arguments.get("workspace")
