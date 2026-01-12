@@ -90,17 +90,19 @@ class PoznoteClient:
         
         Returns list of matching notes with excerpts
         """
-        params = {"q": query, "limit": limit}
+        params = {"search": query}
         ws = workspace or self.default_workspace
         if ws:
             params["workspace"] = ws
         
-        response = self.client.get("/notes/search", params=params)
+        response = self.client.get("/notes", params=params)
         response.raise_for_status()
         data = response.json()
         
         if data.get("success"):
-            return data.get("results", [])
+            notes = data.get("notes", [])
+            # Limit results
+            return notes[:limit]
         return []
     
     def create_note(
