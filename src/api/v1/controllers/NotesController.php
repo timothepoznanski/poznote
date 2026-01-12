@@ -299,10 +299,19 @@ class NotesController {
             return;
         }
         
+        // DEBUG logging
+        error_log("NotesController::create - Input received: " . json_encode($input));
+        
         $originalHeading = isset($input['heading']) ? trim($input['heading']) : '';
         $tags = isset($input['tags']) ? trim($input['tags']) : '';
         $folder = isset($input['folder_name']) ? trim($input['folder_name']) : null;
-        $workspace = isset($input['workspace']) ? trim($input['workspace']) : getFirstWorkspaceName();
+        
+        // Handle workspace - use provided value or fallback to first workspace
+        // $workspace = isset($input['workspace']) && trim($input['workspace']) !== '' 
+        //     ? trim($input['workspace']) 
+        //     : getFirstWorkspaceName();
+        
+        // error_log("NotesController::create - workspace after processing: " . $workspace);
         $entry = $input['content'] ?? $input['entry'] ?? '';
         $entrycontent = $input['entrycontent'] ?? $entry;
         $type = isset($input['type']) ? trim($input['type']) : 'note';

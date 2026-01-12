@@ -5,6 +5,9 @@ Poznote API Client - HTTP client for communicating with Poznote REST API
 import httpx
 from typing import Optional
 import os
+import logging
+
+logger = logging.getLogger("poznote-mcp.client")
 
 
 class PoznoteClient:
@@ -113,10 +116,18 @@ class PoznoteClient:
         
         Returns the created note with its ID
         """
+        # DEBUG: Log input parameter
+        logger.info(f"[CLIENT] create_note called with workspace={workspace!r}")
+        
+        # Use provided workspace or fall back to default
+        ws = workspace if workspace else self.default_workspace
+        
+        logger.info(f"[CLIENT] Using workspace: {ws!r} (default_workspace={self.default_workspace!r})")
+        
         payload = {
             "heading": title,
             "content": content,
-            "workspace": workspace or self.default_workspace,
+            "workspace": ws,
         }
         
         if tags:
@@ -124,9 +135,14 @@ class PoznoteClient:
         if folder_name:
             payload["folder_name"] = folder_name
         
+        logger.info(f"Creating note with payload: {payload}")
+        logger.info(f"API URL: {self.base_url}/notes")
+        
         response = self.client.post("/notes", json=payload)
         response.raise_for_status()
         data = response.json()
+        
+        logger.info(f"API response: {data}")
         
         if data.get("success"):
             return data.get("note", {"id": data.get("id")})
