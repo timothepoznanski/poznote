@@ -88,13 +88,11 @@ sudo apt update
 sudo apt install python3 python3-venv python3-pip
 ```
 
-Download the mcp-server folder:
+Clone the repository:
 
 ```
-git clone --depth 1 --filter=blob:none --sparse https://github.com/timothepoznanski/poznote.git
-cd poznote
-git sparse-checkout set mcp-server
-cd mcp-server
+git clone https://github.com/timothepoznanski/poznote.git
+cd poznote/mcp-server
 ```
 
 Create and activate the venv:
@@ -125,13 +123,11 @@ List existing Python installations and get the full path of your python.exe:
 Get-ChildItem 'C:\Users\YOUR-USERNAME\AppData\Local\Programs\Python','C:\Program Files' -Recurse -Filter 'python.exe' -ErrorAction SilentlyContinue | Select-Object FullName
 ```
 
-Download the mcp-server folder:
+Clone the repository:
 
 ```
-git clone --depth 1 --filter=blob:none --sparse https://github.com/timothepoznanski/poznote.git
-cd poznote
-git sparse-checkout set mcp-server
-cd mcp-server
+git clone https://github.com/timothepoznanski/poznote.git
+cd poznote/mcp-server
 ```
 
 Create and activate the venv:
