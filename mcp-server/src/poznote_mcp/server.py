@@ -11,9 +11,13 @@ Resources:
   - note/{id}: Get a specific note with content
 
 Tools:
+  - get_note: Get a specific note by its ID with full content
   - search_notes: Search notes by text query
-  - create_note: Create a new note  
+  - create_note: Create a new note
   - update_note: Update an existing note
+  - delete_note: Delete a note by its ID
+  - list_notes: List all notes from a specific workspace
+  - create_folder: Create a new folder in Poznote
 
 Usage:
   python -m poznote_mcp.server
@@ -208,10 +212,10 @@ async def list_tools() -> ListToolsResult:
                         },
                         "workspace": {
                             "type": "string",
-                            "description": "Workspace name (optional, uses default workspace if not specified)",
+                            "description": "Workspace name",
                         },
                     },
-                    "required": ["id"],
+                    "required": ["id", "workspace"],
                 },
             ),
             Tool(
@@ -231,10 +235,10 @@ async def list_tools() -> ListToolsResult:
                         },
                         "workspace": {
                             "type": "string",
-                            "description": "Workspace name (optional, uses default workspace if not specified)",
+                            "description": "Workspace name",
                         },
                     },
-                    "required": ["query"],
+                    "required": ["query", "workspace"],
                 },
             ),
             Tool(
@@ -261,10 +265,10 @@ async def list_tools() -> ListToolsResult:
                         },
                         "workspace": {
                             "type": "string",
-                            "description": "Workspace name (optional, uses default workspace if not specified)",
+                            "description": "Workspace name",
                         },
                     },
-                    "required": ["title", "content"],
+                    "required": ["title", "content", "workspace"],
                 },
             ),
             Tool(
@@ -291,10 +295,10 @@ async def list_tools() -> ListToolsResult:
                         },
                         "workspace": {
                             "type": "string",
-                            "description": "Workspace name (optional, uses default workspace if not specified)",
+                            "description": "Workspace name",
                         },
                     },
-                    "required": ["id"],
+                    "required": ["id", "workspace"],
                 },
             ),
             Tool(
@@ -309,10 +313,10 @@ async def list_tools() -> ListToolsResult:
                         },
                         "workspace": {
                             "type": "string",
-                            "description": "Workspace name (optional, uses default workspace if not specified)",
+                            "description": "Workspace name",
                         },
                     },
-                    "required": ["id"],
+                    "required": ["id", "workspace"],
                 },
             ),
             Tool(
@@ -323,7 +327,7 @@ async def list_tools() -> ListToolsResult:
                     "properties": {
                         "workspace": {
                             "type": "string",
-                            "description": "Workspace name (optional, uses default workspace if not specified)",
+                            "description": "Workspace name",
                         },
                         "limit": {
                             "type": "integer",
@@ -331,7 +335,7 @@ async def list_tools() -> ListToolsResult:
                             "default": 50,
                         },
                     },
-                    "required": [],
+                    "required": ["workspace"],
                 },
             ),
             Tool(
@@ -350,10 +354,10 @@ async def list_tools() -> ListToolsResult:
                         },
                         "workspace": {
                             "type": "string",
-                            "description": "Workspace name (optional, uses default workspace if not specified)",
+                            "description": "Workspace name",
                         },
                     },
-                    "required": ["folder_name"],
+                    "required": ["folder_name", "workspace"],
                 },
             ),
         ]
@@ -390,7 +394,6 @@ async def call_tool(name: str, arguments: dict) -> CallToolResult:
                 "content": note.get("content", ""),
                 "tags": [t.strip() for t in (note.get("tags") or "").split(",") if t.strip()],
                 "folder": note.get("folder"),
-                "workspace": note.get("workspace"),
                 "updatedAt": note.get("updated"),
                 "createdAt": note.get("created"),
             }
@@ -411,7 +414,7 @@ async def call_tool(name: str, arguments: dict) -> CallToolResult:
             
             if not query:
                 return CallToolResult(
-                    content=[TextContent(type="text", text="Error: query is required")]
+                    content=[TextContent(type="text", text="Error: query parameter is required")]
                 )
             
             results = client.search_notes(query, limit=limit, workspace=workspace)
@@ -446,9 +449,6 @@ async def call_tool(name: str, arguments: dict) -> CallToolResult:
             tags = arguments.get("tags")
             folder = arguments.get("folder")
             workspace = arguments.get("workspace")
-            
-            # DEBUG: Log what we receive from MCP client
-            logger.info(f"[SERVER] create_note called with arguments: {arguments}")        
             
             result = client.create_note(
                 title=title,
@@ -557,7 +557,6 @@ async def call_tool(name: str, arguments: dict) -> CallToolResult:
                     "title": note.get("heading", "Untitled"),
                     "tags": note.get("tags", ""),
                     "folder": note.get("folder"),
-                    "workspace": note.get("workspace"),
                     "updatedAt": note.get("updated"),
                     "createdAt": note.get("created"),
                 })
