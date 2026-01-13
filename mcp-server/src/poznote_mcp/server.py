@@ -212,10 +212,10 @@ async def list_tools() -> ListToolsResult:
                         },
                         "workspace": {
                             "type": "string",
-                            "description": "Workspace name (optional, uses default workspace if not specified)",
+                            "description": "Workspace name",
                         },
                     },
-                    "required": ["id"],
+                    "required": ["id", "workspace"],
                 },
             ),
             Tool(
@@ -235,10 +235,10 @@ async def list_tools() -> ListToolsResult:
                         },
                         "workspace": {
                             "type": "string",
-                            "description": "Workspace name (optional, uses default workspace if not specified)",
+                            "description": "Workspace name",
                         },
                     },
-                    "required": ["query"],
+                    "required": ["query", "workspace"],
                 },
             ),
             Tool(
@@ -265,10 +265,10 @@ async def list_tools() -> ListToolsResult:
                         },
                         "workspace": {
                             "type": "string",
-                            "description": "Workspace name (optional, uses default workspace if not specified)",
+                            "description": "Workspace name",
                         },
                     },
-                    "required": ["title", "content"],
+                    "required": ["title", "content", "workspace"],
                 },
             ),
             Tool(
@@ -295,10 +295,10 @@ async def list_tools() -> ListToolsResult:
                         },
                         "workspace": {
                             "type": "string",
-                            "description": "Workspace name (optional, uses default workspace if not specified)",
+                            "description": "Workspace name",
                         },
                     },
-                    "required": ["id"],
+                    "required": ["id", "workspace"],
                 },
             ),
             Tool(
@@ -313,10 +313,10 @@ async def list_tools() -> ListToolsResult:
                         },
                         "workspace": {
                             "type": "string",
-                            "description": "Workspace name (optional, uses default workspace if not specified)",
+                            "description": "Workspace name",
                         },
                     },
-                    "required": ["id"],
+                    "required": ["id", "workspace"],
                 },
             ),
             Tool(
@@ -327,7 +327,7 @@ async def list_tools() -> ListToolsResult:
                     "properties": {
                         "workspace": {
                             "type": "string",
-                            "description": "Workspace name (optional, uses default workspace if not specified)",
+                            "description": "Workspace name",
                         },
                         "limit": {
                             "type": "integer",
@@ -335,7 +335,7 @@ async def list_tools() -> ListToolsResult:
                             "default": 50,
                         },
                     },
-                    "required": [],
+                    "required": ["workspace"],
                 },
             ),
             Tool(
@@ -354,10 +354,10 @@ async def list_tools() -> ListToolsResult:
                         },
                         "workspace": {
                             "type": "string",
-                            "description": "Workspace name (optional, uses default workspace if not specified)",
+                            "description": "Workspace name",
                         },
                     },
-                    "required": ["folder_name"],
+                    "required": ["folder_name", "workspace"],
                 },
             ),
         ]
