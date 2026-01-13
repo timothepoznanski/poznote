@@ -11,9 +11,13 @@ Resources:
   - note/{id}: Get a specific note with content
 
 Tools:
+  - get_note: Get a specific note by its ID with full content
   - search_notes: Search notes by text query
-  - create_note: Create a new note  
+  - create_note: Create a new note
   - update_note: Update an existing note
+  - delete_note: Delete a note by its ID
+  - list_notes: List all notes from a specific workspace
+  - create_folder: Create a new folder in Poznote
 
 Usage:
   python -m poznote_mcp.server
