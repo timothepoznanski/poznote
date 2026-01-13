@@ -394,7 +394,6 @@ async def call_tool(name: str, arguments: dict) -> CallToolResult:
                 "content": note.get("content", ""),
                 "tags": [t.strip() for t in (note.get("tags") or "").split(",") if t.strip()],
                 "folder": note.get("folder"),
-                "workspace": note.get("workspace"),
                 "updatedAt": note.get("updated"),
                 "createdAt": note.get("created"),
             }
@@ -415,7 +414,7 @@ async def call_tool(name: str, arguments: dict) -> CallToolResult:
             
             if not query:
                 return CallToolResult(
-                    content=[TextContent(type="text", text="Error: query is required")]
+                    content=[TextContent(type="text", text="Error: query parameter is required")]
                 )
             
             results = client.search_notes(query, limit=limit, workspace=workspace)
@@ -450,9 +449,6 @@ async def call_tool(name: str, arguments: dict) -> CallToolResult:
             tags = arguments.get("tags")
             folder = arguments.get("folder")
             workspace = arguments.get("workspace")
-            
-            # DEBUG: Log what we receive from MCP client
-            logger.info(f"[SERVER] create_note called with arguments: {arguments}")        
             
             result = client.create_note(
                 title=title,
@@ -561,7 +557,6 @@ async def call_tool(name: str, arguments: dict) -> CallToolResult:
                     "title": note.get("heading", "Untitled"),
                     "tags": note.get("tags", ""),
                     "folder": note.get("folder"),
-                    "workspace": note.get("workspace"),
                     "updatedAt": note.get("updated"),
                     "createdAt": note.get("created"),
                 })
