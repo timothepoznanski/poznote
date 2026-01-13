@@ -23,7 +23,7 @@ Tools:
 
 Usage:
   poznote-mcp serve --transport=stdio
-  poznote-mcp serve --transport=http --port=8081
+  poznote-mcp serve --transport=http --port=8041
 """
 
 import argparse
@@ -48,16 +48,20 @@ logger = logging.getLogger("poznote-mcp")
 # Parse CLI args early to configure FastMCP with correct host/port
 def _get_config():
     """Get configuration from CLI args or environment variables"""
+    # Create a simplified parser that matches our actual CLI structure
     parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument("command", nargs="?", default=None)
-    parser.add_argument("--transport", choices=["stdio", "http"], default=None)
-    parser.add_argument("--host", default=None)
-    parser.add_argument("--port", type=int, default=None)
+    subparsers = parser.add_subparsers(dest="command")
+    serve_parser = subparsers.add_parser("serve", add_help=False)
+    serve_parser.add_argument("--transport", choices=["stdio", "http"], default=None)
+    serve_parser.add_argument("--host", default=None)
+    serve_parser.add_argument("--port", type=int, default=None)
+    
     args, _ = parser.parse_known_args()
     
-    transport = args.transport or os.getenv("MCP_TRANSPORT", "stdio")
-    host = args.host or os.getenv("MCP_HOST", "0.0.0.0")
-    port = args.port or int(os.getenv("MCP_PORT", "8081"))
+    # Get values from args or environment
+    transport = getattr(args, 'transport', None) or os.getenv("MCP_TRANSPORT", "stdio")
+    host = getattr(args, 'host', None) or os.getenv("MCP_HOST", "0.0.0.0")
+    port = getattr(args, 'port', None) or int(os.getenv("MCP_PORT", "8041"))
     
     return transport, host, port
 
@@ -337,8 +341,8 @@ def create_parser() -> argparse.ArgumentParser:
     serve_parser.add_argument(
         "--port",
         type=int,
-        default=8081,
-        help="Port to listen on for HTTP mode (default: 8081)",
+        default=8041,
+        help="Port to listen on for HTTP mode (default: 8041)",
     )
     
     return parser
@@ -349,10 +353,16 @@ def main():
     parser = create_parser()
     args = parser.parse_args()
     
-    # Use pre-parsed config (already parsed for FastMCP init)
-    transport = _transport
-    host = _host
-    port = _port
+    # Get actual values from parsed arguments (not pre-parsed config)
+    if args.command == "serve":
+        transport = args.transport
+        host = args.host
+        port = args.port
+    else:
+        # Backward compatibility: no subcommand means use env vars
+        transport = os.getenv("MCP_TRANSPORT", "stdio")
+        host = os.getenv("MCP_HOST", "0.0.0.0")
+        port = int(os.getenv("MCP_PORT", "8041"))
     
     try:
         if transport == "http":

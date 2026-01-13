@@ -12,7 +12,7 @@ The MCP server supports two transport modes:
 | Mode | Command |
 |------|---------|
 | **stdio** | `poznote-mcp serve --transport=stdio` |
-| **http** | `poznote-mcp serve --transport=http --port=8081` |
+| **http** | `poznote-mcp serve --transport=http --port=8041` |
 
 ## How It Works
 
@@ -37,8 +37,8 @@ The MCP server consists of two main modules:
 3. The HTTP client calls the Poznote API at `http://localhost/api/v1`
 
 **HTTP Mode (Streamable HTTP):**
-1. MCP server runs on the Poznote server: `poznote-mcp serve --transport=http --port=8081`
-2. VS Code connects directly to `http://your-server:8081/mcp`
+1. MCP server runs on the Poznote server: `poznote-mcp serve --transport=http --port=8041`
+2. VS Code connects directly to `http://your-server:8041/mcp`
 3. No local Python installation required on client machine
 4. Works through corporate proxies and firewalls
 
@@ -123,7 +123,7 @@ python -c "import poznote_mcp; print('poznote_mcp OK')"
 poznote-mcp serve --transport=stdio
 
 # Test HTTP mode (press CTRL+C to stop)
-poznote-mcp serve --transport=http --port=8081
+poznote-mcp serve --transport=http --port=8041
 ```
 
 When configured in VS Code, the MCP server is automatically started by VS Code and invoked on-demand when you make requests in Copilot Chat.
@@ -174,7 +174,7 @@ python -c "import poznote_mcp; print('poznote_mcp OK')"
 poznote-mcp serve --transport=stdio
 
 # Test HTTP mode (press CTRL+C to stop)
-poznote-mcp serve --transport=http --port=8081
+poznote-mcp serve --transport=http --port=8041
 ```
 
 When configured in VS Code, the MCP server is automatically started by VS Code and invoked on-demand when you make requests in Copilot Chat.
@@ -210,8 +210,15 @@ If poznote-mcp-server has been cloned on /root for example :
       "command": "ssh",
       "args": [
         "user@your-server",
-        "cd /root/poznote-mcp-server/mcp-server && source venv/bin/activate && POZNOTE_API_URL=http://localhost:PORT/api/v1 POZNOTE_USERNAME=YOUR-LOGIN POZNOTE_PASSWORD=YOUR-PASSWORD poznote-mcp serve --transport=stdio"
-      ]
+        "cd /root/poznote-mcp-server/mcp-server && source venv/bin/activate poznote-mcp serve --transport=stdio"
+      ],
+      "env": {
+        "POZNOTE_API_URL": "http://localhost:PORT/api/v1",
+        "POZNOTE_USERNAME": "YOUR-LOGIN",
+        "POZNOTE_PASSWORD": "YOUR-PASSWORD",
+        "POZNOTE_DEFAULT_WORKSPACE": "Poznote",
+        "POZNOTE_DEBUG": "1"
+      }
     }
   }
 }
@@ -250,13 +257,13 @@ source venv/bin/activate
 export POZNOTE_API_URL=http://localhost:PORT/api/v1
 export POZNOTE_USERNAME=YOUR-LOGIN
 export POZNOTE_PASSWORD=YOUR-PASSWORD
-poznote-mcp serve --transport=http --port=8081
+poznote-mcp serve --transport=http --port=8041
 ```
 
 Or run as a background service (optional):
 
 ```bash
-nohup poznote-mcp serve --transport=http --port=8081 > /var/log/poznote-mcp.log 2>&1 &
+nohup poznote-mcp serve --transport=http --port=8041 > /var/log/poznote-mcp.log 2>&1 &
 ```
 
 **Step 2: Configure VS Code to connect via HTTP**
@@ -268,13 +275,13 @@ nohup poznote-mcp serve --transport=http --port=8081 > /var/log/poznote-mcp.log 
   "servers": {
     "poznote": {
       "type": "http",
-      "url": "http://your-server:8081/mcp"
+      "url": "http://your-server:8041/mcp"
     }
   }
 }
 ```
 
-> **Note:** Make sure port 8081 is accessible from your workstation. You may need to configure firewall rules or use an SSH tunnel if direct access is not available.
+> **Note:** Make sure port 8041 is accessible from your workstation. You may need to configure firewall rules or use an SSH tunnel if direct access is not available.
 
 ### Environment Variables Reference
 
@@ -287,7 +294,7 @@ nohup poznote-mcp serve --transport=http --port=8081 > /var/log/poznote-mcp.log 
 | `POZNOTE_DEBUG` | Enable debug logging | `0` |
 | `MCP_TRANSPORT` | Transport mode (legacy) | `stdio` |
 | `MCP_HOST` | HTTP host (legacy) | `0.0.0.0` |
-| `MCP_PORT` | HTTP port (legacy) | `8081` |
+| `MCP_PORT` | HTTP port (legacy) | `8041` |
 
 ## After configuring, restart the MCP server
 
