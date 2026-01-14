@@ -52,8 +52,6 @@ Password: `poznote`
 - [API Documentation](#api-documentation)
 - [Use Poznote in the Cloud](#use-poznote-in-the-cloud)
 - [Tech Stack](#tech-stack)
-- [Star History](#star-history)
-
 
 ## Install
 
@@ -1459,11 +1457,3 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 - **Alpine Linux** - Secure, lightweight base image
 - **Docker** - Containerization for easy deployment and portability
 </details>
-
-## Star History
-
-<p align="center">
-  <a href="https://star-history.com/#timothepoznanski/poznote&Date">
-    <img src="https://api.star-history.com/svg?repos=timothepoznanski/poznote&type=Date" alt="Star History Chart">
-  </a>
-</p>

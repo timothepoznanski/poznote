@@ -77,7 +77,6 @@ The MCP server acts as a bridge between VS Code Copilot and your Poznote instanc
 1. MCP server runs on the Poznote server: `poznote-mcp serve --transport=http --port=8041`
 2. VS Code connects directly to `http://your-server:8041/mcp`
 3. No local Python installation required on client machine
-4. Works through corporate proxies and firewalls
 
 ```
   ┌─────────────────────┐
@@ -164,7 +163,7 @@ poznote-mcp serve --transport=stdio
 poznote-mcp serve --transport=http --port=8041
 ```
 
-When configured in VS Code, the MCP server is automatically started by VS Code and invoked on-demand when you make requests in Copilot Chat.
+When configured in VS Code with stdio transport (SSH or local), the MCP server is automatically started on-demand. For HTTP transport, you must run the server as a persistent service.
 
 ### Windows Local
 
@@ -215,7 +214,7 @@ poznote-mcp serve --transport=stdio
 poznote-mcp serve --transport=http --port=8041
 ```
 
-When configured in VS Code, the MCP server is automatically started by VS Code and invoked on-demand when you make requests in Copilot Chat.
+When configured in VS Code with stdio transport (SSH or local), the MCP server is automatically started on-demand. For HTTP transport, you must run the server as a persistent service.
 
 ## VS Code Configuration
 
@@ -308,7 +307,7 @@ For local development without SSH:
 Set environment variables and start the server:
 
 ```bash
-cd /root/poznote-mcp-server/mcp-server
+cd /home/user/poznote-mcp-server/mcp-server
 source venv/bin/activate
 export POZNOTE_API_URL=http://localhost:8040/api/v1
 export POZNOTE_USERNAME=your-poznote-username
@@ -327,13 +326,13 @@ After=network.target
 
 [Service]
 Type=simple
-User=root
-WorkingDirectory=/root/poznote-mcp-server/mcp-server
+User=user
+WorkingDirectory=/home/user/poznote-mcp-server/mcp-server
 Environment="POZNOTE_API_URL=http://localhost:8040/api/v1"
 Environment="POZNOTE_USERNAME=your-poznote-username"
 Environment="POZNOTE_PASSWORD=your-poznote-password"
 Environment="POZNOTE_DEFAULT_WORKSPACE=Poznote"
-ExecStart=/root/poznote-mcp-server/mcp-server/venv/bin/poznote-mcp serve --transport=http --port=8041
+ExecStart=/home/user/poznote-mcp-server/mcp-server/venv/bin/poznote-mcp serve --transport=http --port=8041
 Restart=always
 
 [Install]
