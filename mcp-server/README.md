@@ -307,7 +307,7 @@ For local development without SSH:
 Set environment variables and start the server:
 
 ```bash
-cd /root/poznote-mcp-server/mcp-server
+cd /home/user/poznote-mcp-server/mcp-server
 source venv/bin/activate
 export POZNOTE_API_URL=http://localhost:8040/api/v1
 export POZNOTE_USERNAME=your-poznote-username
@@ -326,13 +326,13 @@ After=network.target
 
 [Service]
 Type=simple
-User=root
-WorkingDirectory=/root/poznote-mcp-server/mcp-server
+User=user
+WorkingDirectory=/home/user/poznote-mcp-server/mcp-server
 Environment="POZNOTE_API_URL=http://localhost:8040/api/v1"
 Environment="POZNOTE_USERNAME=your-poznote-username"
 Environment="POZNOTE_PASSWORD=your-poznote-password"
 Environment="POZNOTE_DEFAULT_WORKSPACE=Poznote"
-ExecStart=/root/poznote-mcp-server/mcp-server/venv/bin/poznote-mcp serve --transport=http --port=8041
+ExecStart=/home/user/poznote-mcp-server/mcp-server/venv/bin/poznote-mcp serve --transport=http --port=8041
 Restart=always
 
 [Install]
