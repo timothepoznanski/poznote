@@ -164,7 +164,7 @@ poznote-mcp serve --transport=stdio
 poznote-mcp serve --transport=http --port=8041
 ```
 
-When configured in VS Code, the MCP server is automatically started by VS Code and invoked on-demand when you make requests in Copilot Chat.
+When configured in VS Code with stdio transport (SSH or local), the MCP server is automatically started on-demand. For HTTP transport, you must run the server as a persistent service.
 
 ### Windows Local
 
@@ -215,7 +215,7 @@ poznote-mcp serve --transport=stdio
 poznote-mcp serve --transport=http --port=8041
 ```
 
-When configured in VS Code, the MCP server is automatically started by VS Code and invoked on-demand when you make requests in Copilot Chat.
+When configured in VS Code with stdio transport (SSH or local), the MCP server is automatically started on-demand. For HTTP transport, you must run the server as a persistent service.
 
 ## VS Code Configuration
 
