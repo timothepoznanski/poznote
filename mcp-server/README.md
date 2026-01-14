@@ -77,7 +77,6 @@ The MCP server acts as a bridge between VS Code Copilot and your Poznote instanc
 1. MCP server runs on the Poznote server: `poznote-mcp serve --transport=http --port=8041`
 2. VS Code connects directly to `http://your-server:8041/mcp`
 3. No local Python installation required on client machine
-4. Works through corporate proxies and firewalls
 
 ```
   ┌─────────────────────┐
