@@ -239,7 +239,7 @@ There are three configuration methods:
 
 For remote development, VS Code launches the MCP server via SSH.
 
-**Example `mcp.json`** (assuming poznote-mcp-server is in `/root`):
+**Example `mcp.json`** (assuming poznote-mcp-server is in `/home/user`):
 
 ```json
 {
@@ -248,7 +248,7 @@ For remote development, VS Code launches the MCP server via SSH.
       "command": "ssh",
       "args": [
         "user@your-server",
-        "cd /root/poznote-mcp-server/mcp-server && source venv/bin/activate && poznote-mcp serve --transport=stdio"
+        "cd /home/user/poznote-mcp-server/mcp-server && source venv/bin/activate && poznote-mcp serve --transport=stdio"
       ],
       "env": {
         "POZNOTE_API_URL": "http://localhost:8040/api/v1",
@@ -346,6 +346,38 @@ sudo systemctl daemon-reload
 sudo systemctl enable poznote-mcp
 sudo systemctl start poznote-mcp
 sudo systemctl status poznote-mcp
+```
+
+**Or run as a user systemd service (no sudo required):**
+
+Create `~/.config/systemd/user/poznote-mcp.service`:
+
+```ini
+[Unit]
+Description=Poznote MCP Server
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/poznote-mcp-server/mcp-server
+Environment="POZNOTE_API_URL=http://localhost:8040/api/v1"
+Environment="POZNOTE_USERNAME=your-poznote-username"
+Environment="POZNOTE_PASSWORD=your-poznote-password"
+Environment="POZNOTE_DEFAULT_WORKSPACE=Poznote"
+ExecStart=%h/poznote-mcp-server/mcp-server/venv/bin/poznote-mcp serve --transport=http --port=8041
+Restart=always
+
+[Install]
+WantedBy=default.target
+```
+
+Enable and start the user service:
+
+```bash
+systemctl --user daemon-reload
+systemctl --user enable poznote-mcp
+systemctl --user start poznote-mcp
+systemctl --user status poznote-mcp
 ```
 
 **Step 2: Configure VS Code to connect via HTTP**
