@@ -712,6 +712,10 @@
         "title": "Exporter en HTML",
         "description": "Télécharger en fichier HTML avec tout le formatage préservé"
       },
+      "json": {
+        "title": "Télécharger en JSON",
+        "description": "Télécharger les données brutes de la liste de tâches au format JSON"
+      },
       "print": {
         "title": "Imprimer en PDF (Navigateur)",
         "description": "Utiliser la boîte de dialogue d'impression native du navigateur pour enregistrer en PDF"

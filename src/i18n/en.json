@@ -721,6 +721,10 @@
         "title": "Export as HTML",
         "description": "Download as HTML file with all formatting preserved"
       },
+      "json": {
+        "title": "Download as JSON",
+        "description": "Download the raw tasklist data as a JSON file"
+      },
       "print": {
         "title": "Print to PDF (Browser)",
         "description": "Use browser's native print dialog to save as PDF"

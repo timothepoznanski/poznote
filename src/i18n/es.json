@@ -724,6 +724,10 @@
         "title": "Exportar como HTML",
         "description": "Descargar como archivo HTML con todo el formato preservado"
       },
+      "json": {
+        "title": "Descargar como JSON",
+        "description": "Descargar los datos sin procesar de la lista de tareas como archivo JSON"
+      },
       "print": {
         "title": "Imprimir a PDF (Navegador)",
         "description": "Usar el diálogo de impresión nativo del navegador para guardar como PDF"

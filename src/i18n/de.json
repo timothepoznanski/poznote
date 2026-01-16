@@ -724,6 +724,10 @@
         "title": "Als HTML exportieren",
         "description": "Als HTML-Datei mit vollständig erhaltener Formatierung herunterladen"
       },
+      "json": {
+        "title": "Als JSON herunterladen",
+        "description": "Die Rohdaten der Aufgabenliste als JSON-Datei herunterladen"
+      },
       "print": {
         "title": "Als PDF drucken (Browser)",
         "description": "Verwenden Sie den nativen Druckdialog des Browsers, um als PDF zu speichern"
