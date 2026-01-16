@@ -169,16 +169,19 @@
     /**
      * Find all matches in the note
      */
-    function findMatches(noteId) {
+    function findMatches(noteId, options) {
         const searchInput = document.getElementById('searchInput' + noteId);
         if (!searchInput) return;
 
         const searchText = searchInput.value;
+        const state = getNoteState(noteId);
+        const preserveIndex = options && options.preserveIndex === true;
+        const skipScroll = options && options.skipScroll === true;
+        const previousIndex = state.currentIndex;
         if (!searchText) {
             const countEl = document.getElementById('searchCount' + noteId);
             if (countEl) countEl.textContent = '';
             clearHighlights(noteId);
-            const state = getNoteState(noteId);
             state.matches = [];
             state.currentIndex = -1;
             return;
@@ -188,9 +191,8 @@
         if (!noteEntry) return;
 
         clearHighlights(noteId);
-        const state = getNoteState(noteId);
         state.matches = [];
-        state.currentIndex = -1;
+        state.currentIndex = preserveIndex ? previousIndex : -1;
 
         // Build regex pattern - escape special chars
         let pattern = searchText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -204,10 +206,20 @@
         const count = state.matches.length;
         if (countEl) {
             if (count > 0) {
-                state.currentIndex = 0;
+                if (preserveIndex) {
+                    let nextIndex = previousIndex;
+                    if (nextIndex >= count) nextIndex = count - 1;
+                    if (nextIndex < -1) nextIndex = -1;
+                    state.currentIndex = nextIndex;
+                } else {
+                    state.currentIndex = 0;
+                }
                 countEl.textContent = `${count} ${count > 1 ? tr('search_replace.results', {}, 'results') : tr('search_replace.result', {}, 'result')}`;
-                scrollToMatch(noteId, 0);
+                if (!skipScroll && state.currentIndex >= 0) {
+                    scrollToMatch(noteId, state.currentIndex);
+                }
             } else {
+                state.currentIndex = -1;
                 countEl.textContent = tr('search_replace.no_matches', {}, 'No results');
             }
         }
@@ -271,7 +283,7 @@
      */
     function nextMatch(noteId) {
         // Relancer la recherche pour avoir les résultats à jour
-        findMatches(noteId);
+        findMatches(noteId, { preserveIndex: true, skipScroll: true });
         
         const state = getNoteState(noteId);
         if (state.matches.length === 0) return;
@@ -285,7 +297,7 @@
      */
     function prevMatch(noteId) {
         // Relancer la recherche pour avoir les résultats à jour
-        findMatches(noteId);
+        findMatches(noteId, { preserveIndex: true, skipScroll: true });
         
         const state = getNoteState(noteId);
         if (state.matches.length === 0) return;
