@@ -495,6 +495,11 @@ $body_classes = trim($extra_body_classes);
                     if ($note_type === 'note' || $note_type === 'markdown') {
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-search-replace"><i class="fa-search"></i> '.t_h('editor.toolbar.search_replace', [], 'Search and replace').'</button>';
                     }
+
+                    // Clear completed tasks (only for tasklist notes, shown in mobile menu)
+                    if ($note_type === 'tasklist') {
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-clear-completed"><i class="fa-broom"></i> '.t_h('tasklist.clear_completed', [], 'Clear completed tasks').'</button>';
+                    }
                     
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-duplicate"><i class="fa-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-move"><i class="fa-folder-open"></i> '.t_h('common.move', [], 'Move').'</button>';
