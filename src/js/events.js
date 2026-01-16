@@ -1884,6 +1884,9 @@ function moveNoteToTargetFolder(noteId, targetFolderIdOrName) {
                 }, 200);
             } else {
                 setTimeout(function() {
+                    if (typeof persistFolderStatesFromDOM === 'function') {
+                        persistFolderStatesFromDOM();
+                    }
                     location.reload();
                 }, 500);
             }
@@ -1973,6 +1976,9 @@ function moveNoteToRoot(noteId) {
                 }, 200);
             } else {
                 setTimeout(function() {
+                    if (typeof persistFolderStatesFromDOM === 'function') {
+                        persistFolderStatesFromDOM();
+                    }
                     location.reload();
                 }, 500);
             }

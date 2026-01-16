@@ -15,6 +15,10 @@ function updateSharedCount(delta) {
 
 // Refresh notes list after folder action (share/revoke)
 function refreshNotesListAfterFolderAction() {
+    if (typeof persistFolderStatesFromDOM === 'function') {
+        persistFolderStatesFromDOM();
+    }
+
     const url = new URL(window.location.href);
     
     fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
@@ -51,6 +55,10 @@ function refreshNotesListAfterFolderAction() {
                 if (typeof setupNoteDragDropEvents === 'function') {
                     setupNoteDragDropEvents();
                 }
+
+            if (typeof restoreFolderStates === 'function') {
+                restoreFolderStates();
+            }
             } catch (error) {
                 console.error('Error reinitializing after folder action:', error);
             }

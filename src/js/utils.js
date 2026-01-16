@@ -1278,6 +1278,23 @@ function toggleFolder(folderId) {
 }
 
 /**
+ * Persist current folder open/closed states to localStorage
+ * Useful before actions that reload the page (e.g., drag & drop moves)
+ */
+function persistFolderStatesFromDOM() {
+    const folderToggles = document.querySelectorAll('.folder-name[data-folder-dom-id]');
+
+    folderToggles.forEach(function(toggleElement) {
+        const folderDomId = toggleElement.getAttribute('data-folder-dom-id');
+        const folderContent = folderDomId ? document.getElementById(folderDomId) : null;
+        if (!folderDomId || !folderContent) return;
+
+        const isOpen = window.getComputedStyle(folderContent).display !== 'none';
+        localStorage.setItem('folder_' + folderDomId, isOpen ? 'open' : 'closed');
+    });
+}
+
+/**
  * Restore folder states from localStorage on page load
  * This preserves user preferences for which folders should stay open/closed
  */
