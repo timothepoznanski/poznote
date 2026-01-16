@@ -9,9 +9,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterInput = document.getElementById('filterInput');
     const clearFilterBtn = document.getElementById('clearFilterBtn');
     const backToNotesBtn = document.getElementById('backToNotesBtn');
+    const backToHomeBtn = document.getElementById('backToHomeBtn');
     
     if (backToNotesBtn) {
         backToNotesBtn.addEventListener('click', goBackToNotes);
+    }
+
+    if (backToHomeBtn) {
+        backToHomeBtn.addEventListener('click', goBackToHome);
     }
     
     if (filterInput) {

@@ -893,6 +893,19 @@ function saveDefaultWorkspaceSetting() {
 function initializeWorkspacesPage() {
     // Only run on workspaces.php page
     if (!document.getElementById('create-workspace-form')) return;
+
+    // Back to home link (preserve workspace)
+    try {
+        var homeLink = document.getElementById('backToHomeLink');
+        if (homeLink) {
+            homeLink.addEventListener('click', function(e) {
+                if (typeof window.goBackToHome === 'function') {
+                    e.preventDefault();
+                    window.goBackToHome();
+                }
+            });
+        }
+    } catch (e) {}
     
     // Handle clear workspace redirect (when workspace was deleted and need to redirect)
     var clearWs = document.body.getAttribute('data-clear-workspace');

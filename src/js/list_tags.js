@@ -21,6 +21,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (backBtn) {
         backBtn.addEventListener('click', goBackToNotes);
     }
+
+    // Back to home button
+    const backHomeBtn = document.getElementById('backToHomeBtn');
+    if (backHomeBtn) {
+        backHomeBtn.addEventListener('click', goBackToHome);
+    }
     
     // Attach click listeners to tag items (using event delegation)
     const tagsList = document.getElementById('tagsList');

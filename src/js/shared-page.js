@@ -547,6 +547,18 @@
     // ========== Initialization ==========
     
     document.addEventListener('DOMContentLoaded', function() {
+        // Back to home button
+        var backHomeBtn = document.getElementById('backToHomeBtn');
+        if (backHomeBtn) {
+            backHomeBtn.addEventListener('click', function() {
+                if (typeof window.goBackToHome === 'function') {
+                    window.goBackToHome();
+                } else {
+                    window.location.href = 'home.php';
+                }
+            });
+        }
+
         // Back button
         var backBtn = document.getElementById('backToNotesBtn');
         if (backBtn) {

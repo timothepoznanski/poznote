@@ -34,6 +34,9 @@ $currentLang = getUserLanguage();
 			<button id="backToNotesBtn" class="btn btn-secondary">
 				<?php echo t_h('common.back_to_notes'); ?>
 			</button>
+			<button id="backToHomeBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_home', [], 'Back to Home'); ?>">
+				<?php echo t_h('common.back_to_home', [], 'Back to Home'); ?>
+			</button>
 		</div>
 		
 		<div class="shared-filter-bar">

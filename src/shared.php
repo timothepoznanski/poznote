@@ -55,6 +55,9 @@ $currentLang = getUserLanguage();
 			<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
 				<?php echo t_h('common.back_to_notes'); ?>
 			</button>
+			<button id="backToHomeBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_home', [], 'Back to Home'); ?>">
+				<?php echo t_h('common.back_to_home', [], 'Back to Home'); ?>
+			</button>
 			<button id="sharedFoldersBtn" class="btn btn-shared" title="<?php echo t_h('shared_folders.view_shared_folders', [], 'View shared folders'); ?>">
 				<?php echo t_h('shared_folders.button', [], 'Shared Folders'); ?>
 			</button>
@@ -88,6 +91,7 @@ $currentLang = getUserLanguage();
 		</div>
 	</div>
 	
+	<script src="js/navigation.js"></script>
 	<script src="js/shared-page.js"></script>
 </body>
 </html>

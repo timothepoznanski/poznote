@@ -4,6 +4,7 @@
   },
   "common": {
     "notes": "Notes",
+    "back_to_home": "Retour à l'accueil",
     "back_to_notes": "Retour aux notes",
     "back_to_settings": "Retour aux paramètres",
     "close": "Fermer",

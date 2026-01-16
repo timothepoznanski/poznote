@@ -17,6 +17,19 @@
     padding: 40px 20px;
 }
 
+.version-display-desktop-bottom {
+    margin-top: 18px;
+    text-align: center;
+    color: #6b7280;
+}
+
+.version-display-desktop-bottom a.release-notes-link {
+    color: inherit;
+    text-decoration: underline;
+}
+
+/* On home page, keep version display at the bottom on all viewports */
+
 .home-header {
     display: flex;
     align-items: center;
