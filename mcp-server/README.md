@@ -254,7 +254,7 @@ When you update the code (new release / git pull), you must also update the Pyth
 If you installed from this repo with a venv (recommended):
 
 ```bash
-cd /home/user/poznote-mcp-server
+cd /home/YOUR_LINUX_USER/poznote-mcp-server
 git pull
 
 cd mcp-server
@@ -321,7 +321,7 @@ For remote development, VS Code launches the MCP server via SSH.
       "command": "ssh",
       "args": [
         "user@your-server",
-        "cd /home/user/poznote-mcp-server/mcp-server && source venv/bin/activate && poznote-mcp serve --transport=stdio"
+        "cd /home/YOUR_LINUX_USER/poznote-mcp-server/mcp-server && source venv/bin/activate && poznote-mcp serve --transport=stdio"
       ],
       "env": {
         "POZNOTE_API_URL": "http://localhost:YOUR_POZNOTE_API_PORT/api/v1",
@@ -380,7 +380,7 @@ For local development without SSH:
 Set environment variables and start the server:
 
 ```bash
-cd /home/user/poznote-mcp-server/mcp-server
+cd /home/YOUR_LINUX_USER/poznote-mcp-server/mcp-server
 source venv/bin/activate
 export POZNOTE_API_URL=http://localhost:YOUR_POZNOTE_API_PORT/api/v1
 export POZNOTE_USERNAME=your-poznote-username
@@ -399,13 +399,13 @@ After=network.target
 
 [Service]
 Type=simple
-User=user
-WorkingDirectory=/home/user/poznote-mcp-server/mcp-server
+User=YOUR_LINUX_USER
+WorkingDirectory=/home/YOUR_LINUX_USER/poznote-mcp-server/mcp-server
 Environment="POZNOTE_API_URL=http://localhost:YOUR_POZNOTE_API_PORT/api/v1"
 Environment="POZNOTE_USERNAME=your-poznote-username"
 Environment="POZNOTE_PASSWORD=your-poznote-password"
 Environment="POZNOTE_DEFAULT_WORKSPACE=Poznote"
-ExecStart=/home/user/poznote-mcp-server/mcp-server/venv/bin/poznote-mcp serve --transport=http --port=YOUR_POZNOTE_MCP_PORT
+ExecStart=/home/YOUR_LINUX_USER/poznote-mcp-server/mcp-server/venv/bin/poznote-mcp serve --transport=http --port=YOUR_POZNOTE_MCP_PORT
 Restart=always
 
 [Install]
