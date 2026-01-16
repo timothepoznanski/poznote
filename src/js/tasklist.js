@@ -306,8 +306,7 @@ function toggleTask(taskId, noteId) {
     // - when insert order is 'bottom', newly completed tasks should be
     //   placed at the start of the completed group (so they don't end up
     //   below existing checked tasks when new tasks are added at bottom)
-    const btn = document.querySelector('.btn-task-order');
-    const insertOrder = (btn && btn.classList.contains('active')) ? 'top' : 'bottom';
+    const insertOrder = (noteEntry.dataset.tasklistInsertOrder === 'top') ? 'top' : 'bottom';
 
     // Build groups preserving original relative order
     const importantIncomplete = [];

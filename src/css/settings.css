@@ -258,6 +258,8 @@ body {
 .fa-calendar-alt::before { content: "\f073"; }
 .fa-map-marker-alt::before { content: "\f3c5"; }
 .fa-hashtag::before { content: "\f292"; }
+.fa-arrow-down::before { content: "\f063"; }
+.fa-arrow-up::before { content: "\f062"; }
 .fa-folder-open::before { content: "\f07c"; }
 .fa-chevron-down::before { content: "\f078"; }
 .fa-eye::before { content: "\f06e"; }
@@ -291,6 +293,8 @@ body {
 .fa-calendar-alt,
 .fa-map-marker-alt,
 .fa-hashtag,
+.fa-arrow-down,
+.fa-arrow-up,
 .fa-folder-open,
 .fa-chevron-down,
 .fa-eye,

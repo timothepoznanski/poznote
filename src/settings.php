@@ -301,6 +301,14 @@ $currentLang = getUserLanguage();
                     </div>
                 </div>
 
+                <!-- Tasklist Insert Order -->
+                <div class="settings-card" id="tasklist-insert-order-card">
+                    <div class="settings-card-icon"><i class="fa-arrow-down"></i></div>
+                    <div class="settings-card-content">
+                        <h3><?php echo t_h('display.cards.tasklist_insert_order', [], 'Task list insert order'); ?> <span id="tasklist-insert-order-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
+                    </div>
+                </div>
+
                 <!-- Show Note Created -->
                 <div class="settings-card" id="show-created-card">
                     <div class="settings-card-icon"><i class="fa-calendar-alt"></i></div>

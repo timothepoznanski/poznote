@@ -126,11 +126,6 @@
                     toggleInlineCode();
                 }
                 break;
-            case 'toggle-task-insert-order':
-                if (typeof toggleTaskInsertOrder === 'function') {
-                    toggleTaskInsertOrder();
-                }
-                break;
             case 'insert-excalidraw':
                 if (typeof insertExcalidrawDiagram === 'function') {
                     insertExcalidrawDiagram();

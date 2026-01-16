@@ -365,6 +365,7 @@
       "login_display": "Login Page Title",
       "note_font_size": "Note Content Font Size",
       "note_sort_order": "Note sort order",
+      "tasklist_insert_order": "Task list insert order",
       "timezone": "Timezone",
       "show_note_created": "Show Note Creation Date",
       "show_note_subheading": "Show Note Subheading",
@@ -428,6 +429,8 @@
     "drag_to_reorder": "Drag to reorder",
     "add_to_top": "Add new tasks at the top",
     "add_to_bottom": "Add new tasks at the bottom",
+    "insert_order_top": "Top",
+    "insert_order_bottom": "Bottom",
     "clear_completed": "Clear completed tasks",
     "no_completed_tasks": "No completed tasks to clear.",
     "confirm_clear_completed": "Delete {{count}} completed task(s)?"

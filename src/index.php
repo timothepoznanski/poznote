@@ -435,23 +435,8 @@ $body_classes = trim($extra_body_classes);
                         echo '<button type="button" class="toolbar-btn btn-search-replace note-action-btn" title="' . t_h('editor.toolbar.search_replace', [], 'Search and replace') . '" data-action="open-search-replace-modal" data-note-id="'.$row['id'].'"><i class="fa-search"></i></button>';
                     }
                 
-                    // Task list order button (only visible for tasklist notes)
+                    // Task list actions (only visible for tasklist notes)
                     if ($note_type === 'tasklist') {
-                        // Get current setting from database
-                        $task_order = 'bottom'; // default
-                        try {
-                            $order_stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
-                            $order_stmt->execute(['tasklist_insert_order']);
-                            $order_val = $order_stmt->fetchColumn();
-                            if ($order_val === 'top') $task_order = 'top';
-                        } catch (Exception $e) {
-                            // Use default on error
-                        }
-                        $order_icon = $task_order === 'top' ? 'fa-arrow-up' : 'fa-arrow-down';
-                        $order_title = $task_order === 'top' ? t_h('tasklist.add_to_top') : t_h('tasklist.add_to_bottom');
-                        $active_class = $task_order === 'top' ? ' active' : '';
-                        echo '<button type="button" class="toolbar-btn btn-task-order note-action-btn' . $active_class . '" title="' . $order_title . '" data-action="toggle-task-insert-order"><i class="' . $order_icon . '"></i></button>';
-                        
                         // Clear completed tasks button
                         echo '<button type="button" class="toolbar-btn btn-clear-completed note-action-btn" title="' . t_h('tasklist.clear_completed', [], 'Clear completed tasks') . '" data-action="clear-completed-tasks" data-note-id="' . $row['id'] . '"><i class="fa-broom"></i></button>';
                     }

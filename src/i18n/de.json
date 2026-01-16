@@ -363,6 +363,7 @@
       "login_display": "Login-Seiten-Titel",
       "note_font_size": "Schriftgröße des Notizinhalts",
       "note_sort_order": "Notizen-Sortierreihenfolge",
+      "tasklist_insert_order": "Einfüge-Reihenfolge der Aufgaben",
       "timezone": "Zeitzone",
       "show_note_created": "Erstellungsdatum der Notiz anzeigen",
       "show_note_subheading": "Notiz-Untertitel anzeigen",
@@ -426,6 +427,8 @@
     "drag_to_reorder": "Zum Neuanordnen ziehen",
     "add_to_top": "Neue Aufgaben oben hinzufügen",
     "add_to_bottom": "Neue Aufgaben unten hinzufügen",
+    "insert_order_top": "Oben",
+    "insert_order_bottom": "Unten",
     "clear_completed": "Erledigte Aufgaben löschen",
     "no_completed_tasks": "Keine erledigten Aufgaben zum Löschen.",
     "confirm_clear_completed": "{{count}} erledigte Aufgabe(n) löschen?"

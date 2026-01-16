@@ -201,6 +201,28 @@
             }
         });
     }
+
+    function refreshTasklistInsertOrderBadge() {
+        getSetting('tasklist_insert_order', function(value) {
+            var badge = document.getElementById('tasklist-insert-order-badge');
+            var card = document.getElementById('tasklist-insert-order-card');
+            if (!badge) return;
+            var order = (value === 'top' || value === 'bottom') ? value : 'bottom';
+            var text = order === 'top'
+                ? tr('tasklist.insert_order_top', {}, 'Top')
+                : tr('tasklist.insert_order_bottom', {}, 'Bottom');
+            badge.textContent = text;
+            badge.className = 'setting-status enabled';
+
+            if (card) {
+                var icon = card.querySelector('.settings-card-icon i');
+                if (icon) {
+                    icon.classList.toggle('fa-arrow-up', order === 'top');
+                    icon.classList.toggle('fa-arrow-down', order !== 'top');
+                }
+            }
+        });
+    }
     
     function refreshToolbarModeBadge() {
         getSetting('toolbar_mode', function(value) {
@@ -366,6 +388,24 @@
         if (noteSortCard) {
             noteSortCard.addEventListener('click', openNoteSortModal);
         }
+
+        var tasklistInsertOrderCard = document.getElementById('tasklist-insert-order-card');
+        if (tasklistInsertOrderCard) {
+            tasklistInsertOrderCard.addEventListener('click', function() {
+                getSetting('tasklist_insert_order', function(currentValue) {
+                    var current = (currentValue === 'top' || currentValue === 'bottom') ? currentValue : 'bottom';
+                    var next = current === 'top' ? 'bottom' : 'top';
+                    setSetting('tasklist_insert_order', next, function(success) {
+                        if (success) {
+                            refreshTasklistInsertOrderBadge();
+                            reloadOpener();
+                        } else {
+                            alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                        }
+                    });
+                });
+            });
+        }
         
         // Theme mode card - calls toggleTheme from theme-manager.js
         var themeModeCard = document.getElementById('theme-mode-card');
@@ -459,6 +499,7 @@
         refreshLoginDisplayBadge();
         refreshFontSizeBadge();
         refreshNoteSortBadge();
+        refreshTasklistInsertOrderBadge();
         refreshToolbarModeBadge();
         refreshTimezoneBadge();
         
@@ -467,6 +508,7 @@
             try { refreshLanguageBadge(); } catch(e) {}
             try { refreshFontSizeBadge(); } catch(e) {}
             try { refreshNoteSortBadge(); } catch(e) {}
+            try { refreshTasklistInsertOrderBadge(); } catch(e) {}
             try { refreshToolbarModeBadge(); } catch(e) {}
         });
     });
@@ -479,6 +521,7 @@
     window.refreshLoginDisplayBadge = refreshLoginDisplayBadge;
     window.refreshFontSizeBadge = refreshFontSizeBadge;
     window.refreshNoteSortBadge = refreshNoteSortBadge;
+    window.refreshTasklistInsertOrderBadge = refreshTasklistInsertOrderBadge;
     window.refreshToolbarModeBadge = refreshToolbarModeBadge;
     window.refreshTimezoneBadge = refreshTimezoneBadge;
     

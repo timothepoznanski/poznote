@@ -365,6 +365,7 @@
       "login_display": "Titre page de connexion",
       "note_font_size": "Taille de police du contenu",
       "note_sort_order": "Tri des notes",
+      "tasklist_insert_order": "Ordre d'insertion des tâches",
       "timezone": "Fuseau horaire",
       "show_note_created": "Afficher la date de création",
       "show_note_subheading": "Afficher le sous-titre",
@@ -428,6 +429,8 @@
     "drag_to_reorder": "Glisser pour réorganiser",
     "add_to_top": "Ajouter les nouvelles tâches en haut",
     "add_to_bottom": "Ajouter les nouvelles tâches en bas",
+    "insert_order_top": "En haut",
+    "insert_order_bottom": "En bas",
     "clear_completed": "Supprimer les tâches terminées",
     "no_completed_tasks": "Aucune tâche terminée à supprimer.",
     "confirm_clear_completed": "Supprimer {{count}} tâche(s) terminée(s) ?"

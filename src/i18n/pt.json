@@ -362,6 +362,7 @@
       "login_display": "Título da Página de Login",
       "note_font_size": "Tamanho da Fonte do Conteúdo da Nota",
       "note_sort_order": "Ordem de classificação das notas",
+      "tasklist_insert_order": "Ordem de inserção das tarefas",
       "timezone": "Fuso Horário",
       "show_note_created": "Mostrar Data de Criação da Nota",
       "show_note_subheading": "Mostrar Subtítulo da Nota",
@@ -425,6 +426,8 @@
     "drag_to_reorder": "Arraste para reordenar",
     "add_to_top": "Adicionar novas tarefas no topo",
     "add_to_bottom": "Adicionar novas tarefas no final",
+    "insert_order_top": "Em cima",
+    "insert_order_bottom": "Em baixo",
     "clear_completed": "Limpar tarefas concluídas",
     "no_completed_tasks": "Nenhuma tarefa concluída para limpar.",
     "confirm_clear_completed": "Excluir {{count}} tarefa(s) concluída(s)?"
