@@ -29,10 +29,39 @@ function initializeTaskList(noteId, noteType) {
         }
     }
 
-    // Ensure all tasks have noteId set
-    tasks.forEach(task => {
-        if (!task.noteId) task.noteId = noteId;
+    // Normalize task data (ensure numeric IDs and correct noteId)
+    const normalizeTaskId = (value) => {
+        if (typeof value === 'number' && isFinite(value)) return value;
+        if (typeof value === 'string') {
+            const num = parseFloat(value);
+            if (!isNaN(num) && isFinite(num)) return num;
+        }
+        return Date.now() + Math.random();
+    };
+
+    tasks = tasks.map(task => {
+        if (!task || typeof task !== 'object') {
+            return {
+                id: Date.now() + Math.random(),
+                text: '',
+                completed: false,
+                noteId: noteId,
+                important: false
+            };
+        }
+
+        return {
+            ...task,
+            id: normalizeTaskId(task.id),
+            noteId: noteId,
+            completed: !!task.completed,
+            important: !!task.important,
+            text: typeof task.text === 'string' ? task.text : String(task.text ?? '')
+        };
     });
+
+    // Persist normalized data for subsequent actions
+    noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
 
     // Replace the contenteditable div with task list interface
     renderTaskList(noteId, tasks);
@@ -127,6 +156,7 @@ function renderTasks(tasks, noteId) {
         const starClass = 'fa-star';
         const favBtnClass = task.important ? 'task-important-btn btn-favorite is-favorite' : 'task-important-btn btn-favorite';
         const title = task.important ? 'Remove important' : 'Mark as important';
+        const moveTitle = window.t ? window.t('tasklist.move_to_list', null, 'Move to another list') : 'Move to another list';
         
         // Conditional buttons based on completion status
         let buttonsHtml = '';
@@ -135,6 +165,9 @@ function renderTasks(tasks, noteId) {
             buttonsHtml = `
             <button class="task-delete-btn" onclick="deleteTask(${task.id}, ${task.noteId || 'null'})">
                 <i class="fa-trash"></i>
+            </button>
+            <button class="task-move-btn" title="${moveTitle}" onclick="openMoveTaskModal(${task.id}, ${task.noteId || 'null'})">
+                <i class="fa-arrow-right"></i>
             </button>
             <div class="task-drag-handle" title="${window.t ? window.t('tasklist.drag_to_reorder', null, 'Drag to reorder') : 'Drag to reorder'}">
                 <i class="fa-grip-vertical"></i>
@@ -145,13 +178,16 @@ function renderTasks(tasks, noteId) {
             <button class="${favBtnClass}" title="${title}" onclick="toggleImportant(${task.id}, ${task.noteId || 'null'})">
                 <i class="${starClass}"></i>
             </button>
+            <button class="task-move-btn" title="${moveTitle}" onclick="openMoveTaskModal(${task.id}, ${task.noteId || 'null'})">
+                <i class="fa-arrow-right"></i>
+            </button>
             <div class="task-drag-handle" title="${window.t ? window.t('tasklist.drag_to_reorder', null, 'Drag to reorder') : 'Drag to reorder'}">
                 <i class="fa-grip-vertical"></i>
             </div>`;
         }
         
         return `
-        <div class="task-item ${task.completed ? 'completed' : ''} ${task.important ? 'important' : ''}" data-task-id="${task.id}" draggable="true">
+        <div class="task-item ${task.completed ? 'completed' : ''} ${task.important ? 'important' : ''}" data-task-id="${task.id}" draggable="false">
             <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id}, ${task.noteId || 'null'})">
             <span class="task-text" onclick="editTask(${task.id}, ${task.noteId || 'null'})">${linkifyHtml(task.text)}</span>
             ${buttonsHtml}
@@ -277,8 +313,7 @@ function toggleTask(taskId, noteId) {
     // - when insert order is 'bottom', newly completed tasks should be
     //   placed at the start of the completed group (so they don't end up
     //   below existing checked tasks when new tasks are added at bottom)
-    const btn = document.querySelector('.btn-task-order');
-    const insertOrder = (btn && btn.classList.contains('active')) ? 'top' : 'bottom';
+    const insertOrder = (noteEntry.dataset.tasklistInsertOrder === 'top') ? 'top' : 'bottom';
 
     // Build groups preserving original relative order
     const importantIncomplete = [];
@@ -440,7 +475,7 @@ function saveTaskEdit(taskId, noteId, newText) {
             // Ensure links inside don't trigger the span's onclick
             const anchors = newTaskText.querySelectorAll('a');
             anchors.forEach(a => a.addEventListener('click', e => e.stopPropagation()));
-            
+
             // Check if element is still in DOM before replacing
             try {
                 taskText.replaceWith(newTaskText);
@@ -538,6 +573,365 @@ function toggleImportant(taskId, noteId) {
     markTaskListAsModified(noteId);
 }
 
+// Move task to another tasklist note
+let moveTaskState = {
+    taskId: null,
+    sourceNoteId: null,
+    targetNoteId: null,
+    notes: []
+};
+
+function openMoveTaskModal(taskId, sourceNoteId) {
+    const modal = document.getElementById('moveTaskModal');
+    if (!modal) return;
+
+    moveTaskState = {
+        taskId: taskId,
+        sourceNoteId: sourceNoteId,
+        targetNoteId: null,
+        notes: []
+    };
+
+    attachMoveTaskModalHandlers(modal);
+
+    const list = document.getElementById('moveTaskList');
+    if (list) list.innerHTML = '';
+
+    const confirmBtn = document.getElementById('confirmMoveTaskBtn');
+    if (confirmBtn) confirmBtn.disabled = true;
+
+    const searchInput = document.getElementById('moveTaskSearchInput');
+    if (searchInput) {
+        searchInput.value = '';
+        searchInput.focus();
+    }
+
+    modal.style.display = 'flex';
+    loadMoveTaskTargets('');
+}
+
+function attachMoveTaskModalHandlers(modal) {
+    if (modal.dataset.handlersAttached === 'true') return;
+
+    const searchInput = document.getElementById('moveTaskSearchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            loadMoveTaskTargets(e.target.value || '');
+        });
+    }
+
+    const confirmBtn = document.getElementById('confirmMoveTaskBtn');
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', executeMoveTask);
+    }
+
+    modal.dataset.handlersAttached = 'true';
+}
+
+function getCurrentWorkspace() {
+    return (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '')
+        || (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : '')
+        || '';
+}
+
+async function loadMoveTaskTargets(searchQuery) {
+    const list = document.getElementById('moveTaskList');
+    if (!list) return;
+
+    list.innerHTML = '<div class="move-task-empty">' +
+        (window.t ? window.t('modals.task_move.loading', null, 'Loading...') : 'Loading...') +
+        '</div>';
+
+    try {
+        const workspace = getCurrentWorkspace();
+        const response = await fetch(`/api/v1/notes?workspace=${encodeURIComponent(workspace)}`);
+        const data = await response.json();
+
+        let notes = (data && data.success && Array.isArray(data.notes)) ? data.notes : [];
+
+        notes = notes.filter(n => n.type === 'tasklist' && String(n.id) !== String(moveTaskState.sourceNoteId));
+
+        if (searchQuery && searchQuery.trim()) {
+            const q = searchQuery.toLowerCase().trim();
+            notes = notes.filter(n => (n.heading || '').toLowerCase().includes(q));
+        }
+
+        moveTaskState.notes = notes;
+        renderMoveTaskTargets(notes);
+    } catch (e) {
+        list.innerHTML = '<div class="move-task-empty">' +
+            (window.t ? window.t('modals.task_move.error', null, 'Unable to load task lists.') : 'Unable to load task lists.') +
+            '</div>';
+    }
+}
+
+function renderMoveTaskTargets(notes) {
+    const list = document.getElementById('moveTaskList');
+    if (!list) return;
+
+    list.innerHTML = '';
+
+    if (!notes || notes.length === 0) {
+        list.innerHTML = '<div class="move-task-empty">' +
+            (window.t ? window.t('modals.task_move.empty', null, 'No task lists found.') : 'No task lists found.') +
+            '</div>';
+        return;
+    }
+
+    notes.forEach(note => {
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'move-task-item';
+
+        if (String(note.id) === String(moveTaskState.targetNoteId)) {
+            item.classList.add('selected');
+        }
+
+        const title = note.heading || (window.t ? window.t('note_reference.untitled', null, 'Untitled') : 'Untitled');
+
+        const titleSpan = document.createElement('span');
+        titleSpan.textContent = title;
+
+        item.appendChild(titleSpan);
+
+        if (note.folder) {
+            const meta = document.createElement('small');
+            meta.textContent = note.folder;
+            item.appendChild(meta);
+        }
+
+        item.addEventListener('click', function() {
+            moveTaskState.targetNoteId = note.id;
+            const items = list.querySelectorAll('.move-task-item');
+            items.forEach(el => el.classList.remove('selected'));
+            item.classList.add('selected');
+
+            const confirmBtn = document.getElementById('confirmMoveTaskBtn');
+            if (confirmBtn) confirmBtn.disabled = false;
+        });
+
+        list.appendChild(item);
+    });
+}
+
+async function executeMoveTask() {
+    const targetNoteId = moveTaskState.targetNoteId;
+    const sourceNoteId = moveTaskState.sourceNoteId;
+    const taskId = moveTaskState.taskId;
+
+    if (!targetNoteId || !sourceNoteId || !taskId) return;
+
+    const sourceEntry = document.getElementById('entry' + sourceNoteId);
+    if (!sourceEntry) return;
+
+    let sourceTasks = [];
+    try {
+        sourceTasks = JSON.parse(sourceEntry.dataset.tasklistJson || '[]');
+    } catch (e) {
+        sourceTasks = [];
+    }
+
+    const taskIndex = sourceTasks.findIndex(task => String(task.id) === String(taskId));
+    if (taskIndex === -1) return;
+
+    const taskToMove = sourceTasks[taskIndex];
+
+    const spinner = (window.modalAlert && typeof window.modalAlert.showSpinner === 'function')
+        ? window.modalAlert.showSpinner(
+            window.t ? window.t('modals.task_move.moving', null, 'Moving task...') : 'Moving task...'
+        )
+        : null;
+
+    try {
+        const workspace = getCurrentWorkspace();
+        const noteResp = await fetch(`/api/v1/notes/${targetNoteId}?workspace=${encodeURIComponent(workspace)}`);
+        const noteData = await noteResp.json();
+
+        if (!noteData || !noteData.success || !noteData.note || noteData.note.type !== 'tasklist') {
+            if (window.modalAlert) {
+                window.modalAlert.alert(
+                    window.t ? window.t('tasklist.move_error', null, 'Unable to move task') : 'Unable to move task',
+                    'error'
+                );
+            }
+            return;
+        }
+
+        let targetTasks = [];
+        try {
+            targetTasks = JSON.parse(noteData.note.content || '[]');
+            if (!Array.isArray(targetTasks)) targetTasks = [];
+        } catch (e) {
+            targetTasks = [];
+        }
+
+        const newTask = {
+            ...taskToMove,
+            id: Date.now() + Math.random(),
+            noteId: targetNoteId
+        };
+
+        const insertOrder = await getTasklistInsertOrder();
+        targetTasks = insertTaskWithOrder(targetTasks, newTask, insertOrder);
+
+        const updateResp = await fetch(`/api/v1/notes/${targetNoteId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ content: JSON.stringify(targetTasks) })
+        });
+
+        const updateData = await updateResp.json();
+        if (!updateData || !updateData.success) {
+            if (window.modalAlert) {
+                window.modalAlert.alert(
+                    window.t ? window.t('tasklist.move_error', null, 'Unable to move task') : 'Unable to move task',
+                    'error'
+                );
+            }
+            return;
+        }
+
+        sourceTasks.splice(taskIndex, 1);
+        sourceEntry.dataset.tasklistJson = JSON.stringify(sourceTasks);
+
+        const sourceList = document.getElementById(`tasks-list-${sourceNoteId}`);
+        if (sourceList) {
+            sourceList.innerHTML = renderTasks(sourceTasks, sourceNoteId);
+            enableDragAndDrop(sourceNoteId);
+        }
+
+        markTaskListAsModified(sourceNoteId);
+
+        const targetEntry = document.getElementById('entry' + targetNoteId);
+        if (targetEntry && targetEntry.getAttribute('data-note-type') === 'tasklist') {
+            targetEntry.dataset.tasklistJson = JSON.stringify(targetTasks);
+            const targetList = document.getElementById(`tasks-list-${targetNoteId}`);
+            if (targetList) {
+                targetList.innerHTML = renderTasks(targetTasks, targetNoteId);
+                enableDragAndDrop(targetNoteId);
+            }
+        }
+
+        if (typeof closeModal === 'function') {
+            closeModal('moveTaskModal');
+        }
+    } catch (e) {
+        if (window.modalAlert) {
+            window.modalAlert.alert(
+                window.t ? window.t('tasklist.move_error', null, 'Unable to move task') : 'Unable to move task',
+                'error'
+            );
+        }
+    } finally {
+        if (spinner && typeof spinner.close === 'function') spinner.close();
+    }
+}
+
+function insertTaskWithOrder(tasks, task, insertOrder) {
+    const importantIncomplete = [];
+    const normalIncomplete = [];
+    const completedArr = [];
+
+    for (let i = 0; i < tasks.length; i++) {
+        const t = tasks[i];
+        if (t.completed) completedArr.push(t);
+        else if (t.important) importantIncomplete.push(t);
+        else normalIncomplete.push(t);
+    }
+
+    if (task.completed) {
+        if (insertOrder === 'bottom') completedArr.unshift(task);
+        else completedArr.push(task);
+    } else if (task.important) {
+        if (insertOrder === 'top') importantIncomplete.unshift(task);
+        else importantIncomplete.push(task);
+    } else {
+        if (insertOrder === 'top') normalIncomplete.unshift(task);
+        else normalIncomplete.push(task);
+    }
+
+    return [].concat(importantIncomplete, normalIncomplete, completedArr);
+}
+
+async function getTasklistInsertOrder() {
+    try {
+        const resp = await fetch('/api/v1/settings/tasklist_insert_order', {
+            method: 'GET',
+            credentials: 'same-origin'
+        });
+        const data = await resp.json();
+        return (data && data.success && (data.value === 'top' || data.value === 'bottom')) ? data.value : 'bottom';
+    } catch (e) {
+        return 'bottom';
+    }
+}
+
+// Clear all completed tasks
+function clearCompletedTasks(noteId) {
+    const noteEntry = document.getElementById('entry' + noteId);
+    if (!noteEntry) return;
+
+    let tasks = [];
+    try {
+        tasks = JSON.parse(noteEntry.dataset.tasklistJson || '[]');
+    } catch (e) {
+        return;
+    }
+
+    // Count completed tasks before filtering
+    const completedCount = tasks.filter(task => task.completed).length;
+    
+    if (completedCount === 0) {
+        // No completed tasks to clear
+        if (window.modalAlert && window.modalAlert.info) {
+            window.modalAlert.info(
+                window.t ? window.t('tasklist.no_completed_tasks', null, 'No completed tasks to clear.') : 'No completed tasks to clear.'
+            );
+        }
+        return;
+    }
+
+    // Ask for confirmation
+    if (window.modalAlert && window.modalAlert.confirm) {
+        const message = window.t 
+            ? window.t('tasklist.confirm_clear_completed', {count: completedCount}, 'Delete {{count}} completed task(s)?')
+            : `Delete ${completedCount} completed task(s)?`;
+        
+        window.modalAlert.confirm(message).then(confirmed => {
+            if (!confirmed) return;
+            
+            // Filter out completed tasks
+            tasks = tasks.filter(task => !task.completed);
+            noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
+
+            // Re-render the task list
+            const tasksList = document.getElementById(`tasks-list-${noteId}`);
+            if (tasksList) {
+                tasksList.innerHTML = renderTasks(tasks, noteId);
+                enableDragAndDrop(noteId);
+            }
+
+            markTaskListAsModified(noteId);
+        });
+    } else {
+        // Fallback to native confirm if modalAlert not available
+        const message = `Delete ${completedCount} completed task(s)?`;
+        if (confirm(message)) {
+            tasks = tasks.filter(task => !task.completed);
+            noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
+
+            const tasksList = document.getElementById(`tasks-list-${noteId}`);
+            if (tasksList) {
+                tasksList.innerHTML = renderTasks(tasks, noteId);
+                enableDragAndDrop(noteId);
+            }
+
+            markTaskListAsModified(noteId);
+        }
+    }
+}
+
 // Mark note as modified (to trigger save)
 function markTaskListAsModified(noteId) {
     const noteEntry = document.getElementById('entry' + noteId);
@@ -613,6 +1007,8 @@ window.deleteTask = deleteTask;
 window.getTaskListData = getTaskListData;
 window.toggleImportant = toggleImportant;
 window.toggleTaskInsertOrder = toggleTaskInsertOrder;
+window.clearCompletedTasks = clearCompletedTasks;
+window.openMoveTaskModal = openMoveTaskModal;
 
 // Toggle the task insert order preference (top vs bottom)
 function toggleTaskInsertOrder() {

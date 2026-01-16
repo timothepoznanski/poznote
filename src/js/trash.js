@@ -15,6 +15,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (backBtn) {
         backBtn.addEventListener('click', goBackToNotes);
     }
+
+    // Back to home button
+    var backHomeBtn = document.getElementById('backToHomeBtn');
+    if (backHomeBtn) {
+        backHomeBtn.addEventListener('click', goBackToHome);
+    }
     
     // Clear search button
     var clearSearchBtn = document.querySelector('.trash-clear-search');

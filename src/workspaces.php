@@ -506,12 +506,12 @@ try {
     <div class="settings-container">
         <h1><?php echo t_h('settings.cards.workspaces', [], 'Workspaces', $currentLang); ?></h1>
         <p><?php echo t_h('workspaces.description', [], 'Workspaces allow you to organize your notes into separate environments within a single Poznote instance - like having different notebooks for work, personal life, or projects.', $currentLang); ?></p>
-
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
             <?php echo t_h('common.back_to_notes', [], 'Back to Notes', $currentLang); ?>
         </a>
-        <a href="settings.php" class="btn btn-secondary">
-            <?php echo t_h('common.back_to_settings', [], 'Back to Settings', $currentLang); ?>
+
+        <a id="backToHomeLink" href="home.php" class="btn btn-secondary">
+            <?php echo t_h('common.back_to_home', [], 'Back to Home', $currentLang); ?>
         </a>
 
         <br><br>
@@ -616,6 +616,7 @@ try {
     </div>
 
     <script src="js/theme-manager.js"></script>
+    <script src="js/navigation.js"></script>
     <script src="js/workspaces.js"></script>
     <script src="js/modals-events.js"></script>
     

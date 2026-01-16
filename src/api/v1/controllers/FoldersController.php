@@ -292,10 +292,10 @@ class FoldersController {
             return;
         }
         
-        $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, created FROM folders WHERE workspace = ?');
+        $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, created FROM folders WHERE workspace = ?');
         $stmt->execute([$workspace]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         $foldersById = [];
         foreach ($rows as $r) {
             $id = (int)$r['id'];
@@ -304,6 +304,7 @@ class FoldersController {
                 'name' => (string)$r['name'],
                 'parent_id' => $r['parent_id'] !== null ? (int)$r['parent_id'] : null,
                 'icon' => $r['icon'] ?? null,
+                'icon_color' => $r['icon_color'] ?? null,
                 'created' => $r['created'] ?? null,
             ];
         }
@@ -316,12 +317,13 @@ class FoldersController {
                     'name' => $f['name'],
                     'parent_id' => $f['parent_id'],
                     'icon' => $f['icon'],
+                    'icon_color' => $f['icon_color'],
                     'path' => $this->computeFolderPath($id, $foldersById),
                 ];
             }
-            
+
             $tree = $this->buildHierarchy($folders);
-            
+
             $this->sendJson([
                 'success' => true,
                 'workspace' => $workspace,
@@ -336,6 +338,7 @@ class FoldersController {
                     'name' => $f['name'],
                     'parent_id' => $f['parent_id'],
                     'icon' => $f['icon'],
+                    'icon_color' => $f['icon_color'],
                     'path' => $this->computeFolderPath($id, $foldersById),
                 ];
             }
@@ -359,26 +362,26 @@ class FoldersController {
         $workspace = isset($_GET['workspace']) ? trim((string)$_GET['workspace']) : null;
         
         if ($workspace !== null) {
-            $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, created, workspace FROM folders WHERE id = ? AND workspace = ?');
+            $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, created, workspace FROM folders WHERE id = ? AND workspace = ?');
             $stmt->execute([$folderId, $workspace]);
         } else {
-            $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, created, workspace FROM folders WHERE id = ?');
+            $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, created, workspace FROM folders WHERE id = ?');
             $stmt->execute([$folderId]);
         }
-        
+
         $folder = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         if (!$folder) {
             $this->sendError('Folder not found', 404);
             return;
         }
-        
+
         // Get path
         $ws = $folder['workspace'] ?? '';
         $pathStmt = $this->db->prepare('SELECT id, name, parent_id FROM folders WHERE workspace = ?');
         $pathStmt->execute([$ws]);
         $allFolders = $pathStmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         $foldersById = [];
         foreach ($allFolders as $r) {
             $fid = (int)$r['id'];
@@ -388,7 +391,7 @@ class FoldersController {
                 'parent_id' => $r['parent_id'] !== null ? (int)$r['parent_id'] : null,
             ];
         }
-        
+
         $this->sendJson([
             'success' => true,
             'folder' => [
@@ -396,6 +399,7 @@ class FoldersController {
                 'name' => $folder['name'],
                 'parent_id' => $folder['parent_id'] !== null ? (int)$folder['parent_id'] : null,
                 'icon' => $folder['icon'],
+                'icon_color' => $folder['icon_color'],
                 'workspace' => $folder['workspace'],
                 'path' => $this->computeFolderPath($folderId, $foldersById),
                 'created' => $folder['created'],
@@ -919,21 +923,25 @@ class FoldersController {
         $folderId = (int)$id;
         $data = $this->getInputData();
         $icon = trim($data['icon'] ?? '');
-        
+        $iconColor = trim($data['icon_color'] ?? '');
+
         if ($folderId <= 0) {
             $this->sendError('Invalid folder ID', 400);
             return;
         }
-        
+
         $iconValue = $icon === '' ? null : $icon;
-        $stmt = $this->db->prepare("UPDATE folders SET icon = ? WHERE id = ?");
-        $success = $stmt->execute([$iconValue, $folderId]);
-        
+        $iconColorValue = $iconColor === '' ? null : $iconColor;
+
+        $stmt = $this->db->prepare("UPDATE folders SET icon = ?, icon_color = ? WHERE id = ?");
+        $success = $stmt->execute([$iconValue, $iconColorValue, $folderId]);
+
         if ($success) {
             $this->sendJson([
                 'success' => true,
                 'message' => 'Folder icon updated successfully',
-                'icon' => $iconValue
+                'icon' => $iconValue,
+                'icon_color' => $iconColorValue
             ]);
         } else {
             $this->sendError('Database error', 500);

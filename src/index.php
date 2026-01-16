@@ -172,6 +172,10 @@ try {
     $v4 = $stmt->fetchColumn();
     if ($v4 === '0' || $v4 === 'false') $extra_body_classes .= ' hide-folder-counts';
 
+    $stmt->execute(['center_note_content']);
+    $v5 = $stmt->fetchColumn();
+    if ($v5 === '1' || $v5 === 'true') $extra_body_classes .= ' center-note-content';
+
 } catch (Exception $e) {
     // ignore errors and continue without extra classes
 }
@@ -330,11 +334,15 @@ $body_classes = trim($extra_body_classes);
     ?>
 
     </div>
-    
-    <div class="resize-handle" id="resizeHandle"></div>
-    
 
-    
+    <div class="resize-handle" id="resizeHandle">
+        <button class="toggle-sidebar-btn" id="toggleSidebarBtn" title="<?php echo t_h('sidebar.toggle'); ?>" aria-label="<?php echo t_h('sidebar.toggle'); ?>">
+            <i class="fa-chevron-left"></i>
+        </button>
+    </div>
+
+
+
     <!-- RIGHT COLUMN -->	
     <div id="right_col">
             
@@ -431,22 +439,10 @@ $body_classes = trim($extra_body_classes);
                         echo '<button type="button" class="toolbar-btn btn-search-replace note-action-btn" title="' . t_h('editor.toolbar.search_replace', [], 'Search and replace') . '" data-action="open-search-replace-modal" data-note-id="'.$row['id'].'"><i class="fa-search"></i></button>';
                     }
                 
-                    // Task list order button (only visible for tasklist notes)
+                    // Task list actions (only visible for tasklist notes)
                     if ($note_type === 'tasklist') {
-                        // Get current setting from database
-                        $task_order = 'bottom'; // default
-                        try {
-                            $order_stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
-                            $order_stmt->execute(['tasklist_insert_order']);
-                            $order_val = $order_stmt->fetchColumn();
-                            if ($order_val === 'top') $task_order = 'top';
-                        } catch (Exception $e) {
-                            // Use default on error
-                        }
-                        $order_icon = $task_order === 'top' ? 'fa-arrow-up' : 'fa-arrow-down';
-                        $order_title = $task_order === 'top' ? t_h('tasklist.add_to_top') : t_h('tasklist.add_to_bottom');
-                        $active_class = $task_order === 'top' ? ' active' : '';
-                        echo '<button type="button" class="toolbar-btn btn-task-order note-action-btn' . $active_class . '" title="' . $order_title . '" data-action="toggle-task-insert-order"><i class="' . $order_icon . '"></i></button>';
+                        // Clear completed tasks button
+                        echo '<button type="button" class="toolbar-btn btn-clear-completed note-action-btn" title="' . t_h('tasklist.clear_completed', [], 'Clear completed tasks') . '" data-action="clear-completed-tasks" data-note-id="' . $row['id'] . '"><i class="fa-broom"></i></button>';
                     }
                 
                     // Excalidraw diagram button - insert at cursor position (hidden for markdown and tasklist notes)
@@ -502,6 +498,11 @@ $body_classes = trim($extra_body_classes);
                     // Search and replace button (only for note and markdown types, shown in mobile menu)
                     if ($note_type === 'note' || $note_type === 'markdown') {
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-search-replace"><i class="fa-search"></i> '.t_h('editor.toolbar.search_replace', [], 'Search and replace').'</button>';
+                    }
+
+                    // Clear completed tasks (only for tasklist notes, shown in mobile menu)
+                    if ($note_type === 'tasklist') {
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-clear-completed"><i class="fa-broom"></i> '.t_h('tasklist.clear_completed', [], 'Clear completed tasks').'</button>';
                     }
                     
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-duplicate"><i class="fa-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';
@@ -605,11 +606,10 @@ $body_classes = trim($extra_body_classes);
                         echo '<div class="search-replace-buttons">';
                         echo '<button type="button" class="search-replace-btn search-replace-prev-btn" id="searchPrevBtn'.$row['id'].'" title="'.t_h('search_replace.previous', [], 'Previous').'"><i class="fa-chevron-left"></i></button>';
                         echo '<button type="button" class="search-replace-btn search-replace-next-btn" id="searchNextBtn'.$row['id'].'" title="'.t_h('search_replace.next', [], 'Next').'"><i class="fa-chevron-right"></i></button>';
-                        echo '<button type="button" class="search-replace-btn search-replace-toggle-btn" id="searchToggleReplaceBtn'.$row['id'].'" title="'.t_h('search_replace.toggle_replace', [], 'Toggle replace').'"><i class="fa-chevron-down"></i></button>';
                         echo '<button type="button" class="search-replace-btn search-replace-close-btn" id="searchCloseBtn'.$row['id'].'" title="'.t_h('search_replace.close', [], 'Close').'"><i class="fa-times"></i></button>';
                         echo '</div>';
                         echo '</div>';
-                        echo '<div class="search-replace-replace-row" id="searchReplaceRow'.$row['id'].'" style="display: none;">';
+                        echo '<div class="search-replace-replace-row" id="searchReplaceRow'.$row['id'].'">';
                         echo '<div class="search-replace-input-group">';
                         echo '<input type="text" class="search-replace-input" id="replaceInput'.$row['id'].'" placeholder="'.t_h('search_replace.replace_placeholder', [], 'Replace...').'" autocomplete="off">';
                         echo '</div>';

@@ -139,6 +139,10 @@ try {
         if (!in_array('icon', $existingColumns)) {
             $con->exec("ALTER TABLE folders ADD COLUMN icon TEXT");
         }
+        // Add 'icon_color' column if missing (for custom folder icon colors)
+        if (!in_array('icon_color', $existingColumns)) {
+            $con->exec("ALTER TABLE folders ADD COLUMN icon_color TEXT");
+        }
     } catch (Exception $e) {
         error_log('Could not add missing columns to folders: ' . $e->getMessage());
     }

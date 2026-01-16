@@ -3,6 +3,8 @@
     "name": "Poznote"
   },
   "common": {
+    "notes": "Notizen",
+    "back_to_home": "Zurück zur Startseite",
     "back_to_notes": "Zurück zu den Notizen",
     "back_to_settings": "Zurück zu den Einstellungen",
     "close": "Schließen",
@@ -33,7 +35,8 @@
     "yes": "Ja",
     "no": "Nein",
     "not_available": "Nicht verfügbar",
-    "not_specified": "Nicht angegeben"
+    "not_specified": "Nicht angegeben",
+    "apply": "Anwenden"
   },
   "folders": {
     "delete": {
@@ -362,12 +365,14 @@
       "login_display": "Login-Seiten-Titel",
       "note_font_size": "Schriftgröße des Notizinhalts",
       "note_sort_order": "Notizen-Sortierreihenfolge",
+      "tasklist_insert_order": "Einfüge-Reihenfolge der Aufgaben",
       "timezone": "Zeitzone",
       "show_note_created": "Erstellungsdatum der Notiz anzeigen",
       "show_note_subheading": "Notiz-Untertitel anzeigen",
       "show_folder_counts": "Ordner-Notizzähler anzeigen",
       "notes_without_folders_after": "Notizen nach Ordnern anzeigen",
-      "show_folder_actions": "Ordner-Aktionen anzeigen"
+      "show_folder_actions": "Ordner-Aktionen anzeigen",
+      "center_note_content": "Notizinhalt zentrieren"
     },
     "badges": {
       "font_size_default": "Standard ({{size}}px)",
@@ -391,7 +396,8 @@
     "display": "Anzeige",
     "home": "Startseite",
     "settings": "Einstellungen",
-    "create": "Erstellen"
+    "create": "Erstellen",
+    "toggle": "Linke Spalte ein-/ausblenden"
   },
   "home": {
     "title": "Startseite",
@@ -423,7 +429,15 @@
     "input_placeholder": "Neue Aufgabe schreiben und Enter drücken, um sie zur Liste hinzuzufügen...",
     "drag_to_reorder": "Zum Neuanordnen ziehen",
     "add_to_top": "Neue Aufgaben oben hinzufügen",
-    "add_to_bottom": "Neue Aufgaben unten hinzufügen"
+    "add_to_bottom": "Neue Aufgaben unten hinzufügen",
+    "insert_order_top": "Oben",
+    "insert_order_bottom": "Unten",
+    "clear_completed": "Erledigte Aufgaben löschen",
+    "no_completed_tasks": "Keine erledigten Aufgaben zum Löschen.",
+    "confirm_clear_completed": "{{count}} erledigte Aufgabe(n) löschen?",
+    "move_to_list": "In eine andere Liste verschieben",
+    "move_success": "Aufgabe verschoben",
+    "move_error": "Aufgabe konnte nicht verschoben werden"
   },
   "tags": {
     "add_single": "Tag hinzufügen...",
@@ -716,10 +730,24 @@
         "title": "Als HTML exportieren",
         "description": "Als HTML-Datei mit vollständig erhaltener Formatierung herunterladen"
       },
+      "json": {
+        "title": "Als JSON herunterladen",
+        "description": "Die Rohdaten der Aufgabenliste als JSON-Datei herunterladen"
+      },
       "print": {
         "title": "Als PDF drucken (Browser)",
         "description": "Verwenden Sie den nativen Druckdialog des Browsers, um als PDF zu speichern"
       }
+    },
+    "task_move": {
+      "title": "Aufgabe verschieben",
+      "description": "Wählen Sie eine Aufgabenliste aus, in die diese Aufgabe verschoben werden soll.",
+      "search_placeholder": "Aufgabenlisten suchen...",
+      "loading": "Laden...",
+      "empty": "Keine Aufgabenlisten gefunden.",
+      "moving": "Aufgabe wird verschoben...",
+      "error": "Aufgabenlisten konnten nicht geladen werden.",
+      "confirm": "Aufgabe verschieben"
     },
     "note_sort": {
       "title": "Notizen-Sortierreihenfolge",
@@ -1132,9 +1160,9 @@
         "select_files": "Dateien auswählen",
         "files_info": "Mehrere Dateien (max {{maxIndividualFiles}}) oder einzelnes ZIP-Archiv (max {{maxZipFiles}} Dateien). Diese Limits können geändert werden,",
         "files_info_link": "siehe Dokumentation",
-        "supported_formats": "Unterstützt: .html, .md, .markdown, .txt, .zip",
-        "description_html": "Importieren Sie einzelne HTML-, Markdown- oder Textdateien oder ein ZIP-Archiv mit mehreren Dateien.<br><br>Der Titel wird automatisch aus dem Dateinamen erstellt (ohne Erweiterung), es sei denn, ein Titelschlüssel ist in einem Front-Matter für MD-Dateien definiert.",
-        "helper": "Sie können mehrere Dateien auf einmal auswählen (Maximum 50 Dateien). Unterstützte Formate: .html, .md, .markdown, .txt"
+        "supported_formats": "Unterstützt: .html, .md, .markdown, .txt, .json, .zip",
+        "description_html": "Importieren Sie einzelne HTML-, Markdown-, Text- oder JSON-Dateien oder ein ZIP-Archiv mit mehreren Dateien.<br><br>Der Titel wird automatisch aus dem Dateinamen erstellt (ohne Erweiterung), es sei denn, ein Titelschlüssel ist in einem Front-Matter für MD-Dateien definiert.<br><br><strong>Aufgabenlisten:</strong> .json-Dateien mit Aufgaben-Arrays und .md-Dateien mit Checkbox-Syntax (- [ ] oder - [x]) werden automatisch als Aufgabenlisten importiert.",
+        "helper": "Sie können mehrere Dateien auf einmal auswählen (Maximum 50 Dateien). Unterstützte Formate: .html, .md, .markdown, .txt, .json"
       }
     },
     "buttons": {

@@ -20,7 +20,8 @@ class PoznoteClient:
         password: str | None = None,
         workspace: str | None = None,
     ):
-        self.base_url = (base_url or os.getenv("POZNOTE_API_URL", "http://localhost/api/v1")).rstrip("/")
+        # Default includes Poznote's typical dev port (8040). Users can override with POZNOTE_API_URL.
+        self.base_url = (base_url or os.getenv("POZNOTE_API_URL", "http://localhost:8040/api/v1")).rstrip("/")
         self.username = username or os.getenv("POZNOTE_USERNAME", "")
         self.password = password or os.getenv("POZNOTE_PASSWORD", "")
         self.default_workspace = workspace or os.getenv("POZNOTE_DEFAULT_WORKSPACE", "Poznote")
@@ -110,6 +111,7 @@ class PoznoteClient:
         tags: str | None = None,
         folder_name: str | None = None,
         workspace: str | None = None,
+        note_type: str | None = None,
     ) -> dict | None:
         """
         Create a new note
@@ -128,6 +130,8 @@ class PoznoteClient:
             payload["tags"] = tags
         if folder_name:
             payload["folder_name"] = folder_name
+        if note_type:
+            payload["type"] = note_type
         
         response = self.client.post("/notes", json=payload)
         response.raise_for_status()

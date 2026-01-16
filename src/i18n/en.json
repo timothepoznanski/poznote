@@ -3,6 +3,8 @@
     "name": "Poznote"
   },
   "common": {
+    "notes": "Notes",
+    "back_to_home": "Back to Home",
     "back_to_notes": "Back to Notes",
     "back_to_settings": "Back to Settings",
     "close": "Close",
@@ -34,7 +36,8 @@
     "yes": "Yes",
     "no": "No",
     "not_available": "Not available",
-    "not_specified": "Not specified"
+    "not_specified": "Not specified",
+    "apply": "Apply"
   },
   "folders": {
     "delete": {
@@ -364,12 +367,14 @@
       "login_display": "Login Page Title",
       "note_font_size": "Note Content Font Size",
       "note_sort_order": "Note sort order",
+      "tasklist_insert_order": "Task list insert order",
       "timezone": "Timezone",
       "show_note_created": "Show Note Creation Date",
       "show_note_subheading": "Show Note Subheading",
       "show_folder_counts": "Show Folders Notes Counts",
       "notes_without_folders_after": "Display notes after folders",
-      "show_folder_actions": "Show Folder Actions"
+      "show_folder_actions": "Show Folder Actions",
+      "center_note_content": "Center Note Content"
     },
     "badges": {
       "font_size_default": "default ({{size}}px)",
@@ -393,7 +398,8 @@
     "display": "Display",
     "home": "Home",
     "settings": "Settings",
-    "create": "Create"
+    "create": "Create",
+    "toggle": "Show/Hide left sidebar"
   },
   "home": {
     "title": "Home",
@@ -425,7 +431,12 @@
     "input_placeholder": "Write a new task and press enter to add it to the list...",
     "drag_to_reorder": "Drag to reorder",
     "add_to_top": "Add new tasks at the top",
-    "add_to_bottom": "Add new tasks at the bottom"
+    "add_to_bottom": "Add new tasks at the bottom",
+    "insert_order_top": "Top",
+    "insert_order_bottom": "Bottom",
+    "clear_completed": "Clear completed tasks",
+    "no_completed_tasks": "No completed tasks to clear.",
+    "confirm_clear_completed": "Delete {{count}} completed task(s)?"
   },
   "tags": {
     "add_single": "Add tag...",
@@ -712,6 +723,10 @@
       "html": {
         "title": "Export as HTML",
         "description": "Download as HTML file with all formatting preserved"
+      },
+      "json": {
+        "title": "Download as JSON",
+        "description": "Download the raw tasklist data as a JSON file"
       },
       "print": {
         "title": "Print to PDF (Browser)",
@@ -1146,9 +1161,9 @@
         "select_files": "Select Files",
         "files_info": "Multiple files (max {{maxIndividualFiles}}) or single ZIP archive (max {{maxZipFiles}} files). These limits can be changed,",
         "files_info_link": "see documentation",
-        "supported_formats": "Supported: .html, .md, .markdown, .txt, .zip",
-        "description_html": "Import individual HTML, Markdown or text files, or a ZIP archive containing multiple files.<br><br>The title will be automatically created from the file name (without the extension), unless a title key is defined in a front matter for MD files.",
-        "helper": "You can select multiple files at once (maximum 50 files). Supported formats: .html, .md, .markdown, .txt"
+        "supported_formats": "Supported: .html, .md, .markdown, .txt, .json, .zip",
+        "description_html": "Import individual HTML, Markdown, text or JSON files, or a ZIP archive containing multiple files.<br><br>The title will be automatically created from the file name (without the extension), unless a title key is defined in a front matter for MD files.<br><br><strong>Tasklists:</strong> .json files containing task arrays and .md files with checkbox syntax (- [ ] or - [x]) are automatically imported as tasklists.",
+        "helper": "You can select multiple files at once (maximum 50 files). Supported formats: .html, .md, .markdown, .txt, .json"
       }
     },
     "buttons": {

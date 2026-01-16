@@ -15,7 +15,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
     
     // PRE-LOAD all folders in one query to avoid N+1 problem
     $folders_cache = [];
-    $folders_query = "SELECT id, name, icon FROM folders";
+    $folders_query = "SELECT id, name, icon, icon_color FROM folders";
     if ($workspace_filter) {
         $folders_query .= " WHERE workspace = ?";
         $folders_stmt = $con->prepare($folders_query);
@@ -26,7 +26,8 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
     while ($folder_row = $folders_stmt->fetch(PDO::FETCH_ASSOC)) {
         $folders_cache[(int)$folder_row['id']] = [
             'name' => $folder_row['name'],
-            'icon' => $folder_row['icon'] ?? null
+            'icon' => $folder_row['icon'] ?? null,
+            'icon_color' => $folder_row['icon_color'] ?? null
         ];
     }
     
@@ -34,28 +35,31 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
         $folderId = isset($row1["folder_id"]) && $row1["folder_id"] ? (int)$row1["folder_id"] : null;
         $folderName = $row1["folder"] ?: null;
         $folderIcon = null; // Initialize icon variable
-        
+        $folderIconColor = null; // Initialize icon color variable
+
         // If no folder_id, this note has no folder - add to uncategorized list
         if ($folderId === null) {
             $uncategorized_notes[] = $row1;
             continue;
         }
-        
+
         // Use pre-loaded folder data (FAST - no DB query)
         if (isset($folders_cache[$folderId])) {
             $folderName = $folders_cache[$folderId]['name'];
             $folderIcon = $folders_cache[$folderId]['icon'];
+            $folderIconColor = $folders_cache[$folderId]['icon_color'];
         }
-        
+
         if (!isset($folders[$folderId])) {
             $folders[$folderId] = [
                 'id' => $folderId,
                 'name' => $folderName,
                 'icon' => $folderIcon ?? null,
+                'icon_color' => $folderIconColor ?? null,
                 'notes' => []
             ];
         }
-        
+
         $folders[$folderId]['notes'][] = $row1;
     }
     
@@ -70,31 +74,34 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
  * Now uses folder_id as key
  */
 function addEmptyFolders($con, $folders, $workspace_filter) {
-    $folders_sql = "SELECT id, name, icon FROM folders";
+    $folders_sql = "SELECT id, name, icon, icon_color FROM folders";
     if (!empty($workspace_filter)) {
         $folders_sql .= " WHERE workspace = '" . addslashes($workspace_filter) . "'";
     }
     $folders_sql .= " ORDER BY name";
-    
+
     $empty_folders_query = $con->query($folders_sql);
     while($folder_row = $empty_folders_query->fetch(PDO::FETCH_ASSOC)) {
         $folderId = (int)$folder_row['id'];
         $folderName = $folder_row['name'];
         $folderIcon = $folder_row['icon'] ?? null;
-        
+        $folderIconColor = $folder_row['icon_color'] ?? null;
+
         if (!isset($folders[$folderId])) {
             $folders[$folderId] = [
                 'id' => $folderId,
                 'name' => $folderName,
                 'icon' => $folderIcon,
+                'icon_color' => $folderIconColor,
                 'notes' => []
             ];
         } else {
-            // Update icon if folder already exists
+            // Update icon and color if folder already exists
             $folders[$folderId]['icon'] = $folderIcon;
+            $folders[$folderId]['icon_color'] = $folderIconColor;
         }
     }
-    
+
     return $folders;
 }
 

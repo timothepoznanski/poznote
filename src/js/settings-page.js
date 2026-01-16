@@ -201,6 +201,28 @@
             }
         });
     }
+
+    function refreshTasklistInsertOrderBadge() {
+        getSetting('tasklist_insert_order', function(value) {
+            var badge = document.getElementById('tasklist-insert-order-badge');
+            var card = document.getElementById('tasklist-insert-order-card');
+            if (!badge) return;
+            var order = (value === 'top' || value === 'bottom') ? value : 'bottom';
+            var text = order === 'top'
+                ? tr('tasklist.insert_order_top', {}, 'Top')
+                : tr('tasklist.insert_order_bottom', {}, 'Bottom');
+            badge.textContent = text;
+            badge.className = 'setting-status enabled';
+
+            if (card) {
+                var icon = card.querySelector('.settings-card-icon i');
+                if (icon) {
+                    icon.classList.toggle('fa-arrow-up', order === 'top');
+                    icon.classList.toggle('fa-arrow-down', order !== 'top');
+                }
+            }
+        });
+    }
     
     function refreshToolbarModeBadge() {
         getSetting('toolbar_mode', function(value) {
@@ -309,7 +331,6 @@
         
         // Navigation cards (left column)
         var navCards = {
-            'workspaces-card': 'workspaces.php',
             'backup-export-card': 'backup_export.php',
             'restore-import-card': 'restore_import.php'
         };
@@ -355,6 +376,7 @@
         setupToggleCard('folder-counts-card', 'folder-counts-status', 'hide_folder_counts', true);
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
+        setupToggleCard('center-note-card', 'center-note-status', 'center_note_content', false);
         
         // Card click handlers for modals (using event delegation)
         var languageCard = document.getElementById('language-card');
@@ -365,6 +387,24 @@
         var noteSortCard = document.getElementById('note-sort-card');
         if (noteSortCard) {
             noteSortCard.addEventListener('click', openNoteSortModal);
+        }
+
+        var tasklistInsertOrderCard = document.getElementById('tasklist-insert-order-card');
+        if (tasklistInsertOrderCard) {
+            tasklistInsertOrderCard.addEventListener('click', function() {
+                getSetting('tasklist_insert_order', function(currentValue) {
+                    var current = (currentValue === 'top' || currentValue === 'bottom') ? currentValue : 'bottom';
+                    var next = current === 'top' ? 'bottom' : 'top';
+                    setSetting('tasklist_insert_order', next, function(success) {
+                        if (success) {
+                            refreshTasklistInsertOrderBadge();
+                            reloadOpener();
+                        } else {
+                            alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                        }
+                    });
+                });
+            });
         }
         
         // Theme mode card - calls toggleTheme from theme-manager.js
@@ -459,6 +499,7 @@
         refreshLoginDisplayBadge();
         refreshFontSizeBadge();
         refreshNoteSortBadge();
+        refreshTasklistInsertOrderBadge();
         refreshToolbarModeBadge();
         refreshTimezoneBadge();
         
@@ -467,6 +508,7 @@
             try { refreshLanguageBadge(); } catch(e) {}
             try { refreshFontSizeBadge(); } catch(e) {}
             try { refreshNoteSortBadge(); } catch(e) {}
+            try { refreshTasklistInsertOrderBadge(); } catch(e) {}
             try { refreshToolbarModeBadge(); } catch(e) {}
         });
     });
@@ -479,6 +521,7 @@
     window.refreshLoginDisplayBadge = refreshLoginDisplayBadge;
     window.refreshFontSizeBadge = refreshFontSizeBadge;
     window.refreshNoteSortBadge = refreshNoteSortBadge;
+    window.refreshTasklistInsertOrderBadge = refreshTasklistInsertOrderBadge;
     window.refreshToolbarModeBadge = refreshToolbarModeBadge;
     window.refreshTimezoneBadge = refreshTimezoneBadge;
     

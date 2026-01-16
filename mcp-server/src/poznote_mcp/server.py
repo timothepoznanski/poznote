@@ -45,34 +45,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger("poznote-mcp")
 
-# Parse CLI args early to configure FastMCP with correct host/port
-def _get_config():
-    """Get configuration from CLI args or environment variables"""
-    # Create a simplified parser that matches our actual CLI structure
-    parser = argparse.ArgumentParser(add_help=False)
-    subparsers = parser.add_subparsers(dest="command")
-    serve_parser = subparsers.add_parser("serve", add_help=False)
-    serve_parser.add_argument("--transport", choices=["stdio", "http"], default=None)
-    serve_parser.add_argument("--host", default=None)
-    serve_parser.add_argument("--port", type=int, default=None)
-    
-    args, _ = parser.parse_known_args()
-    
-    # Get values from args or environment
-    transport = getattr(args, 'transport', None) or os.getenv("MCP_TRANSPORT", "stdio")
-    host = getattr(args, 'host', None) or os.getenv("MCP_HOST", "0.0.0.0")
-    port = getattr(args, 'port', None) or int(os.getenv("MCP_PORT", "8041"))
-    
-    return transport, host, port
-
-_transport, _host, _port = _get_config()
-
-# Initialize FastMCP server with stateless HTTP mode for scalability
+# Initialize FastMCP server.
+#
+# NOTE: We don't pre-parse CLI args at import time.
+# VS Code (stdio) and HTTP mode both execute this module; we want a single
+# source of truth for host/port in main(), while keeping tool decorators simple.
 mcp = FastMCP(
     "poznote-mcp",
     stateless_http=True,
-    host=_host,
-    port=_port,
 )
 
 # Poznote client (initialized lazily)
@@ -88,6 +68,41 @@ def get_client() -> PoznoteClient:
     return _client
 
 
+def _get_client_or_error() -> tuple[PoznoteClient | None, str | None]:
+    """Return a configured client or a JSON error string.
+
+    The MCP tools are expected to return strings; this helper lets us fail fast
+    with a clear configuration message instead of surfacing a generic 401.
+    """
+    client = get_client()
+
+    missing: list[str] = []
+    if not getattr(client, "base_url", None):
+        missing.append("POZNOTE_API_URL")
+    if not getattr(client, "username", None):
+        missing.append("POZNOTE_USERNAME")
+    if not getattr(client, "password", None):
+        missing.append("POZNOTE_PASSWORD")
+
+    if missing:
+        return None, json.dumps(
+            {
+                "error": "Missing required environment variables for Poznote MCP server.",
+                "missing": missing,
+                "example": {
+                    "POZNOTE_API_URL": "http://localhost:8040/api/v1",
+                    "POZNOTE_USERNAME": "admin",
+                    "POZNOTE_PASSWORD": "your-password",
+                },
+                "note": "These are the same credentials as the Poznote web login.",
+            },
+            indent=2,
+            ensure_ascii=False,
+        )
+
+    return client, None
+
+
 # =============================================================================
 # TOOLS - Actions for searching and modifying notes
 # =============================================================================
@@ -100,7 +115,9 @@ def get_note(id: int, workspace: Optional[str] = None) -> str:
         id: ID of the note to retrieve
         workspace: Workspace name (optional, uses default workspace if not specified)
     """
-    client = get_client()
+    client, err = _get_client_or_error()
+    if err:
+        return err
     note = client.get_note(id, workspace=workspace)
     
     if note is None:
@@ -128,7 +145,9 @@ def list_notes(workspace: Optional[str] = None, limit: int = 50) -> str:
         workspace: Workspace name (optional, uses default workspace if not specified)
         limit: Maximum number of results (default: 50)
     """
-    client = get_client()
+    client, err = _get_client_or_error()
+    if err:
+        return err
     notes = client.list_notes(workspace=workspace)
     
     # Limit results if specified
@@ -166,7 +185,9 @@ def search_notes(query: str, workspace: Optional[str] = None, limit: int = 10) -
     if not query:
         return json.dumps({"error": "query parameter is required"}, ensure_ascii=False)
     
-    client = get_client()
+    client, err = _get_client_or_error()
+    if err:
+        return err
     results = client.search_notes(query, limit=limit, workspace=workspace)
     
     # Format results
@@ -194,6 +215,7 @@ def create_note(
     workspace: Optional[str] = None,
     tags: Optional[str] = None,
     folder: Optional[str] = None,
+    note_type: Optional[str] = None,
 ) -> str:
     """Create a new note in Poznote
     
@@ -203,14 +225,33 @@ def create_note(
         workspace: Workspace name (optional, uses default workspace if not specified)
         tags: Comma-separated tags (e.g., 'ai, docs, important')
         folder: Folder name to place the note in
+        note_type: Note type/format. Supported: 'note' (HTML, default), 'markdown'.
     """
-    client = get_client()
+    client, err = _get_client_or_error()
+    if err:
+        return err
+
+    # Normalize note_type for convenience (allow 'html' as an alias of 'note')
+    if note_type is not None:
+        note_type = note_type.strip().lower()
+        if note_type == "html":
+            note_type = "note"
+        if note_type not in {"note", "markdown", "excalidraw"}:
+            return json.dumps(
+                {
+                    "error": "Invalid note_type. Use 'note' (HTML), 'markdown', or 'excalidraw'.",
+                    "note_type": note_type,
+                },
+                ensure_ascii=False,
+            )
+
     result = client.create_note(
         title=title,
         content=content,
         tags=tags,
         folder_name=folder,
         workspace=workspace,
+        note_type=note_type,
     )
     
     if result:
@@ -240,7 +281,9 @@ def update_note(
         title: New title for the note
         tags: New tags (comma-separated)
     """
-    client = get_client()
+    client, err = _get_client_or_error()
+    if err:
+        return err
     result = client.update_note(
         note_id=id,
         content=content,
@@ -267,7 +310,9 @@ def delete_note(id: int, workspace: Optional[str] = None) -> str:
         id: ID of the note to delete
         workspace: Workspace name (optional, uses default workspace if not specified)
     """
-    client = get_client()
+    client, err = _get_client_or_error()
+    if err:
+        return err
     success = client.delete_note(id, workspace=workspace)
     
     if success:
@@ -295,7 +340,9 @@ def create_folder(
     if not folder_name:
         return json.dumps({"error": "folder_name is required"}, ensure_ascii=False)
     
-    client = get_client()
+    client, err = _get_client_or_error()
+    if err:
+        return err
     result = client.create_folder(
         folder_name=folder_name,
         parent_folder_id=parent_folder_id,
@@ -367,6 +414,14 @@ def main():
     try:
         if transport == "http":
             logger.info(f"Starting Poznote MCP Server (HTTP mode on {host}:{port})...")
+            # Ensure FastMCP is configured with the host/port that the user passed.
+            # FastMCP exposes host/port as attributes; set them before running.
+            try:
+                setattr(mcp, "host", host)
+                setattr(mcp, "port", port)
+            except Exception:
+                # If the underlying FastMCP implementation changes, fall back to defaults.
+                logger.debug("Unable to set host/port on FastMCP instance; using defaults")
             mcp.run(transport="streamable-http")
         else:
             logger.info("Starting Poznote MCP Server (stdio mode)...")

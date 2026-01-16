@@ -297,6 +297,12 @@ body.dark-mode .folder-icon {
     color: #b0b0b0;
 }
 
+/* Custom color icons should keep their color in dark mode */
+html[data-theme='dark'] .folder-icon[data-icon-color],
+body.dark-mode .folder-icon[data-icon-color] {
+    /* Inline style with !important will override */
+}
+
 /* Folder note count */
 html[data-theme='dark'] .folder-note-count,
 body.dark-mode .folder-note-count {
@@ -682,6 +688,33 @@ body.dark-mode .modal-buttons button:first-child {
 html[data-theme='dark'] .modal-buttons button:first-child:hover,
 body.dark-mode .modal-buttons button:first-child:hover {
     background-color: #2a4a7f;
+}
+
+/* Move Task modal list (dark mode) */
+html[data-theme='dark'] .move-task-list,
+body.dark-mode .move-task-list {
+    border-color: #404040;
+    background-color: #1f1f1f;
+}
+
+html[data-theme='dark'] .move-task-item,
+body.dark-mode .move-task-item {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .move-task-item:hover,
+body.dark-mode .move-task-item:hover {
+    background: #2a2a2a;
+}
+
+html[data-theme='dark'] .move-task-item.selected,
+body.dark-mode .move-task-item.selected {
+    background: #1e3a5f;
+}
+
+html[data-theme='dark'] .move-task-item small,
+body.dark-mode .move-task-item small {
+    color: #a8a8a8;
 }
 
 /* Move Folder Files Modal (dark theme refinements) */
@@ -1529,12 +1562,28 @@ body.dark-mode ::-webkit-scrollbar-thumb:hover {
 html[data-theme='dark'] .resize-handle,
 body.dark-mode .resize-handle {
     background-color: #1a1a1a;
-    border-right: 1px solid #404040;
+    border-right: 1px solid #2a2a2a;
 }
 
 html[data-theme='dark'] .resize-handle:hover,
 body.dark-mode .resize-handle:hover {
-    background-color: #4a9eff;
+    background-color: #2a2a2a;
+    border-right: 1px solid #3a3a3a;
+}
+
+/* Toggle sidebar button in dark mode */
+html[data-theme='dark'] .toggle-sidebar-btn,
+body.dark-mode .toggle-sidebar-btn {
+    background: #2a2a2a;
+    border-color: #404040;
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .toggle-sidebar-btn:hover,
+body.dark-mode .toggle-sidebar-btn:hover {
+    background: #333;
+    color: #4a9eff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* Notification popup */
@@ -2170,14 +2219,15 @@ body.dark-mode .info-box {
 
 /* Icons - Make all icons lighter in dark mode by modifying the filter */
 /* Override the default dark gray filter with a lighter one */
-html[data-theme='dark'] [class*="fa-"],
-body.dark-mode [class*="fa-"] {
+/* Exclude folder icons with custom colors from the filter */
+html[data-theme='dark'] [class*="fa-"]:not(.folder-icon[data-icon-color]),
+body.dark-mode [class*="fa-"]:not(.folder-icon[data-icon-color]) {
     filter: brightness(0) saturate(0%) invert(80%) !important;
     transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-html[data-theme='dark'] [class*="fa-"]:hover,
-body.dark-mode [class*="fa-"]:hover {
+html[data-theme='dark'] [class*="fa-"]:not(.folder-icon[data-icon-color]):hover,
+body.dark-mode [class*="fa-"]:not(.folder-icon[data-icon-color]):hover {
     transform: scale(1.18);
     filter: brightness(0) saturate(0%) invert(90%) !important;
 }
@@ -2425,4 +2475,45 @@ body.dark-mode .folder-icon-grid::-webkit-scrollbar-thumb {
 html[data-theme='dark'] .folder-icon-grid::-webkit-scrollbar-thumb:hover,
 body.dark-mode .folder-icon-grid::-webkit-scrollbar-thumb:hover {
     background: #6b7280;
+}
+
+/* Folder Color Picker */
+html[data-theme='dark'] .folder-color-label,
+body.dark-mode .folder-color-label {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .folder-color-picker,
+body.dark-mode .folder-color-picker {
+    background: #1a1a1a;
+    border-color: #404040;
+}
+
+html[data-theme='dark'] .folder-color-swatch,
+body.dark-mode .folder-color-swatch {
+    border-color: #404040;
+}
+
+html[data-theme='dark'] .folder-color-option:hover .folder-color-swatch,
+body.dark-mode .folder-color-option:hover .folder-color-swatch {
+    border-color: #6366f1;
+}
+
+html[data-theme='dark'] .folder-color-option.selected .folder-color-swatch,
+body.dark-mode .folder-color-option.selected .folder-color-swatch {
+    border-color: #6366f1;
+}
+
+html[data-theme='dark'] .folder-color-default,
+body.dark-mode .folder-color-default {
+    background: linear-gradient(135deg, #404040 25%, transparent 25%, transparent 75%, #404040 75%, #404040),
+                linear-gradient(135deg, #404040 25%, #1a1a1a 25%, #1a1a1a 75%, #404040 75%, #404040);
+    background-size: 8px 8px;
+    background-position: 0 0, 4px 4px;
+}
+
+html[data-theme='dark'] .folder-icon[data-icon-color],
+body.dark-mode .folder-icon[data-icon-color] {
+    /* Custom color icons should keep their color in dark mode */
+    /* This ensures the inline style color is preserved */
 }

@@ -30,12 +30,24 @@
     const filterStats = document.getElementById('filterStats');
     const foldersList = document.getElementById('sharedFoldersList');
     const backBtn = document.getElementById('backToNotesBtn');
+    const backHomeBtn = document.getElementById('backToHomeBtn');
     const publicNotesBtn = document.getElementById('publicNotesBtn');
 
     // Back to notes button
     if (backBtn) {
         backBtn.addEventListener('click', function() {
             window.location.href = 'index.php';
+        });
+    }
+
+    // Back to home button
+    if (backHomeBtn) {
+        backHomeBtn.addEventListener('click', function() {
+            if (typeof window.goBackToHome === 'function') {
+                window.goBackToHome();
+            } else {
+                window.location.href = 'home.php';
+            }
         });
     }
 

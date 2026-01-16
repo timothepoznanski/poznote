@@ -846,7 +846,87 @@ body {
     flex-shrink: 0;
     /* subtle divider line to match the mockup */
     border-right: 1px solid #ccc;
+}
 
+/* Extend hover area for easier button access */
+.resize-handle::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -8px;
+    right: -8px;
+    bottom: 0;
+    z-index: 1;
+}
+
+/* Toggle sidebar button */
+.toggle-sidebar-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 48px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.resize-handle:hover .toggle-sidebar-btn,
+.toggle-sidebar-btn:focus {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.toggle-sidebar-btn:hover {
+    background: #f8f9fa;
+    color: #007DB8;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-sidebar-btn i {
+    transition: transform 0.3s ease;
+    font-size: 0.75em;
+}
+
+/* Collapsed state */
+body.sidebar-collapsed #left_col {
+    width: 0 !important;
+    min-width: 0 !important;
+    padding: 0;
+    overflow: hidden;
+    transition: width 0.3s ease, padding 0.3s ease;
+}
+
+body.sidebar-collapsed .resize-handle {
+    cursor: default;
+}
+
+body.sidebar-collapsed .toggle-sidebar-btn {
+    left: 3px;
+    border-radius: 0 4px 4px 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+body.sidebar-collapsed .toggle-sidebar-btn i {
+    transform: rotate(180deg);
+}
+
+/* Smooth transition for left column */
+#left_col {
+    transition: width 0.3s ease, padding 0.3s ease;
 }
 
 /* Separator after Favorites to visually separate important folders */
@@ -2819,6 +2899,11 @@ body.dark-mode .folder-header.folder-drop-target {
     align-content: center;
 }
 
+/* Custom color icons should override default color */
+.folder-icon[data-icon-color] {
+    /* Inline style will be applied here with higher specificity */
+}
+
 /* Container pour les dossiers système - maintenant masqué (remplacé par page Home) */
 .system-folders-container {
     display: none !important;
@@ -3542,6 +3627,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-trash-restore-alt::before { content: "\f2ea"; }
 .fa-grip-vertical::before { content: "\f58e"; }
 .fa-grip-lines-vertical::before { content: "\f7a5"; }
+.fa-broom::before { content: "\f51a"; }
 .fa-times-circle::before { content: "\f057"; }
 .fa-times::before { content: "\f00d"; }
 .fa-chevron-right::before { content: "\f054"; }
@@ -3824,6 +3910,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-arrows-h,
 .fa-sort,
 .fa-file-import,
+.fa-broom,
 .fa-moon,
 .fa-briefcase,
 .fa-heart,
@@ -4440,12 +4527,13 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 /* Apply default gray filter (rgb(55, 53, 47)) to all icons not on hover */
-[class*="fa-"] {
+/* Exclude folder icons with custom colors from the filter */
+[class*="fa-"]:not(.folder-icon[data-icon-color]) {
   filter: brightness(0) saturate(100%) invert(21%) sepia(8%) saturate(1075%) hue-rotate(17deg) brightness(94%) contrast(89%);
   transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-[class*="fa-"]:hover {
+[class*="fa-"]:not(.folder-icon[data-icon-color]):hover {
   transform: scale(1.18);
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
@@ -5066,6 +5154,23 @@ a.links_arbo_left.dragging,
 /* Section bottom spacer */
 .section-bottom-spacer {
     padding-bottom: 50px;
+}
+
+/* ============================================
+   CENTER NOTE CONTENT
+   When enabled, the note content is centered with a max-width
+   for better readability on wide screens
+   ============================================ */
+body.center-note-content #right_col .innernote {
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+body.center-note-content #right_col .note-header {
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* ============================================

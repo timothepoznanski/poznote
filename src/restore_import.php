@@ -1310,6 +1310,36 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         // Determine note type based on file extension
         $noteType = ($fileExtension === 'md' || $fileExtension === 'markdown') ? 'markdown' : 'note';
         
+        // Store original JSON data for tasklists (will be updated with new noteId later)
+        $originalJsonData = null;
+        
+        // Special handling for JSON files - check if they contain tasklist data
+        if ($fileExtension === 'json') {
+            $jsonData = json_decode($content, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($jsonData)) {
+                // Check if this looks like a tasklist (array of objects with text/completed properties)
+                $isTasklist = true;
+                foreach ($jsonData as $item) {
+                    if (!is_array($item) || !isset($item['text'])) {
+                        $isTasklist = false;
+                        break;
+                    }
+                }
+                if ($isTasklist) {
+                    $noteType = 'tasklist';
+                    $originalJsonData = $jsonData; // Store for later update
+                } else {
+                    // If it's valid JSON but not a tasklist, treat as regular note with JSON content
+                    $noteType = 'note';
+                    $content = '<pre>' . htmlspecialchars($content, ENT_QUOTES, 'UTF-8') . '</pre>';
+                }
+            } else {
+                // Invalid JSON - treat as regular note
+                $noteType = 'note';
+                $content = '<pre>' . htmlspecialchars($content, ENT_QUOTES, 'UTF-8') . '</pre>';
+            }
+        }
+        
         // Remove <style> tags from HTML files
         if ($noteType === 'note' && $fileExtension === 'html') {
             $content = removeStyleTags($content);
@@ -1468,6 +1498,26 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
             }
             $noteId = $con->lastInsertId();
             
+            // For tasklists imported from JSON, update task IDs and noteId
+            if ($noteType === 'tasklist' && $originalJsonData !== null) {
+                // Regenerate task IDs and update noteId for all tasks
+                foreach ($originalJsonData as &$task) {
+                    // Generate new unique ID based on timestamp
+                    $task['id'] = (int)(microtime(true) * 10000);
+                    // Update noteId to match the newly created note
+                    $task['noteId'] = (int)$noteId;
+                    // Small delay to ensure unique IDs
+                    usleep(1);
+                }
+                unset($task); // Break reference
+                // Update content with new IDs
+                $content = json_encode($originalJsonData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                
+                // Update database entry with regenerated task data
+                $updateStmt = $con->prepare("UPDATE entries SET entry = ? WHERE id = ?");
+                $updateStmt->execute([$content, $noteId]);
+            }
+            
             // Process Obsidian-style image references ![[image.png]] and convert to standard markdown
             // Also build the attachments array for this note
             $noteAttachments = [];
@@ -1577,6 +1627,9 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
             
             if ($noteType === 'markdown') {
                 // For markdown notes, save content as-is
+                $wrappedContent = $content;
+            } elseif ($noteType === 'tasklist') {
+                // For tasklist notes, save JSON content as-is (no HTML wrapper)
                 $wrappedContent = $content;
             } else {
                 // For HTML notes, ensure it's properly formatted
@@ -1701,9 +1754,9 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
         
         // Validate file type
-        if (!in_array($fileExtension, ['html', 'md', 'markdown', 'txt'])) {
+        if (!in_array($fileExtension, ['html', 'md', 'markdown', 'txt', 'json'])) {
             $errorCount++;
-            $errors[] = $fileName . ': ' . t('restore_import.individual_notes.errors.invalid_file_type', ['allowed' => '.html, .md, .markdown, .txt']);
+            $errors[] = $fileName . ': ' . t('restore_import.individual_notes.errors.invalid_file_type', ['allowed' => '.html, .md, .markdown, .txt, .json']);
             continue;
         }
         
@@ -1717,6 +1770,32 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         
         // Determine note type based on file extension
         $noteType = ($fileExtension === 'md' || $fileExtension === 'markdown') ? 'markdown' : 'note';
+        
+        // Special handling for JSON files - check if they contain tasklist data
+        if ($fileExtension === 'json') {
+            $jsonData = json_decode($content, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($jsonData)) {
+                // Check if this looks like a tasklist (array of objects with text/completed properties)
+                $isTasklist = true;
+                foreach ($jsonData as $item) {
+                    if (!is_array($item) || !isset($item['text'])) {
+                        $isTasklist = false;
+                        break;
+                    }
+                }
+                if ($isTasklist) {
+                    $noteType = 'tasklist';
+                } else {
+                    // If it's valid JSON but not a tasklist, treat as regular note with JSON content
+                    $noteType = 'note';
+                    $content = '<pre>' . htmlspecialchars($content, ENT_QUOTES, 'UTF-8') . '</pre>';
+                }
+            } else {
+                // Invalid JSON - treat as regular note
+                $noteType = 'note';
+                $content = '<pre>' . htmlspecialchars($content, ENT_QUOTES, 'UTF-8') . '</pre>';
+            }
+        }
         
         // Remove <style> tags from HTML files
         if ($noteType === 'note' && $fileExtension === 'html') {
@@ -1842,12 +1921,35 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             }
             $noteId = $con->lastInsertId();
             
+            // For tasklists imported from JSON, update task IDs and noteId
+            if ($noteType === 'tasklist' && $originalJsonData !== null) {
+                // Regenerate task IDs and update noteId for all tasks
+                foreach ($originalJsonData as &$task) {
+                    // Generate new unique ID based on timestamp
+                    $task['id'] = (int)(microtime(true) * 10000);
+                    // Update noteId to match the newly created note
+                    $task['noteId'] = (int)$noteId;
+                    // Small delay to ensure unique IDs
+                    usleep(1);
+                }
+                unset($task); // Break reference
+                // Update content with new IDs
+                $content = json_encode($originalJsonData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                
+                // Update database entry with regenerated task data
+                $updateStmt = $con->prepare("UPDATE entries SET entry = ? WHERE id = ?");
+                $updateStmt->execute([$content, $noteId]);
+            }
+            
             // Save content to file with correct extension
             $fileExtension = ($noteType === 'markdown') ? '.md' : '.html';
             $noteFile = $entriesPath . '/' . $noteId . $fileExtension;
             
             if ($noteType === 'markdown') {
                 // For markdown notes, save content as-is
+                $wrappedContent = $content;
+            } elseif ($noteType === 'tasklist') {
+                // For tasklist notes, save JSON content as-is (no HTML wrapper)
                 $wrappedContent = $content;
             } else {
                 // For HTML notes, ensure it's properly formatted
@@ -2133,7 +2235,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                         </span><br>
                         <?php echo t_h('restore_import.sections.individual_notes.supported_formats', 'Supported: .html, .md, .markdown, .txt, .zip'); ?>
                     </small>
-                    <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown,.txt,.zip" multiple required class="form-file-input">
+                    <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown,.txt,.json,.zip" multiple required class="form-file-input">
                 </div>
                 
                 <button type="button" class="btn btn-primary btn-with-margin-top" data-action="show-individual-notes-import-confirmation" id="individualNotesImportBtn">

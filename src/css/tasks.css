@@ -59,6 +59,10 @@
     border-radius: 6px;
     background: #fafafa;
     transition: all 0.2s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .task-drag-handle {
@@ -148,6 +152,10 @@
     word-break: break-word;
     padding: 2px 0;
     min-height: 20px;
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
 }
 
 .task-text a {
@@ -193,6 +201,20 @@
     justify-content: center;
 }
 
+.task-move-btn {
+    padding: 4px 8px;
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .task-delete-btn i {
     font-size: 16px !important;
 }
@@ -201,8 +223,13 @@
     font-size: 16px !important;
 }
 
+.task-move-btn i {
+    font-size: 16px !important;
+}
+
 .task-delete-btn i,
 .task-important-btn i,
+.task-move-btn i,
 .task-drag-handle i {
     color: #999;
     font-family: "Font Awesome 5 Pro" !important;
@@ -216,6 +243,10 @@
 
 .task-important-btn:hover i {
     color: #ffa000;
+}
+
+.task-move-btn:hover i {
+    color: #007DB8;
 }
 
 /* Important task styling */

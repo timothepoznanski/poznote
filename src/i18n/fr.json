@@ -3,6 +3,8 @@
     "name": "Poznote"
   },
   "common": {
+    "notes": "Notes",
+    "back_to_home": "Retour à l'accueil",
     "back_to_notes": "Retour aux notes",
     "back_to_settings": "Retour aux paramètres",
     "close": "Fermer",
@@ -34,7 +36,8 @@
     "yes": "Oui",
     "no": "Non",
     "not_available": "Non disponible",
-    "not_specified": "Non spécifié"
+    "not_specified": "Non spécifié",
+    "apply": "Appliquer"
   },
   "folders": {
     "delete": {
@@ -364,12 +367,14 @@
       "login_display": "Titre page de connexion",
       "note_font_size": "Taille de police du contenu",
       "note_sort_order": "Tri des notes",
+      "tasklist_insert_order": "Ordre d'insertion des tâches",
       "timezone": "Fuseau horaire",
       "show_note_created": "Afficher la date de création",
       "show_note_subheading": "Afficher le sous-titre",
       "show_folder_counts": "Afficher le nombre de notes par dossier",
       "notes_without_folders_after": "Afficher les notes après les dossiers",
-      "show_folder_actions": "Afficher les actions de dossier"
+      "show_folder_actions": "Afficher les actions de dossier",
+      "center_note_content": "Centrer le contenu de la note"
     },
     "badges": {
       "font_size_default": "par défaut ({{size}}px)",
@@ -393,7 +398,8 @@
     "display": "Affichage",
     "home": "Accueil",
     "settings": "Paramètres",
-    "create": "Créer"
+    "create": "Créer",
+    "toggle": "Cacher/Afficher la colonne de gauche"
   },
   "home": {
     "title": "Accueil",
@@ -425,7 +431,15 @@
     "input_placeholder": "Écrivez une nouvelle tâche et appuyez sur Entrée pour l'ajouter à la liste...",
     "drag_to_reorder": "Glisser pour réorganiser",
     "add_to_top": "Ajouter les nouvelles tâches en haut",
-    "add_to_bottom": "Ajouter les nouvelles tâches en bas"
+    "add_to_bottom": "Ajouter les nouvelles tâches en bas",
+    "insert_order_top": "En haut",
+    "insert_order_bottom": "En bas",
+    "clear_completed": "Supprimer les tâches terminées",
+    "no_completed_tasks": "Aucune tâche terminée à supprimer.",
+    "confirm_clear_completed": "Supprimer {{count}} tâche(s) terminée(s) ?",
+    "move_to_list": "Déplacer vers une autre liste",
+    "move_success": "Tâche déplacée",
+    "move_error": "Impossible de déplacer la tâche"
   },
   "tags": {
     "add_single": "Ajouter un tag...",
@@ -704,10 +718,24 @@
         "title": "Exporter en HTML",
         "description": "Télécharger en fichier HTML avec tout le formatage préservé"
       },
+      "json": {
+        "title": "Télécharger en JSON",
+        "description": "Télécharger les données brutes de la liste de tâches au format JSON"
+      },
       "print": {
         "title": "Imprimer en PDF (Navigateur)",
         "description": "Utiliser la boîte de dialogue d'impression native du navigateur pour enregistrer en PDF"
       }
+    },
+    "task_move": {
+      "title": "Déplacer une tâche",
+      "description": "Choisissez une liste de tâches vers laquelle déplacer cette tâche.",
+      "search_placeholder": "Rechercher une liste de tâches...",
+      "loading": "Chargement...",
+      "empty": "Aucune liste de tâches trouvée.",
+      "moving": "Déplacement de la tâche...",
+      "error": "Impossible de charger les listes de tâches.",
+      "confirm": "Déplacer la tâche"
     },
     "convert": {
       "title": "Convertir la note",
@@ -1143,9 +1171,9 @@
         "select_files": "Sélectionner les fichiers",
         "files_info": "Plusieurs fichiers (max {{maxIndividualFiles}}) ou archive ZIP unique (max {{maxZipFiles}} fichiers). Ces limites sont modifiables,",
         "files_info_link": "voir la documentation",
-        "supported_formats": "Formats supportés : .html, .md, .markdown, .txt, .zip",
-        "description_html": "Importez des fichiers HTML, Markdown ou texte individuels, ou une archive ZIP contenant plusieurs fichiers.<br><br>Le titre sera automatiquement créé à partir du nom de fichier (sans l'extension), sauf si une clé title est définie dans un front matter pour les fichiers MD.",
-        "helper": "Vous pouvez sélectionner plusieurs fichiers à la fois (maximum 50 fichiers). Formats pris en charge : .html, .md, .markdown, .txt"
+        "supported_formats": "Formats supportés : .html, .md, .markdown, .txt, .json, .zip",
+        "description_html": "Importez des fichiers HTML, Markdown, texte ou JSON individuels, ou une archive ZIP contenant plusieurs fichiers.<br><br>Le titre sera automatiquement créé à partir du nom de fichier (sans l'extension), sauf si une clé title est définie dans un front matter pour les fichiers MD.<br><br><strong>Tasklists :</strong> Les fichiers .json contenant des tableaux de tâches et les fichiers .md avec syntaxe checkbox (- [ ] ou - [x]) sont automatiquement importés comme listes de tâches.",
+        "helper": "Vous pouvez sélectionner plusieurs fichiers à la fois (maximum 50 fichiers). Formats pris en charge : .html, .md, .markdown, .txt, .json"
       }
     },
     "buttons": {

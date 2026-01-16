@@ -22,7 +22,8 @@
             noteStates.set(noteId, {
                 matches: [],
                 currentIndex: -1,
-                replaceVisible: false
+                replaceVisible: false,
+                suppressClearOnInput: false
             });
         }
         return noteStates.get(noteId);
@@ -49,6 +50,12 @@
         const bar = getSearchBar(noteId);
         if (!bar) return;
 
+        const isOpen = window.getComputedStyle(bar).display !== 'none';
+        if (isOpen) {
+            closeSearchBar(noteId);
+            return;
+        }
+
         // Make sure listeners are initialized
         initNoteListeners(noteId);
 
@@ -63,13 +70,11 @@
         const searchInput = document.getElementById('searchInput' + noteId);
         const replaceInput = document.getElementById('replaceInput' + noteId);
         const replaceRow = document.getElementById('searchReplaceRow' + noteId);
-        const toggleBtn = document.getElementById('searchToggleReplaceBtn' + noteId);
         const countEl = document.getElementById('searchCount' + noteId);
 
         if (searchInput) searchInput.value = '';
         if (replaceInput) replaceInput.value = '';
-        if (replaceRow) replaceRow.style.display = 'none';
-        if (toggleBtn) toggleBtn.classList.remove('active');
+        if (replaceRow) replaceRow.style.display = 'flex';
         if (countEl) countEl.textContent = '';
 
         // Show bar with animation
@@ -123,17 +128,9 @@
         state.replaceVisible = !state.replaceVisible;
 
         const replaceRow = document.getElementById('searchReplaceRow' + noteId);
-        const toggleBtn = document.getElementById('searchToggleReplaceBtn' + noteId);
 
         if (replaceRow) {
-            replaceRow.style.display = state.replaceVisible ? 'flex' : 'none';
-        }
-        if (toggleBtn) {
-            if (state.replaceVisible) {
-                toggleBtn.classList.add('active');
-            } else {
-                toggleBtn.classList.remove('active');
-            }
+            replaceRow.style.display = 'flex';
         }
 
         // Focus replace input when shown
@@ -169,16 +166,19 @@
     /**
      * Find all matches in the note
      */
-    function findMatches(noteId) {
+    function findMatches(noteId, options) {
         const searchInput = document.getElementById('searchInput' + noteId);
         if (!searchInput) return;
 
         const searchText = searchInput.value;
+        const state = getNoteState(noteId);
+        const preserveIndex = options && options.preserveIndex === true;
+        const skipScroll = options && options.skipScroll === true;
+        const previousIndex = state.currentIndex;
         if (!searchText) {
             const countEl = document.getElementById('searchCount' + noteId);
             if (countEl) countEl.textContent = '';
             clearHighlights(noteId);
-            const state = getNoteState(noteId);
             state.matches = [];
             state.currentIndex = -1;
             return;
@@ -188,9 +188,8 @@
         if (!noteEntry) return;
 
         clearHighlights(noteId);
-        const state = getNoteState(noteId);
         state.matches = [];
-        state.currentIndex = -1;
+        state.currentIndex = preserveIndex ? previousIndex : -1;
 
         // Build regex pattern - escape special chars
         let pattern = searchText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -204,10 +203,20 @@
         const count = state.matches.length;
         if (countEl) {
             if (count > 0) {
-                state.currentIndex = 0;
+                if (preserveIndex) {
+                    let nextIndex = previousIndex;
+                    if (nextIndex >= count) nextIndex = count - 1;
+                    if (nextIndex < -1) nextIndex = -1;
+                    state.currentIndex = nextIndex;
+                } else {
+                    state.currentIndex = 0;
+                }
                 countEl.textContent = `${count} ${count > 1 ? tr('search_replace.results', {}, 'results') : tr('search_replace.result', {}, 'result')}`;
-                scrollToMatch(noteId, 0);
+                if (!skipScroll && state.currentIndex >= 0) {
+                    scrollToMatch(noteId, state.currentIndex);
+                }
             } else {
+                state.currentIndex = -1;
                 countEl.textContent = tr('search_replace.no_matches', {}, 'No results');
             }
         }
@@ -271,7 +280,7 @@
      */
     function nextMatch(noteId) {
         // Relancer la recherche pour avoir les résultats à jour
-        findMatches(noteId);
+        findMatches(noteId, { preserveIndex: true, skipScroll: true });
         
         const state = getNoteState(noteId);
         if (state.matches.length === 0) return;
@@ -285,7 +294,7 @@
      */
     function prevMatch(noteId) {
         // Relancer la recherche pour avoir les résultats à jour
-        findMatches(noteId);
+        findMatches(noteId, { preserveIndex: true, skipScroll: true });
         
         const state = getNoteState(noteId);
         if (state.matches.length === 0) return;
@@ -333,33 +342,22 @@
             const textNode = document.createTextNode(matchText);
             const parent = currentMatch.parentNode;
             parent.replaceChild(textNode, currentMatch);
-            parent.normalize();
-            
-            // Now select the text node and replace with new text
-            const range = document.createRange();
-            range.selectNodeContents(parent);
-            // Find the text we just inserted
-            const walker = document.createTreeWalker(parent, NodeFilter.SHOW_TEXT);
-            let targetNode = null;
-            while (walker.nextNode()) {
-                if (walker.currentNode.textContent.includes(matchText)) {
-                    targetNode = walker.currentNode;
-                    const startIndex = walker.currentNode.textContent.indexOf(matchText);
-                    range.setStart(walker.currentNode, startIndex);
-                    range.setEnd(walker.currentNode, startIndex + matchText.length);
-                    break;
-                }
-            }
-            
-            if (targetNode) {
-                const selection = window.getSelection();
-                selection.removeAllRanges();
-                selection.addRange(range);
 
-                // Use execCommand to make the replacement undoable
-                noteEntry.focus();
-                document.execCommand('insertText', false, replaceText);
-            }
+            // Select the exact text node we just inserted
+            const range = document.createRange();
+            range.setStart(textNode, 0);
+            range.setEnd(textNode, textNode.length);
+
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            // Use execCommand to make the replacement undoable
+            state.suppressClearOnInput = true;
+            noteEntry.focus();
+            document.execCommand('insertText', false, replaceText);
+            state.suppressClearOnInput = false;
+            parent.normalize();
 
             // Remove from matches array
             state.matches.splice(state.currentIndex, 1);
@@ -375,7 +373,11 @@
                 if (countEl) {
                     countEl.textContent = `${state.matches.length} ${state.matches.length > 1 ? tr('search_replace.results', {}, 'results') : tr('search_replace.result', {}, 'result')}`;
                 }
-                scrollToMatch(noteId, state.currentIndex);
+                // Rebuild highlights and move to the next match
+                findMatches(noteId, { preserveIndex: true, skipScroll: true });
+                if (state.matches.length > 0 && state.currentIndex >= 0) {
+                    scrollToMatch(noteId, state.currentIndex);
+                }
             } else {
                 // No more matches - clear any remaining highlights
                 clearHighlights(noteId);
@@ -413,6 +415,7 @@
 
         // Focus the note to enable execCommand
         noteEntry.focus();
+        state.suppressClearOnInput = true;
 
         // Replace all matches in reverse order to maintain correct positions
         for (let i = state.matches.length - 1; i >= 0; i--) {
@@ -423,27 +426,22 @@
                 const textNode = document.createTextNode(matchText);
                 const parent = match.parentNode;
                 parent.replaceChild(textNode, match);
-                parent.normalize();
-                
-                // Find and select the text we just inserted
+
+                // Select the exact text node we just inserted
                 const range = document.createRange();
-                const walker = document.createTreeWalker(parent, NodeFilter.SHOW_TEXT);
-                while (walker.nextNode()) {
-                    if (walker.currentNode.textContent.includes(matchText)) {
-                        const startIndex = walker.currentNode.textContent.indexOf(matchText);
-                        range.setStart(walker.currentNode, startIndex);
-                        range.setEnd(walker.currentNode, startIndex + matchText.length);
-                        
-                        const selection = window.getSelection();
-                        selection.removeAllRanges();
-                        selection.addRange(range);
-                        
-                        document.execCommand('insertText', false, replaceText);
-                        break;
-                    }
-                }
+                range.setStart(textNode, 0);
+                range.setEnd(textNode, textNode.length);
+
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+
+                document.execCommand('insertText', false, replaceText);
+                parent.normalize();
             }
         }
+
+        state.suppressClearOnInput = false;
         
         // Clear matches
         state.matches = [];
@@ -496,11 +494,6 @@
         }
 
         // Toggle replace button
-        const toggleBtn = document.getElementById('searchToggleReplaceBtn' + noteId);
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', () => toggleReplaceRow(noteId));
-        }
-
         // Replace button
         const replaceBtn = document.getElementById('replaceBtn' + noteId);
         if (replaceBtn) {
@@ -549,6 +542,9 @@
         if (noteEntry) {
             const clearHighlightsOnEdit = function() {
                 const state = getNoteState(noteId);
+                if (state.suppressClearOnInput) {
+                    return;
+                }
                 // Only clear if there are active matches
                 if (state.matches.length > 0) {
                     clearHighlights(noteId);

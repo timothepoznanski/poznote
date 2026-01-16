@@ -90,6 +90,14 @@ function navigateToPage(page) {
     window.location.href = url;
 }
 
+/**
+ * Navigate back to Home (home.php)
+ * Preserves workspace when available.
+ */
+function goBackToHome() {
+    navigateToPage('home.php');
+}
+
 // Expose functions globally
 window.getPageWorkspace = getPageWorkspace;
 window.getEffectiveWorkspace = getEffectiveWorkspace;
@@ -97,3 +105,4 @@ window.buildUrl = buildUrl;
 window.goBackToNotes = goBackToNotes;
 window.goBackToNote = goBackToNote;
 window.navigateToPage = navigateToPage;
+window.goBackToHome = goBackToHome;

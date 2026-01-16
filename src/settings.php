@@ -129,12 +129,6 @@ $currentLang = getUserLanguage();
             $back_href = 'index.php' . (!empty($back_params) ? '?' . implode('&', $back_params) : '');
         ?>
 
-        <!-- Version Display (mobile top) -->
-        <div class="version-display version-display-mobile-top">
-            <small>Poznote <?php echo htmlspecialchars(trim(file_get_contents('version.txt')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></small><br>
-            <small><a href="https://poznote.com/releases.html" target="_blank" class="release-notes-link"><?php echo t_h('settings.cards.release_notes'); ?></a></small>
-        </div>
-
         <div class="settings-two-columns">
             <!-- Left Column: Actions (without badges) -->
             <div class="settings-column settings-column-left">
@@ -145,16 +139,6 @@ $currentLang = getUserLanguage();
                     </div>
                     <div class="settings-card-content">
                         <h3><?php echo t_h('common.back_to_notes'); ?></h3>
-                    </div>
-                </div>
-
-                <!-- Workspaces -->
-                <div class="settings-card" id="workspaces-card">
-                    <div class="settings-card-icon">
-                        <i class="fa-layer-group"></i>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.workspaces'); ?></h3>
                     </div>
                 </div>
 
@@ -301,6 +285,14 @@ $currentLang = getUserLanguage();
                     </div>
                 </div>
 
+                <!-- Tasklist Insert Order -->
+                <div class="settings-card" id="tasklist-insert-order-card">
+                    <div class="settings-card-icon"><i class="fa-arrow-down"></i></div>
+                    <div class="settings-card-content">
+                        <h3><?php echo t_h('display.cards.tasklist_insert_order', [], 'Task list insert order'); ?> <span id="tasklist-insert-order-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
+                    </div>
+                </div>
+
                 <!-- Show Note Created -->
                 <div class="settings-card" id="show-created-card">
                     <div class="settings-card-icon"><i class="fa-calendar-alt"></i></div>
@@ -324,14 +316,17 @@ $currentLang = getUserLanguage();
                         <h3><?php echo t_h('display.cards.notes_without_folders_after'); ?> <span id="notes-without-folders-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span></h3>
                     </div>
                 </div>
+
+                <!-- Center Note Content -->
+                <div class="settings-card" id="center-note-card">
+                    <div class="settings-card-icon"><i class="fa-align-center"></i></div>
+                    <div class="settings-card-content">
+                        <h3><?php echo t_h('display.cards.center_note_content'); ?> <span id="center-note-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span></h3>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Version Display (desktop bottom) -->
-        <div class="version-display version-display-desktop-bottom">
-            <small>Poznote <?php echo htmlspecialchars(trim(file_get_contents('version.txt')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></small><br>
-            <small><a href="https://poznote.com/releases.html" target="_blank" class="release-notes-link"><?php echo t_h('settings.cards.release_notes'); ?></a></small>
-        </div>
     </div>
 
     <?php include 'modals.php'; ?>

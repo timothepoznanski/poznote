@@ -68,6 +68,9 @@ $currentLang = getUserLanguage();
 			<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
 				<?php echo t_h('common.back_to_notes'); ?>
 			</button>
+			<button id="backToHomeBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_home', [], 'Back to Home'); ?>">
+				<?php echo t_h('common.back_to_home', [], 'Back to Home'); ?>
+			</button>
 			<h1 class="tags-header"><?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?></h1>
 		</div>
 		

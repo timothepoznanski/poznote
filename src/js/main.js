@@ -145,6 +145,7 @@ window.showDeleteFolderModal = showDeleteFolderModal;
 window.selectFolder = selectFolder;
 window.toggleFolder = toggleFolder;
 window.restoreFolderStates = restoreFolderStates;
+window.persistFolderStatesFromDOM = persistFolderStatesFromDOM;
 window.showNewWorkspacePrompt = showNewWorkspacePrompt;
 window.deleteCurrentWorkspace = deleteCurrentWorkspace;
 window.startDownload = startDownload;

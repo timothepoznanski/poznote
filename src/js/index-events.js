@@ -126,11 +126,6 @@
                     toggleInlineCode();
                 }
                 break;
-            case 'toggle-task-insert-order':
-                if (typeof toggleTaskInsertOrder === 'function') {
-                    toggleTaskInsertOrder();
-                }
-                break;
             case 'insert-excalidraw':
                 if (typeof insertExcalidrawDiagram === 'function') {
                     insertExcalidrawDiagram();
@@ -164,6 +159,11 @@
             case 'open-search-replace-modal':
                 if (noteId && typeof openSearchReplaceModal === 'function') {
                     openSearchReplaceModal(noteId);
+                }
+                break;
+            case 'clear-completed-tasks':
+                if (noteId && typeof clearCompletedTasks === 'function') {
+                    clearCompletedTasks(noteId);
                 }
                 break;
 

@@ -224,6 +224,7 @@ const FOLDER_ICONS = [
 let currentFolderIdForIcon = null;
 let currentFolderNameForIcon = null;
 let selectedIconClass = null;
+let selectedIconColor = '';
 
 /**
  * Get translated name for an icon
@@ -241,20 +242,22 @@ function showChangeFolderIconModal(folderId, folderName) {
     currentFolderIdForIcon = folderId;
     currentFolderNameForIcon = folderName;
     selectedIconClass = null;
-    
+    selectedIconColor = '';
+
     // Get the modal
     const modal = document.getElementById('folderIconModal');
     if (!modal) return;
-    
+
     // Populate icon grid
     const iconGrid = document.getElementById('folderIconGrid');
     if (!iconGrid) return;
-    
+
     iconGrid.innerHTML = '';
-    
-    // Get the current folder icon (if any)
+
+    // Get the current folder icon and color (if any)
     const folderElement = document.querySelector(`[data-folder-id="${folderId}"] .folder-icon`);
     let currentIcon = null;
+    let currentColor = '';
     if (folderElement) {
         for (let iconClass of FOLDER_ICONS) {
             if (folderElement.classList.contains(iconClass)) {
@@ -262,6 +265,8 @@ function showChangeFolderIconModal(folderId, folderName) {
                 break;
             }
         }
+        // Get current color from data attribute or inline style
+        currentColor = folderElement.getAttribute('data-icon-color') || '';
     }
     
     // Create icon items
@@ -271,15 +276,15 @@ function showChangeFolderIconModal(folderId, folderName) {
         iconItem.dataset.iconClass = iconClass;
         iconItem.dataset.iconName = getIconTranslation(iconClass);
         iconItem.title = getIconTranslation(iconClass);
-        
+
         if (iconClass === currentIcon) {
             iconItem.classList.add('selected');
             selectedIconClass = iconClass;
         }
-        
+
         const icon = document.createElement('i');
         icon.className = iconClass;
-        
+
         iconItem.appendChild(icon);
         iconItem.addEventListener('click', function() {
             // Remove selected class from all items
@@ -289,35 +294,86 @@ function showChangeFolderIconModal(folderId, folderName) {
             // Add selected class to clicked item
             iconItem.classList.add('selected');
             selectedIconClass = iconClass;
-            
-            // Apply the icon immediately
-            saveFolderIcon();
+
+            // Don't save immediately - let user choose color first
         });
-        
+
         iconGrid.appendChild(iconItem);
     });
+
+    // Setup color picker
+    setupColorPicker(currentColor);
+    if (currentColor) {
+        selectedIconColor = currentColor;
+    }
     
     // Setup search functionality
     const searchInput = document.getElementById('folderIconSearchInput');
     if (searchInput) {
         // Clear previous value
         searchInput.value = '';
-        
+
         // Remove previous event listeners by cloning the element
         const newSearchInput = searchInput.cloneNode(true);
         searchInput.parentNode.replaceChild(newSearchInput, searchInput);
-        
+
         // Add new event listener
         newSearchInput.addEventListener('input', function(e) {
             filterIcons(e.target.value);
         });
-        
+
         // Focus on search input
         setTimeout(() => newSearchInput.focus(), 100);
     }
-    
+
+    // Setup Apply button
+    const applyBtn = document.getElementById('applyFolderIconBtn');
+    if (applyBtn) {
+        // Remove previous event listeners by cloning the element
+        const newApplyBtn = applyBtn.cloneNode(true);
+        applyBtn.parentNode.replaceChild(newApplyBtn, applyBtn);
+
+        // Add click event to save icon and color
+        newApplyBtn.addEventListener('click', function() {
+            if (selectedIconClass) {
+                saveFolderIcon();
+            }
+        });
+    }
+
     // Show modal
     modal.style.display = 'block';
+}
+
+/**
+ * Setup color picker
+ */
+function setupColorPicker(currentColor) {
+    const colorOptions = document.querySelectorAll('.folder-color-option');
+
+    colorOptions.forEach(option => {
+        const color = option.getAttribute('data-color');
+
+        // Mark current color as selected
+        if (color === currentColor) {
+            option.classList.add('selected');
+        } else {
+            option.classList.remove('selected');
+        }
+
+        // Add click event
+        option.addEventListener('click', function() {
+            // Remove selected class from all color options
+            document.querySelectorAll('.folder-color-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            // Add selected class to clicked option
+            option.classList.add('selected');
+            selectedIconColor = color;
+
+            // Don't save immediately - let user confirm with Apply button
+        });
+    });
 }
 
 /**
@@ -326,11 +382,11 @@ function showChangeFolderIconModal(folderId, folderName) {
 function filterIcons(searchQuery) {
     const query = searchQuery.toLowerCase().trim();
     const iconItems = document.querySelectorAll('.folder-icon-item');
-    
+
     iconItems.forEach(item => {
         const iconName = item.dataset.iconName.toLowerCase();
         const iconClass = item.dataset.iconClass.toLowerCase();
-        
+
         // Show if query matches icon name or icon class
         if (iconName.includes(query) || iconClass.includes(query)) {
             item.classList.remove('hidden');
@@ -351,6 +407,7 @@ function closeFolderIconModal() {
     currentFolderIdForIcon = null;
     currentFolderNameForIcon = null;
     selectedIconClass = null;
+    selectedIconColor = '';
 }
 
 /**
@@ -358,7 +415,7 @@ function closeFolderIconModal() {
  */
 function saveFolderIcon() {
     if (!currentFolderIdForIcon || !selectedIconClass) return;
-    
+
     // Send request to API
     fetch('/api/v1/folders/' + currentFolderIdForIcon + '/icon', {
         method: 'PUT',
@@ -367,18 +424,19 @@ function saveFolderIcon() {
         },
         credentials: 'same-origin',
         body: JSON.stringify({
-            icon: selectedIconClass
+            icon: selectedIconClass,
+            icon_color: selectedIconColor
         })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
             // Update the icon in the UI
-            updateFolderIconInUI(currentFolderIdForIcon, selectedIconClass);
-            
+            updateFolderIconInUI(currentFolderIdForIcon, selectedIconClass, selectedIconColor);
+
             // Close modal
             closeFolderIconModal();
-            
+
             // Show success notification
             if (typeof window.showNotification === 'function') {
                 window.showNotification(window.i18n?.t('notifications.folder_icon_updated') || 'Folder icon updated successfully', 'success');
@@ -438,16 +496,19 @@ function resetFolderIcon() {
 /**
  * Update folder icon in the UI
  */
-function updateFolderIconInUI(folderId, iconClass) {
+function updateFolderIconInUI(folderId, iconClass, iconColor) {
     const folderElement = document.querySelector(`[data-folder-id="${folderId}"] .folder-icon`);
-    if (!folderElement) return;
-    
+
+    if (!folderElement) {
+        return;
+    }
+
     // Remove all icon classes (including default folder icons)
     const allIconsToRemove = [...FOLDER_ICONS, 'fa-folder', 'fa-folder-open'];
     allIconsToRemove.forEach(icon => {
         folderElement.classList.remove(icon);
     });
-    
+
     // Add new icon class or default
     if (iconClass) {
         folderElement.classList.add(iconClass);
@@ -456,6 +517,15 @@ function updateFolderIconInUI(folderId, iconClass) {
         // Default icons
         folderElement.classList.add('fa-folder');
         folderElement.setAttribute('data-custom-icon', 'false');
+    }
+
+    // Apply color with !important to override CSS rules
+    if (iconColor) {
+        folderElement.style.setProperty('color', iconColor, 'important');
+        folderElement.setAttribute('data-icon-color', iconColor);
+    } else {
+        folderElement.style.removeProperty('color');
+        folderElement.removeAttribute('data-icon-color');
     }
 }
 

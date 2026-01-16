@@ -1,3 +1,4 @@
 """Poznote MCP Server - Minimal MCP for reading, searching and writing notes."""
 
-__version__ = "1.0.0"
+# Keep this in sync with mcp-server/pyproject.toml
+__version__ = "1.1.0"
