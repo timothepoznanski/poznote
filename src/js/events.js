@@ -1730,8 +1730,9 @@ function handleNoteDragEnd(e) {
     });
     
     // Remove drag-over class from all folders
-    document.querySelectorAll('.folder-header.drag-over').forEach(function(header) {
+    document.querySelectorAll('.folder-header.drag-over, .folder-header.folder-drop-target').forEach(function(header) {
         header.classList.remove('drag-over');
+        header.classList.remove('folder-drop-target');
         if (header.dataset && header.dataset.dragEnterCount) {
             delete header.dataset.dragEnterCount;
         }
@@ -1876,11 +1877,16 @@ function moveNoteToTargetFolder(noteId, targetFolderIdOrName) {
             if (data.share_delta && typeof updateSharedCount === 'function') {
                 updateSharedCount(data.share_delta);
             }
-            // Note moved successfully - no notification needed
-            // Reload the page to reflect changes
-            setTimeout(function() {
-                location.reload();
-            }, 500);
+            // Note moved successfully - refresh the left panel without full reload
+            if (typeof refreshNotesListAfterFolderAction === 'function') {
+                setTimeout(function() {
+                    refreshNotesListAfterFolderAction();
+                }, 200);
+            } else {
+                setTimeout(function() {
+                    location.reload();
+                }, 500);
+            }
         } else {
             var err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';
             showNotificationPopup('Error moving note: ' + err, 'error');
@@ -1960,10 +1966,16 @@ function moveNoteToRoot(noteId) {
     .then(function(response) { return response.json(); })
     .then(function(data) {
         if (data && data.success) {
-            // Note moved to root successfully
-            setTimeout(function() {
-                location.reload();
-            }, 500);
+            // Note moved to root successfully - refresh the left panel without full reload
+            if (typeof refreshNotesListAfterFolderAction === 'function') {
+                setTimeout(function() {
+                    refreshNotesListAfterFolderAction();
+                }, 200);
+            } else {
+                setTimeout(function() {
+                    location.reload();
+                }, 500);
+            }
         } else {
             var err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';
             showNotificationPopup('Error removing note from folder: ' + err, 'error');
@@ -2121,8 +2133,20 @@ function handleFolderDragEnterEnhanced(e) {
     var folderHeader = e.target.closest('.folder-header');
     if (!folderHeader) return;
 
-    var count = parseInt(folderHeader.dataset.dragEnterCount || '0', 10) + 1;
-    folderHeader.dataset.dragEnterCount = String(count);
+    if (e.relatedTarget && folderHeader.contains(e.relatedTarget)) {
+        return;
+    }
+
+    document.querySelectorAll('.folder-header.drag-over, .folder-header.folder-drop-target').forEach(function(header) {
+        if (header === folderHeader) return;
+        header.classList.remove('drag-over');
+        header.classList.remove('folder-drop-target');
+        if (header.dataset && header.dataset.dragEnterCount) {
+            delete header.dataset.dragEnterCount;
+        }
+    });
+
+    folderHeader.dataset.dragEnterCount = '1';
 
     var targetFolder = folderHeader.getAttribute('data-folder');
     var targetFolderId = folderHeader.getAttribute('data-folder-id');
