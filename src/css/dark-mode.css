@@ -1537,6 +1537,21 @@ body.dark-mode .resize-handle:hover {
     background-color: #4a9eff;
 }
 
+/* Toggle sidebar button in dark mode */
+html[data-theme='dark'] .toggle-sidebar-btn,
+body.dark-mode .toggle-sidebar-btn {
+    background: #2a2a2a;
+    border-color: #404040;
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .toggle-sidebar-btn:hover,
+body.dark-mode .toggle-sidebar-btn:hover {
+    background: #333;
+    color: #4a9eff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
 /* Notification popup */
 html[data-theme='dark'] #notificationPopup,
 body.dark-mode #notificationPopup {

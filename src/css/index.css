@@ -846,7 +846,85 @@ body {
     flex-shrink: 0;
     /* subtle divider line to match the mockup */
     border-right: 1px solid #ccc;
+}
 
+/* Extend hover area for easier button access */
+.resize-handle::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -8px;
+    right: -8px;
+    bottom: 0;
+    z-index: 1;
+}
+
+/* Toggle sidebar button */
+.toggle-sidebar-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 48px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.resize-handle:hover .toggle-sidebar-btn,
+.toggle-sidebar-btn:focus {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.toggle-sidebar-btn:hover {
+    background: #f8f9fa;
+    color: #007DB8;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-sidebar-btn i {
+    transition: transform 0.3s ease;
+    font-size: 0.75em;
+}
+
+/* Collapsed state */
+body.sidebar-collapsed #left_col {
+    width: 0 !important;
+    min-width: 0 !important;
+    padding: 0;
+    overflow: hidden;
+    transition: width 0.3s ease, padding 0.3s ease;
+}
+
+body.sidebar-collapsed .resize-handle {
+    cursor: default;
+}
+
+body.sidebar-collapsed .toggle-sidebar-btn {
+    left: 3px;
+    border-radius: 0 4px 4px 0;
+}
+
+body.sidebar-collapsed .toggle-sidebar-btn i {
+    transform: rotate(180deg);
+}
+
+/* Smooth transition for left column */
+#left_col {
+    transition: width 0.3s ease, padding 0.3s ease;
 }
 
 /* Separator after Favorites to visually separate important folders */
