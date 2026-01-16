@@ -151,7 +151,7 @@ function renderTasks(tasks, noteId) {
         }
         
         return `
-        <div class="task-item ${task.completed ? 'completed' : ''} ${task.important ? 'important' : ''}" data-task-id="${task.id}" draggable="true">
+        <div class="task-item ${task.completed ? 'completed' : ''} ${task.important ? 'important' : ''}" data-task-id="${task.id}" draggable="false">
             <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id}, ${task.noteId || 'null'})">
             <span class="task-text" onclick="editTask(${task.id}, ${task.noteId || 'null'})">${linkifyHtml(task.text)}</span>
             ${buttonsHtml}
@@ -440,7 +440,7 @@ function saveTaskEdit(taskId, noteId, newText) {
             // Ensure links inside don't trigger the span's onclick
             const anchors = newTaskText.querySelectorAll('a');
             anchors.forEach(a => a.addEventListener('click', e => e.stopPropagation()));
-            
+
             // Check if element is still in DOM before replacing
             try {
                 taskText.replaceWith(newTaskText);

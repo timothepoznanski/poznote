@@ -59,6 +59,10 @@
     border-radius: 6px;
     background: #fafafa;
     transition: all 0.2s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .task-drag-handle {
@@ -148,6 +152,10 @@
     word-break: break-word;
     padding: 2px 0;
     min-height: 20px;
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
 }
 
 .task-text a {
