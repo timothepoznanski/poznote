@@ -1310,6 +1310,32 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         // Determine note type based on file extension
         $noteType = ($fileExtension === 'md' || $fileExtension === 'markdown') ? 'markdown' : 'note';
         
+        // Special handling for JSON files - check if they contain tasklist data
+        if ($fileExtension === 'json') {
+            $jsonData = json_decode($content, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($jsonData)) {
+                // Check if this looks like a tasklist (array of objects with text/completed properties)
+                $isTasklist = true;
+                foreach ($jsonData as $item) {
+                    if (!is_array($item) || !isset($item['text'])) {
+                        $isTasklist = false;
+                        break;
+                    }
+                }
+                if ($isTasklist) {
+                    $noteType = 'tasklist';
+                } else {
+                    // If it's valid JSON but not a tasklist, treat as regular note with JSON content
+                    $noteType = 'note';
+                    $content = '<pre>' . htmlspecialchars($content, ENT_QUOTES, 'UTF-8') . '</pre>';
+                }
+            } else {
+                // Invalid JSON - treat as regular note
+                $noteType = 'note';
+                $content = '<pre>' . htmlspecialchars($content, ENT_QUOTES, 'UTF-8') . '</pre>';
+            }
+        }
+        
         // Remove <style> tags from HTML files
         if ($noteType === 'note' && $fileExtension === 'html') {
             $content = removeStyleTags($content);
@@ -1578,6 +1604,9 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
             if ($noteType === 'markdown') {
                 // For markdown notes, save content as-is
                 $wrappedContent = $content;
+            } elseif ($noteType === 'tasklist') {
+                // For tasklist notes, save JSON content as-is (no HTML wrapper)
+                $wrappedContent = $content;
             } else {
                 // For HTML notes, ensure it's properly formatted
                 if (stripos($content, '<html') === false) {
@@ -1718,6 +1747,32 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         // Determine note type based on file extension
         $noteType = ($fileExtension === 'md' || $fileExtension === 'markdown') ? 'markdown' : 'note';
         
+        // Special handling for JSON files - check if they contain tasklist data
+        if ($fileExtension === 'json') {
+            $jsonData = json_decode($content, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($jsonData)) {
+                // Check if this looks like a tasklist (array of objects with text/completed properties)
+                $isTasklist = true;
+                foreach ($jsonData as $item) {
+                    if (!is_array($item) || !isset($item['text'])) {
+                        $isTasklist = false;
+                        break;
+                    }
+                }
+                if ($isTasklist) {
+                    $noteType = 'tasklist';
+                } else {
+                    // If it's valid JSON but not a tasklist, treat as regular note with JSON content
+                    $noteType = 'note';
+                    $content = '<pre>' . htmlspecialchars($content, ENT_QUOTES, 'UTF-8') . '</pre>';
+                }
+            } else {
+                // Invalid JSON - treat as regular note
+                $noteType = 'note';
+                $content = '<pre>' . htmlspecialchars($content, ENT_QUOTES, 'UTF-8') . '</pre>';
+            }
+        }
+        
         // Remove <style> tags from HTML files
         if ($noteType === 'note' && $fileExtension === 'html') {
             $content = removeStyleTags($content);
@@ -1848,6 +1903,9 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             
             if ($noteType === 'markdown') {
                 // For markdown notes, save content as-is
+                $wrappedContent = $content;
+            } elseif ($noteType === 'tasklist') {
+                // For tasklist notes, save JSON content as-is (no HTML wrapper)
                 $wrappedContent = $content;
             } else {
                 // For HTML notes, ensure it's properly formatted
