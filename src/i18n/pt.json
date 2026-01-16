@@ -368,7 +368,8 @@
       "show_note_subheading": "Mostrar Subtítulo da Nota",
       "show_folder_counts": "Mostrar Contagem de Notas das Pastas",
       "notes_without_folders_after": "Mostrar notas após as pastas",
-      "show_folder_actions": "Mostrar Ações da Pasta"
+      "show_folder_actions": "Mostrar Ações da Pasta",
+      "center_note_content": "Centralizar conteúdo da nota"
     },
     "badges": {
       "font_size_default": "padrão ({{size}}px)",

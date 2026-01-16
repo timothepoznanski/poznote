@@ -369,7 +369,8 @@
       "show_note_subheading": "Mostrar subtítulo de la nota",
       "show_folder_counts": "Mostrar conteo de notas de carpetas",
       "notes_without_folders_after": "Mostrar notas después de las carpetas",
-      "show_folder_actions": "Mostrar acciones de carpeta"
+      "show_folder_actions": "Mostrar acciones de carpeta",
+      "center_note_content": "Centrar contenido de la nota"
     },
     "badges": {
       "font_size_default": "predeterminado ({{size}}px)",

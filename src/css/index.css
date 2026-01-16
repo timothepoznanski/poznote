@@ -5157,6 +5157,23 @@ a.links_arbo_left.dragging,
 }
 
 /* ============================================
+   CENTER NOTE CONTENT
+   When enabled, the note content is centered with a max-width
+   for better readability on wide screens
+   ============================================ */
+body.center-note-content #right_col .innernote {
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+body.center-note-content #right_col .note-header {
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ============================================
 .folder-content .links_arbo_left {
     pointer-events: auto;
 }

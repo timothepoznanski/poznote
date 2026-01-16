@@ -371,7 +371,8 @@
       "show_note_subheading": "Show Note Subheading",
       "show_folder_counts": "Show Folders Notes Counts",
       "notes_without_folders_after": "Display notes after folders",
-      "show_folder_actions": "Show Folder Actions"
+      "show_folder_actions": "Show Folder Actions",
+      "center_note_content": "Center Note Content"
     },
     "badges": {
       "font_size_default": "default ({{size}}px)",

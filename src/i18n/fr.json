@@ -371,7 +371,8 @@
       "show_note_subheading": "Afficher le sous-titre",
       "show_folder_counts": "Afficher le nombre de notes par dossier",
       "notes_without_folders_after": "Afficher les notes après les dossiers",
-      "show_folder_actions": "Afficher les actions de dossier"
+      "show_folder_actions": "Afficher les actions de dossier",
+      "center_note_content": "Centrer le contenu de la note"
     },
     "badges": {
       "font_size_default": "par défaut ({{size}}px)",

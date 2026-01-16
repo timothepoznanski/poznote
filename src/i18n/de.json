@@ -369,7 +369,8 @@
       "show_note_subheading": "Notiz-Untertitel anzeigen",
       "show_folder_counts": "Ordner-Notizzähler anzeigen",
       "notes_without_folders_after": "Notizen nach Ordnern anzeigen",
-      "show_folder_actions": "Ordner-Aktionen anzeigen"
+      "show_folder_actions": "Ordner-Aktionen anzeigen",
+      "center_note_content": "Notizinhalt zentrieren"
     },
     "badges": {
       "font_size_default": "Standard ({{size}}px)",

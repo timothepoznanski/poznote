@@ -332,6 +332,14 @@ $currentLang = getUserLanguage();
                         <h3><?php echo t_h('display.cards.notes_without_folders_after'); ?> <span id="notes-without-folders-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span></h3>
                     </div>
                 </div>
+
+                <!-- Center Note Content -->
+                <div class="settings-card" id="center-note-card">
+                    <div class="settings-card-icon"><i class="fa-align-center"></i></div>
+                    <div class="settings-card-content">
+                        <h3><?php echo t_h('display.cards.center_note_content'); ?> <span id="center-note-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span></h3>
+                    </div>
+                </div>
             </div>
         </div>
 

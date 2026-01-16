@@ -172,6 +172,10 @@ try {
     $v4 = $stmt->fetchColumn();
     if ($v4 === '0' || $v4 === 'false') $extra_body_classes .= ' hide-folder-counts';
 
+    $stmt->execute(['center_note_content']);
+    $v5 = $stmt->fetchColumn();
+    if ($v5 === '1' || $v5 === 'true') $extra_body_classes .= ' center-note-content';
+
 } catch (Exception $e) {
     // ignore errors and continue without extra classes
 }
