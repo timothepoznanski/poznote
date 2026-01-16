@@ -1145,9 +1145,9 @@
         "select_files": "Sélectionner les fichiers",
         "files_info": "Plusieurs fichiers (max {{maxIndividualFiles}}) ou archive ZIP unique (max {{maxZipFiles}} fichiers). Ces limites sont modifiables,",
         "files_info_link": "voir la documentation",
-        "supported_formats": "Formats supportés : .html, .md, .markdown, .txt, .zip",
-        "description_html": "Importez des fichiers HTML, Markdown ou texte individuels, ou une archive ZIP contenant plusieurs fichiers.<br><br>Le titre sera automatiquement créé à partir du nom de fichier (sans l'extension), sauf si une clé title est définie dans un front matter pour les fichiers MD.",
-        "helper": "Vous pouvez sélectionner plusieurs fichiers à la fois (maximum 50 fichiers). Formats pris en charge : .html, .md, .markdown, .txt"
+        "supported_formats": "Formats supportés : .html, .md, .markdown, .txt, .json, .zip",
+        "description_html": "Importez des fichiers HTML, Markdown, texte ou JSON individuels, ou une archive ZIP contenant plusieurs fichiers.<br><br>Le titre sera automatiquement créé à partir du nom de fichier (sans l'extension), sauf si une clé title est définie dans un front matter pour les fichiers MD.<br><br><strong>Tasklists :</strong> Les fichiers .json contenant des tableaux de tâches et les fichiers .md avec syntaxe checkbox (- [ ] ou - [x]) sont automatiquement importés comme listes de tâches.",
+        "helper": "Vous pouvez sélectionner plusieurs fichiers à la fois (maximum 50 fichiers). Formats pris en charge : .html, .md, .markdown, .txt, .json"
       }
     },
     "buttons": {

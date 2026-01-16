@@ -1683,14 +1683,18 @@ function showExportModal(noteId, filename, title, noteType) {
             if (htmlOption) htmlOption.style.display = 'flex';
             if (jsonOption) jsonOption.style.display = 'none';
             if (printOption) printOption.style.display = 'flex';
+        } else if (noteType === 'tasklist') {
+            // For tasklist notes: allow MD export (checkbox format), HTML export, JSON export and print
+            if (markdownOption) markdownOption.style.display = 'flex';
+            if (htmlOption) htmlOption.style.display = 'flex';
+            if (jsonOption) jsonOption.style.display = 'flex';
+            if (printOption) printOption.style.display = 'flex';
         } else {
-            // For other notes: show HTML, print and PDF options, hide MD option
+            // For other notes: show HTML and print options, hide MD and JSON options
             if (markdownOption) markdownOption.style.display = 'none';
             if (htmlOption) htmlOption.style.display = 'flex';
+            if (jsonOption) jsonOption.style.display = 'none';
             if (printOption) printOption.style.display = 'flex';
-
-            // Only tasklist notes support JSON export
-            if (jsonOption) jsonOption.style.display = (noteType === 'tasklist') ? 'flex' : 'none';
         }
         
         modal.style.display = 'flex';

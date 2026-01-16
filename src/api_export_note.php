@@ -133,6 +133,10 @@ try {
 
     // Check format and export accordingly
     if ($format === 'markdown') {
+        // For tasklist notes, convert JSON to markdown checkbox format
+        if ($noteType === 'tasklist') {
+            $content = convertTasklistToMarkdown($content);
+        }
         // Export as Markdown with front matter YAML
         exportAsMarkdown($content, $note, $con);
     } else {
@@ -177,6 +181,49 @@ try {
     header('Content-Type: application/json');
     http_response_code(500);
     echo json_encode(['success' => false, 'error' => 'Export failed: ' . $e->getMessage()]);
+}
+
+/**
+ * Convert tasklist JSON to Markdown checkbox format
+ *
+ * @param string $jsonContent JSON string containing tasklist data
+ * @return string Markdown formatted tasklist with checkboxes
+ */
+function convertTasklistToMarkdown($jsonContent) {
+    // Remove UTF-8 BOM if present
+    $jsonContent = preg_replace('/^\xEF\xBB\xBF/', '', $jsonContent);
+
+    // Parse JSON
+    $tasks = json_decode($jsonContent, true);
+
+    if (!is_array($tasks) || empty($tasks)) {
+        return '';
+    }
+
+    $markdown = '';
+
+    foreach ($tasks as $task) {
+        $text = isset($task['text']) ? trim($task['text']) : '';
+        $completed = !empty($task['completed']);
+        $important = !empty($task['important']);
+
+        // Skip empty tasks
+        if (empty($text)) {
+            continue;
+        }
+
+        // Build checkbox syntax: - [ ] or - [x]
+        $checkbox = $completed ? '[x]' : '[ ]';
+
+        // Add important marker if task is marked as important
+        if ($important) {
+            $markdown .= '- ' . $checkbox . ' **' . $text . '** ⭐' . "\n";
+        } else {
+            $markdown .= '- ' . $checkbox . ' ' . $text . "\n";
+        }
+    }
+
+    return $markdown;
 }
 
 /**

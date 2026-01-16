@@ -1701,9 +1701,9 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
         
         // Validate file type
-        if (!in_array($fileExtension, ['html', 'md', 'markdown', 'txt'])) {
+        if (!in_array($fileExtension, ['html', 'md', 'markdown', 'txt', 'json'])) {
             $errorCount++;
-            $errors[] = $fileName . ': ' . t('restore_import.individual_notes.errors.invalid_file_type', ['allowed' => '.html, .md, .markdown, .txt']);
+            $errors[] = $fileName . ': ' . t('restore_import.individual_notes.errors.invalid_file_type', ['allowed' => '.html, .md, .markdown, .txt, .json']);
             continue;
         }
         
@@ -2133,7 +2133,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                         </span><br>
                         <?php echo t_h('restore_import.sections.individual_notes.supported_formats', 'Supported: .html, .md, .markdown, .txt, .zip'); ?>
                     </small>
-                    <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown,.txt,.zip" multiple required class="form-file-input">
+                    <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown,.txt,.json,.zip" multiple required class="form-file-input">
                 </div>
                 
                 <button type="button" class="btn btn-primary btn-with-margin-top" data-action="show-individual-notes-import-confirmation" id="individualNotesImportBtn">
