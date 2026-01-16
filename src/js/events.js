@@ -1311,6 +1311,7 @@ function setupNoteDragDropEvents() {
         header.removeEventListener('drop', handleFolderDrop);
         header.removeEventListener('dragleave', handleFolderDragLeave);
         // Also remove enhanced handlers
+        header.removeEventListener('dragenter', handleFolderDragEnterEnhanced);
         header.removeEventListener('dragover', handleFolderDragOverEnhanced);
         header.removeEventListener('drop', handleFolderDropEnhanced);
         header.removeEventListener('dragleave', handleFolderDragLeaveEnhanced);
@@ -1468,6 +1469,7 @@ function setupNoteDragDropEvents() {
     // Add drop events to folder headers (using enhanced handlers for folder+note support)
     var folderHeaders = document.querySelectorAll('.folder-header');
     folderHeaders.forEach(function(header) {
+        header.addEventListener('dragenter', handleFolderDragEnterEnhanced);
         header.addEventListener('dragover', handleFolderDragOverEnhanced);
         header.addEventListener('drop', handleFolderDropEnhanced);
         header.addEventListener('dragleave', handleFolderDragLeaveEnhanced);
@@ -1730,6 +1732,9 @@ function handleNoteDragEnd(e) {
     // Remove drag-over class from all folders
     document.querySelectorAll('.folder-header.drag-over').forEach(function(header) {
         header.classList.remove('drag-over');
+        if (header.dataset && header.dataset.dragEnterCount) {
+            delete header.dataset.dragEnterCount;
+        }
     });
     
     // Clean up global drag data and hide drop zone after a longer delay
@@ -2096,6 +2101,9 @@ function handleFolderDragEnd(e) {
     // Clean up all folder drag-over states
     document.querySelectorAll('.folder-header.folder-drop-target').forEach(function(header) {
         header.classList.remove('folder-drop-target');
+        if (header.dataset && header.dataset.dragEnterCount) {
+            delete header.dataset.dragEnterCount;
+        }
     });
     
     // Clean up global drag data
@@ -2104,6 +2112,40 @@ function handleFolderDragEnd(e) {
             window.currentDragData = null;
         }
     }, 100);
+}
+
+/**
+ * Enhanced folder drag enter handler to avoid flicker on nested elements
+ */
+function handleFolderDragEnterEnhanced(e) {
+    var folderHeader = e.target.closest('.folder-header');
+    if (!folderHeader) return;
+
+    var count = parseInt(folderHeader.dataset.dragEnterCount || '0', 10) + 1;
+    folderHeader.dataset.dragEnterCount = String(count);
+
+    var targetFolder = folderHeader.getAttribute('data-folder');
+    var targetFolderId = folderHeader.getAttribute('data-folder-id');
+
+    var dragData = window.currentDragData;
+
+    if (dragData && dragData.type === 'folder') {
+        if (dragData.folderId === targetFolderId) {
+            return;
+        }
+        if (folderHeader.classList.contains('system-folder')) {
+            return;
+        }
+        folderHeader.classList.add('folder-drop-target');
+        folderHeader.classList.add('drag-over');
+        return;
+    }
+
+    if (targetFolder === 'Tags') {
+        return;
+    }
+
+    folderHeader.classList.add('drag-over');
 }
 
 /**
@@ -2159,6 +2201,20 @@ function handleFolderDragOverEnhanced(e) {
 function handleFolderDragLeaveEnhanced(e) {
     var folderHeader = e.target.closest('.folder-header');
     if (folderHeader) {
+        if (e.relatedTarget && folderHeader.contains(e.relatedTarget)) {
+            return;
+        }
+
+        var count = parseInt(folderHeader.dataset.dragEnterCount || '0', 10) - 1;
+        if (count > 0) {
+            folderHeader.dataset.dragEnterCount = String(count);
+            return;
+        }
+
+        if (folderHeader.dataset && folderHeader.dataset.dragEnterCount) {
+            delete folderHeader.dataset.dragEnterCount;
+        }
+
         folderHeader.classList.remove('drag-over');
         folderHeader.classList.remove('folder-drop-target');
     }
@@ -2175,6 +2231,9 @@ function handleFolderDropEnhanced(e) {
     
     folderHeader.classList.remove('drag-over');
     folderHeader.classList.remove('folder-drop-target');
+    if (folderHeader.dataset && folderHeader.dataset.dragEnterCount) {
+        delete folderHeader.dataset.dragEnterCount;
+    }
     
     try {
         var data = JSON.parse(e.dataTransfer.getData('text/plain'));
