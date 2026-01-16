@@ -22,7 +22,8 @@
             noteStates.set(noteId, {
                 matches: [],
                 currentIndex: -1,
-                replaceVisible: false
+                replaceVisible: false,
+                suppressClearOnInput: false
             });
         }
         return noteStates.get(noteId);
@@ -375,8 +376,10 @@
                 selection.addRange(range);
 
                 // Use execCommand to make the replacement undoable
+                state.suppressClearOnInput = true;
                 noteEntry.focus();
                 document.execCommand('insertText', false, replaceText);
+                state.suppressClearOnInput = false;
             }
 
             // Remove from matches array
@@ -393,7 +396,11 @@
                 if (countEl) {
                     countEl.textContent = `${state.matches.length} ${state.matches.length > 1 ? tr('search_replace.results', {}, 'results') : tr('search_replace.result', {}, 'result')}`;
                 }
-                scrollToMatch(noteId, state.currentIndex);
+                // Rebuild highlights and move to the next match
+                findMatches(noteId, { preserveIndex: true, skipScroll: true });
+                if (state.matches.length > 0 && state.currentIndex >= 0) {
+                    scrollToMatch(noteId, state.currentIndex);
+                }
             } else {
                 // No more matches - clear any remaining highlights
                 clearHighlights(noteId);
@@ -567,6 +574,9 @@
         if (noteEntry) {
             const clearHighlightsOnEdit = function() {
                 const state = getNoteState(noteId);
+                if (state.suppressClearOnInput) {
+                    return;
+                }
                 // Only clear if there are active matches
                 if (state.matches.length > 0) {
                     clearHighlights(noteId);
