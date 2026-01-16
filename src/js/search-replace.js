@@ -342,35 +342,22 @@
             const textNode = document.createTextNode(matchText);
             const parent = currentMatch.parentNode;
             parent.replaceChild(textNode, currentMatch);
-            parent.normalize();
-            
-            // Now select the text node and replace with new text
-            const range = document.createRange();
-            range.selectNodeContents(parent);
-            // Find the text we just inserted
-            const walker = document.createTreeWalker(parent, NodeFilter.SHOW_TEXT);
-            let targetNode = null;
-            while (walker.nextNode()) {
-                if (walker.currentNode.textContent.includes(matchText)) {
-                    targetNode = walker.currentNode;
-                    const startIndex = walker.currentNode.textContent.indexOf(matchText);
-                    range.setStart(walker.currentNode, startIndex);
-                    range.setEnd(walker.currentNode, startIndex + matchText.length);
-                    break;
-                }
-            }
-            
-            if (targetNode) {
-                const selection = window.getSelection();
-                selection.removeAllRanges();
-                selection.addRange(range);
 
-                // Use execCommand to make the replacement undoable
-                state.suppressClearOnInput = true;
-                noteEntry.focus();
-                document.execCommand('insertText', false, replaceText);
-                state.suppressClearOnInput = false;
-            }
+            // Select the exact text node we just inserted
+            const range = document.createRange();
+            range.setStart(textNode, 0);
+            range.setEnd(textNode, textNode.length);
+
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            // Use execCommand to make the replacement undoable
+            state.suppressClearOnInput = true;
+            noteEntry.focus();
+            document.execCommand('insertText', false, replaceText);
+            state.suppressClearOnInput = false;
+            parent.normalize();
 
             // Remove from matches array
             state.matches.splice(state.currentIndex, 1);
@@ -439,25 +426,18 @@
                 const textNode = document.createTextNode(matchText);
                 const parent = match.parentNode;
                 parent.replaceChild(textNode, match);
-                parent.normalize();
-                
-                // Find and select the text we just inserted
+
+                // Select the exact text node we just inserted
                 const range = document.createRange();
-                const walker = document.createTreeWalker(parent, NodeFilter.SHOW_TEXT);
-                while (walker.nextNode()) {
-                    if (walker.currentNode.textContent.includes(matchText)) {
-                        const startIndex = walker.currentNode.textContent.indexOf(matchText);
-                        range.setStart(walker.currentNode, startIndex);
-                        range.setEnd(walker.currentNode, startIndex + matchText.length);
-                        
-                        const selection = window.getSelection();
-                        selection.removeAllRanges();
-                        selection.addRange(range);
-                        
-                        document.execCommand('insertText', false, replaceText);
-                        break;
-                    }
-                }
+                range.setStart(textNode, 0);
+                range.setEnd(textNode, textNode.length);
+
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+
+                document.execCommand('insertText', false, replaceText);
+                parent.normalize();
             }
         }
 
