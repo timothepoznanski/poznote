@@ -690,6 +690,33 @@ body.dark-mode .modal-buttons button:first-child:hover {
     background-color: #2a4a7f;
 }
 
+/* Move Task modal list (dark mode) */
+html[data-theme='dark'] .move-task-list,
+body.dark-mode .move-task-list {
+    border-color: #404040;
+    background-color: #1f1f1f;
+}
+
+html[data-theme='dark'] .move-task-item,
+body.dark-mode .move-task-item {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .move-task-item:hover,
+body.dark-mode .move-task-item:hover {
+    background: #2a2a2a;
+}
+
+html[data-theme='dark'] .move-task-item.selected,
+body.dark-mode .move-task-item.selected {
+    background: #1e3a5f;
+}
+
+html[data-theme='dark'] .move-task-item small,
+body.dark-mode .move-task-item small {
+    color: #a8a8a8;
+}
+
 /* Move Folder Files Modal (dark theme refinements) */
 html[data-theme='dark'] #moveFolderFilesModal .modal-content h3,
 body.dark-mode #moveFolderFilesModal .modal-content h3 {
