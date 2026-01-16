@@ -13,6 +13,7 @@ Minimal MCP (Model Context Protocol) server for Poznote - enables AI-powered not
 - [How It Works](#how-it-works)
 - [Features](#features)
 - [Installation](#installation)
+- [Update MCP Server](#update-mcp-server)
 - [VS Code Configuration](#vs-code-configuration)
 - [Environment Variables](#environment-variables)
 - [Troubleshooting](#troubleshooting)
@@ -241,6 +242,52 @@ poznote-mcp serve --transport=http --port=YOUR_POZNOTE_MCP_PORT
 ```
 
 When configured in VS Code with stdio transport (SSH or local), the MCP server is automatically started on-demand. For HTTP transport, you must run the server as a persistent service.
+
+---
+
+## Update MCP Server
+
+When you update the code (new release / git pull), you must also update the Python package inside the venv used to run the server.
+
+### Linux / Remote Server
+
+If you installed from this repo with a venv (recommended):
+
+```bash
+cd /home/user/poznote-mcp-server
+git pull
+
+cd mcp-server
+source venv/bin/activate
+pip install -e .
+```
+
+If you run the MCP server with systemd, restart it:
+
+```bash
+sudo systemctl restart poznote-mcp
+sudo systemctl status poznote-mcp
+```
+
+For a user service:
+
+```bash
+systemctl --user restart poznote-mcp
+systemctl --user status poznote-mcp
+```
+
+### Windows (Local)
+
+```powershell
+cd C:\Users\YOUR-USERNAME\poznote-mcp-server
+git pull
+
+cd mcp-server
+. .\.venv\Scripts\Activate.ps1
+python -m pip install -e .
+```
+
+If you use stdio mode from VS Code, just restart/reload MCP servers in VS Code after updating.
 
 ## VS Code Configuration
 
