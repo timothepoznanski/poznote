@@ -70,13 +70,11 @@
         const searchInput = document.getElementById('searchInput' + noteId);
         const replaceInput = document.getElementById('replaceInput' + noteId);
         const replaceRow = document.getElementById('searchReplaceRow' + noteId);
-        const toggleBtn = document.getElementById('searchToggleReplaceBtn' + noteId);
         const countEl = document.getElementById('searchCount' + noteId);
 
         if (searchInput) searchInput.value = '';
         if (replaceInput) replaceInput.value = '';
-        if (replaceRow) replaceRow.style.display = 'none';
-        if (toggleBtn) toggleBtn.classList.remove('active');
+        if (replaceRow) replaceRow.style.display = 'flex';
         if (countEl) countEl.textContent = '';
 
         // Show bar with animation
@@ -130,17 +128,9 @@
         state.replaceVisible = !state.replaceVisible;
 
         const replaceRow = document.getElementById('searchReplaceRow' + noteId);
-        const toggleBtn = document.getElementById('searchToggleReplaceBtn' + noteId);
 
         if (replaceRow) {
-            replaceRow.style.display = state.replaceVisible ? 'flex' : 'none';
-        }
-        if (toggleBtn) {
-            if (state.replaceVisible) {
-                toggleBtn.classList.add('active');
-            } else {
-                toggleBtn.classList.remove('active');
-            }
+            replaceRow.style.display = 'flex';
         }
 
         // Focus replace input when shown
@@ -524,11 +514,6 @@
         }
 
         // Toggle replace button
-        const toggleBtn = document.getElementById('searchToggleReplaceBtn' + noteId);
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', () => toggleReplaceRow(noteId));
-        }
-
         // Replace button
         const replaceBtn = document.getElementById('replaceBtn' + noteId);
         if (replaceBtn) {
