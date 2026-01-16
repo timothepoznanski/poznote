@@ -173,13 +173,14 @@ Run it to test it:
 python -c "import poznote_mcp; print('poznote_mcp OK')"
 ```
 
+Test stdio mode (press CTRL+C to stop): 
+
 ```
-# Test stdio mode (press CTRL+C to stop)
 poznote-mcp serve --transport=stdio
 ```
 
+Test HTTP mode (press CTRL+C to stop)
 ```
-# Test HTTP mode (press CTRL+C to stop)
 poznote-mcp serve --transport=http --port=8041
 ```
 
