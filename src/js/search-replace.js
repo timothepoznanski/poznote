@@ -438,6 +438,7 @@
 
         // Focus the note to enable execCommand
         noteEntry.focus();
+        state.suppressClearOnInput = true;
 
         // Replace all matches in reverse order to maintain correct positions
         for (let i = state.matches.length - 1; i >= 0; i--) {
@@ -469,6 +470,8 @@
                 }
             }
         }
+
+        state.suppressClearOnInput = false;
         
         // Clear matches
         state.matches = [];
