@@ -34,7 +34,8 @@
     "yes": "Oui",
     "no": "Non",
     "not_available": "Non disponible",
-    "not_specified": "Non spécifié"
+    "not_specified": "Non spécifié",
+    "apply": "Appliquer"
   },
   "folders": {
     "delete": {
@@ -393,7 +394,8 @@
     "display": "Affichage",
     "home": "Accueil",
     "settings": "Paramètres",
-    "create": "Créer"
+    "create": "Créer",
+    "toggle": "Cacher/Afficher la colonne de gauche"
   },
   "home": {
     "title": "Accueil",

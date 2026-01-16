@@ -32,7 +32,8 @@
     "yes": "Sim",
     "no": "Não",
     "not_available": "Não disponível",
-    "not_specified": "Não especificado"
+    "not_specified": "Não especificado",
+    "apply": "Aplicar"
   },
   "folders": {
     "delete": {
@@ -390,7 +391,8 @@
     "display": "Exibição",
     "home": "Início",
     "settings": "Configurações",
-    "create": "Criar"
+    "create": "Criar",
+    "toggle": "Mostrar/Ocultar a coluna esquerda"
   },
   "home": {
     "title": "Início",

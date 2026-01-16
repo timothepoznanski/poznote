@@ -34,7 +34,8 @@
     "yes": "Yes",
     "no": "No",
     "not_available": "Not available",
-    "not_specified": "Not specified"
+    "not_specified": "Not specified",
+    "apply": "Apply"
   },
   "folders": {
     "delete": {
@@ -393,7 +394,8 @@
     "display": "Display",
     "home": "Home",
     "settings": "Settings",
-    "create": "Create"
+    "create": "Create",
+    "toggle": "Show/Hide left sidebar"
   },
   "home": {
     "title": "Home",

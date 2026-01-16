@@ -103,9 +103,10 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         $should_be_open = shouldFolderBeOpen($con, $folderId, $folderName, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes);
         
         // Set appropriate folder icon (open/closed) and display style
-        // Check if folder has a custom icon
+        // Check if folder has a custom icon and color
         $customIcon = isset($folderData['icon']) && !empty($folderData['icon']) ? $folderData['icon'] : null;
-        
+        $customIconColor = isset($folderData['icon_color']) && !empty($folderData['icon_color']) ? $folderData['icon_color'] : null;
+
         if ($customIcon) {
             // Use custom icon - don't toggle between open/closed
             $chevron_icon = $customIcon;
@@ -135,7 +136,9 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             echo "<i class='fa-star-light folder-icon'></i>";
         } else {
             // Add click action to change icon (except for Favorites)
-            echo "<i class='$chevron_icon folder-icon' data-custom-icon='" . ($customIcon ? 'true' : 'false') . "' data-action='open-folder-icon-picker' data-folder-id='$folderId' data-folder-name='" . htmlspecialchars($folderName, ENT_QUOTES) . "' title='" . t_h('notes_list.folder_actions.change_icon', [], 'Change icon') . "'></i>";
+            $iconStyle = $customIconColor ? " style='color: " . htmlspecialchars($customIconColor, ENT_QUOTES) . ";'" : "";
+            $iconColorAttr = $customIconColor ? " data-icon-color='" . htmlspecialchars($customIconColor, ENT_QUOTES) . "'" : "";
+            echo "<i class='$chevron_icon folder-icon' data-custom-icon='" . ($customIcon ? 'true' : 'false') . "'$iconColorAttr data-action='open-folder-icon-picker' data-folder-id='$folderId' data-folder-name='" . htmlspecialchars($folderName, ENT_QUOTES) . "' title='" . t_h('notes_list.folder_actions.change_icon', [], 'Change icon') . "'$iconStyle></i>";
         }
         
         // Workspace-aware folder handling in UI

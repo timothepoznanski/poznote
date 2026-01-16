@@ -916,6 +916,8 @@ body.sidebar-collapsed .resize-handle {
 body.sidebar-collapsed .toggle-sidebar-btn {
     left: 3px;
     border-radius: 0 4px 4px 0;
+    opacity: 0;
+    pointer-events: none;
 }
 
 body.sidebar-collapsed .toggle-sidebar-btn i {
@@ -2897,6 +2899,11 @@ body.dark-mode .folder-header.folder-drop-target {
     align-content: center;
 }
 
+/* Custom color icons should override default color */
+.folder-icon[data-icon-color] {
+    /* Inline style will be applied here with higher specificity */
+}
+
 /* Container pour les dossiers système - maintenant masqué (remplacé par page Home) */
 .system-folders-container {
     display: none !important;
@@ -4518,12 +4525,13 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 /* Apply default gray filter (rgb(55, 53, 47)) to all icons not on hover */
-[class*="fa-"] {
+/* Exclude folder icons with custom colors from the filter */
+[class*="fa-"]:not(.folder-icon[data-icon-color]) {
   filter: brightness(0) saturate(100%) invert(21%) sepia(8%) saturate(1075%) hue-rotate(17deg) brightness(94%) contrast(89%);
   transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-[class*="fa-"]:hover {
+[class*="fa-"]:not(.folder-icon[data-icon-color]):hover {
   transform: scale(1.18);
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }

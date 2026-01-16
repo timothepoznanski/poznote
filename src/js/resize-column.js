@@ -113,6 +113,12 @@ function initToggleSidebar() {
 function toggleSidebar() {
     const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
     localStorage.setItem('sidebarCollapsed', isCollapsed);
+
+    // Remove focus from the toggle button after click to hide it
+    const toggleBtn = document.getElementById('toggleSidebarBtn');
+    if (toggleBtn) {
+        toggleBtn.blur();
+    }
 }
 
 // Expose functions globally for debugging

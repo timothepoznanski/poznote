@@ -332,7 +332,7 @@ $body_classes = trim($extra_body_classes);
     </div>
 
     <div class="resize-handle" id="resizeHandle">
-        <button class="toggle-sidebar-btn" id="toggleSidebarBtn" title="Cacher/Afficher la colonne de gauche" aria-label="Toggle sidebar">
+        <button class="toggle-sidebar-btn" id="toggleSidebarBtn" title="<?php echo t_h('sidebar.toggle'); ?>" aria-label="<?php echo t_h('sidebar.toggle'); ?>">
             <i class="fa-chevron-left"></i>
         </button>
     </div>
