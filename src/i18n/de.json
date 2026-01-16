@@ -3,6 +3,7 @@
     "name": "Poznote"
   },
   "common": {
+    "notes": "Notizen",
     "back_to_notes": "Zurück zu den Notizen",
     "back_to_settings": "Zurück zu den Einstellungen",
     "close": "Schließen",

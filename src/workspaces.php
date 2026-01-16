@@ -510,9 +510,6 @@ try {
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
             <?php echo t_h('common.back_to_notes', [], 'Back to Notes', $currentLang); ?>
         </a>
-        <a href="settings.php" class="btn btn-secondary">
-            <?php echo t_h('common.back_to_settings', [], 'Back to Settings', $currentLang); ?>
-        </a>
 
         <br><br>
 

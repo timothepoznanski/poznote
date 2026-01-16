@@ -187,18 +187,6 @@ function displayWorkspaceMenu(menu, workspaces) {
         menuHtml += '</div>';
     }
     
-    // Add management link
-    menuHtml += '<div class="workspace-menu-divider"></div>';
-    menuHtml += '<div class="workspace-menu-item" data-action="manage-workspaces">';
-    menuHtml += '<i class="fa-cog"></i>';
-    menuHtml += '<span>' + tr('settings.cards.workspaces', {}, 'Workspaces') + '</span>';
-    menuHtml += '</div>';
-    // Add Logout right after Settings
-    menuHtml += '<div class="workspace-menu-item" data-action="logout">';
-    menuHtml += '<i class="fa-sign-out-alt"></i>';
-    menuHtml += '<span>' + tr('workspaces.menu.logout', {}, 'Logout') + '</span>';
-    menuHtml += '</div>';
-    
     menu.innerHTML = menuHtml;
     
     // Add event listeners using delegation
@@ -207,20 +195,6 @@ function displayWorkspaceMenu(menu, workspaces) {
             switchToWorkspace(this.getAttribute('data-workspace-name'));
         });
     });
-    
-    var manageItem = menu.querySelector('[data-action="manage-workspaces"]');
-    if (manageItem) {
-        manageItem.addEventListener('click', function() {
-            window.location.href = 'workspaces.php';
-        });
-    }
-    
-    var logoutItem = menu.querySelector('[data-action="logout"]');
-    if (logoutItem) {
-        logoutItem.addEventListener('click', function() {
-            window.location.href = 'logout.php';
-        });
-    }
 }
 
 function switchToWorkspace(workspaceName) {

@@ -331,7 +331,6 @@
         
         // Navigation cards (left column)
         var navCards = {
-            'workspaces-card': 'workspaces.php',
             'backup-export-card': 'backup_export.php',
             'restore-import-card': 'restore_import.php'
         };

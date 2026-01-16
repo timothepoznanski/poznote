@@ -148,16 +148,6 @@ $currentLang = getUserLanguage();
                     </div>
                 </div>
 
-                <!-- Workspaces -->
-                <div class="settings-card" id="workspaces-card">
-                    <div class="settings-card-icon">
-                        <i class="fa-layer-group"></i>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.workspaces'); ?></h3>
-                    </div>
-                </div>
-
                 <!-- Backup / Export -->
                 <div class="settings-card" id="backup-export-card">
                     <div class="settings-card-icon">

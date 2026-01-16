@@ -176,20 +176,22 @@ try {
 </head>
 <body class="home-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <div class="home-container">
-        <div class="home-buttons-container home-buttons-top">
-            <button id="backToNotesBtn" class="btn btn-primary" title="<?php echo t_h('common.back_to_notes'); ?>">
-                <i class="fa-arrow-left"></i>
-                <?php echo t_h('common.back_to_notes'); ?>
-            </button>
-        </div>
-        
         <h2 class="home-header">
-            <img src="favicon.ico" class="home-logo" alt="Poznote">
             <span class="home-workspace-name"><?php echo htmlspecialchars($pageWorkspace ?: 'Poznote', ENT_QUOTES); ?></span>
-            <span class="home-notes-count"><?php echo $total_notes_count; ?> <?php echo $total_notes_count > 1 ? t_h('home.notes', [], 'notes') : t_h('home.note', [], 'note'); ?></span>
         </h2>
         
         <div class="home-grid">
+            <!-- Notes -->
+            <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('common.notes', [], 'Notes'); ?>">
+                <div class="home-card-icon">
+                    <i class="fa-sticky-note"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('common.notes', [], 'Notes'); ?></span>
+                    <span class="home-card-count"><?php echo $total_notes_count; ?></span>
+                </div>
+            </a>
+
             <!-- Tags -->
             <a href="list_tags.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?>">
                 <div class="home-card-icon">
@@ -266,22 +268,21 @@ try {
                     <span class="home-card-count"><?php echo $workspaces_count; ?></span>
                 </div>
             </a>
+
+            <!-- Logout -->
+            <a href="logout.php" class="home-card home-card-logout" title="<?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?>">
+                <div class="home-card-icon">
+                    <i class="fa-sign-out-alt"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?></span>
+                </div>
+            </a>
         </div>
     </div>
     
     <script src="js/globals.js"></script>
     <script src="js/workspaces.js"></script>
     <script src="js/navigation.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var backBtn = document.getElementById('backToNotesBtn');
-            if (backBtn) {
-                backBtn.addEventListener('click', function() {
-                    var workspace = document.body.getAttribute('data-workspace') || '';
-                    window.location.href = 'index.php?workspace=' + encodeURIComponent(workspace);
-                });
-            }
-        });
-    </script>
 </body>
 </html>

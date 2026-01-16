@@ -25,8 +25,10 @@
     font-size: 1.8rem;
     font-weight: 600;
     margin-bottom: 40px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #e5e7eb;
+    /* padding-bottom: 15px; */
+    /* border-bottom: 2px solid #e5e7eb; */
+    justify-content: center;
+    text-align: center;
 }
 
 .home-workspace-name {
@@ -42,12 +44,6 @@
     padding: 4px 10px;
     border-radius: 12px;
     margin-left: auto;
-}
-
-.home-logo {
-    width: 40px;
-    height: 40px;
-    object-fit: contain;
 }
 
 /* Grid layout for cards */
@@ -96,6 +92,20 @@
     font-style: normal;
 }
 
+/* Special cards (Logout) */
+.home-card-logout .home-card-icon {
+    background: rgba(239, 68, 68, 0.12);
+}
+
+.home-card-logout .home-card-icon i {
+    color: #ef4444;
+}
+
+html[data-theme='dark'] .home-card-logout .home-card-icon,
+body.dark-mode .home-card-logout .home-card-icon {
+    background: rgba(239, 68, 68, 0.22);
+}
+
 /* Special icon colors — unified to Poznote blue */
 .home-card-icon-favorites,
 .home-card-icon-trash,
@@ -128,52 +138,20 @@
 }
 
 /* Buttons container */
-.home-buttons-container {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-}
 
-.home-buttons-top {
-    margin-bottom: 20px;
-}
-
-.home-buttons-container .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s;
-}
-
-.home-buttons-container .btn-primary {
-    background: #007DB8;
-    color: white;
-}
-
-.home-buttons-container .btn-primary:hover {
-    background: #005a8a;
-}
-
-.home-buttons-container .btn-primary i {
-    font-size: 14px;
-}
 
 /* Font Awesome icon definitions */
 .fa-tags::before { content: "\f02c"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
 .fa-star::before { content: "\f005"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
 .fa-cloud::before { content: "\f0c2"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
 .fa-trash::before { content: "\f1f8"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
+.fa-sign-out-alt::before { content: "\f2f5"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
 .fa-paperclip::before { content: "\f0c6"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
 .fa-arrow-left::before { content: "\f060"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
 .fa-share-alt::before { content: "\f1e0"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
 .fa-folder-open::before { content: "\f07c"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
 .fa-layer-group::before { content: "\f5fd"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
+.fa-sticky-note::before { content: "\f249"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
 
 /* Dark mode */
 html[data-theme='dark'] .home-page,
