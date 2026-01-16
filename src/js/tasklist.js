@@ -29,10 +29,39 @@ function initializeTaskList(noteId, noteType) {
         }
     }
 
-    // Ensure all tasks have noteId set
-    tasks.forEach(task => {
-        if (!task.noteId) task.noteId = noteId;
+    // Normalize task data (ensure numeric IDs and correct noteId)
+    const normalizeTaskId = (value) => {
+        if (typeof value === 'number' && isFinite(value)) return value;
+        if (typeof value === 'string') {
+            const num = parseFloat(value);
+            if (!isNaN(num) && isFinite(num)) return num;
+        }
+        return Date.now() + Math.random();
+    };
+
+    tasks = tasks.map(task => {
+        if (!task || typeof task !== 'object') {
+            return {
+                id: Date.now() + Math.random(),
+                text: '',
+                completed: false,
+                noteId: noteId,
+                important: false
+            };
+        }
+
+        return {
+            ...task,
+            id: normalizeTaskId(task.id),
+            noteId: noteId,
+            completed: !!task.completed,
+            important: !!task.important,
+            text: typeof task.text === 'string' ? task.text : String(task.text ?? '')
+        };
     });
+
+    // Persist normalized data for subsequent actions
+    noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
 
     // Replace the contenteditable div with task list interface
     renderTaskList(noteId, tasks);
@@ -538,6 +567,71 @@ function toggleImportant(taskId, noteId) {
     markTaskListAsModified(noteId);
 }
 
+// Clear all completed tasks
+function clearCompletedTasks(noteId) {
+    const noteEntry = document.getElementById('entry' + noteId);
+    if (!noteEntry) return;
+
+    let tasks = [];
+    try {
+        tasks = JSON.parse(noteEntry.dataset.tasklistJson || '[]');
+    } catch (e) {
+        return;
+    }
+
+    // Count completed tasks before filtering
+    const completedCount = tasks.filter(task => task.completed).length;
+    
+    if (completedCount === 0) {
+        // No completed tasks to clear
+        if (window.modalAlert && window.modalAlert.info) {
+            window.modalAlert.info(
+                window.t ? window.t('tasklist.no_completed_tasks', null, 'No completed tasks to clear.') : 'No completed tasks to clear.'
+            );
+        }
+        return;
+    }
+
+    // Ask for confirmation
+    if (window.modalAlert && window.modalAlert.confirm) {
+        const message = window.t 
+            ? window.t('tasklist.confirm_clear_completed', {count: completedCount}, 'Delete {{count}} completed task(s)?')
+            : `Delete ${completedCount} completed task(s)?`;
+        
+        window.modalAlert.confirm(message).then(confirmed => {
+            if (!confirmed) return;
+            
+            // Filter out completed tasks
+            tasks = tasks.filter(task => !task.completed);
+            noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
+
+            // Re-render the task list
+            const tasksList = document.getElementById(`tasks-list-${noteId}`);
+            if (tasksList) {
+                tasksList.innerHTML = renderTasks(tasks, noteId);
+                enableDragAndDrop(noteId);
+            }
+
+            markTaskListAsModified(noteId);
+        });
+    } else {
+        // Fallback to native confirm if modalAlert not available
+        const message = `Delete ${completedCount} completed task(s)?`;
+        if (confirm(message)) {
+            tasks = tasks.filter(task => !task.completed);
+            noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
+
+            const tasksList = document.getElementById(`tasks-list-${noteId}`);
+            if (tasksList) {
+                tasksList.innerHTML = renderTasks(tasks, noteId);
+                enableDragAndDrop(noteId);
+            }
+
+            markTaskListAsModified(noteId);
+        }
+    }
+}
+
 // Mark note as modified (to trigger save)
 function markTaskListAsModified(noteId) {
     const noteEntry = document.getElementById('entry' + noteId);
@@ -613,6 +707,7 @@ window.deleteTask = deleteTask;
 window.getTaskListData = getTaskListData;
 window.toggleImportant = toggleImportant;
 window.toggleTaskInsertOrder = toggleTaskInsertOrder;
+window.clearCompletedTasks = clearCompletedTasks;
 
 // Toggle the task insert order preference (top vs bottom)
 function toggleTaskInsertOrder() {

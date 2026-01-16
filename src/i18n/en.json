@@ -427,7 +427,10 @@
     "input_placeholder": "Write a new task and press enter to add it to the list...",
     "drag_to_reorder": "Drag to reorder",
     "add_to_top": "Add new tasks at the top",
-    "add_to_bottom": "Add new tasks at the bottom"
+    "add_to_bottom": "Add new tasks at the bottom",
+    "clear_completed": "Clear completed tasks",
+    "no_completed_tasks": "No completed tasks to clear.",
+    "confirm_clear_completed": "Delete {{count}} completed task(s)?"
   },
   "tags": {
     "add_single": "Add tag...",

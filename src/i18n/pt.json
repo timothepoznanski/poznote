@@ -424,7 +424,10 @@
     "input_placeholder": "Escreva uma nova tarefa e pressione enter para adicioná-la à lista...",
     "drag_to_reorder": "Arraste para reordenar",
     "add_to_top": "Adicionar novas tarefas no topo",
-    "add_to_bottom": "Adicionar novas tarefas no final"
+    "add_to_bottom": "Adicionar novas tarefas no final",
+    "clear_completed": "Limpar tarefas concluídas",
+    "no_completed_tasks": "Nenhuma tarefa concluída para limpar.",
+    "confirm_clear_completed": "Excluir {{count}} tarefa(s) concluída(s)?"
   },
   "tags": {
     "add_single": "Adicionar etiqueta...",

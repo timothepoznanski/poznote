@@ -451,6 +451,9 @@ $body_classes = trim($extra_body_classes);
                         $order_title = $task_order === 'top' ? t_h('tasklist.add_to_top') : t_h('tasklist.add_to_bottom');
                         $active_class = $task_order === 'top' ? ' active' : '';
                         echo '<button type="button" class="toolbar-btn btn-task-order note-action-btn' . $active_class . '" title="' . $order_title . '" data-action="toggle-task-insert-order"><i class="' . $order_icon . '"></i></button>';
+                        
+                        // Clear completed tasks button
+                        echo '<button type="button" class="toolbar-btn btn-clear-completed note-action-btn" title="' . t_h('tasklist.clear_completed', [], 'Clear completed tasks') . '" data-action="clear-completed-tasks" data-note-id="' . $row['id'] . '"><i class="fa-broom"></i></button>';
                     }
                 
                     // Excalidraw diagram button - insert at cursor position (hidden for markdown and tasklist notes)

@@ -425,7 +425,10 @@
     "input_placeholder": "Escribe una nueva tarea y presiona enter para agregarla a la lista...",
     "drag_to_reorder": "Arrastrar para reordenar",
     "add_to_top": "Agregar nuevas tareas arriba",
-    "add_to_bottom": "Agregar nuevas tareas abajo"
+    "add_to_bottom": "Agregar nuevas tareas abajo",
+    "clear_completed": "Borrar tareas completadas",
+    "no_completed_tasks": "No hay tareas completadas para borrar.",
+    "confirm_clear_completed": "¿Eliminar {{count}} tarea(s) completada(s)?"
   },
   "tags": {
     "add_single": "Agregar etiqueta...",

@@ -3627,6 +3627,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-trash-restore-alt::before { content: "\f2ea"; }
 .fa-grip-vertical::before { content: "\f58e"; }
 .fa-grip-lines-vertical::before { content: "\f7a5"; }
+.fa-broom::before { content: "\f51a"; }
 .fa-times-circle::before { content: "\f057"; }
 .fa-times::before { content: "\f00d"; }
 .fa-chevron-right::before { content: "\f054"; }
@@ -3909,6 +3910,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-arrows-h,
 .fa-sort,
 .fa-file-import,
+.fa-broom,
 .fa-moon,
 .fa-briefcase,
 .fa-heart,

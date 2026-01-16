@@ -166,6 +166,11 @@
                     openSearchReplaceModal(noteId);
                 }
                 break;
+            case 'clear-completed-tasks':
+                if (noteId && typeof clearCompletedTasks === 'function') {
+                    clearCompletedTasks(noteId);
+                }
+                break;
 
             // Note actions with noteId
             case 'toggle-favorite':

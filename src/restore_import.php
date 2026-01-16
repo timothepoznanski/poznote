@@ -1310,6 +1310,9 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         // Determine note type based on file extension
         $noteType = ($fileExtension === 'md' || $fileExtension === 'markdown') ? 'markdown' : 'note';
         
+        // Store original JSON data for tasklists (will be updated with new noteId later)
+        $originalJsonData = null;
+        
         // Special handling for JSON files - check if they contain tasklist data
         if ($fileExtension === 'json') {
             $jsonData = json_decode($content, true);
@@ -1324,6 +1327,7 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
                 }
                 if ($isTasklist) {
                     $noteType = 'tasklist';
+                    $originalJsonData = $jsonData; // Store for later update
                 } else {
                     // If it's valid JSON but not a tasklist, treat as regular note with JSON content
                     $noteType = 'note';
@@ -1493,6 +1497,26 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
                 $stmt->execute([$title, $content, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite]);
             }
             $noteId = $con->lastInsertId();
+            
+            // For tasklists imported from JSON, update task IDs and noteId
+            if ($noteType === 'tasklist' && $originalJsonData !== null) {
+                // Regenerate task IDs and update noteId for all tasks
+                foreach ($originalJsonData as &$task) {
+                    // Generate new unique ID based on timestamp
+                    $task['id'] = (int)(microtime(true) * 10000);
+                    // Update noteId to match the newly created note
+                    $task['noteId'] = (int)$noteId;
+                    // Small delay to ensure unique IDs
+                    usleep(1);
+                }
+                unset($task); // Break reference
+                // Update content with new IDs
+                $content = json_encode($originalJsonData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                
+                // Update database entry with regenerated task data
+                $updateStmt = $con->prepare("UPDATE entries SET entry = ? WHERE id = ?");
+                $updateStmt->execute([$content, $noteId]);
+            }
             
             // Process Obsidian-style image references ![[image.png]] and convert to standard markdown
             // Also build the attachments array for this note
@@ -1896,6 +1920,26 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                 $stmt->execute([$title, $content, $folder, $folder_id, $workspace, $noteType, $tags, $favorite]);
             }
             $noteId = $con->lastInsertId();
+            
+            // For tasklists imported from JSON, update task IDs and noteId
+            if ($noteType === 'tasklist' && $originalJsonData !== null) {
+                // Regenerate task IDs and update noteId for all tasks
+                foreach ($originalJsonData as &$task) {
+                    // Generate new unique ID based on timestamp
+                    $task['id'] = (int)(microtime(true) * 10000);
+                    // Update noteId to match the newly created note
+                    $task['noteId'] = (int)$noteId;
+                    // Small delay to ensure unique IDs
+                    usleep(1);
+                }
+                unset($task); // Break reference
+                // Update content with new IDs
+                $content = json_encode($originalJsonData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                
+                // Update database entry with regenerated task data
+                $updateStmt = $con->prepare("UPDATE entries SET entry = ? WHERE id = ?");
+                $updateStmt->execute([$content, $noteId]);
+            }
             
             // Save content to file with correct extension
             $fileExtension = ($noteType === 'markdown') ? '.md' : '.html';
