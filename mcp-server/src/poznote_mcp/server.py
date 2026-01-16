@@ -194,6 +194,7 @@ def create_note(
     workspace: Optional[str] = None,
     tags: Optional[str] = None,
     folder: Optional[str] = None,
+    note_type: Optional[str] = None,
 ) -> str:
     """Create a new note in Poznote
     
@@ -203,14 +204,31 @@ def create_note(
         workspace: Workspace name (optional, uses default workspace if not specified)
         tags: Comma-separated tags (e.g., 'ai, docs, important')
         folder: Folder name to place the note in
+        note_type: Note type/format. Supported: 'note' (HTML, default), 'markdown'.
     """
     client = get_client()
+
+    # Normalize note_type for convenience (allow 'html' as an alias of 'note')
+    if note_type is not None:
+        note_type = note_type.strip().lower()
+        if note_type == "html":
+            note_type = "note"
+        if note_type not in {"note", "markdown", "excalidraw"}:
+            return json.dumps(
+                {
+                    "error": "Invalid note_type. Use 'note' (HTML), 'markdown', or 'excalidraw'.",
+                    "note_type": note_type,
+                },
+                ensure_ascii=False,
+            )
+
     result = client.create_note(
         title=title,
         content=content,
         tags=tags,
         folder_name=folder,
         workspace=workspace,
+        note_type=note_type,
     )
     
     if result:

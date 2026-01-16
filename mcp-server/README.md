@@ -112,10 +112,26 @@ The MCP server acts as a bridge between VS Code Copilot and your Poznote instanc
 - `get_note` - Get a specific note by ID with full content
 - `list_notes` - List all notes from a specific workspace
 - `search_notes` - Full-text search across notes
-- `create_note` - Create a new note with title, content, tags, and folder
+- `create_note` - Create a new note with title, content, tags, folder, and optional `note_type` (e.g. `markdown`)
 - `update_note` - Update an existing note (title, content, tags)
 - `delete_note` - Delete a note by ID
 - `create_folder` - Create a new folder in a workspace
+
+#### Creating Markdown notes
+
+By default, `create_note` creates HTML notes (`note_type="note"`). To create a Markdown note stored as a `.md` entry in Poznote, pass `note_type="markdown"`.
+
+Example:
+
+```json
+{
+  "title": "Mon mémo en Markdown",
+  "content": "# Titre\n\n- élément 1\n- élément 2\n",
+  "workspace": "Poznote",
+  "tags": "docs, markdown",
+  "note_type": "markdown"
+}
+```
 
 ---
 

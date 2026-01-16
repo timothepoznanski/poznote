@@ -110,6 +110,7 @@ class PoznoteClient:
         tags: str | None = None,
         folder_name: str | None = None,
         workspace: str | None = None,
+        note_type: str | None = None,
     ) -> dict | None:
         """
         Create a new note
@@ -128,6 +129,8 @@ class PoznoteClient:
             payload["tags"] = tags
         if folder_name:
             payload["folder_name"] = folder_name
+        if note_type:
+            payload["type"] = note_type
         
         response = self.client.post("/notes", json=payload)
         response.raise_for_status()
