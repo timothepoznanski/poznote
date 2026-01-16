@@ -49,6 +49,12 @@
         const bar = getSearchBar(noteId);
         if (!bar) return;
 
+        const isOpen = window.getComputedStyle(bar).display !== 'none';
+        if (isOpen) {
+            closeSearchBar(noteId);
+            return;
+        }
+
         // Make sure listeners are initialized
         initNoteListeners(noteId);
 
