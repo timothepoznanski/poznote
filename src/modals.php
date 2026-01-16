@@ -392,6 +392,22 @@
     </div>
 </div>
 
+<!-- Move Task Modal -->
+<div id="moveTaskModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.task_move.title', [], 'Move task'); ?></h3>
+        <div class="modal-body">
+            <p><?php echo t_h('modals.task_move.description', [], 'Choose a task list to move this task to.'); ?></p>
+            <input type="text" id="moveTaskSearchInput" placeholder="<?php echo t_h('modals.task_move.search_placeholder', [], 'Search task lists...'); ?>">
+            <div id="moveTaskList" class="move-task-list"></div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-primary" id="confirmMoveTaskBtn"><?php echo t_h('modals.task_move.confirm', [], 'Move task'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="moveTaskModal"><?php echo t_h('common.cancel'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Convert Note Modal -->
 <div id="convertNoteModal" class="modal">
     <div class="modal-content">

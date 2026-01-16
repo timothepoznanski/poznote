@@ -433,7 +433,10 @@
     "insert_order_bottom": "En bas",
     "clear_completed": "Supprimer les tâches terminées",
     "no_completed_tasks": "Aucune tâche terminée à supprimer.",
-    "confirm_clear_completed": "Supprimer {{count}} tâche(s) terminée(s) ?"
+    "confirm_clear_completed": "Supprimer {{count}} tâche(s) terminée(s) ?",
+    "move_to_list": "Déplacer vers une autre liste",
+    "move_success": "Tâche déplacée",
+    "move_error": "Impossible de déplacer la tâche"
   },
   "tags": {
     "add_single": "Ajouter un tag...",
@@ -720,6 +723,16 @@
         "title": "Imprimer en PDF (Navigateur)",
         "description": "Utiliser la boîte de dialogue d'impression native du navigateur pour enregistrer en PDF"
       }
+    },
+    "task_move": {
+      "title": "Déplacer une tâche",
+      "description": "Choisissez une liste de tâches vers laquelle déplacer cette tâche.",
+      "search_placeholder": "Rechercher une liste de tâches...",
+      "loading": "Chargement...",
+      "empty": "Aucune liste de tâches trouvée.",
+      "moving": "Déplacement de la tâche...",
+      "error": "Impossible de charger les listes de tâches.",
+      "confirm": "Déplacer la tâche"
     },
     "convert": {
       "title": "Convertir la note",

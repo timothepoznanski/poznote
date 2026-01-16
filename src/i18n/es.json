@@ -431,7 +431,10 @@
     "insert_order_bottom": "Abajo",
     "clear_completed": "Borrar tareas completadas",
     "no_completed_tasks": "No hay tareas completadas para borrar.",
-    "confirm_clear_completed": "¿Eliminar {{count}} tarea(s) completada(s)?"
+    "confirm_clear_completed": "¿Eliminar {{count}} tarea(s) completada(s)?",
+    "move_to_list": "Mover a otra lista",
+    "move_success": "Tarea movida",
+    "move_error": "No se pudo mover la tarea"
   },
   "tags": {
     "add_single": "Agregar etiqueta...",
@@ -732,6 +735,16 @@
         "title": "Imprimir a PDF (Navegador)",
         "description": "Usar el diálogo de impresión nativo del navegador para guardar como PDF"
       }
+    },
+    "task_move": {
+      "title": "Mover tarea",
+      "description": "Elige una lista de tareas a la que mover esta tarea.",
+      "search_placeholder": "Buscar listas de tareas...",
+      "loading": "Cargando...",
+      "empty": "No se encontraron listas de tareas.",
+      "moving": "Moviendo tarea...",
+      "error": "No se pudieron cargar las listas de tareas.",
+      "confirm": "Mover tarea"
     },
     "note_sort": {
       "title": "Orden de clasificación de notas",

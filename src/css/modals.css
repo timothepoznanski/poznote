@@ -140,6 +140,49 @@
     margin-top: 12px;
 }
 
+/* Move task modal list */
+.move-task-list {
+    max-height: 260px;
+    overflow: auto;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    padding: 6px;
+    margin-top: 6px;
+}
+
+.move-task-item {
+    width: 100%;
+    text-align: left;
+    padding: 8px 10px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.move-task-item:hover {
+    background: #f3f4f6;
+}
+
+.move-task-item.selected {
+    background: #e0f2fe;
+}
+
+.move-task-item small {
+    color: #6b7280;
+    font-size: 0.8rem;
+}
+
+.move-task-empty {
+    color: #6b7280;
+    font-size: 0.9rem;
+    padding: 8px;
+}
+
 .modal-buttons button {
     padding: 8px 14px;
     border: none;
@@ -2124,4 +2167,9 @@ html[data-theme='dark'] #folderShareModal .share-indexable-label {
 /* Backup warning text */
 .backup-warning-text {
     color: #dc3545;
+}
+
+/* Move Task Modal */
+#moveTaskModal .modal-buttons {
+    margin-top: 12px;
 }

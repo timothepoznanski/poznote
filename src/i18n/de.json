@@ -431,7 +431,10 @@
     "insert_order_bottom": "Unten",
     "clear_completed": "Erledigte Aufgaben löschen",
     "no_completed_tasks": "Keine erledigten Aufgaben zum Löschen.",
-    "confirm_clear_completed": "{{count}} erledigte Aufgabe(n) löschen?"
+    "confirm_clear_completed": "{{count}} erledigte Aufgabe(n) löschen?",
+    "move_to_list": "In eine andere Liste verschieben",
+    "move_success": "Aufgabe verschoben",
+    "move_error": "Aufgabe konnte nicht verschoben werden"
   },
   "tags": {
     "add_single": "Tag hinzufügen...",
@@ -732,6 +735,16 @@
         "title": "Als PDF drucken (Browser)",
         "description": "Verwenden Sie den nativen Druckdialog des Browsers, um als PDF zu speichern"
       }
+    },
+    "task_move": {
+      "title": "Aufgabe verschieben",
+      "description": "Wählen Sie eine Aufgabenliste aus, in die diese Aufgabe verschoben werden soll.",
+      "search_placeholder": "Aufgabenlisten suchen...",
+      "loading": "Laden...",
+      "empty": "Keine Aufgabenlisten gefunden.",
+      "moving": "Aufgabe wird verschoben...",
+      "error": "Aufgabenlisten konnten nicht geladen werden.",
+      "confirm": "Aufgabe verschieben"
     },
     "note_sort": {
       "title": "Notizen-Sortierreihenfolge",

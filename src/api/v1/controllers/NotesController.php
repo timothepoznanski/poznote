@@ -48,7 +48,7 @@ class NotesController {
             }
             
             // Build query for notes
-            $sql = "SELECT id, heading, tags, folder, folder_id, workspace, updated, created FROM entries WHERE trash = 0";
+            $sql = "SELECT id, heading, type, tags, folder, folder_id, workspace, updated, created FROM entries WHERE trash = 0";
             $params = [];
             
             if ($workspace) {
