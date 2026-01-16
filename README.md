@@ -724,8 +724,8 @@ Server: my-server.com
 │   └── Data: ./poznote-tom/data/
 │
 └── Poznote-Alice
-    ├── Port: 8041
-    ├── URL: http://my-server.com:8041
+  ├── Port: YOUR_POZNOTE_API_PORT
+  ├── URL: http://my-server.com:YOUR_POZNOTE_API_PORT
     ├── Container: poznote-alice-webserver-1
     └── Data: ./poznote-alice/data/
 ```

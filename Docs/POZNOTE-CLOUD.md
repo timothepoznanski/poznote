@@ -109,7 +109,8 @@ ghcr.io/timothepoznanski/poznote:latest
 SQLITE_DATABASE=/var/www/html/data/database/poznote.db
 POZNOTE_USERNAME=admin
 POZNOTE_PASSWORD=admin
-HTTP_WEB_PORT=8040
+HTTP_WEB_PORT=YOUR_POZNOTE_API_PORT
+
 ```
 
 **Docker Run Command (for platforms that support it):**
@@ -120,8 +121,8 @@ docker run -d \
   -e SQLITE_DATABASE=/var/www/html/data/database/poznote.db \
   -e POZNOTE_USERNAME=admin \
   -e POZNOTE_PASSWORD=admin \
-  -e HTTP_WEB_PORT=8040 \
-  -p 8040:80 \
+  -e HTTP_WEB_PORT=YOUR_POZNOTE_API_PORT \
+  -p YOUR_POZNOTE_API_PORT:80 \
   -v ./data:/var/www/html/data \
   ghcr.io/timothepoznanski/poznote:latest
 ```

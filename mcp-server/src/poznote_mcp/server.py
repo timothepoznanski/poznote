@@ -23,13 +23,14 @@ Tools:
 
 Usage:
   poznote-mcp serve --transport=stdio
-  poznote-mcp serve --transport=http --port=8041
+    poznote-mcp serve --transport=http --port=YOUR_POZNOTE_MCP_PORT
 """
 
 import argparse
 import json
 import logging
 import os
+import socket
 import sys
 from typing import Optional
 
@@ -45,14 +46,96 @@ logging.basicConfig(
 )
 logger = logging.getLogger("poznote-mcp")
 
+
+def _is_addr_in_use_error(exc: BaseException) -> bool:
+    """Return True if exc (or a contained exception) is an "address already in use" bind error."""
+    if isinstance(exc, OSError) and getattr(exc, "errno", None) == 98:
+        return True
+
+    # Python 3.11+ may wrap async failures in an ExceptionGroup.
+    try:
+        from builtins import BaseExceptionGroup as _BaseExceptionGroup  # type: ignore
+    except Exception:
+        _BaseExceptionGroup = None
+
+    if _BaseExceptionGroup is not None and isinstance(exc, _BaseExceptionGroup):
+        return any(_is_addr_in_use_error(sub) for sub in exc.exceptions)
+
+    return False
+
+
+def _assert_port_available(host: str, port: int) -> None:
+    """Fail fast with a clear message if host:port cannot be bound.
+
+    Uvicorn may only log a bind failure and exit; doing a preflight bind check
+    makes the error user-friendly and deterministic.
+    """
+    try:
+        addrinfos = socket.getaddrinfo(host, port, type=socket.SOCK_STREAM)
+    except socket.gaierror:
+        # If the host isn't resolvable, let Uvicorn/FastMCP surface the error.
+        return
+
+    last_error: OSError | None = None
+    for family, socktype, proto, _, sockaddr in addrinfos:
+        test_socket: socket.socket | None = None
+        try:
+            test_socket = socket.socket(family, socktype, proto)
+            test_socket.bind(sockaddr)
+        except OSError as e:
+            last_error = e
+            # Address already in use
+            if getattr(e, "errno", None) == 98:
+                logger.error(
+                    "Port already in use: cannot bind %s:%s. "
+                    "Choose another port (e.g. --port=18042) or stop the process using it. "
+                    "To check: ss -tulpn | grep -E ':%s\\b'",
+                    host,
+                    port,
+                    port,
+                )
+                raise
+            # Permission denied (privileged port / policy)
+            if getattr(e, "errno", None) == 13:
+                logger.error(
+                    "Permission denied binding %s:%s. Try a port >= 1024 (e.g. --port=YOUR_POZNOTE_MCP_PORT).",
+                    host,
+                    port,
+                )
+                raise
+        finally:
+            if test_socket is not None:
+                try:
+                    test_socket.close()
+                except Exception:
+                    pass
+
+    # If all addrinfos failed, re-raise the last one so the caller can handle/log.
+    if last_error is not None:
+        raise last_error
+
 # Initialize FastMCP server.
 #
 # NOTE: We don't pre-parse CLI args at import time.
 # VS Code (stdio) and HTTP mode both execute this module; we want a single
 # source of truth for host/port in main(), while keeping tool decorators simple.
+def _env_int(name: str, default: int) -> int:
+    value = os.getenv(name)
+    if not value:
+        return default
+    try:
+        return int(value)
+    except ValueError:
+        return default
+
+
 mcp = FastMCP(
     "poznote-mcp",
     stateless_http=True,
+    # FastMCP defaults to 127.0.0.1:8000 for HTTP-based transports.
+    # Poznote MCP expects 0.0.0.0:8041 by default (and the CLI exposes --host/--port).
+    host=os.getenv("MCP_HOST", "0.0.0.0"),
+    port=_env_int("MCP_PORT", 8041),
 )
 
 # Poznote client (initialized lazily)
@@ -414,20 +497,31 @@ def main():
     try:
         if transport == "http":
             logger.info(f"Starting Poznote MCP Server (HTTP mode on {host}:{port})...")
-            # Ensure FastMCP is configured with the host/port that the user passed.
-            # FastMCP exposes host/port as attributes; set them before running.
             try:
-                setattr(mcp, "host", host)
-                setattr(mcp, "port", port)
-            except Exception:
-                # If the underlying FastMCP implementation changes, fall back to defaults.
-                logger.debug("Unable to set host/port on FastMCP instance; using defaults")
+                _assert_port_available(host, port)
+            except OSError:
+                sys.exit(1)
+            # Ensure FastMCP is configured with the host/port that the user passed.
+            # FastMCP binds using mcp.settings.host / mcp.settings.port.
+            mcp.settings.host = host
+            mcp.settings.port = port
             mcp.run(transport="streamable-http")
         else:
             logger.info("Starting Poznote MCP Server (stdio mode)...")
             mcp.run(transport="stdio")
     except KeyboardInterrupt:
         logger.info("Server stopped by user")
+    except Exception as e:
+        if _is_addr_in_use_error(e):
+            logger.error(
+                "Cannot start MCP server: %s:%s is already in use. "
+                "Choose another port (e.g. --port=18042) or stop the process using it. "
+                "To check: ss -tulpn | grep -E ':%s\\b'",
+                host,
+                port,
+                port,
+            )
+            sys.exit(1)
     except Exception as e:
         logger.exception("Server error")
         sys.exit(1)
