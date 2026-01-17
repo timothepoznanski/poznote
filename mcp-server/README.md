@@ -110,8 +110,7 @@ Endpoint: `http://YOUR_SERVER_HOSTNAME_OR_IP:POZNOTE_MCP_SERVER_PORT/mcp`
 1) Create an environment file (example: `/etc/poznote-mcp.env`):
 
 ```bash
-sudo install -m 600 -o root -g root /dev/null /etc/poznote-mcp.env
-sudoedit /etc/poznote-mcp.env
+vim /etc/poznote-mcp.env
 ```
 
 Content:
@@ -165,8 +164,7 @@ This mode installs the unit for a single Linux user (no `sudo` for `systemctl`).
 1) Create an environment file (example: `~/.config/poznote-mcp.env`):
 
 ```bash
-install -m 600 /dev/null ~/.config/poznote-mcp.env
-$EDITOR ~/.config/poznote-mcp.env
+vim ~/.config/poznote-mcp.env
 ```
 
 Content:
