@@ -21,6 +21,7 @@ require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../functions.php';
 require_once __DIR__ . '/../users/db_master.php';
 require_once __DIR__ . '/../users/UserDataManager.php';
+require_once __DIR__ . '/../version_helper.php';
 
 $currentLang = getUserLanguage();
 $message = '';
@@ -122,6 +123,10 @@ $availableIcons = [
 ];
 
 ?>
+<?php 
+// Cache version based on app version to force reload on updates
+$v = getAppVersion();
+?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES); ?>">
 <head>
@@ -129,13 +134,16 @@ $availableIcons = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo t_h('multiuser.admin.title', [], 'User Management'); ?> - Poznote</title>
     <meta name="color-scheme" content="dark light">
-    <script src="../js/theme-init.js"></script>
-    <link rel="stylesheet" href="../css/fontawesome.min.css">
-    <link rel="stylesheet" href="../css/light.min.css">
-    <link rel="stylesheet" href="../css/settings.css">
-    <link rel="stylesheet" href="../css/dark-mode.css">
+    <script src="../js/theme-init.js?v=<?php echo $v; ?>"></script>
+    <link rel="stylesheet" href="../css/fontawesome.min.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/light.min.css?v=<?php echo $v; ?>">
+    <link type="text/css" rel="stylesheet" href="../css/brands.min.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="../css/solid.min.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="../css/regular.min.css?v=<?php echo $v; ?>"/>
+    <link rel="stylesheet" href="../css/settings.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/dark-mode.css?v=<?php echo $v; ?>">
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
-    <script src="../js/theme-manager.js"></script>
+    <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <style>
         .admin-container {
             max-width: 1200px;
@@ -393,7 +401,7 @@ $availableIcons = [
 <body>
     <div class="admin-container">
         <a href="../settings.php" class="back-link">
-            <i class="fa-arrow-left"></i>
+            <i class="fas fa-arrow-left"></i>
             <?php echo t_h('common.back_to_settings', [], 'Back to Settings'); ?>
         </a>
         
@@ -403,7 +411,7 @@ $availableIcons = [
                 <p class="admin-subtitle"><?php echo t_h('multiuser.admin.subtitle', [], 'Manage user profiles and their data spaces'); ?></p>
             </div>
             <button class="btn btn-primary" onclick="openCreateModal()">
-                <i class="fa-plus"></i> <?php echo t_h('multiuser.admin.create_user', [], 'Create Profile'); ?>
+                <i class="fas fa-plus"></i> <?php echo t_h('multiuser.admin.create_user', [], 'Create Profile'); ?>
             </button>
         </div>
         
@@ -433,7 +441,7 @@ $availableIcons = [
                         <td>
                             <div class="user-info">
                                 <div class="user-avatar" style="background: <?php echo htmlspecialchars($user['color'] ?? '#007DB8'); ?>">
-                                    <i class="fa-<?php echo htmlspecialchars($user['icon'] ?? 'user'); ?>"></i>
+                                    <i class="fas fa-<?php echo htmlspecialchars($user['icon'] ?? 'user'); ?>"></i>
                                 </div>
                                 <div>
                                     <div class="user-name"><?php echo htmlspecialchars($user['display_name'] ?: $user['username']); ?></div>
@@ -469,11 +477,11 @@ $availableIcons = [
                         <td>
                             <div class="actions">
                                 <button class="btn btn-secondary btn-small" onclick="openEditModal(<?php echo htmlspecialchars(json_encode($user)); ?>)">
-                                    <i class="fa-edit"></i>
+                                    <i class="fas fa-edit"></i>
                                 </button>
                                 <?php if ($user['id'] !== getCurrentUserId()): ?>
                                     <button class="btn btn-danger btn-small" onclick="openDeleteModal(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>')">
-                                        <i class="fa-trash"></i>
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 <?php endif; ?>
                             </div>
@@ -518,7 +526,7 @@ $availableIcons = [
                     <div class="icon-picker">
                         <?php foreach ($availableIcons as $icon): ?>
                             <div class="icon-option <?php echo $icon === 'user' ? 'selected' : ''; ?>" data-icon="<?php echo $icon; ?>" onclick="selectIcon(this, 'create')">
-                                <i class="fa-<?php echo $icon; ?>"></i>
+                                <i class="fas fa-<?php echo $icon; ?>"></i>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -561,7 +569,7 @@ $availableIcons = [
                     <div class="icon-picker" id="edit_icon_picker">
                         <?php foreach ($availableIcons as $icon): ?>
                             <div class="icon-option" data-icon="<?php echo $icon; ?>" onclick="selectIcon(this, 'edit')">
-                                <i class="fa-<?php echo $icon; ?>"></i>
+                                <i class="fas fa-<?php echo $icon; ?>"></i>
                             </div>
                         <?php endforeach; ?>
                     </div>

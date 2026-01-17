@@ -13,6 +13,7 @@ require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/functions.php';
 require_once __DIR__ . '/users/db_master.php';
 require_once __DIR__ . '/users/UserDataManager.php';
+require_once __DIR__ . '/version_helper.php';
 
 $currentLang = getUserLanguage();
 $currentUser = getCurrentUser();
@@ -75,6 +76,10 @@ $availableIcons = [
 $colors = ['#007DB8', '#28a745', '#dc3545', '#ffc107', '#6f42c1', '#20c997', '#fd7e14', '#6c757d', '#17a2b8', '#e83e8c'];
 
 ?>
+<?php 
+// Cache version based on app version to force reload on updates
+$v = getAppVersion();
+?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES); ?>">
 <head>
@@ -82,25 +87,28 @@ $colors = ['#007DB8', '#28a745', '#dc3545', '#ffc107', '#6f42c1', '#20c997', '#f
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo t_h('multiuser.profile.title', [], 'My Profile'); ?> - Poznote</title>
     <meta name="color-scheme" content="dark light">
-    <script src="js/theme-init.js"></script>
-    <link rel="stylesheet" href="css/fontawesome.min.css">
-    <link rel="stylesheet" href="css/light.min.css">
-    <link rel="stylesheet" href="css/settings.css">
-    <link rel="stylesheet" href="css/profile.css">
-    <link rel="stylesheet" href="css/dark-mode.css">
+    <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
+    <link rel="stylesheet" href="css/fontawesome.min.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/light.min.css?v=<?php echo $v; ?>">
+    <link type="text/css" rel="stylesheet" href="css/brands.min.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/solid.min.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/regular.min.css?v=<?php echo $v; ?>"/>
+    <link rel="stylesheet" href="css/settings.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/profile.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode.css?v=<?php echo $v; ?>">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <script src="js/theme-manager.js"></script>
+    <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
 </head>
 <body>
     <div class="profile-container">
         <a href="settings.php" class="back-link">
-            <i class="fa-arrow-left"></i>
+            <i class="fas fa-arrow-left"></i>
             <?php echo t_h('common.back_to_settings', [], 'Back to Settings'); ?>
         </a>
         
         <div class="profile-header">
             <div class="profile-avatar" style="background: <?php echo htmlspecialchars($currentUser['color'] ?? '#007DB8'); ?>">
-                <i class="fa-<?php echo htmlspecialchars($currentUser['icon'] ?? 'user'); ?>"></i>
+                <i class="fas fa-<?php echo htmlspecialchars($currentUser['icon'] ?? 'user'); ?>"></i>
             </div>
             <div class="profile-info">
                 <h1><?php echo htmlspecialchars($currentUser['display_name'] ?: $currentUser['username']); ?></h1>
@@ -152,7 +160,7 @@ $colors = ['#007DB8', '#28a745', '#dc3545', '#ffc107', '#6f42c1', '#20c997', '#f
                             <div class="icon-option <?php echo ($currentUser['icon'] ?? 'user') === $icon ? 'selected' : ''; ?>" 
                                  data-icon="<?php echo $icon; ?>" 
                                  onclick="selectIcon(this)">
-                                <i class="fa-<?php echo $icon; ?>"></i>
+                                <i class="fas fa-<?php echo $icon; ?>"></i>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -223,7 +231,7 @@ $colors = ['#007DB8', '#28a745', '#dc3545', '#ffc107', '#6f42c1', '#20c997', '#f
             
             // Update avatar preview
             var avatar = document.querySelector('.profile-avatar i');
-            avatar.className = 'fa-' + element.dataset.icon;
+            avatar.className = 'fas ' + element.dataset.icon;
         }
     </script>
 </body>

@@ -95,6 +95,8 @@ extract($search_params); // Extracts variables: $search, $tags_search, $note, et
 $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
 
 $currentLang = getUserLanguage();
+$currentUser = getCurrentUser();
+$displayName = htmlspecialchars($currentUser['display_name'] ?: $currentUser['username']);
 
 ?>
 
@@ -104,7 +106,7 @@ $currentLang = getUserLanguage();
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-    <title><?php echo t_h('settings.title'); ?> - <?php echo t_h('app.name'); ?></title>
+    <title><?php echo $displayName; ?> - <?php echo t_h('app.name'); ?></title>
     <meta name="color-scheme" content="dark light">
     <script src="js/theme-init.js"></script>
     <link rel="stylesheet" href="css/fontawesome.min.css">
@@ -149,8 +151,7 @@ $currentLang = getUserLanguage();
                         <i class="fa-user-circle"></i>
                     </div>
                     <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.profile', [], 'My Profile'); ?></h3>
-                        <small><?php echo htmlspecialchars(getCurrentUser()['username'] ?? ''); ?></small>
+                        <h3><?php echo $displayName; ?></h3>
                     </div>
                 </div>
 
