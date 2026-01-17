@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
-"""
-Poznote MCP Server
+"""Poznote MCP Server
 
 Minimal MCP server enabling AI assistants to read, search and write notes.
 
-Supports two transport modes:
-  - stdio: Local execution or remote SSH execution (default)
-  - streamable-http: HTTP transport for corporate environments
+Transport:
+    - streamable-http (HTTP) only
 
 Resources:
   - notes: List all notes
@@ -22,8 +20,7 @@ Tools:
   - create_folder: Create a new folder in Poznote
 
 Usage:
-  poznote-mcp serve --transport=stdio
-    poznote-mcp serve --transport=http --port=YOUR_POZNOTE_MCP_PORT
+    poznote-mcp serve --host=0.0.0.0 --port=YOUR_POZNOTE_MCP_PORT
 """
 
 import argparse
@@ -117,8 +114,8 @@ def _assert_port_available(host: str, port: int) -> None:
 # Initialize FastMCP server.
 #
 # NOTE: We don't pre-parse CLI args at import time.
-# VS Code (stdio) and HTTP mode both execute this module; we want a single
-# source of truth for host/port in main(), while keeping tool decorators simple.
+# We keep a single source of truth for host/port in main(), while keeping tool
+# decorators simple.
 def _env_int(name: str, default: int) -> int:
     value = os.getenv(name)
     if not value:
@@ -295,17 +292,17 @@ def search_notes(query: str, workspace: Optional[str] = None, limit: int = 10) -
 def create_note(
     title: str,
     content: str,
-    workspace: Optional[str] = None,
+    workspace: str = "Poznote",
     tags: Optional[str] = None,
     folder: Optional[str] = None,
-    note_type: Optional[str] = None,
+    note_type: str = "note",
 ) -> str:
     """Create a new note in Poznote
     
     Args:
         title: Title of the new note
         content: Content of the note (HTML or Markdown)
-        workspace: Workspace name (optional, uses default workspace if not specified)
+        workspace: Workspace name (optional, default: 'Poznote')
         tags: Comma-separated tags (e.g., 'ai, docs, important')
         folder: Folder name to place the note in
         note_type: Note type/format. Supported: 'note' (HTML, default), 'markdown'.
@@ -315,8 +312,11 @@ def create_note(
         return err
 
     # Normalize note_type for convenience (allow 'html' as an alias of 'note')
-    if note_type is not None:
-        note_type = note_type.strip().lower()
+    # If note_type is missing/empty, default to HTML (note).
+    if note_type is None or not str(note_type).strip():
+        note_type = "note"
+    else:
+        note_type = str(note_type).strip().lower()
         if note_type == "html":
             note_type = "note"
         if note_type not in {"note", "markdown", "excalidraw"}:
@@ -458,21 +458,15 @@ def create_parser() -> argparse.ArgumentParser:
     # serve command
     serve_parser = subparsers.add_parser("serve", help="Start the MCP server")
     serve_parser.add_argument(
-        "--transport",
-        choices=["stdio", "http"],
-        default="stdio",
-        help="Transport mode: stdio (default) or http",
-    )
-    serve_parser.add_argument(
         "--host",
         default="0.0.0.0",
-        help="Host to bind to for HTTP mode (default: 0.0.0.0)",
+        help="Host to bind to (default: 0.0.0.0)",
     )
     serve_parser.add_argument(
         "--port",
         type=int,
         default=8041,
-        help="Port to listen on for HTTP mode (default: 8041)",
+        help="Port to listen on (default: 8041)",
     )
     
     return parser
@@ -485,30 +479,25 @@ def main():
     
     # Get actual values from parsed arguments (not pre-parsed config)
     if args.command == "serve":
-        transport = args.transport
         host = args.host
         port = args.port
     else:
         # Backward compatibility: no subcommand means use env vars
-        transport = os.getenv("MCP_TRANSPORT", "stdio")
         host = os.getenv("MCP_HOST", "0.0.0.0")
         port = int(os.getenv("MCP_PORT", "8041"))
     
     try:
-        if transport == "http":
-            logger.info(f"Starting Poznote MCP Server (HTTP mode on {host}:{port})...")
-            try:
-                _assert_port_available(host, port)
-            except OSError:
-                sys.exit(1)
-            # Ensure FastMCP is configured with the host/port that the user passed.
-            # FastMCP binds using mcp.settings.host / mcp.settings.port.
-            mcp.settings.host = host
-            mcp.settings.port = port
-            mcp.run(transport="streamable-http")
-        else:
-            logger.info("Starting Poznote MCP Server (stdio mode)...")
-            mcp.run(transport="stdio")
+        logger.info(f"Starting Poznote MCP Server (HTTP mode on {host}:{port})...")
+        try:
+            _assert_port_available(host, port)
+        except OSError:
+            sys.exit(1)
+
+        # Ensure FastMCP is configured with the host/port that the user passed.
+        # FastMCP binds using mcp.settings.host / mcp.settings.port.
+        mcp.settings.host = host
+        mcp.settings.port = port
+        mcp.run(transport="streamable-http")
     except KeyboardInterrupt:
         logger.info("Server stopped by user")
     except Exception as e:
@@ -522,7 +511,6 @@ def main():
                 port,
             )
             sys.exit(1)
-    except Exception as e:
         logger.exception("Server error")
         sys.exit(1)
 
