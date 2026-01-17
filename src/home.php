@@ -176,9 +176,14 @@ try {
 </head>
 <body class="home-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <div class="home-container">
-        <h2 class="home-header">
-            <span class="home-workspace-name"><?php echo htmlspecialchars($pageWorkspace ?: 'Poznote', ENT_QUOTES); ?></span>
-        </h2>
+        <?php $currentUser = getCurrentUser(); ?>
+        <div class="home-header">
+            <div class="home-info-line">
+                <span class="home-info-username"><?php echo htmlspecialchars($currentUser['username'] ?? 'User', ENT_QUOTES); ?></span>
+                <span class="home-info-separator">-</span>
+                <span class="home-workspace-name"><?php echo htmlspecialchars($pageWorkspace ?: 'Poznote', ENT_QUOTES); ?></span>
+            </div>
+        </div>
         
         <div class="home-grid">
             <!-- Notes -->

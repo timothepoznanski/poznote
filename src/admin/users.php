@@ -84,11 +84,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [];
             if ($field === 'is_admin' || $field === 'active') {
                 $data[$field] = (int)$value;
+            } elseif ($field === 'username') {
+                $data[$field] = trim((string)$value);
+                if (empty($data[$field])) {
+                    $error = t('multiuser.admin.errors.username_required', [], 'Username is required');
+                    break;
+                }
+            }
+
+            if (!empty($data)) {
                 $result = updateUserProfile($userId, $data);
-                
-                if ($result['success']) {
-                    // Success, no message
-                } else {
+                if (!$result['success']) {
                     $error = $result['error'];
                 }
             }
@@ -206,8 +212,17 @@ $v = getAppVersion();
             font-weight: 500;
         }
         .user-username {
-            color: var(--text-muted, #666);
-            font-size: 0.9em;
+            color: var(--text-color, #333);
+            font-size: 0.95em;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            display: inline-block;
+        }
+        .user-username:hover {
+            background: rgba(0, 125, 184, 0.1);
+            color: #007DB8;
         }
         .badge {
             display: inline-block;
@@ -417,6 +432,21 @@ $v = getAppVersion();
         document.body.appendChild(form);
         form.submit();
     }
+
+    function renameUser(userId, currentUsername) {
+        document.getElementById('rename_user_id').value = userId;
+        document.getElementById('rename_username').value = currentUsername;
+        document.getElementById('renameModal').classList.add('active');
+        setTimeout(() => document.getElementById('rename_username').focus(), 100);
+    }
+    
+    function submitRename() {
+        const userId = document.getElementById('rename_user_id').value;
+        const newUsername = document.getElementById('rename_username').value;
+        if (newUsername.trim() !== "") {
+            toggleUserStatus(userId, 'username', newUsername.trim());
+        }
+    }
     </script>
 </head>
 <body>
@@ -462,7 +492,11 @@ $v = getAppVersion();
                     <tr>
                         <td>
                             <div class="user-info">
-                                <div class="user-username"><?php echo htmlspecialchars($user['username']); ?></div>
+                                <div class="user-username" 
+                                     title="<?php echo t_h('multiuser.admin.click_to_rename', [], 'Click to rename'); ?>"
+                                     onclick="renameUser(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>')">
+                                    <?php echo htmlspecialchars($user['username']); ?>
+                                </div>
                             </div>
                         </td>
 
@@ -528,8 +562,7 @@ $v = getAppVersion();
                 <input type="hidden" name="action" value="create">
                 
                 <div class="form-group">
-                    <label for="create_username"><?php echo t_h('multiuser.admin.username', [], 'Username'); ?> *</label>
-                    <input type="text" id="create_username" name="username" required>
+                    <input type="text" id="create_username" name="username" placeholder="<?php echo t_h('multiuser.admin.username', [], 'Username'); ?> *" required>
                 </div>
                 
 
@@ -543,6 +576,21 @@ $v = getAppVersion();
     </div>
     
 
+    
+    <!-- Rename User Modal -->
+    <div class="modal" id="renameModal">
+        <div class="modal-content">
+            <h2 class="modal-title"><?php echo t_h('multiuser.admin.rename_user', [], 'Rename User'); ?></h2>
+            <div class="form-group">
+                <input type="hidden" id="rename_user_id">
+                <input type="text" id="rename_username" placeholder="<?php echo t_h('multiuser.admin.username', [], 'Username'); ?>" onkeydown="if(event.key==='Enter') submitRename()">
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('renameModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
+                <button type="button" class="btn btn-primary" onclick="submitRename()"><?php echo t_h('common.save', [], 'Save'); ?></button>
+            </div>
+        </div>
+    </div>
     
     <!-- Delete Confirmation Modal -->
     <div class="modal" id="deleteModal">

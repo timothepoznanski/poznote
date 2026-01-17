@@ -32,20 +32,34 @@
 
 .home-header {
     display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 15px;
-    color: #1f2937;
-    font-size: 1.8rem;
-    font-weight: 600;
     margin-bottom: 40px;
-    /* padding-bottom: 15px; */
-    /* border-bottom: 2px solid #e5e7eb; */
-    justify-content: center;
-    text-align: center;
 }
 
+.home-info-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+html[data-theme='dark'] .home-info-line,
+body.dark-mode .home-info-line {
+    color: #e5e7eb;
+}
+
+.home-info-separator {
+    color: #6b7280;
+    opacity: 0.5;
+}
+
+
+
 .home-workspace-name {
-    font-size: 1.8rem;
     font-weight: 600;
 }
 
@@ -154,17 +168,71 @@ body.dark-mode .home-card-logout .home-card-icon {
 
 
 /* Font Awesome icon definitions */
-.fa-tags::before { content: "\f02c"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
-.fa-star::before { content: "\f005"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
-.fa-cloud::before { content: "\f0c2"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
-.fa-trash::before { content: "\f1f8"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
-.fa-sign-out-alt::before { content: "\f2f5"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
-.fa-paperclip::before { content: "\f0c6"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
-.fa-arrow-left::before { content: "\f060"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
-.fa-share-alt::before { content: "\f1e0"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
-.fa-folder-open::before { content: "\f07c"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
-.fa-layer-group::before { content: "\f5fd"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
-.fa-sticky-note::before { content: "\f249"; font-family: "Font Awesome 5 Pro"; font-weight: 400; }
+.fa-tags::before {
+    content: "\f02c";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 400;
+}
+
+.fa-star::before {
+    content: "\f005";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 400;
+}
+
+.fa-cloud::before {
+    content: "\f0c2";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 400;
+}
+
+.fa-trash::before {
+    content: "\f1f8";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 400;
+}
+
+.fa-sign-out-alt::before {
+    content: "\f2f5";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 400;
+}
+
+.fa-paperclip::before {
+    content: "\f0c6";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 400;
+}
+
+.fa-arrow-left::before {
+    content: "\f060";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 400;
+}
+
+.fa-share-alt::before {
+    content: "\f1e0";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 400;
+}
+
+.fa-folder-open::before {
+    content: "\f07c";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 400;
+}
+
+.fa-layer-group::before {
+    content: "\f5fd";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 400;
+}
+
+.fa-sticky-note::before {
+    content: "\f249";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 400;
+}
 
 /* Dark mode */
 html[data-theme='dark'] .home-page,
@@ -229,15 +297,15 @@ body.dark-mode .home-card-icon-shared {
     .home-container {
         padding: 20px 15px;
     }
-    
+
     .home-header {
         font-size: 1.4rem;
     }
-    
+
     .home-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .home-card {
         padding: 16px;
     }
