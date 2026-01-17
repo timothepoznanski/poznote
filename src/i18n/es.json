@@ -1362,6 +1362,10 @@
     "password_remove_hint": "Dejar vacío para eliminar la protección con contraseña.",
     "enter_new_password": "Ingrese una nueva contraseña"
   },
+  "public_folder": {
+    "filter_placeholder": "Buscar notas",
+    "no_filter_results": "Sin resultados."
+  },
   "icon_names": {
     "briefcase": "maletín",
     "home": "casa",

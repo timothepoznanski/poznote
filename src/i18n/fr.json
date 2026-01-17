@@ -1373,6 +1373,10 @@
     "password_remove_hint": "Laissez vide pour supprimer la protection par mot de passe.",
     "enter_new_password": "Entrez un nouveau mot de passe"
   },
+  "public_folder": {
+    "filter_placeholder": "Rechercher des notes",
+    "no_filter_results": "Aucun résultat."
+  },
   "icon_names": {
     "briefcase": "mallette",
     "home": "maison",

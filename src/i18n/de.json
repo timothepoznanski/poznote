@@ -1362,6 +1362,10 @@
     "password_remove_hint": "Leer lassen, um den Passwortschutz zu entfernen.",
     "enter_new_password": "Neues Passwort eingeben"
   },
+  "public_folder": {
+    "filter_placeholder": "Notizen suchen",
+    "no_filter_results": "Keine Ergebnisse."
+  },
   "icon_names": {
     "briefcase": "Aktentasche",
     "home": "Zuhause",

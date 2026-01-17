@@ -1363,6 +1363,10 @@
     "password_remove_hint": "Leave empty to remove password protection.",
     "enter_new_password": "Enter new password"
   },
+  "public_folder": {
+    "filter_placeholder": "Search notes",
+    "no_filter_results": "No results."
+  },
   "icon_names": {
     "briefcase": "briefcase",
     "home": "home",

@@ -123,6 +123,13 @@ try {
     $stmt->execute([$folder_id, $folder['name']]);
     $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    $sharedNotes = [];
+    foreach ($notes as $note) {
+        if (!empty($note['token'])) {
+            $sharedNotes[] = $note;
+        }
+    }
+
 } catch (Exception $e) {
     http_response_code(500);
     echo 'Server error';
@@ -157,33 +164,56 @@ $noteBaseUrl = $protocol . '://' . $host;
     <link rel="stylesheet" href="/css/dark-mode.css">
     <link rel="stylesheet" href="/css/public_folder.css">
 </head>
-<body class="public-folder-body">
+<body class="public-folder-body" data-txt-no-results="No results.">
     <button class="theme-toggle" onclick="toggleTheme()">
         <i class="fas fa-moon" id="themeIcon"></i>
     </button>
-    
+
     <h1><i class="fas fa-folder-open"></i> <?php echo htmlspecialchars($folder['name']); ?></h1>
-    
-    <?php if (empty($notes)): ?>
-        <div class="empty-folder">
+
+    <?php if (!empty($sharedNotes)): ?>
+        <div class="public-folder-filter">
+            <div class="filter-input-wrapper">
+                <input type="text" id="folderFilterInput" class="filter-input" placeholder="<?php echo t_h('public_folder.filter_placeholder', [], 'Search notes'); ?>" autocomplete="off" />
+                <button id="clearFilterBtn" class="clear-filter-btn" type="button" aria-label="Clear search" style="display: none;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="folderFilterStats" class="filter-stats" style="display: none;"></div>
+        </div>
+    <?php endif; ?>
+
+    <?php if (empty($sharedNotes)): ?>
+        <div id="folderEmptyMessage" class="empty-folder">
             <i class="fas fa-folder-open"></i>
             <p>This folder is empty</p>
         </div>
     <?php else: ?>
-        <ul class="notes-list">
-            <?php foreach ($notes as $note): ?>
-                <?php if (!empty($note['token'])): ?>
-                    <li>
-                        <a href="<?php echo htmlspecialchars($noteBaseUrl . '/' . $note['token']); ?>" target="_blank">
-                            <i class="fas fa-file-alt"></i>
-                            <?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?>
-                        </a>
-                    </li>
-                <?php endif; ?>
+        <ul id="folderNotesList" class="notes-list">
+            <?php foreach ($sharedNotes as $note): ?>
+                <?php
+                    $noteTitle = $note['heading'] ?: 'Untitled';
+                    $noteTitleLower = $noteTitle;
+                    if (function_exists('mb_strtolower')) {
+                        $noteTitleLower = mb_strtolower($noteTitleLower, 'UTF-8');
+                    } else {
+                        $noteTitleLower = strtolower($noteTitleLower);
+                    }
+                ?>
+                <li class="public-note-item" data-title="<?php echo htmlspecialchars($noteTitleLower, ENT_QUOTES, 'UTF-8'); ?>">
+                    <a class="public-note-link" href="<?php echo htmlspecialchars($noteBaseUrl . '/' . $note['token']); ?>" target="_blank" rel="noopener">
+                        <i class="fas fa-file-alt"></i>
+                        <span class="public-note-title"><?php echo htmlspecialchars($noteTitle); ?></span>
+                    </a>
+                </li>
             <?php endforeach; ?>
         </ul>
+        <div id="folderNoResults" class="empty-folder is-hidden">
+            <i class="fas fa-search"></i>
+            <p><?php echo t_h('public_folder.no_filter_results', [], 'No results.'); ?></p>
+        </div>
     <?php endif; ?>
-    
+
     <script src="/js/public_folder.js"></script>
 </body>
 </html>

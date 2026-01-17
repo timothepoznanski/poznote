@@ -1366,6 +1366,10 @@
     "password_remove_hint": "Deixe vazio para remover a proteção por senha.",
     "enter_new_password": "Digite uma nova senha"
   },
+  "public_folder": {
+    "filter_placeholder": "Pesquisar notas",
+    "no_filter_results": "Nenhum resultado."
+  },
   "icon_names": {
     "briefcase": "maleta",
     "home": "casa",
