@@ -158,7 +158,7 @@ sudo systemctl status poznote-mcp
 <summary><strong>Run with user systemd</strong></summary>
 
 This mode installs the unit for a single Linux user (no `sudo` for `systemctl`).
-<br>
+<br><br>
 
 1) Create an environment file (example: `~/.config/poznote-mcp.env`):
 
