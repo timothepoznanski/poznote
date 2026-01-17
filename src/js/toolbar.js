@@ -1543,6 +1543,12 @@ window.insertTable = insertTable;
     const target = toolbar.querySelector(targetSelector);
     if (target && typeof target.click === 'function') {
       target.click();
+    } else if (targetSelector === '.btn-uncheck-all') {
+      // Special handling for uncheck all tasks action
+      const noteId = toolbar.closest('.note-entry')?.id?.replace('entry', '');
+      if (noteId && typeof uncheckAllTasks === 'function') {
+        uncheckAllTasks(noteId);
+      }
     }
   };
 

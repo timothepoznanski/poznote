@@ -1186,6 +1186,11 @@ body.sidebar-collapsed .toggle-sidebar-btn i {
     display: none;
 }
 
+.tasklist-actions-dropdown {
+    position: relative;
+    display: inline-flex;
+}
+
 .dropdown-menu {
     position: absolute;
     top: 100%;
@@ -1209,6 +1214,21 @@ body.sidebar-collapsed .toggle-sidebar-btn i {
     border-bottom: 1px solid #f0f0f0;
     transition: background-color 0.2s;
     font-style: normal;
+}
+
+.dropdown-menu button.dropdown-item {
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+    font-weight: inherit;
+    box-shadow: none;
+    outline: none;
+}
+
+.dropdown-menu button.dropdown-item:focus {
+    outline: none;
 }
 
 .dropdown-item:last-child {
@@ -3910,6 +3930,8 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-arrows-h,
 .fa-sort,
 .fa-file-import,
+.fa-check-square,
+.fa-square,
 .fa-broom,
 .fa-moon,
 .fa-briefcase,

@@ -436,7 +436,11 @@
     "insert_order_bottom": "Bottom",
     "clear_completed": "Clear completed tasks",
     "no_completed_tasks": "No completed tasks to clear.",
-    "confirm_clear_completed": "Delete {{count}} completed task(s)?"
+    "confirm_clear_completed": "Delete {{count}} completed task(s)?",
+    "actions": "Task list actions",
+    "uncheck_all": "Uncheck all tasks",
+    "no_checked_tasks": "No checked tasks to uncheck.",
+    "confirm_uncheck_all": "Uncheck {{count}} task(s)?"
   },
   "tags": {
     "add_single": "Add tag...",

@@ -437,7 +437,11 @@
     "confirm_clear_completed": "¿Eliminar {{count}} tarea(s) completada(s)?",
     "move_to_list": "Mover a otra lista",
     "move_success": "Tarea movida",
-    "move_error": "No se pudo mover la tarea"
+    "move_error": "No se pudo mover la tarea",
+    "actions": "Acciones de lista de tareas",
+    "uncheck_all": "Desmarcar todas las tareas",
+    "no_checked_tasks": "No hay tareas marcadas para desmarcar.",
+    "confirm_uncheck_all": "¿Desmarcar {{count}} tarea(s)?"
   },
   "tags": {
     "add_single": "Agregar etiqueta...",

@@ -441,8 +441,14 @@ $body_classes = trim($extra_body_classes);
                 
                     // Task list actions (only visible for tasklist notes)
                     if ($note_type === 'tasklist') {
-                        // Clear completed tasks button
-                        echo '<button type="button" class="toolbar-btn btn-clear-completed note-action-btn" title="' . t_h('tasklist.clear_completed', [], 'Clear completed tasks') . '" data-action="clear-completed-tasks" data-note-id="' . $row['id'] . '"><i class="fa-broom"></i></button>';
+                        // Task list actions dropdown
+                        echo '<div class="tasklist-actions-dropdown">';
+                        echo '<button type="button" class="toolbar-btn btn-tasklist-actions note-action-btn" title="' . t_h('tasklist.actions', [], 'Task list actions') . '" data-action="toggle-tasklist-actions" data-note-id="' . $row['id'] . '" aria-haspopup="true" aria-expanded="false"><i class="fa-check-square"></i></button>';
+                        echo '<div id="tasklist-actions-menu-' . $row['id'] . '" class="dropdown-menu tasklist-actions-menu" hidden>';
+                        echo '<button type="button" class="dropdown-item" data-action="clear-completed-tasks" data-note-id="' . $row['id'] . '"><i class="fa-broom"></i> ' . t_h('tasklist.clear_completed', [], 'Clear completed tasks') . '</button>';
+                        echo '<button type="button" class="dropdown-item" data-action="uncheck-all-tasks" data-note-id="' . $row['id'] . '"><i class="fa-square"></i> ' . t_h('tasklist.uncheck_all', [], 'Uncheck all tasks') . '</button>';
+                        echo '</div>';
+                        echo '</div>';
                     }
                 
                     // Excalidraw diagram button - insert at cursor position (hidden for markdown and tasklist notes)
@@ -500,9 +506,10 @@ $body_classes = trim($extra_body_classes);
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-search-replace"><i class="fa-search"></i> '.t_h('editor.toolbar.search_replace', [], 'Search and replace').'</button>';
                     }
 
-                    // Clear completed tasks (only for tasklist notes, shown in mobile menu)
+                    // Task list actions (only for tasklist notes, shown in mobile menu)
                     if ($note_type === 'tasklist') {
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-clear-completed"><i class="fa-broom"></i> '.t_h('tasklist.clear_completed', [], 'Clear completed tasks').'</button>';
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="clear-completed-tasks" data-note-id="' . $row['id'] . '"><i class="fa-check-square"></i> '.t_h('tasklist.clear_completed', [], 'Clear completed tasks').'</button>';
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="uncheck-all-tasks" data-note-id="' . $row['id'] . '"><i class="fa-square"></i> '.t_h('tasklist.uncheck_all', [], 'Uncheck all tasks').'</button>';
                     }
                     
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-duplicate"><i class="fa-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';

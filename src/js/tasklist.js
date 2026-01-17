@@ -932,6 +932,75 @@ function clearCompletedTasks(noteId) {
     }
 }
 
+// Uncheck all tasks (mark all as incomplete)
+function uncheckAllTasks(noteId) {
+    const noteEntry = document.getElementById('entry' + noteId);
+    if (!noteEntry) return;
+
+    let tasks = [];
+    try {
+        tasks = JSON.parse(noteEntry.dataset.tasklistJson || '[]');
+    } catch (e) {
+        return;
+    }
+
+    // Count checked tasks
+    const checkedCount = tasks.filter(task => task.completed).length;
+    
+    if (checkedCount === 0) {
+        // No checked tasks to uncheck
+        if (window.modalAlert && window.modalAlert.info) {
+            window.modalAlert.info(
+                window.t ? window.t('tasklist.no_checked_tasks', null, 'No checked tasks to uncheck.') : 'No checked tasks to uncheck.'
+            );
+        }
+        return;
+    }
+
+    // Ask for confirmation
+    if (window.modalAlert && window.modalAlert.confirm) {
+        const message = window.t 
+            ? window.t('tasklist.confirm_uncheck_all', {count: checkedCount}, 'Uncheck {{count}} task(s)?')
+            : `Uncheck ${checkedCount} task(s)?`;
+        
+        window.modalAlert.confirm(message).then(confirmed => {
+            if (!confirmed) return;
+            
+            // Mark all tasks as incomplete
+            tasks.forEach(task => {
+                task.completed = false;
+            });
+            noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
+
+            // Re-render the task list
+            const tasksList = document.getElementById(`tasks-list-${noteId}`);
+            if (tasksList) {
+                tasksList.innerHTML = renderTasks(tasks, noteId);
+                enableDragAndDrop(noteId);
+            }
+
+            markTaskListAsModified(noteId);
+        });
+    } else {
+        // Fallback to native confirm if modalAlert not available
+        const message = `Uncheck ${checkedCount} task(s)?`;
+        if (confirm(message)) {
+            tasks.forEach(task => {
+                task.completed = false;
+            });
+            noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
+
+            const tasksList = document.getElementById(`tasks-list-${noteId}`);
+            if (tasksList) {
+                tasksList.innerHTML = renderTasks(tasks, noteId);
+                enableDragAndDrop(noteId);
+            }
+
+            markTaskListAsModified(noteId);
+        }
+    }
+}
+
 // Mark note as modified (to trigger save)
 function markTaskListAsModified(noteId) {
     const noteEntry = document.getElementById('entry' + noteId);
