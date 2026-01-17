@@ -145,15 +145,7 @@ $displayName = htmlspecialchars($currentUser['display_name'] ?: $currentUser['us
                 </div>
 
                 <?php // Profile and admin links - always available ?>
-                <!-- My Profile -->
-                <div class="settings-card settings-card-clickable" id="profile-card" data-href="profile.php">
-                    <div class="settings-card-icon">
-                        <i class="fa-user-circle"></i>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3><?php echo $displayName; ?></h3>
-                    </div>
-                </div>
+                
 
                 <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
                 <!-- User Management (Admin only) -->

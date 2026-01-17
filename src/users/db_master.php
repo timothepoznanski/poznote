@@ -58,9 +58,7 @@ function initializeMasterDatabase(PDO $con): void {
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
-            display_name TEXT,
-            color TEXT DEFAULT '#007DB8',
-            icon TEXT DEFAULT 'user',
+
             active INTEGER DEFAULT 1,
             is_admin INTEGER DEFAULT 0,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -92,10 +90,10 @@ function createDefaultUserIfNeeded(PDO $con): void {
     $stmt = $con->query("SELECT COUNT(*) FROM users");
     if ($stmt->fetchColumn() == 0) {
         $stmt = $con->prepare("
-            INSERT INTO users (username, display_name, is_admin, active)
-            VALUES (?, ?, 1, 1)
+            INSERT INTO users (username, is_admin, active)
+            VALUES (?, 1, 1)
         ");
-        $stmt->execute(['Admin', 'Administrateur']);
+        $stmt->execute(['admin']);
     }
 }
 
@@ -106,7 +104,7 @@ function getAllUserProfiles(): array {
     try {
         $con = getMasterConnection();
         $stmt = $con->query("
-            SELECT id, username, display_name, color, icon, is_admin 
+            SELECT id, username, is_admin 
             FROM users 
             WHERE active = 1 
             ORDER BY username
@@ -164,7 +162,8 @@ function updateUserLastLogin(int $userId): void {
 /**
  * Create a new user profile
  */
-function createUserProfile(string $username, ?string $displayName = null, ?string $color = null, ?string $icon = null): array {
+
+function createUserProfile(string $username): array {
     try {
         $con = getMasterConnection();
         
@@ -176,14 +175,11 @@ function createUserProfile(string $username, ?string $displayName = null, ?strin
         }
         
         $stmt = $con->prepare("
-            INSERT INTO users (username, display_name, color, icon, active)
-            VALUES (?, ?, ?, ?, 1)
+            INSERT INTO users (username, active)
+            VALUES (?, 1)
         ");
         $stmt->execute([
-            $username,
-            $displayName ?: $username,
-            $color ?: '#007DB8',
-            $icon ?: 'user'
+            $username
         ]);
         
         return ['success' => true, 'user_id' => $con->lastInsertId()];
@@ -199,7 +195,7 @@ function updateUserProfile(int $id, array $data): array {
     try {
         $con = getMasterConnection();
         
-        $allowedFields = ['username', 'display_name', 'color', 'icon', 'active', 'is_admin'];
+        $allowedFields = ['username', 'active', 'is_admin'];
         $updates = [];
         $params = [];
         
@@ -269,7 +265,7 @@ function listAllUserProfiles(): array {
     try {
         $con = getMasterConnection();
         $stmt = $con->query("
-            SELECT id, username, display_name, color, icon, is_admin, active, created_at, last_login
+            SELECT id, username, is_admin, active, created_at, last_login
             FROM users 
             ORDER BY username
         ");

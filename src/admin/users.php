@@ -20,7 +20,8 @@ if (!isCurrentUserAdmin()) {
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../functions.php';
 require_once __DIR__ . '/../users/db_master.php';
-require_once __DIR__ . '/../users/UserDataManager.php';
+
+
 require_once __DIR__ . '/../version_helper.php';
 
 $currentLang = getUserLanguage();
@@ -34,56 +35,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     switch ($action) {
         case 'create':
             $username = trim($_POST['username'] ?? '');
-            $displayName = trim($_POST['display_name'] ?? '');
-            $color = trim($_POST['color'] ?? '#007DB8');
-            $icon = trim($_POST['icon'] ?? 'user');
             
             if (empty($username)) {
                 $error = t('multiuser.admin.errors.username_required', [], 'Username is required');
                 break;
             }
             
-            $result = createUserProfile($username, $displayName ?: null, $color, $icon);
+            $result = createUserProfile($username);
             
             if ($result['success']) {
-                $message = t('multiuser.admin.user_created', [], 'User profile created successfully');
+                // Succès, on ne met pas de message
             } else {
                 $error = $result['error'];
             }
             break;
             
-        case 'update':
-            $userId = (int)($_POST['user_id'] ?? 0);
-            $data = [];
-            
-            if (isset($_POST['display_name'])) {
-                $data['display_name'] = trim($_POST['display_name']);
-            }
-            if (isset($_POST['color'])) {
-                $data['color'] = trim($_POST['color']);
-            }
-            if (isset($_POST['icon'])) {
-                $data['icon'] = trim($_POST['icon']);
-            }
-            if (isset($_POST['is_admin'])) {
-                $data['is_admin'] = $_POST['is_admin'] === '1' ? 1 : 0;
-            }
-            if (isset($_POST['active'])) {
-                $data['active'] = $_POST['active'] === '1' ? 1 : 0;
-            }
-            
-            $result = updateUserProfile($userId, $data);
-            
-            if ($result['success']) {
-                $message = t('multiuser.admin.user_updated', [], 'User profile updated successfully');
-            } else {
-                $error = $result['error'];
-            }
-            break;
+
             
         case 'delete':
             $userId = (int)($_POST['user_id'] ?? 0);
-            $deleteData = isset($_POST['delete_data']) && $_POST['delete_data'] === '1';
+            $deleteData = true; // Always delete data when deleting a user now
             
             // Cannot delete yourself
             if ($userId === getCurrentUserId()) {
@@ -94,9 +65,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result = deleteUserProfile($userId, $deleteData);
             
             if ($result['success']) {
-                $message = t('multiuser.admin.user_deleted', [], 'User profile deleted successfully');
+                // Success, no message
             } else {
                 $error = $result['error'];
+            }
+            break;
+        case 'toggle_status':
+            $userId = (int)($_POST['user_id'] ?? 0);
+            $field = $_POST['field'] ?? '';
+            $value = $_POST['value'] ?? 0;
+            
+            // Cannot modify yourself for some fields
+            if ($userId === getCurrentUserId() && ($field === 'is_admin' || $field === 'active')) {
+                $error = t('multiuser.admin.errors.cannot_change_self', [], 'You cannot change your own status/role');
+                break;
+            }
+            
+            $data = [];
+            if ($field === 'is_admin' || $field === 'active') {
+                $data[$field] = (int)$value;
+                $result = updateUserProfile($userId, $data);
+                
+                if ($result['success']) {
+                    // Success, no message
+                } else {
+                    $error = $result['error'];
+                }
             }
             break;
     }
@@ -104,23 +98,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Get list of user profiles
 $users = listAllUserProfiles();
-
-// Add storage info for each user
-foreach ($users as &$user) {
-    $dataManager = new UserDataManager($user['id']);
-    $stats = $dataManager->getStorageStats();
-    $user['storage'] = $stats;
-    $user['notes_count'] = $dataManager->getNotesCount();
-}
-unset($user);
-
-// Common icons for user avatars
-$availableIcons = [
-    'user', 'user-circle', 'user-astronaut', 'user-ninja', 'user-tie',
-    'smile', 'star', 'heart', 'sun', 'moon',
-    'coffee', 'book', 'laptop', 'code', 'paint-brush',
-    'music', 'camera', 'gamepad', 'rocket', 'leaf'
-];
 
 ?>
 <?php 
@@ -219,16 +196,7 @@ $v = getAppVersion();
         .users-table tr:hover {
             background: var(--bg-hover, #f5f5f5);
         }
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.2rem;
-        }
+
         .user-info {
             display: flex;
             align-items: center;
@@ -317,7 +285,7 @@ $v = getAppVersion();
             font-weight: 500;
             color: var(--text-color, #333);
         }
-        .form-group input,
+        .form-group input:not([type="checkbox"]),
         .form-group select {
             width: 100%;
             padding: 10px 12px;
@@ -327,7 +295,7 @@ $v = getAppVersion();
             background: var(--bg-color, #fff);
             color: var(--text-color, #333);
         }
-        .form-group input:focus,
+        .form-group input:not([type="checkbox"]):focus,
         .form-group select:focus {
             outline: none;
             border-color: #007DB8;
@@ -339,48 +307,7 @@ $v = getAppVersion();
             justify-content: flex-end;
             margin-top: 20px;
         }
-        .color-picker {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .color-option {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: transform 0.2s;
-        }
-        .color-option:hover {
-            transform: scale(1.1);
-        }
-        .color-option.selected {
-            border-color: #333;
-        }
-        .icon-picker {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .icon-option {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--border-color, #ddd);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .icon-option:hover {
-            background: var(--bg-hover, #f5f5f5);
-        }
-        .icon-option.selected {
-            border-color: #007DB8;
-            background: rgba(0, 125, 184, 0.1);
-        }
+
         .back-link {
             display: inline-flex;
             align-items: center;
@@ -392,27 +319,123 @@ $v = getAppVersion();
         .back-link:hover {
             text-decoration: underline;
         }
-        .storage-info {
-            font-size: 0.85em;
-            color: var(--text-muted, #666);
+
+
+        .clickable-badge {
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .clickable-badge:hover {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 36px;
+            height: 20px;
+        }
+        .toggle-switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #007DB8;
+        }
+        input:checked + .slider:before {
+            transform: translateX(16px);
+        }
+        /* Admin specific color */
+        input.admin-toggle:checked + .slider {
+            background-color: #ffc107;
+        }
+        
+        /* Disabled toggle styling */
+        .toggle-switch.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .toggle-switch.disabled .slider {
+            cursor: not-allowed;
+        }
+        input:disabled + .slider {
+            background-color: #ccc;
+        }
+        input.admin-toggle:disabled:checked + .slider {
+            background-color: #ffc107;
         }
     </style>
+    <script>
+    function toggleUserStatus(userId, field, newValue) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.style.display = 'none';
+        
+        const actionInput = document.createElement('input');
+        actionInput.name = 'action';
+        actionInput.value = 'toggle_status';
+        form.appendChild(actionInput);
+        
+        const idInput = document.createElement('input');
+        idInput.name = 'user_id';
+        idInput.value = userId;
+        form.appendChild(idInput);
+        
+        const fieldInput = document.createElement('input');
+        fieldInput.name = 'field';
+        fieldInput.value = field;
+        form.appendChild(fieldInput);
+        
+        const valueInput = document.createElement('input');
+        valueInput.name = 'value';
+        valueInput.value = newValue;
+        form.appendChild(valueInput);
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+    </script>
 </head>
 <body>
     <div class="admin-container">
-        <a href="../settings.php" class="back-link">
-            <i class="fas fa-arrow-left"></i>
-            <?php echo t_h('common.back_to_settings', [], 'Back to Settings'); ?>
+        <a id="backToNotesLink" href="../index.php" class="btn btn-secondary" style="margin-right: 10px;">
+            <?php echo t_h('common.back_to_notes'); ?>
         </a>
+        <a href="../settings.php" class="btn btn-secondary">
+            <?php echo t_h('common.back_to_settings'); ?>
+        </a>
+        <br><br>
         
         <div class="admin-header">
             <div>
                 <h1 class="admin-title"><?php echo t_h('multiuser.admin.title', [], 'User Management'); ?></h1>
-                <p class="admin-subtitle"><?php echo t_h('multiuser.admin.subtitle', [], 'Manage user profiles and their data spaces'); ?></p>
+                <button class="btn btn-primary" onclick="openCreateModal()" style="margin-top: 10px;">
+                    <i class="fas fa-plus"></i> <?php echo t_h('multiuser.admin.create_user', [], 'Create Profile'); ?>
+                </button>
             </div>
-            <button class="btn btn-primary" onclick="openCreateModal()">
-                <i class="fas fa-plus"></i> <?php echo t_h('multiuser.admin.create_user', [], 'Create Profile'); ?>
-            </button>
         </div>
         
         <?php if ($message): ?>
@@ -427,12 +450,11 @@ $v = getAppVersion();
             <thead>
                 <tr>
                     <th><?php echo t_h('multiuser.admin.username', [], 'User'); ?></th>
-                    <th><?php echo t_h('multiuser.admin.role', [], 'Role'); ?></th>
-                    <th><?php echo t_h('multiuser.admin.status', [], 'Status'); ?></th>
-                    <th><?php echo t_h('multiuser.admin.notes_count', [], 'Notes'); ?></th>
-                    <th><?php echo t_h('multiuser.admin.storage', [], 'Storage'); ?></th>
-                    <th><?php echo t_h('multiuser.admin.last_login', [], 'Last Login'); ?></th>
-                    <th><?php echo t_h('multiuser.admin.actions', [], 'Actions'); ?></th>
+                    <th style="text-align: center;"><?php echo t_h('multiuser.admin.administrator', [], 'Administrator'); ?></th>
+                    <th style="text-align: center;"><?php echo t_h('multiuser.admin.status', [], 'Status'); ?></th>
+
+
+                    <th style="text-align: center;"><?php echo t_h('multiuser.admin.actions', [], 'Actions'); ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -440,45 +462,51 @@ $v = getAppVersion();
                     <tr>
                         <td>
                             <div class="user-info">
-                                <div class="user-avatar" style="background: <?php echo htmlspecialchars($user['color'] ?? '#007DB8'); ?>">
-                                    <i class="fas fa-<?php echo htmlspecialchars($user['icon'] ?? 'user'); ?>"></i>
-                                </div>
-                                <div>
-                                    <div class="user-name"><?php echo htmlspecialchars($user['display_name'] ?: $user['username']); ?></div>
-                                    <div class="user-username">@<?php echo htmlspecialchars($user['username']); ?></div>
-                                </div>
+                                <div class="user-username"><?php echo htmlspecialchars($user['username']); ?></div>
                             </div>
                         </td>
-                        <td>
-                            <?php if ($user['is_admin']): ?>
-                                <span class="badge badge-admin"><?php echo t_h('multiuser.admin.role_admin', [], 'Admin'); ?></span>
+
+                        <td style="text-align: center;">
+                            <?php if ($user['id'] === getCurrentUserId()): ?>
+                                <label class="toggle-switch disabled" title="<?php echo t_h('multiuser.admin.errors.cannot_change_self', [], 'You cannot change your own status/role'); ?>">
+                                    <input type="checkbox" class="admin-toggle" 
+                                           <?php echo $user['is_admin'] ? 'checked' : ''; ?> disabled>
+                                    <span class="slider"></span>
+                                </label>
                             <?php else: ?>
-                                <span class="badge"><?php echo t_h('multiuser.admin.role_user', [], 'User'); ?></span>
+                                <label class="toggle-switch" title="<?php echo t_h('multiuser.admin.toggle_admin', [], 'Toggle Admin Role'); ?>">
+                                    <input type="checkbox" class="admin-toggle" 
+                                           <?php echo $user['is_admin'] ? 'checked' : ''; ?>
+                                           onchange="toggleUserStatus(<?php echo $user['id']; ?>, 'is_admin', this.checked ? 1 : 0)">
+                                    <span class="slider"></span>
+                                </label>
                             <?php endif; ?>
                         </td>
-                        <td>
-                            <?php if ($user['active']): ?>
+                        <td style="text-align: center;">
+
+                            <?php if ($user['id'] === getCurrentUserId()): ?>
                                 <span class="badge badge-active"><?php echo t_h('multiuser.admin.active', [], 'Active'); ?></span>
                             <?php else: ?>
-                                <span class="badge badge-inactive"><?php echo t_h('multiuser.admin.inactive', [], 'Inactive'); ?></span>
+                                <?php if ($user['active']): ?>
+                                    <span class="badge badge-active clickable-badge" 
+                                          title="<?php echo t_h('multiuser.admin.click_to_deactivate', [], 'Click to deactivate'); ?>"
+                                          onclick="toggleUserStatus(<?php echo $user['id']; ?>, 'active', 0)">
+                                        <?php echo t_h('multiuser.admin.active', [], 'Active'); ?>
+                                    </span>
+                                <?php else: ?>
+                                    <span class="badge badge-inactive clickable-badge" 
+                                          title="<?php echo t_h('multiuser.admin.click_to_activate', [], 'Click to activate'); ?>"
+                                          onclick="toggleUserStatus(<?php echo $user['id']; ?>, 'active', 1)">
+                                        <?php echo t_h('multiuser.admin.inactive', [], 'Inactive'); ?>
+                                    </span>
+                                <?php endif; ?>
                             <?php endif; ?>
                         </td>
-                        <td><?php echo $user['notes_count']; ?></td>
-                        <td class="storage-info">
-                            <?php echo formatBytes($user['storage']['total'] ?? 0); ?>
-                        </td>
-                        <td>
-                            <?php if ($user['last_login']): ?>
-                                <?php echo date('Y-m-d H:i', strtotime($user['last_login'])); ?>
-                            <?php else: ?>
-                                <span style="color: var(--text-muted);">-</span>
-                            <?php endif; ?>
-                        </td>
-                        <td>
-                            <div class="actions">
-                                <button class="btn btn-secondary btn-small" onclick="openEditModal(<?php echo htmlspecialchars(json_encode($user)); ?>)">
-                                    <i class="fas fa-edit"></i>
-                                </button>
+
+
+                        <td style="text-align: center;">
+                            <div class="actions" style="justify-content: center;">
+
                                 <?php if ($user['id'] !== getCurrentUserId()): ?>
                                     <button class="btn btn-danger btn-small" onclick="openDeleteModal(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>')">
                                         <i class="fas fa-trash"></i>
@@ -504,34 +532,7 @@ $v = getAppVersion();
                     <input type="text" id="create_username" name="username" required>
                 </div>
                 
-                <div class="form-group">
-                    <label for="create_display_name"><?php echo t_h('multiuser.admin.display_name', [], 'Display Name'); ?></label>
-                    <input type="text" id="create_display_name" name="display_name">
-                </div>
-                
-                <div class="form-group">
-                    <label>Color</label>
-                    <div class="color-picker">
-                        <?php
-                        $colors = ['#007DB8', '#28a745', '#dc3545', '#ffc107', '#6f42c1', '#20c997', '#fd7e14', '#6c757d', '#17a2b8', '#e83e8c'];
-                        foreach ($colors as $color): ?>
-                            <div class="color-option" style="background: <?php echo $color; ?>" data-color="<?php echo $color; ?>" onclick="selectColor(this, 'create')"></div>
-                        <?php endforeach; ?>
-                    </div>
-                    <input type="hidden" id="create_color" name="color" value="#007DB8">
-                </div>
-                
-                <div class="form-group">
-                    <label>Icon</label>
-                    <div class="icon-picker">
-                        <?php foreach ($availableIcons as $icon): ?>
-                            <div class="icon-option <?php echo $icon === 'user' ? 'selected' : ''; ?>" data-icon="<?php echo $icon; ?>" onclick="selectIcon(this, 'create')">
-                                <i class="fas fa-<?php echo $icon; ?>"></i>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <input type="hidden" id="create_icon" name="icon" value="user">
-                </div>
+
                 
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('createModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
@@ -541,62 +542,7 @@ $v = getAppVersion();
         </div>
     </div>
     
-    <!-- Edit User Modal -->
-    <div class="modal" id="editModal">
-        <div class="modal-content">
-            <h2 class="modal-title"><?php echo t_h('multiuser.admin.edit_user', [], 'Edit User Profile'); ?></h2>
-            <form method="POST">
-                <input type="hidden" name="action" value="update">
-                <input type="hidden" name="user_id" id="edit_user_id">
-                
-                <div class="form-group">
-                    <label for="edit_display_name"><?php echo t_h('multiuser.admin.display_name', [], 'Display Name'); ?></label>
-                    <input type="text" id="edit_display_name" name="display_name">
-                </div>
-                
-                <div class="form-group">
-                    <label>Color</label>
-                    <div class="color-picker" id="edit_color_picker">
-                        <?php foreach ($colors as $color): ?>
-                            <div class="color-option" style="background: <?php echo $color; ?>" data-color="<?php echo $color; ?>" onclick="selectColor(this, 'edit')"></div>
-                        <?php endforeach; ?>
-                    </div>
-                    <input type="hidden" id="edit_color" name="color">
-                </div>
-                
-                <div class="form-group">
-                    <label>Icon</label>
-                    <div class="icon-picker" id="edit_icon_picker">
-                        <?php foreach ($availableIcons as $icon): ?>
-                            <div class="icon-option" data-icon="<?php echo $icon; ?>" onclick="selectIcon(this, 'edit')">
-                                <i class="fas fa-<?php echo $icon; ?>"></i>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <input type="hidden" id="edit_icon" name="icon">
-                </div>
-                
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="edit_is_admin" name="is_admin" value="1">
-                        <?php echo t_h('multiuser.admin.role_admin', [], 'Administrator'); ?>
-                    </label>
-                </div>
-                
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="edit_active" name="active" value="1">
-                        <?php echo t_h('multiuser.admin.active', [], 'Active'); ?>
-                    </label>
-                </div>
-                
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('editModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
-                    <button type="submit" class="btn btn-primary"><?php echo t_h('common.save', [], 'Save'); ?></button>
-                </div>
-            </form>
-        </div>
-    </div>
+
     
     <!-- Delete Confirmation Modal -->
     <div class="modal" id="deleteModal">
@@ -607,12 +553,10 @@ $v = getAppVersion();
                 <input type="hidden" name="action" value="delete">
                 <input type="hidden" name="user_id" id="delete_user_id">
                 
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" name="delete_data" value="1">
-                        <?php echo t_h('multiuser.admin.confirm_delete_data', [], 'Also delete all user data (notes, attachments, etc.)'); ?>
-                    </label>
-                </div>
+                <p style="color: #dc3545; font-weight: 500; margin-top: 15px;">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    <?php echo t_h('multiuser.admin.delete_warning_all_data', [], 'All user data (notes, attachments, etc.) will be permanently deleted.'); ?>
+                </p>
                 
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('deleteModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
@@ -627,32 +571,12 @@ $v = getAppVersion();
             document.getElementById('createModal').classList.add('active');
         }
         
-        function openEditModal(user) {
-            document.getElementById('edit_user_id').value = user.id;
-            document.getElementById('edit_display_name').value = user.display_name || '';
-            document.getElementById('edit_color').value = user.color || '#007DB8';
-            document.getElementById('edit_icon').value = user.icon || 'user';
-            document.getElementById('edit_is_admin').checked = user.is_admin == 1;
-            document.getElementById('edit_active').checked = user.active == 1;
-            
-            // Select color
-            document.querySelectorAll('#edit_color_picker .color-option').forEach(el => {
-                el.classList.toggle('selected', el.dataset.color === user.color);
-            });
-            
-            // Select icon
-            document.querySelectorAll('#edit_icon_picker .icon-option').forEach(el => {
-                el.classList.toggle('selected', el.dataset.icon === user.icon);
-            });
-            
-            document.getElementById('editModal').classList.add('active');
-        }
+
         
         function openDeleteModal(userId, username) {
             document.getElementById('delete_user_id').value = userId;
-            document.getElementById('delete_message').textContent = 
-                '<?php echo t_h('multiuser.admin.confirm_delete', ['username' => ''], 'Are you sure you want to delete user'); ?>' + 
-                ' "' + username + '"?';
+            const messageTemplate = <?php echo json_encode(t('multiuser.admin.confirm_delete', ['username' => 'NAME_HOLDER'], 'Are you sure you want to delete user "NAME_HOLDER"?')); ?>;
+            document.getElementById('delete_message').textContent = messageTemplate.replace('NAME_HOLDER', username);
             document.getElementById('deleteModal').classList.add('active');
         }
         
@@ -660,21 +584,7 @@ $v = getAppVersion();
             document.getElementById(modalId).classList.remove('active');
         }
         
-        function selectColor(element, prefix) {
-            element.parentElement.querySelectorAll('.color-option').forEach(el => {
-                el.classList.remove('selected');
-            });
-            element.classList.add('selected');
-            document.getElementById(prefix + '_color').value = element.dataset.color;
-        }
-        
-        function selectIcon(element, prefix) {
-            element.parentElement.querySelectorAll('.icon-option').forEach(el => {
-                el.classList.remove('selected');
-            });
-            element.classList.add('selected');
-            document.getElementById(prefix + '_icon').value = element.dataset.icon;
-        }
+
         
         // Close modal on outside click
         document.querySelectorAll('.modal').forEach(modal => {
@@ -697,13 +607,5 @@ $v = getAppVersion();
 </body>
 </html>
 
-<?php
-function formatBytes($bytes, $precision = 2) {
-    $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-    $bytes = max($bytes, 0);
-    $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-    $pow = min($pow, count($units) - 1);
-    $bytes /= pow(1024, $pow);
-    return round($bytes, $precision) . ' ' . $units[$pow];
-}
-?>
+
+

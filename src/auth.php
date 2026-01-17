@@ -126,7 +126,7 @@ function authenticate($username, $password, $rememberMe = false, $userId = null)
                 $userId = $profiles[0]['id'];
             } else {
                 // No profiles exist, create a default one
-                $result = createUserProfile('Admin', 'Administrateur');
+                $result = createUserProfile('admin');
                 if ($result['success']) {
                     $userId = $result['user_id'];
                 }
