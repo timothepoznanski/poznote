@@ -437,7 +437,11 @@
     "confirm_clear_completed": "¿Eliminar {{count}} tarea(s) completada(s)?",
     "move_to_list": "Mover a otra lista",
     "move_success": "Tarea movida",
-    "move_error": "No se pudo mover la tarea"
+    "move_error": "No se pudo mover la tarea",
+    "actions": "Acciones de lista de tareas",
+    "uncheck_all": "Desmarcar todas las tareas",
+    "no_checked_tasks": "No hay tareas marcadas para desmarcar.",
+    "confirm_uncheck_all": "¿Desmarcar {{count}} tarea(s)?"
   },
   "tags": {
     "add_single": "Agregar etiqueta...",
@@ -1357,6 +1361,10 @@
     "change_password_title": "Cambiar contraseña",
     "password_remove_hint": "Dejar vacío para eliminar la protección con contraseña.",
     "enter_new_password": "Ingrese una nueva contraseña"
+  },
+  "public_folder": {
+    "filter_placeholder": "Buscar notas",
+    "no_filter_results": "Sin resultados."
   },
   "icon_names": {
     "briefcase": "maletín",

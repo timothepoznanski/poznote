@@ -437,7 +437,11 @@
     "confirm_clear_completed": "{{count}} erledigte Aufgabe(n) löschen?",
     "move_to_list": "In eine andere Liste verschieben",
     "move_success": "Aufgabe verschoben",
-    "move_error": "Aufgabe konnte nicht verschoben werden"
+    "move_error": "Aufgabe konnte nicht verschoben werden",
+    "actions": "Aufgabenlisten-Aktionen",
+    "uncheck_all": "Alle Aufgaben abwählen",
+    "no_checked_tasks": "Keine ausgewählten Aufgaben zum Abwählen.",
+    "confirm_uncheck_all": "{{count}} Aufgabe(n) abwählen?"
   },
   "tags": {
     "add_single": "Tag hinzufügen...",
@@ -1357,6 +1361,10 @@
     "change_password_title": "Passwort ändern",
     "password_remove_hint": "Leer lassen, um den Passwortschutz zu entfernen.",
     "enter_new_password": "Neues Passwort eingeben"
+  },
+  "public_folder": {
+    "filter_placeholder": "Notizen suchen",
+    "no_filter_results": "Keine Ergebnisse."
   },
   "icon_names": {
     "briefcase": "Aktentasche",

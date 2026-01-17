@@ -436,7 +436,11 @@
     "insert_order_bottom": "Bottom",
     "clear_completed": "Clear completed tasks",
     "no_completed_tasks": "No completed tasks to clear.",
-    "confirm_clear_completed": "Delete {{count}} completed task(s)?"
+    "confirm_clear_completed": "Delete {{count}} completed task(s)?",
+    "actions": "Task list actions",
+    "uncheck_all": "Uncheck all tasks",
+    "no_checked_tasks": "No checked tasks to uncheck.",
+    "confirm_uncheck_all": "Uncheck {{count}} task(s)?"
   },
   "tags": {
     "add_single": "Add tag...",
@@ -1358,6 +1362,10 @@
     "change_password_title": "Change password",
     "password_remove_hint": "Leave empty to remove password protection.",
     "enter_new_password": "Enter new password"
+  },
+  "public_folder": {
+    "filter_placeholder": "Search notes",
+    "no_filter_results": "No results."
   },
   "icon_names": {
     "briefcase": "briefcase",

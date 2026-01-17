@@ -1,10 +1,10 @@
-# Poznote MCP Server (HTTP only)
-
-> **Note:** This MCP server is intended to be used with VS Code Copilot MCP. For advanced options, see the official VS Code MCP documentation: https://code.visualstudio.com/docs/copilot/customization/mcp-servers
+# Poznote MCP Server
 
 MCP (Model Context Protocol) server for Poznote — enables AI-powered note management through natural language.
 
 This server supports **HTTP transport only** (MCP *streamable-http*).
+
+> **Note:** This MCP server is intended to be used with VS Code Copilot MCP. For advanced options, see the official VS Code MCP documentation: https://code.visualstudio.com/docs/copilot/customization/mcp-servers
 
 ## How It Works
 
@@ -75,6 +75,7 @@ Choose a way to run the MCP Server:
 
 <details>
 <summary><strong>Run (HTTP / streamable-http)</strong></summary>
+<br>
 
 Activate the venv:
 
@@ -104,12 +105,12 @@ Endpoint: `http://YOUR_SERVER_HOSTNAME_OR_IP:POZNOTE_MCP_SERVER_PORT/mcp`
 
 <details>
 <summary><strong>Run with systemd</strong></summary>
+<br>
 
 1) Create an environment file (example: `/etc/poznote-mcp.env`):
 
 ```bash
-sudo install -m 600 -o root -g root /dev/null /etc/poznote-mcp.env
-sudoedit /etc/poznote-mcp.env
+vim /etc/poznote-mcp.env
 ```
 
 Content:
@@ -156,13 +157,14 @@ sudo systemctl status poznote-mcp
 <details>
 <summary><strong>Run with user systemd</strong></summary>
 
+<br>
+
 This mode installs the unit for a single Linux user (no `sudo` for `systemctl`).
 
 1) Create an environment file (example: `~/.config/poznote-mcp.env`):
 
 ```bash
-install -m 600 /dev/null ~/.config/poznote-mcp.env
-$EDITOR ~/.config/poznote-mcp.env
+vim ~/.config/poznote-mcp.env
 ```
 
 Content:
@@ -243,7 +245,7 @@ Example:
 
 ## Example prompts
 
-- List all notes in workspace 'Personal'
+- List all notes in workspace 'Poznote' of my Poznote instance
 - Search for notes about 'MCP'
 - Create a markdown note type titled 'Birds' about birds
 - Update note 100041 with new content

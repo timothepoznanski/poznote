@@ -1186,6 +1186,11 @@ body.sidebar-collapsed .toggle-sidebar-btn i {
     display: none;
 }
 
+.tasklist-actions-dropdown {
+    position: relative;
+    display: inline-flex;
+}
+
 .dropdown-menu {
     position: absolute;
     top: 100%;
@@ -1209,6 +1214,21 @@ body.sidebar-collapsed .toggle-sidebar-btn i {
     border-bottom: 1px solid #f0f0f0;
     transition: background-color 0.2s;
     font-style: normal;
+}
+
+.dropdown-menu button.dropdown-item {
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+    font-weight: inherit;
+    box-shadow: none;
+    outline: none;
+}
+
+.dropdown-menu button.dropdown-item:focus {
+    outline: none;
 }
 
 .dropdown-item:last-child {
@@ -1931,7 +1951,7 @@ a[data-image-link] {
 /* Editable tags styling */
 .editable-tags-container {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 6px;
     align-items: center;
     min-height: 24px;
@@ -1939,7 +1959,17 @@ a[data-image-link] {
     border-radius: 4px;
     padding: 4px;
     transition: border-color 0.2s ease;
-    overflow: visible;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+}
+
+.editable-tags-container::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
 }
 
 .clickable-tag-wrapper {
@@ -1949,6 +1979,7 @@ a[data-image-link] {
     border: 1px solid #e2e8f0;
     border-radius: 12px;
     transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
 .clickable-tag-wrapper:hover {
@@ -3910,6 +3941,8 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-arrows-h,
 .fa-sort,
 .fa-file-import,
+.fa-check-square,
+.fa-square,
 .fa-broom,
 .fa-moon,
 .fa-briefcase,
@@ -5162,13 +5195,13 @@ a.links_arbo_left.dragging,
    for better readability on wide screens
    ============================================ */
 body.center-note-content #right_col .innernote {
-    max-width: 900px;
+    max-width: 800px;
     margin-left: auto;
     margin-right: auto;
 }
 
 body.center-note-content #right_col .note-header {
-    max-width: 900px;
+    max-width: 800px;
     margin-left: auto;
     margin-right: auto;
 }

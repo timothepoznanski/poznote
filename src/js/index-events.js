@@ -30,6 +30,40 @@
         }
     }
 
+    function closeTasklistActionsMenus() {
+        const openMenus = document.querySelectorAll('.tasklist-actions-menu:not([hidden])');
+        openMenus.forEach(menu => {
+            menu.hidden = true;
+            const btn = menu.parentElement?.querySelector('[data-action="toggle-tasklist-actions"]');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+        });
+    }
+
+    function toggleTasklistActionsMenu(noteId, triggerEl) {
+        if (!noteId) return;
+
+        const menu = document.getElementById(`tasklist-actions-menu-${noteId}`);
+        if (!menu) return;
+
+        const isHidden = menu.hasAttribute('hidden');
+        closeTasklistActionsMenus();
+
+        if (isHidden) {
+            menu.hidden = false;
+            if (triggerEl) triggerEl.setAttribute('aria-expanded', 'true');
+
+            setTimeout(() => {
+                document.addEventListener('click', function closeMenu(e) {
+                    if (!menu.contains(e.target) && !(triggerEl && triggerEl.contains(e.target))) {
+                        menu.hidden = true;
+                        if (triggerEl) triggerEl.setAttribute('aria-expanded', 'false');
+                        document.removeEventListener('click', closeMenu);
+                    }
+                });
+            }, 0);
+        }
+    }
+
     /**
      * Handle click events using event delegation
      * @param {Event} e - Click event
@@ -165,6 +199,16 @@
                 if (noteId && typeof clearCompletedTasks === 'function') {
                     clearCompletedTasks(noteId);
                 }
+                closeTasklistActionsMenus();
+                break;
+            case 'uncheck-all-tasks':
+                if (noteId && typeof uncheckAllTasks === 'function') {
+                    uncheckAllTasks(noteId);
+                }
+                closeTasklistActionsMenus();
+                break;
+            case 'toggle-tasklist-actions':
+                toggleTasklistActionsMenu(noteId, target);
                 break;
 
             // Note actions with noteId

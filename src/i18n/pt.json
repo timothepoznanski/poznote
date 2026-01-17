@@ -436,7 +436,11 @@
     "confirm_clear_completed": "Excluir {{count}} tarefa(s) concluída(s)?",
     "move_to_list": "Mover para outra lista",
     "move_success": "Tarefa movida",
-    "move_error": "Não foi possível mover a tarefa"
+    "move_error": "Não foi possível mover a tarefa",
+    "actions": "Ações da lista de tarefas",
+    "uncheck_all": "Desmarcar todas as tarefas",
+    "no_checked_tasks": "Nenhuma tarefa marcada para desmarcar.",
+    "confirm_uncheck_all": "Desmarcar {{count}} tarefa(s)?"
   },
   "tags": {
     "add_single": "Adicionar etiqueta...",
@@ -1361,6 +1365,10 @@
     "change_password_title": "Alterar senha",
     "password_remove_hint": "Deixe vazio para remover a proteção por senha.",
     "enter_new_password": "Digite uma nova senha"
+  },
+  "public_folder": {
+    "filter_placeholder": "Pesquisar notas",
+    "no_filter_results": "Nenhum resultado."
   },
   "icon_names": {
     "briefcase": "maleta",

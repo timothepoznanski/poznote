@@ -439,7 +439,11 @@
     "confirm_clear_completed": "Supprimer {{count}} tâche(s) terminée(s) ?",
     "move_to_list": "Déplacer vers une autre liste",
     "move_success": "Tâche déplacée",
-    "move_error": "Impossible de déplacer la tâche"
+    "move_error": "Impossible de déplacer la tâche",
+    "actions": "Actions de liste de tâches",
+    "uncheck_all": "Décocher toutes les tâches",
+    "no_checked_tasks": "Aucune tâche cochée à décocher.",
+    "confirm_uncheck_all": "Décocher {{count}} tâche(s) ?"
   },
   "tags": {
     "add_single": "Ajouter un tag...",
@@ -1368,6 +1372,10 @@
     "change_password_title": "Modifier le mot de passe",
     "password_remove_hint": "Laissez vide pour supprimer la protection par mot de passe.",
     "enter_new_password": "Entrez un nouveau mot de passe"
+  },
+  "public_folder": {
+    "filter_placeholder": "Rechercher des notes",
+    "no_filter_results": "Aucun résultat."
   },
   "icon_names": {
     "briefcase": "mallette",
