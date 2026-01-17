@@ -20,6 +20,10 @@ Poznote is a lightweight, open-source personal note-taking and documentation pla
   <img src="images/github.png" alt="Poznote" width="100%">
 </p>
 
+<p align="center">
+  <img src="images/poznote.png" alt="Poznote" width="100%">
+</p>
+
 ## Features
 
 Discover all the [powerful features](https://poznote.com/index.html#features) that make Poznote your perfect note-taking companion!
