@@ -75,6 +75,7 @@ Choose a way to run the MCP Server:
 
 <details>
 <summary><strong>Run (HTTP / streamable-http)</strong></summary>
+<br>
 
 Activate the venv:
 
