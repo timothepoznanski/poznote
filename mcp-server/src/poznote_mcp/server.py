@@ -295,17 +295,17 @@ def search_notes(query: str, workspace: Optional[str] = None, limit: int = 10) -
 def create_note(
     title: str,
     content: str,
-    workspace: Optional[str] = None,
+    workspace: str = "Poznote",
     tags: Optional[str] = None,
     folder: Optional[str] = None,
-    note_type: Optional[str] = None,
+    note_type: str = "note",
 ) -> str:
     """Create a new note in Poznote
     
     Args:
         title: Title of the new note
         content: Content of the note (HTML or Markdown)
-        workspace: Workspace name (optional, uses default workspace if not specified)
+        workspace: Workspace name (optional, default: 'Poznote')
         tags: Comma-separated tags (e.g., 'ai, docs, important')
         folder: Folder name to place the note in
         note_type: Note type/format. Supported: 'note' (HTML, default), 'markdown'.
@@ -315,8 +315,11 @@ def create_note(
         return err
 
     # Normalize note_type for convenience (allow 'html' as an alias of 'note')
-    if note_type is not None:
-        note_type = note_type.strip().lower()
+    # If note_type is missing/empty, default to HTML (note).
+    if note_type is None or not str(note_type).strip():
+        note_type = "note"
+    else:
+        note_type = str(note_type).strip().lower()
         if note_type == "html":
             note_type = "note"
         if note_type not in {"note", "markdown", "excalidraw"}:

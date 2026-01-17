@@ -3,7 +3,7 @@
 
 > **Note:** The Poznote MCP server has mainly been tested with Visual Studio Code. For more details and advanced customization options, see the official VS Code MCP documentation: [https://code.visualstudio.com/docs/copilot/customization/mcp-servers](https://code.visualstudio.com/docs/copilot/customization/mcp-servers)
 
-Minimal MCP (Model Context Protocol) server for Poznote - enables AI-powered note management through natural language in VS Code.
+MCP (Model Context Protocol) server for Poznote - enables AI-powered note management through natural language in VS Code.
 
 ---
 
@@ -21,32 +21,11 @@ Minimal MCP (Model Context Protocol) server for Poznote - enables AI-powered not
 
 ---
 
-## Quick Start
+## Prerequisites
 
-**Prerequisites:**
 1. A running Poznote instance (default port: `8040`)
 2. Your Poznote username and password (same as web login)
 3. VS Code with GitHub Copilot extension
-
-**Essential Configuration Steps:**
-1. Install the MCP server (see [Installation](#installation))
-2. Configure environment variables:
-  - `POZNOTE_API_URL` - Your Poznote API endpoint (e.g., `http://localhost:YOUR_POZNOTE_API_PORT/api/v1`)
-   - `POZNOTE_USERNAME` - Your Poznote username
-   - `POZNOTE_PASSWORD` - Your Poznote password
-3. Add configuration to VS Code `mcp.json` (see [VS Code Configuration](#vs-code-configuration))
-4. Restart VS Code or reload MCP servers
-
----
-
-## Transport Modes
-
-The MCP server supports two transport modes:
-
-| Mode | Command | Use Case |
-|------|---------|----------|
-| **stdio** | `poznote-mcp serve --transport=stdio` | Local/SSH connection, VS Code manages the process |
-| **http** | `poznote-mcp serve --transport=http --port=YOUR_POZNOTE_MCP_PORT` | Remote connection, server runs independently |
 
 ---
 
@@ -69,15 +48,21 @@ The MCP server acts as a bridge between VS Code Copilot and your Poznote instanc
 
 ### Communication Flow
 
+The MCP server supports two transport modes:
+
+| Mode | Command | Use Case |
+|------|---------|----------|
+| **stdio** | `poznote-mcp serve --transport=stdio` | Local/SSH connection, VS Code manages the process |
+| **http** | `poznote-mcp serve --transport=http --port=YOUR_POZNOTE_MCP_PORT` | Remote connection, server runs independently |
+
 **stdio Mode (Local/SSH):**
 1. VS Code launches `poznote-mcp serve --transport=stdio` locally or via SSH
 2. Communication happens via stdin/stdout
-3. The HTTP client calls the Poznote API at `http://localhost:YOUR_POZNOTE_API_PORT/api/v1` (or your configured URL)
+3. The HTTP client calls the Poznote API at `http://YOUR_SERVER_HOSTNAME_OR_IP:YOUR_POZNOTE_PORT/api/v1` (or your configured URL)
 
 **HTTP Mode (Streamable HTTP):**
 1. MCP server runs on the Poznote server: `poznote-mcp serve --transport=http --port=YOUR_POZNOTE_MCP_PORT`
-2. VS Code connects directly to `http://your-server:YOUR_POZNOTE_MCP_PORT/mcp`
-3. No local Python installation required on client machine
+2. VS Code connects directly to `http://YOUR_SERVER_HOSTNAME_OR_IP:YOUR_POZNOTE_MCP_PORT/mcp`
 
 ```
   ┌─────────────────────┐
@@ -97,7 +82,7 @@ The MCP server acts as a bridge between VS Code Copilot and your Poznote instanc
      ↕ REST API
   ┌─────────────────────┐
   │   Poznote API       │
-  │   (port YOUR_POZNOTE_API_PORT)       │
+  │   (port YOUR_POZNOTE_PORT)       │
   └─────────────────────┘
 ```
 
@@ -118,9 +103,10 @@ The MCP server acts as a bridge between VS Code Copilot and your Poznote instanc
 - `delete_note` - Delete a note by ID
 - `create_folder` - Create a new folder in a workspace
 
+
 #### Creating Markdown notes
 
-By default, `create_note` creates HTML notes (`note_type="note"`). To create a Markdown note stored as a `.md` entry in Poznote, pass `note_type="markdown"`.
+By default, `create_note` creates **HTML** notes (`note_type="note"`) in the **`Poznote`** workspace. To create a Markdown note stored as a `.md` entry in Poznote, pass `note_type="markdown"` and (optionally) a different `workspace`.
 
 Example:
 
@@ -140,7 +126,7 @@ Example:
 
 ### Linux / Remote Server
 
-Install Python (if not already installed):
+Install Python:
 
 ```
 sudo apt update
@@ -324,22 +310,16 @@ For remote development, VS Code launches the MCP server via SSH.
         "cd /home/YOUR_LINUX_USER/poznote-mcp-server/mcp-server && source venv/bin/activate && poznote-mcp serve --transport=stdio"
       ],
       "env": {
-        "POZNOTE_API_URL": "http://localhost:YOUR_POZNOTE_API_PORT/api/v1",
-        "POZNOTE_USERNAME": "your-poznote-username",
-        "POZNOTE_PASSWORD": "your-poznote-password",
-        "POZNOTE_DEFAULT_WORKSPACE": "Poznote",
+        "POZNOTE_API_URL": "http://YOUR_SERVER_HOSTNAME_OR_IP:YOUR_POZNOTE_PORT/api/v1",
+        "POZNOTE_USERNAME": "YOUR_POZNOTE_USERNAME",
+        "POZNOTE_PASSWORD": "YOUR_POZNOTE_PASSWORD",
+        "POZNOTE_DEFAULT_WORKSPACE": "YOUR_POZNOTE_WORKSPACE",
         "POZNOTE_DEBUG": "1"
       }
     }
   }
 }
 ```
-
-**Important:**
-- Replace `user@your-server` with your actual SSH connection
-- Replace `your-poznote-username` and `your-poznote-password` with your Poznote credentials
-- Adjust the port in `POZNOTE_API_URL` if Poznote runs on a different port (default: 8040)
-- Ensure SSH key authentication is configured for passwordless login
 
 ---
 
@@ -356,9 +336,9 @@ For local development without SSH:
       "command": "C:\\Users\\YOUR-USERNAME\\poznote-mcp-server\\mcp-server\\.venv\\Scripts\\poznote-mcp.exe",
       "args": ["serve", "--transport=stdio"],
       "env": {
-        "POZNOTE_API_URL": "http://localhost:YOUR_POZNOTE_API_PORT/api/v1",
-        "POZNOTE_USERNAME": "your-poznote-username",
-        "POZNOTE_PASSWORD": "your-poznote-password",
+        "POZNOTE_API_URL": "http://YOUR_SERVER_HOSTNAME_OR_IP:YOUR_POZNOTE_PORT/api/v1",
+        "POZNOTE_USERNAME": "YOUR_POZNOTE_USERNAME",
+        "POZNOTE_PASSWORD": "YOUR_POZNOTE_PASSWORD",
         "POZNOTE_DEBUG": "1"
       }
     }
@@ -382,9 +362,9 @@ Set environment variables and start the server:
 ```bash
 cd /home/YOUR_LINUX_USER/poznote-mcp-server/mcp-server
 source venv/bin/activate
-export POZNOTE_API_URL=http://localhost:YOUR_POZNOTE_API_PORT/api/v1
-export POZNOTE_USERNAME=your-poznote-username
-export POZNOTE_PASSWORD=your-poznote-password
+export POZNOTE_API_URL=http://YOUR_SERVER_HOSTNAME_OR_IP:YOUR_POZNOTE_PORT/api/v1
+export POZNOTE_USERNAME=YOUR_POZNOTE_USERNAME
+export POZNOTE_PASSWORD=YOUR_POZNOTE_PASSWORD
 poznote-mcp serve --transport=http --port=YOUR_POZNOTE_MCP_PORT
 ```
 
@@ -401,10 +381,10 @@ After=network.target
 Type=simple
 User=YOUR_LINUX_USER
 WorkingDirectory=/home/YOUR_LINUX_USER/poznote-mcp-server/mcp-server
-Environment="POZNOTE_API_URL=http://localhost:YOUR_POZNOTE_API_PORT/api/v1"
-Environment="POZNOTE_USERNAME=your-poznote-username"
-Environment="POZNOTE_PASSWORD=your-poznote-password"
-Environment="POZNOTE_DEFAULT_WORKSPACE=Poznote"
+Environment="POZNOTE_API_URL=http://YOUR_SERVER_HOSTNAME_OR_IP:YOUR_POZNOTE_PORT/api/v1"
+Environment="POZNOTE_USERNAME=YOUR_POZNOTE_USERNAME"
+Environment="POZNOTE_PASSWORD=YOUR_POZNOTE_PASSWORD"
+Environment="POZNOTE_DEFAULT_WORKSPACE=YOUR_POZNOTE_WORKSPACE"
 ExecStart=/home/YOUR_LINUX_USER/poznote-mcp-server/mcp-server/venv/bin/poznote-mcp serve --transport=http --port=YOUR_POZNOTE_MCP_PORT
 Restart=always
 
@@ -423,7 +403,10 @@ sudo systemctl status poznote-mcp
 
 **Or run as a user systemd service (no sudo required):**
 
-Create `~/.config/systemd/user/poznote-mcp.service`:
+```ini
+mkdir -p ~/.config/systemd/YOUR_USER/
+vim ~/.config/systemd/YOUR_USER/poznote-mcp.service
+```
 
 ```ini
 [Unit]
@@ -433,10 +416,10 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=%h/poznote-mcp-server/mcp-server
-Environment="POZNOTE_API_URL=http://localhost:YOUR_POZNOTE_API_PORT/api/v1"
-Environment="POZNOTE_USERNAME=your-poznote-username"
-Environment="POZNOTE_PASSWORD=your-poznote-password"
-Environment="POZNOTE_DEFAULT_WORKSPACE=Poznote"
+Environment="POZNOTE_API_URL=http://YOUR_SERVER_HOSTNAME_OR_IP:YOUR_POZNOTE_PORT/api/v1"
+Environment="POZNOTE_USERNAME=YOUR_POZNOTE_USERNAME"
+Environment="POZNOTE_PASSWORD=YOUR_POZNOTE_PASSWORD"
+Environment="POZNOTE_DEFAULT_WORKSPACE=YOUR_POZNOTE_WORKSPACE"
 ExecStart=%h/poznote-mcp-server/mcp-server/venv/bin/poznote-mcp serve --transport=http --port=YOUR_POZNOTE_MCP_PORT
 Restart=always
 
@@ -469,13 +452,13 @@ systemctl --user status poznote-mcp
 ```
 
 **Important:**
-- Replace `your-server` with your server's hostname or IP
+- Replace `YOUR_SERVER_HOSTNAME_OR_IP` with your server's hostname or IP
 - Ensure port YOUR_POZNOTE_MCP_PORT is accessible from your workstation
 - Configure firewall rules if needed
 - For remote access, consider using SSH tunneling for security:
   ```bash
-  ssh -L YOUR_POZNOTE_MCP_PORT:localhost:YOUR_POZNOTE_MCP_PORT user@your-server
-  # Then use: "url": "http://localhost:YOUR_POZNOTE_MCP_PORT/mcp"
+  ssh -L YOUR_POZNOTE_MCP_PORT:YOUR_SERVER_HOSTNAME_OR_IP:YOUR_POZNOTE_MCP_PORT user@your-server
+  # Then use: "url": "http://YOUR_SERVER_HOSTNAME_OR_IP:YOUR_POZNOTE_MCP_PORT/mcp"
   ```
 
 ---
@@ -497,7 +480,7 @@ Configure these environment variables for the MCP server to connect to your Pozn
 
 | Variable | Description | Example | Required |
 |----------|-------------|---------|----------|
-| `POZNOTE_API_URL` | URL of the Poznote REST API | `http://localhost:YOUR_POZNOTE_API_PORT/api/v1` | ✅ Yes |
+| `POZNOTE_API_URL` | URL of the Poznote REST API | `http://YOUR_SERVER_HOSTNAME_OR_IP:YOUR_POZNOTE_PORT/api/v1` | ✅ Yes |
 | `POZNOTE_USERNAME` | Username for Basic Auth (same as web login) | `admin` | ✅ Yes |
 | `POZNOTE_PASSWORD` | Password for Basic Auth (same as web login) | `your-password` | ✅ Yes |
 | `POZNOTE_DEFAULT_WORKSPACE` | Default workspace name | `Poznote` | No |
@@ -506,15 +489,15 @@ Configure these environment variables for the MCP server to connect to your Pozn
 ### Important Notes
 
 **Finding Your API URL:**
-- If Poznote runs on the default port: `http://localhost:YOUR_POZNOTE_API_PORT/api/v1`
-- If Poznote runs on a custom port: `http://localhost:YOUR_POZNOTE_API_PORT/api/v1`
-- For remote servers: `http://your-server-ip:YOUR_POZNOTE_API_PORT/api/v1`
+- If Poznote runs on the default port: `http://YOUR_SERVER_HOSTNAME_OR_IP:YOUR_POZNOTE_PORT/api/v1`
+- If Poznote runs on a custom port: `http://YOUR_SERVER_HOSTNAME_OR_IP:YOUR_POZNOTE_PORT/api/v1`
+- For remote servers: `http://YOUR_SERVER_HOSTNAME_OR_IP:YOUR_POZNOTE_PORT/api/v1`
 - Check your `docker-compose.yml` for the `HTTP_WEB_PORT` variable
 
 **Credentials:**
 - Use the **same username and password** you use to log into Poznote's web interface
 - These credentials are used for HTTP Basic Authentication with the Poznote API
-- If you're unsure about your credentials, try logging into Poznote at `http://localhost:YOUR_POZNOTE_API_PORT` first
+- If you're unsure about your credentials, try logging into Poznote at `http://YOUR_SERVER_HOSTNAME_OR_IP:YOUR_POZNOTE_PORT` first
 
 **Security:**
 - Never commit credentials to version control
@@ -529,20 +512,20 @@ Configure these environment variables for the MCP server to connect to your Pozn
 
 #### 1. Error 404 Not Found - API endpoint not accessible
 
-**Symptoms:** `Client error '404 Not Found' for url 'http://localhost/api/v1/notes'`
+**Symptoms:** `Client error '404 Not Found' for url 'http://YOUR_SERVER_HOSTNAME_OR_IP/api/v1/notes'`
 
 **Causes and Solutions:**
 
 - **Wrong API URL:** 
-  - ❌ `http://localhost/api/v1` (missing port)
-  - ✅ `http://localhost:YOUR_POZNOTE_API_PORT/api/v1` (correct with port)
+  - ❌ `http://YOUR_SERVER_HOSTNAME_OR_IP/api/v1` (missing port)
+  - ✅ `http://YOUR_SERVER_HOSTNAME_OR_IP:YOUR_POZNOTE_PORT/api/v1` (correct with port)
   
 - **Poznote not running:**
   ```bash
   # Check if Poznote is running
   docker ps | grep poznote
   # Or check the port
-  curl http://localhost:YOUR_POZNOTE_API_PORT
+  curl http://YOUR_SERVER_HOSTNAME_OR_IP:YOUR_POZNOTE_PORT
   ```
 
 - **Wrong port configured:**
@@ -556,7 +539,7 @@ Configure these environment variables for the MCP server to connect to your Pozn
 **Fix:**
 ```bash
 # Set the correct URL with port
-export POZNOTE_API_URL=http://localhost:YOUR_POZNOTE_API_PORT/api/v1
+export POZNOTE_API_URL=http://YOUR_SERVER_HOSTNAME_OR_IP:YOUR_POZNOTE_PORT/api/v1
 ```
 
 ---
@@ -570,7 +553,7 @@ export POZNOTE_API_URL=http://localhost:YOUR_POZNOTE_API_PORT/api/v1
 - User doesn't exist in Poznote
 
 **Fix:**
-1. Verify credentials by logging into Poznote web interface at `http://localhost:YOUR_POZNOTE_API_PORT`
+1. Verify credentials by logging into Poznote web interface at `http://YOUR_SERVER_HOSTNAME_OR_IP:YOUR_POZNOTE_PORT`
 2. Update environment variables with correct credentials:
    ```bash
    export POZNOTE_USERNAME=your-actual-username
@@ -633,8 +616,8 @@ export POZNOTE_API_URL=http://localhost:YOUR_POZNOTE_API_PORT/api/v1
 
 4. **Use SSH tunnel if needed:**
    ```bash
-  ssh -L YOUR_POZNOTE_MCP_PORT:localhost:YOUR_POZNOTE_MCP_PORT user@your-server
-  # Then use http://localhost:YOUR_POZNOTE_MCP_PORT/mcp in VS Code
+  ssh -L YOUR_POZNOTE_MCP_PORT:YOUR_SERVER_HOSTNAME_OR_IP:YOUR_POZNOTE_MCP_PORT user@your-server
+  # Then use http://YOUR_SERVER_HOSTNAME_OR_IP:YOUR_POZNOTE_MCP_PORT/mcp in VS Code
    ```
 
 ---
@@ -734,7 +717,7 @@ Verify Poznote API is accessible:
 
 ```bash
 # Test API endpoint
-curl -u 'your-username:your-password' http://localhost:YOUR_POZNOTE_API_PORT/api/v1/notes
+curl -u 'your-username:your-password' http://YOUR_SERVER_HOSTNAME_OR_IP:YOUR_POZNOTE_PORT/api/v1/notes
 
 # Should return JSON with your notes
 ```
