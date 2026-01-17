@@ -246,6 +246,7 @@ $displayName = htmlspecialchars($currentUser['display_name'] ?: $currentUser['us
                 <!-- Mobile Separator -->
                 <div class="settings-sep settings-sep-mobile"></div>
                 
+                <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
                 <!-- Login Display -->
                 <div class="settings-card" id="login-display-card">
                     <div class="settings-card-icon">
@@ -255,6 +256,7 @@ $displayName = htmlspecialchars($currentUser['display_name'] ?: $currentUser['us
                         <h3><?php echo t_h('display.cards.login_display'); ?> <span id="login-display-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
                     </div>
                 </div>
+                <?php endif; ?>
 
                 <!-- Language -->
                 <div class="settings-card" id="language-card">
