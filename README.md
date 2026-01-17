@@ -254,6 +254,17 @@ sudo chown -R 82:82 data
 docker compose up -d
 ```
 
+If you get this error instead:
+
+`Connection failed: SQLSTATE[HY000]: General error: 8 attempt to write a readonly database`
+
+Stop the container and fix ownership for the `data` folder (adapt UID/GID to your setup, example uses 1000:1000):
+
+```bash
+docker compose down
+sudo chown 1000:1000 -R data
+```
+
 > 💡 **Note:** UID 82 corresponds to the `www-data` user in Alpine Linux, which is used by the Poznote Docker image.
 
 </details>
