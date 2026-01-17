@@ -1049,12 +1049,14 @@
     "redirecting": "Weiterleitung...",
     "fields": {
       "username": "Benutzername",
-      "password": "Passwort"
+      "password": "Passwort",
+      "profile": "Wählen Sie Ihr Profil"
     },
     "remember_me": "30 Tage merken",
     "button": "Anmelden",
     "oidc_button": "Weiter mit {{provider}}",
     "documentation": "Poznote-Dokumentation",
+    "no_profiles": "Keine Benutzerprofile verfügbar. Bitte kontaktieren Sie den Administrator.",
     "errors": {
       "invalid_credentials": "Falscher Benutzername oder Passwort.",
       "oidc_failed": "SSO-Anmeldung fehlgeschlagen. Bitte erneut versuchen.",

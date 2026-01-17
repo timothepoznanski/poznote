@@ -1,29 +1,31 @@
 <?php
-// Debug display disabled for production
-// (Previously enabled with display_errors / error_reporting for debugging)
+/**
+ * Login Page
+ * 
+ * - Single global password (same credentials for all profiles)
+ * - User selects their profile from a dropdown
+ */
 require 'auth.php';
 require_once 'functions.php';
 require_once 'oidc.php';
+require_once __DIR__ . '/users/db_master.php';
 
 $error = '';
 $oidcError = '';
 
-// Load configured login display name if present
+// Load user profiles
+$userProfiles = getAllUserProfiles();
+
+// Load configured login display name from global settings
 try {
     require_once 'config.php';
-    // Open a local PDO connection to read the setting without depending on global db_connect which may die()
     $login_display_name = '';
     try {
-        $tmpCon = new PDO('sqlite:' . SQLITE_DATABASE);
-        $tmpCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $stmt = $tmpCon->prepare("SELECT value FROM settings WHERE key = ?");
-        $stmt->execute(['login_display_name']);
-        $login_display_name = $stmt->fetchColumn();
-
-        // Also read preferred language for login page i18n
-        $stmt = $tmpCon->prepare("SELECT value FROM settings WHERE key = ?");
-        $stmt->execute(['language']);
-        $currentLang = $stmt->fetchColumn();
+        // Get settings from master database
+        $currentLang = getGlobalSetting('language', 'en');
+        $login_display_name = getGlobalSetting('login_display_name', '');
+        $default_workspace = '';
+        
         if (!is_string($currentLang) || $currentLang === '') {
             $currentLang = 'en';
         }
@@ -31,18 +33,7 @@ try {
         if (!preg_match('/^[a-z]{2}(-[a-z]{2})?$/', $currentLang)) {
             $currentLang = 'en';
         }
-
-        // Read default_workspace to decide if we should clear localStorage
-        $stmt = $tmpCon->prepare("SELECT value FROM settings WHERE key = ?");
-        $stmt->execute(['default_workspace']);
-        $default_workspace = $stmt->fetchColumn();
-        if ($default_workspace === false) {
-            $default_workspace = '';
-        }
-
-        $tmpCon = null;
     } catch (Exception $e) {
-        // ignore DB errors and leave display name empty
         $login_display_name = '';
         $currentLang = 'en';
         $default_workspace = '';
@@ -56,8 +47,6 @@ try {
 
 // If already authenticated, redirect to home
 if (isAuthenticated()) {
-    // Redirect to index with JavaScript to include localStorage workspace
-    // CSP-compliant: use external script with JSON config
     echo '<!DOCTYPE html><html><head>';
     echo '<script type="application/json" id="workspace-redirect-data">{}</script>';
     echo '<script src="js/workspace-redirect.js"></script>';
@@ -69,7 +58,6 @@ if (isAuthenticated()) {
 if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
     $showNormalLogin = !(function_exists('oidc_is_enabled') && oidc_is_enabled() && defined('OIDC_DISABLE_NORMAL_LOGIN') && OIDC_DISABLE_NORMAL_LOGIN);
     if (!$showNormalLogin) {
-        // Normal login is disabled, redirect to login page
         header('Location: login.php');
         exit;
     }
@@ -77,9 +65,13 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
     $password = $_POST['password'];
     $rememberMe = isset($_POST['remember_me']) && $_POST['remember_me'] === '1';
     
-    if (authenticate($username, $password, $rememberMe)) {
-        // Redirect to index with JavaScript to include localStorage workspace
-        // CSP-compliant: use external script with JSON config
+    // Get selected user profile
+    $selectedUserId = isset($_POST['user_profile']) ? (int)$_POST['user_profile'] : null;
+    if ($selectedUserId === null && !empty($userProfiles)) {
+        $selectedUserId = $userProfiles[0]['id']; // Default to first user
+    }
+    
+    if (authenticate($username, $password, $rememberMe, $selectedUserId)) {
         echo '<!DOCTYPE html><html><head>';
         echo '<script type="application/json" id="workspace-redirect-data">{}</script>';
         echo '<script src="js/workspace-redirect.js"></script>';
@@ -90,7 +82,7 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
     }
 }
 
-// OIDC error feedback (generic)
+// OIDC error feedback
 if (isset($_GET['oidc_error'])) {
     if ($_GET['oidc_error'] === 'unauthorized') {
         $oidcError = t('login.errors.oidc_unauthorized', [], 'You are not authorized to access this application. Please contact your administrator.', $currentLang ?? 'en');
@@ -113,6 +105,37 @@ if (isset($_GET['oidc_error'])) {
     <link rel="stylesheet" href="css/dark-mode.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <script src="js/theme-manager.js"></script>
+    <style>
+        .user-profile-selector {
+            margin-bottom: 15px;
+        }
+        .user-profile-selector select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            background: var(--bg-color, #fff);
+            color: var(--text-color, #333);
+            cursor: pointer;
+        }
+        .user-profile-selector select:focus {
+            outline: none;
+            border-color: #007DB8;
+            box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
+        }
+        .user-profile-selector label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color, #666);
+        }
+        .user-profile-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
 </head>
 <body>
     <div class="login-container">
@@ -128,6 +151,22 @@ if (isset($_GET['oidc_error'])) {
         if ($showNormalLogin): 
         ?>
         <form method="POST">
+            <?php if (!empty($userProfiles)): ?>
+            <div class="form-group user-profile-selector">
+                <label for="user_profile"><?php echo t_h('login.fields.profile', [], 'Profile', $currentLang ?? 'en'); ?></label>
+                <select id="user_profile" name="user_profile" required>
+                    <?php foreach ($userProfiles as $profile): ?>
+                        <option value="<?php echo $profile['id']; ?>" 
+                                data-color="<?php echo htmlspecialchars($profile['color'] ?? '#007DB8'); ?>">
+                            <?php echo htmlspecialchars($profile['display_name'] ?: $profile['username']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <?php else: ?>
+            <p class="no-profiles-warning"><?php echo t_h('login.no_profiles', [], 'No profiles available. Please contact administrator.', $currentLang ?? 'en'); ?></p>
+            <?php endif; ?>
+            
             <div class="form-group">
                 <input type="text" id="username" name="username" placeholder="<?php echo t_h('login.fields.username', [], 'Username', $currentLang ?? 'en'); ?>" required autofocus autocomplete="username">
             </div>
@@ -156,19 +195,18 @@ if (isset($_GET['oidc_error'])) {
         <?php if ($oidcError): ?>
             <div class="error oidc-error"><?php echo htmlspecialchars($oidcError); ?></div>
         <?php endif; ?>
-            <p class="github-link">
-                <a href="https://github.com/timothepoznanski/poznote" target="_blank">
-                    <?php echo t_h('login.documentation', [], 'Poznote documentation', $currentLang ?? 'en'); ?>
-                </a>
-            </p>
-        </div>
-        <?php
-        // Note: last_opened_workspace is now stored in database, no localStorage clearing needed
-        $loginConfig = [
-            'focusOidc' => !$showNormalLogin && function_exists('oidc_is_enabled') && oidc_is_enabled()
-        ];
-        ?>
-        <script type="application/json" id="login-config"><?php echo json_encode($loginConfig); ?></script>
-        <script src="js/login-page.js"></script>
+        <p class="github-link">
+            <a href="https://github.com/timothepoznanski/poznote" target="_blank">
+                <?php echo t_h('login.documentation', [], 'Poznote documentation', $currentLang ?? 'en'); ?>
+            </a>
+        </p>
+    </div>
+    <?php
+    $loginConfig = [
+        'focusOidc' => !$showNormalLogin && function_exists('oidc_is_enabled') && oidc_is_enabled()
+    ];
+    ?>
+    <script type="application/json" id="login-config"><?php echo json_encode($loginConfig); ?></script>
+    <script src="js/login-page.js"></script>
 </body>
 </html>

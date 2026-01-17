@@ -1,9 +1,33 @@
 <?php
 
+/**
+ * Database Connection
+ * 
+ * Connects to the current user's personal database.
+ * Each user profile has their own isolated database and files.
+ */
+
+// Include auto-migration to ensure multi-user structure exists
+require_once __DIR__ . '/auto_migrate.php';
+
+// Determine database path based on authenticated user
+$dbPath = SQLITE_DATABASE; // Default path (fallback)
+
+// Use user-specific database if authenticated
+if (isset($_SESSION['user_id']) && $_SESSION['user_id']) {
+    require_once __DIR__ . '/users/UserDataManager.php';
+    $userDataManager = new UserDataManager($_SESSION['user_id']);
+    $dbPath = $userDataManager->getUserDatabasePath();
+    
+    // Ensure user directories exist
+    if (!$userDataManager->userDirectoriesExist()) {
+        $userDataManager->initializeUserDirectories();
+    }
+}
+
 // SQLite connection
 try {
     // Ensure the database directory exists
-    $dbPath = SQLITE_DATABASE;
     $dbDir = dirname($dbPath);
     if (!is_dir($dbDir)) {
         mkdir($dbDir, 0755, true);

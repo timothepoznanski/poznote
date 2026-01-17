@@ -1060,12 +1060,14 @@
     "redirecting": "Redirection...",
     "fields": {
       "username": "Nom d’utilisateur",
-      "password": "Mot de passe"
+      "password": "Mot de passe",
+      "profile": "Sélectionnez votre profil"
     },
     "remember_me": "Se souvenir de moi pendant 30 jours",
     "button": "Se connecter",
     "oidc_button": "Continuer avec {{provider}}",
     "documentation": "Documentation Poznote",
+    "no_profiles": "Aucun profil utilisateur disponible. Veuillez contacter l'administrateur.",
     "errors": {
       "invalid_credentials": "Nom d’utilisateur ou mot de passe incorrect.",
       "oidc_failed": "Échec de la connexion SSO. Veuillez réessayer.",
@@ -1618,5 +1620,126 @@
     "results": "résultats",
     "no_matches": "Aucun résultat",
     "replaced_all": "{{count}} remplacement(s) effectué(s)"
+  },
+  "multiuser": {
+    "admin": {
+      "title": "Gestion des utilisateurs",
+      "subtitle": "Gérer les utilisateurs et leurs accès",
+      "users_list": "Liste des utilisateurs",
+      "create_user": "Créer un utilisateur",
+      "edit_user": "Modifier l'utilisateur",
+      "delete_user": "Supprimer l'utilisateur",
+      "reset_password": "Réinitialiser le mot de passe",
+      "logout_all_sessions": "Déconnecter toutes les sessions",
+      "download_backup": "Télécharger la sauvegarde",
+      "username": "Nom d'utilisateur",
+      "email": "Email",
+      "display_name": "Nom d'affichage",
+      "role": "Rôle",
+      "status": "Statut",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "created_at": "Créé le",
+      "last_login": "Dernière connexion",
+      "storage": "Stockage",
+      "notes_count": "Notes",
+      "attachments_count": "Pièces jointes",
+      "actions": "Actions",
+      "password": "Mot de passe",
+      "profile": "Sélectionnez votre profil",
+      "confirm_password": "Confirmer le mot de passe",
+      "new_password": "Nouveau mot de passe",
+      "role_admin": "Administrateur",
+      "role_user": "Utilisateur",
+      "confirm_delete": "Êtes-vous sûr de vouloir supprimer l'utilisateur \"{{username}}\" ?",
+      "confirm_delete_data": "Supprimer également toutes les données de l'utilisateur (notes, pièces jointes, etc.)",
+      "confirm_reset_password": "Réinitialiser le mot de passe de l'utilisateur \"{{username}}\" ?",
+      "confirm_logout_all": "Déconnecter l'utilisateur \"{{username}}\" de toutes les sessions ?",
+      "user_created": "Utilisateur créé avec succès",
+      "user_updated": "Utilisateur mis à jour avec succès",
+      "user_deleted": "Utilisateur supprimé avec succès",
+      "password_reset": "Mot de passe réinitialisé avec succès",
+      "sessions_terminated": "Toutes les sessions terminées",
+      "errors": {
+        "username_required": "Le nom d'utilisateur est requis",
+        "password_required": "Le mot de passe est requis",
+        "password_mismatch": "Les mots de passe ne correspondent pas",
+        "password_too_short": "Le mot de passe doit contenir au moins 8 caractères",
+        "username_taken": "Ce nom d'utilisateur est déjà pris",
+        "email_taken": "Cet email est déjà utilisé",
+        "cannot_delete_self": "Vous ne pouvez pas supprimer votre propre compte",
+        "cannot_demote_self": "Vous ne pouvez pas retirer vos propres privilèges administrateur"
+      },
+      "stats": {
+        "title": "Statistiques système",
+        "total_users": "Total des utilisateurs",
+        "active_users": "Utilisateurs actifs",
+        "admin_users": "Administrateurs",
+        "total_storage": "Stockage total",
+        "total_notes": "Total des notes",
+        "total_attachments": "Total des pièces jointes"
+      }
+    },
+    "profile": {
+      "title": "Mon profil",
+      "subtitle": "Gérer les paramètres de votre compte",
+      "account_info": "Informations du compte",
+      "username": "Nom d'utilisateur",
+      "email": "Email",
+      "display_name": "Nom d'affichage",
+      "role": "Rôle",
+      "created_at": "Compte créé le",
+      "last_login": "Dernière connexion",
+      "update_profile": "Mettre à jour le profil",
+      "change_password": "Changer le mot de passe",
+      "current_password": "Mot de passe actuel",
+      "new_password": "Nouveau mot de passe",
+      "confirm_password": "Confirmer le nouveau mot de passe",
+      "my_sessions": "Mes sessions",
+      "current_session": "Session actuelle",
+      "other_sessions": "Autres sessions",
+      "terminate_session": "Terminer",
+      "terminate_all_others": "Terminer toutes les autres sessions",
+      "storage_usage": "Utilisation du stockage",
+      "notes_count": "Notes",
+      "attachments_count": "Pièces jointes",
+      "backups_count": "Sauvegardes",
+      "profile_updated": "Profil mis à jour avec succès",
+      "password_changed": "Mot de passe changé avec succès",
+      "session_terminated": "Session terminée",
+      "sessions_terminated": "Toutes les autres sessions terminées",
+      "errors": {
+        "current_password_wrong": "Le mot de passe actuel est incorrect",
+        "password_mismatch": "Les nouveaux mots de passe ne correspondent pas",
+        "password_too_short": "Le mot de passe doit contenir au moins 8 caractères"
+      }
+    },
+    "login": {
+      "title": "Connexion",
+      "username": "Nom d'utilisateur",
+      "password": "Mot de passe",
+      "profile": "Sélectionnez votre profil",
+      "remember_me": "Se souvenir de moi",
+      "sign_in": "Se connecter",
+      "sign_in_with_oidc": "Se connecter avec {{provider}}",
+      "forgot_password": "Mot de passe oublié ?",
+      "no_account": "Vous n'avez pas de compte ?",
+      "register": "S'inscrire",
+      "errors": {
+        "invalid_credentials": "Nom d'utilisateur ou mot de passe invalide",
+        "account_disabled": "Votre compte a été désactivé",
+        "too_many_attempts": "Trop de tentatives échouées. Veuillez réessayer plus tard."
+      }
+    },
+    "settings": {
+      "profile_card": {
+        "title": "Profil",
+        "description": "Gérer les paramètres de votre compte et votre mot de passe"
+      },
+      "admin_card": {
+        "title": "Gestion des utilisateurs",
+        "description": "Gérer les utilisateurs et leurs accès (Admin uniquement)"
+      }
+    }
   }
 }

@@ -530,5 +530,49 @@ $router->get('/shared', function($params) use ($systemController) {
     echo json_encode($systemController->listShared());
 });
 
+// ======================
+// User Profile Routes
+// ======================
+
+require_once __DIR__ . '/controllers/UsersController.php';
+$usersController = new UsersController($con);
+
+// Get available user profiles for login selector (public endpoint)
+$router->get('/users/profiles', function($params) use ($usersController) {
+    echo json_encode($usersController->profiles());
+});
+
+// Admin: System stats
+$router->get('/admin/stats', function($params) use ($usersController) {
+    echo json_encode($usersController->stats());
+});
+
+// Admin: List all user profiles
+$router->get('/admin/users', function($params) use ($usersController) {
+    echo json_encode($usersController->list($_GET));
+});
+
+// Admin: Get a specific user profile
+$router->get('/admin/users/{id}', function($params) use ($usersController) {
+    echo json_encode($usersController->get($params['id']));
+});
+
+// Admin: Create a new user profile
+$router->post('/admin/users', function($params) use ($usersController) {
+    $data = json_decode(file_get_contents('php://input'), true) ?? [];
+    echo json_encode($usersController->create($data));
+});
+
+// Admin: Update a user profile
+$router->patch('/admin/users/{id}', function($params) use ($usersController) {
+    $data = json_decode(file_get_contents('php://input'), true) ?? [];
+    echo json_encode($usersController->update($params['id'], $data));
+});
+
+// Admin: Delete a user profile
+$router->delete('/admin/users/{id}', function($params) use ($usersController) {
+    echo json_encode($usersController->delete($params['id'], $_GET));
+});
+
 // Dispatch the request
 $router->dispatch();

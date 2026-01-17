@@ -473,17 +473,20 @@ body {
 .sidebar-display { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; }
 .sidebar-home { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; }
 .sidebar-settings { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; position: relative; }
+.sidebar-user { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; }
 .sidebar-plus { background: transparent; border: none; color: #6c757d !important; font-size: 1.2rem; cursor: pointer; padding: 6px; border-radius: 6px; }
 
 /* Hover and focus states for sidebar buttons */
 .sidebar-display:hover,
 .sidebar-home:hover,
 .sidebar-settings:hover,
+.sidebar-user:hover,
 .sidebar-plus:hover { background: rgba(0, 125, 184, 0.1); }
 
 .sidebar-display:focus,
 .sidebar-home:focus,
 .sidebar-settings:focus,
+.sidebar-user:focus,
 .sidebar-plus:focus { outline: 2px solid #007DB8; outline-offset: 2px; }
 
 /* Réduire la taille des icônes Font Awesome dans la sidebar */
@@ -494,7 +497,9 @@ body {
 .sidebar-home i,
 .sidebar-home [class*="fa-"],
 .sidebar-settings i,
-.sidebar-settings [class*="fa-"] {
+.sidebar-settings [class*="fa-"],
+.sidebar-user i,
+.sidebar-user [class*="fa-"] {
     font-size: 0.7em !important;
 }
 
@@ -3643,6 +3648,23 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-globe::before { content: "\f0ac"; }
 .fa-upload::before { content: "\f093"; }
 .fa-arrow-left::before { content: "\f060"; }
+.fa-user::before { content: "\f007"; }
+.fa-user-circle::before { content: "\f2bd"; }
+.fa-user-astronaut::before { content: "\f4fb"; }
+.fa-user-ninja::before { content: "\f504"; }
+.fa-user-tie::before { content: "\f508"; }
+.fa-users-cog::before { content: "\f509"; }
+.fa-heart::before { content: "\f004"; }
+.fa-sun::before { content: "\f185"; }
+.fa-coffee::before { content: "\f0f4"; }
+.fa-book::before { content: "\f02d"; }
+.fa-laptop::before { content: "\f109"; }
+.fa-music::before { content: "\f001"; }
+.fa-camera::before { content: "\f030"; }
+.fa-gamepad::before { content: "\f11b"; }
+.fa-rocket::before { content: "\f135"; }
+.fa-leaf::before { content: "\f06c"; }
+.fa-plus-circle::before { content: "\f055"; }
 .fa-info::before { content: "\f129"; }
 .fa-file-alt::before { content: "\f15c"; }
 .fa-plus::before { content: "\f067"; }
@@ -4126,7 +4148,25 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-weight,
 .fa-wifi,
 .fa-wind,
-.fa-yen-sign {
+.fa-yen-sign,
+.fa-user,
+.fa-user-circle,
+.fa-user-astronaut,
+.fa-user-ninja,
+.fa-user-tie,
+.fa-users-cog,
+.fa-moon,
+.fa-book,
+.fa-laptop,
+.fa-paint-brush,
+.fa-music,
+.fa-camera,
+.fa-gamepad,
+.fa-rocket,
+.fa-leaf,
+.fa-arrow-left,
+.fa-home,
+.fa-plus-circle {
   font-family: "Font Awesome 5 Pro";
   font-weight: 300;
   font-style: normal;

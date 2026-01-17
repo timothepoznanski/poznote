@@ -522,8 +522,52 @@ function oidc_finish_login($claims, $tokens) {
         throw new Exception('User not authorized to access this application');
     }
     
+    // Find or create user profile based on OIDC claims
+    require_once __DIR__ . '/users/db_master.php';
+    
+    $email = $claims['email'] ?? '';
+    $displayName = $claims['name'] ?? $claims['preferred_username'] ?? null;
+    $username = $claims['preferred_username'] ?? $email;
+    
+    // Try to find existing user by username (email or preferred_username)
+    $user = getUserProfileByUsername($username);
+    
+    if (!$user && $email) {
+        // Also try by email as username
+        $user = getUserProfileByUsername($email);
+    }
+    
+    if (!$user) {
+        // Create a new user profile for this OIDC user
+        $result = createUserProfile($username, $displayName ?: $username);
+        
+        if (!$result['success']) {
+            throw new Exception('Failed to create OIDC user profile: ' . ($result['error'] ?? 'Unknown error'));
+        }
+        
+        $user = getUserProfileById($result['user_id']);
+    }
+    
+    if (!$user) {
+        throw new Exception('Failed to find or create OIDC user profile');
+    }
+    
+    // Set up session with user profile
     $_SESSION['authenticated'] = true;
     $_SESSION['auth_method'] = 'oidc';
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['user'] = [
+        'id' => $user['id'],
+        'username' => $user['username'],
+        'display_name' => $user['display_name'],
+        'is_admin' => (bool)$user['is_admin'],
+        'color' => $user['color'] ?? '#667eea',
+        'icon' => $user['icon'] ?? 'fa-user'
+    ];
+    
+    // Update last login
+    updateUserProfile($user['id'], ['last_login' => date('Y-m-d H:i:s')]);
+    
     $_SESSION['oidc_sub'] = $claims['sub'] ?? null;
     $_SESSION['oidc_user'] = oidc_claims_to_display_user($claims);
     $_SESSION['oidc_claims'] = [

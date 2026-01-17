@@ -182,16 +182,44 @@ function formatDateTime($t) {
 
 /**
  * Get the entries directory path
+ * Returns the path for the current user
  */
 function getEntriesPath() {
+    if (isset($_SESSION['user_id'])) {
+        require_once __DIR__ . '/users/UserDataManager.php';
+        $dataManager = new UserDataManager($_SESSION['user_id']);
+        return $dataManager->getUserEntriesPath();
+    }
+    // Fallback for unauthenticated access (should not happen in normal use)
     return __DIR__ . '/data/entries';
 }
 
 /**
  * Get the attachments directory path
+ * Returns the path for the current user
  */
 function getAttachmentsPath() {
+    if (isset($_SESSION['user_id'])) {
+        require_once __DIR__ . '/users/UserDataManager.php';
+        $dataManager = new UserDataManager($_SESSION['user_id']);
+        return $dataManager->getUserAttachmentsPath();
+    }
+    // Fallback for unauthenticated access
     return __DIR__ . '/data/attachments';
+}
+
+/**
+ * Get the backups directory path
+ * Returns the path for the current user
+ */
+function getBackupsPath() {
+    if (isset($_SESSION['user_id'])) {
+        require_once __DIR__ . '/users/UserDataManager.php';
+        $dataManager = new UserDataManager($_SESSION['user_id']);
+        return $dataManager->getUserBackupsPath();
+    }
+    // Fallback for unauthenticated access
+    return dirname(__DIR__) . '/data/backups';
 }
 
 /**

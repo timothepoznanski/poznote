@@ -142,6 +142,30 @@ $currentLang = getUserLanguage();
                     </div>
                 </div>
 
+                <?php // Profile and admin links - always available ?>
+                <!-- My Profile -->
+                <div class="settings-card settings-card-clickable" id="profile-card" data-href="profile.php">
+                    <div class="settings-card-icon">
+                        <i class="fa-user-circle"></i>
+                    </div>
+                    <div class="settings-card-content">
+                        <h3><?php echo t_h('settings.cards.profile', [], 'My Profile'); ?></h3>
+                        <small><?php echo htmlspecialchars(getCurrentUser()['username'] ?? ''); ?></small>
+                    </div>
+                </div>
+
+                <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
+                <!-- User Management (Admin only) -->
+                <div class="settings-card settings-card-clickable" id="users-admin-card" data-href="admin/users.php">
+                    <div class="settings-card-icon">
+                        <i class="fa-users-cog"></i>
+                    </div>
+                    <div class="settings-card-content">
+                        <h3><?php echo t_h('settings.cards.user_management', [], 'User Management'); ?></h3>
+                    </div>
+                </div>
+                <?php endif; ?>
+
                 <!-- Backup / Export -->
                 <div class="settings-card" id="backup-export-card">
                     <div class="settings-card-icon">

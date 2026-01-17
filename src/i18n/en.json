@@ -1050,12 +1050,14 @@
     "redirecting": "Redirecting...",
     "fields": {
       "username": "Username",
-      "password": "Password"
+      "password": "Password",
+      "profile": "Select your profile"
     },
     "remember_me": "Remember me for 30 days",
     "button": "Login",
     "oidc_button": "Continue with {{provider}}",
     "documentation": "Poznote documentation",
+    "no_profiles": "No user profiles available. Please contact the administrator.",
     "errors": {
       "invalid_credentials": "Incorrect username or password.",
       "oidc_failed": "SSO login failed. Please try again.",
@@ -1608,5 +1610,124 @@
     "results": "results",
     "no_matches": "No results",
     "replaced_all": "Replaced {{count}} match(es)"
+  },
+  "multiuser": {
+    "admin": {
+      "title": "User Management",
+      "subtitle": "Manage users and their access",
+      "users_list": "Users List",
+      "create_user": "Create User",
+      "edit_user": "Edit User",
+      "delete_user": "Delete User",
+      "reset_password": "Reset Password",
+      "logout_all_sessions": "Logout All Sessions",
+      "download_backup": "Download Backup",
+      "username": "Username",
+      "email": "Email",
+      "display_name": "Display Name",
+      "role": "Role",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "created_at": "Created",
+      "last_login": "Last Login",
+      "storage": "Storage",
+      "notes_count": "Notes",
+      "attachments_count": "Attachments",
+      "actions": "Actions",
+      "password": "Password",
+      "confirm_password": "Confirm Password",
+      "new_password": "New Password",
+      "role_admin": "Administrator",
+      "role_user": "User",
+      "confirm_delete": "Are you sure you want to delete user \"{{username}}\"?",
+      "confirm_delete_data": "Also delete all user data (notes, attachments, etc.)",
+      "confirm_reset_password": "Reset password for user \"{{username}}\"?",
+      "confirm_logout_all": "Logout user \"{{username}}\" from all sessions?",
+      "user_created": "User created successfully",
+      "user_updated": "User updated successfully",
+      "user_deleted": "User deleted successfully",
+      "password_reset": "Password reset successfully",
+      "sessions_terminated": "All sessions terminated",
+      "errors": {
+        "username_required": "Username is required",
+        "password_required": "Password is required",
+        "password_mismatch": "Passwords do not match",
+        "password_too_short": "Password must be at least 8 characters",
+        "username_taken": "Username is already taken",
+        "email_taken": "Email is already in use",
+        "cannot_delete_self": "You cannot delete your own account",
+        "cannot_demote_self": "You cannot remove admin privileges from yourself"
+      },
+      "stats": {
+        "title": "System Statistics",
+        "total_users": "Total Users",
+        "active_users": "Active Users",
+        "admin_users": "Administrators",
+        "total_storage": "Total Storage",
+        "total_notes": "Total Notes",
+        "total_attachments": "Total Attachments"
+      }
+    },
+    "profile": {
+      "title": "My Profile",
+      "subtitle": "Manage your account settings",
+      "account_info": "Account Information",
+      "username": "Username",
+      "email": "Email",
+      "display_name": "Display Name",
+      "role": "Role",
+      "created_at": "Account Created",
+      "last_login": "Last Login",
+      "update_profile": "Update Profile",
+      "change_password": "Change Password",
+      "current_password": "Current Password",
+      "new_password": "New Password",
+      "confirm_password": "Confirm New Password",
+      "my_sessions": "My Sessions",
+      "current_session": "Current Session",
+      "other_sessions": "Other Sessions",
+      "terminate_session": "Terminate",
+      "terminate_all_others": "Terminate All Other Sessions",
+      "storage_usage": "Storage Usage",
+      "notes_count": "Notes",
+      "attachments_count": "Attachments",
+      "backups_count": "Backups",
+      "profile_updated": "Profile updated successfully",
+      "password_changed": "Password changed successfully",
+      "session_terminated": "Session terminated",
+      "sessions_terminated": "All other sessions terminated",
+      "errors": {
+        "current_password_wrong": "Current password is incorrect",
+        "password_mismatch": "New passwords do not match",
+        "password_too_short": "Password must be at least 8 characters"
+      }
+    },
+    "login": {
+      "title": "Sign In",
+      "username": "Username",
+      "password": "Password",
+      "remember_me": "Remember me",
+      "sign_in": "Sign In",
+      "sign_in_with_oidc": "Sign in with {{provider}}",
+      "forgot_password": "Forgot password?",
+      "no_account": "Don't have an account?",
+      "register": "Register",
+      "errors": {
+        "invalid_credentials": "Invalid username or password",
+        "account_disabled": "Your account has been disabled",
+        "too_many_attempts": "Too many failed attempts. Please try again later."
+      }
+    },
+    "settings": {
+      "profile_card": {
+        "title": "Profile",
+        "description": "Manage your account settings and password"
+      },
+      "admin_card": {
+        "title": "User Management",
+        "description": "Manage users and their access (Admin only)"
+      }
+    }
   }
 }

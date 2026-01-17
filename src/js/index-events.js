@@ -93,6 +93,11 @@
                     navigateToDisplayOrSettings('settings.php');
                 }
                 break;
+            case 'navigate-to-profile':
+                if (typeof navigateToDisplayOrSettings === 'function') {
+                    navigateToDisplayOrSettings('profile.php');
+                }
+                break;
             case 'toggle-create-menu':
                 if (typeof toggleCreateMenu === 'function') {
                     toggleCreateMenu();
@@ -561,10 +566,13 @@
             params.push('workspace=' + encodeURIComponent(window.selectedWorkspace));
         }
 
-        var urlParams = new URLSearchParams(window.location.search);
-        var noteId = urlParams.get('note');
-        if (noteId) {
-            params.push('note=' + encodeURIComponent(noteId));
+        // Don't pass note parameter to profile.php
+        if (page !== 'profile.php') {
+            var urlParams = new URLSearchParams(window.location.search);
+            var noteId = urlParams.get('note');
+            if (noteId) {
+                params.push('note=' + encodeURIComponent(noteId));
+            }
         }
 
         if (params.length > 0) {
