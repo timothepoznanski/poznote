@@ -213,6 +213,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                     </div>
                 </div>
 
+                <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
                 <!-- Check for Updates -->
                 <div class="settings-card" id="check-updates-card">
                     <div class="settings-card-icon">
@@ -223,6 +224,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                         <h3><?php echo t_h('settings.cards.check_updates'); ?></h3>
                     </div>
                 </div>
+                <?php endif; ?>
 
                 <!-- API Documentation -->
                 <div class="settings-card" id="api-docs-card">
