@@ -110,6 +110,18 @@ try {
     $workspaces_count = 0;
 }
 
+// Count users (for admin)
+$users_count = 0;
+if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
+    try {
+        require_once 'users/db_master.php';
+        $users = listAllUserProfiles();
+        $users_count = count($users);
+    } catch (Exception $e) {
+        $users_count = 0;
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -176,7 +188,7 @@ try {
                         <i class="fa-users-cog"></i>
                     </div>
                     <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.user_management', [], 'User Management'); ?></h3>
+                        <h3><?php echo t_h('settings.cards.user_management', [], 'User Management'); ?> <span class="setting-status enabled"><?php echo $users_count; ?></span></h3>
                     </div>
                 </div>
                 <?php endif; ?>

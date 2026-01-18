@@ -32,14 +32,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// Include required files
-require_once __DIR__ . '/../../auth.php';
+// Include required files (order matters!)
 require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../auth.php';
+
+// Check if this is an admin/user endpoint that doesn't need X-User-ID
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$isAdminEndpoint = strpos($uri, '/api/v1/admin') !== false;
+$isPublicProfilesEndpoint = strpos($uri, '/api/v1/users/profiles') !== false;
+
+// Require authentication (with X-User-ID for data endpoints, without for admin/public endpoints)
+if ($isAdminEndpoint || $isPublicProfilesEndpoint) {
+    // Admin endpoints only need credential validation, not X-User-ID
+    requireApiAuthAdmin();
+} else {
+    // Data endpoints require X-User-ID to know which user's data to access
+    requireApiAuth();
+}
+
+// Now load db_connect.php AFTER session is set up with user_id
+// This ensures the correct user database is used
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../functions.php';
-
-// Require authentication
-requireApiAuth();
 
 // Include controllers
 require_once __DIR__ . '/controllers/NotesController.php';

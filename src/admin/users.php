@@ -128,6 +128,15 @@ $v = getAppVersion();
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <style>
+        html[data-theme='dark'], body.dark-mode {
+            --bg-color: #1a1a1a;
+            --bg-secondary: #242424;
+            --bg-hover: #2d2d2d;
+            --text-color: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --border-color: #333;
+        }
+
         .admin-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -183,30 +192,43 @@ $v = getAppVersion();
         .users-table {
             width: 100%;
             border-collapse: collapse;
-            background: var(--bg-color, #fff);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background: transparent;
+            border-radius: 0;
+            overflow: visible;
+            box-shadow: none;
         }
+        
         .users-table th,
         .users-table td {
             padding: 15px;
             text-align: left;
             border-bottom: 1px solid var(--border-color, #eee);
-        }
-        .users-table th {
-            background: var(--bg-secondary, #f8f9fa);
-            font-weight: 600;
             color: var(--text-color, #333);
         }
+
+        .users-table th {
+            background: transparent;
+            font-weight: 600;
+            border-top: 2px solid var(--border-color, #eee);
+        }
+
+        .users-table tbody tr {
+            background: transparent;
+        }
+
         .users-table tr:hover {
-            background: var(--bg-hover, #f5f5f5);
+            background: var(--bg-hover, rgba(0,0,0,0.02));
         }
 
         .user-info {
             display: flex;
             align-items: center;
             gap: 12px;
+            color: inherit;
+        }
+        
+        html[data-theme='dark'] .users-table td {
+            color: #e0e0e0;
         }
         .user-name {
             font-weight: 500;
@@ -479,6 +501,7 @@ $v = getAppVersion();
         <table class="users-table">
             <thead>
                 <tr>
+                    <th style="text-align: center; width: 60px;">ID</th>
                     <th><?php echo t_h('multiuser.admin.username', [], 'User'); ?></th>
                     <th style="text-align: center;"><?php echo t_h('multiuser.admin.administrator', [], 'Administrator'); ?></th>
                     <th style="text-align: center;"><?php echo t_h('multiuser.admin.status', [], 'Status'); ?></th>
@@ -489,7 +512,10 @@ $v = getAppVersion();
             </thead>
             <tbody>
                 <?php foreach ($users as $user): ?>
-                    <tr>
+                <tr>
+                        <td style="text-align: center; font-family: monospace; color: var(--text-color, #333); font-size: 1.1rem; font-weight: 600;">
+                            <?php echo $user['id']; ?>
+                        </td>
                         <td>
                             <div class="user-info">
                                 <div class="user-username" 

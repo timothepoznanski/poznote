@@ -92,11 +92,56 @@ function isAuthenticated() {
                     return true;
                 }
             } elseif (count($parts) === 3) {
-                // Legacy format: username:timestamp:hash (single-user mode)
+                // Legacy format: username:timestamp:hash (single-user mode before multi-user migration)
+                // These cookies are from before the multi-user migration and don't contain a user_id.
+                // We need to check if a migration has occurred and invalidate these old cookies.
                 list($username, $timestamp, $hash) = $parts;
+                
+                // Check if migration has occurred by looking for migration_timestamp in global_settings
+                $migrationTimestamp = null;
+                try {
+                    require_once __DIR__ . '/users/db_master.php';
+                    $migrationTimestamp = getGlobalSetting('migration_timestamp');
+                } catch (Exception $e) {
+                    // Ignore errors, proceed without migration check
+                }
+                
+                // If migration occurred and cookie was created before migration, invalidate it
+                // This forces the user to re-login and select their profile
+                if ($migrationTimestamp !== null && (int)$timestamp < (int)$migrationTimestamp) {
+                    // Cookie was created before migration, invalidate it
+                    setcookie(REMEMBER_ME_COOKIE, '', time() - 3600, '/', '', false, true);
+                    error_log("Poznote: Invalidated pre-migration remember-me cookie");
+                    return false;
+                }
+                
+                // If no migration or cookie was created after (shouldn't happen for legacy format),
+                // validate normally but auto-select the first user profile
                 if (time() - $timestamp < REMEMBER_ME_DURATION && 
                     $username === AUTH_USERNAME &&
                     $hash === hash('sha256', $username . $timestamp . AUTH_PASSWORD)) {
+                    
+                    // For legacy cookies, we need to associate with a user profile
+                    // Auto-select the first active user (typically the migrated admin user)
+                    require_once __DIR__ . '/users/db_master.php';
+                    $profiles = getAllUserProfiles();
+                    if (!empty($profiles)) {
+                        $firstUser = $profiles[0];
+                        $_SESSION['authenticated'] = true;
+                        $_SESSION['user_id'] = (int)$firstUser['id'];
+                        $_SESSION['user'] = getUserProfileById((int)$firstUser['id']);
+                        updateUserLastLogin((int)$firstUser['id']);
+                        
+                        // Upgrade the cookie to the new format with user_id
+                        $newTimestamp = time();
+                        $newHash = hash('sha256', $username . $firstUser['id'] . $newTimestamp . AUTH_PASSWORD);
+                        $newToken = base64_encode($username . ':' . $firstUser['id'] . ':' . $newTimestamp . ':' . $newHash);
+                        setcookie(REMEMBER_ME_COOKIE, $newToken, time() + REMEMBER_ME_DURATION, '/', '', false, true);
+                        
+                        return true;
+                    }
+                    
+                    // Fallback if no profiles exist (shouldn't happen)
                     $_SESSION['authenticated'] = true;
                     return true;
                 }
@@ -224,7 +269,7 @@ function requireApiAuth() {
         exit;
     }
     
-    // Validate credentials (API uses global password, not user profiles)
+    // Validate credentials (API uses global password)
     if ($_SERVER['PHP_AUTH_USER'] !== AUTH_USERNAME || $_SERVER['PHP_AUTH_PW'] !== AUTH_PASSWORD) {
         $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
         header('HTTP/1.1 401 Unauthorized');
@@ -232,6 +277,47 @@ function requireApiAuth() {
         echo json_encode(['error' => $msg]);
         exit;
     }
+    
+    // For Basic Auth, require X-User-ID header to specify which user profile to use
+    // This is needed because with multi-user, each user has their own data
+    $userId = $_SERVER['HTTP_X_USER_ID'] ?? null;
+    
+    if ($userId === null) {
+        header('HTTP/1.1 400 Bad Request');
+        header('Content-Type: application/json');
+        echo json_encode([
+            'error' => 'X-User-ID header is required for API authentication',
+            'hint' => 'Specify the user profile ID to access. Use GET /api/v1/admin/users to list available profiles.'
+        ]);
+        exit;
+    }
+    
+    // Validate user ID and load user profile
+    require_once __DIR__ . '/users/db_master.php';
+    $user = getUserProfileById((int)$userId);
+    
+    if (!$user) {
+        header('HTTP/1.1 404 Not Found');
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'User profile not found: ' . $userId]);
+        exit;
+    }
+    
+    if (!$user['active']) {
+        header('HTTP/1.1 403 Forbidden');
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'User profile is disabled']);
+        exit;
+    }
+    
+    // Set up session with the specified user profile
+    $_SESSION['authenticated'] = true;
+    $_SESSION['user_id'] = (int)$userId;
+    $_SESSION['user'] = [
+        'id' => $user['id'],
+        'username' => $user['username'],
+        'is_admin' => (bool)$user['is_admin']
+    ];
 }
 
 /**
@@ -265,6 +351,105 @@ function requireAdmin() {
         header('HTTP/1.1 403 Forbidden');
         echo 'Admin access required';
         exit;
+    }
+}
+
+/**
+ * Require API authentication for admin endpoints
+ * Similar to requireApiAuth but doesn't require X-User-ID header
+ * Used for /admin/* and /users/profiles endpoints that access master.db, not user data
+ */
+function requireApiAuthAdmin() {
+    // For API endpoints, check session first
+    if (isAuthenticated()) {
+        return;
+    }
+    
+    // Check if Basic Auth is disabled
+    $basicAuthDisabled = defined('OIDC_DISABLE_BASIC_AUTH') && OIDC_DISABLE_BASIC_AUTH;
+    
+    // If no session, try HTTP Basic Auth
+    if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW'])) {
+        $msg = api_t('auth.api.authentication_required', [], 'Authentication required');
+        header('HTTP/1.1 401 Unauthorized');
+        if (!$basicAuthDisabled) {
+            header('WWW-Authenticate: Basic realm="Poznote API"');
+        }
+        header('Content-Type: application/json');
+        echo json_encode(['error' => $msg]);
+        exit;
+    }
+    
+    if ($basicAuthDisabled) {
+        $msg = api_t('auth.api.basic_auth_disabled', [], 'Basic authentication is disabled');
+        header('HTTP/1.1 403 Forbidden');
+        header('Content-Type: application/json');
+        echo json_encode(['error' => $msg]);
+        exit;
+    }
+    
+    // Validate credentials (API uses global password)
+    if ($_SERVER['PHP_AUTH_USER'] !== AUTH_USERNAME || $_SERVER['PHP_AUTH_PW'] !== AUTH_PASSWORD) {
+        $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
+        header('HTTP/1.1 401 Unauthorized');
+        header('Content-Type: application/json');
+        echo json_encode(['error' => $msg]);
+        exit;
+    }
+    
+    // For admin endpoints, we still need a user context for getCurrentUserId() etc.
+    // Use X-User-ID if provided, otherwise use the first admin user
+    $userId = $_SERVER['HTTP_X_USER_ID'] ?? null;
+    
+    if ($userId !== null) {
+        // Use the specified user
+        require_once __DIR__ . '/users/db_master.php';
+        $user = getUserProfileById((int)$userId);
+        
+        if ($user && $user['active']) {
+            $_SESSION['authenticated'] = true;
+            $_SESSION['user_id'] = (int)$userId;
+            $_SESSION['user'] = [
+                'id' => $user['id'],
+                'username' => $user['username'],
+                'is_admin' => (bool)$user['is_admin']
+            ];
+        }
+    } else {
+        // No X-User-ID provided, use the first admin user for admin operations
+        require_once __DIR__ . '/users/db_master.php';
+        $profiles = getAllUserProfiles();
+        
+        // Find an admin user
+        $adminUser = null;
+        foreach ($profiles as $profile) {
+            if ($profile['is_admin']) {
+                $adminUser = getUserProfileById($profile['id']);
+                break;
+            }
+        }
+        
+        if ($adminUser) {
+            $_SESSION['authenticated'] = true;
+            $_SESSION['user_id'] = (int)$adminUser['id'];
+            $_SESSION['user'] = [
+                'id' => $adminUser['id'],
+                'username' => $adminUser['username'],
+                'is_admin' => true
+            ];
+        } else if (!empty($profiles)) {
+            // Fallback to first user if no admin exists
+            $firstUser = getUserProfileById($profiles[0]['id']);
+            if ($firstUser) {
+                $_SESSION['authenticated'] = true;
+                $_SESSION['user_id'] = (int)$firstUser['id'];
+                $_SESSION['user'] = [
+                    'id' => $firstUser['id'],
+                    'username' => $firstUser['username'],
+                    'is_admin' => (bool)$firstUser['is_admin']
+                ];
+            }
+        }
     }
 }
 ?>

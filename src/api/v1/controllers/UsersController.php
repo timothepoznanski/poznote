@@ -85,16 +85,13 @@ class UsersController {
         require_once __DIR__ . '/../../users/db_master.php';
         
         $username = $data['username'] ?? '';
-        $displayName = $data['display_name'] ?? null;
-        $color = $data['color'] ?? '#007DB8';
-        $icon = $data['icon'] ?? 'user';
         
         if (empty($username)) {
             http_response_code(400);
             return ['error' => 'Username is required'];
         }
         
-        $result = createUserProfile($username, $displayName, $color, $icon);
+        $result = createUserProfile($username);
         
         if (!$result['success']) {
             http_response_code(400);
@@ -207,14 +204,11 @@ class UsersController {
         
         $users = getAllUserProfiles();
         
-        // Return only public info (no admin status, no last_login, etc.)
+        // Return only public info
         return array_map(function($user) {
             return [
                 'id' => $user['id'],
-                'username' => $user['username'],
-                'display_name' => $user['display_name'],
-                'color' => $user['color'],
-                'icon' => $user['icon']
+                'username' => $user['username']
             ];
         }, $users);
     }

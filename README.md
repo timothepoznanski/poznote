@@ -761,6 +761,20 @@ Poznote provides a RESTful API v1 for programmatic access to notes, folders, wor
 
 Access the **Swagger UI** directly from Poznote from `Settings > API Documentation` and browse all endpoints, view request/response schemas, and test API calls interactively.
 
+### Multi-User Mode
+
+Poznote supports multiple user profiles, each with their own isolated data. For API calls that access **user data** (notes, folders, etc.), you must include the `X-User-ID` header:
+
+```bash
+# Get notes for user ID 1
+curl -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/notes
+```
+
+**Admin endpoints** (`/api/v1/admin/*`) and **public endpoints** (`/api/v1/users/profiles`) do **not** require the `X-User-ID` header.
+
+Use `GET /api/v1/users/profiles` to list available user profiles and their IDs.
+
 ### Command Line Examples (Curl)
 
 Ready-to-use curl commands for every API operation.
@@ -771,15 +785,15 @@ Ready-to-use curl commands for every API operation.
 
 **List Notes**
 
-List all notes in the system:
+List all notes for a user:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes
 ```
 
 Filter notes by workspace, folder, tag, or search:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/notes?workspace=Personal&folder=Projects&tag=important"
 ```
 
@@ -787,7 +801,7 @@ curl -u 'username:password' \
 
 List all notes that have file attachments:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/with-attachments
 ```
 
@@ -795,13 +809,13 @@ curl -u 'username:password' \
 
 Get a specific note by ID:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123
 ```
 
 Resolve a note by title (reference) inside a workspace:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/notes/resolve?reference=My+Note&workspace=Personal"
 ```
 
@@ -809,7 +823,7 @@ curl -u 'username:password' \
 
 Create a new note with title, content, tags, folder and workspace:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{
     "heading": "My New Note",
@@ -826,7 +840,7 @@ curl -X POST -u 'username:password' \
 
 Update an existing note by ID:
 ```bash
-curl -X PATCH -u 'username:password' \
+curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{
     "heading": "Updated Title",
@@ -840,13 +854,13 @@ curl -X PATCH -u 'username:password' \
 
 Move a note to trash:
 ```bash
-curl -X DELETE -u 'username:password' \
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123
 ```
 
 Permanently delete (bypass trash):
 ```bash
-curl -X DELETE -u 'username:password' \
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/notes/123?permanent=true"
 ```
 
@@ -854,7 +868,7 @@ curl -X DELETE -u 'username:password' \
 
 Restore a note from trash:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/restore
 ```
 
@@ -862,7 +876,7 @@ curl -X POST -u 'username:password' \
 
 Create a copy of an existing note:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/duplicate
 ```
 
@@ -870,7 +884,7 @@ curl -X POST -u 'username:password' \
 
 Convert between markdown and HTML:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"target_type": "markdown"}' \
   http://YOUR_SERVER/api/v1/notes/123/convert
@@ -880,7 +894,7 @@ curl -X POST -u 'username:password' \
 
 Replace all tags on a note:
 ```bash
-curl -X PUT -u 'username:password' \
+curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"tags": "work,urgent,meeting"}' \
   http://YOUR_SERVER/api/v1/notes/123/tags
@@ -890,7 +904,7 @@ curl -X PUT -u 'username:password' \
 
 Toggle favorite status:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/favorite
 ```
 
@@ -898,7 +912,7 @@ curl -X POST -u 'username:password' \
 
 Move a note to a different folder:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"folder_id": 45}' \
   http://YOUR_SERVER/api/v1/notes/123/folder
@@ -906,7 +920,7 @@ curl -X POST -u 'username:password' \
 
 Remove from folder (move to root):
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/remove-folder
 ```
 
@@ -920,7 +934,7 @@ curl -X POST -u 'username:password' \
 
 Check if a note is shared:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/share
 ```
 
@@ -928,7 +942,7 @@ curl -u 'username:password' \
 
 Create a share link for a note:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{
     "theme": "light",
@@ -942,7 +956,7 @@ curl -X POST -u 'username:password' \
 
 Update share settings:
 ```bash
-curl -X PATCH -u 'username:password' \
+curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"theme": "dark", "indexable": true}' \
   http://YOUR_SERVER/api/v1/notes/123/share
@@ -952,7 +966,7 @@ curl -X PATCH -u 'username:password' \
 
 Remove sharing access:
 ```bash
-curl -X DELETE -u 'username:password' \
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/share
 ```
 
@@ -960,13 +974,13 @@ curl -X DELETE -u 'username:password' \
 
 Get list of all shared notes:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/shared
 ```
 
 Filter by workspace:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/shared?workspace=Personal"
 ```
 
@@ -980,7 +994,7 @@ curl -u 'username:password' \
 
 Check if a folder is shared:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/folders/5/share
 ```
 
@@ -988,7 +1002,7 @@ curl -u 'username:password' \
 
 Share a folder (all notes in the folder will also be shared):
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{
     "theme": "light",
@@ -1000,7 +1014,7 @@ curl -X POST -u 'username:password' \
 
 With custom token:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{
     "custom_token": "my-shared-folder"
@@ -1012,7 +1026,7 @@ curl -X POST -u 'username:password' \
 
 Update share settings:
 ```bash
-curl -X PATCH -u 'username:password' \
+curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"indexable": 1, "password": "new-password"}' \
   http://YOUR_SERVER/api/v1/folders/5/share
@@ -1022,7 +1036,7 @@ curl -X PATCH -u 'username:password' \
 
 Revoke folder sharing (all notes in the folder will also be unshared):
 ```bash
-curl -X DELETE -u 'username:password' \
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/folders/5/share
 ```
 
@@ -1036,13 +1050,13 @@ curl -X DELETE -u 'username:password' \
 
 Get all notes in trash:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/trash
 ```
 
 Filter by workspace:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/trash?workspace=Personal"
 ```
 
@@ -1050,7 +1064,7 @@ curl -u 'username:password' \
 
 Permanently delete all notes in trash:
 ```bash
-curl -X DELETE -u 'username:password' \
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/trash
 ```
 
@@ -1058,7 +1072,7 @@ curl -X DELETE -u 'username:password' \
 
 Delete a specific note from trash:
 ```bash
-curl -X DELETE -u 'username:password' \
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/trash/123
 ```
 
@@ -1072,13 +1086,13 @@ curl -X DELETE -u 'username:password' \
 
 List all folders in a workspace:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/folders?workspace=Personal"
 ```
 
 Get folder tree (nested structure):
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/folders?workspace=Personal&tree=true"
 ```
 
@@ -1086,7 +1100,7 @@ curl -u 'username:password' \
 
 Get note counts for all folders:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/folders/counts?workspace=Personal"
 ```
 
@@ -1094,7 +1108,7 @@ curl -u 'username:password' \
 
 Create a new folder:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "My Projects",
@@ -1105,7 +1119,7 @@ curl -X POST -u 'username:password' \
 
 Create a subfolder:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "2024",
@@ -1119,7 +1133,7 @@ curl -X POST -u 'username:password' \
 
 Rename an existing folder:
 ```bash
-curl -X PATCH -u 'username:password' \
+curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"name": "New Folder Name"}' \
   http://YOUR_SERVER/api/v1/folders/12
@@ -1129,7 +1143,7 @@ curl -X PATCH -u 'username:password' \
 
 Move folder to a different parent:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"parent_id": 56}' \
   http://YOUR_SERVER/api/v1/folders/34/move
@@ -1137,7 +1151,7 @@ curl -X POST -u 'username:password' \
 
 Move to root (no parent):
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"parent_id": null}' \
   http://YOUR_SERVER/api/v1/folders/34/move
@@ -1147,7 +1161,7 @@ curl -X POST -u 'username:password' \
 
 Set a custom icon:
 ```bash
-curl -X PUT -u 'username:password' \
+curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"icon": "fa-folder-open"}' \
   http://YOUR_SERVER/api/v1/folders/12/icon
@@ -1157,7 +1171,7 @@ curl -X PUT -u 'username:password' \
 
 Move all notes in folder to trash:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/folders/12/empty
 ```
 
@@ -1165,7 +1179,7 @@ curl -X POST -u 'username:password' \
 
 Delete a folder:
 ```bash
-curl -X DELETE -u 'username:password' \
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/folders/12
 ```
 
@@ -1179,7 +1193,7 @@ curl -X DELETE -u 'username:password' \
 
 Get all workspaces:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/workspaces
 ```
 
@@ -1187,7 +1201,7 @@ curl -u 'username:password' \
 
 Create a new workspace:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"name": "MyProject"}' \
   http://YOUR_SERVER/api/v1/workspaces
@@ -1197,7 +1211,7 @@ curl -X POST -u 'username:password' \
 
 Rename an existing workspace:
 ```bash
-curl -X PATCH -u 'username:password' \
+curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"new_name": "NewName"}' \
   http://YOUR_SERVER/api/v1/workspaces/OldName
@@ -1207,7 +1221,7 @@ curl -X PATCH -u 'username:password' \
 
 Delete a workspace:
 ```bash
-curl -X DELETE -u 'username:password' \
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/workspaces/OldWorkspace
 ```
 
@@ -1221,13 +1235,13 @@ curl -X DELETE -u 'username:password' \
 
 Get all unique tags:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/tags
 ```
 
 Filter by workspace:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/tags?workspace=Personal"
 ```
 
@@ -1241,7 +1255,7 @@ curl -u 'username:password' \
 
 Get all attachments for a note:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/attachments
 ```
 
@@ -1249,7 +1263,7 @@ curl -u 'username:password' \
 
 Upload a file to a note:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -F "file=@/path/to/file.pdf" \
   http://YOUR_SERVER/api/v1/notes/123/attachments
 ```
@@ -1258,7 +1272,7 @@ curl -X POST -u 'username:password' \
 
 Download a specific attachment:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/attachments/456 \
   -o downloaded-file.pdf
 ```
@@ -1267,7 +1281,7 @@ curl -u 'username:password' \
 
 Delete an attachment:
 ```bash
-curl -X DELETE -u 'username:password' \
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/attachments/456
 ```
 
@@ -1281,7 +1295,7 @@ curl -X DELETE -u 'username:password' \
 
 Get a list of all backup files:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/backups
 ```
 
@@ -1289,7 +1303,7 @@ curl -u 'username:password' \
 
 Create a complete backup:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/backups
 ```
 
@@ -1297,7 +1311,7 @@ curl -X POST -u 'username:password' \
 
 Download a specific backup file:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/backups/poznote_backup_2025-01-05_12-00-00.zip \
   -o backup.zip
 ```
@@ -1306,7 +1320,7 @@ curl -u 'username:password' \
 
 Delete a backup file:
 ```bash
-curl -X DELETE -u 'username:password' \
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/backups/poznote_backup_2025-01-05_12-00-00.zip
 ```
 
@@ -1322,7 +1336,7 @@ curl -X DELETE -u 'username:password' \
 
 Export a note as HTML or Markdown:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api_export_note.php?id=123&format=html" \
   -o exported-note.html
 ```
@@ -1331,7 +1345,7 @@ curl -u 'username:password' \
 
 Export a folder as ZIP:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api_export_folder.php?folder_id=123" \
   -o folder-export.zip
 ```
@@ -1340,7 +1354,7 @@ curl -u 'username:password' \
 
 Export all notes preserving folder hierarchy:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api_export_structured.php?workspace=Personal" \
   -o structured-export.zip
 ```
@@ -1349,7 +1363,7 @@ curl -u 'username:password' \
 
 Export all note files as ZIP:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api_export_entries.php \
   -o all-notes.zip
 ```
@@ -1358,7 +1372,7 @@ curl -u 'username:password' \
 
 Export all attachments as ZIP:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api_export_attachments.php \
   -o all-attachments.zip
 ```
@@ -1373,7 +1387,7 @@ curl -u 'username:password' \
 
 Get a setting value:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/settings/language
 ```
 
@@ -1381,7 +1395,7 @@ curl -u 'username:password' \
 
 Set a setting value:
 ```bash
-curl -X PUT -u 'username:password' \
+curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"value": "fr"}' \
   http://YOUR_SERVER/api/v1/settings/language
@@ -1397,7 +1411,7 @@ curl -X PUT -u 'username:password' \
 
 Get current version and system info:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/system/version
 ```
 
@@ -1405,7 +1419,7 @@ curl -u 'username:password' \
 
 Check if a newer version is available:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/system/updates
 ```
 
@@ -1413,7 +1427,7 @@ curl -u 'username:password' \
 
 Get translation strings:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/system/i18n
 ```
 

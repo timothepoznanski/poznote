@@ -6,9 +6,25 @@ info:
     
     **Base URL:** `/api/v1`
     
-    **Authentication:** All endpoints support both HTTP Basic Authentication and Session Authentication.
+    ## Authentication
+    
+    All endpoints support both HTTP Basic Authentication and Session Authentication.
     - Use HTTP Basic Auth (`-u username:password`) for scripts and automation
     - Use Session Auth for browser-based access (Swagger UI)
+    
+    ### Multi-User Mode
+    
+    Poznote supports multiple user profiles, each with their own isolated data (notes, folders, attachments, etc.).
+    
+    For endpoints that access **user data** (notes, folders, workspaces, etc.), you must include the `X-User-ID` header to specify which user's data to access:
+    
+    ```bash
+    curl -u admin:password -H "X-User-ID: 1" https://poznote.example.com/api/v1/notes
+    ```
+    
+    **Admin endpoints** (`/admin/*`) and **public endpoints** (`/users/profiles`) do **not** require the `X-User-ID` header.
+    
+    Use `GET /api/v1/users/profiles` to list available user profiles and their IDs.
 
     **OIDC / SSO (optional):** Poznote can be configured to authenticate users via OpenID Connect for interactive login.
     - Start the flow: `GET /oidc_login.php`
@@ -42,6 +58,8 @@ tags:
     description: Backup and restore
   - name: System
     description: System information and utilities
+  - name: Users
+    description: User profiles management
   - name: Export
     description: Export operations (legacy endpoints)
 
@@ -54,10 +72,20 @@ components:
     BasicAuth:
       type: http
       scheme: basic
+      description: HTTP Basic Auth with global username/password. Include X-User-ID header for data endpoints.
     SessionAuth:
       type: apiKey
       in: cookie
       name: POZNOTE_SESSION_8040
+  
+  parameters:
+    UserIdHeader:
+      name: X-User-ID
+      in: header
+      required: true
+      schema:
+        type: integer
+      description: User profile ID to access. Required for all data endpoints (notes, folders, etc.). Use GET /users/profiles to list available profiles.
 
   schemas:
     Note:

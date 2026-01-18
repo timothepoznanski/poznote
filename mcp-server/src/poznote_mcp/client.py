@@ -19,23 +19,32 @@ class PoznoteClient:
         username: str | None = None,
         password: str | None = None,
         workspace: str | None = None,
+        user_id: str | int | None = None,
     ):
         # Default includes Poznote's typical dev port (8040). Users can override with POZNOTE_API_URL.
         self.base_url = (base_url or os.getenv("POZNOTE_API_URL", "http://localhost:8040/api/v1")).rstrip("/")
         self.username = username or os.getenv("POZNOTE_USERNAME", "")
         self.password = password or os.getenv("POZNOTE_PASSWORD", "")
         self.default_workspace = workspace or os.getenv("POZNOTE_DEFAULT_WORKSPACE", "Poznote")
+        self.user_id = str(user_id or os.getenv("POZNOTE_USER_ID", "1"))
         
         # Configure HTTP client with Basic Auth
         auth = None
         if self.username and self.password:
             auth = httpx.BasicAuth(self.username, self.password)
         
+        # Headers include X-User-ID for multi-user support
+        headers = {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "X-User-ID": self.user_id
+        }
+        
         self.client = httpx.Client(
             base_url=self.base_url,
             auth=auth,
             timeout=30.0,
-            headers={"Accept": "application/json", "Content-Type": "application/json"}
+            headers=headers
         )
     
     def list_notes(self, workspace: str | None = None) -> list[dict]:
