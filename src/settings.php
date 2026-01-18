@@ -98,6 +98,18 @@ $currentLang = getUserLanguage();
 $currentUser = getCurrentUser();
 $displayName = htmlspecialchars($currentUser['display_name'] ?: $currentUser['username']);
 
+// Count workspaces
+$workspaces_count = 0;
+try {
+    if (isset($con)) {
+        $stmtWs = $con->prepare("SELECT COUNT(*) as cnt FROM workspaces");
+        $stmtWs->execute();
+        $workspaces_count = (int)$stmtWs->fetchColumn();
+    }
+} catch (Exception $e) {
+    $workspaces_count = 0;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -141,6 +153,16 @@ $displayName = htmlspecialchars($currentUser['display_name'] ?: $currentUser['us
                     </div>
                     <div class="settings-card-content">
                         <h3><?php echo t_h('common.back_to_notes'); ?></h3>
+                    </div>
+                </div>
+
+                <!-- Workspaces -->
+                <div class="settings-card settings-card-clickable" id="workspaces-card" data-href="workspaces.php">
+                    <div class="settings-card-icon">
+                        <i class="fa-layer-group"></i>
+                    </div>
+                    <div class="settings-card-content">
+                        <h3><?php echo t_h('settings.cards.workspaces', [], 'Workspaces'); ?> <span class="setting-status enabled"><?php echo $workspaces_count; ?></span></h3>
                     </div>
                 </div>
 

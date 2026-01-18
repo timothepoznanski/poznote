@@ -144,17 +144,6 @@ try {
     $total_notes_count = 0;
 }
 
-// Count workspaces
-$workspaces_count = 0;
-try {
-    if (isset($con)) {
-        $stmtWs = $con->prepare("SELECT COUNT(*) as cnt FROM workspaces");
-        $stmtWs->execute();
-        $workspaces_count = (int)$stmtWs->fetchColumn();
-    }
-} catch (Exception $e) {
-    $workspaces_count = 0;
-}
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
@@ -179,9 +168,8 @@ try {
         <?php $currentUser = getCurrentUser(); ?>
         <div class="home-header">
             <div class="home-info-line">
-                <span class="home-info-username"><?php echo htmlspecialchars($currentUser['username'] ?? 'User', ENT_QUOTES); ?></span>
-                <span class="home-info-separator">-</span>
-                <span class="home-workspace-name"><?php echo htmlspecialchars($pageWorkspace ?: 'Poznote', ENT_QUOTES); ?></span>
+                <span class="home-info-username"><i class="fa-user home-info-icon"></i><?php echo htmlspecialchars($currentUser['username'] ?? 'User', ENT_QUOTES); ?></span>
+                <span class="home-workspace-name"><i class="fa-layer-group home-info-icon"></i><?php echo htmlspecialchars($pageWorkspace ?: 'Poznote', ENT_QUOTES); ?></span>
             </div>
         </div>
         
@@ -263,16 +251,6 @@ try {
                 </div>
             </a>
 
-            <!-- Workspaces -->
-            <a href="workspaces.php" class="home-card" title="<?php echo t_h('home.workspaces', [], 'Workspaces'); ?>">
-                <div class="home-card-icon">
-                    <i class="fa-layer-group"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('home.workspaces', [], 'Workspaces'); ?></span>
-                    <span class="home-card-count"><?php echo $workspaces_count; ?></span>
-                </div>
-            </a>
 
             <!-- Logout -->
             <a href="logout.php" class="home-card home-card-logout" title="<?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?>">

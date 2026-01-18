@@ -41,10 +41,11 @@
 .home-info-line {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 20px;
     font-size: 1.3rem;
     font-weight: 600;
     color: #1f2937;
+    line-height: 0.8;
 }
 
 html[data-theme='dark'] .home-info-line,
@@ -59,8 +60,19 @@ body.dark-mode .home-info-line {
 
 
 
+.home-info-username,
 .home-workspace-name {
-    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+}
+
+.home-info-icon {
+    font-size: 0.7em;
+    opacity: 0.6;
+    margin-right: 8px;
+    font-style: normal;
+    display: inline-block;
+    line-height: 1;
 }
 
 .home-notes-count {
@@ -230,6 +242,12 @@ body.dark-mode .home-card-logout .home-card-icon {
 
 .fa-sticky-note::before {
     content: "\f249";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 400;
+}
+
+.fa-user::before {
+    content: "\f007";
     font-family: "Font Awesome 5 Pro";
     font-weight: 400;
 }
