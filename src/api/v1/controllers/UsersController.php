@@ -233,7 +233,7 @@ class UsersController {
         ];
         
         // Define users data directory path
-        $usersBaseDir = dirname(__DIR__, 3) . '/data/users';
+        $usersBaseDir = dirname(__DIR__, 4) . '/data/users';
         if (!is_dir($usersBaseDir)) {
             return ['success' => false, 'error' => 'Users data directory not found at ' . $usersBaseDir];
         }
