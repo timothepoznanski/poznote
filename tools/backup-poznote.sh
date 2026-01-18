@@ -71,18 +71,35 @@ log() {
 
 log "Creating backup for: $BASE_URL"
 log "Using credentials: $USERNAME"
+
+# Multi-user support: detect user ID from profiles
+log "Detecting User ID for $USERNAME..."
+PROFILES_RESPONSE=$(curl -s -u "$USERNAME:$PASSWORD" "$BASE_URL/api/v1/users/profiles")
+USER_ID=$(echo "$PROFILES_RESPONSE" | jq -r ".[] | select(.username == \"$USERNAME\") | .id" 2>/dev/null)
+
+if [ -z "$USER_ID" ] || [ "$USER_ID" = "null" ]; then
+    log "Warning: User ID not found in profiles list. Attempting with default context."
+    # If we can't find the ID (e.g. non-admin user), we'll try without the header
+    # Poznote usually defaults to ID 1 or the first available user.
+    AUTH_HEADER=""
+else
+    log "Detected User ID: $USER_ID"
+    AUTH_HEADER="-H \"X-User-ID: $USER_ID\""
+fi
+
 log "Backup directory: $BACKUP_DIR"
 log "Maximum backups to keep: $MAX_BACKUPS"
 
 # Call API to create backup using REST API v1
-RESPONSE=$(curl -s -u "$USERNAME:$PASSWORD" -X POST "$BASE_URL/api/v1/backups")
+# Note: we use eval to handle the dynamic AUTH_HEADER with quotes
+RESPONSE=$(eval "curl -s -u \"$USERNAME:$PASSWORD\" $AUTH_HEADER -X POST \"$BASE_URL/api/v1/backups\"")
 
 # Extract filename from response
-FILENAME=$(echo "$RESPONSE" | jq -r '.backup_file')
+FILENAME=$(echo "$RESPONSE" | jq -r '.backup_file' 2>/dev/null)
 
 if [ "$FILENAME" = "null" ] || [ -z "$FILENAME" ]; then
     log "ERROR: Failed to create backup"
-    echo "$RESPONSE" | jq '.'
+    echo "$RESPONSE" | jq '.' 2>/dev/null || echo "$RESPONSE"
     exit 1
 fi
 
@@ -96,7 +113,7 @@ log "Backup created: $FILENAME ($SIZE_MB MB)"
 DOWNLOAD_URL="$BASE_URL/api/v1/backups/$FILENAME"
 OUTPUT_FILE="$BACKUP_DIR/$FILENAME"
 
-if curl -s -u "$USERNAME:$PASSWORD" -o "$OUTPUT_FILE" "$DOWNLOAD_URL"; then
+if eval "curl -s -u \"$USERNAME:$PASSWORD\" $AUTH_HEADER -o \"$OUTPUT_FILE\" \"$DOWNLOAD_URL\""; then
     log "Backup downloaded: $OUTPUT_FILE"
 else
     log "ERROR: Failed to download backup"
@@ -132,7 +149,7 @@ fi
 
 # Clean old backups on server (via REST API v1)
 log "Cleaning old backups on server..."
-SERVER_BACKUPS=$(curl -s -u "$USERNAME:$PASSWORD" "$BASE_URL/api/v1/backups" | jq -r '.backups[] | .filename' | sort)
+SERVER_BACKUPS=$(eval "curl -s -u \"$USERNAME:$PASSWORD\" $AUTH_HEADER \"$BASE_URL/api/v1/backups\"" | jq -r '.backups[] | .filename' | sort)
 SERVER_COUNT=$(echo "$SERVER_BACKUPS" | grep -c "poznote_backup_")
 
 if [ "$SERVER_COUNT" -gt "$MAX_BACKUPS" ]; then
@@ -142,7 +159,7 @@ if [ "$SERVER_COUNT" -gt "$MAX_BACKUPS" ]; then
     # Get oldest backups to remove
     echo "$SERVER_BACKUPS" | head -n "$REMOVE_COUNT" | while read -r OLD_BACKUP; do
         if [ -n "$OLD_BACKUP" ]; then
-            DELETE_RESPONSE=$(curl -s -u "$USERNAME:$PASSWORD" -X DELETE "$BASE_URL/api/v1/backups/$OLD_BACKUP")
+            DELETE_RESPONSE=$(eval "curl -s -u \"$USERNAME:$PASSWORD\" $AUTH_HEADER -X DELETE \"$BASE_URL/api/v1/backups/$OLD_BACKUP\"")
             
             if echo "$DELETE_RESPONSE" | jq -e '.success' > /dev/null 2>&1; then
                 log "Deleted from server: $OLD_BACKUP"
