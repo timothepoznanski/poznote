@@ -964,7 +964,8 @@ function repairDatabaseEntries($con) {
     
     try {
         // --- PART 1: FOLDERS MIGRATION ---
-        $stmt = $con->query("SELECT id, folder, workspace FROM entries WHERE folder IS NOT NULL AND folder != '' AND folder_id IS NULL");
+        // Only repair notes that are NOT in trash to avoid re-creating deleted folders
+        $stmt = $con->query("SELECT id, folder, workspace FROM entries WHERE folder IS NOT NULL AND folder != '' AND folder_id IS NULL AND trash = 0");
         $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         foreach ($notes as $note) {
