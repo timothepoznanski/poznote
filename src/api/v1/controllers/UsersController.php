@@ -31,8 +31,8 @@ class UsersController {
     public function list($params = []) {
         if ($err = $this->requireAdmin()) return $err;
         
-        require_once __DIR__ . '/../../users/db_master.php';
-        require_once __DIR__ . '/../../users/UserDataManager.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/UserDataManager.php';
         
         $users = listAllUserProfiles();
         
@@ -58,8 +58,8 @@ class UsersController {
     public function get($id) {
         if ($err = $this->requireAdmin()) return $err;
         
-        require_once __DIR__ . '/../../users/db_master.php';
-        require_once __DIR__ . '/../../users/UserDataManager.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/UserDataManager.php';
         
         $user = getUserProfileById((int)$id);
         
@@ -82,7 +82,7 @@ class UsersController {
     public function create($data) {
         if ($err = $this->requireAdmin()) return $err;
         
-        require_once __DIR__ . '/../../users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
         
         $username = $data['username'] ?? '';
         
@@ -111,7 +111,7 @@ class UsersController {
     public function update($id, $data) {
         if ($err = $this->requireAdmin()) return $err;
         
-        require_once __DIR__ . '/../../users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
         
         // Check if user exists
         $user = getUserProfileById((int)$id);
@@ -136,7 +136,7 @@ class UsersController {
     public function delete($id, $params = []) {
         if ($err = $this->requireAdmin()) return $err;
         
-        require_once __DIR__ . '/../../users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
         
         // Cannot delete yourself
         if ((int)$id === getCurrentUserId()) {
@@ -162,8 +162,8 @@ class UsersController {
     public function stats() {
         if ($err = $this->requireAdmin()) return $err;
         
-        require_once __DIR__ . '/../../users/db_master.php';
-        require_once __DIR__ . '/../../users/UserDataManager.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/UserDataManager.php';
         
         $users = listAllUserProfiles();
         
@@ -200,7 +200,7 @@ class UsersController {
      * This endpoint is public (no admin required)
      */
     public function profiles() {
-        require_once __DIR__ . '/../../users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
         
         $users = getAllUserProfiles();
         
@@ -218,7 +218,7 @@ class UsersController {
     public function repair() {
         if ($err = $this->requireAdmin()) return $err;
         
-        require_once __DIR__ . '/../../users/db_master.php';
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
         try {
             $masterCon = getMasterConnection();
         } catch (Exception $e) {
@@ -233,9 +233,14 @@ class UsersController {
         ];
         
         // Define users data directory path
-        $usersBaseDir = dirname(__DIR__, 4) . '/data/users';
+        // Use SQLITE_DATABASE constant to find data directory reliably
+        // SQLITE_DATABASE = /path/to/data/database/poznote.db
+        // So dirname(SQLITE_DATABASE, 2) = /path/to/data
+        $dataDir = dirname(SQLITE_DATABASE, 2);
+        $usersBaseDir = $dataDir . '/users';
+        
         if (!is_dir($usersBaseDir)) {
-            return ['success' => false, 'error' => 'Users data directory not found at ' . $usersBaseDir];
+            return ['success' => false, 'error' => 'Users data directory not found at ' . $usersBaseDir . ' (derived from SQLITE_DATABASE: ' . SQLITE_DATABASE . ')'];
         }
         
         try {
