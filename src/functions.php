@@ -1008,7 +1008,6 @@ function repairDatabaseEntries($con) {
                 }
             }
         }
-        
         return [
             'success' => true, 
             'folders_fixed' => $fixedFolders, 

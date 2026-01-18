@@ -110,87 +110,6 @@ body {
     background: #5a6268;
 }
 
-#subheading-input {
-    width: 350px;
-    max-width: 100%;
-    padding: 7px 12px;
-    border: 1px solid #ced4da;
-    border-radius: 5px;
-    font-size: 15px;
-    margin-right: 12px;
-    box-sizing: border-box;
-    transition: border-color 0.2s;
-}
-
-#subheading-input:focus {
-    border-color: #007db8;
-    outline: none;
-}
-
-#subheading-buttons {
-    display: flex;
-    gap: 8px;
-}
-
-.btn-save {
-    background: linear-gradient(90deg, #28a745 100%);
-    color: white;
-    border: none;
-    padding: 6px 18px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: background 0.2s;
-}
-
-.btn-save:hover {
-    background: linear-gradient(90deg, #218838 100%);
-}
-
-.btn-cancel {
-    background: linear-gradient(90deg, #6c757d 100%);
-    color: white;
-    border: none;
-    padding: 6px 18px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: background 0.2s;
-}
-
-.btn-cancel:hover {
-    background: linear-gradient(90deg, #5a6268 100%);
-}
-
-.btn-edit {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    margin-left: 10px;
-    padding: 2px 8px;
-    border-radius: 3px;
-    opacity: 0.7;
-    transition: background 0.2s, opacity 0.2s;
-}
-
-.btn-edit:hover {
-    opacity: 1;
-    background-color: #e9ecef;
-}
-
-/* Make subheading appear clickable (blue) but not underlined */
-#subheading-display {
-    color: #007DB8;
-    font-weight: 600;
-}
-#subheading-display:hover, #subheading-display:focus {
-    color: #005a8a;
-    outline: none;
-}
-
 /* Responsive adjustments for mobile: stack label/value and make inputs full-width */
 @media (max-width: 800px) {
     .info-row {
@@ -199,35 +118,24 @@ body {
         align-items: flex-start;
         padding: 12px 16px;
     }
+
     .info-label {
         min-width: auto;
         margin-bottom: 8px;
     }
+
     .info-value {
         width: 100%;
         flex-direction: column;
         align-items: stretch;
         gap: 8px;
     }
-    #subheading-input {
-        width: 100% !important;
-        margin-right: 0;
-        display: block;
-    }
-    #subheading-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 6px;
-    }
-    .btn-save, .btn-cancel { padding: 8px 14px; }
-    #edit-subheading-btn { margin-left: 0; }
 
-     /* Hide the "Back to notes" button on mobile */
+    /* Hide the "Back to notes" button on mobile */
     .info-buttons-container .btn[title="Back to notes"] {
         display: none !important;
     }
-    
+
     /* Center the header when button is hidden */
     .info-buttons-container {
         justify-content: center;
@@ -246,10 +154,4 @@ body {
 /* Cursor pointer */
 .cursor-pointer {
     cursor: pointer;
-}
-
-/* Subheading buttons container */
-.subheading-buttons-container {
-    display: none;
-    margin-left: 10px;
 }

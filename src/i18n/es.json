@@ -1,1613 +1,1604 @@
 {
-  "app": {
-    "name": "Poznote"
-  },
-  "common": {
-    "notes": "Notas",
-    "back_to_home": "Volver al inicio",
-    "back_to_notes": "Volver a las notas",
-    "back_to_settings": "Volver a la configuración",
-    "close": "Cerrar",
-    "cancel": "Cancelar",
-    "confirm": "Confirmar",
-    "confirmation": "Confirmación",
-    "save": "Guardar",
-    "download": "Descargar",
-    "convert": "Convertir",
-    "create": "Crear",
-    "delete": "Eliminar",
-    "duplicate": "Duplicar",
-    "move": "Mover",
-    "rename": "Renombrar",
-    "menu": "Menú",
-    "enabled": "habilitado",
-    "disabled": "deshabilitado",
-    "loading": "Cargando...",
-    "please_wait": "Por favor espere...",
-    "information": "Información",
-    "error": "Error",
-    "warning": "Advertencia",
-    "success": "Éxito",
-    "notification": "Notificación",
-    "saved": "guardado",
-    "not_defined": "no establecido",
-    "unknown_error": "Error desconocido",
-    "yes": "Sí",
-    "no": "No",
-    "not_available": "No disponible",
-    "not_specified": "No especificado",
-    "apply": "Aplicar"
-  },
-  "folders": {
-    "delete": {
-      "confirm_main": "¿Estás seguro de que quieres eliminar la carpeta \"{{folder}}\"?",
-      "details": {
-        "subfolder_singular_html": "<strong>• {{count}}</strong> subcarpeta también será eliminada",
-        "subfolder_plural_html": "<strong>• {{count}}</strong> subcarpetas también serán eliminadas",
-        "note_singular_html": "<strong>• {{count}}</strong> nota será movida a la papelera",
-        "note_plural_html": "<strong>• {{count}}</strong> notas serán movidas a la papelera"
-      }
+    "app": {
+        "name": "Poznote"
     },
-    "download": {
-      "starting": "Preparando descarga de la carpeta \"{{folder}}\"...",
-      "started": "Descarga iniciada para la carpeta \"{{folder}}\""
+    "common": {
+        "notes": "Notas",
+        "back_to_home": "Volver al inicio",
+        "back_to_notes": "Volver a las notas",
+        "back_to_settings": "Volver a la configuración",
+        "close": "Cerrar",
+        "cancel": "Cancelar",
+        "confirm": "Confirmar",
+        "confirmation": "Confirmación",
+        "save": "Guardar",
+        "download": "Descargar",
+        "convert": "Convertir",
+        "create": "Crear",
+        "delete": "Eliminar",
+        "duplicate": "Duplicar",
+        "move": "Mover",
+        "rename": "Renombrar",
+        "menu": "Menú",
+        "enabled": "habilitado",
+        "disabled": "deshabilitado",
+        "loading": "Cargando...",
+        "please_wait": "Por favor espere...",
+        "information": "Información",
+        "error": "Error",
+        "warning": "Advertencia",
+        "success": "Éxito",
+        "notification": "Notificación",
+        "saved": "guardado",
+        "not_defined": "no establecido",
+        "unknown_error": "Error desconocido",
+        "yes": "Sí",
+        "no": "No",
+        "not_available": "No disponible",
+        "not_specified": "No especificado",
+        "apply": "Aplicar"
     },
-    "move_all": {
-      "same_source_target": "Las carpetas de origen y destino no pueden ser las mismas",
-      "moving": "Moviendo...",
-      "files_count_singular": "1 archivo será movido",
-      "files_count_plural": "{{count}} archivos serán movidos",
-      "empty_folder": "Esta carpeta está vacía",
-      "unable_to_count_files": "No se pueden contar los archivos"
+    "folders": {
+        "delete": {
+            "confirm_main": "¿Estás seguro de que quieres eliminar la carpeta \"{{folder}}\"?",
+            "details": {
+                "subfolder_singular_html": "<strong>• {{count}}</strong> subcarpeta también será eliminada",
+                "subfolder_plural_html": "<strong>• {{count}}</strong> subcarpetas también serán eliminadas",
+                "note_singular_html": "<strong>• {{count}}</strong> nota será movida a la papelera",
+                "note_plural_html": "<strong>• {{count}}</strong> notas serán movidas a la papelera"
+            }
+        },
+        "download": {
+            "starting": "Preparando descarga de la carpeta \"{{folder}}\"...",
+            "started": "Descarga iniciada para la carpeta \"{{folder}}\""
+        },
+        "move_all": {
+            "same_source_target": "Las carpetas de origen y destino no pueden ser las mismas",
+            "moving": "Moviendo...",
+            "files_count_singular": "1 archivo será movido",
+            "files_count_plural": "{{count}} archivos serán movidos",
+            "empty_folder": "Esta carpeta está vacía",
+            "unable_to_count_files": "No se pueden contar los archivos"
+        },
+        "errors": {
+            "check_content_prefix": "Error al verificar el contenido de la carpeta: {{error}}",
+            "move_files_prefix": "Error al mover archivos: {{error}}",
+            "cannot_rename_system_folders": "No se pueden renombrar carpetas del sistema",
+            "generic_prefix": "Error: {{error}}",
+            "create_title": "Error al crear carpeta",
+            "create_prefix": "Error al crear carpeta: {{error}}",
+            "delete_prefix": "Error al eliminar carpeta: {{error}}",
+            "rename_prefix": "Error al renombrar carpeta: {{error}}",
+            "load_prefix": "Error al cargar carpetas: {{error}}",
+            "empty_folder_prefix": "Error al vaciar carpeta: {{error}}",
+            "move_folder_prefix": "Error al mover la carpeta: {{error}}"
+        },
+        "validation": {
+            "enter_folder_name": "Por favor ingresa un nombre de carpeta"
+        },
+        "empty": {
+            "title": "Vaciar carpeta",
+            "confirm_message": "¿Estás seguro de que quieres mover todas las notas de \"{{folder}}\" a la papelera?",
+            "confirm_button": "Enviar notas a la papelera",
+            "success_moved_to_trash": "Todas las notas movidas a la papelera desde la carpeta: {{folder}}"
+        },
+        "move_note": {
+            "select_note_first": "Por favor selecciona una nota primero antes de moverla a una carpeta.",
+            "select_target_folder": "Por favor selecciona una carpeta de destino",
+            "create_and_move": "Crear y mover",
+            "errors": {
+                "move_prefix": "Error al mover nota: {{error}}",
+                "duplicate_title": "Ya existe una nota con el mismo título en la carpeta de destino.",
+                "duplicate_title_root": "Ya existe una nota con el mismo título en el nivel raíz."
+            }
+        },
+        "subfolder": {
+            "modal_title": "Nueva subcarpeta",
+            "modal_message": "Ingresa el nombre de la subcarpeta (dentro de {{parent}})"
+        },
+        "move": {
+            "moving": "Moviendo...",
+            "success": "Carpeta \"{{folder}}\" movida exitosamente"
+        }
     },
-    "errors": {
-      "check_content_prefix": "Error al verificar el contenido de la carpeta: {{error}}",
-      "move_files_prefix": "Error al mover archivos: {{error}}",
-      "cannot_rename_system_folders": "No se pueden renombrar carpetas del sistema",
-      "generic_prefix": "Error: {{error}}",
-      "create_title": "Error al crear carpeta",
-      "create_prefix": "Error al crear carpeta: {{error}}",
-      "delete_prefix": "Error al eliminar carpeta: {{error}}",
-      "rename_prefix": "Error al renombrar carpeta: {{error}}",
-      "load_prefix": "Error al cargar carpetas: {{error}}",
-      "empty_folder_prefix": "Error al vaciar carpeta: {{error}}",
-      "move_folder_prefix": "Error al mover la carpeta: {{error}}"
+    "modal_alerts": {
+        "cursor_warning": {
+            "title": "Posición del cursor requerida",
+            "message": "Por favor haz clic dentro del editor antes de continuar."
+        }
     },
-    "validation": {
-      "enter_folder_name": "Por favor ingresa un nombre de carpeta"
+    "excalidraw": {
+        "titles": {
+            "editing_not_available": "Edición no disponible",
+            "unsaved_note": "Nota no guardada",
+            "insertion_error": "Error de inserción",
+            "image_not_found": "Imagen no encontrada"
+        },
+        "editor": {
+            "titles": {
+                "embedded_diagram": "Diagrama incrustado",
+                "new_note": "Nueva nota"
+            },
+            "toolbar": {
+                "save_and_exit": "Guardar y salir",
+                "exit_without_saving": "Salir sin guardar",
+                "saving": "Guardando...",
+                "saved": "¡Guardado!"
+            },
+            "loading": "Cargando Excalidraw Poznote...",
+            "alerts": {
+                "editor_not_ready": "Editor no listo",
+                "error_prefix": "Error: {{error}}"
+            },
+            "errors": {
+                "failed_to_load": "Error: Falló al cargar Excalidraw. Por favor refresca la página.",
+                "initializing_prefix": "Error al inicializar Excalidraw: {{error}}",
+                "save_failed": "Guardado fallido"
+            },
+            "library_warning": {
+                "line1": "El botón \"Agregar a Excalidraw\" en la página externa de la biblioteca no funciona con esta versión autoalojada.",
+                "line2": "Debes descargar el archivo de biblioteca (.excalidrawlib) y importarlo manualmente usando el botón \"Abrir\" en el menú de la biblioteca.",
+                "ok": "Entendido"
+            }
+        },
+        "messages": {
+            "disabled_small_screens": "La edición de Excalidraw está deshabilitada en pantallas pequeñas para una mejor experiencia de usuario.",
+            "disabled_mobile": "La edición de Excalidraw está deshabilitada en dispositivos móviles.",
+            "disabled_under_800": "La edición de Excalidraw está deshabilitada en pantallas menores de 800px."
+        },
+        "spinner": {
+            "saving_note": "Guardando nota...",
+            "saving_title": "Guardando"
+        },
+        "errors": {
+            "save_before_adding": "Por favor guarda la nota antes de agregar diagramas",
+            "save_before_editing": "Por favor guarda la nota antes de editar diagramas",
+            "note_editor_not_found": "Editor de nota no encontrado",
+            "failed_to_save_try_again": "Falló al guardar la nota. Por favor intenta de nuevo.",
+            "error_saving_note_prefix": "Error al guardar nota: {{error}}",
+            "insert_area_not_found": "No se pudo encontrar el área de contenido de la nota para insertar el diagrama",
+            "image_not_found": "Imagen de Excalidraw no encontrada. Por favor abre el diagrama en el editor y guárdalo primero."
+        }
     },
-    "empty": {
-      "title": "Vaciar carpeta",
-      "confirm_message": "¿Estás seguro de que quieres mover todas las notas de \"{{folder}}\" a la papelera?",
-      "confirm_button": "Enviar notas a la papelera",
-      "success_moved_to_trash": "Todas las notas movidas a la papelera desde la carpeta: {{folder}}"
-    },
-    "move_note": {
-      "select_note_first": "Por favor selecciona una nota primero antes de moverla a una carpeta.",
-      "select_target_folder": "Por favor selecciona una carpeta de destino",
-      "create_and_move": "Crear y mover",
-      "errors": {
-        "move_prefix": "Error al mover nota: {{error}}",
-        "duplicate_title": "Ya existe una nota con el mismo título en la carpeta de destino.",
-        "duplicate_title_root": "Ya existe una nota con el mismo título en el nivel raíz."
-      }
-    },
-    "subfolder": {
-      "modal_title": "Nueva subcarpeta",
-      "modal_message": "Ingresa el nombre de la subcarpeta (dentro de {{parent}})"
-    },
-    "move": {
-      "moving": "Moviendo...",
-      "success": "Carpeta \"{{folder}}\" movida exitosamente"
-    }
-  },
-  "modal_alerts": {
-    "cursor_warning": {
-      "title": "Posición del cursor requerida",
-      "message": "Por favor haz clic dentro del editor antes de continuar."
-    }
-  },
-  "excalidraw": {
-    "titles": {
-      "editing_not_available": "Edición no disponible",
-      "unsaved_note": "Nota no guardada",
-      "insertion_error": "Error de inserción",
-      "image_not_found": "Imagen no encontrada"
-    },
-    "editor": {
-      "titles": {
-        "embedded_diagram": "Diagrama incrustado",
-        "new_note": "Nueva nota"
-      },
-      "toolbar": {
-        "save_and_exit": "Guardar y salir",
-        "exit_without_saving": "Salir sin guardar",
-        "saving": "Guardando...",
-        "saved": "¡Guardado!"
-      },
-      "loading": "Cargando Excalidraw Poznote...",
-      "alerts": {
-        "editor_not_ready": "Editor no listo",
-        "error_prefix": "Error: {{error}}"
-      },
-      "errors": {
-        "failed_to_load": "Error: Falló al cargar Excalidraw. Por favor refresca la página.",
-        "initializing_prefix": "Error al inicializar Excalidraw: {{error}}",
-        "save_failed": "Guardado fallido"
-      },
-      "library_warning": {
-        "line1": "El botón \"Agregar a Excalidraw\" en la página externa de la biblioteca no funciona con esta versión autoalojada.",
-        "line2": "Debes descargar el archivo de biblioteca (.excalidrawlib) y importarlo manualmente usando el botón \"Abrir\" en el menú de la biblioteca.",
-        "ok": "Entendido"
-      }
-    },
-    "messages": {
-      "disabled_small_screens": "La edición de Excalidraw está deshabilitada en pantallas pequeñas para una mejor experiencia de usuario.",
-      "disabled_mobile": "La edición de Excalidraw está deshabilitada en dispositivos móviles.",
-      "disabled_under_800": "La edición de Excalidraw está deshabilitada en pantallas menores de 800px."
-    },
-    "spinner": {
-      "saving_note": "Guardando nota...",
-      "saving_title": "Guardando"
-    },
-    "errors": {
-      "save_before_adding": "Por favor guarda la nota antes de agregar diagramas",
-      "save_before_editing": "Por favor guarda la nota antes de editar diagramas",
-      "note_editor_not_found": "Editor de nota no encontrado",
-      "failed_to_save_try_again": "Falló al guardar la nota. Por favor intenta de nuevo.",
-      "error_saving_note_prefix": "Error al guardar nota: {{error}}",
-      "insert_area_not_found": "No se pudo encontrar el área de contenido de la nota para insertar el diagrama",
-      "image_not_found": "Imagen de Excalidraw no encontrada. Por favor abre el diagrama en el editor y guárdalo primero."
-    }
-  },
-  "note_reference": {
-    "loading": "Cargando...",
-    "untitled": "Sin título",
-    "modal": {
-      "search_placeholder": "Buscar una nota...",
-      "recent_notes": "Notas recientes"
-    },
-    "empty": {
-      "no_notes_found": "No se encontraron notas",
-      "no_match": "Ninguna nota coincide con tu búsqueda",
-      "no_other": "No hay otras notas disponibles"
-    },
-    "error": {
-      "loading_notes": "Error al cargar notas"
-    }
-  },
-  "attachments": {
-    "empty": "Sin adjuntos.",
-    "upload": {
-      "button_uploading": "Subiendo..."
-    },
-    "actions": {
-      "view": "Ver",
-      "delete": "Eliminar",
-      "open_attachments": "Abrir adjuntos",
-      "download": "Descargar {{filename}}"
-    },
-    "errors": {
-      "select_file": "Por favor selecciona un archivo para subir.",
-      "no_note_selected": "Ninguna nota seleccionada.",
-      "file_too_large": "El archivo es demasiado grande (máx: {{maxSize}}).",
-      "http_error": "Error HTTP: {{status}}",
-      "invalid_server_response": "Respuesta del servidor inválida.",
-      "upload_failed": "Subida fallida: {{error}}",
-      "deletion_failed": "Eliminación fallida: {{error}}",
-      "deletion_failed_generic": "Eliminación fallida.",
-      "loading_failed": "Falló al cargar adjuntos",
-      "loading_error": "Error al cargar adjuntos",
-      "upload_failed_generic": "Subida fallida. Por favor intenta de nuevo.",
-      "upload_failed_connection": "Subida fallida. Por favor verifica tu conexión."
-    },
-    "messages": {
-      "upload_success": "¡Archivo subido exitosamente!",
-      "deleted_success": "Adjunto eliminado exitosamente"
-    },
-    "page": {
-      "title": "Administrar adjuntos",
-      "subtitle": "Administrar adjuntos para la nota:",
-      "upload_section_title": "Subir nuevo adjunto",
-      "drag_drop_info": "Puedes arrastrar y soltar tu archivo a continuación:",
-      "all_types_accepted": "Todos los tipos de archivo aceptados (máx 200MB)",
-      "upload_button": "Subir archivo",
-      "current_attachments": "Adjuntos actuales",
-      "loading_attachments": "Cargando adjuntos...",
-      "preview_alt": "Vista previa",
-      "uploaded_prefix": "Subido: ",
-      "open_in_new_tab": "Abrir en nueva pestaña"
-    },
-    "modals": {
-      "delete": {
-        "title": "Eliminar adjunto",
-        "message": "¿Quieres eliminar este adjunto? Esta acción no se puede deshacer."
-      }
-    },
-    "size": {
-      "units": {
-        "bytes": "bytes",
-        "kb": "KB",
-        "mb": "MB",
-        "gb": "GB"
-      }
-    },
-    "list": {
-      "title": "Notas con archivos adjuntos",
-      "no_attachments": "Aún no hay notas con archivos adjuntos.",
-      "hint": "Añada archivos adjuntos a sus notas usando el botón del clip en la barra de herramientas.",
-      "filter_placeholder": "Filtrar por título de nota o nombre de archivo adjunto...",
-      "no_filter_results": "Ninguna nota coincide con su búsqueda.",
-      "download": "Descargar"
-    }
-  },
-  "auth": {
-    "api": {
-      "authentication_required": "Autenticación requerida",
-      "invalid_credentials": "Credenciales inválidas"
-    }
-  },
-  "settings": {
-    "title": "Configuración",
-    "sections": {
-      "account_display": "Cuenta y Visualización",
-      "notes_folders": "Notas y Carpetas",
-      "backup_restore": "Copia de seguridad, Restauración y Actualizaciones",
-      "advanced": "Avanzado"
-    },
-    "language": {
-      "label": "Idioma",
-      "english": "Inglés",
-      "french": "Francés",
-      "spanish": "Español",
-      "portuguese": "Portugués",
-      "german": "Alemán",
-      "saved": "Idioma guardado",
-      "save_error": "No se pudo guardar el idioma",
-      "reload_hint": "Recargando…"
-    },
-    "cards": {
-      "workspaces": "Espacios de trabajo",
-      "backup_export": "Copia de seguridad / Exportar",
-      "restore_import": "Restaurar / Importar",
-      "check_updates": "Buscar actualizaciones",
-      "api_docs": "Documentación de API",
-      "documentation": "Repositorio Github",
-      "news": "Blog de Poznote",
-      "website": "Sitio web de Poznote",
-      "support": "Apoyar al desarrollador",
-      "release_notes": "Notas de la versión"
-    }
-  },
-  "workspaces": {
-    "page": {
-      "title": "Administrar espacios de trabajo - Poznote"
-    },
-    "description": "Los espacios de trabajo te permiten organizar tus notas en entornos separados dentro de una sola instancia de Poznote - como tener diferentes cuadernos para trabajo, vida personal o proyectos.",
-    "sections": {
-      "create": {
-        "title": "Crear un nuevo espacio de trabajo",
-        "placeholder": "Ingresa el nombre del espacio de trabajo"
-      },
-      "existing": {
-        "title": "Espacios de trabajo existentes",
-        "empty": "No hay espacios de trabajo definidos."
-      }
-    },
-    "actions": {
-      "select": "Seleccionar",
-      "move_notes": "Mover notas"
-    },
-    "count": {
-      "notes_0": "0 notas",
-      "notes_1": "1 nota",
-      "notes_n": "{{count}} notas"
-    },
-    "default": {
-      "title": "Espacio de trabajo de inicio",
-      "description_1": "Elige qué espacio de trabajo se abre al iniciar Poznote.",
-      "description_2": "Selecciona \"{{last}}\" para siempre abrir el espacio de trabajo que estabas usando anteriormente.",
-      "last_opened": "Último espacio de trabajo abierto",
-      "save_button": "Guardar",
-      "status_set_to": "✓ Espacio de trabajo de inicio establecido en: {{workspace}}",
-      "error_saving": "Error al guardar el espacio de trabajo de inicio"
-    },
-    "validation": {
-      "enter_name": "Ingresa un nombre de espacio de trabajo",
-      "invalid_name": "Nombre inválido: usa solo letras, números, guión o guion bajo",
-      "enter_new_name": "Por favor ingresa un nuevo nombre",
-      "new_name_must_differ": "El nuevo nombre debe ser diferente al actual"
-    },
-    "alerts": {
-      "unknown_error": "Error desconocido",
-      "error_prefix": "Error: {{error}}",
-      "renamed_success": "Espacio de trabajo renombrado exitosamente",
-      "deleted_success": "Espacio de trabajo eliminado exitosamente",
-      "rename_error": "Error al renombrar espacio de trabajo",
-      "delete_error": "Error al eliminar espacio de trabajo"
-    },
-    "move": {
-      "choose_target": "Elige un destino",
-      "moved_to": "Movidas {{count}} notas a {{target}}",
-      "error_moving_notes": "Error al mover notas: {{error}}"
-    },
-    "menu": {
-      "loading": "Cargando espacios de trabajo...",
-      "error_loading": "Error al cargar espacios de trabajo",
-      "logout": "Cerrar sesión"
-    },
-    "errors": {
-      "name_empty": "El nombre del espacio de trabajo no puede estar vacío",
-      "invalid_name": "Nombre de espacio de trabajo inválido. Usa solo letras, números, guión y guion bajo (sin espacios).",
-      "name_required": "Nombre de espacio de trabajo requerido",
-      "cannot_delete_default": "No se puede eliminar el espacio de trabajo de inicio",
-      "not_found": "Espacio de trabajo no encontrado",
-      "cannot_rename_default": "No se puede renombrar el espacio de trabajo de inicio",
-      "invalid_new_name": "Nuevo nombre de espacio de trabajo inválido. Usa solo letras, números, guión y guion bajo (sin espacios).",
-      "name_and_target_required": "Nombre de espacio de trabajo y destino requeridos",
-      "source_target_must_differ": "Los espacios de trabajo de origen y destino deben ser diferentes"
-    },
-    "messages": {
-      "created": "Espacio de trabajo creado",
-      "deleted_all": "Espacio de trabajo eliminado y todas las notas, carpetas y adjuntos asociados eliminados",
-      "renamed": "Espacio de trabajo renombrado en notas y etiquetas",
-      "notes_moved_to": "Notas movidas a {{target}}"
-    },
-    "confirm_delete": {
-      "title": "Confirmar eliminación de espacio de trabajo",
-      "message": "Eliminar espacio de trabajo \"{{workspace}}\"? Las notas serán movidas al espacio de trabajo de inicio."
-    }
-  },
-  "display": {
-    "title": "Pantalla",
-    "cards": {
-      "theme_mode": "Tema",
-      "login_display": "Título de página de inicio de sesión",
-      "note_font_size": "Tamaño de fuente del contenido de la nota",
-      "note_sort_order": "Orden de clasificación de notas",
-      "tasklist_insert_order": "Orden de inserción de tareas",
-      "timezone": "Zona horaria",
-      "show_note_created": "Mostrar fecha de creación de la nota",
-      "show_note_subheading": "Mostrar subtítulo de la nota",
-      "show_folder_counts": "Mostrar conteo de notas de carpetas",
-      "notes_without_folders_after": "Mostrar notas después de las carpetas",
-      "show_folder_actions": "Mostrar acciones de carpeta",
-      "center_note_content": "Centrar contenido de la nota"
-    },
-    "badges": {
-      "font_size_default": "predeterminado ({{size}}px)",
-      "toolbar_mode": {
-        "full": "Solo barra de herramientas",
-        "slash": "Solo comando de barra",
-        "both": "Iconos de barra de herramientas + menú de comando de barra"
-      }
-    },
-    "alerts": {
-      "error_saving_preference": "Error al guardar preferencia"
-    },
-    "timezone": {
-      "alerts": {
-        "updated_success": "Zona horaria actualizada exitosamente. Los cambios tomarán efecto inmediatamente.",
-        "update_error": "Error al actualizar zona horaria"
-      }
-    }
-  },
-  "sidebar": {
-    "display": "Pantalla",
-    "home": "Inicio",
-    "settings": "Configuración",
-    "create": "Crear",
-    "toggle": "Mostrar/Ocultar la columna izquierda"
-  },
-  "home": {
-    "title": "Inicio",
-    "shared_notes": "Notas compartidas",
-    "shared_folders": "Carpetas compartidas",
-    "note": "nota",
-    "notes": "notas"
-  },
-  "search": {
-    "placeholder": "Buscar...",
-    "clear": "Limpiar búsqueda",
-    "placeholder_notes": "Buscar una o más palabras...",
-    "placeholder_tags": "Buscar una o más etiquetas...",
-    "validation": {
-      "select_type": "Por favor selecciona al menos una opción de búsqueda (Notas o Etiquetas)",
-      "single_letter_warning": "Buscar con palabras de una sola letra puede devolver demasiados resultados. Intenta usar palabras más largas para una búsqueda más precisa."
-    }
-  },
-  "autosave": {
-    "confirm_switch": "⚠️ Cambios no guardados detectados\n\nTienes cambios no guardados que se perderán si cambias ahora.\n\nHaz clic en Aceptar para guardar y continuar, o Cancelar para quedarte.\n(El autoguardado ocurre 2 segundos después de que dejes de escribir)",
-    "beforeunload_warning": "⚠️ Tienes cambios no guardados. ¿Estás seguro de que quieres irte?",
-    "confirm_navigation": "⚠️ Cambios no guardados\n\nTienes cambios no guardados que se perderán.\n¿Guardar antes de navegar?",
-    "notification": {
-      "saving": "Guardando cambios...",
-      "saved": "¡Guardado!"
-    }
-  },
-  "tasklist": {
-    "input_placeholder": "Escribe una nueva tarea y presiona enter para agregarla a la lista...",
-    "drag_to_reorder": "Arrastrar para reordenar",
-    "add_to_top": "Agregar nuevas tareas arriba",
-    "add_to_bottom": "Agregar nuevas tareas abajo",
-    "insert_order_top": "Arriba",
-    "insert_order_bottom": "Abajo",
-    "clear_completed": "Borrar tareas completadas",
-    "no_completed_tasks": "No hay tareas completadas para borrar.",
-    "confirm_clear_completed": "¿Eliminar {{count}} tarea(s) completada(s)?",
-    "move_to_list": "Mover a otra lista",
-    "move_success": "Tarea movida",
-    "move_error": "No se pudo mover la tarea",
-    "actions": "Acciones de lista de tareas",
-    "uncheck_all": "Desmarcar todas las tareas",
-    "no_checked_tasks": "No hay tareas marcadas para desmarcar.",
-    "confirm_uncheck_all": "¿Desmarcar {{count}} tarea(s)?"
-  },
-  "tags": {
-    "add_single": "Agregar etiqueta...",
-    "add_multiple": "Agregar etiquetas...",
-    "search": {
-      "placeholder": "Filtrar etiquetas...",
-      "results_one": "1 etiqueta encontrada para \"{{term}}\"",
-      "results_other": "{{count}} etiquetas encontradas para \"{{term}}\""
-    },
-    "count": {
-      "one": "Hay {{count}} etiqueta en total",
-      "other": "Hay {{count}} etiquetas en total"
-    },
-    "empty": "No se encontraron etiquetas."
-  },
-  "trash": {
-    "search": {
-      "placeholder": "Buscar en la papelera...",
-      "results_for": "Resultados para \"{{term}}\"",
-      "results_one": "1 nota encontrada para \"{{term}}\"",
-      "results_other": "{{count}} notas encontradas para \"{{term}}\""
-    },
-    "actions": {
-      "empty_trash": "Vaciar papelera",
-      "restore": "Restaurar",
-      "delete_forever": "Eliminar permanentemente",
-      "restore_note_tooltip": "Restaurar esta nota",
-      "delete_permanently_tooltip": "Eliminar permanentemente"
-    },
-    "note": {
-      "last_modified_on": "Última modificación el {{date}}"
-    },
-    "empty": "No hay notas en la papelera.",
-    "modals": {
-      "empty": {
-        "title": "Vaciar papelera",
-        "message": "¿Quieres vaciar la papelera completamente? Esta acción no se puede deshacer."
-      },
-      "restore": {
-        "title": "Restaurar nota",
-        "message": "¿Quieres restaurar esta nota?"
-      },
-      "delete": {
-        "title": "Eliminar nota permanentemente",
-        "message": "¿Quieres eliminar permanentemente esta nota? Esta acción no se puede deshacer."
-      }
-    },
-    "alerts": {
-      "restore_error_title": "Error de restauración",
-      "restore_error_prefix": "Error al restaurar la nota: ",
-      "restore_error_generic": "Error al restaurar la nota",
-      "delete_error_title": "Error de eliminación",
-      "delete_error_prefix": "Error durante la eliminación permanente: ",
-      "delete_error_generic": "Error durante la eliminación permanente de la nota",
-      "empty_error_title": "Error al vaciar papelera",
-      "empty_error_prefix": "Error al vaciar papelera: ",
-      "empty_error_generic": "Error al vaciar papelera"
-    }
-  },
-  "editor": {
-    "markdown_placeholder": "Escribe tu markdown o usa / para abrir el menú de comandos aquí...",
-    "markdown_placeholder_mobile": "Escribe tu markdown aquí...",
-    "images": {
-      "delete_confirm": {
-        "title": "Eliminar imagen",
-        "message": "¿Estás seguro de que quieres eliminar esta imagen? Esta acción no se puede deshacer."
-      }
-    },
-    "colors": {
-      "black": "Negro",
-      "red": "Rojo",
-      "orange": "Naranja",
-      "yellow": "Amarillo",
-      "green": "Verde",
-      "blue": "Azul",
-      "purple": "Morado",
-      "none": "Ninguno"
-    },
-    "font_size": {
-      "very_small": "Muy pequeño",
-      "small": "Pequeño",
-      "normal": "Normal",
-      "large": "Grande",
-      "very_large": "Muy grande",
-      "huge": "Enorme",
-      "giant": "Gigante"
-    },
-    "emoji": {
-      "hint_windows": "En Windows, presiona Win + ; para abrir el selector de emoji"
-    },
-    "table_picker": {
-      "title": "Insertar tabla",
-      "rows_label": "Filas:",
-      "rows_placeholder": "Filas",
-      "cols_label": "Columnas:",
-      "cols_placeholder": "Columnas",
-      "insert": "Insertar"
-    },
-    "toolbar": {
-      "back_to_notes": "Volver a notas",
-      "bold": "Negrita",
-      "italic": "Cursiva",
-      "underline": "Subrayado",
-      "strikethrough": "Tachado",
-      "link": "Enlace",
-      "text_color": "Color del texto",
-      "highlight": "Resaltar",
-      "bullet_list": "Lista con viñetas",
-      "numbered_list": "Lista numerada",
-      "font_size": "Tamaño de fuente",
-      "code_block": "Bloque de código",
-      "inline_code": "Código en línea",
-      "clear_formatting": "Limpiar formato",
-      "insert_excalidraw": "Insertar diagrama Excalidraw",
-      "insert_emoji": "Insertar emoji",
-      "insert_table": "Insertar tabla",
-      "insert_checklist": "Insertar lista de verificación",
-      "add_separator": "Agregar separador",
-      "insert_note_reference": "Insertar referencia de nota",
-      "open_in_new_tab": "Abrir en nueva pestaña"
-    },
-    "link": {
-      "add_title": "Agregar enlace",
-      "title": "Administrar enlace",
-      "url_label": "URL:",
-      "url_placeholder": "https://ejemplo.com",
-      "text_label": "Texto del enlace (opcional):",
-      "text_placeholder": "Texto mostrado",
-      "remove": "Eliminar enlace",
-      "cancel": "Cancelar",
-      "save": "Guardar"
-    }
-  },
-  "info": {
-    "page_title": "Información de la nota",
-    "actions": {
-      "back_to_note": "Volver a la nota"
-    },
-    "labels": {
-      "note_title": "Título de la nota:",
-      "workspace": "Espacio de trabajo:",
-      "folder": "Carpeta:",
-      "created": "Creado:",
-      "last_modified": "Última modificación:",
-      "subheading": "Subtítulo:",
-      "tags": "Etiquetas:",
-      "favorite": "Favorito:",
-      "attachments": "Adjuntos:",
-      "note_id": "ID de la nota:",
-      "full_path": "Ruta completa:"
+    "note_reference": {
+        "loading": "Cargando...",
+        "untitled": "Sin título",
+        "modal": {
+            "search_placeholder": "Buscar una nota...",
+            "recent_notes": "Notas recientes"
+        },
+        "empty": {
+            "no_notes_found": "No se encontraron notas",
+            "no_match": "Ninguna nota coincide con tu búsqueda",
+            "no_other": "No hay otras notas disponibles"
+        },
+        "error": {
+            "loading_notes": "Error al cargar notas"
+        }
     },
     "attachments": {
-      "count_singular": "1 archivo",
-      "count_plural": "{{count}} archivos"
+        "empty": "Sin adjuntos.",
+        "upload": {
+            "button_uploading": "Subiendo..."
+        },
+        "actions": {
+            "view": "Ver",
+            "delete": "Eliminar",
+            "open_attachments": "Abrir adjuntos",
+            "download": "Descargar {{filename}}"
+        },
+        "errors": {
+            "select_file": "Por favor selecciona un archivo para subir.",
+            "no_note_selected": "Ninguna nota seleccionada.",
+            "file_too_large": "El archivo es demasiado grande (máx: {{maxSize}}).",
+            "http_error": "Error HTTP: {{status}}",
+            "invalid_server_response": "Respuesta del servidor inválida.",
+            "upload_failed": "Subida fallida: {{error}}",
+            "deletion_failed": "Eliminación fallida: {{error}}",
+            "deletion_failed_generic": "Eliminación fallida.",
+            "loading_failed": "Falló al cargar adjuntos",
+            "loading_error": "Error al cargar adjuntos",
+            "upload_failed_generic": "Subida fallida. Por favor intenta de nuevo.",
+            "upload_failed_connection": "Subida fallida. Por favor verifica tu conexión."
+        },
+        "messages": {
+            "upload_success": "¡Archivo subido exitosamente!",
+            "deleted_success": "Adjunto eliminado exitosamente"
+        },
+        "page": {
+            "title": "Administrar adjuntos",
+            "subtitle": "Administrar adjuntos para la nota:",
+            "upload_section_title": "Subir nuevo adjunto",
+            "drag_drop_info": "Puedes arrastrar y soltar tu archivo a continuación:",
+            "all_types_accepted": "Todos los tipos de archivo aceptados (máx 200MB)",
+            "upload_button": "Subir archivo",
+            "current_attachments": "Adjuntos actuales",
+            "loading_attachments": "Cargando adjuntos...",
+            "preview_alt": "Vista previa",
+            "uploaded_prefix": "Subido: ",
+            "open_in_new_tab": "Abrir en nueva pestaña"
+        },
+        "modals": {
+            "delete": {
+                "title": "Eliminar adjunto",
+                "message": "¿Quieres eliminar este adjunto? Esta acción no se puede deshacer."
+            }
+        },
+        "size": {
+            "units": {
+                "bytes": "bytes",
+                "kb": "KB",
+                "mb": "MB",
+                "gb": "GB"
+            }
+        },
+        "list": {
+            "title": "Notas con archivos adjuntos",
+            "no_attachments": "Aún no hay notas con archivos adjuntos.",
+            "hint": "Añada archivos adjuntos a sus notas usando el botón del clip en la barra de herramientas.",
+            "filter_placeholder": "Filtrar por título de nota o nombre de archivo adjunto...",
+            "no_filter_results": "Ninguna nota coincide con su búsqueda.",
+            "download": "Descargar"
+        }
     },
-    "empty": {
-      "no_tags": "Sin etiquetas"
+    "auth": {
+        "api": {
+            "authentication_required": "Autenticación requerida",
+            "invalid_credentials": "Credenciales inválidas"
+        }
     },
-    "errors": {
-      "failed_to_update_subheading_prefix": "Falló al actualizar el encabezado: {{error}}",
-      "network_error_updating_subheading": "Error de red al actualizar el encabezado"
-    }
-  },
-  "modals": {
-    "update": {
-      "title": "📱 Versión de la aplicación",
-      "backup_warning": "Haz una copia de seguridad de tus datos.",
-      "backup_hint": "<strong>Configuración > Copia de seguridad</strong>",
-      "current_version": "Versión actual:",
-      "latest_available": "Última disponible:",
-      "view_release_notes": "Ver notas de la versión",
-      "self_hosted": "Instrucciones de autoalojamiento",
-      "cloud": "Instrucciones de nube"
-    },
-    "update_check": {
-      "title": "Buscando actualizaciones...",
-      "status": "Por favor espera mientras buscamos actualizaciones..."
-    },
-    "login_display": {
-      "title": "Nombre de pantalla de inicio de sesión",
-      "description": "Establece el nombre mostrado en la pantalla de inicio de sesión.",
-      "placeholder": "Nombre de pantalla"
-    },
-    "language": {
-      "description": "Selecciona tu idioma preferido:"
-    },
-    "input": {
-      "placeholder": "Ingresa texto"
-    },
-    "font_size": {
-      "title": "Tamaño de fuente del contenido de la nota",
-      "description": "Selecciona el tamaño de fuente predeterminado para tus notas:",
-      "label": "Tamaño de fuente (px):",
-      "default_value": "{{size}} px es el valor predeterminado",
-      "preview": "Este es un texto de vista previa"
-    },
-    "confirm": {
-      "title": "Confirmar acción",
-      "message": "¿Estás seguro de que quieres proceder?",
-      "save_and_exit": "Guardar y salir",
-      "exit_without_saving": "Salir sin guardar"
-    },
-    "folder": {
-      "new_title": "Nueva carpeta",
-      "new_placeholder": "Nuevo nombre de carpeta",
-      "create": "Crear",
-      "rename_title": "Renombrar carpeta",
-      "rename_placeholder": "Nuevo nombre de carpeta",
-      "delete_title": "Eliminar carpeta",
-      "delete_folder": "Eliminar carpeta",
-      "change_folder": "Cambiar carpeta",
-      "move_prefix": "Mover",
-      "move_suffix": "a:",
-      "move_prompt": "Mover \"{{title}}\" a:",
-      "no_folder": "Sin carpeta"
-    },
-    "move_note_folder": {
-      "title": "Mover nota a carpeta",
-      "workspace_destination": "Seleccionar destino del espacio de trabajo:",
-      "target_folder": "Seleccionar carpeta de destino:",
-      "enter_folder_name": "Por favor ingresa un nombre de carpeta"
-    },
-    "move_folder_files": {
-      "title": "Mover todos los archivos",
-      "prompt_prefix": "Mover todos los archivos de",
-      "prompt_suffix": "a:",
-      "select_target": "Seleccionar carpeta de destino...",
-      "hint_move_single": "Para mover una sola nota a otro espacio de trabajo, usa el botón \"Mover nota\" en la barra de herramientas",
-      "hint_move_all": "Para mover todas las notas de un espacio de trabajo a otro, ve a Configuración → Espacios de trabajo",
-      "move_all": "Mover todos los archivos"
+    "settings": {
+        "title": "Configuración",
+        "sections": {
+            "account_display": "Cuenta y Visualización",
+            "notes_folders": "Notas y Carpetas",
+            "backup_restore": "Copia de seguridad, Restauración y Actualizaciones",
+            "advanced": "Avanzado"
+        },
+        "language": {
+            "label": "Idioma",
+            "english": "Inglés",
+            "french": "Francés",
+            "spanish": "Español",
+            "portuguese": "Portugués",
+            "german": "Alemán",
+            "saved": "Idioma guardado",
+            "save_error": "No se pudo guardar el idioma",
+            "reload_hint": "Recargando…"
+        },
+        "cards": {
+            "workspaces": "Espacios de trabajo",
+            "backup_export": "Copia de seguridad / Exportar",
+            "restore_import": "Restaurar / Importar",
+            "check_updates": "Buscar actualizaciones",
+            "api_docs": "Documentación de API",
+            "documentation": "Repositorio Github",
+            "news": "Blog de Poznote",
+            "website": "Sitio web de Poznote",
+            "support": "Apoyar al desarrollador",
+            "release_notes": "Notas de la versión"
+        }
     },
     "workspaces": {
-      "move_notes_title": "Mover notas de",
-      "select_target_workspace": "Seleccionar espacio de trabajo de destino",
-      "rename_title": "Renombrar espacio de trabajo",
-      "new_name": "Nuevo nombre",
-      "delete_title": "Confirmar eliminación de espacio de trabajo",
-      "delete_description": "Todas las notas y carpetas serán eliminadas permanentemente y no se pueden recuperar.",
-      "delete_placeholder": "Escribe el nombre del espacio de trabajo para confirmar",
-      "delete_button": "Eliminar"
+        "page": {
+            "title": "Administrar espacios de trabajo - Poznote"
+        },
+        "description": "Los espacios de trabajo te permiten organizar tus notas en entornos separados dentro de una sola instancia de Poznote - como tener diferentes cuadernos para trabajo, vida personal o proyectos.",
+        "sections": {
+            "create": {
+                "title": "Crear un nuevo espacio de trabajo",
+                "placeholder": "Ingresa el nombre del espacio de trabajo"
+            },
+            "existing": {
+                "title": "Espacios de trabajo existentes",
+                "empty": "No hay espacios de trabajo definidos."
+            }
+        },
+        "actions": {
+            "select": "Seleccionar",
+            "move_notes": "Mover notas"
+        },
+        "count": {
+            "notes_0": "0 notas",
+            "notes_1": "1 nota",
+            "notes_n": "{{count}} notas"
+        },
+        "default": {
+            "title": "Espacio de trabajo de inicio",
+            "description_1": "Elige qué espacio de trabajo se abre al iniciar Poznote.",
+            "description_2": "Selecciona \"{{last}}\" para siempre abrir el espacio de trabajo que estabas usando anteriormente.",
+            "last_opened": "Último espacio de trabajo abierto",
+            "save_button": "Guardar",
+            "status_set_to": "✓ Espacio de trabajo de inicio establecido en: {{workspace}}",
+            "error_saving": "Error al guardar el espacio de trabajo de inicio"
+        },
+        "validation": {
+            "enter_name": "Ingresa un nombre de espacio de trabajo",
+            "invalid_name": "Nombre inválido: usa solo letras, números, guión o guion bajo",
+            "enter_new_name": "Por favor ingresa un nuevo nombre",
+            "new_name_must_differ": "El nuevo nombre debe ser diferente al actual"
+        },
+        "alerts": {
+            "unknown_error": "Error desconocido",
+            "error_prefix": "Error: {{error}}",
+            "renamed_success": "Espacio de trabajo renombrado exitosamente",
+            "deleted_success": "Espacio de trabajo eliminado exitosamente",
+            "rename_error": "Error al renombrar espacio de trabajo",
+            "delete_error": "Error al eliminar espacio de trabajo"
+        },
+        "move": {
+            "choose_target": "Elige un destino",
+            "moved_to": "Movidas {{count}} notas a {{target}}",
+            "error_moving_notes": "Error al mover notas: {{error}}"
+        },
+        "menu": {
+            "loading": "Cargando espacios de trabajo...",
+            "error_loading": "Error al cargar espacios de trabajo",
+            "logout": "Cerrar sesión"
+        },
+        "errors": {
+            "name_empty": "El nombre del espacio de trabajo no puede estar vacío",
+            "invalid_name": "Nombre de espacio de trabajo inválido. Usa solo letras, números, guión y guion bajo (sin espacios).",
+            "name_required": "Nombre de espacio de trabajo requerido",
+            "cannot_delete_default": "No se puede eliminar el espacio de trabajo de inicio",
+            "not_found": "Espacio de trabajo no encontrado",
+            "cannot_rename_default": "No se puede renombrar el espacio de trabajo de inicio",
+            "invalid_new_name": "Nuevo nombre de espacio de trabajo inválido. Usa solo letras, números, guión y guion bajo (sin espacios).",
+            "name_and_target_required": "Nombre de espacio de trabajo y destino requeridos",
+            "source_target_must_differ": "Los espacios de trabajo de origen y destino deben ser diferentes"
+        },
+        "messages": {
+            "created": "Espacio de trabajo creado",
+            "deleted_all": "Espacio de trabajo eliminado y todas las notas, carpetas y adjuntos asociados eliminados",
+            "renamed": "Espacio de trabajo renombrado en notas y etiquetas",
+            "notes_moved_to": "Notas movidas a {{target}}"
+        },
+        "confirm_delete": {
+            "title": "Confirmar eliminación de espacio de trabajo",
+            "message": "Eliminar espacio de trabajo \"{{workspace}}\"? Las notas serán movidas al espacio de trabajo de inicio."
+        }
     },
-    "create": {
-      "title_in_folder": "Crear en {{folder}}",
-      "folder_fallback": "carpeta",
-      "note": {
-        "title": "Nota HTML (no Markdown)"
-      },
-      "markdown": {
-        "title": "Nota Markdown (no HTML)"
-      },
-      "task_list": {
-        "title": "Lista de tareas"
-      },
-      "subfolder": {
-        "title": "Subcarpeta"
-      },
-      "folder": {
-        "title": "Carpeta"
-      },
-      "workspace": {
-        "title": "Espacio de trabajo"
-      }
+    "display": {
+        "title": "Pantalla",
+        "cards": {
+            "theme_mode": "Tema",
+            "login_display": "Título de página de inicio de sesión",
+            "note_font_size": "Tamaño de fuente del contenido de la nota",
+            "note_sort_order": "Orden de clasificación de notas",
+            "tasklist_insert_order": "Orden de inserción de tareas",
+            "timezone": "Zona horaria",
+            "show_note_created": "Mostrar fecha de creación de la nota",
+            "show_folder_counts": "Mostrar conteo de notas de carpetas",
+            "notes_without_folders_after": "Mostrar notas después de las carpetas",
+            "show_folder_actions": "Mostrar acciones de carpeta",
+            "center_note_content": "Centrar contenido de la nota"
+        },
+        "badges": {
+            "font_size_default": "predeterminado ({{size}}px)",
+            "toolbar_mode": {
+                "full": "Solo barra de herramientas",
+                "slash": "Solo comando de barra",
+                "both": "Iconos de barra de herramientas + menú de comando de barra"
+            }
+        },
+        "alerts": {
+            "error_saving_preference": "Error al guardar preferencia"
+        },
+        "timezone": {
+            "alerts": {
+                "updated_success": "Zona horaria actualizada exitosamente. Los cambios tomarán efecto inmediatamente.",
+                "update_error": "Error al actualizar zona horaria"
+            }
+        }
     },
-    "folder_icon": {
-      "title": "Cambiar icono de carpeta",
-      "reset": "Restaurar el comportamiento predeterminado",
-      "search_placeholder": "Buscar iconos..."
+    "sidebar": {
+        "display": "Pantalla",
+        "home": "Inicio",
+        "settings": "Configuración",
+        "create": "Crear",
+        "toggle": "Mostrar/Ocultar la columna izquierda"
     },
-    "convert": {
-      "title": "Convertir nota",
-      "message": "¿Estás seguro de que quieres convertir esta nota?",
-      "to_html_title": "Convertir a HTML",
-      "to_html_message": "Esto convertirá tu nota Markdown a formato HTML.",
-      "to_html_warning": "Antes de convertir esta nota, puedes duplicarla para mantener una copia en caso de que la conversión no cumpla con tus expectativas.",
-      "to_markdown_title": "Convertir a Markdown",
-      "to_markdown_message": "Esto convertirá tu nota HTML a formato Markdown. Las imágenes embebidas se guardarán como adjuntos.",
-      "to_markdown_warning": "Antes de convertir esta nota, puedes duplicarla para mantener una copia en caso de que la conversión no cumpla con tus expectativas.",
-      "converting": "Convirtiendo nota...",
-      "success": "¡Nota convertida con éxito!",
-      "error": "Error al convertir la nota",
-      "duplicate_button": "Duplicar"
+    "home": {
+        "title": "Inicio",
+        "shared_notes": "Notas compartidas",
+        "shared_folders": "Carpetas compartidas",
+        "note": "nota",
+        "notes": "notas"
     },
-    "export": {
-      "title": "Exportar nota",
-      "markdown": {
-        "title": "Exportar como Markdown",
-        "description": "Descargar como archivo MD con metadatos (título, etiquetas, carpeta) en frontmatter YAML"
-      },
-      "html": {
-        "title": "Exportar como HTML",
-        "description": "Descargar como archivo HTML con todo el formato preservado"
-      },
-      "json": {
-        "title": "Descargar como JSON",
-        "description": "Descargar los datos sin procesar de la lista de tareas como archivo JSON"
-      },
-      "print": {
-        "title": "Imprimir a PDF (Navegador)",
-        "description": "Usar el diálogo de impresión nativo del navegador para guardar como PDF"
-      }
+    "search": {
+        "placeholder": "Buscar...",
+        "clear": "Limpiar búsqueda",
+        "placeholder_notes": "Buscar una o más palabras...",
+        "placeholder_tags": "Buscar una o más etiquetas...",
+        "validation": {
+            "select_type": "Por favor selecciona al menos una opción de búsqueda (Notas o Etiquetas)",
+            "single_letter_warning": "Buscar con palabras de una sola letra puede devolver demasiados resultados. Intenta usar palabras más largas para una búsqueda más precisa."
+        }
     },
-    "task_move": {
-      "title": "Mover tarea",
-      "description": "Elige una lista de tareas a la que mover esta tarea.",
-      "search_placeholder": "Buscar listas de tareas...",
-      "loading": "Cargando...",
-      "empty": "No se encontraron listas de tareas.",
-      "moving": "Moviendo tarea...",
-      "error": "No se pudieron cargar las listas de tareas.",
-      "confirm": "Mover tarea"
+    "autosave": {
+        "confirm_switch": "⚠️ Cambios no guardados detectados\n\nTienes cambios no guardados que se perderán si cambias ahora.\n\nHaz clic en Aceptar para guardar y continuar, o Cancelar para quedarte.\n(El autoguardado ocurre 2 segundos después de que dejes de escribir)",
+        "beforeunload_warning": "⚠️ Tienes cambios no guardados. ¿Estás seguro de que quieres irte?",
+        "confirm_navigation": "⚠️ Cambios no guardados\n\nTienes cambios no guardados que se perderán.\n¿Guardar antes de navegar?",
+        "notification": {
+            "saving": "Guardando cambios...",
+            "saved": "¡Guardado!"
+        }
     },
-    "note_sort": {
-      "title": "Orden de clasificación de notas",
-      "description": "Elige cómo se ordenan las notas en la lista de notas:",
-      "options": {
-        "last_modified": "Última modificación",
-        "last_created": "Última creación",
-        "alphabetical": "Alfabético"
-      }
+    "tasklist": {
+        "input_placeholder": "Escribe una nueva tarea y presiona enter para agregarla a la lista...",
+        "drag_to_reorder": "Arrastrar para reordenar",
+        "add_to_top": "Agregar nuevas tareas arriba",
+        "add_to_bottom": "Agregar nuevas tareas abajo",
+        "insert_order_top": "Arriba",
+        "insert_order_bottom": "Abajo",
+        "clear_completed": "Borrar tareas completadas",
+        "no_completed_tasks": "No hay tareas completadas para borrar.",
+        "confirm_clear_completed": "¿Eliminar {{count}} tarea(s) completada(s)?",
+        "move_to_list": "Mover a otra lista",
+        "move_success": "Tarea movida",
+        "move_error": "No se pudo mover la tarea",
+        "actions": "Acciones de lista de tareas",
+        "uncheck_all": "Desmarcar todas las tareas",
+        "no_checked_tasks": "No hay tareas marcadas para desmarcar.",
+        "confirm_uncheck_all": "¿Desmarcar {{count}} tarea(s)?"
     },
-    "timezone": {
-      "title": "Zona horaria",
-      "description": "Selecciona tu zona horaria:",
-      "groups": {
-        "europe": "Europa",
-        "america": "América",
-        "asia": "Asia",
-        "pacific": "Pacífico",
-        "africa": "África"
-      }
+    "tags": {
+        "add_single": "Agregar etiqueta...",
+        "add_multiple": "Agregar etiquetas...",
+        "search": {
+            "placeholder": "Filtrar etiquetas...",
+            "results_one": "1 etiqueta encontrada para \"{{term}}\"",
+            "results_other": "{{count}} etiquetas encontradas para \"{{term}}\""
+        },
+        "count": {
+            "one": "Hay {{count}} etiqueta en total",
+            "other": "Hay {{count}} etiquetas en total"
+        },
+        "empty": "No se encontraron etiquetas."
     },
-    "move_folder": {
-      "title": "Mover carpeta",
-      "prompt_prefix": "Mover carpeta",
-      "prompt_suffix": "a:",
-      "select_target": "Seleccionar carpeta padre...",
-      "root": "Raíz (Nivel superior)",
-      "hint": "Esto moverá la carpeta y todas sus notas como subcarpeta. Seleccione \"Raíz\" para moverla al nivel superior.",
-      "move": "Mover carpeta"
-    }
-  },
-  "notes_list": {
-    "system_folders": {
-      "trash": "Papelera",
-      "tags": "Etiquetas",
-      "favorites": "Favoritos",
-      "public": "Compartidas",
-      "attachments": "Archivos adjuntos"
-    },
-    "drop_zone": {
-      "remove_from_folder": "Suelta aquí para eliminar de la carpeta"
-    },
-    "folder_actions": {
-      "menu": "Acciones",
-      "create": "Crear",
-      "move_all_files": "Mover todos los archivos a otra carpeta",
-      "rename_folder": "Renombrar carpeta",
-      "delete_folder": "Eliminar carpeta",
-      "move_folder": "Mover carpeta a subcarpeta",
-      "change_icon": "Cambiar icono",
-      "download_folder": "Descargar carpeta",
-      "is_public": "Es compartida",
-      "share_folder": "Compartir"
-    }
-  },
-  "update": {
-    "new_available": "🎉 ¡Nueva actualización disponible!",
-    "description": "Tus datos serán preservados durante la actualización.",
-    "up_to_date": "✅ Poznote está actualizado",
-    "error_loading_version": "Error al cargar versión"
-  },
-  "slash_menu": {
-    "back_to_normal": "Volver a texto normal",
-    "title": "Título",
-    "heading_1": "Encabezado 1",
-    "heading_2": "Encabezado 2",
-    "heading_3": "Encabezado 3",
-    "format_text": "Formatear texto",
-    "red": "Rojo",
-    "bold": "Negrita",
-    "italic": "Cursiva",
-    "highlight": "Resaltar",
-    "strikethrough": "Tachado",
-    "code": "Código",
-    "inline_code": "Código en línea",
-    "code_block": "Bloque de código",
-    "list": "Lista",
-    "bullet_list": "Lista con viñetas",
-    "numbered_list": "Lista numerada",
-    "checklist": "Lista de verificación",
-    "image": "Imagen",
-    "excalidraw": "Excalidraw",
-    "emoji": "Emoji",
-    "table": "Tabla",
-    "separator": "Separador",
-    "link_to_note": "Enlace a nota",
-    "link": "Enlace",
-    "cancel": "Cancelar",
-    "back": "Volver",
-    "quote": "Cita",
-    "blockquote": "Bloque de cita",
-    "callout_note": "Nota",
-    "callout_tip": "Consejo",
-    "callout_important": "Importante",
-    "callout_warning": "Advertencia",
-    "callout_caution": "Precaución"
-  },
-  "api": {
-    "settings": {
-      "key_required": "clave requerida",
-      "invalid_action": "acción inválida",
-      "internal_error": "error interno"
-    },
-    "errors": {
-      "workspace_not_found": "Espacio de trabajo no encontrado",
-      "method_not_allowed": "Método no permitido",
-      "invalid_action": "Acción inválida",
-      "internal_server_error": "Error interno del servidor",
-      "duplicate_title_in_folder": "Otra nota con el mismo título existe en esta carpeta.",
-      "invalid_custom_token": "Token personalizado inválido.\n\nPermitidos:\n\nletras, números, -, _, . (4-128 caracteres)"
-    }
-  },
-  "ui": {
-    "login_display": {
-      "prompt": "Nombre de pantalla de inicio de sesión (vacío para borrar):"
-    },
-    "alerts": {
-      "saved": "Guardado",
-      "save_error": "Error al guardar",
-      "network_error": "Error de red"
-    }
-  },
-  "theme": {
-    "badge": {
-      "dark": "modo oscuro",
-      "light": "modo claro"
-    }
-  },
-  "table": {
-    "context_menu": {
-      "insert_row_above": "Insertar fila arriba",
-      "insert_row_below": "Insertar fila abajo",
-      "insert_column_left": "Insertar columna izquierda",
-      "insert_column_right": "Insertar columna derecha",
-      "delete_row": "Eliminar fila",
-      "delete_column": "Eliminar columna",
-      "delete_table": "Eliminar tabla",
-      "errors": {
-        "cannot_delete_last_row": "No se puede eliminar la última fila de la tabla.",
-        "cannot_delete_last_column": "No se puede eliminar la última columna de la tabla."
-      },
-      "confirm": {
-        "delete_table": "¿Realmente quieres eliminar esta tabla?"
-      }
-    }
-  },
-  "index": {
-    "errors": {
-      "create_task_list": "Error al crear lista de tareas",
-      "create_task_list_prefix": "Error al crear lista de tareas: ",
-      "create_markdown_note": "Error al crear nota markdown",
-      "create_markdown_note_prefix": "Error al crear nota markdown: ",
-      "failed_to_save_subheading": "Falló al guardar subtítulo",
-      "conversion_failed_prefix": "Error en la conversión: {{error}}",
-      "network_error_converting": "Error de red al convertir la nota"
-    },
-    "toolbar": {
-      "favorite_add": "Agregar a favoritos",
-      "favorite_remove": "Eliminar de favoritos",
-      "public_note": "Compartir nota",
-      "attachments_with_count": "Adjuntos ({{count}})",
-      "menu_actions": "Acciones del menú"
-    },
-    "share_modal": {
-      "custom_token": "Token personalizado (opcional)",
-      "custom_token_placeholder": "mi_token_personalizado-1",
-      "password": "Contraseña (opcional)",
-      "password_placeholder": "Ingrese una contraseña",
-      "indexable": "Permitir indexación por motores de búsqueda",
-      "create_url": "Crear URL",
-      "close": "Cerrar",
-      "error_prefix": "Error: ",
-      "unknown_error": "Error desconocido al crear el enlace público",
-      "error_creating": "Error al crear el enlace público: "
-    },
-    "public_modal": {
-      "title": "URL compartida",
-      "close": "Cerrar",
-      "open": "Abrir",
-      "copy": "Copiar",
-      "revoke": "Revocar",
-      "renew": "Renovar",
-      "manage": "Editar",
-      "create_url": "Crear url",
-      "no_link_yet": "Aún no hay enlace público",
-      "custom_token": "Token personalizado (opcional)",
-      "custom_token_placeholder": "my_custom_token-1",
-      "indexable": "Permitir indexación por motores de búsqueda",
-      "password": "Contraseña (opcional)",
-      "password_placeholder": "Ingrese una contraseña",
-      "error_prefix": "Error: ",
-      "unknown_error": "Error desconocido al crear el enlace público",
-      "error_creating": "Error al crear el enlace público: "
-    },
-    "folder_share_modal": {
-      "title": "URL de carpeta compartida",
-      "description": "Cualquiera con este enlace puede ver todas las notas de esta carpeta (a menos que esté protegida con contraseña).",
-      "use_https": "HTTPS",
-      "renewed": "Enlace de carpeta compartida renovado",
-      "failed_renew": "Error al renovar el enlace de la carpeta",
-      "failed_revoke": "Error al revocar el enlace de la carpeta"
-    },
-    "note": {
-      "new_note": "Nueva nota",
-      "new_note_numbered": "Nueva nota ({{number}})",
-      "title_placeholder": "¿Título?"
-    },
-    "subheading": {
-      "placeholder": "Agrega subtítulo aquí"
+    "trash": {
+        "search": {
+            "placeholder": "Buscar en la papelera...",
+            "results_for": "Resultados para \"{{term}}\"",
+            "results_one": "1 nota encontrada para \"{{term}}\"",
+            "results_other": "{{count}} notas encontradas para \"{{term}}\""
+        },
+        "actions": {
+            "empty_trash": "Vaciar papelera",
+            "restore": "Restaurar",
+            "delete_forever": "Eliminar permanentemente",
+            "restore_note_tooltip": "Restaurar esta nota",
+            "delete_permanently_tooltip": "Eliminar permanentemente"
+        },
+        "note": {
+            "last_modified_on": "Última modificación el {{date}}"
+        },
+        "empty": "No hay notas en la papelera.",
+        "modals": {
+            "empty": {
+                "title": "Vaciar papelera",
+                "message": "¿Quieres vaciar la papelera completamente? Esta acción no se puede deshacer."
+            },
+            "restore": {
+                "title": "Restaurar nota",
+                "message": "¿Quieres restaurar esta nota?"
+            },
+            "delete": {
+                "title": "Eliminar nota permanentemente",
+                "message": "¿Quieres eliminar permanentemente esta nota? Esta acción no se puede deshacer."
+            }
+        },
+        "alerts": {
+            "restore_error_title": "Error de restauración",
+            "restore_error_prefix": "Error al restaurar la nota: ",
+            "restore_error_generic": "Error al restaurar la nota",
+            "delete_error_title": "Error de eliminación",
+            "delete_error_prefix": "Error durante la eliminación permanente: ",
+            "delete_error_generic": "Error durante la eliminación permanente de la nota",
+            "empty_error_title": "Error al vaciar papelera",
+            "empty_error_prefix": "Error al vaciar papelera: ",
+            "empty_error_generic": "Error al vaciar papelera"
+        }
     },
     "editor": {
-      "placeholder_desktop": "Ingresa texto, usa / para abrir el menú de comandos, pega imágenes o arrastra y suelta una imagen en el cursor.",
-      "placeholder_mobile": "Ingresa texto o pega imágenes aquí..."
-    }
-  },
-  "image_menu": {
-    "view_large": "Ver grande",
-    "download": "Descargar",
-    "resize": "Redimensionar",
-    "edit": "Editar",
-    "add_border": "Agregar borde",
-    "remove_border": "Eliminar borde",
-    "add_border_no_padding": "Agregar borde sin relleno",
-    "remove_border_no_padding": "Eliminar borde sin relleno",
-    "delete_image": "Eliminar imagen",
-    "links": "Enlaces",
-    "open_link": "Abrir enlace",
-    "add_link": "Añadir enlace",
-    "edit_link": "Editar enlace",
-    "remove_link": "Eliminar enlace",
-    "link_modal": {
-      "title_add": "Añadir enlace a la imagen",
-      "title_edit": "Editar enlace de la imagen",
-      "description": "Este enlace hará que la imagen sea clickable cuando la nota esté compartida.",
-      "url_label": "Introduce la URL:",
-      "url_placeholder": "https://www.ejemplo.com",
-      "cancel": "Cancelar",
-      "ok": "OK"
-    }
-  },
-  "backup_export": {
-    "page": {
-      "title": "Copia de seguridad / Exportar"
+        "markdown_placeholder": "Escribe tu markdown o usa / para abrir el menú de comandos aquí...",
+        "markdown_placeholder_mobile": "Escribe tu markdown aquí...",
+        "images": {
+            "delete_confirm": {
+                "title": "Eliminar imagen",
+                "message": "¿Estás seguro de que quieres eliminar esta imagen? Esta acción no se puede deshacer."
+            }
+        },
+        "colors": {
+            "black": "Negro",
+            "red": "Rojo",
+            "orange": "Naranja",
+            "yellow": "Amarillo",
+            "green": "Verde",
+            "blue": "Azul",
+            "purple": "Morado",
+            "none": "Ninguno"
+        },
+        "font_size": {
+            "very_small": "Muy pequeño",
+            "small": "Pequeño",
+            "normal": "Normal",
+            "large": "Grande",
+            "very_large": "Muy grande",
+            "huge": "Enorme",
+            "giant": "Gigante"
+        },
+        "emoji": {
+            "hint_windows": "En Windows, presiona Win + ; para abrir el selector de emoji"
+        },
+        "table_picker": {
+            "title": "Insertar tabla",
+            "rows_label": "Filas:",
+            "rows_placeholder": "Filas",
+            "cols_label": "Columnas:",
+            "cols_placeholder": "Columnas",
+            "insert": "Insertar"
+        },
+        "toolbar": {
+            "back_to_notes": "Volver a notas",
+            "bold": "Negrita",
+            "italic": "Cursiva",
+            "underline": "Subrayado",
+            "strikethrough": "Tachado",
+            "link": "Enlace",
+            "text_color": "Color del texto",
+            "highlight": "Resaltar",
+            "bullet_list": "Lista con viñetas",
+            "numbered_list": "Lista numerada",
+            "font_size": "Tamaño de fuente",
+            "code_block": "Bloque de código",
+            "inline_code": "Código en línea",
+            "clear_formatting": "Limpiar formato",
+            "insert_excalidraw": "Insertar diagrama Excalidraw",
+            "insert_emoji": "Insertar emoji",
+            "insert_table": "Insertar tabla",
+            "insert_checklist": "Insertar lista de verificación",
+            "add_separator": "Agregar separador",
+            "insert_note_reference": "Insertar referencia de nota",
+            "open_in_new_tab": "Abrir en nueva pestaña"
+        },
+        "link": {
+            "add_title": "Agregar enlace",
+            "title": "Administrar enlace",
+            "url_label": "URL:",
+            "url_placeholder": "https://ejemplo.com",
+            "text_label": "Texto del enlace (opcional):",
+            "text_placeholder": "Texto mostrado",
+            "remove": "Eliminar enlace",
+            "cancel": "Cancelar",
+            "save": "Guardar"
+        }
     },
-    "common": {
-      "all_workspaces": "todos los espacios de trabajo"
-    },
-    "sections": {
-      "complete_backup": {
-        "title": "Copia de seguridad completa",
-        "description_prefix": "Descarga una copia de seguridad completa que contenga base de datos, notas y adjuntos para",
-        "description_suffix": "en un solo archivo ZIP.",
-        "use_cases": "Dos casos de uso:",
-        "use_case_restore_label": "Restaurar",
-        "use_case_restore_text": "Importa esta copia de seguridad para recuperar tus datos en caso de pérdida",
-        "use_case_offline_label": "Lectura sin conexión",
-        "use_case_offline_text": "Abre el incluido",
-        "use_case_offline_text_suffix": "para navegar tus notas sin Poznote"
-      },
-      "structured_export": {
-        "title": "Exportación Estructurada",
-        "description": "Exporta tus notas organizadas en carpetas que coinciden con tu estructura de carpetas de Poznote. Cada nota se guardará en un directorio que corresponde a su carpeta en Poznote, preservando la jerarquía completa. Los archivos Markdown incluyen front matter YAML con metadatos.",
-        "warning": "Nota: Este tipo de exportación no está diseñado para una copia de seguridad perfecta de Poznote.",
-        "select_workspace": "Seleccionar espacio de trabajo:",
-        "loading_workspaces": "Cargando espacios de trabajo..."
-      }
-    },
-    "buttons": {
-      "download_complete_backup": "Descargar copia de seguridad completa (ZIP)",
-      "download_structured_export": "Descargar exportación estructurada (ZIP)"
-    },
-    "spinner": {
-      "preparing": "Preparando copia de seguridad...",
-      "preparing_long": "Preparando copia de seguridad... Esto puede tomar unos momentos."
-    },
-    "errors": {
-      "export_error": "Error de exportación: {{error}}",
-      "complete_backup_error": "Error de copia de seguridad completa: {{error}}",
-      "cannot_create_zip": "No se puede crear archivo ZIP",
-      "failed_to_create_db_backup": "Falló al crear copia de seguridad de base de datos",
-      "failed_to_create_backup_file": "Falló al crear archivo de copia de seguridad"
-    },
-    "dump": {
-      "title": "Volcado de base de datos de Poznote",
-      "generated_on": "Generado el {{date}}"
-    },
-    "index": {
-      "title": "Índice de Poznote"
-    }
-  },
-  "login": {
-    "page": {
-      "title": "Inicio de sesión"
-    },
-    "redirecting": "Redirigiendo...",
-    "fields": {
-      "username": "Nombre de usuario",
-      "password": "Contraseña",
-      "profile": "Selecciona tu perfil"
-    },
-    "remember_me": "Recordarme por 30 días",
-    "button": "Inicio de sesión",
-    "oidc_button": "Continuar con {{provider}}",
-    "documentation": "Documentación de Poznote",
-    "no_profiles": "No hay perfiles de usuario disponibles. Por favor, contacta al administrador.",
-    "errors": {
-      "invalid_credentials": "Nombre de usuario o contraseña incorrectos.",
-      "oidc_failed": "Falló el inicio de sesión SSO. Por favor, inténtalo de nuevo.",
-      "oidc_unauthorized": "No estás autorizado para acceder a esta aplicación. Por favor, contacta con tu administrador."
-    }
-  },
-  "restore_import": {
-    "page": {
-      "title": "Restaurar / Importar"
-    },
-    "advanced": {
-      "show": "Mostrar opciones de importación avanzadas",
-      "hide": "Ocultar opciones de importación avanzadas"
-    },
-    "messages": {
-      "database_restored": "Base de datos restaurada exitosamente!",
-      "complete_backup_restored": "{{message}}",
-      "notes_imported": "Importadas {{count}} nota(s) en espacio de trabajo \"{{workspace}}\", carpeta \"{{folder}}\".",
-      "attachments_imported": "{{message}}",
-      "notes_imported_zip": "Importadas {{count}} nota(s) del ZIP en espacio de trabajo \"{{workspace}}\", carpeta \"{{folder}}\"."
-    },
-    "errors": {
-      "complete_restore_form_not_found": "Formulario de restauración completa no encontrado. Por favor intenta de nuevo.",
-      "form_not_found": "Formulario no encontrado. Por favor intenta de nuevo.",
-      "select_backup_first": "Por favor selecciona un archivo de copia de seguridad primero.",
-      "restore_error": "Error de restauración: {{error}}",
-      "no_backup_file_or_upload": "No se proporcionó archivo de copia de seguridad o error de subida.",
-      "complete_restore_error": "Error de restauración completa: {{error}} - {{message}}",
-      "no_complete_backup_file_or_upload": "No se proporcionó archivo de copia de seguridad completa o error de subida.",
-      "import_error": "Error de importación: {{error}}",
-      "no_notes_file_or_upload": "No se seleccionaron archivos de notas o error de subida.",
-      "no_attachments_file_or_upload": "No se seleccionaron archivos de adjuntos o error de subida.",
-      "no_notes_selected_or_upload": "No se seleccionaron notas o error de subida.",
-      "file_type_zip_only": "Solo se permiten archivos ZIP.",
-      "error_uploading_file": "Error al subir archivo.",
-      "cannot_find_entries_directory": "No se puede encontrar el directorio de entradas.",
-      "cannot_open_zip": "No se puede abrir archivo ZIP.",
-      "failed_extract_content": "Falló al extraer contenido de {{file}}."
-    },
-    "spinner": {
-      "processing": "Procesando restauración...",
-      "processing_long": "Procesando restauración... Esto puede tomar unos momentos.",
-      "importing_notes": "Importando notas..."
-    },
-    "units": {
-      "bytes": "Bytes",
-      "kb": "KB",
-      "mb": "MB",
-      "gb": "GB"
-    },
-    "direct_copy": {
-      "backup_file_found": "Archivo de copia de seguridad encontrado:",
-      "ready_to_restore": "¿Listo para restaurar?",
-      "replace_all_data_warning": "Esto reemplazará todos los datos en TODOS los espacios de trabajo.",
-      "no_backup_found_prefix": "No se encontró archivo de copia de seguridad en contenedor en",
-      "no_backup_found_hint": "Por favor ejecuta el comando docker cp primero.",
-      "completed_successfully_prefix": "Restauración de copia directa de archivo completada exitosamente!",
-      "failed_prefix": "Restauración de copia directa de archivo fallida:",
-      "backup_not_found_for_restoration": "Archivo de copia de seguridad no encontrado para restauración.",
-      "buttons": {
-        "yes_restore_direct_copy": "Sí, Restaurar desde copia directa"
-      }
-    },
-    "individual_notes": {
-      "default_title_with_date": "Nota importada {{date}}",
-      "file_count_one": "1 nota",
-      "file_count_many": "{{count}} notas",
-      "summary": "Esto importará {{fileText}} al espacio de trabajo de Poznote sin asignarlas a una carpeta.",
-      "errors": {
-        "too_many_files": "Demasiados archivos seleccionados. Máximo permitido: {{max}}. Seleccionaste: {{count}}.",
-        "workspace_not_found": "El espacio de trabajo no existe",
-        "entries_dir_not_found": "No se puede encontrar el directorio de entradas",
-        "upload_error": "Error de subida",
-        "invalid_file_type": "Tipo de archivo inválido (solo {{allowed}} permitidos)",
-        "cannot_read_file": "No se puede leer archivo"
-      },
-      "summary_with_location": "Esto importará {{fileText}} en espacio de trabajo \"{{workspace}}\", carpeta \"{{folder}}\".",
-      "summary_zip_with_location": "Esto extraerá e importará todos los archivos del archivo ZIP en espacio de trabajo \"{{workspace}}\", carpeta \"{{folder}}\"."
-    },
-    "sections": {
-      "restore_from_backup": {
-        "title": "¿Quieres restaurar desde un archivo de copia de seguridad ZIP de Poznote?",
-        "description": "Restaure su base de datos Poznote desde una copia de seguridad completa"
-      },
-      "standard_restore": {
-        "title": "Restauración estándar",
-        "description": "Elige un archivo de copia de seguridad completa ZIP.",
-        "helper": "Tamaño recomendado máximo: 500MB."
-      },
-      "direct_copy_restore": {
-        "title": "Restauración cuando la restauración estándar no funciona (timeout si el archivo zip es demasiado grande)",
-        "step1": "1. Copia el archivo al contenedor:",
-        "docker_command": "docker cp /ruta/al/backup.zip poznote-webserver-1:/tmp/backup_restore.zip",
-        "step2": "2. Haz clic a continuación para restaurar"
-      },
-      "individual_notes": {
-        "title": "¿Quieres importar archivos HTML, Markdown, de texto o archivos ZIP?",
-        "description": "Importe notas individuales (HTML, Markdown o ZIP) a un espacio de trabajo y carpeta específicos",
-        "workspace": "Espacio de trabajo destino",
-        "loading": "Cargando...",
-        "folder": "Carpeta destino",
-        "optional": "opcional",
-        "frontmatter_warning": "Si una nota MD contiene una clave folder en un front matter, este valor anulará el seleccionado a continuación. Por lo tanto, primero debe asegurarse de que la carpeta ya existe, de lo contrario, la nota se creará en la raíz del espacio de trabajo.",
-        "zip_folders_info": "ZIP con estructura de carpetas:",
-        "zip_folders_description": "Si su ZIP contiene carpetas, se crearán automáticamente como carpetas en Poznote, preservando su jerarquía (subcarpetas incluidas).",
-        "no_folder": "Sin carpeta (nivel raíz)",
-        "select_files": "Seleccionar archivos",
-        "files_info": "Varios archivos (máx {{maxIndividualFiles}}) o archivo ZIP único (máx {{maxZipFiles}} archivos). Estos límites se pueden cambiar,",
-        "files_info_link": "consulte la documentación",
-        "supported_formats": "Soportados: .html, .md, .markdown, .txt, .json, .zip",
-        "description_html": "Importe archivos HTML, Markdown, texto o JSON individuales, o un archivo ZIP que contenga varios archivos.<br><br>El título será creado automáticamente desde el nombre del archivo (sin la extensión), a menos que se defina una clave title en un front matter para archivos MD.<br><br><strong>Listas de tareas:</strong> Los archivos .json que contienen arrays de tareas y los archivos .md con sintaxis de checkbox (- [ ] o - [x]) se importan automáticamente como listas de tareas.",
-        "helper": "Puedes seleccionar múltiples archivos a la vez (máximo 50 archivos). Formatos soportados: .html, .md, .markdown, .txt, .json"
-      }
-    },
-    "buttons": {
-      "start_restore": "Iniciar restauración",
-      "start_import": "Iniciar importación"
-    },
-    "drag_drop": {
-      "individual_notes": "Soltar archivos aquí",
-      "complete_backup": "Soltar ZIP de respaldo aquí",
-      "database": "Soltar archivo SQL aquí",
-      "notes": "Soltar ZIP de notas aquí",
-      "attachments": "Soltar ZIP de adjuntos aquí"
+    "info": {
+        "page_title": "Información de la nota",
+        "actions": {
+            "back_to_note": "Volver a la nota"
+        },
+        "labels": {
+            "note_title": "Título de la nota:",
+            "workspace": "Espacio de trabajo:",
+            "folder": "Carpeta:",
+            "created": "Creado:",
+            "last_modified": "Última modificación:",
+            "tags": "Etiquetas:",
+            "favorite": "Favorito:",
+            "attachments": "Adjuntos:",
+            "note_id": "ID de la nota:",
+            "full_path": "Ruta completa:"
+        },
+        "attachments": {
+            "count_singular": "1 archivo",
+            "count_plural": "{{count}} archivos"
+        },
+        "empty": {
+            "no_tags": "Sin etiquetas"
+        },
+        "errors": []
     },
     "modals": {
-      "import_confirm": {
-        "title": "¿Estás seguro?",
-        "body": "Esto reemplazará títulos de notas, etiquetas, índice de búsqueda y metadatos, pero no el contenido real de la nota. Esta acción no se puede deshacer.",
-        "confirm": "Sí, Importar"
-      },
-      "complete_restore": {
-        "title": "¿Restaurar completamente?",
-        "warning_large_html": "<strong>Advertencia:</strong> Este archivo es {{size}}MB. La subida estándar puede ser lenta o fallar para archivos grandes.<br><br><strong>Esto reemplazará tu base de datos, restaurará todas las notas y adjuntos para <span style=\"color: #dc3545; font-weight: bold;\">todos los espacios de trabajo</span>.</strong>",
-        "warning_html": "<strong>Advertencia:</strong> Esto reemplazará tu base de datos, restaurará todas las notas y adjuntos para <span style=\"color: #dc3545; font-weight: bold;\">todos los espacios de trabajo</span>.",
-        "body_html": "Esto reemplazará tu base de datos, restaurará todas las notas y adjuntos para <span style=\"color: #dc3545; font-weight: bold;\">todos los espacios de trabajo</span>.",
-        "confirm": "Sí, Restaurar completamente"
-      },
-      "import_notes": {
-        "title": "¿Importar notas?",
-        "body": "Esto importará todos los archivos HTML del ZIP. Los archivos serán agregados a tu colección de notas existente.",
-        "confirm": "Sí, Importar notas"
-      },
-      "import_attachments": {
-        "title": "¿Importar adjuntos?",
-        "body": "Esto importará todos los archivos del ZIP a la carpeta de adjuntos. Los archivos serán agregados a tus adjuntos existentes.",
-        "confirm": "Sí, Importar adjuntos"
-      },
-      "complete_restore_direct_copy": {
-        "title": "¿Restaurar completamente (copia directa)?",
-        "body_html": "Esto reemplazará tu base de datos, restaurará todas las notas y adjuntos para <span style=\"color: #dc3545; font-weight: bold;\">todos los espacios de trabajo</span>.",
-        "confirm": "Sí, Restaurar completamente"
-      },
-      "import_individual_notes": {
-        "title": "¿Importar notas individuales?",
-        "body": "Esto importará notas al espacio de trabajo de Poznote.",
-        "confirm": "Sí, Importar notas"
-      }
-    },
-    "alerts": {
-      "ok": "OK",
-      "no_zip_selected_title": "No se seleccionó archivo ZIP",
-      "no_zip_selected_restore": "Por favor selecciona un archivo de copia de seguridad completa ZIP antes de proceder con la restauración.",
-      "no_zip_selected_notes": "Por favor selecciona un archivo ZIP que contenga notas HTML antes de proceder con la importación.",
-      "no_zip_selected_attachments": "Por favor selecciona un archivo ZIP que contenga adjuntos antes de proceder con la importación.",
-      "no_sql_selected_title": "No se seleccionó archivo SQL",
-      "no_sql_selected_body": "Por favor selecciona un archivo SQL antes de proceder con la importación de base de datos.",
-      "no_files_selected_title": "No se seleccionaron archivos",
-      "no_files_selected_body": "Por favor selecciona uno o más archivos HTML o Markdown antes de proceder con la importación.",
-      "too_many_files_title": "Demasiados archivos seleccionados",
-      "too_many_files_body": "Puedes importar un máximo de {{max}} archivos a la vez. Seleccionaste {{count}} archivos. Por favor selecciona menos archivos e intenta de nuevo.",
-      "no_file_selected": {
-        "title": "No se seleccionó archivo",
-        "body": "Por favor selecciona un archivo antes de proceder con la importación."
-      },
-      "no_workspace_title": "Ningún espacio de trabajo seleccionado",
-      "no_workspace_body": "Por favor seleccione un espacio de trabajo para las notas importadas."
-    },
-    "inline": {
-      "standard": {
-        "button": "Iniciar restauración completa (Estándar)",
-        "too_large": "⚠️ El archivo es {{size}}MB. La subida estándar puede ser lenta o fallar."
-      }
-    }
-  },
-  "markdown_guide": {
-    "page_title": "Guía de Markdown",
-    "title": "Guía de Markdown",
-    "toc": {
-      "label": "Tabla de contenidos",
-      "title": "Tabla de contenidos"
-    },
-    "common": {
-      "syntax": "Sintaxis",
-      "result": "Resultado"
-    },
-    "sections": {
-      "headers": {
-        "title": "Encabezados",
-        "heading1": "Encabezado 1",
-        "heading2": "Encabezado 2",
-        "heading3": "Encabezado 3"
-      },
-      "text_formatting": {
-        "title": "Formateo de texto",
-        "bold": "texto en negrita",
-        "italic": "texto en cursiva",
-        "strikethrough": "tachado",
-        "inline_code": "código en línea"
-      },
-      "unordered_lists": {
-        "title": "Listas sin ordenar",
-        "item_one": "Elemento uno",
-        "item_two": "Elemento dos",
-        "nested_item": "Elemento anidado"
-      },
-      "ordered_lists": {
-        "title": "Listas ordenadas",
-        "first": "Primero",
-        "second": "Segundo",
-        "third": "Tercero"
-      },
-      "checkboxes": {
-        "title": "Casillas de verificación",
-        "unchecked_note": "Elemento sin marcar (solo un espacio!)",
-        "unchecked": "Elemento sin marcar",
-        "checked": "Elemento marcado"
-      },
-      "images": {
-        "title": "Imágenes",
-        "alt_text": "Texto alternativo",
-        "preview": "(vista previa de imagen)"
-      },
-      "urls": {
-        "title": "URLs",
-        "link_text": "Texto del enlace"
-      },
-      "code_blocks": {
-        "title": "Bloques de código"
-      },
-      "quotes": {
-        "title": "Citas",
-        "quote_text": "Esta es una cita",
-        "quote_line2": "que abarca dos líneas"
-      },
-      "line_breaks": {
-        "title": "Saltos de línea",
-        "description": "Un salto de línea único en modo de edición crea un salto de línea en la vista previa.",
-        "first_line": "Primera línea",
-        "second_line": "Segunda línea"
-      },
-      "horizontal_rule": {
-        "title": "Regla horizontal"
-      },
-      "tables": {
-        "title": "Tablas",
-        "col_name": "Nombre",
-        "col_value": "Valor"
-      },
-      "math": {
-        "title": "Ecuaciones Matemáticas",
-        "inline": {
-          "title": "Ecuaciones en Línea"
+        "update": {
+            "title": "📱 Versión de la aplicación",
+            "backup_warning": "Haz una copia de seguridad de tus datos.",
+            "backup_hint": "<strong>Configuración > Copia de seguridad</strong>",
+            "current_version": "Versión actual:",
+            "latest_available": "Última disponible:",
+            "view_release_notes": "Ver notas de la versión",
+            "self_hosted": "Instrucciones de autoalojamiento",
+            "cloud": "Instrucciones de nube"
         },
-        "block": {
-          "title": "Ecuaciones en Bloque"
+        "update_check": {
+            "title": "Buscando actualizaciones...",
+            "status": "Por favor espera mientras buscamos actualizaciones..."
         },
-        "examples": {
-          "title": "Más Ejemplos"
+        "login_display": {
+            "title": "Nombre de pantalla de inicio de sesión",
+            "description": "Establece el nombre mostrado en la pantalla de inicio de sesión.",
+            "placeholder": "Nombre de pantalla"
+        },
+        "language": {
+            "description": "Selecciona tu idioma preferido:"
+        },
+        "input": {
+            "placeholder": "Ingresa texto"
+        },
+        "font_size": {
+            "title": "Tamaño de fuente del contenido de la nota",
+            "description": "Selecciona el tamaño de fuente predeterminado para tus notas:",
+            "label": "Tamaño de fuente (px):",
+            "default_value": "{{size}} px es el valor predeterminado",
+            "preview": "Este es un texto de vista previa"
+        },
+        "confirm": {
+            "title": "Confirmar acción",
+            "message": "¿Estás seguro de que quieres proceder?",
+            "save_and_exit": "Guardar y salir",
+            "exit_without_saving": "Salir sin guardar"
+        },
+        "folder": {
+            "new_title": "Nueva carpeta",
+            "new_placeholder": "Nuevo nombre de carpeta",
+            "create": "Crear",
+            "rename_title": "Renombrar carpeta",
+            "rename_placeholder": "Nuevo nombre de carpeta",
+            "delete_title": "Eliminar carpeta",
+            "delete_folder": "Eliminar carpeta",
+            "change_folder": "Cambiar carpeta",
+            "move_prefix": "Mover",
+            "move_suffix": "a:",
+            "move_prompt": "Mover \"{{title}}\" a:",
+            "no_folder": "Sin carpeta"
+        },
+        "move_note_folder": {
+            "title": "Mover nota a carpeta",
+            "workspace_destination": "Seleccionar destino del espacio de trabajo:",
+            "target_folder": "Seleccionar carpeta de destino:",
+            "enter_folder_name": "Por favor ingresa un nombre de carpeta"
+        },
+        "move_folder_files": {
+            "title": "Mover todos los archivos",
+            "prompt_prefix": "Mover todos los archivos de",
+            "prompt_suffix": "a:",
+            "select_target": "Seleccionar carpeta de destino...",
+            "hint_move_single": "Para mover una sola nota a otro espacio de trabajo, usa el botón \"Mover nota\" en la barra de herramientas",
+            "hint_move_all": "Para mover todas las notas de un espacio de trabajo a otro, ve a Configuración → Espacios de trabajo",
+            "move_all": "Mover todos los archivos"
+        },
+        "workspaces": {
+            "move_notes_title": "Mover notas de",
+            "select_target_workspace": "Seleccionar espacio de trabajo de destino",
+            "rename_title": "Renombrar espacio de trabajo",
+            "new_name": "Nuevo nombre",
+            "delete_title": "Confirmar eliminación de espacio de trabajo",
+            "delete_description": "Todas las notas y carpetas serán eliminadas permanentemente y no se pueden recuperar.",
+            "delete_placeholder": "Escribe el nombre del espacio de trabajo para confirmar",
+            "delete_button": "Eliminar"
+        },
+        "create": {
+            "title_in_folder": "Crear en {{folder}}",
+            "folder_fallback": "carpeta",
+            "note": {
+                "title": "Nota HTML (no Markdown)"
+            },
+            "markdown": {
+                "title": "Nota Markdown (no HTML)"
+            },
+            "task_list": {
+                "title": "Lista de tareas"
+            },
+            "subfolder": {
+                "title": "Subcarpeta"
+            },
+            "folder": {
+                "title": "Carpeta"
+            },
+            "workspace": {
+                "title": "Espacio de trabajo"
+            }
+        },
+        "folder_icon": {
+            "title": "Cambiar icono de carpeta",
+            "reset": "Restaurar el comportamiento predeterminado",
+            "search_placeholder": "Buscar iconos..."
+        },
+        "convert": {
+            "title": "Convertir nota",
+            "message": "¿Estás seguro de que quieres convertir esta nota?",
+            "to_html_title": "Convertir a HTML",
+            "to_html_message": "Esto convertirá tu nota Markdown a formato HTML.",
+            "to_html_warning": "Antes de convertir esta nota, puedes duplicarla para mantener una copia en caso de que la conversión no cumpla con tus expectativas.",
+            "to_markdown_title": "Convertir a Markdown",
+            "to_markdown_message": "Esto convertirá tu nota HTML a formato Markdown. Las imágenes embebidas se guardarán como adjuntos.",
+            "to_markdown_warning": "Antes de convertir esta nota, puedes duplicarla para mantener una copia en caso de que la conversión no cumpla con tus expectativas.",
+            "converting": "Convirtiendo nota...",
+            "success": "¡Nota convertida con éxito!",
+            "error": "Error al convertir la nota",
+            "duplicate_button": "Duplicar"
+        },
+        "export": {
+            "title": "Exportar nota",
+            "markdown": {
+                "title": "Exportar como Markdown",
+                "description": "Descargar como archivo MD con metadatos (título, etiquetas, carpeta) en frontmatter YAML"
+            },
+            "html": {
+                "title": "Exportar como HTML",
+                "description": "Descargar como archivo HTML con todo el formato preservado"
+            },
+            "json": {
+                "title": "Descargar como JSON",
+                "description": "Descargar los datos sin procesar de la lista de tareas como archivo JSON"
+            },
+            "print": {
+                "title": "Imprimir a PDF (Navegador)",
+                "description": "Usar el diálogo de impresión nativo del navegador para guardar como PDF"
+            }
+        },
+        "task_move": {
+            "title": "Mover tarea",
+            "description": "Elige una lista de tareas a la que mover esta tarea.",
+            "search_placeholder": "Buscar listas de tareas...",
+            "loading": "Cargando...",
+            "empty": "No se encontraron listas de tareas.",
+            "moving": "Moviendo tarea...",
+            "error": "No se pudieron cargar las listas de tareas.",
+            "confirm": "Mover tarea"
+        },
+        "note_sort": {
+            "title": "Orden de clasificación de notas",
+            "description": "Elige cómo se ordenan las notas en la lista de notas:",
+            "options": {
+                "last_modified": "Última modificación",
+                "last_created": "Última creación",
+                "alphabetical": "Alfabético"
+            }
+        },
+        "timezone": {
+            "title": "Zona horaria",
+            "description": "Selecciona tu zona horaria:",
+            "groups": {
+                "europe": "Europa",
+                "america": "América",
+                "asia": "Asia",
+                "pacific": "Pacífico",
+                "africa": "África"
+            }
+        },
+        "move_folder": {
+            "title": "Mover carpeta",
+            "prompt_prefix": "Mover carpeta",
+            "prompt_suffix": "a:",
+            "select_target": "Seleccionar carpeta padre...",
+            "root": "Raíz (Nivel superior)",
+            "hint": "Esto moverá la carpeta y todas sus notas como subcarpeta. Seleccione \"Raíz\" para moverla al nivel superior.",
+            "move": "Mover carpeta"
         }
-      },
-      "mermaid": {
-        "title": "Diagramas Mermaid",
-        "node_a": "Escribir Markdown",
-        "node_b": "¿Necesitas un diagrama?",
-        "node_c": "Usar Mermaid",
-        "node_d": "Seguir escribiendo",
-        "edge_yes": "Sí",
-        "edge_no": "No"
-      }
-    }
-  },
-  "public": {
-    "button": "Notas Compartidas",
-    "view_public_notes": "Ver notas compartidas",
-    "page": {
-      "title": "Notas Compartidas",
-      "no_public_notes": "Aún no hay notas compartidas.",
-      "public_hint": "Comparte una nota haciendo clic en el botón de nube en la barra de herramientas de la nota."
     },
-    "filter_placeholder": "Filtrar por título, token o nombre de carpeta...",
-    "no_filter_results": "Ninguna nota coincide con su búsqueda.",
+    "notes_list": {
+        "system_folders": {
+            "trash": "Papelera",
+            "tags": "Etiquetas",
+            "favorites": "Favoritos",
+            "public": "Compartidas",
+            "attachments": "Archivos adjuntos"
+        },
+        "drop_zone": {
+            "remove_from_folder": "Suelta aquí para eliminar de la carpeta"
+        },
+        "folder_actions": {
+            "menu": "Acciones",
+            "create": "Crear",
+            "move_all_files": "Mover todos los archivos a otra carpeta",
+            "rename_folder": "Renombrar carpeta",
+            "delete_folder": "Eliminar carpeta",
+            "move_folder": "Mover carpeta a subcarpeta",
+            "change_icon": "Cambiar icono",
+            "download_folder": "Descargar carpeta",
+            "is_public": "Es compartida",
+            "share_folder": "Compartir"
+        }
+    },
+    "update": {
+        "new_available": "🎉 ¡Nueva actualización disponible!",
+        "description": "Tus datos serán preservados durante la actualización.",
+        "up_to_date": "✅ Poznote está actualizado",
+        "error_loading_version": "Error al cargar versión"
+    },
+    "slash_menu": {
+        "back_to_normal": "Volver a texto normal",
+        "title": "Título",
+        "heading_1": "Encabezado 1",
+        "heading_2": "Encabezado 2",
+        "heading_3": "Encabezado 3",
+        "format_text": "Formatear texto",
+        "red": "Rojo",
+        "bold": "Negrita",
+        "italic": "Cursiva",
+        "highlight": "Resaltar",
+        "strikethrough": "Tachado",
+        "code": "Código",
+        "inline_code": "Código en línea",
+        "code_block": "Bloque de código",
+        "list": "Lista",
+        "bullet_list": "Lista con viñetas",
+        "numbered_list": "Lista numerada",
+        "checklist": "Lista de verificación",
+        "image": "Imagen",
+        "excalidraw": "Excalidraw",
+        "emoji": "Emoji",
+        "table": "Tabla",
+        "separator": "Separador",
+        "link_to_note": "Enlace a nota",
+        "link": "Enlace",
+        "cancel": "Cancelar",
+        "back": "Volver",
+        "quote": "Cita",
+        "blockquote": "Bloque de cita",
+        "callout_note": "Nota",
+        "callout_tip": "Consejo",
+        "callout_important": "Importante",
+        "callout_warning": "Advertencia",
+        "callout_caution": "Precaución"
+    },
+    "api": {
+        "settings": {
+            "key_required": "clave requerida",
+            "invalid_action": "acción inválida",
+            "internal_error": "error interno"
+        },
+        "errors": {
+            "workspace_not_found": "Espacio de trabajo no encontrado",
+            "method_not_allowed": "Método no permitido",
+            "invalid_action": "Acción inválida",
+            "internal_server_error": "Error interno del servidor",
+            "duplicate_title_in_folder": "Otra nota con el mismo título existe en esta carpeta.",
+            "invalid_custom_token": "Token personalizado inválido.\n\nPermitidos:\n\nletras, números, -, _, . (4-128 caracteres)"
+        }
+    },
+    "ui": {
+        "login_display": {
+            "prompt": "Nombre de pantalla de inicio de sesión (vacío para borrar):"
+        },
+        "alerts": {
+            "saved": "Guardado",
+            "save_error": "Error al guardar",
+            "network_error": "Error de red"
+        }
+    },
+    "theme": {
+        "badge": {
+            "dark": "modo oscuro",
+            "light": "modo claro"
+        }
+    },
     "table": {
-      "note": "Nota",
-      "url": "URL Compartida"
+        "context_menu": {
+            "insert_row_above": "Insertar fila arriba",
+            "insert_row_below": "Insertar fila abajo",
+            "insert_column_left": "Insertar columna izquierda",
+            "insert_column_right": "Insertar columna derecha",
+            "delete_row": "Eliminar fila",
+            "delete_column": "Eliminar columna",
+            "delete_table": "Eliminar tabla",
+            "errors": {
+                "cannot_delete_last_row": "No se puede eliminar la última fila de la tabla.",
+                "cannot_delete_last_column": "No se puede eliminar la última columna de la tabla."
+            },
+            "confirm": {
+                "delete_table": "¿Realmente quieres eliminar esta tabla?"
+            }
+        }
     },
-    "actions": {
-      "open": "Abrir",
-      "revoke": "Revocar"
+    "index": {
+        "errors": {
+            "create_task_list": "Error al crear lista de tareas",
+            "create_task_list_prefix": "Error al crear lista de tareas: ",
+            "create_markdown_note": "Error al crear nota markdown",
+            "create_markdown_note_prefix": "Error al crear nota markdown: ",
+            "conversion_failed_prefix": "Error en la conversión: {{error}}",
+            "network_error_converting": "Error de red al convertir la nota"
+        },
+        "toolbar": {
+            "favorite_add": "Agregar a favoritos",
+            "favorite_remove": "Eliminar de favoritos",
+            "public_note": "Compartir nota",
+            "attachments_with_count": "Adjuntos ({{count}})",
+            "menu_actions": "Acciones del menú"
+        },
+        "share_modal": {
+            "custom_token": "Token personalizado (opcional)",
+            "custom_token_placeholder": "mi_token_personalizado-1",
+            "password": "Contraseña (opcional)",
+            "password_placeholder": "Ingrese una contraseña",
+            "indexable": "Permitir indexación por motores de búsqueda",
+            "create_url": "Crear URL",
+            "close": "Cerrar",
+            "error_prefix": "Error: ",
+            "unknown_error": "Error desconocido al crear el enlace público",
+            "error_creating": "Error al crear el enlace público: "
+        },
+        "public_modal": {
+            "title": "URL compartida",
+            "close": "Cerrar",
+            "open": "Abrir",
+            "copy": "Copiar",
+            "revoke": "Revocar",
+            "renew": "Renovar",
+            "manage": "Editar",
+            "create_url": "Crear url",
+            "no_link_yet": "Aún no hay enlace público",
+            "custom_token": "Token personalizado (opcional)",
+            "custom_token_placeholder": "my_custom_token-1",
+            "indexable": "Permitir indexación por motores de búsqueda",
+            "password": "Contraseña (opcional)",
+            "password_placeholder": "Ingrese una contraseña",
+            "error_prefix": "Error: ",
+            "unknown_error": "Error desconocido al crear el enlace público",
+            "error_creating": "Error al crear el enlace público: "
+        },
+        "folder_share_modal": {
+            "title": "URL de carpeta compartida",
+            "description": "Cualquiera con este enlace puede ver todas las notas de esta carpeta (a menos que esté protegida con contraseña).",
+            "use_https": "HTTPS",
+            "renewed": "Enlace de carpeta compartida renovado",
+            "failed_renew": "Error al renovar el enlace de la carpeta",
+            "failed_revoke": "Error al revocar el enlace de la carpeta"
+        },
+        "note": {
+            "new_note": "Nueva nota",
+            "new_note_numbered": "Nueva nota ({{number}})",
+            "title_placeholder": "¿Título?"
+        },
+        "editor": {
+            "placeholder_desktop": "Ingresa texto, usa / para abrir el menú de comandos, pega imágenes o arrastra y suelta una imagen en el cursor.",
+            "placeholder_mobile": "Ingresa texto o pega imágenes aquí..."
+        }
     },
-    "indexable": "Indexable",
-    "password_protected": "Protegido con contraseña",
-    "add_password_title": "Agregar protección con contraseña",
-    "change_password_title": "Cambiar contraseña",
-    "password_remove_hint": "Dejar vacío para eliminar la protección con contraseña.",
-    "enter_new_password": "Ingrese una nueva contraseña"
-  },
-  "public_folder": {
-    "filter_placeholder": "Buscar notas",
-    "no_filter_results": "Sin resultados."
-  },
-  "icon_names": {
-    "briefcase": "maletín",
-    "home": "casa",
-    "star": "estrella",
-    "heart": "corazón",
-    "lightbulb": "bombilla",
-    "image": "imagen",
-    "music": "música",
-    "book": "libro",
-    "graduation-cap": "graduación",
-    "code": "código",
-    "rocket": "cohete",
-    "plane": "avión",
-    "map-marker-alt": "ubicación",
-    "calendar-alt": "calendario",
-    "clock": "reloj",
-    "user": "usuario",
-    "users": "usuarios",
-    "cog": "configuración",
-    "wrench": "llave",
-    "paint-brush": "pincel",
-    "palette": "paleta",
-    "camera": "cámara",
-    "shield": "escudo",
-    "lock": "candado",
-    "key": "llave",
-    "envelope": "sobre",
-    "inbox": "bandeja de entrada",
-    "archive": "archivo",
-    "box": "caja",
-    "shopping-cart": "carrito",
-    "credit-card": "tarjeta",
-    "chart-line": "gráfico",
-    "chart-bar": "diagrama",
-    "database": "base de datos",
-    "server": "servidor",
-    "cloud": "nube",
-    "download": "descarga",
-    "upload": "subida",
-    "tasks": "tareas",
-    "clipboard": "portapapeles",
-    "file-alt": "archivo",
-    "copy": "copiar",
-    "gamepad": "juego",
-    "trophy": "trofeo",
-    "gift": "regalo",
-    "birthday-cake": "pastel",
-    "coffee": "café",
-    "pizza-slice": "pizza",
-    "utensils": "restaurante",
-    "medkit": "médico",
-    "heartbeat": "salud",
-    "dumbbell": "fitness",
-    "bicycle": "bicicleta",
-    "tree": "árbol",
-    "leaf": "hoja",
-    "seedling": "planta",
-    "paw": "mascota",
-    "bug": "insecto",
-    "flask": "ciencia",
-    "atom": "átomo",
-    "magnet": "imán",
-    "fire": "fuego",
-    "sun": "sol",
-    "moon": "luna",
-    "umbrella": "paraguas",
-    "snowflake": "nieve",
-    "bolt": "rayo",
-    "flag": "bandera",
-    "bookmark": "marcador",
-    "thumbs-up": "me gusta",
-    "smile": "sonrisa",
-    "layer-group": "capas",
-    "terminal": "terminal",
-    "at": "arroba",
-    "hashtag": "hashtag",
-    "question-circle": "pregunta",
-    "times-circle": "cerrar",
-    "eye": "ojo",
-    "anchor": "ancla",
-    "apple-alt": "manzana",
-    "award": "premio",
-    "bell": "campana",
-    "binoculars": "binoculares",
-    "book-open": "libro abierto",
-    "briefcase-medical": "maletín médico",
-    "brush": "brocha",
-    "building": "edificio",
-    "bus": "autobús",
-    "calculator": "calculadora",
-    "candy-cane": "bastón de caramelo",
-    "car": "coche",
-    "certificate": "certificado",
-    "chart-network": "red",
-    "chart-pie": "gráfico circular",
-    "chess": "ajedrez",
-    "clipboard-list": "lista",
-    "cloud-sun": "nube y sol",
-    "coins": "monedas",
-    "comment": "comentario",
-    "compass": "brújula",
-    "crown": "corona",
-    "cube": "cubo",
-    "cubes": "cubos",
-    "desktop": "escritorio",
-    "diploma": "diploma",
-    "dna": "ADN",
-    "dollar-sign": "dólar",
-    "dragon": "dragón",
-    "drum": "tambor",
-    "elephant": "elefante",
-    "euro-sign": "euro",
-    "feather": "pluma",
-    "file-code": "archivo de código",
-    "file-contract": "contrato",
-    "file-invoice": "factura",
-    "film": "película",
-    "fingerprint": "huella digital",
-    "folder-tree": "árbol de carpetas",
-    "gem": "gema",
-    "glasses": "gafas",
-    "globe-americas": "Américas",
-    "globe-asia": "Asia",
-    "globe-europe": "Europa",
-    "guitar": "guitarra",
-    "hamburger": "hamburguesa",
-    "hammer": "martillo",
-    "hard-hat": "casco",
-    "headphones": "auriculares",
-    "headset": "auriculares con micrófono",
-    "hiking": "senderismo",
-    "hospital": "hospital",
-    "icons": "iconos",
-    "id-badge": "insignia",
-    "id-card": "tarjeta de identidad",
-    "industry": "industria",
-    "infinity": "infinito",
-    "jedi": "jedi",
-    "laptop": "portátil",
-    "laptop-code": "desarrollo",
-    "lightbulb-dollar": "idea rentable",
-    "map": "mapa",
-    "medal": "medalla",
-    "microphone": "micrófono",
-    "microscope": "microscopio",
-    "money-bill": "billete",
-    "mountain": "montaña",
-    "mug-hot": "taza",
-    "network-wired": "red cableada",
-    "passport": "pasaporte",
-    "pen": "bolígrafo",
-    "pencil-alt": "lápiz",
-    "pepper-hot": "pimiento picante",
-    "phone": "teléfono",
-    "piggy-bank": "alcancía",
-    "plane-alt": "avión",
-    "plane-departure": "salida",
-    "plug": "enchufe",
-    "print": "impresora",
-    "project-diagram": "proyecto",
-    "puzzle-piece": "rompecabezas",
-    "receipt": "recibo",
-    "robot": "robot",
-    "running": "corriendo",
-    "satellite": "satélite",
-    "satellite-dish": "antena parabólica",
-    "school": "escuela",
-    "screwdriver": "destornillador",
-    "scroll": "pergamino",
-    "shield-alt": "escudo",
-    "shopping-bag": "bolsa",
-    "sign": "letrero",
-    "sitemap": "mapa del sitio",
-    "snowman": "muñeco de nieve",
-    "solar-panel": "panel solar",
-    "spa": "spa",
-    "space-shuttle": "transbordador espacial",
-    "stamp": "sello",
-    "stethoscope": "estetoscopio",
-    "store": "tienda",
-    "store-alt": "tienda",
-    "suitcase": "maleta",
-    "sun-cloud": "sol y nube",
-    "swimmer": "nadador",
-    "sync": "sincronización",
-    "syringe": "jeringa",
-    "tablet": "tableta",
-    "tachometer-alt": "velocidad",
-    "tag": "etiqueta",
-    "tags": "etiquetas",
-    "theater-masks": "teatro",
-    "toilet-paper": "papel higiénico",
-    "toolbox": "caja de herramientas",
-    "tooth": "diente",
-    "tools": "herramientas",
-    "tractor": "tractor",
-    "trash-alt": "papelera",
-    "tree-alt": "árbol",
-    "truck": "camión",
-    "tv": "televisión",
-    "umbrella-beach": "sombrilla de playa",
-    "university": "universidad",
-    "user-graduate": "estudiante",
-    "utensil-spoon": "cuchara",
-    "vial": "vial",
-    "video": "vídeo",
-    "walking": "caminando",
-    "wallet": "cartera",
-    "warehouse": "almacén",
-    "water": "agua",
-    "weight": "peso",
-    "wifi": "wifi",
-    "wind": "viento",
-    "yen-sign": "yen"
-  },
-  "shared_folders": {
-    "page": {
-      "title": "Carpetas Compartidas",
-      "no_shared_folders": "Aún no hay carpetas compartidas.",
-      "shared_folders_hint": "Comparte una carpeta haciendo clic en el botón de nube en el menú de la carpeta."
+    "image_menu": {
+        "view_large": "Ver grande",
+        "download": "Descargar",
+        "resize": "Redimensionar",
+        "edit": "Editar",
+        "add_border": "Agregar borde",
+        "remove_border": "Eliminar borde",
+        "add_border_no_padding": "Agregar borde sin relleno",
+        "remove_border_no_padding": "Eliminar borde sin relleno",
+        "delete_image": "Eliminar imagen",
+        "links": "Enlaces",
+        "open_link": "Abrir enlace",
+        "add_link": "Añadir enlace",
+        "edit_link": "Editar enlace",
+        "remove_link": "Eliminar enlace",
+        "link_modal": {
+            "title_add": "Añadir enlace a la imagen",
+            "title_edit": "Editar enlace de la imagen",
+            "description": "Este enlace hará que la imagen sea clickable cuando la nota esté compartida.",
+            "url_label": "Introduce la URL:",
+            "url_placeholder": "https://www.ejemplo.com",
+            "cancel": "Cancelar",
+            "ok": "OK"
+        }
     },
-    "button": "Carpetas Compartidas",
-    "view_shared_folders": "Ver carpetas compartidas",
-    "filter_placeholder": "Filtrar por nombre de carpeta o token...",
-    "empty": "No se encontraron carpetas compartidas.",
-    "confirm_revoke": "¿Está seguro de que desea revocar el uso compartido de esta carpeta? Todas las notas de esta carpeta también dejarán de estar compartidas."
-  },
-  "search_replace": {
-    "search_placeholder": "Buscar...",
-    "replace_placeholder": "Reemplazar...",
-    "previous": "Anterior",
-    "next": "Siguiente",
-    "toggle_replace": "Mostrar/Ocultar reemplazar",
-    "close": "Cerrar",
-    "replace": "Reemplazar",
-    "replace_one": "Reemplazar",
-    "replace_all": "Reemplazar todo",
-    "result": "resultado",
-    "results": "resultados",
-    "no_matches": "Sin resultados",
-    "replaced_all": "{{count}} reemplazo(s) realizado(s)"
-  }
+    "backup_export": {
+        "page": {
+            "title": "Copia de seguridad / Exportar"
+        },
+        "common": {
+            "all_workspaces": "todos los espacios de trabajo"
+        },
+        "sections": {
+            "complete_backup": {
+                "title": "Copia de seguridad completa",
+                "description_prefix": "Descarga una copia de seguridad completa que contenga base de datos, notas y adjuntos para",
+                "description_suffix": "en un solo archivo ZIP.",
+                "use_cases": "Dos casos de uso:",
+                "use_case_restore_label": "Restaurar",
+                "use_case_restore_text": "Importa esta copia de seguridad para recuperar tus datos en caso de pérdida",
+                "use_case_offline_label": "Lectura sin conexión",
+                "use_case_offline_text": "Abre el incluido",
+                "use_case_offline_text_suffix": "para navegar tus notas sin Poznote"
+            },
+            "structured_export": {
+                "title": "Exportación Estructurada",
+                "description": "Exporta tus notas organizadas en carpetas que coinciden con tu estructura de carpetas de Poznote. Cada nota se guardará en un directorio que corresponde a su carpeta en Poznote, preservando la jerarquía completa. Los archivos Markdown incluyen front matter YAML con metadatos.",
+                "warning": "Nota: Este tipo de exportación no está diseñado para una copia de seguridad perfecta de Poznote.",
+                "select_workspace": "Seleccionar espacio de trabajo:",
+                "loading_workspaces": "Cargando espacios de trabajo..."
+            }
+        },
+        "buttons": {
+            "download_complete_backup": "Descargar copia de seguridad completa (ZIP)",
+            "download_structured_export": "Descargar exportación estructurada (ZIP)"
+        },
+        "spinner": {
+            "preparing": "Preparando copia de seguridad...",
+            "preparing_long": "Preparando copia de seguridad... Esto puede tomar unos momentos."
+        },
+        "errors": {
+            "export_error": "Error de exportación: {{error}}",
+            "complete_backup_error": "Error de copia de seguridad completa: {{error}}",
+            "cannot_create_zip": "No se puede crear archivo ZIP",
+            "failed_to_create_db_backup": "Falló al crear copia de seguridad de base de datos",
+            "failed_to_create_backup_file": "Falló al crear archivo de copia de seguridad"
+        },
+        "dump": {
+            "title": "Volcado de base de datos de Poznote",
+            "generated_on": "Generado el {{date}}"
+        },
+        "index": {
+            "title": "Índice de Poznote"
+        }
+    },
+    "login": {
+        "page": {
+            "title": "Inicio de sesión"
+        },
+        "redirecting": "Redirigiendo...",
+        "fields": {
+            "username": "Nombre de usuario",
+            "password": "Contraseña",
+            "profile": "Selecciona tu perfil"
+        },
+        "remember_me": "Recordarme por 30 días",
+        "button": "Inicio de sesión",
+        "oidc_button": "Continuar con {{provider}}",
+        "documentation": "Documentación de Poznote",
+        "no_profiles": "No hay perfiles de usuario disponibles. Por favor, contacta al administrador.",
+        "errors": {
+            "invalid_credentials": "Nombre de usuario o contraseña incorrectos.",
+            "oidc_failed": "Falló el inicio de sesión SSO. Por favor, inténtalo de nuevo.",
+            "oidc_unauthorized": "No estás autorizado para acceder a esta aplicación. Por favor, contacta con tu administrador."
+        }
+    },
+    "restore_import": {
+        "page": {
+            "title": "Restaurar / Importar"
+        },
+        "advanced": {
+            "show": "Mostrar opciones de importación avanzadas",
+            "hide": "Ocultar opciones de importación avanzadas"
+        },
+        "messages": {
+            "database_restored": "Base de datos restaurada exitosamente!",
+            "complete_backup_restored": "{{message}}",
+            "notes_imported": "Importadas {{count}} nota(s) en espacio de trabajo \"{{workspace}}\", carpeta \"{{folder}}\".",
+            "attachments_imported": "{{message}}",
+            "notes_imported_zip": "Importadas {{count}} nota(s) del ZIP en espacio de trabajo \"{{workspace}}\", carpeta \"{{folder}}\"."
+        },
+        "errors": {
+            "complete_restore_form_not_found": "Formulario de restauración completa no encontrado. Por favor intenta de nuevo.",
+            "form_not_found": "Formulario no encontrado. Por favor intenta de nuevo.",
+            "select_backup_first": "Por favor selecciona un archivo de copia de seguridad primero.",
+            "restore_error": "Error de restauración: {{error}}",
+            "no_backup_file_or_upload": "No se proporcionó archivo de copia de seguridad o error de subida.",
+            "complete_restore_error": "Error de restauración completa: {{error}} - {{message}}",
+            "no_complete_backup_file_or_upload": "No se proporcionó archivo de copia de seguridad completa o error de subida.",
+            "import_error": "Error de importación: {{error}}",
+            "no_notes_file_or_upload": "No se seleccionaron archivos de notas o error de subida.",
+            "no_attachments_file_or_upload": "No se seleccionaron archivos de adjuntos o error de subida.",
+            "no_notes_selected_or_upload": "No se seleccionaron notas o error de subida.",
+            "file_type_zip_only": "Solo se permiten archivos ZIP.",
+            "error_uploading_file": "Error al subir archivo.",
+            "cannot_find_entries_directory": "No se puede encontrar el directorio de entradas.",
+            "cannot_open_zip": "No se puede abrir archivo ZIP.",
+            "failed_extract_content": "Falló al extraer contenido de {{file}}."
+        },
+        "spinner": {
+            "processing": "Procesando restauración...",
+            "processing_long": "Procesando restauración... Esto puede tomar unos momentos.",
+            "importing_notes": "Importando notas..."
+        },
+        "units": {
+            "bytes": "Bytes",
+            "kb": "KB",
+            "mb": "MB",
+            "gb": "GB"
+        },
+        "direct_copy": {
+            "backup_file_found": "Archivo de copia de seguridad encontrado:",
+            "ready_to_restore": "¿Listo para restaurar?",
+            "replace_all_data_warning": "Esto reemplazará todos los datos en TODOS los espacios de trabajo.",
+            "no_backup_found_prefix": "No se encontró archivo de copia de seguridad en contenedor en",
+            "no_backup_found_hint": "Por favor ejecuta el comando docker cp primero.",
+            "completed_successfully_prefix": "Restauración de copia directa de archivo completada exitosamente!",
+            "failed_prefix": "Restauración de copia directa de archivo fallida:",
+            "backup_not_found_for_restoration": "Archivo de copia de seguridad no encontrado para restauración.",
+            "buttons": {
+                "yes_restore_direct_copy": "Sí, Restaurar desde copia directa"
+            }
+        },
+        "individual_notes": {
+            "default_title_with_date": "Nota importada {{date}}",
+            "file_count_one": "1 nota",
+            "file_count_many": "{{count}} notas",
+            "summary": "Esto importará {{fileText}} al espacio de trabajo de Poznote sin asignarlas a una carpeta.",
+            "errors": {
+                "too_many_files": "Demasiados archivos seleccionados. Máximo permitido: {{max}}. Seleccionaste: {{count}}.",
+                "workspace_not_found": "El espacio de trabajo no existe",
+                "entries_dir_not_found": "No se puede encontrar el directorio de entradas",
+                "upload_error": "Error de subida",
+                "invalid_file_type": "Tipo de archivo inválido (solo {{allowed}} permitidos)",
+                "cannot_read_file": "No se puede leer archivo"
+            },
+            "summary_with_location": "Esto importará {{fileText}} en espacio de trabajo \"{{workspace}}\", carpeta \"{{folder}}\".",
+            "summary_zip_with_location": "Esto extraerá e importará todos los archivos del archivo ZIP en espacio de trabajo \"{{workspace}}\", carpeta \"{{folder}}\"."
+        },
+        "sections": {
+            "restore_from_backup": {
+                "title": "¿Quieres restaurar desde un archivo de copia de seguridad ZIP de Poznote?",
+                "description": "Restaure su base de datos Poznote desde una copia de seguridad completa"
+            },
+            "standard_restore": {
+                "title": "Restauración estándar",
+                "description": "Elige un archivo de copia de seguridad completa ZIP.",
+                "helper": "Tamaño recomendado máximo: 500MB."
+            },
+            "direct_copy_restore": {
+                "title": "Restauración cuando la restauración estándar no funciona (timeout si el archivo zip es demasiado grande)",
+                "step1": "1. Copia el archivo al contenedor:",
+                "docker_command": "docker cp /ruta/al/backup.zip poznote-webserver-1:/tmp/backup_restore.zip",
+                "step2": "2. Haz clic a continuación para restaurar"
+            },
+            "individual_notes": {
+                "title": "¿Quieres importar archivos HTML, Markdown, de texto o archivos ZIP?",
+                "description": "Importe notas individuales (HTML, Markdown o ZIP) a un espacio de trabajo y carpeta específicos",
+                "workspace": "Espacio de trabajo destino",
+                "loading": "Cargando...",
+                "folder": "Carpeta destino",
+                "optional": "opcional",
+                "frontmatter_warning": "Si una nota MD contiene una clave folder en un front matter, este valor anulará el seleccionado a continuación. Por lo tanto, primero debe asegurarse de que la carpeta ya existe, de lo contrario, la nota se creará en la raíz del espacio de trabajo.",
+                "zip_folders_info": "ZIP con estructura de carpetas:",
+                "zip_folders_description": "Si su ZIP contiene carpetas, se crearán automáticamente como carpetas en Poznote, preservando su jerarquía (subcarpetas incluidas).",
+                "no_folder": "Sin carpeta (nivel raíz)",
+                "select_files": "Seleccionar archivos",
+                "files_info": "Varios archivos (máx {{maxIndividualFiles}}) o archivo ZIP único (máx {{maxZipFiles}} archivos). Estos límites se pueden cambiar,",
+                "files_info_link": "consulte la documentación",
+                "supported_formats": "Soportados: .html, .md, .markdown, .txt, .json, .zip",
+                "description_html": "Importe archivos HTML, Markdown, texto o JSON individuales, o un archivo ZIP que contenga varios archivos.<br><br>El título será creado automáticamente desde el nombre del archivo (sin la extensión), a menos que se defina una clave title en un front matter para archivos MD.<br><br><strong>Listas de tareas:</strong> Los archivos .json que contienen arrays de tareas y los archivos .md con sintaxis de checkbox (- [ ] o - [x]) se importan automáticamente como listas de tareas.",
+                "helper": "Puedes seleccionar múltiples archivos a la vez (máximo 50 archivos). Formatos soportados: .html, .md, .markdown, .txt, .json"
+            }
+        },
+        "buttons": {
+            "start_restore": "Iniciar restauración",
+            "start_import": "Iniciar importación"
+        },
+        "drag_drop": {
+            "individual_notes": "Soltar archivos aquí",
+            "complete_backup": "Soltar ZIP de respaldo aquí",
+            "database": "Soltar archivo SQL aquí",
+            "notes": "Soltar ZIP de notas aquí",
+            "attachments": "Soltar ZIP de adjuntos aquí"
+        },
+        "modals": {
+            "import_confirm": {
+                "title": "¿Estás seguro?",
+                "body": "Esto reemplazará títulos de notas, etiquetas, índice de búsqueda y metadatos, pero no el contenido real de la nota. Esta acción no se puede deshacer.",
+                "confirm": "Sí, Importar"
+            },
+            "complete_restore": {
+                "title": "¿Restaurar completamente?",
+                "warning_large_html": "<strong>Advertencia:</strong> Este archivo es {{size}}MB. La subida estándar puede ser lenta o fallar para archivos grandes.<br><br><strong>Esto reemplazará tu base de datos, restaurará todas las notas y adjuntos para <span style=\"color: #dc3545; font-weight: bold;\">todos los espacios de trabajo</span>.</strong>",
+                "warning_html": "<strong>Advertencia:</strong> Esto reemplazará tu base de datos, restaurará todas las notas y adjuntos para <span style=\"color: #dc3545; font-weight: bold;\">todos los espacios de trabajo</span>.",
+                "body_html": "Esto reemplazará tu base de datos, restaurará todas las notas y adjuntos para <span style=\"color: #dc3545; font-weight: bold;\">todos los espacios de trabajo</span>.",
+                "confirm": "Sí, Restaurar completamente"
+            },
+            "import_notes": {
+                "title": "¿Importar notas?",
+                "body": "Esto importará todos los archivos HTML del ZIP. Los archivos serán agregados a tu colección de notas existente.",
+                "confirm": "Sí, Importar notas"
+            },
+            "import_attachments": {
+                "title": "¿Importar adjuntos?",
+                "body": "Esto importará todos los archivos del ZIP a la carpeta de adjuntos. Los archivos serán agregados a tus adjuntos existentes.",
+                "confirm": "Sí, Importar adjuntos"
+            },
+            "complete_restore_direct_copy": {
+                "title": "¿Restaurar completamente (copia directa)?",
+                "body_html": "Esto reemplazará tu base de datos, restaurará todas las notas y adjuntos para <span style=\"color: #dc3545; font-weight: bold;\">todos los espacios de trabajo</span>.",
+                "confirm": "Sí, Restaurar completamente"
+            },
+            "import_individual_notes": {
+                "title": "¿Importar notas individuales?",
+                "body": "Esto importará notas al espacio de trabajo de Poznote.",
+                "confirm": "Sí, Importar notas"
+            }
+        },
+        "alerts": {
+            "ok": "OK",
+            "no_zip_selected_title": "No se seleccionó archivo ZIP",
+            "no_zip_selected_restore": "Por favor selecciona un archivo de copia de seguridad completa ZIP antes de proceder con la restauración.",
+            "no_zip_selected_notes": "Por favor selecciona un archivo ZIP que contenga notas HTML antes de proceder con la importación.",
+            "no_zip_selected_attachments": "Por favor selecciona un archivo ZIP que contenga adjuntos antes de proceder con la importación.",
+            "no_sql_selected_title": "No se seleccionó archivo SQL",
+            "no_sql_selected_body": "Por favor selecciona un archivo SQL antes de proceder con la importación de base de datos.",
+            "no_files_selected_title": "No se seleccionaron archivos",
+            "no_files_selected_body": "Por favor selecciona uno o más archivos HTML o Markdown antes de proceder con la importación.",
+            "too_many_files_title": "Demasiados archivos seleccionados",
+            "too_many_files_body": "Puedes importar un máximo de {{max}} archivos a la vez. Seleccionaste {{count}} archivos. Por favor selecciona menos archivos e intenta de nuevo.",
+            "no_file_selected": {
+                "title": "No se seleccionó archivo",
+                "body": "Por favor selecciona un archivo antes de proceder con la importación."
+            },
+            "no_workspace_title": "Ningún espacio de trabajo seleccionado",
+            "no_workspace_body": "Por favor seleccione un espacio de trabajo para las notas importadas."
+        },
+        "inline": {
+            "standard": {
+                "button": "Iniciar restauración completa (Estándar)",
+                "too_large": "⚠️ El archivo es {{size}}MB. La subida estándar puede ser lenta o fallar."
+            }
+        }
+    },
+    "markdown_guide": {
+        "page_title": "Guía de Markdown",
+        "title": "Guía de Markdown",
+        "toc": {
+            "label": "Tabla de contenidos",
+            "title": "Tabla de contenidos"
+        },
+        "common": {
+            "syntax": "Sintaxis",
+            "result": "Resultado"
+        },
+        "sections": {
+            "headers": {
+                "title": "Encabezados",
+                "heading1": "Encabezado 1",
+                "heading2": "Encabezado 2",
+                "heading3": "Encabezado 3"
+            },
+            "text_formatting": {
+                "title": "Formateo de texto",
+                "bold": "texto en negrita",
+                "italic": "texto en cursiva",
+                "strikethrough": "tachado",
+                "inline_code": "código en línea"
+            },
+            "unordered_lists": {
+                "title": "Listas sin ordenar",
+                "item_one": "Elemento uno",
+                "item_two": "Elemento dos",
+                "nested_item": "Elemento anidado"
+            },
+            "ordered_lists": {
+                "title": "Listas ordenadas",
+                "first": "Primero",
+                "second": "Segundo",
+                "third": "Tercero"
+            },
+            "checkboxes": {
+                "title": "Casillas de verificación",
+                "unchecked_note": "Elemento sin marcar (solo un espacio!)",
+                "unchecked": "Elemento sin marcar",
+                "checked": "Elemento marcado"
+            },
+            "images": {
+                "title": "Imágenes",
+                "alt_text": "Texto alternativo",
+                "preview": "(vista previa de imagen)"
+            },
+            "urls": {
+                "title": "URLs",
+                "link_text": "Texto del enlace"
+            },
+            "code_blocks": {
+                "title": "Bloques de código"
+            },
+            "quotes": {
+                "title": "Citas",
+                "quote_text": "Esta es una cita",
+                "quote_line2": "que abarca dos líneas"
+            },
+            "line_breaks": {
+                "title": "Saltos de línea",
+                "description": "Un salto de línea único en modo de edición crea un salto de línea en la vista previa.",
+                "first_line": "Primera línea",
+                "second_line": "Segunda línea"
+            },
+            "horizontal_rule": {
+                "title": "Regla horizontal"
+            },
+            "tables": {
+                "title": "Tablas",
+                "col_name": "Nombre",
+                "col_value": "Valor"
+            },
+            "math": {
+                "title": "Ecuaciones Matemáticas",
+                "inline": {
+                    "title": "Ecuaciones en Línea"
+                },
+                "block": {
+                    "title": "Ecuaciones en Bloque"
+                },
+                "examples": {
+                    "title": "Más Ejemplos"
+                }
+            },
+            "mermaid": {
+                "title": "Diagramas Mermaid",
+                "node_a": "Escribir Markdown",
+                "node_b": "¿Necesitas un diagrama?",
+                "node_c": "Usar Mermaid",
+                "node_d": "Seguir escribiendo",
+                "edge_yes": "Sí",
+                "edge_no": "No"
+            }
+        }
+    },
+    "public": {
+        "button": "Notas Compartidas",
+        "view_public_notes": "Ver notas compartidas",
+        "page": {
+            "title": "Notas Compartidas",
+            "no_public_notes": "Aún no hay notas compartidas.",
+            "public_hint": "Comparte una nota haciendo clic en el botón de nube en la barra de herramientas de la nota."
+        },
+        "filter_placeholder": "Filtrar por título, token o nombre de carpeta...",
+        "no_filter_results": "Ninguna nota coincide con su búsqueda.",
+        "table": {
+            "note": "Nota",
+            "url": "URL Compartida"
+        },
+        "actions": {
+            "open": "Abrir",
+            "revoke": "Revocar"
+        },
+        "indexable": "Indexable",
+        "password_protected": "Protegido con contraseña",
+        "add_password_title": "Agregar protección con contraseña",
+        "change_password_title": "Cambiar contraseña",
+        "password_remove_hint": "Dejar vacío para eliminar la protección con contraseña.",
+        "enter_new_password": "Ingrese una nueva contraseña"
+    },
+    "public_folder": {
+        "filter_placeholder": "Buscar notas",
+        "no_filter_results": "Sin resultados."
+    },
+    "icon_names": {
+        "briefcase": "maletín",
+        "home": "casa",
+        "star": "estrella",
+        "heart": "corazón",
+        "lightbulb": "bombilla",
+        "image": "imagen",
+        "music": "música",
+        "book": "libro",
+        "graduation-cap": "graduación",
+        "code": "código",
+        "rocket": "cohete",
+        "plane": "avión",
+        "map-marker-alt": "ubicación",
+        "calendar-alt": "calendario",
+        "clock": "reloj",
+        "user": "usuario",
+        "users": "usuarios",
+        "cog": "configuración",
+        "wrench": "llave",
+        "paint-brush": "pincel",
+        "palette": "paleta",
+        "camera": "cámara",
+        "shield": "escudo",
+        "lock": "candado",
+        "key": "llave",
+        "envelope": "sobre",
+        "inbox": "bandeja de entrada",
+        "archive": "archivo",
+        "box": "caja",
+        "shopping-cart": "carrito",
+        "credit-card": "tarjeta",
+        "chart-line": "gráfico",
+        "chart-bar": "diagrama",
+        "database": "base de datos",
+        "server": "servidor",
+        "cloud": "nube",
+        "download": "descarga",
+        "upload": "subida",
+        "tasks": "tareas",
+        "clipboard": "portapapeles",
+        "file-alt": "archivo",
+        "copy": "copiar",
+        "gamepad": "juego",
+        "trophy": "trofeo",
+        "gift": "regalo",
+        "birthday-cake": "pastel",
+        "coffee": "café",
+        "pizza-slice": "pizza",
+        "utensils": "restaurante",
+        "medkit": "médico",
+        "heartbeat": "salud",
+        "dumbbell": "fitness",
+        "bicycle": "bicicleta",
+        "tree": "árbol",
+        "leaf": "hoja",
+        "seedling": "planta",
+        "paw": "mascota",
+        "bug": "insecto",
+        "flask": "ciencia",
+        "atom": "átomo",
+        "magnet": "imán",
+        "fire": "fuego",
+        "sun": "sol",
+        "moon": "luna",
+        "umbrella": "paraguas",
+        "snowflake": "nieve",
+        "bolt": "rayo",
+        "flag": "bandera",
+        "bookmark": "marcador",
+        "thumbs-up": "me gusta",
+        "smile": "sonrisa",
+        "layer-group": "capas",
+        "terminal": "terminal",
+        "at": "arroba",
+        "hashtag": "hashtag",
+        "question-circle": "pregunta",
+        "times-circle": "cerrar",
+        "eye": "ojo",
+        "anchor": "ancla",
+        "apple-alt": "manzana",
+        "award": "premio",
+        "bell": "campana",
+        "binoculars": "binoculares",
+        "book-open": "libro abierto",
+        "briefcase-medical": "maletín médico",
+        "brush": "brocha",
+        "building": "edificio",
+        "bus": "autobús",
+        "calculator": "calculadora",
+        "candy-cane": "bastón de caramelo",
+        "car": "coche",
+        "certificate": "certificado",
+        "chart-network": "red",
+        "chart-pie": "gráfico circular",
+        "chess": "ajedrez",
+        "clipboard-list": "lista",
+        "cloud-sun": "nube y sol",
+        "coins": "monedas",
+        "comment": "comentario",
+        "compass": "brújula",
+        "crown": "corona",
+        "cube": "cubo",
+        "cubes": "cubos",
+        "desktop": "escritorio",
+        "diploma": "diploma",
+        "dna": "ADN",
+        "dollar-sign": "dólar",
+        "dragon": "dragón",
+        "drum": "tambor",
+        "elephant": "elefante",
+        "euro-sign": "euro",
+        "feather": "pluma",
+        "file-code": "archivo de código",
+        "file-contract": "contrato",
+        "file-invoice": "factura",
+        "film": "película",
+        "fingerprint": "huella digital",
+        "folder-tree": "árbol de carpetas",
+        "gem": "gema",
+        "glasses": "gafas",
+        "globe-americas": "Américas",
+        "globe-asia": "Asia",
+        "globe-europe": "Europa",
+        "guitar": "guitarra",
+        "hamburger": "hamburguesa",
+        "hammer": "martillo",
+        "hard-hat": "casco",
+        "headphones": "auriculares",
+        "headset": "auriculares con micrófono",
+        "hiking": "senderismo",
+        "hospital": "hospital",
+        "icons": "iconos",
+        "id-badge": "insignia",
+        "id-card": "tarjeta de identidad",
+        "industry": "industria",
+        "infinity": "infinito",
+        "jedi": "jedi",
+        "laptop": "portátil",
+        "laptop-code": "desarrollo",
+        "lightbulb-dollar": "idea rentable",
+        "map": "mapa",
+        "medal": "medalla",
+        "microphone": "micrófono",
+        "microscope": "microscopio",
+        "money-bill": "billete",
+        "mountain": "montaña",
+        "mug-hot": "taza",
+        "network-wired": "red cableada",
+        "passport": "pasaporte",
+        "pen": "bolígrafo",
+        "pencil-alt": "lápiz",
+        "pepper-hot": "pimiento picante",
+        "phone": "teléfono",
+        "piggy-bank": "alcancía",
+        "plane-alt": "avión",
+        "plane-departure": "salida",
+        "plug": "enchufe",
+        "print": "impresora",
+        "project-diagram": "proyecto",
+        "puzzle-piece": "rompecabezas",
+        "receipt": "recibo",
+        "robot": "robot",
+        "running": "corriendo",
+        "satellite": "satélite",
+        "satellite-dish": "antena parabólica",
+        "school": "escuela",
+        "screwdriver": "destornillador",
+        "scroll": "pergamino",
+        "shield-alt": "escudo",
+        "shopping-bag": "bolsa",
+        "sign": "letrero",
+        "sitemap": "mapa del sitio",
+        "snowman": "muñeco de nieve",
+        "solar-panel": "panel solar",
+        "spa": "spa",
+        "space-shuttle": "transbordador espacial",
+        "stamp": "sello",
+        "stethoscope": "estetoscopio",
+        "store": "tienda",
+        "store-alt": "tienda",
+        "suitcase": "maleta",
+        "sun-cloud": "sol y nube",
+        "swimmer": "nadador",
+        "sync": "sincronización",
+        "syringe": "jeringa",
+        "tablet": "tableta",
+        "tachometer-alt": "velocidad",
+        "tag": "etiqueta",
+        "tags": "etiquetas",
+        "theater-masks": "teatro",
+        "toilet-paper": "papel higiénico",
+        "toolbox": "caja de herramientas",
+        "tooth": "diente",
+        "tools": "herramientas",
+        "tractor": "tractor",
+        "trash-alt": "papelera",
+        "tree-alt": "árbol",
+        "truck": "camión",
+        "tv": "televisión",
+        "umbrella-beach": "sombrilla de playa",
+        "university": "universidad",
+        "user-graduate": "estudiante",
+        "utensil-spoon": "cuchara",
+        "vial": "vial",
+        "video": "vídeo",
+        "walking": "caminando",
+        "wallet": "cartera",
+        "warehouse": "almacén",
+        "water": "agua",
+        "weight": "peso",
+        "wifi": "wifi",
+        "wind": "viento",
+        "yen-sign": "yen"
+    },
+    "shared_folders": {
+        "page": {
+            "title": "Carpetas Compartidas",
+            "no_shared_folders": "Aún no hay carpetas compartidas.",
+            "shared_folders_hint": "Comparte una carpeta haciendo clic en el botón de nube en el menú de la carpeta."
+        },
+        "button": "Carpetas Compartidas",
+        "view_shared_folders": "Ver carpetas compartidas",
+        "filter_placeholder": "Filtrar por nombre de carpeta o token...",
+        "empty": "No se encontraron carpetas compartidas.",
+        "confirm_revoke": "¿Está seguro de que desea revocar el uso compartido de esta carpeta? Todas las notas de esta carpeta también dejarán de estar compartidas."
+    },
+    "search_replace": {
+        "search_placeholder": "Buscar...",
+        "replace_placeholder": "Reemplazar...",
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "toggle_replace": "Mostrar/Ocultar reemplazar",
+        "close": "Cerrar",
+        "replace": "Reemplazar",
+        "replace_one": "Reemplazar",
+        "replace_all": "Reemplazar todo",
+        "result": "resultado",
+        "results": "resultados",
+        "no_matches": "Sin resultados",
+        "replaced_all": "{{count}} reemplazo(s) realizado(s)"
+    }
 }
