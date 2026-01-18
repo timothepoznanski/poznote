@@ -727,7 +727,12 @@ function restoreDatabaseFromFile($sqlFile) {
     
     // Remove current database
     if (file_exists($dbPath)) {
-        unlink($dbPath);
+        if (!unlink($dbPath)) {
+            // If unlink fails (e.g. open handle), try to truncate the file
+            if (file_put_contents($dbPath, '') === false) {
+                return ['success' => false, 'error' => 'Failed to delete or clear existing database file. Please check permissions or restarting the service.'];
+            }
+        }
     }
     
     // Restore database

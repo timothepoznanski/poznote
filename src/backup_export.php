@@ -51,14 +51,20 @@ function generateSQLDump() {
     }
     
     foreach ($tableNames as $table) {
-        // Get CREATE TABLE statement
-        $createStmt = $con->query("SELECT sql FROM sqlite_master WHERE type='table' AND name='{$table}'")->fetch(PDO::FETCH_ASSOC);
+        // Get CREATE TABLE statement using prepared statement to prevent SQL injection
+        $stmt = $con->prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name=?");
+        $stmt->execute([$table]);
+        $createStmt = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($createStmt && $createStmt['sql']) {
+            // Add DROP TABLE to ensure clean restoration
+            $sql .= "DROP TABLE IF EXISTS \"{$table}\";\n";
             $sql .= $createStmt['sql'] . ";\n\n";
         }
         
-        // Get all data
-        $data = $con->query("SELECT * FROM \"{$table}\"");
+        // Get all data using prepared statement
+        $stmt = $con->prepare("SELECT * FROM \"{$table}\"");
+        $stmt->execute();
+        $data = $stmt;
         while ($row = $data->fetch(PDO::FETCH_ASSOC)) {
             $columns = array_keys($row);
             $values = array_map(function($value) use ($con) {

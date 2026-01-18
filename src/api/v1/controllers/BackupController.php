@@ -247,12 +247,19 @@ class BackupController {
         }
         
         foreach ($tableNames as $table) {
-            $createStmt = $this->con->query("SELECT sql FROM sqlite_master WHERE type='table' AND name='{$table}'")->fetch(PDO::FETCH_ASSOC);
-            if ($createStmt && $createStmt['sql']) {
-                $sql .= $createStmt['sql'] . ";\n\n";
-            }
-            
-            $data = $this->con->query("SELECT * FROM \"{$table}\"");
+        // Get CREATE TABLE statement using prepared statement to prevent SQL injection
+        $stmt = $this->con->prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name=?");
+        $stmt->execute([$table]);
+        $createStmt = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($createStmt && $createStmt['sql']) {
+            $sql .= "DROP TABLE IF EXISTS \"{$table}\";\n";
+            $sql .= $createStmt['sql'] . ";\n\n";
+        }
+        
+        // Get all data using prepared statement
+        $stmt = $this->con->prepare("SELECT * FROM \"{$table}\"");
+        $stmt->execute();
+        $data = $stmt;
             while ($row = $data->fetch(PDO::FETCH_ASSOC)) {
                 $columns = array_keys($row);
                 $values = array_map(function($value) {
