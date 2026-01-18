@@ -123,13 +123,29 @@ class ShareController {
             $stmt->execute([$noteId]);
             $existsRow = $stmt->fetchColumn();
             
+            // Register in global registry (master.db)
+            require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+            
+            $oldToken = null;
+            if ($existsRow) {
+                $stmt = $this->con->prepare('SELECT token FROM shared_notes WHERE note_id = ?');
+                $stmt->execute([$noteId]);
+                $oldToken = $stmt->fetchColumn();
+            }
+
             if ($existsRow) {
                 $stmt = $this->con->prepare('UPDATE shared_notes SET token = ?, theme = ?, indexable = ?, password = ?, created = CURRENT_TIMESTAMP WHERE note_id = ?');
                 $stmt->execute([$token, $theme, $indexable, $hashedPassword, $noteId]);
+                
+                if ($oldToken && $oldToken !== $token) {
+                    unregisterSharedLink($oldToken);
+                }
             } else {
                 $stmt = $this->con->prepare('INSERT INTO shared_notes (note_id, token, theme, indexable, password) VALUES (?, ?, ?, ?, ?)');
                 $stmt->execute([$noteId, $token, $theme, $indexable, $hashedPassword]);
             }
+            
+            registerSharedLink($token, $_SESSION['user_id'], 'note', (int)$noteId);
             
             $urls = $this->buildUrls($token);
             
@@ -164,6 +180,15 @@ class ShareController {
                 return;
             }
             
+            // Remove from global registry first
+            $stmtToken = $this->con->prepare('SELECT token FROM shared_notes WHERE note_id = ?');
+            $stmtToken->execute([$noteId]);
+            $token = $stmtToken->fetchColumn();
+            if ($token) {
+                require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+                unregisterSharedLink($token);
+            }
+
             $stmt = $this->con->prepare('DELETE FROM shared_notes WHERE note_id = ?');
             $stmt->execute([$noteId]);
             

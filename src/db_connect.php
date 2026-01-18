@@ -23,6 +23,42 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id']) {
     if (!$userDataManager->userDirectoriesExist()) {
         $userDataManager->initializeUserDirectories();
     }
+} else {
+    // If not authenticated, check if this is a public shared link
+    // We can detect this by looking for 'token' in GET or by checking the path
+    $publicToken = $_GET['token'] ?? null;
+    
+    // Also check pretty URLs (tokens are usually alphanumeric/hex)
+    if (!$publicToken && !empty($_SERVER['REQUEST_URI'])) {
+        $uri = trim($_SERVER['REQUEST_URI'], '/');
+        $parts = explode('/', $uri);
+        $lastPart = end($parts);
+        if ($lastPart && preg_match('/^[a-f0-9]{32}$|^[a-zA-Z0-9\-_.]{4,128}$/', $lastPart)) {
+            $publicToken = $lastPart;
+        }
+    }
+    
+    if ($publicToken) {
+        require_once __DIR__ . '/users/db_master.php';
+        try {
+            $masterCon = getMasterConnection();
+            $stmt = $masterCon->prepare("SELECT user_id FROM shared_links WHERE token = ? LIMIT 1");
+            $stmt->execute([$publicToken]);
+            $ownerId = $stmt->fetchColumn();
+            
+            if ($ownerId) {
+                require_once __DIR__ . '/users/UserDataManager.php';
+                $userDataManager = new UserDataManager((int)$ownerId);
+                $dbPath = $userDataManager->getUserDatabasePath();
+                
+                // For public access, we don't automatically create directories, 
+                // they must already exist if a token exists.
+            }
+        } catch (Exception $e) {
+            // Master DB not available or token not found, fallback to default
+            error_log("Public routing failed: " . $e->getMessage());
+        }
+    }
 }
 
 // SQLite connection

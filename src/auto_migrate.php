@@ -197,10 +197,39 @@ function checkAndMigrateToMultiUser(): void {
             error_log("Poznote: Moved $backupsMoved backup files");
         }
         
-        // Step 7: Clean up old empty directories after successful migration
-        cleanupOldDirectories($dataDir);
+        // Step 8: Migrate shared links to master registry
+        // This allows public links created in single-user mode to keep working
+        try {
+            $user1Db = new PDO('sqlite:' . $newDbPath);
+            
+            // Check for shared notes
+            $stmt = $user1Db->query("SELECT token, note_id FROM shared_notes");
+            if ($stmt) {
+                $sharedNotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $registryStmt = $masterCon->prepare("INSERT OR IGNORE INTO shared_links (token, user_id, target_type, target_id) VALUES (?, 1, 'note', ?)");
+                foreach ($sharedNotes as $row) {
+                    $registryStmt->execute([$row['token'], $row['note_id']]);
+                }
+                error_log("Poznote: Migrated " . count($sharedNotes) . " shared note links to registry");
+            }
+            
+            // Check for shared folders
+            $stmt = $user1Db->query("SELECT token, folder_id FROM shared_folders");
+            if ($stmt) {
+                $sharedFolders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $registryStmt = $masterCon->prepare("INSERT OR IGNORE INTO shared_links (token, user_id, target_type, target_id) VALUES (?, 1, 'folder', ?)");
+                foreach ($sharedFolders as $row) {
+                    $registryStmt->execute([$row['token'], $row['folder_id']]);
+                }
+                error_log("Poznote: Migrated " . count($sharedFolders) . " shared folder links to registry");
+            }
+            
+            $user1Db = null;
+        } catch (Exception $e) {
+            error_log("Poznote: Shared links migration skipped or failed: " . $e->getMessage());
+        }
         
-        // Step 8: Invalidate old "remember me" cookies by recording migration timestamp
+        // Step 9: Invalidate old "remember me" cookies by recording migration timestamp
         // This forces users to re-login and select their profile
         $masterCon->exec("INSERT OR REPLACE INTO global_settings (key, value) VALUES ('migration_timestamp', '" . time() . "')");
         

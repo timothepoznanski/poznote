@@ -75,9 +75,22 @@ function initializeMasterDatabase(PDO $con): void {
         )
     ");
     
+    // Shared links registry (for public routing)
+    $con->exec("
+        CREATE TABLE IF NOT EXISTS shared_links (
+            token TEXT PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            target_type TEXT NOT NULL, -- 'note' or 'folder'
+            target_id INTEGER NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ");
+    
     // Create indexes
     $con->exec("CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)");
     $con->exec("CREATE INDEX IF NOT EXISTS idx_users_active ON users(active)");
+    $con->exec("CREATE INDEX IF NOT EXISTS idx_shared_links_token ON shared_links(token)");
+    $con->exec("CREATE INDEX IF NOT EXISTS idx_shared_links_user ON shared_links(user_id)");
     
     // Create default user if none exist
     createDefaultUserIfNeeded($con);
@@ -249,6 +262,10 @@ function deleteUserProfile(int $id, bool $deleteData = false): array {
             $dataManager->deleteAllUserData();
         }
         
+        // Delete user's shared links from global registry
+        $stmt = $con->prepare("DELETE FROM shared_links WHERE user_id = ?");
+        $stmt->execute([$id]);
+        
         $stmt = $con->prepare("DELETE FROM users WHERE id = ?");
         $stmt->execute([$id]);
         
@@ -302,6 +319,37 @@ function setGlobalSetting(string $key, $value): bool {
         ");
         return $stmt->execute([$key, $value]);
     } catch (Exception $e) {
+        return false;
+    }
+}
+
+/**
+ * Register a shared link in the global registry
+ */
+function registerSharedLink(string $token, int $userId, string $targetType, int $targetId): bool {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("
+            INSERT OR REPLACE INTO shared_links (token, user_id, target_type, target_id)
+            VALUES (?, ?, ?, ?)
+        ");
+        return $stmt->execute([$token, $userId, $targetType, $targetId]);
+    } catch (Exception $e) {
+        error_log("Failed to register shared link: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Unregister a shared link from the global registry
+ */
+function unregisterSharedLink(string $token): bool {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("DELETE FROM shared_links WHERE token = ?");
+        return $stmt->execute([$token]);
+    } catch (Exception $e) {
+        error_log("Failed to unregister shared link: " . $e->getMessage());
         return false;
     }
 }

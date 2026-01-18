@@ -533,18 +533,26 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         }
         
         // Ensure required data directories exist
-        $dataDir = dirname(__DIR__) . '/data';
-        $requiredDirs = ['attachments', 'database', 'entries'];
-        foreach ($requiredDirs as $dir) {
-            $fullPath = $dataDir . '/' . $dir;
-            if (!is_dir($fullPath)) {
-                mkdir($fullPath, 0755, true);
-                // Set proper ownership if running as root (Docker context)
-                if (function_exists('posix_getuid') && posix_getuid() === 0) {
-                    $current_uid = posix_getuid();
-                    $current_gid = posix_getgid();
-                    chown($fullPath, $current_uid);
-                    chgrp($fullPath, $current_gid);
+        if (isset($_SESSION['user_id'])) {
+            require_once __DIR__ . '/users/UserDataManager.php';
+            $dataManager = new UserDataManager($_SESSION['user_id']);
+            if (!$dataManager->userDirectoriesExist()) {
+                $dataManager->initializeUserDirectories();
+            }
+        } else {
+            // Fallback for non-user mode (old structure compatibility)
+            $dataDir = dirname(__DIR__) . '/data';
+            $requiredDirs = ['attachments', 'database', 'entries'];
+            foreach ($requiredDirs as $dir) {
+                $fullPath = $dataDir . '/' . $dir;
+                if (!is_dir($fullPath)) {
+                    mkdir($fullPath, 0755, true);
+                    if (function_exists('posix_getuid') && posix_getuid() === 0) {
+                        $current_uid = posix_getuid();
+                        $current_gid = posix_getgid();
+                        chown($fullPath, $current_uid);
+                        chgrp($fullPath, $current_gid);
+                    }
                 }
             }
         }
@@ -685,7 +693,17 @@ function restoreDatabaseFromFile($sqlFile) {
         return ['success' => false, 'error' => 'Cannot read SQL file'];
     }
     
-    $dbPath = SQLITE_DATABASE;
+    // Use the active database path from db_connect.php or determine it for the current user
+    global $dbPath; 
+    if (!isset($dbPath) || empty($dbPath)) {
+        if (isset($_SESSION['user_id'])) {
+            require_once __DIR__ . '/users/UserDataManager.php';
+            $dataManager = new UserDataManager($_SESSION['user_id']);
+            $dbPath = $dataManager->getUserDatabasePath();
+        } else {
+            $dbPath = SQLITE_DATABASE;
+        }
+    }
     
     // Remove current database
     if (file_exists($dbPath)) {
@@ -814,19 +832,36 @@ function deleteDirectory($dir) {
 
 // Helper function to ensure proper permissions on data directory
 function ensureDataPermissions() {
-    $dataDir = dirname(__DIR__) . '/data';
-    if (is_dir($dataDir)) {
-        // Recursively set ownership to match the data directory owner
-        $dataOwner = fileowner($dataDir);
-        $dataGroup = filegroup($dataDir);
+    if (isset($_SESSION['user_id'])) {
+        require_once __DIR__ . '/users/UserDataManager.php';
+        $dataManager = new UserDataManager($_SESSION['user_id']);
+        $userDir = $dataManager->getUserBasePath();
+        $dbPath = $dataManager->getUserDatabasePath();
         
-        // Use shell command for recursive chown since PHP chown is not recursive
-        exec("chown -R {$dataOwner}:{$dataGroup} {$dataDir} 2>/dev/null");
-        
-        // Ensure database file has write permissions
-        $dbPath = $dataDir . '/database/poznote.db';
-        if (file_exists($dbPath)) {
-            chmod($dbPath, 0664);
+        if (is_dir($userDir)) {
+            if (function_exists('posix_getuid') && posix_getuid() === 0) {
+                // Use shell command for recursive chown
+                exec("chown -R www-data:www-data {$userDir} 2>/dev/null");
+            }
+            if (file_exists($dbPath)) {
+                chmod($dbPath, 0664);
+            }
+        }
+    } else {
+        $dataDir = dirname(__DIR__) . '/data';
+        if (is_dir($dataDir)) {
+            // Recursively set ownership to match the data directory owner
+            $dataOwner = fileowner($dataDir);
+            $dataGroup = filegroup($dataDir);
+            
+            // Use shell command for recursive chown
+            exec("chown -R {$dataOwner}:{$dataGroup} {$dataDir} 2>/dev/null");
+            
+            // Ensure database file has write permissions
+            $dbPath = $dataDir . '/database/poznote.db';
+            if (file_exists($dbPath)) {
+                chmod($dbPath, 0664);
+            }
         }
     }
 }
