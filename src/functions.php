@@ -643,6 +643,17 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
             $dbResult = restoreDatabaseFromFile($sqlFile);
             $results[] = 'Database: ' . ($dbResult['success'] ? 'Restored successfully' : 'Failed - ' . $dbResult['error']);
             if (!$dbResult['success']) $hasErrors = true;
+            
+            // Fix orphaned folders immediately after DB restore
+            if ($dbResult['success']) {
+                global $con;
+                if (isset($con)) {
+                    $fixResult = fixOrphanedFolders($con);
+                    if ($fixResult['success'] && $fixResult['count'] > 0) {
+                        $results[] = "Migration: Fixed {$fixResult['count']} notes and created {$fixResult['created']} missing folders";
+                    }
+                }
+            }
             // Note: Schema migration is now handled inside restoreDatabaseFromFile()
         } else {
             $results[] = 'Database: No SQL file found in backup';
@@ -929,5 +940,65 @@ function getFolderPath($folder_id, $con) {
     $result = !empty($path) ? implode('/', $path) : 'Default';
     $cache[$folder_id] = $result;
     return $result;
+}
+
+/**
+ * Fix notes with empty folder_id but non-empty folder name.
+ * This happens after restoring an old backup or after manual DB manipulation.
+ * It ensures consistency between the legacy 'folder' (TEXT) column and the new 'folder_id' (INTEGER) column.
+ * 
+ * @param PDO $con The database connection
+ * @return array Results of the fix operation
+ */
+function fixOrphanedFolders($con) {
+    if (!$con) return ['success' => false, 'error' => 'No database connection'];
+    
+    $fixedCount = 0;
+    $createdFolders = 0;
+    
+    try {
+        // Find notes that have a folder name but no folder_id
+        $stmt = $con->query("SELECT id, folder, workspace FROM entries WHERE folder IS NOT NULL AND folder != '' AND folder_id IS NULL");
+        $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        if (empty($notes)) {
+            return ['success' => true, 'count' => 0, 'created' => 0];
+        }
+        
+        foreach ($notes as $note) {
+            $noteId = $note['id'];
+            $folderName = $note['folder'];
+            $workspace = $note['workspace'] ?: 'Poznote';
+            
+            // 1. Check if folder exists
+            $checkStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ? LIMIT 1");
+            $checkStmt->execute([$folderName, $workspace]);
+            $folder = $checkStmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($folder) {
+                $folderId = $folder['id'];
+            } else {
+                // 2. Create folder if it doesn't exist
+                $insertStmt = $con->prepare("INSERT INTO folders (name, workspace) VALUES (?, ?)");
+                $insertStmt->execute([$folderName, $workspace]);
+                $folderId = $con->lastInsertId();
+                $createdFolders++;
+            }
+            
+            // 3. Update entry with folder_id
+            $updateStmt = $con->prepare("UPDATE entries SET folder_id = ? WHERE id = ?");
+            $updateStmt->execute([$folderId, $noteId]);
+            $fixedCount++;
+        }
+        
+        return [
+            'success' => true, 
+            'count' => $fixedCount, 
+            'created' => $createdFolders
+        ];
+    } catch (Exception $e) {
+        error_log("Error in fixOrphanedFolders: " . $e->getMessage());
+        return ['success' => false, 'error' => $e->getMessage()];
+    }
 }
 ?>
