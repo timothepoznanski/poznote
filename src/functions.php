@@ -644,13 +644,13 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
             $results[] = 'Database: ' . ($dbResult['success'] ? 'Restored successfully' : 'Failed - ' . $dbResult['error']);
             if (!$dbResult['success']) $hasErrors = true;
             
-            // Fix orphaned folders immediately after DB restore
+            // Fix orphaned folders and missing entries immediately after DB restore
             if ($dbResult['success']) {
                 global $con;
                 if (isset($con)) {
-                    $fixResult = fixOrphanedFolders($con);
-                    if ($fixResult['success'] && $fixResult['count'] > 0) {
-                        $results[] = "Migration: Fixed {$fixResult['count']} notes and created {$fixResult['created']} missing folders";
+                    $repairResult = repairDatabaseEntries($con);
+                    if ($repairResult['success'] && ($repairResult['folders_fixed'] > 0 || $repairResult['entries_fixed'] > 0)) {
+                        $results[] = "Migration: Fixed {$repairResult['folders_fixed']} folders and {$repairResult['entries_fixed']} entry snippets";
                     }
                 }
             }
@@ -943,34 +943,30 @@ function getFolderPath($folder_id, $con) {
 }
 
 /**
- * Fix notes with empty folder_id but non-empty folder name.
- * This happens after restoring an old backup or after manual DB manipulation.
- * It ensures consistency between the legacy 'folder' (TEXT) column and the new 'folder_id' (INTEGER) column.
+ * Fix database inconsistencies in notes:
+ * 1. Populates folder_id from legacy folder (TEXT) column.
+ * 2. Re-generates search snippets (entry column) from physical files if empty.
  * 
  * @param PDO $con The database connection
- * @return array Results of the fix operation
+ * @return array Results of the repair operation
  */
-function fixOrphanedFolders($con) {
+function repairDatabaseEntries($con) {
     if (!$con) return ['success' => false, 'error' => 'No database connection'];
     
-    $fixedCount = 0;
+    $fixedFolders = 0;
     $createdFolders = 0;
+    $fixedEntries = 0;
     
     try {
-        // Find notes that have a folder name but no folder_id
+        // --- PART 1: FOLDERS MIGRATION ---
         $stmt = $con->query("SELECT id, folder, workspace FROM entries WHERE folder IS NOT NULL AND folder != '' AND folder_id IS NULL");
         $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        if (empty($notes)) {
-            return ['success' => true, 'count' => 0, 'created' => 0];
-        }
         
         foreach ($notes as $note) {
             $noteId = $note['id'];
             $folderName = $note['folder'];
             $workspace = $note['workspace'] ?: 'Poznote';
             
-            // 1. Check if folder exists
             $checkStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ? LIMIT 1");
             $checkStmt->execute([$folderName, $workspace]);
             $folder = $checkStmt->fetch(PDO::FETCH_ASSOC);
@@ -978,26 +974,49 @@ function fixOrphanedFolders($con) {
             if ($folder) {
                 $folderId = $folder['id'];
             } else {
-                // 2. Create folder if it doesn't exist
                 $insertStmt = $con->prepare("INSERT INTO folders (name, workspace) VALUES (?, ?)");
                 $insertStmt->execute([$folderName, $workspace]);
                 $folderId = $con->lastInsertId();
                 $createdFolders++;
             }
             
-            // 3. Update entry with folder_id
             $updateStmt = $con->prepare("UPDATE entries SET folder_id = ? WHERE id = ?");
             $updateStmt->execute([$folderId, $noteId]);
-            $fixedCount++;
+            $fixedFolders++;
+        }
+
+        // --- PART 2: EMPTY ENTRY SNIPPETS (FOR SEARCH) ---
+        $stmt = $con->query("SELECT id, type FROM entries WHERE (entry IS NULL OR entry = '') AND trash = 0");
+        $emptyNotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach ($emptyNotes as $note) {
+            $noteId = $note['id'];
+            $type = $note['type'] ?: 'note';
+            $filePath = getEntryFilename($noteId, $type);
+            
+            if (file_exists($filePath)) {
+                $content = file_get_contents($filePath);
+                if ($content !== false) {
+                    // Extract a clean snippet for search
+                    $snippet = cleanContentForSearch($content);
+                    $snippet = strip_tags($snippet);
+                    $snippet = mb_substr($snippet, 0, 500); // Limit to 500 chars for DB performance
+                    
+                    $updateStmt = $con->prepare("UPDATE entries SET entry = ? WHERE id = ?");
+                    $updateStmt->execute([$snippet, $noteId]);
+                    $fixedEntries++;
+                }
+            }
         }
         
         return [
             'success' => true, 
-            'count' => $fixedCount, 
-            'created' => $createdFolders
+            'folders_fixed' => $fixedFolders, 
+            'folders_created' => $createdFolders,
+            'entries_fixed' => $fixedEntries
         ];
     } catch (Exception $e) {
-        error_log("Error in fixOrphanedFolders: " . $e->getMessage());
+        error_log("Error in repairDatabaseEntries: " . $e->getMessage());
         return ['success' => false, 'error' => $e->getMessage()];
     }
 }

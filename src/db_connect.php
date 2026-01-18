@@ -401,9 +401,9 @@ try {
                 chgrp($welcomeFile, 'www-data');
             }
         }
-        // Legacy migration: ensure folder_id is populated from folder column
-        if (function_exists('fixOrphanedFolders')) {
-            fixOrphanedFolders($con);
+        // Legacy migration: ensure folder_id is populated and entries are fixed
+        if (function_exists('repairDatabaseEntries')) {
+            repairDatabaseEntries($con);
         }
     } catch(Exception $e) {
         // Log error but don't fail database connection
