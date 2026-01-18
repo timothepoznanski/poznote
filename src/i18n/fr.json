@@ -270,6 +270,7 @@
         },
         "cards": {
             "workspaces": "Espaces de travail",
+            "user_management": "Gestion des utilisateurs",
             "backup_export": "Sauvegarde / Export",
             "restore_import": "Restauration / Import",
             "check_updates": "Vérifier les mises à jour",
@@ -1657,8 +1658,9 @@
                 "password_too_short": "Le mot de passe doit contenir au moins 8 caractères",
                 "username_taken": "Ce nom d'utilisateur est déjà pris",
                 "email_taken": "Cet email est déjà utilisé",
-                "cannot_delete_self": "Vous ne pouvez pas supprimer votre propre compte",
-                "cannot_demote_self": "Vous ne pouvez pas retirer vos propres privilèges administrateur"
+                "cannot_delete_self": "Vous ne pouvez pas supprimer votre propre profil",
+                "cannot_demote_self": "Vous ne pouvez pas retirer vos propres privilèges administrateur",
+                "cannot_change_self": "Vous ne pouvez pas modifier votre propre statut ou rôle"
             },
             "stats": {
                 "title": "Statistiques système",
@@ -1670,13 +1672,26 @@
                 "total_attachments": "Total des pièces jointes"
             },
             "maintenance": {
-                "title": "Maintenance système",
-                "subtitle": "Outils de réparation et de maintenance du registre système",
-                "repair_registry": "Réparer le registre système",
-                "repair_registry_confirm": "Cela va scanner tous les dossiers utilisateurs et reconstruire le registre des partages. Utile si la base de données master a été perdue ou corrompue. Continuer ?",
-                "repair_registry_success": "Registre système réparé avec succès :\n- {{scanned}} dossiers scannés\n- {{added}} utilisateurs restaurés\n- {{links}} liens de partage reconstruits",
-                "repair_registry_error": "Erreur de réparation : {{error}}"
-            }
+                "title": "Reconstruire la base Master",
+                "subtitle": "",
+                "description": "La base de données principale (master.db) contient les informations des utilisateurs, leurs liens publics et les réglages globaux de Poznote. Si ce fichier est perdu ou corrompu, cet outil scanne vos dossiers 'data/users' pour réinscrire automatiquement les comptes, récupérer leurs vrais noms depuis leurs bases personnelles et rétablir tous les liens de partage publics.",
+                "repair_registry": "Lancer la reconstruction",
+                "repair_registry_confirm": "Cela va scanner tous les dossiers utilisateurs et reconstruire la base de données master.",
+                "repair_registry_success": "Base de données master reconstruite avec succès :\n- {{scanned}} dossiers scannés\n- {{added}} utilisateurs restaurés\n- {{links}} liens de partage reconstruits",
+                "repair_registry_error": "Erreur de reconstruction : {{error}}"
+            },
+            "administrator": "Administrateur",
+            "processing": "Traitement...",
+            "errors_label": "Erreurs :",
+            "network_error": "Erreur réseau :",
+            "click_to_rename": "Cliquer pour renommer",
+            "rename_user": "Renommer l'utilisateur",
+            "delete_warning_all_data": "Toutes les données de l'utilisateur (notes, pièces jointes, etc.) seront définitivement supprimées.",
+            "access_denied_admin": "Accès refusé. Privilèges administrateur requis.",
+            "toggle_admin": "Basculer le rôle Administrateur",
+            "click_to_deactivate": "Cliquer pour désactiver",
+            "click_to_activate": "Cliquer pour activer",
+            "id": "ID"
         },
         "profile": {
             "title": "Mon profil",

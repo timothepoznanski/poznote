@@ -1604,5 +1604,35 @@
         "results": "resultados",
         "no_matches": "Sem resultados",
         "replaced_all": "{{count}} substituição(ões) realizada(s)"
+    },
+    "multiuser": {
+        "admin": {
+            "maintenance": {
+                "title": "Reconstruir Base de Dados Master",
+                "subtitle": "Restaurar perfis de utilizador e links de partilha",
+                "description": "A base de dados master (master.db) é o núcleo do sistema, contendo perfis de utilizador, links de partilha públicos e definições globais. Se este ficheiro for perdido ou corrompido, esta ferramenta analisa o diretório 'data/users' para registar novamente as contas, recuperar os nomes originais das bases de dados pessoais e restaurar todos os links de partilha ativos.",
+                "repair_registry": "Iniciar Reconstrução",
+                "repair_registry_confirm": "Isto irá analisar todas as pastas de utilizador e reconstruir a base de dados master. Continuar?",
+                "repair_registry_success": "Base de dados master reconstruída com sucesso:\n- {{scanned}} pastas analisadas\n- {{added}} utilizadores restaurados\n- {{links}} links partilhados reconstruídos",
+                "repair_registry_error": "Erro de reconstrução: {{error}}"
+            },
+            "administrator": "Administrador",
+            "processing": "Processando...",
+            "errors_label": "Erros:",
+            "network_error": "Erro de rede:",
+            "click_to_rename": "Clique para renomear",
+            "rename_user": "Renomear usuário",
+            "delete_warning_all_data": "Todos os dados do usuário (notas, anexos, etc.) serão permanentemente excluídos.",
+            "access_denied_admin": "Acesso negado. Privilégios de administrador necessários.",
+            "toggle_admin": "Alternar privilégios de administrador",
+            "click_to_deactivate": "Clique para desativar",
+            "click_to_activate": "Clique para ativar",
+            "id": "ID",
+            "errors": {
+                "username_required": "O nome de usuário é obrigatório",
+                "cannot_delete_self": "Você não pode excluir seu próprio perfil",
+                "cannot_change_self": "Você não pode alterar seu próprio status/função"
+            }
+        }
     }
 }

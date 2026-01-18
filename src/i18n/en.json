@@ -270,6 +270,7 @@
         },
         "cards": {
             "workspaces": "Workspaces",
+            "user_management": "User Management",
             "backup_export": "Backup / Export",
             "restore_import": "Restore / Import",
             "check_updates": "Check for Updates",
@@ -1646,8 +1647,9 @@
                 "password_too_short": "Password must be at least 8 characters",
                 "username_taken": "Username is already taken",
                 "email_taken": "Email is already in use",
-                "cannot_delete_self": "You cannot delete your own account",
-                "cannot_demote_self": "You cannot remove admin privileges from yourself"
+                "cannot_delete_self": "You cannot delete your own profile",
+                "cannot_demote_self": "You cannot remove admin privileges from yourself",
+                "cannot_change_self": "You cannot change your own status/role"
             },
             "stats": {
                 "title": "System Statistics",
@@ -1659,13 +1661,26 @@
                 "total_attachments": "Total Attachments"
             },
             "maintenance": {
-                "title": "System Maintenance",
-                "subtitle": "Tools for repairing and maintaining the system registry",
-                "repair_registry": "Repair System Registry",
-                "repair_registry_confirm": "This will scan all user folders and rebuild the shared links registry. This is useful if the master database was lost or corrupted. Continue?",
-                "repair_registry_success": "System registry repaired successfully:\n- {{scanned}} folders scanned\n- {{added}} users restored\n- {{links}} shared links rebuilt",
-                "repair_registry_error": "Repair error: {{error}}"
-            }
+                "title": "Rebuild Master Database",
+                "subtitle": "",
+                "description": "The master database (master.db) is the system's core registry, containing user profiles, public shared links, and global settings. If this file is lost or corrupted, this tool scans the 'data/users' directory to automatically re-register accounts, recover original usernames from personal databases, and restore all active public links.",
+                "repair_registry": "Launch Reconstruction",
+                "repair_registry_confirm": "This will scan all user folders and rebuild the master database registry.",
+                "repair_registry_success": "Master database reconstructed successfully:\n- {{scanned}} folders scanned\n- {{added}} users restored\n- {{links}} shared links rebuilt",
+                "repair_registry_error": "Reconstruction error: {{error}}"
+            },
+            "administrator": "Administrator",
+            "processing": "Processing...",
+            "errors_label": "Errors:",
+            "network_error": "Network error: ",
+            "click_to_rename": "Click to rename",
+            "rename_user": "Rename User",
+            "delete_warning_all_data": "All user data (notes, attachments, etc.) will be permanently deleted.",
+            "access_denied_admin": "Access denied. Admin privileges required.",
+            "toggle_admin": "Toggle Admin Role",
+            "click_to_deactivate": "Click to deactivate",
+            "click_to_activate": "Click to activate",
+            "id": "ID"
         },
         "profile": {
             "title": "My Profile",

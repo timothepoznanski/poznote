@@ -1600,5 +1600,35 @@
         "results": "Ergebnisse",
         "no_matches": "Keine Ergebnisse",
         "replaced_all": "{{count}} Ersetzung(en) durchgeführt"
+    },
+    "multiuser": {
+        "admin": {
+            "maintenance": {
+                "title": "Master-Datenbank rekonstruieren",
+                "subtitle": "Benutzerprofile und öffentliche Links wiederherstellen",
+                "description": "Die Master-Datenbank (master.db) ist das Herzstück des Systems und enthält Benutzerprofile, öffentliche Links und globale Einstellungen. Wenn diese Datei verloren geht oder beschädigt ist, scannt dieses Tool das Verzeichnis 'data/users', um Konten automatisch neu zu registrieren, ursprüngliche Benutzernamen aus persönlichen Datenbanken wiederherzustellen und alle aktiven öffentlichen Links wiederherzustellen.",
+                "repair_registry": "Rekonstruktion starten",
+                "repair_registry_confirm": "Dies scannt alle Benutzerordner und stellt die Master-Datenbank wieder her. Fortfahren?",
+                "repair_registry_success": "Master-Datenbank erfolgreich rekonstruiert:\n- {{scanned}} Ordner gescannt\n- {{added}} Benutzer wiederhergestellt\n- {{links}} geteilte Links neu aufgebaut",
+                "repair_registry_error": "Rekonstruktionsfehler: {{error}}"
+            },
+            "administrator": "Administrator",
+            "processing": "Verarbeitung...",
+            "errors_label": "Fehler:",
+            "network_error": "Netzwerkfehler:",
+            "click_to_rename": "Klicken zum Umbenennen",
+            "rename_user": "Benutzer umbenennen",
+            "delete_warning_all_data": "Alle Benutzerdaten (Notizen, Anhänge usw.) werden dauerhaft gelöscht.",
+            "access_denied_admin": "Zugriff verweigert. Administratorrechte erforderlich.",
+            "toggle_admin": "Administratorrolle umschalten",
+            "click_to_deactivate": "Klicken zum Deaktivieren",
+            "click_to_activate": "Klicken zum Aktivieren",
+            "id": "ID",
+            "errors": {
+                "username_required": "Benutzername ist erforderlich",
+                "cannot_delete_self": "Sie können Ihr eigenes Profil nicht löschen",
+                "cannot_change_self": "Sie können Ihren eigenen Status/Ihre eigene Rolle nicht ändern"
+            }
+        }
     }
 }

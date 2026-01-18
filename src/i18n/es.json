@@ -1600,5 +1600,35 @@
         "results": "resultados",
         "no_matches": "Sin resultados",
         "replaced_all": "{{count}} reemplazo(s) realizado(s)"
+    },
+    "multiuser": {
+        "admin": {
+            "maintenance": {
+                "title": "Reconstruir Base Maestra",
+                "subtitle": "Restaurar perfiles de usuario y enlaces compartidos",
+                "description": "La base de datos maestra (master.db) contiene la información de los usuarios, sus enlaces públicos y la configuración global de Poznote. Si este archivo se pierde o se corrompe, esta herramienta escanea sus carpetas 'data/users' para volver a registrar automáticamente las cuentas, recuperar sus nombres de usuario originales de sus bases personales y restablecer todos los enlaces compartidos.",
+                "repair_registry": "Iniciar Reconstrucción",
+                "repair_registry_confirm": "Esto escaneará todas las carpetas de usuario y reconstruirá la base de datos maestra. ¿Continuar?",
+                "repair_registry_success": "Base de datos maestra reconstruida con éxito:\n- {{scanned}} carpetas escaneadas\n- {{added}} usuarios restaurados\n- {{links}} enlaces compartidos reconstruidos",
+                "repair_registry_error": "Error de reconstrucción: {{error}}"
+            },
+            "administrator": "Administrador",
+            "processing": "Procesando...",
+            "errors_label": "Errores:",
+            "network_error": "Error de red:",
+            "click_to_rename": "Haga clic para renombrar",
+            "rename_user": "Renombrar usuario",
+            "delete_warning_all_data": "Todos los datos del usuario (notas, archivos adjuntos, etc.) se eliminarán permanentemente.",
+            "access_denied_admin": "Acceso denegado. Se requieren privilegios de administrador.",
+            "toggle_admin": "Cambiar rol de administrador",
+            "click_to_deactivate": "Haga clic para desactivar",
+            "click_to_activate": "Haga clic para activar",
+            "id": "ID",
+            "errors": {
+                "username_required": "Se requiere nombre de usuario",
+                "cannot_delete_self": "No puedes eliminar tu propio perfil",
+                "cannot_change_self": "No puedes cambiar tu propio estado o rol"
+            }
+        }
     }
 }
