@@ -194,7 +194,7 @@ function getEntriesPath() {
         return $dataManager->getUserEntriesPath();
     }
     // Fallback for unauthenticated access (should not happen in normal use)
-    return __DIR__ . '/data/entries';
+    return dirname(__DIR__) . '/data/entries';
 }
 
 /**
@@ -211,7 +211,7 @@ function getAttachmentsPath() {
         return $dataManager->getUserAttachmentsPath();
     }
     // Fallback for unauthenticated access
-    return __DIR__ . '/data/attachments';
+    return dirname(__DIR__) . '/data/attachments';
 }
 
 /**
