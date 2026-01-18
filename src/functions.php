@@ -185,9 +185,12 @@ function formatDateTime($t) {
  * Returns the path for the current user
  */
 function getEntriesPath() {
-    if (isset($_SESSION['user_id'])) {
+    global $activeUserId;
+    $userId = $_SESSION['user_id'] ?? $activeUserId;
+    
+    if ($userId) {
         require_once __DIR__ . '/users/UserDataManager.php';
-        $dataManager = new UserDataManager($_SESSION['user_id']);
+        $dataManager = new UserDataManager($userId);
         return $dataManager->getUserEntriesPath();
     }
     // Fallback for unauthenticated access (should not happen in normal use)
@@ -199,9 +202,12 @@ function getEntriesPath() {
  * Returns the path for the current user
  */
 function getAttachmentsPath() {
-    if (isset($_SESSION['user_id'])) {
+    global $activeUserId;
+    $userId = $_SESSION['user_id'] ?? $activeUserId;
+
+    if ($userId) {
         require_once __DIR__ . '/users/UserDataManager.php';
-        $dataManager = new UserDataManager($_SESSION['user_id']);
+        $dataManager = new UserDataManager($userId);
         return $dataManager->getUserAttachmentsPath();
     }
     // Fallback for unauthenticated access
@@ -213,9 +219,12 @@ function getAttachmentsPath() {
  * Returns the path for the current user
  */
 function getBackupsPath() {
-    if (isset($_SESSION['user_id'])) {
+    global $activeUserId;
+    $userId = $_SESSION['user_id'] ?? $activeUserId;
+
+    if ($userId) {
         require_once __DIR__ . '/users/UserDataManager.php';
-        $dataManager = new UserDataManager($_SESSION['user_id']);
+        $dataManager = new UserDataManager($userId);
         return $dataManager->getUserBackupsPath();
     }
     // Fallback for unauthenticated access

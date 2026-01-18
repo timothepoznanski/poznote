@@ -285,9 +285,9 @@ function convertImageToBase64($imagePath) {
         // Remove leading ../ or ./ if present
         $cleanPath = preg_replace('/^\.\.?\//', '', $imagePath);
         
-        // Remove 'data/attachments/' prefix if present
-        if (strpos($cleanPath, 'data/attachments/') === 0) {
-            $cleanPath = substr($cleanPath, strlen('data/attachments/'));
+        // Remove 'data/(users/X/)?attachments/' prefix if present
+        if (preg_match('#^data/(?:users/\d+/)?attachments/#i', $cleanPath)) {
+            $cleanPath = preg_replace('#^data/(?:users/\d+/)?attachments/#i', '', $cleanPath);
         }
         // Remove 'attachments/' prefix if present
         elseif (strpos($cleanPath, 'attachments/') === 0) {

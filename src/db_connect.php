@@ -12,11 +12,13 @@ require_once __DIR__ . '/auto_migrate.php';
 
 // Determine database path based on authenticated user
 $dbPath = SQLITE_DATABASE; // Default path (fallback)
+$activeUserId = null;
 
 // Use user-specific database if authenticated
 if (isset($_SESSION['user_id']) && $_SESSION['user_id']) {
+    $activeUserId = (int)$_SESSION['user_id'];
     require_once __DIR__ . '/users/UserDataManager.php';
-    $userDataManager = new UserDataManager($_SESSION['user_id']);
+    $userDataManager = new UserDataManager($activeUserId);
     $dbPath = $userDataManager->getUserDatabasePath();
     
     // Ensure user directories exist
@@ -47,8 +49,9 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id']) {
             $ownerId = $stmt->fetchColumn();
             
             if ($ownerId) {
+                $activeUserId = (int)$ownerId;
                 require_once __DIR__ . '/users/UserDataManager.php';
-                $userDataManager = new UserDataManager((int)$ownerId);
+                $userDataManager = new UserDataManager($activeUserId);
                 $dbPath = $userDataManager->getUserDatabasePath();
                 
                 // For public access, we don't automatically create directories, 

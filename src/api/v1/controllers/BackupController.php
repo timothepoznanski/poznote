@@ -15,8 +15,7 @@ class BackupController {
     
     public function __construct($con) {
         $this->con = $con;
-        // Path from api/v1/controllers/ to data/backups/
-        $this->backupsDir = __DIR__ . '/../../../data/backups';
+        $this->backupsDir = getBackupsPath();
     }
     
     /**
@@ -50,7 +49,6 @@ class BackupController {
                     
                     $backups[] = [
                         'filename' => $file,
-                        'path' => '../data/backups/' . $file,
                         'download_url' => '/api/v1/backups/' . urlencode($file),
                         'size' => $fileSize,
                         'size_mb' => round($fileSize / 1024 / 1024, 2),
@@ -164,7 +162,6 @@ class BackupController {
                 'success' => true,
                 'message' => 'Backup created successfully',
                 'backup_file' => $zipFileName,
-                'backup_path' => '../data/backups/' . $zipFileName,
                 'backup_size' => filesize($zipFilePath),
                 'backup_size_mb' => round(filesize($zipFilePath) / 1024 / 1024, 2),
                 'created_at' => date('c')
