@@ -174,12 +174,20 @@ function checkAndMigrateToMultiUser(): void {
         $newEntriesPath = $user1Dir . '/entries';
         $entriesMoved = 0;
         if (is_dir($oldEntriesPath)) {
-            $files = glob($oldEntriesPath . '/*.{html,md}', GLOB_BRACE);
-            foreach ($files as $file) {
-                $newPath = $newEntriesPath . '/' . basename($file);
-                if (!file_exists($newPath)) {
-                    if (rename($file, $newPath)) {
-                        $entriesMoved++;
+            // Use scandir to get all files (not just .html and .md)
+            $items = scandir($oldEntriesPath);
+            foreach ($items as $item) {
+                if ($item === '.' || $item === '..') {
+                    continue;
+                }
+                $file = $oldEntriesPath . '/' . $item;
+                // Only move files, not directories
+                if (is_file($file)) {
+                    $newPath = $newEntriesPath . '/' . $item;
+                    if (!file_exists($newPath)) {
+                        if (rename($file, $newPath)) {
+                            $entriesMoved++;
+                        }
                     }
                 }
             }
