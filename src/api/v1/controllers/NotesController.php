@@ -720,8 +720,9 @@ class NotesController {
         
         // Delete PNG file for Excalidraw
         $png_file_path = getEntriesPath() . '/' . $noteId . '.png';
+        $png_deleted = false;
         if (file_exists($png_file_path)) {
-            unlink($png_file_path);
+            $png_deleted = unlink($png_file_path);
         }
 
         // Delete database entry

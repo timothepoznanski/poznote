@@ -65,9 +65,22 @@ function checkAndMigrateToMultiUser(): void {
             )
         ");
         
+        // Shared links registry (for public routing)
+        $masterCon->exec("
+            CREATE TABLE IF NOT EXISTS shared_links (
+                token TEXT PRIMARY KEY,
+                user_id INTEGER NOT NULL,
+                target_type TEXT NOT NULL,
+                target_id INTEGER NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ");
+        
         // Create indexes
         $masterCon->exec("CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)");
         $masterCon->exec("CREATE INDEX IF NOT EXISTS idx_users_active ON users(active)");
+        $masterCon->exec("CREATE INDEX IF NOT EXISTS idx_shared_links_token ON shared_links(token)");
+        $masterCon->exec("CREATE INDEX IF NOT EXISTS idx_shared_links_user ON shared_links(user_id)");
         
         // Create default admin user (username 'admin' lowercase for consistency)
         $stmt = $masterCon->prepare("
