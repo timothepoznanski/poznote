@@ -347,6 +347,7 @@ $v = getAppVersion();
                 </div>
             </form>
         </div>
+    </div>
     <!-- Custom Status Modal -->
     <div class="modal" id="statusModal">
         <div class="modal-content">

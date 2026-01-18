@@ -25,8 +25,9 @@ function checkAndMigrateToMultiUser(): void {
     $usersDir = $dataDir . '/users';
     $user1Dir = $usersDir . '/1';
     
-    // If master.db exists, migration already done
+    // If master.db exists, migration already done, but we might still have empty old folders to clean up
     if (file_exists($masterDbPath)) {
+        cleanupOldDirectories($dataDir);
         return;
     }
     
@@ -247,6 +248,9 @@ function checkAndMigrateToMultiUser(): void {
         $masterCon->exec("INSERT OR REPLACE INTO global_settings (key, value) VALUES ('migration_timestamp', '" . time() . "')");
         
         error_log("Poznote: Migration complete!");
+        
+        // Step 10: Clean up old directories if empty
+        cleanupOldDirectories($dataDir);
         
     } catch (Exception $e) {
         error_log("Poznote: Migration failed: " . $e->getMessage());
