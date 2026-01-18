@@ -578,6 +578,16 @@ $v = getAppVersion();
                 <?php endforeach; ?>
             </tbody>
         </table>
+
+        <!-- Maintenance Section -->
+        <div style="margin-top: 50px; border-top: 1px solid var(--border-color); padding-top: 30px; margin-bottom: 50px;">
+            <h2 class="admin-title" style="font-size: 1.4rem;"><?php echo t_h('multiuser.admin.maintenance.title', [], 'System Maintenance'); ?></h2>
+            <p class="admin-subtitle"><?php echo t_h('multiuser.admin.maintenance.subtitle', [], 'Tools for repairing and maintaining the system registry'); ?></p>
+            
+            <button class="btn btn-secondary" onclick="runRepair()" style="margin-top: 15px;">
+                <i class="fas fa-tools"></i> <?php echo t_h('multiuser.admin.maintenance.repair_registry', [], 'Repair System Registry'); ?>
+            </button>
+        </div>
     </div>
     
     <!-- Create User Modal -->
@@ -677,6 +687,46 @@ $v = getAppVersion();
                 });
             }
         });
+
+        async function runRepair() {
+            const confirmMsg = <?php echo json_encode(t('multiuser.admin.maintenance.repair_registry_confirm', [], 'This will scan all user folders and rebuild the shared links registry. This is useful if the master database was lost or corrupted. Continue?')); ?>;
+            if (!confirm(confirmMsg)) return;
+
+            const btn = event.currentTarget;
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            
+            try {
+                const response = await fetch('../api/v1/admin/repair', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    let successMsg = <?php echo json_encode(t('multiuser.admin.maintenance.repair_registry_success', [], "System registry repaired successfully:\n- {{scanned}} folders scanned\n- {{added}} users restored\n- {{links}} shared links rebuilt")); ?>;
+                    successMsg = successMsg
+                        .replace('{{scanned}}', result.stats.users_scanned)
+                        .replace('{{added}}', result.stats.users_added)
+                        .replace('{{links}}', result.stats.links_rebuilt);
+                    
+                    if (result.stats.errors && result.stats.errors.length > 0) {
+                        successMsg += '\n\nErrors:\n' + result.stats.errors.join('\n');
+                    }
+                    alert(successMsg);
+                    window.location.reload();
+                } else {
+                    const errorMsg = <?php echo json_encode(t('multiuser.admin.maintenance.repair_registry_error', [], 'Repair error: {{error}}')); ?>;
+                    alert(errorMsg.replace('{{error}}', result.error));
+                }
+            } catch (e) {
+                alert('Network error: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
     </script>
 </body>
 </html>

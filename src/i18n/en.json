@@ -1657,6 +1657,14 @@
                 "total_storage": "Total Storage",
                 "total_notes": "Total Notes",
                 "total_attachments": "Total Attachments"
+            },
+            "maintenance": {
+                "title": "System Maintenance",
+                "subtitle": "Tools for repairing and maintaining the system registry",
+                "repair_registry": "Repair System Registry",
+                "repair_registry_confirm": "This will scan all user folders and rebuild the shared links registry. This is useful if the master database was lost or corrupted. Continue?",
+                "repair_registry_success": "System registry repaired successfully:\n- {{scanned}} folders scanned\n- {{added}} users restored\n- {{links}} shared links rebuilt",
+                "repair_registry_error": "Repair error: {{error}}"
             }
         },
         "profile": {

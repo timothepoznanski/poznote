@@ -212,4 +212,110 @@ class UsersController {
             ];
         }, $users);
     }
+    /**
+     * POST /api/v1/admin/repair - Repair master database (Scan & Rebuild)
+     */
+    public function repair() {
+        if ($err = $this->requireAdmin()) return $err;
+        
+        require_once __DIR__ . '/../../users/db_master.php';
+        try {
+            $masterCon = getMasterConnection();
+        } catch (Exception $e) {
+            return ['success' => false, 'error' => 'Could not connect to master database: ' . $e->getMessage()];
+        }
+        
+        $stats = [
+            'users_scanned' => 0,
+            'users_added' => 0,
+            'links_rebuilt' => 0,
+            'errors' => []
+        ];
+        
+        // Define users data directory path
+        $usersBaseDir = dirname(__DIR__, 3) . '/data/users';
+        if (!is_dir($usersBaseDir)) {
+            return ['success' => false, 'error' => 'Users data directory not found at ' . $usersBaseDir];
+        }
+        
+        try {
+            // 1. Rebuild shared_links registry - clear existing to avoid conflicts
+            $masterCon->exec("DELETE FROM shared_links");
+            
+            $dirs = array_filter(glob($usersBaseDir . '/*'), 'is_dir');
+            foreach ($dirs as $userDir) {
+                $userIdStr = basename($userDir);
+                if (!is_numeric($userIdStr)) continue;
+                $userId = (int)$userIdStr;
+                if ($userId <= 0) continue;
+                
+                $stats['users_scanned']++;
+                
+                // Open user's database to scan for shared items
+                $userDbFile = $userDir . '/database/poznote.db';
+                if (!file_exists($userDbFile)) continue;
+                
+                try {
+                    $userCon = new PDO('sqlite:' . $userDbFile);
+                    $userCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                    // Add user to master if missing from 'users' table
+                    $stmt = $masterCon->prepare("SELECT id FROM users WHERE id = ?");
+                    $stmt->execute([$userId]);
+                    if (!$stmt->fetch()) {
+                        $username = 'user_' . $userId;
+                        
+                        // Try to recover original username from local DB settings
+                        $recoverStmt = $userCon->prepare("SELECT value FROM settings WHERE key = 'login_display_name' LIMIT 1");
+                        $recoverStmt->execute();
+                        $savedName = $recoverStmt->fetchColumn();
+                        if ($savedName) {
+                            $username = $savedName;
+                        }
+
+                        $stmtAdd = $masterCon->prepare("INSERT INTO users (id, username, is_admin, active) VALUES (?, ?, 0, 1)");
+                        $stmtAdd->execute([$userId, $username]);
+                        $stats['users_added']++;
+                    }
+                    
+                    // Collect shared notes
+                    // Check if table exists first
+                    $tableCheck = $userCon->query("SELECT name FROM sqlite_master WHERE type='table' AND name='shared_notes'");
+                    if ($tableCheck->fetch()) {
+                        $stmt = $userCon->query("SELECT token, note_id FROM shared_notes");
+                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                            $st = $masterCon->prepare("INSERT OR REPLACE INTO shared_links (token, user_id, target_type, target_id) VALUES (?, ?, 'note', ?)");
+                            $st->execute([$row['token'], $userId, (int)$row['note_id']]);
+                            $stats['links_rebuilt']++;
+                        }
+                    }
+                    
+                    // Collect shared folders
+                    $tableCheck = $userCon->query("SELECT name FROM sqlite_master WHERE type='table' AND name='shared_folders'");
+                    if ($tableCheck->fetch()) {
+                        $stmt = $userCon->query("SELECT token, folder_id FROM shared_folders");
+                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                            $st = $masterCon->prepare("INSERT OR REPLACE INTO shared_links (token, user_id, target_type, target_id) VALUES (?, ?, 'folder', ?)");
+                            $st->execute([$row['token'], $userId, (int)$row['folder_id']]);
+                            $stats['links_rebuilt']++;
+                        }
+                    }
+                    
+                    $userCon = null; // Close connection
+                    
+                } catch (Exception $e) {
+                    $stats['errors'][] = "User $userId: " . $e->getMessage();
+                }
+            }
+            
+            return [
+                'success' => true,
+                'message' => 'System registry repaired successfully',
+                'stats' => $stats
+            ];
+            
+        } catch (Exception $e) {
+            return ['success' => false, 'error' => 'Repair failed: ' . $e->getMessage()];
+        }
+    }
 }

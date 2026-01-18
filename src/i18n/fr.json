@@ -1668,6 +1668,14 @@
                 "total_storage": "Stockage total",
                 "total_notes": "Total des notes",
                 "total_attachments": "Total des pièces jointes"
+            },
+            "maintenance": {
+                "title": "Maintenance système",
+                "subtitle": "Outils de réparation et de maintenance du registre système",
+                "repair_registry": "Réparer le registre système",
+                "repair_registry_confirm": "Cela va scanner tous les dossiers utilisateurs et reconstruire le registre des partages. Utile si la base de données master a été perdue ou corrompue. Continuer ?",
+                "repair_registry_success": "Registre système réparé avec succès :\n- {{scanned}} dossiers scannés\n- {{added}} utilisateurs restaurés\n- {{links}} liens de partage reconstruits",
+                "repair_registry_error": "Erreur de réparation : {{error}}"
             }
         },
         "profile": {

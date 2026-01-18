@@ -15,7 +15,9 @@ class UserDataManager {
     
     public function __construct($userId) {
         $this->userId = (int)$userId;
-        $this->baseDataPath = dirname(__DIR__) . '/data';
+        // Derive data path from the main SQLITE_DATABASE constant to ensure consistency
+        // SQLITE_DATABASE is typically [data_root]/database/poznote.db
+        $this->baseDataPath = dirname(SQLITE_DATABASE, 2);
     }
     
     /**
@@ -463,5 +465,28 @@ class UserDataManager {
         }
         
         return false;
+    }
+    /**
+     * Sync username to user's local settings table for redundancy (disaster recovery)
+     * @param string $username
+     * @return bool
+     */
+    public function syncUsername($username) {
+        $dbPath = $this->getUserDatabasePath();
+        if (!file_exists($dbPath)) {
+            // If DB doesn't exist yet, we can't sync, but it's not strictly an error
+            return true;
+        }
+        
+        try {
+            $con = new PDO('sqlite:' . $dbPath);
+            $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            
+            $stmt = $con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('login_display_name', ?)");
+            return $stmt->execute([$username]);
+        } catch (Exception $e) {
+            error_log("Failed to sync username for user " . $this->userId . ": " . $e->getMessage());
+            return false;
+        }
     }
 }

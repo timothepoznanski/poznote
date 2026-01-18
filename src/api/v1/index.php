@@ -583,6 +583,11 @@ $router->patch('/admin/users/{id}', function($params) use ($usersController) {
     echo json_encode($usersController->update($params['id'], $data));
 });
 
+// Admin: Repair system (rebuild master registry)
+$router->post('/admin/repair', function($params) use ($usersController) {
+    echo json_encode($usersController->repair());
+});
+
 // Admin: Delete a user profile
 $router->delete('/admin/users/{id}', function($params) use ($usersController) {
     echo json_encode($usersController->delete($params['id'], $_GET));

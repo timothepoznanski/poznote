@@ -16,8 +16,8 @@ if (!defined('SQLITE_DATABASE')) {
 // Include auto-migration to ensure multi-user structure exists
 require_once __DIR__ . '/../auto_migrate.php';
 
-// Master database path
-define('MASTER_DATABASE', $_ENV['POZNOTE_MASTER_DATABASE'] ?? dirname(__DIR__) . '/data/master.db');
+// Master database path - usually located at the root of the data directory
+define('MASTER_DATABASE', $_ENV['POZNOTE_MASTER_DATABASE'] ?? dirname(SQLITE_DATABASE, 2) . '/master.db');
 
 /**
  * Get connection to master database
@@ -195,7 +195,14 @@ function createUserProfile(string $username): array {
             $username
         ]);
         
-        return ['success' => true, 'user_id' => $con->lastInsertId()];
+        $userId = (int)$con->lastInsertId();
+        
+        // Sync username to user's local DB for recovery
+        require_once __DIR__ . '/UserDataManager.php';
+        $udm = new UserDataManager($userId);
+        $udm->syncUsername($username);
+        
+        return ['success' => true, 'user_id' => $userId];
     } catch (Exception $e) {
         return ['success' => false, 'error' => $e->getMessage()];
     }
@@ -229,6 +236,13 @@ function updateUserProfile(int $id, array $data): array {
         $sql = "UPDATE users SET " . implode(', ', $updates) . " WHERE id = ?";
         $stmt = $con->prepare($sql);
         $stmt->execute($params);
+        
+        // If username was updated, sync to local DB
+        if (isset($data['username'])) {
+            require_once __DIR__ . '/UserDataManager.php';
+            $udm = new UserDataManager($id);
+            $udm->syncUsername($data['username']);
+        }
         
         return ['success' => true];
     } catch (Exception $e) {
