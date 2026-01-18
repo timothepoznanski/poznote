@@ -180,7 +180,6 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
 
                 <?php // Profile and admin links - always available ?>
                 
-
                 <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
                 <!-- User Management (Admin only) -->
                 <div class="settings-card settings-card-clickable" id="users-admin-card" data-href="admin/users.php">
