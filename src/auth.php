@@ -15,39 +15,61 @@ session_name($session_name);
 
 session_start();
 
+// Prevent browser caching to ensure fresh content on every load (especially for home and settings)
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
+
 // Load config first
 require_once __DIR__ . '/config.php';
 
 // Ensure multi-user migration runs on first access (before any auth checks)
 require_once __DIR__ . '/auto_migrate.php';
 
-// Simple .env parser fallback for new variables if not loaded by server
-// This ensures POZNOTE_USERNAME_USER is available even if server wasn't restarted
-$envPath = dirname(__DIR__) . '/.env';
-if (file_exists($envPath)) {
-    $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        $line = trim($line);
-        if ($line === '' || strpos($line, '#') === 0) continue;
-        if (strpos($line, '=') !== false) {
-            list($key, $value) = explode('=', $line, 2);
-            $key = trim($key);
-            $value = trim($value);
-            // Remove quotes if present
-            $value = trim($value, '"\'');
-            if (!isset($_ENV[$key])) {
-                $_ENV[$key] = $value;
-                putenv("$key=$value");
+// Robust .env parser fallback
+// Search in current directory (src/) and parent directory (project root)
+$envSearchPaths = [__DIR__ . '/.env', dirname(__DIR__) . '/.env'];
+foreach ($envSearchPaths as $envPath) {
+    if (file_exists($envPath)) {
+        $lines = @file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if ($lines !== false) {
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if ($line === '' || strpos($line, '#') === 0) continue;
+                if (strpos($line, '=') !== false) {
+                    list($key, $value) = explode('=', $line, 2);
+                    $key = trim($key);
+                    $value = trim($value);
+                    $value = trim($value, '"\'');
+                    
+                    // Overwrite environment variables to ensure .env changes take effect
+                    // even if Docker was started with default values.
+                    if ($value !== '') {
+                        $_ENV[$key] = $value;
+                        putenv("$key=$value");
+                    }
+                }
             }
         }
+        break; // Stop after first .env found
     }
 }
 
-// Authentication configuration - single global password
-define("AUTH_USERNAME", $_ENV['POZNOTE_USERNAME'] ?? 'admin');
-define("AUTH_PASSWORD", $_ENV['POZNOTE_PASSWORD'] ?? 'admin123');
-define("AUTH_USER_USERNAME", $_ENV['POZNOTE_USERNAME_USER'] ?? 'user');
-define("AUTH_USER_PASSWORD", $_ENV['POZNOTE_PASSWORD_USER'] ?? 'user123');
+// Authentication configuration - role-based credentials
+// We use ?: and trim() to handle empty shell variables and trailing spaces
+function getAuthConfig($key, $default) {
+    $val = $_ENV[$key] ?? getenv($key);
+    if ($val === false || $val === null || (is_string($val) && trim($val) === '')) {
+        return $default;
+    }
+    return trim((string)$val);
+}
+
+define("AUTH_USERNAME", getAuthConfig('POZNOTE_USERNAME', 'admin'));
+define("AUTH_PASSWORD", getAuthConfig('POZNOTE_PASSWORD', 'admin'));
+define("AUTH_USER_USERNAME", getAuthConfig('POZNOTE_USERNAME_USER', 'user'));
+define("AUTH_USER_PASSWORD", getAuthConfig('POZNOTE_PASSWORD_USER', 'user'));
 
 // Remember me cookie settings
 define("REMEMBER_ME_COOKIE", 'poznote_remember_' . ($configured_port ?? '8040'));
@@ -210,6 +232,7 @@ function authenticate($username, $password, $rememberMe = false, $userId = null)
     $isUserCreds = ($username === AUTH_USER_USERNAME && $password === AUTH_USER_PASSWORD);
 
     if (!$isAdminCreds && !$isUserCreds) {
+        error_log("Poznote Auth: Login failed for '$username' - Incorrect credentials (no match for Admin or User sets)");
         return false;
     }
 
@@ -264,6 +287,7 @@ function authenticate($username, $password, $rememberMe = false, $userId = null)
         $isProfileAdmin = (bool)$user['is_admin'];
         if ($isProfileAdmin) {
             if (!$isAdminCreds) { // Admin profile requires Admin credentials
+                error_log("Poznote Auth: Role mismatch - User '{$user['username']}' is Admin, but used non-admin credentials");
                 return false;
             }
         } else {

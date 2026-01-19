@@ -153,15 +153,20 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title><?php echo t_h('home.title', [], 'Home'); ?> - <?php echo t_h('app.name'); ?></title>
     <meta name="color-scheme" content="dark light">
-    <script src="js/theme-init.js"></script>
-    <link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
-    <link type="text/css" rel="stylesheet" href="css/light.min.css"/>
-    <link type="text/css" rel="stylesheet" href="css/solid.min.css"/>
-    <link type="text/css" rel="stylesheet" href="css/regular.min.css"/>
-    <link type="text/css" rel="stylesheet" href="css/modals.css"/>
-    <link type="text/css" rel="stylesheet" href="css/home.css"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode.css"/>
-    <script src="js/theme-manager.js"></script>
+    <?php 
+    $cache_v = @file_get_contents('version.txt');
+    if ($cache_v === false) $cache_v = time();
+    $cache_v = urlencode(trim($cache_v));
+    ?>
+    <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
+    <link type="text/css" rel="stylesheet" href="css/fontawesome.min.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/light.min.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/solid.min.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/regular.min.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/home.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode.css?v=<?php echo $cache_v; ?>"/>
+    <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
 </head>
 <body class="home-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <div class="home-container">
