@@ -43,6 +43,8 @@ The MCP server is a bridge between VS Code Copilot and your Poznote instance.
 - `delete_note`
 - `create_folder`
 
+All tools accept an optional `user_id` argument to target a specific user profile. When provided, the MCP server sends the `X-User-ID` header for that request, allowing you to create or read notes across different profiles without changing the global MCP environment.
+
 ---
 
 To get everything working end-to-end, simply follow these three steps: 
