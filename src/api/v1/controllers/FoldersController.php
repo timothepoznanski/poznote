@@ -425,7 +425,7 @@ class FoldersController {
         $workspace = isset($data['workspace']) ? trim((string)$data['workspace']) : $this->getFirstWorkspaceName();
         $folderPath = isset($data['folder_path']) ? trim((string)$data['folder_path']) : null;
         $createParents = isset($data['create_parents']) ? (bool)$data['create_parents'] : false;
-        $folderName = isset($data['folder_name']) ? trim((string)$data['folder_name']) : null;
+        $folderName = isset($data['folder_name']) ? trim((string)$data['folder_name']) : (isset($data['name']) ? trim((string)$data['name']) : null);
         $parentFolder = isset($data['parent_folder']) ? trim((string)$data['parent_folder']) : null;
         $parentFolderId = $data['parent_folder_id'] ?? $data['parent_id'] ?? null;
         if ($parentFolderId !== null) $parentFolderId = (int)$parentFolderId;
