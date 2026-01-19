@@ -47,6 +47,7 @@ Password: `poznote`
 - [Troubleshooting Installation](#troubleshooting-installation)
 - [Change Settings](#change-settings)
 - [Authentication](#authentication)
+- [Multi-users](#multi-users)
 - [Update application](#update-application)
 - [Backup / Export](#backup--export)
 - [Restore / Import](#restore--import)
@@ -303,6 +304,20 @@ Alternatively, install Poznote in a directory outside of `/root`, such as `/opt/
 
 </details>
 
+<details>
+<summary><strong>User Profile Issues (Login/Selection)</strong></summary>
+<br>
+
+**User profile doesn't appear in the login dropdown:**
+1. Log in as an administrator and check if the profile is marked as **active** in the User Management panel.
+2. Verify that the master database exists and is readable: `data/master.db`.
+
+**Authentication failed for an existing user:**
+1. Check if the user's role (Admin vs User) matches the password you are using from the `.env` file.
+2. Ensure no extra spaces were added when editing the `.env` variables.
+
+</details>
+
 ## Change Settings
 
 Poznote configuration is split between two locations:
@@ -313,9 +328,9 @@ Poznote configuration is split between two locations:
 
 The following settings are configured in the `.env` file located in your Poznote installation directory:
 
-**Basic Authentication**
-- `POZNOTE_USERNAME` - Admin username for login (default: `admin`)
-- `POZNOTE_PASSWORD` - Admin password for login (default: `admin`)
+**Authentication**
+- `POZNOTE_PASSWORD` - Global password for Administrator accounts (default: `admin`)
+- `POZNOTE_PASSWORD_USER` - Global password for Standard User accounts (default: `user`)
 
 **Web Server**
 - `HTTP_WEB_PORT` - Port on which Poznote will be accessible (default: `8040`)
@@ -385,53 +400,55 @@ Additional settings are available through the Poznote web interface and are stor
 
 ## Authentication
 
-Poznote supports two authentication methods:
-
 <details>
 <summary><strong>Traditional Authentication</strong></summary>
 <br>
 
-By default, Poznote uses traditional username/password authentication. Configure your credentials in the `.env` file:
+Poznote uses a global password model. You define your administrator and standard user passwords in the `.env` file, and users log in using their database-managed usernames.
+
+#### Authentication Model
+
+- **Global Authentication**: Uses `POZNOTE_PASSWORD` and `POZNOTE_PASSWORD_USER` environment variables in your `.env`.
+- **User Profiles**: Each user has a unique profile (username) with isolated data.
+- **Automatic Profile Selection**: The system automatically selects the correct profile when you log in based on your credentials.
+- **First Account**: On a new installation or migration, the first user created is always an administrator named `admin_change_me`.
 
 ```bash
-POZNOTE_USERNAME=your_username
+# Global Administrator password
+# Used for all accounts with administrator role
 POZNOTE_PASSWORD=your_secure_password
+
+# Global Standard User password (optional)
+# Used for all accounts with standard user role
+POZNOTE_PASSWORD_USER=your_user_password
 ```
+
+#### Login Flow
+
+1. User opens Poznote.
+2. User enters their **username** and **password**.
+3. System automatically selects the appropriate user profile.
+4. User accesses their personal data space.
 
 </details>
 
+<a id="oidc"></a>
 <details>
 <summary><strong>OIDC / SSO Authentication (Optional)</strong></summary>
 <br>
 
-Poznote can optionally authenticate users via OpenID Connect (authorization code + PKCE) for sign-on integration.
-
-This allows users to log in using external identity providers such as:
-
-- Auth0
-- Keycloak
-- Azure Active Directory
-- Google Identity
-- And any other OIDC-compliant provider
-
-#### Configuration
-
-Add the OIDC variables (see .env.example) to your `.env` file and restart the container.
+Poznote supports OpenID Connect (authorization code + PKCE) for single sign-on integration. This allows users to log in using external identity providers such as Auth0, Keycloak, Azure AD, or Google Identity.
 
 #### How it works
 
-When OIDC is enabled:
-1. The login page displays a "Continue with [Provider Name]" button
-2. Clicking the button redirects users to your identity provider
-3. After successful authentication, users are redirected back to Poznote
-4. Poznote validates the OIDC tokens and creates a session
+1. **Pre-requisite**: An administrator must first create a user profile with a username matching the OIDC user's `preferred_username` or `email`.
+2. The login page displays a "Continue with [Provider Name]" button.
+3. Clicking the button redirects users to your identity provider.
+4. After successful authentication, Poznote matches the OIDC identity to an existing user profile and creates a session.
 
-If `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN` is set to `true`, the normal username/password login form will be hidden, forcing users to authenticate only through OIDC.
+#### Configuration
 
-If `POZNOTE_OIDC_DISABLE_BASIC_AUTH` is set to `true`, HTTP Basic Auth for API requests will be disabled, rejecting API calls that use username/password credentials. This can be combined with `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN` to fully enforce OIDC-only authentication across both the UI and API.
-
-Note that OIDC configuration is stored in `.env` file (not in the database) to keep sensitive credentials secure.
-
+Add the OIDC variables to your `.env` file (see `.env.example`). If `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN` is `true`, the standard login form will be hidden.
 
 #### Access Control Example
 
@@ -441,6 +458,61 @@ POZNOTE_OIDC_ALLOWED_USERS=alice@example.com,bob@example.com,charlie@company.org
 ```
 
 </details>
+
+## Multi-users
+
+Poznote is built with a multi-user architecture where each user has their own isolated data space.
+
+### Key Concepts
+
+- **Data Isolation**: Each user has their own separate notes, folders, workspaces, tags, and attachments. Data is strictly separated at the database and file levels.
+- **Role-based Global Passwords**: Instead of per-user passwords, Poznote uses two global passwords defined in your `.env`.
+- **User Management**: Administrators can create, rename, and manage users via the Admin Panel (Settings > Advanced > User Management).
+
+### Profile Properties
+
+Each user profile has:
+- **Username**: Unique identifier (used for OIDC matching and display).
+- **Admin Role**: Can manage other profiles, backup data for any user, manage global settings, and access their own private data space.
+- **Active Status**: Can login and access the system.
+
+### Architecture & Structure
+
+Poznote uses a master database (`data/master.db`) to track profiles and global settings, and individual databases for each user.
+
+```
+data/
+├── master.db                    # Master database (profiles, global settings)
+└── users/
+    ├── 1/                       # User ID 1 (default admin)
+    │   ├── database/poznote.db  # User's notes database
+    │   ├── entries/             # User's note files (HTML/MD)
+    │   └── attachments/         # User's attachments
+    ├── 2/                       # User ID 2
+    └── ...
+```
+
+### Security Considerations
+
+1. **Shared Password**: All users share the same role-based login password (trusted environments).
+2. **Data Isolation**: Users cannot access other users' data through the application.
+3. **Admin Control**: Only admins can manage user profiles or global settings.
+
+### Use Cases
+
+- **Families**: Shared home server where each member has their own notes.
+- **Small Teams**: Trusted team members sharing a Poznote instance.
+- **Personal Personas**: One person with different contexts (work, personal, projects).
+
+### Automatic Migration
+
+If you are upgrading from an older version of Poznote (v1.x), your data will be **automatically migrated** on the first startup:
+1. A master database is created with your default administrator profile (`admin_change_me`).
+2. Your existing notes, database, and attachments are moved to `data/users/1/`.
+3. All file permissions and SQLite integrity are preserved.
+4. Old empty directories are cleaned up.
+
+No manual action is required, the system handles the transition to the multi-user structure automatically.
 
 ## Update application
 
@@ -526,6 +598,18 @@ Single ZIP containing database, all notes, and attachments for all workspaces:
   - Notes are organized by workspace and folder
   - Attachments are accessible via clickable links
 
+#### Per-User vs Complete Backups
+
+Poznote supports two backup scopes:
+
+1. **Per-User Backups**: Created from the user's Settings page. This backup contains *only* the data belonging to that specific user (their database, notes, and attachments).
+2. **Complete System Backup**: Created manually by backing up the entire `/data` directory. This is the only way to backup the master configuration and all users' data at once.
+
+```bash
+# Complete system backup via CLI
+tar -czvf poznote-full-backup.tar.gz data/
+```
+
 </details>
 
 <a id="export-individual-notes"></a>
@@ -559,12 +643,12 @@ bash backup-poznote.sh '<poznote_url>' '<username>' '<password>' '<backup_direct
 To schedule automatic backups twice daily (at midnight and noon), add this line to your crontab:
 
 ```bash
-0 0,12 * * * bash /root/backup-poznote.sh 'https://poznote.xxxxx.com' 'admin' 'xxxxx' '/root/poznote' '30'
+0 0,12 * * * bash /root/backup-poznote.sh 'https://poznote.xxxxx.com' 'admin_change_me' 'xxxxx' '/root/poznote' '30'
 ```
 
 **Parameters explained:**
 - `'https://poznote.xxxxx.com'` - Your Poznote instance URL
-- `'admin'` - Your Poznote username
+- `'admin_change_me'` - Your Poznote username
 - `'xxxxx'` - Your Poznote password
 - `'/root/poznote'` - Parent directory where backups will be stored (the script creates a `backups-poznote` folder inside this path)
 - `'30'` - Number of backups to keep (older ones are automatically deleted)
@@ -591,6 +675,14 @@ Upload the complete backup ZIP to restore everything:
 
   - Replaces database, restores all notes, and attachments
   - Works for all workspaces at once
+
+</details>
+
+<details>
+<summary><strong>Disaster Recovery (Reconstruct System Index)</strong></summary>
+<br>
+
+In case of system corruption or loss of the master database, Poznote can reconstruct its entire user index by scanning the data folders. This tool is accessible via Settings > Advanced > Reconstruct System Index.
 
 </details>
 
@@ -1429,6 +1521,91 @@ Get translation strings:
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/system/i18n
+```
+
+</details>
+
+<details>
+<summary><strong>👥 User Management (Admin Only)</strong></summary>
+<br>
+
+User management endpoints are for administrators only and do **not** require the `X-User-ID` header.
+
+**List All User Profiles (Public)**
+
+Get list of active user profiles (no authentication required):
+```bash
+curl http://YOUR_SERVER/api/v1/users/profiles
+```
+
+**List All Users with Statistics**
+
+Get detailed list of all users with storage info (admin only):
+```bash
+curl -u 'username:password' \
+  http://YOUR_SERVER/api/v1/admin/users
+```
+
+**Get Specific User**
+
+Get detailed information about a user:
+```bash
+curl -u 'username:password' \
+  http://YOUR_SERVER/api/v1/admin/users/1
+```
+
+**Create New User**
+
+Create a new user profile:
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"username": "newuser"}' \
+  http://YOUR_SERVER/api/v1/admin/users
+```
+
+**Update User**
+
+Update user properties (username, active status, admin status):
+```bash
+curl -X PATCH -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "renameduser",
+    "active": true,
+    "is_admin": false
+  }' \
+  http://YOUR_SERVER/api/v1/admin/users/2
+```
+
+**Delete User**
+
+Delete a user profile (without data):
+```bash
+curl -X DELETE -u 'username:password' \
+  http://YOUR_SERVER/api/v1/admin/users/2
+```
+
+Delete a user profile and all their data:
+```bash
+curl -X DELETE -u 'username:password' \
+  "http://YOUR_SERVER/api/v1/admin/users/2?delete_data=true"
+```
+
+**Get System Statistics**
+
+Get aggregated statistics for all users:
+```bash
+curl -u 'username:password' \
+  http://YOUR_SERVER/api/v1/admin/stats
+```
+
+**Repair Master Database**
+
+Scan and rebuild the master database registry:
+```bash
+curl -X POST -u 'username:password' \
+  http://YOUR_SERVER/api/v1/admin/repair
 ```
 
 </details>

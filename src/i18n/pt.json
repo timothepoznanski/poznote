@@ -12,6 +12,23 @@
         "confirm": "Confirmar",
         "confirmation": "Confirmação",
         "save": "Salvar",
+        "login": {
+            "fields": {
+                "username": "Usuário",
+                "password": "Senha",
+                "profile": "Perfil"
+            },
+            "button": "Entrar",
+            "remember_me": "Lembrar-me por 30 dias",
+            "no_profiles": "Nenhum perfil disponível. Por favor, contate o administrador.",
+            "oidc_button": "Continuar com {{provider}}",
+            "documentation": "Documentação do Poznote",
+            "redirecting": "Redirecionando...",
+            "admin_warning": "A conta de administrador padrão está ativa com o nome de usuário <code>admin_change_me</code>. Por favor, faça login e renomeie esta conta para maior segurança (esta mensagem desaparecerá assim que o nome de usuário não for mais <code>admin_change_me</code>).",
+            "errors": {
+                "invalid_credentials": "Usuário ou senha incorretos."
+            }
+        },
         "download": "Baixar",
         "convert": "Converter",
         "create": "Criar",

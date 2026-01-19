@@ -12,6 +12,23 @@
         "confirm": "Bestätigen",
         "confirmation": "Bestätigung",
         "save": "Speichern",
+        "login": {
+            "fields": {
+                "username": "Benutzername",
+                "password": "Passwort",
+                "profile": "Profil"
+            },
+            "button": "Anmelden",
+            "remember_me": "Für 30 Tage angemeldet bleiben",
+            "no_profiles": "Keine Profile verfügbar. Bitte kontaktieren Sie den Administrator.",
+            "oidc_button": "Mit {{provider}} fortfahren",
+            "documentation": "Poznote Dokumentation",
+            "redirecting": "Weiterleitung...",
+            "admin_warning": "Das Standard-Administratorkonto ist mit dem Benutzernamen <code>admin_change_me</code> aktiv. Bitte melden Sie sich an und benennen Sie dieses Konto für mehr Sicherheit um (diese Nachricht verschwindet, sobald der Benutzername nicht mehr <code>admin_change_me</code> lautet).",
+            "errors": {
+                "invalid_credentials": "Benutzername oder Passwort ist falsch."
+            }
+        },
         "download": "Herunterladen",
         "convert": "Konvertieren",
         "create": "Erstellen",

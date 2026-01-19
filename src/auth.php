@@ -66,9 +66,7 @@ function getAuthConfig($key, $default) {
     return trim((string)$val);
 }
 
-define("AUTH_USERNAME", getAuthConfig('POZNOTE_USERNAME', 'admin'));
 define("AUTH_PASSWORD", getAuthConfig('POZNOTE_PASSWORD', 'admin'));
-define("AUTH_USER_USERNAME", getAuthConfig('POZNOTE_USERNAME_USER', 'user'));
 define("AUTH_USER_PASSWORD", getAuthConfig('POZNOTE_PASSWORD_USER', 'user'));
 
 // Remember me cookie settings
@@ -125,37 +123,20 @@ function isAuthenticated() {
                 // Format: username:user_id:timestamp:hash
                 list($username, $userId, $timestamp, $hash) = $parts;
                 if (time() - $timestamp < REMEMBER_ME_DURATION) {
-                    // Check signature with both possible passwords
-                
-                    // Case 1: Admin Password
-                    if ($username === AUTH_USERNAME && 
-                        $hash === hash('sha256', $username . $userId . $timestamp . AUTH_PASSWORD)) {
-                         // Valid Admin session? Check if user is actually admin
-                         require_once __DIR__ . '/users/db_master.php';
-                         $user = getUserProfileById((int)$userId);
-                         if ($user && $user['active'] && $user['is_admin']) { // Admin must be admin
-                            $_SESSION['authenticated'] = true;
-                            $_SESSION['user_id'] = (int)$userId;
-                            $_SESSION['user'] = $user;
-                            updateUserLastLogin((int)$userId);
-                            return true;
-                         }
-                    }
+                    require_once __DIR__ . '/users/db_master.php';
+                    $user = getUserProfileById((int)$userId);
                     
-                    // Case 2: User Password
-                    if ($username === AUTH_USER_USERNAME && 
-                        $hash === hash('sha256', $username . $userId . $timestamp . AUTH_USER_PASSWORD)) {
-                         // Valid User session? Check if user is NOT admin (or allowed?)
-                         // Assuming strictly separate: User creds for non-admin only
-                         require_once __DIR__ . '/users/db_master.php';
-                         $user = getUserProfileById((int)$userId);
-                         if ($user && $user['active'] && !$user['is_admin']) { 
+                    if ($user && $user['active'] && $user['username'] === $username) {
+                        $secretToUse = $user['is_admin'] ? AUTH_PASSWORD : AUTH_USER_PASSWORD;
+                        $expectedHash = hash('sha256', $username . $userId . $timestamp . $secretToUse);
+                        
+                        if (hash_equals($expectedHash, $hash)) {
                             $_SESSION['authenticated'] = true;
                             $_SESSION['user_id'] = (int)$userId;
                             $_SESSION['user'] = $user;
                             updateUserLastLogin((int)$userId);
                             return true;
-                         }
+                        }
                     }
                 }
             } elseif (count($parts) === 3) {
@@ -222,107 +203,52 @@ function isAuthenticated() {
 }
 
 /**
- * Authenticate with username/password and optionally select a user profile
+ * Authenticate with username/password
  */
-function authenticate($username, $password, $rememberMe = false, $userId = null) {
+function authenticate($username, $password, $rememberMe = false) {
     require_once __DIR__ . '/users/db_master.php';
 
-    // Verify which credentials were offered
-    $isAdminCreds = ($username === AUTH_USERNAME && $password === AUTH_PASSWORD);
-    $isUserCreds = ($username === AUTH_USER_USERNAME && $password === AUTH_USER_PASSWORD);
-
-    if (!$isAdminCreds && !$isUserCreds) {
-        error_log("Poznote Auth: Login failed for '$username' - Incorrect credentials (no match for Admin or User sets)");
+    // 1. Find user profile by their own username (not the .env one)
+    $user = getUserProfileByUsername($username);
+    
+    if (!$user || !$user['active']) {
+        error_log("Poznote Auth: Login failed - User '$username' not found or inactive");
         return false;
     }
 
-    // Determine target user if not specified
-    if ($userId === null) {
-        $profiles = getAllUserProfiles();
-        if (empty($profiles)) {
-            // No profiles exist, create a default admin
-            // Only allow if using admin creds
-            if ($isAdminCreds) {
-                $result = createUserProfile('admin');
-                if ($result['success']) {
-                    $userId = $result['user_id'];
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
+    $userId = (int)$user['id'];
+    $isProfileAdmin = (bool)$user['is_admin'];
+
+    // 2. Validate password against the correct global password
+    $authenticated = false;
+    if ($isProfileAdmin) {
+        // Admin profiles MUST use the admin password
+        if ($password === AUTH_PASSWORD) {
+            $authenticated = true;
         } else {
-            // Try to find a matching profile for the credentials used
-            foreach ($profiles as $profile) {
-                if ($isAdminCreds && $profile['is_admin']) {
-                    $userId = $profile['id'];
-                    break;
-                }
-                if ($isUserCreds && !$profile['is_admin']) {
-                    $userId = $profile['id'];
-                    break;
-                }
-            }
-            
-            // If still no user found (e.g. admin creds used but no admin user exists? unlikely if profiles !empty)
-            // But if we have mixed case: admin creds used, but only standard users exist -> fail? Or create new admin?
-            // Current system assumes profiles exist.
-            if ($userId === null) {
-                 return false;
-            }
+            error_log("Poznote Auth: Admin password mismatch for user '$username'");
+        }
+    } else {
+        // Regular profiles MUST use the user password
+        if ($password === AUTH_USER_PASSWORD) {
+            $authenticated = true;
+        } else {
+            error_log("Poznote Auth: User password mismatch for user '$username'");
         }
     }
 
-    // Validate if the selected user allows these credentials
-    if ($userId !== null) {
-        $user = getUserProfileById((int)$userId);
-        if (!$user || !$user['active']) {
-            $_SESSION['authenticated'] = false;
-            unset($_SESSION['user_id'], $_SESSION['user']);
-            return false;
-        }
-
-        // Check permission: Admin User needs Admin Creds, Regular User needs User Creds
-        $isProfileAdmin = (bool)$user['is_admin'];
-        if ($isProfileAdmin) {
-            if (!$isAdminCreds) { // Admin profile requires Admin credentials
-                error_log("Poznote Auth: Role mismatch - User '{$user['username']}' is Admin, but used non-admin credentials");
-                return false;
-            }
-        } else {
-             if (!$isUserCreds) { // Regular profile requires User credentials
-                 // Wait, can Admin Creds log in as Regular User? 
-                 // The requirement: "Le POZNOTE_USERNAME et le POZNOTE_PASSWORD doivent rester les credentials des comptes qui son admin."
-                 // "Quand on passe un profil en admin, il devra utiliser ces credentials pour ce connecter."
-                 // It doesn't explicitly say Admin creds CANNOT login as user. But "Separation" implies it.
-                 // Usually admin credentials are for admin accounts.
-                 // IF I am an admin, I log in to MY ADMIN ACCOUNT.
-                 // IF I use admin creds to log into a user account, is that allowed?
-                 // The prompt says: "POZNOTE_USERNAME/PASSWORD must remain credentials for accounts THAT ARE ADMIN."
-                 // It implies a 1-to-1 mapping between Credential Type and Account Type.
-                 // So: Admin Creds -> Admin Account. User Creds -> User Account.
-                 return false;
-             }
-        }
-
+    if ($authenticated) {
         $_SESSION['authenticated'] = true;
-        $_SESSION['user_id'] = (int)$userId;
+        $_SESSION['user_id'] = $userId;
         $_SESSION['user'] = $user;
-        updateUserLastLogin((int)$userId); // Ensure this function exists in users/db_master.php
+        updateUserLastLogin($userId);
 
         // Set remember me cookie if requested
         if ($rememberMe) {
             $timestamp = time();
-            // Include user_id in token
-            // We use the credential set that was used to login? No, hash uses AUTH_PASSWORD constant usually.
-            // We should use the password corresponding to the user type to generate the hash, 
-            // OR just stick to one internal secret? 
-            // The existing check uses AUTH_PASSWORD in `isAuthenticated`.
-            // We need to update `isAuthenticated` too!
-            
             $secretToUse = $isProfileAdmin ? AUTH_PASSWORD : AUTH_USER_PASSWORD;
             
+            // Format: username:user_id:timestamp:hash
             $hash = hash('sha256', $username . $userId . $timestamp . $secretToUse);
             $token = base64_encode($username . ':' . $userId . ':' . $timestamp . ':' . $hash);
             setcookie(REMEMBER_ME_COOKIE, $token, time() + REMEMBER_ME_DURATION, '/', '', false, true);
@@ -397,9 +323,30 @@ function requireApiAuth() {
         exit;
     }
     
-    // Validate credentials
-    $isAdminCreds = ($_SERVER['PHP_AUTH_USER'] === AUTH_USERNAME && $_SERVER['PHP_AUTH_PW'] === AUTH_PASSWORD);
-    $isUserCreds = ($_SERVER['PHP_AUTH_USER'] === AUTH_USER_USERNAME && $_SERVER['PHP_AUTH_PW'] === AUTH_USER_PASSWORD);
+    // Validate credentials using database profiles
+    require_once __DIR__ . '/users/db_master.php';
+    $authUser = getUserProfileByUsername($_SERVER['PHP_AUTH_USER']);
+    
+    if (!$authUser || !$authUser['active']) {
+        $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
+        header('HTTP/1.1 401 Unauthorized');
+        header('Content-Type: application/json');
+        echo json_encode(['error' => $msg]);
+        exit;
+    }
+
+    $isAdminCreds = false;
+    $isUserCreds = false;
+    
+    if ((bool)$authUser['is_admin']) {
+        if ($_SERVER['PHP_AUTH_PW'] === AUTH_PASSWORD) {
+            $isAdminCreds = true;
+        }
+    } else {
+        if ($_SERVER['PHP_AUTH_PW'] === AUTH_USER_PASSWORD) {
+            $isUserCreds = true;
+        }
+    }
     
     if (!$isAdminCreds && !$isUserCreds) {
         $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
@@ -423,26 +370,18 @@ function requireApiAuth() {
         exit;
     }
     
-    // Validate user ID and load user profile
-    require_once __DIR__ . '/users/db_master.php';
+    // Validate target user ID and load user profile
     $user = getUserProfileById((int)$userId);
     
-    // Check role/credentials match
+    // Authorization check: 
+    // - Admin credentials can access ANY user's data
+    // - User credentials can ONLY access their own data
     if ($user) {
-        $isProfileAdmin = (bool)$user['is_admin'];
-        if ($isProfileAdmin && !$isAdminCreds) {
-            // Admin profile entered but User credentials provided -> Fail
+        // If the authenticated user is NOT an admin, they must match the X-User-ID profile
+        if (!$isAdminCreds && (int)$authUser['id'] !== (int)$userId) {
              header('HTTP/1.1 403 Forbidden');
              header('Content-Type: application/json');
-             echo json_encode(['error' => 'Admin profile requires admin credentials']);
-             exit;
-        }
-        if (!$isProfileAdmin && !$isUserCreds) {
-            // User profile entered but Admin credentials provided
-            // Strictly forcing User credentials for User profiles
-             header('HTTP/1.1 403 Forbidden');
-             header('Content-Type: application/json');
-             echo json_encode(['error' => 'User profile requires user credentials']);
+             echo json_encode(['error' => 'User credentials can only access their own profile data']);
              exit;
         }
     }
@@ -539,8 +478,11 @@ function requireApiAuthAdmin() {
         exit;
     }
     
-    // Validate credentials (API uses global password)
-    if ($_SERVER['PHP_AUTH_USER'] !== AUTH_USERNAME || $_SERVER['PHP_AUTH_PW'] !== AUTH_PASSWORD) {
+    // Validate credentials using database profiles (must be an admin)
+    require_once __DIR__ . '/users/db_master.php';
+    $authUser = getUserProfileByUsername($_SERVER['PHP_AUTH_USER']);
+    
+    if (!$authUser || !$authUser['active'] || !(bool)$authUser['is_admin'] || $_SERVER['PHP_AUTH_PW'] !== AUTH_PASSWORD) {
         $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
         header('HTTP/1.1 401 Unauthorized');
         header('Content-Type: application/json');

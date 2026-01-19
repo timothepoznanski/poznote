@@ -12,6 +12,23 @@
         "confirm": "Confirmar",
         "confirmation": "Confirmación",
         "save": "Guardar",
+        "login": {
+            "fields": {
+                "username": "Usuario",
+                "password": "Contraseña",
+                "profile": "Perfil"
+            },
+            "button": "Iniciar sesión",
+            "remember_me": "Recordarme por 30 días",
+            "no_profiles": "No hay perfiles disponibles. Por favor, contacte al administrador.",
+            "oidc_button": "Continuar con {{provider}}",
+            "documentation": "Documentación de Poznote",
+            "redirecting": "Redirigiendo...",
+            "admin_warning": "La cuenta de administrador predeterminada está activa con el nombre de usuario <code>admin_change_me</code>. Por favor, inicie sesión y cambie el nombre de esta cuenta para mayor seguridad (este mensaje desaparecerá una vez que el nombre de usuario ya no sea <code>admin_change_me</code>).",
+            "errors": {
+                "invalid_credentials": "Usuario o contraseña incorrectos."
+            }
+        },
         "download": "Descargar",
         "convert": "Convertir",
         "create": "Crear",

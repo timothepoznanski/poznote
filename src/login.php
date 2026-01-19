@@ -2,8 +2,9 @@
 /**
  * Login Page
  * 
- * - Single global password (same credentials for all profiles)
- * - User selects their profile from a dropdown
+ * - Single global password for authentication
+ * - User profile is automatically selected based on credentials
+ * - First user created (on install/migration) is always admin
  */
 require 'auth.php';
 require_once 'functions.php';
@@ -12,9 +13,6 @@ require_once __DIR__ . '/users/db_master.php';
 
 $error = '';
 $oidcError = '';
-
-// Load user profiles
-$userProfiles = getAllUserProfiles();
 
 // Load configured login display name from global settings
 try {
@@ -65,13 +63,9 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
     $password = $_POST['password'];
     $rememberMe = isset($_POST['remember_me']) && $_POST['remember_me'] === '1';
     
-    // Get selected user profile
-    $selectedUserId = isset($_POST['user_profile']) ? (int)$_POST['user_profile'] : null;
-    if ($selectedUserId === null && !empty($userProfiles)) {
-        $selectedUserId = $userProfiles[0]['id']; // Default to first user
-    }
-    
-    if (authenticate($username, $password, $rememberMe, $selectedUserId)) {
+    // User profile is automatically selected based on credentials (no dropdown)
+    // authenticate() handles matching credentials to the appropriate profile
+    if (authenticate($username, $password, $rememberMe)) {
         echo '<!DOCTYPE html><html><head>';
         echo '<script type="application/json" id="workspace-redirect-data">{}</script>';
         echo '<script src="js/workspace-redirect.js"></script>';
@@ -105,37 +99,6 @@ if (isset($_GET['oidc_error'])) {
     <link rel="stylesheet" href="css/dark-mode.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <script src="js/theme-manager.js"></script>
-    <style>
-        .user-profile-selector {
-            margin-bottom: 15px;
-        }
-        .user-profile-selector select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            background: var(--bg-color, #fff);
-            color: var(--text-color, #333);
-            cursor: pointer;
-        }
-        .user-profile-selector select:focus {
-            outline: none;
-            border-color: #007DB8;
-            box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
-        }
-        .user-profile-selector label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text-color, #666);
-        }
-        .user-profile-option {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-    </style>
 </head>
 <body>
     <div class="login-container">
@@ -145,28 +108,32 @@ if (isset($_GET['oidc_error'])) {
             </div>
             <h1 class="login-title"><?php echo htmlspecialchars($login_display_name !== '' ? $login_display_name : 'Poznote'); ?></h1>
         </div>
+
+        <?php 
+        // Display warning if default 'admin_change_me' user exists
+        $hasDefaultAdmin = false;
+        try {
+            $profiles = getAllUserProfiles();
+            foreach ($profiles as $profile) {
+                if ($profile['username'] === 'admin_change_me') {
+                    $hasDefaultAdmin = true;
+                    break;
+                }
+            }
+        } catch (Exception $e) {}
+
+        if ($hasDefaultAdmin): 
+        ?>
+        <div class="admin-warning" style="background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.875rem; text-align: left; line-height: 1.5;">
+            <?php echo t('login.admin_warning', [], 'The default administrator account is active with the username <code>admin_change_me</code>. Please log in and rename this account for better security.', $currentLang ?? 'en'); ?>
+        </div>
+        <?php endif; ?>
         
         <?php 
         $showNormalLogin = !(function_exists('oidc_is_enabled') && oidc_is_enabled() && defined('OIDC_DISABLE_NORMAL_LOGIN') && OIDC_DISABLE_NORMAL_LOGIN);
         if ($showNormalLogin): 
         ?>
         <form method="POST">
-            <?php if (!empty($userProfiles)): ?>
-            <div class="form-group user-profile-selector">
-                <label for="user_profile"><?php echo t_h('login.fields.profile', [], 'Profile', $currentLang ?? 'en'); ?></label>
-                <select id="user_profile" name="user_profile" required>
-                    <?php foreach ($userProfiles as $profile): ?>
-                        <option value="<?php echo $profile['id']; ?>" 
-                                data-color="<?php echo htmlspecialchars($profile['color'] ?? '#007DB8'); ?>">
-                            <?php echo htmlspecialchars($profile['display_name'] ?: $profile['username']); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <?php else: ?>
-            <p class="no-profiles-warning"><?php echo t_h('login.no_profiles', [], 'No profiles available. Please contact administrator.', $currentLang ?? 'en'); ?></p>
-            <?php endif; ?>
-            
             <div class="form-group">
                 <input type="text" id="username" name="username" placeholder="<?php echo t_h('login.fields.username', [], 'Username', $currentLang ?? 'en'); ?>" required autofocus autocomplete="username">
             </div>

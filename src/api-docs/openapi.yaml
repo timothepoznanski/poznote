@@ -1594,3 +1594,298 @@ paths:
       responses:
         '200':
           description: Diagram saved
+
+  # ==================
+  # User Management Endpoints
+  # ==================
+  /users/profiles:
+    get:
+      tags: [Users]
+      summary: Get available user profiles (public)
+      description: |
+        Returns a list of active user profiles for login/selection purposes.
+        This endpoint does NOT require authentication and is used by the login page.
+        Does NOT require X-User-ID header.
+      security: []
+      responses:
+        '200':
+          description: List of active user profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    username:
+                      type: string
+                      example: "admin"
+
+  /admin/users:
+    get:
+      tags: [Users]
+      summary: List all user profiles (admin only)
+      description: |
+        Get detailed list of all user profiles with storage statistics.
+        Requires admin privileges. Does NOT require X-User-ID header.
+      responses:
+        '200':
+          description: List of users with statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        username:
+                          type: string
+                        is_admin:
+                          type: boolean
+                        active:
+                          type: boolean
+                        created_at:
+                          type: string
+                          format: date-time
+                        last_login:
+                          type: string
+                          format: date-time
+                          nullable: true
+                        storage_bytes:
+                          type: integer
+                        notes_count:
+                          type: integer
+                        attachments_count:
+                          type: integer
+                  total:
+                    type: integer
+        '403':
+          description: Admin access required
+    post:
+      tags: [Users]
+      summary: Create a new user profile (admin only)
+      description: |
+        Create a new user profile. Requires admin privileges.
+        Does NOT require X-User-ID header.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+              properties:
+                username:
+                  type: string
+                  example: "newuser"
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  message:
+                    type: string
+        '400':
+          description: Invalid request or username already exists
+        '403':
+          description: Admin access required
+
+  /admin/users/{id}:
+    get:
+      tags: [Users]
+      summary: Get a specific user profile (admin only)
+      description: |
+        Get detailed information about a specific user including storage statistics.
+        Requires admin privileges. Does NOT require X-User-ID header.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User profile details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  username:
+                    type: string
+                  is_admin:
+                    type: boolean
+                  active:
+                    type: boolean
+                  created_at:
+                    type: string
+                    format: date-time
+                  last_login:
+                    type: string
+                    format: date-time
+                    nullable: true
+                  storage:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                      database:
+                        type: integer
+                      entries:
+                        type: integer
+                      attachments:
+                        type: integer
+                  notes_count:
+                    type: integer
+                  attachments_count:
+                    type: integer
+        '404':
+          description: User not found
+        '403':
+          description: Admin access required
+    patch:
+      tags: [Users]
+      summary: Update a user profile (admin only)
+      description: |
+        Update user profile properties (username, active status, admin status).
+        Requires admin privileges. Does NOT require X-User-ID header.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "newusername"
+                active:
+                  type: boolean
+                is_admin:
+                  type: boolean
+      responses:
+        '200':
+          description: User updated successfully
+        '400':
+          description: Invalid request
+        '403':
+          description: Admin access required
+        '404':
+          description: User not found
+    delete:
+      tags: [Users]
+      summary: Delete a user profile (admin only)
+      description: |
+        Delete a user profile. Optionally delete all user data.
+        Cannot delete your own profile or the last admin.
+        Requires admin privileges. Does NOT require X-User-ID header.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: delete_data
+          in: query
+          schema:
+            type: boolean
+            default: false
+          description: If true, also delete all user data (notes, attachments, etc.)
+      responses:
+        '200':
+          description: User deleted successfully
+        '400':
+          description: Cannot delete own profile or last admin
+        '403':
+          description: Admin access required
+        '404':
+          description: User not found
+
+  /admin/stats:
+    get:
+      tags: [Users]
+      summary: Get system statistics (admin only)
+      description: |
+        Get aggregated statistics for all users (total storage, notes count, etc.).
+        Requires admin privileges. Does NOT require X-User-ID header.
+      responses:
+        '200':
+          description: System statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_users:
+                    type: integer
+                  active_users:
+                    type: integer
+                  admin_users:
+                    type: integer
+                  total_storage_bytes:
+                    type: integer
+                  total_storage_mb:
+                    type: number
+                  total_notes:
+                    type: integer
+                  total_attachments:
+                    type: integer
+        '403':
+          description: Admin access required
+
+  /admin/repair:
+    post:
+      tags: [Users]
+      summary: Repair master database (admin only)
+      description: |
+        Scan user data directories and rebuild the master database registry.
+        This includes rebuilding shared links and discovering orphaned users.
+        Requires admin privileges. Does NOT require X-User-ID header.
+      responses:
+        '200':
+          description: Repair completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  stats:
+                    type: object
+                    properties:
+                      users_scanned:
+                        type: integer
+                      users_added:
+                        type: integer
+                      links_rebuilt:
+                        type: integer
+                      errors:
+                        type: array
+                        items:
+                          type: string
+        '403':
+          description: Admin access required

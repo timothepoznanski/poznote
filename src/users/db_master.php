@@ -100,13 +100,14 @@ function initializeMasterDatabase(PDO $con): void {
  * Create default user profile if none exist
  */
 function createDefaultUserIfNeeded(PDO $con): void {
+    // Check if any users exist
     $stmt = $con->query("SELECT COUNT(*) FROM users");
     if ($stmt->fetchColumn() == 0) {
         $stmt = $con->prepare("
             INSERT INTO users (username, is_admin, active)
-            VALUES (?, 1, 1)
+            VALUES ('admin_change_me', 1, 1)
         ");
-        $stmt->execute(['admin']);
+        $stmt->execute();
     }
 }
 
