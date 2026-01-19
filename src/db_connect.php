@@ -26,8 +26,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id']) {
         $userDataManager->initializeUserDirectories();
     }
 } else {
-    // If not authenticated, check if this is a public shared link
-    // We can detect this by looking for 'token' in GET or by checking the path
+    // Check if this is a public shared link access
     $publicToken = $_GET['token'] ?? null;
     
     // Also check pretty URLs (tokens are usually alphanumeric/hex)
@@ -41,6 +40,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id']) {
     }
     
     if ($publicToken) {
+        // Public access - lookup owner from shared_links registry
         require_once __DIR__ . '/users/db_master.php';
         try {
             $masterCon = getMasterConnection();
@@ -53,13 +53,23 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id']) {
                 require_once __DIR__ . '/users/UserDataManager.php';
                 $userDataManager = new UserDataManager($activeUserId);
                 $dbPath = $userDataManager->getUserDatabasePath();
-                
-                // For public access, we don't automatically create directories, 
-                // they must already exist if a token exists.
             }
         } catch (Exception $e) {
-            // Master DB not available or token not found, fallback to default
             error_log("Public routing failed: " . $e->getMessage());
+        }
+    } else {
+        // Not authenticated and not a public link
+        // If master.db exists (migration done), default to user 1's database
+        // This ensures migrated data is accessible before first login
+        $dataDir = dirname(__DIR__) . '/data';
+        $masterDbPath = $dataDir . '/master.db';
+        $user1DbPath = $dataDir . '/users/1/database/poznote.db';
+        
+        if (file_exists($masterDbPath) && file_exists($user1DbPath)) {
+            $activeUserId = 1;
+            require_once __DIR__ . '/users/UserDataManager.php';
+            $userDataManager = new UserDataManager($activeUserId);
+            $dbPath = $userDataManager->getUserDatabasePath();
         }
     }
 }

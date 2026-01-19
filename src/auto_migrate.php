@@ -24,20 +24,46 @@ function checkAndMigrateToMultiUser(): void {
     $oldDbPath = $dataDir . '/database/poznote.db';
     $usersDir = $dataDir . '/users';
     $user1Dir = $usersDir . '/1';
+    $user1DbPath = $user1Dir . '/database/poznote.db';
     
-    // If master.db exists, migration already done, but we might still have empty old folders to clean up
-    if (file_exists($masterDbPath)) {
+    // If no old database exists, this is either a fresh install or migration already complete
+    if (!file_exists($oldDbPath)) {
+        // Clean up any empty old directories
+        if (file_exists($masterDbPath)) {
+            cleanupOldDirectories($dataDir);
+        }
+        return;
+    }
+    
+    // Old database exists - check if we need to migrate data
+    // Migration is needed if:
+    // 1. User 1's database doesn't exist, OR
+    // 2. User 1's database is much smaller than the old one (incomplete migration)
+    $needsDataMigration = false;
+    
+    if (!file_exists($user1DbPath)) {
+        $needsDataMigration = true;
+        error_log("Poznote: User 1 database doesn't exist, migration needed");
+    } else {
+        // Check if user 1's database has significantly fewer records
+        // This handles the case where master.db was created but data wasn't migrated
+        $oldSize = filesize($oldDbPath);
+        $newSize = filesize($user1DbPath);
+        
+        // If old database is more than 10x larger, data wasn't migrated properly
+        if ($oldSize > ($newSize * 10) && $oldSize > 100000) {
+            $needsDataMigration = true;
+            error_log("Poznote: Old database ($oldSize bytes) much larger than user 1 database ($newSize bytes), re-migrating data");
+        }
+    }
+    
+    if (!$needsDataMigration) {
+        // Data already migrated, just clean up old directories
         cleanupOldDirectories($dataDir);
         return;
     }
     
-    // If no old database exists either, this is a fresh install
-    // The master database will be created on first access
-    if (!file_exists($oldDbPath)) {
-        return;
-    }
-    
-    // Migration needed: old database exists but no master.db
+    // Migration needed: old database has data that wasn't migrated
     error_log("Poznote: Auto-migrating to multi-user structure...");
     
     try {
@@ -83,14 +109,15 @@ function checkAndMigrateToMultiUser(): void {
         $masterCon->exec("CREATE INDEX IF NOT EXISTS idx_shared_links_token ON shared_links(token)");
         $masterCon->exec("CREATE INDEX IF NOT EXISTS idx_shared_links_user ON shared_links(user_id)");
         
-        // Create default admin user (username 'admin' lowercase for consistency)
+        // Create default admin user if not exists (username 'admin' lowercase for consistency)
+        // Using INSERT OR IGNORE in case master.db already exists from a previous incomplete migration
         $stmt = $masterCon->prepare("
-            INSERT INTO users (id, username, is_admin, active)
+            INSERT OR IGNORE INTO users (id, username, is_admin, active)
             VALUES (1, ?, 1, 1)
         ");
         $stmt->execute(['admin']);
         
-        error_log("Poznote: Created master database with default user profile");
+        error_log("Poznote: Master database ready with default user profile");
         
         // Step 2: Create user directory structure
         $dirsToCreate = [
@@ -108,90 +135,92 @@ function checkAndMigrateToMultiUser(): void {
             }
         }
         
-        // Step 3: Move database (including WAL/SHM files if present for data integrity)
-        $newDbPath = $user1Dir . '/database/poznote.db';
-        if (!file_exists($newDbPath)) {
-            // First, handle WAL and SHM files to ensure data integrity
-            // These files contain uncommitted transactions and must be moved together
-            $walFile = $oldDbPath . '-wal';
-            $shmFile = $oldDbPath . '-shm';
-            $newWalFile = $newDbPath . '-wal';
-            $newShmFile = $newDbPath . '-shm';
-            
-            // Move WAL file if exists (contains pending transactions)
-            if (file_exists($walFile)) {
-                if (!rename($walFile, $newWalFile)) {
-                    if (copy($walFile, $newWalFile)) {
-                        // Verify copy before deleting
-                        if (filesize($newWalFile) === filesize($walFile)) {
-                            unlink($walFile);
-                        }
-                    }
-                }
-                error_log("Poznote: Moved WAL file");
-            }
-            
-            // Move SHM file if exists (shared memory map)
-            if (file_exists($shmFile)) {
-                if (!rename($shmFile, $newShmFile)) {
-                    if (copy($shmFile, $newShmFile)) {
-                        // Verify copy before deleting
-                        if (filesize($newShmFile) === filesize($shmFile)) {
-                            unlink($shmFile);
-                        }
-                    }
-                }
-                error_log("Poznote: Moved SHM file");
-            }
-            
-            // Move main database file with safety checks
-            $originalSize = filesize($oldDbPath);
-            if (!rename($oldDbPath, $newDbPath)) {
-                // Try copy instead, but verify before deleting
-                if (copy($oldDbPath, $newDbPath)) {
-                    // Verify the copy was successful by checking file sizes
-                    clearstatcache(true, $newDbPath);
-                    $copiedSize = filesize($newDbPath);
-                    if ($copiedSize === $originalSize && $copiedSize > 0) {
-                        unlink($oldDbPath);
-                    } else {
-                        error_log("Poznote: WARNING - Database copy verification failed (original: $originalSize, copy: $copiedSize), keeping original");
-                        // Remove the incomplete copy
-                        if (file_exists($newDbPath)) {
-                            unlink($newDbPath);
-                        }
-                        throw new Exception("Database copy verification failed");
-                    }
-                } else {
-                    throw new Exception("Failed to copy database file");
-                }
-            }
-            error_log("Poznote: Moved database to user directory");
+        // Step 3: Copy database (including WAL/SHM files if present for data integrity)
+        // We copy instead of move to preserve the original until migration is verified complete
+        $newDbPath = $user1DbPath;
+        
+        // Remove existing incomplete database if present
+        if (file_exists($newDbPath)) {
+            error_log("Poznote: Removing incomplete user database for re-migration");
+            @unlink($newDbPath);
+            @unlink($newDbPath . '-wal');
+            @unlink($newDbPath . '-shm');
         }
         
-        // Step 4: Move entries
+        // First, handle WAL and SHM files to ensure data integrity
+        // These files contain uncommitted transactions and must be copied together
+        $walFile = $oldDbPath . '-wal';
+        $shmFile = $oldDbPath . '-shm';
+        $newWalFile = $newDbPath . '-wal';
+        $newShmFile = $newDbPath . '-shm';
+        
+        // Copy WAL file if exists (contains pending transactions)
+        if (file_exists($walFile)) {
+            if (copy($walFile, $newWalFile)) {
+                error_log("Poznote: Copied WAL file");
+            }
+        }
+        
+        // Copy SHM file if exists (shared memory map)
+        if (file_exists($shmFile)) {
+            if (copy($shmFile, $newShmFile)) {
+                error_log("Poznote: Copied SHM file");
+            }
+        }
+        
+        // Copy main database file with safety checks
+        $originalSize = filesize($oldDbPath);
+        if (copy($oldDbPath, $newDbPath)) {
+            // Verify the copy was successful by checking file sizes
+            clearstatcache(true, $newDbPath);
+            $copiedSize = filesize($newDbPath);
+            if ($copiedSize === $originalSize && $copiedSize > 0) {
+                error_log("Poznote: Copied database to user directory ($copiedSize bytes)");
+            } else {
+                error_log("Poznote: WARNING - Database copy verification failed (original: $originalSize, copy: $copiedSize)");
+                // Remove the incomplete copy
+                @unlink($newDbPath);
+                throw new Exception("Database copy verification failed");
+            }
+        } else {
+            throw new Exception("Failed to copy database file");
+        }
+        
+        // Step 4: Copy entries files
         $oldEntriesPath = $dataDir . '/entries';
         $newEntriesPath = $user1Dir . '/entries';
-        $entriesMoved = 0;
+        $entriesCopied = 0;
+        $entriesSkipped = 0;
+        $entriesFailed = 0;
         if (is_dir($oldEntriesPath)) {
-            // Use scandir to get all files (not just .html and .md)
+            // Use scandir to get all files
             $items = scandir($oldEntriesPath);
+            $totalItems = count($items) - 2; // Exclude . and ..
+            error_log("Poznote: Found $totalItems items in old entries directory");
+            
             foreach ($items as $item) {
                 if ($item === '.' || $item === '..') {
                     continue;
                 }
                 $file = $oldEntriesPath . '/' . $item;
-                // Only move files, not directories
+                // Only copy files, not directories
                 if (is_file($file)) {
                     $newPath = $newEntriesPath . '/' . $item;
                     if (!file_exists($newPath)) {
-                        if (rename($file, $newPath)) {
-                            $entriesMoved++;
+                        if (copy($file, $newPath)) {
+                            $entriesCopied++;
+                        } else {
+                            $entriesFailed++;
+                            if ($entriesFailed <= 5) {
+                                error_log("Poznote: Failed to copy entry file: $item");
+                            }
                         }
+                    } else {
+                        $entriesSkipped++;
                     }
                 }
             }
-            error_log("Poznote: Moved $entriesMoved entry files");
+            error_log("Poznote: Entries migration - copied: $entriesCopied, skipped: $entriesSkipped, failed: $entriesFailed");
         }
         
         // Step 5: Move attachments
@@ -255,14 +284,60 @@ function checkAndMigrateToMultiUser(): void {
         // This forces users to re-login and select their profile
         $masterCon->exec("INSERT OR REPLACE INTO global_settings (key, value) VALUES ('migration_timestamp', '" . time() . "')");
         
+        // Step 10: Fix permissions for migrated files
+        // Ensure www-data can write to the migrated files
+        fixMigratedPermissions($user1Dir);
+        
         error_log("Poznote: Migration complete!");
         
-        // Step 10: Clean up old directories if empty
+        // Step 11: Clean up old directories if empty
         cleanupOldDirectories($dataDir);
         
     } catch (Exception $e) {
         error_log("Poznote: Migration failed: " . $e->getMessage());
         // Don't throw - allow app to continue, user can manually fix
+    }
+}
+
+/**
+ * Fix permissions for migrated files
+ * Ensures www-data can write to the files
+ */
+function fixMigratedPermissions(string $userDir): void {
+    // Get www-data user info
+    $wwwDataInfo = posix_getpwnam('www-data');
+    if (!$wwwDataInfo) {
+        error_log("Poznote: Could not find www-data user, skipping permission fix");
+        return;
+    }
+    
+    $uid = $wwwDataInfo['uid'];
+    $gid = $wwwDataInfo['gid'];
+    
+    // Recursively fix permissions
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($userDir, RecursiveDirectoryIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::SELF_FIRST
+    );
+    
+    $fixedCount = 0;
+    foreach ($iterator as $item) {
+        $path = $item->getPathname();
+        // Only fix if not already owned by www-data
+        $stat = stat($path);
+        if ($stat && $stat['uid'] !== $uid) {
+            @chown($path, $uid);
+            @chgrp($path, $gid);
+            $fixedCount++;
+        }
+    }
+    
+    // Also fix the user directory itself
+    @chown($userDir, $uid);
+    @chgrp($userDir, $gid);
+    
+    if ($fixedCount > 0) {
+        error_log("Poznote: Fixed permissions for $fixedCount files");
     }
 }
 
