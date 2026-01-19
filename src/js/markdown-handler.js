@@ -337,10 +337,11 @@ function parseMarkdown(text) {
     text = text.replace(/!\[([^\]]*)\]\(([^\s\)]+)(?:\s+"([^"]+)")?\)/g, function(match, alt, url, title) {
         let placeholder = '\x00PIMG' + protectedIndex + '\x00';
         let imgTag;
+        // Add lazy loading and async decoding for better performance with many images
         if (title) {
-            imgTag = '<img src="' + url + '" alt="' + alt + '" title="' + title + '">';
+            imgTag = '<img src="' + url + '" alt="' + alt + '" title="' + title + '" loading="lazy" decoding="async">';
         } else {
-            imgTag = '<img src="' + url + '" alt="' + alt + '">';
+            imgTag = '<img src="' + url + '" alt="' + alt + '" loading="lazy" decoding="async">';
         }
         protectedElements[protectedIndex] = imgTag;
         protectedIndex++;

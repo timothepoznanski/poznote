@@ -123,6 +123,7 @@ function createCompleteBackup($userId = null) {
         // Temporarily connect to user's database to generate dump
         $tempCon = new PDO('sqlite:' . $userDbPath);
         $tempCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $tempCon->exec('PRAGMA busy_timeout = 5000');
         
         $sqlContent = generateSQLDumpForConnection($tempCon);
         if ($sqlContent) {

@@ -751,47 +751,59 @@
                     // Handle HTML image insertion
                     const reader = new FileReader();
                     reader.onload = function(ev) {
-                        const dataUrl = ev.target.result;
-                        const imgHtml = '<img src="' + dataUrl + '" alt="image" />';
+                        const originalDataUrl = ev.target.result;
                         
-                        // Insert at cursor using the same method as drag-and-drop
-                        const inserted = insertHTMLAtSelection(imgHtml);
-                        
-                        if (!inserted) {
-                            // Fallback: insert at end of note
+                        // Use compression function if available (from attachments.js)
+                        const processImage = function(dataUrl) {
+                            // Add lazy loading and async decoding for better performance
+                            const imgHtml = '<img src="' + dataUrl + '" alt="image" loading="lazy" decoding="async" />';
+                            
+                            // Insert at cursor using the same method as drag-and-drop
+                            const inserted = insertHTMLAtSelection(imgHtml);
+                            
+                            if (!inserted) {
+                                // Fallback: insert at end of note
+                                const noteEntry = container.closest('.noteentry');
+                                if (noteEntry) {
+                                    noteEntry.innerHTML += imgHtml;
+                                }
+                            }
+                            
+                            // Get note ID for saving
                             const noteEntry = container.closest('.noteentry');
                             if (noteEntry) {
-                                noteEntry.innerHTML += imgHtml;
+                                const targetNoteId = noteEntry.id.replace('entry', '');
+                                if (targetNoteId && targetNoteId !== '' && targetNoteId !== 'search') {
+                                    window.noteid = targetNoteId;
+                                }
                             }
-                        }
-                        
-                        // Get note ID for saving
-                        const noteEntry = container.closest('.noteentry');
-                        if (noteEntry) {
-                            const targetNoteId = noteEntry.id.replace('entry', '');
-                            if (targetNoteId && targetNoteId !== '' && targetNoteId !== 'search') {
-                                window.noteid = targetNoteId;
+                            
+                            // Mark note as modified
+                            if (typeof window.markNoteAsModified === 'function') {
+                                window.markNoteAsModified();
                             }
-                        }
-                        
-                        // Mark note as modified
-                        if (typeof window.markNoteAsModified === 'function') {
-                            window.markNoteAsModified();
-                        }
-                        
-                        // Re-initialize image click handlers
-                        if (typeof reinitializeImageClickHandlers === 'function') {
-                            setTimeout(() => reinitializeImageClickHandlers(), 50);
-                        }
-                        
-                        // Save after insertion
-                        setTimeout(() => {
-                            if (typeof saveNoteToServer === 'function') {
-                                saveNoteToServer();
-                            } else if (typeof window.saveNoteImmediately === 'function') {
-                                window.saveNoteImmediately();
+                            
+                            // Re-initialize image click handlers
+                            if (typeof reinitializeImageClickHandlers === 'function') {
+                                setTimeout(() => reinitializeImageClickHandlers(), 50);
                             }
-                        }, 100);
+                            
+                            // Save after insertion
+                            setTimeout(() => {
+                                if (typeof saveNoteToServer === 'function') {
+                                    saveNoteToServer();
+                                } else if (typeof window.saveNoteImmediately === 'function') {
+                                    window.saveNoteImmediately();
+                                }
+                            }, 100);
+                        };
+                        
+                        // Compress if function available, otherwise use original
+                        if (typeof compressImageIfNeeded === 'function') {
+                            compressImageIfNeeded(originalDataUrl, processImage);
+                        } else {
+                            processImage(originalDataUrl);
+                        }
                     };
                     reader.readAsDataURL(file);
                 }

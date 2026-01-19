@@ -1,5 +1,74 @@
 // Attached file and image drag management
 
+// Maximum size for inline base64 images (in bytes) - images larger than this will be compressed
+var MAX_IMAGE_SIZE_BYTES = 500 * 1024; // 500KB
+var IMAGE_COMPRESSION_QUALITY = 0.8; // JPEG quality for compression
+var MAX_IMAGE_DIMENSION = 1920; // Max width/height in pixels
+
+/**
+ * Compress an image if it's too large
+ * @param {string} dataUrl - The original base64 data URL
+ * @param {function} callback - Called with the (possibly compressed) data URL
+ */
+function compressImageIfNeeded(dataUrl, callback) {
+    // Check if the image is small enough already
+    var sizeInBytes = Math.ceil((dataUrl.length - 22) * 3 / 4); // Approximate base64 size
+    
+    if (sizeInBytes <= MAX_IMAGE_SIZE_BYTES) {
+        callback(dataUrl);
+        return;
+    }
+    
+    // Need to compress - create an image to get dimensions
+    var img = new Image();
+    img.onload = function() {
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d');
+        
+        // Calculate new dimensions while maintaining aspect ratio
+        var width = img.width;
+        var height = img.height;
+        
+        if (width > MAX_IMAGE_DIMENSION || height > MAX_IMAGE_DIMENSION) {
+            if (width > height) {
+                height = Math.round(height * MAX_IMAGE_DIMENSION / width);
+                width = MAX_IMAGE_DIMENSION;
+            } else {
+                width = Math.round(width * MAX_IMAGE_DIMENSION / height);
+                height = MAX_IMAGE_DIMENSION;
+            }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Draw and compress
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Try JPEG compression first (much smaller for photos)
+        var compressedUrl = canvas.toDataURL('image/jpeg', IMAGE_COMPRESSION_QUALITY);
+        
+        // If original was PNG with transparency, keep as PNG but resize
+        if (dataUrl.indexOf('data:image/png') === 0) {
+            var pngUrl = canvas.toDataURL('image/png');
+            // Use PNG only if it's not much larger than JPEG (for transparency)
+            if (pngUrl.length < compressedUrl.length * 1.5) {
+                compressedUrl = pngUrl;
+            }
+        }
+        
+        console.log('[Poznote] Image compressed: ' + Math.round(sizeInBytes/1024) + 'KB -> ' + Math.round((compressedUrl.length * 3/4)/1024) + 'KB');
+        callback(compressedUrl);
+    };
+    
+    img.onerror = function() {
+        // If compression fails, use original
+        callback(dataUrl);
+    };
+    
+    img.src = dataUrl;
+}
+
 function tr(key, vars, fallback) {
     try {
         if (typeof window !== 'undefined' && typeof window.t === 'function') {
@@ -528,56 +597,61 @@ function handleHTMLImageInsert(file, dropTarget) {
     // Code existant pour les notes HTML
     var reader = new FileReader();
     reader.onload = function (ev) {
-        var dataUrl = ev.target.result;
-        var imgHtml = '<img src="' + dataUrl + '" alt="image" />';
+        var originalDataUrl = ev.target.result;
+        
+        // Compress large images to improve performance
+        compressImageIfNeeded(originalDataUrl, function(dataUrl) {
+            // Add lazy loading and async decoding for better performance with many images
+            var imgHtml = '<img src="' + dataUrl + '" alt="image" loading="lazy" decoding="async" />';
 
-        // Get the note ID from the drop target
-        var targetNoteId = dropTarget.id.replace('entry', '');
+            // Get the note ID from the drop target
+            var targetNoteId = dropTarget.id.replace('entry', '');
 
-        var sel = window.getSelection();
-        var inserted = false;
+            var sel = window.getSelection();
+            var inserted = false;
 
-        if (sel && sel.rangeCount) {
-            var range = sel.getRangeAt(0);
-            var container = range.commonAncestorContainer;
-            var noteEntry = container.nodeType === 1 ?
-                container.closest('.noteentry') :
-                container.parentElement.closest('.noteentry');
+            if (sel && sel.rangeCount) {
+                var range = sel.getRangeAt(0);
+                var container = range.commonAncestorContainer;
+                var noteEntry = container.nodeType === 1 ?
+                    container.closest('.noteentry') :
+                    container.parentElement.closest('.noteentry');
 
-            if (noteEntry === dropTarget) {
-                inserted = insertHTMLAtSelection(imgHtml);
+                if (noteEntry === dropTarget) {
+                    inserted = insertHTMLAtSelection(imgHtml);
+                }
             }
-        }
 
-        if (!inserted && dropTarget) {
-            dropTarget.innerHTML += imgHtml;
-        }
+            if (!inserted && dropTarget) {
+                dropTarget.innerHTML += imgHtml;
+            }
 
-        // Update the global noteid to the target note for proper saving
-        if (targetNoteId && targetNoteId !== '' && targetNoteId !== 'search') {
-            window.noteid = targetNoteId;
-        }
+            // Update the global noteid to the target note for proper saving
+            if (targetNoteId && targetNoteId !== '' && targetNoteId !== 'search') {
+                window.noteid = targetNoteId;
+            }
 
-        // Trigger automatic save after image insertion
-        if (typeof window.markNoteAsModified === 'function') {
-            window.markNoteAsModified(); // Mark note as edited
-        }
+            // Trigger automatic save after image insertion
+            if (typeof window.markNoteAsModified === 'function') {
+                window.markNoteAsModified(); // Mark note as edited
+            }
 
-        // Re-initialize image click handlers for the newly inserted image
-        if (typeof reinitializeImageClickHandlers === 'function') {
+            // Re-initialize image click handlers for the newly inserted image
+            if (typeof reinitializeImageClickHandlers === 'function') {
+                setTimeout(function () {
+                    reinitializeImageClickHandlers();
+                }, 50);
+            }
+
+            // Trigger immediate save after a short delay to allow DOM to update
             setTimeout(function () {
-                reinitializeImageClickHandlers();
-            }, 50);
-        }
-
-        // Trigger immediate save after a short delay to allow DOM to update
-        setTimeout(function () {
-            if (typeof saveNoteToServer === 'function') {
-                saveNoteToServer(); // Direct call to save function
-            } else if (typeof window.saveNoteImmediately === 'function') {
-                window.saveNoteImmediately(); // Fallback to saveNoteImmediately
-            }
-        }, 100);
+                if (typeof saveNoteToServer === 'function') {
+                    saveNoteToServer(); // Direct call to save function
+                } else if (typeof window.saveNoteImmediately === 'function') {
+                    window.saveNoteImmediately(); // Fallback to saveNoteImmediately
+                }
+            }, 100);
+        });
     };
     reader.readAsDataURL(file);
 }

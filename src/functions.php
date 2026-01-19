@@ -194,7 +194,7 @@ function getEntriesPath() {
         return $dataManager->getUserEntriesPath();
     }
     // Fallback for unauthenticated access (should not happen in normal use)
-    return dirname(__DIR__) . '/data/entries';
+    return __DIR__ . '/data/entries';
 }
 
 /**
@@ -211,7 +211,7 @@ function getAttachmentsPath() {
         return $dataManager->getUserAttachmentsPath();
     }
     // Fallback for unauthenticated access
-    return dirname(__DIR__) . '/data/attachments';
+    return __DIR__ . '/data/attachments';
 }
 
 /**
@@ -228,7 +228,7 @@ function getBackupsPath() {
         return $dataManager->getUserBackupsPath();
     }
     // Fallback for unauthenticated access
-    return dirname(__DIR__) . '/data/backups';
+    return __DIR__ . '/data/backups';
 }
 
 /**
@@ -550,7 +550,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
             }
         } else {
             // Fallback for non-user mode (old structure compatibility)
-            $dataDir = dirname(__DIR__) . '/data';
+            $dataDir = __DIR__ . '/data';
             $requiredDirs = ['attachments', 'database', 'entries'];
             foreach ($requiredDirs as $dir) {
                 $fullPath = $dataDir . '/' . $dir;
@@ -873,7 +873,7 @@ function ensureDataPermissions() {
             }
         }
     } else {
-        $dataDir = dirname(__DIR__) . '/data';
+        $dataDir = __DIR__ . '/data';
         if (is_dir($dataDir)) {
             // Recursively set ownership to match the data directory owner
             $dataOwner = fileowner($dataDir);

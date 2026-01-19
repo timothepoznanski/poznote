@@ -38,6 +38,7 @@ function getMasterConnection(): PDO {
         
         $masterCon = new PDO('sqlite:' . $dbPath);
         $masterCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $masterCon->exec('PRAGMA busy_timeout = 5000');
         $masterCon->exec('PRAGMA foreign_keys = ON');
         
         initializeMasterDatabase($masterCon);
