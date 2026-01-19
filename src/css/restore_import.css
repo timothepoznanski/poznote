@@ -35,7 +35,7 @@ body {
 /* Navigation buttons container */
 .navigation-buttons {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     flex-wrap: wrap;
     margin-bottom: 20px;
 }
@@ -277,10 +277,17 @@ body {
     border-radius: 4px;
     cursor: pointer;
     text-decoration: none;
-    display: inline-block;
-    margin-right: 10px;
-    margin-bottom: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-right: 0;
+    margin-bottom: 0;
     font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    line-height: 1.4;
+    box-sizing: border-box;
 }
 
 .btn-primary {
@@ -777,14 +784,13 @@ body {
     }
 
     .navigation-buttons {
-        flex-direction: column;
-        gap: 8px;
+        flex-direction: row;
+        gap: 12px;
     }
 
     .navigation-buttons .btn {
-        margin-right: 0;
-        width: 100%;
-        text-align: center;
+        width: auto;
+        flex: 0 1 auto;
     }
 
     .card-header {
@@ -838,16 +844,16 @@ body {
     }
 
     .navigation-buttons {
-        flex-direction: column;
-        gap: 8px;
+        flex-direction: row;
+        gap: 12px;
     }
 
     .navigation-buttons .btn {
-        margin-bottom: 0;
-        text-align: center;
-        box-sizing: border-box;
-        display: block;
-        width: 100%;
+        width: auto;
+        flex: 0 1 auto;
+        display: inline-flex;
+        padding-left: 12px;
+        padding-right: 12px;
     }
 
     .card-header {
@@ -892,7 +898,7 @@ body {
         padding: 0 12px 12px 12px;
     }
 
-    .btn {
+    .btn:not(.navigation-buttons .btn) {
         width: 100%;
         margin-right: 0;
     }
