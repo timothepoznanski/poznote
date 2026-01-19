@@ -469,12 +469,15 @@ Poznote is built with a multi-user architecture where each user has their own is
 - **Role-based Global Passwords**: Instead of per-user passwords, Poznote uses two global passwords defined in your `.env`.
 - **User Management**: Administrators can create, rename, and manage users via the Admin Panel (Settings > Advanced > User Management).
 
-### Profile Properties
+<details>
+<summary><strong>Profile Properties</strong></summary>
 
 Each user profile has:
 - **Username**: Unique identifier (used for OIDC matching and display).
 - **Admin Role**: Can manage other profiles, backup data for any user, manage global settings, and access their own private data space.
 - **Active Status**: Can login and access the system.
+
+</details>
 
 ### Architecture & Structure
 
