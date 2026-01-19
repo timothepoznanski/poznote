@@ -776,6 +776,17 @@ body {
         padding: 15px;
     }
 
+    .navigation-buttons {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .navigation-buttons .btn {
+        margin-right: 0;
+        width: 100%;
+        text-align: center;
+    }
+
     .card-header {
         padding: 16px 20px;
     }
@@ -807,6 +818,16 @@ body {
 
     .sub-card-content.open {
         padding: 0 16px 16px 16px;
+    }
+
+    .card-content:not(.open),
+    .sub-card-content:not(.open) {
+        display: none;
+    }
+
+    .card-content.open,
+    .sub-card-content.open {
+        display: block;
     }
 }
 
