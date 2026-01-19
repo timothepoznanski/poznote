@@ -1001,7 +1001,8 @@
                 "use_case_restore_text": "Import this backup to recover your data in case of loss",
                 "use_case_offline_label": "Offline Reading",
                 "use_case_offline_text": "Open the included",
-                "use_case_offline_text_suffix": "to browse your notes without Poznote"
+                "use_case_offline_text_suffix": "to browse your notes without Poznote",
+                "select_user": "Select user profile:"
             },
             "structured_export": {
                 "title": "Structured Export",

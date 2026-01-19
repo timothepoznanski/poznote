@@ -1000,7 +1000,8 @@
                 "use_case_restore_text": "Importieren Sie diese Sicherung, um Ihre Daten bei Verlust wiederherzustellen",
                 "use_case_offline_label": "Offline-Lesen",
                 "use_case_offline_text": "Öffnen Sie die enthaltene",
-                "use_case_offline_text_suffix": "um Ihre Notizen ohne Poznote zu durchsuchen"
+                "use_case_offline_text_suffix": "um Ihre Notizen ohne Poznote zu durchsuchen",
+                "select_user": "Benutzerprofil auswählen:"
             },
             "structured_export": {
                 "title": "Strukturierter Export",

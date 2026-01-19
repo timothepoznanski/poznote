@@ -1000,7 +1000,8 @@
                 "use_case_restore_text": "Importa esta copia de seguridad para recuperar tus datos en caso de pérdida",
                 "use_case_offline_label": "Lectura sin conexión",
                 "use_case_offline_text": "Abre el incluido",
-                "use_case_offline_text_suffix": "para navegar tus notas sin Poznote"
+                "use_case_offline_text_suffix": "para navegar tus notas sin Poznote",
+                "select_user": "Seleccionar perfil de usuario:"
             },
             "structured_export": {
                 "title": "Exportación Estructurada",

@@ -3,6 +3,8 @@ require_once 'auth.php';
 require_once 'config.php';
 include 'functions.php';
 require_once 'db_connect.php';
+require_once 'users/db_master.php';
+require_once 'users/UserDataManager.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
@@ -28,7 +30,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             break;
         case 'complete_backup':
-            $result = createCompleteBackup();
+            // Get selected user ID (defaults to current user)
+            $currentUserId = getCurrentUserId();
+            $selectedUserId = isset($_POST['selected_user_id']) ? (int)$_POST['selected_user_id'] : $currentUserId;
+            
+            // Security check: Only admin can backup other users
+            if ($selectedUserId !== $currentUserId && !isCurrentUserAdmin()) {
+                $selectedUserId = $currentUserId;
+            }
+            
+            $result = createCompleteBackup($selectedUserId);
             // createCompleteBackup() handles download directly, so we only get here on error
             if (!$result['success']) {
                 $error = t('backup_export.errors.complete_backup_error', ['error' => $result['error']]);
@@ -39,7 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 function generateSQLDump() {
     global $con;
+    return generateSQLDumpForConnection($con);
+}
 
+function generateSQLDumpForConnection($con) {
     $sql = "-- " . t('backup_export.dump.title') . "\n";
     $sql .= "-- " . t('backup_export.dump.generated_on', ['date' => date('Y-m-d H:i:s')]) . "\n\n";
     
@@ -84,27 +98,48 @@ function generateSQLDump() {
     return $sql;
 }
 
-function createCompleteBackup() {
+function createCompleteBackup($userId = null) {
+    // Use current user if no userId specified
+    if ($userId === null) {
+        $userId = getCurrentUserId();
+    }
+    
+    // Get user data manager for the selected user
+    $userDataManager = new UserDataManager($userId);
+    $userProfile = getUserProfileById($userId);
+    $username = $userProfile ? $userProfile['username'] : 'user';
+    
     $tempDir = sys_get_temp_dir();
-    $zipFileName = $tempDir . '/poznote_complete_backup_' . date('Y-m-d_H-i-s') . '.zip';
+    $zipFileName = $tempDir . '/poznote_backup_' . $username . '_' . date('Y-m-d_H-i-s') . '.zip';
     
     $zip = new ZipArchive();
     if ($zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
         return ['success' => false, 'error' => t('backup_export.errors.cannot_create_zip')];
     }
     
-    // Add SQL dump
-    $sqlContent = generateSQLDump();
-    if ($sqlContent) {
-        $zip->addFromString('database/poznote_backup.sql', $sqlContent);
+    // Add SQL dump from user's database
+    $userDbPath = $userDataManager->getUserDatabasePath();
+    if (file_exists($userDbPath)) {
+        // Temporarily connect to user's database to generate dump
+        $tempCon = new PDO('sqlite:' . $userDbPath);
+        $tempCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
+        $sqlContent = generateSQLDumpForConnection($tempCon);
+        if ($sqlContent) {
+            $zip->addFromString('database/poznote_backup.sql', $sqlContent);
+        } else {
+            $zip->close();
+            unlink($zipFileName);
+            return ['success' => false, 'error' => t('backup_export.errors.failed_to_create_db_backup')];
+        }
     } else {
         $zip->close();
         unlink($zipFileName);
-        return ['success' => false, 'error' => t('backup_export.errors.failed_to_create_db_backup')];
+        return ['success' => false, 'error' => 'User database not found'];
     }
     
-    // Add all note entries (HTML and Markdown)
-    $entriesPath = getEntriesPath();
+    // Add all note entries (HTML and Markdown) from user's data
+    $entriesPath = $userDataManager->getUserEntriesPath();
     if ($entriesPath && is_dir($entriesPath)) {
         $files = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($entriesPath), 
@@ -125,10 +160,9 @@ function createCompleteBackup() {
         }
     }
     
-    // Generate index.html for entries
-    global $con;
+    // Generate index.html for entries using user's database
     $query = "SELECT id, heading, tags, folder, folder_id, workspace, attachments, type FROM entries WHERE trash = 0 ORDER BY workspace, folder, updated DESC";
-    $result = $con->query($query);
+    $result = $tempCon->query($query);
     // Generate a simple, icon-free index.html header
     $indexContent = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"utf-8\">\n<title>" . htmlspecialchars(t('backup_export.index.title'), ENT_QUOTES) . "</title>\n<style>\nbody { font-family: Arial, sans-serif; }\nh2 { margin-top: 30px; }\nh3 { color: #28a745; margin-top: 20px; }\nul { list-style-type: none; }\nli { margin: 5px 0; }\na { text-decoration: none; color: #007bff; }\na:hover { text-decoration: underline; }\n.attachments { color: #17a2b8; }\n</style>\n</head>\n<body>\n";
     
@@ -140,7 +174,7 @@ function createCompleteBackup() {
             
             // Get the complete folder path including parents
             $folder_id = $row['folder_id'] ?? null;
-            $folderPath = getFolderPath($folder_id, $con);
+            $folderPath = getFolderPath($folder_id, $tempCon);
             $folder = htmlspecialchars($folderPath);
             
             if ($currentWorkspace !== $workspace) {
@@ -212,8 +246,8 @@ function createCompleteBackup() {
     $indexContent .= "</body>\n</html>";
     $zip->addFromString('index.html', $indexContent);
     
-    // Add attachments
-    $attachmentsPath = getAttachmentsPath();
+    // Add attachments from user's data
+    $attachmentsPath = $userDataManager->getUserAttachmentsPath();
     if ($attachmentsPath && is_dir($attachmentsPath)) {
         $files = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($attachmentsPath), 
@@ -233,10 +267,9 @@ function createCompleteBackup() {
         }
     }
     
-    // Add metadata file for attachments
-    include 'db_connect.php';
+    // Add metadata file for attachments using user's database
     $query = "SELECT id, heading, attachments FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
-    $queryResult = $con->query($query);
+    $queryResult = $tempCon->query($query);
     $metadataInfo = [];
     
     if ($queryResult) {
@@ -275,7 +308,7 @@ function createCompleteBackup() {
             setcookie('poznote_download_token', $_POST['download_token'], 0, '/');
         }
         header('Content-Type: application/zip');
-        header('Content-Disposition: attachment; filename="poznote_complete_backup_' . date('Y-m-d_H-i-s') . '.zip"');
+        header('Content-Disposition: attachment; filename="poznote_backup_' . $username . '_' . date('Y-m-d_H-i-s') . '.zip"');
         header('Content-Length: ' . filesize($zipFileName));
         header('Cache-Control: no-cache, must-revalidate');
         header('Expires: 0');
@@ -347,6 +380,30 @@ function createBackup() {
             
             <form id="completeBackupForm" method="post">
                 <input type="hidden" name="action" value="complete_backup">
+                <?php if (isCurrentUserAdmin()): ?>
+                    <div class="form-group form-group-export">
+                        <label for="completeBackupUserSelect" class="export-label">
+                            <?php echo t_h('backup_export.sections.complete_backup.select_user'); ?>
+                        </label>
+                        <select id="completeBackupUserSelect" name="selected_user_id" class="form-control export-select">
+                            <?php
+                            $allUsers = listAllUserProfiles();
+                            foreach ($allUsers as $user) {
+                                $selected = ($user['id'] == getCurrentUserId()) ? 'selected' : '';
+                                echo '<option value="' . htmlspecialchars($user['id']) . '" ' . $selected . '>';
+                                echo htmlspecialchars($user['username']);
+                                if ($user['is_admin']) {
+                                    echo ' (Admin)';
+                                }
+                                echo '</option>';
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <br>
+                <?php else: ?>
+                    <input type="hidden" name="selected_user_id" value="<?php echo getCurrentUserId(); ?>">
+                <?php endif; ?>
                 <button id="completeBackupBtn" type="submit" class="btn btn-primary">
                     <span><?php echo t_h('backup_export.buttons.download_complete_backup'); ?></span>
                 </button>
