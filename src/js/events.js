@@ -2682,17 +2682,37 @@ function setupPageUnloadWarning() {
 }
 
 // Utility functions
+// Throttle timer for change detection (avoid checking innerHTML too often)
+var changeCheckThrottle = null;
+var lastChangeCheckTime = 0;
+var CHANGE_CHECK_INTERVAL = 400; // Check at most every 400ms
+
 function markNoteAsModified() {
     if (noteid == 'search' || noteid == -1 || noteid === null || noteid === undefined) {
         return;
     }
+    
+    // Throttle expensive innerHTML comparisons to avoid lag when typing
+    var now = Date.now();
+    if (now - lastChangeCheckTime < CHANGE_CHECK_INTERVAL) {
+        // Too soon - schedule a deferred check instead
+        if (!changeCheckThrottle) {
+            changeCheckThrottle = setTimeout(function() {
+                changeCheckThrottle = null;
+                markNoteAsModified();
+            }, CHANGE_CHECK_INTERVAL - (now - lastChangeCheckTime));
+        }
+        return;
+    }
+    
+    lastChangeCheckTime = now;
     
     // Check if there are actually changes before triggering save process
     var entryElem = document.getElementById("entry" + noteid);
     var titleInput = document.getElementById("inp" + noteid);
     var tagsElem = document.getElementById("tags" + noteid);
     
-    var currentContent = entryElem ? entryElem.innerHTML : '';
+    // For title and tags, comparison is cheap
     var currentTitle = titleInput ? titleInput.value : '';
     var currentTags = tagsElem ? tagsElem.value : '';
     
@@ -2701,65 +2721,89 @@ function markNoteAsModified() {
     if (typeof lastSavedTitle === 'undefined') lastSavedTitle = null;
     if (typeof lastSavedTags === 'undefined') lastSavedTags = null;
     
-    
-    var contentChanged = currentContent !== lastSavedContent;
     var titleChanged = currentTitle !== lastSavedTitle;
     var tagsChanged = currentTags !== lastSavedTags;
     
-    if (!contentChanged && !titleChanged && !tagsChanged) {
-        return;
-    }
-    
-    
-    // Modern auto-save: save to localStorage immediately
-    saveToLocalStorage();
-    
-    // Mark this note as having pending changes (until server save completes)
-    notesNeedingRefresh.add(String(noteid));
-    
-    // Visual indicator: add red dot to page title when there are unsaved changes
-    if (!document.title.startsWith('🔴')) {
-        document.title = '🔴 ' + document.title;
-    }
-    
-    // Debounced server save
-    clearTimeout(saveTimeout);
-    var currentNoteId = noteid; // Capture current note ID
-    saveTimeout = setTimeout(() => {
-        // Only save if we're still on the same note
-        if (noteid === currentNoteId && isOnline) {
-            saveToServerDebounced();
-        } else if (noteid !== currentNoteId) {
+    // Use requestIdleCallback for expensive innerHTML comparison (or fallback to immediate)
+    var checkContentAndSave = function() {
+        var currentContent = entryElem ? entryElem.innerHTML : '';
+        var contentChanged = currentContent !== lastSavedContent;
+        
+        if (!contentChanged && !titleChanged && !tagsChanged) {
+            return;
         }
-    }, 2000); // 2 second debounce
+        
+        // Modern auto-save: save to localStorage immediately
+        saveToLocalStorage();
+        
+        // Mark this note as having pending changes (until server save completes)
+        notesNeedingRefresh.add(String(noteid));
+        
+        // Visual indicator: add red dot to page title when there are unsaved changes
+        if (!document.title.startsWith('🔴')) {
+            document.title = '🔴 ' + document.title;
+        }
+        
+        // Debounced server save (increased to 3s for better performance)
+        clearTimeout(saveTimeout);
+        var currentNoteId = noteid; // Capture current note ID
+        saveTimeout = setTimeout(function() {
+            // Only save if we're still on the same note
+            if (noteid === currentNoteId && isOnline) {
+                saveToServerDebounced();
+            }
+        }, 3000); // 3 second debounce (increased from 2s)
+    };
+    
+    // If title or tags changed, check immediately; otherwise use idle callback
+    if (titleChanged || tagsChanged) {
+        checkContentAndSave();
+    } else {
+        // Schedule during browser idle time to avoid blocking typing
+        if (window.requestIdleCallback) {
+            window.requestIdleCallback(checkContentAndSave, { timeout: 500 });
+        } else {
+            // Fallback for browsers without requestIdleCallback
+            setTimeout(checkContentAndSave, 0);
+        }
+    }
 }
+
+// Throttle localStorage saves to avoid excessive writes
+var localStorageSaveTimer = null;
 
 function saveToLocalStorage() {
     if (noteid == 'search' || noteid == -1 || noteid === null || noteid === undefined) return;
     
-    try {
-        var entryElem = document.getElementById("entry" + noteid);
-        var titleInput = document.getElementById("inp" + noteid);
-        var tagsElem = document.getElementById("tags" + noteid);
-        
-        if (entryElem) {
-            // Serialize checklist data before saving
-            serializeChecklists(entryElem);
+    // Debounce localStorage writes (they can be expensive with large content)
+    clearTimeout(localStorageSaveTimer);
+    localStorageSaveTimer = setTimeout(function() {
+        try {
+            var entryElem = document.getElementById("entry" + noteid);
+            var titleInput = document.getElementById("inp" + noteid);
+            var tagsElem = document.getElementById("tags" + noteid);
             
-            var content = entryElem.innerHTML;
-            var draftKey = 'poznote_draft_' + noteid;
-            localStorage.setItem(draftKey, content);
-            
-            // Also save title and tags
-            if (titleInput) {
-                localStorage.setItem('poznote_title_' + noteid, titleInput.value);
+            if (entryElem) {
+                // Serialize checklist data before saving
+                serializeChecklists(entryElem);
+                
+                var content = entryElem.innerHTML;
+                var draftKey = 'poznote_draft_' + noteid;
+                localStorage.setItem(draftKey, content);
+                
+                // Also save title and tags
+                if (titleInput) {
+                    localStorage.setItem('poznote_title_' + noteid, titleInput.value);
+                }
+                if (tagsElem) {
+                    localStorage.setItem('poznote_tags_' + noteid, tagsElem.value);
+                }
             }
-            if (tagsElem) {
-                localStorage.setItem('poznote_tags_' + noteid, tagsElem.value);
-            }
+        } catch (err) {
+            // localStorage quota exceeded or other error
+            console.warn('Failed to save to localStorage:', err);
         }
-    } catch (err) {
-    }
+    }, 300); // Debounce localStorage by 300ms
 }
 
 function saveToServerDebounced() {

@@ -2714,6 +2714,18 @@ textarea:focus {
     font-size: var(--note-font-size, 15px);
 }
 
+/* Optimize image rendering for better performance with many images */
+.noteentry img {
+    max-width: 100%;
+    height: auto;
+    /* Prevent layout shifts while images load */
+    content-visibility: auto;
+    /* Hint browser about size for better performance */
+    contain-intrinsic-size: 300px 200px;
+    /* Async decoding to avoid blocking main thread */
+    image-rendering: auto;
+}
+
 /* Apply Inter to text elements, except in code blocks and monospace elements */
 .noteentry p:not([style*='Consolas']):not([style*='Monaco']):not([style*='Courier']):not([style*='monospace']):not([style*='Segoe UI Mono']),
 .noteentry div:not([style*='Consolas']):not([style*='Monaco']):not([style*='Courier']):not([style*='monospace']):not([style*='Segoe UI Mono']),
