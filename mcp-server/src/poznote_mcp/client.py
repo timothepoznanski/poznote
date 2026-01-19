@@ -46,8 +46,13 @@ class PoznoteClient:
             timeout=30.0,
             headers=headers
         )
+
+    def _headers_for_user(self, user_id: str | int | None) -> dict | None:
+        if user_id is None:
+            return None
+        return {"X-User-ID": str(user_id)}
     
-    def list_notes(self, workspace: str | None = None) -> list[dict]:
+    def list_notes(self, workspace: str | None = None, user_id: str | int | None = None) -> list[dict]:
         """
         List all notes
         
@@ -58,7 +63,7 @@ class PoznoteClient:
         if ws:
             params["workspace"] = ws
         
-        response = self.client.get("/notes", params=params)
+        response = self.client.get("/notes", params=params, headers=self._headers_for_user(user_id))
         response.raise_for_status()
         data = response.json()
         
@@ -66,7 +71,7 @@ class PoznoteClient:
             return data.get("notes", [])
         return []
     
-    def get_note(self, note_id: int, workspace: str | None = None) -> dict | None:
+    def get_note(self, note_id: int, workspace: str | None = None, user_id: str | int | None = None) -> dict | None:
         """
         Get a specific note with its content
         
@@ -77,7 +82,7 @@ class PoznoteClient:
         if ws:
             params["workspace"] = ws
         
-        response = self.client.get(f"/notes/{note_id}", params=params)
+        response = self.client.get(f"/notes/{note_id}", params=params, headers=self._headers_for_user(user_id))
         
         if response.status_code == 404:
             return None
@@ -93,7 +98,8 @@ class PoznoteClient:
         self,
         query: str,
         limit: int = 10,
-        workspace: str | None = None
+        workspace: str | None = None,
+        user_id: str | int | None = None,
     ) -> list[dict]:
         """
         Search notes by text query
@@ -105,7 +111,7 @@ class PoznoteClient:
         if ws:
             params["workspace"] = ws
         
-        response = self.client.get("/notes/search", params=params)
+        response = self.client.get("/notes/search", params=params, headers=self._headers_for_user(user_id))
         response.raise_for_status()
         data = response.json()
         
@@ -121,6 +127,7 @@ class PoznoteClient:
         folder_name: str | None = None,
         workspace: str | None = None,
         note_type: str | None = None,
+        user_id: str | int | None = None,
     ) -> dict | None:
         """
         Create a new note
@@ -142,7 +149,7 @@ class PoznoteClient:
         if note_type:
             payload["type"] = note_type
         
-        response = self.client.post("/notes", json=payload)
+        response = self.client.post("/notes", json=payload, headers=self._headers_for_user(user_id))
         response.raise_for_status()
         data = response.json()
         
@@ -157,6 +164,7 @@ class PoznoteClient:
         title: str | None = None,
         tags: str | None = None,
         workspace: str | None = None,
+        user_id: str | int | None = None,
     ) -> dict | None:
         """
         Update an existing note
@@ -180,7 +188,12 @@ class PoznoteClient:
         if ws:
             params["workspace"] = ws
         
-        response = self.client.patch(f"/notes/{note_id}", json=payload, params=params)
+        response = self.client.patch(
+            f"/notes/{note_id}",
+            json=payload,
+            params=params,
+            headers=self._headers_for_user(user_id),
+        )
         
         if response.status_code == 404:
             return None
@@ -196,6 +209,7 @@ class PoznoteClient:
         self,
         note_id: int,
         workspace: str | None = None,
+        user_id: str | int | None = None,
     ) -> bool:
         """
         Delete a note
@@ -207,7 +221,11 @@ class PoznoteClient:
         if ws:
             params["workspace"] = ws
         
-        response = self.client.delete(f"/notes/{note_id}", params=params)
+        response = self.client.delete(
+            f"/notes/{note_id}",
+            params=params,
+            headers=self._headers_for_user(user_id),
+        )
         
         if response.status_code == 404:
             return False
@@ -222,6 +240,7 @@ class PoznoteClient:
         folder_name: str,
         parent_folder_id: int | None = None,
         workspace: str | None = None,
+        user_id: str | int | None = None,
     ) -> dict | None:
         """
         Create a new folder
@@ -238,7 +257,7 @@ class PoznoteClient:
         if parent_folder_id is not None:
             payload["parent_folder_id"] = parent_folder_id
         
-        response = self.client.post("/folders", json=payload)
+        response = self.client.post("/folders", json=payload, headers=self._headers_for_user(user_id))
         response.raise_for_status()
         data = response.json()
         
