@@ -427,7 +427,8 @@ class FoldersController {
         $createParents = isset($data['create_parents']) ? (bool)$data['create_parents'] : false;
         $folderName = isset($data['folder_name']) ? trim((string)$data['folder_name']) : null;
         $parentFolder = isset($data['parent_folder']) ? trim((string)$data['parent_folder']) : null;
-        $parentFolderId = isset($data['parent_folder_id']) ? (int)$data['parent_folder_id'] : null;
+        $parentFolderId = $data['parent_folder_id'] ?? $data['parent_id'] ?? null;
+        if ($parentFolderId !== null) $parentFolderId = (int)$parentFolderId;
         $parentFolderKey = isset($data['parent_folder_key']) ? trim((string)$data['parent_folder_key']) : null;
         
         // Validate workspace
@@ -782,7 +783,8 @@ class FoldersController {
         $data = $this->getInputData();
         
         $workspace = isset($data['workspace']) ? trim((string)$data['workspace']) : null;
-        $newParentId = array_key_exists('new_parent_folder_id', $data) ? $data['new_parent_folder_id'] : null;
+        $newParentId = $data['new_parent_folder_id'] ?? $data['new_parent_id'] ?? $data['parent_id'] ?? null;
+        if ($newParentId !== null) $newParentId = (int)$newParentId;
         $newParentPath = isset($data['new_parent_folder']) ? trim((string)$data['new_parent_folder']) : null;
         
         // Get folder info
@@ -1311,7 +1313,10 @@ class FoldersController {
     public function moveNoteToFolder(string $noteId): void {
         $data = $this->getInputData();
         
-        $targetFolderId = isset($data['folder_id']) ? ($data['folder_id'] === '' ? null : (int)$data['folder_id']) : null;
+        $targetFolderId = $data['folder_id'] ?? $data['parent_id'] ?? null;
+        if ($targetFolderId !== null) {
+            $targetFolderId = ($targetFolderId === '' ? null : (int)$targetFolderId);
+        }
         $targetFolder = $data['folder'] ?? $data['target_folder'] ?? null;
         $workspace = isset($data['workspace']) ? trim((string)$data['workspace']) : null;
         
