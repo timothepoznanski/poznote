@@ -13,7 +13,7 @@
 </div>
 
 <h3 align="center">
-Poznote is a lightweight, open-source personal note-taking and documentation platform.<br><br>
+Poznote is a lightweight but powerful, open-source note-taking and documentation platform.<br><br>
 </h3>
 
 <p align="center">
@@ -47,6 +47,7 @@ Password: `poznote`
 - [Troubleshooting Installation](#troubleshooting-installation)
 - [Change Settings](#change-settings)
 - [Authentication](#authentication)
+- [Multi-users](#multi-users)
 - [Update application](#update-application)
 - [Backup / Export](#backup--export)
 - [Restore / Import](#restore--import)
@@ -303,6 +304,20 @@ Alternatively, install Poznote in a directory outside of `/root`, such as `/opt/
 
 </details>
 
+<details>
+<summary><strong>User Profile Issues (Login/Selection)</strong></summary>
+<br>
+
+**User profile doesn't appear in the login dropdown:**
+1. Log in as an administrator and check if the profile is marked as **active** in the User Management panel.
+2. Verify that the master database exists and is readable: `data/master.db`.
+
+**Authentication failed for an existing user:**
+1. Check if the user's role (Admin vs User) matches the password you are using from the `.env` file.
+2. Ensure no extra spaces were added when editing the `.env` variables.
+
+</details>
+
 ## Change Settings
 
 Poznote configuration is split between two locations:
@@ -313,9 +328,9 @@ Poznote configuration is split between two locations:
 
 The following settings are configured in the `.env` file located in your Poznote installation directory:
 
-**Basic Authentication**
-- `POZNOTE_USERNAME` - Admin username for login (default: `admin`)
-- `POZNOTE_PASSWORD` - Admin password for login (default: `admin`)
+**Authentication**
+- `POZNOTE_PASSWORD` - Global password for Administrator accounts (default: `admin`)
+- `POZNOTE_PASSWORD_USER` - Global password for Standard User accounts (default: `user`)
 
 **Web Server**
 - `HTTP_WEB_PORT` - Port on which Poznote will be accessible (default: `8040`)
@@ -385,53 +400,55 @@ Additional settings are available through the Poznote web interface and are stor
 
 ## Authentication
 
-Poznote supports two authentication methods:
-
 <details>
 <summary><strong>Traditional Authentication</strong></summary>
 <br>
 
-By default, Poznote uses traditional username/password authentication. Configure your credentials in the `.env` file:
+Poznote uses a global password model. You define your administrator and standard user passwords in the `.env` file, and users log in using their database-managed usernames.
+
+#### Authentication Model
+
+- **Global Authentication**: Uses `POZNOTE_PASSWORD` and `POZNOTE_PASSWORD_USER` environment variables in your `.env`.
+- **User Profiles**: Each user has a unique profile (username) with isolated data.
+- **Automatic Profile Selection**: The system automatically selects the correct profile when you log in based on your credentials.
+- **First Account**: On a new installation or migration, the first user created is always an administrator named `admin_change_me`.
 
 ```bash
-POZNOTE_USERNAME=your_username
+# Global Administrator password
+# Used for all accounts with administrator role
 POZNOTE_PASSWORD=your_secure_password
+
+# Global Standard User password (optional)
+# Used for all accounts with standard user role
+POZNOTE_PASSWORD_USER=your_user_password
 ```
+
+#### Login Flow
+
+1. User opens Poznote.
+2. User enters their **username** and **password**.
+3. System automatically selects the appropriate user profile.
+4. User accesses their personal data space.
 
 </details>
 
+<a id="oidc"></a>
 <details>
 <summary><strong>OIDC / SSO Authentication (Optional)</strong></summary>
 <br>
 
-Poznote can optionally authenticate users via OpenID Connect (authorization code + PKCE) for sign-on integration.
-
-This allows users to log in using external identity providers such as:
-
-- Auth0
-- Keycloak
-- Azure Active Directory
-- Google Identity
-- And any other OIDC-compliant provider
-
-#### Configuration
-
-Add the OIDC variables (see .env.example) to your `.env` file and restart the container.
+Poznote supports OpenID Connect (authorization code + PKCE) for single sign-on integration. This allows users to log in using external identity providers such as Auth0, Keycloak, Azure AD, or Google Identity.
 
 #### How it works
 
-When OIDC is enabled:
-1. The login page displays a "Continue with [Provider Name]" button
-2. Clicking the button redirects users to your identity provider
-3. After successful authentication, users are redirected back to Poznote
-4. Poznote validates the OIDC tokens and creates a session
+1. **Pre-requisite**: An administrator must first create a user profile with a username matching the OIDC user's `preferred_username` or `email`.
+2. The login page displays a "Continue with [Provider Name]" button.
+3. Clicking the button redirects users to your identity provider.
+4. After successful authentication, Poznote matches the OIDC identity to an existing user profile and creates a session.
 
-If `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN` is set to `true`, the normal username/password login form will be hidden, forcing users to authenticate only through OIDC.
+#### Configuration
 
-If `POZNOTE_OIDC_DISABLE_BASIC_AUTH` is set to `true`, HTTP Basic Auth for API requests will be disabled, rejecting API calls that use username/password credentials. This can be combined with `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN` to fully enforce OIDC-only authentication across both the UI and API.
-
-Note that OIDC configuration is stored in `.env` file (not in the database) to keep sensitive credentials secure.
-
+Add the OIDC variables to your `.env` file (see `.env.example`). If `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN` is `true`, the standard login form will be hidden.
 
 #### Access Control Example
 
@@ -441,6 +458,61 @@ POZNOTE_OIDC_ALLOWED_USERS=alice@example.com,bob@example.com,charlie@company.org
 ```
 
 </details>
+
+## Multi-users
+
+Poznote is built with a multi-user architecture where each user has their own isolated data space.
+
+### Key Concepts
+
+- **Data Isolation**: Each user has their own separate notes, folders, workspaces, tags, and attachments. Data is strictly separated at the database and file levels.
+- **Role-based Global Passwords**: Instead of per-user passwords, Poznote uses two global passwords defined in your `.env`.
+- **User Management**: Administrators can create, rename, and manage users via the Admin Panel (Settings > Advanced > User Management).
+
+### Profile Properties
+
+Each user profile has:
+- **Username**: Unique identifier (used for OIDC matching and display).
+- **Admin Role**: Can manage other profiles, backup data for any user, manage global settings, and access their own private data space.
+- **Active Status**: Can login and access the system.
+
+### Architecture & Structure
+
+Poznote uses a master database (`data/master.db`) to track profiles and global settings, and individual databases for each user.
+
+```
+data/
+├── master.db                    # Master database (profiles, global settings)
+└── users/
+    ├── 1/                       # User ID 1 (default admin)
+    │   ├── database/poznote.db  # User's notes database
+    │   ├── entries/             # User's note files (HTML/MD)
+    │   └── attachments/         # User's attachments
+    ├── 2/                       # User ID 2
+    └── ...
+```
+
+### Security Considerations
+
+1. **Shared Password**: All users share the same role-based login password (trusted environments).
+2. **Data Isolation**: Users cannot access other users' data through the application.
+3. **Admin Control**: Only admins can manage user profiles or global settings.
+
+### Use Cases
+
+- **Families**: Shared home server where each member has their own notes.
+- **Small Teams**: Trusted team members sharing a Poznote instance.
+- **Personal Personas**: One person with different contexts (work, personal, projects).
+
+### Automatic Migration
+
+If you are upgrading from an older version of Poznote (v1.x), your data will be **automatically migrated** on the first startup:
+1. A master database is created with your default administrator profile (`admin_change_me`).
+2. Your existing notes, database, and attachments are moved to `data/users/1/`.
+3. All file permissions and SQLite integrity are preserved.
+4. Old empty directories are cleaned up.
+
+No manual action is required, the system handles the transition to the multi-user structure automatically.
 
 ## Update application
 
@@ -494,13 +566,25 @@ Occasionally, beta versions will be published as **pre-releases** on GitHub. The
 
 You can install beta versions by modifying your `docker-compose.yml` to use a specific version tag instead of `latest`:
 
-1. Edit your `docker-compose.yml` file and change the image line to:
+1. Download the latest Docker Compose configuration:
+   ```bash
+   curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
+   ```
+
+2. Download the latest .env.example:
+   ```bash
+   curl -o .env.example https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.example
+   ```
+
+3. Review `.env.example` and add any new variables to your `.env` file if needed.
+
+4. Edit your `docker-compose.yml` file and change the image line to:
    ```yaml
    image: ghcr.io/timothepoznanski/poznote:X.X.X-beta
    ```
    Replace `X.X.X-beta` with the specific beta version from the [GitHub Releases](https://github.com/timothepoznanski/poznote/releases) page.
 
-2. Update and restart:
+5. Update and restart:
    ```bash
    docker compose down
    docker compose pull
@@ -525,6 +609,18 @@ Single ZIP containing database, all notes, and attachments for all workspaces:
   - Includes an `index.html` at the root for offline browsing
   - Notes are organized by workspace and folder
   - Attachments are accessible via clickable links
+
+#### Per-User vs Complete Backups
+
+Poznote supports two backup scopes:
+
+1. **Per-User Backups**: Created from the user's Settings page. This backup contains *only* the data belonging to that specific user (their database, notes, and attachments).
+2. **Complete System Backup**: Created manually by backing up the entire `/data` directory. This is the only way to backup the master configuration and all users' data at once.
+
+```bash
+# Complete system backup via CLI
+tar -czvf poznote-full-backup.tar.gz data/
+```
 
 </details>
 
@@ -559,12 +655,12 @@ bash backup-poznote.sh '<poznote_url>' '<username>' '<password>' '<backup_direct
 To schedule automatic backups twice daily (at midnight and noon), add this line to your crontab:
 
 ```bash
-0 0,12 * * * bash /root/backup-poznote.sh 'https://poznote.xxxxx.com' 'admin' 'xxxxx' '/root/poznote' '30'
+0 0,12 * * * bash /root/backup-poznote.sh 'https://poznote.xxxxx.com' 'admin_change_me' 'xxxxx' '/root/poznote' '30'
 ```
 
 **Parameters explained:**
 - `'https://poznote.xxxxx.com'` - Your Poznote instance URL
-- `'admin'` - Your Poznote username
+- `'admin_change_me'` - Your Poznote username
 - `'xxxxx'` - Your Poznote password
 - `'/root/poznote'` - Parent directory where backups will be stored (the script creates a `backups-poznote` folder inside this path)
 - `'30'` - Number of backups to keep (older ones are automatically deleted)
@@ -591,6 +687,14 @@ Upload the complete backup ZIP to restore everything:
 
   - Replaces database, restores all notes, and attachments
   - Works for all workspaces at once
+
+</details>
+
+<details>
+<summary><strong>Disaster Recovery (Reconstruct System Index)</strong></summary>
+<br>
+
+In case of system corruption or loss of the master database, Poznote can reconstruct its entire user index by scanning the data folders. This tool is accessible via Settings > Advanced > Reconstruct System Index.
 
 </details>
 
@@ -761,6 +865,20 @@ Poznote provides a RESTful API v1 for programmatic access to notes, folders, wor
 
 Access the **Swagger UI** directly from Poznote from `Settings > API Documentation` and browse all endpoints, view request/response schemas, and test API calls interactively.
 
+### Multi-User Mode
+
+Poznote supports multiple user profiles, each with their own isolated data. For API calls that access **user data** (notes, folders, etc.), you must include the `X-User-ID` header:
+
+```bash
+# Get notes for user ID 1
+curl -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/notes
+```
+
+**Admin endpoints** (`/api/v1/admin/*`) and **public endpoints** (`/api/v1/users/profiles`) do **not** require the `X-User-ID` header.
+
+Use `GET /api/v1/users/profiles` to list available user profiles and their IDs.
+
 ### Command Line Examples (Curl)
 
 Ready-to-use curl commands for every API operation.
@@ -771,15 +889,15 @@ Ready-to-use curl commands for every API operation.
 
 **List Notes**
 
-List all notes in the system:
+List all notes for a user:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes
 ```
 
 Filter notes by workspace, folder, tag, or search:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/notes?workspace=Personal&folder=Projects&tag=important"
 ```
 
@@ -787,7 +905,7 @@ curl -u 'username:password' \
 
 List all notes that have file attachments:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/with-attachments
 ```
 
@@ -795,13 +913,13 @@ curl -u 'username:password' \
 
 Get a specific note by ID:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123
 ```
 
 Resolve a note by title (reference) inside a workspace:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/notes/resolve?reference=My+Note&workspace=Personal"
 ```
 
@@ -809,7 +927,7 @@ curl -u 'username:password' \
 
 Create a new note with title, content, tags, folder and workspace:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{
     "heading": "My New Note",
@@ -826,7 +944,7 @@ curl -X POST -u 'username:password' \
 
 Update an existing note by ID:
 ```bash
-curl -X PATCH -u 'username:password' \
+curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{
     "heading": "Updated Title",
@@ -840,13 +958,13 @@ curl -X PATCH -u 'username:password' \
 
 Move a note to trash:
 ```bash
-curl -X DELETE -u 'username:password' \
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123
 ```
 
 Permanently delete (bypass trash):
 ```bash
-curl -X DELETE -u 'username:password' \
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/notes/123?permanent=true"
 ```
 
@@ -854,7 +972,7 @@ curl -X DELETE -u 'username:password' \
 
 Restore a note from trash:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/restore
 ```
 
@@ -862,7 +980,7 @@ curl -X POST -u 'username:password' \
 
 Create a copy of an existing note:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/duplicate
 ```
 
@@ -870,7 +988,7 @@ curl -X POST -u 'username:password' \
 
 Convert between markdown and HTML:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"target_type": "markdown"}' \
   http://YOUR_SERVER/api/v1/notes/123/convert
@@ -880,7 +998,7 @@ curl -X POST -u 'username:password' \
 
 Replace all tags on a note:
 ```bash
-curl -X PUT -u 'username:password' \
+curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"tags": "work,urgent,meeting"}' \
   http://YOUR_SERVER/api/v1/notes/123/tags
@@ -890,7 +1008,7 @@ curl -X PUT -u 'username:password' \
 
 Toggle favorite status:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/favorite
 ```
 
@@ -898,7 +1016,7 @@ curl -X POST -u 'username:password' \
 
 Move a note to a different folder:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"folder_id": 45}' \
   http://YOUR_SERVER/api/v1/notes/123/folder
@@ -906,7 +1024,7 @@ curl -X POST -u 'username:password' \
 
 Remove from folder (move to root):
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/remove-folder
 ```
 
@@ -920,7 +1038,7 @@ curl -X POST -u 'username:password' \
 
 Check if a note is shared:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/share
 ```
 
@@ -928,7 +1046,7 @@ curl -u 'username:password' \
 
 Create a share link for a note:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{
     "theme": "light",
@@ -942,7 +1060,7 @@ curl -X POST -u 'username:password' \
 
 Update share settings:
 ```bash
-curl -X PATCH -u 'username:password' \
+curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"theme": "dark", "indexable": true}' \
   http://YOUR_SERVER/api/v1/notes/123/share
@@ -952,7 +1070,7 @@ curl -X PATCH -u 'username:password' \
 
 Remove sharing access:
 ```bash
-curl -X DELETE -u 'username:password' \
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/share
 ```
 
@@ -960,13 +1078,13 @@ curl -X DELETE -u 'username:password' \
 
 Get list of all shared notes:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/shared
 ```
 
 Filter by workspace:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/shared?workspace=Personal"
 ```
 
@@ -980,7 +1098,7 @@ curl -u 'username:password' \
 
 Check if a folder is shared:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/folders/5/share
 ```
 
@@ -988,7 +1106,7 @@ curl -u 'username:password' \
 
 Share a folder (all notes in the folder will also be shared):
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{
     "theme": "light",
@@ -1000,7 +1118,7 @@ curl -X POST -u 'username:password' \
 
 With custom token:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{
     "custom_token": "my-shared-folder"
@@ -1012,7 +1130,7 @@ curl -X POST -u 'username:password' \
 
 Update share settings:
 ```bash
-curl -X PATCH -u 'username:password' \
+curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"indexable": 1, "password": "new-password"}' \
   http://YOUR_SERVER/api/v1/folders/5/share
@@ -1022,7 +1140,7 @@ curl -X PATCH -u 'username:password' \
 
 Revoke folder sharing (all notes in the folder will also be unshared):
 ```bash
-curl -X DELETE -u 'username:password' \
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/folders/5/share
 ```
 
@@ -1036,13 +1154,13 @@ curl -X DELETE -u 'username:password' \
 
 Get all notes in trash:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/trash
 ```
 
 Filter by workspace:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/trash?workspace=Personal"
 ```
 
@@ -1050,7 +1168,7 @@ curl -u 'username:password' \
 
 Permanently delete all notes in trash:
 ```bash
-curl -X DELETE -u 'username:password' \
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/trash
 ```
 
@@ -1058,7 +1176,7 @@ curl -X DELETE -u 'username:password' \
 
 Delete a specific note from trash:
 ```bash
-curl -X DELETE -u 'username:password' \
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/trash/123
 ```
 
@@ -1072,13 +1190,13 @@ curl -X DELETE -u 'username:password' \
 
 List all folders in a workspace:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/folders?workspace=Personal"
 ```
 
 Get folder tree (nested structure):
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/folders?workspace=Personal&tree=true"
 ```
 
@@ -1086,7 +1204,7 @@ curl -u 'username:password' \
 
 Get note counts for all folders:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/folders/counts?workspace=Personal"
 ```
 
@@ -1094,7 +1212,7 @@ curl -u 'username:password' \
 
 Create a new folder:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "My Projects",
@@ -1105,7 +1223,7 @@ curl -X POST -u 'username:password' \
 
 Create a subfolder:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "2024",
@@ -1119,7 +1237,7 @@ curl -X POST -u 'username:password' \
 
 Rename an existing folder:
 ```bash
-curl -X PATCH -u 'username:password' \
+curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"name": "New Folder Name"}' \
   http://YOUR_SERVER/api/v1/folders/12
@@ -1129,7 +1247,7 @@ curl -X PATCH -u 'username:password' \
 
 Move folder to a different parent:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"parent_id": 56}' \
   http://YOUR_SERVER/api/v1/folders/34/move
@@ -1137,7 +1255,7 @@ curl -X POST -u 'username:password' \
 
 Move to root (no parent):
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"parent_id": null}' \
   http://YOUR_SERVER/api/v1/folders/34/move
@@ -1147,7 +1265,7 @@ curl -X POST -u 'username:password' \
 
 Set a custom icon:
 ```bash
-curl -X PUT -u 'username:password' \
+curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"icon": "fa-folder-open"}' \
   http://YOUR_SERVER/api/v1/folders/12/icon
@@ -1157,7 +1275,7 @@ curl -X PUT -u 'username:password' \
 
 Move all notes in folder to trash:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/folders/12/empty
 ```
 
@@ -1165,7 +1283,7 @@ curl -X POST -u 'username:password' \
 
 Delete a folder:
 ```bash
-curl -X DELETE -u 'username:password' \
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/folders/12
 ```
 
@@ -1179,7 +1297,7 @@ curl -X DELETE -u 'username:password' \
 
 Get all workspaces:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/workspaces
 ```
 
@@ -1187,7 +1305,7 @@ curl -u 'username:password' \
 
 Create a new workspace:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"name": "MyProject"}' \
   http://YOUR_SERVER/api/v1/workspaces
@@ -1197,7 +1315,7 @@ curl -X POST -u 'username:password' \
 
 Rename an existing workspace:
 ```bash
-curl -X PATCH -u 'username:password' \
+curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"new_name": "NewName"}' \
   http://YOUR_SERVER/api/v1/workspaces/OldName
@@ -1207,7 +1325,7 @@ curl -X PATCH -u 'username:password' \
 
 Delete a workspace:
 ```bash
-curl -X DELETE -u 'username:password' \
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/workspaces/OldWorkspace
 ```
 
@@ -1221,13 +1339,13 @@ curl -X DELETE -u 'username:password' \
 
 Get all unique tags:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/tags
 ```
 
 Filter by workspace:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/tags?workspace=Personal"
 ```
 
@@ -1241,7 +1359,7 @@ curl -u 'username:password' \
 
 Get all attachments for a note:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/attachments
 ```
 
@@ -1249,7 +1367,7 @@ curl -u 'username:password' \
 
 Upload a file to a note:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -F "file=@/path/to/file.pdf" \
   http://YOUR_SERVER/api/v1/notes/123/attachments
 ```
@@ -1258,7 +1376,7 @@ curl -X POST -u 'username:password' \
 
 Download a specific attachment:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/attachments/456 \
   -o downloaded-file.pdf
 ```
@@ -1267,7 +1385,7 @@ curl -u 'username:password' \
 
 Delete an attachment:
 ```bash
-curl -X DELETE -u 'username:password' \
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/attachments/456
 ```
 
@@ -1281,7 +1399,7 @@ curl -X DELETE -u 'username:password' \
 
 Get a list of all backup files:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/backups
 ```
 
@@ -1289,7 +1407,7 @@ curl -u 'username:password' \
 
 Create a complete backup:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/backups
 ```
 
@@ -1297,7 +1415,7 @@ curl -X POST -u 'username:password' \
 
 Download a specific backup file:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/backups/poznote_backup_2025-01-05_12-00-00.zip \
   -o backup.zip
 ```
@@ -1306,7 +1424,7 @@ curl -u 'username:password' \
 
 Delete a backup file:
 ```bash
-curl -X DELETE -u 'username:password' \
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/backups/poznote_backup_2025-01-05_12-00-00.zip
 ```
 
@@ -1322,7 +1440,7 @@ curl -X DELETE -u 'username:password' \
 
 Export a note as HTML or Markdown:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api_export_note.php?id=123&format=html" \
   -o exported-note.html
 ```
@@ -1331,7 +1449,7 @@ curl -u 'username:password' \
 
 Export a folder as ZIP:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api_export_folder.php?folder_id=123" \
   -o folder-export.zip
 ```
@@ -1340,7 +1458,7 @@ curl -u 'username:password' \
 
 Export all notes preserving folder hierarchy:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api_export_structured.php?workspace=Personal" \
   -o structured-export.zip
 ```
@@ -1349,7 +1467,7 @@ curl -u 'username:password' \
 
 Export all note files as ZIP:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api_export_entries.php \
   -o all-notes.zip
 ```
@@ -1358,7 +1476,7 @@ curl -u 'username:password' \
 
 Export all attachments as ZIP:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api_export_attachments.php \
   -o all-attachments.zip
 ```
@@ -1373,7 +1491,7 @@ curl -u 'username:password' \
 
 Get a setting value:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/settings/language
 ```
 
@@ -1381,7 +1499,7 @@ curl -u 'username:password' \
 
 Set a setting value:
 ```bash
-curl -X PUT -u 'username:password' \
+curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"value": "fr"}' \
   http://YOUR_SERVER/api/v1/settings/language
@@ -1397,7 +1515,7 @@ curl -X PUT -u 'username:password' \
 
 Get current version and system info:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/system/version
 ```
 
@@ -1405,7 +1523,7 @@ curl -u 'username:password' \
 
 Check if a newer version is available:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/system/updates
 ```
 
@@ -1413,8 +1531,93 @@ curl -u 'username:password' \
 
 Get translation strings:
 ```bash
-curl -u 'username:password' \
+curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/system/i18n
+```
+
+</details>
+
+<details>
+<summary><strong>👥 User Management (Admin Only)</strong></summary>
+<br>
+
+User management endpoints are for administrators only and do **not** require the `X-User-ID` header.
+
+**List All User Profiles (Public)**
+
+Get list of active user profiles (no authentication required):
+```bash
+curl http://YOUR_SERVER/api/v1/users/profiles
+```
+
+**List All Users with Statistics**
+
+Get detailed list of all users with storage info (admin only):
+```bash
+curl -u 'username:password' \
+  http://YOUR_SERVER/api/v1/admin/users
+```
+
+**Get Specific User**
+
+Get detailed information about a user:
+```bash
+curl -u 'username:password' \
+  http://YOUR_SERVER/api/v1/admin/users/1
+```
+
+**Create New User**
+
+Create a new user profile:
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"username": "newuser"}' \
+  http://YOUR_SERVER/api/v1/admin/users
+```
+
+**Update User**
+
+Update user properties (username, active status, admin status):
+```bash
+curl -X PATCH -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "renameduser",
+    "active": true,
+    "is_admin": false
+  }' \
+  http://YOUR_SERVER/api/v1/admin/users/2
+```
+
+**Delete User**
+
+Delete a user profile (without data):
+```bash
+curl -X DELETE -u 'username:password' \
+  http://YOUR_SERVER/api/v1/admin/users/2
+```
+
+Delete a user profile and all their data:
+```bash
+curl -X DELETE -u 'username:password' \
+  "http://YOUR_SERVER/api/v1/admin/users/2?delete_data=true"
+```
+
+**Get System Statistics**
+
+Get aggregated statistics for all users:
+```bash
+curl -u 'username:password' \
+  http://YOUR_SERVER/api/v1/admin/stats
+```
+
+**Repair Master Database**
+
+Scan and rebuild the master database registry:
+```bash
+curl -X POST -u 'username:password' \
+  http://YOUR_SERVER/api/v1/admin/repair
 ```
 
 </details>

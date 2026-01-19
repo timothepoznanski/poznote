@@ -522,8 +522,48 @@ function oidc_finish_login($claims, $tokens) {
         throw new Exception('User not authorized to access this application');
     }
     
+    // Find user profile based on OIDC claims
+    // Note: Profiles must be pre-created by an admin before OIDC users can log in
+    require_once __DIR__ . '/users/db_master.php';
+    
+    $email = $claims['email'] ?? '';
+    $preferredUsername = $claims['preferred_username'] ?? '';
+    
+    // Try to find existing user by preferred_username first
+    $user = null;
+    if ($preferredUsername) {
+        $user = getUserProfileByUsername($preferredUsername);
+    }
+    
+    // If not found, try by email
+    if (!$user && $email) {
+        $user = getUserProfileByUsername($email);
+    }
+    
+    // User profile must exist (no automatic creation)
+    if (!$user) {
+        $identifier = $preferredUsername ?: $email ?: ($claims['sub'] ?? 'unknown');
+        throw new Exception('No user profile found for "' . $identifier . '". Please contact an administrator to create your profile.');
+    }
+    
+    // Check if user is active
+    if (!$user['active']) {
+        throw new Exception('Your user profile is disabled. Please contact an administrator.');
+    }
+    
+    // Set up session with user profile
     $_SESSION['authenticated'] = true;
     $_SESSION['auth_method'] = 'oidc';
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['user'] = [
+        'id' => $user['id'],
+        'username' => $user['username'],
+        'is_admin' => (bool)$user['is_admin']
+    ];
+    
+    // Update last login
+    updateUserLastLogin($user['id']);
+    
     $_SESSION['oidc_sub'] = $claims['sub'] ?? null;
     $_SESSION['oidc_user'] = oidc_claims_to_display_user($claims);
     $_SESSION['oidc_claims'] = [

@@ -75,12 +75,15 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
  */
 function addEmptyFolders($con, $folders, $workspace_filter) {
     $folders_sql = "SELECT id, name, icon, icon_color FROM folders";
+    $params = [];
     if (!empty($workspace_filter)) {
-        $folders_sql .= " WHERE workspace = '" . addslashes($workspace_filter) . "'";
+        $folders_sql .= " WHERE workspace = ?";
+        $params[] = $workspace_filter;
     }
     $folders_sql .= " ORDER BY name";
 
-    $empty_folders_query = $con->query($folders_sql);
+    $empty_folders_query = $con->prepare($folders_sql);
+    $empty_folders_query->execute($params);
     while($folder_row = $empty_folders_query->fetch(PDO::FETCH_ASSOC)) {
         $folderId = (int)$folder_row['id'];
         $folderName = $folder_row['name'];

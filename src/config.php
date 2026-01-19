@@ -1,11 +1,17 @@
 <?php
-    // SQLite configuration
+    // ============================================================
+    // DATABASE CONFIGURATION
+    // ============================================================
+    // SQLite configuration (default path, used as fallback before user is authenticated)
     define("SQLITE_DATABASE", $_ENV['SQLITE_DATABASE'] ?? dirname(__DIR__) . '/data/database/poznote.db');
     define("SERVER_NAME", $_ENV['SERVER_NAME'] ?? 'localhost');
     
     // Default timezone (will be overridden by database setting if available)
     define("DEFAULT_TIMEZONE", 'Europe/Paris');
 
+    // ============================================================
+    // OIDC CONFIGURATION
+    // ============================================================
     // Optional OpenID Connect (OIDC) configuration
     // Configured exclusively via .env file for security
     define('OIDC_ENABLED', filter_var($_ENV['POZNOTE_OIDC_ENABLED'] ?? false, FILTER_VALIDATE_BOOL));

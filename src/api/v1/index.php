@@ -32,14 +32,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// Include required files
-require_once __DIR__ . '/../../auth.php';
+// Include required files (order matters!)
 require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../auth.php';
+
+// Check if this is an admin/user endpoint that doesn't need X-User-ID
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$isAdminEndpoint = strpos($uri, '/api/v1/admin') !== false;
+$isPublicProfilesEndpoint = strpos($uri, '/api/v1/users/profiles') !== false;
+
+// Require authentication (with X-User-ID for data endpoints, without for admin/public endpoints)
+if ($isAdminEndpoint || $isPublicProfilesEndpoint) {
+    // Admin endpoints only need credential validation, not X-User-ID
+    requireApiAuthAdmin();
+} else {
+    // Data endpoints require X-User-ID to know which user's data to access
+    requireApiAuth();
+}
+
+// Now load db_connect.php AFTER session is set up with user_id
+// This ensures the correct user database is used
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../functions.php';
-
-// Require authentication
-requireApiAuth();
 
 // Include controllers
 require_once __DIR__ . '/controllers/NotesController.php';
@@ -528,6 +542,55 @@ $router->post('/system/verify-password', function($params) use ($systemControlle
 // List shared notes
 $router->get('/shared', function($params) use ($systemController) {
     echo json_encode($systemController->listShared());
+});
+
+// ======================
+// User Profile Routes
+// ======================
+
+require_once __DIR__ . '/controllers/UsersController.php';
+$usersController = new UsersController($con);
+
+// Get available user profiles for login selector (public endpoint)
+$router->get('/users/profiles', function($params) use ($usersController) {
+    echo json_encode($usersController->profiles());
+});
+
+// Admin: System stats
+$router->get('/admin/stats', function($params) use ($usersController) {
+    echo json_encode($usersController->stats());
+});
+
+// Admin: List all user profiles
+$router->get('/admin/users', function($params) use ($usersController) {
+    echo json_encode($usersController->list($_GET));
+});
+
+// Admin: Get a specific user profile
+$router->get('/admin/users/{id}', function($params) use ($usersController) {
+    echo json_encode($usersController->get($params['id']));
+});
+
+// Admin: Create a new user profile
+$router->post('/admin/users', function($params) use ($usersController) {
+    $data = json_decode(file_get_contents('php://input'), true) ?? [];
+    echo json_encode($usersController->create($data));
+});
+
+// Admin: Update a user profile
+$router->patch('/admin/users/{id}', function($params) use ($usersController) {
+    $data = json_decode(file_get_contents('php://input'), true) ?? [];
+    echo json_encode($usersController->update($params['id'], $data));
+});
+
+// Admin: Repair system (rebuild master registry)
+$router->post('/admin/repair', function($params) use ($usersController) {
+    echo json_encode($usersController->repair());
+});
+
+// Admin: Delete a user profile
+$router->delete('/admin/users/{id}', function($params) use ($usersController) {
+    echo json_encode($usersController->delete($params['id'], $_GET));
 });
 
 // Dispatch the request

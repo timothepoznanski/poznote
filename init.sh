@@ -24,11 +24,3 @@ if [ -f "$DB_PATH" ]; then
     chown www-data:www-data "$DB_PATH"
     chmod 664 "$DB_PATH"
 fi
-
-# Auto-fix empty entry columns (runs once)
-echo "Running entry column fix check..."
-php /var/www/html/auto-fix-entries.php || true
-
-# Migrate subheadings to note content (moves non-empty subheadings to first line of notes)
-echo "Running subheading migration check..."
-php /var/www/html/migrate-subheadings.php || true

@@ -32,14 +32,14 @@ function openExcalidrawNote(noteId) {
         }
         return false;
     }
-    
+
     var params = new URLSearchParams({
         note_id: noteId
     });
     if (selectedWorkspace) {
         params.append('workspace', selectedWorkspace);
     }
-    
+
     // Redirect to Excalidraw editor
     window.location.href = 'excalidraw_editor.php?' + params.toString();
 }
@@ -49,24 +49,24 @@ function openExcalidrawNote(noteId) {
  */
 function isCursorInEditableNote() {
     const selection = window.getSelection();
-    
+
     // Check if there's a selection/cursor
     if (!selection.rangeCount) {
         return false;
     }
-    
+
     // Get the current element
     const range = selection.getRangeAt(0);
     let container = range.commonAncestorContainer;
     if (container.nodeType === 3) { // Text node
         container = container.parentNode;
     }
-    
+
     // Check if we're inside a contenteditable note area
     const editableElement = container.closest && container.closest('[contenteditable="true"]');
     const noteEntry = container.closest && container.closest('.noteentry');
     const markdownEditor = container.closest && container.closest('.markdown-editor');
-    
+
     // Return true if we're in any editable note context
     return (editableElement && noteEntry) || markdownEditor || (editableElement && editableElement.classList.contains('noteentry'));
 }
@@ -86,7 +86,7 @@ function insertExcalidrawDiagram() {
         }
         return false;
     }
-    
+
     // Check if cursor is in editable note first
     if (!isCursorInEditableNote()) {
         if (typeof window.showCursorWarning === 'function') {
@@ -99,7 +99,7 @@ function insertExcalidrawDiagram() {
         }
         return;
     }
-    
+
     // Check if the current note has content
     const currentNoteId = getCurrentNoteId();
     if (!currentNoteId) {
@@ -109,7 +109,7 @@ function insertExcalidrawDiagram() {
         );
         return;
     }
-    
+
     // Get the current note content
     const noteEntry = document.getElementById('entry' + currentNoteId);
     if (!noteEntry) {
@@ -119,23 +119,23 @@ function insertExcalidrawDiagram() {
         );
         return;
     }
-    
+
     // Show loading spinner
     const spinner = window.showLoadingSpinner(
         excaTr('excalidraw.spinner.saving_note', {}, 'Saving note...'),
         excaTr('excalidraw.spinner.saving_title', {}, 'Saving')
     );
-    
+
     // Create a unique ID for this diagram
     const diagramId = 'excalidraw-' + Date.now();
-    
+
     // Save the note and wait for completion
     saveNoteAndWaitForCompletion()
-        .then(function(success) {
+        .then(function (success) {
             if (success) {
                 // Note saved successfully
                 // Wait a bit more to ensure all handlers complete
-                setTimeout(function() {
+                setTimeout(function () {
                     openExcalidrawEditor(diagramId);
                     // Note: spinner will be closed when page navigates to editor
                 }, 300);
@@ -152,7 +152,7 @@ function insertExcalidrawDiagram() {
                 }
             }
         })
-        .catch(function(error) {
+        .catch(function (error) {
             // Error occurred, close spinner
             if (spinner && spinner.close) {
                 spinner.close();
@@ -173,74 +173,74 @@ function insertExcalidrawDiagram() {
 
 // Helper function to save note and wait for completion
 function saveNoteAndWaitForCompletion() {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         // Check that noteid is valid
         if (typeof noteid === 'undefined' || noteid == -1 || noteid == '' || noteid === null || noteid === undefined) {
             reject(new Error('Invalid note ID'));
             return;
         }
-        
+
         // Check if saveNoteToServer function exists
         if (typeof saveNoteToServer !== 'function') {
             reject(new Error('saveNoteToServer function not available'));
             return;
         }
-        
+
         // Clear any pending save timeout to avoid conflicts
         if (typeof saveTimeout !== 'undefined' && saveTimeout !== null) {
             clearTimeout(saveTimeout);
             saveTimeout = null;
         }
-        
+
         // Call the existing save function
         try {
             saveNoteToServer();
-            
+
             // Wait a bit for the save to complete
             // The save is asynchronous but we can check for indicators
             var checkCount = 0;
             var maxChecks = 20; // 2 seconds max (20 x 100ms)
-            
-            var checkInterval = setInterval(function() {
+
+            var checkInterval = setInterval(function () {
                 checkCount++;
-                
+
                 // Check if save completed by looking at indicators
                 var saveCompleted = true;
-                
+
                 // Check if there's still a pending save timeout
                 if (typeof saveTimeout !== 'undefined' && saveTimeout !== null) {
                     saveCompleted = false;
                 }
-                
+
                 // Check if note still needs refresh
-                if (typeof notesNeedingRefresh !== 'undefined' && 
-                    notesNeedingRefresh.has && 
+                if (typeof notesNeedingRefresh !== 'undefined' &&
+                    notesNeedingRefresh.has &&
                     notesNeedingRefresh.has(String(noteid))) {
                     saveCompleted = false;
                 }
-                
+
                 // Check if page title still has unsaved indicator
                 if (document.title.startsWith('🔴')) {
                     saveCompleted = false;
                 }
-                
+
                 if (saveCompleted || checkCount >= maxChecks) {
                     clearInterval(checkInterval);
-                    
+
                     // Clean up indicators to be sure
                     if (typeof saveTimeout !== 'undefined') {
                         clearTimeout(saveTimeout);
                         saveTimeout = null;
                     }
-                    
+
                     if (typeof notesNeedingRefresh !== 'undefined' && notesNeedingRefresh.delete) {
                         notesNeedingRefresh.delete(String(noteid));
                     }
-                    
+
                     if (document.title.startsWith('🔴')) {
                         document.title = document.title.substring(2);
                     }
-                    
+
                     // Clear draft from localStorage
                     try {
                         localStorage.removeItem('poznote_draft_' + noteid);
@@ -249,15 +249,15 @@ function saveNoteAndWaitForCompletion() {
                     } catch (err) {
                         // Ignore errors
                     }
-                    
+
                     if (checkCount >= maxChecks) {
                         console.warn('Save timeout reached, proceeding anyway');
                     }
-                    
+
                     resolve(true);
                 }
             }, 100); // Check every 100ms
-            
+
         } catch (error) {
             reject(error);
         }
@@ -278,7 +278,7 @@ function openExcalidrawEditor(diagramId) {
         }
         return false;
     }
-    
+
     // Store the current note context
     const currentNoteId = getCurrentNoteId();
     if (!currentNoteId) {
@@ -288,11 +288,11 @@ function openExcalidrawEditor(diagramId) {
         );
         return;
     }
-    
+
     // Get the note entry element to extract cursor position
     const noteEntry = document.getElementById('entry' + currentNoteId);
     let cursorPosition = null;
-    
+
     if (noteEntry) {
         const selection = window.getSelection();
         if (selection.rangeCount > 0) {
@@ -304,7 +304,7 @@ function openExcalidrawEditor(diagramId) {
             cursorPosition = preCaretRange.toString().length;
         }
     }
-    
+
     // Store diagram context in sessionStorage
     sessionStorage.setItem('excalidraw_context', JSON.stringify({
         noteId: currentNoteId,
@@ -312,7 +312,7 @@ function openExcalidrawEditor(diagramId) {
         returnUrl: window.location.href,
         cursorPosition: cursorPosition
     }));
-    
+
     // Redirect to Excalidraw editor with diagram context
     const params = new URLSearchParams({
         diagram_id: diagramId,
@@ -321,7 +321,7 @@ function openExcalidrawEditor(diagramId) {
     if (selectedWorkspace) {
         params.append('workspace', selectedWorkspace);
     }
-    
+
     window.location.href = 'excalidraw_editor.php?' + params.toString();
 }
 
@@ -331,14 +331,14 @@ function getCurrentNoteId() {
     if (typeof noteid !== 'undefined' && noteid !== -1 && noteid !== null && noteid !== 'search') {
         return noteid;
     }
-    
+
     // Try to get note ID from URL parameter
     const urlParams = new URLSearchParams(window.location.search);
     const noteId = urlParams.get('note');
     if (noteId) {
         return noteId;
     }
-    
+
     // Try to get from focused note element
     const focusedNote = document.querySelector('.note-item.focused');
     if (focusedNote) {
@@ -347,7 +347,7 @@ function getCurrentNoteId() {
             return noteElement.id.replace('note', '');
         }
     }
-    
+
     return null;
 }
 
@@ -355,7 +355,7 @@ function getCurrentNoteId() {
 function insertHtmlAtCursor(html) {
     let selection = window.getSelection();
     let insertionSuccessful = false;
-    
+
     // If there's a current selection, use it
     if (selection.rangeCount > 0) {
         const range = selection.getRangeAt(0);
@@ -368,32 +368,32 @@ function insertHtmlAtCursor(html) {
         insertionSuccessful = true;
     } else {
         // No selection, try to find the note content area and insert at the end
-        const noteContentElement = document.querySelector('.note-content[contenteditable="true"]') || 
-                                   document.querySelector('#note-content[contenteditable="true"]') ||
-                                   document.querySelector('[contenteditable="true"]');
-        
+        const noteContentElement = document.querySelector('.note-content[contenteditable="true"]') ||
+            document.querySelector('#note-content[contenteditable="true"]') ||
+            document.querySelector('[contenteditable="true"]');
+
         if (noteContentElement) {
             noteContentElement.focus();
-            
+
             // Create a range at the end of the content
             const range = document.createRange();
             range.selectNodeContents(noteContentElement);
             range.collapse(false); // Move to end
-            
+
             // Insert the HTML
             const fragment = range.createContextualFragment(html);
             range.insertNode(fragment);
             range.collapse(false);
-            
+
             // Update selection
             selection = window.getSelection();
             selection.removeAllRanges();
             selection.addRange(range);
-            
+
             insertionSuccessful = true;
         }
     }
-    
+
     // If we still couldn't insert, show a notification
     if (!insertionSuccessful) {
         if (window.showNotificationPopup) {
@@ -413,15 +413,19 @@ function insertHtmlAtCursor(html) {
 // Download Excalidraw diagram as PNG image
 function downloadExcalidrawImage(noteId) {
     // Get the PNG file path for this note
-    const pngPath = `data/entries/${noteId}.png`;
-    
+    let entriesPath = 'data/entries/';
+    if (typeof window.userEntriesPath !== 'undefined' && window.userEntriesPath) {
+        entriesPath = window.userEntriesPath;
+    }
+    const pngPath = `${entriesPath}${noteId}.png`;
+
     // Check if PNG exists by trying to load it
     const img = new Image();
-    img.onload = function() {
+    img.onload = function () {
         // PNG exists, download it
         downloadImageFromUrl(pngPath, `excalidraw-diagram-${noteId}.png`);
     };
-    img.onerror = function() {
+    img.onerror = function () {
         // PNG doesn't exist, show error message
         console.error('Excalidraw PNG not found for note ' + noteId);
         window.showError(

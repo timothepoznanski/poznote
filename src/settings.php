@@ -95,6 +95,32 @@ extract($search_params); // Extracts variables: $search, $tags_search, $note, et
 $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
 
 $currentLang = getUserLanguage();
+$currentUser = getCurrentUser();
+$displayName = htmlspecialchars($currentUser['display_name'] ?: $currentUser['username']);
+
+// Count workspaces
+$workspaces_count = 0;
+try {
+    if (isset($con)) {
+        $stmtWs = $con->prepare("SELECT COUNT(*) as cnt FROM workspaces");
+        $stmtWs->execute();
+        $workspaces_count = (int)$stmtWs->fetchColumn();
+    }
+} catch (Exception $e) {
+    $workspaces_count = 0;
+}
+
+// Count users (for admin)
+$users_count = 0;
+if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
+    try {
+        require_once 'users/db_master.php';
+        $users = listAllUserProfiles();
+        $users_count = count($users);
+    } catch (Exception $e) {
+        $users_count = 0;
+    }
+}
 
 ?>
 
@@ -104,16 +130,21 @@ $currentLang = getUserLanguage();
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-    <title><?php echo t_h('settings.title'); ?> - <?php echo t_h('app.name'); ?></title>
+    <title><?php echo $displayName; ?> - <?php echo t_h('app.name'); ?></title>
     <meta name="color-scheme" content="dark light">
-    <script src="js/theme-init.js"></script>
-    <link rel="stylesheet" href="css/fontawesome.min.css">
-    <link rel="stylesheet" href="css/all.css">
-    <link rel="stylesheet" href="css/modal-alerts.css">
-    <link rel="stylesheet" href="css/light.min.css">
-    <link rel="stylesheet" href="css/settings.css">
-    <link rel="stylesheet" href="css/modals.css">
-    <link rel="stylesheet" href="css/dark-mode.css">
+    <?php 
+    $cache_v = @file_get_contents('version.txt');
+    if ($cache_v === false) $cache_v = time();
+    $cache_v = urlencode(trim($cache_v));
+    ?>
+    <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
+    <link rel="stylesheet" href="css/fontawesome.min.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/all.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/light.min.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/settings.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode.css?v=<?php echo $cache_v; ?>">
 </head>
 <body data-txt-enabled="<?php echo t_h('common.enabled'); ?>"
       data-txt-disabled="<?php echo t_h('common.disabled'); ?>"
@@ -142,6 +173,30 @@ $currentLang = getUserLanguage();
                     </div>
                 </div>
 
+                <!-- Workspaces -->
+                <div class="settings-card settings-card-clickable" id="workspaces-card" data-href="workspaces.php">
+                    <div class="settings-card-icon">
+                        <i class="fa-layer-group"></i>
+                    </div>
+                    <div class="settings-card-content">
+                        <h3><?php echo t_h('settings.cards.workspaces', [], 'Workspaces'); ?> <span class="setting-status enabled"><?php echo $workspaces_count; ?></span></h3>
+                    </div>
+                </div>
+
+                <?php // Profile and admin links - always available ?>
+                
+                <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
+                <!-- User Management (Admin only) -->
+                <div class="settings-card settings-card-clickable" id="users-admin-card" data-href="admin/users.php">
+                    <div class="settings-card-icon">
+                        <i class="fa-users-cog"></i>
+                    </div>
+                    <div class="settings-card-content">
+                        <h3><?php echo t_h('settings.cards.user_management', [], 'User Management'); ?> <span class="setting-status enabled"><?php echo $users_count; ?></span></h3>
+                    </div>
+                </div>
+                <?php endif; ?>
+
                 <!-- Backup / Export -->
                 <div class="settings-card" id="backup-export-card">
                     <div class="settings-card-icon">
@@ -162,6 +217,7 @@ $currentLang = getUserLanguage();
                     </div>
                 </div>
 
+                <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
                 <!-- Check for Updates -->
                 <div class="settings-card" id="check-updates-card">
                     <div class="settings-card-icon">
@@ -172,6 +228,7 @@ $currentLang = getUserLanguage();
                         <h3><?php echo t_h('settings.cards.check_updates'); ?></h3>
                     </div>
                 </div>
+                <?php endif; ?>
 
                 <!-- API Documentation -->
                 <div class="settings-card" id="api-docs-card">
@@ -229,6 +286,7 @@ $currentLang = getUserLanguage();
                 <!-- Mobile Separator -->
                 <div class="settings-sep settings-sep-mobile"></div>
                 
+                <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
                 <!-- Login Display -->
                 <div class="settings-card" id="login-display-card">
                     <div class="settings-card-icon">
@@ -238,6 +296,7 @@ $currentLang = getUserLanguage();
                         <h3><?php echo t_h('display.cards.login_display'); ?> <span id="login-display-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
                     </div>
                 </div>
+                <?php endif; ?>
 
                 <!-- Language -->
                 <div class="settings-card" id="language-card">

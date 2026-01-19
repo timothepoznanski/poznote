@@ -242,15 +242,16 @@ if ($scriptDir && $scriptDir !== '/') {
 }
 
 // Replace src and href references that point to relative attachments path
-$attachmentsRel = 'data/attachments/';
-// Common patterns: src="data/attachments/..." or src='data/attachments/...' or src=/data/attachments/...
-$content = preg_replace_callback('#(src|href)=(["\']?)(/?' . preg_quote($attachmentsRel, '#') . ')([^"\'\s>]+)(["\']?)#i', function($m) use ($baseUrl, $attachmentsRel) {
+// This handles both legacy "data/attachments/" and multi-user "data/users/ID/attachments/"
+$content = preg_replace_callback('#(src|href)=(["\']?)(/?data/(?:users/\d+/)?attachments/)([^"\'\s>]+)(["\']?)#i', function($m) use ($baseUrl) {
     $attr = $m[1];
     $quote = $m[2] ?: '';
-    $path = $m[4];
+    $relPath = $m[3];
+    $fileName = $m[4];
+    
     // Ensure no duplicate slashes
-    $url = rtrim($baseUrl, '/') . '/' . ltrim($attachmentsRel, '/');
-    $url = rtrim($url, '/') . '/' . ltrim($path, '/');
+    $url = rtrim($baseUrl, '/') . '/' . ltrim($relPath, '/');
+    $url = rtrim($url, '/') . '/' . ltrim($fileName, '/');
     return $attr . '=' . $quote . $url . $quote;
 }, $content);
 

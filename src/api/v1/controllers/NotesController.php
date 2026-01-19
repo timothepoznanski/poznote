@@ -711,15 +711,7 @@ class NotesController {
         
         // Delete note file
         $noteType = $note['type'] ?? 'note';
-        $fileExtension = ($noteType === 'markdown') ? '.md' : '.html';
-        
-        $wsSegment = $workspace ? ('workspace_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($workspace))) : 'workspace_default';
-        $note_file_path = __DIR__ . '/../../entries/' . $wsSegment . '/';
-        
-        if (!empty($note['folder'])) {
-            $note_file_path .= $note['folder'] . '/';
-        }
-        $note_file_path .= $noteId . $fileExtension;
+        $note_file_path = getEntryFilename($noteId, $noteType);
         
         $file_deleted = false;
         if (file_exists($note_file_path)) {
@@ -727,12 +719,12 @@ class NotesController {
         }
         
         // Delete PNG file for Excalidraw
-        $png_deleted = false;
         $png_file_path = getEntriesPath() . '/' . $noteId . '.png';
+        $png_deleted = false;
         if (file_exists($png_file_path)) {
             $png_deleted = unlink($png_file_path);
         }
-        
+
         // Delete database entry
         if ($workspace) {
             $stmt = $this->con->prepare("DELETE FROM entries WHERE id = ? AND workspace = ?");
