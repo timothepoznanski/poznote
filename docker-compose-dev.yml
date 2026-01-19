@@ -6,8 +6,8 @@ services:
     restart: always      
     environment:
       SQLITE_DATABASE: /var/www/html/data/database/poznote.db
-      POZNOTE_USERNAME: ${POZNOTE_USERNAME}
-      POZNOTE_PASSWORD: ${POZNOTE_PASSWORD}
+      POZNOTE_USERNAME: ${POZNOTE_USERNAME:-admin}
+      POZNOTE_PASSWORD: ${POZNOTE_PASSWORD:-admin}
       POZNOTE_USERNAME_USER: ${POZNOTE_USERNAME_USER:-user}
       POZNOTE_PASSWORD_USER: ${POZNOTE_PASSWORD_USER:-user}
       HTTP_WEB_PORT: ${HTTP_WEB_PORT}
