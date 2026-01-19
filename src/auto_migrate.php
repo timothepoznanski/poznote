@@ -28,9 +28,9 @@ function checkAndMigrateToMultiUser(): void {
     
     // If no old database exists, this is either a fresh install or migration already complete
     if (!file_exists($oldDbPath)) {
-        // Clean up any empty old directories
+        // Rename old directories to .old
         if (file_exists($masterDbPath)) {
-            cleanupOldDirectories($dataDir);
+            renameOldDirectories($dataDir);
         }
         return;
     }
@@ -58,8 +58,8 @@ function checkAndMigrateToMultiUser(): void {
     }
     
     if (!$needsDataMigration) {
-        // Data already migrated, just clean up old directories
-        cleanupOldDirectories($dataDir);
+        // Rename old directories if they exist
+        renameOldDirectories($dataDir);
         return;
     }
     
@@ -290,8 +290,8 @@ function checkAndMigrateToMultiUser(): void {
         
         error_log("Poznote: Migration complete!");
         
-        // Step 11: Clean up old directories if empty
-        cleanupOldDirectories($dataDir);
+        // Step 11: Rename old directories to .old
+        renameOldDirectories($dataDir);
         
     } catch (Exception $e) {
         error_log("Poznote: Migration failed: " . $e->getMessage());
@@ -373,70 +373,32 @@ function moveDirectoryContents(string $src, string $dest): void {
 }
 
 /**
- * Clean up old single-user directories after successful migration
- * Only removes directories that are completely empty
+ * Rename old single-user directories to .old after migration
+ * This preserves old data instead of deleting it
  */
-function cleanupOldDirectories(string $dataDir): void {
-    $oldDirs = [
-        $dataDir . '/database',
-        $dataDir . '/entries', 
-        $dataDir . '/attachments',
-        $dataDir . '/backups'
-    ];
+function renameOldDirectories(string $dataDir): void {
+    $oldDirs = ['database', 'entries', 'attachments', 'backups'];
     
-    foreach ($oldDirs as $dir) {
-        if (is_dir($dir)) {
-            // Recursively remove empty subdirectories first
-            removeEmptySubdirectories($dir);
-            
-            // Then try to remove the main directory if empty
-            if (isDirectoryEmpty($dir)) {
-                if (@rmdir($dir)) {
-                    error_log("Poznote: Cleaned up empty directory: " . basename($dir));
+    foreach ($oldDirs as $dirName) {
+        $oldPath = $dataDir . '/' . $dirName;
+        $newPath = $dataDir . '/' . $dirName . '.old';
+        
+        if (is_dir($oldPath)) {
+            // Case-insensitive check if it's already renamed or if migration was already done
+            if (!file_exists($newPath)) {
+                if (@rename($oldPath, $newPath)) {
+                    error_log("Poznote: Renamed old directory $dirName to $dirName.old");
+                } else {
+                    error_log("Poznote: Failed to rename old directory $dirName");
                 }
             } else {
-                error_log("Poznote: Directory not empty after migration, keeping: " . basename($dir));
+                // If .old already exists but the original still exists, it might be a failed previous attempt
+                // or some files were left behind. We could try to merge or just leave it.
+                // For safety, we just log it.
+                error_log("Poznote: Directory $dirName.old already exists, skipping rename of $dirName");
             }
         }
     }
-}
-
-/**
- * Recursively remove empty subdirectories
- */
-function removeEmptySubdirectories(string $dir): void {
-    if (!is_dir($dir)) {
-        return;
-    }
-    
-    $items = scandir($dir);
-    foreach ($items as $item) {
-        if ($item === '.' || $item === '..') {
-            continue;
-        }
-        
-        $path = $dir . '/' . $item;
-        if (is_dir($path)) {
-            // Recurse first
-            removeEmptySubdirectories($path);
-            // Then try to remove if empty
-            if (isDirectoryEmpty($path)) {
-                @rmdir($path);
-            }
-        }
-    }
-}
-
-/**
- * Check if a directory is empty (no files or subdirectories)
- */
-function isDirectoryEmpty(string $dir): bool {
-    if (!is_dir($dir)) {
-        return true;
-    }
-    
-    $iterator = new FilesystemIterator($dir);
-    return !$iterator->valid();
 }
 
 // Run migration check

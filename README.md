@@ -566,13 +566,25 @@ Occasionally, beta versions will be published as **pre-releases** on GitHub. The
 
 You can install beta versions by modifying your `docker-compose.yml` to use a specific version tag instead of `latest`:
 
-1. Edit your `docker-compose.yml` file and change the image line to:
+1. Download the latest Docker Compose configuration:
+   ```bash
+   curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
+   ```
+
+2. Download the latest .env.example:
+   ```bash
+   curl -o .env.example https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.example
+   ```
+
+3. Review `.env.example` and add any new variables to your `.env` file if needed.
+
+4. Edit your `docker-compose.yml` file and change the image line to:
    ```yaml
    image: ghcr.io/timothepoznanski/poznote:X.X.X-beta
    ```
    Replace `X.X.X-beta` with the specific beta version from the [GitHub Releases](https://github.com/timothepoznanski/poznote/releases) page.
 
-2. Update and restart:
+5. Update and restart:
    ```bash
    docker compose down
    docker compose pull
