@@ -19,7 +19,7 @@ require_once __DIR__ . '/config.php';
  * Returns the user ID to use (1 if migrated or single profile)
  */
 function checkAndMigrateToMultiUser(): void {
-    $dataDir = dirname(__DIR__) . '/data';
+    $dataDir = __DIR__ . '/data';
     $masterDbPath = $dataDir . '/master.db';
     $oldDbPath = $dataDir . '/database/poznote.db';
     $usersDir = $dataDir . '/users';

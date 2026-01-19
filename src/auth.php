@@ -18,6 +18,9 @@ session_start();
 // Load config first
 require_once __DIR__ . '/config.php';
 
+// Ensure multi-user migration runs on first access (before any auth checks)
+require_once __DIR__ . '/auto_migrate.php';
+
 // Authentication configuration - single global password
 define("AUTH_USERNAME", $_ENV['POZNOTE_USERNAME'] ?? 'admin');
 define("AUTH_PASSWORD", $_ENV['POZNOTE_PASSWORD'] ?? 'admin123');
