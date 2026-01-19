@@ -281,6 +281,7 @@
             "spanish": "Espagnol",
             "portuguese": "Portugais",
             "german": "Allemand",
+            "login_page": "Langue de la page de connexion :",
             "saved": "Langue enregistrée",
             "save_error": "Impossible d'enregistrer la langue",
             "reload_hint": "Rechargement…"
@@ -1079,6 +1080,8 @@
         "no_profiles": "Aucun profil utilisateur disponible. Veuillez contacter l'administrateur.",
         "errors": {
             "invalid_credentials": "Nom d’utilisateur ou mot de passe incorrect.",
+            "oidc_disabled": "Votre compte a été désactivé par un administrateur. Veuillez le contacter pour plus d'informations.",
+            "oidc_no_profile": "Aucun profil utilisateur trouvé pour \"{{identifier}}\". Veuillez contacter un administrateur pour créer votre profil.",
             "oidc_failed": "Échec de la connexion SSO. Veuillez réessayer.",
             "oidc_unauthorized": "Vous n'êtes pas autorisé à accéder à cette application. Veuillez contacter votre administrateur."
         }

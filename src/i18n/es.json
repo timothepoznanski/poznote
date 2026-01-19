@@ -279,6 +279,7 @@
             "spanish": "Español",
             "portuguese": "Portugués",
             "german": "Alemán",
+            "login_page": "Idioma de la página de inicio de sesión:",
             "saved": "Idioma guardado",
             "save_error": "No se pudo guardar el idioma",
             "reload_hint": "Recargando…"
@@ -1068,6 +1069,8 @@
         "no_profiles": "No hay perfiles de usuario disponibles. Por favor, contacta al administrador.",
         "errors": {
             "invalid_credentials": "Nombre de usuario o contraseña incorrectos.",
+            "oidc_disabled": "Tu cuenta ha sido desactivada por un administrador. Por favor, contacta con él para más información.",
+            "oidc_no_profile": "No se encontró ningún perfil de usuario para \"{{identifier}}\". Por favor, contacta con un administrador para crear tu perfil.",
             "oidc_failed": "Falló el inicio de sesión SSO. Por favor, inténtalo de nuevo.",
             "oidc_unauthorized": "No estás autorizado para acceder a esta aplicación. Por favor, contacta con tu administrador."
         }

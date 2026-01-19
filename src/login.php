@@ -42,6 +42,24 @@ try {
     $currentLang = 'en';
     $default_workspace = '';
 }
+// Detect language change from selector
+if (isset($_GET['lang'])) {
+    $requestedLang = strtolower(trim((string)$_GET['lang']));
+    if (preg_match('/^[a-z]{2}(-[a-z]{2})?$/', $requestedLang)) {
+        setcookie('login_lang', $requestedLang, [
+            'expires' => time() + (86400 * 30),
+            'path' => '/',
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]);
+        $currentLang = $requestedLang;
+    }
+} elseif (isset($_COOKIE['login_lang'])) {
+    $cookieLang = strtolower(trim((string)$_COOKIE['login_lang']));
+    if (preg_match('/^[a-z]{2}(-[a-z]{2})?$/', $cookieLang)) {
+        $currentLang = $cookieLang;
+    }
+}
 
 // If already authenticated, redirect to home
 if (isAuthenticated()) {
@@ -80,6 +98,11 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
 if (isset($_GET['oidc_error'])) {
     if ($_GET['oidc_error'] === 'unauthorized') {
         $oidcError = t('login.errors.oidc_unauthorized', [], 'You are not authorized to access this application. Please contact your administrator.', $currentLang ?? 'en');
+    } elseif ($_GET['oidc_error'] === 'no_profile') {
+        $identifier = $_GET['identifier'] ?? 'unknown';
+        $oidcError = t('login.errors.oidc_no_profile', ['identifier' => $identifier], 'No user profile found for "' . $identifier . '". Please contact an administrator to create your profile.', $currentLang ?? 'en');
+    } elseif ($_GET['oidc_error'] === 'disabled') {
+        $oidcError = t('login.errors.oidc_disabled', [], 'Your account has been disabled by an administrator. Please contact them for more information.', $currentLang ?? 'en');
     } elseif ($_GET['oidc_error'] === '1') {
         $oidcError = t('login.errors.oidc_failed', [], 'SSO login failed. Please try again.', $currentLang ?? 'en');
     }
@@ -133,6 +156,26 @@ if (isset($_GET['oidc_error'])) {
         $showNormalLogin = !(function_exists('oidc_is_enabled') && oidc_is_enabled() && defined('OIDC_DISABLE_NORMAL_LOGIN') && OIDC_DISABLE_NORMAL_LOGIN);
         if ($showNormalLogin): 
         ?>
+        <div class="language-selector" style="margin-bottom: 2rem; text-align: center;">
+            <form method="GET" id="lang-form">
+                <select name="lang" onchange="this.form.submit()" style="background: none; border: none; font-size: 0.85rem; color: var(--text-muted); cursor: pointer; opacity: 0.8; outline: none; transition: opacity 0.2s;">
+                    <?php 
+                    $langs = [
+                        'en' => 'English',
+                        'fr' => 'Français',
+                        'es' => 'Español',
+                        'de' => 'Deutsch',
+                        'pt' => 'Português'
+                    ];
+                    foreach ($langs as $code => $label): ?>
+                        <option value="<?php echo $code; ?>" <?php echo ($currentLang === $code) ? 'selected' : ''; ?>>
+                            <?php echo $label; ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </form>
+        </div>
+
         <form method="POST">
             <div class="form-group">
                 <input type="text" id="username" name="username" placeholder="<?php echo t_h('login.fields.username', [], 'Username', $currentLang ?? 'en'); ?>" required autofocus autocomplete="username">
@@ -162,6 +205,7 @@ if (isset($_GET['oidc_error'])) {
         <?php if ($oidcError): ?>
             <div class="error oidc-error"><?php echo htmlspecialchars($oidcError); ?></div>
         <?php endif; ?>
+
         <p class="github-link">
             <a href="https://github.com/timothepoznanski/poznote" target="_blank">
                 <?php echo t_h('login.documentation', [], 'Poznote documentation', $currentLang ?? 'en'); ?>

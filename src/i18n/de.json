@@ -279,6 +279,7 @@
             "spanish": "Spanisch",
             "portuguese": "Portugiesisch",
             "german": "Deutsch",
+            "login_page": "Sprache der Anmeldeseite:",
             "saved": "Sprache gespeichert",
             "save_error": "Sprache konnte nicht gespeichert werden",
             "reload_hint": "Lädt neu…"
@@ -1068,6 +1069,8 @@
         "no_profiles": "Keine Benutzerprofile verfügbar. Bitte kontaktieren Sie den Administrator.",
         "errors": {
             "invalid_credentials": "Falscher Benutzername oder Passwort.",
+            "oidc_disabled": "Ihr Konto wurde von einem Administrator deaktiviert. Bitte kontaktieren Sie ihn für weitere Informationen.",
+            "oidc_no_profile": "Kein Benutzerprofil für \"{{identifier}}\" gefunden. Bitte kontaktieren Sie einen Administrator, um Ihr Profil zu erstellen.",
             "oidc_failed": "SSO-Anmeldung fehlgeschlagen. Bitte erneut versuchen.",
             "oidc_unauthorized": "Sie sind nicht berechtigt, auf diese Anwendung zuzugreifen. Bitte wenden Sie sich an Ihren Administrator."
         }

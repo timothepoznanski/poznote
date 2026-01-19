@@ -281,6 +281,7 @@
             "spanish": "Spanish",
             "portuguese": "Portuguese",
             "german": "German",
+            "login_page": "Login page language:",
             "saved": "Language saved",
             "save_error": "Could not save language",
             "reload_hint": "Reloading…"
@@ -1069,6 +1070,8 @@
         "no_profiles": "No user profiles available. Please contact the administrator.",
         "errors": {
             "invalid_credentials": "Incorrect username or password.",
+            "oidc_disabled": "Your account has been disabled by an administrator. Please contact them for more information.",
+            "oidc_no_profile": "No user profile found for \"{{identifier}}\". Please contact an administrator to create your profile.",
             "oidc_failed": "SSO login failed. Please try again.",
             "oidc_unauthorized": "You are not authorized to access this application. Please contact your administrator."
         }
