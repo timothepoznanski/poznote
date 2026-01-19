@@ -253,13 +253,30 @@ jobs:
           echo "$TAGS" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
+      - name: Determine Docker platforms
+        if: steps.check_version.outputs.needs_update == 'true'
+        id: docker_platforms
+        run: |
+          VERSION="${{ steps.check_version.outputs.version_clean }}"
+          
+          # Only build ARM for stable versions (not beta versions)
+          if [[ "$VERSION" == *"-beta"* ]]; then
+            PLATFORMS="linux/amd64"
+            echo "🧪 Beta version detected - building only for AMD64 (no ARM)"
+          else
+            PLATFORMS="linux/amd64,linux/arm64"
+            echo "📦 Stable/test version - building for AMD64 and ARM64"
+          fi
+          
+          echo "platforms=$PLATFORMS" >> $GITHUB_OUTPUT
+
       - name: Build and push Docker image
         if: steps.check_version.outputs.needs_update == 'true'
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ steps.docker_platforms.outputs.platforms }}
           build-args: |
             BUILD_DATE=${{ github.event.head_commit.timestamp }}
             VERSION=${{ steps.check_version.outputs.version_clean }}

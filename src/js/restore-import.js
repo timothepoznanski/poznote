@@ -56,9 +56,9 @@ function toggleCard(targetId) {
     const content = document.getElementById(targetId);
     const header = document.querySelector(`[data-target="${targetId}"]`);
     const chevron = header?.querySelector('.chevron');
-    
+
     if (!content) return;
-    
+
     if (content.classList.contains('open')) {
         content.classList.remove('open');
         chevron?.classList.remove('open');
@@ -73,9 +73,9 @@ function toggleSubCard(targetId) {
     const content = document.getElementById(targetId);
     const header = document.querySelector(`[data-target="${targetId}"]`);
     const chevron = header?.querySelector('.chevron');
-    
+
     if (!content) return;
-    
+
     if (content.classList.contains('open')) {
         content.classList.remove('open');
         chevron?.classList.remove('open');
@@ -99,7 +99,7 @@ function handleRestoreImportClick(e) {
             const cardTarget = target.dataset.target;
             if (cardTarget) toggleCard(cardTarget);
             break;
-        
+
         // Sub-card toggles
         case 'toggle-sub-card':
             const subCardTarget = target.dataset.target;
@@ -167,11 +167,16 @@ function handleRestoreImportClick(e) {
         case 'hide-custom-alert':
             hideCustomAlert();
             break;
+
+        // Maintenance actions
+        case 'run-repair':
+            runRepair(target);
+            break;
     }
 }
 
 // Initialize event listeners when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Load config from JSON element if present
     const configEl = document.getElementById('restore-import-config');
     if (configEl) {
@@ -191,14 +196,14 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', handleRestoreImportClick);
 
     // Close modal when clicking outside
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         if (e.target.classList.contains('import-confirm-modal') || e.target.classList.contains('custom-alert')) {
             e.target.style.display = 'none';
         }
     });
 
     // Close modal with Escape key
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
             hideImportConfirmation();
             hideNotesImportConfirmation();
@@ -209,10 +214,10 @@ document.addEventListener('DOMContentLoaded', function() {
             hideCustomAlert();
         }
     });
-    
+
     // Load workspaces for individual notes import
     loadWorkspacesForImport();
-    
+
     // Setup drag and drop visual feedback
     setupDragAndDrop();
 
@@ -222,15 +227,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup workspace select change listener
     const workspaceSelect = document.getElementById('target_workspace_select');
     if (workspaceSelect) {
-        workspaceSelect.addEventListener('change', function() {
+        workspaceSelect.addEventListener('change', function () {
             loadFoldersForImport(this.value);
         });
     }
 
     // Update Back to Notes link with current workspace from PHP
     try {
-        const workspace = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace : 
-                          (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : null;
+        const workspace = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace :
+            (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : null;
         if (workspace) {
             const backLink = document.getElementById('backToNotesLink');
             if (backLink) backLink.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(workspace));
@@ -243,17 +248,17 @@ function setupFileInputListeners() {
     const completeFileInput = document.getElementById('complete_backup_file');
 
     if (completeFileInput) {
-        completeFileInput.addEventListener('change', function(e) {
+        completeFileInput.addEventListener('change', function (e) {
             const file = e.target.files[0];
             const button = document.getElementById('completeRestoreBtn');
             const sizeText = button ? button.parentElement.querySelector('small') : null;
-            
+
             if (file && file.name.toLowerCase().endsWith('.zip')) {
                 const sizeMB = file.size / (1024 * 1024);
-                
+
                 button.disabled = false;
                 button.textContent = tr('restore_import.inline.standard.button', 'Start Complete Restore (Standard)');
-                
+
                 if (sizeText) {
                     if (sizeMB > 500) {
                         sizeText.textContent = tr(
@@ -285,15 +290,15 @@ function showCompleteRestoreConfirmation() {
         );
         return;
     }
-    
+
     const file = fileInput.files[0];
     const sizeMB = file.size / (1024 * 1024);
-    
+
     // Update modal content based on file size
     const modal = document.getElementById('completeRestoreConfirmModal');
     const modalContent = modal.querySelector('.import-confirm-modal-content');
     const warningText = modalContent.querySelector('p');
-    
+
     if (sizeMB > 500) {
         warningText.innerHTML = tr(
             'restore_import.modals.complete_restore.warning_large_html',
@@ -307,7 +312,7 @@ function showCompleteRestoreConfirmation() {
             null
         );
     }
-    
+
     modal.style.display = 'flex';
 }
 
@@ -317,7 +322,7 @@ function hideCompleteRestoreConfirmation() {
 
 function proceedWithCompleteRestore() {
     const forms = document.querySelectorAll('form[method="post"]');
-    const completeForm = Array.from(forms).find(form => 
+    const completeForm = Array.from(forms).find(form =>
         form.querySelector('input[name="action"][value="complete_restore"]')
     );
     if (completeForm) {
@@ -336,7 +341,7 @@ function proceedWithCompleteRestore() {
 function toggleAdvancedImport() {
     const advancedOptions = document.getElementById('advancedImportOptions');
     const toggleButton = document.querySelector('button[onclick="toggleAdvancedImport()"]');
-    
+
     if (advancedOptions.style.display === 'none') {
         advancedOptions.style.display = 'block';
         toggleButton.innerHTML = '<i class="fa-chevron-up"></i> ' + tr('restore_import.advanced.hide', 'Hide Advanced Import Options');
@@ -395,7 +400,7 @@ function hideNotesImportConfirmation() {
 
 function proceedWithNotesImport() {
     const forms = document.querySelectorAll('form[method="post"]');
-    const notesForm = Array.from(forms).find(form => 
+    const notesForm = Array.from(forms).find(form =>
         form.querySelector('input[name="action"][value="import_notes"]')
     );
     if (notesForm) {
@@ -422,7 +427,7 @@ function hideAttachmentsImportConfirmation() {
 
 function proceedWithAttachmentsImport() {
     const forms = document.querySelectorAll('form[method="post"]');
-    const attachmentsForm = Array.from(forms).find(form => 
+    const attachmentsForm = Array.from(forms).find(form =>
         form.querySelector('input[name="action"][value="import_attachments"]')
     );
     if (attachmentsForm) {
@@ -435,7 +440,7 @@ function showIndividualNotesImportConfirmation() {
     const fileInput = document.getElementById('individual_notes_files');
     const workspaceSelect = document.getElementById('target_workspace_select');
     const folderSelect = document.getElementById('target_folder_select');
-    
+
     if (!fileInput.files.length) {
         showCustomAlert(
             tr('restore_import.alerts.no_files_selected_title', 'No Files Selected'),
@@ -443,7 +448,7 @@ function showIndividualNotesImportConfirmation() {
         );
         return;
     }
-    
+
     // Validate workspace selection
     if (!workspaceSelect.value) {
         showCustomAlert(
@@ -452,16 +457,16 @@ function showIndividualNotesImportConfirmation() {
         );
         return;
     }
-    
+
     const fileCount = fileInput.files.length;
     const workspace = workspaceSelect.options[workspaceSelect.selectedIndex].text;
     const folder = folderSelect.value ? folderSelect.options[folderSelect.selectedIndex].text : tr('restore_import.sections.individual_notes.no_folder', 'No folder (root level)');
-    
+
     // Check if it's a single ZIP file
     const isSingleZip = fileCount === 1 && fileInput.files[0].name.toLowerCase().endsWith('.zip');
-    
+
     let summary = '';
-    
+
     if (isSingleZip) {
         // For ZIP files, show different confirmation message
         summary = tr(
@@ -472,7 +477,7 @@ function showIndividualNotesImportConfirmation() {
     } else {
         // Check file count limit for non-ZIP uploads
         const maxFiles = window.POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES || 50;
-        
+
         if (fileCount > maxFiles) {
             showCustomAlert(
                 tr('restore_import.alerts.too_many_files_title', 'Too Many Files Selected'),
@@ -484,7 +489,7 @@ function showIndividualNotesImportConfirmation() {
             );
             return;
         }
-        
+
         // Update summary text for individual files
         const fileText = fileCount === 1
             ? tr('restore_import.individual_notes.file_count_one', '1 note')
@@ -496,7 +501,7 @@ function showIndividualNotesImportConfirmation() {
             { fileText: fileText, workspace: workspace, folder: folder }
         );
     }
-    
+
     document.getElementById('individualNotesImportSummary').textContent = summary;
     document.getElementById('individualNotesImportConfirmModal').style.display = 'flex';
 }
@@ -564,12 +569,12 @@ function proceedWithDirectCopyRestore() {
         form.method = 'post';
         form.id = 'directCopyRestoreForm';
         form.style.display = 'none';
-        
+
         const actionInput = document.createElement('input');
         actionInput.type = 'hidden';
         actionInput.name = 'action';
         actionInput.value = 'restore_cli_upload';
-        
+
         form.appendChild(actionInput);
         document.body.appendChild(form);
     }
@@ -611,7 +616,7 @@ function hideRestoreSpinner() {
 function loadWorkspacesForImport() {
     const workspaceSelect = document.getElementById('target_workspace_select');
     if (!workspaceSelect) return;
-    
+
     fetch('/api/v1/workspaces', {
         method: 'GET',
         headers: { 'Accept': 'application/json' },
@@ -621,27 +626,27 @@ function loadWorkspacesForImport() {
         .then(data => {
             if (data.success && data.workspaces) {
                 workspaceSelect.innerHTML = '';
-                
+
                 // Get the workspace from PHP global (no more localStorage)
-                const currentWorkspace = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace : 
-                                         (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : null;
-                
+                const currentWorkspace = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace :
+                    (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : null;
+
                 // Add workspaces to select
                 data.workspaces.forEach(workspace => {
                     const option = document.createElement('option');
                     option.value = workspace.name;
                     option.textContent = workspace.name;
-                    
+
                     // Select current workspace if it exists, otherwise select first one
                     if (currentWorkspace && workspace.name === currentWorkspace) {
                         option.selected = true;
                     } else if (!currentWorkspace && workspaceSelect.options.length === 0) {
                         option.selected = true;
                     }
-                    
+
                     workspaceSelect.appendChild(option);
                 });
-                
+
                 // Load folders for the selected workspace
                 const selectedWs = workspaceSelect.value;
                 if (selectedWs) {
@@ -660,23 +665,23 @@ function loadWorkspacesForImport() {
 
 // Load folders for selected workspace
 function loadFoldersForImport(workspace) {
-    
+
     const folderSelect = document.getElementById('target_folder_select');
     if (!folderSelect) {
         console.error('folderSelect element not found!');
         return;
     }
-    
+
     // Reset to "No folder" option
-    folderSelect.innerHTML = '<option value="">' + 
-        tr('restore_import.sections.individual_notes.no_folder', 'No folder (root level)') + 
+    folderSelect.innerHTML = '<option value="">' +
+        tr('restore_import.sections.individual_notes.no_folder', 'No folder (root level)') +
         '</option>';
-    
+
     if (!workspace) {
         console.log('No workspace selected, skipping folder load');
         return;
     }
-    
+
     // Fetch folders for the selected workspace
     fetch('/api/v1/folders?workspace=' + encodeURIComponent(workspace) + '&hierarchical=true', {
         method: 'GET',
@@ -687,7 +692,7 @@ function loadFoldersForImport(workspace) {
     })
         .then(response => response.json())
         .then(data => {
-            
+
             if (data.success && data.folders) {
                 // Flatten the hierarchical structure for simple display
                 const flattenFolders = (folders, prefix = '') => {
@@ -695,16 +700,16 @@ function loadFoldersForImport(workspace) {
                     folders.forEach(folder => {
                         const displayName = prefix + folder.name;
                         result.push({ name: folder.name, displayName: displayName });
-                        
+
                         if (folder.children && folder.children.length > 0) {
                             result = result.concat(flattenFolders(folder.children, displayName + ' / '));
                         }
                     });
                     return result;
                 };
-                
+
                 const flatFolders = flattenFolders(data.folders);
-                
+
                 flatFolders.forEach(folder => {
                     const option = document.createElement('option');
                     option.value = folder.name;
@@ -727,25 +732,25 @@ function setupDragAndDrop() {
         { id: 'notes_file', key: 'restore_import.drag_drop.notes', fallback: 'Drop notes ZIP here' },
         { id: 'attachments_file', key: 'restore_import.drag_drop.attachments', fallback: 'Drop attachments ZIP here' }
     ];
-    
+
     fileInputs.forEach(config => {
         const input = document.getElementById(config.id);
         if (!input) return;
-        
+
         const container = input.closest('.form-group') || input.parentElement;
         if (!container) return;
-        
+
         // Create drop overlay element
         const dropOverlay = document.createElement('div');
         dropOverlay.className = 'drop-overlay';
         dropOverlay.style.display = 'none';
-        
+
         const dropText = document.createElement('div');
         dropText.className = 'drop-overlay-text';
         dropText.innerHTML = '📁 <span class="drop-message"></span>';
         dropOverlay.appendChild(dropText);
         container.appendChild(dropOverlay);
-        
+
         // Function to update text with translation
         const updateDropText = () => {
             const message = dropText.querySelector('.drop-message');
@@ -753,18 +758,18 @@ function setupDragAndDrop() {
                 message.textContent = tr(config.key, config.fallback);
             }
         };
-        
+
         // Update text initially and when translations load
         updateDropText();
         if (window.loadPoznoteI18n) {
             setTimeout(updateDropText, 100);
         }
-        
+
         // Prevent default drag behaviors
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
             container.addEventListener(eventName, preventDefaults, false);
         });
-        
+
         // Show overlay when item is dragged over
         ['dragenter', 'dragover'].forEach(eventName => {
             container.addEventListener(eventName, () => {
@@ -773,19 +778,19 @@ function setupDragAndDrop() {
                 updateDropText(); // Update text on drag in case translations loaded
             }, false);
         });
-        
+
         ['dragleave', 'drop'].forEach(eventName => {
             container.addEventListener(eventName, () => {
                 container.classList.remove('drag-over');
                 dropOverlay.style.display = 'none';
             }, false);
         });
-        
+
         // Handle dropped files
         container.addEventListener('drop', (e) => {
             const dt = e.dataTransfer;
             const files = dt.files;
-            
+
             if (files.length > 0) {
                 input.files = files;
                 // Trigger change event to update file input display
@@ -794,7 +799,7 @@ function setupDragAndDrop() {
             }
         }, false);
     });
-    
+
     // Prevent default drag behaviors on body
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         document.body.addEventListener(eventName, preventDefaults, false);
@@ -808,6 +813,98 @@ function preventDefaults(e) {
 
 // Initialize cards state on page load
 function initializeCardsState() {
-    // All sections are closed by default
-    // Users can manually open the sections they need
+    // All sections are closed by default (standard cards)
+}
+
+/**
+ * Status Modal Helpers
+ */
+function showStatusAlert(title, message, onOk = null) {
+    const modal = document.getElementById('statusModal');
+    if (!modal) return;
+
+    document.getElementById('statusModalTitle').textContent = title;
+    document.getElementById('statusModalMessage').textContent = message;
+
+    const confirmBtn = document.getElementById('statusModalConfirmBtn');
+    const cancelBtn = document.getElementById('statusModalCancelBtn');
+
+    confirmBtn.style.display = 'none';
+    cancelBtn.textContent = 'OK';
+    cancelBtn.onclick = () => {
+        modal.style.display = 'none';
+        if (onOk) onOk();
+    };
+
+    modal.style.display = 'flex';
+}
+
+function showStatusConfirm(title, message, onConfirm) {
+    const modal = document.getElementById('statusModal');
+    if (!modal) return;
+
+    document.getElementById('statusModalTitle').textContent = title;
+    document.getElementById('statusModalMessage').textContent = message;
+
+    const confirmBtn = document.getElementById('statusModalConfirmBtn');
+    const cancelBtn = document.getElementById('statusModalCancelBtn');
+
+    confirmBtn.style.display = 'inline-flex';
+    confirmBtn.textContent = 'OK';
+    cancelBtn.style.display = 'inline-flex';
+    cancelBtn.textContent = tr('common.cancel', 'Annuler');
+
+    cancelBtn.onclick = () => modal.style.display = 'none';
+    confirmBtn.onclick = () => {
+        modal.style.display = 'none';
+        onConfirm();
+    };
+
+    modal.style.display = 'flex';
+}
+
+/**
+ * Maintenance / Disaster Recovery
+ */
+async function runRepair(btn) {
+    const confirmTitle = tr('multiuser.admin.maintenance.repair_registry', 'Reconstruct System Index');
+    const confirmMsg = tr('multiuser.admin.maintenance.repair_registry_confirm', 'This will scan all user folders and rebuild the shared links registry.');
+
+    showStatusConfirm(confirmTitle, confirmMsg, async () => {
+        const originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + tr('multiuser.admin.processing', 'Processing...');
+
+        try {
+            const response = await fetch('/api/v1/admin/repair', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin'
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                let successMsg = tr('multiuser.admin.maintenance.repair_registry_success', "System registry repaired successfully:\n- {{scanned}} folders scanned\n- {{added}} users restored\n- {{links}} shared links rebuilt");
+                successMsg = successMsg
+                    .replace('{{scanned}}', result.stats.users_scanned)
+                    .replace('{{added}}', result.stats.users_added)
+                    .replace('{{links}}', result.stats.links_rebuilt);
+
+                if (result.stats.errors && result.stats.errors.length > 0) {
+                    successMsg += '\n\n' + tr('multiuser.admin.errors_label', 'Errors:') + '\n' + result.stats.errors.join('\n');
+                }
+
+                showStatusAlert(confirmTitle, successMsg, () => window.location.reload());
+            } else {
+                const errorMsg = tr('multiuser.admin.maintenance.repair_registry_error', 'Repair error: {{error}}');
+                showStatusAlert(confirmTitle, errorMsg.replace('{{error}}', result.error));
+            }
+        } catch (e) {
+            const networkErrorPrefix = tr('multiuser.admin.network_error', 'Network error: ');
+            showStatusAlert(confirmTitle, networkErrorPrefix + e.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+    });
 }

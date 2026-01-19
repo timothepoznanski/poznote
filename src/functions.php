@@ -182,16 +182,53 @@ function formatDateTime($t) {
 
 /**
  * Get the entries directory path
+ * Returns the path for the current user
  */
 function getEntriesPath() {
+    global $activeUserId;
+    $userId = $_SESSION['user_id'] ?? $activeUserId;
+    
+    if ($userId) {
+        require_once __DIR__ . '/users/UserDataManager.php';
+        $dataManager = new UserDataManager($userId);
+        return $dataManager->getUserEntriesPath();
+    }
+    // Fallback for unauthenticated access (should not happen in normal use)
     return __DIR__ . '/data/entries';
 }
 
 /**
  * Get the attachments directory path
+ * Returns the path for the current user
  */
 function getAttachmentsPath() {
+    global $activeUserId;
+    $userId = $_SESSION['user_id'] ?? $activeUserId;
+
+    if ($userId) {
+        require_once __DIR__ . '/users/UserDataManager.php';
+        $dataManager = new UserDataManager($userId);
+        return $dataManager->getUserAttachmentsPath();
+    }
+    // Fallback for unauthenticated access
     return __DIR__ . '/data/attachments';
+}
+
+/**
+ * Get the backups directory path
+ * Returns the path for the current user
+ */
+function getBackupsPath() {
+    global $activeUserId;
+    $userId = $_SESSION['user_id'] ?? $activeUserId;
+
+    if ($userId) {
+        require_once __DIR__ . '/users/UserDataManager.php';
+        $dataManager = new UserDataManager($userId);
+        return $dataManager->getUserBackupsPath();
+    }
+    // Fallback for unauthenticated access
+    return __DIR__ . '/data/backups';
 }
 
 /**
@@ -505,18 +542,26 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         }
         
         // Ensure required data directories exist
-        $dataDir = dirname(__DIR__) . '/data';
-        $requiredDirs = ['attachments', 'database', 'entries'];
-        foreach ($requiredDirs as $dir) {
-            $fullPath = $dataDir . '/' . $dir;
-            if (!is_dir($fullPath)) {
-                mkdir($fullPath, 0755, true);
-                // Set proper ownership if running as root (Docker context)
-                if (function_exists('posix_getuid') && posix_getuid() === 0) {
-                    $current_uid = posix_getuid();
-                    $current_gid = posix_getgid();
-                    chown($fullPath, $current_uid);
-                    chgrp($fullPath, $current_gid);
+        if (isset($_SESSION['user_id'])) {
+            require_once __DIR__ . '/users/UserDataManager.php';
+            $dataManager = new UserDataManager($_SESSION['user_id']);
+            if (!$dataManager->userDirectoriesExist()) {
+                $dataManager->initializeUserDirectories();
+            }
+        } else {
+            // Fallback for non-user mode (old structure compatibility)
+            $dataDir = __DIR__ . '/data';
+            $requiredDirs = ['attachments', 'database', 'entries'];
+            foreach ($requiredDirs as $dir) {
+                $fullPath = $dataDir . '/' . $dir;
+                if (!is_dir($fullPath)) {
+                    mkdir($fullPath, 0755, true);
+                    if (function_exists('posix_getuid') && posix_getuid() === 0) {
+                        $current_uid = posix_getuid();
+                        $current_gid = posix_getgid();
+                        chown($fullPath, $current_uid);
+                        chgrp($fullPath, $current_gid);
+                    }
                 }
             }
         }
@@ -598,6 +643,17 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
             $dbResult = restoreDatabaseFromFile($sqlFile);
             $results[] = 'Database: ' . ($dbResult['success'] ? 'Restored successfully' : 'Failed - ' . $dbResult['error']);
             if (!$dbResult['success']) $hasErrors = true;
+            
+            // Fix orphaned folders and missing entries immediately after DB restore
+            if ($dbResult['success']) {
+                global $con;
+                if (isset($con)) {
+                    $repairResult = repairDatabaseEntries($con);
+                    if ($repairResult['success'] && ($repairResult['folders_fixed'] > 0 || $repairResult['entries_fixed'] > 0)) {
+                        $results[] = "Migration: Fixed {$repairResult['folders_fixed']} folders and {$repairResult['entries_fixed']} entry snippets";
+                    }
+                }
+            }
             // Note: Schema migration is now handled inside restoreDatabaseFromFile()
         } else {
             $results[] = 'Database: No SQL file found in backup';
@@ -657,11 +713,26 @@ function restoreDatabaseFromFile($sqlFile) {
         return ['success' => false, 'error' => 'Cannot read SQL file'];
     }
     
-    $dbPath = SQLITE_DATABASE;
+    // Use the active database path from db_connect.php or determine it for the current user
+    global $dbPath; 
+    if (!isset($dbPath) || empty($dbPath)) {
+        if (isset($_SESSION['user_id'])) {
+            require_once __DIR__ . '/users/UserDataManager.php';
+            $dataManager = new UserDataManager($_SESSION['user_id']);
+            $dbPath = $dataManager->getUserDatabasePath();
+        } else {
+            $dbPath = SQLITE_DATABASE;
+        }
+    }
     
     // Remove current database
     if (file_exists($dbPath)) {
-        unlink($dbPath);
+        if (!unlink($dbPath)) {
+            // If unlink fails (e.g. open handle), try to truncate the file
+            if (file_put_contents($dbPath, '') === false) {
+                return ['success' => false, 'error' => 'Failed to delete or clear existing database file. Please check permissions or restarting the service.'];
+            }
+        }
     }
     
     // Restore database
@@ -786,19 +857,36 @@ function deleteDirectory($dir) {
 
 // Helper function to ensure proper permissions on data directory
 function ensureDataPermissions() {
-    $dataDir = dirname(__DIR__) . '/data';
-    if (is_dir($dataDir)) {
-        // Recursively set ownership to match the data directory owner
-        $dataOwner = fileowner($dataDir);
-        $dataGroup = filegroup($dataDir);
+    if (isset($_SESSION['user_id'])) {
+        require_once __DIR__ . '/users/UserDataManager.php';
+        $dataManager = new UserDataManager($_SESSION['user_id']);
+        $userDir = $dataManager->getUserBasePath();
+        $dbPath = $dataManager->getUserDatabasePath();
         
-        // Use shell command for recursive chown since PHP chown is not recursive
-        exec("chown -R {$dataOwner}:{$dataGroup} {$dataDir} 2>/dev/null");
-        
-        // Ensure database file has write permissions
-        $dbPath = $dataDir . '/database/poznote.db';
-        if (file_exists($dbPath)) {
-            chmod($dbPath, 0664);
+        if (is_dir($userDir)) {
+            if (function_exists('posix_getuid') && posix_getuid() === 0) {
+                // Use shell command for recursive chown
+                exec("chown -R www-data:www-data {$userDir} 2>/dev/null");
+            }
+            if (file_exists($dbPath)) {
+                chmod($dbPath, 0664);
+            }
+        }
+    } else {
+        $dataDir = __DIR__ . '/data';
+        if (is_dir($dataDir)) {
+            // Recursively set ownership to match the data directory owner
+            $dataOwner = fileowner($dataDir);
+            $dataGroup = filegroup($dataDir);
+            
+            // Use shell command for recursive chown
+            exec("chown -R {$dataOwner}:{$dataGroup} {$dataDir} 2>/dev/null");
+            
+            // Ensure database file has write permissions
+            $dbPath = $dataDir . '/database/poznote.db';
+            if (file_exists($dbPath)) {
+                chmod($dbPath, 0664);
+            }
         }
     }
 }
@@ -857,5 +945,84 @@ function getFolderPath($folder_id, $con) {
     $result = !empty($path) ? implode('/', $path) : 'Default';
     $cache[$folder_id] = $result;
     return $result;
+}
+
+/**
+ * Fix database inconsistencies in notes:
+ * 1. Populates folder_id from legacy folder (TEXT) column.
+ * 2. Re-generates search snippets (entry column) from physical files if empty.
+ * 
+ * @param PDO $con The database connection
+ * @return array Results of the repair operation
+ */
+function repairDatabaseEntries($con) {
+    if (!$con) return ['success' => false, 'error' => 'No database connection'];
+    
+    $fixedFolders = 0;
+    $createdFolders = 0;
+    $fixedEntries = 0;
+    
+    try {
+        // --- PART 1: FOLDERS MIGRATION ---
+        // Only repair notes that are NOT in trash to avoid re-creating deleted folders
+        $stmt = $con->query("SELECT id, folder, workspace FROM entries WHERE folder IS NOT NULL AND folder != '' AND folder_id IS NULL AND trash = 0");
+        $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach ($notes as $note) {
+            $noteId = $note['id'];
+            $folderName = $note['folder'];
+            $workspace = $note['workspace'] ?: 'Poznote';
+            
+            $checkStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ? LIMIT 1");
+            $checkStmt->execute([$folderName, $workspace]);
+            $folder = $checkStmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($folder) {
+                $folderId = $folder['id'];
+            } else {
+                $insertStmt = $con->prepare("INSERT INTO folders (name, workspace) VALUES (?, ?)");
+                $insertStmt->execute([$folderName, $workspace]);
+                $folderId = $con->lastInsertId();
+                $createdFolders++;
+            }
+            
+            $updateStmt = $con->prepare("UPDATE entries SET folder_id = ? WHERE id = ?");
+            $updateStmt->execute([$folderId, $noteId]);
+            $fixedFolders++;
+        }
+
+        // --- PART 2: EMPTY ENTRY SNIPPETS (FOR SEARCH) ---
+        $stmt = $con->query("SELECT id, type FROM entries WHERE (entry IS NULL OR entry = '') AND trash = 0");
+        $emptyNotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach ($emptyNotes as $note) {
+            $noteId = $note['id'];
+            $type = $note['type'] ?: 'note';
+            $filePath = getEntryFilename($noteId, $type);
+            
+            if (file_exists($filePath)) {
+                $content = file_get_contents($filePath);
+                if ($content !== false) {
+                    // Extract a clean snippet for search
+                    $snippet = cleanContentForSearch($content);
+                    $snippet = strip_tags($snippet);
+                    $snippet = mb_substr($snippet, 0, 500); // Limit to 500 chars for DB performance
+                    
+                    $updateStmt = $con->prepare("UPDATE entries SET entry = ? WHERE id = ?");
+                    $updateStmt->execute([$snippet, $noteId]);
+                    $fixedEntries++;
+                }
+            }
+        }
+        return [
+            'success' => true, 
+            'folders_fixed' => $fixedFolders, 
+            'folders_created' => $createdFolders,
+            'entries_fixed' => $fixedEntries
+        ];
+    } catch (Exception $e) {
+        error_log("Error in repairDatabaseEntries: " . $e->getMessage());
+        return ['success' => false, 'error' => $e->getMessage()];
+    }
 }
 ?>

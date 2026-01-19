@@ -1,9 +1,82 @@
 <?php
 
+/**
+ * Database Connection
+ * 
+ * Connects to the current user's personal database.
+ * Each user profile has their own isolated database and files.
+ */
+
+// Include auto-migration to ensure multi-user structure exists
+require_once __DIR__ . '/auto_migrate.php';
+
+// Determine database path based on authenticated user
+$dbPath = SQLITE_DATABASE; // Default path (fallback)
+$activeUserId = null;
+
+// Use user-specific database if authenticated
+if (isset($_SESSION['user_id']) && $_SESSION['user_id']) {
+    $activeUserId = (int)$_SESSION['user_id'];
+    require_once __DIR__ . '/users/UserDataManager.php';
+    $userDataManager = new UserDataManager($activeUserId);
+    $dbPath = $userDataManager->getUserDatabasePath();
+    
+    // Ensure user directories exist
+    if (!$userDataManager->userDirectoriesExist()) {
+        $userDataManager->initializeUserDirectories();
+    }
+} else {
+    // Check if this is a public shared link access
+    $publicToken = $_GET['token'] ?? null;
+    
+    // Also check pretty URLs (tokens are usually alphanumeric/hex)
+    if (!$publicToken && !empty($_SERVER['REQUEST_URI'])) {
+        $uri = trim($_SERVER['REQUEST_URI'], '/');
+        $parts = explode('/', $uri);
+        $lastPart = end($parts);
+        if ($lastPart && preg_match('/^[a-f0-9]{32}$|^[a-zA-Z0-9\-_.]{4,128}$/', $lastPart)) {
+            $publicToken = $lastPart;
+        }
+    }
+    
+    if ($publicToken) {
+        // Public access - lookup owner from shared_links registry
+        require_once __DIR__ . '/users/db_master.php';
+        try {
+            $masterCon = getMasterConnection();
+            $stmt = $masterCon->prepare("SELECT user_id FROM shared_links WHERE token = ? LIMIT 1");
+            $stmt->execute([$publicToken]);
+            $ownerId = $stmt->fetchColumn();
+            
+            if ($ownerId) {
+                $activeUserId = (int)$ownerId;
+                require_once __DIR__ . '/users/UserDataManager.php';
+                $userDataManager = new UserDataManager($activeUserId);
+                $dbPath = $userDataManager->getUserDatabasePath();
+            }
+        } catch (Exception $e) {
+            error_log("Public routing failed: " . $e->getMessage());
+        }
+    } else {
+        // Not authenticated and not a public link
+        // If master.db exists (migration done), default to user 1's database
+        // This ensures migrated data is accessible before first login
+        $dataDir = __DIR__ . '/data';
+        $masterDbPath = $dataDir . '/master.db';
+        $user1DbPath = $dataDir . '/users/1/database/poznote.db';
+        
+        if (file_exists($masterDbPath) && file_exists($user1DbPath)) {
+            $activeUserId = 1;
+            require_once __DIR__ . '/users/UserDataManager.php';
+            $userDataManager = new UserDataManager($activeUserId);
+            $dbPath = $userDataManager->getUserDatabasePath();
+        }
+    }
+}
+
 // SQLite connection
 try {
     // Ensure the database directory exists
-    $dbPath = SQLITE_DATABASE;
     $dbDir = dirname($dbPath);
     if (!is_dir($dbDir)) {
         mkdir($dbDir, 0755, true);
@@ -11,6 +84,7 @@ try {
     
     $con = new PDO('sqlite:' . $dbPath);
     $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $con->exec('PRAGMA busy_timeout = 5000');
     $con->exec('PRAGMA foreign_keys = ON');
         
     // Register custom SQLite function to remove accents for accent-insensitive search
@@ -337,6 +411,10 @@ try {
                 chown($welcomeFile, 'www-data');
                 chgrp($welcomeFile, 'www-data');
             }
+        }
+        // Legacy migration: ensure folder_id is populated and entries are fixed
+        if (function_exists('repairDatabaseEntries')) {
+            repairDatabaseEntries($con);
         }
     } catch(Exception $e) {
         // Log error but don't fail database connection

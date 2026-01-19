@@ -51,7 +51,15 @@ try {
     // Check if the error is due to unauthorized user
     if (strpos($e->getMessage(), 'not authorized') !== false) {
         header('Location: login.php?oidc_error=unauthorized');
+    } elseif (strpos($e->getMessage(), 'No user profile found') !== false) {
+        preg_match('/"([^"]+)"/', $e->getMessage(), $matches);
+        $identifier = $matches[1] ?? 'unknown';
+        header('Location: login.php?oidc_error=no_profile&identifier=' . urlencode($identifier));
+    } elseif (strpos($e->getMessage(), 'profile is disabled') !== false) {
+        header('Location: login.php?oidc_error=disabled');
     } else {
+        // Log the error for debugging
+        error_log("OIDC Callback Error: " . $e->getMessage());
         header('Location: login.php?oidc_error=1');
     }
     exit;

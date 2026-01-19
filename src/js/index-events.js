@@ -3,7 +3,7 @@
  * CSP-compliant event handlers for index.php toolbar and actions
  */
 
-(function() {
+(function () {
     'use strict';
 
     /**
@@ -12,7 +12,7 @@
      */
     function handleIndexFocus(e) {
         var target = e.target;
-        
+
         // Handle note title input focus (starts with 'inp')
         if (target.id && target.id.startsWith('inp') && target.classList.contains('css-title')) {
             if (typeof updateidhead === 'function') {
@@ -20,7 +20,7 @@
             }
             return;
         }
-        
+
         // Handle note entry focus (starts with 'entry')
         if (target.id && target.id.startsWith('entry') && target.classList.contains('noteentry')) {
             if (typeof updateident === 'function') {
@@ -91,6 +91,11 @@
             case 'navigate-to-settings':
                 if (typeof navigateToDisplayOrSettings === 'function') {
                     navigateToDisplayOrSettings('settings.php');
+                }
+                break;
+            case 'navigate-to-profile':
+                if (typeof navigateToDisplayOrSettings === 'function') {
+                    navigateToDisplayOrSettings('profile.php');
                 }
                 break;
             case 'toggle-create-menu':
@@ -312,7 +317,7 @@
             try {
                 var tasklistIds = JSON.parse(dataElement.textContent);
                 if (Array.isArray(tasklistIds)) {
-                    tasklistIds.forEach(function(id) {
+                    tasklistIds.forEach(function (id) {
                         initializeTaskList(id, 'tasklist');
                     });
                 }
@@ -331,7 +336,7 @@
             try {
                 var markdownIds = JSON.parse(dataElement.textContent);
                 if (Array.isArray(markdownIds)) {
-                    markdownIds.forEach(function(id) {
+                    markdownIds.forEach(function (id) {
                         initializeMarkdownNote(id);
                     });
                 }
@@ -354,11 +359,11 @@
                 window.trackNoteOpened(noteId, heading);
             }
         }
-        
+
         // Process note references [[Note Title]] in rendered content
         if (typeof window.processNoteReferences === 'function') {
             var noteEntries = document.querySelectorAll('.noteentry');
-            noteEntries.forEach(function(entry) {
+            noteEntries.forEach(function (entry) {
                 // Only process for view mode or after markdown rendering
                 window.processNoteReferences(entry);
             });
@@ -374,7 +379,7 @@
             try {
                 var data = JSON.parse(dataElement.textContent);
                 if (data && data.noteId) {
-                    setTimeout(function() {
+                    setTimeout(function () {
                         // Check if this was a forced refresh (skip auto-restore in that case)
                         var isRefresh = window.location.search.includes('_refresh=');
                         checkForUnsavedDraft(data.noteId, isRefresh);
@@ -398,11 +403,13 @@
                 window.isSearchMode = config.isSearchMode || false;
                 window.currentNoteFolder = config.currentNoteFolder;
                 window.selectedWorkspace = config.selectedWorkspace || '';
+                window.userId = config.userId;
+                window.userEntriesPath = config.userEntriesPath;
             } catch (e) {
                 console.error('Error parsing page config data:', e);
             }
         }
-        
+
         // Load workspace display map
         var mapElement = document.getElementById('workspace-display-map-data');
         if (mapElement) {
@@ -413,13 +420,13 @@
                 console.error('Error parsing workspace display map:', e);
             }
         }
-        
+
         // Update workspace title - use selectedWorkspace from PHP (no more localStorage dependency)
         var lastOpenedFlag = document.getElementById('workspace-last-opened-flag');
         if (lastOpenedFlag) {
             try {
-                var currentWs = (typeof selectedWorkspace !== 'undefined') ? selectedWorkspace : 
-                                (typeof window.selectedWorkspace !== 'undefined') ? window.selectedWorkspace : null;
+                var currentWs = (typeof selectedWorkspace !== 'undefined') ? selectedWorkspace :
+                    (typeof window.selectedWorkspace !== 'undefined') ? window.selectedWorkspace : null;
                 if (currentWs && currentWs !== '__last_opened__') {
                     var titleElement = document.querySelector('.workspace-title-text');
                     if (titleElement && window.workspaceDisplayMap) {
@@ -456,14 +463,14 @@
     }
 
     // Initialize event delegation
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         document.addEventListener('click', handleIndexClick);
         document.addEventListener('focusin', handleIndexFocus);
-        
+
         // Initialize page configuration first
         initializePageConfig();
         restoreFolderStates();
-        
+
         // Initialize tasklists and markdown notes
         initializeTasklists();
         initializeMarkdownNotes();
@@ -476,7 +483,7 @@
     // ============================================================
 
     // Create menu functionality - opens unified modal
-    window.toggleCreateMenu = function() {
+    window.toggleCreateMenu = function () {
         if (typeof showCreateModal === 'function') {
             showCreateModal();
         } else {
@@ -485,7 +492,7 @@
     };
 
     // Close menu when clicking outside
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         var menu = document.getElementById('header-create-menu');
         var plusBtn = document.querySelector('.sidebar-plus');
         if (menu && plusBtn && !plusBtn.contains(e.target) && !menu.contains(e.target)) {
@@ -495,7 +502,7 @@
     });
 
     // Task list creation function
-    window.createTaskListNote = function() {
+    window.createTaskListNote = function () {
         var noteData = {
             folder_id: window.selectedFolderId || null,
             workspace: window.selectedWorkspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : ''),
@@ -508,23 +515,23 @@
             headers: { "Content-Type": "application/json", 'X-Requested-With': 'XMLHttpRequest' },
             body: JSON.stringify(noteData)
         })
-        .then(function(response) { return response.json(); })
-        .then(function(data) {
-            if (data.success && data.note) {
-                window.scrollTo(0, 0);
-                var ws = encodeURIComponent(window.selectedWorkspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : ''));
-                window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
-            } else {
-                showNotificationPopup(data.error || (window.t ? window.t('index.errors.create_task_list', null, 'Error creating task list') : 'Error creating task list'), 'error');
-            }
-        })
-        .catch(function(error) {
-            showNotificationPopup((window.t ? window.t('ui.alerts.network_error', null, 'Network error') : 'Network error') + ': ' + error.message, 'error');
-        });
+            .then(function (response) { return response.json(); })
+            .then(function (data) {
+                if (data.success && data.note) {
+                    window.scrollTo(0, 0);
+                    var ws = encodeURIComponent(window.selectedWorkspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : ''));
+                    window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
+                } else {
+                    showNotificationPopup(data.error || (window.t ? window.t('index.errors.create_task_list', null, 'Error creating task list') : 'Error creating task list'), 'error');
+                }
+            })
+            .catch(function (error) {
+                showNotificationPopup((window.t ? window.t('ui.alerts.network_error', null, 'Network error') : 'Network error') + ': ' + error.message, 'error');
+            });
     };
 
     // Markdown note creation function
-    window.createMarkdownNote = function() {
+    window.createMarkdownNote = function () {
         var noteData = {
             folder_id: window.selectedFolderId || null,
             workspace: window.selectedWorkspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : ''),
@@ -537,23 +544,23 @@
             headers: { "Content-Type": "application/json", 'X-Requested-With': 'XMLHttpRequest' },
             body: JSON.stringify(noteData)
         })
-        .then(function(response) { return response.json(); })
-        .then(function(data) {
-            if (data.success && data.note) {
-                window.scrollTo(0, 0);
-                var ws = encodeURIComponent(window.selectedWorkspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : ''));
-                window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
-            } else {
-                showNotificationPopup(data.error || (window.t ? window.t('index.errors.create_markdown_note', null, 'Error creating markdown note') : 'Error creating markdown note'), 'error');
-            }
-        })
-        .catch(function(error) {
-            showNotificationPopup((window.t ? window.t('ui.alerts.network_error', null, 'Network error') : 'Network error') + ': ' + error.message, 'error');
-        });
+            .then(function (response) { return response.json(); })
+            .then(function (data) {
+                if (data.success && data.note) {
+                    window.scrollTo(0, 0);
+                    var ws = encodeURIComponent(window.selectedWorkspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : ''));
+                    window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
+                } else {
+                    showNotificationPopup(data.error || (window.t ? window.t('index.errors.create_markdown_note', null, 'Error creating markdown note') : 'Error creating markdown note'), 'error');
+                }
+            })
+            .catch(function (error) {
+                showNotificationPopup((window.t ? window.t('ui.alerts.network_error', null, 'Network error') : 'Network error') + ': ' + error.message, 'error');
+            });
     };
 
     // Navigate to settings.php with current workspace and note parameters
-    window.navigateToDisplayOrSettings = function(page) {
+    window.navigateToDisplayOrSettings = function (page) {
         var url = page;
         var params = [];
 
@@ -561,10 +568,13 @@
             params.push('workspace=' + encodeURIComponent(window.selectedWorkspace));
         }
 
-        var urlParams = new URLSearchParams(window.location.search);
-        var noteId = urlParams.get('note');
-        if (noteId) {
-            params.push('note=' + encodeURIComponent(noteId));
+        // Don't pass note parameter to profile.php
+        if (page !== 'profile.php') {
+            var urlParams = new URLSearchParams(window.location.search);
+            var noteId = urlParams.get('note');
+            if (noteId) {
+                params.push('note=' + encodeURIComponent(noteId));
+            }
         }
 
         if (params.length > 0) {
@@ -575,7 +585,7 @@
     };
 
     // Mobile navigation functionality
-    window.scrollToRightColumn = function() {
+    window.scrollToRightColumn = function () {
         if (window.innerWidth < 800) {
             const scrollAmount = window.innerWidth;
             document.documentElement.scrollLeft = scrollAmount;
@@ -596,7 +606,7 @@
         }
     };
 
-    window.scrollToLeftColumn = function() {
+    window.scrollToLeftColumn = function () {
         if (window.innerWidth < 800) {
             document.documentElement.scrollLeft = 0;
             document.body.scrollLeft = 0;
@@ -624,7 +634,7 @@
             const shouldScroll = urlParams.has('scroll') && urlParams.get('scroll') === '1';
 
             if (shouldScroll) {
-                setTimeout(function() {
+                setTimeout(function () {
                     scrollToRightColumn();
                     urlParams.delete('scroll');
                     const newUrl = window.location.pathname + '?' + urlParams.toString();
@@ -643,15 +653,15 @@
     }
 
     // Add click listeners to all note-related elements
-    window.initializeNoteClickHandlers = function() {
+    window.initializeNoteClickHandlers = function () {
         const noteElements = document.querySelectorAll('a[href*="note="], .links_arbo_left, .note-title, .note-link');
-        noteElements.forEach(function(element) {
+        noteElements.forEach(function (element) {
             element.addEventListener('click', handleNoteClick);
         });
     };
 
     // Initialize on DOMContentLoaded
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         initializeNoteClickHandlers();
         checkAndScrollToNote();
 

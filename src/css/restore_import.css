@@ -6,13 +6,14 @@
 }
 
 @font-face {
-  font-family: 'Inter';
-  src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
-  font-weight: 600;
-  font-style: normal;
+    font-family: 'Inter';
+    src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
 }
 
-html, body {
+html,
+body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     color: rgb(55, 53, 47);
 }
@@ -34,7 +35,7 @@ body {
 /* Navigation buttons container */
 .navigation-buttons {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     flex-wrap: wrap;
     margin-bottom: 20px;
 }
@@ -128,11 +129,11 @@ body {
     visibility: visible;
 }
 
-.card-content > p:first-child {
+.card-content>p:first-child {
     margin-top: 0;
 }
 
-.card-content > *:last-child {
+.card-content>*:last-child {
     margin-bottom: 0;
 }
 
@@ -201,7 +202,7 @@ body {
     visibility: visible;
 }
 
-.sub-card-content > *:first-child {
+.sub-card-content>*:first-child {
     margin-top: 12px;
 }
 
@@ -223,7 +224,8 @@ body {
 }
 
 .accordion-icon {
-    display: none; /* Hide accordion icons in card mode */
+    display: none;
+    /* Hide accordion icons in card mode */
 }
 
 .accordion-content {
@@ -234,6 +236,7 @@ body {
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -274,10 +277,17 @@ body {
     border-radius: 4px;
     cursor: pointer;
     text-decoration: none;
-    display: inline-block;
-    margin-right: 10px;
-    margin-bottom: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-right: 0;
+    margin-bottom: 0;
     font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    line-height: 1.4;
+    box-sizing: border-box;
 }
 
 .btn-primary {
@@ -311,7 +321,7 @@ body {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(0, 0, 0, 0.4);
     /* Position modal higher on screen */
     align-items: flex-start;
     justify-content: center;
@@ -331,7 +341,7 @@ body {
     max-height: 90vh;
     overflow: auto;
     font-family: 'Inter', sans-serif;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     text-align: center;
     box-sizing: border-box;
 }
@@ -394,7 +404,7 @@ body {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(0, 0, 0, 0.4);
     align-items: center;
     justify-content: center;
 }
@@ -410,7 +420,7 @@ body {
     max-height: 80vh;
     overflow: auto;
     font-family: 'Inter', sans-serif;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     text-align: center;
 }
 
@@ -477,7 +487,7 @@ body {
 .restore-spinner-circle {
     width: 20px;
     height: 20px;
-    border: 3px solid rgba(0,0,0,0.08);
+    border: 3px solid rgba(0, 0, 0, 0.08);
     border-top-color: #007cba;
     border-radius: 50%;
     animation: restore-spin 1s linear infinite;
@@ -488,17 +498,24 @@ body {
     color: #333;
 }
 
-.sr-only { /* accessible text for screen readers */
+.sr-only {
+    /* accessible text for screen readers */
     position: absolute !important;
-    height: 1px; width: 1px;
+    height: 1px;
+    width: 1px;
     overflow: hidden;
     clip: rect(1px, 1px, 1px, 1px);
     white-space: nowrap;
 }
 
 @keyframes restore-spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Backup list styles */
@@ -766,6 +783,16 @@ body {
         padding: 15px;
     }
 
+    .navigation-buttons {
+        flex-direction: row;
+        gap: 12px;
+    }
+
+    .navigation-buttons .btn {
+        width: auto;
+        flex: 0 1 auto;
+    }
+
     .card-header {
         padding: 16px 20px;
     }
@@ -782,7 +809,7 @@ body {
     .card-content {
         padding: 20px;
     }
-    
+
     .card-content.open {
         padding: 20px;
     }
@@ -794,9 +821,19 @@ body {
     .sub-card h4 {
         font-size: 15px;
     }
-    
+
     .sub-card-content.open {
         padding: 0 16px 16px 16px;
+    }
+
+    .card-content:not(.open),
+    .sub-card-content:not(.open) {
+        display: none;
+    }
+
+    .card-content.open,
+    .sub-card-content.open {
+        display: block;
     }
 }
 
@@ -807,16 +844,16 @@ body {
     }
 
     .navigation-buttons {
-        flex-direction: column;
-        gap: 8px;
+        flex-direction: row;
+        gap: 12px;
     }
 
     .navigation-buttons .btn {
-        margin-bottom: 0;
-        text-align: center;
-        box-sizing: border-box;
-        display: block;
-        width: 100%;
+        width: auto;
+        flex: 0 1 auto;
+        display: inline-flex;
+        padding-left: 12px;
+        padding-right: 12px;
     }
 
     .card-header {
@@ -827,11 +864,11 @@ body {
         font-size: 15px;
         gap: 8px;
     }
-    
+
     .card-header h3 i.card-icon {
         font-size: 18px;
     }
-    
+
     .card-header h3 i.chevron {
         font-size: 14px;
     }
@@ -848,20 +885,20 @@ body {
     .sub-card-header {
         padding: 12px;
     }
-    
+
     .sub-card h4 {
         font-size: 14px;
     }
-    
+
     .sub-card h4 i.sub-card-icon {
         font-size: 14px;
     }
-    
+
     .sub-card-content.open {
         padding: 0 12px 12px 12px;
     }
 
-    .btn {
+    .btn:not(.navigation-buttons .btn) {
         width: 100%;
         margin-right: 0;
     }
@@ -929,3 +966,28 @@ body {
     font-weight: bold;
 }
 
+/* Disaster Recovery / Maintenance Section */
+.maintenance-subtitle {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.maintenance-description {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.5;
+}
+
+.btn-maintenance {
+    margin-top: 15px;
+    padding: 10px 24px;
+}
+
+html[data-theme='dark'] .maintenance-subtitle {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .maintenance-description {
+    color: #a0a0a0;
+}

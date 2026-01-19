@@ -144,17 +144,6 @@ try {
     $total_notes_count = 0;
 }
 
-// Count workspaces
-$workspaces_count = 0;
-try {
-    if (isset($con)) {
-        $stmtWs = $con->prepare("SELECT COUNT(*) as cnt FROM workspaces");
-        $stmtWs->execute();
-        $workspaces_count = (int)$stmtWs->fetchColumn();
-    }
-} catch (Exception $e) {
-    $workspaces_count = 0;
-}
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
@@ -164,21 +153,36 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title><?php echo t_h('home.title', [], 'Home'); ?> - <?php echo t_h('app.name'); ?></title>
     <meta name="color-scheme" content="dark light">
-    <script src="js/theme-init.js"></script>
-    <link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
-    <link type="text/css" rel="stylesheet" href="css/light.min.css"/>
-    <link type="text/css" rel="stylesheet" href="css/solid.min.css"/>
-    <link type="text/css" rel="stylesheet" href="css/regular.min.css"/>
-    <link type="text/css" rel="stylesheet" href="css/modals.css"/>
-    <link type="text/css" rel="stylesheet" href="css/home.css"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode.css"/>
-    <script src="js/theme-manager.js"></script>
+    <?php 
+    $cache_v = @file_get_contents('version.txt');
+    if ($cache_v === false) $cache_v = time();
+    $cache_v = urlencode(trim($cache_v));
+    ?>
+    <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
+    <link type="text/css" rel="stylesheet" href="css/fontawesome.min.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/light.min.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/solid.min.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/regular.min.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/home.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode.css?v=<?php echo $cache_v; ?>"/>
+    <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
 </head>
 <body class="home-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <div class="home-container">
-        <h2 class="home-header">
-            <span class="home-workspace-name"><?php echo htmlspecialchars($pageWorkspace ?: 'Poznote', ENT_QUOTES); ?></span>
-        </h2>
+        <?php $currentUser = getCurrentUser(); ?>
+        <div class="home-header">
+            <div class="home-info-line">
+                <span class="home-info-username"><i class="fa-user home-info-icon"></i><?php echo htmlspecialchars($currentUser['username'] ?? 'User', ENT_QUOTES); ?></span>
+                <span class="home-workspace-name"><i class="fa-layer-group home-info-icon"></i><?php echo htmlspecialchars($pageWorkspace ?: 'Poznote', ENT_QUOTES); ?></span>
+            </div>
+            
+            <div class="home-buttons">
+                <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary">
+                    <?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?>
+                </a>
+            </div>
+        </div>
         
         <div class="home-grid">
             <!-- Notes -->
@@ -258,16 +262,6 @@ try {
                 </div>
             </a>
 
-            <!-- Workspaces -->
-            <a href="workspaces.php" class="home-card" title="<?php echo t_h('home.workspaces', [], 'Workspaces'); ?>">
-                <div class="home-card-icon">
-                    <i class="fa-layer-group"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('home.workspaces', [], 'Workspaces'); ?></span>
-                    <span class="home-card-count"><?php echo $workspaces_count; ?></span>
-                </div>
-            </a>
 
             <!-- Logout -->
             <a href="logout.php" class="home-card home-card-logout" title="<?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?>">

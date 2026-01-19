@@ -123,13 +123,29 @@ class FolderShareController {
             $stmt->execute([$folderId]);
             $existsRow = $stmt->fetchColumn();
             
+            // Register in global registry (master.db)
+            require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+
+            $oldToken = null;
+            if ($existsRow) {
+                $stmt = $this->con->prepare('SELECT token FROM shared_folders WHERE folder_id = ?');
+                $stmt->execute([$folderId]);
+                $oldToken = $stmt->fetchColumn();
+            }
+
             if ($existsRow) {
                 $stmt = $this->con->prepare('UPDATE shared_folders SET token = ?, theme = ?, indexable = ?, password = ?, created = CURRENT_TIMESTAMP WHERE folder_id = ?');
                 $stmt->execute([$token, $theme, $indexable, $hashedPassword, $folderId]);
+                
+                if ($oldToken && $oldToken !== $token) {
+                    unregisterSharedLink($oldToken);
+                }
             } else {
                 $stmt = $this->con->prepare('INSERT INTO shared_folders (folder_id, token, theme, indexable, password) VALUES (?, ?, ?, ?, ?)');
                 $stmt->execute([$folderId, $token, $theme, $indexable, $hashedPassword]);
             }
+            
+            registerSharedLink($token, $_SESSION['user_id'], 'folder', (int)$folderId);
             
             // Auto-share all notes in this folder
             $sharedCount = $this->shareNotesInFolder($folderId, $folderRow['name'], $theme, $indexable);
@@ -168,6 +184,15 @@ class FolderShareController {
                 return;
             }
             
+            // Remove folder from global registry
+            $stmtToken = $this->con->prepare('SELECT token FROM shared_folders WHERE folder_id = ?');
+            $stmtToken->execute([$folderId]);
+            $token = $stmtToken->fetchColumn();
+            if ($token) {
+                require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+                unregisterSharedLink($token);
+            }
+
             // Delete folder share
             $stmt = $this->con->prepare('DELETE FROM shared_folders WHERE folder_id = ?');
             $stmt->execute([$folderId]);
@@ -246,10 +271,29 @@ class FolderShareController {
                 return;
             }
             
+            $oldToken = null;
+            if (isset($input['custom_token'])) {
+                $stmtToken = $this->con->prepare('SELECT token FROM shared_folders WHERE folder_id = ?');
+                $stmtToken->execute([$folderId]);
+                $oldToken = $stmtToken->fetchColumn();
+            }
+
             $params[] = $folderId;
             $sql = 'UPDATE shared_folders SET ' . implode(', ', $updates) . ' WHERE folder_id = ?';
             $stmt = $this->con->prepare($sql);
             $stmt->execute($params);
+
+            // Update global registry if token changed
+            if (isset($input['custom_token'])) {
+                $newToken = trim($input['custom_token']);
+                require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+                
+                if ($oldToken && $oldToken !== $newToken) {
+                    unregisterSharedLink($oldToken);
+                }
+                
+                registerSharedLink($newToken, $_SESSION['user_id'], 'folder', (int)$folderId);
+            }
             
             $response = ['success' => true];
             if (isset($input['custom_token'])) {
@@ -293,6 +337,11 @@ class FolderShareController {
                 $noteToken = bin2hex(random_bytes(16));
                 $insertStmt = $this->con->prepare('INSERT INTO shared_notes (note_id, token, theme, indexable) VALUES (?, ?, ?, ?)');
                 $insertStmt->execute([$noteId, $noteToken, $theme, $indexable]);
+
+                // Register in global registry
+                require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+                registerSharedLink($noteToken, $_SESSION['user_id'], 'note', (int)$noteId);
+                
                 $sharedCount++;
             }
         }
@@ -312,9 +361,14 @@ class FolderShareController {
         $unsharedCount = 0;
         foreach ($notes as $note) {
             // Check if note was shared before deleting
-            $checkStmt = $this->con->prepare('SELECT id FROM shared_notes WHERE note_id = ? LIMIT 1');
+            $checkStmt = $this->con->prepare('SELECT token FROM shared_notes WHERE note_id = ? LIMIT 1');
             $checkStmt->execute([$note['id']]);
-            if ($checkStmt->fetchColumn()) {
+            $token = $checkStmt->fetchColumn();
+            if ($token) {
+                // Remove from global registry
+                require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+                unregisterSharedLink($token);
+
                 $deleteStmt = $this->con->prepare('DELETE FROM shared_notes WHERE note_id = ?');
                 $deleteStmt->execute([$note['id']]);
                 $unsharedCount++;

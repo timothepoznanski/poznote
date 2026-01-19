@@ -43,6 +43,8 @@ The MCP server is a bridge between VS Code Copilot and your Poznote instance.
 - `delete_note`
 - `create_folder`
 
+All tools accept an optional `user_id` argument to target a specific user profile. When provided, the MCP server sends the `X-User-ID` header for that request, allowing you to create or read notes across different profiles without changing the global MCP environment.
+
 ---
 
 To get everything working end-to-end, simply follow these three steps: 
@@ -88,10 +90,16 @@ Edit and export your values:
 
 ```
 export POZNOTE_API_URL=http://POZNOTE_SERVER:POZNOTE_SERVER_PORT/api/v1
-export POZNOTE_USERNAME=YOUR_POZNOTE_USERNAME
-export POZNOTE_PASSWORD=YOUR_POZNOTE_PASSWORD
-export POZNOTE_DEFAULT_WORKSPACE=YOUR_POZNOTE_WORKSPACE
+export POZNOTE_USERNAME=admin_change_me
+export POZNOTE_PASSWORD=YOUR_GLOBAL_ADMIN_OR_USER_PASSWORD
+export POZNOTE_USER_ID=1
+export POZNOTE_DEFAULT_WORKSPACE=Poznote
 ```
+
+> **Note:** 
+> - `POZNOTE_USERNAME` must be a valid user profile name in your Poznote instance.
+> - `POZNOTE_PASSWORD` must be the global password corresponding to that user's role (Administrator or Standard).
+> - `POZNOTE_USER_ID` specifies which user profile to access. Use the Poznote web interface or API (`GET /api/v1/users/profiles`) to find your user ID.
 
 Start the MCP Server:
 
@@ -117,9 +125,10 @@ Content:
 
 ```bash
 POZNOTE_API_URL=http://POZNOTE_SERVER:POZNOTE_SERVER_PORT/api/v1
-POZNOTE_USERNAME=YOUR_POZNOTE_USERNAME
-POZNOTE_PASSWORD=YOUR_POZNOTE_PASSWORD
-POZNOTE_DEFAULT_WORKSPACE=YOUR_POZNOTE_WORKSPACE
+POZNOTE_USERNAME=admin_change_me
+POZNOTE_PASSWORD=YOUR_GLOBAL_ADMIN_OR_USER_PASSWORD
+POZNOTE_USER_ID=1
+POZNOTE_DEFAULT_WORKSPACE=Poznote
 POZNOTE_DEBUG=1
 MCP_HOST=0.0.0.0
 MCP_PORT=POZNOTE_MCP_SERVER_PORT
@@ -171,9 +180,10 @@ Content:
 
 ```bash
 POZNOTE_API_URL=http://POZNOTE_SERVER:POZNOTE_SERVER_PORT/api/v1
-POZNOTE_USERNAME=YOUR_POZNOTE_USERNAME
-POZNOTE_PASSWORD=YOUR_POZNOTE_PASSWORD
-POZNOTE_DEFAULT_WORKSPACE=YOUR_POZNOTE_WORKSPACE
+POZNOTE_USERNAME=admin_change_me
+POZNOTE_PASSWORD=YOUR_GLOBAL_ADMIN_OR_USER_PASSWORD
+POZNOTE_USER_ID=1
+POZNOTE_DEFAULT_WORKSPACE=Poznote
 POZNOTE_DEBUG=1
 MCP_HOST=0.0.0.0
 MCP_PORT=POZNOTE_MCP_SERVER_PORT

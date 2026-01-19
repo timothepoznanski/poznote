@@ -332,13 +332,28 @@
         // Navigation cards (left column)
         var navCards = {
             'backup-export-card': 'backup_export.php',
-            'restore-import-card': 'restore_import.php'
+            'restore-import-card': 'restore_import.php',
+            'profile-card': 'profile.php',
+            'users-admin-card': 'admin/users.php'
         };
         Object.keys(navCards).forEach(function(cardId) {
             var card = document.getElementById(cardId);
             if (card) {
                 card.addEventListener('click', function() {
                     window.location = navCards[cardId];
+                });
+            }
+        });
+        
+        // Generic clickable cards with data-href attribute
+        var clickableCards = document.querySelectorAll('.settings-card-clickable[data-href]');
+        clickableCards.forEach(function(card) {
+            if (!card.id || !navCards[card.id]) { // Skip if already handled above
+                card.addEventListener('click', function() {
+                    var href = card.getAttribute('data-href');
+                    if (href) {
+                        window.location = href;
+                    }
                 });
             }
         });

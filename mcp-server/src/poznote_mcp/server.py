@@ -188,17 +188,18 @@ def _get_client_or_error() -> tuple[PoznoteClient | None, str | None]:
 # =============================================================================
 
 @mcp.tool()
-def get_note(id: int, workspace: Optional[str] = None) -> str:
+def get_note(id: int, workspace: Optional[str] = None, user_id: Optional[int] = None) -> str:
     """Get a specific note by its ID with full content
     
     Args:
         id: ID of the note to retrieve
         workspace: Workspace name (optional, uses default workspace if not specified)
+        user_id: User profile ID to access (optional, overrides default)
     """
     client, err = _get_client_or_error()
     if err:
         return err
-    note = client.get_note(id, workspace=workspace)
+    note = client.get_note(id, workspace=workspace, user_id=user_id)
     
     if note is None:
         return json.dumps({"error": f"Note {id} not found"}, ensure_ascii=False)
@@ -218,17 +219,18 @@ def get_note(id: int, workspace: Optional[str] = None) -> str:
 
 
 @mcp.tool()
-def list_notes(workspace: Optional[str] = None, limit: int = 50) -> str:
+def list_notes(workspace: Optional[str] = None, limit: int = 50, user_id: Optional[int] = None) -> str:
     """List all notes from a specific workspace
     
     Args:
         workspace: Workspace name (optional, uses default workspace if not specified)
         limit: Maximum number of results (default: 50)
+        user_id: User profile ID to access (optional, overrides default)
     """
     client, err = _get_client_or_error()
     if err:
         return err
-    notes = client.list_notes(workspace=workspace)
+    notes = client.list_notes(workspace=workspace, user_id=user_id)
     
     # Limit results if specified
     if limit and len(notes) > limit:
@@ -254,13 +256,14 @@ def list_notes(workspace: Optional[str] = None, limit: int = 50) -> str:
 
 
 @mcp.tool()
-def search_notes(query: str, workspace: Optional[str] = None, limit: int = 10) -> str:
+def search_notes(query: str, workspace: Optional[str] = None, limit: int = 10, user_id: Optional[int] = None) -> str:
     """Search notes by text query. Returns matching notes with excerpts.
     
     Args:
         query: Search query (text to find in notes)
         workspace: Workspace name (optional, uses default workspace if not specified)
         limit: Maximum number of results (default: 10)
+        user_id: User profile ID to access (optional, overrides default)
     """
     if not query:
         return json.dumps({"error": "query parameter is required"}, ensure_ascii=False)
@@ -268,7 +271,7 @@ def search_notes(query: str, workspace: Optional[str] = None, limit: int = 10) -
     client, err = _get_client_or_error()
     if err:
         return err
-    results = client.search_notes(query, limit=limit, workspace=workspace)
+    results = client.search_notes(query, limit=limit, workspace=workspace, user_id=user_id)
     
     # Format results
     formatted = []
@@ -296,6 +299,7 @@ def create_note(
     tags: Optional[str] = None,
     folder: Optional[str] = None,
     note_type: str = "note",
+    user_id: Optional[int] = None,
 ) -> str:
     """Create a new note in Poznote
     
@@ -306,6 +310,7 @@ def create_note(
         tags: Comma-separated tags (e.g., 'ai, docs, important')
         folder: Folder name to place the note in
         note_type: Note type/format. Supported: 'note' (HTML, default), 'markdown'.
+        user_id: User profile ID to access (optional, overrides default)
     """
     client, err = _get_client_or_error()
     if err:
@@ -335,6 +340,7 @@ def create_note(
         folder_name=folder,
         workspace=workspace,
         note_type=note_type,
+        user_id=user_id,
     )
     
     if result:
@@ -354,6 +360,7 @@ def update_note(
     content: Optional[str] = None,
     title: Optional[str] = None,
     tags: Optional[str] = None,
+    user_id: Optional[int] = None,
 ) -> str:
     """Update an existing note. Only provided fields will be updated.
     
@@ -363,6 +370,7 @@ def update_note(
         content: New content for the note
         title: New title for the note
         tags: New tags (comma-separated)
+        user_id: User profile ID to access (optional, overrides default)
     """
     client, err = _get_client_or_error()
     if err:
@@ -373,6 +381,7 @@ def update_note(
         title=title,
         tags=tags,
         workspace=workspace,
+        user_id=user_id,
     )
     
     if result:
@@ -386,17 +395,18 @@ def update_note(
 
 
 @mcp.tool()
-def delete_note(id: int, workspace: Optional[str] = None) -> str:
+def delete_note(id: int, workspace: Optional[str] = None, user_id: Optional[int] = None) -> str:
     """Delete a note by its ID
     
     Args:
         id: ID of the note to delete
         workspace: Workspace name (optional, uses default workspace if not specified)
+        user_id: User profile ID to access (optional, overrides default)
     """
     client, err = _get_client_or_error()
     if err:
         return err
-    success = client.delete_note(id, workspace=workspace)
+    success = client.delete_note(id, workspace=workspace, user_id=user_id)
     
     if success:
         return json.dumps({
@@ -412,6 +422,7 @@ def create_folder(
     folder_name: str,
     workspace: Optional[str] = None,
     parent_folder_id: Optional[int] = None,
+    user_id: Optional[int] = None,
 ) -> str:
     """Create a new folder in Poznote
     
@@ -419,6 +430,7 @@ def create_folder(
         folder_name: Name of the new folder
         workspace: Workspace name (optional, uses default workspace if not specified)
         parent_folder_id: ID of the parent folder (optional, creates folder at root if not specified)
+        user_id: User profile ID to access (optional, overrides default)
     """
     if not folder_name:
         return json.dumps({"error": "folder_name is required"}, ensure_ascii=False)
@@ -430,6 +442,7 @@ def create_folder(
         folder_name=folder_name,
         parent_folder_id=parent_folder_id,
         workspace=workspace,
+        user_id=user_id,
     )
     
     if result:

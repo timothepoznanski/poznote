@@ -425,9 +425,10 @@ class FoldersController {
         $workspace = isset($data['workspace']) ? trim((string)$data['workspace']) : $this->getFirstWorkspaceName();
         $folderPath = isset($data['folder_path']) ? trim((string)$data['folder_path']) : null;
         $createParents = isset($data['create_parents']) ? (bool)$data['create_parents'] : false;
-        $folderName = isset($data['folder_name']) ? trim((string)$data['folder_name']) : null;
+        $folderName = isset($data['folder_name']) ? trim((string)$data['folder_name']) : (isset($data['name']) ? trim((string)$data['name']) : null);
         $parentFolder = isset($data['parent_folder']) ? trim((string)$data['parent_folder']) : null;
-        $parentFolderId = isset($data['parent_folder_id']) ? (int)$data['parent_folder_id'] : null;
+        $parentFolderId = $data['parent_folder_id'] ?? $data['parent_id'] ?? null;
+        if ($parentFolderId !== null) $parentFolderId = (int)$parentFolderId;
         $parentFolderKey = isset($data['parent_folder_key']) ? trim((string)$data['parent_folder_key']) : null;
         
         // Validate workspace
@@ -714,12 +715,12 @@ class FoldersController {
         $folderId = (int)$id;
         $workspace = isset($_GET['workspace']) ? trim((string)$_GET['workspace']) : null;
         
-        // Get folder info
+        // Get folder info and its actual workspace
         if ($workspace !== null) {
-            $stmt = $this->db->prepare("SELECT id, name FROM folders WHERE id = ? AND workspace = ?");
+            $stmt = $this->db->prepare("SELECT id, name, workspace FROM folders WHERE id = ? AND workspace = ?");
             $stmt->execute([$folderId, $workspace]);
         } else {
-            $stmt = $this->db->prepare("SELECT id, name FROM folders WHERE id = ?");
+            $stmt = $this->db->prepare("SELECT id, name, workspace FROM folders WHERE id = ?");
             $stmt->execute([$folderId]);
         }
         
@@ -729,37 +730,49 @@ class FoldersController {
             return;
         }
         
-        // Get all folder IDs (including subfolders)
-        $allFolderIds = $this->getAllFolderIds($folderId, $workspace);
+        $actualWorkspace = $folder['workspace'];
         
-        // Move all notes from this folder AND all subfolders to trash
-        if (!empty($allFolderIds)) {
-            $placeholders = implode(',', array_fill(0, count($allFolderIds), '?'));
-            
-            if ($workspace !== null) {
+        // Get all folder IDs (including subfolders)
+        $allFolderIds = $this->getAllFolderIds($folderId, $actualWorkspace);
+        
+        try {
+            $this->db->beginTransaction();
+
+            // Move all notes from this folder AND all subfolders to trash
+            if (!empty($allFolderIds)) {
+                $placeholders = implode(',', array_fill(0, count($allFolderIds), '?'));
+                
+                // Trashing by folder_id is reliable. 
+                // We don't reset entries.folder (TEXT) because it's used for restoration, 
+                // but repairDatabaseEntries is now modified to ignore trashed notes.
                 $query = "UPDATE entries SET trash = 1 WHERE folder_id IN ($placeholders) AND workspace = ?";
                 $stmt = $this->db->prepare($query);
-                $stmt->execute(array_merge($allFolderIds, [$workspace]));
-            } else {
-                $query = "UPDATE entries SET trash = 1 WHERE folder_id IN ($placeholders)";
-                $stmt = $this->db->prepare($query);
-                $stmt->execute($allFolderIds);
+                $stmt->execute(array_merge($allFolderIds, [$actualWorkspace]));
             }
+            
+            // Explicitly delete ALL folders in the hierarchy to be safe (regardless of CASCADE)
+            if (!empty($allFolderIds)) {
+                $placeholders = implode(',', array_fill(0, count($allFolderIds), '?'));
+                $delStmt = $this->db->prepare("DELETE FROM folders WHERE id IN ($placeholders) AND workspace = ?");
+                $delStmt->execute(array_merge($allFolderIds, [$actualWorkspace]));
+            } else {
+                // Fallback for the main folder if something went wrong with recursion
+                $delStmt = $this->db->prepare("DELETE FROM folders WHERE id = ? AND workspace = ?");
+                $delStmt->execute([$folderId, $actualWorkspace]);
+            }
+            
+            $this->db->commit();
+
+            $this->sendJson([
+                'success' => true,
+                'message' => 'Folder and all subfolders deleted successfully'
+            ]);
+        } catch (Exception $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            $this->sendError('Failed to delete folder: ' . $e->getMessage(), 500);
         }
-        
-        // Delete the folder (CASCADE should delete subfolders)
-        if ($workspace !== null) {
-            $delStmt = $this->db->prepare("DELETE FROM folders WHERE id = ? AND workspace = ?");
-            $delStmt->execute([$folderId, $workspace]);
-        } else {
-            $delStmt = $this->db->prepare("DELETE FROM folders WHERE id = ?");
-            $delStmt->execute([$folderId]);
-        }
-        
-        $this->sendJson([
-            'success' => true,
-            'message' => 'Folder deleted successfully'
-        ]);
     }
     
     /**
@@ -770,7 +783,8 @@ class FoldersController {
         $data = $this->getInputData();
         
         $workspace = isset($data['workspace']) ? trim((string)$data['workspace']) : null;
-        $newParentId = array_key_exists('new_parent_folder_id', $data) ? $data['new_parent_folder_id'] : null;
+        $newParentId = $data['new_parent_folder_id'] ?? $data['new_parent_id'] ?? $data['parent_id'] ?? null;
+        if ($newParentId !== null) $newParentId = (int)$newParentId;
         $newParentPath = isset($data['new_parent_folder']) ? trim((string)$data['new_parent_folder']) : null;
         
         // Get folder info
@@ -1299,7 +1313,10 @@ class FoldersController {
     public function moveNoteToFolder(string $noteId): void {
         $data = $this->getInputData();
         
-        $targetFolderId = isset($data['folder_id']) ? ($data['folder_id'] === '' ? null : (int)$data['folder_id']) : null;
+        $targetFolderId = $data['folder_id'] ?? $data['parent_id'] ?? null;
+        if ($targetFolderId !== null) {
+            $targetFolderId = ($targetFolderId === '' ? null : (int)$targetFolderId);
+        }
         $targetFolder = $data['folder'] ?? $data['target_folder'] ?? null;
         $workspace = isset($data['workspace']) ? trim((string)$data['workspace']) : null;
         

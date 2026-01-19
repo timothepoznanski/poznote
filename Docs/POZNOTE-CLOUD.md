@@ -8,7 +8,7 @@ This guide will help you **install and manage** Poznote on cloud platforms witho
   - [Installation on Railway](#installation-on-railway)
   - [Access](#access)
   - [Get Your Instance URL](#get-your-instance-url)
-  - [Change Username or Password](#change-username-or-password)
+  - [Change Passwords](#change-passwords)
   - [Password Recovery](#password-recovery)
   - [Update to the latest version](#update-to-the-latest-version)
 - [Option 2: Other Cloud Providers](#option-2-other-cloud-providers)
@@ -36,7 +36,7 @@ Create your instance:
 2. Click on "New"
 3. Choose "Template"
 4. Search for "Poznote"
-5. Create a password and then a username
+5. Create your Administrator password (`POZNOTE_PASSWORD`)
 6. Click on "Deploy"
 7. Click on "Poznote" to open the side panel if it's not already open
 8. Click on the "Settings" tab
@@ -58,17 +58,17 @@ After deployment is complete:
 3. Click on the Poznote service
 4. Navigate to the **Settings** tab
 5. Find your public URL in the **Networking** section
-6. Open this url and connect with the Username and Passwod you configured earlier
+6. Open this url and connect with the default username `admin_change_me` and the Administrator password you configured earlier
 
-### Change Username or Password
+### Change Passwords
 
-To change your username or password on Railway:
+To change your global passwords on Railway:
 
 1. Go to your Railway dashboard -> https://railway.com/dashboard
 2. Click on your Poznote project
 3. Click on the Poznote service
 4. Navigate to the **Variables** tab
-5. Click the three‑dot menu next to the POZNOTE_USERNAME or POZNOTE_PASSWORD variable, choose "Edit", update the value, then save with the submit button
+5. Click the three‑dot menu next to the `POZNOTE_PASSWORD` or `POZNOTE_PASSWORD_USER` variable, choose "Edit", update the value, then save with the submit button
 6. Click on the Deploy button
 
 ### Password Recovery
@@ -107,8 +107,8 @@ ghcr.io/timothepoznanski/poznote:latest
 **Required Environment Variables:**
 ```bash
 SQLITE_DATABASE=/var/www/html/data/database/poznote.db
-POZNOTE_USERNAME=admin
-POZNOTE_PASSWORD=admin
+POZNOTE_PASSWORD=your_admin_password
+POZNOTE_PASSWORD_USER=your_standard_user_password
 HTTP_WEB_PORT=YOUR_POZNOTE_API_PORT
 
 ```
@@ -119,8 +119,8 @@ docker run -d \
   --name poznote-webserver \
   --restart always \
   -e SQLITE_DATABASE=/var/www/html/data/database/poznote.db \
-  -e POZNOTE_USERNAME=admin \
-  -e POZNOTE_PASSWORD=admin \
+  -e POZNOTE_PASSWORD=your_admin_password \
+  -e POZNOTE_PASSWORD_USER=your_standard_user_password \
   -e HTTP_WEB_PORT=YOUR_POZNOTE_API_PORT \
   -p YOUR_POZNOTE_API_PORT:80 \
   -v ./data:/var/www/html/data \
@@ -135,8 +135,8 @@ services:
     restart: always
     environment:
       SQLITE_DATABASE: /var/www/html/data/database/poznote.db
-      POZNOTE_USERNAME: ${POZNOTE_USERNAME}
       POZNOTE_PASSWORD: ${POZNOTE_PASSWORD}
+      POZNOTE_PASSWORD_USER: ${POZNOTE_PASSWORD_USER}
       HTTP_WEB_PORT: ${HTTP_WEB_PORT}
     ports:
       - "${HTTP_WEB_PORT}:80"
@@ -168,7 +168,7 @@ When deploying to custom cloud providers, keep these important points in mind:
 
 The management of your Poznote instance will depend on your chosen cloud provider. Each platform has its own interface and procedures for:
 
-- **Configuration**: Accessing and modifying environment variables (username, password, port settings)
+- **Configuration**: Accessing and modifying environment variables (passwords, port settings)
 - **Updates**: Redeploying with the latest Poznote Docker image
 - **Monitoring**: Viewing logs and managing your instance
 - **Password Recovery**: Accessing your credentials through the platform's interface

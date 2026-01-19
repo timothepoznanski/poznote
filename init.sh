@@ -10,25 +10,23 @@ DB_PATH="$DATA_DIR/database/poznote.db"
 mkdir -p "$DATA_DIR"
 mkdir -p "$DATA_DIR/database"
 
-# Set correct Alpine permissions (UID 82)
-echo "Setting correct permissions..."
+# Ensure data directory and all its contents are owned by www-data
+echo "Setting correct permissions recursively on $DATA_DIR..."
+# Create essential subdirectories if they don't exist
+mkdir -p "$DATA_DIR/database" "$DATA_DIR/users" "$DATA_DIR/entries" "$DATA_DIR/attachments" "$DATA_DIR/backups"
+
+# Fix ownership and permissions for the entire data tree
 chown -R www-data:www-data "$DATA_DIR"
+find "$DATA_DIR" -type d -exec chmod 775 {} +
+find "$DATA_DIR" -type f -exec chmod 664 {} +
 
-chmod -R 775 "$DATA_DIR"
-
-echo "Final permissions check:"
+echo "Final permissions check for $DATA_DIR:"
 ls -la "$DATA_DIR"
 
-# Ensure final permissions are correct for database files
-if [ -f "$DB_PATH" ]; then
-    chown www-data:www-data "$DB_PATH"
-    chmod 664 "$DB_PATH"
+# Check for master database
+MASTER_DB="$DATA_DIR/master.db"
+if [ -f "$MASTER_DB" ]; then
+    echo "Master database found, ensuring permissions..."
+    chown www-data:www-data "$MASTER_DB"
+    chmod 664 "$MASTER_DB"
 fi
-
-# Auto-fix empty entry columns (runs once)
-echo "Running entry column fix check..."
-php /var/www/html/auto-fix-entries.php || true
-
-# Migrate subheadings to note content (moves non-empty subheadings to first line of notes)
-echo "Running subheading migration check..."
-php /var/www/html/migrate-subheadings.php || true

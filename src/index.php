@@ -272,7 +272,9 @@ $body_classes = trim($extra_body_classes);
         $config_data = [
             'isSearchMode' => !empty($search) || !empty($tags_search),
             'currentNoteFolder' => null,
-            'selectedWorkspace' => $workspace_filter ?? ''
+            'selectedWorkspace' => $workspace_filter ?? '',
+            'userId' => $_SESSION['user_id'] ?? null,
+            'userEntriesPath' => isset($_SESSION['user_id']) ? "data/users/{$_SESSION['user_id']}/entries/" : "data/entries/"
         ];
         if ($note != '' && empty($search) && empty($tags_search)) {
             $config_data['currentNoteFolder'] = $current_note_folder ?? '';
