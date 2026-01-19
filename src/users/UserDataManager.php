@@ -481,6 +481,7 @@ class UserDataManager {
         try {
             $con = new PDO('sqlite:' . $dbPath);
             $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $con->exec('PRAGMA busy_timeout = 5000');
             
             $stmt = $con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('login_display_name', ?)");
             return $stmt->execute([$username]);

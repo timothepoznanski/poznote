@@ -61,7 +61,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id']) {
         // Not authenticated and not a public link
         // If master.db exists (migration done), default to user 1's database
         // This ensures migrated data is accessible before first login
-        $dataDir = dirname(__DIR__) . '/data';
+        $dataDir = __DIR__ . '/data';
         $masterDbPath = $dataDir . '/master.db';
         $user1DbPath = $dataDir . '/users/1/database/poznote.db';
         
@@ -84,6 +84,7 @@ try {
     
     $con = new PDO('sqlite:' . $dbPath);
     $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $con->exec('PRAGMA busy_timeout = 5000');
     $con->exec('PRAGMA foreign_keys = ON');
         
     // Register custom SQLite function to remove accents for accent-insensitive search

@@ -263,6 +263,7 @@ class UsersController {
                 try {
                     $userCon = new PDO('sqlite:' . $userDbFile);
                     $userCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                    $userCon->exec('PRAGMA busy_timeout = 5000');
 
                     // Add user to master if missing from 'users' table
                     $stmt = $masterCon->prepare("SELECT id FROM users WHERE id = ?");

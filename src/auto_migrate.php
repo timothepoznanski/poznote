@@ -70,6 +70,7 @@ function checkAndMigrateToMultiUser(): void {
         // Step 1: Create master database
         $masterCon = new PDO('sqlite:' . $masterDbPath);
         $masterCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $masterCon->exec('PRAGMA busy_timeout = 5000');
         
         // Create users table (schema must match db_master.php)
         $masterCon->exec("
@@ -252,6 +253,7 @@ function checkAndMigrateToMultiUser(): void {
         // This allows public links created in single-user mode to keep working
         try {
             $user1Db = new PDO('sqlite:' . $newDbPath);
+            $user1Db->exec('PRAGMA busy_timeout = 5000');
             
             // Check for shared notes
             $stmt = $user1Db->query("SELECT token, note_id FROM shared_notes");
