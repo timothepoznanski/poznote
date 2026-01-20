@@ -59,7 +59,7 @@ function initializeMasterDatabase(PDO $con): void {
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
-
+            email TEXT UNIQUE,
             active INTEGER DEFAULT 1,
             is_admin INTEGER DEFAULT 0,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -67,6 +67,18 @@ function initializeMasterDatabase(PDO $con): void {
             last_login DATETIME
         )
     ");
+    
+    // Migration: Add email column if missing
+    try {
+        $cols = $con->query("PRAGMA table_info(users)")->fetchAll(PDO::FETCH_ASSOC);
+        $existingColumns = array_column($cols, 'name');
+        if (!in_array('email', $existingColumns)) {
+            $con->exec("ALTER TABLE users ADD COLUMN email TEXT");
+            $con->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email) WHERE email IS NOT NULL AND email != ''");
+        }
+    } catch (Exception $e) {
+        error_log("Failed to add email column: " . $e->getMessage());
+    }
     
     // Global settings table
     $con->exec("
@@ -119,7 +131,7 @@ function getAllUserProfiles(): array {
     try {
         $con = getMasterConnection();
         $stmt = $con->query("
-            SELECT id, username, is_admin 
+            SELECT id, username, email, is_admin 
             FROM users 
             WHERE active = 1 
             ORDER BY username
@@ -162,6 +174,22 @@ function getUserProfileByUsername(string $username): ?array {
 }
 
 /**
+ * Get user profile by email
+ */
+function getUserProfileByEmail(string $email): ?array {
+    try {
+        if (trim($email) === '') return null;
+        $con = getMasterConnection();
+        $stmt = $con->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $user ?: null;
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
+/**
  * Update user last login timestamp
  */
 function updateUserLastLogin(int $userId): void {
@@ -178,7 +206,7 @@ function updateUserLastLogin(int $userId): void {
  * Create a new user profile
  */
 
-function createUserProfile(string $username): array {
+function createUserProfile(string $username, string $email = null): array {
     try {
         $con = getMasterConnection();
         
@@ -189,20 +217,33 @@ function createUserProfile(string $username): array {
             return ['success' => false, 'error' => 'Username already exists'];
         }
         
+        // Check if email exists
+        if ($email) {
+            $stmt = $con->prepare("SELECT id FROM users WHERE email = ?");
+            $stmt->execute([$email]);
+            if ($stmt->fetch()) {
+                return ['success' => false, 'error' => 'Email already exists'];
+            }
+        }
+        
         $stmt = $con->prepare("
-            INSERT INTO users (username, active)
-            VALUES (?, 1)
+            INSERT INTO users (username, email, active)
+            VALUES (?, ?, 1)
         ");
         $stmt->execute([
-            $username
+            $username,
+            $email
         ]);
         
         $userId = (int)$con->lastInsertId();
         
-        // Sync username to user's local DB for recovery
+        // Sync username and email to user's local DB for recovery
         require_once __DIR__ . '/UserDataManager.php';
         $udm = new UserDataManager($userId);
         $udm->syncUsername($username);
+        if ($email) {
+            $udm->syncEmail($email);
+        }
         
         return ['success' => true, 'user_id' => $userId];
     } catch (Exception $e) {
@@ -217,7 +258,7 @@ function updateUserProfile(int $id, array $data): array {
     try {
         $con = getMasterConnection();
         
-        $allowedFields = ['username', 'active', 'is_admin'];
+        $allowedFields = ['username', 'email', 'active', 'is_admin'];
         $updates = [];
         $params = [];
         
@@ -239,11 +280,16 @@ function updateUserProfile(int $id, array $data): array {
         $stmt = $con->prepare($sql);
         $stmt->execute($params);
         
-        // If username was updated, sync to local DB
-        if (isset($data['username'])) {
+        // If username or email was updated, sync to local DB
+        if (isset($data['username']) || isset($data['email'])) {
             require_once __DIR__ . '/UserDataManager.php';
             $udm = new UserDataManager($id);
-            $udm->syncUsername($data['username']);
+            if (isset($data['username'])) {
+                $udm->syncUsername($data['username']);
+            }
+            if (isset($data['email'])) {
+                $udm->syncEmail($data['email']);
+            }
         }
         
         return ['success' => true];
@@ -298,7 +344,7 @@ function listAllUserProfiles(): array {
     try {
         $con = getMasterConnection();
         $stmt = $con->query("
-            SELECT id, username, is_admin, active, created_at, last_login
+            SELECT id, username, email, is_admin, active, created_at, last_login
             FROM users 
             ORDER BY username
         ");

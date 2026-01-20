@@ -75,7 +75,7 @@ log "Using credentials: $USERNAME"
 # Multi-user support: detect user ID from profiles
 log "Detecting User ID for $USERNAME..."
 PROFILES_RESPONSE=$(curl -s -u "$USERNAME:$PASSWORD" "$BASE_URL/api/v1/users/profiles")
-USER_ID=$(echo "$PROFILES_RESPONSE" | jq -r ".[] | select(.username == \"$USERNAME\") | .id" 2>/dev/null)
+USER_ID=$(echo "$PROFILES_RESPONSE" | jq -r ".[] | select(.username == \"$USERNAME\" or .email == \"$USERNAME\") | .id" 2>/dev/null)
 
 if [ -z "$USER_ID" ] || [ "$USER_ID" = "null" ]; then
     log "Warning: User ID not found in profiles list. Attempting with default context."

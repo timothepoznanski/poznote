@@ -490,4 +490,28 @@ class UserDataManager {
             return false;
         }
     }
+
+    /**
+     * Sync email to user's local settings table for redundancy (disaster recovery)
+     * @param string $email
+     * @return bool
+     */
+    public function syncEmail($email) {
+        $dbPath = $this->getUserDatabasePath();
+        if (!file_exists($dbPath)) {
+            return true;
+        }
+        
+        try {
+            $con = new PDO('sqlite:' . $dbPath);
+            $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $con->exec('PRAGMA busy_timeout = 5000');
+            
+            $stmt = $con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('login_email', ?)");
+            return $stmt->execute([$email]);
+        } catch (Exception $e) {
+            error_log("Failed to sync email for user " . $this->userId . ": " . $e->getMessage());
+            return false;
+        }
+    }
 }
