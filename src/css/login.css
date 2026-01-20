@@ -89,6 +89,43 @@ input[type="password"] {
     background: white;
 }
 
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-wrapper input {
+    padding-right: 3rem !important;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    margin: 0;
+    color: #a0aec0;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: auto;
+    outline: none;
+}
+
+.password-toggle:hover,
+.password-toggle:focus {
+    color: #4a5568;
+}
+
+.password-toggle i {
+    font-size: 1.1rem;
+}
+
 input[type="text"]:focus,
 input[type="password"]:focus {
     outline: none;
@@ -277,6 +314,14 @@ html[data-theme='dark'] input[type="password"] {
     color: #e0e0e0;
 }
 
+html[data-theme='dark'] .password-toggle {
+    color: #808080;
+}
+
+html[data-theme='dark'] .password-toggle:hover {
+    color: #e0e0e0;
+}
+
 html[data-theme='dark'] input[type="text"]:focus,
 html[data-theme='dark'] input[type="password"]:focus {
     border-color: #4a9eff;
@@ -301,35 +346,35 @@ html[data-theme='dark'] .github-link a:hover {
     body {
         padding: 16px;
     }
-    
+
     .login-header {
         margin-bottom: 2rem;
     }
-    
+
     .logo {
         width: 40px;
         height: 40px;
     }
-    
+
     .logo-favicon {
         width: 40px;
         height: 40px;
     }
-    
+
     .login-title {
         font-size: 1.5rem;
     }
-    
+
     .info {
         font-size: 0.8125rem;
     }
-    
+
     .login-note {
         font-size: 0.8125rem;
         margin-top: 1.5rem;
         padding: 0.875rem;
     }
-    
+
     .login-note code {
         font-size: 0.75rem;
     }

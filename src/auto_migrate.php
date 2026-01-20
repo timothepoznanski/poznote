@@ -110,13 +110,13 @@ function checkAndMigrateToMultiUser(): void {
         $masterCon->exec("CREATE INDEX IF NOT EXISTS idx_shared_links_token ON shared_links(token)");
         $masterCon->exec("CREATE INDEX IF NOT EXISTS idx_shared_links_user ON shared_links(user_id)");
         
-        // Create default admin user if not exists (username 'admin' lowercase for consistency)
+        // Create default admin user if not exists (username 'admin_change_me' to warn about security)
         // Using INSERT OR IGNORE in case master.db already exists from a previous incomplete migration
         $stmt = $masterCon->prepare("
             INSERT OR IGNORE INTO users (id, username, is_admin, active)
             VALUES (1, ?, 1, 1)
         ");
-        $stmt->execute(['admin']);
+        $stmt->execute(['admin_change_me']);
         
         error_log("Poznote: Master database ready with default user profile");
         

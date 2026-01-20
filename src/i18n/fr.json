@@ -25,7 +25,6 @@
             "oidc_button": "Continuer avec {{provider}}",
             "documentation": "Documentation Poznote",
             "redirecting": "Redirection...",
-            "admin_warning": "Le compte administrateur a pour login <code>admin_change_me</code>. Veuillez vous connecter et renommer ce compte pour plus de sécurité (ce message restera affiché tant que le pseudo sera <code>admin_change_me</code>).",
             "errors": {
                 "invalid_credentials": "Pseudo ou mot de passe incorrect."
             }
@@ -1068,6 +1067,9 @@
             "title": "Connexion"
         },
         "redirecting": "Redirection...",
+        "show_password": "Afficher le mot de passe",
+        "hide_password": "Masquer le mot de passe",
+        "admin_warning": "Le compte administrateur par défaut a pour login <code>{{username}}</code>. Veuillez vous connecter et renommer ce compte pour plus de sécurité.",
         "fields": {
             "username": "Nom d’utilisateur",
             "password": "Mot de passe",

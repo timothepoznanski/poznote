@@ -25,7 +25,6 @@
             "oidc_button": "Continue with {{provider}}",
             "documentation": "Poznote documentation",
             "redirecting": "Redirecting...",
-            "admin_warning": "The default administrator account is active with the username <code>admin_change_me</code>. Please log in and rename this account for better security (this message will disappear once the username is no longer <code>admin_change_me</code>).",
             "errors": {
                 "invalid_credentials": "Incorrect username or password."
             }
@@ -1058,6 +1057,9 @@
             "title": "Login"
         },
         "redirecting": "Redirecting...",
+        "show_password": "Show password",
+        "hide_password": "Hide password",
+        "admin_warning": "The default administrator account is active with the username <code>{{username}}</code>. Please log in and rename this account for better security.",
         "fields": {
             "username": "Username",
             "password": "Password",

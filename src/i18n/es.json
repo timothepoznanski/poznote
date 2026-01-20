@@ -24,7 +24,7 @@
             "oidc_button": "Continuar con {{provider}}",
             "documentation": "Documentación de Poznote",
             "redirecting": "Redirigiendo...",
-            "admin_warning": "La cuenta de administrador predeterminada está activa con el nombre de usuario <code>admin_change_me</code>. Por favor, inicie sesión y cambie el nombre de esta cuenta para mayor seguridad (este mensaje desaparecerá una vez que el nombre de usuario ya no sea <code>admin_change_me</code>).",
+            "admin_warning": "La cuenta de administrador predeterminada está activa con el nombre de usuario <code>{{username}}</code>. Por favor, inicie sesión y cambie el nombre de esta cuenta para mayor seguridad.",
             "errors": {
                 "invalid_credentials": "Usuario o contraseña incorrectos."
             }
@@ -1057,6 +1057,9 @@
             "title": "Inicio de sesión"
         },
         "redirecting": "Redirigiendo...",
+        "show_password": "Mostrar contraseña",
+        "hide_password": "Ocultar contraseña",
+        "admin_warning": "La cuenta de administrador predeterminada está activa con el nombre de usuario <code>{{username}}</code>. Por favor, inicie sesión y cambie el nombre de esta cuenta para mayor seguridad.",
         "fields": {
             "username": "Nombre de usuario",
             "password": "Contraseña",
