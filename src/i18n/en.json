@@ -16,6 +16,7 @@
         "login": {
             "fields": {
                 "username": "Username",
+                "username_or_email": "Username or Email",
                 "password": "Password",
                 "profile": "Profile"
             },
@@ -1649,6 +1650,8 @@
             "notes_count": "Notes",
             "attachments_count": "Attachments",
             "actions": "Actions",
+            "not_defined": "not defined",
+            "email_usage_note": "Email addresses are only used for OIDC authentication if configured. Poznote does not send any emails.",
             "password": "Password",
             "confirm_password": "Confirm Password",
             "new_password": "New Password",

@@ -179,7 +179,7 @@ if (isset($_GET['oidc_error'])) {
 
         <form method="POST">
             <div class="form-group">
-                <input type="text" id="username" name="username" placeholder="<?php echo t_h('login.fields.username', [], 'Username', $currentLang ?? 'en'); ?>" required autofocus autocomplete="username">
+                <input type="text" id="username" name="username" placeholder="<?php echo t_h('login.fields.username_or_email', [], 'Username or Email', $currentLang ?? 'en'); ?>" required autofocus autocomplete="username">
             </div>
             <div class="form-group">
                 <div class="password-wrapper">

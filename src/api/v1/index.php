@@ -40,9 +40,11 @@ require_once __DIR__ . '/../../auth.php';
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $isAdminEndpoint = strpos($uri, '/api/v1/admin') !== false;
 $isPublicProfilesEndpoint = strpos($uri, '/api/v1/users/profiles') !== false;
+$isSystemEndpoint = strpos($uri, '/api/v1/system') !== false;
+$isSharedEndpoint = strpos($uri, '/api/v1/shared') !== false;
 
 // Require authentication (with X-User-ID for data endpoints, without for admin/public endpoints)
-if ($isAdminEndpoint || $isPublicProfilesEndpoint) {
+if ($isAdminEndpoint || $isPublicProfilesEndpoint || $isSystemEndpoint || $isSharedEndpoint) {
     // Admin endpoints only need credential validation, not X-User-ID
     requireApiAuthAdmin();
 } else {

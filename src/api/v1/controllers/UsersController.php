@@ -85,13 +85,14 @@ class UsersController {
         require_once dirname(__DIR__, 3) . '/users/db_master.php';
         
         $username = $data['username'] ?? '';
+        $email = $data['email'] ?? null;
         
         if (empty($username)) {
             http_response_code(400);
             return ['error' => 'Username is required'];
         }
         
-        $result = createUserProfile($username);
+        $result = createUserProfile($username, $email);
         
         if (!$result['success']) {
             http_response_code(400);
@@ -208,7 +209,8 @@ class UsersController {
         return array_map(function($user) {
             return [
                 'id' => $user['id'],
-                'username' => $user['username']
+                'username' => $user['username'],
+                'email' => $user['email'] ?? null
             ];
         }, $users);
     }

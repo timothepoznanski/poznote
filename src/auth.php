@@ -208,11 +208,16 @@ function isAuthenticated() {
 function authenticate($username, $password, $rememberMe = false) {
     require_once __DIR__ . '/users/db_master.php';
 
-    // 1. Find user profile by their own username (not the .env one)
+    // 1. Find user profile by their own username or email
     $user = getUserProfileByUsername($username);
     
+    // If not found by username, try by email
+    if (!$user) {
+        $user = getUserProfileByEmail($username);
+    }
+    
     if (!$user || !$user['active']) {
-        error_log("Poznote Auth: Login failed - User '$username' not found or inactive");
+        error_log("Poznote Auth: Login failed - User/Email '$username' not found or inactive");
         return false;
     }
 

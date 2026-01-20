@@ -537,7 +537,7 @@ function oidc_finish_login($claims, $tokens) {
     
     // If not found, try by email
     if (!$user && $email) {
-        $user = getUserProfileByUsername($email);
+        $user = getUserProfileByEmail($email);
     }
     
     // User profile must exist (no automatic creation)

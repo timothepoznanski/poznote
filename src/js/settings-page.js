@@ -1,9 +1,9 @@
 // JavaScript for settings.php page
 // Requires: theme-manager.js, ui.js, font-size-settings.js, modal-alerts.js
 
-(function() {
+(function () {
     'use strict';
-    
+
     // Get translations from data attributes on body
     function getTranslations() {
         var body = document.body;
@@ -15,15 +15,15 @@
             notDefined: body.getAttribute('data-txt-not-defined') || 'Not defined'
         };
     }
-    
+
     // Translation helper with fallback
     function tr(key, vars, fallback) {
         try {
             if (typeof window.t === 'function') return window.t(key, vars || {}, fallback);
-        } catch (e) {}
+        } catch (e) { }
         return (fallback != null ? String(fallback) : String(key));
     }
-    
+
     // Get language label from code
     function getLanguageLabel(code) {
         switch (code) {
@@ -35,7 +35,7 @@
             default: return tr('settings.language.english', {}, 'English');
         }
     }
-    
+
     // Generic function to get setting value from API
     function getSetting(key, callback) {
         fetch('/api/v1/settings/' + encodeURIComponent(key), {
@@ -43,17 +43,17 @@
             headers: { 'Accept': 'application/json' },
             credentials: 'same-origin'
         })
-            .then(function(r) { return r.json(); })
-            .then(function(j) {
+            .then(function (r) { return r.json(); })
+            .then(function (j) {
                 if (j && j.success) {
                     callback(j.value);
                 } else {
                     callback(null);
                 }
             })
-            .catch(function() { callback(null); });
+            .catch(function () { callback(null); });
     }
-    
+
     // Generic function to set setting value via API
     function setSetting(key, value, callback) {
         fetch('/api/v1/settings/' + encodeURIComponent(key), {
@@ -62,34 +62,34 @@
             credentials: 'same-origin',
             body: JSON.stringify({ value: value })
         })
-            .then(function(r) { return r.json(); })
-            .then(function(result) {
+            .then(function (r) { return r.json(); })
+            .then(function (result) {
                 if (callback) callback(result && result.success);
             })
-            .catch(function() {
+            .catch(function () {
                 if (callback) callback(false);
             });
     }
-    
+
     // Reload opener if it's index.php
     function reloadOpener() {
         try {
             if (window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) {
                 window.opener.location.reload();
             }
-        } catch(e) {}
+        } catch (e) { }
     }
-    
+
     // ========== Toggle Cards ==========
-    
+
     // Setup a toggle card that toggles a boolean setting
     function setupToggleCard(cardId, statusId, settingKey, invertLogic) {
         var txt = getTranslations();
         var card = document.getElementById(cardId);
         var status = document.getElementById(statusId);
-        
+
         function refresh() {
-            getSetting(settingKey, function(value) {
+            getSetting(settingKey, function (value) {
                 var enabled = value === '1' || value === 'true';
                 if (invertLogic) {
                     // For hide_* settings: null or '1' means show (enabled)
@@ -109,32 +109,32 @@
                 }
             });
         }
-        
+
         if (card) {
-            card.addEventListener('click', function() {
-                getSetting(settingKey, function(currentValue) {
+            card.addEventListener('click', function () {
+                getSetting(settingKey, function (currentValue) {
                     var currently = currentValue === '1' || currentValue === 'true';
                     if (invertLogic) {
                         currently = currentValue === '1' || currentValue === 'true' || currentValue === null;
                     }
                     var toSet = currently ? '0' : '1';
-                    setSetting(settingKey, toSet, function() {
+                    setSetting(settingKey, toSet, function () {
                         refresh();
                         reloadOpener();
                     });
                 });
             });
         }
-        
+
         refresh();
         return refresh;
     }
-    
+
     // ========== Badge Refresh Functions ==========
-    
+
     function refreshLoginDisplayBadge() {
         var txt = getTranslations();
-        getSetting('login_display_name', function(value) {
+        getSetting('login_display_name', function (value) {
             var badge = document.getElementById('login-display-badge');
             if (badge) {
                 if (value && value.trim()) {
@@ -147,9 +147,9 @@
             }
         });
     }
-    
+
     function refreshFontSizeBadge() {
-        getSetting('note_font_size', function(value) {
+        getSetting('note_font_size', function (value) {
             var badge = document.getElementById('font-size-badge');
             if (badge) {
                 if (value && value.trim()) {
@@ -162,9 +162,9 @@
             }
         });
     }
-    
+
     function refreshLanguageBadge() {
-        getSetting('language', function(value) {
+        getSetting('language', function (value) {
             var badge = document.getElementById('language-badge');
             if (badge) {
                 var langValue = value || 'en';
@@ -173,15 +173,15 @@
             }
         });
     }
-    
+
     function refreshNoteSortBadge() {
-        getSetting('note_list_sort', function(value) {
+        getSetting('note_list_sort', function (value) {
             var badge = document.getElementById('note-sort-badge');
             if (badge) {
                 var sortValue = value || 'updated_desc';
                 var sortLabel = tr('modals.note_sort.options.last_modified', {}, 'Last modified');
-                
-                switch(sortValue) {
+
+                switch (sortValue) {
                     case 'updated_desc':
                         sortLabel = tr('modals.note_sort.options.last_modified', {}, 'Last modified');
                         break;
@@ -195,7 +195,7 @@
                         sortLabel = tr('modals.note_sort.options.last_modified', {}, 'Last modified');
                         break;
                 }
-                
+
                 badge.textContent = sortLabel;
                 badge.className = 'setting-status enabled';
             }
@@ -203,7 +203,7 @@
     }
 
     function refreshTasklistInsertOrderBadge() {
-        getSetting('tasklist_insert_order', function(value) {
+        getSetting('tasklist_insert_order', function (value) {
             var badge = document.getElementById('tasklist-insert-order-badge');
             var card = document.getElementById('tasklist-insert-order-card');
             if (!badge) return;
@@ -223,15 +223,15 @@
             }
         });
     }
-    
+
     function refreshToolbarModeBadge() {
-        getSetting('toolbar_mode', function(value) {
+        getSetting('toolbar_mode', function (value) {
             var badge = document.getElementById('toolbar-mode-badge');
             if (badge) {
                 var modeValue = value || 'both';
                 var modeLabel = tr('display.badges.toolbar_mode.both', {}, 'Toolbar icons + slash command menu');
 
-                switch(modeValue) {
+                switch (modeValue) {
                     case 'full':
                         modeLabel = tr('display.badges.toolbar_mode.full', {}, 'Toolbar only');
                         break;
@@ -251,9 +251,9 @@
             }
         });
     }
-    
+
     function refreshTimezoneBadge() {
-        getSetting('timezone', function(value) {
+        getSetting('timezone', function (value) {
             var badge = document.getElementById('timezone-badge');
             if (badge) {
                 if (value && value.trim()) {
@@ -266,39 +266,39 @@
             }
         });
     }
-    
+
     // ========== Modal Functions ==========
-    
+
     function showLanguageModal() {
         var modal = document.getElementById('languageModal');
         if (!modal) return;
-        getSetting('language', function(value) {
+        getSetting('language', function (value) {
             var v = value || 'en';
             var radios = document.getElementsByName('languageChoice');
             for (var i = 0; i < radios.length; i++) {
-                try { radios[i].checked = (radios[i].value === v); } catch(e) {}
+                try { radios[i].checked = (radios[i].value === v); } catch (e) { }
             }
             modal.style.display = 'flex';
         });
     }
-    
+
     function openNoteSortModal() {
         var modal = document.getElementById('noteSortModal');
         if (!modal) return;
-        getSetting('note_list_sort', function(value) {
+        getSetting('note_list_sort', function (value) {
             var v = value || 'updated_desc';
             var radios = document.getElementsByName('noteSort');
             for (var i = 0; i < radios.length; i++) {
-                try { radios[i].checked = (radios[i].value === v); } catch(e) {}
+                try { radios[i].checked = (radios[i].value === v); } catch (e) { }
             }
             modal.style.display = 'flex';
         });
     }
-    
+
     function showTimezonePrompt() {
         var modal = document.getElementById('timezoneModal');
         if (!modal) return;
-        getSetting('timezone', function(value) {
+        getSetting('timezone', function (value) {
             var currentValue = value || 'Europe/Paris';
             var select = document.getElementById('timezoneSelect');
             if (select) {
@@ -307,49 +307,48 @@
             modal.style.display = 'flex';
         });
     }
-    
+
     // ========== Initialization ==========
-    
-    document.addEventListener('DOMContentLoaded', function() {
+
+    document.addEventListener('DOMContentLoaded', function () {
         // Back to Notes link with workspace from PHP global (no more localStorage)
         var backLink = document.getElementById('backToNotesLink');
         if (backLink) {
-            backLink.addEventListener('click', function() {
+            backLink.addEventListener('click', function () {
                 var href = backLink.getAttribute('data-href') || 'index.php';
                 try {
-                    var workspace = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace : 
-                                    (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : null;
+                    var workspace = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace :
+                        (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : null;
                     if (workspace && workspace !== '') {
                         var url = new URL(href, window.location.origin);
                         url.searchParams.set('workspace', workspace);
                         href = url.toString();
                     }
-                } catch(e) {}
+                } catch (e) { }
                 window.location = href;
             });
         }
-        
+
         // Navigation cards (left column)
         var navCards = {
             'backup-export-card': 'backup_export.php',
             'restore-import-card': 'restore_import.php',
-            'profile-card': 'profile.php',
             'users-admin-card': 'admin/users.php'
         };
-        Object.keys(navCards).forEach(function(cardId) {
+        Object.keys(navCards).forEach(function (cardId) {
             var card = document.getElementById(cardId);
             if (card) {
-                card.addEventListener('click', function() {
+                card.addEventListener('click', function () {
                     window.location = navCards[cardId];
                 });
             }
         });
-        
+
         // Generic clickable cards with data-href attribute
         var clickableCards = document.querySelectorAll('.settings-card-clickable[data-href]');
-        clickableCards.forEach(function(card) {
+        clickableCards.forEach(function (card) {
             if (!card.id || !navCards[card.id]) { // Skip if already handled above
-                card.addEventListener('click', function() {
+                card.addEventListener('click', function () {
                     var href = card.getAttribute('data-href');
                     if (href) {
                         window.location = href;
@@ -357,7 +356,7 @@
                 });
             }
         });
-        
+
         // External link cards
         var externalCards = {
             'api-docs-card': 'api-docs/',
@@ -366,39 +365,39 @@
             'website-card': 'https://poznote.com',
             'support-card': 'https://ko-fi.com/timothepoznanski'
         };
-        Object.keys(externalCards).forEach(function(cardId) {
+        Object.keys(externalCards).forEach(function (cardId) {
             var card = document.getElementById(cardId);
             if (card) {
-                card.addEventListener('click', function() {
+                card.addEventListener('click', function () {
                     window.open(externalCards[cardId], '_blank');
                 });
             }
         });
-        
+
         // Check for updates card
         var checkUpdatesCard = document.getElementById('check-updates-card');
         if (checkUpdatesCard && typeof window.checkForUpdates === 'function') {
             checkUpdatesCard.addEventListener('click', window.checkForUpdates);
         }
-        
+
         // Restore update badge if available
         if (typeof window.restoreUpdateBadge === 'function') {
             window.restoreUpdateBadge();
         }
-        
+
         // Setup toggle cards
         setupToggleCard('show-created-card', 'show-created-status', 'show_note_created', false);
         setupToggleCard('folder-counts-card', 'folder-counts-status', 'hide_folder_counts', true);
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
         setupToggleCard('center-note-card', 'center-note-status', 'center_note_content', false);
-        
+
         // Card click handlers for modals (using event delegation)
         var languageCard = document.getElementById('language-card');
         if (languageCard) {
             languageCard.addEventListener('click', showLanguageModal);
         }
-        
+
         var noteSortCard = document.getElementById('note-sort-card');
         if (noteSortCard) {
             noteSortCard.addEventListener('click', openNoteSortModal);
@@ -406,11 +405,11 @@
 
         var tasklistInsertOrderCard = document.getElementById('tasklist-insert-order-card');
         if (tasklistInsertOrderCard) {
-            tasklistInsertOrderCard.addEventListener('click', function() {
-                getSetting('tasklist_insert_order', function(currentValue) {
+            tasklistInsertOrderCard.addEventListener('click', function () {
+                getSetting('tasklist_insert_order', function (currentValue) {
                     var current = (currentValue === 'top' || currentValue === 'bottom') ? currentValue : 'bottom';
                     var next = current === 'top' ? 'bottom' : 'top';
-                    setSetting('tasklist_insert_order', next, function(success) {
+                    setSetting('tasklist_insert_order', next, function (success) {
                         if (success) {
                             refreshTasklistInsertOrderBadge();
                             reloadOpener();
@@ -421,44 +420,44 @@
                 });
             });
         }
-        
+
         // Theme mode card - calls toggleTheme from theme-manager.js
         var themeModeCard = document.getElementById('theme-mode-card');
         if (themeModeCard && typeof window.toggleTheme === 'function') {
             themeModeCard.addEventListener('click', window.toggleTheme);
         }
-        
+
         // Login display card - calls showLoginDisplayNamePrompt from ui.js
         var loginDisplayCard = document.getElementById('login-display-card');
         if (loginDisplayCard && typeof window.showLoginDisplayNamePrompt === 'function') {
             loginDisplayCard.addEventListener('click', window.showLoginDisplayNamePrompt);
         }
-        
+
         // Font size card - calls showNoteFontSizePrompt from font-size-settings.js
         var fontSizeCard = document.getElementById('font-size-card');
         if (fontSizeCard && typeof window.showNoteFontSizePrompt === 'function') {
             fontSizeCard.addEventListener('click', window.showNoteFontSizePrompt);
         }
-        
+
         // Timezone card
         var timezoneCard = document.getElementById('timezone-card');
         if (timezoneCard) {
             timezoneCard.addEventListener('click', showTimezonePrompt);
         }
-        
+
         // Save note sort modal button
         var saveNoteSortBtn = document.getElementById('saveNoteSortModalBtn');
         if (saveNoteSortBtn) {
-            saveNoteSortBtn.addEventListener('click', function() {
+            saveNoteSortBtn.addEventListener('click', function () {
                 var radios = document.getElementsByName('noteSort');
                 var selected = null;
                 for (var i = 0; i < radios.length; i++) {
                     if (radios[i].checked) { selected = radios[i].value; break; }
                 }
                 if (!selected) selected = 'updated_desc';
-                setSetting('note_list_sort', selected, function(success) {
+                setSetting('note_list_sort', selected, function (success) {
                     if (success) {
-                        try { closeModal('noteSortModal'); } catch(e) {}
+                        try { closeModal('noteSortModal'); } catch (e) { }
                         reloadOpener();
                         refreshNoteSortBadge();
                     } else {
@@ -467,38 +466,38 @@
                 });
             });
         }
-        
+
         // Save language modal button
         var saveLangBtn = document.getElementById('saveLanguageModalBtn');
         if (saveLangBtn) {
-            saveLangBtn.addEventListener('click', function() {
+            saveLangBtn.addEventListener('click', function () {
                 var radios = document.getElementsByName('languageChoice');
                 var selected = null;
                 for (var i = 0; i < radios.length; i++) {
                     if (radios[i].checked) { selected = radios[i].value; break; }
                 }
                 if (!selected) selected = 'en';
-                setSetting('language', selected, function(success) {
+                setSetting('language', selected, function (success) {
                     if (success) {
-                        try { closeModal('languageModal'); } catch(e) {}
+                        try { closeModal('languageModal'); } catch (e) { }
                         refreshLanguageBadge();
-                        setTimeout(function() { window.location.reload(); }, 300);
+                        setTimeout(function () { window.location.reload(); }, 300);
                     } else {
                         alert(tr('settings.language.save_error', {}, 'Error saving language'));
                     }
                 });
             });
         }
-        
+
         // Save timezone modal button
         var saveTimezoneBtn = document.getElementById('saveTimezoneModalBtn');
         if (saveTimezoneBtn) {
-            saveTimezoneBtn.addEventListener('click', function() {
+            saveTimezoneBtn.addEventListener('click', function () {
                 var select = document.getElementById('timezoneSelect');
                 var selectedTimezone = select ? select.value : 'Europe/Paris';
-                setSetting('timezone', selectedTimezone, function(success) {
+                setSetting('timezone', selectedTimezone, function (success) {
                     if (success) {
-                        try { closeModal('timezoneModal'); } catch(e) {}
+                        try { closeModal('timezoneModal'); } catch (e) { }
                         refreshTimezoneBadge();
                         reloadOpener();
                         alert(tr('display.timezone.alerts.updated_success', {}, 'Timezone updated successfully. Changes will take effect immediately.'));
@@ -508,7 +507,7 @@
                 });
             });
         }
-        
+
         // Load all badges
         refreshLanguageBadge();
         refreshLoginDisplayBadge();
@@ -517,17 +516,17 @@
         refreshTasklistInsertOrderBadge();
         refreshToolbarModeBadge();
         refreshTimezoneBadge();
-        
+
         // Re-translate dynamic badges once client-side i18n is loaded
-        document.addEventListener('poznote:i18n:loaded', function() {
-            try { refreshLanguageBadge(); } catch(e) {}
-            try { refreshFontSizeBadge(); } catch(e) {}
-            try { refreshNoteSortBadge(); } catch(e) {}
-            try { refreshTasklistInsertOrderBadge(); } catch(e) {}
-            try { refreshToolbarModeBadge(); } catch(e) {}
+        document.addEventListener('poznote:i18n:loaded', function () {
+            try { refreshLanguageBadge(); } catch (e) { }
+            try { refreshFontSizeBadge(); } catch (e) { }
+            try { refreshNoteSortBadge(); } catch (e) { }
+            try { refreshTasklistInsertOrderBadge(); } catch (e) { }
+            try { refreshToolbarModeBadge(); } catch (e) { }
         });
     });
-    
+
     // Expose functions globally for onclick handlers still in HTML
     window.showLanguageModal = showLanguageModal;
     window.openNoteSortModal = openNoteSortModal;
@@ -539,5 +538,5 @@
     window.refreshTasklistInsertOrderBadge = refreshTasklistInsertOrderBadge;
     window.refreshToolbarModeBadge = refreshToolbarModeBadge;
     window.refreshTimezoneBadge = refreshTimezoneBadge;
-    
+
 })();

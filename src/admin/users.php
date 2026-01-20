@@ -36,17 +36,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     switch ($action) {
         case 'create':
             $username = trim($_POST['username'] ?? '');
+            $email = trim($_POST['email'] ?? '');
             
             if (empty($username)) {
                 $error = t('multiuser.admin.errors.username_required', [], 'Username is required');
                 break;
             }
             
-            $result = createUserProfile($username);
+            $result = createUserProfile($username, $email);
             
             if ($result['success']) {
                 // Succès, on ne met pas de message
             } else {
+                $error = $result['error'];
+            }
+            break;
+            
+        case 'update_profile':
+            $userId = (int)($_POST['user_id'] ?? 0);
+            $username = trim($_POST['username'] ?? '');
+            $email = trim($_POST['email'] ?? '');
+            
+            if (empty($username)) {
+                $error = t('multiuser.admin.errors.username_required', [], 'Username is required');
+                break;
+            }
+            
+            $result = updateUserProfile($userId, [
+                'username' => $username,
+                'email' => $email
+            ]);
+            
+            if (!$result['success']) {
                 $error = $result['error'];
             }
             break;
@@ -85,9 +106,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [];
             if ($field === 'is_admin' || $field === 'active') {
                 $data[$field] = (int)$value;
-            } elseif ($field === 'username') {
+            } elseif ($field === 'username' || $field === 'email') {
                 $data[$field] = trim((string)$value);
-                if (empty($data[$field])) {
+                if ($field === 'username' && empty($data[$field])) {
                     $error = t('multiuser.admin.errors.username_required', [], 'Username is required');
                     break;
                 }
@@ -160,9 +181,10 @@ $v = getAppVersion();
         form.submit();
     }
 
-    function renameUser(userId, currentUsername) {
+    function renameUser(userId, currentUsername, currentEmail) {
         document.getElementById('rename_user_id').value = userId;
         document.getElementById('rename_username').value = currentUsername;
+        document.getElementById('rename_email').value = currentEmail || '';
         document.getElementById('renameModal').classList.add('active');
         setTimeout(() => document.getElementById('rename_username').focus(), 100);
     }
@@ -170,9 +192,36 @@ $v = getAppVersion();
     function submitRename() {
         const userId = document.getElementById('rename_user_id').value;
         const newUsername = document.getElementById('rename_username').value;
-        if (newUsername.trim() !== "") {
-            toggleUserStatus(userId, 'username', newUsername.trim());
-        }
+        const newEmail = document.getElementById('rename_email').value;
+        
+        // We handle multiple updates by submitting them sequentially or updating the logic
+        // For simplicity, we'll just update one for now or add a new action
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.style.display = 'none';
+        
+        const actionInput = document.createElement('input');
+        actionInput.name = 'action';
+        actionInput.value = 'update_profile'; // New action
+        form.appendChild(actionInput);
+        
+        const idInput = document.createElement('input');
+        idInput.name = 'user_id';
+        idInput.value = userId;
+        form.appendChild(idInput);
+        
+        const usernameInput = document.createElement('input');
+        usernameInput.name = 'username';
+        usernameInput.value = newUsername;
+        form.appendChild(usernameInput);
+        
+        const emailInput = document.createElement('input');
+        emailInput.name = 'email';
+        emailInput.value = newEmail;
+        form.appendChild(emailInput);
+        
+        document.body.appendChild(form);
+        form.submit();
     }
     </script>
 </head>
@@ -186,14 +235,16 @@ $v = getAppVersion();
                     <a id="backToNotesLink" href="../index.php" class="btn btn-secondary btn-margin-right">
                         <?php echo t_h('common.back_to_notes'); ?>
                     </a>
-                    <a href="../settings.php" class="btn btn-secondary">
+                    <a href="../settings.php" class="btn btn-secondary btn-margin-right">
                         <?php echo t_h('common.back_to_settings'); ?>
                     </a>
+                    <button class="btn btn-primary" onclick="openCreateModal()">
+                        <i class="fas fa-plus"></i> <?php echo t_h('multiuser.admin.create_user', [], 'Create Profile'); ?>
+                    </button>
                 </div>
-
-                <button class="btn btn-primary btn-margin-top" onclick="openCreateModal()">
-                    <i class="fas fa-plus"></i> <?php echo t_h('multiuser.admin.create_user', [], 'Create Profile'); ?>
-                </button>
+                <p class="email-note">
+                    <?php echo t_h('multiuser.admin.email_usage_note', [], 'Email addresses are only used for OIDC authentication if configured. Poznote does not send any emails.'); ?>
+                </p>
             </div>
         </div>
         
@@ -211,6 +262,7 @@ $v = getAppVersion();
                     <tr>
                         <th class="text-center col-id"><?php echo t_h('multiuser.admin.id', [], 'ID'); ?></th>
                         <th><?php echo t_h('multiuser.admin.username', [], 'User'); ?></th>
+                        <th><?php echo t_h('multiuser.admin.email', [], 'Email'); ?></th>
                         <th class="text-center"><?php echo t_h('multiuser.admin.administrator', [], 'Administrator'); ?></th>
                         <th class="text-center"><?php echo t_h('multiuser.admin.status', [], 'Status'); ?></th>
                         <th class="text-center"><?php echo t_h('multiuser.admin.actions', [], 'Actions'); ?></th>
@@ -225,10 +277,17 @@ $v = getAppVersion();
                             <td data-label="<?php echo t_h('multiuser.admin.username', [], 'User'); ?>">
                                 <div class="user-info">
                                     <div class="user-username" 
-                                         title="<?php echo t_h('multiuser.admin.click_to_rename', [], 'Click to rename'); ?>"
-                                         onclick="renameUser(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>')">
+                                         title="<?php echo t_h('multiuser.admin.click_to_rename', [], 'Click to edit'); ?>"
+                                         onclick="renameUser(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($user['email'] ?? '', ENT_QUOTES); ?>')">
                                         <?php echo htmlspecialchars($user['username']); ?>
                                     </div>
+                                </div>
+                            </td>
+                            <td data-label="<?php echo t_h('multiuser.admin.email', [], 'Email'); ?>">
+                                <div class="user-email <?php echo empty($user['email']) ? 'user-email-empty' : ''; ?>" 
+                                     title="<?php echo t_h('multiuser.admin.click_to_rename', [], 'Click to edit'); ?>"
+                                     onclick="renameUser(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($user['email'] ?? '', ENT_QUOTES); ?>')">
+                                    <?php echo !empty($user['email']) ? htmlspecialchars($user['email']) : '<em>' . t_h('multiuser.admin.not_defined', [], 'not defined') . '</em>'; ?>
                                 </div>
                             </td>
     
@@ -251,7 +310,9 @@ $v = getAppVersion();
                             <td class="text-center" data-label="<?php echo t_h('multiuser.admin.status', [], 'Status'); ?>">
     
                                 <?php if ($user['id'] === getCurrentUserId()): ?>
-                                    <span class="badge badge-active"><?php echo t_h('multiuser.admin.active', [], 'Active'); ?></span>
+                                    <span class="badge badge-active badge-not-allowed" title="<?php echo t_h('multiuser.admin.errors.cannot_change_self', [], 'You cannot change your own status/role'); ?>">
+                                        <?php echo t_h('multiuser.admin.active', [], 'Active'); ?>
+                                    </span>
                                 <?php else: ?>
                                     <?php if ($user['active']): ?>
                                         <span class="badge badge-active clickable-badge" 
@@ -272,9 +333,18 @@ $v = getAppVersion();
     
                             <td class="text-center <?php echo ($user['id'] === getCurrentUserId()) ? 'hide-on-mobile' : ''; ?>" data-label="<?php echo t_h('multiuser.admin.actions', [], 'Actions'); ?>">
                                 <div class="actions actions-center">
-    
+                                    <button class="btn btn-secondary btn-small" title="<?php echo t_h('multiuser.admin.edit_user', [], 'Edit User'); ?>" 
+                                            onclick="renameUser(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($user['email'] ?? '', ENT_QUOTES); ?>')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+
                                     <?php if ($user['id'] !== getCurrentUserId()): ?>
-                                        <button class="btn btn-danger btn-small" onclick="openDeleteModal(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>')">
+                                        <button class="btn btn-danger btn-small" title="<?php echo t_h('common.delete', [], 'Delete'); ?>" 
+                                                onclick="openDeleteModal(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    <?php else: ?>
+                                        <button class="btn btn-danger btn-small disabled" title="<?php echo t_h('multiuser.admin.errors.cannot_delete_self', [], 'You cannot delete your own profile'); ?>" disabled>
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     <?php endif; ?>
@@ -299,6 +369,9 @@ $v = getAppVersion();
                 <div class="form-group">
                     <input type="text" id="create_username" name="username" placeholder="<?php echo t_h('multiuser.admin.username', [], 'Username'); ?> *" required>
                 </div>
+                <div class="form-group">
+                    <input type="email" id="create_email" name="email" placeholder="<?php echo t_h('multiuser.admin.email', [], 'Email'); ?>">
+                </div>
                 
 
                 
@@ -315,10 +388,14 @@ $v = getAppVersion();
     <!-- Rename User Modal -->
     <div class="modal" id="renameModal">
         <div class="modal-content">
-            <h2 class="modal-title"><?php echo t_h('multiuser.admin.rename_user', [], 'Rename User'); ?></h2>
+            <h2 class="modal-title"><?php echo t_h('multiuser.admin.edit_user', [], 'Edit User Profile'); ?></h2>
             <div class="form-group">
                 <input type="hidden" id="rename_user_id">
-                <input type="text" id="rename_username" placeholder="<?php echo t_h('multiuser.admin.username', [], 'Username'); ?>" onkeydown="if(event.key==='Enter') submitRename()">
+                <label style="display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--text-muted);"><?php echo t_h('multiuser.admin.username', [], 'Username'); ?></label>
+                <input type="text" id="rename_username" placeholder="<?php echo t_h('multiuser.admin.username', [], 'Username'); ?>" onkeydown="if(event.key==='Enter') submitRename()" style="margin-bottom: 15px;">
+                
+                <label style="display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--text-muted);"><?php echo t_h('multiuser.admin.email', [], 'Email'); ?></label>
+                <input type="email" id="rename_email" placeholder="<?php echo t_h('multiuser.admin.email', [], 'Email'); ?>" onkeydown="if(event.key==='Enter') submitRename()">
             </div>
             <div class="form-actions">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('renameModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
