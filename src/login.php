@@ -117,6 +117,7 @@ if (isset($_GET['oidc_error'])) {
     <meta name="color-scheme" content="dark light">
     <script src="js/theme-init.js"></script>
     <link rel="stylesheet" href="css/fontawesome.min.css">
+    <link rel="stylesheet" href="css/all.min.css">
     <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/login.css">
     <link rel="stylesheet" href="css/dark-mode.css">
@@ -134,21 +135,21 @@ if (isset($_GET['oidc_error'])) {
 
         <?php 
         // Display warning if default 'admin_change_me' user exists
-        $hasDefaultAdmin = false;
+        $defaultAdminUsername = null;
         try {
             $profiles = getAllUserProfiles();
             foreach ($profiles as $profile) {
                 if ($profile['username'] === 'admin_change_me') {
-                    $hasDefaultAdmin = true;
+                    $defaultAdminUsername = $profile['username'];
                     break;
                 }
             }
         } catch (Exception $e) {}
 
-        if ($hasDefaultAdmin): 
+        if ($defaultAdminUsername): 
         ?>
         <div class="admin-warning" style="background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.875rem; text-align: left; line-height: 1.5;">
-            <?php echo t('login.admin_warning', [], 'The default administrator account is active with the username <code>admin_change_me</code>. Please log in and rename this account for better security.', $currentLang ?? 'en'); ?>
+            <?php echo t('login.admin_warning', ['username' => $defaultAdminUsername], 'The default administrator account is active with the username <code>' . htmlspecialchars($defaultAdminUsername) . '</code>. Please log in and rename this account for better security.', $currentLang ?? 'en'); ?>
         </div>
         <?php endif; ?>
         
@@ -181,7 +182,12 @@ if (isset($_GET['oidc_error'])) {
                 <input type="text" id="username" name="username" placeholder="<?php echo t_h('login.fields.username', [], 'Username', $currentLang ?? 'en'); ?>" required autofocus autocomplete="username">
             </div>
             <div class="form-group">
-                <input type="password" id="password" name="password" placeholder="<?php echo t_h('login.fields.password', [], 'Password', $currentLang ?? 'en'); ?>" required autocomplete="current-password">
+                <div class="password-wrapper">
+                    <input type="password" id="password" name="password" placeholder="<?php echo t_h('login.fields.password', [], 'Password', $currentLang ?? 'en'); ?>" required autocomplete="current-password">
+                    <button type="button" class="password-toggle" id="togglePassword" title="<?php echo t_h('login.show_password', [], 'Show password', $currentLang ?? 'en'); ?>">
+                        <i class="fa fa-eye"></i>
+                    </button>
+                </div>
                 <?php if ($error): ?>
                     <div class="error"><?php echo htmlspecialchars($error); ?></div>
                 <?php endif; ?>
@@ -214,7 +220,9 @@ if (isset($_GET['oidc_error'])) {
     </div>
     <?php
     $loginConfig = [
-        'focusOidc' => !$showNormalLogin && function_exists('oidc_is_enabled') && oidc_is_enabled()
+        'focusOidc' => !$showNormalLogin && function_exists('oidc_is_enabled') && oidc_is_enabled(),
+        'showPasswordTitle' => t('login.show_password', [], 'Show password', $currentLang ?? 'en'),
+        'hidePasswordTitle' => t('login.hide_password', [], 'Hide password', $currentLang ?? 'en')
     ];
     ?>
     <script type="application/json" id="login-config"><?php echo json_encode($loginConfig); ?></script>

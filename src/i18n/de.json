@@ -24,7 +24,7 @@
             "oidc_button": "Mit {{provider}} fortfahren",
             "documentation": "Poznote Dokumentation",
             "redirecting": "Weiterleitung...",
-            "admin_warning": "Das Standard-Administratorkonto ist mit dem Benutzernamen <code>admin_change_me</code> aktiv. Bitte melden Sie sich an und benennen Sie dieses Konto für mehr Sicherheit um (diese Nachricht verschwindet, sobald der Benutzername nicht mehr <code>admin_change_me</code> lautet).",
+            "admin_warning": "Das Standard-Administratorkonto ist mit dem Benutzernamen <code>{{username}}</code> aktiv. Bitte melden Sie sich an und benennen Sie dieses Konto für mehr Sicherheit um.",
             "errors": {
                 "invalid_credentials": "Benutzername oder Passwort ist falsch."
             }
@@ -1057,6 +1057,9 @@
             "title": "Anmeldung"
         },
         "redirecting": "Weiterleitung...",
+        "show_password": "Passwort anzeigen",
+        "hide_password": "Passwort ausblenden",
+        "admin_warning": "Das Standard-Administratorkonto ist mit dem Benutzernamen <code>{{username}}</code> aktiv. Bitte melden Sie sich an und benennen Sie dieses Konto für mehr Sicherheit um.",
         "fields": {
             "username": "Benutzername",
             "password": "Passwort",

@@ -24,7 +24,7 @@
             "oidc_button": "Continuar com {{provider}}",
             "documentation": "Documentação do Poznote",
             "redirecting": "Redirecionando...",
-            "admin_warning": "A conta de administrador padrão está ativa com o nome de usuário <code>admin_change_me</code>. Por favor, faça login e renomeie esta conta para maior segurança (esta mensagem desaparecerá assim que o nome de usuário não for mais <code>admin_change_me</code>).",
+            "admin_warning": "A conta de administrador padrão está ativa com o nome de usuário <code>{{username}}</code>. Por favor, faça login e renomeie esta conta para maior segurança.",
             "errors": {
                 "invalid_credentials": "Usuário ou senha incorretos."
             }
@@ -1061,6 +1061,9 @@
             "title": "Login"
         },
         "redirecting": "Redirecionando...",
+        "show_password": "Mostrar senha",
+        "hide_password": "Ocultar senha",
+        "admin_warning": "A conta de administrador padrão está ativa com o nome de usuário <code>{{username}}</code>. Por favor, faça login e renomeie esta conta para maior segurança.",
         "fields": {
             "username": "Nome de usuário",
             "password": "Senha",
