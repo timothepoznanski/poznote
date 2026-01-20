@@ -233,7 +233,7 @@ After installation, access Poznote in your web browser:
 ## Troubleshooting Installation
 
 <details>
-<summary><strong>mkdir() warnings (permission denied) or Connection failed</strong></summary>
+<summary><strong>"mkdir() warnings (permission denied) or Connection failed"</strong></summary>
 <br>
 
 If you encounter errors like:
@@ -259,11 +259,15 @@ sudo chown -R 82:82 data
 docker compose up -d
 ```
 
-If you get this error instead:
+</details>
 
-`Connection failed: SQLSTATE[HY000]: General error: 8 attempt to write a readonly database`
+<details>
+<summary><strong>"Connection failed: SQLSTATE[HY000]: General error: 8 attempt to write a readonly database"</strong></summary>
+<br>
 
-Stop the container and fix ownership for the `data` folder (adapt UID/GID to your setup, example uses 1000:1000):
+First, try to stop and restart the container and wait for the database to be initialized (refresh the page).
+
+If that didn't work, stop the container and fix ownership for the `data` folder (adapt UID/GID to your setup, example uses 1000:1000):
 
 ```bash
 docker compose down
@@ -305,16 +309,13 @@ Alternatively, install Poznote in a directory outside of `/root`, such as `/opt/
 </details>
 
 <details>
-<summary><strong>User Profile Issues (Login/Selection)</strong></summary>
+<summary><strong>"Incorrect username or password"</strong></summary>
 <br>
 
-**User profile doesn't appear in the login dropdown:**
-1. Log in as an administrator and check if the profile is marked as **active** in the User Management panel.
-2. Verify that the master database exists and is readable: `data/master.db`.
-
-**Authentication failed for an existing user:**
-1. Check if the user's role (Admin vs User) matches the password you are using from the `.env` file.
-2. Ensure no extra spaces were added when editing the `.env` variables.
+1. Try to log with "admin" or "admin_change_me" and your password.
+2. Check if the user's role (Admin vs User) matches the password you are using from the `.env` file.
+3. Ensure no extra spaces were added when editing the `.env` variables.
+4. If you can log in as an administrator (admin) but not as a standard user, check if the profile is marked as **active** in the User Management panel.
 
 </details>
 
@@ -326,35 +327,14 @@ Poznote configuration is split between two locations:
 <summary><strong>System Settings (`.env` file)</strong></summary>
 <br>
 
-The following settings are configured in the `.env` file located in your Poznote installation directory:
+System settings can be modified in the `.env` file. Several categories of settings are available:
 
-**Authentication**
-- `POZNOTE_PASSWORD` - Global password for Administrator accounts (default: `admin`)
-- `POZNOTE_PASSWORD_USER` - Global password for Standard User accounts (default: `user`)
+- **Authentication**
+- **Web Server**
+- **OIDC / SSO Authentication**
+- **Import Limits**
 
-**Web Server**
-- `HTTP_WEB_PORT` - Port on which Poznote will be accessible (default: `8040`)
-
-**OIDC / SSO Authentication**
-- `POZNOTE_OIDC_ENABLED` - Enable OpenID Connect authentication (`true`/`false`)
-- `POZNOTE_OIDC_PROVIDER_NAME` - Display name for the OIDC provider
-- `POZNOTE_OIDC_ISSUER` - OIDC provider issuer URL
-- `POZNOTE_OIDC_CLIENT_ID` - Client ID from OIDC provider
-- `POZNOTE_OIDC_CLIENT_SECRET` - Client secret from OIDC provider
-- `POZNOTE_OIDC_SCOPES` - Custom scopes (default: `"openid profile email"`)
-- `POZNOTE_OIDC_DISCOVERY_URL` - Override auto-discovery URL
-- `POZNOTE_OIDC_REDIRECT_URI` - Custom redirect URI
-- `POZNOTE_OIDC_END_SESSION_ENDPOINT` - Custom logout endpoint
-- `POZNOTE_OIDC_POST_LOGOUT_REDIRECT_URI` - Redirect URL after logout
-- `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN` - Hide username/password login form (`true`/`false`)
-- `POZNOTE_OIDC_DISABLE_BASIC_AUTH` - Disable HTTP Basic Auth for API (`true`/`false`)
-- `POZNOTE_OIDC_ALLOWED_USERS` - Comma-separated list of allowed users (emails or usernames)
-
-**Import Limits**
-- `POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES` - Max number of individual files for import (default: `50`)
-- `POZNOTE_IMPORT_MAX_ZIP_FILES` - Max number of files in ZIP archive for import (default: `300`)
-
-**How to Modify Settings**
+**How to Modify System Settings**
 
 Navigate to your Poznote directory:
 ```bash
@@ -379,16 +359,9 @@ docker compose up -d
 <summary><strong>Application Settings (Settings Page)</strong></summary>
 <br>
 
-Additional settings are available through the Poznote web interface and are stored in the database:
+Additional settings are available through the Poznote web interface and are stored in the database.
 
-- **General settings** - Application preferences, default workspace, language
-- **Note editor** - Default note type (HTML/Markdown), editor preferences
-- **Workspaces** - Create, rename, delete workspaces
-- **Folders** - Manage folder structure and organization
-- **Backup/Restore** - Create backups, restore from backups
-- **And more** - Various application-level configurations
-
-**How to Modify Settings**
+**How to Modify Application Settings**
 
 1. Log in to Poznote
 2. Click on the **Settings** icon (⚙️) in the navigation bar
@@ -461,20 +434,11 @@ POZNOTE_OIDC_ALLOWED_USERS=alice@example.com,bob@example.com,charlie@company.org
 
 ## Multi-users
 
-Poznote is built with a multi-user architecture where each user has their own isolated data space.
+Poznote features a multi-user architecture with isolated data space for each user (ideal for families, teams, or personal personas).
 
-### Key Concepts
-
-- **Data Isolation**: Each user has their own separate notes, folders, workspaces, tags, and attachments. Data is strictly separated at the database and file levels.
-- **Role-based Global Passwords**: Instead of per-user passwords, Poznote uses two global passwords defined in your `.env`.
-- **User Management**: Administrators can create, rename, and manage users via the Admin Panel (Settings > Advanced > User Management).
-
-### Profile Properties
-
-Each user profile has:
-- **Username**: Unique identifier (used for OIDC matching and display).
-- **Admin Role**: Can manage other profiles, backup data for any user, manage global settings, and access their own private data space.
-- **Active Status**: Can login and access the system.
+- **Data Isolation**: Each user has their own separate notes, workspaces, tags, folders and attachments.
+- **Global Passwords**: Access is managed via role-based global passwords defined in `.env`.
+- **User Management**: Administrators can manage profiles via the Settings panel.
 
 ### Architecture & Structure
 
@@ -491,28 +455,6 @@ data/
     ├── 2/                       # User ID 2
     └── ...
 ```
-
-### Security Considerations
-
-1. **Shared Password**: All users share the same role-based login password (trusted environments).
-2. **Data Isolation**: Users cannot access other users' data through the application.
-3. **Admin Control**: Only admins can manage user profiles or global settings.
-
-### Use Cases
-
-- **Families**: Shared home server where each member has their own notes.
-- **Small Teams**: Trusted team members sharing a Poznote instance.
-- **Personal Personas**: One person with different contexts (work, personal, projects).
-
-### Automatic Migration
-
-If you are upgrading from an older version of Poznote (v1.x), your data will be **automatically migrated** on the first startup:
-1. A master database is created with your default administrator profile (`admin_change_me`).
-2. Your existing notes, database, and attachments are moved to `data/users/1/`.
-3. All file permissions and SQLite integrity are preserved.
-4. Old empty directories are cleaned up.
-
-No manual action is required, the system handles the transition to the multi-user structure automatically.
 
 ## Update application
 
