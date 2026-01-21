@@ -54,7 +54,20 @@
         "no": "No",
         "not_available": "Not available",
         "not_specified": "Not specified",
-        "apply": "Apply"
+        "apply": "Apply",
+        "kanban": "Kanban"
+    },
+    "kanban": {
+        "title": "Kanban - {{folder}}",
+        "view_label": "Kanban View",
+        "uncategorized": "In Parent Folder",
+        "empty": {
+            "title": "No subfolders",
+            "message": "Create subfolders to see them as columns here."
+        },
+        "actions": {
+            "open": "Kanban View"
+        }
     },
     "folders": {
         "delete": {

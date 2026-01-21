@@ -237,6 +237,12 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
         $actions .= "<span>" . t_h('notes_list.folder_actions.create', [], 'Create note') . "</span>";
         $actions .= "</div>";
         
+        // Kanban view action
+        $actions .= "<div class='folder-actions-menu-item' data-action='open-kanban-view' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
+        $actions .= "<i class='fa-columns'></i>";
+        $actions .= "<span>" . t_h('kanban.actions.open', [], 'Kanban View') . "</span>";
+        $actions .= "</div>";
+        
         // Move all files action (only if folder has notes)
         if ($noteCount > 0) {
             $actions .= "<div class='folder-actions-menu-item' data-action='move-folder-files' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";

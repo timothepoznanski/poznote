@@ -493,12 +493,16 @@ class NotesController {
             }
             
             // Get folder name from folder_id if changed
-            if ($folder_id !== null && $folder_id !== (int)$note['folder_id']) {
-                $fStmt = $this->con->prepare("SELECT name FROM folders WHERE id = ?");
-                $fStmt->execute([$folder_id]);
-                $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
-                if ($folderData) {
-                    $folder = $folderData['name'];
+            if (isset($input['folder_id'])) {
+                if ($folder_id !== null) {
+                    $fStmt = $this->con->prepare("SELECT name FROM folders WHERE id = ?");
+                    $fStmt->execute([$folder_id]);
+                    $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
+                    if ($folderData) {
+                        $folder = $folderData['name'];
+                    }
+                } else {
+                    $folder = null;
                 }
             }
             

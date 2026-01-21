@@ -305,6 +305,16 @@
                     window.location.href = url;
                 }
                 break;
+            case 'open-kanban-view':
+                if (window.innerWidth <= 800) {
+                    return;
+                }
+                const folderId = target.dataset.folderId;
+                if (folderId) {
+                    const workspace = window.selectedWorkspace || '';
+                    window.location.href = `kanban.php?folder_id=${folderId}&workspace=${encodeURIComponent(workspace)}`;
+                }
+                break;
         }
     }
 

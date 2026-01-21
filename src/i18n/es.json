@@ -54,7 +54,20 @@
         "no": "No",
         "not_available": "No disponible",
         "not_specified": "No especificado",
-        "apply": "Aplicar"
+        "apply": "Aplicar",
+        "kanban": "Kanban"
+    },
+    "kanban": {
+        "title": "Kanban - {{folder}}",
+        "view_label": "Vista Kanban",
+        "uncategorized": "En la carpeta principal",
+        "empty": {
+            "title": "Sin subcarpetas",
+            "message": "Crea subcarpetas para verlas como columnas aquí."
+        },
+        "actions": {
+            "open": "Vista Kanban"
+        }
     },
     "folders": {
         "delete": {

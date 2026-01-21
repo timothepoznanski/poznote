@@ -54,7 +54,20 @@
         "no": "Non",
         "not_available": "Non disponible",
         "not_specified": "Non spécifié",
-        "apply": "Appliquer"
+        "apply": "Appliquer",
+        "kanban": "Kanban"
+    },
+    "kanban": {
+        "title": "Kanban - {{folder}}",
+        "view_label": "Vue Kanban",
+        "uncategorized": "Dans le dossier parent",
+        "empty": {
+            "title": "Aucun sous-dossier",
+            "message": "Créez des sous-dossiers pour les voir apparaître en colonnes ici."
+        },
+        "actions": {
+            "open": "Vue Kanban"
+        }
     },
     "folders": {
         "delete": {
