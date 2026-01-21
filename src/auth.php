@@ -165,8 +165,9 @@ function isAuthenticated() {
                 
                 // If no migration or cookie was created after (shouldn't happen for legacy format),
                 // validate normally but auto-select the first user profile
+                $fallbackUsername = getAuthConfig('POZNOTE_USERNAME', 'admin');
                 if (time() - $timestamp < REMEMBER_ME_DURATION && 
-                    $username === AUTH_USERNAME &&
+                    $username === $fallbackUsername &&
                     $hash === hash('sha256', $username . $timestamp . AUTH_PASSWORD)) {
                     
                     // For legacy cookies, we need to associate with a user profile
