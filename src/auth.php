@@ -253,10 +253,11 @@ function authenticate($username, $password, $rememberMe = false) {
         if ($rememberMe) {
             $timestamp = time();
             $secretToUse = $isProfileAdmin ? AUTH_PASSWORD : AUTH_USER_PASSWORD;
+            $actualUsername = $user['username'];
             
-            // Format: username:user_id:timestamp:hash
-            $hash = hash('sha256', $username . $userId . $timestamp . $secretToUse);
-            $token = base64_encode($username . ':' . $userId . ':' . $timestamp . ':' . $hash);
+            // Format: actual_username:user_id:timestamp:hash
+            $hash = hash('sha256', $actualUsername . $userId . $timestamp . $secretToUse);
+            $token = base64_encode($actualUsername . ':' . $userId . ':' . $timestamp . ':' . $hash);
             setcookie(REMEMBER_ME_COOKIE, $token, time() + REMEMBER_ME_DURATION, '/', '', false, true);
         }
 
