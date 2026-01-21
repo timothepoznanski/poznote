@@ -15,6 +15,7 @@
         "login": {
             "fields": {
                 "username": "Benutzername",
+                "username_or_email": "Benutzername oder E-Mail",
                 "password": "Passwort",
                 "profile": "Profil"
             },
@@ -279,6 +280,7 @@
             "spanish": "Spanisch",
             "portuguese": "Portugiesisch",
             "german": "Deutsch",
+            "chinese_simplified": "Vereinfachtes Chinesisch",
             "login_page": "Sprache der Anmeldeseite:",
             "saved": "Sprache gespeichert",
             "save_error": "Sprache konnte nicht gespeichert werden",
@@ -1062,6 +1064,7 @@
         "admin_warning": "Das Standard-Administratorkonto ist mit dem Benutzernamen <code>{{username}}</code> aktiv. Bitte melden Sie sich an und benennen Sie dieses Konto für mehr Sicherheit um.",
         "fields": {
             "username": "Benutzername",
+            "username_or_email": "Benutzername oder E-Mail",
             "password": "Passwort",
             "profile": "Wählen Sie Ihr Profil"
         },

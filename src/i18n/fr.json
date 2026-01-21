@@ -281,6 +281,7 @@
             "spanish": "Espagnol",
             "portuguese": "Portugais",
             "german": "Allemand",
+            "chinese_simplified": "Chinois simplifié",
             "login_page": "Langue de la page de connexion :",
             "saved": "Langue enregistrée",
             "save_error": "Impossible d'enregistrer la langue",
@@ -1073,6 +1074,7 @@
         "admin_warning": "Le compte administrateur par défaut a pour login <code>{{username}}</code>. Veuillez vous connecter et renommer ce compte pour plus de sécurité.",
         "fields": {
             "username": "Nom d’utilisateur",
+            "username_or_email": "Pseudo ou Email",
             "password": "Mot de passe",
             "profile": "Sélectionnez votre profil"
         },

@@ -15,6 +15,7 @@
         "login": {
             "fields": {
                 "username": "Usuário",
+                "username_or_email": "Nome de usuário ou e-mail",
                 "password": "Senha",
                 "profile": "Perfil"
             },
@@ -278,6 +279,7 @@
             "spanish": "Espanhol",
             "portuguese": "Português",
             "german": "Alemão",
+            "chinese_simplified": "Chinês simplificado",
             "login_page": "Idioma da página de login:",
             "saved": "Idioma salvo",
             "save_error": "Não foi possível salvar o idioma",
@@ -1066,6 +1068,7 @@
         "admin_warning": "A conta de administrador padrão está ativa com o nome de usuário <code>{{username}}</code>. Por favor, faça login e renomeie esta conta para maior segurança.",
         "fields": {
             "username": "Nome de usuário",
+            "username_or_email": "Nome de usuário ou e-mail",
             "password": "Senha",
             "profile": "Selecione seu perfil"
         },

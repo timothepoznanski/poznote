@@ -1,0 +1,1782 @@
+{
+    "app": {
+        "name": "Poznote"
+    },
+    "common": {
+        "notes": "笔记",
+        "back_to_home": "返回主页",
+        "back_to_notes": "返回笔记",
+        "back_to_settings": "返回设置",
+        "close": "关闭",
+        "cancel": "取消",
+        "confirm": "确认",
+        "confirm_action": "确认操作",
+        "confirmation": "确认",
+        "save": "保存",
+        "login": {
+            "fields": {
+                "username": "用户名",
+                "username_or_email": "用户名或邮箱",
+                "password": "密码",
+                "profile": "个人资料"
+            },
+            "button": "登录",
+            "remember_me": "保持登录30天",
+            "no_profiles": "没有可用的个人资料。请联系管理员。",
+            "oidc_button": "使用 {{provider}} 继续",
+            "documentation": "Poznote 文档",
+            "redirecting": "正在重定向...",
+            "errors": {
+                "invalid_credentials": "用户名或密码错误。"
+            }
+        },
+        "download": "下载",
+        "convert": "转换",
+        "create": "创建",
+        "delete": "删除",
+        "duplicate": "复制",
+        "move": "移动",
+        "rename": "重命名",
+        "menu": "菜单",
+        "enabled": "已启用",
+        "disabled": "已禁用",
+        "loading": "加载中...",
+        "please_wait": "请稍候...",
+        "information": "信息",
+        "error": "错误",
+        "warning": "警告",
+        "success": "成功",
+        "notification": "通知",
+        "saved": "已保存",
+        "not_defined": "未设置",
+        "unknown_error": "未知错误",
+        "yes": "是",
+        "no": "否",
+        "not_available": "不可用",
+        "not_specified": "未指定",
+        "apply": "应用"
+    },
+    "folders": {
+        "delete": {
+            "confirm_main": "您确定要删除文件夹 \"{{folder}}\" 吗？",
+            "details": {
+                "subfolder_singular_html": "<strong>• {{count}}</strong> 个子文件夹也将被删除",
+                "subfolder_plural_html": "<strong>• {{count}}</strong> 个子文件夹也将被删除",
+                "note_singular_html": "<strong>• {{count}}</strong> 篇笔记将被移至回收站",
+                "note_plural_html": "<strong>• {{count}}</strong> 篇笔记将被移至回收站"
+            }
+        },
+        "download": {
+            "starting": "正在准备下载文件夹 \"{{folder}}\"...",
+            "started": "文件夹 \"{{folder}}\" 的下载已开始"
+        },
+        "move_all": {
+            "same_source_target": "源文件夹和目标文件夹不能相同",
+            "moving": "正在移动...",
+            "files_count_singular": "1 个文件将被移动",
+            "files_count_plural": "{{count}} 个文件将被移动",
+            "empty_folder": "此文件夹为空",
+            "unable_to_count_files": "无法统计文件数量"
+        },
+        "move": {
+            "moving": "正在移动...",
+            "success": "文件夹 \"{{folder}}\" 移动成功"
+        },
+        "errors": {
+            "check_content_prefix": "检查文件夹内容时出错: {{error}}",
+            "move_files_prefix": "移动文件时出错: {{error}}",
+            "move_folder_prefix": "移动文件夹时出错: {{error}}",
+            "cannot_rename_system_folders": "无法重命名系统文件夹",
+            "generic_prefix": "错误: {{error}}",
+            "create_title": "创建文件夹出错",
+            "create_prefix": "创建文件夹时出错: {{error}}",
+            "delete_prefix": "删除文件夹时出错: {{error}}",
+            "rename_prefix": "重命名文件夹时出错: {{error}}",
+            "load_prefix": "加载文件夹时出错: {{error}}",
+            "empty_folder_prefix": "清空文件夹时出错: {{error}}"
+        },
+        "validation": {
+            "enter_folder_name": "请输入文件夹名称"
+        },
+        "empty": {
+            "title": "清空文件夹",
+            "confirm_message": "您确定要将 \"{{folder}}\" 中的所有笔记移至回收站吗？",
+            "confirm_button": "将笔记移至回收站",
+            "success_moved_to_trash": "已将文件夹 \"{{folder}}\" 中的所有笔记移至回收站"
+        },
+        "move_note": {
+            "select_note_first": "请先选择一篇笔记再移动到文件夹。",
+            "select_target_folder": "请选择目标文件夹",
+            "create_and_move": "创建并移动",
+            "errors": {
+                "move_prefix": "移动笔记时出错: {{error}}",
+                "duplicate_title": "目标文件夹中已存在同名笔记。",
+                "duplicate_title_root": "根目录中已存在同名笔记。"
+            }
+        },
+        "subfolder": {
+            "modal_title": "新建子文件夹",
+            "modal_message": "输入子文件夹名称 (在 {{parent}} 中)"
+        }
+    },
+    "modal_alerts": {
+        "cursor_warning": {
+            "title": "需要光标位置",
+            "message": "在继续之前，请先点击编辑器内部。"
+        }
+    },
+    "excalidraw": {
+        "titles": {
+            "editing_not_available": "编辑不可用",
+            "unsaved_note": "未保存的笔记",
+            "insertion_error": "插入错误",
+            "image_not_found": "图片未找到"
+        },
+        "editor": {
+            "titles": {
+                "embedded_diagram": "嵌入式图表",
+                "new_note": "新笔记"
+            },
+            "toolbar": {
+                "save_and_exit": "保存并退出",
+                "exit_without_saving": "不保存退出",
+                "saving": "正在保存...",
+                "saved": "已保存！"
+            },
+            "loading": "正在加载 Excalidraw Poznote...",
+            "alerts": {
+                "editor_not_ready": "编辑器未就绪",
+                "error_prefix": "错误: {{error}}"
+            },
+            "errors": {
+                "failed_to_load": "错误：无法加载 Excalidraw。请刷新页面。",
+                "initializing_prefix": "初始化 Excalidraw 时出错: {{error}}",
+                "save_failed": "保存失败"
+            },
+            "library_warning": {
+                "line1": "外部库页面上的 \"Add to Excalidraw\" 按钮在自托管版本中不起作用。",
+                "line2": "您必须下载库文件 (.excalidrawlib)，然后使用库菜单中的 \"Open\" 按钮手动导入。",
+                "ok": "我明白"
+            }
+        },
+        "messages": {
+            "disabled_small_screens": "为了获得更好的用户体验，Excalidraw 编辑在小屏幕上已禁用。",
+            "disabled_mobile": "Excalidraw 编辑在移动设备上已禁用。",
+            "disabled_under_800": "Excalidraw 编辑在小于 800 像素的屏幕上已禁用。"
+        },
+        "spinner": {
+            "saving_note": "正在保存笔记...",
+            "saving_title": "保存中"
+        },
+        "errors": {
+            "save_before_adding": "添加图表前请先保存笔记",
+            "save_before_editing": "编辑图表前请先保存笔记",
+            "note_editor_not_found": "未找到笔记编辑器",
+            "failed_to_save_try_again": "保存笔记失败。请稍后重试。",
+            "error_saving_note_prefix": "保存笔记时出错: {{error}}",
+            "insert_area_not_found": "找不到用于插入图表的笔记内容区域",
+            "image_not_found": "未找到 Excalidraw 图片。请先在编辑器中打开图表并保存。"
+        }
+    },
+    "note_reference": {
+        "loading": "加载中...",
+        "untitled": "无标题",
+        "modal": {
+            "search_placeholder": "搜索笔记...",
+            "recent_notes": "最近的笔记"
+        },
+        "empty": {
+            "no_notes_found": "未找到笔记",
+            "no_match": "没有与您的搜索匹配的笔记",
+            "no_other": "没有其他可用的笔记"
+        },
+        "error": {
+            "loading_notes": "加载笔记时出错"
+        }
+    },
+    "attachments": {
+        "empty": "无附件。",
+        "upload": {
+            "button_uploading": "正在上传..."
+        },
+        "actions": {
+            "view": "查看",
+            "delete": "删除",
+            "open_attachments": "打开附件",
+            "download": "下载 {{filename}}"
+        },
+        "errors": {
+            "select_file": "请选择要上传的文件。",
+            "no_note_selected": "未选择笔记。",
+            "file_too_large": "文件太大 (最大: {{maxSize}})。",
+            "http_error": "HTTP 错误: {{status}}",
+            "invalid_server_response": "无效的服务器响应。",
+            "upload_failed": "上传失败: {{error}}",
+            "deletion_failed": "删除失败: {{error}}",
+            "deletion_failed_generic": "删除失败。",
+            "loading_failed": "加载附件失败",
+            "loading_error": "加载附件时出错",
+            "upload_failed_generic": "上传失败。请稍后重试。",
+            "upload_failed_connection": "上传失败。请检查您的网络连接。"
+        },
+        "messages": {
+            "upload_success": "文件上传成功！",
+            "deleted_success": "附件删除成功"
+        },
+        "page": {
+            "title": "管理附件",
+            "subtitle": "管理笔记的附件:",
+            "upload_section_title": "上传新附件",
+            "drag_drop_info": "您可以将文件拖放到下方:",
+            "all_types_accepted": "接受所有文件类型 (最大 200MB)",
+            "upload_button": "上传文件",
+            "current_attachments": "当前附件",
+            "loading_attachments": "正在加载附件...",
+            "preview_alt": "预览",
+            "uploaded_prefix": "已上传: ",
+            "open_in_new_tab": "在新标签页中打开",
+            "pdf_label": "PDF"
+        },
+        "modals": {
+            "delete": {
+                "title": "删除附件",
+                "message": "您确定要删除此附件吗？此操作无法撤销。"
+            }
+        },
+        "size": {
+            "units": {
+                "bytes": "字节",
+                "kb": "KB",
+                "mb": "MB",
+                "gb": "GB"
+            }
+        },
+        "list": {
+            "title": "包含附件的笔记",
+            "no_attachments": "目前没有笔记包含附件。",
+            "hint": "在笔记工具栏中使用回形针按钮向笔记添加附件。",
+            "filter_placeholder": "按笔记标题或附件名称过滤...",
+            "no_filter_results": "没有与您的搜索匹配的笔记。",
+            "download": "下载"
+        }
+    },
+    "auth": {
+        "api": {
+            "authentication_required": "需要身份验证",
+            "invalid_credentials": "身份验证无效"
+        }
+    },
+    "settings": {
+        "title": "设置",
+        "sections": {
+            "account_display": "账户与显示",
+            "notes_folders": "笔记与文件夹",
+            "backup_restore": "备份、还原与更新",
+            "advanced": "高级"
+        },
+        "language": {
+            "label": "语言",
+            "english": "英语",
+            "french": "法语",
+            "spanish": "西班牙语",
+            "portuguese": "葡萄牙语",
+            "german": "德语",
+            "chinese_simplified": "简体中文",
+            "login_page": "登录页面语言:",
+            "saved": "语言已保存",
+            "save_error": "无法保存语言",
+            "reload_hint": "正在重载..."
+        },
+        "cards": {
+            "workspaces": "工作区",
+            "user_management": "用户管理",
+            "backup_export": "备份 / 导出",
+            "restore_import": "还原 / 导入",
+            "check_updates": "检查更新",
+            "api_docs": "API 文档",
+            "documentation": "Github 仓库",
+            "news": "Poznote 博客",
+            "website": "Poznote 网站",
+            "support": "支持开发者",
+            "release_notes": "发布日志"
+        }
+    },
+    "workspaces": {
+        "page": {
+            "title": "管理工作区 - Poznote"
+        },
+        "description": "工作区允许您在单个 Poznote 实例中将笔记组织到不同的环境中，就像为工作、个人生活或项目设置不同的笔记本一样。",
+        "sections": {
+            "create": {
+                "title": "创建新工作区",
+                "placeholder": "输入工作区名称"
+            },
+            "existing": {
+                "title": "现有工作区",
+                "empty": "未定义工作区。"
+            }
+        },
+        "actions": {
+            "select": "选择",
+            "move_notes": "移动笔记"
+        },
+        "count": {
+            "notes_0": "0 篇笔记",
+            "notes_1": "1 篇笔记",
+            "notes_n": "{{count}} 篇笔记"
+        },
+        "default": {
+            "title": "启动工作区",
+            "description_1": "选择启动 Poznote 时打开的工作区。",
+            "description_2": "选择 \"{{last}}\" 以始终打开您上次使用的工作区。",
+            "last_opened": "上次打开的工作区",
+            "save_button": "保存",
+            "status_set_to": "✓ 启动工作区已设置为: {{workspace}}",
+            "error_saving": "保存启动工作区出错"
+        },
+        "validation": {
+            "enter_name": "输入工作区名称",
+            "invalid_name": "名称无效: 仅限使用字母、数字、连字符或下划线",
+            "enter_new_name": "请输入新名称",
+            "new_name_must_differ": "新名称必须与当前名称不同"
+        },
+        "alerts": {
+            "unknown_error": "未知错误",
+            "error_prefix": "错误: {{error}}",
+            "renamed_success": "工作区重命名成功",
+            "deleted_success": "工作区删除成功",
+            "rename_error": "重命名工作区出错",
+            "delete_error": "删除工作区出错"
+        },
+        "move": {
+            "choose_target": "选择目标",
+            "moved_to": "已将 {{count}} 篇笔记移动到 {{target}}",
+            "error_moving_notes": "移动笔记出错: {{error}}"
+        },
+        "menu": {
+            "loading": "正在加载工作区...",
+            "error_loading": "加载工作区出错",
+            "logout": "注销"
+        },
+        "errors": {
+            "name_empty": "工作区名称不能为空",
+            "invalid_name": "工作区名称无效。仅限使用字母、数字、连字符和下划线（无空格）。",
+            "name_required": "需要工作区名称",
+            "cannot_delete_default": "无法删除启动工作区",
+            "not_found": "未找到工作区",
+            "cannot_rename_default": "无法重命名启动工作区",
+            "invalid_new_name": "新工作区名称无效。仅限使用字母、数字、连字符和下划线（无空格）。",
+            "name_and_target_required": "需要工作区名称和目标",
+            "source_target_must_differ": "源工作区和目标工作区必须不同"
+        },
+        "messages": {
+            "created": "工作区已创建",
+            "deleted_all": "工作区已删除，所有关联的笔记、文件夹和附件已被移除",
+            "renamed": "笔记和标签中的工作区已重命名",
+            "notes_moved_to": "笔记已移动到 {{target}}"
+        },
+        "confirm_delete": {
+            "title": "确认删除工作区",
+            "message": "删除工作区 \"{{workspace}}\"？笔记将被移动到启动工作区。"
+        }
+    },
+    "display": {
+        "title": "显示",
+        "cards": {
+            "theme_mode": "主题",
+            "login_display": "登录页面标题",
+            "note_font_size": "笔记内容字体大小",
+            "note_sort_order": "笔记排序规则",
+            "tasklist_insert_order": "任务列表插入顺序",
+            "timezone": "时区",
+            "show_note_created": "显示笔记创建日期",
+            "show_folder_counts": "显示文件夹笔记数量",
+            "notes_without_folders_after": "在文件夹后显示笔记",
+            "show_folder_actions": "显示文件夹操作",
+            "center_note_content": "居中显示笔记内容"
+        },
+        "badges": {
+            "font_size_default": "默认 ({{size}}px)",
+            "toolbar_mode": {
+                "full": "仅工具栏",
+                "slash": "仅斜杠命令",
+                "both": "工具栏图标 + 斜杠命令菜单"
+            }
+        },
+        "alerts": {
+            "error_saving_preference": "保存偏好设置出错"
+        },
+        "timezone": {
+            "alerts": {
+                "updated_success": "时区更新成功。更改将立即生效。",
+                "update_error": "更新时区出错"
+            }
+        }
+    },
+    "sidebar": {
+        "display": "显示",
+        "home": "首页",
+        "settings": "设置",
+        "create": "创建",
+        "toggle": "显示/隐藏左侧边栏"
+    },
+    "home": {
+        "title": "首页",
+        "shared_notes": "共享笔记",
+        "shared_folders": "共享文件夹",
+        "note": "笔记",
+        "notes": "笔记"
+    },
+    "search": {
+        "placeholder": "搜索...",
+        "clear": "清除搜索",
+        "placeholder_notes": "搜索一个或多个关键词...",
+        "placeholder_tags": "搜索一个或多个标签...",
+        "validation": {
+            "select_type": "请至少选择一个搜索选项（笔记或标签）",
+            "single_letter_warning": "使用单字母单词搜索可能会返回过多结果。请尝试使用更长的单词进行精确搜索。"
+        }
+    },
+    "autosave": {
+        "confirm_switch": "⚠️ 检测到未保存的更改\n\n您有未保存的更改，如果现在切换，这些更改将会丢失。\n\n点击“确定”保存并继续，或点击“取消”留下。\n（停止输入 2 秒后将自动保存）",
+        "beforeunload_warning": "⚠️ 您有未保存的更改。确定要离开吗？",
+        "confirm_navigation": "⚠️ 未保存的更改\n\n您有未保存的更改，这些更改将会丢失。\n要在离开前保存吗？",
+        "notification": {
+            "saving": "正在保存更改...",
+            "saved": "已保存！"
+        }
+    },
+    "tasklist": {
+        "input_placeholder": "输入新任务并按回车键添加到列表...",
+        "drag_to_reorder": "拖动以重新排序",
+        "add_to_top": "在顶部添加新任务",
+        "add_to_bottom": "在底部添加新任务",
+        "insert_order_top": "顶部",
+        "insert_order_bottom": "底部",
+        "clear_completed": "清除已完成任务",
+        "no_completed_tasks": "没有可清除的已完成任务。",
+        "confirm_clear_completed": "删除 {{count}} 个已完成任务？",
+        "actions": "任务列表操作",
+        "uncheck_all": "取消勾选所有任务",
+        "no_checked_tasks": "没有已勾选的任务可以取消勾选。",
+        "confirm_uncheck_all": "取消勾选 {{count}} 个任务？"
+    },
+    "tags": {
+        "add_single": "添加标签...",
+        "add_multiple": "添加多个标签...",
+        "search": {
+            "placeholder": "筛选标签...",
+            "results_one": "找到 1 个关于 \"{{term}}\" 的标签",
+            "results_other": "找到 {{count}} 个关于 \"{{term}}\" 的标签"
+        },
+        "count": {
+            "one": "总共有 {{count}} 个标签",
+            "other": "总共有 {{count}} 个标签"
+        },
+        "empty": "未找到标签。"
+    },
+    "trash": {
+        "search": {
+            "placeholder": "在回收站中搜索...",
+            "results_for": "\"{{term}}\" 的搜索结果",
+            "results_one": "找到 1 篇关于 \"{{term}}\" 的笔记",
+            "results_other": "找到 {{count}} 篇关于 \"{{term}}\" 的笔记"
+        },
+        "actions": {
+            "empty_trash": "清空回收站",
+            "restore": "还原",
+            "delete_forever": "永久删除",
+            "restore_note_tooltip": "还原此笔记",
+            "delete_permanently_tooltip": "永久删除"
+        },
+        "note": {
+            "last_modified_on": "最后修改于 {{date}}"
+        },
+        "empty": "回收站中没有笔记。",
+        "modals": {
+            "empty": {
+                "title": "清空回收站",
+                "message": "您确定要彻底清空回收站吗？此操作无法撤销。"
+            },
+            "restore": {
+                "title": "还原笔记",
+                "message": "您确定要还原此笔记吗？"
+            },
+            "delete": {
+                "title": "永久删除笔记",
+                "message": "您确定要永久删除此笔记吗？此操作无法撤销。"
+            }
+        },
+        "alerts": {
+            "restore_error_title": "还原出错",
+            "restore_error_prefix": "还原笔记时出错: ",
+            "restore_error_generic": "还原笔记时出错",
+            "delete_error_title": "删除出错",
+            "delete_error_prefix": "永久删除时出错: ",
+            "delete_error_generic": "永久删除笔记时出错",
+            "empty_error_title": "清空回收站出错",
+            "empty_error_prefix": "清空回收站时出错: ",
+            "empty_error_generic": "清空回收站时出错"
+        }
+    },
+    "editor": {
+        "markdown_placeholder": "编写您的 Markdown 或在此处使用 / 打开命令菜单...",
+        "markdown_placeholder_mobile": "在此处编写您的 Markdown...",
+        "messages": {
+            "preview_mode_hint": "您处于预览模式。请使用工具栏中的按钮切换到编辑模式开始编写 Markdown。",
+            "split_preview_placeholder": "预览将随着您的输入在此处显示..."
+        },
+        "images": {
+            "delete_confirm": {
+                "title": "删除图片",
+                "message": "您确定要删除此图片吗？此操作无法撤销。"
+            }
+        },
+        "colors": {
+            "black": "黑色",
+            "red": "红色",
+            "orange": "橙色",
+            "yellow": "黄色",
+            "green": "绿色",
+            "blue": "蓝色",
+            "purple": "紫色",
+            "none": "无"
+        },
+        "font_size": {
+            "very_small": "极小",
+            "small": "较小",
+            "normal": "正常",
+            "large": "较大",
+            "very_large": "极大",
+            "huge": "超大",
+            "giant": "巨大"
+        },
+        "emoji": {
+            "hint_windows": "在 Windows 上，按 Win + ; 打开表情符号选择器"
+        },
+        "table_picker": {
+            "title": "插入表格",
+            "rows_label": "行:",
+            "rows_placeholder": "行",
+            "cols_label": "列:",
+            "cols_placeholder": "列",
+            "insert": "插入"
+        },
+        "toolbar": {
+            "back_to_notes": "返回笔记",
+            "bold": "加粗",
+            "italic": "斜体",
+            "underline": "下划线",
+            "strikethrough": "删除线",
+            "link": "链接",
+            "text_color": "文本颜色",
+            "highlight": "高亮",
+            "bullet_list": "无序列表",
+            "numbered_list": "有序列表",
+            "font_size": "字体大小",
+            "code_block": "代码块",
+            "inline_code": "内联代码",
+            "clear_formatting": "清除格式",
+            "insert_excalidraw": "插入 Excalidraw 图表",
+            "insert_emoji": "插入表情符号",
+            "insert_table": "插入表格",
+            "insert_checklist": "插入清单",
+            "add_separator": "添加分隔符",
+            "insert_note_reference": "插入笔记引用",
+            "open_in_new_tab": "在新标签页中打开",
+            "search_replace": "查找替换",
+            "split_view": "切换分屏视图",
+            "switch_to_edit": "切换到编辑模式",
+            "switch_to_preview": "切换到预览模式"
+        },
+        "link": {
+            "add_title": "添加链接",
+            "title": "管理链接",
+            "url_label": "URL:",
+            "url_placeholder": "https://example.com",
+            "text_label": "链接文本 (可选):",
+            "text_placeholder": "显示的文本",
+            "remove": "移除链接",
+            "cancel": "取消",
+            "save": "保存"
+        }
+    },
+    "info": {
+        "page_title": "笔记信息",
+        "actions": {
+            "back_to_note": "返回笔记"
+        },
+        "labels": {
+            "note_title": "笔记标题:",
+            "workspace": "工作区:",
+            "folder": "文件夹:",
+            "created": "创建时间:",
+            "last_modified": "最后修改:",
+            "tags": "标签:",
+            "favorite": "收藏:",
+            "attachments": "附件:",
+            "note_id": "笔记 ID:",
+            "full_path": "完整路径:"
+        },
+        "attachments": {
+            "count_singular": "1 个文件",
+            "count_plural": "{{count}} 个文件"
+        },
+        "empty": {
+            "no_tags": "无标签"
+        },
+        "errors": []
+    },
+    "modals": {
+        "update": {
+            "title": "📱 应用程序版本",
+            "backup_warning": "请备份您的数据。",
+            "backup_hint": "<strong>设置 > 备份</strong>",
+            "current_version": "当前版本:",
+            "latest_available": "最新可用版本:",
+            "view_release_notes": "查看发布日志",
+            "self_hosted": "自托管说明",
+            "cloud": "云端说明"
+        },
+        "update_check": {
+            "title": "正在检查更新...",
+            "status": "请稍候，我们正在检查更新..."
+        },
+        "login_display": {
+            "title": "登录显示名称",
+            "description": "设置在登录界面显示的名称。",
+            "placeholder": "显示名称"
+        },
+        "language": {
+            "description": "选择您的首选语言:"
+        },
+        "input": {
+            "placeholder": "输入文本"
+        },
+        "font_size": {
+            "title": "笔记内容字体大小",
+            "description": "选择笔记的默认字体大小:",
+            "label": "字体大小 (像素):",
+            "default_value": "{{size}} 像素是默认值",
+            "preview": "这是一段预览文本"
+        },
+        "confirm": {
+            "title": "确认操作",
+            "message": "您确定要继续吗？",
+            "save_and_exit": "保存并退出",
+            "exit_without_saving": "不保存退出"
+        },
+        "folder": {
+            "new_title": "新建文件夹",
+            "new_placeholder": "新文件夹名称",
+            "create": "创建",
+            "rename_title": "重命名文件夹",
+            "rename_placeholder": "新文件夹名称",
+            "delete_title": "删除文件夹",
+            "delete_folder": "删除文件夹",
+            "change_folder": "更改文件夹",
+            "move_prefix": "移动",
+            "move_suffix": "至:",
+            "move_prompt": "将 \"{{title}}\" 移动至:",
+            "no_folder": "无文件夹"
+        },
+        "move_note_folder": {
+            "title": "将笔记移动到文件夹",
+            "workspace_destination": "选择目标工作区:",
+            "target_folder": "选择目标文件夹:",
+            "enter_folder_name": "请输入文件夹名称"
+        },
+        "move_folder_files": {
+            "title": "移动所有文件",
+            "prompt_prefix": "移动所有文件，从",
+            "prompt_suffix": "至:",
+            "select_target": "选择目标文件夹...",
+            "hint_move_single": "要将单篇笔记移动到另一个工作区，请使用工具栏中的“移动笔记”按钮",
+            "hint_move_all": "要将一个工作区的所有笔记移动到另一个工作区，请前往 设置 → 工作区",
+            "move_all": "移动所有文件"
+        },
+        "move_folder": {
+            "title": "移动文件夹",
+            "prompt_prefix": "移动文件夹",
+            "prompt_suffix": "到:",
+            "select_target": "选择父文件夹...",
+            "root": "根目录 (顶层)",
+            "hint": "这将移动该文件夹及其包含的所有笔记作为子文件夹。选择“根目录”将其移至顶层。",
+            "move": "移动文件夹"
+        },
+        "workspaces": {
+            "move_notes_title": "移动笔记，从",
+            "select_target_workspace": "选择目标工作区",
+            "rename_title": "重命名工作区",
+            "new_name": "新名称",
+            "delete_title": "确认删除工作区",
+            "delete_description": "所有笔记和文件夹将被永久删除且无法恢复。",
+            "delete_placeholder": "输入工作区名称以确认",
+            "delete_button": "删除工作区"
+        },
+        "create": {
+            "title_in_folder": "在 {{folder}} 中创建",
+            "folder_fallback": "文件夹",
+            "note": {
+                "title": "HTML 笔记 (非 Markdown)"
+            },
+            "markdown": {
+                "title": "Markdown 笔记 (非 HTML)"
+            },
+            "task_list": {
+                "title": "任务列表"
+            },
+            "subfolder": {
+                "title": "子文件夹"
+            },
+            "folder": {
+                "title": "文件夹"
+            },
+            "workspace": {
+                "title": "工作区"
+            }
+        },
+        "folder_icon": {
+            "title": "更改文件夹图标",
+            "reset": "恢复默认行为",
+            "search_placeholder": "搜索图标..."
+        },
+        "export": {
+            "title": "导出笔记",
+            "markdown": {
+                "title": "导出为 Markdown",
+                "description": "下载为包含 YAML 前置元数据（标题、标签、文件夹）的 MD 文件"
+            },
+            "html": {
+                "title": "导出为 HTML",
+                "description": "下载为保留所有格式的 HTML 文件"
+            },
+            "json": {
+                "title": "下载为 JSON",
+                "description": "以 JSON 文件形式下载原始任务列表数据"
+            },
+            "print": {
+                "title": "打印为 PDF (浏览器)",
+                "description": "使用浏览器原生打印对话框保存为 PDF"
+            }
+        },
+        "convert": {
+            "title": "转换笔记",
+            "message": "您确定要转换此笔记吗？",
+            "to_html_title": "转换为 HTML",
+            "to_html_message": "这将把您的 Markdown 笔记转换为 HTML 格式。",
+            "to_html_warning": "在转换此笔记之前，您可以先复制一份以防转换不符合您的预期。",
+            "to_markdown_title": "转换为 Markdown",
+            "to_markdown_message": "这将把您的 HTML 笔记转换为 Markdown 格式。嵌入的图片将保存为附件。",
+            "to_markdown_warning": "在转换此笔记之前，您可以先复制一份以防转换不符合您的预期。",
+            "converting": "正在转换笔记...",
+            "success": "笔记转换成功！",
+            "error": "转换笔记失败",
+            "duplicate_button": "复制"
+        },
+        "note_sort": {
+            "title": "笔记排序顺序",
+            "description": "选择笔记在笔记列表中的排序方式：",
+            "options": {
+                "last_modified": "最后修改",
+                "last_created": "最后创建",
+                "alphabetical": "字母顺序"
+            }
+        },
+        "timezone": {
+            "title": "时区",
+            "description": "选择您的时区：",
+            "groups": {
+                "europe": "欧洲",
+                "america": "美洲",
+                "asia": "亚洲",
+                "pacific": "太平洋",
+                "africa": "非洲"
+            }
+        }
+    },
+    "notes_list": {
+        "system_folders": {
+            "trash": "回收站",
+            "tags": "标签",
+            "favorites": "收藏",
+            "public": "共享",
+            "attachments": "附件"
+        },
+        "drop_zone": {
+            "remove_from_folder": "拖放到此处从文件夹中移除"
+        },
+        "folder_actions": {
+            "menu": "操作",
+            "create": "创建",
+            "move_all_files": "将所有文件移动到另一个文件夹",
+            "move_folder": "将文件夹移动到子文件夹",
+            "rename_folder": "重命名文件夹",
+            "delete_folder": "删除文件夹",
+            "download_folder": "下载文件夹",
+            "change_icon": "更改图标",
+            "is_public": "已共享",
+            "share_folder": "共享"
+        }
+    },
+    "update": {
+        "new_available": "🎉 有新版本可用！",
+        "description": "您的数据在更新过程中将被保留。",
+        "up_to_date": "✅ Poznote 已是最新版本",
+        "error_loading_version": "加载版本信息出错"
+    },
+    "slash_menu": {
+        "back_to_normal": "返回普通文本",
+        "title": "标题",
+        "heading_1": "一级标题",
+        "heading_2": "二级标题",
+        "heading_3": "三级标题",
+        "format_text": "文本格式",
+        "red": "红色",
+        "bold": "加粗",
+        "italic": "斜体",
+        "highlight": "高亮",
+        "strikethrough": "删除线",
+        "code": "代码",
+        "inline_code": "内联代码",
+        "code_block": "代码块",
+        "list": "列表",
+        "bullet_list": "无序列表",
+        "numbered_list": "有序列表",
+        "checklist": "清单",
+        "image": "图片",
+        "excalidraw": "Excalidraw",
+        "emoji": "表情符号",
+        "table": "表格",
+        "separator": "分隔符",
+        "link_to_note": "链接到笔记",
+        "link": "链接",
+        "cancel": "取消",
+        "back": "返回",
+        "quote": "引用",
+        "blockquote": "区块引用",
+        "callout_note": "笔记",
+        "callout_tip": "提示",
+        "callout_important": "重要",
+        "callout_warning": "警告",
+        "callout_caution": "注意"
+    },
+    "api": {
+        "settings": {
+            "key_required": "需要 Key",
+            "invalid_action": "操作无效",
+            "internal_error": "系统内部错误"
+        },
+        "errors": {
+            "workspace_not_found": "未找到工作区",
+            "method_not_allowed": "方法不允许",
+            "invalid_action": "无效操作",
+            "internal_server_error": "服务器内部错误",
+            "duplicate_title_in_folder": "该文件夹中已存在同名笔记。",
+            "note_id_required": "需要 note_id",
+            "note_not_found": "未找到笔记",
+            "invalid_custom_token": "无效的自定义 Token。\n\n允许使用：\n\n字母、数字、-、_、. (4-128 个字符)",
+            "token_already_in_use": "Token 已被使用",
+            "no_token_generated": "未生成 Token",
+            "server_error": "服务器错误: {{error}}"
+        }
+    },
+    "ui": {
+        "login_display": {
+            "prompt": "登录显示名称 (留空则清除):"
+        },
+        "alerts": {
+            "saved": "已保存",
+            "save_error": "保存出错",
+            "network_error": "网络错误"
+        }
+    },
+    "theme": {
+        "badge": {
+            "dark": "深色模式",
+            "light": "浅色模式"
+        }
+    },
+    "table": {
+        "context_menu": {
+            "insert_row_above": "在上方插入行",
+            "insert_row_below": "在下方插入行",
+            "insert_column_left": "在左侧插入列",
+            "insert_column_right": "在右侧插入列",
+            "delete_row": "删除行",
+            "delete_column": "删除列",
+            "delete_table": "删除表格",
+            "errors": {
+                "cannot_delete_last_row": "无法删除表格的最后一行。",
+                "cannot_delete_last_column": "无法删除表格的最后一列。"
+            },
+            "confirm": {
+                "delete_table": "您确定要删除此表格吗？"
+            }
+        }
+    },
+    "index": {
+        "errors": {
+            "create_task_list": "创建任务列表出错",
+            "create_task_list_prefix": "创建任务列表出错: ",
+            "create_markdown_note": "创建 Markdown 笔记出错",
+            "create_markdown_note_prefix": "创建 Markdown 笔记出错: ",
+            "conversion_failed_prefix": "转换失败: {{error}}",
+            "network_error_converting": "转换笔记时网络错误"
+        },
+        "toolbar": {
+            "favorite_add": "添加到收藏",
+            "favorite_remove": "取消收藏",
+            "public_note": "共享笔记",
+            "attachments_with_count": "附件 ({{count}})",
+            "menu_actions": "菜单操作",
+            "convert_to_html": "转换为 HTML",
+            "convert_to_markdown": "转换为 Markdown",
+            "share_note": "共享笔记"
+        },
+        "share_modal": {
+            "custom_token": "自定义 Token (可选)",
+            "custom_token_placeholder": "my_custom_token-1",
+            "password": "密码 (可选)",
+            "password_placeholder": "输入密码",
+            "indexable": "允许搜索引擎索引",
+            "create_url": "创建 URL",
+            "close": "关闭",
+            "error_prefix": "错误: ",
+            "unknown_error": "创建公开共享时发生未知错误",
+            "error_creating": "创建公开共享时出错: "
+        },
+        "public_modal": {
+            "title": "已共享 URL",
+            "close": "关闭",
+            "open": "打开",
+            "copy": "复制",
+            "revoke": "撤销",
+            "renew": "更新",
+            "manage": "编辑",
+            "create_url": "创建 URL",
+            "no_link_yet": "尚未创建公开链接",
+            "custom_token": "自定义 Token (可选)",
+            "custom_token_placeholder": "my_custom_token-1",
+            "indexable": "允许搜索引擎索引",
+            "password": "密码 (可选)",
+            "password_placeholder": "输入密码",
+            "error_prefix": "错误: ",
+            "unknown_error": "创建公开共享时发生未知错误",
+            "error_creating": "创建公开共享时出错: "
+        },
+        "folder_share_modal": {
+            "title": "共享文件夹 URL",
+            "description": "任何拥有此链接的人都可以查看此文件夹中的所有笔记（除非有密码保护）。",
+            "use_https": "HTTPS",
+            "renewed": "文件夹共享链接已更新",
+            "failed_renew": "更新文件夹共享失败",
+            "failed_revoke": "撤销文件夹共享失败"
+        },
+        "note": {
+            "new_note": "新笔记",
+            "new_note_numbered": "新笔记 ({{number}})",
+            "title_placeholder": "标题？"
+        },
+        "editor": {
+            "placeholder_desktop": "输入文本，使用 / 打开命令菜单，粘贴图片或在光标处拖放图片。",
+            "placeholder_mobile": "在此处输入文本或粘贴图片..."
+        }
+    },
+    "image_menu": {
+        "view_large": "查看大图",
+        "download": "下载",
+        "resize": "调整大小",
+        "edit": "编辑",
+        "add_border": "添加边框",
+        "remove_border": "移除边框",
+        "add_border_no_padding": "添加边框（无内边距）",
+        "remove_border_no_padding": "移除边框（无内边距）",
+        "delete_image": "删除图片",
+        "links": "链接",
+        "open_link": "打开链接",
+        "add_link": "添加链接",
+        "edit_link": "编辑链接",
+        "remove_link": "移除链接",
+        "link_modal": {
+            "title_add": "向图片添加链接",
+            "title_edit": "编辑图片链接",
+            "description": "此链接将使图片在笔记共享时可点击。",
+            "url_label": "输入 URL:",
+            "url_placeholder": "https://www.example.com",
+            "cancel": "取消",
+            "ok": "确定"
+        }
+    },
+    "backup_export": {
+        "page": {
+            "title": "备份 / 导出"
+        },
+        "info": {
+            "individual_export": "您还可以通过打开笔记并点击工具栏中的下载图标，以不同格式（PDF、HTML、Markdown、文本）导出单篇笔记。"
+        },
+        "common": {
+            "all_workspaces": "所有工作区"
+        },
+        "sections": {
+            "complete_backup": {
+                "title": "完整备份",
+                "description_prefix": "下载一个包含数据库、笔记和附件的完整备份，适用于",
+                "description_suffix": "并打包在单个 ZIP 文件中。",
+                "use_cases": "两种用途：",
+                "use_case_restore_label": "还原",
+                "use_case_restore_text": "在数据丢失时导入此备份进行恢复",
+                "use_case_offline_label": "离线阅读",
+                "use_case_offline_text": "在没有 Poznote 的情况下打开包含的",
+                "use_case_offline_text_suffix": "以浏览您的笔记",
+                "select_user": "选择用户个人资料："
+            },
+            "structured_export": {
+                "title": "结构化导出",
+                "description": "导出您的笔记，并按照 Poznote 中的文件夹结构进行组织。每篇笔记将保存在与其文件夹对应的目录中，保留完整的层级结构。Markdown 文件包含带元数据的 YAML 前置内容。",
+                "warning": "注意：此导出类型并非为完美备份 Poznote 而设计。",
+                "select_workspace": "选择工作区：",
+                "loading_workspaces": "正在加载工作区..."
+            }
+        },
+        "buttons": {
+            "download_complete_backup": "下载完整备份 (ZIP)",
+            "download_structured_export": "下载结构化导出 (ZIP)"
+        },
+        "spinner": {
+            "preparing": "正在准备备份...",
+            "preparing_long": "正在准备备份... 这可能需要一些时间。"
+        },
+        "errors": {
+            "export_error": "导出错误: {{error}}",
+            "complete_backup_error": "完整备份错误: {{error}}",
+            "cannot_create_zip": "无法创建 ZIP 文件",
+            "failed_to_create_db_backup": "创建数据库备份失败",
+            "failed_to_create_backup_file": "创建备份文件失败"
+        },
+        "dump": {
+            "title": "Poznote 数据库转储",
+            "generated_on": "生成于 {{date}}"
+        },
+        "index": {
+            "title": "Poznote 索引"
+        }
+    },
+    "login": {
+        "page": {
+            "title": "登录"
+        },
+        "redirecting": "正在重定向...",
+        "show_password": "显示密码",
+        "hide_password": "隐藏密码",
+        "admin_warning": "默认管理员账户已激活，用户名为 <code>{{username}}</code>。为了安全起见，请登录并重命名此账户。",
+        "fields": {
+            "username": "用户名",
+            "username_or_email": "用户名或邮箱",
+            "password": "密码",
+            "profile": "选择您的个人资料"
+        },
+        "remember_me": "保持登录 30 天",
+        "button": "登录",
+        "oidc_button": "使用 {{provider}} 继续",
+        "documentation": "Poznote 文档",
+        "no_profiles": "没有可用的用户个人资料。请联系管理员。",
+        "errors": {
+            "invalid_credentials": "用户名或密码错误。",
+            "oidc_disabled": "您的账户已被管理员禁用。请联系管理员了解更多信息。",
+            "oidc_no_profile": "未找到 \"{{identifier}}\" 的用户个人资料。请联系管理员创建您的个人资料。",
+            "oidc_failed": "SSO 登录失败。请稍后再试。",
+            "oidc_unauthorized": "您无权访问此应用程序。请联系您的管理员。"
+        }
+    },
+    "restore_import": {
+        "page": {
+            "title": "还原 / 导入"
+        },
+        "advanced": {
+            "show": "显示高级导入选项",
+            "hide": "隐藏高级导入选项"
+        },
+        "messages": {
+            "database_restored": "数据库还原成功！",
+            "complete_backup_restored": "{{message}}",
+            "notes_imported": "已将 {{count}} 篇笔记导入到工作区 \"{{workspace}}\" 的文件夹 \"{{folder}}\" 中。",
+            "attachments_imported": "{{message}}",
+            "notes_imported_zip": "已从 ZIP 导入 {{count}} 篇笔记到工作区 \"{{workspace}}\" 的文件夹 \"{{folder}}\" 中。"
+        },
+        "errors": {
+            "complete_restore_form_not_found": "未找到完整还原表单。请稍后再试。",
+            "form_not_found": "未找到表单。请稍后再试。",
+            "select_backup_first": "请先选择一个备份文件。",
+            "restore_error": "还原错误: {{error}}",
+            "no_backup_file_or_upload": "未提供备份文件或上传出错。",
+            "complete_restore_error": "完整还原错误: {{error}} - {{message}}",
+            "no_complete_backup_file_or_upload": "未提供完整备份文件或上传出错。",
+            "import_error": "导入错误: {{error}}",
+            "no_notes_file_or_upload": "未提供笔记文件或上传出错。",
+            "no_attachments_file_or_upload": "未提供附件文件或上传出错。",
+            "no_notes_selected_or_upload": "未选择笔记或上传出错。",
+            "file_type_zip_only": "仅支持 ZIP 文件。",
+            "error_uploading_file": "上传文件出错。",
+            "cannot_find_entries_directory": "找不到条目目录。",
+            "cannot_open_zip": "无法打开 ZIP 文件。",
+            "failed_extract_content": "无法从 {{file}} 解压内容。"
+        },
+        "spinner": {
+            "processing": "正在处理还原...",
+            "processing_long": "正在处理还原... 这可能需要一些时间。",
+            "importing_notes": "正在导入笔记..."
+        },
+        "units": {
+            "bytes": "字节",
+            "kb": "KB",
+            "mb": "MB",
+            "gb": "GB"
+        },
+        "direct_copy": {
+            "backup_file_found": "已找到备份文件：",
+            "ready_to_restore": "准备好还原了吗？",
+            "replace_all_data_warning": "这将替换所有工作区中的所有数据。",
+            "no_backup_found_prefix": "在容器中未找到备份文件：",
+            "no_backup_found_hint": "请先运行 docker cp 命令。",
+            "completed_successfully_prefix": "直接文件复制还原成功完成！",
+            "failed_prefix": "直接文件复制还原失败：",
+            "backup_not_found_for_restoration": "未找到用于还原的备份文件。",
+            "buttons": {
+                "yes_restore_direct_copy": "是，通过直接复制进行还原"
+            }
+        },
+        "individual_notes": {
+            "default_title_with_date": "导入的笔记 {{date}}",
+            "file_count_one": "1 篇笔记",
+            "file_count_many": "{{count}} 篇笔记",
+            "summary": "这将导入 {{fileText}} 到 Poznote 工作区，而不分配文件夹。",
+            "errors": {
+                "too_many_files": "选择的文件过多。允许的最大值：{{max}}。您选择了：{{count}}。",
+                "workspace_not_found": "工作区不存在",
+                "entries_dir_not_found": "找不到条目目录",
+                "upload_error": "上传错误",
+                "invalid_file_type": "无效的文件类型（仅允许 {{allowed}}）",
+                "cannot_read_file": "无法读取文件"
+            },
+            "summary_with_location": "这将导入 {{fileText}} 到工作区 \"{{workspace}}\" 的文件夹 \"{{folder}}\" 中。",
+            "summary_zip_with_location": "这将解压并把 ZIP 归档中的所有文件导入到工作区 \"{{workspace}}\" 的文件夹 \"{{folder}}\" 中。"
+        },
+        "sections": {
+            "restore_from_backup": {
+                "title": "想要从 Poznote ZIP 备份文件还原吗？",
+                "description": "从完整备份还原您的 Poznote 数据库"
+            },
+            "standard_restore": {
+                "title": "标准还原",
+                "description": "选择一个完整的备份 ZIP 文件。",
+                "helper": "建议最大尺寸：500MB。"
+            },
+            "direct_copy_restore": {
+                "title": "当标准还原不起作用时（如果 ZIP 文件太大导致超时）",
+                "step1": "1. 将文件拷贝到容器中：",
+                "docker_command": "docker cp /path/to/backup.zip poznote-webserver-1:/tmp/backup_restore.zip",
+                "step2": "2. 点击下方按钮进行还原"
+            },
+            "individual_notes": {
+                "title": "想要导入 HTML、Markdown、文本文件或 ZIP 归档吗？",
+                "description": "将个人笔记（HTML、Markdown 或 ZIP）导入到特定的工作区和文件夹中",
+                "workspace": "目标工作区",
+                "loading": "加载中...",
+                "folder": "目标文件夹",
+                "optional": "可选",
+                "frontmatter_warning": "如果 MD 笔记在头信息 (front matter) 中包含 folder 键，此值将覆盖下方选择的文件夹。因此，您必须先确保文件夹已存在，否则笔记将在工作区根目录下创建。",
+                "zip_folders_info": "包含文件夹结构的 ZIP：",
+                "zip_folders_description": "如果您的 ZIP 包含文件夹，它们将在 Poznote 中自动创建，并保留其层级结构（包括子文件夹）。",
+                "no_folder": "无文件夹（根级）",
+                "select_files": "选择文件",
+                "files_info": "多个文件（最多 {{maxIndividualFiles}} 个）或单个 ZIP 归档（最多 {{maxZipFiles}} 个文件）。这些限制可以修改，",
+                "files_info_link": "请参阅文档",
+                "supported_formats": "支持：.html, .md, .markdown, .txt, .json, .zip",
+                "description_html": "导入个人 HTML、Markdown、文本或 JSON 文件，或包含多个文件的 ZIP 归档。<br><br>标题将根据文件名自动创建（不含扩展名），除非在 MD 文件的前置内容中定义了 title 键。<br><br><strong>任务列表：</strong> 包含任务数组的 .json 文件和带有复选框语法的 .md 文件 (- [ ] 或 - [x]) 将被自动导入为任务列表。",
+                "helper": "您可以一次选择多个文件（最多 50 个）。支持格式：.html, .md, .markdown, .txt, .json"
+            }
+        },
+        "buttons": {
+            "start_restore": "开始还原",
+            "start_import": "开始导入"
+        },
+        "drag_drop": {
+            "individual_notes": "将文件拖放到此处",
+            "complete_backup": "将备份 ZIP 拖放到此处",
+            "database": "将 SQL 文件拖放到此处",
+            "notes": "将笔记 ZIP 拖放到此处",
+            "attachments": "将附件 ZIP 拖放到此处"
+        },
+        "modals": {
+            "import_confirm": {
+                "title": "您确定吗？",
+                "body": "这将替换笔记标题、标签、搜索索引和元数据，但不会替换实际笔记内容。此操作无法撤销。",
+                "confirm": "是，开始导入"
+            },
+            "complete_restore": {
+                "title": "完整还原？",
+                "warning_large_html": "<strong>警告：</strong> 该文件大小为 {{size}}MB。标准上传可能会很慢或失败。<br><br><strong>这将替换您的数据库，并还原 <span style=\"color: #dc3545; font-weight: bold;\">所有工作区</span> 的所有笔记和附件。</strong>",
+                "warning_html": "<strong>警告：</strong> 这将替换您的数据库，并还原 <span style=\"color: #dc3545; font-weight: bold;\">所有工作区</span> 的所有笔记和附件。",
+                "body_html": "这将替换您的数据库，并还原 <span style=\"color: #dc3545; font-weight: bold;\">所有工作区</span> 的所有笔记和附件。",
+                "confirm": "是，执行完整还原"
+            },
+            "import_notes": {
+                "title": "导入笔记？",
+                "body": "这将从 ZIP 导入所有 HTML 文件。文件将被添加到您现有的笔记集合中。",
+                "confirm": "是，开始导入笔记"
+            },
+            "import_attachments": {
+                "title": "导入附件？",
+                "body": "这将把 ZIP 中的所有文件导入到附件文件夹中。文件将被添加到您现有的附件中。",
+                "confirm": "是，开始导入附件"
+            },
+            "complete_restore_direct_copy": {
+                "title": "完整还原（直接复制）？",
+                "body_html": "这将替换您的数据库，并还原 <span style=\"color: #dc3545; font-weight: bold;\">所有工作区</span> 的所有笔记和附件。",
+                "confirm": "是，执行完整还原"
+            },
+            "import_individual_notes": {
+                "title": "导入个人笔记？",
+                "body": "这将把笔记导入到 Poznote 工作区中。",
+                "confirm": "是，开始导入笔记"
+            }
+        },
+        "alerts": {
+            "ok": "确定",
+            "no_zip_selected_target": "未选择 ZIP 文件",
+            "no_zip_selected_restore": "在执行还原前，请先选择一个完整的备份 ZIP 文件。",
+            "no_zip_selected_notes": "在执行导入前，请先选择一个包含 HTML 笔记的 ZIP 文件。",
+            "no_zip_selected_attachments": "在执行导入前，请先选择一个包含附件的 ZIP 文件。",
+            "no_sql_selected_title": "未选择 SQL 文件",
+            "no_sql_selected_body": "在执行数据库导入前，请先选择一个 SQL 文件。",
+            "no_files_selected_title": "未选择文件",
+            "no_files_selected_body": "在执行导入前，请先选择一个或多个 HTML 或 Markdown 文件。",
+            "too_many_files_title": "选择的文件过多",
+            "too_many_files_body": "您一次最多可以导入 {{max}} 个文件。您选择了 {{count}} 个文件。请选择较少的文件并重试。",
+            "no_file_selected": {
+                "title": "未选择文件",
+                "body": "在执行导入前，请先选择一个文件。"
+            },
+            "no_workspace_title": "未选择工作区",
+            "no_workspace_body": "请为导入的笔记选择一个工作区。"
+        },
+        "inline": {
+            "standard": {
+                "button": "开始完整还原（标准）",
+                "too_large": "⚠️ 文件大小为 {{size}}MB。标准上传可能会很慢或失败。"
+            }
+        }
+    },
+    "markdown_guide": {
+        "page_title": "Markdown 指南",
+        "title": "Markdown 指南",
+        "toc": {
+            "label": "目录",
+            "title": "目录"
+        },
+        "common": {
+            "syntax": "语法",
+            "result": "效果"
+        },
+        "sections": {
+            "headers": {
+                "title": "标题",
+                "heading1": "一级标题",
+                "heading2": "二级标题",
+                "heading3": "三级标题"
+            },
+            "text_formatting": {
+                "title": "文本格式",
+                "bold": "加粗文本",
+                "italic": "斜体文本",
+                "strikethrough": "删除线",
+                "inline_code": "行内代码"
+            },
+            "unordered_lists": {
+                "title": "无序列表",
+                "item_one": "项目一",
+                "item_two": "项目二",
+                "nested_item": "嵌套项目"
+            },
+            "ordered_lists": {
+                "title": "有序列表",
+                "first": "第一步",
+                "second": "第二步",
+                "third": "第三步"
+            },
+            "checkboxes": {
+                "title": "复选框",
+                "unchecked_note": "未勾选项目（仅限一个空格！）",
+                "unchecked": "未勾选项目",
+                "checked": "已勾选项目"
+            },
+            "images": {
+                "title": "图片",
+                "alt_text": "替代文本",
+                "preview": "(图片预览)"
+            },
+            "urls": {
+                "title": "URL 链接",
+                "link_text": "链接文本"
+            },
+            "code_blocks": {
+                "title": "代码块"
+            },
+            "quotes": {
+                "title": "引用",
+                "quote_text": "这是一段引用",
+                "quote_line2": "跨越两行"
+            },
+            "line_breaks": {
+                "title": "换行",
+                "description": "在编辑模式下，单次换行会在预览中创建一个换行。",
+                "first_line": "第一行",
+                "second_line": "第二行"
+            },
+            "horizontal_rule": {
+                "title": "水平线"
+            },
+            "tables": {
+                "title": "表格",
+                "col_name": "名称",
+                "col_value": "数值"
+            },
+            "math": {
+                "title": "数学公式",
+                "inline": {
+                    "title": "行内公式"
+                },
+                "block": {
+                    "title": "块级公式"
+                },
+                "examples": {
+                    "title": "更多示例"
+                }
+            },
+            "mermaid": {
+                "title": "Mermaid 图表",
+                "node_a": "编写 Markdown",
+                "node_b": "需要图表吗？",
+                "node_c": "使用 Mermaid",
+                "node_d": "继续编写",
+                "edge_yes": "是",
+                "edge_no": "否"
+            }
+        }
+    },
+    "public": {
+        "button": "共享笔记",
+        "view_public_notes": "查看共享笔记",
+        "page": {
+            "title": "共享笔记",
+            "no_public_notes": "目前还没有共享笔记。",
+            "public_hint": "点击笔记工具栏中的云端按钮来共享笔记。"
+        },
+        "filter_placeholder": "按标题、Token 或文件夹名称过滤...",
+        "no_filter_results": "没有与您的搜索匹配的笔记。",
+        "table": {
+            "note": "笔记",
+            "url": "共享 URL"
+        },
+        "actions": {
+            "open": "打开",
+            "revoke": "撤销"
+        },
+        "indexable": "可被索引",
+        "password_protected": "受密码保护",
+        "add_password_title": "添加密码保护",
+        "change_password_title": "修改密码",
+        "password_remove_hint": "留空则移除密码保护。",
+        "enter_new_password": "输入新密码"
+    },
+    "public_folder": {
+        "filter_placeholder": "搜索笔记",
+        "no_filter_results": "无结果。"
+    },
+    "icon_names": {
+        "briefcase": "公文包",
+        "home": "主页",
+        "star": "星星",
+        "heart": "爱心",
+        "lightbulb": "灵感",
+        "image": "图像",
+        "music": "音乐",
+        "book": "书籍",
+        "graduation-cap": "毕业",
+        "code": "代码",
+        "rocket": "火箭",
+        "plane": "飞机",
+        "map-marker-alt": "位置",
+        "calendar-alt": "日历",
+        "clock": "时钟",
+        "user": "用户",
+        "users": "用户集合",
+        "cog": "设置",
+        "wrench": "扳手",
+        "paint-brush": "画笔",
+        "palette": "调色板",
+        "camera": "相机",
+        "shield": "盾牌",
+        "lock": "挂锁",
+        "key": "钥匙",
+        "envelope": "信封",
+        "inbox": "收件箱",
+        "archive": "归档",
+        "box": "盒子",
+        "shopping-cart": "购物车",
+        "credit-card": "卡片",
+        "chart-line": "折线图",
+        "chart-bar": "柱状图",
+        "database": "数据库",
+        "server": "服务器",
+        "cloud": "云",
+        "download": "下载",
+        "upload": "上传",
+        "tasks": "任务",
+        "clipboard": "剪贴板",
+        "file-alt": "文件",
+        "copy": "复制",
+        "gamepad": "游戏",
+        "trophy": "奖杯",
+        "gift": "礼物",
+        "birthday-cake": "蛋糕",
+        "coffee": "咖啡",
+        "pizza-slice": "比萨",
+        "utensils": "餐厅",
+        "medkit": "医疗",
+        "heartbeat": "健康",
+        "dumbbell": "健身",
+        "bicycle": "自行车",
+        "tree": "树木",
+        "leaf": "树叶",
+        "seedling": "植物",
+        "paw": "宠物",
+        "bug": "故障",
+        "flask": "科学",
+        "atom": "原子",
+        "magnet": "磁铁",
+        "fire": "火",
+        "sun": "太阳",
+        "moon": "月亮",
+        "umbrella": "雨伞",
+        "snowflake": "雪花",
+        "bolt": "闪电",
+        "flag": "旗帜",
+        "bookmark": "书签",
+        "thumbs-up": "点赞",
+        "smile": "笑脸",
+        "layer-group": "层级",
+        "terminal": "终端",
+        "at": "@",
+        "hashtag": "话题",
+        "question-circle": "问题",
+        "times-circle": "关闭",
+        "eye": "眼睛",
+        "anchor": "锚",
+        "apple-alt": "苹果",
+        "award": "奖项",
+        "bell": "铃声",
+        "binoculars": "双筒望远镜",
+        "book-open": "翻开的书",
+        "briefcase-medical": "医疗包",
+        "brush": "刷子",
+        "building": "建筑",
+        "bus": "巴士",
+        "calculator": "计算器",
+        "candy-cane": "糖果棒",
+        "car": "汽车",
+        "certificate": "证书",
+        "chart-network": "网络",
+        "chart-pie": "饼图",
+        "chess": "象棋",
+        "clipboard-list": "列表",
+        "cloud-sun": "多云转晴",
+        "coins": "硬币",
+        "comment": "评论",
+        "compass": "指南针",
+        "crown": "皇冠",
+        "cube": "立方体",
+        "cubes": "多个立方体",
+        "desktop": "桌面",
+        "diploma": "文凭",
+        "dna": "DNA",
+        "dollar-sign": "美元",
+        "dragon": "龙",
+        "drum": "鼓",
+        "elephant": "大象",
+        "euro-sign": "欧元",
+        "feather": "羽毛",
+        "file-code": "代码文件",
+        "file-contract": "合同",
+        "file-invoice": "发票",
+        "film": "电影",
+        "fingerprint": "指纹",
+        "folder-tree": "文件夹树",
+        "gem": "宝石",
+        "glasses": "眼镜",
+        "globe-americas": "美洲",
+        "globe-asia": "亚洲",
+        "globe-europe": "欧洲",
+        "guitar": "吉他",
+        "hamburger": "汉堡",
+        "hammer": "锤子",
+        "hard-hat": "安全帽",
+        "headphones": "耳机",
+        "headset": "耳麦",
+        "hiking": "远足",
+        "hospital": "医院",
+        "icons": "图标",
+        "id-badge": "徽章",
+        "id-card": "身份证",
+        "industry": "工业",
+        "infinity": "无限",
+        "jedi": "绝地",
+        "laptop": "笔记本电脑",
+        "laptop-code": "开发",
+        "lightbulb-dollar": "盈利点子",
+        "map": "地图",
+        "medal": "勋章",
+        "microphone": "麦克风",
+        "microscope": "显微镜",
+        "money-bill": "钞票",
+        "mountain": "大山",
+        "mug-hot": "马克杯",
+        "network-wired": "有线网络",
+        "passport": "护照",
+        "pen": "钢笔",
+        "pencil-alt": "铅笔",
+        "pepper-hot": "辣椒",
+        "phone": "电话",
+        "piggy-bank": "存钱罐",
+        "plane-alt": "飞机",
+        "plane-departure": "起飞",
+        "plug": "插头",
+        "print": "打印机",
+        "project-diagram": "项目图",
+        "puzzle-piece": "拼图",
+        "receipt": "收据",
+        "robot": "机器人",
+        "running": "跑步",
+        "satellite": "卫星",
+        "satellite-dish": "卫星天线",
+        "school": "学校",
+        "screwdriver": "螺丝刀",
+        "scroll": "卷轴",
+        "shield-alt": "盾牌",
+        "shopping-bag": "购物袋",
+        "sign": "标志",
+        "sitemap": "站点地图",
+        "snowman": "雪人",
+        "solar-panel": "太阳能电池板",
+        "spa": "水疗",
+        "space-shuttle": "航天飞机",
+        "stamp": "印章",
+        "stethoscope": "听诊器",
+        "store": "商店",
+        "store-alt": "店铺",
+        "suitcase": "手提箱",
+        "sun-cloud": "云太阳",
+        "swimmer": "游泳",
+        "sync": "同步",
+        "syringe": "注射器",
+        "tablet": "平板电脑",
+        "tachometer-alt": "速度计",
+        "tag": "标签",
+        "tags": "标签集合",
+        "theater-masks": "剧院",
+        "toilet-paper": "卫生纸",
+        "toolbox": "工具箱",
+        "tooth": "牙齿",
+        "tools": "工具",
+        "tractor": "拖拉机",
+        "trash-alt": "垃圾桶",
+        "tree-alt": "树木",
+        "truck": "卡车",
+        "tv": "电视",
+        "umbrella-beach": "沙滩伞",
+        "university": "大学",
+        "user-graduate": "学生",
+        "utensil-spoon": "勺子",
+        "vial": "试剂瓶",
+        "video": "视频",
+        "walking": "步行",
+        "wallet": "钱包",
+        "warehouse": "仓库",
+        "water": "水",
+        "weight": "重量",
+        "wifi": "Wifi",
+        "wind": "风",
+        "yen-sign": "日元/人民币"
+    },
+    "shared_folders": {
+        "page": {
+            "title": "共享文件夹",
+            "no_shared_folders": "目前还没有共享文件夹。",
+            "shared_folders_hint": "点击文件夹菜单中的云端按钮来共享文件夹。"
+        },
+        "button": "共享文件夹",
+        "view_shared_folders": "查看共享文件夹",
+        "filter_placeholder": "按文件夹名称或 Token 过滤...",
+        "empty": "未找到共享文件夹。",
+        "confirm_revoke": "您确定要撤销此文件夹的共享吗？该文件夹中的所有笔记也将取消共享。"
+    },
+    "search_replace": {
+        "search_placeholder": "查找...",
+        "replace_placeholder": "替换为...",
+        "previous": "上一个",
+        "next": "下一个",
+        "toggle_replace": "切换替换",
+        "close": "关闭",
+        "replace": "替换",
+        "replace_one": "替换",
+        "replace_all": "全部替换",
+        "result": "个结果",
+        "results": "个结果",
+        "no_matches": "无结果",
+        "replaced_all": "已替换 {{count}} 个匹配项"
+    },
+    "multiuser": {
+        "admin": {
+            "title": "用户管理",
+            "subtitle": "管理用户及其访问权限",
+            "users_list": "用户列表",
+            "create_user": "创建用户",
+            "edit_user": "编辑用户",
+            "delete_user": "删除用户",
+            "reset_password": "重置密码",
+            "logout_all_sessions": "注销所有会话",
+            "download_backup": "下载备份",
+            "username": "用户名",
+            "email": "邮箱",
+            "display_name": "显示名称",
+            "role": "角色",
+            "status": "状态",
+            "active": "激活",
+            "inactive": "未激活",
+            "created_at": "创建于",
+            "last_login": "上次登录",
+            "storage": "存储",
+            "notes_count": "笔记数",
+            "attachments_count": "附件数",
+            "actions": "操作",
+            "not_defined": "未定义",
+            "email_usage_note": "邮箱地址仅在配置 OIDC 转换身份验证时使用。Poznote 不会发送任何电子邮件。",
+            "password": "密码",
+            "confirm_password": "确认密码",
+            "new_password": "新密码",
+            "role_admin": "管理员",
+            "role_user": "普通用户",
+            "confirm_delete": "您确定要删除用户 \"{{username}}\" 吗？",
+            "confirm_delete_data": "同时删除所有用户数据（笔记、附件等）",
+            "confirm_reset_password": "要重置用户 \"{{username}}\" 的密码吗？",
+            "confirm_logout_all": "要注销用户 \"{{username}}\" 的所有会话吗？",
+            "user_created": "用户创建成功",
+            "user_updated": "用户更新成功",
+            "user_deleted": "用户删除成功",
+            "password_reset": "密码重置成功",
+            "sessions_terminated": "所有会话已终止",
+            "errors": {
+                "username_required": "必须输入用户名",
+                "password_required": "必须输入密码",
+                "password_mismatch": "密码不匹配",
+                "password_too_short": "密码必须至少为 8 个字符",
+                "username_taken": "用户名已被占用",
+                "email_taken": "邮箱已被使用",
+                "cannot_delete_self": "您无法删除自己的资料",
+                "cannot_demote_self": "您无法移除自己的管理员权限",
+                "cannot_change_self": "您无法更改自己的状态/角色"
+            },
+            "stats": {
+                "title": "系统统计",
+                "total_users": "总用户数",
+                "active_users": "活跃用户数",
+                "admin_users": "管理员人数",
+                "total_storage": "总存储占用",
+                "total_notes": "总笔记数",
+                "total_attachments": "总附件数"
+            },
+            "maintenance": {
+                "title": "重建主数据库",
+                "subtitle": "",
+                "description": "主数据库 (master.db) 是系统的核心注册表，包含用户资料、公开共享链接和全局设置。如果此文件丢失或损坏，此工具将扫描 'data/users' 目录以自动重新注册账户，并从个人数据库中恢复原始用户名及其所有激活的公开链接。",
+                "repair_registry": "开始重建",
+                "repair_registry_confirm": "这将扫描所有用户文件夹并重建主数据库注册表。",
+                "repair_registry_success": "主数据库重建成功：\n- 扫描了 {{scanned}} 个文件夹\n- 恢复了 {{added}} 个用户\n- 重建了 {{links}} 个共享链接",
+                "repair_registry_error": "重建出错: {{error}}"
+            },
+            "administrator": "管理员",
+            "processing": "正在处理...",
+            "errors_label": "错误：",
+            "network_error": "网络错误：",
+            "click_to_rename": "点击重命名",
+            "rename_user": "重命名用户",
+            "delete_warning_all_data": "所有用户数据（笔记、附件等）都将被永久删除。",
+            "access_denied_admin": "拒绝访问。需要管理员权限。",
+            "toggle_admin": "切换管理员角色",
+            "click_to_deactivate": "点击停用",
+            "click_to_activate": "点击激活",
+            "id": "ID"
+        },
+        "profile": {
+            "title": "我的资料",
+            "subtitle": "管理您的账户设置",
+            "account_info": "账户信息",
+            "username": "用户名",
+            "email": "邮箱",
+            "display_name": "显示名称",
+            "role": "角色",
+            "created_at": "账户创建于",
+            "last_login": "上次登录",
+            "update_profile": "更新资料",
+            "change_password": "修改密码",
+            "current_password": "当前密码",
+            "new_password": "新密码",
+            "confirm_password": "确认新密码",
+            "my_sessions": "我的会话",
+            "current_session": "当前会话",
+            "other_sessions": "其他会话",
+            "terminate_session": "终止",
+            "terminate_all_others": "注销其他所有会话",
+            "storage_usage": "存储占用",
+            "notes_count": "笔记数",
+            "attachments_count": "附件数",
+            "backups_count": "备份数",
+            "profile_updated": "资料已成功更新",
+            "password_changed": "密码已成功修改",
+            "session_terminated": "会话已终止",
+            "sessions_terminated": "其他所有会话已终止",
+            "errors": {
+                "current_password_wrong": "当前密码错误",
+                "password_mismatch": "新密码不匹配",
+                "password_too_short": "密码必须至少为 8 个字符"
+            }
+        },
+        "login": {
+            "title": "登录",
+            "username": "用户名",
+            "password": "密码",
+            "remember_me": "记住我",
+            "sign_in": "登录",
+            "sign_in_with_oidc": "使用 {{provider}} 登录",
+            "forgot_password": "忘记密码？",
+            "no_account": "没有账户？",
+            "register": "注册",
+            "errors": {
+                "invalid_credentials": "用户名或密码错误",
+                "account_disabled": "您的账户已被禁用",
+                "too_many_attempts": "尝试次数过多。请稍后再试。"
+            }
+        },
+        "settings": {
+            "profile_card": {
+                "title": "基本资料",
+                "description": "管理您的账户设置和密码"
+            },
+            "admin_card": {
+                "title": "用户管理",
+                "description": "管理用户及其访问权限（仅限管理员）"
+            }
+        }
+    }
+}

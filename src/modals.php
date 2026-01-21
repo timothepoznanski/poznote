@@ -455,6 +455,7 @@
                 <label><input type="radio" name="languageChoice" value="es"> <?php echo t_h('settings.language.spanish'); ?></label>
                 <label><input type="radio" name="languageChoice" value="pt"> <?php echo t_h('settings.language.portuguese'); ?></label>
                 <label><input type="radio" name="languageChoice" value="de"> <?php echo t_h('settings.language.german'); ?></label>
+                <label><input type="radio" name="languageChoice" value="zh-cn"> <?php echo t_h('settings.language.chinese_simplified'); ?></label>
             </div>
         </div>
         <div class="modal-buttons">

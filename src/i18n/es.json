@@ -15,6 +15,7 @@
         "login": {
             "fields": {
                 "username": "Usuario",
+                "username_or_email": "Nombre de usuario o correo electrónico",
                 "password": "Contraseña",
                 "profile": "Perfil"
             },
@@ -279,6 +280,7 @@
             "spanish": "Español",
             "portuguese": "Portugués",
             "german": "Alemán",
+            "chinese_simplified": "Chino simplificado",
             "login_page": "Idioma de la página de inicio de sesión:",
             "saved": "Idioma guardado",
             "save_error": "No se pudo guardar el idioma",
@@ -1062,6 +1064,7 @@
         "admin_warning": "La cuenta de administrador predeterminada está activa con el nombre de usuario <code>{{username}}</code>. Por favor, inicie sesión y cambie el nombre de esta cuenta para mayor seguridad.",
         "fields": {
             "username": "Nombre de usuario",
+            "username_or_email": "Nombre de usuario o correo electrónico",
             "password": "Contraseña",
             "profile": "Selecciona tu perfil"
         },
