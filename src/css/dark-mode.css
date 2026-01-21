@@ -23,10 +23,7 @@ body.dark-mode #right_col {
 }
 
 /* Sidebar header */
-html[data-theme='dark'] .sidebar-header,
-body.dark-mode .sidebar-header {
-    /* background-color: #242424; */
-}
+
 
 html[data-theme='dark'] .sidebar-title,
 body.dark-mode .sidebar-title {
@@ -298,11 +295,7 @@ body.dark-mode .folder-icon {
     color: #b0b0b0;
 }
 
-/* Custom color icons should keep their color in dark mode */
-html[data-theme='dark'] .folder-icon[data-icon-color],
-body.dark-mode .folder-icon[data-icon-color] {
-    /* Inline style with !important will override */
-}
+
 
 /* Folder note count */
 html[data-theme='dark'] .folder-note-count,
@@ -889,35 +882,67 @@ body.dark-mode #fontSizeModal .modal-header h2 {
 }
 
 html[data-theme='dark'] #fontSizeModal .modal-body p,
-body.dark-mode #fontSizeModal .modal-body p {
+html[data-theme='dark'] #noteWidthModal .modal-body p,
+body.dark-mode #fontSizeModal .modal-body p,
+body.dark-mode #noteWidthModal .modal-body p {
     color: #c8c8c8;
 }
 
 html[data-theme='dark'] #fontSizeModal .font-size-section,
-body.dark-mode #fontSizeModal .font-size-section {
+html[data-theme='dark'] #noteWidthModal .font-size-section,
+body.dark-mode #fontSizeModal .font-size-section,
+body.dark-mode #noteWidthModal .font-size-section {
     background-color: #1f1f1f;
     border-color: #3a3a3a;
 }
 
 html[data-theme='dark'] #fontSizeModal .font-size-controls label,
-body.dark-mode #fontSizeModal .font-size-controls label {
+html[data-theme='dark'] #noteWidthModal .font-size-controls label,
+body.dark-mode #fontSizeModal .font-size-controls label,
+body.dark-mode #noteWidthModal .font-size-controls label {
     color: #d8d8d8;
 }
 
 html[data-theme='dark'] #fontSizeModal .font-size-controls input,
-body.dark-mode #fontSizeModal .font-size-controls input {
+html[data-theme='dark'] #noteWidthModal .font-size-controls input,
+body.dark-mode #fontSizeModal .font-size-controls input,
+body.dark-mode #noteWidthModal .font-size-controls input {
     background-color: #2a2a2a;
     color: #e0e0e0;
     border-color: #404040;
 }
 
+html[data-theme='dark'] #noteWidthModal .btn-full-width-footer,
+body.dark-mode #noteWidthModal .btn-full-width-footer {
+    background-color: #2a2a2a !important;
+    color: #e0e0e0 !important;
+    border-color: #404040 !important;
+}
+
+html[data-theme='dark'] #noteWidthModal .btn-full-width-footer:hover,
+body.dark-mode #noteWidthModal .btn-full-width-footer:hover {
+    background-color: #333333 !important;
+    border-color: #555555 !important;
+}
+
+html[data-theme='dark'] #noteWidthModal .btn-full-width-footer.active,
+body.dark-mode #noteWidthModal .btn-full-width-footer.active {
+    background-color: #007DB8 !important;
+    color: white !important;
+    border-color: #007DB8 !important;
+}
+
 html[data-theme='dark'] #fontSizeModal .font-size-controls input::placeholder,
-body.dark-mode #fontSizeModal .font-size-controls input::placeholder {
+html[data-theme='dark'] #noteWidthModal .font-size-controls input::placeholder,
+body.dark-mode #fontSizeModal .font-size-controls input::placeholder,
+body.dark-mode #noteWidthModal .font-size-controls input::placeholder {
     color: #808080;
 }
 
 html[data-theme='dark'] #fontSizeModal .default-info,
-body.dark-mode #fontSizeModal .default-info {
+html[data-theme='dark'] #noteWidthModal .default-info,
+body.dark-mode #fontSizeModal .default-info,
+body.dark-mode #noteWidthModal .default-info {
     color: #ffa6a6;
     /* softened red for dark bg */
 }
@@ -1903,6 +1928,18 @@ body.dark-mode .markdown-preview code {
     color: #e0e0e0;
 }
 
+/* Fix highlighting inside code blocks in dark mode */
+html[data-theme='dark'] pre *[style*="background"],
+html[data-theme='dark'] code *[style*="background"],
+html[data-theme='dark'] .code-block *[style*="background"],
+body.dark-mode pre *[style*="background"],
+body.dark-mode code *[style*="background"],
+body.dark-mode .code-block *[style*="background"] {
+    background-color: #665500 !important;
+    background-image: none !important;
+    color: #ffff99 !important;
+}
+
 html[data-theme='dark'] .markdown-preview pre,
 body.dark-mode .markdown-preview pre {
     background-color: #2a2a2a;
@@ -2496,10 +2533,4 @@ body.dark-mode .folder-color-default {
         linear-gradient(135deg, #404040 25%, #1a1a1a 25%, #1a1a1a 75%, #404040 75%, #404040);
     background-size: 8px 8px;
     background-position: 0 0, 4px 4px;
-}
-
-html[data-theme='dark'] .folder-icon[data-icon-color],
-body.dark-mode .folder-icon[data-icon-color] {
-    /* Custom color icons should keep their color in dark mode */
-    /* This ensures the inline style color is preserved */
 }

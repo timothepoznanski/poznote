@@ -390,7 +390,7 @@
             "show_folder_counts": "Mostrar Contagem de Notas das Pastas",
             "notes_without_folders_after": "Mostrar notas após as pastas",
             "show_folder_actions": "Mostrar Ações da Pasta",
-            "center_note_content": "Centralizar conteúdo da nota"
+            "note_content_width": "Largura do conteúdo da nota"
         },
         "badges": {
             "font_size_default": "padrão ({{size}}px)",
@@ -651,6 +651,13 @@
             "label": "Tamanho da fonte (px):",
             "default_value": "{{size}} px é o valor Padrão",
             "preview": "Este é um texto de pré-visualização"
+        },
+        "note_width": {
+            "title": "Largura do conteúdo da nota",
+            "description": "Selecione a largura máxima para o conteúdo de suas notas:",
+            "label": "Largura máxima (px):",
+            "full_width": "Largura total",
+            "default_value": "{{width}} px é o valor Padrão"
         },
         "confirm": {
             "title": "Confirmar Ação",

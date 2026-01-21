@@ -376,13 +376,14 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                     </div>
                 </div>
 
-                <!-- Center Note Content -->
-                <div class="settings-card" id="center-note-card">
-                    <div class="settings-card-icon"><i class="fa-align-center"></i></div>
+                <!-- Note Width -->
+                <div class="settings-card" id="note-width-card">
+                    <div class="settings-card-icon"><i class="fa-arrows-h"></i></div>
                     <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.center_note_content'); ?> <span id="center-note-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span></h3>
+                        <h3><?php echo t_h('display.cards.note_content_width', [], 'Note Content Width'); ?> <span id="note-width-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
                     </div>
                 </div>
+
             </div>
         </div>
 
@@ -395,6 +396,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
     <script src="js/ui.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/font-size-settings.js"></script>
+    <script src="js/note-width-settings.js"></script>
     <script src="js/copy-code-on-focus.js"></script>
     <script src="js/modals-events.js"></script>
     <script src="js/settings-page.js"></script>

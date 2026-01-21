@@ -393,7 +393,7 @@
             "show_folder_counts": "显示文件夹笔记数量",
             "notes_without_folders_after": "在文件夹后显示笔记",
             "show_folder_actions": "显示文件夹操作",
-            "center_note_content": "居中显示笔记内容"
+            "note_content_width": "笔记内容宽度"
         },
         "badges": {
             "font_size_default": "默认 ({{size}}px)",
@@ -659,6 +659,13 @@
             "label": "字体大小 (像素):",
             "default_value": "{{size}} 像素是默认值",
             "preview": "这是一段预览文本"
+        },
+        "note_width": {
+            "title": "笔记内容宽度",
+            "description": "选择笔记内容的最大宽度：",
+            "label": "最大宽度 (px)：",
+            "full_width": "全宽",
+            "default_value": "{{width}} px 是默认值"
         },
         "confirm": {
             "title": "确认操作",

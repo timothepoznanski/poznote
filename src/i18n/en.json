@@ -393,7 +393,7 @@
             "show_folder_counts": "Show Folders Notes Counts",
             "notes_without_folders_after": "Display notes after folders",
             "show_folder_actions": "Show Folder Actions",
-            "center_note_content": "Center Note Content"
+            "note_content_width": "Note Content Width"
         },
         "badges": {
             "font_size_default": "default ({{size}}px)",
@@ -659,6 +659,13 @@
             "label": "Font size (px):",
             "default_value": "{{size}} px is the Default value",
             "preview": "This is a preview text"
+        },
+        "note_width": {
+            "title": "Note Content Width",
+            "description": "Select the maximum width for your notes content:",
+            "label": "Maximum width (px):",
+            "full_width": "Full Width",
+            "default_value": "{{width}} px is the Default value"
         },
         "confirm": {
             "title": "Confirm Action",

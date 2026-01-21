@@ -391,7 +391,7 @@
             "show_folder_counts": "Ordner-Notizzähler anzeigen",
             "notes_without_folders_after": "Notizen nach Ordnern anzeigen",
             "show_folder_actions": "Ordner-Aktionen anzeigen",
-            "center_note_content": "Notizinhalt zentrieren"
+            "note_content_width": "Breite des Notizinhalts"
         },
         "badges": {
             "font_size_default": "Standard ({{size}}px)",
@@ -652,6 +652,13 @@
             "label": "Schriftgröße (px):",
             "default_value": "{{size}} px ist der Standardwert",
             "preview": "Dies ist ein Vorschaubtext"
+        },
+        "note_width": {
+            "title": "Breite des Notizinhalts",
+            "description": "Wählen Sie die maximale Breite für Ihren Notizinhalt:",
+            "label": "Maximale Breite (px):",
+            "full_width": "Volle Breite",
+            "default_value": "{{width}} px ist der Standardwert"
         },
         "confirm": {
             "title": "Aktion bestätigen",

@@ -31,7 +31,7 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(0, 0, 0, 0.4);
     /* When opened by JS, the script sets display:flex so the modal uses flex layout */
     align-items: flex-start;
     justify-content: center;
@@ -44,6 +44,7 @@
 .modal {
     z-index: 9999 !important;
 }
+
 .modal .modal-content {
     z-index: 10000 !important;
 }
@@ -80,7 +81,7 @@
 /* Base modal content styles */
 .modal-content {
     background-color: #fefefe;
-/* ==========================================
+    /* ==========================================
    Share Modal Specific Styles
    Centralized styles for the dynamically-created
    share modal (moved here from inline JS styles)
@@ -93,7 +94,7 @@
     max-width: var(--modal-max-width);
     margin: 0 auto;
     font-family: 'Inter', sans-serif;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     box-sizing: border-box;
     /* prevent inner elements from causing horizontal overflow */
     overflow-x: hidden;
@@ -107,7 +108,8 @@
     font-weight: 600;
 }
 
-.modal-content input, .modal-content select {
+.modal-content input,
+.modal-content select {
     /* width: 100%; */
     padding: 8px 12px;
     margin-bottom: 15px;
@@ -119,7 +121,8 @@
     margin-top: 10px;
 }
 
-.modal-content input:focus, .modal-content select:focus {
+.modal-content input:focus,
+.modal-content select:focus {
     outline: none;
     border-color: #007DB8;
 }
@@ -231,30 +234,37 @@
     color: white;
     border: none;
 }
+
 .modal-buttons button.btn-primary:hover {
     background-color: #005a8a;
 }
+
 .modal-buttons button.btn-cancel {
     background-color: #f8f9fa;
     color: #333;
     border: 1px solid #ddd;
 }
+
 .modal-buttons button.btn-cancel:hover {
     background-color: #e9ecef;
 }
+
 .modal-buttons button.btn-success {
     background-color: #28a745;
     color: white;
     border: none;
 }
+
 .modal-buttons button.btn-success:hover {
     background-color: #218838;
 }
+
 .modal-buttons button.btn-danger {
     background-color: #dc3545;
     color: white;
     border: none;
 }
+
 .modal-buttons button.btn-danger:hover {
     background-color: #c82333;
 }
@@ -308,17 +318,20 @@
 #noteSortModal .modal-body {
     margin-bottom: 6px;
 }
-#noteSortModal .modal-body > div {
+
+#noteSortModal .modal-body>div {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
+
 #noteSortModal .modal-body label {
     display: flex;
     align-items: center;
     gap: 10px;
     font-size: 15px;
 }
+
 #noteSortModal .modal-body input[type="radio"] {
     width: auto !important;
     height: auto !important;
@@ -330,17 +343,20 @@
 #languageModal .modal-body {
     margin-bottom: 6px;
 }
-#languageModal .modal-body > div {
+
+#languageModal .modal-body>div {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
+
 #languageModal .modal-body label {
     display: flex;
     align-items: center;
     gap: 10px;
     font-size: 15px;
 }
+
 #languageModal .modal-body input[type="radio"] {
     width: auto !important;
     height: auto !important;
@@ -443,6 +459,57 @@
     border-radius: 4px;
 }
 
+/* Note Width Modal Styles */
+.note-width-input-container {
+    display: flex;
+    justify-content: center;
+    padding: 0 0 30px 0;
+    /* Minimal top space, extra bottom space */
+}
+
+.note-width-input-container input {
+    width: 120px !important;
+    text-align: center;
+    font-size: 1.2rem !important;
+    padding: 10px !important;
+    margin-bottom: 0 !important;
+}
+
+.btn-full-width-footer {
+    background-color: #f3f4f6 !important;
+    color: #4b5563 !important;
+    border: 1px solid #d1d5db !important;
+}
+
+.btn-full-width-footer:hover {
+    background-color: #e5e7eb !important;
+    color: #111827 !important;
+}
+
+.btn-full-width-footer.active {
+    background-color: #007DB8 !important;
+    color: white !important;
+    border-color: #007DB8 !important;
+}
+
+#noteWidthModal .modal-buttons {
+    flex-wrap: nowrap !important;
+}
+
+@media (max-width: 480px) {
+    #noteWidthModal .modal-buttons {
+        flex-direction: row !important;
+        gap: 8px !important;
+    }
+
+    #noteWidthModal .modal-buttons button {
+        width: auto !important;
+        flex: 1 !important;
+        padding: 8px 5px !important;
+        font-size: 0.85rem !important;
+    }
+}
+
 .font-size-preview {
     border: 1px solid #ddd;
     padding: 20px;
@@ -517,7 +584,8 @@
 
 .upload-button-container {
     text-align: center;
-    display: none; /* Hidden by default, shown when file is selected */
+    display: none;
+    /* Hidden by default, shown when file is selected */
 }
 
 .upload-button-container.show {
@@ -632,7 +700,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0,0,0,0.45);
+    background: rgba(0, 0, 0, 0.45);
     z-index: 10050;
     padding: 20px;
     box-sizing: border-box;
@@ -644,7 +712,7 @@
     max-width: 420px;
     width: 90%;
     margin: 0 auto;
-    box-shadow: 0 12px 30px rgba(15,15,15,0.18);
+    box-shadow: 0 12px 30px rgba(15, 15, 15, 0.18);
     padding: 24px 32px 20px 32px;
     box-sizing: border-box;
 }
@@ -709,7 +777,7 @@
 .link-modal-field input:focus {
     outline: none;
     border-color: #007DB8;
-    box-shadow: 0 0 0 3px rgba(0,125,184,0.08);
+    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.08);
 }
 
 .link-modal-footer {
@@ -756,11 +824,13 @@
     border-radius: 6px;
     font-size: 14px;
 }
+
 .alert-success {
     background-color: #d4edda;
     color: #155724;
     border: 1px solid #c3e6cb;
 }
+
 .alert-danger {
     background-color: #f8d7da;
     color: #721c24;
@@ -824,6 +894,7 @@
 #moveNoteFolderModal .form-group {
     margin-bottom: 12px;
 }
+
 #moveNoteFolderModal .form-group label {
     display: block;
     margin-bottom: 6px;
@@ -943,12 +1014,13 @@
     gap: 15px;
     margin-top: 20px;
     padding-top: 20px;
-    border-top: 1px solid rgba(224,224,224,0.9);
+    border-top: 1px solid rgba(224, 224, 224, 0.9);
 }
 
 /* Instructions buttons row */
 #updateModal .update-instructions-buttons {
-    display: none; /* Hidden by default, shown via JS when update available */
+    display: none;
+    /* Hidden by default, shown via JS when update available */
     gap: 12px;
     justify-content: center;
     flex-wrap: wrap;
@@ -960,7 +1032,7 @@
     #updateModal .update-instructions-buttons {
         flex-direction: column;
     }
-    
+
     #updateModal .btn-update {
         width: 100%;
         min-width: auto;
@@ -1099,9 +1171,11 @@
     display: flex;
     gap: 12px;
     justify-content: center;
-    align-items: center; /* vertical alignment */
+    align-items: center;
+    /* vertical alignment */
     flex-wrap: nowrap;
-    margin-top: 6px; /* small safeguard spacing from content */
+    margin-top: 6px;
+    /* small safeguard spacing from content */
     padding-top: 6px;
 }
 
@@ -1116,7 +1190,8 @@
     align-items: center !important;
     justify-content: center !important;
     box-sizing: border-box !important;
-    white-space: nowrap !important; /* prefer truncation/expansion instead of wrapping */
+    white-space: nowrap !important;
+    /* prefer truncation/expansion instead of wrapping */
 }
 
 /* Make confirm modal buttons flexible so they fit inside the modal without overflowing.
@@ -1125,20 +1200,31 @@
 #confirmModal .modal-buttons .btn-secondary {
     /* prefer to keep enough width to avoid wrapping, but remain flexible to fit modal */
     min-width: 140px !important;
-    flex: 0 1 auto !important;  /* don't grow, just shrink if needed */
-    max-width: 200px !important; /* smaller cap for better proportions */
+    flex: 0 1 auto !important;
+    /* don't grow, just shrink if needed */
+    max-width: 200px !important;
+    /* smaller cap for better proportions */
 }
+
 #confirmModal .modal-buttons .btn-cancel {
-    min-width: 90px !important;  /* compact cancel */
-    flex: 0 0 110px !important;  /* keep a predictable small width */
+    min-width: 90px !important;
+    /* compact cancel */
+    flex: 0 0 110px !important;
+    /* keep a predictable small width */
 }
 
 /* On very small screens let them shrink but keep vertical alignment */
 @media (max-width: 420px) {
-    #confirmModal .modal-buttons { gap: 8px; }
+    #confirmModal .modal-buttons {
+        gap: 8px;
+    }
+
     #confirmModal .modal-buttons .btn-danger,
     #confirmModal .modal-buttons .btn-secondary,
-    #confirmModal .modal-buttons .btn-cancel { min-width: 0 !important; flex: 1 1 auto !important; }
+    #confirmModal .modal-buttons .btn-cancel {
+        min-width: 0 !important;
+        flex: 1 1 auto !important;
+    }
 }
 
 #deleteFolderModal .btn-cancel {
@@ -1249,7 +1335,10 @@
 }
 
 /* Ensure modals are centered and fit within very small mobile viewport */
-#moveNotesModal, #renameModal, #deleteModal, .modal {
+#moveNotesModal,
+#renameModal,
+#deleteModal,
+.modal {
     display: none;
 }
 
@@ -1276,8 +1365,10 @@
 #deleteModal .modal-buttons button {
     padding: 8px 14px;
     font-size: 14px;
-    width: 150px; /* fixed width so both buttons are identical */
-    height: 40px; /* fixed height for consistent appearance */
+    width: 150px;
+    /* fixed width so both buttons are identical */
+    height: 40px;
+    /* fixed height for consistent appearance */
     box-sizing: border-box;
     border-radius: 6px;
 }
@@ -1333,9 +1424,9 @@
 
 /* Some modals use a plain div (no .modal-buttons class). Ensure the direct
    action buttons in those modals also get consistent sizing. */
-#deleteModal .modal-content > div > button,
-#renameModal .modal-content > div > button,
-#moveNotesModal .modal-content > div > button {
+#deleteModal .modal-content>div>button,
+#renameModal .modal-content>div>button,
+#moveNotesModal .modal-content>div>button {
     padding: 8px 14px;
     font-size: 14px;
     width: 150px;
@@ -1345,13 +1436,13 @@
 }
 
 /* Keep the destructive/primary visual treatments */
-#deleteModal .modal-content > div > button.btn-danger,
-#renameModal .modal-content > div > button.btn-primary,
-#moveNotesModal .modal-content > div > button.btn-primary {
+#deleteModal .modal-content>div>button.btn-danger,
+#renameModal .modal-content>div>button.btn-primary,
+#moveNotesModal .modal-content>div>button.btn-primary {
     border: none;
 }
 
-#deleteModal .modal-content > div > button:disabled {
+#deleteModal .modal-content>div>button:disabled {
     /* ensure disabled Delete button keeps same sizing but appears disabled */
     cursor: not-allowed;
     opacity: 0.95;
@@ -1359,12 +1450,14 @@
 
 /* Modal mobile adjustments (more specific mobile sizing) */
 .modal-content {
-    margin: 5% auto 0; /* vertical spacing for modals */
+    margin: 5% auto 0;
+    /* vertical spacing for modals */
     /* Ensure modal never exceeds viewport on small screens while respecting the global max width */
     max-width: min(var(--modal-max-width), 95%);
 }
 
-.modal-content input, .modal-content select {
+.modal-content input,
+.modal-content select {
     font-size: 16px !important;
     padding: 12px !important;
 }
@@ -1461,7 +1554,7 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
     align-items: center;
     justify-content: center;
 }
@@ -1474,7 +1567,7 @@
     border-radius: 6px;
     width: 90%;
     max-width: 400px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 /* Move notes modal - ensure overlay and content styles apply to the actual element */
@@ -1486,7 +1579,7 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5) !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
     align-items: center;
     justify-content: center;
 }
@@ -1497,7 +1590,7 @@
     border-radius: 6px;
     width: 90%;
     max-width: 420px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .rename-modal-content h3 {
@@ -1537,11 +1630,28 @@
     color: #222;
 }
 
-.delete-form { margin: 0; }
-.delete-form .btn { margin: 0; }
-.workspace-list ul li > .ws-col .action-btn { margin: 0; }
-.workspace-list .btn-danger { background: #e04b4b; color: #fff; border: none; }
-.workspace-list .btn-danger:hover { background: #c43b3b; }
+.delete-form {
+    margin: 0;
+}
+
+.delete-form .btn {
+    margin: 0;
+}
+
+.workspace-list ul li>.ws-col .action-btn {
+    margin: 0;
+}
+
+.workspace-list .btn-danger {
+    background: #e04b4b;
+    color: #fff;
+    border: none;
+}
+
+.workspace-list .btn-danger:hover {
+    background: #c43b3b;
+}
+
 /* Ensure destructive buttons inside modals are visually prominent */
 .modal .btn-disabled {
     background: #cccccc !important;
@@ -1552,10 +1662,12 @@
     cursor: not-allowed !important;
     opacity: 0.6;
 }
+
 .modal .btn-disabled:hover {
     background: #cccccc !important;
     cursor: not-allowed !important;
 }
+
 .modal .btn-danger {
     background: #e04b4b !important;
     color: #fff !important;
@@ -1565,13 +1677,16 @@
     cursor: pointer;
     opacity: 1;
 }
+
 .modal .btn-danger:hover {
     background: #c43b3b !important;
 }
+
 /* .btn-rename visibility controlled earlier */
 .workspace-list .btn-rename {
     display: inline-flex;
-    background: #f0ad4e; /* orange */
+    background: #f0ad4e;
+    /* orange */
     border: none;
 }
 
@@ -1600,7 +1715,8 @@
     cursor: text;
     border-radius: 6px;
     margin-top: 24px;
-    margin-bottom: 36px; /* spacing between URL and buttons */
+    margin-bottom: 36px;
+    /* spacing between URL and buttons */
     color: #333;
 }
 
@@ -1608,7 +1724,8 @@
     border-top: none;
     display: flex;
     gap: 12px;
-    margin-top: 0; /* spacing handled by .share-url margin-bottom */
+    margin-top: 0;
+    /* spacing handled by .share-url margin-bottom */
     flex-wrap: wrap;
     justify-content: center;
 }
@@ -1639,7 +1756,8 @@
 
 #shareModal .share-custom-label {
     display: block;
-    margin: 30px 0 6px 0; /* 30px gap before the custom token label */
+    margin: 30px 0 6px 0;
+    /* 30px gap before the custom token label */
     font-size: 13px;
     color: #666;
 }
@@ -1742,18 +1860,18 @@
     border-radius: 50%;
 }
 
-#shareModal input:checked + .toggle-slider,
-input:checked + .toggle-slider {
+#shareModal input:checked+.toggle-slider,
+input:checked+.toggle-slider {
     background-color: #28a745 !important;
 }
 
-#shareModal input:focus + .toggle-slider,
-input:focus + .toggle-slider {
+#shareModal input:focus+.toggle-slider,
+input:focus+.toggle-slider {
     box-shadow: 0 0 1px #28a745;
 }
 
-#shareModal input:checked + .toggle-slider:before,
-input:checked + .toggle-slider:before {
+#shareModal input:checked+.toggle-slider:before,
+input:checked+.toggle-slider:before {
     transform: translateX(20px);
 }
 
@@ -1838,8 +1956,8 @@ html[data-theme='dark'] .toggle-slider {
     background-color: #555;
 }
 
-html[data-theme='dark'] #shareModal input:checked + .toggle-slider,
-html[data-theme='dark'] input:checked + .toggle-slider {
+html[data-theme='dark'] #shareModal input:checked+.toggle-slider,
+html[data-theme='dark'] input:checked+.toggle-slider {
     background-color: #28a745 !important;
 }
 
@@ -1968,6 +2086,7 @@ html[data-theme='dark'] #folderShareModal .share-indexable-label {
    =========================================== */
 
 @media (max-width: 800px) {
+
     /* Modals: max width and centering for all modal-content */
     .modal-content {
         max-width: 95% !important;
@@ -1977,16 +2096,18 @@ html[data-theme='dark'] #folderShareModal .share-indexable-label {
     /* All modal buttons: full width, stacked, spacing */
     .modal-buttons,
     .modal-buttons button,
-    .modal-content > div > button {
+    .modal-content>div>button {
         width: 100% !important;
         display: block !important;
         margin-bottom: 10px !important;
         box-sizing: border-box !important;
     }
+
     .modal-buttons button,
-    .modal-content > div > button {
+    .modal-content>div>button {
         height: 44px !important;
     }
+
     .modal-buttons {
         flex-direction: column !important;
         gap: 10px !important;
@@ -1998,6 +2119,7 @@ html[data-theme='dark'] #folderShareModal .share-indexable-label {
         flex-direction: row !important;
         gap: 10px !important;
     }
+
     #confirmModal .modal-buttons button {
         width: auto !important;
         flex: 1 !important;
@@ -2015,9 +2137,11 @@ html[data-theme='dark'] #folderShareModal .share-indexable-label {
     .link-modal-content {
         padding: 12px !important;
     }
+
     .link-modal-header h3 {
         font-size: 1rem !important;
     }
+
     .link-modal-btn {
         width: 100% !important;
     }

@@ -393,7 +393,7 @@
             "show_folder_counts": "Afficher le nombre de notes par dossier",
             "notes_without_folders_after": "Afficher les notes après les dossiers",
             "show_folder_actions": "Afficher les actions de dossier",
-            "center_note_content": "Centrer le contenu de la note"
+            "note_content_width": "Largeur du contenu de la note"
         },
         "badges": {
             "font_size_default": "par défaut ({{size}}px)",
@@ -654,6 +654,13 @@
             "label": "Taille (px) :",
             "default_value": "{{size}} px est la valeur par défaut",
             "preview": "Ceci est un texte d’aperçu"
+        },
+        "note_width": {
+            "title": "Largeur du contenu de la note",
+            "description": "Sélectionnez la largeur maximale pour le contenu de vos notes :",
+            "label": "Largeur maximale (px) :",
+            "full_width": "Pleine largeur",
+            "default_value": "{{width}} px est la valeur par défaut"
         },
         "confirm": {
             "title": "Confirmer l’action",
