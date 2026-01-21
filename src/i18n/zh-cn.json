@@ -54,7 +54,20 @@
         "no": "否",
         "not_available": "不可用",
         "not_specified": "未指定",
-        "apply": "应用"
+        "apply": "应用",
+        "kanban": "看板"
+    },
+    "kanban": {
+        "title": "看板 - {{folder}}",
+        "view_label": "看板视图",
+        "uncategorized": "在父文件夹中",
+        "empty": {
+            "title": "没有子文件夹",
+            "message": "创建子文件夹以在此处将其显示为列。"
+        },
+        "actions": {
+            "open": "看板视图"
+        }
     },
     "folders": {
         "delete": {

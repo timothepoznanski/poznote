@@ -2534,3 +2534,119 @@ body.dark-mode .folder-color-default {
     background-size: 8px 8px;
     background-position: 0 0, 4px 4px;
 }
+
+/* ===== Kanban View Dark Mode ===== */
+html[data-theme='dark'] .kanban-page,
+body.dark-mode .kanban-page {
+    background: #1a1a1a;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .kanban-header,
+body.dark-mode .kanban-header {
+    background: #1a1a1a;
+    border-bottom-color: #404040;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme='dark'] .kanban-title,
+body.dark-mode .kanban-title {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .kanban-back-btn,
+body.dark-mode .kanban-back-btn {
+    background: #2a2a2a;
+    color: #a0a0a0;
+}
+
+html[data-theme='dark'] .kanban-back-btn:hover,
+body.dark-mode .kanban-back-btn:hover {
+    background: #404040;
+    color: #ffffff;
+}
+
+html[data-theme='dark'] .kanban-column,
+body.dark-mode .kanban-column {
+    background: #1a1a1a;
+    border-color: #404040;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme='dark'] .kanban-column-header,
+body.dark-mode .kanban-column-header {
+    border-bottom-color: #404040;
+}
+
+html[data-theme='dark'] .kanban-column-title,
+body.dark-mode .kanban-column-title {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .kanban-column-count,
+body.dark-mode .kanban-column-count {
+    background: #2a2a2a;
+    color: #a0a0a0;
+}
+
+
+/* Kanban Cards Dark Mode */
+html[data-theme='dark'] .kanban-card,
+body.dark-mode .kanban-card {
+    background: #2a2a2a;
+    /* Slightly lighter than background */
+    border-color: #404040;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme='dark'] .kanban-card:hover,
+body.dark-mode .kanban-card:hover {
+    border-color: #666666;
+    background: #333333;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme='dark'] .kanban-card-title,
+body.dark-mode .kanban-card-title {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .kanban-card-snippet,
+body.dark-mode .kanban-card-snippet {
+    color: #a0a0a0;
+}
+
+html[data-theme='dark'] .kanban-card-meta,
+body.dark-mode .kanban-card-meta {
+    color: #808080;
+}
+
+/* Tags in Dark Mode */
+html[data-theme='dark'] .kanban-tag,
+body.dark-mode .kanban-tag {
+    background: #404040;
+    border-color: #555555;
+    color: #e0e0e0;
+}
+
+/* Scrollbars Dark Mode */
+html[data-theme='dark'] .kanban-board::-webkit-scrollbar-track,
+body.dark-mode .kanban-board::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+html[data-theme='dark'] .kanban-board::-webkit-scrollbar-thumb,
+body.dark-mode .kanban-board::-webkit-scrollbar-thumb {
+    background: #404040;
+}
+
+html[data-theme='dark'] .kanban-board::-webkit-scrollbar-thumb:hover,
+body.dark-mode .kanban-board::-webkit-scrollbar-thumb:hover {
+    background: #555555;
+}
+
+html[data-theme='dark'] .kanban-column-content.drag-over,
+body.dark-mode .kanban-column-content.drag-over {
+    background: #2a2a2a;
+    border-color: #6366f1;
+}

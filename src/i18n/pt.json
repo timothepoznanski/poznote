@@ -53,7 +53,20 @@
         "no": "Não",
         "not_available": "Não disponível",
         "not_specified": "Não especificado",
-        "apply": "Aplicar"
+        "apply": "Aplicar",
+        "kanban": "Kanban"
+    },
+    "kanban": {
+        "title": "Kanban - {{folder}}",
+        "view_label": "Visualização Kanban",
+        "uncategorized": "Na pasta pai",
+        "empty": {
+            "title": "Sem subpastas",
+            "message": "Crie subpastas para vê-las como colunas aqui."
+        },
+        "actions": {
+            "open": "Visualização Kanban"
+        }
     },
     "folders": {
         "delete": {
