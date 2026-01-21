@@ -43,7 +43,7 @@
     align-items: center;
     gap: 20px;
     font-size: 1.8rem;
-    font-weight: 600;
+    font-weight: 400;
     color: #1f2937;
     line-height: 0.8;
 }
@@ -77,7 +77,7 @@ body.dark-mode .home-info-line {
 
 .home-notes-count {
     font-size: 1rem;
-    font-weight: 500;
+    font-weight: 400;
     color: #6b7280;
     background: #f3f4f6;
     padding: 4px 10px;
@@ -167,7 +167,7 @@ body.dark-mode .home-card-logout .home-card-icon {
 
 .home-card-title {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 400;
     color: #1f2937;
 }
 
@@ -188,7 +188,7 @@ body.dark-mode .home-card-logout .home-card-icon {
     display: inline-block;
     padding: 8px 16px;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 400;
     text-align: center;
     text-decoration: none;
     border-radius: 6px;

@@ -46,6 +46,13 @@
     }
 }
 
+/* Hide Kanban View option on mobile */
+@media (max-width: 800px) {
+    .folder-actions-menu-item[data-action="open-kanban-view"] {
+        display: none !important;
+    }
+}
+
 /* Folder visibility: when not hidden, ensure folder headers and contents use block layout */
 .folder-header {
     display: block;
@@ -3266,10 +3273,7 @@ body.dark-mode .folder-header.folder-drop-target {
     align-content: center;
 }
 
-/* Custom color icons should override default color */
-.folder-icon[data-icon-color] {
-    /* Inline style will be applied here with higher specificity */
-}
+
 
 /* Container pour les dossiers système - maintenant masqué (remplacé par page Home) */
 .system-folders-container {
@@ -6356,7 +6360,6 @@ a.links_arbo_left.dragging,
     -khtml-user-drag: element !important;
     -moz-user-drag: element !important;
     -o-user-drag: element !important;
-    user-drag: element !important;
     display: block !important;
     position: relative !important;
 }
@@ -6372,7 +6375,6 @@ a.links_arbo_left.dragging,
     -khtml-user-drag: element !important;
     -moz-user-drag: element !important;
     -o-user-drag: element !important;
-    user-drag: element !important;
     display: block !important;
     position: relative !important;
 }
@@ -6515,13 +6517,13 @@ a.links_arbo_left.dragging,
    for better readability on wide screens
    ============================================ */
 body.center-note-content #right_col .innernote {
-    max-width: 800px;
+    max-width: var(--note-max-width, 800px);
     margin-left: auto;
     margin-right: auto;
 }
 
 body.center-note-content #right_col .note-header {
-    max-width: 800px;
+    max-width: var(--note-max-width, 800px);
     margin-left: auto;
     margin-right: auto;
 }

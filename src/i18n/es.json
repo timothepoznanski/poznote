@@ -15,6 +15,7 @@
         "login": {
             "fields": {
                 "username": "Usuario",
+                "username_or_email": "Nombre de usuario o correo electrónico",
                 "password": "Contraseña",
                 "profile": "Perfil"
             },
@@ -53,7 +54,20 @@
         "no": "No",
         "not_available": "No disponible",
         "not_specified": "No especificado",
-        "apply": "Aplicar"
+        "apply": "Aplicar",
+        "kanban": "Kanban"
+    },
+    "kanban": {
+        "title": "Kanban - {{folder}}",
+        "view_label": "Vista Kanban",
+        "uncategorized": "En la carpeta principal",
+        "empty": {
+            "title": "Sin subcarpetas",
+            "message": "Crea subcarpetas para verlas como columnas aquí."
+        },
+        "actions": {
+            "open": "Vista Kanban"
+        }
     },
     "folders": {
         "delete": {
@@ -279,6 +293,7 @@
             "spanish": "Español",
             "portuguese": "Portugués",
             "german": "Alemán",
+            "chinese_simplified": "Chino simplificado",
             "login_page": "Idioma de la página de inicio de sesión:",
             "saved": "Idioma guardado",
             "save_error": "No se pudo guardar el idioma",
@@ -389,7 +404,7 @@
             "show_folder_counts": "Mostrar conteo de notas de carpetas",
             "notes_without_folders_after": "Mostrar notas después de las carpetas",
             "show_folder_actions": "Mostrar acciones de carpeta",
-            "center_note_content": "Centrar contenido de la nota"
+            "note_content_width": "Ancho del contenido de la nota"
         },
         "badges": {
             "font_size_default": "predeterminado ({{size}}px)",
@@ -650,6 +665,13 @@
             "label": "Tamaño de fuente (px):",
             "default_value": "{{size}} px es el valor predeterminado",
             "preview": "Este es un texto de vista previa"
+        },
+        "note_width": {
+            "title": "Ancho del contenido de la nota",
+            "description": "Selecciona el ancho máximo para el contenido de tus notas:",
+            "label": "Ancho máximo (px):",
+            "full_width": "Ancho total",
+            "default_value": "{{width}} px es el valor predeterminado"
         },
         "confirm": {
             "title": "Confirmar acción",
@@ -1062,6 +1084,7 @@
         "admin_warning": "La cuenta de administrador predeterminada está activa con el nombre de usuario <code>{{username}}</code>. Por favor, inicie sesión y cambie el nombre de esta cuenta para mayor seguridad.",
         "fields": {
             "username": "Nombre de usuario",
+            "username_or_email": "Nombre de usuario o correo electrónico",
             "password": "Contraseña",
             "profile": "Selecciona tu perfil"
         },

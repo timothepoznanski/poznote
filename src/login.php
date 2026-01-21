@@ -166,7 +166,8 @@ if (isset($_GET['oidc_error'])) {
                         'fr' => 'Français',
                         'es' => 'Español',
                         'de' => 'Deutsch',
-                        'pt' => 'Português'
+                        'pt' => 'Português',
+                        'zh-cn' => '简体中文'
                     ];
                     foreach ($langs as $code => $label): ?>
                         <option value="<?php echo $code; ?>" <?php echo ($currentLang === $code) ? 'selected' : ''; ?>>

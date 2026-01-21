@@ -54,7 +54,20 @@
         "no": "No",
         "not_available": "Not available",
         "not_specified": "Not specified",
-        "apply": "Apply"
+        "apply": "Apply",
+        "kanban": "Kanban"
+    },
+    "kanban": {
+        "title": "Kanban - {{folder}}",
+        "view_label": "Kanban View",
+        "uncategorized": "In Parent Folder",
+        "empty": {
+            "title": "No subfolders",
+            "message": "Create subfolders to see them as columns here."
+        },
+        "actions": {
+            "open": "Kanban View"
+        }
     },
     "folders": {
         "delete": {
@@ -281,6 +294,7 @@
             "spanish": "Spanish",
             "portuguese": "Portuguese",
             "german": "German",
+            "chinese_simplified": "Simplified Chinese",
             "login_page": "Login page language:",
             "saved": "Language saved",
             "save_error": "Could not save language",
@@ -392,7 +406,7 @@
             "show_folder_counts": "Show Folders Notes Counts",
             "notes_without_folders_after": "Display notes after folders",
             "show_folder_actions": "Show Folder Actions",
-            "center_note_content": "Center Note Content"
+            "note_content_width": "Note Content Width"
         },
         "badges": {
             "font_size_default": "default ({{size}}px)",
@@ -521,6 +535,10 @@
     "editor": {
         "markdown_placeholder": "Write your markdown or use / to open commands menu here...",
         "markdown_placeholder_mobile": "Write your markdown here...",
+        "messages": {
+            "preview_mode_hint": "You are in preview mode. Switch to edit mode using the button in the toolbar to start writing markdown.",
+            "split_preview_placeholder": "Preview will appear here as you type..."
+        },
         "images": {
             "delete_confirm": {
                 "title": "Delete Image",
@@ -578,7 +596,11 @@
             "insert_checklist": "Insert checklist",
             "add_separator": "Add separator",
             "insert_note_reference": "Insert note reference",
-            "open_in_new_tab": "Open in new tab"
+            "open_in_new_tab": "Open in new tab",
+            "search_replace": "Search and replace",
+            "split_view": "Toggle split view",
+            "switch_to_edit": "Switch to edit mode",
+            "switch_to_preview": "Switch to preview mode"
         },
         "link": {
             "add_title": "Add Link",
@@ -650,6 +672,13 @@
             "label": "Font size (px):",
             "default_value": "{{size}} px is the Default value",
             "preview": "This is a preview text"
+        },
+        "note_width": {
+            "title": "Note Content Width",
+            "description": "Select the maximum width for your notes content:",
+            "label": "Maximum width (px):",
+            "full_width": "Full Width",
+            "default_value": "{{width}} px is the Default value"
         },
         "confirm": {
             "title": "Confirm Action",
@@ -1063,6 +1092,7 @@
         "admin_warning": "The default administrator account is active with the username <code>{{username}}</code>. Please log in and rename this account for better security.",
         "fields": {
             "username": "Username",
+            "username_or_email": "Username or Email",
             "password": "Password",
             "profile": "Select your profile"
         },

@@ -54,7 +54,20 @@
         "no": "Non",
         "not_available": "Non disponible",
         "not_specified": "Non spécifié",
-        "apply": "Appliquer"
+        "apply": "Appliquer",
+        "kanban": "Kanban"
+    },
+    "kanban": {
+        "title": "Kanban - {{folder}}",
+        "view_label": "Vue Kanban",
+        "uncategorized": "Dans le dossier parent",
+        "empty": {
+            "title": "Aucun sous-dossier",
+            "message": "Créez des sous-dossiers pour les voir apparaître en colonnes ici."
+        },
+        "actions": {
+            "open": "Vue Kanban"
+        }
     },
     "folders": {
         "delete": {
@@ -281,6 +294,7 @@
             "spanish": "Espagnol",
             "portuguese": "Portugais",
             "german": "Allemand",
+            "chinese_simplified": "Chinois simplifié",
             "login_page": "Langue de la page de connexion :",
             "saved": "Langue enregistrée",
             "save_error": "Impossible d'enregistrer la langue",
@@ -392,7 +406,7 @@
             "show_folder_counts": "Afficher le nombre de notes par dossier",
             "notes_without_folders_after": "Afficher les notes après les dossiers",
             "show_folder_actions": "Afficher les actions de dossier",
-            "center_note_content": "Centrer le contenu de la note"
+            "note_content_width": "Largeur du contenu de la note"
         },
         "badges": {
             "font_size_default": "par défaut ({{size}}px)",
@@ -653,6 +667,13 @@
             "label": "Taille (px) :",
             "default_value": "{{size}} px est la valeur par défaut",
             "preview": "Ceci est un texte d’aperçu"
+        },
+        "note_width": {
+            "title": "Largeur du contenu de la note",
+            "description": "Sélectionnez la largeur maximale pour le contenu de vos notes :",
+            "label": "Largeur maximale (px) :",
+            "full_width": "Pleine largeur",
+            "default_value": "{{width}} px est la valeur par défaut"
         },
         "confirm": {
             "title": "Confirmer l’action",
@@ -1073,6 +1094,7 @@
         "admin_warning": "Le compte administrateur par défaut a pour login <code>{{username}}</code>. Veuillez vous connecter et renommer ce compte pour plus de sécurité.",
         "fields": {
             "username": "Nom d’utilisateur",
+            "username_or_email": "Pseudo ou Email",
             "password": "Mot de passe",
             "profile": "Sélectionnez votre profil"
         },

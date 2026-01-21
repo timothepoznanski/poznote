@@ -15,6 +15,7 @@
         "login": {
             "fields": {
                 "username": "Benutzername",
+                "username_or_email": "Benutzername oder E-Mail",
                 "password": "Passwort",
                 "profile": "Profil"
             },
@@ -53,7 +54,20 @@
         "no": "Nein",
         "not_available": "Nicht verfügbar",
         "not_specified": "Nicht angegeben",
-        "apply": "Anwenden"
+        "apply": "Anwenden",
+        "kanban": "Kanban"
+    },
+    "kanban": {
+        "title": "Kanban - {{folder}}",
+        "view_label": "Kanban-Ansicht",
+        "uncategorized": "Im übergeordneten Ordner",
+        "empty": {
+            "title": "Keine Unterordner",
+            "message": "Erstellen Sie Unterordner, um sie hier als Spalten zu sehen."
+        },
+        "actions": {
+            "open": "Kanban-Ansicht"
+        }
     },
     "folders": {
         "delete": {
@@ -279,6 +293,7 @@
             "spanish": "Spanisch",
             "portuguese": "Portugiesisch",
             "german": "Deutsch",
+            "chinese_simplified": "Vereinfachtes Chinesisch",
             "login_page": "Sprache der Anmeldeseite:",
             "saved": "Sprache gespeichert",
             "save_error": "Sprache konnte nicht gespeichert werden",
@@ -389,7 +404,7 @@
             "show_folder_counts": "Ordner-Notizzähler anzeigen",
             "notes_without_folders_after": "Notizen nach Ordnern anzeigen",
             "show_folder_actions": "Ordner-Aktionen anzeigen",
-            "center_note_content": "Notizinhalt zentrieren"
+            "note_content_width": "Breite des Notizinhalts"
         },
         "badges": {
             "font_size_default": "Standard ({{size}}px)",
@@ -650,6 +665,13 @@
             "label": "Schriftgröße (px):",
             "default_value": "{{size}} px ist der Standardwert",
             "preview": "Dies ist ein Vorschaubtext"
+        },
+        "note_width": {
+            "title": "Breite des Notizinhalts",
+            "description": "Wählen Sie die maximale Breite für Ihren Notizinhalt:",
+            "label": "Maximale Breite (px):",
+            "full_width": "Volle Breite",
+            "default_value": "{{width}} px ist der Standardwert"
         },
         "confirm": {
             "title": "Aktion bestätigen",
@@ -1062,6 +1084,7 @@
         "admin_warning": "Das Standard-Administratorkonto ist mit dem Benutzernamen <code>{{username}}</code> aktiv. Bitte melden Sie sich an und benennen Sie dieses Konto für mehr Sicherheit um.",
         "fields": {
             "username": "Benutzername",
+            "username_or_email": "Benutzername oder E-Mail",
             "password": "Passwort",
             "profile": "Wählen Sie Ihr Profil"
         },

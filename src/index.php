@@ -105,6 +105,23 @@ try {
     // Use default if error
 }
 
+// Load note max width for CSS custom property
+$note_max_width = '800';
+try {
+    $stmt = $con->prepare("SELECT value FROM settings WHERE key = ?");
+    $stmt->execute(['center_note_content']);
+    $width_value = $stmt->fetchColumn();
+    if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $width_value !== 'false') {
+        if ($width_value === '1' || $width_value === 'true') {
+            $note_max_width = '800';
+        } else {
+            $note_max_width = $width_value;
+        }
+    }
+} catch (Exception $e) {
+    // Use default if error
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -139,7 +156,7 @@ try {
     <link type="text/css" rel="stylesheet" href="css/folder-icon-modal.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="js/katex/katex.min.css?v=<?php echo $v; ?>"/>
-    <style>:root { --note-font-size: <?php echo htmlspecialchars($note_font_size, ENT_QUOTES); ?>px; }</style>
+    <style>:root { --note-font-size: <?php echo htmlspecialchars($note_font_size, ENT_QUOTES); ?>px; --note-max-width: <?php echo htmlspecialchars($note_max_width, ENT_QUOTES); ?>px; }</style>
     <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <script src="js/modal-alerts.js?v=<?php echo $v; ?>"></script>
     <script src="js/toolbar.js?v=<?php echo $v; ?>"></script>
@@ -174,7 +191,7 @@ try {
 
     $stmt->execute(['center_note_content']);
     $v5 = $stmt->fetchColumn();
-    if ($v5 === '1' || $v5 === 'true') $extra_body_classes .= ' center-note-content';
+    if ($v5 !== false && $v5 !== '' && $v5 !== '0' && $v5 !== 'false') $extra_body_classes .= ' center-note-content';
 
 } catch (Exception $e) {
     // ignore errors and continue without extra classes

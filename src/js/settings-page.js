@@ -163,6 +163,23 @@
         });
     }
 
+    function refreshNoteWidthBadge() {
+        getSetting('center_note_content', function (value) {
+            var badge = document.getElementById('note-width-badge');
+            if (badge) {
+                if (value === '0' || value === 'false' || value === '' || value === null) {
+                    badge.textContent = tr('modals.note_width.full_width', {}, 'Full Width');
+                    badge.className = 'setting-status enabled';
+                } else {
+                    var width = value;
+                    if (width === '1' || width === 'true') width = '800';
+                    badge.textContent = width + 'px';
+                    badge.className = 'setting-status enabled';
+                }
+            }
+        });
+    }
+
     function refreshLanguageBadge() {
         getSetting('language', function (value) {
             var badge = document.getElementById('language-badge');
@@ -390,7 +407,6 @@
         setupToggleCard('folder-counts-card', 'folder-counts-status', 'hide_folder_counts', true);
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
-        setupToggleCard('center-note-card', 'center-note-status', 'center_note_content', false);
 
         // Card click handlers for modals (using event delegation)
         var languageCard = document.getElementById('language-card');
@@ -516,6 +532,7 @@
         refreshTasklistInsertOrderBadge();
         refreshToolbarModeBadge();
         refreshTimezoneBadge();
+        refreshNoteWidthBadge();
 
         // Re-translate dynamic badges once client-side i18n is loaded
         document.addEventListener('poznote:i18n:loaded', function () {
@@ -538,5 +555,6 @@
     window.refreshTasklistInsertOrderBadge = refreshTasklistInsertOrderBadge;
     window.refreshToolbarModeBadge = refreshToolbarModeBadge;
     window.refreshTimezoneBadge = refreshTimezoneBadge;
+    window.refreshNoteWidthBadge = refreshNoteWidthBadge;
 
 })();

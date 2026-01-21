@@ -80,6 +80,26 @@
     </div>
 </div>
 
+<!-- Note Width Settings Modal -->
+<div id="noteWidthModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><?php echo t_h('modals.note_width.title', [], 'Note Content Width'); ?></h3>
+        </div>
+        <div class="modal-body">
+            <div class="note-width-input-container">
+                <input type="number" id="noteWidthInput" min="0" max="2500" step="50" value="800" placeholder="800">
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" id="cancelNoteWidthBtn"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" id="fullWidthBtn" class="btn-secondary btn-full-width-footer"><?php echo t_h('modals.note_width.full_width', [], 'Full Width'); ?></button>
+            <button type="button" class="btn-primary" id="saveNoteWidthBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
+
 <!-- Confirmation Modal -->
 <div id="confirmModal" class="modal">
     <div class="modal-content">
@@ -455,6 +475,7 @@
                 <label><input type="radio" name="languageChoice" value="es"> <?php echo t_h('settings.language.spanish'); ?></label>
                 <label><input type="radio" name="languageChoice" value="pt"> <?php echo t_h('settings.language.portuguese'); ?></label>
                 <label><input type="radio" name="languageChoice" value="de"> <?php echo t_h('settings.language.german'); ?></label>
+                <label><input type="radio" name="languageChoice" value="zh-cn"> <?php echo t_h('settings.language.chinese_simplified'); ?></label>
             </div>
         </div>
         <div class="modal-buttons">
