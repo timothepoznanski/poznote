@@ -3565,7 +3565,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 } */
 
 .folder-content {
-    margin-left: 29px;
+    margin-left: 15px;
     margin-bottom: 5px;
     /* Reduce space below each folder */
 }
@@ -3576,7 +3576,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     position: relative;
     display: flex !important;
     align-items: center !important;
-    padding-left: 0px !important;
+    padding-left: 10px !important;
     /* Réduction du padding pour récupérer l'espace */
     transition: padding-left 0.2s;
 }
