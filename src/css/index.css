@@ -5898,6 +5898,12 @@ input[type="search"]::-webkit-search-results-decoration {
     filter: none !important;
 }
 
+/* Exception: Remove filter for slash command color icons (so they show their iconColor) */
+.slash-command-item i[style*="color:"],
+.slash-command-submenu i[style*="color:"] {
+    filter: none !important;
+}
+
 /* Exception: Remove filter for save button when modified (to show red color) */
 .toolbar-btn.save-modified .fa-save {
     filter: none !important;

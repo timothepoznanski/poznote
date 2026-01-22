@@ -372,6 +372,16 @@ function parseMarkdown(text) {
         return placeholder;
     });
 
+    // Protect inline span tags with style attributes (for colors, backgrounds, etc.)
+    // Match: <span style="...">content</span>
+    text = text.replace(/<span\s+style="([^"]+)">([^<]*)<\/span>/gi, function (match, styleAttr, content) {
+        let placeholder = '\x00PSPAN' + protectedIndex + '\x00';
+        let spanTag = '<span style="' + styleAttr + '">' + content + '</span>';
+        protectedElements[protectedIndex] = spanTag;
+        protectedIndex++;
+        return placeholder;
+    });
+
     // Now escape HTML to prevent XSS
     let html = text
         .replace(/&/g, '&amp;')
@@ -409,8 +419,8 @@ function parseMarkdown(text) {
             return protectedCode[parseInt(index)] || match;
         });
 
-        // Restore protected elements (images and links)
-        text = text.replace(/\x00P(IMG|LNK)(\d+)\x00/g, function (match, type, index) {
+        // Restore protected elements (images, links, and spans)
+        text = text.replace(/\x00P(IMG|LNK|SPAN)(\d+)\x00/g, function (match, type, index) {
             return protectedElements[parseInt(index)] || match;
         });
 

@@ -879,7 +879,16 @@
         "callout_tip": "Tip",
         "callout_important": "Important",
         "callout_warning": "Warning",
-        "callout_caution": "Caution"
+        "callout_caution": "Caution",
+        "color": "Color",
+        "color_red": "Red",
+        "color_blue": "Blue",
+        "color_green": "Green",
+        "color_yellow": "Yellow",
+        "color_purple": "Purple",
+        "color_orange": "Orange",
+        "color_black": "Black",
+        "bg_yellow": "Yellow highlight"
     },
     "api": {
         "settings": {

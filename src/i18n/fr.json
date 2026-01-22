@@ -884,7 +884,16 @@
         "callout_tip": "Astuce",
         "callout_important": "Important",
         "callout_warning": "Avertissement",
-        "callout_caution": "Attention"
+        "callout_caution": "Attention",
+        "color": "Couleur",
+        "color_red": "Rouge",
+        "color_blue": "Bleu",
+        "color_green": "Vert",
+        "color_yellow": "Jaune",
+        "color_purple": "Violet",
+        "color_orange": "Orange",
+        "color_black": "Noir",
+        "bg_yellow": "Surlignage jaune"
     },
     "api": {
         "settings": {
