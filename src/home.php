@@ -176,12 +176,6 @@ try {
                 <span class="home-info-username"><i class="fa-user home-info-icon"></i><?php echo htmlspecialchars($currentUser['username'] ?? 'User', ENT_QUOTES); ?></span>
                 <span class="home-workspace-name"><i class="fa-layer-group home-info-icon"></i><?php echo htmlspecialchars($pageWorkspace ?: 'Poznote', ENT_QUOTES); ?></span>
             </div>
-            
-            <div class="home-buttons">
-                <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary">
-                    <?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?>
-                </a>
-            </div>
         </div>
         
         <div class="home-grid">
