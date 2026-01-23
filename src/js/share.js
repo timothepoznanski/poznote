@@ -20,53 +20,58 @@ function refreshNotesListAfterFolderAction() {
     }
 
     const url = new URL(window.location.href);
-    
-    fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-    .then(function(response) { return response.text(); })
-    .then(function(html) {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const newLeftCol = doc.getElementById('left_col');
-        const currentLeftCol = document.getElementById('left_col');
-        
-        if (newLeftCol && currentLeftCol) {
-            currentLeftCol.innerHTML = newLeftCol.innerHTML;
-            
-            // Reinitialize components
-            try {
-                if (typeof initializeWorkspaceMenu === 'function') {
-                    initializeWorkspaceMenu();
-                }
-                
-                if (window.searchManager) {
-                    window.searchManager.initializeSearch();
-                    window.searchManager.ensureAtLeastOneButtonActive();
-                }
-                
-                if (typeof reinitializeClickableTagsAfterAjax === 'function') {
-                    reinitializeClickableTagsAfterAjax();
-                }
-                
-                if (typeof window.initializeNoteClickHandlers === 'function') {
-                    window.initializeNoteClickHandlers();
-                }
-                
-                // Reinitialize drag and drop events for notes
-                if (typeof setupNoteDragDropEvents === 'function') {
-                    setupNoteDragDropEvents();
-                }
 
-            if (typeof restoreFolderStates === 'function') {
-                restoreFolderStates();
+    fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(function (response) { return response.text(); })
+        .then(function (html) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newLeftCol = doc.getElementById('left_col');
+            const currentLeftCol = document.getElementById('left_col');
+
+            if (newLeftCol && currentLeftCol) {
+                currentLeftCol.innerHTML = newLeftCol.innerHTML;
+
+                // Reinitialize components
+                try {
+                    if (typeof initializeWorkspaceMenu === 'function') {
+                        initializeWorkspaceMenu();
+                    }
+
+                    if (window.searchManager) {
+                        window.searchManager.initializeSearch();
+                        window.searchManager.ensureAtLeastOneButtonActive();
+                    }
+
+                    if (typeof reinitializeClickableTagsAfterAjax === 'function') {
+                        reinitializeClickableTagsAfterAjax();
+                    }
+
+                    if (typeof window.initializeNoteClickHandlers === 'function') {
+                        window.initializeNoteClickHandlers();
+                    }
+
+                    // Reinitialize drag and drop events for notes
+                    if (typeof setupNoteDragDropEvents === 'function') {
+                        setupNoteDragDropEvents();
+                    }
+
+                    if (typeof restoreFolderStates === 'function') {
+                        restoreFolderStates();
+                    }
+
+                    // Refresh Kanban view if it's currently active
+                    if (typeof window.refreshKanbanView === 'function') {
+                        window.refreshKanbanView();
+                    }
+                } catch (error) {
+                    console.error('Error reinitializing after folder action:', error);
+                }
             }
-            } catch (error) {
-                console.error('Error reinitializing after folder action:', error);
-            }
-        }
-    })
-    .catch(function(err) {
-        console.log('Error during refresh:', err);
-    });
+        })
+        .catch(function (err) {
+            console.log('Error during refresh:', err);
+        });
 }
 
 function toggleShareMenu(event, noteId, filename, titleJson) {
@@ -210,21 +215,21 @@ async function createPublicShare(noteId) {
         try {
             const el = document.getElementById('shareCustomToken');
             if (el && el.value) customToken = el.value.trim();
-        } catch (e) {}
+        } catch (e) { }
 
         // Get indexable checkbox value
         let indexable = 0;
         try {
             const indexableEl = document.getElementById('shareIndexable');
             if (indexableEl && indexableEl.checked) indexable = 1;
-        } catch (e) {}
+        } catch (e) { }
 
         // Get password value
         let password = '';
         try {
             const passwordEl = document.getElementById('sharePassword');
             if (passwordEl && passwordEl.value) password = passwordEl.value.trim();
-        } catch (e) {}
+        } catch (e) { }
 
         const theme = localStorage.getItem('poznote-theme') || 'light';
         const body = { theme: theme, indexable: indexable };
@@ -271,7 +276,7 @@ async function createPublicShare(noteId) {
             if (typeof showShareModal === 'function') {
                 showShareModal(data.url, { noteId: noteId, shared: true, workspace: data.workspace || '' });
             } else if (typeof showLinkModal === 'function') {
-                showLinkModal(data.url, data.url, function(){});
+                showLinkModal(data.url, data.url, function () { });
             } else {
                 // Fallback: prompt
                 window.prompt('Shared URL (read-only):', data.url);
@@ -321,14 +326,14 @@ function applyProtocolToPublicUrl(url, protocol) {
 }
 
 // Close share menu when clicking elsewhere
-document.addEventListener('click', function(e) {
+document.addEventListener('click', function (e) {
     if (!e.target.closest('.share-dropdown')) {
         closeShareMenu();
     }
 });
 
 // Close actions menu when clicking elsewhere
-document.addEventListener('click', function(e) {
+document.addEventListener('click', function (e) {
     if (!e.target.closest('.actions-dropdown')) {
         closeActionsMenu();
     }
@@ -418,8 +423,8 @@ function showShareModal(url, options) {
         openBtn.className = 'btn-open';
         openBtn.textContent = window.t ? window.t('index.public_modal.open', null, 'Open') : 'Open';
         // styling handled by CSS classes
-        openBtn.onclick = function(ev) {
-            try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
+        openBtn.onclick = function (ev) {
+            try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) { }
             // Read the current URL from the modal each time so Renew updates are respected
             try {
                 const urlEl = document.getElementById('shareModalUrl');
@@ -438,9 +443,9 @@ function showShareModal(url, options) {
         copyBtn.type = 'button';
         copyBtn.className = 'btn-primary';
         copyBtn.textContent = window.t ? window.t('index.public_modal.copy', null, 'Copy') : 'Copy';
-        copyBtn.onclick = async function(ev) {
+        copyBtn.onclick = async function (ev) {
             // Prevent clicks from bubbling to global handlers
-            try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
+            try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) { }
 
             // Try to copy the URL, then close the modal. Do NOT change the button text.
             try {
@@ -475,8 +480,8 @@ function showShareModal(url, options) {
             manageBtn.type = 'button';
             manageBtn.className = 'btn-primary';
             manageBtn.textContent = window.t ? window.t('index.public_modal.manage', null, 'Edit') : 'Edit';
-            manageBtn.onclick = function(ev) {
-                try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
+            manageBtn.onclick = function (ev) {
+                try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) { }
                 // Extract token from URL (last part after /)
                 const token = decodeURIComponent(url.split('/').pop());
                 if (token) {
@@ -497,8 +502,8 @@ function showShareModal(url, options) {
             renewBtn.className = 'btn-renew';
             renewBtn.textContent = window.t ? window.t('index.public_modal.renew', null, 'Renew') : 'Renew';
             // styling handled by CSS classes
-            renewBtn.onclick = async function(ev) {
-                try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
+            renewBtn.onclick = async function (ev) {
+                try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) { }
                 try {
                     // Get current theme from localStorage
                     const theme = localStorage.getItem('poznote-theme') || 'light';
@@ -540,32 +545,32 @@ function showShareModal(url, options) {
             revokeBtn.className = 'btn-cancel';
             revokeBtn.textContent = window.t ? window.t('index.public_modal.revoke', null, 'Revoke') : 'Revoke';
             // styling handled by CSS classes
-            revokeBtn.onclick = async function(ev) {
-            try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
-            // Call API to revoke
-            try {
-                const resp = await fetch('/api/v1/notes/' + noteId + '/share', {
-                    method: 'DELETE',
-                    credentials: 'same-origin',
-                    headers: { 'Accept': 'application/json' }
-                });
-                if (resp.ok) {
-                    markShareIconShared(noteId, false);
-                    updateSharedCount(-1);
-                    closeModal('shareModal');
-                } else {
-                    const ct = resp.headers.get('content-type') || '';
-                    let err = 'Failed to revoke';
-                    if (ct.indexOf('application/json') !== -1) {
-                        const j = await resp.json();
-                        err = j.error || err;
+            revokeBtn.onclick = async function (ev) {
+                try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) { }
+                // Call API to revoke
+                try {
+                    const resp = await fetch('/api/v1/notes/' + noteId + '/share', {
+                        method: 'DELETE',
+                        credentials: 'same-origin',
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    if (resp.ok) {
+                        markShareIconShared(noteId, false);
+                        updateSharedCount(-1);
+                        closeModal('shareModal');
+                    } else {
+                        const ct = resp.headers.get('content-type') || '';
+                        let err = 'Failed to revoke';
+                        if (ct.indexOf('application/json') !== -1) {
+                            const j = await resp.json();
+                            err = j.error || err;
+                        }
+                        showNotificationPopup && showNotificationPopup(err, 'error');
                     }
-                    showNotificationPopup && showNotificationPopup(err, 'error');
+                } catch (e) {
+                    showNotificationPopup && showNotificationPopup('Network error: ' + e.message, 'error');
                 }
-            } catch (e) {
-                showNotificationPopup && showNotificationPopup('Network error: ' + e.message, 'error');
-            }
-        };
+            };
             buttonsDiv.appendChild(revokeBtn);
 
             // Create Close button for shared notes
@@ -573,7 +578,7 @@ function showShareModal(url, options) {
             cancelBtn.type = 'button';
             cancelBtn.className = 'btn-cancel';
             cancelBtn.textContent = window.t ? window.t('index.public_modal.close', null, 'Close') : 'Close';
-            cancelBtn.onclick = function() { closeModal('shareModal'); };
+            cancelBtn.onclick = function () { closeModal('shareModal'); };
             buttonsDiv.appendChild(cancelBtn);
         }
     } else {
@@ -649,7 +654,7 @@ function showShareModal(url, options) {
         createBtn.className = 'btn-create-share';
         createBtn.textContent = window.t ? window.t('index.share_modal.create_url', null, 'Create url') : 'Create url';
         // create button styled via CSS class
-        createBtn.onclick = function() { createPublicShare(noteId); };
+        createBtn.onclick = function () { createPublicShare(noteId); };
         buttonsDiv.appendChild(createBtn);
 
         // Create Close button for non-shared notes
@@ -657,7 +662,7 @@ function showShareModal(url, options) {
         cancelBtn.type = 'button';
         cancelBtn.className = 'btn-cancel';
         cancelBtn.textContent = window.t ? window.t('index.share_modal.close', null, 'Close') : 'Close';
-        cancelBtn.onclick = function() { closeModal('shareModal'); };
+        cancelBtn.onclick = function () { closeModal('shareModal'); };
         buttonsDiv.appendChild(cancelBtn);
     }
 
@@ -885,21 +890,21 @@ async function createPublicFolderShare(folderId) {
         try {
             const el = document.getElementById('shareFolderCustomToken');
             if (el && el.value) customToken = el.value.trim();
-        } catch (e) {}
+        } catch (e) { }
 
         // Get indexable checkbox value
         let indexable = 0;
         try {
             const indexableEl = document.getElementById('shareFolderIndexable');
             if (indexableEl && indexableEl.checked) indexable = 1;
-        } catch (e) {}
+        } catch (e) { }
 
         // Get password value
         let password = '';
         try {
             const passwordEl = document.getElementById('shareFolderPassword');
             if (passwordEl && passwordEl.value) password = passwordEl.value.trim();
-        } catch (e) {}
+        } catch (e) { }
 
         const theme = localStorage.getItem('poznote-theme') || 'light';
         const body = { theme: theme, indexable: indexable };
@@ -939,17 +944,17 @@ async function createPublicFolderShare(folderId) {
             if (typeof showFolderShareModal === 'function') {
                 showFolderShareModal(data.url, { folderId: folderId, shared: true, workspace: data.workspace || '' });
             }
-            
+
             // Update shared count in sidebar
             if (data.shared_notes_count && data.shared_notes_count > 0) {
                 updateSharedCount(data.shared_notes_count);
             }
-            
+
             // Close folder actions menu
             if (typeof closeFolderActionsMenu === 'function') {
                 closeFolderActionsMenu(folderId);
             }
-            
+
             // Refresh notes list to update folder actions menu item
             refreshNotesListAfterFolderAction(folderId);
         }
@@ -967,9 +972,9 @@ async function getPublicFolderShare(folderId) {
             credentials: 'same-origin',
             headers: { 'Accept': 'application/json' }
         });
-        
+
         if (!resp.ok) return { shared: false };
-        
+
         const data = await resp.json();
         if (data.success && data.public) {
             const preferredProtocol = getPreferredPublicUrlProtocol();
@@ -989,7 +994,7 @@ async function getPublicFolderShare(folderId) {
 // Open the share modal for a folder
 async function openPublicFolderShareModal(folderId) {
     if (!folderId) return;
-    
+
     const info = await getPublicFolderShare(folderId);
     if (info.shared && info.url) {
         showFolderShareModal(info.url, { folderId: folderId, shared: true, workspace: info.workspace });
@@ -1071,7 +1076,7 @@ function showFolderShareModal(url, options) {
         openBtn.type = 'button';
         openBtn.className = 'btn-open';
         openBtn.textContent = window.t ? window.t('index.public_modal.open', null, 'Open') : 'Open';
-        openBtn.onclick = function() {
+        openBtn.onclick = function () {
             const currentUrl = urlDiv.textContent;
             if (currentUrl) window.open(currentUrl, '_blank', 'noopener');
         };
@@ -1082,8 +1087,8 @@ function showFolderShareModal(url, options) {
         copyBtn.type = 'button';
         copyBtn.className = 'btn-primary';
         copyBtn.textContent = window.t ? window.t('index.public_modal.copy', null, 'Copy') : 'Copy';
-        copyBtn.onclick = async function(ev) {
-            try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
+        copyBtn.onclick = async function (ev) {
+            try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) { }
             try {
                 await navigator.clipboard.writeText(urlDiv.textContent);
             } catch (e) {
@@ -1098,8 +1103,8 @@ function showFolderShareModal(url, options) {
             manageBtn.type = 'button';
             manageBtn.className = 'btn-primary';
             manageBtn.textContent = window.t ? window.t('index.public_modal.manage', null, 'Edit') : 'Edit';
-            manageBtn.onclick = function(ev) {
-                try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
+            manageBtn.onclick = function (ev) {
+                try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) { }
                 // Extract token from URL (last part after /)
                 const token = url.split('/').pop();
                 if (token) {
@@ -1119,8 +1124,8 @@ function showFolderShareModal(url, options) {
             renewBtn.type = 'button';
             renewBtn.className = 'btn-primary';
             renewBtn.textContent = window.t ? window.t('index.public_modal.renew', null, 'Renew') : 'Renew';
-            renewBtn.onclick = async function(ev) {
-                try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
+            renewBtn.onclick = async function (ev) {
+                try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) { }
                 try {
                     const resp = await fetch('/api/v1/folders/' + folderId + '/share', {
                         method: 'POST',
@@ -1169,8 +1174,8 @@ function showFolderShareModal(url, options) {
             revokeBtn.type = 'button';
             revokeBtn.className = 'btn-cancel';
             revokeBtn.textContent = window.t ? window.t('index.public_modal.revoke', null, 'Revoke') : 'Revoke';
-            revokeBtn.onclick = async function(ev) {
-                try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
+            revokeBtn.onclick = async function (ev) {
+                try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) { }
                 try {
                     const resp = await fetch('/api/v1/folders/' + folderId + '/share', {
                         method: 'DELETE',
@@ -1204,9 +1209,9 @@ function showFolderShareModal(url, options) {
         closeBtn.type = 'button';
         closeBtn.className = 'btn-secondary';
         closeBtn.textContent = window.t ? window.t('index.public_modal.close', null, 'Close') : 'Close';
-        closeBtn.onclick = function() { closeModal('folderShareModal'); };
+        closeBtn.onclick = function () { closeModal('folderShareModal'); };
         buttonsDiv.appendChild(closeBtn);
-        
+
         content.appendChild(buttonsDiv);
     } else {
         // Not shared - show create button
@@ -1254,7 +1259,7 @@ function showFolderShareModal(url, options) {
         createBtn.type = 'button';
         createBtn.className = 'btn-primary';
         createBtn.textContent = window.t ? window.t('index.share_modal.create_url', null, 'Create url') : 'Create url';
-        createBtn.onclick = function() { createPublicFolderShare(folderId); };
+        createBtn.onclick = function () { createPublicFolderShare(folderId); };
         buttonsDiv.appendChild(createBtn);
 
         // Cancel button
@@ -1262,7 +1267,7 @@ function showFolderShareModal(url, options) {
         cancelBtn.type = 'button';
         cancelBtn.className = 'btn-cancel';
         cancelBtn.textContent = window.t ? window.t('index.share_modal.close', null, 'Close') : 'Close';
-        cancelBtn.onclick = function() { closeModal('folderShareModal'); };
+        cancelBtn.onclick = function () { closeModal('folderShareModal'); };
         buttonsDiv.appendChild(cancelBtn);
 
         content.appendChild(buttonsDiv);

@@ -3267,7 +3267,7 @@ body.dark-mode .folder-header.folder-drop-target {
 .folder-toggle {
     display: flex;
     align-items: center;
-    padding: 8px 6px;
+    padding: 5px 6px;
     cursor: pointer;
     border-radius: 8px;
     background-color: transparent;

@@ -68,7 +68,6 @@
 }
 
 .kanban-title i {
-    color: #6366f1;
     font-size: 1.25rem;
 }
 
@@ -163,7 +162,6 @@
 
 .kanban-column-title i {
     font-size: 1.1rem;
-    color: #6366f1;
 }
 
 .kanban-column-count {
@@ -287,17 +285,6 @@
     font-weight: 500;
     border-radius: 4px;
     border: 1px solid #e2e8f0;
-}
-
-/* Click to open note */
-.kanban-card::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    cursor: pointer;
 }
 
 .kanban-card {

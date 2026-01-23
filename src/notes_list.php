@@ -137,7 +137,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             echo "<i class='fa-star-light folder-icon'></i>";
         } else {
             // Add click action based on mode
-            $iconStyle = $customIconColor ? " style='color: " . htmlspecialchars($customIconColor, ENT_QUOTES) . ";'" : "";
+            $iconStyle = $customIconColor ? " style='color: " . htmlspecialchars($customIconColor, ENT_QUOTES) . " !important;'" : "";
             $iconColorAttr = $customIconColor ? " data-icon-color='" . htmlspecialchars($customIconColor, ENT_QUOTES) . "'" : "";
             
             if ($kanbanEnabled) {

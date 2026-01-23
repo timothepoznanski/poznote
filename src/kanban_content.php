@@ -125,22 +125,18 @@ try {
     <div id="kanban-view-container" class="kanban-inline-view" data-folder-id="<?php echo $folder_id; ?>">
         <!-- Kanban Header -->
         <div class="kanban-inline-header">
-            <button type="button" class="kanban-back-btn" data-action="close-kanban-view">
-                <i class="fas fa-arrow-left"></i>
-                <span><?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?></span>
-            </button>
             <h1 class="kanban-title">
                 <?php 
                 $pFolderIcon = $parentFolder['icon'] ?? 'fa-folder';
                 $pIconColor = $parentFolder['icon_color'] ?? '';
-                $pIconStyle = $pIconColor ? "style=\"color: {$pIconColor};\"" : '';
+                $pIconStyle = $pIconColor ? "style=\"color: {$pIconColor} !important;\"" : '';
                 ?>
                 <i class="fas <?php echo htmlspecialchars($pFolderIcon); ?> folder-icon" 
-                   <?php echo $pIconStyle; ?> 
                    data-action="open-folder-icon-picker" 
                    data-folder-id="<?php echo $folder_id; ?>" 
                    data-folder-name="<?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?>"
-                   style="cursor: pointer; <?php echo $pIconColor ? "color: {$pIconColor};" : ''; ?>"></i>
+                   data-icon-color="<?php echo htmlspecialchars($pIconColor, ENT_QUOTES); ?>"
+                   style="cursor: pointer; <?php echo $pIconColor ? "color: {$pIconColor} !important;" : ''; ?>"></i>
                 <span data-action="rename-folder" 
                       data-folder-id="<?php echo $folder_id; ?>" 
                       data-folder-name="<?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?>"
@@ -220,14 +216,14 @@ try {
                         <?php 
                         $folderIcon = $subfolder['icon'] ?? 'fa-folder';
                         $iconColor = $subfolder['icon_color'] ?? '';
-                        $iconStyle = $iconColor ? "style=\"color: {$iconColor};\"" : '';
+                        $iconStyle = $iconColor ? "style=\"color: {$iconColor} !important;\"" : '';
                         ?>
                         <i class="fas <?php echo htmlspecialchars($folderIcon); ?> folder-icon" 
-                           <?php echo $iconStyle; ?> 
                            data-action="open-folder-icon-picker" 
                            data-folder-id="<?php echo $subfolder['id']; ?>" 
                            data-folder-name="<?php echo htmlspecialchars($subfolder['name'], ENT_QUOTES); ?>"
-                           style="cursor: pointer; <?php echo $iconColor ? "color: {$iconColor};" : ''; ?>"></i>
+                           data-icon-color="<?php echo htmlspecialchars($iconColor, ENT_QUOTES); ?>"
+                           style="cursor: pointer; <?php echo $iconColor ? "color: {$iconColor} !important;" : ''; ?>"></i>
                         <span data-action="rename-folder" 
                               data-folder-id="<?php echo $subfolder['id']; ?>" 
                               data-folder-name="<?php echo htmlspecialchars($subfolder['name'], ENT_QUOTES); ?>"

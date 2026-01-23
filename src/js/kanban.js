@@ -10,177 +10,233 @@
     let draggedCard = null;
     let draggedFromFolderId = null;
 
-    // Initialize when DOM is ready
-    document.addEventListener('DOMContentLoaded', init);
-
+    /**
+     * Initialization called either on DOMContentLoaded or manually when content is loaded via AJAX
+     */
     function init() {
-        setupDragAndDrop();
-        setupCardClicks();
-    }
-
-    /**
-     * Setup drag and drop functionality
-     */
-    function setupDragAndDrop() {
-        const cards = document.querySelectorAll('.kanban-card');
-        const columns = document.querySelectorAll('.kanban-column-content');
-
-        // Card drag events
-        cards.forEach(card => {
-            card.addEventListener('dragstart', handleDragStart);
-            card.addEventListener('dragend', handleDragEnd);
-        });
-
-        // Column drop events
-        columns.forEach(column => {
-            column.addEventListener('dragover', handleDragOver);
-            column.addEventListener('dragenter', handleDragEnter);
-            column.addEventListener('dragleave', handleDragLeave);
-            column.addEventListener('drop', handleDrop);
-        });
-    }
-
-    /**
-     * Handle drag start
-     */
-    function handleDragStart(e) {
-        draggedCard = this;
-        draggedFromFolderId = this.dataset.folderId;
-
-        this.classList.add('dragging');
-
-        // Set drag data
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', this.dataset.noteId);
-
-        // Add a slight delay for the visual feedback
-        setTimeout(() => {
-            this.style.opacity = '0.4';
-        }, 0);
-    }
-
-    /**
-     * Handle drag end
-     */
-    function handleDragEnd(e) {
-        this.classList.remove('dragging');
-        this.style.opacity = '1';
-
-        // Remove drag-over class from all columns
-        document.querySelectorAll('.kanban-column-content').forEach(col => {
-            col.classList.remove('drag-over');
-        });
-        document.querySelectorAll('.kanban-column').forEach(col => {
-            col.classList.remove('drag-over');
-        });
-
-        draggedCard = null;
-        draggedFromFolderId = null;
-    }
-
-    /**
-     * Handle drag over
-     */
-    function handleDragOver(e) {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-    }
-
-    /**
-     * Handle drag enter
-     */
-    function handleDragEnter(e) {
-        e.preventDefault();
-        this.classList.add('drag-over');
-        this.closest('.kanban-column').classList.add('drag-over');
-    }
-
-    /**
-     * Handle drag leave
-     */
-    function handleDragLeave(e) {
-        // Only remove if we're leaving the column content, not entering a child
-        if (!this.contains(e.relatedTarget)) {
-            this.classList.remove('drag-over');
-            this.closest('.kanban-column').classList.remove('drag-over');
-        }
-    }
-
-    /**
-     * Handle drop
-     */
-    async function handleDrop(e) {
-        e.preventDefault();
-
-        this.classList.remove('drag-over');
-        this.closest('.kanban-column').classList.remove('drag-over');
-
-        if (!draggedCard) return;
-
-        const targetFolderId = this.dataset.folderId;
-        const noteId = draggedCard.dataset.noteId;
-
-        // Don't do anything if dropped in the same column
-        if (targetFolderId === draggedFromFolderId) {
+        console.log("Kanban: Initializing delegated event listeners...");
+        // Document-level delegation ensures listeners work even when content is replaced
+        if (window._kanbanInitialized) {
+            console.log("Kanban: Listeners already initialized on document.");
             return;
         }
 
-        // Move the card visually first for immediate feedback
-        const originalParent = draggedCard.parentNode;
-        this.appendChild(draggedCard);
-        draggedCard.dataset.folderId = targetFolderId;
-        draggedCard.classList.add('kanban-card-dropped');
+        setupDelegatedEvents();
+        window._kanbanInitialized = true;
+    }
 
-        // Remove animation class after it completes
-        setTimeout(() => {
-            draggedCard.classList.remove('kanban-card-dropped');
-        }, 300);
+    /**
+     * Setup drag and drop functionality using document delegation
+     */
+    function setupDelegatedEvents() {
+        // Drag Start
+        document.addEventListener('dragstart', (e) => {
+            const card = e.target.closest('.kanban-card');
+            if (!card) return;
 
-        // Update counts
-        updateColumnCounts();
+            console.log("Kanban: Drag start on card", card.dataset.noteId);
+            draggedCard = card;
+            draggedFromFolderId = card.dataset.folderId;
 
-        // Send API request to move the note
-        try {
-            const success = await moveNoteToFolder(noteId, targetFolderId);
+            // Add dragging class
+            card.classList.add('dragging');
 
-            if (!success) {
-                // Revert the visual change if API call failed
-                originalParent.appendChild(draggedCard);
-                draggedCard.dataset.folderId = draggedFromFolderId;
-                updateColumnCounts();
-                showError('Failed to move note');
+            // Set drag data
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', card.dataset.noteId);
+
+            // Add a slight delay for visual feedback
+            setTimeout(() => {
+                if (draggedCard) draggedCard.style.opacity = '0.4';
+            }, 0);
+        });
+
+        // Drag End
+        document.addEventListener('dragend', (e) => {
+            const card = e.target.closest('.kanban-card');
+            if (!card) return;
+
+            console.log("Kanban: Drag end");
+            card.classList.remove('dragging');
+            card.style.opacity = '1';
+
+            // Clean up visual states
+            document.querySelectorAll('.kanban-column-content, .kanban-column').forEach(el => {
+                el.classList.remove('drag-over');
+            });
+
+            draggedCard = null;
+            draggedFromFolderId = null;
+        });
+
+        // Drag Over - CRITICAL: must prevent default to allow drop
+        document.addEventListener('dragover', (e) => {
+            const columnContent = e.target.closest('.kanban-column-content');
+            if (!columnContent) return;
+
+            // Important: we are over a column, allow drop
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        });
+
+        // Drag Enter
+        document.addEventListener('dragenter', (e) => {
+            const columnContent = e.target.closest('.kanban-column-content');
+            if (!columnContent) return;
+
+            columnContent.classList.add('drag-over');
+            const column = columnContent.closest('.kanban-column');
+            if (column) column.classList.add('drag-over');
+        });
+
+        // Drag Leave
+        document.addEventListener('dragleave', (e) => {
+            const columnContent = e.target.closest('.kanban-column-content');
+            if (!columnContent) return;
+
+            // Check if we're actually leaving the column content (not entering a child card)
+            if (!columnContent.contains(e.relatedTarget)) {
+                columnContent.classList.remove('drag-over');
+                const column = columnContent.closest('.kanban-column');
+                if (column) column.classList.remove('drag-over');
             }
-        } catch (error) {
-            console.error('Error moving note:', error);
-            // Revert on error
-            originalParent.appendChild(draggedCard);
-            draggedCard.dataset.folderId = draggedFromFolderId;
+        });
+
+        // Drop
+        document.addEventListener('drop', async (e) => {
+            const columnContent = e.target.closest('.kanban-column-content');
+            if (!columnContent) return;
+
+            // Prevent browser default drop action
+            e.preventDefault();
+            // Stop propagation to avoid Poznote's folder-drop logic
+            e.stopPropagation();
+
+            console.log("Kanban: Drop detected in column", columnContent.dataset.folderId);
+
+            columnContent.classList.remove('drag-over');
+            const column = columnContent.closest('.kanban-column');
+            if (column) column.classList.remove('drag-over');
+
+            if (!draggedCard) {
+                console.warn("Kanban: Drop occurred but no draggedCard state found.");
+                return;
+            }
+
+            const targetFolderId = columnContent.dataset.folderId;
+            const noteId = draggedCard.dataset.noteId;
+
+            // Don't do anything if dropped in the same column
+            if (targetFolderId === draggedFromFolderId) {
+                console.log("Kanban: Dropped in same column, ignoring.");
+                return;
+            }
+
+            // Move the card visually immediately for best UX
+            const originalParent = draggedCard.parentNode;
+            const oldFolderId = draggedFromFolderId;
+
+            columnContent.appendChild(draggedCard);
+            draggedCard.dataset.folderId = targetFolderId;
+            draggedCard.classList.add('kanban-card-dropped');
+
+            // Remove animation class after it completes
+            setTimeout(() => {
+                if (draggedCard) draggedCard.classList.remove('kanban-card-dropped');
+            }, 300);
+
+            // Update column counts visually
             updateColumnCounts();
-            showError('Error moving note');
-        }
+
+            // Persist the change to the database
+            try {
+                const success = await moveNoteToFolder(noteId, targetFolderId);
+
+                if (!success) {
+                    console.error("Kanban: API move failed, reverting UI...");
+                    // Revert the visual change if API call failed
+                    if (originalParent) originalParent.appendChild(draggedCard);
+                    draggedCard.dataset.folderId = oldFolderId;
+                    updateColumnCounts();
+                    showError('Failed to move note');
+                } else {
+                    console.log("Kanban: Move successful");
+                    // Success: refresh the sidebar to stay in sync with the new note location
+                    if (typeof window.refreshNotesListAfterFolderAction === 'function') {
+                        window.refreshNotesListAfterFolderAction();
+                    }
+                }
+            } catch (error) {
+                console.error('Kanban: Error during persistence:', error);
+                // Revert on error
+                if (draggedCard && originalParent) {
+                    originalParent.appendChild(draggedCard);
+                    draggedCard.dataset.folderId = oldFolderId;
+                }
+                updateColumnCounts();
+                showError('Error moving note');
+            }
+        });
+
+        // Card Click Delegation
+        document.addEventListener('click', (e) => {
+            const card = e.target.closest('.kanban-card');
+            if (!card) return;
+
+            // Don't trigger if dragging
+            if (card.classList.contains('dragging')) return;
+
+            // Find if an action-button or picker was clicked specifically
+            if (e.target.closest('[data-action]') && !e.target.closest('.kanban-card-title') && !e.target.closest('.kanban-card-snippet')) {
+                // Let other listeners handle specific actions on the card
+                return;
+            }
+
+            const noteId = card.dataset.noteId;
+            console.log("Kanban: Card clicked, loading note", noteId);
+
+            // Get workspace
+            let workspace = '';
+            if (typeof window.getSelectedWorkspace === 'function') {
+                workspace = window.getSelectedWorkspace();
+            } else if (document.body.dataset.workspace) {
+                workspace = document.body.dataset.workspace;
+            } else {
+                const urlParams = new URLSearchParams(window.location.search);
+                workspace = urlParams.get('workspace') || '';
+            }
+
+            // Load via AJAX if helper is available
+            if (typeof window.loadNoteDirectly === 'function') {
+                const link = `index.php?note=${noteId}${workspace ? '&workspace=' + encodeURIComponent(workspace) : ''}`;
+                window.loadNoteDirectly(link, noteId, e);
+            } else {
+                // Fallback to full reload
+                let url = 'index.php?note=' + noteId;
+                if (workspace) url += '&workspace=' + encodeURIComponent(workspace);
+                window.location.href = url;
+            }
+        });
     }
 
     /**
      * Move note to folder via API
      */
     async function moveNoteToFolder(noteId, folderId) {
-        // Get workspace from global function, body dataset, or URL
         let workspace = '';
         if (typeof window.getSelectedWorkspace === 'function') {
             workspace = window.getSelectedWorkspace();
         } else if (document.body.dataset.workspace) {
             workspace = document.body.dataset.workspace;
-        } else {
-            const urlParams = new URLSearchParams(window.location.search);
-            workspace = urlParams.get('workspace') || '';
         }
 
         try {
-            const response = await fetch(`api/v1/notes/${noteId}`, {
-                method: 'PATCH',
+            const response = await fetch(`api/v1/notes/${noteId}/folder`, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
                 },
                 body: JSON.stringify({
                     folder_id: folderId,
@@ -189,14 +245,12 @@
                 credentials: 'same-origin'
             });
 
-            if (!response.ok) {
-                throw new Error('HTTP error: ' + response.status);
-            }
+            if (!response.ok) throw new Error('HTTP error: ' + response.status);
 
             const data = await response.json();
             return data.success === true;
         } catch (error) {
-            console.error('API error:', error);
+            console.error('Kanban API error:', error);
             return false;
         }
     }
@@ -216,48 +270,25 @@
     }
 
     /**
-     * Setup click to open note
-     */
-    function setupCardClicks() {
-        document.querySelectorAll('.kanban-card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                // Don't open if we're dragging
-                if (card.classList.contains('dragging')) return;
-
-                const noteId = card.dataset.noteId;
-
-                // Get workspace from global function, body dataset, or URL
-                let workspace = '';
-                if (typeof window.getSelectedWorkspace === 'function') {
-                    workspace = window.getSelectedWorkspace();
-                } else if (document.body.dataset.workspace) {
-                    workspace = document.body.dataset.workspace;
-                } else {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    workspace = urlParams.get('workspace') || '';
-                }
-
-                // Navigate to the note
-                let url = 'index.php?note=' + noteId;
-                if (workspace) {
-                    url += '&workspace=' + encodeURIComponent(workspace);
-                }
-                window.location.href = url;
-            });
-        });
-    }
-
-    /**
-     * Show error message (simple alert for now)
+     * Show notification error
      */
     function showError(message) {
-        // Could be replaced with a nicer notification system
-        console.error(message);
-        // For now, just log - we could add a toast notification later
+        if (typeof window.showNotificationPopup === 'function') {
+            window.showNotificationPopup(message, 'error');
+        } else {
+            console.error(message);
+        }
     }
 
-    // Expose functions globally for inline Kanban initialization
-    window.initKanbanDragDrop = setupDragAndDrop;
-    window.initKanbanCardClicks = setupCardClicks;
+    // Export dummy functions for compatibility with any leftover inline calls
+    window.initKanbanDragDrop = function () { };
+    window.initKanbanCardClicks = function () { };
+
+    // Auto-init on load
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 
 })();

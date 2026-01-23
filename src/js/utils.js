@@ -2342,12 +2342,29 @@ function openKanbanView(folderId, folderName) {
             window._isKanbanViewActive = true;
             window._kanbanFolderId = folderId;
 
-            // Update URL without reload
+            // Remove selection from any notes in the sidebar
+            document.querySelectorAll('.links_arbo_left.selected-note').forEach(function (el) {
+                el.classList.remove('selected-note');
+            });
+
+            // Update URL
             var newUrl = 'index.php?kanban=' + folderId;
             if (workspace) {
                 newUrl += '&workspace=' + encodeURIComponent(workspace);
             }
-            history.pushState({ kanban: folderId }, '', newUrl);
+
+            // If we are already on this kanban view (e.g. page refresh), use replaceState
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('kanban') == folderId) {
+                history.replaceState({ kanban: folderId }, '', newUrl);
+            } else {
+                history.pushState({ kanban: folderId }, '', newUrl);
+            }
+
+            // On mobile, scroll to right column
+            if (window.innerWidth <= 800 && typeof window.scrollToRightColumn === 'function') {
+                window.scrollToRightColumn();
+            }
         })
         .catch(function (error) {
             console.error('Failed to load Kanban view:', error);
@@ -2357,6 +2374,17 @@ function openKanbanView(folderId, folderName) {
                 '<button onclick="closeKanbanView()" class="btn btn-primary" style="margin-top: 16px;">' +
                 (window.t ? window.t('common.back_to_notes', null, 'Back to Notes') : 'Back to Notes') + '</button></div>';
         });
+}
+
+/**
+ * Refresh the current Kanban view if it's active
+ */
+function refreshKanbanView() {
+    if (window._isKanbanViewActive && window._kanbanFolderId) {
+        // Reuse openKanbanView but we'll modify it slightly to not push state if not needed,
+        // or we just call it. Actually, calling it again is fine as it uses replaceState if already on it.
+        openKanbanView(window._kanbanFolderId);
+    }
 }
 
 /**
@@ -2464,13 +2492,17 @@ function createKanbanStructure() {
         })
         .then(function (data) {
             if (data.success && data.folder_id) {
-                // Success - reload and open Kanban view
-                var workspace = selectedWorkspace || getSelectedWorkspace();
-                var url = 'kanban.php?folder_id=' + data.folder_id;
-                if (workspace) {
-                    url += '&workspace=' + encodeURIComponent(workspace);
+                // Success - close modal and open Kanban inline view
+                closeModal('kanbanStructureModal');
+                if (typeof window.refreshNotesListAfterFolderAction === 'function') {
+                    window.refreshNotesListAfterFolderAction();
                 }
-                window.location.href = url;
+                // Delay slightly to let sidebar refresh, then open Kanban
+                setTimeout(function () {
+                    if (typeof openKanbanView === 'function') {
+                        openKanbanView(data.folder_id);
+                    }
+                }, 300);
             } else {
                 showNotificationPopup(
                     data.error || (window.t ? window.t('modals.kanban_structure.error_create', null, 'Failed to create Kanban structure') : 'Failed to create Kanban structure'),
