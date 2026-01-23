@@ -350,6 +350,13 @@ body.dark-mode .home-card-icon-shared {
         font-size: 1.4rem;
     }
 
+    .home-info-line {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+        line-height: 1.2;
+    }
+
     .home-grid {
         grid-template-columns: 1fr;
     }
