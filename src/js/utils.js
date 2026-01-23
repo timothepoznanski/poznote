@@ -1912,6 +1912,9 @@ function executeCreateAction() {
         case 'workspace':
             createWorkspace();
             break;
+        case 'kanban':
+            showKanbanStructureModal();
+            break;
         case 'subfolder':
             if (targetFolderId) {
                 var folderKey = 'folder_' + targetFolderId;
@@ -2289,6 +2292,106 @@ function openKanbanView(folderId, folderName) {
         url += '&workspace=' + encodeURIComponent(workspace);
     }
     window.location.href = url;
+}
+
+/**
+ * Show the Kanban structure modal
+ */
+function showKanbanStructureModal() {
+    var modal = document.getElementById('kanbanStructureModal');
+    if (modal) {
+        // Reset form
+        var folderNameInput = document.getElementById('kanbanFolderName');
+        var columnsInput = document.getElementById('kanbanColumnsCount');
+        if (folderNameInput) folderNameInput.value = '';
+        if (columnsInput) columnsInput.value = '3';
+        
+        modal.style.display = 'flex';
+    }
+}
+
+/**
+ * Create a Kanban structure
+ */
+function createKanbanStructure() {
+    var folderNameInput = document.getElementById('kanbanFolderName');
+    var columnsInput = document.getElementById('kanbanColumnsCount');
+    
+    if (!folderNameInput || !columnsInput) {
+        console.error('Kanban structure inputs not found');
+        return;
+    }
+    
+    var folderName = folderNameInput.value.trim();
+    var columns = parseInt(columnsInput.value, 10);
+    
+    // Validation
+    if (!folderName) {
+        showNotificationPopup(
+            window.t ? window.t('modals.kanban_structure.error_name_required', null, 'Folder name is required') : 'Folder name is required',
+            'error'
+        );
+        return;
+    }
+    
+    if (isNaN(columns) || columns < 1 || columns > 10) {
+        showNotificationPopup(
+            window.t ? window.t('modals.kanban_structure.error_columns_range', null, 'Number of columns must be between 1 and 10') : 'Number of columns must be between 1 and 10',
+            'error'
+        );
+        return;
+    }
+    
+    // Get current language from document
+    var language = document.documentElement.lang || 'en';
+    
+    // Close modal
+    closeModal('kanbanStructureModal');
+    
+    // Create the structure via API
+    var data = {
+        folder_name: folderName,
+        columns: columns,
+        workspace: selectedWorkspace || getSelectedWorkspace(),
+        language: language
+    };
+    
+    fetch('/api/v1/folders/kanban-structure', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(data)
+    })
+    .then(function(response) {
+        if (!response.ok) {
+            return response.json().then(function(errorData) {
+                throw new Error(errorData.error || errorData.message || 'Unknown error');
+            });
+        }
+        return response.json();
+    })
+    .then(function(data) {
+        if (data.success && data.folder_id) {
+            // Success - reload and open Kanban view
+            var workspace = selectedWorkspace || getSelectedWorkspace();
+            var url = 'kanban.php?folder_id=' + data.folder_id;
+            if (workspace) {
+                url += '&workspace=' + encodeURIComponent(workspace);
+            }
+            window.location.href = url;
+        } else {
+            showNotificationPopup(
+                data.error || (window.t ? window.t('modals.kanban_structure.error_create', null, 'Failed to create Kanban structure') : 'Failed to create Kanban structure'),
+                'error'
+            );
+        }
+    })
+    .catch(function(error) {
+        showNotificationPopup(
+            window.t ? window.t('modals.kanban_structure.error_create_prefix', { error: error.message }, 'Error creating Kanban structure: {{error}}') : ('Error creating Kanban structure: ' + error.message),
+            'error'
+        );
+    });
 }
 
 // Export to window

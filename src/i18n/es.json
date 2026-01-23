@@ -739,9 +739,22 @@
             "folder": {
                 "title": "Carpeta"
             },
+            "kanban": {
+                "title": "Estructura Kanban"
+            },
             "workspace": {
                 "title": "Espacio de trabajo"
             }
+        },
+        "kanban_structure": {
+            "title": "Crear estructura Kanban",
+            "folder_name_label": "Nombre de la carpeta:",
+            "folder_name_placeholder": "Mi tablero Kanban",
+            "columns_label": "Número de columnas (1-10):",
+            "error_name_required": "El nombre de la carpeta es obligatorio",
+            "error_columns_range": "El número de columnas debe estar entre 1 y 10",
+            "error_create": "Error al crear la estructura Kanban",
+            "error_create_prefix": "Error al crear la estructura Kanban: {{error}}"
         },
         "folder_icon": {
             "title": "Cambiar icono de carpeta",

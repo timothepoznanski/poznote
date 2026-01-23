@@ -130,6 +130,13 @@
                 }
                 break;
 
+            // Kanban structure creation
+            case 'create-kanban-structure':
+                if (typeof createKanbanStructure === 'function') {
+                    createKanbanStructure();
+                }
+                break;
+
             // Export modal - type selection
             case 'select-export-type':
                 if (type && typeof selectExportType === 'function') {

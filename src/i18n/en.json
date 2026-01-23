@@ -238,9 +238,22 @@
             "folder": {
                 "title": "Folder"
             },
+            "kanban": {
+                "title": "Kanban Structure"
+            },
             "workspace": {
                 "title": "Workspace"
             }
+        },
+        "kanban_structure": {
+            "title": "Create Kanban Structure",
+            "folder_name_label": "Folder name:",
+            "folder_name_placeholder": "My Kanban Board",
+            "columns_label": "Number of columns (1-10):",
+            "error_name_required": "Folder name is required",
+            "error_columns_range": "Number of columns must be between 1 and 10",
+            "error_create": "Failed to create Kanban structure",
+            "error_create_prefix": "Error creating Kanban structure: {{error}}"
         },
         "folder_icon": {
             "title": "Change Folder Icon",

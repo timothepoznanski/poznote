@@ -1573,4 +1573,148 @@ class FoldersController {
             $this->sendError('Database error', 500);
         }
     }
+    
+    /**
+     * POST /api/v1/folders/kanban-structure - Create a Kanban structure
+     * 
+     * Creates a parent folder with numbered column subfolders (max 10)
+     * and automatically enables Kanban view on the parent folder.
+     * 
+     * Body params:
+     *   - folder_name: string (required) - Name of the parent Kanban folder
+     *   - columns: int (required) - Number of columns (1-10)
+     *   - workspace: string (optional) - Workspace to create in
+     *   - parent_folder_id: int (optional) - Parent folder ID
+     *   - language: string (optional) - Language for column names (en, fr, de, es, pt, zh-cn)
+     */
+    public function createKanbanStructure(): void {
+        $data = $this->getInputData();
+        
+        $workspace = isset($data['workspace']) ? trim((string)$data['workspace']) : $this->getFirstWorkspaceName();
+        $folderName = isset($data['folder_name']) ? trim((string)$data['folder_name']) : null;
+        $columns = isset($data['columns']) ? (int)$data['columns'] : null;
+        $parentFolderId = isset($data['parent_folder_id']) ? (int)$data['parent_folder_id'] : null;
+        $language = isset($data['language']) ? trim((string)$data['language']) : 'en';
+        
+        // Validate inputs
+        if ($folderName === null || $folderName === '') {
+            $this->sendError('folder_name is required', 400);
+            return;
+        }
+        
+        if ($columns === null || $columns < 1 || $columns > 10) {
+            $this->sendError('columns must be between 1 and 10', 400);
+            return;
+        }
+        
+        if (!$this->validateWorkspace($workspace)) {
+            $this->sendError('Workspace not found', 404);
+            return;
+        }
+        
+        // Validate folder name
+        $err = $this->validateFolderSegment($folderName);
+        if ($err !== null) {
+            $this->sendError($err, 400);
+            return;
+        }
+        
+        // Validate parent folder if provided
+        if ($parentFolderId !== null && $parentFolderId > 0) {
+            $checkParent = $this->db->prepare('SELECT id FROM folders WHERE id = ? AND workspace = ?');
+            $checkParent->execute([$parentFolderId, $workspace]);
+            if (!$checkParent->fetch(PDO::FETCH_ASSOC)) {
+                $this->sendError('Parent folder not found', 404);
+                return;
+            }
+        } else {
+            $parentFolderId = null;
+        }
+        
+        // Check for duplicate parent folder
+        if ($parentFolderId === null) {
+            $checkStmt = $this->db->prepare('SELECT COUNT(*) FROM folders WHERE name = ? AND workspace = ? AND parent_id IS NULL');
+            $checkStmt->execute([$folderName, $workspace]);
+        } else {
+            $checkStmt = $this->db->prepare('SELECT COUNT(*) FROM folders WHERE name = ? AND workspace = ? AND parent_id = ?');
+            $checkStmt->execute([$folderName, $workspace, $parentFolderId]);
+        }
+        
+        if ((int)$checkStmt->fetchColumn() > 0) {
+            $this->sendJson(['success' => false, 'error' => 'Folder already exists in this location'], 409);
+            return;
+        }
+        
+        // Translation map for "Column" in different languages
+        $columnTranslations = [
+            'en' => 'Column',
+            'fr' => 'Colonne',
+            'de' => 'Spalte',
+            'es' => 'Columna',
+            'pt' => 'Coluna',
+            'zh-cn' => '列'
+        ];
+        
+        $columnWord = $columnTranslations[$language] ?? $columnTranslations['en'];
+        
+        try {
+            $this->db->beginTransaction();
+            
+            // Create parent folder
+            $stmt = $this->db->prepare("INSERT INTO folders (name, workspace, parent_id, kanban_enabled, created) VALUES (?, ?, ?, 1, datetime('now'))");
+            $result = $stmt->execute([$folderName, $workspace, $parentFolderId]);
+            
+            if (!$result) {
+                $this->db->rollBack();
+                $this->sendError('Failed to create parent folder', 500);
+                return;
+            }
+            
+            $parentId = (int)$this->db->lastInsertId();
+            
+            // Create column subfolders
+            $createdColumns = [];
+            for ($i = 1; $i <= $columns; $i++) {
+                $columnName = "{$i}. {$columnWord}";
+                
+                $stmt = $this->db->prepare("INSERT INTO folders (name, workspace, parent_id, created) VALUES (?, ?, ?, datetime('now'))");
+                $result = $stmt->execute([$columnName, $workspace, $parentId]);
+                
+                if (!$result) {
+                    $this->db->rollBack();
+                    $this->sendError("Failed to create column {$i}", 500);
+                    return;
+                }
+                
+                $createdColumns[] = [
+                    'id' => (int)$this->db->lastInsertId(),
+                    'name' => $columnName,
+                    'position' => $i
+                ];
+            }
+            
+            $this->db->commit();
+            
+            $this->sendJson([
+                'success' => true,
+                'message' => 'Kanban structure created successfully',
+                'parent_folder' => [
+                    'id' => $parentId,
+                    'name' => $folderName,
+                    'workspace' => $workspace,
+                    'parent_id' => $parentFolderId,
+                    'kanban_enabled' => true
+                ],
+                'columns' => $createdColumns,
+                'folder_id' => $parentId
+            ], 201);
+            
+        } catch (Exception $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            error_log('Error creating Kanban structure: ' . $e->getMessage());
+            $this->sendError('Failed to create Kanban structure', 500);
+        }
+    }
 }

@@ -333,6 +333,11 @@ $router->post('/folders/move-files', function($params) use ($foldersController) 
     $foldersController->moveFiles();
 });
 
+// Create a Kanban structure
+$router->post('/folders/kanban-structure', function($params) use ($foldersController) {
+    $foldersController->createKanbanStructure();
+});
+
 // List all folders
 $router->get('/folders', function($params) use ($foldersController) {
     $foldersController->index();

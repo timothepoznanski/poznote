@@ -100,12 +100,24 @@
     overflow-y: hidden;
     flex: 1;
     align-items: flex-start;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
 }
 
 .kanban-board::-webkit-scrollbar {
-    display: none;
+    height: 10px;
+}
+
+.kanban-board::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+.kanban-board::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.kanban-board::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }
 
 

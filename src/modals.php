@@ -351,6 +351,12 @@
                             <span><?php echo t_h('modals.create.folder.title', [], 'Folder'); ?></span>
                         </div>
                     </div>
+                    <div class="create-note-option mt-12" data-type="kanban" data-action="select-create-type">
+                        <i class="fa fa-columns"></i>
+                        <div>
+                            <span><?php echo t_h('modals.create.kanban.title', [], 'Kanban Structure'); ?></span>
+                        </div>
+                    </div>
                     <div class="create-note-option mt-12" data-type="workspace" data-action="select-create-type">
                         <i class="fa fa-layer-group"></i>
                         <div>
@@ -681,6 +687,23 @@
             <button type="button" class="btn-cancel" data-action="close-folder-icon-modal"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-secondary" id="resetFolderIconBtn"><i class="fa-folder-open"></i> / <i class="fa-folder"></i></button>
             <button type="button" class="btn-primary" id="applyFolderIconBtn"><?php echo t_h('common.apply', [], 'Apply'); ?></button>
+        </div>
+    </div>
+</div>
+<!-- Kanban Structure Modal -->
+<div id="kanbanStructureModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.kanban_structure.title', [], 'Create Kanban Structure'); ?></h3>
+        <div class="modal-body modal-body-spaced">
+            <label for="kanbanFolderName"><?php echo t_h('modals.kanban_structure.folder_name_label', [], 'Folder name:'); ?></label>
+            <input type="text" id="kanbanFolderName" placeholder="<?php echo t_h('modals.kanban_structure.folder_name_placeholder', [], 'My Kanban Board'); ?>" maxlength="255" class="kanban-folder-input">
+            
+            <label for="kanbanColumnsCount" style="margin-top: 12px;"><?php echo t_h('modals.kanban_structure.columns_label', [], 'Number of columns (1-10):'); ?></label>
+            <input type="number" id="kanbanColumnsCount" min="1" max="10" value="3" class="kanban-columns-input">
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="kanbanStructureModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" data-action="create-kanban-structure"><?php echo t_h('common.create'); ?></button>
         </div>
     </div>
 </div>
