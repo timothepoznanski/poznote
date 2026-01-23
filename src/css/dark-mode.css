@@ -250,7 +250,24 @@ body.dark-mode .system-menu-item span:not(.menu-item-count) {
 /* Favorites separator */
 html[data-theme='dark'] .favorites-separator,
 body.dark-mode .favorites-separator {
-    border-bottom-color: #404040;
+    background: #404040;
+}
+
+html[data-theme='dark'] .favorites-toggle-btn,
+body.dark-mode .favorites-toggle-btn {
+    background: #2a2a2a;
+    border-color: #404040;
+}
+
+html[data-theme='dark'] .favorites-toggle-btn:hover,
+body.dark-mode .favorites-toggle-btn:hover {
+    background: #3a3a3a;
+    border-color: #606060;
+}
+
+html[data-theme='dark'] .favorites-toggle-btn i,
+body.dark-mode .favorites-toggle-btn i {
+    color: #e0e0e0;
 }
 
 /* Separator after favorites - always visible now */

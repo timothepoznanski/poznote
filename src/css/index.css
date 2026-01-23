@@ -1162,10 +1162,53 @@ body.sidebar-collapsed .toggle-sidebar-btn i {
 
 /* Separator after Favorites to visually separate important folders */
 .favorites-separator {
-    height: 8px;
-    border-bottom: 1px solid #ccc;
-    /* match left column right border */
+    position: relative;
+    height: 1px;
+    background: #ddd;
     margin: 8px 6px;
+}
+
+.favorites-toggle-btn {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    border: 1px solid #ccc;
+    background: var(--bg-main, #fff);
+    border-radius: 2px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: all 0.2s ease;
+}
+
+.favorites-toggle-btn:hover {
+    background: var(--bg-hover, #f0f0f0);
+    border-color: #999;
+}
+
+.favorites-toggle-btn i {
+    font-size: 8px;
+    color: var(--text-main, #333);
+    transition: transform 0.3s ease;
+}
+
+.favorites-toggle-btn.collapsed i {
+    transform: rotate(180deg);
+}
+
+/* Hide favorites folder content when collapsed */
+.folder-header[data-folder="Favorites"].favorites-collapsed .folder-content,
+.folder-header[data-folder="Favorites"].favorites-collapsed #folder-favorites {
+    display: none !important;
+}
+
+.folder-header[data-folder="Favorites"].favorites-collapsed .folder-toggle {
+    opacity: 0.5;
 }
 
 /* Sidebar footer: CTA buttons pinned at bottom of left column */
@@ -3437,11 +3480,10 @@ body.dark-mode .folder-header.folder-drop-target {
     display: block !important;
 }
 
-/* Ajouter une bordure de séparation en bas quand les favoris sont affichés */
+/* Padding en bas pour espacer du séparateur */
 #folder-favorites {
-    border-bottom: 1px solid #e5e7eb;
-    padding-bottom: 15px;
-    margin-bottom: 15px;
+    padding-bottom: 8px;
+    margin-bottom: 0;
 }
 
 /* Aligner les notes favorites à gauche sans indentation */

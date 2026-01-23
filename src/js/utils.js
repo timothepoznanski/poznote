@@ -1278,6 +1278,33 @@ function toggleFolder(folderId) {
 }
 
 /**
+ * Toggle favorites visibility
+ */
+function toggleFavorites(buttonElement) {
+    // Find the favorites folder
+    var favoritesFolder = document.querySelector('[data-folder="Favorites"]');
+    if (!favoritesFolder) return;
+
+    var isCollapsed = favoritesFolder.classList.contains('favorites-collapsed');
+    
+    if (isCollapsed) {
+        // Show favorites
+        favoritesFolder.classList.remove('favorites-collapsed');
+        if (buttonElement) {
+            buttonElement.classList.remove('collapsed');
+        }
+        localStorage.setItem('favorites_collapsed', 'false');
+    } else {
+        // Hide favorites
+        favoritesFolder.classList.add('favorites-collapsed');
+        if (buttonElement) {
+            buttonElement.classList.add('collapsed');
+        }
+        localStorage.setItem('favorites_collapsed', 'true');
+    }
+}
+
+/**
  * Persist current folder open/closed states to localStorage
  * Useful before actions that reload the page (e.g., drag & drop moves)
  */
@@ -2542,3 +2569,4 @@ function showInfoModal(title, message, reloadAfter = false) {
 window.toggleKanbanView = toggleKanbanView;
 window.openKanbanView = openKanbanView;
 window.showInfoModal = showInfoModal;
+window.toggleFavorites = toggleFavorites;

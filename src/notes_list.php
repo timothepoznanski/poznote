@@ -256,6 +256,13 @@ if ($favoritesFolder && $favorites_count > 0) {
     foreach($favoritesFolder as $folderId => $folderData) {
         displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags);
     }
+    
+    // Add separator with toggle button after favorites
+    echo '<div class="favorites-separator">';
+    echo '<button type="button" class="favorites-toggle-btn" data-action="toggle-favorites" title="' . t_h('notes_list.favorites.toggle', [], 'Show/hide favorites') . '">';
+    echo '<i class="fas fa-chevron-up"></i>';
+    echo '</button>';
+    echo '</div>';
 }
 
 // Add drop zone for moving notes to root (no folder)
