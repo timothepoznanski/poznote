@@ -375,6 +375,29 @@ body.dark-mode div[contentEditable=true]:empty:before {
     color: #555555;
 }
 
+/* Force readable text colors in note content */
+html[data-theme='dark'] .noteentry,
+html[data-theme='dark'] .noteentry *,
+body.dark-mode .noteentry,
+body.dark-mode .noteentry * {
+    color: #e0e0e0 !important;
+}
+
+/* Preserve code blocks and pre formatting colors */
+html[data-theme='dark'] .noteentry code,
+html[data-theme='dark'] .noteentry pre,
+body.dark-mode .noteentry code,
+body.dark-mode .noteentry pre {
+    background-color: #2a2a2a !important;
+    color: #e0e0e0 !important;
+}
+
+/* Links in dark mode */
+html[data-theme='dark'] .noteentry a,
+body.dark-mode .noteentry a {
+    color: #64B5F6 !important;
+}
+
 /* Toolbar buttons */
 html[data-theme='dark'] .toolbar-btn,
 body.dark-mode .toolbar-btn {
