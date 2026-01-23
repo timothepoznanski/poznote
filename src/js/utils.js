@@ -1292,6 +1292,7 @@ function toggleFavorites(buttonElement) {
         favoritesFolder.classList.remove('favorites-collapsed');
         if (buttonElement) {
             buttonElement.classList.remove('collapsed');
+            buttonElement.classList.add('favorites-expanded');
         }
         localStorage.setItem('favorites_collapsed', 'false');
     } else {
@@ -1299,6 +1300,7 @@ function toggleFavorites(buttonElement) {
         favoritesFolder.classList.add('favorites-collapsed');
         if (buttonElement) {
             buttonElement.classList.add('collapsed');
+            buttonElement.classList.remove('favorites-expanded');
         }
         localStorage.setItem('favorites_collapsed', 'true');
     }
@@ -1367,6 +1369,24 @@ function restoreFolderStates() {
         // If no saved state exists, leave the folder as it was set by PHP logic
         // This preserves the smart PHP logic for determining initial folder states
     });
+
+    // Restore favorites collapsed state
+    var favoritesCollapsed = localStorage.getItem('favorites_collapsed') === 'true';
+    var favoritesHeader = document.querySelector('[data-folder="Favorites"]');
+    var favoritesToggleBtn = document.querySelector('[data-action="toggle-favorites"]');
+    if (favoritesCollapsed && favoritesHeader) {
+        favoritesHeader.classList.add('favorites-collapsed');
+        if (favoritesToggleBtn) {
+            favoritesToggleBtn.classList.add('collapsed');
+            favoritesToggleBtn.classList.remove('favorites-expanded');
+        }
+    } else if (favoritesHeader) {
+        favoritesHeader.classList.remove('favorites-collapsed');
+        if (favoritesToggleBtn) {
+            favoritesToggleBtn.classList.remove('collapsed');
+            favoritesToggleBtn.classList.add('favorites-expanded');
+        }
+    }
 }
 
 function emptyFolder(folderId, folderName) {
@@ -2272,50 +2292,6 @@ function executeNoteConversion() {
 
 /**
  * Toggle Kanban view for a folder
- * @param {number} folderId - The folder ID
- * @param {boolean} enabled - Whether to enable or disable Kanban view
- * @param {string} folderName - The folder name (for display)
- */
-function toggleKanbanView(folderId, enabled, folderName) {
-    fetch('/api/v1/folders/' + folderId + '/kanban', {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        credentials: 'same-origin',
-        body: JSON.stringify({ enabled: enabled })
-    })
-        .then(function (response) { return response.json(); })
-        .then(function (data) {
-            if (data.success) {
-                if (enabled) {
-                    // Show modal informing about Kanban view
-                    showInfoModal(
-                        window.t ? window.t('kanban.notifications.activated_title', null, 'Kanban view enabled') : 'Kanban view enabled',
-                        window.t ? window.t('kanban.notifications.activated_message', null, 'This folder is now in Kanban mode. Click its icon to open the board.') : 'This folder is now in Kanban mode. Click its icon to open the board.',
-                        true // reload after closing
-                    );
-                } else {
-                    // Just reload if disabling
-                    window.location.reload();
-                }
-            } else {
-                showNotificationPopup(
-                    data.error || (window.t ? window.t('kanban.errors.toggle_failed', null, 'Failed to toggle Kanban view') : 'Failed to toggle Kanban view'),
-                    'error'
-                );
-            }
-        })
-        .catch(function (error) {
-            console.error('Toggle Kanban error:', error);
-            showNotificationPopup(
-                window.t ? window.t('kanban.errors.toggle_failed', null, 'Failed to toggle Kanban view') : 'Failed to toggle Kanban view',
-                'error'
-            );
-        });
-}
-
 /**
  * Open Kanban view for a folder (inline in right column)
  * @param {number} folderId - The folder ID
@@ -2561,7 +2537,6 @@ function showInfoModal(title, message, reloadAfter = false) {
 }
 
 // Export to window
-window.toggleKanbanView = toggleKanbanView;
 window.openKanbanView = openKanbanView;
 window.showInfoModal = showInfoModal;
 window.toggleFavorites = toggleFavorites;

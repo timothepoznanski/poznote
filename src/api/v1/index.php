@@ -378,11 +378,6 @@ $router->put('/folders/{id}/icon', function($params) use ($foldersController) {
     $foldersController->updateIcon($params['id']);
 });
 
-// Toggle Kanban view for folder
-$router->put('/folders/{id}/kanban', function($params) use ($foldersController) {
-    $foldersController->toggleKanban($params['id']);
-});
-
 // Get note count in folder
 $router->get('/folders/{id}/notes', function($params) use ($foldersController) {
     $foldersController->noteCount($params['id']);

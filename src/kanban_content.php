@@ -152,7 +152,6 @@ try {
             <div class="kanban-column" data-folder-id="<?php echo $folder_id; ?>">
                 <div class="kanban-column-header">
                     <div class="kanban-column-title">
-                        <i class="fas fa-inbox"></i>
                         <span><?php echo t_h('kanban.uncategorized', [], 'Uncategorized'); ?></span>
                     </div>
                     <span class="kanban-column-count"><?php echo count($parentNotes); ?></span>
