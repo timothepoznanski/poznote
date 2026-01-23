@@ -8,18 +8,19 @@ function showNoteFontSizePrompt() {
     if (typeof closeSettingsMenus === 'function') {
         closeSettingsMenus();
     }
-    
+
     // Get modal elements
     const modal = document.getElementById('fontSizeModal');
     const fontSizeInput = document.getElementById('fontSizeInput');
+    const sidebarFontSizeInput = document.getElementById('sidebarFontSizeInput');
     const closeFontSizeBtn = document.getElementById('closeFontSizeModal');
     const cancelFontSizeBtn = document.getElementById('cancelFontSizeBtn');
     const saveFontSizeBtn = document.getElementById('saveFontSizeBtn');
-    
-    if (!modal || !fontSizeInput) {
+
+    if (!modal || !fontSizeInput || !sidebarFontSizeInput) {
         return;
     }
-    
+
     // Add event listeners if they don't exist yet
     if (!modal.hasAttribute('data-initialized')) {
         // Add event listeners
@@ -32,19 +33,14 @@ function showNoteFontSizePrompt() {
         if (saveFontSizeBtn) {
             saveFontSizeBtn.addEventListener('click', saveFontSize);
         }
-        
-        // Font size input change event
-        fontSizeInput.addEventListener('input', function() {
-            updateFontSizePreview();
-        });
-        
+
         // Mark as initialized
         modal.setAttribute('data-initialized', 'true');
     }
-    
+
     // Load current font size settings
     loadCurrentFontSizes();
-    
+
     // Show modal
     modal.style.display = 'block';
 }
@@ -66,159 +62,138 @@ function safeShowNotification(message, type) {
     }
 }
 
-// Function to update preview text with selected font size
+// Function to update preview text with selected font sizes
 function updateFontSizePreview() {
-    const fontSizeInput = document.getElementById('fontSizeInput');
-    const fontSizePreview = document.getElementById('fontSizePreview');
-    const defaultInfo = document.getElementById('defaultFontSizeInfo');
-    
-    if (fontSizeInput && fontSizePreview) {
-        const fontSize = fontSizeInput.value;
-        fontSizePreview.style.fontSize = fontSize + 'px';
-        
-        // Show/hide default info based on value
-        if (defaultInfo) {
-            if (fontSize == 15) {
-                defaultInfo.style.display = 'block';
-            } else {
-                defaultInfo.style.display = 'none';
-            }
-        }
-    }
+    // Preview logic removed as per user request to simplify
 }
 
 // Function to load current font size settings
 function loadCurrentFontSizes() {
-    // Load font size
-    fetch('/api/v1/settings/note_font_size', { 
-        method: 'GET', 
+    // Load note font size
+    fetch('/api/v1/settings/note_font_size', {
+        method: 'GET',
         credentials: 'same-origin'
     })
-    .then(function(response) {
-        if (!response.ok) {
-            return null;
-        }
-        return response.json();
-    })
-    .then(function(data) {
-        if (data && data.success) {
-            // Set input value
-            const fontSizeInput = document.getElementById('fontSizeInput');
-            if (fontSizeInput) {
-                // Default to 15px if not set
-                fontSizeInput.value = data.value || '15';
-                
-                // Update preview
-                updateFontSizePreview();
+        .then(response => response.ok ? response.json() : null)
+        .then(data => {
+            if (data && data.success) {
+                const fontSizeInput = document.getElementById('fontSizeInput');
+                if (fontSizeInput) {
+                    fontSizeInput.value = data.value || '15';
+                    updateFontSizePreview();
+                }
             }
-        }
+        })
+        .catch(() => { });
+
+    // Load sidebar font size
+    fetch('/api/v1/settings/sidebar_font_size', {
+        method: 'GET',
+        credentials: 'same-origin'
     })
-    .catch(function(error) {
-        // Silently fail, no need to show errors for font size loading
-    });
+        .then(response => response.ok ? response.json() : null)
+        .then(data => {
+            if (data && data.success) {
+                const sidebarFontSizeInput = document.getElementById('sidebarFontSizeInput');
+                if (sidebarFontSizeInput) {
+                    sidebarFontSizeInput.value = data.value || '13';
+                    updateFontSizePreview();
+                }
+            }
+        })
+        .catch(() => { });
 }
 
 // Function to save font size settings
 function saveFontSize() {
     const fontSizeInput = document.getElementById('fontSizeInput');
-    
-    if (!fontSizeInput) {
+    const sidebarFontSizeInput = document.getElementById('sidebarFontSizeInput');
+
+    if (!fontSizeInput || !sidebarFontSizeInput) {
         return;
     }
-    
+
     const fontSize = fontSizeInput.value;
-    
-    // Validate input (ensure it's between 10 and 32)
-    if (fontSize < 10 || fontSize > 32) {
+    const sidebarFontSize = sidebarFontSizeInput.value;
+
+    // Validate inputs
+    if (fontSize < 10 || fontSize > 32 || sidebarFontSize < 10 || sidebarFontSize > 32) {
         safeShowNotification('Font size must be between 10 and 32 pixels', 'error');
         return;
     }
-    
-    // Save setting to server
-    fetch('/api/v1/settings/note_font_size', { 
-        method: 'PUT', 
-        credentials: 'same-origin', 
-        headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify({ value: fontSize })
-    })
-    .then(function(response) {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(function(data) {
-        if (data.success) {
-            // Close modal
-            closeFontSizeModal();
-            
-            // Apply font size to current note
-            applyFontSizeToNotes();
-            
-            // Refresh the font size badge if the function exists
-            if (typeof window.refreshFontSizeBadge === 'function') {
-                window.refreshFontSizeBadge();
+
+    const promises = [
+        fetch('/api/v1/settings/note_font_size', {
+            method: 'PUT',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ value: fontSize })
+        }),
+        fetch('/api/v1/settings/sidebar_font_size', {
+            method: 'PUT',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ value: sidebarFontSize })
+        })
+    ];
+
+    Promise.all(promises)
+        .then(responses => {
+            if (responses.every(r => r.ok)) {
+                closeFontSizeModal();
+
+                // Apply changes immediately to the UI
+                const noteSize = fontSize + 'px';
+                const sidebarSize = sidebarFontSize + 'px';
+
+                document.documentElement.style.setProperty('--note-font-size', noteSize);
+                document.documentElement.style.setProperty('--sidebar-font-size', sidebarSize);
+
+                // Direct application as fallback for existing elements
+                document.querySelectorAll('.noteentry').forEach(el => el.style.fontSize = noteSize);
+                document.querySelectorAll('.links_arbo_left .note-title, .folder-name').forEach(el => el.style.fontSize = sidebarSize);
+
+                if (typeof window.refreshFontSizeBadge === 'function') {
+                    window.refreshFontSizeBadge();
+                }
+            } else {
+                throw new Error('Some requests failed');
             }
-        } else {
+        })
+        .catch(error => {
             safeShowNotification('Error saving font size settings', 'error');
-        }
-    })
-    .catch(function(error) {
-        safeShowNotification('Error saving font size settings', 'error');
-    });
+        });
 }
 
 // Function to apply font size to all note editors and note list
+// Function to apply font size to all note editors and note list
 function applyFontSizeToNotes() {
-    // Get the font size from settings
-    fetch('/api/v1/settings/note_font_size', { 
-        method: 'GET', 
+    // Note: The font sizes are now handled via CSS variables on :root
+    // Loading from API on demand to ensure UI is in sync if needed (e.g. on page load)
+
+    fetch('/api/v1/settings/note_font_size', {
+        method: 'GET',
         credentials: 'same-origin'
     })
-    .then(function(response) {
-        if (!response.ok) {
-            return null;
-        }
-        return response.json();
-    })
-    .then(function(data) {
-        if (data && data.success && data.value) {
-            const fontSize = data.value;
-            
-            // Apply font size to the note editor
-            const noteEditor = document.querySelector('[contenteditable="true"]');
-            if (noteEditor) {
-                noteEditor.style.fontSize = fontSize + 'px';
+        .then(response => response.ok ? response.json() : null)
+        .then(data => {
+            if (data && data.success && data.value) {
+                document.documentElement.style.setProperty('--note-font-size', data.value + 'px');
             }
-            
-            // Apply font size to note list items
-            const noteListItems = document.querySelectorAll('.links_arbo_left .note-title');
-            noteListItems.forEach(function(item) {
-                item.style.fontSize = fontSize + 'px';
-            });
-            
-            // Apply font size to folder names
-            const folderNames = document.querySelectorAll('.folder-name');
-            folderNames.forEach(function(item) {
-                item.style.fontSize = fontSize + 'px';
-            });
-            
-            // Apply font size to checklist items
-            const checklistTexts = document.querySelectorAll('.checklist-text');
-            checklistTexts.forEach(function(item) {
-                item.style.fontSize = fontSize + 'px';
-            });
-            
-            // Apply font size to task list items (markdown format)
-            const taskListItems = document.querySelectorAll('.task-list-item, .task-text');
-            taskListItems.forEach(function(item) {
-                item.style.fontSize = fontSize + 'px';
-            });
-        }
+        })
+        .catch(() => { });
+
+    fetch('/api/v1/settings/sidebar_font_size', {
+        method: 'GET',
+        credentials: 'same-origin'
     })
-    .catch(function(error) {
-        // Silently fail
-    });
+        .then(response => response.ok ? response.json() : null)
+        .then(data => {
+            if (data && data.success && data.value) {
+                document.documentElement.style.setProperty('--sidebar-font-size', data.value + 'px');
+            }
+        })
+        .catch(() => { });
 }
 
 // Function to apply font size on page load
@@ -231,105 +206,66 @@ window.showNoteFontSizePrompt = showNoteFontSizePrompt;
 
 // Function to initialize all font size settings elements and events
 function initFontSizeSettings() {
-    // Get elements
     const fontSizeModal = document.getElementById('fontSizeModal');
-    const fontSizeDesktopInput = document.getElementById('fontSizeDesktopInput');
-    const fontSizeMobileInput = document.getElementById('fontSizeMobileInput');
+    const fontSizeInput = document.getElementById('fontSizeInput');
+    const sidebarFontSizeInput = document.getElementById('sidebarFontSizeInput');
     const closeFontSizeBtn = document.getElementById('closeFontSizeModal');
     const cancelFontSizeBtn = document.getElementById('cancelFontSizeBtn');
     const saveFontSizeBtn = document.getElementById('saveFontSizeBtn');
-    
-    // Check if elements exist
-    if (!fontSizeModal || !fontSizeDesktopInput || !fontSizeMobileInput || 
-        !closeFontSizeBtn || !cancelFontSizeBtn || !saveFontSizeBtn) {
+
+    if (!fontSizeModal || !fontSizeInput || !sidebarFontSizeInput || !cancelFontSizeBtn || !saveFontSizeBtn) {
         return;
     }
-    
-    // Remove any existing event listeners (in case of multiple initializations)
-    const cloneCloseBtn = closeFontSizeBtn.cloneNode(true);
-    const cloneCancelBtn = cancelFontSizeBtn.cloneNode(true);
-    const cloneSaveBtn = saveFontSizeBtn.cloneNode(true);
-    const cloneDesktopInput = fontSizeDesktopInput.cloneNode(true);
-    const cloneMobileInput = fontSizeMobileInput.cloneNode(true);
-    
-    if (closeFontSizeBtn.parentNode) {
-        closeFontSizeBtn.parentNode.replaceChild(cloneCloseBtn, closeFontSizeBtn);
-    }
-    if (cancelFontSizeBtn.parentNode) {
-        cancelFontSizeBtn.parentNode.replaceChild(cloneCancelBtn, cancelFontSizeBtn);
-    }
-    if (saveFontSizeBtn.parentNode) {
-        saveFontSizeBtn.parentNode.replaceChild(cloneSaveBtn, saveFontSizeBtn);
-    }
-    if (fontSizeDesktopInput.parentNode) {
-        fontSizeDesktopInput.parentNode.replaceChild(cloneDesktopInput, fontSizeDesktopInput);
-    }
-    if (fontSizeMobileInput.parentNode) {
-        fontSizeMobileInput.parentNode.replaceChild(cloneMobileInput, fontSizeMobileInput);
-    }
-    
-    // Add event listeners
-    cloneCloseBtn.addEventListener('click', function() {
-        fontSizeModal.style.display = 'none';
-    });
-    
-    cloneCancelBtn.addEventListener('click', function() {
-        fontSizeModal.style.display = 'none';
-    });
-    
-    cloneSaveBtn.addEventListener('click', function() {
-        saveFontSize();
-    });
-    
-    cloneDesktopInput.addEventListener('input', function() {
-        const fontSizeDesktopPreview = document.getElementById('fontSizeDesktopPreview');
-        if (fontSizeDesktopPreview) {
-            fontSizeDesktopPreview.style.fontSize = cloneDesktopInput.value + 'px';
+
+    // Add event listeners (once)
+    if (!fontSizeModal.hasAttribute('data-initialized')) {
+        if (closeFontSizeBtn) {
+            closeFontSizeBtn.addEventListener('click', closeFontSizeModal);
         }
-    });
-    
-    cloneMobileInput.addEventListener('input', function() {
-        const fontSizeMobilePreview = document.getElementById('fontSizeMobilePreview');
-        if (fontSizeMobilePreview) {
-            fontSizeMobilePreview.style.fontSize = cloneMobileInput.value + 'px';
-        }
-    });
+        cancelFontSizeBtn.addEventListener('click', closeFontSizeModal);
+        saveFontSizeBtn.addEventListener('click', saveFontSize);
+
+        fontSizeInput.addEventListener('input', updateFontSizePreview);
+        sidebarFontSizeInput.addEventListener('input', updateFontSizePreview);
+
+        fontSizeModal.setAttribute('data-initialized', 'true');
+    }
 }
 
 // Apply stored font size when page loads
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     initFontSizeSettings();
     applyStoredFontSize();
-    
+
     // Set up a MutationObserver to watch for changes in the note list
     const notesContainer = document.getElementById('left_col');
     if (notesContainer) {
-        const observer = new MutationObserver(function(mutations) {
+        const observer = new MutationObserver(function (mutations) {
             // Check if any mutations added new note list items, folders, or task lists
             let hasNewNotes = false;
-            mutations.forEach(function(mutation) {
-                mutation.addedNodes.forEach(function(node) {
+            mutations.forEach(function (mutation) {
+                mutation.addedNodes.forEach(function (node) {
                     if (node.nodeType === 1) { // Element node
-                        if (node.classList && (node.classList.contains('links_arbo_left') || 
+                        if (node.classList && (node.classList.contains('links_arbo_left') ||
                             node.classList.contains('folder-name') ||
                             node.classList.contains('checklist-text') ||
                             node.classList.contains('task-list-item') ||
-                            node.querySelector && (node.querySelector('.links_arbo_left') || 
-                            node.querySelector('.folder-name') ||
-                            node.querySelector('.checklist-text') ||
-                            node.querySelector('.task-list-item')))) {
+                            node.querySelector && (node.querySelector('.links_arbo_left') ||
+                                node.querySelector('.folder-name') ||
+                                node.querySelector('.checklist-text') ||
+                                node.querySelector('.task-list-item')))) {
                             hasNewNotes = true;
                         }
                     }
                 });
             });
-            
+
             if (hasNewNotes) {
                 // Apply font size to newly added notes, folders, and task lists
                 applyStoredFontSize();
             }
         });
-        
+
         // Start observing
         observer.observe(notesContainer, {
             childList: true,
@@ -340,14 +276,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Fallback initialization - sometimes DOMContentLoaded might have already fired
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    setTimeout(function() {
+    setTimeout(function () {
         initFontSizeSettings();
         applyStoredFontSize();
     }, 500);
 }
 
 // Add event to apply font size when a note is loaded
-document.addEventListener('noteLoaded', function() {
+document.addEventListener('noteLoaded', function () {
     applyStoredFontSize();
 });
 
@@ -359,7 +295,7 @@ function reinitializeFontSize() {
 // Add to reinitializeNoteContent if it exists
 if (typeof window.reinitializeNoteContent === 'function') {
     const originalReinitializeNoteContent = window.reinitializeNoteContent;
-    window.reinitializeNoteContent = function() {
+    window.reinitializeNoteContent = function () {
         originalReinitializeNoteContent();
         reinitializeFontSize();
     };

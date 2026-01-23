@@ -672,9 +672,10 @@
         },
         "font_size": {
             "title": "Tamaño de fuente",
-            "label": "Tamaño de fuente (px):",
+            "note_label": "Contenido de la nota (px):",
+            "sidebar_label": "Notas y carpetas (px):",
             "default_value": "{{size}} px es el valor predeterminado",
-            "preview": "Este es un texto de vista previa"
+            "preview": "Vista previa"
         },
         "note_width": {
             "title": "Ancho del contenido de la nota",

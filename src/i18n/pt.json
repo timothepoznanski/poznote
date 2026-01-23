@@ -671,9 +671,10 @@
         },
         "font_size": {
             "title": "Tamanho da Fonte",
-            "label": "Tamanho da fonte (px):",
+            "note_label": "Conteúdo da nota (px):",
+            "sidebar_label": "Notas e pastas (px):",
             "default_value": "{{size}} px é o valor Padrão",
-            "preview": "Este é um texto de pré-visualização"
+            "preview": "Pré-visualização"
         },
         "note_width": {
             "title": "Largura do conteúdo da nota",

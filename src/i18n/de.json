@@ -672,9 +672,10 @@
         },
         "font_size": {
             "title": "Schriftgröße",
-            "label": "Schriftgröße (px):",
+            "note_label": "Notizinhalt (px):",
+            "sidebar_label": "Notizen und Ordner (px):",
             "default_value": "{{size}} px ist der Standardwert",
-            "preview": "Dies ist ein Vorschaubtext"
+            "preview": "Vorschau"
         },
         "note_width": {
             "title": "Breite des Notizinhalts",

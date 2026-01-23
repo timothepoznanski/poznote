@@ -428,6 +428,8 @@
         },
         "badges": {
             "font_size_default": "par défaut ({{size}}px)",
+            "note_font_size": "Note : {{size}}px",
+            "sidebar_font_size": "Sidebar : {{size}}px",
             "toolbar_mode": {
                 "full": "Barre d’outils uniquement",
                 "slash": "Commandes slash uniquement",
@@ -686,9 +688,10 @@
         },
         "font_size": {
             "title": "Taille de police",
-            "label": "Taille (px) :",
+            "note_label": "Contenu de la note (px) :",
+            "sidebar_label": "Notes et dossiers (px) :",
             "default_value": "{{size}} px est la valeur par défaut",
-            "preview": "Ceci est un texte d’aperçu"
+            "preview": "Aperçu"
         },
         "note_width": {
             "title": "Largeur du contenu de la note",

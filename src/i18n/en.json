@@ -77,6 +77,11 @@
             "notes_without_folders_after": "Show notes after folders",
             "show_folder_actions": "Show folder actions",
             "note_content_width": "Note content width"
+        },
+        "badges": {
+            "font_size_default": "default ({{size}}px)",
+            "note_font_size": "Note: {{size}}px",
+            "sidebar_font_size": "Sidebar: {{size}}px"
         }
     },
     "tasklist": {
@@ -155,9 +160,10 @@
         },
         "font_size": {
             "title": "Font Size",
-            "label": "Font size (px):",
+            "note_label": "Note content (px):",
+            "sidebar_label": "Notes and folders (px):",
             "default_value": "{{size}} px is the Default value",
-            "preview": "This is a preview text"
+            "preview": "Preview"
         },
         "note_width": {
             "title": "Note Content Width",

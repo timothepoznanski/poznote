@@ -59,17 +59,14 @@
             <h2><?php echo t_h('modals.font_size.title'); ?></h2>
         </div>
         <div class="modal-body">
-            <p><?php echo t_h('modals.font_size.description'); ?></p>
             <div class="font-size-controls">
-                <div class="font-size-section">
-                    <label for="fontSizeInput"><?php echo t_h('modals.font_size.label'); ?></label>
+                <div class="font-size-row">
+                    <label for="fontSizeInput"><?php echo t_h('modals.font_size.note_label'); ?></label>
                     <input type="number" id="fontSizeInput" min="10" max="32" step="1" value="15">
-                    <div id="defaultFontSizeInfo" class="default-info default-font-size-info">
-                        <?php echo t_h('modals.font_size.default_value', ['size' => '15']); ?>
-                    </div>
-                    <div class="font-size-preview">
-                        <p id="fontSizePreview"><?php echo t_h('modals.font_size.preview'); ?></p>
-                    </div>
+                </div>
+                <div class="font-size-row">
+                    <label for="sidebarFontSizeInput"><?php echo t_h('modals.font_size.sidebar_label'); ?></label>
+                    <input type="number" id="sidebarFontSizeInput" min="10" max="32" step="1" value="13">
                 </div>
             </div>
         </div>
