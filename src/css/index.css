@@ -1093,11 +1093,11 @@ body {
 /* Toggle sidebar button */
 .toggle-sidebar-btn {
     position: absolute;
-    top: 50%;
+    bottom: 10px;
     left: 50%;
-    transform: translate(-50%, -50%);
-    width: 24px;
-    height: 48px;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 20px;
     background: #fff;
     border: 1px solid #ccc;
     border-radius: 0 4px 4px 0;
@@ -1110,8 +1110,8 @@ body {
     transition: all 0.2s ease;
     z-index: 10;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    opacity: 0;
-    pointer-events: none;
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .resize-handle:hover .toggle-sidebar-btn,
@@ -1147,8 +1147,8 @@ body.sidebar-collapsed .resize-handle {
 body.sidebar-collapsed .toggle-sidebar-btn {
     left: 3px;
     border-radius: 0 4px 4px 0;
-    opacity: 0;
-    pointer-events: none;
+    opacity: 1;
+    pointer-events: auto;
 }
 
 body.sidebar-collapsed .toggle-sidebar-btn i {
@@ -1170,7 +1170,7 @@ body.sidebar-collapsed .toggle-sidebar-btn i {
 
 .favorites-toggle-btn {
     position: absolute;
-    left: 50%;
+    left: 100%;
     top: 50%;
     transform: translate(-50%, -50%);
     width: 16px;
