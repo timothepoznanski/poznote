@@ -156,8 +156,14 @@ body.dark-mode .home-card-logout .home-card-icon {
 
 .home-card-icon-favorites i,
 .home-card-icon-trash i,
-.home-card-icon-shared i {
+.home-card-icon-shared i,
+.home-card-icon-kanban i {
     color: #007DB8;
+    transition: color 0.15s ease;
+}
+
+.home-card:hover .home-card-icon-kanban i {
+    color: #ef4444 !important;
 }
 
 .home-card-content {
@@ -280,6 +286,12 @@ body.dark-mode .home-card-logout .home-card-icon {
 
 .fa-user::before {
     content: "\f007";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 400;
+}
+
+.fa-columns::before {
+    content: "\f0db";
     font-family: "Font Awesome 5 Pro";
     font-weight: 400;
 }

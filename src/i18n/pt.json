@@ -68,6 +68,10 @@
             "enable": "Ativar visualização Kanban",
             "disable": "Desativar visualização Kanban",
             "open": "Abrir visualização Kanban"
+        },
+        "notifications": {
+            "activated_title": "Vista Kanban ativada",
+            "activated_message": "Esta pasta está agora no modo Kanban. Clique no seu ícone para abrir o quadro."
         }
     },
     "folders": {
@@ -436,6 +440,7 @@
         "title": "Início",
         "shared_notes": "Notas compartilhadas",
         "shared_folders": "Pastas compartilhadas",
+        "kanban": "Kanban",
         "note": "nota",
         "notes": "notas"
     },

@@ -108,10 +108,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         $customIconColor = isset($folderData['icon_color']) && !empty($folderData['icon_color']) ? $folderData['icon_color'] : null;
         $kanbanEnabled = isset($folderData['kanban_enabled']) && $folderData['kanban_enabled'] ? true : false;
 
-        if ($kanbanEnabled) {
-            // Use Kanban icon when Kanban mode is enabled
-            $chevron_icon = 'fa-columns';
-        } elseif ($customIcon) {
+        if ($customIcon) {
             // Use custom icon - don't toggle between open/closed
             $chevron_icon = $customIcon;
         } else {
@@ -140,7 +137,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             echo "<i class='fa-star-light folder-icon'></i>";
         } else {
             // Add click action based on mode
-            $iconStyle = $customIconColor ? " style='color: " . htmlspecialchars($customIconColor, ENT_QUOTES) . ";'" : "";
+            $iconStyle = $customIconColor ? " style='color: " . htmlspecialchars($customIconColor, ENT_QUOTES) . " !important;'" : "";
             $iconColorAttr = $customIconColor ? " data-icon-color='" . htmlspecialchars($customIconColor, ENT_QUOTES) . "'" : "";
             
             if ($kanbanEnabled) {
@@ -259,6 +256,13 @@ if ($favoritesFolder && $favorites_count > 0) {
     foreach($favoritesFolder as $folderId => $folderData) {
         displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags);
     }
+    
+    // Add separator with toggle button after favorites
+    echo '<div class="favorites-separator">';
+    echo '<button type="button" class="favorites-toggle-btn" data-action="toggle-favorites" title="' . t_h('notes_list.favorites.toggle', [], 'Show/hide favorites') . '">';
+    echo '<i class="fas fa-chevron-up"></i>';
+    echo '</button>';
+    echo '</div>';
 }
 
 // Add drop zone for moving notes to root (no folder)

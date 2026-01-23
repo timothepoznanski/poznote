@@ -707,3 +707,14 @@
         </div>
     </div>
 </div>
+
+<!-- Info Modal -->
+<div id="infoModal" class="modal">
+    <div class="modal-content">
+        <h3 id="infoModalTitle"></h3>
+        <p id="infoModalMessage"></p>
+        <div class="modal-buttons">
+            <button type="button" class="btn-primary" data-action="close-info-modal"><?php echo t_h('common.ok', [], 'OK'); ?></button>
+        </div>
+    </div>
+</div>

@@ -191,6 +191,14 @@
                 }
                 break;
 
+            case 'toggle-favorites':
+                event.preventDefault();
+                event.stopPropagation();
+                if (typeof window.toggleFavorites === 'function') {
+                    window.toggleFavorites(actionElement);
+                }
+                break;
+
             case 'open-folder-icon-picker':
                 event.preventDefault();
                 event.stopPropagation();
@@ -357,6 +365,14 @@
                     window.openKanbanView(folderId, folderName);
                 }
                 break;
+
+            case 'close-kanban-view':
+                event.preventDefault();
+                event.stopPropagation();
+                if (typeof window.closeKanbanView === 'function') {
+                    window.closeKanbanView();
+                }
+                break;
         }
     }
 
@@ -416,6 +432,28 @@
         if (favoritesFolder) {
             favoritesFolder.style.display = 'block';
             localStorage.setItem('folder_folder-favorites', 'open');
+        }
+
+        // Restore favorites collapsed state
+        var favoritesCollapsed = localStorage.getItem('favorites_collapsed') === 'true';
+        var favoritesHeader = document.querySelector('[data-folder="Favorites"]');
+        var favoritesToggleBtn = document.querySelector('[data-action="toggle-favorites"]');
+        if (favoritesCollapsed && favoritesHeader) {
+            favoritesHeader.classList.add('favorites-collapsed');
+            if (favoritesToggleBtn) {
+                favoritesToggleBtn.classList.add('collapsed');
+            }
+        }
+
+        // Add direct event listener to favorites toggle button (in case delegation doesn't work)
+        if (favoritesToggleBtn) {
+            favoritesToggleBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (typeof window.toggleFavorites === 'function') {
+                    window.toggleFavorites(this);
+                }
+            });
         }
 
         // Add click event listener with delegation

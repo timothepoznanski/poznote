@@ -305,16 +305,22 @@
                     window.location.href = url;
                 }
                 break;
-            case 'open-kanban-view':
-                if (window.innerWidth <= 800) {
-                    return;
-                }
-                const folderId = target.dataset.folderId;
-                if (folderId) {
-                    const workspace = window.selectedWorkspace || '';
-                    window.location.href = `kanban.php?folder_id=${folderId}&workspace=${encodeURIComponent(workspace)}`;
+            case 'open-kanban-view': {
+                e.preventDefault();
+                e.stopPropagation();
+                const kanbanFolderId = target.dataset.folderId;
+                const kanbanFolderName = target.dataset.folderName || '';
+
+                if (kanbanFolderId && typeof window.openKanbanView === 'function') {
+                    window.openKanbanView(parseInt(kanbanFolderId, 10), kanbanFolderName);
+
+                    // On mobile, scroll to the right column to show the Kanban board
+                    if (window.innerWidth <= 800 && typeof window.scrollToRightColumn === 'function') {
+                        window.scrollToRightColumn();
+                    }
                 }
                 break;
+            }
         }
     }
 
@@ -480,6 +486,13 @@
         // Initialize page configuration first
         initializePageConfig();
         restoreFolderStates();
+
+        // Check for kanban parameter in URL to restore Kanban view
+        const urlParams = new URLSearchParams(window.location.search);
+        const kanbanFolderId = urlParams.get('kanban');
+        if (kanbanFolderId && typeof window.openKanbanView === 'function') {
+            window.openKanbanView(parseInt(kanbanFolderId, 10));
+        }
 
         // Initialize tasklists and markdown notes
         initializeTasklists();

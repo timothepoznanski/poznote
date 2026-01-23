@@ -69,6 +69,15 @@
             "enable": "Activer la vue Kanban",
             "disable": "Désactiver la vue Kanban",
             "open": "Ouvrir la vue Kanban"
+        },
+        "notifications": {
+            "activated_title": "Vue Kanban activée",
+            "activated_message": "Ce dossier est maintenant en mode Kanban. Cliquez sur son icône pour ouvrir le tableau."
+        },
+        "list": {
+            "filter_placeholder": "Filtrer par nom de tableau...",
+            "no_boards": "Aucun tableau Kanban pour le moment.",
+            "hint": "Activez la vue Kanban sur un dossier pour le voir apparaître ici."
         }
     },
     "folders": {
@@ -446,6 +455,7 @@
         "title": "Accueil",
         "shared_notes": "Notes partagées",
         "shared_folders": "Dossiers partagés",
+        "kanban": "Kanban",
         "note": "note",
         "notes": "notes"
     },
