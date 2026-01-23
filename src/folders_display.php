@@ -15,7 +15,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
     
     // PRE-LOAD all folders in one query to avoid N+1 problem
     $folders_cache = [];
-    $folders_query = "SELECT id, name, icon, icon_color FROM folders";
+    $folders_query = "SELECT id, name, icon, icon_color, kanban_enabled FROM folders";
     if ($workspace_filter) {
         $folders_query .= " WHERE workspace = ?";
         $folders_stmt = $con->prepare($folders_query);
@@ -27,7 +27,8 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
         $folders_cache[(int)$folder_row['id']] = [
             'name' => $folder_row['name'],
             'icon' => $folder_row['icon'] ?? null,
-            'icon_color' => $folder_row['icon_color'] ?? null
+            'icon_color' => $folder_row['icon_color'] ?? null,
+            'kanban_enabled' => (int)($folder_row['kanban_enabled'] ?? 0)
         ];
     }
     
@@ -36,6 +37,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
         $folderName = $row1["folder"] ?: null;
         $folderIcon = null; // Initialize icon variable
         $folderIconColor = null; // Initialize icon color variable
+        $kanbanEnabled = 0; // Initialize kanban_enabled
 
         // If no folder_id, this note has no folder - add to uncategorized list
         if ($folderId === null) {
@@ -48,6 +50,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
             $folderName = $folders_cache[$folderId]['name'];
             $folderIcon = $folders_cache[$folderId]['icon'];
             $folderIconColor = $folders_cache[$folderId]['icon_color'];
+            $kanbanEnabled = $folders_cache[$folderId]['kanban_enabled'];
         }
 
         if (!isset($folders[$folderId])) {
@@ -56,6 +59,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
                 'name' => $folderName,
                 'icon' => $folderIcon ?? null,
                 'icon_color' => $folderIconColor ?? null,
+                'kanban_enabled' => $kanbanEnabled,
                 'notes' => []
             ];
         }
@@ -74,7 +78,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
  * Now uses folder_id as key
  */
 function addEmptyFolders($con, $folders, $workspace_filter) {
-    $folders_sql = "SELECT id, name, icon, icon_color FROM folders";
+    $folders_sql = "SELECT id, name, icon, icon_color, kanban_enabled FROM folders";
     $params = [];
     if (!empty($workspace_filter)) {
         $folders_sql .= " WHERE workspace = ?";
@@ -89,6 +93,7 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
         $folderName = $folder_row['name'];
         $folderIcon = $folder_row['icon'] ?? null;
         $folderIconColor = $folder_row['icon_color'] ?? null;
+        $kanbanEnabled = (int)($folder_row['kanban_enabled'] ?? 0);
 
         if (!isset($folders[$folderId])) {
             $folders[$folderId] = [
@@ -96,12 +101,14 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
                 'name' => $folderName,
                 'icon' => $folderIcon,
                 'icon_color' => $folderIconColor,
+                'kanban_enabled' => $kanbanEnabled,
                 'notes' => []
             ];
         } else {
-            // Update icon and color if folder already exists
+            // Update icon, color and kanban_enabled if folder already exists
             $folders[$folderId]['icon'] = $folderIcon;
             $folders[$folderId]['icon_color'] = $folderIconColor;
+            $folders[$folderId]['kanban_enabled'] = $kanbanEnabled;
         }
     }
 
@@ -194,7 +201,7 @@ function shouldFolderBeOpen($con, $folderId, $folderName, $is_search_mode, $fold
  * Génère les actions disponibles pour un dossier
  * OPTIMIZED: Uses cached shared folders data to avoid N+1 queries
  */
-function generateFolderActions($folderId, $folderName, $workspace_filter, $noteCount = 0) {
+function generateFolderActions($folderId, $folderName, $workspace_filter, $noteCount = 0, $kanbanEnabled = 0) {
     global $con;
     static $sharedFoldersCache = null;
     
@@ -237,11 +244,18 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
         $actions .= "<span>" . t_h('notes_list.folder_actions.create', [], 'Create note') . "</span>";
         $actions .= "</div>";
         
-        // Kanban view action
-        $actions .= "<div class='folder-actions-menu-item' data-action='open-kanban-view' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-        $actions .= "<i class='fa-columns'></i>";
-        $actions .= "<span>" . t_h('kanban.actions.open', [], 'Kanban View') . "</span>";
-        $actions .= "</div>";
+        // Kanban view toggle action (enable/disable based on current state)
+        if ($kanbanEnabled) {
+            $actions .= "<div class='folder-actions-menu-item' data-action='toggle-kanban-view' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName' data-kanban-enabled='1'>";
+            $actions .= "<i class='fa-columns'></i>";
+            $actions .= "<span>" . t_h('kanban.actions.disable', [], 'Disable Kanban view') . "</span>";
+            $actions .= "</div>";
+        } else {
+            $actions .= "<div class='folder-actions-menu-item' data-action='toggle-kanban-view' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName' data-kanban-enabled='0'>";
+            $actions .= "<i class='fa-columns'></i>";
+            $actions .= "<span>" . t_h('kanban.actions.enable', [], 'Enable Kanban view') . "</span>";
+            $actions .= "</div>";
+        }
         
         // Move all files action (only if folder has notes)
         if ($noteCount > 0) {

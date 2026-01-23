@@ -97,6 +97,18 @@ function parseMarkdown($text) {
         return $placeholder;
     }, $text);
     
+    // Protect inline span tags with style attributes (for colors, backgrounds, etc.)
+    // Match: <span style="...">content</span>
+    $text = preg_replace_callback('/<span\s+style="([^"]+)">([^<]*)<\/span>/i', function($matches) use (&$protectedElements, &$protectedIndex) {
+        $styleAttr = $matches[1];
+        $content = $matches[2];
+        $placeholder = "\x00PSPAN" . $protectedIndex . "\x00";
+        $spanTag = '<span style="' . htmlspecialchars($styleAttr, ENT_QUOTES, 'UTF-8') . '">' . htmlspecialchars($content, ENT_QUOTES, 'UTF-8') . '</span>';
+        $protectedElements[$protectedIndex] = $spanTag;
+        $protectedIndex++;
+        return $placeholder;
+    }, $text);
+    
     // Now escape HTML to prevent XSS
     $html = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
     
@@ -142,8 +154,8 @@ function parseMarkdown($text) {
             return $matches[0];
         }, $text);
         
-        // Restore protected elements (images and links)
-        $text = preg_replace_callback('/\x00P(IMG|LNK)(\d+)\x00/', function($matches) use ($protectedElements) {
+        // Restore protected elements (images, links, and spans)
+        $text = preg_replace_callback('/\x00P(IMG|LNK|SPAN)(\d+)\x00/', function($matches) use ($protectedElements) {
             $index = (int)$matches[2];
             return isset($protectedElements[$index]) ? $protectedElements[$index] : $matches[0];
         }, $text);

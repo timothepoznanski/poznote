@@ -52,7 +52,12 @@ $currentLang = getUserLanguage();
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title><?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?> - <?php echo t_h('app.name'); ?></title>
+	<?php
+	require_once 'users/db_master.php';
+	$login_display_name = getGlobalSetting('login_display_name', '');
+	$pageTitle = ($login_display_name && trim($login_display_name) !== '') ? htmlspecialchars($login_display_name) : t_h('app.name');
+	?>
+	<title><?php echo $pageTitle; ?></title>
 	<meta name="color-scheme" content="dark light">
 	<script src="js/theme-init.js"></script>
 	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
@@ -65,13 +70,14 @@ $currentLang = getUserLanguage();
 <body class="tags-page" data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>">
 	<div class="tags-container">
 		<div class="tags-buttons-container">
-			<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
-				<?php echo t_h('common.back_to_notes'); ?>
-			</button>
-			<button id="backToHomeBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_home', [], 'Back to Home'); ?>">
-				<?php echo t_h('common.back_to_home', [], 'Back to Home'); ?>
-			</button>
-			<h1 class="tags-header"><?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?></h1>
+			<div class="tags-actions">
+				<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
+					<?php echo t_h('common.back_to_notes'); ?>
+				</button>
+				<button id="backToHomeBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_home', [], 'Back to Home'); ?>">
+					<?php echo t_h('common.back_to_home', [], 'Back to Home'); ?>
+				</button>
+			</div>
 		</div>
 		
         

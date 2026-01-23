@@ -25,7 +25,7 @@
             "oidc_button": "Continuar com {{provider}}",
             "documentation": "Documentação do Poznote",
             "redirecting": "Redirecionando...",
-            "admin_warning": "A conta de administrador padrão está ativa com o nome de usuário <code>{{username}}</code>. Por favor, faça login e renomeie esta conta para maior segurança.",
+            "admin_warning": "Inicie sessão com o nome de usuário <code>{{username}}</code> e sua senha (armazenada no .env). Você poderá renomear esta conta nas configurações para maior segurança.",
             "errors": {
                 "invalid_credentials": "Usuário ou senha incorretos."
             }
@@ -65,7 +65,9 @@
             "message": "Crie subpastas para vê-las como colunas aqui."
         },
         "actions": {
-            "open": "Visualização Kanban"
+            "enable": "Ativar visualização Kanban",
+            "disable": "Desativar visualização Kanban",
+            "open": "Abrir visualização Kanban"
         }
     },
     "folders": {
@@ -395,7 +397,7 @@
         "cards": {
             "theme_mode": "Tema",
             "login_display": "Título da Página de Login",
-            "note_font_size": "Tamanho da Fonte do Conteúdo da Nota",
+            "note_font_size": "Tamanho da Fonte",
             "note_sort_order": "Ordem de classificação das notas",
             "tasklist_insert_order": "Ordem de inserção das tarefas",
             "timezone": "Fuso Horário",
@@ -652,6 +654,10 @@
             "description": "Defina o nome mostrado na tela de login.",
             "placeholder": "Nome de exibição"
         },
+        "theme": {
+            "title": "Seleção de Tema",
+            "description": "Escolha o seu tema preferido:"
+        },
         "language": {
             "description": "Selecione seu idioma preferido:"
         },
@@ -659,8 +665,7 @@
             "placeholder": "Insira texto"
         },
         "font_size": {
-            "title": "Tamanho da Fonte do Conteúdo da Nota",
-            "description": "Selecione o tamanho da fonte padrão para suas notas:",
+            "title": "Tamanho da Fonte",
             "label": "Tamanho da fonte (px):",
             "default_value": "{{size}} px é o valor Padrão",
             "preview": "Este é um texto de pré-visualização"
@@ -735,9 +740,22 @@
             "folder": {
                 "title": "Pasta"
             },
+            "kanban": {
+                "title": "Estrutura Kanban"
+            },
             "workspace": {
                 "title": "Espaço de Trabalho"
             }
+        },
+        "kanban_structure": {
+            "title": "Criar estrutura Kanban",
+            "folder_name_label": "Nome da pasta:",
+            "folder_name_placeholder": "Meu quadro Kanban",
+            "columns_label": "Número de colunas (1-10):",
+            "error_name_required": "O nome da pasta é obrigatório",
+            "error_columns_range": "O número de colunas deve estar entre 1 e 10",
+            "error_create": "Falha ao criar a estrutura Kanban",
+            "error_create_prefix": "Erro ao criar a estrutura Kanban: {{error}}"
         },
         "folder_icon": {
             "title": "Alterar ícone da pasta",
@@ -824,6 +842,9 @@
             "favorites": "Favoritos",
             "public": "Compartilhadas",
             "attachments": "Anexos"
+        },
+        "favorites": {
+            "empty": "Ainda não há notas favoritas."
         },
         "drop_zone": {
             "remove_from_folder": "Solte aqui para remover da pasta"
@@ -916,7 +937,8 @@
     "theme": {
         "badge": {
             "dark": "modo escuro",
-            "light": "modo claro"
+            "light": "modo claro",
+            "system": "modo sistema"
         }
     },
     "table": {
@@ -1085,7 +1107,7 @@
         "redirecting": "Redirecionando...",
         "show_password": "Mostrar senha",
         "hide_password": "Ocultar senha",
-        "admin_warning": "A conta de administrador padrão está ativa com o nome de usuário <code>{{username}}</code>. Por favor, faça login e renomeie esta conta para maior segurança.",
+        "admin_warning": "Inicie sessão com o nome de usuário <code>{{username}}</code> e sua senha (armazenada no .env). Você poderá renomear esta conta nas configurações para maior segurança.",
         "fields": {
             "username": "Nome de usuário",
             "username_or_email": "Nome de usuário ou e-mail",

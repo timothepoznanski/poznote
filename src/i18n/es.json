@@ -25,7 +25,7 @@
             "oidc_button": "Continuar con {{provider}}",
             "documentation": "Documentación de Poznote",
             "redirecting": "Redirigiendo...",
-            "admin_warning": "La cuenta de administrador predeterminada está activa con el nombre de usuario <code>{{username}}</code>. Por favor, inicie sesión y cambie el nombre de esta cuenta para mayor seguridad.",
+            "admin_warning": "Inicie sesión con el nombre de usuario <code>{{username}}</code> y su contraseña (almacenada en .env). Luego podrá cambiar el nombre de esta cuenta en la configuración para mayor seguridad.",
             "errors": {
                 "invalid_credentials": "Usuario o contraseña incorrectos."
             }
@@ -396,7 +396,7 @@
         "cards": {
             "theme_mode": "Tema",
             "login_display": "Título de página de inicio de sesión",
-            "note_font_size": "Tamaño de fuente del contenido de la nota",
+            "note_font_size": "Tamaño de fuente",
             "note_sort_order": "Orden de clasificación de notas",
             "tasklist_insert_order": "Orden de inserción de tareas",
             "timezone": "Zona horaria",
@@ -653,6 +653,10 @@
             "description": "Establece el nombre mostrado en la pantalla de inicio de sesión.",
             "placeholder": "Nombre de pantalla"
         },
+        "theme": {
+            "title": "Selección de tema",
+            "description": "Elija su tema preferido:"
+        },
         "language": {
             "description": "Selecciona tu idioma preferido:"
         },
@@ -660,8 +664,7 @@
             "placeholder": "Ingresa texto"
         },
         "font_size": {
-            "title": "Tamaño de fuente del contenido de la nota",
-            "description": "Selecciona el tamaño de fuente predeterminado para tus notas:",
+            "title": "Tamaño de fuente",
             "label": "Tamaño de fuente (px):",
             "default_value": "{{size}} px es el valor predeterminado",
             "preview": "Este es un texto de vista previa"
@@ -736,9 +739,22 @@
             "folder": {
                 "title": "Carpeta"
             },
+            "kanban": {
+                "title": "Estructura Kanban"
+            },
             "workspace": {
                 "title": "Espacio de trabajo"
             }
+        },
+        "kanban_structure": {
+            "title": "Crear estructura Kanban",
+            "folder_name_label": "Nombre de la carpeta:",
+            "folder_name_placeholder": "Mi tablero Kanban",
+            "columns_label": "Número de columnas (1-10):",
+            "error_name_required": "El nombre de la carpeta es obligatorio",
+            "error_columns_range": "El número de columnas debe estar entre 1 y 10",
+            "error_create": "Error al crear la estructura Kanban",
+            "error_create_prefix": "Error al crear la estructura Kanban: {{error}}"
         },
         "folder_icon": {
             "title": "Cambiar icono de carpeta",
@@ -826,6 +842,9 @@
             "public": "Compartidas",
             "attachments": "Archivos adjuntos"
         },
+        "favorites": {
+            "empty": "Aún no hay notas favoritas."
+        },
         "drop_zone": {
             "remove_from_folder": "Suelta aquí para eliminar de la carpeta"
         },
@@ -912,7 +931,8 @@
     "theme": {
         "badge": {
             "dark": "modo oscuro",
-            "light": "modo claro"
+            "light": "modo claro",
+            "system": "modo sistema"
         }
     },
     "table": {
@@ -1081,7 +1101,7 @@
         "redirecting": "Redirigiendo...",
         "show_password": "Mostrar contraseña",
         "hide_password": "Ocultar contraseña",
-        "admin_warning": "La cuenta de administrador predeterminada está activa con el nombre de usuario <code>{{username}}</code>. Por favor, inicie sesión y cambie el nombre de esta cuenta para mayor seguridad.",
+        "admin_warning": "Inicie sesión con el nombre de usuario <code>{{username}}</code> y su contraseña (almacenada en .env). Luego podrá cambiar el nombre de esta cuenta en la configuración para mayor seguridad.",
         "fields": {
             "username": "Nombre de usuario",
             "username_or_email": "Nombre de usuario o correo electrónico",

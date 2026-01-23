@@ -314,50 +314,25 @@
    2. SPECIFIC MODAL STYLES
    =========================================== */
 
-/* NOTE SORT MODAL: ensure radio buttons align with their labels and do not inherit width:100% */
-#noteSortModal .modal-body {
-    margin-bottom: 6px;
-}
-
-#noteSortModal .modal-body>div {
+/* Radio buttons container styling for all modals */
+.radio-options {
+    margin-top: 8px;
+    margin-bottom: 24px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
-#noteSortModal .modal-body label {
+.radio-options label {
     display: flex;
     align-items: center;
     gap: 10px;
     font-size: 15px;
+    cursor: pointer;
+    line-height: 1.2;
 }
 
-#noteSortModal .modal-body input[type="radio"] {
-    width: auto !important;
-    height: auto !important;
-    margin: 0 !important;
-    flex: 0 0 auto;
-}
-
-/* Language Modal */
-#languageModal .modal-body {
-    margin-bottom: 6px;
-}
-
-#languageModal .modal-body>div {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-#languageModal .modal-body label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 15px;
-}
-
-#languageModal .modal-body input[type="radio"] {
+.radio-options input[type="radio"] {
     width: auto !important;
     height: auto !important;
     margin: 0 !important;
@@ -2268,10 +2243,6 @@ html[data-theme='dark'] #folderShareModal .share-indexable-label {
     box-sizing: border-box;
 }
 
-/* Radio button container */
-.radio-options {
-    margin-top: 8px;
-}
 
 /* Timezone select */
 .timezone-select {

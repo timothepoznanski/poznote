@@ -29,7 +29,7 @@
         // Ensure editor is actually in edit mode (visible)
         try {
             if (window.getComputedStyle(editor).display === 'none') return null;
-        } catch (e) {}
+        } catch (e) { }
 
         return editor;
     }
@@ -64,7 +64,7 @@
             if (typeof window.normalizeContentEditableText === 'function') {
                 return window.normalizeContentEditableText(rootEl);
             }
-        } catch (e) {}
+        } catch (e) { }
 
         // Fallback: innerText preserves visual newlines better than textContent
         return rootEl.innerText || rootEl.textContent || '';
@@ -104,7 +104,7 @@
             try {
                 range.selectNodeContents(rootEl);
                 range.collapse(false);
-            } catch (e2) {}
+            } catch (e2) { }
         }
 
         selection.removeAllRanges();
@@ -128,7 +128,7 @@
 
         try {
             rootEl.dispatchEvent(new Event('input', { bubbles: true }));
-        } catch (e) {}
+        } catch (e) { }
     }
 
     function insertMarkdownAtCursor(text, caretDeltaFromInsertEnd) {
@@ -157,7 +157,7 @@
 
         try {
             editor.dispatchEvent(new Event('input', { bubbles: true }));
-        } catch (e) {}
+        } catch (e) { }
     }
 
     function wrapMarkdownSelection(prefix, suffix, emptyInnerCaretOffset) {
@@ -200,7 +200,7 @@
 
         try {
             editor.dispatchEvent(new Event('input', { bubbles: true }));
-        } catch (e) {}
+        } catch (e) { }
     }
 
     function insertMarkdownPrefixAtLineStart(prefix) {
@@ -220,18 +220,18 @@
         // Create new heading
         const heading = document.createElement(tag);
         heading.appendChild(document.createElement('br'));
-        
+
         // Insert at cursor position
         range.deleteContents();
         range.insertNode(heading);
-        
+
         // Place cursor inside heading
         const newRange = document.createRange();
         newRange.setStart(heading, 0);
         newRange.collapse(true);
         selection.removeAllRanges();
         selection.addRange(newRange);
-        
+
         // Trigger input event for autosave
         const noteEntry = heading.closest('.noteentry');
         if (noteEntry) {
@@ -249,18 +249,18 @@
         const strong = document.createElement('strong');
         const textNode = document.createTextNode('\u200B'); // Zero-width space to place cursor
         strong.appendChild(textNode);
-        
+
         // Insert at cursor position
         range.deleteContents();
         range.insertNode(strong);
-        
+
         // Place cursor inside bold element after the zero-width space
         const newRange = document.createRange();
         newRange.setStart(textNode, 1);
         newRange.collapse(true);
         selection.removeAllRanges();
         selection.addRange(newRange);
-        
+
         // Trigger input event for autosave
         const noteEntry = strong.closest('.noteentry');
         if (noteEntry) {
@@ -278,16 +278,16 @@
         const em = document.createElement('em');
         const textNode = document.createTextNode('\u200B');
         em.appendChild(textNode);
-        
+
         range.deleteContents();
         range.insertNode(em);
-        
+
         const newRange = document.createRange();
         newRange.setStart(textNode, 1);
         newRange.collapse(true);
         selection.removeAllRanges();
         selection.addRange(newRange);
-        
+
         const noteEntry = em.closest('.noteentry');
         if (noteEntry) {
             noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
@@ -307,16 +307,16 @@
         }
         const textNode = document.createTextNode('\u200B');
         span.appendChild(textNode);
-        
+
         range.deleteContents();
         range.insertNode(span);
-        
+
         const newRange = document.createRange();
         newRange.setStart(textNode, 1);
         newRange.collapse(true);
         selection.removeAllRanges();
         selection.addRange(newRange);
-        
+
         const noteEntry = span.closest('.noteentry');
         if (noteEntry) {
             noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
@@ -333,16 +333,16 @@
         const mark = document.createElement('mark');
         const textNode = document.createTextNode('\u200B');
         mark.appendChild(textNode);
-        
+
         range.deleteContents();
         range.insertNode(mark);
-        
+
         const newRange = document.createRange();
         newRange.setStart(textNode, 1);
         newRange.collapse(true);
         selection.removeAllRanges();
         selection.addRange(newRange);
-        
+
         const noteEntry = mark.closest('.noteentry');
         if (noteEntry) {
             noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
@@ -359,16 +359,16 @@
         const s = document.createElement('s');
         const textNode = document.createTextNode('\u200B');
         s.appendChild(textNode);
-        
+
         range.deleteContents();
         range.insertNode(s);
-        
+
         const newRange = document.createRange();
         newRange.setStart(textNode, 1);
         newRange.collapse(true);
         selection.removeAllRanges();
         selection.addRange(newRange);
-        
+
         const noteEntry = s.closest('.noteentry');
         if (noteEntry) {
             noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
@@ -385,16 +385,16 @@
         const code = document.createElement('code');
         const textNode = document.createTextNode('\u200B');
         code.appendChild(textNode);
-        
+
         range.deleteContents();
         range.insertNode(code);
-        
+
         const newRange = document.createRange();
         newRange.setStart(textNode, 1);
         newRange.collapse(true);
         selection.removeAllRanges();
         selection.addRange(newRange);
-        
+
         const noteEntry = code.closest('.noteentry');
         if (noteEntry) {
             noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
@@ -413,18 +413,18 @@
         const textNode = document.createTextNode('\u200B');
         code.appendChild(textNode);
         pre.appendChild(code);
-        
+
         // Insert at cursor position
         range.deleteContents();
         range.insertNode(pre);
-        
+
         // Place cursor inside code element
         const newRange = document.createRange();
         newRange.setStart(textNode, 1);
         newRange.collapse(true);
         selection.removeAllRanges();
         selection.addRange(newRange);
-        
+
         // Trigger input event for autosave
         const noteEntry = pre.closest('.noteentry');
         if (noteEntry) {
@@ -448,7 +448,7 @@
         const formattingTags = ['CODE', 'STRONG', 'EM', 'MARK', 'S', 'SPAN', 'B', 'I', 'U'];
         let formattingElement = null;
         let node = currentNode;
-        
+
         while (node && !node.classList?.contains('noteentry')) {
             if (formattingTags.includes(node.tagName)) {
                 formattingElement = node;
@@ -467,25 +467,25 @@
         span.style.textDecoration = 'none';
         span.style.fontSize = 'inherit';
         span.style.fontFamily = 'inherit';
-        
+
         const textNode = document.createTextNode('\u200B');
         span.appendChild(textNode);
-        
+
         range.deleteContents();
-        
+
         // If inside a formatting element, insert after it
         if (formattingElement) {
             formattingElement.parentNode.insertBefore(span, formattingElement.nextSibling);
         } else {
             range.insertNode(span);
         }
-        
+
         const newRange = document.createRange();
         newRange.setStart(textNode, 1);
         newRange.collapse(true);
         selection.removeAllRanges();
         selection.addRange(newRange);
-        
+
         // Trigger input event for autosave
         const noteEntry = span.closest('.noteentry');
         if (noteEntry) {
@@ -500,7 +500,7 @@
         const range = selection.getRangeAt(0);
 
         let element;
-        
+
         if (!type || type === 'plain') {
             // Plain blockquote
             element = document.createElement('blockquote');
@@ -510,11 +510,11 @@
             // Callout with icon and title
             element = document.createElement('aside');
             element.className = 'callout callout-' + type;
-            
+
             // Create title div
             const titleDiv = document.createElement('div');
             titleDiv.className = 'callout-title';
-            
+
             // Add icon SVG
             const iconSvgs = {
                 'note': '<svg class="callout-icon-svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>',
@@ -523,21 +523,21 @@
                 'warning': '<svg class="callout-icon-svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>',
                 'caution': '<svg class="callout-icon-svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4.47.22A.75.75 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.75.75 0 0 1-.22.53l-4.25 4.25A.75.75 0 0 1 11 16H5a.75.75 0 0 1-.53-.22L.22 11.53A.75.75 0 0 1 0 11V5a.75.75 0 0 1 .22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>'
             };
-            
+
             titleDiv.innerHTML = iconSvgs[type] || iconSvgs['note'];
-            
+
             const titleSpan = document.createElement('span');
             titleSpan.className = 'callout-title-text';
             const defaultTitle = type.charAt(0).toUpperCase() + type.slice(1);
             titleSpan.textContent = (window.t ? window.t('slash_menu.callout_' + type, null, defaultTitle) : defaultTitle);
             titleDiv.appendChild(titleSpan);
-            
+
             // Create body div
             const bodyDiv = document.createElement('div');
             bodyDiv.className = 'callout-body';
             const textNode = document.createTextNode('\u200B');
             bodyDiv.appendChild(textNode);
-            
+
             element.appendChild(titleDiv);
             element.appendChild(bodyDiv);
         }
@@ -562,8 +562,8 @@
         // Apply the selection after focusing (short timeout) to avoid focus stealing.
         const noteEntry = element.closest('.noteentry');
         if (noteEntry) {
-            try { noteEntry.focus(); } catch (err) {}
-            setTimeout(function() {
+            try { noteEntry.focus(); } catch (err) { }
+            setTimeout(function () {
                 const sel = window.getSelection();
                 sel.removeAllRanges();
                 sel.addRange(newRange);
@@ -588,18 +588,18 @@
         const li = document.createElement('li');
         li.appendChild(document.createElement('br'));
         list.appendChild(li);
-        
+
         // Insert at cursor position
         range.deleteContents();
         range.insertNode(list);
-        
+
         // Place cursor inside li
         const newRange = document.createRange();
         newRange.setStart(li, 0);
         newRange.collapse(true);
         selection.removeAllRanges();
         selection.addRange(newRange);
-        
+
         // Trigger input event for autosave
         const noteEntry = list.closest('.noteentry');
         if (noteEntry) {
@@ -613,38 +613,38 @@
         fileInput.type = 'file';
         fileInput.accept = 'image/*';
         fileInput.style.display = 'none';
-        
-        fileInput.addEventListener('change', function() {
+
+        fileInput.addEventListener('change', function () {
             if (fileInput.files && fileInput.files.length > 0) {
                 const file = fileInput.files[0];
-                
+
                 // Check if we're in a markdown note
                 const selection = window.getSelection();
                 if (!selection.rangeCount) return;
-                
+
                 const range = selection.getRangeAt(0);
                 let container = range.commonAncestorContainer;
                 if (container.nodeType === 3) container = container.parentNode;
-                
+
                 const noteEntry = container.closest('.noteentry');
-                const isMarkdown = noteEntry && noteEntry.hasAttribute('data-note-type') && 
-                                 noteEntry.getAttribute('data-note-type') === 'markdown';
-                
+                const isMarkdown = noteEntry && noteEntry.hasAttribute('data-note-type') &&
+                    noteEntry.getAttribute('data-note-type') === 'markdown';
+
                 if (isMarkdown) {
                     // Handle markdown image insertion
                     const noteId = noteEntry.id.replace('entry', '');
                     const loadingText = '![Uploading ' + file.name + '...]()';
-                    
+
                     // Insert loading text
                     const editor = noteEntry.querySelector('.markdown-editor');
                     if (editor) {
                         range.deleteContents();
                         const textNode = document.createTextNode(loadingText);
                         range.insertNode(textNode);
-                        
+
                         // Trigger input event
                         editor.dispatchEvent(new Event('input', { bubbles: true }));
-                        
+
                         // Upload the file
                         const formData = new FormData();
                         formData.append('note_id', noteId);
@@ -652,52 +652,77 @@
                         if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) {
                             formData.append('workspace', selectedWorkspace);
                         }
-                        
+
                         fetch('/api/v1/notes/' + noteId + '/attachments', {
                             method: 'POST',
                             body: formData
                         })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                const imageMarkdown = '![' + file.name + '](/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id + ')';
-                                
-                                // Replace loading text
-                                const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null);
-                                let textNodes = [];
-                                let node;
-                                while (node = walker.nextNode()) {
-                                    textNodes.push(node);
-                                }
-                                
-                                for (let i = 0; i < textNodes.length; i++) {
-                                    const textNode = textNodes[i];
-                                    const text = textNode.textContent;
-                                    if (text.indexOf(loadingText) !== -1) {
-                                        textNode.textContent = text.replace(loadingText, imageMarkdown);
-                                        break;
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    const imageMarkdown = '![' + file.name + '](/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id + ')';
+
+                                    // Replace loading text
+                                    const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null);
+                                    let textNodes = [];
+                                    let node;
+                                    while (node = walker.nextNode()) {
+                                        textNodes.push(node);
+                                    }
+
+                                    for (let i = 0; i < textNodes.length; i++) {
+                                        const textNode = textNodes[i];
+                                        const text = textNode.textContent;
+                                        if (text.indexOf(loadingText) !== -1) {
+                                            textNode.textContent = text.replace(loadingText, imageMarkdown);
+                                            break;
+                                        }
+                                    }
+
+                                    editor.dispatchEvent(new Event('input', { bubbles: true }));
+
+                                    // Mark note as modified
+                                    if (typeof window.markNoteAsModified === 'function') {
+                                        window.markNoteAsModified();
+                                    }
+
+                                    // Re-initialize image click handlers
+                                    if (typeof reinitializeImageClickHandlers === 'function') {
+                                        setTimeout(() => reinitializeImageClickHandlers(), 200);
+                                    }
+
+                                    // Save after upload
+                                    setTimeout(() => {
+                                        if (typeof window.saveNoteImmediately === 'function') {
+                                            window.saveNoteImmediately();
+                                        }
+                                    }, 500);
+                                } else {
+                                    // Remove loading text on error
+                                    const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null);
+                                    let textNodes = [];
+                                    let node;
+                                    while (node = walker.nextNode()) {
+                                        textNodes.push(node);
+                                    }
+
+                                    for (let i = 0; i < textNodes.length; i++) {
+                                        const textNode = textNodes[i];
+                                        const text = textNode.textContent;
+                                        if (text.indexOf(loadingText) !== -1) {
+                                            textNode.textContent = text.replace(loadingText, '');
+                                            break;
+                                        }
+                                    }
+
+                                    editor.dispatchEvent(new Event('input', { bubbles: true }));
+
+                                    if (typeof showNotificationPopup === 'function') {
+                                        showNotificationPopup('Upload failed: ' + data.message, 'error');
                                     }
                                 }
-                                
-                                editor.dispatchEvent(new Event('input', { bubbles: true }));
-                                
-                                // Mark note as modified
-                                if (typeof window.markNoteAsModified === 'function') {
-                                    window.markNoteAsModified();
-                                }
-                                
-                                // Re-initialize image click handlers
-                                if (typeof reinitializeImageClickHandlers === 'function') {
-                                    setTimeout(() => reinitializeImageClickHandlers(), 200);
-                                }
-                                
-                                // Save after upload
-                                setTimeout(() => {
-                                    if (typeof window.saveNoteImmediately === 'function') {
-                                        window.saveNoteImmediately();
-                                    }
-                                }, 500);
-                            } else {
+                            })
+                            .catch(error => {
                                 // Remove loading text on error
                                 const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null);
                                 let textNodes = [];
@@ -705,7 +730,7 @@
                                 while (node = walker.nextNode()) {
                                     textNodes.push(node);
                                 }
-                                
+
                                 for (let i = 0; i < textNodes.length; i++) {
                                     const textNode = textNodes[i];
                                     const text = textNode.textContent;
@@ -714,53 +739,28 @@
                                         break;
                                     }
                                 }
-                                
+
                                 editor.dispatchEvent(new Event('input', { bubbles: true }));
-                                
+
                                 if (typeof showNotificationPopup === 'function') {
-                                    showNotificationPopup('Upload failed: ' + data.message, 'error');
+                                    showNotificationPopup('Upload failed: ' + error.message, 'error');
                                 }
-                            }
-                        })
-                        .catch(error => {
-                            // Remove loading text on error
-                            const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null);
-                            let textNodes = [];
-                            let node;
-                            while (node = walker.nextNode()) {
-                                textNodes.push(node);
-                            }
-                            
-                            for (let i = 0; i < textNodes.length; i++) {
-                                const textNode = textNodes[i];
-                                const text = textNode.textContent;
-                                if (text.indexOf(loadingText) !== -1) {
-                                    textNode.textContent = text.replace(loadingText, '');
-                                    break;
-                                }
-                            }
-                            
-                            editor.dispatchEvent(new Event('input', { bubbles: true }));
-                            
-                            if (typeof showNotificationPopup === 'function') {
-                                showNotificationPopup('Upload failed: ' + error.message, 'error');
-                            }
-                        });
+                            });
                     }
                 } else {
                     // Handle HTML image insertion
                     const reader = new FileReader();
-                    reader.onload = function(ev) {
+                    reader.onload = function (ev) {
                         const originalDataUrl = ev.target.result;
-                        
+
                         // Use compression function if available (from attachments.js)
-                        const processImage = function(dataUrl) {
+                        const processImage = function (dataUrl) {
                             // Add lazy loading and async decoding for better performance
                             const imgHtml = '<img src="' + dataUrl + '" alt="image" loading="lazy" decoding="async" />';
-                            
+
                             // Insert at cursor using the same method as drag-and-drop
                             const inserted = insertHTMLAtSelection(imgHtml);
-                            
+
                             if (!inserted) {
                                 // Fallback: insert at end of note
                                 const noteEntry = container.closest('.noteentry');
@@ -768,7 +768,7 @@
                                     noteEntry.innerHTML += imgHtml;
                                 }
                             }
-                            
+
                             // Get note ID for saving
                             const noteEntry = container.closest('.noteentry');
                             if (noteEntry) {
@@ -777,17 +777,17 @@
                                     window.noteid = targetNoteId;
                                 }
                             }
-                            
+
                             // Mark note as modified
                             if (typeof window.markNoteAsModified === 'function') {
                                 window.markNoteAsModified();
                             }
-                            
+
                             // Re-initialize image click handlers
                             if (typeof reinitializeImageClickHandlers === 'function') {
                                 setTimeout(() => reinitializeImageClickHandlers(), 50);
                             }
-                            
+
                             // Save after insertion
                             setTimeout(() => {
                                 if (typeof saveNoteToServer === 'function') {
@@ -797,7 +797,7 @@
                                 }
                             }, 100);
                         };
-                        
+
                         // Compress if function available, otherwise use original
                         if (typeof compressImageIfNeeded === 'function') {
                             compressImageIfNeeded(originalDataUrl, processImage);
@@ -808,11 +808,11 @@
                     reader.readAsDataURL(file);
                 }
             }
-            
+
             // Remove the temporary input
             document.body.removeChild(fileInput);
         });
-        
+
         // Add to DOM and trigger click
         document.body.appendChild(fileInput);
         fileInput.click();
@@ -847,11 +847,24 @@
                 icon: 'fa-bold',
                 label: t('slash_menu.format_text', null, 'Format text'),
                 submenu: [
-                    { id: 'red', icon: 'fa-palette', label: t('slash_menu.red', null, 'Red'), action: () => insertColor('#e74c3c') },
                     { id: 'bold', icon: 'fa-bold', label: t('slash_menu.bold', null, 'Bold'), action: () => insertBold() },
                     { id: 'italic', icon: 'fa-italic', label: t('slash_menu.italic', null, 'Italic'), action: () => insertItalic() },
                     { id: 'highlight', icon: 'fa-fill-drip', label: t('slash_menu.highlight', null, 'Highlight'), action: () => insertHighlight() },
                     { id: 'strikethrough', icon: 'fa-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => insertStrikethrough() }
+                ]
+            },
+            {
+                id: 'color',
+                icon: 'fa-palette',
+                label: t('slash_menu.color', null, 'Color'),
+                submenu: [
+                    { id: 'red', icon: 'fa-circle', iconColor: '#e74c3c', label: t('slash_menu.color_red', null, 'Red'), action: () => insertColor('#e74c3c') },
+                    { id: 'blue', icon: 'fa-circle', iconColor: '#3498db', label: t('slash_menu.color_blue', null, 'Blue'), action: () => insertColor('#3498db') },
+                    { id: 'green', icon: 'fa-circle', iconColor: '#2ecc71', label: t('slash_menu.color_green', null, 'Green'), action: () => insertColor('#2ecc71') },
+                    { id: 'yellow', icon: 'fa-circle', iconColor: '#f1c40f', label: t('slash_menu.color_yellow', null, 'Yellow'), action: () => insertColor('#f1c40f') },
+                    { id: 'purple', icon: 'fa-circle', iconColor: '#9b59b6', label: t('slash_menu.color_purple', null, 'Purple'), action: () => insertColor('#9b59b6') },
+                    { id: 'orange', icon: 'fa-circle', iconColor: '#e67e22', label: t('slash_menu.color_orange', null, 'Orange'), action: () => insertColor('#e67e22') },
+                    { id: 'black', icon: 'fa-circle', iconColor: '#000000', label: t('slash_menu.color_black', null, 'Black'), action: () => insertColor('inherit') }
                 ]
             },
             {
@@ -964,44 +977,44 @@
                         // Save the note entry and editable element before they get cleared
                         const noteEntry = savedNoteEntry;
                         const editableElement = savedEditableElement;
-                        
+
                         // Get current selection if any
                         const sel = window.getSelection();
                         const hasSelection = sel && sel.rangeCount > 0 && !sel.getRangeAt(0).collapsed;
                         const selectedText = hasSelection ? sel.toString() : '';
-                        
+
                         // Save the current range/position
                         let savedRange = null;
                         if (sel && sel.rangeCount > 0) {
                             savedRange = sel.getRangeAt(0).cloneRange();
                         }
-                        
-                        window.showLinkModal('https://', selectedText, function(url, text) {
+
+                        window.showLinkModal('https://', selectedText, function (url, text) {
                             if (!url) return;
-                            
+
                             // Create a new link element
                             const a = document.createElement('a');
                             a.href = url;
                             a.textContent = text || url;
                             a.target = '_blank';
                             a.rel = 'noopener noreferrer';
-                            
+
                             // Focus the editable element first
                             if (editableElement) {
                                 editableElement.focus();
                             }
-                            
+
                             // Restore selection and insert link
                             try {
                                 const sel = window.getSelection();
                                 if (savedRange) {
                                     sel.removeAllRanges();
                                     sel.addRange(savedRange);
-                                    
+
                                     // Replace the selected text with the link
                                     savedRange.deleteContents();
                                     savedRange.insertNode(a);
-                                    
+
                                     // Position cursor after the link
                                     const newRange = document.createRange();
                                     newRange.setStartAfter(a);
@@ -1027,12 +1040,12 @@
                                     editableElement.appendChild(a);
                                 }
                             }
-                            
+
                             // Trigger input event for autosave
                             if (noteEntry) {
                                 noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
                             }
-                            
+
                             // Save the note
                             if (typeof window.saveNoteImmediately === 'function') {
                                 window.saveNoteImmediately();
@@ -1120,6 +1133,20 @@
                 ]
             },
             {
+                id: 'color',
+                icon: 'fa-palette',
+                label: t('slash_menu.color', null, 'Color'),
+                submenu: [
+                    { id: 'red', icon: 'fa-circle', iconColor: '#e74c3c', label: t('slash_menu.color_red', null, 'Red'), action: () => wrapMarkdownSelection('<span style="color:#e74c3c">', '</span>') },
+                    { id: 'blue', icon: 'fa-circle', iconColor: '#3498db', label: t('slash_menu.color_blue', null, 'Blue'), action: () => wrapMarkdownSelection('<span style="color:#3498db">', '</span>') },
+                    { id: 'green', icon: 'fa-circle', iconColor: '#2ecc71', label: t('slash_menu.color_green', null, 'Green'), action: () => wrapMarkdownSelection('<span style="color:#2ecc71">', '</span>') },
+                    { id: 'yellow', icon: 'fa-circle', iconColor: '#f1c40f', label: t('slash_menu.color_yellow', null, 'Yellow'), action: () => wrapMarkdownSelection('<span style="color:#f1c40f">', '</span>') },
+                    { id: 'purple', icon: 'fa-circle', iconColor: '#9b59b6', label: t('slash_menu.color_purple', null, 'Purple'), action: () => wrapMarkdownSelection('<span style="color:#9b59b6">', '</span>') },
+                    { id: 'orange', icon: 'fa-circle', iconColor: '#e67e22', label: t('slash_menu.color_orange', null, 'Orange'), action: () => wrapMarkdownSelection('<span style="color:#e67e22">', '</span>') },
+                    { id: 'bg-yellow', icon: 'fa-fill-drip', iconColor: '#f1c40f', label: t('slash_menu.bg_yellow', null, 'Yellow background'), action: () => wrapMarkdownSelection('<span style="background-color:#f1c40f">', '</span>') }
+                ]
+            },
+            {
                 id: 'image',
                 icon: 'fa-image',
                 label: t('slash_menu.image', null, 'Image'),
@@ -1172,28 +1199,28 @@
                     if (typeof window.showLinkModal === 'function') {
                         const editor = getCurrentMarkdownEditorFromSelection();
                         if (!editor) return;
-                        
+
                         const offsets = getSelectionOffsetsWithin(editor);
                         if (!offsets) return;
-                        
+
                         const text = getMarkdownEditorText(editor);
                         const selectedText = text.substring(offsets.start, offsets.end);
-                        
-                        window.showLinkModal('https://', selectedText, function(url, linkText) {
+
+                        window.showLinkModal('https://', selectedText, function (url, linkText) {
                             if (!url) return;
-                            
+
                             const linkMarkdown = '[' + (linkText || 'link') + '](' + url + ')';
                             const before = text.substring(0, offsets.start);
                             const after = text.substring(offsets.end);
                             const newText = before + linkMarkdown + after;
-                            
+
                             editor.textContent = '';
                             editor.appendChild(document.createTextNode(newText));
-                            
+
                             // Position cursor after the inserted link
                             const newOffset = offsets.start + linkMarkdown.length;
                             setSelectionByOffsets(editor, newOffset, newOffset);
-                            
+
                             // Trigger input event for autosave
                             const noteEntry = editor.closest('.noteentry');
                             if (noteEntry) {
@@ -1262,7 +1289,7 @@
             if (!editableElement.classList || !editableElement.classList.contains('markdown-editor')) return null;
             try {
                 if (window.getComputedStyle(editableElement).display === 'none') return null;
-            } catch (e) {}
+            } catch (e) { }
         }
 
         return { noteType: noteType || 'note', noteEntry, editableElement };
@@ -1280,12 +1307,12 @@
 
         const search = removeAccents(searchText.toLowerCase());
         const results = [];
-        
+
         // Flatten the menu structure when filtering
         commands.forEach(cmd => {
             // Check if main command label matches
             const cmdMatches = cmd.label && removeAccents(cmd.label.toLowerCase()).includes(search);
-            
+
             if (cmdMatches && (!cmd.submenu || cmd.submenu.length === 0)) {
                 // Command without submenu matches - add it directly
                 results.push(cmd);
@@ -1313,7 +1340,7 @@
                 // Command doesn't match but might have matching submenu items
                 cmd.submenu.forEach(subItem => {
                     const subItemMatches = subItem.label && removeAccents(subItem.label.toLowerCase()).includes(search);
-                    
+
                     if (subItemMatches && (!subItem.submenu || subItem.submenu.length === 0)) {
                         // Submenu item matches and has no sub-submenu
                         results.push({
@@ -1345,7 +1372,7 @@
                 });
             }
         });
-        
+
         return results;
     }
 
@@ -1359,9 +1386,10 @@
                 const selectedClass = idx === selectedIndex ? ' selected' : '';
                 const hasSubmenu = cmd.submenu && cmd.submenu.length > 0;
                 const submenuIndicator = hasSubmenu ? '<i class="fa fa-chevron-right slash-command-submenu-indicator"></i>' : '';
+                const iconStyle = cmd.iconColor ? ' style="color: ' + cmd.iconColor + ';"' : '';
                 return (
                     '<div class="slash-command-item' + selectedClass + '" data-command-id="' + cmd.id + '" data-has-submenu="' + hasSubmenu + '">' +
-                    '<i class="slash-command-icon fa ' + cmd.icon + '"></i>' +
+                    '<i class="slash-command-icon fa ' + cmd.icon + '"' + iconStyle + '></i>' +
                     '<span class="slash-command-label">' + escapeHtml(cmd.label) + '</span>' +
                     submenuIndicator +
                     '</div>'
@@ -1373,23 +1401,24 @@
     function buildSubmenuHTML(items) {
         const isMobile = window.innerWidth < 768;
         const t = window.t || ((key, params, fallback) => fallback);
-        
+
         let html = '';
-        
+
         // Add back button on mobile
         if (isMobile) {
             html += '<div class="slash-command-item slash-command-back" data-action="back">' +
-                    '<i class="fa fa-arrow-left" style="margin-right: 8px; width: 16px; display: inline-block; text-align: center;"></i>' +
-                    '<span class="slash-command-label">' + escapeHtml(t('slash_menu.back', null, 'Back')) + '</span>' +
-                    '</div>';
+                '<i class="fa fa-arrow-left" style="margin-right: 8px; width: 16px; display: inline-block; text-align: center;"></i>' +
+                '<span class="slash-command-label">' + escapeHtml(t('slash_menu.back', null, 'Back')) + '</span>' +
+                '</div>';
         }
-        
+
         html += items
             .map((item, idx) => {
                 const selectedClass = idx === selectedSubmenuIndex ? ' selected' : '';
                 const hasSubmenu = item.submenu && item.submenu.length > 0;
                 const submenuIndicator = hasSubmenu ? '<i class="fa fa-chevron-right slash-command-submenu-indicator"></i>' : '';
-                const iconHtml = item.icon ? '<i class="fa ' + item.icon + '" style="margin-right: 8px; width: 16px; display: inline-block; text-align: center;"></i>' : '';
+                const iconStyle = item.iconColor ? ' style="margin-right: 8px; width: 16px; display: inline-block; text-align: center; color: ' + item.iconColor + ';"' : ' style="margin-right: 8px; width: 16px; display: inline-block; text-align: center;"';
+                const iconHtml = item.icon ? '<i class="fa ' + item.icon + '"' + iconStyle + '></i>' : '';
                 return (
                     '<div class="slash-command-item' + selectedClass + '" data-submenu-id="' + item.id + '" data-has-sub-submenu="' + hasSubmenu + '">' +
                     iconHtml +
@@ -1399,24 +1428,24 @@
                 );
             })
             .join('');
-            
+
         return html;
     }
 
     function buildSubSubmenuHTML(items) {
         const isMobile = window.innerWidth < 768;
         const t = window.t || ((key, params, fallback) => fallback);
-        
+
         let html = '';
-        
+
         // Add back button on mobile
         if (isMobile) {
             html += '<div class="slash-command-item slash-command-back" data-action="back-sub">' +
-                    '<i class="fa fa-arrow-left" style="margin-right: 8px; width: 16px; display: inline-block; text-align: center;"></i>' +
-                    '<span class="slash-command-label">' + escapeHtml(t('slash_menu.back', null, 'Back')) + '</span>' +
-                    '</div>';
+                '<i class="fa fa-arrow-left" style="margin-right: 8px; width: 16px; display: inline-block; text-align: center;"></i>' +
+                '<span class="slash-command-label">' + escapeHtml(t('slash_menu.back', null, 'Back')) + '</span>' +
+                '</div>';
         }
-        
+
         html += items
             .map((item, idx) => {
                 const selectedClass = idx === selectedSubSubmenuIndex ? ' selected' : '';
@@ -1430,7 +1459,7 @@
                 );
             })
             .join('');
-            
+
         return html;
     }
 
@@ -1451,7 +1480,7 @@
         const isMobile = window.innerWidth < 768;
 
         const padding = 8;
-        
+
         if (isMobile) {
             // On mobile, center horizontally and position near cursor
             const menuWidth = menuRect.width || 360;
@@ -1479,7 +1508,7 @@
             subSubmenuElement.removeEventListener('mousedown', handleMenuMouseDown);
             subSubmenuElement.removeEventListener('click', handleSubSubmenuClick);
             subSubmenuElement.removeEventListener('touchend', handleSubSubmenuTouchEnd);
-        } catch (e) {}
+        } catch (e) { }
 
         try {
             subSubmenuElement.remove();
@@ -1502,7 +1531,7 @@
             submenuElement.removeEventListener('click', handleSubmenuClick);
             submenuElement.removeEventListener('touchend', handleSubmenuTouchEnd);
             submenuElement.removeEventListener('mouseover', handleSubmenuMouseOver);
-        } catch (e) {}
+        } catch (e) { }
 
         try {
             submenuElement.remove();
@@ -1524,7 +1553,7 @@
             slashMenuElement.removeEventListener('mousedown', handleMenuMouseDown);
             slashMenuElement.removeEventListener('click', handleMenuClick);
             slashMenuElement.removeEventListener('mouseover', handleMenuMouseOver);
-        } catch (e) {}
+        } catch (e) { }
 
         try {
             slashMenuElement.remove();
@@ -1738,7 +1767,7 @@
         if (!shouldKeepSlash) {
             deleteSlashText();
         }
-        
+
         hideSlashMenu();
 
         // Exécuter la commande immédiatement (la sélection est déjà restaurée par deleteSlashText)
@@ -1753,11 +1782,11 @@
             if (savedEditableElement) {
                 try {
                     savedEditableElement.focus();
-                } catch (e) {}
+                } catch (e) { }
             } else if (savedNoteEntry) {
                 try {
                     savedNoteEntry.focus();
-                } catch (e) {}
+                } catch (e) { }
             }
         }
 
@@ -1859,7 +1888,7 @@
 
         const hasSubSubmenu = item.getAttribute('data-has-sub-submenu') === 'true';
         const submenuId = item.getAttribute('data-submenu-id');
-        
+
         if (hasSubSubmenu && submenuId && currentSubmenu) {
             const subItem = currentSubmenu.find(i => i.id === submenuId);
             if (subItem) {
@@ -1876,7 +1905,7 @@
 
         const hasSubmenu = item.getAttribute('data-has-submenu') === 'true';
         const commandId = item.getAttribute('data-command-id');
-        
+
         if (hasSubmenu && commandId) {
             const cmd = filteredCommands.find(c => c.id === commandId);
             if (cmd) {
@@ -2086,7 +2115,7 @@
         // Extract text after the slash
         const textContent = slashTextNode.textContent || '';
         const textAfterSlash = textContent.substring(slashOffset + 1);
-        
+
         // Find the first space or newline after the slash to limit the filter text
         const spaceIndex = textAfterSlash.search(/[\s\n]/);
         filterText = spaceIndex >= 0 ? textAfterSlash.substring(0, spaceIndex) : textAfterSlash;
@@ -2199,7 +2228,7 @@
         const isClickInsideMenu = slashMenuElement.contains(e.target);
         const isClickInsideSubmenu = submenuElement && submenuElement.contains(e.target);
         const isClickInsideSubSubmenu = subSubmenuElement && subSubmenuElement.contains(e.target);
-        
+
         if (!isClickInsideMenu && !isClickInsideSubmenu && !isClickInsideSubSubmenu) {
             hideSlashMenu();
             savedNoteEntry = null;

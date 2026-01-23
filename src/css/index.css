@@ -46,13 +46,6 @@
     }
 }
 
-/* Hide Kanban View option on mobile */
-@media (max-width: 800px) {
-    .folder-actions-menu-item[data-action="open-kanban-view"] {
-        display: none !important;
-    }
-}
-
 /* Folder visibility: when not hidden, ensure folder headers and contents use block layout */
 .folder-header {
     display: block;
@@ -889,6 +882,28 @@ body {
 .folder-actions-toggle i[class*="fa-"],
 .folder-actions-toggle [class*="fa-"] {
     font-size: 0.85em !important;
+}
+
+/* Kanban icon style */
+.folder-kanban-icon {
+    padding: 2px 4px;
+    cursor: pointer;
+    color: #6b7280;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.folder-kanban-icon:hover {
+    background: rgba(107, 114, 128, 0.1);
+    color: #0b4da6;
+}
+
+.folder-kanban-icon i,
+.folder-kanban-icon [class*="fa-"] {
+    font-size: 0.75em !important;
 }
 
 /* Dropdown menu for folder actions */
@@ -3565,7 +3580,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 } */
 
 .folder-content {
-    margin-left: 29px;
+    margin-left: 15px;
     margin-bottom: 5px;
     /* Reduce space below each folder */
 }
@@ -3576,7 +3591,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     position: relative;
     display: flex !important;
     align-items: center !important;
-    padding-left: 0px !important;
+    padding-left: 10px !important;
     /* Réduction du padding pour récupérer l'espace */
     transition: padding-left 0.2s;
 }
@@ -5895,6 +5910,12 @@ input[type="search"]::-webkit-search-results-decoration {
 .searchbar-type-btn.active i::before,
 .searchbar-type-btn:hover i,
 .searchbar-type-btn:hover i::before {
+    filter: none !important;
+}
+
+/* Exception: Remove filter for slash command color icons (so they show their iconColor) */
+.slash-command-item i[style*="color:"],
+.slash-command-submenu i[style*="color:"] {
     filter: none !important;
 }
 

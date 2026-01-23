@@ -56,7 +56,12 @@ $currentLang = getUserLanguage();
 	<meta charset="utf-8"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-	<title><?php echo t_h('shared_folders.page.title', [], 'Shared Folders'); ?> - <?php echo t_h('app.name'); ?></title>
+	<?php
+	require_once 'users/db_master.php';
+	$login_display_name = getGlobalSetting('login_display_name', '');
+	$pageTitle = ($login_display_name && trim($login_display_name) !== '') ? htmlspecialchars($login_display_name) : t_h('app.name');
+	?>
+	<title><?php echo $pageTitle; ?></title>
 	<meta name="color-scheme" content="dark light">
 	<script src="js/theme-init.js"></script>
 	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
@@ -81,8 +86,6 @@ $currentLang = getUserLanguage();
       data-txt-save="<?php echo t_h('common.save', [], 'Save'); ?>"
       data-txt-confirm-revoke="<?php echo t_h('shared_folders.confirm_revoke', [], 'Are you sure you want to revoke sharing for this folder? All notes in this folder will also be unshared.'); ?>">
 	<div class="shared-container">
-		<h2 class="shared-header"><?php echo t_h('shared_folders.page.title', [], 'Shared Folders'); ?></h2>
-		
 		<div class="shared-buttons-container">
 			<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
 				<?php echo t_h('common.back_to_notes'); ?>
@@ -101,7 +104,7 @@ $currentLang = getUserLanguage();
 					type="text" 
 					id="filterInput"
 					class="filter-input"
-					placeholder="<?php echo t_h('shared_folders.filter_placeholder', [], 'Filter by folder name or token...'); ?>"
+					placeholder="<?php echo t_h('shared_folders.filter_placeholder', [], 'Filter by folder name...'); ?>"
 				/>
 				<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
 					<i class="fa-times"></i>

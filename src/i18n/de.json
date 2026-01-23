@@ -25,7 +25,7 @@
             "oidc_button": "Mit {{provider}} fortfahren",
             "documentation": "Poznote Dokumentation",
             "redirecting": "Weiterleitung...",
-            "admin_warning": "Das Standard-Administratorkonto ist mit dem Benutzernamen <code>{{username}}</code> aktiv. Bitte melden Sie sich an und benennen Sie dieses Konto für mehr Sicherheit um.",
+            "admin_warning": "Bitte melden Sie sich mit dem Benutzernamen <code>{{username}}</code> und Ihrem Passwort (in .env gespeichert) an. Sie können dieses Konto dann in den Einstellungen für mehr Sicherheit umbenennen.",
             "errors": {
                 "invalid_credentials": "Benutzername oder Passwort ist falsch."
             }
@@ -66,7 +66,9 @@
             "message": "Erstellen Sie Unterordner, um sie hier als Spalten zu sehen."
         },
         "actions": {
-            "open": "Kanban-Ansicht"
+            "enable": "Kanban-Ansicht aktivieren",
+            "disable": "Kanban-Ansicht deaktivieren",
+            "open": "Kanban-Ansicht öffnen"
         }
     },
     "folders": {
@@ -396,7 +398,7 @@
         "cards": {
             "theme_mode": "Thema",
             "login_display": "Login-Seiten-Titel",
-            "note_font_size": "Schriftgröße des Notizinhalts",
+            "note_font_size": "Schriftgröße",
             "note_sort_order": "Notizen-Sortierreihenfolge",
             "tasklist_insert_order": "Einfüge-Reihenfolge der Aufgaben",
             "timezone": "Zeitzone",
@@ -653,6 +655,10 @@
             "description": "Legen Sie den Namen fest, der auf dem Login-Bildschirm angezeigt wird.",
             "placeholder": "Anzeigename"
         },
+        "theme": {
+            "title": "Themenauswahl",
+            "description": "Wählen Sie Ihr bevorzugtes Thema:"
+        },
         "language": {
             "description": "Wählen Sie Ihre bevorzugte Sprache:"
         },
@@ -660,15 +666,14 @@
             "placeholder": "Text eingeben"
         },
         "font_size": {
-            "title": "Schriftgröße des Notizinhalts",
-            "description": "Wählen Sie die Standardschriftgröße für Ihre Notizen:",
+            "title": "Schriftgröße",
             "label": "Schriftgröße (px):",
             "default_value": "{{size}} px ist der Standardwert",
             "preview": "Dies ist ein Vorschaubtext"
         },
         "note_width": {
             "title": "Breite des Notizinhalts",
-            "description": "Wählen Sie die maximale Breite für Ihren Notizinhalt:",
+            "description": "Wählen Sie die maximale Breite für Ihren Notizinhalt (in Pixel):",
             "label": "Maximale Breite (px):",
             "full_width": "Volle Breite",
             "default_value": "{{width}} px ist der Standardwert"
@@ -736,9 +741,22 @@
             "folder": {
                 "title": "Ordner"
             },
+            "kanban": {
+                "title": "Kanban-Struktur"
+            },
             "workspace": {
                 "title": "Arbeitsbereich"
             }
+        },
+        "kanban_structure": {
+            "title": "Kanban-Struktur erstellen",
+            "folder_name_label": "Ordnername:",
+            "folder_name_placeholder": "Mein Kanban-Board",
+            "columns_label": "Anzahl der Spalten (1-10):",
+            "error_name_required": "Ordnername ist erforderlich",
+            "error_columns_range": "Die Anzahl der Spalten muss zwischen 1 und 10 liegen",
+            "error_create": "Fehler beim Erstellen der Kanban-Struktur",
+            "error_create_prefix": "Fehler beim Erstellen der Kanban-Struktur: {{error}}"
         },
         "folder_icon": {
             "title": "Ordnersymbol ändern",
@@ -826,6 +844,9 @@
             "public": "Geteilte",
             "attachments": "Anhänge"
         },
+        "favorites": {
+            "empty": "Noch keine Favoriten vorhanden."
+        },
         "drop_zone": {
             "remove_from_folder": "Hier ablegen, um aus Ordner zu entfernen"
         },
@@ -912,7 +933,8 @@
     "theme": {
         "badge": {
             "dark": "Dunkelmodus",
-            "light": "Hellmodus"
+            "light": "Hellmodus",
+            "system": "Systemmodus"
         }
     },
     "table": {
@@ -1081,7 +1103,7 @@
         "redirecting": "Weiterleitung...",
         "show_password": "Passwort anzeigen",
         "hide_password": "Passwort ausblenden",
-        "admin_warning": "Das Standard-Administratorkonto ist mit dem Benutzernamen <code>{{username}}</code> aktiv. Bitte melden Sie sich an und benennen Sie dieses Konto für mehr Sicherheit um.",
+        "admin_warning": "Bitte melden Sie sich mit dem Benutzernamen <code>{{username}}</code> und Ihrem Passwort (in .env gespeichert) an und benennen Sie dieses Konto in den Einstellungen für mehr Sicherheit um.",
         "fields": {
             "username": "Benutzername",
             "username_or_email": "Benutzername oder E-Mail",
@@ -1405,6 +1427,13 @@
     "public_folder": {
         "filter_placeholder": "Notizen suchen",
         "no_filter_results": "Keine Ergebnisse."
+    },
+    "kanban": {
+        "actions": {
+            "enable": "Kanban-Ansicht aktivieren",
+            "disable": "Kanban-Ansicht deaktivieren",
+            "open": "Kanban-Ansicht öffnen"
+        }
     },
     "icon_names": {
         "briefcase": "Aktentasche",

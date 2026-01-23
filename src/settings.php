@@ -96,7 +96,14 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
 
 $currentLang = getUserLanguage();
 $currentUser = getCurrentUser();
-$displayName = htmlspecialchars($currentUser['display_name'] ?: $currentUser['username']);
+$username = htmlspecialchars($currentUser['display_name'] ?: $currentUser['username']);
+
+// Get global login_display_name for page title
+require_once 'users/db_master.php';
+$login_display_name = getGlobalSetting('login_display_name', '');
+$pageTitle = ($login_display_name && trim($login_display_name) !== '') 
+    ? htmlspecialchars($login_display_name) 
+    : t_h('app.name');
 
 // Count workspaces
 $workspaces_count = 0;
@@ -130,7 +137,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-    <title><?php echo $displayName; ?> - <?php echo t_h('app.name'); ?></title>
+    <title><?php echo $pageTitle; ?></title>
     <meta name="color-scheme" content="dark light">
     <?php 
     $cache_v = @file_get_contents('version.txt');
@@ -149,6 +156,8 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
 <body data-txt-enabled="<?php echo t_h('common.enabled'); ?>"
       data-txt-disabled="<?php echo t_h('common.disabled'); ?>"
       data-txt-not-defined="<?php echo t_h('common.not_defined'); ?>"
+      data-txt-saved="<?php echo t_h('common.saved'); ?>"
+      data-txt-error="<?php echo t_h('common.error'); ?>"
       data-workspace="<?php echo htmlspecialchars(getWorkspaceFilter(), ENT_QUOTES, 'UTF-8'); ?>">
     <div class="settings-container">
         <?php 
@@ -203,7 +212,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                         <i class="fa-upload"></i>
                     </div>
                     <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.backup_export'); ?></h3>
+                        <h3><?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?></h3>
                     </div>
                 </div>
 
@@ -213,7 +222,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                         <i class="fa-download"></i>
                     </div>
                     <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.restore_import'); ?></h3>
+                        <h3><?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?></h3>
                     </div>
                 </div>
 
@@ -225,7 +234,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                         <span class="update-badge update-badge-hidden"></span>
                     </div>
                     <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.check_updates'); ?></h3>
+                        <h3><?php echo t_h('settings.cards.check_updates', [], 'Check for Updates'); ?></h3>
                     </div>
                 </div>
                 <?php endif; ?>
@@ -236,7 +245,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                         <i class="fa-code"></i>
                     </div>
                     <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.api_docs'); ?></h3>
+                        <h3><?php echo t_h('settings.cards.api_docs', [], 'API Documentation'); ?></h3>
                     </div>
                 </div>
 
@@ -246,7 +255,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                         <i class="fa-code-branch"></i>
                     </div>
                     <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.documentation'); ?></h3>
+                        <h3><?php echo t_h('settings.cards.documentation', [], 'Github Repository'); ?></h3>
                     </div>
                 </div>
 
@@ -256,7 +265,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                         <i class="fa-newspaper"></i>
                     </div>
                     <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.news'); ?></h3>
+                        <h3><?php echo t_h('settings.cards.news', [], 'Poznote Blog'); ?></h3>
                     </div>
                 </div>
 
@@ -266,7 +275,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                         <i class="fa-globe"></i>
                     </div>
                     <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.website'); ?></h3>
+                        <h3><?php echo t_h('settings.cards.website', [], 'Poznote Website'); ?></h3>
                     </div>
                 </div>
 
@@ -276,7 +285,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                         <i class="fa-heart heart-blink"></i>
                     </div>
                     <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.support'); ?></h3>
+                        <h3><?php echo t_h('settings.cards.support', [], 'Support Developer'); ?></h3>
                     </div>
                 </div>
             </div>
@@ -293,7 +302,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                         <i class="fa-user"></i>
                     </div>
                     <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.login_display'); ?> <span id="login-display-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
+                        <h3><?php echo t_h('display.cards.login_display', [], 'Login page title'); ?> <span id="login-display-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
                     </div>
                 </div>
                 <?php endif; ?>
@@ -314,7 +323,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                         <i class="fa fa-sun"></i>
                     </div>
                     <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.theme_mode'); ?> <span id="theme-mode-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
+                        <h3><?php echo t_h('display.cards.theme_mode', [], 'Theme'); ?> <span id="theme-mode-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
                     </div>
                 </div>
 
@@ -324,7 +333,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                         <i class="fa-text-height"></i>
                     </div>
                     <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.note_font_size'); ?> <span id="font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
+                        <h3><?php echo t_h('display.cards.note_font_size', [], 'Content font size'); ?> <span id="font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
                     </div>
                 </div>
 
@@ -332,7 +341,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                 <div class="settings-card" id="timezone-card">
                     <div class="settings-card-icon"><i class="fal fa-clock"></i></div>
                     <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.timezone'); ?> <span id="timezone-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
+                        <h3><?php echo t_h('display.cards.timezone', [], 'Timezone'); ?> <span id="timezone-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
                     </div>
                 </div>
 
@@ -340,7 +349,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                 <div class="settings-card" id="note-sort-card">
                     <div class="settings-card-icon"><i class="fa-sort-amount-down"></i></div>
                     <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.note_sort_order'); ?> <span id="note-sort-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
+                        <h3><?php echo t_h('display.cards.note_sort_order', [], 'Note sorting'); ?> <span id="note-sort-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
                     </div>
                 </div>
 
@@ -356,7 +365,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                 <div class="settings-card" id="show-created-card">
                     <div class="settings-card-icon"><i class="fa-calendar-alt"></i></div>
                     <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.show_note_created'); ?> <span id="show-created-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span></h3>
+                        <h3><?php echo t_h('display.cards.show_note_created', [], 'Show creation date'); ?> <span id="show-created-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span></h3>
                     </div>
                 </div>
 
@@ -364,7 +373,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                 <div class="settings-card" id="folder-counts-card">
                     <div class="settings-card-icon"><i class="fa-hashtag"></i></div>
                     <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.show_folder_counts'); ?> <span id="folder-counts-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span></h3>
+                        <h3><?php echo t_h('display.cards.show_folder_counts', [], 'Show folder note counts'); ?> <span id="folder-counts-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span></h3>
                     </div>
                 </div>
 
@@ -372,12 +381,12 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                 <div class="settings-card" id="notes-without-folders-card">
                     <div class="settings-card-icon"><i class="fa-folder-tree"></i></div>
                     <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.notes_without_folders_after'); ?> <span id="notes-without-folders-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span></h3>
+                        <h3><?php echo t_h('display.cards.notes_without_folders_after', [], 'Show notes after folders'); ?> <span id="notes-without-folders-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span></h3>
                     </div>
                 </div>
 
                 <!-- Note Width -->
-                <div class="settings-card" id="note-width-card">
+                <div class="settings-card desktop-only" id="note-width-card">
                     <div class="settings-card-icon"><i class="fa-arrows-h"></i></div>
                     <div class="settings-card-content">
                         <h3><?php echo t_h('display.cards.note_content_width', [], 'Note Content Width'); ?> <span id="note-width-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>

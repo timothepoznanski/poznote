@@ -134,32 +134,12 @@ if (isset($_GET['oidc_error'])) {
         </div>
 
         <?php 
-        // Display warning if default 'admin_change_me' user exists
-        $defaultAdminUsername = null;
-        try {
-            $profiles = getAllUserProfiles();
-            foreach ($profiles as $profile) {
-                if ($profile['username'] === 'admin_change_me') {
-                    $defaultAdminUsername = $profile['username'];
-                    break;
-                }
-            }
-        } catch (Exception $e) {}
-
-        if ($defaultAdminUsername): 
-        ?>
-        <div class="admin-warning" style="background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.875rem; text-align: left; line-height: 1.5;">
-            <?php echo t('login.admin_warning', ['username' => $defaultAdminUsername], 'The default administrator account is active with the username <code>' . htmlspecialchars($defaultAdminUsername) . '</code>. Please log in and rename this account for better security.', $currentLang ?? 'en'); ?>
-        </div>
-        <?php endif; ?>
-        
-        <?php 
         $showNormalLogin = !(function_exists('oidc_is_enabled') && oidc_is_enabled() && defined('OIDC_DISABLE_NORMAL_LOGIN') && OIDC_DISABLE_NORMAL_LOGIN);
         if ($showNormalLogin): 
         ?>
-        <div class="language-selector" style="margin-bottom: 2rem; text-align: center;">
+        <div class="language-selector">
             <form method="GET" id="lang-form">
-                <select name="lang" onchange="this.form.submit()" style="background: none; border: none; font-size: 0.85rem; color: var(--text-muted); cursor: pointer; opacity: 0.8; outline: none; transition: opacity 0.2s;">
+                <select name="lang" class="language-select" onchange="this.form.submit()">
                     <?php 
                     $langs = [
                         'en' => 'English',
@@ -177,7 +157,29 @@ if (isset($_GET['oidc_error'])) {
                 </select>
             </form>
         </div>
+        <?php endif; ?>
 
+        <?php 
+        // Display warning if default 'admin_change_me' user exists
+        $defaultAdminUsername = null;
+        try {
+            $profiles = getAllUserProfiles();
+            foreach ($profiles as $profile) {
+                if ($profile['username'] === 'admin_change_me') {
+                    $defaultAdminUsername = $profile['username'];
+                    break;
+                }
+            }
+        } catch (Exception $e) {}
+
+        if ($defaultAdminUsername): 
+        ?>
+        <div class="admin-warning">
+            <?php echo t('login.admin_warning', ['username' => $defaultAdminUsername], 'The default administrator account is active with the username <code>' . htmlspecialchars($defaultAdminUsername) . '</code>. Please log in and rename this account for better security.', $currentLang ?? 'en'); ?>
+        </div>
+        <?php endif; ?>
+        
+        <?php if ($showNormalLogin): ?>
         <form method="POST">
             <div class="form-group">
                 <input type="text" id="username" name="username" placeholder="<?php echo t_h('login.fields.username_or_email', [], 'Username or Email', $currentLang ?? 'en'); ?>" required autofocus autocomplete="username">

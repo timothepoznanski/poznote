@@ -437,10 +437,19 @@
             });
         }
 
-        // Theme mode card - calls toggleTheme from theme-manager.js
+        // Theme mode card - opens the theme selection modal
         var themeModeCard = document.getElementById('theme-mode-card');
-        if (themeModeCard && typeof window.toggleTheme === 'function') {
-            themeModeCard.addEventListener('click', window.toggleTheme);
+        if (themeModeCard) {
+            themeModeCard.addEventListener('click', function () {
+                var modal = document.getElementById('themeModal');
+                if (!modal) return;
+                var currentMode = (typeof window.getCurrentThemeMode === 'function') ? window.getCurrentThemeMode() : 'system';
+                var radios = document.getElementsByName('themeChoice');
+                for (var i = 0; i < radios.length; i++) {
+                    radios[i].checked = (radios[i].value === currentMode);
+                }
+                modal.style.display = 'flex';
+            });
         }
 
         // Login display card - calls showLoginDisplayNamePrompt from ui.js
@@ -516,11 +525,27 @@
                         try { closeModal('timezoneModal'); } catch (e) { }
                         refreshTimezoneBadge();
                         reloadOpener();
-                        alert(tr('display.timezone.alerts.updated_success', {}, 'Timezone updated successfully. Changes will take effect immediately.'));
                     } else {
                         alert(tr('display.timezone.alerts.update_error', {}, 'Error updating timezone'));
                     }
                 });
+            });
+        }
+
+        // Save theme modal button
+        var saveThemeBtn = document.getElementById('saveThemeModalBtn');
+        if (saveThemeBtn) {
+            saveThemeBtn.addEventListener('click', function () {
+                var radios = document.getElementsByName('themeChoice');
+                var selected = 'system';
+                for (var i = 0; i < radios.length; i++) {
+                    if (radios[i].checked) { selected = radios[i].value; break; }
+                }
+                if (typeof window.applyTheme === 'function') {
+                    window.applyTheme(selected, true);
+                    try { closeModal('themeModal'); } catch (e) { }
+                    reloadOpener();
+                }
             });
         }
 

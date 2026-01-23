@@ -29,6 +29,7 @@ class NotesController {
         $folderId = $_GET['folder_id'] ?? null;
         $getFolders = $_GET['get_folders'] ?? null;
         $sort = $_GET['sort'] ?? null;
+        $favorite = isset($_GET['favorite']) ? (int)$_GET['favorite'] : null;
         
         try {
             // Validate workspace if provided
@@ -64,6 +65,11 @@ class NotesController {
             if ($folderId) {
                 $sql .= " AND folder_id = ?";
                 $params[] = $folderId;
+            }
+
+            if ($favorite !== null) {
+                $sql .= " AND favorite = ?";
+                $params[] = $favorite;
             }
             
             // Handle sorting

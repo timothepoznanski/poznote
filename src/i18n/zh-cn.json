@@ -63,10 +63,12 @@
         "uncategorized": "在父文件夹中",
         "empty": {
             "title": "没有子文件夹",
-            "message": "创建子文件夹以在此处将其显示为列。"
+            "message": "创建子文件夹以在此处将它们显示为列。"
         },
         "actions": {
-            "open": "看板视图"
+            "enable": "启用看板视图",
+            "disable": "禁用看板视图",
+            "open": "打开看板视图"
         }
     },
     "folders": {
@@ -398,7 +400,7 @@
         "cards": {
             "theme_mode": "主题",
             "login_display": "登录页面标题",
-            "note_font_size": "笔记内容字体大小",
+            "note_font_size": "字体大小",
             "note_sort_order": "笔记排序规则",
             "tasklist_insert_order": "任务列表插入顺序",
             "timezone": "时区",
@@ -660,6 +662,10 @@
             "description": "设置在登录界面显示的名称。",
             "placeholder": "显示名称"
         },
+        "theme": {
+            "title": "主题选择",
+            "description": "选择您喜欢的主题："
+        },
         "language": {
             "description": "选择您的首选语言:"
         },
@@ -667,15 +673,14 @@
             "placeholder": "输入文本"
         },
         "font_size": {
-            "title": "笔记内容字体大小",
-            "description": "选择笔记的默认字体大小:",
+            "title": "字体大小",
             "label": "字体大小 (像素):",
             "default_value": "{{size}} 像素是默认值",
             "preview": "这是一段预览文本"
         },
         "note_width": {
             "title": "笔记内容宽度",
-            "description": "选择笔记内容的最大宽度：",
+            "description": "选择笔记内容的最大宽度（像素）：",
             "label": "最大宽度 (px)：",
             "full_width": "全宽",
             "default_value": "{{width}} px 是默认值"
@@ -752,9 +757,22 @@
             "folder": {
                 "title": "文件夹"
             },
+            "kanban": {
+                "title": "看板结构"
+            },
             "workspace": {
                 "title": "工作区"
             }
+        },
+        "kanban_structure": {
+            "title": "创建看板结构",
+            "folder_name_label": "文件夹名称：",
+            "folder_name_placeholder": "我的看板",
+            "columns_label": "列数 (1-10)：",
+            "error_name_required": "文件夹名称为必填项",
+            "error_columns_range": "列数必须在 1 到 10 之间",
+            "error_create": "创建看板结构失败",
+            "error_create_prefix": "创建看板结构时出错：{{error}}"
         },
         "folder_icon": {
             "title": "更改文件夹图标",
@@ -822,6 +840,9 @@
             "favorites": "收藏",
             "public": "共享",
             "attachments": "附件"
+        },
+        "favorites": {
+            "empty": "暂无收藏笔记。"
         },
         "drop_zone": {
             "remove_from_folder": "拖放到此处从文件夹中移除"
@@ -914,7 +935,8 @@
     "theme": {
         "badge": {
             "dark": "深色模式",
-            "light": "浅色模式"
+            "light": "浅色模式",
+            "system": "系统模式"
         }
     },
     "table": {
@@ -1089,7 +1111,7 @@
         "redirecting": "正在重定向...",
         "show_password": "显示密码",
         "hide_password": "隐藏密码",
-        "admin_warning": "默认管理员账户已激活，用户名为 <code>{{username}}</code>。为了安全起见，请登录并重命名此账户。",
+        "admin_warning": "请使用用户名 <code>{{username}}</code> 和您的密码（存储在 .env 中）登录，并在设置中重命名此帐户以提高安全性。",
         "fields": {
             "username": "用户名",
             "username_or_email": "用户名或邮箱",

@@ -6,11 +6,11 @@
 
 /* Responsive helpers: show/hide elements on mobile */
 .desktop-only {
-    display: block !important;
+    display: none !important;
 }
 
 .mobile-only {
-    display: none !important;
+    display: block !important;
 }
 
 /* Hide mobile elements on desktop */

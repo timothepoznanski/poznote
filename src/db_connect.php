@@ -217,6 +217,10 @@ try {
         if (!in_array('icon_color', $existingColumns)) {
             $con->exec("ALTER TABLE folders ADD COLUMN icon_color TEXT");
         }
+        // Add 'kanban_enabled' column if missing (for enabling Kanban view per folder)
+        if (!in_array('kanban_enabled', $existingColumns)) {
+            $con->exec("ALTER TABLE folders ADD COLUMN kanban_enabled INTEGER DEFAULT 0");
+        }
     } catch (Exception $e) {
         error_log('Could not add missing columns to folders: ' . $e->getMessage());
     }

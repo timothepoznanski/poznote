@@ -6,10 +6,10 @@
 }
 
 @font-face {
-  font-family: 'Inter';
-  src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
-  font-weight: 600;
-  font-style: normal;
+    font-family: 'Inter';
+    src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
 }
 
 html.tags-page {
@@ -38,13 +38,15 @@ html.tags-page {
 }
 
 .tags-header {
-    display: block;
-    margin: 0 auto;
     font-size: 1.8em;
     color: #333;
     font-weight: 500;
-    text-align: center;
-    flex: 1;
+    margin: 0;
+}
+
+.tags-actions {
+    display: flex;
+    gap: 10px;
 }
 
 /* Button styles matching trash.css */
@@ -123,7 +125,7 @@ html.tags-page {
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Classe pour masquer les tags lors du filtrage */
@@ -134,7 +136,7 @@ html.tags-page {
 .tag-item:hover {
     border-color: #007DB8;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .tag-name {
@@ -156,32 +158,41 @@ html.tags-page {
 
 /* Mobile styles */
 @media (max-width: 800px) {
+
     /* Adjust search input width for mobile */
     .tags-search-input {
         width: 90%;
     }
-    
+
     /* Adjust container padding for mobile */
     .tags-container {
         padding: 15px;
     }
-    
-    /* Adjust button container margins for mobile */
+
+    /* Adjust button container for mobile */
     .tags-buttons-container {
-        margin: 15px 10px;
-        gap: 10px;
+        flex-direction: column;
+        margin: 15px 10px 20px 10px;
+        gap: 15px;
+        text-align: center;
     }
-    
-    /* Adjust header font size for mobile */
+
+    /* Adjust header for mobile */
     .tags-header {
         font-size: 1.5em;
+        width: 100%;
     }
-    
+
+    .tags-actions {
+        width: 100%;
+        justify-content: center;
+    }
+
     /* Adjust grid for mobile */
     .tags-grid {
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
-    
+
     /* Make button text smaller on mobile */
     .btn {
         font-size: 13px;

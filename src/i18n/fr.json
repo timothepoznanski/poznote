@@ -66,7 +66,9 @@
             "message": "Créez des sous-dossiers pour les voir apparaître en colonnes ici."
         },
         "actions": {
-            "open": "Vue Kanban"
+            "enable": "Activer la vue Kanban",
+            "disable": "Désactiver la vue Kanban",
+            "open": "Ouvrir la vue Kanban"
         }
     },
     "folders": {
@@ -281,6 +283,13 @@
     },
     "settings": {
         "title": "Paramètres",
+        "password": {
+            "title": "Accès aux Paramètres",
+            "heading": "Accès Protégé",
+            "placeholder": "Entrez le mot de passe",
+            "submit": "Accéder aux Paramètres",
+            "cancel": "Retour à l'accueil"
+        },
         "sections": {
             "account_display": "Compte & Affichage",
             "notes_folders": "Notes & Dossiers",
@@ -398,7 +407,7 @@
         "cards": {
             "theme_mode": "Thème",
             "login_display": "Titre page de connexion",
-            "note_font_size": "Taille de police du contenu",
+            "note_font_size": "Taille de police",
             "note_sort_order": "Tri des notes",
             "tasklist_insert_order": "Ordre d'insertion des tâches",
             "timezone": "Fuseau horaire",
@@ -655,6 +664,10 @@
             "description": "Définissez le nom affiché sur l’écran de connexion.",
             "placeholder": "Nom affiché"
         },
+        "theme": {
+            "title": "Sélection du thème",
+            "description": "Choisissez votre thème préféré :"
+        },
         "language": {
             "description": "Sélectionnez votre langue préférée :"
         },
@@ -662,15 +675,14 @@
             "placeholder": "Saisir le texte"
         },
         "font_size": {
-            "title": "Taille de police du contenu",
-            "description": "Sélectionnez la taille de police par défaut pour vos notes :",
+            "title": "Taille de police",
             "label": "Taille (px) :",
             "default_value": "{{size}} px est la valeur par défaut",
             "preview": "Ceci est un texte d’aperçu"
         },
         "note_width": {
             "title": "Largeur du contenu de la note",
-            "description": "Sélectionnez la largeur maximale pour le contenu de vos notes :",
+            "description": "Sélectionnez la largeur maximale pour le contenu de vos notes (en pixels) :",
             "label": "Largeur maximale (px) :",
             "full_width": "Pleine largeur",
             "default_value": "{{width}} px est la valeur par défaut"
@@ -738,9 +750,22 @@
             "folder": {
                 "title": "Dossier"
             },
+            "kanban": {
+                "title": "Structure Kanban"
+            },
             "workspace": {
                 "title": "Espace de travail"
             }
+        },
+        "kanban_structure": {
+            "title": "Créer une structure Kanban",
+            "folder_name_label": "Nom du dossier :",
+            "folder_name_placeholder": "Mon tableau Kanban",
+            "columns_label": "Nombre de colonnes (1-10) :",
+            "error_name_required": "Le nom du dossier est requis",
+            "error_columns_range": "Le nombre de colonnes doit être entre 1 et 10",
+            "error_create": "Échec de la création de la structure Kanban",
+            "error_create_prefix": "Erreur lors de la création de la structure Kanban : {{error}}"
         },
         "folder_icon": {
             "title": "Changer l'icône du dossier",
@@ -828,6 +853,9 @@
             "public": "Partagées",
             "attachments": "Pièces jointes"
         },
+        "favorites": {
+            "empty": "Aucune note en favoris pour le moment."
+        },
         "drop_zone": {
             "remove_from_folder": "Déposez ici pour retirer du dossier"
         },
@@ -884,7 +912,16 @@
         "callout_tip": "Astuce",
         "callout_important": "Important",
         "callout_warning": "Avertissement",
-        "callout_caution": "Attention"
+        "callout_caution": "Attention",
+        "color": "Couleur",
+        "color_red": "Rouge",
+        "color_blue": "Bleu",
+        "color_green": "Vert",
+        "color_yellow": "Jaune",
+        "color_purple": "Violet",
+        "color_orange": "Orange",
+        "color_black": "Noir",
+        "bg_yellow": "Surlignage jaune"
     },
     "api": {
         "settings": {
@@ -919,7 +956,8 @@
     "theme": {
         "badge": {
             "dark": "mode sombre",
-            "light": "mode clair"
+            "light": "mode clair",
+            "system": "mode système"
         }
     },
     "table": {
@@ -1091,7 +1129,7 @@
         "redirecting": "Redirection...",
         "show_password": "Afficher le mot de passe",
         "hide_password": "Masquer le mot de passe",
-        "admin_warning": "Le compte administrateur par défaut a pour login <code>{{username}}</code>. Veuillez vous connecter et renommer ce compte pour plus de sécurité.",
+        "admin_warning": "Veuillez vous connecter avec le pseudo <code>{{username}}</code> et votre mot de passe (stocké dans le .env). Vous pourrez renommer ce compte dans les settings pour plus de sécurité.",
         "fields": {
             "username": "Nom d’utilisateur",
             "username_or_email": "Pseudo ou Email",

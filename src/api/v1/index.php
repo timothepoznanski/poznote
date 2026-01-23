@@ -333,6 +333,11 @@ $router->post('/folders/move-files', function($params) use ($foldersController) 
     $foldersController->moveFiles();
 });
 
+// Create a Kanban structure
+$router->post('/folders/kanban-structure', function($params) use ($foldersController) {
+    $foldersController->createKanbanStructure();
+});
+
 // List all folders
 $router->get('/folders', function($params) use ($foldersController) {
     $foldersController->index();
@@ -371,6 +376,11 @@ $router->post('/folders/{id}/empty', function($params) use ($foldersController) 
 // Update folder icon
 $router->put('/folders/{id}/icon', function($params) use ($foldersController) {
     $foldersController->updateIcon($params['id']);
+});
+
+// Toggle Kanban view for folder
+$router->put('/folders/{id}/kanban', function($params) use ($foldersController) {
+    $foldersController->toggleKanban($params['id']);
 });
 
 // Get note count in folder

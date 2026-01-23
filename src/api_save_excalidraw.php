@@ -162,13 +162,13 @@ if ($note_id > 0) {
         // Build style attribute
         $img_style = !empty($existing_img_style) ? ' style="' . htmlspecialchars($existing_img_style) . '"' : '';
         
-        $new_excalidraw_html = '<div class="excalidraw-container" contenteditable="false">';
+        $new_excalidraw_html = '<p><br></p><div class="excalidraw-container" contenteditable="false">';
         $new_excalidraw_html .= '<img src="data:' . $mime_type . ';base64,' . $base64_image . '" alt="Excalidraw diagram" class="' . $img_classes . '" data-is-excalidraw="true" data-excalidraw-note-id="' . $note_id . '"' . $img_style . ' />';
         $new_excalidraw_html .= '<div class="excalidraw-data" style="display: none;">' . htmlspecialchars($diagram_data, ENT_QUOTES) . '</div>';
         $new_excalidraw_html .= '</div><p><br></p>';
     } else {
         // If no image, create a placeholder with just the diagram data
-        $new_excalidraw_html = '<div class="excalidraw-container" contenteditable="false">';
+        $new_excalidraw_html = '<p><br></p><div class="excalidraw-container" contenteditable="false">';
         $new_excalidraw_html .= '<p style="text-align:center; padding: 40px; color: #999;">Excalidraw diagram</p>';
         $new_excalidraw_html .= '<div class="excalidraw-data" style="display: none;">' . htmlspecialchars($diagram_data, ENT_QUOTES) . '</div>';
         $new_excalidraw_html .= '</div><p><br></p>';
@@ -306,7 +306,7 @@ function saveEmbeddedDiagram() {
         }
         
         // Create the updated diagram HTML with embedded data and preview
-        $diagram_html = '<div class="excalidraw-container" id="' . htmlspecialchars($diagram_id) . '" 
+        $diagram_html = '<p><br></p><div class="excalidraw-container" id="' . htmlspecialchars($diagram_id) . '" 
                               style="padding: 10px; margin: 10px 0; cursor: pointer; text-align: center;" 
                               data-diagram-id="' . htmlspecialchars($diagram_id) . '"
                               data-excalidraw="' . htmlspecialchars($diagram_data) . '">';

@@ -483,7 +483,10 @@ class UserDataManager {
             $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $con->exec('PRAGMA busy_timeout = 5000');
             
-            $stmt = $con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('login_display_name', ?)");
+            // Use 'user_profile_username' instead of 'login_display_name' to avoid confusion
+            // login_display_name is a GLOBAL setting for the login page title
+            // user_profile_username is for disaster recovery of the user profile
+            $stmt = $con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('user_profile_username', ?)");
             return $stmt->execute([$username]);
         } catch (Exception $e) {
             error_log("Failed to sync username for user " . $this->userId . ": " . $e->getMessage());

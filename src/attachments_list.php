@@ -16,7 +16,12 @@ $currentLang = getUserLanguage();
 	<meta charset="utf-8"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-	<title><?php echo t_h('attachments.list.title', [], 'Notes with Attachments'); ?> - <?php echo t_h('app.name'); ?></title>
+	<?php
+	require_once 'users/db_master.php';
+	$login_display_name = getGlobalSetting('login_display_name', '');
+	$pageTitle = ($login_display_name && trim($login_display_name) !== '') ? htmlspecialchars($login_display_name) : t_h('app.name');
+	?>
+	<title><?php echo $pageTitle; ?></title>
 	<meta name="color-scheme" content="dark light">
 	<script src="js/theme-init.js"></script>
 	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
@@ -28,8 +33,6 @@ $currentLang = getUserLanguage();
 </head>
 <body class="shared-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>" data-txt-untitled="<?php echo t_h('common.untitled', [], 'Untitled'); ?>" data-txt-no-results="<?php echo t_h('attachments.list.no_filter_results', [], 'No results.'); ?>">
 	<div class="shared-container">
-		<h2 class="shared-header"><?php echo t_h('attachments.list.title', [], 'Notes with Attachments'); ?></h2>
-		
 		<div class="shared-buttons-container">
 			<button id="backToNotesBtn" class="btn btn-secondary">
 				<?php echo t_h('common.back_to_notes'); ?>
