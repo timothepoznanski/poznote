@@ -14,7 +14,6 @@
      * Initialization called either on DOMContentLoaded or manually when content is loaded via AJAX
      */
     function init() {
-        console.log("Kanban: Initializing delegated event listeners...");
         // Document-level delegation ensures listeners work even when content is replaced
         if (window._kanbanInitialized) {
             console.log("Kanban: Listeners already initialized on document.");
