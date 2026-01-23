@@ -930,7 +930,20 @@
         "notifications": {
             "activated_title": "Kanban view enabled",
             "activated_message": "This folder is now in Kanban mode. Click its icon to open the board."
+        },
+        "list": {
+            "filter_placeholder": "Filter by board name...",
+            "no_boards": "No Kanban boards yet.",
+            "hint": "Enable Kanban view on a folder to see it here."
         }
+    },
+    "home": {
+        "title": "Home",
+        "shared_notes": "Shared Notes",
+        "shared_folders": "Shared Folders",
+        "kanban": "Kanban",
+        "note": "note",
+        "notes": "notes"
     },
     "icon_names": {
         "briefcase": "briefcase",

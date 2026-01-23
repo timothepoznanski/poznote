@@ -144,6 +144,24 @@ try {
     $total_notes_count = 0;
 }
 
+// Count for Kanban boards
+$kanban_boards_count = 0;
+try {
+    if (isset($con)) {
+        $query = "SELECT COUNT(*) as cnt FROM folders WHERE kanban_enabled = 1";
+        $params = [];
+        if (!empty($pageWorkspace)) {
+            $query .= " AND workspace = ?";
+            $params[] = $pageWorkspace;
+        }
+        $stmtKanban = $con->prepare($query);
+        $stmtKanban->execute($params);
+        $kanban_boards_count = (int)$stmtKanban->fetchColumn();
+    }
+} catch (Exception $e) {
+    $kanban_boards_count = 0;
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
@@ -216,6 +234,19 @@ try {
                     <span class="home-card-count"><?php echo $favorites_count; ?></span>
                 </div>
             </a>
+
+            <?php if ($kanban_boards_count > 0): ?>
+            <!-- Kanban -->
+            <a href="list_kanban_boards.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('home.kanban', [], 'Kanban'); ?>">
+                <div class="home-card-icon home-card-icon-kanban">
+                    <i class="fa-columns"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('home.kanban', [], 'Kanban'); ?></span>
+                    <span class="home-card-count"><?php echo $kanban_boards_count; ?></span>
+                </div>
+            </a>
+            <?php endif; ?>
             
             <!-- Shared Notes -->
             <a href="shared.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('home.shared_notes', [], 'Shared Notes'); ?>">

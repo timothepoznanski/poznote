@@ -3495,6 +3495,7 @@ body.dark-mode .folder-header.folder-drop-target {
 
 .folder-icon[data-action='open-kanban-view']:hover {
     transform: scale(1.15);
+    color: #ef4444 !important;
 }
 
 .folder-note-count {
