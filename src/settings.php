@@ -386,7 +386,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                 </div>
 
                 <!-- Note Width -->
-                <div class="settings-card" id="note-width-card">
+                <div class="settings-card desktop-only" id="note-width-card">
                     <div class="settings-card-icon"><i class="fa-arrows-h"></i></div>
                     <div class="settings-card-content">
                         <h3><?php echo t_h('display.cards.note_content_width', [], 'Note Content Width'); ?> <span id="note-width-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>

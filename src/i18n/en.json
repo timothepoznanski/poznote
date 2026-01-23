@@ -68,7 +68,7 @@
         "cards": {
             "theme_mode": "Theme",
             "login_display": "Login page title",
-            "note_font_size": "Content font size",
+            "note_font_size": "Font size",
             "note_sort_order": "Note sorting",
             "tasklist_insert_order": "Task list insert order",
             "timezone": "Timezone",
@@ -154,15 +154,14 @@
             "placeholder": "Enter text"
         },
         "font_size": {
-            "title": "Note Content Font Size",
-            "description": "Select the default font size for your notes:",
+            "title": "Font Size",
             "label": "Font size (px):",
             "default_value": "{{size}} px is the Default value",
             "preview": "This is a preview text"
         },
         "note_width": {
             "title": "Note Content Width",
-            "description": "Select the maximum width for your notes content:",
+            "description": "Select the maximum width for your notes content (in pixels):",
             "label": "Maximum width (px):",
             "full_width": "Full Width",
             "default_value": "{{width}} px is the Default value"

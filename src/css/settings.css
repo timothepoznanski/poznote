@@ -59,6 +59,10 @@ body {
     .settings-two-columns {
         grid-template-columns: 1fr;
     }
+
+    #note-width-card {
+        display: none !important;
+    }
 }
 
 .settings-sep {

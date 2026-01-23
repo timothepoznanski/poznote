@@ -396,7 +396,7 @@
         "cards": {
             "theme_mode": "Tema",
             "login_display": "Título de página de inicio de sesión",
-            "note_font_size": "Tamaño de fuente del contenido de la nota",
+            "note_font_size": "Tamaño de fuente",
             "note_sort_order": "Orden de clasificación de notas",
             "tasklist_insert_order": "Orden de inserción de tareas",
             "timezone": "Zona horaria",
@@ -664,8 +664,7 @@
             "placeholder": "Ingresa texto"
         },
         "font_size": {
-            "title": "Tamaño de fuente del contenido de la nota",
-            "description": "Selecciona el tamaño de fuente predeterminado para tus notas:",
+            "title": "Tamaño de fuente",
             "label": "Tamaño de fuente (px):",
             "default_value": "{{size}} px es el valor predeterminado",
             "preview": "Este es un texto de vista previa"

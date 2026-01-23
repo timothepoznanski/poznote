@@ -407,7 +407,7 @@
         "cards": {
             "theme_mode": "Thème",
             "login_display": "Titre page de connexion",
-            "note_font_size": "Taille de police du contenu",
+            "note_font_size": "Taille de police",
             "note_sort_order": "Tri des notes",
             "tasklist_insert_order": "Ordre d'insertion des tâches",
             "timezone": "Fuseau horaire",
@@ -675,15 +675,14 @@
             "placeholder": "Saisir le texte"
         },
         "font_size": {
-            "title": "Taille de police du contenu",
-            "description": "Sélectionnez la taille de police par défaut pour vos notes :",
+            "title": "Taille de police",
             "label": "Taille (px) :",
             "default_value": "{{size}} px est la valeur par défaut",
             "preview": "Ceci est un texte d’aperçu"
         },
         "note_width": {
             "title": "Largeur du contenu de la note",
-            "description": "Sélectionnez la largeur maximale pour le contenu de vos notes :",
+            "description": "Sélectionnez la largeur maximale pour le contenu de vos notes (en pixels) :",
             "label": "Largeur maximale (px) :",
             "full_width": "Pleine largeur",
             "default_value": "{{width}} px est la valeur par défaut"

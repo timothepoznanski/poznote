@@ -398,7 +398,7 @@
         "cards": {
             "theme_mode": "Thema",
             "login_display": "Login-Seiten-Titel",
-            "note_font_size": "Schriftgröße des Notizinhalts",
+            "note_font_size": "Schriftgröße",
             "note_sort_order": "Notizen-Sortierreihenfolge",
             "tasklist_insert_order": "Einfüge-Reihenfolge der Aufgaben",
             "timezone": "Zeitzone",
@@ -666,15 +666,14 @@
             "placeholder": "Text eingeben"
         },
         "font_size": {
-            "title": "Schriftgröße des Notizinhalts",
-            "description": "Wählen Sie die Standardschriftgröße für Ihre Notizen:",
+            "title": "Schriftgröße",
             "label": "Schriftgröße (px):",
             "default_value": "{{size}} px ist der Standardwert",
             "preview": "Dies ist ein Vorschaubtext"
         },
         "note_width": {
             "title": "Breite des Notizinhalts",
-            "description": "Wählen Sie die maximale Breite für Ihren Notizinhalt:",
+            "description": "Wählen Sie die maximale Breite für Ihren Notizinhalt (in Pixel):",
             "label": "Maximale Breite (px):",
             "full_width": "Volle Breite",
             "default_value": "{{width}} px ist der Standardwert"

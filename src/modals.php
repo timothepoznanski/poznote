@@ -87,6 +87,7 @@
             <h3><?php echo t_h('modals.note_width.title', [], 'Note Content Width'); ?></h3>
         </div>
         <div class="modal-body">
+            <p><?php echo t_h('modals.note_width.description', [], 'Select the maximum width for your notes content (in pixels):'); ?></p>
             <div class="note-width-input-container">
                 <input type="number" id="noteWidthInput" min="0" max="2500" step="50" value="800" placeholder="800">
             </div>

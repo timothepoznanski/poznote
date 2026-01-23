@@ -46,13 +46,6 @@
     }
 }
 
-/* Hide Kanban View option on mobile */
-@media (max-width: 800px) {
-    .folder-actions-menu-item[data-action="open-kanban-view"] {
-        display: none !important;
-    }
-}
-
 /* Folder visibility: when not hidden, ensure folder headers and contents use block layout */
 .folder-header {
     display: block;

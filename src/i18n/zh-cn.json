@@ -400,7 +400,7 @@
         "cards": {
             "theme_mode": "主题",
             "login_display": "登录页面标题",
-            "note_font_size": "笔记内容字体大小",
+            "note_font_size": "字体大小",
             "note_sort_order": "笔记排序规则",
             "tasklist_insert_order": "任务列表插入顺序",
             "timezone": "时区",
@@ -673,15 +673,14 @@
             "placeholder": "输入文本"
         },
         "font_size": {
-            "title": "笔记内容字体大小",
-            "description": "选择笔记的默认字体大小:",
-            "label": "字体大小 (像素):",
+            "title": "字体大小",
+            "label": "字体大小 (像素):",,
             "default_value": "{{size}} 像素是默认值",
             "preview": "这是一段预览文本"
         },
         "note_width": {
             "title": "笔记内容宽度",
-            "description": "选择笔记内容的最大宽度：",
+            "description": "选择笔记内容的最大宽度（像素）：",
             "label": "最大宽度 (px)：",
             "full_width": "全宽",
             "default_value": "{{width}} px 是默认值"
