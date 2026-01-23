@@ -164,7 +164,16 @@
      * Move note to folder via API
      */
     async function moveNoteToFolder(noteId, folderId) {
-        const workspace = document.body.dataset.workspace;
+        // Get workspace from global function, body dataset, or URL
+        let workspace = '';
+        if (typeof window.getSelectedWorkspace === 'function') {
+            workspace = window.getSelectedWorkspace();
+        } else if (document.body.dataset.workspace) {
+            workspace = document.body.dataset.workspace;
+        } else {
+            const urlParams = new URLSearchParams(window.location.search);
+            workspace = urlParams.get('workspace') || '';
+        }
 
         try {
             const response = await fetch(`api/v1/notes/${noteId}`, {
@@ -216,10 +225,24 @@
                 if (card.classList.contains('dragging')) return;
 
                 const noteId = card.dataset.noteId;
-                const workspace = document.body.dataset.workspace;
+
+                // Get workspace from global function, body dataset, or URL
+                let workspace = '';
+                if (typeof window.getSelectedWorkspace === 'function') {
+                    workspace = window.getSelectedWorkspace();
+                } else if (document.body.dataset.workspace) {
+                    workspace = document.body.dataset.workspace;
+                } else {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    workspace = urlParams.get('workspace') || '';
+                }
 
                 // Navigate to the note
-                window.location.href = `index.php?workspace=${encodeURIComponent(workspace)}&note=${noteId}`;
+                let url = 'index.php?note=' + noteId;
+                if (workspace) {
+                    url += '&workspace=' + encodeURIComponent(workspace);
+                }
+                window.location.href = url;
             });
         });
     }
@@ -232,5 +255,9 @@
         console.error(message);
         // For now, just log - we could add a toast notification later
     }
+
+    // Expose functions globally for inline Kanban initialization
+    window.initKanbanDragDrop = setupDragAndDrop;
+    window.initKanbanCardClicks = setupCardClicks;
 
 })();

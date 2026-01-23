@@ -305,16 +305,24 @@
                     window.location.href = url;
                 }
                 break;
-            case 'open-kanban-view':
+            case 'open-kanban-view': {
+                e.preventDefault();
+                e.stopPropagation();
+                const kanbanFolderId = target.dataset.folderId;
+                const kanbanFolderName = target.dataset.folderName || '';
                 if (window.innerWidth <= 800) {
+                    // On mobile, open the separate page
+                    if (kanbanFolderId) {
+                        const workspace = window.selectedWorkspace || '';
+                        window.location.href = `kanban.php?folder_id=${kanbanFolderId}&workspace=${encodeURIComponent(workspace)}`;
+                    }
                     return;
                 }
-                const folderId = target.dataset.folderId;
-                if (folderId) {
-                    const workspace = window.selectedWorkspace || '';
-                    window.location.href = `kanban.php?folder_id=${folderId}&workspace=${encodeURIComponent(workspace)}`;
+                if (kanbanFolderId && typeof window.openKanbanView === 'function') {
+                    window.openKanbanView(parseInt(kanbanFolderId, 10), kanbanFolderName);
                 }
                 break;
+            }
         }
     }
 

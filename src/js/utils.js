@@ -2290,18 +2290,101 @@ function toggleKanbanView(folderId, enabled, folderName) {
 }
 
 /**
- * Open Kanban view for a folder
+ * Open Kanban view for a folder (inline in right column)
  * @param {number} folderId - The folder ID
  * @param {string} folderName - The folder name
  */
 function openKanbanView(folderId, folderName) {
     var workspace = getSelectedWorkspace();
-    var url = 'kanban.php?folder_id=' + folderId;
+    var rightCol = document.getElementById('right_col');
+
+    if (!rightCol) {
+        // Fallback to separate page if right_col not found
+        var url = 'kanban.php?folder_id=' + folderId;
+        if (workspace) {
+            url += '&workspace=' + encodeURIComponent(workspace);
+        }
+        window.location.href = url;
+        return;
+    }
+
+    // Store original content for restoration
+    if (!window._originalRightColContent) {
+        window._originalRightColContent = rightCol.innerHTML;
+    }
+
+    // Show loading state
+    rightCol.innerHTML = '<div class="kanban-loading" style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-secondary);"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-right: 12px;"></i> ' +
+        (window.t ? window.t('common.loading', null, 'Loading...') : 'Loading...') + '</div>';
+
+    // Build AJAX URL
+    var url = 'kanban_content.php?ajax=1&folder_id=' + folderId;
     if (workspace) {
         url += '&workspace=' + encodeURIComponent(workspace);
     }
-    window.location.href = url;
+
+    // Fetch Kanban content
+    fetch(url, {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: { 'Accept': 'text/html' }
+    })
+        .then(function (response) {
+            if (!response.ok) {
+                throw new Error('HTTP ' + response.status);
+            }
+            return response.text();
+        })
+        .then(function (html) {
+            rightCol.innerHTML = html;
+
+            // Mark that we're in Kanban view
+            window._isKanbanViewActive = true;
+            window._kanbanFolderId = folderId;
+
+            // Update URL without reload
+            var newUrl = 'index.php?kanban=' + folderId;
+            if (workspace) {
+                newUrl += '&workspace=' + encodeURIComponent(workspace);
+            }
+            history.pushState({ kanban: folderId }, '', newUrl);
+        })
+        .catch(function (error) {
+            console.error('Failed to load Kanban view:', error);
+            rightCol.innerHTML = '<div class="kanban-error" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-secondary);">' +
+                '<i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 16px; color: #f59e0b;"></i>' +
+                '<p>' + (window.t ? window.t('common.error', null, 'Error') : 'Error') + '</p>' +
+                '<button onclick="closeKanbanView()" class="btn btn-primary" style="margin-top: 16px;">' +
+                (window.t ? window.t('common.back_to_notes', null, 'Back to Notes') : 'Back to Notes') + '</button></div>';
+        });
 }
+
+/**
+ * Close Kanban view and restore normal content
+ */
+function closeKanbanView() {
+    var rightCol = document.getElementById('right_col');
+
+    if (window._originalRightColContent && rightCol) {
+        rightCol.innerHTML = window._originalRightColContent;
+        window._originalRightColContent = null;
+    }
+
+    window._isKanbanViewActive = false;
+    window._kanbanFolderId = null;
+
+    // Update URL back to normal
+    var workspace = getSelectedWorkspace();
+    var newUrl = 'index.php';
+    if (workspace) {
+        newUrl += '?workspace=' + encodeURIComponent(workspace);
+    }
+    history.pushState({}, '', newUrl);
+}
+
+// Expose closeKanbanView globally
+window.closeKanbanView = closeKanbanView;
+
 
 /**
  * Show the Kanban structure modal

@@ -1,0 +1,330 @@
+<?php
+/**
+ * Kanban Content - Generates only the HTML content for inline Kanban view
+ * This file is included via AJAX to display Kanban in the right column of index.php
+ */
+
+// Headers for AJAX
+if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
+    header('Content-Type: text/html; charset=utf-8');
+}
+
+// Enable error reporting but capture it to avoid breaking JSON/HTML structure if possible, 
+// though here we output HTML so it's fine.
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+try {
+    // 1. Authentication
+    if (!file_exists('auth.php')) {
+        throw new Exception('auth.php not found');
+    }
+    require 'auth.php';
+    
+    // Check authentication
+    if (!function_exists('requireAuth')) {
+        throw new Exception('requireAuth function not found');
+    }
+    requireAuth();
+    
+    // 2. Configuration and Includes
+    if (!file_exists('config.php')) throw new Exception('config.php not found');
+    require_once 'config.php';
+    
+    if (!file_exists('functions.php')) throw new Exception('functions.php not found');
+    include 'functions.php';
+    
+    if (file_exists('version_helper.php')) {
+        require_once 'version_helper.php';
+    }
+    
+    if (!file_exists('db_connect.php')) throw new Exception('db_connect.php not found');
+    include 'db_connect.php';
+    
+    // 3. Helper Functions Fallback
+    if (!function_exists('t')) {
+        function t($key, $params = [], $fallback = null) {
+            return $fallback ?? $key;
+        }
+    }
+    if (!function_exists('t_h')) {
+        function t_h($key, $params = [], $fallback = null) {
+            return htmlspecialchars(t($key, $params, $fallback), ENT_QUOTES, 'UTF-8');
+        }
+    }
+
+    // 4. Input Validation
+    $folder_id = intval($_GET['folder_id'] ?? 0);
+    $workspace_filter = $_GET['workspace'] ?? '';
+
+    if (!$folder_id) {
+        throw new Exception('Invalid folder ID');
+        exit;
+    }
+
+    if (!isset($con)) {
+       throw new Exception('Database connection not established ($con is null)');
+    }
+
+    // 5. Data Fetching
+    // Get parent folder info
+    $stmt = $con->prepare("SELECT id, name, parent_id, icon, icon_color FROM folders WHERE id = ?");
+    $stmt->execute([$folder_id]);
+    $parentFolder = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$parentFolder) {
+        throw new Exception('Folder not found');
+    }
+
+    // Get subfolders
+    $stmt = $con->prepare("SELECT id, name, parent_id, icon, icon_color FROM folders WHERE parent_id = ? ORDER BY name");
+    $stmt->execute([$folder_id]);
+    $subfolders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Get notes directly in parent folder (using 'entries' table and 'trash' column)
+    $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.updated DESC");
+    $stmt->execute([$folder_id]);
+    $parentNotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Load entry snippets for parent notes
+    foreach ($parentNotes as &$note) {
+        $filename = getEntryFilename($note['id'], $note['type'] ?? 'note');
+        if (file_exists($filename)) {
+            $content = file_get_contents($filename);
+            $note['entry'] = mb_substr(strip_tags($content), 0, 150);
+        } else {
+            $note['entry'] = '';
+        }
+    }
+    unset($note);
+
+    // Get notes for each subfolder
+    $subfolderNotes = [];
+    foreach ($subfolders as $subfolder) {
+        $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.updated DESC");
+        $stmt->execute([$subfolder['id']]);
+        $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Load entry snippets
+        foreach ($notes as &$note) {
+            $filename = getEntryFilename($note['id'], $note['type'] ?? 'note');
+            if (file_exists($filename)) {
+                $content = file_get_contents($filename);
+                $note['entry'] = mb_substr(strip_tags($content), 0, 150);
+            } else {
+                $note['entry'] = '';
+            }
+        }
+        unset($note);
+        
+        $subfolderNotes[$subfolder['id']] = $notes;
+    }
+
+    // 6. Output HTML
+    ?>
+    <div id="kanban-view-container" class="kanban-inline-view" data-folder-id="<?php echo $folder_id; ?>">
+        <!-- Kanban Header -->
+        <div class="kanban-inline-header">
+            <button type="button" class="kanban-back-btn" data-action="close-kanban-view">
+                <i class="fas fa-arrow-left"></i>
+                <span><?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?></span>
+            </button>
+            <h1 class="kanban-title">
+                <?php 
+                $pFolderIcon = $parentFolder['icon'] ?? 'fa-folder';
+                $pIconColor = $parentFolder['icon_color'] ?? '';
+                $pIconStyle = $pIconColor ? "style=\"color: {$pIconColor};\"" : '';
+                ?>
+                <i class="fas <?php echo htmlspecialchars($pFolderIcon); ?> folder-icon" 
+                   <?php echo $pIconStyle; ?> 
+                   data-action="open-folder-icon-picker" 
+                   data-folder-id="<?php echo $folder_id; ?>" 
+                   data-folder-name="<?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?>"
+                   style="cursor: pointer; <?php echo $pIconColor ? "color: {$pIconColor};" : ''; ?>"></i>
+                <span data-action="rename-folder" 
+                      data-folder-id="<?php echo $folder_id; ?>" 
+                      data-folder-name="<?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?>"
+                      style="cursor: pointer;"><?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?></span>
+            </h1>
+        </div>
+
+        <!-- Kanban Board -->
+        <div class="kanban-board" id="kanbanBoard">
+            
+            <?php if (!empty($parentNotes)): ?>
+            <!-- Column for notes directly in parent folder -->
+            <div class="kanban-column" data-folder-id="<?php echo $folder_id; ?>">
+                <div class="kanban-column-header">
+                    <div class="kanban-column-title">
+                        <i class="fas fa-inbox"></i>
+                        <span><?php echo t_h('kanban.uncategorized', [], 'Uncategorized'); ?></span>
+                    </div>
+                    <span class="kanban-column-count"><?php echo count($parentNotes); ?></span>
+                </div>
+                <div class="kanban-column-content" data-folder-id="<?php echo $folder_id; ?>">
+                    <?php foreach ($parentNotes as $note): ?>
+                    <div class="kanban-card" 
+                         data-note-id="<?php echo $note['id']; ?>" 
+                         data-folder-id="<?php echo $folder_id; ?>"
+                         draggable="true">
+                        <?php if (!empty($note['tags'])): ?>
+                        <div class="kanban-card-tags">
+                            <?php 
+                            $tags = explode(',', $note['tags']);
+                            foreach ($tags as $tag): 
+                                $tag = trim($tag);
+                                if ($tag === '') continue;
+                            ?>
+                                <span class="kanban-tag"><?php echo htmlspecialchars($tag, ENT_QUOTES); ?></span>
+                            <?php endforeach; ?>
+                        </div>
+                        <?php endif; ?>
+
+                        <div class="kanban-card-meta">
+                            <span class="kanban-card-date">
+                                <?php 
+                                $updated = $note['updated'] ?? '';
+                                if ($updated) {
+                                    $dt = new DateTime($updated);
+                                    echo $dt->format('d/m H:i');
+                                }
+                                ?>
+                            </span>
+                        </div>
+
+                        <div class="kanban-card-title">
+                            <?php 
+                            $noteTitle = $note['heading'] ?: t('index.note.new_note', [], 'New note');
+                            echo htmlspecialchars($noteTitle, ENT_QUOTES); 
+                            ?>
+                        </div>
+
+                        <div class="kanban-card-snippet">
+                            <?php 
+                            $snippet = strip_tags($note['entry'] ?? '');
+                            $snippet = html_entity_decode($snippet);
+                            echo htmlspecialchars(mb_substr($snippet, 0, 80) . (mb_strlen($snippet) > 80 ? '...' : ''), ENT_QUOTES);
+                            ?>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <?php foreach ($subfolders as $subfolder): ?>
+            <!-- Column for subfolder: <?php echo htmlspecialchars($subfolder['name']); ?> -->
+            <div class="kanban-column" data-folder-id="<?php echo $subfolder['id']; ?>">
+                <div class="kanban-column-header">
+                    <div class="kanban-column-title">
+                        <?php 
+                        $folderIcon = $subfolder['icon'] ?? 'fa-folder';
+                        $iconColor = $subfolder['icon_color'] ?? '';
+                        $iconStyle = $iconColor ? "style=\"color: {$iconColor};\"" : '';
+                        ?>
+                        <i class="fas <?php echo htmlspecialchars($folderIcon); ?> folder-icon" 
+                           <?php echo $iconStyle; ?> 
+                           data-action="open-folder-icon-picker" 
+                           data-folder-id="<?php echo $subfolder['id']; ?>" 
+                           data-folder-name="<?php echo htmlspecialchars($subfolder['name'], ENT_QUOTES); ?>"
+                           style="cursor: pointer; <?php echo $iconColor ? "color: {$iconColor};" : ''; ?>"></i>
+                        <span data-action="rename-folder" 
+                              data-folder-id="<?php echo $subfolder['id']; ?>" 
+                              data-folder-name="<?php echo htmlspecialchars($subfolder['name'], ENT_QUOTES); ?>"
+                              style="cursor: pointer;"><?php echo htmlspecialchars($subfolder['name'], ENT_QUOTES); ?></span>
+                    </div>
+                    <span class="kanban-column-count"><?php echo count($subfolderNotes[$subfolder['id']] ?? []); ?></span>
+                </div>
+                <div class="kanban-column-content" data-folder-id="<?php echo $subfolder['id']; ?>">
+                    <?php foreach ($subfolderNotes[$subfolder['id']] ?? [] as $note): ?>
+                    <div class="kanban-card" 
+                         data-note-id="<?php echo $note['id']; ?>" 
+                         data-folder-id="<?php echo $subfolder['id']; ?>"
+                         draggable="true">
+                        <?php if (!empty($note['tags'])): ?>
+                        <div class="kanban-card-tags">
+                            <?php 
+                            $tags = explode(',', $note['tags']);
+                            foreach ($tags as $tag): 
+                                $tag = trim($tag);
+                                if ($tag === '') continue;
+                            ?>
+                                <span class="kanban-tag"><?php echo htmlspecialchars($tag, ENT_QUOTES); ?></span>
+                            <?php endforeach; ?>
+                        </div>
+                        <?php endif; ?>
+
+                        <div class="kanban-card-meta">
+                            <span class="kanban-card-date">
+                                <?php 
+                                $updated = $note['updated'] ?? '';
+                                if ($updated) {
+                                    $dt = new DateTime($updated);
+                                    echo $dt->format('d/m H:i');
+                                }
+                                ?>
+                            </span>
+                        </div>
+
+                        <div class="kanban-card-title">
+                            <?php 
+                            $noteTitle = $note['heading'] ?: t('index.note.new_note', [], 'New note');
+                            echo htmlspecialchars($noteTitle, ENT_QUOTES); 
+                            ?>
+                        </div>
+
+                        <div class="kanban-card-snippet">
+                            <?php 
+                            $snippet = strip_tags($note['entry'] ?? '');
+                            $snippet = html_entity_decode($snippet);
+                            echo htmlspecialchars(mb_substr($snippet, 0, 80) . (mb_strlen($snippet) > 80 ? '...' : ''), ENT_QUOTES);
+                            ?>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endforeach; ?>
+
+            <?php if (empty($subfolders) && empty($parentNotes)): ?>
+            <!-- Empty state -->
+            <div class="kanban-empty-state">
+                <h2><?php echo t_h('kanban.empty.title', [], 'No subfolders yet'); ?></h2>
+                <p><?php echo t_h('kanban.empty.message', [], 'Create subfolders in this folder to use the Kanban view. Each subfolder will become a column.'); ?></p>
+            </div>
+            <?php endif; ?>
+
+        </div>
+    </div>
+    
+    <script>
+    // Initialize Kanban drag and drop for inline view
+    (function() {
+        if (typeof window.initKanbanDragDrop === 'function') {
+            window.initKanbanDragDrop();
+        }
+        
+        // Initialize card click handlers
+        if (typeof window.initKanbanCardClicks === 'function') {
+            window.initKanbanCardClicks();
+        }
+    })();
+    </script>
+    <?php
+
+} catch (Exception $e) {
+    // Graceful error handling in inline view
+    ?>
+    <div class="kanban-error" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-secondary, #64748b); padding: 40px; text-align: center;">
+        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px; color: #f59e0b;"></i>
+        <h2 style="font-size: 1.5rem; margin-bottom: 10px;"><?php echo t_h('common.error', [], 'Error'); ?></h2>
+        <p style="margin-bottom: 20px; color: var(--text-tertiary, #94a3b8); max-width: 400px;">
+            <?php echo htmlspecialchars($e->getMessage()); ?>
+        </p>
+        <button type="button" class="btn btn-primary" onclick="window.closeKanbanView ? window.closeKanbanView() : window.location.reload();">
+            <i class="fas fa-arrow-left"></i> <?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?>
+        </button>
+    </div>
+    <?php
+}
+?>

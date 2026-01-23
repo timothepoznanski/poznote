@@ -357,6 +357,14 @@
                     window.openKanbanView(folderId, folderName);
                 }
                 break;
+
+            case 'close-kanban-view':
+                event.preventDefault();
+                event.stopPropagation();
+                if (typeof window.closeKanbanView === 'function') {
+                    window.closeKanbanView();
+                }
+                break;
         }
     }
 
