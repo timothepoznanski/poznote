@@ -168,14 +168,8 @@ function saveFontSize() {
     });
 }
 
-// Function to apply font size to all note editors
+// Function to apply font size to all note editors and note list
 function applyFontSizeToNotes() {
-    // Apply to the current note editor if it exists
-    const noteEditor = document.querySelector('[contenteditable="true"]');
-    if (!noteEditor) {
-        return;
-    }
-    
     // Get the font size from settings
     fetch('/api/v1/settings/note_font_size', { 
         method: 'GET', 
@@ -189,8 +183,37 @@ function applyFontSizeToNotes() {
     })
     .then(function(data) {
         if (data && data.success && data.value) {
+            const fontSize = data.value;
+            
             // Apply font size to the note editor
-            noteEditor.style.fontSize = data.value + 'px';
+            const noteEditor = document.querySelector('[contenteditable="true"]');
+            if (noteEditor) {
+                noteEditor.style.fontSize = fontSize + 'px';
+            }
+            
+            // Apply font size to note list items
+            const noteListItems = document.querySelectorAll('.links_arbo_left .note-title');
+            noteListItems.forEach(function(item) {
+                item.style.fontSize = fontSize + 'px';
+            });
+            
+            // Apply font size to folder names
+            const folderNames = document.querySelectorAll('.folder-name');
+            folderNames.forEach(function(item) {
+                item.style.fontSize = fontSize + 'px';
+            });
+            
+            // Apply font size to checklist items
+            const checklistTexts = document.querySelectorAll('.checklist-text');
+            checklistTexts.forEach(function(item) {
+                item.style.fontSize = fontSize + 'px';
+            });
+            
+            // Apply font size to task list items (markdown format)
+            const taskListItems = document.querySelectorAll('.task-list-item, .task-text');
+            taskListItems.forEach(function(item) {
+                item.style.fontSize = fontSize + 'px';
+            });
         }
     })
     .catch(function(error) {
@@ -277,11 +300,50 @@ function initFontSizeSettings() {
 document.addEventListener('DOMContentLoaded', function() {
     initFontSizeSettings();
     applyStoredFontSize();
+    
+    // Set up a MutationObserver to watch for changes in the note list
+    const notesContainer = document.getElementById('left_col');
+    if (notesContainer) {
+        const observer = new MutationObserver(function(mutations) {
+            // Check if any mutations added new note list items, folders, or task lists
+            let hasNewNotes = false;
+            mutations.forEach(function(mutation) {
+                mutation.addedNodes.forEach(function(node) {
+                    if (node.nodeType === 1) { // Element node
+                        if (node.classList && (node.classList.contains('links_arbo_left') || 
+                            node.classList.contains('folder-name') ||
+                            node.classList.contains('checklist-text') ||
+                            node.classList.contains('task-list-item') ||
+                            node.querySelector && (node.querySelector('.links_arbo_left') || 
+                            node.querySelector('.folder-name') ||
+                            node.querySelector('.checklist-text') ||
+                            node.querySelector('.task-list-item')))) {
+                            hasNewNotes = true;
+                        }
+                    }
+                });
+            });
+            
+            if (hasNewNotes) {
+                // Apply font size to newly added notes, folders, and task lists
+                applyStoredFontSize();
+            }
+        });
+        
+        // Start observing
+        observer.observe(notesContainer, {
+            childList: true,
+            subtree: true
+        });
+    }
 });
 
 // Fallback initialization - sometimes DOMContentLoaded might have already fired
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    setTimeout(initFontSizeSettings, 500);
+    setTimeout(function() {
+        initFontSizeSettings();
+        applyStoredFontSize();
+    }, 500);
 }
 
 // Add event to apply font size when a note is loaded
