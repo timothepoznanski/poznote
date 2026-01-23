@@ -490,7 +490,6 @@
     <div class="modal-content">
         <h3><?php echo t_h('modals.theme.title', [], 'Theme Selection'); ?></h3>
         <div class="modal-body">
-            <p><?php echo t_h('modals.theme.description', [], 'Choose your preferred theme:'); ?></p>
             <div class="radio-options">
                 <label><input type="radio" name="themeChoice" value="light"> <?php echo t_h('theme.badge.light', [], 'Light'); ?></label>
                 <label><input type="radio" name="themeChoice" value="dark"> <?php echo t_h('theme.badge.dark', [], 'Dark'); ?></label>

@@ -134,26 +134,6 @@ if (isset($_GET['oidc_error'])) {
         </div>
 
         <?php 
-        // Display warning if default 'admin_change_me' user exists
-        $defaultAdminUsername = null;
-        try {
-            $profiles = getAllUserProfiles();
-            foreach ($profiles as $profile) {
-                if ($profile['username'] === 'admin_change_me') {
-                    $defaultAdminUsername = $profile['username'];
-                    break;
-                }
-            }
-        } catch (Exception $e) {}
-
-        if ($defaultAdminUsername): 
-        ?>
-        <div class="admin-warning">
-            <?php echo t('login.admin_warning', ['username' => $defaultAdminUsername], 'The default administrator account is active with the username <code>' . htmlspecialchars($defaultAdminUsername) . '</code>. Please log in and rename this account for better security.', $currentLang ?? 'en'); ?>
-        </div>
-        <?php endif; ?>
-        
-        <?php 
         $showNormalLogin = !(function_exists('oidc_is_enabled') && oidc_is_enabled() && defined('OIDC_DISABLE_NORMAL_LOGIN') && OIDC_DISABLE_NORMAL_LOGIN);
         if ($showNormalLogin): 
         ?>
@@ -177,7 +157,29 @@ if (isset($_GET['oidc_error'])) {
                 </select>
             </form>
         </div>
+        <?php endif; ?>
 
+        <?php 
+        // Display warning if default 'admin_change_me' user exists
+        $defaultAdminUsername = null;
+        try {
+            $profiles = getAllUserProfiles();
+            foreach ($profiles as $profile) {
+                if ($profile['username'] === 'admin_change_me') {
+                    $defaultAdminUsername = $profile['username'];
+                    break;
+                }
+            }
+        } catch (Exception $e) {}
+
+        if ($defaultAdminUsername): 
+        ?>
+        <div class="admin-warning">
+            <?php echo t('login.admin_warning', ['username' => $defaultAdminUsername], 'The default administrator account is active with the username <code>' . htmlspecialchars($defaultAdminUsername) . '</code>. Please log in and rename this account for better security.', $currentLang ?? 'en'); ?>
+        </div>
+        <?php endif; ?>
+        
+        <?php if ($showNormalLogin): ?>
         <form method="POST">
             <div class="form-group">
                 <input type="text" id="username" name="username" placeholder="<?php echo t_h('login.fields.username_or_email', [], 'Username or Email', $currentLang ?? 'en'); ?>" required autofocus autocomplete="username">
