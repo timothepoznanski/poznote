@@ -159,7 +159,25 @@ try {
         $kanban_boards_count = (int)$stmtKanban->fetchColumn();
     }
 } catch (Exception $e) {
-    $kanban_boards_count = 0;
+    $total_notes_count = 0;
+}
+
+// Count total folders
+$folder_count = 0;
+try {
+    if (isset($con)) {
+        $query = "SELECT COUNT(*) as cnt FROM folders";
+        $params = [];
+        if (!empty($pageWorkspace)) {
+            $query .= " WHERE workspace = ?";
+            $params[] = $pageWorkspace;
+        }
+        $stmtFolders = $con->prepare($query);
+        $stmtFolders->execute($params);
+        $folder_count = (int)$stmtFolders->fetchColumn();
+    }
+} catch (Exception $e) {
+    $folder_count = 0;
 }
 
 ?>
@@ -234,19 +252,17 @@ try {
                     <span class="home-card-count"><?php echo $favorites_count; ?></span>
                 </div>
             </a>
-
-            <?php if ($kanban_boards_count > 0): ?>
-            <!-- Kanban -->
-            <a href="list_kanban_boards.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('home.kanban', [], 'Kanban'); ?>">
+            
+            <!-- Folders -->
+            <a href="list_folders.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('home.folders', [], 'Folders'); ?>">
                 <div class="home-card-icon home-card-icon-kanban">
-                    <i class="fa-columns"></i>
+                    <i class="fa-folder-open"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('home.kanban', [], 'Kanban'); ?></span>
-                    <span class="home-card-count"><?php echo $kanban_boards_count; ?></span>
+                    <span class="home-card-title"><?php echo t_h('home.folders', [], 'Folders'); ?></span>
+                    <span class="home-card-count"><?php echo $folder_count; ?></span>
                 </div>
             </a>
-            <?php endif; ?>
             
             <!-- Shared Notes -->
             <a href="shared.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('home.shared_notes', [], 'Shared Notes'); ?>">

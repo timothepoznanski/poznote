@@ -335,26 +335,6 @@
                 }
                 break;
 
-            case 'toggle-kanban-view':
-                event.preventDefault();
-                event.stopPropagation();
-                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
-                var folderName = actionElement.getAttribute('data-folder-name');
-                // Get current state from data attribute (as string '0' or '1')
-                var currentEnabled = actionElement.getAttribute('data-kanban-enabled') === '1';
-                // Toggle to opposite state
-                var newEnabled = !currentEnabled;
-
-                if (typeof window.closeFolderActionsMenu === 'function') {
-                    window.closeFolderActionsMenu(folderId);
-                }
-
-                // Call global function to handle the API call and UI update
-                if (folderId && typeof window.toggleKanbanView === 'function') {
-                    window.toggleKanbanView(folderId, newEnabled, folderName);
-                }
-                break;
-
             case 'open-kanban-view':
                 event.preventDefault();
                 event.stopPropagation();
@@ -442,7 +422,12 @@
             favoritesHeader.classList.add('favorites-collapsed');
             if (favoritesToggleBtn) {
                 favoritesToggleBtn.classList.add('collapsed');
+                favoritesToggleBtn.classList.remove('favorites-expanded');
             }
+        } else if (favoritesHeader && favoritesToggleBtn) {
+            favoritesHeader.classList.remove('favorites-collapsed');
+            favoritesToggleBtn.classList.remove('collapsed');
+            favoritesToggleBtn.classList.add('favorites-expanded');
         }
 
         // Add direct event listener to favorites toggle button (in case delegation doesn't work)
@@ -462,6 +447,31 @@
         // Add double-click event listener with delegation
         document.addEventListener('dblclick', handleNotesListDblClick);
     }
+
+    /**
+     * Reinitialize favorites toggle button event listener
+     * Called after AJAX refresh of notes list
+     */
+    function reinitializeFavoritesToggle() {
+        var favoritesToggleBtn = document.querySelector('[data-action="toggle-favorites"]');
+        if (favoritesToggleBtn) {
+            // Remove old listener by cloning the element
+            var newBtn = favoritesToggleBtn.cloneNode(true);
+            favoritesToggleBtn.parentNode.replaceChild(newBtn, favoritesToggleBtn);
+            
+            // Add fresh event listener
+            newBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (typeof window.toggleFavorites === 'function') {
+                    window.toggleFavorites(this);
+                }
+            });
+        }
+    }
+
+    // Expose to window for use after AJAX refresh
+    window.reinitializeFavoritesToggle = reinitializeFavoritesToggle;
 
     // Initialize on DOMContentLoaded
     if (document.readyState === 'loading') {

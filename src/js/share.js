@@ -60,6 +60,11 @@ function refreshNotesListAfterFolderAction() {
                         restoreFolderStates();
                     }
 
+                    // Reinitialize favorites toggle button
+                    if (typeof window.reinitializeFavoritesToggle === 'function') {
+                        window.reinitializeFavoritesToggle();
+                    }
+
                     // Refresh Kanban view if it's currently active
                     if (typeof window.refreshKanbanView === 'function') {
                         window.refreshKanbanView();

@@ -201,7 +201,7 @@ function shouldFolderBeOpen($con, $folderId, $folderName, $is_search_mode, $fold
  * Génère les actions disponibles pour un dossier
  * OPTIMIZED: Uses cached shared folders data to avoid N+1 queries
  */
-function generateFolderActions($folderId, $folderName, $workspace_filter, $noteCount = 0, $kanbanEnabled = 0) {
+function generateFolderActions($folderId, $folderName, $workspace_filter, $noteCount = 0) {
     global $con;
     static $sharedFoldersCache = null;
     
@@ -243,19 +243,6 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
         $actions .= "<i class='fa-plus-circle'></i>";
         $actions .= "<span>" . t_h('notes_list.folder_actions.create', [], 'Create note') . "</span>";
         $actions .= "</div>";
-        
-        // Kanban view toggle action (enable/disable based on current state)
-        if ($kanbanEnabled) {
-            $actions .= "<div class='folder-actions-menu-item' data-action='toggle-kanban-view' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName' data-kanban-enabled='1'>";
-            $actions .= "<i class='fa-columns'></i>";
-            $actions .= "<span>" . t_h('kanban.actions.disable', [], 'Disable Kanban view') . "</span>";
-            $actions .= "</div>";
-        } else {
-            $actions .= "<div class='folder-actions-menu-item' data-action='toggle-kanban-view' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName' data-kanban-enabled='0'>";
-            $actions .= "<i class='fa-columns'></i>";
-            $actions .= "<span>" . t_h('kanban.actions.enable', [], 'Enable Kanban view') . "</span>";
-            $actions .= "</div>";
-        }
         
         // Move all files action (only if folder has notes)
         if ($noteCount > 0) {

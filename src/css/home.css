@@ -162,8 +162,11 @@ body.dark-mode .home-card-logout .home-card-icon {
     transition: color 0.15s ease;
 }
 
+.home-card:hover .home-card-icon-favorites i,
+.home-card:hover .home-card-icon-trash i,
+.home-card:hover .home-card-icon-shared i,
 .home-card:hover .home-card-icon-kanban i {
-    color: #ef4444 !important;
+    color: #0099e6 !important;
 }
 
 .home-card-content {

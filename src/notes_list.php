@@ -106,7 +106,6 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         // Check if folder has a custom icon and color
         $customIcon = isset($folderData['icon']) && !empty($folderData['icon']) ? $folderData['icon'] : null;
         $customIconColor = isset($folderData['icon_color']) && !empty($folderData['icon_color']) ? $folderData['icon_color'] : null;
-        $kanbanEnabled = isset($folderData['kanban_enabled']) && $folderData['kanban_enabled'] ? true : false;
 
         if ($customIcon) {
             // Use custom icon - don't toggle between open/closed
@@ -136,17 +135,11 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         if ($folderName === 'Favorites') {
             echo "<i class='fa-star-light folder-icon'></i>";
         } else {
-            // Add click action based on mode
+            // All folder icons open kanban view
             $iconStyle = $customIconColor ? " style='color: " . htmlspecialchars($customIconColor, ENT_QUOTES) . " !important;'" : "";
             $iconColorAttr = $customIconColor ? " data-icon-color='" . htmlspecialchars($customIconColor, ENT_QUOTES) . "'" : "";
             
-            if ($kanbanEnabled) {
-                // Kanban icon opens kanban view
-                echo "<i class='$chevron_icon folder-icon' data-custom-icon='" . ($customIcon ? 'true' : 'false') . "'$iconColorAttr data-action='open-kanban-view' data-folder-id='$folderId' data-folder-name='" . htmlspecialchars($folderName, ENT_QUOTES) . "' title='" . t_h('kanban.actions.open', [], 'Open Kanban view') . "'$iconStyle></i>";
-            } else {
-                // Regular icon opens icon picker
-                echo "<i class='$chevron_icon folder-icon' data-custom-icon='" . ($customIcon ? 'true' : 'false') . "'$iconColorAttr data-action='open-folder-icon-picker' data-folder-id='$folderId' data-folder-name='" . htmlspecialchars($folderName, ENT_QUOTES) . "' title='" . t_h('notes_list.folder_actions.change_icon', [], 'Change icon') . "'$iconStyle></i>";
-            }
+            echo "<i class='$chevron_icon folder-icon' data-custom-icon='" . ($customIcon ? 'true' : 'false') . "'$iconColorAttr data-action='open-kanban-view' data-folder-id='$folderId' data-folder-name='" . htmlspecialchars($folderName, ENT_QUOTES) . "' title='" . t_h('kanban.actions.open', [], 'Open Kanban view') . "'$iconStyle></i>";
         }
         
         // Workspace-aware folder handling in UI
@@ -164,8 +157,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         echo "<span class='folder-actions'>";
         
         // Generate folder actions
-        $kanbanEnabled = isset($folderData['kanban_enabled']) ? (int)$folderData['kanban_enabled'] : 0;
-        echo generateFolderActions($folderId, $folderName, $workspace_filter, $noteCount, $kanbanEnabled);
+        echo generateFolderActions($folderId, $folderName, $workspace_filter, $noteCount);
         
         echo "</span>";
         echo "</div>";
@@ -259,8 +251,8 @@ if ($favoritesFolder && $favorites_count > 0) {
     
     // Add separator with toggle button after favorites
     echo '<div class="favorites-separator">';
-    echo '<button type="button" class="favorites-toggle-btn" data-action="toggle-favorites" title="' . t_h('notes_list.favorites.toggle', [], 'Show/hide favorites') . '">';
-    echo '<i class="fas fa-chevron-up"></i>';
+    echo '<button type="button" class="favorites-toggle-btn favorites-expanded" data-action="toggle-favorites" title="' . t_h('notes_list.favorites.toggle', [], 'Show/hide favorites') . '">';
+    echo '<i class="fas fa-chevron-down"></i>';
     echo '</button>';
     echo '</div>';
 }
