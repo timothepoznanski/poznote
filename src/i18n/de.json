@@ -66,7 +66,9 @@
             "message": "Erstellen Sie Unterordner, um sie hier als Spalten zu sehen."
         },
         "actions": {
-            "open": "Kanban-Ansicht"
+            "enable": "Kanban-Ansicht aktivieren",
+            "disable": "Kanban-Ansicht deaktivieren",
+            "open": "Kanban-Ansicht öffnen"
         }
     },
     "folders": {
@@ -1413,6 +1415,13 @@
     "public_folder": {
         "filter_placeholder": "Notizen suchen",
         "no_filter_results": "Keine Ergebnisse."
+    },
+    "kanban": {
+        "actions": {
+            "enable": "Kanban-Ansicht aktivieren",
+            "disable": "Kanban-Ansicht deaktivieren",
+            "open": "Kanban-Ansicht öffnen"
+        }
     },
     "icon_names": {
         "briefcase": "Aktentasche",

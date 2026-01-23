@@ -891,6 +891,28 @@ body {
     font-size: 0.85em !important;
 }
 
+/* Kanban icon style */
+.folder-kanban-icon {
+    padding: 2px 4px;
+    cursor: pointer;
+    color: #6b7280;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.folder-kanban-icon:hover {
+    background: rgba(107, 114, 128, 0.1);
+    color: #0b4da6;
+}
+
+.folder-kanban-icon i,
+.folder-kanban-icon [class*="fa-"] {
+    font-size: 0.75em !important;
+}
+
 /* Dropdown menu for folder actions */
 .folder-actions-menu {
     position: absolute;

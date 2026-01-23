@@ -65,7 +65,9 @@
             "message": "Crie subpastas para vê-las como colunas aqui."
         },
         "actions": {
-            "open": "Visualização Kanban"
+            "enable": "Ativar visualização Kanban",
+            "disable": "Desativar visualização Kanban",
+            "open": "Abrir visualização Kanban"
         }
     },
     "folders": {

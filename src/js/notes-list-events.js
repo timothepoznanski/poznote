@@ -1,7 +1,7 @@
 // Notes list event delegation (CSP-compliant)
 // This file handles all click events for notes_list.php using event delegation
 
-(function() {
+(function () {
     'use strict';
 
     /**
@@ -11,17 +11,17 @@
         var searchContainer = document.getElementById('search-bar-container');
         var searchInput = document.getElementById('unified-search');
         if (!searchContainer) return;
-        
+
         var currentDisplay = window.getComputedStyle(searchContainer).display;
-        
+
         if (currentDisplay === 'none') {
             // Open search bar
             searchContainer.style.display = 'block';
             localStorage.setItem('searchBarVisible', 'true');
-            
+
             // Focus the search input
             if (searchInput) {
-                setTimeout(function() {
+                setTimeout(function () {
                     searchInput.focus();
                 }, 100);
             }
@@ -29,14 +29,14 @@
             // Close search bar
             searchContainer.style.display = 'none';
             localStorage.setItem('searchBarVisible', 'false');
-            
+
             // Clear search only if there's an active search
             if (window.isSearchMode && typeof window.clearUnifiedSearch === 'function') {
                 window.clearUnifiedSearch();
             }
         }
     }
-    
+
     // Expose toggleSearchBar globally
     window.toggleSearchBar = toggleSearchBar;
 
@@ -46,29 +46,29 @@
     function handleSearchTypeToggle(event) {
         var button = event.target.closest('.searchbar-type-btn');
         if (!button) return;
-        
+
         var searchType = button.getAttribute('data-search-type');
         if (!searchType) return;
-        
+
         // Delegate to SearchManager if available (handles both button state and search execution)
         if (window.searchManager && typeof window.searchManager.handleButtonClick === 'function') {
             window.searchManager.handleButtonClick(searchType, false); // false = desktop
             return;
         }
-        
+
         // Fallback: manual update if SearchManager not available
         // Update button states
         var allButtons = document.querySelectorAll('.searchbar-type-btn');
-        allButtons.forEach(function(btn) {
+        allButtons.forEach(function (btn) {
             btn.classList.remove('active');
         });
         button.classList.add('active');
-        
+
         // Update hidden fields
         var searchInNotes = document.getElementById('search-in-notes');
         var searchInTags = document.getElementById('search-in-tags');
         var searchInput = document.getElementById('unified-search');
-        
+
         if (searchType === 'notes') {
             if (searchInNotes) searchInNotes.value = '1';
             if (searchInTags) searchInTags.value = '';
@@ -78,7 +78,7 @@
             if (searchInTags) searchInTags.value = '1';
             if (searchInput) searchInput.placeholder = (window.t ? window.t('search.placeholder_tags', null, 'Search for one or more tags...') : 'Search for one or more tags...');
         }
-        
+
         // Focus the input
         if (searchInput) {
             searchInput.focus();
@@ -90,20 +90,20 @@
      */
     function handleNotesListClick(event) {
         var target = event.target;
-        
+
         // Find the closest element with a data-action attribute
         var actionElement = target.closest('[data-action]');
         if (!actionElement) return;
-        
+
         var action = actionElement.getAttribute('data-action');
-        
+
         // Skip if the action element is inside another action element (nested actions)
         // In that case, only handle the innermost action
         var parentAction = actionElement.parentElement ? actionElement.parentElement.closest('[data-action]') : null;
         if (parentAction && target.closest('[data-action]') !== actionElement) {
             return; // Let the innermost action handle it
         }
-        
+
         switch (action) {
             case 'toggle-search-bar':
                 event.preventDefault();
@@ -112,7 +112,7 @@
                     window.toggleSearchBar();
                 }
                 break;
-                
+
             case 'navigate-tags':
                 event.preventDefault();
                 event.stopPropagation();
@@ -121,7 +121,7 @@
                     window.location = tagsUrl;
                 }
                 break;
-                
+
             case 'toggle-favorites':
                 event.preventDefault();
                 event.stopPropagation();
@@ -129,7 +129,7 @@
                     window.toggleFolder('folder-favorites');
                 }
                 break;
-                
+
             case 'navigate-shared':
                 event.preventDefault();
                 event.stopPropagation();
@@ -138,7 +138,7 @@
                     window.location = sharedUrl;
                 }
                 break;
-                
+
             case 'toggle-system-menu':
                 event.preventDefault();
                 event.stopPropagation();
@@ -146,7 +146,7 @@
                     window.toggleSystemMenu();
                 }
                 break;
-                
+
             case 'navigate-trash':
                 event.preventDefault();
                 event.stopPropagation();
@@ -155,7 +155,7 @@
                     window.location = trashUrl;
                 }
                 break;
-                
+
             case 'navigate-attachments':
                 event.preventDefault();
                 event.stopPropagation();
@@ -164,7 +164,7 @@
                     window.location = attachmentsUrl;
                 }
                 break;
-                
+
             case 'clear-search':
                 event.preventDefault();
                 event.stopPropagation();
@@ -172,7 +172,7 @@
                     window.clearUnifiedSearch();
                 }
                 break;
-                
+
             case 'select-folder':
                 // Don't stop propagation here - let the parent handle it
                 var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
@@ -181,7 +181,7 @@
                     window.selectFolder(folderId, folderName, actionElement);
                 }
                 break;
-                
+
             case 'toggle-folder':
                 event.preventDefault();
                 event.stopPropagation();
@@ -190,7 +190,7 @@
                     window.toggleFolder(folderDomId);
                 }
                 break;
-                
+
             case 'open-folder-icon-picker':
                 event.preventDefault();
                 event.stopPropagation();
@@ -200,7 +200,7 @@
                     window.showChangeFolderIconModal(folderId, folderName);
                 }
                 break;
-                
+
             case 'load-note':
                 // Handle note loading via AJAX
                 var noteLink = actionElement.getAttribute('href');
@@ -212,7 +212,7 @@
                     }
                 }
                 break;
-                
+
             // Folder actions menu
             case 'toggle-folder-actions-menu':
                 event.preventDefault();
@@ -222,7 +222,7 @@
                     window.toggleFolderActionsMenu(folderId);
                 }
                 break;
-                
+
             case 'create-note-in-folder':
                 event.preventDefault();
                 event.stopPropagation();
@@ -235,7 +235,7 @@
                     window.showCreateNoteInFolderModal(folderId, folderName);
                 }
                 break;
-                
+
             case 'move-folder-files':
                 event.preventDefault();
                 event.stopPropagation();
@@ -248,7 +248,7 @@
                     window.showMoveFolderFilesDialog(folderId, folderName);
                 }
                 break;
-                
+
             case 'move-entire-folder':
                 event.preventDefault();
                 event.stopPropagation();
@@ -261,7 +261,7 @@
                     window.showMoveEntireFolderDialog(folderId, folderName);
                 }
                 break;
-                
+
             case 'download-folder':
                 event.preventDefault();
                 event.stopPropagation();
@@ -274,7 +274,7 @@
                     window.downloadFolder(folderId, folderName);
                 }
                 break;
-                
+
             case 'rename-folder':
                 event.preventDefault();
                 event.stopPropagation();
@@ -287,7 +287,7 @@
                     window.editFolderName(folderId, folderName);
                 }
                 break;
-                
+
             case 'delete-folder':
                 event.preventDefault();
                 event.stopPropagation();
@@ -300,7 +300,7 @@
                     window.deleteFolder(folderId, folderName);
                 }
                 break;
-                
+
             case 'change-folder-icon':
                 event.preventDefault();
                 event.stopPropagation();
@@ -313,7 +313,7 @@
                     window.showChangeFolderIconModal(folderId, folderName);
                 }
                 break;
-                
+
             case 'share-folder':
                 event.preventDefault();
                 event.stopPropagation();
@@ -326,6 +326,37 @@
                     window.openPublicFolderShareModal(folderId);
                 }
                 break;
+
+            case 'toggle-kanban-view':
+                event.preventDefault();
+                event.stopPropagation();
+                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
+                var folderName = actionElement.getAttribute('data-folder-name');
+                // Get current state from data attribute (as string '0' or '1')
+                var currentEnabled = actionElement.getAttribute('data-kanban-enabled') === '1';
+                // Toggle to opposite state
+                var newEnabled = !currentEnabled;
+
+                if (typeof window.closeFolderActionsMenu === 'function') {
+                    window.closeFolderActionsMenu(folderId);
+                }
+
+                // Call global function to handle the API call and UI update
+                if (folderId && typeof window.toggleKanbanView === 'function') {
+                    window.toggleKanbanView(folderId, newEnabled, folderName);
+                }
+                break;
+
+            case 'open-kanban-view':
+                event.preventDefault();
+                event.stopPropagation();
+                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
+                var folderName = actionElement.getAttribute('data-folder-name');
+
+                if (folderId && typeof window.openKanbanView === 'function') {
+                    window.openKanbanView(folderId, folderName);
+                }
+                break;
         }
     }
 
@@ -334,13 +365,13 @@
      */
     function handleNotesListDblClick(event) {
         var target = event.target;
-        
+
         // Find the closest element with a data-dblaction attribute
         var actionElement = target.closest('[data-dblaction]');
         if (!actionElement) return;
-        
+
         var action = actionElement.getAttribute('data-dblaction');
-        
+
         if (action === 'edit-folder-name') {
             var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
             var folderName = actionElement.getAttribute('data-folder-name');
@@ -359,13 +390,13 @@
         if (searchContainer) {
             searchContainer.style.display = 'block';
         }
-        
+
         // Initialize search type buttons state
         var searchInNotes = document.getElementById('search-in-notes');
         var searchInTags = document.getElementById('search-in-tags');
         var notesBtn = document.querySelector('.searchbar-type-notes');
         var tagsBtn = document.querySelector('.searchbar-type-tags');
-        
+
         if (searchInTags && searchInTags.value === '1') {
             if (notesBtn) notesBtn.classList.remove('active');
             if (tagsBtn) tagsBtn.classList.add('active');
@@ -373,23 +404,23 @@
             if (notesBtn) notesBtn.classList.add('active');
             if (tagsBtn) tagsBtn.classList.remove('active');
         }
-        
+
         // Add event listener for search type buttons
         var typeButtons = document.querySelectorAll('.searchbar-type-btn');
-        typeButtons.forEach(function(btn) {
+        typeButtons.forEach(function (btn) {
             btn.addEventListener('click', handleSearchTypeToggle);
         });
-        
+
         // Favorites are now always visible - force them open
         var favoritesFolder = document.getElementById('folder-favorites');
         if (favoritesFolder) {
             favoritesFolder.style.display = 'block';
             localStorage.setItem('folder_folder-favorites', 'open');
         }
-        
+
         // Add click event listener with delegation
         document.addEventListener('click', handleNotesListClick);
-        
+
         // Add double-click event listener with delegation
         document.addEventListener('dblclick', handleNotesListDblClick);
     }

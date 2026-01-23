@@ -63,10 +63,12 @@
         "uncategorized": "在父文件夹中",
         "empty": {
             "title": "没有子文件夹",
-            "message": "创建子文件夹以在此处将其显示为列。"
+            "message": "创建子文件夹以在此处将它们显示为列。"
         },
         "actions": {
-            "open": "看板视图"
+            "enable": "启用看板视图",
+            "disable": "禁用看板视图",
+            "open": "打开看板视图"
         }
     },
     "folders": {

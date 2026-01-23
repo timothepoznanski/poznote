@@ -2239,3 +2239,58 @@ function executeNoteConversion() {
     convertNoteId = null;
     convertNoteTarget = null;
 }
+
+/**
+ * Toggle Kanban view for a folder
+ * @param {number} folderId - The folder ID
+ * @param {boolean} enabled - Whether to enable or disable Kanban view
+ * @param {string} folderName - The folder name (for display)
+ */
+function toggleKanbanView(folderId, enabled, folderName) {
+    fetch('/api/v1/folders/' + folderId + '/kanban', {
+        method: 'PUT',
+        headers: { 
+            'Content-Type': 'application/json', 
+            'Accept': 'application/json' 
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({ enabled: enabled })
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data.success) {
+            // Reload page to update the folder display (no confirmation popup)
+            window.location.reload();
+        } else {
+            showNotificationPopup(
+                data.error || (window.t ? window.t('kanban.errors.toggle_failed', null, 'Failed to toggle Kanban view') : 'Failed to toggle Kanban view'),
+                'error'
+            );
+        }
+    })
+    .catch(function(error) {
+        console.error('Toggle Kanban error:', error);
+        showNotificationPopup(
+            window.t ? window.t('kanban.errors.toggle_failed', null, 'Failed to toggle Kanban view') : 'Failed to toggle Kanban view',
+            'error'
+        );
+    });
+}
+
+/**
+ * Open Kanban view for a folder
+ * @param {number} folderId - The folder ID
+ * @param {string} folderName - The folder name
+ */
+function openKanbanView(folderId, folderName) {
+    var workspace = getSelectedWorkspace();
+    var url = 'kanban.php?folder_id=' + folderId;
+    if (workspace) {
+        url += '&workspace=' + encodeURIComponent(workspace);
+    }
+    window.location.href = url;
+}
+
+// Export to window
+window.toggleKanbanView = toggleKanbanView;
+window.openKanbanView = openKanbanView;

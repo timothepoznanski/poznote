@@ -1536,4 +1536,41 @@ class FoldersController {
             $this->sendError('Database error', 500);
         }
     }
+    
+    /**
+     * PUT /api/v1/folders/{id}/kanban - Toggle Kanban view for folder
+     */
+    public function toggleKanban(string $id): void {
+        $folderId = (int)$id;
+        $data = $this->getInputData();
+        
+        if ($folderId <= 0) {
+            $this->sendError('Invalid folder ID', 400);
+            return;
+        }
+        
+        // Get the enabled state from request, default to toggle current state
+        if (isset($data['enabled'])) {
+            $enabled = (bool)$data['enabled'] ? 1 : 0;
+        } else {
+            // Toggle current state
+            $stmt = $this->db->prepare("SELECT kanban_enabled FROM folders WHERE id = ?");
+            $stmt->execute([$folderId]);
+            $current = $stmt->fetchColumn();
+            $enabled = $current ? 0 : 1;
+        }
+        
+        $stmt = $this->db->prepare("UPDATE folders SET kanban_enabled = ? WHERE id = ?");
+        $success = $stmt->execute([$enabled, $folderId]);
+        
+        if ($success) {
+            $this->sendJson([
+                'success' => true,
+                'message' => $enabled ? 'Kanban view enabled' : 'Kanban view disabled',
+                'kanban_enabled' => (bool)$enabled
+            ]);
+        } else {
+            $this->sendError('Database error', 500);
+        }
+    }
 }

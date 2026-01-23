@@ -909,6 +909,13 @@
         "filter_placeholder": "Search notes",
         "no_filter_results": "No results."
     },
+    "kanban": {
+        "actions": {
+            "enable": "Enable Kanban view",
+            "disable": "Disable Kanban view",
+            "open": "Open Kanban view"
+        }
+    },
     "icon_names": {
         "briefcase": "briefcase",
         "home": "home",
