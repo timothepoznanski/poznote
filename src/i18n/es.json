@@ -653,6 +653,10 @@
             "description": "Establece el nombre mostrado en la pantalla de inicio de sesión.",
             "placeholder": "Nombre de pantalla"
         },
+        "theme": {
+            "title": "Selección de tema",
+            "description": "Elija su tema preferido:"
+        },
         "language": {
             "description": "Selecciona tu idioma preferido:"
         },
@@ -912,7 +916,8 @@
     "theme": {
         "badge": {
             "dark": "modo oscuro",
-            "light": "modo claro"
+            "light": "modo claro",
+            "system": "modo sistema"
         }
     },
     "table": {

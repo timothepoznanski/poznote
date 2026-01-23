@@ -1,115 +1,137 @@
 /**
  * Theme Manager for Poznote
- * Handles dark mode / light mode switching
+ * Handles dark mode / light mode / system mode switching
  */
 
-(function() {
+(function () {
     'use strict';
 
     // Initialize theme on page load
     function initTheme() {
         var savedTheme = localStorage.getItem('poznote-theme');
-        if (!savedTheme) {
-            // Fallback to system preference if nothing saved
-            try {
-                savedTheme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
-            } catch (e) {
-                savedTheme = 'light';
-            }
+        var themeToApply = savedTheme;
+
+        if (!savedTheme || savedTheme === 'system') {
+            // Use system preference
+            themeToApply = getSystemTheme();
+
+            // Listen for system theme changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+                // Only re-apply if no manual preference is set
+                if (!localStorage.getItem('poznote-theme') || localStorage.getItem('poznote-theme') === 'system') {
+                    applyTheme('system', false);
+                }
+            });
         }
-        
-        // Check if theme was already applied by inline script to avoid duplication
-        var currentTheme = document.documentElement.getAttribute('data-theme');
-        if (currentTheme && currentTheme === savedTheme) {
-            // Theme already applied, just update UI elements
-            updateToggleButton(savedTheme);
-        } else {
-            // Apply theme if not already set or different
-            applyTheme(savedTheme);
+
+        // Apply theme
+        applyTheme(savedTheme || 'system', false);
+    }
+
+    // Get system theme preference
+    function getSystemTheme() {
+        try {
+            return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        } catch (e) {
+            return 'light';
         }
     }
 
     // Apply theme to document
-    function applyTheme(theme) {
+    // theme: 'light', 'dark', or 'system'
+    // save: boolean, whether to save to localStorage
+    function applyTheme(theme, save) {
         var root = document.documentElement;
-        var normalizedTheme = theme === 'dark' ? 'dark' : 'light';
-        
-        // Set data-theme on <html> for early CSS and keep legacy body class for compatibility
+        var themeToApply = theme;
+
+        if (theme === 'system') {
+            themeToApply = getSystemTheme();
+            if (save !== false) {
+                localStorage.removeItem('poznote-theme');
+            }
+        } else if (save !== false) {
+            localStorage.setItem('poznote-theme', theme);
+        }
+
+        var normalizedTheme = themeToApply === 'dark' ? 'dark' : 'light';
+
+        // Set data-theme on <html> for early CSS
         root.setAttribute('data-theme', normalizedTheme);
         root.style.colorScheme = normalizedTheme;
         root.style.backgroundColor = normalizedTheme === 'dark' ? '#1a1a1a' : '#ffffff';
-        
+
         // Manage body class for compatibility
         if (normalizedTheme === 'dark') {
             document.body.classList.add('dark-mode');
         } else {
             document.body.classList.remove('dark-mode');
         }
-        
-        // Save preference
-        localStorage.setItem('poznote-theme', normalizedTheme);
-        
-        // Update toggle button if it exists
-        updateToggleButton(normalizedTheme);
+
+        // Update toggle button/badge if it exists
+        // We pass the original theme (light, dark, or system) to update UI correctly
+        updateThemeUI(theme);
     }
 
-    // Toggle between light and dark mode
+    // Toggle between light and dark mode (Legacy support for old UI if needed)
     function toggleTheme() {
-        var currentTheme = localStorage.getItem('poznote-theme') || 'light';
-        var newTheme = currentTheme === 'light' ? 'dark' : 'light';
-        
-        // Force apply the new theme to ensure all elements are updated
-        applyTheme(newTheme);
-        
-        // Force a small delay and re-apply to ensure proper styling
-        setTimeout(function() {
-            applyTheme(newTheme);
-        }, 10);
+        var currentTheme = localStorage.getItem('poznote-theme') || 'system';
+        var newTheme;
+
+        if (currentTheme === 'system') {
+            // If currently system, toggle to the opposite of current system theme
+            newTheme = getSystemTheme() === 'light' ? 'dark' : 'light';
+        } else {
+            newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        }
+
+        applyTheme(newTheme, true);
     }
 
-    // Update toggle button appearance
-    function updateToggleButton(theme) {
+    // Update UI elements (badges, buttons) based on the SELECTED theme mode
+    function updateThemeUI(mode) {
         var badge = document.getElementById('theme-mode-badge');
         var icon = document.querySelector('#theme-mode-card .settings-card-icon i');
-        
+
+        var label = 'system';
+        if (mode === 'dark') label = 'dark';
+        if (mode === 'light') label = 'light';
+
         if (badge) {
-            if (theme === 'dark') {
-                badge.textContent = (window.t ? window.t('theme.badge.dark', null, 'dark mode') : 'dark mode');
-                badge.className = 'setting-status enabled';
-            } else {
-                badge.textContent = (window.t ? window.t('theme.badge.light', null, 'light mode') : 'light mode');
-                badge.className = 'setting-status enabled';
-            }
+            var translationKey = 'theme.badge.' + label;
+            var fallback = label + ' mode';
+            badge.textContent = (window.t ? window.t(translationKey, null, fallback) : fallback);
+            badge.className = 'setting-status enabled';
         }
-        
-        // Change icon: moon for dark mode, sun for light mode
+
+        // Change icon: moon for dark mode, sun for light mode, desktop for system
         if (icon) {
-            if (theme === 'dark') {
+            if (mode === 'dark') {
                 icon.className = 'fa fa-moon';
-            } else {
+            } else if (mode === 'light') {
                 icon.className = 'fa fa-sun';
+            } else {
+                icon.className = 'fa fa-desktop';
             }
         }
     }
 
     // When client-side i18n finishes loading, re-render the badge label
-    // (initial render may have used fallback English strings).
-    document.addEventListener('poznote:i18n:loaded', function() {
-        try {
-            updateToggleButton(getCurrentTheme());
-        } catch (e) {
-            // ignore
-        }
+    document.addEventListener('poznote:i18n:loaded', function () {
+        updateThemeUI(getCurrentThemeMode());
     });
 
-    // Get current theme
-    function getCurrentTheme() {
-        return localStorage.getItem('poznote-theme') || 'light';
+    // Get current theme mode (light, dark, or system)
+    function getCurrentThemeMode() {
+        return localStorage.getItem('poznote-theme') || 'system';
     }
 
     // Make functions globally available
     window.toggleTheme = toggleTheme;
-    window.getCurrentTheme = getCurrentTheme;
+    window.getCurrentTheme = function () {
+        var mode = getCurrentThemeMode();
+        return mode === 'system' ? getSystemTheme() : mode;
+    };
+    window.getCurrentThemeMode = getCurrentThemeMode;
     window.applyTheme = applyTheme;
 
     // Initialize theme when DOM is ready

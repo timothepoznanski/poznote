@@ -652,6 +652,10 @@
             "description": "Defina o nome mostrado na tela de login.",
             "placeholder": "Nome de exibição"
         },
+        "theme": {
+            "title": "Seleção de Tema",
+            "description": "Escolha o seu tema preferido:"
+        },
         "language": {
             "description": "Selecione seu idioma preferido:"
         },
@@ -916,7 +920,8 @@
     "theme": {
         "badge": {
             "dark": "modo escuro",
-            "light": "modo claro"
+            "light": "modo claro",
+            "system": "modo sistema"
         }
     },
     "table": {

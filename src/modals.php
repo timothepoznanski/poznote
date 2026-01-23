@@ -485,6 +485,25 @@
     </div>
 </div>
 
+<!-- Theme selection modal -->
+<div id="themeModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.theme.title', [], 'Theme Selection'); ?></h3>
+        <div class="modal-body">
+            <p><?php echo t_h('modals.theme.description', [], 'Choose your preferred theme:'); ?></p>
+            <div class="radio-options">
+                <label><input type="radio" name="themeChoice" value="light"> <?php echo t_h('theme.badge.light', [], 'Light'); ?></label>
+                <label><input type="radio" name="themeChoice" value="dark"> <?php echo t_h('theme.badge.dark', [], 'Dark'); ?></label>
+                <label><input type="radio" name="themeChoice" value="system"> <?php echo t_h('theme.badge.system', [], 'System'); ?></label>
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="themeModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveThemeModalBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Timezone modal -->
 <div id="timezoneModal" class="modal">
     <div class="modal-content">

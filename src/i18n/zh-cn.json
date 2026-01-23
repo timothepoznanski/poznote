@@ -660,6 +660,10 @@
             "description": "设置在登录界面显示的名称。",
             "placeholder": "显示名称"
         },
+        "theme": {
+            "title": "主题选择",
+            "description": "选择您喜欢的主题："
+        },
         "language": {
             "description": "选择您的首选语言:"
         },
@@ -914,7 +918,8 @@
     "theme": {
         "badge": {
             "dark": "深色模式",
-            "light": "浅色模式"
+            "light": "浅色模式",
+            "system": "系统模式"
         }
     },
     "table": {

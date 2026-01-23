@@ -653,6 +653,10 @@
             "description": "Legen Sie den Namen fest, der auf dem Login-Bildschirm angezeigt wird.",
             "placeholder": "Anzeigename"
         },
+        "theme": {
+            "title": "Themenauswahl",
+            "description": "Wählen Sie Ihr bevorzugtes Thema:"
+        },
         "language": {
             "description": "Wählen Sie Ihre bevorzugte Sprache:"
         },
@@ -912,7 +916,8 @@
     "theme": {
         "badge": {
             "dark": "Dunkelmodus",
-            "light": "Hellmodus"
+            "light": "Hellmodus",
+            "system": "Systemmodus"
         }
     },
     "table": {

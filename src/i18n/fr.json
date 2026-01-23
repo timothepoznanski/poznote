@@ -655,6 +655,10 @@
             "description": "Définissez le nom affiché sur l’écran de connexion.",
             "placeholder": "Nom affiché"
         },
+        "theme": {
+            "title": "Sélection du thème",
+            "description": "Choisissez votre thème préféré :"
+        },
         "language": {
             "description": "Sélectionnez votre langue préférée :"
         },
@@ -928,7 +932,8 @@
     "theme": {
         "badge": {
             "dark": "mode sombre",
-            "light": "mode clair"
+            "light": "mode clair",
+            "system": "mode système"
         }
     },
     "table": {
