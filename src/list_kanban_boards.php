@@ -84,8 +84,6 @@ $currentLang = getUserLanguage();
 			</button>
 		</div>
 		
-		<h1 class="shared-header"><?php echo t_h('home.kanban_boards', [], 'Kanban Boards'); ?></h1>
-
 		<div class="shared-filter-bar">
 			<div class="filter-input-wrapper">
 				<input 
