@@ -16,6 +16,7 @@
         "not_defined": "Not defined",
         "loading": "Loading...",
         "back_to_notes": "Back to Notes",
+        "back_to_settings": "Back to Settings",
         "back": "Back",
         "error": "Error",
         "success": "Success",
@@ -25,6 +26,68 @@
         "important": "Important",
         "note": "Note",
         "apply": "Apply"
+    },
+    "settings": {
+        "title": "Settings",
+        "password": {
+            "title": "Settings Access",
+            "heading": "Settings Protected",
+            "placeholder": "Enter password",
+            "submit": "Access Settings",
+            "cancel": "Back to Home"
+        },
+        "cards": {
+            "workspaces": "Workspaces",
+            "user_management": "User Management",
+            "backup_export": "Backup / Export",
+            "restore_import": "Restore / Import",
+            "check_updates": "Check for Updates",
+            "api_docs": "API Documentation",
+            "documentation": "Github Repository",
+            "news": "Poznote Blog",
+            "website": "Poznote Website",
+            "support": "Support Developer",
+            "release_notes": "Release Notes"
+        },
+        "language": {
+            "label": "Language",
+            "english": "English",
+            "french": "French",
+            "spanish": "Spanish",
+            "portuguese": "Portuguese",
+            "german": "German",
+            "chinese_simplified": "Chinese Simplified",
+            "login_page": "Login page language:",
+            "saved": "Language saved",
+            "save_error": "Could not save language",
+            "reload_hint": "Reloading..."
+        }
+    },
+    "display": {
+        "title": "Display",
+        "cards": {
+            "theme_mode": "Theme",
+            "login_display": "Login page title",
+            "note_font_size": "Content font size",
+            "note_sort_order": "Note sorting",
+            "tasklist_insert_order": "Task list insert order",
+            "timezone": "Timezone",
+            "show_note_created": "Show creation date",
+            "show_folder_counts": "Show folder note counts",
+            "notes_without_folders_after": "Show notes after folders",
+            "show_folder_actions": "Show folder actions",
+            "note_content_width": "Note content width"
+        }
+    },
+    "tasklist": {
+        "input_placeholder": "Write a new task and press Enter to add to list...",
+        "drag_to_reorder": "Drag to reorder",
+        "add_to_top": "Add new tasks to top",
+        "add_to_bottom": "Add new tasks to bottom",
+        "insert_order_top": "Top",
+        "insert_order_bottom": "Bottom",
+        "clear_completed": "Clear completed tasks",
+        "no_completed_tasks": "No completed tasks to clear."
     },
     "download": "Download",
     "convert": "Convert",
@@ -84,6 +147,7 @@
             "description": "Choose your preferred theme:"
         },
         "language": {
+            "title": "Language Selection",
             "description": "Select your preferred language:"
         },
         "input": {

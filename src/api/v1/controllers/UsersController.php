@@ -274,7 +274,7 @@ class UsersController {
                         $username = 'user_' . $userId;
                         
                         // Try to recover original username from local DB settings
-                        $recoverStmt = $userCon->prepare("SELECT value FROM settings WHERE key = 'login_display_name' LIMIT 1");
+                        $recoverStmt = $userCon->prepare("SELECT value FROM settings WHERE key = 'user_profile_username' LIMIT 1");
                         $recoverStmt->execute();
                         $savedName = $recoverStmt->fetchColumn();
                         if ($savedName) {

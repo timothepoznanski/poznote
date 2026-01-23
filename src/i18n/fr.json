@@ -281,6 +281,13 @@
     },
     "settings": {
         "title": "Paramètres",
+        "password": {
+            "title": "Accès aux Paramètres",
+            "heading": "Accès Protégé",
+            "placeholder": "Entrez le mot de passe",
+            "submit": "Accéder aux Paramètres",
+            "cancel": "Retour à l'accueil"
+        },
         "sections": {
             "account_display": "Compte & Affichage",
             "notes_folders": "Notes & Dossiers",

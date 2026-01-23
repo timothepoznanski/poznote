@@ -331,7 +331,12 @@ function createBackup() {
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES); ?>">
 <head>
-    <title><?php echo t_h('backup_export.page.title'); ?> - <?php echo t_h('app.name'); ?></title>
+    <?php
+    require_once 'users/db_master.php';
+    $login_display_name = getGlobalSetting('login_display_name', '');
+    $pageTitle = ($login_display_name && trim($login_display_name) !== '') ? htmlspecialchars($login_display_name) : t_h('app.name');
+    ?>
+    <title><?php echo $pageTitle; ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
     <script src="js/theme-init.js"></script>

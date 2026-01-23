@@ -81,13 +81,11 @@ $using_unified_search = handleUnifiedSearch();
 
 // Workspace filter already initialized above
 
-// Load login display name for page title
+// Load login display name for page title from global settings
 $login_display_name = '';
 try {
-    $stmt = $con->prepare("SELECT value FROM settings WHERE key = ?");
-    $stmt->execute(['login_display_name']);
-    $login_display_name = $stmt->fetchColumn();
-    if ($login_display_name === false) $login_display_name = '';
+    require_once 'users/db_master.php';
+    $login_display_name = getGlobalSetting('login_display_name', '');
 } catch (Exception $e) {
     $login_display_name = '';
 }
