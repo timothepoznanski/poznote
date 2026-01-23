@@ -1098,7 +1098,7 @@
         "redirecting": "Redirecting...",
         "show_password": "Show password",
         "hide_password": "Hide password",
-        "admin_warning": "The default administrator account is active with the username <code>{{username}}</code>. Please log in and rename this account for better security.",
+        "admin_warning": "Please log in with the username <code>{{username}}</code> and your password (stored in .env). You can then rename this account in settings for better security.",
         "fields": {
             "username": "Username",
             "username_or_email": "Username or Email",

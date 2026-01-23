@@ -148,7 +148,7 @@ if (isset($_GET['oidc_error'])) {
 
         if ($defaultAdminUsername): 
         ?>
-        <div class="admin-warning" style="background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.875rem; text-align: left; line-height: 1.5;">
+        <div class="admin-warning">
             <?php echo t('login.admin_warning', ['username' => $defaultAdminUsername], 'The default administrator account is active with the username <code>' . htmlspecialchars($defaultAdminUsername) . '</code>. Please log in and rename this account for better security.', $currentLang ?? 'en'); ?>
         </div>
         <?php endif; ?>
@@ -157,9 +157,9 @@ if (isset($_GET['oidc_error'])) {
         $showNormalLogin = !(function_exists('oidc_is_enabled') && oidc_is_enabled() && defined('OIDC_DISABLE_NORMAL_LOGIN') && OIDC_DISABLE_NORMAL_LOGIN);
         if ($showNormalLogin): 
         ?>
-        <div class="language-selector" style="margin-bottom: 2rem; text-align: center;">
+        <div class="language-selector">
             <form method="GET" id="lang-form">
-                <select name="lang" onchange="this.form.submit()" style="background: none; border: none; font-size: 0.85rem; color: var(--text-muted); cursor: pointer; opacity: 0.8; outline: none; transition: opacity 0.2s;">
+                <select name="lang" class="language-select" onchange="this.form.submit()">
                     <?php 
                     $langs = [
                         'en' => 'English',

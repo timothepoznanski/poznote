@@ -1100,7 +1100,7 @@
         "redirecting": "Redirection...",
         "show_password": "Afficher le mot de passe",
         "hide_password": "Masquer le mot de passe",
-        "admin_warning": "Le compte administrateur par défaut a pour login <code>{{username}}</code>. Veuillez vous connecter et renommer ce compte pour plus de sécurité.",
+        "admin_warning": "Veuillez vous connecter avec le pseudo <code>{{username}}</code> et votre mot de passe (stocké dans le .env). Vous pourrez renommer ce compte dans les settings pour plus de sécurité.",
         "fields": {
             "username": "Nom d’utilisateur",
             "username_or_email": "Pseudo ou Email",

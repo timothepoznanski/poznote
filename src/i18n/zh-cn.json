@@ -1089,7 +1089,7 @@
         "redirecting": "正在重定向...",
         "show_password": "显示密码",
         "hide_password": "隐藏密码",
-        "admin_warning": "默认管理员账户已激活，用户名为 <code>{{username}}</code>。为了安全起见，请登录并重命名此账户。",
+        "admin_warning": "请使用用户名 <code>{{username}}</code> 和您的密码（存储在 .env 中）登录，并在设置中重命名此帐户以提高安全性。",
         "fields": {
             "username": "用户名",
             "username_or_email": "用户名或邮箱",

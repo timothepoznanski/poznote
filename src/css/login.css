@@ -14,6 +14,10 @@
     src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
 }
 
+:root {
+    --text-muted: #4a5568;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -204,6 +208,26 @@ input[type="password"]::placeholder {
     text-align: left;
 }
 
+.admin-warning {
+    background: #fff5f5;
+    border: 1px solid #feb2b2;
+    color: #c53030;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    text-align: left;
+    line-height: 1.5;
+}
+
+.admin-warning code {
+    background: #fed7d7;
+    color: #c53030;
+    padding: 0.125rem 0.25rem;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
 .info {
     margin-top: 2rem;
     padding: 1rem;
@@ -289,6 +313,33 @@ input[type="password"]::placeholder {
     font-size: 1rem;
 }
 
+/* Language selector */
+.language-selector {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.language-select {
+    background: none;
+    border: none;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    opacity: 0.8;
+    outline: none;
+    transition: opacity 0.2s, color 0.2s;
+    font-family: inherit;
+}
+
+.language-select:hover {
+    opacity: 1;
+}
+
+.language-select option {
+    background: white;
+    color: #1a202c;
+}
+
 /* ============================================
    Dark Mode (Login Page)
    ============================================ */
@@ -296,6 +347,7 @@ input[type="password"]::placeholder {
 html[data-theme='dark'] body {
     background-color: #1a1a1a;
     color: #e0e0e0;
+    --text-muted: #a0aec0;
 }
 
 html[data-theme='dark'] .login-title {
@@ -339,6 +391,22 @@ html[data-theme='dark'] .github-link a {
 
 html[data-theme='dark'] .github-link a:hover {
     color: #4a9eff;
+}
+
+html[data-theme='dark'] .admin-warning {
+    background: rgba(197, 48, 48, 0.1);
+    border-color: #c53030;
+    color: #feb2b2;
+}
+
+html[data-theme='dark'] .admin-warning code {
+    background: rgba(254, 215, 215, 0.2);
+    color: #fff;
+}
+
+html[data-theme='dark'] .language-select option {
+    background: #2a2a2a;
+    color: #e0e0e0;
 }
 
 /* Responsive Design */
