@@ -505,45 +505,51 @@ function resetFolderIcon() {
  * Update folder icon in the UI
  */
 function updateFolderIconInUI(folderId, iconClass, iconColor) {
-    // Try to find the icon as a descendant of a container with data-folder-id
-    let folderElement = document.querySelector(`[data-folder-id="${folderId}"] .folder-icon`);
+    // Collect all elements that might be the icon or contain the icon
+    const selectors = [
+        `[data-folder-id="${folderId}"] .folder-icon`,
+        `[data-folder-id="${folderId}"].folder-icon`
+    ];
 
-    // If not found, check if the element with data-folder-id is itself the icon
-    if (!folderElement) {
-        const potentialIcon = document.querySelector(`[data-folder-id="${folderId}"].folder-icon`);
-        if (potentialIcon) {
-            folderElement = potentialIcon;
-        }
-    }
+    const elementsToUpdate = [];
+    selectors.forEach(selector => {
+        document.querySelectorAll(selector).forEach(el => {
+            if (!elementsToUpdate.includes(el)) {
+                elementsToUpdate.push(el);
+            }
+        });
+    });
 
-    if (!folderElement) {
+    if (elementsToUpdate.length === 0) {
         return;
     }
 
-    // Remove all icon classes (including default folder icons)
-    const allIconsToRemove = [...FOLDER_ICONS, 'fa-folder', 'fa-folder-open'];
-    allIconsToRemove.forEach(icon => {
-        folderElement.classList.remove(icon);
+    elementsToUpdate.forEach(folderElement => {
+        // Remove all icon classes (including default folder icons)
+        const allIconsToRemove = [...FOLDER_ICONS, 'fa-folder', 'fa-folder-open'];
+        allIconsToRemove.forEach(icon => {
+            folderElement.classList.remove(icon);
+        });
+
+        // Add new icon class or default
+        if (iconClass) {
+            folderElement.classList.add(iconClass);
+            folderElement.setAttribute('data-custom-icon', 'true');
+        } else {
+            // Default icons
+            folderElement.classList.add('fa-folder');
+            folderElement.setAttribute('data-custom-icon', 'false');
+        }
+
+        // Apply color with !important to override CSS rules
+        if (iconColor) {
+            folderElement.style.setProperty('color', iconColor, 'important');
+            folderElement.setAttribute('data-icon-color', iconColor);
+        } else {
+            folderElement.style.removeProperty('color');
+            folderElement.removeAttribute('data-icon-color');
+        }
     });
-
-    // Add new icon class or default
-    if (iconClass) {
-        folderElement.classList.add(iconClass);
-        folderElement.setAttribute('data-custom-icon', 'true');
-    } else {
-        // Default icons
-        folderElement.classList.add('fa-folder');
-        folderElement.setAttribute('data-custom-icon', 'false');
-    }
-
-    // Apply color with !important to override CSS rules
-    if (iconColor) {
-        folderElement.style.setProperty('color', iconColor, 'important');
-        folderElement.setAttribute('data-icon-color', iconColor);
-    } else {
-        folderElement.style.removeProperty('color');
-        folderElement.removeAttribute('data-icon-color');
-    }
 }
 
 // Export functions to window
