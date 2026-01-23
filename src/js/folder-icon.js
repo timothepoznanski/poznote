@@ -505,49 +505,56 @@ function resetFolderIcon() {
  * Update folder icon in the UI
  */
 function updateFolderIconInUI(folderId, iconClass, iconColor) {
-    // Collect all elements that might be the icon or contain the icon
-    const selectors = [
-        `[data-folder-id="${folderId}"] .folder-icon`,
-        `[data-folder-id="${folderId}"].folder-icon`
-    ];
-
     const elementsToUpdate = [];
-    selectors.forEach(selector => {
-        document.querySelectorAll(selector).forEach(el => {
-            if (!elementsToUpdate.includes(el)) {
-                elementsToUpdate.push(el);
-            }
-        });
+
+    // 1. Update in the notes list (sidebar) - find only direct child icon
+    const folderElement = document.querySelector(`[data-folder-id="${folderId}"]`);
+    if (folderElement) {
+        // Find only the direct child .folder-icon (not descendants from subfolders)
+        // Use > child combinator to target only immediate children within .folder-toggle
+        const iconElement = folderElement.querySelector(':scope > .folder-toggle > .folder-icon');
+        if (iconElement) {
+            elementsToUpdate.push(iconElement);
+        }
+    }
+
+    // 2. Update in Kanban view
+    // In kanban view, the icon has data-folder-id directly on it
+    const kanbanIcons = document.querySelectorAll(`.kanban-title .folder-icon[data-folder-id="${folderId}"], .kanban-column-header .folder-icon[data-folder-id="${folderId}"]`);
+    kanbanIcons.forEach(icon => {
+        if (!elementsToUpdate.includes(icon)) {
+            elementsToUpdate.push(icon);
+        }
     });
 
     if (elementsToUpdate.length === 0) {
         return;
     }
 
-    elementsToUpdate.forEach(folderElement => {
+    elementsToUpdate.forEach(folderIconElement => {
         // Remove all icon classes (including default folder icons)
         const allIconsToRemove = [...FOLDER_ICONS, 'fa-folder', 'fa-folder-open'];
         allIconsToRemove.forEach(icon => {
-            folderElement.classList.remove(icon);
+            folderIconElement.classList.remove(icon);
         });
 
         // Add new icon class or default
         if (iconClass) {
-            folderElement.classList.add(iconClass);
-            folderElement.setAttribute('data-custom-icon', 'true');
+            folderIconElement.classList.add(iconClass);
+            folderIconElement.setAttribute('data-custom-icon', 'true');
         } else {
             // Default icons
-            folderElement.classList.add('fa-folder');
-            folderElement.setAttribute('data-custom-icon', 'false');
+            folderIconElement.classList.add('fa-folder');
+            folderIconElement.setAttribute('data-custom-icon', 'false');
         }
 
         // Apply color with !important to override CSS rules
         if (iconColor) {
-            folderElement.style.setProperty('color', iconColor, 'important');
-            folderElement.setAttribute('data-icon-color', iconColor);
+            folderIconElement.style.setProperty('color', iconColor, 'important');
+            folderIconElement.setAttribute('data-icon-color', iconColor);
         } else {
-            folderElement.style.removeProperty('color');
-            folderElement.removeAttribute('data-icon-color');
+            folderIconElement.style.removeProperty('color');
+            folderIconElement.removeAttribute('data-icon-color');
         }
     });
 }
