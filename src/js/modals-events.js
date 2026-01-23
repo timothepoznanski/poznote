@@ -3,7 +3,7 @@
  * CSP-compliant event handlers for modal buttons
  */
 
-(function() {
+(function () {
     'use strict';
 
     /**
@@ -59,6 +59,15 @@
             case 'close-confirm-modal':
                 if (typeof closeConfirmModal === 'function') {
                     closeConfirmModal();
+                }
+                break;
+            case 'close-info-modal':
+                if (typeof closeModal === 'function') {
+                    closeModal('infoModal');
+                    // Reload if indicated (useful for Kanban activation)
+                    if (window.reloadAfterInfoModal) {
+                        window.location.reload();
+                    }
                 }
                 break;
             case 'execute-save-and-exit':
@@ -194,7 +203,7 @@
     }
 
     // Initialize event listeners when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         document.addEventListener('click', handleModalsClick);
         document.addEventListener('change', handleModalsChange);
         document.addEventListener('keypress', handleModalsKeypress);

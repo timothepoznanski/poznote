@@ -3487,6 +3487,16 @@ body.dark-mode .folder-header.folder-drop-target {
     opacity: 0.7;
 }
 
+/* Make kanban icon clickable for opening kanban view */
+.folder-icon[data-action='open-kanban-view'] {
+    cursor: pointer;
+    transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.folder-icon[data-action='open-kanban-view']:hover {
+    transform: scale(1.15);
+}
+
 .folder-note-count {
     font-size: 12px;
     color: #999;

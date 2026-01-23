@@ -69,6 +69,10 @@
             "enable": "Kanban-Ansicht aktivieren",
             "disable": "Kanban-Ansicht deaktivieren",
             "open": "Kanban-Ansicht öffnen"
+        },
+        "notifications": {
+            "activated_title": "Kanban-Ansicht aktiviert",
+            "activated_message": "Dieser Ordner ist jetzt im Kanban-Modus. Klicken Sie auf sein Symbol, um das Board zu öffnen."
         }
     },
     "folders": {
@@ -1427,13 +1431,6 @@
     "public_folder": {
         "filter_placeholder": "Notizen suchen",
         "no_filter_results": "Keine Ergebnisse."
-    },
-    "kanban": {
-        "actions": {
-            "enable": "Kanban-Ansicht aktivieren",
-            "disable": "Kanban-Ansicht deaktivieren",
-            "open": "Kanban-Ansicht öffnen"
-        }
     },
     "icon_names": {
         "briefcase": "Aktentasche",

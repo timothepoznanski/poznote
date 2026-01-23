@@ -69,6 +69,10 @@
             "enable": "Activer la vue Kanban",
             "disable": "Désactiver la vue Kanban",
             "open": "Ouvrir la vue Kanban"
+        },
+        "notifications": {
+            "activated_title": "Vue Kanban activée",
+            "activated_message": "Ce dossier est maintenant en mode Kanban. Cliquez sur son icône pour ouvrir le tableau."
         }
     },
     "folders": {

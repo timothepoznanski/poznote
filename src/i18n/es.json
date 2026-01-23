@@ -66,7 +66,13 @@
             "message": "Crea subcarpetas para verlas como columnas aquí."
         },
         "actions": {
-            "open": "Vista Kanban"
+            "enable": "Activar la vista Kanban",
+            "disable": "Desactivar la vista Kanban",
+            "open": "Abrir la vista Kanban"
+        },
+        "notifications": {
+            "activated_title": "Vista Kanban activada",
+            "activated_message": "Esta carpeta está ahora en modo Kanban. Haz clic en su icono para abrir el tablero."
         }
     },
     "folders": {

@@ -926,6 +926,10 @@
             "enable": "Enable Kanban view",
             "disable": "Disable Kanban view",
             "open": "Open Kanban view"
+        },
+        "notifications": {
+            "activated_title": "Kanban view enabled",
+            "activated_message": "This folder is now in Kanban mode. Click its icon to open the board."
         }
     },
     "icon_names": {

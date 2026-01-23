@@ -95,7 +95,11 @@ $cache_v = getAppVersion();
     <link type="text/css" rel="stylesheet" href="css/brands.min.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/solid.min.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/regular.min.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/index.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/kanban.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folder-icon-modal.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode.css?v=<?php echo $cache_v; ?>"/>
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
 </head>
@@ -114,8 +118,16 @@ $cache_v = getAppVersion();
                     $pIconColor = $parentFolder['icon_color'] ?? '';
                     $pIconStyle = $pIconColor ? "style=\"color: {$pIconColor};\"" : '';
                     ?>
-                    <i class="fas <?php echo htmlspecialchars($pFolderIcon); ?>" <?php echo $pIconStyle; ?>></i>
-                    <span><?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?></span>
+                    <i class="fas <?php echo htmlspecialchars($pFolderIcon); ?> folder-icon" 
+                       <?php echo $pIconStyle; ?> 
+                       data-action="open-folder-icon-picker" 
+                       data-folder-id="<?php echo $folder_id; ?>" 
+                       data-folder-name="<?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?>"
+                       style="cursor: pointer; <?php echo $pIconColor ? "color: {$pIconColor};" : ''; ?>"></i>
+                    <span data-action="rename-folder" 
+                          data-folder-id="<?php echo $folder_id; ?>" 
+                          data-folder-name="<?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?>"
+                          style="cursor: pointer;"><?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?></span>
                 </h1>
             </div>
             <div class="kanban-header-right">
@@ -196,8 +208,16 @@ $cache_v = getAppVersion();
                         $iconColor = $subfolder['icon_color'] ?? '';
                         $iconStyle = $iconColor ? "style=\"color: {$iconColor};\"" : '';
                         ?>
-                        <i class="fas <?php echo htmlspecialchars($folderIcon); ?>" <?php echo $iconStyle; ?>></i>
-                        <span><?php echo htmlspecialchars($subfolder['name'], ENT_QUOTES); ?></span>
+                        <i class="fas <?php echo htmlspecialchars($folderIcon); ?> folder-icon" 
+                           <?php echo $iconStyle; ?> 
+                           data-action="open-folder-icon-picker" 
+                           data-folder-id="<?php echo $subfolder['id']; ?>" 
+                           data-folder-name="<?php echo htmlspecialchars($subfolder['name'], ENT_QUOTES); ?>"
+                           style="cursor: pointer; <?php echo $iconColor ? "color: {$iconColor};" : ''; ?>"></i>
+                        <span data-action="rename-folder" 
+                              data-folder-id="<?php echo $subfolder['id']; ?>" 
+                              data-folder-name="<?php echo htmlspecialchars($subfolder['name'], ENT_QUOTES); ?>"
+                              style="cursor: pointer;"><?php echo htmlspecialchars($subfolder['name'], ENT_QUOTES); ?></span>
                     </div>
                     <span class="kanban-column-count"><?php echo count($subfolderNotes[$subfolder['id']] ?? []); ?></span>
                 </div>
@@ -266,7 +286,17 @@ $cache_v = getAppVersion();
         </div>
     </div>
 
+    <!-- Modals -->
+    <?php include 'modals.php'; ?>
+
     <!-- JavaScript for drag and drop -->
+    <script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="js/ui.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="js/utils.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="js/modals-events.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="js/notes-list-events.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="js/folder-icon.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/kanban.js?v=<?php echo $cache_v; ?>"></script>
 </body>
 </html>

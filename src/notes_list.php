@@ -108,10 +108,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         $customIconColor = isset($folderData['icon_color']) && !empty($folderData['icon_color']) ? $folderData['icon_color'] : null;
         $kanbanEnabled = isset($folderData['kanban_enabled']) && $folderData['kanban_enabled'] ? true : false;
 
-        if ($kanbanEnabled) {
-            // Use Kanban icon when Kanban mode is enabled
-            $chevron_icon = 'fa-columns';
-        } elseif ($customIcon) {
+        if ($customIcon) {
             // Use custom icon - don't toggle between open/closed
             $chevron_icon = $customIcon;
         } else {

@@ -2299,6 +2299,7 @@ body.dark-mode .toolbar-btn.has-attachments .fa-paperclip {
     filter: none !important;
 }
 
+
 /* Make markdown view mode toggle button blue in dark mode */
 html[data-theme='dark'] .toolbar-btn.markdown-view-mode-btn i,
 html[data-theme='dark'] .toolbar-btn.markdown-view-mode-btn [class*="fa-"],

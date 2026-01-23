@@ -69,6 +69,10 @@
             "enable": "启用看板视图",
             "disable": "禁用看板视图",
             "open": "打开看板视图"
+        },
+        "notifications": {
+            "activated_title": "看板视图已启用",
+            "activated_message": "此文件夹现在处于看板模式。点击其图标打开看板。"
         }
     },
     "folders": {
