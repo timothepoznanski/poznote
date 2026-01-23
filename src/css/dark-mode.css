@@ -2241,14 +2241,14 @@ body.dark-mode .info-box {
 /* Icons - Make all icons lighter in dark mode by modifying the filter */
 /* Override the default dark gray filter with a lighter one */
 /* Exclude folder icons with custom colors from the filter */
-html[data-theme='dark'] [class*="fa-"]:not(.folder-icon[data-icon-color]),
-body.dark-mode [class*="fa-"]:not(.folder-icon[data-icon-color]) {
+html[data-theme='dark'] [class*="fa-"]:not(.folder-icon[data-icon-color]):not(.kanban-title [class*="fa-"][style*="color"]):not(.kanban-column-title [class*="fa-"][style*="color"]),
+body.dark-mode [class*="fa-"]:not(.folder-icon[data-icon-color]):not(.kanban-title [class*="fa-"][style*="color"]):not(.kanban-column-title [class*="fa-"][style*="color"]) {
     filter: brightness(0) saturate(0%) invert(80%) !important;
     transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-html[data-theme='dark'] [class*="fa-"]:not(.folder-icon[data-icon-color]):hover,
-body.dark-mode [class*="fa-"]:not(.folder-icon[data-icon-color]):hover {
+html[data-theme='dark'] [class*="fa-"]:not(.folder-icon[data-icon-color]):not(.kanban-title [class*="fa-"][style*="color"]):not(.kanban-column-title [class*="fa-"][style*="color"]):hover,
+body.dark-mode [class*="fa-"]:not(.folder-icon[data-icon-color]):not(.kanban-title [class*="fa-"][style*="color"]):not(.kanban-column-title [class*="fa-"][style*="color"]):hover {
     transform: scale(1.18);
     filter: brightness(0) saturate(0%) invert(90%) !important;
 }
