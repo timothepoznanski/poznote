@@ -829,6 +829,9 @@
             "public": "Compartilhadas",
             "attachments": "Anexos"
         },
+        "favorites": {
+            "empty": "Ainda não há notas favoritas."
+        },
         "drop_zone": {
             "remove_from_folder": "Solte aqui para remover da pasta"
         },

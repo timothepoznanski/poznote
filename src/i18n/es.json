@@ -830,6 +830,9 @@
             "public": "Compartidas",
             "attachments": "Archivos adjuntos"
         },
+        "favorites": {
+            "empty": "Aún no hay notas favoritas."
+        },
         "drop_zone": {
             "remove_from_folder": "Suelta aquí para eliminar de la carpeta"
         },

@@ -202,7 +202,7 @@ try {
             </a>
             
             <!-- Favorites -->
-            <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>&show_favorites=1" class="home-card" title="<?php echo t_h('notes_list.system_folders.favorites', [], 'Favorites'); ?>">
+            <a href="favorites.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('notes_list.system_folders.favorites', [], 'Favorites'); ?>">
                 <div class="home-card-icon home-card-icon-favorites">
                     <i class="fa-star"></i>
                 </div>

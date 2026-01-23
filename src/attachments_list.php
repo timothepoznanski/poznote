@@ -28,8 +28,6 @@ $currentLang = getUserLanguage();
 </head>
 <body class="shared-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>" data-txt-untitled="<?php echo t_h('common.untitled', [], 'Untitled'); ?>" data-txt-no-results="<?php echo t_h('attachments.list.no_filter_results', [], 'No results.'); ?>">
 	<div class="shared-container">
-		<h2 class="shared-header"><?php echo t_h('attachments.list.title', [], 'Notes with Attachments'); ?></h2>
-		
 		<div class="shared-buttons-container">
 			<button id="backToNotesBtn" class="btn btn-secondary">
 				<?php echo t_h('common.back_to_notes'); ?>

@@ -110,7 +110,7 @@
             } else if (mode === 'light') {
                 icon.className = 'fa fa-sun';
             } else {
-                icon.className = 'fa fa-desktop';
+                icon.className = 'fal fa-desktop';
             }
         }
     }

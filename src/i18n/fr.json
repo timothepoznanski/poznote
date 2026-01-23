@@ -832,6 +832,9 @@
             "public": "Partagées",
             "attachments": "Pièces jointes"
         },
+        "favorites": {
+            "empty": "Aucune note en favoris pour le moment."
+        },
         "drop_zone": {
             "remove_from_folder": "Déposez ici pour retirer du dossier"
         },

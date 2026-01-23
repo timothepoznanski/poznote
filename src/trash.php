@@ -46,7 +46,6 @@ $currentLang = getUserLanguage();
 </head>
 <body class="trash-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
 	<div class="trash-container">
-		<h2 class="trash-header"><?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?></h2>
 		
 	<?php if (!empty($search)): ?>
 			<div class="trash-search-notice">
@@ -56,18 +55,6 @@ $currentLang = getUserLanguage();
 				</span>
 			</div>
 		<?php endif; ?>
-		
-		<form action="trash.php" method="POST" class="trash-search-form">
-			<input 
-				type="text" 
-				name="search" 
-				id="searchInput"
-				class="trash-search-input"
-				placeholder="<?php echo t_h('trash.search.placeholder', [], 'Search in trash...'); ?>" 
-				value="<?php echo htmlspecialchars($search); ?>"
-				autocomplete="off"
-			>
-		</form>
 		
 		<div class="trash-buttons-container">
 			<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
@@ -79,6 +66,27 @@ $currentLang = getUserLanguage();
 			<button class="btn btn-danger" id="emptyTrashBtn" title="<?php echo t_h('trash.actions.empty_trash', [], 'Empty trash'); ?>">
 				<?php echo t_h('trash.actions.empty_trash', [], 'Empty trash'); ?>
 			</button>
+		</div>
+
+		<div class="trash-filter-bar">
+			<div class="filter-input-wrapper">
+				<form action="trash.php" method="POST" id="trashSearchForm">
+					<input 
+						type="text" 
+						name="search" 
+						id="searchInput"
+						class="trash-search-input"
+						placeholder="<?php echo t_h('trash.search.placeholder', [], 'Search in trash...'); ?>" 
+						value="<?php echo htmlspecialchars($search); ?>"
+						autocomplete="off"
+					>
+				</form>
+				<?php if (!empty($search)): ?>
+					<button id="clearTrashSearchBtn" class="clear-filter-btn">
+						<i class="fas fa-times"></i>
+					</button>
+				<?php endif; ?>
+			</div>
 		</div>
 		
 		<div class="trash-content">

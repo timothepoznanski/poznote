@@ -525,7 +525,6 @@
                         try { closeModal('timezoneModal'); } catch (e) { }
                         refreshTimezoneBadge();
                         reloadOpener();
-                        alert(tr('display.timezone.alerts.updated_success', {}, 'Timezone updated successfully. Changes will take effect immediately.'));
                     } else {
                         alert(tr('display.timezone.alerts.update_error', {}, 'Error updating timezone'));
                     }

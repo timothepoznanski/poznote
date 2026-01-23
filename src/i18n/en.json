@@ -26,24 +26,6 @@
         "note": "Note",
         "apply": "Apply"
     },
-    "login": {
-        "fields": {
-            "username": "Username",
-            "username_or_email": "Username or Email",
-            "password": "Password",
-            "profile": "Profile"
-        },
-        "button": "Login",
-        "remember_me": "Remember me for 30 days",
-        "no_profiles": "No profiles available. Please contact administrator.",
-        "oidc_button": "Continue with {{provider}}",
-        "documentation": "Poznote Documentation",
-        "redirecting": "Redirecting...",
-        "admin_warning": "Please log in with the username <code>{{username}}</code> and your password (stored in .env). You can then rename this account in settings for better security.",
-        "errors": {
-            "invalid_credentials": "Incorrect username or password."
-        }
-    },
     "download": "Download",
     "convert": "Convert",
     "create": "Create",
@@ -264,15 +246,6 @@
                 "pacific": "Pacific",
                 "africa": "Africa"
             }
-        },
-        "move_folder": {
-            "title": "Move Folder",
-            "prompt_prefix": "Move folder",
-            "prompt_suffix": "to:",
-            "select_target": "Select parent folder...",
-            "root": "Root (Top Level)",
-            "hint": "This will move the folder and all its notes as a subfolder. Select \"Root\" to move it to the top level.",
-            "move": "Move Folder"
         }
     },
     "notes_list": {
@@ -282,6 +255,9 @@
             "favorites": "Favorites",
             "public": "Shared",
             "attachments": "Attachments"
+        },
+        "favorites": {
+            "empty": "No favorite notes yet."
         },
         "drop_zone": {
             "remove_from_folder": "Drop here to remove from folder"
@@ -848,7 +824,7 @@
             "no_public_notes": "No shared notes yet.",
             "public_hint": "Share a note by clicking the cloud button in note toolbar."
         },
-        "filter_placeholder": "Filter by title, token or folder name...",
+        "filter_placeholder": "Filter by title or folder name...",
         "no_filter_results": "No notes match your search.",
         "table": {
             "note": "Note",

@@ -6,10 +6,10 @@ function clearSearchAndReturn() {
     navigateToPage('trash.php');
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Set global pageWorkspace for compatibility with other functions
     window.pageWorkspace = getPageWorkspace();
-    
+
     // Back to notes button
     var backBtn = document.getElementById('backToNotesBtn');
     if (backBtn) {
@@ -21,28 +21,43 @@ document.addEventListener('DOMContentLoaded', function() {
     if (backHomeBtn) {
         backHomeBtn.addEventListener('click', goBackToHome);
     }
-    
+
     // Clear search button
-    var clearSearchBtn = document.querySelector('.trash-clear-search');
+    var clearSearchBtn = document.getElementById('clearTrashSearchBtn') || document.querySelector('.trash-clear-search');
     if (clearSearchBtn) {
-        clearSearchBtn.addEventListener('click', clearSearchAndReturn);
+        clearSearchBtn.addEventListener('click', function () {
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.value = '';
+                // If it's a server-side search (search param in URL), we need to reload
+                if (window.location.search.includes('search=')) {
+                    clearSearchAndReturn();
+                } else {
+                    // Just clear client-side filter
+                    searchInput.dispatchEvent(new Event('input'));
+                    this.parentElement.style.display = 'none';
+                }
+            } else {
+                clearSearchAndReturn();
+            }
+        });
     }
-    
+
     // Trash notes search management
-    const searchInput = document.getElementById('searchInput'); 
+    const searchInput = document.getElementById('searchInput');
     if (searchInput) {
-        searchInput.addEventListener('input', function() {
+        searchInput.addEventListener('input', function () {
             const searchTerm = this.value.toLowerCase();
             const noteCards = document.querySelectorAll('.trash-notecard');
             let visibleCount = 0;
-            
+
             noteCards.forEach(card => {
                 const title = card.querySelector('.css-title');
                 const content = card.querySelector('.noteentry');
-                
+
                 let titleText = title ? title.textContent.toLowerCase() : '';
                 let contentText = content ? content.textContent.toLowerCase() : '';
-                
+
                 if (titleText.includes(searchTerm) || contentText.includes(searchTerm)) {
                     card.style.display = 'block';
                     visibleCount++;
@@ -50,14 +65,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     card.style.display = 'none';
                 }
             });
-            
+
             // Display number of results
             updateSearchResults(visibleCount, searchTerm);
         });
     }
-    
+
     // Management of restore and permanent delete buttons
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         if (e.target.classList.contains('fa-trash-restore-alt')) {
             e.preventDefault();
             const noteid = e.target.getAttribute('data-noteid');
@@ -65,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 showRestoreConfirmModal(noteid);
             }
         }
-        
+
         if (e.target.classList.contains('fa-trash')) {
             e.preventDefault();
             const noteid = e.target.getAttribute('data-noteid');
@@ -74,16 +89,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-    
+
     // Management of "Empty trash" button
     const emptyTrashBtn = document.getElementById('emptyTrashBtn');
     if (emptyTrashBtn) {
-        emptyTrashBtn.addEventListener('click', function(e) {
+        emptyTrashBtn.addEventListener('click', function (e) {
             e.preventDefault();
             showEmptyTrashConfirmModal();
         });
     }
-    
+
     // Modal button event listeners
     // Empty trash modal
     var emptyTrashCancelBtn = document.querySelector('#emptyTrashConfirmModal .btn-cancel');
@@ -94,13 +109,13 @@ document.addEventListener('DOMContentLoaded', function() {
     if (emptyTrashConfirmBtn) {
         emptyTrashConfirmBtn.addEventListener('click', executeEmptyTrash);
     }
-    
+
     // Info modal
     var infoModalCloseBtn = document.querySelector('#infoModal .btn-primary');
     if (infoModalCloseBtn) {
         infoModalCloseBtn.addEventListener('click', closeInfoModal);
     }
-    
+
     // Restore modal
     var restoreCancelBtn = document.querySelector('#restoreConfirmModal .btn-cancel');
     if (restoreCancelBtn) {
@@ -110,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (restoreConfirmBtn) {
         restoreConfirmBtn.addEventListener('click', executeRestoreNote);
     }
-    
+
     // Delete modal
     var deleteCancelBtn = document.querySelector('#deleteConfirmModal .btn-cancel');
     if (deleteCancelBtn) {
@@ -128,11 +143,13 @@ function updateSearchResults(count, searchTerm) {
         resultsDiv = document.createElement('div');
         resultsDiv.id = 'searchResults';
         resultsDiv.className = 'trash-search-results';
-        
-        const searchContainer = document.querySelector('.trash-search-input').parentNode;
-        searchContainer.appendChild(resultsDiv);
+
+        const filterBar = document.querySelector('.trash-filter-bar');
+        if (filterBar) {
+            filterBar.appendChild(resultsDiv);
+        }
     }
-    
+
     if (searchTerm.trim() === '') {
         resultsDiv.style.display = 'none';
     } else {
@@ -149,11 +166,11 @@ function updateSearchResults(count, searchTerm) {
 function restoreNote(noteid) {
     const workspace = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? pageWorkspace : null;
     const requestBody = {};
-    
+
     if (workspace) {
         requestBody.workspace = workspace;
     }
-    
+
     // Use RESTful API: POST /api/v1/notes/{id}/restore
     fetch('/api/v1/notes/' + noteid + '/restore', {
         method: 'POST',
@@ -162,27 +179,27 @@ function restoreNote(noteid) {
         },
         body: JSON.stringify(requestBody)
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data && data.success) {
-            // Visually remove note from list
-            const noteElement = document.getElementById('note' + noteid);
-            if (noteElement) {
-                noteElement.style.display = 'none';
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.success) {
+                // Visually remove note from list
+                const noteElement = document.getElementById('note' + noteid);
+                if (noteElement) {
+                    noteElement.style.display = 'none';
+                }
+            } else {
+                const title = (window.t ? window.t('trash.alerts.restore_error_title', {}, 'Restore Error') : 'Restore Error');
+                const unknown = (window.t ? window.t('common.unknown_error', {}, 'Unknown error') : 'Unknown error');
+                const msgPrefix = (window.t ? window.t('trash.alerts.restore_error_prefix', {}, 'Error restoring the note: ') : 'Error restoring the note: ');
+                showInfoModal(title, msgPrefix + (data.error || data.message || unknown));
             }
-        } else {
+        })
+        .catch(error => {
+            console.error('Error during restoration:', error);
             const title = (window.t ? window.t('trash.alerts.restore_error_title', {}, 'Restore Error') : 'Restore Error');
-            const unknown = (window.t ? window.t('common.unknown_error', {}, 'Unknown error') : 'Unknown error');
-            const msgPrefix = (window.t ? window.t('trash.alerts.restore_error_prefix', {}, 'Error restoring the note: ') : 'Error restoring the note: ');
-            showInfoModal(title, msgPrefix + (data.error || data.message || unknown));
-        }
-    })
-    .catch(error => {
-        console.error('Error during restoration:', error);
-        const title = (window.t ? window.t('trash.alerts.restore_error_title', {}, 'Restore Error') : 'Restore Error');
-        const msg = (window.t ? window.t('trash.alerts.restore_error_generic', {}, 'Error restoring the note') : 'Error restoring the note');
-        showInfoModal(title, msg);
-    });
+            const msg = (window.t ? window.t('trash.alerts.restore_error_generic', {}, 'Error restoring the note') : 'Error restoring the note');
+            showInfoModal(title, msg);
+        });
 }
 
 function permanentlyDeleteNote(noteid) {
@@ -194,26 +211,26 @@ function permanentlyDeleteNote(noteid) {
         },
         credentials: 'same-origin'
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data && data.success === true) {
-            // Visually remove note from list
-            const noteElement = document.getElementById('note' + noteid);
-            if (noteElement) {
-                noteElement.style.display = 'none';
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.success === true) {
+                // Visually remove note from list
+                const noteElement = document.getElementById('note' + noteid);
+                if (noteElement) {
+                    noteElement.style.display = 'none';
+                }
+            } else {
+                const title = (window.t ? window.t('trash.alerts.delete_error_title', {}, 'Delete Error') : 'Delete Error');
+                const msgPrefix = (window.t ? window.t('trash.alerts.delete_error_prefix', {}, 'Error during permanent deletion: ') : 'Error during permanent deletion: ');
+                showInfoModal(title, msgPrefix + (data.error || 'Unknown error'));
             }
-        } else {
+        })
+        .catch(error => {
+            console.error('Error during deletion:', error);
             const title = (window.t ? window.t('trash.alerts.delete_error_title', {}, 'Delete Error') : 'Delete Error');
-            const msgPrefix = (window.t ? window.t('trash.alerts.delete_error_prefix', {}, 'Error during permanent deletion: ') : 'Error during permanent deletion: ');
-            showInfoModal(title, msgPrefix + (data.error || 'Unknown error'));
-        }
-    })
-    .catch(error => {
-        console.error('Error during deletion:', error);
-        const title = (window.t ? window.t('trash.alerts.delete_error_title', {}, 'Delete Error') : 'Delete Error');
-        const msg = (window.t ? window.t('trash.alerts.delete_error_generic', {}, 'Error during permanent deletion of the note') : 'Error during permanent deletion of the note');
-        showInfoModal(title, msg);
-    });
+            const msg = (window.t ? window.t('trash.alerts.delete_error_generic', {}, 'Error during permanent deletion of the note') : 'Error during permanent deletion of the note');
+            showInfoModal(title, msg);
+        });
 }
 
 function emptyTrash() {
@@ -225,24 +242,24 @@ function emptyTrash() {
         },
         credentials: 'same-origin'
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success === true) {
-            // Success - redirect to home page
-            window.location.href = 'index.php' + (typeof pageWorkspace !== 'undefined' && pageWorkspace ? '?workspace=' + encodeURIComponent(pageWorkspace) : '');
-        } else {
+        .then(response => response.json())
+        .then(data => {
+            if (data.success === true) {
+                // Success - redirect to home page
+                window.location.href = 'index.php' + (typeof pageWorkspace !== 'undefined' && pageWorkspace ? '?workspace=' + encodeURIComponent(pageWorkspace) : '');
+            } else {
+                const title = (window.t ? window.t('trash.alerts.empty_error_title', {}, 'Empty Trash Error') : 'Empty Trash Error');
+                const unknown = (window.t ? window.t('common.unknown_error', {}, 'Unknown error') : 'Unknown error');
+                const msgPrefix = (window.t ? window.t('trash.alerts.empty_error_prefix', {}, 'Error emptying trash: ') : 'Error emptying trash: ');
+                showInfoModal(title, msgPrefix + (data.error || unknown));
+            }
+        })
+        .catch(error => {
+            console.error('Error during trash emptying:', error);
             const title = (window.t ? window.t('trash.alerts.empty_error_title', {}, 'Empty Trash Error') : 'Empty Trash Error');
-            const unknown = (window.t ? window.t('common.unknown_error', {}, 'Unknown error') : 'Unknown error');
-            const msgPrefix = (window.t ? window.t('trash.alerts.empty_error_prefix', {}, 'Error emptying trash: ') : 'Error emptying trash: ');
-            showInfoModal(title, msgPrefix + (data.error || unknown));
-        }
-    })
-    .catch(error => {
-        console.error('Error during trash emptying:', error);
-        const title = (window.t ? window.t('trash.alerts.empty_error_title', {}, 'Empty Trash Error') : 'Empty Trash Error');
-        const msg = (window.t ? window.t('trash.alerts.empty_error_generic', {}, 'Error emptying trash') : 'Error emptying trash');
-        showInfoModal(title, msg);
-    });
+            const msg = (window.t ? window.t('trash.alerts.empty_error_generic', {}, 'Error emptying trash') : 'Error emptying trash');
+            showInfoModal(title, msg);
+        });
 }
 
 // Modal management for restore and delete confirmations
@@ -306,24 +323,24 @@ function executePermanentDelete() {
 }
 
 // Close modals when clicking outside
-window.addEventListener('click', function(event) {
+window.addEventListener('click', function (event) {
     const restoreModal = document.getElementById('restoreConfirmModal');
     const deleteModal = document.getElementById('deleteConfirmModal');
     const infoModal = document.getElementById('infoModal');
     const emptyTrashModal = document.getElementById('emptyTrashConfirmModal');
-    
+
     if (event.target === restoreModal) {
         closeRestoreConfirmModal();
     }
-    
+
     if (event.target === deleteModal) {
         closeDeleteConfirmModal();
     }
-    
+
     if (event.target === infoModal) {
         closeInfoModal();
     }
-    
+
     if (event.target === emptyTrashModal) {
         closeEmptyTrashConfirmModal();
     }

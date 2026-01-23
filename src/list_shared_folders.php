@@ -81,8 +81,6 @@ $currentLang = getUserLanguage();
       data-txt-save="<?php echo t_h('common.save', [], 'Save'); ?>"
       data-txt-confirm-revoke="<?php echo t_h('shared_folders.confirm_revoke', [], 'Are you sure you want to revoke sharing for this folder? All notes in this folder will also be unshared.'); ?>">
 	<div class="shared-container">
-		<h2 class="shared-header"><?php echo t_h('shared_folders.page.title', [], 'Shared Folders'); ?></h2>
-		
 		<div class="shared-buttons-container">
 			<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
 				<?php echo t_h('common.back_to_notes'); ?>
@@ -101,7 +99,7 @@ $currentLang = getUserLanguage();
 					type="text" 
 					id="filterInput"
 					class="filter-input"
-					placeholder="<?php echo t_h('shared_folders.filter_placeholder', [], 'Filter by folder name or token...'); ?>"
+					placeholder="<?php echo t_h('shared_folders.filter_placeholder', [], 'Filter by folder name...'); ?>"
 				/>
 				<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
 					<i class="fa-times"></i>

@@ -827,6 +827,9 @@
             "public": "共享",
             "attachments": "附件"
         },
+        "favorites": {
+            "empty": "暂无收藏笔记。"
+        },
         "drop_zone": {
             "remove_from_folder": "拖放到此处从文件夹中移除"
         },

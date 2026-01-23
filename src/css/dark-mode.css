@@ -314,9 +314,8 @@ body.dark-mode .system-folder .folder-note-count {
 /* Notes list */
 html[data-theme='dark'] .links_arbo_left,
 body.dark-mode .links_arbo_left {
-    background-color: #1a1a1a;
+    background-color: transparent !important;
     color: #e0e0e0;
-    /* border-bottom: 1px solid #333; */
 }
 
 html[data-theme='dark'] .links_arbo_left:hover,

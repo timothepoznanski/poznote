@@ -2,12 +2,15 @@
 
 /* Override des règles globales qui cachent les scrollbars */
 body.trash-page {
-    scrollbar-width: auto !important; /* Firefox - Override global rule */
-    -ms-overflow-style: scrollbar !important; /* Internet Explorer 10+ - Override global rule */
+    scrollbar-width: auto !important;
+    /* Firefox - Override global rule */
+    -ms-overflow-style: scrollbar !important;
+    /* Internet Explorer 10+ - Override global rule */
 }
 
 body.trash-page::-webkit-scrollbar {
-    display: block !important; /* Override global rule that hides scrollbars */
+    display: block !important;
+    /* Override global rule that hides scrollbars */
     width: 8px !important;
     background-color: #f1f1f1 !important;
 }
@@ -63,9 +66,11 @@ body.trash-page {
 }
 
 .trash-container {
-    min-height: calc(100vh + 1px); /* Force scroll by making content slightly taller */
+    min-height: calc(100vh + 1px);
+    /* Force scroll by making content slightly taller */
     position: relative;
-    padding-bottom: 50px; /* Extra space to ensure scrolling */
+    padding-bottom: 50px;
+    /* Extra space to ensure scrolling */
 }
 
 .trash-header {
@@ -77,26 +82,66 @@ body.trash-page {
 }
 
 .trash-search-results {
-    text-align: center;
-    font-weight: 300;
-    margin-bottom: 20px;
+    font-size: 13px;
+    color: #666;
+    white-space: nowrap;
+    padding: 6px 12px;
+    background-color: #f0f7ff;
+    border-radius: 6px;
+    font-weight: 500;
+    margin-left: 10px;
 }
 
-.trash-search-form {
-    text-align: center;
-    font-weight: 300;
-    margin-bottom: 20px;
+/* Filter Bar */
+.trash-filter-bar {
+    max-width: 900px;
+    margin: 0 auto 30px auto;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.filter-input-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+#trashSearchForm {
+    width: 100%;
 }
 
 .trash-search-input {
-    background: #f8f8f8;
-    text-align: center;
-    width: 25%;
+    width: 100%;
+    padding: 10px 40px 10px 12px;
     border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 8px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #333;
+    background-color: #f8f8f8;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.trash-search-input:focus {
+    outline: none;
+    border-color: #007DB8;
+    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
+}
+
+.clear-filter-btn {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    padding: 6px 8px;
+    cursor: pointer;
     color: #666;
-    font-size: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
 }
 
 .trash-search-input::placeholder {
@@ -121,7 +166,9 @@ body.trash-page {
     display: flex;
     justify-content: flex-start;
     gap: 20px;
-    margin: 20px 30px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    padding-left: 30px;
 }
 
 .btn {
@@ -207,6 +254,7 @@ body.trash-page {
     color: #666;
     margin-top: 50px;
     font-size: 1.1em;
+    padding-bottom: 100px;
 }
 
 .trash-close-search {
@@ -219,7 +267,8 @@ body.trash-page {
     color: #007DB8;
 }
 
-.backbutton, .emptytrash {
+.backbutton,
+.emptytrash {
     display: inline-block;
     width: 30px;
     cursor: pointer;
@@ -233,8 +282,8 @@ body.trash-page {
     color: white;
 }
 
-.searchtrash:-ms-input-placeholder {  
-    color: white;  
+.searchtrash:-ms-input-placeholder {
+    color: white;
 }
 
 .searchtrash:focus {
@@ -264,10 +313,21 @@ body.trash-page {
     color: #d32f2f;
 }
 
-.fa-arrow-circle-left::before { content: "\f060"; }
-.trash-empty-button::before { content: "\f51a"; }
-.fa-trash::before { content: "\f2ed"; }
-.fa-trash-restore-alt::before { content: "\f2ea"; }
+.fa-arrow-circle-left::before {
+    content: "\f060";
+}
+
+.trash-empty-button::before {
+    content: "\f51a";
+}
+
+.fa-trash::before {
+    content: "\f2ed";
+}
+
+.fa-trash-restore-alt::before {
+    content: "\f2ea";
+}
 
 .fa-arrow-circle-left,
 .trash-empty-button {
@@ -284,9 +344,11 @@ body.trash-page {
     vertical-align: middle;
 }
 
-.fa-trash {
+.fa-trash,
+.fa-trash-restore-alt {
     font-family: "Font Awesome 5 Pro";
-    font-weight: 300;
+    font-weight: 900;
+    /* Solid */
     font-style: normal;
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
@@ -295,9 +357,12 @@ body.trash-page {
     text-rendering: auto;
     line-height: 1;
     cursor: pointer;
+    vertical-align: middle;
+}
+
+.fa-trash {
     transition: color 0.1s ease;
     font-size: 0.95em;
-    vertical-align: middle;
 }
 
 .fa-trash:hover {
@@ -305,19 +370,8 @@ body.trash-page {
 }
 
 .fa-trash-restore-alt {
-    font-family: "Font Awesome 5 Pro";
-    font-weight: 300;
-    font-style: normal;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    display: inline-block;
-    font-variant: normal;
-    text-rendering: auto;
-    line-height: 1;
-    cursor: pointer;
     transition: color 0.2s ease;
     font-size: 0.95em;
-    vertical-align: middle;
 }
 
 .fa-trash-restore-alt:hover {
@@ -327,11 +381,12 @@ body.trash-page {
 /* Styles mobiles pour la page trash */
 
 @media (max-width: 800px) {
+
     /* Reset complet pour le scroll sur mobile */
     * {
         box-sizing: border-box;
     }
-    
+
     /* Override des règles globales sur mobile */
     html {
         overflow: auto !important;
@@ -341,16 +396,19 @@ body.trash-page {
         max-height: none !important;
         -webkit-overflow-scrolling: touch;
         min-height: 100vh !important;
-        scrollbar-width: auto !important; /* Override global rule */
-        -ms-overflow-style: scrollbar !important; /* Override global rule */
+        scrollbar-width: auto !important;
+        /* Override global rule */
+        -ms-overflow-style: scrollbar !important;
+        /* Override global rule */
     }
-    
+
     html::-webkit-scrollbar {
-        display: block !important; /* Override global rule */
+        display: block !important;
+        /* Override global rule */
         width: 6px !important;
         background-color: #f1f1f1 !important;
     }
-    
+
     body {
         overflow: auto !important;
         overflow-y: scroll !important;
@@ -359,16 +417,19 @@ body.trash-page {
         max-height: none !important;
         min-height: 100vh !important;
         -webkit-overflow-scrolling: touch;
-        scrollbar-width: auto !important; /* Override global rule */
-        -ms-overflow-style: scrollbar !important; /* Override global rule */
+        scrollbar-width: auto !important;
+        /* Override global rule */
+        -ms-overflow-style: scrollbar !important;
+        /* Override global rule */
     }
-    
+
     body::-webkit-scrollbar {
-        display: block !important; /* Override global rule */
+        display: block !important;
+        /* Override global rule */
         width: 12px !important;
         background-color: #f1f1f1 !important;
     }
-    
+
     body.trash-page {
         overflow-y: scroll !important;
         overflow-x: hidden !important;
@@ -377,16 +438,19 @@ body.trash-page {
         position: static !important;
         padding: 10px;
         background: #f5f5f5 !important;
-        scrollbar-width: auto !important; /* Override global rule */
-        -ms-overflow-style: scrollbar !important; /* Override global rule */
+        scrollbar-width: auto !important;
+        /* Override global rule */
+        -ms-overflow-style: scrollbar !important;
+        /* Override global rule */
     }
-    
+
     body.trash-page::-webkit-scrollbar {
-        display: block !important; /* Override global rule */
+        display: block !important;
+        /* Override global rule */
         width: 12px !important;
         background-color: #f1f1f1 !important;
     }
-    
+
     /* Fix pour iOS Safari */
     .trash-container {
         position: relative !important;
@@ -395,78 +459,144 @@ body.trash-page {
         min-height: calc(100vh - 20px) !important;
         padding-bottom: 20px !important;
     }
-    
+
     .trash-header {
         font-size: 1.8em;
         margin-top: 20px;
         margin-bottom: 15px;
     }
-    
+
     .trash-search-input {
         width: 80% !important;
         font-size: 1.1em;
         padding: 12px;
         margin: 10px 0;
     }
-    
+
     .trash-buttons-container {
         justify-content: center;
         margin: 15px 10px;
         gap: 30px;
     }
-    
-    
+
+
     .trash-content {
         padding: 10px;
     }
-    
+
     .trash-notecard {
         margin-bottom: 20px;
         border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
-    
+
     .trash-innernote {
         padding: 15px;
         font-size: 16px;
         line-height: 1.4;
     }
-    
+
     .trash-action-icons {
         position: static;
         justify-content: flex-end;
         margin-bottom: 10px;
         gap: 15px;
     }
-    
+
     /* Larger trash action icons on mobile for better touch targets */
-    .fa-trash, .fa-trash-restore-alt {
+    .fa-trash,
+    .fa-trash-restore-alt {
         width: 1.5em !important;
         height: 1.5em !important;
     }
-    
+
     .css-title {
         font-size: 18px !important;
         margin-bottom: 15px;
     }
-    
+
     .lastupdated {
         font-size: 14px !important;
         margin-bottom: 10px;
     }
-    
+
     .noteentry {
         font-size: 16px !important;
         line-height: 1.4;
     }
-    
+
     .trash-no-notes {
         font-size: 1.2em;
         padding: 20px;
     }
-    
+
     .trash-search-results {
         font-size: 1.1em;
         margin: 15px 0;
     }
+}
+
+/* Dark Mode Support for Trash Page */
+html[data-theme='dark'] body.trash-page,
+[data-theme='dark'] body.trash-page,
+body.dark-mode.trash-page {
+    background-color: #1a1a1a !important;
+    background: #1a1a1a !important;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .trash-search-input,
+[data-theme='dark'] .trash-search-input,
+body.dark-mode .trash-search-input {
+    background-color: #2a2a2a !important;
+    color: #e0e0e0 !important;
+    border-color: #404040 !important;
+}
+
+[data-theme='dark'] .clear-filter-btn {
+    color: #888;
+}
+
+html[data-theme='dark'] .trash-notecard,
+body.dark-mode .trash-notecard {
+    background-color: #242424 !important;
+    border-color: #333 !important;
+}
+
+html[data-theme='dark'] .trash-innernote,
+body.dark-mode .trash-innernote {
+    /* background-color: #242424 !important; */
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .css-title,
+body.dark-mode .css-title {
+    color: #4a9eff;
+}
+
+html[data-theme='dark'] .trash-no-notes,
+body.dark-mode .trash-no-notes {
+    color: #a0a0a0;
+}
+
+html[data-theme='dark'] .trash-search-notice,
+body.dark-mode .trash-search-notice {
+    background-color: #1a2a3a !important;
+    border-color: #2c5282 !important;
+    color: #9cc6ef !important;
+}
+
+[data-theme='dark'] .trash-search-results {
+    background-color: #1e3a52;
+    color: #9cc6ef;
+}
+
+html[data-theme='dark'] .lastupdated,
+body.dark-mode .lastupdated {
+    color: #888;
+}
+
+html[data-theme='dark'] .noteentry,
+body.dark-mode .noteentry {
+    color: #ccc;
 }

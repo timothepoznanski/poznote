@@ -830,6 +830,9 @@
             "public": "Geteilte",
             "attachments": "Anhänge"
         },
+        "favorites": {
+            "empty": "Noch keine Favoriten vorhanden."
+        },
         "drop_zone": {
             "remove_from_folder": "Hier ablegen, um aus Ordner zu entfernen"
         },
