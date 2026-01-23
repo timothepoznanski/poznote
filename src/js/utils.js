@@ -2326,12 +2326,7 @@ function openKanbanView(folderId, folderName) {
     var rightCol = document.getElementById('right_col');
 
     if (!rightCol) {
-        // Fallback to separate page if right_col not found
-        var url = 'kanban.php?folder_id=' + folderId;
-        if (workspace) {
-            url += '&workspace=' + encodeURIComponent(workspace);
-        }
-        window.location.href = url;
+        console.error('right_col element not found');
         return;
     }
 
