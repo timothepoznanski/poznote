@@ -1185,7 +1185,6 @@ body.sidebar-collapsed .toggle-sidebar-btn i {
     align-items: center;
     justify-content: center;
     padding: 0;
-    transition: all 0.2s ease;
 }
 
 .favorites-toggle-btn:hover {
@@ -1196,12 +1195,6 @@ body.sidebar-collapsed .toggle-sidebar-btn i {
 .favorites-toggle-btn i {
     font-size: 8px;
     color: var(--text-main, #333);
-    transition: transform 0.3s ease;
-    transform: rotate(0deg);
-}
-
-.favorites-toggle-btn.collapsed i {
-    transform: rotate(180deg);
 }
 
 /* Hide favorites folder content when collapsed */

@@ -150,41 +150,41 @@ try {
             <p class="github-sync-description"><?php echo t_h('github_sync.description'); ?></p>
         </div>
         
-        <div style="margin: 20px 0;">
-            <table style="width: 100%; border-collapse: collapse;">
+        <div class="limitations-table-wrapper">
+            <table class="limitations-table">
                 <thead>
-                    <tr style="background-color: #f8f9fa;">
-                        <th style="padding: 8px; text-align: center; border: 1px solid #dee2e6;"><?php echo t_h('github_sync.limitations.element'); ?></th>
-                        <th style="padding: 8px; text-align: center; border: 1px solid #dee2e6;"><?php echo t_h('github_sync.limitations.html_notes'); ?></th>
-                        <th style="padding: 8px; text-align: center; border: 1px solid #dee2e6;"><?php echo t_h('github_sync.limitations.markdown_notes'); ?></th>
+                    <tr>
+                        <th><?php echo t_h('github_sync.limitations.element'); ?></th>
+                        <th><?php echo t_h('github_sync.limitations.html_notes'); ?></th>
+                        <th><?php echo t_h('github_sync.limitations.markdown_notes'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td style="padding: 8px; border: 1px solid #dee2e6;"><?php echo t_h('github_sync.limitations.text_content'); ?></td>
-                        <td style="padding: 8px; text-align: center; border: 1px solid #dee2e6;"><i class="fas fa-check" style="color: #28a745;"></i></td>
-                        <td style="padding: 8px; text-align: center; border: 1px solid #dee2e6;"><i class="fas fa-check" style="color: #28a745;"></i></td>
-                    </tr>
-                    <tr style="background-color: #f8f9fa;">
-                        <td style="padding: 8px; border: 1px solid #dee2e6;"><?php echo t_h('github_sync.limitations.attachments'); ?></td>
-                        <td style="padding: 8px; text-align: center; border: 1px solid #dee2e6;"><i class="fas fa-times" style="color: #dc3545;"></i></td>
-                        <td style="padding: 8px; text-align: center; border: 1px solid #dee2e6;"><i class="fas fa-times" style="color: #dc3545;"></i></td>
+                        <td><?php echo t_h('github_sync.limitations.text_content'); ?></td>
+                        <td class="text-center status-success"><i class="fas fa-check"></i></td>
+                        <td class="text-center status-success"><i class="fas fa-check"></i></td>
                     </tr>
                     <tr>
-                        <td style="padding: 8px; border: 1px solid #dee2e6;"><?php echo t_h('github_sync.limitations.embedded_images'); ?></td>
-                        <td style="padding: 8px; text-align: center; border: 1px solid #dee2e6;"><i class="fas fa-check" style="color: #28a745;"></i> *</td>
-                        <td style="padding: 8px; text-align: center; border: 1px solid #dee2e6;"><i class="fas fa-times" style="color: #dc3545;"></i></td>
+                        <td><?php echo t_h('github_sync.limitations.attachments'); ?></td>
+                        <td class="text-center status-error"><i class="fas fa-times"></i></td>
+                        <td class="text-center status-error"><i class="fas fa-times"></i></td>
                     </tr>
-                    <tr style="background-color: #f8f9fa;">
-                        <td style="padding: 8px; border: 1px solid #dee2e6;"><?php echo t_h('github_sync.limitations.metadata'); ?></td>
-                        <td style="padding: 8px; text-align: center; border: 1px solid #dee2e6;"><i class="fas fa-times" style="color: #dc3545;"></i></td>
-                        <td style="padding: 8px; text-align: center; border: 1px solid #dee2e6;"><i class="fas fa-check" style="color: #28a745;"></i></td>
+                    <tr>
+                        <td><?php echo t_h('github_sync.limitations.embedded_images'); ?></td>
+                        <td class="text-center status-success"><i class="fas fa-check"></i> *</td>
+                        <td class="text-center status-error"><i class="fas fa-times"></i></td>
+                    </tr>
+                    <tr>
+                        <td><?php echo t_h('github_sync.limitations.metadata'); ?></td>
+                        <td class="text-center status-error"><i class="fas fa-times"></i></td>
+                        <td class="text-center status-success"><i class="fas fa-check"></i></td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
-        <p style="margin: 0 0 20px 0; font-size: 12px; font-style: italic;">
+        <p class="limitations-note">
             <strong>*</strong> <?php echo t_h('github_sync.limitations.embedded_note'); ?>
         </p>
 

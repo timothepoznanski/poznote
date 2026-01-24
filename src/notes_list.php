@@ -252,7 +252,7 @@ if ($favoritesFolder && $favorites_count > 0) {
     // Add separator with toggle button after favorites
     echo '<div class="favorites-separator">';
     echo '<button type="button" class="favorites-toggle-btn favorites-expanded" data-action="toggle-favorites" title="' . t_h('notes_list.favorites.toggle', [], 'Show/hide favorites') . '">';
-    echo '<i class="fas fa-chevron-down"></i>';
+    echo '<i class="fas fa-chevron-up"></i>';
     echo '</button>';
     echo '</div>';
 }
