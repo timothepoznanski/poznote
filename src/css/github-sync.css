@@ -65,13 +65,13 @@
 }
 
 .github-sync-footer-note {
-    /* margin: 80px auto 40px; */
-    padding: 0px 0px 24px;
+    margin: 0px auto 40px;
+    padding: 0px 24px 15px;
     text-align: center;
     color: #71717a;
     font-size: 0.9rem;
     line-height: 1.6;
-    /* border-top: 1px solid #f4f4f5; */
+    /* border-top: 1px solid #eee; */
     max-width: 700px;
 }
 
