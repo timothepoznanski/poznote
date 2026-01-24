@@ -1445,7 +1445,7 @@ body.sidebar-collapsed .toggle-sidebar-btn i {
 /* Réduire la taille des icônes Font Awesome dans la toolbar */
 .toolbar-btn i,
 .toolbar-btn [class*="fa-"] {
-    font-size: 0.9em !important;
+    font-size: 0.75em !important;
 }
 
 /* Text formatting buttons: hidden by default, visible on selection */
