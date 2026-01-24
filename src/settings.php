@@ -226,6 +226,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                     </div>
                 </div>
 
+                <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
                 <!-- GitHub Sync -->
                 <div class="settings-card settings-card-clickable" id="github-sync-card" data-href="github_sync.php">
                     <div class="settings-card-icon">
@@ -235,6 +236,8 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                         <h3><?php echo t_h('settings.cards.github_sync', [], 'GitHub Sync'); ?></h3>
                     </div>
                 </div>
+
+                <?php endif; ?>
 
                 <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
                 <!-- Check for Updates -->

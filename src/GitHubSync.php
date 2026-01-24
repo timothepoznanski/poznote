@@ -190,9 +190,12 @@ class GitHubSync {
                 $content = file_get_contents($filePath);
                 
                 // Build the path in the repository
+                $workspace = $note['workspace'] ?? 'Poznote';
                 $folderPath = $this->getFolderPath($note['folder_id']);
                 $safeTitle = $this->sanitizeFileName($note['heading'] ?: 'Untitled');
-                $repoPath = trim($folderPath . '/' . $safeTitle . '.' . $extension, '/');
+                
+                // Add workspace as top-level folder
+                $repoPath = $workspace . '/' . trim($folderPath . '/' . $safeTitle . '.' . $extension, '/');
                 
                 // Add front matter for markdown files
                 if ($noteType === 'markdown') {
@@ -285,7 +288,11 @@ class GitHubSync {
                 
                 // Parse content and metadata
                 $noteData = $this->parseNoteFromGitHub($path, $content['content'], $extension);
-                $noteData['workspace'] = $workspaceTarget;
+                
+                // Use workspace from path, or target workspace if specified
+                if (empty($noteData['workspace'])) {
+                    $noteData['workspace'] = $workspaceTarget;
+                }
                 
                 // Check if note already exists (by title and folder)
                 $existingNote = $this->findExistingNote($noteData);
@@ -510,11 +517,25 @@ class GitHubSync {
      * Parse note data from GitHub file
      */
     private function parseNoteFromGitHub($path, $content, $extension) {
+        // Extract workspace from path (first folder)
+        $pathParts = explode('/', $path);
+        $workspace = count($pathParts) > 1 ? $pathParts[0] : 'Poznote';
+        
+        // Remove workspace from folder path
+        $folderPath = dirname($path);
+        if (strpos($folderPath, $workspace . '/') === 0) {
+            $folderPath = substr($folderPath, strlen($workspace) + 1);
+        }
+        if ($folderPath === $workspace) {
+            $folderPath = '';
+        }
+        
         $data = [
             'type' => ($extension === 'md') ? 'markdown' : 'note',
             'heading' => pathinfo(pathinfo($path, PATHINFO_FILENAME), PATHINFO_FILENAME),
             'tags' => '',
-            'folder_path' => dirname($path)
+            'folder_path' => $folderPath,
+            'workspace' => $workspace
         ];
         
         // Parse front matter for markdown files

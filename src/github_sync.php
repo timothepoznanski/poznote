@@ -8,6 +8,12 @@
 require 'auth.php';
 requireAuth();
 
+// Check if user is admin
+if (!function_exists('isCurrentUserAdmin') || !isCurrentUserAdmin()) {
+    header('Location: settings.php');
+    exit;
+}
+
 require_once 'config.php';
 require_once 'functions.php';
 require_once 'db_connect.php';
