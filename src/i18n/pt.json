@@ -308,6 +308,7 @@
             "workspaces": "Espaços de trabalho",
             "backup_export": "Backup / Exportar",
             "restore_import": "Restaurar / Importar",
+            "github_sync": "Sincronização GitHub",
             "check_updates": "Verificar atualizações",
             "api_docs": "Documentação da API",
             "documentation": "Repositório Github",
@@ -1710,6 +1711,67 @@
                 "cannot_delete_self": "Você não pode excluir seu próprio perfil",
                 "cannot_change_self": "Você não pode alterar seu próprio status/função"
             }
+        }
+    },
+    "github_sync": {
+        "title": "Sincronização GitHub",
+        "description": "Sincronize suas notas com um repositório do GitHub. Envie suas notas para o GitHub para backup ou colaboração, ou recupere notas de um repositório existente.",
+        "config": {
+            "title": "Configuração",
+            "status": "Status",
+            "repository": "Repositório",
+            "branch": "Branch",
+            "mode": "Modo de sincronização",
+            "token": "Token de acesso",
+            "token_set": "Configurado",
+            "token_missing": "Não configurado",
+            "not_configured": "Não configurado",
+            "hint": "A sincronização com GitHub está desativada. Defina POZNOTE_GITHUB_SYNC_ENABLED=true no seu arquivo .env para ativá-la."
+        },
+        "test": {
+            "title": "Testar conexão",
+            "button": "Testar conexão"
+        },
+        "last_sync": {
+            "title": "Última sincronização",
+            "action": "Ação",
+            "time": "Hora",
+            "pushed": "Enviadas",
+            "pulled": "Recuperadas",
+            "notes": "notas"
+        },
+        "actions": {
+            "title": "Ações de sincronização",
+            "workspace": "Espaço de trabalho",
+            "target_workspace": "Espaço de trabalho de destino",
+            "all_workspaces": "Todos os espaços de trabalho",
+            "push": {
+                "title": "Enviar para GitHub",
+                "description": "Exporte suas notas para o repositório do GitHub. Os arquivos existentes serão atualizados.",
+                "button": "Enviar notas"
+            },
+            "pull": {
+                "title": "Recuperar do GitHub",
+                "description": "Importe notas do repositório do GitHub. As notas existentes com o mesmo título serão atualizadas.",
+                "button": "Recuperar notas"
+            }
+        },
+        "messages": {
+            "connection_success": "Conexão bem-sucedida! Conectado a {{repo}}",
+            "connection_error": "Erro de conexão: {{error}}",
+            "push_success": "{{count}} notas enviadas com sucesso ({{errors}} erros)",
+            "push_error": "Erro ao enviar: {{error}}",
+            "pull_success": "{{pulled}} novas notas recuperadas e {{updated}} notas existentes atualizadas",
+            "pull_error": "Erro ao recuperar: {{error}}"
+        },
+        "not_configured": {
+            "title": "Sincronização com GitHub não configurada",
+            "description": "Para usar a sincronização com GitHub, você deve configurar suas credenciais do GitHub no arquivo .env.",
+            "steps_title": "Instruções de configuração",
+            "step1": "Crie um token de acesso pessoal do GitHub em github.com/settings/tokens com o escopo 'repo'",
+            "step2": "Crie um repositório do GitHub (público ou privado) para suas notas",
+            "step3": "Adicione a configuração ao seu arquivo .env",
+            "step4": "Reinicie a aplicação para que as alterações entrem em vigor"
         }
     }
 }

@@ -311,6 +311,7 @@
             "user_management": "用户管理",
             "backup_export": "备份 / 导出",
             "restore_import": "还原 / 导入",
+            "github_sync": "GitHub 同步",
             "check_updates": "检查更新",
             "api_docs": "API 文档",
             "documentation": "Github 仓库",
@@ -1827,6 +1828,67 @@
                 "title": "用户管理",
                 "description": "管理用户及其访问权限（仅限管理员）"
             }
+        }
+    },
+    "github_sync": {
+        "title": "GitHub 同步",
+        "description": "将您的笔记与 GitHub 仓库同步。将您的笔记推送到 GitHub 进行备份或协作，或从现有仓库中拉取笔记。",
+        "config": {
+            "title": "配置",
+            "status": "状态",
+            "repository": "仓库",
+            "branch": "分支",
+            "mode": "同步模式",
+            "token": "访问令牌",
+            "token_set": "已配置",
+            "token_missing": "未配置",
+            "not_configured": "未配置",
+            "hint": "GitHub 同步已禁用。在您的 .env 文件中设置 POZNOTE_GITHUB_SYNC_ENABLED=true 来启用它。"
+        },
+        "test": {
+            "title": "测试连接",
+            "button": "测试连接"
+        },
+        "last_sync": {
+            "title": "上次同步",
+            "action": "操作",
+            "time": "时间",
+            "pushed": "已推送",
+            "pulled": "已拉取",
+            "notes": "笔记"
+        },
+        "actions": {
+            "title": "同步操作",
+            "workspace": "工作区",
+            "target_workspace": "目标工作区",
+            "all_workspaces": "所有工作区",
+            "push": {
+                "title": "推送到 GitHub",
+                "description": "将您的笔记导出到 GitHub 仓库。现有文件将被更新。",
+                "button": "推送笔记"
+            },
+            "pull": {
+                "title": "从 GitHub 拉取",
+                "description": "从 GitHub 仓库导入笔记。具有相同标题的现有笔记将被更新。",
+                "button": "拉取笔记"
+            }
+        },
+        "messages": {
+            "connection_success": "连接成功！已连接到 {{repo}}",
+            "connection_error": "连接失败：{{error}}",
+            "push_success": "成功推送 {{count}} 条笔记（{{errors}} 个错误）",
+            "push_error": "推送失败：{{error}}",
+            "pull_success": "拉取 {{pulled}} 条新笔记并更新 {{updated}} 条现有笔记",
+            "pull_error": "拉取失败：{{error}}"
+        },
+        "not_configured": {
+            "title": "GitHub 同步未配置",
+            "description": "要使用 GitHub 同步，您需要在 .env 文件中配置 GitHub 凭据。",
+            "steps_title": "配置指南",
+            "step1": "在 github.com/settings/tokens 创建 GitHub 个人访问令牌，带有 'repo' 范围",
+            "step2": "为您的笔记创建一个 GitHub 仓库（公开或私有）",
+            "step3": "将配置添加到您的 .env 文件",
+            "step4": "重启应用程序以使更改生效"
         }
     }
 }

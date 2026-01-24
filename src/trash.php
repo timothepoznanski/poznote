@@ -56,7 +56,7 @@ $currentLang = getUserLanguage();
 			<div class="trash-search-notice">
 				<?php echo t_h('trash.search.results_for', ['term' => htmlspecialchars($search, ENT_QUOTES)], 'Results for "{{term}}"'); ?>
 		<span class="trash-clear-search">
-					<i class="fal fa-times"></i>
+					<i class="fas fa-times"></i>
 				</span>
 			</div>
 		<?php endif; ?>
@@ -88,7 +88,7 @@ $currentLang = getUserLanguage();
 				</form>
 				<?php if (!empty($search)): ?>
 					<button id="clearTrashSearchBtn" class="clear-filter-btn">
-						<i class="fal fa-times"></i>
+						<i class="fas fa-times"></i>
 					</button>
 				<?php endif; ?>
 			</div>
@@ -176,8 +176,8 @@ $currentLang = getUserLanguage();
 				echo '<div id="note'.$id.'" class="trash-notecard">'
 					.'<div class="trash-innernote">'
 					.'<div class="trash-action-icons">'
-					.'<i title="'.t_h('trash.actions.restore_note_tooltip', [], 'Restore this note').'" class="fal fa-trash-restore-alt" data-noteid="'.$id.'"></i>'
-					.'<i title="'.t_h('trash.actions.delete_permanently_tooltip', [], 'Delete permanently').'" class="fal fa-trash" data-noteid="'.$id.'"></i>'
+					.'<i title="'.t_h('trash.actions.restore_note_tooltip', [], 'Restore this note').'" class="fas fa-trash-restore-alt" data-noteid="'.$id.'"></i>'
+					.'<i title="'.t_h('trash.actions.delete_permanently_tooltip', [], 'Delete permanently').'" class="fas fa-trash" data-noteid="'.$id.'"></i>'
 					.'</div>'
 					.'<div class="lastupdated">'.$lastModifiedLabel.'</div>'
 					.'<h3 class="css-title">'.htmlspecialchars($heading, ENT_QUOTES).'</h3>'
