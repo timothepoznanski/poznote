@@ -2579,7 +2579,7 @@ body.dark-mode .folder-color-default {
 /* ===== Kanban View Dark Mode ===== */
 html[data-theme='dark'] .kanban-page,
 body.dark-mode .kanban-page {
-    background: #1a1a1a;
+    background: transparent;
     color: #e0e0e0;
 }
 
