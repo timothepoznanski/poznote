@@ -180,13 +180,6 @@ try {
                 </div>
                 
                 <div class="config-item">
-                    <span class="config-label"><?php echo t_h('github_sync.config.mode'); ?></span>
-                    <span class="config-value">
-                        <span class="badge badge-info"><?php echo htmlspecialchars(ucfirst($configStatus['mode'])); ?></span>
-                    </span>
-                </div>
-                
-                <div class="config-item">
                     <span class="config-label"><?php echo t_h('github_sync.config.token'); ?></span>
                     <span class="config-value">
                         <?php if ($configStatus['hasToken']): ?>

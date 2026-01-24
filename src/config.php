@@ -53,8 +53,6 @@
     define('GITHUB_REPO', (string)($_ENV['POZNOTE_GITHUB_REPO'] ?? getenv('POZNOTE_GITHUB_REPO') ?? ''));
     // GitHub branch to sync with
     define('GITHUB_BRANCH', (string)($_ENV['POZNOTE_GITHUB_BRANCH'] ?? getenv('POZNOTE_GITHUB_BRANCH') ?: 'main'));
-    // Sync mode: 'manual' or 'auto'
-    define('GITHUB_SYNC_MODE', (string)($_ENV['POZNOTE_GITHUB_SYNC_MODE'] ?? getenv('POZNOTE_GITHUB_SYNC_MODE') ?: 'manual'));
     // Commit author name
     define('GITHUB_AUTHOR_NAME', (string)($_ENV['POZNOTE_GITHUB_AUTHOR_NAME'] ?? getenv('POZNOTE_GITHUB_AUTHOR_NAME') ?: 'Poznote'));
     // Commit author email

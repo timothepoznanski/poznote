@@ -55,7 +55,6 @@ class GitHubSync {
             'configured' => $this->isConfigured(),
             'repo' => $this->repo ?: null,
             'branch' => $this->branch,
-            'mode' => defined('GITHUB_SYNC_MODE') ? GITHUB_SYNC_MODE : 'manual',
             'hasToken' => !empty($this->token),
             'authorName' => $this->authorName,
         ];
