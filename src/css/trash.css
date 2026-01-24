@@ -345,10 +345,11 @@ body.trash-page {
 }
 
 .fa-trash,
-.fa-trash-restore-alt {
+.fa-trash-restore-alt,
+.fa-times {
     font-family: "Font Awesome 5 Pro";
-    font-weight: 900;
-    /* Solid */
+    font-weight: 300;
+    /* Light */
     font-style: normal;
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
