@@ -607,13 +607,24 @@
         details.appendChild(summary);
         details.appendChild(contentDiv);
 
+        // Create empty lines before and after
+        const emptyLineBefore = document.createElement('p');
+        emptyLineBefore.innerHTML = '<br>';
+        const emptyLineAfter = document.createElement('p');
+        emptyLineAfter.innerHTML = '<br>';
+
         // Insert at cursor position
         range.deleteContents();
-        range.insertNode(details);
 
-        // Place cursor at the summary text so user can type the label
+        // Insert in reverse order to maintain correct sequence: before -> details -> after
+        range.insertNode(emptyLineAfter);
+        range.insertNode(details);
+        range.insertNode(emptyLineBefore);
+
+        // Place cursor at the end of the summary text
         const newRange = document.createRange();
         newRange.selectNodeContents(summary);
+        newRange.collapse(false);
         selection.removeAllRanges();
         selection.addRange(newRange);
 
@@ -1192,7 +1203,8 @@
                 icon: 'fa-caret-down',
                 label: t('slash_menu.toggle', null, 'Toggle'),
                 action: function () {
-                    insertMarkdownAtCursor('<details class="toggle-block" open>\n<summary class="toggle-header">Toggle</summary>\n\n...\n\n</details>\n', -15);
+                    // Automatically add empty lines before and after for better spacing
+                    insertMarkdownAtCursor('\n\n<details class="toggle-block" open>\n<summary class="toggle-header">Toggle</summary>\n\n...\n\n</details>\n\n', -17);
                 }
             },
             {
