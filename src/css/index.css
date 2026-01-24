@@ -2781,8 +2781,61 @@ textarea:focus {
 }
 
 .noteentry,
-.noteentry *:not(.fa):not(.fab):not(.fas):not(.far):not(.fal):not(.fad):not(i):not([class*="fa-"]) {
+.noteentry *:not(.fa):not(.fab):not(.fas):not(.far):not(.fal):not(.fad):not(i):not([class*="fa-"]):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) {
     font-size: var(--note-font-size, 15px) !important;
+}
+
+/* Heading styles - must have higher specificity to override font-size */
+.noteentry h1 {
+    font-size: 2em !important;
+    font-weight: bold;
+    margin: 0.67em 0;
+}
+
+.noteentry h2 {
+    font-size: 1.5em !important;
+    font-weight: bold;
+    margin: 0.83em 0;
+}
+
+.noteentry h3 {
+    font-size: 1.17em !important;
+    font-weight: bold;
+    margin: 1em 0;
+}
+
+.noteentry h4 {
+    font-size: 1em !important;
+    font-weight: bold;
+    margin: 1.33em 0;
+}
+
+.noteentry h5 {
+    font-size: 0.83em !important;
+    font-weight: bold;
+    margin: 1.67em 0;
+}
+
+.noteentry h6 {
+    font-size: 0.67em !important;
+    font-weight: bold;
+    margin: 2.33em 0;
+}
+
+/* Ensure headings inside <font> tags keep their size */
+.noteentry font h1,
+.noteentry font h2,
+.noteentry font h3,
+.noteentry font h4,
+.noteentry font h5,
+.noteentry font h6,
+.noteentry h1 font,
+.noteentry h2 font,
+.noteentry h3 font,
+.noteentry h4 font,
+.noteentry h5 font,
+.noteentry h6 font {
+    font-size: inherit !important;
 }
 
 /* Optimize image rendering for better performance with many images */
