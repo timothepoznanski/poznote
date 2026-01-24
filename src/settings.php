@@ -226,6 +226,15 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                     </div>
                 </div>
 
+                <!-- GitHub Sync -->
+                <div class="settings-card settings-card-clickable" id="github-sync-card" data-href="github_sync.php">
+                    <div class="settings-card-icon">
+                        <i class="fab fa-github"></i>
+                    </div>
+                    <div class="settings-card-content">
+                        <h3><?php echo t_h('settings.cards.github_sync', [], 'GitHub Sync'); ?></h3>
+                    </div>
+                </div>
 
                 <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
                 <!-- Check for Updates -->

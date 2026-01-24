@@ -293,34 +293,6 @@ try {
             </div>
         </div>
 
-        <?php else: ?>
-        
-        <!-- Not Configured Message -->
-        <div class="github-sync-section not-configured-section">
-            <div class="not-configured-icon">
-                <i class="fab fa-github"></i>
-            </div>
-            <h2><?php echo t_h('github_sync.not_configured.title'); ?></h2>
-            <p><?php echo t_h('github_sync.not_configured.description'); ?></p>
-            
-            <div class="setup-instructions">
-                <h3><?php echo t_h('github_sync.not_configured.steps_title'); ?></h3>
-                <ol>
-                    <li><?php echo t('github_sync.not_configured.step1'); ?></li>
-                    <li><?php echo t('github_sync.not_configured.step2'); ?></li>
-                    <li><?php echo t('github_sync.not_configured.step3'); ?></li>
-                    <li><?php echo t('github_sync.not_configured.step4'); ?></li>
-                </ol>
-                
-                <div class="code-example">
-                    <pre>POZNOTE_GITHUB_SYNC_ENABLED=true
-POZNOTE_GITHUB_TOKEN=ghp_your_token_here
-POZNOTE_GITHUB_REPO=username/my-notes
-POZNOTE_GITHUB_BRANCH=main</pre>
-                </div>
-            </div>
-        </div>
-
         <?php endif; ?>
 
     </div>
