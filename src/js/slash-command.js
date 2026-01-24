@@ -583,6 +583,58 @@
         }
     }
 
+    function insertToggle() {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+
+        // Create the details element (HTML5 collapsible)
+        const details = document.createElement('details');
+        details.className = 'toggle-block';
+        details.open = true; // Open by default for easier editing
+
+        // Create summary (the always-visible label)
+        const summary = document.createElement('summary');
+        summary.className = 'toggle-header';
+        summary.textContent = window.t ? window.t('slash_menu.toggle_placeholder', null, 'Toggle') : 'Toggle';
+
+        // Create content div (hidden content)
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'toggle-content';
+        contentDiv.innerHTML = '';
+
+        details.appendChild(summary);
+        details.appendChild(contentDiv);
+
+        // Create empty lines before and after
+        const emptyLineBefore = document.createElement('p');
+        emptyLineBefore.innerHTML = '<br>';
+        const emptyLineAfter = document.createElement('p');
+        emptyLineAfter.innerHTML = '<br>';
+
+        // Insert at cursor position
+        range.deleteContents();
+
+        // Insert in reverse order to maintain correct sequence: before -> details -> after
+        range.insertNode(emptyLineAfter);
+        range.insertNode(details);
+        range.insertNode(emptyLineBefore);
+
+        // Place cursor at the end of the summary text
+        const newRange = document.createRange();
+        newRange.selectNodeContents(summary);
+        newRange.collapse(false);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+
+        // Trigger input event for autosave
+        const noteEntry = details.closest('.noteentry');
+        if (noteEntry) {
+            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+
     function insertList(ordered) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -915,6 +967,14 @@
                 ]
             },
             {
+                id: 'toggle',
+                icon: 'fa-caret-down',
+                label: t('slash_menu.toggle', null, 'Toggle'),
+                action: function () {
+                    insertToggle();
+                }
+            },
+            {
                 id: 'image',
                 icon: 'fa-image',
                 label: t('slash_menu.image', null, 'Image'),
@@ -1137,6 +1197,15 @@
                     { id: 'warning', label: t('slash_menu.callout_warning', null, 'Warning'), action: () => insertMarkdownAtCursor('> Warning\n> ', 0) },
                     { id: 'caution', label: t('slash_menu.callout_caution', null, 'Caution'), action: () => insertMarkdownAtCursor('> Caution\n> ', 0) }
                 ]
+            },
+            {
+                id: 'toggle',
+                icon: 'fa-caret-down',
+                label: t('slash_menu.toggle', null, 'Toggle'),
+                action: function () {
+                    // Automatically add empty lines before and after for better spacing
+                    insertMarkdownAtCursor('\n\n<details class="toggle-block" open>\n<summary class="toggle-header">Toggle</summary>\n\n...\n\n</details>\n\n', -17);
+                }
             },
             {
                 id: 'color',
@@ -2251,6 +2320,103 @@
         document.addEventListener('input', handleInput, true);
         document.addEventListener('keydown', handleKeydown, true);
         document.addEventListener('mousedown', handleClickOutside, true);
+
+        // Position caret at the end of the toggle title when clicked
+        document.addEventListener('click', function (e) {
+            const header = e.target.closest('.toggle-header');
+            if (header && header.isContentEditable) {
+                const selection = window.getSelection();
+                const range = document.createRange();
+                range.selectNodeContents(header);
+                range.collapse(false);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+        });
+
+        // Prevent new lines and duplication in toggle title
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                const header = e.target.closest('.toggle-header');
+                if (header) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Move focus to the content area instead of creating a new line
+                    const content = header.nextElementSibling;
+                    if (content && content.classList.contains('toggle-content')) {
+                        const selection = window.getSelection();
+                        const range = document.createRange();
+                        range.selectNodeContents(content);
+                        range.collapse(true);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    }
+                }
+            }
+        }, true);
+
+        // Prevent multi-line pastes in toggle title
+        document.addEventListener('paste', function (e) {
+            const header = e.target.closest('.toggle-header');
+            if (header) {
+                e.preventDefault();
+                const text = (e.originalEvent || e).clipboardData.getData('text/plain');
+                const cleanText = text.replace(/[\r\n]+/g, ' ');
+                document.execCommand('insertText', false, cleanText);
+            }
+        }, true);
+
+        // Aggressively sanitize toggle headers on input to enforce single-line structure
+        document.addEventListener('input', function (e) {
+            const target = e.target;
+            const toggleBlock = target.closest && target.closest('.toggle-block');
+
+            if (toggleBlock) {
+                // 1. Prevent multiple summaries (duplicate headers)
+                const summaries = toggleBlock.querySelectorAll('summary');
+                if (summaries.length > 1) {
+                    const first = summaries[0];
+                    let mergedText = first.textContent;
+
+                    for (let i = 1; i < summaries.length; i++) {
+                        mergedText += ' ' + summaries[i].textContent;
+                        summaries[i].remove();
+                    }
+
+                    first.textContent = mergedText;
+
+                    // Restore focus to first header (at end)
+                    const range = document.createRange();
+                    range.selectNodeContents(first);
+                    range.collapse(false);
+                    const sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
+
+                // 2. Flatten content inside the header (remove BRs, DIVs, newlines)
+                const header = toggleBlock.querySelector('.toggle-header');
+                if (header) {
+                    const hasBlockContent = header.querySelector('div, p, br');
+                    const hasNewlines = header.textContent.includes('\n');
+
+                    if (hasBlockContent || hasNewlines) {
+                        // Flatten text
+                        const cleanText = header.textContent.replace(/[\r\n]+/g, '');
+                        header.textContent = cleanText;
+
+                        // Restore caret to end
+                        const range = document.createRange();
+                        range.selectNodeContents(header);
+                        range.collapse(false);
+                        const sel = window.getSelection();
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                    }
+                }
+            }
+        }, true);
 
         window.hideSlashMenu = hideSlashMenu;
     }

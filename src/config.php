@@ -41,4 +41,20 @@
     define('DISABLE_SETTINGS_ACCESS', filter_var($_ENV['POZNOTE_DISABLE_SETTINGS_ACCESS'] ?? getenv('POZNOTE_DISABLE_SETTINGS_ACCESS') ?? false, FILTER_VALIDATE_BOOL));
     // Option 2: Protect settings with a password
     define('SETTINGS_PASSWORD', (string)($_ENV['POZNOTE_SETTINGS_PASSWORD'] ?? getenv('POZNOTE_SETTINGS_PASSWORD') ?? ''));
+
+    // ============================================================
+    // GITHUB SYNC CONFIGURATION
+    // ============================================================
+    // Enable or disable GitHub synchronization
+    define('GITHUB_SYNC_ENABLED', filter_var($_ENV['POZNOTE_GITHUB_SYNC_ENABLED'] ?? getenv('POZNOTE_GITHUB_SYNC_ENABLED') ?? false, FILTER_VALIDATE_BOOL));
+    // GitHub Personal Access Token
+    define('GITHUB_TOKEN', (string)($_ENV['POZNOTE_GITHUB_TOKEN'] ?? getenv('POZNOTE_GITHUB_TOKEN') ?? ''));
+    // GitHub repository (owner/repo format)
+    define('GITHUB_REPO', (string)($_ENV['POZNOTE_GITHUB_REPO'] ?? getenv('POZNOTE_GITHUB_REPO') ?? ''));
+    // GitHub branch to sync with
+    define('GITHUB_BRANCH', (string)($_ENV['POZNOTE_GITHUB_BRANCH'] ?? getenv('POZNOTE_GITHUB_BRANCH') ?: 'main'));
+    // Commit author name
+    define('GITHUB_AUTHOR_NAME', (string)($_ENV['POZNOTE_GITHUB_AUTHOR_NAME'] ?? getenv('POZNOTE_GITHUB_AUTHOR_NAME') ?: 'Poznote'));
+    // Commit author email
+    define('GITHUB_AUTHOR_EMAIL', (string)($_ENV['POZNOTE_GITHUB_AUTHOR_EMAIL'] ?? getenv('POZNOTE_GITHUB_AUTHOR_EMAIL') ?: 'poznote@localhost'));
 ?>

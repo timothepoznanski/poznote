@@ -41,6 +41,7 @@
             "user_management": "User Management",
             "backup_export": "Backup / Export",
             "restore_import": "Restore / Import",
+            "github_sync": "GitHub Sync",
             "check_updates": "Check for Updates",
             "api_docs": "API Documentation",
             "documentation": "Github Repository",
@@ -463,7 +464,9 @@
         "callout_tip": "Tip",
         "callout_important": "Important",
         "callout_warning": "Warning",
-        "callout_caution": "Caution"
+        "callout_caution": "Caution",
+        "toggle": "Toggle",
+        "toggle_placeholder": "Toggle"
     },
     "api": {
         "settings": {
@@ -1212,5 +1215,84 @@
         "anchor": "anchor",
         "apple-alt": "apple",
         "award": "award"
+    },
+    "github_sync": {
+        "title": "GitHub Sync",
+        "description": "Synchronize your notes with a GitHub repository. Push your notes to GitHub for backup or collaboration, or pull notes from an existing repository.",
+        "warning": "Do not use this feature as your only backup solution.\nConsider setting up manual or automatic ZIP exports of your notes.",
+        "config": {
+            "title": "Configuration",
+            "status": "Status",
+            "repository": "Repository",
+            "branch": "Branch",
+            "mode": "Sync Mode",
+            "token": "Access Token",
+            "token_set": "Configured",
+            "token_missing": "Not configured",
+            "not_configured": "Not configured",
+            "hint": "GitHub sync is disabled. Set POZNOTE_GITHUB_SYNC_ENABLED=true in your .env file to enable it."
+        },
+        "test": {
+            "title": "Test Connection",
+            "button": "Test Connection"
+        },
+        "last_sync": {
+            "title": "Last Synchronization",
+            "action": "Action",
+            "time": "Time",
+            "pushed": "Pushed",
+            "pulled": "Pulled",
+            "notes": "notes"
+        },
+        "actions": {
+            "title": "Sync Actions",
+            "workspace": "Workspace",
+            "target_workspace": "Target Workspace",
+            "all_workspaces": "All workspaces",
+            "push": {
+                "title": "Push to GitHub",
+                "description": "Export your notes to GitHub. Updates existing files and deletes files that no longer exist in Poznote.",
+                "button": "Push Notes"
+            },
+            "pull": {
+                "title": "Pull from GitHub",
+                "description": "Import notes from GitHub. Updates existing notes and moves to trash notes that no longer exist on GitHub.",
+                "button": "Pull Notes"
+            }
+        },
+        "messages": {
+            "connection_success": "Connection successful! Connected to {{repo}}",
+            "connection_error": "Connection failed: {{error}}",
+            "push_success": "Successfully pushed {{count}} notes, deleted {{deleted}} files ({{errors}} errors)",
+            "push_error": "Push failed: {{error}}",
+            "pull_success": "Successfully pulled {{pulled}} new notes, updated {{updated}} existing notes, deleted {{deleted}} notes ({{errors}} errors)",
+            "pull_error": "Pull failed: {{error}}"
+        },
+        "debug": {
+            "show": "Show Debug Info",
+            "hide": "Hide Debug Info",
+            "copy": "Copy Debug",
+            "copied": "Copied!"
+        },
+        "limitations": {
+            "title": "Synchronization Limitations",
+            "element": "Element",
+            "html_notes": "HTML Notes",
+            "markdown_notes": "Markdown Notes",
+            "text_content": "Text content",
+            "attachments": "File attachments",
+            "embedded_images": "Images",
+            "metadata": "Metadata (tags, date, ID)",
+            "embedded_note": "Embedded images are preserved in HTML but not displayed on GitHub"
+        },
+        "not_configured": {
+            "title": "GitHub Sync Not Configured",
+            "description": "To use GitHub synchronization, you need to configure your GitHub credentials in the .env file.",
+            "steps_title": "Setup Instructions",
+            "step1": "Create a GitHub Personal Access Token at github.com/settings/tokens with 'repo' scope",
+            "step2": "Create a GitHub repository (public or private) for your notes",
+            "step3": "Add the configuration to your .env file",
+            "step4": "Restart the application for changes to take effect"
+        }
     }
 }

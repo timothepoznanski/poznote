@@ -451,3 +451,121 @@
     color: #d1242f;
     fill: #d1242f;
 }
+
+/* Toggle / Collapsible block styles */
+.toggle-block {
+    display: block;
+    /* margin: 0.5em 0; */
+    overflow: hidden;
+    /* padding-bottom: 20px; */
+    /* padding-left: 10px; */
+    /* padding-right: 10px; */
+    /* border: 1px solid #e1e4e8; */
+    border-radius: 6px;
+}
+
+/* Ensure caret is visible at the bottom of the open block */
+.toggle-block[open] {
+    padding-bottom: 20px;
+}
+
+/* Target only the first summary to avoid duplicate arrows if browser quirks occur */
+.toggle-block>summary {
+    display: flex;
+    align-items: center;
+    padding: 10px 0px 0px 1px;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+    /* Hide default marker in Firefox */
+    user-select: none;
+    outline: none;
+    /* Remove focus outline */
+    white-space: nowrap;
+    overflow: hidden;
+    /* border-bottom: 1px solid #e1e4e8; */
+    text-overflow: ellipsis;
+    min-width: 0;
+    margin-bottom: 15px;
+}
+
+/* Hide any subsequent summaries that might be accidentally created */
+.toggle-block>summary~summary {
+    display: none !important;
+}
+
+/* Hide default marker in Webkit */
+.toggle-block>summary::-webkit-details-marker {
+    display: none;
+}
+
+.toggle-block>summary::before {
+    content: '';
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-right: 10px;
+    border-left: 5px solid currentColor;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    transition: transform 0.2s ease;
+    opacity: 0.5;
+}
+
+.toggle-block[open]>summary::before {
+    transform: rotate(90deg);
+}
+
+/* .toggle-block > summary:hover handled by removing opacity */
+
+/* Move border to summary when open for consistent looking regardless of content structure */
+.toggle-block[open]>summary {
+    /* border-bottom: 1px solid #e1e4e8; */
+    margin-bottom: 15px;
+    /* Spacing between header and content */
+}
+
+/* Base style for content elements (both wrapper div and direct children) */
+.toggle-block>.toggle-content,
+.toggle-block>p,
+.toggle-block>ul,
+.toggle-block>ol,
+.toggle-block>div:not(.toggle-content),
+.toggle-block>pre,
+.toggle-block>blockquote {
+    font-size: 0.95em;
+    line-height: 1.6;
+}
+
+/* HTML Mode: Content inside wrapper */
+.toggle-block>.toggle-content {
+    padding: 8px 10px 0px 0px;
+    border-top: none;
+    /* Removed in favor of summary border */
+}
+
+/* Markdown Mode: Direct children indentation */
+.toggle-block>p,
+.toggle-block>ul,
+.toggle-block>ol,
+.toggle-block>div:not(.toggle-content),
+.toggle-block>pre,
+.toggle-block>blockquote {
+    /* margin-left: 15px !important; */
+    margin-right: 10px;
+    margin-bottom: 0.5em;
+}
+
+/* Reset margin for p inside toggle-content (HTML mode) */
+.toggle-block>.toggle-content p {
+    margin: 0;
+}
+
+/* Dark mode adjustments */
+body.dark-mode .toggle-block {
+    border-color: #30363d;
+}
+
+body.dark-mode .toggle-block[open]>summary {
+    border-bottom-color: #30363d;
+}

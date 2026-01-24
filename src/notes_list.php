@@ -32,10 +32,10 @@ try {
             <div class="searchbar-row searchbar-icon-row">
                 <div class="searchbar-type-icons">
                     <button type="button" id="search-notes-btn" class="searchbar-type-btn searchbar-type-notes active" data-search-type="notes" title="<?php echo t_h('search.search_in_notes', [], 'Search in notes'); ?>">
-                        <i class="fa fa-file-alt"></i>
+                        <i class="fas fa-file-alt"></i>
                     </button>
                     <button type="button" id="search-tags-btn" class="searchbar-type-btn searchbar-type-tags" data-search-type="tags" title="<?php echo t_h('search.search_in_tags', [], 'Search in tags'); ?>">
-                        <i class="fa fa-tag"></i>
+                        <i class="fas fa-tag"></i>
                     </button>
                 </div>
                 <div class="searchbar-input-wrapper">
@@ -112,7 +112,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             $chevron_icon = $customIcon;
         } else {
             // Use default icons that toggle
-            $chevron_icon = $should_be_open ? 'fa-folder-open' : 'fa-folder';
+            $chevron_icon = $should_be_open ? 'fas fa-folder-open' : 'fas fa-folder';
         }
         
         $folder_display = $should_be_open ? 'block' : 'none';
@@ -133,7 +133,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         
         // Use an empty star icon for the Favorites pseudo-folder
         if ($folderName === 'Favorites') {
-            echo "<i class='fa-star-light folder-icon'></i>";
+            echo "<i class='fas fa-star folder-icon'></i>";
         } else {
             // All folder icons open kanban view
             $iconStyle = $customIconColor ? " style='color: " . htmlspecialchars($customIconColor, ENT_QUOTES) . " !important;'" : "";
@@ -252,7 +252,7 @@ if ($favoritesFolder && $favorites_count > 0) {
     // Add separator with toggle button after favorites
     echo '<div class="favorites-separator">';
     echo '<button type="button" class="favorites-toggle-btn favorites-expanded" data-action="toggle-favorites" title="' . t_h('notes_list.favorites.toggle', [], 'Show/hide favorites') . '">';
-    echo '<i class="fas fa-chevron-down"></i>';
+    echo '<i class="fas fa-chevron-up"></i>';
     echo '</button>';
     echo '</div>';
 }
@@ -261,7 +261,7 @@ if ($favoritesFolder && $favorites_count > 0) {
 if (empty($folder_filter)) {
     echo '<div id="root-drop-zone" class="root-drop-zone initially-hidden">';
     echo '<div class="drop-zone-content">';
-    echo '<i class="fa-home drop-zone-icon"></i>';
+    echo '<i class="fas fa-home drop-zone-icon"></i>';
     echo '<span class="drop-zone-text">' . t_h('notes_list.drop_zone.remove_from_folder', [], 'Drop here to remove from folder') . '</span>';
     echo '</div>';
     echo '</div>';

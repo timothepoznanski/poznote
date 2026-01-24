@@ -460,12 +460,12 @@
 
 /* Dark mode support for inline view */
 body.dark-mode .kanban-inline-view {
-    background: var(--bg-secondary, #1a1a2e);
+    background: transparent;
 }
 
 body.dark-mode .kanban-inline-header {
-    background: var(--bg-primary, #16162a);
-    border-bottom-color: var(--border-color, #2a2a4a);
+    background: transparent;
+    border-bottom-color: var(--border-color, rgb(46, 46, 46));
 }
 
 body.dark-mode .kanban-inline-header .kanban-back-btn {

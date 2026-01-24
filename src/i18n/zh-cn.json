@@ -311,6 +311,7 @@
             "user_management": "用户管理",
             "backup_export": "备份 / 导出",
             "restore_import": "还原 / 导入",
+            "github_sync": "GitHub 同步",
             "check_updates": "检查更新",
             "api_docs": "API 文档",
             "documentation": "Github 仓库",
@@ -906,7 +907,9 @@
         "callout_tip": "提示",
         "callout_important": "重要",
         "callout_warning": "警告",
-        "callout_caution": "注意"
+        "callout_caution": "注意",
+        "toggle": "Toggle",
+        "toggle_placeholder": "Toggle"
     },
     "api": {
         "settings": {
@@ -1825,6 +1828,85 @@
                 "title": "用户管理",
                 "description": "管理用户及其访问权限（仅限管理员）"
             }
+        }
+    },
+    "github_sync": {
+        "title": "GitHub 同步",
+        "description": "将您的笔记与 GitHub 仓库同步。将您的笔记推送到 GitHub 进行备份或协作，或从现有仓库中拉取笔记。",
+        "warning": "不要将此功能作为唯一的备份解决方案。\n请考虑为您的笔记设置手动或自动 ZIP 导出。",
+        "config": {
+            "title": "配置",
+            "status": "状态",
+            "repository": "仓库",
+            "branch": "分支",
+            "mode": "同步模式",
+            "token": "访问令牌",
+            "token_set": "已配置",
+            "token_missing": "未配置",
+            "not_configured": "未配置",
+            "hint": "GitHub 同步已禁用。在您的 .env 文件中设置 POZNOTE_GITHUB_SYNC_ENABLED=true 来启用它。"
+        },
+        "test": {
+            "title": "测试连接",
+            "button": "测试连接"
+        },
+        "last_sync": {
+            "title": "上次同步",
+            "action": "操作",
+            "time": "时间",
+            "pushed": "已推送",
+            "pulled": "已拉取",
+            "notes": "笔记"
+        },
+        "actions": {
+            "title": "同步操作",
+            "workspace": "工作区",
+            "target_workspace": "目标工作区",
+            "all_workspaces": "所有工作区",
+            "push": {
+                "title": "推送到 GitHub",
+                "description": "将您的笔记导出到 GitHub。更新现有文件并删除 Poznote 中不再存在的文件。",
+                "button": "推送笔记"
+            },
+            "pull": {
+                "title": "从 GitHub 拉取",
+                "description": "从 GitHub 导入笔记。更新现有笔记并将 GitHub 上不再存在的笔记移至回收站。",
+                "button": "拉取笔记"
+            }
+        },
+        "messages": {
+            "connection_success": "连接成功！已连接到 {{repo}}",
+            "connection_error": "连接失败：{{error}}",
+            "push_success": "成功推送 {{count}} 条笔记，删除 {{deleted}} 个文件（{{errors}} 个错误）",
+            "push_error": "推送失败：{{error}}",
+            "pull_success": "拉取 {{pulled}} 条新笔记并更新 {{updated}} 条现有笔记，删除 {{deleted}} 条笔记（{{errors}} 个错误）",
+            "pull_error": "拉取失败：{{error}}"
+        },
+        "debug": {
+            "show": "显示调试信息",
+            "hide": "隐藏调试信息",
+            "copy": "复制调试信息",
+            "copied": "已复制！"
+        },
+        "limitations": {
+            "title": "同步限制",
+            "element": "元素",
+            "html_notes": "HTML笔记",
+            "markdown_notes": "Markdown笔记",
+            "text_content": "文本内容",
+            "attachments": "文件附件",
+            "embedded_images": "图片",
+            "metadata": "元数据（标签、日期、ID）",
+            "embedded_note": "嵌入的图片保存在HTML中但不会在GitHub上显示"
+        },
+        "not_configured": {
+            "title": "GitHub 同步未配置",
+            "description": "要使用 GitHub 同步，您需要在 .env 文件中配置 GitHub 凭据。",
+            "steps_title": "配置指南",
+            "step1": "在 github.com/settings/tokens 创建 GitHub 个人访问令牌，带有 'repo' 范围",
+            "step2": "为您的笔记创建一个 GitHub 仓库（公开或私有）",
+            "step3": "将配置添加到您的 .env 文件",
+            "step4": "重启应用程序以使更改生效"
         }
     }
 }

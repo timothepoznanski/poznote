@@ -108,6 +108,24 @@ function parseMarkdown($text) {
         $protectedIndex++;
         return $placeholder;
     }, $text);
+
+    // Protect details and summary tags
+    $text = preg_replace_callback('/<(details|summary)([^>]*)>/i', function($matches) use (&$protectedElements, &$protectedIndex) {
+        $tag = $matches[1];
+        $attrs = $matches[2];
+        $placeholder = "\x00PTAG" . $protectedIndex . "\x00";
+        $protectedElements[$protectedIndex] = '<' . $tag . $attrs . '>';
+        $protectedIndex++;
+        return $placeholder;
+    }, $text);
+
+    $text = preg_replace_callback('/<\/(details|summary)>/i', function($matches) use (&$protectedElements, &$protectedIndex) {
+        $tag = $matches[1];
+        $placeholder = "\x00PTAG" . $protectedIndex . "\x00";
+        $protectedElements[$protectedIndex] = '</' . $tag . '>';
+        $protectedIndex++;
+        return $placeholder;
+    }, $text);
     
     // Now escape HTML to prevent XSS
     $html = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
@@ -154,8 +172,8 @@ function parseMarkdown($text) {
             return $matches[0];
         }, $text);
         
-        // Restore protected elements (images, links, and spans)
-        $text = preg_replace_callback('/\x00P(IMG|LNK|SPAN)(\d+)\x00/', function($matches) use ($protectedElements) {
+        // Restore protected elements (images, links, spans, and tags)
+        $text = preg_replace_callback('/\x00P(IMG|LNK|SPAN|TAG)(\d+)\x00/', function($matches) use ($protectedElements) {
             $index = (int)$matches[2];
             return isset($protectedElements[$index]) ? $protectedElements[$index] : $matches[0];
         }, $text);
@@ -196,6 +214,14 @@ function parseMarkdown($text) {
     
     for ($i = 0; $i < count($lines); $i++) {
         $line = $lines[$i];
+
+        // Check for protected HTML block tags (details, summary)
+        // This ensures they are treated as block-level elements
+        if (preg_match('/^\x00PTAG\d+\x00/', $line)) {
+            $flushParagraph();
+            $result[] = $applyInlineStyles($line);
+            continue;
+        }
         
         // Check if this line contains a protected math block placeholder
         if (preg_match('/\x00MATHBLOCK\d+\x00/', $line)) {

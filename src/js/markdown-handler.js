@@ -382,6 +382,20 @@ function parseMarkdown(text) {
         return placeholder;
     });
 
+    // Protect details and summary tags
+    text = text.replace(/<(details|summary)([^>]*)>/gi, function (match, tag, attrs) {
+        let placeholder = '\x00PTAG' + protectedIndex + '\x00';
+        protectedElements[protectedIndex] = '<' + tag + attrs + '>';
+        protectedIndex++;
+        return placeholder;
+    });
+    text = text.replace(/<\/(details|summary)>/gi, function (match, tag) {
+        let placeholder = '\x00PTAG' + protectedIndex + '\x00';
+        protectedElements[protectedIndex] = '</' + tag + '>';
+        protectedIndex++;
+        return placeholder;
+    });
+
     // Now escape HTML to prevent XSS
     let html = text
         .replace(/&/g, '&amp;')
@@ -419,8 +433,8 @@ function parseMarkdown(text) {
             return protectedCode[parseInt(index)] || match;
         });
 
-        // Restore protected elements (images, links, and spans)
-        text = text.replace(/\x00P(IMG|LNK|SPAN)(\d+)\x00/g, function (match, type, index) {
+        // Restore protected elements (images, links, spans, and details tags)
+        text = text.replace(/\x00P(IMG|LNK|SPAN|TAG)(\d+)\x00/g, function (match, type, index) {
             return protectedElements[parseInt(index)] || match;
         });
 
@@ -521,6 +535,24 @@ function parseMarkdown(text) {
             });
             result.push(line);
             continue;
+        }
+
+        // Check for protected HTML block tags (details, summary) to prevent wrapping in <p>
+        // This ensures they are treated as block-level elements
+        let ptagMatch = line.match(/^\x00PTAG(\d+)\x00/);
+        if (ptagMatch) {
+            let index = parseInt(ptagMatch[1]);
+            let tagContent = protectedElements[index];
+            if (tagContent && (
+                tagContent.toLowerCase().startsWith('<details') ||
+                tagContent.toLowerCase().startsWith('</details') ||
+                tagContent.toLowerCase().startsWith('<summary') ||
+                tagContent.toLowerCase().startsWith('</summary')
+            )) {
+                flushParagraph();
+                result.push(applyInlineStyles(line));
+                continue;
+            }
         }
 
         // Empty line - paragraph separator

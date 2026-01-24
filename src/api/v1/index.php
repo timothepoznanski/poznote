@@ -69,6 +69,7 @@ require_once __DIR__ . '/controllers/FolderShareController.php';
 require_once __DIR__ . '/controllers/SettingsController.php';
 require_once __DIR__ . '/controllers/BackupController.php';
 require_once __DIR__ . '/controllers/SystemController.php';
+require_once __DIR__ . '/controllers/GitHubSyncController.php';
 
 /**
  * Simple Router class for handling RESTful routes
@@ -209,6 +210,7 @@ $folderShareController = new FolderShareController($con);
 $settingsController = new SettingsController($con);
 $backupController = new BackupController($con);
 $systemController = new SystemController($con);
+$githubSyncController = new GitHubSyncController($con);
 
 // ======================
 // Notes Routes
@@ -549,6 +551,30 @@ $router->post('/system/verify-password', function($params) use ($systemControlle
 // List shared notes
 $router->get('/shared', function($params) use ($systemController) {
     echo json_encode($systemController->listShared());
+});
+
+// ======================
+// GitHub Sync Routes
+// ======================
+
+// Get GitHub sync status
+$router->get('/github-sync/status', function($params) use ($githubSyncController) {
+    $githubSyncController->status();
+});
+
+// Test GitHub connection
+$router->post('/github-sync/test', function($params) use ($githubSyncController) {
+    $githubSyncController->test();
+});
+
+// Push notes to GitHub
+$router->post('/github-sync/push', function($params) use ($githubSyncController) {
+    $githubSyncController->push();
+});
+
+// Pull notes from GitHub
+$router->post('/github-sync/pull', function($params) use ($githubSyncController) {
+    $githubSyncController->pull();
 });
 
 // ======================

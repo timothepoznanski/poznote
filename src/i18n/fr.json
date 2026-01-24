@@ -323,6 +323,7 @@
             "user_management": "Gestion des utilisateurs",
             "backup_export": "Sauvegarde / Export",
             "restore_import": "Restauration / Import",
+            "github_sync": "Synchronisation GitHub",
             "check_updates": "Vérifier les mises à jour",
             "api_docs": "Documentation API",
             "documentation": "Repository Github",
@@ -926,6 +927,8 @@
         "callout_important": "Important",
         "callout_warning": "Avertissement",
         "callout_caution": "Attention",
+        "toggle": "Toggle",
+        "toggle_placeholder": "Toggle",
         "color": "Couleur",
         "color_red": "Rouge",
         "color_blue": "Bleu",
@@ -1852,6 +1855,85 @@
                 "title": "Gestion des utilisateurs",
                 "description": "Gérer les utilisateurs et leurs accès (Admin uniquement)"
             }
+        }
+    },
+    "github_sync": {
+        "title": "Synchronisation GitHub",
+        "description": "Synchronisez vos notes avec un dépôt GitHub. Envoyez vos notes vers GitHub pour les sauvegarder ou collaborer, ou récupérez des notes depuis un dépôt existant.",
+        "warning": "Ne vous servez pas de cette fonctionnalité comme seule solution de sauvegarde.\nPensez à mettre en place des exports manuels ou automatiques de fichiers ZIP de vos notes.",
+        "config": {
+            "title": "Configuration",
+            "status": "Statut",
+            "repository": "Dépôt",
+            "branch": "Branche",
+            "mode": "Mode de synchronisation",
+            "token": "Jeton d'accès",
+            "token_set": "Configuré",
+            "token_missing": "Non configuré",
+            "not_configured": "Non configuré",
+            "hint": "La synchronisation GitHub est désactivée. Définissez POZNOTE_GITHUB_SYNC_ENABLED=true dans votre fichier .env pour l'activer."
+        },
+        "test": {
+            "title": "Tester la connexion",
+            "button": "Tester la connexion"
+        },
+        "last_sync": {
+            "title": "Dernière synchronisation",
+            "action": "Action",
+            "time": "Heure",
+            "pushed": "Envoyées",
+            "pulled": "Récupérées",
+            "notes": "notes"
+        },
+        "actions": {
+            "title": "Actions de synchronisation",
+            "workspace": "Espace de travail",
+            "target_workspace": "Espace de travail cible",
+            "all_workspaces": "Tous les espaces de travail",
+            "push": {
+                "title": "Envoyer vers GitHub",
+                "description": "Exporte vos notes vers GitHub. Met à jour les fichiers existants et supprime les fichiers qui n'existent plus dans Poznote.",
+                "button": "Envoyer les notes"
+            },
+            "pull": {
+                "title": "Récupérer depuis GitHub",
+                "description": "Importe les notes depuis GitHub. Met à jour les notes existantes et déplace dans la corbeille les notes qui n'existent plus sur GitHub.",
+                "button": "Récupérer les notes"
+            }
+        },
+        "messages": {
+            "connection_success": "Connexion réussie ! Connecté à {{repo}}",
+            "connection_error": "Échec de la connexion : {{error}}",
+            "push_success": "{{count}} notes envoyées avec succès, {{deleted}} fichiers supprimés ({{errors}} erreurs)",
+            "push_error": "Échec de l'envoi : {{error}}",
+            "pull_success": "{{pulled}} nouvelles notes récupérées, {{updated}} notes existantes mises à jour, {{deleted}} notes supprimées ({{errors}} erreurs)",
+            "pull_error": "Échec de la récupération : {{error}}"
+        },
+        "debug": {
+            "show": "Afficher les infos de debug",
+            "hide": "Masquer les infos de debug",
+            "copy": "Copier le debug",
+            "copied": "Copié !"
+        },
+        "limitations": {
+            "title": "Limitations de la synchronisation",
+            "element": "Élément",
+            "html_notes": "Notes HTML",
+            "markdown_notes": "Notes Markdown",
+            "text_content": "Contenu texte",
+            "attachments": "Pièces jointes",
+            "embedded_images": "Images",
+            "metadata": "Métadonnées (tags, date, ID)",
+            "embedded_note": "Les images intégrées sont conservées dans le HTML mais pas affichées sur GitHub"
+        },
+        "not_configured": {
+            "title": "Synchronisation GitHub non configurée",
+            "description": "Pour utiliser la synchronisation GitHub, vous devez configurer vos identifiants GitHub dans le fichier .env.",
+            "steps_title": "Instructions de configuration",
+            "step1": "Créez un jeton d'accès personnel GitHub sur github.com/settings/tokens avec le scope 'repo'",
+            "step2": "Créez un dépôt GitHub (public ou privé) pour vos notes",
+            "step3": "Ajoutez la configuration dans votre fichier .env",
+            "step4": "Redémarrez l'application pour que les changements prennent effet"
         }
     }
 }
