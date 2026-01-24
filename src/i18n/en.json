@@ -1115,6 +1115,13 @@
             "hint": "Enable Kanban view on a folder to see it here."
         }
     },
+    "sidebar": {
+        "display": "Display",
+        "home": "Home",
+        "settings": "Settings",
+        "create": "Create",
+        "toggle": "Hide/Show left column"
+    },
     "home": {
         "title": "Home",
         "shared_notes": "Shared Notes",
