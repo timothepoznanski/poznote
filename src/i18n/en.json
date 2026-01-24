@@ -127,6 +127,72 @@
         },
         "errors": []
     },
+    "attachments": {
+        "empty": "No attachments.",
+        "upload": {
+            "button_uploading": "Uploading..."
+        },
+        "actions": {
+            "view": "View",
+            "delete": "Delete",
+            "open_attachments": "Open attachments",
+            "download": "Download {{filename}}"
+        },
+        "errors": {
+            "select_file": "Please select a file to upload.",
+            "no_note_selected": "No note selected.",
+            "file_too_large": "The file is too large (max: {{maxSize}}).",
+            "http_error": "HTTP error: {{status}}",
+            "invalid_server_response": "Invalid server response.",
+            "upload_failed": "Upload failed: {{error}}",
+            "deletion_failed": "Deletion failed: {{error}}",
+            "deletion_failed_generic": "Deletion failed.",
+            "loading_failed": "Failed to load attachments",
+            "loading_error": "Error loading attachments",
+            "upload_failed_generic": "Upload failed. Please try again.",
+            "upload_failed_connection": "Upload failed. Please check your connection."
+        },
+        "messages": {
+            "upload_success": "File uploaded successfully!",
+            "deleted_success": "Attachment deleted successfully"
+        },
+        "page": {
+            "title": "Manage attachments",
+            "subtitle": "Manage attachments for note:",
+            "upload_section_title": "Choose a new attachment",
+            "drag_drop_info": "You can drag and drop your file below:",
+            "all_types_accepted": "All file types accepted (max 200 MB)",
+            "upload_button": "Choose file",
+            "current_attachments": "Current attachments",
+            "loading_attachments": "Loading attachments...",
+            "preview_alt": "Preview",
+            "uploaded_prefix": "Uploaded: ",
+            "open_in_new_tab": "Open in new tab",
+            "pdf_label": "PDF"
+        },
+        "modals": {
+            "delete": {
+                "title": "Delete attachment",
+                "message": "Do you want to delete this attachment? This action is irreversible."
+            }
+        },
+        "size": {
+            "units": {
+                "bytes": "bytes",
+                "kb": "KB",
+                "mb": "MB",
+                "gb": "GB"
+            }
+        },
+        "list": {
+            "title": "Notes with attachments",
+            "no_attachments": "No notes with attachments yet.",
+            "back_to_notes": "Back to notes",
+            "manage_attachments": "Manage attachments",
+            "attachment_count_singular": "1 attachment",
+            "attachment_count_plural": "{{count}} attachments"
+        }
+    },
     "modals": {
         "update": {
             "title": "📱 Application Version",

@@ -219,15 +219,16 @@
 
         // Create new heading
         const heading = document.createElement(tag);
-        heading.appendChild(document.createElement('br'));
+        const textNode = document.createTextNode('\u200B'); // Zero-width space to place cursor
+        heading.appendChild(textNode);
 
         // Insert at cursor position
         range.deleteContents();
         range.insertNode(heading);
 
-        // Place cursor inside heading
+        // Place cursor inside heading after the zero-width space
         const newRange = document.createRange();
-        newRange.setStart(heading, 0);
+        newRange.setStart(textNode, 1);
         newRange.collapse(true);
         selection.removeAllRanges();
         selection.addRange(newRange);
