@@ -1716,6 +1716,7 @@
     "github_sync": {
         "title": "Sincronização GitHub",
         "description": "Sincronize suas notas com um repositório do GitHub. Envie suas notas para o GitHub para backup ou colaboração, ou recupere notas de um repositório existente.",
+        "warning": "Não utilize esta funcionalidade como a sua única solução de backup.\nConsidere configurar exportações ZIP manuais ou automáticas das suas notas.",
         "config": {
             "title": "Configuração",
             "status": "Status",

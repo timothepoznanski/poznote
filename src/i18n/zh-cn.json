@@ -1833,6 +1833,7 @@
     "github_sync": {
         "title": "GitHub 同步",
         "description": "将您的笔记与 GitHub 仓库同步。将您的笔记推送到 GitHub 进行备份或协作，或从现有仓库中拉取笔记。",
+        "warning": "不要将此功能作为唯一的备份解决方案。\n请考虑为您的笔记设置手动或自动 ZIP 导出。",
         "config": {
             "title": "配置",
             "status": "状态",
