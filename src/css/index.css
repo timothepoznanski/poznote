@@ -1445,7 +1445,7 @@ body.sidebar-collapsed .toggle-sidebar-btn i {
 /* Réduire la taille des icônes Font Awesome dans la toolbar */
 .toolbar-btn i,
 .toolbar-btn [class*="fa-"] {
-    font-size: 0.75em !important;
+    font-size: 0.9em !important;
 }
 
 /* Text formatting buttons: hidden by default, visible on selection */
@@ -4014,15 +4014,15 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 }
 
 /* Blue color for favorite star when it's marked as favorite - #007DB8 */
+.toolbar-btn.btn-favorite.is-favorite i.fa-star,
 .toolbar-btn.btn-favorite.is-favorite i.fa-star-light,
-.toolbar-btn.btn-favorite.is-favorite .fa-star-light {
-    color: #007DB8 !important;
-}
-
-/* Blue color when a note is shared publicly */
+.toolbar-btn.btn-favorite.is-favorite .fa-star,
+.toolbar-btn.btn-favorite.is-favorite .fa-star-light,
 .toolbar-btn.btn-share.is-shared i.fa-cloud,
-.toolbar-btn.btn-share.is-shared .fa-cloud {
+.toolbar-btn.btn-share.is-shared .fa-cloud,
+.toolbar-btn.btn-attachment.has-attachments i {
     color: #007DB8 !important;
+    filter: none !important;
 }
 
 /* Blue color for markdown view mode toggle button */
@@ -6036,9 +6036,11 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 /* Exception: Remove filter for favorite/share/attachment (to show blue color) */
+.toolbar-btn.is-favorite .fa-star,
 .toolbar-btn.is-favorite .fa-star-light,
 .toolbar-btn.is-shared .fa-cloud,
-.toolbar-btn.has-attachments .fa-paperclip {
+.toolbar-btn.has-attachments .fa-paperclip,
+.toolbar-btn.has-attachments .fa-paperclip-light {
     filter: none !important;
 }
 
@@ -6049,13 +6051,18 @@ input[type="search"]::-webkit-search-results-decoration {
 
 /* Make markdown toggle icons blue */
 .markdown-edit-btn .fa-markdown,
-.markdown-preview-btn .fa-eye {
+.markdown-preview-btn .fa-eye,
+.markdown-view-mode-btn i,
+.markdown-split-btn.active i,
+.markdown-split-btn.active [class*="fa-"] {
     color: #007DB8 !important;
     filter: none !important;
 }
 
 .markdown-edit-btn:hover .fa-markdown,
-.markdown-preview-btn:hover .fa-eye {
+.markdown-preview-btn:hover .fa-eye,
+.markdown-view-mode-btn:hover i,
+.markdown-split-btn:hover i {
     color: #007DB8 !important;
     filter: none !important;
     transform: scale(1.18);

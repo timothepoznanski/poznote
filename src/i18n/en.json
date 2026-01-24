@@ -1219,6 +1219,7 @@
     "github_sync": {
         "title": "GitHub Sync",
         "description": "Synchronize your notes with a GitHub repository. Push your notes to GitHub for backup or collaboration, or pull notes from an existing repository.",
+        "warning": "Do not use this feature as your only backup solution.\nConsider setting up manual or automatic ZIP exports of your notes.",
         "config": {
             "title": "Configuration",
             "status": "Status",

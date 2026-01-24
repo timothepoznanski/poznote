@@ -149,7 +149,7 @@ try {
         <div class="github-sync-header">
             <p class="github-sync-description"><?php echo t_h('github_sync.description'); ?></p>
         </div>
-        
+
         <div class="limitations-table-wrapper">
             <table class="limitations-table">
                 <thead>
@@ -348,6 +348,11 @@ try {
                 </div>
             </div>
         <?php endif; ?>
+
+        <div class="github-sync-footer-note">
+            <strong><?php echo t_h('slash_menu.callout_important'); ?> :</strong><br>
+            <?php echo nl2br(t_h('github_sync.warning')); ?>
+        </div>
 
     </div>
     

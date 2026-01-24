@@ -1860,6 +1860,7 @@
     "github_sync": {
         "title": "Synchronisation GitHub",
         "description": "Synchronisez vos notes avec un dépôt GitHub. Envoyez vos notes vers GitHub pour les sauvegarder ou collaborer, ou récupérez des notes depuis un dépôt existant.",
+        "warning": "Ne vous servez pas de cette fonctionnalité comme seule solution de sauvegarde.\nPensez à mettre en place des exports manuels ou automatiques de fichiers ZIP de vos notes.",
         "config": {
             "title": "Configuration",
             "status": "Statut",

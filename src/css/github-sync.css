@@ -58,6 +58,28 @@
     border: 1px solid #f5c6cb;
 }
 
+.alert-warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.github-sync-footer-note {
+    /* margin: 80px auto 40px; */
+    padding: 0px 0px 24px;
+    text-align: center;
+    color: #71717a;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    /* border-top: 1px solid #f4f4f5; */
+    max-width: 700px;
+}
+
+.github-sync-footer-note strong {
+    color: #ef4444;
+    font-weight: 600;
+}
+
 /* Sections */
 .github-sync-section {
     background: #fff;
@@ -230,7 +252,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px;
-    margin-bottom: 20px;
+    /* margin-bottom: 20px; */
 }
 
 .sync-action-card {
@@ -521,6 +543,23 @@ body.dark-mode .alert-error {
     background: rgba(220, 53, 69, 0.2);
     color: #e57373;
     border-color: rgba(220, 53, 69, 0.3);
+}
+
+body.dark-mode .alert-warning {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffca28;
+    border-color: rgba(255, 193, 7, 0.3);
+}
+
+body.dark-mode .github-sync-footer-note,
+html[data-theme='dark'] .github-sync-footer-note {
+    border-top-color: #333;
+    color: #999;
+}
+
+body.dark-mode .github-sync-footer-note strong,
+html[data-theme='dark'] .github-sync-footer-note strong {
+    color: #f1716d;
 }
 
 body.dark-mode .badge-success {

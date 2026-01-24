@@ -1331,7 +1331,7 @@ body.dark-mode .attachment-upload-section {
 
 html[data-theme='dark'] .note-attachments-row,
 body.dark-mode .note-attachments-row {
-    background-color: #242424;
+    background-color: transparent;
     border-color: #404040;
 }
 
@@ -2306,13 +2306,14 @@ body.dark-mode .toolbar-btn.save-modified .fa-save {
     filter: none !important;
 }
 
-html[data-theme='dark'] .toolbar-btn.is-favorite .fa-star-light,
-html[data-theme='dark'] .toolbar-btn.is-shared .fa-cloud,
-html[data-theme='dark'] .toolbar-btn.has-attachments .fa-paperclip,
-body.dark-mode .toolbar-btn.is-favorite .fa-star-light,
-body.dark-mode .toolbar-btn.is-shared .fa-cloud,
-body.dark-mode .toolbar-btn.has-attachments .fa-paperclip {
-    filter: none !important;
+/* Increased specificity to beat the generic icon filter in dark mode */
+html[data-theme='dark'] .toolbar-btn.is-favorite i,
+html[data-theme='dark'] .toolbar-btn.is-shared i,
+html[data-theme='dark'] .toolbar-btn.has-attachments i,
+body.dark-mode .toolbar-btn.is-favorite i,
+body.dark-mode .toolbar-btn.is-shared i,
+body.dark-mode .toolbar-btn.has-attachments i {
+    color: #007DB8 !important;
     filter: none !important;
 }
 
@@ -2371,11 +2372,11 @@ body.dark-mode .toolbar-btn.markdown-help-btn:hover [class*="fa-"] {
     transform: scale(1.18);
 }
 
-/* Make markdown split view button blue in dark mode */
-html[data-theme='dark'] .toolbar-btn.markdown-split-btn i,
-html[data-theme='dark'] .toolbar-btn.markdown-split-btn [class*="fa-"],
-body.dark-mode .toolbar-btn.markdown-split-btn i,
-body.dark-mode .toolbar-btn.markdown-split-btn [class*="fa-"] {
+/* Make markdown split view button blue in dark mode when active */
+html[data-theme='dark'] .toolbar-btn.markdown-split-btn.active i,
+html[data-theme='dark'] .toolbar-btn.markdown-split-btn.active [class*="fa-"],
+body.dark-mode .toolbar-btn.markdown-split-btn.active i,
+body.dark-mode .toolbar-btn.markdown-split-btn.active [class*="fa-"] {
     color: #007DB8 !important;
     filter: none !important;
 }
