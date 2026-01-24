@@ -103,6 +103,17 @@ try {
     // Use default if error
 }
 
+// Load sidebar font size
+$sidebar_font_size = '13';
+try {
+    $stmt = $con->prepare("SELECT value FROM settings WHERE key = ?");
+    $stmt->execute(['sidebar_font_size']);
+    $sidebar_font_size_value = $stmt->fetchColumn();
+    if ($sidebar_font_size_value !== false && $sidebar_font_size_value !== '') {
+        $sidebar_font_size = $sidebar_font_size_value;
+    }
+} catch (Exception $e) {}
+
 // Load note max width for CSS custom property
 $note_max_width = '800';
 try {
@@ -155,7 +166,7 @@ try {
     <link type="text/css" rel="stylesheet" href="css/kanban.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="js/katex/katex.min.css?v=<?php echo $v; ?>"/>
-    <style>:root { --note-font-size: <?php echo htmlspecialchars($note_font_size, ENT_QUOTES); ?>px; --note-max-width: <?php echo htmlspecialchars($note_max_width, ENT_QUOTES); ?>px; }</style>
+    <style>:root { --note-font-size: <?php echo htmlspecialchars($note_font_size, ENT_QUOTES); ?>px; --sidebar-font-size: <?php echo htmlspecialchars($sidebar_font_size, ENT_QUOTES); ?>px; --note-max-width: <?php echo htmlspecialchars($note_max_width, ENT_QUOTES); ?>px; }</style>
     <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <script src="js/modal-alerts.js?v=<?php echo $v; ?>"></script>
     <script src="js/toolbar.js?v=<?php echo $v; ?>"></script>

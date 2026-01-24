@@ -767,6 +767,7 @@ body {
 .folder-name {
     font-weight: 600;
     color: #111827;
+    font-size: var(--sidebar-font-size, 13px);
 }
 
 .folder-note-count {
@@ -822,6 +823,7 @@ body {
 .links_arbo_left .note-title {
     font-weight: 500;
     color: #1f2937;
+    font-size: var(--sidebar-font-size, 13px);
 }
 
 /* Notes without folder - indent to align with folder items */
@@ -2770,14 +2772,70 @@ textarea:focus {
 
 .noteentry {
     padding: 0;
-    /* padding-top: 8px;  */
     width: 100%;
     border: 0 none white;
     overflow-wrap: break-word;
     outline: none;
     resize: none;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-    font-size: var(--note-font-size, 15px);
+}
+
+.noteentry,
+.noteentry *:not(.fa):not(.fab):not(.fas):not(.far):not(.fal):not(.fad):not(i):not([class*="fa-"]):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) {
+    font-size: var(--note-font-size, 15px) !important;
+}
+
+/* Heading styles - must have higher specificity to override font-size */
+.noteentry h1 {
+    font-size: 2em !important;
+    font-weight: bold;
+    margin: 0.67em 0;
+}
+
+.noteentry h2 {
+    font-size: 1.5em !important;
+    font-weight: bold;
+    margin: 0.83em 0;
+}
+
+.noteentry h3 {
+    font-size: 1.17em !important;
+    font-weight: bold;
+    margin: 1em 0;
+}
+
+.noteentry h4 {
+    font-size: 1em !important;
+    font-weight: bold;
+    margin: 1.33em 0;
+}
+
+.noteentry h5 {
+    font-size: 0.83em !important;
+    font-weight: bold;
+    margin: 1.67em 0;
+}
+
+.noteentry h6 {
+    font-size: 0.67em !important;
+    font-weight: bold;
+    margin: 2.33em 0;
+}
+
+/* Ensure headings inside <font> tags keep their size */
+.noteentry font h1,
+.noteentry font h2,
+.noteentry font h3,
+.noteentry font h4,
+.noteentry font h5,
+.noteentry font h6,
+.noteentry h1 font,
+.noteentry h2 font,
+.noteentry h3 font,
+.noteentry h4 font,
+.noteentry h5 font,
+.noteentry h6 font {
+    font-size: inherit !important;
 }
 
 /* Optimize image rendering for better performance with many images */
@@ -6157,6 +6215,7 @@ body.dark-mode .create-section h4 {
     background-color: transparent !important;
     padding: 0;
     margin-left: 8px;
+    font-size: var(--note-font-size, 15px);
     min-height: 1.6em;
     word-wrap: break-word;
     white-space: pre-wrap;

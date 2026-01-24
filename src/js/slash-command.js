@@ -134,13 +134,19 @@
     function insertMarkdownAtCursor(text, caretDeltaFromInsertEnd) {
         // Prefer DOM-range insertion to avoid line/offset mismatches in contentEditable.
         const editor = getCurrentMarkdownEditorFromSelection();
-        if (!editor) return;
+        if (!editor) {
+            return;
+        }
 
         const selection = window.getSelection();
-        if (!selection || !selection.rangeCount) return;
+        if (!selection || !selection.rangeCount) {
+            return;
+        }
 
         const range = selection.getRangeAt(0);
-        if (!editor.contains(range.startContainer)) return;
+        if (!editor.contains(range.startContainer)) {
+            return;
+        }
 
         const caretDelta = typeof caretDeltaFromInsertEnd === 'number' ? caretDeltaFromInsertEnd : 0;
         const caretPos = Math.max(0, Math.min(text.length, text.length + caretDelta));
@@ -1672,11 +1678,15 @@
 
     function deleteSlashText() {
         try {
-            if (!slashTextNode || slashOffset < 0) return;
+            if (!slashTextNode || slashOffset < 0) {
+                return;
+            }
 
             // Obtenir la position actuelle du curseur
             const sel = window.getSelection();
-            if (!sel || !sel.rangeCount) return;
+            if (!sel || !sel.rangeCount) {
+                return;
+            }
 
             const currentRange = sel.getRangeAt(0);
             const currentOffset = currentRange.startOffset;
@@ -1760,7 +1770,9 @@
             }
         }
 
-        if (!actionToExecute) return;
+        if (!actionToExecute) {
+            return;
+        }
 
         // Supprimer le slash et le texte de filtre (sauf si keepSlash est true)
         const shouldKeepSlash = foundCmd && foundCmd.keepSlash;

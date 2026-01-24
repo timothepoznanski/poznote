@@ -1602,8 +1602,8 @@ class FoldersController {
             return;
         }
         
-        if ($columns === null || $columns < 1 || $columns > 10) {
-            $this->sendError('columns must be between 1 and 10', 400);
+        if ($columns === null || $columns < 1 || $columns > 9) {
+            $this->sendError('columns must be between 1 and 9', 400);
             return;
         }
         

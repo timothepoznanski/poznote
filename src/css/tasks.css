@@ -82,7 +82,7 @@
 
 .task-drag-handle:hover {
     color: #666;
-    background: rgba(0,0,0,0.05);
+    background: rgba(0, 0, 0, 0.05);
 }
 
 .task-drag-handle:active {
@@ -103,7 +103,7 @@
 .task-item.dragging {
     opacity: 0.5;
     /* transform: rotate(3deg) scale(1.05); */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 1000;
     border: 4px solid #007DB8 !important;
 }
@@ -111,7 +111,7 @@
 /* Placeholder used for touch drag-and-drop */
 .task-item.placeholder {
     border: 1px dashed #cbd5e0;
-    background: rgba(0,0,0,0.02);
+    background: rgba(0, 0, 0, 0.02);
 }
 
 .task-item.completed {
@@ -144,7 +144,7 @@
 
 .task-text {
     flex: 1;
-    font-size: 14px;
+    font-size: var(--note-font-size, 15px);
     line-height: 1.4;
     cursor: text;
     /* Ensure very long words/URLs wrap to next line to avoid overflowing the container */
@@ -183,7 +183,8 @@
 /* Make sure the inline edit input doesn't cause horizontal scrolling and wraps long content */
 .task-edit-input,
 .task-input {
-    white-space: pre-wrap; /* preserve user line breaks but allow wrapping */
+    white-space: pre-wrap;
+    /* preserve user line breaks but allow wrapping */
     overflow-wrap: anywhere;
 }
 
@@ -256,7 +257,8 @@
 }
 
 .task-item.important .task-text {
-    color: #c62828; /* red text for important tasks */
+    color: #c62828;
+    /* red text for important tasks */
     font-weight: 600;
 }
 
@@ -283,8 +285,13 @@
     justify-content: center;
 }
 
-.task-icon-trash::before { content: "\f2ed"; }
-.task-icon-star::before { content: "\f005"; }
+.task-icon-trash::before {
+    content: "\f2ed";
+}
+
+.task-icon-star::before {
+    content: "\f005";
+}
 
 .task-icon-trash,
 .task-icon-star {
@@ -302,15 +309,15 @@
 
 /* Red star icon for important tasks */
 .task-item.important .task-icon-star {
-  color: #ff0000 !important;
+    color: #ff0000 !important;
 }
 
 .task-item.important .fa-star {
-  color: #ff0000 !important;
+    color: #ff0000 !important;
 }
 
 .task-important-btn.is-favorite i {
-  color: #ff0000 !important;
+    color: #ff0000 !important;
 }
 
 /* Ensure Font Awesome glyphs render correctly inside tasklist notes
@@ -357,6 +364,7 @@
     padding: 8px 0 8px 12px;
     margin: 12px 0;
 }
+
 .callout .callout-title {
     font-weight: 700;
     margin-bottom: 15px;
@@ -364,13 +372,15 @@
     align-items: center;
     gap: 8px;
 }
+
 .callout .callout-body {
     font-size: 14px;
     line-height: 1.45;
 }
 
 /* Ensure callouts look good inside notes (inherit text color) */
-.noteentry .callout, .innernote .callout {
+.noteentry .callout,
+.innernote .callout {
     color: inherit;
 }
 
@@ -382,8 +392,10 @@
     height: 16px;
     margin-right: 8px;
     vertical-align: middle;
-    opacity: 0.75; /* lighten icons so they're not too dark */
+    opacity: 0.75;
+    /* lighten icons so they're not too dark */
 }
+
 .callout .callout-title-text {
     font-weight: 600;
     font-size: 14px;
@@ -393,8 +405,9 @@
 .callout-note {
     border-left-color: #0969da;
 }
+
 .callout-note .callout-icon-svg,
-.callout-note .callout-title-text { 
+.callout-note .callout-title-text {
     color: #0969da;
     fill: #0969da;
 }
@@ -402,8 +415,9 @@
 .callout-tip {
     border-left-color: #1a7f37;
 }
+
 .callout-tip .callout-icon-svg,
-.callout-tip .callout-title-text { 
+.callout-tip .callout-title-text {
     color: #1a7f37;
     fill: #1a7f37;
 }
@@ -411,8 +425,9 @@
 .callout-important {
     border-left-color: #8250df;
 }
+
 .callout-important .callout-icon-svg,
-.callout-important .callout-title-text { 
+.callout-important .callout-title-text {
     color: #8250df;
     fill: #8250df;
 }
@@ -420,8 +435,9 @@
 .callout-warning {
     border-left-color: #9a6700;
 }
+
 .callout-warning .callout-icon-svg,
-.callout-warning .callout-title-text { 
+.callout-warning .callout-title-text {
     color: #9a6700;
     fill: #9a6700;
 }
@@ -429,8 +445,9 @@
 .callout-caution {
     border-left-color: #d1242f;
 }
+
 .callout-caution .callout-icon-svg,
-.callout-caution .callout-title-text { 
+.callout-caution .callout-title-text {
     color: #d1242f;
     fill: #d1242f;
 }

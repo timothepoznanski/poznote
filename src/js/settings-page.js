@@ -149,16 +149,23 @@
     }
 
     function refreshFontSizeBadge() {
+        // Refresh note font size badge
         getSetting('note_font_size', function (value) {
             var badge = document.getElementById('font-size-badge');
             if (badge) {
-                if (value && value.trim()) {
-                    badge.textContent = value + 'px';
-                    badge.className = 'setting-status enabled';
-                } else {
-                    badge.textContent = tr('display.badges.font_size_default', { size: 15 }, 'default (15px)');
-                    badge.className = 'setting-status disabled';
-                }
+                var size = value || '15';
+                badge.textContent = tr('display.badges.note_font_size', { size: size }, 'Note: ' + size + 'px');
+                badge.className = 'setting-status enabled';
+            }
+        });
+
+        // Refresh sidebar font size badge
+        getSetting('sidebar_font_size', function (value) {
+            var badge = document.getElementById('sidebar-font-size-badge');
+            if (badge) {
+                var size = value || '13';
+                badge.textContent = tr('display.badges.sidebar_font_size', { size: size }, 'Sidebar: ' + size + 'px');
+                badge.className = 'setting-status enabled';
             }
         });
     }

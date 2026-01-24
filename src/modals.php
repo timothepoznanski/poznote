@@ -59,17 +59,14 @@
             <h2><?php echo t_h('modals.font_size.title'); ?></h2>
         </div>
         <div class="modal-body">
-            <p><?php echo t_h('modals.font_size.description'); ?></p>
             <div class="font-size-controls">
-                <div class="font-size-section">
-                    <label for="fontSizeInput"><?php echo t_h('modals.font_size.label'); ?></label>
+                <div class="font-size-row">
+                    <label for="fontSizeInput"><?php echo t_h('modals.font_size.note_label'); ?></label>
                     <input type="number" id="fontSizeInput" min="10" max="32" step="1" value="15">
-                    <div id="defaultFontSizeInfo" class="default-info default-font-size-info">
-                        <?php echo t_h('modals.font_size.default_value', ['size' => '15']); ?>
-                    </div>
-                    <div class="font-size-preview">
-                        <p id="fontSizePreview"><?php echo t_h('modals.font_size.preview'); ?></p>
-                    </div>
+                </div>
+                <div class="font-size-row">
+                    <label for="sidebarFontSizeInput"><?php echo t_h('modals.font_size.sidebar_label'); ?></label>
+                    <input type="number" id="sidebarFontSizeInput" min="10" max="32" step="1" value="13">
                 </div>
             </div>
         </div>
@@ -698,8 +695,8 @@
             <label for="kanbanFolderName"><?php echo t_h('modals.kanban_structure.folder_name_label', [], 'Folder name:'); ?></label>
             <input type="text" id="kanbanFolderName" placeholder="<?php echo t_h('modals.kanban_structure.folder_name_placeholder', [], 'My Kanban Board'); ?>" maxlength="255" class="kanban-folder-input">
             
-            <label for="kanbanColumnsCount" style="margin-top: 12px;"><?php echo t_h('modals.kanban_structure.columns_label', [], 'Number of columns (1-10):'); ?></label>
-            <input type="number" id="kanbanColumnsCount" min="1" max="10" value="3" class="kanban-columns-input">
+            <label for="kanbanColumnsCount" style="margin-top: 12px;"><?php echo t_h('modals.kanban_structure.columns_label', [], 'Number of columns (1-9):'); ?></label>
+            <input type="number" id="kanbanColumnsCount" min="1" max="9" value="3" class="kanban-columns-input">
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="kanbanStructureModal"><?php echo t_h('common.cancel'); ?></button>

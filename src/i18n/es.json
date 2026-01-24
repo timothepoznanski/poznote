@@ -672,9 +672,10 @@
         },
         "font_size": {
             "title": "Tamaño de fuente",
-            "label": "Tamaño de fuente (px):",
+            "note_label": "Contenido de la nota (px):",
+            "sidebar_label": "Notas y carpetas (px):",
             "default_value": "{{size}} px es el valor predeterminado",
-            "preview": "Este es un texto de vista previa"
+            "preview": "Vista previa"
         },
         "note_width": {
             "title": "Ancho del contenido de la nota",
@@ -757,9 +758,9 @@
             "title": "Crear estructura Kanban",
             "folder_name_label": "Nombre de la carpeta:",
             "folder_name_placeholder": "Mi tablero Kanban",
-            "columns_label": "Número de columnas (1-10):",
+            "columns_label": "Número de columnas (1-9):",
             "error_name_required": "El nombre de la carpeta es obligatorio",
-            "error_columns_range": "El número de columnas debe estar entre 1 y 10",
+            "error_columns_range": "El número de columnas debe estar entre 1 y 9",
             "error_create": "Error al crear la estructura Kanban",
             "error_create_prefix": "Error al crear la estructura Kanban: {{error}}"
         },

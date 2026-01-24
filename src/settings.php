@@ -333,7 +333,10 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                         <i class="fa-text-height"></i>
                     </div>
                     <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.note_font_size', [], 'Content font size'); ?> <span id="font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
+                        <h3><?php echo t_h('display.cards.note_font_size', [], 'Font size'); ?> 
+                            <span id="font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                            <span id="sidebar-font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                        </h3>
                     </div>
                 </div>
 
