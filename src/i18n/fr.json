@@ -1891,22 +1891,39 @@
             "all_workspaces": "Tous les espaces de travail",
             "push": {
                 "title": "Envoyer vers GitHub",
-                "description": "Exportez vos notes vers le dépôt GitHub. Les fichiers existants seront mis à jour.",
+                "description": "Exporte vos notes vers GitHub. Met à jour les fichiers existants et supprime les fichiers qui n'existent plus dans Poznote.",
                 "button": "Envoyer les notes"
             },
             "pull": {
                 "title": "Récupérer depuis GitHub",
-                "description": "Importez des notes depuis le dépôt GitHub. Les notes existantes avec le même titre seront mises à jour.",
+                "description": "Importe les notes depuis GitHub. Met à jour les notes existantes et déplace dans la corbeille les notes qui n'existent plus sur GitHub.",
                 "button": "Récupérer les notes"
             }
         },
         "messages": {
             "connection_success": "Connexion réussie ! Connecté à {{repo}}",
             "connection_error": "Échec de la connexion : {{error}}",
-            "push_success": "{{count}} notes envoyées avec succès ({{errors}} erreurs)",
+            "push_success": "{{count}} notes envoyées avec succès, {{deleted}} fichiers supprimés ({{errors}} erreurs)",
             "push_error": "Échec de l'envoi : {{error}}",
-            "pull_success": "{{pulled}} nouvelles notes récupérées et {{updated}} notes existantes mises à jour",
+            "pull_success": "{{pulled}} nouvelles notes récupérées, {{updated}} notes existantes mises à jour, {{deleted}} notes supprimées ({{errors}} erreurs)",
             "pull_error": "Échec de la récupération : {{error}}"
+        },
+        "debug": {
+            "show": "Afficher les infos de debug",
+            "hide": "Masquer les infos de debug",
+            "copy": "Copier le debug",
+            "copied": "Copié !"
+        },
+        "limitations": {
+            "title": "Limitations de la synchronisation",
+            "element": "Élément",
+            "html_notes": "Notes HTML",
+            "markdown_notes": "Notes Markdown",
+            "text_content": "Contenu texte",
+            "attachments": "Pièces jointes",
+            "embedded_images": "Images",
+            "metadata": "Métadonnées (tags, date, ID)",
+            "embedded_note": "Les images intégrées sont conservées dans le HTML mais pas affichées sur GitHub"
         },
         "not_configured": {
             "title": "Synchronisation GitHub non configurée",

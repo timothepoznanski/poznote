@@ -183,7 +183,7 @@
 }
 
 .sync-action-card {
-    background: #f9fafb;
+    background: transparent;
     border-radius: 10px;
     padding: 24px;
     text-align: center;
@@ -266,12 +266,12 @@
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background-color: #007cba;
     color: #fff;
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #5558e8, #7c4fe3);
+    background-color: #005a8a;
     transform: translateY(-1px);
 }
 
@@ -402,7 +402,7 @@ body.dark-mode .config-hint {
 }
 
 body.dark-mode .sync-action-card {
-    background: #252525;
+    background: transparent;
 }
 
 body.dark-mode .sync-action-card h3 {

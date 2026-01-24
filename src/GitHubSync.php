@@ -153,8 +153,10 @@ class GitHubSync {
         $results = [
             'success' => true,
             'pushed' => 0,
+            'deleted' => 0,
             'errors' => [],
-            'skipped' => 0
+            'skipped' => 0,
+            'debug' => []
         ];
         
         try {
@@ -175,6 +177,9 @@ class GitHubSync {
             require_once __DIR__ . '/functions.php';
             $entriesPath = getEntriesPath();
             
+            // Build a map of expected paths in GitHub
+            $expectedPaths = [];
+            
             foreach ($notes as $note) {
                 $noteId = $note['id'];
                 $noteType = $note['type'] ?? 'note';
@@ -183,6 +188,8 @@ class GitHubSync {
                 
                 if (!file_exists($filePath)) {
                     $results['skipped']++;
+                    $results['debug'][] = "Skipped note ID {$noteId}: file not found";
+                    $results['debug'][] = "";
                     continue;
                 }
                 
@@ -196,6 +203,12 @@ class GitHubSync {
                 // Add workspace as top-level folder
                 $repoPath = $workspace . '/' . trim($folderPath . '/' . $safeTitle . '.' . $extension, '/');
                 
+                $results['debug'][] = "Pushing: " . $repoPath;
+                $results['debug'][] = "Workspace: {$workspace}, Folder: {$folderPath}, Title: {$safeTitle}";
+                
+                // Track this path as expected
+                $expectedPaths[] = $repoPath;
+                
                 // Add front matter for markdown files
                 if ($noteType === 'markdown') {
                     $content = $this->addFrontMatter($content, $note);
@@ -206,12 +219,56 @@ class GitHubSync {
                 
                 if ($pushResult['success']) {
                     $results['pushed']++;
+                    $results['debug'][] = "Pushed successfully";
                 } else {
+                    $results['debug'][] = "Push failed: " . $pushResult['error'];
                     $results['errors'][] = [
                         'note_id' => $noteId,
                         'title' => $note['heading'],
                         'error' => $pushResult['error']
                     ];
+                }
+                
+                $results['debug'][] = "";
+            }
+            
+            // Get all files currently on GitHub
+            $tree = $this->getRepoTree();
+            
+            if (!isset($tree['error'])) {
+                foreach ($tree as $item) {
+                    if ($item['type'] !== 'blob') continue;
+                    
+                    $path = $item['path'];
+                    $extension = pathinfo($path, PATHINFO_EXTENSION);
+                    
+                    // Only consider note files (.md, .html, .txt, .markdown, .json)
+                    if (!in_array($extension, ['md', 'html', 'txt', 'markdown', 'json'])) continue;
+                    
+                    // If workspace filter is set, only delete files in that workspace
+                    if ($workspaceFilter) {
+                        if (strpos($path, $workspaceFilter . '/') !== 0) {
+                            continue;
+                        }
+                    }
+                    
+                    // If this file is not in our expected paths, delete it
+                    if (!in_array($path, $expectedPaths)) {
+                        $results['debug'][] = "Deleting orphaned file: " . $path;
+                        $deleteResult = $this->deleteFile($path, "Deleted from Poznote");
+                        
+                        if ($deleteResult['success']) {
+                            $results['deleted']++;
+                            $results['debug'][] = "Deleted successfully";
+                        } else {
+                            $results['debug'][] = "Delete failed: " . $deleteResult['error'];
+                            $results['errors'][] = [
+                                'path' => $path,
+                                'error' => $deleteResult['error']
+                            ];
+                        }
+                        $results['debug'][] = "";
+                    }
                 }
             }
             
@@ -220,6 +277,7 @@ class GitHubSync {
                 'timestamp' => date('c'),
                 'action' => 'push',
                 'pushed' => $results['pushed'],
+                'deleted' => $results['deleted'],
                 'errors' => count($results['errors']),
                 'workspace' => $workspaceFilter
             ]);
@@ -239,7 +297,7 @@ class GitHubSync {
     /**
      * Pull notes from GitHub repository
      */
-    public function pullNotes($workspaceTarget = 'Poznote') {
+    public function pullNotes($workspaceTarget = null) {
         if (!$this->isConfigured()) {
             return ['success' => false, 'error' => 'GitHub sync is not configured'];
         }
@@ -252,7 +310,9 @@ class GitHubSync {
             'success' => true,
             'pulled' => 0,
             'updated' => 0,
-            'errors' => []
+            'deleted' => 0,
+            'errors' => [],
+            'debug' => []
         ];
         
         try {
@@ -266,18 +326,25 @@ class GitHubSync {
             require_once __DIR__ . '/functions.php';
             $entriesPath = getEntriesPath();
             
+            // Track which notes from GitHub we've seen
+            $githubNotePaths = [];
+            
             foreach ($tree as $item) {
                 if ($item['type'] !== 'blob') continue;
                 
                 $path = $item['path'];
                 $extension = pathinfo($path, PATHINFO_EXTENSION);
                 
-                if (!in_array($extension, ['md', 'html'])) continue;
+                if (!in_array($extension, ['md', 'html', 'txt', 'markdown', 'json'])) continue;
+                
+                $results['debug'][] = "Processing: " . $path;
                 
                 // Get file content
                 $content = $this->getFileContent($path);
                 
                 if (isset($content['error'])) {
+                    $results['debug'][] = "Error getting content: " . $content['error'];
+                    $results['debug'][] = "";
                     $results['errors'][] = [
                         'path' => $path,
                         'error' => $content['error']
@@ -287,23 +354,96 @@ class GitHubSync {
                 
                 // Parse content and metadata
                 $noteData = $this->parseNoteFromGitHub($path, $content['content'], $extension);
+                $results['debug'][] = "Parsed - workspace: " . $noteData['workspace'] . ", folder: " . $noteData['folder_path'] . ", title: " . $noteData['heading'];
                 
-                // Use workspace from path, or target workspace if specified
+                // Use workspace from path, or use Poznote as default
                 if (empty($noteData['workspace'])) {
-                    $noteData['workspace'] = $workspaceTarget;
+                    $noteData['workspace'] = $workspaceTarget ?: 'Poznote';
+                    $results['debug'][] = "Empty workspace, using: " . $noteData['workspace'];
                 }
+                
+                // If workspace filter is set and doesn't match, skip this note
+                if ($workspaceTarget && $noteData['workspace'] !== $workspaceTarget) {
+                    $results['debug'][] = "SKIPPED (workspace mismatch): " . $noteData['workspace'] . " != " . $workspaceTarget;
+                    $results['debug'][] = "";
+                    continue;
+                }
+                
+                // Track this note path
+                $githubNotePaths[] = $path;
                 
                 // Check if note already exists (by title and folder)
                 $existingNote = $this->findExistingNote($noteData);
                 
                 if ($existingNote) {
+                    $results['debug'][] = "Found existing note ID: " . $existingNote['id'];
                     // Update existing note
-                    $this->updateNote($existingNote['id'], $noteData, $content['content'], $entriesPath);
-                    $results['updated']++;
+                    try {
+                        $this->updateNote($existingNote['id'], $noteData, $content['content'], $entriesPath);
+                        $results['updated']++;
+                        $results['debug'][] = "Updated successfully";
+                    } catch (Exception $e) {
+                        $results['debug'][] = "Update failed: " . $e->getMessage();
+                        $results['errors'][] = [
+                            'path' => $path,
+                            'error' => 'Failed to update: ' . $e->getMessage()
+                        ];
+                    }
                 } else {
+                    $results['debug'][] = "Creating new note...";
                     // Create new note
-                    $this->createNote($noteData, $content['content'], $entriesPath);
-                    $results['pulled']++;
+                    try {
+                        $this->createNote($noteData, $content['content'], $entriesPath);
+                        $results['pulled']++;
+                        $results['debug'][] = "Created successfully";
+                    } catch (Exception $e) {
+                        $results['debug'][] = "Create failed: " . $e->getMessage();
+                        $results['errors'][] = [
+                            'path' => $path,
+                            'error' => 'Failed to create: ' . $e->getMessage()
+                        ];
+                    }
+                }
+                
+                $results['debug'][] = "";
+            }
+            
+            // Now delete notes in Poznote that no longer exist on GitHub
+            // Get all notes (filtered by workspace if specified)
+            $query = "SELECT id, heading, type, folder_id, workspace FROM entries WHERE trash = 0";
+            $params = [];
+            
+            if ($workspaceTarget) {
+                $query .= " AND workspace = ?";
+                $params[] = $workspaceTarget;
+            }
+            
+            $stmt = $this->con->prepare($query);
+            $stmt->execute($params);
+            $localNotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            foreach ($localNotes as $note) {
+                $noteType = $note['type'] ?? 'note';
+                $extension = ($noteType === 'markdown') ? 'md' : 'html';
+                
+                // Build expected path on GitHub
+                $workspace = $note['workspace'] ?? 'Poznote';
+                $folderPath = $this->getFolderPath($note['folder_id']);
+                $safeTitle = $this->sanitizeFileName($note['heading'] ?: 'Untitled');
+                $expectedPath = $workspace . '/' . trim($folderPath . '/' . $safeTitle . '.' . $extension, '/');
+                
+                // If this note's path is not in GitHub, move it to trash
+                if (!in_array($expectedPath, $githubNotePaths)) {
+                    try {
+                        $deleteStmt = $this->con->prepare("UPDATE entries SET trash = 1 WHERE id = ?");
+                        $deleteStmt->execute([$note['id']]);
+                        $results['deleted']++;
+                    } catch (Exception $e) {
+                        $results['errors'][] = [
+                            'note_id' => $note['id'],
+                            'error' => 'Failed to delete: ' . $e->getMessage()
+                        ];
+                    }
                 }
             }
             
@@ -313,6 +453,7 @@ class GitHubSync {
                 'action' => 'pull',
                 'pulled' => $results['pulled'],
                 'updated' => $results['updated'],
+                'deleted' => $results['deleted'],
                 'errors' => count($results['errors']),
                 'workspace' => $workspaceTarget
             ]);
@@ -323,6 +464,45 @@ class GitHubSync {
         }
         
         return $results;
+    }
+    
+    /**
+     * Delete a file from GitHub repository
+     */
+    private function deleteFile($path, $message) {
+        // Encode the path for URL
+        $encodedPath = implode('/', array_map('rawurlencode', explode('/', $path)));
+        
+        // Get the file to retrieve its SHA (required for deletion)
+        $existingFile = $this->apiRequest('GET', "/repos/{$this->repo}/contents/{$encodedPath}?ref={$this->branch}");
+        
+        if (!isset($existingFile['sha'])) {
+            return [
+                'success' => false,
+                'error' => 'File not found or unable to get SHA'
+            ];
+        }
+        
+        $body = [
+            'message' => $message,
+            'sha' => $existingFile['sha'],
+            'branch' => $this->branch,
+            'committer' => [
+                'name' => $this->authorName,
+                'email' => $this->authorEmail
+            ]
+        ];
+        
+        $response = $this->apiRequest('DELETE', "/repos/{$this->repo}/contents/{$encodedPath}", $body);
+        
+        if (isset($response['commit'])) {
+            return ['success' => true];
+        }
+        
+        return [
+            'success' => false,
+            'error' => $response['message'] ?? $response['error'] ?? 'Unknown error'
+        ];
     }
     
     /**
@@ -410,7 +590,7 @@ class GitHubSync {
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         
-        if ($method === 'PUT' || $method === 'POST') {
+        if ($method === 'PUT' || $method === 'POST' || $method === 'DELETE') {
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
             if ($body) {
                 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
@@ -489,6 +669,53 @@ class GitHubSync {
     }
     
     /**
+     * Get or create folder ID from a folder path
+     */
+    private function getOrCreateFolderFromPath($folderPath, $workspace) {
+        if (empty($folderPath) || !$this->con) {
+            return null;
+        }
+        
+        // Split path into folder names
+        $folders = explode('/', trim($folderPath, '/'));
+        $parentId = null;
+        
+        // Create each folder in the hierarchy
+        foreach ($folders as $folderName) {
+            if (empty($folderName)) continue;
+            
+            // Check if folder exists
+            $stmt = $this->con->prepare("
+                SELECT id FROM folders 
+                WHERE name = ? AND workspace = ? AND " . 
+                ($parentId ? "parent_id = ?" : "parent_id IS NULL")
+            );
+            
+            if ($parentId) {
+                $stmt->execute([$folderName, $workspace, $parentId]);
+            } else {
+                $stmt->execute([$folderName, $workspace]);
+            }
+            
+            $folder = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($folder) {
+                $parentId = $folder['id'];
+            } else {
+                // Create folder
+                $stmt = $this->con->prepare("
+                    INSERT INTO folders (name, workspace, parent_id, created) 
+                    VALUES (?, ?, ?, ?)
+                ");
+                $stmt->execute([$folderName, $workspace, $parentId, date('Y-m-d H:i:s')]);
+                $parentId = $this->con->lastInsertId();
+            }
+        }
+        
+        return $parentId;
+    }
+    
+    /**
      * Add front matter to markdown content
      */
     private function addFrontMatter($content, $note) {
@@ -518,27 +745,34 @@ class GitHubSync {
     private function parseNoteFromGitHub($path, $content, $extension) {
         // Extract workspace from path (first folder)
         $pathParts = explode('/', $path);
-        $workspace = count($pathParts) > 1 ? $pathParts[0] : 'Poznote';
         
-        // Remove workspace from folder path
-        $folderPath = dirname($path);
-        if (strpos($folderPath, $workspace . '/') === 0) {
-            $folderPath = substr($folderPath, strlen($workspace) + 1);
-        }
-        if ($folderPath === $workspace) {
+        // If file is at root (no slash), use default workspace
+        if (count($pathParts) === 1) {
+            $workspace = 'Poznote';
             $folderPath = '';
+        } else {
+            $workspace = $pathParts[0];
+            
+            // Remove workspace from folder path
+            $folderPath = dirname($path);
+            if (strpos($folderPath, $workspace . '/') === 0) {
+                $folderPath = substr($folderPath, strlen($workspace) + 1);
+            }
+            if ($folderPath === $workspace) {
+                $folderPath = '';
+            }
         }
         
         $data = [
-            'type' => ($extension === 'md') ? 'markdown' : 'note',
+            'type' => (in_array($extension, ['md', 'markdown', 'txt'])) ? 'markdown' : 'note',
             'heading' => pathinfo(pathinfo($path, PATHINFO_FILENAME), PATHINFO_FILENAME),
             'tags' => '',
             'folder_path' => $folderPath,
             'workspace' => $workspace
         ];
         
-        // Parse front matter for markdown files
-        if ($extension === 'md' && preg_match('/^---\s*\n(.+?)\n---\s*\n/s', $content, $matches)) {
+        // Parse front matter for markdown-like files
+        if (in_array($extension, ['md', 'markdown', 'txt']) && preg_match('/^---\s*\n(.+?)\n---\s*\n/s', $content, $matches)) {
             $frontMatter = $matches[1];
             
             if (preg_match('/^title:\s*(.+)$/m', $frontMatter, $m)) {
@@ -589,9 +823,15 @@ class GitHubSync {
         // Remove front matter from content
         $cleanContent = preg_replace('/^---\s*\n.+?\n---\s*\n/s', '', $content);
         
+        // Get or create folder ID from folder path
+        $folderId = null;
+        if (!empty($noteData['folder_path'])) {
+            $folderId = $this->getOrCreateFolderFromPath($noteData['folder_path'], $noteData['workspace']);
+        }
+        
         $stmt = $this->con->prepare("
-            INSERT INTO entries (heading, entry, type, tags, workspace, created, updated, trash, favorite)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)
+            INSERT INTO entries (heading, entry, type, tags, workspace, folder_id, created, updated, trash, favorite)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 0)
         ");
         
         $stmt->execute([
@@ -600,6 +840,7 @@ class GitHubSync {
             $noteData['type'],
             $noteData['tags'],
             $noteData['workspace'],
+            $folderId,
             $now,
             $now
         ]);

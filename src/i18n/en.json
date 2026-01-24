@@ -1250,22 +1250,39 @@
             "all_workspaces": "All workspaces",
             "push": {
                 "title": "Push to GitHub",
-                "description": "Export your notes to GitHub repository. Existing files will be updated.",
+                "description": "Export your notes to GitHub. Updates existing files and deletes files that no longer exist in Poznote.",
                 "button": "Push Notes"
             },
             "pull": {
                 "title": "Pull from GitHub",
-                "description": "Import notes from GitHub repository. Existing notes with same title will be updated.",
+                "description": "Import notes from GitHub. Updates existing notes and moves to trash notes that no longer exist on GitHub.",
                 "button": "Pull Notes"
             }
         },
         "messages": {
             "connection_success": "Connection successful! Connected to {{repo}}",
             "connection_error": "Connection failed: {{error}}",
-            "push_success": "Successfully pushed {{count}} notes ({{errors}} errors)",
+            "push_success": "Successfully pushed {{count}} notes, deleted {{deleted}} files ({{errors}} errors)",
             "push_error": "Push failed: {{error}}",
-            "pull_success": "Successfully pulled {{pulled}} new notes and updated {{updated}} existing notes",
+            "pull_success": "Successfully pulled {{pulled}} new notes, updated {{updated}} existing notes, deleted {{deleted}} notes ({{errors}} errors)",
             "pull_error": "Pull failed: {{error}}"
+        },
+        "debug": {
+            "show": "Show Debug Info",
+            "hide": "Hide Debug Info",
+            "copy": "Copy Debug",
+            "copied": "Copied!"
+        },
+        "limitations": {
+            "title": "Synchronization Limitations",
+            "element": "Element",
+            "html_notes": "HTML Notes",
+            "markdown_notes": "Markdown Notes",
+            "text_content": "Text content",
+            "attachments": "File attachments",
+            "embedded_images": "Images",
+            "metadata": "Metadata (tags, date, ID)",
+            "embedded_note": "Embedded images are preserved in HTML but not displayed on GitHub"
         },
         "not_configured": {
             "title": "GitHub Sync Not Configured",

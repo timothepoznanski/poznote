@@ -1743,22 +1743,39 @@
             "all_workspaces": "Alle Arbeitsbereiche",
             "push": {
                 "title": "An GitHub senden",
-                "description": "Exportieren Sie Ihre Notizen in das GitHub-Repository. Vorhandene Dateien werden aktualisiert.",
+                "description": "Exportiert Ihre Notizen nach GitHub. Aktualisiert vorhandene Dateien und löscht Dateien, die in Poznote nicht mehr vorhanden sind.",
                 "button": "Notizen senden"
             },
             "pull": {
                 "title": "Von GitHub abrufen",
-                "description": "Importieren Sie Notizen aus dem GitHub-Repository. Vorhandene Notizen mit demselben Titel werden aktualisiert.",
+                "description": "Importiert Notizen von GitHub. Aktualisiert vorhandene Notizen und verschiebt Notizen in den Papierkorb, die auf GitHub nicht mehr vorhanden sind.",
                 "button": "Notizen abrufen"
             }
         },
         "messages": {
             "connection_success": "Verbindung erfolgreich! Verbunden mit {{repo}}",
             "connection_error": "Verbindungsfehler: {{error}}",
-            "push_success": "{{count}} Notizen erfolgreich gesendet ({{errors}} Fehler)",
+            "push_success": "{{count}} Notizen erfolgreich gesendet, {{deleted}} Dateien gelöscht ({{errors}} Fehler)",
             "push_error": "Fehler beim Senden: {{error}}",
-            "pull_success": "{{pulled}} neue Notizen abgerufen und {{updated}} vorhandene Notizen aktualisiert",
+            "pull_success": "{{pulled}} neue Notizen abgerufen, {{updated}} vorhandene Notizen aktualisiert, {{deleted}} Notizen gelöscht ({{errors}} Fehler)",
             "pull_error": "Fehler beim Abrufen: {{error}}"
+        },
+        "debug": {
+            "show": "Debug-Informationen anzeigen",
+            "hide": "Debug-Informationen ausblenden",
+            "copy": "Debug kopieren",
+            "copied": "Kopiert!"
+        },
+        "limitations": {
+            "title": "Synchronisierungsbeschränkungen",
+            "element": "Element",
+            "html_notes": "HTML-Notizen",
+            "markdown_notes": "Markdown-Notizen",
+            "text_content": "Textinhalt",
+            "attachments": "Dateianhänge",
+            "embedded_images": "Bilder",
+            "metadata": "Metadaten (Tags, Datum, ID)",
+            "embedded_note": "Eingebettete Bilder werden in HTML beibehalten, aber nicht auf GitHub angezeigt"
         },
         "not_configured": {
             "title": "GitHub-Synchronisierung nicht konfiguriert",

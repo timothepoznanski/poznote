@@ -1743,22 +1743,39 @@
             "all_workspaces": "Todos los espacios de trabajo",
             "push": {
                 "title": "Enviar a GitHub",
-                "description": "Exporta tus notas al repositorio de GitHub. Los archivos existentes se actualizarán.",
+                "description": "Exporta tus notas a GitHub. Actualiza archivos existentes y elimina archivos que ya no existen en Poznote.",
                 "button": "Enviar notas"
             },
             "pull": {
                 "title": "Recuperar de GitHub",
-                "description": "Importa notas del repositorio de GitHub. Las notas existentes con el mismo título se actualizarán.",
+                "description": "Importa notas desde GitHub. Actualiza notas existentes y mueve a la papelera notas que ya no existen en GitHub.",
                 "button": "Recuperar notas"
             }
         },
         "messages": {
             "connection_success": "¡Conexión exitosa! Conectado a {{repo}}",
             "connection_error": "Error de conexión: {{error}}",
-            "push_success": "{{count}} notas enviadas con éxito ({{errors}} errores)",
+            "push_success": "{{count}} notas enviadas con éxito, {{deleted}} archivos eliminados ({{errors}} errores)",
             "push_error": "Error al enviar: {{error}}",
-            "pull_success": "{{pulled}} notas nuevas recuperadas y {{updated}} notas existentes actualizadas",
+            "pull_success": "{{pulled}} notas nuevas recuperadas, {{updated}} notas existentes actualizadas, {{deleted}} notas eliminadas ({{errors}} errores)",
             "pull_error": "Error al recuperar: {{error}}"
+        },
+        "debug": {
+            "show": "Mostrar información de depuración",
+            "hide": "Ocultar información de depuración",
+            "copy": "Copiar debug",
+            "copied": "¡Copiado!"
+        },
+        "limitations": {
+            "title": "Limitaciones de sincronización",
+            "element": "Elemento",
+            "html_notes": "Notas HTML",
+            "markdown_notes": "Notas Markdown",
+            "text_content": "Contenido de texto",
+            "attachments": "Archivos adjuntos",
+            "embedded_images": "Imágenes",
+            "metadata": "Metadatos (etiquetas, fecha, ID)",
+            "embedded_note": "Las imágenes incrustadas se conservan en HTML pero no se muestran en GitHub"
         },
         "not_configured": {
             "title": "Sincronización con GitHub no configurada",

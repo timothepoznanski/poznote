@@ -1864,22 +1864,39 @@
             "all_workspaces": "所有工作区",
             "push": {
                 "title": "推送到 GitHub",
-                "description": "将您的笔记导出到 GitHub 仓库。现有文件将被更新。",
+                "description": "将您的笔记导出到 GitHub。更新现有文件并删除 Poznote 中不再存在的文件。",
                 "button": "推送笔记"
             },
             "pull": {
                 "title": "从 GitHub 拉取",
-                "description": "从 GitHub 仓库导入笔记。具有相同标题的现有笔记将被更新。",
+                "description": "从 GitHub 导入笔记。更新现有笔记并将 GitHub 上不再存在的笔记移至回收站。",
                 "button": "拉取笔记"
             }
         },
         "messages": {
             "connection_success": "连接成功！已连接到 {{repo}}",
             "connection_error": "连接失败：{{error}}",
-            "push_success": "成功推送 {{count}} 条笔记（{{errors}} 个错误）",
+            "push_success": "成功推送 {{count}} 条笔记，删除 {{deleted}} 个文件（{{errors}} 个错误）",
             "push_error": "推送失败：{{error}}",
-            "pull_success": "拉取 {{pulled}} 条新笔记并更新 {{updated}} 条现有笔记",
+            "pull_success": "拉取 {{pulled}} 条新笔记并更新 {{updated}} 条现有笔记，删除 {{deleted}} 条笔记（{{errors}} 个错误）",
             "pull_error": "拉取失败：{{error}}"
+        },
+        "debug": {
+            "show": "显示调试信息",
+            "hide": "隐藏调试信息",
+            "copy": "复制调试信息",
+            "copied": "已复制！"
+        },
+        "limitations": {
+            "title": "同步限制",
+            "element": "元素",
+            "html_notes": "HTML笔记",
+            "markdown_notes": "Markdown笔记",
+            "text_content": "文本内容",
+            "attachments": "文件附件",
+            "embedded_images": "图片",
+            "metadata": "元数据（标签、日期、ID）",
+            "embedded_note": "嵌入的图片保存在HTML中但不会在GitHub上显示"
         },
         "not_configured": {
             "title": "GitHub 同步未配置",

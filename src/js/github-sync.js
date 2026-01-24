@@ -1,0 +1,35 @@
+/**
+ * GitHub Sync Page JavaScript
+ * Handles loading states for push/pull operations
+ */
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Show loading spinner on push/pull submit
+    const forms = document.querySelectorAll('form[method="post"]');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const actionInput = form.querySelector('input[name="action"]');
+            if (!actionInput) return;
+            
+            const action = actionInput.value;
+            if (action === 'push' || action === 'pull') {
+                const button = form.querySelector('button[type="submit"]');
+                if (!button) return;
+                
+                const icon = button.querySelector('i');
+                if (icon) {
+                    // Store original icon class
+                    icon.setAttribute('data-original-class', icon.className);
+                    icon.className = 'fas fa-spinner fa-spin';
+                }
+                
+                const buttonText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + button.textContent.trim();
+                button.disabled = true;
+                
+                // Force a repaint to ensure spinner is visible
+                button.offsetHeight;
+            }
+        });
+    });
+});
