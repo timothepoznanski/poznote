@@ -602,7 +602,7 @@
         // Create content div (hidden content)
         const contentDiv = document.createElement('div');
         contentDiv.className = 'toggle-content';
-        contentDiv.innerHTML = '<p><br></p>';
+        contentDiv.innerHTML = '';
 
         details.appendChild(summary);
         details.appendChild(contentDiv);

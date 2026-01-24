@@ -537,6 +537,24 @@ function parseMarkdown(text) {
             continue;
         }
 
+        // Check for protected HTML block tags (details, summary) to prevent wrapping in <p>
+        // This ensures they are treated as block-level elements
+        let ptagMatch = line.match(/^\x00PTAG(\d+)\x00/);
+        if (ptagMatch) {
+            let index = parseInt(ptagMatch[1]);
+            let tagContent = protectedElements[index];
+            if (tagContent && (
+                tagContent.toLowerCase().startsWith('<details') ||
+                tagContent.toLowerCase().startsWith('</details') ||
+                tagContent.toLowerCase().startsWith('<summary') ||
+                tagContent.toLowerCase().startsWith('</summary')
+            )) {
+                flushParagraph();
+                result.push(applyInlineStyles(line));
+                continue;
+            }
+        }
+
         // Empty line - paragraph separator
         if (line.trim() === '') {
             flushParagraph();
