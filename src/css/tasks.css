@@ -451,3 +451,79 @@
     color: #d1242f;
     fill: #d1242f;
 }
+
+/* Toggle / Collapsible block styles */
+.toggle-block {
+    display: block;
+    margin: 0.5em 0;
+    overflow: hidden;
+    border: 1px solid #e1e4e8;
+    border-radius: 6px;
+}
+
+/* Target only the first summary to avoid duplicate arrows if browser quirks occur */
+.toggle-block>summary {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+    /* Hide default marker in Firefox */
+    user-select: none;
+    outline: none;
+    /* Remove focus outline */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+
+/* Hide any subsequent summaries that might be accidentally created */
+.toggle-block>summary~summary {
+    display: none !important;
+}
+
+/* Hide default marker in Webkit */
+.toggle-block>summary::-webkit-details-marker {
+    display: none;
+}
+
+.toggle-block>summary::before {
+    content: '';
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-right: 10px;
+    border-left: 5px solid currentColor;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    transition: transform 0.2s ease;
+    opacity: 0.5;
+}
+
+.toggle-block[open]>summary::before {
+    transform: rotate(90deg);
+}
+
+/* .toggle-block > summary:hover handled by removing opacity */
+
+.toggle-block>.toggle-content {
+    padding: 8px 10px 12px 10px;
+    font-size: 0.95em;
+    line-height: 1.6;
+    border-top: 1px solid #e1e4e8;
+}
+
+.toggle-block>.toggle-content p {
+    margin: 0;
+}
+
+/* Dark mode adjustments */
+body.dark-mode .toggle-block {
+    border-color: #30363d;
+}
+
+body.dark-mode .toggle-block>.toggle-content {
+    border-top-color: #30363d;
+}

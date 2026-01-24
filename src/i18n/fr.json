@@ -926,6 +926,8 @@
         "callout_important": "Important",
         "callout_warning": "Avertissement",
         "callout_caution": "Attention",
+        "toggle": "Toggle",
+        "toggle_placeholder": "Toggle",
         "color": "Couleur",
         "color_red": "Rouge",
         "color_blue": "Bleu",

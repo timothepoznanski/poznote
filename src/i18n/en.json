@@ -463,7 +463,9 @@
         "callout_tip": "Tip",
         "callout_important": "Important",
         "callout_warning": "Warning",
-        "callout_caution": "Caution"
+        "callout_caution": "Caution",
+        "toggle": "Toggle",
+        "toggle_placeholder": "Toggle"
     },
     "api": {
         "settings": {

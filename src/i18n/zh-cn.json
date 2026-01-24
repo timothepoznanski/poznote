@@ -906,7 +906,9 @@
         "callout_tip": "提示",
         "callout_important": "重要",
         "callout_warning": "警告",
-        "callout_caution": "注意"
+        "callout_caution": "注意",
+        "toggle": "Toggle",
+        "toggle_placeholder": "Toggle"
     },
     "api": {
         "settings": {

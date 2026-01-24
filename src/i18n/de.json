@@ -909,7 +909,9 @@
         "callout_tip": "Tipp",
         "callout_important": "Wichtig",
         "callout_warning": "Warnung",
-        "callout_caution": "Vorsicht"
+        "callout_caution": "Vorsicht",
+        "toggle": "Toggle",
+        "toggle_placeholder": "Toggle"
     },
     "api": {
         "settings": {

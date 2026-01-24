@@ -2785,6 +2785,12 @@ textarea:focus {
     font-size: var(--note-font-size, 15px) !important;
 }
 
+.noteentry p,
+.noteentry div {
+    margin: 0;
+    padding: 0;
+}
+
 /* Heading styles - must have higher specificity to override font-size */
 .noteentry h1 {
     font-size: 2em !important;
