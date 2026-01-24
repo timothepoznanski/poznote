@@ -695,8 +695,8 @@
             <label for="kanbanFolderName"><?php echo t_h('modals.kanban_structure.folder_name_label', [], 'Folder name:'); ?></label>
             <input type="text" id="kanbanFolderName" placeholder="<?php echo t_h('modals.kanban_structure.folder_name_placeholder', [], 'My Kanban Board'); ?>" maxlength="255" class="kanban-folder-input">
             
-            <label for="kanbanColumnsCount" style="margin-top: 12px;"><?php echo t_h('modals.kanban_structure.columns_label', [], 'Number of columns (1-10):'); ?></label>
-            <input type="number" id="kanbanColumnsCount" min="1" max="10" value="3" class="kanban-columns-input">
+            <label for="kanbanColumnsCount" style="margin-top: 12px;"><?php echo t_h('modals.kanban_structure.columns_label', [], 'Number of columns (1-9):'); ?></label>
+            <input type="number" id="kanbanColumnsCount" min="1" max="9" value="3" class="kanban-columns-input">
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="kanbanStructureModal"><?php echo t_h('common.cancel'); ?></button>

@@ -1286,7 +1286,7 @@ function toggleFavorites(buttonElement) {
     if (!favoritesFolder) return;
 
     var isCollapsed = favoritesFolder.classList.contains('favorites-collapsed');
-    
+
     if (isCollapsed) {
         // Show favorites
         favoritesFolder.classList.remove('favorites-collapsed');
@@ -2452,9 +2452,9 @@ function createKanbanStructure() {
         return;
     }
 
-    if (isNaN(columns) || columns < 1 || columns > 10) {
+    if (isNaN(columns) || columns < 1 || columns > 9) {
         showNotificationPopup(
-            window.t ? window.t('modals.kanban_structure.error_columns_range', null, 'Number of columns must be between 1 and 10') : 'Number of columns must be between 1 and 10',
+            window.t ? window.t('modals.kanban_structure.error_columns_range', null, 'Number of columns must be between 1 and 9') : 'Number of columns must be between 1 and 9',
             'error'
         );
         return;

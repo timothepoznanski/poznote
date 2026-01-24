@@ -758,9 +758,9 @@
             "title": "Kanban-Struktur erstellen",
             "folder_name_label": "Ordnername:",
             "folder_name_placeholder": "Mein Kanban-Board",
-            "columns_label": "Anzahl der Spalten (1-10):",
+            "columns_label": "Anzahl der Spalten (1-9):",
             "error_name_required": "Ordnername ist erforderlich",
-            "error_columns_range": "Die Anzahl der Spalten muss zwischen 1 und 10 liegen",
+            "error_columns_range": "Die Anzahl der Spalten muss zwischen 1 und 9 liegen",
             "error_create": "Fehler beim Erstellen der Kanban-Struktur",
             "error_create_prefix": "Fehler beim Erstellen der Kanban-Struktur: {{error}}"
         },

@@ -774,9 +774,9 @@
             "title": "Créer une structure Kanban",
             "folder_name_label": "Nom du dossier :",
             "folder_name_placeholder": "Mon tableau Kanban",
-            "columns_label": "Nombre de colonnes (1-10) :",
+            "columns_label": "Nombre de colonnes (1-9) :",
             "error_name_required": "Le nom du dossier est requis",
-            "error_columns_range": "Le nombre de colonnes doit être entre 1 et 10",
+            "error_columns_range": "Le nombre de colonnes doit être entre 1 et 9",
             "error_create": "Échec de la création de la structure Kanban",
             "error_create_prefix": "Erreur lors de la création de la structure Kanban : {{error}}"
         },

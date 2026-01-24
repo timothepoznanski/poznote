@@ -774,9 +774,9 @@
             "title": "创建看板结构",
             "folder_name_label": "文件夹名称：",
             "folder_name_placeholder": "我的看板",
-            "columns_label": "列数 (1-10)：",
+            "columns_label": "列数 (1-9)：",
             "error_name_required": "文件夹名称为必填项",
-            "error_columns_range": "列数必须在 1 到 10 之间",
+            "error_columns_range": "列数必须在 1 到 9 之间",
             "error_create": "创建看板结构失败",
             "error_create_prefix": "创建看板结构时出错：{{error}}"
         },
