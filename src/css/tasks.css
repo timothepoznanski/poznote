@@ -473,7 +473,7 @@
 .toggle-block>summary {
     display: flex;
     align-items: center;
-    padding: 20px 0px;
+    padding: 10px 0px 0px 1px;
     font-weight: 600;
     cursor: pointer;
     list-style: none;
@@ -483,8 +483,10 @@
     /* Remove focus outline */
     white-space: nowrap;
     overflow: hidden;
+    /* border-bottom: 1px solid #e1e4e8; */
     text-overflow: ellipsis;
     min-width: 0;
+    margin-bottom: 15px;
 }
 
 /* Hide any subsequent summaries that might be accidentally created */
@@ -518,7 +520,7 @@
 
 /* Move border to summary when open for consistent looking regardless of content structure */
 .toggle-block[open]>summary {
-    border-bottom: 1px solid #e1e4e8;
+    /* border-bottom: 1px solid #e1e4e8; */
     margin-bottom: 15px;
     /* Spacing between header and content */
 }
