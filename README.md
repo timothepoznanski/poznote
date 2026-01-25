@@ -793,9 +793,62 @@ Server: my-server.com
 
 ## MCP Server
 
-Poznote includes a Model Context Protocol (MCP) server that enables integration with AI assistants like GitHub Copilot, allowing you to interact with your notes directly from your development environment.
+Poznote includes a Model Context Protocol (MCP) server that enables AI assistants like GitHub Copilot to interact with your notes using natural language.
 
-For detailed setup and usage instructions, see the [MCP Server README](mcp-server/README.md).
+### Configuration
+
+Add these variables to your `.env` file:
+
+```bash
+# Enable MCP server
+POZNOTE_MCP_ENABLED=true
+
+# MCP Server port (default: 8041)
+POZNOTE_MCP_PORT=8041
+
+# Poznote username for MCP authentication
+POZNOTE_MCP_USERNAME=admin
+
+# User ID for MCP operations (1 = admin)
+POZNOTE_MCP_USER_ID=1
+
+# Default workspace
+POZNOTE_MCP_WORKSPACE=Poznote
+```
+
+To disable the MCP server, set `POZNOTE_MCP_ENABLED=false` or comment out the line.
+
+### VS Code Setup
+
+Add to your `mcp.json` file:
+
+```json
+{
+  "servers": {
+    "poznote": {
+      "type": "http",
+      "url": "http://localhost:8041/mcp"
+    }
+  }
+}
+```
+
+**File location:**
+- Windows: `C:\Users\YOUR-USERNAME\AppData\Roaming\Code\User\mcp.json`
+- Linux: `~/.config/Code/User/mcp.json`
+- macOS: `~/Library/Application Support/Code/User/mcp.json`
+
+### Example Prompts
+
+Once configured, you can interact with Poznote in VS Code Copilot:
+
+- "List all notes in my Poznote workspace"
+- "Search for notes about 'Docker'"
+- "Create a new note titled 'Meeting Notes' with the content..."
+- "Update note 42 with new information"
+- "Create a folder named 'Projects'"
+
+For detailed setup, manual installation, and advanced configuration, see the [MCP Server README](mcp-server/README.md).
 
 ## API Documentation
 

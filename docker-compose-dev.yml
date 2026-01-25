@@ -37,3 +37,35 @@ services:
     volumes:
       - "./src:/var/www/html"
       - "./data:/var/www/html/data"
+
+  # MCP Server - AI assistant integration (optional)
+  # Enable by setting POZNOTE_MCP_ENABLED=true in .env
+  mcp-server:
+    build:
+      context: ./mcp-server
+      dockerfile: Dockerfile
+    image: poznote-mcp:dev
+    container_name: poznote-mcp-dev
+    restart: unless-stopped
+    profiles:
+      - ${POZNOTE_MCP_ENABLED:-false}
+    environment:
+      # Connect to Poznote via Docker internal network
+      POZNOTE_API_URL: http://webserver:80/api/v1
+      POZNOTE_USERNAME: ${POZNOTE_MCP_USERNAME:-admin}
+      POZNOTE_PASSWORD: ${POZNOTE_PASSWORD:-admin}
+      POZNOTE_USER_ID: ${POZNOTE_MCP_USER_ID:-1}
+      POZNOTE_DEFAULT_WORKSPACE: ${POZNOTE_MCP_WORKSPACE:-Poznote}
+      MCP_HOST: "0.0.0.0"
+      MCP_PORT: "8041"
+      POZNOTE_DEBUG: ${POZNOTE_MCP_DEBUG:-true}
+    ports:
+      - "${POZNOTE_MCP_PORT:-8041}:8041"
+    depends_on:
+      - webserver
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8041/mcp"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
