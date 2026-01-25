@@ -567,6 +567,10 @@ body {
     border-radius: 6px;
 }
 
+.sidebar-kofi {
+    text-decoration: none;
+}
+
 .sidebar-settings {
     background: transparent;
     border: none;
