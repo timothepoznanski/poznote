@@ -1132,6 +1132,7 @@
     },
     "home": {
         "title": "Home",
+        "folders": "Folders",
         "shared_notes": "Shared Notes",
         "shared_folders": "Shared Folders",
         "kanban": "Kanban",

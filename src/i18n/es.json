@@ -440,6 +440,7 @@
     },
     "home": {
         "title": "Inicio",
+        "folders": "Carpetas",
         "shared_notes": "Notas compartidas",
         "shared_folders": "Carpetas compartidas",
         "kanban": "Kanban",

@@ -442,6 +442,7 @@
     },
     "home": {
         "title": "首页",
+        "folders": "文件夹",
         "shared_notes": "共享笔记",
         "shared_folders": "共享文件夹",
         "kanban": "看板",

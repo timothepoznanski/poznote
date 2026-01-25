@@ -5,6 +5,8 @@ MCP (Model Context Protocol) server for Poznote — enables AI-powered note mana
 This server supports **HTTP transport only** (MCP *streamable-http*).
 
 > **Note:** This MCP server is intended to be used with VS Code Copilot MCP. For advanced options, see the official VS Code MCP documentation: https://code.visualstudio.com/docs/copilot/customization/mcp-servers
+>
+> **Legacy Documentation:** For alternative installation methods, manual setup, and development instructions, see [README-old-method.md](README-old-method.md).
 
 ## How It Works
 
@@ -13,7 +15,7 @@ The MCP server is a bridge between VS Code Copilot and your Poznote instance.
 ### Components
 
 - **`server.py`** — MCP server (HTTP / streamable-http)
-  - Exposes MCP endpoint at `http://POZNOTE_MCP_SERVER:POZNOTE_MCP_SERVER_PORT/mcp`
+  - Exposes MCP endpoint at `http://localhost:8045/mcp`
   - Defines tools (actions) for note management
   - Orchestrates calls between the AI and the Poznote API
 
@@ -21,12 +23,11 @@ The MCP server is a bridge between VS Code Copilot and your Poznote instance.
   - Performs HTTP requests (GET, POST, PATCH, DELETE)
   - Handles Basic Auth
 
-### Communication flow (HTTP)
+### Communication flow
 
-1. Start the MCP server
-2. VS Code connects to the MCP Server
-3. MCP server calls Poznote REST Poznote API
-
+1. VS Code Copilot connects to the MCP Server
+2. MCP server calls Poznote REST API
+3. Results are returned to the AI assistant
 
 ## Features
 
@@ -35,229 +36,178 @@ The MCP server is a bridge between VS Code Copilot and your Poznote instance.
 - `poznote://note/{id}` : Content of a specific note
 
 ### Tools (actions)
-- `get_note`
-- `list_notes`
-- `search_notes`
-- `create_note`
-- `update_note`
-- `delete_note`
-- `create_folder`
+- `get_note` — Get a specific note by ID with full content
+- `list_notes` — List all notes from a workspace
+- `search_notes` — Search notes by text query
+- `create_note` — Create a new note
+- `update_note` — Update an existing note
+- `delete_note` — Delete a note by ID
+- `create_folder` — Create a new folder
 
 All tools accept an optional `user_id` argument to target a specific user profile. When provided, the MCP server sends the `X-User-ID` header for that request, allowing you to create or read notes across different profiles without changing the global MCP environment.
 
 ---
 
-To get everything working end-to-end, simply follow these three steps: 
+## Installation & Setup
 
-1. Install the MCP server
-2. Run it (either via command line or systemd)
-3. Register the server in VS Code (Copilot MCP)
+The MCP server is already integrated in Poznote's main `docker-compose.yml`. Just enable it!
 
-## 1. Install MCP Server (Linux)
+### Quick Start
+
+Edit your `.env` file (at Poznote root) and add:
+```bash
+COMPOSE_PROFILES=mcp
+```
+
+Then start normally:
+```bash
+docker compose up -d
+```
+
+That's it! Check the logs:
+```bash
+docker compose logs -f mcp-server
+```
+
+### Configuration
+
+Add these variables to your `.env` file (at Poznote root):
 
 ```bash
-sudo apt update
-sudo apt install python3 python3-venv python3-pip
+# Enable MCP server
+COMPOSE_PROFILES=mcp
 
-git clone https://github.com/timothepoznanski/poznote.git poznote-mcp-server
-cd poznote-mcp-server/mcp-server
+# MCP Server port (default: 8045)
+POZNOTE_MCP_PORT=8045
 
-python3 -m venv venv
-source venv/bin/activate
+# Poznote username for MCP authentication
+POZNOTE_MCP_USERNAME=admin
 
-pip install --upgrade pip
-pip install -e .
+# User ID for MCP operations (1 = admin)
+POZNOTE_MCP_USER_ID=1
 
-python -c "import poznote_mcp; print('poznote_mcp OK')"
+# Default workspace
+POZNOTE_MCP_WORKSPACE=Poznote
+
+# Enable debug logging (optional)
+POZNOTE_MCP_DEBUG=false
 ```
 
-## 2. Run MCP Server (Linux)
+To disable the MCP server, comment out the `COMPOSE_PROFILES=mcp` line in your `.env`.
 
-Choose a way to run the MCP Server:
+> **Note:** If the MCP container is already running, you need to stop it manually:
+> ```bash
+> docker compose down mcp-server
+> ```
+> Docker Compose won't automatically remove running containers when you disable a service.
 
-<details>
-<summary><strong>Run (HTTP / streamable-http)</strong></summary>
-<br>
+### Reverse Proxy Compatibility
 
-Activate the venv:
+If you use a reverse proxy (Nginx Proxy Manager, Traefik, Caddy, etc.) to expose Poznote, connect the MCP container to your proxy's network:
 
 ```bash
-cd /home/YOUR_LINUX_USER/poznote-mcp-server/mcp-server
-source venv/bin/activate
+# Start Poznote and MCP
+docker compose up -d
+
+# Connect MCP to your reverse proxy network
+# Replace with your actual network name (npm-poznote-webserver-net, traefik_default, etc.)
+docker network connect YOUR_PROXY_NETWORK poznote-mcp
 ```
 
-Edit and export your values:
+This allows the MCP server to communicate with the Poznote webserver through the proxy network while remaining accessible externally.
 
-```
-export POZNOTE_API_URL=http://POZNOTE_SERVER:POZNOTE_SERVER_PORT/api/v1
-export POZNOTE_USERNAME=admin_change_me
-export POZNOTE_PASSWORD=YOUR_GLOBAL_ADMIN_OR_USER_PASSWORD
-export POZNOTE_USER_ID=1
-export POZNOTE_DEFAULT_WORKSPACE=Poznote
-```
+### VS Code Configuration
 
-> **Note:** 
-> - `POZNOTE_USERNAME` must be a valid user profile name in your Poznote instance.
-> - `POZNOTE_PASSWORD` must be the global password corresponding to that user's role (Administrator or Standard).
-> - `POZNOTE_USER_ID` specifies which user profile to access. Use the Poznote web interface or API (`GET /api/v1/users/profiles`) to find your user ID.
-
-Start the MCP Server:
-
-```
-poznote-mcp serve --host=0.0.0.0 --port=POZNOTE_MCP_PORT
-```
-
-Endpoint: `http://YOUR_SERVER_HOSTNAME_OR_IP:POZNOTE_MCP_SERVER_PORT/mcp`
-
-</details>
-
-<details>
-<summary><strong>Run with systemd</strong></summary>
-<br>
-
-1) Create an environment file (example: `/etc/poznote-mcp.env`):
-
-```bash
-vim /etc/poznote-mcp.env
-```
-
-Content:
-
-```bash
-POZNOTE_API_URL=http://POZNOTE_SERVER:POZNOTE_SERVER_PORT/api/v1
-POZNOTE_USERNAME=admin_change_me
-POZNOTE_PASSWORD=YOUR_GLOBAL_ADMIN_OR_USER_PASSWORD
-POZNOTE_USER_ID=1
-POZNOTE_DEFAULT_WORKSPACE=Poznote
-POZNOTE_DEBUG=1
-MCP_HOST=0.0.0.0
-MCP_PORT=POZNOTE_MCP_SERVER_PORT
-```
-
-2) Create `/etc/systemd/system/poznote-mcp.service`:
-
-```ini
-[Unit]
-Description=Poznote MCP Server
-After=network.target
-
-[Service]
-Type=simple
-User=YOUR_LINUX_USER
-WorkingDirectory=/home/YOUR_LINUX_USER/poznote-mcp-server/mcp-server
-EnvironmentFile=/etc/poznote-mcp.env
-ExecStart=/home/YOUR_LINUX_USER/poznote-mcp-server/mcp-server/venv/bin/poznote-mcp serve --host=${MCP_HOST} --port=${MCP_PORT}
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-```
-
-3) Reload and start:
-
-```bash
-sudo systemctl daemon-reload
-sudo systemctl enable --now poznote-mcp
-sudo systemctl status poznote-mcp
-```
-
-</details>
-
-<details>
-<summary><strong>Run with user systemd</strong></summary>
-
-<br>
-
-This mode installs the unit for a single Linux user (no `sudo` for `systemctl`).
-
-1) Create an environment file (example: `~/.config/poznote-mcp.env`):
-
-```bash
-vim ~/.config/poznote-mcp.env
-```
-
-Content:
-
-```bash
-POZNOTE_API_URL=http://POZNOTE_SERVER:POZNOTE_SERVER_PORT/api/v1
-POZNOTE_USERNAME=admin_change_me
-POZNOTE_PASSWORD=YOUR_GLOBAL_ADMIN_OR_USER_PASSWORD
-POZNOTE_USER_ID=1
-POZNOTE_DEFAULT_WORKSPACE=Poznote
-POZNOTE_DEBUG=1
-MCP_HOST=0.0.0.0
-MCP_PORT=POZNOTE_MCP_SERVER_PORT
-```
-
-2) Create the user unit at `~/.config/systemd/user/poznote-mcp.service`:
-
-```bash
-mkdir -p ~/.config/systemd/user
-$EDITOR ~/.config/systemd/user/poznote-mcp.service
-```
-
-Example unit:
-
-```ini
-[Unit]
-Description=Poznote MCP Server
-After=network.target
-
-[Service]
-Type=simple
-WorkingDirectory=%h/poznote-mcp-server/mcp-server
-EnvironmentFile=%h/.config/poznote-mcp.env
-ExecStart=%h/poznote-mcp-server/mcp-server/venv/bin/poznote-mcp serve --host=${MCP_HOST} --port=${MCP_PORT}
-Restart=always
-
-[Install]
-WantedBy=default.target
-```
-
-3) Reload and start:
-
-```bash
-systemctl --user daemon-reload
-systemctl --user enable --now poznote-mcp
-systemctl --user status poznote-mcp
-```
-
-Optional (start even when you’re not logged in):
-
-```bash
-sudo loginctl enable-linger $USER
-```
-
-</details>
-
-
-## 3. Configure VS Code (HTTP)
-
-`mcp.json` location:
-- **Windows:** `C:\\Users\\YOUR-USERNAME\\AppData\\Roaming\\Code\\User\\mcp.json`
-- **Linux:** `~/.config/Code/User/mcp.json`
-- **macOS:** `~/Library/Application Support/Code/User/mcp.json`
-
-Example:
+Add to your `mcp.json`:
 
 ```json
 {
   "servers": {
     "poznote": {
       "type": "http",
-      "url": "http://POZNOTE_MCP_SERVER:POZNOTE_MCP_SERVER_PORT/mcp"
+      "url": "http://localhost:8045/mcp"
     }
   }
 }
 ```
 
+`mcp.json` location:
+- **Windows:** `C:\Users\YOUR-USERNAME\AppData\Roaming\Code\User\mcp.json`
+- **Linux:** `~/.config/Code/User/mcp.json`
+- **macOS:** `~/Library/Application Support/Code/User/mcp.json`
+
+### Docker Commands
+
+```bash
+# Start (if COMPOSE_PROFILES=mcp is in .env)
+docker compose up -d
+
+# Stop
+docker compose down
+
+# View MCP logs
+docker compose logs -f mcp-server
+
+# Rebuild MCP after updates
+docker compose build mcp-server
+docker compose up -d
+```
+
 ---
 
-## Example prompts
+## Example Prompts
 
-- List all notes in workspace 'Poznote' of my Poznote instance
-- Search for notes about 'MCP'
-- Create a markdown note type titled 'Birds' about birds
-- Update note 100041 with new content
-- Create a folder "Test" in workspace "Workspace1"
-- ...
+Once configured in VS Code, you can interact with Poznote using natural language:
+
+- "List all notes in workspace 'Poznote' of my Poznote instance"
+- "Search for notes about 'MCP'"
+- "Create a markdown note titled 'Birds' about birds"
+- "Update note 100041 with new content"
+- "Create a folder 'Test' in workspace 'Workspace1'"
+
+---
+
+## Development
+
+### Manual Installation (for development only)
+
+If you need to modify the MCP server code:
+
+```bash
+# Clone and setup
+git clone https://github.com/timothepoznanski/poznote.git
+cd poznote/mcp-server
+
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# Install dependencies
+pip install --upgrade pip
+pip install -e .
+
+# Configure environment
+export POZNOTE_API_URL=http://localhost:8040/api/v1
+export POZNOTE_USERNAME=admin
+export POZNOTE_PASSWORD=admin
+export POZNOTE_USER_ID=1
+export POZNOTE_DEFAULT_WORKSPACE=Poznote
+
+# Run development server
+poznote-mcp serve --host=0.0.0.0 --port=8045
+```
+
+### Building the Docker Image
+
+```bash
+# From the mcp-server directory
+docker build -t poznote-mcp:latest .
+
+# Test the image
+docker run -d \
+  -e POZNOTE_API_URL=http://host.docker.internal:8040/api/v1 \
+  -e POZNOTE_USERNAME=admin \
+  -e POZNOTE_PASSWORD=admin \
+  -p 8045:8045 \
+  poznote-mcp:latest
+```

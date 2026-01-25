@@ -130,9 +130,9 @@ mcp = FastMCP(
     "poznote-mcp",
     stateless_http=True,
     # FastMCP defaults to 127.0.0.1:8000 for HTTP-based transports.
-    # Poznote MCP expects 0.0.0.0:8041 by default (and the CLI exposes --host/--port).
+    # Poznote MCP expects 0.0.0.0:8045 by default (and the CLI exposes --host/--port).
     host=os.getenv("MCP_HOST", "0.0.0.0"),
-    port=_env_int("MCP_PORT", 8041),
+    port=_env_int("MCP_PORT", 8045),
 )
 
 # Poznote client (initialized lazily)
@@ -478,8 +478,8 @@ def create_parser() -> argparse.ArgumentParser:
     serve_parser.add_argument(
         "--port",
         type=int,
-        default=8041,
-        help="Port to listen on (default: 8041)",
+        default=8045,
+        help="Port to listen on (default: 8045)",
     )
     
     return parser
@@ -497,7 +497,7 @@ def main():
     else:
         # Backward compatibility: no subcommand means use env vars
         host = os.getenv("MCP_HOST", "0.0.0.0")
-        port = int(os.getenv("MCP_PORT", "8041"))
+        port = int(os.getenv("MCP_PORT", "8045"))
     
     try:
         logger.info(f"Starting Poznote MCP Server (HTTP mode on {host}:{port})...")
