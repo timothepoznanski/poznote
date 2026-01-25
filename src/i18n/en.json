@@ -466,7 +466,9 @@
         "callout_warning": "Warning",
         "callout_caution": "Caution",
         "toggle": "Toggle",
-        "toggle_placeholder": "Toggle"
+        "toggle_placeholder": "Toggle",
+        "toggle_content_placeholder": "Write inside the toggle here…",
+        "toggle_after_placeholder": "Write outside the toggle here…"
     },
     "api": {
         "settings": {

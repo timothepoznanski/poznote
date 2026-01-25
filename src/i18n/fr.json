@@ -929,6 +929,8 @@
         "callout_caution": "Attention",
         "toggle": "Toggle",
         "toggle_placeholder": "Toggle",
+        "toggle_content_placeholder": "Écrivez à l’intérieur du toggle ici…",
+        "toggle_after_placeholder": "Écrivez à l’extérieur du toggle ici…",
         "color": "Couleur",
         "color_red": "Rouge",
         "color_blue": "Bleu",

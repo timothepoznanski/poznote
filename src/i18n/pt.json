@@ -911,7 +911,9 @@
         "callout_warning": "Aviso",
         "callout_caution": "Atenção",
         "toggle": "Toggle",
-        "toggle_placeholder": "Toggle"
+        "toggle_placeholder": "Toggle",
+        "toggle_content_placeholder": "Escreva dentro do toggle aqui…",
+        "toggle_after_placeholder": "Escreva fora do toggle aqui…"
     },
     "api": {
         "settings": {

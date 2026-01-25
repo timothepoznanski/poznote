@@ -599,11 +599,18 @@
         summary.className = 'toggle-header';
         summary.textContent = window.t ? window.t('slash_menu.toggle_placeholder', null, 'Toggle') : 'Toggle';
 
+        const toggleContentPlaceholder = window.t
+            ? window.t('slash_menu.toggle_content_placeholder', null, 'Write inside the toggle…')
+            : 'Write inside the toggle…';
+        const toggleAfterPlaceholder = window.t
+            ? window.t('slash_menu.toggle_after_placeholder', null, 'Continue writing below…')
+            : 'Continue writing below…';
+
         // Create content div (hidden content)
         const contentDiv = document.createElement('div');
         contentDiv.className = 'toggle-content';
         contentDiv.setAttribute('contenteditable', 'true');
-        contentDiv.setAttribute('data-ph', 'insert here');
+        contentDiv.setAttribute('data-ph', toggleContentPlaceholder);
         contentDiv.innerHTML = '';
 
         details.appendChild(summary);
@@ -611,9 +618,13 @@
 
         // Create empty lines before and after
         const emptyLineBefore = document.createElement('p');
-        emptyLineBefore.innerHTML = '<br>';
+        emptyLineBefore.className = 'toggle-before-placeholder';
+        emptyLineBefore.setAttribute('data-ph', toggleAfterPlaceholder);
+        emptyLineBefore.innerHTML = '';
         const emptyLineAfter = document.createElement('p');
-        emptyLineAfter.innerHTML = '<br>';
+        emptyLineAfter.className = 'toggle-after-placeholder';
+        emptyLineAfter.setAttribute('data-ph', toggleAfterPlaceholder);
+        emptyLineAfter.innerHTML = '';
 
         // Insert at cursor position
         range.deleteContents();

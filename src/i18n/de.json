@@ -912,7 +912,9 @@
         "callout_warning": "Warnung",
         "callout_caution": "Vorsicht",
         "toggle": "Toggle",
-        "toggle_placeholder": "Toggle"
+        "toggle_placeholder": "Toggle",
+        "toggle_content_placeholder": "Hier im Toggle schreiben…",
+        "toggle_after_placeholder": "Hier außerhalb des Toggles schreiben…"
     },
     "api": {
         "settings": {

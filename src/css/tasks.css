@@ -570,6 +570,15 @@
     margin: 0;
 }
 
+/* Placeholder line before/after toggle (HTML mode) */
+.toggle-before-placeholder:empty:before,
+.toggle-after-placeholder:empty:before {
+    content: attr(data-ph);
+    color: #999;
+    font-style: italic;
+    opacity: 0.6;
+}
+
 /* Dark mode adjustments */
 body.dark-mode .toggle-block {
     border-color: #30363d;

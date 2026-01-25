@@ -909,7 +909,9 @@
         "callout_warning": "警告",
         "callout_caution": "注意",
         "toggle": "Toggle",
-        "toggle_placeholder": "Toggle"
+        "toggle_placeholder": "Toggle",
+        "toggle_content_placeholder": "在折叠块内在此输入…",
+        "toggle_after_placeholder": "在折叠块外在此输入…"
     },
     "api": {
         "settings": {
