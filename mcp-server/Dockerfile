@@ -44,10 +44,10 @@ ENV POZNOTE_PASSWORD=admin
 ENV POZNOTE_USER_ID=1
 ENV POZNOTE_DEFAULT_WORKSPACE=Poznote
 ENV MCP_HOST=0.0.0.0
-ENV MCP_PORT=8041
+ENV MCP_PORT=8045
 
 # Expose MCP server port
-EXPOSE 8041
+EXPOSE 8045
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
