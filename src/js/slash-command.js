@@ -2356,6 +2356,45 @@
                     }
                 }
             }
+            
+            // Delete toggle when backspace is pressed on empty header
+            if (e.key === 'Backspace') {
+                const selection = window.getSelection();
+                let header = e.target.closest('.toggle-header');
+                if (!header && selection && selection.anchorNode) {
+                    const anchorEl = selection.anchorNode.nodeType === Node.ELEMENT_NODE
+                        ? selection.anchorNode
+                        : selection.anchorNode.parentElement;
+                    if (anchorEl) {
+                        header = anchorEl.closest('.toggle-header');
+                    }
+                }
+
+                if (header && header.textContent.trim() === '') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const toggleBlock = header.closest('.toggle-block');
+                    if (toggleBlock) {
+                        const parent = toggleBlock.parentNode;
+                        if (parent) {
+                            // Create a paragraph to maintain cursor position
+                            const p = document.createElement('p');
+                            p.innerHTML = '<br>';
+                            parent.insertBefore(p, toggleBlock);
+                            toggleBlock.remove();
+                            
+                            // Move cursor to the new paragraph
+                            const range = document.createRange();
+                            range.setStart(p, 0);
+                            range.collapse(true);
+                            const sel = window.getSelection();
+                            sel.removeAllRanges();
+                            sel.addRange(range);
+                        }
+                    }
+                }
+            }
         }, true);
 
         // Prevent multi-line pastes in toggle title
