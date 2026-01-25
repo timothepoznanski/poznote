@@ -93,6 +93,12 @@ POZNOTE_MCP_DEBUG=false
 
 To disable the MCP server, comment out the `COMPOSE_PROFILES=mcp` line in your `.env`.
 
+> **Note:** If the MCP container is already running, you need to stop it manually:
+> ```bash
+> docker compose down mcp-server
+> ```
+> Docker Compose won't automatically remove running containers when you disable a service.
+
 ### Reverse Proxy Compatibility
 
 If you use a reverse proxy (Nginx Proxy Manager, Traefik, Caddy, etc.) to expose Poznote, connect the MCP container to your proxy's network:
