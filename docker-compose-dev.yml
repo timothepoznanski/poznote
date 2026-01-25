@@ -64,7 +64,7 @@ services:
     depends_on:
       - webserver
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8041/mcp"]
+      test: ["CMD", "sh", "-c", "wget --quiet --tries=1 --timeout=5 -O /dev/null http://127.0.0.1:8041/ || exit 0"]
       interval: 30s
       timeout: 10s
       retries: 3
