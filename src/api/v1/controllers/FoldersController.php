@@ -629,10 +629,10 @@ class FoldersController {
         
         // Get current folder
         if ($workspace !== null) {
-            $stmt = $this->db->prepare("SELECT id, name, workspace FROM folders WHERE id = ? AND workspace = ?");
+            $stmt = $this->db->prepare("SELECT id, name, workspace, parent_id FROM folders WHERE id = ? AND workspace = ?");
             $stmt->execute([$folderId, $workspace]);
         } else {
-            $stmt = $this->db->prepare("SELECT id, name, workspace FROM folders WHERE id = ?");
+            $stmt = $this->db->prepare("SELECT id, name, workspace, parent_id FROM folders WHERE id = ?");
             $stmt->execute([$folderId]);
         }
         
@@ -644,6 +644,7 @@ class FoldersController {
         
         $oldName = $folder['name'];
         $ws = $workspace ?? $folder['workspace'];
+        $parentId = $folder['parent_id'];
         
         // Handle rename
         if (isset($data['name']) || isset($data['new_name'])) {
@@ -666,17 +667,29 @@ class FoldersController {
                 return;
             }
             
-            // Check if target name exists
-            if ($ws !== null) {
-                $check = $this->db->prepare("SELECT COUNT(*) FROM folders WHERE name = ? AND workspace = ? AND id != ?");
-                $check->execute([$newName, $ws, $folderId]);
+            // Check if target name exists in the same parent folder
+            if ($parentId === null) {
+                // Root folder - check for duplicates at root level
+                if ($ws !== null) {
+                    $check = $this->db->prepare("SELECT COUNT(*) FROM folders WHERE name = ? AND workspace = ? AND parent_id IS NULL AND id != ?");
+                    $check->execute([$newName, $ws, $folderId]);
+                } else {
+                    $check = $this->db->prepare("SELECT COUNT(*) FROM folders WHERE name = ? AND parent_id IS NULL AND id != ?");
+                    $check->execute([$newName, $folderId]);
+                }
             } else {
-                $check = $this->db->prepare("SELECT COUNT(*) FROM folders WHERE name = ? AND id != ?");
-                $check->execute([$newName, $folderId]);
+                // Subfolder - check for duplicates in the same parent
+                if ($ws !== null) {
+                    $check = $this->db->prepare("SELECT COUNT(*) FROM folders WHERE name = ? AND workspace = ? AND parent_id = ? AND id != ?");
+                    $check->execute([$newName, $ws, $parentId, $folderId]);
+                } else {
+                    $check = $this->db->prepare("SELECT COUNT(*) FROM folders WHERE name = ? AND parent_id = ? AND id != ?");
+                    $check->execute([$newName, $parentId, $folderId]);
+                }
             }
             
             if ((int)$check->fetchColumn() > 0) {
-                $this->sendError('Folder already exists in this workspace', 409);
+                $this->sendError('Folder already exists in this location', 409);
                 return;
             }
             

@@ -567,6 +567,10 @@ body {
     border-radius: 6px;
 }
 
+.sidebar-kofi {
+    text-decoration: none;
+}
+
 .sidebar-settings {
     background: transparent;
     border: none;
@@ -2720,6 +2724,14 @@ a[data-image-link] {
 div[contentEditable=true]:empty:before {
     content: attr(data-ph);
     color: #bababa;
+}
+
+/* Placeholder lines around embedded Excalidraw diagrams */
+.excalidraw-placeholder:empty:before {
+    content: attr(data-ph);
+    color: #999;
+    font-style: italic;
+    opacity: 0.6;
 }
 
 /* Exclure les blocs de code du placeholder automatique */

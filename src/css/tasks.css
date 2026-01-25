@@ -545,6 +545,14 @@
     /* Removed in favor of summary border */
 }
 
+/* Placeholder for empty toggle content */
+.toggle-block>.toggle-content[data-ph]:empty:before {
+    content: attr(data-ph);
+    color: #999;
+    font-style: italic;
+    opacity: 0.6;
+}
+
 /* Markdown Mode: Direct children indentation */
 .toggle-block>p,
 .toggle-block>ul,
@@ -560,6 +568,15 @@
 /* Reset margin for p inside toggle-content (HTML mode) */
 .toggle-block>.toggle-content p {
     margin: 0;
+}
+
+/* Placeholder line before/after toggle (HTML mode) */
+.toggle-before-placeholder:empty:before,
+.toggle-after-placeholder:empty:before {
+    content: attr(data-ph);
+    color: #999;
+    font-style: italic;
+    opacity: 0.6;
 }
 
 /* Dark mode adjustments */

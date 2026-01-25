@@ -599,9 +599,18 @@
         summary.className = 'toggle-header';
         summary.textContent = window.t ? window.t('slash_menu.toggle_placeholder', null, 'Toggle') : 'Toggle';
 
+        const toggleContentPlaceholder = window.t
+            ? window.t('slash_menu.toggle_content_placeholder', null, 'Write inside the toggle…')
+            : 'Write inside the toggle…';
+        const toggleAfterPlaceholder = window.t
+            ? window.t('slash_menu.toggle_after_placeholder', null, 'Continue writing below…')
+            : 'Continue writing below…';
+
         // Create content div (hidden content)
         const contentDiv = document.createElement('div');
         contentDiv.className = 'toggle-content';
+        contentDiv.setAttribute('contenteditable', 'true');
+        contentDiv.setAttribute('data-ph', toggleContentPlaceholder);
         contentDiv.innerHTML = '';
 
         details.appendChild(summary);
@@ -609,9 +618,13 @@
 
         // Create empty lines before and after
         const emptyLineBefore = document.createElement('p');
-        emptyLineBefore.innerHTML = '<br>';
+        emptyLineBefore.className = 'toggle-before-placeholder';
+        emptyLineBefore.setAttribute('data-ph', toggleAfterPlaceholder);
+        emptyLineBefore.innerHTML = '';
         const emptyLineAfter = document.createElement('p');
-        emptyLineAfter.innerHTML = '<br>';
+        emptyLineAfter.className = 'toggle-after-placeholder';
+        emptyLineAfter.setAttribute('data-ph', toggleAfterPlaceholder);
+        emptyLineAfter.innerHTML = '';
 
         // Insert at cursor position
         range.deleteContents();
@@ -2351,6 +2364,45 @@
                         range.collapse(true);
                         selection.removeAllRanges();
                         selection.addRange(range);
+                    }
+                }
+            }
+            
+            // Delete toggle when backspace is pressed on empty header
+            if (e.key === 'Backspace') {
+                const selection = window.getSelection();
+                let header = e.target.closest('.toggle-header');
+                if (!header && selection && selection.anchorNode) {
+                    const anchorEl = selection.anchorNode.nodeType === Node.ELEMENT_NODE
+                        ? selection.anchorNode
+                        : selection.anchorNode.parentElement;
+                    if (anchorEl) {
+                        header = anchorEl.closest('.toggle-header');
+                    }
+                }
+
+                if (header && header.textContent.trim() === '') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const toggleBlock = header.closest('.toggle-block');
+                    if (toggleBlock) {
+                        const parent = toggleBlock.parentNode;
+                        if (parent) {
+                            // Create a paragraph to maintain cursor position
+                            const p = document.createElement('p');
+                            p.innerHTML = '<br>';
+                            parent.insertBefore(p, toggleBlock);
+                            toggleBlock.remove();
+                            
+                            // Move cursor to the new paragraph
+                            const range = document.createRange();
+                            range.setStart(p, 0);
+                            range.collapse(true);
+                            const sel = window.getSelection();
+                            sel.removeAllRanges();
+                            sel.addRange(range);
+                        }
                     }
                 }
             }

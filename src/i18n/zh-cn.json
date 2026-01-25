@@ -543,6 +543,9 @@
     "editor": {
         "markdown_placeholder": "编写您的 Markdown 或在此处使用 / 打开命令菜单...",
         "markdown_placeholder_mobile": "在此处编写您的 Markdown...",
+        "excalidraw": {
+            "placeholder_outside": "在图形外在此输入…"
+        },
         "messages": {
             "preview_mode_hint": "您处于预览模式。请使用工具栏中的按钮切换到编辑模式开始编写 Markdown。",
             "split_preview_placeholder": "预览将随着您的输入在此处显示..."
@@ -909,7 +912,9 @@
         "callout_warning": "警告",
         "callout_caution": "注意",
         "toggle": "Toggle",
-        "toggle_placeholder": "Toggle"
+        "toggle_placeholder": "Toggle",
+        "toggle_content_placeholder": "在折叠块内在此输入…",
+        "toggle_after_placeholder": "在折叠块外在此输入…"
     },
     "api": {
         "settings": {

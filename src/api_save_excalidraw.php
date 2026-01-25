@@ -147,6 +147,9 @@ if ($note_id > 0) {
     }
     
     // Generate new Excalidraw HTML content
+    $excalidraw_placeholder = t('editor.excalidraw.placeholder_outside', [], 'Write outside the diagram here…');
+    $excalidraw_placeholder = htmlspecialchars($excalidraw_placeholder, ENT_QUOTES);
+
     if (!empty($base64_image)) {
         // Build class attribute preserving border classes
         $img_classes = 'excalidraw-image';
@@ -162,16 +165,16 @@ if ($note_id > 0) {
         // Build style attribute
         $img_style = !empty($existing_img_style) ? ' style="' . htmlspecialchars($existing_img_style) . '"' : '';
         
-        $new_excalidraw_html = '<p><br></p><div class="excalidraw-container" contenteditable="false">';
+        $new_excalidraw_html = '<p class="excalidraw-placeholder" data-ph="' . $excalidraw_placeholder . '"></p><div class="excalidraw-container" contenteditable="false">';
         $new_excalidraw_html .= '<img src="data:' . $mime_type . ';base64,' . $base64_image . '" alt="Excalidraw diagram" class="' . $img_classes . '" data-is-excalidraw="true" data-excalidraw-note-id="' . $note_id . '"' . $img_style . ' />';
         $new_excalidraw_html .= '<div class="excalidraw-data" style="display: none;">' . htmlspecialchars($diagram_data, ENT_QUOTES) . '</div>';
-        $new_excalidraw_html .= '</div><p><br></p>';
+        $new_excalidraw_html .= '</div><p class="excalidraw-placeholder" data-ph="' . $excalidraw_placeholder . '"></p>';
     } else {
         // If no image, create a placeholder with just the diagram data
-        $new_excalidraw_html = '<p><br></p><div class="excalidraw-container" contenteditable="false">';
+        $new_excalidraw_html = '<p class="excalidraw-placeholder" data-ph="' . $excalidraw_placeholder . '"></p><div class="excalidraw-container" contenteditable="false">';
         $new_excalidraw_html .= '<p style="text-align:center; padding: 40px; color: #999;">Excalidraw diagram</p>';
         $new_excalidraw_html .= '<div class="excalidraw-data" style="display: none;">' . htmlspecialchars($diagram_data, ENT_QUOTES) . '</div>';
-        $new_excalidraw_html .= '</div><p><br></p>';
+        $new_excalidraw_html .= '</div><p class="excalidraw-placeholder" data-ph="' . $excalidraw_placeholder . '"></p>';
     }
     
     // If we have existing content, replace just the Excalidraw part
@@ -216,6 +219,8 @@ function saveEmbeddedDiagram() {
     $diagram_data = isset($_POST['diagram_data']) ? $_POST['diagram_data'] : '';
     $preview_image_base64 = isset($_POST['preview_image_base64']) ? $_POST['preview_image_base64'] : '';
     $cursor_position = isset($_POST['cursor_position']) ? intval($_POST['cursor_position']) : null;
+    $excalidraw_placeholder = t('editor.excalidraw.placeholder_outside', [], 'Write outside the diagram here…');
+    $excalidraw_placeholder = htmlspecialchars($excalidraw_placeholder, ENT_QUOTES);
     
     if ($note_id <= 0 || empty($diagram_id)) {
         http_response_code(400);
@@ -306,7 +311,7 @@ function saveEmbeddedDiagram() {
         }
         
         // Create the updated diagram HTML with embedded data and preview
-        $diagram_html = '<p><br></p><div class="excalidraw-container" id="' . htmlspecialchars($diagram_id) . '" 
+        $diagram_html = '<p class="excalidraw-placeholder" data-ph="' . $excalidraw_placeholder . '"></p><div class="excalidraw-container" id="' . htmlspecialchars($diagram_id) . '" 
                               style="padding: 10px; margin: 10px 0; cursor: pointer; text-align: center;" 
                               data-diagram-id="' . htmlspecialchars($diagram_id) . '"
                               data-excalidraw="' . htmlspecialchars($diagram_data) . '">';
@@ -318,7 +323,7 @@ function saveEmbeddedDiagram() {
                               <p style="color: #666; font-size: 16px; margin: 0;">Excalidraw diagram</p>';
         }
         
-        $diagram_html .= '</div><p><br></p>';
+        $diagram_html .= '</div><p class="excalidraw-placeholder" data-ph="' . $excalidraw_placeholder . '"></p>';
         
         // Find and replace the existing diagram container or button placeholder
         $pattern = '/<div class="excalidraw-container" id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<\/div>/s';

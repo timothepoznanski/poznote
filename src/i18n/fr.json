@@ -560,6 +560,9 @@
     "editor": {
         "markdown_placeholder": "Écrivez votre markdown ou utilisez / pour ouvrir le menu de commandes...",
         "markdown_placeholder_mobile": "Écrivez votre markdown ici...",
+        "excalidraw": {
+            "placeholder_outside": "Écrivez en dehors du diagramme ici…"
+        },
         "images": {
             "delete_confirm": {
                 "title": "Supprimer l’image",
@@ -929,6 +932,8 @@
         "callout_caution": "Attention",
         "toggle": "Toggle",
         "toggle_placeholder": "Toggle",
+        "toggle_content_placeholder": "Écrivez à l’intérieur du toggle ici…",
+        "toggle_after_placeholder": "Écrivez à l’extérieur du toggle ici…",
         "color": "Couleur",
         "color_red": "Rouge",
         "color_blue": "Bleu",

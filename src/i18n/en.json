@@ -466,7 +466,9 @@
         "callout_warning": "Warning",
         "callout_caution": "Caution",
         "toggle": "Toggle",
-        "toggle_placeholder": "Toggle"
+        "toggle_placeholder": "Toggle",
+        "toggle_content_placeholder": "Write inside the toggle here…",
+        "toggle_after_placeholder": "Write outside the toggle here…"
     },
     "api": {
         "settings": {
@@ -623,6 +625,9 @@
     "editor": {
         "markdown_placeholder": "Write your markdown or use / to open the command menu...",
         "markdown_placeholder_mobile": "Write your markdown here...",
+        "excalidraw": {
+            "placeholder_outside": "Write outside the diagram here…"
+        },
         "images": {
             "delete_confirm": {
                 "title": "Delete image",

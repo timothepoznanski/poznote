@@ -285,6 +285,7 @@ $body_classes = trim($extra_body_classes);
                 <i class="fas fa-caret-down workspace-dropdown-icon"></i>
             </div>
             <div class="sidebar-title-actions">
+                <a class="sidebar-home sidebar-kofi" href="https://ko-fi.com/timothepoznanski" target="_blank" rel="noopener noreferrer" title="Ko-fi"><i class="fas fa-heart"></i></a>
                 <button class="sidebar-home" data-action="navigate-to-home" title="<?php echo t_h('sidebar.home', [], 'Home'); ?>"><i class="fas fa-home"></i></button>
                 <button class="sidebar-settings" data-action="navigate-to-settings" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>"><i class="fas fa-cog"></i><span class="update-badge update-badge-hidden"></span></button>
                 <button class="sidebar-plus" data-action="toggle-create-menu" title="<?php echo t_h('sidebar.create'); ?>"><i class="fas fa-plus-circle"></i></button>

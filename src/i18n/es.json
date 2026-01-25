@@ -544,6 +544,9 @@
     "editor": {
         "markdown_placeholder": "Escribe tu markdown o usa / para abrir el menú de comandos aquí...",
         "markdown_placeholder_mobile": "Escribe tu markdown aquí...",
+        "excalidraw": {
+            "placeholder_outside": "Escribe fuera del diagrama aquí…"
+        },
         "images": {
             "delete_confirm": {
                 "title": "Eliminar imagen",
@@ -912,7 +915,9 @@
         "callout_warning": "Advertencia",
         "callout_caution": "Precaución",
         "toggle": "Toggle",
-        "toggle_placeholder": "Toggle"
+        "toggle_placeholder": "Toggle",
+        "toggle_content_placeholder": "Escribe dentro del toggle aquí…",
+        "toggle_after_placeholder": "Escribe fuera del toggle aquí…"
     },
     "api": {
         "settings": {
