@@ -439,6 +439,7 @@
     },
     "home": {
         "title": "Início",
+        "folders": "Pastas",
         "shared_notes": "Notas compartilhadas",
         "shared_folders": "Pastas compartilhadas",
         "kanban": "Kanban",

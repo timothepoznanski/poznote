@@ -440,6 +440,7 @@
     },
     "home": {
         "title": "Startseite",
+        "folders": "Ordner",
         "shared_notes": "Geteilte Notizen",
         "shared_folders": "Geteilte Ordner",
         "kanban": "Kanban",
