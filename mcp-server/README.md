@@ -54,7 +54,7 @@ The MCP server is already integrated in Poznote's main `docker-compose.yml`. Jus
 
 Edit your `.env` file (at Poznote root) and add:
 ```bash
-POZNOTE_MCP_ENABLED=true
+COMPOSE_PROFILES=mcp
 ```
 
 Then start normally:
@@ -73,7 +73,7 @@ Add these variables to your `.env` file (at Poznote root):
 
 ```bash
 # Enable MCP server
-POZNOTE_MCP_ENABLED=true
+COMPOSE_PROFILES=mcp
 
 # MCP Server port (default: 8041)
 POZNOTE_MCP_PORT=8041
@@ -91,7 +91,7 @@ POZNOTE_MCP_WORKSPACE=Poznote
 POZNOTE_MCP_DEBUG=false
 ```
 
-To disable the MCP server, set `POZNOTE_MCP_ENABLED=false` or comment out the line.
+To disable the MCP server, comment out the `COMPOSE_PROFILES=mcp` line in your `.env`.
 
 ### VS Code Configuration
 
@@ -116,7 +116,7 @@ Add to your `mcp.json`:
 ### Docker Commands
 
 ```bash
-# Start (if POZNOTE_MCP_ENABLED=true is in .env)
+# Start (if COMPOSE_PROFILES=mcp is in .env)
 docker compose up -d
 
 # Stop

@@ -816,7 +816,7 @@ POZNOTE_MCP_USER_ID=1
 POZNOTE_MCP_WORKSPACE=Poznote
 ```
 
-To disable the MCP server, set `POZNOTE_MCP_ENABLED=false` or comment out the line.
+To disable the MCP server, comment out the `COMPOSE_PROFILES=mcp` line in your `.env`.
 
 ### VS Code Setup
 

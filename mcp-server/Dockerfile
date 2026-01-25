@@ -23,15 +23,13 @@ RUN addgroup -g 1000 mcp && adduser -u 1000 -G mcp -s /bin/sh -D mcp
 # Set working directory
 WORKDIR /app
 
-# Copy only dependency files first (for better caching)
-COPY pyproject.toml ./
+# Copy project files for installation
+COPY pyproject.toml README.md ./
+COPY src/ ./src/
 
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -e .
-
-# Copy application source
-COPY src/ ./src/
+    && pip install --no-cache-dir .
 
 # Remove build dependencies to reduce image size
 RUN apk del gcc musl-dev libffi-dev
