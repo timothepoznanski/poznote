@@ -1623,4 +1623,5 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 - **Nginx + PHP-FPM** - High-performance web server with FastCGI Process Manager
 - **Alpine Linux** - Secure, lightweight base image
 - **Docker** - Containerization for easy deployment and portability
+- **Python 3.12 (Alpine)** - MCP server runtime with httpx, fastmcp, and mcp libraries for AI assistant integration
 </details>
