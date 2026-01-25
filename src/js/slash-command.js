@@ -602,6 +602,8 @@
         // Create content div (hidden content)
         const contentDiv = document.createElement('div');
         contentDiv.className = 'toggle-content';
+        contentDiv.setAttribute('contenteditable', 'true');
+        contentDiv.setAttribute('data-ph', 'insert here');
         contentDiv.innerHTML = '';
 
         details.appendChild(summary);
