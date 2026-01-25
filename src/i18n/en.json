@@ -625,6 +625,9 @@
     "editor": {
         "markdown_placeholder": "Write your markdown or use / to open the command menu...",
         "markdown_placeholder_mobile": "Write your markdown here...",
+        "excalidraw": {
+            "placeholder_outside": "Write outside the diagram here…"
+        },
         "images": {
             "delete_confirm": {
                 "title": "Delete image",

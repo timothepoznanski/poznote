@@ -544,6 +544,9 @@
     "editor": {
         "markdown_placeholder": "Schreiben Sie Ihr Markdown oder verwenden Sie /, um das Befehlsmenü zu öffnen...",
         "markdown_placeholder_mobile": "Schreiben Sie Ihr Markdown hier...",
+        "excalidraw": {
+            "placeholder_outside": "Hier außerhalb des Diagramms schreiben…"
+        },
         "images": {
             "delete_confirm": {
                 "title": "Bild löschen",

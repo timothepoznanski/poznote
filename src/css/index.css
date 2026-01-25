@@ -2722,6 +2722,14 @@ div[contentEditable=true]:empty:before {
     color: #bababa;
 }
 
+/* Placeholder lines around embedded Excalidraw diagrams */
+.excalidraw-placeholder:empty:before {
+    content: attr(data-ph);
+    color: #999;
+    font-style: italic;
+    opacity: 0.6;
+}
+
 /* Exclure les blocs de code du placeholder automatique */
 .code-block:empty:before,
 .noteentry .code-block:empty:before {
