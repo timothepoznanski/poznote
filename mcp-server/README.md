@@ -50,26 +50,20 @@ All tools accept an optional `user_id` argument to target a specific user profil
 
 ## Installation & Setup
 
-The MCP server is already integrated in Poznote's main `docker-compose.yml`. Just enable it!
+The MCP server is already integrated in Poznote's main `docker-compose.yml`.
 
-### Quick Start
-
-Edit your `.env` file (at Poznote root) and add:
 ```bash
-COMPOSE_PROFILES=mcp
+# Navigate to your Poznote directory
+cd poznote
 ```
 
-Then start normally:
 ```bash
-docker compose up -d
+# Get the Poznote MCP Server code
+wget https://codeload.github.com/timothepoznanski/poznote/zip/refs/heads/main -O poznote.zip
+unzip poznote.zip
+mv poznote-main/mcp-server .
+rm -rf poznote.zip poznote-main
 ```
-
-That's it! Check the logs:
-```bash
-docker compose logs -f mcp-server
-```
-
-### Configuration
 
 Add these variables to your `.env` file (at Poznote root):
 
@@ -91,6 +85,9 @@ POZNOTE_MCP_WORKSPACE=Poznote
 
 # Enable debug logging (optional)
 POZNOTE_MCP_DEBUG=false
+
+# Start the MCP Server
+docker compose up -d
 ```
 
 To disable the MCP server, comment out the `COMPOSE_PROFILES=mcp` line in your `.env`.
@@ -136,23 +133,6 @@ Add to your `mcp.json`:
 - **Linux:** `~/.config/Code/User/mcp.json`
 - **macOS:** `~/Library/Application Support/Code/User/mcp.json`
 
-### Docker Commands
-
-```bash
-# Start (if COMPOSE_PROFILES=mcp is in .env)
-docker compose up -d
-
-# Stop
-docker compose down
-
-# View MCP logs
-docker compose logs -f mcp-server
-
-# Rebuild MCP after updates
-docker compose build mcp-server
-docker compose up -d
-```
-
 ---
 
 ## Example Prompts
@@ -164,50 +144,3 @@ Once configured in VS Code, you can interact with Poznote using natural language
 - "Create a markdown note titled 'Birds' about birds"
 - "Update note 100041 with new content"
 - "Create a folder 'Test' in workspace 'Workspace1'"
-
----
-
-## Development
-
-### Manual Installation (for development only)
-
-If you need to modify the MCP server code:
-
-```bash
-# Clone and setup
-git clone https://github.com/timothepoznanski/poznote.git
-cd poznote/mcp-server
-
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate
-
-# Install dependencies
-pip install --upgrade pip
-pip install -e .
-
-# Configure environment
-export POZNOTE_API_URL=http://localhost:8040/api/v1
-export POZNOTE_USERNAME=admin
-export POZNOTE_PASSWORD=admin
-export POZNOTE_USER_ID=1
-export POZNOTE_DEFAULT_WORKSPACE=Poznote
-
-# Run development server
-poznote-mcp serve --host=0.0.0.0 --port=8045
-```
-
-### Building the Docker Image
-
-```bash
-# From the mcp-server directory
-docker build -t poznote-mcp:latest .
-
-# Test the image
-docker run -d \
-  -e POZNOTE_API_URL=http://host.docker.internal:8040/api/v1 \
-  -e POZNOTE_USERNAME=admin \
-  -e POZNOTE_PASSWORD=admin \
-  -p 8045:8045 \
-  poznote-mcp:latest
-```
