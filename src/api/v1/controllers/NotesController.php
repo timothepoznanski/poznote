@@ -22,6 +22,7 @@ class NotesController {
      *   - folder_id: Filter by folder ID
      *   - sort: Sort order (updated_desc, created_desc, heading_asc)
      *   - get_folders: If set, return folders instead of notes
+     *   - search: Search query to filter notes by heading or content
      */
     public function index(): void {
         $workspace = $_GET['workspace'] ?? null;
@@ -30,6 +31,7 @@ class NotesController {
         $getFolders = $_GET['get_folders'] ?? null;
         $sort = $_GET['sort'] ?? null;
         $favorite = isset($_GET['favorite']) ? (int)$_GET['favorite'] : null;
+        $search = $_GET['search'] ?? null;
         
         try {
             // Validate workspace if provided
@@ -70,6 +72,14 @@ class NotesController {
             if ($favorite !== null) {
                 $sql .= " AND favorite = ?";
                 $params[] = $favorite;
+            }
+            
+            // Add search filter if provided
+            if ($search !== null && $search !== '') {
+                $sql .= " AND (remove_accents(heading) LIKE remove_accents(?) 
+                         OR remove_accents(search_clean_entry(entry)) LIKE remove_accents(?))";
+                $params[] = '%' . $search . '%';
+                $params[] = '%' . $search . '%';
             }
             
             // Handle sorting
