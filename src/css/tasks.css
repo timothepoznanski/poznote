@@ -1,5 +1,5 @@
 .task-list-container {
-    padding: 10px 0;
+    padding: 10px;
     font-family: inherit;
 }
 
@@ -19,7 +19,7 @@
 
 .task-input-container {
     position: relative;
-    margin-bottom: 15px;
+    margin-bottom: 25px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -47,14 +47,15 @@
 .tasks-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-top: 15px;
+    gap: 8px !important;
+    margin-top: 25px !important;
 }
 
 .task-item {
     display: flex;
     align-items: center;
-    padding: 8px 12px;
+    padding: 6px 12px !important;
+    margin-bottom: 8px;
     border: 1px solid #e0e0e0;
     border-radius: 6px;
     background: #fafafa;
