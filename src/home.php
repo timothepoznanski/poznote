@@ -249,6 +249,7 @@ try {
     <link type="text/css" rel="stylesheet" href="css/regular.min.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/home.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode.css?v=<?php echo $cache_v; ?>"/>
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
 </head>
@@ -284,7 +285,7 @@ try {
 
             <?php if ($syncResult && isset($syncResult['debug']) && !empty($syncResult['debug'])): ?>
             <div style="grid-column: 1 / -1; margin-bottom: 20px;">
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <div style="display: flex; gap: 10px; margin-bottom: 10px; justify-content: center;">
                     <button id="debug-toggle-btn" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;">
                         <i class="fas fa-bug"></i> <span id="debug-toggle-text"><?php echo t_h('github_sync.debug.show'); ?></span>
                     </button>
@@ -471,7 +472,7 @@ try {
             <?php endif; ?>
 
             <!-- Settings -->
-            <a href="settings.php" class="home-card" title="<?php echo t_h('settings.title', [], 'Settings'); ?>">
+            <a href="settings.php" class="home-card home-card-orange" title="<?php echo t_h('settings.title', [], 'Settings'); ?>">
                 <div class="home-card-icon">
                     <i class="fa-cog"></i>
                 </div>
@@ -517,11 +518,38 @@ try {
     <script src="js/globals.js"></script>
     <script src="js/workspaces.js"></script>
     <script src="js/navigation.js"></script>
+    <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
 
     <script>
     function handleSyncClick(card) {
         if (card.classList.contains('is-loading')) return;
         
+        const action = card.querySelector('input[name="sync_action"]')?.value;
+        const workspaceName = card.querySelector('input[name="workspace"]')?.value || 'All';
+        
+        let confirmMsg = '';
+        if (action === 'push') {
+            confirmMsg = window.t ? 
+                window.t('github_sync.confirm_push', { workspace: workspaceName }, 'Push all notes to GitHub?') : 
+                'Push all notes to GitHub?';
+        } else if (action === 'pull') {
+            confirmMsg = window.t ? 
+                window.t('github_sync.confirm_pull', { workspace: workspaceName }, 'Pull all notes from GitHub? This may overwrite local changes.') : 
+                'Pull all notes from GitHub? This may overwrite local changes.';
+        }
+        
+        if (confirmMsg) {
+            window.modalAlert.confirm(confirmMsg).then(function(confirmed) {
+                if (confirmed) {
+                    executeSync(card);
+                }
+            });
+        } else {
+            executeSync(card);
+        }
+    }
+
+    function executeSync(card) {
         card.classList.add('is-loading');
         const icon = card.querySelector('.home-card-icon i');
         if (icon) {

@@ -283,6 +283,25 @@ body.dark-mode .home-card-red .home-card-icon {
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
 }
 
+/* Orange cards (Settings) */
+.home-card-orange .home-card-icon {
+    background: rgba(245, 158, 11, 0.12);
+}
+
+.home-card-orange .home-card-icon i {
+    color: #f59e0b;
+}
+
+html[data-theme='dark'] .home-card-orange .home-card-icon,
+body.dark-mode .home-card-orange .home-card-icon {
+    background: rgba(245, 158, 11, 0.22);
+}
+
+.home-card-orange:hover {
+    border-color: #f59e0b;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+}
+
 /* Green cards for Sync */
 .home-card-green {
     /* background: rgba(16, 185, 129, 0.05); */

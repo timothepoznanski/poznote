@@ -825,13 +825,16 @@ class GitHubSync {
         
         // Get or create folder ID from folder path
         $folderId = null;
+        $folderName = null;
         if (!empty($noteData['folder_path'])) {
             $folderId = $this->getOrCreateFolderFromPath($noteData['folder_path'], $noteData['workspace']);
+            $folderParts = explode('/', $noteData['folder_path']);
+            $folderName = end($folderParts);
         }
         
         $stmt = $this->con->prepare("
-            INSERT INTO entries (heading, entry, type, tags, workspace, folder_id, created, updated, trash, favorite)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 0)
+            INSERT INTO entries (heading, entry, type, tags, workspace, folder, folder_id, created, updated, trash, favorite)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0)
         ");
         
         $stmt->execute([
@@ -840,6 +843,7 @@ class GitHubSync {
             $noteData['type'],
             $noteData['tags'],
             $noteData['workspace'],
+            $folderName,
             $folderId,
             $now,
             $now
@@ -864,8 +868,17 @@ class GitHubSync {
         // Remove front matter from content
         $cleanContent = preg_replace('/^---\s*\n.+?\n---\s*\n/s', '', $content);
         
+        // Get or create folder ID from folder path
+        $folderId = null;
+        $folderName = null;
+        if (!empty($noteData['folder_path'])) {
+            $folderId = $this->getOrCreateFolderFromPath($noteData['folder_path'], $noteData['workspace']);
+            $folderParts = explode('/', $noteData['folder_path']);
+            $folderName = end($folderParts);
+        }
+
         $stmt = $this->con->prepare("
-            UPDATE entries SET entry = ?, tags = ?, updated = ?
+            UPDATE entries SET entry = ?, tags = ?, updated = ?, folder = ?, folder_id = ?
             WHERE id = ?
         ");
         
@@ -873,6 +886,8 @@ class GitHubSync {
             $noteData['type'] === 'markdown' ? '' : $cleanContent,
             $noteData['tags'],
             $now,
+            $folderName,
+            $folderId,
             $noteId
         ]);
         
