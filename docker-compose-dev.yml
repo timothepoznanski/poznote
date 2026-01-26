@@ -47,7 +47,6 @@ services:
     container_name: poznote-mcp-dev
     restart: unless-stopped
     environment:
-      # Connect to Poznote via Docker internal network
       POZNOTE_API_URL: http://webserver:80/api/v1
       POZNOTE_USERNAME: ${POZNOTE_MCP_USERNAME:-admin}
       POZNOTE_PASSWORD: ${POZNOTE_PASSWORD:-admin}

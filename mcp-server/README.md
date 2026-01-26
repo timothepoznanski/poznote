@@ -50,9 +50,7 @@ All tools accept an optional `user_id` argument to target a specific user profil
 
 ## Installation & Setup
 
-The MCP server is integrated into the official Poznote `docker-compose.yml`. It is **commented out by default**.
-
-To enable it, simply uncomment the `mcp-server` block in your `docker-compose.yml` and restart Poznote.
+The MCP server is integrated into the official Poznote `docker-compose.yml`.
 
 ### Configuration
 
@@ -73,19 +71,7 @@ POZNOTE_MCP_WORKSPACE=Poznote
 POZNOTE_MCP_DEBUG=false
 ```
 
-To disable the MCP server, comment out the `mcp-server` service in `docker-compose.yml`.
-
-⚠️ Commenting out won't remove the existing container.
-
-### Reverse Proxy Compatibility
-
-The MCP server is accessible by default on port `8045`. 
-
-1. **Direct Access**: Point your AI assistant to `http://your-server-ip:8045/mcp`.
-2. **Via Reverse Proxy**: If you want to use a domain with HTTPS (e.g., `https://mcp.yourdomain.com`), configure your proxy (Nginx Proxy Manager, Traefik, etc.) to forward traffic to your server's IP and port `8045`.
-
-> **Note**: Internal communication between the MCP server and the Poznote webserver is automatically handled by Docker Compose via the internal network. No additional network configuration is required.
-
+To disable the MCP server, comment out the `mcp-server` service in `docker-compose.yml` and remove the existing container.
 
 ### VS Code Configuration
 
