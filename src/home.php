@@ -421,7 +421,7 @@ try {
             <?php if ($showGitHubTiles): ?>
                 <?php if ($githubEnabled): ?>
                     <!-- GitHub Push (Enabled) -->
-                    <form method="post" class="home-card home-card-green" onclick="this.submit();">
+                    <form method="post" class="home-card home-card-green" onclick="handleSyncClick(this);">
                         <input type="hidden" name="sync_action" value="push">
                         <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($pageWorkspace); ?>">
                         <div class="home-card-icon">
@@ -434,7 +434,7 @@ try {
                     </form>
 
                     <!-- GitHub Pull (Enabled) -->
-                    <form method="post" class="home-card home-card-green" onclick="this.submit();">
+                    <form method="post" class="home-card home-card-green" onclick="handleSyncClick(this);">
                         <input type="hidden" name="sync_action" value="pull">
                         <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($pageWorkspace); ?>">
                         <div class="home-card-icon">
@@ -519,6 +519,17 @@ try {
     <script src="js/navigation.js"></script>
 
     <script>
+    function handleSyncClick(card) {
+        if (card.classList.contains('is-loading')) return;
+        
+        card.classList.add('is-loading');
+        const icon = card.querySelector('.home-card-icon i');
+        if (icon) {
+            icon.className = 'fa-spinner fa-spin';
+        }
+        card.submit();
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('home-search-input');
         const cards = document.querySelectorAll('.home-grid .home-card');
