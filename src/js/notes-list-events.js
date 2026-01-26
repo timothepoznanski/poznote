@@ -338,6 +338,19 @@
             case 'open-kanban-view':
                 event.preventDefault();
                 event.stopPropagation();
+
+                // Check if Kanban on click is disabled via body class
+                if (document.body.classList.contains('disable-kanban-click')) {
+                    // Open folder icon picker instead
+                    var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
+                    var folderName = actionElement.getAttribute('data-folder-name');
+
+                    if (folderId && folderName && typeof window.showChangeFolderIconModal === 'function') {
+                        window.showChangeFolderIconModal(folderId, folderName);
+                    }
+                    break;
+                }
+
                 var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
                 var folderName = actionElement.getAttribute('data-folder-name');
 
@@ -432,7 +445,7 @@
 
         // Add direct event listener to favorites toggle button (in case delegation doesn't work)
         if (favoritesToggleBtn) {
-            favoritesToggleBtn.addEventListener('click', function(e) {
+            favoritesToggleBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
                 if (typeof window.toggleFavorites === 'function') {
@@ -458,9 +471,9 @@
             // Remove old listener by cloning the element
             var newBtn = favoritesToggleBtn.cloneNode(true);
             favoritesToggleBtn.parentNode.replaceChild(newBtn, favoritesToggleBtn);
-            
+
             // Add fresh event listener
-            newBtn.addEventListener('click', function(e) {
+            newBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
                 if (typeof window.toggleFavorites === 'function') {

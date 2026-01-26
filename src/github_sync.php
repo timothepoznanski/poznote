@@ -130,6 +130,9 @@ try {
     <div class="settings-container github-sync-container">
 
         <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 24px;">
+            <a id="backToHomeLink" href="home.php" class="btn btn-secondary">
+                <?php echo t_h('common.back_to_home', [], 'Back to Home', $currentLang); ?>
+            </a>
             <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
                 <?php echo t_h('common.back_to_notes', [], 'Back to Notes', $currentLang); ?>
             </a>

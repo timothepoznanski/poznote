@@ -410,6 +410,7 @@
             "show_folder_counts": "Mostrar Contagem de Notas das Pastas",
             "notes_without_folders_after": "Mostrar notas após as pastas",
             "show_folder_actions": "Mostrar Ações da Pasta",
+            "kanban_on_folder_click": "Abrir visualização Kanban ao clicar na pasta",
             "note_content_width": "Largura do conteúdo da nota"
         },
         "badges": {
@@ -444,7 +445,9 @@
         "shared_folders": "Pastas compartilhadas",
         "kanban": "Kanban",
         "note": "nota",
-        "notes": "notas"
+        "notes": "notas",
+        "support_poznote": "Apoiar o Poznote",
+        "version": "Versão"
     },
     "search": {
         "placeholder": "Buscar...",
@@ -1733,6 +1736,7 @@
             "token_set": "Configurado",
             "token_missing": "Não configurado",
             "not_configured": "Não configurado",
+            "not_configured_yet": "A configurar",
             "hint": "A sincronização com GitHub está desativada. Defina POZNOTE_GITHUB_SYNC_ENABLED=true no seu arquivo .env para ativá-la."
         },
         "test": {
@@ -1755,12 +1759,12 @@
             "push": {
                 "title": "Enviar para GitHub",
                 "description": "Exporta suas notas para o GitHub. Atualiza arquivos existentes e exclui arquivos que não existem mais no Poznote.",
-                "button": "Enviar notas"
+                "button": "Push"
             },
             "pull": {
                 "title": "Recuperar do GitHub",
                 "description": "Importa notas do GitHub. Atualiza notas existentes e move para a lixeira notas que não existem mais no GitHub.",
-                "button": "Recuperar notas"
+                "button": "Pull"
             }
         },
         "messages": {

@@ -413,6 +413,7 @@
             "show_folder_counts": "显示文件夹笔记数量",
             "notes_without_folders_after": "在文件夹后显示笔记",
             "show_folder_actions": "显示文件夹操作",
+            "kanban_on_folder_click": "点击文件夹时打开看板视图",
             "note_content_width": "笔记内容宽度"
         },
         "badges": {
@@ -447,7 +448,9 @@
         "shared_folders": "共享文件夹",
         "kanban": "看板",
         "note": "笔记",
-        "notes": "笔记"
+        "notes": "笔记",
+        "support_poznote": "支持 Poznote",
+        "version": "版本"
     },
     "search": {
         "placeholder": "搜索...",
@@ -1850,6 +1853,7 @@
             "token_set": "已配置",
             "token_missing": "未配置",
             "not_configured": "未配置",
+            "not_configured_yet": "待配置",
             "hint": "GitHub 同步已禁用。在您的 .env 文件中设置 POZNOTE_GITHUB_SYNC_ENABLED=true 来启用它。"
         },
         "test": {
@@ -1872,12 +1876,12 @@
             "push": {
                 "title": "推送到 GitHub",
                 "description": "将您的笔记导出到 GitHub。更新现有文件并删除 Poznote 中不再存在的文件。",
-                "button": "推送笔记"
+                "button": "Push"
             },
             "pull": {
                 "title": "从 GitHub 拉取",
                 "description": "从 GitHub 导入笔记。更新现有笔记并将 GitHub 上不再存在的笔记移至回收站。",
-                "button": "拉取笔记"
+                "button": "Pull"
             }
         },
         "messages": {

@@ -13,6 +13,49 @@ include 'db_connect.php';
 $pageWorkspace = trim(getWorkspaceFilter());
 $currentLang = getUserLanguage();
 
+// GitHub Sync Logic
+require_once 'GitHubSync.php';
+$githubSync = new GitHubSync($con);
+$githubEnabled = GitHubSync::isEnabled() && $githubSync->isConfigured();
+$isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
+$showGitHubSync = $githubEnabled && $isAdmin; // For processing actions
+$showGitHubTiles = $isAdmin; // Always show tiles for admin, even if not configured
+
+$syncMessage = '';
+$syncError = '';
+$syncResult = null;
+
+if ($showGitHubSync && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sync_action'])) {
+    $action = $_POST['sync_action'];
+    $workspace = $_POST['workspace'] ?? null;
+    if ($workspace === '') $workspace = null;
+    
+    if ($action === 'push') {
+        $syncResult = $githubSync->pushNotes($workspace);
+        if ($syncResult['success']) {
+            $syncMessage = t('github_sync.messages.push_success', [
+                'count' => $syncResult['pushed'],
+                'deleted' => $syncResult['deleted'] ?? 0,
+                'errors' => count($syncResult['errors'])
+            ]);
+        } else {
+            $syncError = t('github_sync.messages.push_error', ['error' => $syncResult['errors'][0]['error'] ?? 'Unknown error']);
+        }
+    } else if ($action === 'pull') {
+        $syncResult = $githubSync->pullNotes($workspace);
+        if ($syncResult['success']) {
+            $syncMessage = t('github_sync.messages.pull_success', [
+                'pulled' => $syncResult['pulled'],
+                'updated' => $syncResult['updated'],
+                'deleted' => $syncResult['deleted'] ?? 0,
+                'errors' => count($syncResult['errors'])
+            ]);
+        } else {
+            $syncError = t('github_sync.messages.pull_error', ['error' => $syncResult['errors'][0]['error'] ?? 'Unknown error']);
+        }
+    }
+}
+
 // Count for Tags folder - OPTIMIZED: only fetch tags when needed
 $tag_count = 0;
 $unique_tags = [];
@@ -215,11 +258,78 @@ try {
         <div class="home-header">
             <div class="home-info-line">
                 <span class="home-info-username"><i class="fa-user home-info-icon"></i><?php echo htmlspecialchars($currentUser['username'] ?? 'User', ENT_QUOTES); ?></span>
+                <span class="home-info-dash">-</span>
                 <span class="home-workspace-name"><i class="fa-layer-group home-info-icon"></i><?php echo htmlspecialchars($pageWorkspace ?: 'Poznote', ENT_QUOTES); ?></span>
+            </div>
+        </div>
+
+        <div class="home-search-container">
+            <div class="home-search-wrapper">
+                <i class="fas fa-search home-search-icon"></i>
+                <input type="text" id="home-search-input" class="home-search-input" placeholder="<?php echo t_h('search.placeholder'); ?>" autocomplete="off">
             </div>
         </div>
         
         <div class="home-grid">
+            <?php if ($syncMessage): ?>
+            <div class="alert alert-success" style="grid-column: 1 / -1; margin-bottom: 10px;">
+                <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($syncMessage); ?>
+            </div>
+            <?php endif; ?>
+            <?php if ($syncError): ?>
+            <div class="alert alert-error" style="grid-column: 1 / -1; margin-bottom: 10px;">
+                <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($syncError); ?>
+            </div>
+            <?php endif; ?>
+
+            <?php if ($syncResult && isset($syncResult['debug']) && !empty($syncResult['debug'])): ?>
+            <div style="grid-column: 1 / -1; margin-bottom: 20px;">
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <button id="debug-toggle-btn" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;">
+                        <i class="fas fa-bug"></i> <span id="debug-toggle-text"><?php echo t_h('github_sync.debug.show'); ?></span>
+                    </button>
+                    <button id="debug-copy-btn" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px; display: none;">
+                        <i class="fas fa-copy"></i> <?php echo t_h('github_sync.debug.copy'); ?>
+                    </button>
+                </div>
+                <div id="debug-info" class="debug-info" style="display: none; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 15px; max-height: 250px; overflow-y: auto;">
+                    <h4 style="margin: 0 0 10px 0; font-size: 13px; font-weight: 600;">Debug Info:</h4>
+                    <pre style="margin: 0; font-size: 11px; white-space: pre-wrap; word-wrap: break-word; font-family: monospace; text-align: left;"><?php echo htmlspecialchars(implode("\n", $syncResult['debug'])); ?></pre>
+                </div>
+                <script>
+                (function() {
+                    const debugContent = <?php echo json_encode(implode("\n", $syncResult['debug'])); ?>;
+                    const toggleBtn = document.getElementById('debug-toggle-btn');
+                    const debugDiv = document.getElementById('debug-info');
+                    const toggleText = document.getElementById('debug-toggle-text');
+                    const copyBtn = document.getElementById('debug-copy-btn');
+
+                    toggleBtn?.addEventListener('click', function() {
+                        if (debugDiv.style.display === 'none') {
+                            debugDiv.style.display = 'block';
+                            copyBtn.style.display = 'inline-block';
+                            toggleText.textContent = '<?php echo addslashes(t_h('github_sync.debug.hide')); ?>';
+                        } else {
+                            debugDiv.style.display = 'none';
+                            copyBtn.style.display = 'none';
+                            toggleText.textContent = '<?php echo addslashes(t_h('github_sync.debug.show')); ?>';
+                        }
+                    });
+
+                    copyBtn?.addEventListener('click', function() {
+                        navigator.clipboard.writeText(debugContent).then(function() {
+                            const originalHTML = copyBtn.innerHTML;
+                            copyBtn.innerHTML = '<i class="fas fa-check"></i> <?php echo addslashes(t_h('github_sync.debug.copied')); ?>';
+                            setTimeout(function() {
+                                copyBtn.innerHTML = originalHTML;
+                            }, 2000);
+                        });
+                    });
+                })();
+                </script>
+            </div>
+            <?php endif; ?>
+
             <!-- Notes -->
             <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('common.notes', [], 'Notes'); ?>">
                 <div class="home-card-icon">
@@ -308,6 +418,88 @@ try {
                 </div>
             </a>
 
+            <?php if ($showGitHubTiles): ?>
+                <?php if ($githubEnabled): ?>
+                    <!-- GitHub Push (Enabled) -->
+                    <form method="post" class="home-card home-card-green" onclick="this.submit();">
+                        <input type="hidden" name="sync_action" value="push">
+                        <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($pageWorkspace); ?>">
+                        <div class="home-card-icon">
+                            <i class="fa-upload"></i>
+                        </div>
+                        <div class="home-card-content">
+                            <span class="home-card-title"><?php echo t_h('github_sync.actions.push.button', [], 'Push'); ?></span>
+                            <span class="home-card-count"><?php echo htmlspecialchars($pageWorkspace ?: 'All'); ?></span>
+                        </div>
+                    </form>
+
+                    <!-- GitHub Pull (Enabled) -->
+                    <form method="post" class="home-card home-card-green" onclick="this.submit();">
+                        <input type="hidden" name="sync_action" value="pull">
+                        <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($pageWorkspace); ?>">
+                        <div class="home-card-icon">
+                            <i class="fa-download"></i>
+                        </div>
+                        <div class="home-card-content">
+                            <span class="home-card-title"><?php echo t_h('github_sync.actions.pull.button', [], 'Pull'); ?></span>
+                            <span class="home-card-count"><?php echo htmlspecialchars($pageWorkspace ?: 'All'); ?></span>
+                        </div>
+                    </form>
+                <?php else: ?>
+                    <!-- GitHub Push (Disabled) -->
+                    <a href="github_sync.php" class="home-card home-card-green">
+                        <div class="home-card-icon">
+                            <i class="fa-upload"></i>
+                        </div>
+                        <div class="home-card-content">
+                            <span class="home-card-title"><?php echo t_h('github_sync.actions.push.button', [], 'Push'); ?></span>
+                            <span class="home-card-count" style="color: #6b7280; font-size: 0.85em;"><?php echo t_h('github_sync.config.not_configured_yet', [], 'Not configured yet'); ?></span>
+                        </div>
+                    </a>
+
+                    <!-- GitHub Pull (Disabled) -->
+                    <a href="github_sync.php" class="home-card home-card-green">
+                        <div class="home-card-icon">
+                            <i class="fa-download"></i>
+                        </div>
+                        <div class="home-card-content">
+                            <span class="home-card-title"><?php echo t_h('github_sync.actions.pull.button', [], 'Pull'); ?></span>
+                            <span class="home-card-count" style="color: #6b7280; font-size: 0.85em;"><?php echo t_h('github_sync.config.not_configured_yet', [], 'Not configured yet'); ?></span>
+                        </div>
+                    </a>
+                <?php endif; ?>
+            <?php endif; ?>
+
+            <!-- Settings -->
+            <a href="settings.php" class="home-card" title="<?php echo t_h('settings.title', [], 'Settings'); ?>">
+                <div class="home-card-icon">
+                    <i class="fa-cog"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.title', [], 'Settings'); ?></span>
+                </div>
+            </a>
+
+            <!-- Version -->
+            <a href="https://github.com/timothepoznanski/poznote/releases" target="_blank" class="home-card" title="<?php echo t_h('home.version', [], 'Version'); ?>">
+                <div class="home-card-icon">
+                    <i class="fa-info-circle"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('home.version', [], 'Version'); ?></span>
+                    <span class="home-card-count"><?php echo htmlspecialchars(trim(file_get_contents('version.txt')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
+                </div>
+            </a>
+
+            <!-- Support -->
+            <a href="https://ko-fi.com/timothepoznanski" target="_blank" class="home-card home-card-red" title="<?php echo t_h('home.support_poznote', [], 'Support Poznote'); ?>">
+                <div class="home-card-icon">
+                    <i class="fa-heart"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('home.support_poznote', [], 'Support Poznote'); ?></span>
+                </div>
+            </a>
 
             <!-- Logout -->
             <a href="logout.php" class="home-card home-card-logout" title="<?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?>">
@@ -320,15 +512,54 @@ try {
             </a>
         </div>
 
-        <!-- Version Display (desktop bottom) -->
-        <div class="version-display version-display-desktop-bottom">
-            <small>Poznote <?php echo htmlspecialchars(trim(file_get_contents('version.txt')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></small><br>
-            <small><a href="https://poznote.com/releases.html" target="_blank" class="release-notes-link"><?php echo t_h('settings.cards.release_notes'); ?></a></small>
-        </div>
     </div>
     
     <script src="js/globals.js"></script>
     <script src="js/workspaces.js"></script>
     <script src="js/navigation.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('home-search-input');
+        const cards = document.querySelectorAll('.home-grid .home-card');
+        const grid = document.querySelector('.home-grid');
+        
+        // Create no results message if it doesn't exist
+        let noResults = document.createElement('div');
+        noResults.className = 'home-no-results';
+        noResults.style.display = 'none';
+        noResults.style.gridColumn = '1 / -1';
+        noResults.style.textAlign = 'center';
+        noResults.style.padding = '40px 20px';
+        noResults.style.color = '#6b7280';
+        noResults.innerHTML = '<i class="fas fa-search" style="font-size: 24px; display: block; margin-bottom: 10px; opacity: 0.5;"></i><?php echo addslashes(t_h('public.no_filter_results', [], 'No results found.')); ?>';
+        grid.appendChild(noResults);
+
+        searchInput?.addEventListener('input', function() {
+            const term = this.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const title = card.querySelector('.home-card-title')?.textContent.toLowerCase() || '';
+                if (title.includes(term)) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            noResults.style.display = (visibleCount === 0) ? 'block' : 'none';
+        });
+
+        // Focus search on / key press if not in input
+        document.addEventListener('keydown', function(e) {
+            if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                searchInput?.focus();
+            }
+        });
+    });
+    </script>
 </body>
 </html>

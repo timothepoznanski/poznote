@@ -77,6 +77,7 @@
             "show_folder_counts": "Show folder note counts",
             "notes_without_folders_after": "Show notes after folders",
             "show_folder_actions": "Show folder actions",
+            "kanban_on_folder_click": "Open Kanban view on folder click",
             "note_content_width": "Note content width"
         },
         "badges": {
@@ -1137,7 +1138,19 @@
         "shared_folders": "Shared Folders",
         "kanban": "Kanban",
         "note": "note",
-        "notes": "notes"
+        "notes": "notes",
+        "support_poznote": "Support Poznote",
+        "version": "Version"
+    },
+    "search": {
+        "placeholder": "Search...",
+        "clear": "Clear search",
+        "placeholder_notes": "Search for one or more words...",
+        "placeholder_tags": "Search for one or more tags...",
+        "validation": {
+            "select_type": "Please select at least one search option (Notes or Tags)",
+            "single_letter_warning": "Searching with single-letter words can return too many results. Try using longer words for a more precise search."
+        }
     },
     "icon_names": {
         "briefcase": "briefcase",
@@ -1236,6 +1249,7 @@
             "token_set": "Configured",
             "token_missing": "Not configured",
             "not_configured": "Not configured",
+            "not_configured_yet": "To configure",
             "hint": "GitHub sync is disabled. Set POZNOTE_GITHUB_SYNC_ENABLED=true in your .env file to enable it."
         },
         "test": {
@@ -1258,12 +1272,12 @@
             "push": {
                 "title": "Push to GitHub",
                 "description": "Export your notes to GitHub. Updates existing files and deletes files that no longer exist in Poznote.",
-                "button": "Push Notes"
+                "button": "Push"
             },
             "pull": {
                 "title": "Pull from GitHub",
                 "description": "Import notes from GitHub. Updates existing notes and moves to trash notes that no longer exist on GitHub.",
-                "button": "Pull Notes"
+                "button": "Pull"
             }
         },
         "messages": {

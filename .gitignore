@@ -69,7 +69,7 @@ htmlcov/
 
 # Environment variables / secrets
 .env
-.env*
+!.env.template
 
 # Misc scripts
 clear_all_except_poznote.sh

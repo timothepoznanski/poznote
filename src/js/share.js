@@ -723,9 +723,12 @@ function markShareIconShared(noteId, shared) {
     try {
         const sel = document.querySelectorAll('.btn-share');
         sel.forEach(btn => {
-            // Check if this button's onclick contains the noteId
+            // Check if this button's data-note-id matches (new system)
+            const btnNoteId = btn.getAttribute('data-note-id');
+            // Also check onclick for backward compatibility
             const onclick = btn.getAttribute('onclick') || '';
-            if (onclick.includes("openPublicShareModal('" + noteId + "')")) {
+            
+            if (btnNoteId === noteId || onclick.includes("openPublicShareModal('" + noteId + "')")) {
                 if (shared) {
                     btn.classList.add('is-shared');
                 } else {

@@ -88,7 +88,7 @@ cd poznote
 Create the environment file:
 
 ```powershell
-curl -o .env https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.example
+curl -o .env https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.template
 ```
 
 Edit the `.env` file:
@@ -138,7 +138,7 @@ cd poznote
 
 Create the environment file:
 ```bash
-curl -o .env https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.example
+curl -o .env https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.template
 ```
 
 Edit the `.env` file:
@@ -185,7 +185,7 @@ cd poznote
 
 Download the environment file:
 ```bash
-curl -o .env https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.example
+curl -o .env https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.template
 ```
 
 Edit the `.env` file:
@@ -421,7 +421,7 @@ Poznote supports OpenID Connect (authorization code + PKCE) for single sign-on i
 
 #### Configuration
 
-Add the OIDC variables to your `.env` file (see `.env.example`). If `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN` is `true`, the standard login form will be hidden.
+Add the OIDC variables to your `.env` file (see `.env.template`). If `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN` is `true`, the standard login form will be hidden.
 
 #### Access Control Example
 
@@ -453,14 +453,14 @@ Download the latest Docker Compose configuration:
 curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
 ```
 
-Download the latest .env.example:
+Download the latest .env.template:
 ```bash
-curl -o .env.example https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.example
+curl -o .env.template https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.template
 ```
 
-Review `.env.example` and add any new variables to your `.env` file if needed:
+Review `.env.template` and add any new variables to your `.env` file if needed:
 ```bash
-sdiff .env .env.example
+sdiff .env .env.template
 ```
 
 Download the latest Poznote Webserver and Poznote MCP (if uncommented in docker-compose.yml) images:
@@ -492,14 +492,14 @@ You can install beta versions by modifying your `docker-compose.yml` to use a sp
    curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
    ```
 
-2. Download the latest .env.example:
+2. Download the latest .env.template:
    ```bash
-   curl -o .env.example https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.example
+   curl -o .env.template https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.template
    ```
 
-3. Review `.env.example` and add any new variables to your `.env` file if needed.
+3. Review `.env.template` and add any new variables to your `.env` file if needed.
    ```bash
-   sdiff .env .env.example
+   sdiff .env .env.template
    ```
 
 4. Edit your `docker-compose.yml` file and change the image line to:

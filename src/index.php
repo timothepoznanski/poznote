@@ -203,6 +203,10 @@ try {
     $v5 = $stmt->fetchColumn();
     if ($v5 !== false && $v5 !== '' && $v5 !== '0' && $v5 !== 'false') $extra_body_classes .= ' center-note-content';
 
+    $stmt->execute(['kanban_folder_click']);
+    $v6 = $stmt->fetchColumn();
+    if ($v6 === '0' || $v6 === 'false') $extra_body_classes .= ' disable-kanban-click';
+
 } catch (Exception $e) {
     // ignore errors and continue without extra classes
 }
@@ -285,7 +289,6 @@ $body_classes = trim($extra_body_classes);
                 <i class="fas fa-caret-down workspace-dropdown-icon"></i>
             </div>
             <div class="sidebar-title-actions">
-                <a class="sidebar-home sidebar-kofi" href="https://ko-fi.com/timothepoznanski" target="_blank" rel="noopener noreferrer" title="Ko-fi"><i class="fas fa-heart"></i></a>
                 <button class="sidebar-home" data-action="navigate-to-home" title="<?php echo t_h('sidebar.home', [], 'Home'); ?>"><i class="fas fa-home"></i></button>
                 <button class="sidebar-settings" data-action="navigate-to-settings" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>"><i class="fas fa-cog"></i><span class="update-badge update-badge-hidden"></span></button>
                 <button class="sidebar-plus" data-action="toggle-create-menu" title="<?php echo t_h('sidebar.create'); ?>"><i class="fas fa-plus-circle"></i></button>

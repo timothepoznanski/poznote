@@ -412,6 +412,7 @@
         // Setup toggle cards
         setupToggleCard('show-created-card', 'show-created-status', 'show_note_created', false);
         setupToggleCard('folder-counts-card', 'folder-counts-status', 'hide_folder_counts', true);
+        setupToggleCard('kanban-folder-click-card', 'kanban-folder-click-status', 'kanban_folder_click', true);
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
 

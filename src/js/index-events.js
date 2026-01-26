@@ -478,9 +478,75 @@
         }
     }
 
+    /**
+     * Helper to place cursor at the end of contentEditable
+     * @param {HTMLElement} el 
+     */
+    function focusAtEnd(el) {
+        el.focus();
+        if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
+            var range = document.createRange();
+            range.selectNodeContents(el);
+            range.collapse(false);
+            var sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+        } else if (typeof document.body.createTextRange != "undefined") {
+            var textRange = document.body.createTextRange();
+            textRange.moveToElementText(el);
+            textRange.collapse(false);
+            textRange.select();
+        }
+    }
+
+    /**
+     * Handle clicks on note background to focus the editor at the end
+     */
+    function handleNoteBackgroundClick(e) {
+        // If the click is on an interactive element, ignore
+        if (e.target.closest('button, a, input, textarea, select, [contenteditable="true"], .search-replace-bar, .mobile-toolbar-menu, .note-edit-toolbar, .note-tags-row')) {
+            return;
+        }
+
+        // Also ignore if clicking on specific icons
+        if (e.target.tagName === 'I' || e.target.tagName === 'SVG' || e.target.tagName === 'PATH') {
+            if (e.target.closest('button, a, .cursor-pointer')) return;
+        }
+
+        // Check if text is being selected
+        const selection = window.getSelection();
+        if (selection.toString().length > 0) {
+            return;
+        }
+
+        // Find the visible (active) note entry
+        // Since typically only one note is displayed in the right column, we can query it directly
+        // We look for one inside #right_col to be safe
+        const noteEntry = document.querySelector('#right_col .noteentry');
+        if (!noteEntry || noteEntry.offsetParent === null) return;
+
+        // If clicking specifically on the bottom space div, always focus end
+        if (e.target.classList.contains('note-bottom-space')) {
+            focusAtEnd(noteEntry);
+            e.preventDefault();
+            return;
+        }
+
+        const rect = noteEntry.getBoundingClientRect();
+
+        // If the click is vertically below the note entry content
+        if (e.clientY > rect.bottom) {
+            focusAtEnd(noteEntry);
+            // Verify the click is within the horizontal bounds of the main viewing area (rough check)
+            // or just prevent default to accept the click
+            e.preventDefault();
+        }
+    }
+
     // Initialize event delegation
     document.addEventListener('DOMContentLoaded', function () {
         document.addEventListener('click', handleIndexClick);
+        document.addEventListener('click', handleNoteBackgroundClick);
         document.addEventListener('focusin', handleIndexFocus);
 
         // Initialize page configuration first
