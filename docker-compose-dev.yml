@@ -38,7 +38,6 @@ services:
       - "./src:/var/www/html"
       - "./data:/var/www/html/data"
 
-  # MCP Server - AI assistant integration (Already Uncommented for dev)
   mcp-server:
     build:
       context: ./mcp-server

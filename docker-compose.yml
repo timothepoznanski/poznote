@@ -35,7 +35,6 @@ services:
     volumes:
       - "./data:/var/www/html/data"
 
-  MCP Server - AI assistant integration (Uncomment to enable)
   mcp-server:
     image: ghcr.io/timothepoznanski/poznote-mcp:latest
     container_name: poznote-mcp
