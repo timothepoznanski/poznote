@@ -341,13 +341,12 @@
 
                 // Check if Kanban on click is disabled via body class
                 if (document.body.classList.contains('disable-kanban-click')) {
-                    // Fallback to toggle folder behavior (if in sidebar)
-                    var folderToggle = actionElement.closest('.folder-toggle');
-                    if (folderToggle) {
-                        var folderDomId = folderToggle.getAttribute('data-folder-dom-id');
-                        if (folderDomId && typeof window.toggleFolder === 'function') {
-                            window.toggleFolder(folderDomId);
-                        }
+                    // Open folder icon picker instead
+                    var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
+                    var folderName = actionElement.getAttribute('data-folder-name');
+
+                    if (folderId && folderName && typeof window.showChangeFolderIconModal === 'function') {
+                        window.showChangeFolderIconModal(folderId, folderName);
                     }
                     break;
                 }
