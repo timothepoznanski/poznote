@@ -50,7 +50,7 @@ All tools accept an optional `user_id` argument to target a specific user profil
 
 ## Installation & Setup
 
-The MCP server is integrated into the official Poznote `docker-compose.yml`. For security and resource optimization, it is **commented out by default**.
+The MCP server is integrated into the official Poznote `docker-compose.yml`. It is **commented out by default**.
 
 To enable it, simply uncomment the `mcp-server` block in your `docker-compose.yml` and restart Poznote.
 
