@@ -418,17 +418,6 @@ try {
                 </div>
             </a>
 
-            <!-- Version -->
-            <a href="https://github.com/timothepoznanski/poznote/releases" target="_blank" class="home-card" title="<?php echo t_h('home.version', [], 'Version'); ?>">
-                <div class="home-card-icon">
-                    <i class="fa-info-circle"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('home.version', [], 'Version'); ?></span>
-                    <span class="home-card-count"><?php echo htmlspecialchars(trim(file_get_contents('version.txt')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
-                </div>
-            </a>
-
             <?php if ($showGitHubTiles): ?>
                 <?php if ($githubEnabled): ?>
                     <!-- GitHub Push (Enabled) -->
@@ -481,9 +470,29 @@ try {
                 <?php endif; ?>
             <?php endif; ?>
 
+            <!-- Settings -->
+            <a href="settings.php" class="home-card" title="<?php echo t_h('settings.title', [], 'Settings'); ?>">
+                <div class="home-card-icon">
+                    <i class="fa-cog"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.title', [], 'Settings'); ?></span>
+                </div>
+            </a>
+
+            <!-- Version -->
+            <a href="https://github.com/timothepoznanski/poznote/releases" target="_blank" class="home-card" title="<?php echo t_h('home.version', [], 'Version'); ?>">
+                <div class="home-card-icon">
+                    <i class="fa-info-circle"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('home.version', [], 'Version'); ?></span>
+                    <span class="home-card-count"><?php echo htmlspecialchars(trim(file_get_contents('version.txt')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
+                </div>
+            </a>
 
             <!-- Support -->
-            <a href="https://ko-fi.com/timothepoznanski" target="_blank" class="home-card home-card-green" title="<?php echo t_h('home.support_poznote', [], 'Support Poznote'); ?>">
+            <a href="https://ko-fi.com/timothepoznanski" target="_blank" class="home-card home-card-red" title="<?php echo t_h('home.support_poznote', [], 'Support Poznote'); ?>">
                 <div class="home-card-icon">
                     <i class="fa-heart"></i>
                 </div>
@@ -491,7 +500,6 @@ try {
                     <span class="home-card-title"><?php echo t_h('home.support_poznote', [], 'Support Poznote'); ?></span>
                 </div>
             </a>
-
 
             <!-- Logout -->
             <a href="logout.php" class="home-card home-card-logout" title="<?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?>">

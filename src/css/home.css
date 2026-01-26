@@ -36,6 +36,8 @@
     align-items: center;
     gap: 15px;
     margin-bottom: 25px;
+    width: 100%;
+    text-align: center;
 }
 
 .home-info-line {
@@ -66,6 +68,7 @@
 
 .home-search-wrapper {
     position: relative;
+    width: 100%;
     max-width: 500px;
     margin: 0 auto;
     box-sizing: border-box;
@@ -209,6 +212,7 @@ body.dark-mode .alert-error {
     text-decoration: none;
     color: inherit;
     transition: all 0.2s ease;
+    cursor: pointer;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
@@ -250,6 +254,25 @@ body.dark-mode .home-card-logout .home-card-icon {
 }
 
 .home-card-logout:hover {
+    border-color: #ef4444;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+}
+
+/* Red cards */
+.home-card-red .home-card-icon {
+    background: rgba(239, 68, 68, 0.12);
+}
+
+.home-card-red .home-card-icon i {
+    color: #ef4444;
+}
+
+html[data-theme='dark'] .home-card-red .home-card-icon,
+body.dark-mode .home-card-red .home-card-icon {
+    background: rgba(239, 68, 68, 0.22);
+}
+
+.home-card-red:hover {
     border-color: #ef4444;
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
 }
@@ -432,6 +455,12 @@ body.dark-mode .home-card-green .home-card-icon {
 
 .fa-share-alt::before {
     content: "\f1e0";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 400;
+}
+
+.fa-cog::before {
+    content: "\f013";
     font-family: "Font Awesome 5 Pro";
     font-weight: 400;
 }
