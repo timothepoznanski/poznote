@@ -191,7 +191,7 @@ body.dark-mode .alert-error {
 /* Grid layout for cards */
 .home-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 15px;
     margin-bottom: 40px;
 }
@@ -246,6 +246,11 @@ body.dark-mode .alert-error {
 html[data-theme='dark'] .home-card-logout .home-card-icon,
 body.dark-mode .home-card-logout .home-card-icon {
     background: rgba(239, 68, 68, 0.22);
+}
+
+.home-card-logout:hover {
+    border-color: #ef4444;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
 }
 
 /* Green cards for Sync */

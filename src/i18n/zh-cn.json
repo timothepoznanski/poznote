@@ -1852,6 +1852,7 @@
             "token_set": "已配置",
             "token_missing": "未配置",
             "not_configured": "未配置",
+            "not_configured_yet": "待配置",
             "hint": "GitHub 同步已禁用。在您的 .env 文件中设置 POZNOTE_GITHUB_SYNC_ENABLED=true 来启用它。"
         },
         "test": {
@@ -1874,12 +1875,12 @@
             "push": {
                 "title": "推送到 GitHub",
                 "description": "将您的笔记导出到 GitHub。更新现有文件并删除 Poznote 中不再存在的文件。",
-                "button": "推送笔记"
+                "button": "Push"
             },
             "pull": {
                 "title": "从 GitHub 拉取",
                 "description": "从 GitHub 导入笔记。更新现有笔记并将 GitHub 上不再存在的笔记移至回收站。",
-                "button": "拉取笔记"
+                "button": "Pull"
             }
         },
         "messages": {

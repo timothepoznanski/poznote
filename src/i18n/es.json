@@ -1731,6 +1731,7 @@
             "token_set": "Configurado",
             "token_missing": "No configurado",
             "not_configured": "No configurado",
+            "not_configured_yet": "A configurar",
             "hint": "La sincronización con GitHub está desactivada. Establece POZNOTE_GITHUB_SYNC_ENABLED=true en tu archivo .env para activarla."
         },
         "test": {
@@ -1753,12 +1754,12 @@
             "push": {
                 "title": "Enviar a GitHub",
                 "description": "Exporta tus notas a GitHub. Actualiza archivos existentes y elimina archivos que ya no existen en Poznote.",
-                "button": "Enviar notas"
+                "button": "Push"
             },
             "pull": {
                 "title": "Recuperar de GitHub",
                 "description": "Importa notas desde GitHub. Actualiza notas existentes y mueve a la papelera notas que ya no existen en GitHub.",
-                "button": "Recuperar notas"
+                "button": "Pull"
             }
         },
         "messages": {

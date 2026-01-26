@@ -18,7 +18,8 @@ require_once 'GitHubSync.php';
 $githubSync = new GitHubSync($con);
 $githubEnabled = GitHubSync::isEnabled() && $githubSync->isConfigured();
 $isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
-$showGitHubSync = $githubEnabled && $isAdmin;
+$showGitHubSync = $githubEnabled && $isAdmin; // For processing actions
+$showGitHubTiles = $isAdmin; // Always show tiles for admin, even if not configured
 
 $syncMessage = '';
 $syncError = '';
@@ -428,32 +429,56 @@ try {
                 </div>
             </a>
 
-            <?php if ($showGitHubSync): ?>
-            <!-- GitHub Push -->
-            <form method="post" class="home-card home-card-green" onclick="this.submit();">
-                <input type="hidden" name="sync_action" value="push">
-                <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($pageWorkspace); ?>">
-                <div class="home-card-icon">
-                    <i class="fa-upload"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('github_sync.actions.push.button', [], 'Push'); ?></span>
-                    <span class="home-card-count"><?php echo htmlspecialchars($pageWorkspace ?: 'All'); ?></span>
-                </div>
-            </form>
+            <?php if ($showGitHubTiles): ?>
+                <?php if ($githubEnabled): ?>
+                    <!-- GitHub Push (Enabled) -->
+                    <form method="post" class="home-card home-card-green" onclick="this.submit();">
+                        <input type="hidden" name="sync_action" value="push">
+                        <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($pageWorkspace); ?>">
+                        <div class="home-card-icon">
+                            <i class="fa-upload"></i>
+                        </div>
+                        <div class="home-card-content">
+                            <span class="home-card-title"><?php echo t_h('github_sync.actions.push.button', [], 'Push'); ?></span>
+                            <span class="home-card-count"><?php echo htmlspecialchars($pageWorkspace ?: 'All'); ?></span>
+                        </div>
+                    </form>
 
-            <!-- GitHub Pull -->
-            <form method="post" class="home-card home-card-green" onclick="this.submit();">
-                <input type="hidden" name="sync_action" value="pull">
-                <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($pageWorkspace); ?>">
-                <div class="home-card-icon">
-                    <i class="fa-download"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('github_sync.actions.pull.button', [], 'Pull'); ?></span>
-                    <span class="home-card-count"><?php echo htmlspecialchars($pageWorkspace ?: 'All'); ?></span>
-                </div>
-            </form>
+                    <!-- GitHub Pull (Enabled) -->
+                    <form method="post" class="home-card home-card-green" onclick="this.submit();">
+                        <input type="hidden" name="sync_action" value="pull">
+                        <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($pageWorkspace); ?>">
+                        <div class="home-card-icon">
+                            <i class="fa-download"></i>
+                        </div>
+                        <div class="home-card-content">
+                            <span class="home-card-title"><?php echo t_h('github_sync.actions.pull.button', [], 'Pull'); ?></span>
+                            <span class="home-card-count"><?php echo htmlspecialchars($pageWorkspace ?: 'All'); ?></span>
+                        </div>
+                    </form>
+                <?php else: ?>
+                    <!-- GitHub Push (Disabled) -->
+                    <a href="settings.php" class="home-card home-card-green">
+                        <div class="home-card-icon">
+                            <i class="fa-upload"></i>
+                        </div>
+                        <div class="home-card-content">
+                            <span class="home-card-title"><?php echo t_h('github_sync.actions.push.button', [], 'Push'); ?></span>
+                            <span class="home-card-count" style="color: #6b7280; font-size: 0.85em;"><?php echo t_h('github_sync.config.not_configured_yet', [], 'Not configured yet'); ?></span>
+                        </div>
+                    </a>
+
+                    <!-- GitHub Pull (Disabled) -->
+                    <a href="settings.php" class="home-card home-card-green">
+                        <div class="home-card-icon">
+                            <i class="fa-download"></i>
+                        </div>
+                        <div class="home-card-content">
+                            <span class="home-card-title"><?php echo t_h('github_sync.actions.pull.button', [], 'Pull'); ?></span>
+                            <span class="home-card-count" style="color: #6b7280; font-size: 0.85em;"><?php echo t_h('github_sync.config.not_configured_yet', [], 'Not configured yet'); ?></span>
+                        </div>
+                    </a>
+                <?php endif; ?>
             <?php endif; ?>
 
 

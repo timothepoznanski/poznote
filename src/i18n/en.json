@@ -1248,6 +1248,7 @@
             "token_set": "Configured",
             "token_missing": "Not configured",
             "not_configured": "Not configured",
+            "not_configured_yet": "To configure",
             "hint": "GitHub sync is disabled. Set POZNOTE_GITHUB_SYNC_ENABLED=true in your .env file to enable it."
         },
         "test": {
@@ -1270,12 +1271,12 @@
             "push": {
                 "title": "Push to GitHub",
                 "description": "Export your notes to GitHub. Updates existing files and deletes files that no longer exist in Poznote.",
-                "button": "Push Notes"
+                "button": "Push"
             },
             "pull": {
                 "title": "Pull from GitHub",
                 "description": "Import notes from GitHub. Updates existing notes and moves to trash notes that no longer exist on GitHub.",
-                "button": "Pull Notes"
+                "button": "Pull"
             }
         },
         "messages": {
