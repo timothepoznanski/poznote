@@ -2285,14 +2285,14 @@ body.dark-mode .info-box {
 /* Icons - Make all icons lighter in dark mode by modifying the filter */
 /* Override the default dark gray filter with a lighter one */
 /* Exclude folder icons with custom colors from the filter */
-html[data-theme='dark'] [class*="fa-"]:not(.folder-icon[data-icon-color]):not(.kanban-title [class*="fa-"][style*="color"]):not(.kanban-column-title [class*="fa-"][style*="color"]):not(.limitations-table [class*="fa-"]),
-body.dark-mode [class*="fa-"]:not(.folder-icon[data-icon-color]):not(.kanban-title [class*="fa-"][style*="color"]):not(.kanban-column-title [class*="fa-"][style*="color"]):not(.limitations-table [class*="fa-"]) {
+html[data-theme='dark'] [class*="fa-"]:not(.folder-icon[data-icon-color]):not(.kanban-title [class*="fa-"][style*="color"]):not(.kanban-column-title [class*="fa-"][style*="color"]):not(.limitations-table [class*="fa-"]):not(.markdown-edit-btn [class*="fa-"]):not(.markdown-preview-btn [class*="fa-"]):not(.markdown-view-mode-btn [class*="fa-"]):not(.markdown-split-btn [class*="fa-"]):not(.btn-favorite.is-favorite [class*="fa-"]):not(.btn-share.is-shared [class*="fa-"]):not(.btn-attachment.has-attachments [class*="fa-"]),
+body.dark-mode [class*="fa-"]:not(.folder-icon[data-icon-color]):not(.kanban-title [class*="fa-"][style*="color"]):not(.kanban-column-title [class*="fa-"][style*="color"]):not(.limitations-table [class*="fa-"]):not(.markdown-edit-btn [class*="fa-"]):not(.markdown-preview-btn [class*="fa-"]):not(.markdown-view-mode-btn [class*="fa-"]):not(.markdown-split-btn [class*="fa-"]):not(.btn-favorite.is-favorite [class*="fa-"]):not(.btn-share.is-shared [class*="fa-"]):not(.btn-attachment.has-attachments [class*="fa-"]) {
     filter: brightness(0) saturate(0%) invert(80%) !important;
     transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-html[data-theme='dark'] [class*="fa-"]:not(.folder-icon[data-icon-color]):not(.kanban-title [class*="fa-"][style*="color"]):not(.kanban-column-title [class*="fa-"][style*="color"]):not(.limitations-table [class*="fa-"]):hover,
-body.dark-mode [class*="fa-"]:not(.folder-icon[data-icon-color]):not(.kanban-title [class*="fa-"][style*="color"]):not(.kanban-column-title [class*="fa-"][style*="color"]):not(.limitations-table [class*="fa-"]):hover {
+html[data-theme='dark'] [class*="fa-"]:not(.folder-icon[data-icon-color]):not(.kanban-title [class*="fa-"][style*="color"]):not(.kanban-column-title [class*="fa-"][style*="color"]):not(.limitations-table [class*="fa-"]):not(.markdown-edit-btn [class*="fa-"]):not(.markdown-preview-btn [class*="fa-"]):not(.markdown-view-mode-btn [class*="fa-"]):not(.markdown-split-btn [class*="fa-"]):not(.btn-favorite.is-favorite [class*="fa-"]):not(.btn-share.is-shared [class*="fa-"]):not(.btn-attachment.has-attachments [class*="fa-"]):hover,
+body.dark-mode [class*="fa-"]:not(.folder-icon[data-icon-color]):not(.kanban-title [class*="fa-"][style*="color"]):not(.kanban-column-title [class*="fa-"][style*="color"]):not(.limitations-table [class*="fa-"]):not(.markdown-edit-btn [class*="fa-"]):not(.markdown-preview-btn [class*="fa-"]):not(.markdown-view-mode-btn [class*="fa-"]):not(.markdown-split-btn [class*="fa-"]):not(.btn-favorite.is-favorite [class*="fa-"]):not(.btn-share.is-shared [class*="fa-"]):not(.btn-attachment.has-attachments [class*="fa-"]):hover {
     transform: scale(1.18);
     filter: brightness(0) saturate(0%) invert(90%) !important;
 }
@@ -2343,16 +2343,26 @@ body.dark-mode .toolbar-btn.markdown-view-mode-btn:hover [class*="fa-"] {
 /* Make markdown toggle icons blue in dark mode (legacy support) */
 html[data-theme='dark'] .markdown-edit-btn .fa-markdown,
 html[data-theme='dark'] .markdown-preview-btn .fa-eye,
+html[data-theme='dark'] .markdown-view-mode-btn i,
+html[data-theme='dark'] .markdown-split-btn.active i,
+html[data-theme='dark'] .markdown-split-btn.active [class*="fa-"],
 body.dark-mode .markdown-edit-btn .fa-markdown,
-body.dark-mode .markdown-preview-btn .fa-eye {
+body.dark-mode .markdown-preview-btn .fa-eye,
+body.dark-mode .markdown-view-mode-btn i,
+body.dark-mode .markdown-split-btn.active i,
+body.dark-mode .markdown-split-btn.active [class*="fa-"] {
     color: #007DB8 !important;
     filter: none !important;
 }
 
 html[data-theme='dark'] .markdown-edit-btn:hover .fa-markdown,
 html[data-theme='dark'] .markdown-preview-btn:hover .fa-eye,
+html[data-theme='dark'] .markdown-view-mode-btn:hover i,
+html[data-theme='dark'] .markdown-split-btn:hover i,
 body.dark-mode .markdown-edit-btn:hover .fa-markdown,
-body.dark-mode .markdown-preview-btn:hover .fa-eye {
+body.dark-mode .markdown-preview-btn:hover .fa-eye,
+body.dark-mode .markdown-view-mode-btn:hover i,
+body.dark-mode .markdown-split-btn:hover i {
     color: #007DB8 !important;
     filter: none !important;
     transform: scale(1.18);
