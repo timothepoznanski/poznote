@@ -38,8 +38,7 @@ services:
       - "./src:/var/www/html"
       - "./data:/var/www/html/data"
 
-  # MCP Server - AI assistant integration (optional)
-  # Enable by setting COMPOSE_PROFILES=mcp in your .env
+  # MCP Server - AI assistant integration
   mcp-server:
     build:
       context: ./mcp-server
@@ -47,8 +46,6 @@ services:
     image: poznote-mcp:dev
     container_name: poznote-mcp-dev
     restart: unless-stopped
-    profiles:
-      - mcp
     environment:
       # Connect to Poznote via Docker internal network
       POZNOTE_API_URL: http://webserver:80/api/v1

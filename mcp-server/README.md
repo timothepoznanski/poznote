@@ -50,27 +50,26 @@ All tools accept an optional `user_id` argument to target a specific user profil
 
 ## Installation & Setup
 
-The MCP server is already integrated in Poznote's main `docker-compose.yml`.
+The MCP server is integrated into the official Poznote `docker-compose.yml` and starts automatically with the main application.
+
+To set up the MCP server, you must download the `mcp-server` directory:
 
 ```bash
 # Navigate to your Poznote directory
 cd poznote
-```
 
-```bash
-# Get the Poznote MCP Server code
-wget https://codeload.github.com/timothepoznanski/poznote/zip/refs/heads/main -O poznote.zip
-unzip poznote.zip
+# Download and extract the mcp-server directory
+wget https://codeload.github.com/timothepoznanski/poznote/zip/refs/heads/main -O mcp.zip
+unzip mcp.zip
 mv poznote-main/mcp-server .
-rm -rf poznote.zip poznote-main
+rm -rf mcp.zip poznote-main
 ```
 
-Add these variables to your `.env` file (at Poznote root):
+
+### Configuration
+
 
 ```bash
-# Enable MCP server
-COMPOSE_PROFILES=mcp
-
 # MCP Server port (default: 8045)
 POZNOTE_MCP_PORT=8045
 
@@ -85,18 +84,10 @@ POZNOTE_MCP_WORKSPACE=Poznote
 
 # Enable debug logging (optional)
 POZNOTE_MCP_DEBUG=false
-
-# Start the MCP Server
-docker compose up -d
 ```
 
-To disable the MCP server, comment out the `COMPOSE_PROFILES=mcp` line in your `.env`.
+To disable the MCP server, you can comment out the `mcp-server` service in `docker-compose.yml`.
 
-> **Note:** If the MCP container is already running, you need to stop it manually:
-> ```bash
-> docker compose down mcp-server
-> ```
-> Docker Compose won't automatically remove running containers when you disable a service.
 
 ### Reverse Proxy Compatibility
 
