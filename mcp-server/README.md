@@ -74,7 +74,7 @@ POZNOTE_MCP_DEBUG=false
 ```
 
 To disable the MCP server, you can comment out the `mcp-server` service in `docker-compose.yml`.
-
+⚠️ Commenting out won't remove the existing container.
 
 ### Reverse Proxy Compatibility
 

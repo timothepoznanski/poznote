@@ -47,8 +47,8 @@ Password: `poznote`
 - [Troubleshooting Installation](#troubleshooting-installation)
 - [Change Settings](#change-settings)
 - [Authentication](#authentication)
-- [Multi-users](#multi-users)
 - [Update application](#update-application)
+- [Multi-users](#multi-users)
 - [Backup / Export](#backup--export)
 - [Restore / Import](#restore--import)
 - [Offline View](#offline-view)
@@ -432,30 +432,6 @@ POZNOTE_OIDC_ALLOWED_USERS=alice@example.com,bob@example.com,charlie@company.org
 
 </details>
 
-## Multi-users
-
-Poznote features a multi-user architecture with isolated data space for each user (ideal for families, teams, or personal personas).
-
-- **Data Isolation**: Each user has their own separate notes, workspaces, tags, folders and attachments.
-- **Global Passwords**: Access is managed via role-based global passwords defined in `.env`.
-- **User Management**: Administrators can manage profiles via the Settings panel.
-
-### Architecture & Structure
-
-Poznote uses a master database (`data/master.db`) to track profiles and global settings, and individual databases for each user.
-
-```
-data/
-├── master.db                    # Master database (profiles, global settings)
-└── users/
-    ├── 1/                       # User ID 1 (default admin)
-    │   ├── database/poznote.db  # User's notes database
-    │   ├── entries/             # User's note files (HTML/MD)
-    │   └── attachments/         # User's attachments
-    ├── 2/                       # User ID 2
-    └── ...
-```
-
 ## Update application
 
 <details>
@@ -542,6 +518,30 @@ You can install beta versions by modifying your `docker-compose.yml` to use a sp
 > **Note:** Beta versions are marked as "Pre-release" on GitHub and are not automatically suggested for updates in the application.
 
 </details>
+
+## Multi-users
+
+Poznote features a multi-user architecture with isolated data space for each user (ideal for families, teams, or personal personas).
+
+- **Data Isolation**: Each user has their own separate notes, workspaces, tags, folders and attachments.
+- **Global Passwords**: Access is managed via role-based global passwords defined in `.env`.
+- **User Management**: Administrators can manage profiles via the Settings panel.
+
+### Architecture & Structure
+
+Poznote uses a master database (`data/master.db`) to track profiles and global settings, and individual databases for each user.
+
+```
+data/
+├── master.db                    # Master database (profiles, global settings)
+└── users/
+    ├── 1/                       # User ID 1 (default admin)
+    │   ├── database/poznote.db  # User's notes database
+    │   ├── entries/             # User's note files (HTML/MD)
+    │   └── attachments/         # User's attachments
+    ├── 2/                       # User ID 2
+    └── ...
+```
 
 ## Backup / Export
 
