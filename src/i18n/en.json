@@ -1137,7 +1137,19 @@
         "shared_folders": "Shared Folders",
         "kanban": "Kanban",
         "note": "note",
-        "notes": "notes"
+        "notes": "notes",
+        "support_poznote": "Support Poznote",
+        "version": "Version"
+    },
+    "search": {
+        "placeholder": "Search...",
+        "clear": "Clear search",
+        "placeholder_notes": "Search for one or more words...",
+        "placeholder_tags": "Search for one or more tags...",
+        "validation": {
+            "select_type": "Please select at least one search option (Notes or Tags)",
+            "single_letter_warning": "Searching with single-letter words can return too many results. Try using longer words for a more precise search."
+        }
     },
     "icon_names": {
         "briefcase": "briefcase",

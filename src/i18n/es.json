@@ -445,7 +445,9 @@
         "shared_folders": "Carpetas compartidas",
         "kanban": "Kanban",
         "note": "nota",
-        "notes": "notas"
+        "notes": "notas",
+        "support_poznote": "Apoyar a Poznote",
+        "version": "Versión"
     },
     "search": {
         "placeholder": "Buscar...",

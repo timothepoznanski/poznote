@@ -461,7 +461,9 @@
         "shared_folders": "Dossiers partagés",
         "kanban": "Kanban",
         "note": "note",
-        "notes": "notes"
+        "notes": "notes",
+        "support_poznote": "Soutenir Poznote",
+        "version": "Version"
     },
     "search": {
         "placeholder": "Rechercher...",

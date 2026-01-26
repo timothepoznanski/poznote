@@ -445,7 +445,9 @@
         "shared_folders": "Geteilte Ordner",
         "kanban": "Kanban",
         "note": "Notiz",
-        "notes": "Notizen"
+        "notes": "Notizen",
+        "support_poznote": "Poznote unterstützen",
+        "version": "Version"
     },
     "search": {
         "placeholder": "Suchen...",

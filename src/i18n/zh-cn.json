@@ -447,7 +447,9 @@
         "shared_folders": "共享文件夹",
         "kanban": "看板",
         "note": "笔记",
-        "notes": "笔记"
+        "notes": "笔记",
+        "support_poznote": "支持 Poznote",
+        "version": "版本"
     },
     "search": {
         "placeholder": "搜索...",

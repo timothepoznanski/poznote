@@ -257,7 +257,15 @@ try {
         <div class="home-header">
             <div class="home-info-line">
                 <span class="home-info-username"><i class="fa-user home-info-icon"></i><?php echo htmlspecialchars($currentUser['username'] ?? 'User', ENT_QUOTES); ?></span>
+                <span class="home-info-dash">-</span>
                 <span class="home-workspace-name"><i class="fa-layer-group home-info-icon"></i><?php echo htmlspecialchars($pageWorkspace ?: 'Poznote', ENT_QUOTES); ?></span>
+            </div>
+        </div>
+
+        <div class="home-search-container">
+            <div class="home-search-wrapper">
+                <i class="fas fa-search home-search-icon"></i>
+                <input type="text" id="home-search-input" class="home-search-input" placeholder="<?php echo t_h('search.placeholder'); ?>" autocomplete="off">
             </div>
         </div>
         
@@ -409,6 +417,17 @@ try {
                 </div>
             </a>
 
+            <!-- Version -->
+            <a href="https://github.com/timothepoznanski/poznote/releases" target="_blank" class="home-card" title="<?php echo t_h('home.version', [], 'Version'); ?>">
+                <div class="home-card-icon">
+                    <i class="fa-info-circle"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('home.version', [], 'Version'); ?></span>
+                    <span class="home-card-count"><?php echo htmlspecialchars(trim(file_get_contents('version.txt')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
+                </div>
+            </a>
+
             <?php if ($showGitHubSync): ?>
             <!-- GitHub Push -->
             <form method="post" class="home-card home-card-green" onclick="this.submit();">
@@ -438,6 +457,17 @@ try {
             <?php endif; ?>
 
 
+            <!-- Support -->
+            <a href="https://ko-fi.com/timothepoznanski" target="_blank" class="home-card home-card-green" title="<?php echo t_h('home.support_poznote', [], 'Support Poznote'); ?>">
+                <div class="home-card-icon">
+                    <i class="fa-heart"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('home.support_poznote', [], 'Support Poznote'); ?></span>
+                </div>
+            </a>
+
+
             <!-- Logout -->
             <a href="logout.php" class="home-card home-card-logout" title="<?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?>">
                 <div class="home-card-icon">
@@ -449,15 +479,54 @@ try {
             </a>
         </div>
 
-        <!-- Version Display (desktop bottom) -->
-        <div class="version-display version-display-desktop-bottom">
-            <small>Poznote <?php echo htmlspecialchars(trim(file_get_contents('version.txt')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></small><br>
-            <small><a href="https://poznote.com/releases.html" target="_blank" class="release-notes-link"><?php echo t_h('settings.cards.release_notes'); ?></a></small>
-        </div>
     </div>
     
     <script src="js/globals.js"></script>
     <script src="js/workspaces.js"></script>
     <script src="js/navigation.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('home-search-input');
+        const cards = document.querySelectorAll('.home-grid .home-card');
+        const grid = document.querySelector('.home-grid');
+        
+        // Create no results message if it doesn't exist
+        let noResults = document.createElement('div');
+        noResults.className = 'home-no-results';
+        noResults.style.display = 'none';
+        noResults.style.gridColumn = '1 / -1';
+        noResults.style.textAlign = 'center';
+        noResults.style.padding = '40px 20px';
+        noResults.style.color = '#6b7280';
+        noResults.innerHTML = '<i class="fas fa-search" style="font-size: 24px; display: block; margin-bottom: 10px; opacity: 0.5;"></i><?php echo addslashes(t_h('public.no_filter_results', [], 'No results found.')); ?>';
+        grid.appendChild(noResults);
+
+        searchInput?.addEventListener('input', function() {
+            const term = this.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const title = card.querySelector('.home-card-title')?.textContent.toLowerCase() || '';
+                if (title.includes(term)) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            noResults.style.display = (visibleCount === 0) ? 'block' : 'none';
+        });
+
+        // Focus search on / key press if not in input
+        document.addEventListener('keydown', function(e) {
+            if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                searchInput?.focus();
+            }
+        });
+    });
+    </script>
 </body>
 </html>

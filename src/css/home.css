@@ -40,14 +40,74 @@
 
 .home-info-line {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
-    gap: 10px;
-    font-size: 1.8rem;
+    gap: 8px;
+    font-size: 1.4rem;
     font-weight: 400;
     color: #1f2937;
     line-height: 1.2;
     text-align: center;
+}
+
+.home-info-dash {
+    opacity: 0.5;
+    margin: 0 2px;
+}
+
+/* Search Bar */
+.home-search-container {
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: center;
+}
+
+.home-search-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+}
+
+.home-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    font-size: 14px;
+}
+
+.home-search-input {
+    width: 100%;
+    padding: 10px 12px 10px 36px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    font-size: 15px;
+    color: #1f2937;
+    outline: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.home-search-input:focus {
+    border-color: #007DB8;
+    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
+}
+
+html[data-theme='dark'] .home-search-input,
+body.dark-mode .home-search-input {
+    background: #2d2d2d;
+    border-color: #374151;
+    color: #e5e7eb;
+}
+
+html[data-theme='dark'] .home-search-input:focus,
+body.dark-mode .home-search-input:focus {
+    border-color: #007DB8;
+    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.2);
 }
 
 html[data-theme='dark'] .home-info-line,
@@ -131,8 +191,8 @@ body.dark-mode .alert-error {
 /* Grid layout for cards */
 .home-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 15px;
     margin-bottom: 40px;
 }
 
@@ -140,11 +200,11 @@ body.dark-mode .alert-error {
 .home-card {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
     background: #ffffff;
     border: 1px solid #e5e7eb;
     border-radius: 12px;
-    padding: 20px;
+    padding: 12px 16px;
     text-decoration: none;
     color: inherit;
     transition: all 0.2s ease;
@@ -158,18 +218,18 @@ body.dark-mode .alert-error {
 }
 
 .home-card-icon {
-    width: 48px;
-    height: 48px;
+    width: 38px;
+    height: 38px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: rgba(0, 125, 184, 0.1);
-    border-radius: 10px;
+    border-radius: 8px;
     flex-shrink: 0;
 }
 
 .home-card-icon i {
-    font-size: 22px;
+    font-size: 18px;
     color: #007DB8;
     font-style: normal;
 }
@@ -322,6 +382,12 @@ body.dark-mode .home-card-green .home-card-icon {
     font-weight: 400;
 }
 
+.fa-heart::before {
+    content: "\f004";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 400;
+}
+
 .fa-sign-out-alt::before {
     content: "\f2f5";
     font-family: "Font Awesome 5 Pro";
@@ -330,6 +396,12 @@ body.dark-mode .home-card-green .home-card-icon {
 
 .fa-paperclip::before {
     content: "\f0c6";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 400;
+}
+
+.fa-info-circle::before {
+    content: "\f05a";
     font-family: "Font Awesome 5 Pro";
     font-weight: 400;
 }

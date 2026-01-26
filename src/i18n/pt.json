@@ -444,7 +444,9 @@
         "shared_folders": "Pastas compartilhadas",
         "kanban": "Kanban",
         "note": "nota",
-        "notes": "notas"
+        "notes": "notas",
+        "support_poznote": "Apoiar o Poznote",
+        "version": "Versão"
     },
     "search": {
         "placeholder": "Buscar...",
