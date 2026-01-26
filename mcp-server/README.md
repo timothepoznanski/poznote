@@ -73,7 +73,8 @@ POZNOTE_MCP_WORKSPACE=Poznote
 POZNOTE_MCP_DEBUG=false
 ```
 
-To disable the MCP server, you can comment out the `mcp-server` service in `docker-compose.yml`.
+To disable the MCP server, comment out the `mcp-server` service in `docker-compose.yml`.
+
 ⚠️ Commenting out won't remove the existing container.
 
 ### Reverse Proxy Compatibility
@@ -95,7 +96,7 @@ Add to your `mcp.json`:
   "servers": {
     "poznote": {
       "type": "http",
-      "url": "http://localhost:8045/mcp"
+      "url": "http://YOUR-SERVER:8045/mcp"
     }
   }
 }
