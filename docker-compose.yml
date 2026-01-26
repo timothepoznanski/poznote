@@ -34,34 +34,28 @@ services:
     volumes:
       - "./data:/var/www/html/data"
 
-  # MCP Server - AI assistant integration (optional)
-  # Enable by setting COMPOSE_PROFILES=mcp in your .env
-  mcp-server:
-    build:
-      context: ./mcp-server
-      dockerfile: Dockerfile
-    image: ghcr.io/timothepoznanski/poznote-mcp:latest
-    container_name: poznote-mcp
-    restart: unless-stopped
-    profiles:
-      - mcp
-    environment:
-      # Connect to Poznote via Docker internal network
-      POZNOTE_API_URL: http://webserver:80/api/v1
-      POZNOTE_USERNAME: ${POZNOTE_MCP_USERNAME:-admin}
-      POZNOTE_PASSWORD: ${POZNOTE_PASSWORD:-admin}
-      POZNOTE_USER_ID: ${POZNOTE_MCP_USER_ID:-1}
-      POZNOTE_DEFAULT_WORKSPACE: ${POZNOTE_MCP_WORKSPACE:-Poznote}
-      MCP_HOST: "0.0.0.0"
-      MCP_PORT: "8045"
-      POZNOTE_DEBUG: ${POZNOTE_MCP_DEBUG:-false}
-    ports:
-      - "${POZNOTE_MCP_PORT:-8045}:8045"
-    depends_on:
-      - webserver
-    healthcheck:
-      test: ["CMD", "sh", "-c", "wget --quiet --tries=1 --timeout=5 -O /dev/null http://127.0.0.1:8045/ || exit 0"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
+  # MCP Server - AI assistant integration (Uncomment to enable)
+  # mcp-server:
+  #   image: ghcr.io/timothepoznanski/poznote-mcp:latest
+  #   container_name: poznote-mcp
+  #   restart: unless-stopped
+  #   environment:
+  #     # Connect to Poznote via Docker internal network
+  #     POZNOTE_API_URL: http://webserver:80/api/v1
+  #     POZNOTE_USERNAME: ${POZNOTE_MCP_USERNAME:-admin}
+  #     POZNOTE_PASSWORD: ${POZNOTE_PASSWORD:-admin}
+  #     POZNOTE_USER_ID: ${POZNOTE_MCP_USER_ID:-1}
+  #     POZNOTE_DEFAULT_WORKSPACE: ${POZNOTE_MCP_WORKSPACE:-Poznote}
+  #     MCP_HOST: "0.0.0.0"
+  #     MCP_PORT: "8045"
+  #     POZNOTE_DEBUG: ${POZNOTE_MCP_DEBUG:-false}
+  #   ports:
+  #     - "${POZNOTE_MCP_PORT:-8045}:8045"
+  #   depends_on:
+  #     - webserver
+  #   healthcheck:
+  #     test: ["CMD", "sh", "-c", "wget --quiet --tries=1 --timeout=5 -O /dev/null http://127.0.0.1:8045/ || exit 0"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 10s

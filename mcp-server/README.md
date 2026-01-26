@@ -50,33 +50,13 @@ All tools accept an optional `user_id` argument to target a specific user profil
 
 ## Installation & Setup
 
-The MCP server is already integrated in Poznote's main `docker-compose.yml`. Just enable it!
+The MCP server is integrated into the official Poznote `docker-compose.yml`. For security and resource optimization, it is **commented out by default**.
 
-### Quick Start
-
-Edit your `.env` file (at Poznote root) and add:
-```bash
-COMPOSE_PROFILES=mcp
-```
-
-Then start normally:
-```bash
-docker compose up -d
-```
-
-That's it! Check the logs:
-```bash
-docker compose logs -f mcp-server
-```
+To enable it, simply uncomment the `mcp-server` block in your `docker-compose.yml` and restart Poznote.
 
 ### Configuration
 
-Add these variables to your `.env` file (at Poznote root):
-
 ```bash
-# Enable MCP server
-COMPOSE_PROFILES=mcp
-
 # MCP Server port (default: 8045)
 POZNOTE_MCP_PORT=8045
 
@@ -93,28 +73,18 @@ POZNOTE_MCP_WORKSPACE=Poznote
 POZNOTE_MCP_DEBUG=false
 ```
 
-To disable the MCP server, comment out the `COMPOSE_PROFILES=mcp` line in your `.env`.
+To disable the MCP server, you can comment out the `mcp-server` service in `docker-compose.yml`.
 
-> **Note:** If the MCP container is already running, you need to stop it manually:
-> ```bash
-> docker compose down mcp-server
-> ```
-> Docker Compose won't automatically remove running containers when you disable a service.
 
 ### Reverse Proxy Compatibility
 
-If you use a reverse proxy (Nginx Proxy Manager, Traefik, Caddy, etc.) to expose Poznote, connect the MCP container to your proxy's network:
+The MCP server is accessible by default on port `8045`. 
 
-```bash
-# Start Poznote and MCP
-docker compose up -d
+1. **Direct Access**: Point your AI assistant to `http://your-server-ip:8045/mcp`.
+2. **Via Reverse Proxy**: If you want to use a domain with HTTPS (e.g., `https://mcp.yourdomain.com`), configure your proxy (Nginx Proxy Manager, Traefik, etc.) to forward traffic to your server's IP and port `8045`.
 
-# Connect MCP to your reverse proxy network
-# Replace with your actual network name (npm-poznote-webserver-net, traefik_default, etc.)
-docker network connect YOUR_PROXY_NETWORK poznote-mcp
-```
+> **Note**: Internal communication between the MCP server and the Poznote webserver is automatically handled by Docker Compose via the internal network. No additional network configuration is required.
 
-This allows the MCP server to communicate with the Poznote webserver through the proxy network while remaining accessible externally.
 
 ### VS Code Configuration
 
@@ -136,23 +106,6 @@ Add to your `mcp.json`:
 - **Linux:** `~/.config/Code/User/mcp.json`
 - **macOS:** `~/Library/Application Support/Code/User/mcp.json`
 
-### Docker Commands
-
-```bash
-# Start (if COMPOSE_PROFILES=mcp is in .env)
-docker compose up -d
-
-# Stop
-docker compose down
-
-# View MCP logs
-docker compose logs -f mcp-server
-
-# Rebuild MCP after updates
-docker compose build mcp-server
-docker compose up -d
-```
-
 ---
 
 ## Example Prompts
@@ -164,50 +117,3 @@ Once configured in VS Code, you can interact with Poznote using natural language
 - "Create a markdown note titled 'Birds' about birds"
 - "Update note 100041 with new content"
 - "Create a folder 'Test' in workspace 'Workspace1'"
-
----
-
-## Development
-
-### Manual Installation (for development only)
-
-If you need to modify the MCP server code:
-
-```bash
-# Clone and setup
-git clone https://github.com/timothepoznanski/poznote.git
-cd poznote/mcp-server
-
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate
-
-# Install dependencies
-pip install --upgrade pip
-pip install -e .
-
-# Configure environment
-export POZNOTE_API_URL=http://localhost:8040/api/v1
-export POZNOTE_USERNAME=admin
-export POZNOTE_PASSWORD=admin
-export POZNOTE_USER_ID=1
-export POZNOTE_DEFAULT_WORKSPACE=Poznote
-
-# Run development server
-poznote-mcp serve --host=0.0.0.0 --port=8045
-```
-
-### Building the Docker Image
-
-```bash
-# From the mcp-server directory
-docker build -t poznote-mcp:latest .
-
-# Test the image
-docker run -d \
-  -e POZNOTE_API_URL=http://host.docker.internal:8040/api/v1 \
-  -e POZNOTE_USERNAME=admin \
-  -e POZNOTE_PASSWORD=admin \
-  -p 8045:8045 \
-  poznote-mcp:latest
-```
