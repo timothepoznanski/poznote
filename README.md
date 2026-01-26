@@ -103,7 +103,7 @@ Download the Docker Compose configuration file:
 curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
 ```
 
-Download the latest Docker image:
+Download the latest Poznote Webserver and Poznote MCP images:
 ```powershell
 docker compose pull
 ```
@@ -151,7 +151,7 @@ Download the Docker Compose configuration file:
 curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
 ```
 
-Download the latest Docker image:
+Download the latest Poznote Webserver and Poznote MCP images:
 ```bash
 docker compose pull
 ```
@@ -198,7 +198,7 @@ Download the Docker Compose configuration file:
 curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
 ```
 
-Download the latest Docker image:
+Download the latest Poznote Webserver and Poznote MCP images:
 ```bash
 docker compose pull
 ```
@@ -487,7 +487,7 @@ Review `.env.example` and add any new variables to your `.env` file if needed:
 sdiff .env .env.example
 ```
 
-Download the latest Poznote image:
+Download the latest Poznote Webserver and Poznote MCP images:
 ```bash
 docker compose pull
 ```
