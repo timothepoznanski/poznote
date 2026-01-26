@@ -482,7 +482,10 @@ Download the latest .env.example:
 curl -o .env.example https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.example
 ```
 
-Review `.env.example` and add any new variables to your `.env` file if needed.
+Review `.env.example` and add any new variables to your `.env` file if needed:
+```bash
+sdiff .env .env.example
+```
 
 Download the latest Poznote image:
 ```bash
@@ -519,6 +522,9 @@ You can install beta versions by modifying your `docker-compose.yml` to use a sp
    ```
 
 3. Review `.env.example` and add any new variables to your `.env` file if needed.
+   ```bash
+   sdiff .env .env.example
+   ```
 
 4. Edit your `docker-compose.yml` file and change the image line to:
    ```yaml
