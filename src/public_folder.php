@@ -146,7 +146,11 @@ if (!empty($row['theme']) && in_array($row['theme'], ['dark', 'light'])) {
 
 // Build base URL for note links
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+// Detect HTTPS including reverse proxy headers
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+         || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+         || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on')
+         ? 'https' : 'http';
 $noteBaseUrl = $protocol . '://' . $host;
 ?>
 <!doctype html>

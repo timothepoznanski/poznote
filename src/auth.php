@@ -8,6 +8,23 @@
  * - User selects their profile on login page
  */
 
+// Detect if behind a reverse proxy (HTTPS termination)
+$isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+         || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+         || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on')
+         || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
+
+// Configure session cookie for reverse proxy compatibility
+$cookieParams = [
+    'lifetime' => 0,
+    'path' => '/',
+    'domain' => '',
+    'secure' => $isSecure,
+    'httponly' => true,
+    'samesite' => 'Lax'
+];
+session_set_cookie_params($cookieParams);
+
 // Configure session name based on configured port to allow multiple instances
 $configured_port = $_ENV['HTTP_WEB_PORT'] ?? '8040';
 $session_name = 'POZNOTE_SESSION_' . $configured_port;
