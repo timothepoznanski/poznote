@@ -108,14 +108,6 @@ Download the latest Docker image:
 docker compose pull
 ```
 
-Download the MCP server (required):
-```powershell
-curl -L -o mcp.zip https://codeload.github.com/timothepoznanski/poznote/zip/refs/heads/main
-Expand-Archive -Path mcp.zip -DestinationPath .
-Move-Item -Path poznote-main/mcp-server -Destination .
-Remove-Item -Path mcp.zip, poznote-main -Recurse
-```
-
 Start Poznote container:
 ```powershell
 docker compose up -d
@@ -164,13 +156,6 @@ Download the latest Docker image:
 docker compose pull
 ```
 
-Download the MCP server (required):
-```bash
-wget https://codeload.github.com/timothepoznanski/poznote/zip/refs/heads/main -O mcp.zip && \
-unzip mcp.zip && mv poznote-main/mcp-server . && \
-rm -rf mcp.zip poznote-main
-```
-
 Start Poznote container:
 ```bash
 docker compose up -d
@@ -216,13 +201,6 @@ curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/po
 Download the latest Docker image:
 ```bash
 docker compose pull
-```
-
-Download the MCP server (required):
-```bash
-wget https://codeload.github.com/timothepoznanski/poznote/zip/refs/heads/main -O mcp.zip && \
-unzip mcp.zip && mv poznote-main/mcp-server . && \
-rm -rf mcp.zip poznote-main
 ```
 
 Start Poznote container:
@@ -509,13 +487,6 @@ Review `.env.example` and add any new variables to your `.env` file if needed.
 Download the latest Poznote image:
 ```bash
 docker compose pull
-```
-
-Download or update the MCP server (required):
-```bash
-wget https://codeload.github.com/timothepoznanski/poznote/zip/refs/heads/main -O mcp.zip && \
-unzip mcp.zip && mv poznote-main/mcp-server . && \
-rm -rf mcp.zip poznote-main
 ```
 
 Start the updated container:

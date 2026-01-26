@@ -50,24 +50,11 @@ All tools accept an optional `user_id` argument to target a specific user profil
 
 ## Installation & Setup
 
-The MCP server is integrated into the official Poznote `docker-compose.yml` and starts automatically with the main application.
+The MCP server is integrated into the official Poznote `docker-compose.yml`. For security and resource optimization, it is **commented out by default**.
 
-To set up the MCP server, you must download the `mcp-server` directory:
-
-```bash
-# Navigate to your Poznote directory
-cd poznote
-
-# Download and extract the mcp-server directory
-wget https://codeload.github.com/timothepoznanski/poznote/zip/refs/heads/main -O mcp.zip
-unzip mcp.zip
-mv poznote-main/mcp-server .
-rm -rf mcp.zip poznote-main
-```
-
+To enable it, simply uncomment the `mcp-server` block in your `docker-compose.yml` and restart Poznote.
 
 ### Configuration
-
 
 ```bash
 # MCP Server port (default: 8045)
@@ -91,18 +78,13 @@ To disable the MCP server, you can comment out the `mcp-server` service in `dock
 
 ### Reverse Proxy Compatibility
 
-If you use a reverse proxy (Nginx Proxy Manager, Traefik, Caddy, etc.) to expose Poznote, connect the MCP container to your proxy's network:
+The MCP server is accessible by default on port `8045`. 
 
-```bash
-# Start Poznote and MCP
-docker compose up -d
+1. **Direct Access**: Point your AI assistant to `http://your-server-ip:8045/mcp`.
+2. **Via Reverse Proxy**: If you want to use a domain with HTTPS (e.g., `https://mcp.yourdomain.com`), configure your proxy (Nginx Proxy Manager, Traefik, etc.) to forward traffic to your server's IP and port `8045`.
 
-# Connect MCP to your reverse proxy network
-# Replace with your actual network name (npm-poznote-webserver-net, traefik_default, etc.)
-docker network connect YOUR_PROXY_NETWORK poznote-mcp
-```
+> **Note**: Internal communication between the MCP server and the Poznote webserver is automatically handled by Docker Compose via the internal network. No additional network configuration is required.
 
-This allows the MCP server to communicate with the Poznote webserver through the proxy network while remaining accessible externally.
 
 ### VS Code Configuration
 
