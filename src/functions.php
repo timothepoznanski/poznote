@@ -2,6 +2,33 @@
 date_default_timezone_set('UTC');
 
 /**
+ * Detect if the current request is using HTTPS
+ * Supports reverse proxy headers (X-Forwarded-Proto, X-Forwarded-SSL)
+ */
+function isSecureConnection() {
+    return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+        || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on')
+        || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
+}
+
+/**
+ * Get the current protocol (http or https), supporting reverse proxies
+ */
+function getProtocol() {
+    return isSecureConnection() ? 'https' : 'http';
+}
+
+/**
+ * Get the full base URL for the application, supporting reverse proxies
+ */
+function getBaseUrl() {
+    $protocol = getProtocol();
+    $host = $_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? 'localhost';
+    return $protocol . '://' . $host;
+}
+
+/**
  * Global settings cache - loads all settings in one query and caches them
  * This dramatically reduces database queries when settings are accessed multiple times
  */
