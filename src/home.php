@@ -458,7 +458,7 @@ try {
                     </form>
                 <?php else: ?>
                     <!-- GitHub Push (Disabled) -->
-                    <a href="settings.php" class="home-card home-card-green">
+                    <a href="github_sync.php" class="home-card home-card-green">
                         <div class="home-card-icon">
                             <i class="fa-upload"></i>
                         </div>
@@ -469,7 +469,7 @@ try {
                     </a>
 
                     <!-- GitHub Pull (Disabled) -->
-                    <a href="settings.php" class="home-card home-card-green">
+                    <a href="github_sync.php" class="home-card home-card-green">
                         <div class="home-card-icon">
                             <i class="fa-download"></i>
                         </div>

@@ -66,8 +66,9 @@
 
 .home-search-wrapper {
     position: relative;
-    width: 100%;
     max-width: 500px;
+    margin: 0 auto;
+    box-sizing: border-box;
 }
 
 .home-search-icon {
@@ -548,6 +549,30 @@ body.dark-mode .debug-info pre {
 
     .home-header {
         font-size: 1.4rem;
+    }
+
+    .home-search-container {
+        justify-content: center;
+        padding: 0;
+    }
+
+    .home-search-wrapper {
+        width: calc(100% - 30px);
+        max-width: none;
+        margin: 0 auto;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .home-search-input {
+        width: 100%;
+        padding: 10px 14px 10px 40px;
+        border-radius: 8px;
+        box-sizing: border-box;
+    }
+
+    .home-search-icon {
+        left: 14px;
     }
 
     .home-grid {

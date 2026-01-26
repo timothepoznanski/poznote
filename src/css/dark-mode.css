@@ -394,9 +394,13 @@ body.dark-mode div[contentEditable=true]:empty:before {
 
 /* Force readable text colors in note content */
 html[data-theme='dark'] .noteentry,
-html[data-theme='dark'] .noteentry *,
-body.dark-mode .noteentry,
-body.dark-mode .noteentry * {
+body.dark-mode .noteentry {
+    color: #e0e0e0 !important;
+}
+
+/* Force readable text colors in note content, but preserve inline color styles */
+html[data-theme='dark'] .noteentry *:not([style*="color"]),
+body.dark-mode .noteentry *:not([style*="color"]) {
     color: #e0e0e0 !important;
 }
 
@@ -406,7 +410,7 @@ html[data-theme='dark'] .noteentry pre,
 body.dark-mode .noteentry code,
 body.dark-mode .noteentry pre {
     background-color: #2a2a2a !important;
-    color: #e0e0e0 !important;
+    color: #e0e0e0;
 }
 
 /* Links in dark mode */
@@ -1366,7 +1370,7 @@ body.dark-mode .noteentry pre,
 body.dark-mode .code-block,
 body.dark-mode pre.code-block {
     background-color: #262424 !important;
-    color: #e0e0e0 !important;
+    color: #e0e0e0;
     border-color: #404040 !important;
 }
 
