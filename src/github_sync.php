@@ -123,6 +123,7 @@ try {
     <link rel="stylesheet" href="css/light.min.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/settings.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/github-sync.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode.css?v=<?php echo $cache_v; ?>">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
@@ -206,7 +207,7 @@ try {
         <?php endif; ?>
         
         <?php if ($result && isset($result['debug']) && !empty($result['debug'])): ?>
-        <div style="margin: 20px 0; display: flex; gap: 10px;">
+        <div style="margin: 20px 0; display: flex; gap: 10px; justify-content: center;">
             <button id="debug-toggle-btn" class="btn btn-secondary" style="font-size: 12px;">
                 <i class="fas fa-bug"></i> <span id="debug-toggle-text"><?php echo t_h('github_sync.debug.show'); ?></span>
             </button>
@@ -360,6 +361,64 @@ try {
     </div>
     
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
+    <script>
+    /**
+     * Intercept Push/Pull forms to show confirmation
+     */
+    document.addEventListener('DOMContentLoaded', function() {
+        const syncForms = document.querySelectorAll('form.sync-form');
+        
+        // Localization strings for JS
+        const i18n = {
+            confirmPush: <?php echo json_encode(t('github_sync.confirm_push')); ?>,
+            confirmPull: <?php echo json_encode(t('github_sync.confirm_pull')); ?>,
+            allWorkspaces: <?php echo json_encode(t('github_sync.actions.all_workspaces')); ?>
+        };
+
+        syncForms.forEach(form => {
+            const actionInput = form.querySelector('input[name="action"]');
+            if (!actionInput) return;
+            
+            const action = actionInput.value;
+            if (action !== 'push' && action !== 'pull') return;
+            
+            form.addEventListener('submit', function(e) {
+                // If already confirmed, let it proceed
+                if (form.dataset.confirmed === 'true') {
+                    return;
+                }
+                
+                e.preventDefault();
+                
+                const workspaceSelect = form.querySelector('select[name="workspace"]');
+                const workspaceName = (workspaceSelect && workspaceSelect.value) ? 
+                    (workspaceSelect.options[workspaceSelect.selectedIndex].text) : 
+                    i18n.allWorkspaces;
+                
+                let confirmMsg = (action === 'push' ? i18n.confirmPush : i18n.confirmPull)
+                    .replace('{{workspace}}', workspaceName);
+                
+                window.modalAlert.confirm(confirmMsg).then(function(confirmed) {
+                    if (confirmed) {
+                        form.dataset.confirmed = 'true';
+                        
+                        // Show loading state on the button manually 
+                        // as form.submit() won't trigger the submit event listener
+                        const button = form.querySelector('button[type="submit"]');
+                        if (button) {
+                            const icon = button.querySelector('i');
+                            if (icon) icon.className = 'fas fa-spinner fa-spin';
+                            button.disabled = true;
+                        }
+                        
+                        form.submit();
+                    }
+                });
+            });
+        });
+    });
+    </script>
     <script src="js/github-sync.js?v=<?php echo $cache_v; ?>"></script>
 </body>
 </html>

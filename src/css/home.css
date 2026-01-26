@@ -216,6 +216,12 @@ body.dark-mode .alert-error {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
+.home-card.is-loading {
+    pointer-events: none;
+    opacity: 0.7;
+    cursor: default;
+}
+
 .home-card:hover {
     border-color: #007DB8;
     box-shadow: 0 4px 12px rgba(0, 125, 184, 0.15);
@@ -275,6 +281,25 @@ body.dark-mode .home-card-red .home-card-icon {
 .home-card-red:hover {
     border-color: #ef4444;
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+}
+
+/* Orange cards (Settings) */
+.home-card-orange .home-card-icon {
+    background: rgba(245, 158, 11, 0.12);
+}
+
+.home-card-orange .home-card-icon i {
+    color: #f59e0b;
+}
+
+html[data-theme='dark'] .home-card-orange .home-card-icon,
+body.dark-mode .home-card-orange .home-card-icon {
+    background: rgba(245, 158, 11, 0.22);
+}
+
+.home-card-orange:hover {
+    border-color: #f59e0b;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
 }
 
 /* Green cards for Sync */
@@ -445,6 +470,27 @@ body.dark-mode .home-card-green .home-card-icon {
     content: "\f019";
     font-family: "Font Awesome 5 Pro";
     font-weight: 400;
+}
+
+.fa-spinner::before {
+    content: "\f110";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 400;
+}
+
+.fa-spin {
+    animation: fa-spin 2s infinite linear;
+    display: inline-block;
+}
+
+@keyframes fa-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .fa-arrow-left::before {

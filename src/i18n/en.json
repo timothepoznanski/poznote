@@ -1237,8 +1237,10 @@
     },
     "github_sync": {
         "title": "GitHub Sync",
-        "description": "Synchronize your notes with a GitHub repository. Push your notes to GitHub for backup or collaboration, or pull notes from an existing repository.",
+        "description": "Push your notes to GitHub or pull notes from an existing repository. One repository is equal to one profile. Workspaces will be folders at the root of the repo.",
         "warning": "Do not use this feature as your only backup solution.\nConsider setting up manual or automatic ZIP exports of your notes.",
+        "confirm_push": "Push notes of workspace \"{{workspace}}\" to GitHub? Updates existing files and deletes files that no longer exist in Poznote.",
+        "confirm_pull": "Pull notes for workspace \"{{workspace}}\" from GitHub? Import notes from GitHub. Updates existing notes and moves to trash notes that no longer exist on GitHub.",
         "config": {
             "title": "Configuration",
             "status": "Status",

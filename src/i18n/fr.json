@@ -1868,8 +1868,10 @@
     },
     "github_sync": {
         "title": "Synchronisation GitHub",
-        "description": "Synchronisez vos notes avec un dépôt GitHub. Envoyez vos notes vers GitHub pour les sauvegarder ou collaborer, ou récupérez des notes depuis un dépôt existant.",
+        "description": "Push your notes to GitHub or pull notes from an existing repository. Un repository est égal à un profil. Les workspaces seront des folder à la racine du repo",
         "warning": "Ne vous servez pas de cette fonctionnalité comme seule solution de sauvegarde.\nPensez à mettre en place des exports manuels ou automatiques de fichiers ZIP de vos notes.",
+        "confirm_push": "Pousser les notes de l’espace « {{workspace}} » vers GitHub ? Met à jour les fichiers existants et supprime ceux qui n'existent plus dans Poznote.",
+        "confirm_pull": "Récupérer les notes de l’espace « {{workspace}} » depuis GitHub ? Importe les notes depuis GitHub. Met à jour les notes existantes et déplace vers la corbeille celles qui n'existent plus sur GitHub.",
         "config": {
             "title": "Configuration",
             "status": "Statut",
