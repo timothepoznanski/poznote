@@ -77,6 +77,7 @@
             "show_folder_counts": "Show folder note counts",
             "notes_without_folders_after": "Show notes after folders",
             "show_folder_actions": "Show folder actions",
+            "kanban_on_folder_click": "Open Kanban view on folder click",
             "note_content_width": "Note content width"
         },
         "badges": {

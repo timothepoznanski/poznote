@@ -410,6 +410,7 @@
             "show_folder_counts": "Mostrar Contagem de Notas das Pastas",
             "notes_without_folders_after": "Mostrar notas após as pastas",
             "show_folder_actions": "Mostrar Ações da Pasta",
+            "kanban_on_folder_click": "Abrir visualização Kanban ao clicar na pasta",
             "note_content_width": "Largura do conteúdo da nota"
         },
         "badges": {

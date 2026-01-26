@@ -425,6 +425,7 @@
             "show_folder_counts": "Afficher le nombre de notes par dossier",
             "notes_without_folders_after": "Afficher les notes après les dossiers",
             "show_folder_actions": "Afficher les actions de dossier",
+            "kanban_on_folder_click": "Ouvrir la vue Kanban au clic sur dossier",
             "note_content_width": "Largeur du contenu de la note"
         },
         "badges": {

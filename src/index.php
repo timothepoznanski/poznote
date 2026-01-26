@@ -203,6 +203,10 @@ try {
     $v5 = $stmt->fetchColumn();
     if ($v5 !== false && $v5 !== '' && $v5 !== '0' && $v5 !== 'false') $extra_body_classes .= ' center-note-content';
 
+    $stmt->execute(['kanban_folder_click']);
+    $v6 = $stmt->fetchColumn();
+    if ($v6 === '0' || $v6 === 'false') $extra_body_classes .= ' disable-kanban-click';
+
 } catch (Exception $e) {
     // ignore errors and continue without extra classes
 }

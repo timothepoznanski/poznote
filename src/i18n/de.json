@@ -411,6 +411,7 @@
             "show_folder_counts": "Ordner-Notizzähler anzeigen",
             "notes_without_folders_after": "Notizen nach Ordnern anzeigen",
             "show_folder_actions": "Ordner-Aktionen anzeigen",
+            "kanban_on_folder_click": "Kanban-Ansicht beim Klicken auf Ordner öffnen",
             "note_content_width": "Breite des Notizinhalts"
         },
         "badges": {

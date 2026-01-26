@@ -411,6 +411,7 @@
             "show_folder_counts": "Mostrar conteo de notas de carpetas",
             "notes_without_folders_after": "Mostrar notas después de las carpetas",
             "show_folder_actions": "Mostrar acciones de carpeta",
+            "kanban_on_folder_click": "Abrir vista Kanban al hacer clic en la carpeta",
             "note_content_width": "Ancho del contenido de la nota"
         },
         "badges": {

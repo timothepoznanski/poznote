@@ -413,6 +413,7 @@
             "show_folder_counts": "显示文件夹笔记数量",
             "notes_without_folders_after": "在文件夹后显示笔记",
             "show_folder_actions": "显示文件夹操作",
+            "kanban_on_folder_click": "点击文件夹时打开看板视图",
             "note_content_width": "笔记内容宽度"
         },
         "badges": {
