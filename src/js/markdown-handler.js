@@ -510,6 +510,10 @@ function parseMarkdown(text) {
                         .replace(/&#039;/g, "'");
                     result.push('<div class="mermaid">' + unescapedContent + '</div>');
                 } else {
+                    // Restore span color placeholders inside code blocks to allow coloring
+                    codeContent = codeContent.replace(/\x00PSPAN(\d+)\x00/g, function (match, index) {
+                        return protectedElements[parseInt(index)] || match;
+                    });
                     result.push('<pre><code class="language-' + (codeBlockLang || 'text') + '">' + codeContent + '</code></pre>');
                 }
                 codeBlockContent = [];
