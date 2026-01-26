@@ -799,16 +799,14 @@ Server: my-server.com
 
 ## MCP Server
 
-Poznote includes a Model Context Protocol (MCP) server that enables AI assistants like GitHub Copilot to interact with your notes using natural language.
-
-### Example Usage
+Poznote includes a Model Context Protocol (MCP) server that enables AI assistants like GitHub Copilot to interact with your notes using natural language. For example:
 
 - "Create a new note titled 'Meeting Notes' with the content..."
 - "Search for notes about 'Docker'"
 - "List all notes in my Poznote workspace"
 - "Update note 42 with new information"
 
-📚 **For installation, configuration, and setup instructions, see the [MCP Server README](mcp-server/README.md).**
+For installation, configuration, and setup instructions, see the [MCP Server README](mcp-server/README.md).
 
 ## API Documentation
 
