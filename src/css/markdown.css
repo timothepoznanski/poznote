@@ -216,8 +216,21 @@
 
 .markdown-preview li.task-list-item input[type="checkbox"] {
     margin-right: 0.5em;
-    cursor: default;
+    cursor: pointer;
     vertical-align: middle;
+}
+
+/* Interactive markdown checkbox styling */
+.markdown-preview .markdown-task-checkbox {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    accent-color: #007DB8;
+}
+
+.markdown-preview .markdown-task-checkbox:hover {
+    transform: scale(1.1);
+    transition: transform 0.1s ease;
 }
 
 /* Nested task lists need indentation */
@@ -232,6 +245,16 @@
 .markdown-preview li.task-list-item input[type="checkbox"]:checked + span {
     text-decoration: line-through;
     color: #888;
+}
+
+/* Click-to-navigate hint in split mode */
+.noteentry.markdown-split-mode .markdown-preview [data-line]:not(.markdown-task-checkbox) {
+    transition: background-color 0.15s ease;
+}
+
+.noteentry.markdown-split-mode .markdown-preview [data-line]:not(.markdown-task-checkbox):hover {
+    background-color: rgba(0, 125, 184, 0.05);
+    border-radius: 3px;
 }
 
 /* Indicateur visuel pour le drag & drop */

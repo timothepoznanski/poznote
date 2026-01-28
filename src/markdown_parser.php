@@ -185,8 +185,9 @@ function parseMarkdown($text) {
     $lines = explode("\n", $html);
     $result = [];
     $currentParagraph = [];
+    $paragraphStartLine = -1;
     
-    $flushParagraph = function() use (&$currentParagraph, &$result, $applyInlineStyles) {
+    $flushParagraph = function() use (&$currentParagraph, &$result, &$paragraphStartLine, $applyInlineStyles) {
         if (count($currentParagraph) > 0) {
             // Process line breaks according to GitHub Flavored Markdown rules
             $processedLines = [];
@@ -207,8 +208,9 @@ function parseMarkdown($text) {
             }
             $para = implode('', $processedLines);
             $para = $applyInlineStyles($para);
-            $result[] = '<p>' . $para . '</p>';
+            $result[] = '<p data-line="' . $paragraphStartLine . '">' . $para . '</p>';
             $currentParagraph = [];
+            $paragraphStartLine = -1;
         }
     };
     
@@ -262,7 +264,7 @@ function parseMarkdown($text) {
             $flushParagraph();
             $level = strlen($matches[1]);
             $content = $applyInlineStyles($matches[2]);
-            $result[] = '<h' . $level . '>' . $content . '</h' . $level . '>';
+            $result[] = '<h' . $level . ' data-line="' . $i . '">' . $content . '</h' . $level . '>';
             continue;
         }
         
@@ -489,10 +491,10 @@ function parseMarkdown($text) {
                     // Same level item
                     if ($isTaskList) {
                         $isChecked = strtolower($matches[2]) === 'x';
-                        $checkbox = '<input type="checkbox" ' . ($isChecked ? 'checked ' : '') . 'disabled>';
-                        $itemHtml = '<li class="task-list-item">' . $checkbox . ' <span>' . $applyInlineStyles($content) . '</span>';
+                        $checkbox = '<input type="checkbox" class="markdown-task-checkbox" data-line="' . $currentIndex . '" ' . ($isChecked ? 'checked ' : '') . '>';
+                        $itemHtml = '<li class="task-list-item" data-line="' . $currentIndex . '">' . $checkbox . ' <span>' . $applyInlineStyles($content) . '</span>';
                     } else {
-                        $itemHtml = '<li>' . $applyInlineStyles($content);
+                        $itemHtml = '<li data-line="' . $currentIndex . '">' . $applyInlineStyles($content);
                     }
                     
                     // Check if next items are more indented (nested)
@@ -612,6 +614,9 @@ function parseMarkdown($text) {
         }
         
         // Regular text - add to current paragraph
+        if ($paragraphStartLine === -1) {
+            $paragraphStartLine = $i;
+        }
         $currentParagraph[] = $line;
     }
     

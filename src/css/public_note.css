@@ -227,6 +227,7 @@ pre:hover .code-block-copy-btn {
     cursor: default;
     vertical-align: middle;
     display: inline-block;
+    pointer-events: none; /* Make checkboxes non-interactive in public view */
 }
 
 /* Nested task lists need indentation */

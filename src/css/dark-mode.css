@@ -2096,6 +2096,24 @@ body.dark-mode .markdown-preview-placeholder {
     color: #666;
 }
 
+/* Interactive markdown checkbox - dark mode */
+html[data-theme='dark'] .markdown-preview .markdown-task-checkbox,
+body.dark-mode .markdown-preview .markdown-task-checkbox {
+    accent-color: #4a9eff;
+}
+
+/* Click-to-navigate hover effect in split mode - dark mode */
+html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview [data-line]:not(.markdown-task-checkbox):hover,
+body.dark-mode .noteentry.markdown-split-mode .markdown-preview [data-line]:not(.markdown-task-checkbox):hover {
+    background-color: rgba(74, 158, 255, 0.1);
+}
+
+/* Checked task item text - dark mode */
+html[data-theme='dark'] .markdown-preview li.task-list-item input[type="checkbox"]:checked + span,
+body.dark-mode .markdown-preview li.task-list-item input[type="checkbox"]:checked + span {
+    color: #666;
+}
+
 /* Backup/Export page */
 html[data-theme='dark'] .backup-container,
 body.dark-mode .backup-container {
