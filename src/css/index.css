@@ -2888,16 +2888,26 @@ textarea:focus {
     font-size: inherit !important;
 }
 
-/* Optimize image rendering for better performance with many images */
-.noteentry img {
+/* Optimize image and iframe rendering for better performance and responsiveness */
+.noteentry img,
+.noteentry iframe {
     max-width: 100%;
     height: auto;
+}
+
+.noteentry img {
     /* Prevent layout shifts while images load */
     content-visibility: auto;
     /* Hint browser about size for better performance */
     contain-intrinsic-size: 300px 200px;
     /* Async decoding to avoid blocking main thread */
     image-rendering: auto;
+}
+
+.noteentry iframe {
+    /* Default aspect ratio for videos, can be overridden */
+    aspect-ratio: 16 / 9;
+    border: none;
 }
 
 /* Apply Inter to text elements, except in code blocks and monospace elements */

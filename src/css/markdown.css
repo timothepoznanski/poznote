@@ -154,11 +154,22 @@
     text-decoration: underline;
 }
 
-.markdown-preview img {
+.markdown-preview img,
+.markdown-preview iframe {
     max-width: 100%;
-    height: auto;
     border-radius: 4px;
     margin: 1em 0;
+}
+
+.markdown-preview img {
+    height: auto;
+}
+
+.markdown-preview iframe {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 16 / 9;
+    border: none;
 }
 
 .markdown-preview hr {

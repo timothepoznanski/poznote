@@ -424,6 +424,15 @@
     border-top: 1px solid var(--border-color);
 }
 
+.note-full-content iframe {
+    width: 100% !important;
+    max-width: 100%;
+    height: auto !important;
+    aspect-ratio: 16 / 9;
+    border: none;
+    border-radius: 8px;
+}
+
 .expand-note-btn {
     background: var(--primary-color);
     color: white;

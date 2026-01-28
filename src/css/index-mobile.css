@@ -257,10 +257,23 @@ body::-webkit-scrollbar {
    - Make the table fill the available width and let cell contents wrap
 */
 .noteentry table,
-.markdown-preview table {
-    width: 100%;
+.markdown-preview table,
+.noteentry iframe,
+.markdown-preview iframe {
+    width: 100% !important;
     max-width: 100%;
+}
+
+.noteentry table,
+.markdown-preview table {
     table-layout: fixed;
+}
+
+.noteentry iframe,
+.markdown-preview iframe {
+    height: auto !important;
+    aspect-ratio: 16 / 9;
+    border: none;
 }
 
 .noteentry table td,
