@@ -920,7 +920,14 @@
         "toggle": "Toggle",
         "toggle_placeholder": "Toggle",
         "toggle_content_placeholder": "Escreva dentro do toggle aqui…",
-        "toggle_after_placeholder": "Escreva fora do toggle aqui…"
+        "toggle_after_placeholder": "Escreva fora do toggle aqui…",
+        "youtube_video": "Vídeo do YouTube",
+        "youtube_modal_title": "Inserir vídeo do YouTube",
+        "youtube_url_label": "URL do YouTube ou ID do Vídeo:",
+        "youtube_url_prompt": "Introduza o URL ou o ID do vídeo do YouTube:",
+        "youtube_help": "Suporta: youtube.com/watch?v=ID, youtu.be/ID ou apenas o ID do vídeo",
+        "youtube_insert": "Inserir",
+        "youtube_invalid_url": "URL do YouTube inválido"
     },
     "api": {
         "settings": {
