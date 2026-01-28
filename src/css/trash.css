@@ -467,8 +467,18 @@ body.trash-page {
         margin-bottom: 15px;
     }
 
+    .trash-filter-bar {
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .filter-input-wrapper {
+        flex: 0 0 95%;
+        max-width: 95%;
+    }
+
     .trash-search-input {
-        width: 80% !important;
+        width: 100% !important;
         font-size: 1.1em;
         padding: 12px;
         margin: 10px 0;
@@ -478,6 +488,7 @@ body.trash-page {
         justify-content: center;
         margin: 15px 10px;
         gap: 30px;
+        padding-left: 0;
     }
 
 
