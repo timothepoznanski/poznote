@@ -96,26 +96,62 @@ class SearchManager {
     }
 
     /**
-     * Restore combined mode state from hidden input
+     * Restore combined mode state from URL, localStorage, or hidden input
      */
     restoreCombinedModeState(isMobile) {
         const elements = this.getElements(isMobile);
         if (!elements.typeIconsContainer || !elements.optionsToggle) return;
         
-        // Check if combined mode is enabled
-        const isCombined = elements.hiddenInputs.combinedMode?.value === '1';
+        // Check if combined mode is enabled - first from URL, then localStorage, then from hidden input
+        let isCombined = false;
+        
+        // Check URL parameters first (highest priority - preserves state during navigation)
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlCombined = urlParams.get('search_combined');
+        
+        if (urlCombined === '1') {
+            isCombined = true;
+        } else if (urlCombined === '0') {
+            // URL param explicitly set to '0'
+            isCombined = false;
+        } else {
+            // No URL param or other value, try localStorage
+            try {
+                const savedState = localStorage.getItem('poznote_combined_search_mode');
+                if (savedState === '0') {
+                    // User explicitly disabled combined mode
+                    isCombined = false;
+                } else if (savedState === '1') {
+                    isCombined = true;
+                } else {
+                    // No saved state - default to combined mode (hidden icons)
+                    isCombined = true;
+                }
+            } catch (e) {
+                // localStorage not available - default to combined mode
+                isCombined = true;
+            }
+        }
         
         if (isCombined) {
             // Hide icons and update toggle state
             elements.typeIconsContainer.classList.add('hidden');
             elements.optionsToggle.classList.remove('active');
             elements.searchInput?.classList.add('search-combined-mode');
+            // Update hidden input to match
+            if (elements.hiddenInputs.combinedMode) {
+                elements.hiddenInputs.combinedMode.value = '1';
+            }
             this.updatePlaceholderForCombinedMode(isMobile);
         } else {
             // Show icons - this is the default state
             elements.typeIconsContainer.classList.remove('hidden');
             elements.optionsToggle.classList.add('active');
             elements.searchInput?.classList.remove('search-combined-mode');
+            // Update hidden input to match
+            if (elements.hiddenInputs.combinedMode) {
+                elements.hiddenInputs.combinedMode.value = '';
+            }
         }
     }
 
@@ -452,6 +488,8 @@ class SearchManager {
             if (elements.hiddenInputs.combinedMode) {
                 elements.hiddenInputs.combinedMode.value = '';
             }
+            // Save state to localStorage
+            try { localStorage.setItem('poznote_combined_search_mode', '0'); } catch (e) { /* ignore */ }
         } else {
             // Hide icons - switch to combined mode
             elements.typeIconsContainer.classList.add('hidden');
@@ -461,6 +499,8 @@ class SearchManager {
             if (elements.hiddenInputs.combinedMode) {
                 elements.hiddenInputs.combinedMode.value = '1';
             }
+            // Save state to localStorage
+            try { localStorage.setItem('poznote_combined_search_mode', '1'); } catch (e) { /* ignore */ }
         }
         
         // Update hidden inputs and placeholder
