@@ -264,6 +264,191 @@ class PoznoteClient:
         if data.get("success"):
             return data.get("folder")
         return None
+
+    def list_folders(self, workspace: str | None = None, user_id: str | int | None = None) -> list[dict]:
+        """List all folders in the specified workspace"""
+        params = {}
+        ws = workspace or self.default_workspace
+        if ws:
+            params["workspace"] = ws
+        
+        response = self.client.get("/folders", params=params, headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        
+        if data.get("success"):
+            return data.get("folders", [])
+        return []
+
+    def list_workspaces(self, user_id: str | int | None = None) -> list[dict]:
+        """List all available workspaces"""
+        response = self.client.get("/workspaces", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        
+        if data.get("success"):
+            return data.get("workspaces", [])
+        return []
+
+    def list_tags(self, user_id: str | int | None = None) -> list[str]:
+        """List all unique tags"""
+        response = self.client.get("/tags", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        
+        if data.get("success"):
+            return data.get("tags", [])
+        return []
+
+    def get_trash(self, user_id: str | int | None = None) -> list[dict]:
+        """List all notes in trash"""
+        response = self.client.get("/trash", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        
+        if data.get("success"):
+            return data.get("notes", [])
+        return []
+
+    def empty_trash(self, user_id: str | int | None = None) -> bool:
+        """Empty the trash (permanently delete all notes in trash)"""
+        response = self.client.delete("/trash", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        return data.get("success", False)
+
+    def restore_note(self, note_id: int, user_id: str | int | None = None) -> bool:
+        """Restore a note from trash"""
+        response = self.client.post(f"/notes/{note_id}/restore", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        return data.get("success", False)
+
+    def duplicate_note(self, note_id: int, user_id: str | int | None = None) -> dict | None:
+        """Duplicate an existing note"""
+        response = self.client.post(f"/notes/{note_id}/duplicate", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        
+        if data.get("success"):
+            return data.get("note")
+        return None
+
+    def toggle_favorite(self, note_id: int, user_id: str | int | None = None) -> bool:
+        """Toggle favorite status for a note"""
+        response = self.client.post(f"/notes/{note_id}/favorite", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        return data.get("success", False)
+
+    def list_attachments(self, note_id: int, user_id: str | int | None = None) -> list[dict]:
+        """List all attachments for a note"""
+        response = self.client.get(f"/notes/{note_id}/attachments", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return data.get("attachments", [])
+        return []
+
+    def move_note_to_folder(self, note_id: int, folder_id: int, user_id: str | int | None = None) -> bool:
+        """Move a note to a specific folder"""
+        payload = {"folder_id": folder_id}
+        response = self.client.post(f"/notes/{note_id}/folder", json=payload, headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        return data.get("success", False)
+
+    def remove_note_from_folder(self, note_id: int, user_id: str | int | None = None) -> bool:
+        """Remove a note from its current folder (move to root)"""
+        response = self.client.post(f"/notes/{note_id}/remove-folder", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        return data.get("success", False)
+
+    def get_note_share_status(self, note_id: int, user_id: str | int | None = None) -> dict | None:
+        """Get public sharing status for a note"""
+        response = self.client.get(f"/notes/{note_id}/share", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return data.get("share")
+        return None
+
+    def create_note_share(self, note_id: int, user_id: str | int | None = None) -> dict | None:
+        """Enable public sharing for a note and return the link"""
+        response = self.client.post(f"/notes/{note_id}/share", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return data.get("share")
+        return None
+
+    def delete_note_share(self, note_id: int, user_id: str | int | None = None) -> bool:
+        """Disable public sharing for a note"""
+        response = self.client.delete(f"/notes/{note_id}/share", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        return data.get("success", False)
+
+    def get_folder_share_status(self, folder_id: int, user_id: str | int | None = None) -> dict | None:
+        """Get public sharing status for a folder"""
+        response = self.client.get(f"/folders/{folder_id}/share", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return data.get("share")
+        return None
+
+    def convert_note_type(self, note_id: int, user_id: str | int | None = None) -> dict | None:
+        """Convert note between Markdown and HTML"""
+        response = self.client.post(f"/notes/{note_id}/convert", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return data.get("note")
+        return None
+
+    def get_github_status(self, user_id: str | int | None = None) -> dict | None:
+        """Get GitHub synchronization status"""
+        response = self.client.get("/github-sync/status", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        return response.json()
+
+    def github_push(self, user_id: str | int | None = None) -> dict:
+        """Force push notes to GitHub"""
+        response = self.client.post("/github-sync/push", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        return response.json()
+
+    def github_pull(self, user_id: str | int | None = None) -> dict:
+        """Force pull notes from GitHub"""
+        response = self.client.post("/github-sync/pull", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        return response.json()
+
+    def get_system_version(self) -> dict:
+        """Get Poznote version information"""
+        response = self.client.get("/system/version")
+        response.raise_for_status()
+        return response.json()
+
+    def list_backups(self) -> list[dict]:
+        """List all available backups"""
+        response = self.client.get("/backups")
+        response.raise_for_status()
+        return response.json()
+
+    def create_backup(self) -> dict:
+        """Trigger a new full backup"""
+        response = self.client.post("/backups")
+        response.raise_for_status()
+        return response.json()
+
+    def get_setting(self, key: str, user_id: str | int | None = None) -> dict:
+        """Get a specific application setting"""
+        response = self.client.get(f"/settings/{key}", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        return response.json()
     
     def close(self):
         """Close the HTTP client"""

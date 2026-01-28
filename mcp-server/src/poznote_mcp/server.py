@@ -455,6 +455,344 @@ def create_folder(
         return json.dumps({"error": "Failed to create folder"}, ensure_ascii=False)
 
 
+@mcp.tool()
+def list_folders(workspace: Optional[str] = None, user_id: Optional[int] = None) -> str:
+    """List all folders from a specific workspace
+    
+    Args:
+        workspace: Workspace name (optional, uses default workspace if not specified)
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    folders = client.list_folders(workspace=workspace, user_id=user_id)
+    return json.dumps({
+        "workspace": workspace or client.default_workspace,
+        "count": len(folders),
+        "folders": folders,
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def list_workspaces(user_id: Optional[int] = None) -> str:
+    """List all available workspaces
+    
+    Args:
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    workspaces = client.list_workspaces(user_id=user_id)
+    return json.dumps({
+        "count": len(workspaces),
+        "workspaces": workspaces,
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def list_tags(user_id: Optional[int] = None) -> str:
+    """List all unique tags used in notes
+    
+    Args:
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    tags = client.list_tags(user_id=user_id)
+    return json.dumps({
+        "count": len(tags),
+        "tags": tags,
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def get_trash(user_id: Optional[int] = None) -> str:
+    """List all notes currently in the trash
+    
+    Args:
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    notes = client.get_trash(user_id=user_id)
+    return json.dumps({
+        "count": len(notes),
+        "notes": notes,
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def empty_trash(user_id: Optional[int] = None) -> str:
+    """Permanently delete all notes in the trash
+    
+    Args:
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    success = client.empty_trash(user_id=user_id)
+    return json.dumps({"success": success, "message": "Trash emptied" if success else "Failed to empty trash"}, ensure_ascii=False)
+
+
+@mcp.tool()
+def restore_note(id: int, user_id: Optional[int] = None) -> str:
+    """Restore a note from the trash
+    
+    Args:
+        id: ID of the note to restore
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    success = client.restore_note(id, user_id=user_id)
+    return json.dumps({"success": success, "message": f"Note {id} restored" if success else f"Failed to restore note {id}"}, ensure_ascii=False)
+
+
+@mcp.tool()
+def duplicate_note(id: int, user_id: Optional[int] = None) -> str:
+    """Create a duplicate of an existing note
+    
+    Args:
+        id: ID of the note to duplicate
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    note = client.duplicate_note(id, user_id=user_id)
+    if note:
+        return json.dumps({"success": True, "note": note}, indent=2, ensure_ascii=False)
+    else:
+        return json.dumps({"success": False, "error": f"Failed to duplicate note {id}"}, ensure_ascii=False)
+
+
+@mcp.tool()
+def toggle_favorite(id: int, user_id: Optional[int] = None) -> str:
+    """Toggle the favorite status of a note
+    
+    Args:
+        id: ID of the note to favor/unfavor
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    success = client.toggle_favorite(id, user_id=user_id)
+    return json.dumps({"success": success, "message": f"Note {id} favorite status toggled"}, ensure_ascii=False)
+
+
+@mcp.tool()
+def list_attachments(note_id: int, user_id: Optional[int] = None) -> str:
+    """List all attachments for a specific note
+    
+    Args:
+        note_id: ID of the note to list attachments for
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    attachments = client.list_attachments(note_id, user_id=user_id)
+    return json.dumps({
+        "note_id": note_id,
+        "count": len(attachments),
+        "attachments": attachments,
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def move_note_to_folder(note_id: int, folder_id: int, user_id: Optional[int] = None) -> str:
+    """Move a note to a specific folder
+    
+    Args:
+        note_id: ID of the note to move
+        folder_id: ID of the target folder
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    success = client.move_note_to_folder(note_id, folder_id, user_id=user_id)
+    return json.dumps({"success": success, "message": f"Note {note_id} moved to folder {folder_id}" if success else "Failed to move note"}, ensure_ascii=False)
+
+
+@mcp.tool()
+def remove_note_from_folder(note_id: int, user_id: Optional[int] = None) -> str:
+    """Remove a note from its current folder (moves it to root)
+    
+    Args:
+        note_id: ID of the note to remove from folder
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    success = client.remove_note_from_folder(note_id, user_id=user_id)
+    return json.dumps({"success": success, "message": f"Note {note_id} removed from folder" if success else "Failed to remove note from folder"}, ensure_ascii=False)
+
+
+@mcp.tool()
+def share_note(note_id: int, user_id: Optional[int] = None) -> str:
+    """Enable public sharing for a note and get the public URL
+    
+    Args:
+        note_id: ID of the note to share
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    share = client.create_note_share(note_id, user_id=user_id)
+    if share:
+        return json.dumps({"success": True, "share": share}, indent=2, ensure_ascii=False)
+    else:
+        return json.dumps({"success": False, "error": "Failed to enable sharing"}, ensure_ascii=False)
+
+
+@mcp.tool()
+def unshare_note(note_id: int, user_id: Optional[int] = None) -> str:
+    """Disable public sharing for a note
+    
+    Args:
+        note_id: ID of the note to unshare
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    success = client.delete_note_share(note_id, user_id=user_id)
+    return json.dumps({"success": success, "message": "Sharing disabled" if success else "Failed to disable sharing"}, ensure_ascii=False)
+
+
+@mcp.tool()
+def get_note_share_status(note_id: int, user_id: Optional[int] = None) -> str:
+    """Get the current sharing status and public URL for a note
+    
+    Args:
+        note_id: ID of the note
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    share = client.get_note_share_status(note_id, user_id=user_id)
+    if share:
+        return json.dumps({"success": True, "share": share}, indent=2, ensure_ascii=False)
+    else:
+        return json.dumps({"success": False, "message": "Note is not shared publicly"}, ensure_ascii=False)
+
+
+@mcp.tool()
+def convert_note_format(note_id: int, user_id: Optional[int] = None) -> str:
+    """Convert a note between HTML and Markdown formats
+    
+    Args:
+        note_id: ID of the note to convert
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    note = client.convert_note_type(note_id, user_id=user_id)
+    if note:
+        return json.dumps({"success": True, "message": f"Note converted to {note.get('type')}", "note": note}, indent=2, ensure_ascii=False)
+    else:
+        return json.dumps({"success": False, "error": "Conversion failed"}, ensure_ascii=False)
+
+
+@mcp.tool()
+def get_github_sync_status(user_id: Optional[int] = None) -> str:
+    """Get the current status of GitHub synchronization
+    
+    Args:
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    status = client.get_github_status(user_id=user_id)
+    return json.dumps(status, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def github_push(user_id: Optional[int] = None) -> str:
+    """Force push local notes to the configured GitHub repository
+    
+    Args:
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    result = client.github_push(user_id=user_id)
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def github_pull(user_id: Optional[int] = None) -> str:
+    """Force pull notes from the configured GitHub repository
+    
+    Args:
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    result = client.github_pull(user_id=user_id)
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def get_system_info() -> str:
+    """Get version information about the Poznote installation"""
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    info = client.get_system_version()
+    return json.dumps(info, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def list_backups() -> str:
+    """List all available system backups"""
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    backups = client.list_backups()
+    return json.dumps({"count": len(backups), "backups": backups}, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def create_backup() -> str:
+    """Trigger the creation of a new system backup"""
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    result = client.create_backup()
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def get_app_setting(key: str, user_id: Optional[int] = None) -> str:
+    """Get the value of a specific application setting
+    
+    Args:
+        key: The setting key to retrieve
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    setting = client.get_setting(key, user_id=user_id)
+    return json.dumps(setting, indent=2, ensure_ascii=False)
+
+
 # =============================================================================
 # CLI & MAIN
 # =============================================================================

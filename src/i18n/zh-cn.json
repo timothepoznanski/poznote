@@ -1841,7 +1841,7 @@
     },
     "github_sync": {
         "title": "GitHub 同步",
-        "description": "Push your notes to GitHub or pull notes from an existing repository. Un repositroy est égal à un profil. Les workspaces seront des folder à la racine du repo",
+        "description": "将您的笔记推送到 GitHub 或从现有仓库拉取笔记。一个仓库相当于一个用户资料。工作区将作为仓库根目录下的文件夹。",
         "warning": "不要将此功能作为唯一的备份解决方案。\n请考虑为您的笔记设置手动或自动 ZIP 导出。",
         "confirm_push": "将工作区 \"{{workspace}}\" 的笔记推送到 GitHub 吗？Updates existing files and deletes files that no longer exist in Poznote.",
         "confirm_pull": "从 GitHub 拉取工作区 \"{{workspace}}\" 的笔记吗？Import notes from GitHub. Updates existing notes and moves to trash notes that no longer exist on GitHub.",
@@ -1895,6 +1895,7 @@
             "pull_error": "拉取失败：{{error}}"
         },
         "debug": {
+            "title": "调试信息",
             "show": "显示调试信息",
             "hide": "隐藏调试信息",
             "copy": "复制调试信息",

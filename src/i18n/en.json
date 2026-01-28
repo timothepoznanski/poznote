@@ -1291,6 +1291,7 @@
             "pull_error": "Pull failed: {{error}}"
         },
         "debug": {
+            "title": "Debug Info",
             "show": "Show Debug Info",
             "hide": "Hide Debug Info",
             "copy": "Copy Debug",

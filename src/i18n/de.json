@@ -1720,7 +1720,7 @@
     },
     "github_sync": {
         "title": "GitHub-Synchronisierung",
-        "description": "Push your notes to GitHub or pull notes from an existing repository. One repository is equal to one profile. Workspaces will be folders at the root of the repo.",
+        "description": "Übertragen Sie Ihre Notizen zu GitHub oder ziehen Sie Notizen aus einem bestehenden Repository. Ein Repository entspricht einem Profil. Arbeitsbereiche werden als Ordner im Repository-Stammverzeichnis abgelegt.",
         "warning": "Verwenden Sie diese Funktion nicht als einzige Backup-Lösung.\nErwägen Sie die Einrichtung manueller oder automatischer ZIP-Exporte Ihrer Notizen.",
         "confirm_push": "Notizen des Workspace \"{{workspace}}\" zu GitHub pushen? Updates existing files and deletes files that no longer exist in Poznote.",
         "confirm_pull": "Pull notes for workspace \"{{workspace}}\" from GitHub? Import notes from GitHub. Updates existing notes and moves to trash notes that no longer exist on GitHub.",
@@ -1774,6 +1774,7 @@
             "pull_error": "Fehler beim Abrufen: {{error}}"
         },
         "debug": {
+            "title": "Debug-Informationen",
             "show": "Debug-Informationen anzeigen",
             "hide": "Debug-Informationen ausblenden",
             "copy": "Debug kopieren",
