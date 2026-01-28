@@ -393,7 +393,7 @@ html[data-theme='dark'] .theme-toggle-btn {
 }
 
 html[data-theme='dark'] .theme-toggle-btn:hover {
-    background: #2d2d2d;
+    background: #333333;
     border-color: #666;
 }
 
@@ -412,12 +412,12 @@ html[data-theme='dark'] .public-note .content .task-item.important .task-text {
 html[data-theme='dark'] * table td,
 html[data-theme='dark'] * table th {
     border-color: #404040 !important;
-    background: #1a1a1a !important;
+    background: #252526 !important;
     color: #e0e0e0 !important;
 }
 
 html[data-theme='dark'] * table th {
-    background-color: #2a2a2a !important;
+    background-color: #333333 !important;
 }
 
 html[data-theme='dark'] table td,
@@ -426,12 +426,12 @@ html[data-theme='dark'] table th {
 }
 
 html[data-theme='dark'] table th {
-    background-color: #2a2a2a !important;
+    background-color: #333333 !important;
     color: #e0e0e0 !important;
 }
 
 html[data-theme='dark'] table td {
-    background: #1a1a1a !important;
+    background: #252526 !important;
     color: #e0e0e0 !important;
 }
 
@@ -444,13 +444,13 @@ html[data-theme='dark'] .public-note table.inserted-table th {
 
 html[data-theme='dark'] .public-note table th,
 html[data-theme='dark'] .public-note table.inserted-table th {
-    background-color: #2a2a2a !important;
+    background-color: #333333 !important;
     color: #e0e0e0 !important;
 }
 
 html[data-theme='dark'] .public-note table td,
 html[data-theme='dark'] .public-note table.inserted-table td {
-    background: #1a1a1a !important;
+    background: #252526 !important;
     color: #e0e0e0 !important;
 }
 
@@ -460,12 +460,12 @@ html[data-theme='dark'] .public-note .content table th {
 }
 
 html[data-theme='dark'] .public-note .content table th {
-    background-color: #2a2a2a !important;
+    background-color: #333333 !important;
     color: #e0e0e0 !important;
 }
 
 html[data-theme='dark'] .public-note .content table td {
-    background: #1a1a1a !important;
+    background: #252526 !important;
     color: #e0e0e0 !important;
 }
 

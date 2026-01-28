@@ -1890,7 +1890,7 @@ input:checked+.toggle-slider:before {
 
 /* Dark mode styles for share modal */
 html[data-theme='dark'] #shareModal .modal-content {
-    background-color: #2d2d2d;
+    background-color: #333333;
     color: #e0e0e0;
 }
 
@@ -1914,7 +1914,7 @@ html[data-theme='dark'] #shareModal .share-custom-label .optional-text {
 }
 
 html[data-theme='dark'] #shareModal .share-custom-input {
-    background: #1a1a1a;
+    background: #252526;
     border: 1px solid #404040;
     color: #e0e0e0;
 }
@@ -2038,7 +2038,7 @@ html[data-theme='dark'] input:checked+.toggle-slider {
 
 /* Dark mode for folder share modal */
 html[data-theme='dark'] #folderShareModal .modal-content {
-    background-color: #2d2d2d;
+    background-color: #333333;
     color: #e0e0e0;
 }
 

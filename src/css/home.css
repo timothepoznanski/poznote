@@ -103,7 +103,7 @@
 
 html[data-theme='dark'] .home-search-input,
 body.dark-mode .home-search-input {
-    background: #2d2d2d;
+    background: #333333;
     border-color: #374151;
     color: #e5e7eb;
 }
@@ -544,7 +544,7 @@ body.dark-mode .home-card-green .home-card-icon {
 /* Dark mode */
 html[data-theme='dark'] .home-page,
 body.dark-mode .home-page {
-    background: #1a1a1a;
+    background: #252526;
 }
 
 html[data-theme='dark'] .home-header,
@@ -566,7 +566,7 @@ body.dark-mode .home-notes-count {
 
 html[data-theme='dark'] .home-card,
 body.dark-mode .home-card {
-    background: #2d2d2d;
+    background: #333333;
     border-color: #374151;
 }
 

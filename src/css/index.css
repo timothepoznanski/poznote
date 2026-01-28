@@ -6153,7 +6153,7 @@ input[type="search"]::-webkit-search-results-decoration {
 /* Dark mode styles for create note modal */
 html[data-theme='dark'] .create-note-option,
 body.dark-mode .create-note-option {
-    background-color: #2a2a2a;
+    background-color: #333333;
     border-color: #444;
 }
 
@@ -6456,7 +6456,7 @@ body.dark-mode .checklist-checkbox:checked+.checklist-text {
 /* Dark mode for drop zone */
 html[data-theme='dark'] .root-drop-zone,
 body.dark-mode .root-drop-zone {
-    background-color: #2a2a2a;
+    background-color: #333333;
     border-color: #4a4a4a;
 }
 

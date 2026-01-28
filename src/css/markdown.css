@@ -291,7 +291,7 @@
 
 /* Dark mode adjustment for mermaid container */
 [data-theme='dark'] .mermaid {
-    background-color: #2d2d2d;
+    background-color: #333333;
 }
 
 /* Math equations styling */

@@ -173,7 +173,7 @@ span.note-link-broken {
 
 /* Dark mode adjustments */
 [data-theme="dark"] .note-reference-search input {
-    background: var(--dark-input-bg, #2a2a2a);
+    background: var(--dark-input-bg, #333333);
     border-color: var(--dark-border-color, #444);
     color: var(--dark-text-color, #e0e0e0);
 }

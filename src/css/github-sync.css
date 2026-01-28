@@ -428,7 +428,7 @@
 }
 
 .code-example {
-    background: #1e1e1e;
+    background: #252526;
     border-radius: 8px;
     padding: 16px;
     overflow-x: auto;
@@ -445,7 +445,7 @@
 
 /* Dark Mode */
 body.dark-mode .github-sync-section {
-    background: #1e1e1e;
+    background: #252526;
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
@@ -491,7 +491,7 @@ body.dark-mode .form-group label {
 }
 
 body.dark-mode .form-group select {
-    background: #2a2a2a;
+    background: #333333;
     border-color: #444;
     color: #e0e0e0;
 }
@@ -588,7 +588,7 @@ body.dark-mode .repo-link {
 
 html[data-theme='dark'] .limitations-table thead tr,
 body.dark-mode .limitations-table thead tr {
-    background-color: #2a2a2a;
+    background-color: #333333;
 }
 
 html[data-theme='dark'] .limitations-table th,
@@ -601,7 +601,7 @@ body.dark-mode .limitations-table td {
 
 html[data-theme='dark'] .limitations-table tbody tr:nth-child(even),
 body.dark-mode .limitations-table tbody tr:nth-child(even) {
-    background-color: #2a2a2a;
+    background-color: #333333;
 }
 
 body.dark-mode .limitations-note {

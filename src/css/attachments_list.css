@@ -398,7 +398,7 @@ body.attachments-page {
 
 /* Dark mode adjustments */
 [data-theme="dark"] body.attachments-page {
-    background-color: #1a1a1a;
+    background-color: #252526;
     color: #e0e0e0;
 }
 
@@ -407,7 +407,7 @@ body.attachments-page {
 }
 
 [data-theme="dark"] .attachment-note-item {
-    background-color: #2a2a2a;
+    background-color: #333333;
     border-color: #444444;
 }
 
@@ -445,7 +445,7 @@ body.attachments-page {
 }
 
 [data-theme="dark"] body.attachments-page::-webkit-scrollbar {
-    background-color: #2a2a2a !important;
+    background-color: #333333 !important;
 }
 
 [data-theme="dark"] body.attachments-page::-webkit-scrollbar-thumb {

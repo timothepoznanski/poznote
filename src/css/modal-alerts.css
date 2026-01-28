@@ -137,7 +137,7 @@ html[data-theme='dark'] .alert-modal-body,
 
 html[data-theme='dark'] .alert-modal-button,
 .dark-mode .alert-modal-button {
-    background-color: #2a2a2a;
+    background-color: #333333;
     color: #e0e0e0;
     border-color: #404040;
 }

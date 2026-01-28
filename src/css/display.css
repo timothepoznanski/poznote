@@ -211,7 +211,7 @@ body {
 /* Ensure dark mode applies correctly */
 html[data-theme='dark'] body,
 body.dark-mode {
-    background: #1a1a1a !important;
+    background: #252526 !important;
     color: #e0e0e0 !important;
 }
 

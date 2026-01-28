@@ -218,7 +218,7 @@ body.favorites-page {
 
 /* Dark mode */
 [data-theme="dark"] body.favorites-page {
-    background-color: #1a1a1a;
+    background-color: #252526;
     color: #e0e0e0;
 }
 
@@ -232,7 +232,7 @@ body.favorites-page {
 }
 
 [data-theme="dark"] .filter-input {
-    background-color: #2a2a2a;
+    background-color: #333333;
     border-color: #444;
     color: #e0e0e0;
 }

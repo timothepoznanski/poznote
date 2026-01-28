@@ -15,7 +15,7 @@
         var root = document.documentElement;
         root.setAttribute('data-theme', theme);
         root.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
-        root.style.backgroundColor = theme === 'dark' ? '#1a1a1a' : '#ffffff';
+        root.style.backgroundColor = theme === 'dark' ? '#252526' : '#ffffff';
     } catch (e) {
         // Fallback silently
     }

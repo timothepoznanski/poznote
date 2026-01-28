@@ -54,7 +54,7 @@
 
 /* Mode sombre */
 [data-theme="dark"] .excalidraw-container {
-    background-color: #2a2a2a;
+    background-color: #333333;
     border-color: #404040;
 }
 

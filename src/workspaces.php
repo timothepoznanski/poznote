@@ -470,13 +470,18 @@ try {
     <title><?php echo $pageTitle; ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
-    <script src="js/theme-init.js"></script>
-    <script src="js/globals.js"></script>
-    <link rel="stylesheet" href="css/fontawesome.min.css">
-    <link rel="stylesheet" href="css/light.min.css">
-    <link rel="stylesheet" href="css/workspaces.css">
-    <link rel="stylesheet" href="css/modals.css">
-    <link rel="stylesheet" href="css/dark-mode.css">
+    <?php 
+    $cache_v = @file_get_contents('version.txt');
+    if ($cache_v === false) $cache_v = time();
+    $cache_v = urlencode(trim($cache_v));
+    ?>
+    <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
+    <link rel="stylesheet" href="css/fontawesome.min.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/light.min.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/workspaces.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode.css?v=<?php echo $cache_v; ?>">
     <style>
         /* Ensure workspace list displays name + buttons on a single line */
         .workspace-list ul { list-style: none; padding: 0; margin: 0; }

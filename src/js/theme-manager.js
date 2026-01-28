@@ -58,7 +58,7 @@
         // Set data-theme on <html> for early CSS
         root.setAttribute('data-theme', normalizedTheme);
         root.style.colorScheme = normalizedTheme;
-        root.style.backgroundColor = normalizedTheme === 'dark' ? '#1a1a1a' : '#ffffff';
+        root.style.backgroundColor = normalizedTheme === 'dark' ? '#252526' : '#ffffff';
 
         // Manage body class for compatibility
         if (normalizedTheme === 'dark') {

@@ -59,7 +59,7 @@ body {
 }
 
 .login-title {
-    color: #1a202c;
+    color: #252526;
     font-size: 1.875rem;
     font-weight: 600;
     margin: 0;
@@ -184,12 +184,12 @@ input[type="password"]::placeholder {
     display: block;
     text-decoration: none;
     text-align: center;
-    background: #2d3748;
+    background: #333333;
     margin-top: 0.75rem;
 }
 
 .oidc-button:hover {
-    background: #1a202c;
+    background: #252526;
 }
 
 .login-button:hover {
@@ -283,7 +283,7 @@ input[type="password"]::placeholder {
     border-radius: 4px;
     font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
     font-size: 0.8125rem;
-    color: #2d3748;
+    color: #333333;
     display: inline-block;
     margin: 0.5rem 0;
 }
@@ -337,7 +337,7 @@ input[type="password"]::placeholder {
 
 .language-select option {
     background: white;
-    color: #1a202c;
+    color: #252526;
 }
 
 /* ============================================
@@ -345,7 +345,7 @@ input[type="password"]::placeholder {
    ============================================ */
 
 html[data-theme='dark'] body {
-    background-color: #1a1a1a;
+    background-color: #252526;
     color: #e0e0e0;
     --text-muted: #a0aec0;
 }
@@ -361,7 +361,7 @@ html[data-theme='dark'] .remember-me-label {
 
 html[data-theme='dark'] input[type="text"],
 html[data-theme='dark'] input[type="password"] {
-    background-color: #2a2a2a;
+    background-color: #333333;
     border-color: #404040;
     color: #e0e0e0;
 }
@@ -405,7 +405,7 @@ html[data-theme='dark'] .admin-warning code {
 }
 
 html[data-theme='dark'] .language-select option {
-    background: #2a2a2a;
+    background: #333333;
     color: #e0e0e0;
 }
 
