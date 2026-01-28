@@ -56,22 +56,6 @@ try {
 
 <?php
 /**
- * Calculate total number of notes in a folder and all its subfolders recursively
- */
-function countNotesRecursively($folderData) {
-    $count = count($folderData['notes']);
-    
-    // Add notes from all subfolders
-    if (isset($folderData['children']) && !empty($folderData['children'])) {
-        foreach ($folderData['children'] as $childData) {
-            $count += countNotesRecursively($childData);
-        }
-    }
-    
-    return $count;
-}
-
-/**
  * Recursive function to display folders and their subfolders
  */
 function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags) {
@@ -79,17 +63,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
     $notes = $folderData['notes'];
     
     // In search mode, don't display empty folders (unless they have children with results)
-    $hasChildrenWithNotes = false;
-    if (isset($folderData['children']) && !empty($folderData['children'])) {
-        foreach ($folderData['children'] as $childData) {
-            if (!empty($childData['notes']) || (isset($childData['children']) && !empty($childData['children']))) {
-                $hasChildrenWithNotes = true;
-                break;
-            }
-        }
-    }
-    
-    if ($is_search_mode && empty($notes) && !$hasChildrenWithNotes) {
+    if ($is_search_mode && countNotesRecursively($folderData) === 0) {
         return;
     }
     
@@ -100,7 +74,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         $folderDomId = 'folder-' . $folderId;
         
         // Determine if this folder should be open
-        $should_be_open = shouldFolderBeOpen($con, $folderId, $folderName, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes);
+        $should_be_open = shouldFolderBeOpen($con, $folderData, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes);
         
         // Set appropriate folder icon (open/closed) and display style
         // Check if folder has a custom icon and color

@@ -4,6 +4,22 @@
  */
 
 /**
+ * Calculate total number of notes in a folder and all its subfolders recursively
+ */
+function countNotesRecursively($folderData) {
+    $count = count($folderData['notes']);
+    
+    // Add notes from all subfolders
+    if (isset($folderData['children']) && !empty($folderData['children'])) {
+        foreach ($folderData['children'] as $childData) {
+            $count += countNotesRecursively($childData);
+        }
+    }
+    
+    return $count;
+}
+
+/**
  * Organize notes by folder
  * Now returns array with 'folders' and 'uncategorized_notes' keys
  * OPTIMIZED: Pre-load all folder data to avoid N+1 queries
@@ -162,9 +178,14 @@ function sortFolders($folders) {
 
 /**
  * Determines if a folder should be open
- * Now accepts both folder ID and name
+ * Now accepts the full folder data array
  */
-function shouldFolderBeOpen($con, $folderId, $folderName, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes) {
+function shouldFolderBeOpen($con, $folderData, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes) {
+    if (!$folderData) return false;
+    
+    $folderId = $folderData['id'];
+    $folderName = $folderData['name'];
+
     // Favorites folder is always open
     if ($folderName === 'Favorites') {
         return true;
@@ -182,8 +203,11 @@ function shouldFolderBeOpen($con, $folderId, $folderName, $is_search_mode, $fold
         // If we have very few notes (demo notes just created), open all folders
         return true;
     } else if($is_search_mode) {
-        // In search mode: open folders that have results
-        return isset($folders_with_results[$folderName]);
+        // In search mode: open folders that have results (direct or in subfolders)
+        if (isset($folders_with_results[$folderName])) {
+            return true;
+        }
+        return countNotesRecursively($folderData) > 0;
     } else if($note != '') {
         // If a note is selected: open the folder of the current note
         if ($folderName === $current_note_folder) {
