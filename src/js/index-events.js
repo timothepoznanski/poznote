@@ -516,42 +516,54 @@
      * Handle clicks on note background to focus the editor at the end
      */
     function handleNoteBackgroundClick(e) {
+        // Ensure the click is within the right column (editor area)
+        // This prevents triggering focus when clicking on the sidebar/note list
+        if (!e.target.closest('#right_col')) {
+            return;
+        }
+
         // If the click is on an interactive element, ignore
         if (e.target.closest('button, a, input, textarea, select, [contenteditable="true"], .search-replace-bar, .mobile-toolbar-menu, .note-edit-toolbar, .note-tags-row')) {
             return;
         }
 
-        // Also ignore if clicking on specific icons
+        // Also ignore if clicking on specific icons that are meant to be interactive
         if (e.target.tagName === 'I' || e.target.tagName === 'SVG' || e.target.tagName === 'PATH') {
-            if (e.target.closest('button, a, .cursor-pointer')) return;
+            if (e.target.closest('button, a, .cursor-pointer, .note-tags-row')) return;
         }
 
-        // Check if text is being selected
+        // Check if text is being selected - don't focus if user is selecting text
         const selection = window.getSelection();
-        if (selection.toString().length > 0) {
+        if (selection && selection.toString().length > 0) {
             return;
         }
 
-        // Find the visible (active) note entry
-        // Since typically only one note is displayed in the right column, we can query it directly
-        // We look for one inside #right_col to be safe
+        // Find the visible (active) note entry inside the right column
         const noteEntry = document.querySelector('#right_col .noteentry');
         if (!noteEntry || noteEntry.offsetParent === null) return;
 
-        // If clicking specifically on the bottom space div, always focus end
+        // Determine the actual target element for focusing
+        // For HTML notes, it's the noteEntry. For Markdown notes, it's the .markdown-editor child.
+        let targetEl = noteEntry;
+        const markdownEditor = noteEntry.querySelector('.markdown-editor');
+        if (markdownEditor && markdownEditor.offsetParent !== null) {
+            targetEl = markdownEditor;
+        }
+
+        // If clicking specifically on the bottom space padding div
         if (e.target.classList.contains('note-bottom-space')) {
-            focusAtEnd(noteEntry);
+            focusAtEnd(targetEl);
             e.preventDefault();
             return;
         }
 
         const rect = noteEntry.getBoundingClientRect();
 
-        // If the click is vertically below the note entry content
-        if (e.clientY > rect.bottom) {
-            focusAtEnd(noteEntry);
-            // Verify the click is within the horizontal bounds of the main viewing area (rough check)
-            // or just prevent default to accept the click
+        // If the click is anywhere in the right column background (below the note or around it)
+        // Since we already checked for #right_col target and excluded interactive elements,
+        // we can focus the end of the note.
+        if (e.clientY > rect.bottom || e.target.closest('#right_col')) {
+            focusAtEnd(targetEl);
             e.preventDefault();
         }
     }
