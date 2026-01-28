@@ -1760,39 +1760,58 @@
 
     function deleteSlashText() {
         try {
-            if (!slashTextNode || slashOffset < 0) {
+            if (!slashTextNode || slashOffset < 0 || !slashTextNode.parentNode) {
                 return;
             }
 
             // Obtenir la position actuelle du curseur
             const sel = window.getSelection();
-            if (!sel || !sel.rangeCount) {
-                return;
+            let currentOffset = -1;
+
+            if (sel && sel.rangeCount > 0) {
+                const currentRange = sel.getRangeAt(0);
+                // On vérifie si on est dans le bon nœud
+                if (currentRange.startContainer === slashTextNode) {
+                    currentOffset = currentRange.startOffset;
+                }
             }
 
-            const currentRange = sel.getRangeAt(0);
-            const currentOffset = currentRange.startOffset;
-            const currentNode = currentRange.startContainer;
+            // Si on n'a pas pu obtenir l'offset (ex: mobile blurred), on utilise filterText
+            if (currentOffset === -1) {
+                const textContent = slashTextNode.textContent || '';
+                // L'offset de fin est slashOffset + 1 (pour le '/') + longueur du filtre
+                // On utilise la longueur actuelle du texte après le slash comme fallback
+                const textAfterSlash = textContent.substring(slashOffset + 1);
+                const spaceIndex = textAfterSlash.search(/[\s\n]/);
+                const actualFilterLength = spaceIndex >= 0 ? spaceIndex : textAfterSlash.length;
+                currentOffset = slashOffset + 1 + actualFilterLength;
+            }
 
-            // Si on est toujours dans le même nœud texte
-            if (currentNode === slashTextNode && currentNode.nodeType === 3) {
-                // Supprimer depuis le slash jusqu'à la position actuelle
-                const text = slashTextNode.textContent;
-                const before = text.substring(0, slashOffset);
-                const after = text.substring(currentOffset);
-                slashTextNode.textContent = before + after;
+            const text = slashTextNode.textContent;
+            // Sécurité : on ne veut pas supprimer moins que le slash lui-même
+            const safeEndOffset = Math.max(slashOffset + 1, Math.min(text.length, currentOffset));
 
-                // Replacer le curseur
+            const before = text.substring(0, slashOffset);
+            const after = text.substring(safeEndOffset);
+            slashTextNode.textContent = before + after;
+
+            // Replacer le curseur là où le slash a été supprimé
+            if (sel) {
                 const newRange = document.createRange();
-                newRange.setStart(slashTextNode, before.length);
-                newRange.collapse(true);
-                sel.removeAllRanges();
-                sel.addRange(newRange);
-
-                const target = savedEditableElement || savedNoteEntry;
-                if (target) {
-                    target.dispatchEvent(new Event('input', { bubbles: true }));
+                try {
+                    const finalPos = Math.min(slashTextNode.textContent.length, slashOffset);
+                    newRange.setStart(slashTextNode, finalPos);
+                    newRange.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(newRange);
+                } catch (e) {
+                    // Fallback si le nœud a un problème
                 }
+            }
+
+            const target = savedEditableElement || savedNoteEntry;
+            if (target) {
+                target.dispatchEvent(new Event('input', { bubbles: true }));
             }
         } catch (e) {
             console.error('Error deleting slash text:', e);
@@ -1854,6 +1873,13 @@
 
         if (!actionToExecute) {
             return;
+        }
+
+        // Sur mobile, on restaure le focus avant de supprimer le texte pour s'assurer
+        // que la sélection est bien prise en compte si possible par deleteSlashText.
+        const isMobile = window.innerWidth < 768;
+        if (isMobile && savedEditableElement) {
+            try { savedEditableElement.focus(); } catch (e) { }
         }
 
         // Supprimer le slash et le texte de filtre (sauf si keepSlash est true)
@@ -2367,7 +2393,7 @@
                     }
                 }
             }
-            
+
             // Delete toggle when backspace is pressed on empty header
             if (e.key === 'Backspace') {
                 const selection = window.getSelection();
@@ -2384,7 +2410,7 @@
                 if (header && header.textContent.trim() === '') {
                     e.preventDefault();
                     e.stopPropagation();
-                    
+
                     const toggleBlock = header.closest('.toggle-block');
                     if (toggleBlock) {
                         const parent = toggleBlock.parentNode;
@@ -2394,7 +2420,7 @@
                             p.innerHTML = '<br>';
                             parent.insertBefore(p, toggleBlock);
                             toggleBlock.remove();
-                            
+
                             // Move cursor to the new paragraph
                             const range = document.createRange();
                             range.setStart(p, 0);
