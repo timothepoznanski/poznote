@@ -307,7 +307,20 @@
                 break;
             case 'open-kanban-view': {
                 e.preventDefault();
-                e.stopPropagation();
+                e.stopImmediatePropagation();
+
+                // Check if Kanban on click is disabled via body class
+                if (document.body.classList.contains('disable-kanban-click')) {
+                    // Open folder icon picker instead
+                    const folderId = target.dataset.folderId;
+                    const folderName = target.dataset.folderName || '';
+
+                    if (folderId && folderName && typeof window.showChangeFolderIconModal === 'function') {
+                        window.showChangeFolderIconModal(parseInt(folderId, 10), folderName);
+                    }
+                    break;
+                }
+
                 const kanbanFolderId = target.dataset.folderId;
                 const kanbanFolderName = target.dataset.folderName || '';
 

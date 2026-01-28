@@ -201,7 +201,7 @@
 
             case 'open-folder-icon-picker':
                 event.preventDefault();
-                event.stopPropagation();
+                event.stopImmediatePropagation();
                 var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
                 var folderName = actionElement.getAttribute('data-folder-name');
                 if (folderId && folderName && typeof window.showChangeFolderIconModal === 'function') {
@@ -337,7 +337,7 @@
 
             case 'open-kanban-view':
                 event.preventDefault();
-                event.stopPropagation();
+                event.stopImmediatePropagation();
 
                 // Check if Kanban on click is disabled via body class
                 if (document.body.classList.contains('disable-kanban-click')) {
