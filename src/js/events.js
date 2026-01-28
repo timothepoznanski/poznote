@@ -2495,6 +2495,85 @@ function setupLinkEvents() {
                 var htmlData = e.clipboardData.getData('text/html');
                 var plainText = e.clipboardData.getData('text/plain');
 
+                // Detect and handle iframe HTML (YouTube embeds, etc.)
+                if (plainText) {
+                    // Check if the pasted text is iframe HTML
+                    var iframeMatch = plainText.match(/<iframe\s+([^>]+)>\s*<\/iframe>/i);
+                    if (iframeMatch) {
+                        e.preventDefault();
+
+                        // Parse iframe attributes to validate and filter
+                        var iframeHtml = iframeMatch[0];
+                        var srcMatch = iframeHtml.match(/src\s*=\s*["']([^"']+)["']/i);
+                        
+                        if (srcMatch) {
+                            var src = srcMatch[1];
+                            
+                            // Whitelist of allowed iframe domains (same as PHP markdown parser)
+                            var allowedDomains = [
+                                'youtube.com',
+                                'www.youtube.com',
+                                'youtube-nocookie.com',
+                                'www.youtube-nocookie.com',
+                                'player.vimeo.com',
+                                'vimeo.com'
+                            ];
+                            
+                            var isAllowed = allowedDomains.some(function(domain) {
+                                return src.indexOf('//' + domain) !== -1 || src.indexOf('.' + domain) !== -1;
+                            });
+                            
+                            if (isAllowed) {
+                                // Create actual iframe element from the HTML string
+                                var tempContainer = document.createElement('div');
+                                tempContainer.innerHTML = iframeHtml;
+                                var iframeElement = tempContainer.querySelector('iframe');
+                                
+                                if (iframeElement) {
+                                    // Insert iframe at cursor position
+                                    var selection = window.getSelection();
+                                    if (selection.rangeCount > 0) {
+                                        var range = selection.getRangeAt(0);
+                                        range.deleteContents();
+                                        
+                                        // Create a wrapper for better spacing
+                                        var fragment = document.createDocumentFragment();
+                                        
+                                        // Add line break before
+                                        var lineBefore = document.createElement('div');
+                                        lineBefore.innerHTML = '<br>';
+                                        fragment.appendChild(lineBefore);
+                                        
+                                        // Add the iframe
+                                        fragment.appendChild(iframeElement);
+                                        
+                                        // Add line break after
+                                        var lineAfter = document.createElement('div');
+                                        lineAfter.innerHTML = '<br>';
+                                        fragment.appendChild(lineAfter);
+                                        
+                                        range.insertNode(fragment);
+                                        
+                                        // Move cursor after the inserted content
+                                        range.collapse(false);
+                                        selection.removeAllRanges();
+                                        selection.addRange(range);
+                                    }
+                                    
+                                    // Trigger update
+                                    if (typeof window.markNoteAsModified === 'function') {
+                                        window.markNoteAsModified();
+                                    }
+                                    return;
+                                }
+                            } else {
+                                // Domain not allowed - show warning
+                                console.warn('Iframe domain not in whitelist:', src);
+                            }
+                        }
+                    }
+                }
+
                 // Detect if pasted content is code from VS Code or similar editors
                 // VS Code uses Consolas, Monaco, Courier New, or monospace fonts
                 if (htmlData && (
