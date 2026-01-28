@@ -471,6 +471,8 @@
         "clear": "Effacer la recherche",
         "placeholder_notes": "Rechercher un ou plusieurs mots...",
         "placeholder_tags": "Rechercher un ou plusieurs tags...",
+        "placeholder_combined": "Rechercher dans les notes et les tags...",
+        "toggle_options": "Afficher/masquer les options de recherche",
         "validation": {
             "select_type": "Veuillez sélectionner au moins une option de recherche (Notes ou Tags)",
             "single_letter_warning": "La recherche avec des mots d’une seule lettre peut retourner trop de résultats. Essayez d’utiliser des mots plus longs pour une recherche plus précise."

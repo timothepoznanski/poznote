@@ -30,7 +30,10 @@ try {
     <form id="unified-search-form" action="index.php" method="POST">
         <div class="unified-search-container">
             <div class="searchbar-row searchbar-icon-row">
-                <div class="searchbar-type-icons">
+                <button type="button" id="search-options-toggle" class="searchbar-options-toggle" title="<?php echo t_h('search.toggle_options', [], 'Toggle search options'); ?>">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div class="searchbar-type-icons" id="searchbar-type-icons">
                     <button type="button" id="search-notes-btn" class="searchbar-type-btn searchbar-type-notes active" data-search-type="notes" title="<?php echo t_h('search.search_in_notes', [], 'Search in notes'); ?>">
                         <i class="fas fa-file-alt"></i>
                     </button>
@@ -50,6 +53,7 @@ try {
             <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
             <input type="hidden" id="search-in-notes" name="search_in_notes" value="<?php echo ($using_unified_search && !empty($_POST['search_in_notes']) && $_POST['search_in_notes'] === '1') || (!$using_unified_search && (!empty($search) || $preserve_notes)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search) && !$preserve_tags) ? '1' : ''); ?>">
             <input type="hidden" id="search-in-tags" name="search_in_tags" value="<?php echo ($using_unified_search && !empty($_POST['search_in_tags']) && $_POST['search_in_tags'] === '1') || (!$using_unified_search && (!empty($tags_search) || $preserve_tags)) ? '1' : ''; ?>">
+            <input type="hidden" id="search-combined-mode" name="search_combined" value="<?php echo !empty($_POST['search_combined']) && $_POST['search_combined'] === '1' ? '1' : ''; ?>">
         </div>
     </form>
 </div>

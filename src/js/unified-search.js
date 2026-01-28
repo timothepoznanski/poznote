@@ -45,8 +45,10 @@ class SearchManager {
                 notesTerm: document.getElementById(`search-notes-hidden${suffix}`),
                 tagsFlag: document.getElementById(`search-in-tags${suffix}`),
                 tagsTerm: document.getElementById(`search-tags-hidden${suffix}`),
-                // folders removed
+                combinedMode: document.getElementById(`search-combined-mode${suffix}`)
             },
+            optionsToggle: document.getElementById(`search-options-toggle${suffix}`),
+            typeIconsContainer: document.getElementById(`searchbar-type-icons${suffix}`),
             container: document.querySelector(isMobile ? '.unified-search-container.mobile' : '.unified-search-container')
         };
     }
@@ -86,7 +88,35 @@ class SearchManager {
         if (!this.suppressURLRestore) {
             this.restoreSearchStateFromURL(isMobile);
         }
+        
+        // Initialize combined mode state from hidden input
+        this.restoreCombinedModeState(isMobile);
+        
         this.updateInterface(isMobile);
+    }
+
+    /**
+     * Restore combined mode state from hidden input
+     */
+    restoreCombinedModeState(isMobile) {
+        const elements = this.getElements(isMobile);
+        if (!elements.typeIconsContainer || !elements.optionsToggle) return;
+        
+        // Check if combined mode is enabled
+        const isCombined = elements.hiddenInputs.combinedMode?.value === '1';
+        
+        if (isCombined) {
+            // Hide icons and update toggle state
+            elements.typeIconsContainer.classList.add('hidden');
+            elements.optionsToggle.classList.remove('active');
+            elements.searchInput?.classList.add('search-combined-mode');
+            this.updatePlaceholderForCombinedMode(isMobile);
+        } else {
+            // Show icons - this is the default state
+            elements.typeIconsContainer.classList.remove('hidden');
+            elements.optionsToggle.classList.add('active');
+            elements.searchInput?.classList.remove('search-combined-mode');
+        }
     }
 
     /**
@@ -354,20 +384,137 @@ class SearchManager {
         const searchValue = elements.searchInput?.value.trim() || '';
 
         // Update term-bearing hidden inputs (so AJAX receives the actual search term)
-        // Only set the active type's term input; clear the other to avoid sending both params.
+        // In combined mode, set BOTH term inputs; otherwise only set the active type's term.
+        const isCombinedMode = this.isCombinedModeActive(isMobile);
         if (elements.hiddenInputs.notesTerm) {
-            elements.hiddenInputs.notesTerm.value = activeType === 'notes' ? searchValue : '';
+            elements.hiddenInputs.notesTerm.value = (isCombinedMode || activeType === 'notes') ? searchValue : '';
         }
         if (elements.hiddenInputs.tagsTerm) {
-            elements.hiddenInputs.tagsTerm.value = activeType === 'tags' ? searchValue : '';
+            elements.hiddenInputs.tagsTerm.value = (isCombinedMode || activeType === 'tags') ? searchValue : '';
         }
 
         // Update flag inputs (search-in-*) to reflect active type
+        // In combined mode, both flags should be set
         if (elements.hiddenInputs.notesFlag) {
-            elements.hiddenInputs.notesFlag.value = activeType === 'notes' ? '1' : '';
+            elements.hiddenInputs.notesFlag.value = (isCombinedMode || activeType === 'notes') ? '1' : '';
         }
         if (elements.hiddenInputs.tagsFlag) {
-            elements.hiddenInputs.tagsFlag.value = activeType === 'tags' ? '1' : '';
+            elements.hiddenInputs.tagsFlag.value = (isCombinedMode || activeType === 'tags') ? '1' : '';
+        }
+        if (elements.hiddenInputs.combinedMode) {
+            elements.hiddenInputs.combinedMode.value = isCombinedMode ? '1' : '';
+        }
+    }
+
+    /**
+     * Check if combined search mode is active
+     */
+    isCombinedModeActive(isMobile) {
+        const elements = this.getElements(isMobile);
+        
+        // Check the hidden input value first (most reliable)
+        if (elements.hiddenInputs.combinedMode?.value === '1') {
+            return true;
+        }
+        
+        // Fallback: check if type icons container is hidden
+        if (elements.typeIconsContainer?.classList.contains('hidden')) {
+            return true;
+        }
+        
+        // Also check via CSS class on container
+        const container = elements.container;
+        if (container) {
+            const iconsDiv = container.querySelector('.searchbar-type-icons');
+            if (iconsDiv?.classList.contains('hidden')) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    /**
+     * Toggle combined search mode
+     */
+    toggleCombinedMode(isMobile) {
+        const elements = this.getElements(isMobile);
+        if (!elements.typeIconsContainer || !elements.optionsToggle) return;
+        
+        const isHidden = elements.typeIconsContainer.classList.contains('hidden');
+        
+        if (isHidden) {
+            // Show icons - switch to single mode
+            elements.typeIconsContainer.classList.remove('hidden');
+            elements.optionsToggle.classList.add('active');
+            elements.searchInput?.classList.remove('search-combined-mode');
+            // Update combined mode hidden input immediately
+            if (elements.hiddenInputs.combinedMode) {
+                elements.hiddenInputs.combinedMode.value = '';
+            }
+        } else {
+            // Hide icons - switch to combined mode
+            elements.typeIconsContainer.classList.add('hidden');
+            elements.optionsToggle.classList.remove('active');
+            elements.searchInput?.classList.add('search-combined-mode');
+            // Update combined mode hidden input immediately
+            if (elements.hiddenInputs.combinedMode) {
+                elements.hiddenInputs.combinedMode.value = '1';
+            }
+        }
+        
+        // Update hidden inputs and placeholder
+        this.updateHiddenInputs(isMobile);
+        this.updatePlaceholderForCombinedMode(isMobile);
+        
+        // If there's a search term, perform search immediately
+        if (elements.searchInput?.value.trim()) {
+            const searchValue = elements.searchInput.value.trim();
+            const activeType = this.getActiveSearchType(isMobile);
+            
+            if (!this.validateSearchTerms(searchValue, activeType, isMobile)) {
+                elements.searchInput?.focus();
+                return;
+            }
+            
+            this.performAjaxSearch(elements.form, isMobile);
+        }
+    }
+
+    /**
+     * Apply combined mode highlighting (both notes and tags)
+     */
+    applyCombinedModeHighlighting(isMobile) {
+        const elements = this.getElements(isMobile);
+        const searchTerm = elements.searchInput?.value?.trim() || '';
+        
+        if (!searchTerm) return;
+        
+        // Apply notes highlighting
+        if (typeof highlightSearchTerms === 'function') {
+            try { highlightSearchTerms(); } catch (e) { /* ignore */ }
+        }
+        
+        // Apply tags highlighting
+        if (typeof window.highlightMatchingTags === 'function') {
+            try { window.highlightMatchingTags(searchTerm); } catch (e) { /* ignore */ }
+        }
+    }
+
+    /**
+     * Update placeholder for combined mode
+     */
+    updatePlaceholderForCombinedMode(isMobile) {
+        const elements = this.getElements(isMobile);
+        if (!elements.searchInput) return;
+        
+        const isCombinedMode = this.isCombinedModeActive(isMobile);
+        
+        if (isCombinedMode) {
+            const placeholder = window.t ? window.t('search.placeholder_combined', null, 'Search in notes and tags...') : 'Search in notes and tags...';
+            elements.searchInput.placeholder = placeholder;
+        } else {
+            this.updatePlaceholder(isMobile);
         }
     }
 
@@ -383,6 +530,31 @@ class SearchManager {
         this.setupIconListeners(true);
         this.setupInputListeners(false);
         this.setupInputListeners(true);
+        this.setupOptionsToggleListeners(false);
+        this.setupOptionsToggleListeners(true);
+    }
+
+    /**
+     * Setup options toggle listeners
+     */
+    setupOptionsToggleListeners(isMobile) {
+        const elements = this.getElements(isMobile);
+        if (!elements.optionsToggle) return;
+        
+        const handlerKey = `options-toggle-${isMobile ? 'mobile' : 'desktop'}`;
+        const existingHandler = this.eventHandlers.get(handlerKey);
+        if (existingHandler) {
+            elements.optionsToggle.removeEventListener('click', existingHandler);
+        }
+        
+        const handler = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.toggleCombinedMode(isMobile);
+        };
+        
+        this.eventHandlers.set(handlerKey, handler);
+        elements.optionsToggle.addEventListener('click', handler);
     }
 
     /**
@@ -654,6 +826,11 @@ class SearchManager {
      * Validate search state
      */
     validateSearchState(isMobile) {
+        // In combined mode, search state is always valid
+        if (this.isCombinedModeActive(isMobile)) {
+            return true;
+        }
+        
         const elements = this.getElements(isMobile);
         // If explicit buttons exist in the DOM (older UI with pills), use them
         const buttonsExist = Object.values(elements.buttons).some(b => b !== null && b !== undefined);
@@ -682,8 +859,9 @@ class SearchManager {
      * Validate search terms length
      */
     validateSearchTerms(searchValue, activeType, isMobile) {
-        // Only validate for notes search
-        if (activeType !== 'notes') {
+        // Skip single-letter validation for tags search and combined mode
+        // (tags are usually short)
+        if (activeType === 'tags' || this.isCombinedModeActive(isMobile)) {
             return true;
         }
 
@@ -928,7 +1106,26 @@ class SearchManager {
                     }
 
                     const activeType = this.getActiveSearchType();
-                    if (activeType === 'notes') {
+                    const isCombinedMode = this.isCombinedModeActive(false) || this.isCombinedModeActive(true);
+                    
+                    // In combined mode, apply BOTH notes and tags highlighting
+                    if (isCombinedMode) {
+                        // Highlight notes
+                        if (typeof highlightSearchTerms === 'function') {
+                            try { highlightSearchTerms(); } catch (e) { /* ignore */ }
+                        }
+                        // Highlight tags
+                        if (typeof window.highlightMatchingTags === 'function') {
+                            try {
+                                const desktopElements = this.getElements(false);
+                                const mobileElements = this.getElements(true);
+                                const hiddenTagsTerm = desktopElements.hiddenInputs.tagsTerm?.value || mobileElements.hiddenInputs.tagsTerm?.value || '';
+                                const visibleTerm = (desktopElements.searchInput && desktopElements.searchInput.value) || (mobileElements.searchInput && mobileElements.searchInput.value) || '';
+                                const term = hiddenTagsTerm && hiddenTagsTerm.trim() ? hiddenTagsTerm.trim() : visibleTerm.trim();
+                                window.highlightMatchingTags(term);
+                            } catch (e) { /* ignore */ }
+                        }
+                    } else if (activeType === 'notes') {
                         if (typeof highlightSearchTerms === 'function') {
                             try { highlightSearchTerms(); } catch (e) { /* ignore */ }
                         }
@@ -982,11 +1179,13 @@ class SearchManager {
 
         const desktopState = {
             notes: false,
-            tags: false
+            tags: false,
+            combinedMode: this.isCombinedModeActive(false)
         };
         const mobileState = {
             notes: false,
-            tags: false
+            tags: false,
+            combinedMode: this.isCombinedModeActive(true)
         };
 
         if (desktopButtonsExist) {
@@ -1022,12 +1221,44 @@ class SearchManager {
         // Restore desktop state immediately to avoid intermediate UI reset
         if (state.desktop.notes) this.setActiveSearchType('notes', false);
         else if (state.desktop.tags) this.setActiveSearchType('tags', false);
+        
+        // Restore combined mode for desktop
+        this.restoreCombinedModeFromState(state.desktop, false);
 
         // Restore mobile state immediately
         if (state.mobile.notes) this.setActiveSearchType('notes', true);
         else if (state.mobile.tags) this.setActiveSearchType('tags', true);
+        
+        // Restore combined mode for mobile
+        this.restoreCombinedModeFromState(state.mobile, true);
 
     this.ensureAtLeastOneButtonActive();
+    }
+    
+    /**
+     * Restore combined mode from saved state
+     */
+    restoreCombinedModeFromState(state, isMobile) {
+        if (!state) return;
+        const elements = this.getElements(isMobile);
+        if (!elements.typeIconsContainer || !elements.optionsToggle) return;
+        
+        if (state.combinedMode) {
+            elements.typeIconsContainer.classList.add('hidden');
+            elements.optionsToggle.classList.remove('active');
+            elements.searchInput?.classList.add('search-combined-mode');
+            if (elements.hiddenInputs.combinedMode) {
+                elements.hiddenInputs.combinedMode.value = '1';
+            }
+        } else {
+            elements.typeIconsContainer.classList.remove('hidden');
+            elements.optionsToggle.classList.add('active');
+            elements.searchInput?.classList.remove('search-combined-mode');
+            if (elements.hiddenInputs.combinedMode) {
+                elements.hiddenInputs.combinedMode.value = '';
+            }
+        }
+        this.updatePlaceholderForCombinedMode(isMobile);
     }
 
     /**

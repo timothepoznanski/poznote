@@ -1147,6 +1147,8 @@
         "clear": "Clear search",
         "placeholder_notes": "Search for one or more words...",
         "placeholder_tags": "Search for one or more tags...",
+        "placeholder_combined": "Search in notes and tags...",
+        "toggle_options": "Toggle search options",
         "validation": {
             "select_type": "Please select at least one search option (Notes or Tags)",
             "single_letter_warning": "Searching with single-letter words can return too many results. Try using longer words for a more precise search."

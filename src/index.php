@@ -270,7 +270,7 @@ $body_classes = trim($extra_body_classes);
         
     <?php
     // Construction des conditions de recherche sécurisées
-    $search_conditions = buildSearchConditions($search, $tags_search, $folder_filter, $workspace_filter);
+    $search_conditions = buildSearchConditions($search, $tags_search, $folder_filter, $workspace_filter, $search_combined ?? false);
     $where_clause = $search_conditions['where_clause'];
     $search_params = $search_conditions['search_params'];
     

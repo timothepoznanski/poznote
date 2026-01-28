@@ -158,6 +158,22 @@ body.dark-mode .searchbar-icon {
     color: #e0e0e0;
 }
 
+/* Search options toggle button */
+html[data-theme='dark'] .searchbar-options-toggle,
+body.dark-mode .searchbar-options-toggle {
+    color: #808080;
+}
+
+html[data-theme='dark'] .searchbar-options-toggle:hover,
+body.dark-mode .searchbar-options-toggle:hover {
+    color: #5cb3e9;
+}
+
+html[data-theme='dark'] .searchbar-options-toggle.active,
+body.dark-mode .searchbar-options-toggle.active {
+    color: #5cb3e9;
+}
+
 /* Search type buttons */
 html[data-theme='dark'] .searchbar-type-btn,
 body.dark-mode .searchbar-type-btn {
