@@ -396,6 +396,70 @@ function parseMarkdown(text) {
         return placeholder;
     });
 
+    // Protect iframe tags (for YouTube, Vimeo, and other embeds)
+    // Only allow iframes from trusted sources for security
+    text = text.replace(/<iframe\s+([^>]+)>\s*<\/iframe>/gis, function (match, attrs) {
+        // Extract src attribute to validate the source
+        const srcMatch = attrs.match(/src\s*=\s*["']([^"']+)["']/i);
+        if (srcMatch) {
+            const src = srcMatch[1];
+            
+            // Whitelist of allowed iframe sources (trusted embed providers)
+            const allowedDomains = [
+                'youtube.com', 'www.youtube.com', 'youtube-nocookie.com', 'www.youtube-nocookie.com',
+                'player.vimeo.com', 'vimeo.com',
+                'dailymotion.com', 'www.dailymotion.com',
+                'player.twitch.tv', 'clips.twitch.tv',
+                'open.spotify.com', 'w.soundcloud.com', 'bandcamp.com',
+                'codepen.io', 'jsfiddle.net', 'codesandbox.io', 'stackblitz.com',
+                'docs.google.com', 'drive.google.com', 'maps.google.com', 'www.google.com/maps', 'calendar.google.com',
+                'onedrive.live.com', 'office.com',
+                'twitter.com', 'x.com', 'platform.twitter.com',
+                'linkedin.com', 'slides.com', 'prezi.com', 'canva.com',
+                'figma.com', 'miro.com', 'excalidraw.com',
+                'loom.com', 'wistia.com', 'fast.wistia.net', 'share.descript.com',
+                'rumble.com', 'odysee.com', 'bitchute.com', 'peertube', 'invidio.us', 'piped.video'
+            ];
+            
+            // Check if the src matches any allowed domain
+            const isAllowed = allowedDomains.some(domain => 
+                src.includes('//' + domain) || src.includes('.' + domain)
+            );
+            
+            if (isAllowed) {
+                const placeholder = '\x00PIFRAME' + protectedIndex + '\x00';
+                
+                // Sanitize attributes: only allow safe attributes
+                const safeAttrs = [];
+                const attrRegex = /(\w+)\s*=\s*["']([^"']*)["']/g;
+                let attrMatch;
+                
+                while ((attrMatch = attrRegex.exec(attrs)) !== null) {
+                    const attrName = attrMatch[1].toLowerCase();
+                    const attrValue = attrMatch[2];
+                    
+                    // Only allow safe attributes
+                    if (['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'title', 'loading', 'referrerpolicy', 'sandbox', 'style', 'class'].includes(attrName)) {
+                        safeAttrs.push(attrName + '="' + attrValue + '"');
+                    }
+                }
+                
+                // Handle boolean attributes like allowfullscreen
+                if (/allowfullscreen/i.test(attrs) && !safeAttrs.some(attr => attr.startsWith('allowfullscreen'))) {
+                    safeAttrs.push('allowfullscreen');
+                }
+                
+                const iframeTag = '<iframe ' + safeAttrs.join(' ') + '></iframe>';
+                protectedElements[protectedIndex] = iframeTag;
+                protectedIndex++;
+                return placeholder;
+            }
+        }
+        
+        // If not allowed, return the original (will be escaped)
+        return match;
+    });
+
     // Now escape HTML to prevent XSS
     let html = text
         .replace(/&/g, '&amp;')
@@ -433,8 +497,8 @@ function parseMarkdown(text) {
             return protectedCode[parseInt(index)] || match;
         });
 
-        // Restore protected elements (images, links, spans, and details tags)
-        text = text.replace(/\x00P(IMG|LNK|SPAN|TAG)(\d+)\x00/g, function (match, type, index) {
+        // Restore protected elements (images, links, spans, tags, and iframes)
+        text = text.replace(/\x00P(IMG|LNK|SPAN|TAG|IFRAME)(\d+)\x00/g, function (match, type, index) {
             return protectedElements[parseInt(index)] || match;
         });
 
