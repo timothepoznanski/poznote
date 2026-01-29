@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Poznote URL Saver</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 10px;
+      width: 350px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 5px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 15px;
+      width: 100%;
+      padding: 10px;
+      background: #4285f4;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #3367d6;
+    }
+
+    #status {
+      margin-top: 10px;
+      color: red;
+      word-wrap: break-word;
+    }
+
+    .row {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+
+    #fetchWorkspaces,
+    #loadFolders {
+      width: auto;
+      margin-top: 5px;
+      padding: 5px 10px;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Poznote Url Saver</h2>
+  <label>App URL (e.g. https://your-server/)</label>
+  <input type="url" id="appUrl" placeholder="https://your-server/">
+
+  <label>Username</label>
+  <input type="text" id="username">
+
+  <label>Password</label>
+  <input type="password" id="password">
+
+  <label>Workspace</label>
+  <div class="row">
+    <select id="workspaceSelect">
+      <option value="Poznote">Poznote (Default)</option>
+    </select>
+    <button id="fetchWorkspaces" title="Fetch Workspaces">↻</button>
+  </div>
+
+  <label>Folder</label>
+  <div class="row">
+    <select id="folderSelect">
+      <option value="">📁 Root (No Folder)</option>
+    </select>
+    <button id="loadFolders" title="Load Folders">↻</button>
+  </div>
+
+  <button id="saveConfig">Save Configuration</button>
+
+  <button id="saveNote">Save URL to Note</button>
+
+  <div id="status"></div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>
