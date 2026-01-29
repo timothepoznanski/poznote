@@ -469,7 +469,14 @@
         "toggle": "Toggle",
         "toggle_placeholder": "Toggle",
         "toggle_content_placeholder": "Write inside the toggle here…",
-        "toggle_after_placeholder": "Write outside the toggle here…"
+        "toggle_after_placeholder": "Write outside the toggle here…",
+        "youtube_video": "YouTube video",
+        "youtube_modal_title": "Insert YouTube Video",
+        "youtube_url_label": "YouTube URL or Video ID:",
+        "youtube_url_prompt": "Enter YouTube video URL or ID:",
+        "youtube_help": "Supports: youtube.com/watch?v=ID, youtu.be/ID, or just the video ID",
+        "youtube_insert": "Insert",
+        "youtube_invalid_url": "Invalid YouTube URL"
     },
     "api": {
         "settings": {
@@ -1147,6 +1154,8 @@
         "clear": "Clear search",
         "placeholder_notes": "Search for one or more words...",
         "placeholder_tags": "Search for one or more tags...",
+        "placeholder_combined": "Search in notes and tags...",
+        "toggle_options": "Toggle search options",
         "validation": {
             "select_type": "Please select at least one search option (Notes or Tags)",
             "single_letter_warning": "Searching with single-letter words can return too many results. Try using longer words for a more precise search."
@@ -1291,6 +1300,7 @@
             "pull_error": "Pull failed: {{error}}"
         },
         "debug": {
+            "title": "Debug Info",
             "show": "Show Debug Info",
             "hide": "Hide Debug Info",
             "copy": "Copy Debug",

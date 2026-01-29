@@ -1,5 +1,5 @@
 // Theme initialization - runs synchronously in <head> to prevent FOUC
-(function() {
+(function () {
     try {
         var t = localStorage.getItem('poznote-theme');
         if (!t) {
@@ -8,7 +8,7 @@
         var r = document.documentElement;
         r.setAttribute('data-theme', t);
         r.style.colorScheme = t === 'dark' ? 'dark' : 'light';
-        r.style.backgroundColor = t === 'dark' ? '#1a1a1a' : '#ffffff';
+        r.style.backgroundColor = t === 'dark' ? '#252526' : '#ffffff';
         // Add theme class for pages that need it (settings, display)
         if (t === 'dark') {
             r.classList.add('theme-dark');

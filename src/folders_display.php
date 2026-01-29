@@ -4,6 +4,22 @@
  */
 
 /**
+ * Calculate total number of notes in a folder and all its subfolders recursively
+ */
+function countNotesRecursively($folderData) {
+    $count = count($folderData['notes']);
+    
+    // Add notes from all subfolders
+    if (isset($folderData['children']) && !empty($folderData['children'])) {
+        foreach ($folderData['children'] as $childData) {
+            $count += countNotesRecursively($childData);
+        }
+    }
+    
+    return $count;
+}
+
+/**
  * Organize notes by folder
  * Now returns array with 'folders' and 'uncategorized_notes' keys
  * OPTIMIZED: Pre-load all folder data to avoid N+1 queries
@@ -162,9 +178,14 @@ function sortFolders($folders) {
 
 /**
  * Determines if a folder should be open
- * Now accepts both folder ID and name
+ * Now accepts the full folder data array
  */
-function shouldFolderBeOpen($con, $folderId, $folderName, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes) {
+function shouldFolderBeOpen($con, $folderData, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes) {
+    if (!$folderData) return false;
+    
+    $folderId = $folderData['id'];
+    $folderName = $folderData['name'];
+
     // Favorites folder is always open
     if ($folderName === 'Favorites') {
         return true;
@@ -182,8 +203,11 @@ function shouldFolderBeOpen($con, $folderId, $folderName, $is_search_mode, $fold
         // If we have very few notes (demo notes just created), open all folders
         return true;
     } else if($is_search_mode) {
-        // In search mode: open folders that have results
-        return isset($folders_with_results[$folderName]);
+        // In search mode: open folders that have results (direct or in subfolders)
+        if (isset($folders_with_results[$folderName])) {
+            return true;
+        }
+        return countNotesRecursively($folderData) > 0;
     } else if($note != '') {
         // If a note is selected: open the folder of the current note
         if ($folderName === $current_note_folder) {
@@ -306,7 +330,7 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
 /**
  * Génère le lien pour une note en préservant l'état de recherche
  */
-function generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $note_id) {
+function generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $note_id, $search_combined = false) {
     $params = [];
     if (!empty($search)) $params[] = 'search=' . urlencode($search);
     if (!empty($tags_search)) $params[] = 'tags_search=' . urlencode($tags_search);
@@ -314,6 +338,7 @@ function generateNoteLink($search, $tags_search, $folder_filter, $workspace_filt
     if (!empty($workspace_filter)) $params[] = 'workspace=' . urlencode($workspace_filter);
     if ($preserve_notes) $params[] = 'preserve_notes=1';
     if ($preserve_tags) $params[] = 'preserve_tags=1';
+    if ($search_combined) $params[] = 'search_combined=1';
     $params[] = 'note=' . intval($note_id);
     
     return 'index.php?' . implode('&', $params);

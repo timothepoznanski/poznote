@@ -270,7 +270,7 @@ $body_classes = trim($extra_body_classes);
         
     <?php
     // Construction des conditions de recherche sécurisées
-    $search_conditions = buildSearchConditions($search, $tags_search, $folder_filter, $workspace_filter);
+    $search_conditions = buildSearchConditions($search, $tags_search, $folder_filter, $workspace_filter, $search_combined ?? false);
     $where_clause = $search_conditions['where_clause'];
     $search_params = $search_conditions['search_params'];
     
@@ -772,6 +772,10 @@ $body_classes = trim($extra_body_classes);
                     } else {
                         // For all other notes (HTML, Excalidraw), use the file content directly
                         $display_content = $entryfinal;
+                        
+                        // Unescape iframe tags if they were HTML-escaped in the content
+                        // This allows iframes to render properly when pasted via API or older versions
+                        $display_content = unescapeIframesInHtml($display_content);
                     }
                     
                     // All notes are now editable, including Excalidraw notes

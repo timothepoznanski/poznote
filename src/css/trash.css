@@ -467,8 +467,18 @@ body.trash-page {
         margin-bottom: 15px;
     }
 
+    .trash-filter-bar {
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .filter-input-wrapper {
+        flex: 0 0 95%;
+        max-width: 95%;
+    }
+
     .trash-search-input {
-        width: 80% !important;
+        width: 100% !important;
         font-size: 1.1em;
         padding: 12px;
         margin: 10px 0;
@@ -478,6 +488,7 @@ body.trash-page {
         justify-content: center;
         margin: 15px 10px;
         gap: 30px;
+        padding-left: 0;
     }
 
 
@@ -541,15 +552,15 @@ body.trash-page {
 html[data-theme='dark'] body.trash-page,
 [data-theme='dark'] body.trash-page,
 body.dark-mode.trash-page {
-    background-color: #1a1a1a !important;
-    background: #1a1a1a !important;
+    background-color: #252526 !important;
+    background: #252526 !important;
     color: #e0e0e0;
 }
 
 html[data-theme='dark'] .trash-search-input,
 [data-theme='dark'] .trash-search-input,
 body.dark-mode .trash-search-input {
-    background-color: #2a2a2a !important;
+    background-color: #333333 !important;
     color: #e0e0e0 !important;
     border-color: #404040 !important;
 }
@@ -560,13 +571,13 @@ body.dark-mode .trash-search-input {
 
 html[data-theme='dark'] .trash-notecard,
 body.dark-mode .trash-notecard {
-    background-color: #242424 !important;
+    background-color: #333333 !important;
     border-color: #333 !important;
 }
 
 html[data-theme='dark'] .trash-innernote,
 body.dark-mode .trash-innernote {
-    /* background-color: #242424 !important; */
+    /* background-color: #333333 !important; */
     color: #e0e0e0;
 }
 

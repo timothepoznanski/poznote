@@ -80,7 +80,7 @@
 
 [data-theme="dark"] .public-folder-body,
 [data-theme="dark"].public-folder-html {
-    --bg-color: #1a1a1a;
+    --bg-color: #252526;
     --text-color: #e0e0e0;
     --link-color: #6db3f2;
     --border-color: #333;
@@ -424,6 +424,15 @@
     border-top: 1px solid var(--border-color);
 }
 
+.note-full-content iframe {
+    width: 100% !important;
+    max-width: 100%;
+    height: auto !important;
+    aspect-ratio: 16 / 9;
+    border: none;
+    border-radius: 8px;
+}
+
 .expand-note-btn {
     background: var(--primary-color);
     color: white;
@@ -481,7 +490,7 @@
 
 /* Dark mode support */
 [data-theme="dark"] {
-    --note-bg: #2a2a2a;
+    --note-bg: #333333;
     --text-color: #e0e0e0;
     --text-muted: #999;
     --border-color: #444;

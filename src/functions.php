@@ -1052,4 +1052,58 @@ function repairDatabaseEntries($con) {
         return ['success' => false, 'error' => $e->getMessage()];
     }
 }
+
+/**
+ * Unescape iframe HTML entities in content
+ * This fixes notes that were created with HTML-escaped iframe tags
+ * (e.g., &lt;iframe&gt; becomes <iframe>)
+ * Only unescapes iframes from whitelisted domains for security
+ */
+function unescapeIframesInHtml($content) {
+    if (empty($content)) {
+        return $content;
+    }
+    
+    // Find escaped iframe tags: &lt;iframe...&gt;&lt;/iframe&gt;
+    $pattern = '/&lt;iframe\s+([^&]+)&gt;\s*&lt;\/iframe&gt;/i';
+    
+    return preg_replace_callback($pattern, function($matches) {
+        $escapedAttrs = $matches[1];
+        // Unescape the attributes
+        $attrs = html_entity_decode($escapedAttrs, ENT_QUOTES, 'UTF-8');
+        
+        // Extract src attribute to validate domain
+        if (preg_match('/src\s*=\s*["\']([^"\']+)["\']/i', $attrs, $srcMatch)) {
+            $src = $srcMatch[1];
+            
+            // Whitelist of allowed iframe domains (same as markdown parser)
+            $allowedDomains = [
+                'youtube.com',
+                'www.youtube.com',
+                'youtube-nocookie.com',
+                'www.youtube-nocookie.com',
+                'player.vimeo.com',
+                'vimeo.com',
+            ];
+            
+            // Check if domain is whitelisted
+            $isAllowed = false;
+            foreach ($allowedDomains as $domain) {
+                if (stripos($src, '//' . $domain) !== false || stripos($src, '.' . $domain) !== false) {
+                    $isAllowed = true;
+                    break;
+                }
+            }
+            
+            if ($isAllowed) {
+                // Return unescaped iframe
+                return '<iframe ' . $attrs . '></iframe>';
+            }
+        }
+        
+        // If not whitelisted, keep it escaped for security
+        return $matches[0];
+    }, $content);
+}
 ?>
+

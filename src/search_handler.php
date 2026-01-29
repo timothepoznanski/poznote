@@ -9,11 +9,17 @@ function handleUnifiedSearch() {
         $unified_search = $_POST['unified_search'];
         $search_in_notes = isset($_POST['search_in_notes']) && $_POST['search_in_notes'] !== '';
         $search_in_tags = isset($_POST['search_in_tags']) && $_POST['search_in_tags'] !== '';
+        $search_combined = isset($_POST['search_combined']) && $_POST['search_combined'] === '1';
         
         $using_unified_search = true;
         
+        // Combined mode: search in both notes and tags
+        if ($search_combined) {
+            $search = $unified_search;
+            $tags_search = $unified_search;
+        }
         // Only proceed if at least one option is selected
-        if ($search_in_notes || $search_in_tags) {
+        else if ($search_in_notes || $search_in_tags) {
             // Set search values based on selected options
             if ($search_in_notes) {
                 $search = $unified_search;
@@ -58,9 +64,15 @@ function parseSearchTerms($search) {
 /**
  * Build secure search conditions
  */
-function buildSearchConditions($search, $tags_search, $folder_filter, $workspace_filter) {
+function buildSearchConditions($search, $tags_search, $folder_filter, $workspace_filter, $combined_mode = false) {
     $where_conditions = ["trash = 0"];
     $search_params = [];
+    
+    // For combined mode, we want notes OR tags, so we collect them separately
+    $notes_condition = null;
+    $notes_params = [];
+    $tags_condition = null;
+    $tags_params = [];
     
     // Intelligent search that excludes Excalidraw content
     // Optimized: Check heading first (indexed), then entry content (slower)
@@ -72,10 +84,10 @@ function buildSearchConditions($search, $tags_search, $folder_filter, $workspace
             // Single word: Optimized search - check heading first (fast with index), then entry (slower)
             // Using CASE to avoid calling search_clean_entry when heading matches
             // Accent-insensitive search using remove_accents function
-            $where_conditions[] = "(remove_accents(heading) LIKE remove_accents(?) OR (remove_accents(heading) NOT LIKE remove_accents(?) AND remove_accents(search_clean_entry(entry)) LIKE remove_accents(?)))";
-            $search_params[] = '%' . $parsed_terms[0]['value'] . '%';
-            $search_params[] = '%' . $parsed_terms[0]['value'] . '%';
-            $search_params[] = '%' . $parsed_terms[0]['value'] . '%';
+            $notes_condition = "(remove_accents(heading) LIKE remove_accents(?) OR (remove_accents(heading) NOT LIKE remove_accents(?) AND remove_accents(search_clean_entry(entry)) LIKE remove_accents(?)))";
+            $notes_params[] = '%' . $parsed_terms[0]['value'] . '%';
+            $notes_params[] = '%' . $parsed_terms[0]['value'] . '%';
+            $notes_params[] = '%' . $parsed_terms[0]['value'] . '%';
         } else {
             // Multiple terms or phrase: require ALL terms to appear (AND)
             // Optimized to check heading first for each term
@@ -83,11 +95,11 @@ function buildSearchConditions($search, $tags_search, $folder_filter, $workspace
             $term_conditions = [];
             foreach ($parsed_terms as $term) {
                 $term_conditions[] = "(remove_accents(heading) LIKE remove_accents(?) OR (remove_accents(heading) NOT LIKE remove_accents(?) AND remove_accents(search_clean_entry(entry)) LIKE remove_accents(?)))";
-                $search_params[] = '%' . $term['value'] . '%';
-                $search_params[] = '%' . $term['value'] . '%';
-                $search_params[] = '%' . $term['value'] . '%';
+                $notes_params[] = '%' . $term['value'] . '%';
+                $notes_params[] = '%' . $term['value'] . '%';
+                $notes_params[] = '%' . $term['value'] . '%';
             }
-            $where_conditions[] = "(" . implode(" AND ", $term_conditions) . ")";
+            $notes_condition = "(" . implode(" AND ", $term_conditions) . ")";
         }
     }
     
@@ -97,16 +109,33 @@ function buildSearchConditions($search, $tags_search, $folder_filter, $workspace
         
         if (count($search_tags) == 1) {
             // Single tag search - accent-insensitive
-            $where_conditions[] = "remove_accents(tags) LIKE remove_accents(?)";
-            $search_params[] = '%' . $search_tags[0] . '%';
+            $tags_condition = "remove_accents(tags) LIKE remove_accents(?)";
+            $tags_params[] = '%' . $search_tags[0] . '%';
         } else {
             // Multiple tags search - all tags must be present - accent-insensitive
             $tag_conditions = [];
             foreach ($search_tags as $tag) {
                 $tag_conditions[] = "remove_accents(tags) LIKE remove_accents(?)";
-                $search_params[] = '%' . $tag . '%';
+                $tags_params[] = '%' . $tag . '%';
             }
-            $where_conditions[] = "(" . implode(" AND ", $tag_conditions) . ")";
+            $tags_condition = "(" . implode(" AND ", $tag_conditions) . ")";
+        }
+    }
+    
+    // Combine notes and tags conditions based on mode
+    if ($combined_mode && $notes_condition && $tags_condition) {
+        // Combined mode: search for notes OR tags match
+        $where_conditions[] = "(" . $notes_condition . " OR " . $tags_condition . ")";
+        $search_params = array_merge($search_params, $notes_params, $tags_params);
+    } else {
+        // Standard mode: both conditions must match (AND)
+        if ($notes_condition) {
+            $where_conditions[] = $notes_condition;
+            $search_params = array_merge($search_params, $notes_params);
+        }
+        if ($tags_condition) {
+            $where_conditions[] = $tags_condition;
+            $search_params = array_merge($search_params, $tags_params);
         }
     }
     

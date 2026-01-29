@@ -83,7 +83,7 @@
     function setTheme(theme) {
         root.setAttribute('data-theme', theme);
         root.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
-        root.style.backgroundColor = theme === 'dark' ? '#1a1a1a' : '#ffffff';
+        root.style.backgroundColor = theme === 'dark' ? '#252526' : '#ffffff';
         
         try {
             localStorage.setItem('poznote-public-theme', theme);

@@ -12,7 +12,7 @@
     root.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
 
     // Ensure initial background matches theme to avoid flash
-    root.style.backgroundColor = theme === 'dark' ? '#1a1a1a' : '#ffffff';
+    root.style.backgroundColor = theme === 'dark' ? '#252526' : '#ffffff';
   } catch (e) {
     // no-op
   }

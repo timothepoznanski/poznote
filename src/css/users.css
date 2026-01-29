@@ -16,9 +16,9 @@
 
 html[data-theme='dark'],
 body.dark-mode {
-    --bg-color: #1a1a1a;
-    --bg-secondary: #242424;
-    --bg-hover: #2d2d2d;
+    --bg-color: #252526;
+    --bg-secondary: #333333;
+    --bg-hover: #333333;
     --text-color: #e0e0e0;
     --text-muted: #a0a0a0;
     --border-color: #333;

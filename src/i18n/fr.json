@@ -471,6 +471,8 @@
         "clear": "Effacer la recherche",
         "placeholder_notes": "Rechercher un ou plusieurs mots...",
         "placeholder_tags": "Rechercher un ou plusieurs tags...",
+        "placeholder_combined": "Rechercher dans les notes et les tags...",
+        "toggle_options": "Afficher/masquer les options de recherche",
         "validation": {
             "select_type": "Veuillez sélectionner au moins une option de recherche (Notes ou Tags)",
             "single_letter_warning": "La recherche avec des mots d’une seule lettre peut retourner trop de résultats. Essayez d’utiliser des mots plus longs pour une recherche plus précise."
@@ -946,7 +948,14 @@
         "color_purple": "Violet",
         "color_orange": "Orange",
         "color_black": "Noir",
-        "bg_yellow": "Surlignage jaune"
+        "bg_yellow": "Surlignage jaune",
+        "youtube_video": "Vidéo YouTube",
+        "youtube_modal_title": "Insérer une vidéo YouTube",
+        "youtube_url_label": "URL ou ID de la vidéo YouTube :",
+        "youtube_url_prompt": "Entrez l'URL ou l'ID de la vidéo YouTube :",
+        "youtube_help": "Formats supportés : youtube.com/watch?v=ID, youtu.be/ID, ou juste l'ID",
+        "youtube_insert": "Insérer",
+        "youtube_invalid_url": "URL YouTube invalide"
     },
     "api": {
         "settings": {
@@ -1868,7 +1877,7 @@
     },
     "github_sync": {
         "title": "Synchronisation GitHub",
-        "description": "Push your notes to GitHub or pull notes from an existing repository. Un repository est égal à un profil. Les workspaces seront des folder à la racine du repo",
+        "description": "Poussez vos notes vers GitHub ou récupérez des notes depuis un dépôt existant. Un dépôt correspond à un profil utilisateur. Les espaces de travail seront organisés en dossiers à la racine du dépôt.",
         "warning": "Ne vous servez pas de cette fonctionnalité comme seule solution de sauvegarde.\nPensez à mettre en place des exports manuels ou automatiques de fichiers ZIP de vos notes.",
         "confirm_push": "Pousser les notes de l’espace « {{workspace}} » vers GitHub ? Met à jour les fichiers existants et supprime ceux qui n'existent plus dans Poznote.",
         "confirm_pull": "Récupérer les notes de l’espace « {{workspace}} » depuis GitHub ? Importe les notes depuis GitHub. Met à jour les notes existantes et déplace vers la corbeille celles qui n'existent plus sur GitHub.",
@@ -1922,6 +1931,7 @@
             "pull_error": "Échec de la récupération : {{error}}"
         },
         "debug": {
+            "title": "Informations de debug",
             "show": "Afficher les infos de debug",
             "hide": "Masquer les infos de debug",
             "copy": "Copier le debug",

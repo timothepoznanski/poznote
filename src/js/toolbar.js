@@ -286,13 +286,9 @@ function changeFontSize() {
     return;
   }
 
-  // Save the current selection before opening popup
+  // Save the current selection before opening popup - declare in function scope
   const selection = window.getSelection();
-  let savedRange = null;
-  
-  if (selection.rangeCount > 0) {
-    savedRange = selection.getRangeAt(0).cloneRange();
-  }
+  const savedRange = selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null;
   
   // Check if we have selected text
   const hasSelection = savedRange && !savedRange.collapsed;
@@ -363,19 +359,44 @@ function changeFontSize() {
     item.addEventListener('click', (e) => {
       e.stopPropagation();
       const size = item.getAttribute('data-size');
+      const fontSize = getFontSizeFromValue(size);
       
       // Ensure editor has focus
       const editor = document.querySelector('[contenteditable="true"]');
-      if (editor) {
+      if (editor && savedRange) {
         editor.focus();
         
         // Restore the saved selection
-        if (savedRange) {
-          const selection = window.getSelection();
-          selection.removeAllRanges();
-          selection.addRange(savedRange);
-          // Apply font size to the restored selection
-          document.execCommand('fontSize', false, size);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(savedRange);
+        
+        // Apply font size by wrapping selection in span with CSS class instead of inline style
+        const range = selection.getRangeAt(0);
+        const span = document.createElement('span');
+        // Use cssText to set font-size with !important to prevent override
+        span.style.cssText = 'font-size: ' + fontSize + ' !important';
+        
+        try {
+          range.surroundContents(span);
+        } catch (surroundErr) {
+          // If surroundContents fails (partial selections), use insertNode
+          const docFrag = range.cloneContents();
+          span.appendChild(docFrag);
+          range.deleteContents();
+          range.insertNode(span);
+        }
+        
+        // Remove selection (place cursor at the end of modified text)
+        selection.removeAllRanges();
+        const newRange = document.createRange();
+        newRange.setStartAfter(span);
+        newRange.collapse(true);
+        selection.addRange(newRange);
+        
+        // Trigger update callback
+        if (typeof window.update === 'function') {
+          window.update();
         }
       }
       

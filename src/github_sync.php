@@ -216,7 +216,7 @@ try {
             </button>
         </div>
         <div id="debug-info" class="debug-info" style="display: none; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 15px; margin: 20px 0; max-height: 300px; overflow-y: auto;">
-            <h4 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 600;">Debug Info:</h4>
+            <h4 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 600;"><?php echo t_h('github_sync.debug.title'); ?>:</h4>
             <pre style="margin: 0; font-size: 12px; white-space: pre-wrap; word-wrap: break-word; font-family: monospace; text-align: left;"><?php echo htmlspecialchars(implode("\n", $result['debug'])); ?></pre>
         </div>
         <script>

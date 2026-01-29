@@ -8,7 +8,7 @@
     try {
         var theme = localStorage.getItem('poznote-theme') || 'light';
         document.documentElement.setAttribute('data-theme', theme);
-        document.documentElement.style.backgroundColor = theme === 'dark' ? '#1a1a1a' : '#ffffff';
+        document.documentElement.style.backgroundColor = theme === 'dark' ? '#252526' : '#ffffff';
     } catch (e) {
         // Fallback silently
     }

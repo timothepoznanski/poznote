@@ -44,6 +44,11 @@ function initializeSearchParams() {
     // Handle search type preservation when clearing search
     $preserve_notes = isset($_GET['preserve_notes']) && $_GET['preserve_notes'] === '1';
     $preserve_tags = isset($_GET['preserve_tags']) && $_GET['preserve_tags'] === '1';
+    
+    // Handle combined search mode - check both POST and GET
+    $search_combined = (isset($_POST['search_combined']) && $_POST['search_combined'] === '1') ||
+                       (isset($_GET['search_combined']) && $_GET['search_combined'] === '1');
+    
     return [
         'search' => $search,
         'tags_search' => $tags_search,
@@ -51,7 +56,8 @@ function initializeSearchParams() {
         'folder_filter' => $folder_filter,
         'workspace_filter' => getWorkspaceFilter(),
         'preserve_notes' => $preserve_notes,
-        'preserve_tags' => $preserve_tags
+        'preserve_tags' => $preserve_tags,
+        'search_combined' => $search_combined
     ];
 }
 

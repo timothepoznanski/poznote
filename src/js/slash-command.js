@@ -1028,6 +1028,16 @@
                 }
             },
             {
+                id: 'youtube',
+                icon: 'fa-video',
+                label: t('slash_menu.youtube_video', null, 'YouTube video'),
+                action: function () {
+                    if (typeof window.insertYouTubeVideo === 'function') {
+                        window.insertYouTubeVideo();
+                    }
+                }
+            },
+            {
                 id: 'separator',
                 icon: 'fa-minus',
                 label: t('slash_menu.separator', null, 'Separator'),
@@ -1259,6 +1269,16 @@
                 label: t('slash_menu.table', null, 'Table'),
                 action: function () {
                     insertMarkdownAtCursor('| Column | Column |\n| --- | --- |\n|  |  |\n', 0);
+                }
+            },
+            {
+                id: 'youtube',
+                icon: 'fa-video',
+                label: t('slash_menu.youtube_video', null, 'YouTube video'),
+                action: function () {
+                    if (typeof window.insertYouTubeVideoMarkdown === 'function') {
+                        window.insertYouTubeVideoMarkdown();
+                    }
                 }
             },
             {
@@ -1760,39 +1780,58 @@
 
     function deleteSlashText() {
         try {
-            if (!slashTextNode || slashOffset < 0) {
+            if (!slashTextNode || slashOffset < 0 || !slashTextNode.parentNode) {
                 return;
             }
 
             // Obtenir la position actuelle du curseur
             const sel = window.getSelection();
-            if (!sel || !sel.rangeCount) {
-                return;
+            let currentOffset = -1;
+
+            if (sel && sel.rangeCount > 0) {
+                const currentRange = sel.getRangeAt(0);
+                // On vérifie si on est dans le bon nœud
+                if (currentRange.startContainer === slashTextNode) {
+                    currentOffset = currentRange.startOffset;
+                }
             }
 
-            const currentRange = sel.getRangeAt(0);
-            const currentOffset = currentRange.startOffset;
-            const currentNode = currentRange.startContainer;
+            // Si on n'a pas pu obtenir l'offset (ex: mobile blurred), on utilise filterText
+            if (currentOffset === -1) {
+                const textContent = slashTextNode.textContent || '';
+                // L'offset de fin est slashOffset + 1 (pour le '/') + longueur du filtre
+                // On utilise la longueur actuelle du texte après le slash comme fallback
+                const textAfterSlash = textContent.substring(slashOffset + 1);
+                const spaceIndex = textAfterSlash.search(/[\s\n]/);
+                const actualFilterLength = spaceIndex >= 0 ? spaceIndex : textAfterSlash.length;
+                currentOffset = slashOffset + 1 + actualFilterLength;
+            }
 
-            // Si on est toujours dans le même nœud texte
-            if (currentNode === slashTextNode && currentNode.nodeType === 3) {
-                // Supprimer depuis le slash jusqu'à la position actuelle
-                const text = slashTextNode.textContent;
-                const before = text.substring(0, slashOffset);
-                const after = text.substring(currentOffset);
-                slashTextNode.textContent = before + after;
+            const text = slashTextNode.textContent;
+            // Sécurité : on ne veut pas supprimer moins que le slash lui-même
+            const safeEndOffset = Math.max(slashOffset + 1, Math.min(text.length, currentOffset));
 
-                // Replacer le curseur
+            const before = text.substring(0, slashOffset);
+            const after = text.substring(safeEndOffset);
+            slashTextNode.textContent = before + after;
+
+            // Replacer le curseur là où le slash a été supprimé
+            if (sel) {
                 const newRange = document.createRange();
-                newRange.setStart(slashTextNode, before.length);
-                newRange.collapse(true);
-                sel.removeAllRanges();
-                sel.addRange(newRange);
-
-                const target = savedEditableElement || savedNoteEntry;
-                if (target) {
-                    target.dispatchEvent(new Event('input', { bubbles: true }));
+                try {
+                    const finalPos = Math.min(slashTextNode.textContent.length, slashOffset);
+                    newRange.setStart(slashTextNode, finalPos);
+                    newRange.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(newRange);
+                } catch (e) {
+                    // Fallback si le nœud a un problème
                 }
+            }
+
+            const target = savedEditableElement || savedNoteEntry;
+            if (target) {
+                target.dispatchEvent(new Event('input', { bubbles: true }));
             }
         } catch (e) {
             console.error('Error deleting slash text:', e);
@@ -1854,6 +1893,13 @@
 
         if (!actionToExecute) {
             return;
+        }
+
+        // Sur mobile, on restaure le focus avant de supprimer le texte pour s'assurer
+        // que la sélection est bien prise en compte si possible par deleteSlashText.
+        const isMobile = window.innerWidth < 768;
+        if (isMobile && savedEditableElement) {
+            try { savedEditableElement.focus(); } catch (e) { }
         }
 
         // Supprimer le slash et le texte de filtre (sauf si keepSlash est true)
@@ -2367,7 +2413,7 @@
                     }
                 }
             }
-            
+
             // Delete toggle when backspace is pressed on empty header
             if (e.key === 'Backspace') {
                 const selection = window.getSelection();
@@ -2384,7 +2430,7 @@
                 if (header && header.textContent.trim() === '') {
                     e.preventDefault();
                     e.stopPropagation();
-                    
+
                     const toggleBlock = header.closest('.toggle-block');
                     if (toggleBlock) {
                         const parent = toggleBlock.parentNode;
@@ -2394,7 +2440,7 @@
                             p.innerHTML = '<br>';
                             parent.insertBefore(p, toggleBlock);
                             toggleBlock.remove();
-                            
+
                             // Move cursor to the new paragraph
                             const range = document.createRange();
                             range.setStart(p, 0);
@@ -2473,9 +2519,185 @@
         window.hideSlashMenu = hideSlashMenu;
     }
 
+    // YouTube video insertion functions (exposed globally)
+    window.insertYouTubeVideo = function() {
+        const t = window.t || ((key, params, fallback) => fallback);
+        
+        if (typeof window.showYouTubeModal !== 'function') {
+            // Fallback to prompt if modal not available
+            const url = prompt(t('slash_menu.youtube_url_prompt', null, 'Enter YouTube video URL or ID:'), 'https://www.youtube.com/watch?v=');
+            if (url) processYouTubeUrl(url, false, null, null, null);
+            return;
+        }
+        
+        // Save the note entry and editable element before they get cleared
+        const noteEntry = savedNoteEntry;
+        const editableElement = savedEditableElement;
+
+        // Save the current range/position
+        let savedRange = null;
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+            savedRange = sel.getRangeAt(0).cloneRange();
+        }
+        
+        window.showYouTubeModal(function(url) {
+            processYouTubeUrl(url, false, editableElement, savedRange, noteEntry);
+        });
+    };
+
+    window.insertYouTubeVideoMarkdown = function() {
+        const t = window.t || ((key, params, fallback) => fallback);
+        
+        if (typeof window.showYouTubeModal !== 'function') {
+            // Fallback to prompt if modal not available
+            const url = prompt(t('slash_menu.youtube_url_prompt', null, 'Enter YouTube video URL or ID:'), 'https://www.youtube.com/watch?v=');
+            if (url) processYouTubeUrl(url, true, null, null, null);
+            return;
+        }
+        
+        // Save the note entry and editable element before they get cleared
+        const noteEntry = savedNoteEntry;
+        const editableElement = savedEditableElement;
+
+        // Save the current range/position
+        let savedRange = null;
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+            savedRange = sel.getRangeAt(0).cloneRange();
+        }
+        
+        window.showYouTubeModal(function(url) {
+            processYouTubeUrl(url, true, editableElement, savedRange, noteEntry);
+        });
+    };
+    
+    // Helper function to process YouTube URL and insert iframe
+    function processYouTubeUrl(url, isMarkdown, editableElement, savedRange, noteEntry) {
+        const t = window.t || ((key, params, fallback) => fallback);
+        
+        if (!url) return;
+        
+        // Extract video ID from various YouTube URL formats
+        let videoId = null;
+        const patterns = [
+            /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/,
+            /^([a-zA-Z0-9_-]{11})$/  // Direct ID (exactly 11 chars)
+        ];
+        
+        for (const pattern of patterns) {
+            const match = url.match(pattern);
+            if (match) {
+                videoId = match[1];
+                break;
+            }
+        }
+        
+        if (!videoId) {
+            if (typeof showNotificationPopup === 'function') {
+                showNotificationPopup(t('slash_menu.youtube_invalid_url', null, 'Invalid YouTube URL'), 'error');
+            } else {
+                alert(t('slash_menu.youtube_invalid_url', null, 'Invalid YouTube URL'));
+            }
+            return;
+        }
+        
+        if (isMarkdown) {
+            // For markdown, insert iframe HTML directly
+            const iframeMarkdown = '<iframe width="560" height="315" src="https://www.youtube.com/embed/' + videoId + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>\n\n';
+            
+            // Focus the editable element first
+            if (editableElement) {
+                editableElement.focus();
+            }
+            
+            // Restore selection if saved
+            if (savedRange) {
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(savedRange);
+            }
+            
+            insertMarkdownAtCursor(iframeMarkdown, 0);
+        } else {
+            // For HTML notes
+            // Create iframe HTML
+            const iframeHtml = '<iframe width="560" height="315" src="https://www.youtube.com/embed/' + videoId + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+            
+            // Focus the editable element first
+            if (editableElement) {
+                editableElement.focus();
+            }
+            
+            // Restore selection and insert iframe
+            try {
+                const sel = window.getSelection();
+                let range;
+                
+                if (savedRange) {
+                    sel.removeAllRanges();
+                    sel.addRange(savedRange);
+                    range = savedRange;
+                } else if (sel && sel.rangeCount > 0) {
+                    range = sel.getRangeAt(0);
+                } else {
+                    // No saved range and no current range, try to create one at the end of editableElement
+                    if (editableElement) {
+                        range = document.createRange();
+                        range.selectNodeContents(editableElement);
+                        range.collapse(false);
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                    } else {
+                        return; // Cannot insert without a valid target
+                    }
+                }
+                
+                // Create a temporary container to parse the HTML
+                const tempContainer = document.createElement('div');
+                tempContainer.innerHTML = iframeHtml;
+                const iframeElement = tempContainer.firstChild;
+                
+                // Insert with spacing
+                const fragment = document.createDocumentFragment();
+                
+                const lineBefore = document.createElement('div');
+                lineBefore.innerHTML = '<br>';
+                fragment.appendChild(lineBefore);
+                
+                fragment.appendChild(iframeElement);
+                
+                const lineAfter = document.createElement('div');
+                lineAfter.innerHTML = '<br>';
+                fragment.appendChild(lineAfter);
+                
+                range.deleteContents();
+                range.insertNode(fragment);
+                
+                // Move cursor after
+                range.collapse(false);
+                sel.removeAllRanges();
+                sel.addRange(range);
+                
+                // Trigger input event
+                if (noteEntry) {
+                    noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+                
+                // Mark as modified and save
+                if (typeof window.markNoteAsModified === 'function') {
+                    window.markNoteAsModified();
+                }
+            } catch (e) {
+                console.error('Error inserting YouTube iframe:', e);
+            }
+        }
+    }
+
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
         init();
     }
 })();
+

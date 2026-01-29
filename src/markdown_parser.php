@@ -126,6 +126,105 @@ function parseMarkdown($text) {
         $protectedIndex++;
         return $placeholder;
     }, $text);
+
+    // Protect iframe tags (for YouTube, Vimeo, and other embeds)
+    // Only allow iframes from trusted sources for security
+    $text = preg_replace_callback('/<iframe\s+([^>]+)>\s*<\/iframe>/is', function($matches) use (&$protectedElements, &$protectedIndex) {
+        $attrs = $matches[1];
+        
+        // Extract src attribute to validate the source
+        if (preg_match('/src\s*=\s*["\']([^"\']+)["\']/i', $attrs, $srcMatch)) {
+            $src = $srcMatch[1];
+            
+            // Whitelist of allowed iframe sources (trusted embed providers)
+            $allowedDomains = [
+                'youtube.com',
+                'www.youtube.com',
+                'youtube-nocookie.com',
+                'www.youtube-nocookie.com',
+                // 'player.vimeo.com',
+                // 'vimeo.com',
+                // 'dailymotion.com',
+                // 'www.dailymotion.com',
+                // 'player.twitch.tv',
+                // 'clips.twitch.tv',
+                // 'open.spotify.com',
+                // 'w.soundcloud.com',
+                // 'bandcamp.com',
+                // 'codepen.io',
+                // 'jsfiddle.net',
+                // 'codesandbox.io',
+                // 'stackblitz.com',
+                // 'docs.google.com',
+                // 'drive.google.com',
+                // 'maps.google.com',
+                // 'www.google.com/maps',
+                // 'calendar.google.com',
+                // 'onedrive.live.com',
+                // 'office.com',
+                // 'twitter.com',
+                // 'x.com',
+                // 'platform.twitter.com',
+                // 'linkedin.com',
+                // 'slides.com',
+                // 'prezi.com',
+                // 'canva.com',
+                // 'figma.com',
+                // 'miro.com',
+                // 'excalidraw.com',
+                // 'loom.com',
+                // 'wistia.com',
+                // 'fast.wistia.net',
+                // 'share.descript.com',
+                // 'rumble.com',
+                // 'odysee.com',
+                // 'bitchute.com',
+                // 'peertube',
+                // 'invidio.us',
+                // 'piped.video',
+            ];
+            
+            // Check if the src matches any allowed domain
+            $isAllowed = false;
+            foreach ($allowedDomains as $domain) {
+                if (stripos($src, '//' . $domain) !== false || stripos($src, '.' . $domain) !== false) {
+                    $isAllowed = true;
+                    break;
+                }
+            }
+            
+            if ($isAllowed) {
+                $placeholder = "\x00PIFRAME" . $protectedIndex . "\x00";
+                // Sanitize attributes: only allow safe attributes
+                $safeAttrs = [];
+                
+                // Extract and sanitize individual attributes
+                preg_match_all('/(\w+)\s*=\s*["\']([^"\']*)["\']/', $attrs, $attrMatches, PREG_SET_ORDER);
+                foreach ($attrMatches as $attr) {
+                    $attrName = strtolower($attr[1]);
+                    $attrValue = $attr[2];
+                    
+                    // Only allow safe attributes
+                    if (in_array($attrName, ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'title', 'loading', 'referrerpolicy', 'sandbox', 'style', 'class'])) {
+                        $safeAttrs[] = $attrName . '="' . htmlspecialchars($attrValue, ENT_QUOTES, 'UTF-8') . '"';
+                    }
+                }
+                
+                // Handle boolean attributes like allowfullscreen
+                if (stripos($attrs, 'allowfullscreen') !== false && !in_array('allowfullscreen', array_map(function($a) { return explode('=', $a)[0]; }, $safeAttrs))) {
+                    $safeAttrs[] = 'allowfullscreen';
+                }
+                
+                $iframeTag = '<iframe ' . implode(' ', $safeAttrs) . '></iframe>';
+                $protectedElements[$protectedIndex] = $iframeTag;
+                $protectedIndex++;
+                return $placeholder;
+            }
+        }
+        
+        // If not allowed, return the original (will be escaped)
+        return $matches[0];
+    }, $text);
     
     // Now escape HTML to prevent XSS
     $html = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
@@ -172,8 +271,8 @@ function parseMarkdown($text) {
             return $matches[0];
         }, $text);
         
-        // Restore protected elements (images, links, spans, and tags)
-        $text = preg_replace_callback('/\x00P(IMG|LNK|SPAN|TAG)(\d+)\x00/', function($matches) use ($protectedElements) {
+        // Restore protected elements (images, links, spans, tags, and iframes)
+        $text = preg_replace_callback('/\x00P(IMG|LNK|SPAN|TAG|IFRAME)(\d+)\x00/', function($matches) use ($protectedElements) {
             $index = (int)$matches[2];
             return isset($protectedElements[$index]) ? $protectedElements[$index] : $matches[0];
         }, $text);
@@ -185,8 +284,9 @@ function parseMarkdown($text) {
     $lines = explode("\n", $html);
     $result = [];
     $currentParagraph = [];
+    $paragraphStartLine = -1;
     
-    $flushParagraph = function() use (&$currentParagraph, &$result, $applyInlineStyles) {
+    $flushParagraph = function() use (&$currentParagraph, &$result, &$paragraphStartLine, $applyInlineStyles) {
         if (count($currentParagraph) > 0) {
             // Process line breaks according to GitHub Flavored Markdown rules
             $processedLines = [];
@@ -207,8 +307,9 @@ function parseMarkdown($text) {
             }
             $para = implode('', $processedLines);
             $para = $applyInlineStyles($para);
-            $result[] = '<p>' . $para . '</p>';
+            $result[] = '<p data-line="' . $paragraphStartLine . '">' . $para . '</p>';
             $currentParagraph = [];
+            $paragraphStartLine = -1;
         }
     };
     
@@ -262,7 +363,7 @@ function parseMarkdown($text) {
             $flushParagraph();
             $level = strlen($matches[1]);
             $content = $applyInlineStyles($matches[2]);
-            $result[] = '<h' . $level . '>' . $content . '</h' . $level . '>';
+            $result[] = '<h' . $level . ' data-line="' . $i . '">' . $content . '</h' . $level . '>';
             continue;
         }
         
@@ -489,10 +590,10 @@ function parseMarkdown($text) {
                     // Same level item
                     if ($isTaskList) {
                         $isChecked = strtolower($matches[2]) === 'x';
-                        $checkbox = '<input type="checkbox" ' . ($isChecked ? 'checked ' : '') . 'disabled>';
-                        $itemHtml = '<li class="task-list-item">' . $checkbox . ' <span>' . $applyInlineStyles($content) . '</span>';
+                        $checkbox = '<input type="checkbox" class="markdown-task-checkbox" data-line="' . $currentIndex . '" ' . ($isChecked ? 'checked ' : '') . '>';
+                        $itemHtml = '<li class="task-list-item" data-line="' . $currentIndex . '">' . $checkbox . ' <span>' . $applyInlineStyles($content) . '</span>';
                     } else {
-                        $itemHtml = '<li>' . $applyInlineStyles($content);
+                        $itemHtml = '<li data-line="' . $currentIndex . '">' . $applyInlineStyles($content);
                     }
                     
                     // Check if next items are more indented (nested)
@@ -612,6 +713,9 @@ function parseMarkdown($text) {
         }
         
         // Regular text - add to current paragraph
+        if ($paragraphStartLine === -1) {
+            $paragraphStartLine = $i;
+        }
         $currentParagraph[] = $line;
     }
     

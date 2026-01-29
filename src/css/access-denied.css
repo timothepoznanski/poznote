@@ -119,11 +119,11 @@ body.access-denied-page {
 /* Dark mode support */
 [data-theme="dark"] body.access-denied-page,
 body.access-denied-page[data-theme="dark"] {
-    background-color: #1a1a1a;
+    background-color: #252526;
 }
 
 [data-theme="dark"] .access-denied-modal {
-    background: #2d2d2d;
+    background: #333333;
 }
 
 [data-theme="dark"] .access-denied-modal h1 {

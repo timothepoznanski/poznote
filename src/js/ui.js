@@ -670,5 +670,100 @@ function executeLinkModalRemove() {
     }, 50);
 }
 
+// YouTube Modal for inserting YouTube videos
+var youtubeModalCallback = null;
+
+function showYouTubeModal(callback) {
+    // Create modal if it doesn't exist
+    var modal = document.getElementById('youtubeModal');
+
+    if (!modal) {
+        createYouTubeModal();
+        modal = document.getElementById('youtubeModal');
+    }
+
+    var urlInput = document.getElementById('youtubeModalUrl');
+    urlInput.value = 'https://www.youtube.com/watch?v=';
+    youtubeModalCallback = callback;
+
+    modal.style.display = 'flex';
+    setTimeout(function () {
+        urlInput.focus();
+        urlInput.select();
+    }, 100);
+}
+
+function createYouTubeModal() {
+    var modalHtml = '<div id="youtubeModal" class="modal" style="display: none;">' +
+        '<div class="modal-content">' +
+        '<div class="modal-header">' +
+        '<h3>' + (window.t ? window.t('slash_menu.youtube_modal_title', null, 'Insert YouTube Video') : 'Insert YouTube Video') + '</h3>' +
+        '</div>' +
+        '<div class="modal-body">' +
+        '<div style="margin-bottom: 10px;">' +
+        '<label for="youtubeModalUrl" style="display: block; font-weight: bold; margin-bottom: 5px;">' + (window.t ? window.t('slash_menu.youtube_url_label', null, 'YouTube URL or Video ID:') : 'YouTube URL or Video ID:') + '</label>' +
+        '<input type="url" id="youtubeModalUrl" placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ" />' +
+        '</div>' +
+        '<div style="font-size: 0.9em; color: #666; margin-top: 10px;">' +
+        (window.t ? window.t('slash_menu.youtube_help', null, 'Supports: youtube.com/watch?v=ID, youtu.be/ID, or just the video ID') : 'Supports: youtube.com/watch?v=ID, youtu.be/ID, or just the video ID') +
+        '</div>' +
+        '</div>' +
+        '<div class="modal-buttons">' +
+        '<button type="button" class="btn btn-cancel" id="youtubeModalCancel">' + (window.t ? window.t('editor.link.cancel', null, 'Cancel') : 'Cancel') + '</button>' +
+        '<button type="button" class="btn btn-primary" id="youtubeModalInsert">' + (window.t ? window.t('slash_menu.youtube_insert', null, 'Insert') : 'Insert') + '</button>' +
+        '</div>' +
+        '</div>' +
+        '</div>';
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Attach event listeners to buttons
+    var cancelBtn = document.getElementById('youtubeModalCancel');
+    var insertBtn = document.getElementById('youtubeModalInsert');
+    var urlInput = document.getElementById('youtubeModalUrl');
+
+    cancelBtn.addEventListener('click', function () {
+        closeYouTubeModal();
+    });
+
+    insertBtn.addEventListener('click', function () {
+        executeYouTubeModalAction();
+    });
+
+    urlInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            executeYouTubeModalAction();
+        }
+    });
+}
+
+function closeYouTubeModal() {
+    closeModal('youtubeModal');
+    youtubeModalCallback = null;
+}
+
+function executeYouTubeModalAction() {
+    var url = document.getElementById('youtubeModalUrl').value.trim();
+    var callback = youtubeModalCallback;
+
+    // Reset callback BEFORE calling it to avoid re-entry
+    youtubeModalCallback = null;
+
+    if (callback && url) {
+        callback(url);
+    }
+
+    // Close modal with a slight delay to allow DOM operations to complete
+    setTimeout(function () {
+        var modal = document.getElementById('youtubeModal');
+        if (modal) {
+            modal.remove();
+        }
+    }, 50);
+}
+
+// Expose globally
+window.showYouTubeModal = showYouTubeModal;
+
 // Expose setSaveButtonRed globally for use in other modules
 window.setSaveButtonRed = setSaveButtonRed;

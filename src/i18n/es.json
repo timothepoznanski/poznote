@@ -921,7 +921,14 @@
         "toggle": "Toggle",
         "toggle_placeholder": "Toggle",
         "toggle_content_placeholder": "Escribe dentro del toggle aquí…",
-        "toggle_after_placeholder": "Escribe fuera del toggle aquí…"
+        "toggle_after_placeholder": "Escribe fuera del toggle aquí…",
+        "youtube_video": "Video de YouTube",
+        "youtube_modal_title": "Insertar video de YouTube",
+        "youtube_url_label": "URL de YouTube o ID del video:",
+        "youtube_url_prompt": "Introduce la URL o la ID del video de YouTube:",
+        "youtube_help": "Soportados: youtube.com/watch?v=ID, youtu.be/ID, o solo la ID del video",
+        "youtube_insert": "Insertar",
+        "youtube_invalid_url": "URL de YouTube no válida"
     },
     "api": {
         "settings": {
@@ -1720,7 +1727,7 @@
     },
     "github_sync": {
         "title": "Sincronización GitHub",
-        "description": "Push your notes to GitHub or pull notes from an existing repository. Un repositroy est égal à un profil. Les workspaces seront des folder à la racine du repo",
+        "description": "Envíe sus notas a GitHub o extraiga notas de un repositorio existente. Un repositorio equivale a un perfil. Los espacios de trabajo serán carpetas en la raíz del repositorio.",
         "warning": "No utilice esta función como su única solución de copia de seguridad.\nConsidere configurar exportaciones ZIP manuales o automáticas de sus notas.",
         "confirm_push": "¿Enviar notas del espacio de trabajo \"{{workspace}}\" a GitHub? Updates existing files and deletes files that no longer exist in Poznote.",
         "confirm_pull": "¿Recuperar notas del espacio de trabajo \"{{workspace}}\" de GitHub? Import notes from GitHub. Updates existing notes and moves to trash notes that no longer exist on GitHub.",
@@ -1774,6 +1781,7 @@
             "pull_error": "Error al recuperar: {{error}}"
         },
         "debug": {
+            "title": "Información de depuración",
             "show": "Mostrar información de depuración",
             "hide": "Ocultar información de depuración",
             "copy": "Copiar debug",

@@ -12,7 +12,13 @@
 $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
          || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
          || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on')
-         || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
+         || (!empty($_SERVER['HTTP_X_FORWARDED_PORT']) && $_SERVER['HTTP_X_FORWARDED_PORT'] === '443');
+
+// Allow override via environment variable for edge cases
+$forceSecureCookies = getenv('POZNOTE_FORCE_SECURE_COOKIES');
+if ($forceSecureCookies !== false && $forceSecureCookies !== '') {
+    $isSecure = filter_var($forceSecureCookies, FILTER_VALIDATE_BOOLEAN);
+}
 
 // Configure session cookie for reverse proxy compatibility
 $cookieParams = [

@@ -920,7 +920,14 @@
         "toggle": "Toggle",
         "toggle_placeholder": "Toggle",
         "toggle_content_placeholder": "Escreva dentro do toggle aqui…",
-        "toggle_after_placeholder": "Escreva fora do toggle aqui…"
+        "toggle_after_placeholder": "Escreva fora do toggle aqui…",
+        "youtube_video": "Vídeo do YouTube",
+        "youtube_modal_title": "Inserir vídeo do YouTube",
+        "youtube_url_label": "URL do YouTube ou ID do Vídeo:",
+        "youtube_url_prompt": "Introduza o URL ou o ID do vídeo do YouTube:",
+        "youtube_help": "Suporta: youtube.com/watch?v=ID, youtu.be/ID ou apenas o ID do vídeo",
+        "youtube_insert": "Inserir",
+        "youtube_invalid_url": "URL do YouTube inválido"
     },
     "api": {
         "settings": {
@@ -1724,7 +1731,7 @@
     },
     "github_sync": {
         "title": "Sincronização GitHub",
-        "description": "Push your notes to GitHub or pull notes from an existing repository. Un repositroy est égal à un profil. Les workspaces seront des folder à la racine du repo",
+        "description": "Envie suas notas para o GitHub ou baixe notas de um repositório existente. Um repositório equivale a um perfil. Os espaços de trabalho serão pastas na raiz do repositório.",
         "warning": "Não utilize esta funcionalidade como a sua única solução de backup.\nConsidere configurar exportações ZIP manuais ou automáticas das suas notas.",
         "confirm_push": "Enviar notas do espaço de trabalho \"{{workspace}}\" para o GitHub? Updates existing files and deletes files that no longer exist in Poznote.",
         "confirm_pull": "Recuperar notas do espaço de trabalho \"{{workspace}}\" do GitHub? Import notes from GitHub. Updates existing notes and moves to trash notes that no longer exist on GitHub.",
@@ -1778,6 +1785,7 @@
             "pull_error": "Erro ao recuperar: {{error}}"
         },
         "debug": {
+            "title": "Informações de depuração",
             "show": "Mostrar informações de depuração",
             "hide": "Ocultar informações de depuração",
             "copy": "Copiar debug",

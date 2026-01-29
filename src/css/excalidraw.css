@@ -36,7 +36,7 @@
     margin: 0;
     font-size: 18px;
     font-weight: 600;
-    color: var(--text-primary, #1a1a1a);
+    color: var(--text-primary, #252526);
 }
 
 .excalidraw-toolbar .toolbar-btn {
@@ -49,7 +49,7 @@
     border: 1px solid var(--border-color, #e0e0e0);
     border-radius: 6px;
     background: var(--bg-secondary, #f5f5f5);
-    color: var(--text-primary, #1a1a1a);
+    color: var(--text-primary, #252526);
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -178,7 +178,7 @@ div[onclick*="openExcalidrawNote"] {
 
 /* Dark mode styles */
 [data-theme="dark"] .excalidraw-toolbar {
-    background: var(--bg-primary, #1e1e1e);
+    background: var(--bg-primary, #252526);
     border-bottom-color: var(--border-color, #333333);
 }
 
@@ -187,7 +187,7 @@ div[onclick*="openExcalidrawNote"] {
 }
 
 [data-theme="dark"] .excalidraw-toolbar .toolbar-btn {
-    background: var(--bg-secondary, #2a2a2a);
+    background: var(--bg-secondary, #333333);
     border-color: var(--border-color, #444444);
     color: var(--text-primary, #e0e0e0);
 }
@@ -199,7 +199,7 @@ div[onclick*="openExcalidrawNote"] {
 
 [data-theme="dark"] .excalidraw-preview-container {
     border-color: var(--border-color, #333333);
-    background: var(--bg-secondary, #2a2a2a);
+    background: var(--bg-secondary, #333333);
 }
 
 /* Mobile responsive */
@@ -273,7 +273,7 @@ div[onclick*="openExcalidrawNote"] {
     /* Dark mode adjustments for mobile */
     [data-theme="dark"] .excalidraw-toolbar,
     [data-theme="dark"] div[style*="justify-content: space-between"][style*="align-items: center"] {
-        background: #1e1e1e !important;
+        background: #252526 !important;
         border-bottom-color: #333333 !important;
     }
 }

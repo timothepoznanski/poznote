@@ -30,7 +30,10 @@ try {
     <form id="unified-search-form" action="index.php" method="POST">
         <div class="unified-search-container">
             <div class="searchbar-row searchbar-icon-row">
-                <div class="searchbar-type-icons">
+                <button type="button" id="search-options-toggle" class="searchbar-options-toggle" title="<?php echo t_h('search.toggle_options', [], 'Toggle search options'); ?>">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div class="searchbar-type-icons<?php echo !isset($search_combined) || $search_combined !== false ? ' hidden' : ''; ?>" id="searchbar-type-icons">
                     <button type="button" id="search-notes-btn" class="searchbar-type-btn searchbar-type-notes active" data-search-type="notes" title="<?php echo t_h('search.search_in_notes', [], 'Search in notes'); ?>">
                         <i class="fas fa-file-alt"></i>
                     </button>
@@ -50,46 +53,21 @@ try {
             <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
             <input type="hidden" id="search-in-notes" name="search_in_notes" value="<?php echo ($using_unified_search && !empty($_POST['search_in_notes']) && $_POST['search_in_notes'] === '1') || (!$using_unified_search && (!empty($search) || $preserve_notes)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search) && !$preserve_tags) ? '1' : ''); ?>">
             <input type="hidden" id="search-in-tags" name="search_in_tags" value="<?php echo ($using_unified_search && !empty($_POST['search_in_tags']) && $_POST['search_in_tags'] === '1') || (!$using_unified_search && (!empty($tags_search) || $preserve_tags)) ? '1' : ''; ?>">
+            <input type="hidden" id="search-combined-mode" name="search_combined" value="<?php echo $search_combined ? '1' : ''; ?>">
         </div>
     </form>
 </div>
 
 <?php
 /**
- * Calculate total number of notes in a folder and all its subfolders recursively
- */
-function countNotesRecursively($folderData) {
-    $count = count($folderData['notes']);
-    
-    // Add notes from all subfolders
-    if (isset($folderData['children']) && !empty($folderData['children'])) {
-        foreach ($folderData['children'] as $childData) {
-            $count += countNotesRecursively($childData);
-        }
-    }
-    
-    return $count;
-}
-
-/**
  * Recursive function to display folders and their subfolders
  */
-function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags) {
+function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined = false) {
     $folderName = $folderData['name'];
     $notes = $folderData['notes'];
     
     // In search mode, don't display empty folders (unless they have children with results)
-    $hasChildrenWithNotes = false;
-    if (isset($folderData['children']) && !empty($folderData['children'])) {
-        foreach ($folderData['children'] as $childData) {
-            if (!empty($childData['notes']) || (isset($childData['children']) && !empty($childData['children']))) {
-                $hasChildrenWithNotes = true;
-                break;
-            }
-        }
-    }
-    
-    if ($is_search_mode && empty($notes) && !$hasChildrenWithNotes) {
+    if ($is_search_mode && countNotesRecursively($folderData) === 0) {
         return;
     }
     
@@ -100,7 +78,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         $folderDomId = 'folder-' . $folderId;
         
         // Determine if this folder should be open
-        $should_be_open = shouldFolderBeOpen($con, $folderId, $folderName, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes);
+        $should_be_open = shouldFolderBeOpen($con, $folderData, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes);
         
         // Set appropriate folder icon (open/closed) and display style
         // Check if folder has a custom icon and color
@@ -169,7 +147,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         $isSelected = ($note == $row1["id"]) ? 'selected-note' : '';
         
         // Generate note link
-        $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"]);
+        $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"], $search_combined);
         
         $noteClass = empty($folder_filter) ? 'links_arbo_left note-in-folder' : 'links_arbo_left';
         if ($depth > 0) $noteClass .= ' note-in-subfolder';
@@ -197,7 +175,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
     // Recursively display subfolders
     if (isset($folderData['children']) && !empty($folderData['children'])) {
         foreach ($folderData['children'] as $childId => $childData) {
-            displayFolderRecursive($childId, $childData, $depth + 1, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags);
+            displayFolderRecursive($childId, $childData, $depth + 1, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined);
         }
     }
     
@@ -285,7 +263,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         $isSelected = (isset($note) && $row1["id"] == $note) ? 'selected-note' : '';
         
         // Generate note link
-        $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"]);
+        $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"], $search_combined);
         
         $noteClass = 'links_arbo_left note-without-folder';
         $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
@@ -299,7 +277,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
 
 // Display regular folders and notes hierarchically
 foreach($regularFolders as $folderId => $folderData) {
-    displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags);
+    displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined);
 }
 
 // Display uncategorized notes (notes without folder) at the END if NOT sorting by date (i.e., alphabetical sort)
@@ -308,7 +286,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         $isSelected = (isset($note) && $row1["id"] == $note) ? 'selected-note' : '';
         
         // Generate note link
-        $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"]);
+        $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"], $search_combined);
         
         $noteClass = 'links_arbo_left note-without-folder';
         $noteDbId = isset($row1["id"]) ? $row1["id"] : '';

@@ -1656,12 +1656,12 @@ a.links_arbo_left.selected-note {
 }
 
 .searchbar-input {
-    padding: 10px 12px 10px 80px;
+    padding: 10px 12px 10px 95px;
     border-radius: 8px;
     border: 1px solid #d3d6db;
     background: #ffffff;
     font-size: 0.9em;
-    transition: border-color 0.18s, box-shadow 0.18s;
+    transition: border-color 0.18s, box-shadow 0.18s, padding-left 0.2s;
     /* box-shadow: 0 0 0 1px #e6e6e6; */
     outline: none;
     width: 100%;
@@ -1698,15 +1698,54 @@ a.links_arbo_left.selected-note {
     align-items: center;
 }
 
+/* Search options toggle button (3 dots) */
+.searchbar-options-toggle {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    padding: 6px 6px;
+    cursor: pointer;
+    color: #9aa3a8;
+    font-size: 14px;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+}
+
+.searchbar-options-toggle:hover {
+    color: #007DB8;
+}
+
+.searchbar-options-toggle.active {
+    color: #007DB8;
+}
+
 /* Search type toggle buttons */
 .searchbar-type-icons {
     position: absolute;
-    left: 12px;
+    left: 30px;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
     gap: 2px;
     z-index: 2;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.searchbar-type-icons.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* When search icons are hidden, adjust input padding */
+.searchbar-input.search-combined-mode {
+    padding-left: 32px !important;
 }
 
 .searchbar-type-btn {
@@ -2849,16 +2888,26 @@ textarea:focus {
     font-size: inherit !important;
 }
 
-/* Optimize image rendering for better performance with many images */
-.noteentry img {
+/* Optimize image and iframe rendering for better performance and responsiveness */
+.noteentry img,
+.noteentry iframe {
     max-width: 100%;
     height: auto;
+}
+
+.noteentry img {
     /* Prevent layout shifts while images load */
     content-visibility: auto;
     /* Hint browser about size for better performance */
     contain-intrinsic-size: 300px 200px;
     /* Async decoding to avoid blocking main thread */
     image-rendering: auto;
+}
+
+.noteentry iframe {
+    /* Default aspect ratio for videos, can be overridden */
+    aspect-ratio: 16 / 9;
+    border: none;
 }
 
 /* Apply Inter to text elements, except in code blocks and monospace elements */
@@ -6153,7 +6202,7 @@ input[type="search"]::-webkit-search-results-decoration {
 /* Dark mode styles for create note modal */
 html[data-theme='dark'] .create-note-option,
 body.dark-mode .create-note-option {
-    background-color: #2a2a2a;
+    background-color: #333333;
     border-color: #444;
 }
 
@@ -6456,7 +6505,7 @@ body.dark-mode .checklist-checkbox:checked+.checklist-text {
 /* Dark mode for drop zone */
 html[data-theme='dark'] .root-drop-zone,
 body.dark-mode .root-drop-zone {
-    background-color: #2a2a2a;
+    background-color: #333333;
     border-color: #4a4a4a;
 }
 

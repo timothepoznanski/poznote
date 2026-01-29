@@ -396,6 +396,70 @@ function parseMarkdown(text) {
         return placeholder;
     });
 
+    // Protect iframe tags (for YouTube, Vimeo, and other embeds)
+    // Only allow iframes from trusted sources for security
+    text = text.replace(/<iframe\s+([^>]+)>\s*<\/iframe>/gis, function (match, attrs) {
+        // Extract src attribute to validate the source
+        const srcMatch = attrs.match(/src\s*=\s*["']([^"']+)["']/i);
+        if (srcMatch) {
+            const src = srcMatch[1];
+            
+            // Whitelist of allowed iframe sources (trusted embed providers)
+            const allowedDomains = [
+                'youtube.com', 'www.youtube.com', 'youtube-nocookie.com', 'www.youtube-nocookie.com',
+                'player.vimeo.com', 'vimeo.com',
+                'dailymotion.com', 'www.dailymotion.com',
+                'player.twitch.tv', 'clips.twitch.tv',
+                'open.spotify.com', 'w.soundcloud.com', 'bandcamp.com',
+                'codepen.io', 'jsfiddle.net', 'codesandbox.io', 'stackblitz.com',
+                'docs.google.com', 'drive.google.com', 'maps.google.com', 'www.google.com/maps', 'calendar.google.com',
+                'onedrive.live.com', 'office.com',
+                'twitter.com', 'x.com', 'platform.twitter.com',
+                'linkedin.com', 'slides.com', 'prezi.com', 'canva.com',
+                'figma.com', 'miro.com', 'excalidraw.com',
+                'loom.com', 'wistia.com', 'fast.wistia.net', 'share.descript.com',
+                'rumble.com', 'odysee.com', 'bitchute.com', 'peertube', 'invidio.us', 'piped.video'
+            ];
+            
+            // Check if the src matches any allowed domain
+            const isAllowed = allowedDomains.some(domain => 
+                src.includes('//' + domain) || src.includes('.' + domain)
+            );
+            
+            if (isAllowed) {
+                const placeholder = '\x00PIFRAME' + protectedIndex + '\x00';
+                
+                // Sanitize attributes: only allow safe attributes
+                const safeAttrs = [];
+                const attrRegex = /(\w+)\s*=\s*["']([^"']*)["']/g;
+                let attrMatch;
+                
+                while ((attrMatch = attrRegex.exec(attrs)) !== null) {
+                    const attrName = attrMatch[1].toLowerCase();
+                    const attrValue = attrMatch[2];
+                    
+                    // Only allow safe attributes
+                    if (['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'title', 'loading', 'referrerpolicy', 'sandbox', 'style', 'class'].includes(attrName)) {
+                        safeAttrs.push(attrName + '="' + attrValue + '"');
+                    }
+                }
+                
+                // Handle boolean attributes like allowfullscreen
+                if (/allowfullscreen/i.test(attrs) && !safeAttrs.some(attr => attr.startsWith('allowfullscreen'))) {
+                    safeAttrs.push('allowfullscreen');
+                }
+                
+                const iframeTag = '<iframe ' + safeAttrs.join(' ') + '></iframe>';
+                protectedElements[protectedIndex] = iframeTag;
+                protectedIndex++;
+                return placeholder;
+            }
+        }
+        
+        // If not allowed, return the original (will be escaped)
+        return match;
+    });
+
     // Now escape HTML to prevent XSS
     let html = text
         .replace(/&/g, '&amp;')
@@ -433,8 +497,8 @@ function parseMarkdown(text) {
             return protectedCode[parseInt(index)] || match;
         });
 
-        // Restore protected elements (images, links, spans, and details tags)
-        text = text.replace(/\x00P(IMG|LNK|SPAN|TAG)(\d+)\x00/g, function (match, type, index) {
+        // Restore protected elements (images, links, spans, tags, and iframes)
+        text = text.replace(/\x00P(IMG|LNK|SPAN|TAG|IFRAME)(\d+)\x00/g, function (match, type, index) {
             return protectedElements[parseInt(index)] || match;
         });
 
@@ -454,9 +518,11 @@ function parseMarkdown(text) {
     let lines = html.split('\n');
     let result = [];
     let currentParagraph = [];
+    let paragraphStartLine = -1;
     let inCodeBlock = false;
     let codeBlockLang = '';
     let codeBlockContent = [];
+    let codeBlockStartLine = -1;
 
     function flushParagraph() {
         if (currentParagraph.length > 0) {
@@ -481,8 +547,9 @@ function parseMarkdown(text) {
             }
             let para = processedLines.join('');
             para = applyInlineStyles(para);
-            result.push('<p>' + para + '</p>');
+            result.push('<p data-line="' + paragraphStartLine + '">' + para + '</p>');
             currentParagraph = [];
+            paragraphStartLine = -1;
         }
     }
 
@@ -573,43 +640,49 @@ function parseMarkdown(text) {
         // Headers
         if (line.match(/^######\s+(.+)$/)) {
             flushParagraph();
+            let lineNum = i;
             result.push(line.replace(/^######\s+(.+)$/, function (match, content) {
-                return '<h6>' + applyInlineStyles(content) + '</h6>';
+                return '<h6 data-line="' + lineNum + '">' + applyInlineStyles(content) + '</h6>';
             }));
             continue;
         }
         if (line.match(/^#####\s+(.+)$/)) {
             flushParagraph();
+            let lineNum = i;
             result.push(line.replace(/^#####\s+(.+)$/, function (match, content) {
-                return '<h5>' + applyInlineStyles(content) + '</h5>';
+                return '<h5 data-line="' + lineNum + '">' + applyInlineStyles(content) + '</h5>';
             }));
             continue;
         }
         if (line.match(/^####\s+(.+)$/)) {
             flushParagraph();
+            let lineNum = i;
             result.push(line.replace(/^####\s+(.+)$/, function (match, content) {
-                return '<h4>' + applyInlineStyles(content) + '</h4>';
+                return '<h4 data-line="' + lineNum + '">' + applyInlineStyles(content) + '</h4>';
             }));
             continue;
         }
         if (line.match(/^###\s+(.+)$/)) {
             flushParagraph();
+            let lineNum = i;
             result.push(line.replace(/^###\s+(.+)$/, function (match, content) {
-                return '<h3>' + applyInlineStyles(content) + '</h3>';
+                return '<h3 data-line="' + lineNum + '">' + applyInlineStyles(content) + '</h3>';
             }));
             continue;
         }
         if (line.match(/^##\s+(.+)$/)) {
             flushParagraph();
+            let lineNum = i;
             result.push(line.replace(/^##\s+(.+)$/, function (match, content) {
-                return '<h2>' + applyInlineStyles(content) + '</h2>';
+                return '<h2 data-line="' + lineNum + '">' + applyInlineStyles(content) + '</h2>';
             }));
             continue;
         }
         if (line.match(/^#\s+(.+)$/)) {
             flushParagraph();
+            let lineNum = i;
             result.push(line.replace(/^#\s+(.+)$/, function (match, content) {
-                return '<h1>' + applyInlineStyles(content) + '</h1>';
+                return '<h1 data-line="' + lineNum + '">' + applyInlineStyles(content) + '</h1>';
             }));
             continue;
         }
@@ -823,10 +896,11 @@ function parseMarkdown(text) {
                     let itemHtml;
                     if (isTaskList) {
                         let isChecked = listMatch[2].toLowerCase() === 'x';
-                        let checkbox = '<input type="checkbox" ' + (isChecked ? 'checked ' : '') + 'disabled>';
-                        itemHtml = '<li class="task-list-item">' + checkbox + ' <span>' + applyInlineStyles(content) + '</span>';
+                        // Add data-line attribute for interactive checkbox toggling
+                        let checkbox = '<input type="checkbox" class="markdown-task-checkbox" data-line="' + currentIndex + '" ' + (isChecked ? 'checked ' : '') + '>';
+                        itemHtml = '<li class="task-list-item" data-line="' + currentIndex + '">' + checkbox + ' <span>' + applyInlineStyles(content) + '</span>';
                     } else {
-                        itemHtml = '<li>' + applyInlineStyles(content);
+                        itemHtml = '<li data-line="' + currentIndex + '">' + applyInlineStyles(content);
                     }
 
                     // Check if next items are more indented (nested)
@@ -961,6 +1035,9 @@ function parseMarkdown(text) {
         }
 
         // Regular text - add to current paragraph
+        if (paragraphStartLine === -1) {
+            paragraphStartLine = i;
+        }
         currentParagraph.push(line);
     }
 
@@ -1143,6 +1220,8 @@ function initializeMarkdownNote(noteId) {
             if (typeof renderMathInElement === 'function') {
                 renderMathInElement(previewDiv);
             }
+            // Setup checkbox and click-to-navigate handlers
+            setupPreviewInteractivity(noteId);
         }, 100);
     }
 
@@ -1372,6 +1451,8 @@ function switchToPreviewMode(noteId) {
             if (typeof renderMathInElement === 'function') {
                 renderMathInElement(previewDiv);
             }
+            // Setup checkbox handlers (not click-to-navigate since we're in preview mode)
+            setupPreviewInteractivity(noteId);
         }, 100);
     }
 
@@ -1623,6 +1704,8 @@ function switchToSplitMode(noteId) {
             if (typeof renderMathInElement === 'function') {
                 renderMathInElement(previewDiv);
             }
+            // Setup checkbox and click-to-navigate handlers
+            setupPreviewInteractivity(noteId);
         }, 100);
     }
 
@@ -1752,6 +1835,8 @@ function setupSplitModePreviewUpdate(noteId) {
                     if (typeof renderMathInElement === 'function') {
                         renderMathInElement(previewDiv);
                     }
+                    // Re-attach checkbox and click-to-navigate handlers
+                    setupPreviewInteractivity(noteId);
                 }, 50);
             }
         }, 300); // 300ms debounce
@@ -1778,6 +1863,183 @@ function toggleMarkdownModeSplit(noteId) {
     }
 }
 
+/**
+ * Toggle a markdown checkbox and update the source content
+ * @param {HTMLInputElement} checkbox - The checkbox element that was clicked
+ * @param {number} lineNumber - The line number in the markdown source
+ */
+function toggleMarkdownCheckbox(checkbox, lineNumber) {
+    // Find the note entry containing this checkbox
+    var noteEntry = checkbox.closest('.noteentry');
+    if (!noteEntry) return;
+
+    var noteId = noteEntry.id.replace('entry', '');
+    var editorDiv = noteEntry.querySelector('.markdown-editor');
+    var previewDiv = noteEntry.querySelector('.markdown-preview');
+
+    if (!editorDiv) return;
+
+    // Get the current markdown content
+    var content = normalizeContentEditableText(editorDiv);
+    var lines = content.split('\n');
+
+    // Validate line number
+    if (lineNumber < 0 || lineNumber >= lines.length) {
+        console.warn('Invalid line number for checkbox toggle:', lineNumber);
+        return;
+    }
+
+    var line = lines[lineNumber];
+
+    // Toggle the checkbox in the markdown source
+    if (checkbox.checked) {
+        // Changed from unchecked to checked
+        lines[lineNumber] = line.replace(/\[([ ])\]/, '[x]');
+    } else {
+        // Changed from checked to unchecked
+        lines[lineNumber] = line.replace(/\[([xX])\]/, '[ ]');
+    }
+
+    // Update the editor content
+    var newContent = lines.join('\n');
+    editorDiv.textContent = newContent;
+    noteEntry.setAttribute('data-markdown-content', newContent);
+
+    // Mark the note as modified
+    if (typeof window.markNoteAsModified === 'function') {
+        window.markNoteAsModified();
+    }
+
+    // Set the global noteid
+    if (typeof noteid !== 'undefined') {
+        noteid = noteId;
+    }
+    window.noteid = noteId;
+
+    // If in split mode, update the preview (but preserve checkbox states that just changed)
+    if (noteEntry.classList.contains('markdown-split-mode') && previewDiv) {
+        // Re-render the preview
+        previewDiv.innerHTML = parseMarkdown(newContent);
+        previewDiv.classList.remove('empty');
+        
+        // Re-initialize Mermaid and Math
+        setTimeout(function () {
+            initMermaid();
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(previewDiv);
+            }
+            // Re-attach checkbox and click-to-navigate handlers
+            setupPreviewInteractivity(noteId);
+        }, 50);
+    }
+}
+
+/**
+ * Navigate to a specific line in the markdown editor
+ * @param {number} lineNumber - The line number to navigate to
+ * @param {HTMLElement} noteEntry - The note entry element
+ */
+function navigateToEditorLine(lineNumber, noteEntry) {
+    var editorDiv = noteEntry.querySelector('.markdown-editor');
+    if (!editorDiv) return;
+
+    var content = editorDiv.textContent || '';
+    var lines = content.split('\n');
+
+    // Calculate character offset for the target line
+    var charOffset = 0;
+    for (var i = 0; i < lineNumber && i < lines.length; i++) {
+        charOffset += lines[i].length + 1; // +1 for newline
+    }
+
+    // Focus the editor
+    editorDiv.focus();
+
+    // Set cursor position using Selection API
+    try {
+        var textNode = editorDiv.firstChild;
+        if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+            var range = document.createRange();
+            var selection = window.getSelection();
+
+            // Clamp the offset to valid range
+            var maxOffset = textNode.textContent.length;
+            charOffset = Math.min(charOffset, maxOffset);
+
+            range.setStart(textNode, charOffset);
+            range.collapse(true);
+
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            // Scroll the editor to show the cursor
+            // Calculate approximate scroll position
+            var lineHeight = parseInt(window.getComputedStyle(editorDiv).lineHeight) || 20;
+            var scrollTop = lineNumber * lineHeight - editorDiv.clientHeight / 2;
+            editorDiv.scrollTop = Math.max(0, scrollTop);
+        }
+    } catch (e) {
+        console.warn('Could not set cursor position:', e);
+    }
+}
+
+/**
+ * Setup interactivity for markdown preview (checkbox toggling and click-to-navigate)
+ * @param {number} noteId - The note ID
+ */
+function setupPreviewInteractivity(noteId) {
+    var noteEntry = document.getElementById('entry' + noteId);
+    if (!noteEntry) return;
+
+    var previewDiv = noteEntry.querySelector('.markdown-preview');
+    if (!previewDiv) return;
+
+    var isInSplitMode = noteEntry.classList.contains('markdown-split-mode');
+
+    // Setup checkbox click handlers
+    var checkboxes = previewDiv.querySelectorAll('.markdown-task-checkbox');
+    checkboxes.forEach(function (checkbox) {
+        // Remove any existing listener
+        checkbox.removeEventListener('click', checkbox._checkboxClickHandler);
+        checkbox.removeEventListener('change', checkbox._checkboxChangeHandler);
+
+        // Add click handler
+        checkbox._checkboxChangeHandler = function (e) {
+            var lineNumber = parseInt(checkbox.getAttribute('data-line'));
+            toggleMarkdownCheckbox(checkbox, lineNumber);
+        };
+
+        checkbox.addEventListener('change', checkbox._checkboxChangeHandler);
+    });
+
+    // Setup click-to-navigate only in split mode
+    if (isInSplitMode) {
+        // Find all elements with data-line attributes
+        var lineElements = previewDiv.querySelectorAll('[data-line]');
+        lineElements.forEach(function (element) {
+            // Skip checkboxes (they have their own handler)
+            if (element.classList.contains('markdown-task-checkbox')) return;
+
+            // Remove any existing listener
+            element.removeEventListener('click', element._navigateClickHandler);
+
+            // Add click handler for navigation
+            element._navigateClickHandler = function (e) {
+                // Don't navigate if clicking a link or checkbox
+                if (e.target.tagName === 'A' || e.target.tagName === 'INPUT') return;
+
+                var lineNumber = parseInt(element.getAttribute('data-line'));
+                navigateToEditorLine(lineNumber, noteEntry);
+            };
+
+            element.addEventListener('click', element._navigateClickHandler);
+            
+            // Add a visual hint that the element is clickable
+            element.style.cursor = 'pointer';
+        });
+    }
+}
+
 // Make functions globally available
 window.initializeMarkdownNote = initializeMarkdownNote;
 window.toggleMarkdownMode = toggleMarkdownModeSplit;
@@ -1791,3 +2053,6 @@ window.parseMarkdown = parseMarkdown;
 window.setupMarkdownEditorListeners = setupMarkdownEditorListeners;
 window.updateViewModeButton = updateViewModeButton;
 window.setupSplitModePreviewUpdate = setupSplitModePreviewUpdate;
+window.toggleMarkdownCheckbox = toggleMarkdownCheckbox;
+window.navigateToEditorLine = navigateToEditorLine;
+window.setupPreviewInteractivity = setupPreviewInteractivity;
