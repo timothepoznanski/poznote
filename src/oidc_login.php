@@ -1,4 +1,9 @@
 <?php
+// // Enable error logging (but not display to avoid header issues)
+// error_reporting(E_ALL);
+// ini_set('log_errors', 1);
+// ini_set('display_errors', 0);
+
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/oidc.php';
 
@@ -25,6 +30,11 @@ try {
     header('Location: ' . $url);
     exit;
 } catch (Exception $e) {
-    header('Location: login.php?oidc_error=1');
+    // Log the error for debugging
+    error_log('OIDC Login Error: ' . $e->getMessage());
+    error_log('Stack trace: ' . $e->getTraceAsString());
+    
+    // Redirect to login with error parameter
+    header('Location: login.php?oidc_error=1&msg=' . urlencode($e->getMessage()));
     exit;
 }

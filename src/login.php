@@ -104,7 +104,13 @@ if (isset($_GET['oidc_error'])) {
     } elseif ($_GET['oidc_error'] === 'disabled') {
         $oidcError = t('login.errors.oidc_disabled', [], 'Your account has been disabled by an administrator. Please contact them for more information.', $currentLang ?? 'en');
     } elseif ($_GET['oidc_error'] === '1') {
-        $oidcError = t('login.errors.oidc_failed', [], 'SSO login failed. Please try again.', $currentLang ?? 'en');
+        $defaultMsg = t('login.errors.oidc_failed', [], 'SSO login failed. Please try again.', $currentLang ?? 'en');
+        // If a detailed error message is provided in the URL, display it (for debugging)
+        if (isset($_GET['msg']) && is_string($_GET['msg']) && $_GET['msg'] !== '') {
+            $oidcError = $defaultMsg . ' (' . htmlspecialchars($_GET['msg']) . ')';
+        } else {
+            $oidcError = $defaultMsg;
+        }
     }
 }
 ?>

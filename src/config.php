@@ -57,4 +57,3 @@
     define('GITHUB_AUTHOR_NAME', (string)($_ENV['POZNOTE_GITHUB_AUTHOR_NAME'] ?? getenv('POZNOTE_GITHUB_AUTHOR_NAME') ?: 'Poznote'));
     // Commit author email
     define('GITHUB_AUTHOR_EMAIL', (string)($_ENV['POZNOTE_GITHUB_AUTHOR_EMAIL'] ?? getenv('POZNOTE_GITHUB_AUTHOR_EMAIL') ?: 'poznote@localhost'));
-?>
