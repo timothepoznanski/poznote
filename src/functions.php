@@ -1105,5 +1105,3 @@ function unescapeIframesInHtml($content) {
         return $matches[0];
     }, $content);
 }
-?>
-

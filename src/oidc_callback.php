@@ -1,4 +1,9 @@
 <?php
+// // Enable error logging (but not display to avoid header issues)
+// error_reporting(E_ALL);
+// ini_set('log_errors', 1);
+// ini_set('display_errors', 0);
+
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/functions.php';
 require_once __DIR__ . '/oidc.php';
@@ -48,6 +53,10 @@ try {
     echo '</head><body>' . t_h('login.redirecting', [], 'Redirecting...', getUserLanguage()) . '</body></html>';
     exit;
 } catch (Exception $e) {
+    // Log the error for debugging
+    error_log("OIDC Callback Error: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
+    
     // Check if the error is due to unauthorized user
     if (strpos($e->getMessage(), 'not authorized') !== false) {
         header('Location: login.php?oidc_error=unauthorized');
@@ -58,9 +67,8 @@ try {
     } elseif (strpos($e->getMessage(), 'profile is disabled') !== false) {
         header('Location: login.php?oidc_error=disabled');
     } else {
-        // Log the error for debugging
-        error_log("OIDC Callback Error: " . $e->getMessage());
-        header('Location: login.php?oidc_error=1');
+        // Redirect to login with error parameter
+        header('Location: login.php?oidc_error=1&msg=' . urlencode($e->getMessage()));
     }
     exit;
 }
