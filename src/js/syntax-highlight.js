@@ -21,12 +21,9 @@
         // Find all code blocks with a language class
         var codeBlocks = container.querySelectorAll('pre code[class*="language-"]');
         
-        console.log('Syntax Highlight: Found', codeBlocks.length, 'code blocks with language class');
-        
         codeBlocks.forEach(function(codeBlock) {
             // Skip if already highlighted
             if (codeBlock.classList.contains('hljs')) {
-                console.log('Syntax Highlight: Skipping already highlighted block');
                 return;
             }
 
@@ -39,12 +36,10 @@
             // Skip if the code block is empty or only has zero-width space
             var text = codeBlock.textContent || '';
             if (!text.trim() || text === '\u200B') {
-                console.log('Syntax Highlight: Skipping empty block');
                 return;
             }
 
             try {
-                console.log('Syntax Highlight: Highlighting block with class', codeBlock.className);
                 hljs.highlightElement(codeBlock);
             } catch (e) {
                 console.warn('Highlight.js error:', e);
