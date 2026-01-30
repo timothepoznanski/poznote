@@ -427,6 +427,17 @@ body.dark-mode .noteentry pre {
     background-color: #262424 !important;
 }
 
+/* Fix for highlighter in code blocks in dark mode: preserve dark background and ensure readable text */
+html[data-theme='dark'] .noteentry pre *[style*="background"],
+body.dark-mode .noteentry pre *[style*="background"],
+html[data-theme='dark'] .noteentry code *[style*="background"],
+body.dark-mode .noteentry code *[style*="background"],
+html[data-theme='dark'] .noteentry .code-block *[style*="background"],
+body.dark-mode .noteentry .code-block *[style*="background"] {
+    background: linear-gradient(rgba(255, 255, 0, 0.4), rgba(255, 255, 0, 0.4)), #262424 !important;
+    color: #e0e0e0 !important;
+}
+
 /* Inline code only (not inside pre blocks with syntax highlighting) */
 html[data-theme='dark'] .noteentry code:not([class*="hljs"]):not([class*="language-"]),
 body.dark-mode .noteentry code:not([class*="hljs"]):not([class*="language-"]) {
@@ -2129,8 +2140,8 @@ body.dark-mode .noteentry.markdown-split-mode .markdown-preview [data-line]:not(
 }
 
 /* Checked task item text - dark mode */
-html[data-theme='dark'] .markdown-preview li.task-list-item input[type="checkbox"]:checked + span,
-body.dark-mode .markdown-preview li.task-list-item input[type="checkbox"]:checked + span {
+html[data-theme='dark'] .markdown-preview li.task-list-item input[type="checkbox"]:checked+span,
+body.dark-mode .markdown-preview li.task-list-item input[type="checkbox"]:checked+span {
     color: #666;
 }
 
