@@ -12,7 +12,7 @@
      */
     function applySyntaxHighlighting(container) {
         if (typeof hljs === 'undefined') {
-            console.warn('Highlight.js is not loaded');
+            console.warn('Syntax Highlight: Highlight.js is not loaded');
             return;
         }
 
@@ -21,9 +21,12 @@
         // Find all code blocks with a language class
         var codeBlocks = container.querySelectorAll('pre code[class*="language-"]');
         
+        console.log('Syntax Highlight: Found', codeBlocks.length, 'code blocks with language class');
+        
         codeBlocks.forEach(function(codeBlock) {
             // Skip if already highlighted
             if (codeBlock.classList.contains('hljs')) {
+                console.log('Syntax Highlight: Skipping already highlighted block');
                 return;
             }
 
@@ -36,10 +39,12 @@
             // Skip if the code block is empty or only has zero-width space
             var text = codeBlock.textContent || '';
             if (!text.trim() || text === '\u200B') {
+                console.log('Syntax Highlight: Skipping empty block');
                 return;
             }
 
             try {
+                console.log('Syntax Highlight: Highlighting block with class', codeBlock.className);
                 hljs.highlightElement(codeBlock);
             } catch (e) {
                 console.warn('Highlight.js error:', e);
@@ -127,12 +132,31 @@
         initSyntaxHighlighting();
     }
 
-    // Also apply highlighting when notes are loaded
-    document.addEventListener('noteLoaded', function() {
-        setTimeout(function() {
-            applySyntaxHighlighting(document);
-        }, 100);
-    });
+    // Hook into reinitializeNoteContent to apply highlighting after note loads
+    function hookReinitializeNoteContent() {
+        if (typeof window.reinitializeNoteContent === 'function') {
+            var originalReinitializeNoteContent = window.reinitializeNoteContent;
+            window.reinitializeNoteContent = function() {
+                originalReinitializeNoteContent.apply(this, arguments);
+                // Apply syntax highlighting after note content is reinitialized
+                setTimeout(function() {
+                    applySyntaxHighlighting(document);
+                }, 100);
+            };
+        } else {
+            // If reinitializeNoteContent doesn't exist yet, try again later
+            setTimeout(hookReinitializeNoteContent, 100);
+        }
+    }
+
+    // Hook after a short delay to ensure other scripts have loaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(hookReinitializeNoteContent, 200);
+        });
+    } else {
+        setTimeout(hookReinitializeNoteContent, 200);
+    }
 
     // Listen for content changes in note entries (for live preview)
     var observer = new MutationObserver(function(mutations) {
