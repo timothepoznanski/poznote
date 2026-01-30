@@ -591,7 +591,7 @@ function parseMarkdown($text) {
                     if ($isTaskList) {
                         $isChecked = strtolower($matches[2]) === 'x';
                         $checkbox = '<input type="checkbox" class="markdown-task-checkbox" data-line="' . $currentIndex . '" ' . ($isChecked ? 'checked ' : '') . '>';
-                        $itemHtml = '<li class="task-list-item" data-line="' . $currentIndex . '">' . $checkbox . ' <span>' . $applyInlineStyles($content) . '</span>';
+                        $itemHtml = '<li class="task-list-item" data-line="' . $currentIndex . '">' . $checkbox . ' <span class="task-text" data-text="' . htmlspecialchars($content, ENT_QUOTES) . '">' . $applyInlineStyles($content) . '</span>';
                     } else {
                         $itemHtml = '<li data-line="' . $currentIndex . '">' . $applyInlineStyles($content);
                     }

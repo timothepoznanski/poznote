@@ -3,12 +3,12 @@
  * Handles theme toggle, mermaid rendering, and other public note functionality
  * CSP-compliant external script
  */
-(function() {
+(function () {
     'use strict';
-    
+
     // Mark this as a public note page for JS behavior
     window.isPublicNotePage = true;
-    
+
     /**
      * Get Mermaid configuration for the given theme
      * Uses 'base' theme for dark mode with custom colors for better integration
@@ -67,11 +67,11 @@
             };
         }
     }
-    
+
     // Theme toggle functionality
     var themeToggle = document.getElementById('themeToggle');
     var root = document.documentElement;
-    
+
     function updateThemeIcon(theme) {
         if (!themeToggle) return;
         var icon = themeToggle.querySelector('i');
@@ -79,67 +79,67 @@
             icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
         }
     }
-    
+
     function setTheme(theme) {
         root.setAttribute('data-theme', theme);
         root.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
         root.style.backgroundColor = theme === 'dark' ? '#252526' : '#ffffff';
-        
+
         try {
             localStorage.setItem('poznote-public-theme', theme);
         } catch (e) {
             // localStorage not available
         }
-        
+
         updateThemeIcon(theme);
-        
+
         // Reinitialize mermaid with new theme if present
         rerenderMermaidDiagrams(theme === 'dark');
     }
-    
+
     /**
      * Re-render all Mermaid diagrams with the specified theme
      * This properly handles Mermaid's caching by removing old IDs and re-rendering
      */
     function rerenderMermaidDiagrams(isDark) {
         if (typeof mermaid === 'undefined') return;
-        
+
         var mermaidNodes = document.querySelectorAll('.mermaid');
         if (mermaidNodes.length === 0) return;
-        
+
         try {
             // Re-initialize mermaid with new config
             mermaid.initialize(getMermaidConfig(isDark));
-            
+
             // Collect nodes that need re-rendering
             var nodesToRender = [];
-            
-            mermaidNodes.forEach(function(node) {
+
+            mermaidNodes.forEach(function (node) {
                 var source = node.getAttribute('data-mermaid-source') || '';
                 if (!source.trim()) return;
-                
+
                 // Remove the data-processed attribute to allow re-rendering
                 node.removeAttribute('data-processed');
-                
+
                 // Remove any existing ID that Mermaid assigned (they are like mermaid-123)
                 if (node.id && node.id.startsWith('mermaid-')) {
                     node.removeAttribute('id');
                 }
-                
+
                 // Clear the node content and restore original source
                 node.innerHTML = '';
                 node.textContent = source;
-                
+
                 nodesToRender.push(node);
             });
-            
+
             if (nodesToRender.length > 0) {
                 // Use mermaid.run for modern versions
                 if (typeof mermaid.run === 'function') {
-                    mermaid.run({ 
+                    mermaid.run({
                         nodes: nodesToRender,
-                        suppressErrors: true 
-                    }).catch(function(e) {
+                        suppressErrors: true
+                    }).catch(function (e) {
                         console.error('Mermaid re-render failed', e);
                     });
                 } else {
@@ -151,15 +151,15 @@
             console.error('Mermaid theme update failed', e);
         }
     }
-    
+
     if (themeToggle) {
-        themeToggle.addEventListener('click', function() {
+        themeToggle.addEventListener('click', function () {
             var currentTheme = root.getAttribute('data-theme');
             var newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             setTheme(newTheme);
         });
     }
-    
+
     // Check localStorage on page load (visitor preference overrides server theme)
     try {
         var savedTheme = localStorage.getItem('poznote-public-theme');
@@ -176,7 +176,7 @@
     } catch (e) {
         updateThemeIcon(root.getAttribute('data-theme') || 'light');
     }
-    
+
     // Mermaid rendering - ensure it runs after DOM is ready and mermaid is loaded
     function tryInitializeMermaid() {
         if (typeof mermaid !== 'undefined') {
@@ -185,12 +185,12 @@
         }
         return false;
     }
-    
+
     // Try immediately
     if (!tryInitializeMermaid()) {
         // If mermaid not available, wait for DOM and try again
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 if (!tryInitializeMermaid()) {
                     // Last resort: wait a bit for async script loading
                     setTimeout(tryInitializeMermaid, 100);
@@ -201,7 +201,7 @@
             setTimeout(tryInitializeMermaid, 100);
         }
     }
-    
+
     function escapeHtml(str) {
         return String(str)
             .replace(/&/g, '&amp;')
@@ -219,7 +219,7 @@
                 else if (err.str) msg = err.str;
                 else if (err.message) msg = err.message;
             }
-        } catch (e) {}
+        } catch (e) { }
 
         node.classList.remove('mermaid');
         node.innerHTML =
@@ -231,7 +231,7 @@
 
     function initializeMermaid() {
         var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        
+
         try {
             // Support Mermaid blocks that ended up rendered as regular code blocks
             // e.g. <pre><code class="language-mermaid">...</code></pre>
@@ -275,26 +275,26 @@
 
             if (typeof mermaid.parse === 'function' && typeof Promise !== 'undefined') {
                 var validNodes = [];
-                var checks = mermaidNodes.map(function(node) {
+                var checks = mermaidNodes.map(function (node) {
                     var src = node.getAttribute('data-mermaid-source') || '';
                     if (!src.trim()) return Promise.resolve();
                     return Promise.resolve(mermaid.parse(src))
-                        .then(function() {
+                        .then(function () {
                             node.textContent = src;
                             validNodes.push(node);
                         })
-                        .catch(function(err) {
+                        .catch(function (err) {
                             renderMermaidError(node, err, src);
                         });
                 });
 
-                Promise.all(checks).then(function() {
+                Promise.all(checks).then(function () {
                     if (!validNodes.length) return;
                     return mermaid.run({
                         nodes: validNodes,
                         suppressErrors: true
                     });
-                }).catch(function(e1) {
+                }).catch(function (e1) {
                     console.error('Mermaid rendering failed', e1);
                 });
             } else {
@@ -311,5 +311,276 @@
                 console.error('Mermaid initialization failed', e2);
             }
         }
+    }
+
+    /**
+     * Helper to get public config
+     */
+    function getPublicConfig() {
+        const configElement = document.getElementById('public-note-config');
+        if (!configElement) return null;
+        try {
+            return JSON.parse(configElement.textContent);
+        } catch (err) {
+            console.error('Failed to parse config', err);
+            return null;
+        }
+    }
+
+    // Task list interaction (Checkboxes)
+    document.addEventListener('change', function (e) {
+        if (!e.target || !e.target.matches('.task-checkbox, .markdown-task-checkbox')) return;
+
+        const checkbox = e.target;
+        const config = getPublicConfig();
+        if (!config || !config.token) return;
+
+        const isMarkdown = checkbox.classList.contains('markdown-task-checkbox');
+        const completed = checkbox.checked;
+        const idOrIndex = isMarkdown ? checkbox.getAttribute('data-line') : checkbox.getAttribute('data-index');
+        const apiBaseUrl = config.apiBaseUrl || 'api/v1';
+
+        // Optimistic UI update
+        const taskItem = checkbox.closest('.task-item, .task-list-item');
+        if (taskItem) {
+            taskItem.classList.toggle('completed', completed);
+
+            // Move to bottom if completed
+            if (completed) {
+                const parent = taskItem.parentNode;
+                // Add a small delay for the animation/feel
+                setTimeout(() => {
+                    if (checkbox.checked) { // Double check it's still checked
+                        parent.appendChild(taskItem);
+                    }
+                }, 300);
+            }
+        }
+
+        fetch(`${apiBaseUrl}/public/tasks/${idOrIndex}?token=${encodeURIComponent(config.token)}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ completed: completed })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    console.error('Failed to update task', data.error);
+                    location.reload(); // Revert by reloading
+                } else if (!isMarkdown) {
+                    // For tasklists, sorting on server might have changed indices
+                    // Let's reload to be safe and keep UI in sync with server sort
+                    setTimeout(() => location.reload(), 800);
+                }
+            })
+            .catch(err => {
+                console.error('Network error', err);
+                checkbox.checked = !completed;
+                if (taskItem) taskItem.classList.toggle('completed', !completed);
+            });
+    });
+
+    // Add Task Handler
+    function handleAddTask(input, isMarkdown = false) {
+        const text = input.value.trim();
+        if (!text) return;
+
+        const config = getPublicConfig();
+        if (!config || !config.token) return;
+        const apiBaseUrl = config.apiBaseUrl || 'api/v1';
+
+        fetch(`${apiBaseUrl}/public/tasks?token=${encodeURIComponent(config.token)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Reload to show new item (simpler for public view)
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(err => console.error('Network error', err));
+    }
+
+    document.addEventListener('keydown', function (e) {
+        if (e.target.matches('.public-task-add-input, .public-markdown-task-add-input')) {
+            if (e.key === 'Enter') {
+                handleAddTask(e.target, e.target.matches('.public-markdown-task-add-input'));
+            }
+        }
+    });
+
+    /**
+     * Helper for Poznote-styled prompt
+     */
+    function publicNotePrompt(message, defaultValue = '') {
+        return new Promise((resolve) => {
+            const config = {
+                type: 'prompt',
+                message,
+                alertType: 'info',
+                title: 'Poznote',
+                buttons: [
+                    { text: 'Cancel', type: 'secondary', action: () => resolve(null) },
+                    {
+                        text: 'OK', type: 'primary', action: () => {
+                            const input = document.getElementById('public-prompt-input');
+                            resolve(input ? input.value : null);
+                        }
+                    }
+                ]
+            };
+
+            // Custom implementation for prompt since modal-alerts.js doesn't have it
+            if (window.modalAlert) {
+                const originalCreateModal = window.modalAlert.createModal;
+                window.modalAlert.createModal = function (cfg) {
+                    if (cfg.type === 'prompt') {
+                        const overlay = document.createElement('div');
+                        overlay.className = 'alert-modal-overlay';
+                        const modal = document.createElement('div');
+                        modal.className = 'alert-modal';
+                        const body = document.createElement('div');
+                        body.className = 'alert-modal-body';
+                        body.textContent = cfg.message;
+
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.id = 'public-prompt-input';
+                        input.value = defaultValue;
+                        input.style.width = '100%';
+                        input.style.marginTop = '15px';
+                        input.style.padding = '10px';
+                        input.style.border = '1px solid #ddd';
+                        input.style.borderRadius = '4px';
+                        input.style.boxSizing = 'border-box';
+                        body.appendChild(input);
+
+                        const footer = document.createElement('div');
+                        footer.className = 'alert-modal-footer';
+                        cfg.buttons.forEach(btn => {
+                            const b = document.createElement('button');
+                            b.className = `alert-modal-button ${btn.type}`;
+                            b.textContent = btn.text;
+                            b.onclick = () => {
+                                window.modalAlert.closeModal(overlay);
+                                btn.action();
+                            };
+                            footer.appendChild(b);
+                        });
+
+                        modal.appendChild(body);
+                        modal.appendChild(footer);
+                        overlay.appendChild(modal);
+                        document.body.appendChild(overlay);
+                        window.modalAlert.currentModal = overlay;
+
+                        input.onkeydown = (e) => {
+                            if (e.key === 'Enter') {
+                                window.modalAlert.closeModal(overlay);
+                                cfg.buttons.find(b => b.type === 'primary').action();
+                            } else if (e.key === 'Escape') {
+                                window.modalAlert.closeModal(overlay);
+                                cfg.buttons.find(b => b.type === 'secondary').action();
+                            }
+                        };
+
+                        requestAnimationFrame(() => overlay.classList.add('show'));
+                        setTimeout(() => input.focus(), 100);
+
+                        // Restore original method
+                        window.modalAlert.createModal = originalCreateModal;
+                    } else {
+                        originalCreateModal.call(window.modalAlert, cfg);
+                    }
+                };
+                window.modalAlert.showModal(config);
+            } else {
+                // Fallback to native prompt if something failed
+                resolve(prompt(message, defaultValue));
+            }
+        });
+    }
+
+    // Edit Task Handler
+    document.addEventListener('click', async function (e) {
+        const editBtn = e.target.closest('.public-task-edit-btn');
+        if (editBtn) {
+            const taskItem = editBtn.closest('.task-item');
+            const textSpan = taskItem.querySelector('.task-text');
+            const originalText = textSpan.getAttribute('data-text') || textSpan.textContent;
+
+            const newText = await publicNotePrompt('Edit task:', originalText);
+            if (newText !== null && newText.trim() !== originalText) {
+                updateTaskText(taskItem.getAttribute('data-index'), newText.trim());
+            }
+            return;
+        }
+
+        const deleteBtn = e.target.closest('.public-task-delete-btn');
+        if (deleteBtn) {
+            const isConfirmed = await window.confirm('Delete this task?');
+            if (isConfirmed) {
+                const taskItem = deleteBtn.closest('.task-item');
+                deleteTask(taskItem.getAttribute('data-index'));
+            }
+            return;
+        }
+
+        // Click on markdown task text to edit
+        if (e.target.matches('.task-list-item .task-text')) {
+            const taskItem = e.target.closest('.task-list-item');
+            const idOrIndex = taskItem.getAttribute('data-line');
+            const originalText = e.target.getAttribute('data-text') || e.target.textContent;
+
+            const newText = await publicNotePrompt('Edit task:', originalText);
+            if (newText !== null && newText.trim() !== originalText) {
+                updateTaskText(idOrIndex, newText.trim(), true);
+            }
+        }
+    });
+
+    function updateTaskText(idOrIndex, text, isMarkdown = false) {
+        const config = getPublicConfig();
+        if (!config || !config.token) return;
+        const apiBaseUrl = config.apiBaseUrl || 'api/v1';
+
+        fetch(`${apiBaseUrl}/public/tasks/${idOrIndex}?token=${encodeURIComponent(config.token)}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(err => console.error('Network error', err));
+    }
+
+    function deleteTask(index) {
+        const config = getPublicConfig();
+        if (!config || !config.token || index === null) return;
+        const apiBaseUrl = config.apiBaseUrl || 'api/v1';
+
+        fetch(`${apiBaseUrl}/public/tasks/${index}?token=${encodeURIComponent(config.token)}`, {
+            method: 'DELETE'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(err => console.error('Network error', err));
     }
 })();

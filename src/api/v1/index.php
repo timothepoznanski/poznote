@@ -42,9 +42,12 @@ $isAdminEndpoint = strpos($uri, '/api/v1/admin') !== false;
 $isPublicProfilesEndpoint = strpos($uri, '/api/v1/users/profiles') !== false;
 $isSystemEndpoint = strpos($uri, '/api/v1/system') !== false;
 $isSharedEndpoint = strpos($uri, '/api/v1/shared') !== false;
+$isPublicApiEndpoint = strpos($uri, '/api/v1/public') !== false;
 
 // Require authentication (with X-User-ID for data endpoints, without for admin/public endpoints)
-if ($isAdminEndpoint || $isPublicProfilesEndpoint || $isSystemEndpoint || $isSharedEndpoint) {
+if ($isPublicApiEndpoint) {
+    // No additional authentication required (token validation happens in controller)
+} elseif ($isAdminEndpoint || $isPublicProfilesEndpoint || $isSystemEndpoint || $isSharedEndpoint) {
     // Admin endpoints only need credential validation, not X-User-ID
     requireApiAuthAdmin();
 } else {
@@ -70,6 +73,7 @@ require_once __DIR__ . '/controllers/SettingsController.php';
 require_once __DIR__ . '/controllers/BackupController.php';
 require_once __DIR__ . '/controllers/SystemController.php';
 require_once __DIR__ . '/controllers/GitHubSyncController.php';
+require_once __DIR__ . '/controllers/PublicController.php';
 
 /**
  * Simple Router class for handling RESTful routes
@@ -211,6 +215,7 @@ $settingsController = new SettingsController($con);
 $backupController = new BackupController($con);
 $systemController = new SystemController($con);
 $githubSyncController = new GitHubSyncController($con);
+$publicController = new PublicController($con);
 
 // ======================
 // Notes Routes
@@ -629,6 +634,22 @@ $router->post('/admin/repair', function($params) use ($usersController) {
 // Admin: Delete a user profile
 $router->delete('/admin/users/{id}', function($params) use ($usersController) {
     echo json_encode($usersController->delete($params['id'], $_GET));
+});
+
+// ======================
+// Public Routes
+// ======================
+
+$router->patch('/public/tasks/{id}', function($params) use ($publicController) {
+    $publicController->updateTask($params['id']);
+});
+
+$router->post('/public/tasks', function($params) use ($publicController) {
+    $publicController->addTask();
+});
+
+$router->delete('/public/tasks/{id}', function($params) use ($publicController) {
+    $publicController->deleteTask($params['id']);
 });
 
 // Dispatch the request

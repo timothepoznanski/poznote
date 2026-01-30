@@ -205,20 +205,46 @@ if (is_readable($htmlFile)) {
     $content = $note['entry'] ?? '';
 }
 
+// If this is markdown, we might want to add an "Add task" input at the bottom if it contains a tasklist
+if (isset($note['type']) && $note['type'] === 'markdown') {
+    if (strpos($content, 'class="task-list"') !== false) {
+        $addTaskHtml = '<div class="public-markdown-task-add-container" style="margin-top: 20px; padding: 10px; border-top: 1px solid #eee;">';
+        $addTaskHtml .= '<input type="text" class="task-input public-markdown-task-add-input" placeholder="'.t('index.note.add_task', [], 'Add a task...').'" />';
+        $addTaskHtml .= '</div>';
+        $content .= $addTaskHtml;
+    }
+}
+
 // If this is a tasklist type, try to parse the stored JSON and render a readable task list
 if (isset($note['type']) && $note['type'] === 'tasklist') {
     $decoded = json_decode($content, true);
     if (is_array($decoded)) {
+        // Sort tasks: uncompleted first, then completed
+        usort($decoded, function($a, $b) {
+            $aComp = !empty($a['completed']) ? 1 : 0;
+            $bComp = !empty($b['completed']) ? 1 : 0;
+            return $aComp <=> $bComp;
+        });
+
         $tasksHtml = '<div class="task-list-container">';
+        // Add item input
+        $tasksHtml .= '<div class="task-input-container">';
+        $tasksHtml .= '<input type="text" class="task-input public-task-add-input" placeholder="'.t('index.note.add_task', [], 'Add a task...').'" />';
+        $tasksHtml .= '</div>';
+
         $tasksHtml .= '<div class="tasks-list">';
-        foreach ($decoded as $task) {
+        foreach ($decoded as $i => $task) {
             $text = isset($task['text']) ? htmlspecialchars($task['text'], ENT_QUOTES) : '';
             $completed = !empty($task['completed']) ? ' completed' : '';
             $checked = !empty($task['completed']) ? ' checked' : '';
             $important = !empty($task['important']) ? ' important' : '';
-            $tasksHtml .= '<div class="task-item'.$completed.$important.'">';
-            $tasksHtml .= '<input type="checkbox" disabled'.$checked.' /> ';
-            $tasksHtml .= '<span class="task-text">'.$text.'</span>';
+            $tasksHtml .= '<div class="task-item'.$completed.$important.'" data-index="'.$i.'">';
+            $tasksHtml .= '<input type="checkbox" class="task-checkbox" data-index="'.$i.'"'.$checked.' /> ';
+            $tasksHtml .= '<span class="task-text" data-text="'.$text.'">'.$text.'</span>';
+            $tasksHtml .= '<div class="task-actions">';
+            $tasksHtml .= '<button class="task-action-btn public-task-edit-btn" title="Edit"><i class="fas fa-edit"></i></button>';
+            $tasksHtml .= '<button class="task-action-btn public-task-delete-btn" title="Delete"><i class="fas fa-trash"></i></button>';
+            $tasksHtml .= '</div>';
             $tasksHtml .= '</div>';
         }
         $tasksHtml .= '</div></div>';
@@ -285,13 +311,17 @@ if (!empty($row['theme']) && in_array($row['theme'], ['dark', 'light'])) {
     <?php endif; ?>
     <title>Shared note - <?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?></title>
     <!-- CSP-compliant theme initialization -->
-    <script type="application/json" id="public-note-config"><?php echo json_encode(['serverTheme' => $theme]); ?></script>
+    <script type="application/json" id="public-note-config"><?php 
+        $apiBaseUrl = $scriptDir . '/api/v1';
+        echo json_encode(['serverTheme' => $theme, 'token' => $token, 'apiBaseUrl' => $apiBaseUrl]); 
+    ?></script>
     <script src="js/public-note-theme-init.js"></script>
     <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/solid.min.css">
     <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/dark-mode.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode.css') ? filemtime(__DIR__ . '/css/dark-mode.css') : '1'; ?>">
     <link rel="stylesheet" href="css/public_note.css?v=<?php echo filemtime(__DIR__ . '/css/public_note.css'); ?>">
+    <link rel="stylesheet" href="css/modal-alerts.css">
     <link rel="stylesheet" href="css/tasks.css">
     <link rel="stylesheet" href="css/markdown.css?v=<?php echo filemtime(__DIR__ . '/css/markdown.css'); ?>">
     <link rel="stylesheet" href="css/syntax-highlight.css?v=<?php echo file_exists(__DIR__ . '/css/syntax-highlight.css') ? filemtime(__DIR__ . '/css/syntax-highlight.css') : '1'; ?>">
@@ -314,6 +344,7 @@ if (!empty($row['theme']) && in_array($row['theme'], ['dark', 'light'])) {
     </div>
 </body>
 <script src="js/copy-code-on-focus.js"></script>
+<script src="js/modal-alerts.js"></script>
 <script src="js/math-renderer.js?v=<?php echo filemtime(__DIR__ . '/js/math-renderer.js'); ?>"></script>
 <script src="js/public-note.js?v=<?php echo filemtime(__DIR__ . '/js/public-note.js'); ?>"></script>
 </html>

@@ -3,6 +3,7 @@ body {
     /* background: #f7f7f7; */
     font-family: 'Inter', sans-serif;
 }
+
 .public-note {
     max-width: 900px;
     margin: 18px auto;
@@ -11,21 +12,28 @@ body {
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(16,24,40,0.04); */
 }
+
 .public-note h1 {
     margin-top: 0;
     font-size: 1.4rem;
     color: #0f172a;
 }
+
 .public-note .meta {
     color: #666;
     font-size: 0.9em;
     margin-bottom: 12px;
 }
+
 .public-note .content {
     /* container for note HTML */
     line-height: 1.6;
 }
-.public-note img { max-width: 100%; height: auto; }
+
+.public-note img {
+    max-width: 100%;
+    height: auto;
+}
 
 /* FORCE TABLE STYLES - VERY AGGRESSIVE */
 * table {
@@ -224,22 +232,21 @@ table th {
 
 .public-note .content li.task-list-item input[type="checkbox"] {
     margin-right: 0.8em;
-    cursor: default;
+    cursor: pointer;
     vertical-align: middle;
     display: inline-block;
-    pointer-events: none; /* Make checkboxes non-interactive in public view */
 }
 
 /* Nested task lists need indentation */
-.public-note .content li.task-list-item > ul.task-list,
-.public-note .content li.task-list-item > ul,
-.public-note .content li.task-list-item > ol {
+.public-note .content li.task-list-item>ul.task-list,
+.public-note .content li.task-list-item>ul,
+.public-note .content li.task-list-item>ol {
     padding-left: 1.5em;
     margin: 0.5em 0;
 }
 
 /* Style for checked task items */
-.public-note .content li.task-list-item input[type="checkbox"]:checked + span {
+.public-note .content li.task-list-item input[type="checkbox"]:checked+span {
     text-decoration: line-through;
     color: #888;
 }
@@ -247,13 +254,57 @@ table th {
 /* Tasklist note styles (JSON-based tasklists) */
 .public-note .content .task-item input[type="checkbox"] {
     margin-right: 0.8em;
-    cursor: default;
+    cursor: pointer;
     vertical-align: middle;
 }
 
 .public-note .content .task-item.completed .task-text {
     text-decoration: line-through;
     color: #888;
+}
+
+/* Task actions (edit/delete buttons) */
+.task-actions {
+    display: flex;
+    gap: 5px;
+    margin-left: auto;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.task-item:hover .task-actions {
+    opacity: 1;
+}
+
+.task-action-btn {
+    background: transparent;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 5px;
+    transition: color 0.2s;
+}
+
+.task-action-btn:hover {
+    color: #666;
+}
+
+.public-task-delete-btn {
+    display: none;
+}
+
+.task-item.completed .public-task-delete-btn {
+    display: flex;
+}
+
+.public-task-delete-btn:hover {
+    color: #dc3545;
+}
+
+/* Interactive task text */
+.task-text {
+    cursor: text;
 }
 
 /* Important task styling for public view */
@@ -410,6 +461,10 @@ html[data-theme='dark'] .public-note .content .task-item.important .task-text {
 }
 
 /* Dark mode styles for tables */
+.alert-modal-header {
+    display: none !important;
+}
+
 html[data-theme='dark'] * table td,
 html[data-theme='dark'] * table th {
     border-color: #404040 !important;
@@ -469,4 +524,3 @@ html[data-theme='dark'] .public-note .content table td {
     background: #252526 !important;
     color: #e0e0e0 !important;
 }
-
