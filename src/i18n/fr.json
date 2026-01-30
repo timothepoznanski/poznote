@@ -957,7 +957,8 @@
         "youtube_url_prompt": "Entrez l'URL ou l'ID de la vidéo YouTube :",
         "youtube_help": "Formats supportés : youtube.com/watch?v=ID, youtu.be/ID, ou juste l'ID",
         "youtube_insert": "Insérer",
-        "youtube_invalid_url": "URL YouTube invalide"
+        "youtube_invalid_url": "URL YouTube invalide",
+        "date": "Date"
     },
     "api": {
         "settings": {

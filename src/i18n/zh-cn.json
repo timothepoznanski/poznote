@@ -927,7 +927,8 @@
         "youtube_url_prompt": "输入 YouTube 视频链接或 ID：",
         "youtube_help": "支持：youtube.com/watch?v=ID、youtu.be/ID 或直接输入视频 ID",
         "youtube_insert": "插入",
-        "youtube_invalid_url": "YouTube 链接无效"
+        "youtube_invalid_url": "YouTube 链接无效",
+        "date": "日期"
     },
     "api": {
         "settings": {

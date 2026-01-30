@@ -889,6 +889,131 @@
         fileInput.click();
     }
 
+    function insertDate() {
+        // Find current editor context to restore later
+        const context = getEditorContext();
+        if (!context) return;
+
+        const dateInput = document.createElement('input');
+        dateInput.type = 'date';
+        dateInput.style.position = 'fixed';
+        dateInput.style.opacity = '0';
+        dateInput.style.zIndex = '9999';
+        dateInput.style.pointerEvents = 'none';
+
+        // Attempt to position near the cursor
+        try {
+            const selection = window.getSelection();
+            if (selection && selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                const rect = range.getBoundingClientRect();
+                dateInput.style.left = rect.left + 'px';
+                dateInput.style.top = rect.bottom + 'px';
+            } else {
+                // Fallback to center
+                dateInput.style.left = '50%';
+                dateInput.style.top = '50%';
+                dateInput.style.transform = 'translate(-50%, -50%)';
+            }
+        } catch (e) {
+            // Fallback to center
+            dateInput.style.left = '50%';
+            dateInput.style.top = '50%';
+            dateInput.style.transform = 'translate(-50%, -50%)';
+        }
+
+        document.body.appendChild(dateInput);
+
+        dateInput.addEventListener('change', function () {
+            const date = dateInput.value;
+            if (date) {
+                // Focus the editor back before inserting
+                context.editableElement.focus();
+
+                // Format the date based on user's locale
+                const formattedDate = new Date(date).toLocaleDateString();
+                if (typeof window.insertHTMLAtSelection === 'function') {
+                    window.insertHTMLAtSelection(formattedDate);
+                } else {
+                    // Fallback for HTML notes
+                    const selection = window.getSelection();
+                    if (selection && selection.rangeCount) {
+                        const range = selection.getRangeAt(0);
+                        range.deleteContents();
+                        range.insertNode(document.createTextNode(formattedDate));
+                    }
+                }
+            }
+            document.body.removeChild(dateInput);
+
+            // Trigger input event for autosave
+            const noteEntry = context.noteEntry;
+            if (noteEntry) {
+                noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        });
+
+        // Some browsers need a short delay or user interaction
+        if (dateInput.showPicker) {
+            dateInput.showPicker();
+        } else {
+            dateInput.click();
+        }
+    }
+
+    function insertDateMarkdown() {
+        const context = getEditorContext();
+        if (!context) return;
+
+        const dateInput = document.createElement('input');
+        dateInput.type = 'date';
+        dateInput.style.position = 'fixed';
+        dateInput.style.opacity = '0';
+        dateInput.style.zIndex = '9999';
+        dateInput.style.pointerEvents = 'none';
+
+        // Attempt to position near the cursor
+        try {
+            const selection = window.getSelection();
+            if (selection && selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                const rect = range.getBoundingClientRect();
+                dateInput.style.left = rect.left + 'px';
+                dateInput.style.top = rect.bottom + 'px';
+            } else {
+                // Fallback to center
+                dateInput.style.left = '50%';
+                dateInput.style.top = '50%';
+                dateInput.style.transform = 'translate(-50%, -50%)';
+            }
+        } catch (e) {
+            // Fallback to center
+            dateInput.style.left = '50%';
+            dateInput.style.top = '50%';
+            dateInput.style.transform = 'translate(-50%, -50%)';
+        }
+
+        document.body.appendChild(dateInput);
+
+        dateInput.addEventListener('change', function () {
+            const date = dateInput.value;
+            if (date) {
+                // Focus the editor back before inserting
+                context.editableElement.focus();
+
+                const formattedDate = new Date(date).toLocaleDateString();
+                insertMarkdownAtCursor(formattedDate, 0);
+            }
+            document.body.removeChild(dateInput);
+        });
+
+        if (dateInput.showPicker) {
+            dateInput.showPicker();
+        } else {
+            dateInput.click();
+        }
+    }
+
     // Slash command menu items - actions match toolbar exactly
     // Order matches toolbar
     // Use a function to get translated labels at runtime
@@ -993,6 +1118,14 @@
                 label: t('slash_menu.image', null, 'Image'),
                 action: function () {
                     insertImage();
+                }
+            },
+            {
+                id: 'date',
+                icon: 'fa-calendar-alt',
+                label: t('slash_menu.date', null, 'Date'),
+                action: function () {
+                    insertDate();
                 }
             },
             {
@@ -1250,6 +1383,14 @@
                 label: t('slash_menu.image', null, 'Image'),
                 action: function () {
                     insertImage();
+                }
+            },
+            {
+                id: 'date',
+                icon: 'fa-calendar-alt',
+                label: t('slash_menu.date', null, 'Date'),
+                action: function () {
+                    insertDateMarkdown();
                 }
             },
             {
