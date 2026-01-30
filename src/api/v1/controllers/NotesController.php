@@ -361,16 +361,16 @@ class NotesController {
             if ($folder_id === 0) $folder_id = null;
             
             if ($folder && !$folder_id) {
-                if ($workspace) {
-                    $fStmt = $this->con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
-                    $fStmt->execute([$folder, $workspace]);
-                } else {
-                    $fStmt = $this->con->prepare("SELECT id FROM folders WHERE name = ?");
-                    $fStmt->execute([$folder]);
-                }
-                $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
-                if ($folderData) {
-                    $folder_id = (int)$folderData['id'];
+                // Robust path resolution and automatic creation of missing subfolders
+                $resolvedId = resolveFolderPathToId($workspace, $folder, true, $this->con);
+                if ($resolvedId) {
+                    $folder_id = $resolvedId;
+                    
+                    // Update folder name to only the last segment for database consistency if needed
+                    // Actually, Poznote uses the 'folder' column for legacy/display, but folder_id is primary.
+                    // We'll keep the full path in 'folder' for now as it's common in this codebase.
+                    $segments = explode('/', $folder);
+                    $folder = end($segments);
                 }
             }
             

@@ -1105,3 +1105,54 @@ function unescapeIframesInHtml($content) {
         return $matches[0];
     }, $content);
 }
+
+/**
+ * Resolve folder path to ID, optionally creating missing segments
+ * 
+ * @param string $workspace The workspace name
+ * @param string $folderPath The full folder path (e.g., "A/B/C")
+ * @param bool $createIfMissing Whether to create folders if they don't exist
+ * @param PDO $con Database connection
+ * @return int|null The resolved folder ID or null if not found/created
+ */
+function resolveFolderPathToId($workspace, $folderPath, $createIfMissing = false, $con = null) {
+    if ($con === null) {
+        global $con;
+    }
+    if (!$con) return null;
+
+    $folderPath = trim($folderPath);
+    if ($folderPath === '' || strtolower($folderPath) === 'default') return null;
+    
+    $segments = array_values(array_filter(array_map('trim', explode('/', $folderPath)), fn($s) => $s !== ''));
+    if (empty($segments)) return null;
+    
+    $parentId = null;
+    foreach ($segments as $seg) {
+        $sql = "SELECT id FROM folders WHERE name = ? AND workspace = ?";
+        $params = [$seg, $workspace];
+        if ($parentId === null) {
+            $sql .= " AND parent_id IS NULL";
+        } else {
+            $sql .= " AND parent_id = ?";
+            $params[] = $parentId;
+        }
+        
+        $stmt = $con->prepare($sql);
+        $stmt->execute($params);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($row) {
+            $parentId = (int)$row['id'];
+        } elseif ($createIfMissing) {
+            // Create the folder segment
+            $stmt = $con->prepare("INSERT INTO folders (name, workspace, parent_id, created) VALUES (?, ?, ?, datetime('now'))");
+            $stmt->execute([$seg, $workspace, $parentId]);
+            $parentId = (int)$con->lastInsertId();
+        } else {
+            return null;
+        }
+    }
+    
+    return $parentId;
+}
