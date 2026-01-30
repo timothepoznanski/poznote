@@ -239,7 +239,7 @@
             badge.className = 'setting-status enabled';
 
             if (card) {
-                var icon = card.querySelector('.settings-card-icon i');
+                var icon = card.querySelector('.home-card-icon i');
                 if (icon) {
                     icon.classList.toggle('fa-arrow-up', order === 'top');
                     icon.classList.toggle('fa-arrow-down', order !== 'top');
