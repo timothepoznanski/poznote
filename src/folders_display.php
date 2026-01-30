@@ -378,8 +378,7 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
         $actions .= "<span>" . t_h('notes_list.folder_actions.change_icon', [], 'Change icon') . "</span>";
         $actions .= "</div>";
         
-        // Separator
-        $actions .= "<div class='folder-actions-menu-separator'></div>";
+
         
         // Sort Options Definition
         $sortTypes = [
@@ -395,7 +394,7 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
         $actions .= "<div class='folder-actions-menu-item' data-action='toggle-sort-submenu' data-folder-id='$folderId'>";
         $actions .= "<i class='fal fa-sort-amount-down'></i>";
         $actions .= "<span class='sort-header-label'>" . $currentLabel . "</span>";
-        $actions .= "<i class='fal fa-sort sort-chevron' style='margin-left: auto; font-size: 0.8em;'></i>";
+
         $actions .= "</div>";
 
         // Sort Options Container
@@ -412,8 +411,7 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
         }
         $actions .= "</div>"; // Close sort-submenu
         
-         // Separator before delete
-        $actions .= "<div class='dropdown-divider' style='margin: 4px 0; border-top: 1px solid #eee;'></div>";
+
 
         
         // Delete folder action
