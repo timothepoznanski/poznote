@@ -1014,6 +1014,79 @@
         }
     }
 
+    // Slash command menu items for title inputs (notecards)
+    // Limited set of commands suitable for title editing
+    function getTitleSlashCommands() {
+        const t = window.t || ((key, params, fallback) => fallback);
+        return [
+            {
+                id: 'emoji',
+                icon: 'fa-smile',
+                label: t('slash_menu.emoji', null, 'Emoji'),
+                action: function () {
+                    const input = savedEditableElement;
+                    if (!input || input.tagName !== 'INPUT') return;
+
+                    // Ensure input focus and preserve selection for emoji insertion
+                    input.focus();
+                    window.savedActiveInput = input;
+                    window.savedActiveInputSelection = {
+                        start: input.selectionStart,
+                        end: input.selectionEnd
+                    };
+
+                    // Open the emoji picker after focus is applied
+                    if (typeof window.toggleEmojiPicker === 'function') {
+                        setTimeout(() => window.toggleEmojiPicker(), 0);
+                    }
+                }
+            },
+            {
+                id: 'date',
+                icon: 'fa-calendar-alt',
+                label: t('slash_menu.date', null, 'Date'),
+                action: function () {
+                    const input = savedEditableElement;
+                    if (!input || input.tagName !== 'INPUT') return;
+                    
+                    const dateInput = document.createElement('input');
+                    dateInput.type = 'date';
+                    dateInput.style.position = 'fixed';
+                    dateInput.style.top = '-1000px';
+                    dateInput.style.left = '-1000px';
+                    document.body.appendChild(dateInput);
+
+                    dateInput.addEventListener('change', function () {
+                        const date = dateInput.value;
+                        if (date) {
+                            const formattedDate = new Date(date).toLocaleDateString();
+                            const start = slashOffset;
+                            const text = input.value;
+                            
+                            // Find end of slash command text
+                            let end = start + 1;
+                            while (end < text.length && !/\s/.test(text[end])) {
+                                end++;
+                            }
+                            
+                            input.value = text.substring(0, start) + formattedDate + text.substring(end);
+                            input.selectionStart = input.selectionEnd = start + formattedDate.length;
+                            input.dispatchEvent(new Event('input', { bubbles: true }));
+                            input.focus();
+                        }
+                        document.body.removeChild(dateInput);
+                    });
+
+                    if (dateInput.showPicker) {
+                        dateInput.showPicker();
+                    } else {
+                        dateInput.click();
+                    }
+                }
+            }
+        ];
+    }
+
     // Slash command menu items - actions match toolbar exactly
     // Order matches toolbar
     // Use a function to get translated labels at runtime
@@ -1121,6 +1194,7 @@
                         id: 'date',
                         icon: 'fa-calendar-alt',
                         label: t('slash_menu.date', null, 'Date'),
+                        mobileHidden: true,
                         action: function () {
                             insertDate();
                         }
@@ -1407,6 +1481,7 @@
                         id: 'date',
                         icon: 'fa-calendar-alt',
                         label: t('slash_menu.date', null, 'Date'),
+                        mobileHidden: true,
                         action: function () {
                             insertDateMarkdown();
                         }
@@ -1715,6 +1790,7 @@
         }
 
         html += items
+            .filter(item => !isMobile || !item.mobileHidden)
             .map((item, idx) => {
                 const selectedClass = idx === selectedSubmenuIndex ? ' selected' : '';
                 const hasSubmenu = item.submenu && item.submenu.length > 0;
@@ -1874,6 +1950,86 @@
         document.body.style.cursor = '';
     }
 
+    function showSlashMenuForInput(input, pos) {
+        hideSlashMenu();
+
+        // Save context
+        savedEditableElement = input;
+        savedNoteEntry = input.closest('.notecard');
+
+        // Mark slash position
+        slashOffset = pos - 1;
+
+        const ctx = { noteType: 'title', noteEntry: savedNoteEntry, editableElement: input };
+
+        activeCommands = getTitleSlashCommands();
+        filterText = '';
+        selectedIndex = 0;
+        filteredCommands = getFilteredCommands('');
+
+        slashMenuElement = document.createElement('div');
+        slashMenuElement.className = 'slash-command-menu';
+        slashMenuElement.innerHTML = buildMenuHTML();
+
+        document.body.appendChild(slashMenuElement);
+
+        // Position menu for input
+        const rect = input.getBoundingClientRect();
+
+        // Measure text width up to cursor to position horizontally
+        const styles = window.getComputedStyle(input);
+        const span = document.createElement('span');
+        span.style.visibility = 'hidden';
+        span.style.position = 'absolute';
+
+        // Copy relevant font properties safely
+        span.style.fontFamily = styles.fontFamily;
+        span.style.fontSize = styles.fontSize;
+        span.style.fontWeight = styles.fontWeight;
+        span.style.fontStyle = styles.fontStyle;
+        span.style.letterSpacing = styles.letterSpacing;
+        span.style.textTransform = styles.textTransform;
+        span.style.whiteSpace = 'pre';
+
+        span.textContent = input.value.substring(0, pos);
+        document.body.appendChild(span);
+        const textWidth = span.getBoundingClientRect().width;
+        document.body.removeChild(span);
+
+        // Position: left = input rect left + paddingWidth + text width - scroll
+        const menuRect = slashMenuElement.getBoundingClientRect();
+        const padding = 8;
+
+        const paddingLeft = parseFloat(styles.paddingLeft) || 0;
+        const scrollLeft = input.scrollLeft || 0;
+
+        // Calculate caret position relative to viewport
+        let x = rect.left + paddingLeft + textWidth - scrollLeft;
+        let y = rect.bottom + 6;
+
+        // Boundary checks
+        if (x + menuRect.width > window.innerWidth - padding) {
+            x = window.innerWidth - menuRect.width - padding;
+        }
+        // Ensure menu doesn't start off-screen left
+        x = Math.max(padding, x);
+
+        if (y + menuRect.height > window.innerHeight - padding) {
+            y = Math.max(padding, rect.top - menuRect.height - 6);
+        }
+
+        slashMenuElement.style.left = x + 'px';
+        slashMenuElement.style.top = y + 'px';
+
+        requestAnimationFrame(() => {
+            if (slashMenuElement) slashMenuElement.classList.add('show');
+        });
+
+        slashMenuElement.addEventListener('mousedown', handleMenuMouseDown);
+        slashMenuElement.addEventListener('click', handleMenuClick);
+        slashMenuElement.addEventListener('mouseover', handleMenuMouseOver);
+    }
+
     function updateMenuContent() {
         if (!slashMenuElement) return;
 
@@ -1974,6 +2130,32 @@
 
     function deleteSlashText() {
         try {
+            // Handle input fields (title inputs)
+            if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+                const input = savedEditableElement;
+                const text = input.value;
+                const start = slashOffset;
+
+                if (start < 0 || start >= text.length) return;
+
+                // Find the end of the slash command text (up to whitespace)
+                let end = start + 1;
+                while (end < text.length && !/\s/.test(text[end])) {
+                    end++;
+                }
+
+                // Remove the slash and filter text
+                input.value = text.substring(0, start) + text.substring(end);
+
+                // Position cursor where the slash was
+                input.selectionStart = input.selectionEnd = start;
+
+                // Trigger input event
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+                return;
+            }
+            
+            // Handle contenteditable elements
             if (!slashTextNode || slashOffset < 0 || !slashTextNode.parentNode) {
                 return;
             }
@@ -2298,10 +2480,18 @@
                                 hideSlashMenu();
                                 savedNoteEntry = null;
                             } else {
-                                setTimeout(updateFilterFromEditor, 0);
+                                if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+                                    setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
+                                } else {
+                                    setTimeout(updateFilterFromEditor, 0);
+                                }
                             }
                         } else {
-                            setTimeout(updateFilterFromEditor, 0);
+                            if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+                                setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
+                            } else {
+                                setTimeout(updateFilterFromEditor, 0);
+                            }
                         }
                     }
                     break;
@@ -2366,10 +2556,18 @@
                                 hideSlashMenu();
                                 savedNoteEntry = null;
                             } else {
-                                setTimeout(updateFilterFromEditor, 0);
+                                if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+                                    setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
+                                } else {
+                                    setTimeout(updateFilterFromEditor, 0);
+                                }
                             }
                         } else {
-                            setTimeout(updateFilterFromEditor, 0);
+                            if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+                                setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
+                            } else {
+                                setTimeout(updateFilterFromEditor, 0);
+                            }
                         }
                     }
                     break;
@@ -2426,7 +2624,12 @@
                     hideSlashMenu();
                     savedNoteEntry = null;
                 } else {
-                    setTimeout(updateFilterFromEditor, 0);
+                    // Update from input field if we're in one, otherwise from editor
+                    if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+                        setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
+                    } else {
+                        setTimeout(updateFilterFromEditor, 0);
+                    }
                 }
                 break;
 
@@ -2437,7 +2640,12 @@
 
             default:
                 if (e.key.length === 1 || e.key === 'Delete') {
-                    setTimeout(updateFilterFromEditor, 0);
+                    // Update from input field if we're in one, otherwise from editor
+                    if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+                        setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
+                    } else {
+                        setTimeout(updateFilterFromEditor, 0);
+                    }
                 }
                 break;
         }
@@ -2452,6 +2660,21 @@
 
         // Find the first space or newline after the slash to limit the filter text
         const spaceIndex = textAfterSlash.search(/[\s\n]/);
+        filterText = spaceIndex >= 0 ? textAfterSlash.substring(0, spaceIndex) : textAfterSlash;
+
+        // Update the menu with filtered commands
+        updateMenuContent();
+    }
+
+    function updateFilterFromInput(input) {
+        if (!slashMenuElement || slashOffset < 0 || !input) return;
+
+        // Extract text after the slash in the input
+        const text = input.value || '';
+        const textAfterSlash = text.substring(slashOffset + 1);
+
+        // Find the first space after the slash to limit the filter text
+        const spaceIndex = textAfterSlash.search(/\s/);
         filterText = spaceIndex >= 0 ? textAfterSlash.substring(0, spaceIndex) : textAfterSlash;
 
         // Update the menu with filtered commands
@@ -2709,6 +2932,30 @@
                         sel.removeAllRanges();
                         sel.addRange(range);
                     }
+                }
+            }
+        }, true);
+
+        // Handle slash menu in title inputs (notecards)
+        document.addEventListener('input', function (e) {
+            const target = e.target;
+            
+            // Check if this is a title input field
+            if (target.tagName === 'INPUT' && target.classList.contains('css-title')) {
+                const value = target.value;
+                const pos = target.selectionStart;
+                
+                // Check if the last character typed is a slash
+                if (pos > 0 && value[pos - 1] === '/') {
+                    // Don't show if we're deleting
+                    const isDeleting = e.inputType && e.inputType.startsWith('delete');
+                    if (!isDeleting) {
+                        showSlashMenuForInput(target, pos);
+                    }
+                }
+                // Update filter if menu is already open
+                else if (slashMenuElement && savedEditableElement === target) {
+                    updateFilterFromInput(target);
                 }
             }
         }, true);
