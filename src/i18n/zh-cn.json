@@ -866,11 +866,11 @@
         "folder_actions": {
             "menu": "操作",
             "create": "创建",
-            "move_all_files": "将所有文件移动到另一个文件夹",
-            "move_folder": "将文件夹移动到子文件夹",
+            "move_all_files": "移动文件",
+            "move_folder": "移动文件夹",
             "rename_folder": "重命名文件夹",
             "delete_folder": "删除文件夹",
-            "download_folder": "下载文件夹",
+            "download_folder": "下载",
             "change_icon": "更改图标",
             "is_public": "已共享",
             "share_folder": "共享"
@@ -1931,5 +1931,11 @@
             "step3": "将配置添加到您的 .env 文件",
             "step4": "重启应用程序以使更改生效"
         }
+    },
+    "sort": {
+        "header": "排序方式",
+        "alphabet": "名称",
+        "created": "创建日期",
+        "modified": "修改日期"
     }
 }

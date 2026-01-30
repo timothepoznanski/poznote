@@ -988,6 +988,64 @@ body {
     margin: 4px 0;
 }
 
+.folder-actions-menu-header {
+    padding: 6px 16px;
+    font-size: 0.75em;
+    text-transform: uppercase;
+    color: #9ca3af;
+    font-weight: 600;
+    pointer-events: none;
+    letter-spacing: 0.05em;
+}
+
+.folder-actions-menu-item.active {
+    background-color: #e3f2fd;
+    color: #007DB8;
+    font-weight: 600;
+}
+
+.folder-actions-menu-item.active i {
+    color: #007DB8;
+}
+
+/* Dark mode adjustments */
+html[data-theme='dark'] .folder-actions-menu-item.active,
+body.dark-mode .folder-actions-menu-item.active {
+    background-color: rgba(0, 125, 184, 0.2);
+    color: #38bdf8;
+}
+
+html[data-theme='dark'] .folder-actions-menu-item.active i,
+body.dark-mode .folder-actions-menu-item.active i {
+    color: #38bdf8;
+}
+
+/* Visibility of sort checkmark */
+.folder-actions-menu-item .sort-check {
+    display: none;
+}
+
+/* Visibility of sort checkmark */
+.folder-actions-menu-item .sort-check {
+    display: none;
+}
+
+.folder-actions-menu-item.active .sort-check {
+    display: inline-block;
+}
+
+.folder-actions-menu-item.submenu-item {
+    font-size: 0.9em;
+}
+
+.folder-actions-menu-item.submenu-item i.fal {
+    width: 14px;
+    /* Slightly smaller icons for submenu */
+    text-align: center;
+}
+
+
+
 /* Dropdown menu for create button */
 .dropdown-menu {
     position: absolute;

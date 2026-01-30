@@ -887,11 +887,11 @@
         "folder_actions": {
             "menu": "Actions",
             "create": "Créer",
-            "move_all_files": "Déplacer tous les fichiers vers un autre dossier",
-            "move_folder": "Déplacer le dossier en sous-dossier",
+            "move_all_files": "Déplacer les fichiers",
+            "move_folder": "Déplacer le dossier",
             "rename_folder": "Renommer le dossier",
             "delete_folder": "Supprimer le dossier",
-            "download_folder": "Télécharger le dossier",
+            "download_folder": "Télécharger",
             "change_icon": "Changer l'icône",
             "is_public": "Est partagé",
             "share_folder": "Partager"
@@ -1960,5 +1960,11 @@
             "step3": "Ajoutez la configuration dans votre fichier .env",
             "step4": "Redémarrez l'application pour que les changements prennent effet"
         }
+    },
+    "sort": {
+        "header": "Trier par",
+        "alphabet": "Nom",
+        "created": "Date de création",
+        "modified": "Date de modification"
     }
 }

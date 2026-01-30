@@ -434,6 +434,7 @@
                 window.selectedWorkspace = config.selectedWorkspace || '';
                 window.userId = config.userId;
                 window.userEntriesPath = config.userEntriesPath;
+                window.defaultNoteSortType = config.defaultNoteSortType || 'updated_desc';
             } catch (e) {
                 console.error('Error parsing page config data:', e);
             }
@@ -786,7 +787,7 @@
         const expandFolderId = urlParams.get('expand_folder');
         if (expandFolderId && typeof window.toggleFolder === 'function') {
             // Wait for the DOM to be fully loaded including folder structure
-            setTimeout(function() {
+            setTimeout(function () {
                 const folderDomId = 'folder-' + expandFolderId;
                 const folderContent = document.getElementById(folderDomId);
                 // Expand folder if it exists and is currently closed

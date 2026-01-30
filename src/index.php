@@ -303,10 +303,11 @@ $body_classes = trim($extra_body_classes);
     <script type="application/json" id="page-config-data"><?php 
         $config_data = [
             'isSearchMode' => !empty($search) || !empty($tags_search),
-            'currentNoteFolder' => null,
+            'currentNoteFolder' => null, // Will be set below
             'selectedWorkspace' => $workspace_filter ?? '',
             'userId' => $_SESSION['user_id'] ?? null,
-            'userEntriesPath' => isset($_SESSION['user_id']) ? "data/users/{$_SESSION['user_id']}/entries/" : "data/entries/"
+            'userEntriesPath' => isset($_SESSION['user_id']) ? "data/users/{$_SESSION['user_id']}/entries/" : "data/entries/",
+            'defaultNoteSortType' => $note_list_sort_type
         ];
         if ($note != '' && empty($search) && empty($tags_search)) {
             $config_data['currentNoteFolder'] = $current_note_folder ?? '';
@@ -333,7 +334,7 @@ $body_classes = trim($extra_body_classes);
         // Sinon, garder $res_right tel qu'il a été défini par loadNoteData
         
         // Group notes by folder for hierarchical display (now uses folder_id)
-        $organized = organizeNotesByFolder($stmt_left, $con, $workspace_filter);
+        $organized = organizeNotesByFolder($stmt_left, $con, $workspace_filter, $note_list_sort_type);
         $folders = $organized['folders'];
         $uncategorized_notes = $organized['uncategorized_notes'];
         

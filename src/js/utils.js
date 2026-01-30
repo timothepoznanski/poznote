@@ -2151,6 +2151,16 @@ function toggleFolderActionsMenu(folderId) {
     if (menu) {
         var isShowing = menu.classList.toggle('show');
 
+        // If closing, unexpand sort submenus
+        if (!isShowing) {
+            menu.querySelectorAll('.sort-submenu').forEach(function (submenu) {
+                submenu.style.display = 'none';
+            });
+            menu.querySelectorAll('.sort-chevron').forEach(function (chevron) {
+                chevron.style.transform = 'rotate(0deg)';
+            });
+        }
+
         // If showing, check if menu would overflow viewport and adjust position
         if (isShowing) {
             adjustMenuPosition(menu);
@@ -2162,18 +2172,70 @@ function adjustMenuPosition(menu) {
     // Reset any previous adjustments
     menu.style.bottom = '';
     menu.style.top = '';
+    menu.style.marginTop = '';
+    menu.style.marginBottom = '';
+    menu.style.left = '';
+    menu.style.right = '';
 
     // Get menu position and dimensions
     var rect = menu.getBoundingClientRect();
     var viewportHeight = window.innerHeight;
+    var viewportWidth = window.innerWidth;
 
-    // Check if menu overflows bottom of viewport
+    // Check vertical overflow
     if (rect.bottom > viewportHeight) {
-        // Position menu above the toggle button instead
+        // Calculate space above and below
+        // The menu is currently positioned below the parent (default CSS)
+        // Parent top is roughly rect.top - margin
+
+        // We will flip to top if there is more space above or if it simply fits better
         menu.style.top = 'auto';
         menu.style.bottom = '100%';
         menu.style.marginTop = '0';
         menu.style.marginBottom = '4px';
+
+        // Re-check if it now overflows the top
+        var newRect = menu.getBoundingClientRect();
+        if (newRect.top < 0) {
+            // It overflows top too. 
+            // Revert to bottom if there's more space below, or just cap height.
+            // For simplicity, if it overflows top after flipping, revert to bottom and set max-height
+            menu.style.top = '';
+            menu.style.bottom = '';
+            menu.style.marginTop = '';
+            menu.style.marginBottom = '';
+
+            // Re-read rect
+            rect = menu.getBoundingClientRect();
+
+            // Constrain height to available space
+            var availableHeight = viewportHeight - rect.top - 10;
+            if (availableHeight < 100) {
+                // Not enough space below, force top with max-height?
+                // Or just use fixed positioning (which is complex with scrolling parents)
+                // Let's set max-height to fit below
+                menu.style.maxHeight = Math.max(100, availableHeight) + 'px';
+                menu.style.overflowY = 'auto';
+            } else {
+                menu.style.maxHeight = availableHeight + 'px';
+                menu.style.overflowY = 'auto';
+            }
+        }
+    }
+
+    // Refresh rect after vertical adjustments
+    rect = menu.getBoundingClientRect();
+
+    // Check horizontal overflow
+    // Logic: Default CSS is usually 'right: 0' (aligned right).
+    // If rect.left < 0, it overflows left. Switch to 'left: 0'.
+    if (rect.left < 0) {
+        menu.style.right = 'auto';
+        menu.style.left = '0';
+    } else if (rect.right > viewportWidth) {
+        // If rect.right > viewportWidth, it overflows right. Switch to 'right: 0'.
+        menu.style.left = 'auto';
+        menu.style.right = '0';
     }
 }
 
@@ -2181,6 +2243,13 @@ function closeFolderActionsMenu(folderId) {
     var menu = document.getElementById('folder-actions-menu-' + folderId);
     if (menu) {
         menu.classList.remove('show');
+        // Unexpand sort submenus
+        menu.querySelectorAll('.sort-submenu').forEach(function (submenu) {
+            submenu.style.display = 'none';
+        });
+        menu.querySelectorAll('.sort-chevron').forEach(function (chevron) {
+            chevron.style.transform = 'rotate(0deg)';
+        });
     }
 }
 
@@ -2190,6 +2259,13 @@ document.addEventListener('click', function (event) {
     if (!event.target.closest('.folder-actions')) {
         document.querySelectorAll('.folder-actions-menu.show').forEach(function (menu) {
             menu.classList.remove('show');
+            // Unexpand sort submenus
+            menu.querySelectorAll('.sort-submenu').forEach(function (submenu) {
+                submenu.style.display = 'none';
+            });
+            menu.querySelectorAll('.sort-chevron').forEach(function (chevron) {
+                chevron.style.transform = 'rotate(0deg)';
+            });
         });
     }
 });

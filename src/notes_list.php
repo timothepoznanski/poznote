@@ -104,7 +104,8 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         $draggableAttr = $isSystemFolder ? '' : " draggable='true'";
         
         // Note: draggable is set on folder-toggle, not folder-header, to avoid conflicts with note dragging
-        echo "<div class='$folderClass' data-folder-id='$folderId' data-folder='$folderName' data-folder-key='folder_$folderId' data-action='select-folder'>";
+        $currentSort = isset($folderData['sort_setting']) ? $folderData['sort_setting'] : '';
+        echo "<div class='$folderClass' data-folder-id='$folderId' data-folder='$folderName' data-folder-key='folder_$folderId' data-sort-setting='$currentSort' data-action='select-folder'>";
         // Make the entire folder toggle area clickable to open/close the folder
         // draggable is set here to avoid capturing note drag events from folder-content
         echo "<div class='folder-toggle' data-action='toggle-folder' data-folder-dom-id='$folderDomId' data-folder-id='$folderId' data-folder='$folderName'$draggableAttr>";
@@ -135,7 +136,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         echo "<span class='folder-actions'>";
         
         // Generate folder actions
-        echo generateFolderActions($folderId, $folderName, $workspace_filter, $noteCount);
+        echo generateFolderActions($folderId, $folderName, $workspace_filter, $noteCount, $currentSort);
         
         echo "</span>";
         echo "</div>";
@@ -166,7 +167,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             }
         }
         
-        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='$folderId' data-folder='$folderName' draggable='true' data-action='load-note'>";
+        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='$folderId' data-folder='$folderName' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note'>";
         echo "<span class='note-title'>" . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
         echo "</a>";
         echo "<div id=pxbetweennotes></div>";
@@ -268,7 +269,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         $noteClass = 'links_arbo_left note-without-folder';
         $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
         
-        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='' data-folder='' draggable='true' data-action='load-note'>";
+        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='' data-folder='' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note'>";
         echo "<span class='note-title'>" . htmlspecialchars(($row1["heading"] ?: t('index.note.new_note', [], 'New note')), ENT_QUOTES) . "</span>";
         echo "</a>";
         echo "<div id=pxbetweennotes></div>";
@@ -291,7 +292,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         $noteClass = 'links_arbo_left note-without-folder';
         $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
         
-        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='' data-folder='' draggable='true' data-action='load-note'>";
+        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='' data-folder='' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note'>";
         echo "<span class='note-title'>" . htmlspecialchars(($row1["heading"] ?: t('index.note.new_note', [], 'New note')), ENT_QUOTES) . "</span>";
         echo "</a>";
         echo "<div id=pxbetweennotes></div>";

@@ -869,12 +869,12 @@
         "folder_actions": {
             "menu": "Acciones",
             "create": "Crear",
-            "move_all_files": "Mover todos los archivos a otra carpeta",
+            "move_all_files": "Mover los archivos",
             "rename_folder": "Renombrar carpeta",
             "delete_folder": "Eliminar carpeta",
-            "move_folder": "Mover carpeta a subcarpeta",
+            "move_folder": "Mover carpeta",
             "change_icon": "Cambiar icono",
-            "download_folder": "Descargar carpeta",
+            "download_folder": "Descargar",
             "is_public": "Es compartida",
             "share_folder": "Compartir"
         }
@@ -1810,5 +1810,11 @@
             "step3": "Agrega la configuración a tu archivo .env",
             "step4": "Reinicia la aplicación para que los cambios surtan efecto"
         }
+    },
+    "sort": {
+        "header": "Ordenar por",
+        "alphabet": "Nombre",
+        "created": "Fecha de creación",
+        "modified": "Fecha de modificación"
     }
 }

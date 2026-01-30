@@ -869,11 +869,11 @@
         "folder_actions": {
             "menu": "Aktionen",
             "create": "Erstellen",
-            "move_all_files": "Alle Dateien in einen anderen Ordner verschieben",
+            "move_all_files": "Dateien verschieben",
             "rename_folder": "Ordner umbenennen",
             "delete_folder": "Ordner löschen",
-            "move_folder": "Ordner in Unterordner verschieben",
-            "download_folder": "Ordner herunterladen",
+            "move_folder": "Ordner verschieben",
+            "download_folder": "Herunterladen",
             "change_icon": "Symbol ändern",
             "is_public": "Ist geteilt",
             "share_folder": "Teilen"
@@ -1810,5 +1810,11 @@
             "step3": "Fügen Sie die Konfiguration zu Ihrer .env-Datei hinzu",
             "step4": "Starten Sie die Anwendung neu, damit die Änderungen wirksam werden"
         }
+    },
+    "sort": {
+        "header": "Sortieren nach",
+        "alphabet": "Name",
+        "created": "Erstellungsdatum",
+        "modified": "Änderungsdatum"
     }
 }

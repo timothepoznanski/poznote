@@ -7,3 +7,4 @@
 // Global configuration variables (will be set by PHP)
 var isSearchMode;
 var currentNoteFolder;
+var defaultNoteSortType;

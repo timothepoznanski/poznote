@@ -221,6 +221,10 @@ try {
         if (!in_array('kanban_enabled', $existingColumns)) {
             $con->exec("ALTER TABLE folders ADD COLUMN kanban_enabled INTEGER DEFAULT 0");
         }
+        // Add 'sort_setting' column if missing (for per-folder sort preference)
+        if (!in_array('sort_setting', $existingColumns)) {
+            $con->exec("ALTER TABLE folders ADD COLUMN sort_setting TEXT");
+        }
     } catch (Exception $e) {
         error_log('Could not add missing columns to folders: ' . $e->getMessage());
     }
