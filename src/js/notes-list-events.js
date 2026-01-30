@@ -366,6 +366,79 @@
                     window.closeKanbanView();
                 }
                 break;
+
+
+
+            case 'toggle-sort-submenu':
+                event.preventDefault();
+                event.stopPropagation();
+
+                var chevron = actionElement.querySelector('.sort-chevron');
+                var submenu = actionElement.nextElementSibling;
+
+                if (submenu && submenu.classList.contains('sort-submenu')) {
+                    if (submenu.style.display === 'none' || !submenu.style.display) {
+                        submenu.style.display = 'block';
+                        if (chevron) chevron.style.transform = 'rotate(90deg)';
+                    } else {
+                        submenu.style.display = 'none';
+                        if (chevron) chevron.style.transform = 'rotate(0deg)';
+                    }
+                }
+                break;
+
+            case 'sort-folder':
+                event.preventDefault();
+                event.stopPropagation();
+                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
+                var sortType = actionElement.getAttribute('data-sort-type');
+
+                // Update UI: checkmark and active highlighting
+                var parentMenu = actionElement.closest('.folder-actions-menu');
+                if (parentMenu) {
+                    var siblings = parentMenu.querySelectorAll('[data-action="sort-folder"]');
+                    siblings.forEach(function (el) {
+                        el.classList.remove('active');
+                    });
+                    actionElement.classList.add('active');
+
+                    // Update header label
+                    var submenuContainer = actionElement.parentElement;
+                    if (submenuContainer && submenuContainer.classList.contains('sort-submenu')) {
+                        var toggleBtn = submenuContainer.previousElementSibling;
+                        if (toggleBtn && toggleBtn.getAttribute('data-action') === 'toggle-sort-submenu') {
+                            var headerLabel = toggleBtn.querySelector('.sort-header-label');
+                            var optionLabel = actionElement.querySelector('.sort-option-label');
+                            if (headerLabel && optionLabel) {
+                                headerLabel.textContent = optionLabel.textContent;
+                            }
+                        }
+                    }
+                }
+
+                if (typeof window.closeFolderActionsMenu === 'function') {
+                    window.closeFolderActionsMenu(folderId);
+                }
+
+                if (folderId && typeof window.sortNotesInFolder === 'function') {
+                    if (!sortType) sortType = 'modified';
+                    window.sortNotesInFolder(folderId, sortType);
+
+                    // Save to database
+                    fetch('api_save_folder_sort.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            folder_id: folderId,
+                            sort_type: sortType
+                        })
+                    }).catch(function (err) {
+                        console.error('Failed to save sort setting', err);
+                    });
+                }
+                break;
         }
     }
 
@@ -484,6 +557,81 @@
     }
 
     // Expose to window for use after AJAX refresh
+    /**
+     * Sort notes within a folder DOM element
+     * @param {number} folderId - The ID of the folder to sort
+     * @param {string} sortType - The sort criteria ('alphabet', 'created', 'modified')
+     */
+    function sortNotesInFolder(folderId, sortType) {
+        var folderContentId = 'folder-' + folderId;
+        var folderContent = document.getElementById(folderContentId);
+        if (!folderContent) return;
+
+        // Get all notes (links) - scope to direct children to avoid subfolder notes
+        // Note: we look for .links_arbo_left which are notes
+        var notes = Array.from(folderContent.querySelectorAll(':scope > a.links_arbo_left'));
+
+        if (notes.length === 0) return;
+
+        // Sort the notes array
+        notes.sort(function (a, b) {
+            var valA, valB;
+
+            if (sortType === 'alphabet') {
+                valA = (a.querySelector('.note-title').textContent || '').toLowerCase();
+                valB = (b.querySelector('.note-title').textContent || '').toLowerCase();
+                return valA.localeCompare(valB);
+            } else if (sortType === 'created') {
+                // Descending (Newest first)
+                valA = a.getAttribute('data-created') || '';
+                valB = b.getAttribute('data-created') || '';
+                if (valA < valB) return 1;
+                if (valA > valB) return -1;
+                return 0;
+            } else if (sortType === 'modified') {
+                // Descending (Newest first)
+                valA = a.getAttribute('data-updated') || '';
+                valB = b.getAttribute('data-updated') || '';
+                if (valA < valB) return 1;
+                if (valA > valB) return -1;
+                return 0;
+            }
+            return 0;
+        });
+
+        // Find the insertion point (before the first subfolder)
+        var firstSubfolder = folderContent.querySelector(':scope > .folder-header');
+
+        // Create a document fragment for better performance
+        var fragment = document.createDocumentFragment();
+
+        // Detach notes and re-attach in order with spacers
+        notes.forEach(function (note) {
+            // Remove the spacer following this note if it exists
+            var next = note.nextElementSibling;
+            if (next && next.id === 'pxbetweennotes') {
+                next.remove();
+            }
+
+            // Note: note.remove() is automatic when we appendChild to fragment
+            fragment.appendChild(note);
+
+            // Add spacer
+            var spacer = document.createElement('div');
+            spacer.id = 'pxbetweennotes';
+            fragment.appendChild(spacer);
+        });
+
+        // Insert sorted content
+        if (firstSubfolder) {
+            folderContent.insertBefore(fragment, firstSubfolder);
+        } else {
+            folderContent.appendChild(fragment);
+        }
+    }
+
+    // Expose to window
+    window.sortNotesInFolder = sortNotesInFolder;
     window.reinitializeFavoritesToggle = reinitializeFavoritesToggle;
 
     // Initialize on DOMContentLoaded

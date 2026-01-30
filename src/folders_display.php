@@ -24,14 +24,14 @@ function countNotesRecursively($folderData) {
  * Now returns array with 'folders' and 'uncategorized_notes' keys
  * OPTIMIZED: Pre-load all folder data to avoid N+1 queries
  */
-function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
+function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sort = 'updated_desc') {
     $folders = [];
     $uncategorized_notes = []; // Notes without folder
     $folders_with_results = [];
     
     // PRE-LOAD all folders in one query to avoid N+1 problem
     $folders_cache = [];
-    $folders_query = "SELECT id, name, icon, icon_color, kanban_enabled FROM folders";
+    $folders_query = "SELECT id, name, icon, icon_color, kanban_enabled, sort_setting FROM folders";
     if ($workspace_filter) {
         $folders_query .= " WHERE workspace = ?";
         $folders_stmt = $con->prepare($folders_query);
@@ -44,7 +44,8 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
             'name' => $folder_row['name'],
             'icon' => $folder_row['icon'] ?? null,
             'icon_color' => $folder_row['icon_color'] ?? null,
-            'kanban_enabled' => (int)($folder_row['kanban_enabled'] ?? 0)
+            'kanban_enabled' => (int)($folder_row['kanban_enabled'] ?? 0),
+            'sort_setting' => $folder_row['sort_setting'] ?? null
         ];
     }
     
@@ -54,6 +55,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
         $folderIcon = null; // Initialize icon variable
         $folderIconColor = null; // Initialize icon color variable
         $kanbanEnabled = 0; // Initialize kanban_enabled
+        $sortSetting = null;
 
         // If no folder_id, this note has no folder - add to uncategorized list
         if ($folderId === null) {
@@ -67,6 +69,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
             $folderIcon = $folders_cache[$folderId]['icon'];
             $folderIconColor = $folders_cache[$folderId]['icon_color'];
             $kanbanEnabled = $folders_cache[$folderId]['kanban_enabled'];
+            $sortSetting = $folders_cache[$folderId]['sort_setting'];
         }
 
         if (!isset($folders[$folderId])) {
@@ -76,11 +79,68 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
                 'icon' => $folderIcon ?? null,
                 'icon_color' => $folderIconColor ?? null,
                 'kanban_enabled' => $kanbanEnabled,
+                'sort_setting' => $sortSetting,
                 'notes' => []
             ];
         }
 
         $folders[$folderId]['notes'][] = $row1;
+    }
+    
+    // Sort notes within folders based on sort_setting OR default sort
+    foreach ($folders as &$folder) {
+        $sortType = null;
+        
+        // Folder-specific sort overrides global default
+        if (isset($folder['sort_setting']) && !empty($folder['sort_setting'])) {
+            $sortType = $folder['sort_setting'];
+        } else {
+            // Map global setting to folder sort type
+            switch ($default_sort) {
+                case 'heading_asc':
+                    $sortType = 'alphabet';
+                    break;
+                case 'created_desc':
+                    $sortType = 'created';
+                    break;
+                case 'updated_desc':
+                default:
+                    $sortType = 'modified';
+                    break;
+            }
+        }
+        
+        // Ensure effective sort type is used for UI rendering (e.g. checkmark display)
+        if ($sortType) {
+            $folder['sort_setting'] = $sortType;
+        }
+        
+        // Apply sort
+        
+        if ($sortType === 'alphabet') {
+            usort($folder['notes'], function($a, $b) {
+                // Use heading, fallback to empty string
+                $headingA = isset($a['heading']) ? mb_strtolower($a['heading'], 'UTF-8') : '';
+                $headingB = isset($b['heading']) ? mb_strtolower($b['heading'], 'UTF-8') : '';
+                
+                // Handle "New note" translations if needed, but simplistic approach here
+                return strnatcasecmp($headingA, $headingB);
+            });
+        } elseif ($sortType === 'created') {
+            usort($folder['notes'], function($a, $b) {
+                $createdA = isset($a['created']) ? $a['created'] : '';
+                $createdB = isset($b['created']) ? $b['created'] : '';
+                // Newest first
+                return strcmp($createdB, $createdA);
+            });
+        } elseif ($sortType === 'modified') {
+            usort($folder['notes'], function($a, $b) {
+                $updatedA = isset($a['updated']) ? $a['updated'] : '';
+                $updatedB = isset($b['updated']) ? $b['updated'] : '';
+                // Newest first
+                return strcmp($updatedB, $updatedA);
+            });
+        }
     }
     
     return [
@@ -94,7 +154,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
  * Now uses folder_id as key
  */
 function addEmptyFolders($con, $folders, $workspace_filter) {
-    $folders_sql = "SELECT id, name, icon, icon_color, kanban_enabled FROM folders";
+    $folders_sql = "SELECT id, name, icon, icon_color, kanban_enabled, sort_setting FROM folders";
     $params = [];
     if (!empty($workspace_filter)) {
         $folders_sql .= " WHERE workspace = ?";
@@ -110,6 +170,7 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
         $folderIcon = $folder_row['icon'] ?? null;
         $folderIconColor = $folder_row['icon_color'] ?? null;
         $kanbanEnabled = (int)($folder_row['kanban_enabled'] ?? 0);
+        $sortSetting = $folder_row['sort_setting'] ?? null;
 
         if (!isset($folders[$folderId])) {
             $folders[$folderId] = [
@@ -118,13 +179,15 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
                 'icon' => $folderIcon,
                 'icon_color' => $folderIconColor,
                 'kanban_enabled' => $kanbanEnabled,
+                'sort_setting' => $sortSetting,
                 'notes' => []
             ];
         } else {
-            // Update icon, color and kanban_enabled if folder already exists
+            // Update icon, color, kanban_enabled and sort_setting if folder already exists
             $folders[$folderId]['icon'] = $folderIcon;
             $folders[$folderId]['icon_color'] = $folderIconColor;
             $folders[$folderId]['kanban_enabled'] = $kanbanEnabled;
+            $folders[$folderId]['sort_setting'] = $sortSetting;
         }
     }
 
@@ -225,7 +288,7 @@ function shouldFolderBeOpen($con, $folderData, $is_search_mode, $folders_with_re
  * Génère les actions disponibles pour un dossier
  * OPTIMIZED: Uses cached shared folders data to avoid N+1 queries
  */
-function generateFolderActions($folderId, $folderName, $workspace_filter, $noteCount = 0) {
+function generateFolderActions($folderId, $folderName, $workspace_filter, $noteCount = 0, $currentSort = null) {
     global $con;
     static $sharedFoldersCache = null;
     
@@ -314,6 +377,42 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
         $actions .= "<i class='fa-palette'></i>";
         $actions .= "<span>" . t_h('notes_list.folder_actions.change_icon', [], 'Change icon') . "</span>";
         $actions .= "</div>";
+        
+
+        
+        // Sort Options Definition
+        $sortTypes = [
+            'alphabet' => ['icon' => 'fal fa-sort-alpha-down', 'label' => t_h('sort.alphabet', [], 'Name')],
+            'created' => ['icon' => 'fal fa-calendar-plus', 'label' => t_h('sort.created', [], 'Date Created')],
+            'modified' => ['icon' => 'fal fa-calendar-alt', 'label' => t_h('sort.modified', [], 'Date Modified')]
+        ];
+
+        // Determine active label
+        $currentLabel = isset($sortTypes[$currentSort]) ? $sortTypes[$currentSort]['label'] : t_h('sort.header', [], 'Sort by');
+
+        // Sort Submenu Toggle (Accordion style)
+        $actions .= "<div class='folder-actions-menu-item' data-action='toggle-sort-submenu' data-folder-id='$folderId'>";
+        $actions .= "<i class='fal fa-sort-amount-down'></i>";
+        $actions .= "<span class='sort-header-label'>" . $currentLabel . "</span>";
+
+        $actions .= "</div>";
+
+        // Sort Options Container
+        $actions .= "<div class='sort-submenu' style='display: none; background: rgba(0,0,0,0.03);'>";
+
+        foreach ($sortTypes as $type => $data) {
+            $isActive = ($currentSort === $type);
+            $activeClass = $isActive ? ' active' : '';
+            
+            $actions .= "<div class='folder-actions-menu-item$activeClass submenu-item' data-action='sort-folder' data-sort-type='$type' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName' style='padding-left: 28px;'>";
+            $actions .= "<i class='" . $data['icon'] . "'></i>";
+            $actions .= "<span class='sort-option-label'>" . $data['label'] . "</span>";
+            $actions .= "</div>";
+        }
+        $actions .= "</div>"; // Close sort-submenu
+        
+
+
         
         // Delete folder action
         $actions .= "<div class='folder-actions-menu-item danger' data-action='delete-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";

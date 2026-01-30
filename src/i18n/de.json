@@ -741,10 +741,12 @@
             "title_in_folder": "Erstellen in {{folder}}",
             "folder_fallback": "Ordner",
             "note": {
-                "title": "HTML-Notiz (nicht Markdown)"
+                "title": "HTML-Notiz",
+                "description": "Nicht Markdown"
             },
             "markdown": {
-                "title": "Markdown-Notiz (nicht HTML)"
+                "title": "Markdown-Notiz",
+                "description": "Nicht HTML"
             },
             "task_list": {
                 "title": "Aufgabenliste"
@@ -867,11 +869,11 @@
         "folder_actions": {
             "menu": "Aktionen",
             "create": "Erstellen",
-            "move_all_files": "Alle Dateien in einen anderen Ordner verschieben",
+            "move_all_files": "Dateien verschieben",
             "rename_folder": "Ordner umbenennen",
             "delete_folder": "Ordner löschen",
-            "move_folder": "Ordner in Unterordner verschieben",
-            "download_folder": "Ordner herunterladen",
+            "move_folder": "Ordner verschieben",
+            "download_folder": "Herunterladen",
             "change_icon": "Symbol ändern",
             "is_public": "Ist geteilt",
             "share_folder": "Teilen"
@@ -928,7 +930,8 @@
         "youtube_url_prompt": "Geben Sie die YouTube-Video-URL oder -ID ein:",
         "youtube_help": "Unterstützt: youtube.com/watch?v=ID, youtu.be/ID oder nur die Video-ID",
         "youtube_insert": "Einfügen",
-        "youtube_invalid_url": "Ungültige YouTube-URL"
+        "youtube_invalid_url": "Ungültige YouTube-URL",
+        "date": "Datum"
     },
     "api": {
         "settings": {
@@ -1807,5 +1810,11 @@
             "step3": "Fügen Sie die Konfiguration zu Ihrer .env-Datei hinzu",
             "step4": "Starten Sie die Anwendung neu, damit die Änderungen wirksam werden"
         }
+    },
+    "sort": {
+        "header": "Sortieren nach",
+        "alphabet": "Name",
+        "created": "Erstellungsdatum",
+        "modified": "Änderungsdatum"
     }
 }

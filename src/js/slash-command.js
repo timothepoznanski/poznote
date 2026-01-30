@@ -407,7 +407,7 @@
         }
     }
 
-    function insertCodeBlock() {
+    function insertCodeBlock(language) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
 
@@ -416,6 +416,14 @@
         // Create code block (pre > code structure)
         const pre = document.createElement('pre');
         const code = document.createElement('code');
+        
+        // Add language class if specified
+        if (language) {
+            code.className = 'language-' + language;
+            code.setAttribute('data-language', language);
+            pre.setAttribute('data-language', language);
+        }
+        
         const textNode = document.createTextNode('\u200B');
         code.appendChild(textNode);
         pre.appendChild(code);
@@ -889,6 +897,217 @@
         fileInput.click();
     }
 
+    function insertDate() {
+        // Find current editor context to restore later
+        const context = getEditorContext();
+        if (!context) return;
+
+        const dateInput = document.createElement('input');
+        dateInput.type = 'date';
+        dateInput.style.position = 'fixed';
+        dateInput.style.opacity = '0';
+        dateInput.style.zIndex = '9999';
+        dateInput.style.pointerEvents = 'none';
+
+        // Attempt to position near the cursor
+        try {
+            const selection = window.getSelection();
+            if (selection && selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                const rect = range.getBoundingClientRect();
+                dateInput.style.left = rect.left + 'px';
+                dateInput.style.top = rect.bottom + 'px';
+            } else {
+                // Fallback to center
+                dateInput.style.left = '50%';
+                dateInput.style.top = '50%';
+                dateInput.style.transform = 'translate(-50%, -50%)';
+            }
+        } catch (e) {
+            // Fallback to center
+            dateInput.style.left = '50%';
+            dateInput.style.top = '50%';
+            dateInput.style.transform = 'translate(-50%, -50%)';
+        }
+
+        document.body.appendChild(dateInput);
+
+        dateInput.addEventListener('change', function () {
+            const date = dateInput.value;
+            if (date) {
+                // Focus the editor back before inserting
+                context.editableElement.focus();
+
+                // Format the date based on user's locale
+                const formattedDate = new Date(date).toLocaleDateString();
+                if (typeof window.insertHTMLAtSelection === 'function') {
+                    window.insertHTMLAtSelection(formattedDate);
+                } else {
+                    // Fallback for HTML notes
+                    const selection = window.getSelection();
+                    if (selection && selection.rangeCount) {
+                        const range = selection.getRangeAt(0);
+                        range.deleteContents();
+                        range.insertNode(document.createTextNode(formattedDate));
+                    }
+                }
+            }
+            document.body.removeChild(dateInput);
+
+            // Trigger input event for autosave
+            const noteEntry = context.noteEntry;
+            if (noteEntry) {
+                noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        });
+
+        // Some browsers need a short delay or user interaction
+        if (dateInput.showPicker) {
+            dateInput.showPicker();
+        } else {
+            dateInput.click();
+        }
+    }
+
+    function insertDateMarkdown() {
+        const context = getEditorContext();
+        if (!context) return;
+
+        const dateInput = document.createElement('input');
+        dateInput.type = 'date';
+        dateInput.style.position = 'fixed';
+        dateInput.style.opacity = '0';
+        dateInput.style.zIndex = '9999';
+        dateInput.style.pointerEvents = 'none';
+
+        // Attempt to position near the cursor
+        try {
+            const selection = window.getSelection();
+            if (selection && selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                const rect = range.getBoundingClientRect();
+                dateInput.style.left = rect.left + 'px';
+                dateInput.style.top = rect.bottom + 'px';
+            } else {
+                // Fallback to center
+                dateInput.style.left = '50%';
+                dateInput.style.top = '50%';
+                dateInput.style.transform = 'translate(-50%, -50%)';
+            }
+        } catch (e) {
+            // Fallback to center
+            dateInput.style.left = '50%';
+            dateInput.style.top = '50%';
+            dateInput.style.transform = 'translate(-50%, -50%)';
+        }
+
+        document.body.appendChild(dateInput);
+
+        dateInput.addEventListener('change', function () {
+            const date = dateInput.value;
+            if (date) {
+                // Focus the editor back before inserting
+                context.editableElement.focus();
+
+                const formattedDate = new Date(date).toLocaleDateString();
+                insertMarkdownAtCursor(formattedDate, 0);
+            }
+            document.body.removeChild(dateInput);
+        });
+
+        if (dateInput.showPicker) {
+            dateInput.showPicker();
+        } else {
+            dateInput.click();
+        }
+    }
+
+    // Slash command menu items for title inputs (notecards)
+    // Limited set of commands suitable for title editing
+    function getTitleSlashCommands() {
+        const t = window.t || ((key, params, fallback) => fallback);
+        return [
+            {
+                id: 'emoji',
+                icon: 'fa-smile',
+                label: t('slash_menu.emoji', null, 'Emoji'),
+                action: function () {
+                    const input = savedEditableElement;
+                    if (!input || input.tagName !== 'INPUT') return;
+
+                    // Ensure input focus and preserve selection for emoji insertion
+                    input.focus();
+                    window.savedActiveInput = input;
+                    window.savedActiveInputSelection = {
+                        start: input.selectionStart,
+                        end: input.selectionEnd
+                    };
+
+                    // Open the emoji picker after focus is applied
+                    if (typeof window.toggleEmojiPicker === 'function') {
+                        setTimeout(() => window.toggleEmojiPicker(), 0);
+                    }
+                }
+            },
+            {
+                id: 'date',
+                icon: 'fa-calendar-alt',
+                label: t('slash_menu.date', null, 'Date'),
+                action: function () {
+                    const input = savedEditableElement;
+                    if (!input || input.tagName !== 'INPUT') return;
+
+                    // Capture insertion position now (selection is already restored by deleteSlashText)
+                    const insertionStart = (typeof input.selectionStart === 'number') ? input.selectionStart : Math.max(0, slashOffset);
+                    const insertionEnd = (typeof input.selectionEnd === 'number') ? input.selectionEnd : insertionStart;
+                    
+                    const dateInput = document.createElement('input');
+                    dateInput.type = 'date';
+                    dateInput.style.position = 'fixed';
+                    dateInput.style.top = '-1000px';
+                    dateInput.style.left = '-1000px';
+                    document.body.appendChild(dateInput);
+
+                    dateInput.addEventListener('change', function () {
+                        const date = dateInput.value;
+                        if (date) {
+                            const formattedDate = new Date(date).toLocaleDateString() + ' ';
+                            const text = input.value;
+
+                            const safeStart = Math.max(0, Math.min(insertionStart, text.length));
+                            const safeEnd = Math.max(safeStart, Math.min(insertionEnd, text.length));
+
+                            if (typeof input.setRangeText === 'function') {
+                                input.setRangeText(formattedDate, safeStart, safeEnd, 'end');
+                            } else {
+                                input.value = text.substring(0, safeStart) + formattedDate + text.substring(safeEnd);
+                            }
+
+                            const caretPos = safeStart + formattedDate.length;
+                            input.dispatchEvent(new Event('input', { bubbles: true }));
+                            input.focus();
+                            try {
+                                input.setSelectionRange(caretPos, caretPos);
+                            } catch (e) { }
+                            setTimeout(() => {
+                                try {
+                                    input.setSelectionRange(caretPos, caretPos);
+                                } catch (e) { }
+                            }, 0);
+                        }
+                        document.body.removeChild(dateInput);
+                    });
+
+                    if (dateInput.showPicker) {
+                        dateInput.showPicker();
+                    } else {
+                        dateInput.click();
+                    }
+                }
+            }
+        ];
+    }
+
     // Slash command menu items - actions match toolbar exactly
     // Order matches toolbar
     // Use a function to get translated labels at runtime
@@ -944,7 +1163,32 @@
                 label: t('slash_menu.code', null, 'Code'),
                 submenu: [
                     { id: 'inline-code', icon: 'fa-terminal', label: t('slash_menu.inline_code', null, 'Inline code'), action: () => insertCode() },
-                    { id: 'code-block', icon: 'fa-code', label: t('slash_menu.code_block', null, 'Code block'), action: () => insertCodeBlock() }
+                    { id: 'code-block', icon: 'fa-code', label: t('slash_menu.code_block', null, 'Code block'), action: () => insertCodeBlock() },
+                    {
+                        id: 'block-languages',
+                        icon: 'fa-laptop-code',
+                        label: t('slash_menu.block_languages', null, 'Block Languages'),
+                        submenu: [
+                            { id: 'code-javascript', icon: 'fa-code', iconColor: '#f7df1e', label: 'JavaScript', action: () => insertCodeBlock('javascript') },
+                            { id: 'code-typescript', icon: 'fa-code', iconColor: '#3178c6', label: 'TypeScript', action: () => insertCodeBlock('typescript') },
+                            { id: 'code-python', icon: 'fa-code', iconColor: '#3776ab', label: 'Python', action: () => insertCodeBlock('python') },
+                            { id: 'code-html', icon: 'fa-code', iconColor: '#e34f26', label: 'HTML', action: () => insertCodeBlock('html') },
+                            { id: 'code-css', icon: 'fa-code', iconColor: '#1572b6', label: 'CSS', action: () => insertCodeBlock('css') },
+                            { id: 'code-json', icon: 'fa-code', iconColor: '#292929', label: 'JSON', action: () => insertCodeBlock('json') },
+                            { id: 'code-bash', icon: 'fa-terminal', iconColor: '#4eaa25', label: 'Bash', action: () => insertCodeBlock('bash') },
+                            { id: 'code-sql', icon: 'fa-database', iconColor: '#336791', label: 'SQL', action: () => insertCodeBlock('sql') },
+                            { id: 'code-php', icon: 'fa-code', iconColor: '#777bb4', label: 'PHP', action: () => insertCodeBlock('php') },
+                            { id: 'code-java', icon: 'fa-code', iconColor: '#007396', label: 'Java', action: () => insertCodeBlock('java') },
+                            { id: 'code-csharp', icon: 'fa-code', iconColor: '#239120', label: 'C#', action: () => insertCodeBlock('csharp') },
+                            { id: 'code-cpp', icon: 'fa-code', iconColor: '#00599c', label: 'C++', action: () => insertCodeBlock('cpp') },
+                            { id: 'code-go', icon: 'fa-code', iconColor: '#00add8', label: 'Go', action: () => insertCodeBlock('go') },
+                            { id: 'code-rust', icon: 'fa-code', iconColor: '#b7410e', label: 'Rust', action: () => insertCodeBlock('rust') },
+                            { id: 'code-ruby', icon: 'fa-gem', iconColor: '#cc342d', label: 'Ruby', action: () => insertCodeBlock('ruby') },
+                            { id: 'code-yaml', icon: 'fa-file-code', iconColor: '#cb171e', label: 'YAML', action: () => insertCodeBlock('yaml') },
+                            { id: 'code-xml', icon: 'fa-file-code', iconColor: '#0060ac', label: 'XML', action: () => insertCodeBlock('xml') },
+                            { id: 'code-markdown', icon: 'fa-file-code', iconColor: '#083fa1', label: 'Markdown', action: () => insertCodeBlock('markdown') }
+                        ]
+                    }
                 ]
             },
             {
@@ -980,168 +1224,198 @@
                 ]
             },
             {
-                id: 'toggle',
-                icon: 'fa-caret-down',
-                label: t('slash_menu.toggle', null, 'Toggle'),
-                action: function () {
-                    insertToggle();
-                }
-            },
-            {
-                id: 'image',
-                icon: 'fa-image',
-                label: t('slash_menu.image', null, 'Image'),
-                action: function () {
-                    insertImage();
-                }
-            },
-            {
-                id: 'excalidraw',
-                icon: 'fal fa-paint-brush',
-                label: t('slash_menu.excalidraw', null, 'Excalidraw'),
-                action: function () {
-                    if (typeof window.insertExcalidrawDiagram === 'function') {
-                        window.insertExcalidrawDiagram();
+                id: 'insert',
+                icon: 'fa-plus',
+                label: t('slash_menu.insert', null, 'Insert'),
+                submenu: [
+                    {
+                        id: 'toggle',
+                        icon: 'fa-caret-down',
+                        label: t('slash_menu.toggle', null, 'Toggle'),
+                        action: function () {
+                            insertToggle();
+                        }
+                    },
+                    {
+                        id: 'date',
+                        icon: 'fa-calendar-alt',
+                        label: t('slash_menu.date', null, 'Date'),
+                        mobileHidden: true,
+                        action: function () {
+                            insertDate();
+                        }
+                    },
+                    {
+                        id: 'excalidraw',
+                        icon: 'fal fa-paint-brush',
+                        label: t('slash_menu.excalidraw', null, 'Excalidraw'),
+                        action: function () {
+                            if (typeof window.insertExcalidrawDiagram === 'function') {
+                                window.insertExcalidrawDiagram();
+                            }
+                        },
+                        mobileHidden: true
+                    },
+                    {
+                        id: 'emoji',
+                        icon: 'fa-smile',
+                        label: t('slash_menu.emoji', null, 'Emoji'),
+                        mobileHidden: true,
+                        action: function () {
+                            if (typeof window.toggleEmojiPicker === 'function') {
+                                window.toggleEmojiPicker();
+                            }
+                        }
+                    },
+                    {
+                        id: 'table',
+                        icon: 'fa-table',
+                        label: t('slash_menu.table', null, 'Table'),
+                        action: function () {
+                            if (typeof window.toggleTablePicker === 'function') {
+                                window.toggleTablePicker();
+                            }
+                        }
+                    },
+                    {
+                        id: 'separator',
+                        icon: 'fa-minus',
+                        label: t('slash_menu.separator', null, 'Separator'),
+                        action: function () {
+                            if (typeof window.insertSeparator === 'function') {
+                                window.insertSeparator();
+                            }
+                        }
                     }
-                },
-                mobileHidden: true
+                ]
             },
             {
-                id: 'emoji',
-                icon: 'fa-smile',
-                label: t('slash_menu.emoji', null, 'Emoji'),
-                mobileHidden: true,
-                action: function () {
-                    if (typeof window.toggleEmojiPicker === 'function') {
-                        window.toggleEmojiPicker();
-                    }
-                }
-            },
-            {
-                id: 'table',
-                icon: 'fa-table',
-                label: t('slash_menu.table', null, 'Table'),
-                action: function () {
-                    if (typeof window.toggleTablePicker === 'function') {
-                        window.toggleTablePicker();
-                    }
-                }
-            },
-            {
-                id: 'youtube',
-                icon: 'fa-video',
-                label: t('slash_menu.youtube_video', null, 'YouTube video'),
-                action: function () {
-                    if (typeof window.insertYouTubeVideo === 'function') {
-                        window.insertYouTubeVideo();
-                    }
-                }
-            },
-            {
-                id: 'separator',
-                icon: 'fa-minus',
-                label: t('slash_menu.separator', null, 'Separator'),
-                action: function () {
-                    if (typeof window.insertSeparator === 'function') {
-                        window.insertSeparator();
-                    }
-                }
-            },
-            {
-                id: 'note-reference',
-                icon: 'fa-at',
-                label: t('slash_menu.link_to_note', null, 'Link to note'),
-                action: function () {
-                    if (typeof window.openNoteReferenceModal === 'function') {
-                        window.openNoteReferenceModal();
-                    }
-                }
-            },
-            {
-                id: 'link',
+                id: 'link-menu',
                 icon: 'fa-link',
                 label: t('slash_menu.link', null, 'Link'),
-                action: function () {
-                    if (typeof window.showLinkModal === 'function') {
-                        // Save the note entry and editable element before they get cleared
-                        const noteEntry = savedNoteEntry;
-                        const editableElement = savedEditableElement;
+                submenu: [
+                    {
+                        id: 'link',
+                        icon: 'fa fa-link',
+                        label: t('slash_menu.link', null, 'Link'),
+                        action: function () {
+                            if (typeof window.showLinkModal === 'function') {
+                                // Save the note entry and editable element before they get cleared
+                                const noteEntry = savedNoteEntry;
+                                const editableElement = savedEditableElement;
 
-                        // Get current selection if any
-                        const sel = window.getSelection();
-                        const hasSelection = sel && sel.rangeCount > 0 && !sel.getRangeAt(0).collapsed;
-                        const selectedText = hasSelection ? sel.toString() : '';
-
-                        // Save the current range/position
-                        let savedRange = null;
-                        if (sel && sel.rangeCount > 0) {
-                            savedRange = sel.getRangeAt(0).cloneRange();
-                        }
-
-                        window.showLinkModal('https://', selectedText, function (url, text) {
-                            if (!url) return;
-
-                            // Create a new link element
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.textContent = text || url;
-                            a.target = '_blank';
-                            a.rel = 'noopener noreferrer';
-
-                            // Focus the editable element first
-                            if (editableElement) {
-                                editableElement.focus();
-                            }
-
-                            // Restore selection and insert link
-                            try {
+                                // Get current selection if any
                                 const sel = window.getSelection();
-                                if (savedRange) {
-                                    sel.removeAllRanges();
-                                    sel.addRange(savedRange);
+                                const hasSelection = sel && sel.rangeCount > 0 && !sel.getRangeAt(0).collapsed;
+                                const selectedText = hasSelection ? sel.toString() : '';
 
-                                    // Replace the selected text with the link
-                                    savedRange.deleteContents();
-                                    savedRange.insertNode(a);
-
-                                    // Position cursor after the link
-                                    const newRange = document.createRange();
-                                    newRange.setStartAfter(a);
-                                    newRange.setEndAfter(a);
-                                    sel.removeAllRanges();
-                                    sel.addRange(newRange);
-                                } else if (sel && sel.rangeCount > 0) {
-                                    // Fallback: insert at current position
-                                    const range = sel.getRangeAt(0);
-                                    range.insertNode(a);
-                                    range.setStartAfter(a);
-                                    range.setEndAfter(a);
-                                    sel.removeAllRanges();
-                                    sel.addRange(range);
-                                } else if (editableElement) {
-                                    // Last resort: append to editable element
-                                    editableElement.appendChild(a);
+                                // Save the current range/position
+                                let savedRange = null;
+                                if (sel && sel.rangeCount > 0) {
+                                    savedRange = sel.getRangeAt(0).cloneRange();
                                 }
-                            } catch (e) {
-                                console.error('Error inserting link:', e);
-                                // Absolute fallback
-                                if (editableElement) {
-                                    editableElement.appendChild(a);
-                                }
-                            }
 
-                            // Trigger input event for autosave
-                            if (noteEntry) {
-                                noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
-                            }
+                                window.showLinkModal('https://', selectedText, function (url, text) {
+                                    if (!url) return;
 
-                            // Save the note
-                            if (typeof window.saveNoteImmediately === 'function') {
-                                window.saveNoteImmediately();
+                                    // Create a new link element
+                                    const a = document.createElement('a');
+                                    a.href = url;
+                                    a.textContent = text || url;
+                                    a.target = '_blank';
+                                    a.rel = 'noopener noreferrer';
+
+                                    // Focus the editable element first
+                                    if (editableElement) {
+                                        editableElement.focus();
+                                    }
+
+                                    // Restore selection and insert link
+                                    try {
+                                        const sel = window.getSelection();
+                                        if (savedRange) {
+                                            sel.removeAllRanges();
+                                            sel.addRange(savedRange);
+
+                                            // Replace the selected text with the link
+                                            savedRange.deleteContents();
+                                            savedRange.insertNode(a);
+
+                                            // Position cursor after the link
+                                            const newRange = document.createRange();
+                                            newRange.setStartAfter(a);
+                                            newRange.setEndAfter(a);
+                                            sel.removeAllRanges();
+                                            sel.addRange(newRange);
+                                        } else if (sel && sel.rangeCount > 0) {
+                                            // Fallback: insert at current position
+                                            const range = sel.getRangeAt(0);
+                                            range.insertNode(a);
+                                            range.setStartAfter(a);
+                                            range.setEndAfter(a);
+                                            sel.removeAllRanges();
+                                            sel.addRange(range);
+                                        } else if (editableElement) {
+                                            // Last resort: append to editable element
+                                            editableElement.appendChild(a);
+                                        }
+                                    } catch (e) {
+                                        console.error('Error inserting link:', e);
+                                        // Absolute fallback
+                                        if (editableElement) {
+                                            editableElement.appendChild(a);
+                                        }
+                                    }
+
+                                    // Trigger input event for autosave
+                                    if (noteEntry) {
+                                        noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+                                    }
+
+                                    // Save the note
+                                    if (typeof window.saveNoteImmediately === 'function') {
+                                        window.saveNoteImmediately();
+                                    }
+                                });
                             }
-                        });
+                        }
+                    },
+                    {
+                        id: 'note-reference',
+                        icon: 'fa fa-at',
+                        label: t('slash_menu.link_to_note', null, 'Link to note'),
+                        action: function () {
+                            if (typeof window.openNoteReferenceModal === 'function') {
+                                window.openNoteReferenceModal();
+                            }
+                        }
                     }
-                }
+                ]
+            },
+            {
+                id: 'media',
+                icon: 'fa-image',
+                label: t('slash_menu.media', null, 'Media'),
+                submenu: [
+                    {
+                        id: 'image',
+                        icon: 'fa fa-image',
+                        label: t('slash_menu.image', null, 'Image'),
+                        action: function () {
+                            insertImage();
+                        }
+                    },
+                    {
+                        id: 'youtube',
+                        icon: 'fa fa-video',
+                        label: t('slash_menu.youtube_video', null, 'YouTube video'),
+                        action: function () {
+                            if (typeof window.insertYouTubeVideo === 'function') {
+                                window.insertYouTubeVideo();
+                            }
+                        }
+                    }
+                ]
             },
             {
                 id: 'open-keyboard',
@@ -1195,7 +1469,32 @@
                 label: t('slash_menu.code', null, 'Code'),
                 submenu: [
                     { id: 'inline-code', icon: 'fa-terminal', label: t('slash_menu.inline_code', null, 'Inline code'), action: () => wrapMarkdownSelection('`', '`', 1) },
-                    { id: 'code-block', icon: 'fa-code', label: t('slash_menu.code_block', null, 'Code block'), action: () => insertMarkdownAtCursor('```\n\n```\n', -5) }
+                    { id: 'code-block', icon: 'fa-code', label: t('slash_menu.code_block', null, 'Code block'), action: () => insertMarkdownAtCursor('```\n\n```\n', -5) },
+                    {
+                        id: 'block-languages',
+                        icon: 'fa-laptop-code',
+                        label: t('slash_menu.block_languages', null, 'Block Languages'),
+                        submenu: [
+                            { id: 'code-javascript', icon: 'fa-code', iconColor: '#f7df1e', label: 'JavaScript', action: () => insertMarkdownAtCursor('```javascript\n\n```\n', -5) },
+                            { id: 'code-typescript', icon: 'fa-code', iconColor: '#3178c6', label: 'TypeScript', action: () => insertMarkdownAtCursor('```typescript\n\n```\n', -5) },
+                            { id: 'code-python', icon: 'fa-code', iconColor: '#3776ab', label: 'Python', action: () => insertMarkdownAtCursor('```python\n\n```\n', -5) },
+                            { id: 'code-html', icon: 'fa-code', iconColor: '#e34f26', label: 'HTML', action: () => insertMarkdownAtCursor('```html\n\n```\n', -5) },
+                            { id: 'code-css', icon: 'fa-code', iconColor: '#1572b6', label: 'CSS', action: () => insertMarkdownAtCursor('```css\n\n```\n', -5) },
+                            { id: 'code-json', icon: 'fa-code', iconColor: '#292929', label: 'JSON', action: () => insertMarkdownAtCursor('```json\n\n```\n', -5) },
+                            { id: 'code-bash', icon: 'fa-terminal', iconColor: '#4eaa25', label: 'Bash', action: () => insertMarkdownAtCursor('```bash\n\n```\n', -5) },
+                            { id: 'code-sql', icon: 'fa-database', iconColor: '#336791', label: 'SQL', action: () => insertMarkdownAtCursor('```sql\n\n```\n', -5) },
+                            { id: 'code-php', icon: 'fa-code', iconColor: '#777bb4', label: 'PHP', action: () => insertMarkdownAtCursor('```php\n\n```\n', -5) },
+                            { id: 'code-java', icon: 'fa-code', iconColor: '#007396', label: 'Java', action: () => insertMarkdownAtCursor('```java\n\n```\n', -5) },
+                            { id: 'code-csharp', icon: 'fa-code', iconColor: '#239120', label: 'C#', action: () => insertMarkdownAtCursor('```csharp\n\n```\n', -5) },
+                            { id: 'code-cpp', icon: 'fa-code', iconColor: '#00599c', label: 'C++', action: () => insertMarkdownAtCursor('```cpp\n\n```\n', -5) },
+                            { id: 'code-go', icon: 'fa-code', iconColor: '#00add8', label: 'Go', action: () => insertMarkdownAtCursor('```go\n\n```\n', -5) },
+                            { id: 'code-rust', icon: 'fa-code', iconColor: '#b7410e', label: 'Rust', action: () => insertMarkdownAtCursor('```rust\n\n```\n', -5) },
+                            { id: 'code-ruby', icon: 'fa-gem', iconColor: '#cc342d', label: 'Ruby', action: () => insertMarkdownAtCursor('```ruby\n\n```\n', -5) },
+                            { id: 'code-yaml', icon: 'fa-file-code', iconColor: '#cb171e', label: 'YAML', action: () => insertMarkdownAtCursor('```yaml\n\n```\n', -5) },
+                            { id: 'code-xml', icon: 'fa-file-code', iconColor: '#0060ac', label: 'XML', action: () => insertMarkdownAtCursor('```xml\n\n```\n', -5) },
+                            { id: 'code-markdown', icon: 'fa-file-code', iconColor: '#083fa1', label: 'Markdown', action: () => insertMarkdownAtCursor('```markdown\n\n```\n', -5) }
+                        ]
+                    }
                 ]
             },
             {
@@ -1222,15 +1521,6 @@
                 ]
             },
             {
-                id: 'toggle',
-                icon: 'fa-caret-down',
-                label: t('slash_menu.toggle', null, 'Toggle'),
-                action: function () {
-                    // Automatically add empty lines before and after for better spacing
-                    insertMarkdownAtCursor('\n\n<details class="toggle-block" open>\n<summary class="toggle-header">Toggle</summary>\n\n...\n\n</details>\n\n', -17);
-                }
-            },
-            {
                 id: 'color',
                 icon: 'fa-palette',
                 label: t('slash_menu.color', null, 'Color'),
@@ -1245,98 +1535,148 @@
                 ]
             },
             {
-                id: 'image',
-                icon: 'fa-image',
-                label: t('slash_menu.image', null, 'Image'),
-                action: function () {
-                    insertImage();
-                }
-            },
-            {
-                id: 'emoji',
-                icon: 'fa-smile',
-                label: t('slash_menu.emoji', null, 'Emoji'),
-                mobileHidden: true,
-                action: function () {
-                    if (typeof window.toggleEmojiPicker === 'function') {
-                        window.toggleEmojiPicker();
+                id: 'insert',
+                icon: 'fa-plus',
+                label: t('slash_menu.insert', null, 'Insert'),
+                submenu: [
+                    {
+                        id: 'toggle',
+                        icon: 'fa-caret-down',
+                        label: t('slash_menu.toggle', null, 'Toggle'),
+                        action: function () {
+                            // Automatically add empty lines before and after for better spacing
+                            insertMarkdownAtCursor('\n\n<details class="toggle-block" open>\n<summary class="toggle-header">Toggle</summary>\n\n...\n\n</details>\n\n', -17);
+                        }
+                    },
+                    {
+                        id: 'date',
+                        icon: 'fa-calendar-alt',
+                        label: t('slash_menu.date', null, 'Date'),
+                        mobileHidden: true,
+                        action: function () {
+                            insertDateMarkdown();
+                        }
+                    },
+                    {
+                        id: 'excalidraw',
+                        icon: 'fal fa-paint-brush',
+                        label: t('slash_menu.excalidraw', null, 'Excalidraw'),
+                        action: function () {
+                            if (typeof window.insertExcalidrawDiagram === 'function') {
+                                window.insertExcalidrawDiagram();
+                            }
+                        },
+                        mobileHidden: true
+                    },
+                    {
+                        id: 'emoji',
+                        icon: 'fa-smile',
+                        label: t('slash_menu.emoji', null, 'Emoji'),
+                        mobileHidden: true,
+                        action: function () {
+                            if (typeof window.toggleEmojiPicker === 'function') {
+                                window.toggleEmojiPicker();
+                            }
+                        }
+                    },
+                    {
+                        id: 'table',
+                        icon: 'fa-table',
+                        label: t('slash_menu.table', null, 'Table'),
+                        action: function () {
+                            insertMarkdownAtCursor('| Column | Column |\n| --- | --- |\n|  |  |\n', 0);
+                        }
+                    },
+                    {
+                        id: 'separator',
+                        icon: 'fa-minus',
+                        label: t('slash_menu.separator', null, 'Separator'),
+                        action: function () {
+                            insertMarkdownAtCursor('\n---\n', 0);
+                        }
                     }
-                }
+                ]
             },
             {
-                id: 'table',
-                icon: 'fa-table',
-                label: t('slash_menu.table', null, 'Table'),
-                action: function () {
-                    insertMarkdownAtCursor('| Column | Column |\n| --- | --- |\n|  |  |\n', 0);
-                }
-            },
-            {
-                id: 'youtube',
-                icon: 'fa-video',
-                label: t('slash_menu.youtube_video', null, 'YouTube video'),
-                action: function () {
-                    if (typeof window.insertYouTubeVideoMarkdown === 'function') {
-                        window.insertYouTubeVideoMarkdown();
-                    }
-                }
-            },
-            {
-                id: 'separator',
-                icon: 'fa-minus',
-                label: t('slash_menu.separator', null, 'Separator'),
-                action: function () {
-                    insertMarkdownAtCursor('\n---\n', 0);
-                }
-            },
-            {
-                id: 'note-reference',
-                icon: 'fa-at',
-                label: t('slash_menu.link_to_note', null, 'Link to note'),
-                action: function () {
-                    if (typeof window.openNoteReferenceModal === 'function') {
-                        window.openNoteReferenceModal();
-                    }
-                }
-            },
-            {
-                id: 'link',
+                id: 'link-menu',
                 icon: 'fa-link',
                 label: t('slash_menu.link', null, 'Link'),
-                action: function () {
-                    if (typeof window.showLinkModal === 'function') {
-                        const editor = getCurrentMarkdownEditorFromSelection();
-                        if (!editor) return;
+                submenu: [
+                    {
+                        id: 'link',
+                        icon: 'fa fa-link',
+                        label: t('slash_menu.link', null, 'Link'),
+                        action: function () {
+                            if (typeof window.showLinkModal === 'function') {
+                                const editor = getCurrentMarkdownEditorFromSelection();
+                                if (!editor) return;
 
-                        const offsets = getSelectionOffsetsWithin(editor);
-                        if (!offsets) return;
+                                const offsets = getSelectionOffsetsWithin(editor);
+                                if (!offsets) return;
 
-                        const text = getMarkdownEditorText(editor);
-                        const selectedText = text.substring(offsets.start, offsets.end);
+                                const text = getMarkdownEditorText(editor);
+                                const selectedText = text.substring(offsets.start, offsets.end);
 
-                        window.showLinkModal('https://', selectedText, function (url, linkText) {
-                            if (!url) return;
+                                window.showLinkModal('https://', selectedText, function (url, linkText) {
+                                    if (!url) return;
 
-                            const linkMarkdown = '[' + (linkText || 'link') + '](' + url + ')';
-                            const before = text.substring(0, offsets.start);
-                            const after = text.substring(offsets.end);
-                            const newText = before + linkMarkdown + after;
+                                    const linkMarkdown = '[' + (linkText || 'link') + '](' + url + ')';
+                                    const before = text.substring(0, offsets.start);
+                                    const after = text.substring(offsets.end);
+                                    const newText = before + linkMarkdown + after;
 
-                            editor.textContent = '';
-                            editor.appendChild(document.createTextNode(newText));
+                                    editor.textContent = '';
+                                    editor.appendChild(document.createTextNode(newText));
 
-                            // Position cursor after the inserted link
-                            const newOffset = offsets.start + linkMarkdown.length;
-                            setSelectionByOffsets(editor, newOffset, newOffset);
+                                    // Position cursor after the inserted link
+                                    const newOffset = offsets.start + linkMarkdown.length;
+                                    setSelectionByOffsets(editor, newOffset, newOffset);
 
-                            // Trigger input event for autosave
-                            const noteEntry = editor.closest('.noteentry');
-                            if (noteEntry) {
-                                noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+                                    // Trigger input event for autosave
+                                    const noteEntry = editor.closest('.noteentry');
+                                    if (noteEntry) {
+                                        noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+                                    }
+                                });
                             }
-                        });
+                        }
+                    },
+                    {
+                        id: 'note-reference',
+                        icon: 'fa fa-at',
+                        label: t('slash_menu.link_to_note', null, 'Link to note'),
+                        action: function () {
+                            if (typeof window.openNoteReferenceModal === 'function') {
+                                window.openNoteReferenceModal();
+                            }
+                        }
                     }
-                }
+                ]
+            },
+            {
+                id: 'media',
+                icon: 'fa-image',
+                label: t('slash_menu.media', null, 'Media'),
+                submenu: [
+                    {
+                        id: 'image',
+                        icon: 'fa fa-image',
+                        label: t('slash_menu.image', null, 'Image'),
+                        action: function () {
+                            insertImage();
+                        }
+                    },
+                    {
+                        id: 'youtube',
+                        icon: 'fa fa-video',
+                        label: t('slash_menu.youtube_video', null, 'YouTube video'),
+                        action: function () {
+                            if (typeof window.insertYouTubeVideoMarkdown === 'function') {
+                                window.insertYouTubeVideoMarkdown();
+                            }
+                        }
+                    }
+                ]
             },
             {
                 id: 'open-keyboard',
@@ -1521,12 +1861,13 @@
         }
 
         html += items
+            .filter(item => !isMobile || !item.mobileHidden)
             .map((item, idx) => {
                 const selectedClass = idx === selectedSubmenuIndex ? ' selected' : '';
                 const hasSubmenu = item.submenu && item.submenu.length > 0;
                 const submenuIndicator = hasSubmenu ? '<i class="fa fa-chevron-right slash-command-submenu-indicator"></i>' : '';
                 const iconStyle = item.iconColor ? ' style="margin-right: 8px; width: 16px; display: inline-block; text-align: center; color: ' + item.iconColor + ';"' : ' style="margin-right: 8px; width: 16px; display: inline-block; text-align: center;"';
-                const iconHtml = item.icon ? '<i class="fa ' + item.icon + '"' + iconStyle + '></i>' : '';
+                const iconHtml = item.icon ? '<i class="slash-command-icon fa ' + item.icon + '"' + iconStyle + '></i>' : '';
                 return (
                     '<div class="slash-command-item' + selectedClass + '" data-submenu-id="' + item.id + '" data-has-sub-submenu="' + hasSubmenu + '">' +
                     iconHtml +
@@ -1558,7 +1899,7 @@
             .map((item, idx) => {
                 const selectedClass = idx === selectedSubSubmenuIndex ? ' selected' : '';
                 const iconStyle = item.iconColor ? ' style="margin-right: 8px; color: ' + item.iconColor + ';"' : ' style="margin-right: 8px;"';
-                const iconHtml = item.icon ? '<i class="' + item.icon + '"' + iconStyle + '></i>' : '';
+                const iconHtml = item.icon ? '<i class="slash-command-icon ' + item.icon + '"' + iconStyle + '></i>' : '';
                 return (
                     '<div class="slash-command-item' + selectedClass + '" data-sub-submenu-id="' + item.id + '">' +
                     iconHtml +
@@ -1680,6 +2021,86 @@
         document.body.style.cursor = '';
     }
 
+    function showSlashMenuForInput(input, pos) {
+        hideSlashMenu();
+
+        // Save context
+        savedEditableElement = input;
+        savedNoteEntry = input.closest('.notecard');
+
+        // Mark slash position
+        slashOffset = pos - 1;
+
+        const ctx = { noteType: 'title', noteEntry: savedNoteEntry, editableElement: input };
+
+        activeCommands = getTitleSlashCommands();
+        filterText = '';
+        selectedIndex = 0;
+        filteredCommands = getFilteredCommands('');
+
+        slashMenuElement = document.createElement('div');
+        slashMenuElement.className = 'slash-command-menu';
+        slashMenuElement.innerHTML = buildMenuHTML();
+
+        document.body.appendChild(slashMenuElement);
+
+        // Position menu for input
+        const rect = input.getBoundingClientRect();
+
+        // Measure text width up to cursor to position horizontally
+        const styles = window.getComputedStyle(input);
+        const span = document.createElement('span');
+        span.style.visibility = 'hidden';
+        span.style.position = 'absolute';
+
+        // Copy relevant font properties safely
+        span.style.fontFamily = styles.fontFamily;
+        span.style.fontSize = styles.fontSize;
+        span.style.fontWeight = styles.fontWeight;
+        span.style.fontStyle = styles.fontStyle;
+        span.style.letterSpacing = styles.letterSpacing;
+        span.style.textTransform = styles.textTransform;
+        span.style.whiteSpace = 'pre';
+
+        span.textContent = input.value.substring(0, pos);
+        document.body.appendChild(span);
+        const textWidth = span.getBoundingClientRect().width;
+        document.body.removeChild(span);
+
+        // Position: left = input rect left + paddingWidth + text width - scroll
+        const menuRect = slashMenuElement.getBoundingClientRect();
+        const padding = 8;
+
+        const paddingLeft = parseFloat(styles.paddingLeft) || 0;
+        const scrollLeft = input.scrollLeft || 0;
+
+        // Calculate caret position relative to viewport
+        let x = rect.left + paddingLeft + textWidth - scrollLeft;
+        let y = rect.bottom + 6;
+
+        // Boundary checks
+        if (x + menuRect.width > window.innerWidth - padding) {
+            x = window.innerWidth - menuRect.width - padding;
+        }
+        // Ensure menu doesn't start off-screen left
+        x = Math.max(padding, x);
+
+        if (y + menuRect.height > window.innerHeight - padding) {
+            y = Math.max(padding, rect.top - menuRect.height - 6);
+        }
+
+        slashMenuElement.style.left = x + 'px';
+        slashMenuElement.style.top = y + 'px';
+
+        requestAnimationFrame(() => {
+            if (slashMenuElement) slashMenuElement.classList.add('show');
+        });
+
+        slashMenuElement.addEventListener('mousedown', handleMenuMouseDown);
+        slashMenuElement.addEventListener('click', handleMenuClick);
+        slashMenuElement.addEventListener('mouseover', handleMenuMouseOver);
+    }
+
     function updateMenuContent() {
         if (!slashMenuElement) return;
 
@@ -1780,6 +2201,32 @@
 
     function deleteSlashText() {
         try {
+            // Handle input fields (title inputs)
+            if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+                const input = savedEditableElement;
+                const text = input.value;
+                const start = slashOffset;
+
+                if (start < 0 || start >= text.length) return;
+
+                // Find the end of the slash command text (up to whitespace)
+                let end = start + 1;
+                while (end < text.length && !/\s/.test(text[end])) {
+                    end++;
+                }
+
+                // Remove the slash and filter text
+                input.value = text.substring(0, start) + text.substring(end);
+
+                // Position cursor where the slash was
+                input.selectionStart = input.selectionEnd = start;
+
+                // Trigger input event
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+                return;
+            }
+            
+            // Handle contenteditable elements
             if (!slashTextNode || slashOffset < 0 || !slashTextNode.parentNode) {
                 return;
             }
@@ -2104,10 +2551,18 @@
                                 hideSlashMenu();
                                 savedNoteEntry = null;
                             } else {
-                                setTimeout(updateFilterFromEditor, 0);
+                                if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+                                    setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
+                                } else {
+                                    setTimeout(updateFilterFromEditor, 0);
+                                }
                             }
                         } else {
-                            setTimeout(updateFilterFromEditor, 0);
+                            if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+                                setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
+                            } else {
+                                setTimeout(updateFilterFromEditor, 0);
+                            }
                         }
                     }
                     break;
@@ -2172,10 +2627,18 @@
                                 hideSlashMenu();
                                 savedNoteEntry = null;
                             } else {
-                                setTimeout(updateFilterFromEditor, 0);
+                                if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+                                    setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
+                                } else {
+                                    setTimeout(updateFilterFromEditor, 0);
+                                }
                             }
                         } else {
-                            setTimeout(updateFilterFromEditor, 0);
+                            if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+                                setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
+                            } else {
+                                setTimeout(updateFilterFromEditor, 0);
+                            }
                         }
                     }
                     break;
@@ -2232,7 +2695,12 @@
                     hideSlashMenu();
                     savedNoteEntry = null;
                 } else {
-                    setTimeout(updateFilterFromEditor, 0);
+                    // Update from input field if we're in one, otherwise from editor
+                    if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+                        setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
+                    } else {
+                        setTimeout(updateFilterFromEditor, 0);
+                    }
                 }
                 break;
 
@@ -2243,7 +2711,12 @@
 
             default:
                 if (e.key.length === 1 || e.key === 'Delete') {
-                    setTimeout(updateFilterFromEditor, 0);
+                    // Update from input field if we're in one, otherwise from editor
+                    if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+                        setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
+                    } else {
+                        setTimeout(updateFilterFromEditor, 0);
+                    }
                 }
                 break;
         }
@@ -2258,6 +2731,21 @@
 
         // Find the first space or newline after the slash to limit the filter text
         const spaceIndex = textAfterSlash.search(/[\s\n]/);
+        filterText = spaceIndex >= 0 ? textAfterSlash.substring(0, spaceIndex) : textAfterSlash;
+
+        // Update the menu with filtered commands
+        updateMenuContent();
+    }
+
+    function updateFilterFromInput(input) {
+        if (!slashMenuElement || slashOffset < 0 || !input) return;
+
+        // Extract text after the slash in the input
+        const text = input.value || '';
+        const textAfterSlash = text.substring(slashOffset + 1);
+
+        // Find the first space after the slash to limit the filter text
+        const spaceIndex = textAfterSlash.search(/\s/);
         filterText = spaceIndex >= 0 ? textAfterSlash.substring(0, spaceIndex) : textAfterSlash;
 
         // Update the menu with filtered commands
@@ -2354,7 +2842,10 @@
         const textBefore = container.textContent.substring(0, offset);
         const lastChar = textBefore.charAt(textBefore.length - 1);
 
-        if (lastChar === '/') {
+        // Don't open menu if we're deleting (e.g. backspace landing on a slash)
+        const isDeleting = e.inputType && e.inputType.startsWith('delete');
+
+        if (lastChar === '/' && !isDeleting) {
             showSlashMenu();
         } else if (slashMenuElement) {
             // If menu is open, update filter from editor
@@ -2516,20 +3007,44 @@
             }
         }, true);
 
+        // Handle slash menu in title inputs (notecards)
+        document.addEventListener('input', function (e) {
+            const target = e.target;
+            
+            // Check if this is a title input field
+            if (target.tagName === 'INPUT' && target.classList.contains('css-title')) {
+                const value = target.value;
+                const pos = target.selectionStart;
+                
+                // Check if the last character typed is a slash
+                if (pos > 0 && value[pos - 1] === '/') {
+                    // Don't show if we're deleting
+                    const isDeleting = e.inputType && e.inputType.startsWith('delete');
+                    if (!isDeleting) {
+                        showSlashMenuForInput(target, pos);
+                    }
+                }
+                // Update filter if menu is already open
+                else if (slashMenuElement && savedEditableElement === target) {
+                    updateFilterFromInput(target);
+                }
+            }
+        }, true);
+
         window.hideSlashMenu = hideSlashMenu;
     }
 
     // YouTube video insertion functions (exposed globally)
-    window.insertYouTubeVideo = function() {
+    window.insertYouTubeVideo = function () {
         const t = window.t || ((key, params, fallback) => fallback);
-        
+
         if (typeof window.showYouTubeModal !== 'function') {
             // Fallback to prompt if modal not available
             const url = prompt(t('slash_menu.youtube_url_prompt', null, 'Enter YouTube video URL or ID:'), 'https://www.youtube.com/watch?v=');
             if (url) processYouTubeUrl(url, false, null, null, null);
             return;
         }
-        
+
         // Save the note entry and editable element before they get cleared
         const noteEntry = savedNoteEntry;
         const editableElement = savedEditableElement;
@@ -2540,22 +3055,22 @@
         if (sel && sel.rangeCount > 0) {
             savedRange = sel.getRangeAt(0).cloneRange();
         }
-        
-        window.showYouTubeModal(function(url) {
+
+        window.showYouTubeModal(function (url) {
             processYouTubeUrl(url, false, editableElement, savedRange, noteEntry);
         });
     };
 
-    window.insertYouTubeVideoMarkdown = function() {
+    window.insertYouTubeVideoMarkdown = function () {
         const t = window.t || ((key, params, fallback) => fallback);
-        
+
         if (typeof window.showYouTubeModal !== 'function') {
             // Fallback to prompt if modal not available
             const url = prompt(t('slash_menu.youtube_url_prompt', null, 'Enter YouTube video URL or ID:'), 'https://www.youtube.com/watch?v=');
             if (url) processYouTubeUrl(url, true, null, null, null);
             return;
         }
-        
+
         // Save the note entry and editable element before they get cleared
         const noteEntry = savedNoteEntry;
         const editableElement = savedEditableElement;
@@ -2566,25 +3081,25 @@
         if (sel && sel.rangeCount > 0) {
             savedRange = sel.getRangeAt(0).cloneRange();
         }
-        
-        window.showYouTubeModal(function(url) {
+
+        window.showYouTubeModal(function (url) {
             processYouTubeUrl(url, true, editableElement, savedRange, noteEntry);
         });
     };
-    
+
     // Helper function to process YouTube URL and insert iframe
     function processYouTubeUrl(url, isMarkdown, editableElement, savedRange, noteEntry) {
         const t = window.t || ((key, params, fallback) => fallback);
-        
+
         if (!url) return;
-        
+
         // Extract video ID from various YouTube URL formats
         let videoId = null;
         const patterns = [
             /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/,
             /^([a-zA-Z0-9_-]{11})$/  // Direct ID (exactly 11 chars)
         ];
-        
+
         for (const pattern of patterns) {
             const match = url.match(pattern);
             if (match) {
@@ -2592,7 +3107,7 @@
                 break;
             }
         }
-        
+
         if (!videoId) {
             if (typeof showNotificationPopup === 'function') {
                 showNotificationPopup(t('slash_menu.youtube_invalid_url', null, 'Invalid YouTube URL'), 'error');
@@ -2601,39 +3116,39 @@
             }
             return;
         }
-        
+
         if (isMarkdown) {
             // For markdown, insert iframe HTML directly
             const iframeMarkdown = '<iframe width="560" height="315" src="https://www.youtube.com/embed/' + videoId + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>\n\n';
-            
+
             // Focus the editable element first
             if (editableElement) {
                 editableElement.focus();
             }
-            
+
             // Restore selection if saved
             if (savedRange) {
                 const sel = window.getSelection();
                 sel.removeAllRanges();
                 sel.addRange(savedRange);
             }
-            
+
             insertMarkdownAtCursor(iframeMarkdown, 0);
         } else {
             // For HTML notes
             // Create iframe HTML
             const iframeHtml = '<iframe width="560" height="315" src="https://www.youtube.com/embed/' + videoId + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
-            
+
             // Focus the editable element first
             if (editableElement) {
                 editableElement.focus();
             }
-            
+
             // Restore selection and insert iframe
             try {
                 const sel = window.getSelection();
                 let range;
-                
+
                 if (savedRange) {
                     sel.removeAllRanges();
                     sel.addRange(savedRange);
@@ -2652,38 +3167,38 @@
                         return; // Cannot insert without a valid target
                     }
                 }
-                
+
                 // Create a temporary container to parse the HTML
                 const tempContainer = document.createElement('div');
                 tempContainer.innerHTML = iframeHtml;
                 const iframeElement = tempContainer.firstChild;
-                
+
                 // Insert with spacing
                 const fragment = document.createDocumentFragment();
-                
+
                 const lineBefore = document.createElement('div');
                 lineBefore.innerHTML = '<br>';
                 fragment.appendChild(lineBefore);
-                
+
                 fragment.appendChild(iframeElement);
-                
+
                 const lineAfter = document.createElement('div');
                 lineAfter.innerHTML = '<br>';
                 fragment.appendChild(lineAfter);
-                
+
                 range.deleteContents();
                 range.insertNode(fragment);
-                
+
                 // Move cursor after
                 range.collapse(false);
                 sel.removeAllRanges();
                 sel.addRange(range);
-                
+
                 // Trigger input event
                 if (noteEntry) {
                     noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
                 }
-                
+
                 // Mark as modified and save
                 if (typeof window.markNoteAsModified === 'function') {
                     window.markNoteAsModified();

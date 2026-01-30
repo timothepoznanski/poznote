@@ -759,10 +759,12 @@
             "title_in_folder": "Créer dans {{folder}}",
             "folder_fallback": "dossier",
             "note": {
-                "title": "Note HTML (pas Markdown)"
+                "title": "Note HTML",
+                "description": "Pas Markdown"
             },
             "markdown": {
-                "title": "Note Markdown (pas HTML)"
+                "title": "Note Markdown",
+                "description": "Pas HTML"
             },
             "task_list": {
                 "title": "Liste de tâches"
@@ -885,11 +887,11 @@
         "folder_actions": {
             "menu": "Actions",
             "create": "Créer",
-            "move_all_files": "Déplacer tous les fichiers vers un autre dossier",
-            "move_folder": "Déplacer le dossier en sous-dossier",
+            "move_all_files": "Déplacer les fichiers",
+            "move_folder": "Déplacer le dossier",
             "rename_folder": "Renommer le dossier",
             "delete_folder": "Supprimer le dossier",
-            "download_folder": "Télécharger le dossier",
+            "download_folder": "Télécharger",
             "change_icon": "Changer l'icône",
             "is_public": "Est partagé",
             "share_folder": "Partager"
@@ -955,7 +957,8 @@
         "youtube_url_prompt": "Entrez l'URL ou l'ID de la vidéo YouTube :",
         "youtube_help": "Formats supportés : youtube.com/watch?v=ID, youtu.be/ID, ou juste l'ID",
         "youtube_insert": "Insérer",
-        "youtube_invalid_url": "URL YouTube invalide"
+        "youtube_invalid_url": "URL YouTube invalide",
+        "date": "Date"
     },
     "api": {
         "settings": {
@@ -1957,5 +1960,11 @@
             "step3": "Ajoutez la configuration dans votre fichier .env",
             "step4": "Redémarrez l'application pour que les changements prennent effet"
         }
+    },
+    "sort": {
+        "header": "Trier par",
+        "alphabet": "Nom",
+        "created": "Date de création",
+        "modified": "Date de modification"
     }
 }

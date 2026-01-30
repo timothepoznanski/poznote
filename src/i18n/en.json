@@ -298,10 +298,12 @@
             "title_in_folder": "Create in {{folder}}",
             "folder_fallback": "folder",
             "note": {
-                "title": "HTML Note (not markdown)"
+                "title": "HTML Note",
+                "description": "Not Markdown"
             },
             "markdown": {
-                "title": "Markdown note (not HTML)"
+                "title": "Markdown note",
+                "description": "Not HTML"
             },
             "task_list": {
                 "title": "Task List"
@@ -415,12 +417,12 @@
         "folder_actions": {
             "menu": "Actions",
             "create": "Create",
-            "move_all_files": "Move all files to another folder",
+            "move_all_files": "Move all files",
             "rename_folder": "Rename folder",
             "delete_folder": "Delete folder",
-            "move_folder": "Move folder to subfolder",
+            "move_folder": "Move folder",
             "change_icon": "Change icon",
-            "download_folder": "Download folder",
+            "download_folder": "Download",
             "is_public": "Is shared",
             "share_folder": "Share"
         }
@@ -476,7 +478,8 @@
         "youtube_url_prompt": "Enter YouTube video URL or ID:",
         "youtube_help": "Supports: youtube.com/watch?v=ID, youtu.be/ID, or just the video ID",
         "youtube_insert": "Insert",
-        "youtube_invalid_url": "Invalid YouTube URL"
+        "youtube_invalid_url": "Invalid YouTube URL",
+        "date": "Date"
     },
     "api": {
         "settings": {
@@ -1326,5 +1329,11 @@
             "step3": "Add the configuration to your .env file",
             "step4": "Restart the application for changes to take effect"
         }
+    },
+    "sort": {
+        "header": "Sort by",
+        "alphabet": "Name",
+        "created": "Date Created",
+        "modified": "Date Modified"
     }
 }

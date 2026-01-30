@@ -69,8 +69,8 @@ body.dark-mode .slash-command-label {
     color: #ffffff !important;
 }
 
-html[data-theme='dark'] .slash-command-icon,
-body.dark-mode .slash-command-icon {
+html[data-theme='dark'] .slash-command-icon:not([style*="color"]),
+body.dark-mode .slash-command-icon:not([style*="color"]) {
     color: #9ca3af;
 }
 
@@ -414,17 +414,33 @@ body.dark-mode .noteentry {
     color: #e0e0e0 !important;
 }
 
-/* Force readable text colors in note content, but preserve inline color styles */
-html[data-theme='dark'] .noteentry *:not([style*="color"]),
-body.dark-mode .noteentry *:not([style*="color"]) {
+/* Force readable text colors in note content, but preserve inline color styles, links, and syntax highlighting */
+html[data-theme='dark'] .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]),
+body.dark-mode .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]) {
     color: #e0e0e0 !important;
 }
 
 /* Preserve code blocks and pre formatting colors */
-html[data-theme='dark'] .noteentry code,
+/* Note: We don't set color here to let Highlight.js syntax colors work */
 html[data-theme='dark'] .noteentry pre,
-body.dark-mode .noteentry code,
 body.dark-mode .noteentry pre {
+    background-color: #262424 !important;
+}
+
+/* Fix for highlighter in code blocks in dark mode: preserve dark background and ensure readable text */
+html[data-theme='dark'] .noteentry pre *[style*="background"],
+body.dark-mode .noteentry pre *[style*="background"],
+html[data-theme='dark'] .noteentry code *[style*="background"],
+body.dark-mode .noteentry code *[style*="background"],
+html[data-theme='dark'] .noteentry .code-block *[style*="background"],
+body.dark-mode .noteentry .code-block *[style*="background"] {
+    background: linear-gradient(rgba(255, 255, 0, 0.4), rgba(255, 255, 0, 0.4)), #262424 !important;
+    color: #e0e0e0 !important;
+}
+
+/* Inline code only (not inside pre blocks with syntax highlighting) */
+html[data-theme='dark'] .noteentry code:not([class*="hljs"]):not([class*="language-"]),
+body.dark-mode .noteentry code:not([class*="hljs"]):not([class*="language-"]) {
     background-color: #333333 !important;
     color: #e0e0e0;
 }
@@ -1411,16 +1427,21 @@ body.dark-mode .no-attachments {
     color: #e0e0e0;
 }
 
-/* Code blocks */
-html[data-theme='dark'] .noteentry code,
+/* Code blocks - background only, don't override Highlight.js syntax colors */
 html[data-theme='dark'] .noteentry pre,
 html[data-theme='dark'] .code-block,
 html[data-theme='dark'] pre.code-block,
-body.dark-mode .noteentry code,
 body.dark-mode .noteentry pre,
 body.dark-mode .code-block,
 body.dark-mode pre.code-block {
     background-color: #262424 !important;
+    border-color: #404040 !important;
+}
+
+/* Inline code only (not syntax highlighted blocks) */
+html[data-theme='dark'] .noteentry code:not([class*="hljs"]):not([class*="language-"]),
+body.dark-mode .noteentry code:not([class*="hljs"]):not([class*="language-"]) {
+    background-color: #333333 !important;
     color: #e0e0e0;
     border-color: #404040 !important;
 }
@@ -1429,22 +1450,32 @@ body.dark-mode pre.code-block {
 html[data-theme='dark'] .code-block-copy-btn,
 html[data-theme='dark'] pre.code-block .code-block-copy-btn,
 html[data-theme='dark'] .noteentry pre .code-block-copy-btn,
+html[data-theme='dark'] .public-note .content pre .code-block-copy-btn,
 body.dark-mode .code-block-copy-btn,
 body.dark-mode pre.code-block .code-block-copy-btn,
-body.dark-mode .noteentry pre .code-block-copy-btn {
-    background: rgba(40, 40, 40, 0.95);
-    border-color: #505050;
-    color: #b8b8b8;
+body.dark-mode .noteentry pre .code-block-copy-btn,
+body.dark-mode .public-note .content pre .code-block-copy-btn {
+    background: rgba(100, 100, 100, 0.95) !important;
+    border-color: #888888 !important;
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+html[data-theme='dark'] .code-block-copy-btn svg,
+body.dark-mode .code-block-copy-btn svg {
+    stroke: currentColor !important;
 }
 
 html[data-theme='dark'] .code-block-copy-btn:hover,
 html[data-theme='dark'] pre.code-block .code-block-copy-btn:hover,
 html[data-theme='dark'] .noteentry pre .code-block-copy-btn:hover,
+html[data-theme='dark'] .public-note .content pre .code-block-copy-btn:hover,
 body.dark-mode .code-block-copy-btn:hover,
 body.dark-mode pre.code-block .code-block-copy-btn:hover,
-body.dark-mode .noteentry pre .code-block-copy-btn:hover {
-    background: rgba(60, 60, 60, 0.95);
-    color: #e0e0e0;
+body.dark-mode .noteentry pre .code-block-copy-btn:hover,
+body.dark-mode .public-note .content pre .code-block-copy-btn:hover {
+    background: rgba(130, 130, 130, 0.95) !important;
+    color: #ffffff !important;
 }
 
 html[data-theme='dark'] .code-block-copy-btn.copied,
@@ -2015,20 +2046,20 @@ body.dark-mode .markdown-preview h2 {
     border-bottom-color: #404040;
 }
 
-/* Markdown code blocks */
-html[data-theme='dark'] .markdown-preview code,
-body.dark-mode .markdown-preview code {
+/* Markdown code blocks - inline code only */
+html[data-theme='dark'] .markdown-preview code:not([class*="hljs"]):not([class*="language-"]),
+body.dark-mode .markdown-preview code:not([class*="hljs"]):not([class*="language-"]) {
     background-color: #333333;
     color: #e0e0e0;
 }
 
-/* Fix highlighting inside code blocks in dark mode */
-html[data-theme='dark'] pre *[style*="background"],
-html[data-theme='dark'] code *[style*="background"],
-html[data-theme='dark'] .code-block *[style*="background"],
-body.dark-mode pre *[style*="background"],
-body.dark-mode code *[style*="background"],
-body.dark-mode .code-block *[style*="background"] {
+/* Fix highlighting inside code blocks in dark mode - only for search/highlight marks, not syntax */
+html[data-theme='dark'] pre mark[style*="background"],
+html[data-theme='dark'] code mark[style*="background"],
+html[data-theme='dark'] .code-block mark[style*="background"],
+body.dark-mode pre mark[style*="background"],
+body.dark-mode code mark[style*="background"],
+body.dark-mode .code-block mark[style*="background"] {
     background-color: #665500 !important;
     background-image: none !important;
     color: #ffff99 !important;
@@ -2109,8 +2140,8 @@ body.dark-mode .noteentry.markdown-split-mode .markdown-preview [data-line]:not(
 }
 
 /* Checked task item text - dark mode */
-html[data-theme='dark'] .markdown-preview li.task-list-item input[type="checkbox"]:checked + span,
-body.dark-mode .markdown-preview li.task-list-item input[type="checkbox"]:checked + span {
+html[data-theme='dark'] .markdown-preview li.task-list-item input[type="checkbox"]:checked+span,
+body.dark-mode .markdown-preview li.task-list-item input[type="checkbox"]:checked+span {
     color: #666;
 }
 
@@ -2354,14 +2385,14 @@ body.dark-mode .info-box {
 /* Icons - Make all icons lighter in dark mode by modifying the filter */
 /* Override the default dark gray filter with a lighter one */
 /* Exclude folder icons with custom colors from the filter */
-html[data-theme='dark'] [class*="fa-"]:not(.folder-icon[data-icon-color]):not(.kanban-title [class*="fa-"][style*="color"]):not(.kanban-column-title [class*="fa-"][style*="color"]):not(.limitations-table [class*="fa-"]):not(.markdown-edit-btn [class*="fa-"]):not(.markdown-preview-btn [class*="fa-"]):not(.markdown-view-mode-btn [class*="fa-"]):not(.markdown-split-btn [class*="fa-"]):not(.btn-favorite.is-favorite [class*="fa-"]):not(.btn-share.is-shared [class*="fa-"]):not(.btn-attachment.has-attachments [class*="fa-"]):not(.searchbar-type-btn [class*="fa-"]),
-body.dark-mode [class*="fa-"]:not(.folder-icon[data-icon-color]):not(.kanban-title [class*="fa-"][style*="color"]):not(.kanban-column-title [class*="fa-"][style*="color"]):not(.limitations-table [class*="fa-"]):not(.markdown-edit-btn [class*="fa-"]):not(.markdown-preview-btn [class*="fa-"]):not(.markdown-view-mode-btn [class*="fa-"]):not(.markdown-split-btn [class*="fa-"]):not(.btn-favorite.is-favorite [class*="fa-"]):not(.btn-share.is-shared [class*="fa-"]):not(.btn-attachment.has-attachments [class*="fa-"]):not(.searchbar-type-btn [class*="fa-"]) {
+html[data-theme='dark'] [class*="fa-"]:not(.folder-icon[data-icon-color]):not([class*="slash-command-icon"][style*="color"]):not(.kanban-title [class*="fa-"][style*="color"]):not(.kanban-column-title [class*="fa-"][style*="color"]):not(.limitations-table [class*="fa-"]):not(.markdown-edit-btn [class*="fa-"]):not(.markdown-preview-btn [class*="fa-"]):not(.markdown-view-mode-btn [class*="fa-"]):not(.markdown-split-btn [class*="fa-"]):not(.btn-favorite.is-favorite [class*="fa-"]):not(.btn-share.is-shared [class*="fa-"]):not(.btn-attachment.has-attachments [class*="fa-"]):not(.searchbar-type-btn [class*="fa-"]),
+body.dark-mode [class*="fa-"]:not(.folder-icon[data-icon-color]):not([class*="slash-command-icon"][style*="color"]):not(.kanban-title [class*="fa-"][style*="color"]):not(.kanban-column-title [class*="fa-"][style*="color"]):not(.limitations-table [class*="fa-"]):not(.markdown-edit-btn [class*="fa-"]):not(.markdown-preview-btn [class*="fa-"]):not(.markdown-view-mode-btn [class*="fa-"]):not(.markdown-split-btn [class*="fa-"]):not(.btn-favorite.is-favorite [class*="fa-"]):not(.btn-share.is-shared [class*="fa-"]):not(.btn-attachment.has-attachments [class*="fa-"]):not(.searchbar-type-btn [class*="fa-"]) {
     filter: brightness(0) saturate(0%) invert(80%) !important;
     transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-html[data-theme='dark'] [class*="fa-"]:not(.folder-icon[data-icon-color]):not(.kanban-title [class*="fa-"][style*="color"]):not(.kanban-column-title [class*="fa-"][style*="color"]):not(.limitations-table [class*="fa-"]):not(.markdown-edit-btn [class*="fa-"]):not(.markdown-preview-btn [class*="fa-"]):not(.markdown-view-mode-btn [class*="fa-"]):not(.markdown-split-btn [class*="fa-"]):not(.btn-favorite.is-favorite [class*="fa-"]):not(.btn-share.is-shared [class*="fa-"]):not(.btn-attachment.has-attachments [class*="fa-"]):not(.searchbar-type-btn [class*="fa-"]):hover,
-body.dark-mode [class*="fa-"]:not(.folder-icon[data-icon-color]):not(.kanban-title [class*="fa-"][style*="color"]):not(.kanban-column-title [class*="fa-"][style*="color"]):not(.limitations-table [class*="fa-"]):not(.markdown-edit-btn [class*="fa-"]):not(.markdown-preview-btn [class*="fa-"]):not(.markdown-view-mode-btn [class*="fa-"]):not(.markdown-split-btn [class*="fa-"]):not(.btn-favorite.is-favorite [class*="fa-"]):not(.btn-share.is-shared [class*="fa-"]):not(.btn-attachment.has-attachments [class*="fa-"]):not(.searchbar-type-btn [class*="fa-"]):hover {
+html[data-theme='dark'] [class*="fa-"]:not(.folder-icon[data-icon-color]):not([class*="slash-command-icon"][style*="color"]):not(.kanban-title [class*="fa-"][style*="color"]):not(.kanban-column-title [class*="fa-"][style*="color"]):not(.limitations-table [class*="fa-"]):not(.markdown-edit-btn [class*="fa-"]):not(.markdown-preview-btn [class*="fa-"]):not(.markdown-view-mode-btn [class*="fa-"]):not(.markdown-split-btn [class*="fa-"]):not(.btn-favorite.is-favorite [class*="fa-"]):not(.btn-share.is-shared [class*="fa-"]):not(.btn-attachment.has-attachments [class*="fa-"]):not(.searchbar-type-btn [class*="fa-"]):hover,
+body.dark-mode [class*="fa-"]:not(.folder-icon[data-icon-color]):not([class*="slash-command-icon"][style*="color"]):not(.kanban-title [class*="fa-"][style*="color"]):not(.kanban-column-title [class*="fa-"][style*="color"]):not(.limitations-table [class*="fa-"]):not(.markdown-edit-btn [class*="fa-"]):not(.markdown-preview-btn [class*="fa-"]):not(.markdown-view-mode-btn [class*="fa-"]):not(.markdown-split-btn [class*="fa-"]):not(.btn-favorite.is-favorite [class*="fa-"]):not(.btn-share.is-shared [class*="fa-"]):not(.btn-attachment.has-attachments [class*="fa-"]):not(.searchbar-type-btn [class*="fa-"]):hover {
     transform: scale(1.18);
     filter: brightness(0) saturate(0%) invert(90%) !important;
 }
@@ -2487,15 +2518,16 @@ body.dark-mode .image-resize-handle {
 }
 
 /* Public note dark mode styles */
-html[data-theme='dark'] .public-note .content code,
-body.dark-mode .public-note .content code {
+/* Inline code only - don't override Highlight.js syntax colors */
+html[data-theme='dark'] .public-note .content code:not([class*="hljs"]):not([class*="language-"]),
+body.dark-mode .public-note .content code:not([class*="hljs"]):not([class*="language-"]) {
     background-color: #333333;
     color: #e0e0e0;
 }
 
 html[data-theme='dark'] .public-note .content pre,
 body.dark-mode .public-note .content pre {
-    background-color: #333333;
+    background-color: #262424;
     border-color: #404040;
 }
 
@@ -2504,22 +2536,7 @@ body.dark-mode .public-note .content pre code {
     background-color: transparent;
 }
 
-html[data-theme='dark'] .public-note .content pre .code-block-copy-btn,
-html[data-theme='dark'] .code-block-copy-btn,
-body.dark-mode .public-note .content pre .code-block-copy-btn,
-body.dark-mode .code-block-copy-btn {
-    background: rgba(42, 42, 42, 0.9);
-    border-color: #404040;
-    color: #e0e0e0;
-}
-
-html[data-theme='dark'] .public-note .content pre .code-block-copy-btn:hover,
-html[data-theme='dark'] .code-block-copy-btn:hover,
-body.dark-mode .public-note .content pre .code-block-copy-btn:hover,
-body.dark-mode .code-block-copy-btn:hover {
-    background-color: #333;
-    color: #fff;
-}
+/* Copy button dark mode styles are now consolidated above in the main dark mode section */
 
 html[data-theme='dark'] .image-resize-handle:hover,
 body.dark-mode .image-resize-handle:hover {

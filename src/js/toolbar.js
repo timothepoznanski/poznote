@@ -222,7 +222,7 @@
       document.addEventListener('keydown', keyHandler);
 
     } catch (err) {
-      
+
     }
   }
 
@@ -238,13 +238,13 @@ function toggleYellowHighlight() {
     const range = sel.getRangeAt(0);
     let allYellow = true, hasText = false;
     const treeWalker = document.createTreeWalker(range.commonAncestorContainer, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
-      acceptNode: function(node) {
+      acceptNode: function (node) {
         if (!range.intersectsNode(node)) return NodeFilter.FILTER_REJECT;
         return NodeFilter.FILTER_ACCEPT;
       }
     });
     let node = treeWalker.currentNode;
-    while(node) {
+    while (node) {
       if (node.nodeType === 3 && node.nodeValue.trim() !== '') {
         hasText = true;
         let parent = node.parentNode;
@@ -289,10 +289,10 @@ function changeFontSize() {
   // Save the current selection before opening popup - declare in function scope
   const selection = window.getSelection();
   const savedRange = selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null;
-  
+
   // Check if we have selected text
   const hasSelection = savedRange && !savedRange.collapsed;
-  
+
   if (!hasSelection) {
     // No selection - silently return
     return;
@@ -305,7 +305,7 @@ function changeFontSize() {
   // Create the popup
   const popup = document.createElement('div');
   popup.className = 'font-size-popup';
-  
+
   // Font size options with labels
   const fontSizes = [
     { value: '1', key: 'editor.font_size.very_small', fallback: 'Very small', preview: 'Aa' },
@@ -327,9 +327,9 @@ function changeFontSize() {
       </div>
     `;
   });
-  
+
   popup.innerHTML = popupHTML;
-  
+
   // Append popup to body and compute coordinates so it doesn't get clipped
   document.body.appendChild(popup);
   popup.style.position = 'absolute';
@@ -360,23 +360,23 @@ function changeFontSize() {
       e.stopPropagation();
       const size = item.getAttribute('data-size');
       const fontSize = getFontSizeFromValue(size);
-      
+
       // Ensure editor has focus
       const editor = document.querySelector('[contenteditable="true"]');
       if (editor && savedRange) {
         editor.focus();
-        
+
         // Restore the saved selection
         const selection = window.getSelection();
         selection.removeAllRanges();
         selection.addRange(savedRange);
-        
+
         // Apply font size by wrapping selection in span with CSS class instead of inline style
         const range = selection.getRangeAt(0);
         const span = document.createElement('span');
         // Use cssText to set font-size with !important to prevent override
         span.style.cssText = 'font-size: ' + fontSize + ' !important';
-        
+
         try {
           range.surroundContents(span);
         } catch (surroundErr) {
@@ -386,20 +386,20 @@ function changeFontSize() {
           range.deleteContents();
           range.insertNode(span);
         }
-        
+
         // Remove selection (place cursor at the end of modified text)
         selection.removeAllRanges();
         const newRange = document.createRange();
         newRange.setStartAfter(span);
         newRange.collapse(true);
         selection.addRange(newRange);
-        
+
         // Trigger update callback
         if (typeof window.update === 'function') {
           window.update();
         }
       }
-      
+
       // Close popup
       popup.classList.remove('show');
       setTimeout(() => {
@@ -418,7 +418,7 @@ function changeFontSize() {
       document.removeEventListener('click', closePopup);
     }
   };
-  
+
   // Add delay to prevent immediate closure
   setTimeout(() => {
     document.addEventListener('click', closePopup);
@@ -434,18 +434,18 @@ function changeFontSize() {
       document.removeEventListener('keydown', handleEscape);
     }
   };
-  
+
   document.addEventListener('keydown', handleEscape);
 }
 
 function toggleCodeBlock() {
   const sel = window.getSelection();
   if (!sel.rangeCount) return;
-  
+
   const range = sel.getRangeAt(0);
   let container = range.commonAncestorContainer;
   if (container.nodeType === 3) container = container.parentNode;
-  
+
   // If already in a code block, remove it
   const existingPre = container.closest ? container.closest('pre') : null;
   if (existingPre) {
@@ -453,10 +453,10 @@ function toggleCodeBlock() {
     existingPre.outerHTML = text.replace(/\n/g, '<br>');
     return;
   }
-  
+
   // Find the note entry container
   const noteEntry = container.closest ? container.closest('.noteentry') : null;
-  
+
   // Helper function to check if we're at the first line of the note
   function isAtFirstLine() {
     if (!noteEntry) return false;
@@ -471,7 +471,7 @@ function toggleCodeBlock() {
       return false;
     }
   }
-  
+
   // Helper function to check if we're at the last line of the note
   function isAtLastLine() {
     if (!noteEntry) return false;
@@ -487,10 +487,10 @@ function toggleCodeBlock() {
       return false;
     }
   }
-  
+
   const atFirstLine = isAtFirstLine();
   const atLastLine = isAtLastLine();
-  
+
   // Otherwise, create a code block with the selected text
   if (sel.isCollapsed) {
     // No selection: insert empty block
@@ -500,17 +500,17 @@ function toggleCodeBlock() {
     document.execCommand('insertHTML', false, `${brBefore}<pre class="code-block"><br></pre>${brAfter}`);
     return;
   }
-  
+
   // Get selected text
   const selectedText = sel.toString();
   if (!selectedText.trim()) return;
-  
+
   // Escape HTML and create code block
   const escapedText = selectedText
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
-  
+
   // Add blank line before only if at first line, after only if at last line
   const brBefore = atFirstLine ? '<br>' : '';
   const brAfter = atLastLine ? '<br>' : '';
@@ -521,11 +521,11 @@ function toggleCodeBlock() {
 function toggleInlineCode() {
   const sel = window.getSelection();
   if (!sel.rangeCount) return;
-  
+
   const range = sel.getRangeAt(0);
   let container = range.commonAncestorContainer;
   if (container.nodeType === 3) container = container.parentNode;
-  
+
   // Check if we're already in an inline code element
   const existingCode = container.closest ? container.closest('code') : null;
   if (existingCode && existingCode.tagName === 'CODE' && existingCode.parentNode.tagName !== 'PRE') {
@@ -534,7 +534,7 @@ function toggleInlineCode() {
     existingCode.outerHTML = text;
     return;
   }
-  
+
   // If no selection, insert empty inline code
   if (sel.isCollapsed) {
     document.execCommand('insertHTML', false, '<code></code>');
@@ -549,32 +549,32 @@ function toggleInlineCode() {
     }
     return;
   }
-  
+
   // Get selected text
   const selectedText = sel.toString();
   if (!selectedText.trim()) return;
-  
+
   // Check if we're dealing with a partial word with hyphens
   if (selectedText.indexOf('-') === -1 && // No hyphens in selection
-      container.nodeType === 3 && // Text node
-      container.textContent.indexOf('-') !== -1) { // Parent contains hyphens
-    
+    container.nodeType === 3 && // Text node
+    container.textContent.indexOf('-') !== -1) { // Parent contains hyphens
+
     // Get the current word including hyphens
     const startPoint = range.startOffset;
     const endPoint = range.endOffset;
     const fullText = container.textContent;
-    
+
     // Find word boundaries including hyphens
     let wordStart = startPoint;
     while (wordStart > 0 && /[\w\-]/.test(fullText.charAt(wordStart - 1))) {
       wordStart--;
     }
-    
+
     let wordEnd = endPoint;
     while (wordEnd < fullText.length && /[\w\-]/.test(fullText.charAt(wordEnd))) {
       wordEnd++;
     }
-    
+
     // If we found a larger word with hyphens, adjust the selection
     if (wordStart < startPoint || wordEnd > endPoint) {
       const newRange = document.createRange();
@@ -582,28 +582,28 @@ function toggleInlineCode() {
       newRange.setEnd(container, wordEnd);
       sel.removeAllRanges();
       sel.addRange(newRange);
-      
+
       // Get the new selected text
       const newSelectedText = sel.toString();
-      
+
       // Escape HTML and create inline code for the new selection
       const escapedText = newSelectedText
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
-      
+
       const codeHTML = `<code>${escapedText}</code>`;
       document.execCommand('insertHTML', false, codeHTML);
       return;
     }
   }
-  
+
   // Escape HTML and create inline code for normal selections
   const escapedText = selectedText
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
-  
+
   const codeHTML = `<code>${escapedText}</code>`;
   document.execCommand('insertHTML', false, codeHTML);
 }
@@ -612,27 +612,32 @@ function toggleInlineCode() {
  * Check if cursor is in an editable note area
  */
 function isCursorInEditableNote() {
-    const selection = window.getSelection();
-    
-    // Check if there's a selection/cursor
-    if (!selection.rangeCount) {
-        return false;
-    }
-    
-    // Get the current element
-    const range = selection.getRangeAt(0);
-    let container = range.commonAncestorContainer;
-    if (container.nodeType === 3) { // Text node
-        container = container.parentNode;
-    }
-    
-    // Check if we're inside a contenteditable note area
-    const editableElement = container.closest && container.closest('[contenteditable="true"]');
-    const noteEntry = container.closest && container.closest('.noteentry');
-    const markdownEditor = container.closest && container.closest('.markdown-editor');
-    
-    // Return true if we're in any editable note context
-    return (editableElement && noteEntry) || markdownEditor || (editableElement && editableElement.classList.contains('noteentry'));
+  const selection = window.getSelection();
+
+  // Check if there's a selection/cursor
+  if (!selection.rangeCount) {
+    return false;
+  }
+
+  // Get the current element
+  const range = selection.getRangeAt(0);
+  let container = range.commonAncestorContainer;
+  if (container.nodeType === 3) { // Text node
+    container = container.parentNode;
+  }
+
+  // Check if we're inside a contenteditable note area
+  const editableElement = container.closest && container.closest('[contenteditable="true"]');
+  const noteEntry = container.closest && container.closest('.noteentry');
+  const markdownEditor = container.closest && container.closest('.markdown-editor');
+
+  // Check for title input
+  if (document.activeElement && document.activeElement.classList.contains('css-title')) {
+    return true;
+  }
+
+  // Return true if we're in any editable note context
+  return (editableElement && noteEntry) || markdownEditor || (editableElement && editableElement.classList.contains('noteentry'));
 }
 
 function insertSeparator() {
@@ -641,37 +646,37 @@ function insertSeparator() {
     window.showCursorWarning();
     return;
   }
-  
+
   const sel = window.getSelection();
   if (!sel.rangeCount) return;
-  
+
   const range = sel.getRangeAt(0);
   let container = range.commonAncestorContainer;
   if (container.nodeType === 3) container = container.parentNode;
   const noteentry = container.closest && container.closest('.noteentry');
-  
+
   if (!noteentry) return;
-  
+
   // Try execCommand first for browsers that still support it
   try {
     const hrHTML = '<hr style="border: none; border-top: 1px solid #bbb; margin: 12px 0;">';
     const success = document.execCommand('insertHTML', false, hrHTML);
-    
+
     if (success) {
       // Trigger input event
-      noteentry.dispatchEvent(new Event('input', {bubbles:true}));
+      noteentry.dispatchEvent(new Event('input', { bubbles: true }));
       return;
     }
   } catch (e) {
     // execCommand failed, use manual approach
   }
-  
+
   // Fallback: manual insertion with undo support via modern API
   const hr = document.createElement('hr');
   hr.style.border = 'none';
   hr.style.borderTop = '1px solid #bbb';
   hr.style.margin = '12px 0';
-  
+
   // Trigger beforeinput event for undo history
   const beforeInputEvent = new InputEvent('beforeinput', {
     bubbles: true,
@@ -679,20 +684,20 @@ function insertSeparator() {
     inputType: 'insertText',
     data: null
   });
-  
+
   if (noteentry.dispatchEvent(beforeInputEvent)) {
     // Insert the element
     if (!range.collapsed) {
       range.deleteContents();
     }
     range.insertNode(hr);
-    
+
     // Position cursor after the HR
     range.setStartAfter(hr);
     range.setEndAfter(hr);
     sel.removeAllRanges();
     sel.addRange(range);
-    
+
     // Trigger input event
     const inputEvent = new InputEvent('input', {
       bubbles: true,
@@ -704,7 +709,7 @@ function insertSeparator() {
 }
 
 // Consolidated keydown handler for Enter behaviors
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', function (e) {
   if (e.key !== 'Enter') return;
   if (e.shiftKey) return; // allow newline with Shift+Enter
 
@@ -712,7 +717,7 @@ document.addEventListener('keydown', function(e) {
 
 function toggleEmojiPicker() {
   const existingPicker = document.querySelector('.emoji-picker');
-  
+
   if (existingPicker) {
     existingPicker.remove();
     window.savedEmojiRange = null;
@@ -721,7 +726,7 @@ function toggleEmojiPicker() {
 
   // If the cursor is not in an editable note, warn immediately
   // instead of waiting until an emoji is selected.
-  if (!isCursorInEditableNote()) {
+  if (!isCursorInEditableNote() && !window.savedActiveInput) {
     window.showCursorWarning();
     return;
   }
@@ -733,31 +738,42 @@ function toggleEmojiPicker() {
   } catch (e) {
     window.savedEmojiRange = null;
   }
-  
+
+  // Save active input for title support
+  if (document.activeElement && document.activeElement.classList.contains('css-title')) {
+    window.savedActiveInput = document.activeElement;
+    window.savedActiveInputSelection = {
+      start: document.activeElement.selectionStart,
+      end: document.activeElement.selectionEnd
+    };
+  } else if (!window.savedActiveInput) {
+    window.savedActiveInput = null;
+  }
+
   // Create emoji popup
   const picker = document.createElement('div');
   picker.className = 'emoji-picker';
-  
+
   // Simplified popular emojis collection
-  const emojis = ['😀', '😃', '😄', '😊', '😍', '😘', '😎', '🤔', '😅', '😂', '😢', '😭', '😡', '👍', '👎', '👉', '👌', '✌️', '👏', '🙌', '👋', '🤝', '🙏', '✊', '👊', '❤️', '➜', '🚧', '✅', '🟩', '🟪', '☑️', '❌', '✔️', '❗', '❓', '⭐', '🔥', '💯', '🎯', '📌', '🚀', '💡', '🔔', '⚡', '🌟', '💎', '📱', '💻', '📧', '📁', '📄', '📝', '🔍', '🔑', '⚙️', '🛠️', '📊', '📈', '⚠️', '🚩', '🟢', '🔴', '🔵', '☀️', '🌙', '☕', '🍕', '🎂', '🍎', '🌱', '🌸', '🐱', '🐶', '🎵', '🎨'];  
-  
+  const emojis = ['😀', '😃', '😄', '😊', '😍', '😘', '😎', '🤔', '😅', '😂', '😢', '😭', '😡', '👍', '👎', '👉', '👌', '✌️', '👏', '🙌', '👋', '🤝', '🙏', '✊', '👊', '❤️', '➜', '🚧', '✅', '🟩', '🟪', '☑️', '❌', '✔️', '❗', '❓', '⭐', '🔥', '💯', '🎯', '📌', '🚀', '💡', '🔔', '⚡', '🌟', '💎', '📱', '💻', '📧', '📁', '📄', '📝', '🔍', '🔑', '⚙️', '🛠️', '📊', '📈', '⚠️', '🚩', '🟢', '🔴', '🔵', '☀️', '🌙', '☕', '🍕', '🎂', '🍎', '🌱', '🌸', '🐱', '🐶', '🎵', '🎨'];
+
   // Create picker content
   const defaultHint = '💡 On Windows, press <kbd>Win</kbd> + <kbd>;</kbd> to open native emoji picker';
   let content = '<div class="emoji-hint">' + tr('editor.emoji.hint_windows', defaultHint) + '</div>';
   content += '<div class="emoji-category">';
   content += '<div class="emoji-grid">';
-  
+
   emojis.forEach(emoji => {
     content += `<span class="emoji-item" data-emoji="${emoji}">${emoji}</span>`;
   });
-  
+
   content += '</div></div>';
-  
+
   picker.innerHTML = content;
-  
+
   // Position picker near emoji button
   document.body.appendChild(picker);
-  
+
   // Position picker with overflow management
   const windowWidth = window.innerWidth;
   const windowHeight = window.innerHeight;
@@ -771,7 +787,7 @@ function toggleEmojiPicker() {
     try {
       const style = window.getComputedStyle(emojiBtn);
       if (style && (style.display === 'none' || style.visibility === 'hidden')) isVisible = false;
-    } catch (e) {}
+    } catch (e) { }
 
     if (isVisible) {
       anchorRect = rect;
@@ -790,7 +806,7 @@ function toggleEmojiPicker() {
           if (rects && rects.length) anchorRect = rects[0];
         }
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   // Picker dimensions according to screen
@@ -802,7 +818,7 @@ function toggleEmojiPicker() {
 
   if (anchorRect) {
     const rect = anchorRect;
-    
+
     // Calculate vertical position
     let top = rect.bottom + 10;
     if (top + pickerHeight > windowHeight - 20) {
@@ -813,7 +829,7 @@ function toggleEmojiPicker() {
         top = Math.max(20, (windowHeight - pickerHeight) / 2);
       }
     }
-    
+
     // Calculate horizontal position
     let left;
     if (isMobile) {
@@ -829,7 +845,7 @@ function toggleEmojiPicker() {
         left = 20;
       }
     }
-    
+
     picker.style.top = top + 'px';
     picker.style.left = left + 'px';
   } else {
@@ -837,16 +853,16 @@ function toggleEmojiPicker() {
     picker.style.top = Math.max(20, (windowHeight - pickerHeight) / 2) + 'px';
     picker.style.left = Math.max(20, (windowWidth - pickerWidth) / 2) + 'px';
   }
-  
+
   // Handle emoji clicks
-  picker.addEventListener('click', function(e) {
+  picker.addEventListener('click', function (e) {
     if (e.target.classList.contains('emoji-item')) {
       const emoji = e.target.getAttribute('data-emoji');
       insertEmoji(emoji);
       picker.remove();
     }
   });
-  
+
   // Close picker when clicking outside
   setTimeout(() => {
     document.addEventListener('click', function closeEmojiPicker(e) {
@@ -867,7 +883,7 @@ function insertEmoji(emoji) {
       sel.removeAllRanges();
       sel.addRange(window.savedEmojiRange);
     }
-  } catch (e) {}
+  } catch (e) { }
 
   // Ensure focus is back on the editor before inserting.
   try {
@@ -884,7 +900,30 @@ function insertEmoji(emoji) {
         }
       }
     }
-  } catch (e) {}
+  } catch (e) { }
+
+  // Handle title input insertion
+  if (window.savedActiveInput) {
+    const input = window.savedActiveInput;
+    input.focus();
+
+    if (window.savedActiveInputSelection) {
+      input.setSelectionRange(window.savedActiveInputSelection.start, window.savedActiveInputSelection.end);
+    } else {
+      // Restore to saved position or end
+    }
+
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    const text = input.value;
+
+    input.setRangeText(emoji, start, end, 'end');
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+
+    window.savedEmojiRange = null;
+    window.savedActiveInput = null;
+    return;
+  }
 
   // Vérifier si le curseur est dans une zone éditable
   if (!isCursorInEditableNote()) {
@@ -892,24 +931,24 @@ function insertEmoji(emoji) {
     window.savedEmojiRange = null;
     return;
   }
-  
+
   if (!sel.rangeCount) return;
-  
+
   const range = sel.getRangeAt(0);
   let container = range.commonAncestorContainer;
   if (container.nodeType === 3) container = container.parentNode;
   const noteentry = container.closest && container.closest('.noteentry');
-  
+
   if (!noteentry) return;
-  
+
   // Insert emoji
   document.execCommand('insertText', false, emoji);
 
   window.savedEmojiRange = null;
-  
+
   // Trigger input event
   if (noteentry) {
-    noteentry.dispatchEvent(new Event('input', {bubbles: true}));
+    noteentry.dispatchEvent(new Event('input', { bubbles: true }));
   }
 }
 
@@ -922,28 +961,28 @@ function addLinkToNote() {
     const sel = window.getSelection();
     const hasSelection = sel && sel.rangeCount > 0 && !sel.getRangeAt(0).collapsed;
     const selectedText = hasSelection ? sel.toString() : '';
-    
+
     // Check if the selection is within an existing link
     let existingLink = null;
     let existingUrl = 'https://';
-    
+
     if (hasSelection) {
       const range = sel.getRangeAt(0);
       const container = range.commonAncestorContainer;
-      
+
       // Check if the selection is inside a link element
       if (container.nodeType === Node.TEXT_NODE) {
         existingLink = container.parentElement.closest('a');
       } else if (container.nodeType === Node.ELEMENT_NODE) {
         existingLink = container.closest('a');
       }
-      
+
       // If we found an existing link, get its URL
       if (existingLink && existingLink.href) {
         existingUrl = existingLink.href;
       }
     }
-    
+
     // Save the current selection before opening modal to preserve it
     if (hasSelection) {
       window.savedLinkRange = sel.getRangeAt(0).cloneRange();
@@ -952,8 +991,8 @@ function addLinkToNote() {
       window.savedLinkRange = null;
       window.savedExistingLink = null;
     }
-    
-    showLinkModal(existingUrl, selectedText, function(url, text) {
+
+    showLinkModal(existingUrl, selectedText, function (url, text) {
       // If url is null, it means we want to remove the link
       if (url === null) {
         if (window.savedExistingLink) {
@@ -961,22 +1000,22 @@ function addLinkToNote() {
           const linkText = window.savedExistingLink.textContent;
           const textNode = document.createTextNode(linkText);
           window.savedExistingLink.parentNode.replaceChild(textNode, window.savedExistingLink);
-          
+
           // Save the note automatically
           const noteentry = document.querySelector('.noteentry');
           if (noteentry && typeof window.saveNoteImmediately === 'function') {
             window.saveNoteImmediately();
           }
         }
-        
+
         // Clean up
         window.savedLinkRange = null;
         window.savedExistingLink = null;
         return;
       }
-      
+
       if (!url) return;
-      
+
       // If we're editing an existing link, just update it
       if (window.savedExistingLink) {
         window.savedExistingLink.href = url;
@@ -990,17 +1029,17 @@ function addLinkToNote() {
         a.textContent = text;
         a.target = '_blank';
         a.rel = 'noopener noreferrer';
-        
+
         if (window.savedLinkRange) {
           // Restore the saved selection and replace it with the link
           const sel = window.getSelection();
           sel.removeAllRanges();
           sel.addRange(window.savedLinkRange);
-          
+
           // Replace the selected text with the link
           window.savedLinkRange.deleteContents();
           window.savedLinkRange.insertNode(a);
-          
+
           // Clear selection and position cursor after the link
           sel.removeAllRanges();
           const newRange = document.createRange();
@@ -1027,13 +1066,13 @@ function addLinkToNote() {
           }
         }
       }
-      
+
       // Save the note automatically
       const noteentry = document.querySelector('.noteentry');
       if (noteentry && typeof window.saveNoteImmediately === 'function') {
         window.saveNoteImmediately();
       }
-      
+
       // Clean up saved range and existing link reference
       window.savedLinkRange = null;
       window.savedExistingLink = null;
@@ -1050,18 +1089,18 @@ function createLinkFromModal() {
 
 function toggleTablePicker() {
   const existingPicker = document.querySelector('.table-picker-popup');
-  
+
   if (existingPicker) {
     existingPicker.remove();
     return;
   }
-  
+
   // Check if cursor is in editable note BEFORE opening picker
   if (!isCursorInEditableNote()) {
     window.showCursorWarning();
     return;
   }
-  
+
   // Save current selection/cursor position
   const sel = window.getSelection();
   if (sel.rangeCount > 0) {
@@ -1069,33 +1108,33 @@ function toggleTablePicker() {
   } else {
     window.savedTableRange = null;
   }
-  
+
   // Create table picker popup
   const picker = document.createElement('div');
   picker.className = 'table-picker-popup';
-  
+
   // Create header
   const header = document.createElement('div');
   header.className = 'table-picker-header';
   header.textContent = tr('editor.table_picker.title', 'Insert Table');
   picker.appendChild(header);
-  
+
   // Create direct input section
   const inputSection = document.createElement('div');
   inputSection.className = 'table-picker-input-section';
-  
+
   const inputContainer = document.createElement('div');
   inputContainer.className = 'table-picker-input-container';
-  
+
   // Rows input
   const rowsWrapper = document.createElement('div');
   rowsWrapper.className = 'table-picker-input-wrapper';
-  
+
   const rowsLabel = document.createElement('label');
   rowsLabel.textContent = tr('editor.table_picker.rows_label', 'Rows:');
   rowsLabel.className = 'table-picker-input-field-label';
   rowsWrapper.appendChild(rowsLabel);
-  
+
   const rowsInput = document.createElement('input');
   rowsInput.type = 'number';
   rowsInput.className = 'table-picker-input-field';
@@ -1104,18 +1143,18 @@ function toggleTablePicker() {
   rowsInput.value = '3';
   rowsInput.placeholder = tr('editor.table_picker.rows_placeholder', 'Rows');
   rowsWrapper.appendChild(rowsInput);
-  
+
   inputContainer.appendChild(rowsWrapper);
-  
+
   // Columns input
   const colsWrapper = document.createElement('div');
   colsWrapper.className = 'table-picker-input-wrapper';
-  
+
   const colsLabel = document.createElement('label');
   colsLabel.textContent = tr('editor.table_picker.cols_label', 'Cols:');
   colsLabel.className = 'table-picker-input-field-label';
   colsWrapper.appendChild(colsLabel);
-  
+
   const colsInput = document.createElement('input');
   colsInput.type = 'number';
   colsInput.className = 'table-picker-input-field';
@@ -1124,18 +1163,18 @@ function toggleTablePicker() {
   colsInput.value = '3';
   colsInput.placeholder = tr('editor.table_picker.cols_placeholder', 'Cols');
   colsWrapper.appendChild(colsInput);
-  
+
   inputContainer.appendChild(colsWrapper);
-  
+
   // Insert button
   const insertBtn = document.createElement('button');
   insertBtn.className = 'table-picker-insert-btn';
   insertBtn.textContent = tr('editor.table_picker.insert', 'Insert');
   inputContainer.appendChild(insertBtn);
-  
+
   inputSection.appendChild(inputContainer);
   picker.appendChild(inputSection);
-  
+
   // Append to body
   document.body.appendChild(picker);
 
@@ -1221,33 +1260,33 @@ function toggleTablePicker() {
 
   picker.style.left = Math.max(minLeft, Math.min(left, maxLeft)) + 'px';
   picker.style.top = Math.max(minTop, Math.min(top, maxTop)) + 'px';
-  
+
   // Show picker with animation
   setTimeout(() => {
     picker.classList.add('show');
   }, 10);
-  
+
   // Handle insert button click
-  insertBtn.addEventListener('click', function(e) {
+  insertBtn.addEventListener('click', function (e) {
     e.preventDefault();
     e.stopPropagation();
-    
+
     let rows = parseInt(rowsInput.value);
     let cols = parseInt(colsInput.value);
-    
+
     // Validate inputs
     if (isNaN(rows) || rows < 1) rows = 1;
     if (isNaN(cols) || cols < 1) cols = 1;
     if (rows > 20) rows = 20;
     if (cols > 20) cols = 20;
-    
+
     insertTable(rows, cols);
     picker.classList.remove('show');
     setTimeout(() => {
       picker.remove();
     }, 200);
   });
-  
+
   // Handle Enter key in input fields
   const handleInputEnter = (e) => {
     if (e.key === 'Enter') {
@@ -1255,10 +1294,10 @@ function toggleTablePicker() {
       insertBtn.click();
     }
   };
-  
+
   rowsInput.addEventListener('keydown', handleInputEnter);
   colsInput.addEventListener('keydown', handleInputEnter);
-  
+
   // Close picker when clicking outside
   setTimeout(() => {
     document.addEventListener('click', function closeTablePicker(e) {
@@ -1271,7 +1310,7 @@ function toggleTablePicker() {
       }
     });
   }, 100);
-  
+
   // Close on escape key
   const handleEscape = (e) => {
     if (e.key === 'Escape') {
@@ -1282,7 +1321,7 @@ function toggleTablePicker() {
       document.removeEventListener('keydown', handleEscape);
     }
   };
-  
+
   document.addEventListener('keydown', handleEscape);
 }
 
@@ -1293,7 +1332,7 @@ function insertTable(rows, cols) {
     const sel = window.getSelection();
     sel.removeAllRanges();
     sel.addRange(window.savedTableRange);
-    
+
     // Clear the saved range
     window.savedTableRange = null;
   } else {
@@ -1303,22 +1342,22 @@ function insertTable(rows, cols) {
       return;
     }
   }
-  
+
   // Find the active note editor
   const noteentry = document.querySelector('.noteentry[contenteditable="true"]');
-  
+
   if (!noteentry) {
     console.error('No editable note found');
     return;
   }
-  
+
   // Focus the editor first
   noteentry.focus();
-  
+
   // Build table HTML
   let tableHTML = '<table class="inserted-table" style="border-collapse: collapse; width: 100%; margin: 12px 0;">';
   tableHTML += '<tbody>';
-  
+
   for (let r = 0; r < rows; r++) {
     tableHTML += '<tr>';
     for (let c = 0; c < cols; c++) {
@@ -1332,22 +1371,22 @@ function insertTable(rows, cols) {
     }
     tableHTML += '</tr>';
   }
-  
+
   tableHTML += '</tbody></table><p><br></p>'; // Add paragraph after table
-  
+
   // Insert table at saved cursor position
   try {
     let insertSuccess = false;
-    
+
     // Try to restore the saved range
     if (window.savedTableRange) {
       const sel = window.getSelection();
       sel.removeAllRanges();
       sel.addRange(window.savedTableRange);
-      
+
       // Try to insert at the saved position
       insertSuccess = document.execCommand('insertHTML', false, tableHTML);
-      
+
       // Clean up saved range
       window.savedTableRange = null;
     } else {
@@ -1355,19 +1394,19 @@ function insertTable(rows, cols) {
       const sel = window.getSelection();
       if (sel.rangeCount > 0) {
         const range = sel.getRangeAt(0);
-        
+
         // Make sure we're inside the noteentry
         if (noteentry.contains(range.commonAncestorContainer) || noteentry === range.commonAncestorContainer) {
           insertSuccess = document.execCommand('insertHTML', false, tableHTML);
         }
       }
     }
-    
+
     // If insertHTML didn't work, use fallback insertion
     if (!insertSuccess) {
       const sel = window.getSelection();
       let range;
-      
+
       if (window.savedTableRange) {
         range = window.savedTableRange;
         window.savedTableRange = null;
@@ -1379,16 +1418,16 @@ function insertTable(rows, cols) {
         range.selectNodeContents(noteentry);
         range.collapse(false);
       }
-      
+
       // Manual insertion using range
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = tableHTML;
       const table = tempDiv.firstChild;
-      
+
       if (range) {
         range.deleteContents();
         range.insertNode(table);
-        
+
         // Move cursor after the table
         range.setStartAfter(table);
         range.collapse(true);
@@ -1396,10 +1435,10 @@ function insertTable(rows, cols) {
         sel.addRange(range);
       }
     }
-    
+
     // Trigger input event to save
-    noteentry.dispatchEvent(new Event('input', {bubbles: true}));
-    
+    noteentry.dispatchEvent(new Event('input', { bubbles: true }));
+
     // Focus on first cell
     setTimeout(() => {
       const insertedTable = noteentry.querySelector('table.inserted-table:last-of-type');
@@ -1417,14 +1456,14 @@ function insertTable(rows, cols) {
         }
       }
     }, 100);
-    
+
   } catch (e) {
     console.error('Error inserting table:', e);
-    
+
     // Final fallback: append to end of noteentry
     try {
       noteentry.insertAdjacentHTML('beforeend', tableHTML);
-      noteentry.dispatchEvent(new Event('input', {bubbles: true}));
+      noteentry.dispatchEvent(new Event('input', { bubbles: true }));
       window.savedTableRange = null;
     } catch (fallbackError) {
       console.error('Fallback insertion also failed:', fallbackError);
@@ -1558,7 +1597,7 @@ window.insertTable = insertTable;
         } catch (e) {
           window.savedEmojiRange = rangeToRestore;
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     const target = toolbar.querySelector(targetSelector);

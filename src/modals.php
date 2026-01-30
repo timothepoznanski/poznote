@@ -338,6 +338,12 @@
                             <span><?php echo t_h('modals.create.subfolder.title', [], 'Subfolder'); ?></span>
                         </div>
                     </div>
+                    <div class="create-note-option" data-type="template" data-action="select-create-type">
+                        <i class="fas fa-copy"></i>
+                        <div>
+                            <span><?php echo t_h('modals.create.template.title', [], 'Template'); ?></span>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Other items section (only shown when creating from main button) -->
@@ -701,6 +707,29 @@
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="kanbanStructureModal"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" data-action="create-kanban-structure"><?php echo t_h('common.create'); ?></button>
+        </div>
+    </div>
+</div>
+
+<!-- Template Note Selector Modal -->
+<div id="templateNoteSelectorModal" class="modal">
+    <div class="modal-content note-reference-modal-content">
+        <div class="note-reference-modal-header">
+            <h3><?php echo t_h('modals.template_selector.title', [], 'Select Note for Template'); ?></h3>
+        </div>
+        <div class="note-reference-search-container">
+            <input type="text" id="templateNoteSearch" placeholder="<?php echo t_h('modals.template_selector.search_placeholder', [], 'Search notes...'); ?>" class="note-reference-search-input">
+        </div>
+        <div class="note-reference-list-wrapper">
+            <div class="note-reference-recent-label"><?php echo t_h('modals.template_selector.recent_label', [], 'Recent notes'); ?></div>
+            <div id="templateNoteList" class="note-reference-list">
+                <div class="note-reference-loading">
+                    <i class="fa-spinner fa-spin"></i> <?php echo t_h('common.loading', [], 'Loading...'); ?>
+                </div>
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-template-selector-modal"><?php echo t_h('common.cancel'); ?></button>
         </div>
     </div>
 </div>

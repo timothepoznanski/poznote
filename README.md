@@ -54,6 +54,7 @@ Password: `poznote`
 - [Offline View](#offline-view)
 - [Multiple Instances](#multiple-instances)
 - [MCP Server](#mcp-server)
+- [Poznote Extension](#poznote-extension)
 - [API Documentation](#api-documentation)
 - [Use Poznote in the Cloud](#use-poznote-in-the-cloud)
 - [Tech Stack](#tech-stack)
@@ -807,6 +808,17 @@ Poznote includes a Model Context Protocol (MCP) server that enables AI assistant
 - "Update note 42 with new information"
 
 For installation, configuration, and setup instructions, see the [MCP Server README](mcp-server/README.md).
+
+## Poznote Extension
+
+The **Poznote URL Saver** is a browser extension that allows you to quickly save the URL of the current page to your Poznote instance with a single click.
+
+1. Open your browser (Chrome, Edge, or any Chromium-based browser)
+2. Go to the extensions page by typing `chrome://extensions/` in the address bar
+3. Enable **Developer mode** using the toggle switch in the top right corner
+4. Click **Load unpacked** in the top left
+5. Select the `poznote-url-saver` folder from the Poznote repository
+6. The extension is now installed and ready to use!
 
 ## API Documentation
 

@@ -1220,6 +1220,10 @@ function initializeMarkdownNote(noteId) {
             if (typeof renderMathInElement === 'function') {
                 renderMathInElement(previewDiv);
             }
+            // Apply syntax highlighting to code blocks
+            if (typeof applySyntaxHighlighting === 'function') {
+                applySyntaxHighlighting(previewDiv);
+            }
             // Setup checkbox and click-to-navigate handlers
             setupPreviewInteractivity(noteId);
         }, 100);
@@ -1450,6 +1454,10 @@ function switchToPreviewMode(noteId) {
             initMermaid();
             if (typeof renderMathInElement === 'function') {
                 renderMathInElement(previewDiv);
+            }
+            // Apply syntax highlighting to code blocks
+            if (typeof applySyntaxHighlighting === 'function') {
+                applySyntaxHighlighting(previewDiv);
             }
             // Setup checkbox handlers (not click-to-navigate since we're in preview mode)
             setupPreviewInteractivity(noteId);
@@ -1704,6 +1712,10 @@ function switchToSplitMode(noteId) {
             if (typeof renderMathInElement === 'function') {
                 renderMathInElement(previewDiv);
             }
+            // Apply syntax highlighting to code blocks
+            if (typeof applySyntaxHighlighting === 'function') {
+                applySyntaxHighlighting(previewDiv);
+            }
             // Setup checkbox and click-to-navigate handlers
             setupPreviewInteractivity(noteId);
         }, 100);
@@ -1835,6 +1847,10 @@ function setupSplitModePreviewUpdate(noteId) {
                     if (typeof renderMathInElement === 'function') {
                         renderMathInElement(previewDiv);
                     }
+                    // Apply syntax highlighting to code blocks
+                    if (typeof applySyntaxHighlighting === 'function') {
+                        applySyntaxHighlighting(previewDiv);
+                    }
                     // Re-attach checkbox and click-to-navigate handlers
                     setupPreviewInteractivity(noteId);
                 }, 50);
@@ -1927,6 +1943,10 @@ function toggleMarkdownCheckbox(checkbox, lineNumber) {
             initMermaid();
             if (typeof renderMathInElement === 'function') {
                 renderMathInElement(previewDiv);
+            }
+            // Apply syntax highlighting to code blocks
+            if (typeof applySyntaxHighlighting === 'function') {
+                applySyntaxHighlighting(previewDiv);
             }
             // Re-attach checkbox and click-to-navigate handlers
             setupPreviewInteractivity(noteId);

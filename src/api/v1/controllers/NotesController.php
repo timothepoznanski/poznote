@@ -361,16 +361,16 @@ class NotesController {
             if ($folder_id === 0) $folder_id = null;
             
             if ($folder && !$folder_id) {
-                if ($workspace) {
-                    $fStmt = $this->con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
-                    $fStmt->execute([$folder, $workspace]);
-                } else {
-                    $fStmt = $this->con->prepare("SELECT id FROM folders WHERE name = ?");
-                    $fStmt->execute([$folder]);
-                }
-                $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
-                if ($folderData) {
-                    $folder_id = (int)$folderData['id'];
+                // Robust path resolution and automatic creation of missing subfolders
+                $resolvedId = resolveFolderPathToId($workspace, $folder, true, $this->con);
+                if ($resolvedId) {
+                    $folder_id = $resolvedId;
+                    
+                    // Update folder name to only the last segment for database consistency if needed
+                    // Actually, Poznote uses the 'folder' column for legacy/display, but folder_id is primary.
+                    // We'll keep the full path in 'folder' for now as it's common in this codebase.
+                    $segments = explode('/', $folder);
+                    $folder = end($segments);
                 }
             }
             
@@ -1150,6 +1150,127 @@ class NotesController {
             
         } catch (Exception $e) {
             $this->sendError(500, 'Error duplicating note: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * POST /api/v1/notes/{id}/create-template
+     * Create a template from a note (duplicate it to Templates folder)
+     */
+    public function createTemplate(string $id): void {
+        try {
+            // Get the original note
+            $stmt = $this->con->prepare("SELECT heading, entry, tags, folder, folder_id, workspace, type, attachments FROM entries WHERE id = ? AND trash = 0");
+            $stmt->execute([$id]);
+            $originalNote = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$originalNote) {
+                $this->sendError(404, 'Note not found');
+                return;
+            }
+            
+            // Get or create the "Templates" folder
+            $workspace = $originalNote['workspace'];
+            $templatesFolderId = null;
+            
+            // Check if Templates folder exists
+            $folderStmt = $this->con->prepare("SELECT id FROM folders WHERE name = 'Templates' AND workspace = ? AND parent_id IS NULL");
+            $folderStmt->execute([$workspace]);
+            $templatesFolder = $folderStmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($templatesFolder) {
+                $templatesFolderId = (int)$templatesFolder['id'];
+            } else {
+                // Create the Templates folder
+                $createFolderStmt = $this->con->prepare("INSERT INTO folders (name, workspace, parent_id, created) VALUES ('Templates', ?, NULL, datetime('now'))");
+                $createFolderStmt->execute([$workspace]);
+                $templatesFolderId = (int)$this->con->lastInsertId();
+            }
+            
+            // Generate unique heading for template
+            $originalHeading = $originalNote['heading'] ?: t('index.note.new_note', [], 'New note');
+            $templateHeading = '[Template] ' . $originalHeading;
+            $newHeading = generateUniqueTitle($templateHeading, null, $workspace, $templatesFolderId);
+            
+            // Duplicate attachments
+            $newAttachments = null;
+            $attachmentIdMapping = [];
+            $originalAttachments = $originalNote['attachments'] ? json_decode($originalNote['attachments'], true) : [];
+            
+            if (!empty($originalAttachments)) {
+                $attachmentsDir = getAttachmentsPath();
+                $duplicatedAttachments = [];
+                
+                foreach ($originalAttachments as $attachment) {
+                    $originalFilePath = $attachmentsDir . '/' . $attachment['filename'];
+                    
+                    if (file_exists($originalFilePath)) {
+                        $fileExtension = pathinfo($attachment['filename'], PATHINFO_EXTENSION);
+                        $newFilename = uniqid() . '_' . time() . '.' . $fileExtension;
+                        $newFilePath = $attachmentsDir . '/' . $newFilename;
+                        $oldAttachmentId = $attachment['id'];
+                        $newAttachmentId = uniqid();
+                        
+                        if (copy($originalFilePath, $newFilePath)) {
+                            chmod($newFilePath, 0644);
+                            $attachmentIdMapping[$oldAttachmentId] = $newAttachmentId;
+                            
+                            $duplicatedAttachments[] = [
+                                'id' => $newAttachmentId,
+                                'filename' => $newFilename,
+                                'original_filename' => $attachment['original_filename'],
+                                'file_size' => $attachment['file_size'],
+                                'file_type' => $attachment['file_type'],
+                                'uploaded_at' => date('Y-m-d H:i:s')
+                            ];
+                        }
+                    }
+                }
+                
+                $newAttachments = !empty($duplicatedAttachments) ? json_encode($duplicatedAttachments) : null;
+            }
+            
+            // Read original content and update attachment references
+            $originalFilename = getEntryFilename($id, $originalNote['type']);
+            $content = '';
+            if (file_exists($originalFilename)) {
+                $content = file_get_contents($originalFilename);
+                foreach ($attachmentIdMapping as $oldId => $newId) {
+                    $content = str_replace($oldId, $newId, $content);
+                }
+            }
+            
+            // Insert new note in Templates folder
+            $insertStmt = $this->con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, attachments, created, updated, trash, favorite) VALUES (?, '', ?, 'Templates', ?, ?, ?, ?, datetime('now'), datetime('now'), 0, 0)");
+            $insertStmt->execute([
+                $newHeading,
+                $originalNote['tags'],
+                $templatesFolderId,
+                $workspace,
+                $originalNote['type'],
+                $newAttachments
+            ]);
+            
+            $newId = $this->con->lastInsertId();
+            
+            // Write content to file
+            $newFilename = getEntryFilename($newId, $originalNote['type']);
+            if (!empty($content)) {
+                file_put_contents($newFilename, $content);
+                chmod($newFilename, 0644);
+            }
+            
+            http_response_code(201);
+            $this->sendSuccess([
+                'id' => $newId,
+                'heading' => $newHeading,
+                'folder_id' => $templatesFolderId,
+                'message' => 'Template created successfully'
+            ]);
+            
+        } catch (Exception $e) {
+            error_log("Error creating template: " . $e->getMessage());
+            $this->sendError(500, 'Error creating template: ' . $e->getMessage());
         }
     }
     

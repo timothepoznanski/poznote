@@ -30,16 +30,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (config.folder) {
         let exists = false;
+        const val = config.folder_id || config.folder;
         for (let i = 0; i < folderSelect.options.length; i++) {
-          if (folderSelect.options[i].value === config.folder) {
+          if (folderSelect.options[i].value == val) {
             exists = true;
             break;
           }
         }
         if (!exists) {
-          folderSelect.add(new Option(`📁 ${config.folder}`, config.folder));
+          const opt = new Option(`📁 ${config.folder}`, val);
+          opt.dataset.path = config.folder;
+          folderSelect.add(opt);
         }
-        folderSelect.value = config.folder;
+        folderSelect.value = val;
       }
     }
   });
@@ -134,13 +137,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const tempConfig = { appUrl: rawUrl, username, password };
       const userId = await resolveProfileId(tempConfig);
 
+      const selectedOption = folderSelect.options[folderSelect.selectedIndex];
+      const folderPath = selectedOption ? (selectedOption.dataset.path || selectedOption.text.replace(/^📁 /, '')) : '';
+
       config = {
         appUrl: rawUrl,
         username,
         password,
         userId: userId,
         workspace: workspaceSelect.value,
-        folder: folderSelect.value
+        folder: folderPath,
+        folder_id: folderSelect.value
       };
 
       chrome.storage.local.set({ poznoteConfig: config }, () => {
@@ -205,7 +212,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const folderList = Array.isArray(folders) ? folders : Object.values(folders);
         folderList.forEach(folder => {
           const name = folder.path || folder.name;
-          folderSelect.add(new Option(`📁 ${name}`, name));
+          const option = new Option(`📁 ${name}`, folder.id);
+          option.dataset.path = name;
+          folderSelect.add(option);
           count++;
           if (folder.children) addFolders(folder.children);
         });
@@ -268,11 +277,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const pageUrl = tab.url;
       const noteContent = `<a href="${pageUrl}" target="_blank">${pageUrl}</a>`;
 
+      const selectedOption = folderSelect.options[folderSelect.selectedIndex];
+      const selectedFolderName = selectedOption.dataset.path || selectedOption.text.replace(/^📁 /, '');
+
       const noteData = {
         heading: `${pageTitle}`,
         content: noteContent,
         tags: '',
-        folder_name: selectedFolder,
+        folder_name: selectedFolderName,
+        folder_id: selectedFolder,
         workspace: workspaceSelect.value || config.workspace || 'Poznote'
       };
 

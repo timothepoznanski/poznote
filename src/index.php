@@ -174,11 +174,15 @@ try {
     <script src="js/bulletlist.js?v=<?php echo $v; ?>"></script>
     <script src="js/note-loader-common.js?v=<?php echo $v; ?>"></script>
     <script src="js/note-reference.js?v=<?php echo $v; ?>"></script>
+    <script src="js/template-selector.js?v=<?php echo $v; ?>"></script>
     <script src="js/search-replace.js?v=<?php echo $v; ?>"></script>
     <script src="js/markdown-handler.js?v=<?php echo $v; ?>"></script>
     <script src="js/mermaid/mermaid.min.js?v=<?php echo $v; ?>"></script>
     <script src="js/katex/katex.min.js?v=<?php echo $v; ?>"></script>
     <script src="js/katex/auto-render.min.js?v=<?php echo $v; ?>"></script>
+    <link type="text/css" rel="stylesheet" href="css/syntax-highlight.css?v=<?php echo $v; ?>"/>
+    <script src="js/highlight/highlight.min.js?v=<?php echo $v; ?>"></script>
+    <script src="js/syntax-highlight.js?v=<?php echo $v; ?>"></script>
 
 </head>
 
@@ -302,10 +306,11 @@ $body_classes = trim($extra_body_classes);
     <script type="application/json" id="page-config-data"><?php 
         $config_data = [
             'isSearchMode' => !empty($search) || !empty($tags_search),
-            'currentNoteFolder' => null,
+            'currentNoteFolder' => null, // Will be set below
             'selectedWorkspace' => $workspace_filter ?? '',
             'userId' => $_SESSION['user_id'] ?? null,
-            'userEntriesPath' => isset($_SESSION['user_id']) ? "data/users/{$_SESSION['user_id']}/entries/" : "data/entries/"
+            'userEntriesPath' => isset($_SESSION['user_id']) ? "data/users/{$_SESSION['user_id']}/entries/" : "data/entries/",
+            'defaultNoteSortType' => $note_list_sort_type
         ];
         if ($note != '' && empty($search) && empty($tags_search)) {
             $config_data['currentNoteFolder'] = $current_note_folder ?? '';
@@ -332,7 +337,7 @@ $body_classes = trim($extra_body_classes);
         // Sinon, garder $res_right tel qu'il a été défini par loadNoteData
         
         // Group notes by folder for hierarchical display (now uses folder_id)
-        $organized = organizeNotesByFolder($stmt_left, $con, $workspace_filter);
+        $organized = organizeNotesByFolder($stmt_left, $con, $workspace_filter, $note_list_sort_type);
         $folders = $organized['folders'];
         $uncategorized_notes = $organized['uncategorized_notes'];
         

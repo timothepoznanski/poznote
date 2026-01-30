@@ -56,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $userId = (int)($_POST['user_id'] ?? 0);
             $username = trim($_POST['username'] ?? '');
             $email = trim($_POST['email'] ?? '');
+            $oidcSubject = trim($_POST['oidc_subject'] ?? '');
             
             if (empty($username)) {
                 $error = t('multiuser.admin.errors.username_required', [], 'Username is required');
@@ -64,7 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $result = updateUserProfile($userId, [
                 'username' => $username,
-                'email' => $email
+                'email' => $email,
+                'oidc_subject' => $oidcSubject
             ]);
             
             if (!$result['success']) {
@@ -186,10 +188,11 @@ $v = getAppVersion();
         form.submit();
     }
 
-    function renameUser(userId, currentUsername, currentEmail) {
+    function renameUser(userId, currentUsername, currentEmail, currentOidcSubject) {
         document.getElementById('rename_user_id').value = userId;
         document.getElementById('rename_username').value = currentUsername;
         document.getElementById('rename_email').value = currentEmail || '';
+        document.getElementById('rename_oidc_subject').value = currentOidcSubject || '';
         document.getElementById('renameModal').classList.add('active');
         setTimeout(() => document.getElementById('rename_username').focus(), 100);
     }
@@ -198,6 +201,7 @@ $v = getAppVersion();
         const userId = document.getElementById('rename_user_id').value;
         const newUsername = document.getElementById('rename_username').value;
         const newEmail = document.getElementById('rename_email').value;
+        const newOidcSubject = document.getElementById('rename_oidc_subject').value;
         
         // We handle multiple updates by submitting them sequentially or updating the logic
         // For simplicity, we'll just update one for now or add a new action
@@ -224,6 +228,11 @@ $v = getAppVersion();
         emailInput.name = 'email';
         emailInput.value = newEmail;
         form.appendChild(emailInput);
+        
+        const oidcSubjectInput = document.createElement('input');
+        oidcSubjectInput.name = 'oidc_subject';
+        oidcSubjectInput.value = newOidcSubject;
+        form.appendChild(oidcSubjectInput);
         
         document.body.appendChild(form);
         form.submit();
@@ -281,17 +290,13 @@ $v = getAppVersion();
                             </td>
                             <td data-label="<?php echo t_h('multiuser.admin.username', [], 'User'); ?>">
                                 <div class="user-info">
-                                    <div class="user-username" 
-                                         title="<?php echo t_h('multiuser.admin.click_to_rename', [], 'Click to edit'); ?>"
-                                         onclick="renameUser(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($user['email'] ?? '', ENT_QUOTES); ?>')">
+                                    <div class="user-username">
                                         <?php echo htmlspecialchars($user['username']); ?>
                                     </div>
                                 </div>
                             </td>
                             <td data-label="<?php echo t_h('multiuser.admin.email', [], 'Email'); ?>">
-                                <div class="user-email <?php echo empty($user['email']) ? 'user-email-empty' : ''; ?>" 
-                                     title="<?php echo t_h('multiuser.admin.click_to_rename', [], 'Click to edit'); ?>"
-                                     onclick="renameUser(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($user['email'] ?? '', ENT_QUOTES); ?>')">
+                                <div class="user-email <?php echo empty($user['email']) ? 'user-email-empty' : ''; ?>">
                                     <?php echo !empty($user['email']) ? htmlspecialchars($user['email']) : '<em>' . t_h('multiuser.admin.not_defined', [], 'not defined') . '</em>'; ?>
                                 </div>
                             </td>
@@ -339,7 +344,7 @@ $v = getAppVersion();
                             <td class="text-center <?php echo ($user['id'] === getCurrentUserId()) ? 'hide-on-mobile' : ''; ?>" data-label="<?php echo t_h('multiuser.admin.actions', [], 'Actions'); ?>">
                                 <div class="actions actions-center">
                                     <button class="btn btn-secondary btn-small" title="<?php echo t_h('multiuser.admin.edit_user', [], 'Edit User'); ?>" 
-                                            onclick="renameUser(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($user['email'] ?? '', ENT_QUOTES); ?>')">
+                                            onclick="renameUser(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($user['email'] ?? '', ENT_QUOTES); ?>', '<?php echo htmlspecialchars($user['oidc_subject'] ?? '', ENT_QUOTES); ?>')">
                                         <i class="fas fa-edit"></i>
                                     </button>
 
@@ -400,7 +405,13 @@ $v = getAppVersion();
                 <input type="text" id="rename_username" placeholder="<?php echo t_h('multiuser.admin.username', [], 'Username'); ?>" onkeydown="if(event.key==='Enter') submitRename()" style="margin-bottom: 15px;">
                 
                 <label style="display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--text-muted);"><?php echo t_h('multiuser.admin.email', [], 'Email'); ?></label>
-                <input type="email" id="rename_email" placeholder="<?php echo t_h('multiuser.admin.email', [], 'Email'); ?>" onkeydown="if(event.key==='Enter') submitRename()">
+                <input type="email" id="rename_email" placeholder="<?php echo t_h('multiuser.admin.email', [], 'Email'); ?>" onkeydown="if(event.key==='Enter') submitRename()" style="margin-bottom: 15px;">
+                
+                <label style="display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--text-muted);"><?php echo t_h('multiuser.admin.oidc_subject', [], 'OIDC Subject (UUID)'); ?></label>
+                <input type="text" id="rename_oidc_subject" placeholder="<?php echo t_h('multiuser.admin.oidc_subject_placeholder', [], 'e.g., 510ec799-02f8-42e0-...');?>" onkeydown="if(event.key==='Enter') submitRename()">
+                <small style="display: block; margin-top: 5px; font-size: 0.75rem; color: var(--text-muted);">
+                    <?php echo t_h('multiuser.admin.oidc_subject_help', [], 'Optional: UUID from your OIDC provider (LLDAP, Authelia, etc.)'); ?>
+                </small>
             </div>
             <div class="form-actions">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('renameModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>

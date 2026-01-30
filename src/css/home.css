@@ -59,6 +59,33 @@
     margin: 0 2px;
 }
 
+.home-back-link {
+    color: var(--text-color, #333);
+    text-decoration: none;
+    padding: 8px;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+    margin-right: 8px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.home-back-link:hover {
+    background-color: var(--hover-bg, rgba(0, 0, 0, 0.05));
+}
+
+.home-back-link i {
+    font-size: 16px;
+}
+
+.create-page-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text-color, #333);
+    margin: 0 0 24px 0;
+    text-align: center;
+}
+
 /* Search Bar */
 .home-search-container {
     margin-bottom: 25px;
@@ -371,6 +398,14 @@ body.dark-mode .home-card-green .home-card-icon {
     font-size: 16px;
     font-weight: 400;
     color: #1f2937;
+}
+
+.home-card-description {
+    font-size: 11px;
+    color: #dc3545;
+    font-weight: 500;
+    margin-top: 2px;
+    display: block;
 }
 
 .home-card-count {

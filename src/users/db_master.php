@@ -80,6 +80,18 @@ function initializeMasterDatabase(PDO $con): void {
         error_log("Failed to add email column: " . $e->getMessage());
     }
     
+    // Migration: Add oidc_subject column if missing
+    try {
+        $cols = $con->query("PRAGMA table_info(users)")->fetchAll(PDO::FETCH_ASSOC);
+        $existingColumns = array_column($cols, 'name');
+        if (!in_array('oidc_subject', $existingColumns)) {
+            $con->exec("ALTER TABLE users ADD COLUMN oidc_subject TEXT");
+            $con->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_oidc_subject ON users(oidc_subject) WHERE oidc_subject IS NOT NULL AND oidc_subject != ''");
+        }
+    } catch (Exception $e) {
+        error_log("Failed to add oidc_subject column: " . $e->getMessage());
+    }
+    
     // Global settings table
     $con->exec("
         CREATE TABLE IF NOT EXISTS global_settings (
@@ -190,6 +202,22 @@ function getUserProfileByEmail(string $email): ?array {
 }
 
 /**
+ * Get user profile by OIDC subject (sub claim)
+ */
+function getUserProfileByOidcSubject(string $oidcSubject): ?array {
+    try {
+        if (trim($oidcSubject) === '') return null;
+        $con = getMasterConnection();
+        $stmt = $con->prepare("SELECT * FROM users WHERE oidc_subject = ?");
+        $stmt->execute([$oidcSubject]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $user ?: null;
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
+/**
  * Update user last login timestamp
  */
 function updateUserLastLogin(int $userId): void {
@@ -199,6 +227,19 @@ function updateUserLastLogin(int $userId): void {
         $stmt->execute([$userId]);
     } catch (Exception $e) {
         // Ignore errors
+    }
+}
+
+/**
+ * Update user OIDC subject
+ */
+function updateUserOidcSubject(int $userId, string $oidcSubject): void {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("UPDATE users SET oidc_subject = ? WHERE id = ?");
+        $stmt->execute([$oidcSubject, $userId]);
+    } catch (Exception $e) {
+        error_log("Failed to update OIDC subject for user $userId: " . $e->getMessage());
     }
 }
 
@@ -258,7 +299,7 @@ function updateUserProfile(int $id, array $data): array {
     try {
         $con = getMasterConnection();
         
-        $allowedFields = ['username', 'email', 'active', 'is_admin'];
+        $allowedFields = ['username', 'email', 'active', 'is_admin', 'oidc_subject'];
         $updates = [];
         $params = [];
         

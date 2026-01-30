@@ -142,28 +142,6 @@ class FoldersController {
     }
     
     /**
-     * Resolve folder path to ID
-     */
-    private function resolveFolderPathToId(string $workspace, string $folderPath): ?int {
-        $folderPath = trim($folderPath);
-        if ($folderPath === '') return null;
-        
-        $segments = array_values(array_filter(array_map('trim', explode('/', $folderPath)), fn($s) => $s !== ''));
-        if (empty($segments)) return null;
-        
-        $parentId = null;
-        foreach ($segments as $seg) {
-            $stmt = $this->db->prepare('SELECT id FROM folders WHERE name = ? AND workspace = ? AND parent_id IS ?');
-            $stmt->execute([$seg, $workspace, $parentId]);
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            if (!$row) return null;
-            $parentId = (int)$row['id'];
-        }
-        
-        return $parentId;
-    }
-    
-    /**
      * Get all descendant folder IDs recursively
      */
     private function getAllFolderIds(int $folderId, ?string $workspace): array {
@@ -571,7 +549,7 @@ class FoldersController {
             }
             $parentId = $parentFolderId;
         } elseif ($parentFolder !== null && $parentFolder !== '') {
-            $resolvedParent = $this->resolveFolderPathToId($workspace, $parentFolder);
+            $resolvedParent = resolveFolderPathToId($workspace, $parentFolder, false, $this->db);
             if ($resolvedParent === null) {
                 $this->sendError('Parent folder not found', 404);
                 return;
@@ -840,7 +818,7 @@ class FoldersController {
                 $targetParentId = (int)$pRow['id'];
             }
         } elseif ($newParentPath !== null && $newParentPath !== '') {
-            $resolvedParent = $this->resolveFolderPathToId($workspace, $newParentPath);
+            $resolvedParent = resolveFolderPathToId($workspace, $newParentPath, false, $this->db);
             if ($resolvedParent === null) {
                 $this->sendError('New parent folder not found', 404);
                 return;

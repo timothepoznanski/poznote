@@ -757,10 +757,12 @@
             "title_in_folder": "在 {{folder}} 中创建",
             "folder_fallback": "文件夹",
             "note": {
-                "title": "HTML 笔记 (非 Markdown)"
+                "title": "HTML 笔记",
+                "description": "非 Markdown"
             },
             "markdown": {
-                "title": "Markdown 笔记 (非 HTML)"
+                "title": "Markdown 笔记",
+                "description": "非 HTML"
             },
             "task_list": {
                 "title": "任务列表"
@@ -864,11 +866,11 @@
         "folder_actions": {
             "menu": "操作",
             "create": "创建",
-            "move_all_files": "将所有文件移动到另一个文件夹",
-            "move_folder": "将文件夹移动到子文件夹",
+            "move_all_files": "移动文件",
+            "move_folder": "移动文件夹",
             "rename_folder": "重命名文件夹",
             "delete_folder": "删除文件夹",
-            "download_folder": "下载文件夹",
+            "download_folder": "下载",
             "change_icon": "更改图标",
             "is_public": "已共享",
             "share_folder": "共享"
@@ -925,7 +927,8 @@
         "youtube_url_prompt": "输入 YouTube 视频链接或 ID：",
         "youtube_help": "支持：youtube.com/watch?v=ID、youtu.be/ID 或直接输入视频 ID",
         "youtube_insert": "插入",
-        "youtube_invalid_url": "YouTube 链接无效"
+        "youtube_invalid_url": "YouTube 链接无效",
+        "date": "日期"
     },
     "api": {
         "settings": {
@@ -1928,5 +1931,11 @@
             "step3": "将配置添加到您的 .env 文件",
             "step4": "重启应用程序以使更改生效"
         }
+    },
+    "sort": {
+        "header": "排序方式",
+        "alphabet": "名称",
+        "created": "创建日期",
+        "modified": "修改日期"
     }
 }

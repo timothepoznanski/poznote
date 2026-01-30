@@ -157,18 +157,12 @@
 .markdown-preview img,
 .markdown-preview iframe {
     max-width: 100%;
+    height: auto;
     border-radius: 4px;
     margin: 1em 0;
 }
 
-.markdown-preview img {
-    height: auto;
-}
-
 .markdown-preview iframe {
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: 16 / 9;
     border: none;
 }
 
@@ -245,15 +239,15 @@
 }
 
 /* Nested task lists need indentation */
-.markdown-preview li.task-list-item > ul.task-list,
-.markdown-preview li.task-list-item > ul,
-.markdown-preview li.task-list-item > ol {
+.markdown-preview li.task-list-item>ul.task-list,
+.markdown-preview li.task-list-item>ul,
+.markdown-preview li.task-list-item>ol {
     padding-left: 1.5em;
     margin: 0.5em 0;
 }
 
 /* Style for checked task items */
-.markdown-preview li.task-list-item input[type="checkbox"]:checked + span {
+.markdown-preview li.task-list-item input[type="checkbox"]:checked+span {
     text-decoration: line-through;
     color: #888;
 }
@@ -318,7 +312,8 @@
 .mermaid {
     margin: 1em 0;
     text-align: center;
-    background-color: white; /* Ensure visibility in dark mode if mermaid doesn't handle it */
+    background-color: white;
+    /* Ensure visibility in dark mode if mermaid doesn't handle it */
     padding: 10px;
     border-radius: 4px;
 }
