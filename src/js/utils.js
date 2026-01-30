@@ -152,10 +152,20 @@ function newFolder() {
                 .then(function (data) {
                     if (data.success && data.folder_id) {
                         // Folder created successfully with ID
-                        window.location.reload();
+                        if (window.location.pathname.endsWith('create.php')) {
+                            var ws = selectedWorkspace || getSelectedWorkspace();
+                            window.location.href = 'index.php' + (ws ? '?workspace=' + encodeURIComponent(ws) : '');
+                        } else {
+                            window.location.reload();
+                        }
                     } else if (data.success) {
                         // Fallback si pas d'ID retourné
-                        window.location.reload();
+                        if (window.location.pathname.endsWith('create.php')) {
+                            var ws = selectedWorkspace || getSelectedWorkspace();
+                            window.location.href = 'index.php' + (ws ? '?workspace=' + encodeURIComponent(ws) : '');
+                        } else {
+                            window.location.reload();
+                        }
                     } else {
                         // Use modal alert instead of notification popup
                         if (typeof window.showError === 'function') {
