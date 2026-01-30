@@ -1,0 +1,231 @@
+/* Syntax Highlighting - Highlight.js GitHub Themes */
+
+/* Base styles for code blocks */
+pre code.hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 1em;
+}
+
+code.hljs {
+    padding: 3px 5px;
+}
+
+/* Light theme (default) */
+.hljs {
+    color: #24292e;
+    background: #f6f8fa;
+}
+
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+    color: #d73a49;
+}
+
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+    color: #6f42c1;
+}
+
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id,
+.hljs-variable {
+    color: #005cc5;
+}
+
+.hljs-meta .hljs-string,
+.hljs-regexp,
+.hljs-string {
+    color: #032f62;
+}
+
+.hljs-built_in,
+.hljs-symbol {
+    color: #e36209;
+}
+
+.hljs-code,
+.hljs-comment,
+.hljs-formula {
+    color: #6a737d;
+}
+
+.hljs-name,
+.hljs-quote,
+.hljs-selector-pseudo,
+.hljs-selector-tag {
+    color: #22863a;
+}
+
+.hljs-subst {
+    color: #24292e;
+}
+
+.hljs-section {
+    color: #005cc5;
+    font-weight: 700;
+}
+
+.hljs-bullet {
+    color: #735c0f;
+}
+
+.hljs-emphasis {
+    color: #24292e;
+    font-style: italic;
+}
+
+.hljs-strong {
+    color: #24292e;
+    font-weight: 700;
+}
+
+.hljs-addition {
+    color: #22863a;
+    background-color: #f0fff4;
+}
+
+.hljs-deletion {
+    color: #b31d28;
+    background-color: #ffeef0;
+}
+
+/* Dark theme - Applied when data-theme="dark" is set on html element */
+html[data-theme="dark"] .hljs {
+    color: #c9d1d9;
+    background: #161b22;
+}
+
+html[data-theme="dark"] .hljs-doctag,
+html[data-theme="dark"] .hljs-keyword,
+html[data-theme="dark"] .hljs-meta .hljs-keyword,
+html[data-theme="dark"] .hljs-template-tag,
+html[data-theme="dark"] .hljs-template-variable,
+html[data-theme="dark"] .hljs-type,
+html[data-theme="dark"] .hljs-variable.language_ {
+    color: #ff7b72;
+}
+
+html[data-theme="dark"] .hljs-title,
+html[data-theme="dark"] .hljs-title.class_,
+html[data-theme="dark"] .hljs-title.class_.inherited__,
+html[data-theme="dark"] .hljs-title.function_ {
+    color: #d2a8ff;
+}
+
+html[data-theme="dark"] .hljs-attr,
+html[data-theme="dark"] .hljs-attribute,
+html[data-theme="dark"] .hljs-literal,
+html[data-theme="dark"] .hljs-meta,
+html[data-theme="dark"] .hljs-number,
+html[data-theme="dark"] .hljs-operator,
+html[data-theme="dark"] .hljs-selector-attr,
+html[data-theme="dark"] .hljs-selector-class,
+html[data-theme="dark"] .hljs-selector-id,
+html[data-theme="dark"] .hljs-variable {
+    color: #79c0ff;
+}
+
+html[data-theme="dark"] .hljs-meta .hljs-string,
+html[data-theme="dark"] .hljs-regexp,
+html[data-theme="dark"] .hljs-string {
+    color: #a5d6ff;
+}
+
+html[data-theme="dark"] .hljs-built_in,
+html[data-theme="dark"] .hljs-symbol {
+    color: #ffa657;
+}
+
+html[data-theme="dark"] .hljs-code,
+html[data-theme="dark"] .hljs-comment,
+html[data-theme="dark"] .hljs-formula {
+    color: #8b949e;
+}
+
+html[data-theme="dark"] .hljs-name,
+html[data-theme="dark"] .hljs-quote,
+html[data-theme="dark"] .hljs-selector-pseudo,
+html[data-theme="dark"] .hljs-selector-tag {
+    color: #7ee787;
+}
+
+html[data-theme="dark"] .hljs-subst {
+    color: #c9d1d9;
+}
+
+html[data-theme="dark"] .hljs-section {
+    color: #1f6feb;
+    font-weight: 700;
+}
+
+html[data-theme="dark"] .hljs-bullet {
+    color: #f2cc60;
+}
+
+html[data-theme="dark"] .hljs-emphasis {
+    color: #c9d1d9;
+    font-style: italic;
+}
+
+html[data-theme="dark"] .hljs-strong {
+    color: #c9d1d9;
+    font-weight: 700;
+}
+
+html[data-theme="dark"] .hljs-addition {
+    color: #aff5b4;
+    background-color: #033a16;
+}
+
+html[data-theme="dark"] .hljs-deletion {
+    color: #ffdcd7;
+    background-color: #67060c;
+}
+
+/* Language badge for code blocks */
+pre[data-language]::before,
+pre:has(code[data-language])::before {
+    content: attr(data-language);
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 2px 8px;
+    font-size: 0.75em;
+    color: #6e7681;
+    background: rgba(0, 0, 0, 0.05);
+    border-bottom-right-radius: 4px;
+    text-transform: uppercase;
+    font-weight: 500;
+    pointer-events: none;
+}
+
+pre[data-language],
+pre:has(code[data-language]) {
+    position: relative;
+}
+
+html[data-theme="dark"] pre[data-language]::before,
+html[data-theme="dark"] pre:has(code[data-language])::before {
+    color: #8b949e;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Style code blocks with language class */
+pre code[class*="language-"] {
+    border-radius: 4px;
+}

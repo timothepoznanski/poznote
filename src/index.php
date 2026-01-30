@@ -180,6 +180,9 @@ try {
     <script src="js/mermaid/mermaid.min.js?v=<?php echo $v; ?>"></script>
     <script src="js/katex/katex.min.js?v=<?php echo $v; ?>"></script>
     <script src="js/katex/auto-render.min.js?v=<?php echo $v; ?>"></script>
+    <link type="text/css" rel="stylesheet" href="css/syntax-highlight.css?v=<?php echo $v; ?>"/>
+    <script src="js/highlight/highlight.min.js?v=<?php echo $v; ?>"></script>
+    <script src="js/syntax-highlight.js?v=<?php echo $v; ?>"></script>
 
 </head>
 

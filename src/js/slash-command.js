@@ -407,7 +407,7 @@
         }
     }
 
-    function insertCodeBlock() {
+    function insertCodeBlock(language) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
 
@@ -416,6 +416,14 @@
         // Create code block (pre > code structure)
         const pre = document.createElement('pre');
         const code = document.createElement('code');
+        
+        // Add language class if specified
+        if (language) {
+            code.className = 'language-' + language;
+            code.setAttribute('data-language', language);
+            pre.setAttribute('data-language', language);
+        }
+        
         const textNode = document.createTextNode('\u200B');
         code.appendChild(textNode);
         pre.appendChild(code);
@@ -1155,7 +1163,32 @@
                 label: t('slash_menu.code', null, 'Code'),
                 submenu: [
                     { id: 'inline-code', icon: 'fa-terminal', label: t('slash_menu.inline_code', null, 'Inline code'), action: () => insertCode() },
-                    { id: 'code-block', icon: 'fa-code', label: t('slash_menu.code_block', null, 'Code block'), action: () => insertCodeBlock() }
+                    { id: 'code-block', icon: 'fa-code', label: t('slash_menu.code_block', null, 'Code block'), action: () => insertCodeBlock() },
+                    {
+                        id: 'block-languages',
+                        icon: 'fa-laptop-code',
+                        label: t('slash_menu.block_languages', null, 'Block Languages'),
+                        submenu: [
+                            { id: 'code-javascript', icon: 'fa-code', iconColor: '#f7df1e', label: 'JavaScript', action: () => insertCodeBlock('javascript') },
+                            { id: 'code-typescript', icon: 'fa-code', iconColor: '#3178c6', label: 'TypeScript', action: () => insertCodeBlock('typescript') },
+                            { id: 'code-python', icon: 'fa-code', iconColor: '#3776ab', label: 'Python', action: () => insertCodeBlock('python') },
+                            { id: 'code-html', icon: 'fa-code', iconColor: '#e34f26', label: 'HTML', action: () => insertCodeBlock('html') },
+                            { id: 'code-css', icon: 'fa-code', iconColor: '#1572b6', label: 'CSS', action: () => insertCodeBlock('css') },
+                            { id: 'code-json', icon: 'fa-code', iconColor: '#292929', label: 'JSON', action: () => insertCodeBlock('json') },
+                            { id: 'code-bash', icon: 'fa-terminal', iconColor: '#4eaa25', label: 'Bash', action: () => insertCodeBlock('bash') },
+                            { id: 'code-sql', icon: 'fa-database', iconColor: '#336791', label: 'SQL', action: () => insertCodeBlock('sql') },
+                            { id: 'code-php', icon: 'fa-code', iconColor: '#777bb4', label: 'PHP', action: () => insertCodeBlock('php') },
+                            { id: 'code-java', icon: 'fa-code', iconColor: '#007396', label: 'Java', action: () => insertCodeBlock('java') },
+                            { id: 'code-csharp', icon: 'fa-code', iconColor: '#239120', label: 'C#', action: () => insertCodeBlock('csharp') },
+                            { id: 'code-cpp', icon: 'fa-code', iconColor: '#00599c', label: 'C++', action: () => insertCodeBlock('cpp') },
+                            { id: 'code-go', icon: 'fa-code', iconColor: '#00add8', label: 'Go', action: () => insertCodeBlock('go') },
+                            { id: 'code-rust', icon: 'fa-code', iconColor: '#b7410e', label: 'Rust', action: () => insertCodeBlock('rust') },
+                            { id: 'code-ruby', icon: 'fa-gem', iconColor: '#cc342d', label: 'Ruby', action: () => insertCodeBlock('ruby') },
+                            { id: 'code-yaml', icon: 'fa-file-code', iconColor: '#cb171e', label: 'YAML', action: () => insertCodeBlock('yaml') },
+                            { id: 'code-xml', icon: 'fa-file-code', iconColor: '#0060ac', label: 'XML', action: () => insertCodeBlock('xml') },
+                            { id: 'code-markdown', icon: 'fa-file-code', iconColor: '#083fa1', label: 'Markdown', action: () => insertCodeBlock('markdown') }
+                        ]
+                    }
                 ]
             },
             {
@@ -1436,7 +1469,32 @@
                 label: t('slash_menu.code', null, 'Code'),
                 submenu: [
                     { id: 'inline-code', icon: 'fa-terminal', label: t('slash_menu.inline_code', null, 'Inline code'), action: () => wrapMarkdownSelection('`', '`', 1) },
-                    { id: 'code-block', icon: 'fa-code', label: t('slash_menu.code_block', null, 'Code block'), action: () => insertMarkdownAtCursor('```\n\n```\n', -5) }
+                    { id: 'code-block', icon: 'fa-code', label: t('slash_menu.code_block', null, 'Code block'), action: () => insertMarkdownAtCursor('```\n\n```\n', -5) },
+                    {
+                        id: 'block-languages',
+                        icon: 'fa-laptop-code',
+                        label: t('slash_menu.block_languages', null, 'Block Languages'),
+                        submenu: [
+                            { id: 'code-javascript', icon: 'fa-code', iconColor: '#f7df1e', label: 'JavaScript', action: () => insertMarkdownAtCursor('```javascript\n\n```\n', -5) },
+                            { id: 'code-typescript', icon: 'fa-code', iconColor: '#3178c6', label: 'TypeScript', action: () => insertMarkdownAtCursor('```typescript\n\n```\n', -5) },
+                            { id: 'code-python', icon: 'fa-code', iconColor: '#3776ab', label: 'Python', action: () => insertMarkdownAtCursor('```python\n\n```\n', -5) },
+                            { id: 'code-html', icon: 'fa-code', iconColor: '#e34f26', label: 'HTML', action: () => insertMarkdownAtCursor('```html\n\n```\n', -5) },
+                            { id: 'code-css', icon: 'fa-code', iconColor: '#1572b6', label: 'CSS', action: () => insertMarkdownAtCursor('```css\n\n```\n', -5) },
+                            { id: 'code-json', icon: 'fa-code', iconColor: '#292929', label: 'JSON', action: () => insertMarkdownAtCursor('```json\n\n```\n', -5) },
+                            { id: 'code-bash', icon: 'fa-terminal', iconColor: '#4eaa25', label: 'Bash', action: () => insertMarkdownAtCursor('```bash\n\n```\n', -5) },
+                            { id: 'code-sql', icon: 'fa-database', iconColor: '#336791', label: 'SQL', action: () => insertMarkdownAtCursor('```sql\n\n```\n', -5) },
+                            { id: 'code-php', icon: 'fa-code', iconColor: '#777bb4', label: 'PHP', action: () => insertMarkdownAtCursor('```php\n\n```\n', -5) },
+                            { id: 'code-java', icon: 'fa-code', iconColor: '#007396', label: 'Java', action: () => insertMarkdownAtCursor('```java\n\n```\n', -5) },
+                            { id: 'code-csharp', icon: 'fa-code', iconColor: '#239120', label: 'C#', action: () => insertMarkdownAtCursor('```csharp\n\n```\n', -5) },
+                            { id: 'code-cpp', icon: 'fa-code', iconColor: '#00599c', label: 'C++', action: () => insertMarkdownAtCursor('```cpp\n\n```\n', -5) },
+                            { id: 'code-go', icon: 'fa-code', iconColor: '#00add8', label: 'Go', action: () => insertMarkdownAtCursor('```go\n\n```\n', -5) },
+                            { id: 'code-rust', icon: 'fa-code', iconColor: '#b7410e', label: 'Rust', action: () => insertMarkdownAtCursor('```rust\n\n```\n', -5) },
+                            { id: 'code-ruby', icon: 'fa-gem', iconColor: '#cc342d', label: 'Ruby', action: () => insertMarkdownAtCursor('```ruby\n\n```\n', -5) },
+                            { id: 'code-yaml', icon: 'fa-file-code', iconColor: '#cb171e', label: 'YAML', action: () => insertMarkdownAtCursor('```yaml\n\n```\n', -5) },
+                            { id: 'code-xml', icon: 'fa-file-code', iconColor: '#0060ac', label: 'XML', action: () => insertMarkdownAtCursor('```xml\n\n```\n', -5) },
+                            { id: 'code-markdown', icon: 'fa-file-code', iconColor: '#083fa1', label: 'Markdown', action: () => insertMarkdownAtCursor('```markdown\n\n```\n', -5) }
+                        ]
+                    }
                 ]
             },
             {
