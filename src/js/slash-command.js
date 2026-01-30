@@ -1048,6 +1048,10 @@
                 action: function () {
                     const input = savedEditableElement;
                     if (!input || input.tagName !== 'INPUT') return;
+
+                    // Capture insertion position now (selection is already restored by deleteSlashText)
+                    const insertionStart = (typeof input.selectionStart === 'number') ? input.selectionStart : Math.max(0, slashOffset);
+                    const insertionEnd = (typeof input.selectionEnd === 'number') ? input.selectionEnd : insertionStart;
                     
                     const dateInput = document.createElement('input');
                     dateInput.type = 'date';
@@ -1059,20 +1063,29 @@
                     dateInput.addEventListener('change', function () {
                         const date = dateInput.value;
                         if (date) {
-                            const formattedDate = new Date(date).toLocaleDateString();
-                            const start = slashOffset;
+                            const formattedDate = new Date(date).toLocaleDateString() + ' ';
                             const text = input.value;
-                            
-                            // Find end of slash command text
-                            let end = start + 1;
-                            while (end < text.length && !/\s/.test(text[end])) {
-                                end++;
+
+                            const safeStart = Math.max(0, Math.min(insertionStart, text.length));
+                            const safeEnd = Math.max(safeStart, Math.min(insertionEnd, text.length));
+
+                            if (typeof input.setRangeText === 'function') {
+                                input.setRangeText(formattedDate, safeStart, safeEnd, 'end');
+                            } else {
+                                input.value = text.substring(0, safeStart) + formattedDate + text.substring(safeEnd);
                             }
-                            
-                            input.value = text.substring(0, start) + formattedDate + text.substring(end);
-                            input.selectionStart = input.selectionEnd = start + formattedDate.length;
+
+                            const caretPos = safeStart + formattedDate.length;
                             input.dispatchEvent(new Event('input', { bubbles: true }));
                             input.focus();
+                            try {
+                                input.setSelectionRange(caretPos, caretPos);
+                            } catch (e) { }
+                            setTimeout(() => {
+                                try {
+                                    input.setSelectionRange(caretPos, caretPos);
+                                } catch (e) { }
+                            }, 0);
                         }
                         document.body.removeChild(dateInput);
                     });
