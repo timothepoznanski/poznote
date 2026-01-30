@@ -217,6 +217,7 @@ pre:has(code[data-language])::before {
 pre[data-language],
 pre:has(code[data-language]) {
     position: relative;
+    padding-top: 28px;
 }
 
 html[data-theme="dark"] pre[data-language]::before,

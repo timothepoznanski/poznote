@@ -134,6 +134,11 @@ table th {
     border: 1px solid #e0e0e0;
 }
 
+/* Extra padding for code blocks with language badge */
+.public-note .content pre[data-language] {
+    padding-top: 32px;
+}
+
 .public-note .content pre code {
     background-color: transparent;
     padding: 0;
@@ -155,19 +160,14 @@ table th {
     border: 1px solid #ddd;
     border-radius: 4px;
     cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.2s, background-color 0.2s;
+    opacity: 1;
+    transition: background-color 0.2s;
     font-size: 12px;
     color: #555;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 10;
-}
-
-.public-note .content pre:hover .code-block-copy-btn,
-pre:hover .code-block-copy-btn {
-    opacity: 1;
 }
 
 .public-note .content pre .code-block-copy-btn:hover,
