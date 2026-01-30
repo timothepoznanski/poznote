@@ -465,6 +465,10 @@ html[data-theme='dark'] .public-note .content .task-item.important .task-text {
     display: none !important;
 }
 
+.alert-modal-body {
+    padding-top: 30px !important;
+}
+
 html[data-theme='dark'] * table td,
 html[data-theme='dark'] * table th {
     border-color: #404040 !important;

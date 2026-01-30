@@ -209,7 +209,7 @@ if (is_readable($htmlFile)) {
 if (isset($note['type']) && $note['type'] === 'markdown') {
     if (strpos($content, 'class="task-list"') !== false) {
         $addTaskHtml = '<div class="public-markdown-task-add-container" style="margin-top: 20px; padding: 10px; border-top: 1px solid #eee;">';
-        $addTaskHtml .= '<input type="text" class="task-input public-markdown-task-add-input" placeholder="'.t('index.note.add_task', [], 'Add a task...').'" />';
+        $addTaskHtml .= '<input type="text" class="task-input public-markdown-task-add-input" placeholder="'.t('tasklist.input_placeholder', [], 'Add a task...').'" />';
         $addTaskHtml .= '</div>';
         $content .= $addTaskHtml;
     }
@@ -229,7 +229,7 @@ if (isset($note['type']) && $note['type'] === 'tasklist') {
         $tasksHtml = '<div class="task-list-container">';
         // Add item input
         $tasksHtml .= '<div class="task-input-container">';
-        $tasksHtml .= '<input type="text" class="task-input public-task-add-input" placeholder="'.t('index.note.add_task', [], 'Add a task...').'" />';
+        $tasksHtml .= '<input type="text" class="task-input public-task-add-input" placeholder="'.t('tasklist.input_placeholder', [], 'Add a task...').'" />';
         $tasksHtml .= '</div>';
 
         $tasksHtml .= '<div class="tasks-list">';
@@ -313,8 +313,38 @@ if (!empty($row['theme']) && in_array($row['theme'], ['dark', 'light'])) {
     <!-- CSP-compliant theme initialization -->
     <script type="application/json" id="public-note-config"><?php 
         $apiBaseUrl = $scriptDir . '/api/v1';
-        echo json_encode(['serverTheme' => $theme, 'token' => $token, 'apiBaseUrl' => $apiBaseUrl]); 
+        echo json_encode([
+            'serverTheme' => $theme, 
+            'token' => $token, 
+            'apiBaseUrl' => $apiBaseUrl,
+            'i18n' => [
+                'addTask' => t('tasklist.input_placeholder', [], 'Add a task...'),
+                'editTask' => t('image_menu.edit', [], 'Edit') . ' :',
+                'deleteTask' => t('common.delete', [], 'Delete') . ' ?',
+                'confirm' => t('common.confirm', [], 'Confirm'),
+                'cancel' => t('common.cancel', [], 'Cancel'),
+                'ok' => t('common.ok', [], 'OK')
+            ]
+        ]); 
     ?></script>
+    <script>
+        // Simple window.t for modal-alerts.js compatibility (used by window.confirm)
+        (function() {
+            try {
+                const configElement = document.getElementById('public-note-config');
+                if (configElement) {
+                    const config = JSON.parse(configElement.textContent);
+                    window.t = function(key, vars, fallback) {
+                        if (key === 'common.confirm') return config.i18n.confirm;
+                        if (key === 'common.cancel') return config.i18n.cancel;
+                        return fallback || key;
+                    };
+                }
+            } catch (e) {
+                console.error('Error initializing i18n for public note', e);
+            }
+        })();
+    </script>
     <script src="js/public-note-theme-init.js"></script>
     <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/solid.min.css">

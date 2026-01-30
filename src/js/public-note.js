@@ -327,92 +327,17 @@
         }
     }
 
-    // Task list interaction (Checkboxes)
-    document.addEventListener('change', function (e) {
-        if (!e.target || !e.target.matches('.task-checkbox, .markdown-task-checkbox')) return;
-
-        const checkbox = e.target;
-        const config = getPublicConfig();
-        if (!config || !config.token) return;
-
-        const isMarkdown = checkbox.classList.contains('markdown-task-checkbox');
-        const completed = checkbox.checked;
-        const idOrIndex = isMarkdown ? checkbox.getAttribute('data-line') : checkbox.getAttribute('data-index');
-        const apiBaseUrl = config.apiBaseUrl || 'api/v1';
-
-        // Optimistic UI update
-        const taskItem = checkbox.closest('.task-item, .task-list-item');
-        if (taskItem) {
-            taskItem.classList.toggle('completed', completed);
-
-            // Move to bottom if completed
-            if (completed) {
-                const parent = taskItem.parentNode;
-                // Add a small delay for the animation/feel
-                setTimeout(() => {
-                    if (checkbox.checked) { // Double check it's still checked
-                        parent.appendChild(taskItem);
-                    }
-                }, 300);
-            }
-        }
-
-        fetch(`${apiBaseUrl}/public/tasks/${idOrIndex}?token=${encodeURIComponent(config.token)}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ completed: completed })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) {
-                    console.error('Failed to update task', data.error);
-                    location.reload(); // Revert by reloading
-                } else if (!isMarkdown) {
-                    // For tasklists, sorting on server might have changed indices
-                    // Let's reload to be safe and keep UI in sync with server sort
-                    setTimeout(() => location.reload(), 800);
-                }
-            })
-            .catch(err => {
-                console.error('Network error', err);
-                checkbox.checked = !completed;
-                if (taskItem) taskItem.classList.toggle('completed', !completed);
-            });
-    });
-
-    // Add Task Handler
-    function handleAddTask(input, isMarkdown = false) {
-        const text = input.value.trim();
-        if (!text) return;
-
-        const config = getPublicConfig();
-        if (!config || !config.token) return;
-        const apiBaseUrl = config.apiBaseUrl || 'api/v1';
-
-        fetch(`${apiBaseUrl}/public/tasks?token=${encodeURIComponent(config.token)}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: text })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Reload to show new item (simpler for public view)
-                    location.reload();
-                } else {
-                    alert('Error: ' + (data.error || 'Unknown error'));
-                }
-            })
-            .catch(err => console.error('Network error', err));
-    }
-
-    document.addEventListener('keydown', function (e) {
-        if (e.target.matches('.public-task-add-input, .public-markdown-task-add-input')) {
-            if (e.key === 'Enter') {
-                handleAddTask(e.target, e.target.matches('.public-markdown-task-add-input'));
-            }
-        }
-    });
+    // Task strings from PHP-passed i18n or fallbacks
+    const globalConfig = getPublicConfig(); // Get config once for i18n
+    const i18n = globalConfig ? (globalConfig.i18n || {}) : {};
+    const texts = {
+        addTask: i18n.addTask || 'Add a task...',
+        editTask: i18n.editTask || 'Edit task:',
+        deleteTask: i18n.deleteTask || 'Delete this task?',
+        confirm: i18n.confirm || 'Confirm',
+        cancel: i18n.cancel || 'Cancel',
+        ok: i18n.ok || 'OK'
+    };
 
     /**
      * Helper for Poznote-styled prompt
@@ -425,9 +350,9 @@
                 alertType: 'info',
                 title: 'Poznote',
                 buttons: [
-                    { text: 'Cancel', type: 'secondary', action: () => resolve(null) },
+                    { text: texts.cancel, type: 'secondary', action: () => resolve(null) },
                     {
-                        text: 'OK', type: 'primary', action: () => {
+                        text: texts.ok, type: 'primary', action: () => {
                             const input = document.getElementById('public-prompt-input');
                             resolve(input ? input.value : null);
                         }
@@ -506,6 +431,93 @@
         });
     }
 
+    // Task list interaction (Checkboxes)
+    document.addEventListener('change', function (e) {
+        if (!e.target || !e.target.matches('.task-checkbox, .markdown-task-checkbox')) return;
+
+        const checkbox = e.target;
+        const config = getPublicConfig();
+        if (!config || !config.token) return;
+
+        const isMarkdown = checkbox.classList.contains('markdown-task-checkbox');
+        const completed = checkbox.checked;
+        const idOrIndex = isMarkdown ? checkbox.getAttribute('data-line') : checkbox.getAttribute('data-index');
+        const apiBaseUrl = config.apiBaseUrl || 'api/v1';
+
+        // Optimistic UI update
+        const taskItem = checkbox.closest('.task-item, .task-list-item');
+        if (taskItem) {
+            taskItem.classList.toggle('completed', completed);
+
+            // Move to bottom if completed
+            if (completed) {
+                const parent = taskItem.parentNode;
+                // Add a small delay for the animation/feel
+                setTimeout(() => {
+                    if (checkbox.checked) { // Double check it's still checked
+                        parent.appendChild(taskItem);
+                    }
+                }, 300);
+            }
+        }
+
+        fetch(`${apiBaseUrl}/public/tasks/${idOrIndex}?token=${encodeURIComponent(config.token)}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ completed: completed })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    console.error('Failed to update task', data.error);
+                    location.reload(); // Revert by reloading
+                } else if (!isMarkdown) {
+                    // For tasklists, sorting on server might have changed indices
+                    // Let's reload to be safe and keep UI in sync with server sort
+                    setTimeout(() => location.reload(), 800);
+                }
+            })
+            .catch(err => {
+                console.error('Network error', err);
+                checkbox.checked = !completed;
+                if (taskItem) taskItem.classList.toggle('completed', !completed);
+            });
+    });
+
+    // Add Task Handler
+    function handleAddTask(input) {
+        const text = input.value.trim();
+        if (!text) return;
+
+        const config = getPublicConfig();
+        if (!config || !config.token) return;
+        const apiBaseUrl = config.apiBaseUrl || 'api/v1';
+
+        fetch(`${apiBaseUrl}/public/tasks?token=${encodeURIComponent(config.token)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Reload to show new item (simpler for public view)
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(err => console.error('Network error', err));
+    }
+
+    document.addEventListener('keydown', function (e) {
+        if (e.target.matches('.public-task-add-input, .public-markdown-task-add-input')) {
+            if (e.key === 'Enter') {
+                handleAddTask(e.target);
+            }
+        }
+    });
+
     // Edit Task Handler
     document.addEventListener('click', async function (e) {
         const editBtn = e.target.closest('.public-task-edit-btn');
@@ -514,7 +526,7 @@
             const textSpan = taskItem.querySelector('.task-text');
             const originalText = textSpan.getAttribute('data-text') || textSpan.textContent;
 
-            const newText = await publicNotePrompt('Edit task:', originalText);
+            const newText = await publicNotePrompt(texts.editTask, originalText);
             if (newText !== null && newText.trim() !== originalText) {
                 updateTaskText(taskItem.getAttribute('data-index'), newText.trim());
             }
@@ -523,7 +535,7 @@
 
         const deleteBtn = e.target.closest('.public-task-delete-btn');
         if (deleteBtn) {
-            const isConfirmed = await window.confirm('Delete this task?');
+            const isConfirmed = await window.confirm(texts.deleteTask);
             if (isConfirmed) {
                 const taskItem = deleteBtn.closest('.task-item');
                 deleteTask(taskItem.getAttribute('data-index'));
@@ -537,7 +549,7 @@
             const idOrIndex = taskItem.getAttribute('data-line');
             const originalText = e.target.getAttribute('data-text') || e.target.textContent;
 
-            const newText = await publicNotePrompt('Edit task:', originalText);
+            const newText = await publicNotePrompt(texts.editTask, originalText);
             if (newText !== null && newText.trim() !== originalText) {
                 updateTaskText(idOrIndex, newText.trim(), true);
             }
