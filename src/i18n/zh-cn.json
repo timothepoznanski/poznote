@@ -757,10 +757,12 @@
             "title_in_folder": "在 {{folder}} 中创建",
             "folder_fallback": "文件夹",
             "note": {
-                "title": "HTML 笔记 (非 Markdown)"
+                "title": "HTML 笔记",
+                "description": "非 Markdown"
             },
             "markdown": {
-                "title": "Markdown 笔记 (非 HTML)"
+                "title": "Markdown 笔记",
+                "description": "非 HTML"
             },
             "task_list": {
                 "title": "任务列表"

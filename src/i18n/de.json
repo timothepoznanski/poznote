@@ -741,10 +741,12 @@
             "title_in_folder": "Erstellen in {{folder}}",
             "folder_fallback": "Ordner",
             "note": {
-                "title": "HTML-Notiz (nicht Markdown)"
+                "title": "HTML-Notiz",
+                "description": "Nicht Markdown"
             },
             "markdown": {
-                "title": "Markdown-Notiz (nicht HTML)"
+                "title": "Markdown-Notiz",
+                "description": "Nicht HTML"
             },
             "task_list": {
                 "title": "Aufgabenliste"

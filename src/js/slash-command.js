@@ -2354,7 +2354,10 @@
         const textBefore = container.textContent.substring(0, offset);
         const lastChar = textBefore.charAt(textBefore.length - 1);
 
-        if (lastChar === '/') {
+        // Don't open menu if we're deleting (e.g. backspace landing on a slash)
+        const isDeleting = e.inputType && e.inputType.startsWith('delete');
+
+        if (lastChar === '/' && !isDeleting) {
             showSlashMenu();
         } else if (slashMenuElement) {
             // If menu is open, update filter from editor
@@ -2520,16 +2523,16 @@
     }
 
     // YouTube video insertion functions (exposed globally)
-    window.insertYouTubeVideo = function() {
+    window.insertYouTubeVideo = function () {
         const t = window.t || ((key, params, fallback) => fallback);
-        
+
         if (typeof window.showYouTubeModal !== 'function') {
             // Fallback to prompt if modal not available
             const url = prompt(t('slash_menu.youtube_url_prompt', null, 'Enter YouTube video URL or ID:'), 'https://www.youtube.com/watch?v=');
             if (url) processYouTubeUrl(url, false, null, null, null);
             return;
         }
-        
+
         // Save the note entry and editable element before they get cleared
         const noteEntry = savedNoteEntry;
         const editableElement = savedEditableElement;
@@ -2540,22 +2543,22 @@
         if (sel && sel.rangeCount > 0) {
             savedRange = sel.getRangeAt(0).cloneRange();
         }
-        
-        window.showYouTubeModal(function(url) {
+
+        window.showYouTubeModal(function (url) {
             processYouTubeUrl(url, false, editableElement, savedRange, noteEntry);
         });
     };
 
-    window.insertYouTubeVideoMarkdown = function() {
+    window.insertYouTubeVideoMarkdown = function () {
         const t = window.t || ((key, params, fallback) => fallback);
-        
+
         if (typeof window.showYouTubeModal !== 'function') {
             // Fallback to prompt if modal not available
             const url = prompt(t('slash_menu.youtube_url_prompt', null, 'Enter YouTube video URL or ID:'), 'https://www.youtube.com/watch?v=');
             if (url) processYouTubeUrl(url, true, null, null, null);
             return;
         }
-        
+
         // Save the note entry and editable element before they get cleared
         const noteEntry = savedNoteEntry;
         const editableElement = savedEditableElement;
@@ -2566,25 +2569,25 @@
         if (sel && sel.rangeCount > 0) {
             savedRange = sel.getRangeAt(0).cloneRange();
         }
-        
-        window.showYouTubeModal(function(url) {
+
+        window.showYouTubeModal(function (url) {
             processYouTubeUrl(url, true, editableElement, savedRange, noteEntry);
         });
     };
-    
+
     // Helper function to process YouTube URL and insert iframe
     function processYouTubeUrl(url, isMarkdown, editableElement, savedRange, noteEntry) {
         const t = window.t || ((key, params, fallback) => fallback);
-        
+
         if (!url) return;
-        
+
         // Extract video ID from various YouTube URL formats
         let videoId = null;
         const patterns = [
             /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/,
             /^([a-zA-Z0-9_-]{11})$/  // Direct ID (exactly 11 chars)
         ];
-        
+
         for (const pattern of patterns) {
             const match = url.match(pattern);
             if (match) {
@@ -2592,7 +2595,7 @@
                 break;
             }
         }
-        
+
         if (!videoId) {
             if (typeof showNotificationPopup === 'function') {
                 showNotificationPopup(t('slash_menu.youtube_invalid_url', null, 'Invalid YouTube URL'), 'error');
@@ -2601,39 +2604,39 @@
             }
             return;
         }
-        
+
         if (isMarkdown) {
             // For markdown, insert iframe HTML directly
             const iframeMarkdown = '<iframe width="560" height="315" src="https://www.youtube.com/embed/' + videoId + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>\n\n';
-            
+
             // Focus the editable element first
             if (editableElement) {
                 editableElement.focus();
             }
-            
+
             // Restore selection if saved
             if (savedRange) {
                 const sel = window.getSelection();
                 sel.removeAllRanges();
                 sel.addRange(savedRange);
             }
-            
+
             insertMarkdownAtCursor(iframeMarkdown, 0);
         } else {
             // For HTML notes
             // Create iframe HTML
             const iframeHtml = '<iframe width="560" height="315" src="https://www.youtube.com/embed/' + videoId + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
-            
+
             // Focus the editable element first
             if (editableElement) {
                 editableElement.focus();
             }
-            
+
             // Restore selection and insert iframe
             try {
                 const sel = window.getSelection();
                 let range;
-                
+
                 if (savedRange) {
                     sel.removeAllRanges();
                     sel.addRange(savedRange);
@@ -2652,38 +2655,38 @@
                         return; // Cannot insert without a valid target
                     }
                 }
-                
+
                 // Create a temporary container to parse the HTML
                 const tempContainer = document.createElement('div');
                 tempContainer.innerHTML = iframeHtml;
                 const iframeElement = tempContainer.firstChild;
-                
+
                 // Insert with spacing
                 const fragment = document.createDocumentFragment();
-                
+
                 const lineBefore = document.createElement('div');
                 lineBefore.innerHTML = '<br>';
                 fragment.appendChild(lineBefore);
-                
+
                 fragment.appendChild(iframeElement);
-                
+
                 const lineAfter = document.createElement('div');
                 lineAfter.innerHTML = '<br>';
                 fragment.appendChild(lineAfter);
-                
+
                 range.deleteContents();
                 range.insertNode(fragment);
-                
+
                 // Move cursor after
                 range.collapse(false);
                 sel.removeAllRanges();
                 sel.addRange(range);
-                
+
                 // Trigger input event
                 if (noteEntry) {
                     noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
                 }
-                
+
                 // Mark as modified and save
                 if (typeof window.markNoteAsModified === 'function') {
                     window.markNoteAsModified();

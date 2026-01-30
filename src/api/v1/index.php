@@ -281,6 +281,11 @@ $router->post('/notes/{id}/duplicate', function($params) use ($notesController) 
     $notesController->duplicate($params['id']);
 });
 
+// Create a template from a note
+$router->post('/notes/{id}/create-template', function($params) use ($notesController) {
+    $notesController->createTemplate($params['id']);
+});
+
 // Convert note type (markdown <-> html)
 $router->post('/notes/{id}/convert', function($params) use ($notesController) {
     $notesController->convert($params['id']);

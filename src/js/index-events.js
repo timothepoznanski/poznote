@@ -596,13 +596,10 @@
     // Functions previously inline in index.php
     // ============================================================
 
-    // Create menu functionality - opens unified modal
+    // Create menu functionality - redirects to create page
     window.toggleCreateMenu = function () {
-        if (typeof showCreateModal === 'function') {
-            showCreateModal();
-        } else {
-            console.error('showCreateModal function not available');
-        }
+        var workspace = (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || '';
+        window.location.href = 'create.php?workspace=' + encodeURIComponent(workspace);
     };
 
     // Close menu when clicking outside
@@ -782,6 +779,27 @@
         // Initialize image click handlers for images in notes
         if (typeof reinitializeImageClickHandlers === 'function') {
             reinitializeImageClickHandlers();
+        }
+
+        // Check if we need to expand a specific folder (e.g., after creating a template)
+        const urlParams = new URLSearchParams(window.location.search);
+        const expandFolderId = urlParams.get('expand_folder');
+        if (expandFolderId && typeof window.toggleFolder === 'function') {
+            // Wait for the DOM to be fully loaded including folder structure
+            setTimeout(function() {
+                const folderDomId = 'folder-' + expandFolderId;
+                const folderContent = document.getElementById(folderDomId);
+                // Expand folder if it exists and is currently closed
+                if (folderContent) {
+                    if (folderContent.style.display === 'none' || folderContent.style.display === '') {
+                        window.toggleFolder(folderDomId);
+                    }
+                }
+                // Clean up URL parameter
+                urlParams.delete('expand_folder');
+                const newUrl = window.location.pathname + '?' + urlParams.toString();
+                window.history.replaceState({}, '', newUrl);
+            }, 300);
         }
     });
 })();

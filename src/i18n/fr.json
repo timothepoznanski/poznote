@@ -759,10 +759,12 @@
             "title_in_folder": "Créer dans {{folder}}",
             "folder_fallback": "dossier",
             "note": {
-                "title": "Note HTML (pas Markdown)"
+                "title": "Note HTML",
+                "description": "Pas Markdown"
             },
             "markdown": {
-                "title": "Note Markdown (pas HTML)"
+                "title": "Note Markdown",
+                "description": "Pas HTML"
             },
             "task_list": {
                 "title": "Liste de tâches"

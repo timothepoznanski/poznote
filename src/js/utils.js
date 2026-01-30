@@ -1882,6 +1882,7 @@ function showCreateModal(folderId = null, folderName = null) {
     var modalTitle = document.getElementById('createModalTitle');
     var otherSection = document.getElementById('otherSection');
     var subfolderOption = document.getElementById('subfolderOption');
+    var templateOption = document.querySelector('.create-note-option[data-type="template"]');
 
     if (isCreatingInFolder) {
         if (window.t) {
@@ -1894,6 +1895,8 @@ function showCreateModal(folderId = null, folderName = null) {
             modalTitle.textContent = 'Create in ' + (folderName || 'folder');
         }
         if (otherSection) otherSection.style.display = 'none';
+        // Hide template option when creating in folder
+        if (templateOption) templateOption.style.display = 'none';
         // Allow subfolder creation for all folders
         if (subfolderOption) {
             subfolderOption.style.display = 'flex';
@@ -1901,6 +1904,7 @@ function showCreateModal(folderId = null, folderName = null) {
     } else {
         modalTitle.textContent = window.t ? window.t('common.create', null, 'Create') : 'Create';
         if (otherSection) otherSection.style.display = 'block';
+        if (templateOption) templateOption.style.display = 'flex';
         if (subfolderOption) subfolderOption.style.display = 'none';
     }
 
@@ -1961,6 +1965,13 @@ function executeCreateAction() {
             break;
         case 'kanban':
             showKanbanStructureModal();
+            break;
+        case 'template':
+            if (typeof openTemplateNoteSelectorModal === 'function') {
+                openTemplateNoteSelectorModal();
+            } else {
+                console.error('openTemplateNoteSelectorModal function not found');
+            }
             break;
         case 'subfolder':
             if (targetFolderId) {

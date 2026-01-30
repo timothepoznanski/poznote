@@ -741,10 +741,12 @@
             "title_in_folder": "Crear en {{folder}}",
             "folder_fallback": "carpeta",
             "note": {
-                "title": "Nota HTML (no Markdown)"
+                "title": "Nota HTML",
+                "description": "No Markdown"
             },
             "markdown": {
-                "title": "Nota Markdown (no HTML)"
+                "title": "Nota Markdown",
+                "description": "No HTML"
             },
             "task_list": {
                 "title": "Lista de tareas"
