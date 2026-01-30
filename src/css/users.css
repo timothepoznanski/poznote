@@ -213,31 +213,17 @@ html[data-theme='dark'] .users-table td {
 .user-username {
     color: var(--text-color, #333);
     font-size: 0.95em;
-    cursor: pointer;
     padding: 4px 8px;
     border-radius: 4px;
-    transition: background 0.2s;
     display: inline-block;
-}
-
-.user-username:hover {
-    background: rgba(0, 125, 184, 0.1);
-    color: #007DB8;
 }
 
 .user-email {
     color: var(--text-muted, #666);
     font-size: 0.9em;
-    cursor: pointer;
     padding: 4px 8px;
     border-radius: 4px;
-    transition: background 0.2s, color 0.2s;
     display: inline-block;
-}
-
-.user-email:hover {
-    background: rgba(0, 125, 184, 0.1);
-    color: #007DB8;
 }
 
 .user-email-empty {
@@ -549,6 +535,7 @@ input.admin-toggle:disabled:checked+.slider {
     /* Hide table wrapper overflow on mobile to allow cards */
     .table-responsive {
         overflow-x: visible;
+        padding-bottom: 10px;
     }
 
     /* Card Layout */
