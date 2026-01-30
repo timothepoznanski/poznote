@@ -69,8 +69,8 @@ body.dark-mode .slash-command-label {
     color: #ffffff !important;
 }
 
-html[data-theme='dark'] .slash-command-icon,
-body.dark-mode .slash-command-icon {
+html[data-theme='dark'] .slash-command-icon:not([style*="color"]),
+body.dark-mode .slash-command-icon:not([style*="color"]) {
     color: #9ca3af;
 }
 
@@ -414,9 +414,9 @@ body.dark-mode .noteentry {
     color: #e0e0e0 !important;
 }
 
-/* Force readable text colors in note content, but preserve inline color styles */
-html[data-theme='dark'] .noteentry *:not([style*="color"]),
-body.dark-mode .noteentry *:not([style*="color"]) {
+/* Force readable text colors in note content, but preserve inline color styles and links */
+html[data-theme='dark'] .noteentry *:not([style*="color"]):not(a),
+body.dark-mode .noteentry *:not([style*="color"]):not(a) {
     color: #e0e0e0 !important;
 }
 

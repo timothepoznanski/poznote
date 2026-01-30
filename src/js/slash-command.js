@@ -1105,176 +1105,197 @@
                 ]
             },
             {
-                id: 'toggle',
-                icon: 'fa-caret-down',
-                label: t('slash_menu.toggle', null, 'Toggle'),
-                action: function () {
-                    insertToggle();
-                }
-            },
-            {
-                id: 'image',
-                icon: 'fa-image',
-                label: t('slash_menu.image', null, 'Image'),
-                action: function () {
-                    insertImage();
-                }
-            },
-            {
-                id: 'date',
-                icon: 'fa-calendar-alt',
-                label: t('slash_menu.date', null, 'Date'),
-                action: function () {
-                    insertDate();
-                }
-            },
-            {
-                id: 'excalidraw',
-                icon: 'fal fa-paint-brush',
-                label: t('slash_menu.excalidraw', null, 'Excalidraw'),
-                action: function () {
-                    if (typeof window.insertExcalidrawDiagram === 'function') {
-                        window.insertExcalidrawDiagram();
+                id: 'insert',
+                icon: 'fa-plus',
+                label: t('slash_menu.insert', null, 'Insert'),
+                submenu: [
+                    {
+                        id: 'toggle',
+                        icon: 'fa-caret-down',
+                        label: t('slash_menu.toggle', null, 'Toggle'),
+                        action: function () {
+                            insertToggle();
+                        }
+                    },
+                    {
+                        id: 'date',
+                        icon: 'fa-calendar-alt',
+                        label: t('slash_menu.date', null, 'Date'),
+                        action: function () {
+                            insertDate();
+                        }
+                    },
+                    {
+                        id: 'excalidraw',
+                        icon: 'fal fa-paint-brush',
+                        label: t('slash_menu.excalidraw', null, 'Excalidraw'),
+                        action: function () {
+                            if (typeof window.insertExcalidrawDiagram === 'function') {
+                                window.insertExcalidrawDiagram();
+                            }
+                        },
+                        mobileHidden: true
+                    },
+                    {
+                        id: 'emoji',
+                        icon: 'fa-smile',
+                        label: t('slash_menu.emoji', null, 'Emoji'),
+                        mobileHidden: true,
+                        action: function () {
+                            if (typeof window.toggleEmojiPicker === 'function') {
+                                window.toggleEmojiPicker();
+                            }
+                        }
+                    },
+                    {
+                        id: 'table',
+                        icon: 'fa-table',
+                        label: t('slash_menu.table', null, 'Table'),
+                        action: function () {
+                            if (typeof window.toggleTablePicker === 'function') {
+                                window.toggleTablePicker();
+                            }
+                        }
+                    },
+                    {
+                        id: 'separator',
+                        icon: 'fa-minus',
+                        label: t('slash_menu.separator', null, 'Separator'),
+                        action: function () {
+                            if (typeof window.insertSeparator === 'function') {
+                                window.insertSeparator();
+                            }
+                        }
                     }
-                },
-                mobileHidden: true
+                ]
             },
             {
-                id: 'emoji',
-                icon: 'fa-smile',
-                label: t('slash_menu.emoji', null, 'Emoji'),
-                mobileHidden: true,
-                action: function () {
-                    if (typeof window.toggleEmojiPicker === 'function') {
-                        window.toggleEmojiPicker();
-                    }
-                }
-            },
-            {
-                id: 'table',
-                icon: 'fa-table',
-                label: t('slash_menu.table', null, 'Table'),
-                action: function () {
-                    if (typeof window.toggleTablePicker === 'function') {
-                        window.toggleTablePicker();
-                    }
-                }
-            },
-            {
-                id: 'youtube',
-                icon: 'fa-video',
-                label: t('slash_menu.youtube_video', null, 'YouTube video'),
-                action: function () {
-                    if (typeof window.insertYouTubeVideo === 'function') {
-                        window.insertYouTubeVideo();
-                    }
-                }
-            },
-            {
-                id: 'separator',
-                icon: 'fa-minus',
-                label: t('slash_menu.separator', null, 'Separator'),
-                action: function () {
-                    if (typeof window.insertSeparator === 'function') {
-                        window.insertSeparator();
-                    }
-                }
-            },
-            {
-                id: 'note-reference',
-                icon: 'fa-at',
-                label: t('slash_menu.link_to_note', null, 'Link to note'),
-                action: function () {
-                    if (typeof window.openNoteReferenceModal === 'function') {
-                        window.openNoteReferenceModal();
-                    }
-                }
-            },
-            {
-                id: 'link',
+                id: 'link-menu',
                 icon: 'fa-link',
                 label: t('slash_menu.link', null, 'Link'),
-                action: function () {
-                    if (typeof window.showLinkModal === 'function') {
-                        // Save the note entry and editable element before they get cleared
-                        const noteEntry = savedNoteEntry;
-                        const editableElement = savedEditableElement;
+                submenu: [
+                    {
+                        id: 'link',
+                        icon: 'fa fa-link',
+                        label: t('slash_menu.link', null, 'Link'),
+                        action: function () {
+                            if (typeof window.showLinkModal === 'function') {
+                                // Save the note entry and editable element before they get cleared
+                                const noteEntry = savedNoteEntry;
+                                const editableElement = savedEditableElement;
 
-                        // Get current selection if any
-                        const sel = window.getSelection();
-                        const hasSelection = sel && sel.rangeCount > 0 && !sel.getRangeAt(0).collapsed;
-                        const selectedText = hasSelection ? sel.toString() : '';
-
-                        // Save the current range/position
-                        let savedRange = null;
-                        if (sel && sel.rangeCount > 0) {
-                            savedRange = sel.getRangeAt(0).cloneRange();
-                        }
-
-                        window.showLinkModal('https://', selectedText, function (url, text) {
-                            if (!url) return;
-
-                            // Create a new link element
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.textContent = text || url;
-                            a.target = '_blank';
-                            a.rel = 'noopener noreferrer';
-
-                            // Focus the editable element first
-                            if (editableElement) {
-                                editableElement.focus();
-                            }
-
-                            // Restore selection and insert link
-                            try {
+                                // Get current selection if any
                                 const sel = window.getSelection();
-                                if (savedRange) {
-                                    sel.removeAllRanges();
-                                    sel.addRange(savedRange);
+                                const hasSelection = sel && sel.rangeCount > 0 && !sel.getRangeAt(0).collapsed;
+                                const selectedText = hasSelection ? sel.toString() : '';
 
-                                    // Replace the selected text with the link
-                                    savedRange.deleteContents();
-                                    savedRange.insertNode(a);
-
-                                    // Position cursor after the link
-                                    const newRange = document.createRange();
-                                    newRange.setStartAfter(a);
-                                    newRange.setEndAfter(a);
-                                    sel.removeAllRanges();
-                                    sel.addRange(newRange);
-                                } else if (sel && sel.rangeCount > 0) {
-                                    // Fallback: insert at current position
-                                    const range = sel.getRangeAt(0);
-                                    range.insertNode(a);
-                                    range.setStartAfter(a);
-                                    range.setEndAfter(a);
-                                    sel.removeAllRanges();
-                                    sel.addRange(range);
-                                } else if (editableElement) {
-                                    // Last resort: append to editable element
-                                    editableElement.appendChild(a);
+                                // Save the current range/position
+                                let savedRange = null;
+                                if (sel && sel.rangeCount > 0) {
+                                    savedRange = sel.getRangeAt(0).cloneRange();
                                 }
-                            } catch (e) {
-                                console.error('Error inserting link:', e);
-                                // Absolute fallback
-                                if (editableElement) {
-                                    editableElement.appendChild(a);
-                                }
-                            }
 
-                            // Trigger input event for autosave
-                            if (noteEntry) {
-                                noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
-                            }
+                                window.showLinkModal('https://', selectedText, function (url, text) {
+                                    if (!url) return;
 
-                            // Save the note
-                            if (typeof window.saveNoteImmediately === 'function') {
-                                window.saveNoteImmediately();
+                                    // Create a new link element
+                                    const a = document.createElement('a');
+                                    a.href = url;
+                                    a.textContent = text || url;
+                                    a.target = '_blank';
+                                    a.rel = 'noopener noreferrer';
+
+                                    // Focus the editable element first
+                                    if (editableElement) {
+                                        editableElement.focus();
+                                    }
+
+                                    // Restore selection and insert link
+                                    try {
+                                        const sel = window.getSelection();
+                                        if (savedRange) {
+                                            sel.removeAllRanges();
+                                            sel.addRange(savedRange);
+
+                                            // Replace the selected text with the link
+                                            savedRange.deleteContents();
+                                            savedRange.insertNode(a);
+
+                                            // Position cursor after the link
+                                            const newRange = document.createRange();
+                                            newRange.setStartAfter(a);
+                                            newRange.setEndAfter(a);
+                                            sel.removeAllRanges();
+                                            sel.addRange(newRange);
+                                        } else if (sel && sel.rangeCount > 0) {
+                                            // Fallback: insert at current position
+                                            const range = sel.getRangeAt(0);
+                                            range.insertNode(a);
+                                            range.setStartAfter(a);
+                                            range.setEndAfter(a);
+                                            sel.removeAllRanges();
+                                            sel.addRange(range);
+                                        } else if (editableElement) {
+                                            // Last resort: append to editable element
+                                            editableElement.appendChild(a);
+                                        }
+                                    } catch (e) {
+                                        console.error('Error inserting link:', e);
+                                        // Absolute fallback
+                                        if (editableElement) {
+                                            editableElement.appendChild(a);
+                                        }
+                                    }
+
+                                    // Trigger input event for autosave
+                                    if (noteEntry) {
+                                        noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+                                    }
+
+                                    // Save the note
+                                    if (typeof window.saveNoteImmediately === 'function') {
+                                        window.saveNoteImmediately();
+                                    }
+                                });
                             }
-                        });
+                        }
+                    },
+                    {
+                        id: 'note-reference',
+                        icon: 'fa fa-at',
+                        label: t('slash_menu.link_to_note', null, 'Link to note'),
+                        action: function () {
+                            if (typeof window.openNoteReferenceModal === 'function') {
+                                window.openNoteReferenceModal();
+                            }
+                        }
                     }
-                }
+                ]
+            },
+            {
+                id: 'media',
+                icon: 'fa-image',
+                label: t('slash_menu.media', null, 'Media'),
+                submenu: [
+                    {
+                        id: 'image',
+                        icon: 'fa fa-image',
+                        label: t('slash_menu.image', null, 'Image'),
+                        action: function () {
+                            insertImage();
+                        }
+                    },
+                    {
+                        id: 'youtube',
+                        icon: 'fa fa-video',
+                        label: t('slash_menu.youtube_video', null, 'YouTube video'),
+                        action: function () {
+                            if (typeof window.insertYouTubeVideo === 'function') {
+                                window.insertYouTubeVideo();
+                            }
+                        }
+                    }
+                ]
             },
             {
                 id: 'open-keyboard',
@@ -1355,15 +1376,6 @@
                 ]
             },
             {
-                id: 'toggle',
-                icon: 'fa-caret-down',
-                label: t('slash_menu.toggle', null, 'Toggle'),
-                action: function () {
-                    // Automatically add empty lines before and after for better spacing
-                    insertMarkdownAtCursor('\n\n<details class="toggle-block" open>\n<summary class="toggle-header">Toggle</summary>\n\n...\n\n</details>\n\n', -17);
-                }
-            },
-            {
                 id: 'color',
                 icon: 'fa-palette',
                 label: t('slash_menu.color', null, 'Color'),
@@ -1378,106 +1390,147 @@
                 ]
             },
             {
-                id: 'image',
-                icon: 'fa-image',
-                label: t('slash_menu.image', null, 'Image'),
-                action: function () {
-                    insertImage();
-                }
-            },
-            {
-                id: 'date',
-                icon: 'fa-calendar-alt',
-                label: t('slash_menu.date', null, 'Date'),
-                action: function () {
-                    insertDateMarkdown();
-                }
-            },
-            {
-                id: 'emoji',
-                icon: 'fa-smile',
-                label: t('slash_menu.emoji', null, 'Emoji'),
-                mobileHidden: true,
-                action: function () {
-                    if (typeof window.toggleEmojiPicker === 'function') {
-                        window.toggleEmojiPicker();
+                id: 'insert',
+                icon: 'fa-plus',
+                label: t('slash_menu.insert', null, 'Insert'),
+                submenu: [
+                    {
+                        id: 'toggle',
+                        icon: 'fa-caret-down',
+                        label: t('slash_menu.toggle', null, 'Toggle'),
+                        action: function () {
+                            // Automatically add empty lines before and after for better spacing
+                            insertMarkdownAtCursor('\n\n<details class="toggle-block" open>\n<summary class="toggle-header">Toggle</summary>\n\n...\n\n</details>\n\n', -17);
+                        }
+                    },
+                    {
+                        id: 'date',
+                        icon: 'fa-calendar-alt',
+                        label: t('slash_menu.date', null, 'Date'),
+                        action: function () {
+                            insertDateMarkdown();
+                        }
+                    },
+                    {
+                        id: 'excalidraw',
+                        icon: 'fal fa-paint-brush',
+                        label: t('slash_menu.excalidraw', null, 'Excalidraw'),
+                        action: function () {
+                            if (typeof window.insertExcalidrawDiagram === 'function') {
+                                window.insertExcalidrawDiagram();
+                            }
+                        },
+                        mobileHidden: true
+                    },
+                    {
+                        id: 'emoji',
+                        icon: 'fa-smile',
+                        label: t('slash_menu.emoji', null, 'Emoji'),
+                        mobileHidden: true,
+                        action: function () {
+                            if (typeof window.toggleEmojiPicker === 'function') {
+                                window.toggleEmojiPicker();
+                            }
+                        }
+                    },
+                    {
+                        id: 'table',
+                        icon: 'fa-table',
+                        label: t('slash_menu.table', null, 'Table'),
+                        action: function () {
+                            insertMarkdownAtCursor('| Column | Column |\n| --- | --- |\n|  |  |\n', 0);
+                        }
+                    },
+                    {
+                        id: 'separator',
+                        icon: 'fa-minus',
+                        label: t('slash_menu.separator', null, 'Separator'),
+                        action: function () {
+                            insertMarkdownAtCursor('\n---\n', 0);
+                        }
                     }
-                }
+                ]
             },
             {
-                id: 'table',
-                icon: 'fa-table',
-                label: t('slash_menu.table', null, 'Table'),
-                action: function () {
-                    insertMarkdownAtCursor('| Column | Column |\n| --- | --- |\n|  |  |\n', 0);
-                }
-            },
-            {
-                id: 'youtube',
-                icon: 'fa-video',
-                label: t('slash_menu.youtube_video', null, 'YouTube video'),
-                action: function () {
-                    if (typeof window.insertYouTubeVideoMarkdown === 'function') {
-                        window.insertYouTubeVideoMarkdown();
-                    }
-                }
-            },
-            {
-                id: 'separator',
-                icon: 'fa-minus',
-                label: t('slash_menu.separator', null, 'Separator'),
-                action: function () {
-                    insertMarkdownAtCursor('\n---\n', 0);
-                }
-            },
-            {
-                id: 'note-reference',
-                icon: 'fa-at',
-                label: t('slash_menu.link_to_note', null, 'Link to note'),
-                action: function () {
-                    if (typeof window.openNoteReferenceModal === 'function') {
-                        window.openNoteReferenceModal();
-                    }
-                }
-            },
-            {
-                id: 'link',
+                id: 'link-menu',
                 icon: 'fa-link',
                 label: t('slash_menu.link', null, 'Link'),
-                action: function () {
-                    if (typeof window.showLinkModal === 'function') {
-                        const editor = getCurrentMarkdownEditorFromSelection();
-                        if (!editor) return;
+                submenu: [
+                    {
+                        id: 'link',
+                        icon: 'fa fa-link',
+                        label: t('slash_menu.link', null, 'Link'),
+                        action: function () {
+                            if (typeof window.showLinkModal === 'function') {
+                                const editor = getCurrentMarkdownEditorFromSelection();
+                                if (!editor) return;
 
-                        const offsets = getSelectionOffsetsWithin(editor);
-                        if (!offsets) return;
+                                const offsets = getSelectionOffsetsWithin(editor);
+                                if (!offsets) return;
 
-                        const text = getMarkdownEditorText(editor);
-                        const selectedText = text.substring(offsets.start, offsets.end);
+                                const text = getMarkdownEditorText(editor);
+                                const selectedText = text.substring(offsets.start, offsets.end);
 
-                        window.showLinkModal('https://', selectedText, function (url, linkText) {
-                            if (!url) return;
+                                window.showLinkModal('https://', selectedText, function (url, linkText) {
+                                    if (!url) return;
 
-                            const linkMarkdown = '[' + (linkText || 'link') + '](' + url + ')';
-                            const before = text.substring(0, offsets.start);
-                            const after = text.substring(offsets.end);
-                            const newText = before + linkMarkdown + after;
+                                    const linkMarkdown = '[' + (linkText || 'link') + '](' + url + ')';
+                                    const before = text.substring(0, offsets.start);
+                                    const after = text.substring(offsets.end);
+                                    const newText = before + linkMarkdown + after;
 
-                            editor.textContent = '';
-                            editor.appendChild(document.createTextNode(newText));
+                                    editor.textContent = '';
+                                    editor.appendChild(document.createTextNode(newText));
 
-                            // Position cursor after the inserted link
-                            const newOffset = offsets.start + linkMarkdown.length;
-                            setSelectionByOffsets(editor, newOffset, newOffset);
+                                    // Position cursor after the inserted link
+                                    const newOffset = offsets.start + linkMarkdown.length;
+                                    setSelectionByOffsets(editor, newOffset, newOffset);
 
-                            // Trigger input event for autosave
-                            const noteEntry = editor.closest('.noteentry');
-                            if (noteEntry) {
-                                noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+                                    // Trigger input event for autosave
+                                    const noteEntry = editor.closest('.noteentry');
+                                    if (noteEntry) {
+                                        noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+                                    }
+                                });
                             }
-                        });
+                        }
+                    },
+                    {
+                        id: 'note-reference',
+                        icon: 'fa fa-at',
+                        label: t('slash_menu.link_to_note', null, 'Link to note'),
+                        action: function () {
+                            if (typeof window.openNoteReferenceModal === 'function') {
+                                window.openNoteReferenceModal();
+                            }
+                        }
                     }
-                }
+                ]
+            },
+            {
+                id: 'media',
+                icon: 'fa-image',
+                label: t('slash_menu.media', null, 'Media'),
+                submenu: [
+                    {
+                        id: 'image',
+                        icon: 'fa fa-image',
+                        label: t('slash_menu.image', null, 'Image'),
+                        action: function () {
+                            insertImage();
+                        }
+                    },
+                    {
+                        id: 'youtube',
+                        icon: 'fa fa-video',
+                        label: t('slash_menu.youtube_video', null, 'YouTube video'),
+                        action: function () {
+                            if (typeof window.insertYouTubeVideoMarkdown === 'function') {
+                                window.insertYouTubeVideoMarkdown();
+                            }
+                        }
+                    }
+                ]
             },
             {
                 id: 'open-keyboard',
@@ -1667,7 +1720,7 @@
                 const hasSubmenu = item.submenu && item.submenu.length > 0;
                 const submenuIndicator = hasSubmenu ? '<i class="fa fa-chevron-right slash-command-submenu-indicator"></i>' : '';
                 const iconStyle = item.iconColor ? ' style="margin-right: 8px; width: 16px; display: inline-block; text-align: center; color: ' + item.iconColor + ';"' : ' style="margin-right: 8px; width: 16px; display: inline-block; text-align: center;"';
-                const iconHtml = item.icon ? '<i class="fa ' + item.icon + '"' + iconStyle + '></i>' : '';
+                const iconHtml = item.icon ? '<i class="slash-command-icon fa ' + item.icon + '"' + iconStyle + '></i>' : '';
                 return (
                     '<div class="slash-command-item' + selectedClass + '" data-submenu-id="' + item.id + '" data-has-sub-submenu="' + hasSubmenu + '">' +
                     iconHtml +
@@ -1699,7 +1752,7 @@
             .map((item, idx) => {
                 const selectedClass = idx === selectedSubSubmenuIndex ? ' selected' : '';
                 const iconStyle = item.iconColor ? ' style="margin-right: 8px; color: ' + item.iconColor + ';"' : ' style="margin-right: 8px;"';
-                const iconHtml = item.icon ? '<i class="' + item.icon + '"' + iconStyle + '></i>' : '';
+                const iconHtml = item.icon ? '<i class="slash-command-icon ' + item.icon + '"' + iconStyle + '></i>' : '';
                 return (
                     '<div class="slash-command-item' + selectedClass + '" data-sub-submenu-id="' + item.id + '">' +
                     iconHtml +
