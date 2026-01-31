@@ -331,6 +331,16 @@ try {
             </div>
             <?php endif; ?>
 
+            <!-- Back to Notes -->
+            <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?>">
+                <div class="home-card-icon">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?></span>
+                </div>
+            </a>
+
             <!-- Notes -->
             <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('common.notes', [], 'Notes'); ?>">
                 <div class="home-card-icon">

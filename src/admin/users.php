@@ -245,7 +245,7 @@ $v = getAppVersion();
             <div>
                 <h1 class="admin-title"><?php echo t_h('multiuser.admin.title', [], 'User Management'); ?></h1>
                 
-                <div class="admin-nav">
+                <div class="admin-nav" style="justify-content: center;">
                     <a id="backToNotesLink" href="../index.php" class="btn btn-secondary btn-margin-right">
                         <?php echo t_h('common.back_to_notes'); ?>
                     </a>

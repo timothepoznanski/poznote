@@ -2015,7 +2015,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
 <body>
     <div class="backup-container">
         <h1><?php echo t_h('restore_import.page.title'); ?></h1>
-        <div class="navigation-buttons">
+        <div class="navigation-buttons" style="justify-content: center;">
             <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
                 <?php echo t_h('common.back_to_notes'); ?>
             </a>

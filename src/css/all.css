@@ -140,6 +140,7 @@
         -webkit-transform: rotate(0deg);
         transform: rotate(0deg)
     }
+
     to {
         -webkit-transform: rotate(1turn);
         transform: rotate(1turn)
@@ -151,6 +152,7 @@
         -webkit-transform: rotate(0deg);
         transform: rotate(0deg)
     }
+
     to {
         -webkit-transform: rotate(1turn);
         transform: rotate(1turn)
@@ -15933,6 +15935,5 @@
 
 .fa,
 .fas {
-    font-family: "Font Awesome 5 Pro";
-    font-weight: 900
+    font-family: "Font Awesome 5 Pro"
 }
