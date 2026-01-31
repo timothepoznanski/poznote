@@ -140,6 +140,7 @@
         -webkit-transform: rotate(0deg);
         transform: rotate(0deg)
     }
+
     to {
         -webkit-transform: rotate(1turn);
         transform: rotate(1turn)
@@ -151,6 +152,7 @@
         -webkit-transform: rotate(0deg);
         transform: rotate(0deg)
     }
+
     to {
         -webkit-transform: rotate(1turn);
         transform: rotate(1turn)
@@ -15894,7 +15896,6 @@
 @font-face {
     font-family: "Font Awesome 5 Pro";
     font-style: normal;
-    font-weight: 300;
     font-display: auto;
     src: url(../webfonts/fa-light-300.eot);
     src: url(../webfonts/fa-light-300.eot?#iefix) format("embedded-opentype"), url(../webfonts/fa-light-300.woff2) format("woff2"), url(../webfonts/fa-light-300.woff) format("woff"), url(../webfonts/fa-light-300.ttf) format("truetype"), url(../webfonts/fa-light-300.svg#fontawesome) format("svg")

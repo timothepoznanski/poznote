@@ -54,7 +54,7 @@ $currentLang = getUserLanguage();
             <!-- Back to Notes -->
             <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?>">
                 <div class="home-card-icon">
-                    <i class="fas fa-arrow-left"></i>
+                    <i class="fal fa-arrow-left"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?></span>
@@ -64,7 +64,7 @@ $currentLang = getUserLanguage();
             <!-- Note -->
             <a href="#" class="home-card" data-create-type="html" title="<?php echo t_h('modals.create.note.title', [], 'Note'); ?>">
                 <div class="home-card-icon">
-                    <i class="fas fa-file-alt"></i>
+                    <i class="fal fa-file-alt"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('modals.create.note.title', [], 'Note'); ?></span>
@@ -86,7 +86,7 @@ $currentLang = getUserLanguage();
             <!-- Task List -->
             <a href="#" class="home-card" data-create-type="list" title="<?php echo t_h('modals.create.task_list.title', [], 'Task List'); ?>">
                 <div class="home-card-icon">
-                    <i class="fas fa-list-ul"></i>
+                    <i class="fal fa-list-ul"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('modals.create.task_list.title', [], 'Task List'); ?></span>
@@ -96,7 +96,7 @@ $currentLang = getUserLanguage();
             <!-- Template -->
             <a href="#" class="home-card" data-create-type="template" title="<?php echo t_h('modals.create.template.title', [], 'Template'); ?>">
                 <div class="home-card-icon">
-                    <i class="fas fa-copy"></i>
+                    <i class="fal fa-copy"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('modals.create.template.title', [], 'Template'); ?></span>
@@ -106,7 +106,7 @@ $currentLang = getUserLanguage();
             <!-- Folder -->
             <a href="#" class="home-card" data-create-type="folder" title="<?php echo t_h('modals.create.folder.title', [], 'Folder'); ?>">
                 <div class="home-card-icon">
-                    <i class="fas fa-folder"></i>
+                    <i class="fal fa-folder"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('modals.create.folder.title', [], 'Folder'); ?></span>
@@ -116,7 +116,7 @@ $currentLang = getUserLanguage();
             <!-- Kanban Structure -->
             <a href="#" class="home-card" data-create-type="kanban" title="<?php echo t_h('modals.create.kanban.title', [], 'Kanban Structure'); ?>">
                 <div class="home-card-icon">
-                    <i class="fas fa-columns"></i>
+                    <i class="fal fa-columns"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('modals.create.kanban.title', [], 'Kanban Structure'); ?></span>
@@ -126,7 +126,7 @@ $currentLang = getUserLanguage();
             <!-- Workspace -->
             <a href="#" class="home-card" data-create-type="workspace" title="<?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?>">
                 <div class="home-card-icon">
-                    <i class="fas fa-layer-group"></i>
+                    <i class="fal fa-layer-group"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?></span>
