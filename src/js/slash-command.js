@@ -1176,7 +1176,6 @@
                 label: t('slash_menu.code', null, 'Code'),
                 submenu: [
                     { id: 'inline-code', icon: 'fa-terminal', label: t('slash_menu.inline_code', null, 'Inline code'), action: () => insertCode() },
-                    { id: 'code-block', icon: 'fa-code', label: t('slash_menu.code_block', null, 'Code block'), action: () => insertCodeBlock() },
                     {
                         id: 'block-languages',
                         icon: 'fa-laptop-code',
@@ -1482,7 +1481,6 @@
                 label: t('slash_menu.code', null, 'Code'),
                 submenu: [
                     { id: 'inline-code', icon: 'fa-terminal', label: t('slash_menu.inline_code', null, 'Inline code'), action: () => wrapMarkdownSelection('`', '`', 1) },
-                    { id: 'code-block', icon: 'fa-code', label: t('slash_menu.code_block', null, 'Code block'), action: () => insertMarkdownAtCursor('```\n\n```\n', -5) },
                     {
                         id: 'block-languages',
                         icon: 'fa-laptop-code',

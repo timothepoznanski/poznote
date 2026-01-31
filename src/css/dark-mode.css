@@ -1446,6 +1446,14 @@ body.dark-mode .noteentry code:not([class*="hljs"]):not([class*="language-"]) {
     border-color: #404040 !important;
 }
 
+/* Code blocks with language class - ensure readable text before highlight.js processes */
+html[data-theme='dark'] .noteentry pre code[class*="language-"],
+html[data-theme='dark'] .noteentry code[class*="language-"],
+body.dark-mode .noteentry pre code[class*="language-"],
+body.dark-mode .noteentry code[class*="language-"] {
+    color: #ffffff !important;
+}
+
 /* Code block placeholders in dark mode */
 html[data-theme='dark'] p.code-block-placeholder-before[data-ph]:empty:before,
 html[data-theme='dark'] p.code-block-placeholder-after[data-ph]:empty:before,
