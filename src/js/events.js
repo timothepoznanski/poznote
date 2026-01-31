@@ -2505,10 +2505,10 @@ function setupLinkEvents() {
                         // Parse iframe attributes to validate and filter
                         var iframeHtml = iframeMatch[0];
                         var srcMatch = iframeHtml.match(/src\s*=\s*["']([^"']+)["']/i);
-                        
+
                         if (srcMatch) {
                             var src = srcMatch[1];
-                            
+
                             // Whitelist of allowed iframe domains (same as PHP markdown parser)
                             var allowedDomains = [
                                 'youtube.com',
@@ -2518,48 +2518,48 @@ function setupLinkEvents() {
                                 'player.vimeo.com',
                                 'vimeo.com'
                             ];
-                            
-                            var isAllowed = allowedDomains.some(function(domain) {
+
+                            var isAllowed = allowedDomains.some(function (domain) {
                                 return src.indexOf('//' + domain) !== -1 || src.indexOf('.' + domain) !== -1;
                             });
-                            
+
                             if (isAllowed) {
                                 // Create actual iframe element from the HTML string
                                 var tempContainer = document.createElement('div');
                                 tempContainer.innerHTML = iframeHtml;
                                 var iframeElement = tempContainer.querySelector('iframe');
-                                
+
                                 if (iframeElement) {
                                     // Insert iframe at cursor position
                                     var selection = window.getSelection();
                                     if (selection.rangeCount > 0) {
                                         var range = selection.getRangeAt(0);
                                         range.deleteContents();
-                                        
+
                                         // Create a wrapper for better spacing
                                         var fragment = document.createDocumentFragment();
-                                        
+
                                         // Add line break before
                                         var lineBefore = document.createElement('div');
                                         lineBefore.innerHTML = '<br>';
                                         fragment.appendChild(lineBefore);
-                                        
+
                                         // Add the iframe
                                         fragment.appendChild(iframeElement);
-                                        
+
                                         // Add line break after
                                         var lineAfter = document.createElement('div');
                                         lineAfter.innerHTML = '<br>';
                                         fragment.appendChild(lineAfter);
-                                        
+
                                         range.insertNode(fragment);
-                                        
+
                                         // Move cursor after the inserted content
                                         range.collapse(false);
                                         selection.removeAllRanges();
                                         selection.addRange(range);
                                     }
-                                    
+
                                     // Trigger update
                                     if (typeof window.markNoteAsModified === 'function') {
                                         window.markNoteAsModified();
@@ -2587,51 +2587,35 @@ function setupLinkEvents() {
                 )) {
                     e.preventDefault();
 
-                    // Create a temporary container to parse and transform the HTML
-                    var tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = htmlData;
-
-                    // Apply monospace font to all elements
-                    var allElements = tempDiv.querySelectorAll('*');
-                    allElements.forEach(function (el) {
-                        el.style.fontFamily = '"Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace';
-                    });
-
-                    // Also set font on the container itself
-                    tempDiv.style.fontFamily = '"Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace';
-
-                    // Insert at cursor position
+                    // Extract plain text from the pasted content to avoid formatting issues
+                    var codeText = plainText || '';
+                    
+                    // Insert as plain text with monospace styling
                     var selection = window.getSelection();
                     if (selection.rangeCount > 0) {
                         var range = selection.getRangeAt(0);
                         range.deleteContents();
 
-                        // Create fragment with line breaks before and after
+                        // Split text into lines and create proper structure
+                        var lines = codeText.split('\n');
                         var fragment = document.createDocumentFragment();
 
-                        // Add empty line before the code block
-                        var lineBefore = document.createElement('div');
-                        lineBefore.innerHTML = '<br>';
-                        fragment.appendChild(lineBefore);
+                        lines.forEach(function(line, index) {
+                            // Create a span for each line to preserve monospace
+                            var span = document.createElement('span');
+                            span.style.fontFamily = '"Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace';
+                            span.textContent = line;
+                            fragment.appendChild(span);
 
-                        // Insert each child node
-                        while (tempDiv.firstChild) {
-                            var child = tempDiv.firstChild;
-                            // Apply font directly to first-level children
-                            if (child.nodeType === 1) { // Element node
-                                child.style.fontFamily = '"Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace';
+                            // Add line break except for the last line
+                            if (index < lines.length - 1) {
+                                fragment.appendChild(document.createElement('br'));
                             }
-                            fragment.appendChild(child);
-                        }
-
-                        // Add empty line after the code block
-                        var lineAfter = document.createElement('div');
-                        lineAfter.innerHTML = '<br>';
-                        fragment.appendChild(lineAfter);
+                        });
 
                         range.insertNode(fragment);
 
-                        // Move cursor to end (after the line break)
+                        // Move cursor to end
                         range.collapse(false);
                         selection.removeAllRanges();
                         selection.addRange(range);
@@ -2689,6 +2673,36 @@ function setupLinkEvents() {
                 }
             }
         } catch (err) {
+        }
+    });
+
+    // Trigger syntax highlighting on code block input/paste
+    document.body.addEventListener('input', function(e) {
+        var target = e.target;
+        
+        // Check if we're in a code element with a language class
+        if (target.tagName === 'CODE' && target.className && target.className.includes('language-')) {
+            // Apply syntax highlighting after a short delay to allow DOM to update
+            setTimeout(function() {
+                if (typeof window.applySyntaxHighlighting === 'function') {
+                    var pre = target.closest('pre');
+                    if (pre) {
+                        window.applySyntaxHighlighting(pre);
+                    }
+                }
+            }, 10);
+        }
+        
+        // Also check if we're in a pre element containing a code with language
+        if (target.tagName === 'PRE') {
+            var codeElement = target.querySelector('code[class*="language-"]');
+            if (codeElement) {
+                setTimeout(function() {
+                    if (typeof window.applySyntaxHighlighting === 'function') {
+                        window.applySyntaxHighlighting(target);
+                    }
+                }, 10);
+            }
         }
     });
 }

@@ -403,7 +403,7 @@ function parseMarkdown(text) {
         const srcMatch = attrs.match(/src\s*=\s*["']([^"']+)["']/i);
         if (srcMatch) {
             const src = srcMatch[1];
-            
+
             // Whitelist of allowed iframe sources (trusted embed providers)
             const allowedDomains = [
                 'youtube.com', 'www.youtube.com', 'youtube-nocookie.com', 'www.youtube-nocookie.com',
@@ -420,42 +420,42 @@ function parseMarkdown(text) {
                 'loom.com', 'wistia.com', 'fast.wistia.net', 'share.descript.com',
                 'rumble.com', 'odysee.com', 'bitchute.com', 'peertube', 'invidio.us', 'piped.video'
             ];
-            
+
             // Check if the src matches any allowed domain
-            const isAllowed = allowedDomains.some(domain => 
+            const isAllowed = allowedDomains.some(domain =>
                 src.includes('//' + domain) || src.includes('.' + domain)
             );
-            
+
             if (isAllowed) {
                 const placeholder = '\x00PIFRAME' + protectedIndex + '\x00';
-                
+
                 // Sanitize attributes: only allow safe attributes
                 const safeAttrs = [];
                 const attrRegex = /(\w+)\s*=\s*["']([^"']*)["']/g;
                 let attrMatch;
-                
+
                 while ((attrMatch = attrRegex.exec(attrs)) !== null) {
                     const attrName = attrMatch[1].toLowerCase();
                     const attrValue = attrMatch[2];
-                    
+
                     // Only allow safe attributes
                     if (['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'title', 'loading', 'referrerpolicy', 'sandbox', 'style', 'class'].includes(attrName)) {
                         safeAttrs.push(attrName + '="' + attrValue + '"');
                     }
                 }
-                
+
                 // Handle boolean attributes like allowfullscreen
                 if (/allowfullscreen/i.test(attrs) && !safeAttrs.some(attr => attr.startsWith('allowfullscreen'))) {
                     safeAttrs.push('allowfullscreen');
                 }
-                
+
                 const iframeTag = '<iframe ' + safeAttrs.join(' ') + '></iframe>';
                 protectedElements[protectedIndex] = iframeTag;
                 protectedIndex++;
                 return placeholder;
             }
         }
-        
+
         // If not allowed, return the original (will be escaped)
         return match;
     });
@@ -586,7 +586,11 @@ function parseMarkdown(text) {
                         }
                         return match;
                     });
-                    result.push('<pre><code class="language-' + (codeBlockLang || 'text') + '">' + codeContent + '</code></pre>');
+                    if (codeBlockLang) {
+                        result.push('<pre data-language="' + codeBlockLang + '"><code class="language-' + codeBlockLang + '">' + codeContent + '</code></pre>');
+                    } else {
+                        result.push('<pre><code>' + codeContent + '</code></pre>');
+                    }
                 }
                 codeBlockContent = [];
                 codeBlockLang = '';
@@ -1047,7 +1051,11 @@ function parseMarkdown(text) {
     // Handle unclosed code block
     if (inCodeBlock && codeBlockContent.length > 0) {
         let codeContent = codeBlockContent.join('\n');
-        result.push('<pre><code class="language-' + (codeBlockLang || 'text') + '">' + codeContent + '</code></pre>');
+        if (codeBlockLang) {
+            result.push('<pre><code class="language-' + codeBlockLang + '">' + codeContent + '</code></pre>');
+        } else {
+            result.push('<pre><code>' + codeContent + '</code></pre>');
+        }
     }
 
     return result.join('\n');
@@ -1190,6 +1198,17 @@ function initializeMarkdownNote(noteId) {
 
     // Ensure proper line break handling in contentEditable
     editorDiv.style.whiteSpace = 'pre-wrap';
+
+    // Handle paste to ensure plain text only
+    editorDiv.addEventListener('paste', function (e) {
+        e.preventDefault();
+        var text = (e.clipboardData || window.clipboardData).getData('text/plain');
+
+        // Normalize line endings
+        text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+        document.execCommand('insertText', false, text);
+    });
 
     // Set initial display states using setProperty to override any CSS !important rules
     if (startInSplitMode) {
@@ -1937,7 +1956,7 @@ function toggleMarkdownCheckbox(checkbox, lineNumber) {
         // Re-render the preview
         previewDiv.innerHTML = parseMarkdown(newContent);
         previewDiv.classList.remove('empty');
-        
+
         // Re-initialize Mermaid and Math
         setTimeout(function () {
             initMermaid();
@@ -2053,7 +2072,7 @@ function setupPreviewInteractivity(noteId) {
             };
 
             element.addEventListener('click', element._navigateClickHandler);
-            
+
             // Add a visual hint that the element is clickable
             element.style.cursor = 'pointer';
         });

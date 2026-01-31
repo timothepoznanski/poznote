@@ -921,6 +921,8 @@
         "toggle_placeholder": "Toggle",
         "toggle_content_placeholder": "在折叠块内在此输入…",
         "toggle_after_placeholder": "在折叠块外在此输入…",
+        "code_block_placeholder_before": "在此处输入文本…",
+        "code_block_placeholder_after": "在此处输入文本…",
         "youtube_video": "YouTube 视频",
         "youtube_modal_title": "插入 YouTube 视频",
         "youtube_url_label": "YouTube 链接或视频 ID：",

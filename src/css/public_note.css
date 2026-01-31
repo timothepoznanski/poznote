@@ -272,7 +272,8 @@ table th {
     transition: opacity 0.2s;
 }
 
-.task-item:hover .task-actions {
+.task-item:hover .task-actions,
+.task-item.completed .task-actions {
     opacity: 1;
 }
 
@@ -296,6 +297,8 @@ table th {
 
 .task-item.completed .public-task-delete-btn {
     display: flex;
+    opacity: 1;
+    /* Ensure opacity is 1 */
 }
 
 .public-task-delete-btn:hover {

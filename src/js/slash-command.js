@@ -412,6 +412,7 @@
         if (!selection.rangeCount) return;
 
         const range = selection.getRangeAt(0);
+        const t = window.t || ((key, params, fallback) => fallback);
 
         // Create code block (pre > code structure)
         const pre = document.createElement('pre');
@@ -428,9 +429,21 @@
         code.appendChild(textNode);
         pre.appendChild(code);
 
-        // Insert at cursor position
+        // Create placeholder line before code block
+        const placeholderBefore = document.createElement('p');
+        placeholderBefore.className = 'code-block-placeholder-before';
+        placeholderBefore.setAttribute('data-ph', t('slash_menu.code_block_placeholder_before', null, 'Write text here…'));
+        placeholderBefore.innerHTML = '';
+
+        // Create empty paragraph for spacing before code block
+        const spaceBefore = document.createElement('p');
+        spaceBefore.innerHTML = '<br>';
+
+        // Insert at cursor position in reverse order to maintain correct sequence
         range.deleteContents();
         range.insertNode(pre);
+        range.insertNode(spaceBefore);
+        range.insertNode(placeholderBefore);
 
         // Place cursor inside code element
         const newRange = document.createRange();
@@ -1163,7 +1176,6 @@
                 label: t('slash_menu.code', null, 'Code'),
                 submenu: [
                     { id: 'inline-code', icon: 'fa-terminal', label: t('slash_menu.inline_code', null, 'Inline code'), action: () => insertCode() },
-                    { id: 'code-block', icon: 'fa-code', label: t('slash_menu.code_block', null, 'Code block'), action: () => insertCodeBlock() },
                     {
                         id: 'block-languages',
                         icon: 'fa-laptop-code',
@@ -1469,7 +1481,6 @@
                 label: t('slash_menu.code', null, 'Code'),
                 submenu: [
                     { id: 'inline-code', icon: 'fa-terminal', label: t('slash_menu.inline_code', null, 'Inline code'), action: () => wrapMarkdownSelection('`', '`', 1) },
-                    { id: 'code-block', icon: 'fa-code', label: t('slash_menu.code_block', null, 'Code block'), action: () => insertMarkdownAtCursor('```\n\n```\n', -5) },
                     {
                         id: 'block-languages',
                         icon: 'fa-laptop-code',

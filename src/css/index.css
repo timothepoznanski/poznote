@@ -2837,6 +2837,15 @@ div[contentEditable=true]:empty:before {
     content: none !important;
 }
 
+/* Placeholder for code blocks - before and after */
+p.code-block-placeholder-before[data-ph]:empty:before,
+p.code-block-placeholder-after[data-ph]:empty:before {
+    content: attr(data-ph);
+    color: #999;
+    font-style: italic;
+    opacity: 0.6;
+}
+
 .notecard {
     margin-left: 1%;
     margin-right: 1%;
