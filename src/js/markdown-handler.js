@@ -586,7 +586,7 @@ function parseMarkdown(text) {
                         }
                         return match;
                     });
-                    result.push('<pre><code class="language-' + (codeBlockLang || 'text') + '">' + codeContent + '</code></pre>');
+                    result.push('<pre data-language="' + (codeBlockLang || 'text') + '"><code class="language-' + (codeBlockLang || 'text') + '">' + codeContent + '</code></pre>');
                 }
                 codeBlockContent = [];
                 codeBlockLang = '';
@@ -1190,6 +1190,13 @@ function initializeMarkdownNote(noteId) {
 
     // Ensure proper line break handling in contentEditable
     editorDiv.style.whiteSpace = 'pre-wrap';
+
+    // Handle paste to ensure plain text only
+    editorDiv.addEventListener('paste', function (e) {
+        e.preventDefault();
+        var text = (e.clipboardData || window.clipboardData).getData('text/plain');
+        document.execCommand('insertText', false, text);
+    });
 
     // Set initial display states using setProperty to override any CSS !important rules
     if (startInSplitMode) {

@@ -543,6 +543,19 @@
             return;
         }
 
+        // Click on structured task text to edit
+        if (e.target.matches('.task-item .task-text')) {
+            const taskItem = e.target.closest('.task-item');
+            const idOrIndex = taskItem.getAttribute('data-index');
+            const originalText = e.target.getAttribute('data-text') || e.target.textContent;
+
+            const newText = await publicNotePrompt(texts.editTask, originalText);
+            if (newText !== null && newText.trim() !== originalText) {
+                updateTaskText(idOrIndex, newText.trim());
+            }
+            return;
+        }
+
         // Click on markdown task text to edit
         if (e.target.matches('.task-list-item .task-text')) {
             const taskItem = e.target.closest('.task-list-item');
