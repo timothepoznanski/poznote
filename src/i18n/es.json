@@ -924,6 +924,8 @@
         "toggle_placeholder": "Toggle",
         "toggle_content_placeholder": "Escribe dentro del toggle aquí…",
         "toggle_after_placeholder": "Escribe fuera del toggle aquí…",
+        "code_block_placeholder_before": "Escribe texto aquí…",
+        "code_block_placeholder_after": "Escribe texto aquí…",
         "youtube_video": "Video de YouTube",
         "youtube_modal_title": "Insertar video de YouTube",
         "youtube_url_label": "URL de YouTube o ID del video:",

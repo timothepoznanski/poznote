@@ -2505,10 +2505,10 @@ function setupLinkEvents() {
                         // Parse iframe attributes to validate and filter
                         var iframeHtml = iframeMatch[0];
                         var srcMatch = iframeHtml.match(/src\s*=\s*["']([^"']+)["']/i);
-                        
+
                         if (srcMatch) {
                             var src = srcMatch[1];
-                            
+
                             // Whitelist of allowed iframe domains (same as PHP markdown parser)
                             var allowedDomains = [
                                 'youtube.com',
@@ -2518,48 +2518,48 @@ function setupLinkEvents() {
                                 'player.vimeo.com',
                                 'vimeo.com'
                             ];
-                            
-                            var isAllowed = allowedDomains.some(function(domain) {
+
+                            var isAllowed = allowedDomains.some(function (domain) {
                                 return src.indexOf('//' + domain) !== -1 || src.indexOf('.' + domain) !== -1;
                             });
-                            
+
                             if (isAllowed) {
                                 // Create actual iframe element from the HTML string
                                 var tempContainer = document.createElement('div');
                                 tempContainer.innerHTML = iframeHtml;
                                 var iframeElement = tempContainer.querySelector('iframe');
-                                
+
                                 if (iframeElement) {
                                     // Insert iframe at cursor position
                                     var selection = window.getSelection();
                                     if (selection.rangeCount > 0) {
                                         var range = selection.getRangeAt(0);
                                         range.deleteContents();
-                                        
+
                                         // Create a wrapper for better spacing
                                         var fragment = document.createDocumentFragment();
-                                        
+
                                         // Add line break before
                                         var lineBefore = document.createElement('div');
                                         lineBefore.innerHTML = '<br>';
                                         fragment.appendChild(lineBefore);
-                                        
+
                                         // Add the iframe
                                         fragment.appendChild(iframeElement);
-                                        
+
                                         // Add line break after
                                         var lineAfter = document.createElement('div');
                                         lineAfter.innerHTML = '<br>';
                                         fragment.appendChild(lineAfter);
-                                        
+
                                         range.insertNode(fragment);
-                                        
+
                                         // Move cursor after the inserted content
                                         range.collapse(false);
                                         selection.removeAllRanges();
                                         selection.addRange(range);
                                     }
-                                    
+
                                     // Trigger update
                                     if (typeof window.markNoteAsModified === 'function') {
                                         window.markNoteAsModified();
@@ -2591,13 +2591,17 @@ function setupLinkEvents() {
                     var tempDiv = document.createElement('div');
                     tempDiv.innerHTML = htmlData;
 
-                    // Apply monospace font to all elements
+                    // Apply monospace font to all elements and strip colors
                     var allElements = tempDiv.querySelectorAll('*');
                     allElements.forEach(function (el) {
+                        // Remove all inline styles that could interfere
+                        el.removeAttribute('style');
+                        el.removeAttribute('class');
+                        // Apply only monospace font
                         el.style.fontFamily = '"Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace';
                     });
 
-                    // Also set font on the container itself
+                    // Also set styles on the container itself
                     tempDiv.style.fontFamily = '"Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace';
 
                     // Insert at cursor position
@@ -2606,13 +2610,8 @@ function setupLinkEvents() {
                         var range = selection.getRangeAt(0);
                         range.deleteContents();
 
-                        // Create fragment with line breaks before and after
+                        // Create fragment
                         var fragment = document.createDocumentFragment();
-
-                        // Add empty line before the code block
-                        var lineBefore = document.createElement('div');
-                        lineBefore.innerHTML = '<br>';
-                        fragment.appendChild(lineBefore);
 
                         // Insert each child node
                         while (tempDiv.firstChild) {
@@ -2624,14 +2623,9 @@ function setupLinkEvents() {
                             fragment.appendChild(child);
                         }
 
-                        // Add empty line after the code block
-                        var lineAfter = document.createElement('div');
-                        lineAfter.innerHTML = '<br>';
-                        fragment.appendChild(lineAfter);
-
                         range.insertNode(fragment);
 
-                        // Move cursor to end (after the line break)
+                        // Move cursor to end
                         range.collapse(false);
                         selection.removeAllRanges();
                         selection.addRange(range);

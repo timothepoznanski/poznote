@@ -1446,6 +1446,15 @@ body.dark-mode .noteentry code:not([class*="hljs"]):not([class*="language-"]) {
     border-color: #404040 !important;
 }
 
+/* Code block placeholders in dark mode */
+html[data-theme='dark'] p.code-block-placeholder-before[data-ph]:empty:before,
+html[data-theme='dark'] p.code-block-placeholder-after[data-ph]:empty:before,
+body.dark-mode p.code-block-placeholder-before[data-ph]:empty:before,
+body.dark-mode p.code-block-placeholder-after[data-ph]:empty:before {
+    color: #888 !important;
+    opacity: 0.6;
+}
+
 /* Icône de copie pour les blocs de code en mode sombre */
 html[data-theme='dark'] .code-block-copy-btn,
 html[data-theme='dark'] pre.code-block .code-block-copy-btn,
