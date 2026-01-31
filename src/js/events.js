@@ -2675,6 +2675,36 @@ function setupLinkEvents() {
         } catch (err) {
         }
     });
+
+    // Trigger syntax highlighting on code block input/paste
+    document.body.addEventListener('input', function(e) {
+        var target = e.target;
+        
+        // Check if we're in a code element with a language class
+        if (target.tagName === 'CODE' && target.className && target.className.includes('language-')) {
+            // Apply syntax highlighting after a short delay to allow DOM to update
+            setTimeout(function() {
+                if (typeof window.applySyntaxHighlighting === 'function') {
+                    var pre = target.closest('pre');
+                    if (pre) {
+                        window.applySyntaxHighlighting(pre);
+                    }
+                }
+            }, 10);
+        }
+        
+        // Also check if we're in a pre element containing a code with language
+        if (target.tagName === 'PRE') {
+            var codeElement = target.querySelector('code[class*="language-"]');
+            if (codeElement) {
+                setTimeout(function() {
+                    if (typeof window.applySyntaxHighlighting === 'function') {
+                        window.applySyntaxHighlighting(target);
+                    }
+                }, 10);
+            }
+        }
+    });
 }
 
 function setupFocusEvents() {

@@ -222,8 +222,8 @@ pre:has(code[data-language]) {
 
 html[data-theme="dark"] pre[data-language]::before,
 html[data-theme="dark"] pre:has(code[data-language])::before {
-    color: #8b949e;
-    background: rgba(255, 255, 255, 0.05);
+    color: #c9d1d9;
+    background: rgba(255, 255, 255, 0.12);
 }
 
 /* Style code blocks with language class */
