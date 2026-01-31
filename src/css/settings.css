@@ -1,155 +1,9 @@
-body {
-    /* background: #f8f9fa; */
-    font-family: 'Inter', sans-serif;
-    display: flex;
-    flex-direction: row;
-    height: 100vh;
-    margin: 0;
-    min-width: 0;
-    min-height: 0;
-}
+/**
+ * Settings page specific styles
+ * Most styles are now inherited from home.css
+ */
 
-.settings-container {
-    max-width: 800px;
-    margin: 10px auto;
-    padding: 8px 12px;
-    display: block;
-    text-align: center;
-    position: relative;
-}
-
-.settings-header {
-    padding: 12px 8px;
-    margin-bottom: 8px;
-}
-
-.settings-header h1 {
-    margin: 0 0 6px 0;
-    color: #1f2937;
-    font-size: 1.15rem;
-    font-weight: 400;
-}
-
-.settings-header p {
-    display: none;
-}
-
-/* settings list: vertical simple rows */
-.settings-grid {
-    display: block;
-    margin: 0;
-    padding: 0;
-}
-
-/* Two columns layout for desktop */
-.settings-two-columns {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    /* gap: 20px; */
-    margin: 0;
-    padding: 0;
-    text-align: left;
-}
-
-.settings-column {
-    display: block;
-}
-
-@media (max-width: 800px) {
-    .settings-two-columns {
-        grid-template-columns: 1fr;
-    }
-
-    #note-width-card {
-        display: none !important;
-    }
-}
-
-.settings-sep {
-    height: 1px;
-    background: #afb3b6ff;
-    margin: 12px 0;
-}
-
-.settings-sep-mobile {
-    display: none;
-}
-
-@media (max-width: 800px) {
-    .settings-sep-mobile {
-        display: block;
-    }
-}
-
-/* Version display positioning */
-.version-display-mobile-top {
-    display: none;
-}
-
-.version-display-desktop-bottom {
-    display: block;
-}
-
-@media (max-width: 800px) {
-    .version-display-mobile-top {
-        display: block;
-        margin-bottom: 20px;
-    }
-
-    .version-display-desktop-bottom {
-        display: none;
-    }
-}
-
-.settings-footer {
-    display: flex;
-    gap: 12px;
-    justify-content: flex-start;
-    padding: 12px 6px;
-    border-top: 1px solid #eef2f5;
-    margin-top: 12px;
-}
-
-.back-link {
-    display: inline-flex;
-    margin-bottom: 10px;
-}
-
-.settings-card {
-    background: transparent;
-    border-radius: 0;
-    padding: 12px 6px;
-    cursor: pointer;
-    transition: background 0.12s ease;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.settings-card:hover {
-    background: rgba(15, 23, 42, 0.02);
-}
-
-.settings-card-icon {
-    width: 24px;
-    height: 24px;
-    border-radius: 3px;
-    background: transparent;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    color: #6b7280;
-    font-size: 2.2rem;
-    position: relative;
-}
-
-/* Réduire les icônes Font Awesome dans settings-card-icon */
-.settings-card-icon i[class*="fa-"],
-.settings-card-icon [class*="fa-"] {
-    font-size: 0.55em !important;
-}
-
+/* Update Badge */
 .update-badge {
     position: absolute;
     top: -2px;
@@ -169,66 +23,24 @@ body {
     z-index: 10;
 }
 
+.update-badge.update-badge-hidden {
+    display: none !important;
+}
+
 @keyframes pulse {
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.1);
-    }
-
-    100% {
-        transform: scale(1);
-    }
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
 }
 
-.settings-card-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-}
-
-.settings-card h3 {
-    margin: 0;
-    color: #1f2937;
-    font-size: 0.95rem;
-    font-weight: 400;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Mobile: allow text wrapping */
-@media (max-width: 800px) {
-    .settings-card h3 {
-        white-space: normal;
-        overflow: visible;
-        text-overflow: clip;
-    }
-}
-
-.back-link {
-    color: #007DB8;
-    text-decoration: none;
-    font-weight: 400;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 20px;
-}
-
-.back-link:hover {
-    color: #005a8a;
-}
-
+/* Settings Status Badges */
 .setting-status {
     font-size: 0.75rem;
     padding: 2px 6px;
     border-radius: 4px;
-    margin-left: 8px;
     font-weight: 600;
+    display: inline-block; /* Ensure it respects padding/dimensions */
+    align-self: flex-start; /* Align to left in flex column */
 }
 
 .setting-status.enabled {
@@ -241,6 +53,7 @@ body {
     color: #991b1b;
 }
 
+/* Heart Blink Animation */
 .heart-blink {
     color: #ef4444;
     font-size: 0.85em;
@@ -248,416 +61,28 @@ body {
 }
 
 @keyframes heartbeat {
-    0% {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    25% {
-        opacity: 0.6;
-        transform: scale(0.9);
-    }
-
-    50% {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    75% {
-        opacity: 0.6;
-        transform: scale(0.9);
-    }
-
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
+    0% { opacity: 1; transform: scale(1); }
+    25% { opacity: 0.6; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1); }
+    75% { opacity: 0.6; transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1); }
 }
 
-.fa-arrow-left::before {
-    content: "\f060";
-}
-
-.fa-layer-group::before {
-    content: "\f5fd";
-}
-
-.fa-upload::before {
-    content: "\f093";
-}
-
-.fa-download::before {
-    content: "\f019";
-}
-
-.fa-file-alt::before {
-    content: "\f15c";
-}
-
-.fa-sync-alt::before {
-    content: "\f2f1";
-}
-
-.fa-globe::before {
-    content: "\f0ac";
-}
-
-.fa-newspaper::before {
-    content: "\f1ea";
-}
-
-.fa-info::before {
-    content: "\f129";
-}
-
-.fa-code-branch::before {
-    content: "\f126";
-}
-
-.fa-code::before {
-    content: "\f121";
-}
-
-.fa-coffee::before {
-    content: "\f0f4";
-}
-
-.fa-lightbulb::before {
-    content: "\f0eb";
-}
-
-.fa-user::before {
-    content: "\f007";
-}
-
-.fa-folder::before {
-    content: "\f07b";
-}
-
-.fa-database::before {
-    content: "\f1c0";
-}
-
-.fa-cog::before {
-    content: "\f013";
-}
-
-.fa-flag::before {
-    content: "\f024";
-}
-
-.fa-sun::before {
-    content: "\f185";
-}
-
-.fa-text-height::before {
-    content: "\f034";
-}
-
-.fa-clock::before {
-    content: "\f017";
-}
-
-.fa-list-ol::before {
-    content: "\f0cb";
-}
-
-.fa-calendar-alt::before {
-    content: "\f073";
-}
-
-.fa-map-marker-alt::before {
-    content: "\f3c5";
-}
-
-.fa-hashtag::before {
-    content: "\f292";
-}
-
-.fa-arrow-down::before {
-    content: "\f063";
-}
-
-.fa-arrow-up::before {
-    content: "\f062";
-}
-
-.fa-folder-open::before {
-    content: "\f07c";
-}
-
-.fa-chevron-down::before {
-    content: "\f078";
-}
-
-.fa-eye::before {
-    content: "\f06e";
-}
-
-.fa-heart::before {
-    content: "\f004";
-}
-
-.fa-sort-amount-down::before {
-    content: "\f161";
-}
-
-.fa-folder-plus::before {
-    content: "\f65e";
-}
-
-.fa-folder-tree::before {
-    content: "\f802";
-}
-
-.fa-align-center::before {
-    content: "\f037";
-}
-
-.fa-arrow-left,
-.fa-layer-group,
-.fa-upload,
-.fa-download,
-.fa-file-alt,
-.fa-sync-alt,
-.fa-globe,
-.fa-newspaper,
-.fa-info,
-.fa-code-branch,
-.fa-code,
-.fa-coffee,
-.fa-lightbulb,
-.fa-user,
-.fa-folder,
-.fa-database,
-.fa-cog,
-.fa-flag,
-.fa-sun,
-.fa-text-height,
-.fa-clock,
-.fa-list-ol,
-.fa-calendar-alt,
-.fa-map-marker-alt,
-.fa-hashtag,
-.fa-arrow-down,
-.fa-arrow-up,
-.fa-folder-open,
-.fa-chevron-down,
-.fa-eye,
-.fa-heart,
-.fa-sort-amount-down,
-.fa-folder-plus,
-.fa-folder-tree,
-.fa-align-center,
-.fa-user-circle,
-.fa-user-astronaut,
-.fa-user-ninja,
-.fa-user-tie,
-.fa-users-cog,
-.fa-moon,
-.fa-book,
-.fa-laptop,
-.fa-paint-brush,
-.fa-music,
-.fa-camera,
-.fa-gamepad,
-.fa-rocket,
-.fa-leaf,
-.fa-arrow-left,
-.fa-home,
-.fa-arrows-h,
-.fa-plus-circle {
-    font-family: "Font Awesome 5 Pro";
-    font-weight: 300;
-    font-style: normal;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    display: inline-block;
-    font-variant: normal;
-    text-rendering: auto;
-    line-height: 1;
-    font-size: 0.875em;
-    vertical-align: middle;
-}
-
-/* Button styles */
-.btn {
-    padding: 12px 25px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    font-weight: 400;
-    transition: all 0.2s ease;
-}
-
-.btn-secondary {
-    background: #6c757d;
-    color: white;
-}
-
-.btn-secondary:hover {
-    background: #5a6268;
-    color: white;
-    text-decoration: none;
-    transform: translateY(-1px);
-}
-
-/* ===========================================
-   UTILITY CLASSES FOR INLINE STYLE EXTRACTION
-   =========================================== */
-
-/* Version display styles */
-.version-display {
-    text-align: center;
-    color: var(--text-secondary);
-}
-
-.version-display-mobile-top {
-    padding: 12px 6px;
-    margin-bottom: 12px;
-}
-
-.version-display-desktop-bottom {
-    padding: 20px;
-    margin-top: 15px;
-    border-top: 1px solid var(--border-color);
-}
-
-/* Settings card cursor */
+/* Settings Card Clickable Cursor - helper if needed, though home-card handles it */
 .settings-card-clickable {
     cursor: pointer;
 }
 
-/* Update badge hidden state */
-.update-badge.update-badge-hidden {
-    display: none !important;
+/* Ensure font awesome icons work if not covered by home.css */
+/* home.css covers most, but let's ensure compatibility */
+
+/* Utility classes */
+.desktop-only {
+    display: flex;
 }
 
-/* Release notes link */
-.release-notes-link {
-    color: var(--link-color);
-    text-decoration: underline;
-    opacity: 1;
-}
-
-/* Font Awesome icon customizations */
-.fa-cog::before {
-    content: "\f013";
-}
-
-.fa-user::before {
-    content: "\f007";
-}
-
-.fa-users-cog::before {
-    content: "\f509";
-}
-
-.fa-user-circle::before {
-    content: "\f2bd";
-}
-
-.fa-user-astronaut::before {
-    content: "\f4fb";
-}
-
-.fa-user-ninja::before {
-    content: "\f504";
-}
-
-.fa-user-tie::before {
-    content: "\f508";
-}
-
-.fa-heart::before {
-    content: "\f004";
-}
-
-.fa-sun::before {
-    content: "\f185";
-}
-
-.fa-moon::before {
-    content: "\f186";
-}
-
-.fa-coffee::before {
-    content: "\f0f4";
-}
-
-.fa-book::before {
-    content: "\f02d";
-}
-
-.fa-laptop::before {
-    content: "\f109";
-}
-
-.fa-paint-brush::before {
-    content: "\f1fc";
-}
-
-.fa-music::before {
-    content: "\f001";
-}
-
-.fa-camera::before {
-    content: "\f030";
-}
-
-.fa-gamepad::before {
-    content: "\f11b";
-}
-
-.fa-rocket::before {
-    content: "\f135";
-}
-
-.fa-leaf::before {
-    content: "\f06c";
-}
-
-.fa-arrow-left::before {
-    content: "\f060";
-}
-
-.fa-home::before {
-    content: "\f015";
-}
-
-.fa-plus-circle::before {
-    content: "\f055";
-}
-
-.fa-download::before {
-    content: "\f019";
-}
-
-.fa-upload::before {
-    content: "\f093";
-}
-
-.fa-cloud::before {
-    content: "\f0c2";
-}
-
-.fa-info-circle::before {
-    content: "\f05a";
-}
-
-.fa-github::before {
-    content: "\f09b";
-}
-
-.fa-globe::before {
-    content: "\f0ac";
-}
-
-.fa-arrows-h::before {
-    content: "\f07e";
+@media (max-width: 800px) {
+    .desktop-only {
+        display: none !important;
+    }
 }

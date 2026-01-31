@@ -97,6 +97,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
 $currentLang = getUserLanguage();
 $currentUser = getCurrentUser();
 $username = htmlspecialchars($currentUser['display_name'] ?: $currentUser['username']);
+$pageWorkspace = trim(getWorkspaceFilter());
 
 // Get global login_display_name for page title
 require_once 'users/db_master.php';
@@ -149,17 +150,27 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
     <link rel="stylesheet" href="css/all.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/light.min.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/settings.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modals.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode.css?v=<?php echo $cache_v; ?>">
 </head>
-<body data-txt-enabled="<?php echo t_h('common.enabled'); ?>"
+<body class="home-page"
+      data-txt-enabled="<?php echo t_h('common.enabled'); ?>"
       data-txt-disabled="<?php echo t_h('common.disabled'); ?>"
       data-txt-not-defined="<?php echo t_h('common.not_defined'); ?>"
       data-txt-saved="<?php echo t_h('common.saved'); ?>"
       data-txt-error="<?php echo t_h('common.error'); ?>"
-      data-workspace="<?php echo htmlspecialchars(getWorkspaceFilter(), ENT_QUOTES, 'UTF-8'); ?>">
-    <div class="settings-container">
+      data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+    <div class="home-container">
+
+        <div class="home-search-container">
+            <div class="home-search-wrapper">
+                <i class="fas fa-search home-search-icon"></i>
+                <input type="text" id="home-search-input" class="home-search-input" placeholder="<?php echo t_h('search.placeholder'); ?>" autocomplete="off">
+            </div>
+        </div>
+
         <?php 
             // Build basic URL - workspace will be handled by JavaScript
             $back_params = [];
@@ -169,255 +180,261 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
             $back_href = 'index.php' . (!empty($back_params) ? '?' . implode('&', $back_params) : '');
         ?>
 
-        <div class="settings-two-columns">
-            <!-- Left Column: Actions (without badges) -->
-            <div class="settings-column settings-column-left">
-                <!-- Back to Notes -->
-                <div class="settings-card settings-card-clickable" id="backToNotesLink" data-href="<?php echo $back_href; ?>">
-                    <div class="settings-card-icon">
-                        <i class="fas fa-arrow-left"></i>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('common.back_to_notes'); ?></h3>
-                    </div>
+        <div class="home-grid">
+
+            <!-- Back to Notes -->
+            <div class="home-card settings-card-clickable" id="backToNotesLink" data-href="<?php echo $back_href; ?>">
+                <div class="home-card-icon">
+                    <i class="fas fa-arrow-left"></i>
                 </div>
-
-                <!-- Workspaces -->
-                <div class="settings-card settings-card-clickable" id="workspaces-card" data-href="workspaces.php">
-                    <div class="settings-card-icon">
-                        <i class="fas fa-layer-group"></i>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.workspaces', [], 'Workspaces'); ?> <span class="setting-status enabled"><?php echo $workspaces_count; ?></span></h3>
-                    </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('common.back_to_notes'); ?></span>
                 </div>
+            </div>
 
-                <?php // Profile and admin links - always available ?>
-                
-                <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
-                <!-- User Management (Admin only) -->
-                <div class="settings-card settings-card-clickable" id="users-admin-card" data-href="admin/users.php">
-                    <div class="settings-card-icon">
-                        <i class="fas fa-users-cog"></i>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.user_management', [], 'User Management'); ?> <span class="setting-status enabled"><?php echo $users_count; ?></span></h3>
-                    </div>
+            <!-- Workspaces -->
+            <div class="home-card settings-card-clickable" id="workspaces-card" data-href="workspaces.php">
+                <div class="home-card-icon">
+                    <i class="fas fa-layer-group"></i>
                 </div>
-                <?php endif; ?>
-
-                <!-- Backup / Export -->
-                <div class="settings-card" id="backup-export-card">
-                    <div class="settings-card-icon">
-                        <i class="fas fa-upload"></i>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?></h3>
-                    </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.workspaces', [], 'Workspaces'); ?></span>
+                    <span class="setting-status enabled"><?php echo $workspaces_count; ?></span>
                 </div>
+            </div>
 
-                <!-- Restore / Import -->
-                <div class="settings-card" id="restore-import-card">
-                    <div class="settings-card-icon">
-                        <i class="fas fa-download"></i>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?></h3>
-                    </div>
+            <?php // Profile and admin links - always available ?>
+
+            <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
+            <!-- User Management (Admin only) -->
+            <div class="home-card settings-card-clickable" id="users-admin-card" data-href="admin/users.php">
+                <div class="home-card-icon">
+                    <i class="fas fa-users-cog"></i>
                 </div>
-
-                <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
-                <!-- GitHub Sync -->
-                <div class="settings-card settings-card-clickable" id="github-sync-card" data-href="github_sync.php">
-                    <div class="settings-card-icon">
-                        <i class="fab fa-github"></i>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.github_sync', [], 'GitHub Sync'); ?></h3>
-                    </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.user_management', [], 'User Management'); ?></span>
+                    <span class="setting-status enabled"><?php echo $users_count; ?></span>
                 </div>
+            </div>
+            <?php endif; ?>
 
-                <?php endif; ?>
-
-                <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
-                <!-- Check for Updates -->
-                <div class="settings-card" id="check-updates-card">
-                    <div class="settings-card-icon">
-                        <i class="fas fa-sync-alt"></i>
-                        <span class="update-badge update-badge-hidden"></span>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.check_updates', [], 'Check for Updates'); ?></h3>
-                    </div>
+            <!-- Backup / Export -->
+            <div class="home-card" id="backup-export-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-upload"></i>
                 </div>
-                <?php endif; ?>
-
-                <!-- API Documentation -->
-                <div class="settings-card" id="api-docs-card">
-                    <div class="settings-card-icon">
-                        <i class="fas fa-code"></i>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.api_docs', [], 'API Documentation'); ?></h3>
-                    </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?></span>
                 </div>
+            </div>
 
-                <!-- Github repository -->
-                <div class="settings-card" id="github-card">
-                    <div class="settings-card-icon">
-                        <i class="fas fa-code-branch"></i>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.documentation', [], 'Github Repository'); ?></h3>
-                    </div>
+            <!-- Restore / Import -->
+            <div class="home-card" id="restore-import-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-download"></i>
                 </div>
-
-                <!-- News -->
-                <div class="settings-card" id="news-card">
-                    <div class="settings-card-icon">
-                        <i class="fas fa-newspaper"></i>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.news', [], 'Poznote Blog'); ?></h3>
-                    </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?></span>
                 </div>
+            </div>
 
-                <!-- Poznote Website -->
-                <div class="settings-card" id="website-card">
-                    <div class="settings-card-icon">
-                        <i class="fas fa-globe"></i>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.website', [], 'Poznote Website'); ?></h3>
-                    </div>
+            <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
+            <!-- GitHub Sync -->
+            <div class="home-card settings-card-clickable" id="github-sync-card" data-href="github_sync.php">
+                <div class="home-card-icon">
+                    <i class="fab fa-github"></i>
                 </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.github_sync', [], 'GitHub Sync'); ?></span>
+                </div>
+            </div>
 
-                <!-- Support Developer -->
-                <div class="settings-card" id="support-card">
-                    <div class="settings-card-icon">
-                        <i class="fas fa-heart heart-blink"></i>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.support', [], 'Support Developer'); ?></h3>
+            <?php endif; ?>
+
+            <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
+            <!-- Check for Updates -->
+            <div class="home-card" id="check-updates-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-sync-alt"></i>
+                    <span class="update-badge update-badge-hidden"></span>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.check_updates', [], 'Check for Updates'); ?></span>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <!-- API Documentation -->
+            <div class="home-card" id="api-docs-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.api_docs', [], 'API Documentation'); ?></span>
+                </div>
+            </div>
+
+            <!-- Github repository -->
+            <div class="home-card" id="github-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-code-branch"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.documentation', [], 'Github Repository'); ?></span>
+                </div>
+            </div>
+
+            <!-- News -->
+            <div class="home-card" id="news-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-newspaper"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.news', [], 'Poznote Blog'); ?></span>
+                </div>
+            </div>
+
+            <!-- Poznote Website -->
+            <div class="home-card" id="website-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.website', [], 'Poznote Website'); ?></span>
+                </div>
+            </div>
+
+            <!-- Support Developer -->
+            <div class="home-card home-card-red" id="support-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-heart heart-blink"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.support', [], 'Support Developer'); ?></span>
+                </div>
+            </div>
+
+            <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
+            <!-- Login Display -->
+            <div class="home-card" id="login-display-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.login_display', [], 'Login page title'); ?></span>
+                    <span id="login-display-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <!-- Language -->
+            <div class="home-card" id="language-card">
+                <div class="home-card-icon">
+                    <i class="fal fa-flag"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.language.label'); ?></span>
+                    <span id="language-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+            <!-- Theme Mode -->
+            <div class="home-card" id="theme-mode-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-sun"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.theme_mode', [], 'Theme'); ?></span>
+                    <span id="theme-mode-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+            <!-- Font Size -->
+            <div class="home-card" id="font-size-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-text-height"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.note_font_size', [], 'Font size'); ?></span>
+                    <div>
+                        <span id="font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                        <span id="sidebar-font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column: Settings with badges -->
-            <div class="settings-column settings-column-right">
-                <!-- Mobile Separator -->
-                <div class="settings-sep settings-sep-mobile"></div>
-                
-                <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
-                <!-- Login Display -->
-                <div class="settings-card" id="login-display-card">
-                    <div class="settings-card-icon">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.login_display', [], 'Login page title'); ?> <span id="login-display-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
-                    </div>
+            <!-- Timezone -->
+            <div class="home-card" id="timezone-card">
+                <div class="home-card-icon"><i class="fal fa-clock"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.timezone', [], 'Timezone'); ?></span>
+                    <span id="timezone-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                 </div>
-                <?php endif; ?>
-
-                <!-- Language -->
-                <div class="settings-card" id="language-card">
-                    <div class="settings-card-icon">
-                        <i class="fal fa-flag"></i>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.language.label'); ?> <span id="language-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
-                    </div>
-                </div>
-
-                <!-- Theme Mode -->
-                <div class="settings-card" id="theme-mode-card">
-                    <div class="settings-card-icon">
-                        <i class="fas fa-sun"></i>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.theme_mode', [], 'Theme'); ?> <span id="theme-mode-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
-                    </div>
-                </div>
-
-                <!-- Font Size -->
-                <div class="settings-card" id="font-size-card">
-                    <div class="settings-card-icon">
-                        <i class="fas fa-text-height"></i>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.note_font_size', [], 'Font size'); ?> 
-                            <span id="font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                            <span id="sidebar-font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                        </h3>
-                    </div>
-                </div>
-
-                <!-- Timezone -->
-                <div class="settings-card" id="timezone-card">
-                    <div class="settings-card-icon"><i class="fal fa-clock"></i></div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.timezone', [], 'Timezone'); ?> <span id="timezone-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
-                    </div>
-                </div>
-
-                <!-- Note Sort Order -->
-                <div class="settings-card" id="note-sort-card">
-                    <div class="settings-card-icon"><i class="fas fa-sort-amount-down"></i></div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.note_sort_order', [], 'Note sorting'); ?> <span id="note-sort-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
-                    </div>
-                </div>
-
-                <!-- Tasklist Insert Order -->
-                <div class="settings-card" id="tasklist-insert-order-card">
-                    <div class="settings-card-icon"><i class="fas fa-arrow-down"></i></div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.tasklist_insert_order', [], 'Task list insert order'); ?> <span id="tasklist-insert-order-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
-                    </div>
-                </div>
-
-                <!-- Show Note Created -->
-                <div class="settings-card" id="show-created-card">
-                    <div class="settings-card-icon"><i class="fas fa-calendar-alt"></i></div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.show_note_created', [], 'Show creation date'); ?> <span id="show-created-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span></h3>
-                    </div>
-                </div>
-
-                <!-- Show Folder Counts -->
-                <div class="settings-card" id="folder-counts-card">
-                    <div class="settings-card-icon"><i class="fas fa-hashtag"></i></div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.show_folder_counts', [], 'Show folder note counts'); ?> <span id="folder-counts-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span></h3>
-                    </div>
-                </div>
-
-                <!-- Kanban on Folder Click -->
-                <div class="settings-card" id="kanban-folder-click-card">
-                    <div class="settings-card-icon"><i class="fal fa-columns"></i></div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.kanban_on_folder_click', [], 'Open Kanban view on folder click'); ?> <span id="kanban-folder-click-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span></h3>
-                    </div>
-                </div>
-
-                <!-- Notes Without Folders Position -->
-                <div class="settings-card" id="notes-without-folders-card">
-                    <div class="settings-card-icon"><i class="fas fa-folder-tree"></i></div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.notes_without_folders_after', [], 'Show notes after folders'); ?> <span id="notes-without-folders-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span></h3>
-                    </div>
-                </div>
-
-                <!-- Note Width -->
-                <div class="settings-card desktop-only" id="note-width-card">
-                    <div class="settings-card-icon"><i class="fas fa-arrows-h"></i></div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.note_content_width', [], 'Note Content Width'); ?> <span id="note-width-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
-                    </div>
-                </div>
-
             </div>
+
+            <!-- Note Sort Order -->
+            <div class="home-card" id="note-sort-card">
+                <div class="home-card-icon"><i class="fas fa-sort-amount-down"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.note_sort_order', [], 'Note sorting'); ?></span>
+                    <span id="note-sort-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+            <!-- Tasklist Insert Order -->
+            <div class="home-card" id="tasklist-insert-order-card">
+                <div class="home-card-icon"><i class="fas fa-arrow-down"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.tasklist_insert_order', [], 'Task list insert order'); ?></span>
+                    <span id="tasklist-insert-order-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+            <!-- Show Note Created -->
+            <div class="home-card" id="show-created-card">
+                <div class="home-card-icon"><i class="fas fa-calendar-alt"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.show_note_created', [], 'Show creation date'); ?></span>
+                    <span id="show-created-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Show Folder Counts -->
+            <div class="home-card" id="folder-counts-card">
+                <div class="home-card-icon"><i class="fas fa-hashtag"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.show_folder_counts', [], 'Show folder note counts'); ?></span>
+                    <span id="folder-counts-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Kanban on Folder Click -->
+            <div class="home-card" id="kanban-folder-click-card">
+                <div class="home-card-icon"><i class="fal fa-columns"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.kanban_on_folder_click', [], 'Open Kanban view on folder click'); ?></span>
+                    <span id="kanban-folder-click-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Notes Without Folders Position -->
+            <div class="home-card" id="notes-without-folders-card">
+                <div class="home-card-icon"><i class="fas fa-folder-tree"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.notes_without_folders_after', [], 'Show notes after folders'); ?></span>
+                    <span id="notes-without-folders-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Note Width -->
+            <div class="home-card desktop-only" id="note-width-card">
+                <div class="home-card-icon"><i class="fas fa-arrows-h"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.note_content_width', [], 'Note Content Width'); ?></span>
+                    <span id="note-width-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
         </div>
 
     </div>

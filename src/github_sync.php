@@ -121,16 +121,17 @@ try {
     <link rel="stylesheet" href="css/fontawesome.min.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/all.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/light.min.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/settings.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/github-sync.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode.css?v=<?php echo $cache_v; ?>">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
-<body>
-    <div class="settings-container github-sync-container">
+<body class="home-page">
+    <div class="home-container github-sync-container">
 
-        <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 24px;">
+        <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 24px; justify-content: center;">
             <a id="backToHomeLink" href="home.php" class="btn btn-secondary">
                 <?php echo t_h('common.back_to_home', [], 'Back to Home', $currentLang); ?>
             </a>
