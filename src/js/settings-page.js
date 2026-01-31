@@ -567,6 +567,55 @@
         refreshTimezoneBadge();
         refreshNoteWidthBadge();
 
+        // Search functionality
+        var searchInput = document.getElementById('home-search-input');
+        var cards = document.querySelectorAll('.home-grid .home-card');
+        var grid = document.querySelector('.home-grid');
+
+        if (searchInput && grid) {
+            // Create no results message if it doesn't exist
+            var noResults = document.createElement('div');
+            noResults.className = 'home-no-results';
+            noResults.style.display = 'none';
+            noResults.style.gridColumn = '1 / -1';
+            noResults.style.textAlign = 'center';
+            noResults.style.padding = '40px 20px';
+            noResults.style.color = '#6b7280';
+            noResults.innerHTML = '<i class="fas fa-search" style="font-size: 24px; display: block; margin-bottom: 10px; opacity: 0.5;"></i>' + tr('public.no_filter_results', {}, 'No results found.');
+            grid.appendChild(noResults);
+
+            searchInput.addEventListener('input', function() {
+                var term = this.value.toLowerCase().trim();
+                var visibleCount = 0;
+
+                cards.forEach(function(card) {
+                    var titleEl = card.querySelector('.home-card-title');
+                    var title = titleEl ? titleEl.textContent.toLowerCase() : '';
+
+                    // Also search in status badges if available
+                    var statusEl = card.querySelector('.setting-status');
+                    var status = statusEl ? statusEl.textContent.toLowerCase() : '';
+
+                    if (title.includes(term) || status.includes(term)) {
+                        card.style.display = 'flex';
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                noResults.style.display = (visibleCount === 0) ? 'block' : 'none';
+            });
+
+            // Focus search on / key press if not in input
+            document.addEventListener('keydown', function(e) {
+                if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                    e.preventDefault();
+                    searchInput.focus();
+                }
+            });
+        }
+
         // Re-translate dynamic badges once client-side i18n is loaded
         document.addEventListener('poznote:i18n:loaded', function () {
             try { refreshLanguageBadge(); } catch (e) { }

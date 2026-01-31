@@ -164,11 +164,10 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <div class="home-container">
 
-        <div class="home-header">
-            <div class="home-info-line">
-                <span class="home-info-username"><i class="fa-user home-info-icon"></i><?php echo htmlspecialchars($currentUser['username'] ?? 'User', ENT_QUOTES); ?></span>
-                <span class="home-info-dash">-</span>
-                <span class="home-workspace-name"><i class="fa-layer-group home-info-icon"></i><?php echo htmlspecialchars($pageWorkspace ?: 'Poznote', ENT_QUOTES); ?></span>
+        <div class="home-search-container">
+            <div class="home-search-wrapper">
+                <i class="fas fa-search home-search-icon"></i>
+                <input type="text" id="home-search-input" class="home-search-input" placeholder="<?php echo t_h('search.placeholder'); ?>" autocomplete="off">
             </div>
         </div>
 
