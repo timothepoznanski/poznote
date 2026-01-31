@@ -352,12 +352,14 @@ function createBackup() {
     <div class="backup-container">
         <h1><?php echo t_h('backup_export.page.title'); ?></h1>
         
-        <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
-            <?php echo t_h('common.back_to_notes'); ?>
-        </a>
-        <a href="settings.php" class="btn btn-secondary">
-            <?php echo t_h('common.back_to_settings'); ?>
-        </a>
+        <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
+            <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
+                <?php echo t_h('common.back_to_notes'); ?>
+            </a>
+            <a href="settings.php" class="btn btn-secondary">
+                <?php echo t_h('common.back_to_settings'); ?>
+            </a>
+        </div>
         <br><br>
         <!-- Complete Backup Section -->
         <div class="backup-section">

@@ -131,7 +131,7 @@ try {
 <body class="home-page">
     <div class="home-container github-sync-container">
 
-        <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 24px;">
+        <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 24px; justify-content: center;">
             <a id="backToHomeLink" href="home.php" class="btn btn-secondary">
                 <?php echo t_h('common.back_to_home', [], 'Back to Home', $currentLang); ?>
             </a>

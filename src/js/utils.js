@@ -2589,15 +2589,23 @@ function createKanbanStructure() {
             if (data.success && data.folder_id) {
                 // Success - close modal and open Kanban inline view
                 closeModal('kanbanStructureModal');
-                if (typeof window.refreshNotesListAfterFolderAction === 'function') {
-                    window.refreshNotesListAfterFolderAction();
-                }
-                // Delay slightly to let sidebar refresh, then open Kanban
-                setTimeout(function () {
-                    if (typeof openKanbanView === 'function') {
-                        openKanbanView(data.folder_id);
+
+                // If on create.php, redirect to index.php with kanban parameter
+                if (window.location.pathname.endsWith('create.php')) {
+                    var ws = selectedWorkspace || getSelectedWorkspace();
+                    var wsStr = ws ? '&workspace=' + encodeURIComponent(ws) : '';
+                    window.location.href = 'index.php?kanban=' + data.folder_id + wsStr;
+                } else {
+                    if (typeof window.refreshNotesListAfterFolderAction === 'function') {
+                        window.refreshNotesListAfterFolderAction();
                     }
-                }, 300);
+                    // Delay slightly to let sidebar refresh, then open Kanban
+                    setTimeout(function () {
+                        if (typeof openKanbanView === 'function') {
+                            openKanbanView(data.folder_id);
+                        }
+                    }, 300);
+                }
             } else {
                 showNotificationPopup(
                     data.error || (window.t ? window.t('modals.kanban_structure.error_create', null, 'Failed to create Kanban structure') : 'Failed to create Kanban structure'),
