@@ -2587,41 +2587,31 @@ function setupLinkEvents() {
                 )) {
                     e.preventDefault();
 
-                    // Create a temporary container to parse and transform the HTML
-                    var tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = htmlData;
-
-                    // Apply monospace font to all elements and strip colors
-                    var allElements = tempDiv.querySelectorAll('*');
-                    allElements.forEach(function (el) {
-                        // Remove all inline styles that could interfere
-                        el.removeAttribute('style');
-                        el.removeAttribute('class');
-                        // Apply only monospace font
-                        el.style.fontFamily = '"Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace';
-                    });
-
-                    // Also set styles on the container itself
-                    tempDiv.style.fontFamily = '"Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace';
-
-                    // Insert at cursor position
+                    // Extract plain text from the pasted content to avoid formatting issues
+                    var codeText = plainText || '';
+                    
+                    // Insert as plain text with monospace styling
                     var selection = window.getSelection();
                     if (selection.rangeCount > 0) {
                         var range = selection.getRangeAt(0);
                         range.deleteContents();
 
-                        // Create fragment
+                        // Split text into lines and create proper structure
+                        var lines = codeText.split('\n');
                         var fragment = document.createDocumentFragment();
 
-                        // Insert each child node
-                        while (tempDiv.firstChild) {
-                            var child = tempDiv.firstChild;
-                            // Apply font directly to first-level children
-                            if (child.nodeType === 1) { // Element node
-                                child.style.fontFamily = '"Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace';
+                        lines.forEach(function(line, index) {
+                            // Create a span for each line to preserve monospace
+                            var span = document.createElement('span');
+                            span.style.fontFamily = '"Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace';
+                            span.textContent = line;
+                            fragment.appendChild(span);
+
+                            // Add line break except for the last line
+                            if (index < lines.length - 1) {
+                                fragment.appendChild(document.createElement('br'));
                             }
-                            fragment.appendChild(child);
-                        }
+                        });
 
                         range.insertNode(fragment);
 
