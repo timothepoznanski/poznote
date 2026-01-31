@@ -242,7 +242,7 @@ if (isset($note['type']) && $note['type'] === 'tasklist') {
             $tasksHtml .= '<input type="checkbox" class="task-checkbox" data-index="'.$i.'"'.$checked.' /> ';
             $tasksHtml .= '<span class="task-text" data-text="'.$text.'">'.$text.'</span>';
             $tasksHtml .= '<div class="task-actions">';
-            $tasksHtml .= '<button class="task-action-btn public-task-edit-btn" title="Edit"><i class="fas fa-edit"></i></button>';
+
             $tasksHtml .= '<button class="task-action-btn public-task-delete-btn" title="Delete"><i class="fas fa-trash"></i></button>';
             $tasksHtml .= '</div>';
             $tasksHtml .= '</div>';

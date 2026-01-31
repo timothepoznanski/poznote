@@ -342,94 +342,7 @@
     /**
      * Helper for Poznote-styled prompt
      */
-    function publicNotePrompt(message, defaultValue = '') {
-        return new Promise((resolve) => {
-            const config = {
-                type: 'prompt',
-                message,
-                alertType: 'info',
-                title: 'Poznote',
-                buttons: [
-                    { text: texts.cancel, type: 'secondary', action: () => resolve(null) },
-                    {
-                        text: texts.ok, type: 'primary', action: () => {
-                            const input = document.getElementById('public-prompt-input');
-                            resolve(input ? input.value : null);
-                        }
-                    }
-                ]
-            };
 
-            // Custom implementation for prompt since modal-alerts.js doesn't have it
-            if (window.modalAlert) {
-                const originalCreateModal = window.modalAlert.createModal;
-                window.modalAlert.createModal = function (cfg) {
-                    if (cfg.type === 'prompt') {
-                        const overlay = document.createElement('div');
-                        overlay.className = 'alert-modal-overlay';
-                        const modal = document.createElement('div');
-                        modal.className = 'alert-modal';
-                        const body = document.createElement('div');
-                        body.className = 'alert-modal-body';
-                        body.textContent = cfg.message;
-
-                        const input = document.createElement('input');
-                        input.type = 'text';
-                        input.id = 'public-prompt-input';
-                        input.value = defaultValue;
-                        input.style.width = '100%';
-                        input.style.marginTop = '15px';
-                        input.style.padding = '10px';
-                        input.style.border = '1px solid #ddd';
-                        input.style.borderRadius = '4px';
-                        input.style.boxSizing = 'border-box';
-                        body.appendChild(input);
-
-                        const footer = document.createElement('div');
-                        footer.className = 'alert-modal-footer';
-                        cfg.buttons.forEach(btn => {
-                            const b = document.createElement('button');
-                            b.className = `alert-modal-button ${btn.type}`;
-                            b.textContent = btn.text;
-                            b.onclick = () => {
-                                window.modalAlert.closeModal(overlay);
-                                btn.action();
-                            };
-                            footer.appendChild(b);
-                        });
-
-                        modal.appendChild(body);
-                        modal.appendChild(footer);
-                        overlay.appendChild(modal);
-                        document.body.appendChild(overlay);
-                        window.modalAlert.currentModal = overlay;
-
-                        input.onkeydown = (e) => {
-                            if (e.key === 'Enter') {
-                                window.modalAlert.closeModal(overlay);
-                                cfg.buttons.find(b => b.type === 'primary').action();
-                            } else if (e.key === 'Escape') {
-                                window.modalAlert.closeModal(overlay);
-                                cfg.buttons.find(b => b.type === 'secondary').action();
-                            }
-                        };
-
-                        requestAnimationFrame(() => overlay.classList.add('show'));
-                        setTimeout(() => input.focus(), 100);
-
-                        // Restore original method
-                        window.modalAlert.createModal = originalCreateModal;
-                    } else {
-                        originalCreateModal.call(window.modalAlert, cfg);
-                    }
-                };
-                window.modalAlert.showModal(config);
-            } else {
-                // Fallback to native prompt if something failed
-                resolve(prompt(message, defaultValue));
-            }
-        });
-    }
 
     // Task list interaction (Checkboxes)
     document.addEventListener('change', function (e) {
@@ -518,20 +431,70 @@
         }
     });
 
+    // Inline Edit Handler
+    function enableInlineEdit(textElement, idOrIndex, isMarkdown) {
+        const originalText = textElement.getAttribute('data-text') || textElement.textContent;
+        const width = textElement.offsetWidth;
+
+        // Create input
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = originalText;
+        input.className = 'public-task-edit-input';
+
+        // Style to look like text
+        input.style.width = '100%';
+        input.style.minWidth = Math.max(width, 200) + 'px';
+        input.style.font = 'inherit';
+        input.style.color = 'inherit';
+        input.style.background = 'transparent';
+        // Use css variable if available, else fallback
+        input.style.border = '1px solid var(--primary-color, #3b82f6)';
+        input.style.borderRadius = '4px';
+        input.style.padding = '2px 4px';
+        input.style.boxSizing = 'border-box';
+
+        let isSaving = false;
+
+        const save = () => {
+            if (isSaving) return;
+            isSaving = true;
+
+            const newText = input.value.trim();
+            if (newText !== null && newText !== originalText) {
+                updateTaskText(idOrIndex, newText, isMarkdown);
+            } else {
+                cancel();
+            }
+        };
+
+        const cancel = () => {
+            // If we're cancelling, we just put back the element
+            // If save was called and triggered a reload, this might race, but usually reload wins
+            if (input.parentNode) {
+                input.replaceWith(textElement);
+            }
+        };
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                input.blur();
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                cancel();
+            }
+        });
+
+        input.addEventListener('blur', save);
+
+        textElement.replaceWith(input);
+        input.focus();
+    }
+
     // Edit Task Handler
     document.addEventListener('click', async function (e) {
-        const editBtn = e.target.closest('.public-task-edit-btn');
-        if (editBtn) {
-            const taskItem = editBtn.closest('.task-item');
-            const textSpan = taskItem.querySelector('.task-text');
-            const originalText = textSpan.getAttribute('data-text') || textSpan.textContent;
 
-            const newText = await publicNotePrompt(texts.editTask, originalText);
-            if (newText !== null && newText.trim() !== originalText) {
-                updateTaskText(taskItem.getAttribute('data-index'), newText.trim());
-            }
-            return;
-        }
 
         const deleteBtn = e.target.closest('.public-task-delete-btn');
         if (deleteBtn) {
@@ -547,12 +510,7 @@
         if (e.target.matches('.task-item .task-text')) {
             const taskItem = e.target.closest('.task-item');
             const idOrIndex = taskItem.getAttribute('data-index');
-            const originalText = e.target.getAttribute('data-text') || e.target.textContent;
-
-            const newText = await publicNotePrompt(texts.editTask, originalText);
-            if (newText !== null && newText.trim() !== originalText) {
-                updateTaskText(idOrIndex, newText.trim());
-            }
+            enableInlineEdit(e.target, idOrIndex, false);
             return;
         }
 
@@ -560,12 +518,7 @@
         if (e.target.matches('.task-list-item .task-text')) {
             const taskItem = e.target.closest('.task-list-item');
             const idOrIndex = taskItem.getAttribute('data-line');
-            const originalText = e.target.getAttribute('data-text') || e.target.textContent;
-
-            const newText = await publicNotePrompt(texts.editTask, originalText);
-            if (newText !== null && newText.trim() !== originalText) {
-                updateTaskText(idOrIndex, newText.trim(), true);
-            }
+            enableInlineEdit(e.target, idOrIndex, true);
         }
     });
 
