@@ -77,21 +77,88 @@ To disable the MCP server, comment out the `mcp-server` service in `docker-compo
 
 Add to your `mcp.json`:
 
+**Local installation:**
 ```json
 {
   "servers": {
     "poznote": {
       "type": "http",
-      "url": "http://YOUR-SERVER:8045/mcp"
+      "url": "http://localhost:8045/mcp"
     }
   }
 }
+```
+
+**Remote server (via SSH tunnel):**
+```json
+{
+  "servers": {
+    "poznote": {
+      "type": "http",
+      "url": "http://localhost:8045/mcp"
+    }
+  }
+}
+```
+
+Then establish the SSH tunnel:
+```bash
+ssh -L 8045:localhost:8045 user@your-server
 ```
 
 `mcp.json` location:
 - **Windows:** `C:\Users\YOUR-USERNAME\AppData\Roaming\Code\User\mcp.json`
 - **Linux:** `~/.config/Code/User/mcp.json`
 - **macOS:** `~/Library/Application Support/Code/User/mcp.json`
+
+---
+
+## Security Considerations
+
+⚠️ **Important:** The MCP server does **not implement authentication** for incoming requests. Anyone with network access to the MCP endpoint can read, create, modify, and delete your notes.
+
+### Recommended Security Setup
+
+**For local development only:**
+
+The default `docker-compose.yml` configuration binds the MCP server to `127.0.0.1` (localhost only):
+
+```yaml
+ports:
+  - "127.0.0.1:${POZNOTE_MCP_PORT:-8045}:8045"
+```
+
+This ensures the MCP server is only accessible from the host machine.
+
+**For remote access from VS Code:**
+
+Use SSH port forwarding to securely connect:
+
+```bash
+ssh -L 8045:localhost:8045 user@your-server
+```
+
+Then configure `mcp.json` to use localhost:
+
+```json
+{
+  "servers": {
+    "poznote": {
+      "type": "http",
+      "url": "http://localhost:8045/mcp"
+    }
+  }
+}
+```
+
+**For production environments:**
+
+If you need to expose the MCP server over a network, add a reverse proxy with authentication:
+Or use a VPN solution (Tailscale, WireGuard, etc.) to restrict access.
+
+### Authentication Flow
+
+While the MCP server itself has no authentication, it authenticates to the Poznote API using Basic Auth credentials configured via environment variables (`POZNOTE_USERNAME` and `POZNOTE_PASSWORD`). This protects the Poznote instance but not the MCP endpoint itself.
 
 ---
 

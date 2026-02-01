@@ -49,7 +49,7 @@ services:
       MCP_PORT: "8045"
       POZNOTE_DEBUG: ${POZNOTE_MCP_DEBUG:-false}
     ports:
-      - "${POZNOTE_MCP_PORT:-8045}:8045"
+      - "127.0.0.1:${POZNOTE_MCP_PORT:-8045}:8045"
     depends_on:
       - webserver
     healthcheck:
