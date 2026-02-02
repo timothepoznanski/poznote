@@ -355,6 +355,17 @@ function parseMarkdown($text) {
         // Empty line - paragraph separator
         if (trim($line) === '') {
             $flushParagraph();
+            // Preserve blank lines by adding a non-breaking space paragraph
+            // Count consecutive blank lines to preserve multiple blank lines
+            $blankLineCount = 1;
+            while ($i + 1 < count($lines) && trim($lines[$i + 1]) === '') {
+                $blankLineCount++;
+                $i++;
+            }
+            // Add blank line placeholders (use CSS to control spacing)
+            for ($bl = 0; $bl < $blankLineCount; $bl++) {
+                $result[] = '<p class="blank-line">&nbsp;</p>';
+            }
             continue;
         }
         

@@ -408,6 +408,13 @@ table th {
     line-height: 1.2;
 }
 
+/* Blank lines to preserve spacing in markdown */
+.public-note .content p.blank-line {
+    margin: 0;
+    min-height: 1.2em; /* Match the line-height */
+    line-height: 1.2;
+}
+
 /* Theme toggle button */
 .public-note-header {
     display: flex;
