@@ -28,6 +28,7 @@ body {
 .public-note .content {
     /* container for note HTML */
     line-height: 1.6;
+    white-space: pre-wrap;
 }
 
 .public-note img {
