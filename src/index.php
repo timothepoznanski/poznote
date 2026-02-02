@@ -310,7 +310,8 @@ $body_classes = trim($extra_body_classes);
             'selectedWorkspace' => $workspace_filter ?? '',
             'userId' => $_SESSION['user_id'] ?? null,
             'userEntriesPath' => isset($_SESSION['user_id']) ? "data/users/{$_SESSION['user_id']}/entries/" : "data/entries/",
-            'defaultNoteSortType' => $note_list_sort_type
+            'defaultNoteSortType' => $note_list_sort_type,
+            'isAdmin' => function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()
         ];
         if ($note != '' && empty($search) && empty($tags_search)) {
             $config_data['currentNoteFolder'] = $current_note_folder ?? '';

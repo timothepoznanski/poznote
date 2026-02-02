@@ -435,6 +435,7 @@
                 window.userId = config.userId;
                 window.userEntriesPath = config.userEntriesPath;
                 window.defaultNoteSortType = config.defaultNoteSortType || 'updated_desc';
+                window.isAdmin = config.isAdmin || false;
             } catch (e) {
                 console.error('Error parsing page config data:', e);
             }
