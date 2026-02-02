@@ -3087,6 +3087,7 @@ pre.code-block .code-block-copy-btn,
 pre.code-block,
 .code-block {
     padding: 30px !important;
+    padding-bottom: 20px !important;
 }
 
 
