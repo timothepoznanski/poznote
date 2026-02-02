@@ -362,9 +362,42 @@ function parseMarkdown($text) {
                 $blankLineCount++;
                 $i++;
             }
-            // Add blank line placeholders (use CSS to control spacing)
-            for ($bl = 0; $bl < $blankLineCount; $bl++) {
-                $result[] = '<p class="blank-line">&nbsp;</p>';
+            
+            // Check if the next non-empty line is a block element (code block, header, list, etc.)
+            // If so, don't add blank line placeholders as block elements have their own spacing
+            $nextNonEmptyIndex = $i + 1;
+            $isNextBlockElement = false;
+            if ($nextNonEmptyIndex < count($lines)) {
+                $nextLine = $lines[$nextNonEmptyIndex];
+                // Check for various block-level elements
+                $isNextBlockElement = (
+                    preg_match('/\x00CODEBLOCK\d+\x00/', $nextLine) ||  // Code block
+                    preg_match('/\x00MATHBLOCK\d+\x00/', $nextLine) ||  // Math block
+                    preg_match('/^\x00PTAG\d+\x00/', $nextLine) ||      // HTML tags
+                    preg_match('/^#{1,6}\s+/', $nextLine) ||            // Headers
+                    preg_match('/^(\*{3,}|-{3,}|_{3,})$/', $nextLine) || // Horizontal rules
+                    preg_match('/^&gt;\s/', $nextLine) ||               // Blockquotes
+                    preg_match('/^\s*[\*\-\+]\s+\[([ xX])\]\s+/', $nextLine) || // Task lists
+                    preg_match('/^\s*[\*\-\+]\s+/', $nextLine) ||       // Unordered lists
+                    preg_match('/^\s*\d+\.\s+/', $nextLine) ||          // Ordered lists
+                    preg_match('/^\s*\|.+\|\s*$/', $nextLine)           // Tables
+                );
+            }
+            
+            // Handle blank lines based on context:
+            // - If next is a block element: keep extra blank lines (blankLineCount - 1)
+            //   because the block element already provides one line of spacing
+            // - If next is regular text or nothing: keep all blank lines
+            if ($isNextBlockElement) {
+                // Keep only extra blank lines (subtract 1 for the natural block spacing)
+                for ($bl = 0; $bl < ($blankLineCount - 1); $bl++) {
+                    $result[] = '<p class="blank-line">&nbsp;</p>';
+                }
+            } else {
+                // Keep all blank lines for text-to-text spacing
+                for ($bl = 0; $bl < $blankLineCount; $bl++) {
+                    $result[] = '<p class="blank-line">&nbsp;</p>';
+                }
             }
             continue;
         }
