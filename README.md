@@ -104,7 +104,7 @@ Download the Docker Compose configuration file:
 curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
 ```
 
-Download the latest Poznote Webserver and Poznote MCP (if uncommented in docker-compose.yml) images :
+Download the latest Poznote Webserver and Poznote MCP images :
 ```powershell
 docker compose pull
 ```
@@ -152,7 +152,7 @@ Download the Docker Compose configuration file:
 curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
 ```
 
-Download the latest Poznote Webserver and Poznote MCP (if uncommented in docker-compose.yml) images:
+Download the latest Poznote Webserver and Poznote MCP images:
 ```bash
 docker compose pull
 ```
@@ -199,7 +199,7 @@ Download the Docker Compose configuration file:
 curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
 ```
 
-Download the latest Poznote Webserver and Poznote MCP (if uncommented in docker-compose.yml) images:
+Download the latest Poznote Webserver and Poznote MCP images:
 ```bash
 docker compose pull
 ```
@@ -435,6 +435,8 @@ POZNOTE_OIDC_ALLOWED_USERS=alice@example.com,bob@example.com,charlie@company.org
 
 ## Update application
 
+> **📘 Docker Versioning**: Poznote supports flexible Docker image versioning. Learn about major/minor version tags in our [Docker Versioning Guide](Docs/DOCKER-VERSIONING.md).
+
 <details>
 <summary><strong>Update to the latest version</strong></summary>
 <br>
@@ -464,7 +466,7 @@ Review `.env.template` and add any new variables to your `.env` file if needed:
 sdiff .env .env.template
 ```
 
-Download the latest Poznote Webserver and Poznote MCP (if uncommented in docker-compose.yml) images:
+Download the latest Poznote Webserver and Poznote MCP images:
 ```bash
 docker compose pull
 ```
@@ -475,6 +477,38 @@ docker compose up -d
 ```
 
 Your data is preserved in the `./data` directory and will not be affected by the update.
+
+</details>
+
+<details>
+<summary><strong>Version pinning and automatic updates</strong></summary>
+<br>
+
+Poznote supports multiple Docker image tags for different upgrade strategies:
+
+- **Major version** (`poznote:4`): Auto-upgrade within v4.x.x, no breaking changes
+- **Minor version** (`poznote:4.1`): Auto-upgrade within v4.1.x, patch updates only  
+- **Exact version** (`poznote:4.1.0`): No automatic updates, complete control
+- **Latest** (`poznote:latest`): Always the newest stable release
+
+**Example: Stay on major version 4 with auto-updates**
+
+Edit your `docker-compose.yml`:
+```yaml
+services:
+  poznote:
+    image: ghcr.io/timothepoznanski/poznote:4  # Auto-upgrade to 4.x.x
+    # ... rest of config
+```
+
+Then update with:
+```bash
+docker compose pull && docker compose up -d
+```
+
+**⚠️ Note about Watchtower**: Automated tools like Watchtower only update Docker images, not `docker-compose.yml` or environment variables. For production, manual updates are recommended to ensure configuration compatibility.
+
+For complete details on versioning strategies, automatic updates, and migration between major versions, see the [Docker Versioning Guide](Docs/DOCKER-VERSIONING.md).
 
 </details>
 

@@ -1,0 +1,109 @@
+# Docker Compose Versioning Examples for Poznote
+# See Docs/DOCKER-VERSIONING.md for complete documentation
+
+# ==================================================================================
+# Example 1: Major Version Tag (RECOMMENDED)
+# ==================================================================================
+# Use this for production - auto-upgrade within major version, no breaking changes
+# When version 4.2.0 is released, this will automatically use it
+# You must manually switch to poznote:5 when v5 is released
+# ==================================================================================
+
+services:
+  webserver-major:
+    image: ghcr.io/timothepoznanski/poznote:4  # Auto-updates to any 4.x.x version
+    # ... (see main docker-compose.yml for full configuration)
+
+  mcp-server-major:
+    image: ghcr.io/timothepoznanski/poznote-mcp:4  # Matches main app version
+    # ...
+
+
+# ==================================================================================
+# Example 2: Minor Version Tag
+# ==================================================================================
+# Use this when you want patch updates but control minor version upgrades
+# Automatically gets 4.1.1, 4.1.2, etc., but not 4.2.0
+# ==================================================================================
+
+#services:
+#  webserver-minor:
+#    image: ghcr.io/timothepoznanski/poznote:4.1  # Auto-updates to 4.1.x only
+#    # ...
+#
+#  mcp-server-minor:
+#    image: ghcr.io/timothepoznanski/poznote-mcp:4.1
+#    # ...
+
+
+# ==================================================================================
+# Example 3: Exact Version Tag (Maximum Stability)
+# ==================================================================================
+# Use this when you need complete control - no automatic updates
+# You must manually change the version tag to upgrade
+# ==================================================================================
+
+#services:
+#  webserver-exact:
+#    image: ghcr.io/timothepoznanski/poznote:4.1.0  # Pinned to exact version
+#    # ...
+#
+#  mcp-server-exact:
+#    image: ghcr.io/timothepoznanski/poznote-mcp:4.1.0  # Pinned to exact version
+#    # ...
+
+
+# ==================================================================================
+# Example 4: Latest Tag (Bleeding Edge)
+# ==================================================================================
+# Use this for development/testing - always gets the newest stable release
+# May include major version changes with potential breaking changes
+# ==================================================================================
+
+#services:
+#  webserver-latest:
+#    image: ghcr.io/timothepoznanski/poznote:latest  # Always latest stable
+#    # ...
+#
+#  mcp-server-latest:
+#    image: ghcr.io/timothepoznanski/poznote-mcp:latest  # Always latest stable
+#    # ...
+
+
+# ==================================================================================
+# Example 5: With Watchtower (Automatic Updates)
+# ==================================================================================
+# ⚠️  WARNING: Watchtower ONLY updates Docker images, NOT docker-compose.yml or .env
+#    If a new version adds required environment variables or changes configuration,
+#    your application may break. Use with caution or monitor release notes carefully.
+#
+# RECOMMENDED: Use manual updates (docker compose pull) for production instead.
+# ==================================================================================
+
+#services:
+#  webserver-auto:
+#    image: ghcr.io/timothepoznanski/poznote:4  # Watchtower will update this
+#    # ...
+#
+#  mcp-server-auto:
+#    image: ghcr.io/timothepoznanski/poznote-mcp:4
+#    # ...
+#
+#  watchtower:
+#    image: containrrr/watchtower
+#    # ...
+
+
+# ==================================================================================
+# MIGRATION STRATEGY EXAMPLE
+# ==================================================================================
+# When migrating from v4 to v5 (future major version):
+#
+# Step 1: Review release notes for v5
+# Step 2: Test in a separate environment first
+# Step 3: Backup your data directory
+# Step 4: Change image tag from poznote:4 to poznote:5
+# Step 5: Run: docker compose pull && docker compose up -d
+#
+# Your data is preserved in ./data volume across version changes
+# ==================================================================================
