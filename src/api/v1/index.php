@@ -40,6 +40,8 @@ require_once __DIR__ . '/../../auth.php';
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $isAdminEndpoint = strpos($uri, '/api/v1/admin') !== false;
 $isPublicProfilesEndpoint = strpos($uri, '/api/v1/users/profiles') !== false;
+$isMeEndpoint = strpos($uri, '/api/v1/users/me') !== false;
+$isLookupEndpoint = strpos($uri, '/api/v1/users/lookup/') !== false;
 $isSystemEndpoint = strpos($uri, '/api/v1/system') !== false;
 $isSharedEndpoint = strpos($uri, '/api/v1/shared') !== false;
 $isPublicApiEndpoint = strpos($uri, '/api/v1/public') !== false;
@@ -47,7 +49,7 @@ $isPublicApiEndpoint = strpos($uri, '/api/v1/public') !== false;
 // Require authentication (with X-User-ID for data endpoints, without for admin/public endpoints)
 if ($isPublicApiEndpoint) {
     // No additional authentication required (token validation happens in controller)
-} elseif ($isAdminEndpoint || $isPublicProfilesEndpoint || $isSystemEndpoint || $isSharedEndpoint) {
+} elseif ($isAdminEndpoint || $isPublicProfilesEndpoint || $isMeEndpoint || $isLookupEndpoint || $isSystemEndpoint || $isSharedEndpoint) {
     // Admin endpoints only need credential validation, not X-User-ID
     requireApiAuthAdmin();
 } else {
@@ -534,6 +536,11 @@ $router->delete('/backups/{filename}', function($params) use ($backupController)
     echo json_encode($backupController->destroy($params['filename']));
 });
 
+// Restore a backup file
+$router->post('/backups/{filename}/restore', function($params) use ($backupController) {
+    echo json_encode($backupController->restore($params['filename']));
+});
+
 // ======================
 // System Routes
 // ======================
@@ -597,6 +604,16 @@ $usersController = new UsersController($con);
 // Get available user profiles for login selector (public endpoint)
 $router->get('/users/profiles', function($params) use ($usersController) {
     echo json_encode($usersController->profiles());
+});
+
+// Get current authenticated user's profile
+$router->get('/users/me', function($params) use ($usersController) {
+    echo json_encode($usersController->me());
+});
+
+// Get user ID by username (admin only, used by backup scripts)
+$router->get('/users/lookup/{username}', function($params) use ($usersController) {
+    echo json_encode($usersController->lookup($params['username']));
 });
 
 // Admin: System stats

@@ -595,9 +595,21 @@ Single ZIP containing database, all notes, and attachments for all workspaces:
 
 #### Per-User vs Complete Backups
 
-Poznote supports two backup scopes:
+Poznote provides flexible backup options:
 
-1. **Per-User Backups**: Created from the user's Settings page. This backup contains *only* the data belonging to that specific user (their database, notes, and attachments).
+**Via Web Interface (Settings > Backup/Export):**
+- **All users** can backup and restore their own profile
+- **Admins** can select which user profile to backup or restore
+- Backups contain the user's database, notes, and attachments
+
+**Via API/Script (Administrators only):**
+- Automated backups using the `backup-poznote.sh` script
+- Programmatic access via REST API v1
+- Requires admin credentials
+
+**Backup Scopes:**
+
+1. **Per-User Backups**: Created from Settings or via API. Contains *only* the data belonging to a specific user (their database, notes, and attachments).
 2. **Complete System Backup**: Created manually by backing up the entire `/data` directory. This is the only way to backup the master configuration and all users' data at once.
 
 ```bash
@@ -624,42 +636,67 @@ Export individual notes using the **Export** button in the note toolbar:
 <summary><strong>Automated Backups with Bash Script</strong></summary>
 <br>
 
-For automated scheduled backups, you can use the included `backup-poznote.sh` script. This script creates complete backups via the Poznote REST API v1 and automatically manages retention.
+For automated scheduled backups via API, you can use the included `backup-poznote.sh` script.
+
+**IMPORTANT:** Only administrators can create backups via the API.
 
 **Script location:** `backup-poznote.sh` in the `tools` folder of the Poznote repository
 
-**Usage:**
+**Administrator Usage:**
+
+Admins can backup any user profile - **no need to know user IDs**, just the username:
+
 ```bash
-bash backup-poznote.sh '<poznote_url>' '<username>' '<password>' '<backup_directory>' '<retention_count>'
+# Backup your own profile
+bash backup-poznote.sh 'https://poznote.example.com' 'admin' 'admin_password' 'admin' '/backups' '30'
+
+# Backup another user's profile (Nina)
+bash backup-poznote.sh 'https://poznote.example.com' 'admin' 'admin_password' 'Nina' '/backups' '30'
 ```
 
-**Example with crontab:**
+**Usage:**
+```bash
+bash backup-poznote.sh '<poznote_url>' '<admin_username>' '<admin_password>' '<target_username>' '<backup_directory>' '<retention_count>'
+```
 
-To schedule automatic backups twice daily (at midnight and noon), add this line to your crontab:
+**Example with crontab (admin backing up Nina):**
 
 ```bash
-0 0,12 * * * bash /root/backup-poznote.sh 'https://poznote.xxxxx.com' 'admin_change_me' 'xxxxx' '/root/poznote' '30'
+# Add to crontab for automated backups twice daily
+0 0,12 * * * bash /root/backup-poznote.sh 'https://poznote.example.com' 'admin' 'admin_password' 'Nina' '/root/backups' '30'
 ```
 
 **Parameters explained:**
-- `'https://poznote.xxxxx.com'` - Your Poznote instance URL
-- `'admin_change_me'` - Your Poznote username
-- `'xxxxx'` - Your Poznote password
-- `'/root/poznote'` - Parent directory where backups will be stored (the script creates a `backups-poznote` folder inside this path)
+- `'https://poznote.example.com'` - Your Poznote instance URL
+- `'admin'` - Admin username for authentication (must be an admin)
+- `'admin_password'` - Admin password (POZNOTE_PASSWORD from .env)
+- `'Nina'` - Target username to backup
+- `'/root/backups'` - Parent directory where backups will be stored (creates `backups-poznote-<username>` folder)
 - `'30'` - Number of backups to keep (older ones are automatically deleted)
 
 **How the backup process works:**
 
-1. The script calls the Poznote REST API v1 (`POST /api/v1/backups`) to create a backup at 00:00 (midnight) and 12:00 (noon) every day
-2. The API generates a backup ZIP in the Poznote container: `/var/www/html/data/backups/`
-3. The script downloads this backup locally (`GET /api/v1/backups/{filename}`) to: `/root/poznote/backups-poznote/`
-4. Old backups are automatically deleted from both locations (`DELETE /api/v1/backups/{filename}`) to keep only the most recent ones based on retention count
+1. The script authenticates with admin credentials
+2. Automatically looks up the user ID from the username
+3. Creates a backup via the API
+4. Calls the Poznote REST API v1 (`POST /api/v1/backups` with `X-User-ID` header)
+5. Downloads the backup ZIP locally to `backups-poznote-<username>/`
+6. Automatically manages retention (keeps only the specified number of recent backups)
+
+**Note:** Each user's backups are stored in separate folders (`backups-poznote-Nina`, `backups-poznote-Tim`, etc.)
 
 </details>
 
 ## Restore / Import
 
-Poznote includes built-in Restoration / Import functionality accessible through Settings.
+**Via Web Interface (Settings > Restore/Import):**
+- **All users** can restore backups to their own profile
+- **Admins** can access additional disaster recovery tools
+- Supports complete backup restoration and individual file imports
+
+**Via API (Administrators only):**
+- Restore via REST API v1 endpoint `POST /api/v1/backups/{filename}/restore`
+- Requires admin credentials
 
 <a id="complete-restore"></a>
 <details>

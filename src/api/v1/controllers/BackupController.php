@@ -3,10 +3,11 @@
  * BackupController - RESTful API for backup operations
  * 
  * Endpoints:
- *   GET    /api/v1/backups           - List all backups
- *   POST   /api/v1/backups           - Create a new backup
- *   GET    /api/v1/backups/{filename} - Download a backup file
- *   DELETE /api/v1/backups/{filename} - Delete a backup file
+ *   GET    /api/v1/backups              - List all backups
+ *   POST   /api/v1/backups              - Create a new backup
+ *   GET    /api/v1/backups/{filename}   - Download a backup file
+ *   DELETE /api/v1/backups/{filename}   - Delete a backup file
+ *   POST   /api/v1/backups/{filename}/restore - Restore a backup file
  */
 
 class BackupController {
@@ -237,6 +238,83 @@ class BackupController {
         } else {
             http_response_code(500);
             return ['success' => false, 'error' => 'Failed to delete backup file'];
+        }
+    }
+    
+    /**
+     * POST /api/v1/backups/{filename}/restore - Restore a backup file
+     */
+    public function restore($filename) {
+        $filename = basename($filename); // Security: prevent path traversal
+        
+        // Validate filename format
+        if (!preg_match('/^poznote_backup_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.zip$/', $filename)) {
+            http_response_code(400);
+            return ['success' => false, 'error' => 'Invalid backup filename format'];
+        }
+        
+        $filePath = $this->backupsDir . '/' . $filename;
+        
+        if (!file_exists($filePath)) {
+            http_response_code(404);
+            return ['success' => false, 'error' => 'Backup file not found'];
+        }
+        
+        // Include restore functions
+        require_once __DIR__ . '/../../restore_import.php';
+        
+        // Create a temporary file object that mimics $_FILES structure
+        $fileInfo = [
+            'name' => $filename,
+            'type' => 'application/zip',
+            'tmp_name' => $filePath,
+            'error' => UPLOAD_ERR_OK,
+            'size' => filesize($filePath)
+        ];
+        
+        // Use the existing restoreCompleteBackup function
+        // We need to temporarily copy the file since restoreCompleteBackup expects an uploaded file
+        $tempFile = sys_get_temp_dir() . '/poznote_restore_' . uniqid() . '.zip';
+        if (!copy($filePath, $tempFile)) {
+            http_response_code(500);
+            return ['success' => false, 'error' => 'Failed to prepare backup for restoration'];
+        }
+        
+        $fileInfo['tmp_name'] = $tempFile;
+        
+        try {
+            $result = restoreCompleteBackup($fileInfo);
+            
+            // Clean up temp file
+            if (file_exists($tempFile)) {
+                @unlink($tempFile);
+            }
+            
+            if ($result['success']) {
+                return [
+                    'success' => true,
+                    'message' => $result['message'] ?? 'Backup restored successfully',
+                    'details' => $result
+                ];
+            } else {
+                http_response_code(500);
+                return [
+                    'success' => false,
+                    'error' => $result['error'] ?? 'Failed to restore backup',
+                    'message' => $result['message'] ?? ''
+                ];
+            }
+        } catch (Exception $e) {
+            // Clean up temp file on error
+            if (file_exists($tempFile)) {
+                @unlink($tempFile);
+            }
+            
+            http_response_code(500);
+            return [
+                'success' => false,
+                'error' => 'Exception during restore: ' . $e->getMessage()
+            ];
         }
     }
     

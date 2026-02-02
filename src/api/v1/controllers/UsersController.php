@@ -26,6 +26,34 @@ class UsersController {
     }
     
     /**
+     * GET /api/v1/users/me - Get current authenticated user's profile
+     */
+    public function me() {
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
+        
+        $userId = getCurrentUserId();
+        if (!$userId) {
+            http_response_code(401);
+            return ['error' => 'Not authenticated'];
+        }
+        
+        $user = getUserProfileById((int)$userId);
+        
+        if (!$user) {
+            http_response_code(404);
+            return ['error' => 'User profile not found'];
+        }
+        
+        return [
+            'id' => $user['id'],
+            'username' => $user['username'],
+            'email' => $user['email'],
+            'is_admin' => (bool)$user['is_admin'],
+            'active' => (bool)$user['active']
+        ];
+    }
+    
+    /**
      * GET /api/v1/admin/users - List all user profiles
      */
     public function list($params = []) {
@@ -325,5 +353,31 @@ class UsersController {
         } catch (Exception $e) {
             return ['success' => false, 'error' => 'Repair failed: ' . $e->getMessage()];
         }
+    }
+    
+    /**
+     * GET /api/v1/users/lookup/{username} - Get user ID by username
+     * Returns the user ID for a given username
+     * Accessible to administrators only (no X-User-ID required)
+     */
+    public function lookup($username) {
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
+        
+        if (empty($username)) {
+            http_response_code(400);
+            return ['error' => 'Username is required'];
+        }
+        
+        $user = getUserProfileByUsername($username);
+        
+        if (!$user) {
+            http_response_code(404);
+            return ['error' => 'User not found'];
+        }
+        
+        return [
+            'id' => (int)$user['id'],
+            'username' => $user['username']
+        ];
     }
 }

@@ -779,6 +779,21 @@ def create_backup() -> str:
 
 
 @mcp.tool()
+def restore_backup(filename: str, user_id: Optional[int] = None) -> str:
+    """Restore a backup file. This will replace all current user data.
+    
+    Args:
+        filename: Name of the backup file to restore (e.g., poznote_backup_2026-02-02_15-30-00.zip)
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    result = client.restore_backup(filename, user_id=user_id)
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
 def get_app_setting(key: str, user_id: Optional[int] = None) -> str:
     """Get the value of a specific application setting
     

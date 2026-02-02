@@ -5,36 +5,47 @@
 # ==============================================================================
 # This script can be used both manually and with cron
 #
+# IMPORTANT: Only administrators can create backups via API
+#
+# Administrators can:
+#   - Backup their own profile
+#   - Backup any user's profile
+#   - The script automatically looks up the user ID from the username
+#
 # Usage:
-#   ./backup-poznote.sh <URL> <USERNAME> <PASSWORD> <BACKUP_PATH> [MAX_BACKUPS]
+#   ./backup-poznote.sh <URL> <ADMIN_USERNAME> <ADMIN_PASSWORD> <TARGET_USERNAME> <BACKUP_PATH> [MAX_BACKUPS]
 #
 # Examples:
-#   ./backup-poznote.sh 'http://localhost:8080' 'admin' 'mypassword' '/var/backups'
-#   ./backup-poznote.sh 'https://poznote.example.com' 'myuser' 'mypassword' '/home/user' '30'
-#
-# Note: The script will create a 'backups-poznote' folder inside the specified path
-#       Default MAX_BACKUPS is 20 if not specified
+#   # Admin backing up their own profile
+#   ./backup-poznote.sh 'https://poznote.example.com' 'admin' 'adminpass' 'admin' '/backups' '30'
+#   
+#   # Admin backing up Nina's profile
+#   ./backup-poznote.sh 'https://poznote.example.com' 'admin' 'adminpass' 'Nina' '/backups' '30'
 #
 # ==============================================================================
 
 # Check if all required parameters are provided
-if [ $# -lt 4 ] || [ $# -gt 5 ]; then
+if [ $# -lt 5 ] || [ $# -gt 6 ]; then
     echo "ERROR: Missing required parameters"
     echo ""
-    echo "Usage: $0 <URL> <USERNAME> <PASSWORD> <BACKUP_PATH> [MAX_BACKUPS]"
+    echo "Usage: $0 <URL> <USERNAME> <PASSWORD> <TARGET_USERNAME> <BACKUP_PATH> [MAX_BACKUPS]"
     echo ""
     echo "Parameters:"
-    echo "  URL          - Base URL of your Poznote instance"
-    echo "  USERNAME     - Your Poznote username"
-    echo "  PASSWORD     - Your Poznote password"
-    echo "  BACKUP_PATH  - Parent directory where 'backups-poznote' folder will be created"
-    echo "  MAX_BACKUPS  - Maximum number of backups to keep (default: 20)"
+    echo "  URL              - Base URL of your Poznote instance"
+    echo "  ADMIN_USERNAME   - Admin username for authentication (required)"
+    echo "  ADMIN_PASSWORD   - Admin password (POZNOTE_PASSWORD from .env)"
+    echo "  TARGET_USERNAME  - Username of the profile to backup"
+    echo "  BACKUP_PATH      - Parent directory where backups will be stored"
+    echo "  MAX_BACKUPS      - Maximum number of backups to keep (default: 20)"
+    echo ""
+    echo "Note: Only administrators can create backups via API."
     echo ""
     echo "Examples:"
-    echo "  $0 'http://localhost:8080' 'admin' 'mypassword' '/var/backups'"
-    echo "  $0 'https://poznote.example.com' 'myuser' 'mypassword' '/home/myuser' '30'"
+    echo "  # Admin backing up their own profile:"
+    echo "  $0 'https://poznote.example.com' 'admin' 'adminpass' 'admin' '/backups' '30'"
     echo ""
-    echo "Note: The script will create a 'backups-poznote' folder inside the specified path"
+    echo "  # Admin backing up Nina's profile:"
+    echo "  $0 'https://poznote.example.com' 'admin' 'adminpass' 'Nina' '/backups' '30'"
     echo ""
     exit 1
 fi
@@ -43,11 +54,12 @@ fi
 BASE_URL="$1"
 USERNAME="$2"
 PASSWORD="$3"
-BACKUP_PATH="$4"
-MAX_BACKUPS="${5:-20}"
+TARGET_USERNAME="$4"
+BACKUP_PATH="$5"
+MAX_BACKUPS="${6:-20}"
 
 # Backup configuration
-BACKUP_DIR="$BACKUP_PATH/backups-poznote"
+BACKUP_DIR="$BACKUP_PATH/backups-poznote-$TARGET_USERNAME"
 
 # Check if parent path exists
 if [ ! -d "$BACKUP_PATH" ]; then
@@ -70,29 +82,36 @@ log() {
 }
 
 log "Creating backup for: $BASE_URL"
-log "Using credentials: $USERNAME"
+log "Authenticated as: $USERNAME"
+log "Target user profile: $TARGET_USERNAME"
 
-# Multi-user support: detect user ID from profiles
-log "Detecting User ID for $USERNAME..."
-PROFILES_RESPONSE=$(curl -s -u "$USERNAME:$PASSWORD" "$BASE_URL/api/v1/users/profiles")
-USER_ID=$(echo "$PROFILES_RESPONSE" | jq -r ".[] | select(.username == \"$USERNAME\" or .email == \"$USERNAME\") | .id" 2>/dev/null)
+# Detect User ID from username
+log "Looking up User ID for $TARGET_USERNAME..."
 
-if [ -z "$USER_ID" ] || [ "$USER_ID" = "null" ]; then
-    log "Warning: User ID not found in profiles list. Attempting with default context."
-    # If we can't find the ID (e.g. non-admin user), we'll try without the header
-    # Poznote usually defaults to ID 1 or the first available user.
-    AUTH_HEADER=""
-else
-    log "Detected User ID: $USER_ID"
-    AUTH_HEADER="-H \"X-User-ID: $USER_ID\""
+# Use the /users/lookup/{username} endpoint to get the ID
+LOOKUP_RESPONSE=$(curl -s -u "$USERNAME:$PASSWORD" "$BASE_URL/api/v1/users/lookup/$TARGET_USERNAME")
+
+# Check for errors
+if echo "$LOOKUP_RESPONSE" | jq -e '.error' > /dev/null 2>&1; then
+    log "ERROR: Failed to lookup user ID for $TARGET_USERNAME"
+    echo "$LOOKUP_RESPONSE" | jq '.'
+    exit 1
 fi
 
+# Extract the user ID
+USER_ID=$(echo "$LOOKUP_RESPONSE" | jq -r '.id' 2>/dev/null)
+
+if [ -z "$USER_ID" ] || [ "$USER_ID" = "null" ]; then
+    log "ERROR: Could not determine user ID for $TARGET_USERNAME"
+    exit 1
+fi
+
+log "Resolved User ID: $USER_ID"
 log "Backup directory: $BACKUP_DIR"
 log "Maximum backups to keep: $MAX_BACKUPS"
 
 # Call API to create backup using REST API v1
-# Note: we use eval to handle the dynamic AUTH_HEADER with quotes
-RESPONSE=$(eval "curl -s -u \"$USERNAME:$PASSWORD\" $AUTH_HEADER -X POST \"$BASE_URL/api/v1/backups\"")
+RESPONSE=$(curl -s -u "$USERNAME:$PASSWORD" -H "X-User-ID: $USER_ID" -X POST "$BASE_URL/api/v1/backups")
 
 # Extract filename from response
 FILENAME=$(echo "$RESPONSE" | jq -r '.backup_file' 2>/dev/null)
@@ -113,7 +132,7 @@ log "Backup created: $FILENAME ($SIZE_MB MB)"
 DOWNLOAD_URL="$BASE_URL/api/v1/backups/$FILENAME"
 OUTPUT_FILE="$BACKUP_DIR/$FILENAME"
 
-if eval "curl -s -u \"$USERNAME:$PASSWORD\" $AUTH_HEADER -o \"$OUTPUT_FILE\" \"$DOWNLOAD_URL\""; then
+if curl -s -u "$USERNAME:$PASSWORD" -H "X-User-ID: $USER_ID" -o "$OUTPUT_FILE" "$DOWNLOAD_URL"; then
     log "Backup downloaded: $OUTPUT_FILE"
 else
     log "ERROR: Failed to download backup"
@@ -149,7 +168,7 @@ fi
 
 # Clean old backups on server (via REST API v1)
 log "Cleaning old backups on server..."
-SERVER_BACKUPS=$(eval "curl -s -u \"$USERNAME:$PASSWORD\" $AUTH_HEADER \"$BASE_URL/api/v1/backups\"" | jq -r '.backups[] | .filename' | sort)
+SERVER_BACKUPS=$(curl -s -u "$USERNAME:$PASSWORD" -H "X-User-ID: $USER_ID" "$BASE_URL/api/v1/backups" | jq -r '.backups[] | .filename' | sort)
 SERVER_COUNT=$(echo "$SERVER_BACKUPS" | grep -c "poznote_backup_")
 
 if [ "$SERVER_COUNT" -gt "$MAX_BACKUPS" ]; then
@@ -159,7 +178,7 @@ if [ "$SERVER_COUNT" -gt "$MAX_BACKUPS" ]; then
     # Get oldest backups to remove
     echo "$SERVER_BACKUPS" | head -n "$REMOVE_COUNT" | while read -r OLD_BACKUP; do
         if [ -n "$OLD_BACKUP" ]; then
-            DELETE_RESPONSE=$(eval "curl -s -u \"$USERNAME:$PASSWORD\" $AUTH_HEADER -X DELETE \"$BASE_URL/api/v1/backups/$OLD_BACKUP\"")
+            DELETE_RESPONSE=$(curl -s -u "$USERNAME:$PASSWORD" -H "X-User-ID: $USER_ID" -X DELETE "$BASE_URL/api/v1/backups/$OLD_BACKUP")
             
             if echo "$DELETE_RESPONSE" | jq -e '.success' > /dev/null 2>&1; then
                 log "Deleted from server: $OLD_BACKUP"

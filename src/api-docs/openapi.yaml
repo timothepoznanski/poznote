@@ -1323,7 +1323,18 @@ paths:
   /backups:
     get:
       tags: [Backups]
-      summary: List all backups
+      summary: List all backups (requires admin credentials and X-User-ID)
+      description: |
+        Lists all backups for the specified user. Requires admin credentials.
+        The X-User-ID header specifies which user's backups to list.
+      parameters:
+        - name: X-User-ID
+          in: header
+          required: true
+          schema:
+            type: integer
+          description: ID of the user whose backups to list
+          example: 9
       responses:
         '200':
           description: List of backups
@@ -1342,7 +1353,18 @@ paths:
                     type: integer
     post:
       tags: [Backups]
-      summary: Create a new backup
+      summary: Create a new backup (requires admin credentials and X-User-ID)
+      description: |
+        Creates a backup for the specified user. Requires admin credentials.
+        The X-User-ID header specifies which user's data to backup.
+      parameters:
+        - name: X-User-ID
+          in: header
+          required: true
+          schema:
+            type: integer
+          description: ID of the user to backup
+          example: 9
       responses:
         '201':
           description: Backup created
@@ -1363,13 +1385,24 @@ paths:
   /backups/{filename}:
     get:
       tags: [Backups]
-      summary: Download a backup
+      summary: Download a backup (requires admin credentials and X-User-ID)
+      description: |
+        Downloads a backup file. Requires admin credentials.
+        The X-User-ID header specifies which user's backup to download.
       parameters:
         - name: filename
           in: path
           required: true
           schema:
             type: string
+          example: poznote_backup_2026-02-02_15-30-00.zip
+        - name: X-User-ID
+          in: header
+          required: true
+          schema:
+            type: integer
+          description: ID of the user who owns this backup
+          example: 9
       responses:
         '200':
           description: Backup file download
@@ -1380,16 +1413,61 @@ paths:
                 format: binary
     delete:
       tags: [Backups]
-      summary: Delete a backup
+      summary: Delete a backup (requires admin credentials and X-User-ID)
+      description: |
+        Deletes a backup file. Requires admin credentials.
+        The X-User-ID header specifies which user's backup to delete.
       parameters:
         - name: filename
           in: path
           required: true
           schema:
             type: string
+          example: poznote_backup_2026-02-02_15-30-00.zip
+        - name: X-User-ID
+          in: header
+          required: true
+          schema:
+            type: integer
+          description: ID of the user who owns this backup
+          example: 9
       responses:
         '200':
           description: Backup deleted
+
+  /backups/{filename}/restore:
+    post:
+      tags: [Backups]
+      summary: Restore a backup
+      description: Restore a backup file. This will replace all current user data (database, notes, and attachments) with the data from the backup.
+      parameters:
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+            example: poznote_backup_2026-02-02_15-30-00.zip
+        - $ref: '#/components/parameters/UserIdHeader'
+      responses:
+        '200':
+          description: Backup restored successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  details:
+                    type: object
+        '400':
+          description: Invalid backup filename format
+        '404':
+          description: Backup file not found
+        '500':
+          description: Failed to restore backup
 
   # ==================
   # System Endpoints
@@ -1623,6 +1701,47 @@ paths:
                     username:
                       type: string
                       example: "admin"
+
+  /users/lookup/{username}:
+    get:
+      tags: [Users]
+      summary: Get user ID by username (admin only)
+      description: |
+        Converts a username to a user ID. Accessible to administrators only.
+        Does NOT require X-User-ID header (since the purpose is to find the ID).
+        Used by backup scripts to resolve usernames to IDs.
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Username to lookup
+          example: "Nina"
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 9
+                  username:
+                    type: string
+                    example: "Nina"
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "User not found"
 
   /admin/users:
     get:
