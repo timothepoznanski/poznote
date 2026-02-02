@@ -9,18 +9,6 @@ include 'functions.php';
 // Respect optional workspace parameter
 $workspace = isset($_GET['workspace']) ? trim($_GET['workspace']) : (isset($_POST['workspace']) ? trim($_POST['workspace']) : '');
 
-// Function to get base URL
-function getBaseUrl() {
-	$host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
-	$scriptDir = dirname($_SERVER['SCRIPT_NAME']);
-	if ($scriptDir === '/' || $scriptDir === '\\' || $scriptDir === '.') {
-		$scriptDir = '';
-	}
-	$scriptDir = rtrim($scriptDir, '/\\');
-	$base = '//' . $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '');
-	return $base;
-}
-
 // Build query to get shared folders with folder information and note count
 $select_query = "SELECT sf.id, sf.folder_id, sf.token, sf.created, sf.indexable, sf.password, 
                  f.name as folder_name, f.icon as folder_icon,

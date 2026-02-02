@@ -84,6 +84,7 @@
 .github-sync-section {
     background: #fff;
     border-radius: 12px;
+    border: 1px solid #e5e7eb;
     padding: 24px;
     margin: 20px 0;
 }

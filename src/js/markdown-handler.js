@@ -1826,8 +1826,8 @@ function exitSplitMode(noteId) {
         previewDiv.style.setProperty('display', 'none', 'important');
     }
 
-    // Switch to edit mode
-    switchToEditMode(noteId);
+    // Switch to preview mode instead of edit mode
+    switchToPreviewMode(noteId);
 }
 
 // Setup live preview update in split mode

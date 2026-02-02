@@ -38,6 +38,35 @@
       background: #3367d6;
     }
 
+    .action-buttons {
+      display: flex;
+      gap: 5px;
+      margin-top: 15px;
+    }
+
+    .action-buttons button {
+      margin-top: 0;
+      flex: 1;
+      font-size: 13px;
+      padding: 8px 5px;
+    }
+
+    #saveNote {
+      background: #34a853;
+    }
+
+    #saveNote:hover {
+      background: #2d8e47;
+    }
+
+    #saveScreenshot {
+      background: #ea4335;
+    }
+
+    #saveScreenshot:hover {
+      background: #c5362c;
+    }
+
     #status {
       margin-top: 10px;
       color: red;
@@ -90,7 +119,10 @@
 
   <button id="saveConfig">Save Configuration</button>
 
-  <button id="saveNote">Save URL to Note</button>
+  <div class="action-buttons">
+    <button id="saveNote" title="Save URL only">📌 URL</button>
+    <button id="saveScreenshot" title="Save with screenshot">📸 Screenshot</button>
+  </div>
 
   <div id="status"></div>
 

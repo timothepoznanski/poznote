@@ -1,4 +1,20 @@
 /* Styles for the public (shared) note view */
+
+/* Load Inter font */
+@font-face {
+    font-family: 'Inter';
+    src: url('../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
+
 body {
     /* background: #f7f7f7; */
     font-family: 'Inter', sans-serif;
@@ -405,6 +421,13 @@ table th {
 /* Paragraphs */
 .public-note .content p {
     margin: 0;
+    line-height: 1.2;
+}
+
+/* Blank lines to preserve spacing in markdown */
+.public-note .content p.blank-line {
+    margin: 0;
+    min-height: 1.2em; /* Match the line-height */
     line-height: 1.2;
 }
 

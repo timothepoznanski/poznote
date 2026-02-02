@@ -238,6 +238,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Save Note
   document.getElementById('saveNote').addEventListener('click', async () => {
+    await saveToNote('url');
+  });
+
+  // Save Screenshot
+  document.getElementById('saveScreenshot').addEventListener('click', async () => {
+    await saveToNote('screenshot');
+  });
+
+  async function saveToNote(contentType) {
     const selectedFolder = folderSelect.value;
 
     let rawUrl = document.getElementById('appUrl').value.trim().replace(/\/+$/, '');
@@ -275,13 +284,31 @@ document.addEventListener('DOMContentLoaded', () => {
       const tempConfig = { appUrl: rawUrl, username, password, userId };
       const pageTitle = tab.title || 'Untitled Page';
       const pageUrl = tab.url;
-      const noteContent = `<a href="${pageUrl}" target="_blank">${pageUrl}</a>`;
+      
+      let noteContent = '';
+      let contentDescription = '';
+      
+      if (contentType === 'url') {
+        noteContent = `<a href="${pageUrl}" target="_blank">${pageUrl}</a>`;
+        contentDescription = 'URL';
+      } else if (contentType === 'screenshot') {
+        status.textContent = '📸 Capturing screenshot...';
+        try {
+          const screenshot = await chrome.tabs.captureVisibleTab(null, { format: 'png' });
+          noteContent = `<p><a href="${pageUrl}" target="_blank">${pageUrl}</a></p><br><p><img src="${screenshot}" alt="Page Screenshot" style="max-width: 100%; height: auto;" /></p>`;
+          contentDescription = 'Screenshot';
+        } catch (error) {
+          status.textContent = '❌ Screenshot failed: ' + error.message;
+          status.style.color = 'red';
+          return;
+        }
+      }
 
       const selectedOption = folderSelect.options[folderSelect.selectedIndex];
-      const selectedFolderName = selectedOption.dataset.path || selectedOption.text.replace(/^📁 /, '');
+      const selectedFolderName = selectedFolder ? (selectedOption.dataset.path || selectedOption.text.replace(/^📁 /, '')) : '';
 
       const noteData = {
-        heading: `${pageTitle}`,
+        heading: `${pageTitle}${contentDescription ? ' - ' + contentDescription : ''}`,
         content: noteContent,
         tags: '',
         folder_name: selectedFolderName,
@@ -289,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
         workspace: workspaceSelect.value || config.workspace || 'Poznote'
       };
 
-      status.textContent = 'Creating note...';
+      status.textContent = `Creating note with ${contentDescription}...`;
       const response = await chrome.runtime.sendMessage({ type: 'createNote', config: tempConfig, noteData });
 
       if (response.error) {
@@ -304,5 +331,5 @@ document.addEventListener('DOMContentLoaded', () => {
       status.style.color = 'red';
       console.error(error);
     }
-  });
+  }
 });
