@@ -264,6 +264,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
             </div>
             <?php endif; ?>
 
+            <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
             <!-- API Documentation -->
             <div class="home-card" id="api-docs-card">
                 <div class="home-card-icon">
@@ -273,6 +274,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                     <span class="home-card-title"><?php echo t_h('settings.cards.api_docs', [], 'API Documentation'); ?></span>
                 </div>
             </div>
+            <?php endif; ?>
 
             <!-- Github repository -->
             <div class="home-card" id="github-card">

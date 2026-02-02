@@ -444,6 +444,17 @@ class PoznoteClient:
         response.raise_for_status()
         return response.json()
 
+    def restore_backup(self, filename: str, user_id: str | int | None = None) -> dict:
+        """Restore a backup file
+        
+        Args:
+            filename: Name of the backup file to restore
+            user_id: User profile ID to access (optional, overrides default)
+        """
+        response = self.client.post(f"/backups/{filename}/restore", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        return response.json()
+
     def get_setting(self, key: str, user_id: str | int | None = None) -> dict:
         """Get a specific application setting"""
         response = self.client.get(f"/settings/{key}", headers=self._headers_for_user(user_id))

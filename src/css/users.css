@@ -97,6 +97,10 @@ body.dark-mode {
     box-shadow: none;
 }
 
+.btn i {
+    font-weight: 300 !important;
+}
+
 .btn-primary {
     background: #007cba;
     color: white !important;
@@ -324,6 +328,7 @@ html[data-theme='dark'] .users-table td {
     width: 90%;
     max-height: 90vh;
     overflow-y: auto;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 .modal-title {

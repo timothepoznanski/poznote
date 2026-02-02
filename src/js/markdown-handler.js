@@ -2058,22 +2058,24 @@ function setupPreviewInteractivity(noteId) {
         lineElements.forEach(function (element) {
             // Skip checkboxes (they have their own handler)
             if (element.classList.contains('markdown-task-checkbox')) return;
+            
+            // Skip details and summary elements (they have native toggle functionality)
+            if (element.tagName === 'DETAILS' || element.tagName === 'SUMMARY') return;
 
             // Remove any existing listener
             element.removeEventListener('click', element._navigateClickHandler);
 
             // Add click handler for navigation
             element._navigateClickHandler = function (e) {
-                // Don't navigate if clicking a link or checkbox
+                // Don't navigate if clicking a link, checkbox, or toggle elements
                 if (e.target.tagName === 'A' || e.target.tagName === 'INPUT') return;
+                if (e.target.closest('summary, details')) return;
 
                 var lineNumber = parseInt(element.getAttribute('data-line'));
                 navigateToEditorLine(lineNumber, noteEntry);
             };
 
             element.addEventListener('click', element._navigateClickHandler);
-
-            // Add a visual hint that the element is clickable
             element.style.cursor = 'pointer';
         });
     }

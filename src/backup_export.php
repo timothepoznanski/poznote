@@ -55,7 +55,9 @@ function generateSQLDump() {
 
 function generateSQLDumpForConnection($con) {
     $sql = "-- " . t('backup_export.dump.title') . "\n";
-    $sql .= "-- " . t('backup_export.dump.generated_on', ['date' => date('Y-m-d H:i:s')]) . "\n\n";
+    $userTimezone = getUserTimezone();
+    $dt = new DateTime('now', new DateTimeZone($userTimezone));
+    $sql .= "-- " . t('backup_export.dump.generated_on', ['date' => $dt->format('Y-m-d H:i:s')]) . "\n\n";
     
     // Get all table names
     $tables = $con->query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
@@ -110,7 +112,9 @@ function createCompleteBackup($userId = null) {
     $username = $userProfile ? $userProfile['username'] : 'user';
     
     $tempDir = sys_get_temp_dir();
-    $zipFileName = $tempDir . '/poznote_backup_' . $username . '_' . date('Y-m-d_H-i-s') . '.zip';
+    $userTimezone = getUserTimezone();
+    $dt = new DateTime('now', new DateTimeZone($userTimezone));
+    $zipFileName = $tempDir . '/poznote_backup_' . $username . '_' . $dt->format('Y-m-d_H-i-s') . '.zip';
     
     $zip = new ZipArchive();
     if ($zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
@@ -308,8 +312,10 @@ function createCompleteBackup($userId = null) {
             // Cookie will be session cookie and valid for path '/'
             setcookie('poznote_download_token', $_POST['download_token'], 0, '/');
         }
+        $userTimezone = getUserTimezone();
+        $dt = new DateTime('now', new DateTimeZone($userTimezone));
         header('Content-Type: application/zip');
-        header('Content-Disposition: attachment; filename="poznote_backup_' . $username . '_' . date('Y-m-d_H-i-s') . '.zip"');
+        header('Content-Disposition: attachment; filename="poznote_backup_' . $username . '_' . $dt->format('Y-m-d_H-i-s') . '.zip"');
         header('Content-Length: ' . filesize($zipFileName));
         header('Cache-Control: no-cache, must-revalidate');
         header('Expires: 0');

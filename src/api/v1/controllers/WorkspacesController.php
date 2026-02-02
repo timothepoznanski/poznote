@@ -270,25 +270,6 @@ class WorkspacesController {
                 }
             }
             
-            // Audit log: record delete attempts
-            try {
-                $logDir = __DIR__ . '/../../../../data';
-                if (!is_dir($logDir)) @mkdir($logDir, 0755, true);
-                $logFile = $logDir . '/workspace_actions.log';
-                // Determine actor for log: prefer session auth, else basic auth username if present
-                $who = 'unknown';
-                if (session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['authenticated'])) {
-                    $who = 'session_user';
-                } elseif (!empty($_SERVER['PHP_AUTH_USER'])) {
-                    $who = $_SERVER['PHP_AUTH_USER'];
-                }
-                $ip = $_SERVER['REMOTE_ADDR'] ?? 'cli';
-                $entry = date('c') . "\tapi/v1/workspaces\tDELETE\t$name\tby:$who\tfrom:$ip\n";
-                @file_put_contents($logFile, $entry, FILE_APPEND | LOCK_EX);
-            } catch (Exception $e) {
-                // ignore logging errors
-            }
-            
             $stmt = $this->con->prepare("DELETE FROM workspaces WHERE name = ?");
             if ($stmt->execute([$name])) {
                 echo json_encode(['success' => true]);

@@ -524,7 +524,12 @@
         }
 
         // If the click is on an interactive element, ignore
-        if (e.target.closest('button, a, input, textarea, select, [contenteditable="true"], .search-replace-bar, .mobile-toolbar-menu, .note-edit-toolbar, .note-tags-row')) {
+        if (e.target.closest('button, a, input, textarea, select, [contenteditable="true"], .search-replace-bar, .mobile-toolbar-menu, .note-edit-toolbar, .note-tags-row, summary, details')) {
+            return;
+        }
+        
+        // Also ignore if clicking on a toggle block (details/summary elements)
+        if (e.target.tagName === 'SUMMARY' || e.target.tagName === 'DETAILS' || e.target.closest('.toggle-block')) {
             return;
         }
 

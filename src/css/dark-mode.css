@@ -2151,8 +2151,8 @@ body.dark-mode .markdown-preview .markdown-task-checkbox {
 }
 
 /* Click-to-navigate hover effect in split mode - dark mode */
-html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview [data-line]:not(.markdown-task-checkbox):hover,
-body.dark-mode .noteentry.markdown-split-mode .markdown-preview [data-line]:not(.markdown-task-checkbox):hover {
+html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview [data-line]:not(.markdown-task-checkbox):not(summary):not(details):hover,
+body.dark-mode .noteentry.markdown-split-mode .markdown-preview [data-line]:not(.markdown-task-checkbox):not(summary):not(details):hover {
     background-color: rgba(74, 158, 255, 0.1);
 }
 

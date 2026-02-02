@@ -289,7 +289,9 @@ class UserDataManager {
                 mkdir($backupsPath, 0755, true);
             }
             
-            $backupName = 'backup_' . date('Y-m-d_H-i-s') . '.zip';
+            $userTimezone = getUserTimezone();
+            $dt = new DateTime('now', new DateTimeZone($userTimezone));
+            $backupName = 'backup_' . $dt->format('Y-m-d_H-i-s') . '.zip';
             $backupPath = $backupsPath . '/' . $backupName;
             
             $zip = new ZipArchive();
