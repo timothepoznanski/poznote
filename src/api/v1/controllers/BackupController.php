@@ -44,7 +44,9 @@ class BackupController {
                     $fileSize = filesize($filePath);
                     $timestamp = $matches[1];
                     
-                    $dateTime = DateTime::createFromFormat('Y-m-d_H-i-s', $timestamp);
+                    // Parse the timestamp in the user's timezone (since backups are created with user's timezone)
+                    $userTimezone = getUserTimezone();
+                    $dateTime = DateTime::createFromFormat('Y-m-d_H-i-s', $timestamp, new DateTimeZone($userTimezone));
                     $isoDate = $dateTime ? $dateTime->format('c') : null;
                     
                     $backups[] = [
@@ -82,7 +84,10 @@ class BackupController {
             }
         }
         
-        $timestamp = date('Y-m-d_H-i-s');
+        // Use user's timezone for backup filename
+        $userTimezone = getUserTimezone();
+        $dt = new DateTime('now', new DateTimeZone($userTimezone));
+        $timestamp = $dt->format('Y-m-d_H-i-s');
         $zipFileName = 'poznote_backup_' . $timestamp . '.zip';
         $zipFilePath = $this->backupsDir . '/' . $zipFileName;
         
