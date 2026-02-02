@@ -100,7 +100,7 @@ try {
                 <title>Password Protected</title>
                 <style>
                     body {
-                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                        font-family: 'Inter', sans-serif;
                         display: flex;
                         align-items: center;
                         justify-content: center;
