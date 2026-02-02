@@ -1,6 +1,20 @@
+# Poznote Docker Compose Configuration
+# 
+# IMPORTANT: When updating Poznote, always update these files:
+# 
+# 1. docker-compose.yml:
+#    curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
+#
+# 2. .env.template (compare with your .env):
+#    curl -o .env.template https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.template
+#    sdiff .env .env.template  # Add any new variables to your .env
+#
+# The :4 tag automatically gets new 4.x.x versions, but new environment variables
+# or configuration options require updating these files manually.
+
 services:
   webserver:
-    image: ghcr.io/timothepoznanski/poznote:latest
+    image: ghcr.io/timothepoznanski/poznote:4
     restart: always
     environment:
       SQLITE_DATABASE: /var/www/html/data/database/poznote.db
@@ -36,7 +50,7 @@ services:
       - "./data:/var/www/html/data"
 
   mcp-server:
-    image: ghcr.io/timothepoznanski/poznote-mcp:latest
+    image: ghcr.io/timothepoznanski/poznote-mcp:4
     container_name: poznote-mcp
     restart: unless-stopped
     environment:

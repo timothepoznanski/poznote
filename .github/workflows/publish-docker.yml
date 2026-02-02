@@ -241,12 +241,29 @@ jobs:
           VERSION="${{ steps.check_version.outputs.version_clean }}"
           TAGS="ghcr.io/${{ github.repository_owner }}/poznote:$VERSION"
           
-          # Only add 'latest' tag for stable versions (not test or beta versions)
+          # Only add semantic version tags and 'latest' for stable versions (not test or beta versions)
           if [[ "$VERSION" != *"-test"* ]] && [[ "$VERSION" != *"-beta"* ]]; then
+            # Extract major, minor, and patch version numbers
+            if [[ "$VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+              MAJOR="${BASH_REMATCH[1]}"
+              MINOR="${BASH_REMATCH[2]}"
+              PATCH="${BASH_REMATCH[3]}"
+              
+              # Add major version tag (e.g., poznote:4)
+              TAGS="$TAGS"$'\n'"ghcr.io/${{ github.repository_owner }}/poznote:$MAJOR"
+              
+              # Add major.minor version tag (e.g., poznote:4.1)
+              TAGS="$TAGS"$'\n'"ghcr.io/${{ github.repository_owner }}/poznote:$MAJOR.$MINOR"
+              
+              echo "📦 Stable version detected - will tag as: $VERSION, $MAJOR, $MAJOR.$MINOR, latest"
+            else
+              echo "⚠️  Version doesn't match semver pattern, skipping major/minor tags"
+            fi
+            
+            # Add latest tag
             TAGS="$TAGS"$'\n'"ghcr.io/${{ github.repository_owner }}/poznote:latest"
-            echo "📦 Stable version detected - will tag as 'latest'"
           else
-            echo "🧪 Pre-release version detected (test/beta) - will NOT tag as 'latest'"
+            echo "🧪 Pre-release version detected (test/beta) - will NOT tag as 'latest' or major/minor versions"
           fi
           
           echo "tags<<EOF" >> $GITHUB_OUTPUT
@@ -260,10 +277,29 @@ jobs:
           VERSION="${{ steps.check_version.outputs.version_clean }}"
           TAGS="ghcr.io/${{ github.repository_owner }}/poznote-mcp:$VERSION"
           
-          # Only add 'latest' tag for stable versions
+          # Only add semantic version tags and 'latest' for stable versions
           if [[ "$VERSION" != *"-test"* ]] && [[ "$VERSION" != *"-beta"* ]]; then
+            # Extract major, minor, and patch version numbers
+            if [[ "$VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+              MAJOR="${BASH_REMATCH[1]}"
+              MINOR="${BASH_REMATCH[2]}"
+              PATCH="${BASH_REMATCH[3]}"
+              
+              # Add major version tag (e.g., poznote-mcp:4)
+              TAGS="$TAGS"$'\n'"ghcr.io/${{ github.repository_owner }}/poznote-mcp:$MAJOR"
+              
+              # Add major.minor version tag (e.g., poznote-mcp:4.1)
+              TAGS="$TAGS"$'\n'"ghcr.io/${{ github.repository_owner }}/poznote-mcp:$MAJOR.$MINOR"
+              
+              echo "📦 Stable version detected - will tag MCP as: $VERSION, $MAJOR, $MAJOR.$MINOR, latest"
+            else
+              echo "⚠️  Version doesn't match semver pattern, skipping major/minor tags"
+            fi
+            
+            # Add latest tag
             TAGS="$TAGS"$'\n'"ghcr.io/${{ github.repository_owner }}/poznote-mcp:latest"
-            echo "Stable version detected - will tag MCP as 'latest'"
+          else
+            echo "🧪 Pre-release version detected (test/beta) - will NOT tag MCP with major/minor or 'latest'"
           fi
           
           echo "tags<<EOF" >> $GITHUB_OUTPUT
