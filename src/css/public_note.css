@@ -27,7 +27,8 @@ body {
 
 .public-note .content {
     /* container for note HTML */
-    line-height: 1.6;
+    line-height: 1.2;
+    white-space: normal;
 }
 
 .public-note img {
@@ -137,9 +138,10 @@ table th {
     padding: 12px;
     border-radius: 4px;
     overflow-x: auto;
-    margin: 1em 0;
+    margin: 0.5em 0;
     position: relative;
     border: 1px solid #e0e0e0;
+    white-space: pre;
 }
 
 /* Extra padding for code blocks with language badge */
@@ -154,7 +156,7 @@ table th {
     border-radius: 0;
     border: none;
     display: block;
-    line-height: 1.5;
+    line-height: 1.4;
 }
 
 /* Copy button for code blocks */
@@ -402,8 +404,8 @@ table th {
 
 /* Paragraphs */
 .public-note .content p {
-    margin: 0 0 1em 0;
-    line-height: 1.6;
+    margin: 0;
+    line-height: 1.2;
 }
 
 /* Theme toggle button */

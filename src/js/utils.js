@@ -616,6 +616,11 @@ function checkForUpdates() {
 
 // Check for updates automatically (silent, once per day)
 function checkForUpdatesAutomatic() {
+    // Only check for updates if user is admin
+    if (!window.isAdmin) {
+        return;
+    }
+
     const now = Date.now();
     const lastCheck = localStorage.getItem('poznote_last_update_check');
     const lastCheckTime = lastCheck ? parseInt(lastCheck) : 0;
@@ -858,6 +863,10 @@ function hideUpdateBadge() {
 }
 
 function showUpdateBadge() {
+    // Only show badge for admin users
+    if (!window.isAdmin) {
+        return;
+    }
     var badges = document.querySelectorAll('.update-badge');
     for (var i = 0; i < badges.length; i++) {
         badges[i].classList.remove('update-badge-hidden');
@@ -866,6 +875,10 @@ function showUpdateBadge() {
 }
 
 function restoreUpdateBadge() {
+    // Only restore badge for admin users
+    if (!window.isAdmin) {
+        return;
+    }
     const updateAvailable = localStorage.getItem('poznote_update_available');
     if (updateAvailable === 'true') {
         showUpdateBadge();

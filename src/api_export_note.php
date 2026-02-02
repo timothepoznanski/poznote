@@ -709,7 +709,7 @@ function generateStyledHtml($content, $title, $noteType, $tags) {
         
         body {
             font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            line-height: 1.6;
+            line-height: 1.2;
             color: #333;
             background: white;
             padding: 40px;
@@ -748,7 +748,7 @@ function generateStyledHtml($content, $title, $noteType, $tags) {
         
         .note-content {
             font-size: 16px;
-            line-height: 1.8;
+            line-height: 1.2;
         }
         
         /* Code blocks */
