@@ -501,9 +501,6 @@ try {
       data-clear-workspace="<?php echo htmlspecialchars(json_encode($workspaces[0] ?? ''), ENT_QUOTES, 'UTF-8'); ?>"
       <?php endif; ?>>
     <div class="settings-container">
-        <h1><?php echo t_h('settings.cards.workspaces', [], 'Workspaces', $currentLang); ?></h1>
-        <p><?php echo t_h('workspaces.description', [], 'Workspaces allow you to organize your notes into separate environments within a single Poznote instance - like having different notebooks for work, personal life, or projects.', $currentLang); ?></p>
-
         <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
             <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
                 <?php echo t_h('common.back_to_notes', [], 'Back to Notes', $currentLang); ?>
@@ -514,7 +511,7 @@ try {
             </a>
         </div>
 
-        <br><br>
+        <br>
 
         <!-- Top alert area: used for both server-side and client-side messages -->
         <div id="topAlert" class="<?php echo ($message || $error) ? '' : 'initially-hidden'; ?> alert-with-margin <?php echo $message ? 'alert alert-success' : ($error ? 'alert alert-danger' : ''); ?>">
