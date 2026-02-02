@@ -1,15 +1,16 @@
 {
   "manifest_version": 3,
   "name": "Poznote URL Saver",
-  "version": "1.1",
-  "description": "Saves the current page URL to Poznote.",
+  "version": "1.2",
+  "description": "Saves the current page URL or screenshot to Poznote.",
   "permissions": [
     "storage",
     "tabs",
     "activeTab"
   ],
   "host_permissions": [
-    "*://*/api/v1/*"
+    "*://*/api/v1/*",
+    "<all_urls>"
   ],
   "background": {
     "service_worker": "background.js"
