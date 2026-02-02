@@ -208,19 +208,6 @@ if ($_POST) {
                 $stmt = $con->prepare('DELETE FROM workspaces WHERE name = ?');
                 $stmt->execute([$name]);
 
-                // Audit log for manual deletion from manage_workspaces
-                try {
-                    $logDir = dirname(getEntriesPath());
-                    if (!is_dir($logDir)) @mkdir($logDir, 0755, true);
-                    $logFile = $logDir . '/workspace_actions.log';
-                    $who = (session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['user_id'])) ? $_SESSION['user_id'] : ($_SERVER['PHP_AUTH_USER'] ?? 'unknown');
-                    $ip = $_SERVER['REMOTE_ADDR'] ?? 'cli';
-                    $entry = date('c') . "\tworkspaces.php\tDELETE\t$name\tby:$who\tfrom:$ip\n";
-                    @file_put_contents($logFile, $entry, FILE_APPEND | LOCK_EX);
-                } catch (Exception $e) {
-                    // ignore logging errors
-                }
-
                 $message = t('workspaces.messages.deleted_all', [], 'Workspace deleted and all associated notes, folders and attachments removed', $currentLang);
                 // If this was an AJAX delete, return JSON response immediately
                 if (!empty($isAjax)) {
