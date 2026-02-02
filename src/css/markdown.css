@@ -253,11 +253,11 @@
 }
 
 /* Click-to-navigate hint in split mode */
-.noteentry.markdown-split-mode .markdown-preview [data-line]:not(.markdown-task-checkbox) {
+.noteentry.markdown-split-mode .markdown-preview [data-line]:not(.markdown-task-checkbox):not(summary):not(details) {
     transition: background-color 0.15s ease;
 }
 
-.noteentry.markdown-split-mode .markdown-preview [data-line]:not(.markdown-task-checkbox):hover {
+.noteentry.markdown-split-mode .markdown-preview [data-line]:not(.markdown-task-checkbox):not(summary):not(details):hover {
     background-color: rgba(0, 125, 184, 0.05);
     border-radius: 3px;
 }
