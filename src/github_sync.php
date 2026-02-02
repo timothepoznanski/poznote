@@ -127,6 +127,9 @@ try {
     <link rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode.css?v=<?php echo $cache_v; ?>">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <style>
+        .home-page { background: transparent; }
+    </style>
 </head>
 <body class="home-page">
     <div class="home-container github-sync-container">
