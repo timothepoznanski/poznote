@@ -597,6 +597,16 @@
         initializeMarkdownNotes();
         trackAndProcessNotes();
         checkForDrafts();
+        
+        // Close all toggle blocks on page load (toggles should always start closed)
+        try {
+            const toggleBlocks = document.querySelectorAll('details.toggle-block');
+            toggleBlocks.forEach(function(toggle) {
+                toggle.removeAttribute('open');
+            });
+        } catch (e) {
+            console.error('Error closing toggle blocks:', e);
+        }
     });
 
     // ============================================================
