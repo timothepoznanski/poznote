@@ -69,39 +69,21 @@ function updateFontSizePreview() {
 
 // Function to load current font size settings
 function loadCurrentFontSizes() {
-    // Load note font size
-    fetch('/api/v1/settings/note_font_size', {
-        method: 'GET',
-        credentials: 'same-origin'
-    })
-        .then(response => response.ok ? response.json() : null)
-        .then(data => {
-            if (data && data.success) {
-                const fontSizeInput = document.getElementById('fontSizeInput');
-                if (fontSizeInput) {
-                    fontSizeInput.value = data.value || '15';
-                    updateFontSizePreview();
-                }
-            }
-        })
-        .catch(() => { });
+    // Load note font size from localStorage
+    const noteFontSize = localStorage.getItem('note_font_size') || '15';
+    const fontSizeInput = document.getElementById('fontSizeInput');
+    if (fontSizeInput) {
+        fontSizeInput.value = noteFontSize;
+        updateFontSizePreview();
+    }
 
-    // Load sidebar font size
-    fetch('/api/v1/settings/sidebar_font_size', {
-        method: 'GET',
-        credentials: 'same-origin'
-    })
-        .then(response => response.ok ? response.json() : null)
-        .then(data => {
-            if (data && data.success) {
-                const sidebarFontSizeInput = document.getElementById('sidebarFontSizeInput');
-                if (sidebarFontSizeInput) {
-                    sidebarFontSizeInput.value = data.value || '13';
-                    updateFontSizePreview();
-                }
-            }
-        })
-        .catch(() => { });
+    // Load sidebar font size from localStorage
+    const sidebarFontSize = localStorage.getItem('sidebar_font_size') || '13';
+    const sidebarFontSizeInput = document.getElementById('sidebarFontSizeInput');
+    if (sidebarFontSizeInput) {
+        sidebarFontSizeInput.value = sidebarFontSize;
+        updateFontSizePreview();
+    }
 }
 
 // Function to save font size settings
@@ -122,78 +104,42 @@ function saveFontSize() {
         return;
     }
 
-    const promises = [
-        fetch('/api/v1/settings/note_font_size', {
-            method: 'PUT',
-            credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ value: fontSize })
-        }),
-        fetch('/api/v1/settings/sidebar_font_size', {
-            method: 'PUT',
-            credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ value: sidebarFontSize })
-        })
-    ];
+    try {
+        // Save to localStorage instead of database
+        localStorage.setItem('note_font_size', fontSize);
+        localStorage.setItem('sidebar_font_size', sidebarFontSize);
 
-    Promise.all(promises)
-        .then(responses => {
-            if (responses.every(r => r.ok)) {
-                closeFontSizeModal();
+        closeFontSizeModal();
 
-                // Apply changes immediately to the UI
-                const noteSize = fontSize + 'px';
-                const sidebarSize = sidebarFontSize + 'px';
+        // Apply changes immediately to the UI
+        const noteSize = fontSize + 'px';
+        const sidebarSize = sidebarFontSize + 'px';
 
-                document.documentElement.style.setProperty('--note-font-size', noteSize);
-                document.documentElement.style.setProperty('--sidebar-font-size', sidebarSize);
+        document.documentElement.style.setProperty('--note-font-size', noteSize);
+        document.documentElement.style.setProperty('--sidebar-font-size', sidebarSize);
 
-                // Direct application as fallback for existing elements
-                document.querySelectorAll('.noteentry').forEach(el => el.style.fontSize = noteSize);
-                document.querySelectorAll('.links_arbo_left .note-title, .folder-name').forEach(el => el.style.fontSize = sidebarSize);
+        // Direct application as fallback for existing elements
+        document.querySelectorAll('.noteentry').forEach(el => el.style.fontSize = noteSize);
+        document.querySelectorAll('.links_arbo_left .note-title, .folder-name').forEach(el => el.style.fontSize = sidebarSize);
 
-                if (typeof window.refreshFontSizeBadge === 'function') {
-                    window.refreshFontSizeBadge();
-                }
-            } else {
-                throw new Error('Some requests failed');
-            }
-        })
-        .catch(error => {
-            safeShowNotification('Error saving font size settings', 'error');
-        });
+        if (typeof window.refreshFontSizeBadge === 'function') {
+            window.refreshFontSizeBadge();
+        }
+    } catch (error) {
+        safeShowNotification('Error saving font size settings', 'error');
+    }
 }
 
 // Function to apply font size to all note editors and note list
-// Function to apply font size to all note editors and note list
 function applyFontSizeToNotes() {
     // Note: The font sizes are now handled via CSS variables on :root
-    // Loading from API on demand to ensure UI is in sync if needed (e.g. on page load)
+    // Loading from localStorage to ensure UI is in sync (e.g. on page load)
 
-    fetch('/api/v1/settings/note_font_size', {
-        method: 'GET',
-        credentials: 'same-origin'
-    })
-        .then(response => response.ok ? response.json() : null)
-        .then(data => {
-            if (data && data.success && data.value) {
-                document.documentElement.style.setProperty('--note-font-size', data.value + 'px');
-            }
-        })
-        .catch(() => { });
+    const noteFontSize = localStorage.getItem('note_font_size') || '15';
+    document.documentElement.style.setProperty('--note-font-size', noteFontSize + 'px');
 
-    fetch('/api/v1/settings/sidebar_font_size', {
-        method: 'GET',
-        credentials: 'same-origin'
-    })
-        .then(response => response.ok ? response.json() : null)
-        .then(data => {
-            if (data && data.success && data.value) {
-                document.documentElement.style.setProperty('--sidebar-font-size', data.value + 'px');
-            }
-        })
-        .catch(() => { });
+    const sidebarFontSize = localStorage.getItem('sidebar_font_size') || '13';
+    document.documentElement.style.setProperty('--sidebar-font-size', sidebarFontSize + 'px');
 }
 
 // Function to apply font size on page load
