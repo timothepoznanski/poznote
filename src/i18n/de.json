@@ -869,6 +869,7 @@
         "folder_actions": {
             "menu": "Aktionen",
             "create": "Erstellen",
+            "kanban_view": "Kanban-Ansicht",
             "move_all_files": "Dateien verschieben",
             "rename_folder": "Ordner umbenennen",
             "delete_folder": "Ordner löschen",

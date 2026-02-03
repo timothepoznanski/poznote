@@ -887,6 +887,7 @@
         "folder_actions": {
             "menu": "Actions",
             "create": "Créer",
+            "kanban_view": "Vue Kanban",
             "move_all_files": "Déplacer les fichiers",
             "move_folder": "Déplacer le dossier",
             "rename_folder": "Renommer le dossier",

@@ -868,6 +868,7 @@
         "folder_actions": {
             "menu": "Ações",
             "create": "Criar",
+            "kanban_view": "Visualização Kanban",
             "move_all_files": "Mover os arquivos",
             "rename_folder": "Renomear pasta",
             "delete_folder": "Excluir pasta",

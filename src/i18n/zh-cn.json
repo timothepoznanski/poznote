@@ -866,6 +866,7 @@
         "folder_actions": {
             "menu": "操作",
             "create": "创建",
+            "kanban_view": "看板视图",
             "move_all_files": "移动文件",
             "move_folder": "移动文件夹",
             "rename_folder": "重命名文件夹",

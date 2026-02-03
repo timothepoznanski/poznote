@@ -353,6 +353,11 @@
 
                 var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
                 var folderName = actionElement.getAttribute('data-folder-name');
+                
+                // Close folder actions menu if opened from there
+                if (typeof window.closeFolderActionsMenu === 'function') {
+                    window.closeFolderActionsMenu(folderId);
+                }
 
                 if (folderId && typeof window.openKanbanView === 'function') {
                     window.openKanbanView(folderId, folderName);

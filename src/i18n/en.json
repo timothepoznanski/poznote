@@ -417,6 +417,7 @@
         "folder_actions": {
             "menu": "Actions",
             "create": "Create",
+            "kanban_view": "Kanban view",
             "move_all_files": "Move all files",
             "rename_folder": "Rename folder",
             "delete_folder": "Delete folder",
