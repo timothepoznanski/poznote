@@ -554,11 +554,27 @@ function toggleImportant(taskId, noteId) {
     // Toggle flag
     tasks[taskIndex].important = !tasks[taskIndex].important;
 
-    // Reorder: important tasks first (keep relative order otherwise)
-    tasks.sort((a, b) => {
-        if ((a.important ? 1 : 0) === (b.important ? 1 : 0)) return 0;
-        return (b.important ? 1 : 0) - (a.important ? 1 : 0);
-    });
+    // Reorder tasks to maintain grouping:
+    // - important incomplete tasks first
+    // - other incomplete tasks next
+    // - completed tasks last (regardless of importance)
+    const importantIncomplete = [];
+    const normalIncomplete = [];
+    const completedArr = [];
+
+    for (let i = 0; i < tasks.length; i++) {
+        const t = tasks[i];
+        if (t.completed) {
+            completedArr.push(t);
+        } else if (t.important) {
+            importantIncomplete.push(t);
+        } else {
+            normalIncomplete.push(t);
+        }
+    }
+
+    // Reassemble tasks ensuring completed tasks stay at the end
+    tasks = [].concat(importantIncomplete, normalIncomplete, completedArr);
 
     noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
 

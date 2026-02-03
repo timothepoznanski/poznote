@@ -1387,6 +1387,16 @@ function reinitializeNoteContent() {
     // Translate callout titles to the current language
     translateCalloutTitles();
     
+    // Close all toggle blocks on page load (toggles should always start closed)
+    try {
+        const toggleBlocks = document.querySelectorAll('details.toggle-block');
+        toggleBlocks.forEach(function(toggle) {
+            toggle.removeAttribute('open');
+        });
+    } catch (e) {
+        console.error('Error closing toggle blocks:', e);
+    }
+    
     // On mobile, ensure the right column is properly displayed only when a specific note is selected
     if (isMobileDevice()) {
         const urlParams = new URLSearchParams(window.location.search);

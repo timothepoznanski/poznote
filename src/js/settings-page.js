@@ -149,25 +149,21 @@
     }
 
     function refreshFontSizeBadge() {
-        // Refresh note font size badge
-        getSetting('note_font_size', function (value) {
-            var badge = document.getElementById('font-size-badge');
-            if (badge) {
-                var size = value || '15';
-                badge.textContent = tr('display.badges.note_font_size', { size: size }, 'Note: ' + size + 'px');
-                badge.className = 'setting-status enabled';
-            }
-        });
+        // Refresh note font size badge (from localStorage)
+        var badge = document.getElementById('font-size-badge');
+        if (badge) {
+            var size = localStorage.getItem('note_font_size') || '15';
+            badge.textContent = tr('display.badges.note_font_size', { size: size }, 'Note: ' + size + 'px');
+            badge.className = 'setting-status enabled';
+        }
 
-        // Refresh sidebar font size badge
-        getSetting('sidebar_font_size', function (value) {
-            var badge = document.getElementById('sidebar-font-size-badge');
-            if (badge) {
-                var size = value || '13';
-                badge.textContent = tr('display.badges.sidebar_font_size', { size: size }, 'Sidebar: ' + size + 'px');
-                badge.className = 'setting-status enabled';
-            }
-        });
+        // Refresh sidebar font size badge (from localStorage)
+        var sidebarBadge = document.getElementById('sidebar-font-size-badge');
+        if (sidebarBadge) {
+            var sidebarSize = localStorage.getItem('sidebar_font_size') || '13';
+            sidebarBadge.textContent = tr('display.badges.sidebar_font_size', { size: sidebarSize }, 'Sidebar: ' + sidebarSize + 'px');
+            sidebarBadge.className = 'setting-status enabled';
+        }
     }
 
     function refreshNoteWidthBadge() {

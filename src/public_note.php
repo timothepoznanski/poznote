@@ -360,6 +360,7 @@ if (!empty($row['theme']) && in_array($row['theme'], ['dark', 'light'])) {
     <script src="js/katex/katex.min.js?v=<?php echo filemtime(__DIR__ . '/js/katex/katex.min.js'); ?>"></script>
     <script src="js/katex/auto-render.min.js?v=<?php echo filemtime(__DIR__ . '/js/katex/auto-render.min.js'); ?>"></script>
     <script src="js/highlight/highlight.min.js?v=<?php echo file_exists(__DIR__ . '/js/highlight/highlight.min.js') ? filemtime(__DIR__ . '/js/highlight/highlight.min.js') : '1'; ?>"></script>
+    <script src="js/highlight/powershell.min.js?v=<?php echo file_exists(__DIR__ . '/js/highlight/powershell.min.js') ? filemtime(__DIR__ . '/js/highlight/powershell.min.js') : '1'; ?>"></script>
     <script src="js/syntax-highlight.js?v=<?php echo file_exists(__DIR__ . '/js/syntax-highlight.js') ? filemtime(__DIR__ . '/js/syntax-highlight.js') : '1'; ?>"></script>
 </head>
 <body>
