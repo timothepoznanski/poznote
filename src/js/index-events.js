@@ -113,24 +113,61 @@
 
             // Text formatting commands
             case 'exec-bold':
-                document.execCommand('bold');
+                if (typeof isInMarkdownEditor === 'function' && isInMarkdownEditor()) {
+                    if (typeof applyMarkdownBold === 'function') {
+                        applyMarkdownBold();
+                    }
+                } else {
+                    document.execCommand('bold');
+                }
                 break;
             case 'exec-italic':
-                document.execCommand('italic');
+                if (typeof isInMarkdownEditor === 'function' && isInMarkdownEditor()) {
+                    if (typeof applyMarkdownItalic === 'function') {
+                        applyMarkdownItalic();
+                    }
+                } else {
+                    document.execCommand('italic');
+                }
                 break;
             case 'exec-underline':
-                document.execCommand('underline');
+                // Underline not supported in standard markdown
+                if (typeof isInMarkdownEditor === 'function' && isInMarkdownEditor()) {
+                    // Skip or use HTML fallback
+                    document.execCommand('underline');
+                } else {
+                    document.execCommand('underline');
+                }
                 break;
             case 'exec-strikethrough':
-                document.execCommand('strikeThrough');
+                if (typeof isInMarkdownEditor === 'function' && isInMarkdownEditor()) {
+                    if (typeof applyMarkdownStrikethrough === 'function') {
+                        applyMarkdownStrikethrough();
+                    }
+                } else {
+                    document.execCommand('strikeThrough');
+                }
                 break;
             case 'exec-unordered-list':
-                document.execCommand('insertUnorderedList');
+                if (typeof isInMarkdownEditor === 'function' && isInMarkdownEditor()) {
+                    if (typeof toggleMarkdownList === 'function') {
+                        toggleMarkdownList('ul');
+                    }
+                } else {
+                    document.execCommand('insertUnorderedList');
+                }
                 break;
             case 'exec-ordered-list':
-                document.execCommand('insertOrderedList');
+                if (typeof isInMarkdownEditor === 'function' && isInMarkdownEditor()) {
+                    if (typeof toggleMarkdownList === 'function') {
+                        toggleMarkdownList('ol');
+                    }
+                } else {
+                    document.execCommand('insertOrderedList');
+                }
                 break;
             case 'exec-remove-format':
+                // For markdown, this doesn't make much sense, but we keep it
                 document.execCommand('removeFormat');
                 break;
 

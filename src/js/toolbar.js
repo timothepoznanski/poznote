@@ -66,6 +66,23 @@
 
   // Apply color (or remove it) to the saved selection
   function applyColorToSelection(color) {
+    // Check if we're in markdown mode
+    if (typeof isInMarkdownEditor === 'function' && isInMarkdownEditor()) {
+      // For markdown, use HTML inline styles
+      if (typeof applyMarkdownColor === 'function') {
+        // Restore selection first
+        restoreSelection();
+        if (color === 'none') {
+          // Try to remove color - this is tricky, just apply inherit
+          applyMarkdownColor('inherit');
+        } else {
+          applyMarkdownColor(color);
+        }
+      }
+      return;
+    }
+
+    // HTML mode - original logic
     // restore selection first
     restoreSelection();
 
@@ -233,6 +250,15 @@
 
 })();
 function toggleYellowHighlight() {
+  // Check if we're in markdown mode
+  if (typeof isInMarkdownEditor === 'function' && isInMarkdownEditor()) {
+    if (typeof applyMarkdownHighlight === 'function') {
+      applyMarkdownHighlight('#ffe066');
+    }
+    return;
+  }
+
+  // HTML mode - original logic
   const sel = window.getSelection();
   if (sel.rangeCount > 0) {
     const range = sel.getRangeAt(0);
@@ -361,6 +387,9 @@ function changeFontSize() {
       const size = item.getAttribute('data-size');
       const fontSize = getFontSizeFromValue(size);
 
+      // Check if we're in markdown mode
+      const inMarkdown = typeof isInMarkdownEditor === 'function' && isInMarkdownEditor();
+
       // Ensure editor has focus
       const editor = document.querySelector('[contenteditable="true"]');
       if (editor && savedRange) {
@@ -371,32 +400,38 @@ function changeFontSize() {
         selection.removeAllRanges();
         selection.addRange(savedRange);
 
-        // Apply font size by wrapping selection in span with CSS class instead of inline style
-        const range = selection.getRangeAt(0);
-        const span = document.createElement('span');
-        // Use cssText to set font-size with !important to prevent override
-        span.style.cssText = 'font-size: ' + fontSize + ' !important';
+        if (inMarkdown && typeof applyMarkdownFontSize === 'function') {
+          // Use markdown HTML inline style
+          applyMarkdownFontSize(fontSize);
+        } else {
+          // HTML mode - original logic
+          // Apply font size by wrapping selection in span with CSS class instead of inline style
+          const range = selection.getRangeAt(0);
+          const span = document.createElement('span');
+          // Use cssText to set font-size with !important to prevent override
+          span.style.cssText = 'font-size: ' + fontSize + ' !important';
 
-        try {
-          range.surroundContents(span);
-        } catch (surroundErr) {
-          // If surroundContents fails (partial selections), use insertNode
-          const docFrag = range.cloneContents();
-          span.appendChild(docFrag);
-          range.deleteContents();
-          range.insertNode(span);
-        }
+          try {
+            range.surroundContents(span);
+          } catch (surroundErr) {
+            // If surroundContents fails (partial selections), use insertNode
+            const docFrag = range.cloneContents();
+            span.appendChild(docFrag);
+            range.deleteContents();
+            range.insertNode(span);
+          }
 
-        // Remove selection (place cursor at the end of modified text)
-        selection.removeAllRanges();
-        const newRange = document.createRange();
-        newRange.setStartAfter(span);
-        newRange.collapse(true);
-        selection.addRange(newRange);
+          // Remove selection (place cursor at the end of modified text)
+          selection.removeAllRanges();
+          const newRange = document.createRange();
+          newRange.setStartAfter(span);
+          newRange.collapse(true);
+          selection.addRange(newRange);
 
-        // Trigger update callback
-        if (typeof window.update === 'function') {
-          window.update();
+          // Trigger update callback
+          if (typeof window.update === 'function') {
+            window.update();
+          }
         }
       }
 
@@ -439,6 +474,14 @@ function changeFontSize() {
 }
 
 function toggleCodeBlock() {
+  // Check if we're in markdown mode
+  if (typeof isInMarkdownEditor === 'function' && isInMarkdownEditor()) {
+    if (typeof applyMarkdownCodeBlock === 'function') {
+      applyMarkdownCodeBlock();
+    }
+    return;
+  }
+
   const sel = window.getSelection();
   if (!sel.rangeCount) return;
 
@@ -519,6 +562,14 @@ function toggleCodeBlock() {
 }
 
 function toggleInlineCode() {
+  // Check if we're in markdown mode
+  if (typeof isInMarkdownEditor === 'function' && isInMarkdownEditor()) {
+    if (typeof applyMarkdownInlineCode === 'function') {
+      applyMarkdownInlineCode();
+    }
+    return;
+  }
+
   const sel = window.getSelection();
   if (!sel.rangeCount) return;
 
@@ -958,10 +1009,60 @@ window.insertSeparator = insertSeparator;
 // Link insertion functionality
 function addLinkToNote() {
   try {
+    // Check if we're in markdown mode
+    const inMarkdown = typeof isInMarkdownEditor === 'function' && isInMarkdownEditor();
+
     const sel = window.getSelection();
     const hasSelection = sel && sel.rangeCount > 0 && !sel.getRangeAt(0).collapsed;
     const selectedText = hasSelection ? sel.toString() : '';
 
+    // For markdown, handle differently
+    if (inMarkdown) {
+      // Check if selection looks like a markdown link
+      const linkPattern = /\[([^\]]+)\]\(([^)]+)\)/;
+      const match = selectedText.match(linkPattern);
+      
+      let existingUrl = 'https://';
+      let existingText = selectedText;
+      
+      if (match) {
+        existingText = match[1];
+        existingUrl = match[2];
+      }
+
+      // Save selection
+      if (hasSelection) {
+        window.savedLinkRange = sel.getRangeAt(0).cloneRange();
+      } else {
+        window.savedLinkRange = null;
+      }
+
+      showLinkModal(existingUrl, existingText, function (url, text) {
+        if (url === null) {
+          // Remove link - replace with just text
+          if (window.savedLinkRange) {
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(window.savedLinkRange);
+            document.execCommand('insertText', false, existingText);
+          }
+          window.savedLinkRange = null;
+          return;
+        }
+
+        if (!url) return;
+
+        // Apply markdown link syntax
+        if (typeof applyMarkdownLink === 'function') {
+          applyMarkdownLink(url, text);
+        }
+
+        window.savedLinkRange = null;
+      });
+      return;
+    }
+
+    // HTML mode - original logic
     // Check if the selection is within an existing link
     let existingLink = null;
     let existingUrl = 'https://';

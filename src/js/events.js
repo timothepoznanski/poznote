@@ -3066,10 +3066,13 @@ function initTextSelectionHandlers() {
                         isTitleOrTagField = true;
                         break;
                     }
-                    // If selection is inside a markdown editor or preview, hide formatting toolbar
-                    if (currentElement.classList &&
-                        (currentElement.classList.contains('markdown-editor') ||
-                            currentElement.classList.contains('markdown-preview'))) {
+                    // If selection is inside a markdown editor, allow formatting toolbar
+                    if (currentElement.classList && currentElement.classList.contains('markdown-editor')) {
+                        editableElement = currentElement;
+                        break;
+                    }
+                    // If selection is inside a markdown preview (read-only), hide formatting toolbar
+                    if (currentElement.classList && currentElement.classList.contains('markdown-preview')) {
                         isTitleOrTagField = true;
                         break;
                     }
