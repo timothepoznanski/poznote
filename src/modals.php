@@ -16,14 +16,8 @@
             <p><strong><?php echo t_h('modals.update.latest_available'); ?></strong> <span id="availableVersion"><?php echo t_h('common.loading'); ?></span></p>
             <p id="releaseNotesLink" class="initially-hidden"><a href="#" id="releaseNotesHref" target="_blank"><?php echo t_h('modals.update.view_release_notes'); ?></a></p>
         </div>
-        <div class="update-buttons-container">
-            <div class="update-instructions-buttons">
-                <button type="button" class="btn-update" data-action="go-to-self-hosted-update"><?php echo t_h('modals.update.self_hosted'); ?></button>
-                <button type="button" class="btn-update" data-action="go-to-cloud-update"><?php echo t_h('modals.update.cloud'); ?></button>
-            </div>
-            <div class="modal-buttons">
-                <button type="button" class="btn-cancel" data-action="close-update-modal"><?php echo t_h('common.close'); ?></button>
-            </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-update-modal"><?php echo t_h('common.close'); ?></button>
         </div>
     </div>
 </div>

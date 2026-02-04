@@ -701,10 +701,7 @@ function showUpdateInstructions(hasUpdate = false) {
 
         if (hasUpdate) {
             if (titleEl) titleEl.textContent = window.t ? window.t('update.new_available', null, '🎉 New Update Available!') : '🎉 New Update Available!';
-            if (messageEl) messageEl.textContent = window.t ? window.t('update.description', null, 'A new version of Poznote is available. Your data will be preserved during the update.') : 'A new version of Poznote is available. Your data will be preserved during the update.';
-            if (updateButtonsContainer) {
-                updateButtonsContainer.style.display = 'flex';
-            }
+            if (messageEl) messageEl.textContent = window.t ? window.t('update.new_version_available', null, 'A new version of Poznote is available.') : 'A new version of Poznote is available.';
             if (backupWarning) {
                 backupWarning.style.display = 'block';
             }
@@ -716,16 +713,13 @@ function showUpdateInstructions(hasUpdate = false) {
         } else {
             if (titleEl) titleEl.textContent = window.t ? window.t('update.up_to_date', null, '✅ Poznote is Up to date') : '✅ Poznote is Up to date';
             if (messageEl) messageEl.textContent = '';
-            if (updateButtonsContainer) {
-                updateButtonsContainer.style.display = 'none';
-            }
             if (backupWarning) {
                 backupWarning.style.display = 'none';
             }
-            // Hide release notes link
+            // Show release notes link for up-to-date status as well
             var releaseNotesLink = document.getElementById('releaseNotesLink');
             if (releaseNotesLink) {
-                releaseNotesLink.style.display = 'none';
+                releaseNotesLink.style.display = 'block';
             }
         }
 
@@ -754,11 +748,15 @@ function showUpdateInstructions(hasUpdate = false) {
                     if (availableVersionEl) {
                         availableVersionEl.textContent = data.remote_version || 'unknown';
                     }
-                    // Set release notes link if update available
-                    if (hasUpdate && data.remote_version) {
-                        var releaseNotesHref = document.getElementById('releaseNotesHref');
-                        if (releaseNotesHref) {
+                    // Set release notes link
+                    var releaseNotesHref = document.getElementById('releaseNotesHref');
+                    if (releaseNotesHref) {
+                        if (hasUpdate && data.remote_version) {
+                            // If update available, link to new version
                             releaseNotesHref.href = 'https://github.com/timothepoznanski/poznote/releases/tag/' + data.remote_version;
+                        } else if (data.current_version) {
+                            // If up to date, link to current version
+                            releaseNotesHref.href = 'https://github.com/timothepoznanski/poznote/releases/tag/' + data.current_version;
                         }
                     }
                 } else {
