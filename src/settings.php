@@ -415,7 +415,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                 <div class="home-card-icon"><i class="fal fa-columns"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.kanban_on_folder_click', [], 'Open Kanban view on folder click'); ?></span>
-                    <span id="kanban-folder-click-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
+                    <span id="kanban-folder-click-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
 

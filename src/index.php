@@ -211,7 +211,7 @@ try {
 
     $stmt->execute(['kanban_folder_click']);
     $v6 = $stmt->fetchColumn();
-    if ($v6 === '0' || $v6 === 'false') $extra_body_classes .= ' disable-kanban-click';
+    if ($v6 === '0' || $v6 === 'false' || $v6 === null || $v6 === false) $extra_body_classes .= ' disable-kanban-click';
 
 } catch (Exception $e) {
     // ignore errors and continue without extra classes
