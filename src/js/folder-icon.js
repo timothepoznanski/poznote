@@ -614,12 +614,6 @@ document.addEventListener('DOMContentLoaded', function () {
         button.addEventListener('click', closeFolderIconModal);
     });
 
-    // Reset icon button
-    const resetButton = document.getElementById('resetFolderIconBtn');
-    if (resetButton) {
-        resetButton.addEventListener('click', resetFolderIcon);
-    }
-
     // Close modal when clicking outside
     const modal = document.getElementById('folderIconModal');
     if (modal) {

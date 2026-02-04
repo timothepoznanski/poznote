@@ -682,7 +682,6 @@
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-folder-icon-modal"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-secondary" id="resetFolderIconBtn"><i class="fa-folder-open"></i> / <i class="fa-folder"></i></button>
             <button type="button" class="btn-primary" id="applyFolderIconBtn"><?php echo t_h('common.apply', [], 'Apply'); ?></button>
         </div>
     </div>
