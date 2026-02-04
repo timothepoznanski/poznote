@@ -3,6 +3,11 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 
+    // Initialize page configuration first (sets window.isAdmin, etc.)
+    if (typeof window.initializePageConfig === 'function') {
+        window.initializePageConfig();
+    }
+
     // Initialize global variables and workspaces
     initializeWorkspaces();
 
@@ -16,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize text selection handling for formatting
     initTextSelectionHandlers();
 
-    // Initialize automatic update checking (once per day)
+    // Initialize automatic update checking (once per day, for admin users only)
     checkForUpdatesAutomatic();
 
     // Restore folder states from localStorage

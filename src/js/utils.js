@@ -617,7 +617,12 @@ function checkForUpdates() {
 // Check for updates automatically (silent, once per day)
 function checkForUpdatesAutomatic() {
     // Only check for updates if user is admin
-    if (!window.isAdmin) {
+    // Check if badge exists in DOM (PHP only renders it for admins) as fallback
+    var badges = document.querySelectorAll('.update-badge');
+    if (!badges.length) {
+        return; // No badge in DOM means user is not admin
+    }
+    if (typeof window.isAdmin !== 'undefined' && !window.isAdmin) {
         return;
     }
 
@@ -864,10 +869,14 @@ function hideUpdateBadge() {
 
 function showUpdateBadge() {
     // Only show badge for admin users
-    if (!window.isAdmin) {
+    // Check if badge exists in DOM (PHP only renders it for admins) as fallback
+    var badges = document.querySelectorAll('.update-badge');
+    if (!badges.length) {
+        return; // No badge in DOM means user is not admin
+    }
+    if (typeof window.isAdmin !== 'undefined' && !window.isAdmin) {
         return;
     }
-    var badges = document.querySelectorAll('.update-badge');
     for (var i = 0; i < badges.length; i++) {
         badges[i].classList.remove('update-badge-hidden');
         badges[i].style.display = 'inline-block';
@@ -876,7 +885,12 @@ function showUpdateBadge() {
 
 function restoreUpdateBadge() {
     // Only restore badge for admin users
-    if (!window.isAdmin) {
+    // Check if badge exists (PHP only renders it for admins) as fallback for window.isAdmin
+    var badges = document.querySelectorAll('.update-badge');
+    if (!badges.length) {
+        return; // No badge in DOM means user is not admin
+    }
+    if (typeof window.isAdmin !== 'undefined' && !window.isAdmin) {
         return;
     }
     const updateAvailable = localStorage.getItem('poznote_update_available');

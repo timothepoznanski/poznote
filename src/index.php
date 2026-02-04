@@ -860,7 +860,8 @@ $body_classes = trim($extra_body_classes);
 <script src="js/folder-hierarchy.js?v=<?php echo $v; ?>"></script>
 <script src="js/math-renderer.js?v=<?php echo $v; ?>"></script>
 <script src="js/modals-events.js?v=<?php echo $v; ?>"></script>
-<script src="js/main.js"></script>
+<script src="js/index-events.js?v=<?php echo $v; ?>"></script>
+<script src="js/main.js?v=<?php echo $v; ?>"></script>
 <script src="js/resize-column.js"></script>
 <script src="js/unified-search.js"></script>
 <script src="js/clickable-tags.js?v=<?php echo $v; ?>"></script>
@@ -873,7 +874,6 @@ $body_classes = trim($extra_body_classes);
 <script src="js/notes-list-events.js?v=<?php echo $v; ?>"></script>
 <script src="js/folder-icon.js?v=<?php echo $v; ?>"></script>
 <script src="js/kanban.js?v=<?php echo $v; ?>"></script>
-<script src="js/index-events.js?v=<?php echo $v; ?>"></script>
 
 <?php if ($note && is_numeric($note)): ?>
 <!-- Data for draft check (used by index-events.js) -->

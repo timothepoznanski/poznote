@@ -508,6 +508,9 @@
             }
         }
     }
+    
+    // Expose initializePageConfig globally so it can be called from main.js
+    window.initializePageConfig = initializePageConfig;
 
     /**
      * Restore folder states from localStorage
