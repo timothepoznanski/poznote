@@ -242,6 +242,7 @@ function getIconTranslation(iconClass) {
 function showChangeFolderIconModal(folderId, folderName) {
     currentFolderIdForIcon = folderId;
     currentFolderNameForIcon = folderName;
+    // '' means: use default folder icon (toggle open/closed). null means: not initialized.
     selectedIconClass = null;
     selectedIconColor = '';
 
@@ -269,6 +270,38 @@ function showChangeFolderIconModal(folderId, folderName) {
         // Get current color from data attribute or inline style
         currentColor = folderElement.getAttribute('data-icon-color') || '';
     }
+
+    // If no custom icon is set, we consider this folder to be using the default toggle icon.
+    selectedIconClass = currentIcon || '';
+
+    // Create a "Default" icon item (keeps the open/closed toggle behaviour)
+    const defaultIconItem = document.createElement('div');
+    defaultIconItem.className = 'folder-icon-item';
+    defaultIconItem.dataset.iconClass = '';
+    defaultIconItem.dataset.iconName = (window.t ? window.t('folder_icon.default', null, 'Default') : 'Default');
+    defaultIconItem.title = defaultIconItem.dataset.iconName;
+
+    if (selectedIconClass === '') {
+        defaultIconItem.classList.add('selected');
+        setTimeout(() => {
+            defaultIconItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+    }
+
+    const defaultIcon = document.createElement('i');
+    // Use the same base class style as existing UI (no need to add "fas")
+    defaultIcon.className = 'fa-folder';
+    defaultIconItem.appendChild(defaultIcon);
+
+    defaultIconItem.addEventListener('click', function () {
+        document.querySelectorAll('.folder-icon-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+        defaultIconItem.classList.add('selected');
+        selectedIconClass = '';
+    });
+
+    iconGrid.appendChild(defaultIconItem);
 
     // Create icon items
     FOLDER_ICONS.forEach(iconClass => {
@@ -340,9 +373,8 @@ function showChangeFolderIconModal(folderId, folderName) {
 
         // Add click event to save icon and color
         newApplyBtn.addEventListener('click', function () {
-            if (selectedIconClass) {
-                saveFolderIcon();
-            }
+            // Allow applying a color even when keeping the default folder icon (selectedIconClass === '')
+            if (selectedIconClass !== null) saveFolderIcon();
         });
     }
 
@@ -422,7 +454,8 @@ function closeFolderIconModal() {
  * Save the selected folder icon
  */
 function saveFolderIcon() {
-    if (!currentFolderIdForIcon || !selectedIconClass) return;
+    // selectedIconClass can be '' to keep the default toggle icon
+    if (!currentFolderIdForIcon || selectedIconClass === null) return;
 
     // Send request to API
     fetch('/api/v1/folders/' + currentFolderIdForIcon + '/icon', {
@@ -478,14 +511,16 @@ function resetFolderIcon() {
         },
         credentials: 'same-origin',
         body: JSON.stringify({
-            icon: ''
+            icon: '',
+            icon_color: ''
         })
     })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Reload the page
-                window.location.reload();
+                // Update the icon in the UI (default toggle + default color)
+                updateFolderIconInUI(currentFolderIdForIcon, '', '');
+                closeFolderIconModal();
             } else {
                 console.error('Failed to reset folder icon:', data.message);
                 if (typeof window.showNotification === 'function') {
@@ -543,8 +578,15 @@ function updateFolderIconInUI(folderId, iconClass, iconColor) {
             folderIconElement.classList.add(iconClass);
             folderIconElement.setAttribute('data-custom-icon', 'true');
         } else {
-            // Default icons
-            folderIconElement.classList.add('fa-folder');
+            // Default icons (can toggle open/closed in the sidebar)
+            const isSidebarFolderIcon = !!folderIconElement.closest('.folder-toggle');
+            if (isSidebarFolderIcon) {
+                const folderContent = document.getElementById('folder-' + folderId);
+                const isOpen = folderContent && window.getComputedStyle(folderContent).display !== 'none';
+                folderIconElement.classList.add(isOpen ? 'fa-folder-open' : 'fa-folder');
+            } else {
+                folderIconElement.classList.add('fa-folder');
+            }
             folderIconElement.setAttribute('data-custom-icon', 'false');
         }
 
