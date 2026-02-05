@@ -31,7 +31,6 @@
             }
         },
         "download": "Herunterladen",
-        "convert": "Konvertieren",
         "create": "Erstellen",
         "delete": "Löschen",
         "duplicate": "Duplizieren",
@@ -798,20 +797,6 @@
             "delete_link_only": "Nur diesen Link löschen",
             "delete_link_and_target": "Notiz und alle ihre Links löschen"
         },
-        "convert": {
-            "title": "Notiz konvertieren",
-            "message": "Sind Sie sicher, dass Sie diese Notiz konvertieren möchten?",
-            "to_html_title": "In HTML konvertieren",
-            "to_html_message": "Dies wird Ihre Markdown-Notiz in das HTML-Format konvertieren.",
-            "to_html_warning": "Bevor Sie diese Notiz konvertieren, können Sie sie duplizieren, um eine Kopie zu behalten, falls die Konvertierung nicht Ihren Erwartungen entspricht.",
-            "to_markdown_title": "In Markdown konvertieren",
-            "to_markdown_message": "Dies wird Ihre HTML-Notiz in das Markdown-Format konvertieren. Eingebettete Bilder werden als Anhänge gespeichert.",
-            "to_markdown_warning": "Bevor Sie diese Notiz konvertieren, können Sie sie duplizieren, um eine Kopie zu behalten, falls die Konvertierung nicht Ihren Erwartungen entspricht.",
-            "converting": "Notiz wird konvertiert...",
-            "success": "Notiz erfolgreich konvertiert!",
-            "error": "Fehler beim Konvertieren der Notiz",
-            "duplicate_button": "Duplizieren"
-        },
         "export": {
             "title": "Notiz exportieren",
             "markdown": {
@@ -1011,9 +996,7 @@
             "create_task_list": "Fehler beim Erstellen der Aufgabenliste",
             "create_task_list_prefix": "Fehler beim Erstellen der Aufgabenliste: ",
             "create_markdown_note": "Fehler beim Erstellen der Markdown-Notiz",
-            "create_markdown_note_prefix": "Fehler beim Erstellen der Markdown-Notiz: ",
-            "conversion_failed_prefix": "Konvertierung fehlgeschlagen: {{error}}",
-            "network_error_converting": "Netzwerkfehler beim Konvertieren der Notiz"
+            "create_markdown_note_prefix": "Fehler beim Erstellen der Markdown-Notiz: "
         },
         "toolbar": {
             "favorite_add": "Zu Favoriten hinzufügen",

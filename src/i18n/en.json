@@ -97,7 +97,6 @@
         "no_completed_tasks": "No completed tasks to clear."
     },
     "download": "Download",
-    "convert": "Convert",
     "create": "Create",
     "edit": "Edit",
     "delete": "Delete",
@@ -354,20 +353,6 @@
             "delete_link_only": "Delete this link only",
             "delete_link_and_target": "Delete the note and all its links"
         },
-        "convert": {
-            "title": "Convert Note",
-            "message": "Are you sure you want to convert this note?",
-            "to_html_title": "Convert to HTML",
-            "to_html_message": "This will convert your Markdown note to HTML format.",
-            "to_html_warning": "Before converting this note, you may want to duplicate it to keep a copy in case the conversion doesn't meet your expectations.",
-            "to_markdown_title": "Convert to Markdown",
-            "to_markdown_message": "This will convert your HTML note to Markdown format. Embedded images will be saved as attachments.",
-            "to_markdown_warning": "Before converting this note, you may want to duplicate it to keep a copy in case the conversion doesn't meet your expectations.",
-            "converting": "Converting note...",
-            "success": "Note converted successfully!",
-            "error": "Error converting note",
-            "duplicate_button": "Duplicate"
-        },
         "export": {
             "title": "Export Note",
             "markdown": {
@@ -563,9 +548,7 @@
             "create_task_list": "Error creating task list",
             "create_task_list_prefix": "Error creating task list: ",
             "create_markdown_note": "Error creating markdown note",
-            "create_markdown_note_prefix": "Error creating markdown note: ",
-            "conversion_failed_prefix": "Conversion error: {{error}}",
-            "network_error_converting": "Network error converting note"
+            "create_markdown_note_prefix": "Error creating markdown note: "
         },
         "toolbar": {
             "favorite_add": "Add to favorites",

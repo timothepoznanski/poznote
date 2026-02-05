@@ -31,7 +31,6 @@
             }
         },
         "download": "Descargar",
-        "convert": "Convertir",
         "create": "Crear",
         "delete": "Eliminar",
         "duplicate": "Duplicar",
@@ -798,20 +797,6 @@
             "delete_link_only": "Eliminar solo este vínculo",
             "delete_link_and_target": "Eliminar la nota y todos sus vínculos"
         },
-        "convert": {
-            "title": "Convertir nota",
-            "message": "¿Estás seguro de que quieres convertir esta nota?",
-            "to_html_title": "Convertir a HTML",
-            "to_html_message": "Esto convertirá tu nota Markdown a formato HTML.",
-            "to_html_warning": "Antes de convertir esta nota, puedes duplicarla para mantener una copia en caso de que la conversión no cumpla con tus expectativas.",
-            "to_markdown_title": "Convertir a Markdown",
-            "to_markdown_message": "Esto convertirá tu nota HTML a formato Markdown. Las imágenes embebidas se guardarán como adjuntos.",
-            "to_markdown_warning": "Antes de convertir esta nota, puedes duplicarla para mantener una copia en caso de que la conversión no cumpla con tus expectativas.",
-            "converting": "Convirtiendo nota...",
-            "success": "¡Nota convertida con éxito!",
-            "error": "Error al convertir la nota",
-            "duplicate_button": "Duplicar"
-        },
         "export": {
             "title": "Exportar nota",
             "markdown": {
@@ -1011,9 +996,7 @@
             "create_task_list": "Error al crear lista de tareas",
             "create_task_list_prefix": "Error al crear lista de tareas: ",
             "create_markdown_note": "Error al crear nota markdown",
-            "create_markdown_note_prefix": "Error al crear nota markdown: ",
-            "conversion_failed_prefix": "Error en la conversión: {{error}}",
-            "network_error_converting": "Error de red al convertir la nota"
+            "create_markdown_note_prefix": "Error al crear nota markdown: "
         },
         "toolbar": {
             "favorite_add": "Agregar a favoritos",

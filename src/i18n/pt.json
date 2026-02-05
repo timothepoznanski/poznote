@@ -31,7 +31,6 @@
             }
         },
         "download": "Baixar",
-        "convert": "Converter",
         "create": "Criar",
         "duplicate": "Duplicar",
         "move": "Mover",
@@ -797,20 +796,6 @@
             "delete_link_only": "Excluir apenas este vínculo",
             "delete_link_and_target": "Excluir a nota e todos os seus vínculos"
         },
-        "convert": {
-            "title": "Converter nota",
-            "message": "Tem certeza de que deseja converter esta nota?",
-            "to_html_title": "Converter para HTML",
-            "to_html_message": "Isso converterá sua nota Markdown para o formato HTML.",
-            "to_html_warning": "Antes de converter esta nota, você pode duplicá-la para manter uma cópia caso a conversão não atenda às suas expectativas.",
-            "to_markdown_title": "Converter para Markdown",
-            "to_markdown_message": "Isso converterá sua nota HTML para o formato Markdown. Imagens incorporadas serão salvas como anexos.",
-            "to_markdown_warning": "Antes de converter esta nota, você pode duplicá-la para manter uma cópia caso a conversão não atenda às suas expectativas.",
-            "converting": "Convertendo nota...",
-            "success": "Nota convertida com sucesso!",
-            "error": "Falha ao converter nota",
-            "duplicate_button": "Duplicar"
-        },
         "export": {
             "title": "Exportar nota",
             "markdown": {
@@ -1015,9 +1000,7 @@
             "create_task_list": "Erro ao criar lista de tarefas",
             "create_task_list_prefix": "Erro ao criar lista de tarefas: ",
             "create_markdown_note": "Erro ao criar nota markdown",
-            "create_markdown_note_prefix": "Erro ao criar nota markdown: ",
-            "conversion_failed_prefix": "Falha na conversão: {{error}}",
-            "network_error_converting": "Erro de rede ao converter a nota"
+            "create_markdown_note_prefix": "Erro ao criar nota markdown: "
         },
         "toolbar": {
             "favorite_add": "Adicionar aos favoritos",
