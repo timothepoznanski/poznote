@@ -82,14 +82,27 @@ try {
     $subfolders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Get notes directly in parent folder (using 'entries' table and 'trash' column)
-    $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.updated DESC");
+    $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type, n.linked_note_id FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.updated DESC");
     $stmt->execute([$folder_id]);
     $parentNotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Load entry snippets for parent notes
     foreach ($parentNotes as &$note) {
-        $filename = getEntryFilename($note['id'], $note['type'] ?? 'note');
-        if (file_exists($filename)) {
+        // For linked notes, load the target note's content
+        if (($note['type'] ?? 'note') === 'linked' && !empty($note['linked_note_id'])) {
+            $targetStmt = $con->prepare("SELECT type FROM entries WHERE id = ?");
+            $targetStmt->execute([$note['linked_note_id']]);
+            $targetNote = $targetStmt->fetch(PDO::FETCH_ASSOC);
+            if ($targetNote) {
+                $filename = getEntryFilename($note['linked_note_id'], $targetNote['type'] ?? 'note');
+            } else {
+                $filename = '';
+            }
+        } else {
+            $filename = getEntryFilename($note['id'], $note['type'] ?? 'note');
+        }
+        
+        if ($filename && file_exists($filename)) {
             $content = file_get_contents($filename);
             $note['entry'] = mb_substr(strip_tags($content), 0, 150);
         } else {
@@ -101,14 +114,27 @@ try {
     // Get notes for each subfolder
     $subfolderNotes = [];
     foreach ($subfolders as $subfolder) {
-        $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.updated DESC");
+        $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type, n.linked_note_id FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.updated DESC");
         $stmt->execute([$subfolder['id']]);
         $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         // Load entry snippets
         foreach ($notes as &$note) {
-            $filename = getEntryFilename($note['id'], $note['type'] ?? 'note');
-            if (file_exists($filename)) {
+            // For linked notes, load the target note's content
+            if (($note['type'] ?? 'note') === 'linked' && !empty($note['linked_note_id'])) {
+                $targetStmt = $con->prepare("SELECT type FROM entries WHERE id = ?");
+                $targetStmt->execute([$note['linked_note_id']]);
+                $targetNote = $targetStmt->fetch(PDO::FETCH_ASSOC);
+                if ($targetNote) {
+                    $filename = getEntryFilename($note['linked_note_id'], $targetNote['type'] ?? 'note');
+                } else {
+                    $filename = '';
+                }
+            } else {
+                $filename = getEntryFilename($note['id'], $note['type'] ?? 'note');
+            }
+            
+            if ($filename && file_exists($filename)) {
                 $content = file_get_contents($filename);
                 $note['entry'] = mb_substr(strip_tags($content), 0, 150);
             } else {

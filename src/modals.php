@@ -16,14 +16,8 @@
             <p><strong><?php echo t_h('modals.update.latest_available'); ?></strong> <span id="availableVersion"><?php echo t_h('common.loading'); ?></span></p>
             <p id="releaseNotesLink" class="initially-hidden"><a href="#" id="releaseNotesHref" target="_blank"><?php echo t_h('modals.update.view_release_notes'); ?></a></p>
         </div>
-        <div class="update-buttons-container">
-            <div class="update-instructions-buttons">
-                <button type="button" class="btn-update" data-action="go-to-self-hosted-update"><?php echo t_h('modals.update.self_hosted'); ?></button>
-                <button type="button" class="btn-update" data-action="go-to-cloud-update"><?php echo t_h('modals.update.cloud'); ?></button>
-            </div>
-            <div class="modal-buttons">
-                <button type="button" class="btn-cancel" data-action="close-update-modal"><?php echo t_h('common.close'); ?></button>
-            </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-update-modal"><?php echo t_h('common.close'); ?></button>
         </div>
     </div>
 </div>
@@ -344,6 +338,12 @@
                             <span><?php echo t_h('modals.create.template.title', [], 'Template'); ?></span>
                         </div>
                     </div>
+                    <div class="create-note-option" data-type="linked" data-action="select-create-type">
+                        <i class="fa fa-link"></i>
+                        <div>
+                            <span><?php echo t_h('modals.create.linked.title', [], 'Linked Note'); ?></span>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Other items section (only shown when creating from main button) -->
@@ -434,22 +434,6 @@
         <div class="modal-buttons">
             <button type="button" class="btn-primary" id="confirmMoveTaskBtn"><?php echo t_h('modals.task_move.confirm', [], 'Move task'); ?></button>
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="moveTaskModal"><?php echo t_h('common.cancel'); ?></button>
-        </div>
-    </div>
-</div>
-
-<!-- Convert Note Modal -->
-<div id="convertNoteModal" class="modal">
-    <div class="modal-content">
-        <h3 id="convertNoteTitle"><?php echo t_h('modals.convert.title', [], 'Convert Note'); ?></h3>
-        <div class="modal-body">
-            <p id="convertNoteMessage"><?php echo t_h('modals.convert.message', [], 'Are you sure you want to convert this note?'); ?></p>
-            <p id="convertNoteWarning" class="convert-warning"></p>
-        </div>
-        <div class="modal-buttons">
-            <button type="button" class="btn-danger" data-action="close-modal" data-modal="convertNoteModal"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-success" id="duplicateBeforeConvertBtn"><?php echo t_h('modals.convert.duplicate_button', [], 'Duplicate'); ?></button>
-            <button type="button" class="btn-primary" id="confirmConvertBtn"><?php echo t_h('common.convert', [], 'Convert'); ?></button>
         </div>
     </div>
 </div>
@@ -688,7 +672,6 @@
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-folder-icon-modal"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-secondary" id="resetFolderIconBtn"><i class="fa-folder-open"></i> / <i class="fa-folder"></i></button>
             <button type="button" class="btn-primary" id="applyFolderIconBtn"><?php echo t_h('common.apply', [], 'Apply'); ?></button>
         </div>
     </div>
@@ -734,6 +717,44 @@
     </div>
 </div>
 
+<!-- Linked Note Selector Modal -->
+<div id="linkedNoteSelectorModal" class="modal">
+    <div class="modal-content note-reference-modal-content">
+        <div class="note-reference-modal-header">
+            <h3><?php echo t_h('modals.linked_selector.title', [], 'Select Note to Link'); ?></h3>
+        </div>
+        <div class="note-reference-search-container">
+            <input type="text" id="linkedNoteSearch" placeholder="<?php echo t_h('modals.linked_selector.search_placeholder', [], 'Search notes...'); ?>" class="note-reference-search-input">
+        </div>
+        <div class="note-reference-list-wrapper">
+            <div class="note-reference-recent-label"><?php echo t_h('modals.linked_selector.recent_label', [], 'Recent notes'); ?></div>
+            <div id="linkedNoteList" class="note-reference-list">
+                <div class="note-reference-loading">
+                    <i class="fa-spinner fa-spin"></i> <?php echo t_h('common.loading', [], 'Loading...'); ?>
+                </div>
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-linked-selector-modal"><?php echo t_h('common.cancel'); ?></button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Linked Note Modal -->
+<div id="deleteLinkedNoteModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.delete_linked_note.title', [], 'Delete Linked Note'); ?></h3>
+        <div class="modal-body">
+            <p><?php echo t_h('modals.delete_linked_note.message', [], 'What do you want to delete?'); ?></p>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-primary" id="deleteLinkedNoteOnlyBtn"><?php echo t_h('modals.delete_linked_note.delete_link_only', [], 'Delete link only'); ?></button>
+            <button type="button" class="btn-danger" id="deleteLinkedNoteAndTargetBtn"><?php echo t_h('modals.delete_linked_note.delete_link_and_target', [], 'Delete link and target note'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="deleteLinkedNoteModal"><?php echo t_h('common.cancel'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Info Modal -->
 <div id="infoModal" class="modal">
     <div class="modal-content">
@@ -741,6 +762,46 @@
         <p id="infoModalMessage"></p>
         <div class="modal-buttons">
             <button type="button" class="btn-primary" data-action="close-info-modal"><?php echo t_h('common.ok', [], 'OK'); ?></button>
+        </div>
+    </div>
+</div>
+
+<!-- Background Image Settings Modal -->
+<div id="backgroundImageModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><?php echo t_h('modals.background_image.title', [], 'Background Image Settings'); ?></h3>
+        </div>
+        <div class="modal-body">
+            <p><?php echo t_h('modals.background_image.description', [], 'Upload a background image for your workspace. You can adjust the opacity to make it subtle.'); ?></p>
+            
+            <div class="background-preview-container" id="backgroundPreviewContainer">
+                <div class="background-preview" id="backgroundPreview">
+                    <p class="no-background-text"><?php echo t_h('modals.background_image.no_image', [], 'No background image set'); ?></p>
+                </div>
+            </div>
+            
+            <div class="background-upload-controls">
+                <input type="file" id="backgroundImageInput" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp" style="display: none;">
+                <button type="button" class="btn-secondary" id="uploadBackgroundBtn">
+                    <?php echo t_h('modals.background_image.upload', [], 'Upload Image'); ?>
+                </button>
+                <button type="button" class="btn-danger" id="removeBackgroundBtn" style="display: none;">
+                    <?php echo t_h('modals.background_image.remove', [], 'Remove'); ?>
+                </button>
+            </div>
+            
+            <div class="background-opacity-control">
+                <label for="backgroundOpacityInput">
+                    <?php echo t_h('modals.background_image.opacity', [], 'Background Opacity'); ?>: 
+                    <span id="backgroundOpacityValue">30</span>%
+                </label>
+                <input type="range" id="backgroundOpacityInput" min="5" max="25" step="1" value="25">
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" id="cancelBackgroundBtn"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveBackgroundBtn"><?php echo t_h('common.save'); ?></button>
         </div>
     </div>
 </div>

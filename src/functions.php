@@ -55,14 +55,6 @@ function getSetting($key, $default = null) {
 }
 
 /**
- * Clear settings cache (call after updating settings)
- */
-function clearSettingsCache() {
-    static $cache = null;
-    $cache = null;
-}
-
-/**
  * Clean content for search by removing base64 images and other heavy data
  * This is used to keep the database entry column lightweight for search functionality
  */
@@ -160,6 +152,29 @@ function t_h($key, $vars = [], $default = null, $lang = null) {
 }
 
 /**
+ * Get the page title for the application
+ * Uses custom display name from settings if available, otherwise uses app name from i18n
+ * @return string The HTML-escaped page title
+ */
+function getPageTitle() {
+    static $cached = null;
+    if ($cached !== null) {
+        return $cached;
+    }
+    
+    require_once __DIR__ . '/users/db_master.php';
+    $login_display_name = getGlobalSetting('login_display_name', '');
+    
+    if ($login_display_name && trim($login_display_name) !== '') {
+        $cached = htmlspecialchars($login_display_name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    } else {
+        $cached = t_h('app.name');
+    }
+    
+    return $cached;
+}
+
+/**
  * Get the user's configured timezone from the database
  * Returns 'UTC' if no timezone is configured
  * @return string The timezone identifier (e.g., 'Europe/Paris')
@@ -199,12 +214,21 @@ function convertUtcToUserTimezone($utcDatetime, $format = 'Y-m-d H:i:s') {
     }
 }
 
-function formatDate($t) {
-	return date('j M Y',$t);
-}
-
-function formatDateTime($t) {
-	return formatDate($t)." à ".date('H:i',$t);
+/**
+ * Format a timestamp for display (with i18n support)
+ * @param int $timestamp Unix timestamp
+ * @param string $format Date format (default: 'j M Y H:i')
+ * @return string Formatted date string
+ */
+function formatDateTime($timestamp) {
+    $timezone = getUserTimezone();
+    try {
+        $date = new DateTime('@' . $timestamp);
+        $date->setTimezone(new DateTimeZone($timezone));
+        return $date->format('j M Y') . ' ' . t('common.at', [], 'at') . ' ' . $date->format('H:i');
+    } catch (Exception $e) {
+        return date('j M Y H:i', $timestamp);
+    }
 }
 
 /**
@@ -1155,4 +1179,218 @@ function resolveFolderPathToId($workspace, $folderPath, $createIfMissing = false
     }
     
     return $parentId;
+}
+
+/**
+ * Sanitize HTML content to prevent XSS attacks
+ * 
+ * This function removes dangerous HTML tags and attributes that could be used
+ * for Cross-Site Scripting (XSS) attacks while preserving safe formatting.
+ * 
+ * @param string $html The HTML content to sanitize
+ * @return string The sanitized HTML content
+ */
+function sanitizeHtml($html) {
+    if (empty($html)) {
+        return $html;
+    }
+    
+    // Allowed HTML tags (safe formatting tags)
+    $allowedTags = [
+        'p', 'br', 'div', 'span', 'a', 'strong', 'b', 'em', 'i', 'u', 's', 'strike',
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        'ul', 'ol', 'li', 'dl', 'dt', 'dd',
+        'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td',
+        'blockquote', 'pre', 'code', 'hr',
+        'img', 'figure', 'figcaption',
+        'details', 'summary',
+        'mark', 'small', 'sub', 'sup',
+        'abbr', 'cite', 'q', 'time',
+        'input', 'label', // For task lists
+        'iframe', // For YouTube, Vimeo embeds (validated separately)
+        'button', 'i' // For Excalidraw buttons and icons
+    ];
+    
+    // Allowed attributes per tag
+    $allowedAttrs = [
+        'a' => ['href', 'title', 'target', 'rel'],
+        'img' => ['src', 'alt', 'title', 'width', 'height', 'data-is-excalidraw', 'data-excalidraw-note-id'],
+        'td' => ['colspan', 'rowspan'],
+        'th' => ['colspan', 'rowspan', 'scope'],
+        'div' => ['class', 'data-tasklist-json', 'data-markdown-content', 'data-excalidraw', 'data-diagram-id', 'contenteditable'],
+        'span' => ['class'],
+        'input' => ['type', 'checked', 'disabled'],
+        'time' => ['datetime'],
+        'blockquote' => ['cite'],
+        'q' => ['cite'],
+        'iframe' => ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'title'],
+        'button' => ['class', 'data-action']
+    ];
+    
+    // Global allowed attributes (safe for all tags)
+    $globalAllowedAttrs = ['id', 'class', 'style'];
+    
+    // Dangerous patterns to remove
+    $dangerousPatterns = [
+        // Remove javascript: protocol
+        '/javascript:/i',
+        // Remove data: protocol (except for images which we'll handle separately)
+        '/data:(?!image\/)/i',
+        // Remove vbscript: protocol
+        '/vbscript:/i',
+        // Remove on* event handlers
+        '/\s*on\w+\s*=/i'
+    ];
+    
+    // Note: We don't do regex-based removal here because it's blind to context
+    // (e.g., it would remove <script> even inside <code> blocks where it's legitimate)
+    // Instead, we let DOMDocument handle everything as it understands HTML structure
+    
+    // Use DOMDocument for more precise sanitization
+    libxml_use_internal_errors(true);
+    $dom = new DOMDocument();
+    $dom->encoding = 'UTF-8';
+    
+    // Load HTML with UTF-8 encoding
+    // Use HTML5 meta tag instead of XML declaration to avoid it appearing in output
+    $wrappedHtml = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>' . $html . '</body></html>';
+    @$dom->loadHTML($wrappedHtml, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    
+    $xpath = new DOMXPath($dom);
+    
+    // Remove all disallowed tags
+    $allElements = $xpath->query('//body//*');
+    $elementsToRemove = [];
+    
+    foreach ($allElements as $element) {
+        $tagName = strtolower($element->tagName);
+        
+        // Check if this element is inside a <code> or <pre> block
+        $isInCodeBlock = false;
+        $parent = $element->parentNode;
+        while ($parent && $parent->nodeType === XML_ELEMENT_NODE) {
+            $parentTag = strtolower($parent->tagName);
+            if ($parentTag === 'code' || $parentTag === 'pre') {
+                $isInCodeBlock = true;
+                break;
+            }
+            $parent = $parent->parentNode;
+        }
+        
+        // If it's a dangerous tag inside a code block, encode it as text instead of removing
+        if ($isInCodeBlock && in_array($tagName, ['script', 'iframe', 'object', 'embed', 'applet', 'form', 'style'])) {
+            // Convert the element to text (encode it)
+            $encodedTag = htmlspecialchars($element->ownerDocument->saveHTML($element), ENT_QUOTES, 'UTF-8');
+            $textNode = $element->ownerDocument->createTextNode($encodedTag);
+            $element->parentNode->replaceChild($textNode, $element);
+            continue;
+        }
+        
+        // If tag is not in allowed list, mark for removal
+        if (!in_array($tagName, $allowedTags)) {
+            $elementsToRemove[] = $element;
+            continue;
+        }
+        
+        // Check and sanitize attributes
+        $attributesToRemove = [];
+        foreach ($element->attributes as $attr) {
+            $attrName = strtolower($attr->name);
+            $attrValue = $attr->value;
+            
+            // Check if attribute is allowed for this tag
+            $tagAllowedAttrs = $allowedAttrs[$tagName] ?? [];
+            $isAllowed = in_array($attrName, $tagAllowedAttrs) || in_array($attrName, $globalAllowedAttrs);
+            
+            if (!$isAllowed) {
+                $attributesToRemove[] = $attrName;
+                continue;
+            }
+            
+            // Check for dangerous patterns in attribute values
+            foreach ($dangerousPatterns as $pattern) {
+                if (preg_match($pattern, $attrValue)) {
+                    $attributesToRemove[] = $attrName;
+                    continue 2;
+                }
+            }
+            
+            // Special validation for href and src attributes
+            if ($attrName === 'href' || $attrName === 'src') {
+                // For iframes, validate that src is from trusted domains
+                if ($tagName === 'iframe' && $attrName === 'src') {
+                    $allowedIframeDomains = [
+                        'youtube.com',
+                        'www.youtube.com',
+                        'youtube-nocookie.com',
+                        'www.youtube-nocookie.com',
+                    ];
+                    
+                    $isTrustedIframe = false;
+                    foreach ($allowedIframeDomains as $domain) {
+                        if (stripos($attrValue, '//' . $domain) !== false || stripos($attrValue, 'https://' . $domain) !== false) {
+                            $isTrustedIframe = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!$isTrustedIframe) {
+                        // Not a trusted iframe source - mark entire element for removal
+                        $elementsToRemove[] = $element;
+                        break; // Exit attribute loop
+                    }
+                    continue;
+                }
+                
+                // Allow http, https, mailto, and relative URLs
+                // Allow data:image for images
+                if ($attrName === 'src' && $tagName === 'img' && strpos($attrValue, 'data:image/') === 0) {
+                    // Allow data:image URLs for images
+                    continue;
+                }
+                
+                if (!preg_match('/^(https?:\/\/|mailto:|\/|#|\.\/|\.\.\/)/i', $attrValue) && 
+                    strpos($attrValue, 'data:') !== 0) {
+                    // If it doesn't start with allowed protocols, it might be relative - keep it
+                    // but if it contains suspicious patterns, remove it
+                    if (preg_match('/[<>"\']/', $attrValue)) {
+                        $attributesToRemove[] = $attrName;
+                    }
+                }
+            }
+        }
+        
+        // Remove dangerous attributes
+        foreach ($attributesToRemove as $attrName) {
+            $element->removeAttribute($attrName);
+        }
+    }
+    
+    // Remove disallowed elements
+    foreach ($elementsToRemove as $element) {
+        if ($element->parentNode) {
+            $element->parentNode->removeChild($element);
+        }
+    }
+    
+    // Get the sanitized HTML (only body content)
+    $body = $dom->getElementsByTagName('body')->item(0);
+    if ($body) {
+        $sanitized = '';
+        foreach ($body->childNodes as $child) {
+            $sanitized .= $dom->saveHTML($child);
+        }
+    } else {
+        $sanitized = $dom->saveHTML();
+    }
+    
+    // Trim whitespace
+    $sanitized = trim($sanitized);
+    
+    // Clean up any remaining dangerous patterns that might have been encoded
+    $sanitized = str_replace(['&lt;script', '&lt;/script'], '', $sanitized);
+    
+    libxml_clear_errors();
+    
+    return $sanitized;
 }

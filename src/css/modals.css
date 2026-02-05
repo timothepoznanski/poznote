@@ -143,6 +143,11 @@
     margin-top: 12px;
 }
 
+/* Delete linked note modal: align buttons to the left */
+#deleteLinkedNoteModal .modal-buttons {
+    justify-content: flex-start;
+}
+
 /* Move task modal list */
 .move-task-list {
     max-height: 260px;
@@ -2137,13 +2142,6 @@ html[data-theme='dark'] #folderShareModal .share-indexable-label {
 
 #createModal .modal-content {
     margin: 0 auto !important;
-}
-
-/* Convert note modal warning */
-#convertNoteModal .convert-warning {
-    color: #dc3545;
-    margin-top: 10px;
-    margin-bottom: 20px;
 }
 
 /* ===========================================

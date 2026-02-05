@@ -230,12 +230,7 @@ try {
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-    <?php
-    require_once 'users/db_master.php';
-    $login_display_name = getGlobalSetting('login_display_name', '');
-    $pageTitle = ($login_display_name && trim($login_display_name) !== '') ? htmlspecialchars($login_display_name) : t_h('app.name');
-    ?>
-    <title><?php echo $pageTitle; ?></title>
+    <title><?php echo getPageTitle(); ?></title>
     <meta name="color-scheme" content="dark light">
     <?php 
     $cache_v = @file_get_contents('version.txt');
@@ -264,10 +259,16 @@ try {
             </div>
         </div>
 
+        <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+            <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary">
+                <?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?>
+            </a>
+        </div>
+
         <div class="home-search-container">
             <div class="home-search-wrapper">
                 <i class="fas fa-search home-search-icon"></i>
-                <input type="text" id="home-search-input" class="home-search-input" placeholder="<?php echo t_h('search.placeholder'); ?>" autocomplete="off">
+                <input type="text" id="home-search-input" class="home-search-input" placeholder="Filtrer" autocomplete="off">
             </div>
         </div>
         
@@ -330,16 +331,6 @@ try {
                 </script>
             </div>
             <?php endif; ?>
-
-            <!-- Back to Notes -->
-            <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?>">
-                <div class="home-card-icon">
-                    <i class="fas fa-arrow-left"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?></span>
-                </div>
-            </a>
 
             <!-- Notes -->
             <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('common.notes', [], 'Notes'); ?>">
@@ -480,37 +471,6 @@ try {
                     </a>
                 <?php endif; ?>
             <?php endif; ?>
-
-            <!-- Settings -->
-            <a href="settings.php" class="home-card home-card-orange" title="<?php echo t_h('settings.title', [], 'Settings'); ?>">
-                <div class="home-card-icon">
-                    <i class="fa-cog"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.title', [], 'Settings'); ?></span>
-                </div>
-            </a>
-
-            <!-- Version -->
-            <a href="https://github.com/timothepoznanski/poznote/releases" target="_blank" class="home-card" title="<?php echo t_h('home.version', [], 'Version'); ?>">
-                <div class="home-card-icon">
-                    <i class="fa-info-circle"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('home.version', [], 'Version'); ?></span>
-                    <span class="home-card-count"><?php echo htmlspecialchars(trim(file_get_contents('version.txt')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
-                </div>
-            </a>
-
-            <!-- Support -->
-            <a href="https://ko-fi.com/timothepoznanski" target="_blank" class="home-card home-card-red" title="<?php echo t_h('home.support_poznote', [], 'Support Poznote'); ?>">
-                <div class="home-card-icon">
-                    <i class="fa-heart"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('home.support_poznote', [], 'Support Poznote'); ?></span>
-                </div>
-            </a>
 
             <!-- Logout -->
             <a href="logout.php" class="home-card home-card-logout" title="<?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?>">

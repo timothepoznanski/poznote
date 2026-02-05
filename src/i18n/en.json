@@ -25,7 +25,8 @@
         "tip": "Tip",
         "important": "Important",
         "note": "Note",
-        "apply": "Apply"
+        "apply": "Apply",
+        "at": "at"
     },
     "settings": {
         "title": "Settings",
@@ -97,7 +98,6 @@
         "no_completed_tasks": "No completed tasks to clear."
     },
     "download": "Download",
-    "convert": "Convert",
     "create": "Create",
     "edit": "Edit",
     "delete": "Delete",
@@ -308,6 +308,12 @@
             "task_list": {
                 "title": "Task List"
             },
+            "linked": {
+                "title": "Linked Note",
+                "default_heading": "{{note}}",
+                "success": "Linked note created successfully",
+                "error": "Error creating linked note"
+            },
             "subfolder": {
                 "title": "Subfolder"
             },
@@ -324,10 +330,11 @@
         "kanban_structure": {
             "title": "Create Kanban Structure",
             "folder_name_label": "Folder name:",
-            "folder_name_placeholder": "My Kanban Board",
+            "folder_name_placeholder": "My Kanban View",
             "columns_label": "Number of columns (1-9):",
             "error_name_required": "Folder name is required",
             "error_columns_range": "Number of columns must be between 1 and 9",
+            "error_folder_exists": "Folder already exists in this location",
             "error_create": "Failed to create Kanban structure",
             "error_create_prefix": "Error creating Kanban structure: {{error}}"
         },
@@ -336,19 +343,16 @@
             "reset": "Restore default behavior",
             "search_placeholder": "Search icons..."
         },
-        "convert": {
-            "title": "Convert Note",
-            "message": "Are you sure you want to convert this note?",
-            "to_html_title": "Convert to HTML",
-            "to_html_message": "This will convert your Markdown note to HTML format.",
-            "to_html_warning": "Before converting this note, you may want to duplicate it to keep a copy in case the conversion doesn't meet your expectations.",
-            "to_markdown_title": "Convert to Markdown",
-            "to_markdown_message": "This will convert your HTML note to Markdown format. Embedded images will be saved as attachments.",
-            "to_markdown_warning": "Before converting this note, you may want to duplicate it to keep a copy in case the conversion doesn't meet your expectations.",
-            "converting": "Converting note...",
-            "success": "Note converted successfully!",
-            "error": "Error converting note",
-            "duplicate_button": "Duplicate"
+        "linked_selector": {
+            "title": "Select Note to Link",
+            "search_placeholder": "Search notes...",
+            "recent_label": "Recent notes"
+        },
+        "delete_linked_note": {
+            "title": "Delete Linked Note",
+            "message": "What do you want to delete?",
+            "delete_link_only": "Delete this link only",
+            "delete_link_and_target": "Delete the note and all its links"
         },
         "export": {
             "title": "Export Note",
@@ -492,6 +496,7 @@
         },
         "errors": {
             "workspace_not_found": "Workspace not found",
+            "linked_note_already_exists": "A linked note already exists for this note",
             "method_not_allowed": "Method not allowed",
             "invalid_action": "Invalid action",
             "internal_server_error": "Internal server error",
@@ -544,9 +549,7 @@
             "create_task_list": "Error creating task list",
             "create_task_list_prefix": "Error creating task list: ",
             "create_markdown_note": "Error creating markdown note",
-            "create_markdown_note_prefix": "Error creating markdown note: ",
-            "conversion_failed_prefix": "Conversion error: {{error}}",
-            "network_error_converting": "Network error converting note"
+            "create_markdown_note_prefix": "Error creating markdown note: "
         },
         "toolbar": {
             "favorite_add": "Add to favorites",
@@ -601,46 +604,14 @@
         },
         "editor": {
             "placeholder_desktop": "Enter text, use / for command menu, paste images or drop an image at cursor.",
-            "placeholder_mobile": "Enter text or paste images here...",
-            "table_picker": {
-                "title": "Insert table",
-                "rows_label": "Rows:",
-                "rows_placeholder": "Rows",
-                "cols_label": "Columns:",
-                "cols_placeholder": "Columns",
-                "insert": "Insert"
-            },
-            "toolbar": {
-                "back_to_notes": "Back to notes",
-                "bold": "Bold",
-                "italic": "Italic",
-                "underline": "Underline",
-                "strikethrough": "Strikethrough",
-                "link": "Link",
-                "text_color": "Text color",
-                "highlight": "Highlight",
-                "bullet_list": "Bullet list",
-                "numbered_list": "Numbered list",
-                "font_size": "Font size",
-                "code_block": "Code block",
-                "inline_code": "Inline code",
-                "clear_formatting": "Clear formatting",
-                "insert_excalidraw": "Insert Excalidraw diagram",
-                "insert_emoji": "Insert emoji",
-                "insert_table": "Insert table",
-                "insert_checklist": "Insert checklist",
-                "add_separator": "Add separator",
-                "insert_note_reference": "Insert note reference",
-                "open_in_new_tab": "Open in new tab",
-                "search_replace": "Search and replace"
-            }
+            "placeholder_mobile": "Enter text or paste images here..."
         }
     },
     "editor": {
         "markdown_placeholder": "Write your markdown or use / to open the command menu...",
         "markdown_placeholder_mobile": "Write your markdown here...",
         "excalidraw": {
-            "placeholder_outside": "Write outside the diagram here…"
+            "placeholder_outside": "…"
         },
         "images": {
             "delete_confirm": {
@@ -699,7 +670,9 @@
             "insert_checklist": "Insert checklist",
             "add_separator": "Add separator",
             "insert_note_reference": "Insert note reference",
-            "open_in_new_tab": "Open in new tab"
+            "open_in_new_tab": "Open in new tab",
+            "create_linked_note": "Create linked note",
+            "search_replace": "Search and replace"
         },
         "link": {
             "add_title": "Add link",

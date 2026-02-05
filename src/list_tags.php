@@ -52,16 +52,12 @@ $currentLang = getUserLanguage();
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<?php
-	require_once 'users/db_master.php';
-	$login_display_name = getGlobalSetting('login_display_name', '');
-	$pageTitle = ($login_display_name && trim($login_display_name) !== '') ? htmlspecialchars($login_display_name) : t_h('app.name');
-	?>
-	<title><?php echo $pageTitle; ?></title>
+	<title><?php echo getPageTitle(); ?></title>
 	<meta name="color-scheme" content="dark light">
 	<script src="js/theme-init.js"></script>
 	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
 	<link type="text/css" rel="stylesheet" href="css/light.min.css"/>
+	<link type="text/css" rel="stylesheet" href="css/home.css"/>
 	<link type="text/css" rel="stylesheet" href="css/list_tags.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode.css"/>
@@ -80,17 +76,18 @@ $currentLang = getUserLanguage();
 			</div>
 		</div>
 		
-        
 		
-		<form class="tags-search-form">
-			<input 
-				type="text" 
-				id="tagsSearchInput"
-				class="tags-search-input"
-				placeholder="<?php echo t_h('tags.search.placeholder', [], 'Filter tags...'); ?>"
-				autocomplete="off"
-			>
-		</form>
+		<div class="home-search-container">
+			<div class="home-search-wrapper">
+				<input 
+					type="text" 
+					id="tagsSearchInput"
+					class="home-search-input tags-search-no-icon"
+					placeholder="<?php echo t_h('tags.search.placeholder', [], 'Filter tags...'); ?>"
+					autocomplete="off"
+				>
+			</div>
+		</div>
 		
 		<div class="tags-info">
 			<?php

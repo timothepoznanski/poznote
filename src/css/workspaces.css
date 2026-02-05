@@ -95,6 +95,12 @@ body {
     min-width: 150px;
 }
 
+.ws-col-background {
+    flex: 0 0 auto;
+    justify-content: center;
+    min-width: 50px;
+}
+
 /* Bloc de nom du workspace */
 .ws-name-block {
     display: flex;
@@ -152,6 +158,21 @@ body {
 .btn-rename:hover {
     background-color: #e0a800;
     border-color: #d39e00;
+}
+
+.btn-background {
+    background-color: #6c757d;
+    color: white;
+    border-color: #6c757d;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+}
+
+.btn-background:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
 }
 
 .btn-delete-ws {

@@ -139,12 +139,7 @@ $v = getAppVersion();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?php
-    require_once dirname(__DIR__) . '/users/db_master.php';
-    $login_display_name = getGlobalSetting('login_display_name', '');
-    $pageTitle = ($login_display_name && trim($login_display_name) !== '') ? htmlspecialchars($login_display_name) : 'Poznote';
-    ?>
-    <title><?php echo $pageTitle; ?></title>
+    <title><?php echo getPageTitle(); ?></title>
     <meta name="color-scheme" content="dark light">
     <script src="../js/theme-init.js?v=<?php echo $v; ?>"></script>
     <link rel="stylesheet" href="../css/fontawesome.min.css?v=<?php echo $v; ?>">

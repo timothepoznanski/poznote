@@ -232,6 +232,11 @@
                     openNoteReferenceModal();
                 }
                 break;
+            case 'create-linked-note':
+                if (typeof createLinkedNoteFromCurrent === 'function') {
+                    createLinkedNoteFromCurrent();
+                }
+                break;
             case 'open-search-replace-modal':
                 if (noteId && typeof openSearchReplaceModal === 'function') {
                     openSearchReplaceModal(noteId);
@@ -300,12 +305,6 @@
                     const title = target.dataset.title;
                     const noteType = target.dataset.noteType;
                     showExportModal(noteId, filename, title, noteType);
-                }
-                break;
-            case 'show-convert-modal':
-                if (noteId && typeof showConvertNoteModal === 'function') {
-                    const convertTo = target.dataset.convertTo;
-                    showConvertNoteModal(noteId, convertTo);
                 }
                 break;
             case 'delete-note':
@@ -508,6 +507,9 @@
             }
         }
     }
+    
+    // Expose initializePageConfig globally so it can be called from main.js
+    window.initializePageConfig = initializePageConfig;
 
     /**
      * Restore folder states from localStorage

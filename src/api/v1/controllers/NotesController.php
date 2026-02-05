@@ -331,6 +331,7 @@ class NotesController {
         $entry = $input['content'] ?? $input['entry'] ?? '';
         $entrycontent = $input['entrycontent'] ?? $entry;
         $type = isset($input['type']) ? trim($input['type']) : 'note';
+        $linked_note_id = isset($input['linked_note_id']) ? (int)$input['linked_note_id'] : null;
         
         try {
             // Validate workspace if provided
@@ -378,27 +379,54 @@ class NotesController {
             if ($originalHeading === '') {
                 $heading = generateUniqueTitle(t('index.note.new_note', [], 'New note'), null, $workspace, $folder_id);
             } else {
-                // Check uniqueness
-                if ($folder_id !== null) {
-                    $check = $this->con->prepare("SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND folder_id = ? AND workspace = ?");
-                    $check->execute([$originalHeading, $folder_id, $workspace]);
-                } else {
-                    $check = $this->con->prepare("SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND folder_id IS NULL AND workspace = ?");
-                    $check->execute([$originalHeading, $workspace]);
-                }
-                if ($check->fetchColumn() > 0) {
-                    $heading = generateUniqueTitle($originalHeading, null, $workspace, $folder_id);
-                } else {
+                // For linked notes, don't check uniqueness - multiple links can have the same title
+                if ($type === 'linked') {
                     $heading = $originalHeading;
+                } else {
+                    // Check uniqueness for regular notes
+                    if ($folder_id !== null) {
+                        $check = $this->con->prepare("SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND folder_id = ? AND workspace = ?");
+                        $check->execute([$originalHeading, $folder_id, $workspace]);
+                    } else {
+                        $check = $this->con->prepare("SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND folder_id IS NULL AND workspace = ?");
+                        $check->execute([$originalHeading, $workspace]);
+                    }
+                    if ($check->fetchColumn() > 0) {
+                        $heading = generateUniqueTitle($originalHeading, null, $workspace, $folder_id);
+                    } else {
+                        $heading = $originalHeading;
+                    }
                 }
             }
             
             // Create the note
             $now_utc = gmdate('Y-m-d H:i:s', time());
             
-            $stmt = $this->con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            // Validate linked_note_id if provided
+            if ($linked_note_id !== null) {
+                $checkLinkedNote = $this->con->prepare("SELECT id FROM entries WHERE id = ? AND trash = 0");
+                $checkLinkedNote->execute([$linked_note_id]);
+                if (!$checkLinkedNote->fetch()) {
+                    error_log("NotesController::create - Linked note not found: $linked_note_id");
+                    $this->sendError(404, 'Linked note not found');
+                    return;
+                }
+                
+                // Check if a linked note already exists for this target
+                $checkExistingLink = $this->con->prepare("SELECT id FROM entries WHERE linked_note_id = ? AND trash = 0");
+                $checkExistingLink->execute([$linked_note_id]);
+                $existingLink = $checkExistingLink->fetch();
+                if ($existingLink) {
+                    error_log("NotesController::create - Linked note already exists for target: $linked_note_id, existing link ID: " . $existingLink['id']);
+                    $this->sendError(400, 'A linked note already exists for this note');
+                    return;
+                }
+                error_log("NotesController::create - No existing link found for target: $linked_note_id, creating new link");
+            }
             
-            if ($stmt->execute([$heading, $entrycontent, $tags, $folder, $folder_id, $workspace, $type, $now_utc, $now_utc])) {
+            $stmt = $this->con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, linked_note_id, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            
+            if ($stmt->execute([$heading, $entrycontent, $tags, $folder, $folder_id, $workspace, $type, $linked_note_id, $now_utc, $now_utc])) {
                 $id = $this->con->lastInsertId();
                 
                 // If folder is shared, auto-share the new note
@@ -424,10 +452,27 @@ class NotesController {
                 }
                 
                 if (!empty($entry)) {
-                    $write_result = file_put_contents($filename, $entry);
+                    // Sanitize HTML content to prevent XSS attacks
+                    $contentToSave = $entry;
+                    
+                    // For HTML notes (type='note'), sanitize the content
+                    if ($type === 'note') {
+                        $contentToSave = sanitizeHtml($entry);
+                    }
+                    
+                    // For markdown notes, sanitize as well (in case HTML is embedded)
+                    if ($type === 'markdown') {
+                        $contentToSave = sanitizeHtml($entry);
+                    }
+                    
+                    $write_result = file_put_contents($filename, $contentToSave);
                     if ($write_result === false) {
                         error_log("Failed to write file for note ID $id: $filename");
                     }
+                    
+                    // Update the entry content in database with sanitized version
+                    $updateStmt = $this->con->prepare("UPDATE entries SET entry = ? WHERE id = ?");
+                    $updateStmt->execute([$contentToSave, $id]);
                 }
                 
                 http_response_code(201);
@@ -569,8 +614,15 @@ class NotesController {
                     mkdir($entriesDir, 0755, true);
                 }
                 
-                // For markdown notes, clean HTML if needed
+                // Sanitize HTML content to prevent XSS attacks
                 $contentToSave = $entry;
+                
+                // For HTML notes (type='note'), sanitize the content
+                if ($noteType === 'note' && !empty($entry)) {
+                    $contentToSave = sanitizeHtml($entry);
+                }
+                
+                // For markdown notes, clean HTML if needed
                 if ($noteType === 'markdown' && !empty($entry)) {
                     if (strpos($entry, '<div class="markdown-editor"') !== false) {
                         if (preg_match('/<div class="markdown-editor"[^>]*>(.*?)<\/div>/', $entry, $matches)) {
@@ -578,6 +630,8 @@ class NotesController {
                             $contentToSave = html_entity_decode($contentToSave, ENT_QUOTES | ENT_HTML5, 'UTF-8');
                         }
                     }
+                    // Sanitize markdown content as well (in case HTML is embedded)
+                    $contentToSave = sanitizeHtml($contentToSave);
                 }
                 
                 $write_result = file_put_contents($filename, $contentToSave);
@@ -585,6 +639,9 @@ class NotesController {
                     $this->sendError(500, 'Failed to write file');
                     return;
                 }
+                
+                // Update the entry variable with sanitized content for database storage
+                $entry = $contentToSave;
             }
             
             // Update database
@@ -619,13 +676,36 @@ class NotesController {
             $stmt = $this->con->prepare($sql);
             
             if ($stmt->execute($updateParams)) {
-                $this->sendSuccess([
+                $updatedLinkedNotes = [];
+                
+                // If the heading changed, update linked notes that point to this note
+                if ($heading !== $note['heading']) {
+                    // Get IDs of linked notes before updating
+                    $linkIdsStmt = $this->con->prepare("SELECT id FROM entries WHERE linked_note_id = ? AND trash = 0");
+                    $linkIdsStmt->execute([$noteId]);
+                    $linkedNoteIds = $linkIdsStmt->fetchAll(PDO::FETCH_COLUMN);
+                    
+                    if (!empty($linkedNoteIds)) {
+                        $linkStmt = $this->con->prepare("UPDATE entries SET heading = ?, updated = ? WHERE linked_note_id = ? AND trash = 0");
+                        $linkStmt->execute([$heading, $now_utc, $noteId]);
+                        $updatedLinkedNotes = $linkedNoteIds;
+                    }
+                }
+                
+                $response = [
                     'note' => [
                         'id' => $noteId,
                         'heading' => $heading,
                         'updated' => $now_utc
                     ]
-                ]);
+                ];
+                
+                // Include updated linked note IDs if any
+                if (!empty($updatedLinkedNotes)) {
+                    $response['updated_linked_notes'] = $updatedLinkedNotes;
+                }
+                
+                $this->sendSuccess($response);
             } else {
                 $this->sendError(500, 'Database error while updating note');
             }
@@ -680,6 +760,25 @@ class NotesController {
                     return;
                 }
                 
+                // First, find and delete all linked notes that reference this note
+                $linkedNotesStmt = $this->con->prepare("SELECT id FROM entries WHERE linked_note_id = ?");
+                $linkedNotesStmt->execute([$noteId]);
+                $linkedNotes = $linkedNotesStmt->fetchAll(PDO::FETCH_ASSOC);
+                
+                $deletedLinkedCount = 0;
+                foreach ($linkedNotes as $linkedNote) {
+                    $linkedId = $linkedNote['id'];
+                    if ($workspace) {
+                        $delStmt = $this->con->prepare("UPDATE entries SET trash = 1, updated = datetime('now') WHERE id = ? AND workspace = ?");
+                        $delStmt->execute([$linkedId, $workspace]);
+                    } else {
+                        $delStmt = $this->con->prepare("UPDATE entries SET trash = 1, updated = datetime('now') WHERE id = ?");
+                        $delStmt->execute([$linkedId]);
+                    }
+                    $deletedLinkedCount++;
+                }
+                
+                // Then delete the main note
                 if ($workspace) {
                     $stmt = $this->con->prepare("UPDATE entries SET trash = 1, updated = datetime('now') WHERE id = ? AND workspace = ?");
                     $success = $stmt->execute([$noteId, $workspace]);
@@ -694,7 +793,8 @@ class NotesController {
                         'note' => [
                             'id' => $noteId,
                             'heading' => $note['heading'],
-                            'action' => 'moved_to_trash'
+                            'action' => 'moved_to_trash',
+                            'linked_notes_deleted' => $deletedLinkedCount
                         ]
                     ]);
                 } else {
@@ -712,7 +812,47 @@ class NotesController {
      * Helper for permanent deletion
      */
     private function permanentDelete(int $noteId, array $note, ?string $workspace): void {
-        // Delete attachments
+        // First, find and permanently delete all linked notes that reference this note
+        $linkedNotesStmt = $this->con->prepare("SELECT id, type, attachments FROM entries WHERE linked_note_id = ?");
+        $linkedNotesStmt->execute([$noteId]);
+        $linkedNotes = $linkedNotesStmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $deletedLinkedCount = 0;
+        foreach ($linkedNotes as $linkedNote) {
+            $linkedId = $linkedNote['id'];
+            
+            // Delete linked note's file
+            $linkedNoteType = $linkedNote['type'] ?? 'note';
+            $linked_file_path = getEntryFilename($linkedId, $linkedNoteType);
+            if (file_exists($linked_file_path)) {
+                unlink($linked_file_path);
+            }
+            
+            // Delete linked note's attachments
+            $linkedAttachments = $linkedNote['attachments'] ? json_decode($linkedNote['attachments'], true) : [];
+            if (is_array($linkedAttachments) && !empty($linkedAttachments)) {
+                foreach ($linkedAttachments as $attachment) {
+                    if (isset($attachment['filename'])) {
+                        $attachment_file = getAttachmentsPath() . '/' . $attachment['filename'];
+                        if (file_exists($attachment_file)) {
+                            unlink($attachment_file);
+                        }
+                    }
+                }
+            }
+            
+            // Delete linked note from database
+            if ($workspace) {
+                $delStmt = $this->con->prepare("DELETE FROM entries WHERE id = ? AND workspace = ?");
+                $delStmt->execute([$linkedId, $workspace]);
+            } else {
+                $delStmt = $this->con->prepare("DELETE FROM entries WHERE id = ?");
+                $delStmt->execute([$linkedId]);
+            }
+            $deletedLinkedCount++;
+        }
+        
+        // Delete attachments of the main note
         $attachments = $note['attachments'] ? json_decode($note['attachments'], true) : [];
         $deleted_attachments = [];
         
@@ -762,7 +902,8 @@ class NotesController {
                     'heading' => $note['heading'],
                     'file_deleted' => $file_deleted,
                     'png_file_deleted' => $png_deleted,
-                    'attachments_deleted' => $deleted_attachments
+                    'attachments_deleted' => $deleted_attachments,
+                    'linked_notes_deleted' => $deletedLinkedCount
                 ]
             ]);
         } else {
@@ -1271,263 +1412,6 @@ class NotesController {
         } catch (Exception $e) {
             error_log("Error creating template: " . $e->getMessage());
             $this->sendError(500, 'Error creating template: ' . $e->getMessage());
-        }
-    }
-    
-    /**
-     * POST /api/v1/notes/{id}/convert
-     * Convert note between markdown and HTML
-     */
-    public function convert(string $id): void {
-        $input = json_decode(file_get_contents('php://input'), true);
-        $targetType = isset($input['target']) ? strtolower(trim($input['target'])) : '';
-        
-        if (!in_array($targetType, ['html', 'markdown'], true)) {
-            $this->sendError(400, 'Invalid target type. Use "html" or "markdown"');
-            return;
-        }
-        
-        try {
-            $stmt = $this->con->prepare('SELECT id, heading, type, attachments, folder_id FROM entries WHERE id = ? AND trash = 0');
-            $stmt->execute([$id]);
-            $note = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            if (!$note) {
-                $this->sendError(404, 'Note not found');
-                return;
-            }
-            
-            $currentType = $note['type'] ?? 'note';
-            
-            // Validate conversion
-            if ($targetType === 'html' && $currentType !== 'markdown') {
-                $this->sendError(400, 'Only markdown notes can be converted to HTML');
-                return;
-            }
-            
-            if ($targetType === 'markdown' && !in_array($currentType, ['note', 'html'], true)) {
-                $this->sendError(400, 'Only HTML notes can be converted to markdown');
-                return;
-            }
-            
-            $currentFilePath = getEntryFilename($id, $currentType);
-            
-            if (!file_exists($currentFilePath) || !is_readable($currentFilePath)) {
-                $this->sendError(404, 'Note file not found');
-                return;
-            }
-            
-            $content = file_get_contents($currentFilePath);
-            $attachments = $note['attachments'] ? json_decode($note['attachments'], true) : [];
-            $attachmentsToRemove = [];
-            $attachmentsDir = getAttachmentsPath();
-            
-            // Convert content
-            if ($targetType === 'markdown') {
-                // Converting HTML to markdown: extract base64 images and save as attachments
-                
-                // Find all base64 images in HTML: <img src="data:image/...;base64,...">
-                $content = preg_replace_callback(
-                    '/<img[^>]*src=["\']data:image\/([a-zA-Z0-9+]+);base64,([^"\']+)["\'][^>]*(?:alt=["\']([^"\']*)["\'])?[^>]*\/?>/is',
-                    function($matches) use ($id, $attachmentsDir, &$attachments) {
-                        $imageType = strtolower($matches[1]);
-                        $base64Data = $matches[2];
-                        $altText = isset($matches[3]) ? $matches[3] : '';
-                        
-                        // Determine file extension
-                        $extensionMap = [
-                            'jpeg' => 'jpg',
-                            'png' => 'png',
-                            'gif' => 'gif',
-                            'webp' => 'webp',
-                            'svg+xml' => 'svg',
-                            'bmp' => 'bmp'
-                        ];
-                        $extension = $extensionMap[$imageType] ?? 'png';
-                        $mimeType = 'image/' . ($imageType === 'svg+xml' ? 'svg+xml' : $imageType);
-                        
-                        // Decode base64 data
-                        $imageData = base64_decode($base64Data);
-                        if ($imageData === false) {
-                            // If decoding fails, keep original
-                            return $matches[0];
-                        }
-                        
-                        // Generate unique filename
-                        $attachmentId = uniqid();
-                        $filename = $attachmentId . '_' . time() . '.' . $extension;
-                        $filePath = $attachmentsDir . '/' . $filename;
-                        
-                        // Save the image file
-                        if (file_put_contents($filePath, $imageData) === false) {
-                            // If saving fails, keep original
-                            return $matches[0];
-                        }
-                        chmod($filePath, 0644);
-                        
-                        // Create attachment entry
-                        $originalFilename = !empty($altText) ? $altText . '.' . $extension : $filename;
-                        $newAttachment = [
-                            'id' => $attachmentId,
-                            'filename' => $filename,
-                            'original_filename' => $originalFilename,
-                            'file_size' => strlen($imageData),
-                            'file_type' => $mimeType,
-                            'uploaded_at' => date('Y-m-d H:i:s')
-                        ];
-                        $attachments[] = $newAttachment;
-                        
-                        // Return img tag with attachment reference for htmlToMarkdown to convert
-                        return '<img src="/api/v1/notes/' . $id . '/attachments/' . $attachmentId . '" alt="' . htmlspecialchars($altText) . '">';
-                    },
-                    $content
-                );
-                
-                // Also handle case where alt comes before src
-                $content = preg_replace_callback(
-                    '/<img[^>]*alt=["\']([^"\']*)["\'][^>]*src=["\']data:image\/([a-zA-Z0-9+]+);base64,([^"\']+)["\'][^>]*\/?>/is',
-                    function($matches) use ($id, $attachmentsDir, &$attachments) {
-                        $altText = $matches[1];
-                        $imageType = strtolower($matches[2]);
-                        $base64Data = $matches[3];
-                        
-                        // Determine file extension
-                        $extensionMap = [
-                            'jpeg' => 'jpg',
-                            'png' => 'png',
-                            'gif' => 'gif',
-                            'webp' => 'webp',
-                            'svg+xml' => 'svg',
-                            'bmp' => 'bmp'
-                        ];
-                        $extension = $extensionMap[$imageType] ?? 'png';
-                        $mimeType = 'image/' . ($imageType === 'svg+xml' ? 'svg+xml' : $imageType);
-                        
-                        // Decode base64 data
-                        $imageData = base64_decode($base64Data);
-                        if ($imageData === false) {
-                            return $matches[0];
-                        }
-                        
-                        // Generate unique filename
-                        $attachmentId = uniqid();
-                        $filename = $attachmentId . '_' . time() . '.' . $extension;
-                        $filePath = $attachmentsDir . '/' . $filename;
-                        
-                        // Save the image file
-                        if (file_put_contents($filePath, $imageData) === false) {
-                            return $matches[0];
-                        }
-                        chmod($filePath, 0644);
-                        
-                        // Create attachment entry
-                        $originalFilename = !empty($altText) ? $altText . '.' . $extension : $filename;
-                        $newAttachment = [
-                            'id' => $attachmentId,
-                            'filename' => $filename,
-                            'original_filename' => $originalFilename,
-                            'file_size' => strlen($imageData),
-                            'file_type' => $mimeType,
-                            'uploaded_at' => date('Y-m-d H:i:s')
-                        ];
-                        $attachments[] = $newAttachment;
-                        
-                        return '<img src="/api/v1/notes/' . $id . '/attachments/' . $attachmentId . '" alt="' . htmlspecialchars($altText) . '">';
-                    },
-                    $content
-                );
-                
-                $convertedContent = $this->htmlToMarkdown($content);
-                $newType = 'markdown';
-            } else {
-                // Converting markdown to HTML: embed image attachments as base64
-                
-                // Find all markdown image references to attachments: ![...](/api/v1/notes/{id}/attachments/{attachmentId})
-                $content = preg_replace_callback(
-                    '/!\[([^\]]*)\]\(\/api\/v1\/notes\/' . preg_quote($id, '/') . '\/attachments\/([a-zA-Z0-9]+)\)/',
-                    function($matches) use ($attachments, $attachmentsDir, &$attachmentsToRemove) {
-                        $altText = $matches[1];
-                        $attachmentId = $matches[2];
-                        
-                        // Find the attachment in the list
-                        foreach ($attachments as $attachment) {
-                            if (isset($attachment['id']) && $attachment['id'] === $attachmentId) {
-                                $filePath = $attachmentsDir . '/' . $attachment['filename'];
-                                
-                                if (file_exists($filePath) && is_readable($filePath)) {
-                                    // Check if it's an image
-                                    $mimeType = $attachment['file_type'] ?? '';
-                                    if (strpos($mimeType, 'image/') === 0) {
-                                        // Read file and convert to base64
-                                        $fileContent = file_get_contents($filePath);
-                                        $base64 = base64_encode($fileContent);
-                                        $dataUri = 'data:' . $mimeType . ';base64,' . $base64;
-                                        
-                                        // Mark this attachment for removal
-                                        $attachmentsToRemove[] = $attachmentId;
-                                        
-                                        // Return markdown with base64 data URI
-                                        return '![' . $altText . '](' . $dataUri . ')';
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                        
-                        // If attachment not found or not an image, keep original reference
-                        return $matches[0];
-                    },
-                    $content
-                );
-                
-                require_once __DIR__ . '/../../../markdown_parser.php';
-                $convertedContent = parseMarkdown($content);
-                $newType = 'note';
-                
-                // Remove embedded image attachments from the note and delete files
-                if (!empty($attachmentsToRemove)) {
-                    $remainingAttachments = [];
-                    foreach ($attachments as $attachment) {
-                        if (in_array($attachment['id'], $attachmentsToRemove)) {
-                            // Delete the attachment file
-                            $filePath = $attachmentsDir . '/' . $attachment['filename'];
-                            if (file_exists($filePath)) {
-                                unlink($filePath);
-                            }
-                        } else {
-                            $remainingAttachments[] = $attachment;
-                        }
-                    }
-                    $attachments = $remainingAttachments;
-                }
-            }
-            
-            // Create new file with converted content
-            $newFilePath = getEntryFilename($id, $newType);
-            if (file_put_contents($newFilePath, $convertedContent) === false) {
-                $this->sendError(500, 'Failed to save converted note');
-                return;
-            }
-            chmod($newFilePath, 0644);
-            
-            // Update database (including attachments if any were removed)
-            $attachmentsJson = !empty($attachments) ? json_encode($attachments) : null;
-            $updateStmt = $this->con->prepare("UPDATE entries SET type = ?, attachments = ?, updated = datetime('now') WHERE id = ?");
-            $updateStmt->execute([$newType, $attachmentsJson, $id]);
-            
-            // Delete old file if extension changed
-            if ($currentFilePath !== $newFilePath && file_exists($currentFilePath)) {
-                unlink($currentFilePath);
-            }
-            
-            $this->sendSuccess([
-                'id' => $id,
-                'type' => $newType,
-                'message' => 'Note converted successfully'
-            ]);
-            
-        } catch (Exception $e) {
-            $this->sendError(500, 'Error converting note: ' . $e->getMessage());
         }
     }
     

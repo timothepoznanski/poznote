@@ -63,6 +63,11 @@ function onWorkspaceChange() {
         saveLastOpenedWorkspace(val);
     }
 
+    // Reload workspace background if function exists
+    if (typeof window.reloadWorkspaceBackground === 'function') {
+        window.reloadWorkspaceBackground();
+    }
+
     // Reload the page with the new workspace
     var url = new URL(window.location.href);
 
@@ -240,6 +245,11 @@ function switchToWorkspace(workspaceName) {
     // Save last opened workspace to database
     if (typeof saveLastOpenedWorkspace === 'function') {
         saveLastOpenedWorkspace(workspaceName);
+    }
+
+    // Reload workspace background if function exists
+    if (typeof window.reloadWorkspaceBackground === 'function') {
+        window.reloadWorkspaceBackground();
     }
 
     // Clear the right column when switching workspace

@@ -99,13 +99,6 @@ $currentUser = getCurrentUser();
 $username = htmlspecialchars($currentUser['display_name'] ?: $currentUser['username']);
 $pageWorkspace = trim(getWorkspaceFilter());
 
-// Get global login_display_name for page title
-require_once 'users/db_master.php';
-$login_display_name = getGlobalSetting('login_display_name', '');
-$pageTitle = ($login_display_name && trim($login_display_name) !== '') 
-    ? htmlspecialchars($login_display_name) 
-    : t_h('app.name');
-
 // Count workspaces
 $workspaces_count = 0;
 try {
@@ -138,7 +131,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-    <title><?php echo $pageTitle; ?></title>
+    <title><?php echo getPageTitle(); ?></title>
     <meta name="color-scheme" content="dark light">
     <?php 
     $cache_v = @file_get_contents('version.txt');
@@ -153,6 +146,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
     <link rel="stylesheet" href="css/home.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/settings.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modals.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/background-image.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode.css?v=<?php echo $cache_v; ?>">
 </head>
 <body class="home-page"
@@ -164,13 +158,6 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <div class="home-container">
 
-        <div class="home-search-container">
-            <div class="home-search-wrapper">
-                <i class="fas fa-search home-search-icon"></i>
-                <input type="text" id="home-search-input" class="home-search-input" placeholder="<?php echo t_h('search.placeholder'); ?>" autocomplete="off">
-            </div>
-        </div>
-
         <?php 
             // Build basic URL - workspace will be handled by JavaScript
             $back_params = [];
@@ -180,17 +167,22 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
             $back_href = 'index.php' . (!empty($back_params) ? '?' . implode('&', $back_params) : '');
         ?>
 
-        <div class="home-grid">
+        <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
+            <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary">
+                <?php echo t_h('common.back_to_notes'); ?>
+            </a>
+        </div>
 
-            <!-- Back to Notes -->
-            <div class="home-card settings-card-clickable" id="backToNotesLink" data-href="<?php echo $back_href; ?>">
-                <div class="home-card-icon">
-                    <i class="fas fa-arrow-left"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('common.back_to_notes'); ?></span>
-                </div>
+        <div class="home-search-container">
+            <div class="home-search-wrapper">
+                <i class="fas fa-search home-search-icon"></i>
+                <input type="text" id="home-search-input" class="home-search-input" placeholder="<?php echo t_h('search.placeholder'); ?>" autocomplete="off">
             </div>
+        </div>
+
+        <!-- ACTIONS CATEGORY -->
+        <h2 class="settings-category-title"><?php echo t_h('settings.categories.actions', [], 'Actions'); ?></h2>
+        <div class="home-grid">
 
             <!-- Workspaces -->
             <div class="home-card settings-card-clickable" id="workspaces-card" data-href="workspaces.php">
@@ -264,57 +256,11 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
             </div>
             <?php endif; ?>
 
-            <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
-            <!-- API Documentation -->
-            <div class="home-card" id="api-docs-card">
-                <div class="home-card-icon">
-                    <i class="fas fa-code"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.api_docs', [], 'API Documentation'); ?></span>
-                </div>
-            </div>
-            <?php endif; ?>
+        </div>
 
-            <!-- Github repository -->
-            <div class="home-card" id="github-card">
-                <div class="home-card-icon">
-                    <i class="fas fa-code-branch"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.documentation', [], 'Github Repository'); ?></span>
-                </div>
-            </div>
-
-            <!-- News -->
-            <div class="home-card" id="news-card">
-                <div class="home-card-icon">
-                    <i class="fas fa-newspaper"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.news', [], 'Poznote Blog'); ?></span>
-                </div>
-            </div>
-
-            <!-- Poznote Website -->
-            <div class="home-card" id="website-card">
-                <div class="home-card-icon">
-                    <i class="fas fa-globe"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.website', [], 'Poznote Website'); ?></span>
-                </div>
-            </div>
-
-            <!-- Support Developer -->
-            <div class="home-card home-card-red" id="support-card">
-                <div class="home-card-icon">
-                    <i class="fas fa-heart heart-blink"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.support', [], 'Support Developer'); ?></span>
-                </div>
-            </div>
+        <!-- DISPLAY CATEGORY -->
+        <h2 class="settings-category-title"><?php echo t_h('settings.categories.display', [], 'Display'); ?></h2>
+        <div class="home-grid">
 
             <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
             <!-- Login Display -->
@@ -415,7 +361,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                 <div class="home-card-icon"><i class="fal fa-columns"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.kanban_on_folder_click', [], 'Open Kanban view on folder click'); ?></span>
-                    <span id="kanban-folder-click-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
+                    <span id="kanban-folder-click-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
 
@@ -439,6 +385,75 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
 
         </div>
 
+        <!-- ABOUT CATEGORY -->
+        <h2 class="settings-category-title"><?php echo t_h('settings.categories.about', [], 'About'); ?></h2>
+        <div class="home-grid">
+
+            <!-- Version -->
+            <a href="https://github.com/timothepoznanski/poznote/releases" target="_blank" class="home-card" id="version-card" title="<?php echo t_h('home.version', [], 'Version'); ?>">
+                <div class="home-card-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('home.version', [], 'Version'); ?></span>
+                    <span class="home-card-count"><?php echo htmlspecialchars(trim(@file_get_contents('version.txt') ?: 'Unknown'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
+                </div>
+            </a>
+
+            <!-- Github repository -->
+            <div class="home-card" id="github-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-code-branch"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.documentation', [], 'Github Repository'); ?></span>
+                </div>
+            </div>
+
+            <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
+            <!-- API Documentation -->
+            <div class="home-card" id="api-docs-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.api_docs', [], 'API Documentation'); ?></span>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <!-- News -->
+            <div class="home-card" id="news-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-newspaper"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.news', [], 'Poznote Blog'); ?></span>
+                </div>
+            </div>
+
+            <!-- Poznote Website -->
+            <div class="home-card" id="website-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.website', [], 'Poznote Website'); ?></span>
+                </div>
+            </div>
+
+            <!-- Support Developer -->
+            <div class="home-card home-card-red" id="support-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-heart heart-blink"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.support', [], 'Support Developer'); ?></span>
+                </div>
+            </div>
+
+        </div>
+
     </div>
 
     <?php include 'modals.php'; ?>
@@ -449,6 +464,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
     <script src="js/utils.js"></script>
     <script src="js/font-size-settings.js"></script>
     <script src="js/note-width-settings.js"></script>
+    <script src="js/background-settings.js"></script>
     <script src="js/copy-code-on-focus.js"></script>
     <script src="js/modals-events.js"></script>
     <script src="js/settings-page.js"></script>

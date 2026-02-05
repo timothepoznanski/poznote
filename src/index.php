@@ -4,6 +4,24 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// Set security headers to mitigate XSS attacks
+// Content-Security-Policy: Restrict where scripts can be loaded from
+// Note: 'unsafe-inline' is needed for the rich text editor, but we sanitize all user input
+// to prevent XSS. In the future, consider using nonces for inline scripts.
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-src 'self' https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com https://youtube-nocookie.com;");
+
+// X-XSS-Protection: Enable browser's XSS filter (legacy but still useful)
+header("X-XSS-Protection: 1; mode=block");
+
+// X-Content-Type-Options: Prevent MIME type sniffing
+header("X-Content-Type-Options: nosniff");
+
+// X-Frame-Options: Prevent clickjacking
+header("X-Frame-Options: SAMEORIGIN");
+
+// Referrer-Policy: Control referrer information
+header("Referrer-Policy: strict-origin-when-cross-origin");
+
 // Authentication check
 require 'auth.php';
 requireAuth();
@@ -81,15 +99,6 @@ $using_unified_search = handleUnifiedSearch();
 
 // Workspace filter already initialized above
 
-// Load login display name for page title from global settings
-$login_display_name = '';
-try {
-    require_once 'users/db_master.php';
-    $login_display_name = getGlobalSetting('login_display_name', '');
-} catch (Exception $e) {
-    $login_display_name = '';
-}
-
 // Load note font size for CSS custom property
 $note_font_size = '15';
 try {
@@ -140,7 +149,7 @@ try {
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-    <title><?php echo htmlspecialchars($login_display_name !== '' ? $login_display_name : 'Poznote'); ?></title>
+    <title><?php echo getPageTitle(); ?></title>
     <?php 
     // Cache version based on app version to force reload on updates
     $v = getAppVersion();
@@ -164,6 +173,7 @@ try {
     <link type="text/css" rel="stylesheet" href="css/search-replace.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/folder-icon-modal.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/kanban.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/background-image.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="js/katex/katex.min.css?v=<?php echo $v; ?>"/>
     <style>:root { --note-font-size: <?php echo htmlspecialchars($note_font_size, ENT_QUOTES); ?>px; --sidebar-font-size: <?php echo htmlspecialchars($sidebar_font_size, ENT_QUOTES); ?>px; --note-max-width: <?php echo htmlspecialchars($note_max_width, ENT_QUOTES); ?>px; }</style>
@@ -176,6 +186,7 @@ try {
     <script src="js/note-loader-common.js?v=<?php echo $v; ?>"></script>
     <script src="js/note-reference.js?v=<?php echo $v; ?>"></script>
     <script src="js/template-selector.js?v=<?php echo $v; ?>"></script>
+    <script src="js/linked-note-selector.js?v=<?php echo $v; ?>"></script>
     <script src="js/search-replace.js?v=<?php echo $v; ?>"></script>
     <script src="js/markdown-handler.js?v=<?php echo $v; ?>"></script>
     <script src="js/mermaid/mermaid.min.js?v=<?php echo $v; ?>"></script>
@@ -211,7 +222,7 @@ try {
 
     $stmt->execute(['kanban_folder_click']);
     $v6 = $stmt->fetchColumn();
-    if ($v6 === '0' || $v6 === 'false') $extra_body_classes .= ' disable-kanban-click';
+    if ($v6 === '0' || $v6 === 'false' || $v6 === null || $v6 === false) $extra_body_classes .= ' disable-kanban-click';
 
 } catch (Exception $e) {
     // ignore errors and continue without extra classes
@@ -281,7 +292,7 @@ $body_classes = trim($extra_body_classes);
     $search_params = $search_conditions['search_params'];
     
     // Secure prepared queries
-    $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, created, updated, type FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
+    $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, created, updated, type, linked_note_id FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
     $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
     ?>
 
@@ -408,13 +419,14 @@ $body_classes = trim($extra_body_classes);
                     // Check if note is shared for CSS class
                     $share_class = $is_shared ? ' is-shared' : '';
                 
-                    $filename = getEntryFilename($row["id"], $row["type"] ?? 'note');
+                    $note_type = $row['type'] ?? 'note';
+                    
+                    $filename = getEntryFilename($row["id"], $note_type);
                     $title = $row['heading'];
                     // Ensure we have a safe JSON-encoded title for JavaScript
                     $title_safe = $title ?? 'Note';
                     $title_json = json_encode($title_safe, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
                     if ($title_json === false) $title_json = '"Note"';
-                    $note_type = $row['type'] ?? 'note';
                     
                     if ($note_type === 'tasklist') {
                         // For task list notes, use the JSON content from file
@@ -563,13 +575,6 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-move"><i class="fa-folder-open"></i> '.t_h('common.move', [], 'Move').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-download"><i class="fa-download"></i> '.t_h('common.download', [], 'Download').'</button>';
                     
-                    // Convert button (only for markdown and note types, with appropriate icon)
-                    if ($note_type === 'markdown') {
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-convert"><i class="fa-file-code"></i> '.t_h('common.convert', [], 'Convert').'</button>';
-                    } elseif ($note_type === 'note') {
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-convert"><i class="fa-file-alt"></i> '.t_h('common.convert', [], 'Convert').'</button>';
-                    }
-                    
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-open-new-tab"><i class="fa-external-link"></i> '.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-trash"><i class="fa-trash"></i> '.t_h('common.delete', [], 'Delete').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-info"><i class="fa-info-circle"></i> '.t_h('common.information', [], 'Information').'</button>';
@@ -633,15 +638,20 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="toolbar-btn btn-duplicate note-action-btn" data-action="duplicate-note" data-note-id="'.$row['id'].'" title="'.t_h('common.duplicate', [], 'Duplicate').'"><i class="fas fa-copy"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-move note-action-btn" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" title="'.t_h('common.move', [], 'Move').'"><i class="fas fa-folder-open"></i></button>';
                     
+                    // Create linked note button (hidden for linked notes and notes that already have a link)
+                    if ($note_type !== 'linked') {
+                        // Check if this note already has a linked note
+                        $checkExistingLink = $con->prepare("SELECT id FROM entries WHERE linked_note_id = ? AND trash = 0 LIMIT 1");
+                        $checkExistingLink->execute([$row['id']]);
+                        $hasLinkedNote = $checkExistingLink->fetch();
+                        
+                        if (!$hasLinkedNote) {
+                            echo '<button type="button" class="toolbar-btn btn-create-linked-note note-action-btn" title="' . t_h('editor.toolbar.create_linked_note') . '" data-action="create-linked-note"><i class="fas fa-link"></i></button>';
+                        }
+                    }
+                    
                     // Download button
                     echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="'.t_h('common.download', [], 'Download').'" data-action="show-export-modal" data-note-id="'.$row['id'].'" data-filename="'.htmlspecialchars($filename, ENT_QUOTES).'" data-title="'.htmlspecialchars($title_safe, ENT_QUOTES).'" data-note-type="'.$note_type.'"><i class="fas fa-download"></i></button>';
-                    
-                    // Convert button (only for markdown and note types)
-                    if ($note_type === 'markdown') {
-                        echo '<button type="button" class="toolbar-btn btn-convert note-action-btn" data-action="show-convert-modal" data-note-id="'.$row['id'].'" data-convert-to="html" title="'.t_h('index.toolbar.convert_to_html', [], 'Convert to HTML').'"><i class="fas fa-file-code"></i></button>';
-                    } elseif ($note_type === 'note') {
-                        echo '<button type="button" class="toolbar-btn btn-convert note-action-btn" data-action="show-convert-modal" data-note-id="'.$row['id'].'" data-convert-to="markdown" title="'.t_h('index.toolbar.convert_to_markdown', [], 'Convert to Markdown').'"><i class="fas fa-file-alt"></i></button>';
-                    }
                     
                     echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" data-action="delete-note" data-note-id="'.$row['id'].'" title="'.t_h('common.delete', [], 'Delete').'"><i class="fas fa-trash"></i></button>';
                     
@@ -804,7 +814,11 @@ $body_classes = trim($extra_body_classes);
                         $placeholder_attr .= ' data-ph-mobile="' . htmlspecialchars($placeholder_mobile, ENT_QUOTES) . '"';
                     }
 
-                    echo '<div class="noteentry" autocomplete="off" autocapitalize="off" spellcheck="false" id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'"'.$placeholder_attr.' contenteditable="'.$editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.'>'.$display_content.'</div>';
+                    $linked_note_id_attr = '';
+                    if (isset($row['linked_note_id']) && $row['linked_note_id']) {
+                        $linked_note_id_attr = ' data-linked-note-id="'.$row['linked_note_id'].'"';
+                    }
+                    echo '<div class="noteentry" autocomplete="off" autocapitalize="off" spellcheck="false" id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'"'.$placeholder_attr.' contenteditable="'.$editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.$linked_note_id_attr.'>'.$display_content.'</div>';
                     echo '<div class="note-bottom-space"></div>';
                     echo '</div>';
                     echo '</div>';
@@ -860,11 +874,13 @@ $body_classes = trim($extra_body_classes);
 <script src="js/folder-hierarchy.js?v=<?php echo $v; ?>"></script>
 <script src="js/math-renderer.js?v=<?php echo $v; ?>"></script>
 <script src="js/modals-events.js?v=<?php echo $v; ?>"></script>
-<script src="js/main.js"></script>
+<script src="js/index-events.js?v=<?php echo $v; ?>"></script>
+<script src="js/main.js?v=<?php echo $v; ?>"></script>
 <script src="js/resize-column.js"></script>
 <script src="js/unified-search.js"></script>
 <script src="js/clickable-tags.js?v=<?php echo $v; ?>"></script>
 <script src="js/font-size-settings.js?v=<?php echo $v; ?>"></script>
+<script src="js/background-settings.js?v=<?php echo $v; ?>"></script>
 <script src="js/tasklist.js?v=<?php echo $v; ?>"></script>
 <script src="js/excalidraw.js?v=<?php echo $v; ?>"></script>
 <script src="js/copy-code-on-focus.js?v=<?php echo $v; ?>"></script>
@@ -873,7 +889,6 @@ $body_classes = trim($extra_body_classes);
 <script src="js/notes-list-events.js?v=<?php echo $v; ?>"></script>
 <script src="js/folder-icon.js?v=<?php echo $v; ?>"></script>
 <script src="js/kanban.js?v=<?php echo $v; ?>"></script>
-<script src="js/index-events.js?v=<?php echo $v; ?>"></script>
 
 <?php if ($note && is_numeric($note)): ?>
 <!-- Data for draft check (used by index-events.js) -->

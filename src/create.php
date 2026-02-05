@@ -20,12 +20,7 @@ $currentLang = getUserLanguage();
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-    <?php
-    require_once 'users/db_master.php';
-    $login_display_name = getGlobalSetting('login_display_name', '');
-    $pageTitle = ($login_display_name && trim($login_display_name) !== '') ? htmlspecialchars($login_display_name) : t_h('app.name');
-    ?>
-    <title><?php echo $pageTitle; ?> - <?php echo t_h('common.create', [], 'Create'); ?></title>
+    <title><?php echo getPageTitle(); ?> - <?php echo t_h('common.create', [], 'Create'); ?></title>
     <meta name="color-scheme" content="dark light">
     <?php 
     $cache_v = @file_get_contents('version.txt');
@@ -47,19 +42,13 @@ $currentLang = getUserLanguage();
 </head>
 <body class="home-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <div class="home-container">
-        <h1 class="create-page-title"><?php echo t_h('common.create', [], 'Create'); ?></h1>
-        
-        <div class="home-grid">
-
-            <!-- Back to Notes -->
-            <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?>">
-                <div class="home-card-icon">
-                    <i class="fas fa-arrow-left"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?></span>
-                </div>
+        <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+            <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary">
+                <?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?>
             </a>
+        </div>
+
+        <div class="home-grid">
 
             <!-- Note -->
             <a href="#" class="home-card" data-create-type="html" title="<?php echo t_h('modals.create.note.title', [], 'Note'); ?>">
@@ -90,6 +79,16 @@ $currentLang = getUserLanguage();
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('modals.create.task_list.title', [], 'Task List'); ?></span>
+                </div>
+            </a>
+
+            <!-- Linked Note -->
+            <a href="#" class="home-card" data-create-type="linked" title="<?php echo t_h('modals.create.linked.title', [], 'Linked Note'); ?>">
+                <div class="home-card-icon">
+                    <i class="fas fa-link"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('modals.create.linked.title', [], 'Linked Note'); ?></span>
                 </div>
             </a>
 
@@ -146,6 +145,7 @@ $currentLang = getUserLanguage();
     <script src="js/ui.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/utils.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/template-selector.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="js/linked-note-selector.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/modals-events.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/notes.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/folder-hierarchy.js?v=<?php echo $cache_v; ?>"></script>

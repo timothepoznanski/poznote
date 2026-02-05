@@ -76,28 +76,15 @@ html.tags-page {
     text-decoration: none;
 }
 
-.tags-search-form {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.tags-search-input {
-    width: 40%;
-    padding: 12px 20px;
-    font-size: 1.1em;
-    border: 2px solid #ddd;
-    border-radius: 25px;
-    outline: none;
-    transition: border-color 0.3s ease;
-}
-
-.tags-search-input:focus {
-    border-color: #007DB8;
-}
-
 .tags-info {
     text-align: center;
     margin-bottom: 20px;
+}
+
+/* Adjust padding for search input without icon */
+.tags-search-no-icon {
+    padding-left: 12px !important;
+}
     color: #666;
     font-size: 1.1em;
     font-weight: 500;

@@ -76,6 +76,16 @@
 /* Ensure font awesome icons work if not covered by home.css */
 /* home.css covers most, but let's ensure compatibility */
 
+/* Settings Category Titles */
+.settings-category-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 1.5rem 0 0.75rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
 /* Utility classes */
 .desktop-only {
     display: flex;

@@ -882,14 +882,21 @@ For installation, configuration, and setup instructions, see the [MCP Server REA
 
 ## Poznote Extension
 
-The **Poznote URL Saver** is a browser extension that allows you to quickly save the URL of the current page to your Poznote instance with a single click.
+The **Poznote URL Saver** is a browser extension (Chrome, Edge, Brave, Opera, and any Chromium-based browser) that allows you to quickly save the URL of the current page to your Poznote instance with a single click.
 
-1. Open your browser (Chrome, Edge, or any Chromium-based browser)
-2. Go to the extensions page by typing `chrome://extensions/` in the address bar
-3. Enable **Developer mode** using the toggle switch in the top right corner
-4. Click **Load unpacked** in the top left
-5. Select the `poznote-url-saver` folder from the Poznote repository
-6. The extension is now installed and ready to use!
+<p align="center">
+  <img src="images/chrome-extension.png" alt="Poznote Chrome Extension" width="50%">
+</p>
+
+1. Get the extension folder (two possibilities):
+   - **Download:** [Download the repository as ZIP](https://github.com/timothepoznanski/poznote/archive/refs/heads/main.zip) and extract it
+   - **Clone:** `git clone https://github.com/timothepoznanski/poznote.git`
+2. Open your browser (Chrome, Edge, or any Chromium-based browser)
+3. Go to the extensions page by typing `chrome://extensions/` in the address bar
+4. Enable **Developer mode** using the toggle switch in the top right corner
+5. Click **Load unpacked** in the top left
+6. Select the `poznote-url-saver` folder from the Poznote repository
+7. The extension is now installed and ready to use!
 
 ## API Documentation
 
@@ -1018,16 +1025,6 @@ Create a copy of an existing note:
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/duplicate
-```
-
-**Convert Note Type**
-
-Convert between markdown and HTML:
-```bash
-curl -X POST -u 'username:password' -H "X-User-ID: 1" \
-  -H "Content-Type: application/json" \
-  -d '{"target_type": "markdown"}' \
-  http://YOUR_SERVER/api/v1/notes/123/convert
 ```
 
 **Update Tags**

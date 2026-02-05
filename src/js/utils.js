@@ -617,7 +617,12 @@ function checkForUpdates() {
 // Check for updates automatically (silent, once per day)
 function checkForUpdatesAutomatic() {
     // Only check for updates if user is admin
-    if (!window.isAdmin) {
+    // Check if badge exists in DOM (PHP only renders it for admins) as fallback
+    var badges = document.querySelectorAll('.update-badge');
+    if (!badges.length) {
+        return; // No badge in DOM means user is not admin
+    }
+    if (typeof window.isAdmin !== 'undefined' && !window.isAdmin) {
         return;
     }
 
@@ -696,10 +701,7 @@ function showUpdateInstructions(hasUpdate = false) {
 
         if (hasUpdate) {
             if (titleEl) titleEl.textContent = window.t ? window.t('update.new_available', null, '🎉 New Update Available!') : '🎉 New Update Available!';
-            if (messageEl) messageEl.textContent = window.t ? window.t('update.description', null, 'A new version of Poznote is available. Your data will be preserved during the update.') : 'A new version of Poznote is available. Your data will be preserved during the update.';
-            if (updateButtonsContainer) {
-                updateButtonsContainer.style.display = 'flex';
-            }
+            if (messageEl) messageEl.textContent = window.t ? window.t('update.new_version_available', null, 'A new version of Poznote is available.') : 'A new version of Poznote is available.';
             if (backupWarning) {
                 backupWarning.style.display = 'block';
             }
@@ -711,16 +713,13 @@ function showUpdateInstructions(hasUpdate = false) {
         } else {
             if (titleEl) titleEl.textContent = window.t ? window.t('update.up_to_date', null, '✅ Poznote is Up to date') : '✅ Poznote is Up to date';
             if (messageEl) messageEl.textContent = '';
-            if (updateButtonsContainer) {
-                updateButtonsContainer.style.display = 'none';
-            }
             if (backupWarning) {
                 backupWarning.style.display = 'none';
             }
-            // Hide release notes link
+            // Show release notes link for up-to-date status as well
             var releaseNotesLink = document.getElementById('releaseNotesLink');
             if (releaseNotesLink) {
-                releaseNotesLink.style.display = 'none';
+                releaseNotesLink.style.display = 'block';
             }
         }
 
@@ -749,11 +748,15 @@ function showUpdateInstructions(hasUpdate = false) {
                     if (availableVersionEl) {
                         availableVersionEl.textContent = data.remote_version || 'unknown';
                     }
-                    // Set release notes link if update available
-                    if (hasUpdate && data.remote_version) {
-                        var releaseNotesHref = document.getElementById('releaseNotesHref');
-                        if (releaseNotesHref) {
+                    // Set release notes link
+                    var releaseNotesHref = document.getElementById('releaseNotesHref');
+                    if (releaseNotesHref) {
+                        if (hasUpdate && data.remote_version) {
+                            // If update available, link to new version
                             releaseNotesHref.href = 'https://github.com/timothepoznanski/poznote/releases/tag/' + data.remote_version;
+                        } else if (data.current_version) {
+                            // If up to date, link to current version
+                            releaseNotesHref.href = 'https://github.com/timothepoznanski/poznote/releases/tag/' + data.current_version;
                         }
                     }
                 } else {
@@ -864,10 +867,14 @@ function hideUpdateBadge() {
 
 function showUpdateBadge() {
     // Only show badge for admin users
-    if (!window.isAdmin) {
+    // Check if badge exists in DOM (PHP only renders it for admins) as fallback
+    var badges = document.querySelectorAll('.update-badge');
+    if (!badges.length) {
+        return; // No badge in DOM means user is not admin
+    }
+    if (typeof window.isAdmin !== 'undefined' && !window.isAdmin) {
         return;
     }
-    var badges = document.querySelectorAll('.update-badge');
     for (var i = 0; i < badges.length; i++) {
         badges[i].classList.remove('update-badge-hidden');
         badges[i].style.display = 'inline-block';
@@ -876,7 +883,12 @@ function showUpdateBadge() {
 
 function restoreUpdateBadge() {
     // Only restore badge for admin users
-    if (!window.isAdmin) {
+    // Check if badge exists (PHP only renders it for admins) as fallback for window.isAdmin
+    var badges = document.querySelectorAll('.update-badge');
+    if (!badges.length) {
+        return; // No badge in DOM means user is not admin
+    }
+    if (typeof window.isAdmin !== 'undefined' && !window.isAdmin) {
         return;
     }
     const updateAvailable = localStorage.getItem('poznote_update_available');
@@ -1590,6 +1602,11 @@ function onWorkspaceChange() {
     // When workspace changes, reload folders for the new workspace
     var newWorkspace = document.getElementById('workspaceSelect').value;
 
+    // Reload workspace background if function exists
+    if (typeof window.reloadWorkspaceBackground === 'function') {
+        window.reloadWorkspaceBackground();
+    }
+
     // Clear the move modal state
     updateMoveButton('');
     hideMoveFolderError();
@@ -1996,6 +2013,13 @@ function executeCreateAction() {
                 console.error('openTemplateNoteSelectorModal function not found');
             }
             break;
+        case 'linked':
+            if (typeof openLinkedNoteSelectorModal === 'function') {
+                openLinkedNoteSelectorModal();
+            } else {
+                console.error('openLinkedNoteSelectorModal function not found');
+            }
+            break;
         case 'subfolder':
             if (targetFolderId) {
                 var folderKey = 'folder_' + targetFolderId;
@@ -2294,114 +2318,9 @@ document.addEventListener('click', function (event) {
 });
 
 // ============================================
-// Note Conversion Functions
+// Kanban View Functions
 // ============================================
 
-var convertNoteId = null;
-var convertNoteTarget = null;
-
-/**
- * Show the convert note confirmation modal
- * @param {string} noteId - The note ID to convert
- * @param {string} target - Target type: 'html' or 'markdown'
- */
-function showConvertNoteModal(noteId, target) {
-    convertNoteId = noteId;
-    convertNoteTarget = target;
-
-    var modal = document.getElementById('convertNoteModal');
-    var titleEl = document.getElementById('convertNoteTitle');
-    var messageEl = document.getElementById('convertNoteMessage');
-    var warningEl = document.getElementById('convertNoteWarning');
-    var confirmBtn = document.getElementById('confirmConvertBtn');
-    var duplicateBtn = document.getElementById('duplicateBeforeConvertBtn');
-
-    if (!modal) return;
-
-    if (target === 'html') {
-        titleEl.textContent = window.t ? window.t('modals.convert.to_html_title', null, 'Convert to HTML') : 'Convert to HTML';
-        messageEl.textContent = window.t ? window.t('modals.convert.to_html_message', null, 'This will convert your Markdown note to HTML format. The markdown syntax will be rendered as HTML.') : 'This will convert your Markdown note to HTML format. The markdown syntax will be rendered as HTML.';
-        warningEl.textContent = window.t ? window.t('modals.convert.to_html_warning', null, 'Make sure to backup your note first. You can also duplicate the note beforehand to keep a copy in case the conversion doesn\'t meet your expectations.') : 'Make sure to backup your note first. You can also duplicate the note beforehand to keep a copy in case the conversion doesn\'t meet your expectations.';
-    } else {
-        titleEl.textContent = window.t ? window.t('modals.convert.to_markdown_title', null, 'Convert to Markdown') : 'Convert to Markdown';
-        messageEl.textContent = window.t ? window.t('modals.convert.to_markdown_message', null, 'This will convert your HTML note to Markdown format. Embedded images will be saved as attachments.') : 'This will convert your HTML note to Markdown format. Embedded images will be saved as attachments.';
-        warningEl.textContent = window.t ? window.t('modals.convert.to_markdown_warning', null, 'Some complex HTML formatting may not convert perfectly to Markdown.') : 'Some complex HTML formatting may not convert perfectly to Markdown.';
-    }
-
-    confirmBtn.onclick = function () {
-        executeNoteConversion();
-    };
-
-    if (duplicateBtn) {
-        duplicateBtn.onclick = function () {
-            // Duplicate the note without reloading the page
-            fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/duplicate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'same-origin'
-            })
-                .then(function (response) {
-                    return response.json();
-                })
-                .then(function (data) {
-                    if (data.success) {
-                        // Update shared count if note was auto-shared
-                        if (data.share_delta && typeof updateSharedCount === 'function') {
-                            updateSharedCount(data.share_delta);
-                        }
-                        // Hide the warning message and disable the duplicate button
-                        if (warningEl) warningEl.style.display = 'none';
-                        duplicateBtn.disabled = true;
-                        duplicateBtn.style.opacity = '0.5';
-                        duplicateBtn.style.cursor = 'not-allowed';
-                    }
-                })
-                .catch(function (error) {
-                    console.error('Duplicate error:', error);
-                });
-        };
-    }
-
-    modal.style.display = 'flex';
-}
-
-/**
- * Execute the note conversion
- */
-function executeNoteConversion() {
-    if (!convertNoteId || !convertNoteTarget) return;
-
-    closeModal('convertNoteModal');
-
-    fetch('/api/v1/notes/' + encodeURIComponent(convertNoteId) + '/convert', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        body: JSON.stringify({ target: convertNoteTarget })
-    })
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (data) {
-            if (data.success) {
-                // Reload the page to show the converted note
-                window.location.reload();
-            } else {
-                showNotificationPopup(data.error || (window.t ? window.t('modals.convert.error', null, 'Failed to convert note') : 'Failed to convert note'), 'error');
-            }
-        })
-        .catch(function (error) {
-            console.error('Convert error:', error);
-            showNotificationPopup(window.t ? window.t('modals.convert.error', null, 'Failed to convert note') : 'Failed to convert note', 'error');
-        });
-
-    // Reset
-    convertNoteId = null;
-    convertNoteTarget = null;
-}
-
-/**
- * Toggle Kanban view for a folder
 /**
  * Open Kanban view for a folder (inline in right column)
  * @param {number} folderId - The folder ID
@@ -2553,13 +2472,9 @@ function createKanbanStructure() {
     var folderName = folderNameInput.value.trim();
     var columns = parseInt(columnsInput.value, 10);
 
-    // Validation
+    // If no folder name is provided, use the placeholder value
     if (!folderName) {
-        showNotificationPopup(
-            window.t ? window.t('modals.kanban_structure.error_name_required', null, 'Folder name is required') : 'Folder name is required',
-            'error'
-        );
-        return;
+        folderName = folderNameInput.placeholder || (window.t ? window.t('modals.kanban_structure.folder_name_placeholder', null, 'My Kanban Board') : 'My Kanban Board');
     }
 
     if (isNaN(columns) || columns < 1 || columns > 9) {

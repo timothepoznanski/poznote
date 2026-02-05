@@ -31,7 +31,6 @@
             }
         },
         "download": "Descargar",
-        "convert": "Convertir",
         "create": "Crear",
         "delete": "Eliminar",
         "duplicate": "Duplicar",
@@ -55,6 +54,7 @@
         "not_available": "No disponible",
         "not_specified": "No especificado",
         "apply": "Aplicar",
+        "at": "a las",
         "kanban": "Kanban"
     },
     "kanban": {
@@ -608,6 +608,7 @@
             "insert_checklist": "Insertar lista de verificación",
             "add_separator": "Agregar separador",
             "insert_note_reference": "Insertar referencia de nota",
+            "create_linked_note": "Crear nota vinculada",
             "open_in_new_tab": "Abrir en nueva pestaña"
         },
         "link": {
@@ -751,6 +752,12 @@
             "task_list": {
                 "title": "Lista de tareas"
             },
+            "linked": {
+                "title": "Nota vinculada",
+                "default_heading": "{{note}}",
+                "success": "Nota vinculada creada con éxito",
+                "error": "Error al crear la nota vinculada"
+            },
             "subfolder": {
                 "title": "Subcarpeta"
             },
@@ -767,10 +774,11 @@
         "kanban_structure": {
             "title": "Crear estructura Kanban",
             "folder_name_label": "Nombre de la carpeta:",
-            "folder_name_placeholder": "Mi tablero Kanban",
+            "folder_name_placeholder": "Mi vista Kanban",
             "columns_label": "Número de columnas (1-9):",
             "error_name_required": "El nombre de la carpeta es obligatorio",
             "error_columns_range": "El número de columnas debe estar entre 1 y 9",
+            "error_folder_exists": "Ya existe una carpeta en esta ubicación",
             "error_create": "Error al crear la estructura Kanban",
             "error_create_prefix": "Error al crear la estructura Kanban: {{error}}"
         },
@@ -779,19 +787,16 @@
             "reset": "Restaurar el comportamiento predeterminado",
             "search_placeholder": "Buscar iconos..."
         },
-        "convert": {
-            "title": "Convertir nota",
-            "message": "¿Estás seguro de que quieres convertir esta nota?",
-            "to_html_title": "Convertir a HTML",
-            "to_html_message": "Esto convertirá tu nota Markdown a formato HTML.",
-            "to_html_warning": "Antes de convertir esta nota, puedes duplicarla para mantener una copia en caso de que la conversión no cumpla con tus expectativas.",
-            "to_markdown_title": "Convertir a Markdown",
-            "to_markdown_message": "Esto convertirá tu nota HTML a formato Markdown. Las imágenes embebidas se guardarán como adjuntos.",
-            "to_markdown_warning": "Antes de convertir esta nota, puedes duplicarla para mantener una copia en caso de que la conversión no cumpla con tus expectativas.",
-            "converting": "Convirtiendo nota...",
-            "success": "¡Nota convertida con éxito!",
-            "error": "Error al convertir la nota",
-            "duplicate_button": "Duplicar"
+        "linked_selector": {
+            "title": "Seleccionar nota para vincular",
+            "search_placeholder": "Buscar notas...",
+            "recent_label": "Notas recientes"
+        },
+        "delete_linked_note": {
+            "title": "Eliminar nota vinculada",
+            "message": "¿Qué desea eliminar?",
+            "delete_link_only": "Eliminar solo este vínculo",
+            "delete_link_and_target": "Eliminar la nota y todos sus vínculos"
         },
         "export": {
             "title": "Exportar nota",
@@ -944,6 +949,7 @@
         },
         "errors": {
             "workspace_not_found": "Espacio de trabajo no encontrado",
+            "linked_note_already_exists": "Ya existe una nota vinculada para esta nota",
             "method_not_allowed": "Método no permitido",
             "invalid_action": "Acción inválida",
             "internal_server_error": "Error interno del servidor",
@@ -991,9 +997,7 @@
             "create_task_list": "Error al crear lista de tareas",
             "create_task_list_prefix": "Error al crear lista de tareas: ",
             "create_markdown_note": "Error al crear nota markdown",
-            "create_markdown_note_prefix": "Error al crear nota markdown: ",
-            "conversion_failed_prefix": "Error en la conversión: {{error}}",
-            "network_error_converting": "Error de red al convertir la nota"
+            "create_markdown_note_prefix": "Error al crear nota markdown: "
         },
         "toolbar": {
             "favorite_add": "Agregar a favoritos",

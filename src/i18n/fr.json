@@ -31,7 +31,6 @@
             }
         },
         "download": "Télécharger",
-        "convert": "Convertir",
         "create": "Créer",
         "delete": "Supprimer",
         "duplicate": "Dupliquer",
@@ -55,6 +54,7 @@
         "not_available": "Non disponible",
         "not_specified": "Non spécifié",
         "apply": "Appliquer",
+        "at": "à",
         "kanban": "Kanban"
     },
     "kanban": {
@@ -626,6 +626,7 @@
             "insert_checklist": "Insérer une checklist",
             "add_separator": "Ajouter un séparateur",
             "insert_note_reference": "Insérer une référence de note",
+            "create_linked_note": "Créer une note liée",
             "open_in_new_tab": "Ouvrir dans un nouvel onglet"
         },
         "link": {
@@ -769,6 +770,12 @@
             "task_list": {
                 "title": "Liste de tâches"
             },
+            "linked": {
+                "title": "Note liée",
+                "default_heading": "{{note}}",
+                "success": "Note liée créée avec succès",
+                "error": "Erreur lors de la création de la note liée"
+            },
             "subfolder": {
                 "title": "Sous-dossier"
             },
@@ -785,10 +792,11 @@
         "kanban_structure": {
             "title": "Créer une structure Kanban",
             "folder_name_label": "Nom du dossier :",
-            "folder_name_placeholder": "Mon tableau Kanban",
+            "folder_name_placeholder": "Ma vue Kanban",
             "columns_label": "Nombre de colonnes (1-9) :",
             "error_name_required": "Le nom du dossier est requis",
             "error_columns_range": "Le nombre de colonnes doit être entre 1 et 9",
+            "error_folder_exists": "Un dossier existe déjà à cet emplacement",
             "error_create": "Échec de la création de la structure Kanban",
             "error_create_prefix": "Erreur lors de la création de la structure Kanban : {{error}}"
         },
@@ -796,6 +804,17 @@
             "title": "Changer l'icône du dossier",
             "reset": "Reset",
             "search_placeholder": "Rechercher des icônes..."
+        },
+        "linked_selector": {
+            "title": "Sélectionner une note à lier",
+            "search_placeholder": "Rechercher des notes...",
+            "recent_label": "Notes récentes"
+        },
+        "delete_linked_note": {
+            "title": "Supprimer la note liée",
+            "message": "Que voulez-vous supprimer ?",
+            "delete_link_only": "Supprimer uniquement ce lien",
+            "delete_link_and_target": "Supprimer la note et tous ses liens"
         },
         "export": {
             "title": "Exporter la note",
@@ -825,20 +844,6 @@
             "moving": "Déplacement de la tâche...",
             "error": "Impossible de charger les listes de tâches.",
             "confirm": "Déplacer la tâche"
-        },
-        "convert": {
-            "title": "Convertir la note",
-            "message": "Êtes-vous sûr de vouloir convertir cette note ?",
-            "to_html_title": "Convertir en HTML",
-            "to_html_message": "Cela convertira votre note Markdown en format HTML.",
-            "to_html_warning": "Avant de convertir cette note, vous pouvez la dupliquer pour conserver une copie au cas où la conversion ne serait pas satisfaisante.",
-            "to_markdown_title": "Convertir en Markdown",
-            "to_markdown_message": "Cela convertira votre note HTML en format Markdown. Les images intégrées seront enregistrées comme pièces jointes.",
-            "to_markdown_warning": "Avant de convertir cette note, vous pouvez la dupliquer pour conserver une copie au cas où la conversion ne serait pas satisfaisante.",
-            "converting": "Conversion en cours...",
-            "success": "Note convertie avec succès !",
-            "error": "Échec de la conversion de la note",
-            "duplicate_button": "Dupliquer"
         },
         "note_sort": {
             "title": "Ordre de tri des notes",
@@ -971,6 +976,7 @@
         },
         "errors": {
             "workspace_not_found": "Espace de travail introuvable",
+            "linked_note_already_exists": "Un lien existe déjà pour cette note",
             "method_not_allowed": "Méthode non autorisée",
             "invalid_action": "Action invalide",
             "internal_server_error": "Erreur interne du serveur",
@@ -1023,9 +1029,7 @@
             "create_task_list": "Erreur lors de la création de la liste de tâches",
             "create_task_list_prefix": "Erreur lors de la création de la liste de tâches : ",
             "create_markdown_note": "Erreur lors de la création de la note Markdown",
-            "create_markdown_note_prefix": "Erreur lors de la création de la note Markdown : ",
-            "conversion_failed_prefix": "Échec de la conversion : {{error}}",
-            "network_error_converting": "Erreur réseau lors de la conversion de la note"
+            "create_markdown_note_prefix": "Erreur lors de la création de la note Markdown : "
         },
         "toolbar": {
             "favorite_add": "Ajouter aux favoris",
@@ -1033,8 +1037,6 @@
             "public_note": "Partager la note",
             "attachments_with_count": "Pièces jointes ({{count}})",
             "menu_actions": "Actions du menu",
-            "convert_to_html": "Convertir en HTML",
-            "convert_to_markdown": "Convertir en Markdown",
             "share_note": "Partager la note"
         },
         "share_modal": {

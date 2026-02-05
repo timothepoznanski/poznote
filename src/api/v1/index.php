@@ -19,6 +19,12 @@
 // ini_set('display_errors', 1);
 // error_reporting(E_ALL);
 
+// Set security headers to mitigate XSS attacks
+header("X-XSS-Protection: 1; mode=block");
+header("X-Content-Type-Options: nosniff");
+header("X-Frame-Options: SAMEORIGIN");
+header("Referrer-Policy: strict-origin-when-cross-origin");
+
 // Set content type for all responses
 header('Content-Type: application/json; charset=utf-8');
 
@@ -291,11 +297,6 @@ $router->post('/notes/{id}/duplicate', function($params) use ($notesController) 
 // Create a template from a note
 $router->post('/notes/{id}/create-template', function($params) use ($notesController) {
     $notesController->createTemplate($params['id']);
-});
-
-// Convert note type (markdown <-> html)
-$router->post('/notes/{id}/convert', function($params) use ($notesController) {
-    $notesController->convert($params['id']);
 });
 
 // Get share status for a note

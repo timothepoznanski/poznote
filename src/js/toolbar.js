@@ -764,6 +764,63 @@ document.addEventListener('keydown', function (e) {
   if (e.key !== 'Enter') return;
   if (e.shiftKey) return; // allow newline with Shift+Enter
 
+  // Check if we're in a contenteditable note
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  
+  const range = sel.getRangeAt(0);
+  let container = range.commonAncestorContainer;
+  if (container.nodeType === 3) container = container.parentNode;
+  
+  // Check if we're in a contenteditable noteentry
+  const noteentry = container.closest && container.closest('.noteentry');
+  if (!noteentry || !noteentry.isContentEditable) return;
+  
+  // Check if cursor is inside a span with font-size style
+  let fontSizeSpan = container.closest('span[style*="font-size"]');
+  
+  if (fontSizeSpan) {
+    // Let the browser handle the Enter key first
+    setTimeout(function() {
+      try {
+        const newSel = window.getSelection();
+        if (!newSel.rangeCount) return;
+        
+        const newRange = newSel.getRangeAt(0);
+        let newContainer = newRange.startContainer;
+        if (newContainer.nodeType === 3) newContainer = newContainer.parentNode;
+        
+        // Check if we're still in a font-size span after Enter
+        let newFontSizeSpan = newContainer.closest('span[style*="font-size"]');
+        
+        if (newFontSizeSpan) {
+          // Remove font-size from the style
+          const currentStyle = newFontSizeSpan.getAttribute('style') || '';
+          const newStyle = currentStyle.replace(/font-size:[^;]+;?\s*/gi, '').trim();
+          
+          if (newStyle) {
+            newFontSizeSpan.setAttribute('style', newStyle);
+          } else {
+            // If no other styles, unwrap the span
+            const parent = newFontSizeSpan.parentNode;
+            while (newFontSizeSpan.firstChild) {
+              parent.insertBefore(newFontSizeSpan.firstChild, newFontSizeSpan);
+            }
+            parent.removeChild(newFontSizeSpan);
+          }
+          
+          // Restore cursor position
+          const restoreRange = document.createRange();
+          restoreRange.setStart(newContainer, newRange.startOffset);
+          restoreRange.collapse(true);
+          newSel.removeAllRanges();
+          newSel.addRange(restoreRange);
+        }
+      } catch (err) {
+        // Silently fail if something goes wrong
+      }
+    }, 0);
+  }
 });
 
 function toggleEmojiPicker() {

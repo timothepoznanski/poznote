@@ -28,14 +28,14 @@
       margin-top: 15px;
       width: 100%;
       padding: 10px;
-      background: #4285f4;
+      background: #007cba;
       color: white;
       border: none;
       cursor: pointer;
     }
 
     button:hover {
-      background: #3367d6;
+      background: #005a87;
     }
 
     .action-buttons {
@@ -52,19 +52,19 @@
     }
 
     #saveNote {
-      background: #34a853;
+      background: #007cba;
     }
 
     #saveNote:hover {
-      background: #2d8e47;
+      background: #005a87;
     }
 
     #saveScreenshot {
-      background: #ea4335;
+      background: #007cba;
     }
 
     #saveScreenshot:hover {
-      background: #c5362c;
+      background: #005a87;
     }
 
     #status {
@@ -109,10 +109,9 @@
     <button id="fetchWorkspaces" title="Fetch Workspaces">↻</button>
   </div>
 
-  <label>Folder</label>
+  <label>Folder (optional)</label>
   <div class="row">
     <select id="folderSelect">
-      <option value="">📁 Root (No Folder)</option>
     </select>
     <button id="loadFolders" title="Load Folders">↻</button>
   </div>
@@ -120,8 +119,8 @@
   <button id="saveConfig">Save Configuration</button>
 
   <div class="action-buttons">
-    <button id="saveNote" title="Save URL only">📌 URL</button>
-    <button id="saveScreenshot" title="Save with screenshot">📸 Screenshot</button>
+    <button id="saveNote" title="Save URL only">URL</button>
+    <button id="saveScreenshot" title="Save with screenshot">Screenshot</button>
   </div>
 
   <div id="status"></div>

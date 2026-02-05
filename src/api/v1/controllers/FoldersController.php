@@ -1632,7 +1632,17 @@ class FoldersController {
         }
         
         if ((int)$checkStmt->fetchColumn() > 0) {
-            $this->sendJson(['success' => false, 'error' => 'Folder already exists in this location'], 409);
+            // Translation map for "Folder already exists in this location"
+            $errorMessages = [
+                'en' => 'Folder already exists in this location',
+                'fr' => 'Un dossier existe déjà à cet emplacement',
+                'de' => 'An diesem Speicherort existiert bereits ein Ordner',
+                'es' => 'Ya existe una carpeta en esta ubicación',
+                'pt' => 'Já existe uma pasta neste local',
+                'zh-cn' => '此位置已存在文件夹'
+            ];
+            $errorMessage = $errorMessages[$language] ?? $errorMessages['en'];
+            $this->sendJson(['success' => false, 'error' => $errorMessage], 409);
             return;
         }
         

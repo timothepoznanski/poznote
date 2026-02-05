@@ -147,7 +147,7 @@ if ($note_id > 0) {
     }
     
     // Generate new Excalidraw HTML content
-    $excalidraw_placeholder = t('editor.excalidraw.placeholder_outside', [], 'Write outside the diagram here…');
+    $excalidraw_placeholder = t('editor.excalidraw.placeholder_outside', [], '…');
     $excalidraw_placeholder = htmlspecialchars($excalidraw_placeholder, ENT_QUOTES);
 
     if (!empty($base64_image)) {
@@ -184,36 +184,18 @@ if ($note_id > 0) {
         $pattern_with_placeholders = '/(<p class="excalidraw-placeholder"[^>]*><\/p>)?\s*<div class="excalidraw-container"[^>]*>.*?<\/div>\s*(<p class="excalidraw-placeholder"[^>]*><\/p>)?/s';
         
         if (preg_match($pattern_with_placeholders, $existing_content, $matches, PREG_OFFSET_CAPTURE)) {
-            // Found existing container, check what surrounds it
+            // Found existing container, replace without placeholders
             $match_start = $matches[0][1];
             $match_end = $match_start + strlen($matches[0][0]);
             
-            // Check if there's content before (not just whitespace or existing placeholder)
-            $content_before = substr($existing_content, 0, $match_start);
-            $has_content_before = !empty(trim($content_before)) && !preg_match('/<p class="excalidraw-placeholder"[^>]*><\/p>\s*$/s', $content_before);
-            
-            // Check if there's content after (not just whitespace or existing placeholder)
-            $content_after = substr($existing_content, $match_end);
-            $has_content_after = !empty(trim($content_after)) && !preg_match('/^\s*<p class="excalidraw-placeholder"[^>]*><\/p>/s', $content_after);
-            
-            // Build replacement with placeholders only where needed
-            $replacement = '';
-            if (!$has_content_before) {
-                $replacement .= '<p class="excalidraw-placeholder" data-ph="' . $excalidraw_placeholder . '"></p>';
-            }
-            $replacement .= $new_excalidraw_html;
-            if (!$has_content_after) {
-                $replacement .= '<p class="excalidraw-placeholder" data-ph="' . $excalidraw_placeholder . '"></p>';
-            }
-            
-            $html_content = substr($existing_content, 0, $match_start) . $replacement . substr($existing_content, $match_end);
+            $html_content = substr($existing_content, 0, $match_start) . $new_excalidraw_html . substr($existing_content, $match_end);
         } else {
-            // No existing Excalidraw container found, append with placeholders
-            $html_content = $existing_content . '<p class="excalidraw-placeholder" data-ph="' . $excalidraw_placeholder . '"></p>' . $new_excalidraw_html . '<p class="excalidraw-placeholder" data-ph="' . $excalidraw_placeholder . '"></p>';
+            // No existing Excalidraw container found, append without placeholders
+            $html_content = $existing_content . $new_excalidraw_html;
         }
     } else {
-        // New file, use the Excalidraw content with placeholders
-        $html_content = '<p class="excalidraw-placeholder" data-ph="' . $excalidraw_placeholder . '"></p>' . $new_excalidraw_html . '<p class="excalidraw-placeholder" data-ph="' . $excalidraw_placeholder . '"></p>';
+        // New file, use the Excalidraw content without placeholders
+        $html_content = $new_excalidraw_html;
     }
     
     // Write HTML content to file
@@ -237,7 +219,7 @@ function saveEmbeddedDiagram() {
     $diagram_data = isset($_POST['diagram_data']) ? $_POST['diagram_data'] : '';
     $preview_image_base64 = isset($_POST['preview_image_base64']) ? $_POST['preview_image_base64'] : '';
     $cursor_position = isset($_POST['cursor_position']) ? intval($_POST['cursor_position']) : null;
-    $excalidraw_placeholder = t('editor.excalidraw.placeholder_outside', [], 'Write outside the diagram here…');
+    $excalidraw_placeholder = t('editor.excalidraw.placeholder_outside', [], '…');
     $excalidraw_placeholder = htmlspecialchars($excalidraw_placeholder, ENT_QUOTES);
     
     if ($note_id <= 0 || empty($diagram_id)) {
@@ -287,8 +269,11 @@ function saveEmbeddedDiagram() {
         // Extract existing image classes and style to preserve border settings
         $existing_img_classes = '';
         $existing_img_style = '';
-        $pattern_for_extraction = '/<div class="excalidraw-container" id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<img[^>]+class="([^"]*)"[^>]*style="([^"]*)".*?<\/div>/s';
-        if (preg_match($pattern_for_extraction, $html_content, $extraction_matches)) {
+        // Pattern flexible: class before id, or id before class
+        $pattern_for_extraction = '/<div[^>]*class="excalidraw-container"[^>]*id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<img[^>]+class="([^"]*)"[^>]*style="([^"]*)".*?<\/div>/s';
+        $pattern_for_extraction_alt = '/<div[^>]*id="' . preg_quote($diagram_id, '/') . '"[^>]*class="excalidraw-container"[^>]*>.*?<img[^>]+class="([^"]*)"[^>]*style="([^"]*)".*?<\/div>/s';
+        if (preg_match($pattern_for_extraction, $html_content, $extraction_matches) || 
+            preg_match($pattern_for_extraction_alt, $html_content, $extraction_matches)) {
             if (isset($extraction_matches[1])) {
                 $existing_img_classes = $extraction_matches[1];
             }
@@ -296,14 +281,18 @@ function saveEmbeddedDiagram() {
                 $existing_img_style = $extraction_matches[2];
             }
         } else {
-            // Try extracting just class or just style separately
-            $class_pattern = '/<div class="excalidraw-container" id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<img[^>]+class="([^"]*)".*?<\/div>/s';
-            $style_pattern = '/<div class="excalidraw-container" id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<img[^>]+style="([^"]*)".*?<\/div>/s';
+            // Try extracting just class or just style separately (flexible order)
+            $class_pattern = '/<div[^>]*class="excalidraw-container"[^>]*id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<img[^>]+class="([^"]*)".*?<\/div>/s';
+            $class_pattern_alt = '/<div[^>]*id="' . preg_quote($diagram_id, '/') . '"[^>]*class="excalidraw-container"[^>]*>.*?<img[^>]+class="([^"]*)".*?<\/div>/s';
+            $style_pattern = '/<div[^>]*class="excalidraw-container"[^>]*id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<img[^>]+style="([^"]*)".*?<\/div>/s';
+            $style_pattern_alt = '/<div[^>]*id="' . preg_quote($diagram_id, '/') . '"[^>]*class="excalidraw-container"[^>]*>.*?<img[^>]+style="([^"]*)".*?<\/div>/s';
             
-            if (preg_match($class_pattern, $html_content, $class_matches)) {
+            if (preg_match($class_pattern, $html_content, $class_matches) || 
+                preg_match($class_pattern_alt, $html_content, $class_matches)) {
                 $existing_img_classes = $class_matches[1];
             }
-            if (preg_match($style_pattern, $html_content, $style_matches)) {
+            if (preg_match($style_pattern, $html_content, $style_matches) || 
+                preg_match($style_pattern_alt, $html_content, $style_matches)) {
                 $existing_img_style = $style_matches[1];
             }
         }
@@ -329,10 +318,8 @@ function saveEmbeddedDiagram() {
         }
         
         // Create the core diagram HTML without placeholders initially
-        $diagram_html_core = '<div class="excalidraw-container" id="' . htmlspecialchars($diagram_id) . '" 
-                              style="padding: 10px; margin: 10px 0; cursor: pointer; text-align: center;" 
-                              data-diagram-id="' . htmlspecialchars($diagram_id) . '"
-                              data-excalidraw="' . htmlspecialchars($diagram_data) . '">';
+        // Keep all attributes on a single line for consistent regex matching
+        $diagram_html_core = '<div class="excalidraw-container" id="' . htmlspecialchars($diagram_id) . '" style="padding: 10px; cursor: pointer; text-align: center;" data-diagram-id="' . htmlspecialchars($diagram_id) . '" data-excalidraw="' . htmlspecialchars($diagram_data) . '">';
         
         if (!empty($image_data)) {
             $diagram_html_core .= '<img src="data:image/png;base64,' . $image_data . '" class="' . $img_classes . '" data-is-excalidraw="true"' . $img_style_attr . ' alt="Excalidraw diagram" />';
@@ -344,41 +331,30 @@ function saveEmbeddedDiagram() {
         $diagram_html_core .= '</div>';
         
         // Find and replace the existing diagram container or button placeholder
-        $pattern_with_placeholders = '/(<p class="excalidraw-placeholder"[^>]*><\/p>)?\s*<div class="excalidraw-container" id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<\/div>\s*(<p class="excalidraw-placeholder"[^>]*><\/p>)?/s';
+        // Flexible patterns to match both attribute orders (class before id, or id before class)
+        $pattern_with_placeholders = '/(<p class="excalidraw-placeholder"[^>]*><\/p>)?\s*<div[^>]*class="excalidraw-container"[^>]*id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<\/div>\s*(<p class="excalidraw-placeholder"[^>]*><\/p>)?/s';
+        $pattern_with_placeholders_alt = '/(<p class="excalidraw-placeholder"[^>]*><\/p>)?\s*<div[^>]*id="' . preg_quote($diagram_id, '/') . '"[^>]*class="excalidraw-container"[^>]*>.*?<\/div>\s*(<p class="excalidraw-placeholder"[^>]*><\/p>)?/s';
         $button_pattern = '/<button[^>]*id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<\/button>/s';
         
         if (preg_match($pattern_with_placeholders, $html_content, $matches, PREG_OFFSET_CAPTURE)) {
-            // Replace existing diagram container, checking for surrounding content
+            // Replace existing diagram container without placeholders
             $match_start = $matches[0][1];
             $match_end = $match_start + strlen($matches[0][0]);
             
-            // Check if there's content before (not just whitespace or existing placeholder)
-            $content_before = substr($html_content, 0, $match_start);
-            $has_content_before = !empty(trim($content_before)) && !preg_match('/<p class="excalidraw-placeholder"[^>]*><\/p>\s*$/s', $content_before);
+            $html_content = substr($html_content, 0, $match_start) . $diagram_html_core . substr($html_content, $match_end);
+        } else if (preg_match($pattern_with_placeholders_alt, $html_content, $matches, PREG_OFFSET_CAPTURE)) {
+            // Replace existing diagram container (alternate attribute order)
+            $match_start = $matches[0][1];
+            $match_end = $match_start + strlen($matches[0][0]);
             
-            // Check if there's content after (not just whitespace or existing placeholder)
-            $content_after = substr($html_content, $match_end);
-            $has_content_after = !empty(trim($content_after)) && !preg_match('/^\s*<p class="excalidraw-placeholder"[^>]*><\/p>/s', $content_after);
-            
-            // Build replacement with placeholders only where needed
-            $diagram_html = '';
-            if (!$has_content_before) {
-                $diagram_html .= '<p class="excalidraw-placeholder" data-ph="' . $excalidraw_placeholder . '"></p>';
-            }
-            $diagram_html .= $diagram_html_core;
-            if (!$has_content_after) {
-                $diagram_html .= '<p class="excalidraw-placeholder" data-ph="' . $excalidraw_placeholder . '"></p>';
-            }
-            
-            $html_content = substr($html_content, 0, $match_start) . $diagram_html . substr($html_content, $match_end);
+            $html_content = substr($html_content, 0, $match_start) . $diagram_html_core . substr($html_content, $match_end);
         } else if (preg_match($button_pattern, $html_content, $matches, PREG_OFFSET_CAPTURE)) {
-            // Replace existing button placeholder, adding placeholders as this is initial creation
-            $diagram_html = '<p class="excalidraw-placeholder" data-ph="' . $excalidraw_placeholder . '"></p>' . $diagram_html_core . '<p class="excalidraw-placeholder" data-ph="' . $excalidraw_placeholder . '"></p>';
-            $html_content = preg_replace($button_pattern, $diagram_html, $html_content);
+            // Replace existing button placeholder without placeholders
+            $html_content = preg_replace($button_pattern, $diagram_html_core, $html_content);
         } else {
             // Neither container nor button exists, insert at cursor position if available
-            // Build diagram with placeholders for new insertions
-            $diagram_html_new = '<p class="excalidraw-placeholder" data-ph="' . $excalidraw_placeholder . '"></p>' . $diagram_html_core . '<p class="excalidraw-placeholder" data-ph="' . $excalidraw_placeholder . '"></p>';
+            // Build diagram with text lines before and after for new insertions
+            $diagram_html_new = '<p>' . $excalidraw_placeholder . '</p>' . $diagram_html_core . '<p>' . $excalidraw_placeholder . '</p>';
             
             if ($cursor_position !== null && !empty($html_content)) {
                 // Strip HTML tags to get plain text position
