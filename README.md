@@ -1027,16 +1027,6 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/duplicate
 ```
 
-**Convert Note Type**
-
-Convert between markdown and HTML:
-```bash
-curl -X POST -u 'username:password' -H "X-User-ID: 1" \
-  -H "Content-Type: application/json" \
-  -d '{"target_type": "markdown"}' \
-  http://YOUR_SERVER/api/v1/notes/123/convert
-```
-
 **Update Tags**
 
 Replace all tags on a note:

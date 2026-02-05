@@ -689,24 +689,6 @@ def get_note_share_status(note_id: int, user_id: Optional[int] = None) -> str:
 
 
 @mcp.tool()
-def convert_note_format(note_id: int, user_id: Optional[int] = None) -> str:
-    """Convert a note between HTML and Markdown formats
-    
-    Args:
-        note_id: ID of the note to convert
-        user_id: User profile ID to access (optional, overrides default)
-    """
-    client, err = _get_client_or_error()
-    if err:
-        return err
-    note = client.convert_note_type(note_id, user_id=user_id)
-    if note:
-        return json.dumps({"success": True, "message": f"Note converted to {note.get('type')}", "note": note}, indent=2, ensure_ascii=False)
-    else:
-        return json.dumps({"success": False, "error": "Conversion failed"}, ensure_ascii=False)
-
-
-@mcp.tool()
 def get_github_sync_status(user_id: Optional[int] = None) -> str:
     """Get the current status of GitHub synchronization
     

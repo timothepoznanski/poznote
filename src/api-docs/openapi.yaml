@@ -541,30 +541,6 @@ paths:
                   new_note_id:
                     type: integer
 
-  /notes/{id}/convert:
-    post:
-      tags: [Notes]
-      summary: Convert note type
-      description: Convert between Markdown and HTML formats
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                target_type:
-                  type: string
-                  enum: [note, markdown]
-      responses:
-        '200':
-          description: Note converted
-
   /notes/{id}/folder:
     post:
       tags: [Notes]

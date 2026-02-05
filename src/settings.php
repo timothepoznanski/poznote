@@ -193,6 +193,12 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                 </div>
             </div>
 
+        </div>
+
+        <!-- ACTIONS CATEGORY -->
+        <h2 class="settings-category-title"><?php echo t_h('settings.categories.actions', [], 'Actions'); ?></h2>
+        <div class="home-grid">
+
             <!-- Workspaces -->
             <div class="home-card settings-card-clickable" id="workspaces-card" data-href="workspaces.php">
                 <div class="home-card-icon">
@@ -265,57 +271,11 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
             </div>
             <?php endif; ?>
 
-            <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
-            <!-- API Documentation -->
-            <div class="home-card" id="api-docs-card">
-                <div class="home-card-icon">
-                    <i class="fas fa-code"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.api_docs', [], 'API Documentation'); ?></span>
-                </div>
-            </div>
-            <?php endif; ?>
+        </div>
 
-            <!-- Github repository -->
-            <div class="home-card" id="github-card">
-                <div class="home-card-icon">
-                    <i class="fas fa-code-branch"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.documentation', [], 'Github Repository'); ?></span>
-                </div>
-            </div>
-
-            <!-- News -->
-            <div class="home-card" id="news-card">
-                <div class="home-card-icon">
-                    <i class="fas fa-newspaper"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.news', [], 'Poznote Blog'); ?></span>
-                </div>
-            </div>
-
-            <!-- Poznote Website -->
-            <div class="home-card" id="website-card">
-                <div class="home-card-icon">
-                    <i class="fas fa-globe"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.website', [], 'Poznote Website'); ?></span>
-                </div>
-            </div>
-
-            <!-- Support Developer -->
-            <div class="home-card home-card-red" id="support-card">
-                <div class="home-card-icon">
-                    <i class="fas fa-heart heart-blink"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.support', [], 'Support Developer'); ?></span>
-                </div>
-            </div>
+        <!-- DISPLAY CATEGORY -->
+        <h2 class="settings-category-title"><?php echo t_h('settings.categories.display', [], 'Display'); ?></h2>
+        <div class="home-grid">
 
             <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
             <!-- Login Display -->
@@ -435,6 +395,75 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.note_content_width', [], 'Note Content Width'); ?></span>
                     <span id="note-width-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ABOUT CATEGORY -->
+        <h2 class="settings-category-title"><?php echo t_h('settings.categories.about', [], 'About'); ?></h2>
+        <div class="home-grid">
+
+            <!-- Version -->
+            <a href="https://github.com/timothepoznanski/poznote/releases" target="_blank" class="home-card" id="version-card" title="<?php echo t_h('home.version', [], 'Version'); ?>">
+                <div class="home-card-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('home.version', [], 'Version'); ?></span>
+                    <span class="home-card-count"><?php echo htmlspecialchars(trim(@file_get_contents('version.txt') ?: 'Unknown'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
+                </div>
+            </a>
+
+            <!-- Github repository -->
+            <div class="home-card" id="github-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-code-branch"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.documentation', [], 'Github Repository'); ?></span>
+                </div>
+            </div>
+
+            <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
+            <!-- API Documentation -->
+            <div class="home-card" id="api-docs-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.api_docs', [], 'API Documentation'); ?></span>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <!-- News -->
+            <div class="home-card" id="news-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-newspaper"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.news', [], 'Poznote Blog'); ?></span>
+                </div>
+            </div>
+
+            <!-- Poznote Website -->
+            <div class="home-card" id="website-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.website', [], 'Poznote Website'); ?></span>
+                </div>
+            </div>
+
+            <!-- Support Developer -->
+            <div class="home-card home-card-red" id="support-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-heart heart-blink"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.support', [], 'Support Developer'); ?></span>
                 </div>
             </div>
 

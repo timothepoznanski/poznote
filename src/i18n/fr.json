@@ -626,8 +626,7 @@
             "add_separator": "Ajouter un séparateur",
             "insert_note_reference": "Insérer une référence de note",
             "create_linked_note": "Créer une note liée",
-            "open_in_new_tab": "Ouvrir dans un nouvel onglet",
-            "search_replace": "Rechercher et remplacer"
+            "open_in_new_tab": "Ouvrir dans un nouvel onglet"
         },
         "link": {
             "add_title": "Ajouter un lien",

@@ -608,8 +608,7 @@
             "add_separator": "Trennlinie hinzufügen",
             "insert_note_reference": "Notiz-Referenz einfügen",
             "create_linked_note": "Verknüpfte Notiz erstellen",
-            "open_in_new_tab": "In neuem Tab öffnen",
-            "search_replace": "Suchen und ersetzen"
+            "open_in_new_tab": "In neuem Tab öffnen"
         },
         "link": {
             "add_title": "Link hinzufügen",

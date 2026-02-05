@@ -2144,13 +2144,6 @@ html[data-theme='dark'] #folderShareModal .share-indexable-label {
     margin: 0 auto !important;
 }
 
-/* Convert note modal warning */
-#convertNoteModal .convert-warning {
-    color: #dc3545;
-    margin-top: 10px;
-    margin-bottom: 20px;
-}
-
 /* ===========================================
    UTILITY CLASSES FOR INLINE STYLE EXTRACTION
    =========================================== */

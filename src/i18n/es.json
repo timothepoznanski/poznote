@@ -608,8 +608,7 @@
             "add_separator": "Agregar separador",
             "insert_note_reference": "Insertar referencia de nota",
             "create_linked_note": "Crear nota vinculada",
-            "open_in_new_tab": "Abrir en nueva pestaña",
-            "search_replace": "Buscar y reemplazar"
+            "open_in_new_tab": "Abrir en nueva pestaña"
         },
         "link": {
             "add_title": "Agregar enlace",

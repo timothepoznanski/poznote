@@ -1058,6 +1058,12 @@ body.dark-mode .settings-container {
     color: #e0e0e0;
 }
 
+html[data-theme='dark'] .settings-category-title,
+body.dark-mode .settings-category-title {
+    color: #e0e0e0;
+    border-bottom-color: #404040;
+}
+
 html[data-theme='dark'] .settings-container h1,
 body.dark-mode .settings-container h1 {
     color: #e0e0e0;

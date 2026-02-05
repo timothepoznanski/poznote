@@ -399,15 +399,6 @@ class PoznoteClient:
             return data.get("share")
         return None
 
-    def convert_note_type(self, note_id: int, user_id: str | int | None = None) -> dict | None:
-        """Convert note between Markdown and HTML"""
-        response = self.client.post(f"/notes/{note_id}/convert", headers=self._headers_for_user(user_id))
-        response.raise_for_status()
-        data = response.json()
-        if data.get("success"):
-            return data.get("note")
-        return None
-
     def get_github_status(self, user_id: str | int | None = None) -> dict | None:
         """Get GitHub synchronization status"""
         response = self.client.get("/github-sync/status", headers=self._headers_for_user(user_id))
