@@ -25,7 +25,8 @@
         "tip": "Tip",
         "important": "Important",
         "note": "Note",
-        "apply": "Apply"
+        "apply": "Apply",
+        "at": "at"
     },
     "settings": {
         "title": "Settings",

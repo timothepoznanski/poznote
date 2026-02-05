@@ -23,13 +23,6 @@ $currentLang = getUserLanguage();
 $currentUser = getCurrentUser();
 $username = htmlspecialchars($currentUser['display_name'] ?: $currentUser['username']);
 
-// Get global login_display_name for page title
-require_once 'users/db_master.php';
-$login_display_name = getGlobalSetting('login_display_name', '');
-$pageTitle = ($login_display_name && trim($login_display_name) !== '') 
-    ? htmlspecialchars($login_display_name) 
-    : t_h('app.name');
-
 // Initialize GitHubSync
 $githubSync = new GitHubSync($con, $_SESSION['user_id'] ?? null);
 $configStatus = $githubSync->getConfigStatus();
@@ -110,7 +103,7 @@ try {
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-    <title><?php echo t_h('github_sync.title'); ?> - <?php echo $pageTitle; ?></title>
+    <title><?php echo t_h('github_sync.title'); ?> - <?php echo getPageTitle(); ?></title>
     <meta name="color-scheme" content="dark light">
     <?php 
     $cache_v = @file_get_contents('version.txt');

@@ -99,15 +99,6 @@ $using_unified_search = handleUnifiedSearch();
 
 // Workspace filter already initialized above
 
-// Load login display name for page title from global settings
-$login_display_name = '';
-try {
-    require_once 'users/db_master.php';
-    $login_display_name = getGlobalSetting('login_display_name', '');
-} catch (Exception $e) {
-    $login_display_name = '';
-}
-
 // Load note font size for CSS custom property
 $note_font_size = '15';
 try {
@@ -158,7 +149,7 @@ try {
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-    <title><?php echo htmlspecialchars($login_display_name !== '' ? $login_display_name : 'Poznote'); ?></title>
+    <title><?php echo getPageTitle(); ?></title>
     <?php 
     // Cache version based on app version to force reload on updates
     $v = getAppVersion();

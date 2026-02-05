@@ -44,12 +44,7 @@ $currentLang = getUserLanguage();
 	<meta charset="utf-8"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-	<?php
-	require_once 'users/db_master.php';
-	$login_display_name = getGlobalSetting('login_display_name', '');
-	$pageTitle = ($login_display_name && trim($login_display_name) !== '') ? htmlspecialchars($login_display_name) : t_h('app.name');
-	?>
-	<title><?php echo $pageTitle; ?></title>
+	<title><?php echo getPageTitle(); ?></title>
 	<meta name="color-scheme" content="dark light">
 	<script src="js/theme-init.js"></script>
 	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>

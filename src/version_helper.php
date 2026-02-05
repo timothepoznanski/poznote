@@ -50,12 +50,4 @@ function getAppVersion() {
     $cached_version = 'X.X.X';
     return $cached_version;
 }
-
-/**
- * Get version with 'v' prefix for display
- */
-function getAppVersionWithPrefix() {
-    $version = getAppVersion();
-    return (strpos($version, 'v') === 0) ? $version : 'v' . $version;
-}
 ?>

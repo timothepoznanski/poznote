@@ -367,25 +367,47 @@ body.dark-mode .home-card-green .home-card-icon {
 }
 
 /* Special icon colors — unified to Poznote blue */
-.home-card-icon-favorites,
-.home-card-icon-trash,
 .home-card-icon-shared {
     background: rgba(0, 125, 184, 0.1);
 }
 
-.home-card-icon-favorites i,
-.home-card-icon-trash i,
 .home-card-icon-shared i,
 .home-card-icon-kanban i {
     color: #007DB8;
     transition: color 0.15s ease;
 }
 
-.home-card:hover .home-card-icon-favorites i,
-.home-card:hover .home-card-icon-trash i,
 .home-card:hover .home-card-icon-shared i,
 .home-card:hover .home-card-icon-kanban i {
     color: #0099e6 !important;
+}
+
+/* Favorites icon - yellow */
+.home-card-icon-favorites {
+    background: rgba(255, 193, 7, 0.1);
+}
+
+.home-card-icon-favorites i {
+    color: #ffc107;
+    transition: color 0.15s ease;
+}
+
+.home-card:hover .home-card-icon-favorites i {
+    color: #ffb300 !important;
+}
+
+/* Trash icon - orange */
+.home-card-icon-trash {
+    background: rgba(255, 152, 0, 0.1);
+}
+
+.home-card-icon-trash i {
+    color: #ff9800;
+    transition: color 0.15s ease;
+}
+
+.home-card:hover .home-card-icon-trash i {
+    color: #fb8c00 !important;
 }
 
 .home-card-content {
@@ -423,26 +445,40 @@ body.dark-mode .home-card-green .home-card-icon {
 }
 
 .btn {
-    display: inline-block;
-    padding: 8px 16px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
     font-size: 14px;
     font-weight: 400;
-    text-align: center;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     text-decoration: none;
-    border-radius: 6px;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    line-height: 1.4;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.btn:hover {
+    opacity: 0.8;
+}
+
+.btn:focus {
+    outline: none;
+    box-shadow: none;
 }
 
 .btn-secondary {
     background: #6c757d;
-    color: white;
+    color: white !important;
 }
 
 .btn-secondary:hover {
     background: #5a6268;
-    color: white;
+    color: white !important;
     text-decoration: none;
 }
 
@@ -638,13 +674,19 @@ body.dark-mode .home-card-icon {
     background: rgba(0, 125, 184, 0.2);
 }
 
-html[data-theme='dark'] .home-card-icon-favorites,
-body.dark-mode .home-card-icon-favorites,
-html[data-theme='dark'] .home-card-icon-trash,
-body.dark-mode .home-card-icon-trash,
 html[data-theme='dark'] .home-card-icon-shared,
 body.dark-mode .home-card-icon-shared {
     background: rgba(0, 125, 184, 0.2);
+}
+
+html[data-theme='dark'] .home-card-icon-favorites,
+body.dark-mode .home-card-icon-favorites {
+    background: rgba(255, 193, 7, 0.2);
+}
+
+html[data-theme='dark'] .home-card-icon-trash,
+body.dark-mode .home-card-icon-trash {
+    background: rgba(255, 152, 0, 0.2);
 }
 
 html[data-theme='dark'] .debug-info,

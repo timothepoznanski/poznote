@@ -55,14 +55,6 @@ function getSetting($key, $default = null) {
 }
 
 /**
- * Clear settings cache (call after updating settings)
- */
-function clearSettingsCache() {
-    static $cache = null;
-    $cache = null;
-}
-
-/**
  * Clean content for search by removing base64 images and other heavy data
  * This is used to keep the database entry column lightweight for search functionality
  */
@@ -160,6 +152,29 @@ function t_h($key, $vars = [], $default = null, $lang = null) {
 }
 
 /**
+ * Get the page title for the application
+ * Uses custom display name from settings if available, otherwise uses app name from i18n
+ * @return string The HTML-escaped page title
+ */
+function getPageTitle() {
+    static $cached = null;
+    if ($cached !== null) {
+        return $cached;
+    }
+    
+    require_once __DIR__ . '/users/db_master.php';
+    $login_display_name = getGlobalSetting('login_display_name', '');
+    
+    if ($login_display_name && trim($login_display_name) !== '') {
+        $cached = htmlspecialchars($login_display_name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    } else {
+        $cached = t_h('app.name');
+    }
+    
+    return $cached;
+}
+
+/**
  * Get the user's configured timezone from the database
  * Returns 'UTC' if no timezone is configured
  * @return string The timezone identifier (e.g., 'Europe/Paris')
@@ -199,12 +214,21 @@ function convertUtcToUserTimezone($utcDatetime, $format = 'Y-m-d H:i:s') {
     }
 }
 
-function formatDate($t) {
-	return date('j M Y',$t);
-}
-
-function formatDateTime($t) {
-	return formatDate($t)." à ".date('H:i',$t);
+/**
+ * Format a timestamp for display (with i18n support)
+ * @param int $timestamp Unix timestamp
+ * @param string $format Date format (default: 'j M Y H:i')
+ * @return string Formatted date string
+ */
+function formatDateTime($timestamp) {
+    $timezone = getUserTimezone();
+    try {
+        $date = new DateTime('@' . $timestamp);
+        $date->setTimezone(new DateTimeZone($timezone));
+        return $date->format('j M Y') . ' ' . t('common.at', [], 'at') . ' ' . $date->format('H:i');
+    } catch (Exception $e) {
+        return date('j M Y H:i', $timestamp);
+    }
 }
 
 /**

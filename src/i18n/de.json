@@ -54,6 +54,7 @@
         "not_available": "Nicht verfügbar",
         "not_specified": "Nicht angegeben",
         "apply": "Anwenden",
+        "at": "um",
         "kanban": "Kanban"
     },
     "kanban": {

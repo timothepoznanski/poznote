@@ -54,6 +54,7 @@
         "not_available": "不可用",
         "not_specified": "未指定",
         "apply": "应用",
+        "at": "于",
         "kanban": "看板"
     },
     "kanban": {
