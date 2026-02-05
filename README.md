@@ -884,12 +884,19 @@ For installation, configuration, and setup instructions, see the [MCP Server REA
 
 The **Poznote URL Saver** is a browser extension that allows you to quickly save the URL of the current page to your Poznote instance with a single click.
 
-1. Open your browser (Chrome, Edge, or any Chromium-based browser)
-2. Go to the extensions page by typing `chrome://extensions/` in the address bar
-3. Enable **Developer mode** using the toggle switch in the top right corner
-4. Click **Load unpacked** in the top left
-5. Select the `poznote-url-saver` folder from the Poznote repository
-6. The extension is now installed and ready to use!
+<p align="center">
+  <img src="images/chrome-extension.png" alt="Poznote Chrome Extension" width="100%">
+</p>
+
+1. Get the extension folder (two possibilities):
+   - **Download:** [Download the repository as ZIP](https://github.com/timothepoznanski/poznote/archive/refs/heads/main.zip) and extract it
+   - **Clone:** `git clone https://github.com/timothepoznanski/poznote.git`
+2. Open your browser (Chrome, Edge, or any Chromium-based browser)
+3. Go to the extensions page by typing `chrome://extensions/` in the address bar
+4. Enable **Developer mode** using the toggle switch in the top right corner
+5. Click **Load unpacked** in the top left
+6. Select the `poznote-url-saver` folder from the Poznote repository
+7. The extension is now installed and ready to use!
 
 ## API Documentation
 
