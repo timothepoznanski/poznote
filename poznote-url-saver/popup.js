@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const currentFolder = folderSelect.value;
-      folderSelect.innerHTML = '<option value="">📁 Root (No Folder)</option>';
+      folderSelect.innerHTML = '';
 
       let count = 0;
       function addFolders(folders) {
@@ -295,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
         status.textContent = '📸 Capturing screenshot...';
         try {
           const screenshot = await chrome.tabs.captureVisibleTab(null, { format: 'png' });
-          noteContent = `<p><a href="${pageUrl}" target="_blank">${pageUrl}</a></p><br><p><img src="${screenshot}" alt="Page Screenshot" style="max-width: 100%; height: auto;" /></p>`;
+          noteContent = `<p><a href="${pageUrl}" target="_blank">${pageUrl}</a></p><br><p><img src="${screenshot}" alt="Page Screenshot" style="max-width: 100%; height: auto; border: 1px solid #ddd;" /></p>`;
           contentDescription = 'Screenshot';
         } catch (error) {
           status.textContent = '❌ Screenshot failed: ' + error.message;
@@ -308,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const selectedFolderName = selectedFolder ? (selectedOption.dataset.path || selectedOption.text.replace(/^📁 /, '')) : '';
 
       const noteData = {
-        heading: `🌐 ${pageTitle}${contentDescription ? ' - ' + contentDescription : ''}`,
+        heading: `🌐 ${pageTitle}`,
         content: noteContent,
         tags: '',
         folder_name: selectedFolderName,
