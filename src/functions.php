@@ -1183,22 +1183,24 @@ function sanitizeHtml($html) {
         'mark', 'small', 'sub', 'sup',
         'abbr', 'cite', 'q', 'time',
         'input', 'label', // For task lists
-        'iframe' // For YouTube, Vimeo embeds (validated separately)
+        'iframe', // For YouTube, Vimeo embeds (validated separately)
+        'button', 'i' // For Excalidraw buttons and icons
     ];
     
     // Allowed attributes per tag
     $allowedAttrs = [
         'a' => ['href', 'title', 'target', 'rel'],
-        'img' => ['src', 'alt', 'title', 'width', 'height'],
+        'img' => ['src', 'alt', 'title', 'width', 'height', 'data-is-excalidraw', 'data-excalidraw-note-id'],
         'td' => ['colspan', 'rowspan'],
         'th' => ['colspan', 'rowspan', 'scope'],
-        'div' => ['class', 'data-tasklist-json', 'data-markdown-content'],
+        'div' => ['class', 'data-tasklist-json', 'data-markdown-content', 'data-excalidraw', 'data-diagram-id', 'contenteditable'],
         'span' => ['class'],
         'input' => ['type', 'checked', 'disabled'],
         'time' => ['datetime'],
         'blockquote' => ['cite'],
         'q' => ['cite'],
-        'iframe' => ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'title']
+        'iframe' => ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'title'],
+        'button' => ['class', 'data-action']
     ];
     
     // Global allowed attributes (safe for all tags)

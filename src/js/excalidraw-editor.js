@@ -171,11 +171,13 @@
 
     // Save embedded diagram
     async function saveEmbeddedDiagram(data, elements, appState, files) {
-        // Generate preview canvas
+        // Generate preview canvas with padding for white margin around drawing
         var canvas = await excalidrawAPI.exportToCanvas({
             elements: elements,
             appState: appState,
-            files: files
+            files: files,
+            exportPadding: 10,
+            exportBackground: true
         });
         
         // Convert to base64 image for embedding
@@ -208,11 +210,13 @@
     
     // Save full note
     async function saveFullNote(data, elements, appState, files) {
-        // Generate PNG preview
+        // Generate PNG preview with padding for white margin around drawing
         var canvas = await excalidrawAPI.exportToCanvas({
             elements: elements,
             appState: appState,
-            files: files
+            files: files,
+            exportPadding: 10,
+            exportBackground: true
         });
         
         var blob = await new Promise(function(resolve) {

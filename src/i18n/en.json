@@ -660,7 +660,7 @@
         "markdown_placeholder": "Write your markdown or use / to open the command menu...",
         "markdown_placeholder_mobile": "Write your markdown here...",
         "excalidraw": {
-            "placeholder_outside": "Write outside the diagram here…"
+            "placeholder_outside": "…"
         },
         "images": {
             "delete_confirm": {

@@ -38,11 +38,36 @@ if ($note_id > 0) {
             if (file_exists($html_file)) {
                 $html_content = file_get_contents($html_file);
                 // Look for the specific diagram container
-                $pattern = '/<div class="excalidraw-container" id="' . preg_quote($diagram_id, '/') . '"[^>]*data-excalidraw="([^"]*)"[^>]*>/';
-                if (preg_match($pattern, $html_content, $matches)) {
-                    $existing_data = html_entity_decode($matches[1], ENT_QUOTES | ENT_HTML5);
-                    error_log("Found embedded diagram data for $diagram_id in note $note_id");
-                } else {
+                // Use 's' modifier (DOTALL) to match newlines, and be flexible with attribute order
+                // First find the div with the matching id, then extract data-excalidraw from it
+                $container_pattern = '/<div[^>]*class="excalidraw-container"[^>]*id="' . preg_quote($diagram_id, '/') . '"[^>]*>/s';
+                // Also try with id before class (attributes can be in any order)
+                $container_pattern_alt = '/<div[^>]*id="' . preg_quote($diagram_id, '/') . '"[^>]*class="excalidraw-container"[^>]*>/s';
+                
+                $found = false;
+                if (preg_match($container_pattern, $html_content, $container_match) || 
+                    preg_match($container_pattern_alt, $html_content, $container_match)) {
+                    // Now extract data-excalidraw from the matched div tag
+                    // The sanitizer may convert double quotes to single quotes around attribute values
+                    // If single quotes wrap the value, the JSON inside uses double quotes (safe to match)
+                    // If double quotes wrap the value, the JSON inside uses HTML entities
+                    $div_tag = $container_match[0];
+                    
+                    // Try single-quoted attribute first (more common after sanitization)
+                    if (preg_match("/data-excalidraw='([^']*)'/", $div_tag, $data_match)) {
+                        $existing_data = html_entity_decode($data_match[1], ENT_QUOTES | ENT_HTML5);
+                        error_log("Found embedded diagram data (single-quoted) for $diagram_id in note $note_id");
+                        $found = true;
+                    }
+                    // Then try double-quoted attribute
+                    elseif (preg_match('/data-excalidraw="([^"]*)"/', $div_tag, $data_match)) {
+                        $existing_data = html_entity_decode($data_match[1], ENT_QUOTES | ENT_HTML5);
+                        error_log("Found embedded diagram data (double-quoted) for $diagram_id in note $note_id");
+                        $found = true;
+                    }
+                }
+                
+                if (!$found) {
                     error_log("No existing data found for diagram $diagram_id in note $note_id");
                     $existing_data = null;
                 }

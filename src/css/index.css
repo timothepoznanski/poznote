@@ -2176,8 +2176,8 @@ img.img-with-border {
 
 /* Image border style without padding */
 img.img-with-border-no-padding {
-    border: 1px solid #ddd !important;
-    /* border-radius: 4px !important; */
+    border: 1px solid #ccc !important;
+    display: block !important;
     box-sizing: border-box !important;
 }
 
