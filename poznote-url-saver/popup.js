@@ -308,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const selectedFolderName = selectedFolder ? (selectedOption.dataset.path || selectedOption.text.replace(/^📁 /, '')) : '';
 
       const noteData = {
-        heading: `🔗 ${pageTitle}${contentDescription ? ' - ' + contentDescription : ''}`,
+        heading: `🌐 ${pageTitle}${contentDescription ? ' - ' + contentDescription : ''}`,
         content: noteContent,
         tags: '',
         folder_name: selectedFolderName,
