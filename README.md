@@ -882,7 +882,7 @@ For installation, configuration, and setup instructions, see the [MCP Server REA
 
 ## Poznote Extension
 
-The **Poznote URL Saver** is a browser extension that allows you to quickly save the URL of the current page to your Poznote instance with a single click.
+The **Poznote URL Saver** is a browser extension (Chrome, Edge, Brave, Opera, and any Chromium-based browser) that allows you to quickly save the URL of the current page to your Poznote instance with a single click.
 
 <p align="center">
   <img src="images/chrome-extension.png" alt="Poznote Chrome Extension" width="50%">
