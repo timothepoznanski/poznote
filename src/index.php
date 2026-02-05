@@ -562,6 +562,14 @@ $body_classes = trim($extra_body_classes);
                     // Open in new tab button
                     echo '<button type="button" class="toolbar-btn btn-open-new-tab note-action-btn" title="'.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'" data-action="open-note-new-tab" data-note-id="'.$row['id'].'"><i class="fas fa-external-link"></i></button>';
 
+                    // Check if this note already has a linked note (for both desktop and mobile menu)
+                    $hasLinkedNote = false;
+                    if ($note_type !== 'linked') {
+                        $checkExistingLink = $con->prepare("SELECT id FROM entries WHERE linked_note_id = ? AND trash = 0 LIMIT 1");
+                        $checkExistingLink->execute([$row['id']]);
+                        $hasLinkedNote = $checkExistingLink->fetch();
+                    }
+
                     // Mobile overflow menu button (shown only on mobile via CSS)
                     // Marked as note-action-btn so it can be hidden during text selection (hide-on-selection)
                     echo '<button type="button" class="toolbar-btn mobile-more-btn note-action-btn" title="'.t_h('common.menu', [], 'Menu').'" data-action="toggle-mobile-toolbar-menu" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>';
@@ -578,6 +586,11 @@ $body_classes = trim($extra_body_classes);
                     if ($note_type === 'tasklist') {
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="clear-completed-tasks" data-note-id="' . $row['id'] . '"><i class="fa-check-square"></i> '.t_h('tasklist.clear_completed', [], 'Clear completed tasks').'</button>';
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="uncheck-all-tasks" data-note-id="' . $row['id'] . '"><i class="fa-square"></i> '.t_h('tasklist.uncheck_all', [], 'Uncheck all tasks').'</button>';
+                    }
+                    
+                    // Create linked note button in mobile menu (only for notes without links)
+                    if ($note_type !== 'linked' && !$hasLinkedNote) {
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-create-linked-note"><i class="fa-link"></i> '.t_h('editor.toolbar.create_linked_note', [], 'Create linked note').'</button>';
                     }
                     
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-duplicate"><i class="fa-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';
@@ -648,15 +661,8 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="toolbar-btn btn-move note-action-btn" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" title="'.t_h('common.move', [], 'Move').'"><i class="fas fa-folder-open"></i></button>';
                     
                     // Create linked note button (hidden for linked notes and notes that already have a link)
-                    if ($note_type !== 'linked') {
-                        // Check if this note already has a linked note
-                        $checkExistingLink = $con->prepare("SELECT id FROM entries WHERE linked_note_id = ? AND trash = 0 LIMIT 1");
-                        $checkExistingLink->execute([$row['id']]);
-                        $hasLinkedNote = $checkExistingLink->fetch();
-                        
-                        if (!$hasLinkedNote) {
-                            echo '<button type="button" class="toolbar-btn btn-create-linked-note note-action-btn" title="' . t_h('editor.toolbar.create_linked_note') . '" data-action="create-linked-note"><i class="fas fa-link"></i></button>';
-                        }
+                    if ($note_type !== 'linked' && !$hasLinkedNote) {
+                        echo '<button type="button" class="toolbar-btn btn-create-linked-note note-action-btn" title="' . t_h('editor.toolbar.create_linked_note') . '" data-action="create-linked-note"><i class="fas fa-link"></i></button>';
                     }
                     
                     // Download button

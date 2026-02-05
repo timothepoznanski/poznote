@@ -702,6 +702,7 @@
             "insert_checklist": "Insert checklist",
             "add_separator": "Add separator",
             "insert_note_reference": "Insert note reference",
+            "create_linked_note": "Create linked note",
             "open_in_new_tab": "Open in new tab"
         },
         "link": {
