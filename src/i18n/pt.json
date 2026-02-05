@@ -607,6 +607,7 @@
             "insert_checklist": "Inserir lista de tarefas",
             "add_separator": "Adicionar separador",
             "insert_note_reference": "Inserir referência de nota",
+            "create_linked_note": "Criar nota vinculada",
             "open_in_new_tab": "Abrir em nova aba"
         },
         "link": {
@@ -750,6 +751,12 @@
             "task_list": {
                 "title": "Lista de Tarefas"
             },
+            "linked": {
+                "title": "Nota vinculada",
+                "default_heading": "{{note}}",
+                "success": "Nota vinculada criada com sucesso",
+                "error": "Erro ao criar nota vinculada"
+            },
             "subfolder": {
                 "title": "Subpasta"
             },
@@ -766,10 +773,11 @@
         "kanban_structure": {
             "title": "Criar estrutura Kanban",
             "folder_name_label": "Nome da pasta:",
-            "folder_name_placeholder": "Meu quadro Kanban",
+            "folder_name_placeholder": "Minha vista Kanban",
             "columns_label": "Número de colunas (1-9):",
             "error_name_required": "O nome da pasta é obrigatório",
             "error_columns_range": "O número de colunas deve estar entre 1 e 9",
+            "error_folder_exists": "Já existe uma pasta neste local",
             "error_create": "Falha ao criar a estrutura Kanban",
             "error_create_prefix": "Erro ao criar a estrutura Kanban: {{error}}"
         },
@@ -777,6 +785,17 @@
             "title": "Alterar ícone da pasta",
             "reset": "Restaurar comportamento padrão",
             "search_placeholder": "Pesquisar ícones..."
+        },
+        "linked_selector": {
+            "title": "Selecionar nota para vincular",
+            "search_placeholder": "Pesquisar notas...",
+            "recent_label": "Notas recentes"
+        },
+        "delete_linked_note": {
+            "title": "Excluir nota vinculada",
+            "message": "O que você deseja excluir?",
+            "delete_link_only": "Excluir apenas este vínculo",
+            "delete_link_and_target": "Excluir a nota e todos os seus vínculos"
         },
         "convert": {
             "title": "Converter nota",
@@ -943,6 +962,7 @@
         },
         "errors": {
             "workspace_not_found": "Espaço de trabalho não encontrado",
+            "linked_note_already_exists": "Já existe uma nota vinculada para esta nota",
             "method_not_allowed": "Método não permitido",
             "invalid_action": "Ação inválida",
             "internal_server_error": "Erro interno do servidor",

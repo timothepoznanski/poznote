@@ -214,7 +214,7 @@
                 var noteLink = actionElement.getAttribute('href');
                 var noteId = actionElement.getAttribute('data-note-db-id');
                 if (noteLink && noteId && typeof window.loadNoteDirectly === 'function') {
-                    var result = window.loadNoteDirectly(noteLink, noteId, event);
+                    var result = window.loadNoteDirectly(noteLink, noteId, event, actionElement);
                     if (result === false) {
                         event.preventDefault();
                     }

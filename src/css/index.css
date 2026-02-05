@@ -830,6 +830,14 @@ body {
     font-size: var(--sidebar-font-size, 13px);
 }
 
+/* Icon for linked notes */
+.note-type-icon-inline {
+    font-size: 0.85em;
+    color: #6b7280;
+    margin-right: 4px;
+    opacity: 0.8;
+}
+
 /* Notes without folder - indent to align with folder items */
 .links_arbo_left.note-without-folder {
     margin-left: 6px !important;

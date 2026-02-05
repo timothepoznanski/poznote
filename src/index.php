@@ -176,6 +176,7 @@ try {
     <script src="js/note-loader-common.js?v=<?php echo $v; ?>"></script>
     <script src="js/note-reference.js?v=<?php echo $v; ?>"></script>
     <script src="js/template-selector.js?v=<?php echo $v; ?>"></script>
+    <script src="js/linked-note-selector.js?v=<?php echo $v; ?>"></script>
     <script src="js/search-replace.js?v=<?php echo $v; ?>"></script>
     <script src="js/markdown-handler.js?v=<?php echo $v; ?>"></script>
     <script src="js/mermaid/mermaid.min.js?v=<?php echo $v; ?>"></script>
@@ -281,7 +282,7 @@ $body_classes = trim($extra_body_classes);
     $search_params = $search_conditions['search_params'];
     
     // Secure prepared queries
-    $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, created, updated, type FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
+    $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, created, updated, type, linked_note_id FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
     $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
     ?>
 
@@ -408,13 +409,14 @@ $body_classes = trim($extra_body_classes);
                     // Check if note is shared for CSS class
                     $share_class = $is_shared ? ' is-shared' : '';
                 
-                    $filename = getEntryFilename($row["id"], $row["type"] ?? 'note');
+                    $note_type = $row['type'] ?? 'note';
+                    
+                    $filename = getEntryFilename($row["id"], $note_type);
                     $title = $row['heading'];
                     // Ensure we have a safe JSON-encoded title for JavaScript
                     $title_safe = $title ?? 'Note';
                     $title_json = json_encode($title_safe, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
                     if ($title_json === false) $title_json = '"Note"';
-                    $note_type = $row['type'] ?? 'note';
                     
                     if ($note_type === 'tasklist') {
                         // For task list notes, use the JSON content from file
@@ -633,6 +635,18 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="toolbar-btn btn-duplicate note-action-btn" data-action="duplicate-note" data-note-id="'.$row['id'].'" title="'.t_h('common.duplicate', [], 'Duplicate').'"><i class="fas fa-copy"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-move note-action-btn" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" title="'.t_h('common.move', [], 'Move').'"><i class="fas fa-folder-open"></i></button>';
                     
+                    // Create linked note button (hidden for linked notes and notes that already have a link)
+                    if ($note_type !== 'linked') {
+                        // Check if this note already has a linked note
+                        $checkExistingLink = $con->prepare("SELECT id FROM entries WHERE linked_note_id = ? AND trash = 0 LIMIT 1");
+                        $checkExistingLink->execute([$row['id']]);
+                        $hasLinkedNote = $checkExistingLink->fetch();
+                        
+                        if (!$hasLinkedNote) {
+                            echo '<button type="button" class="toolbar-btn btn-create-linked-note note-action-btn" title="' . t_h('editor.toolbar.create_linked_note') . '" data-action="create-linked-note"><i class="fas fa-link"></i></button>';
+                        }
+                    }
+                    
                     // Download button
                     echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="'.t_h('common.download', [], 'Download').'" data-action="show-export-modal" data-note-id="'.$row['id'].'" data-filename="'.htmlspecialchars($filename, ENT_QUOTES).'" data-title="'.htmlspecialchars($title_safe, ENT_QUOTES).'" data-note-type="'.$note_type.'"><i class="fas fa-download"></i></button>';
                     
@@ -804,7 +818,11 @@ $body_classes = trim($extra_body_classes);
                         $placeholder_attr .= ' data-ph-mobile="' . htmlspecialchars($placeholder_mobile, ENT_QUOTES) . '"';
                     }
 
-                    echo '<div class="noteentry" autocomplete="off" autocapitalize="off" spellcheck="false" id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'"'.$placeholder_attr.' contenteditable="'.$editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.'>'.$display_content.'</div>';
+                    $linked_note_id_attr = '';
+                    if (isset($row['linked_note_id']) && $row['linked_note_id']) {
+                        $linked_note_id_attr = ' data-linked-note-id="'.$row['linked_note_id'].'"';
+                    }
+                    echo '<div class="noteentry" autocomplete="off" autocapitalize="off" spellcheck="false" id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'"'.$placeholder_attr.' contenteditable="'.$editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.$linked_note_id_attr.'>'.$display_content.'</div>';
                     echo '<div class="note-bottom-space"></div>';
                     echo '</div>';
                     echo '</div>';

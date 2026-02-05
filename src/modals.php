@@ -338,6 +338,12 @@
                             <span><?php echo t_h('modals.create.template.title', [], 'Template'); ?></span>
                         </div>
                     </div>
+                    <div class="create-note-option" data-type="linked" data-action="select-create-type">
+                        <i class="fa fa-link"></i>
+                        <div>
+                            <span><?php echo t_h('modals.create.linked.title', [], 'Linked Note'); ?></span>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Other items section (only shown when creating from main button) -->
@@ -723,6 +729,44 @@
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-template-selector-modal"><?php echo t_h('common.cancel'); ?></button>
+        </div>
+    </div>
+</div>
+
+<!-- Linked Note Selector Modal -->
+<div id="linkedNoteSelectorModal" class="modal">
+    <div class="modal-content note-reference-modal-content">
+        <div class="note-reference-modal-header">
+            <h3><?php echo t_h('modals.linked_selector.title', [], 'Select Note to Link'); ?></h3>
+        </div>
+        <div class="note-reference-search-container">
+            <input type="text" id="linkedNoteSearch" placeholder="<?php echo t_h('modals.linked_selector.search_placeholder', [], 'Search notes...'); ?>" class="note-reference-search-input">
+        </div>
+        <div class="note-reference-list-wrapper">
+            <div class="note-reference-recent-label"><?php echo t_h('modals.linked_selector.recent_label', [], 'Recent notes'); ?></div>
+            <div id="linkedNoteList" class="note-reference-list">
+                <div class="note-reference-loading">
+                    <i class="fa-spinner fa-spin"></i> <?php echo t_h('common.loading', [], 'Loading...'); ?>
+                </div>
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-linked-selector-modal"><?php echo t_h('common.cancel'); ?></button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Linked Note Modal -->
+<div id="deleteLinkedNoteModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.delete_linked_note.title', [], 'Delete Linked Note'); ?></h3>
+        <div class="modal-body">
+            <p><?php echo t_h('modals.delete_linked_note.message', [], 'What do you want to delete?'); ?></p>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-primary" id="deleteLinkedNoteOnlyBtn"><?php echo t_h('modals.delete_linked_note.delete_link_only', [], 'Delete link only'); ?></button>
+            <button type="button" class="btn-danger" id="deleteLinkedNoteAndTargetBtn"><?php echo t_h('modals.delete_linked_note.delete_link_and_target', [], 'Delete link and target note'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="deleteLinkedNoteModal"><?php echo t_h('common.cancel'); ?></button>
         </div>
     </div>
 </div>

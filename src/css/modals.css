@@ -143,6 +143,11 @@
     margin-top: 12px;
 }
 
+/* Delete linked note modal: align buttons to the left */
+#deleteLinkedNoteModal .modal-buttons {
+    justify-content: flex-start;
+}
+
 /* Move task modal list */
 .move-task-list {
     max-height: 260px;

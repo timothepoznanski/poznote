@@ -206,9 +206,25 @@ function saveNoteToServer() {
         if (data.success) {
             handleSaveResponse(JSON.stringify({date: new Date().toLocaleDateString(), title: headi, original_title: headi}));
             
+            // Update linked notes in the list if any were updated
+            if (data.note && data.updated_linked_notes && data.updated_linked_notes.length > 0) {
+                var newTitle = data.note.heading;
+                data.updated_linked_notes.forEach(function(linkedNoteId) {
+                    var linkElements = document.querySelectorAll('.links_arbo_left[data-note-db-id="' + linkedNoteId + '"]');
+                    linkElements.forEach(function(linkElement) {
+                        updateTitleInElement(linkElement, newTitle);
+                    });
+                });
+            }
+            
             // Refresh tags count in sidebar after successful save
             if (typeof window.refreshTagsCount === 'function') {
                 window.refreshTagsCount();
+            }
+            
+            // Refresh Kanban view if active
+            if (typeof window.refreshKanbanView === 'function') {
+                window.refreshKanbanView();
             }
         } else {
             // Show user-visible error notification
@@ -317,6 +333,42 @@ function handleSaveResponse(data) {
 }
 
 function deleteNote(noteId) {
+    // Check if the selected link in the list is a linked note
+    // (since linked notes redirect to their target, we need to check the list item)
+    const selectedLinks = document.querySelectorAll('.links_arbo_left.selected-note');
+    let isLinkedNote = false;
+    let linkedNoteDbId = null;
+    
+    for (let link of selectedLinks) {
+        const linkType = link.getAttribute('data-note-type');
+        if (linkType === 'linked') {
+            isLinkedNote = true;
+            linkedNoteDbId = link.getAttribute('data-note-db-id');
+            break;
+        }
+    }
+    
+    // If we clicked on a linked note, show the special modal
+    if (isLinkedNote && linkedNoteDbId) {
+        showDeleteLinkedNoteModal(linkedNoteDbId);
+        return;
+    }
+    
+    // Also check if this is a linked note in the DOM (fallback for other cases)
+    const noteCard = document.getElementById('note' + noteId);
+    if (noteCard) {
+        const noteEntry = noteCard.querySelector('.noteentry');
+        const noteType = noteEntry ? noteEntry.getAttribute('data-note-type') : null;
+        const linkedNoteId = noteEntry ? noteEntry.getAttribute('data-linked-note-id') : null;
+        
+        // If this is a linked note (either by type or by having a linked_note_id), show the modal
+        if (noteType === 'linked' || linkedNoteId) {
+            // Show special modal for linked notes
+            showDeleteLinkedNoteModal(noteId);
+            return;
+        }
+    }
+    
     const workspace = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? pageWorkspace : null;
     
     // Build query params for RESTful API
@@ -453,7 +505,16 @@ function updateNoteTitleInLeftColumn() {
 function updateTitleInElement(linkElement, newTitle) {
     var titleSpan = linkElement.querySelector('.note-title');
     if (titleSpan) {
-        titleSpan.textContent = newTitle;
+        // Check if there's an icon (for linked notes) and preserve it
+        var icon = titleSpan.querySelector('.note-type-icon-inline');
+        if (icon) {
+            // Clear content but keep the icon
+            titleSpan.textContent = '';
+            titleSpan.appendChild(icon.cloneNode(true));
+            titleSpan.appendChild(document.createTextNode(' ' + newTitle));
+        } else {
+            titleSpan.textContent = newTitle;
+        }
         
         var href = linkElement.getAttribute('href');
         if (href) {
@@ -481,7 +542,139 @@ function openNoteInNewTab(noteId) {
     window.open(url, '_blank');
 }
 
+// Show delete linked note modal
+function showDeleteLinkedNoteModal(linkedNoteId) {
+    const modal = document.getElementById('deleteLinkedNoteModal');
+    if (!modal) return;
+    
+    // Store the note ID for later use
+    modal.dataset.linkedNoteId = linkedNoteId;
+    
+    // Try to get the linked note target ID from the selected link in the list
+    const selectedLinks = document.querySelectorAll('.links_arbo_left.selected-note[data-note-type="linked"]');
+    let linkedNoteTargetId = null;
+    
+    for (let link of selectedLinks) {
+        const linkDbId = link.getAttribute('data-note-db-id');
+        if (linkDbId === String(linkedNoteId)) {
+            linkedNoteTargetId = link.getAttribute('data-linked-note-id');
+            if (linkedNoteTargetId) {
+                break;
+            }
+        }
+    }
+    
+    // Fallback: try to get from the note card in DOM (for backward compatibility)
+    if (!linkedNoteTargetId) {
+        const noteCard = document.getElementById('note' + linkedNoteId);
+        if (noteCard) {
+            const noteEntry = noteCard.querySelector('.noteentry');
+            linkedNoteTargetId = noteEntry ? noteEntry.getAttribute('data-linked-note-id') : null;
+        }
+    }
+    
+    // Store the target ID if found
+    if (linkedNoteTargetId) {
+        modal.dataset.linkedNoteTargetId = linkedNoteTargetId;
+    } else {
+        // If we don't have the target ID, remove it from dataset
+        delete modal.dataset.linkedNoteTargetId;
+    }
+    
+    modal.style.display = 'flex';
+}
+
+// Delete only the linked note (not the target)
+function deleteLinkedNoteOnly(linkedNoteId) {
+    const workspace = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? pageWorkspace : null;
+    
+    let url = "/api/v1/notes/" + linkedNoteId + "?permanent=false";
+    if (workspace) {
+        url += "&workspace=" + encodeURIComponent(workspace);
+    }
+    
+    fetch(url, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" }
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data && data.success) {
+            closeModal('deleteLinkedNoteModal');
+            redirectToWorkspace();
+            return;
+        }
+        
+        if (data && (data.error || data.message)) {
+            showNotificationPopup('Deletion error: ' + (data.error || data.message), 'error');
+        } else {
+            showNotificationPopup('Deletion error: Unknown error', 'error');
+        }
+    })
+    .catch(function(error) {
+        showNotificationPopup('Network error while deleting: ' + error.message, 'error');
+    });
+}
+
+// Delete the target note and all its links (the backend handles deleting all linked notes)
+function deleteLinkedNoteAndTarget(linkedNoteId, targetNoteId) {
+    const workspace = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? pageWorkspace : null;
+    
+    // Delete the target note - this will automatically delete all linked notes that reference it
+    let url = "/api/v1/notes/" + targetNoteId + "?permanent=false";
+    if (workspace) {
+        url += "&workspace=" + encodeURIComponent(workspace);
+    }
+    
+    fetch(url, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" }
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data && data.success) {
+            closeModal('deleteLinkedNoteModal');
+            redirectToWorkspace();
+        } else {
+            throw new Error(data.error || data.message || 'Unknown error');
+        }
+    })
+    .catch(function(error) {
+        showNotificationPopup('Deletion error: ' + error.message, 'error');
+    });
+}
+
 // Expose functions globally
 window.saveNoteToServer = saveNoteToServer;
 window.deleteNote = deleteNote;
 window.openNoteInNewTab = openNoteInNewTab;
+window.showDeleteLinkedNoteModal = showDeleteLinkedNoteModal;
+window.deleteLinkedNoteOnly = deleteLinkedNoteOnly;
+window.deleteLinkedNoteAndTarget = deleteLinkedNoteAndTarget;
+
+// Event listeners for delete linked note modal
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteLinkedNoteOnlyBtn = document.getElementById('deleteLinkedNoteOnlyBtn');
+    const deleteLinkedNoteAndTargetBtn = document.getElementById('deleteLinkedNoteAndTargetBtn');
+
+    if (deleteLinkedNoteOnlyBtn) {
+        deleteLinkedNoteOnlyBtn.addEventListener('click', function() {
+            const modal = document.getElementById('deleteLinkedNoteModal');
+            const linkedNoteId = modal.dataset.linkedNoteId;
+            if (linkedNoteId) {
+                deleteLinkedNoteOnly(linkedNoteId);
+            }
+        });
+    }
+
+    if (deleteLinkedNoteAndTargetBtn) {
+        deleteLinkedNoteAndTargetBtn.addEventListener('click', function() {
+            const modal = document.getElementById('deleteLinkedNoteModal');
+            const linkedNoteId = modal.dataset.linkedNoteId;
+            const linkedNoteTargetId = modal.dataset.linkedNoteTargetId;
+            if (linkedNoteId && linkedNoteTargetId) {
+                deleteLinkedNoteAndTarget(linkedNoteId, linkedNoteTargetId);
+            }
+        });
+    }
+});

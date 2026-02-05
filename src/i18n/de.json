@@ -608,6 +608,7 @@
             "insert_checklist": "Checkliste einfügen",
             "add_separator": "Trennlinie hinzufügen",
             "insert_note_reference": "Notiz-Referenz einfügen",
+            "create_linked_note": "Verknüpfte Notiz erstellen",
             "open_in_new_tab": "In neuem Tab öffnen"
         },
         "link": {
@@ -751,6 +752,12 @@
             "task_list": {
                 "title": "Aufgabenliste"
             },
+            "linked": {
+                "title": "Verknüpfte Notiz",
+                "default_heading": "{{note}}",
+                "success": "Verknüpfte Notiz erfolgreich erstellt",
+                "error": "Fehler beim Erstellen der verknüpften Notiz"
+            },
             "subfolder": {
                 "title": "Unterordner"
             },
@@ -767,10 +774,11 @@
         "kanban_structure": {
             "title": "Kanban-Struktur erstellen",
             "folder_name_label": "Ordnername:",
-            "folder_name_placeholder": "Mein Kanban-Board",
+            "folder_name_placeholder": "Meine Kanban-Ansicht",
             "columns_label": "Anzahl der Spalten (1-9):",
             "error_name_required": "Ordnername ist erforderlich",
             "error_columns_range": "Die Anzahl der Spalten muss zwischen 1 und 9 liegen",
+            "error_folder_exists": "An diesem Speicherort existiert bereits ein Ordner",
             "error_create": "Fehler beim Erstellen der Kanban-Struktur",
             "error_create_prefix": "Fehler beim Erstellen der Kanban-Struktur: {{error}}"
         },
@@ -778,6 +786,17 @@
             "title": "Ordnersymbol ändern",
             "reset": "Standardverhalten wiederherstellen",
             "search_placeholder": "Symbole suchen..."
+        },
+        "linked_selector": {
+            "title": "Notiz zum Verknüpfen auswählen",
+            "search_placeholder": "Notizen suchen...",
+            "recent_label": "Aktuelle Notizen"
+        },
+        "delete_linked_note": {
+            "title": "Verknüpfte Notiz löschen",
+            "message": "Was möchten Sie löschen?",
+            "delete_link_only": "Nur diesen Link löschen",
+            "delete_link_and_target": "Notiz und alle ihre Links löschen"
         },
         "convert": {
             "title": "Notiz konvertieren",
@@ -944,6 +963,7 @@
         },
         "errors": {
             "workspace_not_found": "Arbeitsbereich nicht gefunden",
+            "linked_note_already_exists": "Für diese Notiz existiert bereits eine verknüpfte Notiz",
             "method_not_allowed": "Methode nicht erlaubt",
             "invalid_action": "Ungültige Aktion",
             "internal_server_error": "Interner Serverfehler",

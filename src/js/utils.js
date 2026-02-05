@@ -2008,6 +2008,13 @@ function executeCreateAction() {
                 console.error('openTemplateNoteSelectorModal function not found');
             }
             break;
+        case 'linked':
+            if (typeof openLinkedNoteSelectorModal === 'function') {
+                openLinkedNoteSelectorModal();
+            } else {
+                console.error('openLinkedNoteSelectorModal function not found');
+            }
+            break;
         case 'subfolder':
             if (targetFolderId) {
                 var folderKey = 'folder_' + targetFolderId;
@@ -2565,13 +2572,9 @@ function createKanbanStructure() {
     var folderName = folderNameInput.value.trim();
     var columns = parseInt(columnsInput.value, 10);
 
-    // Validation
+    // If no folder name is provided, use the placeholder value
     if (!folderName) {
-        showNotificationPopup(
-            window.t ? window.t('modals.kanban_structure.error_name_required', null, 'Folder name is required') : 'Folder name is required',
-            'error'
-        );
-        return;
+        folderName = folderNameInput.placeholder || (window.t ? window.t('modals.kanban_structure.folder_name_placeholder', null, 'My Kanban Board') : 'My Kanban Board');
     }
 
     if (isNaN(columns) || columns < 1 || columns > 9) {

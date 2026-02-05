@@ -195,8 +195,12 @@ function findNoteLinkById(noteId) {
 
 /**
  * Direct note loading function called from onclick
+ * @param {string} url - The URL to load
+ * @param {string|number} noteId - The note ID
+ * @param {Event} event - The click event
+ * @param {HTMLElement} clickedElement - The actual clicked link element (optional)
  */
-window.loadNoteDirectly = function(url, noteId, event) {
+window.loadNoteDirectly = function(url, noteId, event, clickedElement) {
     try {
         
         // Check for unsaved changes in current note before proceeding
@@ -249,8 +253,9 @@ window.loadNoteDirectly = function(url, noteId, event) {
         }
         window.isLoadingNote = true;
 
-        // Find the clicked link to update selection using robust method
-        const clickedLink = findNoteLinkById(noteId);
+        // Find the clicked link to update selection
+        // Use the provided clickedElement if available, otherwise search by ID
+        const clickedLink = clickedElement || findNoteLinkById(noteId);
         
         // Show loading state immediately
         showNoteLoadingState();
@@ -607,6 +612,8 @@ function updateSelectedNote(clickedLink) {
     // Add selected class to clicked note and all other instances of the same note
     if (clickedLink) {
         const noteId = clickedLink.getAttribute('data-note-id');
+        const clickedNoteType = clickedLink.getAttribute('data-note-type');
+        
         if (noteId) {
             // Find all links with the same note ID (including in favorites)
             document.querySelectorAll('.links_arbo_left').forEach(link => {
@@ -614,6 +621,11 @@ function updateSelectedNote(clickedLink) {
                     link.classList.add('selected-note');
                 }
             });
+            
+            // If we clicked on a linked note, also mark the linked note itself as selected
+            if (clickedNoteType === 'linked') {
+                clickedLink.classList.add('selected-note');
+            }
         } else {
             // Fallback to the clicked link only if no data-note-id
             clickedLink.classList.add('selected-note');
@@ -628,6 +640,11 @@ function updateSelectedNote(clickedLink) {
                         link.classList.add('selected-note');
                     }
                 });
+                
+                // Re-apply selection to the linked note if applicable
+                if (clickedNoteType === 'linked' && !clickedLink.classList.contains('selected-note')) {
+                    clickedLink.classList.add('selected-note');
+                }
             } else if (clickedLink && !clickedLink.classList.contains('selected-note')) {
                 clickedLink.classList.add('selected-note');
             }
