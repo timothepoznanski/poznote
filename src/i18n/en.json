@@ -604,40 +604,7 @@
         },
         "editor": {
             "placeholder_desktop": "Enter text, use / for command menu, paste images or drop an image at cursor.",
-            "placeholder_mobile": "Enter text or paste images here...",
-            "table_picker": {
-                "title": "Insert table",
-                "rows_label": "Rows:",
-                "rows_placeholder": "Rows",
-                "cols_label": "Columns:",
-                "cols_placeholder": "Columns",
-                "insert": "Insert"
-            },
-            "toolbar": {
-                "back_to_notes": "Back to notes",
-                "bold": "Bold",
-                "italic": "Italic",
-                "underline": "Underline",
-                "strikethrough": "Strikethrough",
-                "link": "Link",
-                "text_color": "Text color",
-                "highlight": "Highlight",
-                "bullet_list": "Bullet list",
-                "numbered_list": "Numbered list",
-                "font_size": "Font size",
-                "code_block": "Code block",
-                "inline_code": "Inline code",
-                "clear_formatting": "Clear formatting",
-                "insert_excalidraw": "Insert Excalidraw diagram",
-                "insert_emoji": "Insert emoji",
-                "insert_table": "Insert table",
-                "insert_checklist": "Insert checklist",
-                "add_separator": "Add separator",
-                "insert_note_reference": "Insert note reference",
-                "create_linked_note": "Create linked note",
-                "open_in_new_tab": "Open in new tab",
-                "search_replace": "Search and replace"
-            }
+            "placeholder_mobile": "Enter text or paste images here..."
         }
     },
     "editor": {
@@ -703,7 +670,9 @@
             "insert_checklist": "Insert checklist",
             "add_separator": "Add separator",
             "insert_note_reference": "Insert note reference",
-            "open_in_new_tab": "Open in new tab"
+            "open_in_new_tab": "Open in new tab",
+            "create_linked_note": "Create linked note",
+            "search_replace": "Search and replace"
         },
         "link": {
             "add_title": "Add link",
