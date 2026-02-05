@@ -19,6 +19,12 @@
 // ini_set('display_errors', 1);
 // error_reporting(E_ALL);
 
+// Set security headers to mitigate XSS attacks
+header("X-XSS-Protection: 1; mode=block");
+header("X-Content-Type-Options: nosniff");
+header("X-Frame-Options: SAMEORIGIN");
+header("Referrer-Policy: strict-origin-when-cross-origin");
+
 // Set content type for all responses
 header('Content-Type: application/json; charset=utf-8');
 

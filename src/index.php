@@ -4,6 +4,24 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// Set security headers to mitigate XSS attacks
+// Content-Security-Policy: Restrict where scripts can be loaded from
+// Note: 'unsafe-inline' is needed for the rich text editor, but we sanitize all user input
+// to prevent XSS. In the future, consider using nonces for inline scripts.
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-src 'self' https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com https://youtube-nocookie.com;");
+
+// X-XSS-Protection: Enable browser's XSS filter (legacy but still useful)
+header("X-XSS-Protection: 1; mode=block");
+
+// X-Content-Type-Options: Prevent MIME type sniffing
+header("X-Content-Type-Options: nosniff");
+
+// X-Frame-Options: Prevent clickjacking
+header("X-Frame-Options: SAMEORIGIN");
+
+// Referrer-Policy: Control referrer information
+header("Referrer-Policy: strict-origin-when-cross-origin");
+
 // Authentication check
 require 'auth.php';
 requireAuth();

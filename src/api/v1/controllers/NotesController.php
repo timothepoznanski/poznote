@@ -452,10 +452,27 @@ class NotesController {
                 }
                 
                 if (!empty($entry)) {
-                    $write_result = file_put_contents($filename, $entry);
+                    // Sanitize HTML content to prevent XSS attacks
+                    $contentToSave = $entry;
+                    
+                    // For HTML notes (type='note'), sanitize the content
+                    if ($type === 'note') {
+                        $contentToSave = sanitizeHtml($entry);
+                    }
+                    
+                    // For markdown notes, sanitize as well (in case HTML is embedded)
+                    if ($type === 'markdown') {
+                        $contentToSave = sanitizeHtml($entry);
+                    }
+                    
+                    $write_result = file_put_contents($filename, $contentToSave);
                     if ($write_result === false) {
                         error_log("Failed to write file for note ID $id: $filename");
                     }
+                    
+                    // Update the entry content in database with sanitized version
+                    $updateStmt = $this->con->prepare("UPDATE entries SET entry = ? WHERE id = ?");
+                    $updateStmt->execute([$contentToSave, $id]);
                 }
                 
                 http_response_code(201);
@@ -597,8 +614,15 @@ class NotesController {
                     mkdir($entriesDir, 0755, true);
                 }
                 
-                // For markdown notes, clean HTML if needed
+                // Sanitize HTML content to prevent XSS attacks
                 $contentToSave = $entry;
+                
+                // For HTML notes (type='note'), sanitize the content
+                if ($noteType === 'note' && !empty($entry)) {
+                    $contentToSave = sanitizeHtml($entry);
+                }
+                
+                // For markdown notes, clean HTML if needed
                 if ($noteType === 'markdown' && !empty($entry)) {
                     if (strpos($entry, '<div class="markdown-editor"') !== false) {
                         if (preg_match('/<div class="markdown-editor"[^>]*>(.*?)<\/div>/', $entry, $matches)) {
@@ -606,6 +630,8 @@ class NotesController {
                             $contentToSave = html_entity_decode($contentToSave, ENT_QUOTES | ENT_HTML5, 'UTF-8');
                         }
                     }
+                    // Sanitize markdown content as well (in case HTML is embedded)
+                    $contentToSave = sanitizeHtml($contentToSave);
                 }
                 
                 $write_result = file_put_contents($filename, $contentToSave);
@@ -613,6 +639,9 @@ class NotesController {
                     $this->sendError(500, 'Failed to write file');
                     return;
                 }
+                
+                // Update the entry variable with sanitized content for database storage
+                $entry = $contentToSave;
             }
             
             // Update database
