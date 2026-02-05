@@ -30,20 +30,20 @@ if ($workspace) {
 }
 
 // Create user backgrounds directory with workspace subdirectory if it doesn't exist
-$backgrounds_dir = __DIR__ . '/data/backgrounds';
-$user_backgrounds_dir = $backgrounds_dir . '/' . $user_id;
-$workspace_backgrounds_dir = $user_backgrounds_dir . '/' . $workspace;
+$user_dir = __DIR__ . '/data/users/' . $user_id;
+$backgrounds_dir = $user_dir . '/backgrounds';
+$workspace_backgrounds_dir = $backgrounds_dir . '/' . $workspace;
 
-if (!file_exists($backgrounds_dir)) {
-    if (!mkdir($backgrounds_dir, 0755, true)) {
-        echo json_encode(['success' => false, 'error' => 'Failed to create backgrounds directory: ' . $backgrounds_dir]);
+if (!file_exists($user_dir)) {
+    if (!mkdir($user_dir, 0755, true)) {
+        echo json_encode(['success' => false, 'error' => 'Failed to create user directory: ' . $user_dir]);
         exit;
     }
 }
 
-if (!file_exists($user_backgrounds_dir)) {
-    if (!mkdir($user_backgrounds_dir, 0755, true)) {
-        echo json_encode(['success' => false, 'error' => 'Failed to create user backgrounds directory: ' . $user_backgrounds_dir]);
+if (!file_exists($backgrounds_dir)) {
+    if (!mkdir($backgrounds_dir, 0755, true)) {
+        echo json_encode(['success' => false, 'error' => 'Failed to create backgrounds directory: ' . $backgrounds_dir]);
         exit;
     }
 }
@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['background'])) {
     $destination = $workspace_backgrounds_dir . '/' . $filename;
     
     if (move_uploaded_file($file['tmp_name'], $destination)) {
-        $url = '/data/backgrounds/' . $user_id . '/' . $workspace . '/' . $filename . '?v=' . time();
+        $url = '/data/users/' . $user_id . '/backgrounds/' . $workspace . '/' . $filename . '?v=' . time();
         echo json_encode(['success' => true, 'url' => $url, 'workspace' => $workspace]);
     } else {
         $error_msg = 'Failed to save file';
@@ -117,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $files = glob($workspace_backgrounds_dir . '/background.*');
     if (!empty($files)) {
         $file = basename($files[0]);
-        $url = '/data/backgrounds/' . $user_id . '/' . $workspace . '/' . $file . '?v=' . filemtime($files[0]);
+        $url = '/data/users/' . $user_id . '/backgrounds/' . $workspace . '/' . $file . '?v=' . filemtime($files[0]);
         echo json_encode(['success' => true, 'url' => $url, 'exists' => true, 'workspace' => $workspace]);
     } else {
         echo json_encode(['success' => true, 'exists' => false, 'workspace' => $workspace]);
