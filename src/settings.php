@@ -153,6 +153,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
     <link rel="stylesheet" href="css/home.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/settings.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modals.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/background-image.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode.css?v=<?php echo $cache_v; ?>">
 </head>
 <body class="home-page"
@@ -449,6 +450,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
     <script src="js/utils.js"></script>
     <script src="js/font-size-settings.js"></script>
     <script src="js/note-width-settings.js"></script>
+    <script src="js/background-settings.js"></script>
     <script src="js/copy-code-on-focus.js"></script>
     <script src="js/modals-events.js"></script>
     <script src="js/settings-page.js"></script>

@@ -164,6 +164,7 @@ try {
     <link type="text/css" rel="stylesheet" href="css/search-replace.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/folder-icon-modal.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/kanban.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/background-image.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="js/katex/katex.min.css?v=<?php echo $v; ?>"/>
     <style>:root { --note-font-size: <?php echo htmlspecialchars($note_font_size, ENT_QUOTES); ?>px; --sidebar-font-size: <?php echo htmlspecialchars($sidebar_font_size, ENT_QUOTES); ?>px; --note-max-width: <?php echo htmlspecialchars($note_max_width, ENT_QUOTES); ?>px; }</style>
@@ -884,6 +885,7 @@ $body_classes = trim($extra_body_classes);
 <script src="js/unified-search.js"></script>
 <script src="js/clickable-tags.js?v=<?php echo $v; ?>"></script>
 <script src="js/font-size-settings.js?v=<?php echo $v; ?>"></script>
+<script src="js/background-settings.js?v=<?php echo $v; ?>"></script>
 <script src="js/tasklist.js?v=<?php echo $v; ?>"></script>
 <script src="js/excalidraw.js?v=<?php echo $v; ?>"></script>
 <script src="js/copy-code-on-focus.js?v=<?php echo $v; ?>"></script>

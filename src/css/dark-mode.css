@@ -379,16 +379,16 @@ body.dark-mode .innernote {
     color: #e0e0e0;
 }
 
-html[data-theme='dark'] .note-header,
+/* html[data-theme='dark'] .note-header,
 body.dark-mode .note-header {
-    background-color: #252526;
+    background-color: #252526; */
     /* border-bottom: 1px solid #333; */
-}
+/* } */
 
-html[data-theme='dark'] .note-edit-toolbar,
+/* html[data-theme='dark'] .note-edit-toolbar,
 body.dark-mode .note-edit-toolbar {
     background-color: #252526;
-}
+} */
 
 html[data-theme='dark'] .css-title,
 body.dark-mode .css-title {

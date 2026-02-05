@@ -7,6 +7,38 @@ body {
     margin: 0;
     min-width: 0;
     min-height: 0;
+    position: relative;
+}
+
+/* Background Image Support - Create a dedicated background layer */
+body.has-background-image::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: var(--bg-image-url, none);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    opacity: var(--bg-image-opacity, 0.3);
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Ensure main content areas are positioned */
+body.has-background-image > .sidebar,
+body.has-background-image > .main-content,
+body.has-background-image > .home-container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Make note-header transparent when background image is active */
+body.has-background-image .note-header {
+    background: transparent !important;
 }
 
 .settings-container {

@@ -1461,7 +1461,7 @@ body.sidebar-collapsed .toggle-sidebar-btn i {
     position: sticky;
     top: 0;
     z-index: 10;
-    background: #fff;
+    /* background: #fff; */
     padding-top: 10px;
     padding-bottom: 10px;
     padding-left: 10px;

@@ -1602,6 +1602,11 @@ function onWorkspaceChange() {
     // When workspace changes, reload folders for the new workspace
     var newWorkspace = document.getElementById('workspaceSelect').value;
 
+    // Reload workspace background if function exists
+    if (typeof window.reloadWorkspaceBackground === 'function') {
+        window.reloadWorkspaceBackground();
+    }
+
     // Clear the move modal state
     updateMoveButton('');
     hideMoveFolderError();

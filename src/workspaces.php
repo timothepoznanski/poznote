@@ -465,9 +465,12 @@ try {
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
     <link rel="stylesheet" href="css/fontawesome.min.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/solid.min.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/light.min.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/workspaces.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modals.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/background-image.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode.css?v=<?php echo $cache_v; ?>">
     <style>
         /* Ensure workspace list displays name + buttons on a single line */
@@ -565,6 +568,11 @@ try {
                                 <div class="ws-col ws-col-action">
                                     <button class="btn btn-rename action-btn" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('common.rename', [], 'Rename', $currentLang); ?></button>
                                 </div>
+                                <div class="ws-col ws-col-background">
+                                    <button class="btn btn-secondary action-btn btn-background" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
+                                        <?php echo t_h('workspaces.actions.background', [], 'Background', $currentLang); ?>
+                                    </button>
+                                </div>
                                 <div class="ws-col ws-col-select">
                                     <?php if ($ws !== ''): ?>
                                         <button type="button" class="btn btn-primary action-btn btn-select" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('workspaces.actions.select', [], 'Select', $currentLang); ?></button>
@@ -613,8 +621,10 @@ try {
     </div>
 
     <script src="js/theme-manager.js"></script>
+    <script src="js/modal-alerts.js"></script>
     <script src="js/navigation.js"></script>
     <script src="js/workspaces.js"></script>
+    <script src="js/workspace-background.js"></script>
     <script src="js/modals-events.js"></script>
     
     <?php include 'modals.php'; ?>
