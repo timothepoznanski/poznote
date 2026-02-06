@@ -1126,29 +1126,29 @@ body.dark-mode .btn-shared:hover {
 /* Specific button types for dark mode */
 html[data-theme='dark'] .btn-primary,
 body.dark-mode .btn-primary {
-    background-color: #4a9eff;
-    color: #ffffff;
-    border-color: #4a9eff;
+    background-color: #007DB8 !important;
+    color: #ffffff !important;
+    border-color: #007DB8 !important;
 }
 
 html[data-theme='dark'] .btn-primary:hover,
 body.dark-mode .btn-primary:hover {
-    background-color: #3a8ae6;
-    border-color: #3a8ae6;
+    background-color: #005a8a !important;
+    border-color: #005a8a !important;
 }
 
 html[data-theme='dark'] .btn-warning,
 body.dark-mode .btn-warning {
-    background-color: #ffc107;
-    color: #212529;
-    border-color: #ffc107;
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+    border-color: #ffc107 !important;
 }
 
 html[data-theme='dark'] .btn-rename,
 body.dark-mode .btn-rename {
-    background-color: #ffc107;
-    color: #212529;
-    border-color: #ffc107;
+    background-color: #ffc107 !important;
+    color: white !important;
+    border-color: #ffc107 !important;
 }
 
 html[data-theme='dark'] .btn-rename:disabled,
@@ -1160,22 +1160,54 @@ body.dark-mode .btn-rename:disabled {
 }
 
 html[data-theme='dark'] .btn-warning:hover,
-body.dark-mode .btn-warning:hover {
-    background-color: #e0a800;
-    border-color: #e0a800;
+html[data-theme='dark'] .btn-rename:hover,
+body.dark-mode .btn-warning:hover,
+body.dark-mode .btn-rename:hover {
+    background-color: #e0a800 !important;
+    border-color: #e0a800 !important;
+}
+
+html[data-theme='dark'] .btn-background,
+body.dark-mode .btn-background {
+    background-color: #6c757d !important;
+    color: white !important;
+    border-color: #6c757d !important;
+}
+
+html[data-theme='dark'] .btn-background:hover,
+body.dark-mode .btn-background:hover {
+    background-color: #5a6268 !important;
+    border-color: #545b62 !important;
 }
 
 html[data-theme='dark'] .btn-danger,
-body.dark-mode .btn-danger {
-    background-color: #dc3545;
-    color: #ffffff;
-    border-color: #dc3545;
+html[data-theme='dark'] .btn-delete-ws,
+body.dark-mode .btn-danger,
+body.dark-mode .btn-delete-ws {
+    background-color: #dc3545 !important;
+    color: #ffffff !important;
+    border-color: #dc3545 !important;
 }
 
 html[data-theme='dark'] .btn-danger:hover,
-body.dark-mode .btn-danger:hover {
-    background-color: #c82333;
-    border-color: #c82333;
+html[data-theme='dark'] .btn-delete-ws:hover,
+body.dark-mode .btn-danger:hover,
+body.dark-mode .btn-delete-ws:hover {
+    background-color: #c82333 !important;
+    border-color: #bd2130 !important;
+}
+
+html[data-theme='dark'] .btn-success,
+body.dark-mode .btn-success {
+    background-color: #28a745 !important;
+    color: white !important;
+    border-color: #28a745 !important;
+}
+
+html[data-theme='dark'] .btn-success:hover,
+body.dark-mode .btn-success:hover {
+    background-color: #218838 !important;
+    border-color: #218838 !important;
 }
 
 /* Links */
