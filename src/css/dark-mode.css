@@ -379,13 +379,14 @@ body.dark-mode .innernote {
     color: #e0e0e0;
 }
 
- html[data-theme='dark'] .note-header,
-body.dark-mode .note-header {
+/* Only apply header and toolbar background if no workspace background image is set */
+body:not(.has-background-image) html[data-theme='dark'] .note-header,
+body.dark-mode:not(.has-background-image) .note-header {
     background-color: #252526; 
-} */
+}
 
-html[data-theme='dark'] .note-edit-toolbar,
-body.dark-mode .note-edit-toolbar {
+body:not(.has-background-image) html[data-theme='dark'] .note-edit-toolbar,
+body.dark-mode:not(.has-background-image) .note-edit-toolbar {
     background-color: #252526;
 }
 
