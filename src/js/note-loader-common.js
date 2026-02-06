@@ -300,6 +300,13 @@ window.loadNoteDirectly = function(url, noteId, event, clickedElement) {
 
                                     currentRightColumn.innerHTML = rightColumn.innerHTML;
                                     
+                                    // Clear Kanban view flags when loading a note
+                                    // This prevents refreshKanbanView() from overwriting the note
+                                    // when a task is checked in a tasklist
+                                    window._isKanbanViewActive = false;
+                                    window._kanbanFolderId = null;
+                                    window._originalRightColContent = null;
+                                    
                                     // Auto-save handles all state management automatically
                                     
                                     // Update URL before reinitializing so reinitializeNoteContent
