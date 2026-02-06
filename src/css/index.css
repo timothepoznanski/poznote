@@ -1461,7 +1461,6 @@ body.sidebar-collapsed .toggle-sidebar-btn i {
     position: sticky;
     top: 0;
     z-index: 10;
-    /* background: #fff; */
     padding-top: 10px;
     padding-bottom: 10px;
     padding-left: 10px;
@@ -1469,6 +1468,11 @@ body.sidebar-collapsed .toggle-sidebar-btn i {
     box-sizing: border-box;
     /* border-bottom: 1px solid #ccc; */
     gap: 8px;
+}
+
+/* Only apply header background if no workspace background image is set */
+body:not(.has-background-image) .note-header {
+    background: #fff;
 }
 
 .note-edit-toolbar {
