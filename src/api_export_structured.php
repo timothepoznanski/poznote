@@ -179,6 +179,8 @@ while ($row = $res_notes->fetch(PDO::FETCH_ASSOC)) {
         // For Markdown files, add front matter with metadata
         if ($fileExtension === 'md') {
             $content = addFrontMatterToMarkdown($content, $row, $con);
+        } else {
+            $content = removeCopyButtonsFromHtml($content);
         }
         
         $zip->addFromString($noteFileName, $content);
@@ -257,6 +259,28 @@ function addFrontMatterToMarkdown($content, $metadata, $con) {
     $frontMatter .= "---\n\n";
     
     return $frontMatter . $content;
+}
+
+/**
+ * Remove code block copy buttons from HTML export
+ */
+function removeCopyButtonsFromHtml($html) {
+    if ($html === '' || $html === null) {
+        return $html;
+    }
+
+    $dom = new DOMDocument();
+    libxml_use_internal_errors(true);
+    $dom->loadHTML('<?xml encoding="utf-8" ?>' . $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    libxml_clear_errors();
+
+    $xpath = new DOMXPath($dom);
+    $copyButtons = $xpath->query("//*[contains(@class, 'code-block-copy-btn')]");
+    foreach ($copyButtons as $button) {
+        $button->parentNode->removeChild($button);
+    }
+
+    return $dom->saveHTML();
 }
 
 $zip->close();

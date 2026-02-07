@@ -159,7 +159,17 @@ function createCompleteBackup($userId = null) {
                 
                 // Include both HTML and Markdown files
                 if ($extension === 'html' || $extension === 'md') {
-                    $zip->addFile($filePath, 'entries/' . $relativePath);
+                    if ($extension === 'html') {
+                        $content = file_get_contents($filePath);
+                        if ($content !== false) {
+                            $content = removeCopyButtonsFromHtml($content);
+                            $zip->addFromString('entries/' . $relativePath, $content);
+                        } else {
+                            $zip->addFile($filePath, 'entries/' . $relativePath);
+                        }
+                    } else {
+                        $zip->addFile($filePath, 'entries/' . $relativePath);
+                    }
                 }
             }
         }
@@ -331,6 +341,28 @@ function createCompleteBackup($userId = null) {
 
 function createBackup() {
     return createCompleteBackup();
+}
+
+/**
+ * Remove code block copy buttons from HTML export
+ */
+function removeCopyButtonsFromHtml($html) {
+    if ($html === '' || $html === null) {
+        return $html;
+    }
+
+    $dom = new DOMDocument();
+    libxml_use_internal_errors(true);
+    $dom->loadHTML('<?xml encoding="utf-8" ?>' . $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    libxml_clear_errors();
+
+    $xpath = new DOMXPath($dom);
+    $copyButtons = $xpath->query("//*[contains(@class, 'code-block-copy-btn')]");
+    foreach ($copyButtons as $button) {
+        $button->parentNode->removeChild($button);
+    }
+
+    return $dom->saveHTML();
 }
 ?>
 

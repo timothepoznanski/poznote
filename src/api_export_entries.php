@@ -106,13 +106,41 @@ foreach ($files as $name => $file) {
                         $fileCount++;
                     }
                 } else {
-                    // For HTML files, add as-is
-                    $zip->addFile($filePath, $relativePath);
+                    // For HTML files, remove copy buttons before adding
+                    $content = file_get_contents($filePath);
+                    if ($content !== false) {
+                        $content = removeCopyButtonsFromHtml($content);
+                        $zip->addFromString($relativePath, $content);
+                    } else {
+                        $zip->addFile($filePath, $relativePath);
+                    }
                     $fileCount++;
                 }
             }
         }
     }
+}
+
+/**
+ * Remove code block copy buttons from HTML export
+ */
+function removeCopyButtonsFromHtml($html) {
+    if ($html === '' || $html === null) {
+        return $html;
+    }
+
+    $dom = new DOMDocument();
+    libxml_use_internal_errors(true);
+    $dom->loadHTML('<?xml encoding="utf-8" ?>' . $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    libxml_clear_errors();
+
+    $xpath = new DOMXPath($dom);
+    $copyButtons = $xpath->query("//*[contains(@class, 'code-block-copy-btn')]");
+    foreach ($copyButtons as $button) {
+        $button->parentNode->removeChild($button);
+    }
+
+    return $dom->saveHTML();
 }
 
 /**
