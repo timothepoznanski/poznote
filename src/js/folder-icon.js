@@ -210,7 +210,6 @@ const FOLDER_ICONS = [
     'fa-user-graduate',
     'fa-utensil-spoon',
     'fa-vial',
-    'fa-video',
     'fa-walking',
     'fa-wallet',
     'fa-warehouse',
@@ -401,17 +400,16 @@ function setupColorPicker(currentColor) {
             option.classList.remove('selected');
         }
 
-        // Add click event
-        option.addEventListener('click', function () {
-            // Remove selected class from all color options
+        // Clone to remove stale click listeners from previous modal opens
+        const newOption = option.cloneNode(true);
+        option.parentNode.replaceChild(newOption, option);
+
+        newOption.addEventListener('click', function () {
             document.querySelectorAll('.folder-color-option').forEach(opt => {
                 opt.classList.remove('selected');
             });
-            // Add selected class to clicked option
-            option.classList.add('selected');
+            newOption.classList.add('selected');
             selectedIconColor = color;
-
-            // Don't save immediately - let user confirm with Apply button
         });
     });
 }

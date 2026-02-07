@@ -314,11 +314,6 @@ function clearSearchHighlights() {
         inputsWithListeners[i].removeAttribute('data-overlay-listener');
         // Note: We don't remove the event listener as it's anonymous, but the attribute prevents duplicates
     }
-    
-    // Restore folder filter state after clearing search
-    setTimeout(function() {
-        
-    }, 200);
 }
 
 /**

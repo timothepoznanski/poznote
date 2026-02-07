@@ -1213,10 +1213,10 @@ function viewImageLarge(imageSrc) {
         // Open the blob URL in new tab
         window.open(blobUrl, '_blank');
 
-        // Clean up the blob URL after a short delay
+        // Clean up the blob URL after a delay to let the new tab load
         setTimeout(() => {
             URL.revokeObjectURL(blobUrl);
-        }, 1000);
+        }, 60000);
     } else {
         // For regular URLs, open directly
         window.open(imageSrc, '_blank');

@@ -23,14 +23,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!button) return;
 
                 const icon = button.querySelector('i');
-                if (icon) {
-                    // Store original icon class
-                    icon.setAttribute('data-original-class', icon.className);
-                    icon.className = 'fas fa-spinner fa-spin';
-                }
 
-                const buttonText = button.innerHTML;
-                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + button.textContent.trim();
+                const text = button.textContent.trim();
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + text;
                 button.disabled = true;
 
                 // Force a repaint to ensure spinner is visible

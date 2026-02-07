@@ -1528,6 +1528,9 @@ function switchToPreviewMode(noteId) {
     var noteEntry = document.getElementById('entry' + noteId);
     if (!noteEntry) return;
 
+    // Read previous content BEFORE we overwrite the attribute below
+    var previousContent = noteEntry.getAttribute('data-markdown-content') || '';
+
     var previewDiv = noteEntry.querySelector('.markdown-preview');
     var editorDiv = noteEntry.querySelector('.markdown-editor');
     var editorContainer = noteEntry.querySelector('.markdown-editor-container');
@@ -1628,12 +1631,8 @@ function switchToPreviewMode(noteId) {
         console.warn('Could not save view mode to localStorage:', e);
     }
 
-    // Check if content has actually changed before triggering save
-    var previousContent = noteEntry.getAttribute('data-markdown-content') || '';
-    var currentContent = markdownContent;
-
     // Only mark as edited and trigger save if content has changed
-    if (previousContent !== currentContent) {
+    if (previousContent !== markdownContent) {
         if (typeof window.markNoteAsModified === 'function') {
             window.markNoteAsModified();
         }

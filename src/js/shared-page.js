@@ -125,7 +125,11 @@
             .catch(function(error) {
                 if (spinner) spinner.style.display = 'none';
                 if (container) {
-                    container.innerHTML = '<div class="error-message"><i class="fa-exclamation-triangle"></i> ' + config.txtError + ': ' + error.message + '</div>';
+                    var errDiv = document.createElement('div');
+                    errDiv.className = 'error-message';
+                    errDiv.textContent = config.txtError + ': ' + error.message;
+                    container.innerHTML = '';
+                    container.appendChild(errDiv);
                 }
             });
     }

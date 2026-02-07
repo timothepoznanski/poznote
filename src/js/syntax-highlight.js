@@ -128,6 +128,7 @@
     }
 
     // Hook into reinitializeNoteContent to apply highlighting after note loads
+    var hookRetries = 0;
     function hookReinitializeNoteContent() {
         if (typeof window.reinitializeNoteContent === 'function') {
             var originalReinitializeNoteContent = window.reinitializeNoteContent;
@@ -138,8 +139,8 @@
                     applySyntaxHighlighting(document);
                 }, 100);
             };
-        } else {
-            // If reinitializeNoteContent doesn't exist yet, try again later
+        } else if (hookRetries < 20) {
+            hookRetries++;
             setTimeout(hookReinitializeNoteContent, 100);
         }
     }

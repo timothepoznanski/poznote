@@ -134,12 +134,7 @@ function resetAttachmentForm() {
 }
 
 function setSaveButtonRed(isRed) {
-    // Auto-save is now automatic - log status to console only
-    if (isRed) {
-        console.log('[Poznote Auto-Save] Changes detected for note #' + noteid);
-    } else {
-        console.log('[Poznote Auto-Save] Note #' + noteid + ' saved successfully');
-    }
+    // Auto-save status indicator - no visual button needed with auto-save
 }
 
 function showContactPopup() {

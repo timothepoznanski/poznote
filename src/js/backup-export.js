@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             // Generate a random token and attach it to the form so server will set a cookie
                             // when the download starts. The JS will poll for that cookie and hide spinner.
                             try {
-                                var token = 'dt_' + Math.random().toString(36).substr(2, 9);
+                                var token = 'dt_' + Math.random().toString(36).substring(2, 11);
                                 var existing = document.getElementById('downloadTokenInput');
                                 if (existing) existing.parentNode.removeChild(existing);
                                 var input = document.createElement('input');
@@ -161,6 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     }
                                     if (elapsed >= maxPoll) {
                                         clearInterval(pollTimer);
+                                        hideBackupSpinner();
                                     }
                                 }, pollInterval);
 

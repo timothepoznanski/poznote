@@ -227,7 +227,8 @@
         var formData = new FormData();
         formData.append('note_id', noteId);
         formData.append('workspace', workspace);
-        formData.append('heading', document.querySelector('h3').textContent);
+        var h3 = document.querySelector('h3');
+        formData.append('heading', h3 ? h3.textContent : '');
         formData.append('diagram_data', JSON.stringify(data));
         formData.append('preview_image', blob, 'preview.png');
         

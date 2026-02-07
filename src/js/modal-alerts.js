@@ -297,9 +297,9 @@ window.alert = function(message) {
     return window.modalAlert.alert(message, 'info');
 };
 
-window.confirm = function(message) {
-    return window.modalAlert.confirm(message);
-};
+// Note: window.confirm is NOT overridden because modalAlert.confirm() returns
+// a Promise (always truthy), which would break all synchronous if(confirm(...)) callers.
+// Use window.modalAlert.confirm(message).then(...) for async confirmations.
 
 // Convenience functions
 window.showWarning = function(message, title = null) {

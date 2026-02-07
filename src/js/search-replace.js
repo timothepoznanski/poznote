@@ -130,7 +130,7 @@
         const replaceRow = document.getElementById('searchReplaceRow' + noteId);
 
         if (replaceRow) {
-            replaceRow.style.display = 'flex';
+            replaceRow.style.display = state.replaceVisible ? 'flex' : 'none';
         }
 
         // Focus replace input when shown

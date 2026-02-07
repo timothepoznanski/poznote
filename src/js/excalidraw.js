@@ -36,7 +36,7 @@ function openExcalidrawNote(noteId) {
     var params = new URLSearchParams({
         note_id: noteId
     });
-    if (selectedWorkspace) {
+    if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) {
         params.append('workspace', selectedWorkspace);
     }
 
@@ -175,7 +175,7 @@ function insertExcalidrawDiagram() {
 function saveNoteAndWaitForCompletion() {
     return new Promise(function (resolve, reject) {
         // Check that noteid is valid
-        if (typeof noteid === 'undefined' || noteid == -1 || noteid == '' || noteid === null || noteid === undefined) {
+        if (typeof noteid === 'undefined' || noteid === -1 || noteid === '' || noteid === null) {
             reject(new Error('Invalid note ID'));
             return;
         }

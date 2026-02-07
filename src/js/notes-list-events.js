@@ -122,14 +122,6 @@
                 }
                 break;
 
-            case 'toggle-favorites':
-                event.preventDefault();
-                event.stopPropagation();
-                if (typeof window.toggleFolder === 'function') {
-                    window.toggleFolder('folder-favorites');
-                }
-                break;
-
             case 'navigate-shared':
                 event.preventDefault();
                 event.stopPropagation();

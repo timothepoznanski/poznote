@@ -57,7 +57,6 @@ function compressImageIfNeeded(dataUrl, callback) {
             }
         }
         
-        console.log('[Poznote] Image compressed: ' + Math.round(sizeInBytes/1024) + 'KB -> ' + Math.round((compressedUrl.length * 3/4)/1024) + 'KB');
         callback(compressedUrl);
     };
     

@@ -331,38 +331,38 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
             dd.style.top = (inputEl.offsetTop + inputEl.offsetHeight + 4) + 'px';
         }
         // Note: No item is highlighted by default, user must use arrow keys to highlight
+        // Reset highlight index whenever suggestions are rebuilt
+        inputEl._highlightedIdx = -1;
         
         // Only add navigation handler once per input element
         if (!inputEl.hasNavigationHandler) {
-            let highlighted = -1;
             inputEl.addEventListener('keydown', function navHandler(ev) {
                 const items = dd.querySelectorAll('.tag-suggestion-item');
                 if (!items || items.length === 0) return;
                 if (ev.key === 'ArrowDown') {
                     ev.preventDefault(); 
-                    highlighted = Math.min(highlighted + 1, items.length - 1);
+                    inputEl._highlightedIdx = Math.min(inputEl._highlightedIdx + 1, items.length - 1);
                     items.forEach((it, i) => {
-                        it.classList.toggle('highlighted', i === highlighted);
-                        it.style.background = i === highlighted ? '#f0f7ff' : '';
+                        it.classList.toggle('highlighted', i === inputEl._highlightedIdx);
+                        it.style.background = i === inputEl._highlightedIdx ? '#f0f7ff' : '';
                     });
                 } else if (ev.key === 'ArrowUp') {
                     ev.preventDefault(); 
-                    highlighted = Math.max(highlighted - 1, 0);
+                    inputEl._highlightedIdx = Math.max(inputEl._highlightedIdx - 1, 0);
                     items.forEach((it, i) => {
-                        it.classList.toggle('highlighted', i === highlighted);
-                        it.style.background = i === highlighted ? '#f0f7ff' : '';
+                        it.classList.toggle('highlighted', i === inputEl._highlightedIdx);
+                        it.style.background = i === inputEl._highlightedIdx ? '#f0f7ff' : '';
                     });
-                } else if (ev.key === 'Enter' && highlighted >= 0) {
+                } else if (ev.key === 'Enter' && inputEl._highlightedIdx >= 0) {
                     ev.preventDefault(); 
                     ev.stopPropagation();
                     // Dispatch mousedown to reuse the same handler which also triggers save
-                    items[highlighted].dispatchEvent(new MouseEvent('mousedown'));
+                    items[inputEl._highlightedIdx].dispatchEvent(new MouseEvent('mousedown'));
                     // Trigger auto-save for keyboard selection
                     try {
                         const targetNoteId = noteId;
                         if (typeof window !== 'undefined' && targetNoteId) {
                             window.noteid = targetNoteId;
-                            // Auto-save will handle the modification automatically
                             if (typeof window.markNoteAsModified === 'function') {
                                 window.markNoteAsModified();
                             }
@@ -711,35 +711,13 @@ function saveTagsDirectly(noteId, tagsValue) {
 // Make saveTagsDirectly globally available immediately after definition
 window.saveTagsDirectly = saveTagsDirectly;
 
-/**
- * Setup handlers (minimal now since we use inline editing)
- */
-function setupTagsEditingHandlers() {
-    // Minimal setup since tags are always editable
-}
-
-/**
- * Re-initialize clickable tags after AJAX content load
- */
-function reinitializeClickableTagsAfterAjax() {
-    // Clear the tracking set since notes might have changed
-    notesWithClickableTags.clear();
-    
-    // Re-initialize for all visible notes
-    setTimeout(() => {
-        initializeClickableTags();
-    }, 100);
-}
-
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    setupTagsEditingHandlers();
     initializeClickableTags();
 });
 
 // Also initialize if DOM is already loaded
 if (document.readyState !== 'loading') {
-    setupTagsEditingHandlers();
     initializeClickableTags();
 }
 

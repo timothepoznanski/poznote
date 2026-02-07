@@ -61,25 +61,6 @@ function isMobileDevice() {
     return window.innerWidth <= 800;
 }
 
-// Accessibility: set aria-hidden on desktop/mobile variants so assistive tech ignores hidden parts
-function updateMobileDesktopAria() {
-    try {
-        var mq = window.matchMedia && window.matchMedia('(max-width: 800px)');
-        var mobileActive = mq ? mq.matches : (window.innerWidth <= 800);
-        // Note: aria-hidden is not set for desktop-only/mobile-only since CSS display handles visibility
-    } catch (e) {
-        // ignore
-    }
-}
-
-// Initialize on DOMContentLoaded and update on resize
-document.addEventListener('DOMContentLoaded', updateMobileDesktopAria);
-window.addEventListener('resize', function() {
-    // throttle simple: run after short timeout
-    clearTimeout(window._poznoteAriaTimeout);
-    window._poznoteAriaTimeout = setTimeout(updateMobileDesktopAria, 120);
-});
-
 // --- i18n (client-side) ---
 // Loads merged translations from api_i18n.php and exposes window.t(key, vars, fallback)
 (function() {

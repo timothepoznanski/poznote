@@ -1504,6 +1504,3 @@ window.reinitializeSearchAfterWorkspaceChange = function() {
         searchManager.initializeSearch();
     }
 };
-
-// Make searchManager globally accessible
-window.searchManager = searchManager;

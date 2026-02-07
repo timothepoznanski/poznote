@@ -101,7 +101,7 @@ function saveNote() {
 
 function saveNoteToServer() {
     // Check that noteid is valid
-    if (!noteid || noteid == -1 || noteid == '' || noteid === null || noteid === undefined) {
+    if (!noteid || noteid === -1 || noteid === '' || noteid === null || noteid === undefined) {
         console.error('saveNoteToServer: invalid noteid', noteid);
         return;
     }
@@ -140,7 +140,6 @@ function saveNoteToServer() {
     
     // If still empty, don't save to avoid "heading is required" error
     if (headi === '' || headi.trim() === '') {
-        console.log('[Poznote Auto-Save] Skipping save: note has no title');
         return;
     }
     
@@ -259,7 +258,7 @@ function handleSaveResponse(data) {
             updateNoteTitleInLeftColumn();
             
             // Update last saved content for change detection with the content that was just saved
-            var elements = getNoteElements(noteid);
+            elements = getNoteElements(noteid);
             if (elements.entry) {
                 lastSavedContent = elements.entry.innerHTML;
             }
@@ -272,8 +271,10 @@ function handleSaveResponse(data) {
             updateConnectionStatus(true);
             
             // Remove unsaved changes indicator from page title
-            if (document.title.startsWith('🔴')) {
-                document.title = document.title.substring(2); // Remove "🔴 " (emoji + space = 2 chars)
+            if (document.title.startsWith('🔴 ')) {
+                document.title = document.title.substring(3); // emoji (2 code units) + space
+            } else if (document.title.startsWith('🔴')) {
+                document.title = document.title.substring(2);
             }
             
             // Mark note as saved (remove from pending refresh list)
@@ -295,7 +296,7 @@ function handleSaveResponse(data) {
         }
     } catch(e) {
         // Normal response (not JSON)
-        if(data == '1') {
+        if(data === '1') {
             updateLastSavedTime('Saved today');
         } else {
             updateLastSavedTime(data);
@@ -316,8 +317,10 @@ function handleSaveResponse(data) {
         updateConnectionStatus(true);
         
         // Remove unsaved changes indicator from page title
-        if (document.title.startsWith('🔴')) {
-            document.title = document.title.substring(2); // Remove "🔴 " (emoji + space = 2 chars)
+        if (document.title.startsWith('🔴 ')) {
+            document.title = document.title.substring(3); // emoji (2 code units) + space
+        } else if (document.title.startsWith('🔴')) {
+            document.title = document.title.substring(2);
         }
         
         // Clear draft from localStorage after successful save
@@ -445,12 +448,12 @@ function getTextContentFromElement(element) {
 function updateLastSavedTime(timeText) {
     var elements = getNoteElements(noteid);
     if (elements.lastUpdated) {
-        elements.lastUpdated.innerHTML = timeText;
+        elements.lastUpdated.textContent = timeText;
     }
 }
 
 function updateNoteTitleInLeftColumn() {
-    if(noteid == 'search' || noteid == -1 || noteid === null || noteid === undefined) return;
+    if(noteid === 'search' || noteid === -1 || noteid === null || noteid === undefined) return;
     
     var elements = getNoteElements(noteid);
     if (!elements.title) return;

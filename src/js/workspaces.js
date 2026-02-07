@@ -185,10 +185,11 @@ function displayWorkspaceMenu(menu, workspaces) {
         var isCurrent = workspace.name === currentWorkspace;
         var currentClass = isCurrent ? ' current-workspace' : '';
         var icon = isCurrent ? 'fa-check-light-full' : 'fa-layer-group';
+        var safeName = workspace.name.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-        menuHtml += '<div class="workspace-menu-item' + currentClass + '" data-workspace-name="' + workspace.name + '">';
+        menuHtml += '<div class="workspace-menu-item' + currentClass + '" data-workspace-name="' + safeName + '">';
         menuHtml += '<i class="' + icon + '"></i>';
-        menuHtml += '<span>' + workspace.name + '</span>';
+        menuHtml += '<span>' + safeName + '</span>';
         menuHtml += '</div>';
     }
 
@@ -401,7 +402,7 @@ function showAjaxAlert(msg, type) {
     var el = document.getElementById('ajaxAlert');
     el.style.display = 'block';
     el.className = 'alert alert-' + (type === 'success' ? 'success' : 'danger');
-    el.innerHTML = msg;
+    el.textContent = msg;
     // auto-hide after 4s
     setTimeout(function () { el.style.display = 'none'; }, 4000);
 }

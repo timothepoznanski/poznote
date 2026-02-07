@@ -6,6 +6,9 @@
 (function() {
     'use strict';
 
+    var _mathRetryCount = 0;
+    var MAX_MATH_RETRIES = 50; // 5 seconds max
+
     // Function to render all math elements on the page
     window.renderMathInElement = function(element) {
         if (!element) {
@@ -14,12 +17,15 @@
 
         // Check if KaTeX is available
         if (typeof katex === 'undefined') {
-            console.warn('KaTeX is not loaded yet, retrying in 100ms...');
-            setTimeout(function() {
-                window.renderMathInElement(element);
-            }, 100);
+            if (_mathRetryCount < MAX_MATH_RETRIES) {
+                _mathRetryCount++;
+                setTimeout(function() {
+                    window.renderMathInElement(element);
+                }, 100);
+            }
             return;
         }
+        _mathRetryCount = 0;
 
         // Render math blocks (display mode)
         const mathBlocks = element.querySelectorAll('.math-block');
@@ -71,34 +77,35 @@
         return div.innerHTML;
     }
 
+    // Re-render when content changes (for dynamic note loading)
+    function setupMathObserver() {
+        if (typeof MutationObserver !== 'undefined' && document.body) {
+            var observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.addedNodes.length > 0) {
+                        mutation.addedNodes.forEach(function(node) {
+                            if (node.nodeType === 1) {
+                                renderMathInElement(node);
+                            }
+                        });
+                    }
+                });
+            });
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        }
+    }
+
     // Auto-render on page load
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() {
             renderMathInElement(document.body);
+            setupMathObserver();
         });
     } else {
-        // DOM already loaded
         renderMathInElement(document.body);
-    }
-
-    // Re-render when content changes (for dynamic note loading)
-    if (typeof MutationObserver !== 'undefined') {
-        const observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.addedNodes.length > 0) {
-                    mutation.addedNodes.forEach(function(node) {
-                        if (node.nodeType === 1) { // Element node
-                            renderMathInElement(node);
-                        }
-                    });
-                }
-            });
-        });
-
-        // Start observing the document with the configured parameters
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
+        setupMathObserver();
     }
 })();

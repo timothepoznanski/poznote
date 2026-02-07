@@ -124,9 +124,7 @@ document.addEventListener('DOMContentLoaded', function () {
 window.newnote = createNewNote;
 window.saveNoteImmediately = saveNoteToServer;
 window.updatenote = saveNoteToServer; // Legacy alias
-window.saveFocusedNoteJS = function () {
-    console.log('[Poznote Auto-Save] Manual save not needed - auto-save active');
-};
+window.saveFocusedNoteJS = function () {};
 window.deleteNote = deleteNote;
 window.toggleFavorite = toggleFavorite;
 window.duplicateNote = duplicateNote;

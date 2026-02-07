@@ -22,7 +22,7 @@ function tr(key, vars, fallback) {
 // Generic function to update noteid based on element ID with prefix
 function updateNoteIdFromElement(element, prefixLength) {
     if (element && element.id) {
-        noteid = element.id.substr(prefixLength);
+        noteid = element.id.substring(prefixLength);
     }
 }
 
@@ -1025,18 +1025,6 @@ function initializeAutoSaveSystem() {
 
 // Debug all navigation attempts
 function setupNavigationDebugger() {
-    // Monitor URL changes
-    var originalPushState = history.pushState;
-    var originalReplaceState = history.replaceState;
-
-    history.pushState = function () {
-        return originalPushState.apply(history, arguments);
-    };
-
-    history.replaceState = function () {
-        return originalReplaceState.apply(history, arguments);
-    };
-
     // Monitor popstate events - reload note when using browser back/forward
     window.addEventListener('popstate', function (e) {
         // Extract note ID from URL
@@ -1635,112 +1623,6 @@ function handleNoteDragStart(e) {
         noteLink.style.setProperty('border-left', '3px solid rgba(0, 123, 255, 0.4)', 'important');
         noteLink.style.setProperty('transform', 'scale(0.98)', 'important');
 
-        // Show root drop zone only if note is in a folder
-        var rootDropZone = document.getElementById('root-drop-zone');
-
-        if (false && rootDropZone && currentFolderId) {
-            // DISABLED: Zone de drop désactivée
-            // Remove the display:none style completely and force new styles
-            rootDropZone.removeAttribute('style');
-            rootDropZone.className = 'root-drop-zone active-drop-zone';
-
-            // Apply styles via direct assignment
-            rootDropZone.style.cssText = `
-                display: block !important;
-                position: relative !important;
-                z-index: 9999 !important;
-                background-color: #e3f2fd !important;
-                border: 3px dashed #007bff !important;
-                padding: 20px !important;
-                margin: 10px !important;
-                text-align: center !important;
-                font-weight: bold !important;
-                color: #007bff !important;
-                min-height: 60px !important;
-                width: auto !important;
-                visibility: visible !important;
-                opacity: 1 !important;
-            `;
-
-            // Force reflow
-            rootDropZone.offsetHeight;
-
-            // IMPORTANT: Re-apply dragging styles to the note after showing drop zone
-            setTimeout(function () {
-                if (noteLink) {
-                    noteLink.style.setProperty('opacity', '0.6', 'important');
-                    noteLink.style.setProperty('background-color', 'rgba(0, 123, 255, 0.08)', 'important');
-                    noteLink.style.setProperty('border-left', '3px solid rgba(0, 123, 255, 0.4)', 'important');
-                    noteLink.style.setProperty('transform', 'scale(0.98)', 'important');
-                }
-            }, 0);
-
-            // Re-attach event listeners specifically for this drag session
-            rootDropZone.removeEventListener('dragover', handleRootDragOver);
-            rootDropZone.removeEventListener('drop', handleRootDrop);
-            rootDropZone.removeEventListener('dragleave', handleRootDragLeave);
-
-            rootDropZone.addEventListener('dragover', handleRootDragOver);
-            rootDropZone.addEventListener('drop', handleRootDrop);
-            rootDropZone.addEventListener('dragleave', handleRootDragLeave);
-
-            // Alternative: use mouse events during drag as backup
-            rootDropZone.addEventListener('mouseenter', function (e) {
-                // Check if we're currently dragging
-                if (document.querySelector('.links_arbo_left.dragging')) {
-                    rootDropZone.classList.add('drag-over');
-                    rootDropZone.style.backgroundColor = '#e3f2fd';
-                    rootDropZone.style.borderColor = '#007bff';
-                    rootDropZone.style.transform = 'scale(1.02)';
-                }
-            });
-
-            rootDropZone.addEventListener('mouseleave', function (e) {
-                if (document.querySelector('.links_arbo_left.dragging')) {
-                    rootDropZone.classList.remove('drag-over');
-                    rootDropZone.style.transform = 'scale(1)';
-                }
-            });
-
-            // Alternative drop detection via click during or after drag
-            rootDropZone.addEventListener('click', function (e) {
-                // Check if we have drag data stored globally
-                if (window.currentDragData) {
-                    if (window.currentDragData.noteId && window.currentDragData.currentFolderId) {
-                        // Hide the drop zone immediately after successful drop
-                        rootDropZone.classList.remove('drag-over');
-                        rootDropZone.className = 'root-drop-zone';
-                        rootDropZone.style.cssText = 'display: none;';
-
-                        // Move the note
-                        moveNoteToRoot(window.currentDragData.noteId);
-                    }
-                    // Clear the drag data
-                    window.currentDragData = null;
-                }
-            });
-
-            // Keep the mouseup handler as backup
-            rootDropZone.addEventListener('mouseup', function (e) {
-                // Check if we have drag data stored globally
-                if (window.currentDragData) {
-                    if (window.currentDragData.noteId && window.currentDragData.currentFolderId) {
-                        // Hide the drop zone immediately after successful drop
-                        rootDropZone.classList.remove('drag-over');
-                        rootDropZone.className = 'root-drop-zone';
-                        rootDropZone.style.cssText = 'display: none;';
-
-                        // Move the note
-                        moveNoteToRoot(window.currentDragData.noteId);
-                    }
-                    // Clear the drag data
-                    window.currentDragData = null;
-                }
-            });
-
-            // Scroll into view
-            rootDropZone.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
     }
 }
 
@@ -2886,7 +2768,7 @@ var lastChangeCheckTime = 0;
 var CHANGE_CHECK_INTERVAL = 400; // Check at most every 400ms
 
 function markNoteAsModified() {
-    if (noteid == 'search' || noteid == -1 || noteid === null || noteid === undefined) {
+    if (noteid === 'search' || noteid === -1 || noteid === null || noteid === undefined) {
         return;
     }
 
@@ -2971,7 +2853,7 @@ function markNoteAsModified() {
 var localStorageSaveTimer = null;
 
 function saveToLocalStorage() {
-    if (noteid == 'search' || noteid == -1 || noteid === null || noteid === undefined) return;
+    if (noteid === 'search' || noteid === -1 || noteid === null || noteid === undefined) return;
 
     // Debounce localStorage writes (they can be expensive with large content)
     clearTimeout(localStorageSaveTimer);
@@ -3005,7 +2887,7 @@ function saveToLocalStorage() {
 }
 
 function saveToServerDebounced() {
-    if (noteid == 'search' || noteid == -1 || noteid === null || noteid === undefined) return;
+    if (noteid === 'search' || noteid === -1 || noteid === null || noteid === undefined) return;
 
     // Clear the timeout since we're executing the save now
     clearTimeout(saveTimeout);
@@ -3230,7 +3112,7 @@ function switchWorkspace(targetWorkspace, callback) {
 
 // Check if current note has unsaved changes (pending server save)
 function hasUnsavedChanges(noteId) {
-    if (!noteId || noteId == -1 || noteId == 'search') return false;
+    if (!noteId || noteId === -1 || noteId === 'search') return false;
 
 
     // Check if there's a pending server save timeout
@@ -3255,7 +3137,7 @@ function hasUnsavedChanges(noteId) {
 function checkUnsavedBeforeLeaving(targetNoteId) {
     var currentNoteId = window.noteid;
 
-    if (!currentNoteId || currentNoteId == -1 || currentNoteId == 'search') return true;
+    if (!currentNoteId || currentNoteId === -1 || currentNoteId === 'search') return true;
 
     // If staying on same note, no need to check
     if (String(currentNoteId) === String(targetNoteId)) return true;
@@ -3296,7 +3178,7 @@ function checkUnsavedBeforeLeaving(targetNoteId) {
 
 // Emergency save function for page unload scenarios
 function emergencySave(noteId) {
-    if (!noteId || noteId == -1 || noteId == 'search') return;
+    if (!noteId || noteId === -1 || noteId === 'search') return;
 
     var entryElem = document.getElementById("entry" + noteId);
     var titleInput = document.getElementById("inp" + noteId);
@@ -3458,7 +3340,7 @@ window.addEventListener('popstate', function (e) {
 
 // Draft restoration functions
 function checkForUnsavedDraft(noteId, skipAutoRestore) {
-    if (!noteId || noteId == -1 || noteId == 'search') return;
+    if (!noteId || noteId === -1 || noteId === 'search') return;
 
 
     try {
