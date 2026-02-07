@@ -1,0 +1,409 @@
+/**
+ * Menus Styles
+ * 
+ * Styles for dropdown menus including task list actions, workspace menu,
+ * settings dropdown, share/export dropdown, actions dropdown, and other menus.
+ */
+
+.tasklist-actions-dropdown {
+    position: relative;
+    display: inline-flex;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+    font-style: normal;
+}
+
+.dropdown-menu button.dropdown-item {
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+    font-weight: inherit;
+    box-shadow: none;
+    outline: none;
+}
+
+.dropdown-menu button.dropdown-item:focus {
+    outline: none;
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.dropdown-item i {
+    margin-right: 10px;
+    width: 16px;
+    text-align: center;
+    color: #007DB8;
+}
+
+.workspace-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #fff;
+    /* border: 1px solid #ddd; */
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 180px;
+    z-index: 1000;
+    display: none;
+    margin-top: 4px;
+}
+
+.workspace-menu-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+}
+
+.workspace-menu-item:last-child {
+    border-bottom: none;
+}
+
+.workspace-menu-item:hover {
+    background-color: #f8f9fa;
+}
+
+.workspace-menu-item.current-workspace {
+    background-color: #e3f2fd;
+    font-weight: 600;
+    color: #007DB8;
+}
+
+.workspace-menu-item i {
+    margin-right: 8px;
+    font-size: 14px;
+    width: 16px;
+    text-align: center;
+    color: #666;
+}
+
+.workspace-menu-item.current-workspace i {
+    color: #007DB8;
+}
+
+.workspace-menu-divider {
+    height: 1px;
+    background-color: #e0e0e0;
+    margin: 4px 0;
+}
+
+/* MENU LEFT */
+
+.newbutton[style],
+.list_tags[style] {
+    text-align: center;
+}
+
+.newbutton[style] {
+    cursor: pointer;
+    margin-left: 8px;
+}
+
+.newbutton[style] .fa-times-circle {
+    color: #d32f2f;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.newbutton,
+.newfolderbutton,
+.list_tags,
+.settingsbutton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    margin: 4px;
+    color: #007DB8;
+    font-size: 16px;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.newbutton:hover,
+.newfolderbutton:hover,
+.list_tags:hover,
+.settingsbutton:hover {
+    background-color: rgba(0, 125, 184, 0.1);
+    color: #005a8a;
+}
+
+/* Settings dropdown styles */
+.settings-dropdown {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.settingsbutton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    margin: 4px;
+    color: #007DB8;
+    font-size: 16px;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.settings-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 180px;
+    padding: 8px 0;
+    margin-top: 5px;
+    display: none;
+}
+
+.settings-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+
+.settings-menu-item:last-child {
+    border-bottom: none;
+}
+
+.settings-menu-item:hover {
+    background-color: #f8f9fa;
+    color: #007DB8;
+}
+
+.settings-menu-item i {
+    margin-right: 10px;
+    width: 16px;
+    text-align: center;
+    color: #007DB8;
+}
+
+.settings-menu-item .setting-status {
+    margin-left: 8px;
+    /* font-size: 0.85em; */
+    vertical-align: baseline;
+}
+
+.settings-menu-item .setting-status.enabled {
+    color: #28a745;
+}
+
+.settings-menu-item .setting-status.disabled {
+    color: #dc3545;
+}
+
+/* Update Status */
+
+/* Update status styling */
+/* #update-status, #mobileupdate-status- {
+    display: block;
+    margin-top: 2px;
+    font-size: 0.75em;
+    line-height: 1.2;
+} */
+
+/* Share / Export dropdown styles */
+.share-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.share-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    min-width: 160px;
+    padding: 8px 0;
+    margin-top: 5px;
+    display: none;
+}
+
+.share-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+
+.share-menu-item:last-child {
+    border-bottom: none;
+}
+
+.share-menu-item:hover {
+    background-color: #f8f9fa;
+    color: #007DB8;
+}
+
+.share-menu-item i {
+    margin-right: 10px;
+    width: 16px;
+    text-align: center;
+    color: #007DB8;
+    width: 20px !important;
+    font-size: 18px !important;
+}
+
+/* .share-dropdown.mobile .share-menu { min-width: 140px; padding: 6px 0; } */
+
+/* Actions dropdown styles */
+.actions-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.actions-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    min-width: 140px;
+    padding: 8px 0;
+    margin-top: 5px;
+    display: none;
+}
+
+.actions-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+
+.actions-menu-item:last-child {
+    border-bottom: none;
+}
+
+.actions-menu-item:hover {
+    background-color: #f8f9fa;
+    color: #007DB8;
+}
+
+.actions-menu-item i {
+    margin-right: 10px;
+    width: 16px;
+    text-align: center;
+    color: #007DB8;
+    width: 24px !important;
+    font-size: 20px !important;
+}
+
+/* Make delete icon red in actions menu */
+.actions-menu-item .fa-trash {
+    color: #ff0000 !important;
+    filter: none !important;
+}
+
+/* .actions-dropdown.mobile .actions-menu { min-width: 120px; padding: 6px 0; } */
+
+.icon_trash {
+    color: #007DB8;
+}
+
+.trashnotebutton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    margin: 4px;
+    color: #007DB8;
+    font-size: 16px;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.trashnotebutton:hover {
+    background-color: rgba(0, 125, 184, 0.1);
+    color: #005a8a;
+}
+
+.logoutbutton {
+    display: inline-block;
+    width: 30px;
+    cursor: pointer;
+    height: 20px;
+    margin: 5px;
+    color: #dc3545;
+    font-size: 15px;
+}
+
+.logoutbutton:hover {
+    color: #c82333;
+}

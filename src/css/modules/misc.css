@@ -1,0 +1,454 @@
+/**
+ * Miscellaneous Styles
+ * 
+ * File upload, images & media, update notifications, modals, search & highlights,
+ * general rules, placeholders, and utility classes.
+ */
+
+/* File upload styling */
+.file-input-label {
+    display: block;
+    width: 160px;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 6px 12px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+}
+
+.file-input-hidden {
+    display: none;
+}
+
+.accepted-types {
+    font-size: 0.85em;
+    color: #888;
+    text-align: center;
+    margin-top: 4px;
+}
+
+.spacer-18 {
+    height: 18px;
+}
+
+.selected-filename {
+    margin: 0 0 18px 0;
+    font-size: 0.95em;
+    color: #444;
+    text-align: center;
+    min-height: 1.5em;
+}
+
+/* Note list subline (created date) */
+.note-subline {
+    font-size: 0.95em;
+    /* slightly smaller than normal */
+    color: #6b7280;
+    margin-top: -2px;
+    /* space between title and subline */
+    margin-bottom: 18px;
+    /* same space between subline and note content */
+    display: none;
+    /* hidden by default */
+}
+
+.button-48 {
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    margin: 0;
+    /* ensure uniform spacing controlled by gap on the container */
+}
+
+/* Remove margins from h4 note title */
+h4 {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+form {
+    margin: 0px;
+    padding: 0px;
+}
+
+.contains_forms_search {
+    width: 100%;
+    margin: 5px 0 15px 0;
+    padding: 0;
+    text-align: center;
+    box-sizing: border-box;
+    /* display: flex; */
+    /* justify-content: center; */
+}
+
+img {
+    max-width: 100%;
+    /* To prevent screenshots from exceeding their container when they are too large */
+}
+
+/* Image resize wrapper and handle */
+.image-resize-wrapper {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+}
+
+.image-resize-handle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 28px;
+    height: 28px;
+    background: #007DB8;
+    border: 2px solid white;
+    border-radius: 4px 0 4px 0;
+    cursor: nwse-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+    transition: all 0.2s ease;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.image-resize-handle:hover {
+    background: #005a8a;
+    width: 32px;
+    height: 32px;
+}
+
+.image-resize-handle i {
+    color: white;
+    font-size: 10px;
+    pointer-events: none;
+}
+
+.notification-overlay {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+#notificationPopup {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 16px 24px;
+    color: #007DB8;
+    background-color: #fff;
+    border: 2px solid #007DB8;
+    z-index: 1000;
+    font-size: 1em;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 125, 184, 0.2);
+    max-width: 400px;
+    min-width: 200px;
+}
+
+/* Notification types */
+#notificationPopup.notification-error {
+    color: #dc3545;
+    border-color: #dc3545;
+    box-shadow: 0 4px 16px rgba(220, 53, 69, 0.2);
+}
+
+#notificationPopup.notification-warning {
+    color: #007DB8;
+    border-color: #007DB8;
+    box-shadow: 0 4px 16px rgba(0, 125, 184, 0.2);
+}
+
+#notificationPopup.notification-success {
+    color: #198754;
+    border-color: #198754;
+    box-shadow: 0 4px 16px rgba(25, 135, 84, 0.2);
+}
+
+/* NOTE DISPLAY */
+
+div[contentEditable=true]:empty:before {
+    content: attr(data-ph);
+    color: #bababa;
+}
+
+/* Placeholder lines around embedded Excalidraw diagrams */
+.excalidraw-placeholder:empty:before {
+    content: attr(data-ph);
+    color: #999;
+    font-style: italic;
+    opacity: 0.6;
+}
+
+/* Exclure les blocs de code du placeholder automatique */
+.code-block:empty:before,
+.noteentry .code-block:empty:before {
+    content: none !important;
+}
+
+/* Unified create modal styles */
+.create-options {
+    display: flex;
+    flex-direction: column;
+    /* gap: 14px; */
+    margin-top: 16px;
+}
+
+.create-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Legacy class name for backwards compatibility */
+.create-note-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.create-note-option {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: white;
+}
+
+.create-note-option:hover {
+    border-color: #007DB8;
+    background-color: #f8fafb;
+}
+
+.create-note-option.selected {
+    border-color: #007DB8;
+    background-color: #e8f4f8;
+}
+
+.create-note-option i {
+    font-size: 24px;
+    color: #007DB8;
+    margin-right: 16px;
+    min-width: 30px;
+    text-align: center;
+}
+
+.create-note-option span {
+    font-weight: 600;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.create-note-option p {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+    margin-top: 4px;
+}
+
+.create-note-option>div {
+    flex: 1;
+}
+
+/* Dark mode styles for create note modal */
+html[data-theme='dark'] .create-note-option,
+body.dark-mode .create-note-option {
+    background-color: #333333;
+    border-color: #444;
+}
+
+html[data-theme='dark'] .create-note-option:hover,
+body.dark-mode .create-note-option:hover {
+    border-color: #007DB8;
+    background-color: #333;
+}
+
+html[data-theme='dark'] .create-note-option.selected,
+body.dark-mode .create-note-option.selected {
+    border-color: #007DB8;
+    background-color: #1a3a4a;
+}
+
+html[data-theme='dark'] .create-note-option span,
+body.dark-mode .create-note-option span {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .create-note-option p,
+body.dark-mode .create-note-option p {
+    color: #aaa;
+}
+
+/* Discreet subtitle text for create modal options */
+.create-note-option .create-note-subtitle {
+    font-size: 13px !important;
+    color: var(--text-muted, #fd4545);
+    font-weight: 300 !important;
+    margin-left: 4px;
+    opacity: 0.7;
+    display: inline;
+}
+
+html[data-theme='dark'] .create-note-subtitle,
+body.dark-mode .create-note-subtitle {
+    color: var(--text-muted-dark, #999999) !important;
+}
+
+html[data-theme='dark'] .create-section h4,
+body.dark-mode .create-section h4 {
+    color: #aaa;
+}
+
+/* Image menu styles (similar to settings menu) */
+.image-menu {
+    position: absolute;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 160px;
+    padding: 8px 0;
+    display: block;
+}
+
+.image-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+
+.image-menu-item:last-child {
+    border-bottom: none;
+}
+
+.image-menu-item:hover {
+    background-color: #f8f9fa;
+    color: #007DB8;
+}
+
+.image-menu-item i {
+    margin-right: 10px;
+    width: 16px;
+    text-align: center;
+    color: #007DB8;
+}
+
+/* Submenu styles */
+.image-menu-parent {
+    position: relative;
+}
+
+.image-submenu {
+    position: fixed;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 180px;
+    padding: 8px 0;
+    z-index: 10001;
+    display: none;
+}
+
+.image-submenu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+
+.image-submenu-item:last-child {
+    border-bottom: none;
+}
+
+.image-submenu-item:hover {
+    background-color: #f8f9fa;
+    color: #007DB8;
+}
+
+/* Export modal options */
+.export-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.export-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.export-option:hover {
+    background-color: #f9fafb;
+    border-color: #007DB8;
+}
+
+.export-option i {
+    font-size: 1.5em;
+    color: #007DB8;
+    width: 24px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.export-option div {
+    flex: 1;
+}
+
+.export-option span {
+    display: block;
+    font-weight: 600;
+    font-size: 1em;
+    color: #1f2937;
+    margin-bottom: 4px;
+}
+
+.export-option p {
+    margin: 0;
+    font-size: 0.875em;
+    color: #6b7280;
+    line-height: 1.4;
+}

@@ -1,0 +1,519 @@
+/**
+ * Icon Styles
+ * 
+ * Custom SVG icons, Font Awesome declarations, icon filters, and icon color customizations
+ * for the Poznote application.
+ */
+
+/* Custom SVG icons for index.php */
+
+/* spin helper */
+.fa-spin {
+    -webkit-animation: fa-spin 2s infinite linear;
+    animation: fa-spin 2s infinite linear;
+}
+
+@-webkit-keyframes fa-spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(359deg);
+    }
+}
+
+@keyframes fa-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(359deg);
+    }
+}
+
+/* When attachments exist, make the paperclip icon use its SVG and remove tint so it appears filled/blue */
+.btn-attachment.has-attachments i.fa-paperclip,
+.btn-attachment.has-attachments .fa-paperclip {
+    color: #007DB8 !important;
+}
+
+/* Blue color for favorite star when it's marked as favorite - #007DB8 */
+.toolbar-btn.btn-favorite.is-favorite i.fa-star,
+.toolbar-btn.btn-favorite.is-favorite i.fa-star-light,
+.toolbar-btn.btn-favorite.is-favorite .fa-star,
+.toolbar-btn.btn-favorite.is-favorite .fa-star-light,
+.toolbar-btn.btn-share.is-shared i.fa-cloud,
+.toolbar-btn.btn-share.is-shared .fa-cloud,
+.toolbar-btn.btn-attachment.has-attachments i {
+    color: #007DB8 !important;
+    filter: none !important;
+}
+
+/* Blue color for markdown view mode toggle button */
+.toolbar-btn.markdown-view-mode-btn i,
+.toolbar-btn.markdown-view-mode-btn [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+}
+
+.toolbar-btn.markdown-view-mode-btn:hover i,
+.toolbar-btn.markdown-view-mode-btn:hover [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+    transform: scale(1.18);
+}
+
+/* Blue color for markdown help button */
+.toolbar-btn.markdown-help-btn i,
+.toolbar-btn.markdown-help-btn [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+}
+
+.toolbar-btn.markdown-help-btn:hover i,
+.toolbar-btn.markdown-help-btn:hover [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+    transform: scale(1.18);
+}
+
+/* Blue color for markdown split view button */
+.toolbar-btn.markdown-split-btn i,
+.toolbar-btn.markdown-split-btn [class*="fa-"] {
+    color:#007DB8 !important;
+    filter: none !important;
+}
+
+.toolbar-btn.markdown-split-btn:hover i,
+.toolbar-btn.markdown-split-btn:hover [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+    transform: scale(1.18);
+}
+
+/* Add slash through icon when in split mode (active state) */
+.toolbar-btn.markdown-split-btn.active {
+    position: relative;
+}
+
+.toolbar-btn.markdown-split-btn.active::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 24px;
+    height: 2px;
+    background-color: #007DB8;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    pointer-events: none;
+}
+
+/* Apply default gray filter (rgb(55, 53, 47)) to all icons not on hover */
+/* Exclude folder icons with custom colors from the filter */
+[class*="fa-"]:not(.folder-icon[data-icon-color]) {
+    filter: brightness(0) saturate(100%) invert(21%) sepia(8%) saturate(1075%) hue-rotate(17deg) brightness(94%) contrast(89%);
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+[class*="fa-"]:not(.folder-icon[data-icon-color]):hover {
+    transform: scale(1.18);
+    filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
+}
+
+/* Ensure search type button icons are not recolored by the global fa filter */
+.searchbar-type-btn i,
+.searchbar-type-btn i::before,
+.searchbar-type-btn.active i,
+.searchbar-type-btn.active i::before,
+.searchbar-type-btn:hover i,
+.searchbar-type-btn:hover i::before {
+    filter: none !important;
+}
+
+/* Exception: Remove filter for slash command color icons (so they show their iconColor) */
+.slash-command-item i[style*="color:"],
+.slash-command-submenu i[style*="color:"] {
+    filter: none !important;
+}
+
+/* Exception: Remove filter for save button when modified (to show red color) */
+.toolbar-btn.save-modified .fa-save {
+    filter: none !important;
+}
+
+/* Exception: Remove filter for favorite/share/attachment (to show blue color) */
+.toolbar-btn.is-favorite .fa-star,
+.toolbar-btn.is-favorite .fa-star-light,
+.toolbar-btn.is-shared .fa-cloud,
+.toolbar-btn.has-attachments .fa-paperclip,
+.toolbar-btn.has-attachments .fa-paperclip-light {
+    filter: none !important;
+}
+
+.sidebar-plus {
+    /* transform: scale(1.18); */
+    filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
+}
+
+/* Make markdown toggle icons blue */
+.markdown-edit-btn .fa-markdown,
+.markdown-preview-btn .fa-eye,
+.markdown-view-mode-btn i,
+.markdown-split-btn.active i,
+.markdown-split-btn.active [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+}
+
+.markdown-edit-btn:hover .fa-markdown,
+.markdown-preview-btn:hover .fa-eye,
+.markdown-view-mode-btn:hover i,
+.markdown-split-btn:hover i {
+    color: #007DB8 !important;
+    filter: none !important;
+    transform: scale(1.18);
+}
+
+.fa-bold {
+    transition: transform 0.2s ease;
+}
+
+.fa-bold:hover {
+    transform: scale(1.2);
+    color: #007DB8 !important;
+}
+
+/* Red color for cancel icon in mobile slash menu */
+.slash-command-icon.fa-times-circle,
+.slash-command-item .slash-command-icon.fa-times-circle {
+    color: #ef4444 !important;
+    font-weight: 400;
+}
+
+/* Font Awesome Pro Light font family */
+.fa-question-circle,
+.fa-times-circle,
+.fa-times,
+.fa-chevron-right,
+.fa-chevron-left,
+.fa-chevron-up,
+.fa-chevron-down,
+.fa-eye,
+.fa-clock,
+.fa-cloud,
+.fa-caret-down,
+.fa-ellipsis,
+.fa-ellipsis-v,
+.fa-mobile,
+.fa-border-outer,
+.fa-paint-brush,
+.fa-smile,
+.fa-folder,
+.fa-folder-open,
+.fa-edit,
+.fa-download,
+.fa-file-code,
+.fa-maximize,
+.fa-expand,
+.fa-trash,
+.fa-save,
+.fa-link,
+.fa-unlink,
+.fa-paperclip,
+.fa-plane,
+.fa-external-link,
+.fa-minus,
+.fa-info-circle,
+.fa-search,
+.fa-spinner,
+.fa-star-light,
+.fa-star,
+.fa-layer-group,
+.fa-cog,
+.fa-columns,
+.fa-home,
+.fa-bold,
+.fa-italic,
+.fa-underline,
+.fa-eraser,
+.fa-strikethrough,
+.fa-palette,
+.fa-fill-drip,
+.fa-list-ul,
+.fa-list-ol,
+.fa-table,
+.fa-text-height,
+.fa-code,
+.fa-terminal,
+.fa-at,
+.fa-tag,
+.fa-tags,
+.fa-sign-out-alt,
+.fa-sync-alt,
+.fa-globe,
+.fa-upload,
+.fa-arrow-left,
+.fa-arrow-up,
+.fa-arrow-down,
+.fa-info,
+.fa-file-alt,
+.fa-plus,
+.fa-plus-circle,
+.fa-calendar-alt,
+.fa-code-branch,
+.fa-map-marker-alt,
+.fa-user,
+.fa-lightbulb,
+.fa-hashtag,
+.fa-check-light-full,
+.fa-align-left,
+.fa-copy,
+.fa-trash-restore-alt,
+.fa-grip-vertical,
+.fa-grip-lines-vertical,
+.fa-video,
+.fa-list-check,
+.fa-image,
+.fa-share,
+.fa-arrows-up-down,
+.fa-arrows-h,
+.fa-sort,
+.fa-file-import,
+.fa-check-square,
+.fa-square,
+.fa-broom,
+.fa-moon,
+.fa-briefcase,
+.fa-heart,
+.fa-music,
+.fa-book,
+.fa-graduation-cap,
+.fa-rocket,
+.fa-users,
+.fa-wrench,
+.fa-camera,
+.fa-shield,
+.fa-lock,
+.fa-key,
+.fa-envelope,
+.fa-inbox,
+.fa-archive,
+.fa-box,
+.fa-shopping-cart,
+.fa-credit-card,
+.fa-chart-line,
+.fa-chart-bar,
+.fa-database,
+.fa-server,
+.fa-tasks,
+.fa-clipboard,
+.fa-gamepad,
+.fa-trophy,
+.fa-gift,
+.fa-birthday-cake,
+.fa-coffee,
+.fa-pizza-slice,
+.fa-utensils,
+.fa-medkit,
+.fa-heartbeat,
+.fa-dumbbell,
+.fa-bicycle,
+.fa-tree,
+.fa-leaf,
+.fa-seedling,
+.fa-paw,
+.fa-bug,
+.fa-flask,
+.fa-atom,
+.fa-magnet,
+.fa-fire,
+.fa-sun,
+.fa-umbrella,
+.fa-snowflake,
+.fa-bolt,
+.fa-flag,
+.fa-bookmark,
+.fa-thumbs-up,
+.fa-anchor,
+.fa-apple-alt,
+.fa-award,
+.fa-bell,
+.fa-binoculars,
+.fa-book-open,
+.fa-briefcase-medical,
+.fa-brush,
+.fa-building,
+.fa-bus,
+.fa-calculator,
+.fa-candy-cane,
+.fa-car,
+.fa-certificate,
+.fa-chart-network,
+.fa-chart-pie,
+.fa-chess,
+.fa-clipboard-list,
+.fa-cloud-sun,
+.fa-coins,
+.fa-comment,
+.fa-compass,
+.fa-crown,
+.fa-cube,
+.fa-cubes,
+.fa-desktop,
+.fa-diploma,
+.fa-dna,
+.fa-dollar-sign,
+.fa-dragon,
+.fa-drum,
+.fa-elephant,
+.fa-euro-sign,
+.fa-feather,
+.fa-file-contract,
+.fa-file-invoice,
+.fa-film,
+.fa-fingerprint,
+.fa-folder-tree,
+.fa-gem,
+.fa-glasses,
+.fa-globe-americas,
+.fa-globe-asia,
+.fa-globe-europe,
+.fa-guitar,
+.fa-hamburger,
+.fa-hammer,
+.fa-hard-hat,
+.fa-headphones,
+.fa-headset,
+.fa-hiking,
+.fa-hospital,
+.fa-icons,
+.fa-id-badge,
+.fa-id-card,
+.fa-industry,
+.fa-infinity,
+.fa-jedi,
+.fa-laptop,
+.fa-laptop-code,
+.fa-lightbulb-dollar,
+.fa-map,
+.fa-medal,
+.fa-microphone,
+.fa-microscope,
+.fa-money-bill,
+.fa-mountain,
+.fa-mug-hot,
+.fa-network-wired,
+.fa-passport,
+.fa-pen,
+.fa-pencil-alt,
+.fa-pepper-hot,
+.fa-phone,
+.fa-piggy-bank,
+.fa-plane-alt,
+.fa-plane-departure,
+.fa-plug,
+.fa-print,
+.fa-project-diagram,
+.fa-puzzle-piece,
+.fa-receipt,
+.fa-robot,
+.fa-running,
+.fa-satellite,
+.fa-satellite-dish,
+.fa-school,
+.fa-screwdriver,
+.fa-scroll,
+.fa-shield-alt,
+.fa-shopping-bag,
+.fa-sign,
+.fa-sitemap,
+.fa-snowman,
+.fa-solar-panel,
+.fa-spa,
+.fa-space-shuttle,
+.fa-stamp,
+.fa-stethoscope,
+.fa-store,
+.fa-store-alt,
+.fa-suitcase,
+.fa-sun-cloud,
+.fa-swimmer,
+.fa-sync,
+.fa-syringe,
+.fa-tablet,
+.fa-tachometer-alt,
+.fa-theater-masks,
+.fa-toilet-paper,
+.fa-toolbox,
+.fa-tooth,
+.fa-tools,
+.fa-tractor,
+.fa-trash-alt,
+.fa-tree-alt,
+.fa-truck,
+.fa-tv,
+.fa-umbrella-beach,
+.fa-university,
+.fa-utensil-spoon,
+.fa-vial,
+.fa-walking,
+.fa-wallet,
+.fa-warehouse,
+.fa-water,
+.fa-weight,
+.fa-wifi,
+.fa-wind,
+.fa-yen-sign,
+.fa-user,
+.fa-user-circle,
+.fa-user-astronaut,
+.fa-user-ninja,
+.fa-user-tie,
+.fa-users-cog,
+.fa-moon,
+.fa-book,
+.fa-laptop,
+.fa-paint-brush,
+.fa-music,
+.fa-camera,
+.fa-gamepad,
+.fa-rocket,
+.fa-leaf,
+.fa-arrow-left,
+.fa-home,
+.fa-plus-circle {
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+    font-style: normal;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    font-size: 0.875em;
+    vertical-align: middle;
+}
+
+.fa-github,
+.fa-markdown {
+    font-family: "Font Awesome 5 Brands";
+    font-weight: 400;
+    font-style: normal;
+    font-size: 0.875em !important;
+}
+
+.fa-globe {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+}
+
+.fa-plus {
+    font-size: 1em !important;
+}
+
+.fa-star-light {
+    font-size: 0.95em !important;
+}

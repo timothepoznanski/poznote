@@ -1,0 +1,253 @@
+/**
+ * Drag and Drop Styles
+ * 
+ * Complete drag and drop functionality including root drop zone, note dragging,
+ * folder dragging, cursor states, and dark mode variations.
+ */
+
+/* Folder dragging styles - target folder-toggle instead of folder-header */
+.folder-header:not(.system-folder)>.folder-toggle[draggable="true"] {
+    cursor: grab;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.folder-header:not(.system-folder)>.folder-toggle[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+.folder-toggle.folder-dragging,
+.folder-header.folder-dragging {
+    opacity: 0.6 !important;
+    background-color: rgba(0, 123, 255, 0.08) !important;
+    border: 2px dashed rgba(0, 123, 255, 0.4) !important;
+    transform: scale(0.98) !important;
+}
+
+.folder-header.folder-drop-target {
+    background-color: rgba(0, 123, 255, 0.15) !important;
+    border: 2px dashed #007bff !important;
+    box-shadow: 0 0 12px rgba(0, 123, 255, 0.4) !important;
+    transform: scale(1.02);
+    transition: all 0.2s ease;
+}
+
+/* Dark mode folder dragging */
+html[data-theme='dark'] .folder-header.folder-dragging,
+body.dark-mode .folder-header.folder-dragging {
+    background-color: rgba(74, 144, 226, 0.15) !important;
+    border-color: rgba(74, 144, 226, 0.5) !important;
+}
+
+html[data-theme='dark'] .folder-header.folder-drop-target,
+body.dark-mode .folder-header.folder-drop-target {
+    background-color: rgba(74, 144, 226, 0.2) !important;
+    border-color: #4a90e2 !important;
+    box-shadow: 0 0 12px rgba(74, 144, 226, 0.5) !important;
+}
+
+.folder-toggle {
+    display: flex;
+    align-items: center;
+    padding: 5px 6px;
+    cursor: pointer;
+    border-radius: 8px;
+    background-color: transparent;
+    transition: background-color 0.2s;
+    user-select: none;
+    position: relative;
+    width: 100%;
+}
+
+.folder-toggle:hover {
+    background-color: transparent;
+}
+
+.folder-icon {
+    color: #b0b0b0;
+    margin-right: 8px;
+    transition: transform 0.2s;
+    align-content: center;
+}
+
+/* Root Drop Zone Styles */
+.root-drop-zone {
+    padding: 15px;
+    margin: 10px 5px;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    text-align: center;
+    transition: all 0.3s ease;
+    /* Force visibility */
+    position: relative !important;
+    z-index: 999 !important;
+    min-height: 60px !important;
+}
+
+.root-drop-zone.active-drop-zone {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background-color: #e3f2fd !important;
+    border: 3px dashed #007bff !important;
+    color: #007bff !important;
+    font-weight: bold !important;
+    padding: 20px !important;
+    margin: 10px !important;
+    z-index: 9999 !important;
+}
+
+.root-drop-zone[style*="display: block"] {
+    display: block !important;
+    animation: dropZoneShow 0.3s ease;
+}
+
+@keyframes dropZoneShow {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.root-drop-zone.drag-over {
+    border-color: #007bff !important;
+    background-color: #e3f2fd !important;
+    transform: scale(1.02) !important;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3) !important;
+}
+
+.drop-zone-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: #666;
+}
+
+.drop-zone-icon {
+    font-size: 24px;
+    opacity: 0.7;
+}
+
+.drop-zone-text {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Dark mode for drop zone */
+html[data-theme='dark'] .root-drop-zone,
+body.dark-mode .root-drop-zone {
+    background-color: #333333;
+    border-color: #4a4a4a;
+}
+
+html[data-theme='dark'] .root-drop-zone.drag-over,
+body.dark-mode .root-drop-zone.drag-over {
+    background-color: #1a3a5a;
+    border-color: #4a90e2;
+}
+
+html[data-theme='dark'] .drop-zone-content,
+body.dark-mode .drop-zone-content {
+    color: #ccc;
+}
+
+/* Note dragging styles - applies to ALL notes */
+.dragging {
+    opacity: 0.85 !important;
+    background-color: rgba(0, 123, 255, 0.05) !important;
+    border-left: 2px solid rgba(0, 123, 255, 0.3) !important;
+    transform: scale(0.98) !important;
+}
+
+.links_arbo_left.dragging,
+a.links_arbo_left.dragging,
+.note-in-folder.dragging,
+.note-without-folder.dragging {
+    opacity: 0.85 !important;
+    background-color: rgba(0, 123, 255, 0.05) !important;
+    border-left: 2px solid rgba(0, 123, 255, 0.3) !important;
+    box-shadow: 0 2px 6px rgba(0, 123, 255, 0.15) !important;
+    transform: scale(0.98) !important;
+    z-index: 1000 !important;
+    position: relative !important;
+}
+
+/* Ensure drag cursor is shown when hovering note links */
+.links_arbo_left[draggable="true"] {
+    cursor: grab;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.links_arbo_left[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+/* Specific styles for notes in folders */
+.note-in-folder.links_arbo_left[draggable="true"] {
+    cursor: grab !important;
+    -webkit-user-drag: element !important;
+    -khtml-user-drag: element !important;
+    -moz-user-drag: element !important;
+    -o-user-drag: element !important;
+    display: block !important;
+    position: relative !important;
+}
+
+.note-in-folder.links_arbo_left[draggable="true"]:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+/* Specific styles for notes without folder */
+.note-without-folder.links_arbo_left[draggable="true"] {
+    cursor: grab !important;
+    -webkit-user-drag: element !important;
+    -khtml-user-drag: element !important;
+    -moz-user-drag: element !important;
+    -o-user-drag: element !important;
+    display: block !important;
+    position: relative !important;
+}
+
+.note-without-folder.links_arbo_left[draggable="true"]:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+.note-without-folder.links_arbo_left[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+/* Make sure child elements don't interfere with dragging */
+.links_arbo_left[draggable="true"] .note-title {
+    pointer-events: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    /* Force no text selection during drag */
+    -webkit-touch-callout: none;
+    -webkit-user-drag: none;
+}
+
+/* Re-enable pointer events for the link itself */
+.links_arbo_left[draggable="true"] {
+    pointer-events: auto;
+    /* Ensure the link itself can be dragged */
+    -webkit-user-drag: element;
+}
+
+/* Ensure folder content doesn't block drag */
+.folder-content {
+    pointer-events: auto;
+}

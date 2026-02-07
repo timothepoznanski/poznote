@@ -1,0 +1,417 @@
+/**
+ * Toolbar Styles
+ * 
+ * Styles for the note editing toolbar including vertical menu,
+ * color palette, font size picker, note header, and toolbar buttons.
+ */
+
+/* TOOLBAR VERTICAL MENU */
+
+.note-edit-toolbar {
+    position: relative;
+}
+
+/* Color palette popup (desktop) - same appearance as mobile palette */
+.color-palette-popup {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    border-radius: 6px;
+    background: transparent;
+    padding: 6px 8px;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.color-palette-popup {
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 6px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    padding: 8px;
+    z-index: 9999;
+    opacity: 0;
+    transform-origin: top center;
+    transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.color-palette-popup.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.color-palette-popup .color-grid {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.color-item {
+    border: none;
+    background: transparent;
+    padding: 6px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.color-item:focus {
+    outline: 2px solid #4d90fe;
+}
+
+.color-swatch {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+}
+
+.color-palette-popup.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.color-palette-popup .color-grid {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 10px;
+}
+
+.color-item {
+    width: 28px;
+    height: 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: inline-block;
+    box-sizing: border-box;
+}
+
+.color-item:focus {
+    outline: 2px solid #007DB8;
+}
+
+/* baseline removed - simplified palette */
+
+/* caret removed - popup has no arrow */
+
+.toolbar-vertical-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 200px;
+    padding: 8px 0;
+    margin-top: 5px;
+}
+
+/* Font size popup (used by toolbar.js -> changeFontSize) */
+.font-size-popup {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #e6e6e6;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(20, 20, 20, 0.12);
+    padding: 8px;
+    z-index: 1002;
+    min-width: 180px;
+    max-width: 320px;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.font-size-popup.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.font-size-popup .font-size-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.font-size-popup .font-size-item:hover {
+    background-color: #f6fbff;
+}
+
+.font-size-popup .size-label {
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.font-size-popup .size-preview {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    min-height: 28px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #eee;
+    color: #222;
+    background: #fafafa;
+}
+
+/* Map preview classes to approximate sizes (match JS size map) */
+.font-size-popup .size-1 {
+    font-size: 0.75rem;
+}
+
+.font-size-popup .size-2 {
+    font-size: 0.875rem;
+}
+
+.font-size-popup .size-3 {
+    font-size: 1rem;
+}
+
+.font-size-popup .size-4 {
+    font-size: 1.125rem;
+}
+
+.font-size-popup .size-5 {
+    font-size: 1.5rem;
+}
+
+.font-size-popup .size-6 {
+    font-size: 2rem;
+}
+
+.font-size-popup .size-7 {
+    font-size: 3rem;
+    line-height: 1;
+    padding: 2px 6px;
+}
+
+.btn-settings {
+    position: relative;
+}
+
+.btn-settings.active {
+    background: rgba(0, 125, 184, 0.1) !important;
+    color: #007DB8 !important;
+}
+
+/* Attachment indicators (use app blue instead of green) */
+.btn-settings.has-attachments {
+    color: #007DB8 !important;
+}
+
+.btn-settings.has-attachments:hover {
+    color: #005a8a !important;
+}
+
+.btn-attachment.has-attachments i {
+    /* adjust icon tint to match the blue color */
+    filter: none !important;
+    color: #007DB8 !important;
+}
+
+.btn-attachment.has-attachments:hover i {
+    filter: none !important;
+    color: #005a8a !important;
+}
+
+.dropdown-item.has-attachments i {
+    color: #007DB8 !important;
+}
+
+/* Note Header */
+
+/* Note header: contains only the toolbar */
+
+.note-header {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: 100%;
+    /* margin-bottom: 15px; */
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    box-sizing: border-box;
+    /* border-bottom: 1px solid #ccc; */
+    gap: 8px;
+}
+
+/* Only apply header background if no workspace background image is set */
+body:not(.has-background-image) .note-header {
+    background: #fff;
+}
+
+.note-edit-toolbar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    box-sizing: border-box;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    max-width: 100%;
+    text-align: center;
+    position: relative;
+    order: 2;
+}
+
+.note-edit-toolbar::-webkit-scrollbar {
+    display: none;
+}
+
+.note-header>#lastupdated {
+    font-size: 0.95em;
+    color: #888;
+}
+
+/* Toolbar Buttons */
+
+.toolbar-btn {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 5px;
+    padding: 6px 8px;
+    font-size: 1.4em;
+    cursor: pointer;
+    margin: 0 4px;
+    transition: color 0.2s;
+    outline: none;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    /* Fixed size to prevent layout shift */
+    min-width: 38px;
+    min-height: 38px;
+    box-sizing: border-box;
+}
+
+/* Réduire la taille des icônes Font Awesome dans la toolbar */
+.toolbar-btn i,
+.toolbar-btn [class*="fa-"] {
+    font-size: 0.75em !important;
+}
+
+/* Text formatting buttons: hidden by default, visible on selection */
+.text-format-btn {
+    display: none;
+}
+
+.text-format-btn.show-on-selection {
+    display: inline-flex;
+}
+
+/* Note action buttons: visible by default, hidden during selection */
+.note-action-btn {
+    display: inline-flex;
+}
+
+/* Toolbar adjustment for desktop screens */
+/* Use flex-wrap to allow toolbar buttons to wrap on multiple lines if needed */
+.note-edit-toolbar {
+    gap: 2px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    /* Fixed height based on button size: padding (6px*2) + font-size (1.4em ≈ ~22px) + gap = ~38px */
+    min-height: calc(1.4em + 12px + 6px);
+}
+
+.note-action-btn.hide-on-selection {
+    display: none;
+}
+
+/* Note action buttons, toolbar adjustments, and related styles */
+
+.note-header-spacer {
+    width: 100%;
+    height: 15px;
+    background: #fff;
+}
+
+a.links_arbo_left,
+a.links_arbo_left:link,
+a.links_arbo_left:visited,
+a.links_arbo_left:hover,
+a.links_arbo_left:active {
+    display: inline-block;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
+    text-decoration: none;
+    color: rgb(55, 53, 47);
+    padding: 3px 6px 3px 0px;
+    /* Réduction du padding vertical (6px → 3px) */
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.2;
+    font-weight: normal;
+    box-sizing: border-box;
+}
+
+/* Specific rule for note title spans in all links */
+a.links_arbo_left .note-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+a.links_arbo_left.selected-note {
+    background-color: transparent;
+}
+
+/* MENU RIGHT - Note action icons (download, info, save) */
+.icon_download {
+    color: #007DB8;
+    font-size: 17px;
+}
+
+.note-icons-desktop {
+    padding: 4px 11px;
+    font-size: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+    cursor: pointer;
+    margin: 0 0 0 auto;
+}
+
+.icon_info {
+    color: #007DB8;
+    font-size: 1.1em;
+}
+
+.icon_save {
+    color: #007DB8;
+    font-size: 1.1em;
+}
