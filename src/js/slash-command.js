@@ -1310,10 +1310,14 @@
                                 const hasSelection = sel && sel.rangeCount > 0 && !sel.getRangeAt(0).collapsed;
                                 const selectedText = hasSelection ? sel.toString() : '';
 
-                                // Save the current range/position
+                                // Save the current range/position, with fallback to the
+                                // range saved by executeCommand (in case hideSlashMenu lost it)
                                 let savedRange = null;
                                 if (sel && sel.rangeCount > 0) {
                                     savedRange = sel.getRangeAt(0).cloneRange();
+                                }
+                                if (!savedRange && window._slashCommandSavedRange) {
+                                    savedRange = window._slashCommandSavedRange.cloneRange();
                                 }
 
                                 window.showLinkModal('https://', selectedText, function (url, text) {
@@ -1609,34 +1613,80 @@
                         label: t('slash_menu.link', null, 'Link'),
                         action: function () {
                             if (typeof window.showLinkModal === 'function') {
-                                const editor = getCurrentMarkdownEditorFromSelection();
-                                if (!editor) return;
+                                // Get current selection if any
+                                const sel = window.getSelection();
+                                const hasSelection = sel && sel.rangeCount > 0 && !sel.getRangeAt(0).collapsed;
+                                const selectedText = hasSelection ? sel.toString() : '';
 
-                                const offsets = getSelectionOffsetsWithin(editor);
-                                if (!offsets) return;
+                                // Save the current range/position, with fallback to the
+                                // range saved by executeCommand (in case hideSlashMenu lost it)
+                                let savedRange = null;
+                                if (sel && sel.rangeCount > 0) {
+                                    savedRange = sel.getRangeAt(0).cloneRange();
+                                }
+                                if (!savedRange && window._slashCommandSavedRange) {
+                                    savedRange = window._slashCommandSavedRange.cloneRange();
+                                }
 
-                                const text = getMarkdownEditorText(editor);
-                                const selectedText = text.substring(offsets.start, offsets.end);
+                                // Find the editor for focus purpose later
+                                let editor = savedEditableElement;
+                                if (!editor || !editor.classList.contains('markdown-editor')) {
+                                    editor = getCurrentMarkdownEditorFromSelection();
+                                }
 
                                 window.showLinkModal('https://', selectedText, function (url, linkText) {
                                     if (!url) return;
 
                                     const linkMarkdown = '[' + (linkText || 'link') + '](' + url + ')';
-                                    const before = text.substring(0, offsets.start);
-                                    const after = text.substring(offsets.end);
-                                    const newText = before + linkMarkdown + after;
 
-                                    editor.textContent = '';
-                                    editor.appendChild(document.createTextNode(newText));
+                                    // Focus the editor first
+                                    if (editor) {
+                                        try { editor.focus(); } catch (e) { }
+                                    }
 
-                                    // Position cursor after the inserted link
-                                    const newOffset = offsets.start + linkMarkdown.length;
-                                    setSelectionByOffsets(editor, newOffset, newOffset);
+                                    // Restore selection and insert link using DOM insertion (more robust than execCommand)
+                                    try {
+                                        if (savedRange) {
+                                            const selection = window.getSelection();
+                                            selection.removeAllRanges();
+                                            selection.addRange(savedRange);
+
+                                            // Use the same approach as insertMarkdownAtCursor for robustness
+                                            const range = selection.getRangeAt(0);
+                                            range.deleteContents();
+                                            const node = document.createTextNode(linkMarkdown);
+                                            range.insertNode(node);
+
+                                            // Position cursor after the inserted link
+                                            const newRange = document.createRange();
+                                            newRange.setStart(node, linkMarkdown.length);
+                                            newRange.collapse(true);
+                                            selection.removeAllRanges();
+                                            selection.addRange(newRange);
+                                        } else if (editor) {
+                                            // Fallback: insert at end of editor
+                                            const range = document.createRange();
+                                            range.selectNodeContents(editor);
+                                            range.collapse(false);
+                                            const node = document.createTextNode(linkMarkdown);
+                                            range.insertNode(node);
+                                            
+                                            const newRange = document.createRange();
+                                            newRange.setStart(node, linkMarkdown.length);
+                                            newRange.collapse(true);
+                                            const selection = window.getSelection();
+                                            selection.removeAllRanges();
+                                            selection.addRange(newRange);
+                                        }
+                                    } catch (e) {
+                                        console.error('Error inserting markdown link:', e);
+                                    }
 
                                     // Trigger input event for autosave
-                                    const noteEntry = editor.closest('.noteentry');
-                                    if (noteEntry) {
-                                        noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+                                    if (editor) {
+                                        try {
+                                            editor.dispatchEvent(new Event('input', { bubbles: true }));
+                                        } catch (e) { }
                                     }
                                 });
                             }
@@ -2352,18 +2402,45 @@
 
         // Supprimer le slash et le texte de filtre (sauf si keepSlash est true)
         const shouldKeepSlash = foundCmd && foundCmd.keepSlash;
+        let cursorRangeAfterDelete = null;
         if (!shouldKeepSlash) {
             deleteSlashText();
+            // Save cursor position right after deleteSlashText placed it correctly,
+            // because hideSlashMenu() removing the menu DOM can cause the browser
+            // to lose the selection in the contenteditable.
+            try {
+                const sel = window.getSelection();
+                if (sel && sel.rangeCount > 0) {
+                    cursorRangeAfterDelete = sel.getRangeAt(0).cloneRange();
+                }
+            } catch (e) { }
         }
 
         hideSlashMenu();
 
-        // Exécuter la commande immédiatement (la sélection est déjà restaurée par deleteSlashText)
+        // Restore cursor position that was set by deleteSlashText, in case
+        // hideSlashMenu() disrupted it by removing the menu DOM element.
+        if (cursorRangeAfterDelete) {
+            try {
+                if (savedEditableElement) {
+                    savedEditableElement.focus();
+                }
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(cursorRangeAfterDelete);
+            } catch (e) { }
+        }
+        // Also expose it globally so async modal callbacks (link, note-reference)
+        // can use it as a reliable fallback for the cursor position.
+        window._slashCommandSavedRange = cursorRangeAfterDelete;
+
+        // Exécuter la commande immédiatement (la sélection est restaurée ci-dessus)
         try {
             actionToExecute();
         } catch (e) {
             console.error('Error executing command:', e);
         }
+        window._slashCommandSavedRange = null;
 
         // Re-focus after insertion to avoid caret jumping on focus (skip if keepSlash)
         if (!shouldKeepSlash) {
