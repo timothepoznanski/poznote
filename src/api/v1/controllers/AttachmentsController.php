@@ -242,6 +242,76 @@ class AttachmentsController {
             exit('Note ID and Attachment ID are required');
         }
         
+        // Check if note is publicly shared by querying master.db shared_links table
+        $isPubliclyShared = false;
+        $noteOwnerId = null;
+        
+        try {
+            require_once __DIR__ . '/../../../users/db_master.php';
+            $masterCon = getMasterConnection();
+            $stmt = $masterCon->prepare('SELECT user_id FROM shared_links WHERE target_type = ? AND target_id = ? LIMIT 1');
+            $stmt->execute(['note', $noteId]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($result) {
+                $isPubliclyShared = true;
+                $noteOwnerId = (int)$result['user_id'];
+                
+                // Load the correct user database if not already loaded
+                if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] != $noteOwnerId) {
+                    require_once __DIR__ . '/../../../users/UserDataManager.php';
+                    $userDataManager = new UserDataManager($noteOwnerId);
+                    $dbPath = $userDataManager->getUserDatabasePath();
+                    
+                    // Reconnect to the correct database
+                    $this->con = new PDO('sqlite:' . $dbPath);
+                    $this->con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                    $this->con->exec('PRAGMA busy_timeout = 5000');
+                    $this->con->exec('PRAGMA foreign_keys = ON');
+                    
+                    // Update attachments directory for this user
+                    $this->attachmentsDir = $userDataManager->getUserAttachmentsPath();
+                }
+            }
+        } catch (Exception $e) {
+            // If checking master.db fails, continue with current database
+            error_log("Failed to check shared_links: " . $e->getMessage());
+        }
+        
+        // If not publicly shared, require authentication
+        if (!$isPubliclyShared) {
+            // Check if user is authenticated
+            $isAuthenticated = false;
+            
+            // Check session authentication
+            if (function_exists('isAuthenticated') && isAuthenticated()) {
+                $isAuthenticated = true;
+            }
+            
+            // Check HTTP Basic Auth
+            if (!$isAuthenticated && isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
+                // Validate Basic Auth credentials
+                require_once __DIR__ . '/../../../users/db_master.php';
+                $authUser = getUserProfileByUsername($_SERVER['PHP_AUTH_USER']);
+                
+                if ($authUser && $authUser['active']) {
+                    if ((bool)$authUser['is_admin'] && $_SERVER['PHP_AUTH_PW'] === AUTH_PASSWORD) {
+                        $isAuthenticated = true;
+                    } elseif (!$authUser['is_admin'] && $_SERVER['PHP_AUTH_PW'] === AUTH_USER_PASSWORD) {
+                        $isAuthenticated = true;
+                    }
+                }
+            }
+            
+            if (!$isAuthenticated) {
+                http_response_code(401);
+                header('WWW-Authenticate: Basic realm="Poznote API"');
+                header('Content-Type: application/json');
+                echo json_encode(['error' => 'Authentication required']);
+                exit;
+            }
+        }
+        
         try {
             // Get attachment info
             if ($workspace) {
@@ -271,8 +341,11 @@ class AttachmentsController {
                             // Set headers for file download/viewing
                             $file_type = $attachment['file_type'] ?? mime_content_type($file_path);
                             
-                            // For PDFs and images, allow inline viewing
-                            if (strpos($file_type, 'application/pdf') !== false || strpos($file_type, 'image/') !== false) {
+                            // For PDFs, images, videos, and audio, allow inline viewing
+                            if (strpos($file_type, 'application/pdf') !== false || 
+                                strpos($file_type, 'image/') !== false || 
+                                strpos($file_type, 'video/') !== false ||
+                                strpos($file_type, 'audio/') !== false) {
                                 header('Content-Type: ' . $file_type);
                                 header('Content-Disposition: inline; filename="' . $attachment['original_filename'] . '"');
                             } else {

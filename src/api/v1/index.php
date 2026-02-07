@@ -51,10 +51,22 @@ $isLookupEndpoint = strpos($uri, '/api/v1/users/lookup/') !== false;
 $isSystemEndpoint = strpos($uri, '/api/v1/system') !== false;
 $isSharedEndpoint = strpos($uri, '/api/v1/shared') !== false;
 $isPublicApiEndpoint = strpos($uri, '/api/v1/public') !== false;
+$isAttachmentDownload = $_SERVER['REQUEST_METHOD'] === 'GET' && preg_match('#/api/v1/notes/\d+/attachments/[^/]+#', $uri);
 
 // Require authentication (with X-User-ID for data endpoints, without for admin/public endpoints)
 if ($isPublicApiEndpoint) {
     // No additional authentication required (token validation happens in controller)
+} elseif ($isAttachmentDownload) {
+    // Attachment downloads check authentication conditionally (public shared notes don't need auth)
+    // Try to authenticate if credentials provided, but don't require it
+    try {
+        if (isset($_SERVER['HTTP_X_USER_ID']) || (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW']))) {
+            @requireApiAuth();
+        }
+    } catch (Exception $e) {
+        // Authentication failed, but that's ok for public attachments
+        // Controller will check if note is publicly shared
+    }
 } elseif ($isAdminEndpoint || $isPublicProfilesEndpoint || $isMeEndpoint || $isLookupEndpoint || $isSystemEndpoint || $isSharedEndpoint) {
     // Admin endpoints only need credential validation, not X-User-ID
     requireApiAuthAdmin();

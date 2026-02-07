@@ -460,9 +460,9 @@ class NotesController {
                         $contentToSave = sanitizeHtml($entry);
                     }
                     
-                    // For markdown notes, sanitize as well (in case HTML is embedded)
+                    // For markdown notes, use markdown-specific sanitizer to preserve syntax
                     if ($type === 'markdown') {
-                        $contentToSave = sanitizeHtml($entry);
+                        $contentToSave = sanitizeMarkdownContent($entry);
                     }
                     
                     $write_result = file_put_contents($filename, $contentToSave);
@@ -630,8 +630,8 @@ class NotesController {
                             $contentToSave = html_entity_decode($contentToSave, ENT_QUOTES | ENT_HTML5, 'UTF-8');
                         }
                     }
-                    // Sanitize markdown content as well (in case HTML is embedded)
-                    $contentToSave = sanitizeHtml($contentToSave);
+                    // Sanitize markdown content with markdown-specific sanitizer to preserve syntax
+                    $contentToSave = sanitizeMarkdownContent($contentToSave);
                 }
                 
                 $write_result = file_put_contents($filename, $contentToSave);

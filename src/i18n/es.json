@@ -939,6 +939,17 @@
         "youtube_help": "Soportados: youtube.com/watch?v=ID, youtu.be/ID, o solo la ID del video",
         "youtube_insert": "Insertar",
         "youtube_invalid_url": "URL de YouTube no válida",
+        "mp4_video": "Video MP4",
+        "mp4_uploading": "Subiendo video...",
+        "mp4_upload_success": "¡Video subido con éxito!",
+        "mp4_no_note": "Ninguna nota seleccionada",
+        "mp4_invalid_file": "Por favor, seleccione un video MP4.",
+        "mp4_upload_failed": "Error al subir: {{error}}",
+        "audio": "Audio",
+        "audio_uploading": "Subiendo audio...",
+        "audio_no_note": "Ninguna nota seleccionada",
+        "audio_invalid_file": "Por favor, seleccione un archivo de audio.",
+        "audio_upload_failed": "Error al subir: {{error}}",
         "date": "Fecha"
     },
     "api": {

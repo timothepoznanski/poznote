@@ -50,6 +50,51 @@ window.updateidtags = updateidtags;
 window.updateidfolder = updateidfolder;
 window.updateidsearch = updateidsearch;
 
+/**
+ * Convert bare <audio> elements inside contenteditable .noteentry divs to iframes
+ * that point to audio_player.php.  Chrome refuses to render native <audio> controls
+ * inside a contenteditable region, so we isolate the player in its own browsing context.
+ * This function is called on DOMContentLoaded and after every AJAX note load.
+ */
+window.convertNoteAudioToIframes = function () {
+    try {
+        var audios = document.querySelectorAll('.noteentry audio');
+        audios.forEach(function (audio) {
+            var src = audio.getAttribute('src') || '';
+            if (!src) return;
+
+            // Extract note ID and attachment ID from attachment URL
+            // Expected format: /api/v1/notes/{noteId}/attachments/{attachmentId}[?workspace=...]
+            var match = src.match(/\/api\/v1\/notes\/(\d+)\/attachments\/([^?&\/]+)/);
+            if (!match) return;
+
+            var noteId = match[1];
+            var attachmentId = match[2];
+            var wsMatch = src.match(/[?&]workspace=([^&]+)/);
+            var wsParam = wsMatch ? '&workspace=' + wsMatch[1] : '';
+
+            var iframeSrc = '/audio_player.php?note=' + encodeURIComponent(noteId)
+                + '&attachment=' + encodeURIComponent(attachmentId) + wsParam;
+
+            var iframe = document.createElement('iframe');
+            iframe.className = 'note-audio-iframe';
+            iframe.src = iframeSrc;
+            iframe.style.cssText = 'max-width:250px;width:100%;height:54px;border:none;border-radius:8px;display:block;margin:10px 0';
+            iframe.setAttribute('allowtransparency', 'true');
+
+            // Replace the audio (and its optional wrapper div) with the iframe
+            var parent = audio.parentElement;
+            if (parent && parent.classList && parent.classList.contains('note-media-embed')) {
+                parent.replaceWith(iframe);
+            } else {
+                audio.replaceWith(iframe);
+            }
+        });
+    } catch (e) {
+        console.error('[Audio] Error converting audio to iframes:', e);
+    }
+};
+
 // Utility function to extract note ID from entry element
 function extractNoteIdFromEntry(entryElement) {
     return entryElement && entryElement.id ? entryElement.id.replace('entry', '') : null;
@@ -1214,6 +1259,23 @@ document.addEventListener('DOMContentLoaded', function () {
     var fileInput = document.getElementById('attachmentFile');
     var fileNameDiv = document.getElementById('selectedFileName');
     var uploadButtonContainer = document.querySelector('.upload-button-container');
+
+    // Convert <audio> elements to iframes inside contenteditable notes.
+    // Chrome does not render native <audio> controls inside contenteditable zones.
+    // We wrap each audio in an iframe pointing to audio_player.php.
+    if (typeof window.convertNoteAudioToIframes === 'function') {
+        window.convertNoteAudioToIframes();
+    }
+
+    // Ensure embedded media renders with controls inside contenteditable notes
+    try {
+        var mediaEls = document.querySelectorAll('.noteentry video, .noteentry iframe');
+        mediaEls.forEach(function (el) {
+            el.setAttribute('contenteditable', 'false');
+        });
+    } catch (e) {
+        // Ignore errors
+    }
 
     if (fileInput && fileNameDiv) {
         fileInput.addEventListener('change', function () {
@@ -3505,7 +3567,20 @@ function restoreDraft(noteId, content, title, tags) {
     var tagsInput = document.getElementById('tags' + noteId);
 
     if (entryElem && content) {
+        var noteType = entryElem.getAttribute('data-note-type') || 'note';
+        if (noteType === 'note') {
+            // Fix drafts that stored escaped media tags
+            content = content
+                .replace(/&lt;audio\s+([^&]+)&gt;\s*&lt;\/audio&gt;/gi, '<audio $1></audio>')
+                .replace(/&lt;video\s+([^&]+)&gt;\s*&lt;\/video&gt;/gi, '<video $1></video>')
+                .replace(/&lt;iframe\s+([^&]+)&gt;\s*&lt;\/iframe&gt;/gi, '<iframe $1></iframe>');
+        }
         entryElem.innerHTML = content;
+
+        // Convert any restored <audio> elements to iframes for contenteditable
+        if (typeof window.convertNoteAudioToIframes === 'function') {
+            window.convertNoteAudioToIframes();
+        }
     }
     if (titleInput && title) {
         titleInput.value = title;

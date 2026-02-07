@@ -1131,6 +1131,53 @@ function unescapeIframesInHtml($content) {
 }
 
 /**
+ * Unescape audio/video tags that were saved as escaped HTML
+ * Keeps the escaped tag if the src is not a safe URL
+ */
+function unescapeMediaInHtml($content) {
+    if (empty($content)) {
+        return $content;
+    }
+
+    // Unescape iframes first (keeps existing behavior)
+    $content = unescapeIframesInHtml($content);
+
+    $unescapeMediaTag = function($matches, $tagName) {
+        $escapedAttrs = $matches[1];
+        $attrs = html_entity_decode($escapedAttrs, ENT_QUOTES, 'UTF-8');
+
+        // Strip inline event handlers for safety
+        $attrs = preg_replace('/\s+on[a-zA-Z]+=("[^"]*"|\'[^\']*\'|[^\s>]*)/i', '', $attrs);
+
+        if (preg_match('/src\s*=\s*["\']([^"\']+)["\']/i', $attrs, $srcMatch)) {
+            $src = $srcMatch[1];
+            $isAllowed = preg_match('/^https?:\/\//i', $src)
+                || preg_match('/^\//', $src)
+                || preg_match('/^\.\.\//', $src)
+                || preg_match('/^\.\//', $src);
+
+            if ($isAllowed) {
+                return '<' . $tagName . ' ' . $attrs . '></' . $tagName . '>';
+            }
+        }
+
+        return $matches[0];
+    };
+
+    // Unescape audio tags
+    $content = preg_replace_callback('/&lt;audio\s+([^&]+)&gt;\s*&lt;\/audio&gt;/i', function($matches) use ($unescapeMediaTag) {
+        return $unescapeMediaTag($matches, 'audio');
+    }, $content);
+
+    // Unescape video tags
+    $content = preg_replace_callback('/&lt;video\s+([^&]+)&gt;\s*&lt;\/video&gt;/i', function($matches) use ($unescapeMediaTag) {
+        return $unescapeMediaTag($matches, 'video');
+    }, $content);
+
+    return $content;
+}
+
+/**
  * Resolve folder path to ID, optionally creating missing segments
  * 
  * @param string $workspace The workspace name
@@ -1208,7 +1255,11 @@ function sanitizeHtml($html) {
         'abbr', 'cite', 'q', 'time',
         'input', 'label', // For task lists
         'iframe', // For YouTube, Vimeo embeds (validated separately)
-        'button', 'i' // For Excalidraw buttons and icons
+        'video', // For MP4 embeds
+        'audio', // For audio embeds
+        'button', 'i', // For Excalidraw buttons and icons
+        'aside', // For callout/quote blocks
+        'svg', 'path', 'rect', 'polyline' // For callout icons (SVG)
     ];
     
     // Allowed attributes per tag
@@ -1223,8 +1274,14 @@ function sanitizeHtml($html) {
         'time' => ['datetime'],
         'blockquote' => ['cite'],
         'q' => ['cite'],
-        'iframe' => ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'title'],
-        'button' => ['class', 'data-action']
+        'iframe' => ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'allowtransparency', 'title'],
+        'video' => ['src', 'width', 'height', 'preload', 'poster', 'class', 'style', 'controls', 'muted', 'playsinline', 'loop', 'autoplay'],
+        'audio' => ['src', 'preload', 'class', 'style', 'controls', 'muted', 'loop', 'autoplay'],
+        'button' => ['class', 'data-action'],
+        'svg' => ['viewBox', 'width', 'height', 'aria-hidden', 'fill', 'xmlns', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin'],
+        'path' => ['d', 'fill', 'fill-rule', 'clip-rule', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin'],
+        'rect' => ['x', 'y', 'width', 'height', 'rx', 'ry', 'fill', 'stroke', 'stroke-width'],
+        'polyline' => ['points', 'fill', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin']
     ];
     
     // Global allowed attributes (safe for all tags)
@@ -1317,7 +1374,7 @@ function sanitizeHtml($html) {
             
             // Special validation for href and src attributes
             if ($attrName === 'href' || $attrName === 'src') {
-                // For iframes, validate that src is from trusted domains
+                // For iframes, validate that src is from trusted domains or local paths
                 if ($tagName === 'iframe' && $attrName === 'src') {
                     $allowedIframeDomains = [
                         'youtube.com',
@@ -1327,10 +1384,17 @@ function sanitizeHtml($html) {
                     ];
                     
                     $isTrustedIframe = false;
-                    foreach ($allowedIframeDomains as $domain) {
-                        if (stripos($attrValue, '//' . $domain) !== false || stripos($attrValue, 'https://' . $domain) !== false) {
-                            $isTrustedIframe = true;
-                            break;
+                    
+                    // Allow local/relative paths (e.g., /audio_player.php)
+                    if (strpos($attrValue, '/') === 0 || strpos($attrValue, './') === 0) {
+                        $isTrustedIframe = true;
+                    } else {
+                        // Check trusted domains
+                        foreach ($allowedIframeDomains as $domain) {
+                            if (stripos($attrValue, '//' . $domain) !== false || stripos($attrValue, 'https://' . $domain) !== false) {
+                                $isTrustedIframe = true;
+                                break;
+                            }
                         }
                     }
                     
@@ -1393,4 +1457,44 @@ function sanitizeHtml($html) {
     libxml_clear_errors();
     
     return $sanitized;
+}
+
+/**
+ * Sanitize Markdown content to prevent XSS attacks
+ * 
+ * Unlike sanitizeHtml(), this function works on raw Markdown text without
+ * using DOMDocument, which would mangle Markdown syntax characters like >.
+ * It removes dangerous HTML patterns that could be embedded in Markdown
+ * while preserving all Markdown syntax.
+ * 
+ * @param string $markdown The raw Markdown content to sanitize
+ * @return string The sanitized Markdown content
+ */
+function sanitizeMarkdownContent($markdown) {
+    if (empty($markdown)) {
+        return $markdown;
+    }
+
+    // Remove <script> tags and their content
+    $markdown = preg_replace('/<script\b[^>]*>.*?<\/script>/is', '', $markdown);
+
+    // Remove <style> tags and their content
+    $markdown = preg_replace('/<style\b[^>]*>.*?<\/style>/is', '', $markdown);
+
+    // Remove <object>, <embed>, <applet> tags and their content
+    $markdown = preg_replace('/<(object|embed|applet)\b[^>]*>.*?<\/\1>/is', '', $markdown);
+    $markdown = preg_replace('/<(object|embed|applet)\b[^>]*\/?>/is', '', $markdown);
+
+    // Remove <form> tags and their content
+    $markdown = preg_replace('/<form\b[^>]*>.*?<\/form>/is', '', $markdown);
+
+    // Remove on* event handlers from any HTML tags embedded in markdown
+    $markdown = preg_replace('/(<[^>]*)\s+on\w+\s*=\s*(["\']).*?\2/is', '$1', $markdown);
+    $markdown = preg_replace('/(<[^>]*)\s+on\w+\s*=\s*[^\s>]*/is', '$1', $markdown);
+
+    // Remove javascript: and vbscript: protocols from href/src attributes
+    $markdown = preg_replace('/(href|src)\s*=\s*(["\'])\s*javascript:/is', '$1=$2', $markdown);
+    $markdown = preg_replace('/(href|src)\s*=\s*(["\'])\s*vbscript:/is', '$1=$2', $markdown);
+
+    return $markdown;
 }

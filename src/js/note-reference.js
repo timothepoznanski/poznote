@@ -24,6 +24,7 @@
     // Store the selection/range before opening the modal
     let savedSelection = null;
     let savedRange = null;
+    let savedEditableElement = null;
     let currentNoteId = null;
 
     // Track recently opened notes in localStorage
@@ -77,6 +78,22 @@
         if (selection.rangeCount > 0) {
             savedRange = selection.getRangeAt(0).cloneRange();
             savedSelection = selection;
+        } else if (window._slashCommandSavedRange) {
+            // Fallback: use the range saved by the slash command menu's executeCommand,
+            // in case hideSlashMenu() caused the browser to lose the selection.
+            savedRange = window._slashCommandSavedRange.cloneRange();
+            savedSelection = selection;
+        }
+        // Save the editable element so we can focus it before restoring the range
+        // (needed for document.execCommand to work in markdown mode).
+        try {
+            let container = savedRange && savedRange.startContainer;
+            if (container && container.nodeType === 3) container = container.parentNode;
+            savedEditableElement = container && container.closest
+                ? container.closest('[contenteditable="true"]')
+                : null;
+        } catch (e) {
+            savedEditableElement = null;
         }
         // Also store the current note ID
         const noteEntry = document.querySelector('.noteentry');
@@ -90,6 +107,11 @@
      */
     function restoreSelection() {
         if (savedRange) {
+            // Focus the editable element first — required for document.execCommand
+            // to work (e.g. markdown insertText).
+            if (savedEditableElement) {
+                try { savedEditableElement.focus(); } catch (e) { }
+            }
             const selection = window.getSelection();
             selection.removeAllRanges();
             selection.addRange(savedRange);
@@ -266,7 +288,28 @@
             // For markdown notes, insert standard Markdown link syntax
             // The markdown renderer will recognize internal note URLs and turn them into in-app links.
             const referenceText = `[${heading}](index.php?note=${noteId})`;
-            document.execCommand('insertText', false, referenceText);
+            
+            // Use DOM insertion instead of execCommand for precise positioning
+            try {
+                const selection = window.getSelection();
+                if (selection && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    range.deleteContents();
+                    const node = document.createTextNode(referenceText);
+                    range.insertNode(node);
+
+                    // Position cursor after the inserted text
+                    const newRange = document.createRange();
+                    newRange.setStart(node, referenceText.length);
+                    newRange.collapse(true);
+                    selection.removeAllRanges();
+                    selection.addRange(newRange);
+                }
+            } catch (e) {
+                console.error('Error inserting note reference:', e);
+                // Fallback to execCommand if DOM insertion fails
+                document.execCommand('insertText', false, referenceText);
+            }
         } else {
             // For HTML notes, insert a clickable link
             const link = document.createElement('a');

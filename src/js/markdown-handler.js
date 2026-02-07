@@ -396,6 +396,90 @@ function parseMarkdown(text) {
         return placeholder;
     });
 
+    // Protect video tags for local or http(s) sources
+    text = text.replace(/<video\s+([^>]+)>\s*<\/video>/gis, function (match, attrs) {
+        const srcMatch = attrs.match(/src\s*=\s*["']([^"']+)["']/i);
+        if (!srcMatch) return match;
+
+        const src = srcMatch[1];
+        const isAllowed = /^https?:\/\//i.test(src) || src.startsWith('/') || src.startsWith('./') || src.startsWith('../');
+        if (!isAllowed) return match;
+
+        const placeholder = '\x00PVIDEO' + protectedIndex + '\x00';
+
+        const safeAttrs = [];
+        const attrRegex = /(\w+)\s*=\s*["']([^"']*)["']/g;
+        let attrMatch;
+
+        while ((attrMatch = attrRegex.exec(attrs)) !== null) {
+            const attrName = attrMatch[1].toLowerCase();
+            const attrValue = attrMatch[2];
+            if (['src', 'width', 'height', 'preload', 'poster', 'class', 'style'].includes(attrName)) {
+                safeAttrs.push(attrName + '="' + attrValue + '"');
+            }
+        }
+
+        if (/\bcontrols\b/i.test(attrs) && !safeAttrs.some(attr => attr.startsWith('controls'))) {
+            safeAttrs.push('controls');
+        }
+        if (/\bmuted\b/i.test(attrs) && !safeAttrs.some(attr => attr.startsWith('muted'))) {
+            safeAttrs.push('muted');
+        }
+        if (/\bplaysinline\b/i.test(attrs) && !safeAttrs.some(attr => attr.startsWith('playsinline'))) {
+            safeAttrs.push('playsinline');
+        }
+        if (/\bloop\b/i.test(attrs) && !safeAttrs.some(attr => attr.startsWith('loop'))) {
+            safeAttrs.push('loop');
+        }
+
+        const videoTag = '<video ' + safeAttrs.join(' ') + '></video>';
+        protectedElements[protectedIndex] = videoTag;
+        protectedIndex++;
+        return placeholder;
+    });
+
+    // Protect audio tags for local or http(s) sources
+    text = text.replace(/<audio\s+([^>]+)>\s*<\/audio>/gis, function (match, attrs) {
+        const srcMatch = attrs.match(/src\s*=\s*["']([^"']+)["']/i);
+        if (!srcMatch) return match;
+
+        const src = srcMatch[1];
+        const isAllowed = /^https?:\/\//i.test(src) || src.startsWith('/') || src.startsWith('./') || src.startsWith('../');
+        if (!isAllowed) return match;
+
+        const placeholder = '\x00PAUDIO' + protectedIndex + '\x00';
+
+        const safeAttrs = [];
+        const attrRegex = /(\w+)\s*=\s*["']([^"']*)["']/g;
+        let attrMatch;
+
+        while ((attrMatch = attrRegex.exec(attrs)) !== null) {
+            const attrName = attrMatch[1].toLowerCase();
+            const attrValue = attrMatch[2];
+            if (['src', 'preload', 'class', 'style'].includes(attrName)) {
+                safeAttrs.push(attrName + '="' + attrValue + '"');
+            }
+        }
+
+        if (/\bcontrols\b/i.test(attrs) && !safeAttrs.some(attr => attr.startsWith('controls'))) {
+            safeAttrs.push('controls');
+        }
+        if (/\bmuted\b/i.test(attrs) && !safeAttrs.some(attr => attr.startsWith('muted'))) {
+            safeAttrs.push('muted');
+        }
+        if (/\bloop\b/i.test(attrs) && !safeAttrs.some(attr => attr.startsWith('loop'))) {
+            safeAttrs.push('loop');
+        }
+        if (/\bautoplay\b/i.test(attrs) && !safeAttrs.some(attr => attr.startsWith('autoplay'))) {
+            safeAttrs.push('autoplay');
+        }
+
+        const audioTag = '<audio ' + safeAttrs.join(' ') + '></audio>';
+        protectedElements[protectedIndex] = audioTag;
+        protectedIndex++;
+        return placeholder;
+    });
+
     // Protect iframe tags (for YouTube, Vimeo, and other embeds)
     // Only allow iframes from trusted sources for security
     text = text.replace(/<iframe\s+([^>]+)>\s*<\/iframe>/gis, function (match, attrs) {
@@ -497,8 +581,8 @@ function parseMarkdown(text) {
             return protectedCode[parseInt(index)] || match;
         });
 
-        // Restore protected elements (images, links, spans, tags, and iframes)
-        text = text.replace(/\x00P(IMG|LNK|SPAN|TAG|IFRAME)(\d+)\x00/g, function (match, type, index) {
+        // Restore protected elements (images, links, spans, tags, iframes, videos, and audio)
+        text = text.replace(/\x00P(IMG|LNK|SPAN|TAG|IFRAME|VIDEO|AUDIO)(\d+)\x00/g, function (match, type, index) {
             return protectedElements[parseInt(index)] || match;
         });
 

@@ -429,12 +429,20 @@ $body_classes = trim($extra_body_classes);
                     if ($title_json === false) $title_json = '"Note"';
                     
                     if ($note_type === 'tasklist') {
-                        // For task list notes, use the JSON content from file
-                        $entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
+                        // For task list notes, use the JSON content from file when possible
+                        if (is_readable($filename)) {
+                            $entryfinal = file_get_contents($filename);
+                        } else {
+                            $entryfinal = $row['entry'] ?? '';
+                        }
                         $tasklist_json = htmlspecialchars($entryfinal, ENT_QUOTES);
                     } else {
-                        // For all other notes (including Excalidraw), use the HTML file content
-                        $entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
+                        // For all other notes (including Excalidraw), prefer the HTML file content
+                        if (is_readable($filename)) {
+                            $entryfinal = file_get_contents($filename);
+                        } else {
+                            $entryfinal = $row['entry'] ?? '';
+                        }
                         $tasklist_json = '';
                     }
                
@@ -553,6 +561,14 @@ $body_classes = trim($extra_body_classes);
                     // Open in new tab button
                     echo '<button type="button" class="toolbar-btn btn-open-new-tab note-action-btn" title="'.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'" data-action="open-note-new-tab" data-note-id="'.$row['id'].'"><i class="fas fa-external-link"></i></button>';
 
+                    // Check if this note already has a linked note (for toolbar + mobile menu)
+                    $hasLinkedNote = false;
+                    if ($note_type !== 'linked') {
+                        $checkExistingLink = $con->prepare("SELECT id FROM entries WHERE linked_note_id = ? AND trash = 0 LIMIT 1");
+                        $checkExistingLink->execute([$row['id']]);
+                        $hasLinkedNote = (bool)$checkExistingLink->fetch();
+                    }
+
                     // Mobile overflow menu button (shown only on mobile via CSS)
                     // Marked as note-action-btn so it can be hidden during text selection (hide-on-selection)
                     echo '<button type="button" class="toolbar-btn mobile-more-btn note-action-btn" title="'.t_h('common.menu', [], 'Menu').'" data-action="toggle-mobile-toolbar-menu" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>';
@@ -571,6 +587,10 @@ $body_classes = trim($extra_body_classes);
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="uncheck-all-tasks" data-note-id="' . $row['id'] . '"><i class="fa-square"></i> '.t_h('tasklist.uncheck_all', [], 'Uncheck all tasks').'</button>';
                     }
                     
+                    if ($note_type !== 'linked' && !$hasLinkedNote) {
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-create-linked-note"><i class="fa-link"></i> '.t_h('editor.toolbar.create_linked_note').'</button>';
+                    }
+
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-duplicate"><i class="fa-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-move"><i class="fa-folder-open"></i> '.t_h('common.move', [], 'Move').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-download"><i class="fa-download"></i> '.t_h('common.download', [], 'Download').'</button>';
@@ -639,15 +659,8 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="toolbar-btn btn-move note-action-btn" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" title="'.t_h('common.move', [], 'Move').'"><i class="fas fa-folder-open"></i></button>';
                     
                     // Create linked note button (hidden for linked notes and notes that already have a link)
-                    if ($note_type !== 'linked') {
-                        // Check if this note already has a linked note
-                        $checkExistingLink = $con->prepare("SELECT id FROM entries WHERE linked_note_id = ? AND trash = 0 LIMIT 1");
-                        $checkExistingLink->execute([$row['id']]);
-                        $hasLinkedNote = $checkExistingLink->fetch();
-                        
-                        if (!$hasLinkedNote) {
-                            echo '<button type="button" class="toolbar-btn btn-create-linked-note note-action-btn" title="' . t_h('editor.toolbar.create_linked_note') . '" data-action="create-linked-note"><i class="fas fa-link"></i></button>';
-                        }
+                    if ($note_type !== 'linked' && !$hasLinkedNote) {
+                        echo '<button type="button" class="toolbar-btn btn-create-linked-note note-action-btn" title="' . t_h('editor.toolbar.create_linked_note') . '" data-action="create-linked-note"><i class="fas fa-link"></i></button>';
                     }
                     
                     // Download button
@@ -797,9 +810,9 @@ $body_classes = trim($extra_body_classes);
                         // For all other notes (HTML, Excalidraw), use the file content directly
                         $display_content = $entryfinal;
                         
-                        // Unescape iframe tags if they were HTML-escaped in the content
-                        // This allows iframes to render properly when pasted via API or older versions
-                        $display_content = unescapeIframesInHtml($display_content);
+                        // Unescape media tags if they were HTML-escaped in the content
+                        // This allows iframes, audio, and video to render properly
+                        $display_content = unescapeMediaInHtml($display_content);
                     }
                     
                     // All notes are now editable, including Excalidraw notes

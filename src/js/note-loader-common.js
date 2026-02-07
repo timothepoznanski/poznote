@@ -1407,6 +1407,11 @@ function reinitializeNoteContent() {
     if (typeof window.reinitializeCodeCopyButtons === 'function') {
         window.reinitializeCodeCopyButtons();
     }
+
+    // Convert bare <audio> elements to iframes for contenteditable compatibility
+    if (typeof window.convertNoteAudioToIframes === 'function') {
+        window.convertNoteAudioToIframes();
+    }
     
     // Translate callout titles to the current language
     translateCalloutTitles();

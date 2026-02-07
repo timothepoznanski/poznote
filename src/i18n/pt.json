@@ -938,6 +938,17 @@
         "youtube_help": "Suporta: youtube.com/watch?v=ID, youtu.be/ID ou apenas o ID do vídeo",
         "youtube_insert": "Inserir",
         "youtube_invalid_url": "URL do YouTube inválido",
+        "mp4_video": "Vídeo MP4",
+        "mp4_uploading": "A enviar vídeo...",
+        "mp4_upload_success": "Vídeo enviado com sucesso!",
+        "mp4_no_note": "Nenhuma nota selecionada",
+        "mp4_invalid_file": "Por favor, selecione um vídeo MP4.",
+        "mp4_upload_failed": "Erro ao enviar: {{error}}",
+        "audio": "Audio",
+        "audio_uploading": "A enviar audio...",
+        "audio_no_note": "Nenhuma nota selecionada",
+        "audio_invalid_file": "Por favor, selecione um ficheiro de audio.",
+        "audio_upload_failed": "Erro ao enviar: {{error}}",
         "date": "Data"
     },
     "api": {
