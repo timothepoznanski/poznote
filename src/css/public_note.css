@@ -213,6 +213,9 @@ table th {
 .code-block-copy-btn svg {
     width: 16px;
     height: 16px;
+    display: block;
+    stroke: currentColor;
+    fill: none;
 }
 
 /* Blockquote styles */

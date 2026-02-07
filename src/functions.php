@@ -1210,7 +1210,7 @@ function sanitizeHtml($html) {
         'iframe', // For YouTube, Vimeo embeds (validated separately)
         'button', 'i', // For Excalidraw buttons and icons
         'aside', // For callout/quote blocks
-        'svg', 'path' // For callout icons (SVG)
+        'svg', 'path', 'rect', 'polyline' // For callout icons (SVG)
     ];
     
     // Allowed attributes per tag
@@ -1227,8 +1227,10 @@ function sanitizeHtml($html) {
         'q' => ['cite'],
         'iframe' => ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'title'],
         'button' => ['class', 'data-action'],
-        'svg' => ['viewBox', 'width', 'height', 'aria-hidden', 'fill', 'xmlns'],
-        'path' => ['d', 'fill', 'fill-rule', 'clip-rule']
+        'svg' => ['viewBox', 'width', 'height', 'aria-hidden', 'fill', 'xmlns', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin'],
+        'path' => ['d', 'fill', 'fill-rule', 'clip-rule', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin'],
+        'rect' => ['x', 'y', 'width', 'height', 'rx', 'ry', 'fill', 'stroke', 'stroke-width'],
+        'polyline' => ['points', 'fill', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin']
     ];
     
     // Global allowed attributes (safe for all tags)

@@ -4,6 +4,17 @@
 (function () {
     'use strict';
 
+    var COPY_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+    var CHECK_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+
+    function setCopyIcon(btn) {
+        btn.innerHTML = COPY_ICON_SVG;
+    }
+
+    function setCheckIcon(btn) {
+        btn.innerHTML = CHECK_ICON_SVG;
+    }
+
     async function copyText(text) {
         // Prefer navigator.clipboard when available
         if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -154,6 +165,9 @@
                 var newBtn = btn.cloneNode(true);
                 btn.parentNode.replaceChild(newBtn, btn);
                 btn = newBtn;
+                btn.setAttribute('aria-label', 'Copy code to clipboard');
+                btn.setAttribute('title', 'Copy code');
+                setCopyIcon(btn);
             } else {
                 // Create copy button
                 btn = document.createElement('button');
@@ -163,7 +177,7 @@
                 btn.setAttribute('title', 'Copy code');
                 
                 // SVG icon for copy
-                btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+                setCopyIcon(btn);
             }
             
             // Add/re-attach click handler
@@ -182,14 +196,14 @@
                     if (ok) {
                         // Visual feedback on button
                         btn.classList.add('copied');
-                        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+                        setCheckIcon(btn);
                         
                         showToast('Copied to clipboard!');
                         
                         // Reset button after 2 seconds
                         setTimeout(function() {
                             btn.classList.remove('copied');
-                            btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+                            setCopyIcon(btn);
                         }, 2000);
                     } else {
                         showToast('Copy failed — select the code and press Ctrl+C');
