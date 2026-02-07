@@ -666,28 +666,9 @@ function checkForUpdatesAutomatic() {
         });
 }
 
-// Force automatic update check (bypasses 24h limit - for testing)
-function forceCheckForUpdatesAutomatic() {
-    localStorage.removeItem('poznote_last_update_check');
-    checkForUpdatesAutomatic();
-}
-
-// Test function to directly show the badge (for testing)
-function testUpdateBadge() {
-    showUpdateBadge();
-}
-
-// Simulate update available (for testing)
-function simulateUpdateAvailable() {
-    showUpdateBadge();
-}
-
-// Expose functions globally for console access
-window.forceCheckForUpdatesAutomatic = forceCheckForUpdatesAutomatic;
+// Expose functions globally
 window.showUpdateBadge = showUpdateBadge;
 window.hideUpdateBadge = hideUpdateBadge;
-window.testUpdateBadge = testUpdateBadge;
-window.simulateUpdateAvailable = simulateUpdateAvailable;
 window.restoreUpdateBadge = restoreUpdateBadge;
 
 function showUpdateInstructions(hasUpdate = false) {

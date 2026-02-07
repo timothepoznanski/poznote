@@ -102,7 +102,7 @@ if ($note_id > 0) {
                     }
                 } else {
                     // No excalidraw-data div found in HTML, try database as fallback
-                    if ($entry_content && !strpos($entry_content, '<div class="excalidraw-container"')) {
+                    if ($entry_content && strpos($entry_content, '<div class="excalidraw-container"') === false) {
                         // Legacy system: entry field contains direct JSON data
                         $existing_data = $entry_content;
                         error_log("Using legacy JSON from database for note $note_id");
@@ -113,7 +113,7 @@ if ($note_id > 0) {
                 }
             } else {
                 // HTML file doesn't exist, use database content as fallback
-                if ($entry_content && !strpos($entry_content, '<div class="excalidraw-container"')) {
+                if ($entry_content && strpos($entry_content, '<div class="excalidraw-container"') === false) {
                     $existing_data = $entry_content;
                     error_log("HTML file not found, using database content for note $note_id");
                 } else {

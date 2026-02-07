@@ -5,10 +5,10 @@
 require 'auth.php';
 requireAuth();
 
-@ob_start();
-include 'functions.php';
+ob_start();
+require_once 'functions.php';
 require_once 'config.php';
-include 'db_connect.php';
+require_once 'db_connect.php';
 
 $pageWorkspace = trim(getWorkspaceFilter());
 $currentLang = getUserLanguage();
@@ -202,7 +202,7 @@ try {
         $kanban_boards_count = (int)$stmtKanban->fetchColumn();
     }
 } catch (Exception $e) {
-    $total_notes_count = 0;
+    $kanban_boards_count = 0;
 }
 
 // Count total folders
@@ -310,18 +310,18 @@ try {
                         if (debugDiv.style.display === 'none') {
                             debugDiv.style.display = 'block';
                             copyBtn.style.display = 'inline-block';
-                            toggleText.textContent = '<?php echo addslashes(t_h('github_sync.debug.hide')); ?>';
+                            toggleText.textContent = <?php echo json_encode(t_h('github_sync.debug.hide')); ?>;
                         } else {
                             debugDiv.style.display = 'none';
                             copyBtn.style.display = 'none';
-                            toggleText.textContent = '<?php echo addslashes(t_h('github_sync.debug.show')); ?>';
+                            toggleText.textContent = <?php echo json_encode(t_h('github_sync.debug.show')); ?>;
                         }
                     });
 
                     copyBtn?.addEventListener('click', function() {
                         navigator.clipboard.writeText(debugContent).then(function() {
                             const originalHTML = copyBtn.innerHTML;
-                            copyBtn.innerHTML = '<i class="fas fa-check"></i> <?php echo addslashes(t_h('github_sync.debug.copied')); ?>';
+                            copyBtn.innerHTML = '<i class="fas fa-check"></i> ' + <?php echo json_encode(t_h('github_sync.debug.copied')); ?>;
                             setTimeout(function() {
                                 copyBtn.innerHTML = originalHTML;
                             }, 2000);

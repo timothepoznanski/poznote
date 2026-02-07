@@ -20,8 +20,8 @@ ini_set('log_errors', 1);
 error_reporting(E_ALL);
 
 require_once 'config.php';
-include 'functions.php';
-include 'db_connect.php';
+require_once 'functions.php';
+require_once 'db_connect.php';
 
 // Get the correct attachments directory path
 $attachments_dir = getAttachmentsPath();
@@ -377,14 +377,17 @@ function handleDownload() {
                     // Set headers for file download/viewing
                     $file_type = $attachment['file_type'] ?? mime_content_type($file_path);
                     
+                    // Sanitize filename for Content-Disposition header
+                    $safeFilename = str_replace(['"', "\r", "\n"], '', $attachment['original_filename']);
+                    
                     // For PDFs and images, allow inline viewing
                     if (strpos($file_type, 'application/pdf') !== false || strpos($file_type, 'image/') !== false) {
                         header('Content-Type: ' . $file_type);
-                        header('Content-Disposition: inline; filename="' . $attachment['original_filename'] . '"');
+                        header('Content-Disposition: inline; filename="' . $safeFilename . '"');
                     } else {
                         // For other files, force download
                         header('Content-Type: application/octet-stream');
-                        header('Content-Disposition: attachment; filename="' . $attachment['original_filename'] . '"');
+                        header('Content-Disposition: attachment; filename="' . $safeFilename . '"');
                     }
                     
                     header('Content-Description: File Transfer');

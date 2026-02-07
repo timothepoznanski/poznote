@@ -153,7 +153,7 @@ class SystemController {
             return ['success' => true, 'valid' => true, 'message' => 'No password configured'];
         }
         
-        if ($password === $configuredPassword) {
+        if (hash_equals($configuredPassword, $password)) {
             // Set session flag
             $_SESSION['settings_authenticated'] = true;
             return ['success' => true, 'valid' => true];

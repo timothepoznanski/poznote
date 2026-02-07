@@ -2,9 +2,9 @@
 require 'auth.php';
 requireApiAuth();
 
-include 'functions.php';
+require_once 'functions.php';
 require_once 'config.php';
-include 'db_connect.php';
+require_once 'db_connect.php';
 
 // Start output buffering to prevent any unwanted output
 ob_start();
@@ -55,12 +55,16 @@ $fileCount = 0;
 // Build folder hierarchy to understand the structure
 function buildFolderTree($con, $workspace = null) {
     $query = 'SELECT id, name, parent_id FROM folders';
+    $params = [];
     if ($workspace !== null) {
-        $query .= " WHERE workspace = '" . addslashes($workspace) . "'";
+        $query .= ' WHERE workspace = ?';
+        $params[] = $workspace;
     }
     $query .= ' ORDER BY name ASC';
     
-    $res = $con->query($query);
+    $stmt = $con->prepare($query);
+    $stmt->execute($params);
+    $res = $stmt;
     $folders = [];
     $folderMap = [];
     

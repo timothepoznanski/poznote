@@ -257,11 +257,11 @@ class TrashController {
                 return;
             }
             
-            // Optional: Check if note is in trash (safety check)
-            // if (!$note['trash']) {
-            //     $this->sendError('Note is not in trash', 400);
-            //     return;
-            // }
+            // Safety check: only permanently delete notes that are in trash
+            if (!(int)$note['trash']) {
+                $this->sendError('Note is not in trash', 400);
+                return;
+            }
             
             $attachments = $note['attachments'] ? json_decode($note['attachments'], true) : [];
             $noteType = $note['type'] ?? 'note';

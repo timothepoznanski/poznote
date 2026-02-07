@@ -85,8 +85,7 @@ try {
 }
 
 // Build the file path
-$filename = getEntryFilename($noteId, $noteType);
-$filePath = $filename;
+$filePath = getEntryFilename($noteId, $noteType);
 
 // Security: ensure the path is within the entries directory
 $realPath = realpath($filePath);
@@ -105,13 +104,17 @@ if ($realPath === false || strpos($realPath, $expectedDir) !== 0) {
 // Check if file exists
 if (!file_exists($filePath)) {
     http_response_code(404);
-    die('Fichier non disponible sur le site');
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'error' => 'File not found']);
+    exit;
 }
 
 // Check if file is readable
 if (!is_readable($filePath)) {
     http_response_code(500);
-    die('Cannot read file');
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'error' => 'Cannot read file']);
+    exit;
 }
 
 // Get the title for the download filename

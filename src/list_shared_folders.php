@@ -3,8 +3,8 @@ require 'auth.php';
 requireAuth();
 
 require_once 'config.php';
-include 'db_connect.php';
-include 'functions.php';
+require_once 'db_connect.php';
+require_once 'functions.php';
 
 // Respect optional workspace parameter
 $workspace = isset($_GET['workspace']) ? trim($_GET['workspace']) : (isset($_POST['workspace']) ? trim($_POST['workspace']) : '');
@@ -33,8 +33,6 @@ $shared_folders = [];
 while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 	$shared_folders[] = $row;
 }
-
-$count_shared_folders = count($shared_folders);
 
 $currentLang = getUserLanguage();
 ?>

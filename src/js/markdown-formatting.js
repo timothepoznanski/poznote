@@ -76,11 +76,6 @@
         // Wrap the selected text
         var wrappedText = prefix + selectedText + suffix;
         document.execCommand('insertText', false, wrappedText);
-        
-        // Trigger auto-save
-        if (typeof window.update === 'function') {
-            window.update();
-        }
     }
 
     /**
@@ -171,11 +166,6 @@
         if (modified) {
             // Replace editor content
             editor.textContent = lines.join('\n');
-            
-            // Trigger auto-save
-            if (typeof window.update === 'function') {
-                window.update();
-            }
         }
     }
 
@@ -236,11 +226,6 @@
         
         var markdownLink = '[' + linkText + '](' + linkUrl + ')';
         document.execCommand('insertText', false, markdownLink);
-        
-        // Trigger auto-save
-        if (typeof window.update === 'function') {
-            window.update();
-        }
     }
 
     /**
@@ -289,11 +274,6 @@
         sel.removeAllRanges();
         sel.addRange(newRange);
         document.execCommand('insertText', false, newLine);
-        
-        // Trigger auto-save
-        if (typeof window.update === 'function') {
-            window.update();
-        }
     }
 
     /**
@@ -313,11 +293,6 @@
         // Wrap with HTML color span as plain text in the markdown editor
         var coloredText = '<span style="color:' + color + '">' + selectedText + '</span>';
         document.execCommand('insertText', false, coloredText);
-        
-        // Trigger auto-save
-        if (typeof window.update === 'function') {
-            window.update();
-        }
     }
 
     /**
@@ -337,11 +312,6 @@
         // Apply highlight using span tag as plain text in the markdown editor
         var highlightedText = '<span style="background-color:' + highlightColor + '">' + selectedText + '</span>';
         document.execCommand('insertText', false, highlightedText);
-        
-        // Trigger auto-save
-        if (typeof window.update === 'function') {
-            window.update();
-        }
     }
 
     /**
@@ -361,11 +331,6 @@
         // Wrap with HTML span with font size
         var styledText = '<span style="font-size: ' + fontSize + '">' + selectedText + '</span>';
         document.execCommand('insertHTML', false, styledText);
-        
-        // Trigger auto-save
-        if (typeof window.update === 'function') {
-            window.update();
-        }
     }
 
     // Export functions

@@ -648,7 +648,7 @@ function parseMarkdown($text) {
                 }
                 
                 $indent = strlen($matches[1]);
-                $content = $isTaskList ? $matches[3] : $matches[3];
+                $content = $matches[3];
                 
                 // If this is the first item, set the base indentation and marker type
                 if ($baseIndent === null) {

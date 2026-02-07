@@ -297,10 +297,10 @@
                                 $title = t_h('modals.create.note.title', [], 'Note');
                                 $parenPos = strpos($title, ' (');
                                 if ($parenPos !== false) {
-                                    echo htmlspecialchars(substr($title, 0, $parenPos));
-                                    echo '<span class="create-note-subtitle">' . htmlspecialchars(substr($title, $parenPos)) . '</span>';
+                                    echo substr($title, 0, $parenPos);
+                                    echo '<span class="create-note-subtitle">' . substr($title, $parenPos) . '</span>';
                                 } else {
-                                    echo htmlspecialchars($title);
+                                    echo $title;
                                 }
                             ?></span>
                         </div>
@@ -312,10 +312,10 @@
                                 $title = t_h('modals.create.markdown.title', [], 'Markdown Note');
                                 $parenPos = strpos($title, ' (');
                                 if ($parenPos !== false) {
-                                    echo htmlspecialchars(substr($title, 0, $parenPos));
-                                    echo '<span class="create-note-subtitle">' . htmlspecialchars(substr($title, $parenPos)) . '</span>';
+                                    echo substr($title, 0, $parenPos);
+                                    echo '<span class="create-note-subtitle">' . substr($title, $parenPos) . '</span>';
                                 } else {
-                                    echo htmlspecialchars($title);
+                                    echo $title;
                                 }
                             ?></span>
                         </div>

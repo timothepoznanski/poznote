@@ -25,11 +25,11 @@ if ($action === 'save_embedded_diagram') {
 }
 
 // Continue with regular full note save
-$note_id = isset($_POST['note_id']) ? intval($_POST['note_id']) : 0;
-$workspace = isset($_POST['workspace']) ? trim($_POST['workspace']) : getFirstWorkspaceName();
-$heading = isset($_POST['heading']) ? trim($_POST['heading']) : 'New note';
-$diagram_data = isset($_POST['diagram_data']) ? $_POST['diagram_data'] : '';
-$preview_image = isset($_FILES['preview_image']) ? $_FILES['preview_image'] : null;
+$note_id = intval($_POST['note_id'] ?? 0);
+$workspace = trim($_POST['workspace'] ?? '') ?: getFirstWorkspaceName();
+$heading = trim($_POST['heading'] ?? '') ?: 'New note';
+$diagram_data = $_POST['diagram_data'] ?? '';
+$preview_image = $_FILES['preview_image'] ?? null;
 
 // Convert preview image to base64 HTML if provided
 $base64_image = '';

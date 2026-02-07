@@ -9,9 +9,9 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
     header('Content-Type: text/html; charset=utf-8');
 }
 
-// Enable error reporting but capture it to avoid breaking JSON/HTML structure if possible, 
-// though here we output HTML so it's fine.
-ini_set('display_errors', 1);
+// Enable error logging (not display, to avoid breaking HTML output)
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 error_reporting(E_ALL);
 
 try {

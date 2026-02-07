@@ -1,13 +1,10 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 require 'auth.php';
 requireAuth();
 
 require_once 'config.php';
 require_once 'functions.php';
-include 'db_connect.php';
+require_once 'db_connect.php';
 
 // Get note ID from URL
 $note_id = isset($_GET['note_id']) ? (int)$_GET['note_id'] : 0;

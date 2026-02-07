@@ -129,9 +129,6 @@
 
     // trigger optional update callback if present
     const noteentry = document.querySelector('.noteentry');
-    if (noteentry && typeof window.update === 'function') {
-      window.update();
-    }
   }
 
   // Remove any existing popup
@@ -427,11 +424,6 @@ function changeFontSize() {
           newRange.setStartAfter(span);
           newRange.collapse(true);
           selection.addRange(newRange);
-
-          // Trigger update callback
-          if (typeof window.update === 'function') {
-            window.update();
-          }
         }
       }
 
@@ -1256,11 +1248,6 @@ function addLinkToNote() {
   } catch (err) {
     console.error('Error in addLinkToNote:', err);
   }
-}
-
-function createLinkFromModal() {
-  // Backwards-compatible stub: fallback to addLinkToNote behaviour
-  return addLinkToNote();
 }
 
 function toggleTablePicker() {

@@ -128,15 +128,15 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
             });
         } elseif ($sortType === 'created') {
             usort($folder['notes'], function($a, $b) {
-                $createdA = isset($a['created']) ? $a['created'] : '';
-                $createdB = isset($b['created']) ? $b['created'] : '';
+                $createdA = $a['created'] ?? '';
+                $createdB = $b['created'] ?? '';
                 // Newest first
                 return strcmp($createdB, $createdA);
             });
         } elseif ($sortType === 'modified') {
             usort($folder['notes'], function($a, $b) {
-                $updatedA = isset($a['updated']) ? $a['updated'] : '';
-                $updatedB = isset($b['updated']) ? $b['updated'] : '';
+                $updatedA = $a['updated'] ?? '';
+                $updatedB = $b['updated'] ?? '';
                 // Newest first
                 return strcmp($updatedB, $updatedA);
             });
@@ -294,8 +294,7 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
     
     $actions = "";
     
-    // Escape folder name for use in JavaScript strings
-    $escapedFolderName = addslashes($folderName);
+    // Escape folder name for HTML attribute context
     $htmlEscapedFolderName = htmlspecialchars($folderName, ENT_QUOTES);
     
     // Pre-load all shared folders on first call to avoid N+1 queries
@@ -314,9 +313,7 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
     // Check if folder is shared using cache
     $isShared = isset($sharedFoldersCache[(int)$folderId]);
     
-    if ($folderName === 'Favorites') {
-        // No actions for Favorites folder
-    } else {
+    if ($folderName !== 'Favorites') {
         // Create three-dot menu
         $actions .= "<div class='folder-actions-toggle' data-action='toggle-folder-actions-menu' data-folder-id='$folderId' title='" . t_h('notes_list.folder_actions.menu', [], 'Actions') . "'>";
         $actions .= "<i class='fa-ellipsis-v'></i>";

@@ -3,8 +3,8 @@ require 'auth.php';
 requireAuth();
 
 require_once 'config.php';
-include 'db_connect.php';
-include 'functions.php';
+require_once 'db_connect.php';
+require_once 'functions.php';
 
 $currentLang = getUserLanguage();
 

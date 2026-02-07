@@ -22,7 +22,6 @@ try {
         // Get settings from master database
         $currentLang = getGlobalSetting('language', 'en');
         $login_display_name = getGlobalSetting('login_display_name', '');
-        $default_workspace = '';
         
         if (!is_string($currentLang) || $currentLang === '') {
             $currentLang = 'en';
@@ -34,13 +33,11 @@ try {
     } catch (Exception $e) {
         $login_display_name = '';
         $currentLang = 'en';
-        $default_workspace = '';
     }
     if ($login_display_name === false) $login_display_name = '';
 } catch (Exception $e) {
     $login_display_name = '';
     $currentLang = 'en';
-    $default_workspace = '';
 }
 // Detect language change from selector
 if (isset($_GET['lang'])) {

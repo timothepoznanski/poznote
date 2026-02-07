@@ -1,7 +1,7 @@
 <?php
 require_once 'auth.php';
 require_once 'config.php';
-include 'functions.php';
+require_once 'functions.php';
 require_once 'db_connect.php';
 require_once 'users/db_master.php';
 require_once 'users/UserDataManager.php';

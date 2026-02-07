@@ -12,9 +12,6 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
 
 $currentLang = getUserLanguage();
 
-$message = '';
-$error = '';
-
 // Variables for specific section messages
 $restore_message = '';
 $restore_error = '';
@@ -323,6 +320,211 @@ function extractObsidianTags($content) {
         'tags' => $tags,
         'content' => $content
     ];
+}
+
+/**
+ * Sanitize tags string: replace spaces with underscores, remove empties, deduplicate
+ */
+function sanitizeTagsString($tags) {
+    if (empty($tags)) return '';
+    $tagsArray = array_map('trim', explode(',', str_replace(' ', ',', $tags)));
+    $validTags = [];
+    foreach ($tagsArray as $tag) {
+        if (!empty($tag)) {
+            $tag = str_replace(' ', '_', $tag);
+            $validTags[] = $tag;
+        }
+    }
+    return implode(', ', $validTags);
+}
+
+/**
+ * Extract metadata (title, tags, favorite, dates) from front matter and Obsidian tags.
+ * Returns array with keys: title, tags, favorite, created, updated, content
+ */
+function extractNoteMetadata($content, $noteType, $fileName, $frontMatterData = null, $obsidianTags = null) {
+    $tags = '';
+    $favorite = 0;
+    $created = null;
+    $updated = null;
+    $obsidianTags = $obsidianTags === null ? [] : $obsidianTags;
+
+    if ($noteType === 'markdown' && $frontMatterData === null) {
+        $parsed = parseFrontMatter($content);
+        $frontMatterData = $parsed['metadata'];
+        $content = $parsed['content'];
+
+        $obsidianTagsResult = extractObsidianTags($content);
+        $obsidianTags = $obsidianTagsResult['tags'];
+        $content = $obsidianTagsResult['content'];
+    }
+
+    // Extract title
+    if ($frontMatterData && isset($frontMatterData['title'])) {
+        $title = is_array($frontMatterData['title'])
+            ? implode(' ', $frontMatterData['title'])
+            : $frontMatterData['title'];
+    } else {
+        $title = pathinfo($fileName, PATHINFO_FILENAME);
+    }
+
+    // Extract tags
+    $allTags = [];
+    if ($frontMatterData && isset($frontMatterData['tags'])) {
+        if (is_array($frontMatterData['tags'])) {
+            $allTags = array_merge($allTags, $frontMatterData['tags']);
+        } elseif (is_string($frontMatterData['tags'])) {
+            $allTags[] = $frontMatterData['tags'];
+        }
+    }
+    if (!empty($obsidianTags)) {
+        $allTags = array_merge($allTags, $obsidianTags);
+    }
+    if (!empty($allTags)) {
+        $allTags = array_unique($allTags);
+        $tags = implode(', ', $allTags);
+    }
+    $tags = sanitizeTagsString($tags);
+
+    // Extract favorite
+    if ($frontMatterData && isset($frontMatterData['favorite'])) {
+        $favorite = ($frontMatterData['favorite'] === true || $frontMatterData['favorite'] === 1) ? 1 : 0;
+    }
+
+    // Extract dates
+    if ($frontMatterData && isset($frontMatterData['created'])) {
+        $created = $frontMatterData['created'];
+    }
+    if ($frontMatterData && isset($frontMatterData['updated'])) {
+        $updated = $frontMatterData['updated'];
+    }
+
+    // Validate title
+    if (empty($title)) {
+        $title = t('restore_import.individual_notes.default_title_with_date', ['date' => date('Y-m-d H:i:s')]);
+    }
+
+    return [
+        'title' => $title,
+        'tags' => $tags,
+        'favorite' => $favorite,
+        'created' => $created,
+        'updated' => $updated,
+        'content' => $content,
+        'frontMatterData' => $frontMatterData,
+        'obsidianTags' => $obsidianTags,
+    ];
+}
+
+/**
+ * Insert a note into the database with optional created/updated timestamps.
+ * Uses COALESCE to default to datetime('now') when dates are null.
+ */
+function insertNoteIntoDb($con, $title, $content, $folderName, $folderId, $workspace, $noteType, $tags, $favorite, $created, $updated) {
+    $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, COALESCE(?, datetime('now')), COALESCE(?, datetime('now')), 0)");
+    $stmt->execute([$title, $content, $folderName, $folderId, $workspace, $noteType, $tags, $favorite, $created, $updated]);
+    return $con->lastInsertId();
+}
+
+/**
+ * Regenerate tasklist IDs and noteId for imported JSON tasklist data.
+ * Updates the database entry with the regenerated data.
+ */
+function regenerateTasklistIds($con, $noteId, $originalJsonData, &$content) {
+    if ($originalJsonData === null) return;
+    foreach ($originalJsonData as &$task) {
+        $task['id'] = (int)(microtime(true) * 10000);
+        $task['noteId'] = (int)$noteId;
+        usleep(1);
+    }
+    unset($task);
+    $content = json_encode($originalJsonData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    $updateStmt = $con->prepare("UPDATE entries SET entry = ? WHERE id = ?");
+    $updateStmt->execute([$content, $noteId]);
+}
+
+/**
+ * Write note content to file with appropriate wrapping.
+ * Returns true on success, false on failure.
+ */
+function writeNoteToFile($entriesPath, $noteId, $noteType, $title, $content) {
+    $fileExt = ($noteType === 'markdown') ? '.md' : '.html';
+    $noteFile = $entriesPath . '/' . $noteId . $fileExt;
+
+    if ($noteType === 'markdown' || $noteType === 'tasklist') {
+        $wrappedContent = $content;
+    } else {
+        if (stripos($content, '<html') === false) {
+            $wrappedContent = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n<title>" . htmlspecialchars($title, ENT_QUOTES) . "</title>\n</head>\n<body>\n" . $content . "\n</body>\n</html>";
+        } else {
+            $wrappedContent = $content;
+        }
+    }
+
+    if (file_put_contents($noteFile, $wrappedContent) !== false) {
+        chmod($noteFile, 0644);
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Create folder hierarchy from a path string.
+ * Returns the leaf folder ID, or null if path is empty.
+ */
+function createFolderHierarchyFromPath($con, $workspace, $folderPath, &$folderMap, &$createdFolders) {
+    $folderPath = trim($folderPath, '/');
+
+    if (empty($folderPath)) {
+        return null;
+    }
+
+    if (isset($folderMap[$folderPath])) {
+        return $folderMap[$folderPath];
+    }
+
+    $segments = explode('/', $folderPath);
+    $parentId = null;
+    $currentPath = '';
+
+    foreach ($segments as $segment) {
+        $currentPath = ($currentPath === '') ? $segment : $currentPath . '/' . $segment;
+
+        if (isset($folderMap[$currentPath])) {
+            $parentId = $folderMap[$currentPath];
+            continue;
+        }
+
+        if ($parentId === null) {
+            $checkStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ? AND parent_id IS NULL");
+            $checkStmt->execute([$segment, $workspace]);
+        } else {
+            $checkStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ? AND parent_id = ?");
+            $checkStmt->execute([$segment, $workspace, $parentId]);
+        }
+
+        $existing = $checkStmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($existing) {
+            $folderId = (int)$existing['id'];
+            $folderMap[$currentPath] = $folderId;
+            $parentId = $folderId;
+        } else {
+            try {
+                $insertStmt = $con->prepare("INSERT INTO folders (name, workspace, parent_id) VALUES (?, ?, ?)");
+                $insertStmt->execute([$segment, $workspace, $parentId]);
+                $folderId = (int)$con->lastInsertId();
+                $folderMap[$currentPath] = $folderId;
+                $parentId = $folderId;
+                $createdFolders++;
+            } catch (PDOException $e) {
+                error_log("Error creating folder '$segment': " . $e->getMessage());
+                return null;
+            }
+        }
+    }
+
+    return $parentId;
 }
 
 function importNotesZip($uploadedFile) {
@@ -689,72 +891,9 @@ function importZipWithFolders($uploadedFile, $workspace) {
     // Sort files to process folders in order
     sort($files);
     
-    // Helper function to create folder hierarchy
+    // Use shared helper wrapped in closure for local use
     $createFolderHierarchy = function($folderPath) use ($con, $workspace, &$folderMap, &$createdFolders) {
-        // Normalize path (remove leading/trailing slashes)
-        $folderPath = trim($folderPath, '/');
-        
-        if (empty($folderPath)) {
-            return null; // No folder
-        }
-        
-        // Check if we already created this folder
-        if (isset($folderMap[$folderPath])) {
-            return $folderMap[$folderPath];
-        }
-        
-        // Split path into segments
-        $segments = explode('/', $folderPath);
-        $parentId = null;
-        $currentPath = '';
-        
-        foreach ($segments as $segment) {
-            // Build current path
-            if ($currentPath === '') {
-                $currentPath = $segment;
-            } else {
-                $currentPath .= '/' . $segment;
-            }
-            
-            // Check if this segment already exists in our map
-            if (isset($folderMap[$currentPath])) {
-                $parentId = $folderMap[$currentPath];
-                continue;
-            }
-            
-            // Check if folder exists in database
-            if ($parentId === null) {
-                $checkStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ? AND parent_id IS NULL");
-                $checkStmt->execute([$segment, $workspace]);
-            } else {
-                $checkStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ? AND parent_id = ?");
-                $checkStmt->execute([$segment, $workspace, $parentId]);
-            }
-            
-            $existing = $checkStmt->fetch(PDO::FETCH_ASSOC);
-            
-            if ($existing) {
-                // Folder already exists
-                $folderId = (int)$existing['id'];
-                $folderMap[$currentPath] = $folderId;
-                $parentId = $folderId;
-            } else {
-                // Create new folder
-                try {
-                    $insertStmt = $con->prepare("INSERT INTO folders (name, workspace, parent_id) VALUES (?, ?, ?)");
-                    $insertStmt->execute([$segment, $workspace, $parentId]);
-                    $folderId = (int)$con->lastInsertId();
-                    $folderMap[$currentPath] = $folderId;
-                    $parentId = $folderId;
-                    $createdFolders++;
-                } catch (PDOException $e) {
-                    error_log("Error creating folder '$segment': " . $e->getMessage());
-                    return null;
-                }
-            }
-        }
-        
-        return $parentId;
+        return createFolderHierarchyFromPath($con, $workspace, $folderPath, $folderMap, $createdFolders);
     };
     
     // Process each file
@@ -823,18 +962,8 @@ function importZipWithFolders($uploadedFile, $workspace) {
                 }
             }
             
-            // Validate tags format - replace spaces with underscores
-            if (!empty($tags)) {
-                $tagsArray = array_map('trim', explode(',', str_replace(' ', ',', $tags)));
-                $validTags = [];
-                foreach ($tagsArray as $tag) {
-                    if (!empty($tag)) {
-                        $tag = str_replace(' ', '_', $tag);
-                        $validTags[] = $tag;
-                    }
-                }
-                $tags = implode(', ', $validTags);
-            }
+            // Validate tags format
+            $tags = sanitizeTagsString($tags);
             
             // Extract favorite status from front matter
             if ($frontMatterData && isset($frontMatterData['favorite'])) {
@@ -1194,72 +1323,9 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
     $errorCount = 0;
     $errors = [];
     
-    // Helper function to create folder hierarchy
+    // Use shared helper wrapped in closure for local use
     $createFolderHierarchy = function($folderPath) use ($con, $workspace, &$folderMap, &$createdFolders) {
-        // Normalize path (remove leading/trailing slashes)
-        $folderPath = trim($folderPath, '/');
-        
-        if (empty($folderPath)) {
-            return null; // No folder
-        }
-        
-        // Check if we already created this folder
-        if (isset($folderMap[$folderPath])) {
-            return $folderMap[$folderPath];
-        }
-        
-        // Split path into segments
-        $segments = explode('/', $folderPath);
-        $parentId = null;
-        $currentPath = '';
-        
-        foreach ($segments as $segment) {
-            // Build current path
-            if ($currentPath === '') {
-                $currentPath = $segment;
-            } else {
-                $currentPath .= '/' . $segment;
-            }
-            
-            // Check if this segment already exists in our map
-            if (isset($folderMap[$currentPath])) {
-                $parentId = $folderMap[$currentPath];
-                continue;
-            }
-            
-            // Check if folder exists in database
-            if ($parentId === null) {
-                $checkStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ? AND parent_id IS NULL");
-                $checkStmt->execute([$segment, $workspace]);
-            } else {
-                $checkStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ? AND parent_id = ?");
-                $checkStmt->execute([$segment, $workspace, $parentId]);
-            }
-            
-            $existing = $checkStmt->fetch(PDO::FETCH_ASSOC);
-            
-            if ($existing) {
-                // Folder already exists
-                $folderId = (int)$existing['id'];
-                $folderMap[$currentPath] = $folderId;
-                $parentId = $folderId;
-            } else {
-                // Create new folder
-                try {
-                    $insertStmt = $con->prepare("INSERT INTO folders (name, workspace, parent_id) VALUES (?, ?, ?)");
-                    $insertStmt->execute([$segment, $workspace, $parentId]);
-                    $folderId = (int)$con->lastInsertId();
-                    $folderMap[$currentPath] = $folderId;
-                    $parentId = $folderId;
-                    $createdFolders++;
-                } catch (PDOException $e) {
-                    error_log("Error creating folder '$segment': " . $e->getMessage());
-                    return null;
-                }
-            }
-        }
-        
-        return $parentId;
+        return createFolderHierarchyFromPath($con, $workspace, $folderPath, $folderMap, $createdFolders);
     };
     
     // Configure SQLite for better performance and reduce locking
@@ -1396,69 +1462,26 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         if ($noteType === 'markdown') {
             $parsed = parseFrontMatter($content);
             $frontMatterData = $parsed['metadata'];
-            $content = $parsed['content']; // Remove front matter from content
+            $content = $parsed['content'];
             
-            // Also extract Obsidian-style inline tags (#tag) from the beginning of content
             $obsidianTagsResult = extractObsidianTags($content);
             $obsidianTags = $obsidianTagsResult['tags'];
             $content = $obsidianTagsResult['content'];
         }
         
-        // Extract title - prioritize front matter, then filename
-        if ($frontMatterData && isset($frontMatterData['title'])) {
-            // Ensure title is a string (some YAML parsers may return arrays)
-            $title = is_array($frontMatterData['title']) 
-                ? implode(' ', $frontMatterData['title'])
-                : $frontMatterData['title'];
-        } else {
-            $title = pathinfo($fileName, PATHINFO_FILENAME);
-        }
-        
-        // Extract tags from front matter and Obsidian inline tags
-        $allTags = [];
-        
-        // First, get tags from front matter
-        if ($frontMatterData && isset($frontMatterData['tags'])) {
-            if (is_array($frontMatterData['tags'])) {
-                $allTags = array_merge($allTags, $frontMatterData['tags']);
-            } else if (is_string($frontMatterData['tags'])) {
-                $allTags[] = $frontMatterData['tags'];
-            }
-        }
-        
-        // Then, add Obsidian inline tags
-        if (!empty($obsidianTags)) {
-            $allTags = array_merge($allTags, $obsidianTags);
-        }
-        
-        // Remove duplicates and format tags
-        if (!empty($allTags)) {
-            $allTags = array_unique($allTags);
-            $tags = implode(', ', $allTags);
-        }
-        
-        // Validate tags format - replace spaces with underscores
-        if (!empty($tags)) {
-            $tagsArray = array_map('trim', explode(',', str_replace(' ', ',', $tags)));
-            $validTags = [];
-            foreach ($tagsArray as $tag) {
-                if (!empty($tag)) {
-                    $tag = str_replace(' ', '_', $tag);
-                    $validTags[] = $tag;
-                }
-            }
-            $tags = implode(', ', $validTags);
-        }
-        
-        // Extract favorite status from front matter
-        if ($frontMatterData && isset($frontMatterData['favorite'])) {
-            $favorite = ($frontMatterData['favorite'] === true || $frontMatterData['favorite'] === 1) ? 1 : 0;
-        }
+        // Extract all metadata using shared helper
+        $meta = extractNoteMetadata($content, $noteType, $fileName, $frontMatterData, $obsidianTags);
+        $title = $meta['title'];
+        $tags = $meta['tags'];
+        $favorite = $meta['favorite'];
+        $created = $meta['created'];
+        $updated = $meta['updated'];
+        $content = $meta['content'];
+        $frontMatterData = $meta['frontMatterData'];
         
         // Extract folder from front matter (can override ZIP structure)
         if ($frontMatterData && isset($frontMatterData['folder']) && !empty($frontMatterData['folder'])) {
             $targetFolderName = $frontMatterData['folder'];
-            // Try to find this folder
             $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
             $fStmt->execute([$targetFolderName, $workspace]);
             $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
@@ -1467,55 +1490,12 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
             }
         }
         
-        // Extract dates from front matter
-        if ($frontMatterData && isset($frontMatterData['created'])) {
-            $created = $frontMatterData['created'];
-        }
-        if ($frontMatterData && isset($frontMatterData['updated'])) {
-            $updated = $frontMatterData['updated'];
-        }
-        
-        // Validate title is not empty
-        if (empty($title)) {
-            $title = t('restore_import.individual_notes.default_title_with_date', ['date' => date('Y-m-d H:i:s')]);
-        }
-        
         try {
-            // Insert note into database with metadata from front matter
-            // Store content in entry column for search functionality
-            if ($created && $updated) {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
-                $stmt->execute([$title, $content, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite, $created, $updated]);
-            } elseif ($created) {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), 0)");
-                $stmt->execute([$title, $content, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite, $created]);
-            } elseif ($updated) {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), ?, 0)");
-                $stmt->execute([$title, $content, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite, $updated]);
-            } else {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0)");
-                $stmt->execute([$title, $content, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite]);
-            }
-            $noteId = $con->lastInsertId();
+            $noteId = insertNoteIntoDb($con, $title, $content, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite, $created, $updated);
             
             // For tasklists imported from JSON, update task IDs and noteId
-            if ($noteType === 'tasklist' && $originalJsonData !== null) {
-                // Regenerate task IDs and update noteId for all tasks
-                foreach ($originalJsonData as &$task) {
-                    // Generate new unique ID based on timestamp
-                    $task['id'] = (int)(microtime(true) * 10000);
-                    // Update noteId to match the newly created note
-                    $task['noteId'] = (int)$noteId;
-                    // Small delay to ensure unique IDs
-                    usleep(1);
-                }
-                unset($task); // Break reference
-                // Update content with new IDs
-                $content = json_encode($originalJsonData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-                
-                // Update database entry with regenerated task data
-                $updateStmt = $con->prepare("UPDATE entries SET entry = ? WHERE id = ?");
-                $updateStmt->execute([$content, $noteId]);
+            if ($noteType === 'tasklist') {
+                regenerateTasklistIds($con, $noteId, $originalJsonData, $content);
             }
             
             // Process Obsidian-style image references ![[image.png]] and convert to standard markdown
@@ -1621,33 +1601,12 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
                 }
             }
             
-            // Save content to file with correct extension
-            $fileExt = ($noteType === 'markdown') ? '.md' : '.html';
-            $noteFile = $entriesPath . '/' . $noteId . $fileExt;
-            
-            if ($noteType === 'markdown') {
-                // For markdown notes, save content as-is
-                $wrappedContent = $content;
-            } elseif ($noteType === 'tasklist') {
-                // For tasklist notes, save JSON content as-is (no HTML wrapper)
-                $wrappedContent = $content;
-            } else {
-                // For HTML notes, ensure it's properly formatted
-                if (stripos($content, '<html') === false) {
-                    // Wrap in basic HTML structure if not present
-                    $wrappedContent = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n<title>" . htmlspecialchars($title, ENT_QUOTES) . "</title>\n</head>\n<body>\n" . $content . "\n</body>\n</html>";
-                } else {
-                    $wrappedContent = $content;
-                }
-            }
-            
-            if (file_put_contents($noteFile, $wrappedContent) !== false) {
-                chmod($noteFile, 0644);
+            // Save content to file
+            if (writeNoteToFile($entriesPath, $noteId, $noteType, $title, $content)) {
                 $importedCount++;
             } else {
                 $errorCount++;
                 $errors[] = basename($fileName) . ': Cannot write file';
-                // Delete the database entry if file creation failed
                 $stmt = $con->prepare("DELETE FROM entries WHERE id = ?");
                 $stmt->execute([$noteId]);
             }
@@ -1771,6 +1730,9 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         // Determine note type based on file extension
         $noteType = ($fileExtension === 'md' || $fileExtension === 'markdown') ? 'markdown' : 'note';
         
+        // Store original JSON data for tasklists (will be updated with new noteId later)
+        $originalJsonData = null;
+
         // Special handling for JSON files - check if they contain tasklist data
         if ($fileExtension === 'json') {
             $jsonData = json_decode($content, true);
@@ -1785,6 +1747,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                 }
                 if ($isTasklist) {
                     $noteType = 'tasklist';
+                    $originalJsonData = $jsonData; // Store for later update
                 } else {
                     // If it's valid JSON but not a tasklist, treat as regular note with JSON content
                     $noteType = 'note';
@@ -1815,81 +1778,26 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         if ($noteType === 'markdown') {
             $parsed = parseFrontMatter($content);
             $frontMatterData = $parsed['metadata'];
-            $content = $parsed['content']; // Remove front matter from content
+            $content = $parsed['content'];
             
-            // Also extract Obsidian-style inline tags (#tag) from the beginning of content
             $obsidianTagsResult = extractObsidianTags($content);
             $obsidianTags = $obsidianTagsResult['tags'];
             $content = $obsidianTagsResult['content'];
         }
         
-        // Extract title - prioritize front matter, then filename
-        if ($frontMatterData && isset($frontMatterData['title'])) {
-            // Ensure title is a string (some YAML parsers may return arrays)
-            $title = is_array($frontMatterData['title']) 
-                ? implode(' ', $frontMatterData['title'])
-                : $frontMatterData['title'];
-        } else {
-            $title = pathinfo($fileName, PATHINFO_FILENAME);
-        }
-        
-        // Extract tags from front matter and Obsidian inline tags
-        $tags = '';
-        $allTags = [];
-        
-        // First, get tags from front matter
-        if ($frontMatterData && isset($frontMatterData['tags']) && is_array($frontMatterData['tags'])) {
-            $allTags = array_merge($allTags, $frontMatterData['tags']);
-        }
-        
-        // Then, add Obsidian inline tags
-        if (isset($obsidianTags) && !empty($obsidianTags)) {
-            $allTags = array_merge($allTags, $obsidianTags);
-        }
-        
-        // Remove duplicates and format tags
-        if (!empty($allTags)) {
-            $allTags = array_unique($allTags);
-            $tags = implode(', ', $allTags);
-        }
-        
-        // Validate tags format - replace spaces with underscores
-        if (!empty($tags)) {
-            $tagsArray = array_map('trim', explode(',', str_replace(' ', ',', $tags)));
-            $validTags = [];
-            foreach ($tagsArray as $tag) {
-                if (!empty($tag)) {
-                    $tag = str_replace(' ', '_', $tag);
-                    $validTags[] = $tag;
-                }
-            }
-            $tags = implode(', ', $validTags);
-        }
-        
-        // Extract favorite status from front matter
-        $favorite = 0;
-        if ($frontMatterData && isset($frontMatterData['favorite'])) {
-            $favorite = ($frontMatterData['favorite'] === true || $frontMatterData['favorite'] === 1) ? 1 : 0;
-        }
+        // Extract all metadata using shared helper
+        $meta = extractNoteMetadata($content, $noteType, $fileName, $frontMatterData, $obsidianTags);
+        $title = $meta['title'];
+        $tags = $meta['tags'];
+        $favorite = $meta['favorite'];
+        $created = $meta['created'];
+        $updated = $meta['updated'];
+        $content = $meta['content'];
+        $frontMatterData = $meta['frontMatterData'];
         
         // Extract folder from front matter (override if present)
         if ($frontMatterData && isset($frontMatterData['folder']) && !empty($frontMatterData['folder'])) {
             $folder = $frontMatterData['folder'];
-        }
-        
-        // Extract dates from front matter
-        $created = null;
-        $updated = null;
-        if ($frontMatterData && isset($frontMatterData['created'])) {
-            $created = $frontMatterData['created'];
-        }
-        if ($frontMatterData && isset($frontMatterData['updated'])) {
-            $updated = $frontMatterData['updated'];
-        }
-        
-        // Validate title is not empty
-        if (empty($title)) {
-            $title = t('restore_import.individual_notes.default_title_with_date', ['date' => date('Y-m-d H:i:s')]);
         }
         
         try {
@@ -1904,70 +1812,19 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                 }
             }
             
-            // Insert note into database with metadata from front matter
-            // Store content in entry column for search functionality
-            if ($created && $updated) {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)");
-                $stmt->execute([$title, $content, $folder, $folder_id, $workspace, $noteType, $tags, $favorite, $created, $updated]);
-            } elseif ($created) {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), 0)");
-                $stmt->execute([$title, $content, $folder, $folder_id, $workspace, $noteType, $tags, $favorite, $created]);
-            } elseif ($updated) {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), ?, 0)");
-                $stmt->execute([$title, $content, $folder, $folder_id, $workspace, $noteType, $tags, $favorite, $updated]);
-            } else {
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0)");
-                $stmt->execute([$title, $content, $folder, $folder_id, $workspace, $noteType, $tags, $favorite]);
-            }
-            $noteId = $con->lastInsertId();
+            $noteId = insertNoteIntoDb($con, $title, $content, $folder, $folder_id, $workspace, $noteType, $tags, $favorite, $created, $updated);
             
             // For tasklists imported from JSON, update task IDs and noteId
-            if ($noteType === 'tasklist' && $originalJsonData !== null) {
-                // Regenerate task IDs and update noteId for all tasks
-                foreach ($originalJsonData as &$task) {
-                    // Generate new unique ID based on timestamp
-                    $task['id'] = (int)(microtime(true) * 10000);
-                    // Update noteId to match the newly created note
-                    $task['noteId'] = (int)$noteId;
-                    // Small delay to ensure unique IDs
-                    usleep(1);
-                }
-                unset($task); // Break reference
-                // Update content with new IDs
-                $content = json_encode($originalJsonData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-                
-                // Update database entry with regenerated task data
-                $updateStmt = $con->prepare("UPDATE entries SET entry = ? WHERE id = ?");
-                $updateStmt->execute([$content, $noteId]);
+            if ($noteType === 'tasklist') {
+                regenerateTasklistIds($con, $noteId, $originalJsonData, $content);
             }
             
-            // Save content to file with correct extension
-            $fileExtension = ($noteType === 'markdown') ? '.md' : '.html';
-            $noteFile = $entriesPath . '/' . $noteId . $fileExtension;
-            
-            if ($noteType === 'markdown') {
-                // For markdown notes, save content as-is
-                $wrappedContent = $content;
-            } elseif ($noteType === 'tasklist') {
-                // For tasklist notes, save JSON content as-is (no HTML wrapper)
-                $wrappedContent = $content;
-            } else {
-                // For HTML notes, ensure it's properly formatted
-                if (stripos($content, '<html') === false) {
-                    // Wrap in basic HTML structure if not present
-                    $wrappedContent = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n<title>" . htmlspecialchars($title, ENT_QUOTES) . "</title>\n</head>\n<body>\n" . $content . "\n</body>\n</html>";
-                } else {
-                    $wrappedContent = $content;
-                }
-            }
-            
-            if (file_put_contents($noteFile, $wrappedContent) !== false) {
-                chmod($noteFile, 0644);
+            // Save content to file
+            if (writeNoteToFile($entriesPath, $noteId, $noteType, $title, $content)) {
                 $importedCount++;
             } else {
                 $errorCount++;
                 $errors[] = $fileName . ': Cannot write file';
-                // Delete the database entry if file creation failed
                 $stmt = $con->prepare("DELETE FROM entries WHERE id = ?");
                 $stmt->execute([$noteId]);
             }

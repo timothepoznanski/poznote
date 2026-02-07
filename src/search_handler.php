@@ -170,7 +170,3 @@ function buildSearchConditions($search, $tags_search, $folder_filter, $workspace
         'search_params' => $search_params
     ];
 }
-
-/**
- * Traite les dossiers exclus de la recherche
- */

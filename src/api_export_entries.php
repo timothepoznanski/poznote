@@ -2,9 +2,9 @@
 require 'auth.php';
 requireApiAuth();
 
-include 'functions.php';
+require_once 'functions.php';
 require_once 'config.php';
-include 'db_connect.php';
+require_once 'db_connect.php';
 
 // Start output buffering to prevent any unwanted output
 ob_start();
@@ -37,15 +37,18 @@ $indexContent .= '<h1>Poznote Notes Export</h1>';
 $workspace = $_GET['workspace'] ?? null;
 
 $query_right = 'SELECT * FROM entries WHERE trash = 0';
+$query_params = [];
 if ($workspace !== null) {
-    $query_right .= " AND workspace = '" . addslashes($workspace) . "'";
+    $query_right .= ' AND workspace = ?';
+    $query_params[] = $workspace;
 }
 $query_right .= ' ORDER BY updated DESC';
-$res_right = $con->query($query_right);
+$stmt_right = $con->prepare($query_right);
+$stmt_right->execute($query_params);
 
-if ($res_right && $res_right) {
+if ($stmt_right) {
     $indexContent .= '<ul>';
-    while($row = $res_right->fetch(PDO::FETCH_ASSOC)) {
+    while($row = $stmt_right->fetch(PDO::FETCH_ASSOC)) {
         $title = htmlspecialchars($row["heading"] ?: 'New note', ENT_QUOTES, 'UTF-8');
         
         // Get the complete folder path including parents
@@ -162,7 +165,7 @@ function addFrontMatterToMarkdown($content, $metadata, $con) {
     
     // Get folder path if exists
     $folderPath = '';
-    if ($folder_id && function_exists('getFolderPath')) {
+    if ($folder_id) {
         $folderPath = getFolderPath($folder_id, $con);
     }
     

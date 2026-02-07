@@ -341,17 +341,20 @@ class AttachmentsController {
                             // Set headers for file download/viewing
                             $file_type = $attachment['file_type'] ?? mime_content_type($file_path);
                             
+                            // Sanitize filename for Content-Disposition header
+                            $safeFilename = str_replace(['"', "\r", "\n"], '', $attachment['original_filename']);
+                            
                             // For PDFs, images, videos, and audio, allow inline viewing
                             if (strpos($file_type, 'application/pdf') !== false || 
                                 strpos($file_type, 'image/') !== false || 
                                 strpos($file_type, 'video/') !== false ||
                                 strpos($file_type, 'audio/') !== false) {
                                 header('Content-Type: ' . $file_type);
-                                header('Content-Disposition: inline; filename="' . $attachment['original_filename'] . '"');
+                                header('Content-Disposition: inline; filename="' . $safeFilename . '"');
                             } else {
                                 // For other files, force download
                                 header('Content-Type: application/octet-stream');
-                                header('Content-Disposition: attachment; filename="' . $attachment['original_filename'] . '"');
+                                header('Content-Disposition: attachment; filename="' . $safeFilename . '"');
                             }
                             
                             header('Content-Description: File Transfer');

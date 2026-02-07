@@ -10,15 +10,14 @@ $user_id = $currentUser['id'];
 // Get workspace from request (GET, POST, or DELETE body)
 $workspace = null;
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $workspace = isset($_GET['workspace']) ? $_GET['workspace'] : null;
+    $workspace = $_GET['workspace'] ?? null;
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $workspace = isset($_POST['workspace']) ? $_POST['workspace'] : null;
+    $workspace = $_POST['workspace'] ?? null;
 } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-    // For DELETE, try to parse from query string or body
-    $workspace = isset($_GET['workspace']) ? $_GET['workspace'] : null;
+    $workspace = $_GET['workspace'] ?? null;
     if (!$workspace) {
         parse_str(file_get_contents('php://input'), $delete_params);
-        $workspace = isset($delete_params['workspace']) ? $delete_params['workspace'] : null;
+        $workspace = $delete_params['workspace'] ?? null;
     }
 }
 

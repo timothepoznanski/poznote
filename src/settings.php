@@ -82,14 +82,13 @@ if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
     }
 }
 
-include 'db_connect.php';
+require_once 'db_connect.php';
 
 // Include page initialization
 require_once 'page_init.php';
 
-// Initialize search parameters
+// Initialize search parameters (needed for workspace filter)
 $search_params = initializeSearchParams();
-extract($search_params); // Extracts variables: $search, $tags_search, $note, etc.
 
 // Preserve note parameter if provided (now using ID)
 $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;

@@ -2,10 +2,10 @@
 require 'auth.php';
 requireAuth();
 
-@ob_start();
-include 'functions.php';
+ob_start();
+require_once 'functions.php';
 require_once 'config.php';
-include 'db_connect.php';
+require_once 'db_connect.php';
 
 // Helper: convert plain-text URLs into safe HTML anchors
 function linkify_html($text) {
@@ -244,8 +244,8 @@ $currentLang = getUserLanguage();
 	<script src="js/utils.js"></script>
 	<script src="js/search-highlight.js"></script>
 	<script src="js/toolbar.js"></script>
-	<script src="js/checklist.js?v=<?php echo $v; ?>"></script>
-	<script src="js/bulletlist.js?v=<?php echo $v; ?>"></script>
+	<script src="js/checklist.js"></script>
+	<script src="js/bulletlist.js"></script>
 	<script src="js/main.js"></script>
 	<script src="js/navigation.js"></script>
 	<script src="js/trash.js"></script>

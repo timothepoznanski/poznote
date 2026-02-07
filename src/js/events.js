@@ -33,22 +33,9 @@ function updateident(el) {
 function updateidhead(el) {
     updateNoteIdFromElement(el, 3); // 'inp'.length
 }
-function updateidtags(el) {
-    updateNoteIdFromElement(el, 4); // 'tags'.length
-}
-function updateidfolder(el) {
-    updateNoteIdFromElement(el, 6); // 'folder'.length  
-}
-function updateidsearch(el) {
-    updateNoteIdFromElement(el, 5); // 'search'.length or similar
-}
-
 // Expose to window early
 window.updateident = updateident;
 window.updateidhead = updateidhead;
-window.updateidtags = updateidtags;
-window.updateidfolder = updateidfolder;
-window.updateidsearch = updateidsearch;
 
 /**
  * Convert bare <audio> elements inside contenteditable .noteentry divs to iframes
@@ -1068,12 +1055,6 @@ function setupNavigationDebugger() {
         }
     });
 
-    // Monitor all link clicks
-    document.addEventListener('click', function (e) {
-        if (e.target.tagName === 'A' || e.target.closest('a')) {
-            var link = e.target.tagName === 'A' ? e.target : e.target.closest('a');
-        }
-    }, true);
 }
 
 // Global click interceptor for note navigation links
@@ -3058,12 +3039,6 @@ function saveToServerDebounced() {
 
     // Trigger server save
     saveNoteToServer();
-}
-
-// Functions for element IDs
-// Alias for compatibility
-function newnote() {
-    createNewNote();
 }
 
 function saveNoteImmediately() {

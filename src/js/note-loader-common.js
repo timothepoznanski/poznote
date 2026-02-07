@@ -1466,13 +1466,6 @@ function reinitializeNoteContent() {
 }
 
 /**
- * Check if a URL is for note loading
- */
-function isNoteUrl(url) {
-    return url.includes('note=') && url.includes('index.php');
-}
-
-/**
  * Delete an image (works for both Excalidraw and regular images)
  */
 function deleteImage(img) {

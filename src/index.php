@@ -28,10 +28,10 @@ requireAuth();
 
 ob_start();
 require_once 'config.php';
-include 'functions.php';
+require_once 'functions.php';
 require_once 'version_helper.php';
 
-include 'db_connect.php';
+require_once 'db_connect.php';
 
 // Include new modular files
 require_once 'page_init.php';
@@ -206,7 +206,8 @@ try {
     $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
     $stmt->execute(['show_note_created']);
     $v1 = $stmt->fetchColumn();
-    if ($v1 === '1' || $v1 === 'true') $extra_body_classes .= ' show-note-created';
+    $show_note_created_setting = ($v1 === '1' || $v1 === 'true');
+    if ($show_note_created_setting) $extra_body_classes .= ' show-note-created';
 
     $stmt->execute(['hide_folder_actions']);
     $v3 = $stmt->fetchColumn();
@@ -404,7 +405,7 @@ $body_classes = trim($extra_body_classes);
             $markdown_ids = [];
                         
             // Check if we should display a note or nothing
-            if ($res_right && $res_right) {
+            if ($res_right) {
                 while($row = $res_right->fetch(PDO::FETCH_ASSOC))
                 {
                     // Check if note is shared
@@ -767,21 +768,10 @@ $body_classes = trim($extra_body_classes);
                         }
                     }
                 
-                    // Determine whether we need to render the created date subline
-                    $show_created_setting = false;
-                    try {
-                        $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
-                        $stmt->execute(['show_note_created']);
-                        $v1 = $stmt->fetchColumn();
-                        if ($v1 === '1' || $v1 === 'true') $show_created_setting = true;
-                    } catch (Exception $e) {
-                        // keep defaults (false) on error
-                    }
-
-                    $has_created = !empty($created_display) && $show_created_setting;
+                    $has_created = !empty($created_display) && $show_note_created_setting;
 
                     // Show the subline if created date setting is enabled
-                    if ($show_created_setting && $has_created) {
+                    if ($show_note_created_setting && $has_created) {
                         echo '<div class="note-subline">';
                         echo '<span class="note-sub-created">' . htmlspecialchars($created_display, ENT_QUOTES) . '</span>';
                         echo '</div>';
@@ -879,9 +869,6 @@ $body_classes = trim($extra_body_classes);
 <script src="js/events.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/search-highlight.js"></script>
-<script src="js/toolbar.js"></script>
-<script src="js/checklist.js?v=<?php echo $v; ?>"></script>
-<script src="js/bulletlist.js?v=<?php echo $v; ?>"></script>
 <script src="js/slash-command.js?v=<?php echo $v; ?>"></script>
 <script src="js/share.js"></script>
 <script src="js/folder-hierarchy.js?v=<?php echo $v; ?>"></script>

@@ -68,28 +68,22 @@ function initializeMasterDatabase(PDO $con): void {
         )
     ");
     
-    // Migration: Add email column if missing
+    // Migration: Add missing columns
     try {
         $cols = $con->query("PRAGMA table_info(users)")->fetchAll(PDO::FETCH_ASSOC);
         $existingColumns = array_column($cols, 'name');
+        
         if (!in_array('email', $existingColumns)) {
             $con->exec("ALTER TABLE users ADD COLUMN email TEXT");
             $con->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email) WHERE email IS NOT NULL AND email != ''");
         }
-    } catch (Exception $e) {
-        error_log("Failed to add email column: " . $e->getMessage());
-    }
-    
-    // Migration: Add oidc_subject column if missing
-    try {
-        $cols = $con->query("PRAGMA table_info(users)")->fetchAll(PDO::FETCH_ASSOC);
-        $existingColumns = array_column($cols, 'name');
+        
         if (!in_array('oidc_subject', $existingColumns)) {
             $con->exec("ALTER TABLE users ADD COLUMN oidc_subject TEXT");
             $con->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_oidc_subject ON users(oidc_subject) WHERE oidc_subject IS NOT NULL AND oidc_subject != ''");
         }
     } catch (Exception $e) {
-        error_log("Failed to add oidc_subject column: " . $e->getMessage());
+        error_log("Failed to add columns: " . $e->getMessage());
     }
     
     // Global settings table

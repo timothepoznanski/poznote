@@ -343,11 +343,6 @@
                 document.execCommand('insertText', false, ' ');
             }
         }
-        
-        // Trigger save
-        if (typeof window.update === 'function') {
-            window.update();
-        }
     }
 
     /**

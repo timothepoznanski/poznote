@@ -226,11 +226,11 @@ try {
             if (debugDiv.style.display === 'none') {
                 debugDiv.style.display = 'block';
                 copyBtn.style.display = 'inline-block';
-                toggleText.textContent = '<?php echo addslashes(t_h('github_sync.debug.hide')); ?>';
+                toggleText.textContent = <?php echo json_encode(t_h('github_sync.debug.hide')); ?>;
             } else {
                 debugDiv.style.display = 'none';
                 copyBtn.style.display = 'none';
-                toggleText.textContent = '<?php echo addslashes(t_h('github_sync.debug.show')); ?>';
+                toggleText.textContent = <?php echo json_encode(t_h('github_sync.debug.show')); ?>;
             }
         });
         
@@ -238,7 +238,7 @@ try {
             navigator.clipboard.writeText(debugContent).then(function() {
                 const btn = document.getElementById('debug-copy-btn');
                 const originalHTML = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i> <?php echo addslashes(t_h('github_sync.debug.copied')); ?>';
+                btn.innerHTML = '<i class="fas fa-check"></i> ' + <?php echo json_encode(t_h('github_sync.debug.copied')); ?>;
                 setTimeout(function() {
                     btn.innerHTML = originalHTML;
                 }, 2000);

@@ -2,9 +2,9 @@
 require 'auth.php';
 requireApiAuth();
 
-include 'functions.php';
+require_once 'functions.php';
 require_once 'config.php';
-include 'db_connect.php';
+require_once 'db_connect.php';
 
 // First, check if there are any attachments at all
 $checkQuery = "SELECT COUNT(*) as count FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";

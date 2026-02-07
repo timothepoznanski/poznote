@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $input = json_decode(file_get_contents('php://input'), true);
 $folderId = isset($input['folder_id']) ? (int)$input['folder_id'] : null;
-$sortType = isset($input['sort_type']) ? $input['sort_type'] : null;
+$sortType = $input['sort_type'] ?? null;
 
 if (!$folderId || !$sortType) {
     echo json_encode(['success' => false, 'error' => 'Missing folder_id or sort_type']);
