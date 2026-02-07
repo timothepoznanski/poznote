@@ -259,6 +259,40 @@ function parseMarkdown($text) {
         $protectedIndex++;
         return $placeholder;
     }, $text);
+
+    // Protect audio tags (for MP3, WAV, and other audio formats)
+    $text = preg_replace_callback('/<audio\s+([^>]*)>\s*<\/audio>/is', function($matches) use (&$protectedElements, &$protectedIndex) {
+        $attrs = $matches[1];
+        $placeholder = "\x00PAUDIO" . $protectedIndex . "\x00";
+
+        // Sanitize attributes: only allow safe attributes
+        $safeAttrs = [];
+
+        // Extract and sanitize individual attributes
+        preg_match_all('/(\w+)\s*=\s*["\']([^"\']*)["\']/', $attrs, $attrMatches, PREG_SET_ORDER);
+        foreach ($attrMatches as $attr) {
+            $attrName = strtolower($attr[1]);
+            $attrValue = $attr[2];
+
+            // Only allow safe attributes for audio tags
+            if (in_array($attrName, ['src', 'preload', 'class', 'style', 'controls', 'muted', 'loop', 'autoplay'])) {
+                $safeAttrs[] = $attrName . '="' . htmlspecialchars($attrValue, ENT_QUOTES, 'UTF-8') . '"';
+            }
+        }
+
+        // Handle boolean attributes like controls, muted, loop, autoplay
+        $booleanAttrs = ['controls', 'muted', 'loop', 'autoplay'];
+        foreach ($booleanAttrs as $boolAttr) {
+            if (stripos($attrs, $boolAttr) !== false && !in_array($boolAttr, array_map(function($a) { return explode('=', $a)[0]; }, $safeAttrs))) {
+                $safeAttrs[] = $boolAttr;
+            }
+        }
+
+        $audioTag = '<audio ' . implode(' ', $safeAttrs) . '></audio>';
+        $protectedElements[$protectedIndex] = $audioTag;
+        $protectedIndex++;
+        return $placeholder;
+    }, $text);
     
     // Now escape HTML to prevent XSS
     $html = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
@@ -305,8 +339,8 @@ function parseMarkdown($text) {
             return $matches[0];
         }, $text);
         
-        // Restore protected elements (images, links, spans, tags, iframes, and videos)
-        $text = preg_replace_callback('/\x00P(IMG|LNK|SPAN|TAG|IFRAME|VIDEO)(\d+)\x00/', function($matches) use ($protectedElements) {
+        // Restore protected elements (images, links, spans, tags, iframes, videos, and audio)
+        $text = preg_replace_callback('/\x00P(IMG|LNK|SPAN|TAG|IFRAME|VIDEO|AUDIO)(\d+)\x00/', function($matches) use ($protectedElements) {
             $index = (int)$matches[2];
             return isset($protectedElements[$index]) ? $protectedElements[$index] : $matches[0];
         }, $text);

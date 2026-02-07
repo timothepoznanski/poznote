@@ -306,6 +306,14 @@ $content = preg_replace_callback('/<video\s+([^>]*)>\s*<\/video>/is', function($
     return $placeholder;
 }, $content);
 
+// Protect audio tags
+$content = preg_replace_callback('/<audio\s+([^>]*)>\s*<\/audio>/is', function($matches) use (&$protectedElements, &$protectedIndex) {
+    $placeholder = "\x00PAUDIO" . $protectedIndex . "\x00";
+    $protectedElements[$protectedIndex] = $matches[0];
+    $protectedIndex++;
+    return $placeholder;
+}, $content);
+
 // Protect iframe tags
 $content = preg_replace_callback('/<iframe\s+([^>]+)>\s*<\/iframe>/is', function($matches) use (&$protectedElements, &$protectedIndex) {
     $placeholder = "\x00PIFRAME" . $protectedIndex . "\x00";
@@ -325,7 +333,7 @@ $content = preg_replace_callback('#<([a-zA-Z0-9]+)([^>]*)>#', function($m) {
 }, $content);
 
 // Restore protected elements
-$content = preg_replace_callback('/\x00P(VIDEO|IFRAME)(\d+)\x00/', function($matches) use ($protectedElements) {
+$content = preg_replace_callback('/\x00P(VIDEO|AUDIO|IFRAME)(\d+)\x00/', function($matches) use ($protectedElements) {
     $index = (int)$matches[2];
     return isset($protectedElements[$index]) ? $protectedElements[$index] : $matches[0];
 }, $content);

@@ -494,6 +494,11 @@
         "mp4_no_note": "No note selected",
         "mp4_invalid_file": "Please select an MP4 video.",
         "mp4_upload_failed": "Upload failed: {{error}}",
+        "audio": "Audio",
+        "audio_uploading": "Uploading audio...",
+        "audio_no_note": "No note selected",
+        "audio_invalid_file": "Please select an audio file.",
+        "audio_upload_failed": "Upload failed: {{error}}",
         "date": "Date"
     },
     "api": {

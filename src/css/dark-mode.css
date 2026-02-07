@@ -451,6 +451,12 @@ body.dark-mode .noteentry a {
     color: #64B5F6 !important;
 }
 
+/* Audio iframe in dark mode */
+html[data-theme='dark'] .noteentry .note-audio-iframe,
+body.dark-mode .noteentry .note-audio-iframe {
+    background: #333333;
+}
+
 /* Toolbar buttons */
 html[data-theme='dark'] .toolbar-btn,
 body.dark-mode .toolbar-btn {

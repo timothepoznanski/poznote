@@ -972,6 +972,11 @@
         "mp4_no_note": "Aucune note sélectionnée",
         "mp4_invalid_file": "Veuillez sélectionner une vidéo MP4.",
         "mp4_upload_failed": "Échec de l'envoi : {{error}}",
+        "audio": "Audio",
+        "audio_uploading": "Envoi de l'audio...",
+        "audio_no_note": "Aucune note sélectionnée",
+        "audio_invalid_file": "Veuillez sélectionner un fichier audio.",
+        "audio_upload_failed": "Échec de l'envoi : {{error}}",
         "date": "Date"
     },
     "api": {

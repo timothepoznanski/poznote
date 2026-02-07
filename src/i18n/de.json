@@ -945,6 +945,11 @@
         "mp4_no_note": "Keine Notiz ausgewählt",
         "mp4_invalid_file": "Bitte wählen Sie ein MP4-Video aus.",
         "mp4_upload_failed": "Upload fehlgeschlagen: {{error}}",
+        "audio": "Audio",
+        "audio_uploading": "Audio wird hochgeladen...",
+        "audio_no_note": "Keine Notiz ausgewählt",
+        "audio_invalid_file": "Bitte wählen Sie eine Audiodatei aus.",
+        "audio_upload_failed": "Upload fehlgeschlagen: {{error}}",
         "date": "Datum"
     },
     "api": {

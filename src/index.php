@@ -429,12 +429,20 @@ $body_classes = trim($extra_body_classes);
                     if ($title_json === false) $title_json = '"Note"';
                     
                     if ($note_type === 'tasklist') {
-                        // For task list notes, use the JSON content from file
-                        $entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
+                        // For task list notes, use the JSON content from file when possible
+                        if (is_readable($filename)) {
+                            $entryfinal = file_get_contents($filename);
+                        } else {
+                            $entryfinal = $row['entry'] ?? '';
+                        }
                         $tasklist_json = htmlspecialchars($entryfinal, ENT_QUOTES);
                     } else {
-                        // For all other notes (including Excalidraw), use the HTML file content
-                        $entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
+                        // For all other notes (including Excalidraw), prefer the HTML file content
+                        if (is_readable($filename)) {
+                            $entryfinal = file_get_contents($filename);
+                        } else {
+                            $entryfinal = $row['entry'] ?? '';
+                        }
                         $tasklist_json = '';
                     }
                
@@ -802,9 +810,9 @@ $body_classes = trim($extra_body_classes);
                         // For all other notes (HTML, Excalidraw), use the file content directly
                         $display_content = $entryfinal;
                         
-                        // Unescape iframe tags if they were HTML-escaped in the content
-                        // This allows iframes to render properly when pasted via API or older versions
-                        $display_content = unescapeIframesInHtml($display_content);
+                        // Unescape media tags if they were HTML-escaped in the content
+                        // This allows iframes, audio, and video to render properly
+                        $display_content = unescapeMediaInHtml($display_content);
                     }
                     
                     // All notes are now editable, including Excalidraw notes

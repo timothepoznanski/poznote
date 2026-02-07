@@ -1131,6 +1131,53 @@ function unescapeIframesInHtml($content) {
 }
 
 /**
+ * Unescape audio/video tags that were saved as escaped HTML
+ * Keeps the escaped tag if the src is not a safe URL
+ */
+function unescapeMediaInHtml($content) {
+    if (empty($content)) {
+        return $content;
+    }
+
+    // Unescape iframes first (keeps existing behavior)
+    $content = unescapeIframesInHtml($content);
+
+    $unescapeMediaTag = function($matches, $tagName) {
+        $escapedAttrs = $matches[1];
+        $attrs = html_entity_decode($escapedAttrs, ENT_QUOTES, 'UTF-8');
+
+        // Strip inline event handlers for safety
+        $attrs = preg_replace('/\s+on[a-zA-Z]+=("[^"]*"|\'[^\']*\'|[^\s>]*)/i', '', $attrs);
+
+        if (preg_match('/src\s*=\s*["\']([^"\']+)["\']/i', $attrs, $srcMatch)) {
+            $src = $srcMatch[1];
+            $isAllowed = preg_match('/^https?:\/\//i', $src)
+                || preg_match('/^\//', $src)
+                || preg_match('/^\.\.\//', $src)
+                || preg_match('/^\.\//', $src);
+
+            if ($isAllowed) {
+                return '<' . $tagName . ' ' . $attrs . '></' . $tagName . '>';
+            }
+        }
+
+        return $matches[0];
+    };
+
+    // Unescape audio tags
+    $content = preg_replace_callback('/&lt;audio\s+([^&]+)&gt;\s*&lt;\/audio&gt;/i', function($matches) use ($unescapeMediaTag) {
+        return $unescapeMediaTag($matches, 'audio');
+    }, $content);
+
+    // Unescape video tags
+    $content = preg_replace_callback('/&lt;video\s+([^&]+)&gt;\s*&lt;\/video&gt;/i', function($matches) use ($unescapeMediaTag) {
+        return $unescapeMediaTag($matches, 'video');
+    }, $content);
+
+    return $content;
+}
+
+/**
  * Resolve folder path to ID, optionally creating missing segments
  * 
  * @param string $workspace The workspace name
@@ -1209,6 +1256,7 @@ function sanitizeHtml($html) {
         'input', 'label', // For task lists
         'iframe', // For YouTube, Vimeo embeds (validated separately)
         'video', // For MP4 embeds
+        'audio', // For audio embeds
         'button', 'i', // For Excalidraw buttons and icons
         'aside', // For callout/quote blocks
         'svg', 'path', 'rect', 'polyline' // For callout icons (SVG)
@@ -1226,8 +1274,9 @@ function sanitizeHtml($html) {
         'time' => ['datetime'],
         'blockquote' => ['cite'],
         'q' => ['cite'],
-        'iframe' => ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'title'],
+        'iframe' => ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'allowtransparency', 'title'],
         'video' => ['src', 'width', 'height', 'preload', 'poster', 'class', 'style', 'controls', 'muted', 'playsinline', 'loop', 'autoplay'],
+        'audio' => ['src', 'preload', 'class', 'style', 'controls', 'muted', 'loop', 'autoplay'],
         'button' => ['class', 'data-action'],
         'svg' => ['viewBox', 'width', 'height', 'aria-hidden', 'fill', 'xmlns', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin'],
         'path' => ['d', 'fill', 'fill-rule', 'clip-rule', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin'],
@@ -1325,7 +1374,7 @@ function sanitizeHtml($html) {
             
             // Special validation for href and src attributes
             if ($attrName === 'href' || $attrName === 'src') {
-                // For iframes, validate that src is from trusted domains
+                // For iframes, validate that src is from trusted domains or local paths
                 if ($tagName === 'iframe' && $attrName === 'src') {
                     $allowedIframeDomains = [
                         'youtube.com',
@@ -1335,10 +1384,17 @@ function sanitizeHtml($html) {
                     ];
                     
                     $isTrustedIframe = false;
-                    foreach ($allowedIframeDomains as $domain) {
-                        if (stripos($attrValue, '//' . $domain) !== false || stripos($attrValue, 'https://' . $domain) !== false) {
-                            $isTrustedIframe = true;
-                            break;
+                    
+                    // Allow local/relative paths (e.g., /audio_player.php)
+                    if (strpos($attrValue, '/') === 0 || strpos($attrValue, './') === 0) {
+                        $isTrustedIframe = true;
+                    } else {
+                        // Check trusted domains
+                        foreach ($allowedIframeDomains as $domain) {
+                            if (stripos($attrValue, '//' . $domain) !== false || stripos($attrValue, 'https://' . $domain) !== false) {
+                                $isTrustedIframe = true;
+                                break;
+                            }
                         }
                     }
                     

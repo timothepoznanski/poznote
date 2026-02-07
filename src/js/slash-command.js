@@ -1429,6 +1429,16 @@
                                 window.insertMp4Video();
                             }
                         }
+                    },
+                    {
+                        id: 'audio-file',
+                        icon: 'fal fa-music',
+                        label: t('slash_menu.audio', null, 'Audio'),
+                        action: function () {
+                            if (typeof window.insertAudioFile === 'function') {
+                                window.insertAudioFile();
+                            }
+                        }
                     }
                 ]
             },
@@ -1744,6 +1754,16 @@
                         action: function () {
                             if (typeof window.insertMp4VideoMarkdown === 'function') {
                                 window.insertMp4VideoMarkdown();
+                            }
+                        }
+                    },
+                    {
+                        id: 'audio-file',
+                        icon: 'fal fa-music',
+                        label: t('slash_menu.audio', null, 'Audio'),
+                        action: function () {
+                            if (typeof window.insertAudioFileMarkdown === 'function') {
+                                window.insertAudioFileMarkdown();
                             }
                         }
                     }
@@ -3166,6 +3186,14 @@
         return type === 'video/mp4' || name.endsWith('.mp4');
     }
 
+    function isAudioFile(file) {
+        if (!file) return false;
+        const name = String(file.name || '').toLowerCase();
+        const type = String(file.type || '').toLowerCase();
+        if (type.startsWith('audio/')) return true;
+        return name.endsWith('.mp3') || name.endsWith('.wav') || name.endsWith('.m4a') || name.endsWith('.ogg') || name.endsWith('.flac');
+    }
+
     function resolveEditorContext(preferredNoteEntry, preferredEditableElement) {
         if (preferredNoteEntry && preferredEditableElement) {
             return { noteEntry: preferredNoteEntry, editableElement: preferredEditableElement };
@@ -3276,7 +3304,7 @@
                             ? '?workspace=' + encodeURIComponent(selectedWorkspace)
                             : '';
                         const fileUrl = '/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id + wsParam;
-                        const videoHtml = '<video class="note-video-embed" width="560" height="315" controls preload="metadata" playsinline src="' + fileUrl + '"></video>';
+                        const videoHtml = '<video class="note-video-embed" contenteditable="false" width="560" height="315" controls preload="metadata" playsinline src="' + fileUrl + '"></video>';
                         console.log('[MP4] Inserting video HTML:', videoHtml);
 
                         if (editableElement) {
@@ -3390,6 +3418,227 @@
         fileInput.click();
     }
 
+    function insertUploadedAudio(isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange) {
+        console.log('[AUDIO] insertUploadedAudio called', { isMarkdown, preferredNoteEntry, preferredEditableElement });
+        const t = window.t || ((key, params, fallback) => fallback);
+        const context = resolveEditorContext(preferredNoteEntry, preferredEditableElement);
+        const noteEntry = context.noteEntry;
+        let editableElement = context.editableElement;
+
+        let noteId = '';
+        if (noteEntry && noteEntry.id) {
+            noteId = noteEntry.id.replace('entry', '');
+        }
+        if (!noteId && typeof window.noteid !== 'undefined' && window.noteid !== null) {
+            noteId = String(window.noteid);
+        }
+
+        console.log('[AUDIO] noteId found:', noteId);
+
+        if (!editableElement && noteEntry) {
+            editableElement = noteEntry.querySelector ? (noteEntry.querySelector('.markdown-editor') || noteEntry.querySelector('[contenteditable="true"]')) : null;
+        }
+
+        if (!noteId) {
+            console.error('[AUDIO] No note ID found!');
+            const msg = t('slash_menu.audio_no_note', null, 'No note selected');
+            if (typeof showNotificationPopup === 'function') {
+                showNotificationPopup(msg, 'error');
+            } else {
+                alert(msg);
+            }
+            return;
+        }
+
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'audio/*';
+        fileInput.style.display = 'none';
+
+        fileInput.addEventListener('change', function () {
+            console.log('[AUDIO] File input change event triggered');
+            try {
+                const file = fileInput.files && fileInput.files[0];
+                console.log('[AUDIO] Selected file:', file);
+                if (!file) {
+                    console.log('[AUDIO] No file selected');
+                    return;
+                }
+
+                if (!isAudioFile(file)) {
+                    console.warn('[AUDIO] Invalid file type:', file.type);
+                    if (typeof showNotificationPopup === 'function') {
+                        showNotificationPopup(t('slash_menu.audio_invalid_file', null, 'Please select an audio file.'), 'error');
+                    } else {
+                        alert(t('slash_menu.audio_invalid_file', null, 'Please select an audio file.'));
+                    }
+                    return;
+                }
+
+                console.log('[AUDIO] Starting upload for note:', noteId);
+
+                // Show upload spinner
+                const uploadMsg = t('slash_menu.audio_uploading', null, 'Uploading audio...');
+                const uploadSpinner = window.modalAlert?.showSpinner(uploadMsg, t('common.please_wait', null, 'Please wait'));
+
+                const formData = new FormData();
+                formData.append('note_id', noteId);
+                formData.append('file', file);
+                if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) {
+                    formData.append('workspace', selectedWorkspace);
+                }
+
+                console.log('[AUDIO] Uploading to /api/v1/notes/' + noteId + '/attachments');
+                fetch('/api/v1/notes/' + noteId + '/attachments', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => {
+                        console.log('[AUDIO] Upload response status:', response.status);
+                        return response.text();
+                    })
+                    .then(text => {
+                        console.log('[AUDIO] Upload response text:', text);
+                        let data;
+                        try {
+                            data = JSON.parse(text);
+                        } catch (e) {
+                            console.error('[AUDIO] Failed to parse response:', e);
+                            throw new Error('Invalid server response');
+                        }
+                        if (!data || !data.success || !data.attachment_id) {
+                            console.error('[AUDIO] Upload failed:', data);
+                            throw new Error((data && data.message) ? data.message : 'Upload failed');
+                        }
+
+                        console.log('[AUDIO] Upload successful, attachment_id:', data.attachment_id);
+
+                        const wsParam = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace)
+                            ? '?workspace=' + encodeURIComponent(selectedWorkspace)
+                            : '';
+                        const attachmentId = data.attachment_id;
+                        // For HTML (contenteditable) mode, use an iframe to render the audio player.
+                        // Chrome does not render native <audio> controls inside contenteditable zones.
+                        // The iframe isolates the audio player in its own browsing context.
+                        const iframeSrc = '/audio_player.php?note=' + encodeURIComponent(noteId) + '&attachment=' + encodeURIComponent(attachmentId) + (wsParam ? '&' + wsParam.substring(1) : '');
+                        const audioHtmlForEditor = '<iframe class="note-audio-iframe" src="' + iframeSrc + '" style="max-width:250px;width:100%;height:54px;border:none;border-radius:8px;display:block;margin:10px 0" allowtransparency="true"></iframe>';
+                        // For markdown mode, use native <audio> tag (preview is not contenteditable)
+                        const fileUrl = '/api/v1/notes/' + noteId + '/attachments/' + attachmentId + wsParam;
+                        const audioHtmlForMarkdown = '<audio class="note-audio-embed" controls preload="metadata" src="' + fileUrl + '"></audio>';
+                        const audioHtml = isMarkdown ? audioHtmlForMarkdown : audioHtmlForEditor;
+                        console.log('[AUDIO] Inserting audio HTML:', audioHtml);
+
+                        if (editableElement) {
+                            editableElement.focus();
+                        }
+
+                        if (savedRange) {
+                            const sel = window.getSelection();
+                            sel.removeAllRanges();
+                            sel.addRange(savedRange);
+                        }
+
+                        if (isMarkdown) {
+                            insertMarkdownAtCursor(audioHtml + '\n\n', 0);
+                            if (editableElement) {
+                                editableElement.dispatchEvent(new Event('input', { bubbles: true }));
+                            }
+                        } else {
+                            try {
+                                const sel = window.getSelection();
+                                let range;
+                                if (savedRange) {
+                                    range = savedRange;
+                                } else if (sel && sel.rangeCount > 0) {
+                                    range = sel.getRangeAt(0);
+                                } else if (editableElement) {
+                                    range = document.createRange();
+                                    range.selectNodeContents(editableElement);
+                                    range.collapse(false);
+                                    sel.removeAllRanges();
+                                    sel.addRange(range);
+                                }
+
+                                if (range) {
+                                    const temp = document.createElement('div');
+                                    temp.innerHTML = audioHtml;
+                                    const audioEl = temp.firstChild;
+
+                                    const fragment = document.createDocumentFragment();
+                                    const lineBefore = document.createElement('div');
+                                    lineBefore.innerHTML = '<br>';
+                                    fragment.appendChild(lineBefore);
+                                    fragment.appendChild(audioEl);
+                                    const lineAfter = document.createElement('div');
+                                    lineAfter.innerHTML = '<br>';
+                                    fragment.appendChild(lineAfter);
+
+                                    range.deleteContents();
+                                    range.insertNode(fragment);
+                                    range.collapse(false);
+                                    sel.removeAllRanges();
+                                    sel.addRange(range);
+                                }
+                            } catch (e) {
+                                console.error('Error inserting audio:', e);
+                            }
+                        }
+
+                        if (noteEntry) {
+                            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+                        }
+
+                        if (typeof window.markNoteAsModified === 'function') {
+                            window.markNoteAsModified();
+                        }
+
+                        if (typeof window.saveNoteImmediately === 'function') {
+                            window.saveNoteImmediately();
+                        }
+                        console.log('[AUDIO] Audio insertion complete');
+
+                        // Close upload spinner
+                        if (uploadSpinner?.close) {
+                            uploadSpinner.close();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('[AUDIO] Upload error:', error);
+
+                        // Close upload spinner
+                        if (uploadSpinner?.close) {
+                            uploadSpinner.close();
+                        }
+
+                        const msg = t('slash_menu.audio_upload_failed', { error: error.message }, 'Upload failed: {{error}}');
+                        if (typeof showNotificationPopup === 'function') {
+                            showNotificationPopup(msg, 'error');
+                        } else {
+                            alert(msg);
+                        }
+                    });
+            } catch (e) {
+                console.error('[AUDIO] Exception in change handler:', e);
+            } finally {
+                if (fileInput.parentNode) {
+                    document.body.removeChild(fileInput);
+                }
+            }
+        });
+
+        // Cleanup if user cancels the file selection
+        fileInput.addEventListener('cancel', function() {
+            console.log('[AUDIO] File selection cancelled');
+            if (fileInput.parentNode) {
+                document.body.removeChild(fileInput);
+            }
+        });
+
+        document.body.appendChild(fileInput);
+        console.log('[AUDIO] Triggering file picker');
+        fileInput.click();
+    }
+
     window.insertMp4Video = function () {
         console.log('[MP4] insertMp4Video called (HTML mode)');
         const noteEntry = savedNoteEntry;
@@ -3400,6 +3649,18 @@
             savedRange = sel.getRangeAt(0).cloneRange();
         }
         insertUploadedMp4(false, noteEntry, editableElement, savedRange);
+    };
+
+    window.insertAudioFile = function () {
+        console.log('[AUDIO] insertAudioFile called (HTML mode)');
+        const noteEntry = savedNoteEntry;
+        const editableElement = savedEditableElement;
+        let savedRange = null;
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+            savedRange = sel.getRangeAt(0).cloneRange();
+        }
+        insertUploadedAudio(false, noteEntry, editableElement, savedRange);
     };
 
     window.insertYouTubeVideoMarkdown = function () {
@@ -3438,6 +3699,18 @@
             savedRange = sel.getRangeAt(0).cloneRange();
         }
         insertUploadedMp4(true, noteEntry, editableElement, savedRange);
+    };
+
+    window.insertAudioFileMarkdown = function () {
+        console.log('[AUDIO] insertAudioFileMarkdown called (Markdown mode)');
+        const noteEntry = savedNoteEntry;
+        const editableElement = savedEditableElement;
+        let savedRange = null;
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+            savedRange = sel.getRangeAt(0).cloneRange();
+        }
+        insertUploadedAudio(true, noteEntry, editableElement, savedRange);
     };
 
     // Helper function to process YouTube URL and insert iframe
