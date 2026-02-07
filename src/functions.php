@@ -1208,7 +1208,9 @@ function sanitizeHtml($html) {
         'abbr', 'cite', 'q', 'time',
         'input', 'label', // For task lists
         'iframe', // For YouTube, Vimeo embeds (validated separately)
-        'button', 'i' // For Excalidraw buttons and icons
+        'button', 'i', // For Excalidraw buttons and icons
+        'aside', // For callout/quote blocks
+        'svg', 'path' // For callout icons (SVG)
     ];
     
     // Allowed attributes per tag
@@ -1224,7 +1226,9 @@ function sanitizeHtml($html) {
         'blockquote' => ['cite'],
         'q' => ['cite'],
         'iframe' => ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'title'],
-        'button' => ['class', 'data-action']
+        'button' => ['class', 'data-action'],
+        'svg' => ['viewBox', 'width', 'height', 'aria-hidden', 'fill', 'xmlns'],
+        'path' => ['d', 'fill', 'fill-rule', 'clip-rule']
     ];
     
     // Global allowed attributes (safe for all tags)
@@ -1393,4 +1397,44 @@ function sanitizeHtml($html) {
     libxml_clear_errors();
     
     return $sanitized;
+}
+
+/**
+ * Sanitize Markdown content to prevent XSS attacks
+ * 
+ * Unlike sanitizeHtml(), this function works on raw Markdown text without
+ * using DOMDocument, which would mangle Markdown syntax characters like >.
+ * It removes dangerous HTML patterns that could be embedded in Markdown
+ * while preserving all Markdown syntax.
+ * 
+ * @param string $markdown The raw Markdown content to sanitize
+ * @return string The sanitized Markdown content
+ */
+function sanitizeMarkdownContent($markdown) {
+    if (empty($markdown)) {
+        return $markdown;
+    }
+
+    // Remove <script> tags and their content
+    $markdown = preg_replace('/<script\b[^>]*>.*?<\/script>/is', '', $markdown);
+
+    // Remove <style> tags and their content
+    $markdown = preg_replace('/<style\b[^>]*>.*?<\/style>/is', '', $markdown);
+
+    // Remove <object>, <embed>, <applet> tags and their content
+    $markdown = preg_replace('/<(object|embed|applet)\b[^>]*>.*?<\/\1>/is', '', $markdown);
+    $markdown = preg_replace('/<(object|embed|applet)\b[^>]*\/?>/is', '', $markdown);
+
+    // Remove <form> tags and their content
+    $markdown = preg_replace('/<form\b[^>]*>.*?<\/form>/is', '', $markdown);
+
+    // Remove on* event handlers from any HTML tags embedded in markdown
+    $markdown = preg_replace('/(<[^>]*)\s+on\w+\s*=\s*(["\']).*?\2/is', '$1', $markdown);
+    $markdown = preg_replace('/(<[^>]*)\s+on\w+\s*=\s*[^\s>]*/is', '$1', $markdown);
+
+    // Remove javascript: and vbscript: protocols from href/src attributes
+    $markdown = preg_replace('/(href|src)\s*=\s*(["\'])\s*javascript:/is', '$1=$2', $markdown);
+    $markdown = preg_replace('/(href|src)\s*=\s*(["\'])\s*vbscript:/is', '$1=$2', $markdown);
+
+    return $markdown;
 }
