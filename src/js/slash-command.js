@@ -3206,7 +3206,6 @@
     }
 
     function insertUploadedMp4(isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange) {
-        console.log('[MP4] insertUploadedMp4 called', { isMarkdown, preferredNoteEntry, preferredEditableElement });
         const t = window.t || ((key, params, fallback) => fallback);
         const context = resolveEditorContext(preferredNoteEntry, preferredEditableElement);
         const noteEntry = context.noteEntry;
@@ -3219,8 +3218,6 @@
         if (!noteId && typeof window.noteid !== 'undefined' && window.noteid !== null) {
             noteId = String(window.noteid);
         }
-
-        console.log('[MP4] noteId found:', noteId);
 
         if (!editableElement && noteEntry) {
             editableElement = noteEntry.querySelector ? (noteEntry.querySelector('.markdown-editor') || noteEntry.querySelector('[contenteditable="true"]')) : null;
@@ -3243,12 +3240,9 @@
         fileInput.style.display = 'none';
 
         fileInput.addEventListener('change', function () {
-            console.log('[MP4] File input change event triggered');
             try {
                 const file = fileInput.files && fileInput.files[0];
-                console.log('[MP4] Selected file:', file);
                 if (!file) {
-                    console.log('[MP4] No file selected');
                     return;
                 }
 
@@ -3262,8 +3256,6 @@
                     return;
                 }
 
-                console.log('[MP4] Starting upload for note:', noteId);
-                
                 // Show upload spinner
                 const uploadMsg = t('slash_menu.mp4_uploading', null, 'Uploading video...');
                 const uploadSpinner = window.modalAlert?.showSpinner(uploadMsg, t('common.please_wait', null, 'Please wait'));
@@ -3275,17 +3267,14 @@
                     formData.append('workspace', selectedWorkspace);
                 }
 
-                console.log('[MP4] Uploading to /api/v1/notes/' + noteId + '/attachments');
                 fetch('/api/v1/notes/' + noteId + '/attachments', {
                     method: 'POST',
                     body: formData
                 })
                     .then(response => {
-                        console.log('[MP4] Upload response status:', response.status);
                         return response.text();
                     })
                     .then(text => {
-                        console.log('[MP4] Upload response text:', text);
                         let data;
                         try {
                             data = JSON.parse(text);
@@ -3298,14 +3287,11 @@
                             throw new Error((data && data.message) ? data.message : 'Upload failed');
                         }
 
-                        console.log('[MP4] Upload successful, attachment_id:', data.attachment_id);
-                        
                         const wsParam = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace)
                             ? '?workspace=' + encodeURIComponent(selectedWorkspace)
                             : '';
                         const fileUrl = '/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id + wsParam;
                         const videoHtml = '<video class="note-video-embed" contenteditable="false" width="560" height="315" controls preload="metadata" playsinline src="' + fileUrl + '"></video>';
-                        console.log('[MP4] Inserting video HTML:', videoHtml);
 
                         if (editableElement) {
                             editableElement.focus();
@@ -3374,7 +3360,6 @@
                         if (typeof window.saveNoteImmediately === 'function') {
                             window.saveNoteImmediately();
                         }
-                        console.log('[MP4] Video insertion complete');
                         
                         // Close upload spinner
                         if (uploadSpinner?.close) {
@@ -3407,19 +3392,16 @@
 
         // Cleanup if user cancels the file selection
         fileInput.addEventListener('cancel', function() {
-            console.log('[MP4] File selection cancelled');
             if (fileInput.parentNode) {
                 document.body.removeChild(fileInput);
             }
         });
 
         document.body.appendChild(fileInput);
-        console.log('[MP4] Triggering file picker');
         fileInput.click();
     }
 
     function insertUploadedAudio(isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange) {
-        console.log('[AUDIO] insertUploadedAudio called', { isMarkdown, preferredNoteEntry, preferredEditableElement });
         const t = window.t || ((key, params, fallback) => fallback);
         const context = resolveEditorContext(preferredNoteEntry, preferredEditableElement);
         const noteEntry = context.noteEntry;
@@ -3432,8 +3414,6 @@
         if (!noteId && typeof window.noteid !== 'undefined' && window.noteid !== null) {
             noteId = String(window.noteid);
         }
-
-        console.log('[AUDIO] noteId found:', noteId);
 
         if (!editableElement && noteEntry) {
             editableElement = noteEntry.querySelector ? (noteEntry.querySelector('.markdown-editor') || noteEntry.querySelector('[contenteditable="true"]')) : null;
@@ -3456,12 +3436,9 @@
         fileInput.style.display = 'none';
 
         fileInput.addEventListener('change', function () {
-            console.log('[AUDIO] File input change event triggered');
             try {
                 const file = fileInput.files && fileInput.files[0];
-                console.log('[AUDIO] Selected file:', file);
                 if (!file) {
-                    console.log('[AUDIO] No file selected');
                     return;
                 }
 
@@ -3475,8 +3452,6 @@
                     return;
                 }
 
-                console.log('[AUDIO] Starting upload for note:', noteId);
-
                 // Show upload spinner
                 const uploadMsg = t('slash_menu.audio_uploading', null, 'Uploading audio...');
                 const uploadSpinner = window.modalAlert?.showSpinner(uploadMsg, t('common.please_wait', null, 'Please wait'));
@@ -3488,17 +3463,14 @@
                     formData.append('workspace', selectedWorkspace);
                 }
 
-                console.log('[AUDIO] Uploading to /api/v1/notes/' + noteId + '/attachments');
                 fetch('/api/v1/notes/' + noteId + '/attachments', {
                     method: 'POST',
                     body: formData
                 })
                     .then(response => {
-                        console.log('[AUDIO] Upload response status:', response.status);
                         return response.text();
                     })
                     .then(text => {
-                        console.log('[AUDIO] Upload response text:', text);
                         let data;
                         try {
                             data = JSON.parse(text);
@@ -3510,8 +3482,6 @@
                             console.error('[AUDIO] Upload failed:', data);
                             throw new Error((data && data.message) ? data.message : 'Upload failed');
                         }
-
-                        console.log('[AUDIO] Upload successful, attachment_id:', data.attachment_id);
 
                         const wsParam = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace)
                             ? '?workspace=' + encodeURIComponent(selectedWorkspace)
@@ -3526,7 +3496,6 @@
                         const fileUrl = '/api/v1/notes/' + noteId + '/attachments/' + attachmentId + wsParam;
                         const audioHtmlForMarkdown = '<audio class="note-audio-embed" controls preload="metadata" src="' + fileUrl + '"></audio>';
                         const audioHtml = isMarkdown ? audioHtmlForMarkdown : audioHtmlForEditor;
-                        console.log('[AUDIO] Inserting audio HTML:', audioHtml);
 
                         if (editableElement) {
                             editableElement.focus();
@@ -3595,7 +3564,6 @@
                         if (typeof window.saveNoteImmediately === 'function') {
                             window.saveNoteImmediately();
                         }
-                        console.log('[AUDIO] Audio insertion complete');
 
                         // Close upload spinner
                         if (uploadSpinner?.close) {
@@ -3628,19 +3596,16 @@
 
         // Cleanup if user cancels the file selection
         fileInput.addEventListener('cancel', function() {
-            console.log('[AUDIO] File selection cancelled');
             if (fileInput.parentNode) {
                 document.body.removeChild(fileInput);
             }
         });
 
         document.body.appendChild(fileInput);
-        console.log('[AUDIO] Triggering file picker');
         fileInput.click();
     }
 
     window.insertMp4Video = function () {
-        console.log('[MP4] insertMp4Video called (HTML mode)');
         const noteEntry = savedNoteEntry;
         const editableElement = savedEditableElement;
         let savedRange = null;
@@ -3652,7 +3617,6 @@
     };
 
     window.insertAudioFile = function () {
-        console.log('[AUDIO] insertAudioFile called (HTML mode)');
         const noteEntry = savedNoteEntry;
         const editableElement = savedEditableElement;
         let savedRange = null;
@@ -3690,7 +3654,6 @@
     };
 
     window.insertMp4VideoMarkdown = function () {
-        console.log('[MP4] insertMp4VideoMarkdown called (Markdown mode)');
         const noteEntry = savedNoteEntry;
         const editableElement = savedEditableElement;
         let savedRange = null;
@@ -3702,7 +3665,6 @@
     };
 
     window.insertAudioFileMarkdown = function () {
-        console.log('[AUDIO] insertAudioFileMarkdown called (Markdown mode)');
         const noteEntry = savedNoteEntry;
         const editableElement = savedEditableElement;
         let savedRange = null;
