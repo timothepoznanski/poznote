@@ -173,6 +173,15 @@
     border: none;
 }
 
+.markdown-preview video {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1em 0;
+    background: #000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
 .markdown-preview hr {
     border: 0;
     border-top: 2px solid #e0e0e0;

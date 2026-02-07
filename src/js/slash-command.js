@@ -1419,6 +1419,16 @@
                                 window.insertYouTubeVideo();
                             }
                         }
+                    },
+                    {
+                        id: 'mp4-video',
+                        icon: 'fal fa-video',
+                        label: t('slash_menu.mp4_video', null, 'MP4 video'),
+                        action: function () {
+                            if (typeof window.insertMp4Video === 'function') {
+                                window.insertMp4Video();
+                            }
+                        }
                     }
                 ]
             },
@@ -1724,6 +1734,16 @@
                         action: function () {
                             if (typeof window.insertYouTubeVideoMarkdown === 'function') {
                                 window.insertYouTubeVideoMarkdown();
+                            }
+                        }
+                    },
+                    {
+                        id: 'mp4-video',
+                        icon: 'fal fa-video',
+                        label: t('slash_menu.mp4_video', null, 'MP4 video'),
+                        action: function () {
+                            if (typeof window.insertMp4VideoMarkdown === 'function') {
+                                window.insertMp4VideoMarkdown();
                             }
                         }
                     }
@@ -3139,6 +3159,249 @@
         });
     };
 
+    function isMp4File(file) {
+        if (!file) return false;
+        const name = String(file.name || '').toLowerCase();
+        const type = String(file.type || '').toLowerCase();
+        return type === 'video/mp4' || name.endsWith('.mp4');
+    }
+
+    function resolveEditorContext(preferredNoteEntry, preferredEditableElement) {
+        if (preferredNoteEntry && preferredEditableElement) {
+            return { noteEntry: preferredNoteEntry, editableElement: preferredEditableElement };
+        }
+        const ctx = (typeof getEditorContext === 'function') ? getEditorContext() : null;
+        return {
+            noteEntry: preferredNoteEntry || (ctx ? ctx.noteEntry : null),
+            editableElement: preferredEditableElement || (ctx ? ctx.editableElement : null)
+        };
+    }
+
+    function insertUploadedMp4(isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange) {
+        console.log('[MP4] insertUploadedMp4 called', { isMarkdown, preferredNoteEntry, preferredEditableElement });
+        const t = window.t || ((key, params, fallback) => fallback);
+        const context = resolveEditorContext(preferredNoteEntry, preferredEditableElement);
+        const noteEntry = context.noteEntry;
+        let editableElement = context.editableElement;
+
+        let noteId = '';
+        if (noteEntry && noteEntry.id) {
+            noteId = noteEntry.id.replace('entry', '');
+        }
+        if (!noteId && typeof window.noteid !== 'undefined' && window.noteid !== null) {
+            noteId = String(window.noteid);
+        }
+
+        console.log('[MP4] noteId found:', noteId);
+
+        if (!editableElement && noteEntry) {
+            editableElement = noteEntry.querySelector ? (noteEntry.querySelector('.markdown-editor') || noteEntry.querySelector('[contenteditable="true"]')) : null;
+        }
+
+        if (!noteId) {
+            console.error('[MP4] No note ID found!');
+            const msg = t('slash_menu.mp4_no_note', null, 'No note selected');
+            if (typeof showNotificationPopup === 'function') {
+                showNotificationPopup(msg, 'error');
+            } else {
+                alert(msg);
+            }
+            return;
+        }
+
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'video/mp4';
+        fileInput.style.display = 'none';
+
+        fileInput.addEventListener('change', function () {
+            console.log('[MP4] File input change event triggered');
+            try {
+                const file = fileInput.files && fileInput.files[0];
+                console.log('[MP4] Selected file:', file);
+                if (!file) {
+                    console.log('[MP4] No file selected');
+                    return;
+                }
+
+                if (!isMp4File(file)) {
+                    console.warn('[MP4] Invalid file type:', file.type);
+                    if (typeof showNotificationPopup === 'function') {
+                        showNotificationPopup(t('slash_menu.mp4_invalid_file', null, 'Please select an MP4 video.'), 'error');
+                    } else {
+                        alert(t('slash_menu.mp4_invalid_file', null, 'Please select an MP4 video.'));
+                    }
+                    return;
+                }
+
+                console.log('[MP4] Starting upload for note:', noteId);
+                
+                // Show upload spinner
+                const uploadMsg = t('slash_menu.mp4_uploading', null, 'Uploading video...');
+                const uploadSpinner = window.modalAlert?.showSpinner(uploadMsg, t('common.please_wait', null, 'Please wait'));
+                
+                const formData = new FormData();
+                formData.append('note_id', noteId);
+                formData.append('file', file);
+                if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) {
+                    formData.append('workspace', selectedWorkspace);
+                }
+
+                console.log('[MP4] Uploading to /api/v1/notes/' + noteId + '/attachments');
+                fetch('/api/v1/notes/' + noteId + '/attachments', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => {
+                        console.log('[MP4] Upload response status:', response.status);
+                        return response.text();
+                    })
+                    .then(text => {
+                        console.log('[MP4] Upload response text:', text);
+                        let data;
+                        try {
+                            data = JSON.parse(text);
+                        } catch (e) {
+                            console.error('[MP4] Failed to parse response:', e);
+                            throw new Error('Invalid server response');
+                        }
+                        if (!data || !data.success || !data.attachment_id) {
+                            console.error('[MP4] Upload failed:', data);
+                            throw new Error((data && data.message) ? data.message : 'Upload failed');
+                        }
+
+                        console.log('[MP4] Upload successful, attachment_id:', data.attachment_id);
+                        
+                        const wsParam = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace)
+                            ? '?workspace=' + encodeURIComponent(selectedWorkspace)
+                            : '';
+                        const fileUrl = '/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id + wsParam;
+                        const videoHtml = '<video class="note-video-embed" width="560" height="315" controls preload="metadata" playsinline src="' + fileUrl + '"></video>';
+                        console.log('[MP4] Inserting video HTML:', videoHtml);
+
+                        if (editableElement) {
+                            editableElement.focus();
+                        }
+
+                        if (savedRange) {
+                            const sel = window.getSelection();
+                            sel.removeAllRanges();
+                            sel.addRange(savedRange);
+                        }
+
+                        if (isMarkdown) {
+                            insertMarkdownAtCursor(videoHtml + '\n\n', 0);
+                            if (editableElement) {
+                                editableElement.dispatchEvent(new Event('input', { bubbles: true }));
+                            }
+                        } else {
+                            try {
+                                const sel = window.getSelection();
+                                let range;
+                                if (savedRange) {
+                                    range = savedRange;
+                                } else if (sel && sel.rangeCount > 0) {
+                                    range = sel.getRangeAt(0);
+                                } else if (editableElement) {
+                                    range = document.createRange();
+                                    range.selectNodeContents(editableElement);
+                                    range.collapse(false);
+                                    sel.removeAllRanges();
+                                    sel.addRange(range);
+                                }
+
+                                if (range) {
+                                    const temp = document.createElement('div');
+                                    temp.innerHTML = videoHtml;
+                                    const videoEl = temp.firstChild;
+
+                                    const fragment = document.createDocumentFragment();
+                                    const lineBefore = document.createElement('div');
+                                    lineBefore.innerHTML = '<br>';
+                                    fragment.appendChild(lineBefore);
+                                    fragment.appendChild(videoEl);
+                                    const lineAfter = document.createElement('div');
+                                    lineAfter.innerHTML = '<br>';
+                                    fragment.appendChild(lineAfter);
+
+                                    range.deleteContents();
+                                    range.insertNode(fragment);
+                                    range.collapse(false);
+                                    sel.removeAllRanges();
+                                    sel.addRange(range);
+                                }
+                            } catch (e) {
+                                console.error('Error inserting MP4 video:', e);
+                            }
+                        }
+
+                        if (noteEntry) {
+                            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+                        }
+
+                        if (typeof window.markNoteAsModified === 'function') {
+                            window.markNoteAsModified();
+                        }
+
+                        if (typeof window.saveNoteImmediately === 'function') {
+                            window.saveNoteImmediately();
+                        }
+                        console.log('[MP4] Video insertion complete');
+                        
+                        // Close upload spinner
+                        if (uploadSpinner?.close) {
+                            uploadSpinner.close();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('[MP4] Upload error:', error);
+                        
+                        // Close upload spinner
+                        if (uploadSpinner?.close) {
+                            uploadSpinner.close();
+                        }
+                        
+                        const msg = t('slash_menu.mp4_upload_failed', { error: error.message }, 'Upload failed: {{error}}');
+                        if (typeof showNotificationPopup === 'function') {
+                            showNotificationPopup(msg, 'error');
+                        } else {
+                            alert(msg);
+                        }
+                    });
+            } catch (e) {
+                console.error('[MP4] Exception in change handler:', e);
+            } finally {
+                if (fileInput.parentNode) {
+                    document.body.removeChild(fileInput);
+                }
+            }
+        });
+
+        // Cleanup if user cancels the file selection
+        fileInput.addEventListener('cancel', function() {
+            console.log('[MP4] File selection cancelled');
+            if (fileInput.parentNode) {
+                document.body.removeChild(fileInput);
+            }
+        });
+
+        document.body.appendChild(fileInput);
+        console.log('[MP4] Triggering file picker');
+        fileInput.click();
+    }
+
+    window.insertMp4Video = function () {
+        console.log('[MP4] insertMp4Video called (HTML mode)');
+        const noteEntry = savedNoteEntry;
+        const editableElement = savedEditableElement;
+        let savedRange = null;
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+            savedRange = sel.getRangeAt(0).cloneRange();
+        }
+        insertUploadedMp4(false, noteEntry, editableElement, savedRange);
+    };
+
     window.insertYouTubeVideoMarkdown = function () {
         const t = window.t || ((key, params, fallback) => fallback);
 
@@ -3163,6 +3426,18 @@
         window.showYouTubeModal(function (url) {
             processYouTubeUrl(url, true, editableElement, savedRange, noteEntry);
         });
+    };
+
+    window.insertMp4VideoMarkdown = function () {
+        console.log('[MP4] insertMp4VideoMarkdown called (Markdown mode)');
+        const noteEntry = savedNoteEntry;
+        const editableElement = savedEditableElement;
+        let savedRange = null;
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+            savedRange = sel.getRangeAt(0).cloneRange();
+        }
+        insertUploadedMp4(true, noteEntry, editableElement, savedRange);
     };
 
     // Helper function to process YouTube URL and insert iframe

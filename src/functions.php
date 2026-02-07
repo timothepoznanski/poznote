@@ -1208,6 +1208,7 @@ function sanitizeHtml($html) {
         'abbr', 'cite', 'q', 'time',
         'input', 'label', // For task lists
         'iframe', // For YouTube, Vimeo embeds (validated separately)
+        'video', // For MP4 embeds
         'button', 'i', // For Excalidraw buttons and icons
         'aside', // For callout/quote blocks
         'svg', 'path', 'rect', 'polyline' // For callout icons (SVG)
@@ -1226,6 +1227,7 @@ function sanitizeHtml($html) {
         'blockquote' => ['cite'],
         'q' => ['cite'],
         'iframe' => ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'title'],
+        'video' => ['src', 'width', 'height', 'preload', 'poster', 'class', 'style', 'controls', 'muted', 'playsinline', 'loop', 'autoplay'],
         'button' => ['class', 'data-action'],
         'svg' => ['viewBox', 'width', 'height', 'aria-hidden', 'fill', 'xmlns', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin'],
         'path' => ['d', 'fill', 'fill-rule', 'clip-rule', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin'],

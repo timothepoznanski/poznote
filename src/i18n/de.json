@@ -939,6 +939,12 @@
         "youtube_help": "Unterstützt: youtube.com/watch?v=ID, youtu.be/ID oder nur die Video-ID",
         "youtube_insert": "Einfügen",
         "youtube_invalid_url": "Ungültige YouTube-URL",
+        "mp4_video": "MP4-Video",
+        "mp4_uploading": "Video wird hochgeladen...",
+        "mp4_upload_success": "Video erfolgreich hochgeladen!",
+        "mp4_no_note": "Keine Notiz ausgewählt",
+        "mp4_invalid_file": "Bitte wählen Sie ein MP4-Video aus.",
+        "mp4_upload_failed": "Upload fehlgeschlagen: {{error}}",
         "date": "Datum"
     },
     "api": {

@@ -260,6 +260,7 @@ if (isset($note['type']) && $note['type'] === 'markdown') {
     // The content is raw markdown, we need to convert it to HTML
     $content = parseMarkdown($content);
 }
+
 $baseUrl = '//' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
 // If the app is in a subdirectory, ensure the base includes the script dir
 $scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
@@ -281,6 +282,38 @@ $content = preg_replace_callback('#(src|href)=(["\']?)(/?data/(?:users/\d+/)?att
     return $attr . '=' . $quote . $url . $quote;
 }, $content);
 
+// Also handle API attachment URLs (used by videos and images inserted via slash menu)
+// Convert relative API URLs to absolute URLs
+$content = preg_replace_callback('#(src|href)=(["\']?)(/?api/v1/notes/\d+/attachments/[^"\'\s>]+)(["\']?)#i', function($m) use ($baseUrl) {
+    $attr = $m[1];
+    $quote = $m[2] ?: '';
+    $apiPath = $m[3];
+    
+    // Ensure no duplicate slashes
+    $url = rtrim($baseUrl, '/') . '/' . ltrim($apiPath, '/');
+    return $attr . '=' . $quote . $url . $quote;
+}, $content);
+
+// Protect video and iframe tags before sanitization (especially important for HTML notes)
+$protectedElements = [];
+$protectedIndex = 0;
+
+// Protect video tags
+$content = preg_replace_callback('/<video\s+([^>]*)>\s*<\/video>/is', function($matches) use (&$protectedElements, &$protectedIndex) {
+    $placeholder = "\x00PVIDEO" . $protectedIndex . "\x00";
+    $protectedElements[$protectedIndex] = $matches[0];
+    $protectedIndex++;
+    return $placeholder;
+}, $content);
+
+// Protect iframe tags
+$content = preg_replace_callback('/<iframe\s+([^>]+)>\s*<\/iframe>/is', function($matches) use (&$protectedElements, &$protectedIndex) {
+    $placeholder = "\x00PIFRAME" . $protectedIndex . "\x00";
+    $protectedElements[$protectedIndex] = $matches[0];
+    $protectedIndex++;
+    return $placeholder;
+}, $content);
+
 // Light sanitization: remove <script>...</script> blocks and inline event handlers (on*) to reduce XSS risk
 $content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $content);
 $content = preg_replace_callback('#<([a-zA-Z0-9]+)([^>]*)>#', function($m) {
@@ -289,6 +322,12 @@ $content = preg_replace_callback('#<([a-zA-Z0-9]+)([^>]*)>#', function($m) {
     // Remove any on* attributes
     $cleanAttrs = preg_replace('/\s+on[a-zA-Z]+=(["\"][^"\\]*["\\"]|[^\s>]*)/i', '', $attrs);
     return '<' . $tag . $cleanAttrs . '>';
+}, $content);
+
+// Restore protected elements
+$content = preg_replace_callback('/\x00P(VIDEO|IFRAME)(\d+)\x00/', function($matches) use ($protectedElements) {
+    $index = (int)$matches[2];
+    return isset($protectedElements[$index]) ? $protectedElements[$index] : $matches[0];
 }, $content);
 
 ?>

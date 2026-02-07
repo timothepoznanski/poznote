@@ -94,6 +94,7 @@
             
             var isImage = file.type.startsWith('image/');
             var isPDF = file.type === 'application/pdf';
+            var isVideo = file.type.startsWith('video/') || /\.mp4$/i.test(fileName);
             
             var htmlContent = '<div class="selected-file-info"><span>' + fileName + ' (' + fileSize + ')</span></div>';
             
@@ -111,6 +112,16 @@
                     fileNameDiv.innerHTML = htmlContent;
                 };
                 reader.readAsDataURL(file);
+            } else if (isVideo) {
+                var videoUrl = URL.createObjectURL(file);
+                htmlContent += '<div class="video-preview"><video src="' + videoUrl + '" controls muted playsinline preload="metadata" width="200" height="150" style="border-radius: 4px; margin-top: 10px;"></video></div>';
+                fileNameDiv.innerHTML = htmlContent;
+                var videoEl = fileNameDiv.querySelector('video');
+                if (videoEl) {
+                    videoEl.onloadeddata = function() {
+                        URL.revokeObjectURL(videoUrl);
+                    };
+                }
             } else {
                 fileNameDiv.innerHTML = htmlContent;
             }
@@ -249,6 +260,10 @@
             
             var isImage = attachment.file_type && attachment.file_type.startsWith('image/');
             var isPDF = attachment.file_type && attachment.file_type === 'application/pdf';
+            var isVideo = attachment.file_type && attachment.file_type.startsWith('video/');
+            if (!isVideo && attachment.original_filename) {
+                isVideo = /\.mp4$/i.test(attachment.original_filename);
+            }
             var fileUrl = '/api/v1/notes/' + noteId + '/attachments/' + attachment.id;
             if (noteWorkspace) {
                 fileUrl += '?workspace=' + encodeURIComponent(noteWorkspace);
@@ -261,6 +276,11 @@
                 previewContent = '<div class="pdf-thumbnail" onclick="previewPDF(\'' + fileUrl + '\', \'' + fileName.replace(/'/g, "\\'") + '\')">' +
                     '<iframe src="' + fileUrl + '" width="60" height="60" frameborder="0" style="pointer-events: none; transform: scale(0.8); transform-origin: top left;"></iframe>' +
                     '<div class="pdf-overlay"><span>' + TXT.pdfLabel + '</span></div>' +
+                    '</div>';
+            } else if (isVideo) {
+                previewContent = '<div class="video-thumbnail" onclick="downloadAttachment(\'' + attachment.id + '\')">' +
+                    '<video src="' + fileUrl + '#t=0.1" muted playsinline preload="metadata"></video>' +
+                    '<div class="video-overlay"><i class="fa fa-play"></i></div>' +
                     '</div>';
             }
             

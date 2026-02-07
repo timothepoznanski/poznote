@@ -936,6 +936,12 @@
         "youtube_help": "支持：youtube.com/watch?v=ID、youtu.be/ID 或直接输入视频 ID",
         "youtube_insert": "插入",
         "youtube_invalid_url": "YouTube 链接无效",
+        "mp4_video": "MP4 视频",
+        "mp4_uploading": "正在上传视频...",
+        "mp4_upload_success": "视频上传成功！",
+        "mp4_no_note": "未选择笔记",
+        "mp4_invalid_file": "请选择 MP4 视频。",
+        "mp4_upload_failed": "上传失败：{{error}}",
         "date": "日期"
     },
     "api": {

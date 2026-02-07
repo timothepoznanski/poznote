@@ -2994,6 +2994,21 @@ textarea:focus {
     border: none;
 }
 
+/* Video embeds from attachments */
+.noteentry video,
+.noteentry .note-video-embed {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    background: #000;
+}
+
+.noteentry video {
+    display: block;
+    margin: 10px 0;
+}
+
 /* Apply Inter to text elements, except in code blocks and monospace elements */
 .noteentry p:not([style*='Consolas']):not([style*='Monaco']):not([style*='Courier']):not([style*='monospace']):not([style*='Segoe UI Mono']),
 .noteentry div:not([style*='Consolas']):not([style*='Monaco']):not([style*='Courier']):not([style*='monospace']):not([style*='Segoe UI Mono']),

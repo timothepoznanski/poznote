@@ -966,6 +966,12 @@
         "youtube_help": "Formats supportés : youtube.com/watch?v=ID, youtu.be/ID, ou juste l'ID",
         "youtube_insert": "Insérer",
         "youtube_invalid_url": "URL YouTube invalide",
+        "mp4_video": "Vidéo MP4",
+        "mp4_uploading": "Envoi de la vidéo...",
+        "mp4_upload_success": "Vidéo envoyée avec succès !",
+        "mp4_no_note": "Aucune note sélectionnée",
+        "mp4_invalid_file": "Veuillez sélectionner une vidéo MP4.",
+        "mp4_upload_failed": "Échec de l'envoi : {{error}}",
         "date": "Date"
     },
     "api": {

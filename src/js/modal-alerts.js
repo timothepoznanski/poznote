@@ -164,10 +164,15 @@ class ModalAlert {
         
         const title = document.createElement('h3');
         title.className = 'alert-modal-title';
-        title.innerHTML = `
-            <span class="alert-modal-icon ${config.alertType}">${this.getIcon(config.alertType)}</span>
-            ${config.title}
-        `;
+        // Don't show icon for info type
+        if (config.alertType === 'info') {
+            title.textContent = config.title;
+        } else {
+            title.innerHTML = `
+                <span class="alert-modal-icon ${config.alertType}">${this.getIcon(config.alertType)}</span>
+                ${config.title}
+            `;
+        }
         
         const body = document.createElement('div');
         body.className = 'alert-modal-body';
