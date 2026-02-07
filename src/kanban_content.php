@@ -34,10 +34,6 @@ try {
     if (!file_exists('functions.php')) throw new Exception('functions.php not found');
     include 'functions.php';
     
-    if (file_exists('version_helper.php')) {
-        require_once 'version_helper.php';
-    }
-    
     if (!file_exists('db_connect.php')) throw new Exception('db_connect.php not found');
     include 'db_connect.php';
     
