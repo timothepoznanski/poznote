@@ -5,13 +5,6 @@
  * dragging, system folders, note organization, and folder selection.
  */
 
-    border-radius: 4px;
-    padding: 6px 12px;
-    text-align: center;
-    cursor: pointer;
-    position: relative;
-    z-index: 1;
-
 /* Folder header adjustments to match visual spacing */
 .folder-header {
     /* margin-top: 6px; */
@@ -69,8 +62,6 @@
 .hide-folder-counts .folder-toggle:focus-within {
     outline: 2px solid rgba(59, 130, 246, 0.18);
     border-radius: 6px;
-}
-
 }
 
 .folder-icon[data-action='open-kanban-view']:hover {
