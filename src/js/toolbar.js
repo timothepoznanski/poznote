@@ -544,12 +544,13 @@ function toggleCodeBlock() {
     return;
   }
 
-  // Get selected text
-  const selectedText = sel.toString();
+  // Get selected text with normalized line breaks to avoid extra blank lines
+  const selectedText = getNormalizedRangeText(range);
   if (!selectedText.trim()) return;
 
   // Escape HTML and create code block
   const escapedText = selectedText
+    .replace(/\u200B/g, '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
@@ -559,6 +560,23 @@ function toggleCodeBlock() {
   const brAfter = atLastLine ? '<br>' : '';
   const codeHTML = `${brBefore}<pre class="code-block">${escapedText}</pre>${brAfter}`;
   document.execCommand('insertHTML', false, codeHTML);
+}
+
+function getNormalizedRangeText(range) {
+  if (!range) return '';
+  try {
+    const fragment = range.cloneContents();
+    const wrapper = document.createElement('div');
+    wrapper.appendChild(fragment);
+
+    if (typeof window.normalizeContentEditableText === 'function') {
+      return window.normalizeContentEditableText(wrapper);
+    }
+
+    return wrapper.innerText || wrapper.textContent || '';
+  } catch (e) {
+    return '';
+  }
 }
 
 function toggleInlineCode() {
