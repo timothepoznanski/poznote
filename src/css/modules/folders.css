@@ -1153,7 +1153,10 @@ body.dark-mode .folder-actions-menu-item.active i {
 }
 
 .fa-times::before {
+    content: "\f00d";
+}
 
+.table-picker-popup {
     opacity: 0;
     transform: translateY(-10px);
     transition: opacity 0.2s ease, transform 0.2s ease;
@@ -1218,6 +1221,7 @@ body.dark-mode .folder-actions-menu-item.active i {
     font-size: 12px;
     color: #666;
     margin-bottom: 10px;
+}
 
 /* Container pour les dossiers système - maintenant masqué (remplacé par page Home) */
 .system-folders-container {
