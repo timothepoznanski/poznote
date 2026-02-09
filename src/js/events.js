@@ -16,9 +16,6 @@ function tr(key, vars, fallback) {
     }
 }
 
-// Expose critical functions globally early to prevent ReferenceError during HTML event handlers
-// These may be called before events.js is fully loaded due to inline onfocus handlers
-
 // Generic function to update noteid based on element ID with prefix
 function updateNoteIdFromElement(element, prefixLength) {
     if (element && element.id) {
@@ -26,16 +23,15 @@ function updateNoteIdFromElement(element, prefixLength) {
     }
 }
 
-// Legacy compatibility functions
+// Helper functions for note ID tracking from DOM elements
+// Used by event handlers to update the global noteid variable when users interact with notes
 function updateident(el) {
     updateNoteIdFromElement(el, 5); // 'entry'.length
 }
+
 function updateidhead(el) {
     updateNoteIdFromElement(el, 3); // 'inp'.length
 }
-// Expose to window early
-window.updateident = updateident;
-window.updateidhead = updateidhead;
 
 // Utility function to extract note ID from entry element
 function extractNoteIdFromEntry(entryElement) {
@@ -3151,6 +3147,10 @@ function reinitializeAutoSaveState() {
 }
 
 // Make functions globally available
+// Legacy compatibility functions (exposed early for HTML inline handlers)
+window.updateident = updateident;
+window.updateidhead = updateidhead;
+// Auto-save and note management
 window.markNoteAsModified = markNoteAsModified;
 window.saveNoteImmediately = saveNoteToServer;
 window.checkUnsavedBeforeLeaving = checkUnsavedBeforeLeaving;
@@ -3158,6 +3158,7 @@ window.hasUnsavedChanges = hasUnsavedChanges;
 window.checkForUnsavedDraft = checkForUnsavedDraft;
 window.clearDraft = clearDraft;
 window.reinitializeAutoSaveState = reinitializeAutoSaveState;
+// Event setup functions
 window.setupDragDropEvents = setupDragDropEvents;
 window.setupNoteDragDropEvents = setupNoteDragDropEvents;
 window.setupLinkEvents = setupLinkEvents;
@@ -3166,4 +3167,5 @@ window.setupAutoSaveCheck = setupAutoSaveCheck;
 window.setupPageUnloadWarning = setupPageUnloadWarning;
 window.initTextSelectionHandlers = initTextSelectionHandlers;
 window.initializeAutoSaveSystem = initializeAutoSaveSystem;
+// Media conversion
 window.convertNoteAudioToIframes = convertNoteAudioToIframes;
