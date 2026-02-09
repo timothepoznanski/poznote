@@ -78,7 +78,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         $folderDomId = 'folder-' . $folderId;
         
         // Determine if this folder should be open
-        $should_be_open = shouldFolderBeOpen($folderData, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes);
+        $should_be_open = shouldFolderBeOpen($con, $folderData, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes);
         
         // Set appropriate folder icon (open/closed) and display style
         // Check if folder has a custom icon and color
