@@ -4,11 +4,8 @@
 (function () {
     'use strict';
 
-    // -------------------------------------------------------------------
-    // Configuration globale et constantes
-    // -------------------------------------------------------------------
 
-    // Langages disponibles pour les blocs de code (utilisé par les menus HTML et Markdown)
+    // Available languages for code blocks (used by HTML and Markdown menus)
     var CODE_BLOCK_LANGUAGES = [
         { id: 'code-javascript', icon: 'fa-code', iconColor: '#f7df1e', label: 'JavaScript', lang: 'javascript' },
         { id: 'code-typescript', icon: 'fa-code', iconColor: '#3178c6', label: 'TypeScript', lang: 'typescript' },
@@ -31,7 +28,7 @@
         { id: 'code-markdown', icon: 'fa-file-code', iconColor: '#083fa1', label: 'Markdown', lang: 'markdown' }
     ];
 
-    // Types de callouts / citations disponibles
+    // Available callout / quote types
     var CALLOUT_TYPES = [
         { id: 'plain', labelKey: 'slash_menu.blockquote', fallback: 'Blockquote' },
         { id: 'note', labelKey: 'slash_menu.callout_note', fallback: 'Note' },
@@ -42,7 +39,7 @@
     ];
 
     // -------------------------------------------------------------------
-    // Variables globales du menu slash
+    // Slash menu global variables
     // -------------------------------------------------------------------
 
     let slashMenuElement = null;
@@ -54,24 +51,21 @@
     let filteredCommands = [];
     let currentSubmenu = null;
     let currentSubSubmenu = null;
-    let slashTextNode = null;  // Le nœud texte contenant le slash
-    let slashOffset = -1;      // La position du slash dans le nœud
+    let slashTextNode = null;  // The text node containing the slash
+    let slashOffset = -1;      // The position of the slash in the node
     let filterText = '';
     let savedNoteEntry = null;
     let savedEditableElement = null;
     let activeCommands = null;
 
-    // -------------------------------------------------------------------
-    // Fonctions utilitaires
-    // -------------------------------------------------------------------
 
-    // Supprime les accents d'une chaîne pour la recherche
+    // Remove accents from a string for search
     function removeAccents(str) {
         if (!str) return '';
         return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     }
 
-    // Récupère l'éditeur Markdown depuis la sélection courante
+    // Get the Markdown editor from the current selection
     function getCurrentMarkdownEditorFromSelection() {
         const selection = window.getSelection();
         if (!selection || !selection.rangeCount) return null;
@@ -91,7 +85,7 @@
         return editor;
     }
 
-    // Calcule les offsets de début et fin de sélection dans un élément
+    // Calculate selection start and end offsets within an element
     function getSelectionOffsetsWithin(rootEl) {
         const selection = window.getSelection();
         if (!selection || !selection.rangeCount) return null;
@@ -114,7 +108,7 @@
         return { start: Math.min(start, end), end: Math.max(start, end) };
     }
 
-    // Extrait le texte d'un éditeur Markdown
+    // Extract text from a Markdown editor
     function getMarkdownEditorText(rootEl) {
         if (!rootEl) return '';
 
@@ -129,7 +123,7 @@
         return rootEl.innerText || rootEl.textContent || '';
     }
 
-    // Trouve le nœud texte à un offset donné
+    // Find the text node at a given offset
     function findTextNodeAtOffset(rootEl, offset) {
         const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, null);
         let node = walker.nextNode();
@@ -148,7 +142,7 @@
         return { node: rootEl, offset: rootEl.childNodes ? rootEl.childNodes.length : 0 };
     }
 
-    // Définit la sélection à partir d'offsets de début et fin
+    // Set selection from start and end offsets
     function setSelectionByOffsets(rootEl, startOffset, endOffset) {
         const selection = window.getSelection();
         if (!selection) return;
@@ -172,7 +166,7 @@
         selection.addRange(range);
     }
 
-    // Remplace une plage de texte dans l'éditeur Markdown
+    // Replace a text range in the Markdown editor
     function replaceMarkdownRange(rootEl, start, end, replacement, selectStartAfter, selectEndAfter) {
         if (!rootEl) return;
 
@@ -193,7 +187,7 @@
         } catch (e) { }
     }
 
-    // Insère du texte Markdown à la position du curseur
+    // Insert Markdown text at cursor position
     function insertMarkdownAtCursor(text, caretDeltaFromInsertEnd) {
         // Prefer DOM-range insertion to avoid line/offset mismatches in contentEditable.
         const editor = getCurrentMarkdownEditorFromSelection();
@@ -229,7 +223,7 @@
         } catch (e) { }
     }
 
-    // Entoure la sélection Markdown avec un préfixe et un suffixe
+    // Wrap Markdown selection with a prefix and suffix
     function wrapMarkdownSelection(prefix, suffix, emptyInnerCaretOffset) {
         const editor = getCurrentMarkdownEditorFromSelection();
         if (!editor) return;
@@ -273,18 +267,16 @@
         } catch (e) { }
     }
 
-    // Insère un préfixe Markdown au début de la ligne
+    // Insert Markdown prefix at line start
     function insertMarkdownPrefixAtLineStart(prefix) {
         // For Markdown, the slash command is typically typed at the insertion point.
         // Inserting at cursor is more reliable than trying to compute line starts across contentEditable lines.
         insertMarkdownAtCursor(prefix, 0);
     }
 
-    // -------------------------------------------------------------------
-    // Fonctions d'insertion d'éléments HTML
-    // -------------------------------------------------------------------
 
-    // Insère un titre HTML (h1, h2, h3)
+
+    // Insert an HTML heading (h1, h2, h3)
     function insertHeading(level) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -314,7 +306,7 @@
         }
     }
 
-    // Insère un élément HTML en ligne (strong, em, mark, code, etc.)
+    // Insert an inline HTML element (strong, em, mark, code, etc.)
     function insertInlineElement(tagName, styleObj) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -344,37 +336,37 @@
         }
     }
 
-    // Insère du texte en gras
+    // Insert bold text
     function insertBold() { 
         insertInlineElement('strong'); 
     }
 
-    // Insère du texte en italique
+    // Insert italic text
     function insertItalic() { 
         insertInlineElement('em'); 
     }
 
-    // Insère du texte surligné
+    // Insert highlighted text
     function insertHighlight() { 
         insertInlineElement('mark'); 
     }
 
-    // Insère du texte barré
+    // Insert strikethrough text
     function insertStrikethrough() { 
         insertInlineElement('s'); 
     }
 
-    // Insère du code en ligne
+    // Insert inline code
     function insertCode() { 
         insertInlineElement('code'); 
     }
 
-    // Insère du texte coloré
+    // Insert colored text
     function insertColor(color) {
         insertInlineElement('span', color !== 'black' ? { color: color } : undefined);
     }
 
-    // Insère un bloc de code avec coloration syntaxique
+    // Insert a code block with syntax highlighting
     function insertCodeBlock(language) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -415,7 +407,7 @@
         }
     }
 
-    // Revient à du texte normal (supprime le formatage)
+    // Return to normal text (remove formatting)
     function insertNormalText() {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -561,7 +553,7 @@
         }
     }
 
-    // Insère un élément toggle (bloc réductible/extensible)
+    // Insert a toggle element (collapsible/expandable block)
     function insertToggle() {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -627,7 +619,7 @@
         }
     }
 
-    // Insère une liste (ordonnée ou non ordonnée)
+    // Insert a list (ordered or unordered)
     function insertList(ordered) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -658,7 +650,7 @@
         }
     }
 
-    // Insère une image (ouvre un sélecteur de fichier)
+    // Insert an image (opens file picker)
     function insertImage() {
         // Create a temporary file input for images
         const fileInput = document.createElement('input');
@@ -870,7 +862,7 @@
         fileInput.click();
     }
 
-    // Insère une date (ouvre un sélecteur de date)
+    // Insert a date (opens date picker)
     function insertDate() {
         // Find current editor context to restore later
         const context = getEditorContext();
@@ -943,7 +935,7 @@
         }
     }
 
-    // Insère une date dans un éditeur Markdown
+    // Insert a date in a Markdown editor
     function insertDateMarkdown() {
         const context = getEditorContext();
         if (!context) return;
@@ -997,7 +989,7 @@
         }
     }
 
-    // Retourne les commandes de titre pour le menu slash (spécifique au champ titre)
+    // Return title commands for the slash menu (specific to title field)
     function getTitleSlashCommands() {
         const t = window.t || ((key, params, fallback) => fallback);
         return [
@@ -1082,7 +1074,7 @@
         ];
     }
 
-    // Retourne les commandes slash communes entre les modes HTML et Markdown
+    // Return slash commands common between HTML and Markdown modes
     function getCommonSlashCommands() {
         var t = window.t || (function (key, params, fallback) { return fallback; });
         return {
@@ -1422,7 +1414,7 @@
 
     // Slash command menu items for Markdown notes (edit mode)
     // Keep labels close to the HTML menu, but insert Markdown syntax.
-    // Retourne les commandes du menu slash pour les notes Markdown
+    // Return slash menu commands for Markdown notes
     function getMarkdownSlashCommands() {
         const t = window.t || ((key, params, fallback) => fallback);
         var common = getCommonSlashCommands();
@@ -1674,10 +1666,7 @@
         ];
     }
 
-    // -------------------------------------------------------------------
-    // Définition des menus slash (HTML et Markdown)
-    // -------------------------------------------------------------------
-    // Récupère le contexte de l'éditeur actuel (type de note, éléments DOM)
+    // Get current editor context (note type, DOM elements)
     function getEditorContext() {
         const selection = window.getSelection();
         if (!selection.rangeCount) return false;
@@ -1705,7 +1694,7 @@
         return { noteType: noteType || 'note', noteEntry, editableElement };
     }
 
-    // Filtre les commandes du menu slash selon le texte de recherche
+    // Filter slash menu commands based on search text
     function getFilteredCommands(searchText) {
         const isMobile = window.innerWidth < 768;
         const commands = (activeCommands || getSlashCommands()).filter(cmd => {
@@ -1787,7 +1776,7 @@
         return results;
     }
 
-    // Construit le HTML du menu slash
+    // Build slash menu HTML
     function buildMenuHTML() {
         if (!filteredCommands.length) {
             return '<div class="slash-command-empty">No results</div>';
@@ -1957,7 +1946,7 @@
         selectedSubmenuIndex = 0;
     }
 
-    // Masque le menu slash et tous ses sous-menus
+    // Hide slash menu and all its submenus
     function hideSlashMenu() {
         if (!slashMenuElement) return;
 
@@ -1986,7 +1975,7 @@
         document.body.style.cursor = '';
     }
 
-    // Affiche le menu slash pour un champ input (titre)
+    // Show slash menu for an input field (title)
     function showSlashMenuForInput(input, pos) {
         hideSlashMenu();
 
@@ -2090,7 +2079,7 @@
 
         document.body.appendChild(submenuElement);
 
-        // Position à droite de l'item parent
+        // Position to the right of parent item
         const parentRect = parentItem.getBoundingClientRect();
         const submenuRect = submenuElement.getBoundingClientRect();
 
@@ -2098,12 +2087,12 @@
         let x = parentRect.right + 4;
         let y = parentRect.top;
 
-        // Si déborde à droite, afficher à gauche
+        // If overflows to the right, display to the left
         if (x + submenuRect.width > window.innerWidth - padding) {
             x = parentRect.left - submenuRect.width - 4;
         }
 
-        // Si déborde en bas
+        // If overflows at the bottom
         if (y + submenuRect.height > window.innerHeight - padding) {
             y = Math.max(padding, window.innerHeight - submenuRect.height - padding);
         }
@@ -2135,7 +2124,7 @@
 
         document.body.appendChild(subSubmenuElement);
 
-        // Position à droite de l'item parent
+        // Position to the right of parent item
         const parentRect = parentItem.getBoundingClientRect();
         const submenuRect = subSubmenuElement.getBoundingClientRect();
 
@@ -2143,12 +2132,12 @@
         let x = parentRect.right + 4;
         let y = parentRect.top;
 
-        // Si déborde à droite, afficher à gauche
+        // If overflows to the right, display to the left
         if (x + submenuRect.width > window.innerWidth - padding) {
             x = parentRect.left - submenuRect.width - 4;
         }
 
-        // Si déborde en bas
+        // If overflows at the bottom
         if (y + submenuRect.height > window.innerHeight - padding) {
             y = Math.max(padding, window.innerHeight - submenuRect.height - padding);
         }
@@ -2165,7 +2154,7 @@
         subSubmenuElement.addEventListener('touchend', handleSubSubmenuTouchEnd);
     }
 
-    // Supprime le texte du slash et de la recherche
+    // Delete slash text and search
     function deleteSlashText() {
         try {
             // Handle input fields (title inputs)
@@ -2204,17 +2193,17 @@
 
             if (sel && sel.rangeCount > 0) {
                 const currentRange = sel.getRangeAt(0);
-                // On vérifie si on est dans le bon nœud
+                // Check if we're in the correct node
                 if (currentRange.startContainer === slashTextNode) {
                     currentOffset = currentRange.startOffset;
                 }
             }
 
-            // Si on n'a pas pu obtenir l'offset (ex: mobile blurred), on utilise filterText
+            // If we couldn't get the offset (e.g. mobile blurred), use filterText
             if (currentOffset === -1) {
                 const textContent = slashTextNode.textContent || '';
-                // L'offset de fin est slashOffset + 1 (pour le '/') + longueur du filtre
-                // On utilise la longueur actuelle du texte après le slash comme fallback
+                // The end offset is slashOffset + 1 (for the '/') + filter length
+                // Use the current length of text after slash as fallback
                 const textAfterSlash = textContent.substring(slashOffset + 1);
                 const spaceIndex = textAfterSlash.search(/[\s\n]/);
                 const actualFilterLength = spaceIndex >= 0 ? spaceIndex : textAfterSlash.length;
@@ -2222,14 +2211,14 @@
             }
 
             const text = slashTextNode.textContent;
-            // Sécurité : on ne veut pas supprimer moins que le slash lui-même
+            // Safety: we don't want to delete less than the slash itself
             const safeEndOffset = Math.max(slashOffset + 1, Math.min(text.length, currentOffset));
 
             const before = text.substring(0, slashOffset);
             const after = text.substring(safeEndOffset);
             slashTextNode.textContent = before + after;
 
-            // Replacer le curseur là où le slash a été supprimé
+            // Replace cursor where the slash was deleted
             if (sel) {
                 const newRange = document.createRange();
                 try {
@@ -2239,7 +2228,7 @@
                     sel.removeAllRanges();
                     sel.addRange(newRange);
                 } catch (e) {
-                    // Fallback si le nœud a un problème
+                    // Fallback if node has an issue
                 }
             }
 
@@ -2252,7 +2241,6 @@
         }
     }
 
-    // Ex\u00e9cute la commande s\u00e9lectionn\u00e9e depuis le menu slash
     function executeCommand(commandId, isSubmenuItem, isSubSubmenuItem) {
         let actionToExecute = null;
         let foundCmd = null;
@@ -2266,7 +2254,7 @@
         } else if (isSubmenuItem && currentSubmenu) {
             const item = currentSubmenu.find(i => i.id === commandId);
             if (item) {
-                // Si cet item a un sous-menu, l'afficher
+                // If this item has a submenu, display it
                 if (item.submenu && item.submenu.length > 0) {
                     const menuItem = submenuElement.querySelector('[data-submenu-id="' + commandId + '"]');
                     if (menuItem) {
@@ -2290,7 +2278,7 @@
                 const cmd = (activeCommands || getSlashCommands()).find(c => c.id === commandId);
                 if (!cmd) return;
 
-                // Si la commande a un sous-menu, l'afficher au lieu d'exécuter
+                // If command has a submenu, display it instead of executing
                 if (cmd.submenu && cmd.submenu.length > 0) {
                     const item = slashMenuElement.querySelector('[data-command-id="' + commandId + '"]');
                     if (item) {
@@ -2310,14 +2298,14 @@
             return;
         }
 
-        // Sur mobile, on restaure le focus avant de supprimer le texte pour s'assurer
-        // que la sélection est bien prise en compte si possible par deleteSlashText.
+        // On mobile, restore focus before deleting text to ensure
+        // that the selection is properly taken into account if possible by deleteSlashText.
         const isMobile = window.innerWidth < 768;
         if (isMobile && savedEditableElement) {
             try { savedEditableElement.focus(); } catch (e) { }
         }
 
-        // Supprimer le slash et le texte de filtre (sauf si keepSlash est true)
+        // Delete the slash and filter text (unless keepSlash is true)
         const shouldKeepSlash = foundCmd && foundCmd.keepSlash;
         let cursorRangeAfterDelete = null;
         if (!shouldKeepSlash) {
@@ -2351,7 +2339,7 @@
         // can use it as a reliable fallback for the cursor position.
         window._slashCommandSavedRange = cursorRangeAfterDelete;
 
-        // Exécuter la commande immédiatement (la sélection est restaurée ci-dessus)
+        // Execute command immediately (selection is restored above)
         try {
             actionToExecute();
         } catch (e) {
@@ -2520,11 +2508,11 @@
         }
     }
 
-    // Gestion des touches clavier (navigation dans le menu)
+    // Handle keyboard input (menu navigation)
     function handleKeydown(e) {
         if (!slashMenuElement) return;
 
-        // Si un sous-sous-menu est ouvert (niveau 3)
+        // If a sub-submenu is open (level 3)
         if (subSubmenuElement && currentSubSubmenu) {
             switch (e.key) {
                 case 'ArrowDown':
@@ -2571,7 +2559,7 @@
             return;
         }
 
-        // Si un sous-menu est ouvert (niveau 2)
+        // If a submenu is open (level 2)
         if (submenuElement && currentSubmenu) {
             switch (e.key) {
                 case 'ArrowDown':
@@ -2630,7 +2618,7 @@
             return;
         }
 
-        // Navigation dans le menu principal
+        // Navigate in main menu
         switch (e.key) {
             case 'ArrowDown':
                 e.preventDefault();
@@ -2721,7 +2709,7 @@
         updateMenuContent();
     }
 
-    // Affiche le menu slash
+    // Show slash menu
     function showSlashMenu() {
         hideSlashMenu();
 
@@ -2731,10 +2719,10 @@
         const range = sel.getRangeAt(0);
         const container = range.startContainer;
 
-        // On doit être dans un nœud texte
+        // Must be in a text node
         if (container.nodeType !== 3) return;
 
-        // Sauvegarder la position du slash (juste avant la position actuelle)
+        // Save the slash position (just before current position)
         slashTextNode = container;
         slashOffset = range.startOffset - 1;
 
@@ -2787,7 +2775,7 @@
         document.addEventListener('mousemove', showCursor);
     }
 
-    // Gestion des entrées utilisateur (détection du /)
+    // Handle user input (/ detection)
     function handleInput(e) {
         const target = e.target;
         if (!target) return;
@@ -2824,7 +2812,7 @@
         }
     }
 
-    // Gestion du clic en dehors du menu (fermeture)
+    // Handle click outside menu (close)
     function handleClickOutside(e) {
         if (!slashMenuElement) return;
 
@@ -2838,7 +2826,7 @@
         }
     }
 
-    // Initialise le système de menu slash (event listeners)
+    // Initialize slash menu system (event listeners)
     function init() {
         document.addEventListener('input', handleInput, true);
         document.addEventListener('keydown', handleKeydown, true);
@@ -3278,6 +3266,7 @@
     function insertUploadedMp4(isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange) {
         insertUploadedMedia('video', isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange);
     }
+
     function insertUploadedAudio(isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange) {
         insertUploadedMedia('audio', isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange);
     }
@@ -3352,7 +3341,7 @@
         insertUploadedAudio(true, noteEntry, editableElement, savedRange);
     };
 
-    // Traite une URL YouTube et insère l'iframe correspondante
+    // Process a YouTube URL and insert the corresponding iframe
     function processYouTubeUrl(url, isMarkdown, editableElement, savedRange, noteEntry) {
         const t = window.t || ((key, params, fallback) => fallback);
 
@@ -3474,10 +3463,7 @@
         }
     }
 
-    // -------------------------------------------------------------------
-    // Initialisation du module
-    // -------------------------------------------------------------------
-
+    // Module initialization
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
