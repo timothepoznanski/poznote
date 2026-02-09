@@ -1640,10 +1640,8 @@ function moveNoteToRoot(noteId) {
     );
 }
 
-/**
- * Setup drag and drop events for folders
- * Called from setupNoteDragDropEvents to initialize folder dragging
- */
+// Setup drag and drop events for folders
+// Called from setupNoteDragDropEvents to initialize folder dragging
 function setupFolderDragDropEvents() {
     var isMobile = window.innerWidth <= 800;
 
@@ -1672,9 +1670,7 @@ function setupFolderDragDropEvents() {
     });
 }
 
-/**
- * Handle folder drag start
- */
+// Handle folder drag start
 function handleFolderDragStart(e) {
     // Get the folder-toggle element (the draggable element)
     var folderToggle = e.target.closest('.folder-toggle');
@@ -1733,9 +1729,7 @@ function handleFolderDragStart(e) {
     folderHeader.classList.add('folder-source-drag');
 }
 
-/**
- * Handle folder drag end
- */
+// Handle folder drag end
 function handleFolderDragEnd(e) {
     var folderToggle = e.target.closest('.folder-toggle');
     var folderHeader = e.target.closest('.folder-header');
@@ -1775,9 +1769,7 @@ function handleFolderDragEnd(e) {
     }, 100);
 }
 
-/**
- * Enhanced folder drag enter handler to avoid flicker on nested elements
- */
+// Enhanced folder drag enter handler to avoid flicker on nested elements
 function handleFolderDragEnterEnhanced(e) {
     var folderHeader = e.target.closest('.folder-header');
     if (!folderHeader) return;
@@ -1821,9 +1813,7 @@ function handleFolderDragEnterEnhanced(e) {
     folderHeader.classList.add('drag-over');
 }
 
-/**
- * Enhanced folder drag over handler that supports both notes and folders
- */
+// Enhanced folder drag over handler that supports both notes and folders
 function handleFolderDragOverEnhanced(e) {
     e.preventDefault();
 
@@ -1868,9 +1858,7 @@ function handleFolderDragOverEnhanced(e) {
     folderHeader.classList.add('drag-over');
 }
 
-/**
- * Enhanced folder drag leave handler
- */
+// Enhanced folder drag leave handler
 function handleFolderDragLeaveEnhanced(e) {
     var folderHeader = e.target.closest('.folder-header');
     if (folderHeader) {
@@ -1893,9 +1881,7 @@ function handleFolderDragLeaveEnhanced(e) {
     }
 }
 
-/**
- * Enhanced folder drop handler that supports both notes and folders
- */
+// Enhanced folder drop handler that supports both notes and folders
 function handleFolderDropEnhanced(e) {
     e.preventDefault();
 
@@ -1982,9 +1968,7 @@ function handleFolderDropEnhanced(e) {
     }
 }
 
-/**
- * Move folder to a new parent folder (pass null for root)
- */
+// Move folder to a new parent folder (pass null for root)
 function moveFolderToParent(folderId, newParentFolderId) {
     apiPostJson(
         '/api/v1/folders/' + folderId + '/move',
@@ -1994,9 +1978,7 @@ function moveFolderToParent(folderId, newParentFolderId) {
     );
 }
 
-/**
- * Move folder to root (remove from parent folder)
- */
+// Move folder to root (remove from parent folder)
 function moveFolderToRoot(folderId) {
     moveFolderToParent(folderId, null);
 }
