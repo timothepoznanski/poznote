@@ -1104,9 +1104,6 @@ function showSaveInProgressNotification(onCompleteCallback) {
     }, 3000);
 }
 
-// Expose the function globally
-window.showSaveInProgressNotification = showSaveInProgressNotification;
-
 /**
  * Convert bare <audio> elements inside contenteditable .noteentry divs to iframes
  * that point to audio_player.php.  Chrome refuses to render native <audio> controls
@@ -2425,9 +2422,6 @@ function updateConnectionStatus(online) {
     }
 }
 
-// Make it globally available
-window.updateConnectionStatus = updateConnectionStatus;
-
 function setupPageUnloadWarning() {
     // Handled by the global beforeunload listener below
 }
@@ -3147,10 +3141,8 @@ function reinitializeAutoSaveState() {
 }
 
 // Make functions globally available
-// Legacy compatibility functions (exposed early for HTML inline handlers)
 window.updateident = updateident;
 window.updateidhead = updateidhead;
-// Auto-save and note management
 window.markNoteAsModified = markNoteAsModified;
 window.saveNoteImmediately = saveNoteToServer;
 window.checkUnsavedBeforeLeaving = checkUnsavedBeforeLeaving;
@@ -3158,7 +3150,8 @@ window.hasUnsavedChanges = hasUnsavedChanges;
 window.checkForUnsavedDraft = checkForUnsavedDraft;
 window.clearDraft = clearDraft;
 window.reinitializeAutoSaveState = reinitializeAutoSaveState;
-// Event setup functions
+window.showSaveInProgressNotification = showSaveInProgressNotification;
+window.updateConnectionStatus = updateConnectionStatus;
 window.setupDragDropEvents = setupDragDropEvents;
 window.setupNoteDragDropEvents = setupNoteDragDropEvents;
 window.setupLinkEvents = setupLinkEvents;
@@ -3167,5 +3160,4 @@ window.setupAutoSaveCheck = setupAutoSaveCheck;
 window.setupPageUnloadWarning = setupPageUnloadWarning;
 window.initTextSelectionHandlers = initTextSelectionHandlers;
 window.initializeAutoSaveSystem = initializeAutoSaveSystem;
-// Media conversion
 window.convertNoteAudioToIframes = convertNoteAudioToIframes;
