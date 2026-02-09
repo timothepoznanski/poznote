@@ -93,6 +93,23 @@
   }
 
   /**
+   * Sync checkbox visual state with its checked property
+   */
+  function syncCheckboxState(checkbox) {
+    const item = findChecklistItem(checkbox);
+    if (!item) return;
+    const isChecked = checkbox.checked;
+    checkbox.setAttribute('data-checked', isChecked ? '1' : '0');
+    if (isChecked) {
+      checkbox.setAttribute('checked', 'checked');
+      item.classList.add(CHECKED_ITEM_CLASS);
+    } else {
+      checkbox.removeAttribute('checked');
+      item.classList.remove(CHECKED_ITEM_CLASS);
+    }
+  }
+
+  /**
    * Check if cursor is at the beginning of an element
    */
   function isCursorAtStart(element) {
@@ -192,15 +209,6 @@
     return ul;
   }
 
-  /**
-   * Create a paragraph element
-   */
-  function createParagraph() {
-    const p = document.createElement('p');
-    p.appendChild(document.createElement('br'));
-    return p;
-  }
-
   // ===== FIND CHECKLIST ELEMENTS =====
 
   /**
@@ -252,19 +260,7 @@
     const item = findChecklistItem(checkbox);
     if (!item) return;
     
-    const isChecked = checkbox.checked;
-    
-    // Update data attribute
-    checkbox.setAttribute('data-checked', isChecked ? '1' : '0');
-    
-    // Update checked attribute
-    if (isChecked) {
-      checkbox.setAttribute('checked', 'checked');
-      item.classList.add(CHECKED_ITEM_CLASS);
-    } else {
-      checkbox.removeAttribute('checked');
-      item.classList.remove(CHECKED_ITEM_CLASS);
-    }
+    syncCheckboxState(checkbox);
     
     // Mark as modified
     const noteentry = getNoteEntry(checkbox);
@@ -504,15 +500,7 @@
     }
     
     // Position cursor in paragraph
-    const textNode = p.firstChild;
-    if (textNode) {
-      const range = document.createRange();
-      const sel = window.getSelection();
-      range.setStart(textNode, 0);
-      range.collapse(true);
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
+    setCursorInElement(p, false);
     
     // Reset processing flag
     isProcessingEnter = false;
@@ -633,20 +621,7 @@
     
     // Toggle checkbox
     checkbox.checked = !checkbox.checked;
-    
-    const isChecked = checkbox.checked;
-    
-    // Update data attribute
-    checkbox.setAttribute('data-checked', isChecked ? '1' : '0');
-    
-    // Update checked attribute and item class
-    if (isChecked) {
-      checkbox.setAttribute('checked', 'checked');
-      item.classList.add(CHECKED_ITEM_CLASS);
-    } else {
-      checkbox.removeAttribute('checked');
-      item.classList.remove(CHECKED_ITEM_CLASS);
-    }
+    syncCheckboxState(checkbox);
     
     // Mark as modified
     const noteentry = getNoteEntry(checkbox);
@@ -725,12 +700,7 @@
       const prevElement = checklist.previousElementSibling;
       if (prevElement) {
         event.preventDefault();
-        // Position cursor at end of previous element
-        const r = document.createRange();
-        r.selectNodeContents(prevElement);
-        r.collapse(false);
-        sel.removeAllRanges();
-        sel.addRange(r);
+        setCursorInElement(prevElement, true);
       }
     }
   }
@@ -772,12 +742,7 @@
       const nextElement = checklist.nextElementSibling;
       if (nextElement) {
         event.preventDefault();
-        // Position cursor at start of next element
-        const r = document.createRange();
-        r.selectNodeContents(nextElement);
-        r.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(r);
+        setCursorInElement(nextElement, false);
       }
     }
   }
@@ -884,19 +849,8 @@
         const textSpan = item.querySelector('.' + TEXT_CLASS);
         
         if (checkbox && textSpan) {
-          const isChecked = checkbox.checked;
-          const text = getCleanText(textSpan);
-          
-          checkbox.setAttribute('data-checked', isChecked ? '1' : '0');
-          textSpan.setAttribute('data-value', text);
-          
-          if (isChecked) {
-            checkbox.setAttribute('checked', 'checked');
-            item.classList.add(CHECKED_ITEM_CLASS);
-          } else {
-            checkbox.removeAttribute('checked');
-            item.classList.remove(CHECKED_ITEM_CLASS);
-          }
+          textSpan.setAttribute('data-value', getCleanText(textSpan));
+          syncCheckboxState(checkbox);
         }
       });
     });

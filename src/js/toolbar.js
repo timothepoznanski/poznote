@@ -1,3 +1,42 @@
+// === Shared popup helpers ===
+function setupPopupDismiss(popupEl, triggerBtnSelector, onClose) {
+  var animDelay = 200;
+  function close() {
+    popupEl.classList.remove('show');
+    setTimeout(function () { if (popupEl.parentNode) popupEl.remove(); }, animDelay);
+    document.removeEventListener('click', outsideHandler);
+    document.removeEventListener('keydown', keyHandler);
+    if (onClose) onClose();
+  }
+  function outsideHandler(e) {
+    if (!popupEl.contains(e.target) && !(triggerBtnSelector && e.target.closest && e.target.closest(triggerBtnSelector))) {
+      close();
+    }
+  }
+  function keyHandler(e) {
+    if (e.key === 'Escape') close();
+  }
+  setTimeout(function () { document.addEventListener('click', outsideHandler); }, 100);
+  document.addEventListener('keydown', keyHandler);
+  return close;
+}
+
+function clampToViewport(el, margin) {
+  margin = margin || 10;
+  var vp = window.visualViewport;
+  var vpW = vp ? vp.width : window.innerWidth;
+  var vpH = vp ? vp.height : window.innerHeight;
+  var vpOffL = vp ? vp.offsetLeft : 0;
+  var vpOffT = vp ? vp.offsetTop : 0;
+  var rect = el.getBoundingClientRect();
+  var curL = parseFloat(el.style.left) || rect.left;
+  var curT = parseFloat(el.style.top) || rect.top;
+  el.style.left = Math.max(vpOffL + margin, Math.min(curL, vpOffL + vpW - rect.width - margin)) + 'px';
+  el.style.top = Math.max(vpOffT + margin, Math.min(curT, vpOffT + vpH - rect.height - margin)) + 'px';
+}
+
+window.savedRanges = {};
+
 // Clean, popup-only color picker for the toolbar palette button.
 // Exposes window.toggleRedColor() which is called from the toolbar button.
 
@@ -27,14 +66,14 @@
   function saveSelection() {
     const sel = window.getSelection();
     if (sel.rangeCount > 0) {
-      window.savedColorRange = sel.getRangeAt(0).cloneRange();
+      window.savedRanges.color = sel.getRangeAt(0).cloneRange();
     } else {
-      window.savedColorRange = null;
+      window.savedRanges.color = null;
     }
   }
 
   function restoreSelection() {
-    const r = window.savedColorRange;
+    const r = window.savedRanges.color;
     if (r) {
       const sel = window.getSelection();
       sel.removeAllRanges();
@@ -135,7 +174,7 @@
   function removeExistingPopup() {
     const prev = document.querySelector('.color-palette-popup');
     if (prev) prev.remove();
-    window.savedColorRange = null;
+    window.savedRanges.color = null;
   }
 
   // Build popup DOM
@@ -200,40 +239,19 @@
       // show class for CSS transitions
       setTimeout(() => popup.classList.add('show'), 10);
 
+      // Dismiss on outside click / Escape
+      const closePopup = setupPopupDismiss(popup, '.btn-color', function () {
+        window.savedRanges.color = null;
+      });
+
       // Click handler
       popup.addEventListener('click', function (e) {
         const btnItem = e.target.closest('.color-item');
         if (!btnItem) return;
         const color = btnItem.getAttribute('data-color');
         applyColorToSelection(color);
-        popup.classList.remove('show');
-        setTimeout(() => popup.remove(), 160);
-        window.savedColorRange = null;
+        closePopup();
       });
-
-      // Close on outside click
-      function outsideHandler(e) {
-        if (!popup.contains(e.target) && !(e.target.closest && e.target.closest('.btn-color'))) {
-          popup.classList.remove('show');
-          setTimeout(() => popup.remove(), 160);
-          document.removeEventListener('click', outsideHandler);
-          document.removeEventListener('keydown', keyHandler);
-          window.savedColorRange = null;
-        }
-      }
-
-      function keyHandler(e) {
-        if (e.key === 'Escape') {
-          popup.classList.remove('show');
-          setTimeout(() => popup.remove(), 160);
-          document.removeEventListener('click', outsideHandler);
-          document.removeEventListener('keydown', keyHandler);
-          window.savedColorRange = null;
-        }
-      }
-
-      setTimeout(() => document.addEventListener('click', outsideHandler), 20);
-      document.addEventListener('keydown', keyHandler);
 
     } catch (err) {
 
@@ -246,6 +264,7 @@
   window.applyColorToSelection = applyColorToSelection;
 
 })();
+
 function toggleYellowHighlight() {
   // Check if we're in markdown mode
   if (typeof isInMarkdownEditor === 'function' && isInMarkdownEditor()) {
@@ -358,19 +377,11 @@ function changeFontSize() {
   popup.style.position = 'absolute';
   popup.style.minWidth = '180px';
 
-  // Position near the button but keep inside viewport
+  // Position near the button, clamp to viewport
   const btnRect = fontSizeButton.getBoundingClientRect();
-  const popupRectEstimate = { width: 220, height: (fontSizes.length * 44) };
-  let left = btnRect.right - popupRectEstimate.width;
-  if (left < 8) left = 8;
-  let top = btnRect.bottom + 8;
-  // If popup would overflow bottom, place it above the button
-  if (top + popupRectEstimate.height > window.innerHeight - 8) {
-    top = btnRect.top - popupRectEstimate.height - 8;
-    if (top < 8) top = 8;
-  }
-  popup.style.left = left + 'px';
-  popup.style.top = top + 'px';
+  popup.style.left = (btnRect.right - 220) + 'px';
+  popup.style.top = (btnRect.bottom + 8) + 'px';
+  clampToViewport(popup, 8);
 
   // Show popup with animation
   setTimeout(() => {
@@ -435,34 +446,7 @@ function changeFontSize() {
     });
   });
 
-  // Close popup when clicking outside
-  const closePopup = (e) => {
-    if (!popup.contains(e.target) && !fontSizeButton.contains(e.target)) {
-      popup.classList.remove('show');
-      setTimeout(() => {
-        popup.remove();
-      }, 200);
-      document.removeEventListener('click', closePopup);
-    }
-  };
-
-  // Add delay to prevent immediate closure
-  setTimeout(() => {
-    document.addEventListener('click', closePopup);
-  }, 100);
-
-  // Close on escape key
-  const handleEscape = (e) => {
-    if (e.key === 'Escape') {
-      popup.classList.remove('show');
-      setTimeout(() => {
-        popup.remove();
-      }, 200);
-      document.removeEventListener('keydown', handleEscape);
-    }
-  };
-
-  document.addEventListener('keydown', handleEscape);
+  setupPopupDismiss(popup, '.btn-text-height');
 }
 
 function toggleCodeBlock() {
@@ -838,7 +822,7 @@ function toggleEmojiPicker() {
 
   if (existingPicker) {
     existingPicker.remove();
-    window.savedEmojiRange = null;
+    window.savedRanges.emoji = null;
     return;
   }
 
@@ -852,9 +836,9 @@ function toggleEmojiPicker() {
   // Save current selection so clicking inside the picker doesn't lose the caret.
   try {
     const sel = window.getSelection();
-    window.savedEmojiRange = sel && sel.rangeCount ? sel.getRangeAt(0).cloneRange() : null;
+    window.savedRanges.emoji = sel && sel.rangeCount ? sel.getRangeAt(0).cloneRange() : null;
   } catch (e) {
-    window.savedEmojiRange = null;
+    window.savedRanges.emoji = null;
   }
 
   // Save active input for title support
@@ -914,7 +898,7 @@ function toggleEmojiPicker() {
 
   if (!anchorRect) {
     try {
-      const range = window.savedEmojiRange;
+      const range = window.savedRanges.emoji;
       if (range) {
         const rect = range.getBoundingClientRect();
         if (rect && (rect.top || rect.left || rect.bottom || rect.right)) {
@@ -936,41 +920,18 @@ function toggleEmojiPicker() {
 
   if (anchorRect) {
     const rect = anchorRect;
-
-    // Calculate vertical position
     let top = rect.bottom + 10;
     if (top + pickerHeight > windowHeight - 20) {
-      // If picker overflows bottom, place above button
       top = rect.top - pickerHeight - 10;
-      if (top < 20) {
-        // If it doesn't fit above either, center vertically
-        top = Math.max(20, (windowHeight - pickerHeight) / 2);
-      }
     }
-
-    // Calculate horizontal position
-    let left;
-    if (isMobile) {
-      // On mobile, center in screen
-      left = (windowWidth - pickerWidth) / 2;
-    } else {
-      // On desktop, center on anchor
-      left = rect.left - (pickerWidth / 2) + (rect.width / 2);
-      if (left + pickerWidth > windowWidth - 20) {
-        left = windowWidth - pickerWidth - 20;
-      }
-      if (left < 20) {
-        left = 20;
-      }
-    }
-
+    let left = isMobile ? (windowWidth - pickerWidth) / 2 : rect.left - (pickerWidth / 2) + (rect.width / 2);
     picker.style.top = top + 'px';
     picker.style.left = left + 'px';
   } else {
-    // Fallback: center on screen
-    picker.style.top = Math.max(20, (windowHeight - pickerHeight) / 2) + 'px';
-    picker.style.left = Math.max(20, (windowWidth - pickerWidth) / 2) + 'px';
+    picker.style.top = ((windowHeight - pickerHeight) / 2) + 'px';
+    picker.style.left = ((windowWidth - pickerWidth) / 2) + 'px';
   }
+  clampToViewport(picker, 20);
 
   // Handle emoji clicks
   picker.addEventListener('click', function (e) {
@@ -981,25 +942,18 @@ function toggleEmojiPicker() {
     }
   });
 
-  // Close picker when clicking outside
-  setTimeout(() => {
-    document.addEventListener('click', function closeEmojiPicker(e) {
-      if (!picker.contains(e.target) && !e.target.closest('.btn-emoji')) {
-        picker.remove();
-        window.savedEmojiRange = null;
-        document.removeEventListener('click', closeEmojiPicker);
-      }
-    });
-  }, 100);
+  setupPopupDismiss(picker, '.btn-emoji', function () {
+    window.savedRanges.emoji = null;
+  });
 }
 
 function insertEmoji(emoji) {
   // Restore selection saved when opening the picker.
   const sel = window.getSelection();
   try {
-    if (window.savedEmojiRange) {
+    if (window.savedRanges.emoji) {
       sel.removeAllRanges();
-      sel.addRange(window.savedEmojiRange);
+      sel.addRange(window.savedRanges.emoji);
     }
   } catch (e) { }
 
@@ -1038,7 +992,7 @@ function insertEmoji(emoji) {
     input.setRangeText(emoji, start, end, 'end');
     input.dispatchEvent(new Event('input', { bubbles: true }));
 
-    window.savedEmojiRange = null;
+    window.savedRanges.emoji = null;
     window.savedActiveInput = null;
     return;
   }
@@ -1046,7 +1000,7 @@ function insertEmoji(emoji) {
   // Vérifier si le curseur est dans une zone éditable
   if (!isCursorInEditableNote()) {
     window.showCursorWarning();
-    window.savedEmojiRange = null;
+    window.savedRanges.emoji = null;
     return;
   }
 
@@ -1062,7 +1016,7 @@ function insertEmoji(emoji) {
   // Insert emoji
   document.execCommand('insertText', false, emoji);
 
-  window.savedEmojiRange = null;
+  window.savedRanges.emoji = null;
 
   // Trigger input event
   if (noteentry) {
@@ -1099,21 +1053,21 @@ function addLinkToNote() {
 
       // Save selection
       if (hasSelection) {
-        window.savedLinkRange = sel.getRangeAt(0).cloneRange();
+        window.savedRanges.link = sel.getRangeAt(0).cloneRange();
       } else {
-        window.savedLinkRange = null;
+        window.savedRanges.link = null;
       }
 
       showLinkModal(existingUrl, existingText, function (url, text) {
         if (url === null) {
           // Remove link - replace with just text
-          if (window.savedLinkRange) {
+          if (window.savedRanges.link) {
             const sel = window.getSelection();
             sel.removeAllRanges();
-            sel.addRange(window.savedLinkRange);
+            sel.addRange(window.savedRanges.link);
             document.execCommand('insertText', false, existingText);
           }
-          window.savedLinkRange = null;
+          window.savedRanges.link = null;
           return;
         }
 
@@ -1124,7 +1078,7 @@ function addLinkToNote() {
           applyMarkdownLink(url, text);
         }
 
-        window.savedLinkRange = null;
+        window.savedRanges.link = null;
       });
       return;
     }
@@ -1153,10 +1107,10 @@ function addLinkToNote() {
 
     // Save the current selection before opening modal to preserve it
     if (hasSelection) {
-      window.savedLinkRange = sel.getRangeAt(0).cloneRange();
+      window.savedRanges.link = sel.getRangeAt(0).cloneRange();
       window.savedExistingLink = existingLink;
     } else {
-      window.savedLinkRange = null;
+      window.savedRanges.link = null;
       window.savedExistingLink = null;
     }
 
@@ -1177,7 +1131,7 @@ function addLinkToNote() {
         }
 
         // Clean up
-        window.savedLinkRange = null;
+        window.savedRanges.link = null;
         window.savedExistingLink = null;
         return;
       }
@@ -1198,15 +1152,15 @@ function addLinkToNote() {
         a.target = '_blank';
         a.rel = 'noopener noreferrer';
 
-        if (window.savedLinkRange) {
+        if (window.savedRanges.link) {
           // Restore the saved selection and replace it with the link
           const sel = window.getSelection();
           sel.removeAllRanges();
-          sel.addRange(window.savedLinkRange);
+          sel.addRange(window.savedRanges.link);
 
           // Replace the selected text with the link
-          window.savedLinkRange.deleteContents();
-          window.savedLinkRange.insertNode(a);
+          window.savedRanges.link.deleteContents();
+          window.savedRanges.link.insertNode(a);
 
           // Clear selection and position cursor after the link
           sel.removeAllRanges();
@@ -1242,7 +1196,7 @@ function addLinkToNote() {
       }
 
       // Clean up saved range and existing link reference
-      window.savedLinkRange = null;
+      window.savedRanges.link = null;
       window.savedExistingLink = null;
     });
   } catch (err) {
@@ -1267,9 +1221,9 @@ function toggleTablePicker() {
   // Save current selection/cursor position
   const sel = window.getSelection();
   if (sel.rangeCount > 0) {
-    window.savedTableRange = sel.getRangeAt(0).cloneRange();
+    window.savedRanges.table = sel.getRangeAt(0).cloneRange();
   } else {
-    window.savedTableRange = null;
+    window.savedRanges.table = null;
   }
 
   // Create table picker popup
@@ -1378,51 +1332,43 @@ function toggleTablePicker() {
     }
   };
 
-  const viewport = window.visualViewport;
-  const viewportWidth = viewport ? viewport.width : window.innerWidth;
-  const viewportHeight = viewport ? viewport.height : window.innerHeight;
-  const viewportOffsetLeft = viewport ? viewport.offsetLeft : 0;
-  const viewportOffsetTop = viewport ? viewport.offsetTop : 0;
+  const vp = window.visualViewport;
+  const vpW = vp ? vp.width : window.innerWidth;
+  const vpH = vp ? vp.height : window.innerHeight;
+  const vpOffL = vp ? vp.offsetLeft : 0;
+  const vpOffT = vp ? vp.offsetTop : 0;
 
   const isMobile = isMobileDevice();
-  const pickerWidth = isMobile ? Math.min(280, viewportWidth - 40) : 320;
+  const pickerWidth = isMobile ? Math.min(280, vpW - 40) : 320;
 
   picker.style.position = 'fixed';
   picker.style.width = pickerWidth + 'px';
-
-  // Measure real height after width is applied.
   const pickerHeight = picker.offsetHeight || 200;
 
   const margin = 10;
-  let left = viewportOffsetLeft + (viewportWidth - pickerWidth) / 2;
-  let top = viewportOffsetTop + margin;
+  let left = vpOffL + (vpW - pickerWidth) / 2;
+  let top = vpOffT + margin;
 
   const caretRect = getCaretClientRect();
   if (caretRect) {
     const anchorX = caretRect.left + caretRect.width / 2;
     const spaceAbove = caretRect.top;
-    const spaceBelow = viewportHeight - caretRect.bottom;
+    const spaceBelow = vpH - caretRect.bottom;
 
-    // Prefer above, else below, else center.
     if (spaceAbove >= pickerHeight + margin) {
-      top = viewportOffsetTop + caretRect.top - pickerHeight - margin;
+      top = vpOffT + caretRect.top - pickerHeight - margin;
     } else if (spaceBelow >= pickerHeight + margin) {
-      top = viewportOffsetTop + caretRect.bottom + margin;
+      top = vpOffT + caretRect.bottom + margin;
     } else {
-      top = viewportOffsetTop + (viewportHeight - pickerHeight) / 2;
+      top = vpOffT + (vpH - pickerHeight) / 2;
     }
 
-    left = viewportOffsetLeft + (anchorX - pickerWidth / 2);
+    left = vpOffL + (anchorX - pickerWidth / 2);
   }
 
-  // Clamp inside viewport.
-  const minLeft = viewportOffsetLeft + margin;
-  const maxLeft = viewportOffsetLeft + viewportWidth - pickerWidth - margin;
-  const minTop = viewportOffsetTop + margin;
-  const maxTop = viewportOffsetTop + viewportHeight - pickerHeight - margin;
-
-  picker.style.left = Math.max(minLeft, Math.min(left, maxLeft)) + 'px';
-  picker.style.top = Math.max(minTop, Math.min(top, maxTop)) + 'px';
+  picker.style.left = left + 'px';
+  picker.style.top = top + 'px';
+  clampToViewport(picker, margin);
 
   // Show picker with animation
   setTimeout(() => {
@@ -1461,43 +1407,19 @@ function toggleTablePicker() {
   rowsInput.addEventListener('keydown', handleInputEnter);
   colsInput.addEventListener('keydown', handleInputEnter);
 
-  // Close picker when clicking outside
-  setTimeout(() => {
-    document.addEventListener('click', function closeTablePicker(e) {
-      if (!picker.contains(e.target) && !e.target.closest('.btn-table')) {
-        picker.classList.remove('show');
-        setTimeout(() => {
-          picker.remove();
-        }, 200);
-        document.removeEventListener('click', closeTablePicker);
-      }
-    });
-  }, 100);
-
-  // Close on escape key
-  const handleEscape = (e) => {
-    if (e.key === 'Escape') {
-      picker.classList.remove('show');
-      setTimeout(() => {
-        picker.remove();
-      }, 200);
-      document.removeEventListener('keydown', handleEscape);
-    }
-  };
-
-  document.addEventListener('keydown', handleEscape);
+  setupPopupDismiss(picker, '.btn-table');
 }
 
 function insertTable(rows, cols) {
   // Use saved range if available, otherwise check current cursor position
-  if (window.savedTableRange) {
+  if (window.savedRanges.table) {
     // Restore the saved selection
     const sel = window.getSelection();
     sel.removeAllRanges();
-    sel.addRange(window.savedTableRange);
+    sel.addRange(window.savedRanges.table);
 
     // Clear the saved range
-    window.savedTableRange = null;
+    window.savedRanges.table = null;
   } else {
     // Fallback: check if cursor is in editable note
     if (!isCursorInEditableNote()) {
@@ -1542,16 +1464,16 @@ function insertTable(rows, cols) {
     let insertSuccess = false;
 
     // Try to restore the saved range
-    if (window.savedTableRange) {
+    if (window.savedRanges.table) {
       const sel = window.getSelection();
       sel.removeAllRanges();
-      sel.addRange(window.savedTableRange);
+      sel.addRange(window.savedRanges.table);
 
       // Try to insert at the saved position
       insertSuccess = document.execCommand('insertHTML', false, tableHTML);
 
       // Clean up saved range
-      window.savedTableRange = null;
+      window.savedRanges.table = null;
     } else {
       // No saved range, try current selection
       const sel = window.getSelection();
@@ -1570,9 +1492,9 @@ function insertTable(rows, cols) {
       const sel = window.getSelection();
       let range;
 
-      if (window.savedTableRange) {
-        range = window.savedTableRange;
-        window.savedTableRange = null;
+      if (window.savedRanges.table) {
+        range = window.savedRanges.table;
+        window.savedRanges.table = null;
       } else if (sel.rangeCount > 0) {
         range = sel.getRangeAt(0);
       } else {
@@ -1627,17 +1549,12 @@ function insertTable(rows, cols) {
     try {
       noteentry.insertAdjacentHTML('beforeend', tableHTML);
       noteentry.dispatchEvent(new Event('input', { bubbles: true }));
-      window.savedTableRange = null;
+      window.savedRanges.table = null;
     } catch (fallbackError) {
       console.error('Fallback insertion also failed:', fallbackError);
-      window.savedTableRange = null;
+      window.savedRanges.table = null;
     }
   }
-}
-
-// Helper function to detect mobile device (reuse if already exists)
-function isMobileDevice() {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 }
 
 // Ensure all toolbar functions are available in global scope
@@ -1652,12 +1569,7 @@ window.insertEmoji = insertEmoji;
 window.toggleTablePicker = toggleTablePicker;
 window.insertTable = insertTable;
 
-// ===== CHECKLIST FEATURE =====
-// Checklist functionality has been moved to src/js/checklist.js
-// This keeps the codebase modular and uses native DOM APIs exclusively
-
-// Mobile toolbar overflow menu helpers
-// (Used by inline onclick handlers generated in index.php)
+// Mobile toolbar overflow menu helpers (Used by inline onclick handlers generated in index.php)
 (function () {
   'use strict';
 
@@ -1756,9 +1668,9 @@ window.insertTable = insertTable;
 
         // Also keep a copy for the picker insertion pipeline.
         try {
-          window.savedEmojiRange = rangeToRestore.cloneRange();
+          window.savedRanges.emoji = rangeToRestore.cloneRange();
         } catch (e) {
-          window.savedEmojiRange = rangeToRestore;
+          window.savedRanges.emoji = rangeToRestore;
         }
       } catch (e) { }
     }

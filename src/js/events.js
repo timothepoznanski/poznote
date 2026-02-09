@@ -66,7 +66,7 @@ window.convertNoteAudioToIframes = function () {
             var iframe = document.createElement('iframe');
             iframe.className = 'note-audio-iframe';
             iframe.src = iframeSrc;
-            iframe.style.cssText = 'max-width:250px;width:100%;height:54px;border:none;border-radius:8px;display:block;margin:10px 0';
+            // Styles defined in modules/notes.css (.note-audio-iframe)
             iframe.setAttribute('allowtransparency', 'true');
 
             // Replace the audio (and its optional wrapper div) with the iframe
@@ -85,6 +85,85 @@ window.convertNoteAudioToIframes = function () {
 // Utility function to extract note ID from entry element
 function extractNoteIdFromEntry(entryElement) {
     return entryElement && entryElement.id ? entryElement.id.replace('entry', '') : null;
+}
+
+// Set the global noteid from the nearest .noteentry ancestor of a DOM element
+function setNoteIdFromNoteentry(element) {
+    var noteentry = element.closest('.noteentry');
+    if (noteentry) {
+        var id = extractNoteIdFromEntry(noteentry);
+        if (id) noteid = id;
+    }
+    return noteentry;
+}
+
+// Serialize checklists in a noteentry and trigger the auto-save pipeline
+function serializeAndMarkModified(noteentry) {
+    if (noteentry && typeof serializeChecklistsBeforeSave === 'function') {
+        serializeChecklistsBeforeSave(noteentry);
+    }
+    if (typeof window.markNoteAsModified === 'function') {
+        window.markNoteAsModified();
+    }
+}
+
+// Check if element or its direct children are title/tag fields
+function isTitleOrTagElement(element) {
+    if (element.classList &&
+        (element.classList.contains('css-title') ||
+            element.classList.contains('add-margin') ||
+            (element.id && (element.id.indexOf('inp') === 0 || element.id.indexOf('tags') === 0)))) {
+        return true;
+    }
+    if (element.children) {
+        for (var i = 0; i < element.children.length; i++) {
+            var child = element.children[i];
+            if (child.classList &&
+                (child.classList.contains('css-title') ||
+                    child.classList.contains('add-margin') ||
+                    (child.id && (child.id.indexOf('inp') === 0 || child.id.indexOf('tags') === 0)))) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+// Generic JSON POST helper that handles success/failure uniformly
+function apiPostJson(url, body, onSuccess, errorPrefix) {
+    fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(body)
+    })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (data && data.success) {
+                onSuccess(data);
+            } else {
+                var err = (data && (data.error || data.message)) || 'Unknown error';
+                showNotificationPopup(errorPrefix + err, 'error');
+            }
+        })
+        .catch(function (error) {
+            showNotificationPopup(errorPrefix + error.message, 'error');
+        });
+}
+
+// Refresh the sidebar after a folder/note move action
+function refreshSidebarAfterMove(data) {
+    if (data && data.share_delta && typeof updateSharedCount === 'function') {
+        updateSharedCount(data.share_delta);
+    }
+    if (typeof refreshNotesListAfterFolderAction === 'function') {
+        setTimeout(function () { refreshNotesListAfterFolderAction(); }, 200);
+    } else {
+        setTimeout(function () {
+            if (typeof persistFolderStatesFromDOM === 'function') { persistFolderStatesFromDOM(); }
+            location.reload();
+        }, 500);
+    }
 }
 
 // Utility function to serialize checklist data
@@ -149,46 +228,16 @@ function setupNoteEditingEvents() {
 
             // Handle checklist checkbox changes (auto-save)
             if (e.target && e.target.classList && e.target.classList.contains('checklist-checkbox')) {
-                // IMPORTANT: Set noteid from the noteentry element
-                var noteentry = e.target.closest('.noteentry');
-                if (noteentry) {
-                    var noteIdFromEntry = extractNoteIdFromEntry(noteentry);
-                    if (noteIdFromEntry) {
-                        noteid = noteIdFromEntry;
-                    }
-                }
-
-                // Serialize checklist state BEFORE save
-                if (noteentry && typeof serializeChecklistsBeforeSave === 'function') {
-                    serializeChecklistsBeforeSave(noteentry);
-                }
-
-                if (typeof window.markNoteAsModified === 'function') {
-                    window.markNoteAsModified();
-                }
+                var noteentry = setNoteIdFromNoteentry(e.target);
+                serializeAndMarkModified(noteentry);
                 return;
             }
 
             // Handle checklist text input changes (auto-save)
             if (e.target && e.target.classList && e.target.classList.contains('checklist-input')) {
                 if (eventType === 'input' || eventType === 'keyup' || eventType === 'change') {
-                    // IMPORTANT: Set noteid from the noteentry element
-                    var noteentry = e.target.closest('.noteentry');
-                    if (noteentry) {
-                        var noteIdFromEntry = extractNoteIdFromEntry(noteentry);
-                        if (noteIdFromEntry) {
-                            noteid = noteIdFromEntry;
-                        }
-                    }
-
-                    // Serialize checklist state BEFORE save
-                    if (noteentry && typeof serializeChecklistsBeforeSave === 'function') {
-                        serializeChecklistsBeforeSave(noteentry);
-                    }
-
-                    if (typeof window.markNoteAsModified === 'function') {
-                        window.markNoteAsModified();
-                    }
+                    var noteentry = setNoteIdFromNoteentry(e.target);
+                    serializeAndMarkModified(noteentry);
                 }
                 return;
             }
@@ -285,14 +334,7 @@ function handleChecklistKeydown(e) {
         var checklist = checklistItem.closest('.checklist');
         if (!checklist) return;
 
-        // IMPORTANT: Set noteid from the noteentry element
-        var noteentry = checklist.closest('.noteentry');
-        if (noteentry) {
-            var noteIdFromEntry = extractNoteIdFromEntry(noteentry);
-            if (noteIdFromEntry) {
-                noteid = noteIdFromEntry;
-            }
-        }
+        setNoteIdFromNoteentry(input);
 
         var textValue = input.value.trim();
 
@@ -324,12 +366,7 @@ function handleChecklistKeydown(e) {
             var newInput = document.createElement('input');
             newInput.type = 'text';
             newInput.className = 'checklist-input';
-            newInput.style.border = 'none';
-            newInput.style.background = 'none';
-            newInput.style.padding = '0';
-            newInput.style.fontFamily = 'inherit';
-            newInput.style.fontSize = 'inherit';
-            newInput.style.width = 'calc(100% - 30px)';
+            // Styles defined in modules/checklists.css (.checklist-input)
 
             newLi.appendChild(checkbox);
             newLi.appendChild(document.createTextNode(' '));
@@ -342,14 +379,7 @@ function handleChecklistKeydown(e) {
         }
 
         // Serialize and trigger save
-        var noteentry = checklist.closest('.noteentry');
-        if (noteentry && typeof serializeChecklistsBeforeSave === 'function') {
-            serializeChecklistsBeforeSave(noteentry);
-        }
-
-        if (typeof window.markNoteAsModified === 'function') {
-            window.markNoteAsModified();
-        }
+        serializeAndMarkModified(checklist.closest('.noteentry'));
     } else if (e.key === 'Backspace' || e.key === 'Delete') {
         // Handle Backspace/Delete key
         var checklistItem = input.closest('.checklist-item');
@@ -368,14 +398,7 @@ function handleChecklistKeydown(e) {
             // Cursor at beginning - merge with previous item or delete if empty
             e.preventDefault();
 
-            // IMPORTANT: Set noteid from the noteentry element
-            var noteentry = checklist.closest('.noteentry');
-            if (noteentry) {
-                var noteIdFromEntry = extractNoteIdFromEntry(noteentry);
-                if (noteIdFromEntry) {
-                    noteid = noteIdFromEntry;
-                }
-            }
+            setNoteIdFromNoteentry(input);
 
             // Get the previous item to focus on
             var previousItem = checklistItem.previousElementSibling;
@@ -430,13 +453,7 @@ function handleChecklistKeydown(e) {
             }
 
             // Serialize and trigger save
-            if (noteentry && typeof serializeChecklistsBeforeSave === 'function') {
-                serializeChecklistsBeforeSave(noteentry);
-            }
-
-            if (typeof window.markNoteAsModified === 'function') {
-                window.markNoteAsModified();
-            }
+            serializeAndMarkModified(checklist.closest('.noteentry'));
         }
         // Note: We do NOT prevent default for other cases
         // This allows normal text deletion to work
@@ -858,7 +875,7 @@ function handleNoteentryKeydown(e) {
 function handleNoteEditEvent(e) {
     var target = e.target;
 
-    // IMPORTANT: Set noteid from the noteentry element when editing
+    // Set noteid from the noteentry element when editing
     if (target.classList.contains('noteentry')) {
         var noteIdFromEntry = extractNoteIdFromEntry(target);
         if (noteIdFromEntry) {
@@ -866,11 +883,7 @@ function handleNoteEditEvent(e) {
         }
     }
 
-    if (target.classList.contains('name_doss')) {
-        if (typeof window.markNoteAsModified === 'function') {
-            window.markNoteAsModified();
-        }
-    } else if (target.classList.contains('noteentry')) {
+    if (target.classList.contains('name_doss') || target.classList.contains('noteentry')) {
         if (typeof window.markNoteAsModified === 'function') {
             window.markNoteAsModified();
         }
@@ -993,27 +1006,25 @@ function handleTitleKeydown(e) {
 }
 
 function setupAttachmentEvents() {
-    document.addEventListener('DOMContentLoaded', function () {
-        var fileInput = document.getElementById('attachmentFile');
-        var fileNameDiv = document.getElementById('selectedFileName');
-        var uploadButtonContainer = document.querySelector('.upload-button-container');
+    var fileInput = document.getElementById('attachmentFile');
+    var fileNameDiv = document.getElementById('selectedFileName');
+    var uploadButtonContainer = document.querySelector('.upload-button-container');
 
-        if (fileInput && fileNameDiv) {
-            fileInput.addEventListener('change', function () {
-                if (fileInput.files && fileInput.files.length > 0) {
-                    fileNameDiv.textContent = fileInput.files[0].name;
-                    if (uploadButtonContainer) {
-                        uploadButtonContainer.classList.add('show');
-                    }
-                } else {
-                    fileNameDiv.textContent = '';
-                    if (uploadButtonContainer) {
-                        uploadButtonContainer.classList.remove('show');
-                    }
+    if (fileInput && fileNameDiv) {
+        fileInput.addEventListener('change', function () {
+            if (fileInput.files && fileInput.files.length > 0) {
+                fileNameDiv.textContent = fileInput.files[0].name;
+                if (uploadButtonContainer) {
+                    uploadButtonContainer.classList.add('show');
                 }
-            });
-        }
-    });
+            } else {
+                fileNameDiv.textContent = '';
+                if (uploadButtonContainer) {
+                    uploadButtonContainer.classList.remove('show');
+                }
+            }
+        });
+    }
 }
 
 // Initialize all auto-save and navigation systems
@@ -1023,26 +1034,9 @@ function initializeAutoSaveSystem() {
     setupNavigationDebugger();
 }
 
-// Debug all navigation attempts
+// Monitor popstate events - reload note when using browser back/forward
 function setupNavigationDebugger() {
-    // Monitor popstate events - reload note when using browser back/forward
-    window.addEventListener('popstate', function (e) {
-        // Extract note ID from URL
-        var url = new URL(window.location.href);
-        var noteParam = url.searchParams.get('note');
-
-        if (noteParam && typeof loadNoteFromUrl === 'function') {
-            // Use existing loadNoteFromUrl function to reload note via AJAX
-            // Pass true to indicate this is from browser history navigation
-            loadNoteFromUrl(window.location.href, true);
-        } else if (!noteParam && url.searchParams.get('workspace')) {
-            // Just workspace change, let ui.js handler manage it
-        } else {
-            // Full page reload as fallback
-            window.location.reload();
-        }
-    });
-
+    // Handled by the global popstate listener below
 }
 
 // Global click interceptor for note navigation links
@@ -1087,64 +1081,14 @@ function setupNoteNavigationInterceptor() {
 
 // Show a temporary notification while auto-save is in progress
 function showSaveInProgressNotification(onCompleteCallback) {
-    // Create notification element
+    // Build the "saving" notification (styles in modules/misc.css)
     var notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #007DB8;
-        color: white;
-        padding: 15px 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        z-index: 10000;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        font-size: 14px;
-        font-weight: 500;
-        max-width: 300px;
-        animation: slideInRight 0.3s ease;
-    `;
-
-    // Add animation CSS if not already present
-    if (!document.getElementById('saveNotificationCSS')) {
-        var style = document.createElement('style');
-        style.id = 'saveNotificationCSS';
-        style.textContent = `
-            @keyframes slideInRight {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes slideOutRight {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(100%); opacity: 0; }
-            }
-            .save-notification-exit {
-                animation: slideOutRight 0.3s ease forwards;
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    notification.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="width: 16px; height: 16px; border: 2px solid #fff; border-top: 2px solid transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-            <span>${tr('autosave.notification.saving', {}, 'Saving changes...')}</span>
-        </div>
-    `;
-
-    // Add spinner animation
-    if (!document.getElementById('spinnerCSS')) {
-        var spinnerStyle = document.createElement('style');
-        spinnerStyle.id = 'spinnerCSS';
-        spinnerStyle.textContent = `
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-        `;
-        document.head.appendChild(spinnerStyle);
-    }
+    notification.className = 'save-notification';
+    notification.innerHTML =
+        '<div class="save-notification-inner">' +
+            '<div class="save-notification-spinner"></div>' +
+            '<span>' + tr('autosave.notification.saving', {}, 'Saving changes...') + '</span>' +
+        '</div>';
 
     document.body.appendChild(notification);
 
@@ -1157,56 +1101,14 @@ function showSaveInProgressNotification(onCompleteCallback) {
         saveToServerDebounced();
     }
 
-    // Monitor for save completion
-    var checkInterval = setInterval(function () {
-        // Check if save is complete (no timeout, not in refresh list, no red dot)
-        var noTimeout = !saveTimeout || saveTimeout === null || saveTimeout === undefined;
-        var notInRefreshList = !notesNeedingRefresh.has(String(currentNoteId));
-        var noRedDot = !document.title.startsWith('🔴');
+    // Helper: show "Saved!" then remove + callback
+    function showSavedAndDismiss() {
+        notification.innerHTML =
+            '<div class="save-notification-inner">' +
+                '<div class="save-notification-check">\u2713</div>' +
+                '<span>' + tr('autosave.notification.saved', {}, 'Saved!') + '</span>' +
+            '</div>';
 
-
-        var saveComplete = noTimeout && notInRefreshList && noRedDot;
-
-        if (saveComplete) {
-            clearInterval(checkInterval);
-            clearTimeout(fallbackTimeoutId);
-
-            // Change notification to success
-            notification.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <div style="width: 16px; height: 16px; color: #fff; font-weight: bold;">✓</div>
-                    <span>${tr('autosave.notification.saved', {}, 'Saved!')}</span>
-                </div>
-            `;
-
-            // Remove notification and proceed
-            setTimeout(function () {
-                notification.classList.add('save-notification-exit');
-                setTimeout(function () {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                    if (onCompleteCallback) {
-                        onCompleteCallback();
-                    }
-                }, 300);
-            }, 800); // Show "Saved!" for 800ms
-        }
-    }, 100); // Check every 100ms
-
-    // Fallback timeout (in case something goes wrong)
-    var fallbackTimeoutId = setTimeout(function () {
-        clearInterval(checkInterval);
-
-        // Show "Saved!" even if detection failed
-        notification.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 16px; height: 16px; color: #fff; font-weight: bold;">✓</div>
-                <span>${tr('autosave.notification.saved', {}, 'Saved!')}</span>
-            </div>
-        `;
-
-        // Remove notification and proceed
         setTimeout(function () {
             notification.classList.add('save-notification-exit');
             setTimeout(function () {
@@ -1217,21 +1119,34 @@ function showSaveInProgressNotification(onCompleteCallback) {
                     onCompleteCallback();
                 }
             }, 300);
-        }, 800); // Show "Saved!" for 800ms
-    }, 3000); // Maximum 3 seconds
+        }, 800);
+    }
+
+    // Monitor for save completion
+    var checkInterval = setInterval(function () {
+        var noTimeout = !saveTimeout || saveTimeout === null || saveTimeout === undefined;
+        var notInRefreshList = !notesNeedingRefresh.has(String(currentNoteId));
+        var noRedDot = !document.title.startsWith('\uD83D\uDD34');
+        if (noTimeout && notInRefreshList && noRedDot) {
+            clearInterval(checkInterval);
+            clearTimeout(fallbackTimeoutId);
+            showSavedAndDismiss();
+        }
+    }, 100);
+
+    // Fallback timeout
+    var fallbackTimeoutId = setTimeout(function () {
+        clearInterval(checkInterval);
+        showSavedAndDismiss();
+    }, 3000);
 }
 
 // Expose the function globally
 window.showSaveInProgressNotification = showSaveInProgressNotification;
 
 document.addEventListener('DOMContentLoaded', function () {
-    var fileInput = document.getElementById('attachmentFile');
-    var fileNameDiv = document.getElementById('selectedFileName');
-    var uploadButtonContainer = document.querySelector('.upload-button-container');
-
     // Convert <audio> elements to iframes inside contenteditable notes.
     // Chrome does not render native <audio> controls inside contenteditable zones.
-    // We wrap each audio in an iframe pointing to audio_player.php.
     if (typeof window.convertNoteAudioToIframes === 'function') {
         window.convertNoteAudioToIframes();
     }
@@ -1245,22 +1160,6 @@ document.addEventListener('DOMContentLoaded', function () {
     } catch (e) {
         // Ignore errors
     }
-
-    if (fileInput && fileNameDiv) {
-        fileInput.addEventListener('change', function () {
-            if (fileInput.files && fileInput.files.length > 0) {
-                fileNameDiv.textContent = fileInput.files[0].name;
-                if (uploadButtonContainer) {
-                    uploadButtonContainer.classList.add('show');
-                }
-            } else {
-                fileNameDiv.textContent = '';
-                if (uploadButtonContainer) {
-                    uploadButtonContainer.classList.remove('show');
-                }
-            }
-        });
-    }
 });
 
 function setupDragDropEvents() {
@@ -1270,7 +1169,7 @@ function setupDragDropEvents() {
             var potential = el && el.closest ? el.closest('.noteentry') : null;
             if (potential) {
                 e.preventDefault();
-                // Ajouter une classe visuelle pour montrer que le drop est possible
+                // Add visual feedback to show the drop target
                 potential.classList.add('drag-over');
             }
         } catch (err) { }
@@ -1294,7 +1193,7 @@ function setupDragDropEvents() {
             var el = document.elementFromPoint(e.clientX, e.clientY);
             var potential = el && el.closest ? el.closest('.noteentry') : null;
             if (!potential) {
-                // Supprimer la classe visuelle
+                // Remove visual feedback
                 document.querySelectorAll('.noteentry.drag-over').forEach(function (note) {
                     note.classList.remove('drag-over');
                 });
@@ -1316,7 +1215,7 @@ function setupDragDropEvents() {
             e.preventDefault();
             e.stopPropagation();
 
-            // Supprimer la classe visuelle
+            // Remove visual feedback
             note.classList.remove('drag-over');
 
             var dt = e.dataTransfer;
@@ -1615,44 +1514,30 @@ function handleNoteDragStart(e) {
             }
         }, 0);
 
-        // Add visual feedback
+        // Add visual feedback (styles in modules/drag-drop.css .dragging)
         noteLink.classList.add('dragging');
         noteLink.setAttribute('data-dragging', 'true');
-        noteLink.style.setProperty('opacity', '0.6', 'important');
-        noteLink.style.setProperty('background-color', 'rgba(0, 123, 255, 0.08)', 'important');
-        noteLink.style.setProperty('border-left', '3px solid rgba(0, 123, 255, 0.4)', 'important');
-        noteLink.style.setProperty('transform', 'scale(0.98)', 'important');
 
     }
 }
 
+// Remove dragging class and residual inline styles from all note links
+function cleanupDraggingNotes() {
+    document.querySelectorAll('.links_arbo_left.dragging').forEach(function (link) {
+        link.classList.remove('dragging');
+        link.removeAttribute('data-dragging');
+        link.style.cssText = '';
+    });
+}
+
 function handleNoteDragEnd(e) {
-    // DON'T clean up the drop zone immediately - let mouseup events fire first
-    // Only clean up the dragged note styles
+    // Clean up the dragged note styles
     var noteLink = e.target.closest('.links_arbo_left');
     if (noteLink) {
         noteLink.classList.remove('dragging');
-        // Remove inline styles
-        noteLink.style.opacity = '';
-        noteLink.style.transform = '';
-        noteLink.style.backgroundColor = '';
-        noteLink.style.border = '';
-        noteLink.style.zIndex = '';
-        noteLink.style.position = '';
+        noteLink.removeAttribute('data-dragging');
     }
-
-    // Also clean up any other notes that might have been prepared for drag
-    document.querySelectorAll('.links_arbo_left.dragging').forEach(function (link) {
-        if (link !== noteLink) {
-            link.classList.remove('dragging');
-            link.style.opacity = '';
-            link.style.transform = '';
-            link.style.backgroundColor = '';
-            link.style.border = '';
-            link.style.zIndex = '';
-            link.style.position = '';
-        }
-    });
+    cleanupDraggingNotes();
 
     // Remove drag-over class from all folders
     document.querySelectorAll('.folder-header.drag-over, .folder-header.folder-drop-target').forEach(function (header) {
@@ -1679,88 +1564,7 @@ function handleNoteDragEnd(e) {
     }, 2000); // Much longer delay to allow for click interaction
 }
 
-function handleFolderDragOver(e) {
-    e.preventDefault();
-
-    var folderHeader = e.target.closest('.folder-header');
-    if (folderHeader) {
-        var targetFolder = folderHeader.getAttribute('data-folder');
-
-        // Prevent drag-over effect for Tags folder
-        if (targetFolder === 'Tags') {
-            e.dataTransfer.dropEffect = 'none';
-            return;
-        }
-
-        // Allow drag-over for all other folders including Favorites
-        e.dataTransfer.dropEffect = 'move';
-        folderHeader.classList.add('drag-over');
-    }
-}
-
-function handleFolderDragLeave(e) {
-    var folderHeader = e.target.closest('.folder-header');
-    if (folderHeader) {
-        folderHeader.classList.remove('drag-over');
-    }
-}
-
-function handleFolderDrop(e) {
-    e.preventDefault();
-
-    var folderHeader = e.target.closest('.folder-header');
-    if (!folderHeader) return;
-
-    folderHeader.classList.remove('drag-over');
-
-    // Remove dragging class from all notes
-    document.querySelectorAll('.links_arbo_left.dragging').forEach(function (link) {
-        link.classList.remove('dragging');
-    });
-
-    try {
-        var data = JSON.parse(e.dataTransfer.getData('text/plain'));
-        var targetFolder = folderHeader.getAttribute('data-folder');
-        var targetFolderId = folderHeader.getAttribute('data-folder-id');
-
-        // Prevent dropping notes into the Tags folder
-        if (targetFolder === 'Tags') {
-            return;
-        }
-
-        // Special handling for Public folder
-        if (targetFolder === 'Public') {
-            // Open the share popup instead of moving the note
-            if (typeof openPublicShareModal === 'function') {
-                openPublicShareModal(data.noteId);
-            }
-            return;
-        }
-
-        // Special handling for Favorites folder
-        if (targetFolder === 'Favorites') {
-            // Add note to favorites instead of moving it
-            toggleFavorite(data.noteId);
-            return;
-        }
-
-        // Special handling for Trash folder
-        if (targetFolder === 'Trash') {
-            // Delete note and move it to trash
-            deleteNote(data.noteId);
-            return;
-        }
-
-        // Compare folder IDs instead of names to handle subfolders with same names
-        var currentFolderId = data.currentFolderId ? String(data.currentFolderId) : null;
-        var targetFolderIdStr = targetFolderId ? String(targetFolderId) : null;
-
-        if (data.noteId && targetFolderId && currentFolderId !== targetFolderIdStr) {
-            moveNoteToTargetFolder(data.noteId, targetFolderId);
-        }
-    } catch (err) {
-    }
-}
+// Legacy handlers removed — superseded by handleFolderDrag*Enhanced
 
 function moveNoteToTargetFolder(noteId, targetFolderIdOrName) {
     // targetFolderIdOrName can be either a folder ID (preferred) or folder name (legacy)
@@ -1781,48 +1585,12 @@ function moveNoteToTargetFolder(noteId, targetFolderIdOrName) {
         }
     }
 
-    var requestData = {
-        folder_id: targetFolderId || '',
-        workspace: selectedWorkspace || getSelectedWorkspace()
-    };
-
-    fetch('/api/v1/notes/' + noteId + '/folder', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        credentials: 'same-origin',
-        body: JSON.stringify(requestData)
-    })
-        .then(function (response) { return response.json(); })
-        .then(function (data) {
-            if (data && data.success) {
-                // Update shared count if notes were shared/unshared
-                if (data.share_delta && typeof updateSharedCount === 'function') {
-                    updateSharedCount(data.share_delta);
-                }
-                // Note moved successfully - refresh the left panel without full reload
-                if (typeof refreshNotesListAfterFolderAction === 'function') {
-                    setTimeout(function () {
-                        refreshNotesListAfterFolderAction();
-                    }, 200);
-                } else {
-                    setTimeout(function () {
-                        if (typeof persistFolderStatesFromDOM === 'function') {
-                            persistFolderStatesFromDOM();
-                        }
-                        location.reload();
-                    }, 500);
-                }
-            } else {
-                var err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';
-                showNotificationPopup('Error moving note: ' + err, 'error');
-            }
-        })
-        .catch(function (error) {
-            showNotificationPopup('Error moving note: ' + error.message, 'error');
-        });
+    apiPostJson(
+        '/api/v1/notes/' + noteId + '/folder',
+        { folder_id: targetFolderId || '', workspace: selectedWorkspace || getSelectedWorkspace() },
+        refreshSidebarAfterMove,
+        'Error moving note: '
+    );
 }
 
 // Root drop zone handlers
@@ -1855,15 +1623,7 @@ function handleRootDrop(e) {
     }
 
     // Remove dragging class from all notes
-    document.querySelectorAll('.links_arbo_left.dragging').forEach(function (link) {
-        link.classList.remove('dragging');
-        link.style.opacity = '';
-        link.style.transform = '';
-        link.style.backgroundColor = '';
-        link.style.border = '';
-        link.style.zIndex = '';
-        link.style.position = '';
-    });
+    cleanupDraggingNotes();
 
     try {
         var data = JSON.parse(e.dataTransfer.getData('text/plain'));
@@ -1878,43 +1638,12 @@ function handleRootDrop(e) {
 }
 
 function moveNoteToRoot(noteId) {
-    var requestData = {
-        workspace: selectedWorkspace || getSelectedWorkspace()
-    };
-
-    fetch('/api/v1/notes/' + noteId + '/remove-folder', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        credentials: 'same-origin',
-        body: JSON.stringify(requestData)
-    })
-        .then(function (response) { return response.json(); })
-        .then(function (data) {
-            if (data && data.success) {
-                // Note moved to root successfully - refresh the left panel without full reload
-                if (typeof refreshNotesListAfterFolderAction === 'function') {
-                    setTimeout(function () {
-                        refreshNotesListAfterFolderAction();
-                    }, 200);
-                } else {
-                    setTimeout(function () {
-                        if (typeof persistFolderStatesFromDOM === 'function') {
-                            persistFolderStatesFromDOM();
-                        }
-                        location.reload();
-                    }, 500);
-                }
-            } else {
-                var err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';
-                showNotificationPopup('Error removing note from folder: ' + err, 'error');
-            }
-        })
-        .catch(function (error) {
-            showNotificationPopup('Error removing note from folder: ' + error.message, 'error');
-        });
+    apiPostJson(
+        '/api/v1/notes/' + noteId + '/remove-folder',
+        { workspace: selectedWorkspace || getSelectedWorkspace() },
+        refreshSidebarAfterMove,
+        'Error removing note from folder: '
+    );
 }
 
 // =====================================================
@@ -2009,12 +1738,8 @@ function handleFolderDragStart(e) {
         }
     }, 0);
 
-    // Add visual feedback to the folder-toggle being dragged
+    // Add visual feedback (styles in modules/drag-drop.css .folder-dragging)
     folderToggle.classList.add('folder-dragging');
-    folderToggle.style.setProperty('opacity', '0.6', 'important');
-    folderToggle.style.setProperty('background-color', 'rgba(0, 123, 255, 0.08)', 'important');
-    folderToggle.style.setProperty('border', '2px dashed rgba(0, 123, 255, 0.4)', 'important');
-    folderToggle.style.setProperty('transform', 'scale(0.98)', 'important');
 }
 
 /**
@@ -2265,69 +1990,22 @@ function handleFolderDropEnhanced(e) {
 }
 
 /**
- * Move folder to a new parent folder
+ * Move folder to a new parent folder (pass null for root)
  */
 function moveFolderToParent(folderId, newParentFolderId) {
-    var requestData = {
-        workspace: selectedWorkspace || getSelectedWorkspace(),
-        new_parent_folder_id: newParentFolderId
-    };
-
-    fetch('/api/v1/folders/' + folderId + '/move', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        credentials: 'same-origin',
-        body: JSON.stringify(requestData)
-    })
-        .then(function (response) { return response.json(); })
-        .then(function (data) {
-            if (data && data.success) {
-                // Folder moved successfully - reload page
-                location.reload();
-            } else {
-                var err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';
-                showNotificationPopup('Error moving folder: ' + err, 'error');
-            }
-        })
-        .catch(function (error) {
-            showNotificationPopup('Error moving folder: ' + error.message, 'error');
-        });
+    apiPostJson(
+        '/api/v1/folders/' + folderId + '/move',
+        { workspace: selectedWorkspace || getSelectedWorkspace(), new_parent_folder_id: newParentFolderId },
+        function () { location.reload(); },
+        'Error moving folder: '
+    );
 }
 
 /**
  * Move folder to root (remove from parent folder)
  */
 function moveFolderToRoot(folderId) {
-    var requestData = {
-        workspace: selectedWorkspace || getSelectedWorkspace(),
-        new_parent_folder_id: null
-    };
-
-    fetch('/api/v1/folders/' + folderId + '/move', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        credentials: 'same-origin',
-        body: JSON.stringify(requestData)
-    })
-        .then(function (response) { return response.json(); })
-        .then(function (data) {
-            if (data && data.success) {
-                // Folder moved to root successfully - reload page
-                location.reload();
-            } else {
-                var err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';
-                showNotificationPopup('Error moving folder: ' + err, 'error');
-            }
-        })
-        .catch(function (error) {
-            showNotificationPopup('Error moving folder: ' + error.message, 'error');
-        });
+    moveFolderToParent(folderId, null);
 }
 
 function setupLinkEvents() {
@@ -2744,21 +2422,7 @@ function updateConnectionStatus(online) {
 window.updateConnectionStatus = updateConnectionStatus;
 
 function setupPageUnloadWarning() {
-    window.addEventListener('beforeunload', function (e) {
-        // Try to save any pending changes before leaving
-        if (noteid !== -1 && noteid !== 'search' && noteid !== null && noteid !== undefined) {
-            try {
-                var draftKey = 'poznote_draft_' + noteid;
-                var draft = localStorage.getItem(draftKey);
-                if (draft) {
-                    // Use emergency save for reliable final save
-                    emergencySave(noteid);
-                }
-            } catch (err) {
-            }
-        }
-        // No confirmation popup needed - auto-save handles everything
-    });
+    // Handled by the global beforeunload listener below
 }
 
 // Utility functions
@@ -2923,9 +2587,7 @@ function saveToServerDebounced() {
     saveNoteToServer();
 }
 
-function saveNoteImmediately() {
-    saveNoteToServer();
-}
+
 
 // Text selection management for formatting toolbar
 function initTextSelectionHandlers() {
@@ -2956,32 +2618,7 @@ function initTextSelectionHandlers() {
                 var isTitleOrTagField = false;
                 while (currentElement && currentElement !== document.body) {
 
-                    // Check the current element and its direct children for title/tag fields
-                    function checkElementAndChildren(element) {
-                        // Check the element itself
-                        if (element.classList &&
-                            (element.classList.contains('css-title') ||
-                                element.classList.contains('add-margin') ||
-                                (element.id && (element.id.indexOf('inp') === 0 || element.id.indexOf('tags') === 0)))) {
-                            return true;
-                        }
-
-                        // Check direct children (for the case <h4><input class="css-title"...></h4>)
-                        if (element.children) {
-                            for (var i = 0; i < element.children.length; i++) {
-                                var child = element.children[i];
-                                if (child.classList &&
-                                    (child.classList.contains('css-title') ||
-                                        child.classList.contains('add-margin') ||
-                                        (child.id && (child.id.indexOf('inp') === 0 || child.id.indexOf('tags') === 0)))) {
-                                    return true;
-                                }
-                            }
-                        }
-                        return false;
-                    }
-
-                    if (checkElementAndChildren(currentElement)) {
+                    if (isTitleOrTagElement(currentElement)) {
                         isTitleOrTagField = true;
                         break;
                     }
@@ -3282,11 +2919,11 @@ function emergencySave(noteId) {
 
 // Expose markNoteAsModified globally for use in other modules
 window.markNoteAsModified = markNoteAsModified;
-window.saveNoteImmediately = saveNoteImmediately;
+window.saveNoteImmediately = saveNoteToServer;
 window.checkUnsavedBeforeLeaving = checkUnsavedBeforeLeaving;
 window.hasUnsavedChanges = hasUnsavedChanges;
 
-// Warn user when leaving page with unsaved changes
+// Unified beforeunload handler: emergency save + browser warning
 window.addEventListener('beforeunload', function (e) {
     var currentNoteId = window.noteid;
     if (hasUnsavedChanges(currentNoteId)) {
@@ -3311,9 +2948,11 @@ window.addEventListener('beforeunload', function (e) {
     }
 });
 
-// Warn user when using browser back/forward with unsaved changes
+// Unified popstate handler: unsaved changes check + URL-based navigation
 window.addEventListener('popstate', function (e) {
     var currentNoteId = window.noteid;
+
+    // Check for unsaved changes first
     if (hasUnsavedChanges(currentNoteId)) {
         var message = tr(
             'autosave.confirm_navigation',
@@ -3324,17 +2963,25 @@ window.addEventListener('popstate', function (e) {
         );
 
         if (confirm(message)) {
-            // Force immediate save
             clearTimeout(saveTimeout);
             saveTimeout = null;
-
             if (isOnline) {
                 saveToServerDebounced();
             }
-
             notesNeedingRefresh.delete(String(currentNoteId));
         }
-        // Continue with navigation regardless of user choice
+    }
+
+    // Handle URL-based navigation (browser back/forward)
+    var url = new URL(window.location.href);
+    var noteParam = url.searchParams.get('note');
+
+    if (noteParam && typeof loadNoteFromUrl === 'function') {
+        loadNoteFromUrl(window.location.href, true);
+    } else if (!noteParam && url.searchParams.get('workspace')) {
+        // Just workspace change, let ui.js handler manage it
+    } else {
+        window.location.reload();
     }
 });
 

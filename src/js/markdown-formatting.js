@@ -213,9 +213,9 @@
         var sel = window.getSelection();
         
         // Restore saved range if available
-        if (window.savedLinkRange) {
+        if (window.savedRanges && window.savedRanges.link) {
             sel.removeAllRanges();
-            sel.addRange(window.savedLinkRange);
+            sel.addRange(window.savedRanges.link);
         }
         
         if (!sel || sel.rangeCount === 0) return;

@@ -245,48 +245,23 @@
         }
     }
 
-    function insertBold() {
+    // Generic inline element insertion: creates a DOM element, inserts it at cursor, places caret inside.
+    function insertInlineElement(tagName, styleObj) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
 
         const range = selection.getRangeAt(0);
-
-        // Create bold element
-        const strong = document.createElement('strong');
+        const el = document.createElement(tagName);
+        if (styleObj) {
+            for (var key in styleObj) {
+                if (styleObj.hasOwnProperty(key)) el.style[key] = styleObj[key];
+            }
+        }
         const textNode = document.createTextNode('\u200B'); // Zero-width space to place cursor
-        strong.appendChild(textNode);
-
-        // Insert at cursor position
-        range.deleteContents();
-        range.insertNode(strong);
-
-        // Place cursor inside bold element after the zero-width space
-        const newRange = document.createRange();
-        newRange.setStart(textNode, 1);
-        newRange.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(newRange);
-
-        // Trigger input event for autosave
-        const noteEntry = strong.closest('.noteentry');
-        if (noteEntry) {
-            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-    }
-
-    function insertItalic() {
-        const selection = window.getSelection();
-        if (!selection.rangeCount) return;
-
-        const range = selection.getRangeAt(0);
-
-        // Create italic element
-        const em = document.createElement('em');
-        const textNode = document.createTextNode('\u200B');
-        em.appendChild(textNode);
+        el.appendChild(textNode);
 
         range.deleteContents();
-        range.insertNode(em);
+        range.insertNode(el);
 
         const newRange = document.createRange();
         newRange.setStart(textNode, 1);
@@ -294,117 +269,20 @@
         selection.removeAllRanges();
         selection.addRange(newRange);
 
-        const noteEntry = em.closest('.noteentry');
+        const noteEntry = el.closest('.noteentry');
         if (noteEntry) {
             noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
         }
     }
 
+    // Backward-compatible thin wrappers
+    function insertBold() { insertInlineElement('strong'); }
+    function insertItalic() { insertInlineElement('em'); }
+    function insertHighlight() { insertInlineElement('mark'); }
+    function insertStrikethrough() { insertInlineElement('s'); }
+    function insertCode() { insertInlineElement('code'); }
     function insertColor(color) {
-        const selection = window.getSelection();
-        if (!selection.rangeCount) return;
-
-        const range = selection.getRangeAt(0);
-
-        // Create span with color
-        const span = document.createElement('span');
-        if (color !== 'black') {
-            span.style.color = color;
-        }
-        const textNode = document.createTextNode('\u200B');
-        span.appendChild(textNode);
-
-        range.deleteContents();
-        range.insertNode(span);
-
-        const newRange = document.createRange();
-        newRange.setStart(textNode, 1);
-        newRange.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(newRange);
-
-        const noteEntry = span.closest('.noteentry');
-        if (noteEntry) {
-            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-    }
-
-    function insertHighlight() {
-        const selection = window.getSelection();
-        if (!selection.rangeCount) return;
-
-        const range = selection.getRangeAt(0);
-
-        // Create mark element (highlight)
-        const mark = document.createElement('mark');
-        const textNode = document.createTextNode('\u200B');
-        mark.appendChild(textNode);
-
-        range.deleteContents();
-        range.insertNode(mark);
-
-        const newRange = document.createRange();
-        newRange.setStart(textNode, 1);
-        newRange.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(newRange);
-
-        const noteEntry = mark.closest('.noteentry');
-        if (noteEntry) {
-            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-    }
-
-    function insertStrikethrough() {
-        const selection = window.getSelection();
-        if (!selection.rangeCount) return;
-
-        const range = selection.getRangeAt(0);
-
-        // Create strikethrough element
-        const s = document.createElement('s');
-        const textNode = document.createTextNode('\u200B');
-        s.appendChild(textNode);
-
-        range.deleteContents();
-        range.insertNode(s);
-
-        const newRange = document.createRange();
-        newRange.setStart(textNode, 1);
-        newRange.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(newRange);
-
-        const noteEntry = s.closest('.noteentry');
-        if (noteEntry) {
-            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-    }
-
-    function insertCode() {
-        const selection = window.getSelection();
-        if (!selection.rangeCount) return;
-
-        const range = selection.getRangeAt(0);
-
-        // Create code element
-        const code = document.createElement('code');
-        const textNode = document.createTextNode('\u200B');
-        code.appendChild(textNode);
-
-        range.deleteContents();
-        range.insertNode(code);
-
-        const newRange = document.createRange();
-        newRange.setStart(textNode, 1);
-        newRange.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(newRange);
-
-        const noteEntry = code.closest('.noteentry');
-        if (noteEntry) {
-            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
-        }
+        insertInlineElement('span', color !== 'black' ? { color: color } : undefined);
     }
 
     function insertCodeBlock(language) {
@@ -1109,11 +987,106 @@
         ];
     }
 
+    // -------------------------------------------------------------------
+    // Shared data for code-block language submenu (used by both HTML & Markdown modes)
+    // -------------------------------------------------------------------
+    var CODE_BLOCK_LANGUAGES = [
+        { id: 'code-javascript', icon: 'fa-code', iconColor: '#f7df1e', label: 'JavaScript', lang: 'javascript' },
+        { id: 'code-typescript', icon: 'fa-code', iconColor: '#3178c6', label: 'TypeScript', lang: 'typescript' },
+        { id: 'code-python', icon: 'fa-code', iconColor: '#3776ab', label: 'Python', lang: 'python' },
+        { id: 'code-html', icon: 'fa-code', iconColor: '#e34f26', label: 'HTML', lang: 'html' },
+        { id: 'code-css', icon: 'fa-code', iconColor: '#1572b6', label: 'CSS', lang: 'css' },
+        { id: 'code-json', icon: 'fa-code', iconColor: '#292929', label: 'JSON', lang: 'json' },
+        { id: 'code-bash', icon: 'fa-terminal', iconColor: '#4eaa25', label: 'Bash', lang: 'bash' },
+        { id: 'code-powershell', icon: 'fa-terminal', iconColor: '#012456', label: 'PowerShell', lang: 'powershell' },
+        { id: 'code-sql', icon: 'fa-database', iconColor: '#336791', label: 'SQL', lang: 'sql' },
+        { id: 'code-php', icon: 'fa-code', iconColor: '#777bb4', label: 'PHP', lang: 'php' },
+        { id: 'code-java', icon: 'fa-code', iconColor: '#007396', label: 'Java', lang: 'java' },
+        { id: 'code-csharp', icon: 'fa-code', iconColor: '#239120', label: 'C#', lang: 'csharp' },
+        { id: 'code-cpp', icon: 'fa-code', iconColor: '#00599c', label: 'C++', lang: 'cpp' },
+        { id: 'code-go', icon: 'fa-code', iconColor: '#00add8', label: 'Go', lang: 'go' },
+        { id: 'code-rust', icon: 'fa-code', iconColor: '#b7410e', label: 'Rust', lang: 'rust' },
+        { id: 'code-ruby', icon: 'fa-gem', iconColor: '#cc342d', label: 'Ruby', lang: 'ruby' },
+        { id: 'code-yaml', icon: 'fa-file-code', iconColor: '#cb171e', label: 'YAML', lang: 'yaml' },
+        { id: 'code-xml', icon: 'fa-file-code', iconColor: '#0060ac', label: 'XML', lang: 'xml' },
+        { id: 'code-markdown', icon: 'fa-file-code', iconColor: '#083fa1', label: 'Markdown', lang: 'markdown' }
+    ];
+
+    // Shared callout / quote types
+    var CALLOUT_TYPES = [
+        { id: 'plain', labelKey: 'slash_menu.blockquote', fallback: 'Blockquote' },
+        { id: 'note', labelKey: 'slash_menu.callout_note', fallback: 'Note' },
+        { id: 'tip', labelKey: 'slash_menu.callout_tip', fallback: 'Tip' },
+        { id: 'important', labelKey: 'slash_menu.callout_important', fallback: 'Important' },
+        { id: 'warning', labelKey: 'slash_menu.callout_warning', fallback: 'Warning' },
+        { id: 'caution', labelKey: 'slash_menu.callout_caution', fallback: 'Caution' }
+    ];
+
+    // Returns items that are 100% identical between HTML and Markdown slash menus
+    function getCommonSlashCommands() {
+        var t = window.t || (function (key, params, fallback) { return fallback; });
+        return {
+            excalidraw: {
+                id: 'excalidraw',
+                icon: 'fal fa-paint-brush',
+                label: t('slash_menu.excalidraw', null, 'Excalidraw'),
+                mobileHidden: true,
+                action: function () {
+                    if (typeof window.insertExcalidrawDiagram === 'function') {
+                        window.insertExcalidrawDiagram();
+                    }
+                }
+            },
+            emoji: {
+                id: 'emoji',
+                icon: 'fa-smile',
+                label: t('slash_menu.emoji', null, 'Emoji'),
+                mobileHidden: true,
+                action: function () {
+                    if (typeof window.toggleEmojiPicker === 'function') {
+                        window.toggleEmojiPicker();
+                    }
+                }
+            },
+            noteReference: {
+                id: 'note-reference',
+                icon: 'fa fa-at',
+                label: t('slash_menu.link_to_note', null, 'Link to note'),
+                action: function () {
+                    if (typeof window.openNoteReferenceModal === 'function') {
+                        window.openNoteReferenceModal();
+                    }
+                }
+            },
+            image: {
+                id: 'image',
+                icon: 'fa fa-image',
+                label: t('slash_menu.image', null, 'Image'),
+                action: function () { insertImage(); }
+            },
+            cancel: {
+                id: 'open-keyboard',
+                icon: 'fa-times-circle',
+                label: t('slash_menu.cancel', null, 'Cancel'),
+                mobileOnly: true,
+                keepSlash: true,
+                action: function () {
+                    var editable = savedEditableElement;
+                    hideSlashMenu();
+                    savedNoteEntry = null;
+                    savedEditableElement = null;
+                    if (editable) editable.focus();
+                }
+            }
+        };
+    }
+
     // Slash command menu items - actions match toolbar exactly
     // Order matches toolbar
     // Use a function to get translated labels at runtime
     function getSlashCommands() {
         const t = window.t || ((key, params, fallback) => fallback);
+        var common = getCommonSlashCommands();
         return [
             {
                 id: 'normal',
@@ -1168,27 +1141,9 @@
                         id: 'block-languages',
                         icon: 'fa-laptop-code',
                         label: t('slash_menu.block_languages', null, 'Block Languages'),
-                        submenu: [
-                            { id: 'code-javascript', icon: 'fa-code', iconColor: '#f7df1e', label: 'JavaScript', action: () => insertCodeBlock('javascript') },
-                            { id: 'code-typescript', icon: 'fa-code', iconColor: '#3178c6', label: 'TypeScript', action: () => insertCodeBlock('typescript') },
-                            { id: 'code-python', icon: 'fa-code', iconColor: '#3776ab', label: 'Python', action: () => insertCodeBlock('python') },
-                            { id: 'code-html', icon: 'fa-code', iconColor: '#e34f26', label: 'HTML', action: () => insertCodeBlock('html') },
-                            { id: 'code-css', icon: 'fa-code', iconColor: '#1572b6', label: 'CSS', action: () => insertCodeBlock('css') },
-                            { id: 'code-json', icon: 'fa-code', iconColor: '#292929', label: 'JSON', action: () => insertCodeBlock('json') },
-                            { id: 'code-bash', icon: 'fa-terminal', iconColor: '#4eaa25', label: 'Bash', action: () => insertCodeBlock('bash') },
-                            { id: 'code-powershell', icon: 'fa-terminal', iconColor: '#012456', label: 'PowerShell', action: () => insertCodeBlock('powershell') },
-                            { id: 'code-sql', icon: 'fa-database', iconColor: '#336791', label: 'SQL', action: () => insertCodeBlock('sql') },
-                            { id: 'code-php', icon: 'fa-code', iconColor: '#777bb4', label: 'PHP', action: () => insertCodeBlock('php') },
-                            { id: 'code-java', icon: 'fa-code', iconColor: '#007396', label: 'Java', action: () => insertCodeBlock('java') },
-                            { id: 'code-csharp', icon: 'fa-code', iconColor: '#239120', label: 'C#', action: () => insertCodeBlock('csharp') },
-                            { id: 'code-cpp', icon: 'fa-code', iconColor: '#00599c', label: 'C++', action: () => insertCodeBlock('cpp') },
-                            { id: 'code-go', icon: 'fa-code', iconColor: '#00add8', label: 'Go', action: () => insertCodeBlock('go') },
-                            { id: 'code-rust', icon: 'fa-code', iconColor: '#b7410e', label: 'Rust', action: () => insertCodeBlock('rust') },
-                            { id: 'code-ruby', icon: 'fa-gem', iconColor: '#cc342d', label: 'Ruby', action: () => insertCodeBlock('ruby') },
-                            { id: 'code-yaml', icon: 'fa-file-code', iconColor: '#cb171e', label: 'YAML', action: () => insertCodeBlock('yaml') },
-                            { id: 'code-xml', icon: 'fa-file-code', iconColor: '#0060ac', label: 'XML', action: () => insertCodeBlock('xml') },
-                            { id: 'code-markdown', icon: 'fa-file-code', iconColor: '#083fa1', label: 'Markdown', action: () => insertCodeBlock('markdown') }
-                        ]
+                        submenu: CODE_BLOCK_LANGUAGES.map(function (l) {
+                            return { id: l.id, icon: l.icon, iconColor: l.iconColor, label: l.label, action: function () { insertCodeBlock(l.lang); } };
+                        })
                     }
                 ]
             },
@@ -1215,14 +1170,9 @@
                 id: 'quote',
                 icon: 'fa-info-circle',
                 label: t('slash_menu.quote', null, 'Quote'),
-                submenu: [
-                    { id: 'plain', label: t('slash_menu.blockquote', null, 'Blockquote'), action: () => insertCallout('plain') },
-                    { id: 'note', label: t('slash_menu.callout_note', null, 'Note'), action: () => insertCallout('note') },
-                    { id: 'tip', label: t('slash_menu.callout_tip', null, 'Tip'), action: () => insertCallout('tip') },
-                    { id: 'important', label: t('slash_menu.callout_important', null, 'Important'), action: () => insertCallout('important') },
-                    { id: 'warning', label: t('slash_menu.callout_warning', null, 'Warning'), action: () => insertCallout('warning') },
-                    { id: 'caution', label: t('slash_menu.callout_caution', null, 'Caution'), action: () => insertCallout('caution') }
-                ]
+                submenu: CALLOUT_TYPES.map(function (c) {
+                    return { id: c.id, label: t(c.labelKey, null, c.fallback), action: function () { insertCallout(c.id); } };
+                })
             },
             {
                 id: 'insert',
@@ -1246,28 +1196,8 @@
                             insertDate();
                         }
                     },
-                    {
-                        id: 'excalidraw',
-                        icon: 'fal fa-paint-brush',
-                        label: t('slash_menu.excalidraw', null, 'Excalidraw'),
-                        action: function () {
-                            if (typeof window.insertExcalidrawDiagram === 'function') {
-                                window.insertExcalidrawDiagram();
-                            }
-                        },
-                        mobileHidden: true
-                    },
-                    {
-                        id: 'emoji',
-                        icon: 'fa-smile',
-                        label: t('slash_menu.emoji', null, 'Emoji'),
-                        mobileHidden: true,
-                        action: function () {
-                            if (typeof window.toggleEmojiPicker === 'function') {
-                                window.toggleEmojiPicker();
-                            }
-                        }
-                    },
+                    common.excalidraw,
+                    common.emoji,
                     {
                         id: 'table',
                         icon: 'fa-table',
@@ -1385,16 +1315,7 @@
                             }
                         }
                     },
-                    {
-                        id: 'note-reference',
-                        icon: 'fa fa-at',
-                        label: t('slash_menu.link_to_note', null, 'Link to note'),
-                        action: function () {
-                            if (typeof window.openNoteReferenceModal === 'function') {
-                                window.openNoteReferenceModal();
-                            }
-                        }
-                    }
+                    common.noteReference
                 ]
             },
             {
@@ -1402,14 +1323,7 @@
                 icon: 'fa-image',
                 label: t('slash_menu.media', null, 'Media'),
                 submenu: [
-                    {
-                        id: 'image',
-                        icon: 'fa fa-image',
-                        label: t('slash_menu.image', null, 'Image'),
-                        action: function () {
-                            insertImage();
-                        }
-                    },
+                    common.image,
                     {
                         id: 'youtube',
                         icon: 'fa fa-video',
@@ -1442,24 +1356,7 @@
                     }
                 ]
             },
-            {
-                id: 'open-keyboard',
-                icon: 'fa-times-circle',
-                label: t('slash_menu.cancel', null, 'Cancel'),
-                mobileOnly: true,
-                keepSlash: true,
-                action: function () {
-                    // Save reference before clearing
-                    const editable = savedEditableElement;
-                    hideSlashMenu();
-                    savedNoteEntry = null;
-                    savedEditableElement = null;
-                    // Focus after clearing to open keyboard
-                    if (editable) {
-                        editable.focus();
-                    }
-                }
-            }
+            common.cancel
         ];
     }
 
@@ -1467,6 +1364,7 @@
     // Keep labels close to the HTML menu, but insert Markdown syntax.
     function getMarkdownSlashCommands() {
         const t = window.t || ((key, params, fallback) => fallback);
+        var common = getCommonSlashCommands();
         return [
             {
                 id: 'title',
@@ -1498,27 +1396,9 @@
                         id: 'block-languages',
                         icon: 'fa-laptop-code',
                         label: t('slash_menu.block_languages', null, 'Block Languages'),
-                        submenu: [
-                            { id: 'code-javascript', icon: 'fa-code', iconColor: '#f7df1e', label: 'JavaScript', action: () => insertMarkdownAtCursor('```javascript\n\n```\n', -5) },
-                            { id: 'code-typescript', icon: 'fa-code', iconColor: '#3178c6', label: 'TypeScript', action: () => insertMarkdownAtCursor('```typescript\n\n```\n', -5) },
-                            { id: 'code-python', icon: 'fa-code', iconColor: '#3776ab', label: 'Python', action: () => insertMarkdownAtCursor('```python\n\n```\n', -5) },
-                            { id: 'code-html', icon: 'fa-code', iconColor: '#e34f26', label: 'HTML', action: () => insertMarkdownAtCursor('```html\n\n```\n', -5) },
-                            { id: 'code-css', icon: 'fa-code', iconColor: '#1572b6', label: 'CSS', action: () => insertMarkdownAtCursor('```css\n\n```\n', -5) },
-                            { id: 'code-json', icon: 'fa-code', iconColor: '#292929', label: 'JSON', action: () => insertMarkdownAtCursor('```json\n\n```\n', -5) },
-                            { id: 'code-bash', icon: 'fa-terminal', iconColor: '#4eaa25', label: 'Bash', action: () => insertMarkdownAtCursor('```bash\n\n```\n', -5) },
-                            { id: 'code-powershell', icon: 'fa-terminal', iconColor: '#012456', label: 'PowerShell', action: () => insertMarkdownAtCursor('```powershell\n\n```\n', -5) },
-                            { id: 'code-sql', icon: 'fa-database', iconColor: '#336791', label: 'SQL', action: () => insertMarkdownAtCursor('```sql\n\n```\n', -5) },
-                            { id: 'code-php', icon: 'fa-code', iconColor: '#777bb4', label: 'PHP', action: () => insertMarkdownAtCursor('```php\n\n```\n', -5) },
-                            { id: 'code-java', icon: 'fa-code', iconColor: '#007396', label: 'Java', action: () => insertMarkdownAtCursor('```java\n\n```\n', -5) },
-                            { id: 'code-csharp', icon: 'fa-code', iconColor: '#239120', label: 'C#', action: () => insertMarkdownAtCursor('```csharp\n\n```\n', -5) },
-                            { id: 'code-cpp', icon: 'fa-code', iconColor: '#00599c', label: 'C++', action: () => insertMarkdownAtCursor('```cpp\n\n```\n', -5) },
-                            { id: 'code-go', icon: 'fa-code', iconColor: '#00add8', label: 'Go', action: () => insertMarkdownAtCursor('```go\n\n```\n', -5) },
-                            { id: 'code-rust', icon: 'fa-code', iconColor: '#b7410e', label: 'Rust', action: () => insertMarkdownAtCursor('```rust\n\n```\n', -5) },
-                            { id: 'code-ruby', icon: 'fa-gem', iconColor: '#cc342d', label: 'Ruby', action: () => insertMarkdownAtCursor('```ruby\n\n```\n', -5) },
-                            { id: 'code-yaml', icon: 'fa-file-code', iconColor: '#cb171e', label: 'YAML', action: () => insertMarkdownAtCursor('```yaml\n\n```\n', -5) },
-                            { id: 'code-xml', icon: 'fa-file-code', iconColor: '#0060ac', label: 'XML', action: () => insertMarkdownAtCursor('```xml\n\n```\n', -5) },
-                            { id: 'code-markdown', icon: 'fa-file-code', iconColor: '#083fa1', label: 'Markdown', action: () => insertMarkdownAtCursor('```markdown\n\n```\n', -5) }
-                        ]
+                        submenu: CODE_BLOCK_LANGUAGES.map(function (l) {
+                            return { id: l.id, icon: l.icon, iconColor: l.iconColor, label: l.label, action: function () { insertMarkdownAtCursor('```' + l.lang + '\n\n```\n', -5); } };
+                        })
                     }
                 ]
             },
@@ -1536,14 +1416,10 @@
                 id: 'quote',
                 icon: 'fa-info-circle',
                 label: t('slash_menu.quote', null, 'Quote'),
-                submenu: [
-                    { id: 'plain', label: t('slash_menu.blockquote', null, 'Blockquote'), action: () => insertMarkdownAtCursor('> ', 0) },
-                    { id: 'note', label: t('slash_menu.callout_note', null, 'Note'), action: () => insertMarkdownAtCursor('> Note\n> ', 0) },
-                    { id: 'tip', label: t('slash_menu.callout_tip', null, 'Tip'), action: () => insertMarkdownAtCursor('> Tip\n> ', 0) },
-                    { id: 'important', label: t('slash_menu.callout_important', null, 'Important'), action: () => insertMarkdownAtCursor('> Important\n> ', 0) },
-                    { id: 'warning', label: t('slash_menu.callout_warning', null, 'Warning'), action: () => insertMarkdownAtCursor('> Warning\n> ', 0) },
-                    { id: 'caution', label: t('slash_menu.callout_caution', null, 'Caution'), action: () => insertMarkdownAtCursor('> Caution\n> ', 0) }
-                ]
+                submenu: CALLOUT_TYPES.map(function (c) {
+                    var prefix = c.id === 'plain' ? '> ' : '> ' + c.fallback + '\n> ';
+                    return { id: c.id, label: t(c.labelKey, null, c.fallback), action: function () { insertMarkdownAtCursor(prefix, 0); } };
+                })
             },
             {
                 id: 'color',
@@ -1582,28 +1458,8 @@
                             insertDateMarkdown();
                         }
                     },
-                    {
-                        id: 'excalidraw',
-                        icon: 'fal fa-paint-brush',
-                        label: t('slash_menu.excalidraw', null, 'Excalidraw'),
-                        action: function () {
-                            if (typeof window.insertExcalidrawDiagram === 'function') {
-                                window.insertExcalidrawDiagram();
-                            }
-                        },
-                        mobileHidden: true
-                    },
-                    {
-                        id: 'emoji',
-                        icon: 'fa-smile',
-                        label: t('slash_menu.emoji', null, 'Emoji'),
-                        mobileHidden: true,
-                        action: function () {
-                            if (typeof window.toggleEmojiPicker === 'function') {
-                                window.toggleEmojiPicker();
-                            }
-                        }
-                    },
+                    common.excalidraw,
+                    common.emoji,
                     {
                         id: 'table',
                         icon: 'fa-table',
@@ -1712,16 +1568,7 @@
                             }
                         }
                     },
-                    {
-                        id: 'note-reference',
-                        icon: 'fa fa-at',
-                        label: t('slash_menu.link_to_note', null, 'Link to note'),
-                        action: function () {
-                            if (typeof window.openNoteReferenceModal === 'function') {
-                                window.openNoteReferenceModal();
-                            }
-                        }
-                    }
+                    common.noteReference
                 ]
             },
             {
@@ -1729,14 +1576,7 @@
                 icon: 'fa-image',
                 label: t('slash_menu.media', null, 'Media'),
                 submenu: [
-                    {
-                        id: 'image',
-                        icon: 'fa fa-image',
-                        label: t('slash_menu.image', null, 'Image'),
-                        action: function () {
-                            insertImage();
-                        }
-                    },
+                    common.image,
                     {
                         id: 'youtube',
                         icon: 'fa fa-video',
@@ -1769,24 +1609,7 @@
                     }
                 ]
             },
-            {
-                id: 'open-keyboard',
-                icon: 'fa-times-circle',
-                label: t('slash_menu.cancel', null, 'Cancel'),
-                mobileOnly: true,
-                keepSlash: true,
-                action: function () {
-                    // Save reference before clearing
-                    const editable = savedEditableElement;
-                    hideSlashMenu();
-                    savedNoteEntry = null;
-                    savedEditableElement = null;
-                    // Focus after clearing to open keyboard
-                    if (editable) {
-                        editable.focus();
-                    }
-                }
-            }
+            common.cancel
         ];
     }
 
@@ -2621,6 +2444,28 @@
         }
     }
 
+    // Shared helpers for keyboard navigation in slash menu
+    function scheduleFilterUpdate() {
+        if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+            setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
+        } else {
+            setTimeout(updateFilterFromEditor, 0);
+        }
+    }
+
+    function handleMenuFilterKey(key) {
+        if (key === 'Backspace') {
+            if (filterText.length === 0) {
+                hideSlashMenu();
+                savedNoteEntry = null;
+            } else {
+                scheduleFilterUpdate();
+            }
+        } else {
+            scheduleFilterUpdate();
+        }
+    }
+
     function handleKeydown(e) {
         if (!slashMenuElement) return;
 
@@ -2664,24 +2509,7 @@
                     if (e.key.length === 1 || e.key === 'Delete' || e.key === 'Backspace') {
                         hideSubSubmenu();
                         hideSubmenu();
-                        if (e.key === 'Backspace') {
-                            if (filterText.length === 0) {
-                                hideSlashMenu();
-                                savedNoteEntry = null;
-                            } else {
-                                if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
-                                    setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
-                                } else {
-                                    setTimeout(updateFilterFromEditor, 0);
-                                }
-                            }
-                        } else {
-                            if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
-                                setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
-                            } else {
-                                setTimeout(updateFilterFromEditor, 0);
-                            }
-                        }
+                        handleMenuFilterKey(e.key);
                     }
                     break;
             }
@@ -2740,24 +2568,7 @@
                 default:
                     if (e.key.length === 1 || e.key === 'Delete' || e.key === 'Backspace') {
                         hideSubmenu();
-                        if (e.key === 'Backspace') {
-                            if (filterText.length === 0) {
-                                hideSlashMenu();
-                                savedNoteEntry = null;
-                            } else {
-                                if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
-                                    setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
-                                } else {
-                                    setTimeout(updateFilterFromEditor, 0);
-                                }
-                            }
-                        } else {
-                            if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
-                                setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
-                            } else {
-                                setTimeout(updateFilterFromEditor, 0);
-                            }
-                        }
+                        handleMenuFilterKey(e.key);
                     }
                     break;
             }
@@ -2809,17 +2620,7 @@
                 break;
 
             case 'Backspace':
-                if (filterText.length === 0) {
-                    hideSlashMenu();
-                    savedNoteEntry = null;
-                } else {
-                    // Update from input field if we're in one, otherwise from editor
-                    if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
-                        setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
-                    } else {
-                        setTimeout(updateFilterFromEditor, 0);
-                    }
-                }
+                handleMenuFilterKey('Backspace');
                 break;
 
             case ' ':
@@ -2829,12 +2630,7 @@
 
             default:
                 if (e.key.length === 1 || e.key === 'Delete') {
-                    // Update from input field if we're in one, otherwise from editor
-                    if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
-                        setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
-                    } else {
-                        setTimeout(updateFilterFromEditor, 0);
-                    }
+                    scheduleFilterUpdate();
                 }
                 break;
         }
@@ -3205,13 +3001,23 @@
         };
     }
 
-    function insertUploadedMp4(isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange) {
-        const t = window.t || ((key, params, fallback) => fallback);
-        const context = resolveEditorContext(preferredNoteEntry, preferredEditableElement);
-        const noteEntry = context.noteEntry;
-        let editableElement = context.editableElement;
+    // -------------------------------------------------------------------
+    // Generic media upload: handles both MP4 video and audio uploads.
+    // mediaType: 'video' | 'audio'
+    // -------------------------------------------------------------------
+    function insertUploadedMedia(mediaType, isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange) {
+        var isVideo = (mediaType === 'video');
+        var logPrefix = isVideo ? '[MP4]' : '[AUDIO]';
+        var acceptType = isVideo ? 'video/mp4' : 'audio/*';
+        var validateFn = isVideo ? isMp4File : isAudioFile;
+        var i18nPrefix = isVideo ? 'mp4' : 'audio';
 
-        let noteId = '';
+        var t = window.t || (function (key, params, fallback) { return fallback; });
+        var context = resolveEditorContext(preferredNoteEntry, preferredEditableElement);
+        var noteEntry = context.noteEntry;
+        var editableElement = context.editableElement;
+
+        var noteId = '';
         if (noteEntry && noteEntry.id) {
             noteId = noteEntry.id.replace('entry', '');
         }
@@ -3224,43 +3030,42 @@
         }
 
         if (!noteId) {
-            console.error('[MP4] No note ID found!');
-            const msg = t('slash_menu.mp4_no_note', null, 'No note selected');
+            console.error(logPrefix + ' No note ID found!');
+            var noNoteMsg = t('slash_menu.' + i18nPrefix + '_no_note', null, 'No note selected');
             if (typeof showNotificationPopup === 'function') {
-                showNotificationPopup(msg, 'error');
+                showNotificationPopup(noNoteMsg, 'error');
             } else {
-                alert(msg);
+                alert(noNoteMsg);
             }
             return;
         }
 
-        const fileInput = document.createElement('input');
+        var fileInput = document.createElement('input');
         fileInput.type = 'file';
-        fileInput.accept = 'video/mp4';
+        fileInput.accept = acceptType;
         fileInput.style.display = 'none';
 
         fileInput.addEventListener('change', function () {
             try {
-                const file = fileInput.files && fileInput.files[0];
-                if (!file) {
-                    return;
-                }
+                var file = fileInput.files && fileInput.files[0];
+                if (!file) return;
 
-                if (!isMp4File(file)) {
-                    console.warn('[MP4] Invalid file type:', file.type);
+                if (!validateFn(file)) {
+                    console.warn(logPrefix + ' Invalid file type:', file.type);
+                    var invalidMsg = t('slash_menu.' + i18nPrefix + '_invalid_file', null, isVideo ? 'Please select an MP4 video.' : 'Please select an audio file.');
                     if (typeof showNotificationPopup === 'function') {
-                        showNotificationPopup(t('slash_menu.mp4_invalid_file', null, 'Please select an MP4 video.'), 'error');
+                        showNotificationPopup(invalidMsg, 'error');
                     } else {
-                        alert(t('slash_menu.mp4_invalid_file', null, 'Please select an MP4 video.'));
+                        alert(invalidMsg);
                     }
                     return;
                 }
 
                 // Show upload spinner
-                const uploadMsg = t('slash_menu.mp4_uploading', null, 'Uploading video...');
-                const uploadSpinner = window.modalAlert?.showSpinner(uploadMsg, t('common.please_wait', null, 'Please wait'));
-                
-                const formData = new FormData();
+                var uploadMsg = t('slash_menu.' + i18nPrefix + '_uploading', null, isVideo ? 'Uploading video...' : 'Uploading audio...');
+                var uploadSpinner = window.modalAlert?.showSpinner(uploadMsg, t('common.please_wait', null, 'Please wait'));
+
+                var formData = new FormData();
                 formData.append('note_id', noteId);
                 formData.append('file', file);
                 if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) {
@@ -3271,47 +3076,59 @@
                     method: 'POST',
                     body: formData
                 })
-                    .then(response => {
-                        return response.text();
-                    })
-                    .then(text => {
-                        let data;
+                    .then(function (response) { return response.text(); })
+                    .then(function (text) {
+                        var data;
                         try {
                             data = JSON.parse(text);
                         } catch (e) {
-                            console.error('[MP4] Failed to parse response:', e);
+                            console.error(logPrefix + ' Failed to parse response:', e);
                             throw new Error('Invalid server response');
                         }
                         if (!data || !data.success || !data.attachment_id) {
-                            console.error('[MP4] Upload failed:', data);
+                            console.error(logPrefix + ' Upload failed:', data);
                             throw new Error((data && data.message) ? data.message : 'Upload failed');
                         }
 
-                        const wsParam = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace)
+                        var wsParam = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace)
                             ? '?workspace=' + encodeURIComponent(selectedWorkspace)
                             : '';
-                        const fileUrl = '/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id + wsParam;
-                        const videoHtml = '<video class="note-video-embed" contenteditable="false" width="560" height="315" controls preload="metadata" playsinline src="' + fileUrl + '"></video>';
+                        var attachmentId = data.attachment_id;
+                        var fileUrl = '/api/v1/notes/' + noteId + '/attachments/' + attachmentId + wsParam;
+
+                        // Build the HTML to insert (differs by media type)
+                        var mediaHtml;
+                        if (isVideo) {
+                            mediaHtml = '<video class="note-video-embed" contenteditable="false" width="560" height="315" controls preload="metadata" playsinline src="' + fileUrl + '"></video>';
+                        } else {
+                            // Audio: iframe for contenteditable, native <audio> for markdown
+                            if (isMarkdown) {
+                                mediaHtml = '<audio class="note-audio-embed" controls preload="metadata" src="' + fileUrl + '"></audio>';
+                            } else {
+                                var iframeSrc = '/audio_player.php?note=' + encodeURIComponent(noteId) + '&attachment=' + encodeURIComponent(attachmentId) + (wsParam ? '&' + wsParam.substring(1) : '');
+                                mediaHtml = '<iframe class="note-audio-iframe" src="' + iframeSrc + '" style="max-width:250px;width:100%;height:54px;border:none;border-radius:8px;display:block;margin:10px 0" allowtransparency="true"></iframe>';
+                            }
+                        }
 
                         if (editableElement) {
                             editableElement.focus();
                         }
 
                         if (savedRange) {
-                            const sel = window.getSelection();
+                            var sel = window.getSelection();
                             sel.removeAllRanges();
                             sel.addRange(savedRange);
                         }
 
                         if (isMarkdown) {
-                            insertMarkdownAtCursor(videoHtml + '\n\n', 0);
+                            insertMarkdownAtCursor(mediaHtml + '\n\n', 0);
                             if (editableElement) {
                                 editableElement.dispatchEvent(new Event('input', { bubbles: true }));
                             }
                         } else {
                             try {
-                                const sel = window.getSelection();
-                                let range;
+                                var sel = window.getSelection();
+                                var range;
                                 if (savedRange) {
                                     range = savedRange;
                                 } else if (sel && sel.rangeCount > 0) {
@@ -3325,16 +3142,16 @@
                                 }
 
                                 if (range) {
-                                    const temp = document.createElement('div');
-                                    temp.innerHTML = videoHtml;
-                                    const videoEl = temp.firstChild;
+                                    var temp = document.createElement('div');
+                                    temp.innerHTML = mediaHtml;
+                                    var mediaEl = temp.firstChild;
 
-                                    const fragment = document.createDocumentFragment();
-                                    const lineBefore = document.createElement('div');
+                                    var fragment = document.createDocumentFragment();
+                                    var lineBefore = document.createElement('div');
                                     lineBefore.innerHTML = '<br>';
                                     fragment.appendChild(lineBefore);
-                                    fragment.appendChild(videoEl);
-                                    const lineAfter = document.createElement('div');
+                                    fragment.appendChild(mediaEl);
+                                    var lineAfter = document.createElement('div');
                                     lineAfter.innerHTML = '<br>';
                                     fragment.appendChild(lineAfter);
 
@@ -3345,7 +3162,7 @@
                                     sel.addRange(range);
                                 }
                             } catch (e) {
-                                console.error('Error inserting MP4 video:', e);
+                                console.error('Error inserting ' + mediaType + ':', e);
                             }
                         }
 
@@ -3360,29 +3177,29 @@
                         if (typeof window.saveNoteImmediately === 'function') {
                             window.saveNoteImmediately();
                         }
-                        
+
                         // Close upload spinner
                         if (uploadSpinner?.close) {
                             uploadSpinner.close();
                         }
                     })
-                    .catch(error => {
-                        console.error('[MP4] Upload error:', error);
-                        
+                    .catch(function (error) {
+                        console.error(logPrefix + ' Upload error:', error);
+
                         // Close upload spinner
                         if (uploadSpinner?.close) {
                             uploadSpinner.close();
                         }
-                        
-                        const msg = t('slash_menu.mp4_upload_failed', { error: error.message }, 'Upload failed: {{error}}');
+
+                        var failMsg = t('slash_menu.' + i18nPrefix + '_upload_failed', { error: error.message }, 'Upload failed: {{error}}');
                         if (typeof showNotificationPopup === 'function') {
-                            showNotificationPopup(msg, 'error');
+                            showNotificationPopup(failMsg, 'error');
                         } else {
-                            alert(msg);
+                            alert(failMsg);
                         }
                     });
             } catch (e) {
-                console.error('[MP4] Exception in change handler:', e);
+                console.error(logPrefix + ' Exception in change handler:', e);
             } finally {
                 if (fileInput.parentNode) {
                     document.body.removeChild(fileInput);
@@ -3391,7 +3208,7 @@
         });
 
         // Cleanup if user cancels the file selection
-        fileInput.addEventListener('cancel', function() {
+        fileInput.addEventListener('cancel', function () {
             if (fileInput.parentNode) {
                 document.body.removeChild(fileInput);
             }
@@ -3401,208 +3218,12 @@
         fileInput.click();
     }
 
+    // Backward-compatible wrappers
+    function insertUploadedMp4(isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange) {
+        insertUploadedMedia('video', isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange);
+    }
     function insertUploadedAudio(isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange) {
-        const t = window.t || ((key, params, fallback) => fallback);
-        const context = resolveEditorContext(preferredNoteEntry, preferredEditableElement);
-        const noteEntry = context.noteEntry;
-        let editableElement = context.editableElement;
-
-        let noteId = '';
-        if (noteEntry && noteEntry.id) {
-            noteId = noteEntry.id.replace('entry', '');
-        }
-        if (!noteId && typeof window.noteid !== 'undefined' && window.noteid !== null) {
-            noteId = String(window.noteid);
-        }
-
-        if (!editableElement && noteEntry) {
-            editableElement = noteEntry.querySelector ? (noteEntry.querySelector('.markdown-editor') || noteEntry.querySelector('[contenteditable="true"]')) : null;
-        }
-
-        if (!noteId) {
-            console.error('[AUDIO] No note ID found!');
-            const msg = t('slash_menu.audio_no_note', null, 'No note selected');
-            if (typeof showNotificationPopup === 'function') {
-                showNotificationPopup(msg, 'error');
-            } else {
-                alert(msg);
-            }
-            return;
-        }
-
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = 'audio/*';
-        fileInput.style.display = 'none';
-
-        fileInput.addEventListener('change', function () {
-            try {
-                const file = fileInput.files && fileInput.files[0];
-                if (!file) {
-                    return;
-                }
-
-                if (!isAudioFile(file)) {
-                    console.warn('[AUDIO] Invalid file type:', file.type);
-                    if (typeof showNotificationPopup === 'function') {
-                        showNotificationPopup(t('slash_menu.audio_invalid_file', null, 'Please select an audio file.'), 'error');
-                    } else {
-                        alert(t('slash_menu.audio_invalid_file', null, 'Please select an audio file.'));
-                    }
-                    return;
-                }
-
-                // Show upload spinner
-                const uploadMsg = t('slash_menu.audio_uploading', null, 'Uploading audio...');
-                const uploadSpinner = window.modalAlert?.showSpinner(uploadMsg, t('common.please_wait', null, 'Please wait'));
-
-                const formData = new FormData();
-                formData.append('note_id', noteId);
-                formData.append('file', file);
-                if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) {
-                    formData.append('workspace', selectedWorkspace);
-                }
-
-                fetch('/api/v1/notes/' + noteId + '/attachments', {
-                    method: 'POST',
-                    body: formData
-                })
-                    .then(response => {
-                        return response.text();
-                    })
-                    .then(text => {
-                        let data;
-                        try {
-                            data = JSON.parse(text);
-                        } catch (e) {
-                            console.error('[AUDIO] Failed to parse response:', e);
-                            throw new Error('Invalid server response');
-                        }
-                        if (!data || !data.success || !data.attachment_id) {
-                            console.error('[AUDIO] Upload failed:', data);
-                            throw new Error((data && data.message) ? data.message : 'Upload failed');
-                        }
-
-                        const wsParam = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace)
-                            ? '?workspace=' + encodeURIComponent(selectedWorkspace)
-                            : '';
-                        const attachmentId = data.attachment_id;
-                        // For HTML (contenteditable) mode, use an iframe to render the audio player.
-                        // Chrome does not render native <audio> controls inside contenteditable zones.
-                        // The iframe isolates the audio player in its own browsing context.
-                        const iframeSrc = '/audio_player.php?note=' + encodeURIComponent(noteId) + '&attachment=' + encodeURIComponent(attachmentId) + (wsParam ? '&' + wsParam.substring(1) : '');
-                        const audioHtmlForEditor = '<iframe class="note-audio-iframe" src="' + iframeSrc + '" style="max-width:250px;width:100%;height:54px;border:none;border-radius:8px;display:block;margin:10px 0" allowtransparency="true"></iframe>';
-                        // For markdown mode, use native <audio> tag (preview is not contenteditable)
-                        const fileUrl = '/api/v1/notes/' + noteId + '/attachments/' + attachmentId + wsParam;
-                        const audioHtmlForMarkdown = '<audio class="note-audio-embed" controls preload="metadata" src="' + fileUrl + '"></audio>';
-                        const audioHtml = isMarkdown ? audioHtmlForMarkdown : audioHtmlForEditor;
-
-                        if (editableElement) {
-                            editableElement.focus();
-                        }
-
-                        if (savedRange) {
-                            const sel = window.getSelection();
-                            sel.removeAllRanges();
-                            sel.addRange(savedRange);
-                        }
-
-                        if (isMarkdown) {
-                            insertMarkdownAtCursor(audioHtml + '\n\n', 0);
-                            if (editableElement) {
-                                editableElement.dispatchEvent(new Event('input', { bubbles: true }));
-                            }
-                        } else {
-                            try {
-                                const sel = window.getSelection();
-                                let range;
-                                if (savedRange) {
-                                    range = savedRange;
-                                } else if (sel && sel.rangeCount > 0) {
-                                    range = sel.getRangeAt(0);
-                                } else if (editableElement) {
-                                    range = document.createRange();
-                                    range.selectNodeContents(editableElement);
-                                    range.collapse(false);
-                                    sel.removeAllRanges();
-                                    sel.addRange(range);
-                                }
-
-                                if (range) {
-                                    const temp = document.createElement('div');
-                                    temp.innerHTML = audioHtml;
-                                    const audioEl = temp.firstChild;
-
-                                    const fragment = document.createDocumentFragment();
-                                    const lineBefore = document.createElement('div');
-                                    lineBefore.innerHTML = '<br>';
-                                    fragment.appendChild(lineBefore);
-                                    fragment.appendChild(audioEl);
-                                    const lineAfter = document.createElement('div');
-                                    lineAfter.innerHTML = '<br>';
-                                    fragment.appendChild(lineAfter);
-
-                                    range.deleteContents();
-                                    range.insertNode(fragment);
-                                    range.collapse(false);
-                                    sel.removeAllRanges();
-                                    sel.addRange(range);
-                                }
-                            } catch (e) {
-                                console.error('Error inserting audio:', e);
-                            }
-                        }
-
-                        if (noteEntry) {
-                            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
-                        }
-
-                        if (typeof window.markNoteAsModified === 'function') {
-                            window.markNoteAsModified();
-                        }
-
-                        if (typeof window.saveNoteImmediately === 'function') {
-                            window.saveNoteImmediately();
-                        }
-
-                        // Close upload spinner
-                        if (uploadSpinner?.close) {
-                            uploadSpinner.close();
-                        }
-                    })
-                    .catch(error => {
-                        console.error('[AUDIO] Upload error:', error);
-
-                        // Close upload spinner
-                        if (uploadSpinner?.close) {
-                            uploadSpinner.close();
-                        }
-
-                        const msg = t('slash_menu.audio_upload_failed', { error: error.message }, 'Upload failed: {{error}}');
-                        if (typeof showNotificationPopup === 'function') {
-                            showNotificationPopup(msg, 'error');
-                        } else {
-                            alert(msg);
-                        }
-                    });
-            } catch (e) {
-                console.error('[AUDIO] Exception in change handler:', e);
-            } finally {
-                if (fileInput.parentNode) {
-                    document.body.removeChild(fileInput);
-                }
-            }
-        });
-
-        // Cleanup if user cancels the file selection
-        fileInput.addEventListener('cancel', function() {
-            if (fileInput.parentNode) {
-                document.body.removeChild(fileInput);
-            }
-        });
-
-        document.body.appendChild(fileInput);
-        fileInput.click();
+        insertUploadedMedia('audio', isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange);
     }
 
     window.insertMp4Video = function () {

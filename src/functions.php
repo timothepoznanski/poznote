@@ -2,6 +2,34 @@
 date_default_timezone_set('UTC');
 
 /**
+ * Trusted domains allowed for iframe embeds.
+ * Used by both unescapeIframesInHtml() and the Markdown parser.
+ */
+if (!defined('ALLOWED_IFRAME_DOMAINS')) {
+    define('ALLOWED_IFRAME_DOMAINS', [
+        'youtube.com',
+        'www.youtube.com',
+        'youtube-nocookie.com',
+        'www.youtube-nocookie.com',
+        'player.vimeo.com',
+        'vimeo.com',
+        // Uncomment to allow additional embed providers:
+        // 'dailymotion.com', 'www.dailymotion.com',
+        // 'player.twitch.tv', 'clips.twitch.tv',
+        // 'open.spotify.com', 'w.soundcloud.com', 'bandcamp.com',
+        // 'codepen.io', 'jsfiddle.net', 'codesandbox.io', 'stackblitz.com',
+        // 'docs.google.com', 'drive.google.com', 'maps.google.com',
+        // 'www.google.com/maps', 'calendar.google.com',
+        // 'onedrive.live.com', 'office.com',
+        // 'twitter.com', 'x.com', 'platform.twitter.com', 'linkedin.com',
+        // 'slides.com', 'prezi.com', 'canva.com', 'figma.com', 'miro.com',
+        // 'excalidraw.com', 'loom.com', 'wistia.com', 'fast.wistia.net',
+        // 'share.descript.com', 'rumble.com', 'odysee.com', 'bitchute.com',
+        // 'peertube', 'invidio.us', 'piped.video',
+    ]);
+}
+
+/**
  * Detect if the current request is using HTTPS
  * Supports reverse proxy headers (X-Forwarded-Proto, X-Forwarded-SSL)
  */
@@ -232,55 +260,32 @@ function formatDateTime($timestamp) {
 }
 
 /**
- * Get the entries directory path
- * Returns the path for the current user
+ * Get a user data directory path by type.
+ * @param string $type One of 'entries', 'attachments', 'backups'
+ * @return string The directory path
  */
-function getEntriesPath() {
-    global $activeUserId;
-    $userId = $_SESSION['user_id'] ?? $activeUserId;
-    
-    if ($userId) {
-        require_once __DIR__ . '/users/UserDataManager.php';
-        $dataManager = new UserDataManager($userId);
-        return $dataManager->getUserEntriesPath();
-    }
-    // Fallback for unauthenticated access (should not happen in normal use)
-    return __DIR__ . '/data/entries';
-}
-
-/**
- * Get the attachments directory path
- * Returns the path for the current user
- */
-function getAttachmentsPath() {
+function getDataPath(string $type): string {
     global $activeUserId;
     $userId = $_SESSION['user_id'] ?? $activeUserId;
 
-    if ($userId) {
+    $methodMap = [
+        'entries' => 'getUserEntriesPath',
+        'attachments' => 'getUserAttachmentsPath',
+        'backups' => 'getUserBackupsPath',
+    ];
+
+    if ($userId && isset($methodMap[$type])) {
         require_once __DIR__ . '/users/UserDataManager.php';
         $dataManager = new UserDataManager($userId);
-        return $dataManager->getUserAttachmentsPath();
+        return $dataManager->{$methodMap[$type]}();
     }
     // Fallback for unauthenticated access
-    return __DIR__ . '/data/attachments';
+    return __DIR__ . '/data/' . $type;
 }
 
-/**
- * Get the backups directory path
- * Returns the path for the current user
- */
-function getBackupsPath() {
-    global $activeUserId;
-    $userId = $_SESSION['user_id'] ?? $activeUserId;
-
-    if ($userId) {
-        require_once __DIR__ . '/users/UserDataManager.php';
-        $dataManager = new UserDataManager($userId);
-        return $dataManager->getUserBackupsPath();
-    }
-    // Fallback for unauthenticated access
-    return __DIR__ . '/data/backups';
-}
+function getEntriesPath() { return getDataPath('entries'); }
+function getAttachmentsPath() { return getDataPath('attachments'); }
+function getBackupsPath() { return getDataPath('backups'); }
 
 /**
  * Get the appropriate file extension based on note type
@@ -1021,15 +1026,7 @@ function unescapeIframesInHtml($content) {
         if (preg_match('/src\s*=\s*["\']([^"\']+)["\']/i', $attrs, $srcMatch)) {
             $src = $srcMatch[1];
             
-            // Whitelist of allowed iframe domains (same as markdown parser)
-            $allowedDomains = [
-                'youtube.com',
-                'www.youtube.com',
-                'youtube-nocookie.com',
-                'www.youtube-nocookie.com',
-                'player.vimeo.com',
-                'vimeo.com',
-            ];
+            $allowedDomains = ALLOWED_IFRAME_DOMAINS;
             
             // Check if domain is whitelisted
             $isAllowed = false;

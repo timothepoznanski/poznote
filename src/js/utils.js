@@ -117,8 +117,6 @@ function duplicateNote(noteId) {
         });
 }
 
-
-
 // Folder management
 var currentFolderToDelete = { id: null, name: null };
 
@@ -309,12 +307,7 @@ function executeDeleteFolder() {
 }
 
 function executeDeleteFolderOperation(folderId, folderName) {
-    var deleteParams = new URLSearchParams({
-        action: 'delete',
-        folder_id: folderId
-    });
     var ws = getSelectedWorkspace();
-    if (ws) deleteParams.append('workspace', ws);
 
     fetch('/api/v1/folders/' + folderId + '?workspace=' + encodeURIComponent(ws || ''), {
         method: 'DELETE',
@@ -878,8 +871,6 @@ function restoreUpdateBadge() {
     }
 }
 
-
-
 function showMoveFolderFilesDialog(sourceFolderId, sourceFolderName) {
     document.getElementById('sourceFolderName').textContent = sourceFolderName;
     document.getElementById('sourceFolderName').dataset.folderId = sourceFolderId;
@@ -1231,8 +1222,6 @@ function saveFolderName() {
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data.success) {
-                // Clean localStorage entries for the old folder name
-                cleanupRenamedFolderInLocalStorage(oldName, newName);
                 closeModal('editFolderModal');
                 // Folder renamed successfully - no notification needed
                 location.reload();
@@ -1250,14 +1239,6 @@ function saveFolderName() {
             );
         });
 }
-
-function cleanupRenamedFolderInLocalStorage(oldName, newName) {
-    if (!oldName || !newName || oldName === newName) return;
-
-
-}
-
-
 
 // Folder management function (open/closed folder icon)
 function toggleFolder(folderId) {
@@ -1648,8 +1629,6 @@ function onWorkspaceChange() {
         });
 }
 
-
-
 function updateMoveButton(searchTerm, exactMatch) {
     if (exactMatch === undefined) exactMatch = false;
     var button = document.getElementById('moveActionButton');
@@ -1737,8 +1716,6 @@ function hideMoveFolderError() {
     }
 }
 
-
-
 // executeFolderAction removed
 
 
@@ -1790,23 +1767,18 @@ function showExportModal(noteId, filename, title, noteType) {
 function selectExportType(type) {
     closeModal('exportModal');
 
-    if (type === 'markdown') {
-        exportNoteAsMarkdown(currentExportNoteId, currentExportFilename, currentExportNoteType);
-    } else if (type === 'html') {
-        exportNoteAsHTML(currentExportNoteId, null, currentExportFilename, currentExportNoteType);
-    } else if (type === 'json') {
-        exportNoteAsJSON(currentExportNoteId, currentExportNoteType);
-    } else if (type === 'print') {
+    if (type === 'print') {
         exportNoteToPrint(currentExportNoteId, currentExportNoteType);
+    } else {
+        exportNoteAsFormat(currentExportNoteId, type, currentExportNoteType);
     }
 }
 
-// Export note as HTML
-function exportNoteAsHTML(noteId, url, filename, noteType) {
-    // Use the unified export API endpoint
+// Unified export function for HTML, Markdown, JSON formats
+function exportNoteAsFormat(noteId, format, noteType) {
     var apiUrl = 'api_export_note.php?id=' + encodeURIComponent(noteId) +
         '&type=' + encodeURIComponent(noteType) +
-        '&format=html';
+        '&format=' + encodeURIComponent(format);
 
     var link = document.createElement('a');
     link.href = apiUrl;
@@ -1816,34 +1788,10 @@ function exportNoteAsHTML(noteId, url, filename, noteType) {
     document.body.removeChild(link);
 }
 
-// Export note as Markdown
-function exportNoteAsMarkdown(noteId, filename, noteType) {
-    // Use the export API endpoint with markdown format
-    var apiUrl = 'api_export_note.php?id=' + encodeURIComponent(noteId) +
-        '&type=' + encodeURIComponent(noteType) +
-        '&format=markdown';
-
-    var link = document.createElement('a');
-    link.href = apiUrl;
-    link.download = '';  // Let the server set the filename via Content-Disposition
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
-// Export tasklist note as JSON
-function exportNoteAsJSON(noteId, noteType) {
-    var apiUrl = 'api_export_note.php?id=' + encodeURIComponent(noteId) +
-        '&type=' + encodeURIComponent(noteType) +
-        '&format=json';
-
-    var link = document.createElement('a');
-    link.href = apiUrl;
-    link.download = '';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
+// Legacy wrappers for backward compatibility
+function exportNoteAsHTML(noteId, url, filename, noteType) { exportNoteAsFormat(noteId, 'html', noteType); }
+function exportNoteAsMarkdown(noteId, filename, noteType) { exportNoteAsFormat(noteId, 'markdown', noteType); }
+function exportNoteAsJSON(noteId, noteType) { exportNoteAsFormat(noteId, 'json', noteType); }
 
 // Export note using browser's native print dialog
 function exportNoteToPrint(noteId, noteType) {
@@ -1870,21 +1818,6 @@ function exportNoteToPrint(noteId, noteType) {
 // Legacy function for backward compatibility
 function downloadNote(noteId, url, filename, noteType) {
     showExportModal(noteId, filename, null, noteType);
-}
-
-// Function to download a file
-function downloadFile(url, filename) {
-    // Ensure the filename has .html extension
-    if (filename && !filename.toLowerCase().endsWith('.html') && !filename.toLowerCase().endsWith('.htm')) {
-        filename = filename + '.html';
-    }
-
-    var link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
 }
 
 // Unified create functionality
@@ -2018,30 +1951,37 @@ function executeCreateAction() {
     }
 }
 
-function createHtmlNote() {
+/**
+ * Unified note creation function.
+ * @param {string} noteType - The note type for the API ('note', 'tasklist', 'markdown').
+ * @param {string[]} globalFnNames - Ordered list of global function names to try before falling back to the API.
+ */
+function createNoteOfType(noteType, globalFnNames) {
     if (isCreatingInFolder && targetFolderId) {
         // Mark folder as open in localStorage to keep it open after page reload
         var folderDomId = 'folder-' + targetFolderId;
         localStorage.setItem('folder_' + folderDomId, 'open');
 
-        // Set the selected folder temporarily so the existing functions use it
         var originalSelectedFolderId = selectedFolderId;
         var originalSelectedFolder = selectedFolder;
         selectedFolderId = targetFolderId;
         selectedFolder = targetFolderName;
 
-        // Call the note creation function
-        if (typeof newnote === 'function') {
-            newnote();
-        } else if (typeof createNewNote === 'function') {
-            createNewNote();
-        } else {
+        var created = false;
+        for (var i = 0; i < globalFnNames.length; i++) {
+            if (typeof window[globalFnNames[i]] === 'function') {
+                window[globalFnNames[i]]();
+                created = true;
+                break;
+            }
+        }
+        if (!created) {
             // Fallback to RESTful API
             fetch('/api/v1/notes', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ folder_id: targetFolderId, workspace: selectedWorkspace, type: 'note' })
-            }).then(r => r.json()).then(data => {
+                body: JSON.stringify({ folder_id: targetFolderId, workspace: selectedWorkspace, type: noteType })
+            }).then(function (r) { return r.json(); }).then(function (data) {
                 if (data.success && data.note) window.location.href = 'index.php?note=' + data.note.id;
             });
         }
@@ -2051,108 +1991,36 @@ function createHtmlNote() {
         selectedFolder = originalSelectedFolder;
     } else {
         // Regular creation (not in specific folder)
-        if (typeof newnote === 'function') {
-            newnote();
-        } else if (typeof createNewNote === 'function') {
-            createNewNote();
-        } else {
+        var created = false;
+        for (var i = 0; i < globalFnNames.length; i++) {
+            if (typeof window[globalFnNames[i]] === 'function') {
+                window[globalFnNames[i]]();
+                created = true;
+                break;
+            }
+        }
+        if (!created) {
             fetch('/api/v1/notes', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ workspace: selectedWorkspace, type: 'note' })
-            }).then(r => r.json()).then(data => {
+                body: JSON.stringify({ workspace: selectedWorkspace, type: noteType })
+            }).then(function (r) { return r.json(); }).then(function (data) {
                 if (data.success && data.note) window.location.href = 'index.php?note=' + data.note.id;
             });
         }
     }
+}
+
+function createHtmlNote() {
+    createNoteOfType('note', ['newnote', 'createNewNote']);
 }
 
 function createTaskListNoteInUtils() {
-    if (isCreatingInFolder && targetFolderId) {
-        // Mark folder as open in localStorage to keep it open after page reload
-        var folderDomId = 'folder-' + targetFolderId;
-        localStorage.setItem('folder_' + folderDomId, 'open');
-
-        var originalSelectedFolderId = selectedFolderId;
-        var originalSelectedFolder = selectedFolder;
-        selectedFolderId = targetFolderId;
-        selectedFolder = targetFolderName;
-
-        // Call the real createTaskListNote function from notes.js
-        if (typeof window.createTaskListNote === 'function') {
-            window.createTaskListNote();
-        } else {
-            // Fallback to RESTful API
-            fetch('/api/v1/notes', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ folder_id: targetFolderId, workspace: selectedWorkspace, type: 'tasklist' })
-            }).then(r => r.json()).then(data => {
-                if (data.success && data.note) window.location.href = 'index.php?note=' + data.note.id;
-            });
-        }
-
-        // Restore original folder
-        selectedFolderId = originalSelectedFolderId;
-        selectedFolder = originalSelectedFolder;
-    } else {
-        // Regular creation (not in specific folder)
-        if (typeof window.createTaskListNote === 'function') {
-            window.createTaskListNote();
-        } else {
-            // Fallback to RESTful API
-            fetch('/api/v1/notes', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ workspace: selectedWorkspace, type: 'tasklist' })
-            }).then(r => r.json()).then(data => {
-                if (data.success && data.note) window.location.href = 'index.php?note=' + data.note.id;
-            });
-        }
-    }
+    createNoteOfType('tasklist', ['createTaskListNote']);
 }
 
 function createMarkdownNoteInUtils() {
-    if (isCreatingInFolder && targetFolderId) {
-        // Mark folder as open in localStorage to keep it open after page reload
-        var folderDomId = 'folder-' + targetFolderId;
-        localStorage.setItem('folder_' + folderDomId, 'open');
-
-        var originalSelectedFolderId = selectedFolderId;
-        var originalSelectedFolder = selectedFolder;
-        selectedFolderId = targetFolderId;
-        selectedFolder = targetFolderName;
-
-        if (typeof window.createMarkdownNote === 'function') {
-            window.createMarkdownNote();
-        } else {
-            // Fallback to RESTful API
-            fetch('/api/v1/notes', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ folder_id: targetFolderId, workspace: selectedWorkspace, type: 'markdown' })
-            }).then(r => r.json()).then(data => {
-                if (data.success && data.note) window.location.href = 'index.php?note=' + data.note.id;
-            });
-        }
-
-        // Restore original folder
-        selectedFolderId = originalSelectedFolderId;
-        selectedFolder = originalSelectedFolder;
-    } else {
-        // Regular creation (not in specific folder)
-        if (typeof window.createMarkdownNote === 'function') {
-            window.createMarkdownNote();
-        } else {
-            fetch('/api/v1/notes', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ workspace: selectedWorkspace, type: 'markdown' })
-            }).then(r => r.json()).then(data => {
-                if (data.success && data.note) window.location.href = 'index.php?note=' + data.note.id;
-            });
-        }
-    }
+    createNoteOfType('markdown', ['createMarkdownNote']);
 }
 
 function createWorkspace() {
