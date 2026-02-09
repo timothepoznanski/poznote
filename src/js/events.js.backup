@@ -1,52 +1,21 @@
-// Event and user interaction management
-
-var saveTimeout;
-var lastSavedContent = null;
-var lastSavedTitle = null;
-var lastSavedTags = null;
-var isOnline = navigator.onLine;
-var notesNeedingRefresh = new Set();
-var changeCheckThrottle = null;
-var lastChangeCheckTime = 0;
-var CHANGE_CHECK_INTERVAL = 400;
-var localStorageSaveTimer = null;
-
-// Wrapper for translation function with fallback support
-function tr(key, vars, fallback) {
-    try {
-        return window.t ? window.t(key, vars || {}, fallback) : fallback;
-    } catch (e) {
-        return fallback;
-    }
-}
-
-// Generic function to update noteid based on element ID with prefix
-function updateNoteIdFromElement(element, prefixLength) {
-    if (element && element.id) {
-        noteid = element.id.substring(prefixLength);
-    }
-}
-
-// Used by event handlers to update the global noteid variable when users interact with notes
-function updateident(el) {
-    updateNoteIdFromElement(el, 5); // 'entry'.length
-}
-
-// Update noteid from title input element ID
-function updateidhead(el) {
-    updateNoteIdFromElement(el, 3); // 'inp'.length
-}
-
-// Utility function to extract note ID from entry element
-function extractNoteIdFromEntry(entryElement) {
-    return entryElement && entryElement.id ? entryElement.id.replace('entry', '') : null;
-}
+/**
+ * Event Management Orchestrator
+ * 
+ * This file coordinates all event handling modules and initializes the event system.
+ * The actual event handlers are organized in specialized modules:
+ * - events/utils.js: Shared helper functions
+ * - events/auto-save.js: Auto-save system (localStorage + server sync)
+ * - events/navigation.js: Note navigation and history management
+ * - events/drag-drop.js: Drag & drop for files, notes, and folders
+ * - events/rich-text-editing.js: Rich text editing, paste handlers, keyboard shortcuts
+ * - events/text-selection.js: Text selection and formatting toolbar
+ */
 
 // Set the global noteid from the nearest .noteentry ancestor of a DOM element
 function setNoteIdFromNoteentry(element) {
     var noteentry = element.closest('.noteentry');
     if (noteentry) {
-        var id = extractNoteIdFromEntry(noteentry);
+        var id = window.extractNoteIdFromEntry ? window.extractNoteIdFromEntry(noteentry) : null;
         if (id) noteid = id;
     }
     return noteentry;
@@ -145,37 +114,35 @@ function serializeChecklists(entryElement) {
     });
 }
 
+// Main initialization function - called when DOM is ready
 function initializeEventListeners() {
-
-    // Events for note modification
-    setupNoteEditingEvents();
-
-    // Events for attached files
-    setupAttachmentEvents();
-
-    // Events for image drag & drop
-    setupDragDropEvents();
-
-    // Events for note drag & drop between folders
-    setupNoteDragDropEvents();
-
-    // Events for link management
-    setupLinkEvents();
-
-    // Focus events
-    setupFocusEvents();
-
-    // Initialize auto-save system
-    initializeAutoSaveSystem();
-
-    // Warning before page close
-    setupPageUnloadWarning();
-
-    // Convert <audio> elements to iframes inside contenteditable notes
-    // Chrome does not render native <audio> controls inside contenteditable zones
-    convertNoteAudioToIframes();
-
-    // Ensure embedded media renders with controls inside contenteditable notes
+    // Setup all event systems by calling module initialization functions
+    
+    // Rich text editing (paste, keyboard shortcuts, content editing)
+    if (typeof setupNoteEditingEvents === 'function') setupNoteEditingEvents();
+    if (typeof setupAttachmentEvents === 'function') setupAttachmentEvents();
+    if (typeof setupLinkEvents === 'function') setupLinkEvents();
+    if (typeof setupFocusEvents === 'function') setupFocusEvents();
+    
+    // Drag & drop system (files, notes, folders)
+    if (typeof setupDragDropEvents === 'function') setupDragDropEvents();
+    if (typeof setupNoteDragDropEvents === 'function') setupNoteDragDropEvents();
+    if (typeof setupFolderDragDropEvents === 'function') setupFolderDragDropEvents();
+    
+    // Navigation system (note-to-note navigation, history)
+    if (typeof initializeAutoSaveSystem === 'function') initializeAutoSaveSystem();
+    if (typeof setupPageUnloadWarning === 'function') setupPageUnloadWarning();
+    
+    // Text selection and formatting toolbar
+    if (typeof window.initTextSelectionHandlers === 'function') window.initTextSelectionHandlers();
+    
+    // Chrome fix: Convert <audio> elements to iframes inside contenteditable notes
+    // (Chrome does not render native <audio> controls inside contenteditable zones)
+    if (typeof window.convertNoteAudioToIframes === 'function') {
+        window.convertNoteAudioToIframes();
+    }
+    
+    // Ensure embedded media has correct attributes
     try {
         var mediaEls = document.querySelectorAll('.noteentry video, .noteentry iframe');
         mediaEls.forEach(function (el) {
@@ -248,6 +215,18 @@ function setupNoteEditingEvents() {
             // Use requestAnimationFrame to check after the input is processed
             requestAnimationFrame(function () {
                 if (target && target.parentNode) {
+                    var emptyCodeBlocks = target.querySelectorAll('pre code:empty');
+                    emptyCodeBlocks.forEach(function (codeBlock) {
+                        var preParent = codeBlock.parentElement;
+                        if (preParent && preParent.tagName === 'PRE') {
+                            preParent.remove();
+                        }
+                    });
+                }
+            });
+        }
+    });
+}
                     // Find all code blocks in this note
                     var codeBlocks = target.querySelectorAll('pre, .code-block');
 

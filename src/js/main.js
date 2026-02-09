@@ -15,11 +15,39 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeWorkspaceMenu();
     initializeBrowserHistory();
 
-    // Initialize all events
-    initializeEventListeners();
-
-    // Initialize text selection handling for formatting
+    // Initialize all event systems
+    // Rich text editing (paste, keyboard shortcuts, content editing)
+    if (typeof setupNoteEditingEvents === 'function') setupNoteEditingEvents();
+    if (typeof setupAttachmentEvents === 'function') setupAttachmentEvents();
+    if (typeof setupLinkEvents === 'function') setupLinkEvents();
+    if (typeof setupFocusEvents === 'function') setupFocusEvents();
+    
+    // Drag & drop system (files, notes, folders)
+    if (typeof setupDragDropEvents === 'function') setupDragDropEvents();
+    if (typeof setupNoteDragDropEvents === 'function') setupNoteDragDropEvents();
+    if (typeof setupFolderDragDropEvents === 'function') setupFolderDragDropEvents();
+    
+    // Navigation system (note-to-note navigation, history)
+    if (typeof initializeAutoSaveSystem === 'function') initializeAutoSaveSystem();
+    if (typeof setupPageUnloadWarning === 'function') setupPageUnloadWarning();
+    
+    // Text selection and formatting toolbar
     initTextSelectionHandlers();
+    
+    // Chrome fix: Convert <audio> elements to iframes inside contenteditable notes
+    if (typeof window.convertNoteAudioToIframes === 'function') {
+        window.convertNoteAudioToIframes();
+    }
+    
+    // Ensure embedded media has correct attributes
+    try {
+        var mediaEls = document.querySelectorAll('.noteentry video, .noteentry iframe');
+        mediaEls.forEach(function (el) {
+            el.setAttribute('contenteditable', 'false');
+        });
+    } catch (e) {
+        // Ignore errors
+    }
 
     // Initialize automatic update checking (once per day, for admin users only)
     checkForUpdatesAutomatic();
@@ -158,7 +186,6 @@ window.closeLoginDisplayModal = closeLoginDisplayModal;
 window.checkForUpdates = checkForUpdates;
 window.highlightSearchTerms = highlightSearchTerms;
 window.clearSearchHighlights = clearSearchHighlights;
-
 window.showMoveFolderFilesDialog = showMoveFolderFilesDialog;
 window.executeMoveAllFiles = executeMoveAllFiles;
 window.populateTargetFolderDropdown = populateTargetFolderDropdown;

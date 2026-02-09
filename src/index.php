@@ -866,7 +866,13 @@ $body_classes = trim($extra_body_classes);
 <script src="js/notes.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/attachments.js"></script>
-<script src="js/events.js"></script>
+<!-- Event management modules -->
+<script src="js/events-utils.js?v=<?php echo $v; ?>"></script>
+<script src="js/events-auto-save.js?v=<?php echo $v; ?>"></script>
+<script src="js/events-drag-drop.js?v=<?php echo $v; ?>"></script>
+<script src="js/events-navigation.js?v=<?php echo $v; ?>"></script>
+<script src="js/events-rich-text-editing.js?v=<?php echo $v; ?>"></script>
+<script src="js/events-text-selection.js?v=<?php echo $v; ?>"></script>
 <script src="js/utils.js"></script>
 <script src="js/search-highlight.js"></script>
 <script src="js/slash-command.js?v=<?php echo $v; ?>"></script>

@@ -6,6 +6,7 @@
 // Global variables for note loading
 var currentLoadingNoteId = null;
 var isNoteLoading = false;
+var imageClickHandlerInitialized = false;
 
 /**
  * Reapply search highlights with a couple of delayed retries to handle layout timing.
@@ -617,9 +618,6 @@ function updateBrowserUrl(url, noteId) {
         history.pushState(state, '', url);
     }
 }
-
-// Global flag to track if document-level handler is set
-var imageClickHandlerInitialized = false;
 
 /**
  * Re-initialize image click handlers for note content
