@@ -2604,8 +2604,6 @@ function saveToServerDebounced() {
     saveNoteToServer();
 }
 
-
-
 // Text selection management for formatting toolbar
 function initTextSelectionHandlers() {
     // Check if we're in desktop mode
@@ -2934,12 +2932,6 @@ function emergencySave(noteId) {
     }
 }
 
-// Expose markNoteAsModified globally for use in other modules
-window.markNoteAsModified = markNoteAsModified;
-window.saveNoteImmediately = saveNoteToServer;
-window.checkUnsavedBeforeLeaving = checkUnsavedBeforeLeaving;
-window.hasUnsavedChanges = hasUnsavedChanges;
-
 // Unified beforeunload handler: emergency save + browser warning
 window.addEventListener('beforeunload', function (e) {
     var currentNoteId = window.noteid;
@@ -3165,6 +3157,10 @@ function reinitializeAutoSaveState() {
 }
 
 // Make functions globally available
+window.markNoteAsModified = markNoteAsModified;
+window.saveNoteImmediately = saveNoteToServer;
+window.checkUnsavedBeforeLeaving = checkUnsavedBeforeLeaving;
+window.hasUnsavedChanges = hasUnsavedChanges;
 window.checkForUnsavedDraft = checkForUnsavedDraft;
 window.clearDraft = clearDraft;
 window.reinitializeAutoSaveState = reinitializeAutoSaveState;
