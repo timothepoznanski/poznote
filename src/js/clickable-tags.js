@@ -808,7 +808,7 @@ function redirectToTag(tag) {
 
 // Make functions available globally for use by other scripts
 window.initializeClickableTags = initializeClickableTags;
-window.reinitializeClickableTagsAfterAjax = reinitializeClickableTagsAfterAjax;
+window.reinitializeClickableTagsAfterAjax = initializeClickableTags; // Alias for AJAX reinitialization
 window.refreshTagsCount = refreshTagsCount;
 
 // Listen for i18n loaded event to update tag input placeholders

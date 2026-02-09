@@ -21,30 +21,67 @@
 .folder-toggle.folder-dragging,
 .folder-header.folder-dragging {
     opacity: 0.6 !important;
-    background-color: rgba(0, 123, 255, 0.08) !important;
-    border: 2px dashed rgba(0, 123, 255, 0.4) !important;
+    background-color: rgba(255, 152, 0, 0.08) !important;
+    border: 2px dashed rgba(255, 152, 0, 0.4) !important;
     transform: scale(0.98) !important;
+    padding: 4px !important;
+}
+
+.folder-header.folder-source-drag {
+    background-color: rgba(255, 152, 0, 0.08) !important;
+    border: 2px solid rgba(255, 152, 0, 0.3) !important;
+    border-radius: 8px !important;
+    padding: 4px !important;
+    margin: 2px 0 !important;
+    box-shadow: 0 0 6px rgba(255, 152, 0, 0.2) !important;
+    transition: all 0.2s ease !important;
+}
+
+.folder-header.drag-over {
+    background-color: rgba(0, 123, 255, 0.12) !important;
+    border: 2px dashed #007bff !important;
+    border-radius: 8px !important;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.3) !important;
+    padding: 4px !important;
+    margin: 2px 0 !important;
+    transition: all 0.2s ease !important;
 }
 
 .folder-header.folder-drop-target {
     background-color: rgba(0, 123, 255, 0.15) !important;
     border: 2px dashed #007bff !important;
     box-shadow: 0 0 12px rgba(0, 123, 255, 0.4) !important;
+    padding: 4px !important;
+    margin: 2px 0 !important;
     transform: scale(1.02);
-    transition: all 0.2s ease;
+    transition: all 0.2s ease !important;
 }
 
 /* Dark mode folder dragging */
 html[data-theme='dark'] .folder-header.folder-dragging,
 body.dark-mode .folder-header.folder-dragging {
+    background-color: rgba(255, 167, 38, 0.12) !important;
+    border-color: rgba(255, 167, 38, 0.5) !important;
+}
+
+html[data-theme='dark'] .folder-header.folder-source-drag,
+body.dark-mode .folder-header.folder-source-drag {
+    background-color: rgba(255, 167, 38, 0.12) !important;
+    border: 2px solid rgba(255, 167, 38, 0.4) !important;
+    box-shadow: 0 0 6px rgba(255, 167, 38, 0.3) !important;
+}
+
+html[data-theme='dark'] .folder-header.drag-over,
+body.dark-mode .folder-header.drag-over {
     background-color: rgba(74, 144, 226, 0.15) !important;
-    border-color: rgba(74, 144, 226, 0.5) !important;
+    border: 2px dashed #4a90e2 !important;
+    box-shadow: 0 0 8px rgba(74, 144, 226, 0.4) !important;
 }
 
 html[data-theme='dark'] .folder-header.folder-drop-target,
 body.dark-mode .folder-header.folder-drop-target {
     background-color: rgba(74, 144, 226, 0.2) !important;
-    border-color: #4a90e2 !important;
+    border: 2px dashed #4a90e2 !important;
     box-shadow: 0 0 12px rgba(74, 144, 226, 0.5) !important;
 }
 

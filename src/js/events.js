@@ -1237,10 +1237,7 @@ function setupNoteDragDropEvents() {
     });
 
     document.querySelectorAll('.folder-header').forEach(function (header) {
-        header.removeEventListener('dragover', handleFolderDragOver);
-        header.removeEventListener('drop', handleFolderDrop);
-        header.removeEventListener('dragleave', handleFolderDragLeave);
-        // Also remove enhanced handlers
+        // Remove enhanced handlers
         header.removeEventListener('dragenter', handleFolderDragEnterEnhanced);
         header.removeEventListener('dragover', handleFolderDragOverEnhanced);
         header.removeEventListener('drop', handleFolderDropEnhanced);
@@ -1518,6 +1515,18 @@ function handleNoteDragStart(e) {
         noteLink.classList.add('dragging');
         noteLink.setAttribute('data-dragging', 'true');
 
+        // Add visual feedback to the source folder
+        var sourceFolderHeader = noteLink.closest('.folder-content');
+        if (sourceFolderHeader) {
+            var parentFolderHeader = sourceFolderHeader.previousElementSibling;
+            if (parentFolderHeader && parentFolderHeader.classList.contains('folder-toggle')) {
+                var folderHeaderContainer = parentFolderHeader.parentElement;
+                if (folderHeaderContainer && folderHeaderContainer.classList.contains('folder-header')) {
+                    folderHeaderContainer.classList.add('folder-source-drag');
+                }
+            }
+        }
+
     }
 }
 
@@ -1527,6 +1536,10 @@ function cleanupDraggingNotes() {
         link.classList.remove('dragging');
         link.removeAttribute('data-dragging');
         link.style.cssText = '';
+    });
+    // Remove source folder visual feedback
+    document.querySelectorAll('.folder-header.folder-source-drag').forEach(function (header) {
+        header.classList.remove('folder-source-drag');
     });
 }
 
@@ -1540,9 +1553,10 @@ function handleNoteDragEnd(e) {
     cleanupDraggingNotes();
 
     // Remove drag-over class from all folders
-    document.querySelectorAll('.folder-header.drag-over, .folder-header.folder-drop-target').forEach(function (header) {
+    document.querySelectorAll('.folder-header.drag-over, .folder-header.folder-drop-target, .folder-header.folder-source-drag').forEach(function (header) {
         header.classList.remove('drag-over');
         header.classList.remove('folder-drop-target');
+        header.classList.remove('folder-source-drag');
         if (header.dataset && header.dataset.dragEnterCount) {
             delete header.dataset.dragEnterCount;
         }
@@ -1740,6 +1754,7 @@ function handleFolderDragStart(e) {
 
     // Add visual feedback (styles in modules/drag-drop.css .folder-dragging)
     folderToggle.classList.add('folder-dragging');
+    folderHeader.classList.add('folder-source-drag');
 }
 
 /**
@@ -1760,6 +1775,7 @@ function handleFolderDragEnd(e) {
     // Also clean up folder-header styles if any were applied
     if (folderHeader) {
         folderHeader.classList.remove('folder-dragging');
+        folderHeader.classList.remove('folder-source-drag');
         folderHeader.style.opacity = '';
         folderHeader.style.backgroundColor = '';
         folderHeader.style.border = '';
@@ -1767,8 +1783,9 @@ function handleFolderDragEnd(e) {
     }
 
     // Clean up all folder drag-over states
-    document.querySelectorAll('.folder-header.folder-drop-target').forEach(function (header) {
+    document.querySelectorAll('.folder-header.folder-drop-target, .folder-header.folder-source-drag').forEach(function (header) {
         header.classList.remove('folder-drop-target');
+        header.classList.remove('folder-source-drag');
         if (header.dataset && header.dataset.dragEnterCount) {
             delete header.dataset.dragEnterCount;
         }
