@@ -11,6 +11,7 @@ var lastChangeCheckTime = 0;
 var CHANGE_CHECK_INTERVAL = 400;
 var localStorageSaveTimer = null;
 
+// Wrapper for translation function with fallback support
 function tr(key, vars, fallback) {
     try {
         return window.t ? window.t(key, vars || {}, fallback) : fallback;
@@ -26,12 +27,12 @@ function updateNoteIdFromElement(element, prefixLength) {
     }
 }
 
-// Helper functions for note ID tracking from DOM elements
 // Used by event handlers to update the global noteid variable when users interact with notes
 function updateident(el) {
     updateNoteIdFromElement(el, 5); // 'entry'.length
 }
 
+// Update noteid from title input element ID
 function updateidhead(el) {
     updateNoteIdFromElement(el, 3); // 'inp'.length
 }
@@ -185,6 +186,7 @@ function initializeEventListeners() {
     }
 }
 
+// Setup event listeners for note content editing and modification tracking
 function setupNoteEditingEvents() {
     var eventTypes = ['keyup', 'input', 'paste', 'change'];
 
@@ -288,6 +290,7 @@ function setupNoteEditingEvents() {
     }, true); // Use capture phase to catch events from contenteditable children
 }
 
+// Handle keyboard shortcuts and navigation in checklist items
 function handleChecklistKeydown(e) {
     var input = e.target;
 
@@ -524,6 +527,7 @@ function handleChecklistKeydown(e) {
     }
 }
 
+// Handle Enter key in blockquotes/callouts and rich text editing in note content
 function handleNoteentryKeydown(e) {
     var originalTarget = e.target;
     var target = originalTarget.nodeType === 3 ? originalTarget.parentNode : originalTarget;
@@ -838,6 +842,7 @@ function handleNoteentryKeydown(e) {
     }
 }
 
+// Update noteid and trigger auto-save when editing note content, title, or tags
 function handleNoteEditEvent(e) {
     var target = e.target;
 
@@ -882,6 +887,7 @@ function handleNoteEditEvent(e) {
     }
 }
 
+// Handle space key in tags field to auto-separate tags
 function handleTagsKeydown(e) {
     var target = e.target;
 
@@ -919,6 +925,7 @@ function handleTagsKeydown(e) {
     }
 }
 
+// Save note immediately when title loses focus
 function handleTitleBlur(e) {
     var target = e.target;
 
@@ -941,6 +948,7 @@ function handleTitleBlur(e) {
     }
 }
 
+// Handle Enter and Escape keys in title field
 function handleTitleKeydown(e) {
     var target = e.target;
 
@@ -971,6 +979,7 @@ function handleTitleKeydown(e) {
     }
 }
 
+// Setup event listeners for attachment delete buttons
 function setupAttachmentEvents() {
     var fileInput = document.getElementById('attachmentFile');
     var fileNameDiv = document.getElementById('selectedFileName');
@@ -1002,7 +1011,41 @@ function initializeAutoSaveSystem() {
 
 // Monitor popstate events - reload note when using browser back/forward
 function setupNavigationDebugger() {
-    // Handled by the global popstate listener below
+    window.addEventListener('popstate', function (e) {
+        var currentNoteId = window.noteid;
+
+        // Check for unsaved changes first
+        if (hasUnsavedChanges(currentNoteId)) {
+            var message = tr(
+                'autosave.confirm_navigation',
+                {},
+                "⚠️ Unsaved Changes\n\n" +
+                "You have unsaved changes that will be lost.\n" +
+                "Save before navigating away?"
+            );
+
+            if (confirm(message)) {
+                clearTimeout(saveTimeout);
+                saveTimeout = null;
+                if (isOnline) {
+                    saveToServerDebounced();
+                }
+                notesNeedingRefresh.delete(String(currentNoteId));
+            }
+        }
+
+        // Handle URL-based navigation (browser back/forward)
+        var url = new URL(window.location.href);
+        var noteParam = url.searchParams.get('note');
+
+        if (noteParam && typeof loadNoteFromUrl === 'function') {
+            loadNoteFromUrl(window.location.href, true);
+        } else if (!noteParam && url.searchParams.get('workspace')) {
+            // Just workspace change, let ui.js handler manage it
+        } else {
+            window.location.reload();
+        }
+    });
 }
 
 // Global click interceptor for note navigation links
@@ -1107,6 +1150,7 @@ function showSaveInProgressNotification(onCompleteCallback) {
     }, 3000);
 }
 
+// Convert audio tags to iframes in Chrome for contenteditable compatibility
 function convertNoteAudioToIframes() {
     try {
         var audios = document.querySelectorAll('.noteentry audio');
@@ -1146,6 +1190,7 @@ function convertNoteAudioToIframes() {
     }
 }
 
+// Setup drag-and-drop handlers for file uploads
 function setupDragDropEvents() {
     document.body.addEventListener('dragenter', function (e) {
         try {
@@ -1213,6 +1258,7 @@ function setupDragDropEvents() {
     });
 }
 
+// Initialize drag-and-drop for notes between folders and workspace
 function setupNoteDragDropEvents() {
     // Remove existing event listeners to avoid duplicates
     document.querySelectorAll('.links_arbo_left').forEach(function (link) {
@@ -1440,6 +1486,7 @@ function setupNoteDragDropEvents() {
     }
 }
 
+// Handle start of note drag operation
 function handleNoteDragStart(e) {
     var noteLink = e.target.closest('.links_arbo_left');
     if (!noteLink) {
@@ -1514,6 +1561,7 @@ function handleNoteDragStart(e) {
     }
 }
 
+// Remove dragging visual indicators from notes and folders
 function cleanupDraggingNotes() {
     document.querySelectorAll('.links_arbo_left.dragging').forEach(function (link) {
         link.classList.remove('dragging');
@@ -1526,6 +1574,7 @@ function cleanupDraggingNotes() {
     });
 }
 
+// Handle end of note drag operation and cleanup
 function handleNoteDragEnd(e) {
     // Clean up the dragged note styles
     var noteLink = e.target.closest('.links_arbo_left');
@@ -1561,6 +1610,7 @@ function handleNoteDragEnd(e) {
     }, 2000); // Much longer delay to allow for click interaction
 }
 
+// Move a note to a target folder using API
 function moveNoteToTargetFolder(noteId, targetFolderIdOrName) {
     // targetFolderIdOrName can be either a folder ID (preferred) or folder name (legacy)
     var targetFolderId = null;
@@ -1588,6 +1638,7 @@ function moveNoteToTargetFolder(noteId, targetFolderIdOrName) {
     );
 }
 
+// Handle dragover event for root drop zone
 function handleRootDragOver(e) {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
@@ -1599,6 +1650,7 @@ function handleRootDragOver(e) {
     }
 }
 
+// Handle dragleave event for root drop zone
 function handleRootDragLeave(e) {
     var rootDropZone = document.getElementById('root-drop-zone');
     if (rootDropZone) {
@@ -1606,6 +1658,7 @@ function handleRootDragLeave(e) {
     }
 }
 
+// Handle drop event for root zone (move note out of folder)
 function handleRootDrop(e) {
     e.preventDefault();
 
@@ -1631,6 +1684,7 @@ function handleRootDrop(e) {
     }
 }
 
+// Remove a note from its folder (move to root)
 function moveNoteToRoot(noteId) {
     apiPostJson(
         '/api/v1/notes/' + noteId + '/remove-folder',
@@ -1640,8 +1694,7 @@ function moveNoteToRoot(noteId) {
     );
 }
 
-// Setup drag and drop events for folders
-// Called from setupNoteDragDropEvents to initialize folder dragging
+// Setup drag and drop events for folders. Called from setupNoteDragDropEvents to initialize folder dragging
 function setupFolderDragDropEvents() {
     var isMobile = window.innerWidth <= 800;
 
@@ -1983,6 +2036,7 @@ function moveFolderToRoot(folderId) {
     moveFolderToParent(folderId, null);
 }
 
+// Setup event listeners for links and paste handling in contenteditable areas
 function setupLinkEvents() {
     document.addEventListener('click', function (e) {
         // Make links clickable in contenteditable areas
@@ -2285,6 +2339,7 @@ function setupLinkEvents() {
     });
 }
 
+// Setup focus management and auto-focus for empty notes
 function setupFocusEvents() {
     document.body.addEventListener('focusin', function (e) {
         if (e.target.classList.contains('searchbar') ||
@@ -2357,6 +2412,7 @@ function setupFocusEvents() {
     });
 }
 
+// Setup auto-save system with online/offline detection
 function setupAutoSaveCheck() {
     // Modern auto-save: local storage + debounced server sync
     // No longer using periodic checks - saves happen immediately locally and debounced to server
@@ -2384,6 +2440,7 @@ function setupAutoSaveCheck() {
     });
 }
 
+// Update network status and sync notes when coming back online
 function updateConnectionStatus(online) {
     // Auto-save status - console only, no visual indicators
     if (online) {
@@ -2393,10 +2450,34 @@ function updateConnectionStatus(online) {
     }
 }
 
+// Warn user before leaving page with unsaved changes
 function setupPageUnloadWarning() {
-    // Handled by the global beforeunload listener below
+    window.addEventListener('beforeunload', function (e) {
+        var currentNoteId = window.noteid;
+        if (hasUnsavedChanges(currentNoteId)) {
+            // Force immediate save before leaving
+            if (isOnline) {
+                try {
+                    emergencySave(currentNoteId);
+                } catch (err) {
+                    console.error('[Poznote Auto-Save] Emergency save failed:', err);
+                }
+            }
+
+            // Show browser warning
+            var message = tr(
+                'autosave.beforeunload_warning',
+                {},
+                '⚠️ You have unsaved changes. Are you sure you want to leave?'
+            );
+            e.preventDefault();
+            e.returnValue = message;
+            return message;
+        }
+    });
 }
 
+// Trigger auto-save when note content or metadata changes
 function markNoteAsModified() {
     if (noteid === 'search' || noteid === -1 || noteid === null || noteid === undefined) {
         return;
@@ -2479,6 +2560,7 @@ function markNoteAsModified() {
     }
 }
 
+// Save note content and metadata to localStorage immediately
 function saveToLocalStorage() {
     if (noteid === 'search' || noteid === -1 || noteid === null || noteid === undefined) return;
 
@@ -2513,6 +2595,7 @@ function saveToLocalStorage() {
     }, 300); // Debounce localStorage by 300ms
 }
 
+// Debounced server save - triggered after user stops typing
 function saveToServerDebounced() {
     if (noteid === 'search' || noteid === -1 || noteid === null || noteid === undefined) return;
 
@@ -2878,68 +2961,6 @@ function emergencySave(noteId) {
     }
 }
 
-// Unified beforeunload handler: emergency save + browser warning
-window.addEventListener('beforeunload', function (e) {
-    var currentNoteId = window.noteid;
-    if (hasUnsavedChanges(currentNoteId)) {
-        // Force immediate save before leaving
-        if (isOnline) {
-            try {
-                emergencySave(currentNoteId);
-            } catch (err) {
-                console.error('[Poznote Auto-Save] Emergency save failed:', err);
-            }
-        }
-
-        // Show browser warning
-        var message = tr(
-            'autosave.beforeunload_warning',
-            {},
-            '⚠️ You have unsaved changes. Are you sure you want to leave?'
-        );
-        e.preventDefault();
-        e.returnValue = message;
-        return message;
-    }
-});
-
-// Unified popstate handler: unsaved changes check + URL-based navigation
-window.addEventListener('popstate', function (e) {
-    var currentNoteId = window.noteid;
-
-    // Check for unsaved changes first
-    if (hasUnsavedChanges(currentNoteId)) {
-        var message = tr(
-            'autosave.confirm_navigation',
-            {},
-            "⚠️ Unsaved Changes\n\n" +
-            "You have unsaved changes that will be lost.\n" +
-            "Save before navigating away?"
-        );
-
-        if (confirm(message)) {
-            clearTimeout(saveTimeout);
-            saveTimeout = null;
-            if (isOnline) {
-                saveToServerDebounced();
-            }
-            notesNeedingRefresh.delete(String(currentNoteId));
-        }
-    }
-
-    // Handle URL-based navigation (browser back/forward)
-    var url = new URL(window.location.href);
-    var noteParam = url.searchParams.get('note');
-
-    if (noteParam && typeof loadNoteFromUrl === 'function') {
-        loadNoteFromUrl(window.location.href, true);
-    } else if (!noteParam && url.searchParams.get('workspace')) {
-        // Just workspace change, let ui.js handler manage it
-    } else {
-        window.location.reload();
-    }
-});
-
 // Draft restoration functions
 function checkForUnsavedDraft(noteId, skipAutoRestore) {
     if (!noteId || noteId === -1 || noteId === 'search') return;
@@ -3020,6 +3041,7 @@ function checkForUnsavedDraft(noteId, skipAutoRestore) {
     }
 }
 
+// Restore note content from localStorage draft
 function restoreDraft(noteId, content, title, tags) {
     var entryElem = document.getElementById('entry' + noteId);
     var titleInput = document.getElementById('inp' + noteId);
@@ -3051,6 +3073,7 @@ function restoreDraft(noteId, content, title, tags) {
     // Auto-save will handle the restored content automatically
 }
 
+// Clear localStorage draft for a specific note
 function clearDraft(noteId) {
     try {
         localStorage.removeItem('poznote_draft_' + noteId);
@@ -3060,6 +3083,7 @@ function clearDraft(noteId) {
     }
 }
 
+// Reinitialize auto-save state after loading fresh note content from server
 function reinitializeAutoSaveState() {
     // Get current note ID from the DOM
     var currentNoteId = null;
