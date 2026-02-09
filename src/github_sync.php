@@ -8,8 +8,8 @@
 require 'auth.php';
 requireAuth();
 
-// Check if user is admin
-if (!function_exists('isCurrentUserAdmin') || !isCurrentUserAdmin()) {
+// Check if user is admin - only admins can access GitHub sync
+if (!isCurrentUserAdmin()) {
     header('Location: settings.php');
     exit;
 }
@@ -93,7 +93,8 @@ try {
         $workspaces[] = $row['name'];
     }
 } catch (Exception $e) {
-    // Ignore
+    // If workspaces table doesn't exist or query fails, continue with empty list
+    // User can still sync with all workspaces using default option
 }
 
 ?>
@@ -120,9 +121,6 @@ try {
     <link rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode.css?v=<?php echo $cache_v; ?>">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <style>
-        .home-page { background: transparent; }
-    </style>
 </head>
 <body class="home-page">
     <div class="home-container github-sync-container">
@@ -361,12 +359,20 @@ try {
     <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
     <script>
     /**
-     * Intercept Push/Pull forms to show confirmation
+     * GitHub Sync Form Handler
+     * 
+     * Purpose: Show confirmation dialog before push/pull operations and display loading state
+     * 
+     * Flow:
+     * 1. User submits push/pull form
+     * 2. Show confirmation modal
+     * 3. If confirmed: mark form as confirmed, show spinner, submit
+     * 4. If cancelled: do nothing
      */
     document.addEventListener('DOMContentLoaded', function() {
         const syncForms = document.querySelectorAll('form.sync-form');
         
-        // Localization strings for JS
+        // Localization strings from PHP
         const i18n = {
             confirmPush: <?php echo json_encode(t('github_sync.confirm_push')); ?>,
             confirmPull: <?php echo json_encode(t('github_sync.confirm_pull')); ?>,
@@ -378,37 +384,47 @@ try {
             if (!actionInput) return;
             
             const action = actionInput.value;
+            // Only handle push/pull actions (not test)
             if (action !== 'push' && action !== 'pull') return;
             
             form.addEventListener('submit', function(e) {
-                // If already confirmed, let it proceed
+                // If already confirmed by user, allow form submission
                 if (form.dataset.confirmed === 'true') {
                     return;
                 }
                 
+                // Prevent default submission to show confirmation first
                 e.preventDefault();
                 
+                // Get selected workspace name for confirmation message
                 const workspaceSelect = form.querySelector('select[name="workspace"]');
                 const workspaceName = (workspaceSelect && workspaceSelect.value) ? 
                     (workspaceSelect.options[workspaceSelect.selectedIndex].text) : 
                     i18n.allWorkspaces;
                 
+                // Build confirmation message
                 let confirmMsg = (action === 'push' ? i18n.confirmPush : i18n.confirmPull)
                     .replace('{{workspace}}', workspaceName);
                 
+                // Show modal and wait for user response
                 window.modalAlert.confirm(confirmMsg).then(function(confirmed) {
                     if (confirmed) {
+                        // Mark as confirmed to bypass this handler on next submit
                         form.dataset.confirmed = 'true';
                         
-                        // Show loading state on the button manually 
-                        // as form.submit() won't trigger the submit event listener
+                        // Show loading spinner on button
+                        // Note: We can't rely on the submit event firing again,
+                        // so we manually update the button here
                         const button = form.querySelector('button[type="submit"]');
                         if (button) {
                             const icon = button.querySelector('i');
-                            if (icon) icon.className = 'fas fa-spinner fa-spin';
+                            if (icon) {
+                                icon.className = 'fas fa-spinner fa-spin';
+                            }
                             button.disabled = true;
                         }
                         
+                        // Submit the form
                         form.submit();
                     }
                 });
@@ -416,6 +432,5 @@ try {
         });
     });
     </script>
-    <script src="js/github-sync.js?v=<?php echo $cache_v; ?>"></script>
 </body>
 </html>

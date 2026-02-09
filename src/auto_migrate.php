@@ -26,31 +26,32 @@ function checkAndMigrateToMultiUser(): void {
     $user1Dir = $usersDir . '/1';
     $user1DbPath = $user1Dir . '/database/poznote.db';
     
-    // If no old database exists, this is either a fresh install or migration already complete
+    // Check if old database exists
+    // If it doesn't, this is either a fresh install or migration is already complete
     if (!file_exists($oldDbPath)) {
-        // Rename old directories to .old
+        // If master database exists, clean up any remaining old directories
         if (file_exists($masterDbPath)) {
             renameOldDirectories($dataDir);
         }
         return;
     }
     
-    // Old database exists - check if we need to migrate data
+    // Determine if we need to migrate data
     // Migration is needed if:
     // 1. User 1's database doesn't exist, OR
-    // 2. User 1's database is much smaller than the old one (incomplete migration)
+    // 2. User 1's database is much smaller than the old one (incomplete previous migration)
     $needsDataMigration = false;
     
     if (!file_exists($user1DbPath)) {
         $needsDataMigration = true;
         error_log("Poznote: User 1 database doesn't exist, migration needed");
     } else {
-        // Check if user 1's database has significantly fewer records
-        // This handles the case where master.db was created but data wasn't migrated
+        // Compare database sizes to detect incomplete migrations
         $oldSize = filesize($oldDbPath);
         $newSize = filesize($user1DbPath);
         
-        // If old database is more than 10x larger, data wasn't migrated properly
+        // If old database is more than 10x larger and substantial (>100KB),
+        // the data likely wasn't migrated properly
         if ($oldSize > ($newSize * 10) && $oldSize > 100000) {
             $needsDataMigration = true;
             error_log("Poznote: Old database ($oldSize bytes) much larger than user 1 database ($newSize bytes), re-migrating data");
@@ -110,8 +111,9 @@ function checkAndMigrateToMultiUser(): void {
         $masterCon->exec("CREATE INDEX IF NOT EXISTS idx_shared_links_token ON shared_links(token)");
         $masterCon->exec("CREATE INDEX IF NOT EXISTS idx_shared_links_user ON shared_links(user_id)");
         
-        // Create default admin user if not exists (username 'admin_change_me' to warn about security)
-        // Using INSERT OR IGNORE in case master.db already exists from a previous incomplete migration
+        // Create default admin user if not exists
+        // Username 'admin_change_me' serves as a security warning to change it
+        // Using INSERT OR IGNORE to skip if user already exists from previous incomplete migration
         $stmt = $masterCon->prepare("
             INSERT OR IGNORE INTO users (id, username, is_admin, active)
             VALUES (1, ?, 1, 1)
@@ -136,8 +138,10 @@ function checkAndMigrateToMultiUser(): void {
             }
         }
         
-        // Step 3: Copy database (including WAL/SHM files if present for data integrity)
-        // We copy instead of move to preserve the original until migration is verified complete
+        // Step 3: Copy database files
+        // We copy instead of move to preserve the original until migration is verified
+        // WAL (Write-Ahead Log) and SHM (Shared Memory) files contain uncommitted transactions
+        // and must be copied together with the main database for data integrity
         $newDbPath = $user1DbPath;
         
         // Remove existing incomplete database if present
@@ -148,38 +152,39 @@ function checkAndMigrateToMultiUser(): void {
             @unlink($newDbPath . '-shm');
         }
         
-        // First, handle WAL and SHM files to ensure data integrity
-        // These files contain uncommitted transactions and must be copied together
+        // Copy SQLite WAL and SHM files to ensure data integrity
         $walFile = $oldDbPath . '-wal';
         $shmFile = $oldDbPath . '-shm';
         $newWalFile = $newDbPath . '-wal';
         $newShmFile = $newDbPath . '-shm';
         
-        // Copy WAL file if exists (contains pending transactions)
+        // Copy WAL file if it exists (contains pending transactions)
         if (file_exists($walFile)) {
             if (copy($walFile, $newWalFile)) {
                 error_log("Poznote: Copied WAL file");
             }
         }
         
-        // Copy SHM file if exists (shared memory map)
+        // Copy SHM file if it exists (shared memory index for WAL)
         if (file_exists($shmFile)) {
             if (copy($shmFile, $newShmFile)) {
                 error_log("Poznote: Copied SHM file");
             }
         }
         
-        // Copy main database file with safety checks
+        // Copy main database file with verification
         $originalSize = filesize($oldDbPath);
         if (copy($oldDbPath, $newDbPath)) {
-            // Verify the copy was successful by checking file sizes
+            // Verify the copy by comparing file sizes
+            // clearstatcache ensures we get fresh file info, not cached data
             clearstatcache(true, $newDbPath);
             $copiedSize = filesize($newDbPath);
+            
             if ($copiedSize === $originalSize && $copiedSize > 0) {
                 error_log("Poznote: Copied database to user directory ($copiedSize bytes)");
             } else {
                 error_log("Poznote: WARNING - Database copy verification failed (original: $originalSize, copy: $copiedSize)");
-                // Remove the incomplete copy
+                // Remove the incomplete copy to avoid data corruption
                 @unlink($newDbPath);
                 throw new Exception("Database copy verification failed");
             }
@@ -187,31 +192,37 @@ function checkAndMigrateToMultiUser(): void {
             throw new Exception("Failed to copy database file");
         }
         
-        // Step 4: Copy entries files
+        // Step 4: Copy note entry files
+        // Each note's content is stored as a separate HTML file
         $oldEntriesPath = $dataDir . '/entries';
         $newEntriesPath = $user1Dir . '/entries';
         $entriesCopied = 0;
         $entriesSkipped = 0;
         $entriesFailed = 0;
+        
         if (is_dir($oldEntriesPath)) {
-            // Use scandir to get all files
             $items = scandir($oldEntriesPath);
-            $totalItems = count($items) - 2; // Exclude . and ..
+            $totalItems = count($items) - 2; // Exclude '.' and '..'
             error_log("Poznote: Found $totalItems items in old entries directory");
             
             foreach ($items as $item) {
+                // Skip directory navigation entries
                 if ($item === '.' || $item === '..') {
                     continue;
                 }
+                
                 $file = $oldEntriesPath . '/' . $item;
-                // Only copy files, not directories
+                
+                // Only copy files, not subdirectories
                 if (is_file($file)) {
                     $newPath = $newEntriesPath . '/' . $item;
+                    
                     if (!file_exists($newPath)) {
                         if (copy($file, $newPath)) {
                             $entriesCopied++;
                         } else {
                             $entriesFailed++;
+                            // Log only first 5 failures to avoid log spam
                             if ($entriesFailed <= 5) {
                                 error_log("Poznote: Failed to copy entry file: $item");
                             }
@@ -224,7 +235,8 @@ function checkAndMigrateToMultiUser(): void {
             error_log("Poznote: Entries migration - copied: $entriesCopied, skipped: $entriesSkipped, failed: $entriesFailed");
         }
         
-        // Step 5: Move attachments
+        // Step 5: Move attachment files
+        // Attachments are files uploaded by users (images, PDFs, etc.)
         $oldAttachmentsPath = $dataDir . '/attachments';
         $newAttachmentsPath = $user1Dir . '/attachments';
         if (is_dir($oldAttachmentsPath)) {
@@ -232,7 +244,7 @@ function checkAndMigrateToMultiUser(): void {
             error_log("Poznote: Moved attachments");
         }
         
-        // Step 6: Move backups
+        // Step 6: Move backups to user directory
         $oldBackupsPath = $dataDir . '/backups';
         $newBackupsPath = $user1Dir . '/backups';
         $backupsMoved = 0;
@@ -249,13 +261,14 @@ function checkAndMigrateToMultiUser(): void {
             error_log("Poznote: Moved $backupsMoved backup files");
         }
         
-        // Step 8: Migrate shared links to master registry
-        // This allows public links created in single-user mode to keep working
+        // Step 7: Migrate shared links to master registry
+        // This preserves public sharing links that were created in single-user mode
+        // so they continue working after the migration
         try {
             $user1Db = new PDO('sqlite:' . $newDbPath);
             $user1Db->exec('PRAGMA busy_timeout = 5000');
             
-            // Check for shared notes
+            // Migrate shared notes to the central registry
             $stmt = $user1Db->query("SELECT token, note_id FROM shared_notes");
             if ($stmt) {
                 $sharedNotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -266,7 +279,7 @@ function checkAndMigrateToMultiUser(): void {
                 error_log("Poznote: Migrated " . count($sharedNotes) . " shared note links to registry");
             }
             
-            // Check for shared folders
+            // Migrate shared folders to the central registry
             $stmt = $user1Db->query("SELECT token, folder_id FROM shared_folders");
             if ($stmt) {
                 $sharedFolders = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -282,17 +295,19 @@ function checkAndMigrateToMultiUser(): void {
             error_log("Poznote: Shared links migration skipped or failed: " . $e->getMessage());
         }
         
-        // Step 9: Invalidate old "remember me" cookies by recording migration timestamp
-        // This forces users to re-login and select their profile
+        // Step 8: Invalidate old "remember me" cookies
+        // Record migration timestamp to force users to re-login and select their profile
+        // This ensures proper multi-user session handling
         $masterCon->exec("INSERT OR REPLACE INTO global_settings (key, value) VALUES ('migration_timestamp', '" . time() . "')");
         
-        // Step 10: Fix permissions for migrated files
-        // Ensure www-data can write to the migrated files
+        // Step 9: Fix file permissions
+        // Ensure the web server (www-data) can read and write to all migrated files
         fixMigratedPermissions($user1Dir);
         
         error_log("Poznote: Migration complete!");
         
-        // Step 11: Rename old directories to .old
+        // Step 10: Archive old directories
+        // Rename old single-user directories to .old for backup purposes
         renameOldDirectories($dataDir);
         
     } catch (Exception $e) {
@@ -303,20 +318,25 @@ function checkAndMigrateToMultiUser(): void {
 
 /**
  * Fix permissions for migrated files
- * Ensures www-data can write to the files
+ * 
+ * Changes ownership of all migrated files to www-data user/group
+ * This ensures the web server can properly read and write to these files
+ * 
+ * @param string $userDir Path to the user directory to fix permissions for
  */
 function fixMigratedPermissions(string $userDir): void {
-    // Get www-data user info
+    // Get www-data user information from the system
+    // www-data is the default web server user on Debian/Ubuntu systems
     $wwwDataInfo = posix_getpwnam('www-data');
     if (!$wwwDataInfo) {
         error_log("Poznote: Could not find www-data user, skipping permission fix");
         return;
     }
     
-    $uid = $wwwDataInfo['uid'];
-    $gid = $wwwDataInfo['gid'];
+    $uid = $wwwDataInfo['uid']; // User ID
+    $gid = $wwwDataInfo['gid']; // Group ID
     
-    // Recursively fix permissions
+    // Recursively iterate through all files and directories
     $iterator = new RecursiveIteratorIterator(
         new RecursiveDirectoryIterator($userDir, RecursiveDirectoryIterator::SKIP_DOTS),
         RecursiveIteratorIterator::SELF_FIRST
@@ -325,11 +345,13 @@ function fixMigratedPermissions(string $userDir): void {
     $fixedCount = 0;
     foreach ($iterator as $item) {
         $path = $item->getPathname();
-        // Only fix if not already owned by www-data
         $stat = stat($path);
+        
+        // Only change ownership if not already owned by www-data
+        // This prevents unnecessary system calls
         if ($stat && $stat['uid'] !== $uid) {
-            @chown($path, $uid);
-            @chgrp($path, $gid);
+            @chown($path, $uid);  // Change owner to www-data
+            @chgrp($path, $gid);  // Change group to www-data
             $fixedCount++;
         }
     }
@@ -345,16 +367,24 @@ function fixMigratedPermissions(string $userDir): void {
 
 /**
  * Move contents of a directory recursively
+ * 
+ * Moves all files and subdirectories from source to destination
+ * Only moves files that don't already exist at the destination
+ * 
+ * @param string $src Source directory path
+ * @param string $dest Destination directory path
  */
 function moveDirectoryContents(string $src, string $dest): void {
     if (!is_dir($src)) {
         return;
     }
     
+    // Create destination directory if it doesn't exist
     if (!is_dir($dest)) {
         mkdir($dest, 0755, true);
     }
     
+    // Iterate through all files and subdirectories
     $iterator = new RecursiveIteratorIterator(
         new RecursiveDirectoryIterator($src, RecursiveDirectoryIterator::SKIP_DOTS),
         RecursiveIteratorIterator::SELF_FIRST
@@ -362,11 +392,14 @@ function moveDirectoryContents(string $src, string $dest): void {
     
     foreach ($iterator as $item) {
         $destPath = $dest . '/' . $iterator->getSubPathName();
+        
         if ($item->isDir()) {
+            // Create subdirectory in destination
             if (!is_dir($destPath)) {
                 mkdir($destPath, 0755, true);
             }
         } else {
+            // Move file only if it doesn't already exist at destination
             if (!file_exists($destPath)) {
                 rename($item->getPathname(), $destPath);
             }
@@ -376,7 +409,11 @@ function moveDirectoryContents(string $src, string $dest): void {
 
 /**
  * Rename old single-user directories to .old after migration
- * This preserves old data instead of deleting it
+ * 
+ * This preserves the original data for safety instead of deleting it
+ * Allows manual recovery if something goes wrong with the migration
+ * 
+ * @param string $dataDir Path to the data directory containing old directories
  */
 function renameOldDirectories(string $dataDir): void {
     $oldDirs = ['database', 'entries', 'attachments', 'backups'];
@@ -386,17 +423,16 @@ function renameOldDirectories(string $dataDir): void {
         $newPath = $dataDir . '/' . $dirName . '.old';
         
         if (is_dir($oldPath)) {
-            // Case-insensitive check if it's already renamed or if migration was already done
             if (!file_exists($newPath)) {
+                // Rename the directory to .old for backup
                 if (@rename($oldPath, $newPath)) {
                     error_log("Poznote: Renamed old directory $dirName to $dirName.old");
                 } else {
                     error_log("Poznote: Failed to rename old directory $dirName");
                 }
             } else {
-                // If .old already exists but the original still exists, it might be a failed previous attempt
-                // or some files were left behind. We could try to merge or just leave it.
-                // For safety, we just log it.
+                // If .old already exists, this might be from a previous failed migration
+                // We keep both for safety and manual inspection
                 error_log("Poznote: Directory $dirName.old already exists, skipping rename of $dirName");
             }
         }

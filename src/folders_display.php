@@ -3,8 +3,14 @@
  * Management of folder and note display
  */
 
+// Constants
+define('FAVORITES_FOLDER_NAME', 'Favorites');
+
 /**
  * Calculate total number of notes in a folder and all its subfolders recursively
+ * 
+ * @param array $folderData Folder data containing notes and optionally children
+ * @return int Total count of notes
  */
 function countNotesRecursively($folderData) {
     $count = count($folderData['notes']);
@@ -21,13 +27,18 @@ function countNotesRecursively($folderData) {
 
 /**
  * Organize notes by folder
- * Now returns array with 'folders' and 'uncategorized_notes' keys
- * OPTIMIZED: Pre-load all folder data to avoid N+1 queries
+ * Returns array with 'folders' and 'uncategorized_notes' keys
+ * OPTIMIZED: Pre-loads all folder data to avoid N+1 queries
+ * 
+ * @param PDOStatement $stmt_left Statement containing notes to organize
+ * @param PDO $con Database connection
+ * @param string|null $workspace_filter Optional workspace filter
+ * @param string $default_sort Default sort order ('updated_desc', 'heading_asc', 'created_desc')
+ * @return array Array with 'folders' and 'uncategorized_notes' keys
  */
 function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sort = 'updated_desc') {
     $folders = [];
     $uncategorized_notes = []; // Notes without folder
-    $folders_with_results = [];
     
     // PRE-LOAD all folders in one query to avoid N+1 problem
     $folders_cache = [];
@@ -51,11 +62,6 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
     
     while($row1 = $stmt_left->fetch(PDO::FETCH_ASSOC)) {
         $folderId = isset($row1["folder_id"]) && $row1["folder_id"] ? (int)$row1["folder_id"] : null;
-        $folderName = $row1["folder"] ?: null;
-        $folderIcon = null; // Initialize icon variable
-        $folderIconColor = null; // Initialize icon color variable
-        $kanbanEnabled = 0; // Initialize kanban_enabled
-        $sortSetting = null;
 
         // If no folder_id, this note has no folder - add to uncategorized list
         if ($folderId === null) {
@@ -64,6 +70,12 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
         }
 
         // Use pre-loaded folder data (FAST - no DB query)
+        $folderName = null;
+        $folderIcon = null;
+        $folderIconColor = null;
+        $kanbanEnabled = 0;
+        $sortSetting = null;
+        
         if (isset($folders_cache[$folderId])) {
             $folderName = $folders_cache[$folderId]['name'];
             $folderIcon = $folders_cache[$folderId]['icon'];
@@ -76,8 +88,8 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
             $folders[$folderId] = [
                 'id' => $folderId,
                 'name' => $folderName,
-                'icon' => $folderIcon ?? null,
-                'icon_color' => $folderIconColor ?? null,
+                'icon' => $folderIcon,
+                'icon_color' => $folderIconColor,
                 'kanban_enabled' => $kanbanEnabled,
                 'sort_setting' => $sortSetting,
                 'notes' => []
@@ -87,11 +99,11 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
         $folders[$folderId]['notes'][] = $row1;
     }
     
-    // Sort notes within folders based on sort_setting OR default sort
+    // Sort notes within folders based on folder-specific sort_setting or default sort
     foreach ($folders as &$folder) {
         $sortType = null;
         
-        // Folder-specific sort overrides global default
+        // Folder-specific sort setting overrides global default
         if (isset($folder['sort_setting']) && !empty($folder['sort_setting'])) {
             $sortType = $folder['sort_setting'];
         } else {
@@ -110,20 +122,17 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
             }
         }
         
-        // Ensure effective sort type is used for UI rendering (e.g. checkmark display)
+        // Ensure effective sort type is used for UI rendering (e.g., checkmark display)
         if ($sortType) {
             $folder['sort_setting'] = $sortType;
         }
         
-        // Apply sort
-        
+        // Apply sort based on determined type
         if ($sortType === 'alphabet') {
             usort($folder['notes'], function($a, $b) {
-                // Use heading, fallback to empty string
+                // Use heading, fallback to empty string for natural case-insensitive sorting
                 $headingA = isset($a['heading']) ? mb_strtolower($a['heading'], 'UTF-8') : '';
                 $headingB = isset($b['heading']) ? mb_strtolower($b['heading'], 'UTF-8') : '';
-                
-                // Handle "New note" translations if needed, but simplistic approach here
                 return strnatcasecmp($headingA, $headingB);
             });
         } elseif ($sortType === 'created') {
@@ -151,7 +160,12 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
 
 /**
  * Add empty folders from the folders table
- * Now uses folder_id as key
+ * Uses folder_id as key to maintain consistency
+ * 
+ * @param PDO $con Database connection
+ * @param array $folders Existing folders array
+ * @param string|null $workspace_filter Optional workspace filter
+ * @return array Updated folders array including empty folders
  */
 function addEmptyFolders($con, $folders, $workspace_filter) {
     $folders_sql = "SELECT id, name, icon, icon_color, kanban_enabled, sort_setting FROM folders";
@@ -196,12 +210,15 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
 
 /**
  * Ensure Favorites folder always exists (even if empty)
+ * 
+ * @param array $folders Existing folders array
+ * @return array Updated folders array with Favorites folder
  */
 function ensureFavoritesFolder($folders) {
     // Check if Favorites folder exists
     $hasFavorites = false;
     foreach ($folders as $folder) {
-        if (isset($folder['name']) && $folder['name'] === 'Favorites') {
+        if (isset($folder['name']) && $folder['name'] === FAVORITES_FOLDER_NAME) {
             $hasFavorites = true;
             break;
         }
@@ -212,7 +229,7 @@ function ensureFavoritesFolder($folders) {
         // Use 'favorites' as special key (lowercase) to distinguish from regular folders
         $folders['favorites'] = [
             'id' => null,  // No real DB ID for Favorites pseudo-folder
-            'name' => 'Favorites',
+            'name' => FAVORITES_FOLDER_NAME,
             'notes' => []
         ];
     }
@@ -221,8 +238,11 @@ function ensureFavoritesFolder($folders) {
 }
 
 /**
- * Trie les dossiers (Favorites en premier, puis dossier par défaut, puis autres)
- * Now works with folder arrays containing 'id' and 'name'
+ * Sort folders (Favorites first, then alphabetically by name)
+ * Works with folder arrays containing 'id' and 'name'
+ * 
+ * @param array $folders Folders to sort
+ * @return array Sorted folders array
  */
 function sortFolders($folders) {
     uksort($folders, function($a, $b) use ($folders) {
@@ -231,8 +251,8 @@ function sortFolders($folders) {
         $nameA = $folderA['name'];
         $nameB = $folderB['name'];
         
-        if ($nameA === 'Favorites') return -1;
-        if ($nameB === 'Favorites') return 1;
+        if ($nameA === FAVORITES_FOLDER_NAME) return -1;
+        if ($nameB === FAVORITES_FOLDER_NAME) return 1;
         return strcasecmp($nameA, $nameB);
     });
     
@@ -240,23 +260,36 @@ function sortFolders($folders) {
 }
 
 /**
- * Determines if a folder should be open
- * Now accepts the full folder data array
+ * Determines if a folder should be open in the UI
+ * Accepts the full folder data array
+ * 
+ * @param PDO $con Database connection
+ * @param array|null $folderData Folder data array with 'id' and 'name'
+ * @param bool $is_search_mode Whether in search mode
+ * @param array $folders_with_results Folders that have search results
+ * @param string $note Currently selected note ID
+ * @param string|null $current_note_folder Folder of currently selected note
+ * @param string|null $default_note_folder Default note's folder
+ * @param string|null $workspace_filter Workspace filter
+ * @param int $total_notes Total number of notes
+ * @return bool Whether the folder should be open
  */
 function shouldFolderBeOpen($con, $folderData, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes) {
-    if (!$folderData) return false;
+    if (!$folderData || !isset($folderData['id']) || !isset($folderData['name'])) {
+        return false;
+    }
     
     $folderId = $folderData['id'];
     $folderName = $folderData['name'];
 
     // Favorites folder is always open
-    if ($folderName === 'Favorites') {
+    if ($folderName === FAVORITES_FOLDER_NAME) {
         return true;
     }
     
     // Check if this folder was explicitly requested to be opened (e.g., after creating a subfolder)
     if (isset($_GET['open_folder'])) {
-        $openFolderKey = $_GET['open_folder'];
+        $openFolderKey = htmlspecialchars($_GET['open_folder'], ENT_QUOTES, 'UTF-8');
         if ($openFolderKey === 'folder_' . $folderId) {
             return true;
         }
@@ -285,11 +318,18 @@ function shouldFolderBeOpen($con, $folderData, $is_search_mode, $folders_with_re
 }
 
 /**
- * Génère les actions disponibles pour un dossier
+ * Generate available actions for a folder
  * OPTIMIZED: Uses cached shared folders data to avoid N+1 queries
+ * 
+ * @param int $folderId Folder ID
+ * @param string $folderName Folder name
+ * @param PDO $con Database connection
+ * @param string|null $workspace_filter Workspace filter
+ * @param int $noteCount Number of notes in folder
+ * @param string|null $currentSort Current sort setting
+ * @return string HTML for folder actions
  */
-function generateFolderActions($folderId, $folderName, $workspace_filter, $noteCount = 0, $currentSort = null) {
-    global $con;
+function generateFolderActions($folderId, $folderName, $con, $workspace_filter, $noteCount = 0, $currentSort = null) {
     static $sharedFoldersCache = null;
     
     $actions = "";
@@ -313,7 +353,7 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
     // Check if folder is shared using cache
     $isShared = isset($sharedFoldersCache[(int)$folderId]);
     
-    if ($folderName !== 'Favorites') {
+    if ($folderName !== FAVORITES_FOLDER_NAME) {
         // Create three-dot menu
         $actions .= "<div class='folder-actions-toggle' data-action='toggle-folder-actions-menu' data-folder-id='$folderId' title='" . t_h('notes_list.folder_actions.menu', [], 'Actions') . "'>";
         $actions .= "<i class='fa-ellipsis-v'></i>";
@@ -381,8 +421,6 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
         $actions .= "<span>" . t_h('notes_list.folder_actions.change_icon', [], 'Change icon') . "</span>";
         $actions .= "</div>";
         
-
-        
         // Sort Options Definition
         $sortTypes = [
             'alphabet' => ['icon' => 'fal fa-sort-alpha-down', 'label' => t_h('sort.alphabet', [], 'Name')],
@@ -397,7 +435,6 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
         $actions .= "<div class='folder-actions-menu-item' data-action='toggle-sort-submenu' data-folder-id='$folderId'>";
         $actions .= "<i class='fal fa-sort-amount-down'></i>";
         $actions .= "<span class='sort-header-label'>" . $currentLabel . "</span>";
-
         $actions .= "</div>";
 
         // Sort Options Container
@@ -414,9 +451,6 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
         }
         $actions .= "</div>"; // Close sort-submenu
         
-
-
-        
         // Delete folder action
         $actions .= "<div class='folder-actions-menu-item danger' data-action='delete-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
         $actions .= "<i class='fa-trash'></i>";
@@ -430,7 +464,17 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
 }
 
 /**
- * Génère le lien pour une note en préservant l'état de recherche
+ * Generate link for a note while preserving search state
+ * 
+ * @param string $search Search query
+ * @param string $tags_search Tags search query
+ * @param string $folder_filter Folder filter
+ * @param string $workspace_filter Workspace filter
+ * @param bool $preserve_notes Whether to preserve notes state
+ * @param bool $preserve_tags Whether to preserve tags state
+ * @param int $note_id Note ID
+ * @param bool $search_combined Whether to combine search
+ * @return string URL for the note
  */
 function generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $note_id, $search_combined = false) {
     $params = [];
@@ -447,15 +491,22 @@ function generateNoteLink($search, $tags_search, $folder_filter, $workspace_filt
 }
 
 /**
- * Compte le nombre total de notes pour déterminer si on ouvre tous les dossiers
- * OPTIMIZED: Uses prepared statement for security
+ * Count total number of notes to determine if all folders should be opened
+ * OPTIMIZED: Uses prepared statement for security and caches result per workspace
+ * 
+ * @param PDO $con Database connection
+ * @param string|null $workspace_filter Optional workspace filter
+ * @return int Total number of notes
  */
 function getTotalNotesCount($con, $workspace_filter) {
-    static $cache = null;
+    static $cache = [];
+    
+    // Create cache key based on workspace filter
+    $cacheKey = $workspace_filter ?? '__all__';
     
     // Return cached value if available
-    if ($cache !== null) {
-        return $cache;
+    if (isset($cache[$cacheKey])) {
+        return $cache[$cacheKey];
     }
     
     $total_notes_query = "SELECT COUNT(*) as total FROM entries WHERE trash = 0";
@@ -466,12 +517,15 @@ function getTotalNotesCount($con, $workspace_filter) {
     }
     $stmt = $con->prepare($total_notes_query);
     $stmt->execute($params);
-    $cache = (int)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
-    return $cache;
+    $cache[$cacheKey] = (int)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    return $cache[$cacheKey];
 }
 
 /**
  * Organize folders into hierarchical structure
+ * 
+ * @param array $folders Flat array of folders
+ * @return array Hierarchical array of root folders with children
  */
 function buildFolderHierarchy($folders) {
     $folderMap = [];
@@ -501,8 +555,13 @@ function buildFolderHierarchy($folders) {
 }
 
 /**
- * Get parent_id for folders from database
+ * Enrich folders with parent_id from database
  * OPTIMIZED: Uses a single query to fetch all parent_ids at once
+ * 
+ * @param array $folders Folders array
+ * @param PDO $con Database connection
+ * @param string|null $workspace_filter Optional workspace filter
+ * @return array Folders with parent_id enriched
  */
 function enrichFoldersWithParentId($folders, $con, $workspace_filter) {
     if (empty($folders)) {

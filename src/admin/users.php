@@ -27,7 +27,6 @@ require_once __DIR__ . '/../version_helper.php';
 
 // === Initialize Variables ===
 $currentLang = getUserLanguage();
-$message = '';
 $error = '';
 
 // === Handle Form Actions ===
@@ -48,7 +47,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result = createUserProfile($username, $email);
             
             if ($result['success']) {
-                // Success - page will reload
+                // Redirect to refresh the page and show the new user
+                header('Location: ' . $_SERVER['PHP_SELF']);
+                exit;
             } else {
                 $error = $result['error'];
             }
@@ -72,7 +73,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'oidc_subject' => $oidcSubject
             ]);
             
-            if (!$result['success']) {
+            if ($result['success']) {
+                // Redirect to refresh the page
+                header('Location: ' . $_SERVER['PHP_SELF']);
+                exit;
+            } else {
                 $error = $result['error'];
             }
             break;
@@ -90,7 +95,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $result = deleteUserProfile($userId, $deleteData);
             
-            if (!$result['success']) {
+            if ($result['success']) {
+                // Redirect to refresh the page
+                header('Location: ' . $_SERVER['PHP_SELF']);
+                exit;
+            } else {
                 $error = $result['error'];
             }
             break;
@@ -101,26 +110,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $field = $_POST['field'] ?? '';
             $value = $_POST['value'] ?? 0;
             
-            // Cannot modify yourself for some fields
-            if ($userId === getCurrentUserId() && ($field === 'is_admin' || $field === 'active')) {
+            // Cannot modify yourself
+            if ($userId === getCurrentUserId()) {
                 $error = t('multiuser.admin.errors.cannot_change_self', [], 'You cannot change your own status/role');
                 break;
             }
             
-            $data = [];
+            // Only allow toggling is_admin and active fields
             if ($field === 'is_admin' || $field === 'active') {
-                $data[$field] = (int)$value;
-            } elseif ($field === 'username' || $field === 'email') {
-                $data[$field] = trim((string)$value);
-                if ($field === 'username' && empty($data[$field])) {
-                    $error = t('multiuser.admin.errors.username_required', [], 'Username is required');
-                    break;
-                }
-            }
-
-            if (!empty($data)) {
+                $data = [$field => (int)$value];
                 $result = updateUserProfile($userId, $data);
-                if (!$result['success']) {
+                
+                if ($result['success']) {
+                    // Redirect to refresh the page
+                    header('Location: ' . $_SERVER['PHP_SELF']);
+                    exit;
+                } else {
                     $error = $result['error'];
                 }
             }
@@ -239,11 +244,7 @@ $v = getAppVersion();
             </div>
         </div>
         
-        <!-- Messages & Notifications -->
-        <?php if ($message): ?>
-            <div class="message message-success"><?php echo htmlspecialchars($message); ?></div>
-        <?php endif; ?>
-        
+        <!-- Error Messages -->
         <?php if ($error): ?>
             <div class="message message-error"><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
@@ -363,8 +364,6 @@ $v = getAppVersion();
                 <div class="form-group">
                     <input type="email" id="create_email" name="email" placeholder="<?php echo t_h('multiuser.admin.email', [], 'Email'); ?>">
                 </div>
-                
-
                 
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('createModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>

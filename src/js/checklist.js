@@ -57,7 +57,10 @@
   }
 
   /**
-   * Get clean text content (remove zero-width spaces)
+   * Get clean text content
+   * Removes zero-width spaces (\u200B) used for cursor positioning in empty elements
+   * @param {Element} element - The element to get text from
+   * @returns {string} Clean trimmed text
    */
   function getCleanText(element) {
     if (!element) return '';
@@ -66,6 +69,8 @@
 
   /**
    * Set cursor position in an element
+   * @param {Element} element - Element to place cursor in
+   * @param {boolean} atEnd - If true, place cursor at end; otherwise at start
    */
   function setCursorInElement(element, atEnd) {
     if (!element) return;
@@ -75,9 +80,10 @@
     
     if (element.childNodes.length > 0) {
       const textNode = element.firstChild;
-      if (textNode.nodeType === 3) {
+      if (textNode.nodeType === 3) { // Text node
         const offset = atEnd ? textNode.textContent.length : 0;
         range.setStart(textNode, offset);
+        range.collapse(true);
       } else {
         range.selectNodeContents(element);
         range.collapse(!atEnd);
@@ -87,7 +93,6 @@
       range.collapse(!atEnd);
     }
     
-    range.collapse(atEnd);
     sel.removeAllRanges();
     sel.addRange(range);
   }
@@ -154,18 +159,16 @@
 
   /**
    * Create text span element for the checklist item
+   * @param {string} text - Initial text content
+   * @returns {HTMLElement} Span element with checklist-text class
    */
   function createTextSpan(text) {
     const span = document.createElement('span');
     span.className = TEXT_CLASS;
     
-    // Add zero-width space for empty spans to allow cursor placement
-    if (text && text.length > 0) {
-      span.appendChild(document.createTextNode(text));
-    } else {
-      span.appendChild(document.createTextNode('\u200B'));
-    }
-    
+    // Zero-width space (\u200B) allows cursor placement in empty spans
+    const content = (text && text.length > 0) ? text : '\u200B';
+    span.appendChild(document.createTextNode(content));
     span.setAttribute('data-value', text || '');
     
     return span;
@@ -271,6 +274,8 @@
 
   /**
    * Handle Enter key in checklist
+   * - If item is empty: exit checklist
+   * - Otherwise: split text at cursor and create new item below
    */
   function handleEnterKey(event) {
     // Prevent double execution
@@ -309,16 +314,15 @@
     }
     
     const range = sel.getRangeAt(0);
-    const cursorOffset = range.startOffset;
+    const textNode = textSpan.firstChild;
     
-    // Get text before and after cursor
+    // Split text at cursor position
     let textBefore = '';
     let textAfter = '';
     
-    const textNode = textSpan.firstChild;
     if (textNode && textNode.nodeType === 3) {
       const fullText = textNode.textContent.replace(/\u200B/g, '');
-      const actualOffset = Math.min(cursorOffset, fullText.length);
+      const actualOffset = Math.min(range.startOffset, fullText.length);
       textBefore = fullText.substring(0, actualOffset);
       textAfter = fullText.substring(actualOffset);
     }
@@ -327,11 +331,8 @@
     while (textSpan.firstChild) {
       textSpan.removeChild(textSpan.firstChild);
     }
-    if (textBefore.length > 0) {
-      textSpan.appendChild(document.createTextNode(textBefore));
-    } else {
-      textSpan.appendChild(document.createTextNode('\u200B'));
-    }
+    const beforeContent = textBefore.length > 0 ? textBefore : '\u200B';
+    textSpan.appendChild(document.createTextNode(beforeContent));
     textSpan.setAttribute('data-value', textBefore);
     
     // Create new item with text after cursor
@@ -347,7 +348,7 @@
     // Position cursor in new item's text span
     const newTextSpan = newItem.querySelector('.' + TEXT_CLASS);
     if (newTextSpan) {
-      // Need a small delay to ensure DOM is updated
+      // Small delay ensures DOM is fully updated
       setTimeout(function() {
         setCursorInElement(newTextSpan, false);
         isProcessingEnter = false;
@@ -363,6 +364,8 @@
 
   /**
    * Handle Backspace key in checklist
+   * - If at start of empty item: remove item (or exit if only item)
+   * - If at start of non-empty item: merge with previous item
    */
   function handleBackspaceKey(event) {
     const textSpan = findCurrentChecklistText();
@@ -390,21 +393,17 @@
         // Last item: remove entire checklist
         exitChecklist(item, checklist, noteentry);
       } else {
-        // Remove this item and focus previous
+        // Remove this item and focus adjacent item
         const prevItem = item.previousElementSibling;
         const nextItem = item.nextElementSibling;
         
         item.remove();
         
-        if (prevItem) {
-          const prevText = prevItem.querySelector('.' + TEXT_CLASS);
-          if (prevText) {
-            setCursorInElement(prevText, true);
-          }
-        } else if (nextItem) {
-          const nextText = nextItem.querySelector('.' + TEXT_CLASS);
-          if (nextText) {
-            setCursorInElement(nextText, false);
+        const targetItem = prevItem || nextItem;
+        if (targetItem) {
+          const targetText = targetItem.querySelector('.' + TEXT_CLASS);
+          if (targetText) {
+            setCursorInElement(targetText, !!prevItem); // End if prev, start if next
           }
         }
         
@@ -420,22 +419,19 @@
         const prevText = prevItem.querySelector('.' + TEXT_CLASS);
         if (prevText) {
           const prevLength = getCleanText(prevText).length;
+          const mergedText = getCleanText(prevText) + currentText;
           
-          // Merge text
-          const prevTextContent = getCleanText(prevText);
-          const currentTextContent = getCleanText(textSpan);
-          
-          // Clear and set new content
+          // Update previous item with merged text
           while (prevText.firstChild) {
             prevText.removeChild(prevText.firstChild);
           }
-          prevText.appendChild(document.createTextNode(prevTextContent + currentTextContent));
-          prevText.setAttribute('data-value', prevTextContent + currentTextContent);
+          prevText.appendChild(document.createTextNode(mergedText));
+          prevText.setAttribute('data-value', mergedText);
           
           // Remove current item
           item.remove();
           
-          // Position cursor at junction
+          // Position cursor at merge point
           const textNode = prevText.firstChild;
           if (textNode) {
             const range = document.createRange();
@@ -512,14 +508,14 @@
 
   /**
    * Indent a checklist item (TAB key)
-   * Moves the current item as a child of the previous sibling item
-   * Limited to one level of indentation only
+   * Moves current item as a child of the previous sibling
+   * Limited to one level of nesting
+   * @param {HTMLElement} item - The checklist item to indent
    */
   function indentItem(item) {
     const prevItem = item.previousElementSibling;
     if (!prevItem || !prevItem.classList.contains(CHECKLIST_ITEM_CLASS)) {
-      // Cannot indent first item or if previous is not a checklist item
-      return;
+      return; // Cannot indent first item
     }
     
     const parentList = item.parentElement;
@@ -527,27 +523,23 @@
       return;
     }
     
-    // Check if we are already at level 1 (inside a nested list)
-    // If parentList has a parent that is a checklist-item, we're already nested
+    // Check if already nested (limit to one level)
     const parentListParent = parentList.parentElement;
     if (parentListParent && parentListParent.classList.contains(CHECKLIST_ITEM_CLASS)) {
-      // Already indented once, cannot indent further
-      return;
+      return; // Already at max nesting level
     }
     
     // Find or create nested list in previous item
     let nestedList = prevItem.querySelector(':scope > .' + CHECKLIST_CLASS);
-    
     if (!nestedList) {
       nestedList = createChecklist();
-      // CSS handles the indentation via .checklist-item .checklist rule
       prevItem.appendChild(nestedList);
     }
     
     // Move item to nested list
     nestedList.appendChild(item);
     
-    // Restore cursor position in text
+    // Restore cursor position
     const textSpan = item.querySelector('.' + TEXT_CLASS);
     if (textSpan) {
       setCursorInElement(textSpan, true);
@@ -561,7 +553,8 @@
 
   /**
    * Outdent a checklist item (SHIFT+TAB key)
-   * Moves the current item from a nested list back to the parent level
+   * Moves item from nested list back to parent level
+   * @param {HTMLElement} item - The checklist item to outdent
    */
   function outdentItem(item) {
     const parentList = item.parentElement;
@@ -570,28 +563,26 @@
     }
     
     const parentItem = parentList.parentElement;
-    // Check if we're in a nested list (parent is a checklist-item)
     if (!parentItem || !parentItem.classList.contains(CHECKLIST_ITEM_CLASS)) {
-      // Already at root level, cannot outdent
-      return;
+      return; // Already at root level
     }
     
     const grandparentList = parentItem.parentElement;
     if (!grandparentList) return;
     
-    // Move item after parent item in the grandparent list
+    // Move item after parent item in grandparent list
     if (parentItem.nextSibling) {
       grandparentList.insertBefore(item, parentItem.nextSibling);
     } else {
       grandparentList.appendChild(item);
     }
     
-    // Clean up empty nested list
+    // Remove empty nested list
     if (parentList.querySelectorAll(':scope > .' + CHECKLIST_ITEM_CLASS).length === 0) {
       parentList.remove();
     }
     
-    // Restore cursor position in text
+    // Restore cursor position
     const textSpan = item.querySelector('.' + TEXT_CLASS);
     if (textSpan) {
       setCursorInElement(textSpan, true);
@@ -669,82 +660,63 @@
   }
   
   /**
-   * Handle ArrowUp - navigate to previous item or exit list
+   * Navigate between checklist items using arrow keys
+   * @param {Event} event - Keyboard event
+   * @param {HTMLElement} textSpan - Current text span element
+   * @param {boolean} isUp - True for ArrowUp, false for ArrowDown
    */
-  function handleArrowUp(event, textSpan) {
+  function handleArrowNavigation(event, textSpan, isUp) {
     const item = findChecklistItem(textSpan);
-    if (!item) return;
-    
     const checklist = findChecklist(textSpan);
-    if (!checklist) return;
+    if (!item || !checklist) return;
     
-    // Check if at start of text
     const sel = window.getSelection();
     if (!sel.rangeCount) return;
     const range = sel.getRangeAt(0);
     
-    // Only act if we're at the very beginning
-    if (range.startOffset > 0) return;
+    // Check cursor position (start for up, end for down)
+    if (isUp) {
+      if (range.startOffset > 0) return;
+    } else {
+      const textLen = getCleanText(textSpan).length;
+      const textNode = textSpan.firstChild;
+      const cursorAtEnd = textNode && range.startContainer === textNode && 
+                          range.startOffset >= textNode.textContent.replace(/\u200B/g, '').length;
+      if (!cursorAtEnd && range.startOffset < textLen) return;
+    }
     
-    const prevItem = item.previousElementSibling;
+    // Get target item
+    const targetItem = isUp ? item.previousElementSibling : item.nextElementSibling;
     
-    if (prevItem && prevItem.classList.contains(CHECKLIST_ITEM_CLASS)) {
-      // Navigate to previous item
+    if (targetItem && targetItem.classList.contains(CHECKLIST_ITEM_CLASS)) {
+      // Navigate to adjacent item
       event.preventDefault();
-      const prevText = prevItem.querySelector('.' + TEXT_CLASS);
-      if (prevText) {
-        setCursorInElement(prevText, true);
+      const targetText = targetItem.querySelector('.' + TEXT_CLASS);
+      if (targetText) {
+        setCursorInElement(targetText, !isUp); // End for up, start for down
       }
     } else {
-      // First item - navigate to element above the checklist if exists
-      const prevElement = checklist.previousElementSibling;
-      if (prevElement) {
+      // Navigate outside checklist if element exists
+      const outsideElement = isUp ? checklist.previousElementSibling : checklist.nextElementSibling;
+      if (outsideElement) {
         event.preventDefault();
-        setCursorInElement(prevElement, true);
+        setCursorInElement(outsideElement, !isUp);
       }
     }
+  }
+  
+  /**
+   * Handle ArrowUp - navigate to previous item or exit list
+   */
+  function handleArrowUp(event, textSpan) {
+    handleArrowNavigation(event, textSpan, true);
   }
   
   /**
    * Handle ArrowDown - navigate to next item or exit list
    */
   function handleArrowDown(event, textSpan) {
-    const item = findChecklistItem(textSpan);
-    if (!item) return;
-    
-    const checklist = findChecklist(textSpan);
-    if (!checklist) return;
-    
-    // Check if at end of text
-    const sel = window.getSelection();
-    if (!sel.rangeCount) return;
-    const range = sel.getRangeAt(0);
-    
-    // Get text length (excluding zero-width space)
-    const textLen = getCleanText(textSpan).length;
-    const textNode = textSpan.firstChild;
-    const cursorAtEnd = textNode && range.startContainer === textNode && 
-                        range.startOffset >= textNode.textContent.replace(/\u200B/g, '').length;
-    
-    if (!cursorAtEnd && range.startOffset < textLen) return;
-    
-    const nextItem = item.nextElementSibling;
-    
-    if (nextItem && nextItem.classList.contains(CHECKLIST_ITEM_CLASS)) {
-      // Navigate to next item
-      event.preventDefault();
-      const nextText = nextItem.querySelector('.' + TEXT_CLASS);
-      if (nextText) {
-        setCursorInElement(nextText, false);
-      }
-    } else {
-      // Last item - check if there's something below the checklist
-      const nextElement = checklist.nextElementSibling;
-      if (nextElement) {
-        event.preventDefault();
-        setCursorInElement(nextElement, false);
-      }
-    }
+    handleArrowNavigation(event, textSpan, false);
   }
 
   /**
@@ -883,13 +855,18 @@
 
   // ===== INITIALIZATION =====
 
+  /**
+   * Initialize checklist functionality
+   * Sets up event listeners and save hooks
+   */
   function init() {
     setupEventListeners();
     
-    // Set up save hooks
+    // Set up save hooks (only once)
     if (!window._checklistSaveHookInstalled) {
       window._checklistSaveHookInstalled = true;
       
+      // Hook into saveNoteImmediately to serialize before saving
       const originalSaveNoteImmediately = window.saveNoteImmediately;
       if (typeof originalSaveNoteImmediately === 'function') {
         window.saveNoteImmediately = function() {
@@ -900,20 +877,9 @@
           return originalSaveNoteImmediately.apply(this, arguments);
         };
       }
-      
-      const originalMarkNoteAsModified = window.markNoteAsModified;
-      if (typeof originalMarkNoteAsModified === 'function') {
-        window.markNoteAsModified = function() {
-          const noteentry = document.querySelector('.noteentry');
-          if (noteentry) {
-            serializeChecklistsBeforeSave(noteentry);
-          }
-          return originalMarkNoteAsModified.apply(this, arguments);
-        };
-      }
     }
     
-    // Restore any existing checklists
+    // Restore any existing checklists on page load
     const noteentry = document.querySelector('.noteentry');
     if (noteentry) {
       restoreChecklistsAfterLoad(noteentry);

@@ -93,10 +93,21 @@ $search_params = initializeSearchParams();
 // Preserve note parameter if provided (now using ID)
 $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
 
+// Get current user and language settings
 $currentLang = getUserLanguage();
 $currentUser = getCurrentUser();
 $username = htmlspecialchars($currentUser['display_name'] ?: $currentUser['username']);
 $pageWorkspace = trim(getWorkspaceFilter());
+
+// Check if current user is admin (used multiple times in template)
+$isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
+
+// Get cache version for assets
+$cache_v = @file_get_contents('version.txt');
+if ($cache_v === false) {
+    $cache_v = time();
+}
+$cache_v = urlencode(trim($cache_v));
 
 // Count workspaces
 $workspaces_count = 0;
@@ -112,7 +123,7 @@ try {
 
 // Count users (for admin)
 $users_count = 0;
-if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
+if ($isAdmin) {
     try {
         require_once 'users/db_master.php';
         $users = listAllUserProfiles();
@@ -132,11 +143,6 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title><?php echo getPageTitle(); ?></title>
     <meta name="color-scheme" content="dark light">
-    <?php 
-    $cache_v = @file_get_contents('version.txt');
-    if ($cache_v === false) $cache_v = time();
-    $cache_v = urlencode(trim($cache_v));
-    ?>
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
     <link rel="stylesheet" href="css/fontawesome.min.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/all.css?v=<?php echo $cache_v; ?>">
@@ -194,9 +200,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                 </div>
             </div>
 
-            <?php // Profile and admin links - always available ?>
-
-            <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
+            <?php if ($isAdmin): ?>
             <!-- User Management (Admin only) -->
             <div class="home-card settings-card-clickable" id="users-admin-card" data-href="admin/users.php">
                 <div class="home-card-icon">
@@ -229,7 +233,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                 </div>
             </div>
 
-            <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
+            <?php if ($isAdmin): ?>
             <!-- GitHub Sync -->
             <div class="home-card settings-card-clickable" id="github-sync-card" data-href="github_sync.php">
                 <div class="home-card-icon">
@@ -242,7 +246,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
 
             <?php endif; ?>
 
-            <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
+            <?php if ($isAdmin): ?>
             <!-- Check for Updates -->
             <div class="home-card" id="check-updates-card">
                 <div class="home-card-icon">
@@ -261,7 +265,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
         <h2 class="settings-category-title"><?php echo t_h('settings.categories.display', [], 'Display'); ?></h2>
         <div class="home-grid">
 
-            <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
+            <?php if ($isAdmin): ?>
             <!-- Login Display -->
             <div class="home-card" id="login-display-card">
                 <div class="home-card-icon">
@@ -409,7 +413,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                 </div>
             </div>
 
-            <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
+            <?php if ($isAdmin): ?>
             <!-- API Documentation -->
             <div class="home-card" id="api-docs-card">
                 <div class="home-card-icon">

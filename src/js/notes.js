@@ -1,6 +1,22 @@
-// Note management (creation, editing, saving)
+// ============================================================
+// NOTE MANAGEMENT - Creation, Editing, Saving, Deletion
+// ============================================================
 
-// Utility functions for DOM element access
+// Constants
+var DEFAULT_NOTE_TITLE_PATTERNS = [
+    /^New note( \(\d+\))?$/,        // English: "New note" or "New note (2)"
+    /^Nouvelle note( \(\d+\))?$/    // French: "Nouvelle note" or "Nouvelle note (2)"
+];
+
+// ============================================================
+// DOM UTILITIES
+// ============================================================
+
+/**
+ * Get all DOM elements for a specific note
+ * @param {string|number} noteId - The note ID
+ * @returns {Object} Object containing references to note elements
+ */
 function getNoteElements(noteId) {
     return {
         entry: document.getElementById("entry" + noteId),
@@ -11,94 +27,110 @@ function getNoteElements(noteId) {
     };
 }
 
+// ============================================================
+// NOTE CREATION
+// ============================================================
+
+/**
+ * Generic function to create a new note of any type
+ * @param {string} noteType - Type of note: 'note', 'tasklist', or 'markdown'
+ * @private
+ */
+function _createNoteOfType(noteType) {
+    var noteData = {
+        folder_id: selectedFolderId || null,
+        workspace: selectedWorkspace || getSelectedWorkspace(),
+        type: noteType
+    };
+    
+    // Use RESTful API: POST /api/v1/notes
+    fetch("/api/v1/notes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", 'X-Requested-With': 'XMLHttpRequest' },
+        body: JSON.stringify(noteData)
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if(data.success && data.note) {
+            window.scrollTo(0, 0);
+            var ws = encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
+            window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
+        } else {
+            showNotificationPopup(data.error || 'Error creating ' + noteType, 'error');
+        }
+    })
+    .catch(function(error) {
+        showNotificationPopup('Network error: ' + error.message, 'error');
+    });
+}
+
+/**
+ * Create a new standard HTML note
+ */
 function createNewNote() {
-    var noteData = {
-        folder_id: selectedFolderId || null,
-        workspace: selectedWorkspace || getSelectedWorkspace(),
-        type: 'note'
-    };
-    
-    // Use RESTful API: POST /api/v1/notes
-    fetch("/api/v1/notes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", 'X-Requested-With': 'XMLHttpRequest' },
-        body: JSON.stringify(noteData)
-    })
-    .then(function(response) { return response.json(); })
-    .then(function(data) {
-        if(data.success && data.note) {
-            window.scrollTo(0, 0);
-            var ws = encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
-            window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
-        } else {
-            showNotificationPopup(data.error || 'Error creating note', 'error');
-        }
-    })
-    .catch(function(error) {
-        showNotificationPopup('Network error: ' + error.message, 'error');
-    });
+    _createNoteOfType('note');
 }
 
+/**
+ * Create a new task list note
+ */
 function createTaskListNote() {
-    var noteData = {
-        folder_id: selectedFolderId || null,
-        workspace: selectedWorkspace || getSelectedWorkspace(),
-        type: 'tasklist'
-    };
-    
-    // Use RESTful API: POST /api/v1/notes
-    fetch("/api/v1/notes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", 'X-Requested-With': 'XMLHttpRequest' },
-        body: JSON.stringify(noteData)
-    })
-    .then(function(response) { return response.json(); })
-    .then(function(data) {
-        if(data.success && data.note) {
-            window.scrollTo(0, 0);
-            var ws = encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
-            window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
-        } else {
-            showNotificationPopup(data.error || 'Error creating tasklist', 'error');
-        }
-    })
-    .catch(function(error) {
-        showNotificationPopup('Network error: ' + error.message, 'error');
-    });
+    _createNoteOfType('tasklist');
 }
 
+/**
+ * Create a new markdown note
+ */
 function createMarkdownNote() {
-    var noteData = {
-        folder_id: selectedFolderId || null,
-        workspace: selectedWorkspace || getSelectedWorkspace(),
-        type: 'markdown'
-    };
-    
-    // Use RESTful API: POST /api/v1/notes
-    fetch("/api/v1/notes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", 'X-Requested-With': 'XMLHttpRequest' },
-        body: JSON.stringify(noteData)
-    })
-    .then(function(response) { return response.json(); })
-    .then(function(data) {
-        if(data.success && data.note) {
-            window.scrollTo(0, 0);
-            var ws = encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
-            window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
-        } else {
-            showNotificationPopup(data.error || 'Error creating markdown note', 'error');
-        }
-    })
-    .catch(function(error) {
-        showNotificationPopup('Network error: ' + error.message, 'error');
+    _createNoteOfType('markdown');
+}
+
+// ============================================================
+// NOTE SAVING
+// ============================================================
+
+/**
+ * Check if a placeholder matches default note title patterns
+ * @param {string} placeholder - The placeholder text to check
+ * @returns {boolean} True if placeholder is a default title pattern
+ * @private
+ */
+function _isDefaultPlaceholder(placeholder) {
+    if (!placeholder) return false;
+    return DEFAULT_NOTE_TITLE_PATTERNS.some(function(pattern) {
+        return pattern.test(placeholder);
     });
 }
 
-function saveNote() {
-    // Auto-save handles everything automatically now
+/**
+ * Get the title for a note, using placeholder if empty and appropriate
+ * @param {HTMLElement} titleInput - The title input element
+ * @param {string} defaultTitle - Default title to use if empty (optional)
+ * @returns {string} The note title
+ * @private
+ */
+function _getNoteTitle(titleInput, defaultTitle) {
+    if (!titleInput) return defaultTitle || '';
+    
+    var title = titleInput.value || '';
+    
+    // If title is empty, check if placeholder should be used
+    if (title === '' && _isDefaultPlaceholder(titleInput.placeholder)) {
+        title = titleInput.placeholder;
+    }
+    
+    // If still empty, use default
+    if (title === '' && defaultTitle) {
+        title = defaultTitle;
+    }
+    
+    return title;
 }
 
+/**
+ * Save the current note to server
+ * This function is called by the auto-save mechanism
+ */
 function saveNoteToServer() {
     // Check that noteid is valid
     if (!noteid || noteid === -1 || noteid === '' || noteid === null || noteid === undefined) {
@@ -118,27 +150,10 @@ function saveNoteToServer() {
         return;
     }
     
-    // Prepare data
-    var headi = titleInput.value || '';
+    // Get title (using placeholder if appropriate)
+    var headi = _getNoteTitle(titleInput);
     
-    // If title is empty, only use placeholder if it matches default note title patterns
-    // Support both English and French (and potentially other languages)
-    if (headi === '' && titleInput.placeholder) {
-        var placeholderPatterns = [
-            /^New note( \(\d+\))?$/,        // English: "New note" or "New note (2)"
-            /^Nouvelle note( \(\d+\))?$/    // French: "Nouvelle note" or "Nouvelle note (2)"
-        ];
-        
-        var isDefaultPlaceholder = placeholderPatterns.some(function(pattern) {
-            return pattern.test(titleInput.placeholder);
-        });
-        
-        if (isDefaultPlaceholder) {
-            headi = titleInput.placeholder;
-        }
-    }
-    
-    // If still empty, don't save to avoid "heading is required" error
+    // If title is empty, don't save to avoid "heading is required" error
     if (headi === '' || headi.trim() === '') {
         return;
     }
@@ -240,101 +255,102 @@ function saveNoteToServer() {
     });
 }
 
+/**
+ * Handle the response from a save operation
+ * @param {string} data - Response data (JSON string or plain text)
+ */
 function handleSaveResponse(data) {
+    var timeText = 'Saved today';
+    var titleChanged = false;
+    
     try {
         var jsonData = JSON.parse(data);
+        
+        // Handle error response
         if (jsonData.status === 'error') {
             console.error('[Poznote Auto-Save] Save error:', jsonData.message);
             return;
-        } else if (jsonData.date && jsonData.title) {
-            // Title modified to ensure uniqueness
-            updateLastSavedTime(jsonData.date);
+        }
+        
+        // Handle success response with metadata
+        if (jsonData.date && jsonData.title) {
+            timeText = jsonData.date;
             
+            // Check if title was modified for uniqueness
             var elements = getNoteElements(noteid);
             if (elements.title && jsonData.title !== jsonData.original_title) {
                 elements.title.value = jsonData.title;
+                titleChanged = true;
             }
-            
-            updateNoteTitleInLeftColumn();
-            
-            // Update last saved content for change detection with the content that was just saved
-            elements = getNoteElements(noteid);
-            if (elements.entry) {
-                lastSavedContent = elements.entry.innerHTML;
-            }
-            if (elements.title) {
-                lastSavedTitle = elements.title.value;
-            }
-            if (elements.tags) {
-                lastSavedTags = elements.tags.value;
-            }
-            updateConnectionStatus(true);
-            
-            // Remove unsaved changes indicator from page title
-            if (document.title.startsWith('🔴 ')) {
-                document.title = document.title.substring(3); // emoji (2 code units) + space
-            } else if (document.title.startsWith('🔴')) {
-                document.title = document.title.substring(2);
-            }
-            
-            // Mark note as saved (remove from pending refresh list)
-            if (typeof notesNeedingRefresh !== 'undefined') {
-                notesNeedingRefresh.delete(String(noteid));
-            }
-            
-            // Clear draft from localStorage after successful save
-            if (typeof window.clearDraft === 'function') {
-                window.clearDraft(noteid);
-            }
-            
-            // Refresh tags count in sidebar after successful save
-            if (typeof window.refreshTagsCount === 'function') {
-                window.refreshTagsCount();
-            }
-            
-            return;
         }
     } catch(e) {
         // Normal response (not JSON)
-        if(data === '1') {
-            updateLastSavedTime('Saved today');
-        } else {
-            updateLastSavedTime(data);
-        }
+        timeText = (data === '1') ? 'Saved today' : data;
+    }
+    
+    // Update UI after successful save
+    _updateUIAfterSave(timeText, titleChanged);
+}
+
+/**
+ * Update UI elements after a successful save
+ * @param {string} timeText - Time text to display
+ * @param {boolean} titleChanged - Whether the title was changed
+ * @private
+ */
+function _updateUIAfterSave(timeText, titleChanged) {
+    updateLastSavedTime(timeText);
+    
+    if (titleChanged) {
         updateNoteTitleInLeftColumn();
-        
-        // Update last saved content for change detection with the content that was just saved
-        var elements = getNoteElements(noteid);
-        if (elements.entry) {
-            lastSavedContent = elements.entry.innerHTML;
-        }
-        if (elements.title) {
-            lastSavedTitle = elements.title.value;
-        }
-        if (elements.tags) {
-            lastSavedTags = elements.tags.value;
-        }
-        updateConnectionStatus(true);
-        
-        // Remove unsaved changes indicator from page title
-        if (document.title.startsWith('🔴 ')) {
-            document.title = document.title.substring(3); // emoji (2 code units) + space
-        } else if (document.title.startsWith('🔴')) {
-            document.title = document.title.substring(2);
-        }
-        
-        // Clear draft from localStorage after successful save
-        if (typeof window.clearDraft === 'function') {
-            window.clearDraft(noteid);
-        }
-        
-        // Mark note as saved (remove from pending refresh list)
-        if (typeof notesNeedingRefresh !== 'undefined') {
-            notesNeedingRefresh.delete(String(noteid));
-        }
+    }
+    
+    // Update last saved content for change detection
+    var elements = getNoteElements(noteid);
+    if (elements.entry) {
+        lastSavedContent = elements.entry.innerHTML;
+    }
+    if (elements.title) {
+        lastSavedTitle = elements.title.value;
+    }
+    if (elements.tags) {
+        lastSavedTags = elements.tags.value;
+    }
+    
+    updateConnectionStatus(true);
+    
+    // Remove unsaved changes indicator from page title
+    if (document.title.startsWith('🔴 ')) {
+        document.title = document.title.substring(3);
+    } else if (document.title.startsWith('🔴')) {
+        document.title = document.title.substring(2);
+    }
+    
+    // Mark note as saved (remove from pending refresh list)
+    if (typeof notesNeedingRefresh !== 'undefined') {
+        notesNeedingRefresh.delete(String(noteid));
+    }
+    
+    // Clear draft from localStorage after successful save
+    if (typeof window.clearDraft === 'function') {
+        window.clearDraft(noteid);
+    }
+    
+    // Refresh tags count in sidebar after successful save
+    if (typeof window.refreshTagsCount === 'function') {
+        window.refreshTagsCount();
     }
 }
 
+// ============================================================
+// NOTE DELETION
+// ============================================================
+
+/**
+ * Delete a note (move to trash)
+ * Handles both regular notes and linked notes
+ * @param {string|number} noteId - The note ID to delete
+ */
 function deleteNote(noteId) {
     // Check if the selected link in the list is a linked note
     // (since linked notes redirect to their target, we need to check the list item)
@@ -403,6 +419,10 @@ function deleteNote(noteId) {
     });
 }
 
+/**
+ * Redirect to the current workspace after note deletion
+ * @private
+ */
 function redirectToWorkspace() {
     var wsRedirect = 'index.php?workspace=' + encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
     // Ensure we don't scroll to note after delete on mobile
@@ -412,7 +432,15 @@ function redirectToWorkspace() {
     window.location.href = wsRedirect;
 }
 
-// Utility functions for note content
+// ============================================================
+// CONTENT UTILITIES
+// ============================================================
+
+/**
+ * Remove search highlights from an element and return clean HTML
+ * @param {HTMLElement} element - The element to clean
+ * @returns {string} Clean HTML without search highlights
+ */
 function cleanSearchHighlightsFromElement(element) {
     if (!element) return "";
     
@@ -429,6 +457,11 @@ function cleanSearchHighlightsFromElement(element) {
     return clonedElement.innerHTML;
 }
 
+/**
+ * Get text content from an element without search highlights
+ * @param {HTMLElement} element - The element to extract text from
+ * @returns {string} Plain text content
+ */
 function getTextContentFromElement(element) {
     if (!element) return "";
     
@@ -445,6 +478,14 @@ function getTextContentFromElement(element) {
     return clonedElement.textContent || "";
 }
 
+// ============================================================
+// UI UPDATE FUNCTIONS
+// ============================================================
+
+/**
+ * Update the last saved time display
+ * @param {string} timeText - Time text to display
+ */
 function updateLastSavedTime(timeText) {
     var elements = getNoteElements(noteid);
     if (elements.lastUpdated) {
@@ -452,35 +493,18 @@ function updateLastSavedTime(timeText) {
     }
 }
 
+/**
+ * Update the note title in the left sidebar/column
+ * Updates all instances of the current note in the UI
+ */
 function updateNoteTitleInLeftColumn() {
     if(noteid === 'search' || noteid === -1 || noteid === null || noteid === undefined) return;
     
     var elements = getNoteElements(noteid);
     if (!elements.title) return;
     
-    var newTitle = elements.title.value.trim();
-    
-    // If title is empty, only use placeholder if it matches default note title patterns
-    // Support both English and French (and potentially other languages)
-    if (newTitle === '' && elements.title.placeholder) {
-        var placeholderPatterns = [
-            /^New note( \(\d+\))?$/,        // English: "New note" or "New note (2)"
-            /^Nouvelle note( \(\d+\))?$/    // French: "Nouvelle note" or "Nouvelle note (2)"
-        ];
-        
-        var isDefaultPlaceholder = placeholderPatterns.some(function(pattern) {
-            return pattern.test(elements.title.placeholder);
-        });
-        
-        if (isDefaultPlaceholder) {
-            newTitle = elements.title.placeholder;
-        }
-    }
-    
-    // Si le titre est toujours vide après avoir vérifié le placeholder
-    if (newTitle === '') {
-        newTitle = 'Note sans titre';
-    }
+    // Get title using helper function (handles placeholder logic)
+    var newTitle = _getNoteTitle(elements.title, 'Note sans titre').trim();
     
     // Search elements to update
     var elementsToUpdate = [];
@@ -499,12 +523,17 @@ function updateNoteTitleInLeftColumn() {
         }
     }
     
-    // Update all found elements found
+    // Update all found elements
     for (var i = 0; i < elementsToUpdate.length; i++) {
         updateTitleInElement(elementsToUpdate[i], newTitle);
     }
 }
 
+/**
+ * Update the title in a specific link element
+ * @param {HTMLElement} linkElement - The link element to update
+ * @param {string} newTitle - The new title text
+ */
 function updateTitleInElement(linkElement, newTitle) {
     var titleSpan = linkElement.querySelector('.note-title');
     if (titleSpan) {
@@ -530,7 +559,14 @@ function updateTitleInElement(linkElement, newTitle) {
     }
 }
 
-// Open note in new tab
+// ============================================================
+// NOTE NAVIGATION
+// ============================================================
+
+/**
+ * Open a note in a new browser tab
+ * @param {string|number} noteId - The note ID to open
+ */
 function openNoteInNewTab(noteId) {
     if (!noteId) {
         console.error('No note ID provided');
@@ -545,7 +581,15 @@ function openNoteInNewTab(noteId) {
     window.open(url, '_blank');
 }
 
-// Show delete linked note modal
+// ============================================================
+// LINKED NOTES MANAGEMENT
+// ============================================================
+
+/**
+ * Show modal for deleting a linked note
+ * Allows choosing between deleting only the link or the target note too
+ * @param {string|number} linkedNoteId - The linked note ID
+ */
 function showDeleteLinkedNoteModal(linkedNoteId) {
     const modal = document.getElementById('deleteLinkedNoteModal');
     if (!modal) return;
@@ -587,7 +631,10 @@ function showDeleteLinkedNoteModal(linkedNoteId) {
     modal.style.display = 'flex';
 }
 
-// Delete only the linked note (not the target)
+/**
+ * Delete only the linked note (bookmark), keeping the target note
+ * @param {string|number} linkedNoteId - The linked note ID to delete
+ */
 function deleteLinkedNoteOnly(linkedNoteId) {
     const workspace = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? pageWorkspace : null;
     
@@ -619,7 +666,12 @@ function deleteLinkedNoteOnly(linkedNoteId) {
     });
 }
 
-// Delete the target note and all its links (the backend handles deleting all linked notes)
+/**
+ * Delete the target note and all its links
+ * The backend automatically deletes all linked notes that reference the target
+ * @param {string|number} linkedNoteId - The linked note ID
+ * @param {string|number} targetNoteId - The target note ID to delete
+ */
 function deleteLinkedNoteAndTarget(linkedNoteId, targetNoteId) {
     const workspace = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? pageWorkspace : null;
     
@@ -647,7 +699,11 @@ function deleteLinkedNoteAndTarget(linkedNoteId, targetNoteId) {
     });
 }
 
-// Expose functions globally
+// ============================================================
+// GLOBAL EXPORTS & EVENT LISTENERS
+// ============================================================
+
+// Expose functions globally for use in other scripts
 window.saveNoteToServer = saveNoteToServer;
 window.deleteNote = deleteNote;
 window.openNoteInNewTab = openNoteInNewTab;

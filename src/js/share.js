@@ -1,4 +1,13 @@
+// ===========================
 // Share / Export menu functionality
+// ===========================
+
+// Constants
+const MENU_Z_INDEX = 20000;
+const MENU_SPACING = 8;
+const MIN_VIEWPORT_MARGIN = 8;
+
+// State management
 let currentShareMenuNoteId = null;
 let isShareMenuOpen = false;
 
@@ -13,7 +22,77 @@ function updateSharedCount(delta) {
     }
 }
 
-// Refresh notes list after folder action (share/revoke)
+// ===========================
+// Helper Functions
+// ===========================
+
+/**
+ * Clear all inline positioning styles from a menu element
+ * @param {HTMLElement} element - The menu element to clean
+ */
+function clearMenuPositioning(element) {
+    const propertiesToClear = [
+        'position', 'left', 'right', 'top', 'bottom',
+        'transform', 'margin-top', 'z-index', 'box-shadow'
+    ];
+    
+    propertiesToClear.forEach(prop => {
+        try {
+            element.style.removeProperty(prop);
+        } catch (e) {
+            // Ignore removal errors
+        }
+    });
+    element.style.visibility = '';
+}
+
+/**
+ * Position a menu relative to a button using fixed positioning
+ * @param {HTMLElement} menu - The menu to position
+ * @param {HTMLElement} button - The button that triggered the menu
+ */
+function positionMenuNearButton(menu, button) {
+    const rect = button.getBoundingClientRect();
+    
+    // Make menu invisible but displayed to measure height
+    menu.style.visibility = 'hidden';
+    menu.style.display = 'block';
+    
+    // Clear any previous positioning
+    clearMenuPositioning(menu);
+    
+    // Apply fixed positioning with important priority to override CSS
+    menu.style.setProperty('position', 'fixed', 'important');
+    
+    // Center horizontally on the button
+    const centerX = rect.left + rect.width / 2;
+    menu.style.setProperty('left', centerX + 'px', 'important');
+    menu.style.setProperty('transform', 'translateX(-50%)', 'important');
+    menu.style.setProperty('margin-top', '0', 'important');
+    menu.style.setProperty('z-index', MENU_Z_INDEX.toString(), 'important');
+    menu.style.setProperty('box-shadow', '0 8px 24px rgba(0,0,0,0.18)', 'important');
+    
+    // Compute available space and place above by default
+    const menuHeight = menu.getBoundingClientRect().height || menu.offsetHeight || 0;
+    const spaceAbove = rect.top;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    let topPos = rect.top - menuHeight - MENU_SPACING;
+    
+    // If not enough space above, place below instead
+    if (topPos < MIN_VIEWPORT_MARGIN && spaceBelow > spaceAbove) {
+        topPos = rect.bottom + MENU_SPACING;
+    }
+    
+    menu.style.setProperty('top', Math.max(MIN_VIEWPORT_MARGIN, topPos) + 'px', 'important');
+    menu.style.setProperty('bottom', 'auto', 'important');
+    
+    // Restore visibility
+    menu.style.visibility = '';
+}
+
+/**
+ * Refresh notes list after folder action (share/revoke)
+ */
 function refreshNotesListAfterFolderAction() {
     if (typeof persistFolderStatesFromDOM === 'function') {
         persistFolderStatesFromDOM();
@@ -22,8 +101,8 @@ function refreshNotesListAfterFolderAction() {
     const url = new URL(window.location.href);
 
     fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-        .then(function (response) { return response.text(); })
-        .then(function (html) {
+        .then(response => response.text())
+        .then(html => {
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             const newLeftCol = doc.getElementById('left_col');
@@ -51,7 +130,6 @@ function refreshNotesListAfterFolderAction() {
                         window.initializeNoteClickHandlers();
                     }
 
-                    // Reinitialize drag and drop events for notes
                     if (typeof setupNoteDragDropEvents === 'function') {
                         setupNoteDragDropEvents();
                     }
@@ -60,12 +138,10 @@ function refreshNotesListAfterFolderAction() {
                         restoreFolderStates();
                     }
 
-                    // Reinitialize favorites toggle button
                     if (typeof window.reinitializeFavoritesToggle === 'function') {
                         window.reinitializeFavoritesToggle();
                     }
 
-                    // Refresh Kanban view if it's currently active
                     if (typeof window.refreshKanbanView === 'function') {
                         window.refreshKanbanView();
                     }
@@ -74,16 +150,40 @@ function refreshNotesListAfterFolderAction() {
                 }
             }
         })
-        .catch(function (err) {
-            console.log('Error during refresh:', err);
+        .catch(err => {
+            console.error('Error during refresh:', err);
         });
 }
 
+/**
+ * Update the shared notes count in the sidebar
+ * @param {number} delta - The change in count (positive or negative)
+ */
+function updateSharedCount(delta) {
+    const countEl = document.getElementById('count-shared');
+    if (countEl) {
+        const currentCount = parseInt(countEl.textContent.trim(), 10) || 0;
+        const newCount = Math.max(0, currentCount + delta);
+        countEl.textContent = newCount.toString();
+    }
+}
+
+// ===========================
+// Share Menu Functions
+// ===========================
+
+/**
+ * Toggle the share menu for a note
+ * @param {Event} event - The click event
+ * @param {string} noteId - The note ID
+ * @param {string} filename - The note filename (unused but kept for compatibility)
+ * @param {string} titleJson - The note title JSON (unused but kept for compatibility)
+ */
 function toggleShareMenu(event, noteId, filename, titleJson) {
     if (event) event.stopPropagation();
     currentShareMenuNoteId = noteId;
 
-    // Close other menus (guard with typeof to avoid ReferenceError if not present)
+    // Close other menus
     if (typeof closeSettingsMenu === 'function') closeSettingsMenu();
 
     // Find the menu elements specific to this note
@@ -93,260 +193,241 @@ function toggleShareMenu(event, noteId, filename, titleJson) {
 
     if (!activeMenu) return;
 
+    // Toggle off if already open for this note
     if (isShareMenuOpen && currentShareMenuNoteId === noteId) {
         closeShareMenu();
         return;
     }
 
-    // Close any other share menus first and clear their inline positioning
-    const all = document.querySelectorAll('.share-menu');
-    all.forEach(el => {
-        el.style.display = 'none';
-        // remove any inline positioning we may have added earlier
-        el.style.removeProperty('position');
-        el.style.removeProperty('left');
-        el.style.removeProperty('right');
-        el.style.removeProperty('top');
-        el.style.removeProperty('bottom');
-        el.style.removeProperty('transform');
-        el.style.removeProperty('margin-top');
-        el.style.removeProperty('z-index');
-        el.style.removeProperty('box-shadow');
+    // Close any other share menus first
+    const allMenus = document.querySelectorAll('.share-menu');
+    allMenus.forEach(menu => {
+        menu.style.display = 'none';
+        clearMenuPositioning(menu);
     });
 
     // Show the active menu
     activeMenu.style.display = 'block';
 
-    // If this share dropdown is inside a mobile container, position it near the button
+    // Position the menu if it's in a mobile container
     try {
-        // Find the triggering button: prefer the event target's closest element with data-note-id
         let triggerBtn = null;
-        if (event && event.target) triggerBtn = event.target.closest('[data-note-id]');
-        if (!triggerBtn) triggerBtn = document.querySelector('[data-note-id="' + noteId + '"]');
+        if (event && event.target) {
+            triggerBtn = event.target.closest('[data-note-id]');
+        }
+        if (!triggerBtn) {
+            triggerBtn = document.querySelector('[data-note-id="' + noteId + '"]');
+        }
 
-        const isMobileDropdown = !!triggerBtn && !!triggerBtn.closest && triggerBtn.closest('.share-dropdown') && triggerBtn.closest('.share-dropdown').classList.contains('mobile');
+        const isMobileDropdown = triggerBtn && 
+            triggerBtn.closest('.share-dropdown') && 
+            triggerBtn.closest('.share-dropdown').classList.contains('mobile');
 
         if (isMobileDropdown && triggerBtn) {
-            // Force fixed positioning placed near the button. Use important priority to override stylesheet !important rules.
-            const rect = triggerBtn.getBoundingClientRect();
-
-            // Make menu invisible but displayed to measure height
-            activeMenu.style.visibility = 'hidden';
-            activeMenu.style.display = 'block';
-
-            // Ensure any previous important declarations are cleared
-            activeMenu.style.removeProperty('position');
-            activeMenu.style.removeProperty('left');
-            activeMenu.style.removeProperty('top');
-            activeMenu.style.removeProperty('bottom');
-            activeMenu.style.removeProperty('transform');
-
-            // Apply fixed positioning with important priority
-            activeMenu.style.setProperty('position', 'fixed', 'important');
-            // center horizontally on the button
-            const centerX = rect.left + rect.width / 2;
-            activeMenu.style.setProperty('left', centerX + 'px', 'important');
-            activeMenu.style.setProperty('transform', 'translateX(-50%)', 'important');
-            activeMenu.style.setProperty('margin-top', '0', 'important');
-            activeMenu.style.setProperty('z-index', '20000', 'important');
-            activeMenu.style.setProperty('box-shadow', '0 8px 24px rgba(0,0,0,0.18)', 'important');
-
-            // Compute space and place above by default
-            const menuHeight = activeMenu.getBoundingClientRect().height || activeMenu.offsetHeight || 0;
-            const spaceAbove = rect.top;
-            const spaceBelow = window.innerHeight - rect.bottom;
-            let topPos = rect.top - menuHeight - 8; // 8px gap
-            if (topPos < 8 && spaceBelow > spaceAbove) {
-                // Not enough space above -> place below the button
-                topPos = rect.bottom + 8;
-            }
-            activeMenu.style.setProperty('top', Math.max(8, topPos) + 'px', 'important');
-            // ensure bottom is unset
-            activeMenu.style.setProperty('bottom', 'auto', 'important');
-
-            // restore visibility
-            activeMenu.style.visibility = '';
+            positionMenuNearButton(activeMenu, triggerBtn);
         } else {
-            // Desktop/default behavior: ensure menu is positioned by CSS (absolute)
-            // Remove any leftover important positioning
-            activeMenu.style.removeProperty('position');
-            activeMenu.style.removeProperty('left');
-            activeMenu.style.removeProperty('top');
-            activeMenu.style.removeProperty('bottom');
-            activeMenu.style.removeProperty('transform');
-            activeMenu.style.removeProperty('z-index');
+            // Desktop: ensure menu is positioned by CSS
+            clearMenuPositioning(activeMenu);
         }
-    } catch (e) {
-        // If anything fails while computing position, fallback to default display
-        console.error('Error positioning share menu:', e);
+    } catch (error) {
+        console.error('Error positioning share menu:', error);
     }
 
     isShareMenuOpen = true;
     currentShareMenuNoteId = noteId;
 }
 
+/**
+ * Close all share menus
+ */
 function closeShareMenu() {
-    // Hide all share menus
-    const all = document.querySelectorAll('.share-menu');
-    all.forEach(el => {
-        el.style.display = 'none';
-        // Remove any inline styles we added for mobile positioning (including important ones)
-        try {
-            el.style.removeProperty('position');
-            el.style.removeProperty('left');
-            el.style.removeProperty('right');
-            el.style.removeProperty('top');
-            el.style.removeProperty('bottom');
-            el.style.removeProperty('transform');
-            el.style.removeProperty('margin-top');
-            el.style.removeProperty('z-index');
-            el.style.removeProperty('box-shadow');
-            el.style.visibility = '';
-        } catch (e) {
-            // ignore
-        }
+    const allMenus = document.querySelectorAll('.share-menu');
+    allMenus.forEach(menu => {
+        menu.style.display = 'none';
+        clearMenuPositioning(menu);
     });
     isShareMenuOpen = false;
     currentShareMenuNoteId = null;
 }
 
-// Create a public share by calling the server API and show the returned URL in a link modal
+/**
+ * Create a public share link for a note
+ * @param {string} noteId - The note ID
+ */
 async function createPublicShare(noteId) {
     if (!noteId) return;
 
     try {
-        // If modal has a custom token input, include it
+        // Gather optional parameters from modal inputs
         let customToken = '';
         try {
-            const el = document.getElementById('shareCustomToken');
-            if (el && el.value) customToken = el.value.trim();
-        } catch (e) { }
+            const tokenInput = document.getElementById('shareCustomToken');
+            if (tokenInput && tokenInput.value) {
+                customToken = tokenInput.value.trim();
+            }
+        } catch (error) {
+            console.error('Error reading custom token:', error);
+        }
 
-        // Get indexable checkbox value
         let indexable = 0;
         try {
-            const indexableEl = document.getElementById('shareIndexable');
-            if (indexableEl && indexableEl.checked) indexable = 1;
-        } catch (e) { }
+            const indexableCheckbox = document.getElementById('shareIndexable');
+            if (indexableCheckbox && indexableCheckbox.checked) {
+                indexable = 1;
+            }
+        } catch (error) {
+            console.error('Error reading indexable setting:', error);
+        }
 
-        // Get password value
         let password = '';
         try {
-            const passwordEl = document.getElementById('sharePassword');
-            if (passwordEl && passwordEl.value) password = passwordEl.value.trim();
-        } catch (e) { }
+            const passwordInput = document.getElementById('sharePassword');
+            if (passwordInput && passwordInput.value) {
+                password = passwordInput.value.trim();
+            }
+        } catch (error) {
+            console.error('Error reading password:', error);
+        }
 
+        // Build request body
         const theme = localStorage.getItem('poznote-theme') || 'light';
-        const body = { theme: theme, indexable: indexable };
-        if (customToken) body.custom_token = customToken;
-        if (password) body.password = password;
+        const requestBody = { theme: theme, indexable: indexable };
+        if (customToken) requestBody.custom_token = customToken;
+        if (password) requestBody.password = password;
 
-        const resp = await fetch('/api/v1/notes/' + noteId + '/share', {
+        // Make API request
+        const response = await fetch('/api/v1/notes/' + noteId + '/share', {
             method: 'POST',
-            credentials: 'same-origin', // send session cookie
+            credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify(body)
+            body: JSON.stringify(requestBody)
         });
 
-        if (!resp.ok) {
-            // Try to read JSON error if any
-            const ct = resp.headers.get('content-type') || '';
-            if (ct.indexOf('application/json') !== -1) {
-                const errBody = await resp.json();
-                throw new Error(errBody.error || ('Network response not ok: ' + resp.status));
+        if (!response.ok) {
+            const contentType = response.headers.get('content-type') || '';
+            if (contentType.indexOf('application/json') !== -1) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || ('Network response not ok: ' + response.status));
             }
-            throw new Error('Network response not ok: ' + resp.status);
+            throw new Error('Network response not ok: ' + response.status);
         }
 
-        // Parse JSON only when content-type says so
-        const ct2 = resp.headers.get('content-type') || '';
+        // Parse response
+        const contentType = response.headers.get('content-type') || '';
         let data = null;
-        if (ct2.indexOf('application/json') !== -1) {
-            data = await resp.json();
+        if (contentType.indexOf('application/json') !== -1) {
+            data = await response.json();
         } else {
-            // Unexpected non-json response
-            const text = await resp.text();
+            const text = await response.text();
             throw new Error('Unexpected response from server: ' + text);
         }
 
+        // Handle successful response
         if (data && data.url) {
-            // Update toolbar icon to indicate shared state
             markShareIconShared(noteId, true);
             updateSharedCount(1);
 
-            // Use a dedicated share modal (copy + cancel + revoke/renew)
             if (typeof showShareModal === 'function') {
-                showShareModal(data.url, { noteId: noteId, shared: true, workspace: data.workspace || '' });
+                showShareModal(data.url, { 
+                    noteId: noteId, 
+                    shared: true, 
+                    workspace: data.workspace || '' 
+                });
             } else if (typeof showLinkModal === 'function') {
                 showLinkModal(data.url, data.url, function () { });
             } else {
-                // Fallback: prompt
                 window.prompt('Shared URL (read-only):', data.url);
             }
         } else if (data && data.error) {
-            showNotificationPopup && showNotificationPopup((window.t ? window.t('index.share_modal.error_prefix', null, 'Error: ') : 'Error: ') + data.error, 'error');
+            const errorMsg = (window.t ? window.t('index.share_modal.error_prefix', null, 'Error: ') : 'Error: ') + data.error;
+            if (typeof showNotificationPopup === 'function') {
+                showNotificationPopup(errorMsg, 'error');
+            }
         } else {
-            showNotificationPopup && showNotificationPopup(window.t ? window.t('index.share_modal.unknown_error', null, 'Unknown error creating public share') : 'Unknown error creating public share', 'error');
+            const errorMsg = window.t ? window.t('index.share_modal.unknown_error', null, 'Unknown error creating public share') : 'Unknown error creating public share';
+            if (typeof showNotificationPopup === 'function') {
+                showNotificationPopup(errorMsg, 'error');
+            }
         }
-    } catch (err) {
-        console.error('Error creating public share:', err);
-        showNotificationPopup && showNotificationPopup((window.t ? window.t('index.share_modal.error_creating', null, 'Error creating public share: ') : 'Error creating public share: ') + err.message, 'error');
+    } catch (error) {
+        console.error('Error creating public share:', error);
+        const errorMsg = (window.t ? window.t('index.share_modal.error_creating', null, 'Error creating public share: ') : 'Error creating public share: ') + error.message;
+        if (typeof showNotificationPopup === 'function') {
+            showNotificationPopup(errorMsg, 'error');
+        }
     }
 }
 
+// ===========================
+// Public URL Protocol Management
+// ===========================
+
+/**
+ * Get the user's preferred protocol (http or https) for public URLs
+ * @returns {string} 'http' or 'https' (default: 'https')
+ */
 function getPreferredPublicUrlProtocol() {
     try {
-        const v = localStorage.getItem('poznote-public-url-protocol');
-        if (v === 'http' || v === 'https') return v;
-    } catch (e) {
-        // ignore
+        const protocol = localStorage.getItem('poznote-public-url-protocol');
+        if (protocol === 'http' || protocol === 'https') {
+            return protocol;
+        }
+    } catch (error) {
+        console.error('Error reading protocol preference:', error);
     }
     return 'https';
 }
 
+/**
+ * Set the user's preferred protocol for public URLs
+ * @param {string} protocol - Either 'http' or 'https'
+ */
 function setPreferredPublicUrlProtocol(protocol) {
     try {
         if (protocol === 'http' || protocol === 'https') {
             localStorage.setItem('poznote-public-url-protocol', protocol);
         }
-    } catch (e) {
-        // ignore
+    } catch (error) {
+        console.error('Error saving protocol preference:', error);
     }
 }
 
+/**
+ * Apply a protocol to a public URL
+ * @param {string} url - The URL to modify
+ * @param {string} protocol - Either 'http' or 'https'
+ * @returns {string} The URL with the specified protocol
+ */
 function applyProtocolToPublicUrl(url, protocol) {
     if (!url) return url;
     if (protocol !== 'http' && protocol !== 'https') return url;
 
+    // Replace existing protocol
     if (/^https?:\/\//i.test(url)) {
         return protocol + '://' + url.replace(/^https?:\/\//i, '');
     }
+    // Add protocol if URL starts with //
     if (/^\/\//.test(url)) {
         return protocol + ':' + url;
     }
     return url;
 }
 
-// Close share menu when clicking elsewhere
-document.addEventListener('click', function (e) {
-    if (!e.target.closest('.share-dropdown')) {
-        closeShareMenu();
-    }
-});
+// ===========================
+// Share Modal Display
+// ===========================
 
-// Close actions menu when clicking elsewhere
-document.addEventListener('click', function (e) {
-    if (!e.target.closest('.actions-dropdown')) {
-        closeActionsMenu();
-    }
-});
-
-// Show a simple modal with the public URL and Copy / Cancel buttons (English)
-// showShareModal can accept either just url or (url, options)
-// options: { noteId: string, shared: boolean, workspace: string }
+/**
+ * Show a modal with the public URL and appropriate buttons
+ * @param {string} url - The public URL (or empty string if not shared yet)
+ * @param {Object} options - Modal options
+ * @param {string} options.noteId - The note ID
+ * @param {boolean} options.shared - Whether the note is already shared
+ * @param {string} options.workspace - The workspace name
+ */
 function showShareModal(url, options) {
     // Remove existing if any
     const existing = document.getElementById('shareModal');
@@ -674,86 +755,113 @@ function showShareModal(url, options) {
     content.appendChild(buttonsDiv);
     modal.appendChild(content);
     document.body.appendChild(modal);
-
-    // Do not auto-focus or select the URL — user requested no automatic highlighting
 }
 
-// Expose functions globally
-window.toggleShareMenu = toggleShareMenu;
-window.closeShareMenu = closeShareMenu;
-window.createPublicShare = createPublicShare;
+// ===========================
+// Public Share Management
+// ===========================
 
-// Get existing public share for a note (returns {shared: bool, url?: string, workspace?: string})
+/**
+ * Get existing public share info for a note
+ * @param {string} noteId - The note ID
+ * @returns {Promise<Object>} Object with { shared: boolean, url?: string, workspace?: string }
+ */
 async function getPublicShare(noteId) {
     if (!noteId) return { shared: false };
+    
     try {
-        const resp = await fetch('/api/v1/notes/' + noteId + '/share', {
+        const response = await fetch('/api/v1/notes/' + noteId + '/share', {
             method: 'GET',
             credentials: 'same-origin',
             headers: { 'Accept': 'application/json' }
         });
-        if (!resp.ok) return { shared: false };
-        const ct = resp.headers.get('content-type') || '';
-        if (ct.indexOf('application/json') === -1) return { shared: false };
-        const j = await resp.json();
-        if (j && j.url) return { shared: true, url: j.url, workspace: j.workspace || '' };
+        
+        if (!response.ok) return { shared: false };
+        
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.indexOf('application/json') === -1) return { shared: false };
+        
+        const data = await response.json();
+        if (data && data.url) {
+            return { 
+                shared: true, 
+                url: data.url, 
+                workspace: data.workspace || '' 
+            };
+        }
         return { shared: false };
-    } catch (e) {
+    } catch (error) {
+        console.error('Error getting public share:', error);
         return { shared: false };
     }
 }
 
-// Open the share modal for a note without automatically creating a new share.
-// If no share exists, modal will include a Create button via createPublicShare
+/**
+ * Open the share modal for a note (checks existing share first)
+ * @param {string} noteId - The note ID
+ */
 async function openPublicShareModal(noteId) {
     if (!noteId) return;
-    // Fetch existing share
-    const info = await getPublicShare(noteId);
-    if (info.shared && info.url) {
+    
+    const shareInfo = await getPublicShare(noteId);
+    if (shareInfo.shared && shareInfo.url) {
         markShareIconShared(noteId, true);
-        showShareModal(info.url, { noteId: noteId, shared: true, workspace: info.workspace });
+        showShareModal(shareInfo.url, { 
+            noteId: noteId, 
+            shared: true, 
+            workspace: shareInfo.workspace 
+        });
     } else {
-        // Show modal with no url and a Create button
         showShareModal('', { noteId: noteId, shared: false });
     }
 }
 
-// Toggle visual state of share icon in toolbar
+/**
+ * Update the visual state of share icon in toolbar
+ * @param {string} noteId - The note ID
+ * @param {boolean} shared - Whether the note is shared
+ */
 function markShareIconShared(noteId, shared) {
     try {
-        const sel = document.querySelectorAll('.btn-share');
-        sel.forEach(btn => {
-            // Check if this button's data-note-id matches (new system)
-            const btnNoteId = btn.getAttribute('data-note-id');
+        const shareButtons = document.querySelectorAll('.btn-share');
+        shareButtons.forEach(button => {
+            // Check if this button's data-note-id matches
+            const buttonNoteId = button.getAttribute('data-note-id');
             // Also check onclick for backward compatibility
-            const onclick = btn.getAttribute('onclick') || '';
+            const onclick = button.getAttribute('onclick') || '';
             
-            if (btnNoteId === noteId || onclick.includes("openPublicShareModal('" + noteId + "')")) {
+            if (buttonNoteId === noteId || onclick.includes("openPublicShareModal('" + noteId + "')")) {
                 if (shared) {
-                    btn.classList.add('is-shared');
+                    button.classList.add('is-shared');
                 } else {
-                    btn.classList.remove('is-shared');
+                    button.classList.remove('is-shared');
                 }
             }
         });
-    } catch (e) {
-        // ignore
+    } catch (error) {
+        console.error('Error marking share icon:', error);
     }
 }
 
-window.getPublicShare = getPublicShare;
-window.openPublicShareModal = openPublicShareModal;
-window.markShareIconShared = markShareIconShared;
+// ===========================
+// Actions Menu Functions
+// ===========================
 
-// Actions menu functionality
 let currentActionsMenuNoteId = null;
 let isActionsMenuOpen = false;
 
+/**
+ * Toggle the actions menu for a note
+ * @param {Event} event - The click event
+ * @param {string} noteId - The note ID
+ * @param {string} filename - The note filename (unused but kept for compatibility)
+ * @param {string} titleJson - The note title JSON (unused but kept for compatibility)
+ */
 function toggleActionsMenu(event, noteId, filename, titleJson) {
     if (event) event.stopPropagation();
     currentActionsMenuNoteId = noteId;
 
-    // Close other menus (guard with typeof to avoid ReferenceError if not present)
+    // Close other menus
     if (typeof closeSettingsMenu === 'function') closeSettingsMenu();
     if (typeof closeShareMenu === 'function') closeShareMenu();
 
@@ -764,226 +872,181 @@ function toggleActionsMenu(event, noteId, filename, titleJson) {
 
     if (!activeMenu) return;
 
+    // Toggle off if already open for this note
     if (isActionsMenuOpen && currentActionsMenuNoteId === noteId) {
         closeActionsMenu();
         return;
     }
 
-    // Close any other actions menus first and clear their inline positioning
-    const all = document.querySelectorAll('.actions-menu');
-    all.forEach(el => {
-        el.style.display = 'none';
-        // remove any inline positioning we may have added earlier
-        el.style.removeProperty('position');
-        el.style.removeProperty('left');
-        el.style.removeProperty('right');
-        el.style.removeProperty('top');
-        el.style.removeProperty('bottom');
-        el.style.removeProperty('transform');
-        el.style.removeProperty('margin-top');
-        el.style.removeProperty('z-index');
-        el.style.removeProperty('box-shadow');
+    // Close any other actions menus first
+    const allMenus = document.querySelectorAll('.actions-menu');
+    allMenus.forEach(menu => {
+        menu.style.display = 'none';
+        clearMenuPositioning(menu);
     });
 
     // Show the active menu
     activeMenu.style.display = 'block';
 
-    // If this actions dropdown is inside a mobile container, position it near the button
+    // Position the menu if it's in a mobile container
     try {
-        // Find the triggering button: prefer the event target's closest element with data-note-id
         let triggerBtn = null;
-        if (event && event.target) triggerBtn = event.target.closest('.btn-actions');
-        if (!triggerBtn) triggerBtn = document.querySelector('.btn-actions');
+        if (event && event.target) {
+            triggerBtn = event.target.closest('.btn-actions');
+        }
+        if (!triggerBtn) {
+            triggerBtn = document.querySelector('.btn-actions');
+        }
 
-        const isMobileDropdown = !!triggerBtn && !!triggerBtn.closest && triggerBtn.closest('.actions-dropdown') && triggerBtn.closest('.actions-dropdown').classList.contains('mobile');
+        const isMobileDropdown = triggerBtn && 
+            triggerBtn.closest('.actions-dropdown') && 
+            triggerBtn.closest('.actions-dropdown').classList.contains('mobile');
 
         if (isMobileDropdown && triggerBtn) {
-            // Force fixed positioning placed near the button. Use important priority to override stylesheet !important rules.
-            const rect = triggerBtn.getBoundingClientRect();
-
-            // Make menu invisible but displayed to measure height
-            activeMenu.style.visibility = 'hidden';
-            activeMenu.style.display = 'block';
-
-            // Ensure any previous important declarations are cleared
-            activeMenu.style.removeProperty('position');
-            activeMenu.style.removeProperty('left');
-            activeMenu.style.removeProperty('top');
-            activeMenu.style.removeProperty('bottom');
-            activeMenu.style.removeProperty('transform');
-
-            // Apply fixed positioning with important priority
-            activeMenu.style.setProperty('position', 'fixed', 'important');
-            // center horizontally on the button
-            const centerX = rect.left + rect.width / 2;
-            activeMenu.style.setProperty('left', centerX + 'px', 'important');
-            activeMenu.style.setProperty('transform', 'translateX(-50%)', 'important');
-            activeMenu.style.setProperty('margin-top', '0', 'important');
-            activeMenu.style.setProperty('z-index', '20000', 'important');
-            activeMenu.style.setProperty('box-shadow', '0 8px 24px rgba(0,0,0,0.18)', 'important');
-
-            // Compute space and place above by default
-            const menuHeight = activeMenu.getBoundingClientRect().height || activeMenu.offsetHeight || 0;
-            const spaceAbove = rect.top;
-            const spaceBelow = window.innerHeight - rect.bottom;
-            let topPos = rect.top - menuHeight - 8; // 8px gap
-            if (topPos < 8 && spaceBelow > spaceAbove) {
-                // Not enough space above -> place below the button
-                topPos = rect.bottom + 8;
-            }
-            activeMenu.style.setProperty('top', Math.max(8, topPos) + 'px', 'important');
-            // ensure bottom is unset
-            activeMenu.style.setProperty('bottom', 'auto', 'important');
-
-            // restore visibility
-            activeMenu.style.visibility = '';
+            positionMenuNearButton(activeMenu, triggerBtn);
         } else {
-            // Desktop/default behavior: ensure menu is positioned by CSS (absolute)
-            // Remove any leftover important positioning
-            activeMenu.style.removeProperty('position');
-            activeMenu.style.removeProperty('left');
-            activeMenu.style.removeProperty('top');
-            activeMenu.style.removeProperty('bottom');
-            activeMenu.style.removeProperty('transform');
-            activeMenu.style.removeProperty('margin-top');
-            activeMenu.style.removeProperty('z-index');
-            activeMenu.style.removeProperty('box-shadow');
+            // Desktop: ensure menu is positioned by CSS
+            clearMenuPositioning(activeMenu);
         }
-    } catch (e) {
-        // ignore positioning errors
+    } catch (error) {
+        console.error('Error positioning actions menu:', error);
     }
 
     isActionsMenuOpen = true;
 }
 
+/**
+ * Close all actions menus
+ */
 function closeActionsMenu() {
-    // Hide all actions menus
-    const all = document.querySelectorAll('.actions-menu');
-    all.forEach(el => {
-        el.style.display = 'none';
-        // Remove any inline styles we added for mobile positioning (including important ones)
-        try {
-            el.style.removeProperty('position');
-            el.style.removeProperty('left');
-            el.style.removeProperty('right');
-            el.style.removeProperty('top');
-            el.style.removeProperty('bottom');
-            el.style.removeProperty('transform');
-            el.style.removeProperty('margin-top');
-            el.style.removeProperty('z-index');
-            el.style.removeProperty('box-shadow');
-            el.style.visibility = '';
-        } catch (e) {
-            // ignore
-        }
+    const allMenus = document.querySelectorAll('.actions-menu');
+    allMenus.forEach(menu => {
+        menu.style.display = 'none';
+        clearMenuPositioning(menu);
     });
     isActionsMenuOpen = false;
     currentActionsMenuNoteId = null;
 }
 
-window.toggleActionsMenu = toggleActionsMenu;
-window.closeActionsMenu = closeActionsMenu;
-
 // ===========================
 // Folder Sharing Functions
 // ===========================
 
-// Create a public share for a folder
+/**
+ * Create a public share link for a folder
+ * @param {string} folderId - The folder ID
+ */
 async function createPublicFolderShare(folderId) {
     if (!folderId) return;
 
     try {
-        // Get custom token if provided
+        // Gather optional parameters from modal inputs
         let customToken = '';
         try {
-            const el = document.getElementById('shareFolderCustomToken');
-            if (el && el.value) customToken = el.value.trim();
-        } catch (e) { }
+            const tokenInput = document.getElementById('shareFolderCustomToken');
+            if (tokenInput && tokenInput.value) {
+                customToken = tokenInput.value.trim();
+            }
+        } catch (error) {
+            console.error('Error reading folder custom token:', error);
+        }
 
-        // Get indexable checkbox value
         let indexable = 0;
         try {
-            const indexableEl = document.getElementById('shareFolderIndexable');
-            if (indexableEl && indexableEl.checked) indexable = 1;
-        } catch (e) { }
+            const indexableCheckbox = document.getElementById('shareFolderIndexable');
+            if (indexableCheckbox && indexableCheckbox.checked) {
+                indexable = 1;
+            }
+        } catch (error) {
+            console.error('Error reading folder indexable setting:', error);
+        }
 
-        // Get password value
         let password = '';
         try {
-            const passwordEl = document.getElementById('shareFolderPassword');
-            if (passwordEl && passwordEl.value) password = passwordEl.value.trim();
-        } catch (e) { }
+            const passwordInput = document.getElementById('shareFolderPassword');
+            if (passwordInput && passwordInput.value) {
+                password = passwordInput.value.trim();
+            }
+        } catch (error) {
+            console.error('Error reading folder password:', error);
+        }
 
+        // Build request body
         const theme = localStorage.getItem('poznote-theme') || 'light';
-        const body = { theme: theme, indexable: indexable };
-        if (customToken) body.custom_token = customToken;
-        if (password) body.password = password;
+        const requestBody = { theme: theme, indexable: indexable };
+        if (customToken) requestBody.custom_token = customToken;
+        if (password) requestBody.password = password;
 
-        const resp = await fetch('/api/v1/folders/' + folderId + '/share', {
+        // Make API request
+        const response = await fetch('/api/v1/folders/' + folderId + '/share', {
             method: 'POST',
             credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify(body)
+            body: JSON.stringify(requestBody)
         });
 
-        if (!resp.ok) {
-            const ct = resp.headers.get('content-type') || '';
-            if (ct.indexOf('application/json') !== -1) {
-                const errBody = await resp.json();
-                throw new Error(errBody.error || ('Network response not ok: ' + resp.status));
+        if (!response.ok) {
+            const contentType = response.headers.get('content-type') || '';
+            if (contentType.indexOf('application/json') !== -1) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || ('Network response not ok: ' + response.status));
             }
-            throw new Error('Network response not ok: ' + resp.status);
+            throw new Error('Network response not ok: ' + response.status);
         }
 
-        const ct2 = resp.headers.get('content-type') || '';
+        const contentType = response.headers.get('content-type') || '';
         let data = null;
-        if (ct2.indexOf('application/json') !== -1) {
-            data = await resp.json();
+        if (contentType.indexOf('application/json') !== -1) {
+            data = await response.json();
         } else {
-            const text = await resp.text();
+            const text = await response.text();
             throw new Error('Unexpected response from server: ' + text);
         }
 
         if (data && data.url) {
-            // Show success modal with URL
             if (typeof showFolderShareModal === 'function') {
-                showFolderShareModal(data.url, { folderId: folderId, shared: true, workspace: data.workspace || '' });
+                showFolderShareModal(data.url, { 
+                    folderId: folderId, 
+                    shared: true, 
+                    workspace: data.workspace || '' 
+                });
             }
 
-            // Update shared count in sidebar
             if (data.shared_notes_count && data.shared_notes_count > 0) {
                 updateSharedCount(data.shared_notes_count);
             }
 
-            // Close folder actions menu
             if (typeof closeFolderActionsMenu === 'function') {
                 closeFolderActionsMenu(folderId);
             }
 
-            // Refresh notes list to update folder actions menu item
             refreshNotesListAfterFolderAction(folderId);
         }
 
-    } catch (err) {
-        console.error('Failed to create folder share:', err);
-        alert('Failed to create public folder link: ' + err.message);
+    } catch (error) {
+        console.error('Failed to create folder share:', error);
+        alert('Failed to create public folder link: ' + error.message);
     }
 }
 
-// Get existing public share for a folder
+/**
+ * Get existing public share info for a folder
+ * @param {string} folderId - The folder ID
+ * @returns {Promise<Object>} Object with { shared: boolean, url?: string, workspace?: string }
+ */
 async function getPublicFolderShare(folderId) {
     try {
-        const resp = await fetch('/api/v1/folders/' + folderId + '/share', {
+        const response = await fetch('/api/v1/folders/' + folderId + '/share', {
             credentials: 'same-origin',
             headers: { 'Accept': 'application/json' }
         });
 
-        if (!resp.ok) return { shared: false };
+        if (!response.ok) return { shared: false };
 
-        const data = await resp.json();
+        const data = await response.json();
         if (data.success && data.public) {
             const preferredProtocol = getPreferredPublicUrlProtocol();
             return {
@@ -993,13 +1056,16 @@ async function getPublicFolderShare(folderId) {
             };
         }
         return { shared: false };
-    } catch (err) {
-        console.error('Failed to get folder share status:', err);
+    } catch (error) {
+        console.error('Failed to get folder share status:', error);
         return { shared: false };
     }
 }
 
-// Open the share modal for a folder
+/**
+ * Open the share modal for a folder (checks existing share first)
+ * @param {string} folderId - The folder ID
+ */
 async function openPublicFolderShareModal(folderId) {
     if (!folderId) return;
 
@@ -1285,7 +1351,42 @@ function showFolderShareModal(url, options) {
     document.body.appendChild(modal);
 }
 
+// ===========================
+// Global API Exports
+// ===========================
+
+// Share menu functions
+window.toggleShareMenu = toggleShareMenu;
+window.closeShareMenu = closeShareMenu;
+window.createPublicShare = createPublicShare;
+window.getPublicShare = getPublicShare;
+window.openPublicShareModal = openPublicShareModal;
+window.markShareIconShared = markShareIconShared;
+
+// Actions menu functions
+window.toggleActionsMenu = toggleActionsMenu;
+window.closeActionsMenu = closeActionsMenu;
+
+// Folder sharing functions
 window.createPublicFolderShare = createPublicFolderShare;
 window.getPublicFolderShare = getPublicFolderShare;
 window.openPublicFolderShareModal = openPublicFolderShareModal;
 window.showFolderShareModal = showFolderShareModal;
+
+// ===========================
+// Event Listeners
+// ===========================
+
+// Close share menu when clicking outside
+document.addEventListener('click', function (event) {
+    if (!event.target.closest('.share-dropdown')) {
+        closeShareMenu();
+    }
+});
+
+// Close actions menu when clicking outside
+document.addEventListener('click', function (event) {
+    if (!event.target.closest('.actions-dropdown')) {
+        closeActionsMenu();
+    }
+});

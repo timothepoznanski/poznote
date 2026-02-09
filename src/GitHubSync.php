@@ -7,6 +7,10 @@
  */
 
 class GitHubSync {
+    // Supported file extensions
+    const SUPPORTED_NOTE_EXTENSIONS = ['md', 'html', 'txt', 'markdown', 'json'];
+    const MARKDOWN_EXTENSIONS = ['md', 'markdown', 'txt'];
+    
     private $token;
     private $repo;
     private $branch;
@@ -14,10 +18,16 @@ class GitHubSync {
     private $authorEmail;
     private $apiBase = 'https://api.github.com';
     private $con;
+    
+    /**
+     * @var int|null User ID - Reserved for future multi-user support
+     */
     private $userId;
     
     /**
      * Constructor
+     * @param PDO|null $con Database connection
+     * @param int|null $userId User ID (reserved for future use)
      */
     public function __construct($con = null, $userId = null) {
         require_once __DIR__ . '/config.php';
@@ -33,6 +43,7 @@ class GitHubSync {
     
     /**
      * Check if GitHub sync is enabled and properly configured
+     * @return bool True if GitHub sync is enabled
      */
     public static function isEnabled() {
         require_once __DIR__ . '/config.php';
@@ -41,6 +52,7 @@ class GitHubSync {
     
     /**
      * Check if configuration is valid
+     * @return bool True if token and repository are configured
      */
     public function isConfigured() {
         return !empty($this->token) && !empty($this->repo);
@@ -48,6 +60,7 @@ class GitHubSync {
     
     /**
      * Get current configuration status (without exposing sensitive data)
+     * @return array Configuration status with repo, branch, etc.
      */
     public function getConfigStatus() {
         return [
@@ -62,6 +75,7 @@ class GitHubSync {
     
     /**
      * Test connection to GitHub API
+     * @return array Result with success status and repository info or error message
      */
     public function testConnection() {
         if (!$this->isConfigured()) {
@@ -99,6 +113,7 @@ class GitHubSync {
     
     /**
      * Get the latest sync status from database
+     * @return array|null Sync information or null if not found
      */
     public function getLastSyncInfo() {
         if (!$this->con) {
@@ -122,6 +137,8 @@ class GitHubSync {
     
     /**
      * Save sync info to database
+     * @param array $info Sync information to save
+     * @return bool Success status
      */
     private function saveSyncInfo($info) {
         if (!$this->con) {
@@ -140,6 +157,8 @@ class GitHubSync {
     
     /**
      * Push all notes to GitHub repository
+     * @param string|null $workspaceFilter Optional workspace to filter by
+     * @return array Results with success status, counts, and errors
      */
     public function pushNotes($workspaceFilter = null) {
         if (!$this->isConfigured()) {
@@ -242,8 +261,8 @@ class GitHubSync {
                     $path = $item['path'];
                     $extension = pathinfo($path, PATHINFO_EXTENSION);
                     
-                    // Only consider note files (.md, .html, .txt, .markdown, .json)
-                    if (!in_array($extension, ['md', 'html', 'txt', 'markdown', 'json'])) continue;
+                    // Only consider note files
+                    if (!in_array($extension, self::SUPPORTED_NOTE_EXTENSIONS)) continue;
                     
                     // If workspace filter is set, only delete files in that workspace
                     if ($workspaceFilter) {
@@ -296,6 +315,8 @@ class GitHubSync {
     
     /**
      * Pull notes from GitHub repository
+     * @param string|null $workspaceTarget Optional workspace to pull into
+     * @return array Results with success status, counts, and errors
      */
     public function pullNotes($workspaceTarget = null) {
         if (!$this->isConfigured()) {
@@ -335,7 +356,8 @@ class GitHubSync {
                 $path = $item['path'];
                 $extension = pathinfo($path, PATHINFO_EXTENSION);
                 
-                if (!in_array($extension, ['md', 'html', 'txt', 'markdown', 'json'])) continue;
+                // Only consider note files
+                if (!in_array($extension, self::SUPPORTED_NOTE_EXTENSIONS)) continue;
                 
                 $results['debug'][] = "Processing: " . $path;
                 
@@ -468,9 +490,11 @@ class GitHubSync {
     
     /**
      * Delete a file from GitHub repository
+     * @param string $path File path in repository
+     * @param string $message Commit message
+     * @return array Result with success status and error if applicable
      */
     private function deleteFile($path, $message) {
-        // Encode the path for URL
         $encodedPath = implode('/', array_map('rawurlencode', explode('/', $path)));
         
         // Get the file to retrieve its SHA (required for deletion)
@@ -507,12 +531,15 @@ class GitHubSync {
     
     /**
      * Push a single file to GitHub
+     * @param string $path File path in repository
+     * @param string $content File content
+     * @param string $message Commit message
+     * @return array Result with success status, SHA, and error if applicable
      */
     private function pushFile($path, $content, $message) {
-        // Encode the path for URL (each segment separately to preserve /)
         $encodedPath = implode('/', array_map('rawurlencode', explode('/', $path)));
         
-        // First, try to get the existing file to get its SHA
+        // Try to get the existing file to get its SHA
         $existingFile = $this->apiRequest('GET', "/repos/{$this->repo}/contents/{$encodedPath}?ref={$this->branch}");
         
         $body = [
@@ -544,6 +571,7 @@ class GitHubSync {
     
     /**
      * Get repository tree (list of all files)
+     * @return array Tree array or error array
      */
     private function getRepoTree() {
         $response = $this->apiRequest('GET', "/repos/{$this->repo}/git/trees/{$this->branch}?recursive=1");
@@ -557,9 +585,10 @@ class GitHubSync {
     
     /**
      * Get file content from repository
+     * @param string $path File path in repository
+     * @return array Result with content or error
      */
     private function getFileContent($path) {
-        // Encode the path for URL
         $encodedPath = implode('/', array_map('rawurlencode', explode('/', $path)));
         $response = $this->apiRequest('GET', "/repos/{$this->repo}/contents/{$encodedPath}?ref={$this->branch}");
         
@@ -587,17 +616,17 @@ class GitHubSync {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         
         if ($method === 'PUT' || $method === 'POST' || $method === 'DELETE') {
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
             if ($body) {
-                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
                 $headers[] = 'Content-Type: application/json';
-                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
             }
         }
+        
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -621,7 +650,9 @@ class GitHubSync {
     }
     
     /**
-     * Get folder path for a note
+     * Get folder path for a note by building path from folder hierarchy
+     * @param int|null $folderId Folder ID to build path from
+     * @return string Folder path (e.g., "parent/child")
      */
     private function getFolderPath($folderId) {
         if (!$folderId || !$this->con) {
@@ -649,6 +680,9 @@ class GitHubSync {
     
     /**
      * Sanitize file name for use in repository
+     * Removes invalid characters and limits length
+     * @param string $name Original file name
+     * @return string Sanitized file name
      */
     private function sanitizeFileName($name) {
         // Remove/replace invalid characters
@@ -670,6 +704,10 @@ class GitHubSync {
     
     /**
      * Get or create folder ID from a folder path
+     * Creates all folders in hierarchy if they don't exist
+     * @param string $folderPath Folder path (e.g., "parent/child")
+     * @param string $workspace Workspace name
+     * @return int|null Folder ID of the deepest folder in path
      */
     private function getOrCreateFolderFromPath($folderPath, $workspace) {
         if (empty($folderPath) || !$this->con) {
@@ -717,6 +755,9 @@ class GitHubSync {
     
     /**
      * Add front matter to markdown content
+     * @param string $content Original markdown content
+     * @param array $note Note data (heading, tags, updated, id)
+     * @return string Content with front matter prepended
      */
     private function addFrontMatter($content, $note) {
         // Check if content already has front matter
@@ -741,9 +782,19 @@ class GitHubSync {
     
     /**
      * Parse note data from GitHub file
+     * 
+     * Path structure: Workspace/Folder1/Folder2/filename.ext
+     * - First segment = workspace
+     * - Middle segments = folder hierarchy
+     * - Last segment = filename
+     * 
+     * @param string $path File path in repository
+     * @param string $content File content
+     * @param string $extension File extension
+     * @return array Parsed note data with workspace, folder, title, etc.
      */
     private function parseNoteFromGitHub($path, $content, $extension) {
-        // Extract workspace from path (first folder)
+        // Split path into segments
         $pathParts = explode('/', $path);
         
         // If file is at root (no slash), use default workspace
@@ -751,28 +802,32 @@ class GitHubSync {
             $workspace = 'Poznote';
             $folderPath = '';
         } else {
+            // First part is the workspace
             $workspace = $pathParts[0];
             
-            // Remove workspace from folder path
-            $folderPath = dirname($path);
-            if (strpos($folderPath, $workspace . '/') === 0) {
-                $folderPath = substr($folderPath, strlen($workspace) + 1);
-            }
-            if ($folderPath === $workspace) {
+            // Build folder path from middle segments (exclude workspace and filename)
+            if (count($pathParts) > 2) {
+                // Get all parts except first (workspace) and last (filename)
+                $folderPath = implode('/', array_slice($pathParts, 1, -1));
+            } else {
+                // File is directly in workspace folder
                 $folderPath = '';
             }
         }
         
+        // Extract filename without extension
+        $filename = pathinfo($path, PATHINFO_FILENAME);
+        
         $data = [
-            'type' => (in_array($extension, ['md', 'markdown', 'txt'])) ? 'markdown' : 'note',
-            'heading' => pathinfo(pathinfo($path, PATHINFO_FILENAME), PATHINFO_FILENAME),
+            'type' => in_array($extension, self::MARKDOWN_EXTENSIONS) ? 'markdown' : 'note',
+            'heading' => $filename,
             'tags' => '',
             'folder_path' => $folderPath,
             'workspace' => $workspace
         ];
         
         // Parse front matter for markdown-like files
-        if (in_array($extension, ['md', 'markdown', 'txt']) && preg_match('/^---\s*\n(.+?)\n---\s*\n/s', $content, $matches)) {
+        if (in_array($extension, self::MARKDOWN_EXTENSIONS) && preg_match('/^---\s*\n(.+?)\n---\s*\n/s', $content, $matches)) {
             $frontMatter = $matches[1];
             
             if (preg_match('/^title:\s*(.+)$/m', $frontMatter, $m)) {
@@ -795,41 +850,82 @@ class GitHubSync {
     }
     
     /**
-     * Find existing note by title and folder
+     * Find existing note by poznote_id or title
+     * 
+     * Search strategy:
+     * 1. First try by poznote_id from front matter (most reliable)
+     * 2. Then try by title and workspace (may match multiple notes)
+     * 
+     * @param array $noteData Note data with poznote_id, heading, workspace
+     * @return array|false Note data if found, false otherwise
      */
     private function findExistingNote($noteData) {
-        if (!$this->con) return null;
-        
-        // First try by poznote_id if available
-        if (isset($noteData['poznote_id'])) {
-            $stmt = $this->con->prepare("SELECT id FROM entries WHERE id = ? AND trash = 0");
-            $stmt->execute([$noteData['poznote_id']]);
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($row) return $row;
+        if (!$this->con) {
+            return false;
         }
         
-        // Then try by title
-        $stmt = $this->con->prepare("SELECT id FROM entries WHERE heading = ? AND workspace = ? AND trash = 0 LIMIT 1");
+        // First try by poznote_id if available (most reliable method)
+        if (isset($noteData['poznote_id'])) {
+            $stmt = $this->con->prepare("SELECT id, heading, type, workspace FROM entries WHERE id = ? AND trash = 0");
+            $stmt->execute([$noteData['poznote_id']]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($row) {
+                return $row;
+            }
+        }
+        
+        // Fallback: search by title and workspace (ordered by most recent)
+        $stmt = $this->con->prepare("
+            SELECT id, heading, type, workspace 
+            FROM entries 
+            WHERE heading = ? AND workspace = ? AND trash = 0 
+            ORDER BY updated DESC 
+            LIMIT 1
+        ");
         $stmt->execute([$noteData['heading'], $noteData['workspace']]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     
     /**
+     * Extract folder name from folder path
+     * @param string $folderPath Full folder path
+     * @return string|null Last folder name in path
+     */
+    private function extractFolderName($folderPath) {
+        if (empty($folderPath)) {
+            return null;
+        }
+        $folderParts = explode('/', trim($folderPath, '/'));
+        return end($folderParts);
+    }
+    
+    /**
+     * Remove YAML front matter from content
+     * @param string $content Content with possible front matter
+     * @return string Content without front matter
+     */
+    private function removeFrontMatter($content) {
+        return preg_replace('/^---\s*\n.+?\n---\s*\n/s', '', $content);
+    }
+    
+    /**
      * Create a new note from GitHub content
+     * @param array $noteData Note data (heading, type, tags, workspace, folder_path)
+     * @param string $content Note content (may include front matter)
+     * @param string $entriesPath Path to entries directory
+     * @return int New note ID
      */
     private function createNote($noteData, $content, $entriesPath) {
         $now = date('Y-m-d H:i:s');
         
-        // Remove front matter from content
-        $cleanContent = preg_replace('/^---\s*\n.+?\n---\s*\n/s', '', $content);
+        $cleanContent = $this->removeFrontMatter($content);
         
         // Get or create folder ID from folder path
         $folderId = null;
         $folderName = null;
         if (!empty($noteData['folder_path'])) {
             $folderId = $this->getOrCreateFolderFromPath($noteData['folder_path'], $noteData['workspace']);
-            $folderParts = explode('/', $noteData['folder_path']);
-            $folderName = end($folderParts);
+            $folderName = $this->extractFolderName($noteData['folder_path']);
         }
         
         $stmt = $this->con->prepare("
@@ -861,30 +957,38 @@ class GitHubSync {
     
     /**
      * Update an existing note from GitHub content
+     * Updates all fields including heading, type, workspace, and content
+     * @param int $noteId Note ID to update
+     * @param array $noteData Note data (heading, type, tags, workspace, folder_path)
+     * @param string $content Note content (may include front matter)
+     * @param string $entriesPath Path to entries directory
+     * @return bool Success status
      */
     private function updateNote($noteId, $noteData, $content, $entriesPath) {
         $now = date('Y-m-d H:i:s');
         
-        // Remove front matter from content
-        $cleanContent = preg_replace('/^---\s*\n.+?\n---\s*\n/s', '', $content);
+        $cleanContent = $this->removeFrontMatter($content);
         
         // Get or create folder ID from folder path
         $folderId = null;
         $folderName = null;
         if (!empty($noteData['folder_path'])) {
             $folderId = $this->getOrCreateFolderFromPath($noteData['folder_path'], $noteData['workspace']);
-            $folderParts = explode('/', $noteData['folder_path']);
-            $folderName = end($folderParts);
+            $folderName = $this->extractFolderName($noteData['folder_path']);
         }
 
+        // Update all necessary fields including heading, type, and workspace
         $stmt = $this->con->prepare("
-            UPDATE entries SET entry = ?, tags = ?, updated = ?, folder = ?, folder_id = ?
+            UPDATE entries SET heading = ?, entry = ?, type = ?, tags = ?, workspace = ?, updated = ?, folder = ?, folder_id = ?
             WHERE id = ?
         ");
         
         $stmt->execute([
+            $noteData['heading'],
             $noteData['type'] === 'markdown' ? '' : $cleanContent,
+            $noteData['type'],
             $noteData['tags'],
+            $noteData['workspace'],
             $now,
             $folderName,
             $folderId,

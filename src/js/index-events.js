@@ -1,6 +1,16 @@
 /**
  * Index Page Event Delegation
- * CSP-compliant event handlers for index.php toolbar and actions
+ * 
+ * This module handles all event listeners for the main index.php page.
+ * It uses event delegation for better performance and CSP compliance.
+ * 
+ * Key features:
+ * - Event delegation pattern for all click and focus events
+ * - Initialization of tasklists, markdown notes, and page config
+ * - Mobile navigation helpers
+ * - Note creation functions (tasklist and markdown)
+ * 
+ * @module index-events
  */
 
 (function () {
@@ -30,6 +40,13 @@
         }
     }
 
+    // ============================================================
+    // Tasklist Actions Menu Handlers
+    // ============================================================
+    
+    /**
+     * Close all open tasklist action menus
+     */
     function closeTasklistActionsMenus() {
         const openMenus = document.querySelectorAll('.tasklist-actions-menu:not([hidden])');
         openMenus.forEach(menu => {
@@ -39,6 +56,11 @@
         });
     }
 
+    /**
+     * Toggle a tasklist actions menu and attach outside click listener
+     * @param {string} noteId - The note ID
+     * @param {HTMLElement} triggerEl - The button element that triggered the toggle
+     */
     function toggleTasklistActionsMenu(noteId, triggerEl) {
         if (!noteId) return;
 
@@ -131,13 +153,8 @@
                 }
                 break;
             case 'exec-underline':
-                // Underline not supported in standard markdown
-                if (typeof isInMarkdownEditor === 'function' && isInMarkdownEditor()) {
-                    // Skip or use HTML fallback
-                    document.execCommand('underline');
-                } else {
-                    document.execCommand('underline');
-                }
+                // Underline not supported in standard markdown, use HTML fallback
+                document.execCommand('underline');
                 break;
             case 'exec-strikethrough':
                 if (typeof isInMarkdownEditor === 'function' && isInMarkdownEditor()) {
@@ -609,8 +626,11 @@
         }
     }
 
-    // Initialize event delegation
+    // ============================================================
+    // Main Event Initialization
+    // ============================================================
     document.addEventListener('DOMContentLoaded', function () {
+        // Attach global event listeners
         document.addEventListener('click', handleIndexClick);
         document.addEventListener('click', handleNoteBackgroundClick);
         document.addEventListener('focusin', handleIndexFocus);
@@ -641,29 +661,55 @@
         } catch (e) {
             console.error('Error closing toggle blocks:', e);
         }
+
+        // Initialize mobile note click handlers
+        initializeNoteClickHandlers();
+        checkAndScrollToNote();
+
+        // Initialize image click handlers for images in notes
+        if (typeof reinitializeImageClickHandlers === 'function') {
+            reinitializeImageClickHandlers();
+        }
+
+        // Check if we need to expand a specific folder (e.g., after creating a template)
+        const expandFolderId = urlParams.get('expand_folder');
+        if (expandFolderId && typeof window.toggleFolder === 'function') {
+            // Wait for the DOM to be fully loaded including folder structure
+            setTimeout(function () {
+                const folderDomId = 'folder-' + expandFolderId;
+                const folderContent = document.getElementById(folderDomId);
+                // Expand folder if it exists and is currently closed
+                if (folderContent) {
+                    if (folderContent.style.display === 'none' || folderContent.style.display === '') {
+                        window.toggleFolder(folderDomId);
+                    }
+                }
+                // Clean up URL parameter
+                urlParams.delete('expand_folder');
+                const newUrl = window.location.pathname + '?' + urlParams.toString();
+                window.history.replaceState({}, '', newUrl);
+            }, 300);
+        }
     });
 
     // ============================================================
-    // Functions previously inline in index.php
+    // Global Functions (exposed via window object)
+    // These functions are called from other modules or inline event handlers
     // ============================================================
 
-    // Create menu functionality - redirects to create page
+    /**
+     * Redirect to create.php with current workspace
+     * Note: Despite the name "toggle", this function only redirects
+     */
     window.toggleCreateMenu = function () {
         var workspace = (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || '';
         window.location.href = 'create.php?workspace=' + encodeURIComponent(workspace);
     };
 
-    // Close menu when clicking outside
-    document.addEventListener('click', function (e) {
-        var menu = document.getElementById('header-create-menu');
-        var plusBtn = document.querySelector('.sidebar-plus');
-        if (menu && plusBtn && !plusBtn.contains(e.target) && !menu.contains(e.target)) {
-            menu.remove();
-            plusBtn.setAttribute('aria-expanded', 'false');
-        }
-    });
-
-    // Task list creation function
+    /**
+     * Create a new task list note via API
+     * Redirects to the new note after successful creation
+     */
     window.createTaskListNote = function () {
         var noteData = {
             folder_id: window.selectedFolderId || null,
@@ -692,7 +738,10 @@
             });
     };
 
-    // Markdown note creation function
+    /**
+     * Create a new markdown note via API
+     * Redirects to the new note after successful creation
+     */
     window.createMarkdownNote = function () {
         var noteData = {
             folder_id: window.selectedFolderId || null,
@@ -721,7 +770,10 @@
             });
     };
 
-    // Navigate to settings.php with current workspace and note parameters
+    /**
+     * Navigate to a different page while preserving workspace and note context
+     * @param {string} page - The target page (e.g., 'settings.php', 'home.php')
+     */
     window.navigateToDisplayOrSettings = function (page) {
         var url = page;
         var params = [];
@@ -746,7 +798,15 @@
         window.location.href = url;
     };
 
-    // Mobile navigation functionality
+    // ============================================================
+    // Mobile Navigation Helpers
+    // ============================================================
+
+    /**
+     * Scroll to the right column (note editor area)
+     * On mobile: uses horizontal scroll
+     * On desktop: uses scrollIntoView
+     */
     window.scrollToRightColumn = function () {
         if (window.innerWidth < 800) {
             const scrollAmount = window.innerWidth;
@@ -768,6 +828,11 @@
         }
     };
 
+    /**
+     * Scroll to the left column (note list / sidebar)
+     * On mobile: uses horizontal scroll
+     * On desktop: uses scrollIntoView
+     */
     window.scrollToLeftColumn = function () {
         if (window.innerWidth < 800) {
             document.documentElement.scrollLeft = 0;
@@ -788,7 +853,10 @@
         }
     };
 
-    // Auto-scroll to right column when a note is loaded on mobile
+    /**
+     * Check URL parameters and auto-scroll to note if scroll=1 is present
+     * Used on mobile after creating/loading a note
+     */
     function checkAndScrollToNote() {
         const isMobile = window.innerWidth <= 800;
         if (isMobile) {
@@ -806,7 +874,10 @@
         }
     }
 
-    // Auto-scroll to right column when clicking on any element that loads a note
+    /**
+     * Mark that we should scroll to note on next page load (mobile only)
+     * @param {Event} event - Click event
+     */
     function handleNoteClick(event) {
         const isMobile = window.innerWidth <= 800;
         if (isMobile) {
@@ -814,7 +885,10 @@
         }
     }
 
-    // Add click listeners to all note-related elements
+    /**
+     * Initialize click handlers for note-related elements
+     * Attaches handleNoteClick to all elements that load a note
+     */
     window.initializeNoteClickHandlers = function () {
         const noteElements = document.querySelectorAll('a[href*="note="], .links_arbo_left, .note-title, .note-link');
         noteElements.forEach(function (element) {
@@ -822,35 +896,4 @@
         });
     };
 
-    // Initialize on DOMContentLoaded
-    document.addEventListener('DOMContentLoaded', function () {
-        initializeNoteClickHandlers();
-        checkAndScrollToNote();
-
-        // Initialize image click handlers for images in notes
-        if (typeof reinitializeImageClickHandlers === 'function') {
-            reinitializeImageClickHandlers();
-        }
-
-        // Check if we need to expand a specific folder (e.g., after creating a template)
-        const urlParams = new URLSearchParams(window.location.search);
-        const expandFolderId = urlParams.get('expand_folder');
-        if (expandFolderId && typeof window.toggleFolder === 'function') {
-            // Wait for the DOM to be fully loaded including folder structure
-            setTimeout(function () {
-                const folderDomId = 'folder-' + expandFolderId;
-                const folderContent = document.getElementById(folderDomId);
-                // Expand folder if it exists and is currently closed
-                if (folderContent) {
-                    if (folderContent.style.display === 'none' || folderContent.style.display === '') {
-                        window.toggleFolder(folderDomId);
-                    }
-                }
-                // Clean up URL parameter
-                urlParams.delete('expand_folder');
-                const newUrl = window.location.pathname + '?' + urlParams.toString();
-                window.history.replaceState({}, '', newUrl);
-            }, 300);
-        }
-    });
 })();

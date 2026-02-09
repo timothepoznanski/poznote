@@ -15,15 +15,16 @@ $message = '';
 $error = '';
 $clearSelectedWorkspace = false;
 
+// Detect AJAX/JSON request (used throughout the file)
+$isAjax = false;
+if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+    $isAjax = true;
+} elseif (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) {
+    $isAjax = true;
+}
+
 // Handle create/delete actions
 if ($_POST) {
-    // detect AJAX/JSON request
-    $isAjax = false;
-    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
-        $isAjax = true;
-    } elseif (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) {
-        $isAjax = true;
-    }
     try {
         if (isset($_POST['action']) && $_POST['action'] === 'create') {
             $name = trim($_POST['name'] ?? '');
@@ -58,165 +59,155 @@ if ($_POST) {
                 throw new Exception(t('workspaces.errors.not_found', [], 'Workspace not found', $currentLang));
             }
 
-                // Check if this workspace is set as the default workspace
-                $currentDefaultWorkspace = null;
-                try {
-                    $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
-                    $stmt->execute(['default_workspace']);
-                    $currentDefaultWorkspace = $stmt->fetchColumn();
-                } catch (Exception $e) {
-                    // Settings table may not exist - ignore
+            // Get current workspace settings
+            $currentDefaultWorkspace = null;
+            $currentLastOpened = null;
+            try {
+                $settingsStmt = $con->prepare('SELECT key, value FROM settings WHERE key IN (?, ?)');
+                $settingsStmt->execute(['default_workspace', 'last_opened_workspace']);
+                while ($row = $settingsStmt->fetch(PDO::FETCH_ASSOC)) {
+                    if ($row['key'] === 'default_workspace') {
+                        $currentDefaultWorkspace = $row['value'];
+                    } elseif ($row['key'] === 'last_opened_workspace') {
+                        $currentLastOpened = $row['value'];
+                    }
                 }
+            } catch (Exception $e) {
+                // Settings table may not exist - ignore
+            }
 
-                // Check if this workspace is set as the last opened workspace
-                $currentLastOpened = null;
-                try {
-                    $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
-                    $stmt->execute(['last_opened_workspace']);
-                    $currentLastOpened = $stmt->fetchColumn();
-                } catch (Exception $e) {
-                    // Settings table may not exist - ignore
-                }
+            // Find another workspace to redirect to after deletion
+            $otherWs = $con->prepare("SELECT name FROM workspaces WHERE name != ? ORDER BY name LIMIT 1");
+            $otherWs->execute([$name]);
+            $targetWorkspace = $otherWs->fetchColumn();
 
-                // Find another workspace to redirect to after deletion
-                $otherWs = $con->prepare("SELECT name FROM workspaces WHERE name != ? ORDER BY name LIMIT 1");
-                $otherWs->execute([$name]);
-                $targetWorkspace = $otherWs->fetchColumn();
+            // Delete all entries for this workspace (including trashed notes)
+            $selectEntries = $con->prepare('SELECT id, attachments, type FROM entries WHERE workspace = ?');
+            $selectEntries->execute([$name]);
+            $entries = $selectEntries->fetchAll(PDO::FETCH_ASSOC);
 
-                // Delete all entries for this workspace (including trashed notes)
-                $selectEntries = $con->prepare('SELECT id, attachments, type FROM entries WHERE workspace = ?');
-                $selectEntries->execute([$name]);
-                $entries = $selectEntries->fetchAll(PDO::FETCH_ASSOC);
+            // Paths for files
+            $attachmentsPath = getAttachmentsPath();
+            $entriesPath = getEntriesPath();
 
-                // Paths for files
-                $attachmentsPath = getAttachmentsPath();
-                $entriesPath = getEntriesPath();
-
-                // Delete physical attachment files referenced in entries
-                foreach ($entries as $entry) {
-                    // attachments stored as JSON array in `attachments` column
-                    if (!empty($entry['attachments'])) {
-                        $attList = json_decode($entry['attachments'], true);
-                        if (is_array($attList)) {
-                            foreach ($attList as $att) {
-                                if (is_array($att) && !empty($att['filename'])) {
-                                    $file = $attachmentsPath . DIRECTORY_SEPARATOR . $att['filename'];
-                                    if (file_exists($file)) {
-                                        @unlink($file);
-                                    }
+            // Delete physical attachment files referenced in entries
+        foreach ($entries as $entry) {
+                // attachments stored as JSON array in `attachments` column
+                if (!empty($entry['attachments'])) {
+                    $attList = json_decode($entry['attachments'], true);
+                    if (is_array($attList)) {
+                        foreach ($attList as $att) {
+                            if (is_array($att) && !empty($att['filename'])) {
+                                $file = $attachmentsPath . DIRECTORY_SEPARATOR . $att['filename'];
+                                if (file_exists($file)) {
+                                    @unlink($file);
                                 }
                             }
                         }
                     }
+                }
 
-                    // Delete entry files if present (entries can be .html or .md based on type)
-                    if (!empty($entry['id'])) {
-                        $entryType = $entry['type'] ?? 'note';
-                        $fileExtension = ($entryType === 'markdown') ? '.md' : '.html';
-                        $entryFile = rtrim($entriesPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $entry['id'] . $fileExtension;
-                        if (file_exists($entryFile)) {
-                            @unlink($entryFile);
-                        }
+                // Delete entry files if present (entries can be .html or .md based on type)
+            if (!empty($entry['id'])) {
+                    $entryType = $entry['type'] ?? 'note';
+                    $fileExtension = ($entryType === 'markdown') ? '.md' : '.html';
+                    $entryFile = rtrim($entriesPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $entry['id'] . $fileExtension;
+                    if (file_exists($entryFile)) {
+                        @unlink($entryFile);
+                    }
+                    
+                    // Also check for the other extension in case of type changes
+                    $otherExtension = ($entryType === 'markdown') ? '.html' : '.md';
+                    $otherFile = rtrim($entriesPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $entry['id'] . $otherExtension;
+                    if (file_exists($otherFile)) {
+                        @unlink($otherFile);
+                    }
+                }
+            }
+
+            // Remove entries rows from DB
+            $delEntries = $con->prepare('DELETE FROM entries WHERE workspace = ?');
+        $delEntries->execute([$name]);
+
+            // Additional cleanup: remove orphan files from data/entries
+            // Some files can remain on disk if the DB row was missing or inconsistent.
+            // Scan the entries directory and remove any <id>.html or <id>.md files that are no longer present in the entries table.
+            try {
+                $entriesDir = getEntriesPath();
+            if ($entriesDir && is_dir($entriesDir)) {
+                    $files = scandir($entriesDir);
+                    $checkStmt = $con->prepare('SELECT COUNT(*) FROM entries WHERE id = ?');
+                    foreach ($files as $f) {
+                        if (!is_string($f)) continue;
                         
-                        // Also check for the other extension in case of type changes
-                        $otherExtension = ($entryType === 'markdown') ? '.html' : '.md';
-                        $otherFile = rtrim($entriesPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $entry['id'] . $otherExtension;
-                        if (file_exists($otherFile)) {
-                            @unlink($otherFile);
-                        }
-                    }
-                }
-
-                // Remove entries rows from DB
-                $delEntries = $con->prepare('DELETE FROM entries WHERE workspace = ?');
-                $delEntries->execute([$name]);
-
-                // Additional cleanup: remove orphan files from data/entries
-                // Some files can remain on disk if the DB row was missing or inconsistent.
-                // Scan the entries directory and remove any <id>.html or <id>.md files that are no longer present in the entries table.
-                try {
-                    $entriesDir = getEntriesPath();
-                    if ($entriesDir && is_dir($entriesDir)) {
-                        $files = scandir($entriesDir);
-                        $checkStmt = $con->prepare('SELECT COUNT(*) FROM entries WHERE id = ?');
-                        foreach ($files as $f) {
-                            if (!is_string($f)) continue;
-                            
-                            // Check for both .html and .md files
-                            $isHtml = substr($f, -5) === '.html';
-                            $isMd = substr($f, -3) === '.md';
-                            
-                            if (!$isHtml && !$isMd) continue;
-                            if ($f === 'index.html') continue; // keep generic index
-                            
-                            $base = $isHtml ? basename($f, '.html') : basename($f, '.md');
-                            // Only consider numeric IDs (legacy behavior uses numeric ids for exported files)
-                            if (!preg_match('/^\d+$/', $base)) continue;
-                            // If no DB row exists for this id, delete the file
-                            try {
-                                $checkStmt->execute([$base]);
-                                $count = (int)$checkStmt->fetchColumn();
-                                if ($count === 0) {
-                                    @unlink(rtrim($entriesDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $f);
-                                }
-                            } catch (Exception $e) {
-                                // ignore DB check errors and continue
+                        // Check for both .html and .md files
+                        $isHtml = substr($f, -5) === '.html';
+                        $isMd = substr($f, -3) === '.md';
+                        
+                        if (!$isHtml && !$isMd) continue;
+                        if ($f === 'index.html') continue; // keep generic index
+                        
+                        $base = $isHtml ? basename($f, '.html') : basename($f, '.md');
+                        // Only consider numeric IDs (legacy behavior uses numeric ids for exported files)
+                        if (!preg_match('/^\d+$/', $base)) continue;
+                        // If no DB row exists for this id, delete the file
+                        try {
+                            $checkStmt->execute([$base]);
+                            $count = (int)$checkStmt->fetchColumn();
+                            if ($count === 0) {
+                                @unlink(rtrim($entriesDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $f);
                             }
+                        } catch (Exception $e) {
+                            // ignore DB check errors and continue
                         }
                     }
-                } catch (Exception $e) {
-                    // Non-fatal: don't block workspace deletion if cleanup fails
                 }
+            } catch (Exception $e) {
+                // Non-fatal: don't block workspace deletion if cleanup fails
+        }
 
-                // Remove folders scoped to this workspace
-                try {
-                    $delFolders = $con->prepare('DELETE FROM folders WHERE workspace = ?');
-                    $delFolders->execute([$name]);
-                } catch (Exception $e) {
-                    // Table may not exist - ignore
-                }
+            // Remove folders scoped to this workspace
+            try {
+                $delFolders = $con->prepare('DELETE FROM folders WHERE workspace = ?');
+                $delFolders->execute([$name]);
+            } catch (Exception $e) {
+                // Table may not exist - ignore
+            }
 
-                // Remove any settings namespaced for this workspace (key format: something::workspace)
-                try {
-                    $delSettings = $con->prepare("DELETE FROM settings WHERE key LIKE ?");
-                    $delSettings->execute(['%::' . $name]);
-                } catch (Exception $e) {
-                    // non-fatal
-                }
+            // Remove any settings namespaced for this workspace (key format: something::workspace)
+            try {
+                $delSettings = $con->prepare("DELETE FROM settings WHERE key LIKE ?");
+                $delSettings->execute(['%::' . $name]);
+            } catch (Exception $e) {
+                // non-fatal
+            }
 
-                // If the deleted workspace was the default workspace, reset to "last opened"
+            // Update workspace settings if necessary
+        try {
+                $resetStmt = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
                 if ($currentDefaultWorkspace === $name) {
-                    try {
-                        $resetStmt = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
-                        $resetStmt->execute(['default_workspace', '__last_opened__']);
-                    } catch (Exception $e) {
-                        // If settings update fails, continue - it's not critical for workspace deletion
-                    }
+                    $resetStmt->execute(['default_workspace', '__last_opened__']);
                 }
-
-                // If the deleted workspace was the last opened workspace, update to target workspace
                 if ($currentLastOpened === $name && $targetWorkspace) {
-                    try {
-                        $resetStmt = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
-                        $resetStmt->execute(['last_opened_workspace', $targetWorkspace]);
-                    } catch (Exception $e) {
-                        // If settings update fails, continue - it's not critical for workspace deletion
-                    }
+                    $resetStmt->execute(['last_opened_workspace', $targetWorkspace]);
                 }
+            } catch (Exception $e) {
+                // If settings update fails, continue - it's not critical for workspace deletion
+            }
 
-                // Finally remove workspace record
-                $stmt = $con->prepare('DELETE FROM workspaces WHERE name = ?');
-                $stmt->execute([$name]);
+            // Finally remove workspace record
+            $stmt = $con->prepare('DELETE FROM workspaces WHERE name = ?');
+            $stmt->execute([$name]);
 
-                $message = t('workspaces.messages.deleted_all', [], 'Workspace deleted and all associated notes, folders and attachments removed', $currentLang);
-                // If this was an AJAX delete, return JSON response immediately
-                if (!empty($isAjax)) {
-                    header('Content-Type: application/json');
-                    echo json_encode(['success' => true, 'message' => $message]);
-                    exit;
-                }
-                // If this was a non-AJAX delete, instruct client to clear selected workspace (so UI doesn't keep showing deleted workspace)
-                $clearSelectedWorkspace = true;
+            $message = t('workspaces.messages.deleted_all', [], 'Workspace deleted and all associated notes, folders and attachments removed', $currentLang);
+            // If this was an AJAX delete, return JSON response immediately
+            if (!empty($isAjax)) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true, 'message' => $message]);
+                exit;
+            }
+            // If this was a non-AJAX delete, instruct client to clear selected workspace (so UI doesn't keep showing deleted workspace)
+            $clearSelectedWorkspace = true;
         } elseif (isset($_POST['action']) && $_POST['action'] === 'rename') {
             $name = trim($_POST['name'] ?? '');
             $new_name = trim($_POST['new_name'] ?? '');
@@ -248,28 +239,10 @@ if ($_POST) {
                     $upd = $con->prepare('UPDATE folders SET workspace = ? WHERE workspace = ?');
                     $upd->execute([$new_name, $name]);
 
-                    // Update default_workspace setting if it references the old name
+                    // Update workspace references in settings
                     try {
-                        $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
-                        $stmt->execute(['default_workspace']);
-                        $currentDefault = $stmt->fetchColumn();
-                        if ($currentDefault === $name) {
-                            $stmt = $con->prepare('UPDATE settings SET value = ? WHERE key = ?');
-                            $stmt->execute([$new_name, 'default_workspace']);
-                        }
-                    } catch (Exception $e) {
-                        // Non-fatal
-                    }
-
-                    // Update last_opened_workspace setting if it references the old name
-                    try {
-                        $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
-                        $stmt->execute(['last_opened_workspace']);
-                        $currentLastOpened = $stmt->fetchColumn();
-                        if ($currentLastOpened === $name) {
-                            $stmt = $con->prepare('UPDATE settings SET value = ? WHERE key = ?');
-                            $stmt->execute([$new_name, 'last_opened_workspace']);
-                        }
+                        $updateSettingsStmt = $con->prepare('UPDATE settings SET value = ? WHERE key IN (?, ?) AND value = ?');
+                        $updateSettingsStmt->execute([$new_name, 'default_workspace', 'last_opened_workspace', $name]);
                     } catch (Exception $e) {
                         // Non-fatal
                     }
@@ -290,8 +263,7 @@ if ($_POST) {
                 echo json_encode(['success' => true, 'message' => $message, 'name' => $name]);
                 exit;
             }
-        }
-    elseif (isset($_POST['action']) && $_POST['action'] === 'move_notes') {
+        } elseif (isset($_POST['action']) && $_POST['action'] === 'move_notes') {
             $name = trim($_POST['name'] ?? '');
             $target = trim($_POST['target'] ?? '');
             if ($name === '' || $target === '') throw new Exception(t('workspaces.errors.name_and_target_required', [], 'Workspace name and target required', $currentLang));
@@ -467,31 +439,7 @@ try {
     <link rel="stylesheet" href="css/background-image.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode.css?v=<?php echo $cache_v; ?>">
-    <style>
-        /* Ensure workspace list displays name + buttons on a single line */
-        .workspace-list ul { list-style: none; padding: 0; margin: 0; }
-    .workspace-list ul li { display: flex; align-items: flex-start !important; gap: 14px; padding: 10px 0; border-bottom: 0; }
-        .workspace-list .ws-col { margin: 0; }
-        .workspace-list .ws-col-name { flex: 1 1 auto; min-width: 140px; }
-    .ws-name-block { display: flex; flex-direction: column; justify-content: flex-start; padding-top: 0 !important; }
-    .ws-name-row { display: flex; align-items: center; gap: 8px; }
-    .locked-icon { font-size: 0.95em; color: #6e6e6e; margin-left: 4px; }
-    .workspace-count { color: #8a8f92; display: block; margin-top:4px; font-size: 0.92em; }
-
-    /* Override grid centering from css/index.css to ensure name and count stack */
-    .workspace-list .ws-col-name { align-items: flex-start; }
-    .workspace-list .ws-col-name .ws-name-row { flex-direction: column; align-items: flex-start; gap: 4px; }
-    .workspace-list .ws-col-name .workspace-count { margin-left: 0; }
-    .workspace-name-item { justify-self: start; text-align: left; }
-        .workspace-list .ws-col-action,
-        .workspace-list .ws-col-select,
-        .workspace-list .ws-col-move,
-        .workspace-list .ws-col-delete { flex: 0 0 auto; }
-        .workspace-list .btn { min-width: 110px; }
-        /* Make disabled buttons visually consistent */
-        .workspace-list .btn[disabled] { opacity: 0.65; }
-    </style>
-    
+    <link rel="stylesheet" href="css/workspaces-inline.css?v=<?php echo $cache_v; ?>">
 </head>
 <body data-workspaces="<?php echo htmlspecialchars(json_encode($workspaces, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP), ENT_QUOTES, 'UTF-8'); ?>"
       data-txt-last-opened="<?php echo htmlspecialchars(t('workspaces.default.last_opened', [], 'Last workspace opened', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
@@ -542,20 +490,20 @@ try {
                                 $ws_display = htmlspecialchars($ws);
                             ?>
                             <li>
+                                <?php
+                                    $cnt = isset($workspace_counts[$ws]) ? (int)$workspace_counts[$ws] : 0;
+                                    if ($cnt === 0) {
+                                        $cnt_text = t('workspaces.count.notes_0', [], '0 notes', $currentLang);
+                                    } elseif ($cnt === 1) {
+                                        $cnt_text = t('workspaces.count.notes_1', [], '1 note', $currentLang);
+                                    } else {
+                                        $cnt_text = t('workspaces.count.notes_n', ['count' => $cnt], '{{count}} notes', $currentLang);
+                                    }
+                                ?>
                                 <div class="ws-col ws-col-name">
                                     <div class="ws-name-block">
                                         <div class="ws-name-row">
                                             <span class="workspace-name-item"><?php echo $ws_display; ?></span>
-                                            <?php
-                                                $cnt = isset($workspace_counts[$ws]) ? (int)$workspace_counts[$ws] : 0;
-                                                if ($cnt === 0) {
-                                                    $cnt_text = t('workspaces.count.notes_0', [], '0 notes', $currentLang);
-                                                } elseif ($cnt === 1) {
-                                                    $cnt_text = t('workspaces.count.notes_1', [], '1 note', $currentLang);
-                                                } else {
-                                                    $cnt_text = t('workspaces.count.notes_n', ['count' => $cnt], '{{count}} notes', $currentLang);
-                                                }
-                                            ?>
                                             <span class="workspace-count"><?php echo htmlspecialchars($cnt_text); ?></span>
                                         </div>
                                     </div>
@@ -574,11 +522,7 @@ try {
                                     <?php endif; ?>
                                 </div>
                                 <div class="ws-col ws-col-move">
-                                    <?php 
-                                        $cnt = isset($workspace_counts[$ws]) ? (int)$workspace_counts[$ws] : 0;
-                                        $isDisabled = ($cnt === 0);
-                                    ?>
-                                    <button class="btn btn-warning action-btn btn-move" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" <?php echo $isDisabled ? 'disabled' : ''; ?>><?php echo t_h('workspaces.actions.move_notes', [], 'Move notes', $currentLang); ?></button>
+                                    <button class="btn btn-warning action-btn btn-move" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" <?php echo ($cnt === 0) ? 'disabled' : ''; ?>><?php echo t_h('workspaces.actions.move_notes', [], 'Move notes', $currentLang); ?></button>
                                 </div>
                                 <?php if (count($workspaces) > 1): ?>
                                 <div class="ws-col ws-col-delete">

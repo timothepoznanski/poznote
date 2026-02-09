@@ -4,8 +4,6 @@
 (function () {
     'use strict';
 
-    // ========== Utilities ==========
-
     // Get translations from data attributes on body
     function getTranslations() {
         var body = document.body;
@@ -37,8 +35,6 @@
             default: return tr('settings.language.english', {}, 'English');
         }
     }
-
-    // ========== API Helpers ==========
 
     // Generic function to get setting value from API
     function getSetting(key, callback) {
@@ -113,12 +109,12 @@
                     status.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled');
                 }
                 
-                // Special handling for folder actions visibility
+                // Special handling for folder-actions-always-visible class
                 if (cardId === 'folder-actions-card') {
                     document.body.classList.toggle('folder-actions-always-visible', enabled);
                 }
                 
-                // Special handling for kanban folder click
+                // Special handling for kanban-folder-click class
                 if (cardId === 'kanban-folder-click-card') {
                     document.body.classList.toggle('disable-kanban-click', !enabled);
                 }
@@ -207,7 +203,9 @@
     function refreshNoteSortBadge() {
         getSetting('note_list_sort', function (value) {
             var badge = document.getElementById('note-sort-badge');
-            if (!badge) return;
+            if (badge) {
+                var sortValue = value || 'updated_desc';
+                !badge) return;
             
             var sortValue = value || 'updated_desc';
             var sortLabel;
@@ -227,8 +225,6 @@
 
             badge.textContent = sortLabel;
             badge.className = 'setting-status enabled';
-        });
-    }
 
     function refreshTasklistInsertOrderBadge() {
         getSetting('tasklist_insert_order', function (value) {
@@ -257,7 +253,9 @@
     function refreshToolbarModeBadge() {
         getSetting('toolbar_mode', function (value) {
             var badge = document.getElementById('toolbar-mode-badge');
-            if (!badge) return;
+            if (badge) {
+                var modeValue = value || 'both';
+                !badge) return;
             
             var modeValue = value || 'both';
             var modeLabel;
@@ -277,8 +275,6 @@
 
             badge.textContent = modeLabel;
             badge.className = 'setting-status enabled';
-        });
-    }
 
     function refreshTimezoneBadge() {
         getSetting('timezone', function (value) {
@@ -304,7 +300,7 @@
             var v = value || 'en';
             var radios = document.getElementsByName('languageChoice');
             for (var i = 0; i < radios.length; i++) {
-                radios[i].checked = (radios[i].value === v);
+                try { radios[i].checked = (radios[i].value === v); } catch (e) { }
             }
             modal.style.display = 'flex';
         });
@@ -317,7 +313,7 @@
             var v = value || 'updated_desc';
             var radios = document.getElementsByName('noteSort');
             for (var i = 0; i < radios.length; i++) {
-                radios[i].checked = (radios[i].value === v);
+                try { radios[i].checked = (radios[i].value === v); } catch (e) { }
             }
             modal.style.display = 'flex';
         });
@@ -335,11 +331,7 @@
             modal.style.display = 'flex';
         });
     }
-
-    // ========== Initialization ==========
-
-    document.addEventListener('DOMContentLoaded', function () {
-        // Back to Notes link - preserves workspace parameter if available
+- preserves workspace parameter if available
         var backLink = document.getElementById('backToNotesLink');
         if (backLink) {
             backLink.addEventListener('click', function () {
@@ -357,7 +349,11 @@
                     }
                 } catch (e) {
                     // Use default href if URL parsing fails
-                }
+               rl = new URL(href, window.location.origin);
+                        url.searchParams.set('workspace', workspace);
+                        href = url.toString();
+                    }
+                } catch (e) { }
                 window.location = href;
             });
         }
@@ -370,14 +366,7 @@
         };
         Object.keys(navCards).forEach(function (cardId) {
             var card = document.getElementById(cardId);
-            if (card) {
-                card.addEventListener('click', function () {
-                    window.location = navCards[cardId];
-                });
-            }
-        });
-
-        // Generic clickable cards with data-href attribute (excluding already handled cards)
+            if (card) { (excluding already handled cards)
         var clickableCards = document.querySelectorAll('.settings-card-clickable[data-href]');
         clickableCards.forEach(function (card) {
             // Skip if already handled in navCards
@@ -388,7 +377,14 @@
                 if (href) {
                     window.location = href;
                 }
-            });
+            });f (!card.id || !navCards[card.id]) { // Skip if already handled above
+                card.addEventListener('click', function () {
+                    var href = card.getAttribute('data-href');
+                    if (href) {
+                        window.location = href;
+                    }
+                });
+            }
         });
 
         // External link cards
@@ -425,8 +421,7 @@
         setupToggleCard('kanban-folder-click-card', 'kanban-folder-click-status', 'kanban_folder_click', false);
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
-
-        // Card click handlers for modal settings
+ settings
         var languageCard = document.getElementById('language-card');
         if (languageCard) {
             languageCard.addEventListener('click', showLanguageModal);
@@ -487,7 +482,8 @@
         // Font size card - delegates to font-size-settings.js
         var fontSizeCard = document.getElementById('font-size-card');
         if (fontSizeCard && typeof window.showNoteFontSizePrompt === 'function') {
-            fontSizeCard.addEventListener('click', window.showNoteFontSizePrompt);
+            fontSizeCard.addEventListener('click', window.showNoteFontSiz
+            timezoneCard.addEventListener('click', showTimezonePrompt);
         }
 
         // Save note sort modal button
@@ -569,17 +565,11 @@
             });
         }
 
-        // Load all badges on page load
+        // Load all badges
         refreshLanguageBadge();
         refreshLoginDisplayBadge();
         refreshFontSizeBadge();
-        refreshNoteSortBadge();
-        refreshTasklistInsertOrderBadge();
-        refreshToolbarModeBadge();
-        refreshTimezoneBadge();
-        refreshNoteWidthBadge();
-
-        // Search functionality - filters settings cards
+        refreshNoteSortBadge(); - filters settings cards
         var searchInput = document.getElementById('home-search-input');
         var cards = document.querySelectorAll('.home-grid .home-card');
         var grid = document.querySelector('.home-grid');
@@ -617,6 +607,12 @@
             });
 
             // Keyboard shortcut: press "/" to focus search
+                });
+
+                noResults.style.display = (visibleCount === 0) ? 'block' : 'none';
+            });
+
+            // Focus search on / key press if not in input
             document.addEventListener('keydown', function(e) {
                 if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
                     e.preventDefault();

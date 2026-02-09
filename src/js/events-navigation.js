@@ -1,36 +1,45 @@
-// Navigation system for Poznote
-// Handles note-to-note navigation, browser history, and unsaved changes warnings
+/**
+ * Navigation System for Poznote
+ * 
+ * Manages note-to-note navigation, browser history (back/forward),
+ * and warnings for unsaved changes during navigation.
+ * 
+ * External Dependencies:
+ * - hasUnsavedChanges(noteId) - from auto-save.js
+ * - saveToServerDebounced() - from auto-save.js
+ * - loadNoteFromUrl(url, isPop) - from ui.js
+ * - showSaveInProgressNotification(callback) - from ui.js
+ * - tr(key, params, fallback) - translation function
+ * - window.noteid - current note ID
+ * - saveTimeout - auto-save timer reference
+ * - isOnline - connection status
+ * - notesNeedingRefresh - Set of notes pending save
+ */
 
-// Initialize all auto-save and navigation systems
+/**
+ * Initialize all navigation-related event handlers
+ * Called once on page load to set up the navigation system
+ */
 function initializeAutoSaveSystem() {
     setupAutoSaveCheck();
     setupNoteNavigationInterceptor();
-    setupNavigationDebugger();
+    setupBrowserNavigationHandler();
 }
 
-// Monitor popstate events - reload note when using browser back/forward
-function setupNavigationDebugger() {
+/**
+ * Handle browser back/forward button navigation (popstate events)
+ * Checks for unsaved changes and reloads the appropriate note
+ */
+function setupBrowserNavigationHandler() {
     window.addEventListener('popstate', function (e) {
         var currentNoteId = window.noteid;
 
-        // Check for unsaved changes first
+        // Check for unsaved changes before navigating
         if (hasUnsavedChanges(currentNoteId)) {
-            var message = tr(
-                'autosave.confirm_navigation',
-                {},
+            handleUnsavedChanges(currentNoteId, 'autosave.confirm_navigation', 
                 "⚠️ Unsaved Changes\n\n" +
                 "You have unsaved changes that will be lost.\n" +
-                "Save before navigating away?"
-            );
-
-            if (confirm(message)) {
-                clearTimeout(saveTimeout);
-                saveTimeout = null;
-                if (isOnline) {
-                    saveToServerDebounced();
-                }
-                notesNeedingRefresh.delete(String(currentNoteId));
-            }
+                "Save before navigating away?");
         }
 
         // Handle URL-based navigation (browser back/forward)
@@ -47,7 +56,10 @@ function setupNavigationDebugger() {
     });
 }
 
-// Global click interceptor for note navigation links
+/**
+ * Intercept clicks on note links to check for unsaved changes
+ * Prevents navigation if there are unsaved changes and initiates save
+ */
 function setupNoteNavigationInterceptor() {
     document.addEventListener('click', function (e) {
         // Check if this is a note link
@@ -70,7 +82,7 @@ function setupNoteNavigationInterceptor() {
             e.preventDefault();
             e.stopPropagation();
 
-            // Show temporary notification
+            // Show notification and save, then navigate
             showSaveInProgressNotification(function () {
                 // Callback when save is complete - proceed with navigation
                 window.location.href = href;
@@ -83,7 +95,11 @@ function setupNoteNavigationInterceptor() {
     }, true); // Use capture phase to intercept before other handlers
 }
 
-// Load a note by ID (used for note-to-note navigation)
+/**
+ * Load a note by ID (programmatic navigation)
+ * 
+ * @param {string|number} noteId - The ID of the note to load
+ */
 function loadNoteById(noteId) {
     var workspace = selectedWorkspace || getSelectedWorkspace();
     var url = 'index.php?workspace=' + encodeURIComponent(workspace) + '&note=' + noteId;
@@ -97,47 +113,69 @@ function loadNoteById(noteId) {
     }
 }
 
-// Check before leaving a note with unsaved changes
+/**
+ * Check for unsaved changes before leaving current note
+ * Shows confirmation dialog and saves if user confirms
+ * 
+ * @param {string|number} targetNoteId - The ID of the note to navigate to
+ * @returns {boolean} True if navigation should proceed, false otherwise
+ */
 function checkUnsavedBeforeLeaving(targetNoteId) {
     var currentNoteId = window.noteid;
 
-    if (!currentNoteId || currentNoteId === -1 || currentNoteId === 'search') return true;
+    // Skip check for special states
+    if (!currentNoteId || currentNoteId === -1 || currentNoteId === 'search') {
+        return true;
+    }
 
     // If staying on same note, no need to check
-    if (String(currentNoteId) === String(targetNoteId)) return true;
+    if (String(currentNoteId) === String(targetNoteId)) {
+        return true;
+    }
 
+    // Check for unsaved changes
     if (hasUnsavedChanges(currentNoteId)) {
-        var message = tr(
-            'autosave.confirm_switch',
-            {},
+        return handleUnsavedChanges(currentNoteId, 'autosave.confirm_switch',
             "⚠️ Unsaved Changes Detected\n\n" +
             "You have unsaved changes that will be lost if you switch now.\n\n" +
             "Click OK to save and continue, or Cancel to stay.\n" +
-            "(Auto-save occurs 2 seconds after you stop typing)"
-        );
-
-        if (confirm(message)) {
-            // Force immediate save
-            clearTimeout(saveTimeout);
-            saveTimeout = null;
-
-            // Immediate server save
-            if (isOnline) {
-                saveToServerDebounced();
-            }
-
-            // Small delay to let save complete
-            setTimeout(() => {
-                notesNeedingRefresh.delete(String(currentNoteId));
-            }, 500);
-
-            return true;
-        } else {
-            return false;
-        }
+            "(Auto-save occurs 2 seconds after you stop typing)");
     }
 
     return true;
+}
+
+/**
+ * Handle unsaved changes by prompting user and saving if confirmed
+ * Extracted to avoid code duplication
+ * 
+ * @param {string|number} noteId - Current note ID with unsaved changes
+ * @param {string} translationKey - Translation key for the message
+ * @param {string} fallbackMessage - Fallback message if translation not found
+ * @returns {boolean} True if user confirmed save, false otherwise
+ */
+function handleUnsavedChanges(noteId, translationKey, fallbackMessage) {
+    var message = tr(translationKey, {}, fallbackMessage);
+
+    if (confirm(message)) {
+        // Force immediate save
+        clearTimeout(saveTimeout);
+        saveTimeout = null;
+
+        // Immediate server save if online
+        if (isOnline) {
+            saveToServerDebounced();
+        }
+
+        // Clear refresh flag after short delay to let save complete
+        setTimeout(function() {
+            notesNeedingRefresh.delete(String(noteId));
+        }, 500);
+
+        return true;
+    }
+
+    return false;
 }
 
 // Expose navigation functions globally

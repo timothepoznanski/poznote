@@ -1,0 +1,76 @@
+/* Workspace list layout */
+.workspace-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.workspace-list ul li {
+    display: flex;
+    align-items: flex-start !important;
+    gap: 14px;
+    padding: 10px 0;
+    border-bottom: 0;
+}
+
+.workspace-list .ws-col {
+    margin: 0;
+}
+
+.workspace-list .ws-col-name {
+    flex: 1 1 auto;
+    min-width: 140px;
+    align-items: flex-start;
+}
+
+/* Workspace name and count */
+.ws-name-block {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 0 !important;
+}
+
+.ws-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.workspace-name-item {
+    justify-self: start;
+    text-align: left;
+}
+
+.workspace-count {
+    color: #8a8f92;
+    display: block;
+    margin-top: 4px;
+    font-size: 0.92em;
+    margin-left: 0;
+}
+
+.locked-icon {
+    font-size: 0.95em;
+    color: #6e6e6e;
+    margin-left: 4px;
+}
+
+/* Action buttons */
+.workspace-list .ws-col-action,
+.workspace-list .ws-col-select,
+.workspace-list .ws-col-move,
+.workspace-list .ws-col-delete {
+    flex: 0 0 auto;
+}
+
+.workspace-list .btn {
+    min-width: 110px;
+}
+
+.workspace-list .btn[disabled] {
+    opacity: 0.65;
+}
