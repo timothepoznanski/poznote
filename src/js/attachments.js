@@ -85,7 +85,6 @@ function tr(key, vars, fallback) {
     return text;
 }
 
-// Utility functions to check cursor position
 function isCursorInEditableNote() {
     const selection = window.getSelection();
     if (!selection.rangeCount) return false;
@@ -401,7 +400,6 @@ function formatFileSize(bytes) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-// Image drag & drop management
 function handleImageFilesAndInsert(files, dropTarget) {
     if (!files || files.length === 0) return;
 
