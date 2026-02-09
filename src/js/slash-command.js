@@ -3016,30 +3016,6 @@
     function processYouTubeUrl(url, isMarkdown, editableElement, savedRange, noteEntry) {
         const t = window.t || ((key, params, fallback) => fallback);
 
-        if (typeof window.showYouTubeModal !== 'function') {
-            // Fallback to prompt if modal not available
-            const url = prompt(t('slash_menu.youtube_url_prompt', null, 'Enter YouTube video URL or ID:'), 'https://www.youtube.com/watch?v=');
-            if (url) processYouTubeUrl(url, false, null, null, null);
-            return;
-        }
-
-        // Save the note entry and editable element before they get cleared
-        const noteEntry = savedNoteEntry;
-        const editableElement = savedEditableElement;
-
-        // Save the current range/position
-        let savedRange = null;
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0) {
-            savedRange = sel.getRangeAt(0).cloneRange();
-        }
-
-    }
-
-    // Process a YouTube URL and insert the corresponding iframe
-    function processYouTubeUrl(url, isMarkdown, editableElement, savedRange, noteEntry) {
-        const t = window.t || ((key, params, fallback) => fallback);
-
         if (!url) return;
 
         // Extract video ID from various YouTube URL formats
@@ -3410,6 +3386,10 @@
     function insertUploadedAudio(isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange) {
         insertUploadedMedia('audio', isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange);
     }
+
+    // ============================================================================
+    // GLOBALLY EXPOSED FUNCTIONS
+    // ============================================================================
 
     // Expose hideSlashMenu globally
     window.hideSlashMenu = hideSlashMenu;
