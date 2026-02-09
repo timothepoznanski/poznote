@@ -1,12 +1,15 @@
 // Event and user interaction management
 
-// Auto-save system variables
 var saveTimeout;
 var lastSavedContent = null;
 var lastSavedTitle = null;
 var lastSavedTags = null;
 var isOnline = navigator.onLine;
-var notesNeedingRefresh = new Set(); // Track notes that were left before auto-save completed
+var notesNeedingRefresh = new Set();
+var changeCheckThrottle = null;
+var lastChangeCheckTime = 0;
+var CHANGE_CHECK_INTERVAL = 400;
+var localStorageSaveTimer = null;
 
 function tr(key, vars, fallback) {
     try {
@@ -1104,12 +1107,6 @@ function showSaveInProgressNotification(onCompleteCallback) {
     }, 3000);
 }
 
-/**
- * Convert bare <audio> elements inside contenteditable .noteentry divs to iframes
- * that point to audio_player.php.  Chrome refuses to render native <audio> controls
- * inside a contenteditable region, so we isolate the player in its own browsing context.
- * This function is called on DOMContentLoaded and after every AJAX note load.
- */
 function convertNoteAudioToIframes() {
     try {
         var audios = document.querySelectorAll('.noteentry audio');
@@ -1517,7 +1514,6 @@ function handleNoteDragStart(e) {
     }
 }
 
-// Remove dragging class and residual inline styles from all note links
 function cleanupDraggingNotes() {
     document.querySelectorAll('.links_arbo_left.dragging').forEach(function (link) {
         link.classList.remove('dragging');
@@ -1565,8 +1561,6 @@ function handleNoteDragEnd(e) {
     }, 2000); // Much longer delay to allow for click interaction
 }
 
-// Legacy handlers removed — superseded by handleFolderDrag*Enhanced
-
 function moveNoteToTargetFolder(noteId, targetFolderIdOrName) {
     // targetFolderIdOrName can be either a folder ID (preferred) or folder name (legacy)
     var targetFolderId = null;
@@ -1594,7 +1588,6 @@ function moveNoteToTargetFolder(noteId, targetFolderIdOrName) {
     );
 }
 
-// Root drop zone handlers
 function handleRootDragOver(e) {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
@@ -1646,10 +1639,6 @@ function moveNoteToRoot(noteId) {
         'Error removing note from folder: '
     );
 }
-
-// =====================================================
-// FOLDER DRAG AND DROP FUNCTIONALITY
-// =====================================================
 
 /**
  * Setup drag and drop events for folders
@@ -2426,12 +2415,6 @@ function setupPageUnloadWarning() {
     // Handled by the global beforeunload listener below
 }
 
-// Utility functions
-// Throttle timer for change detection (avoid checking innerHTML too often)
-var changeCheckThrottle = null;
-var lastChangeCheckTime = 0;
-var CHANGE_CHECK_INTERVAL = 400; // Check at most every 400ms
-
 function markNoteAsModified() {
     if (noteid === 'search' || noteid === -1 || noteid === null || noteid === undefined) {
         return;
@@ -2513,9 +2496,6 @@ function markNoteAsModified() {
         }
     }
 }
-
-// Throttle localStorage saves to avoid excessive writes
-var localStorageSaveTimer = null;
 
 function saveToLocalStorage() {
     if (noteid === 'search' || noteid === -1 || noteid === null || noteid === undefined) return;
