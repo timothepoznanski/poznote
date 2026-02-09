@@ -2440,13 +2440,10 @@ function setupAutoSaveCheck() {
     });
 }
 
-// Update network status and sync notes when coming back online
+// Update network status - called when connection state changes
 function updateConnectionStatus(online) {
-    // Auto-save status - console only, no visual indicators
     if (online) {
-        // Remove from refresh list since it's now saved
         notesNeedingRefresh.delete(String(noteid));
-    } else {
     }
 }
 
@@ -2635,9 +2632,6 @@ function saveToServerDebounced() {
 
 // Text selection management for formatting toolbar
 function initTextSelectionHandlers() {
-    // Check if we're in desktop mode
-    var isMobile = isMobileDevice();
-
     var selectionTimeout;
 
     function handleSelectionChange() {
@@ -2749,7 +2743,7 @@ function initTextSelectionHandlers() {
     });
 }
 
-// Helper function to load a note by ID
+// Load a note by ID (used for note-to-note navigation)
 function loadNoteById(noteId) {
     var workspace = selectedWorkspace || getSelectedWorkspace();
     var url = 'index.php?workspace=' + encodeURIComponent(workspace) + '&note=' + noteId;
@@ -2760,34 +2754,6 @@ function loadNoteById(noteId) {
     } else {
         // Fallback: navigate directly
         window.location.href = url;
-    }
-}
-
-// Helper function to switch workspace with callback
-function switchWorkspace(targetWorkspace, callback) {
-    // If switching to a different workspace, we need to reload the entire page
-    // to refresh the left column with notes from the new workspace
-    if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace !== targetWorkspace) {
-        // Build the URL for the new workspace with the target note
-        var url = 'index.php?workspace=' + encodeURIComponent(targetWorkspace);
-
-        // If there's a callback that would load a note, extract the note ID from it
-        // Since we're reloading the page, we can append the note parameter
-        if (callback) {
-            // Try to detect if callback will load a note
-            // For now, we'll just reload to the workspace and let the callback handle the note
-            window.location.href = url;
-        } else {
-            window.location.href = url;
-        }
-    } else {
-        // Same workspace, just update the variable and call callback
-        if (typeof selectedWorkspace !== 'undefined') {
-            selectedWorkspace = targetWorkspace;
-        }
-        if (callback) {
-            callback();
-        }
     }
 }
 
@@ -2961,86 +2927,6 @@ function emergencySave(noteId) {
     }
 }
 
-// Draft restoration functions
-function checkForUnsavedDraft(noteId, skipAutoRestore) {
-    if (!noteId || noteId === -1 || noteId === 'search') return;
-
-
-    try {
-        var draftKey = 'poznote_draft_' + noteId;
-        var titleKey = 'poznote_title_' + noteId;
-        var tagsKey = 'poznote_tags_' + noteId;
-
-        var draftContent = localStorage.getItem(draftKey);
-        var draftTitle = localStorage.getItem(titleKey);
-        var draftTags = localStorage.getItem(tagsKey);
-
-        if (draftContent) {
-            var entryElem = document.getElementById('entry' + noteId);
-            var titleInput = document.getElementById('inp' + noteId);
-            var tagsInput = document.getElementById('tags' + noteId);
-
-            // Check if draft is different from current content
-            var currentContent = entryElem ? entryElem.innerHTML : '';
-            var currentTitle = titleInput ? titleInput.value : '';
-            var currentTags = tagsInput ? tagsInput.value : '';
-
-            var hasUnsavedChanges = (draftContent !== currentContent) ||
-                (draftTitle && draftTitle !== currentTitle) ||
-                (draftTags && draftTags !== currentTags);
-
-            if (hasUnsavedChanges && !skipAutoRestore) {
-                // Restore draft automatically without asking
-                restoreDraft(noteId, draftContent, draftTitle, draftTags);
-            } else if (hasUnsavedChanges && skipAutoRestore) {
-                // Draft exists but we're skipping auto-restore (note was refreshed from server)
-                // Clear old draft since server content is more recent
-                clearDraft(noteId);
-                // Initialize with current server content
-                var entryElem = document.getElementById('entry' + noteId);
-                var titleInput = document.getElementById('inp' + noteId);
-                var tagsElem = document.getElementById('tags' + noteId);
-                if (entryElem) {
-                    lastSavedContent = entryElem.innerHTML;
-                }
-                if (titleInput) {
-                    lastSavedTitle = titleInput.value;
-                }
-                if (tagsElem) {
-                    lastSavedTags = tagsElem.value;
-                }
-            } else {
-                // No unsaved changes, initialize lastSaved* variables
-                lastSavedContent = draftContent;
-
-                var titleInput = document.getElementById('inp' + noteId);
-                var tagsElem = document.getElementById('tags' + noteId);
-                if (titleInput) {
-                    lastSavedTitle = titleInput.value;
-                }
-                if (tagsElem) {
-                    lastSavedTags = tagsElem.value;
-                }
-            }
-        } else {
-            // Initialize lastSaved* variables with current content
-            var entryElem = document.getElementById('entry' + noteId);
-            var titleInput = document.getElementById('inp' + noteId);
-            var tagsElem = document.getElementById('tags' + noteId);
-            if (entryElem) {
-                lastSavedContent = entryElem.innerHTML;
-            }
-            if (titleInput) {
-                lastSavedTitle = titleInput.value;
-            }
-            if (tagsElem) {
-                lastSavedTags = tagsElem.value;
-            }
-        }
-    } catch (err) {
-    }
-}
-
 // Restore note content from localStorage draft
 function restoreDraft(noteId, content, title, tags) {
     var entryElem = document.getElementById('entry' + noteId);
@@ -3126,23 +3012,15 @@ function reinitializeAutoSaveState() {
     }
 }
 
-// Make functions globally available
+// Make functions globally available for use by other modules
 window.updateident = updateident;
 window.updateidhead = updateidhead;
 window.markNoteAsModified = markNoteAsModified;
 window.checkUnsavedBeforeLeaving = checkUnsavedBeforeLeaving;
 window.hasUnsavedChanges = hasUnsavedChanges;
-window.checkForUnsavedDraft = checkForUnsavedDraft;
 window.clearDraft = clearDraft;
 window.reinitializeAutoSaveState = reinitializeAutoSaveState;
 window.showSaveInProgressNotification = showSaveInProgressNotification;
 window.updateConnectionStatus = updateConnectionStatus;
-window.setupDragDropEvents = setupDragDropEvents;
-window.setupNoteDragDropEvents = setupNoteDragDropEvents;
-window.setupLinkEvents = setupLinkEvents;
-window.setupFocusEvents = setupFocusEvents;
-window.setupAutoSaveCheck = setupAutoSaveCheck;
-window.setupPageUnloadWarning = setupPageUnloadWarning;
 window.initTextSelectionHandlers = initTextSelectionHandlers;
-window.initializeAutoSaveSystem = initializeAutoSaveSystem;
 window.convertNoteAudioToIframes = convertNoteAudioToIframes;
