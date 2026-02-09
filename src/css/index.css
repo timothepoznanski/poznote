@@ -20,82 +20,82 @@
    ============================================ */
 
 /* CSS Variables - Custom properties for theming and layout */
-@import url('modules/variables.css');
+@import url('variables.css');
 
 /* Base Styles - HTML, Body, Fonts, Forms, Links */
-@import url('modules/base.css');
+@import url('base.css');
 
 /* Utility Classes - Hidden elements, visibility helpers, cursor states */
-@import url('modules/utilities.css');
+@import url('utilities.css');
 
 /* ============================================
    LAYOUT - Page Structure
    ============================================ */
 
 /* Main Layout - Left/Right columns, sidebar toggle, responsive layout */
-@import url('modules/layout.css');
+@import url('layout.css');
 
 /* ============================================
    NAVIGATION & UI COMPONENTS
    ============================================ */
 
 /* Sidebar - Left column header, buttons, footer, workspace selector */
-@import url('modules/sidebar.css');
+@import url('sidebar.css');
 
 /* Toolbar - Note editing toolbar, color palette, font size picker */
-@import url('modules/toolbar.css');
+@import url('toolbar.css');
 
 /* Menus - Dropdown menus (settings, workspace, share, actions, etc.) */
-@import url('modules/menus.css');
+@import url('menus.css');
 
 /* Search Bars - Search input, filters, search types, validation */
-@import url('modules/searchbars.css');
+@import url('searchbars.css');
 
 /* ============================================
    CONTENT & EDITING
    ============================================ */
 
 /* Notes - Note display, editing, tags, attachments, metadata */
-@import url('modules/notes.css');
+@import url('notes.css');
 
 /* Code Blocks - Syntax highlighting, copy button, monospace enforcement */
-@import url('modules/code-blocks.css');
+@import url('code-blocks.css');
 
 /* Checklists - Task lists, checkboxes, nested lists, hierarchical numbering */
-@import url('modules/checklists.css');
+@import url('checklists.css');
 
 /* ============================================
    ORGANIZATION & TOOLS
    ============================================ */
 
 /* Folders - Folder management, system folders, folder actions, icons */
-@import url('modules/folders.css');
+@import url('folders.css');
 
 /* Emoji Picker - Emoji insertion popup with categories and grid */
-@import url('modules/emoji-picker.css');
+@import url('emoji-picker.css');
 
 /* Table Picker - Visual table grid selection and insertion */
-@import url('modules/table-picker.css');
+@import url('table-picker.css');
 
 /* Slash Commands - Command palette popup menu (/ trigger) */
-@import url('modules/slash-commands.css');
+@import url('slash-commands.css');
 
 /* ============================================
    INTERACTIONS
    ============================================ */
 
 /* Drag & Drop - Note and folder dragging, drop zones, drag states */
-@import url('modules/drag-drop.css');
+@import url('drag-drop.css');
 
 /* ============================================
    VISUAL & MEDIA
    ============================================ */
 
 /* Icons - Font Awesome declarations, custom SVG icons, icon filters */
-@import url('modules/icons.css');
+@import url('icons.css');
 
 /* Miscellaneous - File upload, images, notifications, modals, animations */
-@import url('modules/misc.css');
+@import url('misc.css');
 
 /* ============================================
    THEME OVERRIDES
