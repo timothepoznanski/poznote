@@ -263,7 +263,7 @@ function sortFolders($folders) {
  * Determines if a folder should be open in the UI
  * Accepts the full folder data array
  * 
- * @param PDO $con Database connection
+ * @param PDO $con Database connection (kept for API compatibility, currently unused)
  * @param array|null $folderData Folder data array with 'id' and 'name'
  * @param bool $is_search_mode Whether in search mode
  * @param array $folders_with_results Folders that have search results

@@ -11,17 +11,6 @@ const MIN_VIEWPORT_MARGIN = 8;
 let currentShareMenuNoteId = null;
 let isShareMenuOpen = false;
 
-// Update the shared notes count in the sidebar
-function updateSharedCount(delta) {
-    const countEl = document.getElementById('count-shared');
-    if (countEl) {
-        // System folders display count without parentheses, e.g. "5" not "(5)"
-        const currentCount = parseInt(countEl.textContent.trim(), 10) || 0;
-        const newCount = Math.max(0, currentCount + delta);
-        countEl.textContent = newCount.toString();
-    }
-}
-
 // ===========================
 // Helper Functions
 // ===========================
@@ -184,7 +173,7 @@ function toggleShareMenu(event, noteId, filename, titleJson) {
     currentShareMenuNoteId = noteId;
 
     // Close other menus
-    if (typeof closeSettingsMenu === 'function') closeSettingsMenu();
+    if (typeof closeSettingsMenus === 'function') closeSettingsMenus();
 
     // Find the menu elements specific to this note
     const desktop = document.getElementById('shareMenu-' + noteId);
@@ -862,7 +851,7 @@ function toggleActionsMenu(event, noteId, filename, titleJson) {
     currentActionsMenuNoteId = noteId;
 
     // Close other menus
-    if (typeof closeSettingsMenu === 'function') closeSettingsMenu();
+    if (typeof closeSettingsMenus === 'function') closeSettingsMenus();
     if (typeof closeShareMenu === 'function') closeShareMenu();
 
     // Find the menu elements specific to this note

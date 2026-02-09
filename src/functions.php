@@ -1294,12 +1294,7 @@ function sanitizeHtml($html) {
             if ($attrName === 'href' || $attrName === 'src') {
                 // For iframes, validate that src is from trusted domains or local paths
                 if ($tagName === 'iframe' && $attrName === 'src') {
-                    $allowedIframeDomains = [
-                        'youtube.com',
-                        'www.youtube.com',
-                        'youtube-nocookie.com',
-                        'www.youtube-nocookie.com',
-                    ];
+                    $allowedIframeDomains = ALLOWED_IFRAME_DOMAINS;
                     
                     $isTrustedIframe = false;
                     

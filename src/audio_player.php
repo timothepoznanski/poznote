@@ -9,8 +9,9 @@
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/auth.php';
 
-// Verify the user is authenticated
-if (empty($_SESSION['authenticated'])) {
+// Verify the user is authenticated (uses the centralized auth system with
+// session, remember-me cookies, and OIDC support)
+if (!isAuthenticated()) {
     http_response_code(401);
     exit('Unauthorized');
 }

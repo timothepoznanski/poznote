@@ -1,6 +1,16 @@
 // Markdown handler for Poznote
 // Simple markdown parser and renderer
 
+// Shared utility: escape HTML special characters
+function _mdEscapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 // Helper function to normalize content from contentEditable
 function normalizeContentEditableText(element) {
     // More robust content extraction that handles contentEditable quirks
@@ -79,14 +89,7 @@ function initMermaid(retryCount) {
         }
         return;
     }
-    function escapeHtml(str) {
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-    }
+    var escapeHtml = _mdEscapeHtml;
 
     function renderMermaidError(node, err, source) {
         var msg = 'Mermaid: syntax error.';
@@ -292,14 +295,7 @@ function initMermaid(retryCount) {
 function parseMarkdown(text) {
     if (!text) return '';
 
-    function escapeHtml(str) {
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-    }
+    var escapeHtml = _mdEscapeHtml;
 
     function tryParseInternalNoteId(url) {
         if (!url) return null;

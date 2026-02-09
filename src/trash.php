@@ -259,7 +259,6 @@ $currentLang = getUserLanguage();
     <script src="js/notes.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/attachments.js"></script>
-    <script src="js/events.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/search-highlight.js"></script>
     <script src="js/toolbar.js"></script>

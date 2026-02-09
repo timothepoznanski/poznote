@@ -151,8 +151,6 @@ document.addEventListener('DOMContentLoaded', function () {
 // Global functions available for HTML (compatibility)
 window.newnote = createNewNote;
 window.saveNoteImmediately = saveNoteToServer;
-window.updatenote = saveNoteToServer; // Legacy alias
-window.saveFocusedNoteJS = function () {};
 window.deleteNote = deleteNote;
 window.toggleFavorite = toggleFavorite;
 window.duplicateNote = duplicateNote;
