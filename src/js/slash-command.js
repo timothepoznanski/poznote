@@ -267,6 +267,7 @@
         } catch (e) { }
     }
 
+    // Insert a prefix at the start of the current line in Markdown
     function insertMarkdownPrefixAtLineStart(prefix) {
         // For Markdown, the slash command is typically typed at the insertion point.
         // Inserting at cursor is more reliable than trying to compute line starts across contentEditable lines.
@@ -466,6 +467,7 @@
         }
     }
 
+    // Insert a callout block (note, warning, info, etc.)
     function insertCallout(type) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -1796,6 +1798,7 @@
             .join('');
     }
 
+    // Build submenu HTML for level 2 menu items
     function buildSubmenuHTML(items) {
         const isMobile = window.innerWidth < 768;
         const t = window.t || ((key, params, fallback) => fallback);
@@ -1831,6 +1834,7 @@
         return html;
     }
 
+    // Build sub-submenu HTML for level 3 menu items
     function buildSubSubmenuHTML(items) {
         const isMobile = window.innerWidth < 768;
         const t = window.t || ((key, params, fallback) => fallback);
@@ -1862,6 +1866,7 @@
         return html;
     }
 
+    // Escape HTML special characters to prevent XSS
     function escapeHtml(text) {
         return String(text)
             .replace(/&/g, '&amp;')
@@ -1871,6 +1876,7 @@
             .replace(/'/g, '&#039;');
     }
 
+    // Position slash menu near the cursor or selection range
     function positionMenu(range) {
         if (!slashMenuElement) return;
 
@@ -1900,6 +1906,7 @@
         }
     }
 
+    // Hide and cleanup sub-submenu (level 3)
     function hideSubSubmenu() {
         if (!subSubmenuElement) return;
 
@@ -1920,6 +1927,7 @@
         selectedSubSubmenuIndex = 0;
     }
 
+    // Hide and cleanup submenu (level 2)
     function hideSubmenu() {
         if (!submenuElement) return;
 
@@ -2053,6 +2061,7 @@
         slashMenuElement.addEventListener('mouseover', handleMenuMouseOver);
     }
 
+    // Update slash menu content based on current filter text
     function updateMenuContent() {
         if (!slashMenuElement) return;
 
@@ -2062,6 +2071,7 @@
         slashMenuElement.innerHTML = buildMenuHTML();
     }
 
+    // Display submenu (level 2) for a command with subcommands
     function showSubmenu(cmd, parentItem) {
         if (!cmd.submenu || !cmd.submenu.length) return;
 
@@ -2107,6 +2117,7 @@
         submenuElement.addEventListener('mouseover', handleSubmenuMouseOver);
     }
 
+    // Display sub-submenu (level 3) for nested menu items
     function showSubSubmenu(item, parentItem) {
         if (!item.submenu || !item.submenu.length) return;
 
@@ -2238,6 +2249,7 @@
         }
     }
 
+    // Execute a slash command action and cleanup
     function executeCommand(commandId, isSubmenuItem, isSubSubmenuItem) {
         let actionToExecute = null;
         let foundCmd = null;
@@ -2361,11 +2373,13 @@
         savedEditableElement = null;
     }
 
+    // Prevent menu click from losing editor focus
     function handleMenuMouseDown(e) {
         // Prevent editor losing focus before we run the command
         e.preventDefault();
     }
 
+    // Handle click on main menu item
     function handleMenuClick(e) {
         const item = e.target.closest && e.target.closest('.slash-command-item');
         if (!item) return;
@@ -2374,6 +2388,7 @@
         if (commandId) executeCommand(commandId, false);
     }
 
+    // Handle click on submenu (level 2) item
     function handleSubmenuClick(e) {
         const item = e.target.closest && e.target.closest('.slash-command-item');
         if (!item) return;
@@ -2391,6 +2406,7 @@
         if (submenuId) executeCommand(submenuId, true, false);
     }
 
+    // Handle click on sub-submenu (level 3) item
     function handleSubSubmenuClick(e) {
         const item = e.target.closest && e.target.closest('.slash-command-item');
         if (!item) return;
@@ -2429,6 +2445,7 @@
         }
     }
 
+    // Handle touch end on sub-submenu item (mobile support)
     function handleSubSubmenuTouchEnd(e) {
         const item = e.target.closest && e.target.closest('.slash-command-item');
         if (!item) return;
@@ -2449,6 +2466,7 @@
         }
     }
 
+    // Handle mouse hover on submenu item to show sub-submenu if available
     function handleSubmenuMouseOver(e) {
         const item = e.target.closest && e.target.closest('.slash-command-item');
         if (!item) return;
@@ -2466,6 +2484,7 @@
         }
     }
 
+    // Handle mouse hover on main menu item to show submenu if available
     function handleMenuMouseOver(e) {
         const item = e.target.closest && e.target.closest('.slash-command-item');
         if (!item) return;
@@ -2483,7 +2502,7 @@
         }
     }
 
-    // Shared helpers for keyboard navigation in slash menu
+    // Schedule an async filter update based on current input
     function scheduleFilterUpdate() {
         if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
             setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
@@ -2492,6 +2511,7 @@
         }
     }
 
+    // Handle filter text changes from keyboard input
     function handleMenuFilterKey(key) {
         if (key === 'Backspace') {
             if (filterText.length === 0) {
@@ -2676,6 +2696,7 @@
         }
     }
 
+    // Update filter text from contenteditable editor content
     function updateFilterFromEditor() {
         if (!slashMenuElement || !slashTextNode || slashOffset < 0) return;
 
@@ -2691,6 +2712,7 @@
         updateMenuContent();
     }
 
+    // Update filter text from input field (title) value
     function updateFilterFromInput(input) {
         if (!slashMenuElement || slashOffset < 0 || !input) return;
 
@@ -3379,7 +3401,7 @@
         fileInput.click();
     }
 
-    // Backward-compatible wrappers
+    // Backward-compatible wrapper for MP4 video uploads
     function insertUploadedMp4(isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange) {
         insertUploadedMedia('video', isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange);
     }
@@ -3388,10 +3410,6 @@
     function insertUploadedAudio(isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange) {
         insertUploadedMedia('audio', isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange);
     }
-
-    // ============================================================================
-    // GLOBALLY EXPOSED FUNCTIONS
-    // ============================================================================
 
     // Expose hideSlashMenu globally
     window.hideSlashMenu = hideSlashMenu;
