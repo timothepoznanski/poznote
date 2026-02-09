@@ -4,17 +4,74 @@
 (function () {
     'use strict';
 
-    // ----------------------------
-    // Helper function to remove accents for filtering
-    // ----------------------------
+    // -------------------------------------------------------------------
+    // Configuration globale et constantes
+    // -------------------------------------------------------------------
+
+    // Langages disponibles pour les blocs de code (utilisé par les menus HTML et Markdown)
+    var CODE_BLOCK_LANGUAGES = [
+        { id: 'code-javascript', icon: 'fa-code', iconColor: '#f7df1e', label: 'JavaScript', lang: 'javascript' },
+        { id: 'code-typescript', icon: 'fa-code', iconColor: '#3178c6', label: 'TypeScript', lang: 'typescript' },
+        { id: 'code-python', icon: 'fa-code', iconColor: '#3776ab', label: 'Python', lang: 'python' },
+        { id: 'code-html', icon: 'fa-code', iconColor: '#e34f26', label: 'HTML', lang: 'html' },
+        { id: 'code-css', icon: 'fa-code', iconColor: '#1572b6', label: 'CSS', lang: 'css' },
+        { id: 'code-json', icon: 'fa-code', iconColor: '#292929', label: 'JSON', lang: 'json' },
+        { id: 'code-bash', icon: 'fa-terminal', iconColor: '#4eaa25', label: 'Bash', lang: 'bash' },
+        { id: 'code-powershell', icon: 'fa-terminal', iconColor: '#012456', label: 'PowerShell', lang: 'powershell' },
+        { id: 'code-sql', icon: 'fa-database', iconColor: '#336791', label: 'SQL', lang: 'sql' },
+        { id: 'code-php', icon: 'fa-code', iconColor: '#777bb4', label: 'PHP', lang: 'php' },
+        { id: 'code-java', icon: 'fa-code', iconColor: '#007396', label: 'Java', lang: 'java' },
+        { id: 'code-csharp', icon: 'fa-code', iconColor: '#239120', label: 'C#', lang: 'csharp' },
+        { id: 'code-cpp', icon: 'fa-code', iconColor: '#00599c', label: 'C++', lang: 'cpp' },
+        { id: 'code-go', icon: 'fa-code', iconColor: '#00add8', label: 'Go', lang: 'go' },
+        { id: 'code-rust', icon: 'fa-code', iconColor: '#b7410e', label: 'Rust', lang: 'rust' },
+        { id: 'code-ruby', icon: 'fa-gem', iconColor: '#cc342d', label: 'Ruby', lang: 'ruby' },
+        { id: 'code-yaml', icon: 'fa-file-code', iconColor: '#cb171e', label: 'YAML', lang: 'yaml' },
+        { id: 'code-xml', icon: 'fa-file-code', iconColor: '#0060ac', label: 'XML', lang: 'xml' },
+        { id: 'code-markdown', icon: 'fa-file-code', iconColor: '#083fa1', label: 'Markdown', lang: 'markdown' }
+    ];
+
+    // Types de callouts / citations disponibles
+    var CALLOUT_TYPES = [
+        { id: 'plain', labelKey: 'slash_menu.blockquote', fallback: 'Blockquote' },
+        { id: 'note', labelKey: 'slash_menu.callout_note', fallback: 'Note' },
+        { id: 'tip', labelKey: 'slash_menu.callout_tip', fallback: 'Tip' },
+        { id: 'important', labelKey: 'slash_menu.callout_important', fallback: 'Important' },
+        { id: 'warning', labelKey: 'slash_menu.callout_warning', fallback: 'Warning' },
+        { id: 'caution', labelKey: 'slash_menu.callout_caution', fallback: 'Caution' }
+    ];
+
+    // -------------------------------------------------------------------
+    // Variables globales du menu slash
+    // -------------------------------------------------------------------
+
+    let slashMenuElement = null;
+    let submenuElement = null;
+    let subSubmenuElement = null;
+    let selectedIndex = 0;
+    let selectedSubmenuIndex = 0;
+    let selectedSubSubmenuIndex = 0;
+    let filteredCommands = [];
+    let currentSubmenu = null;
+    let currentSubSubmenu = null;
+    let slashTextNode = null;  // Le nœud texte contenant le slash
+    let slashOffset = -1;      // La position du slash dans le nœud
+    let filterText = '';
+    let savedNoteEntry = null;
+    let savedEditableElement = null;
+    let activeCommands = null;
+
+    // -------------------------------------------------------------------
+    // Fonctions utilitaires
+    // -------------------------------------------------------------------
+
+    // Supprime les accents d'une chaîne pour la recherche
     function removeAccents(str) {
         if (!str) return '';
         return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     }
 
-    // ----------------------------
-    // Markdown insertion helpers
-    // ----------------------------
+    // Récupère l'éditeur Markdown depuis la sélection courante
     function getCurrentMarkdownEditorFromSelection() {
         const selection = window.getSelection();
         if (!selection || !selection.rangeCount) return null;
@@ -34,6 +91,7 @@
         return editor;
     }
 
+    // Calcule les offsets de début et fin de sélection dans un élément
     function getSelectionOffsetsWithin(rootEl) {
         const selection = window.getSelection();
         if (!selection || !selection.rangeCount) return null;
@@ -56,6 +114,7 @@
         return { start: Math.min(start, end), end: Math.max(start, end) };
     }
 
+    // Extrait le texte d'un éditeur Markdown
     function getMarkdownEditorText(rootEl) {
         if (!rootEl) return '';
 
@@ -70,6 +129,7 @@
         return rootEl.innerText || rootEl.textContent || '';
     }
 
+    // Trouve le nœud texte à un offset donné
     function findTextNodeAtOffset(rootEl, offset) {
         const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, null);
         let node = walker.nextNode();
@@ -88,6 +148,7 @@
         return { node: rootEl, offset: rootEl.childNodes ? rootEl.childNodes.length : 0 };
     }
 
+    // Définit la sélection à partir d'offsets de début et fin
     function setSelectionByOffsets(rootEl, startOffset, endOffset) {
         const selection = window.getSelection();
         if (!selection) return;
@@ -111,6 +172,7 @@
         selection.addRange(range);
     }
 
+    // Remplace une plage de texte dans l'éditeur Markdown
     function replaceMarkdownRange(rootEl, start, end, replacement, selectStartAfter, selectEndAfter) {
         if (!rootEl) return;
 
@@ -131,6 +193,7 @@
         } catch (e) { }
     }
 
+    // Insère du texte Markdown à la position du curseur
     function insertMarkdownAtCursor(text, caretDeltaFromInsertEnd) {
         // Prefer DOM-range insertion to avoid line/offset mismatches in contentEditable.
         const editor = getCurrentMarkdownEditorFromSelection();
@@ -166,6 +229,7 @@
         } catch (e) { }
     }
 
+    // Entoure la sélection Markdown avec un préfixe et un suffixe
     function wrapMarkdownSelection(prefix, suffix, emptyInnerCaretOffset) {
         const editor = getCurrentMarkdownEditorFromSelection();
         if (!editor) return;
@@ -209,13 +273,18 @@
         } catch (e) { }
     }
 
+    // Insère un préfixe Markdown au début de la ligne
     function insertMarkdownPrefixAtLineStart(prefix) {
         // For Markdown, the slash command is typically typed at the insertion point.
         // Inserting at cursor is more reliable than trying to compute line starts across contentEditable lines.
         insertMarkdownAtCursor(prefix, 0);
     }
 
-    // Helper functions to replace deprecated execCommand
+    // -------------------------------------------------------------------
+    // Fonctions d'insertion d'éléments HTML
+    // -------------------------------------------------------------------
+
+    // Insère un titre HTML (h1, h2, h3)
     function insertHeading(level) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -245,7 +314,7 @@
         }
     }
 
-    // Generic inline element insertion: creates a DOM element, inserts it at cursor, places caret inside.
+    // Insère un élément HTML en ligne (strong, em, mark, code, etc.)
     function insertInlineElement(tagName, styleObj) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -275,16 +344,37 @@
         }
     }
 
-    // Backward-compatible thin wrappers
-    function insertBold() { insertInlineElement('strong'); }
-    function insertItalic() { insertInlineElement('em'); }
-    function insertHighlight() { insertInlineElement('mark'); }
-    function insertStrikethrough() { insertInlineElement('s'); }
-    function insertCode() { insertInlineElement('code'); }
+    // Insère du texte en gras
+    function insertBold() { 
+        insertInlineElement('strong'); 
+    }
+
+    // Insère du texte en italique
+    function insertItalic() { 
+        insertInlineElement('em'); 
+    }
+
+    // Insère du texte surligné
+    function insertHighlight() { 
+        insertInlineElement('mark'); 
+    }
+
+    // Insère du texte barré
+    function insertStrikethrough() { 
+        insertInlineElement('s'); 
+    }
+
+    // Insère du code en ligne
+    function insertCode() { 
+        insertInlineElement('code'); 
+    }
+
+    // Insère du texte coloré
     function insertColor(color) {
         insertInlineElement('span', color !== 'black' ? { color: color } : undefined);
     }
 
+    // Insère un bloc de code avec coloration syntaxique
     function insertCodeBlock(language) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -325,6 +415,7 @@
         }
     }
 
+    // Revient à du texte normal (supprime le formatage)
     function insertNormalText() {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -470,6 +561,7 @@
         }
     }
 
+    // Insère un élément toggle (bloc réductible/extensible)
     function insertToggle() {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -535,6 +627,7 @@
         }
     }
 
+    // Insère une liste (ordonnée ou non ordonnée)
     function insertList(ordered) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -565,6 +658,7 @@
         }
     }
 
+    // Insère une image (ouvre un sélecteur de fichier)
     function insertImage() {
         // Create a temporary file input for images
         const fileInput = document.createElement('input');
@@ -776,6 +870,7 @@
         fileInput.click();
     }
 
+    // Insère une date (ouvre un sélecteur de date)
     function insertDate() {
         // Find current editor context to restore later
         const context = getEditorContext();
@@ -848,6 +943,7 @@
         }
     }
 
+    // Insère une date dans un éditeur Markdown
     function insertDateMarkdown() {
         const context = getEditorContext();
         if (!context) return;
@@ -901,8 +997,7 @@
         }
     }
 
-    // Slash command menu items for title inputs (notecards)
-    // Limited set of commands suitable for title editing
+    // Retourne les commandes de titre pour le menu slash (spécifique au champ titre)
     function getTitleSlashCommands() {
         const t = window.t || ((key, params, fallback) => fallback);
         return [
@@ -987,42 +1082,7 @@
         ];
     }
 
-    // -------------------------------------------------------------------
-    // Shared data for code-block language submenu (used by both HTML & Markdown modes)
-    // -------------------------------------------------------------------
-    var CODE_BLOCK_LANGUAGES = [
-        { id: 'code-javascript', icon: 'fa-code', iconColor: '#f7df1e', label: 'JavaScript', lang: 'javascript' },
-        { id: 'code-typescript', icon: 'fa-code', iconColor: '#3178c6', label: 'TypeScript', lang: 'typescript' },
-        { id: 'code-python', icon: 'fa-code', iconColor: '#3776ab', label: 'Python', lang: 'python' },
-        { id: 'code-html', icon: 'fa-code', iconColor: '#e34f26', label: 'HTML', lang: 'html' },
-        { id: 'code-css', icon: 'fa-code', iconColor: '#1572b6', label: 'CSS', lang: 'css' },
-        { id: 'code-json', icon: 'fa-code', iconColor: '#292929', label: 'JSON', lang: 'json' },
-        { id: 'code-bash', icon: 'fa-terminal', iconColor: '#4eaa25', label: 'Bash', lang: 'bash' },
-        { id: 'code-powershell', icon: 'fa-terminal', iconColor: '#012456', label: 'PowerShell', lang: 'powershell' },
-        { id: 'code-sql', icon: 'fa-database', iconColor: '#336791', label: 'SQL', lang: 'sql' },
-        { id: 'code-php', icon: 'fa-code', iconColor: '#777bb4', label: 'PHP', lang: 'php' },
-        { id: 'code-java', icon: 'fa-code', iconColor: '#007396', label: 'Java', lang: 'java' },
-        { id: 'code-csharp', icon: 'fa-code', iconColor: '#239120', label: 'C#', lang: 'csharp' },
-        { id: 'code-cpp', icon: 'fa-code', iconColor: '#00599c', label: 'C++', lang: 'cpp' },
-        { id: 'code-go', icon: 'fa-code', iconColor: '#00add8', label: 'Go', lang: 'go' },
-        { id: 'code-rust', icon: 'fa-code', iconColor: '#b7410e', label: 'Rust', lang: 'rust' },
-        { id: 'code-ruby', icon: 'fa-gem', iconColor: '#cc342d', label: 'Ruby', lang: 'ruby' },
-        { id: 'code-yaml', icon: 'fa-file-code', iconColor: '#cb171e', label: 'YAML', lang: 'yaml' },
-        { id: 'code-xml', icon: 'fa-file-code', iconColor: '#0060ac', label: 'XML', lang: 'xml' },
-        { id: 'code-markdown', icon: 'fa-file-code', iconColor: '#083fa1', label: 'Markdown', lang: 'markdown' }
-    ];
-
-    // Shared callout / quote types
-    var CALLOUT_TYPES = [
-        { id: 'plain', labelKey: 'slash_menu.blockquote', fallback: 'Blockquote' },
-        { id: 'note', labelKey: 'slash_menu.callout_note', fallback: 'Note' },
-        { id: 'tip', labelKey: 'slash_menu.callout_tip', fallback: 'Tip' },
-        { id: 'important', labelKey: 'slash_menu.callout_important', fallback: 'Important' },
-        { id: 'warning', labelKey: 'slash_menu.callout_warning', fallback: 'Warning' },
-        { id: 'caution', labelKey: 'slash_menu.callout_caution', fallback: 'Caution' }
-    ];
-
-    // Returns items that are 100% identical between HTML and Markdown slash menus
+    // Retourne les commandes slash communes entre les modes HTML et Markdown
     function getCommonSlashCommands() {
         var t = window.t || (function (key, params, fallback) { return fallback; });
         return {
@@ -1362,6 +1422,7 @@
 
     // Slash command menu items for Markdown notes (edit mode)
     // Keep labels close to the HTML menu, but insert Markdown syntax.
+    // Retourne les commandes du menu slash pour les notes Markdown
     function getMarkdownSlashCommands() {
         const t = window.t || ((key, params, fallback) => fallback);
         var common = getCommonSlashCommands();
@@ -1613,23 +1674,10 @@
         ];
     }
 
-
-    let slashMenuElement = null;
-    let submenuElement = null;
-    let subSubmenuElement = null;
-    let selectedIndex = 0;
-    let selectedSubmenuIndex = 0;
-    let selectedSubSubmenuIndex = 0;
-    let filteredCommands = [];
-    let currentSubmenu = null;
-    let currentSubSubmenu = null;
-    let slashTextNode = null;  // Le nœud texte contenant le slash
-    let slashOffset = -1;      // La position du slash dans le nœud
-    let filterText = '';
-    let savedNoteEntry = null;
-    let savedEditableElement = null;
-    let activeCommands = null;
-
+    // -------------------------------------------------------------------
+    // Définition des menus slash (HTML et Markdown)
+    // -------------------------------------------------------------------
+    // Récupère le contexte de l'éditeur actuel (type de note, éléments DOM)
     function getEditorContext() {
         const selection = window.getSelection();
         if (!selection.rangeCount) return false;
@@ -1657,6 +1705,7 @@
         return { noteType: noteType || 'note', noteEntry, editableElement };
     }
 
+    // Filtre les commandes du menu slash selon le texte de recherche
     function getFilteredCommands(searchText) {
         const isMobile = window.innerWidth < 768;
         const commands = (activeCommands || getSlashCommands()).filter(cmd => {
@@ -1738,6 +1787,7 @@
         return results;
     }
 
+    // Construit le HTML du menu slash
     function buildMenuHTML() {
         if (!filteredCommands.length) {
             return '<div class="slash-command-empty">No results</div>';
@@ -1907,6 +1957,7 @@
         selectedSubmenuIndex = 0;
     }
 
+    // Masque le menu slash et tous ses sous-menus
     function hideSlashMenu() {
         if (!slashMenuElement) return;
 
@@ -1935,6 +1986,7 @@
         document.body.style.cursor = '';
     }
 
+    // Affiche le menu slash pour un champ input (titre)
     function showSlashMenuForInput(input, pos) {
         hideSlashMenu();
 
@@ -2113,6 +2165,7 @@
         subSubmenuElement.addEventListener('touchend', handleSubSubmenuTouchEnd);
     }
 
+    // Supprime le texte du slash et de la recherche
     function deleteSlashText() {
         try {
             // Handle input fields (title inputs)
@@ -2199,6 +2252,7 @@
         }
     }
 
+    // Ex\u00e9cute la commande s\u00e9lectionn\u00e9e depuis le menu slash
     function executeCommand(commandId, isSubmenuItem, isSubSubmenuItem) {
         let actionToExecute = null;
         let foundCmd = null;
@@ -2466,6 +2520,7 @@
         }
     }
 
+    // Gestion des touches clavier (navigation dans le menu)
     function handleKeydown(e) {
         if (!slashMenuElement) return;
 
@@ -2666,6 +2721,7 @@
         updateMenuContent();
     }
 
+    // Affiche le menu slash
     function showSlashMenu() {
         hideSlashMenu();
 
@@ -2731,6 +2787,7 @@
         document.addEventListener('mousemove', showCursor);
     }
 
+    // Gestion des entrées utilisateur (détection du /)
     function handleInput(e) {
         const target = e.target;
         if (!target) return;
@@ -2767,6 +2824,7 @@
         }
     }
 
+    // Gestion du clic en dehors du menu (fermeture)
     function handleClickOutside(e) {
         if (!slashMenuElement) return;
 
@@ -2780,6 +2838,7 @@
         }
     }
 
+    // Initialise le système de menu slash (event listeners)
     function init() {
         document.addEventListener('input', handleInput, true);
         document.addEventListener('keydown', handleKeydown, true);
@@ -3001,10 +3060,7 @@
         };
     }
 
-    // -------------------------------------------------------------------
-    // Generic media upload: handles both MP4 video and audio uploads.
-    // mediaType: 'video' | 'audio'
-    // -------------------------------------------------------------------
+    // Generic media upload: handles both MP4 video and audio uploads. mediaType: 'video' | 'audio'
     function insertUploadedMedia(mediaType, isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange) {
         var isVideo = (mediaType === 'video');
         var logPrefix = isVideo ? '[MP4]' : '[AUDIO]';
@@ -3296,7 +3352,7 @@
         insertUploadedAudio(true, noteEntry, editableElement, savedRange);
     };
 
-    // Helper function to process YouTube URL and insert iframe
+    // Traite une URL YouTube et insère l'iframe correspondante
     function processYouTubeUrl(url, isMarkdown, editableElement, savedRange, noteEntry) {
         const t = window.t || ((key, params, fallback) => fallback);
 
@@ -3417,6 +3473,10 @@
             }
         }
     }
+
+    // -------------------------------------------------------------------
+    // Initialisation du module
+    // -------------------------------------------------------------------
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
