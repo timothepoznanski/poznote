@@ -2988,12 +2988,10 @@
                 }
             }
         }, true);
-
-        window.hideSlashMenu = hideSlashMenu;
     }
 
-    // YouTube video insertion functions (exposed globally)
-    window.insertYouTubeVideo = function () {
+    // Process a YouTube URL and insert the corresponding iframe
+    function processYouTubeUrl(url, isMarkdown, editableElement, savedRange, noteEntry) {
         const t = window.t || ((key, params, fallback) => fallback);
 
         if (typeof window.showYouTubeModal !== 'function') {
@@ -3014,37 +3012,7 @@
             savedRange = sel.getRangeAt(0).cloneRange();
         }
 
-        window.showYouTubeModal(function (url) {
-            processYouTubeUrl(url, false, editableElement, savedRange, noteEntry);
-        });
-    };
-
-    // Insert YouTube video into Markdown note (exposed globally)
-    window.insertYouTubeVideoMarkdown = function () {
-        const t = window.t || ((key, params, fallback) => fallback);
-
-        if (typeof window.showYouTubeModal !== 'function') {
-            // Fallback to prompt if modal not available
-            const url = prompt(t('slash_menu.youtube_url_prompt', null, 'Enter YouTube video URL or ID:'), 'https://www.youtube.com/watch?v=');
-            if (url) processYouTubeUrl(url, true, null, null, null);
-            return;
-        }
-
-        // Save the note entry and editable element before they get cleared
-        const noteEntry = savedNoteEntry;
-        const editableElement = savedEditableElement;
-
-        // Save the current range/position
-        let savedRange = null;
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0) {
-            savedRange = sel.getRangeAt(0).cloneRange();
-        }
-
-        window.showYouTubeModal(function (url) {
-            processYouTubeUrl(url, true, editableElement, savedRange, noteEntry);
-        });
-    };
+    }
 
     // Process a YouTube URL and insert the corresponding iframe
     function processYouTubeUrl(url, isMarkdown, editableElement, savedRange, noteEntry) {
@@ -3421,6 +3389,67 @@
         insertUploadedMedia('audio', isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange);
     }
 
+    // ============================================================================
+    // GLOBALLY EXPOSED FUNCTIONS
+    // ============================================================================
+
+    // Expose hideSlashMenu globally
+    window.hideSlashMenu = hideSlashMenu;
+
+    // Insert YouTube video into HTML note (exposed globally)
+    window.insertYouTubeVideo = function () {
+        const t = window.t || ((key, params, fallback) => fallback);
+
+        if (typeof window.showYouTubeModal !== 'function') {
+            // Fallback to prompt if modal not available
+            const url = prompt(t('slash_menu.youtube_url_prompt', null, 'Enter YouTube video URL or ID:'), 'https://www.youtube.com/watch?v=');
+            if (url) processYouTubeUrl(url, false, null, null, null);
+            return;
+        }
+
+        // Save the note entry and editable element before they get cleared
+        const noteEntry = savedNoteEntry;
+        const editableElement = savedEditableElement;
+
+        // Save the current range/position
+        let savedRange = null;
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+            savedRange = sel.getRangeAt(0).cloneRange();
+        }
+
+        window.showYouTubeModal(function (url) {
+            processYouTubeUrl(url, false, editableElement, savedRange, noteEntry);
+        });
+    };
+
+    // Insert YouTube video into Markdown note (exposed globally)
+    window.insertYouTubeVideoMarkdown = function () {
+        const t = window.t || ((key, params, fallback) => fallback);
+
+        if (typeof window.showYouTubeModal !== 'function') {
+            // Fallback to prompt if modal not available
+            const url = prompt(t('slash_menu.youtube_url_prompt', null, 'Enter YouTube video URL or ID:'), 'https://www.youtube.com/watch?v=');
+            if (url) processYouTubeUrl(url, true, null, null, null);
+            return;
+        }
+
+        // Save the note entry and editable element before they get cleared
+        const noteEntry = savedNoteEntry;
+        const editableElement = savedEditableElement;
+
+        // Save the current range/position
+        let savedRange = null;
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+            savedRange = sel.getRangeAt(0).cloneRange();
+        }
+
+        window.showYouTubeModal(function (url) {
+            processYouTubeUrl(url, true, editableElement, savedRange, noteEntry);
+        });
+    };
+
     // Insert MP4 video into HTML note (exposed globally)
     window.insertMp4Video = function () {
         const noteEntry = savedNoteEntry;
@@ -3468,6 +3497,10 @@
         }
         insertUploadedAudio(true, noteEntry, editableElement, savedRange);
     };
+
+    // ============================================================================
+    // MODULE INITIALIZATION
+    // ============================================================================
 
     // Module initialization
     if (document.readyState === 'loading') {
