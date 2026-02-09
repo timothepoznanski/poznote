@@ -3130,7 +3130,6 @@ function reinitializeAutoSaveState() {
 window.updateident = updateident;
 window.updateidhead = updateidhead;
 window.markNoteAsModified = markNoteAsModified;
-window.saveNoteImmediately = saveNoteToServer;
 window.checkUnsavedBeforeLeaving = checkUnsavedBeforeLeaving;
 window.hasUnsavedChanges = hasUnsavedChanges;
 window.checkForUnsavedDraft = checkForUnsavedDraft;
