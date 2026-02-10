@@ -336,18 +336,7 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
                 inputEl.value = '';
                 const targetNoteId = noteId;
                 updateTagsInput(targetNoteId, container);
-                // Set global noteid and trigger auto-save
-                try {
-                    if (typeof window !== 'undefined' && targetNoteId) {
-                        window.noteid = targetNoteId;
-                        // Auto-save will handle the modification automatically
-                        if (typeof window.markNoteAsModified === 'function') {
-                            window.markNoteAsModified();
-                        }
-                    }
-                } catch (err) { 
-                    console.warn('Auto-save trigger failed:', err);
-                }
+                // Tags are auto-saved directly via updateTagsInput, no need to mark as modified
                 dd.style.display = 'none';
                 setTimeout(() => inputEl.focus(), 10);
             });
@@ -399,18 +388,7 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
                     ev.stopPropagation();
                     // Dispatch mousedown to reuse the same handler which also triggers save
                     items[inputEl._highlightedIdx].dispatchEvent(new MouseEvent('mousedown'));
-                    // Trigger auto-save for keyboard selection
-                    try {
-                        const targetNoteId = noteId;
-                        if (typeof window !== 'undefined' && targetNoteId) {
-                            window.noteid = targetNoteId;
-                            if (typeof window.markNoteAsModified === 'function') {
-                                window.markNoteAsModified();
-                            }
-                        }
-                    } catch (err) { 
-                        console.warn('Auto-save trigger failed for keyboard selection:', err);
-                    }
+                    // Tags are auto-saved via the mousedown handler, no need to mark as modified
                 } else if (ev.key === 'Escape') {
                     dd.style.display = 'none';
                 }
@@ -722,21 +700,9 @@ function updateNoteById(noteId) {
         }
     }
     
-    // Visual indicator: add red dot to page title when there are unsaved changes
-    if (!document.title.startsWith('🔴')) {
-        document.title = '🔴 ' + document.title;
-    }
-    
-    // Debounced server save with preserved noteId context
-    var saveKey = 'saveTimeout_' + noteId;
-    if (window[saveKey]) {
-        clearTimeout(window[saveKey]);
-    }
-    
-    window[saveKey] = setTimeout(() => {
-        saveNoteToServerById(noteId);
-        delete window[saveKey]; // Clean up
-    }, 2000);
+    // For tags modification, save immediately without visual indicator or delay
+    // Tags are saved instantly like titles, no red dot needed
+    saveNoteToServerById(noteId);
 }
 
 /**

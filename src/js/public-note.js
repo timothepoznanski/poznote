@@ -487,10 +487,24 @@
     document.addEventListener('click', function (e) {
         const deleteBtn = e.target.closest('.public-task-delete-btn');
         if (deleteBtn) {
-            const isConfirmed = window.confirm('Delete this task?');
-            if (isConfirmed) {
-                const taskItem = deleteBtn.closest('.task-item');
-                deleteTask(taskItem.getAttribute('data-index'));
+            const taskItem = deleteBtn.closest('.task-item');
+            const config = getPublicConfig();
+            const deleteMessage = config?.i18n?.deleteTask || 'Delete this task?';
+            const deleteTitle = config?.i18n?.confirm || 'Confirm';
+            
+            if (window.modalAlert && typeof window.modalAlert.confirm === 'function') {
+                window.modalAlert.confirm(deleteMessage, deleteTitle)
+                    .then(function(isConfirmed) {
+                        if (isConfirmed) {
+                            deleteTask(taskItem.getAttribute('data-index'));
+                        }
+                    });
+            } else {
+                // Fallback to native confirm if modal system not available
+                const isConfirmed = window.confirm(deleteMessage);
+                if (isConfirmed) {
+                    deleteTask(taskItem.getAttribute('data-index'));
+                }
             }
             return;
         }
