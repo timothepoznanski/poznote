@@ -22,11 +22,6 @@
         var codeBlocks = container.querySelectorAll('pre code[class*="language-"]');
         
         codeBlocks.forEach(function(codeBlock) {
-            // Skip if already highlighted
-            if (codeBlock.classList.contains('hljs')) {
-                return;
-            }
-
             // Skip if it's a mermaid block (handled separately)
             if (codeBlock.classList.contains('language-mermaid') ||
                 codeBlock.classList.contains('lang-mermaid')) {
@@ -39,8 +34,31 @@
                 return;
             }
 
+            // Get the parent pre element
+            var preElement = codeBlock.closest('pre');
+            
+            // Extract language from code element's class
+            var languageMatch = codeBlock.className.match(/language-([\w-]+)/);
+            var language = languageMatch ? languageMatch[1] : null;
+            
+            // Save the data-language attribute if it exists
+            var dataLanguage = codeBlock.getAttribute('data-language') || 
+                              (preElement ? preElement.getAttribute('data-language') : null) || 
+                              language;
+            
+            // Remove hljs class to allow re-highlighting
+            codeBlock.classList.remove('hljs');
+
             try {
                 hljs.highlightElement(codeBlock);
+                
+                // Restore/set data-language on both pre and code elements
+                if (dataLanguage) {
+                    codeBlock.setAttribute('data-language', dataLanguage);
+                    if (preElement) {
+                        preElement.setAttribute('data-language', dataLanguage);
+                    }
+                }
             } catch (e) {
                 console.warn('Highlight.js error:', e);
             }

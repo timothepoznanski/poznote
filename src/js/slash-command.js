@@ -383,8 +383,9 @@
             pre.setAttribute('data-language', language);
         }
         
-        const textNode = document.createTextNode('\u200B');
-        code.appendChild(textNode);
+        // Add a line break inside code element for cursor positioning
+        const br = document.createElement('br');
+        code.appendChild(br);
         pre.appendChild(code);
 
         // Insert at cursor position
@@ -393,10 +394,17 @@
 
         // Place cursor inside code element
         const newRange = document.createRange();
-        newRange.setStart(textNode, 1);
+        newRange.selectNodeContents(code);
         newRange.collapse(true);
         selection.removeAllRanges();
         selection.addRange(newRange);
+
+        // Trigger syntax highlighting if available
+        if (language && typeof window.applySyntaxHighlighting === 'function') {
+            setTimeout(function() {
+                window.applySyntaxHighlighting(pre);
+            }, 10);
+        }
 
         // Trigger input event for autosave
         const noteEntry = pre.closest('.noteentry');

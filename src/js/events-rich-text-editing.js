@@ -339,6 +339,39 @@ function handleNavigateToChecklist(e, noteentry) {
 }
 
 /**
+ * Handle Enter key in code block - exit block on Enter
+ * @param {Event} e - The keyboard event
+ * @param {Selection} selection - The current selection
+ */
+function handleCodeBlockEnter(e, selection) {
+    if (!selection.rangeCount) return;
+    
+    var range = selection.getRangeAt(0);
+    var container = range.startContainer.nodeType === 3
+        ? range.startContainer.parentElement
+        : range.startContainer;
+    
+    // Check if we're inside a pre or code element
+    var pre = container.closest('pre');
+    if (!pre) return;
+    
+    var noteentry = pre.closest('.noteentry');
+    if (!noteentry) return;
+    
+    e.preventDefault();
+    
+    // Create a new paragraph after the code block
+    var newPara = document.createElement('div');
+    newPara.innerHTML = '<br>';
+    
+    pre.parentElement.insertBefore(newPara, pre.nextSibling);
+    
+    // Move cursor to the new paragraph
+    setCursorPosition(newPara, 0, false);
+    triggerNoteSave();
+}
+
+/**
  * Handle keyboard events in the note entry area
  * @param {Event} e - The keyboard event
  */
@@ -355,8 +388,23 @@ function handleNoteEntryKeydown(e) {
     
     var selection = window.getSelection();
     
-    // Handle Enter key in blockquote
+    // Handle Enter key in code block
     if (e.key === 'Enter' && !e.shiftKey) {
+        // Check if we're in a code block
+        var container = selection.rangeCount > 0 
+            ? selection.getRangeAt(0).commonAncestorContainer
+            : null;
+        if (container) {
+            var checkNode = container.nodeType === 3 ? container.parentElement : container;
+            var inCodeBlock = checkNode && checkNode.closest && (checkNode.closest('pre') || checkNode.closest('code'));
+            
+            if (inCodeBlock) {
+                handleCodeBlockEnter(e, selection);
+                return;
+            }
+        }
+        
+        // Handle Enter key in blockquote
         handleBlockquoteEnter(e, selection);
     }
     
@@ -802,31 +850,61 @@ function setupPasteHandling() {
  * Setup syntax highlighting trigger on code block input
  */
 function setupCodeBlockHighlighting() {
+    // Helper function to trigger syntax highlighting
+    function triggerHighlighting(target) {
+        var codeElement = target.tagName === 'CODE' ? target : null;
+        var preElement = target.tagName === 'PRE' ? target : (codeElement ? codeElement.closest('pre') : null);
+        
+        if (!codeElement && preElement) {
+            codeElement = preElement.querySelector('code[class*="language-"]');
+        }
+        
+        if (codeElement && codeElement.className && codeElement.className.includes('language-')) {
+            setTimeout(function() {
+                if (typeof window.applySyntaxHighlighting === 'function') {
+                    var pre = codeElement.closest('pre');
+                    if (pre) {
+                        window.applySyntaxHighlighting(pre);
+                    }
+                }
+            }, 50);
+        }
+    }
+    
+    // Listen for input events (typing)
     document.body.addEventListener('input', function(e) {
         var target = e.target;
         
         // Check if editing code element with language class
         if (target.tagName === 'CODE' && target.className && target.className.includes('language-')) {
-            setTimeout(function() {
-                if (typeof window.applySyntaxHighlighting === 'function') {
-                    var pre = target.closest('pre');
-                    if (pre) {
-                        window.applySyntaxHighlighting(pre);
-                    }
-                }
-            }, 10);
+            triggerHighlighting(target);
         }
         
         // Check if editing pre element
         if (target.tagName === 'PRE') {
             var codeElement = target.querySelector('code[class*="language-"]');
             if (codeElement) {
-                setTimeout(function() {
-                    if (typeof window.applySyntaxHighlighting === 'function') {
-                        window.applySyntaxHighlighting(target);
-                    }
-                }, 10);
+                triggerHighlighting(target);
             }
+        }
+    });
+    
+    // Listen for paste events
+    document.body.addEventListener('paste', function(e) {
+        var target = e.target;
+        
+        // Check if pasting into code block
+        var codeElement = null;
+        if (target.tagName === 'CODE') {
+            codeElement = target;
+        } else if (target.closest) {
+            codeElement = target.closest('code');
+        }
+        
+        if (codeElement && codeElement.className && codeElement.className.includes('language-')) {
+            setTimeout(function() {
+                triggerHighlighting(codeElement);
+            }, 100);
         }
     });
 }
