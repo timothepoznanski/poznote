@@ -379,6 +379,7 @@ function showChangeFolderIconModal(folderId, folderName) {
 
     // Show modal
     modal.style.display = 'flex';
+    modal.style.alignItems = 'flex-start';
 }
 
 /**
