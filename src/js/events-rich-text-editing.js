@@ -88,18 +88,25 @@ function setupNoteEditingEvents() {
     // Keyboard shortcuts
     document.body.addEventListener('keydown', handleNoteEntryKeydown);
 
-    // Title field handlers
-    var titleField = document.querySelector('.one_note_title');
-    if (titleField) {
-        titleField.addEventListener('blur', handleTitleBlur);
-        titleField.addEventListener('keydown', handleTitleKeydown);
-    }
+    // Title field handlers - use delegation to handle all title fields
+    document.body.addEventListener('blur', function(e) {
+        if (e.target.classList && e.target.classList.contains('css-title')) {
+            handleTitleBlur(e);
+        }
+    }, true); // Use capture phase
+    
+    document.body.addEventListener('keydown', function(e) {
+        if (e.target.classList && e.target.classList.contains('css-title')) {
+            handleTitleKeydown(e);
+        }
+    });
 
-    // Tags field handlers
-    var tagsField = document.querySelector('.tags');
-    if (tagsField) {
-        tagsField.addEventListener('keydown', handleTagsKeydown);
-    }
+    // Tags field handlers - use delegation
+    document.body.addEventListener('keydown', function(e) {
+        if (e.target.classList && e.target.classList.contains('tags')) {
+            handleTagsKeydown(e);
+        }
+    });
 }
 
 // ============================================================================
@@ -379,6 +386,7 @@ function handleNoteEditEvent(e) {
         target.id === 'search' ||
         target.classList.contains('searchtrash') ||
         target.classList.contains('one_note_title') ||
+        target.classList.contains('css-title') ||
         target.classList.contains('tags')) {
         return;
     }
@@ -414,6 +422,10 @@ function handleTagsKeydown(e) {
  * @param {Event} e - The blur event
  */
 function handleTitleBlur(e) {
+    // Update noteid from title input ID before saving
+    if (window.updateidhead) {
+        window.updateidhead(e.target);
+    }
     triggerNoteSave();
 }
 
@@ -425,11 +437,20 @@ function handleTitleBlur(e) {
 function handleTitleKeydown(e) {
     if (e.key === 'Enter') {
         e.preventDefault();
+        // Update noteid before saving and moving to content
+        if (window.updateidhead) {
+            window.updateidhead(e.target);
+        }
+        triggerNoteSave();
         var noteentry = document.querySelector('.noteentry');
         if (noteentry) {
             noteentry.focus();
         }
     } else if (e.key === 'Escape') {
+        // Update noteid before blur triggers save
+        if (window.updateidhead) {
+            window.updateidhead(e.target);
+        }
         e.target.blur();
     }
 }

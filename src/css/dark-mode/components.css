@@ -206,6 +206,31 @@ body.dark-mode .task-important-btn.is-favorite i {
     color: #ff6b6b !important;
 }
 
+/* Important task styling for dark mode */
+html[data-theme='dark'] .task-item.important,
+body.dark-mode .task-item.important {
+    border-color: #8b4545;
+    background: #3d1f1f;
+}
+
+html[data-theme='dark'] .task-item.important .task-text,
+body.dark-mode .task-item.important .task-text {
+    color: #ff6b6b;
+    font-weight: 600;
+}
+
+html[data-theme='dark'] .task-item.important .task-text a,
+body.dark-mode .task-item.important .task-text a {
+    color: #ff6b6b;
+    font-weight: 600;
+}
+
+html[data-theme='dark'] .task-item.important .task-text a:hover,
+body.dark-mode .task-item.important .task-text a:hover {
+    color: #ff8989;
+    text-decoration: underline;
+}
+
 /* Task order buttons */
 html[data-theme='dark'] .btn-task-order.active,
 body.dark-mode .btn-task-order.active {

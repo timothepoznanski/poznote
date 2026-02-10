@@ -263,6 +263,15 @@ function handleSaveResponse(data) {
     var timeText = 'Saved today';
     var titleChanged = false;
     
+    // Get current title before processing response
+    var elements = getNoteElements(noteid);
+    var currentTitle = elements.title ? elements.title.value : '';
+    
+    // Check if title changed from last saved version
+    if (typeof lastSavedTitle !== 'undefined' && currentTitle !== lastSavedTitle) {
+        titleChanged = true;
+    }
+    
     try {
         var jsonData = JSON.parse(data);
         
@@ -276,8 +285,7 @@ function handleSaveResponse(data) {
         if (jsonData.date && jsonData.title) {
             timeText = jsonData.date;
             
-            // Check if title was modified for uniqueness
-            var elements = getNoteElements(noteid);
+            // Check if server modified the title for uniqueness
             if (elements.title && jsonData.title !== jsonData.original_title) {
                 elements.title.value = jsonData.title;
                 titleChanged = true;

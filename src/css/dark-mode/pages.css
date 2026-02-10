@@ -495,6 +495,19 @@ body.dark-mode .public-note .content pre code {
     background-color: transparent;
 }
 
+/* Important task styling for public view in dark mode */
+html[data-theme='dark'] .public-note .content .task-item.important,
+body.dark-mode .public-note .content .task-item.important {
+    border-color: #8b4545;
+    background: #3d1f1f;
+}
+
+html[data-theme='dark'] .public-note .content .task-item.important .task-text,
+body.dark-mode .public-note .content .task-item.important .task-text {
+    color: #ff6b6b;
+    font-weight: 600;
+}
+
 /* ============================================
    Folder Icon Modal
    ============================================ */
