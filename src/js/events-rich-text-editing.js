@@ -286,7 +286,7 @@ function handleChecklistKeydown(e) {
 // ============================================================================
 
 /**
- * Handle Enter key in blockquote - exit blockquote if at end
+ * Handle Enter key in blockquote or callout - exit block if at end (or always for callouts)
  * @param {Event} e - The keyboard event
  * @param {Selection} selection - The current selection
  */
@@ -294,19 +294,29 @@ function handleBlockquoteEnter(e, selection) {
     if (!selection.rangeCount) return;
     
     var range = selection.getRangeAt(0);
-    var blockquote = range.startContainer.nodeType === 3 
-        ? range.startContainer.parentElement.closest('blockquote')
-        : range.startContainer.closest('blockquote');
+    var container = range.startContainer.nodeType === 3 
+        ? range.startContainer.parentElement 
+        : range.startContainer;
+
+    // Check for standard blockquote OR specialized callout
+    var blockquote = container.closest('blockquote');
+    var callout = container.closest('aside.callout');
     
-    if (!blockquote) return;
+    if (!blockquote && !callout) return;
     
-    // Check if cursor is at end of blockquote
-    if (isCursorAtEnd(blockquote, selection)) {
+    var elementToExit = blockquote || callout;
+    
+    // For callouts, the text is inside .callout-body
+    var checkEndElement = callout ? (callout.querySelector('.callout-body') || callout) : blockquote;
+
+    // Check if cursor is at end of blockquote, or always exit for specialized callouts
+    // as requested (users want to exit callouts with a single Enter)
+    if (callout || isCursorAtEnd(checkEndElement, selection)) {
         e.preventDefault();
         
         var newPara = document.createElement('div');
         newPara.innerHTML = '<br>';
-        blockquote.parentElement.insertBefore(newPara, blockquote.nextSibling);
+        elementToExit.parentElement.insertBefore(newPara, elementToExit.nextSibling);
         
         setCursorPosition(newPara, 0, false);
         triggerNoteSave();
