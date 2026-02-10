@@ -1588,7 +1588,7 @@
                                 window.showLinkModal('https://', selectedText, function (url, linkText) {
                                     if (!url) return;
 
-                                    const linkMarkdown = '[' + (linkText || 'link') + '](' + url + ')';
+                                    const linkMarkdown = '[' + (linkText || url || 'link') + '](' + url + ')';
 
                                     // Focus the editor first
                                     if (editor) {
@@ -2839,13 +2839,15 @@
             savedEditableElement.blur();
         }
 
-        // Hide cursor until mouse moves
-        document.body.style.cursor = 'none';
-        const showCursor = () => {
-            document.body.style.cursor = '';
-            document.removeEventListener('mousemove', showCursor);
-        };
-        document.addEventListener('mousemove', showCursor);
+        // Hide cursor until mouse moves (desktop only)
+        if (!isMobile) {
+            document.body.style.cursor = 'none';
+            const showCursor = () => {
+                document.body.style.cursor = '';
+                document.removeEventListener('mousemove', showCursor);
+            };
+            document.addEventListener('mousemove', showCursor);
+        }
     }
 
     // Handle user input (/ detection)
@@ -3314,13 +3316,8 @@
                         if (isVideo) {
                             mediaHtml = '<video class="note-video-embed" contenteditable="false" width="560" height="315" controls preload="metadata" playsinline src="' + fileUrl + '"></video>';
                         } else {
-                            // Audio: iframe for contenteditable, native <audio> for markdown
-                            if (isMarkdown) {
-                                mediaHtml = '<audio class="note-audio-embed" controls preload="metadata" src="' + fileUrl + '"></audio>';
-                            } else {
-                                var iframeSrc = '/audio_player.php?note=' + encodeURIComponent(noteId) + '&attachment=' + encodeURIComponent(attachmentId) + (wsParam ? '&' + wsParam.substring(1) : '');
-                                mediaHtml = '<iframe class="note-audio-iframe" src="' + iframeSrc + '" style="max-width:250px;width:100%;height:54px;border:none;border-radius:8px;display:block;margin:10px 0" allowtransparency="true"></iframe>';
-                            }
+                            // Audio: use native <audio> with contenteditable="false" (works in Chrome)
+                            mediaHtml = '<audio class="note-audio-embed" controls preload="metadata" contenteditable="false" src="' + fileUrl + '"></audio>';
                         }
 
                         if (editableElement) {

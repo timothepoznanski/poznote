@@ -182,12 +182,21 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.markdown-preview audio {
-    max-width: 100%;
+.markdown-preview audio,
+.markdown-preview .note-audio-embed {
+    max-width: 280px;
     display: block;
-    margin: 1em 0;
+    margin: 8px 0;
     border-radius: 8px;
-    background: #f5f5f5;
+    background: #f1f3f4;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+@media screen and (max-width: 768px) {
+    .markdown-preview audio,
+    .markdown-preview .note-audio-embed {
+        max-width: 240px;
+    }
 }
 
 .markdown-preview hr {

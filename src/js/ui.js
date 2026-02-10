@@ -636,11 +636,19 @@ function executeLinkModalAction() {
     var text = document.getElementById('linkModalText').value.trim();
     var callback = linkModalCallback;
 
+    // Remove invisible characters (zero-width spaces, etc.) and check if really empty
+    // Regex matches: whitespace, zero-width space (U+200B), zero-width non-joiner (U+200C), 
+    // zero-width joiner (U+200D), zero-width no-break space (U+FEFF), etc.
+    if (!text || /^[\s\u200B-\u200D\uFEFF\u00A0]*$/.test(text)) {
+        text = '';
+    }
+
     // Reset callback BEFORE calling it to avoid re-entry
     linkModalCallback = null;
 
     if (callback && url) {
-        callback(url, text || url);
+        var finalText = text || url;
+        callback(url, finalText);
     }
 
     removeModalWithDelay('linkModal');

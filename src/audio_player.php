@@ -38,11 +38,19 @@ if ($workspace) {
 <meta charset="UTF-8">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { width: 100%; height: 100%; overflow: hidden; background: transparent; }
+  html, body { 
+    width: 100%; 
+    min-height: 100%; 
+    overflow: visible; 
+    background: transparent;
+  }
   audio {
     width: 100%;
     display: block;
+    background: #f1f3f4;
     border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin: 5px;
   }
 </style>
 </head>

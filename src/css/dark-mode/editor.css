@@ -159,9 +159,11 @@ body.dark-mode .noteentry a {
     color: #64B5F6 !important;
 }
 
-/* Audio iframe */
-html[data-theme='dark'] .noteentry .note-audio-iframe,
-body.dark-mode .noteentry .note-audio-iframe {
+/* Audio player */
+html[data-theme='dark'] .noteentry .note-audio-embed,
+html[data-theme='dark'] .noteentry audio,
+body.dark-mode .noteentry .note-audio-embed,
+body.dark-mode .noteentry audio {
     background: var(--dm-surface);
 }
 

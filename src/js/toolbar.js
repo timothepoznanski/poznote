@@ -1156,7 +1156,7 @@ function addLinkToNote() {
         // Create a new link element
         const a = document.createElement('a');
         a.href = url;
-        a.textContent = text;
+        a.textContent = text || url;
         a.target = '_blank';
         a.rel = 'noopener noreferrer';
 

@@ -221,7 +221,7 @@
         if (!sel || sel.rangeCount === 0) return;
 
         var selectedText = sel.toString();
-        var linkText = text || selectedText || 'link';
+        var linkText = text || url || selectedText || 'link';
         var linkUrl = url || 'https://';
         
         var markdownLink = '[' + linkText + '](' + linkUrl + ')';
