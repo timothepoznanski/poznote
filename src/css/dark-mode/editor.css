@@ -14,15 +14,20 @@ body.dark-mode .innernote {
     color: var(--dm-text);
 }
 
-/* Note header and toolbar - only when no workspace background image is set */
-body:not(.has-background-image) html[data-theme='dark'] .note-header,
-body.dark-mode:not(.has-background-image) .note-header {
-    background-color: var(--dm-bg);
+/* Note header and toolbar - apply dark background immediately */
+html[data-theme='dark'] .note-header,
+body.dark-mode .note-header {
+    background-color: var(--dm-bg) !important;
 }
 
-body:not(.has-background-image) html[data-theme='dark'] .note-edit-toolbar,
-body.dark-mode:not(.has-background-image) .note-edit-toolbar {
-    background-color: var(--dm-bg);
+html[data-theme='dark'] .note-edit-toolbar,
+body.dark-mode .note-edit-toolbar {
+    background-color: var(--dm-bg) !important;
+}
+
+html[data-theme='dark'] .note-header-spacer,
+body.dark-mode .note-header-spacer {
+    background-color: var(--dm-bg) !important;
 }
 
 /* Note title */
@@ -228,6 +233,53 @@ body.dark-mode .toolbar-btn {
 html[data-theme='dark'] .toolbar-btn:hover,
 body.dark-mode .toolbar-btn:hover {
     background-color: #333;
+}
+
+/* ============================================
+   Toolbar Popups & Menus
+   ============================================ */
+
+/* Color palette popup */
+html[data-theme='dark'] .color-palette-popup,
+body.dark-mode .color-palette-popup {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .color-palette-popup .color-grid,
+body.dark-mode .color-palette-popup .color-grid {
+    background: var(--dm-surface) !important;
+}
+
+/* Toolbar vertical menu */
+html[data-theme='dark'] .toolbar-vertical-menu,
+body.dark-mode .toolbar-vertical-menu {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+/* Font size popup */
+html[data-theme='dark'] .font-size-popup,
+body.dark-mode .font-size-popup {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .font-size-popup .font-size-item:hover,
+body.dark-mode .font-size-popup .font-size-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+html[data-theme='dark'] .font-size-popup .size-label,
+body.dark-mode .font-size-popup .size-label {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .font-size-popup .size-preview,
+body.dark-mode .font-size-popup .size-preview {
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+    background-color: var(--dm-bg);
 }
 
 /* Image resize handle */
