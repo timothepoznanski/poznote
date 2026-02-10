@@ -370,7 +370,6 @@
         if (!selection.rangeCount) return;
 
         const range = selection.getRangeAt(0);
-        const t = window.t || ((key, params, fallback) => fallback);
 
         // Create code block (pre > code structure)
         const pre = document.createElement('pre');
@@ -392,24 +391,38 @@
         range.deleteContents();
         range.insertNode(pre);
 
-        // Place cursor inside code element
+        // Prepare selection inside code element
         const newRange = document.createRange();
-        newRange.selectNodeContents(code);
+        newRange.setStart(code, 0);
         newRange.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(newRange);
 
-        // Trigger syntax highlighting if available
-        if (language && typeof window.applySyntaxHighlighting === 'function') {
-            setTimeout(function() {
-                window.applySyntaxHighlighting(pre);
-            }, 10);
-        }
-
-        // Trigger input event for autosave
+        // Ensure the containing noteentry is focused
         const noteEntry = pre.closest('.noteentry');
         if (noteEntry) {
-            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+            try { noteEntry.focus(); } catch (err) { }
+            // Apply selection after a short timeout to ensure it's not overridden by executeCommand's focus
+            setTimeout(function () {
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(newRange);
+
+                // Trigger syntax highlighting if available
+                if (language && typeof window.applySyntaxHighlighting === 'function') {
+                    window.applySyntaxHighlighting(pre);
+                }
+
+                // Trigger input event for autosave
+                noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+            }, 50);
+        } else {
+            selection.removeAllRanges();
+            selection.addRange(newRange);
+
+            if (language && typeof window.applySyntaxHighlighting === 'function') {
+                setTimeout(function() {
+                    window.applySyntaxHighlighting(pre);
+                }, 10);
+            }
         }
     }
 
