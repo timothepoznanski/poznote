@@ -26,22 +26,17 @@ require_once 'db_connect.php';
 // Get the correct attachments directory path
 $attachments_dir = getAttachmentsPath();
 
-// Enhanced directory creation and permissions handling
-if (!file_exists($attachments_dir)) {
-    if (!mkdir($attachments_dir, 0755, true)) {
-        error_log("Failed to create attachments directory: $attachments_dir");
-        echo json_encode(['success' => false, 'message' => 'Failed to create attachments directory']);
-        exit;
-    }
-    // Set permissions after creation (owner can write, others can read/execute)
-    chmod($attachments_dir, 0755);
-    error_log("Created attachments directory: $attachments_dir");
+// Create directory if needed
+if (!createDirectoryWithPermissions($attachments_dir)) {
+    error_log("Failed to create attachments directory: $attachments_dir");
+    echo json_encode(['success' => false, 'message' => 'Failed to create attachments directory']);
+    exit;
 }
 
 // Verify directory is writable
 if (!is_writable($attachments_dir)) {
     error_log("Attachments directory is not writable: $attachments_dir");
-    // Try to fix permissions (owner-writable only for better security)
+    // Try to fix permissions
     if (!chmod($attachments_dir, 0755)) {
         error_log("Failed to set writable permissions on: $attachments_dir");
     }

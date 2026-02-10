@@ -2,6 +2,8 @@
 require 'auth.php';
 requireAuth();
 
+require_once 'functions.php';
+
 header('Content-Type: application/json');
 
 $currentUser = getCurrentUser();
@@ -33,25 +35,19 @@ $user_dir = __DIR__ . '/data/users/' . $user_id;
 $backgrounds_dir = $user_dir . '/backgrounds';
 $workspace_backgrounds_dir = $backgrounds_dir . '/' . $workspace;
 
-if (!file_exists($user_dir)) {
-    if (!mkdir($user_dir, 0755, true)) {
-        echo json_encode(['success' => false, 'error' => 'Failed to create user directory: ' . $user_dir]);
-        exit;
-    }
+if (!createDirectoryWithPermissions($user_dir)) {
+    echo json_encode(['success' => false, 'error' => 'Failed to create user directory: ' . $user_dir]);
+    exit;
 }
 
-if (!file_exists($backgrounds_dir)) {
-    if (!mkdir($backgrounds_dir, 0755, true)) {
-        echo json_encode(['success' => false, 'error' => 'Failed to create backgrounds directory: ' . $backgrounds_dir]);
-        exit;
-    }
+if (!createDirectoryWithPermissions($backgrounds_dir)) {
+    echo json_encode(['success' => false, 'error' => 'Failed to create backgrounds directory: ' . $backgrounds_dir]);
+    exit;
 }
 
-if (!file_exists($workspace_backgrounds_dir)) {
-    if (!mkdir($workspace_backgrounds_dir, 0755, true)) {
-        echo json_encode(['success' => false, 'error' => 'Failed to create workspace backgrounds directory: ' . $workspace_backgrounds_dir]);
-        exit;
-    }
+if (!createDirectoryWithPermissions($workspace_backgrounds_dir)) {
+    echo json_encode(['success' => false, 'error' => 'Failed to create workspace backgrounds directory: ' . $workspace_backgrounds_dir]);
+    exit;
 }
 
 // Handle upload

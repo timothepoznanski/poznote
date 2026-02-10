@@ -24,11 +24,9 @@ class BackupController {
      */
     public function index() {
         // Create backups directory if it doesn't exist
-        if (!is_dir($this->backupsDir)) {
-            if (!mkdir($this->backupsDir, 0755, true)) {
-                http_response_code(500);
-                return ['success' => false, 'error' => 'Failed to create backups directory'];
-            }
+        if (!createDirectoryWithPermissions($this->backupsDir)) {
+            http_response_code(500);
+            return ['success' => false, 'error' => 'Failed to create backups directory'];
         }
         
         $backups = [];
@@ -78,11 +76,9 @@ class BackupController {
      */
     public function create() {
         // Create backups directory if it doesn't exist
-        if (!is_dir($this->backupsDir)) {
-            if (!mkdir($this->backupsDir, 0755, true)) {
-                http_response_code(500);
-                return ['success' => false, 'error' => 'Failed to create backups directory'];
-            }
+        if (!createDirectoryWithPermissions($this->backupsDir)) {
+            http_response_code(500);
+            return ['success' => false, 'error' => 'Failed to create backups directory'];
         }
         
         // Use user's timezone for backup filename

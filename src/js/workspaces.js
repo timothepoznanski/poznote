@@ -4,19 +4,10 @@
 // Global workspace state
 var selectedWorkspace = '';
 
-function tr(key, vars, fallback) {
-    try {
-        if (window.t) return window.t(key, vars || {}, fallback);
-    } catch (e) { }
-    var out = (fallback != null ? String(fallback) : String(key));
-    if (vars) {
-        for (var k in vars) {
-            if (!Object.prototype.hasOwnProperty.call(vars, k)) continue;
-            out = out.split('{{' + k + '}}').join(String(vars[k]));
-        }
-    }
-    return out;
-}
+// Use global translation function from globals.js
+var tr = window.t || function(key, vars, fallback) {
+    return fallback || key;
+};
 
 function initializeWorkspaces() {
     var wsSelector = document.getElementById('workspaceSelector');

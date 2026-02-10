@@ -430,9 +430,7 @@ class NotesController {
                 // Create the file
                 $filename = getEntryFilename($id, $type);
                 $entriesDir = dirname($filename);
-                if (!is_dir($entriesDir)) {
-                    mkdir($entriesDir, 0755, true);
-                }
+                createDirectoryWithPermissions($entriesDir);
                 
                 if (!empty($entry)) {
                     // Sanitize HTML content to prevent XSS attacks
@@ -581,9 +579,7 @@ class NotesController {
             if ($entry !== null) {
                 $filename = getEntryFilename($noteId, $noteType);
                 $entriesDir = dirname($filename);
-                if (!is_dir($entriesDir)) {
-                    mkdir($entriesDir, 0755, true);
-                }
+                createDirectoryWithPermissions($entriesDir);
                 
                 // Sanitize HTML content to prevent XSS attacks
                 $contentToSave = $entry;
@@ -1048,9 +1044,7 @@ class NotesController {
             // Write file
             $filename = getEntryFilename($noteId, $noteType);
             $entriesDir = dirname($filename);
-            if (!is_dir($entriesDir)) {
-                mkdir($entriesDir, 0755, true);
-            }
+            createDirectoryWithPermissions($entriesDir);
             
             $write_result = file_put_contents($filename, $content);
             if ($write_result === false) {

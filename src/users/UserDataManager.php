@@ -75,17 +75,8 @@ class UserDataManager {
             ];
             
             foreach ($directories as $dir) {
-                if (!is_dir($dir)) {
-                    if (!mkdir($dir, 0755, true)) {
-                        error_log("Failed to create directory: $dir");
-                        return false;
-                    }
-                    
-                    // Set proper ownership if running as root (Docker context)
-                    if (function_exists('posix_getuid') && posix_getuid() === 0) {
-                        chown($dir, 'www-data');
-                        chgrp($dir, 'www-data');
-                    }
+                if (!createDirectoryWithPermissions($dir)) {
+                    return false;
                 }
             }
             
@@ -285,9 +276,7 @@ class UserDataManager {
     public function createBackup() {
         try {
             $backupsPath = $this->getUserBackupsPath();
-            if (!is_dir($backupsPath)) {
-                mkdir($backupsPath, 0755, true);
-            }
+            createDirectoryWithPermissions($backupsPath);
             
             $userTimezone = getUserTimezone();
             $dt = new DateTime('now', new DateTimeZone($userTimezone));

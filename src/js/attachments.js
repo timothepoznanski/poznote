@@ -68,22 +68,13 @@ function compressImageIfNeeded(dataUrl, callback) {
     img.src = dataUrl;
 }
 
-function tr(key, vars, fallback) {
-    try {
-        if (typeof window !== 'undefined' && typeof window.t === 'function') {
-            return window.t(key, vars || {}, fallback);
-        }
-    } catch (e) {
-        // ignore
-    }
-    let text = (fallback !== undefined && fallback !== null) ? String(fallback) : String(key);
-    if (vars && typeof vars === 'object') {
-        Object.keys(vars).forEach((k) => {
-            text = text.replaceAll('{{' + k + '}}', String(vars[k]));
-        });
-    }
-    return text;
-}
+/**
+ * Use global translation function from globals.js
+ * This avoids code duplication across files
+ */
+var tr = window.t || function(key, vars, fallback) {
+    return fallback || key;
+};
 
 function isCursorInEditableNote() {
     const selection = window.getSelection();

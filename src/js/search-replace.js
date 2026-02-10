@@ -5,14 +5,10 @@
 (function() {
     'use strict';
 
-    // Translation helper
-    function tr(key, vars, fallback) {
-        try {
-            return window.t ? window.t(key, vars || {}, fallback) : fallback;
-        } catch (e) {
-            return fallback;
-        }
-    }
+    // Use global translation function from globals.js
+    const tr = window.t || function(key, vars, fallback) {
+        return fallback || key;
+    };
 
     // Store state for each note
     const noteStates = new Map();

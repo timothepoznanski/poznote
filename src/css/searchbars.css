@@ -225,15 +225,6 @@
     color: #2b2b2b;
 }
 
-.searchbar-desktop {
-    margin-top: 12px;
-    margin-bottom: 15px;
-    padding: 0;
-    background: none;
-    border-radius: 0;
-    box-shadow: none;
-}
-
 .searchbar-row {
     display: flex;
     align-items: center;

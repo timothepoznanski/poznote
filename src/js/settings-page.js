@@ -18,13 +18,10 @@
         };
     }
 
-    // Translation helper with fallback
-    function tr(key, vars, fallback) {
-        if (typeof window.t === 'function') {
-            return window.t(key, vars || {}, fallback);
-        }
-        return (fallback != null ? String(fallback) : String(key));
-    }
+    // Use global translation function from globals.js
+    const tr = window.t || function(key, vars, fallback) {
+        return fallback || key;
+    };
 
     // Get language label from code
     function getLanguageLabel(code) {

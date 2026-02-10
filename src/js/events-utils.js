@@ -1,14 +1,10 @@
 // Utility functions for event management
 // Part of Poznote's modular event system
 
-// Wrapper for translation function with fallback support
-function tr(key, vars, fallback) {
-    try {
-        return window.t ? window.t(key, vars || {}, fallback) : fallback;
-    } catch (e) {
-        return fallback;
-    }
-}
+// Use global translation function from globals.js
+var tr = window.t || function(key, vars, fallback) {
+    return fallback || key;
+};
 
 // Generic function to update noteid based on element ID with prefix
 function updateNoteIdFromElement(element, prefixLength) {

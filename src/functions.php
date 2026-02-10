@@ -30,6 +30,58 @@ if (!defined('ALLOWED_IFRAME_DOMAINS')) {
 }
 
 /**
+ * Helper function to create directory with proper permissions
+ * Centralizes the logic for creating directories and setting ownership
+ * 
+ * @param string $path The directory path to create
+ * @param int $permissions The permissions to set (default: 0755)
+ * @param bool $recursive Whether to create parent directories (default: true)
+ * @return bool True on success, false on failure
+ */
+function createDirectoryWithPermissions($path, $permissions = 0755, $recursive = true) {
+    // Directory already exists
+    if (is_dir($path)) {
+        return true;
+    }
+    
+    // Try to create directory
+    if (!mkdir($path, $permissions, $recursive)) {
+        error_log("Failed to create directory: $path");
+        return false;
+    }
+    
+    // Set proper ownership if running as root (Docker context)
+    if (function_exists('posix_getuid') && posix_getuid() === 0) {
+        chown($path, 'www-data');
+        chgrp($path, 'www-data');
+    }
+    
+    return true;
+}
+
+/**
+ * Helper function to set file permissions and ownership
+ * Centralizes the logic for setting file ownership
+ * 
+ * @param string $path The file or directory path
+ * @param int $permissions The permissions to set
+ * @return void
+ */
+function setFilePermissions($path, $permissions = 0644) {
+    if (!file_exists($path)) {
+        return;
+    }
+    
+    chmod($path, $permissions);
+    
+    // Set proper ownership if running as root (Docker context)
+    if (function_exists('posix_getuid') && posix_getuid() === 0) {
+        chown($path, 'www-data');
+        chgrp($path, 'www-data');
+    }
+}
+
+/**
  * Detect if the current request is using HTTPS
  * Supports reverse proxy headers (X-Forwarded-Proto, X-Forwarded-SSL)
  */
@@ -513,7 +565,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         
         // Extract ZIP to temporary directory
         $tempExtractDir = '/tmp/poznote_restore_' . uniqid();
-        if (!mkdir($tempExtractDir, 0755, true)) {
+        if (!createDirectoryWithPermissions($tempExtractDir)) {
             unlink($tempFile);
             return ['success' => false, 'error' => 'Cannot create temporary directory'];
         }
@@ -575,13 +627,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
             error_log("CLEARED $entriesCleared files from entries directory");
         } else {
             // Create entries directory if it doesn't exist
-            mkdir($entriesPath, 0755, true);
-            if (function_exists('posix_getuid') && posix_getuid() === 0) {
-                $current_uid = posix_getuid();
-                $current_gid = posix_getgid();
-                chown($entriesPath, $current_uid);
-                chgrp($entriesPath, $current_gid);
-            }
+            createDirectoryWithPermissions($entriesPath);
         }
         
         // CLEAR ATTACHMENTS DIRECTORY BEFORE RESTORATION
@@ -602,13 +648,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
             error_log("CLEARED $attachmentsCleared files from attachments directory");
         } else {
             // Create attachments directory if it doesn't exist
-            mkdir($attachmentsPath, 0755, true);
-            if (function_exists('posix_getuid') && posix_getuid() === 0) {
-                $current_uid = posix_getuid();
-                $current_gid = posix_getgid();
-                chown($attachmentsPath, $current_uid);
-                chgrp($attachmentsPath, $current_gid);
-            }
+            createDirectoryWithPermissions($attachmentsPath);
         }
         
         $results = [];
@@ -719,13 +759,7 @@ function restoreDatabaseFromFile($sqlFile) {
     
     if ($returnCode === 0) {
         // Ensure proper permissions on restored database
-        if (function_exists('posix_getuid') && posix_getuid() === 0) {
-            $current_uid = posix_getuid();
-            $current_gid = posix_getgid();
-            chown($dbPath, $current_uid);
-            chgrp($dbPath, $current_gid);
-        }
-        chmod($dbPath, 0664);
+        setFilePermissions($dbPath, 0664);
         
         return ['success' => true];
     } else {

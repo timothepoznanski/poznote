@@ -1066,7 +1066,7 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
     $attachmentsPath = getAttachmentsPath();
     if (!$attachmentsPath || !is_dir($attachmentsPath)) {
         // Try to create the attachments directory
-        if (!mkdir($attachmentsPath, 0755, true)) {
+        if (!createDirectoryWithPermissions($attachmentsPath)) {
             $zip->close();
             unlink($tempFile);
             return ['success' => false, 'error' => 'Cannot create attachments directory'];

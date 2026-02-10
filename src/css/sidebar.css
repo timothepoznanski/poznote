@@ -70,20 +70,6 @@
     position: relative;
 }
 
-.sidebar-gear {
-    display: none;
-}
-
-.sidebar-display {
-    background: transparent;
-    border: none;
-    color: #007DB8;
-    font-size: 1.3rem;
-    cursor: pointer;
-    padding: 6px;
-    border-radius: 6px;
-}
-
 .sidebar-home {
     background: transparent;
     border: none;
@@ -92,10 +78,6 @@
     cursor: pointer;
     padding: 6px;
     border-radius: 6px;
-}
-
-.sidebar-kofi {
-    text-decoration: none;
 }
 
 .sidebar-settings {
@@ -109,16 +91,6 @@
     position: relative;
 }
 
-.sidebar-user {
-    background: transparent;
-    border: none;
-    color: #007DB8;
-    font-size: 1.3rem;
-    cursor: pointer;
-    padding: 6px;
-    border-radius: 6px;
-}
-
 .sidebar-plus {
     background: transparent;
     border: none;
@@ -130,18 +102,14 @@
 }
 
 /* Hover and focus states for sidebar buttons */
-.sidebar-display:hover,
 .sidebar-home:hover,
 .sidebar-settings:hover,
-.sidebar-user:hover,
 .sidebar-plus:hover {
     background: rgba(0, 125, 184, 0.1);
 }
 
-.sidebar-display:focus,
 .sidebar-home:focus,
 .sidebar-settings:focus,
-.sidebar-user:focus,
 .sidebar-plus:focus {
     outline: 2px solid #007DB8;
     outline-offset: 2px;
@@ -150,14 +118,10 @@
 /* Réduire la taille des icônes Font Awesome dans la sidebar */
 .sidebar-title-actions i,
 .sidebar-title-actions [class*="fa-"],
-.sidebar-display i,
-.sidebar-display [class*="fa-"],
 .sidebar-home i,
 .sidebar-home [class*="fa-"],
 .sidebar-settings i,
-.sidebar-settings [class*="fa-"],
-.sidebar-user i,
-.sidebar-user [class*="fa-"] {
+.sidebar-settings [class*="fa-"] {
     font-size: 0.7em !important;
 }
 
@@ -193,15 +157,6 @@
 
 /* .sidebar-plus:hover { background: rgba(0,0,0,0.04); color: #005a8a; } /* Display background button plus on hover */
 
-/* Align new note/folder rows with the search bar */
-.sidebar-newnote-row {
-    padding: 6px 0 8px 0;
-}
-
-.sidebar-newfolder-row {
-    padding: 6px 0 8px 0;
-}
-
 .btn-new-note {
     display: inline-flex;
     align-items: center;
@@ -231,7 +186,6 @@
     justify-content: center;
 }
 
-/* .btn-new-note.mobile { padding: 10px; font-size: 0.95rem; } */
 .btn-new-note:hover {
     filter: brightness(0.96);
 }
@@ -391,81 +345,6 @@
     font-weight: 600;
 }
 
-/* Left header */
-
-.left-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    /* padding: 0px 0px 13px 0px; */
-    margin-bottom: 16px;
-    /* space between workspace name and icons */
-    /* border-bottom: 1px solid #e9ecef; */
-}
-
-
-
-.left-header-text {
-    font-family: 'Inter', sans-serif;
-    font-weight: 700;
-    font-size: 1.5rem;
-    /* workspace name size */
-    color: #007DB8;
-    letter-spacing: 0.5px;
-}
-
-/* Sidebar footer and create menu */
-
-/* Sidebar footer: CTA buttons pinned at bottom of left column */
-.sidebar-footer {
-    position: sticky;
-    bottom: 16px;
-    width: 100%;
-    padding: 8px 0 0 0;
-    box-sizing: border-box;
-}
-
-.sidebar-footer-inner {
-    display: flex;
-    gap: 8px;
-    flex-direction: column;
-    /* stack buttons vertically */
-}
-
-.sidebar-footer .btn-new-note,
-.sidebar-footer .btn-new-folder {
-    display: none;
-    /* deprecated: use unified create button */
-}
-
-.btn-create {
-    width: 100%;
-    height: 40px;
-    border-radius: 8px;
-    background: #007DB8;
-    color: #fff;
-    border: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-size: 1rem;
-    padding: 8px 12px;
-    box-sizing: border-box;
-    cursor: pointer;
-}
-
-.btn-create:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(0, 123, 184, 0.12);
-}
-
-.create-caret {
-    margin-left: 6px;
-    font-size: 0.9rem;
-}
-
 .create-menu {
     position: absolute;
     top: 100%;
@@ -480,21 +359,6 @@
     gap: 6px;
     z-index: 60;
     min-width: 140px;
-}
-
-#header-create-menu {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
-    min-width: 150px;
-    padding: 8px 0;
-    margin-top: 5px;
-    display: none;
 }
 
 .create-menu-item {
@@ -548,26 +412,3 @@
     font-size: 18px !important;
 }
 
-/* LEFT HEADER additional */
-
-.left-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    /* padding: 0px 0px 13px 0px; */
-    margin-bottom: 16px;
-    /* space between workspace name and icons */
-    /* border-bottom: 1px solid #e9ecef; */
-}
-
-
-
-.left-header-text {
-    font-family: 'Inter', sans-serif;
-    font-weight: 700;
-    font-size: 1.5rem;
-    /* workspace name size */
-    color: #007DB8;
-    letter-spacing: 0.5px;
-}

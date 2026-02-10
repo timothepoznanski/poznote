@@ -10,6 +10,11 @@
 // Include auto-migration to ensure multi-user structure exists
 require_once __DIR__ . '/auto_migrate.php';
 
+// Ensure shared helpers are available when db_connect is included before functions.php
+if (!function_exists('createDirectoryWithPermissions')) {
+    require_once __DIR__ . '/functions.php';
+}
+
 // Determine database path based on authenticated user
 $dbPath = SQLITE_DATABASE; // Default path (fallback)
 $activeUserId = null;
@@ -78,9 +83,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id']) {
 try {
     // Ensure the database directory exists
     $dbDir = dirname($dbPath);
-    if (!is_dir($dbDir)) {
-        mkdir($dbDir, 0755, true);
-    }
+    createDirectoryWithPermissions($dbDir);
     
     $con = new PDO('sqlite:' . $dbPath);
     $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -332,17 +335,7 @@ try {
     $requiredDirs = ['attachments', 'database', 'entries'];
     foreach ($requiredDirs as $dir) {
         $fullPath = $dataDir . '/' . $dir;
-        if (!is_dir($fullPath)) {
-            if (!mkdir($fullPath, 0755, true)) {
-                error_log("Failed to create directory: $fullPath");
-                continue;
-            }
-            // Set proper ownership if running as root (Docker context)
-            if (function_exists('posix_getuid') && posix_getuid() === 0) {
-                chown($fullPath, 'www-data');
-                chgrp($fullPath, 'www-data');
-            }
-        }
+        createDirectoryWithPermissions($fullPath);
     }
 
     // Create welcome note and Getting Started folder if no notes exist (first installation)
@@ -378,19 +371,11 @@ try {
             // Create the HTML file for the welcome note
             $dataDir = dirname($dbDir);
             $entriesDir = $dataDir . '/entries';
-            if (!is_dir($entriesDir)) {
-                mkdir($entriesDir, 0755, true);
-            }
+            createDirectoryWithPermissions($entriesDir);
             
             $welcomeFile = $entriesDir . '/' . $welcomeNoteId . '.html';
             file_put_contents($welcomeFile, $welcomeContent);
-            chmod($welcomeFile, 0644);
-            
-            // Set proper ownership if running as root
-            if (function_exists('posix_getuid') && posix_getuid() === 0) {
-                chown($welcomeFile, 'www-data');
-                chgrp($welcomeFile, 'www-data');
-            }
+            setFilePermissions($welcomeFile, 0644);
         }
         // Legacy migration: ensure folder_id is populated and entries are fixed
         if (function_exists('repairDatabaseEntries')) {

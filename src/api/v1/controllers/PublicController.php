@@ -233,9 +233,7 @@ class PublicController {
     private function saveNote(int $noteId, string $type, string $content): void {
         $filename = getEntryFilename($noteId, $type);
         $entriesDir = dirname($filename);
-        if (!is_dir($entriesDir)) {
-            mkdir($entriesDir, 0755, true);
-        }
+        createDirectoryWithPermissions($entriesDir);
         file_put_contents($filename, $content);
         
         $stmt = $this->con->prepare('UPDATE entries SET entry = ?, updated = datetime("now") WHERE id = ?');

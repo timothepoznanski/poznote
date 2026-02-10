@@ -6,33 +6,11 @@
  */
 
 /* File upload styling */
-.file-input-label {
-    display: block;
-    width: 160px;
-    margin: 0 auto;
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 6px 12px;
-    text-align: center;
-    cursor: pointer;
-    position: relative;
-    z-index: 1;
-}
-
-.file-input-hidden {
-    display: none;
-}
-
 .accepted-types {
     font-size: 0.85em;
     color: #888;
     text-align: center;
     margin-top: 4px;
-}
-
-.spacer-18 {
-    height: 18px;
 }
 
 .selected-filename {
@@ -54,18 +32,6 @@
     /* same space between subline and note content */
     display: none;
     /* hidden by default */
-}
-
-.button-48 {
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-size: 1rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.12s ease, box-shadow 0.12s ease;
-    margin: 0;
-    /* ensure uniform spacing controlled by gap on the container */
 }
 
 /* Remove margins from h4 note title */
@@ -217,14 +183,6 @@ div[contentEditable=true]:empty:before {
     display: flex;
     flex-direction: column;
     gap: 12px;
-}
-
-/* Legacy class name for backwards compatibility */
-.create-note-options {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 16px;
 }
 
 .create-note-option {
@@ -458,10 +416,6 @@ body.dark-mode .create-section h4 {
     from { transform: translateX(100%); opacity: 0; }
     to   { transform: translateX(0);    opacity: 1; }
 }
-@keyframes slideOutRight {
-    from { transform: translateX(0);    opacity: 1; }
-    to   { transform: translateX(100%); opacity: 0; }
-}
 @keyframes spin {
     0%   { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -482,9 +436,6 @@ body.dark-mode .create-section h4 {
     font-weight: 500;
     max-width: 300px;
     animation: slideInRight 0.3s ease;
-}
-.save-notification-exit {
-    animation: slideOutRight 0.3s ease forwards;
 }
 .save-notification-inner {
     display: flex;

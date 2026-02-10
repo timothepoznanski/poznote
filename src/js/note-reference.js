@@ -29,24 +29,11 @@
     // ============================================================================
 
     /**
-     * Translation helper function
+     * Translation helper function (alias for window.t from globals.js)
      */
-    function tr(key, vars, fallback) {
-        try {
-            if (typeof window !== 'undefined' && typeof window.t === 'function') {
-                return window.t(key, vars || {}, fallback);
-            }
-        } catch (e) {
-            // ignore
-        }
-        let text = (fallback !== undefined && fallback !== null) ? String(fallback) : String(key);
-        if (vars && typeof vars === 'object') {
-            Object.keys(vars).forEach((k) => {
-                text = text.replaceAll('{{' + k + '}}', String(vars[k]));
-            });
-        }
-        return text;
-    }
+    const tr = window.t || function(key, vars, fallback) {
+        return fallback || key;
+    };
 
     /**
      * Get the current workspace
