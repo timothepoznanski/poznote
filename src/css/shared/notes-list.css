@@ -1,0 +1,162 @@
+/**
+ * Shared Page - Notes List
+ *
+ * Shared note items, name, token, indexable toggle,
+ * password button, and action buttons.
+ */
+
+/* Shared Notes List */
+.shared-notes-list {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.shared-note-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border-color, #e0e0e0);
+}
+
+.note-name-container {
+    flex: 0 0 auto;
+    min-width: 200px;
+    max-width: 350px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.note-name {
+    font-weight: 500;
+    color: var(--link-color, #007bff);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.note-name:hover {
+    text-decoration: underline;
+}
+
+.folder-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: #6c757d;
+    background-color: rgba(108, 117, 125, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-decoration: none;
+    max-width: fit-content;
+    transition: all 0.2s ease;
+}
+
+.folder-badge:hover {
+    background-color: rgba(108, 117, 125, 0.2);
+    color: #495057;
+}
+
+.folder-badge i {
+    font-size: 10px;
+}
+
+.note-token {
+    flex: 1;
+    font-family: monospace;
+    font-size: 13px;
+    color: var(--text-muted, #666666);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: text;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.note-token:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+.note-token:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.note-indexable {
+    flex: 0 0 auto;
+    margin-right: 10px;
+}
+
+.indexable-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-color, #333333);
+    cursor: pointer;
+    user-select: none;
+}
+
+.indexable-label-text {
+    white-space: nowrap;
+}
+
+.indexable-checkbox {
+    display: none;
+}
+
+.note-password {
+    flex: 0 0 auto;
+    margin-right: 0;
+}
+
+.btn-password {
+    background: #6c757d;
+    color: white;
+    font-size: 12px;
+    padding: 6px 10px;
+    white-space: nowrap;
+    min-width: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-password i {
+    width: 14px;
+    text-align: center;
+}
+
+.btn-password:hover {
+    background: #5a6268;
+}
+
+.note-actions {
+    flex: 0 0 auto;
+    display: flex;
+    gap: 8px;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted, #666666);
+}
+
+.empty-message i {
+    font-size: 48px;
+    color: var(--text-muted, #cccccc);
+    margin-bottom: 16px;
+}
+
+.empty-message p {
+    font-size: 16px;
+    margin: 8px 0;
+}

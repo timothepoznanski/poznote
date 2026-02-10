@@ -1,0 +1,65 @@
+/**
+ * Folder Headers & Toggles
+ *
+ * Folder header layout, toggle behavior, folder name display,
+ * note count visibility, and kanban icon interaction.
+ */
+
+/* Folder header adjustments to match visual spacing */
+.folder-header {
+    border-radius: 8px;
+}
+
+.folder-toggle {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    cursor: pointer;
+}
+
+.folder-name {
+    font-weight: 600;
+    color: rgb(55, 53, 47);
+    font-size: var(--sidebar-font-size, 13px);
+}
+
+.folder-note-count {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 300;
+    margin-left: 8px;
+    flex: 0 0 auto;
+}
+
+.hide-folder-counts .folder-note-count {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(-2px) scale(0.98);
+    transition: opacity 120ms ease, transform 120ms ease;
+    pointer-events: none;
+}
+
+.hide-folder-counts .folder-toggle:hover .folder-note-count,
+.hide-folder-counts .folder-toggle:focus-within .folder-note-count,
+.hide-folder-counts .folder-header:focus-within .folder-note-count,
+.hide-folder-counts .folder-header:hover .folder-note-count {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+/* For keyboard-only users, provide a visible focus outline on the folder-toggle */
+.hide-folder-counts .folder-toggle:focus-within {
+    outline: 2px solid rgba(59, 130, 246, 0.18);
+    border-radius: 6px;
+}
+
+.folder-icon[data-action='open-kanban-view']:hover {
+    transform: scale(1.15);
+    color: #ef4444 !important;
+}
+
+/* Réduire les icônes dans les autres dossiers (non-système) */
+.folder-icon:not(.system-folder .folder-icon) {
+    font-size: 0.8em !important;
+}

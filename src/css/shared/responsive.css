@@ -1,0 +1,172 @@
+/**
+ * Shared Page - Responsive
+ *
+ * Mobile responsive styles and utility classes.
+ */
+
+@media (max-width: 800px) {
+    /* Reset complet pour le scroll sur mobile */
+    * {
+        box-sizing: border-box;
+    }
+
+    /* Override des règles globales sur mobile */
+    html {
+        overflow: auto !important;
+        overflow-y: scroll !important;
+        height: auto !important;
+        position: static !important;
+        max-height: none !important;
+        -webkit-overflow-scrolling: touch;
+        min-height: 100vh !important;
+        scrollbar-width: auto !important;
+        -ms-overflow-style: scrollbar !important;
+    }
+
+    html::-webkit-scrollbar {
+        display: block !important;
+        width: 6px !important;
+        background-color: #f1f1f1 !important;
+    }
+
+    body {
+        overflow: auto !important;
+        overflow-y: scroll !important;
+        height: auto !important;
+        position: static !important;
+        max-height: none !important;
+        min-height: 100vh !important;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: auto !important;
+        -ms-overflow-style: scrollbar !important;
+    }
+
+    body::-webkit-scrollbar {
+        display: block !important;
+        width: 12px !important;
+        background-color: #f1f1f1 !important;
+    }
+
+    body.shared-page {
+        overflow-y: scroll !important;
+        overflow-x: hidden !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        position: static !important;
+        padding: 10px;
+        scrollbar-width: auto !important;
+        -ms-overflow-style: scrollbar !important;
+    }
+
+    body.shared-page::-webkit-scrollbar {
+        display: block !important;
+        width: 12px !important;
+        background-color: #f1f1f1 !important;
+    }
+
+    /* Fix pour iOS Safari */
+    .shared-container {
+        position: relative !important;
+        height: auto !important;
+        overflow: visible !important;
+        min-height: calc(100vh - 20px) !important;
+        padding: 10px !important;
+        padding-bottom: 20px !important;
+    }
+
+    .shared-header {
+        font-size: 1.8em;
+        margin-top: 20px;
+        margin-bottom: 15px;
+    }
+
+    .shared-buttons-container {
+        justify-content: center;
+        margin: 15px 10px;
+        gap: 30px;
+    }
+
+    .shared-content {
+        padding: 10px;
+    }
+
+    /* Simplified mobile layout */
+    .shared-note-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 15px;
+        border: 1px solid var(--border-color, #e0e0e0);
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+    .note-name {
+        min-width: auto;
+        max-width: 100%;
+        font-size: 16px;
+        white-space: normal;
+    }
+
+    .note-token {
+        width: 100%;
+        font-size: 12px;
+    }
+
+    .note-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .empty-message {
+        padding: 40px 15px;
+    }
+
+    .empty-message i {
+        font-size: 48px;
+    }
+
+    .empty-message p {
+        font-size: 16px;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 10px;
+    }
+
+    /* Dark mode on mobile */
+    [data-theme="dark"] .shared-header {
+        color: #ffffff;
+    }
+
+    [data-theme="dark"] body.shared-page {
+        background: #252526 !important;
+    }
+
+    [data-theme="dark"] .indexable-label-text {
+        color: #e0e0e0;
+    }
+
+    [data-theme="dark"] .shared-note-item {
+        border-color: #555555;
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    [data-theme="dark"] .note-name {
+        color: #5daaff;
+    }
+
+    [data-theme="dark"] .note-token {
+        color: #b0b0b0;
+    }
+}
+
+/* ===========================================
+   UTILITY CLASSES
+   =========================================== */
+
+/* Hidden by default */
+.initially-hidden {
+    display: none;
+}

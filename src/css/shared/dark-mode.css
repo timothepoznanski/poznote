@@ -1,0 +1,110 @@
+/**
+ * Shared Page - Dark Mode
+ *
+ * Dark theme adjustments for the shared notes/folders page.
+ */
+
+[data-theme="dark"] body.shared-page {
+    background-color: #252526;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .shared-header {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .shared-info {
+    background-color: #1e3a52;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .shared-notes-table {
+    background-color: #333333;
+}
+
+[data-theme="dark"] .shared-notes-table thead {
+    background-color: #333333;
+}
+
+[data-theme="dark"] .shared-notes-table th {
+    color: #e0e0e0;
+    border-bottom-color: #444444;
+}
+
+[data-theme="dark"] .shared-notes-table td {
+    border-bottom-color: #444444;
+}
+
+[data-theme="dark"] .shared-notes-table tbody tr:hover {
+    background-color: #333333;
+}
+
+[data-theme="dark"] .note-link {
+    color: #4d9eff;
+}
+
+[data-theme="dark"] .url-input {
+    background-color: #333333;
+    border-color: #444444;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .modal-content {
+    background-color: #333333;
+}
+
+[data-theme="dark"] .modal-header {
+    border-bottom-color: #444444;
+}
+
+[data-theme="dark"] .modal-footer {
+    border-top-color: #444444;
+}
+
+[data-theme="dark"] .error-message {
+    background-color: #3a1f1f;
+    border-left-color: #dc3545;
+    color: #ffcccc;
+}
+
+[data-theme="dark"] body.shared-page::-webkit-scrollbar {
+    background-color: #333333 !important;
+}
+
+[data-theme="dark"] body.shared-page::-webkit-scrollbar-thumb {
+    background-color: #555555 !important;
+}
+
+[data-theme="dark"] body.shared-page::-webkit-scrollbar-thumb:hover {
+    background-color: #666666 !important;
+}
+
+[data-theme="dark"] .indexable-toggle-label {
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .shared-note-item {
+    border-color: #444444;
+}
+
+[data-theme="dark"] .indexable-label-text {
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .note-name {
+    color: #4d9eff;
+}
+
+[data-theme="dark"] .note-token {
+    color: #a0a0a0;
+}
+
+[data-theme="dark"] .folder-badge {
+    color: #a0a0a0;
+    background-color: rgba(160, 160, 160, 0.15);
+}
+
+[data-theme="dark"] .folder-badge:hover {
+    background-color: rgba(160, 160, 160, 0.25);
+    color: #c0c0c0;
+}

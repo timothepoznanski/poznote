@@ -1,0 +1,156 @@
+/**
+ * Restore & Import - Forms & Buttons
+ *
+ * Form groups, labels, file inputs, select elements, text helpers,
+ * and button styles.
+ */
+
+/* Boîte d'information */
+.info-box {
+    background: #e3f2fd;
+    border: 1px solid #1976d2;
+    border-radius: 4px;
+    padding: 12px;
+    margin: 15px 0;
+    font-size: 14px;
+}
+
+/* Groupes de formulaires */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Form label styles */
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Form file input */
+.form-file-input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 2px dashed #d0d0d0;
+    border-radius: 8px;
+    background: #fafafa;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.form-file-input:hover {
+    border-color: #007cba;
+    background: #f0f8ff;
+}
+
+/* Form select styled */
+.form-select-styled {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    background: white;
+    font-size: 15px;
+    transition: border-color 0.2s;
+}
+
+.form-select-styled:focus {
+    outline: none;
+    border-color: #007cba;
+    box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.1);
+}
+
+/* Form text styles */
+.form-text {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+}
+
+.form-text-block {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.form-text-danger {
+    color: #dc3545;
+    font-weight: 500;
+}
+
+.form-text-info {
+    color: #17a2b8;
+}
+
+.form-text-muted-block {
+    display: block;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+/* Form group with spacing */
+.form-group-spaced {
+    margin-bottom: 1.25rem;
+}
+
+/* Boutons */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-right: 0;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    line-height: 1.4;
+    box-sizing: border-box;
+}
+
+.btn:hover {
+    opacity: 0.8;
+}
+
+.btn-primary {
+    background-color: #007cba;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #005a8a;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* Button with top margin */
+.btn-with-margin-top {
+    margin-top: 1rem;
+}

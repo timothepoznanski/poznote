@@ -1,0 +1,48 @@
+/**
+ * Home - Alerts
+ *
+ * Styles for success and error alert messages
+ * with dark mode variants.
+ */
+
+/* Alerts */
+.alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.alert i {
+    font-size: 1.2rem;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Dark mode - alerts */
+html[data-theme='dark'] .alert-success,
+body.dark-mode .alert-success {
+    background: rgba(40, 167, 69, 0.2);
+    color: #5cb85c;
+    border-color: rgba(40, 167, 69, 0.3);
+}
+
+html[data-theme='dark'] .alert-error,
+body.dark-mode .alert-error {
+    background: rgba(220, 53, 69, 0.2);
+    color: #e57373;
+    border-color: rgba(220, 53, 69, 0.3);
+}

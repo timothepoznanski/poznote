@@ -1,0 +1,228 @@
+/* ============================================
+   Dark Mode - Markdown Preview & Toolbar
+   ============================================ */
+
+/* ============================================
+   Markdown Preview
+   ============================================ */
+
+html[data-theme='dark'] .markdown-preview,
+body.dark-mode .markdown-preview {
+    background-color: var(--dm-bg);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .markdown-preview h1,
+html[data-theme='dark'] .markdown-preview h2,
+html[data-theme='dark'] .markdown-preview h3,
+html[data-theme='dark'] .markdown-preview h4,
+html[data-theme='dark'] .markdown-preview h5,
+html[data-theme='dark'] .markdown-preview h6,
+body.dark-mode .markdown-preview h1,
+body.dark-mode .markdown-preview h2,
+body.dark-mode .markdown-preview h3,
+body.dark-mode .markdown-preview h4,
+body.dark-mode .markdown-preview h5,
+body.dark-mode .markdown-preview h6 {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .markdown-preview h1,
+html[data-theme='dark'] .markdown-preview h2,
+body.dark-mode .markdown-preview h1,
+body.dark-mode .markdown-preview h2 {
+    border-bottom-color: var(--dm-border);
+}
+
+/* Inline code only */
+html[data-theme='dark'] .markdown-preview code:not([class*="hljs"]):not([class*="language-"]),
+body.dark-mode .markdown-preview code:not([class*="hljs"]):not([class*="language-"]) {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .markdown-preview pre,
+body.dark-mode .markdown-preview pre {
+    background-color: var(--dm-surface);
+}
+
+html[data-theme='dark'] .markdown-preview blockquote,
+body.dark-mode .markdown-preview blockquote {
+    border-left-color: var(--dm-border);
+    color: #b0b0b0;
+}
+
+/* Tables */
+html[data-theme='dark'] .markdown-preview table,
+body.dark-mode .markdown-preview table {
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .markdown-preview table th,
+html[data-theme='dark'] .markdown-preview table td,
+body.dark-mode .markdown-preview table th,
+body.dark-mode .markdown-preview table td {
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+    background-color: var(--dm-surface);
+}
+
+html[data-theme='dark'] .markdown-preview table th,
+body.dark-mode .markdown-preview table th {
+    background-color: var(--dm-surface);
+    font-weight: bold;
+}
+
+html[data-theme='dark'] .markdown-preview table tr:nth-child(even),
+html[data-theme='dark'] .markdown-preview table tr:nth-child(even) td,
+body.dark-mode .markdown-preview table tr:nth-child(even),
+body.dark-mode .markdown-preview table tr:nth-child(even) td {
+    background-color: var(--dm-surface);
+}
+
+html[data-theme='dark'] .markdown-preview a,
+body.dark-mode .markdown-preview a {
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .markdown-preview hr,
+body.dark-mode .markdown-preview hr {
+    border-top-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .markdown-preview del,
+body.dark-mode .markdown-preview del {
+    color: #808080;
+}
+
+/* Placeholder for empty preview */
+html[data-theme='dark'] .markdown-preview-placeholder,
+body.dark-mode .markdown-preview-placeholder {
+    color: #666;
+}
+
+/* Interactive markdown checkbox */
+html[data-theme='dark'] .markdown-preview .markdown-task-checkbox,
+body.dark-mode .markdown-preview .markdown-task-checkbox {
+    accent-color: var(--dm-accent);
+}
+
+/* Click-to-navigate hover in split mode */
+html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview [data-line]:not(.markdown-task-checkbox):not(summary):not(details):hover,
+body.dark-mode .noteentry.markdown-split-mode .markdown-preview [data-line]:not(.markdown-task-checkbox):not(summary):not(details):hover {
+    background-color: rgba(74, 158, 255, 0.1);
+}
+
+/* Checked task item text */
+html[data-theme='dark'] .markdown-preview li.task-list-item input[type="checkbox"]:checked+span,
+body.dark-mode .markdown-preview li.task-list-item input[type="checkbox"]:checked+span {
+    color: #666;
+}
+
+/* ============================================
+   Markdown Toolbar Icons
+   ============================================ */
+
+/* Keep active toolbar icons with their original colors */
+html[data-theme='dark'] .toolbar-btn.save-modified .fa-save,
+body.dark-mode .toolbar-btn.save-modified .fa-save {
+    filter: none !important;
+}
+
+html[data-theme='dark'] .toolbar-btn.is-favorite i,
+html[data-theme='dark'] .toolbar-btn.is-shared i,
+html[data-theme='dark'] .toolbar-btn.has-attachments i,
+body.dark-mode .toolbar-btn.is-favorite i,
+body.dark-mode .toolbar-btn.is-shared i,
+body.dark-mode .toolbar-btn.has-attachments i {
+    color: #007DB8 !important;
+    filter: none !important;
+}
+
+/* Markdown view mode toggle button */
+html[data-theme='dark'] .toolbar-btn.markdown-view-mode-btn i,
+html[data-theme='dark'] .toolbar-btn.markdown-view-mode-btn [class*="fa-"],
+body.dark-mode .toolbar-btn.markdown-view-mode-btn i,
+body.dark-mode .toolbar-btn.markdown-view-mode-btn [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+}
+
+html[data-theme='dark'] .toolbar-btn.markdown-view-mode-btn:hover i,
+html[data-theme='dark'] .toolbar-btn.markdown-view-mode-btn:hover [class*="fa-"],
+body.dark-mode .toolbar-btn.markdown-view-mode-btn:hover i,
+body.dark-mode .toolbar-btn.markdown-view-mode-btn:hover [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+    transform: scale(1.18);
+}
+
+/* Markdown toggle icons (legacy support) */
+html[data-theme='dark'] .markdown-edit-btn .fa-markdown,
+html[data-theme='dark'] .markdown-preview-btn .fa-eye,
+html[data-theme='dark'] .markdown-view-mode-btn i,
+html[data-theme='dark'] .markdown-split-btn.active i,
+html[data-theme='dark'] .markdown-split-btn.active [class*="fa-"],
+body.dark-mode .markdown-edit-btn .fa-markdown,
+body.dark-mode .markdown-preview-btn .fa-eye,
+body.dark-mode .markdown-view-mode-btn i,
+body.dark-mode .markdown-split-btn.active i,
+body.dark-mode .markdown-split-btn.active [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+}
+
+html[data-theme='dark'] .markdown-edit-btn:hover .fa-markdown,
+html[data-theme='dark'] .markdown-preview-btn:hover .fa-eye,
+html[data-theme='dark'] .markdown-view-mode-btn:hover i,
+html[data-theme='dark'] .markdown-split-btn:hover i,
+body.dark-mode .markdown-edit-btn:hover .fa-markdown,
+body.dark-mode .markdown-preview-btn:hover .fa-eye,
+body.dark-mode .markdown-view-mode-btn:hover i,
+body.dark-mode .markdown-split-btn:hover i {
+    color: #007DB8 !important;
+    filter: none !important;
+    transform: scale(1.18);
+}
+
+/* Markdown help button */
+html[data-theme='dark'] .toolbar-btn.markdown-help-btn i,
+html[data-theme='dark'] .toolbar-btn.markdown-help-btn [class*="fa-"],
+body.dark-mode .toolbar-btn.markdown-help-btn i,
+body.dark-mode .toolbar-btn.markdown-help-btn [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+}
+
+html[data-theme='dark'] .toolbar-btn.markdown-help-btn:hover i,
+html[data-theme='dark'] .toolbar-btn.markdown-help-btn:hover [class*="fa-"],
+body.dark-mode .toolbar-btn.markdown-help-btn:hover i,
+body.dark-mode .toolbar-btn.markdown-help-btn:hover [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+    transform: scale(1.18);
+}
+
+/* Markdown split view button when active */
+html[data-theme='dark'] .toolbar-btn.markdown-split-btn.active i,
+html[data-theme='dark'] .toolbar-btn.markdown-split-btn.active [class*="fa-"],
+body.dark-mode .toolbar-btn.markdown-split-btn.active i,
+body.dark-mode .toolbar-btn.markdown-split-btn.active [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+}
+
+html[data-theme='dark'] .toolbar-btn.markdown-split-btn:hover i,
+html[data-theme='dark'] .toolbar-btn.markdown-split-btn:hover [class*="fa-"],
+body.dark-mode .toolbar-btn.markdown-split-btn:hover i,
+body.dark-mode .toolbar-btn.markdown-split-btn:hover [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+    transform: scale(1.18);
+}
+
+/* Slash through icon when active (in split mode) */
+html[data-theme='dark'] .toolbar-btn.markdown-split-btn.active::after,
+body.dark-mode .toolbar-btn.markdown-split-btn.active::after {
+    background-color: #007DB8;
+}

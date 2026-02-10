@@ -1,0 +1,27 @@
+/* ============================================
+   Dark Mode - CSS Custom Properties & Base
+   ============================================ */
+
+:root[data-theme='dark'],
+body.dark-mode {
+    --dm-text: #e0e0e0;
+    --dm-text-muted: #a0a0a0;
+    --dm-bg: #252526;
+    --dm-surface: #333333;
+    --dm-border: #404040;
+    --dm-border-light: #555555;
+    --dm-accent: #4a9eff;
+}
+
+/* Apply dark background as early as possible */
+html[data-theme='dark'],
+body.dark-mode {
+    background-color: var(--dm-bg);
+    color: var(--dm-text);
+}
+
+/* Prevent transition flash on initial load */
+html[data-theme='dark'] *,
+body.dark-mode * {
+    transition: background-color 0.0s, color 0.0s, border-color 0.0s !important;
+}

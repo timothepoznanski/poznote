@@ -433,7 +433,16 @@ if (!empty($sharedTheme) && in_array($sharedTheme, ['dark', 'light'])) {
     <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/solid.min.css">
     <link rel="stylesheet" href="css/light.min.css">
-    <link rel="stylesheet" href="css/dark-mode.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode.css') ? filemtime(__DIR__ . '/css/dark-mode.css') : '1'; ?>">
+    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/variables.css') ? filemtime(__DIR__ . '/css/dark-mode/variables.css') : '1'; ?>">
+    <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/layout.css') ? filemtime(__DIR__ . '/css/dark-mode/layout.css') : '1'; ?>">
+    <link rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/menus.css') ? filemtime(__DIR__ . '/css/dark-mode/menus.css') : '1'; ?>">
+    <link rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/editor.css') ? filemtime(__DIR__ . '/css/dark-mode/editor.css') : '1'; ?>">
+    <link rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/modals.css') ? filemtime(__DIR__ . '/css/dark-mode/modals.css') : '1'; ?>">
+    <link rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/components.css') ? filemtime(__DIR__ . '/css/dark-mode/components.css') : '1'; ?>">
+    <link rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/pages.css') ? filemtime(__DIR__ . '/css/dark-mode/pages.css') : '1'; ?>">
+    <link rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/markdown.css') ? filemtime(__DIR__ . '/css/dark-mode/markdown.css') : '1'; ?>">
+    <link rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/kanban.css') ? filemtime(__DIR__ . '/css/dark-mode/kanban.css') : '1'; ?>">
+    <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/icons.css') ? filemtime(__DIR__ . '/css/dark-mode/icons.css') : '1'; ?>">
     <link rel="stylesheet" href="css/public_note.css?v=<?php echo filemtime(__DIR__ . '/css/public_note.css'); ?>">
     <link rel="stylesheet" href="css/modal-alerts.css">
     <link rel="stylesheet" href="css/tasks.css">

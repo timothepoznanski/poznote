@@ -1,0 +1,51 @@
+/**
+ * Search Highlights
+ *
+ * Text search highlighting, current match pulse animation,
+ * and input highlight overlay.
+ */
+
+/* search-only hiding to avoid interfering with general hidden class */
+.search-hidden {
+    display: none !important;
+}
+
+/* Search highlight styles */
+.search-highlight {
+    background-color: #ffff00 !important;
+    color: #000 !important;
+    font-weight: normal !important;
+    font-family: inherit !important;
+    font-style: normal !important;
+    text-decoration: none !important;
+    border-radius: 2px;
+    padding: 1px 2px;
+    box-shadow: 0 1px 3px rgba(255, 255, 0, 0.3);
+    display: inline !important;
+    line-height: inherit !important;
+}
+
+.search-highlight.current {
+    background-color: #ff6b35 !important;
+    color: white !important;
+    font-weight: normal !important;
+    animation: highlightPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes highlightPulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* Input highlight overlay for precise word highlighting in input elements */
+.input-highlight-overlay {
+    background-color: #ffff00 !important;
+    opacity: 0.7;
+    border-radius: 2px;
+    box-shadow: 0 1px 3px rgba(255, 255, 0, 0.3);
+}

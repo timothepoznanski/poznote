@@ -1,0 +1,132 @@
+/**
+ * Restore & Import - Responsive
+ *
+ * Responsive design for card layout on tablet and mobile.
+ */
+
+@media (max-width: 768px) {
+    .backup-container {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    .navigation-buttons {
+        flex-direction: row;
+        gap: 12px;
+    }
+
+    .navigation-buttons .btn {
+        width: auto;
+        flex: 0 1 auto;
+    }
+
+    .card-header {
+        padding: 16px 20px;
+    }
+
+    .card-header h3 {
+        font-size: 16px;
+    }
+
+    .card-header p {
+        font-size: 13px;
+        margin-left: 28px;
+    }
+
+    .card-content {
+        padding: 20px;
+    }
+
+    .card-content.open {
+        padding: 20px;
+    }
+
+    .sub-card-header {
+        padding: 14px 16px;
+    }
+
+    .sub-card h4 {
+        font-size: 15px;
+    }
+
+    .sub-card-content.open {
+        padding: 0 16px 16px 16px;
+    }
+
+    .card-content:not(.open),
+    .sub-card-content:not(.open) {
+        display: none;
+    }
+
+    .card-content.open,
+    .sub-card-content.open {
+        display: block;
+    }
+}
+
+@media (max-width: 480px) {
+    .backup-container {
+        margin: 5px;
+        padding: 10px;
+    }
+
+    .navigation-buttons {
+        flex-direction: row;
+        gap: 12px;
+    }
+
+    .navigation-buttons .btn {
+        width: auto;
+        flex: 0 1 auto;
+        display: inline-flex;
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .card-header {
+        padding: 12px 16px;
+    }
+
+    .card-header h3 {
+        font-size: 15px;
+        gap: 8px;
+    }
+
+    .card-header h3 i.card-icon {
+        font-size: 18px;
+    }
+
+    .card-header h3 i.chevron {
+        font-size: 14px;
+    }
+
+    .card-header p {
+        font-size: 12px;
+        margin-left: 26px;
+    }
+
+    .card-content.open {
+        padding: 16px;
+    }
+
+    .sub-card-header {
+        padding: 12px;
+    }
+
+    .sub-card h4 {
+        font-size: 14px;
+    }
+
+    .sub-card h4 i.sub-card-icon {
+        font-size: 14px;
+    }
+
+    .sub-card-content.open {
+        padding: 0 12px 12px 12px;
+    }
+
+    .btn:not(.navigation-buttons .btn) {
+        width: 100%;
+        margin-right: 0;
+    }
+}

@@ -21,9 +21,24 @@ $currentLang = getUserLanguage();
 	<script src="js/theme-init.js"></script>
 	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
 	<link type="text/css" rel="stylesheet" href="css/light.min.css"/>
-	<link type="text/css" rel="stylesheet" href="css/modals.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/base.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/attachments.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/link-modal.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/share-modal.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/alerts-utilities.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/responsive.css"/>
 	<link type="text/css" rel="stylesheet" href="css/favorites.css"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/menus.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/editor.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/modals.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/components.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/pages.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css"/>
 	<script src="js/theme-manager.js"></script>
 </head>
 <body class="favorites-page"

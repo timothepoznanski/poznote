@@ -50,7 +50,16 @@ if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
             <link rel="stylesheet" href="css/fontawesome.min.css">
             <link rel="stylesheet" href="css/light.min.css">
             <link rel="stylesheet" href="css/settings-password.css">
-            <link rel="stylesheet" href="css/dark-mode.css">
+            <link rel="stylesheet" href="css/dark-mode/variables.css">
+            <link rel="stylesheet" href="css/dark-mode/layout.css">
+            <link rel="stylesheet" href="css/dark-mode/menus.css">
+            <link rel="stylesheet" href="css/dark-mode/editor.css">
+            <link rel="stylesheet" href="css/dark-mode/modals.css">
+            <link rel="stylesheet" href="css/dark-mode/components.css">
+            <link rel="stylesheet" href="css/dark-mode/pages.css">
+            <link rel="stylesheet" href="css/dark-mode/markdown.css">
+            <link rel="stylesheet" href="css/dark-mode/kanban.css">
+            <link rel="stylesheet" href="css/dark-mode/icons.css">
             <link rel="icon" href="favicon.ico" type="image/x-icon">
         </head>
         <body>
@@ -148,11 +157,33 @@ if ($isAdmin) {
     <link rel="stylesheet" href="css/all.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/light.min.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/home.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/base.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/search.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/alerts.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/cards.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/buttons.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/fontawesome.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/dark-mode.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/responsive.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/settings.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/modals.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals/base.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals/specific-modals.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals/attachments.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals/link-modal.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals/share-modal.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals/alerts-utilities.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals/responsive.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/background-image.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/dark-mode.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $cache_v; ?>">
 </head>
 <body class="home-page"
       data-txt-enabled="<?php echo t_h('common.enabled'); ?>"

@@ -1,0 +1,116 @@
+/* ============================================
+   Dark Mode - Kanban View
+   ============================================ */
+
+html[data-theme='dark'] .kanban-page,
+body.dark-mode .kanban-page {
+    background: transparent;
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .kanban-header,
+body.dark-mode .kanban-header {
+    background: var(--dm-bg);
+    border-bottom-color: var(--dm-border);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme='dark'] .kanban-title,
+body.dark-mode .kanban-title {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .kanban-back-btn,
+body.dark-mode .kanban-back-btn {
+    background: var(--dm-surface);
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .kanban-back-btn:hover,
+body.dark-mode .kanban-back-btn:hover {
+    background: var(--dm-border);
+    color: #ffffff;
+}
+
+html[data-theme='dark'] .kanban-column,
+body.dark-mode .kanban-column {
+    background: var(--dm-bg);
+    border-color: var(--dm-border);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme='dark'] .kanban-column-header,
+body.dark-mode .kanban-column-header {
+    border-bottom-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .kanban-column-title,
+body.dark-mode .kanban-column-title {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .kanban-column-count,
+body.dark-mode .kanban-column-count {
+    background: var(--dm-surface);
+    color: var(--dm-text-muted);
+}
+
+/* Kanban Cards */
+html[data-theme='dark'] .kanban-card,
+body.dark-mode .kanban-card {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme='dark'] .kanban-card:hover,
+body.dark-mode .kanban-card:hover {
+    border-color: #666666;
+    background: var(--dm-surface);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme='dark'] .kanban-card-title,
+body.dark-mode .kanban-card-title {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .kanban-card-snippet,
+body.dark-mode .kanban-card-snippet {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .kanban-card-meta,
+body.dark-mode .kanban-card-meta {
+    color: #808080;
+}
+
+/* Tags */
+html[data-theme='dark'] .kanban-tag,
+body.dark-mode .kanban-tag {
+    background: var(--dm-border);
+    border-color: var(--dm-border-light);
+    color: var(--dm-text);
+}
+
+/* Scrollbars */
+html[data-theme='dark'] .kanban-board::-webkit-scrollbar-track,
+body.dark-mode .kanban-board::-webkit-scrollbar-track {
+    background: var(--dm-bg);
+}
+
+html[data-theme='dark'] .kanban-board::-webkit-scrollbar-thumb,
+body.dark-mode .kanban-board::-webkit-scrollbar-thumb {
+    background: var(--dm-border);
+}
+
+html[data-theme='dark'] .kanban-board::-webkit-scrollbar-thumb:hover,
+body.dark-mode .kanban-board::-webkit-scrollbar-thumb:hover {
+    background: var(--dm-border-light);
+}
+
+html[data-theme='dark'] .kanban-column-content.drag-over,
+body.dark-mode .kanban-column-content.drag-over {
+    background: var(--dm-surface);
+    border-color: #6366f1;
+}

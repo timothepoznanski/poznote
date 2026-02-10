@@ -165,7 +165,16 @@ $noteBaseUrl = $protocol . '://' . $host;
     <link rel="stylesheet" href="/css/fontawesome.min.css">
     <link rel="stylesheet" href="/css/solid.min.css">
     <link rel="stylesheet" href="/css/light.min.css">
-    <link rel="stylesheet" href="/css/dark-mode.css">
+    <link rel="stylesheet" href="/css/dark-mode/variables.css">
+    <link rel="stylesheet" href="/css/dark-mode/layout.css">
+    <link rel="stylesheet" href="/css/dark-mode/menus.css">
+    <link rel="stylesheet" href="/css/dark-mode/editor.css">
+    <link rel="stylesheet" href="/css/dark-mode/modals.css">
+    <link rel="stylesheet" href="/css/dark-mode/components.css">
+    <link rel="stylesheet" href="/css/dark-mode/pages.css">
+    <link rel="stylesheet" href="/css/dark-mode/markdown.css">
+    <link rel="stylesheet" href="/css/dark-mode/kanban.css">
+    <link rel="stylesheet" href="/css/dark-mode/icons.css">
     <link rel="stylesheet" href="/css/public_folder.css">
 </head>
 <body class="public-folder-body" data-txt-no-results="No results.">

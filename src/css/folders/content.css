@@ -1,0 +1,96 @@
+/**
+ * Folder Content & Notes
+ *
+ * Folder content wrapper, notes within folders, drag-and-drop behavior,
+ * close button, and folder list display.
+ */
+
+.folder-content {
+    margin-left: 15px;
+    margin-bottom: 5px;
+}
+
+.note-in-folder {
+    margin-bottom: 0px !important;
+    position: relative;
+    display: flex !important;
+    align-items: center !important;
+    padding-left: 10px !important;
+    transition: padding-left 0.2s;
+}
+
+.note-in-folder a.links_arbo_left {
+    display: block !important;
+    position: relative !important;
+}
+
+.note-in-folder a.links_arbo_left .note-title {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: block !important;
+    margin-left: 0px !important;
+    transition: margin-left 0.2s ease;
+}
+
+/* On hover, keep title on the left */
+.note-in-folder:hover a.links_arbo_left .note-title {
+    margin-left: 0px !important;
+}
+
+/* Drag and drop styles for notes */
+.note-in-folder a.links_arbo_left[draggable="true"] {
+    cursor: grab;
+}
+
+.note-in-folder a.links_arbo_left[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 1;
+    margin-top: -5px;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: #333;
+    text-decoration: none;
+}
+
+.folders-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background-color: #fafafa;
+    margin-top: 8px;
+}
+
+.folder-item {
+    padding: 8px 12px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 13px;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+
+.folder-item:last-child {
+    border-bottom: none;
+}
+
+.folder-item:hover {
+    background-color: #f0f0f0;
+}
+
+.folder-item i {
+    margin-right: 8px;
+    color: #666;
+    width: 12px;
+}

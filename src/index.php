@@ -150,10 +150,26 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <link type="text/css" rel="stylesheet" href="css/toolbar.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/menus.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/searchbars.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/notes.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/notes/subline.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/notes/sidebar.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/notes/tags.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/notes/attachments-row.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/notes/noteentry.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/notes/editor.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/notes/toolbar.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/notes/checkboxes.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/code-blocks.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/checklists.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/folders.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folders/headers-toggles.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folders/actions-menu.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folders/content.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folders/selection.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folders/search.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folders/animations.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folders/toolbar-icons.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folders/fontawesome.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folders/table-picker.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folders/system-folders.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/emoji-picker.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/table-picker.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/slash-commands.css?v=<?php echo $v; ?>"/>
@@ -162,7 +178,13 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <link type="text/css" rel="stylesheet" href="css/misc.css?v=<?php echo $v; ?>"/>
     <link rel="stylesheet" href="css/index-mobile.css?v=<?php echo $v; ?>" media="(max-width: 800px)">
     <link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/modals.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/base.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/attachments.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/link-modal.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/share-modal.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/alerts-utilities.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/responsive.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/tasks.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/markdown.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/excalidraw.css?v=<?php echo $v; ?>"/>
@@ -172,7 +194,16 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <link type="text/css" rel="stylesheet" href="css/folder-icon-modal.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/kanban.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/background-image.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="js/katex/katex.min.css?v=<?php echo $v; ?>"/>
     <style>:root { --note-font-size: <?php echo htmlspecialchars($note_font_size, ENT_QUOTES); ?>px; --sidebar-font-size: <?php echo htmlspecialchars($sidebar_font_size, ENT_QUOTES); ?>px; --note-max-width: <?php echo htmlspecialchars($note_max_width, ENT_QUOTES); ?>px; }</style>
     <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>

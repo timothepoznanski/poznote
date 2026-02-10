@@ -1,0 +1,104 @@
+/**
+ * Restore & Import - Utilities
+ *
+ * Utility classes, alert styles, text colors, spacing helpers,
+ * and maintenance section.
+ */
+
+/* Hidden by default (for accordion content, spinners, etc.) */
+.initially-hidden {
+    display: none;
+}
+
+/* Progress bar initial state */
+.progress-fill-initial {
+    width: 0%;
+}
+
+/* Link styles */
+.link-primary {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.link-primary:hover {
+    text-decoration: underline;
+}
+
+/* Alert styles */
+.alert {
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    border-left: 4px solid;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #28a745;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #dc3545;
+    color: #721c24;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #17a2b8;
+    color: #0c5460;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffc107;
+    color: #856404;
+}
+
+/* Section bottom spacer */
+.section-bottom-spacer {
+    padding-bottom: 50px;
+}
+
+/* Form with margin top */
+.form-with-margin-top {
+    margin-top: 10px;
+}
+
+/* Text colors */
+.text-danger {
+    color: #dc3545;
+}
+
+.text-warning-bold {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* Disaster Recovery / Maintenance Section */
+.maintenance-subtitle {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.maintenance-description {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.5;
+}
+
+.btn-maintenance {
+    margin-top: 15px;
+    padding: 10px 24px;
+}
+
+html[data-theme='dark'] .maintenance-subtitle {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .maintenance-description {
+    color: #a0a0a0;
+}

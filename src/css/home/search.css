@@ -1,0 +1,67 @@
+/**
+ * Home - Search Bar
+ *
+ * Styles for the home page search input with icon,
+ * focus states, and dark mode variants.
+ */
+
+/* Search Bar */
+.home-search-container {
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: center;
+}
+
+.home-search-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.home-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    font-size: 14px;
+}
+
+.home-search-input {
+    width: 100%;
+    padding: 10px 12px 10px 36px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    font-size: 15px;
+    color: #1f2937;
+    outline: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.home-search-input:focus {
+    border-color: #007DB8;
+    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
+}
+
+/* Dark mode - search */
+html[data-theme='dark'] .home-search-input,
+body.dark-mode .home-search-input {
+    background: #333333;
+    border-color: #374151;
+    color: #e5e7eb;
+}
+
+html[data-theme='dark'] .home-search-input:focus,
+body.dark-mode .home-search-input:focus {
+    border-color: #007DB8;
+    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.2);
+}
+
+html[data-theme='dark'] .home-info-line,
+body.dark-mode .home-info-line {
+    color: #e5e7eb;
+}

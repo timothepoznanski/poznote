@@ -1,0 +1,139 @@
+/* ============================================
+   Modal System - Attachments Modal
+   Upload, display, and manage file attachments
+   ============================================ */
+
+.attachment-modal .modal-content {
+    margin: 5% auto !important;
+    display: flex;
+    flex-direction: column;
+}
+
+#attachmentModal .modal-content {
+    margin: 5% auto !important;
+}
+
+/* Upload Section */
+.attachment-upload {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 2px dashed #ddd;
+    border-radius: 5px;
+    background: #f9f9f9;
+}
+
+.file-input-container {
+    margin-bottom: 5px;
+}
+
+.upload-button-container {
+    text-align: center;
+    display: none;
+}
+
+.upload-button-container.show {
+    display: block;
+}
+
+.attachment-help {
+    margin-top: 10px;
+    padding: 8px;
+    background: #e7f3ff;
+    border: 1px solid #bee5eb;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+
+.attachment-help small {
+    color: #0c5460;
+}
+
+.attachment-upload input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+
+.attachment-upload button {
+    padding: 8px 16px;
+    background: #007DB8;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.attachment-upload button:hover {
+    background: #005a8a;
+}
+
+/* Attachments List */
+.attachments-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.attachment-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 3px;
+    margin-bottom: 5px;
+    background: #f9f9f9;
+}
+
+.attachment-info {
+    flex: 1;
+}
+
+.attachment-filename {
+    font-weight: bold;
+    color: #333;
+}
+
+.attachment-size {
+    font-size: 0.8em;
+    color: #666;
+}
+
+.attachment-info strong {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Action Buttons */
+.attachment-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.attachment-actions button {
+    padding: 4px 8px;
+    font-size: 0.8em;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.attachment-download {
+    background: #28a745;
+    color: white;
+}
+
+.attachment-download:hover {
+    background: #218838;
+}
+
+.attachment-delete {
+    background: #dc3545;
+    color: white;
+}
+
+.attachment-delete:hover {
+    background: #c82333;
+}

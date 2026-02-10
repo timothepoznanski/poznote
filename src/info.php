@@ -118,7 +118,16 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
     <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/info.css">
     <link rel="stylesheet" href="css/modal-alerts.css">
-    <link rel="stylesheet" href="css/dark-mode.css">
+    <link rel="stylesheet" href="css/dark-mode/variables.css">
+    <link rel="stylesheet" href="css/dark-mode/layout.css">
+    <link rel="stylesheet" href="css/dark-mode/menus.css">
+    <link rel="stylesheet" href="css/dark-mode/editor.css">
+    <link rel="stylesheet" href="css/dark-mode/modals.css">
+    <link rel="stylesheet" href="css/dark-mode/components.css">
+    <link rel="stylesheet" href="css/dark-mode/pages.css">
+    <link rel="stylesheet" href="css/dark-mode/markdown.css">
+    <link rel="stylesheet" href="css/dark-mode/kanban.css">
+    <link rel="stylesheet" href="css/dark-mode/icons.css">
     <script src="js/theme-manager.js"></script>
 </head>
 <body data-note-id="<?php echo $note_id; ?>" data-workspace="<?php echo htmlspecialchars($workspace ?? '', ENT_QUOTES, 'UTF-8'); ?>">

@@ -1,0 +1,970 @@
+/* ============================================
+   Modal System - Specific Modal Styles
+   Individual modal customizations: Input, Font Size,
+   Note Width, Move Folder Files, Move Note/Folder,
+   Confirm, Delete, Rename, Update, Note Info, etc.
+   ============================================ */
+
+/* ============================================
+   Input Modal (#inputModal)
+   ============================================ */
+
+#inputModal .modal-content {
+    max-width: 420px;
+    padding: 18px;
+}
+
+#inputModal .modal-body label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+#inputModal .modal-body input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+#inputModal .modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+#inputModal .modal-buttons .btn-cancel {
+    flex: 0 0 auto;
+}
+
+#inputModal .modal-buttons .btn-primary {
+    flex: 0 0 auto;
+}
+
+/* Link modal - wider for longer button texts */
+#linkModal .modal-content {
+    max-width: 520px;
+}
+
+/* Export modal: breathing room above buttons */
+#exportModal .modal-buttons {
+    margin-top: 12px;
+}
+
+/* Delete linked note modal: align buttons left */
+#deleteLinkedNoteModal .modal-buttons {
+    justify-content: flex-start;
+}
+
+/* ============================================
+   Font Size Modal (#fontSizeModal)
+   ============================================ */
+
+#fontSizeModal .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.font-size-controls {
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.font-size-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.font-size-section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 18px;
+    color: #333;
+}
+
+.font-size-controls label {
+    margin: 0;
+    font-weight: normal;
+    font-size: 15px;
+}
+
+.font-size-controls input {
+    width: 70px;
+    padding: 6px 10px;
+    margin: 0;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.font-size-preview {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-top: 10px;
+    background-color: white;
+    border-radius: 4px;
+}
+
+.font-size-preview p {
+    margin: 0;
+    padding: 0;
+    line-height: 1.5;
+}
+
+#fontSizeModal .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+#fontSizeModal button {
+    padding: 8px 15px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-left: 10px;
+}
+
+#fontSizeModal #saveFontSizeBtn {
+    background-color: #007DB8 !important;
+    color: white !important;
+    border: none !important;
+    padding: 8px 14px !important;
+    border-radius: 4px !important;
+}
+
+#fontSizeModal #saveFontSizeBtn:hover {
+    background-color: #005a8a !important;
+}
+
+#fontSizeModal #cancelFontSizeBtn {
+    background-color: #f1f1f1;
+    color: #333;
+}
+
+/* ============================================
+   Note Width Modal (#noteWidthModal)
+   ============================================ */
+
+.note-width-input-container {
+    display: flex;
+    justify-content: center;
+    padding: 0 0 30px 0;
+}
+
+.note-width-input-container input {
+    width: 120px !important;
+    text-align: center;
+    font-size: 1.2rem !important;
+    padding: 10px !important;
+    margin-bottom: 0 !important;
+}
+
+.btn-full-width-footer {
+    background-color: #f3f4f6 !important;
+    color: #4b5563 !important;
+    border: 1px solid #d1d5db !important;
+}
+
+.btn-full-width-footer:hover {
+    background-color: #e5e7eb !important;
+    color: #111827 !important;
+}
+
+.btn-full-width-footer.active {
+    background-color: #007DB8 !important;
+    color: white !important;
+    border-color: #007DB8 !important;
+}
+
+#noteWidthModal .modal-buttons {
+    flex-wrap: nowrap !important;
+}
+
+@media (max-width: 480px) {
+    #noteWidthModal .modal-buttons {
+        flex-direction: row !important;
+        gap: 8px !important;
+    }
+
+    #noteWidthModal .modal-buttons button {
+        width: auto !important;
+        flex: 1 !important;
+        padding: 8px 5px !important;
+        font-size: 0.85rem !important;
+    }
+}
+
+/* ============================================
+   Move Folder Files Modal (#moveFolderFilesModal)
+   ============================================ */
+
+#moveFolderFilesModal .modal-content {
+    max-width: 420px;
+    padding: 18px;
+}
+
+#moveFolderFilesModal select#moveFolderFilesTargetSelect {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+    margin: 10px 0 12px 0;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+#moveFolderFilesModal .modal-info-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6b7280;
+    padding: 8px 0 0 0;
+    margin-top: 8px;
+}
+
+#moveFolderFilesModal .modal-info-message i {
+    color: #6b7280;
+}
+
+#moveFolderFilesModal .modal-buttons {
+    margin-top: 12px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+#moveFolderFilesModal .modal-buttons .btn-cancel {
+    min-width: 110px;
+}
+
+#moveFolderFilesModal .modal-error-message {
+    display: none;
+    margin-top: 10px;
+}
+
+/* ============================================
+   Move Note to Folder Modal (#moveNoteFolderModal)
+   ============================================ */
+
+#moveNoteFolderModal .form-group {
+    margin-bottom: 12px;
+}
+
+#moveNoteFolderModal .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Move Task Modal */
+#moveTaskModal .modal-buttons {
+    margin-top: 12px;
+}
+
+/* ============================================
+   Note Info Modal (#noteInfoModal)
+   ============================================ */
+
+#noteInfoModal .modal-content {
+    max-width: 420px;
+    text-align: left;
+}
+
+#noteInfoModal .modal-content h3 {
+    color: #007DB8;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #007DB8;
+    padding-bottom: 10px;
+}
+
+#noteInfoModal .modal-content h3 i {
+    margin-right: 8px;
+}
+
+#noteInfoModal .info-row {
+    display: flex;
+    align-items: center;
+    margin: 15px 0;
+    padding: 8px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    border-left: 3px solid #007DB8;
+}
+
+#noteInfoModal .info-row strong {
+    min-width: 180px;
+    color: #333;
+    font-weight: 600;
+}
+
+#noteInfoModal .info-row strong i {
+    margin-right: 6px;
+    color: #007DB8;
+    width: 16px;
+    text-align: center;
+}
+
+#noteInfoModal .info-value {
+    color: #555;
+    font-family: monospace;
+    background-color: #fff;
+    padding: 4px 8px;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+    flex: 1;
+    margin-left: 10px;
+}
+
+/* ============================================
+   Update Modal (#updateModal)
+   ============================================ */
+
+#updateModal .modal-content {
+    text-align: center;
+    max-width: 520px;
+    padding: 30px;
+}
+
+#updateModal .modal-content h3 {
+    color: #007DB8;
+    margin-bottom: 15px;
+    font-size: 24px;
+}
+
+#updateModal .modal-content p {
+    margin: 15px 0;
+    line-height: 1.6;
+    color: #555;
+}
+
+#updateModal .version-info {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin: 20px 0;
+}
+
+#updateModal .version-info p {
+    margin: 10px 0;
+    font-size: 15px;
+    color: #333;
+}
+
+#updateModal .version-info strong {
+    color: #007DB8;
+    font-weight: 600;
+}
+
+#updateModal .backup-warning {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin: 15px 0;
+}
+
+#updateModal .backup-warning p {
+    margin: 5px 0;
+    color: #333;
+}
+
+#updateModal .backup-warning strong {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+#updateModal .update-buttons-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(224, 224, 224, 0.9);
+}
+
+#updateModal .update-instructions-buttons {
+    display: none;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: stretch;
+}
+
+@media (max-width: 500px) {
+    #updateModal .update-instructions-buttons {
+        flex-direction: column;
+    }
+
+    #updateModal .btn-update {
+        width: 100%;
+        min-width: auto;
+    }
+}
+
+#updateModal .modal-buttons {
+    justify-content: center;
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+}
+
+#updateModal .btn-cancel {
+    background-color: #6c757d !important;
+    color: white !important;
+    border: none !important;
+    min-width: 120px;
+    padding: 10px 24px !important;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#updateModal .btn-cancel:hover {
+    background-color: #5a6268 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3);
+}
+
+#updateModal .btn-cancel:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#updateModal .btn-update {
+    background-color: #007DB8 !important;
+    color: white !important;
+    border: none !important;
+    padding: 12px 20px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    min-width: 200px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#updateModal .btn-update:hover {
+    background-color: #0056b3 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 125, 184, 0.4);
+}
+
+#updateModal .btn-update:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Update Check Modal */
+#updateCheckModal .modal-content {
+    text-align: center;
+    max-width: 400px;
+}
+
+#updateCheckModal .modal-content h3 {
+    color: #007DB8;
+    margin-bottom: 20px;
+}
+
+#updateCheckModal .modal-content p {
+    margin: 15px 0;
+    line-height: 1.5;
+    color: #555;
+}
+
+/* ============================================
+   Confirm Modal (#confirmModal)
+   ============================================ */
+
+#confirmModal .modal-content {
+    text-align: center;
+    max-width: 520px;
+}
+
+#confirmModal .modal-content h3 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+#confirmModal .modal-content p {
+    line-height: 1.5;
+    color: #555;
+    font-size: 16px;
+}
+
+#confirmModal .btn-secondary {
+    background-color: #007DB8 !important;
+    color: white !important;
+    border: none !important;
+}
+
+#confirmModal .btn-secondary:hover {
+    background-color: #0056b3 !important;
+}
+
+#confirmModal .btn-danger {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+#confirmModal .btn-danger:hover {
+    background-color: #c43b3b !important;
+}
+
+#confirmModal #confirmButton.btn-danger {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+#confirmModal #confirmButton.btn-danger:hover {
+    background-color: #c43b3b !important;
+}
+
+#confirmModal #confirmButton.btn-primary {
+    background-color: #007DB8 !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+#confirmModal #confirmButton.btn-primary:hover {
+    background-color: #0056b3 !important;
+}
+
+#confirmModal .modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    margin-top: 6px;
+    padding-top: 6px;
+}
+
+#confirmModal .modal-buttons button {
+    height: auto !important;
+    min-height: 44px !important;
+    padding: 12px 28px !important;
+    font-size: 15px !important;
+    line-height: 1.1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    white-space: nowrap !important;
+}
+
+#confirmModal .modal-buttons .btn-danger,
+#confirmModal .modal-buttons .btn-secondary {
+    min-width: 140px !important;
+    flex: 0 1 auto !important;
+    max-width: 200px !important;
+}
+
+#confirmModal .modal-buttons .btn-cancel {
+    min-width: 90px !important;
+    flex: 0 0 110px !important;
+}
+
+@media (max-width: 420px) {
+    #confirmModal .modal-buttons {
+        gap: 8px;
+    }
+
+    #confirmModal .modal-buttons .btn-danger,
+    #confirmModal .modal-buttons .btn-secondary,
+    #confirmModal .modal-buttons .btn-cancel {
+        min-width: 0 !important;
+        flex: 1 1 auto !important;
+    }
+}
+
+/* ============================================
+   Delete Folder Modal (#deleteFolderModal)
+   ============================================ */
+
+#deleteFolderModal .btn-cancel {
+    background-color: #6c757d !important;
+    color: white !important;
+    border: none !important;
+}
+
+#deleteFolderModal .btn-cancel:hover {
+    background-color: #5a6268 !important;
+}
+
+#deleteFolderModal .btn-danger {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+#deleteFolderModal .btn-danger:hover {
+    background-color: #c43b3b !important;
+}
+
+/* ============================================
+   Delete Confirm Modal (#deleteConfirmModal)
+   ============================================ */
+
+#deleteConfirmModal .modal-content {
+    max-width: 420px;
+    width: 90%;
+    margin: 0 auto;
+}
+
+#deleteConfirmModal .btn-cancel {
+    background-color: #6c757d !important;
+    color: white !important;
+    border: none !important;
+}
+
+#deleteConfirmModal .btn-cancel:hover {
+    background-color: #5a6268 !important;
+}
+
+#deleteConfirmModal .btn-danger {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+#deleteConfirmModal .btn-danger:hover {
+    background-color: #c43b3b !important;
+}
+
+/* ============================================
+   Empty Trash Modal (#emptyTrashConfirmModal)
+   ============================================ */
+
+#emptyTrashConfirmModal .modal-content {
+    max-width: 420px;
+    width: 90%;
+    margin: 0 auto;
+}
+
+#emptyTrashConfirmModal .btn-cancel {
+    background-color: #6c757d !important;
+    color: white !important;
+    border: none !important;
+}
+
+#emptyTrashConfirmModal .btn-cancel:hover {
+    background-color: #5a6268 !important;
+}
+
+#emptyTrashConfirmModal .btn-danger {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+#emptyTrashConfirmModal .btn-danger:hover {
+    background-color: #c43b3b !important;
+}
+
+/* ============================================
+   Restore Confirm Modal (#restoreConfirmModal)
+   ============================================ */
+
+#restoreConfirmModal .modal-content {
+    max-width: 420px;
+    width: 90%;
+    margin: 0 auto;
+}
+
+#restoreConfirmModal .btn-cancel {
+    background-color: #6c757d !important;
+    color: white !important;
+    border: none !important;
+}
+
+#restoreConfirmModal .btn-cancel:hover {
+    background-color: #5a6268 !important;
+}
+
+#restoreConfirmModal .btn-primary {
+    background-color: #007DB8 !important;
+    color: white !important;
+    border: none !important;
+}
+
+#restoreConfirmModal .btn-primary:hover {
+    background-color: #0056b3 !important;
+}
+
+/* ============================================
+   Delete Modal (#deleteModal)
+   ============================================ */
+
+#deleteModal .modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+#deleteModal .modal-buttons button {
+    padding: 8px 14px;
+    font-size: 14px;
+    width: 150px;
+    height: 40px;
+    box-sizing: border-box;
+    border-radius: 6px;
+}
+
+#deleteModal .modal-buttons .btn-danger {
+    background: #e04b4b;
+    color: #fff;
+    border: none;
+}
+
+#deleteModal .modal-buttons .btn-cancel,
+#deleteModal .modal-buttons .btn-secondary {
+    background: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+#deleteModal .modal-content>div>button {
+    padding: 8px 14px;
+    font-size: 14px;
+    width: 150px;
+    height: 40px;
+    box-sizing: border-box;
+    border-radius: 6px;
+}
+
+#deleteModal .modal-content>div>button.btn-danger {
+    border: none;
+}
+
+#deleteModal .modal-content>div>button:disabled {
+    cursor: not-allowed;
+    opacity: 0.95;
+}
+
+/* ============================================
+   Rename Modal (#renameModal)
+   ============================================ */
+
+#renameModal.modal,
+.rename-modal {
+    display: none;
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+}
+
+#renameModal .modal-content,
+.rename-modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 6px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.rename-modal-content h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+.rename-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.rename-form input {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.rename-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+#renameModal .modal-buttons,
+#moveNotesModal .modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+#renameModal .modal-buttons button,
+#moveNotesModal .modal-buttons button {
+    padding: 8px 14px;
+    font-size: 14px;
+    width: 150px;
+    height: 40px;
+    box-sizing: border-box;
+    border-radius: 6px;
+}
+
+#renameModal .modal-buttons .btn-primary,
+#moveNotesModal .modal-buttons .btn-primary {
+    background-color: #007DB8;
+    color: white;
+    border: none;
+}
+
+#renameModal .modal-buttons .btn-secondary,
+#moveNotesModal .modal-buttons .btn-secondary,
+#renameModal .modal-buttons .btn-cancel,
+#moveNotesModal .modal-buttons .btn-cancel {
+    background: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+#renameModal .modal-content>div>button,
+#moveNotesModal .modal-content>div>button {
+    padding: 8px 14px;
+    font-size: 14px;
+    width: 150px;
+    height: 40px;
+    box-sizing: border-box;
+    border-radius: 6px;
+}
+
+#renameModal .modal-content>div>button.btn-primary,
+#moveNotesModal .modal-content>div>button.btn-primary {
+    border: none;
+}
+
+/* ============================================
+   Move Notes Modal (#moveNotesModal)
+   ============================================ */
+
+#moveNotesModal.modal {
+    display: none;
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    align-items: center;
+    justify-content: center;
+}
+
+#moveNotesModal .modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 6px;
+    width: 90%;
+    max-width: 420px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+#moveNotesModal select {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 12px;
+    background-color: #fff;
+    color: #222;
+}
+
+/* ============================================
+   Workspace Selector (used in move modals)
+   ============================================ */
+
+.workspace-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    font-size: 14px;
+    margin-bottom: 16px;
+    margin-top: 16px;
+}
+
+.workspace-select:focus {
+    outline: none;
+    border-color: #007DB8;
+    box-shadow: 0 0 0 2px rgba(0, 125, 184, 0.2);
+}
+
+/* ============================================
+   Workspace List & Delete Forms
+   ============================================ */
+
+.delete-form {
+    margin: 0;
+}
+
+.delete-form .btn {
+    margin: 0;
+}
+
+.workspace-list ul li>.ws-col .action-btn {
+    margin: 0;
+}
+
+.workspace-list .btn-danger {
+    background: #e04b4b;
+    color: #fff;
+    border: none;
+}
+
+.workspace-list .btn-danger:hover {
+    background: #c43b3b;
+}
+
+.workspace-list .btn-rename {
+    display: inline-flex;
+    background: #f0ad4e;
+    border: none;
+}
+
+/* Create modal positioning */
+#createModal.modal {
+    align-items: flex-start !important;
+    padding: 60px 16px 16px 16px !important;
+}
+
+#createModal .modal-content {
+    margin: 0 auto !important;
+}

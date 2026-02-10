@@ -1,0 +1,506 @@
+/* ============================================
+   Dark Mode - Modals
+   ============================================ */
+
+/* Modal overlay */
+html[data-theme='dark'] .modal,
+body.dark-mode .modal {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Modal content base */
+html[data-theme='dark'] .modal-content,
+body.dark-mode .modal-content {
+    background-color: var(--dm-bg);
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .modal-content h3,
+body.dark-mode .modal-content h3 {
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] #confirmModal .modal-content h3,
+body.dark-mode #confirmModal .modal-content h3 {
+    color: #d0d0d0;
+}
+
+/* Modal form controls */
+html[data-theme='dark'] .modal-content input,
+html[data-theme='dark'] .modal-content select,
+html[data-theme='dark'] .modal-content textarea,
+body.dark-mode .modal-content input,
+body.dark-mode .modal-content select,
+body.dark-mode .modal-content textarea {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+/* Modal buttons */
+html[data-theme='dark'] .modal-buttons button,
+body.dark-mode .modal-buttons button {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .modal-buttons button:hover,
+body.dark-mode .modal-buttons button:hover {
+    background-color: #333;
+}
+
+html[data-theme='dark'] .modal-buttons button:first-child,
+body.dark-mode .modal-buttons button:first-child {
+    background-color: #1e3a5f;
+    color: white;
+}
+
+html[data-theme='dark'] .modal-buttons button:first-child:hover,
+body.dark-mode .modal-buttons button:first-child:hover {
+    background-color: #2a4a7f;
+}
+
+/* ============================================
+   Move Task Modal
+   ============================================ */
+
+html[data-theme='dark'] .move-task-list,
+body.dark-mode .move-task-list {
+    border-color: var(--dm-border);
+    background-color: #1f1f1f;
+}
+
+html[data-theme='dark'] .move-task-item,
+body.dark-mode .move-task-item {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .move-task-item:hover,
+body.dark-mode .move-task-item:hover {
+    background: var(--dm-surface);
+}
+
+html[data-theme='dark'] .move-task-item.selected,
+body.dark-mode .move-task-item.selected {
+    background: #1e3a5f;
+}
+
+html[data-theme='dark'] .move-task-item small,
+body.dark-mode .move-task-item small {
+    color: #a8a8a8;
+}
+
+/* ============================================
+   Move Folder Files Modal
+   ============================================ */
+
+html[data-theme='dark'] #moveFolderFilesModal .modal-content h3,
+body.dark-mode #moveFolderFilesModal .modal-content h3 {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] #moveFolderFilesModal .modal-content p,
+body.dark-mode #moveFolderFilesModal .modal-content p {
+    color: #c8c8c8;
+}
+
+html[data-theme='dark'] #moveFolderFilesModal select#moveFolderFilesTargetSelect,
+body.dark-mode #moveFolderFilesModal select#moveFolderFilesTargetSelect {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] #moveFolderFilesModal select#moveFolderFilesTargetSelect:focus,
+body.dark-mode #moveFolderFilesModal select#moveFolderFilesTargetSelect:focus {
+    outline: none;
+    border-color: var(--dm-accent);
+    box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.25);
+}
+
+html[data-theme='dark'] #moveFolderFilesModal .modal-info-message,
+body.dark-mode #moveFolderFilesModal .modal-info-message {
+    color: #a8a8a8 !important;
+}
+
+html[data-theme='dark'] #moveFolderFilesModal .modal-info-message i,
+body.dark-mode #moveFolderFilesModal .modal-info-message i {
+    color: #9aa4b2;
+}
+
+html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-cancel,
+body.dark-mode #moveFolderFilesModal .modal-buttons .btn-cancel {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+    border: 1px solid var(--dm-border);
+}
+
+html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-cancel:hover,
+body.dark-mode #moveFolderFilesModal .modal-buttons .btn-cancel:hover {
+    background-color: #333;
+}
+
+html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-primary,
+body.dark-mode #moveFolderFilesModal .modal-buttons .btn-primary {
+    background-color: #1e3a5f;
+    color: #fff;
+    border: none;
+}
+
+html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-primary:hover,
+body.dark-mode #moveFolderFilesModal .modal-buttons .btn-primary:hover {
+    background-color: #2a4a7f;
+}
+
+html[data-theme='dark'] #moveFolderFilesModal .modal-error-message,
+body.dark-mode #moveFolderFilesModal .modal-error-message {
+    background-color: rgba(255, 77, 77, 0.08);
+    color: #ff7b7b;
+    border: 1px solid #7a2e2e;
+    border-radius: 4px;
+    padding: 8px 10px;
+}
+
+/* ============================================
+   Move Notes Modal (Workspaces)
+   ============================================ */
+
+html[data-theme='dark'] #moveNotesModal .modal-content,
+body.dark-mode #moveNotesModal .modal-content {
+    background-color: var(--dm-bg);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] #moveNotesModal .modal-content h3,
+body.dark-mode #moveNotesModal .modal-content h3 {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] #moveNotesModal .modal-content label,
+body.dark-mode #moveNotesModal .modal-content label {
+    color: #c8c8c8;
+}
+
+html[data-theme='dark'] #moveNotesModal select,
+body.dark-mode #moveNotesModal select {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] #moveNotesModal select:focus,
+body.dark-mode #moveNotesModal select:focus {
+    outline: none;
+    border-color: var(--dm-accent);
+    box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.25);
+}
+
+/* ============================================
+   Rename Modal
+   ============================================ */
+
+html[data-theme='dark'] #renameModal .modal-content,
+body.dark-mode #renameModal .modal-content {
+    background-color: var(--dm-bg);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] #renameModal .modal-content h3,
+body.dark-mode #renameModal .modal-content h3 {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] #renameModal .modal-content label,
+body.dark-mode #renameModal .modal-content label {
+    color: #c8c8c8;
+}
+
+html[data-theme='dark'] #renameModal input,
+body.dark-mode #renameModal input {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] #renameModal input:focus,
+body.dark-mode #renameModal input:focus {
+    outline: none;
+    border-color: var(--dm-accent);
+    box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.25);
+}
+
+/* ============================================
+   Delete Modal
+   ============================================ */
+
+html[data-theme='dark'] #deleteModal .modal-content,
+body.dark-mode #deleteModal .modal-content {
+    background-color: var(--dm-bg);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] #deleteModal .modal-content h3,
+body.dark-mode #deleteModal .modal-content h3 {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] #deleteModal .modal-content p,
+body.dark-mode #deleteModal .modal-content p {
+    color: #c8c8c8;
+}
+
+html[data-theme='dark'] #deleteModal input,
+body.dark-mode #deleteModal input {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] #deleteModal input:focus,
+body.dark-mode #deleteModal input:focus {
+    outline: none;
+    border-color: var(--dm-accent);
+    box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.25);
+}
+
+/* ============================================
+   Font Size & Note Width Modals
+   ============================================ */
+
+html[data-theme='dark'] #fontSizeModal .modal-header h2,
+body.dark-mode #fontSizeModal .modal-header h2 {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] #fontSizeModal .modal-body p,
+html[data-theme='dark'] #noteWidthModal .modal-body p,
+body.dark-mode #fontSizeModal .modal-body p,
+body.dark-mode #noteWidthModal .modal-body p {
+    color: #c8c8c8;
+}
+
+html[data-theme='dark'] #fontSizeModal .font-size-section,
+html[data-theme='dark'] #noteWidthModal .font-size-section,
+body.dark-mode #fontSizeModal .font-size-section,
+body.dark-mode #noteWidthModal .font-size-section {
+    background-color: #1f1f1f;
+    border-color: #3a3a3a;
+}
+
+html[data-theme='dark'] #fontSizeModal .font-size-controls label,
+html[data-theme='dark'] #noteWidthModal .font-size-controls label,
+body.dark-mode #fontSizeModal .font-size-controls label,
+body.dark-mode #noteWidthModal .font-size-controls label {
+    color: #d8d8d8;
+}
+
+html[data-theme='dark'] #fontSizeModal .font-size-controls input,
+html[data-theme='dark'] #noteWidthModal .font-size-controls input,
+body.dark-mode #fontSizeModal .font-size-controls input,
+body.dark-mode #noteWidthModal .font-size-controls input {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] #noteWidthModal .btn-full-width-footer,
+body.dark-mode #noteWidthModal .btn-full-width-footer {
+    background-color: var(--dm-surface) !important;
+    color: var(--dm-text) !important;
+    border-color: var(--dm-border) !important;
+}
+
+html[data-theme='dark'] #noteWidthModal .btn-full-width-footer:hover,
+body.dark-mode #noteWidthModal .btn-full-width-footer:hover {
+    background-color: var(--dm-surface) !important;
+    border-color: var(--dm-border-light) !important;
+}
+
+html[data-theme='dark'] #noteWidthModal .btn-full-width-footer.active,
+body.dark-mode #noteWidthModal .btn-full-width-footer.active {
+    background-color: #007DB8 !important;
+    color: white !important;
+    border-color: #007DB8 !important;
+}
+
+html[data-theme='dark'] #fontSizeModal .font-size-controls input::placeholder,
+html[data-theme='dark'] #noteWidthModal .font-size-controls input::placeholder,
+body.dark-mode #fontSizeModal .font-size-controls input::placeholder,
+body.dark-mode #noteWidthModal .font-size-controls input::placeholder {
+    color: #808080;
+}
+
+html[data-theme='dark'] #fontSizeModal .default-info,
+html[data-theme='dark'] #noteWidthModal .default-info,
+body.dark-mode #fontSizeModal .default-info,
+body.dark-mode #noteWidthModal .default-info {
+    color: #ffa6a6;
+}
+
+html[data-theme='dark'] #fontSizeModal .font-size-preview,
+body.dark-mode #fontSizeModal .font-size-preview {
+    background-color: var(--dm-surface);
+    border-color: #3a3a3a;
+}
+
+html[data-theme='dark'] #fontSizeModal .modal-footer .btn-primary,
+body.dark-mode #fontSizeModal .modal-footer .btn-primary {
+    background-color: #1e3a5f;
+    color: #fff;
+}
+
+html[data-theme='dark'] #fontSizeModal .modal-footer .btn-primary:hover,
+body.dark-mode #fontSizeModal .modal-footer .btn-primary:hover {
+    background-color: #2a4a7f;
+}
+
+html[data-theme='dark'] #fontSizeModal .modal-footer .btn-cancel,
+body.dark-mode #fontSizeModal .modal-footer .btn-cancel {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] #fontSizeModal .modal-footer .btn-cancel:hover,
+body.dark-mode #fontSizeModal .modal-footer .btn-cancel:hover {
+    background-color: #333;
+}
+
+/* ============================================
+   Share Modal
+   ============================================ */
+
+html[data-theme='dark'] #shareModal .modal-content,
+body.dark-mode #shareModal .modal-content {
+    background-color: #333333;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] #shareModal h3,
+body.dark-mode #shareModal h3 {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] #shareModal .share-url,
+body.dark-mode #shareModal .share-url {
+    background: transparent;
+    border: none;
+    color: #e0e0e0;
+    padding: 0;
+}
+
+html[data-theme='dark'] #shareModal .share-custom-label,
+body.dark-mode #shareModal .share-custom-label {
+    color: #a0a0a0;
+}
+
+html[data-theme='dark'] #shareModal .share-custom-label .optional-text,
+body.dark-mode #shareModal .share-custom-label .optional-text {
+    color: #dc3545;
+}
+
+html[data-theme='dark'] #shareModal .share-custom-input,
+body.dark-mode #shareModal .share-custom-input {
+    background: #252526;
+    border: 1px solid #404040;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] #shareModal .share-custom-input::placeholder,
+body.dark-mode #shareModal .share-custom-input::placeholder {
+    color: #666;
+}
+
+html[data-theme='dark'] #shareModal .share-indexable-label,
+body.dark-mode #shareModal .share-indexable-label {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] #shareModal .toggle-slider,
+html[data-theme='dark'] .toggle-slider,
+body.dark-mode #shareModal .toggle-slider,
+body.dark-mode .toggle-slider {
+    background-color: #555;
+}
+
+html[data-theme='dark'] #shareModal input:checked+.toggle-slider,
+html[data-theme='dark'] input:checked+.toggle-slider,
+body.dark-mode #shareModal input:checked+.toggle-slider,
+body.dark-mode input:checked+.toggle-slider {
+    background-color: #28a745 !important;
+}
+
+/* Folder Share Modal */
+html[data-theme='dark'] #folderShareModal .modal-content,
+body.dark-mode #folderShareModal .modal-content {
+    background-color: #333333;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] #folderShareModal h3,
+body.dark-mode #folderShareModal h3 {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] #folderShareModal .share-url,
+body.dark-mode #folderShareModal .share-url {
+    background: transparent;
+    border: none;
+    color: #e0e0e0;
+    padding: 0;
+}
+
+html[data-theme='dark'] #folderShareModal .share-indexable-label,
+body.dark-mode #folderShareModal .share-indexable-label {
+    color: #e0e0e0;
+}
+
+/* ============================================
+   Folder Options (Move Dialog)
+   ============================================ */
+
+html[data-theme='dark'] .folder-option,
+body.dark-mode .folder-option {
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .folder-option:hover,
+body.dark-mode .folder-option:hover {
+    background-color: var(--dm-surface);
+}
+
+html[data-theme='dark'] .folder-option.selected,
+body.dark-mode .folder-option.selected {
+    background-color: #1e3a5f;
+    color: white;
+}
+
+/* ============================================
+   Import/Alert Modal Content
+   ============================================ */
+
+html[data-theme='dark'] .import-confirm-modal-content,
+html[data-theme='dark'] .custom-alert-content,
+body.dark-mode .import-confirm-modal-content,
+body.dark-mode .custom-alert-content {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+    border: 1px solid var(--dm-border);
+}
+
+html[data-theme='dark'] .import-confirm-modal-content h3,
+html[data-theme='dark'] .custom-alert-content h3,
+body.dark-mode .import-confirm-modal-content h3,
+body.dark-mode .custom-alert-content h3 {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .import-confirm-modal-content p,
+html[data-theme='dark'] .custom-alert-content p,
+body.dark-mode .import-confirm-modal-content p,
+body.dark-mode .custom-alert-content p {
+    color: #b0b0b0;
+}

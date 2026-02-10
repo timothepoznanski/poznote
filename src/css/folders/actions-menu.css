@@ -1,0 +1,224 @@
+/**
+ * Folder Actions & Dropdown Menu
+ *
+ * Folder action buttons, three-dot toggle, dropdown menu items,
+ * kanban icon, and action button visibility rules.
+ */
+
+/* Folder actions container */
+.folder-actions {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    margin-left: auto;
+    flex: 0 0 auto;
+    opacity: 1;
+    transition: opacity 0.2s;
+}
+
+/* Show folder action icons always visible */
+.folder-actions i {
+    opacity: 1;
+    transition: opacity 0.12s ease-in-out, color 0.12s;
+    pointer-events: auto;
+}
+
+/* Reveal icons on folder hover */
+.folder-toggle:hover .folder-actions i {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* When folder actions are set to always visible */
+.folder-actions-always-visible .folder-actions i {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+body.folder-actions-always-visible .folder-toggle .folder-actions i {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Three-dot toggle button */
+.folder-actions-toggle {
+    padding: 4px 8px;
+    cursor: pointer;
+    color: #6b7280;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.folder-actions-toggle:hover {
+    background: rgba(107, 114, 128, 0.1);
+    color: #374151;
+}
+
+.folder-actions-toggle i {
+    font-size: 1.2em;
+}
+
+/* Réduire les icônes Font Awesome dans folder-actions-toggle */
+.folder-actions-toggle i[class*="fa-"],
+.folder-actions-toggle [class*="fa-"] {
+    font-size: 0.85em !important;
+}
+
+/* Kanban icon style */
+.folder-kanban-icon {
+    padding: 2px 4px;
+    cursor: pointer;
+    color: #6b7280;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.folder-kanban-icon:hover {
+    background: rgba(107, 114, 128, 0.1);
+    color: #0b4da6;
+}
+
+.folder-kanban-icon i,
+.folder-kanban-icon [class*="fa-"] {
+    font-size: 0.75em !important;
+}
+
+/* Dropdown menu for folder actions */
+.folder-actions-menu {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 4px;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    min-width: 200px;
+    padding: 4px 0;
+    z-index: 10000;
+    display: none;
+}
+
+.folder-actions-menu.show {
+    display: block;
+}
+
+.folder-actions-menu-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #374151;
+    transition: background-color 0.15s ease;
+    font-size: 0.9em;
+}
+
+.folder-actions-menu-item:hover {
+    background-color: #f3f4f6;
+}
+
+.folder-actions-menu-item i {
+    font-size: 1em;
+    color: #6b7280;
+    width: 16px;
+}
+
+.folder-actions-menu-item:hover i {
+    color: #374151;
+}
+
+.folder-actions-menu-item.danger {
+    color: #dc2626;
+}
+
+.folder-actions-menu-item.danger:hover {
+    background-color: #fee2e2;
+}
+
+.folder-actions-menu-item.danger i {
+    color: #dc2626;
+}
+
+.folder-actions-menu-item.shared {
+    color: #dc2626;
+}
+
+.folder-actions-menu-item.shared:hover {
+    background-color: #fee2e2;
+}
+
+.folder-actions-menu-item.shared i {
+    color: #dc2626;
+}
+
+/* Separator in menu */
+.folder-actions-menu-separator {
+    height: 1px;
+    background: #e5e7eb;
+    margin: 4px 0;
+}
+
+/* Hide Kanban view action when kanban on click is disabled */
+body.disable-kanban-click .folder-actions-menu-item.kanban-view-action {
+    display: none;
+}
+
+.folder-actions-menu-header {
+    padding: 6px 16px;
+    font-size: 0.75em;
+    text-transform: uppercase;
+    color: #9ca3af;
+    font-weight: 600;
+    pointer-events: none;
+    letter-spacing: 0.05em;
+}
+
+.folder-actions-menu-item.active {
+    background-color: #e3f2fd;
+    color: #007DB8;
+    font-weight: 600;
+}
+
+.folder-actions-menu-item.active i {
+    color: #007DB8;
+}
+
+/* Dark mode adjustments */
+html[data-theme='dark'] .folder-actions-menu-item.active,
+body.dark-mode .folder-actions-menu-item.active {
+    background-color: rgba(0, 125, 184, 0.2);
+    color: #38bdf8;
+}
+
+html[data-theme='dark'] .folder-actions-menu-item.active i,
+body.dark-mode .folder-actions-menu-item.active i {
+    color: #38bdf8;
+}
+
+/* Visibility of sort checkmark */
+.folder-actions-menu-item .sort-check {
+    display: none;
+}
+
+/* Folder action buttons */
+.folder-edit-btn,
+.folder-delete-btn,
+.folder-empty-btn,
+.folder-move-files-btn {
+    color: #007DB8;
+    margin-left: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* Hide edit button for system folders to prevent renaming */
+.default-folder .folder-edit-btn {
+    display: none !important;
+}

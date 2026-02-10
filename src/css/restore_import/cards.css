@@ -1,0 +1,193 @@
+/**
+ * Restore & Import - Card System
+ *
+ * Card containers, headers, expandable content, sub-cards,
+ * and legacy accordion support.
+ */
+
+/* Card Container */
+.card-container {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.card-container:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    border-color: #007cba;
+    transform: translateY(-2px);
+}
+
+/* Card Header */
+.card-header {
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s ease;
+}
+
+.card-header:hover {
+    background: linear-gradient(135deg, #f0f4f8 0%, #f8f9fa 100%);
+}
+
+.card-header h3 {
+    margin: 0;
+    color: #252526;
+    font-size: 18px;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.card-header h3 i.card-icon {
+    color: #007cba;
+    font-size: 20px;
+}
+
+.card-header h3 i.chevron {
+    margin-left: auto;
+    font-size: 16px;
+    color: #666;
+    transition: transform 0.3s ease;
+}
+
+.card-header h3 i.chevron.open {
+    transform: rotate(180deg);
+}
+
+.card-header p {
+    margin: 8px 0 0 32px;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Card Content */
+.card-content {
+    background: #ffffff;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out, padding 0.3s ease;
+    padding: 0 24px;
+    visibility: hidden;
+}
+
+.card-content.open {
+    max-height: 5000px;
+    padding: 24px;
+    transition: max-height 0.5s ease-in, padding 0.3s ease;
+    visibility: visible;
+}
+
+.card-content > p:first-child {
+    margin-top: 0;
+}
+
+.card-content > *:last-child {
+    margin-bottom: 0;
+}
+
+/* Sub-cards (for nested sections) */
+.sub-card {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.sub-card:last-child {
+    margin-bottom: 0;
+}
+
+.sub-card-header {
+    padding: 16px 20px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s ease;
+}
+
+.sub-card-header:hover {
+    background: #eef2f5;
+}
+
+.sub-card h4 {
+    margin: 0;
+    color: #333;
+    font-size: 16px;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sub-card h4 i.sub-card-icon {
+    color: #007cba;
+    font-size: 16px;
+}
+
+.sub-card h4 i.chevron {
+    margin-left: auto;
+    font-size: 14px;
+    color: #666;
+    transition: transform 0.3s ease;
+}
+
+.sub-card h4 i.chevron.open {
+    transform: rotate(180deg);
+}
+
+.sub-card-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out, padding 0.3s ease;
+    padding: 0 20px;
+    visibility: hidden;
+}
+
+.sub-card-content.open {
+    max-height: 3000px;
+    padding: 0 20px 20px 20px;
+    transition: max-height 0.5s ease-in, padding 0.3s ease;
+    visibility: visible;
+}
+
+.sub-card-content > *:first-child {
+    margin-top: 12px;
+}
+
+/* Legacy accordion support (kept for JavaScript compatibility) */
+.backup-section.child-section h3 {
+    font-weight: 400;
+}
+
+.accordion-header {
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.accordion-header:hover {
+    color: #007cba;
+}
+
+.accordion-icon {
+    display: none;
+}
+
+.accordion-content {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}

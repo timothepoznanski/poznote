@@ -38,7 +38,13 @@ if (!$hasAttachments) {
         <title>Poznote - Attachments Export</title>
         <link rel="stylesheet" href="css/fontawesome.min.css">
         <link rel="stylesheet" href="css/light.min.css">
-        <link href="css/modals.css" rel="stylesheet">
+        <link href="css/modals/base.css" rel="stylesheet">
+        <link href="css/modals/specific-modals.css" rel="stylesheet">
+        <link href="css/modals/attachments.css" rel="stylesheet">
+        <link href="css/modals/link-modal.css" rel="stylesheet">
+        <link href="css/modals/share-modal.css" rel="stylesheet">
+        <link href="css/modals/alerts-utilities.css" rel="stylesheet">
+        <link href="css/modals/responsive.css" rel="stylesheet">
         <link rel="stylesheet" href="css/export-attachments.css">
     </head>
     <body class="ai-page">

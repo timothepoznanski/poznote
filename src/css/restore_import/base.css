@@ -1,0 +1,55 @@
+/**
+ * Restore & Import - Base
+ *
+ * Font faces, body styles, backup container, navigation, and section layout.
+ */
+
+@font-face {
+    font-family: 'Inter';
+    src: url('../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
+
+html,
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    color: rgb(55, 53, 47);
+}
+
+body {
+    height: 100%;
+}
+
+/* Conteneur principal pour les pages de sauvegarde */
+.backup-container {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+}
+
+/* Navigation buttons container */
+.navigation-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+/* Sections de sauvegarde - Modern Cards */
+.backup-section {
+    padding: 0;
+    margin-top: 20px;
+    margin-bottom: 24px;
+    border: none;
+    border-radius: 12px;
+}

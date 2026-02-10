@@ -1,0 +1,54 @@
+/**
+ * Home - Buttons
+ *
+ * Styles for buttons on the home page including
+ * primary and secondary variants.
+ */
+
+/* Buttons container */
+.home-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+/* Button base */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 400;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    line-height: 1.4;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.btn:hover {
+    opacity: 0.8;
+}
+
+.btn:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Secondary button */
+.btn-secondary {
+    background: #6c757d;
+    color: white !important;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    color: white !important;
+    text-decoration: none;
+}

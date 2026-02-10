@@ -1,0 +1,148 @@
+/**
+ * Home - Font Awesome Icons
+ *
+ * Font Awesome icon ::before definitions for the home page,
+ * fa-spin animation, and global weight override for home-page icons.
+ */
+
+/* Font Awesome icon definitions */
+.fa-tags::before {
+    content: "\f02c";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+}
+
+.fa-star::before {
+    content: "\f005";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+}
+
+.fa-cloud::before {
+    content: "\f0c2";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+}
+
+.fa-trash::before {
+    content: "\f1f8";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+}
+
+.fa-heart::before {
+    content: "\f004";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+}
+
+.fa-sign-out-alt::before {
+    content: "\f2f5";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+}
+
+.fa-paperclip::before {
+    content: "\f0c6";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+}
+
+.fa-info-circle::before {
+    content: "\f05a";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+}
+
+.fa-upload::before {
+    content: "\f093";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+}
+
+.fa-download::before {
+    content: "\f019";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+}
+
+.fa-spinner::before {
+    content: "\f110";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+}
+
+.fa-spin {
+    animation: fa-spin 2s infinite linear;
+    display: inline-block;
+}
+
+@keyframes fa-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.fa-arrow-left::before {
+    content: "\f060";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+}
+
+.fa-share-alt::before {
+    content: "\f1e0";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+}
+
+.fa-cog::before {
+    content: "\f013";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+}
+
+.fa-folder-open::before {
+    content: "\f07c";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+}
+
+.fa-layer-group::before {
+    content: "\f5fd";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+}
+
+.fa-sticky-note::before {
+    content: "\f249";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+}
+
+.fa-user::before {
+    content: "\f007";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+}
+
+.fa-columns::before {
+    content: "\f0db";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+}
+
+/* Global override for home-page icons to ensure they are light (300) */
+.home-page .fas,
+.home-page .far,
+.home-page .fal,
+.home-page .fa,
+.home-page i[class^="fa-"],
+.home-page i[class*=" fa-"],
+.home-page span[class^="fa-"],
+.home-page span[class*=" fa-"] {
+    font-weight: 300 !important;
+}

@@ -1,0 +1,53 @@
+/**
+ * Notes - Sidebar Links
+ *
+ * Styles for workspace action buttons and sidebar note links
+ * (links_arbo_left) including selected state and title truncation.
+ */
+
+/* Workspace list action button */
+.workspace-list .action-btn {
+    min-width: 140px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    margin: 0;
+}
+
+/* Links Arbo Left - note links in sidebar */
+a.links_arbo_left,
+a.links_arbo_left:link,
+a.links_arbo_left:visited,
+a.links_arbo_left:hover,
+a.links_arbo_left:active {
+    display: inline-block;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
+    text-decoration: none;
+    color: rgb(55, 53, 47);
+    padding: 3px 6px 3px 0px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.2;
+    font-weight: normal;
+    box-sizing: border-box;
+}
+
+/* Specific rule for note title spans in all links */
+a.links_arbo_left .note-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+a.links_arbo_left.selected-note {
+    background-color: transparent;
+}

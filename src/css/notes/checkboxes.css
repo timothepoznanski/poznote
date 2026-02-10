@@ -1,0 +1,34 @@
+/**
+ * Notes - Checkboxes & Task Labels
+ *
+ * Styles for checkbox labels and editable task spans
+ * within note entries.
+ */
+
+/* Checkbox & Labels for tasks */
+.noteentry label {
+    user-select: none;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.noteentry label span[contenteditable="true"] {
+    outline: none;
+    border: none;
+    user-select: text;
+    cursor: text;
+    white-space: nowrap;
+    display: inline-block;
+    min-width: 20px;
+}
+
+.noteentry label span[contenteditable="true"]:focus {
+    background-color: transparent;
+    border-radius: 0;
+}
+
+.noteentry label span[contenteditable="true"]:empty:before {
+    content: "Type your task here";
+    color: #999;
+    font-style: italic;
+}

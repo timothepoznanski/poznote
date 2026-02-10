@@ -1,0 +1,133 @@
+/**
+ * Home - Base Layout
+ *
+ * Core layout styles for the home page including container,
+ * version display, header, info line, back link, page title,
+ * username/workspace display, notes count, and grid layout.
+ */
+
+/* Base layout */
+.home-page {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: #f8f9fa;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+.home-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* Version display */
+.version-display-desktop-bottom {
+    margin-top: 18px;
+    text-align: center;
+    color: #6b7280;
+}
+
+.version-display-desktop-bottom a.release-notes-link {
+    color: inherit;
+    text-decoration: underline;
+}
+
+/* Header */
+.home-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    width: 100%;
+    text-align: center;
+}
+
+/* Info line (username, workspace, etc.) */
+.home-info-line {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: #1f2937;
+    line-height: 1.2;
+    text-align: center;
+}
+
+.home-info-dash {
+    opacity: 0.5;
+    margin: 0 2px;
+}
+
+.home-info-separator {
+    color: #6b7280;
+    opacity: 0.5;
+}
+
+.home-info-username,
+.home-workspace-name {
+    display: inline-flex;
+    align-items: center;
+}
+
+.home-info-icon {
+    font-size: 0.7em;
+    opacity: 0.6;
+    margin-right: 8px;
+    font-style: normal;
+    display: inline-block;
+    line-height: 1;
+}
+
+/* Back link */
+.home-back-link {
+    color: var(--text-color, #333);
+    text-decoration: none;
+    padding: 8px;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+    margin-right: 8px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.home-back-link:hover {
+    background-color: var(--hover-bg, rgba(0, 0, 0, 0.05));
+}
+
+.home-back-link i {
+    font-size: 16px;
+}
+
+/* Page title */
+.create-page-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text-color, #333);
+    margin: 0 0 24px 0;
+    text-align: center;
+}
+
+/* Notes count badge */
+.home-notes-count {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 4px 10px;
+    border-radius: 12px;
+    margin-left: auto;
+}
+
+/* Grid layout for cards */
+.home-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+    margin-bottom: 40px;
+}

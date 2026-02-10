@@ -21,9 +21,24 @@ $currentLang = getUserLanguage();
 	<script src="js/theme-init.js"></script>
 	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
 	<link type="text/css" rel="stylesheet" href="css/light.min.css"/>
-	<link type="text/css" rel="stylesheet" href="css/shared.css"/>
+	<link type="text/css" rel="stylesheet" href="css/shared/base.css"/>
+	<link type="text/css" rel="stylesheet" href="css/shared/notes-list.css"/>
+	<link type="text/css" rel="stylesheet" href="css/shared/buttons-modal.css"/>
+	<link type="text/css" rel="stylesheet" href="css/shared/folders-grid.css"/>
+	<link type="text/css" rel="stylesheet" href="css/shared/fontawesome.css"/>
+	<link type="text/css" rel="stylesheet" href="css/shared/dark-mode.css"/>
+	<link type="text/css" rel="stylesheet" href="css/shared/responsive.css"/>
 	<link type="text/css" rel="stylesheet" href="css/attachments_list.css"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/menus.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/editor.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/modals.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/components.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/pages.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css"/>
 	<script src="js/theme-manager.js"></script>
 </head>
 <body class="shared-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>" data-txt-untitled="<?php echo t_h('common.untitled', [], 'Untitled'); ?>" data-txt-no-results="<?php echo t_h('attachments.list.no_filter_results', [], 'No results.'); ?>">

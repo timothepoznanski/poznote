@@ -435,10 +435,25 @@ try {
     <link rel="stylesheet" href="css/solid.min.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/light.min.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/workspaces.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/modals.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals/base.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals/specific-modals.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals/attachments.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals/link-modal.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals/share-modal.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals/alerts-utilities.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals/responsive.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/background-image.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/dark-mode.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/workspaces-inline.css?v=<?php echo $cache_v; ?>">
 </head>
 <body data-workspaces="<?php echo htmlspecialchars(json_encode($workspaces, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP), ENT_QUOTES, 'UTF-8'); ?>"

@@ -156,7 +156,16 @@ $v = getAppVersion();
     <link type="text/css" rel="stylesheet" href="../css/regular.min.css?v=<?php echo $v; ?>"/>
     <link rel="stylesheet" href="../css/settings.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/users.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/dark-mode/variables.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/dark-mode/layout.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/dark-mode/menus.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/dark-mode/editor.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/dark-mode/modals.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/dark-mode/components.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/dark-mode/pages.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/dark-mode/markdown.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/dark-mode/kanban.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/dark-mode/icons.css?v=<?php echo $v; ?>">
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
 
