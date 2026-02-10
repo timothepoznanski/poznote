@@ -820,6 +820,8 @@ function toggleEmojiPicker() {
   if (existingPicker) {
     existingPicker.remove();
     window.savedRanges.emoji = null;
+    window.savedActiveInput = null;
+    window.savedActiveInputSelection = null;
     return;
   }
 
@@ -839,12 +841,16 @@ function toggleEmojiPicker() {
   }
 
   // Save active input for title support
+  // Don't overwrite if already set (e.g., by slash command)
   if (document.activeElement && document.activeElement.classList.contains('css-title')) {
     window.savedActiveInput = document.activeElement;
-    window.savedActiveInputSelection = {
-      start: document.activeElement.selectionStart,
-      end: document.activeElement.selectionEnd
-    };
+    // Only save selection if not already saved
+    if (!window.savedActiveInputSelection) {
+      window.savedActiveInputSelection = {
+        start: document.activeElement.selectionStart,
+        end: document.activeElement.selectionEnd
+      };
+    }
   } else if (!window.savedActiveInput) {
     window.savedActiveInput = null;
   }
@@ -977,7 +983,11 @@ function insertEmoji(emoji) {
     input.focus();
 
     if (window.savedActiveInputSelection) {
-      input.setSelectionRange(window.savedActiveInputSelection.start, window.savedActiveInputSelection.end);
+      // Validate selection positions to avoid errors
+      const maxLength = input.value.length;
+      const safeStart = Math.max(0, Math.min(window.savedActiveInputSelection.start, maxLength));
+      const safeEnd = Math.max(safeStart, Math.min(window.savedActiveInputSelection.end, maxLength));
+      input.setSelectionRange(safeStart, safeEnd);
     } else {
       // Restore to saved position or end
     }
@@ -991,6 +1001,7 @@ function insertEmoji(emoji) {
 
     window.savedRanges.emoji = null;
     window.savedActiveInput = null;
+    window.savedActiveInputSelection = null;
     return;
   }
 

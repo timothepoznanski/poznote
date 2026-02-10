@@ -2173,13 +2173,11 @@
 
                 if (start < 0 || start >= text.length) return;
 
-                // Find the end of the slash command text (up to whitespace)
-                let end = start + 1;
-                while (end < text.length && !/\s/.test(text[end])) {
-                    end++;
-                }
+                // Find the end of the slash command text
+                // Only delete the slash and the filter text that was typed
+                let end = start + 1 + filterText.length;
 
-                // Remove the slash and filter text
+                // Remove the slash and filter text only
                 input.value = text.substring(0, start) + text.substring(end);
 
                 // Position cursor where the slash was
@@ -2317,15 +2315,25 @@
         // Delete the slash and filter text (unless keepSlash is true)
         const shouldKeepSlash = foundCmd && foundCmd.keepSlash;
         let cursorRangeAfterDelete = null;
+        let inputCursorPosition = null;
         if (!shouldKeepSlash) {
             deleteSlashText();
             // Save cursor position right after deleteSlashText placed it correctly,
             // because hideSlashMenu() removing the menu DOM can cause the browser
             // to lose the selection in the contenteditable.
             try {
-                const sel = window.getSelection();
-                if (sel && sel.rangeCount > 0) {
-                    cursorRangeAfterDelete = sel.getRangeAt(0).cloneRange();
+                // For INPUT fields, save selectionStart/End
+                if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+                    inputCursorPosition = {
+                        start: savedEditableElement.selectionStart,
+                        end: savedEditableElement.selectionEnd
+                    };
+                } else {
+                    // For contenteditable, save range
+                    const sel = window.getSelection();
+                    if (sel && sel.rangeCount > 0) {
+                        cursorRangeAfterDelete = sel.getRangeAt(0).cloneRange();
+                    }
                 }
             } catch (e) { }
         }
@@ -2334,7 +2342,14 @@
 
         // Restore cursor position that was set by deleteSlashText, in case
         // hideSlashMenu() disrupted it by removing the menu DOM element.
-        if (cursorRangeAfterDelete) {
+        if (inputCursorPosition && savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+            // Restore cursor for INPUT fields
+            try {
+                savedEditableElement.focus();
+                savedEditableElement.setSelectionRange(inputCursorPosition.start, inputCursorPosition.end);
+            } catch (e) { }
+        } else if (cursorRangeAfterDelete) {
+            // Restore cursor for contenteditable
             try {
                 if (savedEditableElement) {
                     savedEditableElement.focus();
@@ -2347,6 +2362,7 @@
         // Also expose it globally so async modal callbacks (link, note-reference)
         // can use it as a reliable fallback for the cursor position.
         window._slashCommandSavedRange = cursorRangeAfterDelete;
+        window._slashCommandInputCursor = inputCursorPosition;
 
         // Execute command immediately (selection is restored above)
         try {
@@ -2355,6 +2371,7 @@
             console.error('Error executing command:', e);
         }
         window._slashCommandSavedRange = null;
+        window._slashCommandInputCursor = null;
 
         // Re-focus after insertion to avoid caret jumping on focus (skip if keepSlash)
         if (!shouldKeepSlash) {
