@@ -292,7 +292,7 @@ function createUserProfile(string $username, string $email = null): array {
  */
 function updateUserProfile(int $id, array $data): array {
     try {
-        $con = getMasterConnection();
+        $masterCon = getMasterConnection();
         
         $allowedFields = ['username', 'email', 'active', 'is_admin', 'oidc_subject'];
         $updates = [];
@@ -313,18 +313,36 @@ function updateUserProfile(int $id, array $data): array {
         $params[] = $id;
         
         $sql = "UPDATE users SET " . implode(', ', $updates) . " WHERE id = ?";
-        $stmt = $con->prepare($sql);
+        $stmt = $masterCon->prepare($sql);
         $stmt->execute($params);
+        
+        // If updating the current user, refresh the session data
+        $isCurrentUser = (isset($_SESSION['user_id']) && (int)$_SESSION['user_id'] === $id);
+        if ($isCurrentUser) {
+            $stmt = $masterCon->prepare("SELECT * FROM users WHERE id = ?");
+            $stmt->execute([$id]);
+            $updatedUser = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($updatedUser) {
+                $_SESSION['user'] = $updatedUser;
+            }
+        }
         
         // If username or email was updated, sync to local DB
         if (isset($data['username']) || isset($data['email'])) {
             require_once __DIR__ . '/UserDataManager.php';
             $udm = new UserDataManager($id);
+            
+            // If it's the current user, we can reuse the global $con to avoid 
+            // SQLite lock contention which causes several seconds of delay.
+            // The global $con is provided by db_connect.php and points to the user's DB.
+            global $con; 
+            $useCon = ($isCurrentUser && isset($con)) ? $con : null;
+            
             if (isset($data['username'])) {
-                $udm->syncUsername($data['username']);
+                $udm->syncUsername($data['username'], $useCon);
             }
             if (isset($data['email'])) {
-                $udm->syncEmail($data['email']);
+                $udm->syncEmail($data['email'], $useCon);
             }
         }
         

@@ -460,9 +460,10 @@ class UserDataManager {
     /**
      * Sync username to user's local settings table for redundancy (disaster recovery)
      * @param string $username
+     * @param PDO|null $con Optional existing database connection to use
      * @return bool
      */
-    public function syncUsername($username) {
+    public function syncUsername($username, $con = null) {
         $dbPath = $this->getUserDatabasePath();
         if (!file_exists($dbPath)) {
             // If DB doesn't exist yet, we can't sync, but it's not strictly an error
@@ -470,9 +471,11 @@ class UserDataManager {
         }
         
         try {
-            $con = new PDO('sqlite:' . $dbPath);
-            $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $con->exec('PRAGMA busy_timeout = 5000');
+            if ($con === null) {
+                $con = new PDO('sqlite:' . $dbPath);
+                $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $con->exec('PRAGMA busy_timeout = 5000');
+            }
             
             // Use 'user_profile_username' instead of 'login_display_name' to avoid confusion
             // login_display_name is a GLOBAL setting for the login page title
@@ -488,18 +491,21 @@ class UserDataManager {
     /**
      * Sync email to user's local settings table for redundancy (disaster recovery)
      * @param string $email
+     * @param PDO|null $con Optional existing database connection to use
      * @return bool
      */
-    public function syncEmail($email) {
+    public function syncEmail($email, $con = null) {
         $dbPath = $this->getUserDatabasePath();
         if (!file_exists($dbPath)) {
             return true;
         }
         
         try {
-            $con = new PDO('sqlite:' . $dbPath);
-            $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $con->exec('PRAGMA busy_timeout = 5000');
+            if ($con === null) {
+                $con = new PDO('sqlite:' . $dbPath);
+                $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $con->exec('PRAGMA busy_timeout = 5000');
+            }
             
             $stmt = $con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('login_email', ?)");
             return $stmt->execute([$email]);
