@@ -323,14 +323,14 @@ $v = getAppVersion();
     
                             <td class="text-center <?php echo ($user['id'] === getCurrentUserId()) ? 'hide-on-mobile' : ''; ?>" data-label="<?php echo t_h('multiuser.admin.actions', [], 'Actions'); ?>">
                                 <div class="actions actions-center">
-                                    <button class="btn btn-secondary btn-small" title="<?php echo t_h('multiuser.admin.edit_user', [], 'Edit User'); ?>" 
-                                            onclick="renameUser(<?php echo (int)$user['id']; ?>, <?php echo json_encode($user['username']); ?>, <?php echo json_encode($user['email'] ?? ''); ?>, <?php echo json_encode($user['oidc_subject'] ?? ''); ?>)">
+                                        <button class="btn btn-secondary btn-small" title="<?php echo t_h('multiuser.admin.edit_user', [], 'Edit User'); ?>" 
+                                            onclick="renameUser(<?php echo (int)$user['id']; ?>, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($user['email'] ?? ''), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($user['oidc_subject'] ?? ''), ENT_QUOTES); ?>)">
                                         <i class="fas fa-edit"></i>
                                     </button>
 
                                     <?php if ($user['id'] !== getCurrentUserId()): ?>
                                         <button class="btn btn-danger btn-small" title="<?php echo t_h('common.delete', [], 'Delete'); ?>" 
-                                                onclick="openDeleteModal(<?php echo (int)$user['id']; ?>, <?php echo json_encode($user['username']); ?>)">
+                                            onclick="openDeleteModal(<?php echo (int)$user['id']; ?>, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>)">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     <?php else: ?>

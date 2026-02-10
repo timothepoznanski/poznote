@@ -5,7 +5,7 @@
 var selectedWorkspace = '';
 
 // Use global translation function from globals.js
-var tr = window.t || function(key, vars, fallback) {
+var wsTr = window.t || function(key, vars, fallback) {
     return fallback || key;
 };
 
@@ -133,7 +133,7 @@ function toggleWorkspaceMenu(event) {
 }
 
 function loadAndShowWorkspaceMenu(menu) {
-    menu.innerHTML = '<div class="workspace-menu-item"><i class="fa-spinner fa-spin"></i>' + tr('workspaces.menu.loading', {}, 'Loading workspaces...') + '</div>';
+    menu.innerHTML = '<div class="workspace-menu-item"><i class="fa-spinner fa-spin"></i>' + wsTr('workspaces.menu.loading', {}, 'Loading workspaces...') + '</div>';
     menu.style.display = 'block';
 
     fetch('/api/v1/workspaces', {
@@ -146,11 +146,11 @@ function loadAndShowWorkspaceMenu(menu) {
             if (data.success) {
                 displayWorkspaceMenu(menu, data.workspaces);
             } else {
-                menu.innerHTML = '<div class="workspace-menu-item"><i class="fa-exclamation-triangle"></i>' + tr('workspaces.menu.error_loading', {}, 'Error loading workspaces') + '</div>';
+                menu.innerHTML = '<div class="workspace-menu-item"><i class="fa-exclamation-triangle"></i>' + wsTr('workspaces.menu.error_loading', {}, 'Error loading workspaces') + '</div>';
             }
         })
         .catch(function (error) {
-            menu.innerHTML = '<div class="workspace-menu-item"><i class="fa-exclamation-triangle"></i>' + tr('workspaces.menu.error_loading', {}, 'Error loading workspaces') + '</div>';
+            menu.innerHTML = '<div class="workspace-menu-item"><i class="fa-exclamation-triangle"></i>' + wsTr('workspaces.menu.error_loading', {}, 'Error loading workspaces') + '</div>';
         });
 }
 
@@ -198,13 +198,13 @@ function displayWorkspaceMenu(menu, workspaces) {
     // Manage workspaces
     menuHtml += '<div class="workspace-menu-item" id="manage-workspaces-item">';
     menuHtml += '<i class="fa-cog"></i>';
-    menuHtml += '<span>' + tr('settings.cards.workspaces', {}, 'Workspaces') + '</span>';
+    menuHtml += '<span>' + wsTr('settings.cards.workspaces', {}, 'Workspaces') + '</span>';
     menuHtml += '</div>';
 
     // Logout
     menuHtml += '<div class="workspace-menu-item" id="logout-item">';
     menuHtml += '<i class="fa-sign-out-alt"></i>';
-    menuHtml += '<span>' + tr('workspaces.menu.logout', {}, 'Logout') + '</span>';
+    menuHtml += '<span>' + wsTr('workspaces.menu.logout', {}, 'Logout') + '</span>';
     menuHtml += '</div>';
 
     menu.innerHTML = menuHtml;
@@ -424,12 +424,12 @@ function validateCreateWorkspaceForm() {
     if (!el) return true;
     var v = el.value.trim();
     if (v === '') {
-        showTopAlert(tr('workspaces.validation.enter_name', {}, 'Enter a workspace name'), 'danger');
+        showTopAlert(wsTr('workspaces.validation.enter_name', {}, 'Enter a workspace name'), 'danger');
         scrollToTopAlert();
         return false;
     }
     if (!isValidWorkspaceName(v)) {
-        showTopAlert(tr('workspaces.validation.invalid_name', {}, 'Invalid name: use letters, numbers, dash or underscore only'), 'danger');
+        showTopAlert(wsTr('workspaces.validation.invalid_name', {}, 'Invalid name: use letters, numbers, dash or underscore only'), 'danger');
         scrollToTopAlert();
         return false;
     }
@@ -454,15 +454,15 @@ function handleRenameButtonClick(e) {
         document.getElementById('confirmRenameBtn').onclick = function () {
             var newName = document.getElementById('renameNewName').value.trim();
             if (!newName) {
-                showTopAlert(tr('workspaces.validation.enter_new_name', {}, 'Please enter a new name'), 'danger');
+                showTopAlert(wsTr('workspaces.validation.enter_new_name', {}, 'Please enter a new name'), 'danger');
                 return;
             }
             if (!isValidWorkspaceName(newName)) {
-                showTopAlert(tr('workspaces.validation.invalid_name', {}, 'Invalid name: use letters, numbers, dash or underscore only'), 'danger');
+                showTopAlert(wsTr('workspaces.validation.invalid_name', {}, 'Invalid name: use letters, numbers, dash or underscore only'), 'danger');
                 return;
             }
             if (newName === currentName) {
-                showTopAlert(tr('workspaces.validation.new_name_must_differ', {}, 'New name must be different from current name'), 'danger');
+                showTopAlert(wsTr('workspaces.validation.new_name_must_differ', {}, 'New name must be different from current name'), 'danger');
                 return;
             }
 
@@ -490,7 +490,7 @@ function handleRenameButtonClick(e) {
                     document.getElementById('confirmRenameBtn').disabled = false;
 
                     if (json && json.success) {
-                        showAjaxAlert(tr('workspaces.alerts.renamed_success', {}, 'Workspace renamed successfully'), 'success');
+                        showAjaxAlert(wsTr('workspaces.alerts.renamed_success', {}, 'Workspace renamed successfully'), 'success');
                         closeRenameModal();
 
                         // Update last opened workspace if the renamed workspace was the current one
@@ -505,13 +505,13 @@ function handleRenameButtonClick(e) {
                             window.location.reload();
                         }, 1000);
                     } else {
-                        showAjaxAlert(tr('workspaces.alerts.error_prefix', { error: (json.error || tr('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error: {{error}}'), 'danger');
+                        showAjaxAlert(wsTr('workspaces.alerts.error_prefix', { error: (json.error || wsTr('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error: {{error}}'), 'danger');
                     }
                 })
                 .catch(function (err) {
                     document.getElementById('confirmRenameBtn').disabled = false;
                     console.error('Error renaming workspace:', err);
-                    showAjaxAlert(tr('workspaces.alerts.rename_error', {}, 'Error renaming workspace'), 'danger');
+                    showAjaxAlert(wsTr('workspaces.alerts.rename_error', {}, 'Error renaming workspace'), 'danger');
                 });
         };
     }
@@ -579,7 +579,7 @@ function handleDeleteButtonClick(e) {
                 .then(function (resp) { return resp.json(); })
                 .then(function (json) {
                     if (json && json.success) {
-                        showAjaxAlert(tr('workspaces.alerts.deleted_success', {}, 'Workspace deleted successfully'), 'success');
+                        showAjaxAlert(wsTr('workspaces.alerts.deleted_success', {}, 'Workspace deleted successfully'), 'success');
                         closeDeleteModal();
                         
                         // If the deleted workspace was the current one, find another workspace and save it
@@ -608,14 +608,14 @@ function handleDeleteButtonClick(e) {
                             window.location.reload();
                         }, 1000);
                     } else {
-                        showAjaxAlert(tr('workspaces.alerts.error_prefix', { error: (json.error || tr('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error: {{error}}'), 'danger');
+                        showAjaxAlert(wsTr('workspaces.alerts.error_prefix', { error: (json.error || wsTr('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error: {{error}}'), 'danger');
                         confirmBtn.disabled = false; // re-enable on error
                     }
                 })
                 .catch(function () {
                     confirmBtn.disabled = false;
                     console.error('Error deleting workspace:', err);
-                    showAjaxAlert(tr('workspaces.alerts.delete_error', {}, 'Error deleting workspace'), 'danger');
+                    showAjaxAlert(wsTr('workspaces.alerts.delete_error', {}, 'Error deleting workspace'), 'danger');
                 });
         };
     }
@@ -625,9 +625,9 @@ function handleDeleteButtonClick(e) {
 // Functions specific to workspaces.php (creation, moving notes, etc.)
 
 function formatNotesCount(num) {
-    if (num === 0) return tr('workspaces.count.notes_0', {}, '0 notes');
-    if (num === 1) return tr('workspaces.count.notes_1', {}, '1 note');
-    return tr('workspaces.count.notes_n', { count: num }, '{{count}} notes');
+    if (num === 0) return wsTr('workspaces.count.notes_0', {}, '0 notes');
+    if (num === 1) return wsTr('workspaces.count.notes_1', {}, '1 note');
+    return wsTr('workspaces.count.notes_n', { count: num }, '{{count}} notes');
 }
 
 // Handle workspace creation with AJAX
@@ -639,12 +639,12 @@ function handleCreateWorkspace(event) {
 
     // Validate
     if (name === '') {
-        showTopAlert(tr('workspaces.validation.enter_name', {}, 'Enter a workspace name'), 'danger');
+        showTopAlert(wsTr('workspaces.validation.enter_name', {}, 'Enter a workspace name'), 'danger');
         scrollToTopAlert();
         return false;
     }
     if (!isValidWorkspaceName(name)) {
-        showTopAlert(tr('workspaces.validation.invalid_name', {}, 'Invalid name: use letters, numbers, dash or underscore only'), 'danger');
+        showTopAlert(wsTr('workspaces.validation.invalid_name', {}, 'Invalid name: use letters, numbers, dash or underscore only'), 'danger');
         scrollToTopAlert();
         return false;
     }
@@ -673,7 +673,7 @@ function handleCreateWorkspace(event) {
             if (createBtn) createBtn.disabled = false;
 
             if (json && json.success) {
-                showAjaxAlert(tr('workspaces.messages.created', {}, 'Workspace created'), 'success');
+                showAjaxAlert(wsTr('workspaces.messages.created', {}, 'Workspace created'), 'success');
 
                 // Clear input
                 nameInput.value = '';
@@ -683,13 +683,13 @@ function handleCreateWorkspace(event) {
                     window.location.reload();
                 }, 1000);
             } else {
-                showAjaxAlert(tr('workspaces.alerts.error_prefix', { error: (json.error || tr('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error: {{error}}'), 'danger');
+                showAjaxAlert(wsTr('workspaces.alerts.error_prefix', { error: (json.error || wsTr('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error: {{error}}'), 'danger');
             }
         })
 .catch(function (err) {
             if (createBtn) createBtn.disabled = false;
             console.error('Error creating workspace:', err);
-            showAjaxAlert(tr('workspaces.alerts.create_error', {}, 'Error creating workspace'), 'danger');
+            showAjaxAlert(wsTr('workspaces.alerts.create_error', {}, 'Error creating workspace'), 'danger');
         });
 
     return false;
@@ -734,7 +734,7 @@ function handleMoveButtonClick(e) {
         document.getElementById('confirmMoveBtn').onclick = function () {
             var target = sel.value;
             if (!target) {
-                alert(tr('workspaces.move.choose_target', {}, 'Choose a target'));
+                alert(wsTr('workspaces.move.choose_target', {}, 'Choose a target'));
                 return;
             }
 
@@ -765,7 +765,7 @@ function handleMoveButtonClick(e) {
                 .then(function (json) {
                     confirmBtn.disabled = false;
                     if (json && json.success) {
-                        showAjaxAlert(tr('workspaces.move.moved_to', { count: (json.moved || 0), target: json.target }, 'Moved {{count}} notes to {{target}}'), 'success');
+                        showAjaxAlert(wsTr('workspaces.move.moved_to', { count: (json.moved || 0), target: json.target }, 'Moved {{count}} notes to {{target}}'), 'success');
                         
                         // Update counts in the displayed workspace list
                         updateWorkspaceNoteCounts(source, json.target, parseInt(json.moved || 0, 10));
@@ -778,12 +778,12 @@ function handleMoveButtonClick(e) {
                         updateBackToNotesLinks(json.target);
                         closeMoveModal();
                     } else {
-                        showAjaxAlert(tr('workspaces.alerts.error_prefix', { error: (json.error || tr('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error: {{error}}'), 'danger');
+                        showAjaxAlert(wsTr('workspaces.alerts.error_prefix', { error: (json.error || wsTr('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error: {{error}}'), 'danger');
                     }
                 }).catch(function (err) {
                     confirmBtn.disabled = false;
                     console.error('Error moving notes:', err);
-                    showAjaxAlert(tr('workspaces.move.error_moving_notes', { error: (err.message || tr('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error moving notes: {{error}}'), 'danger');
+                    showAjaxAlert(wsTr('workspaces.move.error_moving_notes', { error: (err.message || wsTr('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error moving notes: {{error}}'), 'danger');
                 });
         };
     }
@@ -900,19 +900,19 @@ function saveDefaultWorkspaceSetting() {
                     var displayText = selectedWorkspace === '__last_opened__'
                         ? lastOpenedLabel
                         : selectedWorkspace;
-                    status.textContent = tr('workspaces.default.status_set_to', { workspace: displayText }, '✓ Default workspace set to: {{workspace}}');
+                    status.textContent = wsTr('workspaces.default.status_set_to', { workspace: displayText }, '✓ Default workspace set to: {{workspace}}');
                     status.style.display = 'block';
                     setTimeout(function () {
                         status.style.display = 'none';
                     }, 3000);
                 }
             } else {
-                alert(tr('workspaces.default.error_saving', {}, 'Error saving default workspace'));
+                alert(wsTr('workspaces.default.error_saving', {}, 'Error saving default workspace'));
             }
         })
         .catch(function (err) {
             console.error('Error saving default workspace setting:', err);
-            alert(tr('workspaces.default.error_saving', {}, 'Error saving default workspace'));
+            alert(wsTr('workspaces.default.error_saving', {}, 'Error saving default workspace'));
         });
 }
 
