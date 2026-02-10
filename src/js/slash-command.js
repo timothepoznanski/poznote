@@ -2081,6 +2081,17 @@
         slashMenuElement.addEventListener('mousedown', handleMenuMouseDown);
         slashMenuElement.addEventListener('click', handleMenuClick);
         slashMenuElement.addEventListener('mouseover', handleMenuMouseOver);
+
+        // Hide cursor until mouse moves (desktop only)
+        const isMobile = window.innerWidth < 768;
+        if (!isMobile) {
+            document.body.style.cursor = 'none';
+            const showCursor = () => {
+                document.body.style.cursor = '';
+                document.removeEventListener('mousemove', showCursor);
+            };
+            document.addEventListener('mousemove', showCursor);
+        }
     }
 
     // Update slash menu content based on current filter text
