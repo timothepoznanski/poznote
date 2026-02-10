@@ -134,8 +134,8 @@ $currentLang = getUserLanguage();
 				$note_count = (int)$folder['note_count'];
 				
 				// Build public URL
-				$base_url = getBaseUrl();
-				$public_url = $base_url . '/folder/' . urlencode($folder['token']);
+				// Use relative URL to avoid issues with incorrect base URL detection behind proxies
+				$public_url = '/folder/' . urlencode($folder['token']);
 				
 				echo '<div class="shared-note-item shared-folder-row" data-folder-id="' . $folder_id . '" data-folder-name="' . $folder_name . '" data-has-password="' . ($has_password ? '1' : '0') . '">';
 				

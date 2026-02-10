@@ -104,7 +104,8 @@ function getProtocol() {
  */
 function getBaseUrl() {
     $protocol = getProtocol();
-    $host = $_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $host = !empty($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : 
+            (!empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost');
     return $protocol . '://' . $host;
 }
 
