@@ -29,8 +29,8 @@ if ($_POST) {
         if (isset($_POST['action']) && $_POST['action'] === 'create') {
             $name = trim($_POST['name'] ?? '');
             if ($name === '') throw new Exception(t('workspaces.errors.name_empty', [], 'Workspace name cannot be empty', $currentLang));
-            // validate allowed characters: letters, digits, hyphen, underscore
-            if (!preg_match('/^[A-Za-z0-9_-]+$/', $name)) throw new Exception(t('workspaces.errors.invalid_name', [], 'Invalid workspace name. Use only letters, numbers, dash and underscore (no spaces).', $currentLang));
+            // validate allowed characters: letters (including accented), digits, space, hyphen, underscore
+            if (!preg_match('/^[\p{L}0-9 _-]+$/u', $name)) throw new Exception(t('workspaces.errors.invalid_name', [], 'Invalid workspace name. Letters, numbers, spaces, dash and underscore are allowed.', $currentLang));
             $stmt = $con->prepare('INSERT OR IGNORE INTO workspaces (name) VALUES (?)');
             $stmt->execute([$name]);
             
@@ -214,7 +214,7 @@ if ($_POST) {
             if ($name === '') throw new Exception(t('workspaces.errors.name_required', [], 'Workspace name required', $currentLang));
 
             // validate new name characters
-            if ($new_name !== '' && !preg_match('/^[A-Za-z0-9_-]+$/', $new_name)) throw new Exception(t('workspaces.errors.invalid_new_name', [], 'Invalid new workspace name. Use only letters, numbers, dash and underscore (no spaces).', $currentLang));
+            if ($new_name !== '' && !preg_match('/^[\p{L}0-9 _-]+$/u', $new_name)) throw new Exception(t('workspaces.errors.invalid_new_name', [], 'Invalid new workspace name. Letters, numbers, spaces, dash and underscore are allowed.', $currentLang));
 
             // If new_name provided and different, rename the workspace across DB and labels
             if ($new_name !== '' && $new_name !== $name) {

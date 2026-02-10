@@ -25,7 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 // Sanitize workspace name for filesystem use
 if ($workspace) {
-    $workspace = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $workspace);
+    // Allow letters (including accented), digits, underscore, and hyphen. Replace others with underscore.
+    $workspace = preg_replace('/[^\p{L}0-9_\-]/u', '_', $workspace);
 } else {
     $workspace = 'default';
 }

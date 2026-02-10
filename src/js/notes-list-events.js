@@ -229,14 +229,6 @@
 
         var folderData = getFolderData(element);
 
-        // If Kanban on click is disabled, open folder icon picker instead
-        if (document.body.classList.contains('disable-kanban-click')) {
-            if (folderData.id && folderData.name && typeof window.showChangeFolderIconModal === 'function') {
-                window.showChangeFolderIconModal(folderData.id, folderData.name);
-            }
-            return;
-        }
-
         // Close folder actions menu if opened from there
         if (folderData.id && typeof window.closeFolderActionsMenu === 'function') {
             window.closeFolderActionsMenu(folderData.id);

@@ -250,7 +250,7 @@ function highlightInElement(element, searchWords) {
                     // Add highlighted match
                     var span = document.createElement('span');
                     span.className = 'search-highlight';
-                    span.style.cssText = 'background-color: #ffff00 !important; color: #000 !important; font-weight: normal !important; font-family: inherit !important;';
+                    // We remove inline styles to allow CSS classes to handle the color
                     span.textContent = text.substring(match.start, match.end);
                     tempDiv.appendChild(span);
                     highlightCount++;
@@ -288,6 +288,12 @@ function highlightInElement(element, searchWords) {
  * Clear all search highlights
  */
 function clearSearchHighlights() {
+    // Reset navigation state
+    if (window.searchNavigation) {
+        window.searchNavigation.currentHighlightIndex = -1;
+        window.searchNavigation.highlights = [];
+    }
+
     var highlights = document.querySelectorAll('.search-highlight');
     for (var i = 0; i < highlights.length; i++) {
         var highlight = highlights[i];
@@ -345,12 +351,6 @@ function createInputOverlay(inputElement, word, startIndex) {
     var overlay = document.createElement('div');
     overlay.className = 'input-highlight-overlay';
     overlay.style.position = 'absolute';
-    overlay.style.backgroundColor = '#ffff00';
-    overlay.style.color = 'transparent';
-    overlay.style.pointerEvents = 'none';
-    overlay.style.borderRadius = '2px';
-    overlay.style.zIndex = '1';
-    overlay.style.opacity = '0.7';
     
     // Add data attribute to link it to the input
     overlay.setAttribute('data-input-id', inputElement.id);
@@ -546,4 +546,138 @@ function clearInputOverlays(inputElement) {
     for (var i = 0; i < overlays.length; i++) {
         overlays[i].remove();
     }
+}
+
+/**
+ * Navigation state for highlights
+ */
+window.searchNavigation = {
+    currentHighlightIndex: -1,
+    highlights: []
+};
+
+/**
+ * Update the list of available highlights in the current view
+ */
+function updateHighlightsList() {
+    // Get both standard highlights and input overlays
+    var highlights = Array.from(document.querySelectorAll('.search-highlight, .input-highlight-overlay'));
+    
+    // Sort highlights by their position in the DOM (vertical position first, then horizontal)
+    highlights.sort(function(a, b) {
+        var rectA = a.getBoundingClientRect();
+        var rectB = b.getBoundingClientRect();
+        var topA = rectA.top + window.scrollY;
+        var topB = rectB.top + window.scrollY;
+        
+        if (Math.abs(topA - topB) < 5) { // Same line approximately
+            return rectA.left - rectB.left;
+        }
+        return topA - topB;
+    });
+    
+    window.searchNavigation.highlights = highlights;
+}
+
+/**
+ * Navigate to a specific highlight by index
+ */
+function navigateToHighlight(index) {
+    var highlights = window.searchNavigation.highlights;
+    if (index < 0 || index >= highlights.length) return;
+    
+    var target = highlights[index];
+    
+    // Remove active class from all highlights
+    highlights.forEach(h => {
+        h.classList.remove('search-highlight-active');
+    });
+    
+    // Add active class and scroll
+    target.classList.add('search-highlight-active');
+    
+    // Smooth scroll to the target
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    
+    window.searchNavigation.currentHighlightIndex = index;
+}
+
+/**
+ * Navigate to the next highlight
+ */
+function navigateToNextHighlight() {
+    updateHighlightsList();
+    var highlights = window.searchNavigation.highlights;
+    
+    if (highlights.length === 0) {
+        // No highlights in current note, try to go to next note
+        navigateToNextNote();
+        return;
+    }
+    
+    var nextIndex = window.searchNavigation.currentHighlightIndex + 1;
+    
+    if (nextIndex < highlights.length) {
+        navigateToHighlight(nextIndex);
+    } else {
+        // End of current note reached, go to next note
+        navigateToNextNote();
+    }
+}
+
+/**
+ * Navigate to the next note in the list
+ */
+function navigateToNextNote() {
+    // Find the currently selected note in the left column
+    var currentNote = document.querySelector('.links_arbo_left.selected-note, [data-action="load-note"].selected-note');
+    
+    // Find all visible notes that match search (not hidden)
+    // We use a more robust selector to include ALL notes in the sidebar
+    var allNotes = Array.from(document.querySelectorAll('[data-action="load-note"]')).filter(function(el) {
+        // Skip explicitly hidden notes
+        if (el.classList.contains('search-hidden')) return false;
+        // Skip notes in folders that are hidden by search
+        if (el.closest('.folder-header.search-hidden')) return false;
+        // Skip trash notes if we aren't searching in trash specifically
+        if (el.closest('.folder-header[data-folder="Trash"]') && !el.closest('.folder-header:not(.search-hidden)')) return false;
+        
+        return true;
+    });
+    
+    if (allNotes.length === 0) return;
+    
+    var currentIndex = currentNote ? allNotes.indexOf(currentNote) : -1;
+    var nextNote = allNotes[currentIndex + 1];
+    
+    // If we're at the end, wrap around to the first note
+    if (!nextNote) {
+        nextNote = allNotes[0];
+    }
+    
+    if (nextNote) {
+        // Reset highlight index for the next note
+        window.searchNavigation.currentHighlightIndex = -1;
+        // Click the next note to load it
+        nextNote.click();
+        
+        // Auto-scroll to first highlight after note is loaded
+        window.searchNavigation.pendingAutoScroll = true;
+    }
+}
+
+/**
+ * Automatically scroll to the first highlight
+ */
+function scrollToFirstHighlight() {
+    // Clear pending flag
+    window.searchNavigation.pendingAutoScroll = false;
+    
+    // Wait a bit for everything to be rendered and overlays to be positioned
+    setTimeout(function() {
+        updateHighlightsList();
+        if (window.searchNavigation.highlights.length > 0) {
+            navigateToHighlight(0);
+        }
+    }, 300);
 }

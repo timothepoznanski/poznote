@@ -285,6 +285,11 @@
     },
     "settings": {
         "title": "Configurações",
+        "categories": {
+            "actions": "Ações",
+            "display": "Tela",
+            "about": "Sobre"
+        },
         "sections": {
             "account_display": "Conta e Exibição",
             "notes_folders": "Notas e Pastas",
@@ -1789,12 +1794,12 @@
             "push": {
                 "title": "Enviar para GitHub",
                 "description": "Exporta suas notas para o GitHub. Atualiza arquivos existentes e exclui arquivos que não existem mais no Poznote.",
-                "button": "Push"
+                "button": "Enviar"
             },
             "pull": {
                 "title": "Recuperar do GitHub",
                 "description": "Importa notas do GitHub. Atualiza notas existentes e move para a lixeira notas que não existem mais no GitHub.",
-                "button": "Pull"
+                "button": "Recuperar"
             }
         },
         "messages": {

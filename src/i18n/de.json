@@ -286,6 +286,11 @@
     },
     "settings": {
         "title": "Einstellungen",
+        "categories": {
+            "actions": "Aktionen",
+            "display": "Anzeige",
+            "about": "Über"
+        },
         "sections": {
             "account_display": "Konto & Anzeige",
             "notes_folders": "Notizen & Ordner",
@@ -1785,12 +1790,12 @@
             "push": {
                 "title": "An GitHub senden",
                 "description": "Exportiert Ihre Notizen nach GitHub. Aktualisiert vorhandene Dateien und löscht Dateien, die in Poznote nicht mehr vorhanden sind.",
-                "button": "Push"
+                "button": "Senden"
             },
             "pull": {
                 "title": "Von GitHub abrufen",
                 "description": "Importiert Notizen von GitHub. Aktualisiert vorhandene Notizen und verschiebt Notizen, die auf GitHub nicht mehr vorhanden sind, in den Papierkorb.",
-                "button": "Pull"
+                "button": "Abrufen"
             }
         },
         "messages": {

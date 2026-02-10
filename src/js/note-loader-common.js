@@ -1230,9 +1230,23 @@ function reinitializeNoteContent() {
     // Prefer the centralized helper which knows about notes/tags/folders.
     if (isSearchMode) {
         if (typeof applyHighlightsWithRetries === 'function') {
-            try { setTimeout(function() { try { applyHighlightsWithRetries(); } catch(e){} }, 60); } catch (e) {}
+            try { 
+                setTimeout(function() { 
+                    try { 
+                        applyHighlightsWithRetries(); 
+                        if (window.searchNavigation && window.searchNavigation.pendingAutoScroll && typeof scrollToFirstHighlight === 'function') {
+                            scrollToFirstHighlight();
+                        }
+                    } catch(e){} 
+                }, 60); 
+            } catch (e) {}
         } else if (typeof highlightSearchTerms === 'function') {
-            setTimeout(highlightSearchTerms, 100);
+            setTimeout(function() {
+                highlightSearchTerms();
+                if (window.searchNavigation && window.searchNavigation.pendingAutoScroll && typeof scrollToFirstHighlight === 'function') {
+                    scrollToFirstHighlight();
+                }
+            }, 100);
         }
     }
 

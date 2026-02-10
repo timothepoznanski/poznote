@@ -403,8 +403,8 @@ function showNewWorkspacePrompt() {
     if (!name) return;
 
     // Validate allowed characters
-    if (!/^[A-Za-z0-9_-]+$/.test(name)) {
-        showNotificationPopup('Invalid workspace name: use only letters, numbers, hyphens or underscores (no spaces)', 'error');
+    if (!/^[\p{L}0-9 _-]+$/u.test(name)) {
+        showNotificationPopup('Invalid workspace name: use letters, numbers, spaces, hyphens or underscores', 'error');
         return;
     }
 

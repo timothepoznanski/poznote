@@ -209,6 +209,22 @@
                 window.location.href = url;
             }
         });
+
+        // Kanban Scroll Buttons
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('.kanban-scroll-btn');
+            if (!btn) return;
+
+            const board = document.getElementById('kanbanBoard');
+            if (!board) return;
+
+            const scrollAmount = 350; // Pixels to scroll
+            if (btn.classList.contains('left')) {
+                board.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else if (btn.classList.contains('right')) {
+                board.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        });
     }
 
     /**

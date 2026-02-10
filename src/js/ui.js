@@ -601,15 +601,18 @@ function createLinkModal() {
     var addBtn = document.getElementById('linkModalAdd');
     var removeBtn = document.getElementById('linkModalRemove');
 
-    cancelBtn.addEventListener('click', function () {
+    cancelBtn.addEventListener('click', function (e) {
+        e.preventDefault();
         closeModal('linkModal');
     });
 
-    addBtn.addEventListener('click', function () {
+    addBtn.addEventListener('click', function (e) {
+        e.preventDefault();
         executeLinkModalAction();
     });
 
-    removeBtn.addEventListener('click', function () {
+    removeBtn.addEventListener('click', function (e) {
+        e.preventDefault();
         executeLinkModalRemove();
     });
 
@@ -620,6 +623,7 @@ function createLinkModal() {
     [urlInput, textInput].forEach(function (input) {
         input.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
+                e.preventDefault();
                 executeLinkModalAction();
             }
         });

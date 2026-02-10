@@ -7,12 +7,13 @@ require_once 'functions.php';
 
 // Check if settings access is completely disabled
 if (defined('DISABLE_SETTINGS_ACCESS') && DISABLE_SETTINGS_ACCESS === true) {
+    $currentLang = getUserLanguage();
     ?>
     <!DOCTYPE html>
-    <html>
+    <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
     <head>
         <meta charset="utf-8"/>
-        <title>Access Denied</title>
+        <title><?php echo t_h('common.access_denied', [], 'Access Denied', $currentLang); ?></title>
         <link rel="stylesheet" href="css/fontawesome.min.css">
         <link rel="stylesheet" href="css/all.css">
         <link rel="stylesheet" href="css/access-denied.css">
@@ -20,9 +21,9 @@ if (defined('DISABLE_SETTINGS_ACCESS') && DISABLE_SETTINGS_ACCESS === true) {
     <body class="access-denied-page">
         <div class="access-denied-modal">
             <i class="fas fa-lock"></i>
-            <h1>Access Denied</h1>
-            <p>Access to settings is disabled by administrator.</p>
-            <button id="access-denied-return-btn">Return to Home</button>
+            <h1><?php echo t_h('common.access_denied', [], 'Access Denied', $currentLang); ?></h1>
+            <p><?php echo t_h('settings.disabled_message', [], 'Access to settings is disabled by administrator.', $currentLang); ?></p>
+            <button id="access-denied-return-btn"><?php echo t_h('settings.password.cancel', [], 'Return to Home', $currentLang); ?></button>
         </div>
         <script src="js/access-denied.js"></script>
     </body>
@@ -217,7 +218,7 @@ if ($isAdmin) {
         </div>
 
         <!-- ACTIONS CATEGORY -->
-        <h2 class="settings-category-title"><?php echo t_h('settings.categories.actions', [], 'Actions'); ?></h2>
+        <h2 class="settings-category-title"><?php echo t_h('settings.categories.actions'); ?></h2>
         <div class="home-grid">
 
             <!-- Workspaces -->
@@ -293,7 +294,7 @@ if ($isAdmin) {
         </div>
 
         <!-- DISPLAY CATEGORY -->
-        <h2 class="settings-category-title"><?php echo t_h('settings.categories.display', [], 'Display'); ?></h2>
+        <h2 class="settings-category-title"><?php echo t_h('settings.categories.display'); ?></h2>
         <div class="home-grid">
 
             <?php if ($isAdmin): ?>
@@ -390,15 +391,6 @@ if ($isAdmin) {
                 </div>
             </div>
 
-            <!-- Kanban on Folder Click -->
-            <div class="home-card" id="kanban-folder-click-card">
-                <div class="home-card-icon"><i class="fal fa-columns"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.kanban_on_folder_click', [], 'Open Kanban view on folder click'); ?></span>
-                    <span id="kanban-folder-click-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
-                </div>
-            </div>
-
             <!-- Notes Without Folders Position -->
             <div class="home-card" id="notes-without-folders-card">
                 <div class="home-card-icon"><i class="fas fa-folder-tree"></i></div>
@@ -420,7 +412,7 @@ if ($isAdmin) {
         </div>
 
         <!-- ABOUT CATEGORY -->
-        <h2 class="settings-category-title"><?php echo t_h('settings.categories.about', [], 'About'); ?></h2>
+        <h2 class="settings-category-title"><?php echo t_h('settings.categories.about'); ?></h2>
         <div class="home-grid">
 
             <!-- Version -->

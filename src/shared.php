@@ -20,6 +20,9 @@ $currentLang = getUserLanguage();
 	<meta name="color-scheme" content="dark light">
 	<script src="js/theme-init.js"></script>
 	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
+	<link type="text/css" rel="stylesheet" href="css/solid.min.css"/>
+	<link type="text/css" rel="stylesheet" href="css/regular.min.css"/>
+	<link type="text/css" rel="stylesheet" href="css/brands.min.css"/>
 	<link type="text/css" rel="stylesheet" href="css/light.min.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/base.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css"/>

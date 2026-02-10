@@ -116,27 +116,39 @@
      * Save the current selection before opening the modal
      */
     function saveSelection() {
-        const selection = window.getSelection();
-        if (selection.rangeCount > 0) {
-            savedRange = selection.getRangeAt(0).cloneRange();
-            savedSelection = selection;
-        } else if (window._slashCommandSavedRange) {
-            // Fallback: use the range saved by the slash command menu's executeCommand,
-            // in case hideSlashMenu() caused the browser to lose the selection.
-            savedRange = window._slashCommandSavedRange.cloneRange();
-            savedSelection = selection;
-        }
-        
-        // Save the editable element so we can focus it before restoring the range
-        // (needed for document.execCommand to work in markdown mode).
-        try {
-            let container = savedRange && savedRange.startContainer;
-            if (container && container.nodeType === 3) container = container.parentNode;
-            savedEditableElement = container && container.closest
-                ? container.closest('[contenteditable="true"]')
-                : null;
-        } catch (e) {
-            savedEditableElement = null;
+        // Preference for input fields (slash command support)
+        if (window._slashCommandInputCursor && window._slashCommandSavedEditableElement && window._slashCommandSavedEditableElement.tagName === 'INPUT') {
+            savedEditableElement = window._slashCommandSavedEditableElement;
+            savedRange = null;
+            savedSelection = null;
+            // Note: we'll use window._slashCommandInputCursor during insertion
+        } else {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                savedRange = selection.getRangeAt(0).cloneRange();
+                savedSelection = selection;
+            } else if (window._slashCommandSavedRange) {
+                // Fallback: use the range saved by the slash command menu's executeCommand,
+                // in case hideSlashMenu() caused the browser to lose the selection.
+                savedRange = window._slashCommandSavedRange.cloneRange();
+                savedSelection = selection;
+            }
+            
+            // Save the editable element so we can focus it before restoring the range
+            // (needed for document.execCommand to work in markdown mode).
+            try {
+                if (window._slashCommandSavedEditableElement) {
+                    savedEditableElement = window._slashCommandSavedEditableElement;
+                } else {
+                    let container = savedRange && savedRange.startContainer;
+                    if (container && container.nodeType === 3) container = container.parentNode;
+                    savedEditableElement = container && container.closest
+                        ? container.closest('[contenteditable="true"]')
+                        : null;
+                }
+            } catch (e) {
+                savedEditableElement = null;
+            }
         }
         
         // Store the current note ID
@@ -154,12 +166,19 @@
             // Focus the editable element first — required for document.execCommand
             // to work (e.g. markdown insertText).
             if (savedEditableElement) {
-                try { savedEditableElement.focus(); } catch (e) { }
+                try { savedEditableElement.focus({ preventScroll: true }); } catch (e) { savedEditableElement.focus(); }
             }
             const selection = window.getSelection();
             selection.removeAllRanges();
             selection.addRange(savedRange);
             return true;
+        } else if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+            // Support for input fields (task lists, title)
+            try { 
+                savedEditableElement.focus(); 
+                // Return true if we managed to focus it
+                return true;
+            } catch (e) { }
         }
         return false;
     }
@@ -261,7 +280,9 @@
             </div>
         `;
         
-        item.addEventListener('click', () => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             insertNoteReference(note.id, heading);
         });
         
@@ -425,12 +446,61 @@
         
         // Determine note type and insert appropriate reference
         const noteEntry = document.querySelector('.noteentry');
+
+        // Handle input fields (task lists, titles)
+        if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+            insertInputReference(heading, noteId);
+            return;
+        }
+
         const isMarkdown = noteEntry && noteEntry.closest('.innernote[data-markdown-note="true"]');
         
         if (isMarkdown) {
             insertMarkdownReference(heading, noteId);
         } else {
             insertHtmlReference(heading, noteId);
+        }
+    }
+
+    /**
+     * Insert a note reference in an input field (e.g. [[Note Title]])
+     */
+    function insertInputReference(heading, noteId) {
+        if (!savedEditableElement) return;
+        
+        const referenceText = `[[${heading}]]`;
+        const input = savedEditableElement;
+        const text = input.value;
+        
+        let start = input.selectionStart;
+        let end = input.selectionEnd;
+        
+        // Fallback to slash command saved position if selection is lost
+        if (typeof start !== 'number' && window._slashCommandInputCursor) {
+            start = window._slashCommandInputCursor.start;
+            end = window._slashCommandInputCursor.end;
+        }
+        
+        const safeStart = Math.max(0, Math.min(start, text.length));
+        const safeEnd = Math.max(safeStart, Math.min(end, text.length));
+        
+        if (typeof input.setRangeText === 'function') {
+            input.setRangeText(referenceText, safeStart, safeEnd, 'end');
+        } else {
+            input.value = text.substring(0, safeStart) + referenceText + text.substring(safeEnd);
+        }
+        
+        const caretPos = safeStart + referenceText.length;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.focus();
+        try {
+            input.setSelectionRange(caretPos, caretPos);
+        } catch (e) { }
+        
+        // Force immediate save if it's a task input
+        if (input.classList.contains('task-edit-input')) {
+            // No direct action needed here as 'input' event is dispatched above,
+            // but for tasklist we might want to ensure the edit is saved if they don't blur.
         }
     }
 
@@ -474,6 +544,7 @@
         // Keyboard shortcuts
         searchInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
+                e.preventDefault();
                 // Select first result on Enter
                 const firstItem = document.querySelector('.note-reference-item');
                 if (firstItem) {
@@ -573,6 +644,13 @@
         link.setAttribute('data-note-reference', 'true');
         link.textContent = title;
         link.title = `Go to: ${heading || title}`;
+        
+        // Prevent event propagation so clicking links doesn't trigger 
+        // edit mode in task lists or other parent click handlers
+        link.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+        
         return link;
     }
 
@@ -584,6 +662,12 @@
         span.className = 'note-internal-link note-link-broken';
         span.textContent = title;
         span.title = 'Note not found';
+        
+        // Prevent event propagation
+        span.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+        
         return span;
     }
 
@@ -642,7 +726,9 @@
         }
         
         // Replace the text node with the fragment
-        textNode.parentNode.replaceChild(fragment, textNode);
+        if (textNode.parentNode) {
+            textNode.parentNode.replaceChild(fragment, textNode);
+        }
     }
 
     /**

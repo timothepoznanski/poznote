@@ -20,6 +20,13 @@ function saveAndRenderTasks(noteId, tasks) {
     const tasksList = document.getElementById('tasks-list-' + noteId);
     if (tasksList) {
         tasksList.innerHTML = renderTasks(tasks, noteId);
+        
+        // Process references [[Note Title]] in the newly rendered HTML
+        if (typeof window.processNoteReferences === 'function') {
+            const workspace = typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : (window.selectedWorkspace || '');
+            window.processNoteReferences(tasksList, workspace);
+        }
+
         enableDragAndDrop(noteId);
     }
 }
@@ -101,6 +108,13 @@ function initializeTaskList(noteId, noteType) {
 
     // Replace the contenteditable div with task list interface
     renderTaskList(noteId, tasks);
+
+    // Process references [[Note Title]] in the newly rendered HTML
+    const tasksList = document.getElementById('tasks-list-' + noteId);
+    if (tasksList && typeof window.processNoteReferences === 'function') {
+        const workspace = typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : (window.selectedWorkspace || '');
+        window.processNoteReferences(tasksList, workspace);
+    }
 }
 
 // Extract tasks from existing HTML (recovery function)
@@ -157,8 +171,10 @@ function renderTaskList(noteId, tasks) {
     // Add event listeners
     const input = document.getElementById(`task-input-${noteId}`);
     if (input) {
-        input.addEventListener('keypress', function(e) {
+        input.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation(); // Standardize event handling
                 addTask(noteId);
             }
         });
@@ -381,9 +397,10 @@ function editTask(taskId, noteId) {
     // Flag to prevent double-save (Enter + blur)
     let isSaving = false;
 
-    input.addEventListener('keypress', function(e) {
+    input.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
+            e.stopPropagation(); // Standardize event handling
             if (!isSaving) {
                 isSaving = true;
                 saveTaskEdit(taskId, noteId, input.value.trim());
@@ -443,6 +460,13 @@ function saveTaskEdit(taskId, noteId, newText) {
             const newTaskText = document.createElement('span');
             newTaskText.className = 'task-text';
             newTaskText.innerHTML = linkifyHtml(newText);
+            
+            // Process references [[Note Title]] in the new text
+            if (typeof window.processNoteReferences === 'function') {
+                const workspace = typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : (window.selectedWorkspace || '');
+                window.processNoteReferences(newTaskText, workspace);
+            }
+
             newTaskText.onclick = () => editTask(taskId, noteId);
             // Ensure links inside don't trigger the span's onclick
             const anchors = newTaskText.querySelectorAll('a');

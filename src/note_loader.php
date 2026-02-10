@@ -88,7 +88,7 @@ function getLatestNote($con, $workspace_filter) {
 /**
  * Prépare les requêtes pour les résultats de recherche
  */
-function prepareSearchResults($con, $is_search_mode, $note, $where_clause, $search_params, $workspace_filter) {
+function prepareSearchResults($con, $is_search_mode, &$note, $where_clause, $search_params, $workspace_filter) {
     $res_right = null;
     
     if ($is_search_mode) {
@@ -105,6 +105,7 @@ function prepareSearchResults($con, $is_search_mode, $note, $where_clause, $sear
             $selected_note_result = $stmt_right->fetch(PDO::FETCH_ASSOC);
             
             if ($selected_note_result) {
+                $note = $selected_note_result['id'];
                 // Re-execute: PDO cursors cannot be reset after fetch
                 $stmt_right = $con->prepare($query_right_with_note);
                 $stmt_right->execute($search_params_with_note);
@@ -116,6 +117,7 @@ function prepareSearchResults($con, $is_search_mode, $note, $where_clause, $sear
                 $stmt_right->execute($search_params);
                 $search_result = $stmt_right->fetch(PDO::FETCH_ASSOC);
                 if ($search_result) {
+                    $note = $search_result['id'];
                     // Re-execute: PDO cursors cannot be reset after fetch
                     $stmt_right = $con->prepare($query_right_secure);
                     $stmt_right->execute($search_params);
@@ -131,6 +133,7 @@ function prepareSearchResults($con, $is_search_mode, $note, $where_clause, $sear
             $stmt_right->execute($search_params);
             $search_result = $stmt_right->fetch(PDO::FETCH_ASSOC);
             if ($search_result) {
+                $note = $search_result['id'];
                 // Re-execute: PDO cursors cannot be reset after fetch
                 $stmt_right = $con->prepare($query_right_secure);
                 $stmt_right->execute($search_params);

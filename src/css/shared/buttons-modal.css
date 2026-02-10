@@ -36,12 +36,12 @@
 }
 
 .btn-shared {
-    background: #007bff;
+    background: rgb(0, 125, 184);
     color: white;
 }
 
 .btn-shared:hover {
-    background: #0056b3;
+    background: rgb(0, 105, 154);
     color: white;
     text-decoration: none;
 }

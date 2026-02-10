@@ -27,11 +27,20 @@
         "tip": "Tip",
         "important": "Important",
         "note": "Note",
+        "access_denied": "Access Denied",
         "apply": "Apply",
-        "at": "at"
+        "at": "at",
+        "scroll_left": "Scroll left",
+        "scroll_right": "Scroll right"
     },
     "settings": {
         "title": "Settings",
+        "disabled_message": "Access to settings is disabled by administrator.",
+        "categories": {
+            "actions": "Actions",
+            "display": "Display",
+            "about": "About"
+        },
         "password": {
             "title": "Settings Access",
             "heading": "Settings Protected",
@@ -1105,9 +1114,12 @@
     },
     "public_folder": {
         "filter_placeholder": "Search notes",
-        "no_filter_results": "No results."
+        "no_filter_results": "No results.",
+        "view_notes": "View as list",
+        "view_kanban": "View as Kanban"
     },
     "kanban": {
+        "uncategorized": "Uncategorized",
         "actions": {
             "enable": "Enable Kanban view",
             "disable": "Disable Kanban view",

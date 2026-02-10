@@ -101,12 +101,32 @@ try {
 $shared_notes_count = 0;
 try {
     if (isset($con)) {
-        $query = "SELECT COUNT(*) as cnt FROM shared_notes sn INNER JOIN entries e ON sn.note_id = e.id WHERE e.trash = 0";
+        $workspaceClauseF = !empty($pageWorkspace) ? "WHERE f.workspace = ?" : "";
+        $workspaceClauseE = !empty($pageWorkspace) ? "AND e.workspace = ?" : "";
+        
+        $query = "
+            WITH RECURSIVE shared_hierarchy(id) AS (
+                SELECT sf.folder_id FROM shared_folders sf 
+                INNER JOIN folders f ON sf.folder_id = f.id 
+                $workspaceClauseF
+                UNION ALL
+                SELECT f.id FROM folders f
+                INNER JOIN shared_hierarchy sh ON f.parent_id = sh.id
+            )
+            SELECT COUNT(DISTINCT e.id) as cnt
+            FROM entries e
+            LEFT JOIN shared_notes sn ON e.id = sn.note_id
+            WHERE e.trash = 0 
+            $workspaceClauseE
+            AND (sn.note_id IS NOT NULL OR e.folder_id IN (SELECT id FROM shared_hierarchy))
+        ";
+        
         $params = [];
         if (!empty($pageWorkspace)) {
-            $query .= " AND e.workspace = ?";
+            $params[] = $pageWorkspace;
             $params[] = $pageWorkspace;
         }
+        
         $stmtShared = $con->prepare($query);
         $stmtShared->execute($params);
         $shared_notes_count = (int)$stmtShared->fetchColumn();

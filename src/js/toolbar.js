@@ -1059,11 +1059,10 @@ function addLinkToNote() {
         existingUrl = match[2];
       }
 
-      // Save selection
-      if (hasSelection) {
-        window.savedRanges.link = sel.getRangeAt(0).cloneRange();
-      } else {
-        window.savedRanges.link = null;
+      // Focus the editor first
+      const noteentryLink = document.querySelector('.noteentry');
+      if (noteentryLink) {
+        try { noteentryLink.focus({ preventScroll: true }); } catch (e) { noteentryLink.focus(); }
       }
 
       showLinkModal(existingUrl, existingText, function (url, text) {

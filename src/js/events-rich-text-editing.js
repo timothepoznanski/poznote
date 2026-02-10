@@ -800,6 +800,58 @@ function handleImagePaste(items, note) {
 }
 
 /**
+ * Handle rich text paste - clean up styles that might conflict with theme
+ * @param {string} htmlData - The pasted HTML data
+ * @returns {boolean} True if paste was handled
+ */
+function handleRichTextPaste(htmlData) {
+    if (!htmlData || htmlData.trim() === '') return false;
+    
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(htmlData, 'text/html');
+    
+    // Remove conflicting attributes from all elements
+    var elements = doc.body.querySelectorAll('*');
+    
+    for (var i = 0; i < elements.length; i++) {
+        var el = elements[i];
+        
+        // Remove style attributes that set color or background
+        if (el.hasAttribute('style')) {
+            // Using the style object is more robust than regex for removing specific properties
+            el.style.color = '';
+            el.style.backgroundColor = '';
+            el.style.background = '';
+            el.style.backgroundImage = '';
+            el.style.fontFamily = '';
+            el.style.fontSize = '';
+            el.style.lineHeight = '';
+            
+            // Clean up empty style attribute
+            var styleAttr = el.getAttribute('style').trim();
+            if (styleAttr === '' || el.style.length === 0 || /^;+$/.test(styleAttr)) {
+                el.removeAttribute('style');
+            }
+        }
+        
+        // Remove legacy attributes
+        el.removeAttribute('bgcolor');
+        el.removeAttribute('color');
+        el.removeAttribute('face');
+        el.removeAttribute('width');
+        el.removeAttribute('height');
+    }
+    
+    var cleanHtml = doc.body.innerHTML;
+    if (!cleanHtml || cleanHtml.trim() === '') return false;
+
+    // Insert cleaned HTML and signal success to prevent browser default paste
+    document.execCommand('insertHTML', false, cleanHtml);
+    triggerNoteSave();
+    return true;
+}
+
+/**
  * Setup paste event handling for rich text and images
  */
 function setupPasteHandling() {
@@ -844,6 +896,12 @@ function setupPasteHandling() {
             }
             
             if (handleUrlPaste(plainText, htmlData)) {
+                e.preventDefault();
+                return;
+            }
+
+            // Handle rich text paste (cleanup styles like black text in dark mode)
+            if (htmlData && handleRichTextPaste(htmlData)) {
                 e.preventDefault();
                 return;
             }

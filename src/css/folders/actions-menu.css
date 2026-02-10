@@ -165,11 +165,6 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     margin: 4px 0;
 }
 
-/* Hide Kanban view action when kanban on click is disabled */
-body.disable-kanban-click .folder-actions-menu-item.kanban-view-action {
-    display: none;
-}
-
 .folder-actions-menu-header {
     padding: 6px 16px;
     font-size: 0.75em;

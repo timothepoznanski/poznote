@@ -4,6 +4,7 @@ class SearchManager {
         this.searchTypes = ['notes', 'tags'];
         this.isMobile = false;
         this.currentSearchType = 'notes';
+        this.lastSearchTerm = '';
     // When set, skip restore from recent user toggle (ms since epoch).
     this._suppressUntil = 0;
     // When set, skip restore from URL during initialization (used after AJAX)
@@ -91,6 +92,11 @@ class SearchManager {
         
         // Initialize combined mode state from hidden input
         this.restoreCombinedModeState(isMobile);
+        
+        // Initialize last search term from current input value
+        if (elements.searchInput && elements.searchInput.value) {
+            this.lastSearchTerm = elements.searchInput.value.trim();
+        }
         
         this.updateInterface(isMobile);
     }
@@ -830,9 +836,24 @@ class SearchManager {
         const activeType = this.getActiveSearchType(isMobile);
 
         if (!searchValue) {
+            this.lastSearchTerm = '';
             this.clearSearch();
             return;
         }
+
+        // If the search term is the same as the last one, and we're searching notes,
+        // navigate through highlights instead of re-submitting search.
+        if (searchValue === this.lastSearchTerm && activeType === 'notes' && typeof navigateToNextHighlight === 'function') {
+            navigateToNextHighlight();
+            return;
+        }
+        
+        // Reset navigation state for new search
+        if (window.searchNavigation) {
+            window.searchNavigation.currentHighlightIndex = -1;
+        }
+        
+        this.lastSearchTerm = searchValue;
 
         // Validate that exactly one search type is active
         if (!this.validateSearchState(isMobile)) {
@@ -1093,6 +1114,11 @@ class SearchManager {
                 this.initializeSearch();
             } finally {
                 this.suppressURLRestore = false;
+            }
+
+            // Scroll to the first highlight after AJAX search results are loaded
+            if (this.currentSearchType === 'notes' && typeof scrollToFirstHighlight === 'function') {
+                scrollToFirstHighlight();
             }
 
             // Guard: reapply search state after a short delay in case other init code overrides

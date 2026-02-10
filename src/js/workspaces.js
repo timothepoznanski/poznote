@@ -414,9 +414,9 @@ function scrollToTopAlert() {
     }
 }
 
-// Workspace name validation: only allow letters, digits, dash and underscore
+// Workspace name validation: only allow letters (including accented), digits, spaces, dash and underscore
 function isValidWorkspaceName(name) {
-    return /^[A-Za-z0-9_-]+$/.test(name);
+    return /^[\p{L}0-9 _-]+$/u.test(name);
 }
 
 function validateCreateWorkspaceForm() {
@@ -429,7 +429,7 @@ function validateCreateWorkspaceForm() {
         return false;
     }
     if (!isValidWorkspaceName(v)) {
-        showTopAlert(wsTr('workspaces.validation.invalid_name', {}, 'Invalid name: use letters, numbers, dash or underscore only'), 'danger');
+        showTopAlert(wsTr('workspaces.validation.invalid_name', {}, 'Invalid name: use letters, numbers, spaces, dash or underscore only'), 'danger');
         scrollToTopAlert();
         return false;
     }
@@ -458,7 +458,7 @@ function handleRenameButtonClick(e) {
                 return;
             }
             if (!isValidWorkspaceName(newName)) {
-                showTopAlert(wsTr('workspaces.validation.invalid_name', {}, 'Invalid name: use letters, numbers, dash or underscore only'), 'danger');
+                showTopAlert(wsTr('workspaces.validation.invalid_name', {}, 'Invalid name: use letters, numbers, spaces, dash or underscore only'), 'danger');
                 return;
             }
             if (newName === currentName) {
@@ -644,7 +644,7 @@ function handleCreateWorkspace(event) {
         return false;
     }
     if (!isValidWorkspaceName(name)) {
-        showTopAlert(wsTr('workspaces.validation.invalid_name', {}, 'Invalid name: use letters, numbers, dash or underscore only'), 'danger');
+        showTopAlert(wsTr('workspaces.validation.invalid_name', {}, 'Invalid name: use letters, numbers, spaces, dash or underscore only'), 'danger');
         scrollToTopAlert();
         return false;
     }

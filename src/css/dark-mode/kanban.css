@@ -93,6 +93,19 @@ body.dark-mode .kanban-tag {
     color: var(--dm-text);
 }
 
+html[data-theme='dark'] .kanban-scroll-btn,
+body.dark-mode .kanban-scroll-btn {
+    background: var(--dm-surface);
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .kanban-scroll-btn:hover,
+body.dark-mode .kanban-scroll-btn:hover {
+    background: var(--dm-border);
+    color: #ffffff;
+}
+
 /* Scrollbars */
 html[data-theme='dark'] .kanban-board::-webkit-scrollbar-track,
 body.dark-mode .kanban-board::-webkit-scrollbar-track {

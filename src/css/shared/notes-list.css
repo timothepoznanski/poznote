@@ -22,7 +22,6 @@
 .note-name-container {
     flex: 0 0 auto;
     min-width: 200px;
-    max-width: 350px;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -48,17 +47,18 @@
     gap: 5px;
     font-size: 11px;
     color: #6c757d;
-    background-color: rgba(108, 117, 125, 0.1);
-    padding: 2px 8px;
-    border-radius: 4px;
+    background-color: transparent;
+    padding: 0;
+    margin-right: 5px;
+    border-radius: 0;
     text-decoration: none;
     max-width: fit-content;
     transition: all 0.2s ease;
 }
 
 .folder-badge:hover {
-    background-color: rgba(108, 117, 125, 0.2);
-    color: #495057;
+    background-color: transparent;
+    color: var(--link-color, #007bff);
 }
 
 .folder-badge i {
@@ -94,10 +94,66 @@
     margin-right: 10px;
 }
 
-.indexable-toggle-label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.note-token.read-only {
+    cursor: default;
+    background-color: transparent !important;
+    opacity: 0.7;
+}
+
+.shared-via-parent {
+    padding-left: 0;
+    border-left: none;
+    background-color: transparent;
+}
+
+[data-theme="dark"] .shared-via-parent {
+    border-left-color: transparent;
+    background-color: transparent;
+}
+
+.folder-name-path {
+    font-weight: 500;
+    color: var(--text-color, #333);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+[data-theme="dark"] .folder-name-path {
+    color: var(--text-color, #eee);
+}
+
+.folder-name-path i {
+    margin-right: 6px;
+    opacity: 0.7;
+}
+
+.via-badge {
+    font-size: 10px;
+    margin-right: 5px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    color: #6c757d;
+}
+
+[data-theme="dark"] .via-badge {
+    background-color: #333;
+    border-color: #444;
+    color: #aaa;
+}
+
+.toggle-switch.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.indexable-checkbox[disabled] {
+    cursor: not-allowed;
+}
+
+.folder-name-text {
+    cursor: help;
+}
     font-size: 13px;
     color: var(--text-color, #333333);
     cursor: pointer;

@@ -218,6 +218,12 @@
             sel.addRange(window.savedRanges.link);
         }
         
+        // Ensure editor has focus to avoid scroll jump
+        const noteentry = document.querySelector('.noteentry');
+        if (noteentry) {
+            try { noteentry.focus({ preventScroll: true }); } catch (e) { noteentry.focus(); }
+        }
+        
         if (!sel || sel.rangeCount === 0) return;
 
         var selectedText = sel.toString();

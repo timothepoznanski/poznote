@@ -427,6 +427,13 @@ function setGlobalSetting(string $key, $value): bool {
 function registerSharedLink(string $token, int $userId, string $targetType, int $targetId): bool {
     try {
         $con = getMasterConnection();
+        
+        // Ensure availability before inserting
+        if (!isTokenAvailable($token, $userId, $targetType, $targetId)) {
+            error_log("Token registration denied: collision with existing token ownership.");
+            return false;
+        }
+
         $stmt = $con->prepare("
             INSERT OR REPLACE INTO shared_links (token, user_id, target_type, target_id)
             VALUES (?, ?, ?, ?)
@@ -434,6 +441,32 @@ function registerSharedLink(string $token, int $userId, string $targetType, int 
         return $stmt->execute([$token, $userId, $targetType, $targetId]);
     } catch (Exception $e) {
         error_log("Failed to register shared link: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Check if a token is available for use.
+ * Returns true if the token is not used by anyone, 
+ * or if it is already used by the SAME user for the SAME item.
+ */
+function isTokenAvailable(string $token, int $userId, string $targetType, int $targetId): bool {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("SELECT user_id, target_type, target_id FROM shared_links WHERE token = ? LIMIT 1");
+        $stmt->execute([$token]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$row) {
+            return true;
+        }
+        
+        // It's available if it's the exact same item
+        return (int)$row['user_id'] === $userId && 
+               $row['target_type'] === $targetType && 
+               (int)$row['target_id'] === $targetId;
+    } catch (Exception $e) {
+        error_log("Failed to check token availability: " . $e->getMessage());
         return false;
     }
 }

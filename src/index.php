@@ -91,13 +91,12 @@ $settings = [
     'show_note_created' => false,
     'hide_folder_actions' => null,
     'hide_folder_counts' => null,
-    'kanban_folder_click' => null,
     'note_list_sort' => 'updated_desc',
     'notes_without_folders_after_folders' => false
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'kanban_folder_click', 'note_list_sort', 'notes_without_folders_after_folders')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -244,9 +243,6 @@ if ($settings['hide_folder_counts'] === '0' || $settings['hide_folder_counts'] =
 if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $width_value !== 'false') {
     $extra_body_classes .= ' center-note-content';
 }
-if ($settings['kanban_folder_click'] === '0' || $settings['kanban_folder_click'] === 'false' || $settings['kanban_folder_click'] === null || $settings['kanban_folder_click'] === false) {
-    $extra_body_classes .= ' disable-kanban-click';
-}
 
 // Load note list sort preference using previously loaded settings
 $note_list_sort_type = 'updated_desc'; // default
@@ -320,6 +316,16 @@ $body_classes = trim($extra_body_classes);
         </div>
     </div>
         
+    <?php
+        // Determine which folders should be open
+        $is_search_mode = !empty($search) || !empty($tags_search);
+        
+        // Execute query for right column - only override if in search mode
+        if ($is_search_mode) {
+            $res_right = prepareSearchResults($con, $is_search_mode, $note, $search_conditions['where_clause'], $search_conditions['search_params'], $workspace_filter);
+        }
+    ?>
+
     <!-- Page configuration data (CSP compliant) -->
     <script type="application/json" id="page-config-data"><?php 
         $config_data = [
@@ -331,26 +337,18 @@ $body_classes = trim($extra_body_classes);
             'defaultNoteSortType' => $note_list_sort_type,
             'isAdmin' => function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()
         ];
-        if ($note != '' && empty($search) && empty($tags_search)) {
+        if ($note != '') {
             $config_data['currentNoteFolder'] = $current_note_folder ?? '';
-        } else if (isset($default_note_folder) && $default_note_folder && empty($search) && empty($tags_search)) {
+        } else if (isset($default_note_folder) && $default_note_folder) {
             $config_data['currentNoteFolder'] = $default_note_folder;
         }
         echo json_encode($config_data, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
     ?></script>
                     
     <?php
-        // Determine which folders should be open
-        $is_search_mode = !empty($search) || !empty($tags_search);
-        
         // Execute query for left column
         $stmt_left = $con->prepare($query_left_secure);
         $stmt_left->execute($search_params);
-        
-        // Execute query for right column - only override if in search mode
-        if ($is_search_mode) {
-            $res_right = prepareSearchResults($con, $is_search_mode, $note, $search_conditions['where_clause'], $search_conditions['search_params'], $workspace_filter);
-        }
         
         // Group notes by folder for hierarchical display (now uses folder_id)
         $organized = organizeNotesByFolder($stmt_left, $con, $workspace_filter, $note_list_sort_type);

@@ -368,7 +368,7 @@ function generateFolderActions($folderId, $folderName, $con, $workspace_filter, 
         $actions .= "<span>" . t_h('notes_list.folder_actions.create', [], 'Create note') . "</span>";
         $actions .= "</div>";
         
-        // Kanban view action (only if kanban_folder_click is enabled)
+        // Kanban view action
         $actions .= "<div class='folder-actions-menu-item kanban-view-action' data-action='open-kanban-view' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
         $actions .= "<i class='fal fa-columns'></i>";
         $actions .= "<span>" . t_h('notes_list.folder_actions.kanban_view', [], 'Kanban view') . "</span>";

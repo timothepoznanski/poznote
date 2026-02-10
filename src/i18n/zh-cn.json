@@ -287,6 +287,11 @@
     },
     "settings": {
         "title": "设置",
+        "categories": {
+            "actions": "操作",
+            "display": "显示",
+            "about": "关于"
+        },
         "sections": {
             "account_display": "账户与显示",
             "notes_folders": "笔记与文件夹",
@@ -1904,12 +1909,12 @@
             "push": {
                 "title": "推送到 GitHub",
                 "description": "将您的笔记导出到 GitHub。更新现有文件并删除 Poznote 中不再存在的文件。",
-                "button": "Push"
+                "button": "推送"
             },
             "pull": {
                 "title": "从 GitHub 拉取",
                 "description": "从 GitHub 导入笔记。更新现有笔记并将 GitHub 上不再存在的笔记移至回收站。",
-                "button": "Pull"
+                "button": "拉取"
             }
         },
         "messages": {

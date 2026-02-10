@@ -399,7 +399,7 @@
         // Ensure the containing noteentry is focused
         const noteEntry = pre.closest('.noteentry');
         if (noteEntry) {
-            try { noteEntry.focus(); } catch (err) { }
+            try { noteEntry.focus({ preventScroll: true }); } catch (err) { noteEntry.focus(); }
             // Apply selection after a short timeout to ensure it's not overridden by executeCommand's focus
             setTimeout(function () {
                 const sel = window.getSelection();
@@ -558,7 +558,7 @@
         // Apply the selection after focusing (short timeout) to avoid focus stealing.
         const noteEntry = element.closest('.noteentry');
         if (noteEntry) {
-            try { noteEntry.focus(); } catch (err) { }
+            try { noteEntry.focus({ preventScroll: true }); } catch (err) { noteEntry.focus(); }
             setTimeout(function () {
                 const sel = window.getSelection();
                 sel.removeAllRanges();
@@ -1094,6 +1094,16 @@
         ];
     }
 
+    // Return slash commands for task items
+    function getTaskSlashCommands() {
+        const t = window.t || ((key, params, fallback) => fallback);
+        const common = getCommonSlashCommands();
+        return [
+            common.noteReference,
+            common.cancel
+        ];
+    }
+
     // Return slash commands common between HTML and Markdown modes
     function getCommonSlashCommands() {
         var t = window.t || (function (key, params, fallback) { return fallback; });
@@ -1336,7 +1346,7 @@
 
                                     // Focus the editable element first
                                     if (editableElement) {
-                                        editableElement.focus();
+                                        try { editableElement.focus({ preventScroll: true }); } catch (e) { editableElement.focus(); }
                                     }
 
                                     // Restore selection and insert link
@@ -1591,7 +1601,7 @@
 
                                     // Focus the editor first
                                     if (editor) {
-                                        try { editor.focus(); } catch (e) { }
+                                        try { editor.focus({ preventScroll: true }); } catch (e) { editor.focus(); }
                                     }
 
                                     // Restore selection and insert link using DOM insertion (more robust than execCommand)
@@ -2002,20 +2012,21 @@
         document.body.style.cursor = '';
     }
 
-    // Show slash menu for an input field (title)
+    // Show slash menu for an input field (title or task)
     function showSlashMenuForInput(input, pos) {
         hideSlashMenu();
 
         // Save context
         savedEditableElement = input;
-        savedNoteEntry = input.closest('.notecard');
+        savedNoteEntry = input.closest('.notecard') || input.closest('.noteentry');
 
         // Mark slash position
         slashOffset = pos - 1;
 
-        const ctx = { noteType: 'title', noteEntry: savedNoteEntry, editableElement: input };
+        const isTaskInput = input.classList.contains('task-input');
+        const ctx = { noteType: isTaskInput ? 'tasklist' : 'title', noteEntry: savedNoteEntry, editableElement: input };
 
-        activeCommands = getTitleSlashCommands();
+        activeCommands = isTaskInput ? getTaskSlashCommands() : getTitleSlashCommands();
         filterText = '';
         selectedIndex = 0;
         filteredCommands = getFilteredCommands('');
@@ -2356,7 +2367,7 @@
         // that the selection is properly taken into account if possible by deleteSlashText.
         const isMobile = window.innerWidth < 768;
         if (isMobile && savedEditableElement) {
-            try { savedEditableElement.focus(); } catch (e) { }
+            try { savedEditableElement.focus({ preventScroll: true }); } catch (e) { savedEditableElement.focus(); }
         }
 
         // Delete the slash and filter text (unless keepSlash is true)
@@ -2410,15 +2421,24 @@
         // can use it as a reliable fallback for the cursor position.
         window._slashCommandSavedRange = cursorRangeAfterDelete;
         window._slashCommandInputCursor = inputCursorPosition;
+        window._slashCommandSavedEditableElement = savedEditableElement;
 
         // Execute command immediately (selection is restored above)
         try {
-            actionToExecute();
+            // Use setTimeout to ensure the focus/selection restoration is stable
+            // and doesn't interfere with the immediate execution's side effects (like modals)
+            setTimeout(() => {
+                actionToExecute();
+                window._slashCommandSavedRange = null;
+                window._slashCommandInputCursor = null;
+                window._slashCommandSavedEditableElement = null;
+            }, 0);
         } catch (e) {
             console.error('Error executing command:', e);
+            window._slashCommandSavedRange = null;
+            window._slashCommandInputCursor = null;
+            window._slashCommandSavedEditableElement = null;
         }
-        window._slashCommandSavedRange = null;
-        window._slashCommandInputCursor = null;
 
         // Re-focus after insertion to avoid caret jumping on focus (skip if keepSlash)
         if (!shouldKeepSlash) {
@@ -2445,6 +2465,9 @@
 
     // Handle click on main menu item
     function handleMenuClick(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
         const item = e.target.closest && e.target.closest('.slash-command-item');
         if (!item) return;
 
@@ -2454,14 +2477,15 @@
 
     // Handle click on submenu (level 2) item
     function handleSubmenuClick(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
         const item = e.target.closest && e.target.closest('.slash-command-item');
         if (!item) return;
 
         // Check if it's the back button
         const action = item.getAttribute('data-action');
         if (action === 'back') {
-            e.preventDefault();
-            e.stopPropagation();
             hideSubmenu();
             return;
         }
@@ -2472,14 +2496,15 @@
 
     // Handle click on sub-submenu (level 3) item
     function handleSubSubmenuClick(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
         const item = e.target.closest && e.target.closest('.slash-command-item');
         if (!item) return;
 
         // Check if it's the back button
         const action = item.getAttribute('data-action');
         if (action === 'back-sub') {
-            e.preventDefault();
-            e.stopPropagation();
             hideSubSubmenu();
             return;
         }
@@ -2592,6 +2617,12 @@
     // Handle keyboard input (menu navigation)
     function handleKeydown(e) {
         if (!slashMenuElement) return;
+
+        // Ensure Enter key doesn't leak to underlying inputs when menu is open
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+        }
 
         // If a sub-submenu is open (level 3)
         if (subSubmenuElement && currentSubSubmenu) {
@@ -3053,12 +3084,16 @@
             }
         }, true);
 
-        // Handle slash menu in title inputs (notecards)
+        // Handle slash menu in title inputs (notecards) and task inputs
         document.addEventListener('input', function (e) {
             const target = e.target;
             
-            // Check if this is a title input field
-            if (target.tagName === 'INPUT' && target.classList.contains('css-title')) {
+            // Check if this is a title input field or a task list input
+            const isTitleInput = target.tagName === 'INPUT' && target.classList.contains('css-title');
+            // Restrict to the "new task" input only, excluding existing task editing inputs
+            const isTaskInput = target.tagName === 'INPUT' && target.classList.contains('task-input');
+
+            if (isTitleInput || isTaskInput) {
                 const value = target.value;
                 const pos = target.selectionStart;
                 

@@ -64,7 +64,8 @@
                 var heading = (note.heading || '').toLowerCase();
                 var token = (note.token || '').toLowerCase();
                 var folderName = (note.shared_folder_name || '').toLowerCase();
-                return heading.includes(filterText) || token.includes(filterText) || folderName.includes(filterText);
+                var folderPath = (note.folder_path || '').toLowerCase();
+                return heading.includes(filterText) || token.includes(filterText) || folderName.includes(filterText) || folderPath.includes(filterText);
             });
         }
         renderSharedNotes();
@@ -424,122 +425,123 @@
             var noteNameContainer = document.createElement('div');
             noteNameContainer.className = 'note-name-container';
             
-            // Folder badge if shared via folder (before title)
-            if (note.shared_via_folder) {
-                var folderBadge = document.createElement('a');
-                folderBadge.className = 'folder-badge';
-                folderBadge.href = note.shared_folder_url || '#';
-                folderBadge.target = '_blank';
-                folderBadge.title = config.txtViaFolder + ': ' + (note.shared_folder_name || '');
-                folderBadge.textContent = note.shared_folder_name || '';
-                noteNameContainer.appendChild(folderBadge);
-            }
-            
             // Note name (clickable)
             var noteLink = document.createElement('a');
             noteLink.href = 'index.php?note=' + note.note_id + (config.workspace ? '&workspace=' + encodeURIComponent(config.workspace) : '');
             noteLink.textContent = note.heading || config.txtUntitled;
             noteLink.className = 'note-name';
             noteNameContainer.appendChild(noteLink);
+
+            // Folder badge / path (AFTER title)
+            if (note.folder_path && note.folder_path !== 'Default') {
+                var folderBadge = document.createElement('a');
+                folderBadge.className = 'folder-badge';
+                if (note.shared_via_folder) {
+                    folderBadge.href = note.shared_folder_url || '#';
+                    folderBadge.target = '_blank';
+                    folderBadge.title = config.txtViaFolder + ': ' + (note.folder_path || '');
+                } else {
+                    folderBadge.style.cursor = 'default';
+                    folderBadge.title = note.folder_path;
+                }
+                
+                var pathIcon = document.createElement('i');
+                pathIcon.className = 'fas fa-folder';
+                pathIcon.style.marginRight = '4px';
+                folderBadge.appendChild(pathIcon);
+                
+                var pathText = document.createTextNode(note.folder_path);
+                folderBadge.appendChild(pathText);
+                
+                noteNameContainer.appendChild(folderBadge);
+            }
             
             item.appendChild(noteNameContainer);
             
-            // Token (editable)
+            // Token (editable if explicitly shared)
             var tokenSpan = document.createElement('span');
             tokenSpan.className = 'note-token';
-            tokenSpan.contentEditable = 'true';
-            tokenSpan.textContent = note.token;
-            tokenSpan.title = config.txtEditToken;
-            tokenSpan.dataset.originalToken = note.token;
-            tokenSpan.dataset.noteId = note.note_id;
-            
-            tokenSpan.addEventListener('blur', function() {
-                var newToken = this.textContent.trim();
-                var originalToken = this.dataset.originalToken;
-                var nId = this.dataset.noteId;
-                updateToken(this, newToken, originalToken, nId);
-            });
-            
-            tokenSpan.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    this.blur();
-                }
-            });
+            if (!note.share_id) {
+                tokenSpan.classList.add('read-only');
+                tokenSpan.textContent = note.shared_via_folder ? '(' + config.txtViaFolder + ')' : '';
+                tokenSpan.title = note.shared_via_folder ? config.txtViaFolder : '';
+                tokenSpan.style.fontStyle = 'italic';
+            } else {
+                tokenSpan.contentEditable = 'true';
+                tokenSpan.textContent = note.token;
+                tokenSpan.title = config.txtEditToken;
+                tokenSpan.dataset.originalToken = note.token;
+                tokenSpan.dataset.noteId = note.note_id;
+                
+                tokenSpan.addEventListener('blur', function() {
+                    var newToken = this.textContent.trim();
+                    var originalToken = this.dataset.originalToken;
+                    var nId = this.dataset.noteId;
+                    updateToken(this, newToken, originalToken, nId);
+                });
+                
+                tokenSpan.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.blur();
+                    }
+                });
+            }
             
             item.appendChild(tokenSpan);
-            
-            // Indexable toggle
-            var indexableDiv = document.createElement('div');
-            indexableDiv.className = 'note-indexable';
-            var indexableLabel = document.createElement('label');
-            indexableLabel.className = 'indexable-toggle-label';
-            var indexableText = document.createElement('span');
-            indexableText.textContent = config.txtIndexable;
-            indexableText.className = 'indexable-label-text';
-            var toggleSwitch = document.createElement('label');
-            toggleSwitch.className = 'toggle-switch';
-            var indexableCheckbox = document.createElement('input');
-            indexableCheckbox.type = 'checkbox';
-            indexableCheckbox.checked = note.indexable ? true : false;
-            indexableCheckbox.className = 'indexable-checkbox';
-            (function(nId) {
-                indexableCheckbox.addEventListener('change', function() {
-                    toggleIndexable(nId, this.checked);
-                });
-            })(note.note_id);
-            var slider = document.createElement('span');
-            slider.className = 'toggle-slider';
-            toggleSwitch.appendChild(indexableCheckbox);
-            toggleSwitch.appendChild(slider);
-            indexableLabel.appendChild(indexableText);
-            indexableLabel.appendChild(toggleSwitch);
-            indexableDiv.appendChild(indexableLabel);
-            item.appendChild(indexableDiv);
             
             // Actions
             var actionsDiv = document.createElement('div');
             actionsDiv.className = 'note-actions';
             
-            // Password button
-            var passwordBtn = document.createElement('button');
-            passwordBtn.className = 'btn btn-sm btn-password';
-            if (note.hasPassword) {
-                passwordBtn.innerHTML = '<i class="fa-lock"></i>';
-                passwordBtn.title = config.txtPasswordProtected;
-            } else {
-                passwordBtn.innerHTML = '<i class="fa-lock-open"></i>';
-                passwordBtn.title = config.txtAddPasswordTitle;
+            // Password button (Only if explicitly shared)
+            if (note.share_id) {
+                var passwordBtn = document.createElement('button');
+                passwordBtn.className = 'btn btn-sm btn-password';
+                if (note.hasPassword) {
+                    passwordBtn.innerHTML = '<i class="fa-lock"></i>';
+                    passwordBtn.title = config.txtPasswordProtected;
+                } else {
+                    passwordBtn.innerHTML = '<i class="fa-lock-open"></i>';
+                    passwordBtn.title = config.txtAddPasswordTitle;
+                }
+                (function(nId, hasPwd) {
+                    passwordBtn.addEventListener('click', function() {
+                        showPasswordModal(nId, hasPwd);
+                    });
+                })(note.note_id, note.hasPassword);
+                actionsDiv.appendChild(passwordBtn);
             }
-            (function(nId, hasPwd) {
-                passwordBtn.addEventListener('click', function() {
-                    showPasswordModal(nId, hasPwd);
-                });
-            })(note.note_id, note.hasPassword);
             
             var openBtn = document.createElement('button');
             openBtn.className = 'btn btn-sm btn-secondary';
             openBtn.innerHTML = '<i class="fa-external-link"></i>';
             openBtn.title = config.txtOpen;
-            (function(url) {
-                openBtn.addEventListener('click', function() {
-                    window.open(url, '_blank');
-                });
-            })(note.url);
-            
-            var revokeBtn = document.createElement('button');
-            revokeBtn.className = 'btn btn-sm btn-danger';
-            revokeBtn.innerHTML = '<i class="fa-ban"></i>';
-            revokeBtn.title = config.txtRevoke;
-            (function(nId) {
-                revokeBtn.addEventListener('click', function() {
-                    revokeShare(nId);
-                });
-            })(note.note_id);
-            
-            actionsDiv.appendChild(passwordBtn);
+            if (note.url) {
+                (function(url) {
+                    openBtn.addEventListener('click', function() {
+                        window.open(url, '_blank');
+                    });
+                })(note.url);
+            } else {
+                openBtn.disabled = true;
+                openBtn.style.opacity = '0.5';
+            }
             actionsDiv.appendChild(openBtn);
-            actionsDiv.appendChild(revokeBtn);
+
+            if (note.share_id) {
+                var revokeBtn = document.createElement('button');
+                revokeBtn.className = 'btn btn-sm btn-danger';
+                revokeBtn.innerHTML = '<i class="fa-ban"></i>';
+                revokeBtn.title = config.txtRevoke;
+                (function(nId) {
+                    revokeBtn.addEventListener('click', function() {
+                        revokeShare(nId);
+                    });
+                })(note.note_id);
+                actionsDiv.appendChild(revokeBtn);
+            }
+            
             item.appendChild(actionsDiv);
             
             list.appendChild(item);

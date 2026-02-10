@@ -40,8 +40,10 @@ function extractTokenFromPath($path) {
 }
 
 $token = $_GET['token'] ?? '';
+$folderToken = $_GET['folder_token'] ?? '';
+$noteIdParam = $_GET['id'] ?? '';
 
-if (empty($token)) {
+if (empty($token) && (empty($folderToken) || empty($noteIdParam))) {
     // Try PATH_INFO first
     if (!empty($_SERVER['PATH_INFO'])) {
         $token = extractTokenFromPath($_SERVER['PATH_INFO']);
@@ -59,9 +61,9 @@ if (empty($token)) {
         $token = extractTokenFromPath($uri);
     }
     
-    if (empty($token)) {
+    if (empty($token) && (empty($folderToken) || empty($noteIdParam))) {
         http_response_code(400);
-        echo 'Token missing';
+        echo 'Token or folder authorization missing';
         exit;
     }
 }
@@ -71,13 +73,85 @@ if (empty($token)) {
 // ============================================================================
 
 try {
-    $stmt = $con->prepare('SELECT note_id, created, theme, indexable, password FROM shared_notes WHERE token = ?');
-    $stmt->execute([$token]);
-    $sharedNote = $stmt->fetch(PDO::FETCH_ASSOC);
+    $sharedNote = null;
+    $isFolderShared = false;
+
+    if (!empty($token)) {
+        $stmt = $con->prepare('SELECT note_id, created, theme, indexable, password FROM shared_notes WHERE token = ?');
+        $stmt->execute([$token]);
+        $sharedNote = $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // Fallback: Check if authorized via shared folder
+    if (!$sharedNote && !empty($folderToken) && !empty($noteIdParam)) {
+        $stmt = $con->prepare('SELECT folder_id, theme, indexable, password FROM shared_folders WHERE token = ?');
+        $stmt->execute([$folderToken]);
+        $sharedFolder = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($sharedFolder) {
+            $rootFolderId = $sharedFolder['folder_id'];
+            
+            // Verify note exists and belongs to this folder or its descendants
+            // We need to fetch the workspace to be safe or just trust the folder tree
+            $stmt = $con->prepare('SELECT id, folder_id FROM entries WHERE id = ? AND trash = 0');
+            $stmt->execute([$noteIdParam]);
+            $noteEntry = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($noteEntry) {
+                $noteFolderId = (int)$noteEntry['folder_id'];
+                
+                // Check if it's the root or a descendant
+                if ($noteFolderId === (int)$rootFolderId) {
+                    $isFolderShared = true;
+                } else {
+                    // Fetch all folders in the workspace of the root folder
+                    $stmt = $con->prepare('SELECT workspace FROM folders WHERE id = ?');
+                    $stmt->execute([$rootFolderId]);
+                    $workspaceResult = $stmt->fetch(PDO::FETCH_ASSOC);
+                    
+                    if ($workspaceResult) {
+                        $ws = $workspaceResult['workspace'];
+                        $stmt = $con->prepare('SELECT id, parent_id FROM folders WHERE workspace = ?');
+                        $stmt->execute([$ws]);
+                        $allFoldersPool = [];
+                        while ($f = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                            $allFoldersPool[$f['id']] = $f;
+                        }
+                        
+                        // Recursive check
+                        function isDescendantOf($targetId, $folderToSearch, $pool) {
+                            $current = $pool[$folderToSearch] ?? null;
+                            while ($current && $current['parent_id'] !== null) {
+                                if ((int)$current['parent_id'] === (int)$targetId) return true;
+                                $current = $pool[$current['parent_id']] ?? null;
+                            }
+                            return false;
+                        }
+                        
+                        if (isDescendantOf($rootFolderId, $noteFolderId, $allFoldersPool)) {
+                            $isFolderShared = true;
+                        }
+                    }
+                }
+
+                if ($isFolderShared) {
+                    $sharedNote = [
+                        'note_id' => $noteEntry['id'],
+                        'created' => date('Y-m-d H:i:s'), // Mock
+                        'theme' => $sharedFolder['theme'], // Inherit folder theme
+                        'indexable' => $sharedFolder['indexable'],
+                        'password' => $sharedFolder['password'] // Inherit folder password
+                    ];
+                    // Override token for session consistency if needed
+                    $token = $folderToken . '_note_' . $noteIdParam; 
+                }
+            }
+        }
+    }
     
     if (!$sharedNote) {
         http_response_code(404);
-        echo 'Shared note not found';
+        echo 'Shared note not found or access denied';
         exit;
     }
 
@@ -93,19 +167,25 @@ try {
     if (!empty($storedPassword)) {
         session_start();
         $sessionKey = 'public_note_auth_' . $token;
+        
+        // If accessed via a shared folder, also check the folder's session key
+        $folderSessionKey = !empty($folderToken) ? ('public_folder_auth_' . $folderToken) : '';
+        
         $passwordError = false;
         
         // Handle password submission
         if (isset($_POST['note_password'])) {
             if (password_verify($_POST['note_password'], $storedPassword)) {
                 $_SESSION[$sessionKey] = true;
+                if ($folderSessionKey) $_SESSION[$folderSessionKey] = true;
             } else {
                 $passwordError = true;
             }
         }
         
-        // Display password form if not authenticated
-        if (empty($_SESSION[$sessionKey])) {
+        // Display password form if not authenticated (check both keys)
+        $isAuthenticated = !empty($_SESSION[$sessionKey]) || ($folderSessionKey && !empty($_SESSION[$folderSessionKey]));
+        if (!$isAuthenticated) {
             ?>
             <!doctype html>
             <html>

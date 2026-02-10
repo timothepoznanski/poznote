@@ -176,8 +176,18 @@ try {
             </h1>
         </div>
 
-        <!-- Kanban Board -->
-        <div class="kanban-board" id="kanbanBoard">
+        <!-- Kanban Board Wrapper -->
+        <div class="kanban-board-wrapper">
+            <!-- Scroll Buttons -->
+            <button class="kanban-scroll-btn left" id="kanbanScrollLeft" title="<?php echo t_h('common.scroll_left', [], 'Scroll Left'); ?>">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="kanban-scroll-btn right" id="kanbanScrollRight" title="<?php echo t_h('common.scroll_right', [], 'Scroll Right'); ?>">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <!-- Kanban Board -->
+            <div class="kanban-board" id="kanbanBoard">
             
             <?php if (!empty($parentNotes)): ?>
             <!-- Column for notes directly in parent folder -->
@@ -235,6 +245,7 @@ try {
             </div>
             <?php endif; ?>
 
+            </div>
         </div>
     </div>
     

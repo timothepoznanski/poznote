@@ -53,9 +53,12 @@
         "no": "Non",
         "not_available": "Non disponible",
         "not_specified": "Non spécifié",
+        "access_denied": "Accès refusé",
         "apply": "Appliquer",
         "at": "à",
-        "kanban": "Kanban"
+        "kanban": "Kanban",
+        "scroll_left": "Faire défiler à gauche",
+        "scroll_right": "Faire défiler à droite"
     },
     "kanban": {
         "title": "Kanban - {{folder}}",
@@ -292,6 +295,12 @@
     },
     "settings": {
         "title": "Paramètres",
+        "disabled_message": "L'accès aux paramètres est désactivé par l'administrateur.",
+        "categories": {
+            "actions": "Actions",
+            "display": "Affichage",
+            "about": "À propos"
+        },
         "password": {
             "title": "Accès aux Paramètres",
             "heading": "Accès Protégé",
@@ -1505,7 +1514,9 @@
     },
     "public_folder": {
         "filter_placeholder": "Rechercher des notes",
-        "no_filter_results": "Aucun résultat."
+        "no_filter_results": "Aucun résultat.",
+        "view_notes": "Affichage par liste",
+        "view_kanban": "Affichage Kanban"
     },
     "icon_names": {
         "briefcase": "mallette",
@@ -1933,12 +1944,12 @@
             "push": {
                 "title": "Envoyer vers GitHub",
                 "description": "Exporte vos notes vers GitHub. Met à jour les fichiers existants et supprime les fichiers qui n'existent plus dans Poznote.",
-                "button": "Push"
+                "button": "Envoyer"
             },
             "pull": {
                 "title": "Récupérer depuis GitHub",
                 "description": "Importe les notes depuis GitHub. Met à jour les notes existantes et déplace dans la corbeille les notes qui n'existent plus sur GitHub.",
-                "button": "Pull"
+                "button": "Récupérer"
             }
         },
         "messages": {
