@@ -12,6 +12,7 @@
         "confirm": "Confirmar",
         "confirmation": "Confirmação",
         "save": "Salvar",
+        "untitled": "Sem título",
         "login": {
             "fields": {
                 "username": "Usuário",
@@ -271,6 +272,10 @@
         "list": {
             "title": "Notas com anexos",
             "no_attachments": "Ainda não há notas com anexos.",
+            "back_to_notes": "Voltar para as notas",
+            "manage_attachments": "Gerenciar anexos",
+            "attachment_count_singular": "1 anexo",
+            "attachment_count_plural": "{{count}} anexos",
             "hint": "Adicione anexos às suas notas usando o botão de clipe na barra de ferramentas.",
             "filter_placeholder": "Filtrar por título da nota ou nome do anexo...",
             "no_filter_results": "Nenhuma nota corresponde à sua pesquisa.",

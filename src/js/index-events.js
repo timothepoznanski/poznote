@@ -366,6 +366,11 @@
                 const kanbanFolderName = target.dataset.folderName || '';
 
                 if (kanbanFolderId && typeof window.openKanbanView === 'function') {
+                    // Close folder actions menu if opened from there
+                    if (typeof window.closeFolderActionsMenu === 'function') {
+                        window.closeFolderActionsMenu(kanbanFolderId);
+                    }
+
                     window.openKanbanView(parseInt(kanbanFolderId, 10), kanbanFolderName);
 
                     // On mobile, scroll to the right column to show the Kanban board

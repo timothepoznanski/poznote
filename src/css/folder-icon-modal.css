@@ -1,5 +1,9 @@
 /* Folder Icon Modal Styles */
 
+#folderIconModal {
+    padding-top: 30px;
+}
+
 .folder-icon-modal-content {
     max-width: 600px;
     width: 90%;

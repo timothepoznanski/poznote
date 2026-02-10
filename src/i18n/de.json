@@ -12,6 +12,7 @@
         "confirm": "Bestätigen",
         "confirmation": "Bestätigung",
         "save": "Speichern",
+        "untitled": "Unbenannt",
         "login": {
             "fields": {
                 "username": "Benutzername",
@@ -272,6 +273,10 @@
         "list": {
             "title": "Notizen mit Anhängen",
             "no_attachments": "Noch keine Notizen mit Anhängen.",
+            "back_to_notes": "Zurück zu den Notizen",
+            "manage_attachments": "Anhänge verwalten",
+            "attachment_count_singular": "1 Anhang",
+            "attachment_count_plural": "{{count}} Anhänge",
             "hint": "Fügen Sie Ihren Notizen Anhänge hinzu, indem Sie auf das Büroklammer-Symbol in der Symbolleiste klicken.",
             "filter_placeholder": "Nach Notizentitel oder Anhangsname filtern...",
             "no_filter_results": "Keine Notizen entsprechen Ihrer Suche.",

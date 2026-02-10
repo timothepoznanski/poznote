@@ -13,6 +13,7 @@
         "confirm_action": "确认操作",
         "confirmation": "确认",
         "save": "保存",
+        "untitled": "无标题",
         "login": {
             "fields": {
                 "username": "用户名",
@@ -273,6 +274,10 @@
         "list": {
             "title": "包含附件的笔记",
             "no_attachments": "目前没有笔记包含附件。",
+            "back_to_notes": "返回笔记",
+            "manage_attachments": "管理附件",
+            "attachment_count_singular": "1个附件",
+            "attachment_count_plural": "{{count}}个附件",
             "hint": "在笔记工具栏中使用回形针按钮向笔记添加附件。",
             "filter_placeholder": "按笔记标题或附件名称过滤...",
             "no_filter_results": "没有与您的搜索匹配的笔记。",

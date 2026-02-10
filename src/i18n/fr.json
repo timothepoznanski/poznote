@@ -53,6 +53,7 @@
         "no": "Non",
         "not_available": "Non disponible",
         "not_specified": "Non spécifié",
+        "untitled": "Sans titre",
         "access_denied": "Accès refusé",
         "apply": "Appliquer",
         "at": "à",
@@ -281,6 +282,10 @@
         "list": {
             "title": "Notes avec pièces jointes",
             "no_attachments": "Aucune note avec pièces jointes pour le moment.",
+            "back_to_notes": "Retour aux notes",
+            "manage_attachments": "Gérer les pièces jointes",
+            "attachment_count_singular": "1 pièce jointe",
+            "attachment_count_plural": "{{count}} pièces jointes",
             "hint": "Ajoutez des pièces jointes à vos notes en utilisant le bouton trombone dans la barre d'outils.",
             "filter_placeholder": "Filtrer par titre de note ou nom de pièce jointe...",
             "no_filter_results": "Aucune note ne correspond à votre recherche.",
