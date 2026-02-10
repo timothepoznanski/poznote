@@ -537,7 +537,7 @@ try {
                                     <?php endif; ?>
                                 </div>
                                 <div class="ws-col ws-col-move">
-                                    <button class="btn btn-warning action-btn btn-move" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" <?php echo ($cnt === 0) ? 'disabled' : ''; ?>><?php echo t_h('workspaces.actions.move_notes', [], 'Move notes', $currentLang); ?></button>
+                                    <button class="btn btn-warning action-btn btn-move" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" <?php echo ($cnt === 0 || count($workspaces) <= 1) ? 'disabled' : ''; ?>><?php echo t_h('workspaces.actions.move_notes', [], 'Move notes', $currentLang); ?></button>
                                 </div>
                                 <?php if (count($workspaces) > 1): ?>
                                 <div class="ws-col ws-col-delete">

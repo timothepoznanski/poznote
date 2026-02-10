@@ -212,6 +212,31 @@ body.dark-mode .trash-innernote {
 html[data-theme='dark'] .attachment-upload-section,
 body.dark-mode .attachment-upload-section {
     background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .file-input,
+body.dark-mode .file-input {
+    background-color: var(--dm-bg);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .accepted-types,
+body.dark-mode .accepted-types {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .form-group label,
+body.dark-mode .form-group label {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .selected-filename,
+body.dark-mode .selected-filename {
+    background: #1a4a5e;
+    border-color: var(--dm-accent);
+    color: #a0d8ff;
 }
 
 html[data-theme='dark'] .note-attachments-row,
@@ -239,6 +264,43 @@ body.dark-mode .attachments-display {
 html[data-theme='dark'] .no-attachments,
 body.dark-mode .no-attachments {
     color: var(--dm-text);
+}
+
+html[data-theme='dark'] .loading-attachments,
+body.dark-mode .loading-attachments {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .error-message,
+body.dark-mode .error-message {
+    background: #44272a;
+    border-color: #6c3238;
+    color: #ff8e9a;
+}
+
+html[data-theme='dark'] .attachment-card,
+body.dark-mode .attachment-card {
+    border-bottom-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .attachment-card:hover,
+body.dark-mode .attachment-card:hover {
+    background-color: var(--dm-surface);
+}
+
+html[data-theme='dark'] .attachment-name,
+body.dark-mode .attachment-name {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .attachment-meta,
+body.dark-mode .attachment-meta {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .attachment-size,
+body.dark-mode .attachment-size {
+    color: #b0b0b0;
 }
 
 /* ============================================

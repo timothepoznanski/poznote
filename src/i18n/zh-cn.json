@@ -248,7 +248,7 @@
             "upload_section_title": "上传新附件",
             "drag_drop_info": "您可以将文件拖放到下方:",
             "all_types_accepted": "接受所有文件类型 (最大 200MB)",
-            "upload_button": "上传文件",
+            "upload_button": "添加",
             "current_attachments": "当前附件",
             "loading_attachments": "正在加载附件...",
             "preview_alt": "预览",

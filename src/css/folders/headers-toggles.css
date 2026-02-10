@@ -59,6 +59,10 @@
     color: #ef4444 !important;
 }
 
+.folder-icon {
+    cursor: pointer;
+}
+
 /* Réduire les icônes dans les autres dossiers (non-système) */
 .folder-icon:not(.system-folder .folder-icon) {
     font-size: 0.8em !important;

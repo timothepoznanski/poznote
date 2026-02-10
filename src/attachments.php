@@ -36,7 +36,7 @@ if (!$note) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title><?php echo t_h('attachments.page.title'); ?> - <?php echo htmlspecialchars($note['heading']); ?> - Poznote</title>
+    <title><?php echo htmlspecialchars($note['heading']); ?> - Poznote</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
     <script src="js/theme-init.js"></script>
@@ -99,9 +99,6 @@ if (!$note) {
           t('attachments.size.units.gb', [], 'GB'),
       ]), ENT_QUOTES); ?>">
     <div class="settings-container">
-        <h1><?php echo t_h('attachments.page.title'); ?></h1>
-        <p><?php echo t_h('attachments.page.subtitle'); ?> <strong><?php echo htmlspecialchars($note['heading']); ?></strong></p>
-        
         <?php 
             $back_params = [];
             if ($workspace) $back_params[] = 'workspace=' . urlencode($workspace);

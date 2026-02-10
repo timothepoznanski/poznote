@@ -425,7 +425,7 @@ POZNOTE_OIDC_ALLOWED_USERS=alice@example.com,bob@example.com,charlie@company.org
 
 ## Update application
 
-> **📘 Docker Versioning**: Poznote supports flexible Docker image versioning. Learn about major/minor version tags in our [Docker Versioning Guide](Docs/DOCKER-VERSIONING.md).
+> **📘 Docker Versioning**: Poznote supports flexible Docker image versioning. Learn about major/minor version tags in our [Docker Versioning Guide](docs/DOCKER-VERSIONING.md).
 
 <details>
 <summary><strong>Update to the latest version</strong></summary>
@@ -498,7 +498,7 @@ docker compose pull && docker compose up -d
 
 **⚠️ Note about Watchtower**: Automated tools like Watchtower only update Docker images, not `docker-compose.yml` or environment variables. For production, manual updates are recommended to ensure configuration compatibility.
 
-For complete details on versioning strategies, automatic updates, and migration between major versions, see the [Docker Versioning Guide](Docs/DOCKER-VERSIONING.md).
+For complete details on versioning strategies, automatic updates, and migration between major versions, see the [Docker Versioning Guide](docs/DOCKER-VERSIONING.md).
 
 </details>
 

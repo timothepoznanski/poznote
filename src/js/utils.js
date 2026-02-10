@@ -760,7 +760,7 @@ function goToSelfHostedUpdateInstructions() {
 }
 
 function goToCloudUpdateInstructions() {
-    window.open('https://github.com/timothepoznanski/poznote/blob/main/Docs/POZNOTE-CLOUD.md', '_blank');
+    window.open('https://github.com/timothepoznanski/poznote/blob/main/docs/POZNOTE-CLOUD.md', '_blank');
 }
 
 function showUpdateCheckModal() {

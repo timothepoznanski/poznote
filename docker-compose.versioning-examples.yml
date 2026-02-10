@@ -1,5 +1,5 @@
 # Docker Compose Versioning Examples for Poznote
-# See Docs/DOCKER-VERSIONING.md for complete documentation
+# See docs/DOCKER-VERSIONING.md for complete documentation
 
 # ==================================================================================
 # Example 1: Major Version Tag (RECOMMENDED)

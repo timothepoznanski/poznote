@@ -107,6 +107,7 @@ body.dark-mode .folder-header.folder-drop-target {
     margin-right: 8px;
     transition: transform 0.2s;
     align-content: center;
+    cursor: pointer;
 }
 
 /* Root Drop Zone Styles */

@@ -72,8 +72,11 @@
         notification.textContent = message;
 
         var container = document.querySelector('.settings-container');
-        var titleEl = container.querySelector('h1');
-        container.insertBefore(notification, titleEl.nextSibling);
+        if (container.firstChild) {
+            container.insertBefore(notification, container.firstChild);
+        } else {
+            container.appendChild(notification);
+        }
 
         setTimeout(function() {
             notification.classList.remove('attention');
