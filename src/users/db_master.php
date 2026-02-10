@@ -13,6 +13,9 @@ if (!defined('SQLITE_DATABASE')) {
     require_once __DIR__ . '/../config.php';
 }
 
+// Include utility functions (createDirectoryWithPermissions, etc.)
+require_once __DIR__ . '/../functions.php';
+
 // Include auto-migration to ensure multi-user structure exists
 require_once __DIR__ . '/../auto_migrate.php';
 
