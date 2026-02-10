@@ -1533,7 +1533,6 @@
                             insertDateMarkdown();
                         }
                     },
-                    common.excalidraw,
                     common.emoji,
                     {
                         id: 'table',
