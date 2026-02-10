@@ -71,9 +71,66 @@ function isCursorInEditableNote() {
     return (editableElement && noteEntry) || markdownEditor || (editableElement && editableElement.classList.contains('noteentry'));
 }
 
+// Decode HTML entities in a string
+function decodeHtmlEntities(html) {
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = html;
+    return textarea.value;
+}
+
+// Normalize HTML to plain text in a way that matches server-side insertion mapping
+function normalizeHtmlToText(html) {
+    if (!html) return '';
+    let decoded = decodeHtmlEntities(html);
+    decoded = decoded.replace(/<br\s*\/?\s*>/gi, '\n');
+    decoded = decoded.replace(/<\/(p|div|li|h[1-6])\s*>/gi, '\n');
+    decoded = decoded.replace(/<[^>]*>/g, '');
+    return decoded;
+}
+
+// Compute cursor position based on normalized HTML-to-text mapping
+function getNormalizedCursorPosition(noteEntry, range) {
+    if (!noteEntry || !range) return null;
+
+    const preCaretRange = range.cloneRange();
+    preCaretRange.selectNodeContents(noteEntry);
+    preCaretRange.setEnd(range.endContainer, range.endOffset);
+
+    const fragment = preCaretRange.cloneContents();
+    const container = document.createElement('div');
+    container.appendChild(fragment);
+    const html = container.innerHTML || '';
+    const normalized = normalizeHtmlToText(html);
+
+    return normalized.length;
+}
+
 
 // Insert Excalidraw diagram at cursor position in a note
 function insertExcalidrawDiagram() {
+    // Capture cursor position IMMEDIATELY before anything else
+    // This is crucial for slash commands because the selection might be lost during async save
+    let capturedCursorPosition = null;
+    const currentNoteIdForPosition = getCurrentNoteId();
+    if (currentNoteIdForPosition) {
+        const noteEntryForPosition = document.getElementById('entry' + currentNoteIdForPosition);
+        if (noteEntryForPosition) {
+            let range = null;
+            const selection = window.getSelection();
+            
+            // Try to get from slash command saved range first (most reliable for slash menu)
+            if (window._slashCommandSavedRange && noteEntryForPosition.contains(window._slashCommandSavedRange.commonAncestorContainer)) {
+                range = window._slashCommandSavedRange;
+            } else if (selection.rangeCount > 0) {
+                range = selection.getRangeAt(0);
+            }
+
+            if (range && noteEntryForPosition.contains(range.commonAncestorContainer)) {
+                capturedCursorPosition = getNormalizedCursorPosition(noteEntryForPosition, range);
+            }
+        }
+    }
+
     // Disable Excalidraw insertion on mobile devices (< 800px)
     if (window.innerWidth < 800) {
         if (typeof window.showError === 'function') {
@@ -136,7 +193,7 @@ function insertExcalidrawDiagram() {
                 // Note saved successfully
                 // Wait a bit more to ensure all handlers complete
                 setTimeout(function () {
-                    openExcalidrawEditor(diagramId);
+                    openExcalidrawEditor(diagramId, capturedCursorPosition);
                     // Note: spinner will be closed when page navigates to editor
                 }, 300);
             } else {
@@ -265,7 +322,7 @@ function saveNoteAndWaitForCompletion() {
 }
 
 // Open Excalidraw editor for a specific diagram
-function openExcalidrawEditor(diagramId) {
+function openExcalidrawEditor(diagramId, cursorPosition = null) {
     // Disable Excalidraw editing on mobile devices (< 800px)
     if (window.innerWidth < 800) {
         if (typeof window.showError === 'function') {
@@ -291,17 +348,15 @@ function openExcalidrawEditor(diagramId) {
 
     // Get the note entry element to extract cursor position
     const noteEntry = document.getElementById('entry' + currentNoteId);
-    let cursorPosition = null;
 
-    if (noteEntry) {
+    // If cursorPosition wasn't passed, try to get it from current selection
+    if (cursorPosition === null && noteEntry) {
         const selection = window.getSelection();
         if (selection.rangeCount > 0) {
             const range = selection.getRangeAt(0);
-            // Calculate the offset from the beginning of the note content
-            const preCaretRange = range.cloneRange();
-            preCaretRange.selectNodeContents(noteEntry);
-            preCaretRange.setEnd(range.endContainer, range.endOffset);
-            cursorPosition = preCaretRange.toString().length;
+            if (noteEntry.contains(range.commonAncestorContainer)) {
+                cursorPosition = getNormalizedCursorPosition(noteEntry, range);
+            }
         }
     }
 

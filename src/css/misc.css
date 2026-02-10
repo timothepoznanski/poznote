@@ -372,7 +372,7 @@ img.img-with-border {
 
 img.img-with-border-no-padding {
     border: 1px solid #ddd;
-    border-radius: 6px;
+    border-radius: 0;
     box-sizing: border-box;
 }
 

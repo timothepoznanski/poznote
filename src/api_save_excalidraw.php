@@ -353,12 +353,15 @@ function saveEmbeddedDiagram() {
             $html_content = preg_replace($button_pattern, $diagram_html_core, $html_content);
         } else {
             // Neither container nor button exists, insert at cursor position if available
-            // Build diagram with text lines before and after for new insertions
-            $diagram_html_new = '<p>' . $excalidraw_placeholder . '</p>' . $diagram_html_core . '<p>' . $excalidraw_placeholder . '</p>';
+            // Build diagram without extra line breaks that cause shifting
+            $diagram_html_new = $diagram_html_core;
             
             if ($cursor_position !== null && !empty($html_content)) {
-                // Strip HTML tags to get plain text position
-                $plain_text = strip_tags($html_content);
+                // Normalize HTML to text length comparable to DOM selection offsets
+                $plain_text = html_entity_decode($html_content, ENT_QUOTES | ENT_HTML5);
+                $plain_text = preg_replace('/<br\s*\/?\s*>/i', "\n", $plain_text);
+                $plain_text = preg_replace('/<\/(p|div|li|h[1-6])\s*>/i', "\n", $plain_text);
+                $plain_text = strip_tags($plain_text);
                 
                 // If cursor position is valid
                 if ($cursor_position >= 0 && $cursor_position <= mb_strlen($plain_text)) {
@@ -428,6 +431,24 @@ function findHtmlPositionFromTextOffset($html_content, $text_offset) {
         
         if ($char === '<') {
             $in_tag = true;
+            $tag_end = mb_strpos($decoded_html, '>', $html_position);
+            if ($tag_end === false) {
+                break;
+            }
+
+            $tag_content = mb_substr($decoded_html, $html_position + 1, $tag_end - $html_position - 1);
+            $tag_trim = trim($tag_content);
+            $tag_name = strtolower(preg_replace('/\s+.*/', '', ltrim($tag_trim, '/')));
+
+            // Count line breaks for <br> and closing block tags
+            if ($tag_name === 'br') {
+                $text_position++;
+            } else if (preg_match('/^\/(p|div|li|h[1-6])\b/i', $tag_trim)) {
+                $text_position++;
+            }
+
+            $html_position = $tag_end;
+            $in_tag = false;
         } else if ($char === '>') {
             $in_tag = false;
         } else if (!$in_tag) {
