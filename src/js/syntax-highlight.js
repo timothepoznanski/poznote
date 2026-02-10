@@ -48,6 +48,8 @@
             
             // Remove hljs class to allow re-highlighting
             codeBlock.classList.remove('hljs');
+            // Remove highlighted dataset to prevent the warning
+            delete codeBlock.dataset.highlighted;
 
             try {
                 hljs.highlightElement(codeBlock);

@@ -167,7 +167,7 @@ table th {
 
 /* Code block styles for public notes */
 .public-note .content code {
-    background-color: #f4f4f4;
+    background-color: transparent;
     padding: 2px 6px;
     font-family: 'Courier New', Courier, monospace;
     font-size: 0.9em;
@@ -176,7 +176,7 @@ table th {
 }
 
 .public-note .content pre {
-    background-color: #f4f4f4;
+    background-color: transparent !important;
     padding: 12px;
     border-radius: 4px;
     overflow-x: auto;
@@ -192,13 +192,19 @@ table th {
 }
 
 .public-note .content pre code {
-    background-color: transparent;
+    background-color: transparent !important;
     padding: 0;
     color: inherit;
     border-radius: 0;
     border: none;
     display: block;
     line-height: 1.4;
+}
+
+/* Remove Highlight.js background in public notes */
+.public-note .content pre code.hljs,
+.public-note .content pre .hljs {
+    background: transparent !important;
 }
 
 /* Copy button for code blocks */

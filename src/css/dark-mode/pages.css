@@ -486,13 +486,13 @@ body.dark-mode .public-note .content code:not([class*="hljs"]):not([class*="lang
 
 html[data-theme='dark'] .public-note .content pre,
 body.dark-mode .public-note .content pre {
-    background-color: #262424;
+    background-color: transparent !important;
     border-color: var(--dm-border);
 }
 
 html[data-theme='dark'] .public-note .content pre code,
 body.dark-mode .public-note .content pre code {
-    background-color: transparent;
+    background-color: transparent !important;
 }
 
 /* Important task styling for public view in dark mode */

@@ -216,10 +216,10 @@ class NotesController {
             if ($id !== null && is_numeric($id)) {
                 $noteId = (int)$id;
                 if ($useWorkspaceFilter) {
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
+                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
                     $stmt->execute([$noteId, $workspace]);
                 } else {
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated FROM entries WHERE id = ? AND trash = 0");
+                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id FROM entries WHERE id = ? AND trash = 0");
                     $stmt->execute([$noteId]);
                 }
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -234,10 +234,10 @@ class NotesController {
                 
                 if (is_numeric($reference)) {
                     $refId = (int)$reference;
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
+                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
                     $stmt->execute([$refId, $workspace]);
                 } else {
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ? ORDER BY updated DESC LIMIT 1");
+                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ? ORDER BY updated DESC LIMIT 1");
                     $stmt->execute(['%' . $reference . '%', $workspace]);
                 }
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -252,22 +252,24 @@ class NotesController {
             $noteId = (int)$row['id'];
             
             // Get file content
+            $content = '';
             $filename = getEntryFilename($noteId, $noteType);
             
-            // Security check
-            $realPath = realpath($filename);
-            $expectedDir = realpath(getEntriesPath());
-            
-            if ($realPath === false || $expectedDir === false || strpos($realPath, $expectedDir) !== 0) {
-                $this->sendError(403, 'Invalid file path');
-                return;
-            }
-            
-            $content = '';
-            if (file_exists($filename) && is_readable($filename)) {
-                $content = file_get_contents($filename);
-                if ($content === false) {
-                    $content = '';
+            // Security check - only check realpath if file exists
+            if (file_exists($filename)) {
+                $realPath = realpath($filename);
+                $expectedDir = realpath(getEntriesPath());
+                
+                if ($realPath === false || $expectedDir === false || strpos($realPath, $expectedDir) !== 0) {
+                    $this->sendError(403, 'Invalid file path');
+                    return;
+                }
+                
+                if (is_readable($filename)) {
+                    $content = file_get_contents($filename);
+                    if ($content === false) {
+                        $content = '';
+                    }
                 }
             }
             
@@ -281,6 +283,7 @@ class NotesController {
                     'tags' => $row['tags'] ?? '',
                     'folder' => $row['folder'] ?? null,
                     'folder_id' => $row['folder_id'] ? (int)$row['folder_id'] : null,
+                    'linked_note_id' => $row['linked_note_id'] ? (int)$row['linked_note_id'] : null,
                     'created' => $row['created'] ?? null,
                     'updated' => $row['updated'] ?? null,
                     'content' => $content
