@@ -718,10 +718,8 @@ function handleCodePaste(htmlData, plainText) {
     var fragment = document.createDocumentFragment();
     
     lines.forEach(function(line, index) {
-        var span = document.createElement('span');
-        span.style.fontFamily = '"Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace';
-        span.textContent = line;
-        fragment.appendChild(span);
+        // Just use text nodes for "normal text" as requested by user
+        fragment.appendChild(document.createTextNode(line));
         
         if (index < lines.length - 1) {
             fragment.appendChild(document.createElement('br'));
