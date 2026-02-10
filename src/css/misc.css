@@ -361,6 +361,21 @@ body.dark-mode .create-section h4 {
     color: #007DB8;
 }
 
+/* Image border helpers (used by image menu actions) */
+img.img-with-border {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 6px;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+img.img-with-border-no-padding {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
 /* Export modal options */
 .export-options {
     display: flex;

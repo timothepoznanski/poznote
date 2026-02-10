@@ -154,6 +154,17 @@ body.dark-mode .image-menu-item[data-action='delete-image'] i {
     color: #dc3545;
 }
 
+html[data-theme='dark'] img.img-with-border,
+body.dark-mode img.img-with-border {
+    border-color: #444;
+    background: #1b1b1b;
+}
+
+html[data-theme='dark'] img.img-with-border-no-padding,
+body.dark-mode img.img-with-border-no-padding {
+    border-color: #444;
+}
+
 /* Search bar */
 html[data-theme='dark'] .searchbar-input,
 body.dark-mode .searchbar-input {
