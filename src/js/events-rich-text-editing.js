@@ -426,7 +426,10 @@ function handleTitleBlur(e) {
     if (window.updateidhead) {
         window.updateidhead(e.target);
     }
-    triggerNoteSave();
+    // Immediate save for title changes (no debounce)
+    if (typeof window.saveNoteToServer === 'function') {
+        window.saveNoteToServer();
+    }
 }
 
 /**
@@ -441,7 +444,10 @@ function handleTitleKeydown(e) {
         if (window.updateidhead) {
             window.updateidhead(e.target);
         }
-        triggerNoteSave();
+        // Immediate save for title changes (no debounce)
+        if (typeof window.saveNoteToServer === 'function') {
+            window.saveNoteToServer();
+        }
         var noteentry = document.querySelector('.noteentry');
         if (noteentry) {
             noteentry.focus();
