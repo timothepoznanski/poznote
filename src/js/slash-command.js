@@ -1116,7 +1116,9 @@
                 mobileHidden: true,
                 action: function () {
                     if (typeof window.toggleEmojiPicker === 'function') {
-                        window.toggleEmojiPicker();
+                        // Small delay to ensure focus and selection have settled
+                        // after slash deletion and menu hiding.
+                        setTimeout(() => window.toggleEmojiPicker(), 10);
                     }
                 }
             },
@@ -2243,15 +2245,29 @@
 
             const before = text.substring(0, slashOffset);
             const after = text.substring(safeEndOffset);
-            slashTextNode.textContent = before + after;
+            const result = before + after;
+
+            // If the line became effectively empty, add a ZWSP to keep it from collapsing visually.
+            // This prevents the cursor from jumping to the previous line when deleting the slash.
+            if (result === '') {
+                slashTextNode.textContent = '\u200B';
+            } else {
+                slashTextNode.textContent = result;
+            }
 
             // Replace cursor where the slash was deleted
             if (sel) {
                 const newRange = document.createRange();
                 try {
                     const finalPos = Math.min(slashTextNode.textContent.length, slashOffset);
-                    newRange.setStart(slashTextNode, finalPos);
-                    newRange.collapse(true);
+                    if (result === '') {
+                        // If we added a ZWSP, select it so it gets replaced by the next insertion
+                        newRange.setStart(slashTextNode, 0);
+                        newRange.setEnd(slashTextNode, 1);
+                    } else {
+                        newRange.setStart(slashTextNode, finalPos);
+                        newRange.collapse(true);
+                    }
                     sel.removeAllRanges();
                     sel.addRange(newRange);
                 } catch (e) {

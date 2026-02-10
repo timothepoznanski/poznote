@@ -374,6 +374,8 @@ img.img-with-border-no-padding {
     border: 1px solid #ddd;
     border-radius: 0;
     box-sizing: border-box;
+    padding: 0 !important;
+    vertical-align: middle;
 }
 
 /* Export modal options */

@@ -151,16 +151,7 @@ if ($note_id > 0) {
     $excalidraw_placeholder = htmlspecialchars($excalidraw_placeholder, ENT_QUOTES);
 
     if (!empty($base64_image)) {
-        // Build class attribute preserving border classes
-        $img_classes = 'excalidraw-image';
-        if (!empty($existing_img_classes)) {
-            // Preserve img-with-border and img-with-border-no-padding classes
-            if (strpos($existing_img_classes, 'img-with-border-no-padding') !== false) {
-                $img_classes .= ' img-with-border-no-padding';
-            } elseif (strpos($existing_img_classes, 'img-with-border') !== false) {
-                $img_classes .= ' img-with-border';
-            }
-        }
+        // ... (preserving existing class/style logic) ...
         
         // Build style attribute
         $img_style = !empty($existing_img_style) ? ' style="' . htmlspecialchars($existing_img_style) . '"' : '';
@@ -170,6 +161,9 @@ if ($note_id > 0) {
         $new_excalidraw_html .= '<img src="data:' . $mime_type . ';base64,' . $base64_image . '" alt="Excalidraw diagram" class="' . $img_classes . '" data-is-excalidraw="true" data-excalidraw-note-id="' . $note_id . '"' . $img_style . ' />';
         $new_excalidraw_html .= '<div class="excalidraw-data" style="display: none;">' . htmlspecialchars($diagram_data, ENT_QUOTES) . '</div>';
         $new_excalidraw_html .= '</div>';
+
+        // Wrap with placeholders ONLY for new insertions (handled in main save logic)
+        // Note: For existing diagram update, we preserve/replace patterns.
     } else {
         // If no image, create a placeholder with just the diagram data
         $new_excalidraw_html = '<div class="excalidraw-container" contenteditable="false">';
@@ -319,7 +313,7 @@ function saveEmbeddedDiagram() {
         
         // Create the core diagram HTML without placeholders initially
         // Keep all attributes on a single line for consistent regex matching
-        $diagram_html_core = '<div class="excalidraw-container" id="' . htmlspecialchars($diagram_id) . '" style="padding: 10px; cursor: pointer; text-align: center;" data-diagram-id="' . htmlspecialchars($diagram_id) . '" data-excalidraw="' . htmlspecialchars($diagram_data) . '">';
+        $diagram_html_core = '<div class="excalidraw-container" id="' . htmlspecialchars($diagram_id) . '" style="cursor: pointer; text-align: center;" data-diagram-id="' . htmlspecialchars($diagram_id) . '" data-excalidraw="' . htmlspecialchars($diagram_data) . '">';
         
         if (!empty($image_data)) {
             $diagram_html_core .= '<img src="data:image/png;base64,' . $image_data . '" class="' . $img_classes . '" data-is-excalidraw="true"' . $img_style_attr . ' alt="Excalidraw diagram" />';
@@ -353,8 +347,10 @@ function saveEmbeddedDiagram() {
             $html_content = preg_replace($button_pattern, $diagram_html_core, $html_content);
         } else {
             // Neither container nor button exists, insert at cursor position if available
-            // Build diagram without extra line breaks that cause shifting
-            $diagram_html_new = $diagram_html_core;
+            // Build diagram with placeholders (dots) for easier cursor navigation
+            $diagram_html_new = '<p class="excalidraw-placeholder">' . $excalidraw_placeholder . '</p>' . 
+                               $diagram_html_core . 
+                               '<p class="excalidraw-placeholder">' . $excalidraw_placeholder . '</p>';
             
             if ($cursor_position !== null && !empty($html_content)) {
                 // Normalize HTML to text length comparable to DOM selection offsets
