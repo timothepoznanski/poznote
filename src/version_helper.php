@@ -16,7 +16,12 @@ function getAppVersion() {
     }
     
     // Primary source: version.txt file
-    $version_file = __DIR__ . '/../version.txt';
+    $version_file = __DIR__ . '/version.txt';
+    if (!file_exists($version_file)) {
+        // Fallback for different directory structures
+        $version_file = __DIR__ . '/../version.txt';
+    }
+    
     if (file_exists($version_file)) {
         $version = trim(file_get_contents($version_file));
         if (!empty($version)) {
