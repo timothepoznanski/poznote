@@ -496,7 +496,8 @@ function oidc_is_user_allowed($claims) {
     $allowedUsers = defined('OIDC_ALLOWED_USERS') ? OIDC_ALLOWED_USERS : '';
     
     // If allowlist is not configured, allow all authenticated users
-    if ($allowedUsers === '') {
+    // Use empty() to also handle false/null from misconfigured env vars
+    if (empty($allowedUsers)) {
         return true;
     }
     
