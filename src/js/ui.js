@@ -763,7 +763,97 @@ function executeYouTubeModalAction() {
 }
 
 // ============================================================================
+// MODALS - Streaming Video
+// ============================================================================
+
+// Streaming Video Modal for inserting streaming videos (YouTube, Vimeo, etc.)
+var streamingVideoModalCallback = null;
+
+function showStreamingVideoModal(callback) {
+    // Create modal if it doesn't exist
+    var modal = document.getElementById('streamingVideoModal');
+
+    if (!modal) {
+        createStreamingVideoModal();
+        modal = document.getElementById('streamingVideoModal');
+    }
+
+    var urlInput = document.getElementById('streamingVideoModalUrl');
+    urlInput.value = '';
+    streamingVideoModalCallback = callback;
+
+    modal.style.display = 'flex';
+    setTimeout(function () {
+        urlInput.focus();
+        urlInput.select();
+    }, 100);
+}
+
+function createStreamingVideoModal() {
+    var modalHtml = '<div id="streamingVideoModal" class="modal" style="display: none;">' +
+        '<div class="modal-content">' +
+        '<div class="modal-header">' +
+        '<h3>' + (window.t ? window.t('slash_menu.bilibili_modal_title', null, 'Insert Bilibili Video') : 'Insert Bilibili Video') + '</h3>' +
+        '</div>' +
+        '<div class="modal-body">' +
+        '<div style="margin-bottom: 10px;">' +
+        '<input type="url" id="streamingVideoModalUrl" placeholder="https://www.bilibili.com/video/BV1234567890" />' +
+        '</div>' +
+        '<div style="font-size: 0.9em; color: #666; margin-top: 10px;">' +
+        (window.t ? window.t('slash_menu.bilibili_help', null, 'Enter the Bilibili video page URL (e.g., bilibili.com/video/BV...)') : 'Enter the Bilibili video page URL (e.g., bilibili.com/video/BV...)') +
+        '</div>' +
+        '</div>' +
+        '<div class="modal-buttons">' +
+        '<button type="button" class="btn btn-cancel" id="streamingVideoModalCancel">' + (window.t ? window.t('editor.link.cancel', null, 'Cancel') : 'Cancel') + '</button>' +
+        '<button type="button" class="btn btn-primary" id="streamingVideoModalInsert">' + (window.t ? window.t('slash_menu.video_insert', null, 'Insert') : 'Insert') + '</button>' +
+        '</div>' +
+        '</div>' +
+        '</div>';
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Attach event listeners to buttons
+    var cancelBtn = document.getElementById('streamingVideoModalCancel');
+    var insertBtn = document.getElementById('streamingVideoModalInsert');
+    var urlInput = document.getElementById('streamingVideoModalUrl');
+
+    cancelBtn.addEventListener('click', function () {
+        closeStreamingVideoModal();
+    });
+
+    insertBtn.addEventListener('click', function () {
+        executeStreamingVideoModalAction();
+    });
+
+    urlInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            executeStreamingVideoModalAction();
+        }
+    });
+}
+
+function closeStreamingVideoModal() {
+    closeModal('streamingVideoModal');
+    streamingVideoModalCallback = null;
+}
+
+function executeStreamingVideoModalAction() {
+    var url = document.getElementById('streamingVideoModalUrl').value.trim();
+    var callback = streamingVideoModalCallback;
+
+    // Reset callback BEFORE calling it to avoid re-entry
+    streamingVideoModalCallback = null;
+
+    if (callback && url) {
+        callback(url);
+    }
+
+    removeModalWithDelay('streamingVideoModal');
+}
+
+// ============================================================================
 // GLOBAL EXPORTS
 // ============================================================================
 
 window.showYouTubeModal = showYouTubeModal;
+window.showStreamingVideoModal = showStreamingVideoModal;

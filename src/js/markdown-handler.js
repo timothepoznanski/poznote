@@ -494,21 +494,8 @@ function parseMarkdown(text) {
             const src = srcMatch[1];
 
             // Whitelist of allowed iframe sources (trusted embed providers)
-            const allowedDomains = [
-                'youtube.com', 'www.youtube.com', 'youtube-nocookie.com', 'www.youtube-nocookie.com',
-                'player.vimeo.com', 'vimeo.com',
-                'dailymotion.com', 'www.dailymotion.com',
-                'player.twitch.tv', 'clips.twitch.tv',
-                'open.spotify.com', 'w.soundcloud.com', 'bandcamp.com',
-                'codepen.io', 'jsfiddle.net', 'codesandbox.io', 'stackblitz.com',
-                'docs.google.com', 'drive.google.com', 'maps.google.com', 'www.google.com/maps', 'calendar.google.com',
-                'onedrive.live.com', 'office.com',
-                'twitter.com', 'x.com', 'platform.twitter.com',
-                'linkedin.com', 'slides.com', 'prezi.com', 'canva.com',
-                'figma.com', 'miro.com', 'excalidraw.com',
-                'loom.com', 'wistia.com', 'fast.wistia.net', 'share.descript.com',
-                'rumble.com', 'odysee.com', 'bitchute.com', 'peertube', 'invidio.us', 'piped.video'
-            ];
+            // Synchronized with PHP's ALLOWED_IFRAME_DOMAINS via window object
+            const allowedDomains = window.ALLOWED_IFRAME_DOMAINS || [];
 
             // Check if the src matches any allowed domain
             const isAllowed = allowedDomains.some(domain =>

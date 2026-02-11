@@ -900,7 +900,7 @@ Access the **Swagger UI** directly from Poznote from `Settings > API Documentati
 
 ### Multi-User Mode
 
-Poznote supports multiple user profiles, each with their own isolated data. For API calls that access **user data** (notes, folders, etc.), you must include the `X-User-ID` header:
+Poznote supports multiple user profiles, each with their own isolated data. For API calls that access **user data** (notes, folders, workspaces, tags, attachments, backups, settings, etc.), you must include the `X-User-ID` header:
 
 ```bash
 # Get notes for user ID 1
@@ -908,7 +908,10 @@ curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes
 ```
 
-**Admin endpoints** (`/api/v1/admin/*`) and **public endpoints** (`/api/v1/users/profiles`) do **not** require the `X-User-ID` header.
+**Endpoints that do NOT require the `X-User-ID` header:**
+- **Admin endpoints**: `/api/v1/admin/*`
+- **Public endpoints**: `/api/v1/users/profiles`
+- **System endpoints**: `/api/v1/system/*` (version, updates, i18n)
 
 Use `GET /api/v1/users/profiles` to list available user profiles and their IDs.
 
@@ -1443,6 +1446,14 @@ curl -u 'username:password' -H "X-User-ID: 1" \
   -o backup.zip
 ```
 
+**Restore Backup**
+
+Restore a backup file (replaces all current user data):
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/backups/poznote_backup_2025-01-05_12-00-00.zip/restore
+```
+
 **Delete Backup**
 
 Delete a backup file:
@@ -1534,11 +1545,13 @@ curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
 <summary><strong>ℹ️ System Information</strong></summary>
 <br>
 
+> Note: System endpoints do not require the `X-User-ID` header.
+
 **Get Version**
 
 Get current version and system info:
 ```bash
-curl -u 'username:password' -H "X-User-ID: 1" \
+curl -u 'username:password' \
   http://YOUR_SERVER/api/v1/system/version
 ```
 
@@ -1546,7 +1559,7 @@ curl -u 'username:password' -H "X-User-ID: 1" \
 
 Check if a newer version is available:
 ```bash
-curl -u 'username:password' -H "X-User-ID: 1" \
+curl -u 'username:password' \
   http://YOUR_SERVER/api/v1/system/updates
 ```
 
@@ -1554,7 +1567,7 @@ curl -u 'username:password' -H "X-User-ID: 1" \
 
 Get translation strings:
 ```bash
-curl -u 'username:password' -H "X-User-ID: 1" \
+curl -u 'username:password' \
   http://YOUR_SERVER/api/v1/system/i18n
 ```
 

@@ -9,6 +9,17 @@ require_once 'db_connect.php';
 require_once 'functions.php';
 require_once 'markdown_parser.php';
 
+// Build CSP frame-src directive from allowed domains
+$frameSrcDomains = "'self'";
+foreach (ALLOWED_IFRAME_DOMAINS as $domain) {
+    $frameSrcDomains .= " https://{$domain}";
+}
+
+// Set security headers for public notes
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-src {$frameSrcDomains};");
+header("X-Content-Type-Options: nosniff");
+header("X-Frame-Options: SAMEORIGIN");
+
 // ============================================================================
 // TOKEN EXTRACTION
 // ============================================================================
@@ -474,6 +485,7 @@ if (!empty($sharedTheme) && in_array($sharedTheme, ['dark', 'light'])) {
     <meta name="robots" content="noindex, nofollow">
     <?php endif; ?>
     <title>Shared note - <?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?></title>
+    <script>window.ALLOWED_IFRAME_DOMAINS = <?php echo json_encode(ALLOWED_IFRAME_DOMAINS); ?>;</script>
     <!-- CSP-compliant theme initialization -->
     <script type="application/json" id="public-note-config"><?php 
         $apiBaseUrl = $scriptDir . '/api/v1';
