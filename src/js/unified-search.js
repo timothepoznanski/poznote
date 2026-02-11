@@ -843,9 +843,14 @@ class SearchManager {
 
         // If the search term is the same as the last one, and we're searching notes,
         // navigate through highlights instead of re-submitting search.
-        if (searchValue === this.lastSearchTerm && activeType === 'notes' && typeof navigateToNextHighlight === 'function') {
-            navigateToNextHighlight();
-            return;
+        if (searchValue === this.lastSearchTerm && activeType === 'notes') {
+            if (e.shiftKey && typeof navigateToPreviousHighlight === 'function') {
+                navigateToPreviousHighlight();
+                return;
+            } else if (typeof navigateToNextHighlight === 'function') {
+                navigateToNextHighlight();
+                return;
+            }
         }
         
         // Reset navigation state for new search
@@ -973,6 +978,12 @@ class SearchManager {
         try {
             // Hide any validation errors since we're performing a valid search
             this.hideValidationError(isMobile);
+            
+            const elements = this.getElements(isMobile);
+            const searchValue = elements.searchInput?.value.trim() || '';
+            
+            // Ensure lastSearchTerm is updated when search is initiated through any means
+            this.lastSearchTerm = searchValue;
             
             const formData = new FormData(form);
             const params = new URLSearchParams();
