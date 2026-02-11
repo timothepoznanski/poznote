@@ -139,12 +139,29 @@ try {
 $shared_folders_count = 0;
 try {
     if (isset($con)) {
-        $query = "SELECT COUNT(*) as cnt FROM shared_folders sf INNER JOIN folders f ON sf.folder_id = f.id";
+        $workspaceClauseF = !empty($pageWorkspace) ? "WHERE f.workspace = ?" : "";
+        $workspaceClauseF2 = !empty($pageWorkspace) ? "AND f.workspace = ?" : "";
+        
+        $query = "
+            WITH RECURSIVE shared_hierarchy(id) AS (
+                SELECT sf.folder_id FROM shared_folders sf 
+                INNER JOIN folders f ON sf.folder_id = f.id 
+                $workspaceClauseF
+                UNION ALL
+                SELECT f.id FROM folders f
+                INNER JOIN shared_hierarchy sh ON f.parent_id = sh.id
+            )
+            SELECT COUNT(DISTINCT f.id) as cnt FROM folders f
+            WHERE f.id IN (SELECT id FROM shared_hierarchy)
+            $workspaceClauseF2
+        ";
+        
         $params = [];
         if (!empty($pageWorkspace)) {
-            $query .= " WHERE f.workspace = ?";
+            $params[] = $pageWorkspace;
             $params[] = $pageWorkspace;
         }
+        
         $stmtSharedFolders = $con->prepare($query);
         $stmtSharedFolders->execute($params);
         $shared_folders_count = (int)$stmtSharedFolders->fetchColumn();
