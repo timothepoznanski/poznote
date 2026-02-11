@@ -250,6 +250,7 @@ paths:
       summary: List notes
       description: Get list of notes with optional filters
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: workspace
           in: query
           schema:
@@ -299,6 +300,8 @@ paths:
     post:
       tags: [Notes]
       summary: Create a new note
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
       requestBody:
         required: true
         content:
@@ -348,6 +351,7 @@ paths:
       summary: Resolve a note reference
       description: Find a note by title or ID within a workspace
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: reference
           in: query
           required: true
@@ -391,6 +395,7 @@ paths:
       tags: [Notes]
       summary: Get a specific note
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -414,6 +419,7 @@ paths:
       tags: [Notes]
       summary: Update a note
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -442,6 +448,7 @@ paths:
       tags: [Notes]
       summary: Delete a note (move to trash)
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -462,6 +469,7 @@ paths:
       tags: [Notes]
       summary: Restore a note from trash
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -476,6 +484,7 @@ paths:
       tags: [Notes]
       summary: Update note tags
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -499,6 +508,7 @@ paths:
       tags: [Notes]
       summary: Toggle favorite status
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -523,6 +533,7 @@ paths:
       tags: [Notes]
       summary: Duplicate a note
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -546,6 +557,7 @@ paths:
       tags: [Notes]
       summary: Move note to a folder
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -570,6 +582,7 @@ paths:
       tags: [Notes]
       summary: Remove note from folder (move to root)
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -585,6 +598,7 @@ paths:
       summary: Emergency save via sendBeacon
       description: Used for saving note content when page is closing
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -612,6 +626,7 @@ paths:
       tags: [Share]
       summary: Get share status
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -633,6 +648,7 @@ paths:
       tags: [Share]
       summary: Create or renew share link
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -660,6 +676,7 @@ paths:
       tags: [Share]
       summary: Update share settings
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -685,6 +702,7 @@ paths:
       tags: [Share]
       summary: Revoke share link
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -699,6 +717,7 @@ paths:
       tags: [Share]
       summary: List all shared notes
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: workspace
           in: query
           schema:
@@ -739,6 +758,7 @@ paths:
       tags: [Share]
       summary: Create or renew folder share link
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: folderId
           in: path
           required: true
@@ -766,6 +786,7 @@ paths:
       tags: [Share]
       summary: Update folder share settings
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: folderId
           in: path
           required: true
@@ -790,6 +811,7 @@ paths:
       tags: [Share]
       summary: Revoke folder share link
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: folderId
           in: path
           required: true
@@ -807,6 +829,7 @@ paths:
       tags: [Attachments]
       summary: List attachments for a note
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: noteId
           in: path
           required: true
@@ -830,6 +853,7 @@ paths:
       tags: [Attachments]
       summary: Upload an attachment
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: noteId
           in: path
           required: true
@@ -853,6 +877,7 @@ paths:
       tags: [Attachments]
       summary: Download an attachment
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: noteId
           in: path
           required: true
@@ -875,6 +900,7 @@ paths:
       tags: [Attachments]
       summary: Delete an attachment
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: noteId
           in: path
           required: true
@@ -897,6 +923,7 @@ paths:
       tags: [Folders]
       summary: List all folders
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: workspace
           in: query
           schema:
@@ -912,6 +939,8 @@ paths:
     post:
       tags: [Folders]
       summary: Create a new folder
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
       requestBody:
         content:
           application/json:
@@ -935,6 +964,7 @@ paths:
       tags: [Folders]
       summary: Get note counts for all folders
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: workspace
           in: query
           schema:
@@ -948,6 +978,7 @@ paths:
       tags: [Folders]
       summary: Get suggested folders
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: workspace
           in: query
           schema:
@@ -960,6 +991,8 @@ paths:
     post:
       tags: [Folders]
       summary: Move files between folders
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
       requestBody:
         content:
           application/json:
@@ -981,6 +1014,7 @@ paths:
       tags: [Folders]
       summary: Get a specific folder
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -993,6 +1027,7 @@ paths:
       tags: [Folders]
       summary: Rename a folder
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -1013,6 +1048,7 @@ paths:
       tags: [Folders]
       summary: Delete a folder
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -1032,6 +1068,7 @@ paths:
       tags: [Folders]
       summary: Move folder to new parent
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -1055,6 +1092,7 @@ paths:
       tags: [Folders]
       summary: Empty folder (move notes to trash)
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -1069,6 +1107,7 @@ paths:
       tags: [Folders]
       summary: Update folder icon
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -1092,6 +1131,7 @@ paths:
       tags: [Folders]
       summary: Get note count in folder
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -1106,6 +1146,7 @@ paths:
       tags: [Folders]
       summary: Get folder path
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -1123,6 +1164,7 @@ paths:
       tags: [Trash]
       summary: List notes in trash
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: workspace
           in: query
           schema:
@@ -1134,6 +1176,7 @@ paths:
       tags: [Trash]
       summary: Empty trash (delete all)
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: workspace
           in: query
           schema:
@@ -1147,6 +1190,7 @@ paths:
       tags: [Trash]
       summary: Permanently delete a note from trash
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
@@ -1163,6 +1207,8 @@ paths:
     get:
       tags: [Workspaces]
       summary: List all workspaces
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
       responses:
         '200':
           description: List of workspaces
@@ -1180,6 +1226,8 @@ paths:
     post:
       tags: [Workspaces]
       summary: Create a new workspace
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
       requestBody:
         content:
           application/json:
@@ -1199,6 +1247,7 @@ paths:
       tags: [Workspaces]
       summary: Rename a workspace
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: name
           in: path
           required: true
@@ -1219,6 +1268,7 @@ paths:
       tags: [Workspaces]
       summary: Delete a workspace
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: name
           in: path
           required: true
@@ -1236,6 +1286,7 @@ paths:
       tags: [Tags]
       summary: List all unique tags
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: workspace
           in: query
           schema:
@@ -1263,6 +1314,7 @@ paths:
       tags: [Settings]
       summary: Get a setting value
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: key
           in: path
           required: true
@@ -1276,6 +1328,7 @@ paths:
       tags: [Settings]
       summary: Set a setting value
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: key
           in: path
           required: true
@@ -1541,6 +1594,7 @@ paths:
       summary: Export a note
       description: Download a note in various formats (HTML, Markdown, PDF, DOCX)
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: query
           required: true
@@ -1561,6 +1615,7 @@ paths:
       tags: [Export]
       summary: Export a folder as ZIP
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: folder_id
           in: query
           required: true
@@ -1575,6 +1630,7 @@ paths:
       tags: [Export]
       summary: Export all entries as ZIP
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: workspace
           in: query
           schema:
@@ -1588,6 +1644,7 @@ paths:
       tags: [Export]
       summary: Export structured data
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: workspace
           in: query
           schema:
@@ -1600,6 +1657,8 @@ paths:
     get:
       tags: [Export]
       summary: Export all attachments as ZIP
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
       responses:
         '200':
           description: ZIP file download
@@ -1609,6 +1668,7 @@ paths:
       tags: [Export]
       summary: Download note file
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: query
           required: true
@@ -1628,6 +1688,8 @@ paths:
       tags: [Export]
       summary: Save Excalidraw diagram
       description: Save or update an Excalidraw drawing
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
       requestBody:
         content:
           multipart/form-data:

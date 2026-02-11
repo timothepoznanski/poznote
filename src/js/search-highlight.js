@@ -80,8 +80,45 @@ function highlightSearchTerms() {
         return; // Only highlight in notes search mode
     }
     
-    // Clear existing highlights first
-    clearSearchHighlights();
+    // Check if we already have highlights for this exact term
+    // If so, just ensure the active state is preserved - don't recreate everything
+    var existingHighlights = document.querySelectorAll('.search-highlight');
+    var termUnchanged = window.searchNavigation && searchTerm === window.searchNavigation.lastTerm;
+    
+    if (termUnchanged && existingHighlights.length > 0) {
+        // Highlights already exist for this term - just refresh the list and restore active state
+        updateHighlightsList();
+        
+        if (window.searchNavigation) {
+            var nav = window.searchNavigation;
+            
+            // Check if we need to apply first highlight (pendingAutoScroll)
+            if (nav.pendingAutoScroll && nav.highlights.length > 0) {
+                nav.pendingAutoScroll = false;
+                nav.currentHighlightIndex = 0;
+                // Apply orange without scroll (scroll handled separately)
+                nav.highlights.forEach(function(h) { h.classList.remove('search-highlight-active'); });
+                nav.highlights[0].classList.add('search-highlight-active');
+            } else if (nav.currentHighlightIndex >= 0 && nav.highlights.length > 0) {
+                // Ensure the active highlight has the orange class
+                var idx = Math.min(nav.currentHighlightIndex, nav.highlights.length - 1);
+                var hasActive = document.querySelector('.search-highlight-active');
+                if (!hasActive) {
+                    nav.highlights[idx].classList.add('search-highlight-active');
+                }
+            }
+        }
+        return; // Skip recreation
+    }
+    
+    // Term changed or no existing highlights - do full re-highlighting
+    // Clear existing highlights first. Keep navigation index if search term is same.
+    clearSearchHighlights(termUnchanged);
+    
+    // Set lastTerm AFTER clearSearchHighlights so it doesn't get reset to ''
+    if (window.searchNavigation) {
+        window.searchNavigation.lastTerm = searchTerm;
+    }
     
     // Parse search terms with support for quoted phrases
     var searchWords = parseSearchTerms(searchTerm);
@@ -93,6 +130,28 @@ function highlightSearchTerms() {
     
     for (var i = 0; i < elementsToHighlight.length; i++) {
         totalHighlights += highlightInElement(elementsToHighlight[i], searchWords);
+    }
+
+    // Refresh the list of highlights to include the new DOM elements
+    updateHighlightsList();
+
+    // Apply active highlight state
+    if (window.searchNavigation) {
+        var nav = window.searchNavigation;
+        var hasMatches = nav.highlights.length > 0;
+
+        if (hasMatches) {
+            if (nav.pendingAutoScroll) {
+                // Apply first highlight as active and mark scroll as done
+                nav.pendingAutoScroll = false;
+                nav.currentHighlightIndex = 0;
+                nav.highlights[0].classList.add('search-highlight-active');
+            } else if (nav.currentHighlightIndex >= 0) {
+                // Restore previous active highlight
+                var idx = Math.min(nav.currentHighlightIndex, nav.highlights.length - 1);
+                nav.highlights[idx].classList.add('search-highlight-active');
+            }
+        }
     }
 }
 
@@ -286,11 +345,16 @@ function highlightInElement(element, searchWords) {
 
 /**
  * Clear all search highlights
+ * @param {boolean} skipResetNavigation - If true, preserve currentHighlightIndex
  */
-function clearSearchHighlights() {
+function clearSearchHighlights(skipResetNavigation) {
     // Reset navigation state
     if (window.searchNavigation) {
-        window.searchNavigation.currentHighlightIndex = -1;
+        if (!skipResetNavigation) {
+            window.searchNavigation.currentHighlightIndex = -1;
+            window.searchNavigation.lastTerm = '';
+        }
+        // Always clear the highlights array of DOM nodes as they are about to be destroyed/normalized
         window.searchNavigation.highlights = [];
     }
 
@@ -553,7 +617,9 @@ function clearInputOverlays(inputElement) {
  */
 window.searchNavigation = {
     currentHighlightIndex: -1,
-    highlights: []
+    highlights: [],
+    lastTerm: '',
+    pendingAutoScroll: false
 };
 
 /**
@@ -581,33 +647,70 @@ function updateHighlightsList() {
 
 /**
  * Navigate to a specific highlight by index
+ * @param {number} index - The index of the highlight to navigate to
+ * @param {boolean} smooth - Whether to use smooth scrolling (default: true)
  */
-function navigateToHighlight(index) {
+function navigateToHighlight(index, smooth) {
     var highlights = window.searchNavigation.highlights;
-    if (index < 0 || index >= highlights.length) return;
+    if (!highlights || index < 0 || index >= highlights.length) return;
     
     var target = highlights[index];
+    if (!target) return;
     
-    // Remove active class from all highlights
-    highlights.forEach(h => {
+    // Remove active class from ALL highlight elements in the DOM to be safe
+    document.querySelectorAll('.search-highlight-active, .input-highlight-overlay.search-highlight-active').forEach(h => {
         h.classList.remove('search-highlight-active');
     });
     
-    // Add active class and scroll
+    // Add active class
     target.classList.add('search-highlight-active');
     
-    // Smooth scroll to the target
-    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Scroll to the target
+    if (typeof target.scrollIntoView === 'function') {
+        const behavior = (smooth === false) ? 'auto' : 'smooth';
+        target.scrollIntoView({ behavior: behavior, block: 'center' });
+    }
     
     window.searchNavigation.currentHighlightIndex = index;
+}
+
+/**
+ * Navigate to the previous highlight
+ */
+function navigateToPreviousHighlight() {
+    updateHighlightsList();
+    var highlights = window.searchNavigation.highlights;
+    
+    if (highlights.length === 0) return;
+    
+    var prevIndex = window.searchNavigation.currentHighlightIndex - 1;
+    
+    if (prevIndex >= 0) {
+        navigateToHighlight(prevIndex, true);
+    } else {
+        // Wrap around to the last one
+        navigateToHighlight(highlights.length - 1, true);
+    }
 }
 
 /**
  * Navigate to the next highlight
  */
 function navigateToNextHighlight() {
+    // Refresh the list to ensure we have current DOM elements
     updateHighlightsList();
     var highlights = window.searchNavigation.highlights;
+    
+    // If no highlights found in the list, try re-parsing once in case they were lost
+    if (highlights.length === 0) {
+        var searchInput = document.getElementById('unified-search') || document.getElementById('unified-search-mobile');
+        var term = searchInput ? searchInput.value.trim() : '';
+        if (term) {
+            highlightSearchTerms();
+            updateHighlightsList();
+            highlights = window.searchNavigation.highlights;
+        }
+    }
     
     if (highlights.length === 0) {
         // No highlights in current note, try to go to next note
@@ -617,8 +720,11 @@ function navigateToNextHighlight() {
     
     var nextIndex = window.searchNavigation.currentHighlightIndex + 1;
     
+    // If we're at the end or if we haven't started yet (-1 + 1 = 0)
     if (nextIndex < highlights.length) {
-        navigateToHighlight(nextIndex);
+        // Use 'auto' scroll if we are just moving to the next one quickly, 
+        // helps with rapid Enter presses
+        navigateToHighlight(nextIndex, true);
     } else {
         // End of current note reached, go to next note
         navigateToNextNote();
@@ -629,40 +735,85 @@ function navigateToNextHighlight() {
  * Navigate to the next note in the list
  */
 function navigateToNextNote() {
-    // Find the currently selected note in the left column
-    var currentNote = document.querySelector('.links_arbo_left.selected-note, [data-action="load-note"].selected-note');
-    
-    // Find all visible notes that match search (not hidden)
-    // We use a more robust selector to include ALL notes in the sidebar
-    var allNotes = Array.from(document.querySelectorAll('[data-action="load-note"]')).filter(function(el) {
-        // Skip explicitly hidden notes
-        if (el.classList.contains('search-hidden')) return false;
-        // Skip notes in folders that are hidden by search
-        if (el.closest('.folder-header.search-hidden')) return false;
-        // Skip trash notes if we aren't searching in trash specifically
-        if (el.closest('.folder-header[data-folder="Trash"]') && !el.closest('.folder-header:not(.search-hidden)')) return false;
+    // 1. Collect all notes in document order
+    const rawNotes = Array.from(document.querySelectorAll('[data-action="load-note"]'));
+    if (rawNotes.length === 0) return;
+
+    // 2. Identify all unique note instances, favoring visible ones (Desktop vs Mobile)
+    const noteInstances = new Map();
+    rawNotes.forEach(el => {
+        const id = el.getAttribute('data-note-id');
+        if (!id) return;
         
-        return true;
+        // Visibility check: not hidden by class and has dimensions
+        const isHidden = el.classList.contains('search-hidden') || 
+                         el.closest('.search-hidden') !== null ||
+                         (el.offsetWidth === 0 && el.offsetHeight === 0);
+        
+        const currentEntry = noteInstances.get(id);
+        if (!currentEntry || (!isHidden && currentEntry.hidden)) {
+            noteInstances.set(id, { element: el, hidden: isHidden });
+        }
     });
-    
-    if (allNotes.length === 0) return;
-    
-    var currentIndex = currentNote ? allNotes.indexOf(currentNote) : -1;
-    var nextNote = allNotes[currentIndex + 1];
-    
-    // If we're at the end, wrap around to the first note
-    if (!nextNote) {
-        nextNote = allNotes[0];
+
+    // 3. Filter to keep only the preferred instances that are NOT hidden
+    const validNotes = rawNotes.filter(el => {
+        const id = el.getAttribute('data-note-id');
+        const instance = noteInstances.get(id);
+        return instance && instance.element === el && !instance.hidden;
+    });
+
+    if (validNotes.length === 0) {
+        // Try a last resort: if no "visible" notes but some are rendered without search-hidden
+        // (sometimes offsetWidth is 0 for newly loaded sidebar content)
+        const fallbackNotes = rawNotes.filter(el => !el.classList.contains('search-hidden') && !el.closest('.search-hidden'));
+        if (fallbackNotes.length > 0) {
+            // Apply same de-duplication
+            const fallbackMap = new Map();
+            fallbackNotes.forEach(el => {
+                const id = el.getAttribute('data-note-id');
+                if (!fallbackMap.has(id)) fallbackMap.set(id, el);
+            });
+            const deduplicatedFallback = fallbackNotes.filter(el => fallbackMap.get(el.getAttribute('data-note-id')) === el);
+            _performNoteNavigation(deduplicatedFallback);
+        }
+        return;
     }
+
+    _performNoteNavigation(validNotes);
+}
+
+/**
+ * Internal helper to perform navigation among a list of notes
+ * @param {Array<HTMLElement>} noteList - List of note elements to navigate through
+ * @private
+ */
+function _performNoteNavigation(noteList) {
+    // Find current position by note ID (robust across sidebars)
+    const currentNoteEl = document.querySelector('.selected-note[data-action="load-note"]');
+    const currentNoteId = currentNoteEl ? currentNoteEl.getAttribute('data-note-id') : null;
+    
+    let currentIndex = -1;
+    if (currentNoteId) {
+        currentIndex = noteList.findIndex(el => el.getAttribute('data-note-id') === currentNoteId);
+    }
+
+    // Pick next (wrap around)
+    const nextNote = noteList[currentIndex + 1] || noteList[0];
     
     if (nextNote) {
-        // Reset highlight index for the next note
-        window.searchNavigation.currentHighlightIndex = -1;
-        // Click the next note to load it
+        // Reset scroll position for new note
+        if (window.searchNavigation) {
+            window.searchNavigation.currentHighlightIndex = -1;
+        }
+        
+        // Trigger load
         nextNote.click();
         
-        // Auto-scroll to first highlight after note is loaded
-        window.searchNavigation.pendingAutoScroll = true;
+        // Flag for auto-scroll after load
+        if (window.searchNavigation) {
+            window.searchNavigation.pendingAutoScroll = true;
+        }
     }
 }
 
@@ -670,14 +821,31 @@ function navigateToNextNote() {
  * Automatically scroll to the first highlight
  */
 function scrollToFirstHighlight() {
-    // Clear pending flag
-    window.searchNavigation.pendingAutoScroll = false;
+    // Do NOT clear pendingAutoScroll here - let highlightSearchTerms handle it
+    // This avoids race conditions with the retry mechanism
     
-    // Wait a bit for everything to be rendered and overlays to be positioned
+    // Wait for content to be fully rendered, then scroll to first highlight
     setTimeout(function() {
         updateHighlightsList();
-        if (window.searchNavigation.highlights.length > 0) {
-            navigateToHighlight(0);
+        
+        if (window.searchNavigation && window.searchNavigation.highlights && window.searchNavigation.highlights.length > 0) {
+            // Mark that we've handled the auto-scroll
+            window.searchNavigation.pendingAutoScroll = false;
+            
+            // Set index and apply active class
+            window.searchNavigation.currentHighlightIndex = 0;
+            
+            // Remove any existing active class first
+            document.querySelectorAll('.search-highlight-active').forEach(function(el) {
+                el.classList.remove('search-highlight-active');
+            });
+            
+            // Apply active class to first highlight
+            var firstHighlight = window.searchNavigation.highlights[0];
+            if (firstHighlight) {
+                firstHighlight.classList.add('search-highlight-active');
+                firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
         }
-    }, 300);
+    }, 200);
 }

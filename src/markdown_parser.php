@@ -168,17 +168,21 @@ function parseMarkdown($text) {
             $src = $srcMatch[1];
             
             // Use centralized whitelist from functions.php (ALLOWED_IFRAME_DOMAINS constant)
-            $allowedDomains = defined('ALLOWED_IFRAME_DOMAINS') ? ALLOWED_IFRAME_DOMAINS : [
-                'youtube.com', 'www.youtube.com',
-                'youtube-nocookie.com', 'www.youtube-nocookie.com',
-            ];
+            // Note: functions.php must be loaded before calling parseMarkdown()
+            $allowedDomains = ALLOWED_IFRAME_DOMAINS;
             
-            // Check if the src matches any allowed domain
+            // Check if the src matches any allowed domain (properly validate hostname)
             $isAllowed = false;
-            foreach ($allowedDomains as $domain) {
-                if (stripos($src, '//' . $domain) !== false || stripos($src, '.' . $domain) !== false) {
-                    $isAllowed = true;
-                    break;
+            $parsedUrl = parse_url($src);
+            if (isset($parsedUrl['host'])) {
+                $host = strtolower($parsedUrl['host']);
+                foreach ($allowedDomains as $domain) {
+                    $domain = strtolower($domain);
+                    // Exact match or subdomain match (e.g., www.youtube.com or embed.youtube.com)
+                    if ($host === $domain || substr($host, -(strlen($domain) + 1)) === '.' . $domain) {
+                        $isAllowed = true;
+                        break;
+                    }
                 }
             }
             

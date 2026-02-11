@@ -1409,14 +1409,31 @@
                 submenu: [
                     common.image,
                     {
-                        id: 'youtube',
+                        id: 'youtube-video',
                         icon: 'fa fa-video',
-                        label: t('slash_menu.youtube_video', null, 'YouTube video'),
+                        label: t('slash_menu.youtube', null, 'YouTube'),
                         action: function () {
                             if (typeof window.insertYouTubeVideo === 'function') {
                                 window.insertYouTubeVideo();
                             }
                         }
+                    },
+                    {
+                        id: 'streaming-videos',
+                        icon: 'fa-video',
+                        label: t('slash_menu.streaming_videos', null, 'Streaming videos'),
+                        submenu: [
+                            {
+                                id: 'bilibili-video',
+                                icon: 'fa fa-video',
+                                label: t('slash_menu.bilibili', null, 'Bilibili'),
+                                action: function () {
+                                    if (typeof window.insertStreamingVideo === 'function') {
+                                        window.insertStreamingVideo();
+                                    }
+                                }
+                            }
+                        ]
                     },
                     {
                         id: 'mp4-video',
@@ -1662,14 +1679,31 @@
                 submenu: [
                     common.image,
                     {
-                        id: 'youtube',
+                        id: 'youtube-video',
                         icon: 'fa fa-video',
-                        label: t('slash_menu.youtube_video', null, 'YouTube video'),
+                        label: t('slash_menu.youtube', null, 'YouTube'),
                         action: function () {
                             if (typeof window.insertYouTubeVideoMarkdown === 'function') {
                                 window.insertYouTubeVideoMarkdown();
                             }
                         }
+                    },
+                    {
+                        id: 'streaming-videos',
+                        icon: 'fa-video',
+                        label: t('slash_menu.streaming_videos', null, 'Streaming videos'),
+                        submenu: [
+                            {
+                                id: 'bilibili-video',
+                                icon: 'fa fa-video',
+                                label: t('slash_menu.bilibili', null, 'Bilibili'),
+                                action: function () {
+                                    if (typeof window.insertStreamingVideoMarkdown === 'function') {
+                                        window.insertStreamingVideoMarkdown();
+                                    }
+                                }
+                            }
+                        ]
                     },
                     {
                         id: 'mp4-video',
@@ -1852,7 +1886,9 @@
                 const hasSubmenu = item.submenu && item.submenu.length > 0;
                 const submenuIndicator = hasSubmenu ? '<i class="fa fa-chevron-right slash-command-submenu-indicator"></i>' : '';
                 const iconStyle = item.iconColor ? ' style="margin-right: 8px; width: 16px; display: inline-block; text-align: center; color: ' + item.iconColor + ';"' : ' style="margin-right: 8px; width: 16px; display: inline-block; text-align: center;"';
-                const iconHtml = item.icon ? '<i class="slash-command-icon fa ' + item.icon + '"' + iconStyle + '></i>' : '';
+                // If icon already has fa/fab/fal/fas prefix, use as-is, otherwise add 'fa '
+                const iconClass = item.icon && (item.icon.startsWith('fa ') || item.icon.startsWith('fab ') || item.icon.startsWith('fal ') || item.icon.startsWith('fas ')) ? item.icon : 'fa ' + item.icon;
+                const iconHtml = item.icon ? '<i class="slash-command-icon ' + iconClass + '"' + iconStyle + '></i>' : '';
                 return (
                     '<div class="slash-command-item' + selectedClass + '" data-submenu-id="' + item.id + '" data-has-sub-submenu="' + hasSubmenu + '">' +
                     iconHtml +
@@ -1885,6 +1921,7 @@
             .map((item, idx) => {
                 const selectedClass = idx === selectedSubSubmenuIndex ? ' selected' : '';
                 const iconStyle = item.iconColor ? ' style="margin-right: 8px; color: ' + item.iconColor + ';"' : ' style="margin-right: 8px;"';
+                // If icon already has fa/fab/fal/fas prefix, use as-is, otherwise it should already be complete
                 const iconHtml = item.icon ? '<i class="slash-command-icon ' + item.icon + '"' + iconStyle + '></i>' : '';
                 return (
                     '<div class="slash-command-item' + selectedClass + '" data-sub-submenu-id="' + item.id + '">' +
@@ -3113,7 +3150,131 @@
         }, true);
     }
 
-    // Process a YouTube URL and insert the corresponding iframe
+    // Process a Bilibili URL and insert the corresponding iframe
+    function processStreamingVideoUrl(url, isMarkdown, editableElement, savedRange, noteEntry) {
+        const t = window.t || ((key, params, fallback) => fallback);
+
+        if (!url) return;
+
+        // Validate URL format
+        try {
+            new URL(url);
+        } catch (e) {
+            if (typeof showNotificationPopup === 'function') {
+                showNotificationPopup(t('slash_menu.invalid_url', null, 'Invalid URL'), 'error');
+            } else {
+                alert(t('slash_menu.invalid_url', null, 'Invalid URL'));
+            }
+            return;
+        }
+
+        // Validate that it's a Bilibili URL
+        if (!url.includes('bilibili.com')) {
+            if (typeof showNotificationPopup === 'function') {
+                showNotificationPopup(t('slash_menu.bilibili_invalid_url', null, 'Please enter a valid Bilibili URL'), 'error');
+            } else {
+                alert(t('slash_menu.bilibili_invalid_url', null, 'Please enter a valid Bilibili URL'));
+            }
+            return;
+        }
+
+        // Extract video ID from Bilibili URL and convert to embed URL
+        let embedUrl = url;
+        const bvMatch = url.match(/\/video\/(BV[a-zA-Z0-9]+)/);
+        if (bvMatch) {
+            // Convert page URL to embed URL
+            embedUrl = 'https://player.bilibili.com/player.html?bvid=' + bvMatch[1];
+        } else if (!url.includes('player.bilibili.com')) {
+            // Not a recognized Bilibili URL format
+            if (typeof showNotificationPopup === 'function') {
+                showNotificationPopup(t('slash_menu.bilibili_invalid_format', null, 'Invalid Bilibili URL format. Use a video page URL (bilibili.com/video/BV...)'), 'error');
+            } else {
+                alert(t('slash_menu.bilibili_invalid_format', null, 'Invalid Bilibili URL format. Use a video page URL (bilibili.com/video/BV...)'));
+            }
+            return;
+        }
+
+        if (isMarkdown) {
+            // For markdown, insert iframe HTML directly
+            const iframeMarkdown = '<iframe width="560" height="315" src="' + embedUrl + '" frameborder="0" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation allow-top-navigation-by-user-activation" allowfullscreen></iframe>\n\n';
+
+            // Focus the editable element first
+            if (editableElement) {
+                editableElement.focus();
+            }
+
+            // Restore selection if saved
+            if (savedRange) {
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(savedRange);
+            }
+
+            insertMarkdownAtCursor(iframeMarkdown, 0);
+        } else {
+            // For HTML notes
+            const iframeHtml = '<iframe width="560" height="315" src="' + embedUrl + '" frameborder="0" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation allow-top-navigation-by-user-activation" allowfullscreen></iframe>';
+
+            // Focus the editable element first
+            if (editableElement) {
+                editableElement.focus();
+            }
+
+            // Restore selection and insert iframe
+            try {
+                const sel = window.getSelection();
+                let range;
+
+                if (savedRange) {
+                    sel.removeAllRanges();
+                    sel.addRange(savedRange);
+                    range = savedRange;
+                } else if (sel && sel.rangeCount > 0) {
+                    range = sel.getRangeAt(0);
+                } else {
+                    // No saved range and no current range, try to create one at the end of editableElement
+                    if (editableElement) {
+                        range = document.createRange();
+                        range.selectNodeContents(editableElement);
+                        range.collapse(false);
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                    } else {
+                        return; // Cannot insert without a valid target
+                    }
+                }
+
+                // Create a temporary container to parse the HTML
+                const tempContainer = document.createElement('div');
+                tempContainer.innerHTML = iframeHtml;
+                const iframeElement = tempContainer.firstChild;
+
+                // Insert iframe at cursor position
+                range.deleteContents();
+                range.insertNode(iframeElement);
+
+                // Move cursor after iframe
+                range.setStartAfter(iframeElement);
+                range.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(range);
+
+                // Add paragraph after iframe for continued editing
+                const br = document.createElement('br');
+                range.insertNode(br);
+                range.setStartAfter(br);
+                range.collapse(true);
+
+                // Trigger save if noteEntry exists
+                if (noteEntry && noteEntry.id) {
+                    window.scheduleSaveNote(noteEntry.id, noteEntry.noteType);
+                }
+            } catch (error) {
+                console.error('Error inserting streaming video:', error);
+            }
+        }
+    }
+
     function processYouTubeUrl(url, isMarkdown, editableElement, savedRange, noteEntry) {
         const t = window.t || ((key, params, fallback) => fallback);
 
@@ -3145,7 +3306,7 @@
 
         if (isMarkdown) {
             // For markdown, insert iframe HTML directly
-            const iframeMarkdown = '<iframe width="560" height="315" src="https://www.youtube.com/embed/' + videoId + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>\n\n';
+            const iframeMarkdown = '<iframe width="560" height="315" src="https://www.youtube.com/embed/' + videoId + '" frameborder="0" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation allow-top-navigation-by-user-activation" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>\n\n';
 
             // Focus the editable element first
             if (editableElement) {
@@ -3163,7 +3324,7 @@
         } else {
             // For HTML notes
             // Create iframe HTML
-            const iframeHtml = '<iframe width="560" height="315" src="https://www.youtube.com/embed/' + videoId + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+            const iframeHtml = '<iframe width="560" height="315" src="https://www.youtube.com/embed/' + videoId + '" frameborder="0" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation allow-top-navigation-by-user-activation" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
 
             // Focus the editable element first
             if (editableElement) {
@@ -3541,6 +3702,60 @@
 
         window.showYouTubeModal(function (url) {
             processYouTubeUrl(url, true, editableElement, savedRange, noteEntry);
+        });
+    };
+
+    // Insert streaming video into HTML note (exposed globally)
+    window.insertStreamingVideo = function () {
+        const t = window.t || ((key, params, fallback) => fallback);
+
+        if (typeof window.showStreamingVideoModal !== 'function') {
+            // Fallback to prompt if modal not available
+            const url = prompt(t('slash_menu.streaming_video_url_prompt', null, 'Enter streaming video URL (YouTube, Vimeo, etc.):'), 'https://www.youtube.com/embed/');
+            if (url) processStreamingVideoUrl(url, false, null, null, null);
+            return;
+        }
+
+        // Save the note entry and editable element before they get cleared
+        const noteEntry = savedNoteEntry;
+        const editableElement = savedEditableElement;
+
+        // Save the current range/position
+        let savedRange = null;
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+            savedRange = sel.getRangeAt(0).cloneRange();
+        }
+
+        window.showStreamingVideoModal(function (url) {
+            processStreamingVideoUrl(url, false, editableElement, savedRange, noteEntry);
+        });
+    };
+
+    // Insert streaming video into Markdown note (exposed globally)
+    window.insertStreamingVideoMarkdown = function () {
+        const t = window.t || ((key, params, fallback) => fallback);
+
+        if (typeof window.showStreamingVideoModal !== 'function') {
+            // Fallback to prompt if modal not available
+            const url = prompt(t('slash_menu.streaming_video_url_prompt', null, 'Enter streaming video URL (YouTube, Vimeo, etc.):'), 'https://www.youtube.com/embed/');
+            if (url) processStreamingVideoUrl(url, true, null, null, null);
+            return;
+        }
+
+        // Save the note entry and editable element before they get cleared
+        const noteEntry = savedNoteEntry;
+        const editableElement = savedEditableElement;
+
+        // Save the current range/position
+        let savedRange = null;
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+            savedRange = sel.getRangeAt(0).cloneRange();
+        }
+
+        window.showStreamingVideoModal(function (url) {
+            processStreamingVideoUrl(url, true, editableElement, savedRange, noteEntry);
         });
     };
 

@@ -11,21 +11,9 @@ if (!defined('ALLOWED_IFRAME_DOMAINS')) {
         'www.youtube.com',
         'youtube-nocookie.com',
         'www.youtube-nocookie.com',
-        'player.vimeo.com',
-        'vimeo.com',
-        // Uncomment to allow additional embed providers:
-        // 'dailymotion.com', 'www.dailymotion.com',
-        // 'player.twitch.tv', 'clips.twitch.tv',
-        // 'open.spotify.com', 'w.soundcloud.com', 'bandcamp.com',
-        // 'codepen.io', 'jsfiddle.net', 'codesandbox.io', 'stackblitz.com',
-        // 'docs.google.com', 'drive.google.com', 'maps.google.com',
-        // 'www.google.com/maps', 'calendar.google.com',
-        // 'onedrive.live.com', 'office.com',
-        // 'twitter.com', 'x.com', 'platform.twitter.com', 'linkedin.com',
-        // 'slides.com', 'prezi.com', 'canva.com', 'figma.com', 'miro.com',
-        // 'excalidraw.com', 'loom.com', 'wistia.com', 'fast.wistia.net',
-        // 'share.descript.com', 'rumble.com', 'odysee.com', 'bitchute.com',
-        // 'peertube', 'invidio.us', 'piped.video',
+        'player.bilibili.com',
+        'www.bilibili.com',
+        'bilibili.com',
     ]);
 }
 
@@ -1227,7 +1215,7 @@ function sanitizeHtml($html) {
         'time' => ['datetime'],
         'blockquote' => ['cite'],
         'q' => ['cite'],
-        'iframe' => ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'allowtransparency', 'title'],
+        'iframe' => ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'allowtransparency', 'title', 'sandbox'],
         'video' => ['src', 'width', 'height', 'preload', 'poster', 'class', 'style', 'controls', 'muted', 'playsinline', 'loop', 'autoplay'],
         'audio' => ['src', 'preload', 'class', 'style', 'controls', 'muted', 'loop', 'autoplay'],
         'button' => ['class', 'data-action'],

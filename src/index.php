@@ -4,11 +4,20 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// Load functions to get ALLOWED_IFRAME_DOMAINS
+require_once 'functions.php';
+
+// Build CSP frame-src directive from allowed domains
+$frameSrcDomains = "'self'";
+foreach (ALLOWED_IFRAME_DOMAINS as $domain) {
+    $frameSrcDomains .= " https://{$domain}";
+}
+
 // Set security headers to mitigate XSS attacks
 // Content-Security-Policy: Restrict where scripts can be loaded from
 // Note: 'unsafe-inline' is needed for the rich text editor, but we sanitize all user input
 // to prevent XSS. In the future, consider using nonces for inline scripts.
-header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-src 'self' https://www.youtube.com https://youtube.com https://www.youtube-nocookie.com https://youtube-nocookie.com;");
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-src {$frameSrcDomains};");
 
 // X-XSS-Protection: Enable browser's XSS filter (legacy but still useful)
 header("X-XSS-Protection: 1; mode=block");
@@ -27,7 +36,6 @@ require 'auth.php';
 requireAuth();
 
 require_once 'config.php';
-require_once 'functions.php';
 require_once 'version_helper.php';
 
 require_once 'db_connect.php';
@@ -134,6 +142,7 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     $v = getAppVersion();
     ?>
     <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
+    <script>window.ALLOWED_IFRAME_DOMAINS = <?php echo json_encode(ALLOWED_IFRAME_DOMAINS); ?>;</script>
     <meta name="color-scheme" content="dark light">
     <link type="text/css" rel="stylesheet" href="css/fontawesome.min.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/light.min.css?v=<?php echo $v; ?>"/>
