@@ -75,17 +75,8 @@ class UserDataManager {
             ];
             
             foreach ($directories as $dir) {
-                if (!is_dir($dir)) {
-                    if (!mkdir($dir, 0755, true)) {
-                        error_log("Failed to create directory: $dir");
-                        return false;
-                    }
-                    
-                    // Set proper ownership if running as root (Docker context)
-                    if (function_exists('posix_getuid') && posix_getuid() === 0) {
-                        chown($dir, 'www-data');
-                        chgrp($dir, 'www-data');
-                    }
+                if (!createDirectoryWithPermissions($dir)) {
+                    return false;
                 }
             }
             
@@ -285,9 +276,7 @@ class UserDataManager {
     public function createBackup() {
         try {
             $backupsPath = $this->getUserBackupsPath();
-            if (!is_dir($backupsPath)) {
-                mkdir($backupsPath, 0755, true);
-            }
+            createDirectoryWithPermissions($backupsPath);
             
             $userTimezone = getUserTimezone();
             $dt = new DateTime('now', new DateTimeZone($userTimezone));
@@ -471,9 +460,10 @@ class UserDataManager {
     /**
      * Sync username to user's local settings table for redundancy (disaster recovery)
      * @param string $username
+     * @param PDO|null $con Optional existing database connection to use
      * @return bool
      */
-    public function syncUsername($username) {
+    public function syncUsername($username, $con = null) {
         $dbPath = $this->getUserDatabasePath();
         if (!file_exists($dbPath)) {
             // If DB doesn't exist yet, we can't sync, but it's not strictly an error
@@ -481,9 +471,11 @@ class UserDataManager {
         }
         
         try {
-            $con = new PDO('sqlite:' . $dbPath);
-            $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $con->exec('PRAGMA busy_timeout = 5000');
+            if ($con === null) {
+                $con = new PDO('sqlite:' . $dbPath);
+                $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $con->exec('PRAGMA busy_timeout = 5000');
+            }
             
             // Use 'user_profile_username' instead of 'login_display_name' to avoid confusion
             // login_display_name is a GLOBAL setting for the login page title
@@ -499,18 +491,21 @@ class UserDataManager {
     /**
      * Sync email to user's local settings table for redundancy (disaster recovery)
      * @param string $email
+     * @param PDO|null $con Optional existing database connection to use
      * @return bool
      */
-    public function syncEmail($email) {
+    public function syncEmail($email, $con = null) {
         $dbPath = $this->getUserDatabasePath();
         if (!file_exists($dbPath)) {
             return true;
         }
         
         try {
-            $con = new PDO('sqlite:' . $dbPath);
-            $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $con->exec('PRAGMA busy_timeout = 5000');
+            if ($con === null) {
+                $con = new PDO('sqlite:' . $dbPath);
+                $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $con->exec('PRAGMA busy_timeout = 5000');
+            }
             
             $stmt = $con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('login_email', ?)");
             return $stmt->execute([$email]);

@@ -1,8 +1,49 @@
-// Notes list event delegation (CSP-compliant)
-// This file handles all click events for notes_list.php using event delegation
-
+/**
+ * Notes List Event Delegation
+ * CSP-compliant event handling for notes_list.php
+ * 
+ * This module handles all click and double-click events using event delegation
+ * for better performance and maintainability.
+ */
 (function () {
     'use strict';
+
+    // =====================================================
+    // HELPER FUNCTIONS
+    // =====================================================
+
+    /**
+     * Extract folder data from an action element
+     * @param {HTMLElement} element - The element containing data attributes
+     * @returns {{id: number|null, name: string|null}} Folder data
+     */
+    function getFolderData(element) {
+        var folderId = element.getAttribute('data-folder-id');
+        var folderName = element.getAttribute('data-folder-name');
+        
+        return {
+            id: folderId ? parseInt(folderId, 10) : null,
+            name: folderName
+        };
+    }
+
+    /**
+     * Execute a folder action with menu cleanup
+     * @param {number} folderId - The folder ID
+     * @param {Function} callback - The action to execute
+     */
+    function executeFolderAction(folderId, callback) {
+        if (typeof window.closeFolderActionsMenu === 'function') {
+            window.closeFolderActionsMenu(folderId);
+        }
+        if (typeof callback === 'function') {
+            callback();
+        }
+    }
+
+    // =====================================================
+    // SEARCH BAR MANAGEMENT
+    // =====================================================
 
     /**
      * Toggle search bar visibility
@@ -15,33 +56,29 @@
         var currentDisplay = window.getComputedStyle(searchContainer).display;
 
         if (currentDisplay === 'none') {
-            // Open search bar
             searchContainer.style.display = 'block';
             localStorage.setItem('searchBarVisible', 'true');
 
-            // Focus the search input
             if (searchInput) {
                 setTimeout(function () {
                     searchInput.focus();
                 }, 100);
             }
         } else {
-            // Close search bar
             searchContainer.style.display = 'none';
             localStorage.setItem('searchBarVisible', 'false');
 
-            // Clear search only if there's an active search
             if (window.isSearchMode && typeof window.clearUnifiedSearch === 'function') {
                 window.clearUnifiedSearch();
             }
         }
     }
 
-    // Expose toggleSearchBar globally
     window.toggleSearchBar = toggleSearchBar;
 
     /**
-     * Handle search type toggle (notes vs tags)
+     * Handle search type toggle between notes and tags
+     * @param {Event} event - The click event
      */
     function handleSearchTypeToggle(event) {
         var button = event.target.closest('.searchbar-type-btn');
@@ -50,21 +87,30 @@
         var searchType = button.getAttribute('data-search-type');
         if (!searchType) return;
 
-        // Delegate to SearchManager if available (handles both button state and search execution)
+        // Use SearchManager if available (handles both button state and search execution)
         if (window.searchManager && typeof window.searchManager.handleButtonClick === 'function') {
-            window.searchManager.handleButtonClick(searchType, false); // false = desktop
+            window.searchManager.handleButtonClick(searchType, false);
             return;
         }
 
         // Fallback: manual update if SearchManager not available
+        updateSearchTypeUI(button, searchType);
+    }
+
+    /**
+     * Update search type UI manually (fallback when SearchManager not available)
+     * @param {HTMLElement} activeButton - The button that was clicked
+     * @param {string} searchType - Either 'notes' or 'tags'
+     */
+    function updateSearchTypeUI(activeButton, searchType) {
         // Update button states
         var allButtons = document.querySelectorAll('.searchbar-type-btn');
         allButtons.forEach(function (btn) {
             btn.classList.remove('active');
         });
-        button.classList.add('active');
+        activeButton.classList.add('active');
 
-        // Update hidden fields
+        // Update hidden fields and placeholder
         var searchInNotes = document.getElementById('search-in-notes');
         var searchInTags = document.getElementById('search-in-tags');
         var searchInput = document.getElementById('unified-search');
@@ -72,109 +118,289 @@
         if (searchType === 'notes') {
             if (searchInNotes) searchInNotes.value = '1';
             if (searchInTags) searchInTags.value = '';
-            if (searchInput) searchInput.placeholder = (window.t ? window.t('search.placeholder_notes', null, 'Search for one or more words...') : 'Search for one or more words...');
+            if (searchInput) {
+                searchInput.placeholder = window.t 
+                    ? window.t('search.placeholder_notes', null, 'Search for one or more words...') 
+                    : 'Search for one or more words...';
+            }
         } else if (searchType === 'tags') {
             if (searchInNotes) searchInNotes.value = '';
             if (searchInTags) searchInTags.value = '1';
-            if (searchInput) searchInput.placeholder = (window.t ? window.t('search.placeholder_tags', null, 'Search for one or more tags...') : 'Search for one or more tags...');
+            if (searchInput) {
+                searchInput.placeholder = window.t 
+                    ? window.t('search.placeholder_tags', null, 'Search for one or more tags...') 
+                    : 'Search for one or more tags...';
+            }
         }
 
-        // Focus the input
         if (searchInput) {
             searchInput.focus();
         }
     }
 
+    // =====================================================
+    // EVENT HANDLERS
+    // =====================================================
+
     /**
-     * Handle all click events in the notes list using delegation
+     * Handle navigation actions
+     * @param {Event} event - The click event
+     * @param {HTMLElement} element - The action element
+     */
+    function handleNavigation(event, element) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        var url = element.getAttribute('data-url');
+        if (url) {
+            window.location = url;
+        }
+    }
+
+    /**
+     * Handle folder menu actions that require folder data
+     * @param {Event} event - The click event
+     * @param {string} action - The action type
+     * @param {HTMLElement} element - The action element
+     */
+    function handleFolderMenuAction(event, action, element) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        var folderData = getFolderData(element);
+        if (!folderData.id) return;
+
+        var actionMap = {
+            'create-note-in-folder': function() {
+                if (typeof window.showCreateNoteInFolderModal === 'function') {
+                    window.showCreateNoteInFolderModal(folderData.id, folderData.name);
+                }
+            },
+            'move-folder-files': function() {
+                if (typeof window.showMoveFolderFilesDialog === 'function') {
+                    window.showMoveFolderFilesDialog(folderData.id, folderData.name);
+                }
+            },
+            'move-entire-folder': function() {
+                if (typeof window.showMoveEntireFolderDialog === 'function') {
+                    window.showMoveEntireFolderDialog(folderData.id, folderData.name);
+                }
+            },
+            'download-folder': function() {
+                if (typeof window.downloadFolder === 'function') {
+                    window.downloadFolder(folderData.id, folderData.name);
+                }
+            },
+            'rename-folder': function() {
+                if (typeof window.editFolderName === 'function') {
+                    window.editFolderName(folderData.id, folderData.name);
+                }
+            },
+            'delete-folder': function() {
+                if (typeof window.deleteFolder === 'function') {
+                    window.deleteFolder(folderData.id, folderData.name);
+                }
+            },
+            'change-folder-icon': function() {
+                if (typeof window.showChangeFolderIconModal === 'function') {
+                    window.showChangeFolderIconModal(folderData.id, folderData.name);
+                }
+            },
+            'share-folder': function() {
+                if (typeof window.openPublicFolderShareModal === 'function') {
+                    window.openPublicFolderShareModal(folderData.id);
+                }
+            }
+        };
+
+        if (actionMap[action]) {
+            executeFolderAction(folderData.id, actionMap[action]);
+        }
+    }
+
+    /**
+     * Handle Kanban view opening
+     * @param {Event} event - The click event
+     * @param {HTMLElement} element - The action element
+     */
+    function handleOpenKanban(event, element) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        var folderData = getFolderData(element);
+
+        // Close folder actions menu if opened from there
+        if (folderData.id && typeof window.closeFolderActionsMenu === 'function') {
+            window.closeFolderActionsMenu(folderData.id);
+        }
+
+        if (folderData.id && typeof window.openKanbanView === 'function') {
+            window.openKanbanView(folderData.id, folderData.name);
+        }
+    }
+
+    /**
+     * Handle folder sorting
+     * @param {Event} event - The click event
+     * @param {HTMLElement} element - The action element
+     */
+    function handleFolderSort(event, element) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        var folderId = parseInt(element.getAttribute('data-folder-id'), 10);
+        var sortType = element.getAttribute('data-sort-type') || 'modified';
+
+        // Update UI: checkmark and active highlighting
+        var parentMenu = element.closest('.folder-actions-menu');
+        if (parentMenu) {
+            var siblings = parentMenu.querySelectorAll('[data-action="sort-folder"]');
+            siblings.forEach(function (el) {
+                el.classList.remove('active');
+            });
+            element.classList.add('active');
+
+            // Update header label
+            var submenuContainer = element.parentElement;
+            if (submenuContainer && submenuContainer.classList.contains('sort-submenu')) {
+                var toggleBtn = submenuContainer.previousElementSibling;
+                if (toggleBtn && toggleBtn.getAttribute('data-action') === 'toggle-sort-submenu') {
+                    var headerLabel = toggleBtn.querySelector('.sort-header-label');
+                    var optionLabel = element.querySelector('.sort-option-label');
+                    if (headerLabel && optionLabel) {
+                        headerLabel.textContent = optionLabel.textContent;
+                    }
+                }
+            }
+        }
+
+        if (typeof window.closeFolderActionsMenu === 'function') {
+            window.closeFolderActionsMenu(folderId);
+        }
+
+        if (folderId && typeof window.sortNotesInFolder === 'function') {
+            window.sortNotesInFolder(folderId, sortType);
+
+            // Save sort setting to database
+            fetch('api_save_folder_sort.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    folder_id: folderId,
+                    sort_type: sortType
+                })
+            }).catch(function (err) {
+                console.error('Failed to save sort setting', err);
+            });
+        }
+    }
+
+    /**
+     * Main click event handler using event delegation
+     * @param {Event} event - The click event
      */
     function handleNotesListClick(event) {
         var target = event.target;
-
-        // Find the closest element with a data-action attribute
         var actionElement = target.closest('[data-action]');
         if (!actionElement) return;
 
         var action = actionElement.getAttribute('data-action');
 
-        // Skip if the action element is inside another action element (nested actions)
-        // In that case, only handle the innermost action
+        // Prevent handling nested actions - only handle the innermost action
         var parentAction = actionElement.parentElement ? actionElement.parentElement.closest('[data-action]') : null;
         if (parentAction && target.closest('[data-action]') !== actionElement) {
-            return; // Let the innermost action handle it
+            return;
         }
 
-        switch (action) {
-            case 'toggle-search-bar':
+        // Simple actions that just call global functions
+        var simpleActions = {
+            'toggle-search-bar': function() {
                 event.preventDefault();
                 event.stopPropagation();
                 if (typeof window.toggleSearchBar === 'function') {
                     window.toggleSearchBar();
                 }
-                break;
-
-            case 'navigate-tags':
-                event.preventDefault();
-                event.stopPropagation();
-                var tagsUrl = actionElement.getAttribute('data-url');
-                if (tagsUrl) {
-                    window.location = tagsUrl;
-                }
-                break;
-
-            case 'toggle-favorites':
-                event.preventDefault();
-                event.stopPropagation();
-                if (typeof window.toggleFolder === 'function') {
-                    window.toggleFolder('folder-favorites');
-                }
-                break;
-
-            case 'navigate-shared':
-                event.preventDefault();
-                event.stopPropagation();
-                var sharedUrl = actionElement.getAttribute('data-url');
-                if (sharedUrl) {
-                    window.location = sharedUrl;
-                }
-                break;
-
-            case 'toggle-system-menu':
+            },
+            'toggle-system-menu': function() {
                 event.preventDefault();
                 event.stopPropagation();
                 if (typeof window.toggleSystemMenu === 'function') {
                     window.toggleSystemMenu();
                 }
-                break;
-
-            case 'navigate-trash':
-                event.preventDefault();
-                event.stopPropagation();
-                var trashUrl = actionElement.getAttribute('data-url');
-                if (trashUrl) {
-                    window.location = trashUrl;
-                }
-                break;
-
-            case 'navigate-attachments':
-                event.preventDefault();
-                event.stopPropagation();
-                var attachmentsUrl = actionElement.getAttribute('data-url');
-                if (attachmentsUrl) {
-                    window.location = attachmentsUrl;
-                }
-                break;
-
-            case 'clear-search':
+            },
+            'clear-search': function() {
                 event.preventDefault();
                 event.stopPropagation();
                 if (typeof window.clearUnifiedSearch === 'function') {
                     window.clearUnifiedSearch();
                 }
-                break;
+            },
+            'toggle-favorites': function() {
+                event.preventDefault();
+                event.stopPropagation();
+                if (typeof window.toggleFavorites === 'function') {
+                    window.toggleFavorites(actionElement);
+                }
+            },
+            'close-kanban-view': function() {
+                event.preventDefault();
+                event.stopPropagation();
+                if (typeof window.closeKanbanView === 'function') {
+                    window.closeKanbanView();
+                }
+            },
+            'toggle-folder-actions-menu': function() {
+                event.preventDefault();
+                event.stopPropagation();
+                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
+                if (folderId && typeof window.toggleFolderActionsMenu === 'function') {
+                    window.toggleFolderActionsMenu(folderId);
+                }
+            },
+            'toggle-sort-submenu': function() {
+                event.preventDefault();
+                event.stopPropagation();
+                var chevron = actionElement.querySelector('.sort-chevron');
+                var submenu = actionElement.nextElementSibling;
 
+                if (submenu && submenu.classList.contains('sort-submenu')) {
+                    var isVisible = submenu.style.display === 'block';
+                    submenu.style.display = isVisible ? 'none' : 'block';
+                    if (chevron) {
+                        chevron.style.transform = isVisible ? 'rotate(0deg)' : 'rotate(90deg)';
+                    }
+                }
+            }
+        };
+
+        // Execute simple action if found
+        if (simpleActions[action]) {
+            simpleActions[action]();
+            return;
+        }
+
+        // Navigation actions
+        if (['navigate-tags', 'navigate-shared', 'navigate-trash', 'navigate-attachments'].indexOf(action) !== -1) {
+            handleNavigation(event, actionElement);
+            return;
+        }
+
+        // Folder menu actions
+        var folderMenuActions = [
+            'create-note-in-folder', 'move-folder-files', 'move-entire-folder',
+            'download-folder', 'rename-folder', 'delete-folder', 
+            'change-folder-icon', 'share-folder'
+        ];
+        if (folderMenuActions.indexOf(action) !== -1) {
+            handleFolderMenuAction(event, action, actionElement);
+            return;
+        }
+
+        // Special cases that need custom handling
+        switch (action) {
             case 'select-folder':
-                // Don't stop propagation here - let the parent handle it
                 var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
                 var folderName = actionElement.getAttribute('data-folder');
                 if (typeof window.selectFolder === 'function') {
@@ -191,26 +417,16 @@
                 }
                 break;
 
-            case 'toggle-favorites':
-                event.preventDefault();
-                event.stopPropagation();
-                if (typeof window.toggleFavorites === 'function') {
-                    window.toggleFavorites(actionElement);
-                }
-                break;
-
             case 'open-folder-icon-picker':
                 event.preventDefault();
                 event.stopImmediatePropagation();
-                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
-                var folderName = actionElement.getAttribute('data-folder-name');
-                if (folderId && folderName && typeof window.showChangeFolderIconModal === 'function') {
-                    window.showChangeFolderIconModal(folderId, folderName);
+                var folderData = getFolderData(actionElement);
+                if (folderData.id && folderData.name && typeof window.showChangeFolderIconModal === 'function') {
+                    window.showChangeFolderIconModal(folderData.id, folderData.name);
                 }
                 break;
 
             case 'load-note':
-                // Handle note loading via AJAX
                 var noteLink = actionElement.getAttribute('href');
                 var noteId = actionElement.getAttribute('data-note-db-id');
                 if (noteLink && noteId && typeof window.loadNoteDirectly === 'function') {
@@ -221,264 +437,71 @@
                 }
                 break;
 
-            // Folder actions menu
-            case 'toggle-folder-actions-menu':
-                event.preventDefault();
-                event.stopPropagation();
-                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
-                if (folderId && typeof window.toggleFolderActionsMenu === 'function') {
-                    window.toggleFolderActionsMenu(folderId);
-                }
-                break;
-
-            case 'create-note-in-folder':
-                event.preventDefault();
-                event.stopPropagation();
-                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
-                var folderName = actionElement.getAttribute('data-folder-name');
-                if (typeof window.closeFolderActionsMenu === 'function') {
-                    window.closeFolderActionsMenu(folderId);
-                }
-                if (folderId && folderName && typeof window.showCreateNoteInFolderModal === 'function') {
-                    window.showCreateNoteInFolderModal(folderId, folderName);
-                }
-                break;
-
-            case 'move-folder-files':
-                event.preventDefault();
-                event.stopPropagation();
-                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
-                var folderName = actionElement.getAttribute('data-folder-name');
-                if (typeof window.closeFolderActionsMenu === 'function') {
-                    window.closeFolderActionsMenu(folderId);
-                }
-                if (folderId && folderName && typeof window.showMoveFolderFilesDialog === 'function') {
-                    window.showMoveFolderFilesDialog(folderId, folderName);
-                }
-                break;
-
-            case 'move-entire-folder':
-                event.preventDefault();
-                event.stopPropagation();
-                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
-                var folderName = actionElement.getAttribute('data-folder-name');
-                if (typeof window.closeFolderActionsMenu === 'function') {
-                    window.closeFolderActionsMenu(folderId);
-                }
-                if (folderId && folderName && typeof window.showMoveEntireFolderDialog === 'function') {
-                    window.showMoveEntireFolderDialog(folderId, folderName);
-                }
-                break;
-
-            case 'download-folder':
-                event.preventDefault();
-                event.stopPropagation();
-                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
-                var folderName = actionElement.getAttribute('data-folder-name');
-                if (typeof window.closeFolderActionsMenu === 'function') {
-                    window.closeFolderActionsMenu(folderId);
-                }
-                if (folderId && folderName && typeof window.downloadFolder === 'function') {
-                    window.downloadFolder(folderId, folderName);
-                }
-                break;
-
-            case 'rename-folder':
-                event.preventDefault();
-                event.stopPropagation();
-                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
-                var folderName = actionElement.getAttribute('data-folder-name');
-                if (typeof window.closeFolderActionsMenu === 'function') {
-                    window.closeFolderActionsMenu(folderId);
-                }
-                if (folderId && folderName && typeof window.editFolderName === 'function') {
-                    window.editFolderName(folderId, folderName);
-                }
-                break;
-
-            case 'delete-folder':
-                event.preventDefault();
-                event.stopPropagation();
-                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
-                var folderName = actionElement.getAttribute('data-folder-name');
-                if (typeof window.closeFolderActionsMenu === 'function') {
-                    window.closeFolderActionsMenu(folderId);
-                }
-                if (folderId && folderName && typeof window.deleteFolder === 'function') {
-                    window.deleteFolder(folderId, folderName);
-                }
-                break;
-
-            case 'change-folder-icon':
-                event.preventDefault();
-                event.stopPropagation();
-                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
-                var folderName = actionElement.getAttribute('data-folder-name');
-                if (typeof window.closeFolderActionsMenu === 'function') {
-                    window.closeFolderActionsMenu(folderId);
-                }
-                if (folderId && folderName && typeof window.showChangeFolderIconModal === 'function') {
-                    window.showChangeFolderIconModal(folderId, folderName);
-                }
-                break;
-
-            case 'share-folder':
-                event.preventDefault();
-                event.stopPropagation();
-                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
-                var folderName = actionElement.getAttribute('data-folder-name');
-                if (typeof window.closeFolderActionsMenu === 'function') {
-                    window.closeFolderActionsMenu(folderId);
-                }
-                if (folderId && typeof window.openPublicFolderShareModal === 'function') {
-                    window.openPublicFolderShareModal(folderId);
-                }
-                break;
-
             case 'open-kanban-view':
-                event.preventDefault();
-                event.stopImmediatePropagation();
-
-                // Check if Kanban on click is disabled via body class
-                if (document.body.classList.contains('disable-kanban-click')) {
-                    // Open folder icon picker instead
-                    var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
-                    var folderName = actionElement.getAttribute('data-folder-name');
-
-                    if (folderId && folderName && typeof window.showChangeFolderIconModal === 'function') {
-                        window.showChangeFolderIconModal(folderId, folderName);
-                    }
-                    break;
-                }
-
-                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
-                var folderName = actionElement.getAttribute('data-folder-name');
-                
-                // Close folder actions menu if opened from there
-                if (typeof window.closeFolderActionsMenu === 'function') {
-                    window.closeFolderActionsMenu(folderId);
-                }
-
-                if (folderId && typeof window.openKanbanView === 'function') {
-                    window.openKanbanView(folderId, folderName);
-                }
-                break;
-
-            case 'close-kanban-view':
-                event.preventDefault();
-                event.stopPropagation();
-                if (typeof window.closeKanbanView === 'function') {
-                    window.closeKanbanView();
-                }
-                break;
-
-
-
-            case 'toggle-sort-submenu':
-                event.preventDefault();
-                event.stopPropagation();
-
-                var chevron = actionElement.querySelector('.sort-chevron');
-                var submenu = actionElement.nextElementSibling;
-
-                if (submenu && submenu.classList.contains('sort-submenu')) {
-                    if (submenu.style.display === 'none' || !submenu.style.display) {
-                        submenu.style.display = 'block';
-                        if (chevron) chevron.style.transform = 'rotate(90deg)';
-                    } else {
-                        submenu.style.display = 'none';
-                        if (chevron) chevron.style.transform = 'rotate(0deg)';
-                    }
-                }
+                handleOpenKanban(event, actionElement);
                 break;
 
             case 'sort-folder':
-                event.preventDefault();
-                event.stopPropagation();
-                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
-                var sortType = actionElement.getAttribute('data-sort-type');
-
-                // Update UI: checkmark and active highlighting
-                var parentMenu = actionElement.closest('.folder-actions-menu');
-                if (parentMenu) {
-                    var siblings = parentMenu.querySelectorAll('[data-action="sort-folder"]');
-                    siblings.forEach(function (el) {
-                        el.classList.remove('active');
-                    });
-                    actionElement.classList.add('active');
-
-                    // Update header label
-                    var submenuContainer = actionElement.parentElement;
-                    if (submenuContainer && submenuContainer.classList.contains('sort-submenu')) {
-                        var toggleBtn = submenuContainer.previousElementSibling;
-                        if (toggleBtn && toggleBtn.getAttribute('data-action') === 'toggle-sort-submenu') {
-                            var headerLabel = toggleBtn.querySelector('.sort-header-label');
-                            var optionLabel = actionElement.querySelector('.sort-option-label');
-                            if (headerLabel && optionLabel) {
-                                headerLabel.textContent = optionLabel.textContent;
-                            }
-                        }
-                    }
-                }
-
-                if (typeof window.closeFolderActionsMenu === 'function') {
-                    window.closeFolderActionsMenu(folderId);
-                }
-
-                if (folderId && typeof window.sortNotesInFolder === 'function') {
-                    if (!sortType) sortType = 'modified';
-                    window.sortNotesInFolder(folderId, sortType);
-
-                    // Save to database
-                    fetch('api_save_folder_sort.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            folder_id: folderId,
-                            sort_type: sortType
-                        })
-                    }).catch(function (err) {
-                        console.error('Failed to save sort setting', err);
-                    });
-                }
+                handleFolderSort(event, actionElement);
                 break;
         }
     }
 
     /**
-     * Handle double-click events for folder renaming
+     * Handle double-click events (e.g., folder renaming)
+     * @param {Event} event - The double-click event
      */
     function handleNotesListDblClick(event) {
         var target = event.target;
-
-        // Find the closest element with a data-dblaction attribute
         var actionElement = target.closest('[data-dblaction]');
         if (!actionElement) return;
 
         var action = actionElement.getAttribute('data-dblaction');
 
         if (action === 'edit-folder-name') {
-            var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
-            var folderName = actionElement.getAttribute('data-folder-name');
-            if (folderId && folderName && typeof window.editFolderName === 'function') {
-                window.editFolderName(folderId, folderName);
+            var folderData = getFolderData(actionElement);
+            if (folderData.id && folderData.name && typeof window.editFolderName === 'function') {
+                window.editFolderName(folderData.id, folderData.name);
             }
         }
     }
 
+    // =====================================================
+    // INITIALIZATION
+    // =====================================================
+
     /**
-     * Initialize event delegation
+     * Initialize all event listeners and UI state
      */
     function initNotesListEvents() {
-        // Search bar is now always visible - no need to toggle or restore state
+        // Restore search bar visibility from localStorage
         var searchContainer = document.getElementById('search-bar-container');
         if (searchContainer) {
-            searchContainer.style.display = 'block';
+            var searchBarVisible = localStorage.getItem('searchBarVisible');
+            searchContainer.style.display = (searchBarVisible === 'false') ? 'none' : 'block';
         }
 
-        // Initialize search type buttons state
+        // Initialize search type button states
+        initializeSearchTypeButtons();
+
+        // Ensure favorites section is visible
+        var favoritesFolder = document.getElementById('folder-favorites');
+        if (favoritesFolder) {
+            favoritesFolder.style.display = 'block';
+            localStorage.setItem('folder_folder-favorites', 'open');
+        }
+
+        // Restore favorites collapsed/expanded state
+        restoreFavoritesState();
+
+        // Attach event listeners
+        attachEventListeners();
+    }
+
+    /**
+     * Initialize search type buttons (notes/tags) state
+     */
+    function initializeSearchTypeButtons() {
         var searchInNotes = document.getElementById('search-in-notes');
         var searchInTags = document.getElementById('search-in-tags');
         var notesBtn = document.querySelector('.searchbar-type-notes');
@@ -492,76 +515,64 @@
             if (tagsBtn) tagsBtn.classList.remove('active');
         }
 
-        // Add event listener for search type buttons
+        // Attach click handlers to type buttons
         var typeButtons = document.querySelectorAll('.searchbar-type-btn');
         typeButtons.forEach(function (btn) {
             btn.addEventListener('click', handleSearchTypeToggle);
         });
+    }
 
-        // Favorites are now always visible - force them open
-        var favoritesFolder = document.getElementById('folder-favorites');
-        if (favoritesFolder) {
-            favoritesFolder.style.display = 'block';
-            localStorage.setItem('folder_folder-favorites', 'open');
-        }
-
-        // Restore favorites collapsed state
+    /**
+     * Restore favorites section collapsed/expanded state from localStorage
+     */
+    function restoreFavoritesState() {
         var favoritesCollapsed = localStorage.getItem('favorites_collapsed') === 'true';
         var favoritesHeader = document.querySelector('[data-folder="Favorites"]');
         var favoritesToggleBtn = document.querySelector('[data-action="toggle-favorites"]');
-        if (favoritesCollapsed && favoritesHeader) {
+
+        if (!favoritesHeader) return;
+
+        if (favoritesCollapsed) {
             favoritesHeader.classList.add('favorites-collapsed');
             if (favoritesToggleBtn) {
                 favoritesToggleBtn.classList.add('collapsed');
                 favoritesToggleBtn.classList.remove('favorites-expanded');
             }
-        } else if (favoritesHeader && favoritesToggleBtn) {
+        } else {
             favoritesHeader.classList.remove('favorites-collapsed');
-            favoritesToggleBtn.classList.remove('collapsed');
-            favoritesToggleBtn.classList.add('favorites-expanded');
+            if (favoritesToggleBtn) {
+                favoritesToggleBtn.classList.remove('collapsed');
+                favoritesToggleBtn.classList.add('favorites-expanded');
+            }
         }
-
-        // Add direct event listener to favorites toggle button (in case delegation doesn't work)
-        if (favoritesToggleBtn) {
-            favoritesToggleBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-                if (typeof window.toggleFavorites === 'function') {
-                    window.toggleFavorites(this);
-                }
-            });
-        }
-
-        // Add click event listener with delegation
-        document.addEventListener('click', handleNotesListClick);
-
-        // Add double-click event listener with delegation
-        document.addEventListener('dblclick', handleNotesListDblClick);
     }
 
     /**
-     * Reinitialize favorites toggle button event listener
-     * Called after AJAX refresh of notes list
+     * Attach all event listeners
      */
-    function reinitializeFavoritesToggle() {
-        var favoritesToggleBtn = document.querySelector('[data-action="toggle-favorites"]');
-        if (favoritesToggleBtn) {
-            // Remove old listener by cloning the element
-            var newBtn = favoritesToggleBtn.cloneNode(true);
-            favoritesToggleBtn.parentNode.replaceChild(newBtn, favoritesToggleBtn);
+    function attachEventListeners() {
+        // Main click event delegation
+        document.addEventListener('click', handleNotesListClick);
 
-            // Add fresh event listener
-            newBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-                if (typeof window.toggleFavorites === 'function') {
-                    window.toggleFavorites(this);
-                }
-            });
-        }
+        // Double-click event delegation
+        document.addEventListener('dblclick', handleNotesListDblClick);
     }
 
-    // Expose to window for use after AJAX refresh
+
+    /**
+     * Reinitialize favorites toggle button event listener
+     * NOTE: This function is now deprecated and does nothing.
+     * Event delegation on document handles all favorites toggle clicks automatically,
+     * even after AJAX refreshes. Keeping this as a no-op for backward compatibility.
+     */
+    function reinitializeFavoritesToggle() {
+        // No operation needed - event delegation handles this automatically
+    }
+
+    // =====================================================
+    // UTILITY FUNCTIONS
+    // =====================================================
+
     /**
      * Sort notes within a folder DOM element
      * @param {number} folderId - The ID of the folder to sort
@@ -572,62 +583,58 @@
         var folderContent = document.getElementById(folderContentId);
         if (!folderContent) return;
 
-        // Get all notes (links) - scope to direct children to avoid subfolder notes
-        // Note: we look for .links_arbo_left which are notes
+        // Get all notes (only direct children to avoid subfolder notes)
         var notes = Array.from(folderContent.querySelectorAll(':scope > a.links_arbo_left'));
-
         if (notes.length === 0) return;
 
-        // Sort the notes array
+        // Sort the notes array based on sort type
         notes.sort(function (a, b) {
             var valA, valB;
 
-            if (sortType === 'alphabet') {
-                valA = (a.querySelector('.note-title').textContent || '').toLowerCase();
-                valB = (b.querySelector('.note-title').textContent || '').toLowerCase();
-                return valA.localeCompare(valB);
-            } else if (sortType === 'created') {
-                // Descending (Newest first)
-                valA = a.getAttribute('data-created') || '';
-                valB = b.getAttribute('data-created') || '';
-                if (valA < valB) return 1;
-                if (valA > valB) return -1;
-                return 0;
-            } else if (sortType === 'modified') {
-                // Descending (Newest first)
-                valA = a.getAttribute('data-updated') || '';
-                valB = b.getAttribute('data-updated') || '';
-                if (valA < valB) return 1;
-                if (valA > valB) return -1;
-                return 0;
+            switch (sortType) {
+                case 'alphabet':
+                    valA = (a.querySelector('.note-title').textContent || '').toLowerCase();
+                    valB = (b.querySelector('.note-title').textContent || '').toLowerCase();
+                    return valA.localeCompare(valB);
+
+                case 'created':
+                    // Descending order (newest first)
+                    valA = a.getAttribute('data-created') || '';
+                    valB = b.getAttribute('data-created') || '';
+                    return valA < valB ? 1 : (valA > valB ? -1 : 0);
+
+                case 'modified':
+                default:
+                    // Descending order (newest first)
+                    valA = a.getAttribute('data-updated') || '';
+                    valB = b.getAttribute('data-updated') || '';
+                    return valA < valB ? 1 : (valA > valB ? -1 : 0);
             }
-            return 0;
         });
 
-        // Find the insertion point (before the first subfolder)
+        // Find insertion point (before first subfolder if exists)
         var firstSubfolder = folderContent.querySelector(':scope > .folder-header');
 
-        // Create a document fragment for better performance
+        // Use document fragment for better performance
         var fragment = document.createDocumentFragment();
 
-        // Detach notes and re-attach in order with spacers
+        // Reorder notes with spacers
         notes.forEach(function (note) {
-            // Remove the spacer following this note if it exists
+            // Remove existing spacer after this note
             var next = note.nextElementSibling;
             if (next && next.id === 'pxbetweennotes') {
                 next.remove();
             }
 
-            // Note: note.remove() is automatic when we appendChild to fragment
             fragment.appendChild(note);
 
-            // Add spacer
+            // Add spacer between notes
             var spacer = document.createElement('div');
             spacer.id = 'pxbetweennotes';
             fragment.appendChild(spacer);
         });
 
-        // Insert sorted content
+        // Insert sorted content at appropriate position
         if (firstSubfolder) {
             folderContent.insertBefore(fragment, firstSubfolder);
         } else {
@@ -635,14 +642,21 @@
         }
     }
 
-    // Expose to window
+    // =====================================================
+    // EXPOSE PUBLIC API
+    // =====================================================
+
     window.sortNotesInFolder = sortNotesInFolder;
     window.reinitializeFavoritesToggle = reinitializeFavoritesToggle;
 
-    // Initialize on DOMContentLoaded
+    // =====================================================
+    // AUTO-INITIALIZATION
+    // =====================================================
+
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initNotesListEvents);
     } else {
         initNotesListEvents();
     }
+
 })();

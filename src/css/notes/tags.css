@@ -1,0 +1,245 @@
+/**
+ * Notes - Tags & Folder Badge
+ *
+ * Styles for the note tags row, folder icon & badge, tag icon,
+ * name_tags container, editable tags with scrollbar hiding,
+ * clickable tag wrappers, tag highlight, and tag input.
+ */
+
+/* Note Tags Row */
+.note-tags-row {
+    display: flex;
+    align-items: center;
+    overflow: visible;
+    margin-top: 5px;
+}
+
+/* Folder Icon */
+.fa-folder.icon_folder {
+    font-size: 14px;
+    margin-right: 8px;
+    flex-shrink: 0;
+    align-self: center;
+    line-height: 1;
+    color: #6c757d;
+    cursor: pointer;
+}
+
+.fa-folder.icon_folder::before {
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+    content: "\f07b";
+    font-style: normal;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    font-size: 1em;
+    vertical-align: middle;
+}
+
+/* Folder Name badge */
+.folder_name {
+    font-size: 13px;
+    color: #37352F;
+    flex-shrink: 0;
+    margin-right: 20px;
+    background: #f0f4f8;
+    padding: 4px 8px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    display: inline-block;
+    line-height: 1.2;
+    transition: all 0.2s ease;
+}
+
+.folder_name:hover {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+}
+
+.folder-wrapper {
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Tag Icon */
+.fa-tag.icon_tag {
+    font-size: 14px;
+    margin-right: 4px;
+    flex-shrink: 0;
+    align-self: center;
+    line-height: 1;
+    cursor: pointer;
+    color: #6c757d;
+}
+
+.fa-tag.icon_tag:hover {
+    opacity: 0.7;
+}
+
+.fa-tag.icon_tag::before {
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+    content: "\f02c";
+    font-style: normal;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    font-size: 0.875em;
+    vertical-align: middle;
+}
+
+/* Name Tags container */
+.name_tags {
+    flex: 1;
+    min-width: 0;
+    overflow: visible;
+    color: rgb(55, 53, 47) !important;
+}
+
+.name_tags * {
+    color: rgb(55, 53, 47) !important;
+}
+
+.name_tags input:focus {
+    border: none !important;
+    outline: none;
+}
+
+.add-margin {
+    margin: 8px 5px;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 15px;
+}
+
+/* Editable Tags Container */
+.editable-tags-container {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+    align-items: center;
+    min-height: 24px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 4px;
+    transition: border-color 0.2s ease;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.editable-tags-container::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+}
+
+/* Clickable Tag Wrapper */
+.clickable-tag-wrapper {
+    display: inline-flex;
+    align-items: center;
+    background: #f0f4f8;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.clickable-tag-wrapper:hover {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+}
+
+.clickable-tag {
+    color: #007DB8;
+    padding: 4px 8px 4px 8px;
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-block;
+    text-decoration: none;
+    line-height: 1.2;
+}
+
+.clickable-tag:hover {
+    color: #005a8a;
+    text-decoration: none;
+}
+
+.clickable-tag:visited {
+    color: #007DB8;
+}
+
+.clickable-tag:hover:visited {
+    color: #005a8a;
+}
+
+/* Tag Delete Button */
+.tag-delete-button {
+    color: #94a3b8;
+    padding: 4px 6px 4px 2px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    line-height: 1;
+}
+
+.tag-delete-button:hover {
+    color: #ef4444;
+}
+
+/* Tag Highlight state */
+.clickable-tag-wrapper.tag-highlight {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 6px;
+    border-radius: 8px;
+    background: #fff3b0;
+}
+
+.clickable-tag-wrapper.tag-highlight .clickable-tag {
+    color: #2b2b2b;
+}
+
+.clickable-tag-wrapper.tag-highlight .tag-delete-button {
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 4px;
+    color: #7a3b00;
+}
+
+/* Tag Input */
+.tag-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 4px 8px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    color: #37352F;
+    min-width: 60px;
+    max-width: 150px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    resize: none;
+}
+
+.tag-input::placeholder {
+    color: #bababa;
+    font-style: italic;
+}
+
+.tag-input:focus {
+    outline: none;
+    background: rgba(0, 125, 184, 0.1);
+    border-radius: 4px;
+}

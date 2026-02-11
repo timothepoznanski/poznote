@@ -147,13 +147,9 @@ class FoldersController {
     private function getAllFolderIds(int $folderId, ?string $workspace): array {
         $folderIds = [$folderId];
         
-        if ($workspace !== null) {
-            $stmt = $this->db->prepare("SELECT id FROM folders WHERE parent_id = ? AND workspace = ?");
-            $stmt->execute([$folderId, $workspace]);
-        } else {
-            $stmt = $this->db->prepare("SELECT id FROM folders WHERE parent_id = ?");
-            $stmt->execute([$folderId]);
-        }
+        [$wsCond, $wsParams] = $this->buildWorkspaceCondition($workspace);
+        $stmt = $this->db->prepare("SELECT id FROM folders WHERE parent_id = ?" . $wsCond);
+        $stmt->execute(array_merge([$folderId], $wsParams));
         
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $folderIds = array_merge($folderIds, $this->getAllFolderIds((int)$row['id'], $workspace));
@@ -167,23 +163,14 @@ class FoldersController {
      */
     private function countNotesRecursive(int $folderId, ?string $workspace): int {
         $count = 0;
+        [$wsCond, $wsParams] = $this->buildWorkspaceCondition($workspace);
         
-        if ($workspace !== null) {
-            $stmt = $this->db->prepare("SELECT COUNT(*) FROM entries WHERE folder_id = ? AND trash = 0 AND workspace = ?");
-            $stmt->execute([$folderId, $workspace]);
-        } else {
-            $stmt = $this->db->prepare("SELECT COUNT(*) FROM entries WHERE folder_id = ? AND trash = 0");
-            $stmt->execute([$folderId]);
-        }
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM entries WHERE folder_id = ? AND trash = 0" . $wsCond);
+        $stmt->execute(array_merge([$folderId], $wsParams));
         $count += (int)$stmt->fetchColumn();
         
-        if ($workspace !== null) {
-            $subStmt = $this->db->prepare("SELECT id FROM folders WHERE parent_id = ? AND workspace = ?");
-            $subStmt->execute([$folderId, $workspace]);
-        } else {
-            $subStmt = $this->db->prepare("SELECT id FROM folders WHERE parent_id = ?");
-            $subStmt->execute([$folderId]);
-        }
+        $subStmt = $this->db->prepare("SELECT id FROM folders WHERE parent_id = ?" . $wsCond);
+        $subStmt->execute(array_merge([$folderId], $wsParams));
         
         while ($row = $subStmt->fetch(PDO::FETCH_ASSOC)) {
             $count += $this->countNotesRecursive((int)$row['id'], $workspace);
@@ -198,13 +185,9 @@ class FoldersController {
     private function countSubfoldersRecursive(int $folderId, ?string $workspace): int {
         $count = 0;
         
-        if ($workspace !== null) {
-            $stmt = $this->db->prepare("SELECT id FROM folders WHERE parent_id = ? AND workspace = ?");
-            $stmt->execute([$folderId, $workspace]);
-        } else {
-            $stmt = $this->db->prepare("SELECT id FROM folders WHERE parent_id = ?");
-            $stmt->execute([$folderId]);
-        }
+        [$wsCond, $wsParams] = $this->buildWorkspaceCondition($workspace);
+        $stmt = $this->db->prepare("SELECT id FROM folders WHERE parent_id = ?" . $wsCond);
+        $stmt->execute(array_merge([$folderId], $wsParams));
         
         $subfolders = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $count += count($subfolders);
@@ -216,6 +199,17 @@ class FoldersController {
         return $count;
     }
     
+    /**
+     * Build optional workspace filter SQL and params.
+     * Returns [conditionSQL, params] where conditionSQL is " AND workspace = ?" or empty.
+     */
+    private function buildWorkspaceCondition(?string $workspace): array {
+        if ($workspace !== null) {
+            return [' AND workspace = ?', [$workspace]];
+        }
+        return ['', []];
+    }
+
     /**
      * Send JSON response
      */
@@ -339,13 +333,9 @@ class FoldersController {
         $folderId = (int)$id;
         $workspace = isset($_GET['workspace']) ? trim((string)$_GET['workspace']) : null;
         
-        if ($workspace !== null) {
-            $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, created, workspace FROM folders WHERE id = ? AND workspace = ?');
-            $stmt->execute([$folderId, $workspace]);
-        } else {
-            $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, created, workspace FROM folders WHERE id = ?');
-            $stmt->execute([$folderId]);
-        }
+        [$wsCond, $wsParams] = $this->buildWorkspaceCondition($workspace);
+        $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, created, workspace FROM folders WHERE id = ?' . $wsCond);
+        $stmt->execute(array_merge([$folderId], $wsParams));
 
         $folder = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -606,13 +596,9 @@ class FoldersController {
         $workspace = isset($data['workspace']) ? trim((string)$data['workspace']) : null;
         
         // Get current folder
-        if ($workspace !== null) {
-            $stmt = $this->db->prepare("SELECT id, name, workspace, parent_id FROM folders WHERE id = ? AND workspace = ?");
-            $stmt->execute([$folderId, $workspace]);
-        } else {
-            $stmt = $this->db->prepare("SELECT id, name, workspace, parent_id FROM folders WHERE id = ?");
-            $stmt->execute([$folderId]);
-        }
+        [$wsCond, $wsParams] = $this->buildWorkspaceCondition($workspace);
+        $stmt = $this->db->prepare("SELECT id, name, workspace, parent_id FROM folders WHERE id = ?" . $wsCond);
+        $stmt->execute(array_merge([$folderId], $wsParams));
         
         $folder = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$folder) {
@@ -707,13 +693,9 @@ class FoldersController {
         $workspace = isset($_GET['workspace']) ? trim((string)$_GET['workspace']) : null;
         
         // Get folder info and its actual workspace
-        if ($workspace !== null) {
-            $stmt = $this->db->prepare("SELECT id, name, workspace FROM folders WHERE id = ? AND workspace = ?");
-            $stmt->execute([$folderId, $workspace]);
-        } else {
-            $stmt = $this->db->prepare("SELECT id, name, workspace FROM folders WHERE id = ?");
-            $stmt->execute([$folderId]);
-        }
+        [$wsCond, $wsParams] = $this->buildWorkspaceCondition($workspace);
+        $stmt = $this->db->prepare("SELECT id, name, workspace FROM folders WHERE id = ?" . $wsCond);
+        $stmt->execute(array_merge([$folderId], $wsParams));
         
         $folder = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$folder) {
@@ -903,15 +885,10 @@ class FoldersController {
         $data = $this->getInputData();
         $workspace = isset($data['workspace']) ? trim((string)$data['workspace']) : null;
         
-        if ($workspace !== null) {
-            $query = "UPDATE entries SET trash = 1 WHERE folder_id = ? AND trash = 0 AND workspace = ?";
-            $stmt = $this->db->prepare($query);
-            $stmt->execute([$folderId, $workspace]);
-        } else {
-            $query = "UPDATE entries SET trash = 1 WHERE folder_id = ? AND trash = 0";
-            $stmt = $this->db->prepare($query);
-            $stmt->execute([$folderId]);
-        }
+        [$wsCond, $wsParams] = $this->buildWorkspaceCondition($workspace);
+        $query = "UPDATE entries SET trash = 1 WHERE folder_id = ? AND trash = 0" . $wsCond;
+        $stmt = $this->db->prepare($query);
+        $stmt->execute(array_merge([$folderId], $wsParams));
         
         $affected = $stmt->rowCount();
         
@@ -1013,14 +990,10 @@ class FoldersController {
         $workspace = isset($_GET['workspace']) ? trim((string)$_GET['workspace']) : null;
         
         // Get all folders
-        $foldersQuery = "SELECT id, parent_id FROM folders";
-        if ($workspace !== null) {
-            $foldersQuery .= " WHERE workspace = ?";
-            $stmt = $this->db->prepare($foldersQuery);
-            $stmt->execute([$workspace]);
-        } else {
-            $stmt = $this->db->query($foldersQuery);
-        }
+        [$wsCond, $wsParams] = $this->buildWorkspaceCondition($workspace);
+        $foldersQuery = "SELECT id, parent_id FROM folders WHERE 1=1" . $wsCond;
+        $stmt = $this->db->prepare($foldersQuery);
+        $stmt->execute($wsParams);
         
         $folderHierarchy = [];
         while ($folder = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -1039,44 +1012,30 @@ class FoldersController {
         };
         
         // Get counts
+        // NOTE: This is an N+1 query pattern — one COUNT query per folder.
+        // A single query grouping by folder_id would be more efficient, but
+        // changing query logic is risky; leaving as-is for safety.
         $counts = [];
         foreach (array_keys($folderHierarchy) as $folderId) {
             $allFolderIds = $getDescendants($folderId);
             $placeholders = implode(',', array_fill(0, count($allFolderIds), '?'));
             
-            $query = "SELECT COUNT(*) FROM entries WHERE trash = 0 AND folder_id IN ($placeholders)";
-            if ($workspace !== null) {
-                $query .= " AND workspace = ?";
-                $params = array_merge($allFolderIds, [$workspace]);
-            } else {
-                $params = $allFolderIds;
-            }
-            
+            $query = "SELECT COUNT(*) FROM entries WHERE trash = 0 AND folder_id IN ($placeholders)" . $wsCond;
             $countStmt = $this->db->prepare($query);
-            $countStmt->execute($params);
+            $countStmt->execute(array_merge($allFolderIds, $wsParams));
             $counts[$folderId] = (int)$countStmt->fetchColumn();
         }
         
         // Get uncategorized count
-        $uncategorizedQuery = "SELECT COUNT(*) FROM entries WHERE trash = 0 AND folder_id IS NULL";
-        if ($workspace !== null) {
-            $uncategorizedQuery .= " AND workspace = ?";
-            $uncatStmt = $this->db->prepare($uncategorizedQuery);
-            $uncatStmt->execute([$workspace]);
-        } else {
-            $uncatStmt = $this->db->query($uncategorizedQuery);
-        }
+        $uncategorizedQuery = "SELECT COUNT(*) FROM entries WHERE trash = 0 AND folder_id IS NULL" . $wsCond;
+        $uncatStmt = $this->db->prepare($uncategorizedQuery);
+        $uncatStmt->execute($wsParams);
         $counts['uncategorized'] = (int)$uncatStmt->fetchColumn();
         
         // Get favorites count
-        $favoriteQuery = "SELECT COUNT(*) FROM entries WHERE trash = 0 AND favorite = 1";
-        if ($workspace !== null) {
-            $favoriteQuery .= " AND workspace = ?";
-            $favStmt = $this->db->prepare($favoriteQuery);
-            $favStmt->execute([$workspace]);
-        } else {
-            $favStmt = $this->db->query($favoriteQuery);
-        }
+        $favoriteQuery = "SELECT COUNT(*) FROM entries WHERE trash = 0 AND favorite = 1" . $wsCond;
+        $favStmt = $this->db->prepare($favoriteQuery);
+        $favStmt->execute($wsParams);
         $counts['Favorites'] = (int)$favStmt->fetchColumn();
         
         $this->sendJson(['success' => true, 'counts' => $counts]);
@@ -1327,13 +1286,9 @@ class FoldersController {
             $targetFolderId = null;
         } elseif ($targetFolderId > 0) {
             // Get folder name
-            if ($workspace) {
-                $stmt = $this->db->prepare("SELECT name FROM folders WHERE id = ? AND workspace = ?");
-                $stmt->execute([$targetFolderId, $workspace]);
-            } else {
-                $stmt = $this->db->prepare("SELECT name FROM folders WHERE id = ?");
-                $stmt->execute([$targetFolderId]);
-            }
+            [$wsCond, $wsParams] = $this->buildWorkspaceCondition($workspace);
+            $stmt = $this->db->prepare("SELECT name FROM folders WHERE id = ?" . $wsCond);
+            $stmt->execute(array_merge([$targetFolderId], $wsParams));
             $folderData = $stmt->fetch(PDO::FETCH_ASSOC);
             if (!$folderData) {
                 $this->sendError('Folder not found', 404);
@@ -1342,13 +1297,9 @@ class FoldersController {
             $targetFolder = $folderData['name'];
         } elseif ($targetFolder !== null) {
             // Get folder ID from name
-            if ($workspace) {
-                $stmt = $this->db->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
-                $stmt->execute([$targetFolder, $workspace]);
-            } else {
-                $stmt = $this->db->prepare("SELECT id FROM folders WHERE name = ?");
-                $stmt->execute([$targetFolder]);
-            }
+            [$wsCond2, $wsParams2] = $this->buildWorkspaceCondition($workspace);
+            $stmt = $this->db->prepare("SELECT id FROM folders WHERE name = ?" . $wsCond2);
+            $stmt->execute(array_merge([$targetFolder], $wsParams2));
             $folderData = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($folderData) {
                 $targetFolderId = (int)$folderData['id'];

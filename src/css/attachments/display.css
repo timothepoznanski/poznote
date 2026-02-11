@@ -1,0 +1,193 @@
+/**
+ * Attachments - Display
+ *
+ * Attachment cards, icons, thumbnails, details, and action buttons.
+ */
+
+/* Attachments display */
+.attachments-display {
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #eee;
+}
+
+.loading-attachments {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-style: italic;
+}
+
+.loading-attachments i {
+    margin-right: 8px;
+    animation: spin 1s linear infinite;
+}
+
+.no-attachments {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+    font-style: italic;
+}
+
+.no-attachments i {
+    margin-right: 8px;
+    opacity: 0.7;
+}
+
+.error-message {
+    text-align: center;
+    padding: 20px;
+    color: #dc3545;
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    margin: 10px;
+}
+
+/* Attachment card styles */
+.attachment-card {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s ease;
+}
+
+.attachment-card:last-child {
+    border-bottom: none;
+}
+
+.attachment-card:hover {
+    background-color: #f8f9fa;
+}
+
+.attachment-icon {
+    flex-shrink: 0;
+    width: 40px;
+    background: #007DB8;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+}
+
+.attachment-icon i {
+    color: white;
+    font-size: 18px;
+}
+
+.attachment-thumbnail {
+    width: 48px !important;
+    height: 48px !important;
+    max-width: 48px !important;
+    max-height: 48px !important;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.attachment-thumbnail:hover {
+    transform: scale(1.05);
+}
+
+/* Ensure thumbnails use the intended size */
+.attachment-icon img {
+    width: 48px !important;
+    height: 48px !important;
+    max-width: 48px !important;
+    max-height: 48px !important;
+}
+
+.attachment-details {
+    flex: 1;
+}
+
+.attachment-name {
+    font-weight: 500;
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 4px;
+    word-break: break-word;
+}
+
+.attachment-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 13px;
+    color: #666;
+}
+
+.attachment-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: 15px;
+}
+
+/* Ensure attachment action buttons never stretch */
+.attachment-actions .btn-icon {
+    flex: 0 0 auto !important;
+}
+
+.btn-icon {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 6px !important;
+    font-size: 14px !important;
+    flex: 0 0 auto !important;
+}
+
+/* Keep icon SVGs centered and constrained */
+.btn-icon svg {
+    width: 16px !important;
+    height: 16px !important;
+    vertical-align: middle !important;
+}
+
+.btn-download {
+    background: #28a745;
+    color: white;
+}
+
+.btn-download:hover {
+    background: #218838;
+    transform: translateY(-1px);
+}
+
+.btn-delete {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+}
+
+/* Ensure action icon buttons keep their background/color */
+.btn-icon.btn-download {
+    background: #28a745 !important;
+    color: #fff !important;
+}
+
+.btn-icon.btn-delete {
+    background: #dc3545 !important;
+    color: #fff !important;
+}
+
+/* Prevent modal global rules from making .btn-icon full width */
+.modal .btn-icon {
+    display: inline-flex !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    padding: 0 !important;
+}

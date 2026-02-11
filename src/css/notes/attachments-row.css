@@ -1,0 +1,68 @@
+/**
+ * Notes - Attachments Row
+ *
+ * Styles for the note attachments row, paperclip icon,
+ * attachment links, and icon button wrapper.
+ */
+
+/* Attachments Row */
+.note-attachments-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    margin-top: 15px;
+}
+
+.fa-paperclip.icon_attachment {
+    font-size: 14px;
+    margin-right: 14px;
+    flex-shrink: 0;
+    align-self: center;
+    line-height: 1;
+}
+
+.note-attachments-list {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.4;
+}
+
+/* Attachment Link */
+.attachment-link {
+    color: #007DB8 !important;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+    cursor: pointer;
+    display: inline-block;
+    margin: 2px 4px 2px 8px;
+    word-break: break-word;
+}
+
+.attachment-link:hover {
+    color: #005a8b !important;
+    text-decoration: underline;
+}
+
+.attachment-link:visited {
+    color: #007DB8 !important;
+}
+
+/* Paperclip icon button wrapper */
+.icon-attachment-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.icon-attachment-btn:focus {
+    outline: 2px solid rgba(0, 125, 184, 0.25);
+    outline-offset: 2px;
+    border-radius: 4px;
+}

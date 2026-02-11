@@ -12,6 +12,9 @@ $note_id = isset($_GET['note_id']) ? intval($_GET['note_id']) : 0;
 $diagram_id = isset($_GET['diagram_id']) ? $_GET['diagram_id'] : null;
 $workspace = isset($_GET['workspace']) ? $_GET['workspace'] : getFirstWorkspaceName();
 
+// Enable debug logging only when explicitly requested
+$excalidraw_debug = !empty($_GET['debug']) || (defined('EXCALIDRAW_DEBUG') && EXCALIDRAW_DEBUG);
+
 // Determine if we're in embedded diagram mode
 $is_embedded_diagram = !empty($diagram_id);
 
@@ -56,19 +59,19 @@ if ($note_id > 0) {
                     // Try single-quoted attribute first (more common after sanitization)
                     if (preg_match("/data-excalidraw='([^']*)'/", $div_tag, $data_match)) {
                         $existing_data = html_entity_decode($data_match[1], ENT_QUOTES | ENT_HTML5);
-                        error_log("Found embedded diagram data (single-quoted) for $diagram_id in note $note_id");
+                        if ($excalidraw_debug) error_log("Found embedded diagram data (single-quoted) for $diagram_id in note $note_id");
                         $found = true;
                     }
                     // Then try double-quoted attribute
                     elseif (preg_match('/data-excalidraw="([^"]*)"/', $div_tag, $data_match)) {
                         $existing_data = html_entity_decode($data_match[1], ENT_QUOTES | ENT_HTML5);
-                        error_log("Found embedded diagram data (double-quoted) for $diagram_id in note $note_id");
+                        if ($excalidraw_debug) error_log("Found embedded diagram data (double-quoted) for $diagram_id in note $note_id");
                         $found = true;
                     }
                 }
                 
                 if (!$found) {
-                    error_log("No existing data found for diagram $diagram_id in note $note_id");
+                    if ($excalidraw_debug) error_log("No existing data found for diagram $diagram_id in note $note_id");
                     $existing_data = null;
                 }
             }
@@ -91,45 +94,45 @@ if ($note_id > 0) {
                         $json_test = json_decode($extracted_json, true);
                         if (json_last_error() === JSON_ERROR_NONE && $json_test !== null) {
                             $existing_data = $extracted_json;
-                            error_log("Successfully extracted JSON from HTML for note $note_id");
+                            if ($excalidraw_debug) error_log("Successfully extracted JSON from HTML for note $note_id");
                         } else {
-                            error_log("Invalid JSON extracted for note $note_id: " . json_last_error_msg());
+                            if ($excalidraw_debug) error_log("Invalid JSON extracted for note $note_id: " . json_last_error_msg());
                             $existing_data = null;
                         }
                     } else {
-                        error_log("Empty JSON extracted for note $note_id");
+                        if ($excalidraw_debug) error_log("Empty JSON extracted for note $note_id");
                         $existing_data = null;
                     }
                 } else {
                     // No excalidraw-data div found in HTML, try database as fallback
-                    if ($entry_content && !strpos($entry_content, '<div class="excalidraw-container"')) {
+                    if ($entry_content && strpos($entry_content, '<div class="excalidraw-container"') === false) {
                         // Legacy system: entry field contains direct JSON data
                         $existing_data = $entry_content;
-                        error_log("Using legacy JSON from database for note $note_id");
+                        if ($excalidraw_debug) error_log("Using legacy JSON from database for note $note_id");
                     } else {
-                        error_log("No excalidraw-data div found in HTML and no legacy JSON in database for note $note_id");
+                        if ($excalidraw_debug) error_log("No excalidraw-data div found in HTML and no legacy JSON in database for note $note_id");
                         $existing_data = null;
                     }
                 }
             } else {
                 // HTML file doesn't exist, use database content as fallback
-                if ($entry_content && !strpos($entry_content, '<div class="excalidraw-container"')) {
+                if ($entry_content && strpos($entry_content, '<div class="excalidraw-container"') === false) {
                     $existing_data = $entry_content;
-                    error_log("HTML file not found, using database content for note $note_id");
+                    if ($excalidraw_debug) error_log("HTML file not found, using database content for note $note_id");
                 } else {
-                    error_log("HTML file not found and database content is HTML for note $note_id");
+                    if ($excalidraw_debug) error_log("HTML file not found and database content is HTML for note $note_id");
                     $existing_data = null;
                 }
             }
         }
         
         // Debug: log the data we're loading
-        error_log("Loading note $note_id: " . substr($existing_data, 0, 100) . "...");
+        if ($excalidraw_debug) error_log("Loading note $note_id: " . substr($existing_data, 0, 100) . "...");
     } else {
-        error_log("Note $note_id not found");
+        if ($excalidraw_debug) error_log("Note $note_id not found");
     }
 } else {
-    error_log("Creating new note (note_id = 0)");
+    if ($excalidraw_debug) error_log("Creating new note (note_id = 0)");
 }
 ?>
 <!DOCTYPE html>
@@ -144,7 +147,16 @@ if ($note_id > 0) {
     
     <link rel="stylesheet" href="css/modal-alerts.css">
     <link rel="stylesheet" href="css/excalidraw.css">
-    <link rel="stylesheet" href="css/dark-mode.css">
+    <link rel="stylesheet" href="css/dark-mode/variables.css">
+    <link rel="stylesheet" href="css/dark-mode/layout.css">
+    <link rel="stylesheet" href="css/dark-mode/menus.css">
+    <link rel="stylesheet" href="css/dark-mode/editor.css">
+    <link rel="stylesheet" href="css/dark-mode/modals.css">
+    <link rel="stylesheet" href="css/dark-mode/components.css">
+    <link rel="stylesheet" href="css/dark-mode/pages.css">
+    <link rel="stylesheet" href="css/dark-mode/markdown.css">
+    <link rel="stylesheet" href="css/dark-mode/kanban.css">
+    <link rel="stylesheet" href="css/dark-mode/icons.css">
     
     <!-- Modal alerts system -->
     <script src="js/modal-alerts.js"></script>

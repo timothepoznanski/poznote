@@ -1,0 +1,88 @@
+/**
+ * Notes - Toolbar Icons & Animations
+ *
+ * Styles for the save button animation (pulse effect),
+ * save icon color states, palette/fill-drip icon colors,
+ * and rotate keyframe animation.
+ */
+
+/* Save Button Animation */
+.toolbar-btn.save-modified {
+    background: transparent !important;
+    border: none !important;
+}
+
+/* Pulsation animation for modified save button */
+@keyframes pulse-save {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.4);
+    }
+
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 4px rgba(229, 57, 53, 0.2);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.0);
+    }
+}
+
+/* Pulse animation for update badge */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Save icon - red when modified */
+.toolbar-btn.save-modified i.fa-save {
+    color: #ff0000 !important;
+}
+
+.toolbar-btn.save-modified:hover i.fa-save,
+.toolbar-btn.save-modified:focus i.fa-save {
+    color: #ff0000 !important;
+}
+
+/* Save icon - inherit color when not modified */
+.toolbar-btn:not(.save-modified) i.fa-save {
+    color: inherit;
+}
+
+/* Palette & fill-drip icons - inherit by default, colored on hover */
+.toolbar-btn i.fa-palette,
+.toolbar-btn i.fa-fill-drip {
+    color: inherit !important;
+}
+
+.toolbar-btn:hover i.fa-palette,
+.toolbar-btn:focus i.fa-palette {
+    color: #ff2222 !important;
+}
+
+.toolbar-btn:hover i.fa-fill-drip,
+.toolbar-btn:focus i.fa-fill-drip {
+    color: #ffe066 !important;
+}
+
+/* Rotate animation */
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}

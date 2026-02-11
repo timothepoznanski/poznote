@@ -6,6 +6,7 @@
 // Global variables for note loading
 var currentLoadingNoteId = null;
 var isNoteLoading = false;
+var imageClickHandlerInitialized = false;
 
 /**
  * Reapply search highlights with a couple of delayed retries to handle layout timing.
@@ -194,6 +195,171 @@ function findNoteLinkById(noteId) {
 }
 
 /**
+ * Common note loading logic shared by loadNoteDirectly and loadNoteViaAjax.
+ * Handles XHR request, response parsing, content update, and error handling.
+ * @param {string} url - The original URL to load
+ * @param {string|number} noteId - The note ID
+ * @param {Object} options - Configuration for behavior differences
+ * @param {HTMLElement} options.clickedLink - Element to mark as selected
+ * @param {boolean} options.fromHistory - Whether navigating from popstate (skip URL push)
+ * @param {boolean} options.needsRefresh - Whether to add cache-busting parameter
+ * @param {boolean} options.clearKanbanFlags - Whether to clear Kanban view state
+ * @param {boolean} options.updateSelectionBeforeLoad - Update selection before XHR (true) or after (false)
+ * @param {boolean} options.reinitClickHandlers - Whether to reinitialize note click handlers
+ * @param {number} options.xhrTimeout - XHR timeout in ms (0 = no timeout)
+ * @param {Function} options.onLoadingComplete - Called when loading flag should be cleared
+ * @param {Function} options.onContentLoaded - Called after content is inserted and initialized
+ */
+function loadNoteCommon(url, noteId, options) {
+    options = options || {};
+
+    // Show loading state
+    showNoteLoadingState();
+    if (options.updateSelectionBeforeLoad && options.clickedLink) {
+        updateSelectedNote(options.clickedLink);
+    }
+
+    // On mobile, add note-open class
+    if (isMobileDevice()) {
+        document.body.classList.add('note-open');
+    }
+
+    // Build final URL with cache-busting if needed
+    var finalUrl = url;
+    if (options.needsRefresh) {
+        var separator = url.includes('?') ? '&' : '?';
+        finalUrl = url + separator + '_refresh=' + Date.now();
+    }
+
+    var clearLoading = function() {
+        if (typeof options.onLoadingComplete === 'function') {
+            options.onLoadingComplete();
+        }
+    };
+
+    var handleError = function() {
+        hideNoteLoadingState();
+        if (isMobileDevice()) {
+            document.body.classList.remove('note-open');
+        }
+    };
+
+    // Create XMLHttpRequest
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', finalUrl, true);
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+    xhr.onreadystatechange = function() {
+        try {
+            if (xhr.readyState === 4) {
+                clearLoading();
+
+                if (xhr.status === 200) {
+                    try {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(xhr.responseText, 'text/html');
+                        const rightColumn = doc.getElementById('right_col');
+
+                        if (rightColumn) {
+                            const currentRightColumn = document.getElementById('right_col');
+                            if (currentRightColumn) {
+                                // Clear existing highlights first to avoid overlays being left over
+                                if (typeof clearSearchHighlights === 'function') {
+                                    try { clearSearchHighlights(); } catch (e) { /* ignore */ }
+                                }
+
+                                currentRightColumn.innerHTML = rightColumn.innerHTML;
+
+                                // Clear Kanban view flags if requested
+                                if (options.clearKanbanFlags) {
+                                    window._isKanbanViewActive = false;
+                                    window._kanbanFolderId = null;
+                                    window._originalRightColContent = null;
+                                }
+
+                                // Update URL (skip if coming from popstate)
+                                if (!options.fromHistory) {
+                                    updateBrowserUrl(url, noteId);
+                                }
+
+                                reinitializeNoteContent();
+
+                                // Post-content hook for caller-specific logic
+                                if (typeof options.onContentLoaded === 'function') {
+                                    options.onContentLoaded(noteId, url);
+                                }
+
+                                // Reapply highlights after content initialization
+                                if (typeof applyHighlightsWithRetries === 'function') {
+                                    try { applyHighlightsWithRetries(); } catch (e) { /* ignore */ }
+                                }
+
+                                // Small delay to ensure the loading animation is visible
+                                setTimeout(function() {
+                                    hideNoteLoadingState();
+                                    // Update selection after load if not done before
+                                    if (!options.updateSelectionBeforeLoad && options.clickedLink) {
+                                        updateSelectedNote(options.clickedLink);
+                                    }
+                                }, 80);
+
+                                // Reinitialize note click handlers if requested
+                                if (options.reinitClickHandlers && typeof window.initializeNoteClickHandlers === 'function') {
+                                    window.initializeNoteClickHandlers();
+                                }
+                            } else {
+                                throw new Error('Could not find current right column');
+                            }
+                        } else {
+                            throw new Error('Could not find note content in response');
+                        }
+                    } catch (error) {
+                        console.error('Error loading note:', error);
+                        showNotificationPopup('Error loading note: ' + error.message, 'error');
+                        handleError();
+                    }
+                } else {
+                    // Don't show error popup for network errors (status 0), xhr.onerror will handle it
+                    if (xhr.status !== 0) {
+                        console.error('Failed to load note, status:', xhr.status);
+                        showNotificationPopup('Failed to load note (status: ' + xhr.status + ')', 'error');
+                    }
+                    handleError();
+                }
+            }
+        } catch (error) {
+            console.error('Error in xhr onreadystatechange:', error);
+            clearLoading();
+            handleError();
+        }
+    };
+
+    xhr.onerror = function() {
+        clearLoading();
+        console.error('Network error during note loading');
+        showNotificationPopup('Network error - please check your connection', 'error');
+        handleError();
+        // Re-initialize search highlighting if in search mode
+        if (isMobileDevice() && typeof applyHighlightsWithRetries === 'function' && typeof isSearchMode !== 'undefined' && isSearchMode) {
+            try { applyHighlightsWithRetries(); } catch (e) { /* ignore */ }
+        }
+    };
+
+    xhr.ontimeout = function() {
+        clearLoading();
+        console.error('Request timeout during note loading');
+        showNotificationPopup('Request timeout - please try again', 'error');
+        handleError();
+    };
+
+    if (options.xhrTimeout) {
+        xhr.timeout = options.xhrTimeout;
+    }
+
+    xhr.send();
+}
+
+/**
  * Direct note loading function called from onclick
  * @param {string} url - The URL to load
  * @param {string|number} noteId - The note ID
@@ -202,12 +368,10 @@ function findNoteLinkById(noteId) {
  */
 window.loadNoteDirectly = function(url, noteId, event, clickedElement) {
     try {
-        
         // Check for unsaved changes in current note before proceeding
         var currentNoteId = window.noteid;
         if (currentNoteId && currentNoteId !== noteId && typeof window.hasUnsavedChanges === 'function') {
             if (window.hasUnsavedChanges(currentNoteId)) {
-                
                 // Show save in progress notification
                 if (typeof window.showSaveInProgressNotification === 'function') {
                     window.showSaveInProgressNotification(function() {
@@ -217,36 +381,32 @@ window.loadNoteDirectly = function(url, noteId, event, clickedElement) {
                 }
             }
         }
-        
-        
-        // loadNoteDirectly start
+
         // Prevent default link behavior
         if (event) {
             event.preventDefault();
             event.stopPropagation();
         }
-        
+
         // Set flag for mobile scroll behavior
         if (typeof sessionStorage !== 'undefined' && isMobileDevice()) {
             sessionStorage.setItem('shouldScrollToNote', 'true');
         }
-        
+
         // Cancel any pending auto-save operations for the previous note
         if (typeof saveTimeout !== 'undefined') {
             clearTimeout(saveTimeout);
         }
-        
+
         // Check if this note needs a refresh (was left before auto-save completed)
         var needsRefresh = false;
         if (typeof notesNeedingRefresh !== 'undefined') {
             needsRefresh = notesNeedingRefresh.has(String(noteId));
             if (needsRefresh) {
-                notesNeedingRefresh.delete(String(noteId)); // Remove from list
+                notesNeedingRefresh.delete(String(noteId));
             }
         }
-        
-        // Auto-save ensures no changes are lost during navigation
-        
+
         // Prevent multiple simultaneous loads
         if (window.isLoadingNote) {
             return false;
@@ -254,176 +414,48 @@ window.loadNoteDirectly = function(url, noteId, event, clickedElement) {
         window.isLoadingNote = true;
 
         // Find the clicked link to update selection
-        // Use the provided clickedElement if available, otherwise search by ID
         const clickedLink = clickedElement || findNoteLinkById(noteId);
-        
-        // Show loading state immediately
-        showNoteLoadingState();
-        
-        // If note needs refresh, add cache-busting parameter
-        var finalUrl = url;
-        if (needsRefresh) {
-            var separator = url.includes('?') ? '&' : '?';
-            finalUrl = url + separator + '_refresh=' + Date.now();
-        }
-        
-        // On mobile, add note-open class
-        if (isMobileDevice()) {
-            document.body.classList.add('note-open');
-        }
 
-        // Create XMLHttpRequest
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', finalUrl, true);
-        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        loadNoteCommon(url, noteId, {
+            clickedLink: clickedLink,
+            fromHistory: false,
+            needsRefresh: needsRefresh,
+            clearKanbanFlags: true,
+            updateSelectionBeforeLoad: false,
+            reinitClickHandlers: true,
+            xhrTimeout: 10000,
+            onLoadingComplete: function() {
+                window.isLoadingNote = false;
+            },
+            onContentLoaded: function(loadedNoteId, originalUrl) {
+                // If this was a forced refresh, skip auto-draft restore
+                if (needsRefresh && typeof checkForUnsavedDraft === 'function') {
+                    setTimeout(function() {
+                        checkForUnsavedDraft(loadedNoteId, true); // true = skip auto restore
+                    }, 100);
 
-        xhr.onreadystatechange = function() {
-            try {
-                if (xhr.readyState === 4) {
-                    window.isLoadingNote = false;
-
-                    if (xhr.status === 200) {
-                        // xhr 200 received, processing response
-                        try {
-                            const parser = new DOMParser();
-                            const doc = parser.parseFromString(xhr.responseText, 'text/html');
-                            const rightColumn = doc.getElementById('right_col');
-
-                            if (rightColumn) {
-                                // right_col found in response
-                                const currentRightColumn = document.getElementById('right_col');
-                                    if (currentRightColumn) {
-                                    // Clear existing highlights first to avoid overlays being left over
-                                    if (typeof clearSearchHighlights === 'function') {
-                                        try { clearSearchHighlights(); } catch (e) { /* ignore */ }
-                                    }
-
-                                    currentRightColumn.innerHTML = rightColumn.innerHTML;
-                                    
-                                    // Clear Kanban view flags when loading a note
-                                    // This prevents refreshKanbanView() from overwriting the note
-                                    // when a task is checked in a tasklist
-                                    window._isKanbanViewActive = false;
-                                    window._kanbanFolderId = null;
-                                    window._originalRightColContent = null;
-                                    
-                                    // Auto-save handles all state management automatically
-                                    
-                                    // Update URL before reinitializing so reinitializeNoteContent
-                                    // can detect the 'note' param and keep the right column visible
-                                    updateBrowserUrl(url, noteId);
-                                    reinitializeNoteContent();
-
-                                    // If this was a forced refresh, skip auto-draft restore
-                                    if (needsRefresh && typeof checkForUnsavedDraft === 'function') {
-                                        setTimeout(() => {
-                                            checkForUnsavedDraft(noteId, true); // true = skip auto restore
-                                        }, 100);
-                                        
-                                        // Clean up the URL by removing the _refresh parameter
-                                        if (window.history && window.history.replaceState) {
-                                            var cleanUrl = url.replace(/[?&]_refresh=\d+/, '');
-                                            // Remove trailing ? or & if they exist
-                                            cleanUrl = cleanUrl.replace(/[?&]$/, '');
-                                            window.history.replaceState(null, '', cleanUrl);
-                                        }
-                                    }
-
-                                    // Auto-scroll to right column on mobile after note is loaded
-                                    // Only if the user clicked on a note (sessionStorage flag)
-                                    if (isMobileDevice() && noteId && typeof scrollToRightColumn === 'function') {
-                                        const shouldScroll = sessionStorage.getItem('shouldScrollToNote');
-                                        if (shouldScroll === 'true') {
-                                            setTimeout(() => {
-                                                scrollToRightColumn();
-                                                sessionStorage.removeItem('shouldScrollToNote');
-                                            }, 100);
-                                        }
-                                    }
-
-                                    // Reapply highlights after content has been reinitialized.
-                                    // Use delayed calls to ensure layout has stabilized when switching notes.
-                                    if (typeof applyHighlightsWithRetries === 'function') {
-                                        try { applyHighlightsWithRetries(); } catch (e) { /* ignore */ }
-                                    }
-
-                                    // Add a small delay to ensure the loading animation is visible
-                                    setTimeout(() => {
-                                        hideNoteLoadingState();
-                                        // Apply selection after content is loaded and initialized
-                                        updateSelectedNote(clickedLink);
-                                    }, 80);
-                                    
-                                    // Reinitialize note click handlers for mobile navigation after loading individual note
-                                    if (typeof window.initializeNoteClickHandlers === 'function') {
-                                        window.initializeNoteClickHandlers();
-                                    }
-                                } else {
-                                    throw new Error('Could not find current right column');
-                                }
-                            } else {
-                                // right_col NOT found in server response
-                                throw new Error('Could not find note content in response');
-                            }
-                        } catch (error) {
-                            console.error('Error parsing note content:', error);
-                            showNotificationPopup('Error loading note: ' + error.message, 'error');
-                            hideNoteLoadingState();
-                            if (isMobileDevice()) {
-                                document.body.classList.remove('note-open');
-                            }
-                        }
-                    } else {
-                        // Don't show error popup for network errors (status 0), xhr.onerror will handle it
-                        if (xhr.status !== 0) {
-                            console.error('Failed to load note, status:', xhr.status, 'response:', xhr.responseText);
-                            showNotificationPopup('Failed to load note (status: ' + xhr.status + ')', 'error');
-                        }
-                        hideNoteLoadingState();
-                        if (isMobileDevice()) {
-                            document.body.classList.remove('note-open');
-                        }
+                    // Clean up the URL by removing the _refresh parameter
+                    if (window.history && window.history.replaceState) {
+                        var cleanUrl = originalUrl.replace(/[?&]_refresh=\d+/, '');
+                        // Remove trailing ? or & if they exist
+                        cleanUrl = cleanUrl.replace(/[?&]$/, '');
+                        window.history.replaceState(null, '', cleanUrl);
                     }
                 }
-            } catch (error) {
-                console.error('Error in xhr onreadystatechange:', error);
-                window.isLoadingNote = false;
-                hideNoteLoadingState();
-                if (isMobileDevice()) {
-                    document.body.classList.remove('note-open');
+
+                // Auto-scroll to right column on mobile after note is loaded
+                if (isMobileDevice() && loadedNoteId && typeof scrollToRightColumn === 'function') {
+                    const shouldScroll = sessionStorage.getItem('shouldScrollToNote');
+                    if (shouldScroll === 'true') {
+                        setTimeout(function() {
+                            scrollToRightColumn();
+                            sessionStorage.removeItem('shouldScrollToNote');
+                        }, 100);
+                    }
                 }
             }
-        };
+        });
 
-        xhr.onerror = function() {
-            window.isLoadingNote = false;
-            console.error('Network error during note loading');
-            showNotificationPopup('Network error - please check your connection', 'error');
-            hideNoteLoadingState();
-            if (isMobileDevice()) {
-                document.body.classList.remove('note-open');
-                // Re-initialize search highlighting if in search mode
-                if (typeof applyHighlightsWithRetries === 'function' && isSearchMode) {
-                    try { applyHighlightsWithRetries(); } catch (e) { /* ignore */ }
-                }
-            }
-        };
-
-        xhr.ontimeout = function() {
-            window.isLoadingNote = false;
-            console.error('Request timeout during note loading');
-            showNotificationPopup('Request timeout - please try again', 'error');
-            hideNoteLoadingState();
-            if (isMobileDevice()) {
-                document.body.classList.remove('note-open');
-            }
-        };
-
-        // Set timeout
-        xhr.timeout = 10000; // 10 seconds
-
-        xhr.send();
-        // xhr sent
         return false;
     } catch (error) {
         console.error('Error in loadNoteDirectly:', error);
@@ -448,119 +480,19 @@ function loadNoteViaAjax(url, noteId, clickedLink, fromHistory) {
     currentLoadingNoteId = noteId;
     fromHistory = fromHistory || false;
 
-    // Update UI to show loading state
-    showNoteLoadingState();
-    updateSelectedNote(clickedLink);
-    
-    // On mobile, add the note-open class to show the loading state
-    if (isMobileDevice()) {
-        document.body.classList.add('note-open');
-    }
-
-    // Create XMLHttpRequest
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', url, true);
-    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
+    loadNoteCommon(url, noteId, {
+        clickedLink: clickedLink,
+        fromHistory: fromHistory,
+        needsRefresh: false,
+        clearKanbanFlags: false,
+        updateSelectionBeforeLoad: true,
+        reinitClickHandlers: false,
+        xhrTimeout: 0,
+        onLoadingComplete: function() {
             isNoteLoading = false;
-
-            if (xhr.status === 200) {
-                try {
-                    // Parse the response to extract the right column content
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(xhr.responseText, 'text/html');
-                    const rightColumn = doc.getElementById('right_col');
-
-                    if (rightColumn) {
-                        // Update the right column content
-                        const currentRightColumn = document.getElementById('right_col');
-                            if (currentRightColumn) {
-                            // Clear existing highlights first to avoid overlays being left over
-                            if (typeof clearSearchHighlights === 'function') {
-                                try { clearSearchHighlights(); } catch (e) { /* ignore */ }
-                            }
-
-                            currentRightColumn.innerHTML = rightColumn.innerHTML;
-
-                            // Auto-save handles all state management automatically
-
-                            // Update URL before reinitializing so reinitializeNoteContent
-                            // can detect the 'note' param and keep the right column visible
-                            // Don't push to history if we're coming from popstate event
-                            if (!fromHistory) {
-                                updateBrowserUrl(url, noteId);
-                            }
-
-                            // Re-initialize any JavaScript that might be needed
-                            reinitializeNoteContent();
-
-                            // Reapply highlights after content initialization using centralized helper
-                            if (typeof applyHighlightsWithRetries === 'function') {
-                                try { applyHighlightsWithRetries(); } catch (e) { /* ignore */ }
-                            }
-
-                            // Add a small delay to ensure the loading animation is visible
-                            setTimeout(() => {
-                                // Hide loading state
-                                hideNoteLoadingState();
-                            }, 80);
-                        }
-                    } else {
-                        throw new Error('Could not find note content in response');
-                    }
-                } catch (error) {
-                    console.error('Error loading note:', error);
-                    showNotificationPopup('Error loading note: ' + error.message, 'error');
-                    hideNoteLoadingState();
-                    
-                    // On error, remove note-open class to go back to note list
-                    if (isMobileDevice()) {
-                        document.body.classList.remove('note-open');
-                    }
-                }
-            } else {
-                // Don't show error popup for network errors (status 0), xhr.onerror will handle it
-                if (xhr.status !== 0) {
-                    console.error('Failed to load note:', xhr.status, xhr.statusText);
-                    showNotificationPopup('Failed to load note. Please try again.', 'error');
-                }
-                hideNoteLoadingState();
-                
-                // On error, remove note-open class to go back to note list
-                if (isMobileDevice()) {
-                    document.body.classList.remove('note-open');
-                }
-            }
-        }
-    };
-
-    xhr.onerror = function() {
-        isNoteLoading = false;
-        console.error('Network error while loading note');
-        showNotificationPopup('Network error. Please check your connection.', 'error');
-        hideNoteLoadingState();
-        
-        // On error, remove note-open class to go back to note list
-        if (isMobileDevice()) {
-            document.body.classList.remove('note-open');
-        }
-    };
-
-    xhr.ontimeout = function() {
-        isNoteLoading = false;
-        console.error('Request timeout during note loading');
-        showNotificationPopup('Request timeout - please try again', 'error');
-        hideNoteLoadingState();
-        
-        // On error, remove note-open class to go back to note list
-        if (isMobileDevice()) {
-            document.body.classList.remove('note-open');
-        }
-    };
-
-    xhr.send();
+        },
+        onContentLoaded: null
+    });
 }
 
 /**
@@ -687,9 +619,6 @@ function updateBrowserUrl(url, noteId) {
     }
 }
 
-// Global flag to track if document-level handler is set
-var imageClickHandlerInitialized = false;
-
 /**
  * Re-initialize image click handlers for note content
  */
@@ -768,58 +697,47 @@ function reinitializeImageClickHandlers() {
 }
 
 /**
- * Handle image click to show popup with options
+ * Safely remove the image menu and any associated submenu from the DOM.
+ * @param {HTMLElement} menu - The main menu element
  */
-function handleImageClick(event) {
-    const img = event.target;
-
-    // Check if image has a valid src
-    if (!img.src || img.src.trim() === '') {
-        return;
+function removeImageMenu(menu) {
+    if (!menu) return;
+    // Remove any associated submenu
+    var submenu = menu._associatedSubmenu;
+    if (submenu && document.body.contains(submenu)) {
+        document.body.removeChild(submenu);
     }
-
-    // On public pages, if image is in a link, let the link work
-    if (window.isPublicNotePage && img.closest('a')) {
-        return;
+    if (document.body.contains(menu)) {
+        document.body.removeChild(menu);
     }
+}
 
-    // Always show the custom menu on left-click, even if image is in a link
-    event.preventDefault();
-    event.stopPropagation();
-    event.stopImmediatePropagation();
-
-    const src = img.src;
-
-    // Remove any existing image menu
-    const existingMenu = document.querySelector('.image-menu');
-    if (existingMenu) {
-        document.body.removeChild(existingMenu);
-    }
-
-    // Create simple dropdown menu
-    const menu = document.createElement('div');
-    menu.className = 'image-menu';
-    
+/**
+ * Build the HTML for the image context menu based on image properties.
+ * @param {HTMLImageElement} img - The image element
+ * @returns {string} The menu innerHTML
+ */
+function buildImageMenuHTML(img) {
     // Check if this is an Excalidraw image
     const isExcalidraw = img.getAttribute('data-is-excalidraw') === 'true';
     const excalidrawNoteId = img.getAttribute('data-excalidraw-note-id');
-    
+
     // Also check if this image is inside an Excalidraw container
     const excalidrawContainer = img.closest('.excalidraw-container');
     const isEmbeddedExcalidraw = excalidrawContainer !== null;
     const diagramId = excalidrawContainer ? excalidrawContainer.id : null;
-    
+
     // Check if we're on mobile (width < 800px)
     const isMobile = window.innerWidth < 800;
-    
+
     // Check if this is a markdown note (to exclude certain options for markdown)
-    const isMarkdownNote = img.closest('.markdown-preview') !== null || 
+    const isMarkdownNote = img.closest('.markdown-preview') !== null ||
                            img.closest('.markdown-editor') !== null ||
                            img.closest('.note-entry[data-note-format="markdown"]') !== null;
-    
+
     // Helper function for translations
     const t = window.t || ((key, params, fallback) => fallback);
-    
+
     let menuHTML = `
         <div class="image-menu-item" data-action="view-large">
             <i class="fa-expand"></i>
@@ -830,7 +748,7 @@ function handleImageClick(event) {
             ${t('image_menu.download', null, 'Download')}
         </div>
     `;
-    
+
     // Add Resize option only on desktop (not on mobile) and NOT for markdown notes
     if (!isMobile && !isMarkdownNote) {
         menuHTML += `
@@ -840,7 +758,7 @@ function handleImageClick(event) {
         </div>
     `;
     }
-    
+
     // Add Edit option for Excalidraw images (standalone notes) - hide on mobile
     if (isExcalidraw && excalidrawNoteId && !isMobile) {
         menuHTML = `
@@ -850,7 +768,7 @@ function handleImageClick(event) {
             </div>
         ` + menuHTML;
     }
-    
+
     // Add Edit option for embedded Excalidraw diagrams - hide on mobile
     if (isEmbeddedExcalidraw && diagramId && !isMobile) {
         menuHTML = `
@@ -860,10 +778,10 @@ function handleImageClick(event) {
             </div>
         ` + menuHTML;
     }
-    
+
     // Add link option for all images
     const existingLink = img.closest('a');
-    
+
     // If no existing link, show direct "Add Link" button
     if (!existingLink) {
         menuHTML += `
@@ -875,28 +793,28 @@ function handleImageClick(event) {
     } else {
         // If link exists, create submenu with multiple options
         let linkSubmenuHTML = '';
-        
+
         // Add "Open link" option first
         linkSubmenuHTML += `
             <div class="image-menu-item image-submenu-item" data-action="open-link" data-url="${existingLink.href}">
                 ${t('image_menu.open_link', null, 'Open Link')}
             </div>
         `;
-        
+
         // Add edit link option
         linkSubmenuHTML += `
             <div class="image-menu-item image-submenu-item" data-action="add-link">
                 ${t('image_menu.edit_link', null, 'Modifier le lien')}
             </div>
         `;
-        
+
         // Add remove link option
         linkSubmenuHTML += `
             <div class="image-menu-item image-submenu-item" data-action="remove-link">
                 ${t('image_menu.remove_link', null, 'Retirer le lien')}
             </div>
         `;
-        
+
         // Add link submenu parent
         menuHTML += `
             <div class="image-menu-item image-menu-parent" data-action="link-submenu" data-submenu-html="${encodeURIComponent(linkSubmenuHTML)}">
@@ -906,7 +824,7 @@ function handleImageClick(event) {
             </div>
         `;
     }
-    
+
     // Add border toggle and delete options only for non-markdown notes
     if (!isMarkdownNote) {
         const hasBorder = img.classList.contains('img-with-border');
@@ -921,7 +839,7 @@ function handleImageClick(event) {
                 ${hasBorderNoPadding ? t('image_menu.remove_border_no_padding', null, 'Remove Border without padding') : t('image_menu.add_border_no_padding', null, 'Add Border without padding')}
             </div>
         `;
-        
+
         // Add Delete option at the end
         menuHTML += `
             <div class="image-menu-item" data-action="delete-image" style="color: #dc3545;">
@@ -930,134 +848,107 @@ function handleImageClick(event) {
             </div>
         `;
     }
-    
-    menu.innerHTML = menuHTML;
 
-    // Position the menu at click coordinates
-    const clickX = event.clientX;
-    const clickY = event.clientY;
+    return menuHTML;
+}
 
-    menu.style.position = 'fixed';
-    menu.style.left = clickX + 'px';
-    menu.style.top = clickY + 'px';
-    menu.style.transform = 'translate(-50%, -120%)'; // Center horizontally, position above cursor with more space
-    menu.style.zIndex = '10000';
-
-    document.body.appendChild(menu);
-
-    // Create and handle submenu for link menu (only if link exists)
+/**
+ * Create and attach the link submenu for the image menu.
+ * Handles hover behavior and click delegation for submenu actions.
+ * @param {HTMLElement} menu - The main menu element
+ * @param {HTMLImageElement} img - The image element
+ */
+function createImageSubmenu(menu, img) {
     const linkParent = menu.querySelector('.image-menu-parent[data-action="link-submenu"]');
-    if (linkParent) {
-        // Get submenu HTML from data attribute
-        const linkSubmenuHTML = decodeURIComponent(linkParent.getAttribute('data-submenu-html'));
-        
-        // Create submenu element
-        const submenu = document.createElement('div');
-        submenu.className = 'image-submenu';
-        submenu.style.display = 'none';
-        submenu.innerHTML = linkSubmenuHTML;
-        document.body.appendChild(submenu);
-        
-        linkParent.addEventListener('mouseenter', function() {
-            submenu.style.display = 'block';
-            
-            // Position submenu like slash menu does
-            const parentRect = linkParent.getBoundingClientRect();
-            const submenuRect = submenu.getBoundingClientRect();
-            
-            const padding = 8;
-            let x = parentRect.right + 4;
-            let y = parentRect.top;
-            
-            // If overflows right, show on left
-            if (x + submenuRect.width > window.innerWidth - padding) {
-                x = parentRect.left - submenuRect.width - 4;
-            }
-            
-            // If overflows bottom
-            if (y + submenuRect.height > window.innerHeight - padding) {
-                y = Math.max(padding, window.innerHeight - submenuRect.height - padding);
-            }
-            
-            submenu.style.position = 'fixed';
-            submenu.style.left = Math.max(padding, x) + 'px';
-            submenu.style.top = Math.max(padding, y) + 'px';
-            
+    if (!linkParent) return;
+
+    // Get submenu HTML from data attribute
+    const linkSubmenuHTML = decodeURIComponent(linkParent.getAttribute('data-submenu-html'));
+
+    // Create submenu element
+    const submenu = document.createElement('div');
+    submenu.className = 'image-submenu';
+    submenu.style.display = 'none';
+    submenu.innerHTML = linkSubmenuHTML;
+    document.body.appendChild(submenu);
+
+    // Store reference for cleanup
+    menu._associatedSubmenu = submenu;
+
+    linkParent.addEventListener('mouseenter', function() {
+        submenu.style.display = 'block';
+
+        // Position submenu like slash menu does
+        const parentRect = linkParent.getBoundingClientRect();
+        const submenuRect = submenu.getBoundingClientRect();
+
+        const padding = 8;
+        let x = parentRect.right + 4;
+        let y = parentRect.top;
+
+        // If overflows right, show on left
+        if (x + submenuRect.width > window.innerWidth - padding) {
+            x = parentRect.left - submenuRect.width - 4;
+        }
+
+        // If overflows bottom
+        if (y + submenuRect.height > window.innerHeight - padding) {
+            y = Math.max(padding, window.innerHeight - submenuRect.height - padding);
+        }
+
+        submenu.style.position = 'fixed';
+        submenu.style.left = Math.max(padding, x) + 'px';
+        submenu.style.top = Math.max(padding, y) + 'px';
+
+        const chevron = linkParent.querySelector('.fa-chevron-right');
+        if (chevron) {
+            chevron.style.transform = 'rotate(90deg)';
+        }
+    });
+
+    linkParent.addEventListener('mouseleave', function(e) {
+        // Don't hide if moving to submenu
+        const relatedTarget = e.relatedTarget;
+        if (!relatedTarget || (!submenu.contains(relatedTarget) && relatedTarget !== submenu)) {
+            setTimeout(() => {
+                if (!submenu.matches(':hover')) {
+                    submenu.style.display = 'none';
+                    const chevron = linkParent.querySelector('.fa-chevron-right');
+                    if (chevron) {
+                        chevron.style.transform = '';
+                    }
+                }
+            }, 100);
+        }
+    });
+
+    submenu.addEventListener('mouseleave', function(e) {
+        const relatedTarget = e.relatedTarget;
+        if (!relatedTarget || (!linkParent.contains(relatedTarget) && relatedTarget !== linkParent)) {
+            submenu.style.display = 'none';
             const chevron = linkParent.querySelector('.fa-chevron-right');
             if (chevron) {
-                chevron.style.transform = 'rotate(90deg)';
+                chevron.style.transform = '';
             }
-        });
-        
-        linkParent.addEventListener('mouseleave', function(e) {
-            // Don't hide if moving to submenu
-            const relatedTarget = e.relatedTarget;
-            if (!relatedTarget || (!submenu.contains(relatedTarget) && relatedTarget !== submenu)) {
-                setTimeout(() => {
-                    if (!submenu.matches(':hover')) {
-                        submenu.style.display = 'none';
-                        const chevron = linkParent.querySelector('.fa-chevron-right');
-                        if (chevron) {
-                            chevron.style.transform = '';
-                        }
-                    }
-                }, 100);
-            }
-        });
-        
-        submenu.addEventListener('mouseleave', function(e) {
-            const relatedTarget = e.relatedTarget;
-            if (!relatedTarget || (!linkParent.contains(relatedTarget) && relatedTarget !== linkParent)) {
-                submenu.style.display = 'none';
-                const chevron = linkParent.querySelector('.fa-chevron-right');
-                if (chevron) {
-                    chevron.style.transform = '';
-                }
-            }
-        });
-        
-        // Add click handlers to submenu items
-        submenu.addEventListener('click', function(e) {
-            const action = e.target.closest('.image-menu-item')?.getAttribute('data-action');
-            
-            if (action === 'open-link') {
-                const url = e.target.closest('.image-menu-item')?.getAttribute('data-url');
-                if (url) {
-                    window.open(url, '_blank');
-                }
-                // Remove both menus
-                if (document.body.contains(menu)) {
-                    document.body.removeChild(menu);
-                }
-                if (document.body.contains(submenu)) {
-                    document.body.removeChild(submenu);
-                }
-            } else if (action === 'add-link') {
-                // Stop event propagation to prevent triggering link modal on parent <a> tags
-                e.stopPropagation();
-                e.preventDefault();
-                addOrEditImageLink(img);
-                // Remove both menus
-                if (document.body.contains(menu)) {
-                    document.body.removeChild(menu);
-                }
-                if (document.body.contains(submenu)) {
-                    document.body.removeChild(submenu);
-                }
-            } else if (action === 'remove-link') {
-                removeImageLink(img);
-                // Remove both menus
-                if (document.body.contains(menu)) {
-                    document.body.removeChild(menu);
-                }
-                if (document.body.contains(submenu)) {
-                    document.body.removeChild(submenu);
-                }
-            }
-        });
-    }
+        }
+    });
 
-    // Adjust position if menu goes off-screen
+    // Add click handlers to submenu items
+    submenu.addEventListener('click', function(e) {
+        const action = e.target.closest('.image-menu-item')?.getAttribute('data-action');
+        handleImageMenuAction(action, img, e);
+        removeImageMenu(menu);
+    });
+}
+
+/**
+ * Adjust the image menu position to stay within the viewport.
+ * Must be called after the menu is appended to the DOM.
+ * @param {HTMLElement} menu - The menu element (already in DOM)
+ * @param {number} clickX - clientX of the original click
+ * @param {number} clickY - clientY of the original click
+ */
+function adjustImageMenuPosition(menu, clickX, clickY) {
     const menuRect = menu.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
@@ -1083,6 +974,103 @@ function handleImageClick(event) {
         menu.style.top = clickY + 'px';
         menu.style.transform = 'translate(-50%, 20%)';
     }
+}
+
+/**
+ * Handle an action from the image context menu.
+ * @param {string} action - The action identifier
+ * @param {HTMLImageElement} img - The image element
+ * @param {Event} e - The click event
+ */
+function handleImageMenuAction(action, img, e) {
+    if (!action) return;
+
+    if (action === 'view-large') {
+        viewImageLarge(img.src);
+    } else if (action === 'download') {
+        downloadImage(img.src);
+    } else if (action === 'edit-excalidraw') {
+        const noteId = e.target.closest('.image-menu-item')?.getAttribute('data-note-id');
+        if (noteId) {
+            openExcalidrawNote(noteId);
+        }
+    } else if (action === 'edit-embedded-excalidraw') {
+        const diagramId = e.target.closest('.image-menu-item')?.getAttribute('data-diagram-id');
+        if (diagramId && window.openExcalidrawEditor) {
+            openExcalidrawEditor(diagramId);
+        }
+    } else if (action === 'resize') {
+        enableImageResize(img);
+    } else if (action === 'toggle-border') {
+        toggleImageBorder(img);
+    } else if (action === 'toggle-border-no-padding') {
+        toggleImageBorderNoPadding(img);
+    } else if (action === 'delete-image') {
+        deleteImage(img);
+    } else if (action === 'open-link') {
+        const url = e.target.closest('.image-menu-item')?.getAttribute('data-url');
+        if (url) {
+            window.open(url, '_blank');
+        }
+    } else if (action === 'add-link') {
+        // Stop event propagation to prevent triggering link modal on parent <a> tags
+        e.stopPropagation();
+        e.preventDefault();
+        addOrEditImageLink(img);
+    } else if (action === 'remove-link') {
+        removeImageLink(img);
+    }
+}
+
+/**
+ * Handle image click to show popup with options
+ */
+function handleImageClick(event) {
+    const img = event.target;
+
+    // Check if image has a valid src
+    if (!img.src || img.src.trim() === '') {
+        return;
+    }
+
+    // On public pages, if image is in a link, let the link work
+    if (window.isPublicNotePage && img.closest('a')) {
+        return;
+    }
+
+    // Always show the custom menu on left-click, even if image is in a link
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    // Remove any existing image menu
+    const existingMenu = document.querySelector('.image-menu');
+    if (existingMenu) {
+        removeImageMenu(existingMenu);
+    }
+
+    // Create menu element with built HTML
+    const menu = document.createElement('div');
+    menu.className = 'image-menu';
+    menu.innerHTML = buildImageMenuHTML(img);
+
+    // Position the menu at click coordinates
+    const clickX = event.clientX;
+    const clickY = event.clientY;
+
+    menu.style.position = 'fixed';
+    menu.style.left = clickX + 'px';
+    menu.style.top = clickY + 'px';
+    menu.style.transform = 'translate(-50%, -120%)'; // Center horizontally, position above cursor with more space
+    menu.style.zIndex = '10000';
+
+    document.body.appendChild(menu);
+
+    // Create and attach submenu for link options (if applicable)
+    createImageSubmenu(menu, img);
+
+    // Adjust position if menu goes off-screen
+    adjustImageMenuPosition(menu, clickX, clickY);
 
     // Handle menu item clicks
     menu.addEventListener('click', function(e) {
@@ -1094,85 +1082,8 @@ function handleImageClick(event) {
             return;
         }
 
-        if (action === 'view-large') {
-            viewImageLarge(src);
-            // Remove menu safely
-            if (document.body.contains(menu)) {
-                document.body.removeChild(menu);
-            }
-        } else if (action === 'download') {
-            downloadImage(src);
-            // Remove menu safely
-            if (document.body.contains(menu)) {
-                document.body.removeChild(menu);
-            }
-        } else if (action === 'edit-excalidraw') {
-            const noteId = e.target.closest('.image-menu-item')?.getAttribute('data-note-id');
-            if (noteId) {
-                openExcalidrawNote(noteId);
-            }
-            // Remove menu safely
-            if (document.body.contains(menu)) {
-                document.body.removeChild(menu);
-            }
-        } else if (action === 'edit-embedded-excalidraw') {
-            const diagramId = e.target.closest('.image-menu-item')?.getAttribute('data-diagram-id');
-            if (diagramId && window.openExcalidrawEditor) {
-                openExcalidrawEditor(diagramId);
-            }
-            // Remove menu safely
-            if (document.body.contains(menu)) {
-                document.body.removeChild(menu);
-            }
-        } else if (action === 'resize') {
-            enableImageResize(img);
-            // Remove menu safely
-            if (document.body.contains(menu)) {
-                document.body.removeChild(menu);
-            }
-        } else if (action === 'toggle-border') {
-            toggleImageBorder(img);
-            // Remove menu safely
-            if (document.body.contains(menu)) {
-                document.body.removeChild(menu);
-            }
-        } else if (action === 'toggle-border-no-padding') {
-            toggleImageBorderNoPadding(img);
-            // Remove menu safely
-            if (document.body.contains(menu)) {
-                document.body.removeChild(menu);
-            }
-        } else if (action === 'delete-image') {
-            deleteImage(img);
-            // Remove menu safely
-            if (document.body.contains(menu)) {
-                document.body.removeChild(menu);
-            }
-        } else if (action === 'open-link') {
-            const url = e.target.closest('.image-menu-item')?.getAttribute('data-url');
-            if (url) {
-                window.open(url, '_blank');
-            }
-            // Remove menu safely
-            if (document.body.contains(menu)) {
-                document.body.removeChild(menu);
-            }
-        } else if (action === 'add-link') {
-            // Stop event propagation to prevent triggering link modal on parent <a> tags
-            e.stopPropagation();
-            e.preventDefault();
-            addOrEditImageLink(img);
-            // Remove menu safely
-            if (document.body.contains(menu)) {
-                document.body.removeChild(menu);
-            }
-        } else if (action === 'remove-link') {
-            removeImageLink(img);
-            // Remove menu safely
-            if (document.body.contains(menu)) {
-                document.body.removeChild(menu);
-            }
-        }
+        handleImageMenuAction(action, img, e);
+        removeImageMenu(menu);
 
         // Prevent event bubbling to avoid triggering the global click handler
         e.stopPropagation();
@@ -1182,9 +1093,7 @@ function handleImageClick(event) {
     setTimeout(() => {
         document.addEventListener('click', function closeMenu(e) {
             if (!menu.contains(e.target) && e.target !== img) {
-                if (document.body.contains(menu)) {
-                    document.body.removeChild(menu);
-                }
+                removeImageMenu(menu);
                 document.removeEventListener('click', closeMenu);
             }
         });
@@ -1213,10 +1122,10 @@ function viewImageLarge(imageSrc) {
         // Open the blob URL in new tab
         window.open(blobUrl, '_blank');
 
-        // Clean up the blob URL after a short delay
+        // Clean up the blob URL after a delay to let the new tab load
         setTimeout(() => {
             URL.revokeObjectURL(blobUrl);
-        }, 1000);
+        }, 60000);
     } else {
         // For regular URLs, open directly
         window.open(imageSrc, '_blank');
@@ -1321,9 +1230,23 @@ function reinitializeNoteContent() {
     // Prefer the centralized helper which knows about notes/tags/folders.
     if (isSearchMode) {
         if (typeof applyHighlightsWithRetries === 'function') {
-            try { setTimeout(function() { try { applyHighlightsWithRetries(); } catch(e){} }, 60); } catch (e) {}
+            try { 
+                setTimeout(function() { 
+                    try { 
+                        applyHighlightsWithRetries(); 
+                        if (window.searchNavigation && window.searchNavigation.pendingAutoScroll && typeof scrollToFirstHighlight === 'function') {
+                            scrollToFirstHighlight();
+                        }
+                    } catch(e){} 
+                }, 60); 
+            } catch (e) {}
         } else if (typeof highlightSearchTerms === 'function') {
-            setTimeout(highlightSearchTerms, 100);
+            setTimeout(function() {
+                highlightSearchTerms();
+                if (window.searchNavigation && window.searchNavigation.pendingAutoScroll && typeof scrollToFirstHighlight === 'function') {
+                    scrollToFirstHighlight();
+                }
+            }, 100);
         }
     }
 
@@ -1463,13 +1386,6 @@ function reinitializeNoteContent() {
 
     // Mark that note loading is complete
     window.isLoadingNote = false;
-}
-
-/**
- * Check if a URL is for note loading
- */
-function isNoteUrl(url) {
-    return url.includes('note=') && url.includes('index.php');
 }
 
 /**

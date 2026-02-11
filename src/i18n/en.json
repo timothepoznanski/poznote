@@ -16,6 +16,7 @@
         "not_defined": "Not defined",
         "loading": "Loading...",
         "back_to_notes": "Back to Notes",
+        "back_to_home": "Back to Home",
         "back_to_settings": "Back to Settings",
         "back": "Back",
         "error": "Error",
@@ -27,11 +28,21 @@
         "tip": "Tip",
         "important": "Important",
         "note": "Note",
+        "untitled": "Untitled",
+        "access_denied": "Access Denied",
         "apply": "Apply",
-        "at": "at"
+        "at": "at",
+        "scroll_left": "Scroll left",
+        "scroll_right": "Scroll right"
     },
     "settings": {
         "title": "Settings",
+        "disabled_message": "Access to settings is disabled by administrator.",
+        "categories": {
+            "actions": "Actions",
+            "display": "Display",
+            "about": "About"
+        },
         "password": {
             "title": "Settings Access",
             "heading": "Settings Protected",
@@ -166,7 +177,7 @@
             "upload_section_title": "Choose a new attachment",
             "drag_drop_info": "You can drag and drop your file below:",
             "all_types_accepted": "All file types accepted (max 200 MB)",
-            "upload_button": "Choose file",
+            "upload_button": "Attach",
             "current_attachments": "Current attachments",
             "loading_attachments": "Loading attachments...",
             "preview_alt": "Preview",
@@ -194,7 +205,10 @@
             "back_to_notes": "Back to notes",
             "manage_attachments": "Manage attachments",
             "attachment_count_singular": "1 attachment",
-            "attachment_count_plural": "{{count}} attachments"
+            "attachment_count_plural": "{{count}} attachments",
+            "hint": "Add attachments to your notes using the paperclip button in the toolbar.",
+            "filter_placeholder": "Filter by note title or attachment name...",
+            "no_filter_results": "No notes match your search."
         }
     },
     "modals": {
@@ -1105,9 +1119,12 @@
     },
     "public_folder": {
         "filter_placeholder": "Search notes",
-        "no_filter_results": "No results."
+        "no_filter_results": "No results.",
+        "view_notes": "View as list",
+        "view_kanban": "View as Kanban"
     },
     "kanban": {
+        "uncategorized": "Uncategorized",
         "actions": {
             "enable": "Enable Kanban view",
             "disable": "Disable Kanban view",

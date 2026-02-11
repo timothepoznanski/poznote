@@ -4,6 +4,8 @@
 (function () {
     'use strict';
 
+    // ========== Utilities ==========
+
     // Get translations from data attributes on body
     function getTranslations() {
         var body = document.body;
@@ -16,13 +18,10 @@
         };
     }
 
-    // Translation helper with fallback
-    function tr(key, vars, fallback) {
-        try {
-            if (typeof window.t === 'function') return window.t(key, vars || {}, fallback);
-        } catch (e) { }
-        return (fallback != null ? String(fallback) : String(key));
-    }
+    // Use global translation function from globals.js
+    const tr = window.t || function(key, vars, fallback) {
+        return fallback || key;
+    };
 
     // Get language label from code
     function getLanguageLabel(code) {
@@ -35,6 +34,8 @@
             default: return tr('settings.language.english', {}, 'English');
         }
     }
+
+    // ========== API Helpers ==========
 
     // Generic function to get setting value from API
     function getSetting(key, callback) {
@@ -71,16 +72,28 @@
             });
     }
 
-    // Reload opener if it's index.php
+    // Reload opener window if it's index.php
     function reloadOpener() {
         try {
             if (window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) {
                 window.opener.location.reload();
             }
-        } catch (e) { }
+        } catch (e) {
+            // Safely ignore cross-origin errors
+        }
     }
 
     // ========== Toggle Cards ==========
+
+    // Helper function to determine if a setting is enabled
+    function isSettingEnabled(value, invertLogic) {
+        var enabled = value === '1' || value === 'true';
+        if (invertLogic) {
+            // For hide_* settings: null or '1' means show (enabled)
+            enabled = value === '1' || value === 'true' || value === null;
+        }
+        return enabled;
+    }
 
     // Setup a toggle card that toggles a boolean setting
     function setupToggleCard(cardId, statusId, settingKey, invertLogic) {
@@ -90,30 +103,16 @@
 
         function refresh() {
             getSetting(settingKey, function (value) {
-                var enabled = value === '1' || value === 'true';
-                if (invertLogic) {
-                    // For hide_* settings: null or '1' means show (enabled)
-                    enabled = value === '1' || value === 'true' || value === null;
-                }
+                var enabled = isSettingEnabled(value, invertLogic);
+                
                 if (status) {
                     status.textContent = enabled ? txt.enabled : txt.disabled;
                     status.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled');
                 }
-                // Special handling for folder-actions-always-visible class
+                
+                // Special handling for folder actions visibility
                 if (cardId === 'folder-actions-card') {
-                    if (enabled) {
-                        document.body.classList.add('folder-actions-always-visible');
-                    } else {
-                        document.body.classList.remove('folder-actions-always-visible');
-                    }
-                }
-                // Special handling for kanban-folder-click class
-                if (cardId === 'kanban-folder-click-card') {
-                    if (enabled) {
-                        document.body.classList.remove('disable-kanban-click');
-                    } else {
-                        document.body.classList.add('disable-kanban-click');
-                    }
+                    document.body.classList.toggle('folder-actions-always-visible', enabled);
                 }
             });
         }
@@ -121,10 +120,7 @@
         if (card) {
             card.addEventListener('click', function () {
                 getSetting(settingKey, function (currentValue) {
-                    var currently = currentValue === '1' || currentValue === 'true';
-                    if (invertLogic) {
-                        currently = currentValue === '1' || currentValue === 'true' || currentValue === null;
-                    }
+                    var currently = isSettingEnabled(currentValue, invertLogic);
                     var toSet = currently ? '0' : '1';
                     setSetting(settingKey, toSet, function () {
                         refresh();
@@ -157,21 +153,19 @@
     }
 
     function refreshFontSizeBadge() {
-        // Refresh note font size badge (from localStorage)
-        var badge = document.getElementById('font-size-badge');
-        if (badge) {
-            var size = localStorage.getItem('note_font_size') || '15';
-            badge.textContent = tr('display.badges.note_font_size', { size: size }, 'Note: ' + size + 'px');
-            badge.className = 'setting-status enabled';
-        }
+        var fontBadges = [
+            { id: 'font-size-badge', key: 'note_font_size', default: '15', i18nKey: 'display.badges.note_font_size', fallback: 'Note: ' },
+            { id: 'sidebar-font-size-badge', key: 'sidebar_font_size', default: '13', i18nKey: 'display.badges.sidebar_font_size', fallback: 'Sidebar: ' }
+        ];
 
-        // Refresh sidebar font size badge (from localStorage)
-        var sidebarBadge = document.getElementById('sidebar-font-size-badge');
-        if (sidebarBadge) {
-            var sidebarSize = localStorage.getItem('sidebar_font_size') || '13';
-            sidebarBadge.textContent = tr('display.badges.sidebar_font_size', { size: sidebarSize }, 'Sidebar: ' + sidebarSize + 'px');
-            sidebarBadge.className = 'setting-status enabled';
-        }
+        fontBadges.forEach(function(config) {
+            var badge = document.getElementById(config.id);
+            if (badge) {
+                var size = localStorage.getItem(config.key) || config.default;
+                badge.textContent = tr(config.i18nKey, { size: size }, config.fallback + size + 'px');
+                badge.className = 'setting-status enabled';
+            }
+        });
     }
 
     function refreshNoteWidthBadge() {
@@ -205,48 +199,48 @@
     function refreshNoteSortBadge() {
         getSetting('note_list_sort', function (value) {
             var badge = document.getElementById('note-sort-badge');
-            if (badge) {
-                var sortValue = value || 'updated_desc';
-                var sortLabel = tr('modals.note_sort.options.last_modified', {}, 'Last modified');
+            if (!badge) return;
+            
+            var sortValue = value || 'updated_desc';
+            var sortLabel;
 
-                switch (sortValue) {
-                    case 'updated_desc':
-                        sortLabel = tr('modals.note_sort.options.last_modified', {}, 'Last modified');
-                        break;
-                    case 'created_desc':
-                        sortLabel = tr('modals.note_sort.options.last_created', {}, 'Last created');
-                        break;
-                    case 'heading_asc':
-                        sortLabel = tr('modals.note_sort.options.alphabetical', {}, 'Alphabetical');
-                        break;
-                    default:
-                        sortLabel = tr('modals.note_sort.options.last_modified', {}, 'Last modified');
-                        break;
-                }
-
-                badge.textContent = sortLabel;
-                badge.className = 'setting-status enabled';
+            switch (sortValue) {
+                case 'created_desc':
+                    sortLabel = tr('modals.note_sort.options.last_created', {}, 'Last created');
+                    break;
+                case 'heading_asc':
+                    sortLabel = tr('modals.note_sort.options.alphabetical', {}, 'Alphabetical');
+                    break;
+                case 'updated_desc':
+                default:
+                    sortLabel = tr('modals.note_sort.options.last_modified', {}, 'Last modified');
+                    break;
             }
+
+            badge.textContent = sortLabel;
+            badge.className = 'setting-status enabled';
         });
     }
 
     function refreshTasklistInsertOrderBadge() {
         getSetting('tasklist_insert_order', function (value) {
             var badge = document.getElementById('tasklist-insert-order-badge');
-            var card = document.getElementById('tasklist-insert-order-card');
             if (!badge) return;
+            
             var order = (value === 'top' || value === 'bottom') ? value : 'bottom';
-            var text = order === 'top'
+            var isTop = order === 'top';
+            
+            badge.textContent = isTop 
                 ? tr('tasklist.insert_order_top', {}, 'Top')
                 : tr('tasklist.insert_order_bottom', {}, 'Bottom');
-            badge.textContent = text;
             badge.className = 'setting-status enabled';
 
+            var card = document.getElementById('tasklist-insert-order-card');
             if (card) {
                 var icon = card.querySelector('.home-card-icon i');
                 if (icon) {
-                    icon.classList.toggle('fa-arrow-up', order === 'top');
-                    icon.classList.toggle('fa-arrow-down', order !== 'top');
+                    icon.classList.toggle('fa-arrow-up', isTop);
+                    icon.classList.toggle('fa-arrow-down', !isTop);
                 }
             }
         });
@@ -255,28 +249,26 @@
     function refreshToolbarModeBadge() {
         getSetting('toolbar_mode', function (value) {
             var badge = document.getElementById('toolbar-mode-badge');
-            if (badge) {
-                var modeValue = value || 'both';
-                var modeLabel = tr('display.badges.toolbar_mode.both', {}, 'Toolbar icons + slash command menu');
+            if (!badge) return;
+            
+            var modeValue = value || 'both';
+            var modeLabel;
 
-                switch (modeValue) {
-                    case 'full':
-                        modeLabel = tr('display.badges.toolbar_mode.full', {}, 'Toolbar only');
-                        break;
-                    case 'slash':
-                        modeLabel = tr('display.badges.toolbar_mode.slash', {}, 'Slash command only');
-                        break;
-                    case 'both':
-                        modeLabel = tr('display.badges.toolbar_mode.both', {}, 'Toolbar icons + slash command menu');
-                        break;
-                    default:
-                        modeLabel = tr('display.badges.toolbar_mode.both', {}, 'Toolbar icons + slash command menu');
-                        break;
-                }
-
-                badge.textContent = modeLabel;
-                badge.className = 'setting-status enabled';
+            switch (modeValue) {
+                case 'full':
+                    modeLabel = tr('display.badges.toolbar_mode.full', {}, 'Toolbar only');
+                    break;
+                case 'slash':
+                    modeLabel = tr('display.badges.toolbar_mode.slash', {}, 'Slash command only');
+                    break;
+                case 'both':
+                default:
+                    modeLabel = tr('display.badges.toolbar_mode.both', {}, 'Toolbar icons + slash command menu');
+                    break;
             }
+
+            badge.textContent = modeLabel;
+            badge.className = 'setting-status enabled';
         });
     }
 
@@ -304,7 +296,7 @@
             var v = value || 'en';
             var radios = document.getElementsByName('languageChoice');
             for (var i = 0; i < radios.length; i++) {
-                try { radios[i].checked = (radios[i].value === v); } catch (e) { }
+                radios[i].checked = (radios[i].value === v);
             }
             modal.style.display = 'flex';
         });
@@ -317,7 +309,7 @@
             var v = value || 'updated_desc';
             var radios = document.getElementsByName('noteSort');
             for (var i = 0; i < radios.length; i++) {
-                try { radios[i].checked = (radios[i].value === v); } catch (e) { }
+                radios[i].checked = (radios[i].value === v);
             }
             modal.style.display = 'flex';
         });
@@ -339,20 +331,25 @@
     // ========== Initialization ==========
 
     document.addEventListener('DOMContentLoaded', function () {
-        // Back to Notes link with workspace from PHP global (no more localStorage)
+        // Back to Notes link - preserves workspace parameter if available
         var backLink = document.getElementById('backToNotesLink');
         if (backLink) {
             backLink.addEventListener('click', function () {
                 var href = backLink.getAttribute('data-href') || 'index.php';
                 try {
-                    var workspace = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace :
-                        (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : null;
+                    var workspace = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) 
+                        ? selectedWorkspace 
+                        : (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) 
+                            ? window.selectedWorkspace 
+                            : null;
                     if (workspace && workspace !== '') {
                         var url = new URL(href, window.location.origin);
                         url.searchParams.set('workspace', workspace);
                         href = url.toString();
                     }
-                } catch (e) { }
+                } catch (e) {
+                    // Use default href if URL parsing fails
+                }
                 window.location = href;
             });
         }
@@ -372,17 +369,18 @@
             }
         });
 
-        // Generic clickable cards with data-href attribute
+        // Generic clickable cards with data-href attribute (excluding already handled cards)
         var clickableCards = document.querySelectorAll('.settings-card-clickable[data-href]');
         clickableCards.forEach(function (card) {
-            if (!card.id || !navCards[card.id]) { // Skip if already handled above
-                card.addEventListener('click', function () {
-                    var href = card.getAttribute('data-href');
-                    if (href) {
-                        window.location = href;
-                    }
-                });
-            }
+            // Skip if already handled in navCards
+            if (card.id && navCards[card.id]) return;
+            
+            card.addEventListener('click', function () {
+                var href = card.getAttribute('data-href');
+                if (href) {
+                    window.location = href;
+                }
+            });
         });
 
         // External link cards
@@ -416,11 +414,10 @@
         // Setup toggle cards
         setupToggleCard('show-created-card', 'show-created-status', 'show_note_created', false);
         setupToggleCard('folder-counts-card', 'folder-counts-status', 'hide_folder_counts', true);
-        setupToggleCard('kanban-folder-click-card', 'kanban-folder-click-status', 'kanban_folder_click', false);
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
 
-        // Card click handlers for modals (using event delegation)
+        // Card click handlers for modal settings
         var languageCard = document.getElementById('language-card');
         if (languageCard) {
             languageCard.addEventListener('click', showLanguageModal);
@@ -431,6 +428,12 @@
             noteSortCard.addEventListener('click', openNoteSortModal);
         }
 
+        var timezoneCard = document.getElementById('timezone-card');
+        if (timezoneCard) {
+            timezoneCard.addEventListener('click', showTimezonePrompt);
+        }
+
+        // Tasklist insert order card - toggles between top and bottom
         var tasklistInsertOrderCard = document.getElementById('tasklist-insert-order-card');
         if (tasklistInsertOrderCard) {
             tasklistInsertOrderCard.addEventListener('click', function () {
@@ -449,13 +452,15 @@
             });
         }
 
-        // Theme mode card - opens the theme selection modal
+        // Theme mode card - opens theme selection modal
         var themeModeCard = document.getElementById('theme-mode-card');
         if (themeModeCard) {
             themeModeCard.addEventListener('click', function () {
                 var modal = document.getElementById('themeModal');
                 if (!modal) return;
-                var currentMode = (typeof window.getCurrentThemeMode === 'function') ? window.getCurrentThemeMode() : 'system';
+                var currentMode = (typeof window.getCurrentThemeMode === 'function') 
+                    ? window.getCurrentThemeMode() 
+                    : 'system';
                 var radios = document.getElementsByName('themeChoice');
                 for (var i = 0; i < radios.length; i++) {
                     radios[i].checked = (radios[i].value === currentMode);
@@ -464,22 +469,16 @@
             });
         }
 
-        // Login display card - calls showLoginDisplayNamePrompt from ui.js
+        // Login display card - delegates to ui.js
         var loginDisplayCard = document.getElementById('login-display-card');
         if (loginDisplayCard && typeof window.showLoginDisplayNamePrompt === 'function') {
             loginDisplayCard.addEventListener('click', window.showLoginDisplayNamePrompt);
         }
 
-        // Font size card - calls showNoteFontSizePrompt from font-size-settings.js
+        // Font size card - delegates to font-size-settings.js
         var fontSizeCard = document.getElementById('font-size-card');
         if (fontSizeCard && typeof window.showNoteFontSizePrompt === 'function') {
             fontSizeCard.addEventListener('click', window.showNoteFontSizePrompt);
-        }
-
-        // Timezone card
-        var timezoneCard = document.getElementById('timezone-card');
-        if (timezoneCard) {
-            timezoneCard.addEventListener('click', showTimezonePrompt);
         }
 
         // Save note sort modal button
@@ -561,7 +560,7 @@
             });
         }
 
-        // Load all badges
+        // Load all badges on page load
         refreshLanguageBadge();
         refreshLoginDisplayBadge();
         refreshFontSizeBadge();
@@ -571,13 +570,13 @@
         refreshTimezoneBadge();
         refreshNoteWidthBadge();
 
-        // Search functionality
+        // Search functionality - filters settings cards
         var searchInput = document.getElementById('home-search-input');
         var cards = document.querySelectorAll('.home-grid .home-card');
         var grid = document.querySelector('.home-grid');
 
         if (searchInput && grid) {
-            // Create no results message if it doesn't exist
+            // Create "no results" message element
             var noResults = document.createElement('div');
             noResults.className = 'home-no-results';
             noResults.style.display = 'none';
@@ -585,9 +584,11 @@
             noResults.style.textAlign = 'center';
             noResults.style.padding = '40px 20px';
             noResults.style.color = '#6b7280';
-            noResults.innerHTML = '<i class="fas fa-search" style="font-size: 24px; display: block; margin-bottom: 10px; opacity: 0.5;"></i>' + tr('public.no_filter_results', {}, 'No results found.');
+            noResults.innerHTML = '<i class="fas fa-search" style="font-size: 24px; display: block; margin-bottom: 10px; opacity: 0.5;"></i>' 
+                + tr('public.no_filter_results', {}, 'No results found.');
             grid.appendChild(noResults);
 
+            // Filter cards based on search term
             searchInput.addEventListener('input', function() {
                 var term = this.value.toLowerCase().trim();
                 var visibleCount = 0;
@@ -595,23 +596,18 @@
                 cards.forEach(function(card) {
                     var titleEl = card.querySelector('.home-card-title');
                     var title = titleEl ? titleEl.textContent.toLowerCase() : '';
-
-                    // Also search in status badges if available
                     var statusEl = card.querySelector('.setting-status');
                     var status = statusEl ? statusEl.textContent.toLowerCase() : '';
 
-                    if (title.includes(term) || status.includes(term)) {
-                        card.style.display = 'flex';
-                        visibleCount++;
-                    } else {
-                        card.style.display = 'none';
-                    }
+                    var isMatch = title.includes(term) || status.includes(term);
+                    card.style.display = isMatch ? 'flex' : 'none';
+                    if (isMatch) visibleCount++;
                 });
 
                 noResults.style.display = (visibleCount === 0) ? 'block' : 'none';
             });
 
-            // Focus search on / key press if not in input
+            // Keyboard shortcut: press "/" to focus search
             document.addEventListener('keydown', function(e) {
                 if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
                     e.preventDefault();
@@ -620,17 +616,18 @@
             });
         }
 
-        // Re-translate dynamic badges once client-side i18n is loaded
+        // Re-translate badges when i18n is loaded
         document.addEventListener('poznote:i18n:loaded', function () {
-            try { refreshLanguageBadge(); } catch (e) { }
-            try { refreshFontSizeBadge(); } catch (e) { }
-            try { refreshNoteSortBadge(); } catch (e) { }
-            try { refreshTasklistInsertOrderBadge(); } catch (e) { }
-            try { refreshToolbarModeBadge(); } catch (e) { }
+            refreshLanguageBadge();
+            refreshFontSizeBadge();
+            refreshNoteSortBadge();
+            refreshTasklistInsertOrderBadge();
+            refreshToolbarModeBadge();
         });
     });
 
-    // Expose functions globally for onclick handlers still in HTML
+    // ========== Global API ==========
+    // Expose functions for external access and inline HTML handlers
     window.showLanguageModal = showLanguageModal;
     window.openNoteSortModal = openNoteSortModal;
     window.showTimezonePrompt = showTimezonePrompt;

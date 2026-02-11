@@ -1,57 +1,89 @@
 /**
  * Backup Export Page JavaScript
- * Handles backup and export functionality
+ * Handles backup and export functionality including:
+ * - Exporting notes, attachments, and structured data
+ * - Managing download progress with spinner feedback
+ * - Loading workspace selection for exports
  */
 
+// ========================================
+// Download Functions
+// ========================================
+
 /**
- * Download notes as ZIP file
+ * Download all notes as a ZIP file
  */
 function startDownload() {
-    // Create a direct link to the export script
     window.location.href = 'api_export_entries.php';
 }
 
 /**
- * Download structured export as ZIP file
+ * Download structured export (notes with folder structure) as a ZIP file
+ * Exports the selected workspace or all workspaces if none selected
  */
 function startStructuredExport() {
     var workspaceSelect = document.getElementById('structuredExportWorkspaceSelect');
     var workspace = workspaceSelect ? workspaceSelect.value : '';
     
     if (workspace) {
-        // Create a direct link to the structured export script with workspace parameter
         window.location.href = 'api_export_structured.php?workspace=' + encodeURIComponent(workspace);
     } else {
-        // No workspace selected, export all
         window.location.href = 'api_export_structured.php';
     }
 }
 
 /**
- * Download attachments as ZIP file
+ * Download all attachments as a ZIP file
  */
 function startAttachmentsDownload() {
-    // Create a direct link to the attachments export script
     window.location.href = 'api_export_attachments.php';
 }
 
-// Show spinner and disable submit to avoid duplicate requests
-function showBackupSpinner() {
-    try {
-        var spinner = document.getElementById('backupSpinner');
-        var btn = document.getElementById('completeBackupBtn');
-        if (spinner) {
-            spinner.style.display = 'inline-flex';
-            spinner.setAttribute('aria-hidden', 'false');
-        }
-        if (btn) {
-            btn.disabled = true;
-            btn.setAttribute('aria-disabled', 'true');
-        }
-    } catch (e) { /* ignore */ }
-}
+// ========================================
+// UI Helper Functions
+// ========================================
+
 /**
- * Load workspaces for structured export select
+ * Show loading spinner and disable the backup button to prevent duplicate requests
+ */
+function showBackupSpinner() {
+    var spinner = document.getElementById('backupSpinner');
+    var btn = document.getElementById('completeBackupBtn');
+    
+    if (spinner) {
+        spinner.style.display = 'inline-flex';
+        spinner.setAttribute('aria-hidden', 'false');
+    }
+    if (btn) {
+        btn.disabled = true;
+        btn.setAttribute('aria-disabled', 'true');
+    }
+}
+
+/**
+ * Hide loading spinner and re-enable the backup button
+ */
+function hideBackupSpinner() {
+    var spinner = document.getElementById('backupSpinner');
+    var btn = document.getElementById('completeBackupBtn');
+    
+    if (spinner) {
+        spinner.style.display = 'none';
+        spinner.setAttribute('aria-hidden', 'true');
+    }
+    if (btn) {
+        btn.disabled = false;
+        btn.setAttribute('aria-disabled', 'false');
+    }
+}
+
+// ========================================
+// Workspace Management
+// ========================================
+
+/**
+ * Load available workspaces into the structured export dropdown
+ * Fetches workspaces from API and pre-selects the current workspace
  */
 function loadWorkspacesForStructuredExport() {
     var select = document.getElementById('structuredExportWorkspaceSelect');
@@ -67,11 +99,10 @@ function loadWorkspacesForStructuredExport() {
         if (data.success && data.workspaces) {
             select.innerHTML = '';
             
-            // Get current workspace from PHP global (no more localStorage)
-            var currentWorkspace = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace : 
-                                   (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : '';
+            // Get current workspace from global variable (set by PHP)
+            var currentWorkspace = (typeof window.selectedWorkspace !== 'undefined') ? window.selectedWorkspace : '';
             
-            // Add each workspace as an option
+            // Populate dropdown with workspace options
             data.workspaces.forEach(function(ws) {
                 var option = document.createElement('option');
                 option.value = ws.name;
@@ -82,7 +113,7 @@ function loadWorkspacesForStructuredExport() {
                 select.appendChild(option);
             });
             
-            // If no workspace was selected and we have workspaces, select the first one
+            // If no workspace was pre-selected, select the first one by default
             if (!currentWorkspace && data.workspaces.length > 0) {
                 select.value = data.workspaces[0].name;
             }
@@ -94,82 +125,140 @@ function loadWorkspacesForStructuredExport() {
     });
 }
 
-// Load workspaces when page loads
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadWorkspacesForStructuredExport);
-} else {
+// ========================================
+// Cookie Helper Functions
+// ========================================
+
+/**
+ * Get the value of a specific cookie by name
+ * @param {string} name - The name of the cookie to retrieve
+ * @returns {string|null} The cookie value, or null if not found
+ */
+function getCookie(name) {
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i].trim();
+        var parts = cookie.split('=');
+        var cookieName = parts[0];
+        var cookieValue = parts.slice(1).join('=');
+        if (cookieName === name) {
+            return cookieValue;
+        }
+    }
+    return null;
+}
+
+/**
+ * Delete a cookie by name
+ * @param {string} name - The name of the cookie to delete
+ */
+function deleteCookie(name) {
+    document.cookie = name + '=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+}
+
+// ========================================
+// Download Progress Tracking
+// ========================================
+
+/**
+ * Setup download progress tracking using cookies
+ * When the server starts the download, it sets a cookie with the download token.
+ * This function polls for that cookie to detect when the download has started,
+ * then hides the spinner to provide user feedback.
+ * 
+ * @param {string} token - Unique token to identify this download
+ * @returns {object} Object with pollTimer and fallbackTimer for cleanup
+ */
+function setupDownloadTracking(token) {
+    var pollInterval = 500; // Check every 500ms
+    var maxPollTime = 60000; // Stop polling after 60 seconds
+    var fallbackTimeout = 30000; // Re-enable UI after 30 seconds as safety
+    var elapsed = 0;
+    
+    // Poll for the download cookie
+    var pollTimer = setInterval(function() {
+        elapsed += pollInterval;
+        var cookieValue = getCookie('poznote_download_token');
+        
+        if (cookieValue === token) {
+            // Download has started - cleanup and hide spinner
+            hideBackupSpinner();
+            deleteCookie('poznote_download_token');
+            clearInterval(pollTimer);
+            clearTimeout(fallbackTimer);
+            return;
+        }
+        
+        // Stop polling after max time
+        if (elapsed >= maxPollTime) {
+            clearInterval(pollTimer);
+            hideBackupSpinner();
+        }
+    }, pollInterval);
+    
+    // Fallback timer as a safety measure
+    var fallbackTimer = setTimeout(function() {
+        hideBackupSpinner();
+        clearInterval(pollTimer);
+    }, fallbackTimeout);
+    
+    return { pollTimer: pollTimer, fallbackTimer: fallbackTimer };
+}
+
+/**
+ * Initialize a download token for tracking
+ * Adds a hidden input field with a unique token to the form
+ * @param {HTMLFormElement} form - The form to add the token to
+ * @returns {string} The generated token
+ */
+function initializeDownloadToken(form) {
+    var token = 'dt_' + Math.random().toString(36).substring(2, 11);
+    
+    // Remove existing token input if present
+    var existing = document.getElementById('downloadTokenInput');
+    if (existing) {
+        existing.parentNode.removeChild(existing);
+    }
+    
+    // Add new token input
+    var input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'download_token';
+    input.id = 'downloadTokenInput';
+    input.value = token;
+    form.appendChild(input);
+    
+    return token;
+}
+
+// ========================================
+// Initialization
+// ========================================
+
+/**
+ * Initialize all page functionality when DOM is ready
+ */
+function initializePage() {
+    // Load workspaces for structured export dropdown
     loadWorkspacesForStructuredExport();
-}
-// Hide spinner and re-enable submit
-function hideBackupSpinner() {
-    try {
-        var spinner = document.getElementById('backupSpinner');
-        var btn = document.getElementById('completeBackupBtn');
-        if (spinner) {
-            spinner.style.display = 'none';
-            spinner.setAttribute('aria-hidden', 'true');
-        }
-        if (btn) {
-            btn.disabled = false;
-            btn.setAttribute('aria-disabled', 'false');
-        }
-    } catch (e) { /* ignore */ }
+    
+    // Setup complete backup form handler
+    var form = document.getElementById('completeBackupForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // Show spinner immediately
+            showBackupSpinner();
+            
+            // Setup download tracking with cookie polling
+            var token = initializeDownloadToken(form);
+            setupDownloadTracking(token);
+        });
+    }
 }
 
-// Attach form listener to show spinner during backup creation
-document.addEventListener('DOMContentLoaded', function() {
-    try {
-        var form = document.getElementById('completeBackupForm');
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                            // Show spinner immediately.
-                            showBackupSpinner();
-
-                            // Generate a random token and attach it to the form so server will set a cookie
-                            // when the download starts. The JS will poll for that cookie and hide spinner.
-                            try {
-                                var token = 'dt_' + Math.random().toString(36).substr(2, 9);
-                                var existing = document.getElementById('downloadTokenInput');
-                                if (existing) existing.parentNode.removeChild(existing);
-                                var input = document.createElement('input');
-                                input.type = 'hidden';
-                                input.name = 'download_token';
-                                input.id = 'downloadTokenInput';
-                                input.value = token;
-                                form.appendChild(input);
-
-                                // Poll for cookie named 'poznote_download_token' and hide spinner when found
-                                var pollInterval = 500; // ms
-                                var maxPoll = 60000; // 60s
-                                var elapsed = 0;
-                                var pollTimer = setInterval(function() {
-                                    elapsed += pollInterval;
-                                    var cookies = document.cookie.split(';').map(function(c){ return c.trim(); });
-                                    for (var i = 0; i < cookies.length; i++) {
-                                        var parts = cookies[i].split('=');
-                                        var name = parts[0];
-                                        var value = parts.slice(1).join('=');
-                                        if (name === 'poznote_download_token' && value === token) {
-                                            // Found matching cookie - hide spinner and cleanup
-                                            hideBackupSpinner();
-                                            // Remove the cookie by expiring it
-                                            document.cookie = 'poznote_download_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-                                            clearInterval(pollTimer);
-                                            if (fallbackTimer) clearTimeout(fallbackTimer);
-                                            return;
-                                        }
-                                    }
-                                    if (elapsed >= maxPoll) {
-                                        clearInterval(pollTimer);
-                                    }
-                                }, pollInterval);
-
-                                // As a fallback, re-enable the UI after 30 seconds in case something goes wrong
-                                var fallbackTimer = setTimeout(function() {
-                                    hideBackupSpinner();
-                                }, 30000);
-                            } catch (ex) { /* ignore */ }
-            });
-        }
-    } catch (e) { /* ignore */ }
-});
+// Run initialization when page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializePage);
+} else {
+    initializePage();
+}

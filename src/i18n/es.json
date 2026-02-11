@@ -12,6 +12,7 @@
         "confirm": "Confirmar",
         "confirmation": "Confirmación",
         "save": "Guardar",
+        "untitled": "Sin título",
         "login": {
             "fields": {
                 "username": "Usuario",
@@ -248,7 +249,7 @@
             "upload_section_title": "Subir nuevo adjunto",
             "drag_drop_info": "Puedes arrastrar y soltar tu archivo a continuación:",
             "all_types_accepted": "Todos los tipos de archivo aceptados (máx 200MB)",
-            "upload_button": "Subir archivo",
+            "upload_button": "Adjuntar",
             "current_attachments": "Adjuntos actuales",
             "loading_attachments": "Cargando adjuntos...",
             "preview_alt": "Vista previa",
@@ -272,6 +273,10 @@
         "list": {
             "title": "Notas con archivos adjuntos",
             "no_attachments": "Aún no hay notas con archivos adjuntos.",
+            "back_to_notes": "Volver a las notas",
+            "manage_attachments": "Gestionar archivos adjuntos",
+            "attachment_count_singular": "1 archivo adjunto",
+            "attachment_count_plural": "{{count}} archivos adjuntos",
             "hint": "Añada archivos adjuntos a sus notas usando el botón del clip en la barra de herramientas.",
             "filter_placeholder": "Filtrar por título de nota o nombre de archivo adjunto...",
             "no_filter_results": "Ninguna nota coincide con su búsqueda.",
@@ -286,6 +291,11 @@
     },
     "settings": {
         "title": "Configuración",
+        "categories": {
+            "actions": "Acciones",
+            "display": "Pantalla",
+            "about": "Acerca de"
+        },
         "sections": {
             "account_display": "Cuenta y Visualización",
             "notes_folders": "Notas y Carpetas",
@@ -1785,12 +1795,12 @@
             "push": {
                 "title": "Enviar a GitHub",
                 "description": "Exporta tus notas a GitHub. Actualiza archivos existentes y elimina archivos que ya no existen en Poznote.",
-                "button": "Push"
+                "button": "Enviar"
             },
             "pull": {
                 "title": "Recuperar de GitHub",
                 "description": "Importa notas desde GitHub. Actualiza notas existentes y mueve a la papelera notas que ya no existen en GitHub.",
-                "button": "Pull"
+                "button": "Recuperar"
             }
         },
         "messages": {

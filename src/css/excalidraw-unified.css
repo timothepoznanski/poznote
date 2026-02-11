@@ -25,8 +25,6 @@
 .excalidraw-image {
     max-width: 100%;
     height: auto;
-    border: none;
-    border-radius: 4px;
     cursor: pointer;
     display: block;
     margin: 0;
@@ -38,6 +36,11 @@
     pointer-events: auto;
     /* Prevent any outline or focus indicators */
     outline: none !important;
+}
+
+.excalidraw-image:not(.img-with-border):not(.img-with-border-no-padding) {
+    border: none;
+    border-radius: 0;
 }
 
 .excalidraw-data {

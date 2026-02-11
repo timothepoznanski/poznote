@@ -98,19 +98,19 @@ class FolderShareController {
                     return;
                 }
                 
-                // Check uniqueness within shared_folders only (notes have different URL path)
-                $stmt = $this->con->prepare('SELECT folder_id FROM shared_folders WHERE token = ? LIMIT 1');
-                $stmt->execute([$custom]);
-                $existing = $stmt->fetchColumn();
-                if ($existing && intval($existing) !== (int)$folderId) {
-                    http_response_code(409);
-                    echo json_encode(['success' => false, 'error' => 'Token already in use by another folder']);
-                    return;
-                }
-                
                 $token = $custom;
             } else {
                 $token = bin2hex(random_bytes(16));
+            }
+
+            // Register in global registry (master.db)
+            require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+            
+            // Check global uniqueness (across all users)
+            if (!isTokenAvailable($token, $_SESSION['user_id'], 'folder', (int)$folderId)) {
+                http_response_code(409);
+                echo json_encode(['success' => false, 'error' => 'Token already in use']);
+                return;
             }
             
             $theme = isset($input['theme']) ? trim($input['theme']) : null;
@@ -123,9 +123,6 @@ class FolderShareController {
             $stmt->execute([$folderId]);
             $existsRow = $stmt->fetchColumn();
             
-            // Register in global registry (master.db)
-            require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
-
             $oldToken = null;
             if ($existsRow) {
                 $stmt = $this->con->prepare('SELECT token FROM shared_folders WHERE folder_id = ?');
@@ -239,13 +236,13 @@ class FolderShareController {
                         return;
                     }
                     
-                    // Check uniqueness across both shared_notes and shared_folders
-                    $stmt = $this->con->prepare('SELECT folder_id FROM shared_folders WHERE token = ? LIMIT 1');
-                    $stmt->execute([$custom]);
-                    $existing = $stmt->fetchColumn();
-                    if ($existing && intval($existing) !== (int)$folderId) {
+                    // Register in global registry (master.db)
+                    require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+
+                    // Check global uniqueness (across all users)
+                    if (!isTokenAvailable($custom, $_SESSION['user_id'], 'folder', (int)$folderId)) {
                         http_response_code(409);
-                        echo json_encode(['success' => false, 'error' => 'Token already in use by another folder']);
+                        echo json_encode(['success' => false, 'error' => 'Token already in use']);
                         return;
                     }
                     

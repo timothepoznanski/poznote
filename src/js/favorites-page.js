@@ -52,7 +52,11 @@
             .catch(function (error) {
                 if (spinner) spinner.style.display = 'none';
                 if (container) {
-                    container.innerHTML = '<div class="error-message">' + config.txtError + ': ' + error.message + '</div>';
+                    var errDiv = document.createElement('div');
+                    errDiv.className = 'error-message';
+                    errDiv.textContent = config.txtError + ': ' + error.message;
+                    container.innerHTML = '';
+                    container.appendChild(errDiv);
                 }
             });
     }
@@ -133,7 +137,8 @@
             if (note.folder) {
                 var badge = document.createElement('span');
                 badge.className = 'folder-badge';
-                badge.innerHTML = '<i class="fas fa-folder"></i> ' + note.folder;
+                badge.innerHTML = '<i class="fas fa-folder"></i> ';
+                badge.appendChild(document.createTextNode(note.folder));
                 titleLine.appendChild(badge);
             }
 
@@ -156,19 +161,6 @@
         });
 
         container.appendChild(list);
-    }
-
-    function formatDate(dateString) {
-        if (!dateString) return '';
-        var date = new Date(dateString);
-        var now = new Date();
-        var diffMs = now - date;
-        var diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-        if (diffDays === 0) return config.txtToday;
-        if (diffDays === 1) return config.txtYesterday;
-        if (diffDays < 7) return diffDays + ' ' + config.txtDaysAgo;
-        return date.toLocaleDateString();
     }
 
     document.addEventListener('DOMContentLoaded', function () {

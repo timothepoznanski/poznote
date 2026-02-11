@@ -3,8 +3,8 @@ require 'auth.php';
 requireAuth();
 
 require_once 'config.php';
-include 'db_connect.php';
-include 'functions.php';
+require_once 'db_connect.php';
+require_once 'functions.php';
 
 // Build query with folder exclusions like in index.php
 $where_conditions = ["trash = 0"];
@@ -57,10 +57,32 @@ $currentLang = getUserLanguage();
 	<script src="js/theme-init.js"></script>
 	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
 	<link type="text/css" rel="stylesheet" href="css/light.min.css"/>
-	<link type="text/css" rel="stylesheet" href="css/home.css"/>
+	<link type="text/css" rel="stylesheet" href="css/home/base.css"/>
+	<link type="text/css" rel="stylesheet" href="css/home/search.css"/>
+	<link type="text/css" rel="stylesheet" href="css/home/alerts.css"/>
+	<link type="text/css" rel="stylesheet" href="css/home/cards.css"/>
+	<link type="text/css" rel="stylesheet" href="css/home/buttons.css"/>
+	<link type="text/css" rel="stylesheet" href="css/home/fontawesome.css"/>
+	<link type="text/css" rel="stylesheet" href="css/home/dark-mode.css"/>
+	<link type="text/css" rel="stylesheet" href="css/home/responsive.css"/>
 	<link type="text/css" rel="stylesheet" href="css/list_tags.css"/>
-	<link type="text/css" rel="stylesheet" href="css/modals.css"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/base.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/attachments.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/link-modal.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/share-modal.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/alerts-utilities.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/responsive.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/menus.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/editor.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/modals.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/components.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/pages.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css"/>
 	<script src="js/theme-manager.js"></script>
 </head>
 <body class="tags-page" data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>">

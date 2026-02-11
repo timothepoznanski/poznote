@@ -99,18 +99,19 @@ class ShareController {
                     return;
                 }
                 
-                // Check uniqueness
-                $stmt = $this->con->prepare('SELECT note_id FROM shared_notes WHERE token = ? LIMIT 1');
-                $stmt->execute([$custom]);
-                $existing = $stmt->fetchColumn();
-                if ($existing && intval($existing) !== (int)$noteId) {
-                    http_response_code(409);
-                    echo json_encode(['success' => false, 'error' => 'Token already in use']);
-                    return;
-                }
                 $token = $custom;
             } else {
                 $token = bin2hex(random_bytes(16));
+            }
+
+            // Register in global registry (master.db)
+            require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+            
+            // Check global uniqueness (across all users)
+            if (!isTokenAvailable($token, $_SESSION['user_id'], 'note', (int)$noteId)) {
+                http_response_code(409);
+                echo json_encode(['success' => false, 'error' => 'Token already in use']);
+                return;
             }
             
             $theme = isset($input['theme']) ? trim($input['theme']) : null;
@@ -122,9 +123,6 @@ class ShareController {
             $stmt = $this->con->prepare('SELECT id FROM shared_notes WHERE note_id = ? LIMIT 1');
             $stmt->execute([$noteId]);
             $existsRow = $stmt->fetchColumn();
-            
-            // Register in global registry (master.db)
-            require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
             
             $oldToken = null;
             if ($existsRow) {

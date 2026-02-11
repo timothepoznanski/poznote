@@ -76,11 +76,6 @@
         // Wrap the selected text
         var wrappedText = prefix + selectedText + suffix;
         document.execCommand('insertText', false, wrappedText);
-        
-        // Trigger auto-save
-        if (typeof window.update === 'function') {
-            window.update();
-        }
     }
 
     /**
@@ -171,11 +166,6 @@
         if (modified) {
             // Replace editor content
             editor.textContent = lines.join('\n');
-            
-            // Trigger auto-save
-            if (typeof window.update === 'function') {
-                window.update();
-            }
         }
     }
 
@@ -223,24 +213,25 @@
         var sel = window.getSelection();
         
         // Restore saved range if available
-        if (window.savedLinkRange) {
+        if (window.savedRanges && window.savedRanges.link) {
             sel.removeAllRanges();
-            sel.addRange(window.savedLinkRange);
+            sel.addRange(window.savedRanges.link);
+        }
+        
+        // Ensure editor has focus to avoid scroll jump
+        const noteentry = document.querySelector('.noteentry');
+        if (noteentry) {
+            try { noteentry.focus({ preventScroll: true }); } catch (e) { noteentry.focus(); }
         }
         
         if (!sel || sel.rangeCount === 0) return;
 
         var selectedText = sel.toString();
-        var linkText = text || selectedText || 'link';
+        var linkText = text || url || selectedText || 'link';
         var linkUrl = url || 'https://';
         
         var markdownLink = '[' + linkText + '](' + linkUrl + ')';
         document.execCommand('insertText', false, markdownLink);
-        
-        // Trigger auto-save
-        if (typeof window.update === 'function') {
-            window.update();
-        }
     }
 
     /**
@@ -289,11 +280,6 @@
         sel.removeAllRanges();
         sel.addRange(newRange);
         document.execCommand('insertText', false, newLine);
-        
-        // Trigger auto-save
-        if (typeof window.update === 'function') {
-            window.update();
-        }
     }
 
     /**
@@ -313,11 +299,6 @@
         // Wrap with HTML color span as plain text in the markdown editor
         var coloredText = '<span style="color:' + color + '">' + selectedText + '</span>';
         document.execCommand('insertText', false, coloredText);
-        
-        // Trigger auto-save
-        if (typeof window.update === 'function') {
-            window.update();
-        }
     }
 
     /**
@@ -337,11 +318,6 @@
         // Apply highlight using span tag as plain text in the markdown editor
         var highlightedText = '<span style="background-color:' + highlightColor + '">' + selectedText + '</span>';
         document.execCommand('insertText', false, highlightedText);
-        
-        // Trigger auto-save
-        if (typeof window.update === 'function') {
-            window.update();
-        }
     }
 
     /**
@@ -361,11 +337,6 @@
         // Wrap with HTML span with font size
         var styledText = '<span style="font-size: ' + fontSize + '">' + selectedText + '</span>';
         document.execCommand('insertHTML', false, styledText);
-        
-        // Trigger auto-save
-        if (typeof window.update === 'function') {
-            window.update();
-        }
     }
 
     // Export functions

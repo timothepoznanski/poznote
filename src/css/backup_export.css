@@ -47,31 +47,6 @@ body {
     padding-bottom: 10px;
 }
 
-/* Liste de sauvegardes */
-.backup-list {
-    margin-top: 20px;
-}
-
-.backup-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    border: 1px solid #eee;
-    border-radius: 4px;
-    margin-bottom: 10px;
-    background-color: #f9f9f9;
-}
-
-.backup-info {
-    flex-grow: 1;
-}
-
-.backup-actions {
-    display: flex;
-    gap: 10px;
-}
-
 /* Boutons */
 .btn {
     padding: 10px 20px;

@@ -1,0 +1,87 @@
+/**
+ * Utility Classes
+ * 
+ * Reusable utility classes for common styling patterns including
+ * visibility controls, mobile-specific displays, and helper classes.
+ */
+
+/* Placeholder color for tags input to match note title */
+.name_tags input::placeholder {
+    color: #bababa;
+}
+
+/* Hidden elements */
+.hidden {
+    display: none;
+}
+
+/* Utility: force hidden (used by JS to toggle visibility without inline styles) */
+.hidden {
+    display: none !important;
+}
+
+/* Hide mobile-only elements on desktop */
+.mobile-home-btn {
+    display: none !important;
+}
+
+/* Mobile overflow menu button (only visible on mobile) */
+.mobile-more-btn {
+    display: none !important;
+}
+
+/* Hide emoji buttons when emoji icons are disabled */
+.emoji-hidden .btn-emoji {
+    display: none !important;
+}
+
+/* Hide specific toolbar buttons on desktop only (keep on mobile) */
+@media (min-width: 800px) {
+
+    .btn-excalidraw,
+    .btn-emoji,
+    .btn-table,
+    .btn-checklist,
+    .btn-separator,
+    .btn-note-reference {
+        display: none !important;
+    }
+}
+
+/* Initially hidden elements (used by JS to toggle) */
+.initially-hidden {
+    display: none;
+}
+
+/* Cursor pointer */
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* Update badge hidden in sidebar */
+.sidebar-settings .update-badge.update-badge-hidden,
+.update-badge.update-badge-hidden {
+    display: none !important;
+}
+
+/* Section bottom spacer */
+.section-bottom-spacer {
+    padding-bottom: 50px;
+}
+
+/* ============================================
+   CENTER NOTE CONTENT
+   When enabled, the note content is centered with a max-width
+   for better readability on wide screens
+   ============================================ */
+body.center-note-content #right_col .innernote {
+    max-width: var(--note-max-width, 800px);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+body.center-note-content #right_col .note-header {
+    max-width: var(--note-max-width, 800px);
+    margin-left: auto;
+    margin-right: auto;
+}

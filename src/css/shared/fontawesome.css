@@ -1,0 +1,52 @@
+/**
+ * Shared Page - Font Awesome Icons
+ *
+ * Icon definitions and spin animation for the shared page.
+ */
+
+.fa-spinner::before { content: "\f110"; }
+.fa-exclamation-triangle::before { content: "\f071"; }
+.fa-copy::before { content: "\f0c5"; }
+.fa-external-link::before { content: "\f08e"; }
+.fa-ban::before { content: "\f05e"; }
+.fa-check::before { content: "\f00c"; }
+.fa-times::before { content: "\f00d"; }
+.fa-lock::before { content: "\f023"; }
+.fa-lock-open::before { content: "\f3c1"; }
+.fa-cloud::before { content: "\f0c2"; }
+.fa-plane::before { content: "\f072"; }
+.fa-trash::before { content: "\f2ed"; }
+.fa-eye::before { content: "\f06e"; }
+
+.fa-spinner,
+.fa-exclamation-triangle,
+.fa-copy,
+.fa-external-link,
+.fa-ban,
+.fa-check,
+.fa-times,
+.fa-lock,
+.fa-cloud,
+.fa-plane,
+.fa-trash,
+.fa-eye,
+.fa-lock-open {
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+    font-style: normal;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+}
+
+.fa-spin {
+    animation: fa-spin 2s infinite linear;
+}
+
+@keyframes fa-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

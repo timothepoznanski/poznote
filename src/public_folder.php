@@ -103,7 +103,7 @@ try {
     }
 
     // Get folder information
-    $stmt = $con->prepare('SELECT name, workspace FROM folders WHERE id = ?');
+    $stmt = $con->prepare('SELECT id, name, workspace FROM folders WHERE id = ?');
     $stmt->execute([$folder_id]);
     $folder = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$folder) {
@@ -112,23 +112,104 @@ try {
         exit;
     }
 
-    // Get all notes in this folder with their share tokens
-    $stmt = $con->prepare('
-        SELECT e.id, e.heading, e.created, e.type, sn.token 
-        FROM entries e 
-        LEFT JOIN shared_notes sn ON e.id = sn.note_id
-        WHERE (e.folder_id = ? OR e.folder = ?) AND e.trash = 0 
-        ORDER BY e.created DESC
-    ');
-    $stmt->execute([$folder_id, $folder['name']]);
-    $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // Faster approach: fetch all folders to build hierarchy in memory
+    $allFoldersPool = [];
+    $stmt = $con->prepare('SELECT id, name, parent_id FROM folders WHERE workspace = ?');
+    $stmt->execute([$folder['workspace']]);
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $allFoldersPool[$row['id']] = $row;
+    }
 
-    $sharedNotes = [];
-    foreach ($notes as $note) {
-        if (!empty($note['token'])) {
-            $sharedNotes[] = $note;
+    // Function to get all descendant IDs for a given folder
+    function getDescendantIds($parentId, $foldersPool) {
+        $ids = [];
+        foreach ($foldersPool as $fid => $f) {
+            if ($f['parent_id'] !== null && (int)$f['parent_id'] === (int)$parentId) {
+                $id = (int)$fid;
+                $ids[] = $id;
+                $ids = array_merge($ids, getDescendantIds($id, $foldersPool));
+            }
+        }
+        return array_values(array_unique($ids));
+    }
+
+    $allSubfolderIds = getDescendantIds($folder_id, $allFoldersPool);
+    $allRelevantFolderIds = array_merge([$folder_id], $allSubfolderIds);
+    $placeholders = implode(',', array_fill(0, count($allRelevantFolderIds), '?'));
+
+    // Get direct subfolders for Kanban mapping
+    $directSubfolders = [];
+    $directSubfolderIds = [];
+    foreach ($allFoldersPool as $fid => $f) {
+        if ((int)$f['parent_id'] === (int)$folder_id) {
+            $directSubfolders[] = $f;
+            $directSubfolderIds[] = $fid;
         }
     }
+
+    // Map each descendant to its root-level ancestor (direct child of the shared folder)
+    $descendantToDirectChild = [];
+    foreach ($directSubfolderIds as $dsId) {
+        $dsDescendants = getDescendantIds($dsId, $allFoldersPool);
+        foreach ($dsDescendants as $ddId) {
+            $descendantToDirectChild[$ddId] = $dsId;
+        }
+    }
+
+    // Get all notes in this collection
+    // IMPORTANT: Include notes even without individual tokens if they belong to this shared folder hierarchy?
+    // User said "afficher les notes partagées", so we keep the JOIN to shared_notes.
+    // However, we'll try to be more inclusive in the query.
+    $stmt = $con->prepare("
+        SELECT e.id, e.heading, e.created, e.type, e.folder_id, sn.token 
+        FROM entries e 
+        LEFT JOIN shared_notes sn ON e.id = sn.note_id
+        WHERE e.folder_id IN ($placeholders) AND e.trash = 0 
+        ORDER BY e.created DESC
+    ");
+    $stmt->execute($allRelevantFolderIds);
+    $allNotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $sharedNotes = [];
+    $notesByFolder = [];
+    $kanbanData = [$folder_id => []];
+    foreach ($directSubfolderIds as $sid) $kanbanData[$sid] = [];
+
+    foreach ($allNotes as $note) {
+        $sharedNotes[] = $note;
+        $fid = (int)$note['folder_id'];
+
+        // For List View
+        if (!isset($notesByFolder[$fid])) $notesByFolder[$fid] = [];
+        $notesByFolder[$fid][] = $note;
+
+        // For Kanban View
+        if ($fid === (int)$folder_id) {
+            $kanbanData[$folder_id][] = $note;
+        } elseif (isset($kanbanData[$fid])) {
+            $kanbanData[$fid][] = $note;
+        } elseif (isset($descendantToDirectChild[$fid])) {
+            $rootDirId = $descendantToDirectChild[$fid];
+            $kanbanData[$rootDirId][] = $note;
+        }
+    }
+
+    // Prepare folder names for titles and sort groups
+    $folderNames = [];
+    foreach ($allRelevantFolderIds as $fid) {
+        if ($fid == $folder_id) {
+            $folderNames[$fid] = $folder['name'];
+        } else {
+            $folderNames[$fid] = $allFoldersPool[$fid]['name'] ?? 'Subfolder';
+        }
+    }
+
+    // Sort subfolder groups by name for the list view
+    uksort($notesByFolder, function($a, $b) use ($folderNames, $folder_id) {
+        if ($a == $folder_id) return -1;
+        if ($b == $folder_id) return 1;
+        return strcasecmp($folderNames[$a] ?? '', $folderNames[$b] ?? '');
+    });
 
 } catch (Exception $e) {
     http_response_code(500);
@@ -165,13 +246,30 @@ $noteBaseUrl = $protocol . '://' . $host;
     <link rel="stylesheet" href="/css/fontawesome.min.css">
     <link rel="stylesheet" href="/css/solid.min.css">
     <link rel="stylesheet" href="/css/light.min.css">
-    <link rel="stylesheet" href="/css/dark-mode.css">
+    <link rel="stylesheet" href="/css/dark-mode/variables.css">
+    <link rel="stylesheet" href="/css/dark-mode/layout.css">
+    <link rel="stylesheet" href="/css/dark-mode/menus.css">
+    <link rel="stylesheet" href="/css/dark-mode/editor.css">
+    <link rel="stylesheet" href="/css/dark-mode/modals.css">
+    <link rel="stylesheet" href="/css/dark-mode/components.css">
+    <link rel="stylesheet" href="/css/dark-mode/pages.css">
+    <link rel="stylesheet" href="/css/dark-mode/markdown.css">
+    <link rel="stylesheet" href="/css/dark-mode/kanban.css">
+    <link rel="stylesheet" href="/css/dark-mode/icons.css">
     <link rel="stylesheet" href="/css/public_folder.css">
 </head>
-<body class="public-folder-body" data-txt-no-results="No results.">
-    <button class="theme-toggle" onclick="toggleTheme()">
-        <i class="fas fa-moon" id="themeIcon"></i>
-    </button>
+<body class="public-folder-body" 
+      data-txt-no-results="<?php echo t_h('public_folder.no_filter_results', [], 'No results.'); ?>"
+      data-txt-view-notes="<?php echo t_h('public_folder.view_notes', [], 'View as list'); ?>"
+      data-txt-view-kanban="<?php echo t_h('public_folder.view_kanban', [], 'View as Kanban'); ?>">
+    <div class="header-controls">
+        <button id="viewToggle" class="view-toggle" onclick="toggleView()" title="<?php echo t_h('public_folder.view_kanban', [], 'View as Kanban'); ?>">
+            <i class="fas fa-columns" id="viewIcon"></i>
+        </button>
+        <button class="theme-toggle" onclick="toggleTheme()">
+            <i class="fas fa-moon" id="themeIcon"></i>
+        </button>
+    </div>
 
     <h1><i class="fas fa-folder-open"></i> <?php echo htmlspecialchars($folder['name']); ?></h1>
 
@@ -193,30 +291,111 @@ $noteBaseUrl = $protocol . '://' . $host;
             <p>This folder is empty</p>
         </div>
     <?php else: ?>
-        <ul id="folderNotesList" class="notes-list">
-            <?php foreach ($sharedNotes as $note): ?>
-                <?php
-                    $noteTitle = $note['heading'] ?: 'Untitled';
-                    $noteTitleLower = $noteTitle;
-                    if (function_exists('mb_strtolower')) {
-                        $noteTitleLower = mb_strtolower($noteTitleLower, 'UTF-8');
-                    } else {
-                        $noteTitleLower = strtolower($noteTitleLower);
-                    }
-                ?>
-                <li class="public-note-item" data-title="<?php echo htmlspecialchars($noteTitleLower, ENT_QUOTES, 'UTF-8'); ?>">
-                    <a class="public-note-link" href="<?php echo htmlspecialchars($noteBaseUrl . '/' . $note['token']); ?>" target="_blank" rel="noopener">
-                        <i class="fas fa-file-alt"></i>
-                        <span class="public-note-title"><?php echo htmlspecialchars($noteTitle); ?></span>
-                    </a>
-                </li>
+        <div id="listView">
+            <?php 
+            // Separate direct notes and subfolder notes
+            $directNotes = $notesByFolder[$folder_id] ?? [];
+            unset($notesByFolder[$folder_id]);
+            ?>
+
+            <?php if (!empty($directNotes)): ?>
+                <ul class="notes-list">
+                    <?php foreach ($directNotes as $note): ?>
+                        <?php renderPublicNoteItem($note, $noteBaseUrl, $token); ?>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+
+            <?php foreach ($notesByFolder as $fid => $fNotes): ?>
+                <?php if (!empty($fNotes)): ?>
+                    <div class="public-folder-group">
+                        <h2 class="public-folder-group-title"><i class="fas fa-folder"></i> <?php echo htmlspecialchars($folderNames[$fid] ?? 'Subfolder'); ?></h2>
+                        <ul class="notes-list">
+                            <?php foreach ($fNotes as $note): ?>
+                                <?php renderPublicNoteItem($note, $noteBaseUrl, $token); ?>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
             <?php endforeach; ?>
-        </ul>
+        </div>
+
+        <div id="kanbanView" class="is-hidden">
+            <div class="kanban-board-public">
+                <!-- Parent Folder Column -->
+                <?php if (!empty($kanbanData[$folder_id])): ?>
+                <div class="kanban-col">
+                    <div class="kanban-col-header">
+                        <span class="kanban-col-title"><i class="fas fa-inbox"></i> <?php echo t_h('kanban.uncategorized', [], 'Uncategorized'); ?></span>
+                        <span class="kanban-col-count"><?php echo count($kanbanData[$folder_id]); ?></span>
+                    </div>
+                    <div class="kanban-col-cards">
+                        <?php foreach ($kanbanData[$folder_id] as $note): 
+                            $noteUrl = !empty($note['token']) ? ($noteBaseUrl . '/' . $note['token'] . '?folder_token=' . $token) : ($noteBaseUrl . '/public_note.php?id=' . $note['id'] . '&folder_token=' . $token);
+                        ?>
+                            <a href="<?php echo htmlspecialchars($noteUrl); ?>" class="kanban-public-card" target="_blank" rel="noopener">
+                                <span class="kanban-card-title"><?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?></span>
+                                <span class="kanban-card-meta"><?php echo date('Y-m-d', strtotime($note['created'])); ?></span>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                <?php endif; ?>
+
+                <!-- Subfolder Columns -->
+                <?php foreach ($directSubfolders as $sf): ?>
+                    <?php if (!empty($kanbanData[$sf['id']])): ?>
+                    <div class="kanban-col">
+                        <div class="kanban-col-header">
+                            <span class="kanban-col-title"><i class="fas fa-folder"></i> <?php echo htmlspecialchars($sf['name']); ?></span>
+                            <span class="kanban-col-count"><?php echo count($kanbanData[$sf['id']]); ?></span>
+                        </div>
+                        <div class="kanban-col-cards">
+                            <?php foreach ($kanbanData[$sf['id']] as $note): 
+                                $noteUrl = !empty($note['token']) ? ($noteBaseUrl . '/' . $note['token'] . '?folder_token=' . $token) : ($noteBaseUrl . '/public_note.php?id=' . $note['id'] . '&folder_token=' . $token);
+                            ?>
+                                <a href="<?php echo htmlspecialchars($noteUrl); ?>" class="kanban-public-card" target="_blank" rel="noopener">
+                                    <span class="kanban-card-title"><?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?></span>
+                                    <span class="kanban-card-meta"><?php echo date('Y-m-d', strtotime($note['created'])); ?></span>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
         <div id="folderNoResults" class="empty-folder is-hidden">
             <i class="fas fa-search"></i>
             <p><?php echo t_h('public_folder.no_filter_results', [], 'No results.'); ?></p>
         </div>
     <?php endif; ?>
+
+    <?php
+    /**
+     * Helper to render a single note item in the list view
+     */
+    function renderPublicNoteItem($note, $noteBaseUrl, $folderToken = '') {
+        $noteTitle = $note['heading'] ?: 'Untitled';
+        $noteTitleLower = $noteTitle;
+        if (function_exists('mb_strtolower')) {
+            $noteTitleLower = mb_strtolower($noteTitleLower, 'UTF-8');
+        } else {
+            $noteTitleLower = strtolower($noteTitleLower);
+        }
+        
+        $noteUrl = !empty($note['token']) ? ($noteBaseUrl . '/' . $note['token'] . '?folder_token=' . $folderToken) : ($noteBaseUrl . '/public_note.php?id=' . $note['id'] . '&folder_token=' . $folderToken);
+        ?>
+        <li class="public-note-item" data-title="<?php echo htmlspecialchars($noteTitleLower, ENT_QUOTES, 'UTF-8'); ?>">
+            <a class="public-note-link" href="<?php echo htmlspecialchars($noteUrl); ?>" target="_blank" rel="noopener">
+                <i class="fas fa-file-alt"></i>
+                <span class="public-note-title"><?php echo htmlspecialchars($noteTitle); ?></span>
+            </a>
+        </li>
+        <?php
+    }
+    ?>
 
     <script src="/js/public_folder.js"></script>
 </body>

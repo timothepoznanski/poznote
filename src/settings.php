@@ -7,12 +7,13 @@ require_once 'functions.php';
 
 // Check if settings access is completely disabled
 if (defined('DISABLE_SETTINGS_ACCESS') && DISABLE_SETTINGS_ACCESS === true) {
+    $currentLang = getUserLanguage();
     ?>
     <!DOCTYPE html>
-    <html>
+    <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
     <head>
         <meta charset="utf-8"/>
-        <title>Access Denied</title>
+        <title><?php echo t_h('common.access_denied', [], 'Access Denied', $currentLang); ?></title>
         <link rel="stylesheet" href="css/fontawesome.min.css">
         <link rel="stylesheet" href="css/all.css">
         <link rel="stylesheet" href="css/access-denied.css">
@@ -20,9 +21,9 @@ if (defined('DISABLE_SETTINGS_ACCESS') && DISABLE_SETTINGS_ACCESS === true) {
     <body class="access-denied-page">
         <div class="access-denied-modal">
             <i class="fas fa-lock"></i>
-            <h1>Access Denied</h1>
-            <p>Access to settings is disabled by administrator.</p>
-            <button id="access-denied-return-btn">Return to Home</button>
+            <h1><?php echo t_h('common.access_denied', [], 'Access Denied', $currentLang); ?></h1>
+            <p><?php echo t_h('settings.disabled_message', [], 'Access to settings is disabled by administrator.', $currentLang); ?></p>
+            <button id="access-denied-return-btn"><?php echo t_h('settings.password.cancel', [], 'Return to Home', $currentLang); ?></button>
         </div>
         <script src="js/access-denied.js"></script>
     </body>
@@ -50,7 +51,16 @@ if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
             <link rel="stylesheet" href="css/fontawesome.min.css">
             <link rel="stylesheet" href="css/light.min.css">
             <link rel="stylesheet" href="css/settings-password.css">
-            <link rel="stylesheet" href="css/dark-mode.css">
+            <link rel="stylesheet" href="css/dark-mode/variables.css">
+            <link rel="stylesheet" href="css/dark-mode/layout.css">
+            <link rel="stylesheet" href="css/dark-mode/menus.css">
+            <link rel="stylesheet" href="css/dark-mode/editor.css">
+            <link rel="stylesheet" href="css/dark-mode/modals.css">
+            <link rel="stylesheet" href="css/dark-mode/components.css">
+            <link rel="stylesheet" href="css/dark-mode/pages.css">
+            <link rel="stylesheet" href="css/dark-mode/markdown.css">
+            <link rel="stylesheet" href="css/dark-mode/kanban.css">
+            <link rel="stylesheet" href="css/dark-mode/icons.css">
             <link rel="icon" href="favicon.ico" type="image/x-icon">
         </head>
         <body>
@@ -82,22 +92,32 @@ if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
     }
 }
 
-include 'db_connect.php';
+require_once 'db_connect.php';
 
 // Include page initialization
 require_once 'page_init.php';
 
-// Initialize search parameters
+// Initialize search parameters (needed for workspace filter)
 $search_params = initializeSearchParams();
-extract($search_params); // Extracts variables: $search, $tags_search, $note, etc.
 
 // Preserve note parameter if provided (now using ID)
 $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
 
+// Get current user and language settings
 $currentLang = getUserLanguage();
 $currentUser = getCurrentUser();
 $username = htmlspecialchars($currentUser['display_name'] ?: $currentUser['username']);
 $pageWorkspace = trim(getWorkspaceFilter());
+
+// Check if current user is admin (used multiple times in template)
+$isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
+
+// Get cache version for assets
+$cache_v = @file_get_contents('version.txt');
+if ($cache_v === false) {
+    $cache_v = time();
+}
+$cache_v = urlencode(trim($cache_v));
 
 // Count workspaces
 $workspaces_count = 0;
@@ -113,7 +133,7 @@ try {
 
 // Count users (for admin)
 $users_count = 0;
-if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
+if ($isAdmin) {
     try {
         require_once 'users/db_master.php';
         $users = listAllUserProfiles();
@@ -133,21 +153,38 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title><?php echo getPageTitle(); ?></title>
     <meta name="color-scheme" content="dark light">
-    <?php 
-    $cache_v = @file_get_contents('version.txt');
-    if ($cache_v === false) $cache_v = time();
-    $cache_v = urlencode(trim($cache_v));
-    ?>
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
     <link rel="stylesheet" href="css/fontawesome.min.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/all.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/light.min.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/home.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/base.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/search.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/alerts.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/cards.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/buttons.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/fontawesome.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/dark-mode.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/home/responsive.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/settings.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/modals.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals/base.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals/specific-modals.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals/attachments.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals/link-modal.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals/share-modal.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals/alerts-utilities.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals/responsive.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/background-image.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/dark-mode.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $cache_v; ?>">
 </head>
 <body class="home-page"
       data-txt-enabled="<?php echo t_h('common.enabled'); ?>"
@@ -181,7 +218,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
         </div>
 
         <!-- ACTIONS CATEGORY -->
-        <h2 class="settings-category-title"><?php echo t_h('settings.categories.actions', [], 'Actions'); ?></h2>
+        <h2 class="settings-category-title"><?php echo t_h('settings.categories.actions'); ?></h2>
         <div class="home-grid">
 
             <!-- Workspaces -->
@@ -195,9 +232,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                 </div>
             </div>
 
-            <?php // Profile and admin links - always available ?>
-
-            <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
+            <?php if ($isAdmin): ?>
             <!-- User Management (Admin only) -->
             <div class="home-card settings-card-clickable" id="users-admin-card" data-href="admin/users.php">
                 <div class="home-card-icon">
@@ -230,7 +265,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                 </div>
             </div>
 
-            <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
+            <?php if ($isAdmin): ?>
             <!-- GitHub Sync -->
             <div class="home-card settings-card-clickable" id="github-sync-card" data-href="github_sync.php">
                 <div class="home-card-icon">
@@ -243,7 +278,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
 
             <?php endif; ?>
 
-            <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
+            <?php if ($isAdmin): ?>
             <!-- Check for Updates -->
             <div class="home-card" id="check-updates-card">
                 <div class="home-card-icon">
@@ -259,10 +294,10 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
         </div>
 
         <!-- DISPLAY CATEGORY -->
-        <h2 class="settings-category-title"><?php echo t_h('settings.categories.display', [], 'Display'); ?></h2>
+        <h2 class="settings-category-title"><?php echo t_h('settings.categories.display'); ?></h2>
         <div class="home-grid">
 
-            <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
+            <?php if ($isAdmin): ?>
             <!-- Login Display -->
             <div class="home-card" id="login-display-card">
                 <div class="home-card-icon">
@@ -356,15 +391,6 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                 </div>
             </div>
 
-            <!-- Kanban on Folder Click -->
-            <div class="home-card" id="kanban-folder-click-card">
-                <div class="home-card-icon"><i class="fal fa-columns"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.kanban_on_folder_click', [], 'Open Kanban view on folder click'); ?></span>
-                    <span id="kanban-folder-click-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
-                </div>
-            </div>
-
             <!-- Notes Without Folders Position -->
             <div class="home-card" id="notes-without-folders-card">
                 <div class="home-card-icon"><i class="fas fa-folder-tree"></i></div>
@@ -386,7 +412,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
         </div>
 
         <!-- ABOUT CATEGORY -->
-        <h2 class="settings-category-title"><?php echo t_h('settings.categories.about', [], 'About'); ?></h2>
+        <h2 class="settings-category-title"><?php echo t_h('settings.categories.about'); ?></h2>
         <div class="home-grid">
 
             <!-- Version -->
@@ -410,7 +436,7 @@ if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                 </div>
             </div>
 
-            <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
+            <?php if ($isAdmin): ?>
             <!-- API Documentation -->
             <div class="home-card" id="api-docs-card">
                 <div class="home-card-icon">

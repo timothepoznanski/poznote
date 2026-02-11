@@ -3,22 +3,10 @@
  * Replaces standard alert() and confirm() with styled modals
  */
 
-function tr(key, vars, fallback) {
-    try {
-        if (typeof window !== 'undefined' && typeof window.t === 'function') {
-            return window.t(key, vars || {}, fallback);
-        }
-    } catch (e) {
-        // ignore
-    }
-    let text = (fallback !== undefined && fallback !== null) ? String(fallback) : String(key);
-    if (vars && typeof vars === 'object') {
-        Object.keys(vars).forEach((k) => {
-            text = text.replaceAll('{{' + k + '}}', String(vars[k]));
-        });
-    }
-    return text;
-}
+// Use global translation function from globals.js
+var tr = window.t || function(key, vars, fallback) {
+    return fallback || key;
+};
 
 class ModalAlert {
     constructor() {
@@ -297,9 +285,9 @@ window.alert = function(message) {
     return window.modalAlert.alert(message, 'info');
 };
 
-window.confirm = function(message) {
-    return window.modalAlert.confirm(message);
-};
+// Note: window.confirm is NOT overridden because modalAlert.confirm() returns
+// a Promise (always truthy), which would break all synchronous if(confirm(...)) callers.
+// Use window.modalAlert.confirm(message).then(...) for async confirmations.
 
 // Convenience functions
 window.showWarning = function(message, title = null) {

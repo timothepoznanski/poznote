@@ -2,6 +2,8 @@
 require 'auth.php';
 requireAuth();
 
+require_once 'functions.php';
+
 header('Content-Type: application/json');
 
 $currentUser = getCurrentUser();
@@ -10,21 +12,21 @@ $user_id = $currentUser['id'];
 // Get workspace from request (GET, POST, or DELETE body)
 $workspace = null;
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $workspace = isset($_GET['workspace']) ? $_GET['workspace'] : null;
+    $workspace = $_GET['workspace'] ?? null;
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $workspace = isset($_POST['workspace']) ? $_POST['workspace'] : null;
+    $workspace = $_POST['workspace'] ?? null;
 } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-    // For DELETE, try to parse from query string or body
-    $workspace = isset($_GET['workspace']) ? $_GET['workspace'] : null;
+    $workspace = $_GET['workspace'] ?? null;
     if (!$workspace) {
         parse_str(file_get_contents('php://input'), $delete_params);
-        $workspace = isset($delete_params['workspace']) ? $delete_params['workspace'] : null;
+        $workspace = $delete_params['workspace'] ?? null;
     }
 }
 
 // Sanitize workspace name for filesystem use
 if ($workspace) {
-    $workspace = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $workspace);
+    // Allow letters (including accented), digits, underscore, and hyphen. Replace others with underscore.
+    $workspace = preg_replace('/[^\p{L}0-9_\-]/u', '_', $workspace);
 } else {
     $workspace = 'default';
 }
@@ -34,25 +36,19 @@ $user_dir = __DIR__ . '/data/users/' . $user_id;
 $backgrounds_dir = $user_dir . '/backgrounds';
 $workspace_backgrounds_dir = $backgrounds_dir . '/' . $workspace;
 
-if (!file_exists($user_dir)) {
-    if (!mkdir($user_dir, 0755, true)) {
-        echo json_encode(['success' => false, 'error' => 'Failed to create user directory: ' . $user_dir]);
-        exit;
-    }
+if (!createDirectoryWithPermissions($user_dir)) {
+    echo json_encode(['success' => false, 'error' => 'Failed to create user directory: ' . $user_dir]);
+    exit;
 }
 
-if (!file_exists($backgrounds_dir)) {
-    if (!mkdir($backgrounds_dir, 0755, true)) {
-        echo json_encode(['success' => false, 'error' => 'Failed to create backgrounds directory: ' . $backgrounds_dir]);
-        exit;
-    }
+if (!createDirectoryWithPermissions($backgrounds_dir)) {
+    echo json_encode(['success' => false, 'error' => 'Failed to create backgrounds directory: ' . $backgrounds_dir]);
+    exit;
 }
 
-if (!file_exists($workspace_backgrounds_dir)) {
-    if (!mkdir($workspace_backgrounds_dir, 0755, true)) {
-        echo json_encode(['success' => false, 'error' => 'Failed to create workspace backgrounds directory: ' . $workspace_backgrounds_dir]);
-        exit;
-    }
+if (!createDirectoryWithPermissions($workspace_backgrounds_dir)) {
+    echo json_encode(['success' => false, 'error' => 'Failed to create workspace backgrounds directory: ' . $workspace_backgrounds_dir]);
+    exit;
 }
 
 // Handle upload

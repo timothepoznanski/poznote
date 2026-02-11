@@ -1,0 +1,54 @@
+/**
+ * Notes - Editor UI
+ *
+ * Styles for input fields, note title (.css-title),
+ * horizontal rule, and last updated timestamp.
+ */
+
+/* Input Styles */
+input {
+    width: 100%;
+    border: 0px;
+    text-overflow: ellipsis;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+    width: auto;
+}
+
+/* CSS Title */
+.css-title {
+    margin-top: 15px;
+    margin-bottom: 20px;
+    margin-left: -3px;
+    font-size: 24px;
+    font-weight: 600;
+    color: #37352F;
+    font-family: 'Inter', sans-serif;
+}
+
+.css-title:focus {
+    border: none !important;
+    outline: none;
+    box-shadow: none;
+}
+
+/* Horizontal Rule */
+hr {
+    margin: 0;
+    border-top: 1px solid #ccc;
+}
+
+/* Last Updated Dates */
+.lastupdated {
+    float: none;
+    margin-right: auto;
+    margin-left: 0;
+    font-size: 14px;
+    font-family: 'Inter' !important;
+    font-style: italic;
+    font-weight: 400;
+    margin-top: 7px;
+    color: rgb(51, 51, 51) !important;
+}

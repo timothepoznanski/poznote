@@ -9,11 +9,6 @@ document.addEventListener('DOMContentLoaded', function() {
         searchInput.addEventListener('input', function() {
             filterTags();
         });
-        
-        // Also add keyup event for better mobile compatibility
-        searchInput.addEventListener('keyup', function() {
-            filterTags();
-        });
     }
     
     // Attach back button event listener

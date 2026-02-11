@@ -1,9 +1,4 @@
 <?php
-// // Enable error logging (but not display to avoid header issues)
-// error_reporting(E_ALL);
-// ini_set('log_errors', 1);
-// ini_set('display_errors', 0);
-
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/functions.php';
 require_once __DIR__ . '/oidc.php';

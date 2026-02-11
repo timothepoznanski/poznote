@@ -1,0 +1,204 @@
+/**
+ * Home - Cards
+ *
+ * Styles for home page cards including base card, hover/loading states,
+ * card icon, color variants (blue default, red/logout, orange, green),
+ * special icon colors (shared, favorites, trash, kanban),
+ * and card content (title, description, count).
+ */
+
+/* Card base */
+.home-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 12px 16px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.home-card.is-loading {
+    pointer-events: none;
+    opacity: 0.7;
+    cursor: default;
+}
+
+.home-card:hover {
+    border-color: #007DB8;
+    box-shadow: 0 4px 12px rgba(0, 125, 184, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Card icon (blue default) */
+.home-card-icon {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 125, 184, 0.1);
+    border-radius: 8px;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.home-card-icon i {
+    font-size: 18px;
+    color: #007DB8;
+    font-style: normal;
+}
+
+/* Red cards (logout + red variant — merged, identical styles) */
+.home-card-logout .home-card-icon,
+.home-card-red .home-card-icon {
+    background: rgba(239, 68, 68, 0.12);
+}
+
+.home-card-logout .home-card-icon i,
+.home-card-red .home-card-icon i {
+    color: #ef4444;
+}
+
+html[data-theme='dark'] .home-card-logout .home-card-icon,
+body.dark-mode .home-card-logout .home-card-icon,
+html[data-theme='dark'] .home-card-red .home-card-icon,
+body.dark-mode .home-card-red .home-card-icon {
+    background: rgba(239, 68, 68, 0.22);
+}
+
+.home-card-logout:hover,
+.home-card-red:hover {
+    border-color: #ef4444;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+}
+
+/* Orange cards (Settings) */
+.home-card-orange .home-card-icon {
+    background: rgba(245, 158, 11, 0.12);
+}
+
+.home-card-orange .home-card-icon i {
+    color: #f59e0b;
+}
+
+html[data-theme='dark'] .home-card-orange .home-card-icon,
+body.dark-mode .home-card-orange .home-card-icon {
+    background: rgba(245, 158, 11, 0.22);
+}
+
+.home-card-orange:hover {
+    border-color: #f59e0b;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+}
+
+/* Green cards (Sync) */
+.home-card-green {
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    margin: 0;
+    font-size: inherit;
+    font-family: inherit;
+    color: inherit;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.home-card-green .home-card-icon {
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.home-card-green .home-card-icon i {
+    color: #10b981;
+}
+
+.home-card-green:hover {
+    border-color: #10b981;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+}
+
+html[data-theme='dark'] .home-card-green,
+body.dark-mode .home-card-green {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+html[data-theme='dark'] .home-card-green .home-card-icon,
+body.dark-mode .home-card-green .home-card-icon {
+    background: rgba(16, 185, 129, 0.2);
+}
+
+/* Special icon colors — shared & kanban (Poznote blue) */
+.home-card-icon-shared {
+    background: rgba(0, 125, 184, 0.1);
+}
+
+.home-card-icon-shared i,
+.home-card-icon-kanban i {
+    color: #007DB8;
+    transition: color 0.15s ease;
+}
+
+.home-card:hover .home-card-icon-shared i,
+.home-card:hover .home-card-icon-kanban i {
+    color: #0099e6 !important;
+}
+
+/* Favorites icon (yellow) */
+.home-card-icon-favorites {
+    background: rgba(255, 193, 7, 0.1);
+}
+
+.home-card-icon-favorites i {
+    color: #ffc107;
+    transition: color 0.15s ease;
+}
+
+.home-card:hover .home-card-icon-favorites i {
+    color: #ffb300 !important;
+}
+
+/* Trash icon (orange) */
+.home-card-icon-trash {
+    background: rgba(255, 152, 0, 0.1);
+}
+
+.home-card-icon-trash i {
+    color: #ff9800;
+    transition: color 0.15s ease;
+}
+
+.home-card:hover .home-card-icon-trash i {
+    color: #fb8c00 !important;
+}
+
+/* Card content */
+.home-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.home-card-title {
+    font-size: 16px;
+    font-weight: 400;
+    color: #1f2937;
+}
+
+.home-card-description {
+    font-size: 11px;
+    color: #dc3545;
+    font-weight: 500;
+    margin-top: 2px;
+    display: block;
+}
+
+.home-card-count {
+    font-size: 14px;
+    color: #6b7280;
+}

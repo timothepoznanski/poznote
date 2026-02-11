@@ -3,38 +3,98 @@ require 'auth.php';
 requireAuth();
 
 require_once 'config.php';
-include 'db_connect.php';
-include 'functions.php';
+require_once 'db_connect.php';
+require_once 'functions.php';
 
 // Respect optional workspace parameter
 $workspace = isset($_GET['workspace']) ? trim($_GET['workspace']) : (isset($_POST['workspace']) ? trim($_POST['workspace']) : '');
 
-// Build query to get shared folders with folder information and note count
-$select_query = "SELECT sf.id, sf.folder_id, sf.token, sf.created, sf.indexable, sf.password, 
-                 f.name as folder_name, f.icon as folder_icon,
-                 (SELECT COUNT(*) FROM entries e WHERE e.folder_id = sf.folder_id AND e.trash = 0) as note_count
-                 FROM shared_folders sf
-                 INNER JOIN folders f ON sf.folder_id = f.id";
-
-$search_params = [];
-
-// Add workspace condition if provided
+// Get all folders (filtered by workspace if needed)
+$query = "SELECT id, name, parent_id, workspace, icon FROM folders";
+$params = [];
 if (!empty($workspace)) {
-	$select_query .= " WHERE f.workspace = ?";
-	$search_params[] = $workspace;
+	$query .= " WHERE workspace = ?";
+	$params[] = $workspace;
+}
+$stmt = $con->prepare($query);
+$stmt->execute($params);
+$allFolders = [];
+while ($f = $stmt->fetch(PDO::FETCH_ASSOC)) {
+	$allFolders[$f['id']] = $f;
 }
 
-$select_query .= " ORDER BY f.name";
+// Get all entries in shared_folders
+$stmt = $con->query("SELECT * FROM shared_folders");
+$sharedEntries = [];
+while ($se = $stmt->fetch(PDO::FETCH_ASSOC)) {
+	$sharedEntries[$se['folder_id']] = $se;
+}
 
-$stmt = $con->prepare($select_query);
-$stmt->execute($search_params);
-
+// For each folder, check if it's shared directly or via ancestor
 $shared_folders = [];
-while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-	$shared_folders[] = $row;
+foreach ($allFolders as $fid => $f) {
+	$directEntry = $sharedEntries[$fid] ?? null;
+	$viaEntry = null;
+	
+	// Check ancestors
+	$curr = $f;
+	$maxDepth = 20;
+	$depth = 0;
+	while ($curr['parent_id'] !== null && $depth < $maxDepth) {
+		$parentId = $curr['parent_id'];
+		if (isset($sharedEntries[$parentId])) {
+			$viaEntry = $sharedEntries[$parentId];
+			break;
+		}
+		if (!isset($allFolders[$parentId])) {
+			// Parent might be in another workspace or not loaded? 
+			// Attempt to fetch it if not in allFolders
+			$stmtP = $con->prepare("SELECT id, name, parent_id, workspace, icon FROM folders WHERE id = ?");
+			$stmtP->execute([$parentId]);
+			$pCell = $stmtP->fetch(PDO::FETCH_ASSOC);
+			if ($pCell) {
+				if (isset($sharedEntries[$pCell['id']])) {
+					$viaEntry = $sharedEntries[$pCell['id']];
+					break;
+				}
+				$curr = $pCell;
+			} else {
+				break;
+			}
+		} else {
+			$curr = $allFolders[$parentId];
+		}
+		$depth++;
+	}
+	
+	if ($directEntry || $viaEntry) {
+		$entry = $directEntry ?: $viaEntry;
+		// Count notes in THIS folder
+		$stmtNote = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder_id = ? AND trash = 0");
+		$stmtNote->execute([$fid]);
+		$noteCount = $stmtNote->fetchColumn();
+		
+		$shared_folders[] = [
+			'id' => $directEntry ? $directEntry['id'] : null,
+			'folder_id' => $fid,
+			'token' => $entry['token'],
+			'created' => $entry['created'],
+			'indexable' => $entry['indexable'],
+			'password' => $entry['password'],
+			'folder_name' => $f['name'],
+			'folder_icon' => $f['icon'],
+			'note_count' => $noteCount,
+			'is_direct' => (bool)$directEntry,
+			'shared_via_name' => $viaEntry ? ($allFolders[$viaEntry['folder_id']]['name'] ?? 'Parent') : null,
+			'folder_path' => getFolderPath($fid, $con)
+		];
+	}
 }
 
-$count_shared_folders = count($shared_folders);
+// Sort by path
+usort($shared_folders, function($a, $b) {
+	return strcasecmp($a['folder_path'], $b['folder_path']);
+});
 
 $currentLang = getUserLanguage();
 ?>
@@ -48,10 +108,34 @@ $currentLang = getUserLanguage();
 	<meta name="color-scheme" content="dark light">
 	<script src="js/theme-init.js"></script>
 	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
+	<link type="text/css" rel="stylesheet" href="css/solid.min.css"/>
+	<link type="text/css" rel="stylesheet" href="css/regular.min.css"/>
+	<link type="text/css" rel="stylesheet" href="css/brands.min.css"/>
 	<link type="text/css" rel="stylesheet" href="css/light.min.css"/>
-	<link type="text/css" rel="stylesheet" href="css/modals.css"/>
-	<link type="text/css" rel="stylesheet" href="css/shared.css"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/base.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/attachments.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/link-modal.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/share-modal.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/alerts-utilities.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/responsive.css"/>
+	<link type="text/css" rel="stylesheet" href="css/shared/base.css"/>
+	<link type="text/css" rel="stylesheet" href="css/shared/notes-list.css"/>
+	<link type="text/css" rel="stylesheet" href="css/shared/buttons-modal.css"/>
+	<link type="text/css" rel="stylesheet" href="css/shared/folders-grid.css"/>
+	<link type="text/css" rel="stylesheet" href="css/shared/fontawesome.css"/>
+	<link type="text/css" rel="stylesheet" href="css/shared/dark-mode.css"/>
+	<link type="text/css" rel="stylesheet" href="css/shared/responsive.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/menus.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/editor.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/modals.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/components.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/pages.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css"/>
 	<script src="js/theme-manager.js"></script>
 </head>
 <body class="shared-page" 
@@ -106,54 +190,53 @@ $currentLang = getUserLanguage();
 				echo '</div>';
 			} else {
 			foreach($shared_folders as $folder) {
-				$folder_id = htmlspecialchars($folder['folder_id'], ENT_QUOTES);
-				$folder_name = htmlspecialchars($folder['folder_name'], ENT_QUOTES);
+				$folder_id = htmlspecialchars($folder['folder_id'] ?? '', ENT_QUOTES);
+				$folder_name = htmlspecialchars($folder['folder_name'] ?? '', ENT_QUOTES);
+				$folder_path = htmlspecialchars($folder['folder_path'] ?? '', ENT_QUOTES);
 				$folder_icon = !empty($folder['folder_icon']) ? htmlspecialchars($folder['folder_icon'], ENT_QUOTES) : 'fa-folder';
-				$token = htmlspecialchars($folder['token'], ENT_QUOTES);
+				$token = htmlspecialchars($folder['token'] ?? '', ENT_QUOTES);
 				$has_password = !empty($folder['password']);
 				$indexable = (int)$folder['indexable'] === 1;
 				$note_count = (int)$folder['note_count'];
+				$is_direct = $folder['is_direct'] ?? false;
+				$shared_via_name = htmlspecialchars($folder['shared_via_name'] ?? '', ENT_QUOTES);
 				
 				// Build public URL
-				$base_url = getBaseUrl();
-				$public_url = $base_url . '/folder/' . urlencode($folder['token']);
+				// Use relative URL to avoid issues with incorrect base URL detection behind proxies
+				$public_url = '/folder/' . urlencode($folder['token']);
 				
-				echo '<div class="shared-note-item shared-folder-row" data-folder-id="' . $folder_id . '" data-folder-name="' . $folder_name . '" data-has-password="' . ($has_password ? '1' : '0') . '">';
+				$rowClass = 'shared-note-item shared-folder-row';
+				if (!$is_direct) $rowClass .= ' shared-via-parent';
+
+				echo '<div class="' . $rowClass . '" data-folder-id="' . $folder_id . '" data-folder-name="' . $folder_name . '" data-has-password="' . ($has_password ? '1' : '0') . '">';
 				
 				// Folder name container
 				echo '<div class="note-name-container">';
-				echo '<span class="folder-name-text">' . $folder_name . ' (' . $note_count . ')</span>';
+				echo '<span class="folder-name-path" title="' . $folder_path . '"><i class="fas fa-folder"></i> ' . $folder_path . ' (' . $note_count . ')</span>';
 				echo '</div>';
 				
-				// Token (editable like note-token)
-				echo '<span class="note-token folder-token" contenteditable="true" data-folder-id="' . $folder_id . '" data-original-token="' . $token . '" title="' . t_h('public.edit_token', [], 'Click to edit token') . '">' . $token . '</span>';
-				
-				// Indexable toggle (like note-indexable)
-				echo '<div class="note-indexable">';
-				echo '<label class="indexable-toggle-label">';
-				echo '<span class="indexable-label-text">' . t_h('public.indexable', [], 'Indexable') . '</span>';
-				echo '<label class="toggle-switch">';
-				echo '<input type="checkbox" class="indexable-checkbox" data-folder-id="' . $folder_id . '"' . ($indexable ? ' checked' : '') . '>';
-				echo '<span class="toggle-slider"></span>';
-				echo '</label>';
-				echo '</label>';
-				echo '</div>';
+				// Token (editable if direct)
+				echo '<span class="note-token folder-token' . ($is_direct ? '' : ' read-only') . '" ' . ($is_direct ? 'contenteditable="true"' : '') . ' data-folder-id="' . $folder_id . '" data-original-token="' . $token . '" title="' . ($is_direct ? t_h('public.edit_token', [], 'Click to edit token') : '') . '">' . $token . '</span>';
 				
 				// Actions (like note-actions)
 				echo '<div class="note-actions">';
 				
 				// Password button
-				if ($has_password) {
-					echo '<button class="btn btn-sm btn-password" data-folder-id="' . $folder_id . '" data-has-password="1" title="' . t_h('public.password_protected', [], 'Password protected') . '"><i class="fa-lock"></i></button>';
-				} else {
-					echo '<button class="btn btn-sm btn-password" data-folder-id="' . $folder_id . '" data-has-password="0" title="' . t_h('public.add_password_title', [], 'Add password protection') . '"><i class="fa-lock-open"></i></button>';
+				if ($is_direct) {
+					if ($has_password) {
+						echo '<button class="btn btn-sm btn-password" data-folder-id="' . $folder_id . '" data-has-password="1" title="' . t_h('public.password_protected', [], 'Password protected') . '"><i class="fa-lock"></i></button>';
+					} else {
+						echo '<button class="btn btn-sm btn-password" data-folder-id="' . $folder_id . '" data-has-password="0" title="' . t_h('public.add_password_title', [], 'Add password protection') . '"><i class="fa-lock-open"></i></button>';
+					}
 				}
 				
 				// Open button
 				echo '<button class="btn btn-sm btn-secondary btn-open" data-url="' . htmlspecialchars($public_url, ENT_QUOTES) . '" title="' . t_h('public.actions.open', [], 'Open public view') . '"><i class="fa-external-link"></i></button>';
 				
 				// Revoke button
-				echo '<button class="btn btn-sm btn-danger btn-revoke" data-folder-id="' . $folder_id . '" title="' . t_h('public.actions.revoke', [], 'Revoke') . '"><i class="fa-ban"></i></button>';
+				if ($is_direct) {
+					echo '<button class="btn btn-sm btn-danger btn-revoke" data-folder-id="' . $folder_id . '" title="' . t_h('public.actions.revoke', [], 'Revoke') . '"><i class="fa-ban"></i></button>';
+				}
 				
 				echo '</div>';
 				echo '</div>';

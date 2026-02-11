@@ -9,57 +9,27 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
     header('Content-Type: text/html; charset=utf-8');
 }
 
-// Enable error reporting but capture it to avoid breaking JSON/HTML structure if possible, 
-// though here we output HTML so it's fine.
-ini_set('display_errors', 1);
+// Enable error logging (not display, to avoid breaking HTML output)
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 error_reporting(E_ALL);
 
 try {
     // 1. Authentication
-    if (!file_exists('auth.php')) {
-        throw new Exception('auth.php not found');
-    }
     require 'auth.php';
-    
-    // Check authentication
-    if (!function_exists('requireAuth')) {
-        throw new Exception('requireAuth function not found');
-    }
     requireAuth();
-    
-    // 2. Configuration and Includes
-    if (!file_exists('config.php')) throw new Exception('config.php not found');
-    require_once 'config.php';
-    
-    if (!file_exists('functions.php')) throw new Exception('functions.php not found');
-    include 'functions.php';
-    
-    if (file_exists('version_helper.php')) {
-        require_once 'version_helper.php';
-    }
-    
-    if (!file_exists('db_connect.php')) throw new Exception('db_connect.php not found');
-    include 'db_connect.php';
-    
-    // 3. Helper Functions Fallback
-    if (!function_exists('t')) {
-        function t($key, $params = [], $fallback = null) {
-            return $fallback ?? $key;
-        }
-    }
-    if (!function_exists('t_h')) {
-        function t_h($key, $params = [], $fallback = null) {
-            return htmlspecialchars(t($key, $params, $fallback), ENT_QUOTES, 'UTF-8');
-        }
-    }
 
-    // 4. Input Validation
+    // 2. Configuration and Includes
+    require_once 'config.php';
+    include 'functions.php';
+    include 'db_connect.php';
+
+    // 3. Input Validation
     $folder_id = intval($_GET['folder_id'] ?? 0);
     $workspace_filter = $_GET['workspace'] ?? '';
 
     if (!$folder_id) {
         throw new Exception('Invalid folder ID');
-        exit;
     }
 
     if (!isset($con)) {
@@ -86,28 +56,32 @@ try {
     $stmt->execute([$folder_id]);
     $parentNotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Load entry snippets for parent notes
-    foreach ($parentNotes as &$note) {
+    /**
+     * Load a text snippet for a note (resolves linked notes).
+     * Modifies the note array in-place, adding an 'entry' key.
+     */
+    $loadNoteSnippet = function (&$note) use ($con) {
         // For linked notes, load the target note's content
         if (($note['type'] ?? 'note') === 'linked' && !empty($note['linked_note_id'])) {
             $targetStmt = $con->prepare("SELECT type FROM entries WHERE id = ?");
             $targetStmt->execute([$note['linked_note_id']]);
             $targetNote = $targetStmt->fetch(PDO::FETCH_ASSOC);
-            if ($targetNote) {
-                $filename = getEntryFilename($note['linked_note_id'], $targetNote['type'] ?? 'note');
-            } else {
-                $filename = '';
-            }
+            $filename = $targetNote ? getEntryFilename($note['linked_note_id'], $targetNote['type'] ?? 'note') : '';
         } else {
             $filename = getEntryFilename($note['id'], $note['type'] ?? 'note');
         }
-        
+
         if ($filename && file_exists($filename)) {
             $content = file_get_contents($filename);
             $note['entry'] = mb_substr(strip_tags($content), 0, 150);
         } else {
             $note['entry'] = '';
         }
+    };
+
+    // Load entry snippets for parent notes
+    foreach ($parentNotes as &$note) {
+        $loadNoteSnippet($note);
     }
     unset($note);
 
@@ -118,32 +92,64 @@ try {
         $stmt->execute([$subfolder['id']]);
         $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        // Load entry snippets
         foreach ($notes as &$note) {
-            // For linked notes, load the target note's content
-            if (($note['type'] ?? 'note') === 'linked' && !empty($note['linked_note_id'])) {
-                $targetStmt = $con->prepare("SELECT type FROM entries WHERE id = ?");
-                $targetStmt->execute([$note['linked_note_id']]);
-                $targetNote = $targetStmt->fetch(PDO::FETCH_ASSOC);
-                if ($targetNote) {
-                    $filename = getEntryFilename($note['linked_note_id'], $targetNote['type'] ?? 'note');
-                } else {
-                    $filename = '';
-                }
-            } else {
-                $filename = getEntryFilename($note['id'], $note['type'] ?? 'note');
-            }
-            
-            if ($filename && file_exists($filename)) {
-                $content = file_get_contents($filename);
-                $note['entry'] = mb_substr(strip_tags($content), 0, 150);
-            } else {
-                $note['entry'] = '';
-            }
+            $loadNoteSnippet($note);
         }
         unset($note);
         
         $subfolderNotes[$subfolder['id']] = $notes;
+    }
+
+    /**
+     * Render a single kanban card HTML for a note.
+     */
+    function renderKanbanCard($note, $folderId) {
+        ?>
+        <div class="kanban-card" 
+             data-note-id="<?php echo $note['id']; ?>" 
+             data-folder-id="<?php echo $folderId; ?>"
+             draggable="true">
+            <?php if (!empty($note['tags'])): ?>
+            <div class="kanban-card-tags">
+                <?php 
+                $tags = explode(',', $note['tags']);
+                foreach ($tags as $tag): 
+                    $tag = trim($tag);
+                    if ($tag === '') continue;
+                ?>
+                    <span class="kanban-tag"><?php echo htmlspecialchars($tag, ENT_QUOTES); ?></span>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+
+            <div class="kanban-card-meta">
+                <span class="kanban-card-date">
+                    <?php 
+                    $updated = $note['updated'] ?? '';
+                    if ($updated) {
+                        $dt = new DateTime($updated);
+                        echo $dt->format('d/m H:i');
+                    }
+                    ?>
+                </span>
+            </div>
+
+            <div class="kanban-card-title">
+                <?php 
+                $noteTitle = $note['heading'] ?: t('index.note.new_note', [], 'New note');
+                echo htmlspecialchars($noteTitle, ENT_QUOTES); 
+                ?>
+            </div>
+
+            <div class="kanban-card-snippet">
+                <?php 
+                $snippet = strip_tags($note['entry'] ?? '');
+                $snippet = html_entity_decode($snippet);
+                echo htmlspecialchars(mb_substr($snippet, 0, 80) . (mb_strlen($snippet) > 80 ? '...' : ''), ENT_QUOTES);
+                ?>
+            </div>
+        </div>
+        <?php
     }
 
     // 6. Output HTML
@@ -170,8 +176,18 @@ try {
             </h1>
         </div>
 
-        <!-- Kanban Board -->
-        <div class="kanban-board" id="kanbanBoard">
+        <!-- Kanban Board Wrapper -->
+        <div class="kanban-board-wrapper">
+            <!-- Scroll Buttons -->
+            <button class="kanban-scroll-btn left" id="kanbanScrollLeft" title="<?php echo t_h('common.scroll_left', [], 'Scroll Left'); ?>">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="kanban-scroll-btn right" id="kanbanScrollRight" title="<?php echo t_h('common.scroll_right', [], 'Scroll Right'); ?>">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <!-- Kanban Board -->
+            <div class="kanban-board" id="kanbanBoard">
             
             <?php if (!empty($parentNotes)): ?>
             <!-- Column for notes directly in parent folder -->
@@ -184,50 +200,7 @@ try {
                 </div>
                 <div class="kanban-column-content" data-folder-id="<?php echo $folder_id; ?>">
                     <?php foreach ($parentNotes as $note): ?>
-                    <div class="kanban-card" 
-                         data-note-id="<?php echo $note['id']; ?>" 
-                         data-folder-id="<?php echo $folder_id; ?>"
-                         draggable="true">
-                        <?php if (!empty($note['tags'])): ?>
-                        <div class="kanban-card-tags">
-                            <?php 
-                            $tags = explode(',', $note['tags']);
-                            foreach ($tags as $tag): 
-                                $tag = trim($tag);
-                                if ($tag === '') continue;
-                            ?>
-                                <span class="kanban-tag"><?php echo htmlspecialchars($tag, ENT_QUOTES); ?></span>
-                            <?php endforeach; ?>
-                        </div>
-                        <?php endif; ?>
-
-                        <div class="kanban-card-meta">
-                            <span class="kanban-card-date">
-                                <?php 
-                                $updated = $note['updated'] ?? '';
-                                if ($updated) {
-                                    $dt = new DateTime($updated);
-                                    echo $dt->format('d/m H:i');
-                                }
-                                ?>
-                            </span>
-                        </div>
-
-                        <div class="kanban-card-title">
-                            <?php 
-                            $noteTitle = $note['heading'] ?: t('index.note.new_note', [], 'New note');
-                            echo htmlspecialchars($noteTitle, ENT_QUOTES); 
-                            ?>
-                        </div>
-
-                        <div class="kanban-card-snippet">
-                            <?php 
-                            $snippet = strip_tags($note['entry'] ?? '');
-                            $snippet = html_entity_decode($snippet);
-                            echo htmlspecialchars(mb_substr($snippet, 0, 80) . (mb_strlen($snippet) > 80 ? '...' : ''), ENT_QUOTES);
-                            ?>
-                        </div>
-                    </div>
+                    <?php renderKanbanCard($note, $folder_id); ?>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -258,50 +231,7 @@ try {
                 </div>
                 <div class="kanban-column-content" data-folder-id="<?php echo $subfolder['id']; ?>">
                     <?php foreach ($subfolderNotes[$subfolder['id']] ?? [] as $note): ?>
-                    <div class="kanban-card" 
-                         data-note-id="<?php echo $note['id']; ?>" 
-                         data-folder-id="<?php echo $subfolder['id']; ?>"
-                         draggable="true">
-                        <?php if (!empty($note['tags'])): ?>
-                        <div class="kanban-card-tags">
-                            <?php 
-                            $tags = explode(',', $note['tags']);
-                            foreach ($tags as $tag): 
-                                $tag = trim($tag);
-                                if ($tag === '') continue;
-                            ?>
-                                <span class="kanban-tag"><?php echo htmlspecialchars($tag, ENT_QUOTES); ?></span>
-                            <?php endforeach; ?>
-                        </div>
-                        <?php endif; ?>
-
-                        <div class="kanban-card-meta">
-                            <span class="kanban-card-date">
-                                <?php 
-                                $updated = $note['updated'] ?? '';
-                                if ($updated) {
-                                    $dt = new DateTime($updated);
-                                    echo $dt->format('d/m H:i');
-                                }
-                                ?>
-                            </span>
-                        </div>
-
-                        <div class="kanban-card-title">
-                            <?php 
-                            $noteTitle = $note['heading'] ?: t('index.note.new_note', [], 'New note');
-                            echo htmlspecialchars($noteTitle, ENT_QUOTES); 
-                            ?>
-                        </div>
-
-                        <div class="kanban-card-snippet">
-                            <?php 
-                            $snippet = strip_tags($note['entry'] ?? '');
-                            $snippet = html_entity_decode($snippet);
-                            echo htmlspecialchars(mb_substr($snippet, 0, 80) . (mb_strlen($snippet) > 80 ? '...' : ''), ENT_QUOTES);
-                            ?>
-                        </div>
-                    </div>
+                    <?php renderKanbanCard($note, $subfolder['id']); ?>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -315,6 +245,7 @@ try {
             </div>
             <?php endif; ?>
 
+            </div>
         </div>
     </div>
     

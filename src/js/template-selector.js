@@ -4,22 +4,10 @@
 (function() {
     'use strict';
 
-    function tr(key, vars, fallback) {
-        try {
-            if (typeof window !== 'undefined' && typeof window.t === 'function') {
-                return window.t(key, vars || {}, fallback);
-            }
-        } catch (e) {
-            // ignore
-        }
-        let text = (fallback !== undefined && fallback !== null) ? String(fallback) : String(key);
-        if (vars && typeof vars === 'object') {
-            Object.keys(vars).forEach((k) => {
-                text = text.replaceAll('{{' + k + '}}', String(vars[k]));
-            });
-        }
-        return text;
-    }
+    // Use global translation function from globals.js
+    const tr = window.t || function(key, vars, fallback) {
+        return fallback || key;
+    };
 
     // Track recently opened notes in localStorage
     const RECENT_NOTES_KEY = 'poznote_recent_notes';

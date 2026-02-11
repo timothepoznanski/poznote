@@ -1,0 +1,315 @@
+/**
+ * Layout Styles
+ * 
+ * Main layout structure including left column, right column,
+ * resize handles, sidebar toggle, and responsive layout controls.
+ */
+
+/* LEFT COLUMN */
+
+
+body {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden !important;
+    /* Prevent double scrollbars */
+    min-width: 0;
+    min-height: 0;
+}
+
+.main-container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+}
+
+#left_col {
+    width: var(--left-col-width);
+    min-width: 200px;
+    max-width: 800px;
+    height: 100vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    padding: 6px 16px 16px 16px;
+    box-sizing: border-box;
+    background: #f8f9fa;
+    flex-shrink: 0;
+    /* Hide scrollbars but keep scroll functionality for all screen sizes */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+#left_col::-webkit-scrollbar {
+    display: none;
+}
+
+
+
+
+/* Sidebar header and primary action */
+.sidebar-header {
+    /* padding: 6px 0 14px 0; */
+    margin-bottom: 6px;
+}
+
+.sidebar-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 2px;
+    position: relative;
+    /* anchor dropdown menus inside the title row */
+}
+
+.sidebar-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    /* dark */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.workspace-burger-icon {
+    font-size: 1.1rem;
+    color: #6c757d;
+    pointer-events: none;
+}
+
+.workspace-dropdown-icon {
+    margin-left: 1px;
+    font-size: 0.9rem;
+    color: #6c757d;
+    pointer-events: none;
+    transition: transform 0.2s ease;
+    position: relative;
+    top: 2px;
+}
+
+.workspace-title-icon {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+
+.workspace-title-text {
+    vertical-align: middle;
+    flex: 1;
+}
+
+.sidebar-title[role="button"] {
+    cursor: pointer;
+}
+
+.sidebar-title-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+}
+
+.sidebar-home {
+    background: transparent;
+    border: none;
+    color: #007DB8;
+    font-size: 1.3rem;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+}
+
+.sidebar-settings {
+    background: transparent;
+    border: none;
+    color: #007DB8;
+    font-size: 1.3rem;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    position: relative;
+}
+
+.sidebar-plus {
+    background: transparent;
+    border: none;
+    color: #6c757d !important;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+}
+
+/* Hover and focus states for sidebar buttons */
+.sidebar-home:hover,
+.sidebar-settings:hover,
+.sidebar-plus:hover {
+    background: rgba(0, 125, 184, 0.1);
+}
+
+.sidebar-home:focus,
+.sidebar-settings:focus,
+.sidebar-plus:focus {
+    outline: 2px solid #007DB8;
+    outline-offset: 2px;
+}
+
+/* RIGHT COLUMN */
+
+#right_col {
+    flex: 1;
+    min-width: 400px;
+    height: 100vh;
+    background-color: #FFFFFF;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
+}
+
+/* Toggle sidebar and collapsed state */
+
+.resize-handle {
+    width: 3px;
+    height: 100vh;
+    background: #f8f9fa;
+    cursor: col-resize;
+    position: relative;
+    flex-shrink: 0;
+    /* subtle divider line to match the mockup */
+    border-right: 1px solid #ccc;
+}
+
+/* Extend hover area for easier button access */
+.resize-handle::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -8px;
+    right: -8px;
+    bottom: 0;
+    z-index: 1;
+}
+
+/* Toggle sidebar button */
+.toggle-sidebar-btn {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 20px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.resize-handle:hover .toggle-sidebar-btn,
+.toggle-sidebar-btn:focus {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.toggle-sidebar-btn:hover {
+    background: #f8f9fa;
+    color: #007DB8;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-sidebar-btn i {
+    transition: transform 0.3s ease;
+    font-size: 0.75em;
+}
+
+/* Collapsed state */
+body.sidebar-collapsed #left_col {
+    width: 0 !important;
+    min-width: 0 !important;
+    padding: 0;
+    overflow: hidden;
+    transition: width 0.3s ease, padding 0.3s ease;
+}
+
+body.sidebar-collapsed .resize-handle {
+    cursor: default;
+}
+
+body.sidebar-collapsed .toggle-sidebar-btn {
+    left: 3px;
+    border-radius: 0 4px 4px 0;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+body.sidebar-collapsed .toggle-sidebar-btn i {
+    transform: rotate(180deg);
+}
+
+/* Smooth transition for left column */
+#left_col {
+    transition: width 0.3s ease, padding 0.3s ease;
+}
+
+/* Separator and visibility */
+
+/* Separator after Favorites to visually separate important folders */
+.favorites-separator {
+    position: relative;
+    height: 1px;
+    background: #ddd;
+    margin: 8px 6px;
+}
+
+.favorites-toggle-btn {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    border: 1px solid #ccc;
+    background: var(--bg-main, #fff);
+    border-radius: 2px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.favorites-toggle-btn:hover {
+    background: var(--bg-hover, #f0f0f0);
+    border-color: #999;
+}
+
+.favorites-toggle-btn i {
+    font-size: 8px;
+    color: var(--text-main, #333);
+}
+
+/* Hide favorites folder content when collapsed */
+.folder-header[data-folder="Favorites"].favorites-collapsed .folder-content,
+.folder-header[data-folder="Favorites"].favorites-collapsed #folder-favorites {
+    display: none !important;
+}
+
+.folder-header[data-folder="Favorites"].favorites-collapsed .folder-toggle {
+    opacity: 0.5;
+}

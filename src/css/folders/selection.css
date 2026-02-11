@@ -1,0 +1,97 @@
+/**
+ * Folder Selection & Options
+ *
+ * Folder option items, suggested folder pills, and create folder option.
+ */
+
+.suggested-folder-option {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    background-color: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #333;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.suggested-folder-option:hover {
+    background-color: #007DB8;
+    color: white;
+    border-color: #007DB8;
+}
+
+.suggested-folder-option.selected {
+    background-color: #007DB8;
+    color: white;
+    border-color: #007DB8;
+}
+
+.suggested-folder-option i {
+    margin-right: 6px;
+    font-size: 12px;
+}
+
+.folder-option {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 14px;
+    color: #333;
+}
+
+.folder-option:last-child {
+    border-bottom: none;
+}
+
+.folder-option:hover {
+    background-color: #f0f6ff;
+}
+
+.folder-option.selected {
+    background-color: #007DB8;
+    color: white;
+}
+
+.folder-option.selected:hover {
+    background-color: #005a8a;
+}
+
+.folder-option i {
+    margin-right: 10px;
+    width: 16px;
+    color: #666;
+    flex-shrink: 0;
+}
+
+.folder-option.selected i {
+    color: white;
+}
+
+/* Create folder option styling */
+.create-folder-option {
+    background-color: #f8f9ff !important;
+    border: 1px dashed #007DB8 !important;
+    margin: 5px 0;
+    border-radius: 4px;
+}
+
+.create-folder-option:hover {
+    background-color: #e8f0ff !important;
+    border-color: #0056b3 !important;
+}
+
+.create-folder-option .folder-name {
+    color: #007DB8;
+    font-weight: 500;
+}
+
+.create-folder-option i {
+    color: #007DB8 !important;
+}

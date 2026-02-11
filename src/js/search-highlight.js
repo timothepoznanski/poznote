@@ -75,66 +75,69 @@ function highlightSearchTerms() {
     }
     
     // Check if we're in notes search mode
-    var notesBtn = document.getElementById('search-notes-btn') || document.getElementById('search-notes-btn-mobile');
-    var isNotesActive = false;
-    
-    // First try to detect from buttons
-    if (notesBtn && notesBtn.classList.contains('active')) {
-        isNotesActive = true;
-    } else if (window.searchManager && typeof window.searchManager.getActiveSearchType === 'function') {
-        // Fallback when pills/buttons were removed: consult SearchManager
-        try {
-            var desktopType = window.searchManager.getActiveSearchType(false);
-            var mobileType = window.searchManager.getActiveSearchType(true);
-            if (desktopType === 'notes' || mobileType === 'notes' || window.searchManager.currentSearchType === 'notes') {
-                isNotesActive = true;
-            }
-        } catch (e) {
-            // ignore and fallthrough
-        }
-    }
-    
-    // Fallback: check hidden inputs for mobile search state
-    if (!isNotesActive) {
-        try {
-            var hiddenNotesDesktop = document.getElementById('search-in-notes')?.value === '1';
-            var hiddenNotesMobile = document.getElementById('search-in-notes-mobile')?.value === '1';
-            if (hiddenNotesDesktop || hiddenNotesMobile) {
-                isNotesActive = true;
-            }
-        } catch (e) {
-            // ignore and remain conservative
-        }
-    }
-
+    var isNotesActive = isNotesSearchActive();
     if (!isNotesActive) {
         return; // Only highlight in notes search mode
     }
-    
-    // Find all note content areas
-    var noteContents = document.querySelectorAll('.noteentry');
     
     // Clear existing highlights first
     clearSearchHighlights();
     
     // Parse search terms with support for quoted phrases
     var searchWords = parseSearchTerms(searchTerm);
-    
     if (searchWords.length === 0) return;
     
+    // Highlight in both note contents and titles
+    var elementsToHighlight = document.querySelectorAll('.noteentry, .css-title');
     var totalHighlights = 0;
     
-    for (var i = 0; i < noteContents.length; i++) {
-        var highlightCount = highlightInElement(noteContents[i], searchWords);
-        totalHighlights += highlightCount;
+    for (var i = 0; i < elementsToHighlight.length; i++) {
+        totalHighlights += highlightInElement(elementsToHighlight[i], searchWords);
+    }
+}
+
+/**
+ * Check if notes search mode is currently active
+ * @returns {boolean} True if in notes search mode
+ */
+function isNotesSearchActive() {
+    // Method 1: Check button state
+    var notesBtn = document.getElementById('search-notes-btn') || document.getElementById('search-notes-btn-mobile');
+    if (notesBtn && notesBtn.classList.contains('active')) {
+        return true;
     }
     
-    // Also highlight in note titles
-    var noteTitles = document.querySelectorAll('.css-title');
-    for (var i = 0; i < noteTitles.length; i++) {
-        var highlightCount = highlightInElement(noteTitles[i], searchWords);
-        totalHighlights += highlightCount;
+    // Method 2: Check SearchManager if available
+    if (window.searchManager) {
+        try {
+            if (typeof window.searchManager.getActiveSearchType === 'function') {
+                var desktopType = window.searchManager.getActiveSearchType(false);
+                var mobileType = window.searchManager.getActiveSearchType(true);
+                if (desktopType === 'notes' || mobileType === 'notes') {
+                    return true;
+                }
+            }
+            if (window.searchManager.currentSearchType === 'notes') {
+                return true;
+            }
+        } catch (e) {
+            // Ignore errors and continue to next method
+        }
     }
+    
+    // Method 3: Check hidden input fields
+    try {
+        var hiddenNotesDesktop = document.getElementById('search-in-notes');
+        var hiddenNotesMobile = document.getElementById('search-in-notes-mobile');
+        if ((hiddenNotesDesktop && hiddenNotesDesktop.value === '1') || 
+            (hiddenNotesMobile && hiddenNotesMobile.value === '1')) {
+            return true;
+        }
+    } catch (e) {
+        // Ignore errors
+    }
+    
+    return false;
 }
 
 /**
@@ -221,11 +224,11 @@ function highlightInElement(element, searchWords) {
                 // Sort matches by position and remove overlaps
                 matches.sort(function(a, b) { return a.start - b.start; });
                 var cleanedMatches = [];
-                for (var i = 0; i < matches.length; i++) {
-                    var match = matches[i];
+                for (var matchIdx = 0; matchIdx < matches.length; matchIdx++) {
+                    var match = matches[matchIdx];
                     var overlap = false;
-                    for (var j = 0; j < cleanedMatches.length; j++) {
-                        if (match.start < cleanedMatches[j].end && match.end > cleanedMatches[j].start) {
+                    for (var cleanIdx = 0; cleanIdx < cleanedMatches.length; cleanIdx++) {
+                        if (match.start < cleanedMatches[cleanIdx].end && match.end > cleanedMatches[cleanIdx].start) {
                             overlap = true;
                             break;
                         }
@@ -238,8 +241,8 @@ function highlightInElement(element, searchWords) {
                 // Build the highlighted HTML
                 var tempDiv = document.createElement('div');
                 lastIndex = 0;
-                for (var i = 0; i < cleanedMatches.length; i++) {
-                    var match = cleanedMatches[i];
+                for (var matchIdx = 0; matchIdx < cleanedMatches.length; matchIdx++) {
+                    var match = cleanedMatches[matchIdx];
                     // Add text before match
                     if (match.start > lastIndex) {
                         tempDiv.appendChild(document.createTextNode(text.substring(lastIndex, match.start)));
@@ -247,7 +250,7 @@ function highlightInElement(element, searchWords) {
                     // Add highlighted match
                     var span = document.createElement('span');
                     span.className = 'search-highlight';
-                    span.style.cssText = 'background-color: #ffff00 !important; color: #000 !important; font-weight: normal !important; font-family: inherit !important;';
+                    // We remove inline styles to allow CSS classes to handle the color
                     span.textContent = text.substring(match.start, match.end);
                     tempDiv.appendChild(span);
                     highlightCount++;
@@ -268,11 +271,11 @@ function highlightInElement(element, searchWords) {
         } else if (node.nodeType === 1 && !node.classList.contains('search-highlight')) { // Node.ELEMENT_NODE
             // Process child nodes (but don't process already highlighted spans)
             var children = [];
-            for (var i = 0; i < node.childNodes.length; i++) {
-                children.push(node.childNodes[i]);
+            for (var childIdx = 0; childIdx < node.childNodes.length; childIdx++) {
+                children.push(node.childNodes[childIdx]);
             }
-            for (var i = 0; i < children.length; i++) {
-                processTextNodes(children[i]);
+            for (var childIdx = 0; childIdx < children.length; childIdx++) {
+                processTextNodes(children[childIdx]);
             }
         }
     }
@@ -285,6 +288,12 @@ function highlightInElement(element, searchWords) {
  * Clear all search highlights
  */
 function clearSearchHighlights() {
+    // Reset navigation state
+    if (window.searchNavigation) {
+        window.searchNavigation.currentHighlightIndex = -1;
+        window.searchNavigation.highlights = [];
+    }
+
     var highlights = document.querySelectorAll('.search-highlight');
     for (var i = 0; i < highlights.length; i++) {
         var highlight = highlights[i];
@@ -314,11 +323,6 @@ function clearSearchHighlights() {
         inputsWithListeners[i].removeAttribute('data-overlay-listener');
         // Note: We don't remove the event listener as it's anonymous, but the attribute prevents duplicates
     }
-    
-    // Restore folder filter state after clearing search
-    setTimeout(function() {
-        
-    }, 200);
 }
 
 /**
@@ -347,12 +351,6 @@ function createInputOverlay(inputElement, word, startIndex) {
     var overlay = document.createElement('div');
     overlay.className = 'input-highlight-overlay';
     overlay.style.position = 'absolute';
-    overlay.style.backgroundColor = '#ffff00';
-    overlay.style.color = 'transparent';
-    overlay.style.pointerEvents = 'none';
-    overlay.style.borderRadius = '2px';
-    overlay.style.zIndex = '1';
-    overlay.style.opacity = '0.7';
     
     // Add data attribute to link it to the input
     overlay.setAttribute('data-input-id', inputElement.id);
@@ -392,35 +390,24 @@ function createInputOverlay(inputElement, word, startIndex) {
 
 /**
  * Position an overlay relative to its input element
+ * Calculates the exact position to overlay a highlight on top of text in an input field
  */
 function positionOverlay(overlay, inputElement, offsetX, wordWidth) {
     var inputRect = inputElement.getBoundingClientRect();
     var inputStyle = window.getComputedStyle(inputElement);
+    
+    // Calculate padding and borders to position overlay correctly
     var paddingLeft = parseInt(inputStyle.paddingLeft) || 0;
     var borderLeft = parseInt(inputStyle.borderLeftWidth) || 0;
     var borderTop = parseInt(inputStyle.borderTopWidth) || 0;
-    var paddingTop = parseInt(inputStyle.paddingTop) || 0;
-    var paddingBottom = parseInt(inputStyle.paddingBottom) || 0;
-    var borderBottom = parseInt(inputStyle.borderBottomWidth) || 0;
     
-    // Get viewport scaling for mobile devices
-    var viewport = document.querySelector('meta[name="viewport"]');
-    var scale = 1;
-    if (viewport && viewport.content.includes('initial-scale=')) {
-        var scaleMatch = viewport.content.match(/initial-scale=([0-9.]+)/);
-        if (scaleMatch) {
-            scale = parseFloat(scaleMatch[1]);
-        }
-    }
-    
-    // Calculate position accounting for page scroll and mobile viewport
+    // Calculate position accounting for page scroll
     var scrollX = window.pageXOffset || document.documentElement.scrollLeft;
     var scrollY = window.pageYOffset || document.documentElement.scrollTop;
     
-    // Position overlay to align with the input's content area (account for borders & padding)
-    // Use clientHeight so the overlay height matches the inner area where text is rendered
-    var contentTop = inputRect.top + scrollY + borderTop; // start after border
-    var overlayHeight = inputElement.clientHeight || (inputRect.height - borderTop - borderBottom);
+    // Position overlay to align with the input's content area (account for borders)
+    var contentTop = inputRect.top + scrollY + borderTop;
+    var overlayHeight = inputElement.clientHeight;
 
     // Try to align overlay to the text baseline by using the computed line-height
     var computedLineHeight = parseFloat(inputStyle.lineHeight);
@@ -440,52 +427,50 @@ function positionOverlay(overlay, inputElement, offsetX, wordWidth) {
     overlay.style.width = wordWidth + 'px';
     overlay.style.height = finalLineHeight + 'px';
     overlay.style.lineHeight = finalLineHeight + 'px';
-    
-    // Ensure overlay is visible on mobile
-    overlay.style.zIndex = '1000';
-    overlay.style.pointerEvents = 'none';
 }
 
 /**
- * Measure the bounding rect of a substring inside a text input by creating
- * a hidden mirror positioned over the real input. Returns {left, top, width, height}
- * in viewport coordinates, or null if measurement failed.
+ * Measure the bounding rect of a substring inside a text input
+ * Creates a hidden mirror element to accurately measure word position
+ * @param {HTMLInputElement} inputElement - The input element containing the text
+ * @param {number} startIndex - Start position of the word in the input value
+ * @param {string} word - The word to measure
+ * @returns {Object|null} Object with {left, top, width, height} in viewport coords, or null if failed
  */
 function measureWordRectInInput(inputElement, startIndex, word) {
     try {
         var inputRect = inputElement.getBoundingClientRect();
         var style = window.getComputedStyle(inputElement);
 
+        // Create a hidden mirror div that matches the input's styling exactly
         var mirror = document.createElement('div');
         mirror.style.position = 'absolute';
-    // Place mirror at the input's document coordinates (include page scroll)
-    mirror.style.left = (inputRect.left + (window.pageXOffset || document.documentElement.scrollLeft)) + 'px';
-    mirror.style.top = (inputRect.top + (window.pageYOffset || document.documentElement.scrollTop)) + 'px';
+        mirror.style.left = (inputRect.left + (window.pageXOffset || document.documentElement.scrollLeft)) + 'px';
+        mirror.style.top = (inputRect.top + (window.pageYOffset || document.documentElement.scrollTop)) + 'px';
         mirror.style.visibility = 'hidden';
         mirror.style.whiteSpace = 'pre';
         mirror.style.overflow = 'hidden';
         mirror.style.boxSizing = style.boxSizing;
-    mirror.style.font = style.font;
-    mirror.style.fontFamily = style.fontFamily;
-    mirror.style.fontWeight = style.fontWeight;
-    mirror.style.fontStyle = style.fontStyle;
-    mirror.style.padding = style.padding;
-    mirror.style.border = style.border;
-    mirror.style.letterSpacing = style.letterSpacing;
-    mirror.style.wordSpacing = style.wordSpacing;
-    mirror.style.textTransform = style.textTransform;
-    mirror.style.textIndent = style.textIndent;
-    mirror.style.textAlign = style.textAlign;
-    mirror.style.width = inputRect.width + 'px';
-    mirror.style.height = inputRect.height + 'px';
+        mirror.style.font = style.font;
+        mirror.style.fontFamily = style.fontFamily;
+        mirror.style.fontWeight = style.fontWeight;
+        mirror.style.fontStyle = style.fontStyle;
+        mirror.style.padding = style.padding;
+        mirror.style.border = style.border;
+        mirror.style.letterSpacing = style.letterSpacing;
+        mirror.style.wordSpacing = style.wordSpacing;
+        mirror.style.textTransform = style.textTransform;
+        mirror.style.textIndent = style.textIndent;
+        mirror.style.textAlign = style.textAlign;
+        mirror.style.width = inputRect.width + 'px';
+        mirror.style.height = inputRect.height + 'px';
         mirror.style.lineHeight = style.lineHeight;
 
-        // Build nodes: before text, highlighted span, after text
+        // Build the mirror content: text before + highlighted word + text after
         var before = document.createTextNode(inputElement.value.substring(0, startIndex));
         var span = document.createElement('span');
         span.textContent = word;
         span.style.display = 'inline-block';
-        // Ensure span has minimal styles to measure accurately
         span.style.background = 'transparent';
         var after = document.createTextNode(inputElement.value.substring(startIndex + word.length));
 
@@ -494,9 +479,7 @@ function measureWordRectInInput(inputElement, startIndex, word) {
         mirror.appendChild(after);
 
         document.body.appendChild(mirror);
-
         var rect = span.getBoundingClientRect();
-
         document.body.removeChild(mirror);
 
         return { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
@@ -556,6 +539,7 @@ function updateAllOverlayPositions() {
 
 /**
  * Clear existing overlays for an input element
+ * @param {HTMLInputElement} inputElement - The input element to clear overlays for
  */
 function clearInputOverlays(inputElement) {
     var overlays = document.querySelectorAll('.input-highlight-overlay[data-input-id="' + inputElement.id + '"]');
@@ -565,8 +549,135 @@ function clearInputOverlays(inputElement) {
 }
 
 /**
- * Escape special regex characters
+ * Navigation state for highlights
  */
-function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+window.searchNavigation = {
+    currentHighlightIndex: -1,
+    highlights: []
+};
+
+/**
+ * Update the list of available highlights in the current view
+ */
+function updateHighlightsList() {
+    // Get both standard highlights and input overlays
+    var highlights = Array.from(document.querySelectorAll('.search-highlight, .input-highlight-overlay'));
+    
+    // Sort highlights by their position in the DOM (vertical position first, then horizontal)
+    highlights.sort(function(a, b) {
+        var rectA = a.getBoundingClientRect();
+        var rectB = b.getBoundingClientRect();
+        var topA = rectA.top + window.scrollY;
+        var topB = rectB.top + window.scrollY;
+        
+        if (Math.abs(topA - topB) < 5) { // Same line approximately
+            return rectA.left - rectB.left;
+        }
+        return topA - topB;
+    });
+    
+    window.searchNavigation.highlights = highlights;
+}
+
+/**
+ * Navigate to a specific highlight by index
+ */
+function navigateToHighlight(index) {
+    var highlights = window.searchNavigation.highlights;
+    if (index < 0 || index >= highlights.length) return;
+    
+    var target = highlights[index];
+    
+    // Remove active class from all highlights
+    highlights.forEach(h => {
+        h.classList.remove('search-highlight-active');
+    });
+    
+    // Add active class and scroll
+    target.classList.add('search-highlight-active');
+    
+    // Smooth scroll to the target
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    
+    window.searchNavigation.currentHighlightIndex = index;
+}
+
+/**
+ * Navigate to the next highlight
+ */
+function navigateToNextHighlight() {
+    updateHighlightsList();
+    var highlights = window.searchNavigation.highlights;
+    
+    if (highlights.length === 0) {
+        // No highlights in current note, try to go to next note
+        navigateToNextNote();
+        return;
+    }
+    
+    var nextIndex = window.searchNavigation.currentHighlightIndex + 1;
+    
+    if (nextIndex < highlights.length) {
+        navigateToHighlight(nextIndex);
+    } else {
+        // End of current note reached, go to next note
+        navigateToNextNote();
+    }
+}
+
+/**
+ * Navigate to the next note in the list
+ */
+function navigateToNextNote() {
+    // Find the currently selected note in the left column
+    var currentNote = document.querySelector('.links_arbo_left.selected-note, [data-action="load-note"].selected-note');
+    
+    // Find all visible notes that match search (not hidden)
+    // We use a more robust selector to include ALL notes in the sidebar
+    var allNotes = Array.from(document.querySelectorAll('[data-action="load-note"]')).filter(function(el) {
+        // Skip explicitly hidden notes
+        if (el.classList.contains('search-hidden')) return false;
+        // Skip notes in folders that are hidden by search
+        if (el.closest('.folder-header.search-hidden')) return false;
+        // Skip trash notes if we aren't searching in trash specifically
+        if (el.closest('.folder-header[data-folder="Trash"]') && !el.closest('.folder-header:not(.search-hidden)')) return false;
+        
+        return true;
+    });
+    
+    if (allNotes.length === 0) return;
+    
+    var currentIndex = currentNote ? allNotes.indexOf(currentNote) : -1;
+    var nextNote = allNotes[currentIndex + 1];
+    
+    // If we're at the end, wrap around to the first note
+    if (!nextNote) {
+        nextNote = allNotes[0];
+    }
+    
+    if (nextNote) {
+        // Reset highlight index for the next note
+        window.searchNavigation.currentHighlightIndex = -1;
+        // Click the next note to load it
+        nextNote.click();
+        
+        // Auto-scroll to first highlight after note is loaded
+        window.searchNavigation.pendingAutoScroll = true;
+    }
+}
+
+/**
+ * Automatically scroll to the first highlight
+ */
+function scrollToFirstHighlight() {
+    // Clear pending flag
+    window.searchNavigation.pendingAutoScroll = false;
+    
+    // Wait a bit for everything to be rendered and overlays to be positioned
+    setTimeout(function() {
+        updateHighlightsList();
+        if (window.searchNavigation.highlights.length > 0) {
+            navigateToHighlight(0);
+        }
+    }, 300);
 }

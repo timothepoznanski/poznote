@@ -10,6 +10,52 @@ function toggleTheme() {
     }
 }
 
+// Public Folder View Toggle
+function toggleView() {
+    var list = document.getElementById('listView');
+    var kanban = document.getElementById('kanbanView');
+    var toggleBtn = document.getElementById('viewToggle');
+    var icon = document.getElementById('viewIcon');
+    var body = document.body;
+    
+    if (list && kanban) {
+        var isKanban = list.classList.contains('is-hidden');
+        if (isKanban) {
+            // Switch to List
+            list.classList.remove('is-hidden');
+            kanban.classList.add('is-hidden');
+            if (icon) icon.className = 'fas fa-columns';
+            if (toggleBtn) toggleBtn.title = body.getAttribute('data-txt-view-kanban') || 'View as Kanban';
+            body.classList.remove('view-kanban');
+            // Show filter stats if active
+            applyFilter();
+        } else {
+            // Switch to Kanban
+            list.classList.add('is-hidden');
+            kanban.classList.remove('is-hidden');
+            if (icon) icon.className = 'fas fa-list';
+            if (toggleBtn) toggleBtn.title = body.getAttribute('data-txt-view-notes') || 'View as list';
+            body.classList.add('view-kanban');
+            // Re-apply filter to kanban cards
+            applyFilterToKanban();
+        }
+    }
+}
+
+function applyFilterToKanban() {
+    var filterInput = document.getElementById('folderFilterInput');
+    if (!filterInput) return;
+    
+    var filterText = filterInput.value.trim().toLowerCase();
+    var cards = document.querySelectorAll('.kanban-public-card');
+    
+    cards.forEach(function(card) {
+        var title = card.querySelector('.kanban-card-title').textContent.toLowerCase();
+        var isVisible = !filterText || title.indexOf(filterText) !== -1;
+        card.style.display = isVisible ? '' : 'none';
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     var html = document.documentElement;
     var icon = document.getElementById('themeIcon');
@@ -40,6 +86,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 visibleCount += 1;
             }
         });
+
+        // Hide empty folder groups
+        var groups = document.querySelectorAll('.public-folder-group');
+        groups.forEach(function(group) {
+            var groupItems = group.querySelectorAll('.public-note-item');
+            var groupHasVisible = false;
+            for (var i = 0; i < groupItems.length; i++) {
+                if (groupItems[i].style.display !== 'none') {
+                    groupHasVisible = true;
+                    break;
+                }
+            }
+            group.style.display = groupHasVisible ? '' : 'none';
+        });
+
+        // Also filter Kanban if it exists
+        applyFilterToKanban();
 
         if (filterText) {
             if (clearFilterBtn) {

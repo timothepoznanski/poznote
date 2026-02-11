@@ -1,0 +1,415 @@
+/**
+ * Sidebar Styles
+ * 
+ * Styles for the left sidebar including header, action buttons,
+ * update badge, new note/folder buttons, searchbar, and footer.
+ */
+
+/* Sidebar header and primary action */
+.sidebar-header {
+    /* padding: 6px 0 14px 0; */
+    margin-bottom: 6px;
+}
+
+.sidebar-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 2px;
+    position: relative;
+    /* anchor dropdown menus inside the title row */
+}
+
+.sidebar-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    /* dark */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.workspace-burger-icon {
+    font-size: 1.1rem;
+    color: #6c757d;
+    pointer-events: none;
+}
+
+.workspace-dropdown-icon {
+    margin-left: 1px;
+    font-size: 0.9rem;
+    color: #6c757d;
+    pointer-events: none;
+    transition: transform 0.2s ease;
+    position: relative;
+    top: 2px;
+}
+
+.workspace-title-icon {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+
+.workspace-title-text {
+    vertical-align: middle;
+    flex: 1;
+}
+
+.sidebar-title[role="button"] {
+    cursor: pointer;
+}
+
+.sidebar-title-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+}
+
+.sidebar-home {
+    background: transparent;
+    border: none;
+    color: #007DB8;
+    font-size: 1.3rem;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+}
+
+.sidebar-settings {
+    background: transparent;
+    border: none;
+    color: #007DB8;
+    font-size: 1.3rem;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    position: relative;
+}
+
+.sidebar-plus {
+    background: transparent;
+    border: none;
+    color: #6c757d !important;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+}
+
+/* Hover and focus states for sidebar buttons */
+.sidebar-home:hover,
+.sidebar-settings:hover,
+.sidebar-plus:hover {
+    background: rgba(0, 125, 184, 0.1);
+}
+
+.sidebar-home:focus,
+.sidebar-settings:focus,
+.sidebar-plus:focus {
+    outline: 2px solid #007DB8;
+    outline-offset: 2px;
+}
+
+/* Réduire la taille des icônes Font Awesome dans la sidebar */
+.sidebar-title-actions i,
+.sidebar-title-actions [class*="fa-"],
+.sidebar-home i,
+.sidebar-home [class*="fa-"],
+.sidebar-settings i,
+.sidebar-settings [class*="fa-"] {
+    font-size: 0.7em !important;
+}
+
+/* Icône plus-circle un peu plus grande */
+.sidebar-plus i,
+.sidebar-plus [class*="fa-"],
+.sidebar-plus .fa-plus-circle {
+    font-size: 1em !important;
+    color: #6c757d !important;
+}
+
+/* Update badge for sidebar buttons */
+.sidebar-settings .update-badge {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    background: #ef4444;
+    color: white;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    font-size: 8px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    animation: pulse 2s infinite;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    font-family: system-ui, -apple-system, sans-serif;
+    z-index: 10;
+}
+
+/* .sidebar-plus:hover { background: rgba(0,0,0,0.04); color: #005a8a; } /* Display background button plus on hover */
+
+.btn-new-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #0b78e6;
+    /* flat primary */
+    color: #fff;
+    border: none;
+    padding: 0 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    justify-content: center;
+    font-size: 0.98rem;
+    height: 40px;
+    /* enforce same height as search */
+}
+
+.btn-new-note i {
+    font-size: 16px;
+    color: #fff;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-new-note:hover {
+    filter: brightness(0.96);
+}
+
+.btn-new-folder {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #f7fafc;
+    /* subtle light */
+    color: #0b4da6;
+    border: 1px solid #e6eef8;
+    padding: 0 12px;
+    border-radius: 8px;
+    width: 100%;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.98rem;
+    height: 40px;
+    /* enforce same height as search */
+}
+
+.btn-new-folder i {
+    color: #0b4da6;
+    font-size: 16px;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-new-folder:hover {
+    background: #f3f7fb;
+}
+
+/* Make search bar full width of sidebar and align spacing with buttons */
+.searchbar-row {
+    margin-bottom: 8px;
+    max-width: 100%;
+}
+
+.searchbar-input-wrapper {
+    width: 100%;
+}
+
+/* Make the unified search placeholder French when shown in left column */
+
+/* Folder header adjustments to match visual spacing */
+.folder-header {
+    /* margin-top: 6px; */
+    /* padding: 6px 4px; */
+    border-radius: 8px;
+}
+
+.folder-toggle {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    cursor: pointer;
+}
+
+.folder-name {
+    font-weight: 600;
+    color: #111827;
+    font-size: var(--sidebar-font-size, 13px);
+}
+
+.folder-note-count {
+    color: #6b7280;
+    margin-left: 6px;
+    font-weight: 400;
+}
+
+.hide-folder-counts .folder-note-count {
+    display: none;
+}
+
+/* When folder counts are globally hidden, reveal them when the user hovers the folder
+   or focuses it via keyboard for accessibility. Use opacity + transform for a smooth
+   unobtrusive transition rather than abruptly toggling display. */
+.hide-folder-counts .folder-note-count {
+    /* keep them removed from layout by default */
+    display: inline-block;
+    /* ensure inline layout for transition */
+    opacity: 0;
+    transform: translateY(-2px) scale(0.98);
+    transition: opacity 120ms ease, transform 120ms ease;
+    pointer-events: none;
+    /* avoid interfering with folder clicks */
+}
+
+.hide-folder-counts .folder-toggle:hover .folder-note-count,
+.hide-folder-counts .folder-toggle:focus-within .folder-note-count,
+.hide-folder-counts .folder-header:focus-within .folder-note-count,
+.hide-folder-counts .folder-header:hover .folder-note-count {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+/* For keyboard-only users, provide a visible focus outline on the folder-toggle */
+.hide-folder-counts .folder-toggle:focus-within {
+    outline: 2px solid rgba(59, 130, 246, 0.18);
+    border-radius: 6px;
+}
+
+/* Folder content / notes styling */
+.note-in-folder {
+    padding-left: 26px;
+    display: block;
+}
+
+.links_arbo_left {
+    padding: 8px 10px;
+    margin: 4px 0;
+}
+
+.links_arbo_left .note-title {
+    font-weight: 500;
+    color: #1f2937;
+    font-size: var(--sidebar-font-size, 13px);
+}
+
+/* Icon for linked notes */
+.note-type-icon-inline {
+    font-size: 0.85em;
+    color: #6b7280;
+    margin-right: 4px;
+    opacity: 0.8;
+}
+
+/* Notes without folder - indent to align with folder items */
+.links_arbo_left.note-without-folder {
+    margin-left: 10px !important;
+    padding-left: 10px !important;
+}
+
+/* Hover effect: blue and bold title when hovering over a note */
+.links_arbo_left:hover .note-title {
+    color: #0b4da6 !important;
+    font-weight: 600 !important;
+    transition: color 0.2s ease, font-weight 0.2s ease;
+}
+
+/* Selected note style matching light blue band from screenshot */
+.links_arbo_left.selected-note {
+    background-color: transparent;
+    /* remove blue background */
+    /* keep layout consistent but remove rounded background */
+    border-radius: 0;
+    color: #0b4da6;
+}
+
+.links_arbo_left.selected-note .note-title {
+    color: #0b4da6;
+    font-weight: 600;
+}
+
+.create-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e6eef8;
+    box-shadow: 0 8px 24px rgba(15, 120, 230, 0.08);
+    border-radius: 8px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 60;
+    min-width: 140px;
+}
+
+.create-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+    font-family: 'Inter', sans-serif;
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+}
+
+.create-menu-item:last-child {
+    border-bottom: none;
+}
+
+.create-menu-item:hover {
+    background-color: #f8f9fa;
+    color: #007DB8;
+}
+
+.create-menu-item {
+    background: transparent;
+    border: none;
+    padding: 10px 12px;
+    text-align: left;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.create-menu-item:hover {
+    background: #f6fbff;
+}
+
+/* Enlarge icons in create menu */
+.create-menu-item i {
+    font-size: 20px;
+    margin-right: 10px;
+    color: #007DB8;
+}
+
+/* Override for Font Awesome icons in create menu */
+.create-menu-item i[class*="fa-"],
+.create-menu-item [class*="fa-"] {
+    font-size: 18px !important;
+}
+

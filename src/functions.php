@@ -2,6 +2,86 @@
 date_default_timezone_set('UTC');
 
 /**
+ * Trusted domains allowed for iframe embeds.
+ * Used by both unescapeIframesInHtml() and the Markdown parser.
+ */
+if (!defined('ALLOWED_IFRAME_DOMAINS')) {
+    define('ALLOWED_IFRAME_DOMAINS', [
+        'youtube.com',
+        'www.youtube.com',
+        'youtube-nocookie.com',
+        'www.youtube-nocookie.com',
+        'player.vimeo.com',
+        'vimeo.com',
+        // Uncomment to allow additional embed providers:
+        // 'dailymotion.com', 'www.dailymotion.com',
+        // 'player.twitch.tv', 'clips.twitch.tv',
+        // 'open.spotify.com', 'w.soundcloud.com', 'bandcamp.com',
+        // 'codepen.io', 'jsfiddle.net', 'codesandbox.io', 'stackblitz.com',
+        // 'docs.google.com', 'drive.google.com', 'maps.google.com',
+        // 'www.google.com/maps', 'calendar.google.com',
+        // 'onedrive.live.com', 'office.com',
+        // 'twitter.com', 'x.com', 'platform.twitter.com', 'linkedin.com',
+        // 'slides.com', 'prezi.com', 'canva.com', 'figma.com', 'miro.com',
+        // 'excalidraw.com', 'loom.com', 'wistia.com', 'fast.wistia.net',
+        // 'share.descript.com', 'rumble.com', 'odysee.com', 'bitchute.com',
+        // 'peertube', 'invidio.us', 'piped.video',
+    ]);
+}
+
+/**
+ * Helper function to create directory with proper permissions
+ * Centralizes the logic for creating directories and setting ownership
+ * 
+ * @param string $path The directory path to create
+ * @param int $permissions The permissions to set (default: 0755)
+ * @param bool $recursive Whether to create parent directories (default: true)
+ * @return bool True on success, false on failure
+ */
+function createDirectoryWithPermissions($path, $permissions = 0755, $recursive = true) {
+    // Directory already exists
+    if (is_dir($path)) {
+        return true;
+    }
+    
+    // Try to create directory
+    if (!mkdir($path, $permissions, $recursive)) {
+        error_log("Failed to create directory: $path");
+        return false;
+    }
+    
+    // Set proper ownership if running as root (Docker context)
+    if (function_exists('posix_getuid') && posix_getuid() === 0) {
+        chown($path, 'www-data');
+        chgrp($path, 'www-data');
+    }
+    
+    return true;
+}
+
+/**
+ * Helper function to set file permissions and ownership
+ * Centralizes the logic for setting file ownership
+ * 
+ * @param string $path The file or directory path
+ * @param int $permissions The permissions to set
+ * @return void
+ */
+function setFilePermissions($path, $permissions = 0644) {
+    if (!file_exists($path)) {
+        return;
+    }
+    
+    chmod($path, $permissions);
+    
+    // Set proper ownership if running as root (Docker context)
+    if (function_exists('posix_getuid') && posix_getuid() === 0) {
+        chown($path, 'www-data');
+        chgrp($path, 'www-data');
+    }
+}
+
+/**
  * Detect if the current request is using HTTPS
  * Supports reverse proxy headers (X-Forwarded-Proto, X-Forwarded-SSL)
  */
@@ -24,7 +104,8 @@ function getProtocol() {
  */
 function getBaseUrl() {
     $protocol = getProtocol();
-    $host = $_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $host = !empty($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : 
+            (!empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost');
     return $protocol . '://' . $host;
 }
 
@@ -232,55 +313,32 @@ function formatDateTime($timestamp) {
 }
 
 /**
- * Get the entries directory path
- * Returns the path for the current user
+ * Get a user data directory path by type.
+ * @param string $type One of 'entries', 'attachments', 'backups'
+ * @return string The directory path
  */
-function getEntriesPath() {
-    global $activeUserId;
-    $userId = $_SESSION['user_id'] ?? $activeUserId;
-    
-    if ($userId) {
-        require_once __DIR__ . '/users/UserDataManager.php';
-        $dataManager = new UserDataManager($userId);
-        return $dataManager->getUserEntriesPath();
-    }
-    // Fallback for unauthenticated access (should not happen in normal use)
-    return __DIR__ . '/data/entries';
-}
-
-/**
- * Get the attachments directory path
- * Returns the path for the current user
- */
-function getAttachmentsPath() {
+function getDataPath(string $type): string {
     global $activeUserId;
     $userId = $_SESSION['user_id'] ?? $activeUserId;
 
-    if ($userId) {
+    $methodMap = [
+        'entries' => 'getUserEntriesPath',
+        'attachments' => 'getUserAttachmentsPath',
+        'backups' => 'getUserBackupsPath',
+    ];
+
+    if ($userId && isset($methodMap[$type])) {
         require_once __DIR__ . '/users/UserDataManager.php';
         $dataManager = new UserDataManager($userId);
-        return $dataManager->getUserAttachmentsPath();
+        return $dataManager->{$methodMap[$type]}();
     }
     // Fallback for unauthenticated access
-    return __DIR__ . '/data/attachments';
+    return __DIR__ . '/data/' . $type;
 }
 
-/**
- * Get the backups directory path
- * Returns the path for the current user
- */
-function getBackupsPath() {
-    global $activeUserId;
-    $userId = $_SESSION['user_id'] ?? $activeUserId;
-
-    if ($userId) {
-        require_once __DIR__ . '/users/UserDataManager.php';
-        $dataManager = new UserDataManager($userId);
-        return $dataManager->getUserBackupsPath();
-    }
-    // Fallback for unauthenticated access
-    return __DIR__ . '/data/backups';
-}
+function getEntriesPath() { return getDataPath('entries'); }
+function getAttachmentsPath() { return getDataPath('attachments'); }
+function getBackupsPath() { return getDataPath('backups'); }
 
 /**
  * Get the appropriate file extension based on note type
@@ -480,85 +538,6 @@ function generateUniqueTitle($originalTitle, $excludeId = null, $workspace = nul
 }
 
 /**
- * Create a new note with both database entry and HTML file
- * This is the standard way to create notes used throughout the application
- */
-function createNote($con, $heading, $content, $folder = 'Default', $workspace = null, $favorite = 0, $tags = '', $type = 'note') {
-    // If no workspace provided, get first available
-    if ($workspace === null || $workspace === '') {
-        $workspace = getFirstWorkspaceName();
-    }
-    try {
-        // Get folder_id from folder name
-        $folder_id = null;
-        if ($folder !== null) {
-            $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
-            $fStmt->execute([$folder, $workspace]);
-            $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
-            if ($folderData) {
-                $folder_id = (int)$folderData['id'];
-            }
-        }
-        
-        // Insert note into database
-        $stmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, favorite, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))");
-        
-        if (!$stmt->execute([$heading, $content, $tags, $folder, $folder_id, $workspace, $type, $favorite])) {
-            return ['success' => false, 'error' => 'Failed to insert note into database'];
-        }
-        
-        $noteId = $con->lastInsertId();
-        
-        // If folder is shared, auto-share the new note
-        if ($folder_id) {
-            $sharedFolderStmt = $con->prepare("SELECT id, theme, indexable FROM shared_folders WHERE folder_id = ? LIMIT 1");
-            $sharedFolderStmt->execute([$folder_id]);
-            $sharedFolder = $sharedFolderStmt->fetch(PDO::FETCH_ASSOC);
-            
-            if ($sharedFolder) {
-                $noteToken = bin2hex(random_bytes(16));
-                $insertShareStmt = $con->prepare("INSERT INTO shared_notes (note_id, token, theme, indexable) VALUES (?, ?, ?, ?)");
-                $insertShareStmt->execute([$noteId, $noteToken, $sharedFolder['theme'], $sharedFolder['indexable']]);
-            }
-        }
-        
-        // Create the file for the note content with appropriate extension
-        $filename = getEntryFilename($noteId, $type);
-        
-        // Ensure the entries directory exists
-        $entriesDir = dirname($filename);
-        if (!is_dir($entriesDir)) {
-            mkdir($entriesDir, 0755, true);
-        }
-        
-        // Write content to file
-        if (!empty($content)) {
-            $write_result = file_put_contents($filename, $content);
-            if ($write_result === false) {
-                // Log error but don't fail since DB entry was successful
-                error_log("Failed to write file for note ID $noteId: $filename");
-                return ['success' => false, 'error' => 'Failed to create HTML file', 'id' => $noteId];
-            }
-            
-            // Set proper permissions
-            chmod($filename, 0644);
-            
-            // Set proper ownership if running as root (Docker context)
-            if (function_exists('posix_getuid') && posix_getuid() === 0) {
-                chown($filename, 'www-data');
-                chgrp($filename, 'www-data');
-            }
-        }
-        
-        return ['success' => true, 'id' => $noteId];
-        
-    } catch (Exception $e) {
-        error_log("Error creating note: " . $e->getMessage());
-        return ['success' => false, 'error' => $e->getMessage()];
-    }
-}
-
-/**
  * Restore a complete backup from ZIP file
  * Handles database, notes, and attachments restoration
  */
@@ -587,7 +566,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         
         // Extract ZIP to temporary directory
         $tempExtractDir = '/tmp/poznote_restore_' . uniqid();
-        if (!mkdir($tempExtractDir, 0755, true)) {
+        if (!createDirectoryWithPermissions($tempExtractDir)) {
             unlink($tempFile);
             return ['success' => false, 'error' => 'Cannot create temporary directory'];
         }
@@ -649,13 +628,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
             error_log("CLEARED $entriesCleared files from entries directory");
         } else {
             // Create entries directory if it doesn't exist
-            mkdir($entriesPath, 0755, true);
-            if (function_exists('posix_getuid') && posix_getuid() === 0) {
-                $current_uid = posix_getuid();
-                $current_gid = posix_getgid();
-                chown($entriesPath, $current_uid);
-                chgrp($entriesPath, $current_gid);
-            }
+            createDirectoryWithPermissions($entriesPath);
         }
         
         // CLEAR ATTACHMENTS DIRECTORY BEFORE RESTORATION
@@ -676,13 +649,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
             error_log("CLEARED $attachmentsCleared files from attachments directory");
         } else {
             // Create attachments directory if it doesn't exist
-            mkdir($attachmentsPath, 0755, true);
-            if (function_exists('posix_getuid') && posix_getuid() === 0) {
-                $current_uid = posix_getuid();
-                $current_gid = posix_getgid();
-                chown($attachmentsPath, $current_uid);
-                chgrp($attachmentsPath, $current_gid);
-            }
+            createDirectoryWithPermissions($attachmentsPath);
         }
         
         $results = [];
@@ -793,13 +760,7 @@ function restoreDatabaseFromFile($sqlFile) {
     
     if ($returnCode === 0) {
         // Ensure proper permissions on restored database
-        if (function_exists('posix_getuid') && posix_getuid() === 0) {
-            $current_uid = posix_getuid();
-            $current_gid = posix_getgid();
-            chown($dbPath, $current_uid);
-            chgrp($dbPath, $current_gid);
-        }
-        chmod($dbPath, 0664);
+        setFilePermissions($dbPath, 0664);
         
         return ['success' => true];
     } else {
@@ -1100,15 +1061,7 @@ function unescapeIframesInHtml($content) {
         if (preg_match('/src\s*=\s*["\']([^"\']+)["\']/i', $attrs, $srcMatch)) {
             $src = $srcMatch[1];
             
-            // Whitelist of allowed iframe domains (same as markdown parser)
-            $allowedDomains = [
-                'youtube.com',
-                'www.youtube.com',
-                'youtube-nocookie.com',
-                'www.youtube-nocookie.com',
-                'player.vimeo.com',
-                'vimeo.com',
-            ];
+            $allowedDomains = ALLOWED_IFRAME_DOMAINS;
             
             // Check if domain is whitelisted
             $isAllowed = false;
@@ -1376,12 +1329,7 @@ function sanitizeHtml($html) {
             if ($attrName === 'href' || $attrName === 'src') {
                 // For iframes, validate that src is from trusted domains or local paths
                 if ($tagName === 'iframe' && $attrName === 'src') {
-                    $allowedIframeDomains = [
-                        'youtube.com',
-                        'www.youtube.com',
-                        'youtube-nocookie.com',
-                        'www.youtube-nocookie.com',
-                    ];
+                    $allowedIframeDomains = ALLOWED_IFRAME_DOMAINS;
                     
                     $isTrustedIframe = false;
                     

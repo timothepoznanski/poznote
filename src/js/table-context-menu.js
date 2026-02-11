@@ -6,13 +6,10 @@
     let activeCell = null;
     let contextMenu = null;
 
-    function tr(key, fallback, vars) {
-        if (window.t) return window.t(key, vars || null, fallback);
-        if (vars && typeof vars === 'object') {
-            for (const k in vars) fallback = String(fallback).split('{{' + k + '}}').join(String(vars[k]));
-        }
-        return fallback;
-    }
+    // Use global translation function from globals.js
+    const tr = window.t || function(key, vars, fallback) {
+        return fallback || key;
+    };
 
     /**
      * Creates the context menu for tables

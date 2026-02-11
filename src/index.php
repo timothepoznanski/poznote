@@ -26,12 +26,11 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
 require 'auth.php';
 requireAuth();
 
-ob_start();
 require_once 'config.php';
-include 'functions.php';
+require_once 'functions.php';
 require_once 'version_helper.php';
 
-include 'db_connect.php';
+require_once 'db_connect.php';
 
 // Include new modular files
 require_once 'page_init.php';
@@ -71,20 +70,8 @@ initializeWorkspacesAndLabels($con);
 $search_params = initializeSearchParams();
 extract($search_params); // Extracts variables: $search, $tags_search, $note, etc.
 
-// Display workspace name
-if ($workspace_filter === '__last_opened__') {
-    // Get first available workspace from database
-    $displayWorkspace = '';
-    try {
-        $wsStmt = $con->query("SELECT name FROM workspaces ORDER BY name LIMIT 1");
-        $wsRow = $wsStmt->fetch(PDO::FETCH_ASSOC);
-        $displayWorkspace = $wsRow ? htmlspecialchars($wsRow['name'], ENT_QUOTES) : '';
-    } catch (Exception $e) {
-        $displayWorkspace = '';
-    }
-} else {
-    $displayWorkspace = htmlspecialchars($workspace_filter, ENT_QUOTES);
-}
+// Display workspace name (simplified logic)
+$displayWorkspace = htmlspecialchars($workspace_filter, ENT_QUOTES);
 
 // Load note-related data (res_right, default/current note folders)
 // Ensure these variables exist for included templates
@@ -93,51 +80,43 @@ $default_note_folder = $note_load_result['default_note_folder'] ?? null;
 $current_note_folder = $note_load_result['current_note_folder'] ?? null;
 $res_right = $note_load_result['res_right'] ?? null;
 
-
 // Handle unified search
 $using_unified_search = handleUnifiedSearch();
 
-// Workspace filter already initialized above
+// Load all required settings in a single query for better performance
+$settings = [
+    'note_font_size' => '15',
+    'sidebar_font_size' => '13',
+    'center_note_content' => '800',
+    'show_note_created' => false,
+    'hide_folder_actions' => null,
+    'hide_folder_counts' => null,
+    'note_list_sort' => 'updated_desc',
+    'notes_without_folders_after_folders' => false
+];
 
-// Load note font size for CSS custom property
-$note_font_size = '15';
 try {
-    $stmt = $con->prepare("SELECT value FROM settings WHERE key = ?");
-    $stmt->execute(['note_font_size']);
-    $font_size_value = $stmt->fetchColumn();
-    if ($font_size_value !== false) {
-        $note_font_size = $font_size_value;
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders')");
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $settings[$row['key']] = $row['value'];
     }
 } catch (Exception $e) {
-    // Use default if error
+    // Use defaults if error
 }
 
-// Load sidebar font size
-$sidebar_font_size = '13';
-try {
-    $stmt = $con->prepare("SELECT value FROM settings WHERE key = ?");
-    $stmt->execute(['sidebar_font_size']);
-    $sidebar_font_size_value = $stmt->fetchColumn();
-    if ($sidebar_font_size_value !== false && $sidebar_font_size_value !== '') {
-        $sidebar_font_size = $sidebar_font_size_value;
-    }
-} catch (Exception $e) {}
+// Extract settings with proper defaults
+$note_font_size = $settings['note_font_size'];
+$sidebar_font_size = ($settings['sidebar_font_size'] !== '' && $settings['sidebar_font_size'] !== null) ? $settings['sidebar_font_size'] : '13';
 
-// Load note max width for CSS custom property
+// Calculate note max width
 $note_max_width = '800';
-try {
-    $stmt = $con->prepare("SELECT value FROM settings WHERE key = ?");
-    $stmt->execute(['center_note_content']);
-    $width_value = $stmt->fetchColumn();
-    if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $width_value !== 'false') {
-        if ($width_value === '1' || $width_value === 'true') {
-            $note_max_width = '800';
-        } else {
-            $note_max_width = $width_value;
-        }
+$width_value = $settings['center_note_content'];
+if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $width_value !== 'false') {
+    if ($width_value === '1' || $width_value === 'true') {
+        $note_max_width = '800';
+    } else {
+        $note_max_width = $width_value;
     }
-} catch (Exception $e) {
-    // Use default if error
 }
 
 ?>
@@ -161,10 +140,50 @@ try {
     <link type="text/css" rel="stylesheet" href="css/brands.min.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/solid.min.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/regular.min.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/index.css?v=<?php echo $v; ?>"/>
+    <!-- Modular CSS - Imported directly (previously via index.css) -->
+    <link type="text/css" rel="stylesheet" href="css/variables.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/base.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/utilities.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/layout.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/sidebar.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/toolbar.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/menus.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/searchbars.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/notes/subline.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/notes/sidebar.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/notes/tags.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/notes/attachments-row.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/notes/noteentry.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/notes/editor.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/notes/toolbar.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/notes/checkboxes.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/code-blocks.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/checklists.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folders/headers-toggles.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folders/actions-menu.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folders/content.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folders/selection.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folders/search.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folders/animations.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folders/toolbar-icons.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folders/fontawesome.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folders/table-picker.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folders/system-folders.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/emoji-picker.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/table-picker.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/slash-commands.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/drag-drop.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/icons.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/misc.css?v=<?php echo $v; ?>"/>
     <link rel="stylesheet" href="css/index-mobile.css?v=<?php echo $v; ?>" media="(max-width: 800px)">
     <link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/modals.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/base.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/attachments.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/link-modal.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/share-modal.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/alerts-utilities.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/responsive.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/tasks.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/markdown.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/excalidraw.css?v=<?php echo $v; ?>"/>
@@ -174,7 +193,16 @@ try {
     <link type="text/css" rel="stylesheet" href="css/folder-icon-modal.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/kanban.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/background-image.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="js/katex/katex.min.css?v=<?php echo $v; ?>"/>
     <style>:root { --note-font-size: <?php echo htmlspecialchars($note_font_size, ENT_QUOTES); ?>px; --sidebar-font-size: <?php echo htmlspecialchars($sidebar_font_size, ENT_QUOTES); ?>px; --note-max-width: <?php echo htmlspecialchars($note_max_width, ENT_QUOTES); ?>px; }</style>
     <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
@@ -200,67 +228,40 @@ try {
 </head>
 
 <?php
-// Read settings to control body classes (so settings toggles affect index display on reload)
+// Build body classes from previously loaded settings
 $extra_body_classes = '';
-try {
-    $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
-    $stmt->execute(['show_note_created']);
-    $v1 = $stmt->fetchColumn();
-    if ($v1 === '1' || $v1 === 'true') $extra_body_classes .= ' show-note-created';
-
-    $stmt->execute(['hide_folder_actions']);
-    $v3 = $stmt->fetchColumn();
-    if ($v3 === '1' || $v3 === 'true' || $v3 === null) $extra_body_classes .= ' folder-actions-always-visible';
-
-    $stmt->execute(['hide_folder_counts']);
-    $v4 = $stmt->fetchColumn();
-    if ($v4 === '0' || $v4 === 'false') $extra_body_classes .= ' hide-folder-counts';
-
-    $stmt->execute(['center_note_content']);
-    $v5 = $stmt->fetchColumn();
-    if ($v5 !== false && $v5 !== '' && $v5 !== '0' && $v5 !== 'false') $extra_body_classes .= ' center-note-content';
-
-    $stmt->execute(['kanban_folder_click']);
-    $v6 = $stmt->fetchColumn();
-    if ($v6 === '0' || $v6 === 'false' || $v6 === null || $v6 === false) $extra_body_classes .= ' disable-kanban-click';
-
-} catch (Exception $e) {
-    // ignore errors and continue without extra classes
+$show_note_created_setting = ($settings['show_note_created'] === '1' || $settings['show_note_created'] === 'true');
+if ($show_note_created_setting) {
+    $extra_body_classes .= ' show-note-created';
+}
+if ($settings['hide_folder_actions'] === '1' || $settings['hide_folder_actions'] === 'true' || $settings['hide_folder_actions'] === null) {
+    $extra_body_classes .= ' folder-actions-always-visible';
+}
+if ($settings['hide_folder_counts'] === '0' || $settings['hide_folder_counts'] === 'false') {
+    $extra_body_classes .= ' hide-folder-counts';
+}
+if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $width_value !== 'false') {
+    $extra_body_classes .= ' center-note-content';
 }
 
-// Load note list sort preference to affect server-side note listing
-$note_list_order_by = 'CASE WHEN folder_id IS NULL THEN 0 ELSE 1 END, folder, updated DESC';
+// Load note list sort preference using previously loaded settings
 $note_list_sort_type = 'updated_desc'; // default
-try {
-    $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
-    $stmt->execute(['note_list_sort']);
-    $pref = $stmt->fetchColumn();
-    
-    // Check setting for notes without folders position
-    $notes_without_folders_after = false;
-    try {
-        $stmtSetting = $con->prepare('SELECT value FROM settings WHERE key = ?');
-        $stmtSetting->execute(['notes_without_folders_after_folders']);
-        $settingValue = $stmtSetting->fetchColumn();
-        $notes_without_folders_after = ($settingValue === '1' || $settingValue === 'true');
-    } catch (Exception $e) {
-        // ignore, keep default
-    }
-    
-    $folder_null_case = $notes_without_folders_after ? '1' : '0';
-    $folder_case = $notes_without_folders_after ? '0' : '1';
-    
-    $allowed_sorts = [
-        'updated_desc' => "CASE WHEN folder_id IS NULL THEN $folder_null_case ELSE $folder_case END, folder, updated DESC",
-        'created_desc' => "CASE WHEN folder_id IS NULL THEN $folder_null_case ELSE $folder_case END, folder, created DESC",
-        'heading_asc'  => "folder, heading COLLATE NOCASE ASC"
-    ];
-    if ($pref && isset($allowed_sorts[$pref])) {
-        $note_list_order_by = $allowed_sorts[$pref];
-        $note_list_sort_type = $pref;
-    }
-} catch (Exception $e) {
-    // ignore and keep default
+$pref = $settings['note_list_sort'];
+$notes_without_folders_after = ($settings['notes_without_folders_after_folders'] === '1' || $settings['notes_without_folders_after_folders'] === 'true');
+
+$folder_null_case = $notes_without_folders_after ? '1' : '0';
+$folder_case = $notes_without_folders_after ? '0' : '1';
+
+$allowed_sorts = [
+    'updated_desc' => "CASE WHEN folder_id IS NULL THEN $folder_null_case ELSE $folder_case END, folder, updated DESC",
+    'created_desc' => "CASE WHEN folder_id IS NULL THEN $folder_null_case ELSE $folder_case END, folder, created DESC",
+    'heading_asc'  => "folder, heading COLLATE NOCASE ASC"
+];
+
+$note_list_order_by = $allowed_sorts['updated_desc']; // default
+if ($pref && isset($allowed_sorts[$pref])) {
+    $note_list_order_by = $allowed_sorts[$pref];
+    $note_list_sort_type = $pref;
 }
 
 // Set body classes
@@ -315,6 +316,16 @@ $body_classes = trim($extra_body_classes);
         </div>
     </div>
         
+    <?php
+        // Determine which folders should be open
+        $is_search_mode = !empty($search) || !empty($tags_search);
+        
+        // Execute query for right column - only override if in search mode
+        if ($is_search_mode) {
+            $res_right = prepareSearchResults($con, $is_search_mode, $note, $search_conditions['where_clause'], $search_conditions['search_params'], $workspace_filter);
+        }
+    ?>
+
     <!-- Page configuration data (CSP compliant) -->
     <script type="application/json" id="page-config-data"><?php 
         $config_data = [
@@ -326,29 +337,18 @@ $body_classes = trim($extra_body_classes);
             'defaultNoteSortType' => $note_list_sort_type,
             'isAdmin' => function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()
         ];
-        if ($note != '' && empty($search) && empty($tags_search)) {
+        if ($note != '') {
             $config_data['currentNoteFolder'] = $current_note_folder ?? '';
-        } else if (isset($default_note_folder) && $default_note_folder && empty($search) && empty($tags_search)) {
+        } else if (isset($default_note_folder) && $default_note_folder) {
             $config_data['currentNoteFolder'] = $default_note_folder;
         }
         echo json_encode($config_data, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
     ?></script>
                     
     <?php
-        
-        // Determine which folders should be open
-        $is_search_mode = !empty($search) || !empty($tags_search);
-        
         // Execute query for left column
         $stmt_left = $con->prepare($query_left_secure);
         $stmt_left->execute($search_params);
-        
-        // Execute query for right column 
-        if ($is_search_mode) {
-            // Pour le mode recherche, remplacer $res_right par les résultats de recherche
-            $res_right = prepareSearchResults($con, $is_search_mode, $note, $search_conditions['where_clause'], $search_conditions['search_params'], $workspace_filter);
-        }
-        // Sinon, garder $res_right tel qu'il a été défini par loadNoteData
         
         // Group notes by folder for hierarchical display (now uses folder_id)
         $organized = organizeNotesByFolder($stmt_left, $con, $workspace_filter, $note_list_sort_type);
@@ -404,7 +404,7 @@ $body_classes = trim($extra_body_classes);
             $markdown_ids = [];
                         
             // Check if we should display a note or nothing
-            if ($res_right && $res_right) {
+            if ($res_right) {
                 while($row = $res_right->fetch(PDO::FETCH_ASSOC))
                 {
                     // Check if note is shared
@@ -767,21 +767,10 @@ $body_classes = trim($extra_body_classes);
                         }
                     }
                 
-                    // Determine whether we need to render the created date subline
-                    $show_created_setting = false;
-                    try {
-                        $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
-                        $stmt->execute(['show_note_created']);
-                        $v1 = $stmt->fetchColumn();
-                        if ($v1 === '1' || $v1 === 'true') $show_created_setting = true;
-                    } catch (Exception $e) {
-                        // keep defaults (false) on error
-                    }
-
-                    $has_created = !empty($created_display) && $show_created_setting;
+                    $has_created = !empty($created_display) && $show_note_created_setting;
 
                     // Show the subline if created date setting is enabled
-                    if ($show_created_setting && $has_created) {
+                    if ($show_note_created_setting && $has_created) {
                         echo '<div class="note-subline">';
                         echo '<span class="note-sub-created">' . htmlspecialchars($created_display, ENT_QUOTES) . '</span>';
                         echo '</div>';
@@ -844,15 +833,6 @@ $body_classes = trim($extra_body_classes);
                         $markdown_ids[] = $row['id'];
                     }
                 }
-            } else {
-                // Check if we're in search mode (search or tags search active)
-                $is_search_active = !empty($search) || !empty($tags_search);
-                
-                if ($is_search_active) {
-                    // intentionally left blank: no search results
-                } else {
-                    // intentionally left blank: no notes to display
-                }
             }
         ?>        
     </div>
@@ -869,19 +849,21 @@ $body_classes = trim($extra_body_classes);
     </div>  <!-- Close main-container -->
     
 </body>
-<script src="js/index-config.js"></script>
 <!-- Modules refactorisés de script.js -->
 <script src="js/globals.js"></script>
 <script src="js/workspaces.js"></script>
 <script src="js/notes.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/attachments.js"></script>
-<script src="js/events.js"></script>
+<!-- Event management modules -->
+<script src="js/events-utils.js?v=<?php echo $v; ?>"></script>
+<script src="js/events-auto-save.js?v=<?php echo $v; ?>"></script>
+<script src="js/events-drag-drop.js?v=<?php echo $v; ?>"></script>
+<script src="js/events-navigation.js?v=<?php echo $v; ?>"></script>
+<script src="js/events-rich-text-editing.js?v=<?php echo $v; ?>"></script>
+<script src="js/events-text-selection.js?v=<?php echo $v; ?>"></script>
 <script src="js/utils.js"></script>
 <script src="js/search-highlight.js"></script>
-<script src="js/toolbar.js"></script>
-<script src="js/checklist.js?v=<?php echo $v; ?>"></script>
-<script src="js/bulletlist.js?v=<?php echo $v; ?>"></script>
 <script src="js/slash-command.js?v=<?php echo $v; ?>"></script>
 <script src="js/share.js"></script>
 <script src="js/folder-hierarchy.js?v=<?php echo $v; ?>"></script>

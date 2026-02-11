@@ -95,17 +95,15 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         
         $folder_display = $should_be_open ? 'block' : 'none';
         
-        // Escape folder name for use in JavaScript
-        $escapedFolderName = addslashes($folderName);
-        
         // Check if this is a system folder (not draggable)
         $systemFolders = ['Favorites', 'Tags', 'Trash', 'Public'];
         $isSystemFolder = in_array($folderName, $systemFolders);
         $draggableAttr = $isSystemFolder ? '' : " draggable='true'";
         
-        // Note: draggable is set on folder-toggle, not folder-header, to avoid conflicts with note dragging
-        $currentSort = isset($folderData['sort_setting']) ? $folderData['sort_setting'] : '';
-        echo "<div class='$folderClass' data-folder-id='$folderId' data-folder='$folderName' data-folder-key='folder_$folderId' data-sort-setting='$currentSort' data-action='select-folder'>";
+        // Escape for HTML attributes
+        $htmlFolderName = htmlspecialchars($folderName, ENT_QUOTES, 'UTF-8');
+        $currentSort = $folderData['sort_setting'] ?? '';
+        echo "<div class='$folderClass' data-folder-id='" . (int)$folderId . "' data-folder='$htmlFolderName' data-folder-key='folder_" . (int)$folderId . "' data-sort-setting='" . htmlspecialchars($currentSort, ENT_QUOTES) . "' data-action='select-folder'>";
         // Make the entire folder toggle area clickable to open/close the folder
         // draggable is set here to avoid capturing note drag events from folder-content
         echo "<div class='folder-toggle' data-action='toggle-folder' data-folder-dom-id='$folderDomId' data-folder-id='$folderId' data-folder='$folderName'$draggableAttr>";
@@ -136,7 +134,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         echo "<span class='folder-actions'>";
         
         // Generate folder actions
-        echo generateFolderActions($folderId, $folderName, $workspace_filter, $noteCount, $currentSort);
+        echo generateFolderActions($folderId, $folderName, $con, $workspace_filter, $noteCount, $currentSort);
         
         echo "</span>";
         echo "</div>";

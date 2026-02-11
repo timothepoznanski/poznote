@@ -1,4 +1,11 @@
-// User interface (menus, modals, notifications)
+// ============================================================================
+// UI Module - User Interface Components
+// ============================================================================
+// Handles notifications, menus, modals, and other UI interactions
+
+// ============================================================================
+// NOTIFICATIONS
+// ============================================================================
 
 function showNotificationPopup(message, type) {
     type = type || 'success';
@@ -72,6 +79,10 @@ function showNotificationPopup(message, type) {
     }
 }
 
+// ============================================================================
+// MENUS
+// ============================================================================
+
 function toggleNoteMenu(noteId) {
     var menu = document.getElementById('note-menu-' + noteId);
     var button = document.getElementById('settings-btn-' + noteId);
@@ -108,90 +119,13 @@ function toggleNoteMenu(noteId) {
     }
 }
 
-function closeModal(modalId) {
-    var modal = document.getElementById(modalId);
-    if (modal) {
-        modal.style.display = 'none';
-    }
-
-    // Special actions for certain modals
-    if (modalId === 'attachmentModal') {
-        hideAttachmentError();
-        resetAttachmentForm();
-    }
-}
-
-function resetAttachmentForm() {
-    var fileInput = document.getElementById('attachmentFile');
-    var fileNameDiv = document.getElementById('selectedFileName');
-    var uploadButtonContainer = document.querySelector('.upload-button-container');
-
-    if (fileInput) fileInput.value = '';
-    if (fileNameDiv) fileNameDiv.textContent = '';
-    if (uploadButtonContainer) {
-        uploadButtonContainer.classList.remove('show');
-    }
-}
-
-function setSaveButtonRed(isRed) {
-    // Auto-save is now automatic - log status to console only
-    if (isRed) {
-        console.log('[Poznote Auto-Save] Changes detected for note #' + noteid);
-    } else {
-        console.log('[Poznote Auto-Save] Note #' + noteid + ' saved successfully');
-    }
-}
-
-function showContactPopup() {
-    var modal = document.getElementById('contactModal');
-    if (modal) {
-        modal.style.display = 'block';
-    }
-}
-
-function closeContactModal() {
-    var modal = document.getElementById('contactModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-}
-
-function initializeWorkspaceMenu() {
-    // Close workspace menu when clicking elsewhere
-    document.addEventListener('click', function (e) {
-        var workspaceMenus = document.querySelectorAll('.workspace-menu');
-        for (var i = 0; i < workspaceMenus.length; i++) {
-            var menu = workspaceMenus[i];
-            if (!menu.parentElement.contains(e.target)) {
-                menu.style.display = 'none';
-            }
-        }
-    });
-}
-
-// Browser history management for workspaces
-function initializeBrowserHistory() {
-    window.addEventListener('popstate', function (event) {
-        if (event.state && event.state.workspace) {
-            var workspaceName = event.state.workspace;
-            updateWorkspaceNameInHeaders(workspaceName);
-            selectedWorkspace = workspaceName;
-            refreshLeftColumnForWorkspace(workspaceName);
-        }
-    });
-}
-
 // Settings menu management
 function toggleSettingsMenu(event) {
     event.stopPropagation();
 
     // Try to find the available menu (mobile or desktop)
-    var menu = document.getElementById('settingsMenuMobile');
-    if (!menu) {
-        menu = document.getElementById('settingsMenu');
-    }
+    var menu = document.getElementById('settingsMenuMobile') || document.getElementById('settingsMenu');
 
-    // Check that menu exists
     if (!menu) {
         console.error('No settings menu element found');
         return;
@@ -222,7 +156,81 @@ function closeSettingsMenus() {
     if (settingsMenuMobile) settingsMenuMobile.style.display = 'none';
 }
 
-// Afficher le prompt pour modifier le nom d'affichage de connexion
+function initializeWorkspaceMenu() {
+    // Close workspace menu when clicking elsewhere
+    document.addEventListener('click', function (e) {
+        var workspaceMenus = document.querySelectorAll('.workspace-menu');
+        for (var i = 0; i < workspaceMenus.length; i++) {
+            var menu = workspaceMenus[i];
+            if (!menu.parentElement.contains(e.target)) {
+                menu.style.display = 'none';
+            }
+        }
+    });
+}
+
+// ============================================================================
+// MODALS - Generic
+// ============================================================================
+
+function closeModal(modalId) {
+    var modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+    }
+
+    // Special actions for certain modals
+    if (modalId === 'attachmentModal') {
+        hideAttachmentError();
+        resetAttachmentForm();
+    }
+}
+
+function resetAttachmentForm() {
+    var fileInput = document.getElementById('attachmentFile');
+    var fileNameDiv = document.getElementById('selectedFileName');
+    var uploadButtonContainer = document.querySelector('.upload-button-container');
+
+    if (fileInput) fileInput.value = '';
+    if (fileNameDiv) fileNameDiv.textContent = '';
+    if (uploadButtonContainer) {
+        uploadButtonContainer.classList.remove('show');
+    }
+}
+
+function showContactPopup() {
+    var modal = document.getElementById('contactModal');
+    if (modal) {
+        modal.style.display = 'block';
+    }
+}
+
+function closeContactModal() {
+    var modal = document.getElementById('contactModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// ============================================================================
+// BROWSER HISTORY
+// ============================================================================
+
+function initializeBrowserHistory() {
+    window.addEventListener('popstate', function (event) {
+        if (event.state && event.state.workspace) {
+            var workspaceName = event.state.workspace;
+            updateWorkspaceNameInHeaders(workspaceName);
+            selectedWorkspace = workspaceName;
+            refreshLeftColumnForWorkspace(workspaceName);
+        }
+    });
+}
+
+// ============================================================================
+// MODALS - Login Display Name
+// ============================================================================
+
 function showLoginDisplayNamePrompt() {
     var modal = document.getElementById('loginDisplayModal');
     var input = document.getElementById('loginDisplayInput');
@@ -255,8 +263,8 @@ function showLoginDisplayNamePrompt() {
         return;
     }
 
-    // Helper function to handle server responses
-    function doSet(value) {
+    // Helper function to save the login display name setting
+    function saveLoginDisplayName(value) {
         return fetch('/api/v1/settings/login_display_name', {
             method: 'PUT',
             credentials: 'same-origin',
@@ -265,83 +273,64 @@ function showLoginDisplayNamePrompt() {
         })
             .then(function (r) {
                 if (!r.ok) {
-                    console.error('Erreur api_settings SET', r.status);
+                    console.error('API settings SET error', r.status);
                     showNotificationPopup('Server error', 'error');
                     return null;
                 }
                 return r.json();
             })
             .catch(function (e) {
-                console.error('Erreur api_settings SET parse', e);
+                console.error('API settings SET parse error', e);
                 return null;
             });
     }
 
-    // Charger la valeur actuelle et afficher la modal
+    // Handler for save button
+    function handleSave() {
+        var val = input.value.trim();
+        
+        saveLoginDisplayName(val).then(function (resp) {
+            if (!resp) return;
+
+            if (resp && resp.success) {
+                modal.style.display = 'none';
+                // Refresh settings.php if we're on that page
+                if (window.location.pathname.includes('settings.php')) {
+                    if (typeof window.refreshLoginDisplayBadge === 'function') {
+                        window.refreshLoginDisplayBadge();
+                    }
+                }
+            } else {
+                showNotificationPopup('Save error', 'error');
+            }
+        })
+            .catch(function () {
+                showNotificationPopup('Network error', 'error');
+            });
+    }
+
+    // Load current value and display modal
     fetch('/api/v1/settings/login_display_name', {
         method: 'GET',
         credentials: 'same-origin'
     })
         .then(function (r) {
             if (!r.ok) {
-                console.error('Erreur api_settings GET', r.status);
+                console.error('API settings GET error', r.status);
                 showNotificationPopup('Server error', 'error');
                 return null;
             }
             return r.json();
         })
         .then(function (res) {
-            if (!res) return;
-
             input.value = (res && res.success) ? (res.value || '') : '';
             modal.style.display = 'flex';
-
-            // Attach the handler
-            saveBtn.onclick = function () {
-                var val = input.value.trim();
-                // Allow empty value to clear the login display name
-
-                doSet(val).then(function (resp) {
-                    if (!resp) return;
-
-                    if (resp && resp.success) {
-                        modal.style.display = 'none';
-                        // Refresh settings.php if we're on that page
-                        if (window.location.pathname.includes('settings.php')) {
-                            if (typeof window.refreshLoginDisplayBadge === 'function') {
-                                window.refreshLoginDisplayBadge();
-                            }
-                        }
-                    } else {
-                        showNotificationPopup('Save error', 'error');
-                    }
-                })
-                    .catch(function () {
-                        showNotificationPopup('Network error', 'error');
-                    });
-            };
+            saveBtn.onclick = handleSave;
         })
         .catch(function () {
             input.value = '';
             modal.style.display = 'flex';
-
-            saveBtn.onclick = function () {
-                var val = input.value.trim();
-                // Allow empty value to clear the login display name
-
-                doSet(val).then(function (resp) {
-                    if (!resp) return;
-
-                    if (resp && resp.success) {
-                        modal.style.display = 'none';
-                    } else {
-                        showNotificationPopup('Save error', 'error');
-                    }
-                })
-                    .catch(function () {
-                        showNotificationPopup('Network error', 'error');
-                    });
-            };
+            saveBtn.onclick = handleSave;
         });
 }
 
@@ -352,6 +341,10 @@ function closeLoginDisplayModal() {
         modal.style.display = 'none';
     }
 }
+
+// ============================================================================
+// MODALS - Confirmation
+// ============================================================================
 
 // Confirmation modal functions
 var confirmedActionCallback = null;
@@ -387,22 +380,14 @@ function showConfirmModal(title, message, callback, options, saveAndExitCallback
     if (options && options.danger && confirmBtn) {
         confirmBtn.classList.remove('btn-primary');
         confirmBtn.classList.add('btn-danger');
-        // Also set inline styles as a fallback if CSS is overridden elsewhere
-        try {
-            confirmBtn.style.backgroundColor = '#e04b4b';
-            confirmBtn.style.color = '#ffffff';
-            confirmBtn.style.border = 'none';
-        } catch (e) {
-            // ignore
-        }
-    }
-    else if (confirmBtn) {
-        // ensure any inline danger styles are cleared when not dangerous
-        try {
-            confirmBtn.style.backgroundColor = '';
-            confirmBtn.style.color = '';
-            confirmBtn.style.border = '';
-        } catch (e) { }
+        confirmBtn.style.backgroundColor = '#e04b4b';
+        confirmBtn.style.color = '#ffffff';
+        confirmBtn.style.border = 'none';
+    } else if (confirmBtn) {
+        // Clear any inline danger styles when not dangerous
+        confirmBtn.style.backgroundColor = '';
+        confirmBtn.style.color = '';
+        confirmBtn.style.border = '';
     }
 
     // Show or hide the save and exit button
@@ -441,6 +426,10 @@ function executeSaveAndExitAction() {
     closeConfirmModal();
 }
 
+// ============================================================================
+// MODALS - Input
+// ============================================================================
+
 // Functions for styled input modals (replaces window.prompt)
 var inputModalCallback = null;
 
@@ -458,8 +447,6 @@ function showInputModal(title, placeholder, defaultValue, callback) {
     var labelElem = document.getElementById('inputModalLabel');
 
     titleElement.textContent = title;
-    // Use placeholder as the field label when provided (eg. 'New folder name')
-    // if (labelElem) labelElem.textContent = (placeholder && placeholder.length) ? placeholder : title;
     inputElement.placeholder = placeholder || '';
     inputElement.value = defaultValue || '';
     inputModalCallback = callback;
@@ -519,8 +506,23 @@ function executeInputModalAction() {
     }
 }
 
+// ============================================================================
+// MODALS - Link
+// ============================================================================
+
 // Link modal functionality
 var linkModalCallback = null;
+
+// Helper function for removing modal after delay
+function removeModalWithDelay(modalId, delay) {
+    delay = delay || 50;
+    setTimeout(function () {
+        var modal = document.getElementById(modalId);
+        if (modal) {
+            modal.remove();
+        }
+    }, delay);
+}
 
 function showLinkModal(defaultUrl, defaultText, callback) {
     // Create modal if it doesn't exist
@@ -599,15 +601,18 @@ function createLinkModal() {
     var addBtn = document.getElementById('linkModalAdd');
     var removeBtn = document.getElementById('linkModalRemove');
 
-    cancelBtn.addEventListener('click', function () {
+    cancelBtn.addEventListener('click', function (e) {
+        e.preventDefault();
         closeModal('linkModal');
     });
 
-    addBtn.addEventListener('click', function () {
+    addBtn.addEventListener('click', function (e) {
+        e.preventDefault();
         executeLinkModalAction();
     });
 
-    removeBtn.addEventListener('click', function () {
+    removeBtn.addEventListener('click', function (e) {
+        e.preventDefault();
         executeLinkModalRemove();
     });
 
@@ -618,6 +623,7 @@ function createLinkModal() {
     [urlInput, textInput].forEach(function (input) {
         input.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
+                e.preventDefault();
                 executeLinkModalAction();
             }
         });
@@ -634,20 +640,22 @@ function executeLinkModalAction() {
     var text = document.getElementById('linkModalText').value.trim();
     var callback = linkModalCallback;
 
+    // Remove invisible characters (zero-width spaces, etc.) and check if really empty
+    // Regex matches: whitespace, zero-width space (U+200B), zero-width non-joiner (U+200C), 
+    // zero-width joiner (U+200D), zero-width no-break space (U+FEFF), etc.
+    if (!text || /^[\s\u200B-\u200D\uFEFF\u00A0]*$/.test(text)) {
+        text = '';
+    }
+
     // Reset callback BEFORE calling it to avoid re-entry
     linkModalCallback = null;
 
     if (callback && url) {
-        callback(url, text || url);
+        var finalText = text || url;
+        callback(url, finalText);
     }
 
-    // Close modal with a slight delay to allow DOM operations to complete
-    setTimeout(function () {
-        var modal = document.getElementById('linkModal');
-        if (modal) {
-            modal.remove();
-        }
-    }, 50);
+    removeModalWithDelay('linkModal');
 }
 
 function executeLinkModalRemove() {
@@ -661,14 +669,12 @@ function executeLinkModalRemove() {
         callback(null, null);
     }
 
-    // Close modal with a slight delay to allow DOM operations to complete
-    setTimeout(function () {
-        var modal = document.getElementById('linkModal');
-        if (modal) {
-            modal.remove();
-        }
-    }, 50);
+    removeModalWithDelay('linkModal');
 }
+
+// ============================================================================
+// MODALS - YouTube
+// ============================================================================
 
 // YouTube Modal for inserting YouTube videos
 var youtubeModalCallback = null;
@@ -753,17 +759,11 @@ function executeYouTubeModalAction() {
         callback(url);
     }
 
-    // Close modal with a slight delay to allow DOM operations to complete
-    setTimeout(function () {
-        var modal = document.getElementById('youtubeModal');
-        if (modal) {
-            modal.remove();
-        }
-    }, 50);
+    removeModalWithDelay('youtubeModal');
 }
 
-// Expose globally
-window.showYouTubeModal = showYouTubeModal;
+// ============================================================================
+// GLOBAL EXPORTS
+// ============================================================================
 
-// Expose setSaveButtonRed globally for use in other modules
-window.setSaveButtonRed = setSaveButtonRed;
+window.showYouTubeModal = showYouTubeModal;

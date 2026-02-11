@@ -16,7 +16,6 @@
     function init() {
         // Document-level delegation ensures listeners work even when content is replaced
         if (window._kanbanInitialized) {
-            console.log("Kanban: Listeners already initialized on document.");
             return;
         }
 
@@ -33,7 +32,6 @@
             const card = e.target.closest('.kanban-card');
             if (!card) return;
 
-            console.log("Kanban: Drag start on card", card.dataset.noteId);
             draggedCard = card;
             draggedFromFolderId = card.dataset.folderId;
 
@@ -55,7 +53,6 @@
             const card = e.target.closest('.kanban-card');
             if (!card) return;
 
-            console.log("Kanban: Drag end");
             card.classList.remove('dragging');
             card.style.opacity = '1';
 
@@ -111,7 +108,6 @@
             // Stop propagation to avoid Poznote's folder-drop logic
             e.stopPropagation();
 
-            console.log("Kanban: Drop detected in column", columnContent.dataset.folderId);
 
             columnContent.classList.remove('drag-over');
             const column = columnContent.closest('.kanban-column');
@@ -127,7 +123,6 @@
 
             // Don't do anything if dropped in the same column
             if (targetFolderId === draggedFromFolderId) {
-                console.log("Kanban: Dropped in same column, ignoring.");
                 return;
             }
 
@@ -159,7 +154,6 @@
                     updateColumnCounts();
                     showError('Failed to move note');
                 } else {
-                    console.log("Kanban: Move successful");
                     // Success: refresh the sidebar to stay in sync with the new note location
                     if (typeof window.refreshNotesListAfterFolderAction === 'function') {
                         window.refreshNotesListAfterFolderAction();
@@ -192,7 +186,6 @@
             }
 
             const noteId = card.dataset.noteId;
-            console.log("Kanban: Card clicked, loading note", noteId);
 
             // Get workspace
             let workspace = '';
@@ -214,6 +207,22 @@
                 let url = 'index.php?note=' + noteId;
                 if (workspace) url += '&workspace=' + encodeURIComponent(workspace);
                 window.location.href = url;
+            }
+        });
+
+        // Kanban Scroll Buttons
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('.kanban-scroll-btn');
+            if (!btn) return;
+
+            const board = document.getElementById('kanbanBoard');
+            if (!board) return;
+
+            const scrollAmount = 350; // Pixels to scroll
+            if (btn.classList.contains('left')) {
+                board.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else if (btn.classList.contains('right')) {
+                board.scrollBy({ left: scrollAmount, behavior: 'smooth' });
             }
         });
     }

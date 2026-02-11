@@ -8,6 +8,14 @@
 (function() {
   'use strict';
 
+  // ===== CONSTANTS =====
+  
+  // Class names for checklist items to exclude from bullet list handling
+  const CHECKLIST_CLASSES = {
+    ITEM: ['checklist-item', 'task-list-item'],
+    LIST: ['checklist', 'task-list']
+  };
+
   // Track if event listeners are already set up
   let listenersInitialized = false;
 
@@ -15,10 +23,25 @@
 
   /**
    * Get the noteentry element from a given element
+   * @param {HTMLElement} element - The element to search from
+   * @returns {HTMLElement|null} The noteentry element or null
    */
   function getNoteEntry(element) {
     if (!element) return null;
     return element.closest('.noteentry');
+  }
+
+  /**
+   * Check if an element is a checklist item or list
+   * Checklists are handled by a separate module and should be excluded
+   * @param {HTMLElement} element - The element to check
+   * @param {boolean} isList - Whether checking a list (ul/ol) or list item (li)
+   * @returns {boolean} True if element is a checklist
+   */
+  function isChecklistElement(element, isList = false) {
+    if (!element) return false;
+    const classesToCheck = isList ? CHECKLIST_CLASSES.LIST : CHECKLIST_CLASSES.ITEM;
+    return classesToCheck.some(className => element.classList.contains(className));
   }
 
   /**
@@ -34,6 +57,8 @@
 
   /**
    * Set cursor position in an element
+   * @param {HTMLElement} element - The element to place cursor in
+   * @param {boolean} atEnd - If true, place cursor at end; if false, at beginning
    */
   function setCursorInElement(element, atEnd) {
     if (!element) return;
@@ -43,16 +68,14 @@
     
     if (element.childNodes.length > 0) {
       const textNode = element.firstChild;
-      if (textNode.nodeType === 3) {
+      if (textNode.nodeType === Node.TEXT_NODE) {
         const offset = atEnd ? textNode.textContent.length : 0;
         range.setStart(textNode, offset);
       } else {
         range.selectNodeContents(element);
-        range.collapse(!atEnd);
       }
     } else {
       range.selectNodeContents(element);
-      range.collapse(!atEnd);
     }
     
     range.collapse(atEnd);
@@ -62,7 +85,8 @@
 
   /**
    * Find the current list item (li) that contains the cursor
-   * Excludes checklist items which are handled separately
+   * Excludes checklist items which are handled by a separate module
+   * @returns {HTMLElement|null} The list item element or null
    */
   function findCurrentBulletListItem() {
     const sel = window.getSelection();
@@ -71,17 +95,19 @@
     const range = sel.getRangeAt(0);
     let node = range.startContainer;
     
-    // Walk up to find li
+    // Walk up the DOM tree to find a list item
     while (node && node !== document) {
-      if (node.nodeType === 1 && node.tagName === 'LI') {
-        // Make sure it's NOT a checklist item
-        if (!node.classList.contains('checklist-item') && !node.classList.contains('task-list-item')) {
-          // Make sure parent is ul or ol (not a checklist)
-          const parentList = node.parentElement;
-          if (parentList && (parentList.tagName === 'UL' || parentList.tagName === 'OL')) {
-            if (!parentList.classList.contains('checklist') && !parentList.classList.contains('task-list')) {
-              return node;
-            }
+      if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'LI') {
+        // Exclude checklist items
+        if (isChecklistElement(node, false)) {
+          return null;
+        }
+        
+        // Verify parent is a regular list (ul/ol), not a checklist
+        const parentList = node.parentElement;
+        if (parentList && (parentList.tagName === 'UL' || parentList.tagName === 'OL')) {
+          if (!isChecklistElement(parentList, true)) {
+            return node;
           }
         }
       }
@@ -93,6 +119,8 @@
 
   /**
    * Find the parent list (ul/ol) from a list item
+   * @param {HTMLElement} listItem - The list item element
+   * @returns {HTMLElement|null} The parent ul or ol element
    */
   function findParentList(listItem) {
     if (!listItem) return null;
@@ -105,6 +133,8 @@
 
   /**
    * Create a new list of the same type as the parent
+   * @param {HTMLElement} parentList - The parent list to match type
+   * @returns {HTMLElement} A new ul or ol element
    */
   function createNestedList(parentList) {
     const tagName = parentList ? parentList.tagName : 'UL';
@@ -120,6 +150,8 @@
    * Indent a list item (TAB key)
    * Moves the current item as a child of the previous sibling item
    * Limited to one level of indentation only
+   * @param {HTMLElement} item - The list item to indent
+   * @returns {boolean} True if indentation was successful
    */
   function indentListItem(item) {
     const prevItem = item.previousElementSibling;
@@ -128,15 +160,15 @@
       return false;
     }
     
-    // Also check that prevItem is not a checklist item
-    if (prevItem.classList.contains('checklist-item') || prevItem.classList.contains('task-list-item')) {
+    // Verify previous item is not a checklist item
+    if (isChecklistElement(prevItem, false)) {
       return false;
     }
 
     const parentList = findParentList(item);
     
-    // Check if we are already at level 1 (inside a nested list)
-    // If parentList has a parent that is a LI, we're already nested
+    // Limit indentation to one level only
+    // Check if we're already in a nested list (parentList is inside a LI)
     const parentListParent = parentList.parentElement;
     if (parentListParent && parentListParent.tagName === 'LI') {
       // Already indented once, cannot indent further
@@ -174,6 +206,8 @@
   /**
    * Outdent a list item (SHIFT+TAB key)
    * Moves the current item from a nested list back to the parent level
+   * @param {HTMLElement} item - The list item to outdent
+   * @returns {boolean} True if outdentation was successful
    */
   function outdentListItem(item) {
     const parentList = findParentList(item);
@@ -186,8 +220,8 @@
       return false;
     }
     
-    // Also check parent is not a checklist
-    if (parentListItem.classList.contains('checklist-item') || parentListItem.classList.contains('task-list-item')) {
+    // Verify parent item is not a checklist
+    if (isChecklistElement(parentListItem, false)) {
       return false;
     }
     
@@ -260,11 +294,12 @@
 
   /**
    * Initialize bullet list keyboard handling
+   * Sets up event listeners for Tab/Shift+Tab indentation
    */
   function initBulletList() {
     if (listenersInitialized) return;
     
-    // Use capture phase to handle before other handlers
+    // Use capture phase to handle Tab before other handlers (like checklists)
     document.addEventListener('keydown', handleKeyDown, true);
     
     listenersInitialized = true;

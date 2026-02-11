@@ -10,6 +10,11 @@
 // Include auto-migration to ensure multi-user structure exists
 require_once __DIR__ . '/auto_migrate.php';
 
+// Ensure shared helpers are available when db_connect is included before functions.php
+if (!function_exists('createDirectoryWithPermissions')) {
+    require_once __DIR__ . '/functions.php';
+}
+
 // Determine database path based on authenticated user
 $dbPath = SQLITE_DATABASE; // Default path (fallback)
 $activeUserId = null;
@@ -78,9 +83,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id']) {
 try {
     // Ensure the database directory exists
     $dbDir = dirname($dbPath);
-    if (!is_dir($dbDir)) {
-        mkdir($dbDir, 0755, true);
-    }
+    createDirectoryWithPermissions($dbDir);
     
     $con = new PDO('sqlite:' . $dbPath);
     $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -160,38 +163,7 @@ try {
         type TEXT DEFAULT "note"
     )');
 
-    // Add missing columns to entries if they don't exist (migration for old backups)
-    try {
-        $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
-        $existingColumns = array_column($cols, 'name');
-        
-        // Add 'folder_id' column if missing
-        if (!in_array('folder_id', $existingColumns)) {
-            $con->exec("ALTER TABLE entries ADD COLUMN folder_id INTEGER REFERENCES folders(id) ON DELETE SET NULL");
-        }
-        // Add 'location' column if missing
-        if (!in_array('location', $existingColumns)) {
-            $con->exec("ALTER TABLE entries ADD COLUMN location TEXT");
-        }
-        // Add 'subheading' column if missing
-        if (!in_array('subheading', $existingColumns)) {
-            $con->exec("ALTER TABLE entries ADD COLUMN subheading TEXT");
-        }
-        // Add 'type' column if missing
-        if (!in_array('type', $existingColumns)) {
-            $con->exec("ALTER TABLE entries ADD COLUMN type TEXT DEFAULT 'note'");
-        }
-        // Add 'linked_note_id' column if missing (for linked notes)
-        if (!in_array('linked_note_id', $existingColumns)) {
-            $con->exec("ALTER TABLE entries ADD COLUMN linked_note_id INTEGER REFERENCES entries(id) ON DELETE SET NULL");
-        }
-    } catch (Exception $e) {
-        error_log('Could not add missing columns to entries: ' . $e->getMessage());
-    }
-
     // Create folders table for empty folders (scoped by workspace)
-    // Note: For new installations this creates the full schema.
-    // For old backups, this does nothing since table exists (migrations below handle missing columns)
     $con->exec('CREATE TABLE IF NOT EXISTS folders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -200,82 +172,6 @@ try {
         created DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (parent_id) REFERENCES folders(id) ON DELETE CASCADE
     )');
-
-    // === MIGRATIONS FOR OLD BACKUPS ===
-    // These MUST run BEFORE any indexes that use these columns
-    
-    // Add missing columns to folders if they don't exist (migration for old backups)
-    try {
-        $cols = $con->query("PRAGMA table_info(folders)")->fetchAll(PDO::FETCH_ASSOC);
-        $existingColumns = array_column($cols, 'name');
-        
-        // Add 'parent_id' column if missing (for subfolder support)
-        if (!in_array('parent_id', $existingColumns)) {
-            $con->exec("ALTER TABLE folders ADD COLUMN parent_id INTEGER DEFAULT NULL");
-        }
-        // Add 'icon' column if missing (for custom folder icons)
-        if (!in_array('icon', $existingColumns)) {
-            $con->exec("ALTER TABLE folders ADD COLUMN icon TEXT");
-        }
-        // Add 'icon_color' column if missing (for custom folder icon colors)
-        if (!in_array('icon_color', $existingColumns)) {
-            $con->exec("ALTER TABLE folders ADD COLUMN icon_color TEXT");
-        }
-        // Add 'kanban_enabled' column if missing (for enabling Kanban view per folder)
-        if (!in_array('kanban_enabled', $existingColumns)) {
-            $con->exec("ALTER TABLE folders ADD COLUMN kanban_enabled INTEGER DEFAULT 0");
-        }
-        // Add 'sort_setting' column if missing (for per-folder sort preference)
-        if (!in_array('sort_setting', $existingColumns)) {
-            $con->exec("ALTER TABLE folders ADD COLUMN sort_setting TEXT");
-        }
-    } catch (Exception $e) {
-        error_log('Could not add missing columns to folders: ' . $e->getMessage());
-    }
-
-    // === END MIGRATIONS ===
-
-    // Ensure unique folder names per workspace and parent
-    // These indexes use parent_id, so they MUST come AFTER the migration above
-    // For subfolders (parent_id IS NOT NULL): same name allowed in different parents
-    $con->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_folders_name_workspace_parent_notnull 
-                ON folders(name, workspace, parent_id) 
-                WHERE parent_id IS NOT NULL');
-    
-    // For root folders (parent_id IS NULL): same name NOT allowed
-    $con->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_folders_name_workspace_root 
-                ON folders(name, workspace) 
-                WHERE parent_id IS NULL');
-    
-    // Performance indexes for folders table
-    $con->exec('CREATE INDEX IF NOT EXISTS idx_folders_workspace ON folders(workspace)');
-    $con->exec('CREATE INDEX IF NOT EXISTS idx_folders_parent_id ON folders(parent_id)');
-    $con->exec('CREATE INDEX IF NOT EXISTS idx_folders_name ON folders(name COLLATE NOCASE)');
-
-    // Create indexes on entries table for performance
-    // Index for main queries (trash + workspace filtering)
-    $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_trash_workspace ON entries(trash, workspace)');
-    
-    // Index for ordering by updated date
-    $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_updated ON entries(updated DESC)');
-    
-    // Index for ordering by created date
-    $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_created ON entries(created DESC)');
-    
-    // Index for folder-based queries
-    $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_folder_id ON entries(folder_id)');
-    
-    // Index for favorites filtering
-    $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_favorite ON entries(favorite)');
-    
-    // Index for tags search
-    $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_tags ON entries(tags)');
-    
-    // Composite index for common query pattern (trash + workspace + updated)
-    $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_trash_workspace_updated ON entries(trash, workspace, updated DESC)');
-    
-    // Index for heading searches (text search optimization)
-    $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_heading ON entries(heading COLLATE NOCASE)');
 
     // Create workspaces table
     $con->exec('CREATE TABLE IF NOT EXISTS workspaces (
@@ -305,31 +201,6 @@ try {
         expires DATETIME,
         FOREIGN KEY(note_id) REFERENCES entries(id) ON DELETE CASCADE
     )');
-    
-    // Performance indexes for shared_notes table
-    $con->exec('CREATE INDEX IF NOT EXISTS idx_shared_notes_note_id ON shared_notes(note_id)');
-    $con->exec('CREATE INDEX IF NOT EXISTS idx_shared_notes_token ON shared_notes(token)');
-
-    // Add missing columns to shared_notes if they don't exist (migration for old backups)
-    try {
-        $cols = $con->query("PRAGMA table_info(shared_notes)")->fetchAll(PDO::FETCH_ASSOC);
-        $existingColumns = array_column($cols, 'name');
-        
-        // Add 'theme' column if missing (for storing chosen display mode)
-        if (!in_array('theme', $existingColumns)) {
-            $con->exec("ALTER TABLE shared_notes ADD COLUMN theme TEXT");
-        }
-        // Add 'indexable' column if missing (controls whether the page can be indexed by search engines)
-        if (!in_array('indexable', $existingColumns)) {
-            $con->exec("ALTER TABLE shared_notes ADD COLUMN indexable INTEGER DEFAULT 0");
-        }
-        // Add 'password' column if missing (optional password protection for shared notes)
-        if (!in_array('password', $existingColumns)) {
-            $con->exec("ALTER TABLE shared_notes ADD COLUMN password TEXT");
-        }
-    } catch (Exception $e) {
-        error_log('Could not add missing columns to shared_notes: ' . $e->getMessage());
-    }
 
     // Table for public shared folders (token based)
     $con->exec('CREATE TABLE IF NOT EXISTS shared_folders (
@@ -343,20 +214,120 @@ try {
         password TEXT,
         FOREIGN KEY(folder_id) REFERENCES folders(id) ON DELETE CASCADE
     )');
-    
-    // Performance indexes for shared_folders table
-    $con->exec('CREATE INDEX IF NOT EXISTS idx_shared_folders_folder_id ON shared_folders(folder_id)');
-    $con->exec('CREATE INDEX IF NOT EXISTS idx_shared_folders_token ON shared_folders(token)');
 
-    // Set default settings
-    $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_font_size', '15')");
-    $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('emoji_icons_enabled', '1')");
-    // UI language (default: English)
-    $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('language', 'en')");
-    // Controls to show/hide metadata under note title in notes list (enabled by default)
-    $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_created', '1')");
-    // Folder counts hidden by default
-    $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('hide_folder_counts', '0')");
+    // --- Schema versioning: skip migrations & indexes if already up to date ---
+    $CURRENT_SCHEMA_VERSION = 3;
+    $currentVersion = 0;
+    try {
+        $svStmt = $con->query("SELECT value FROM settings WHERE key = 'schema_version'");
+        $svResult = $svStmt->fetchColumn();
+        if ($svResult !== false) {
+            $currentVersion = (int)$svResult;
+        }
+    } catch (Exception $e) {
+        // settings table might not exist yet for very old databases
+    }
+
+    if ($currentVersion < $CURRENT_SCHEMA_VERSION) {
+        // === COLUMN MIGRATIONS ===
+
+        // Add missing columns to entries if they don't exist (migration for old backups)
+        try {
+            $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
+            $existingColumns = array_column($cols, 'name');
+            if (!in_array('folder_id', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN folder_id INTEGER REFERENCES folders(id) ON DELETE SET NULL");
+            }
+            if (!in_array('location', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN location TEXT");
+            }
+            if (!in_array('subheading', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN subheading TEXT");
+            }
+            if (!in_array('type', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN type TEXT DEFAULT 'note'");
+            }
+            if (!in_array('linked_note_id', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN linked_note_id INTEGER REFERENCES entries(id) ON DELETE SET NULL");
+            }
+        } catch (Exception $e) {
+            error_log('Could not add missing columns to entries: ' . $e->getMessage());
+        }
+
+        // Add missing columns to folders
+        try {
+            $cols = $con->query("PRAGMA table_info(folders)")->fetchAll(PDO::FETCH_ASSOC);
+            $existingColumns = array_column($cols, 'name');
+            if (!in_array('parent_id', $existingColumns)) {
+                $con->exec("ALTER TABLE folders ADD COLUMN parent_id INTEGER DEFAULT NULL");
+            }
+            if (!in_array('icon', $existingColumns)) {
+                $con->exec("ALTER TABLE folders ADD COLUMN icon TEXT");
+            }
+            if (!in_array('icon_color', $existingColumns)) {
+                $con->exec("ALTER TABLE folders ADD COLUMN icon_color TEXT");
+            }
+            if (!in_array('kanban_enabled', $existingColumns)) {
+                $con->exec("ALTER TABLE folders ADD COLUMN kanban_enabled INTEGER DEFAULT 0");
+            }
+            if (!in_array('sort_setting', $existingColumns)) {
+                $con->exec("ALTER TABLE folders ADD COLUMN sort_setting TEXT");
+            }
+        } catch (Exception $e) {
+            error_log('Could not add missing columns to folders: ' . $e->getMessage());
+        }
+
+        // Add missing columns to shared_notes
+        try {
+            $cols = $con->query("PRAGMA table_info(shared_notes)")->fetchAll(PDO::FETCH_ASSOC);
+            $existingColumns = array_column($cols, 'name');
+            if (!in_array('theme', $existingColumns)) {
+                $con->exec("ALTER TABLE shared_notes ADD COLUMN theme TEXT");
+            }
+            if (!in_array('indexable', $existingColumns)) {
+                $con->exec("ALTER TABLE shared_notes ADD COLUMN indexable INTEGER DEFAULT 0");
+            }
+            if (!in_array('password', $existingColumns)) {
+                $con->exec("ALTER TABLE shared_notes ADD COLUMN password TEXT");
+            }
+        } catch (Exception $e) {
+            error_log('Could not add missing columns to shared_notes: ' . $e->getMessage());
+        }
+
+        // === INDEXES ===
+        $con->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_folders_name_workspace_parent_notnull 
+                    ON folders(name, workspace, parent_id) 
+                    WHERE parent_id IS NOT NULL');
+        $con->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_folders_name_workspace_root 
+                    ON folders(name, workspace) 
+                    WHERE parent_id IS NULL');
+        $con->exec('CREATE INDEX IF NOT EXISTS idx_folders_workspace ON folders(workspace)');
+        $con->exec('CREATE INDEX IF NOT EXISTS idx_folders_parent_id ON folders(parent_id)');
+        $con->exec('CREATE INDEX IF NOT EXISTS idx_folders_name ON folders(name COLLATE NOCASE)');
+        $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_trash_workspace ON entries(trash, workspace)');
+        $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_updated ON entries(updated DESC)');
+        $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_created ON entries(created DESC)');
+        $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_folder_id ON entries(folder_id)');
+        $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_favorite ON entries(favorite)');
+        $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_tags ON entries(tags)');
+        $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_trash_workspace_updated ON entries(trash, workspace, updated DESC)');
+        $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_heading ON entries(heading COLLATE NOCASE)');
+        $con->exec('CREATE INDEX IF NOT EXISTS idx_shared_notes_note_id ON shared_notes(note_id)');
+        $con->exec('CREATE INDEX IF NOT EXISTS idx_shared_notes_token ON shared_notes(token)');
+        $con->exec('CREATE INDEX IF NOT EXISTS idx_shared_folders_folder_id ON shared_folders(folder_id)');
+        $con->exec('CREATE INDEX IF NOT EXISTS idx_shared_folders_token ON shared_folders(token)');
+
+        // === DEFAULT SETTINGS ===
+        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_font_size', '15')");
+        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('emoji_icons_enabled', '1')");
+        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('language', 'en')");
+        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_created', '1')");
+        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('hide_folder_counts', '0')");
+
+        // === Update schema version ===
+        $con->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('schema_version', '$CURRENT_SCHEMA_VERSION')");
+    }
+    // --- End schema versioning ---
 
     // Ensure required data directories exist
     // $dbDir points to data/database, so we need to go up one level to get data/
@@ -364,17 +335,7 @@ try {
     $requiredDirs = ['attachments', 'database', 'entries'];
     foreach ($requiredDirs as $dir) {
         $fullPath = $dataDir . '/' . $dir;
-        if (!is_dir($fullPath)) {
-            if (!mkdir($fullPath, 0755, true)) {
-                error_log("Failed to create directory: $fullPath");
-                continue;
-            }
-            // Set proper ownership if running as root (Docker context)
-            if (function_exists('posix_getuid') && posix_getuid() === 0) {
-                chown($fullPath, 'www-data');
-                chgrp($fullPath, 'www-data');
-            }
-        }
+        createDirectoryWithPermissions($fullPath);
     }
 
     // Create welcome note and Getting Started folder if no notes exist (first installation)
@@ -410,19 +371,11 @@ try {
             // Create the HTML file for the welcome note
             $dataDir = dirname($dbDir);
             $entriesDir = $dataDir . '/entries';
-            if (!is_dir($entriesDir)) {
-                mkdir($entriesDir, 0755, true);
-            }
+            createDirectoryWithPermissions($entriesDir);
             
             $welcomeFile = $entriesDir . '/' . $welcomeNoteId . '.html';
             file_put_contents($welcomeFile, $welcomeContent);
-            chmod($welcomeFile, 0644);
-            
-            // Set proper ownership if running as root
-            if (function_exists('posix_getuid') && posix_getuid() === 0) {
-                chown($welcomeFile, 'www-data');
-                chgrp($welcomeFile, 'www-data');
-            }
+            setFilePermissions($welcomeFile, 0644);
         }
         // Legacy migration: ensure folder_id is populated and entries are fixed
         if (function_exists('repairDatabaseEntries')) {

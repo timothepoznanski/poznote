@@ -1,0 +1,63 @@
+/**
+ * Folder Animations
+ *
+ * Note loading states, fade transitions, spin animation,
+ * and sidebar link transitions.
+ */
+
+/* Note Loading State - Smooth fade effect */
+.note-loading-state {
+    opacity: 0;
+    animation: gentleFadeIn 0.15s ease-in-out forwards;
+}
+
+@keyframes gentleFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Smooth fade out for outgoing content */
+.note-fade-out {
+    opacity: 0;
+    transition: opacity 0.1s ease-out;
+}
+
+/* Spin animation */
+.fa-spin {
+    -webkit-animation: fa-spin 2s infinite linear;
+    animation: fa-spin 2s infinite linear;
+}
+
+@-webkit-keyframes fa-spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(359deg);
+    }
+}
+
+@keyframes fa-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Smooth transition for note selection */
+.links_arbo_left {
+    transition: background-color 0.2s ease, border-left 0.2s ease;
+}
+
+.links_arbo_left.selected-note {
+    background-color: transparent !important;
+    border-left: none !important;
+}

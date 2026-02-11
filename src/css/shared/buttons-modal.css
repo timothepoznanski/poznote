@@ -1,0 +1,94 @@
+/**
+ * Shared Page - Buttons & Modal
+ *
+ * Button styles and modal dialog.
+ */
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    color: white;
+    text-decoration: none;
+}
+
+.btn-shared {
+    background: rgb(0, 125, 184);
+    color: white;
+}
+
+.btn-shared:hover {
+    background: rgb(0, 105, 154);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-danger {
+    background: #e04b4b;
+    color: #fff;
+    border: none;
+}
+
+.btn-danger:hover {
+    background: #c43b3b;
+}
+
+.modal-content {
+    background-color: var(--modal-bg, #ffffff);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 90%;
+}
+
+.modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color, #dee2e6);
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-color, #333333);
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-body p {
+    margin: 0;
+    color: var(--text-color, #333333);
+}
+
+.modal-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border-color, #dee2e6);
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}

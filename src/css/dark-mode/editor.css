@@ -1,0 +1,304 @@
+/* ============================================
+   Dark Mode - Note Editor & Content
+   ============================================ */
+
+/* Note card and inner note */
+html[data-theme='dark'] .notecard,
+body.dark-mode .notecard {
+    background-color: var(--dm-bg);
+}
+
+html[data-theme='dark'] .innernote,
+body.dark-mode .innernote {
+    background-color: var(--dm-bg);
+    color: var(--dm-text);
+}
+
+/* Note header and toolbar - apply dark background immediately */
+html[data-theme='dark'] .note-header,
+body.dark-mode .note-header {
+    background-color: var(--dm-bg) !important;
+}
+
+html[data-theme='dark'] .note-edit-toolbar,
+body.dark-mode .note-edit-toolbar {
+    background-color: var(--dm-bg) !important;
+}
+
+html[data-theme='dark'] .note-header-spacer,
+body.dark-mode .note-header-spacer {
+    background-color: var(--dm-bg) !important;
+}
+
+/* Note title */
+html[data-theme='dark'] .css-title,
+body.dark-mode .css-title {
+    background-color: var(--dm-bg);
+    color: var(--dm-text);
+}
+
+/* Note entry content */
+html[data-theme='dark'] .noteentry,
+body.dark-mode .noteentry {
+    background-color: var(--dm-bg);
+    color: var(--dm-text) !important;
+}
+
+/* Readable text colors: preserve inline color styles, links, and syntax highlighting */
+html[data-theme='dark'] .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.search-highlight):not(.search-highlight-active),
+body.dark-mode .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.search-highlight):not(.search-highlight-active) {
+    color: var(--dm-text) !important;
+}
+
+/* Note placeholder */
+html[data-theme='dark'] div[contentEditable=true]:empty:before,
+body.dark-mode div[contentEditable=true]:empty:before {
+    color: var(--dm-border-light);
+}
+
+/* ============================================
+   Code Blocks
+   ============================================ */
+
+/* Pre blocks and code-block class */
+html[data-theme='dark'] .noteentry pre,
+html[data-theme='dark'] .code-block,
+html[data-theme='dark'] pre.code-block,
+body.dark-mode .noteentry pre,
+body.dark-mode .code-block,
+body.dark-mode pre.code-block {
+    background-color: #262424 !important;
+    border-color: var(--dm-border) !important;
+}
+
+/* Highlighter inside code blocks: preserve dark background with readable highlight */
+html[data-theme='dark'] .noteentry pre *[style*="background"],
+body.dark-mode .noteentry pre *[style*="background"],
+html[data-theme='dark'] .noteentry code *[style*="background"],
+body.dark-mode .noteentry code *[style*="background"],
+html[data-theme='dark'] .noteentry .code-block *[style*="background"],
+body.dark-mode .noteentry .code-block *[style*="background"] {
+    background: linear-gradient(rgba(255, 255, 0, 0.4), rgba(255, 255, 0, 0.4)), #262424 !important;
+    color: var(--dm-text) !important;
+}
+
+/* Inline code only (not inside pre blocks with syntax highlighting) */
+html[data-theme='dark'] .noteentry code:not([class*="hljs"]):not([class*="language-"]),
+body.dark-mode .noteentry code:not([class*="hljs"]):not([class*="language-"]) {
+    background-color: var(--dm-surface) !important;
+    color: var(--dm-text);
+    border-color: var(--dm-border) !important;
+}
+
+/* Code blocks with language class - readable text before highlight.js processes */
+html[data-theme='dark'] .noteentry pre code[class*="language-"],
+html[data-theme='dark'] .noteentry code[class*="language-"],
+body.dark-mode .noteentry pre code[class*="language-"],
+body.dark-mode .noteentry code[class*="language-"] {
+    color: #ffffff !important;
+}
+
+/* Code block placeholders */
+html[data-theme='dark'] p.code-block-placeholder-before[data-ph]:empty:before,
+html[data-theme='dark'] p.code-block-placeholder-after[data-ph]:empty:before,
+body.dark-mode p.code-block-placeholder-before[data-ph]:empty:before,
+body.dark-mode p.code-block-placeholder-after[data-ph]:empty:before {
+    color: #888 !important;
+    opacity: 0.6;
+}
+
+/* Code block copy button */
+html[data-theme='dark'] .code-block-copy-btn,
+html[data-theme='dark'] pre.code-block .code-block-copy-btn,
+html[data-theme='dark'] .noteentry pre .code-block-copy-btn,
+html[data-theme='dark'] .public-note .content pre .code-block-copy-btn,
+body.dark-mode .code-block-copy-btn,
+body.dark-mode pre.code-block .code-block-copy-btn,
+body.dark-mode .noteentry pre .code-block-copy-btn,
+body.dark-mode .public-note .content pre .code-block-copy-btn {
+    background: rgba(100, 100, 100, 0.95) !important;
+    border-color: #888888 !important;
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+html[data-theme='dark'] .code-block-copy-btn svg,
+body.dark-mode .code-block-copy-btn svg {
+    stroke: currentColor !important;
+}
+
+html[data-theme='dark'] .code-block-copy-btn:hover,
+html[data-theme='dark'] pre.code-block .code-block-copy-btn:hover,
+html[data-theme='dark'] .noteentry pre .code-block-copy-btn:hover,
+html[data-theme='dark'] .public-note .content pre .code-block-copy-btn:hover,
+body.dark-mode .code-block-copy-btn:hover,
+body.dark-mode pre.code-block .code-block-copy-btn:hover,
+body.dark-mode .noteentry pre .code-block-copy-btn:hover,
+body.dark-mode .public-note .content pre .code-block-copy-btn:hover {
+    background: rgba(130, 130, 130, 0.95) !important;
+    color: #ffffff !important;
+}
+
+html[data-theme='dark'] .code-block-copy-btn.copied,
+html[data-theme='dark'] pre.code-block .code-block-copy-btn.copied,
+html[data-theme='dark'] .noteentry pre .code-block-copy-btn.copied,
+body.dark-mode .code-block-copy-btn.copied,
+body.dark-mode pre.code-block .code-block-copy-btn.copied,
+body.dark-mode .noteentry pre .code-block-copy-btn.copied {
+    background: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+
+/* ============================================
+   Links in Notes
+   ============================================ */
+
+html[data-theme='dark'] .noteentry a,
+body.dark-mode .noteentry a {
+    color: #64B5F6 !important;
+}
+
+/* Audio player */
+html[data-theme='dark'] .noteentry .note-audio-embed,
+html[data-theme='dark'] .noteentry audio,
+body.dark-mode .noteentry .note-audio-embed,
+body.dark-mode .noteentry audio {
+    background: var(--dm-surface);
+}
+
+/* ============================================
+   Text Selection & Highlighting
+   ============================================ */
+
+html[data-theme='dark'] ::selection,
+body.dark-mode ::selection {
+    background-color: #264f78;
+    color: #ffffff;
+}
+
+html[data-theme='dark'] ::-moz-selection,
+body.dark-mode ::-moz-selection {
+    background-color: #264f78;
+    color: #ffffff;
+}
+
+/* Search highlights */
+html[data-theme='dark'] mark,
+html[data-theme='dark'] .highlight,
+body.dark-mode mark,
+body.dark-mode .highlight {
+    background-color: #4d4d00;
+    color: #ffff99;
+}
+
+/* Highlighting inside code blocks (search/highlight marks, not syntax) */
+html[data-theme='dark'] pre mark[style*="background"],
+html[data-theme='dark'] code mark[style*="background"],
+html[data-theme='dark'] .code-block mark[style*="background"],
+body.dark-mode pre mark[style*="background"],
+body.dark-mode code mark[style*="background"],
+body.dark-mode .code-block mark[style*="background"] {
+    background-color: #665500 !important;
+    background-image: none !important;
+    color: #ffff99 !important;
+}
+
+/* Yellow highlighter tool */
+html[data-theme='dark'] [style*="background-color: rgb(255, 224, 102)"],
+html[data-theme='dark'] [style*="background-color:#ffe066"],
+html[data-theme='dark'] [style*="background-color: #ffe066"],
+body.dark-mode [style*="background-color: rgb(255, 224, 102)"],
+body.dark-mode [style*="background-color:#ffe066"],
+body.dark-mode [style*="background-color: #ffe066"] {
+    background-color: #665500 !important;
+    color: #ffff99 !important;
+}
+
+/* Horizontal rules */
+html[data-theme='dark'] hr,
+body.dark-mode hr {
+    border-color: var(--dm-border);
+}
+
+/* ============================================
+   Toolbar Buttons
+   ============================================ */
+
+html[data-theme='dark'] .toolbar-btn,
+body.dark-mode .toolbar-btn {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .toolbar-btn:hover,
+body.dark-mode .toolbar-btn:hover {
+    background-color: #333;
+}
+
+/* ============================================
+   Toolbar Popups & Menus
+   ============================================ */
+
+/* Color palette popup */
+html[data-theme='dark'] .color-palette-popup,
+body.dark-mode .color-palette-popup {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .color-palette-popup .color-grid,
+body.dark-mode .color-palette-popup .color-grid {
+    background: var(--dm-surface) !important;
+}
+
+/* Toolbar vertical menu */
+html[data-theme='dark'] .toolbar-vertical-menu,
+body.dark-mode .toolbar-vertical-menu {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+/* Font size popup */
+html[data-theme='dark'] .font-size-popup,
+body.dark-mode .font-size-popup {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .font-size-popup .font-size-item:hover,
+body.dark-mode .font-size-popup .font-size-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+html[data-theme='dark'] .font-size-popup .size-label,
+body.dark-mode .font-size-popup .size-label {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .font-size-popup .size-preview,
+body.dark-mode .font-size-popup .size-preview {
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+    background-color: var(--dm-bg);
+}
+
+/* Image resize handle */
+html[data-theme='dark'] .image-resize-handle,
+body.dark-mode .image-resize-handle {
+    background: #007DB8;
+    border-color: var(--dm-surface);
+}
+
+html[data-theme='dark'] .image-resize-handle:hover,
+body.dark-mode .image-resize-handle:hover {
+    background: #0099e6;
+}
+
+/* Blockquotes */
+html[data-theme='dark'] .noteentry blockquote,
+body.dark-mode .noteentry blockquote {
+    border-left-color: var(--dm-border);
+    color: #b0b0b0;
+}

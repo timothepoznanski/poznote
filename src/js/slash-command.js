@@ -4,17 +4,68 @@
 (function () {
     'use strict';
 
-    // ----------------------------
-    // Helper function to remove accents for filtering
-    // ----------------------------
+
+    // Available languages for code blocks (used by HTML and Markdown menus)
+    var CODE_BLOCK_LANGUAGES = [
+        { id: 'code-javascript', icon: 'fa-code', iconColor: '#f7df1e', label: 'JavaScript', lang: 'javascript' },
+        { id: 'code-typescript', icon: 'fa-code', iconColor: '#3178c6', label: 'TypeScript', lang: 'typescript' },
+        { id: 'code-python', icon: 'fa-code', iconColor: '#3776ab', label: 'Python', lang: 'python' },
+        { id: 'code-html', icon: 'fa-code', iconColor: '#e34f26', label: 'HTML', lang: 'html' },
+        { id: 'code-css', icon: 'fa-code', iconColor: '#1572b6', label: 'CSS', lang: 'css' },
+        { id: 'code-json', icon: 'fa-code', iconColor: '#292929', label: 'JSON', lang: 'json' },
+        { id: 'code-bash', icon: 'fa-terminal', iconColor: '#4eaa25', label: 'Bash', lang: 'bash' },
+        { id: 'code-powershell', icon: 'fa-terminal', iconColor: '#012456', label: 'PowerShell', lang: 'powershell' },
+        { id: 'code-sql', icon: 'fa-database', iconColor: '#336791', label: 'SQL', lang: 'sql' },
+        { id: 'code-php', icon: 'fa-code', iconColor: '#777bb4', label: 'PHP', lang: 'php' },
+        { id: 'code-java', icon: 'fa-code', iconColor: '#007396', label: 'Java', lang: 'java' },
+        { id: 'code-csharp', icon: 'fa-code', iconColor: '#239120', label: 'C#', lang: 'csharp' },
+        { id: 'code-cpp', icon: 'fa-code', iconColor: '#00599c', label: 'C++', lang: 'cpp' },
+        { id: 'code-go', icon: 'fa-code', iconColor: '#00add8', label: 'Go', lang: 'go' },
+        { id: 'code-rust', icon: 'fa-code', iconColor: '#b7410e', label: 'Rust', lang: 'rust' },
+        { id: 'code-ruby', icon: 'fa-gem', iconColor: '#cc342d', label: 'Ruby', lang: 'ruby' },
+        { id: 'code-yaml', icon: 'fa-file-code', iconColor: '#cb171e', label: 'YAML', lang: 'yaml' },
+        { id: 'code-xml', icon: 'fa-file-code', iconColor: '#0060ac', label: 'XML', lang: 'xml' },
+        { id: 'code-markdown', icon: 'fa-file-code', iconColor: '#083fa1', label: 'Markdown', lang: 'markdown' }
+    ];
+
+    // Available callout / quote types
+    var CALLOUT_TYPES = [
+        { id: 'plain', labelKey: 'slash_menu.blockquote', fallback: 'Blockquote' },
+        { id: 'note', labelKey: 'slash_menu.callout_note', fallback: 'Note' },
+        { id: 'tip', labelKey: 'slash_menu.callout_tip', fallback: 'Tip' },
+        { id: 'important', labelKey: 'slash_menu.callout_important', fallback: 'Important' },
+        { id: 'warning', labelKey: 'slash_menu.callout_warning', fallback: 'Warning' },
+        { id: 'caution', labelKey: 'slash_menu.callout_caution', fallback: 'Caution' }
+    ];
+
+    // -------------------------------------------------------------------
+    // Slash menu global variables
+    // -------------------------------------------------------------------
+
+    let slashMenuElement = null;
+    let submenuElement = null;
+    let subSubmenuElement = null;
+    let selectedIndex = 0;
+    let selectedSubmenuIndex = 0;
+    let selectedSubSubmenuIndex = 0;
+    let filteredCommands = [];
+    let currentSubmenu = null;
+    let currentSubSubmenu = null;
+    let slashTextNode = null;  // The text node containing the slash
+    let slashOffset = -1;      // The position of the slash in the node
+    let filterText = '';
+    let savedNoteEntry = null;
+    let savedEditableElement = null;
+    let activeCommands = null;
+
+
+    // Remove accents from a string for search
     function removeAccents(str) {
         if (!str) return '';
         return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     }
 
-    // ----------------------------
-    // Markdown insertion helpers
-    // ----------------------------
+    // Get the Markdown editor from the current selection
     function getCurrentMarkdownEditorFromSelection() {
         const selection = window.getSelection();
         if (!selection || !selection.rangeCount) return null;
@@ -34,6 +85,7 @@
         return editor;
     }
 
+    // Calculate selection start and end offsets within an element
     function getSelectionOffsetsWithin(rootEl) {
         const selection = window.getSelection();
         if (!selection || !selection.rangeCount) return null;
@@ -56,6 +108,7 @@
         return { start: Math.min(start, end), end: Math.max(start, end) };
     }
 
+    // Extract text from a Markdown editor
     function getMarkdownEditorText(rootEl) {
         if (!rootEl) return '';
 
@@ -70,6 +123,7 @@
         return rootEl.innerText || rootEl.textContent || '';
     }
 
+    // Find the text node at a given offset
     function findTextNodeAtOffset(rootEl, offset) {
         const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, null);
         let node = walker.nextNode();
@@ -88,6 +142,7 @@
         return { node: rootEl, offset: rootEl.childNodes ? rootEl.childNodes.length : 0 };
     }
 
+    // Set selection from start and end offsets
     function setSelectionByOffsets(rootEl, startOffset, endOffset) {
         const selection = window.getSelection();
         if (!selection) return;
@@ -111,6 +166,7 @@
         selection.addRange(range);
     }
 
+    // Replace a text range in the Markdown editor
     function replaceMarkdownRange(rootEl, start, end, replacement, selectStartAfter, selectEndAfter) {
         if (!rootEl) return;
 
@@ -131,6 +187,7 @@
         } catch (e) { }
     }
 
+    // Insert Markdown text at cursor position
     function insertMarkdownAtCursor(text, caretDeltaFromInsertEnd) {
         // Prefer DOM-range insertion to avoid line/offset mismatches in contentEditable.
         const editor = getCurrentMarkdownEditorFromSelection();
@@ -166,6 +223,7 @@
         } catch (e) { }
     }
 
+    // Wrap Markdown selection with a prefix and suffix
     function wrapMarkdownSelection(prefix, suffix, emptyInnerCaretOffset) {
         const editor = getCurrentMarkdownEditorFromSelection();
         if (!editor) return;
@@ -209,13 +267,14 @@
         } catch (e) { }
     }
 
+    // Insert a prefix at the start of the current line in Markdown
     function insertMarkdownPrefixAtLineStart(prefix) {
         // For Markdown, the slash command is typically typed at the insertion point.
         // Inserting at cursor is more reliable than trying to compute line starts across contentEditable lines.
         insertMarkdownAtCursor(prefix, 0);
     }
 
-    // Helper functions to replace deprecated execCommand
+    // Insert an HTML heading (h1, h2, h3)
     function insertHeading(level) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -245,48 +304,23 @@
         }
     }
 
-    function insertBold() {
+    // Insert an inline HTML element (strong, em, mark, code, etc.)
+    function insertInlineElement(tagName, styleObj) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
 
         const range = selection.getRangeAt(0);
-
-        // Create bold element
-        const strong = document.createElement('strong');
+        const el = document.createElement(tagName);
+        if (styleObj) {
+            for (var key in styleObj) {
+                if (styleObj.hasOwnProperty(key)) el.style[key] = styleObj[key];
+            }
+        }
         const textNode = document.createTextNode('\u200B'); // Zero-width space to place cursor
-        strong.appendChild(textNode);
-
-        // Insert at cursor position
-        range.deleteContents();
-        range.insertNode(strong);
-
-        // Place cursor inside bold element after the zero-width space
-        const newRange = document.createRange();
-        newRange.setStart(textNode, 1);
-        newRange.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(newRange);
-
-        // Trigger input event for autosave
-        const noteEntry = strong.closest('.noteentry');
-        if (noteEntry) {
-            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-    }
-
-    function insertItalic() {
-        const selection = window.getSelection();
-        if (!selection.rangeCount) return;
-
-        const range = selection.getRangeAt(0);
-
-        // Create italic element
-        const em = document.createElement('em');
-        const textNode = document.createTextNode('\u200B');
-        em.appendChild(textNode);
+        el.appendChild(textNode);
 
         range.deleteContents();
-        range.insertNode(em);
+        range.insertNode(el);
 
         const newRange = document.createRange();
         newRange.setStart(textNode, 1);
@@ -294,125 +328,48 @@
         selection.removeAllRanges();
         selection.addRange(newRange);
 
-        const noteEntry = em.closest('.noteentry');
+        const noteEntry = el.closest('.noteentry');
         if (noteEntry) {
             noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
         }
     }
 
+    // Insert bold text
+    function insertBold() { 
+        insertInlineElement('strong'); 
+    }
+
+    // Insert italic text
+    function insertItalic() { 
+        insertInlineElement('em'); 
+    }
+
+    // Insert highlighted text
+    function insertHighlight() { 
+        insertInlineElement('mark'); 
+    }
+
+    // Insert strikethrough text
+    function insertStrikethrough() { 
+        insertInlineElement('s'); 
+    }
+
+    // Insert inline code
+    function insertCode() { 
+        insertInlineElement('code'); 
+    }
+
+    // Insert colored text
     function insertColor(color) {
-        const selection = window.getSelection();
-        if (!selection.rangeCount) return;
-
-        const range = selection.getRangeAt(0);
-
-        // Create span with color
-        const span = document.createElement('span');
-        if (color !== 'black') {
-            span.style.color = color;
-        }
-        const textNode = document.createTextNode('\u200B');
-        span.appendChild(textNode);
-
-        range.deleteContents();
-        range.insertNode(span);
-
-        const newRange = document.createRange();
-        newRange.setStart(textNode, 1);
-        newRange.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(newRange);
-
-        const noteEntry = span.closest('.noteentry');
-        if (noteEntry) {
-            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
-        }
+        insertInlineElement('span', color !== 'black' ? { color: color } : undefined);
     }
 
-    function insertHighlight() {
-        const selection = window.getSelection();
-        if (!selection.rangeCount) return;
-
-        const range = selection.getRangeAt(0);
-
-        // Create mark element (highlight)
-        const mark = document.createElement('mark');
-        const textNode = document.createTextNode('\u200B');
-        mark.appendChild(textNode);
-
-        range.deleteContents();
-        range.insertNode(mark);
-
-        const newRange = document.createRange();
-        newRange.setStart(textNode, 1);
-        newRange.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(newRange);
-
-        const noteEntry = mark.closest('.noteentry');
-        if (noteEntry) {
-            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-    }
-
-    function insertStrikethrough() {
-        const selection = window.getSelection();
-        if (!selection.rangeCount) return;
-
-        const range = selection.getRangeAt(0);
-
-        // Create strikethrough element
-        const s = document.createElement('s');
-        const textNode = document.createTextNode('\u200B');
-        s.appendChild(textNode);
-
-        range.deleteContents();
-        range.insertNode(s);
-
-        const newRange = document.createRange();
-        newRange.setStart(textNode, 1);
-        newRange.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(newRange);
-
-        const noteEntry = s.closest('.noteentry');
-        if (noteEntry) {
-            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-    }
-
-    function insertCode() {
-        const selection = window.getSelection();
-        if (!selection.rangeCount) return;
-
-        const range = selection.getRangeAt(0);
-
-        // Create code element
-        const code = document.createElement('code');
-        const textNode = document.createTextNode('\u200B');
-        code.appendChild(textNode);
-
-        range.deleteContents();
-        range.insertNode(code);
-
-        const newRange = document.createRange();
-        newRange.setStart(textNode, 1);
-        newRange.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(newRange);
-
-        const noteEntry = code.closest('.noteentry');
-        if (noteEntry) {
-            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-    }
-
+    // Insert a code block with syntax highlighting
     function insertCodeBlock(language) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
 
         const range = selection.getRangeAt(0);
-        const t = window.t || ((key, params, fallback) => fallback);
 
         // Create code block (pre > code structure)
         const pre = document.createElement('pre');
@@ -425,28 +382,51 @@
             pre.setAttribute('data-language', language);
         }
         
-        const textNode = document.createTextNode('\u200B');
-        code.appendChild(textNode);
+        // Add a line break inside code element for cursor positioning
+        const br = document.createElement('br');
+        code.appendChild(br);
         pre.appendChild(code);
 
         // Insert at cursor position
         range.deleteContents();
         range.insertNode(pre);
 
-        // Place cursor inside code element
+        // Prepare selection inside code element
         const newRange = document.createRange();
-        newRange.setStart(textNode, 1);
+        newRange.setStart(code, 0);
         newRange.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(newRange);
 
-        // Trigger input event for autosave
+        // Ensure the containing noteentry is focused
         const noteEntry = pre.closest('.noteentry');
         if (noteEntry) {
-            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+            try { noteEntry.focus({ preventScroll: true }); } catch (err) { noteEntry.focus(); }
+            // Apply selection after a short timeout to ensure it's not overridden by executeCommand's focus
+            setTimeout(function () {
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(newRange);
+
+                // Trigger syntax highlighting if available
+                if (language && typeof window.applySyntaxHighlighting === 'function') {
+                    window.applySyntaxHighlighting(pre);
+                }
+
+                // Trigger input event for autosave
+                noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+            }, 50);
+        } else {
+            selection.removeAllRanges();
+            selection.addRange(newRange);
+
+            if (language && typeof window.applySyntaxHighlighting === 'function') {
+                setTimeout(function() {
+                    window.applySyntaxHighlighting(pre);
+                }, 10);
+            }
         }
     }
 
+    // Return to normal text (remove formatting)
     function insertNormalText() {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -508,6 +488,7 @@
         }
     }
 
+    // Insert a callout block (note, warning, info, etc.)
     function insertCallout(type) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -577,7 +558,7 @@
         // Apply the selection after focusing (short timeout) to avoid focus stealing.
         const noteEntry = element.closest('.noteentry');
         if (noteEntry) {
-            try { noteEntry.focus(); } catch (err) { }
+            try { noteEntry.focus({ preventScroll: true }); } catch (err) { noteEntry.focus(); }
             setTimeout(function () {
                 const sel = window.getSelection();
                 sel.removeAllRanges();
@@ -592,6 +573,7 @@
         }
     }
 
+    // Insert a toggle element (collapsible/expandable block)
     function insertToggle() {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -657,6 +639,7 @@
         }
     }
 
+    // Insert a list (ordered or unordered)
     function insertList(ordered) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -687,6 +670,7 @@
         }
     }
 
+    // Insert an image (opens file picker)
     function insertImage() {
         // Create a temporary file input for images
         const fileInput = document.createElement('input');
@@ -898,6 +882,7 @@
         fileInput.click();
     }
 
+    // Insert a date (opens date picker)
     function insertDate() {
         // Find current editor context to restore later
         const context = getEditorContext();
@@ -970,6 +955,7 @@
         }
     }
 
+    // Insert a date in a Markdown editor
     function insertDateMarkdown() {
         const context = getEditorContext();
         if (!context) return;
@@ -1023,8 +1009,7 @@
         }
     }
 
-    // Slash command menu items for title inputs (notecards)
-    // Limited set of commands suitable for title editing
+    // Return title commands for the slash menu (specific to title field)
     function getTitleSlashCommands() {
         const t = window.t || ((key, params, fallback) => fallback);
         return [
@@ -1109,11 +1094,83 @@
         ];
     }
 
+    // Return slash commands for task items
+    function getTaskSlashCommands() {
+        const t = window.t || ((key, params, fallback) => fallback);
+        const common = getCommonSlashCommands();
+        return [
+            common.noteReference,
+            common.cancel
+        ];
+    }
+
+    // Return slash commands common between HTML and Markdown modes
+    function getCommonSlashCommands() {
+        var t = window.t || (function (key, params, fallback) { return fallback; });
+        return {
+            excalidraw: {
+                id: 'excalidraw',
+                icon: 'fal fa-paint-brush',
+                label: t('slash_menu.excalidraw', null, 'Excalidraw'),
+                mobileHidden: true,
+                action: function () {
+                    if (typeof window.insertExcalidrawDiagram === 'function') {
+                        window.insertExcalidrawDiagram();
+                    }
+                }
+            },
+            emoji: {
+                id: 'emoji',
+                icon: 'fa-smile',
+                label: t('slash_menu.emoji', null, 'Emoji'),
+                mobileHidden: true,
+                action: function () {
+                    if (typeof window.toggleEmojiPicker === 'function') {
+                        // Small delay to ensure focus and selection have settled
+                        // after slash deletion and menu hiding.
+                        setTimeout(() => window.toggleEmojiPicker(), 10);
+                    }
+                }
+            },
+            noteReference: {
+                id: 'note-reference',
+                icon: 'fa fa-at',
+                label: t('slash_menu.link_to_note', null, 'Link to note'),
+                action: function () {
+                    if (typeof window.openNoteReferenceModal === 'function') {
+                        window.openNoteReferenceModal();
+                    }
+                }
+            },
+            image: {
+                id: 'image',
+                icon: 'fa fa-image',
+                label: t('slash_menu.image', null, 'Image'),
+                action: function () { insertImage(); }
+            },
+            cancel: {
+                id: 'open-keyboard',
+                icon: 'fa-times-circle',
+                label: t('slash_menu.cancel', null, 'Cancel'),
+                mobileOnly: true,
+                keepSlash: true,
+                action: function () {
+                    var editable = savedEditableElement;
+                    hideSlashMenu();
+                    savedNoteEntry = null;
+                    savedEditableElement = null;
+                    if (editable) editable.focus();
+                }
+            }
+        };
+    }
+
     // Slash command menu items - actions match toolbar exactly
     // Order matches toolbar
     // Use a function to get translated labels at runtime
     function getSlashCommands() {
         const t = window.t || ((key, params, fallback) => fallback);
+        var common = getCommonSlashCommands();
         return [
             {
                 id: 'normal',
@@ -1168,27 +1225,9 @@
                         id: 'block-languages',
                         icon: 'fa-laptop-code',
                         label: t('slash_menu.block_languages', null, 'Block Languages'),
-                        submenu: [
-                            { id: 'code-javascript', icon: 'fa-code', iconColor: '#f7df1e', label: 'JavaScript', action: () => insertCodeBlock('javascript') },
-                            { id: 'code-typescript', icon: 'fa-code', iconColor: '#3178c6', label: 'TypeScript', action: () => insertCodeBlock('typescript') },
-                            { id: 'code-python', icon: 'fa-code', iconColor: '#3776ab', label: 'Python', action: () => insertCodeBlock('python') },
-                            { id: 'code-html', icon: 'fa-code', iconColor: '#e34f26', label: 'HTML', action: () => insertCodeBlock('html') },
-                            { id: 'code-css', icon: 'fa-code', iconColor: '#1572b6', label: 'CSS', action: () => insertCodeBlock('css') },
-                            { id: 'code-json', icon: 'fa-code', iconColor: '#292929', label: 'JSON', action: () => insertCodeBlock('json') },
-                            { id: 'code-bash', icon: 'fa-terminal', iconColor: '#4eaa25', label: 'Bash', action: () => insertCodeBlock('bash') },
-                            { id: 'code-powershell', icon: 'fa-terminal', iconColor: '#012456', label: 'PowerShell', action: () => insertCodeBlock('powershell') },
-                            { id: 'code-sql', icon: 'fa-database', iconColor: '#336791', label: 'SQL', action: () => insertCodeBlock('sql') },
-                            { id: 'code-php', icon: 'fa-code', iconColor: '#777bb4', label: 'PHP', action: () => insertCodeBlock('php') },
-                            { id: 'code-java', icon: 'fa-code', iconColor: '#007396', label: 'Java', action: () => insertCodeBlock('java') },
-                            { id: 'code-csharp', icon: 'fa-code', iconColor: '#239120', label: 'C#', action: () => insertCodeBlock('csharp') },
-                            { id: 'code-cpp', icon: 'fa-code', iconColor: '#00599c', label: 'C++', action: () => insertCodeBlock('cpp') },
-                            { id: 'code-go', icon: 'fa-code', iconColor: '#00add8', label: 'Go', action: () => insertCodeBlock('go') },
-                            { id: 'code-rust', icon: 'fa-code', iconColor: '#b7410e', label: 'Rust', action: () => insertCodeBlock('rust') },
-                            { id: 'code-ruby', icon: 'fa-gem', iconColor: '#cc342d', label: 'Ruby', action: () => insertCodeBlock('ruby') },
-                            { id: 'code-yaml', icon: 'fa-file-code', iconColor: '#cb171e', label: 'YAML', action: () => insertCodeBlock('yaml') },
-                            { id: 'code-xml', icon: 'fa-file-code', iconColor: '#0060ac', label: 'XML', action: () => insertCodeBlock('xml') },
-                            { id: 'code-markdown', icon: 'fa-file-code', iconColor: '#083fa1', label: 'Markdown', action: () => insertCodeBlock('markdown') }
-                        ]
+                        submenu: CODE_BLOCK_LANGUAGES.map(function (l) {
+                            return { id: l.id, icon: l.icon, iconColor: l.iconColor, label: l.label, action: function () { insertCodeBlock(l.lang); } };
+                        })
                     }
                 ]
             },
@@ -1215,14 +1254,9 @@
                 id: 'quote',
                 icon: 'fa-info-circle',
                 label: t('slash_menu.quote', null, 'Quote'),
-                submenu: [
-                    { id: 'plain', label: t('slash_menu.blockquote', null, 'Blockquote'), action: () => insertCallout('plain') },
-                    { id: 'note', label: t('slash_menu.callout_note', null, 'Note'), action: () => insertCallout('note') },
-                    { id: 'tip', label: t('slash_menu.callout_tip', null, 'Tip'), action: () => insertCallout('tip') },
-                    { id: 'important', label: t('slash_menu.callout_important', null, 'Important'), action: () => insertCallout('important') },
-                    { id: 'warning', label: t('slash_menu.callout_warning', null, 'Warning'), action: () => insertCallout('warning') },
-                    { id: 'caution', label: t('slash_menu.callout_caution', null, 'Caution'), action: () => insertCallout('caution') }
-                ]
+                submenu: CALLOUT_TYPES.map(function (c) {
+                    return { id: c.id, label: t(c.labelKey, null, c.fallback), action: function () { insertCallout(c.id); } };
+                })
             },
             {
                 id: 'insert',
@@ -1246,28 +1280,8 @@
                             insertDate();
                         }
                     },
-                    {
-                        id: 'excalidraw',
-                        icon: 'fal fa-paint-brush',
-                        label: t('slash_menu.excalidraw', null, 'Excalidraw'),
-                        action: function () {
-                            if (typeof window.insertExcalidrawDiagram === 'function') {
-                                window.insertExcalidrawDiagram();
-                            }
-                        },
-                        mobileHidden: true
-                    },
-                    {
-                        id: 'emoji',
-                        icon: 'fa-smile',
-                        label: t('slash_menu.emoji', null, 'Emoji'),
-                        mobileHidden: true,
-                        action: function () {
-                            if (typeof window.toggleEmojiPicker === 'function') {
-                                window.toggleEmojiPicker();
-                            }
-                        }
-                    },
+                    common.excalidraw,
+                    common.emoji,
                     {
                         id: 'table',
                         icon: 'fa-table',
@@ -1332,7 +1346,7 @@
 
                                     // Focus the editable element first
                                     if (editableElement) {
-                                        editableElement.focus();
+                                        try { editableElement.focus({ preventScroll: true }); } catch (e) { editableElement.focus(); }
                                     }
 
                                     // Restore selection and insert link
@@ -1385,16 +1399,7 @@
                             }
                         }
                     },
-                    {
-                        id: 'note-reference',
-                        icon: 'fa fa-at',
-                        label: t('slash_menu.link_to_note', null, 'Link to note'),
-                        action: function () {
-                            if (typeof window.openNoteReferenceModal === 'function') {
-                                window.openNoteReferenceModal();
-                            }
-                        }
-                    }
+                    common.noteReference
                 ]
             },
             {
@@ -1402,14 +1407,7 @@
                 icon: 'fa-image',
                 label: t('slash_menu.media', null, 'Media'),
                 submenu: [
-                    {
-                        id: 'image',
-                        icon: 'fa fa-image',
-                        label: t('slash_menu.image', null, 'Image'),
-                        action: function () {
-                            insertImage();
-                        }
-                    },
+                    common.image,
                     {
                         id: 'youtube',
                         icon: 'fa fa-video',
@@ -1442,31 +1440,16 @@
                     }
                 ]
             },
-            {
-                id: 'open-keyboard',
-                icon: 'fa-times-circle',
-                label: t('slash_menu.cancel', null, 'Cancel'),
-                mobileOnly: true,
-                keepSlash: true,
-                action: function () {
-                    // Save reference before clearing
-                    const editable = savedEditableElement;
-                    hideSlashMenu();
-                    savedNoteEntry = null;
-                    savedEditableElement = null;
-                    // Focus after clearing to open keyboard
-                    if (editable) {
-                        editable.focus();
-                    }
-                }
-            }
+            common.cancel
         ];
     }
 
     // Slash command menu items for Markdown notes (edit mode)
     // Keep labels close to the HTML menu, but insert Markdown syntax.
+    // Return slash menu commands for Markdown notes
     function getMarkdownSlashCommands() {
         const t = window.t || ((key, params, fallback) => fallback);
+        var common = getCommonSlashCommands();
         return [
             {
                 id: 'title',
@@ -1498,27 +1481,9 @@
                         id: 'block-languages',
                         icon: 'fa-laptop-code',
                         label: t('slash_menu.block_languages', null, 'Block Languages'),
-                        submenu: [
-                            { id: 'code-javascript', icon: 'fa-code', iconColor: '#f7df1e', label: 'JavaScript', action: () => insertMarkdownAtCursor('```javascript\n\n```\n', -5) },
-                            { id: 'code-typescript', icon: 'fa-code', iconColor: '#3178c6', label: 'TypeScript', action: () => insertMarkdownAtCursor('```typescript\n\n```\n', -5) },
-                            { id: 'code-python', icon: 'fa-code', iconColor: '#3776ab', label: 'Python', action: () => insertMarkdownAtCursor('```python\n\n```\n', -5) },
-                            { id: 'code-html', icon: 'fa-code', iconColor: '#e34f26', label: 'HTML', action: () => insertMarkdownAtCursor('```html\n\n```\n', -5) },
-                            { id: 'code-css', icon: 'fa-code', iconColor: '#1572b6', label: 'CSS', action: () => insertMarkdownAtCursor('```css\n\n```\n', -5) },
-                            { id: 'code-json', icon: 'fa-code', iconColor: '#292929', label: 'JSON', action: () => insertMarkdownAtCursor('```json\n\n```\n', -5) },
-                            { id: 'code-bash', icon: 'fa-terminal', iconColor: '#4eaa25', label: 'Bash', action: () => insertMarkdownAtCursor('```bash\n\n```\n', -5) },
-                            { id: 'code-powershell', icon: 'fa-terminal', iconColor: '#012456', label: 'PowerShell', action: () => insertMarkdownAtCursor('```powershell\n\n```\n', -5) },
-                            { id: 'code-sql', icon: 'fa-database', iconColor: '#336791', label: 'SQL', action: () => insertMarkdownAtCursor('```sql\n\n```\n', -5) },
-                            { id: 'code-php', icon: 'fa-code', iconColor: '#777bb4', label: 'PHP', action: () => insertMarkdownAtCursor('```php\n\n```\n', -5) },
-                            { id: 'code-java', icon: 'fa-code', iconColor: '#007396', label: 'Java', action: () => insertMarkdownAtCursor('```java\n\n```\n', -5) },
-                            { id: 'code-csharp', icon: 'fa-code', iconColor: '#239120', label: 'C#', action: () => insertMarkdownAtCursor('```csharp\n\n```\n', -5) },
-                            { id: 'code-cpp', icon: 'fa-code', iconColor: '#00599c', label: 'C++', action: () => insertMarkdownAtCursor('```cpp\n\n```\n', -5) },
-                            { id: 'code-go', icon: 'fa-code', iconColor: '#00add8', label: 'Go', action: () => insertMarkdownAtCursor('```go\n\n```\n', -5) },
-                            { id: 'code-rust', icon: 'fa-code', iconColor: '#b7410e', label: 'Rust', action: () => insertMarkdownAtCursor('```rust\n\n```\n', -5) },
-                            { id: 'code-ruby', icon: 'fa-gem', iconColor: '#cc342d', label: 'Ruby', action: () => insertMarkdownAtCursor('```ruby\n\n```\n', -5) },
-                            { id: 'code-yaml', icon: 'fa-file-code', iconColor: '#cb171e', label: 'YAML', action: () => insertMarkdownAtCursor('```yaml\n\n```\n', -5) },
-                            { id: 'code-xml', icon: 'fa-file-code', iconColor: '#0060ac', label: 'XML', action: () => insertMarkdownAtCursor('```xml\n\n```\n', -5) },
-                            { id: 'code-markdown', icon: 'fa-file-code', iconColor: '#083fa1', label: 'Markdown', action: () => insertMarkdownAtCursor('```markdown\n\n```\n', -5) }
-                        ]
+                        submenu: CODE_BLOCK_LANGUAGES.map(function (l) {
+                            return { id: l.id, icon: l.icon, iconColor: l.iconColor, label: l.label, action: function () { insertMarkdownAtCursor('```' + l.lang + '\n\n```\n', -5); } };
+                        })
                     }
                 ]
             },
@@ -1536,14 +1501,10 @@
                 id: 'quote',
                 icon: 'fa-info-circle',
                 label: t('slash_menu.quote', null, 'Quote'),
-                submenu: [
-                    { id: 'plain', label: t('slash_menu.blockquote', null, 'Blockquote'), action: () => insertMarkdownAtCursor('> ', 0) },
-                    { id: 'note', label: t('slash_menu.callout_note', null, 'Note'), action: () => insertMarkdownAtCursor('> Note\n> ', 0) },
-                    { id: 'tip', label: t('slash_menu.callout_tip', null, 'Tip'), action: () => insertMarkdownAtCursor('> Tip\n> ', 0) },
-                    { id: 'important', label: t('slash_menu.callout_important', null, 'Important'), action: () => insertMarkdownAtCursor('> Important\n> ', 0) },
-                    { id: 'warning', label: t('slash_menu.callout_warning', null, 'Warning'), action: () => insertMarkdownAtCursor('> Warning\n> ', 0) },
-                    { id: 'caution', label: t('slash_menu.callout_caution', null, 'Caution'), action: () => insertMarkdownAtCursor('> Caution\n> ', 0) }
-                ]
+                submenu: CALLOUT_TYPES.map(function (c) {
+                    var prefix = c.id === 'plain' ? '> ' : '> ' + c.fallback + '\n> ';
+                    return { id: c.id, label: t(c.labelKey, null, c.fallback), action: function () { insertMarkdownAtCursor(prefix, 0); } };
+                })
             },
             {
                 id: 'color',
@@ -1582,28 +1543,7 @@
                             insertDateMarkdown();
                         }
                     },
-                    {
-                        id: 'excalidraw',
-                        icon: 'fal fa-paint-brush',
-                        label: t('slash_menu.excalidraw', null, 'Excalidraw'),
-                        action: function () {
-                            if (typeof window.insertExcalidrawDiagram === 'function') {
-                                window.insertExcalidrawDiagram();
-                            }
-                        },
-                        mobileHidden: true
-                    },
-                    {
-                        id: 'emoji',
-                        icon: 'fa-smile',
-                        label: t('slash_menu.emoji', null, 'Emoji'),
-                        mobileHidden: true,
-                        action: function () {
-                            if (typeof window.toggleEmojiPicker === 'function') {
-                                window.toggleEmojiPicker();
-                            }
-                        }
-                    },
+                    common.emoji,
                     {
                         id: 'table',
                         icon: 'fa-table',
@@ -1657,11 +1597,11 @@
                                 window.showLinkModal('https://', selectedText, function (url, linkText) {
                                     if (!url) return;
 
-                                    const linkMarkdown = '[' + (linkText || 'link') + '](' + url + ')';
+                                    const linkMarkdown = '[' + (linkText || url || 'link') + '](' + url + ')';
 
                                     // Focus the editor first
                                     if (editor) {
-                                        try { editor.focus(); } catch (e) { }
+                                        try { editor.focus({ preventScroll: true }); } catch (e) { editor.focus(); }
                                     }
 
                                     // Restore selection and insert link using DOM insertion (more robust than execCommand)
@@ -1712,16 +1652,7 @@
                             }
                         }
                     },
-                    {
-                        id: 'note-reference',
-                        icon: 'fa fa-at',
-                        label: t('slash_menu.link_to_note', null, 'Link to note'),
-                        action: function () {
-                            if (typeof window.openNoteReferenceModal === 'function') {
-                                window.openNoteReferenceModal();
-                            }
-                        }
-                    }
+                    common.noteReference
                 ]
             },
             {
@@ -1729,14 +1660,7 @@
                 icon: 'fa-image',
                 label: t('slash_menu.media', null, 'Media'),
                 submenu: [
-                    {
-                        id: 'image',
-                        icon: 'fa fa-image',
-                        label: t('slash_menu.image', null, 'Image'),
-                        action: function () {
-                            insertImage();
-                        }
-                    },
+                    common.image,
                     {
                         id: 'youtube',
                         icon: 'fa fa-video',
@@ -1769,44 +1693,11 @@
                     }
                 ]
             },
-            {
-                id: 'open-keyboard',
-                icon: 'fa-times-circle',
-                label: t('slash_menu.cancel', null, 'Cancel'),
-                mobileOnly: true,
-                keepSlash: true,
-                action: function () {
-                    // Save reference before clearing
-                    const editable = savedEditableElement;
-                    hideSlashMenu();
-                    savedNoteEntry = null;
-                    savedEditableElement = null;
-                    // Focus after clearing to open keyboard
-                    if (editable) {
-                        editable.focus();
-                    }
-                }
-            }
+            common.cancel
         ];
     }
 
-
-    let slashMenuElement = null;
-    let submenuElement = null;
-    let subSubmenuElement = null;
-    let selectedIndex = 0;
-    let selectedSubmenuIndex = 0;
-    let selectedSubSubmenuIndex = 0;
-    let filteredCommands = [];
-    let currentSubmenu = null;
-    let currentSubSubmenu = null;
-    let slashTextNode = null;  // Le nœud texte contenant le slash
-    let slashOffset = -1;      // La position du slash dans le nœud
-    let filterText = '';
-    let savedNoteEntry = null;
-    let savedEditableElement = null;
-    let activeCommands = null;
-
+    // Get current editor context (note type, DOM elements)
     function getEditorContext() {
         const selection = window.getSelection();
         if (!selection.rangeCount) return false;
@@ -1834,6 +1725,7 @@
         return { noteType: noteType || 'note', noteEntry, editableElement };
     }
 
+    // Filter slash menu commands based on search text
     function getFilteredCommands(searchText) {
         const isMobile = window.innerWidth < 768;
         const commands = (activeCommands || getSlashCommands()).filter(cmd => {
@@ -1915,6 +1807,7 @@
         return results;
     }
 
+    // Build slash menu HTML
     function buildMenuHTML() {
         if (!filteredCommands.length) {
             return '<div class="slash-command-empty">No results</div>';
@@ -1937,6 +1830,7 @@
             .join('');
     }
 
+    // Build submenu HTML for level 2 menu items
     function buildSubmenuHTML(items) {
         const isMobile = window.innerWidth < 768;
         const t = window.t || ((key, params, fallback) => fallback);
@@ -1972,6 +1866,7 @@
         return html;
     }
 
+    // Build sub-submenu HTML for level 3 menu items
     function buildSubSubmenuHTML(items) {
         const isMobile = window.innerWidth < 768;
         const t = window.t || ((key, params, fallback) => fallback);
@@ -2003,6 +1898,7 @@
         return html;
     }
 
+    // Escape HTML special characters to prevent XSS
     function escapeHtml(text) {
         return String(text)
             .replace(/&/g, '&amp;')
@@ -2012,6 +1908,7 @@
             .replace(/'/g, '&#039;');
     }
 
+    // Position slash menu near the cursor or selection range
     function positionMenu(range) {
         if (!slashMenuElement) return;
 
@@ -2041,6 +1938,7 @@
         }
     }
 
+    // Hide and cleanup sub-submenu (level 3)
     function hideSubSubmenu() {
         if (!subSubmenuElement) return;
 
@@ -2061,6 +1959,7 @@
         selectedSubSubmenuIndex = 0;
     }
 
+    // Hide and cleanup submenu (level 2)
     function hideSubmenu() {
         if (!submenuElement) return;
 
@@ -2084,6 +1983,7 @@
         selectedSubmenuIndex = 0;
     }
 
+    // Hide slash menu and all its submenus
     function hideSlashMenu() {
         if (!slashMenuElement) return;
 
@@ -2112,19 +2012,21 @@
         document.body.style.cursor = '';
     }
 
+    // Show slash menu for an input field (title or task)
     function showSlashMenuForInput(input, pos) {
         hideSlashMenu();
 
         // Save context
         savedEditableElement = input;
-        savedNoteEntry = input.closest('.notecard');
+        savedNoteEntry = input.closest('.notecard') || input.closest('.noteentry');
 
         // Mark slash position
         slashOffset = pos - 1;
 
-        const ctx = { noteType: 'title', noteEntry: savedNoteEntry, editableElement: input };
+        const isTaskInput = input.classList.contains('task-input');
+        const ctx = { noteType: isTaskInput ? 'tasklist' : 'title', noteEntry: savedNoteEntry, editableElement: input };
 
-        activeCommands = getTitleSlashCommands();
+        activeCommands = isTaskInput ? getTaskSlashCommands() : getTitleSlashCommands();
         filterText = '';
         selectedIndex = 0;
         filteredCommands = getFilteredCommands('');
@@ -2190,8 +2092,20 @@
         slashMenuElement.addEventListener('mousedown', handleMenuMouseDown);
         slashMenuElement.addEventListener('click', handleMenuClick);
         slashMenuElement.addEventListener('mouseover', handleMenuMouseOver);
+
+        // Hide cursor until mouse moves (desktop only)
+        const isMobile = window.innerWidth < 768;
+        if (!isMobile) {
+            document.body.style.cursor = 'none';
+            const showCursor = () => {
+                document.body.style.cursor = '';
+                document.removeEventListener('mousemove', showCursor);
+            };
+            document.addEventListener('mousemove', showCursor);
+        }
     }
 
+    // Update slash menu content based on current filter text
     function updateMenuContent() {
         if (!slashMenuElement) return;
 
@@ -2201,6 +2115,7 @@
         slashMenuElement.innerHTML = buildMenuHTML();
     }
 
+    // Display submenu (level 2) for a command with subcommands
     function showSubmenu(cmd, parentItem) {
         if (!cmd.submenu || !cmd.submenu.length) return;
 
@@ -2215,7 +2130,7 @@
 
         document.body.appendChild(submenuElement);
 
-        // Position à droite de l'item parent
+        // Position to the right of parent item
         const parentRect = parentItem.getBoundingClientRect();
         const submenuRect = submenuElement.getBoundingClientRect();
 
@@ -2223,12 +2138,12 @@
         let x = parentRect.right + 4;
         let y = parentRect.top;
 
-        // Si déborde à droite, afficher à gauche
+        // If overflows to the right, display to the left
         if (x + submenuRect.width > window.innerWidth - padding) {
             x = parentRect.left - submenuRect.width - 4;
         }
 
-        // Si déborde en bas
+        // If overflows at the bottom
         if (y + submenuRect.height > window.innerHeight - padding) {
             y = Math.max(padding, window.innerHeight - submenuRect.height - padding);
         }
@@ -2246,6 +2161,7 @@
         submenuElement.addEventListener('mouseover', handleSubmenuMouseOver);
     }
 
+    // Display sub-submenu (level 3) for nested menu items
     function showSubSubmenu(item, parentItem) {
         if (!item.submenu || !item.submenu.length) return;
 
@@ -2260,7 +2176,7 @@
 
         document.body.appendChild(subSubmenuElement);
 
-        // Position à droite de l'item parent
+        // Position to the right of parent item
         const parentRect = parentItem.getBoundingClientRect();
         const submenuRect = subSubmenuElement.getBoundingClientRect();
 
@@ -2268,12 +2184,12 @@
         let x = parentRect.right + 4;
         let y = parentRect.top;
 
-        // Si déborde à droite, afficher à gauche
+        // If overflows to the right, display to the left
         if (x + submenuRect.width > window.innerWidth - padding) {
             x = parentRect.left - submenuRect.width - 4;
         }
 
-        // Si déborde en bas
+        // If overflows at the bottom
         if (y + submenuRect.height > window.innerHeight - padding) {
             y = Math.max(padding, window.innerHeight - submenuRect.height - padding);
         }
@@ -2290,6 +2206,7 @@
         subSubmenuElement.addEventListener('touchend', handleSubSubmenuTouchEnd);
     }
 
+    // Delete slash text and search
     function deleteSlashText() {
         try {
             // Handle input fields (title inputs)
@@ -2300,13 +2217,11 @@
 
                 if (start < 0 || start >= text.length) return;
 
-                // Find the end of the slash command text (up to whitespace)
-                let end = start + 1;
-                while (end < text.length && !/\s/.test(text[end])) {
-                    end++;
-                }
+                // Find the end of the slash command text
+                // Only delete the slash and the filter text that was typed
+                let end = start + 1 + filterText.length;
 
-                // Remove the slash and filter text
+                // Remove the slash and filter text only
                 input.value = text.substring(0, start) + text.substring(end);
 
                 // Position cursor where the slash was
@@ -2328,17 +2243,17 @@
 
             if (sel && sel.rangeCount > 0) {
                 const currentRange = sel.getRangeAt(0);
-                // On vérifie si on est dans le bon nœud
+                // Check if we're in the correct node
                 if (currentRange.startContainer === slashTextNode) {
                     currentOffset = currentRange.startOffset;
                 }
             }
 
-            // Si on n'a pas pu obtenir l'offset (ex: mobile blurred), on utilise filterText
+            // If we couldn't get the offset (e.g. mobile blurred), use filterText
             if (currentOffset === -1) {
                 const textContent = slashTextNode.textContent || '';
-                // L'offset de fin est slashOffset + 1 (pour le '/') + longueur du filtre
-                // On utilise la longueur actuelle du texte après le slash comme fallback
+                // The end offset is slashOffset + 1 (for the '/') + filter length
+                // Use the current length of text after slash as fallback
                 const textAfterSlash = textContent.substring(slashOffset + 1);
                 const spaceIndex = textAfterSlash.search(/[\s\n]/);
                 const actualFilterLength = spaceIndex >= 0 ? spaceIndex : textAfterSlash.length;
@@ -2346,24 +2261,38 @@
             }
 
             const text = slashTextNode.textContent;
-            // Sécurité : on ne veut pas supprimer moins que le slash lui-même
+            // Safety: we don't want to delete less than the slash itself
             const safeEndOffset = Math.max(slashOffset + 1, Math.min(text.length, currentOffset));
 
             const before = text.substring(0, slashOffset);
             const after = text.substring(safeEndOffset);
-            slashTextNode.textContent = before + after;
+            const result = before + after;
 
-            // Replacer le curseur là où le slash a été supprimé
+            // If the line became effectively empty, add a ZWSP to keep it from collapsing visually.
+            // This prevents the cursor from jumping to the previous line when deleting the slash.
+            if (result === '') {
+                slashTextNode.textContent = '\u200B';
+            } else {
+                slashTextNode.textContent = result;
+            }
+
+            // Replace cursor where the slash was deleted
             if (sel) {
                 const newRange = document.createRange();
                 try {
                     const finalPos = Math.min(slashTextNode.textContent.length, slashOffset);
-                    newRange.setStart(slashTextNode, finalPos);
-                    newRange.collapse(true);
+                    if (result === '') {
+                        // If we added a ZWSP, select it so it gets replaced by the next insertion
+                        newRange.setStart(slashTextNode, 0);
+                        newRange.setEnd(slashTextNode, 1);
+                    } else {
+                        newRange.setStart(slashTextNode, finalPos);
+                        newRange.collapse(true);
+                    }
                     sel.removeAllRanges();
                     sel.addRange(newRange);
                 } catch (e) {
-                    // Fallback si le nœud a un problème
+                    // Fallback if node has an issue
                 }
             }
 
@@ -2376,6 +2305,7 @@
         }
     }
 
+    // Execute a slash command action and cleanup
     function executeCommand(commandId, isSubmenuItem, isSubSubmenuItem) {
         let actionToExecute = null;
         let foundCmd = null;
@@ -2389,7 +2319,7 @@
         } else if (isSubmenuItem && currentSubmenu) {
             const item = currentSubmenu.find(i => i.id === commandId);
             if (item) {
-                // Si cet item a un sous-menu, l'afficher
+                // If this item has a submenu, display it
                 if (item.submenu && item.submenu.length > 0) {
                     const menuItem = submenuElement.querySelector('[data-submenu-id="' + commandId + '"]');
                     if (menuItem) {
@@ -2413,7 +2343,7 @@
                 const cmd = (activeCommands || getSlashCommands()).find(c => c.id === commandId);
                 if (!cmd) return;
 
-                // Si la commande a un sous-menu, l'afficher au lieu d'exécuter
+                // If command has a submenu, display it instead of executing
                 if (cmd.submenu && cmd.submenu.length > 0) {
                     const item = slashMenuElement.querySelector('[data-command-id="' + commandId + '"]');
                     if (item) {
@@ -2433,25 +2363,35 @@
             return;
         }
 
-        // Sur mobile, on restaure le focus avant de supprimer le texte pour s'assurer
-        // que la sélection est bien prise en compte si possible par deleteSlashText.
+        // On mobile, restore focus before deleting text to ensure
+        // that the selection is properly taken into account if possible by deleteSlashText.
         const isMobile = window.innerWidth < 768;
         if (isMobile && savedEditableElement) {
-            try { savedEditableElement.focus(); } catch (e) { }
+            try { savedEditableElement.focus({ preventScroll: true }); } catch (e) { savedEditableElement.focus(); }
         }
 
-        // Supprimer le slash et le texte de filtre (sauf si keepSlash est true)
+        // Delete the slash and filter text (unless keepSlash is true)
         const shouldKeepSlash = foundCmd && foundCmd.keepSlash;
         let cursorRangeAfterDelete = null;
+        let inputCursorPosition = null;
         if (!shouldKeepSlash) {
             deleteSlashText();
             // Save cursor position right after deleteSlashText placed it correctly,
             // because hideSlashMenu() removing the menu DOM can cause the browser
             // to lose the selection in the contenteditable.
             try {
-                const sel = window.getSelection();
-                if (sel && sel.rangeCount > 0) {
-                    cursorRangeAfterDelete = sel.getRangeAt(0).cloneRange();
+                // For INPUT fields, save selectionStart/End
+                if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+                    inputCursorPosition = {
+                        start: savedEditableElement.selectionStart,
+                        end: savedEditableElement.selectionEnd
+                    };
+                } else {
+                    // For contenteditable, save range
+                    const sel = window.getSelection();
+                    if (sel && sel.rangeCount > 0) {
+                        cursorRangeAfterDelete = sel.getRangeAt(0).cloneRange();
+                    }
                 }
             } catch (e) { }
         }
@@ -2460,7 +2400,14 @@
 
         // Restore cursor position that was set by deleteSlashText, in case
         // hideSlashMenu() disrupted it by removing the menu DOM element.
-        if (cursorRangeAfterDelete) {
+        if (inputCursorPosition && savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+            // Restore cursor for INPUT fields
+            try {
+                savedEditableElement.focus();
+                savedEditableElement.setSelectionRange(inputCursorPosition.start, inputCursorPosition.end);
+            } catch (e) { }
+        } else if (cursorRangeAfterDelete) {
+            // Restore cursor for contenteditable
             try {
                 if (savedEditableElement) {
                     savedEditableElement.focus();
@@ -2473,14 +2420,25 @@
         // Also expose it globally so async modal callbacks (link, note-reference)
         // can use it as a reliable fallback for the cursor position.
         window._slashCommandSavedRange = cursorRangeAfterDelete;
+        window._slashCommandInputCursor = inputCursorPosition;
+        window._slashCommandSavedEditableElement = savedEditableElement;
 
-        // Exécuter la commande immédiatement (la sélection est restaurée ci-dessus)
+        // Execute command immediately (selection is restored above)
         try {
-            actionToExecute();
+            // Use setTimeout to ensure the focus/selection restoration is stable
+            // and doesn't interfere with the immediate execution's side effects (like modals)
+            setTimeout(() => {
+                actionToExecute();
+                window._slashCommandSavedRange = null;
+                window._slashCommandInputCursor = null;
+                window._slashCommandSavedEditableElement = null;
+            }, 0);
         } catch (e) {
             console.error('Error executing command:', e);
+            window._slashCommandSavedRange = null;
+            window._slashCommandInputCursor = null;
+            window._slashCommandSavedEditableElement = null;
         }
-        window._slashCommandSavedRange = null;
 
         // Re-focus after insertion to avoid caret jumping on focus (skip if keepSlash)
         if (!shouldKeepSlash) {
@@ -2499,12 +2457,17 @@
         savedEditableElement = null;
     }
 
+    // Prevent menu click from losing editor focus
     function handleMenuMouseDown(e) {
         // Prevent editor losing focus before we run the command
         e.preventDefault();
     }
 
+    // Handle click on main menu item
     function handleMenuClick(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
         const item = e.target.closest && e.target.closest('.slash-command-item');
         if (!item) return;
 
@@ -2512,15 +2475,17 @@
         if (commandId) executeCommand(commandId, false);
     }
 
+    // Handle click on submenu (level 2) item
     function handleSubmenuClick(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
         const item = e.target.closest && e.target.closest('.slash-command-item');
         if (!item) return;
 
         // Check if it's the back button
         const action = item.getAttribute('data-action');
         if (action === 'back') {
-            e.preventDefault();
-            e.stopPropagation();
             hideSubmenu();
             return;
         }
@@ -2529,15 +2494,17 @@
         if (submenuId) executeCommand(submenuId, true, false);
     }
 
+    // Handle click on sub-submenu (level 3) item
     function handleSubSubmenuClick(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
         const item = e.target.closest && e.target.closest('.slash-command-item');
         if (!item) return;
 
         // Check if it's the back button
         const action = item.getAttribute('data-action');
         if (action === 'back-sub') {
-            e.preventDefault();
-            e.stopPropagation();
             hideSubSubmenu();
             return;
         }
@@ -2567,6 +2534,7 @@
         }
     }
 
+    // Handle touch end on sub-submenu item (mobile support)
     function handleSubSubmenuTouchEnd(e) {
         const item = e.target.closest && e.target.closest('.slash-command-item');
         if (!item) return;
@@ -2587,6 +2555,7 @@
         }
     }
 
+    // Handle mouse hover on submenu item to show sub-submenu if available
     function handleSubmenuMouseOver(e) {
         const item = e.target.closest && e.target.closest('.slash-command-item');
         if (!item) return;
@@ -2604,6 +2573,7 @@
         }
     }
 
+    // Handle mouse hover on main menu item to show submenu if available
     function handleMenuMouseOver(e) {
         const item = e.target.closest && e.target.closest('.slash-command-item');
         if (!item) return;
@@ -2621,10 +2591,40 @@
         }
     }
 
+    // Schedule an async filter update based on current input
+    function scheduleFilterUpdate() {
+        if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+            setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
+        } else {
+            setTimeout(updateFilterFromEditor, 0);
+        }
+    }
+
+    // Handle filter text changes from keyboard input
+    function handleMenuFilterKey(key) {
+        if (key === 'Backspace') {
+            if (filterText.length === 0) {
+                hideSlashMenu();
+                savedNoteEntry = null;
+            } else {
+                scheduleFilterUpdate();
+            }
+        } else {
+            scheduleFilterUpdate();
+        }
+    }
+
+    // Handle keyboard input (menu navigation)
     function handleKeydown(e) {
         if (!slashMenuElement) return;
 
-        // Si un sous-sous-menu est ouvert (niveau 3)
+        // Ensure Enter key doesn't leak to underlying inputs when menu is open
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // If a sub-submenu is open (level 3)
         if (subSubmenuElement && currentSubSubmenu) {
             switch (e.key) {
                 case 'ArrowDown':
@@ -2664,31 +2664,14 @@
                     if (e.key.length === 1 || e.key === 'Delete' || e.key === 'Backspace') {
                         hideSubSubmenu();
                         hideSubmenu();
-                        if (e.key === 'Backspace') {
-                            if (filterText.length === 0) {
-                                hideSlashMenu();
-                                savedNoteEntry = null;
-                            } else {
-                                if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
-                                    setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
-                                } else {
-                                    setTimeout(updateFilterFromEditor, 0);
-                                }
-                            }
-                        } else {
-                            if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
-                                setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
-                            } else {
-                                setTimeout(updateFilterFromEditor, 0);
-                            }
-                        }
+                        handleMenuFilterKey(e.key);
                     }
                     break;
             }
             return;
         }
 
-        // Si un sous-menu est ouvert (niveau 2)
+        // If a submenu is open (level 2)
         if (submenuElement && currentSubmenu) {
             switch (e.key) {
                 case 'ArrowDown':
@@ -2740,31 +2723,14 @@
                 default:
                     if (e.key.length === 1 || e.key === 'Delete' || e.key === 'Backspace') {
                         hideSubmenu();
-                        if (e.key === 'Backspace') {
-                            if (filterText.length === 0) {
-                                hideSlashMenu();
-                                savedNoteEntry = null;
-                            } else {
-                                if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
-                                    setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
-                                } else {
-                                    setTimeout(updateFilterFromEditor, 0);
-                                }
-                            }
-                        } else {
-                            if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
-                                setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
-                            } else {
-                                setTimeout(updateFilterFromEditor, 0);
-                            }
-                        }
+                        handleMenuFilterKey(e.key);
                     }
                     break;
             }
             return;
         }
 
-        // Navigation dans le menu principal
+        // Navigate in main menu
         switch (e.key) {
             case 'ArrowDown':
                 e.preventDefault();
@@ -2809,17 +2775,7 @@
                 break;
 
             case 'Backspace':
-                if (filterText.length === 0) {
-                    hideSlashMenu();
-                    savedNoteEntry = null;
-                } else {
-                    // Update from input field if we're in one, otherwise from editor
-                    if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
-                        setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
-                    } else {
-                        setTimeout(updateFilterFromEditor, 0);
-                    }
-                }
+                handleMenuFilterKey('Backspace');
                 break;
 
             case ' ':
@@ -2829,17 +2785,13 @@
 
             default:
                 if (e.key.length === 1 || e.key === 'Delete') {
-                    // Update from input field if we're in one, otherwise from editor
-                    if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
-                        setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
-                    } else {
-                        setTimeout(updateFilterFromEditor, 0);
-                    }
+                    scheduleFilterUpdate();
                 }
                 break;
         }
     }
 
+    // Update filter text from contenteditable editor content
     function updateFilterFromEditor() {
         if (!slashMenuElement || !slashTextNode || slashOffset < 0) return;
 
@@ -2855,6 +2807,7 @@
         updateMenuContent();
     }
 
+    // Update filter text from input field (title) value
     function updateFilterFromInput(input) {
         if (!slashMenuElement || slashOffset < 0 || !input) return;
 
@@ -2870,6 +2823,7 @@
         updateMenuContent();
     }
 
+    // Show slash menu
     function showSlashMenu() {
         hideSlashMenu();
 
@@ -2879,10 +2833,10 @@
         const range = sel.getRangeAt(0);
         const container = range.startContainer;
 
-        // On doit être dans un nœud texte
+        // Must be in a text node
         if (container.nodeType !== 3) return;
 
-        // Sauvegarder la position du slash (juste avant la position actuelle)
+        // Save the slash position (just before current position)
         slashTextNode = container;
         slashOffset = range.startOffset - 1;
 
@@ -2926,15 +2880,18 @@
             savedEditableElement.blur();
         }
 
-        // Hide cursor until mouse moves
-        document.body.style.cursor = 'none';
-        const showCursor = () => {
-            document.body.style.cursor = '';
-            document.removeEventListener('mousemove', showCursor);
-        };
-        document.addEventListener('mousemove', showCursor);
+        // Hide cursor until mouse moves (desktop only)
+        if (!isMobile) {
+            document.body.style.cursor = 'none';
+            const showCursor = () => {
+                document.body.style.cursor = '';
+                document.removeEventListener('mousemove', showCursor);
+            };
+            document.addEventListener('mousemove', showCursor);
+        }
     }
 
+    // Handle user input (/ detection)
     function handleInput(e) {
         const target = e.target;
         if (!target) return;
@@ -2971,6 +2928,7 @@
         }
     }
 
+    // Handle click outside menu (close)
     function handleClickOutside(e) {
         if (!slashMenuElement) return;
 
@@ -2984,6 +2942,7 @@
         }
     }
 
+    // Initialize slash menu system (event listeners)
     function init() {
         document.addEventListener('input', handleInput, true);
         document.addEventListener('keydown', handleKeydown, true);
@@ -3125,12 +3084,16 @@
             }
         }, true);
 
-        // Handle slash menu in title inputs (notecards)
+        // Handle slash menu in title inputs (notecards) and task inputs
         document.addEventListener('input', function (e) {
             const target = e.target;
             
-            // Check if this is a title input field
-            if (target.tagName === 'INPUT' && target.classList.contains('css-title')) {
+            // Check if this is a title input field or a task list input
+            const isTitleInput = target.tagName === 'INPUT' && target.classList.contains('css-title');
+            // Restrict to the "new task" input only, excluding existing task editing inputs
+            const isTaskInput = target.tagName === 'INPUT' && target.classList.contains('task-input');
+
+            if (isTitleInput || isTaskInput) {
                 const value = target.value;
                 const pos = target.selectionStart;
                 
@@ -3148,572 +3111,9 @@
                 }
             }
         }, true);
-
-        window.hideSlashMenu = hideSlashMenu;
     }
 
-    // YouTube video insertion functions (exposed globally)
-    window.insertYouTubeVideo = function () {
-        const t = window.t || ((key, params, fallback) => fallback);
-
-        if (typeof window.showYouTubeModal !== 'function') {
-            // Fallback to prompt if modal not available
-            const url = prompt(t('slash_menu.youtube_url_prompt', null, 'Enter YouTube video URL or ID:'), 'https://www.youtube.com/watch?v=');
-            if (url) processYouTubeUrl(url, false, null, null, null);
-            return;
-        }
-
-        // Save the note entry and editable element before they get cleared
-        const noteEntry = savedNoteEntry;
-        const editableElement = savedEditableElement;
-
-        // Save the current range/position
-        let savedRange = null;
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0) {
-            savedRange = sel.getRangeAt(0).cloneRange();
-        }
-
-        window.showYouTubeModal(function (url) {
-            processYouTubeUrl(url, false, editableElement, savedRange, noteEntry);
-        });
-    };
-
-    function isMp4File(file) {
-        if (!file) return false;
-        const name = String(file.name || '').toLowerCase();
-        const type = String(file.type || '').toLowerCase();
-        return type === 'video/mp4' || name.endsWith('.mp4');
-    }
-
-    function isAudioFile(file) {
-        if (!file) return false;
-        const name = String(file.name || '').toLowerCase();
-        const type = String(file.type || '').toLowerCase();
-        if (type.startsWith('audio/')) return true;
-        return name.endsWith('.mp3') || name.endsWith('.wav') || name.endsWith('.m4a') || name.endsWith('.ogg') || name.endsWith('.flac');
-    }
-
-    function resolveEditorContext(preferredNoteEntry, preferredEditableElement) {
-        if (preferredNoteEntry && preferredEditableElement) {
-            return { noteEntry: preferredNoteEntry, editableElement: preferredEditableElement };
-        }
-        const ctx = (typeof getEditorContext === 'function') ? getEditorContext() : null;
-        return {
-            noteEntry: preferredNoteEntry || (ctx ? ctx.noteEntry : null),
-            editableElement: preferredEditableElement || (ctx ? ctx.editableElement : null)
-        };
-    }
-
-    function insertUploadedMp4(isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange) {
-        console.log('[MP4] insertUploadedMp4 called', { isMarkdown, preferredNoteEntry, preferredEditableElement });
-        const t = window.t || ((key, params, fallback) => fallback);
-        const context = resolveEditorContext(preferredNoteEntry, preferredEditableElement);
-        const noteEntry = context.noteEntry;
-        let editableElement = context.editableElement;
-
-        let noteId = '';
-        if (noteEntry && noteEntry.id) {
-            noteId = noteEntry.id.replace('entry', '');
-        }
-        if (!noteId && typeof window.noteid !== 'undefined' && window.noteid !== null) {
-            noteId = String(window.noteid);
-        }
-
-        console.log('[MP4] noteId found:', noteId);
-
-        if (!editableElement && noteEntry) {
-            editableElement = noteEntry.querySelector ? (noteEntry.querySelector('.markdown-editor') || noteEntry.querySelector('[contenteditable="true"]')) : null;
-        }
-
-        if (!noteId) {
-            console.error('[MP4] No note ID found!');
-            const msg = t('slash_menu.mp4_no_note', null, 'No note selected');
-            if (typeof showNotificationPopup === 'function') {
-                showNotificationPopup(msg, 'error');
-            } else {
-                alert(msg);
-            }
-            return;
-        }
-
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = 'video/mp4';
-        fileInput.style.display = 'none';
-
-        fileInput.addEventListener('change', function () {
-            console.log('[MP4] File input change event triggered');
-            try {
-                const file = fileInput.files && fileInput.files[0];
-                console.log('[MP4] Selected file:', file);
-                if (!file) {
-                    console.log('[MP4] No file selected');
-                    return;
-                }
-
-                if (!isMp4File(file)) {
-                    console.warn('[MP4] Invalid file type:', file.type);
-                    if (typeof showNotificationPopup === 'function') {
-                        showNotificationPopup(t('slash_menu.mp4_invalid_file', null, 'Please select an MP4 video.'), 'error');
-                    } else {
-                        alert(t('slash_menu.mp4_invalid_file', null, 'Please select an MP4 video.'));
-                    }
-                    return;
-                }
-
-                console.log('[MP4] Starting upload for note:', noteId);
-                
-                // Show upload spinner
-                const uploadMsg = t('slash_menu.mp4_uploading', null, 'Uploading video...');
-                const uploadSpinner = window.modalAlert?.showSpinner(uploadMsg, t('common.please_wait', null, 'Please wait'));
-                
-                const formData = new FormData();
-                formData.append('note_id', noteId);
-                formData.append('file', file);
-                if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) {
-                    formData.append('workspace', selectedWorkspace);
-                }
-
-                console.log('[MP4] Uploading to /api/v1/notes/' + noteId + '/attachments');
-                fetch('/api/v1/notes/' + noteId + '/attachments', {
-                    method: 'POST',
-                    body: formData
-                })
-                    .then(response => {
-                        console.log('[MP4] Upload response status:', response.status);
-                        return response.text();
-                    })
-                    .then(text => {
-                        console.log('[MP4] Upload response text:', text);
-                        let data;
-                        try {
-                            data = JSON.parse(text);
-                        } catch (e) {
-                            console.error('[MP4] Failed to parse response:', e);
-                            throw new Error('Invalid server response');
-                        }
-                        if (!data || !data.success || !data.attachment_id) {
-                            console.error('[MP4] Upload failed:', data);
-                            throw new Error((data && data.message) ? data.message : 'Upload failed');
-                        }
-
-                        console.log('[MP4] Upload successful, attachment_id:', data.attachment_id);
-                        
-                        const wsParam = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace)
-                            ? '?workspace=' + encodeURIComponent(selectedWorkspace)
-                            : '';
-                        const fileUrl = '/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id + wsParam;
-                        const videoHtml = '<video class="note-video-embed" contenteditable="false" width="560" height="315" controls preload="metadata" playsinline src="' + fileUrl + '"></video>';
-                        console.log('[MP4] Inserting video HTML:', videoHtml);
-
-                        if (editableElement) {
-                            editableElement.focus();
-                        }
-
-                        if (savedRange) {
-                            const sel = window.getSelection();
-                            sel.removeAllRanges();
-                            sel.addRange(savedRange);
-                        }
-
-                        if (isMarkdown) {
-                            insertMarkdownAtCursor(videoHtml + '\n\n', 0);
-                            if (editableElement) {
-                                editableElement.dispatchEvent(new Event('input', { bubbles: true }));
-                            }
-                        } else {
-                            try {
-                                const sel = window.getSelection();
-                                let range;
-                                if (savedRange) {
-                                    range = savedRange;
-                                } else if (sel && sel.rangeCount > 0) {
-                                    range = sel.getRangeAt(0);
-                                } else if (editableElement) {
-                                    range = document.createRange();
-                                    range.selectNodeContents(editableElement);
-                                    range.collapse(false);
-                                    sel.removeAllRanges();
-                                    sel.addRange(range);
-                                }
-
-                                if (range) {
-                                    const temp = document.createElement('div');
-                                    temp.innerHTML = videoHtml;
-                                    const videoEl = temp.firstChild;
-
-                                    const fragment = document.createDocumentFragment();
-                                    const lineBefore = document.createElement('div');
-                                    lineBefore.innerHTML = '<br>';
-                                    fragment.appendChild(lineBefore);
-                                    fragment.appendChild(videoEl);
-                                    const lineAfter = document.createElement('div');
-                                    lineAfter.innerHTML = '<br>';
-                                    fragment.appendChild(lineAfter);
-
-                                    range.deleteContents();
-                                    range.insertNode(fragment);
-                                    range.collapse(false);
-                                    sel.removeAllRanges();
-                                    sel.addRange(range);
-                                }
-                            } catch (e) {
-                                console.error('Error inserting MP4 video:', e);
-                            }
-                        }
-
-                        if (noteEntry) {
-                            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
-                        }
-
-                        if (typeof window.markNoteAsModified === 'function') {
-                            window.markNoteAsModified();
-                        }
-
-                        if (typeof window.saveNoteImmediately === 'function') {
-                            window.saveNoteImmediately();
-                        }
-                        console.log('[MP4] Video insertion complete');
-                        
-                        // Close upload spinner
-                        if (uploadSpinner?.close) {
-                            uploadSpinner.close();
-                        }
-                    })
-                    .catch(error => {
-                        console.error('[MP4] Upload error:', error);
-                        
-                        // Close upload spinner
-                        if (uploadSpinner?.close) {
-                            uploadSpinner.close();
-                        }
-                        
-                        const msg = t('slash_menu.mp4_upload_failed', { error: error.message }, 'Upload failed: {{error}}');
-                        if (typeof showNotificationPopup === 'function') {
-                            showNotificationPopup(msg, 'error');
-                        } else {
-                            alert(msg);
-                        }
-                    });
-            } catch (e) {
-                console.error('[MP4] Exception in change handler:', e);
-            } finally {
-                if (fileInput.parentNode) {
-                    document.body.removeChild(fileInput);
-                }
-            }
-        });
-
-        // Cleanup if user cancels the file selection
-        fileInput.addEventListener('cancel', function() {
-            console.log('[MP4] File selection cancelled');
-            if (fileInput.parentNode) {
-                document.body.removeChild(fileInput);
-            }
-        });
-
-        document.body.appendChild(fileInput);
-        console.log('[MP4] Triggering file picker');
-        fileInput.click();
-    }
-
-    function insertUploadedAudio(isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange) {
-        console.log('[AUDIO] insertUploadedAudio called', { isMarkdown, preferredNoteEntry, preferredEditableElement });
-        const t = window.t || ((key, params, fallback) => fallback);
-        const context = resolveEditorContext(preferredNoteEntry, preferredEditableElement);
-        const noteEntry = context.noteEntry;
-        let editableElement = context.editableElement;
-
-        let noteId = '';
-        if (noteEntry && noteEntry.id) {
-            noteId = noteEntry.id.replace('entry', '');
-        }
-        if (!noteId && typeof window.noteid !== 'undefined' && window.noteid !== null) {
-            noteId = String(window.noteid);
-        }
-
-        console.log('[AUDIO] noteId found:', noteId);
-
-        if (!editableElement && noteEntry) {
-            editableElement = noteEntry.querySelector ? (noteEntry.querySelector('.markdown-editor') || noteEntry.querySelector('[contenteditable="true"]')) : null;
-        }
-
-        if (!noteId) {
-            console.error('[AUDIO] No note ID found!');
-            const msg = t('slash_menu.audio_no_note', null, 'No note selected');
-            if (typeof showNotificationPopup === 'function') {
-                showNotificationPopup(msg, 'error');
-            } else {
-                alert(msg);
-            }
-            return;
-        }
-
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = 'audio/*';
-        fileInput.style.display = 'none';
-
-        fileInput.addEventListener('change', function () {
-            console.log('[AUDIO] File input change event triggered');
-            try {
-                const file = fileInput.files && fileInput.files[0];
-                console.log('[AUDIO] Selected file:', file);
-                if (!file) {
-                    console.log('[AUDIO] No file selected');
-                    return;
-                }
-
-                if (!isAudioFile(file)) {
-                    console.warn('[AUDIO] Invalid file type:', file.type);
-                    if (typeof showNotificationPopup === 'function') {
-                        showNotificationPopup(t('slash_menu.audio_invalid_file', null, 'Please select an audio file.'), 'error');
-                    } else {
-                        alert(t('slash_menu.audio_invalid_file', null, 'Please select an audio file.'));
-                    }
-                    return;
-                }
-
-                console.log('[AUDIO] Starting upload for note:', noteId);
-
-                // Show upload spinner
-                const uploadMsg = t('slash_menu.audio_uploading', null, 'Uploading audio...');
-                const uploadSpinner = window.modalAlert?.showSpinner(uploadMsg, t('common.please_wait', null, 'Please wait'));
-
-                const formData = new FormData();
-                formData.append('note_id', noteId);
-                formData.append('file', file);
-                if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) {
-                    formData.append('workspace', selectedWorkspace);
-                }
-
-                console.log('[AUDIO] Uploading to /api/v1/notes/' + noteId + '/attachments');
-                fetch('/api/v1/notes/' + noteId + '/attachments', {
-                    method: 'POST',
-                    body: formData
-                })
-                    .then(response => {
-                        console.log('[AUDIO] Upload response status:', response.status);
-                        return response.text();
-                    })
-                    .then(text => {
-                        console.log('[AUDIO] Upload response text:', text);
-                        let data;
-                        try {
-                            data = JSON.parse(text);
-                        } catch (e) {
-                            console.error('[AUDIO] Failed to parse response:', e);
-                            throw new Error('Invalid server response');
-                        }
-                        if (!data || !data.success || !data.attachment_id) {
-                            console.error('[AUDIO] Upload failed:', data);
-                            throw new Error((data && data.message) ? data.message : 'Upload failed');
-                        }
-
-                        console.log('[AUDIO] Upload successful, attachment_id:', data.attachment_id);
-
-                        const wsParam = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace)
-                            ? '?workspace=' + encodeURIComponent(selectedWorkspace)
-                            : '';
-                        const attachmentId = data.attachment_id;
-                        // For HTML (contenteditable) mode, use an iframe to render the audio player.
-                        // Chrome does not render native <audio> controls inside contenteditable zones.
-                        // The iframe isolates the audio player in its own browsing context.
-                        const iframeSrc = '/audio_player.php?note=' + encodeURIComponent(noteId) + '&attachment=' + encodeURIComponent(attachmentId) + (wsParam ? '&' + wsParam.substring(1) : '');
-                        const audioHtmlForEditor = '<iframe class="note-audio-iframe" src="' + iframeSrc + '" style="max-width:250px;width:100%;height:54px;border:none;border-radius:8px;display:block;margin:10px 0" allowtransparency="true"></iframe>';
-                        // For markdown mode, use native <audio> tag (preview is not contenteditable)
-                        const fileUrl = '/api/v1/notes/' + noteId + '/attachments/' + attachmentId + wsParam;
-                        const audioHtmlForMarkdown = '<audio class="note-audio-embed" controls preload="metadata" src="' + fileUrl + '"></audio>';
-                        const audioHtml = isMarkdown ? audioHtmlForMarkdown : audioHtmlForEditor;
-                        console.log('[AUDIO] Inserting audio HTML:', audioHtml);
-
-                        if (editableElement) {
-                            editableElement.focus();
-                        }
-
-                        if (savedRange) {
-                            const sel = window.getSelection();
-                            sel.removeAllRanges();
-                            sel.addRange(savedRange);
-                        }
-
-                        if (isMarkdown) {
-                            insertMarkdownAtCursor(audioHtml + '\n\n', 0);
-                            if (editableElement) {
-                                editableElement.dispatchEvent(new Event('input', { bubbles: true }));
-                            }
-                        } else {
-                            try {
-                                const sel = window.getSelection();
-                                let range;
-                                if (savedRange) {
-                                    range = savedRange;
-                                } else if (sel && sel.rangeCount > 0) {
-                                    range = sel.getRangeAt(0);
-                                } else if (editableElement) {
-                                    range = document.createRange();
-                                    range.selectNodeContents(editableElement);
-                                    range.collapse(false);
-                                    sel.removeAllRanges();
-                                    sel.addRange(range);
-                                }
-
-                                if (range) {
-                                    const temp = document.createElement('div');
-                                    temp.innerHTML = audioHtml;
-                                    const audioEl = temp.firstChild;
-
-                                    const fragment = document.createDocumentFragment();
-                                    const lineBefore = document.createElement('div');
-                                    lineBefore.innerHTML = '<br>';
-                                    fragment.appendChild(lineBefore);
-                                    fragment.appendChild(audioEl);
-                                    const lineAfter = document.createElement('div');
-                                    lineAfter.innerHTML = '<br>';
-                                    fragment.appendChild(lineAfter);
-
-                                    range.deleteContents();
-                                    range.insertNode(fragment);
-                                    range.collapse(false);
-                                    sel.removeAllRanges();
-                                    sel.addRange(range);
-                                }
-                            } catch (e) {
-                                console.error('Error inserting audio:', e);
-                            }
-                        }
-
-                        if (noteEntry) {
-                            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
-                        }
-
-                        if (typeof window.markNoteAsModified === 'function') {
-                            window.markNoteAsModified();
-                        }
-
-                        if (typeof window.saveNoteImmediately === 'function') {
-                            window.saveNoteImmediately();
-                        }
-                        console.log('[AUDIO] Audio insertion complete');
-
-                        // Close upload spinner
-                        if (uploadSpinner?.close) {
-                            uploadSpinner.close();
-                        }
-                    })
-                    .catch(error => {
-                        console.error('[AUDIO] Upload error:', error);
-
-                        // Close upload spinner
-                        if (uploadSpinner?.close) {
-                            uploadSpinner.close();
-                        }
-
-                        const msg = t('slash_menu.audio_upload_failed', { error: error.message }, 'Upload failed: {{error}}');
-                        if (typeof showNotificationPopup === 'function') {
-                            showNotificationPopup(msg, 'error');
-                        } else {
-                            alert(msg);
-                        }
-                    });
-            } catch (e) {
-                console.error('[AUDIO] Exception in change handler:', e);
-            } finally {
-                if (fileInput.parentNode) {
-                    document.body.removeChild(fileInput);
-                }
-            }
-        });
-
-        // Cleanup if user cancels the file selection
-        fileInput.addEventListener('cancel', function() {
-            console.log('[AUDIO] File selection cancelled');
-            if (fileInput.parentNode) {
-                document.body.removeChild(fileInput);
-            }
-        });
-
-        document.body.appendChild(fileInput);
-        console.log('[AUDIO] Triggering file picker');
-        fileInput.click();
-    }
-
-    window.insertMp4Video = function () {
-        console.log('[MP4] insertMp4Video called (HTML mode)');
-        const noteEntry = savedNoteEntry;
-        const editableElement = savedEditableElement;
-        let savedRange = null;
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0) {
-            savedRange = sel.getRangeAt(0).cloneRange();
-        }
-        insertUploadedMp4(false, noteEntry, editableElement, savedRange);
-    };
-
-    window.insertAudioFile = function () {
-        console.log('[AUDIO] insertAudioFile called (HTML mode)');
-        const noteEntry = savedNoteEntry;
-        const editableElement = savedEditableElement;
-        let savedRange = null;
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0) {
-            savedRange = sel.getRangeAt(0).cloneRange();
-        }
-        insertUploadedAudio(false, noteEntry, editableElement, savedRange);
-    };
-
-    window.insertYouTubeVideoMarkdown = function () {
-        const t = window.t || ((key, params, fallback) => fallback);
-
-        if (typeof window.showYouTubeModal !== 'function') {
-            // Fallback to prompt if modal not available
-            const url = prompt(t('slash_menu.youtube_url_prompt', null, 'Enter YouTube video URL or ID:'), 'https://www.youtube.com/watch?v=');
-            if (url) processYouTubeUrl(url, true, null, null, null);
-            return;
-        }
-
-        // Save the note entry and editable element before they get cleared
-        const noteEntry = savedNoteEntry;
-        const editableElement = savedEditableElement;
-
-        // Save the current range/position
-        let savedRange = null;
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0) {
-            savedRange = sel.getRangeAt(0).cloneRange();
-        }
-
-        window.showYouTubeModal(function (url) {
-            processYouTubeUrl(url, true, editableElement, savedRange, noteEntry);
-        });
-    };
-
-    window.insertMp4VideoMarkdown = function () {
-        console.log('[MP4] insertMp4VideoMarkdown called (Markdown mode)');
-        const noteEntry = savedNoteEntry;
-        const editableElement = savedEditableElement;
-        let savedRange = null;
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0) {
-            savedRange = sel.getRangeAt(0).cloneRange();
-        }
-        insertUploadedMp4(true, noteEntry, editableElement, savedRange);
-    };
-
-    window.insertAudioFileMarkdown = function () {
-        console.log('[AUDIO] insertAudioFileMarkdown called (Markdown mode)');
-        const noteEntry = savedNoteEntry;
-        const editableElement = savedEditableElement;
-        let savedRange = null;
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0) {
-            savedRange = sel.getRangeAt(0).cloneRange();
-        }
-        insertUploadedAudio(true, noteEntry, editableElement, savedRange);
-    };
-
-    // Helper function to process YouTube URL and insert iframe
+    // Process a YouTube URL and insert the corresponding iframe
     function processYouTubeUrl(url, isMarkdown, editableElement, savedRange, noteEntry) {
         const t = window.t || ((key, params, fallback) => fallback);
 
@@ -3835,6 +3235,368 @@
         }
     }
 
+    // Check if a file is an MP4 video
+    function isMp4File(file) {
+        if (!file) return false;
+        const name = String(file.name || '').toLowerCase();
+        const type = String(file.type || '').toLowerCase();
+        return type === 'video/mp4' || name.endsWith('.mp4');
+    }
+
+    // Check if a file is an audio file
+    function isAudioFile(file) {
+        if (!file) return false;
+        const name = String(file.name || '').toLowerCase();
+        const type = String(file.type || '').toLowerCase();
+        if (type.startsWith('audio/')) return true;
+        return name.endsWith('.mp3') || name.endsWith('.wav') || name.endsWith('.m4a') || name.endsWith('.ogg') || name.endsWith('.flac');
+    }
+
+    // Resolve the editor context from provided or global state
+    function resolveEditorContext(preferredNoteEntry, preferredEditableElement) {
+        if (preferredNoteEntry && preferredEditableElement) {
+            return { noteEntry: preferredNoteEntry, editableElement: preferredEditableElement };
+        }
+        const ctx = (typeof getEditorContext === 'function') ? getEditorContext() : null;
+        return {
+            noteEntry: preferredNoteEntry || (ctx ? ctx.noteEntry : null),
+            editableElement: preferredEditableElement || (ctx ? ctx.editableElement : null)
+        };
+    }
+
+    // Generic media upload: handles both MP4 video and audio uploads. mediaType: 'video' | 'audio'
+    function insertUploadedMedia(mediaType, isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange) {
+        var isVideo = (mediaType === 'video');
+        var logPrefix = isVideo ? '[MP4]' : '[AUDIO]';
+        var acceptType = isVideo ? 'video/mp4' : 'audio/*';
+        var validateFn = isVideo ? isMp4File : isAudioFile;
+        var i18nPrefix = isVideo ? 'mp4' : 'audio';
+
+        var t = window.t || (function (key, params, fallback) { return fallback; });
+        var context = resolveEditorContext(preferredNoteEntry, preferredEditableElement);
+        var noteEntry = context.noteEntry;
+        var editableElement = context.editableElement;
+
+        var noteId = '';
+        if (noteEntry && noteEntry.id) {
+            noteId = noteEntry.id.replace('entry', '');
+        }
+        if (!noteId && typeof window.noteid !== 'undefined' && window.noteid !== null) {
+            noteId = String(window.noteid);
+        }
+
+        if (!editableElement && noteEntry) {
+            editableElement = noteEntry.querySelector ? (noteEntry.querySelector('.markdown-editor') || noteEntry.querySelector('[contenteditable="true"]')) : null;
+        }
+
+        if (!noteId) {
+            console.error(logPrefix + ' No note ID found!');
+            var noNoteMsg = t('slash_menu.' + i18nPrefix + '_no_note', null, 'No note selected');
+            if (typeof showNotificationPopup === 'function') {
+                showNotificationPopup(noNoteMsg, 'error');
+            } else {
+                alert(noNoteMsg);
+            }
+            return;
+        }
+
+        var fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = acceptType;
+        fileInput.style.display = 'none';
+
+        fileInput.addEventListener('change', function () {
+            try {
+                var file = fileInput.files && fileInput.files[0];
+                if (!file) return;
+
+                if (!validateFn(file)) {
+                    console.warn(logPrefix + ' Invalid file type:', file.type);
+                    var invalidMsg = t('slash_menu.' + i18nPrefix + '_invalid_file', null, isVideo ? 'Please select an MP4 video.' : 'Please select an audio file.');
+                    if (typeof showNotificationPopup === 'function') {
+                        showNotificationPopup(invalidMsg, 'error');
+                    } else {
+                        alert(invalidMsg);
+                    }
+                    return;
+                }
+
+                // Show upload spinner
+                var uploadMsg = t('slash_menu.' + i18nPrefix + '_uploading', null, isVideo ? 'Uploading video...' : 'Uploading audio...');
+                var uploadSpinner = window.modalAlert?.showSpinner(uploadMsg, t('common.please_wait', null, 'Please wait'));
+
+                var formData = new FormData();
+                formData.append('note_id', noteId);
+                formData.append('file', file);
+                if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) {
+                    formData.append('workspace', selectedWorkspace);
+                }
+
+                fetch('/api/v1/notes/' + noteId + '/attachments', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(function (response) { return response.text(); })
+                    .then(function (text) {
+                        var data;
+                        try {
+                            data = JSON.parse(text);
+                        } catch (e) {
+                            console.error(logPrefix + ' Failed to parse response:', e);
+                            throw new Error('Invalid server response');
+                        }
+                        if (!data || !data.success || !data.attachment_id) {
+                            console.error(logPrefix + ' Upload failed:', data);
+                            throw new Error((data && data.message) ? data.message : 'Upload failed');
+                        }
+
+                        var wsParam = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace)
+                            ? '?workspace=' + encodeURIComponent(selectedWorkspace)
+                            : '';
+                        var attachmentId = data.attachment_id;
+                        var fileUrl = '/api/v1/notes/' + noteId + '/attachments/' + attachmentId + wsParam;
+
+                        // Build the HTML to insert (differs by media type)
+                        var mediaHtml;
+                        if (isVideo) {
+                            mediaHtml = '<video class="note-video-embed" contenteditable="false" width="560" height="315" controls preload="metadata" playsinline src="' + fileUrl + '"></video>';
+                        } else {
+                            // Audio: use native <audio> with contenteditable="false" (works in Chrome)
+                            mediaHtml = '<audio class="note-audio-embed" controls preload="metadata" contenteditable="false" src="' + fileUrl + '"></audio>';
+                        }
+
+                        if (editableElement) {
+                            editableElement.focus();
+                        }
+
+                        if (savedRange) {
+                            var sel = window.getSelection();
+                            sel.removeAllRanges();
+                            sel.addRange(savedRange);
+                        }
+
+                        if (isMarkdown) {
+                            insertMarkdownAtCursor(mediaHtml + '\n\n', 0);
+                            if (editableElement) {
+                                editableElement.dispatchEvent(new Event('input', { bubbles: true }));
+                            }
+                        } else {
+                            try {
+                                var sel = window.getSelection();
+                                var range;
+                                if (savedRange) {
+                                    range = savedRange;
+                                } else if (sel && sel.rangeCount > 0) {
+                                    range = sel.getRangeAt(0);
+                                } else if (editableElement) {
+                                    range = document.createRange();
+                                    range.selectNodeContents(editableElement);
+                                    range.collapse(false);
+                                    sel.removeAllRanges();
+                                    sel.addRange(range);
+                                }
+
+                                if (range) {
+                                    var temp = document.createElement('div');
+                                    temp.innerHTML = mediaHtml;
+                                    var mediaEl = temp.firstChild;
+
+                                    var fragment = document.createDocumentFragment();
+                                    var lineBefore = document.createElement('div');
+                                    lineBefore.innerHTML = '<br>';
+                                    fragment.appendChild(lineBefore);
+                                    fragment.appendChild(mediaEl);
+                                    var lineAfter = document.createElement('div');
+                                    lineAfter.innerHTML = '<br>';
+                                    fragment.appendChild(lineAfter);
+
+                                    range.deleteContents();
+                                    range.insertNode(fragment);
+                                    range.collapse(false);
+                                    sel.removeAllRanges();
+                                    sel.addRange(range);
+                                }
+                            } catch (e) {
+                                console.error('Error inserting ' + mediaType + ':', e);
+                            }
+                        }
+
+                        if (noteEntry) {
+                            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+                        }
+
+                        if (typeof window.markNoteAsModified === 'function') {
+                            window.markNoteAsModified();
+                        }
+
+                        if (typeof window.saveNoteImmediately === 'function') {
+                            window.saveNoteImmediately();
+                        }
+
+                        // Close upload spinner
+                        if (uploadSpinner?.close) {
+                            uploadSpinner.close();
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error(logPrefix + ' Upload error:', error);
+
+                        // Close upload spinner
+                        if (uploadSpinner?.close) {
+                            uploadSpinner.close();
+                        }
+
+                        var failMsg = t('slash_menu.' + i18nPrefix + '_upload_failed', { error: error.message }, 'Upload failed: {{error}}');
+                        if (typeof showNotificationPopup === 'function') {
+                            showNotificationPopup(failMsg, 'error');
+                        } else {
+                            alert(failMsg);
+                        }
+                    });
+            } catch (e) {
+                console.error(logPrefix + ' Exception in change handler:', e);
+            } finally {
+                if (fileInput.parentNode) {
+                    document.body.removeChild(fileInput);
+                }
+            }
+        });
+
+        // Cleanup if user cancels the file selection
+        fileInput.addEventListener('cancel', function () {
+            if (fileInput.parentNode) {
+                document.body.removeChild(fileInput);
+            }
+        });
+
+        document.body.appendChild(fileInput);
+        fileInput.click();
+    }
+
+    // Backward-compatible wrapper for MP4 video uploads
+    function insertUploadedMp4(isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange) {
+        insertUploadedMedia('video', isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange);
+    }
+
+    // Backward-compatible wrapper for audio uploads
+    function insertUploadedAudio(isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange) {
+        insertUploadedMedia('audio', isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange);
+    }
+
+    // ============================================================================
+    // GLOBALLY EXPOSED FUNCTIONS
+    // ============================================================================
+
+    // Expose hideSlashMenu globally
+    window.hideSlashMenu = hideSlashMenu;
+
+    // Insert YouTube video into HTML note (exposed globally)
+    window.insertYouTubeVideo = function () {
+        const t = window.t || ((key, params, fallback) => fallback);
+
+        if (typeof window.showYouTubeModal !== 'function') {
+            // Fallback to prompt if modal not available
+            const url = prompt(t('slash_menu.youtube_url_prompt', null, 'Enter YouTube video URL or ID:'), 'https://www.youtube.com/watch?v=');
+            if (url) processYouTubeUrl(url, false, null, null, null);
+            return;
+        }
+
+        // Save the note entry and editable element before they get cleared
+        const noteEntry = savedNoteEntry;
+        const editableElement = savedEditableElement;
+
+        // Save the current range/position
+        let savedRange = null;
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+            savedRange = sel.getRangeAt(0).cloneRange();
+        }
+
+        window.showYouTubeModal(function (url) {
+            processYouTubeUrl(url, false, editableElement, savedRange, noteEntry);
+        });
+    };
+
+    // Insert YouTube video into Markdown note (exposed globally)
+    window.insertYouTubeVideoMarkdown = function () {
+        const t = window.t || ((key, params, fallback) => fallback);
+
+        if (typeof window.showYouTubeModal !== 'function') {
+            // Fallback to prompt if modal not available
+            const url = prompt(t('slash_menu.youtube_url_prompt', null, 'Enter YouTube video URL or ID:'), 'https://www.youtube.com/watch?v=');
+            if (url) processYouTubeUrl(url, true, null, null, null);
+            return;
+        }
+
+        // Save the note entry and editable element before they get cleared
+        const noteEntry = savedNoteEntry;
+        const editableElement = savedEditableElement;
+
+        // Save the current range/position
+        let savedRange = null;
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+            savedRange = sel.getRangeAt(0).cloneRange();
+        }
+
+        window.showYouTubeModal(function (url) {
+            processYouTubeUrl(url, true, editableElement, savedRange, noteEntry);
+        });
+    };
+
+    // Insert MP4 video into HTML note (exposed globally)
+    window.insertMp4Video = function () {
+        const noteEntry = savedNoteEntry;
+        const editableElement = savedEditableElement;
+        let savedRange = null;
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+            savedRange = sel.getRangeAt(0).cloneRange();
+        }
+        insertUploadedMp4(false, noteEntry, editableElement, savedRange);
+    };
+
+    // Insert audio file into HTML note (exposed globally)
+    window.insertAudioFile = function () {
+        const noteEntry = savedNoteEntry;
+        const editableElement = savedEditableElement;
+        let savedRange = null;
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+            savedRange = sel.getRangeAt(0).cloneRange();
+        }
+        insertUploadedAudio(false, noteEntry, editableElement, savedRange);
+    };
+
+    // Insert MP4 video into Markdown note (exposed globally)
+    window.insertMp4VideoMarkdown = function () {
+        const noteEntry = savedNoteEntry;
+        const editableElement = savedEditableElement;
+        let savedRange = null;
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+            savedRange = sel.getRangeAt(0).cloneRange();
+        }
+        insertUploadedMp4(true, noteEntry, editableElement, savedRange);
+    };
+
+    // Insert audio file into Markdown note (exposed globally)
+    window.insertAudioFileMarkdown = function () {
+        const noteEntry = savedNoteEntry;
+        const editableElement = savedEditableElement;
+        let savedRange = null;
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+            savedRange = sel.getRangeAt(0).cloneRange();
+        }
+        insertUploadedAudio(true, noteEntry, editableElement, savedRange);
+    };
+
+    // ============================================================================
+    // MODULE INITIALIZATION
+    // ============================================================================
+
+    // Module initialization
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {

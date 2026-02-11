@@ -1,8 +1,14 @@
 /* Folder Icon Modal Styles */
 
+#folderIconModal.modal {
+    align-items: flex-start !important;
+    padding-top: 15px !important;
+}
+
 .folder-icon-modal-content {
     max-width: 600px;
     width: 90%;
+    margin: 15px auto !important;
 }
 
 .folder-icon-modal-content h3 {

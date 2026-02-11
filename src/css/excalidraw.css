@@ -126,9 +126,12 @@ img[data-is-excalidraw="true"] {
     max-width: 800px;
     width: auto;
     height: auto;
+    box-shadow: none; /* Remove shadow */
+}
+
+img[data-is-excalidraw="true"]:not(.img-with-border):not(.img-with-border-no-padding) {
     border: none; /* Remove frame */
     border-radius: 0; /* Remove rounded corners */
-    box-shadow: none; /* Remove shadow */
 }
 
 /* Global style to center all Excalidraw previews */

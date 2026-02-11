@@ -1,13 +1,10 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 require 'auth.php';
 requireAuth();
 
 require_once 'config.php';
 require_once 'functions.php';
-include 'db_connect.php';
+require_once 'db_connect.php';
 
 // Get note ID from URL
 $note_id = isset($_GET['note_id']) ? (int)$_GET['note_id'] : 0;
@@ -39,15 +36,35 @@ if (!$note) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title><?php echo t_h('attachments.page.title'); ?> - <?php echo htmlspecialchars($note['heading']); ?> - Poznote</title>
+    <title><?php echo htmlspecialchars($note['heading']); ?> - Poznote</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
     <script src="js/theme-init.js"></script>
     <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/light.min.css">
-    <link rel="stylesheet" href="css/attachments.css">
-    <link rel="stylesheet" href="css/modals.css">
-    <link rel="stylesheet" href="css/dark-mode.css">
+    <link rel="stylesheet" href="css/attachments/base.css">
+    <link rel="stylesheet" href="css/attachments/upload.css">
+    <link rel="stylesheet" href="css/attachments/display.css">
+    <link rel="stylesheet" href="css/attachments/buttons-alerts.css">
+    <link rel="stylesheet" href="css/attachments/preview-modal.css">
+    <link rel="stylesheet" href="css/attachments/responsive.css">
+    <link rel="stylesheet" href="css/modals/base.css">
+    <link rel="stylesheet" href="css/modals/specific-modals.css">
+    <link rel="stylesheet" href="css/modals/attachments.css">
+    <link rel="stylesheet" href="css/modals/link-modal.css">
+    <link rel="stylesheet" href="css/modals/share-modal.css">
+    <link rel="stylesheet" href="css/modals/alerts-utilities.css">
+    <link rel="stylesheet" href="css/modals/responsive.css">
+    <link rel="stylesheet" href="css/dark-mode/variables.css">
+    <link rel="stylesheet" href="css/dark-mode/layout.css">
+    <link rel="stylesheet" href="css/dark-mode/menus.css">
+    <link rel="stylesheet" href="css/dark-mode/editor.css">
+    <link rel="stylesheet" href="css/dark-mode/modals.css">
+    <link rel="stylesheet" href="css/dark-mode/components.css">
+    <link rel="stylesheet" href="css/dark-mode/pages.css">
+    <link rel="stylesheet" href="css/dark-mode/markdown.css">
+    <link rel="stylesheet" href="css/dark-mode/kanban.css">
+    <link rel="stylesheet" href="css/dark-mode/icons.css">
     <script src="js/theme-manager.js"></script>
 </head>
 <body data-note-id="<?php echo $note_id; ?>" 
@@ -82,9 +99,6 @@ if (!$note) {
           t('attachments.size.units.gb', [], 'GB'),
       ]), ENT_QUOTES); ?>">
     <div class="settings-container">
-        <h1><?php echo t_h('attachments.page.title'); ?></h1>
-        <p><?php echo t_h('attachments.page.subtitle'); ?> <strong><?php echo htmlspecialchars($note['heading']); ?></strong></p>
-        
         <?php 
             $back_params = [];
             if ($workspace) $back_params[] = 'workspace=' . urlencode($workspace);

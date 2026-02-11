@@ -1,0 +1,130 @@
+/**
+ * Attachments - Responsive & Utilities
+ *
+ * Mobile responsive styles and utility classes.
+ */
+
+/* Mobile responsiveness */
+@media (max-width: 800px) {
+    .settings-container {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    .settings-container h1 {
+        font-size: 24px;
+    }
+
+    .settings-section {
+        padding: 15px;
+    }
+
+    .attachment-card {
+        padding: 10px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .attachment-icon {
+        align-self: flex-start;
+    }
+
+    .attachment-details {
+        width: 100%;
+    }
+
+    .attachment-actions {
+        align-self: flex-end;
+        margin-left: 0;
+    }
+
+    .attachment-meta {
+        flex-direction: column;
+        gap: 4px;
+        font-size: 12px;
+    }
+
+    .attachment-name {
+        font-size: 14px;
+    }
+
+    .btn-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    /* Mobile attachment display rules */
+    .note-attachments-row {
+        margin-top: 10px !important;
+        margin-bottom: 5px !important;
+    }
+
+    /* When text selection mode shows formatting buttons */
+    .show-format-buttons .btn-bold,
+    .show-format-buttons .btn-italic,
+    .show-format-buttons .btn-underline,
+    .show-format-buttons .btn-strikethrough,
+    .show-format-buttons .btn-link,
+    .show-format-buttons .btn-unlink,
+    .show-format-buttons .btn-color,
+    .show-format-buttons .btn-highlight,
+    .show-format-buttons .btn-list-ul,
+    .show-format-buttons .btn-list-ol,
+    .show-format-buttons .btn-text-height,
+    .show-format-buttons .btn-code,
+    .show-format-buttons .btn-inline-code,
+    .show-format-buttons .btn-eraser {
+        display: flex !important;
+    }
+
+    /* Hide action buttons when formatting buttons are shown */
+    .show-format-buttons .btn-separator,
+    .show-format-buttons .btn-emoji,
+    .show-format-buttons .btn-save,
+    .show-format-buttons .btn-favorite,
+    .show-format-buttons .btn-folder,
+    .show-format-buttons .btn-attachment,
+    .show-format-buttons .btn-download,
+    .show-format-buttons .btn-info,
+    .show-format-buttons .btn-trash {
+        display: none !important;
+    }
+
+    /* Hover/focus visual for attachment button (mobile) */
+    .btn-attachment:hover,
+    .btn-attachment:focus {
+        background: rgba(0, 125, 184, 0.1) !important;
+        color: #005a8a !important;
+    }
+
+    /* Attachment indicators (use app blue) */
+    .btn-settings.has-attachments i,
+    .btn-attachment.has-attachments i {
+        filter: none !important;
+        color: #007DB8 !important;
+    }
+
+    .btn-settings.has-attachments:hover i,
+    .btn-settings.has-attachments:focus i,
+    .btn-attachment.has-attachments:hover i,
+    .btn-attachment.has-attachments:focus i {
+        filter: none !important;
+        color: #005a8a !important;
+    }
+}
+
+/* ===========================================
+   UTILITY CLASSES
+   =========================================== */
+
+/* Hidden by default */
+.initially-hidden {
+    display: none;
+}
+
+/* Section bottom spacer */
+.section-bottom-spacer {
+    padding-bottom: 50px;
+}

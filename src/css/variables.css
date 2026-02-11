@@ -1,0 +1,11 @@
+/**
+ * CSS Variables
+ * 
+ * Global CSS custom properties used throughout the application
+ * for layout configuration and theming.
+ */
+
+/* CSS Variables for resizable layout */
+:root {
+    --left-col-width: 370px;
+}

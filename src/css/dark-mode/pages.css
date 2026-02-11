@@ -1,0 +1,721 @@
+/* ============================================
+   Dark Mode - Pages
+   (Settings, Info, Login, Workspaces, Trash,
+    Backup/Export, Shared, Public Note)
+   ============================================ */
+
+/* ============================================
+   Settings
+   ============================================ */
+
+html[data-theme='dark'] .settings-container,
+body.dark-mode .settings-container {
+    background-color: var(--dm-bg);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .settings-category-title,
+body.dark-mode .settings-category-title {
+    color: var(--dm-text);
+    border-bottom-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .settings-container h1,
+body.dark-mode .settings-container h1 {
+    color: var(--dm-text);
+    border-bottom: 1px solid var(--dm-border);
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+}
+
+html[data-theme='dark'] .settings-card,
+body.dark-mode .settings-card {
+    border-color: var(--dm-border);
+    border-bottom: var(--dm-border);
+}
+
+html[data-theme='dark'] .settings-card:hover,
+body.dark-mode .settings-card:hover {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .settings-card h3,
+body.dark-mode .settings-card h3 {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .settings-card-icon,
+body.dark-mode .settings-card-icon {
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .settings-section,
+body.dark-mode .settings-section {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .settings-section h3,
+body.dark-mode .settings-section h3 {
+    color: var(--dm-text);
+    border-bottom-color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .settings-section .btn,
+body.dark-mode .settings-section .btn {
+    color: var(--dm-border);
+}
+
+html[data-theme='dark'] .settings-section .btn:enabled,
+body.dark-mode .settings-section .btn:enabled {
+    color: var(--dm-text);
+}
+
+/* ============================================
+   Info Page
+   ============================================ */
+
+html[data-theme='dark'] .info-container,
+body.dark-mode .info-container {
+    background-color: var(--dm-bg);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .info-label,
+body.dark-mode .info-label {
+    background-color: var(--dm-bg);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .info-value,
+body.dark-mode .info-value {
+    background-color: var(--dm-bg);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .info-card,
+body.dark-mode .info-card {
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .info-row,
+body.dark-mode .info-row {
+    border-color: var(--dm-border);
+}
+
+/* ============================================
+   Login Page
+   ============================================ */
+
+html[data-theme='dark'] .login-container,
+body.dark-mode .login-container {
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .login-container h1,
+body.dark-mode .login-container h1 {
+    color: var(--dm-text);
+}
+
+/* ============================================
+   Workspaces Page
+   ============================================ */
+
+html[data-theme='dark'] .workspace-name-item,
+body.dark-mode .workspace-name-item {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .workspace-count,
+body.dark-mode .workspace-count {
+    color: var(--dm-text-muted);
+    background-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .workspace-list ul li,
+body.dark-mode .workspace-list ul li {
+    border-bottom-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .action-btn,
+body.dark-mode .action-btn {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .action-btn:hover,
+body.dark-mode .action-btn:hover {
+    background-color: var(--dm-border);
+    border-color: var(--dm-border-light);
+}
+
+html[data-theme='dark'] .default-workspace-status,
+body.dark-mode .default-workspace-status {
+    color: #4ade80;
+}
+
+html[data-theme='dark'] .workspace-list,
+body.dark-mode .workspace-list {
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .locked-icon,
+body.dark-mode .locked-icon {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] #defaultWorkspaceStatus,
+body.dark-mode #defaultWorkspaceStatus {
+    color: #4ade80;
+}
+
+html[data-theme='dark'] .workspace-item,
+body.dark-mode .workspace-item {
+    background-color: var(--dm-bg);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .workspace-item:hover,
+body.dark-mode .workspace-item:hover {
+    background-color: var(--dm-surface);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* ============================================
+   Trash Page
+   ============================================ */
+
+html[data-theme='dark'] .trash-container,
+body.dark-mode .trash-container {
+    background-color: var(--dm-bg);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .trash-header,
+body.dark-mode .trash-header {
+    background-color: var(--dm-bg);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .trash-innernote,
+body.dark-mode .trash-innernote {
+    background-color: var(--dm-bg);
+    color: var(--dm-text);
+}
+
+/* ============================================
+   Attachments
+   ============================================ */
+
+html[data-theme='dark'] .attachment-upload-section,
+body.dark-mode .attachment-upload-section {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .file-input,
+body.dark-mode .file-input {
+    background-color: var(--dm-bg);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .accepted-types,
+body.dark-mode .accepted-types {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .form-group label,
+body.dark-mode .form-group label {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .selected-filename,
+body.dark-mode .selected-filename {
+    background: #1a4a5e;
+    border-color: var(--dm-accent);
+    color: #a0d8ff;
+}
+
+html[data-theme='dark'] .note-attachments-row,
+body.dark-mode .note-attachments-row {
+    background-color: transparent;
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .attachment-link,
+body.dark-mode .attachment-link {
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .attachment-link:hover,
+body.dark-mode .attachment-link:hover {
+    color: #6ab3ff;
+}
+
+html[data-theme='dark'] .attachments-display,
+body.dark-mode .attachments-display {
+    background: var(--dm-bg);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .no-attachments,
+body.dark-mode .no-attachments {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .loading-attachments,
+body.dark-mode .loading-attachments {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .error-message,
+body.dark-mode .error-message {
+    background: #44272a;
+    border-color: #6c3238;
+    color: #ff8e9a;
+}
+
+html[data-theme='dark'] .attachment-card,
+body.dark-mode .attachment-card {
+    border-bottom-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .attachment-card:hover,
+body.dark-mode .attachment-card:hover {
+    background-color: var(--dm-surface);
+}
+
+html[data-theme='dark'] .attachment-name,
+body.dark-mode .attachment-name {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .attachment-meta,
+body.dark-mode .attachment-meta {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .attachment-size,
+body.dark-mode .attachment-size {
+    color: #b0b0b0;
+}
+
+/* ============================================
+   Backup / Export Page
+   ============================================ */
+
+html[data-theme='dark'] .backup-container,
+body.dark-mode .backup-container {
+    background-color: var(--dm-bg);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .accordion-header,
+body.dark-mode .accordion-header {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .accordion-header:hover,
+body.dark-mode .accordion-header:hover {
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .accordion-icon,
+body.dark-mode .accordion-icon {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .backup-section,
+body.dark-mode .backup-section {
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .backup-section h3,
+body.dark-mode .backup-section h3 {
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .backup-section label,
+body.dark-mode .backup-section label {
+    color: var(--dm-text) !important;
+}
+
+html[data-theme='dark'] .backup-section .form-text,
+html[data-theme='dark'] .backup-section .text-muted,
+html[data-theme='dark'] .backup-section small,
+body.dark-mode .backup-section .form-text,
+body.dark-mode .backup-section .text-muted,
+body.dark-mode .backup-section small {
+    color: #b0b0b0 !important;
+}
+
+html[data-theme='dark'] .backup-section select,
+body.dark-mode .backup-section select {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+    border-color: #555;
+}
+
+html[data-theme='dark'] .form-select-styled,
+body.dark-mode .form-select-styled {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+    border-color: #555;
+}
+
+html[data-theme='dark'] .form-select-styled:focus,
+body.dark-mode .form-select-styled:focus {
+    border-color: var(--dm-accent);
+    box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.2);
+}
+
+html[data-theme='dark'] .form-file-input,
+body.dark-mode .form-file-input {
+    background-color: var(--dm-surface);
+    border-color: #555;
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .form-file-input:hover,
+body.dark-mode .form-file-input:hover {
+    border-color: var(--dm-accent);
+    background-color: #1e3a4a;
+}
+
+html[data-theme='dark'] .backup-section select option,
+body.dark-mode .backup-section select option {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .backup-section input[type="file"],
+body.dark-mode .backup-section input[type="file"] {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+    border-color: #555;
+}
+
+html[data-theme='dark'] .backup-section input[type="file"]::file-selector-button,
+body.dark-mode .backup-section input[type="file"]::file-selector-button {
+    background-color: var(--dm-border);
+    color: var(--dm-text);
+    border: 1px solid #555;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+html[data-theme='dark'] .backup-section input[type="file"]::file-selector-button:hover,
+body.dark-mode .backup-section input[type="file"]::file-selector-button:hover {
+    background-color: #4a4a4a;
+}
+
+/* Card containers (backup/export) */
+html[data-theme='dark'] .card-container,
+body.dark-mode .card-container {
+    background-color: var(--dm-bg);
+    border-color: var(--dm-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme='dark'] .card-container:hover,
+body.dark-mode .card-container:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    border-color: #007cba;
+}
+
+html[data-theme='dark'] .card-header,
+body.dark-mode .card-header {
+    background: linear-gradient(135deg, var(--dm-surface) 0%, var(--dm-bg) 100%);
+    border-bottom-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .card-header:hover,
+body.dark-mode .card-header:hover {
+    background: linear-gradient(135deg, var(--dm-surface) 0%, var(--dm-surface) 100%);
+}
+
+html[data-theme='dark'] .card-header h3,
+body.dark-mode .card-header h3 {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .card-header h3 i.card-icon,
+body.dark-mode .card-header h3 i.card-icon {
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .card-header h3 i.chevron,
+body.dark-mode .card-header h3 i.chevron {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .card-header p,
+body.dark-mode .card-header p {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .card-content,
+body.dark-mode .card-content {
+    background-color: var(--dm-bg);
+}
+
+html[data-theme='dark'] .sub-card,
+body.dark-mode .sub-card {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .sub-card-header,
+body.dark-mode .sub-card-header {
+    background-color: transparent;
+}
+
+html[data-theme='dark'] .sub-card-header:hover,
+body.dark-mode .sub-card-header:hover {
+    background-color: var(--dm-surface);
+}
+
+html[data-theme='dark'] .sub-card h4,
+body.dark-mode .sub-card h4 {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .sub-card h4 i.sub-card-icon,
+body.dark-mode .sub-card h4 i.sub-card-icon {
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .sub-card h4 i.chevron,
+body.dark-mode .sub-card h4 i.chevron {
+    color: #b0b0b0;
+}
+
+/* ============================================
+   Shared Page
+   ============================================ */
+
+html[data-theme='dark'] .filter-input,
+body.dark-mode .filter-input {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .filter-input:focus,
+body.dark-mode .filter-input:focus {
+    border-color: #007DB8;
+    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.2);
+}
+
+html[data-theme='dark'] .filter-input::placeholder,
+body.dark-mode .filter-input::placeholder {
+    color: #777777;
+}
+
+html[data-theme='dark'] .clear-filter-btn,
+body.dark-mode .clear-filter-btn {
+    color: #777777;
+}
+
+html[data-theme='dark'] .clear-filter-btn:hover,
+body.dark-mode .clear-filter-btn:hover {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .filter-stats,
+body.dark-mode .filter-stats {
+    background-color: rgba(0, 125, 184, 0.2);
+    color: #a0c4e0;
+}
+
+/* ============================================
+   Public Note
+   ============================================ */
+
+/* Inline code only - don't override Highlight.js */
+html[data-theme='dark'] .public-note .content code:not([class*="hljs"]):not([class*="language-"]),
+body.dark-mode .public-note .content code:not([class*="hljs"]):not([class*="language-"]) {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .public-note .content pre,
+body.dark-mode .public-note .content pre {
+    background-color: transparent !important;
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .public-note .content pre code,
+body.dark-mode .public-note .content pre code {
+    background-color: transparent !important;
+}
+
+/* Important task styling for public view in dark mode */
+html[data-theme='dark'] .public-note .content .task-item.important,
+body.dark-mode .public-note .content .task-item.important {
+    border-color: #8b4545;
+    background: #3d1f1f;
+}
+
+html[data-theme='dark'] .public-note .content .task-item.important .task-text,
+body.dark-mode .public-note .content .task-item.important .task-text {
+    color: #ff6b6b;
+    font-weight: 600;
+}
+
+/* ============================================
+   Folder Icon Modal
+   ============================================ */
+
+html[data-theme='dark'] .folder-icon-modal-content h3,
+body.dark-mode .folder-icon-modal-content h3 {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .folder-icon-description,
+body.dark-mode .folder-icon-description {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .folder-icon-grid,
+body.dark-mode .folder-icon-grid {
+    background: var(--dm-bg);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .folder-icon-item,
+body.dark-mode .folder-icon-item {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .folder-icon-item:hover,
+body.dark-mode .folder-icon-item:hover {
+    background: var(--dm-surface);
+    border-color: #6366f1;
+}
+
+html[data-theme='dark'] .folder-icon-item.selected,
+body.dark-mode .folder-icon-item.selected {
+    background: #1e1b4b;
+    border-color: #6366f1;
+}
+
+html[data-theme='dark'] .folder-icon-modal-content .modal-buttons .btn-secondary,
+body.dark-mode .folder-icon-modal-content .modal-buttons .btn-secondary {
+    background: #4b5563;
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .folder-icon-modal-content .modal-buttons .btn-secondary:hover,
+body.dark-mode .folder-icon-modal-content .modal-buttons .btn-secondary:hover {
+    background: #6b7280;
+}
+
+html[data-theme='dark'] .folder-icon-grid::-webkit-scrollbar-track,
+body.dark-mode .folder-icon-grid::-webkit-scrollbar-track {
+    background: var(--dm-surface);
+}
+
+html[data-theme='dark'] .folder-icon-grid::-webkit-scrollbar-thumb,
+body.dark-mode .folder-icon-grid::-webkit-scrollbar-thumb {
+    background: #4b5563;
+}
+
+html[data-theme='dark'] .folder-icon-grid::-webkit-scrollbar-thumb:hover,
+body.dark-mode .folder-icon-grid::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}
+
+/* ============================================
+   Folder Color Picker
+   ============================================ */
+
+html[data-theme='dark'] .folder-color-label,
+body.dark-mode .folder-color-label {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .folder-color-picker,
+body.dark-mode .folder-color-picker {
+    background: var(--dm-bg);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .folder-color-swatch,
+body.dark-mode .folder-color-swatch {
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .folder-color-option:hover .folder-color-swatch,
+body.dark-mode .folder-color-option:hover .folder-color-swatch {
+    border-color: #6366f1;
+}
+
+html[data-theme='dark'] .folder-color-option.selected .folder-color-swatch,
+body.dark-mode .folder-color-option.selected .folder-color-swatch {
+    border-color: #6366f1;
+}
+
+html[data-theme='dark'] .folder-color-default,
+body.dark-mode .folder-color-default {
+    background: linear-gradient(135deg, var(--dm-border) 25%, transparent 25%, transparent 75%, var(--dm-border) 75%, var(--dm-border)),
+        linear-gradient(135deg, var(--dm-border) 25%, var(--dm-bg) 25%, var(--dm-bg) 75%, var(--dm-border) 75%, var(--dm-border));
+    background-size: 8px 8px;
+    background-position: 0 0, 4px 4px;
+}
+
+/* ============================================
+   GitHub Sync Limitations Table
+   ============================================ */
+
+html[data-theme='dark'] .limitations-table .status-success,
+html[data-theme='dark'] .limitations-table .status-success i,
+html[data-theme='dark'] .limitations-table .status-success svg,
+body.dark-mode .limitations-table .status-success,
+body.dark-mode .limitations-table .status-success i,
+body.dark-mode .limitations-table .status-success svg {
+    color: #5cb85c !important;
+    filter: none !important;
+}
+
+html[data-theme='dark'] .limitations-table .status-error,
+html[data-theme='dark'] .limitations-table .status-error i,
+html[data-theme='dark'] .limitations-table .status-error svg,
+body.dark-mode .limitations-table .status-error,
+body.dark-mode .limitations-table .status-error i,
+body.dark-mode .limitations-table .status-error svg {
+    color: #e57373 !important;
+    filter: none !important;
+}
+
+html[data-theme='dark'] .limitations-table thead tr,
+body.dark-mode .limitations-table thead tr {
+    background-color: var(--dm-surface);
+}
+
+html[data-theme='dark'] .limitations-table th,
+html[data-theme='dark'] .limitations-table td,
+body.dark-mode .limitations-table th,
+body.dark-mode .limitations-table td {
+    border-color: #444;
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .limitations-table tbody tr:nth-child(even),
+body.dark-mode .limitations-table tbody tr:nth-child(even) {
+    background-color: var(--dm-surface);
+}
+
+html[data-theme='dark'] .limitations-note,
+body.dark-mode .limitations-note {
+    color: #aaa;
+}

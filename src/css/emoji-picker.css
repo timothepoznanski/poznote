@@ -1,0 +1,105 @@
+/**
+ * Emoji Picker Styles
+ * 
+ * Complete emoji picker popup styling including grid layout, hover effects,
+ * custom scrollbar, and keyboard hint display.
+ */
+
+/* EMOJI PICKER STYLES */
+
+.emoji-picker {
+    position: fixed;
+    background: white;
+    border: 1px solid #ddd;
+    /* border-radius: 12px; */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    width: 360px;
+    max-height: 550px;
+    overflow-y: auto;
+    font-family: 'Intr', sans-serif;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+.emoji-hint {
+    padding: 10px 15px;
+    margin: 5px 10px 10px 10px;
+    background: #f8f9fa;
+    border-left: 3px solid #0066cc;
+    font-size: 12px;
+    color: #555;
+    border-radius: 4px;
+}
+
+.emoji-hint kbd {
+    display: inline-block;
+    padding: 2px 6px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 11px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.emoji-category {
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f0;
+    width: 100%;
+}
+
+.emoji-category:last-child {
+    border-bottom: none;
+}
+
+.emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 10px;
+    justify-items: center;
+    padding: 5px 15px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.emoji-item {
+    font-size: 18px;
+    width: 30px;
+    /* height: 30px; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+    user-select: none;
+}
+
+.emoji-item:hover {
+    background-color: #f0f8ff;
+    transform: scale(1.1);
+}
+
+.emoji-item:active {
+    transform: scale(0.95);
+}
+
+/* Custom scrollbar for emoji picker */
+.emoji-picker::-webkit-scrollbar {
+    width: 8px;
+}
+
+.emoji-picker::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.emoji-picker::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+.emoji-picker::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}

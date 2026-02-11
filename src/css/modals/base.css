@@ -1,0 +1,346 @@
+/* ============================================
+   Modal System - Base Styles
+   Core modal overlay, content, buttons, form
+   controls, error messages, and radio options.
+   ============================================ */
+
+/* Utility class for hiding elements */
+.hidden {
+    display: none !important;
+}
+
+/* ============================================
+   CSS Variables
+   ============================================ */
+
+:root {
+    /* Central modal max width for standard dialogs */
+    --modal-max-width: 420px;
+}
+
+/* ============================================
+   Modal Overlay
+   ============================================ */
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999 !important;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    align-items: flex-start;
+    justify-content: center;
+    padding: 80px 16px 16px 16px;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+/* ============================================
+   Modal Content
+   ============================================ */
+
+.modal-content {
+    background-color: #fefefe;
+    padding: 28px;
+    border: none;
+    border-radius: 8px;
+    width: 90%;
+    max-width: var(--modal-max-width);
+    margin: 0 auto;
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-sizing: border-box;
+    overflow-x: hidden;
+    z-index: 10000 !important;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: rgb(55, 53, 47);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* ============================================
+   Modal Form Controls
+   ============================================ */
+
+.modal-content input,
+.modal-content select {
+    padding: 8px 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
+    margin-top: 10px;
+}
+
+.modal-content input:focus,
+.modal-content select:focus {
+    outline: none;
+    border-color: #007DB8;
+}
+
+.modal .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+/* Ensure controls inside modals never exceed the modal width */
+.modal-content .btn,
+.modal-content button,
+.modal-content input,
+.modal-content select,
+.modal-content textarea {
+    max-width: 100% !important;
+    box-sizing: border-box;
+}
+
+/* ============================================
+   Modal Buttons
+   ============================================ */
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    margin-top: auto;
+    flex-wrap: wrap;
+}
+
+.modal-buttons button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.2s;
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+.modal-buttons button:first-child {
+    background-color: #007DB8;
+    color: white;
+}
+
+.modal-buttons button:first-child:hover {
+    background-color: #005a8a;
+}
+
+.modal-buttons button:last-child {
+    background-color: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.modal-buttons button:last-child:hover {
+    background-color: #e9ecef;
+}
+
+/* Explicit button classes (take precedence over first/last child rules) */
+.modal-buttons button.btn-primary {
+    background-color: #007DB8;
+    color: white;
+    border: none;
+}
+
+.modal-buttons button.btn-primary:hover {
+    background-color: #005a8a;
+}
+
+.modal-buttons button.btn-cancel {
+    background-color: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.modal-buttons button.btn-cancel:hover {
+    background-color: #e9ecef;
+}
+
+.modal-buttons button.btn-success {
+    background-color: #28a745;
+    color: white;
+    border: none;
+}
+
+.modal-buttons button.btn-success:hover {
+    background-color: #218838;
+}
+
+.modal-buttons button.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+}
+
+.modal-buttons button.btn-danger:hover {
+    background-color: #c82333;
+}
+
+/* ============================================
+   Error & Info Messages
+   ============================================ */
+
+.modal-error-message {
+    display: none;
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+    border: 1px solid #f5c6cb;
+}
+
+.default-info {
+    font-size: 12px;
+    color: #dc3545;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+/* ============================================
+   Radio Buttons
+   ============================================ */
+
+.radio-options {
+    margin-top: 8px;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.radio-options label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    line-height: 1.2;
+}
+
+.radio-options input[type="radio"] {
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    flex: 0 0 auto;
+}
+
+/* ============================================
+   Move Task List (used in multiple modals)
+   ============================================ */
+
+.move-task-list {
+    max-height: 260px;
+    overflow: auto;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    padding: 6px;
+    margin-top: 6px;
+}
+
+.move-task-item {
+    width: 100%;
+    text-align: left;
+    padding: 8px 10px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.move-task-item:hover {
+    background: #f3f4f6;
+}
+
+.move-task-item.selected {
+    background: #e0f2fe;
+}
+
+.move-task-item small {
+    color: #6b7280;
+    font-size: 0.8rem;
+}
+
+.move-task-empty {
+    color: #6b7280;
+    font-size: 0.9rem;
+    padding: 8px;
+}
+
+/* ============================================
+   Modal Footer
+   ============================================ */
+
+.modal-footer .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.modal-footer .btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.modal-footer .btn-primary {
+    background: #007DB8;
+    color: white;
+}
+
+.modal-footer .btn:hover {
+    opacity: 0.9;
+}
+
+/* ============================================
+   Disabled & Danger buttons in modals
+   ============================================ */
+
+.modal .btn-disabled {
+    background: #cccccc !important;
+    color: #888888 !important;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: not-allowed !important;
+    opacity: 0.6;
+}
+
+.modal .btn-disabled:hover {
+    background: #cccccc !important;
+    cursor: not-allowed !important;
+}
+
+.modal .btn-danger {
+    background: #e04b4b !important;
+    color: #fff !important;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    opacity: 1;
+}
+
+.modal .btn-danger:hover {
+    background: #c43b3b !important;
+}

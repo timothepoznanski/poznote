@@ -12,6 +12,7 @@
         "confirm": "Bestätigen",
         "confirmation": "Bestätigung",
         "save": "Speichern",
+        "untitled": "Unbenannt",
         "login": {
             "fields": {
                 "username": "Benutzername",
@@ -248,7 +249,7 @@
             "upload_section_title": "Neuen Anhang hochladen",
             "drag_drop_info": "Sie können Ihre Datei unten ablegen:",
             "all_types_accepted": "Alle Dateitypen akzeptiert (max 200MB)",
-            "upload_button": "Datei hochladen",
+            "upload_button": "Anhängen",
             "current_attachments": "Aktuelle Anhänge",
             "loading_attachments": "Anhänge werden geladen...",
             "preview_alt": "Vorschau",
@@ -272,6 +273,10 @@
         "list": {
             "title": "Notizen mit Anhängen",
             "no_attachments": "Noch keine Notizen mit Anhängen.",
+            "back_to_notes": "Zurück zu den Notizen",
+            "manage_attachments": "Anhänge verwalten",
+            "attachment_count_singular": "1 Anhang",
+            "attachment_count_plural": "{{count}} Anhänge",
             "hint": "Fügen Sie Ihren Notizen Anhänge hinzu, indem Sie auf das Büroklammer-Symbol in der Symbolleiste klicken.",
             "filter_placeholder": "Nach Notizentitel oder Anhangsname filtern...",
             "no_filter_results": "Keine Notizen entsprechen Ihrer Suche.",
@@ -286,6 +291,11 @@
     },
     "settings": {
         "title": "Einstellungen",
+        "categories": {
+            "actions": "Aktionen",
+            "display": "Anzeige",
+            "about": "Über"
+        },
         "sections": {
             "account_display": "Konto & Anzeige",
             "notes_folders": "Notizen & Ordner",
@@ -1785,12 +1795,12 @@
             "push": {
                 "title": "An GitHub senden",
                 "description": "Exportiert Ihre Notizen nach GitHub. Aktualisiert vorhandene Dateien und löscht Dateien, die in Poznote nicht mehr vorhanden sind.",
-                "button": "Push"
+                "button": "Senden"
             },
             "pull": {
                 "title": "Von GitHub abrufen",
                 "description": "Importiert Notizen von GitHub. Aktualisiert vorhandene Notizen und verschiebt Notizen, die auf GitHub nicht mehr vorhanden sind, in den Papierkorb.",
-                "button": "Pull"
+                "button": "Abrufen"
             }
         },
         "messages": {

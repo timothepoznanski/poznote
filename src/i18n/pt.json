@@ -12,6 +12,7 @@
         "confirm": "Confirmar",
         "confirmation": "Confirmação",
         "save": "Salvar",
+        "untitled": "Sem título",
         "login": {
             "fields": {
                 "username": "Usuário",
@@ -247,7 +248,7 @@
             "upload_section_title": "Enviar Novo Anexo",
             "drag_drop_info": "Você pode arrastar e soltar seu arquivo abaixo:",
             "all_types_accepted": "Todos os tipos de arquivo aceitos (máx 200MB)",
-            "upload_button": "Enviar Arquivo",
+            "upload_button": "Anexar",
             "current_attachments": "Anexos Atuais",
             "loading_attachments": "Carregando anexos...",
             "preview_alt": "Pré-visualização",
@@ -271,6 +272,10 @@
         "list": {
             "title": "Notas com anexos",
             "no_attachments": "Ainda não há notas com anexos.",
+            "back_to_notes": "Voltar para as notas",
+            "manage_attachments": "Gerenciar anexos",
+            "attachment_count_singular": "1 anexo",
+            "attachment_count_plural": "{{count}} anexos",
             "hint": "Adicione anexos às suas notas usando o botão de clipe na barra de ferramentas.",
             "filter_placeholder": "Filtrar por título da nota ou nome do anexo...",
             "no_filter_results": "Nenhuma nota corresponde à sua pesquisa.",
@@ -285,6 +290,11 @@
     },
     "settings": {
         "title": "Configurações",
+        "categories": {
+            "actions": "Ações",
+            "display": "Tela",
+            "about": "Sobre"
+        },
         "sections": {
             "account_display": "Conta e Exibição",
             "notes_folders": "Notas e Pastas",
@@ -1789,12 +1799,12 @@
             "push": {
                 "title": "Enviar para GitHub",
                 "description": "Exporta suas notas para o GitHub. Atualiza arquivos existentes e exclui arquivos que não existem mais no Poznote.",
-                "button": "Push"
+                "button": "Enviar"
             },
             "pull": {
                 "title": "Recuperar do GitHub",
                 "description": "Importa notas do GitHub. Atualiza notas existentes e move para a lixeira notas que não existem mais no GitHub.",
-                "button": "Pull"
+                "button": "Recuperar"
             }
         },
         "messages": {

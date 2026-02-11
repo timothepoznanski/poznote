@@ -60,6 +60,22 @@
         root.style.colorScheme = normalizedTheme;
         root.style.backgroundColor = normalizedTheme === 'dark' ? '#252526' : '#ffffff';
 
+        // Update theme-dark/theme-light classes for consistency with theme-init.js
+        if (normalizedTheme === 'dark') {
+            root.classList.add('theme-dark');
+            root.classList.remove('theme-light');
+        } else {
+            root.classList.add('theme-light');
+            root.classList.remove('theme-dark');
+        }
+
+        // Remove critical CSS from theme-init.js if it exists, as it contains !important rules
+        // that will interfere with dynamic theme switching
+        var criticalStyle = document.getElementById('theme-init-critical-css');
+        if (criticalStyle) {
+            criticalStyle.remove();
+        }
+
         // Manage body class for compatibility
         if (normalizedTheme === 'dark') {
             document.body.classList.add('dark-mode');

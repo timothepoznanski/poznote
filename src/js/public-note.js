@@ -69,12 +69,12 @@
     }
 
     // Theme toggle functionality
-    var themeToggle = document.getElementById('themeToggle');
-    var root = document.documentElement;
+    const themeToggle = document.getElementById('themeToggle');
+    const root = document.documentElement;
 
     function updateThemeIcon(theme) {
         if (!themeToggle) return;
-        var icon = themeToggle.querySelector('i');
+        const icon = themeToggle.querySelector('i');
         if (icon) {
             icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
         }
@@ -104,7 +104,7 @@
     function rerenderMermaidDiagrams(isDark) {
         if (typeof mermaid === 'undefined') return;
 
-        var mermaidNodes = document.querySelectorAll('.mermaid');
+        const mermaidNodes = document.querySelectorAll('.mermaid');
         if (mermaidNodes.length === 0) return;
 
         try {
@@ -112,10 +112,10 @@
             mermaid.initialize(getMermaidConfig(isDark));
 
             // Collect nodes that need re-rendering
-            var nodesToRender = [];
+            const nodesToRender = [];
 
             mermaidNodes.forEach(function (node) {
-                var source = node.getAttribute('data-mermaid-source') || '';
+                const source = node.getAttribute('data-mermaid-source') || '';
                 if (!source.trim()) return;
 
                 // Remove the data-processed attribute to allow re-rendering
@@ -154,17 +154,17 @@
 
     if (themeToggle) {
         themeToggle.addEventListener('click', function () {
-            var currentTheme = root.getAttribute('data-theme');
-            var newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            const currentTheme = root.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             setTheme(newTheme);
         });
     }
 
     // Check localStorage on page load (visitor preference overrides server theme)
     try {
-        var savedTheme = localStorage.getItem('poznote-public-theme');
+        const savedTheme = localStorage.getItem('poznote-public-theme');
         if (savedTheme && (savedTheme === 'dark' || savedTheme === 'light')) {
-            var serverTheme = root.getAttribute('data-theme');
+            const serverTheme = root.getAttribute('data-theme');
             if (savedTheme !== serverTheme) {
                 setTheme(savedTheme);
             } else {
@@ -212,7 +212,7 @@
     }
 
     function renderMermaidError(node, err, source) {
-        var msg = 'Mermaid: syntax error.';
+        let msg = 'Mermaid: syntax error.';
         try {
             if (err) {
                 if (typeof err === 'string') msg = err;
@@ -230,29 +230,29 @@
     }
 
     function initializeMermaid() {
-        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 
         try {
             // Support Mermaid blocks that ended up rendered as regular code blocks
             // e.g. <pre><code class="language-mermaid">...</code></pre>
-            var codeNodes = document.querySelectorAll('pre > code, code');
-            for (var i = 0; i < codeNodes.length; i++) {
-                var codeNode = codeNodes[i];
+            const codeNodes = document.querySelectorAll('pre > code, code');
+            for (let i = 0; i < codeNodes.length; i++) {
+                const codeNode = codeNodes[i];
                 if (!codeNode || !codeNode.classList) continue;
-                var isMermaidCode = codeNode.classList.contains('language-mermaid') ||
+                const isMermaidCode = codeNode.classList.contains('language-mermaid') ||
                     codeNode.classList.contains('lang-mermaid') ||
                     codeNode.classList.contains('mermaid');
                 if (!isMermaidCode) continue;
                 if (codeNode.closest && codeNode.closest('.mermaid')) continue;
 
-                var pre = codeNode.parentElement && codeNode.parentElement.tagName === 'PRE'
+                const pre = codeNode.parentElement && codeNode.parentElement.tagName === 'PRE'
                     ? codeNode.parentElement
                     : (codeNode.closest ? codeNode.closest('pre') : null);
 
-                var diagramText = codeNode.textContent || '';
+                const diagramText = codeNode.textContent || '';
                 if (!diagramText.trim()) continue;
 
-                var mermaidDiv = document.createElement('div');
+                const mermaidDiv = document.createElement('div');
                 mermaidDiv.className = 'mermaid';
                 mermaidDiv.textContent = diagramText;
 
@@ -265,18 +265,18 @@
 
             mermaid.initialize(getMermaidConfig(isDark));
 
-            var mermaidNodes = Array.prototype.slice.call(document.querySelectorAll('.mermaid'));
-            for (var j = 0; j < mermaidNodes.length; j++) {
-                var n = mermaidNodes[j];
+            const mermaidNodes = Array.prototype.slice.call(document.querySelectorAll('.mermaid'));
+            for (let j = 0; j < mermaidNodes.length; j++) {
+                const n = mermaidNodes[j];
                 if (!n.getAttribute('data-mermaid-source')) {
                     n.setAttribute('data-mermaid-source', (n.textContent || '').trim());
                 }
             }
 
             if (typeof mermaid.parse === 'function' && typeof Promise !== 'undefined') {
-                var validNodes = [];
-                var checks = mermaidNodes.map(function (node) {
-                    var src = node.getAttribute('data-mermaid-source') || '';
+                const validNodes = [];
+                const checks = mermaidNodes.map(function (node) {
+                    const src = node.getAttribute('data-mermaid-source') || '';
                     if (!src.trim()) return Promise.resolve();
                     return Promise.resolve(mermaid.parse(src))
                         .then(function () {
@@ -326,23 +326,6 @@
             return null;
         }
     }
-
-    // Task strings from PHP-passed i18n or fallbacks
-    const globalConfig = getPublicConfig(); // Get config once for i18n
-    const i18n = globalConfig ? (globalConfig.i18n || {}) : {};
-    const texts = {
-        addTask: i18n.addTask || 'Add a task...',
-        editTask: i18n.editTask || 'Edit task:',
-        deleteTask: i18n.deleteTask || 'Delete this task?',
-        confirm: i18n.confirm || 'Confirm',
-        cancel: i18n.cancel || 'Cancel',
-        ok: i18n.ok || 'OK'
-    };
-
-    /**
-     * Helper for Poznote-styled prompt
-     */
-
 
     // Task list interaction (Checkboxes)
     document.addEventListener('change', function (e) {
@@ -397,7 +380,10 @@
             });
     });
 
-    // Add Task Handler
+    /**
+     * Handle adding a new task
+     * @param {HTMLInputElement} input - The input element containing the task text
+     */
     function handleAddTask(input) {
         const text = input.value.trim();
         if (!text) return;
@@ -431,7 +417,12 @@
         }
     });
 
-    // Inline Edit Handler
+    /**
+     * Enable inline editing for a task
+     * @param {HTMLElement} textElement - The text element to edit
+     * @param {string|number} idOrIndex - The task ID or index
+     * @param {boolean} isMarkdown - Whether this is a markdown task
+     */
     function enableInlineEdit(textElement, idOrIndex, isMarkdown) {
         const originalText = textElement.getAttribute('data-text') || textElement.textContent;
         const width = textElement.offsetWidth;
@@ -492,16 +483,28 @@
         input.focus();
     }
 
-    // Edit Task Handler
-    document.addEventListener('click', async function (e) {
-
-
+    // Task interaction handlers (edit and delete)
+    document.addEventListener('click', function (e) {
         const deleteBtn = e.target.closest('.public-task-delete-btn');
         if (deleteBtn) {
-            const isConfirmed = await window.confirm(texts.deleteTask);
-            if (isConfirmed) {
-                const taskItem = deleteBtn.closest('.task-item');
-                deleteTask(taskItem.getAttribute('data-index'));
+            const taskItem = deleteBtn.closest('.task-item');
+            const config = getPublicConfig();
+            const deleteMessage = config?.i18n?.deleteTask || 'Delete this task?';
+            const deleteTitle = config?.i18n?.confirm || 'Confirm';
+            
+            if (window.modalAlert && typeof window.modalAlert.confirm === 'function') {
+                window.modalAlert.confirm(deleteMessage, deleteTitle)
+                    .then(function(isConfirmed) {
+                        if (isConfirmed) {
+                            deleteTask(taskItem.getAttribute('data-index'));
+                        }
+                    });
+            } else {
+                // Fallback to native confirm if modal system not available
+                const isConfirmed = window.confirm(deleteMessage);
+                if (isConfirmed) {
+                    deleteTask(taskItem.getAttribute('data-index'));
+                }
             }
             return;
         }
@@ -522,6 +525,12 @@
         }
     });
 
+    /**
+     * Update task text on the server
+     * @param {string|number} idOrIndex - The task ID or index
+     * @param {string} text - The new task text
+     * @param {boolean} isMarkdown - Whether this is a markdown task
+     */
     function updateTaskText(idOrIndex, text, isMarkdown = false) {
         const config = getPublicConfig();
         if (!config || !config.token) return;
@@ -543,6 +552,10 @@
             .catch(err => console.error('Network error', err));
     }
 
+    /**
+     * Delete a task from the server
+     * @param {string|number} index - The task index
+     */
     function deleteTask(index) {
         const config = getPublicConfig();
         if (!config || !config.token || index === null) return;

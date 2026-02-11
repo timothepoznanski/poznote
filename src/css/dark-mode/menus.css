@@ -1,0 +1,323 @@
+/* ============================================
+   Dark Mode - Dropdown Menus
+   ============================================ */
+
+/* ============================================
+   Slash Command Menu
+   ============================================ */
+
+html[data-theme='dark'] .slash-command-menu,
+body.dark-mode .slash-command-menu {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .slash-command-item:hover,
+html[data-theme='dark'] .slash-command-item.selected,
+body.dark-mode .slash-command-item:hover,
+body.dark-mode .slash-command-item.selected {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme='dark'] .slash-command-item .slash-command-label,
+html[data-theme='dark'] .slash-command-label,
+body.dark-mode .slash-command-item .slash-command-label,
+body.dark-mode .slash-command-label {
+    color: #ffffff !important;
+}
+
+html[data-theme='dark'] .slash-command-icon:not([style*="color"]),
+body.dark-mode .slash-command-icon:not([style*="color"]) {
+    color: #9ca3af;
+}
+
+html[data-theme='dark'] .slash-command-separator,
+body.dark-mode .slash-command-separator {
+    background: var(--dm-border);
+}
+
+html[data-theme='dark'] .slash-command-back,
+body.dark-mode .slash-command-back {
+    background-color: transparent !important;
+}
+
+html[data-theme='dark'] .slash-command-back:hover,
+body.dark-mode .slash-command-back:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ============================================
+   Image Context Menu
+   ============================================ */
+
+html[data-theme='dark'] .image-menu,
+body.dark-mode .image-menu {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .image-menu-item,
+body.dark-mode .image-menu-item {
+    color: var(--dm-text);
+    border-bottom-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .image-menu-item:hover,
+body.dark-mode .image-menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .image-menu-item i,
+body.dark-mode .image-menu-item i {
+    color: #9ca3af;
+}
+
+html[data-theme='dark'] .image-submenu,
+body.dark-mode .image-submenu {
+    background: var(--dm-bg);
+    border-color: #444;
+}
+
+html[data-theme='dark'] .image-submenu-item,
+body.dark-mode .image-submenu-item {
+    color: var(--dm-text);
+    border-bottom-color: #333;
+}
+
+html[data-theme='dark'] .image-submenu-item:hover,
+body.dark-mode .image-submenu-item:hover {
+    background-color: var(--dm-surface);
+    color: #5cb3e9;
+}
+
+html[data-theme='dark'] .image-menu-item[data-action='delete-image'] i,
+body.dark-mode .image-menu-item[data-action='delete-image'] i {
+    color: #dc3545;
+}
+
+html[data-theme='dark'] img.img-with-border,
+body.dark-mode img.img-with-border {
+    border-color: #444;
+    background: #1b1b1b;
+}
+
+html[data-theme='dark'] img.img-with-border-no-padding,
+body.dark-mode img.img-with-border-no-padding {
+    border-color: #444;
+}
+
+/* ============================================
+   Workspace Menu
+   ============================================ */
+
+html[data-theme='dark'] .workspace-menu,
+body.dark-mode .workspace-menu {
+    background-color: var(--dm-bg);
+    border-color: var(--dm-border);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme='dark'] .workspace-menu-item,
+body.dark-mode .workspace-menu-item {
+    color: var(--dm-text);
+    border-bottom-color: var(--dm-surface);
+}
+
+html[data-theme='dark'] .workspace-menu-item:hover,
+body.dark-mode .workspace-menu-item:hover {
+    background-color: var(--dm-surface);
+}
+
+html[data-theme='dark'] .workspace-menu-item.current-workspace,
+body.dark-mode .workspace-menu-item.current-workspace {
+    background-color: #1e3a5f;
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .workspace-menu-item i,
+body.dark-mode .workspace-menu-item i {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .workspace-menu-item:hover i,
+body.dark-mode .workspace-menu-item:hover i {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .workspace-menu-item.current-workspace i,
+body.dark-mode .workspace-menu-item.current-workspace i {
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .workspace-menu-divider,
+body.dark-mode .workspace-menu-divider {
+    background-color: var(--dm-border);
+}
+
+/* ============================================
+   Create Menu
+   ============================================ */
+
+html[data-theme='dark'] .create-menu,
+html[data-theme='dark'] #header-create-menu,
+body.dark-mode .create-menu,
+body.dark-mode #header-create-menu {
+    background-color: var(--dm-bg);
+    border-color: var(--dm-border);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme='dark'] .create-menu-item,
+body.dark-mode .create-menu-item {
+    color: var(--dm-text);
+    border-bottom-color: var(--dm-surface);
+}
+
+html[data-theme='dark'] .create-menu-item:hover,
+body.dark-mode .create-menu-item:hover {
+    background-color: var(--dm-surface);
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .create-menu-item i,
+body.dark-mode .create-menu-item i {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .create-menu-item:hover i,
+body.dark-mode .create-menu-item:hover i {
+    color: var(--dm-accent);
+}
+
+/* ============================================
+   Folder Actions Menu
+   ============================================ */
+
+html[data-theme='dark'] .folder-actions-toggle,
+body.dark-mode .folder-actions-toggle {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .folder-actions-toggle:hover,
+body.dark-mode .folder-actions-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .folder-actions-menu,
+body.dark-mode .folder-actions-menu {
+    background: var(--dm-bg);
+    border: 1px solid var(--dm-border);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme='dark'] .folder-actions-menu-item,
+body.dark-mode .folder-actions-menu-item {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .folder-actions-menu-item:hover,
+body.dark-mode .folder-actions-menu-item:hover {
+    background-color: var(--dm-surface);
+}
+
+html[data-theme='dark'] .folder-actions-menu-item i,
+body.dark-mode .folder-actions-menu-item i {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .folder-actions-menu-item:hover i,
+body.dark-mode .folder-actions-menu-item:hover i {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .folder-actions-menu-item.danger,
+body.dark-mode .folder-actions-menu-item.danger {
+    color: #ff6b6b;
+}
+
+html[data-theme='dark'] .folder-actions-menu-item.danger:hover,
+body.dark-mode .folder-actions-menu-item.danger:hover {
+    background-color: rgba(220, 38, 38, 0.15);
+}
+
+html[data-theme='dark'] .folder-actions-menu-item.danger i,
+body.dark-mode .folder-actions-menu-item.danger i {
+    color: #ff6b6b;
+}
+
+html[data-theme='dark'] .folder-actions-menu-item.shared,
+body.dark-mode .folder-actions-menu-item.shared {
+    color: #ff6b6b;
+}
+
+html[data-theme='dark'] .folder-actions-menu-item.shared:hover,
+body.dark-mode .folder-actions-menu-item.shared:hover {
+    background-color: rgba(220, 38, 38, 0.15);
+}
+
+html[data-theme='dark'] .folder-actions-menu-item.shared i,
+body.dark-mode .folder-actions-menu-item.shared i {
+    color: #ff6b6b;
+}
+
+html[data-theme='dark'] .folder-actions-menu-separator,
+body.dark-mode .folder-actions-menu-separator {
+    background: var(--dm-border);
+}
+
+/* ============================================
+   Export Options & Mobile Toolbar
+   ============================================ */
+
+html[data-theme='dark'] .export-option,
+body.dark-mode .export-option {
+    border-color: var(--dm-border);
+    background-color: transparent;
+}
+
+html[data-theme='dark'] .export-option:hover,
+body.dark-mode .export-option:hover {
+    background-color: var(--dm-surface);
+    border-color: #007DB8;
+}
+
+html[data-theme='dark'] .export-option span,
+body.dark-mode .export-option span {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .export-option p,
+body.dark-mode .export-option p {
+    color: #9ca3af;
+}
+
+html[data-theme='dark'] .export-option i,
+body.dark-mode .export-option i {
+    color: #007DB8;
+}
+
+/* Mobile toolbar dropdown menu */
+html[data-theme='dark'] .note-edit-toolbar .mobile-toolbar-menu,
+body.dark-mode .note-edit-toolbar .mobile-toolbar-menu {
+    background: var(--dm-bg);
+    border: 1px solid var(--dm-border);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme='dark'] .note-edit-toolbar .mobile-toolbar-item,
+body.dark-mode .note-edit-toolbar .mobile-toolbar-item {
+    color: var(--dm-text);
+    border-bottom: 1px solid #333;
+}
+
+html[data-theme='dark'] .note-edit-toolbar .mobile-toolbar-item:hover,
+body.dark-mode .note-edit-toolbar .mobile-toolbar-item:hover {
+    background-color: var(--dm-surface);
+}
+
+html[data-theme='dark'] .note-edit-toolbar .mobile-toolbar-item i,
+body.dark-mode .note-edit-toolbar .mobile-toolbar-item i {
+    color: var(--dm-accent);
+}

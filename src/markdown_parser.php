@@ -5,6 +5,40 @@
  */
 
 /**
+ * Helper function: Sanitize HTML tag attributes
+ * Only keeps safe attributes and escapes their values
+ * 
+ * @param string $attrs Raw attributes string
+ * @param array $allowedAttrs List of allowed attribute names
+ * @param array $booleanAttrs List of boolean attribute names (e.g., 'controls', 'muted')
+ * @return string Safe attributes string ready for HTML
+ */
+function sanitizeAttributes($attrs, $allowedAttrs, $booleanAttrs = []) {
+    $safeAttrs = [];
+    
+    // Extract and sanitize individual attributes
+    preg_match_all('/(\w+)\s*=\s*["\']([^"\']*)["\']/', $attrs, $attrMatches, PREG_SET_ORDER);
+    foreach ($attrMatches as $attr) {
+        $attrName = strtolower($attr[1]);
+        $attrValue = $attr[2];
+        
+        // Only allow safe attributes
+        if (in_array($attrName, $allowedAttrs)) {
+            $safeAttrs[] = $attrName . '="' . htmlspecialchars($attrValue, ENT_QUOTES, 'UTF-8') . '"';
+        }
+    }
+    
+    // Handle boolean attributes (e.g., controls, muted, allowfullscreen)
+    foreach ($booleanAttrs as $boolAttr) {
+        if (stripos($attrs, $boolAttr) !== false && !in_array($boolAttr, array_map(function($a) { return explode('=', $a)[0]; }, $safeAttrs))) {
+            $safeAttrs[] = $boolAttr;
+        }
+    }
+    
+    return implode(' ', $safeAttrs);
+}
+
+/**
  * Parse markdown content and convert it to HTML
  * 
  * @param string $text Markdown content
@@ -13,7 +47,7 @@
 function parseMarkdown($text) {
     if (!$text) return '';
     
-    // First, extract and protect code blocks from HTML escaping
+    // STEP 1: Extract and protect code blocks from HTML escaping
     $protectedCodeBlocks = [];
     $codeBlockIndex = 0;
     
@@ -23,49 +57,46 @@ function parseMarkdown($text) {
         $placeholder = "\x00CODEBLOCK" . $codeBlockIndex . "\x00";
         
         if (strtolower($lang) === 'mermaid') {
-            // Mermaid code stays unescaped
+            // Mermaid diagrams stay unescaped for rendering
             $protectedCodeBlocks[$codeBlockIndex] = '<div class="mermaid">' . $code . '</div>';
         } else {
             // Escape HTML in code blocks so it displays as text
             $escapedCode = htmlspecialchars($code, ENT_QUOTES, 'UTF-8');
-            // Don't use class="language-xxx" to avoid triggering syntax highlighting
             $protectedCodeBlocks[$codeBlockIndex] = '<pre><code>' . $escapedCode . '</code></pre>';
         }
         $codeBlockIndex++;
         return "\n" . $placeholder . "\n";
     }, $text);
     
-    // Extract and protect math equations (display mode: $$...$$)
+    // STEP 2: Extract and protect math equations (display mode: $$...$$)
     $protectedMathBlocks = [];
     $mathBlockIndex = 0;
     
     $text = preg_replace_callback('/\$\$(.+?)\$\$/s', function($matches) use (&$protectedMathBlocks, &$mathBlockIndex) {
         $math = trim($matches[1]);
         $placeholder = "\x00MATHBLOCK" . $mathBlockIndex . "\x00";
-        // Store the raw math content to be processed after HTML escaping
         $protectedMathBlocks[$mathBlockIndex] = $math;
         $mathBlockIndex++;
         return "\n" . $placeholder . "\n";
     }, $text);
     
-    // Extract and protect inline math equations ($...$)
+    // STEP 3: Extract and protect inline math equations ($...$)
     $protectedMathInline = [];
     $mathInlineIndex = 0;
     
     $text = preg_replace_callback('/(?<!\$)\$(?!\$)(.+?)\$/', function($matches) use (&$protectedMathInline, &$mathInlineIndex) {
         $math = trim($matches[1]);
         $placeholder = "\x00MATHINLINE" . $mathInlineIndex . "\x00";
-        // Store the raw math content to be processed after HTML escaping
         $protectedMathInline[$mathInlineIndex] = $math;
         $mathInlineIndex++;
         return $placeholder;
     }, $text);
     
-    // Extract and protect images and links from HTML escaping
+    // STEP 4: Extract and protect images, links, and HTML elements from escaping
     $protectedElements = [];
     $protectedIndex = 0;
     
-    // Protect images first ![alt](url "title")
+    // Protect images first: ![alt](url "title")
     $text = preg_replace_callback('/!\[([^\]]*)\]\(([^\s\)]+)(?:\s+"([^"]+)")?\)/', function($matches) use (&$protectedElements, &$protectedIndex) {
         $alt = $matches[1];
         $url = $matches[2];
@@ -136,52 +167,10 @@ function parseMarkdown($text) {
         if (preg_match('/src\s*=\s*["\']([^"\']+)["\']/i', $attrs, $srcMatch)) {
             $src = $srcMatch[1];
             
-            // Whitelist of allowed iframe sources (trusted embed providers)
-            $allowedDomains = [
-                'youtube.com',
-                'www.youtube.com',
-                'youtube-nocookie.com',
-                'www.youtube-nocookie.com',
-                // 'player.vimeo.com',
-                // 'vimeo.com',
-                // 'dailymotion.com',
-                // 'www.dailymotion.com',
-                // 'player.twitch.tv',
-                // 'clips.twitch.tv',
-                // 'open.spotify.com',
-                // 'w.soundcloud.com',
-                // 'bandcamp.com',
-                // 'codepen.io',
-                // 'jsfiddle.net',
-                // 'codesandbox.io',
-                // 'stackblitz.com',
-                // 'docs.google.com',
-                // 'drive.google.com',
-                // 'maps.google.com',
-                // 'www.google.com/maps',
-                // 'calendar.google.com',
-                // 'onedrive.live.com',
-                // 'office.com',
-                // 'twitter.com',
-                // 'x.com',
-                // 'platform.twitter.com',
-                // 'linkedin.com',
-                // 'slides.com',
-                // 'prezi.com',
-                // 'canva.com',
-                // 'figma.com',
-                // 'miro.com',
-                // 'excalidraw.com',
-                // 'loom.com',
-                // 'wistia.com',
-                // 'fast.wistia.net',
-                // 'share.descript.com',
-                // 'rumble.com',
-                // 'odysee.com',
-                // 'bitchute.com',
-                // 'peertube',
-                // 'invidio.us',
-                // 'piped.video',
+            // Use centralized whitelist from functions.php (ALLOWED_IFRAME_DOMAINS constant)
+            $allowedDomains = defined('ALLOWED_IFRAME_DOMAINS') ? ALLOWED_IFRAME_DOMAINS : [
+                'youtube.com', 'www.youtube.com',
+                'youtube-nocookie.com', 'www.youtube-nocookie.com',
             ];
             
             // Check if the src matches any allowed domain
@@ -231,30 +220,11 @@ function parseMarkdown($text) {
         $attrs = $matches[1];
         $placeholder = "\x00PVIDEO" . $protectedIndex . "\x00";
         
-        // Sanitize attributes: only allow safe attributes
-        $safeAttrs = [];
-        
-        // Extract and sanitize individual attributes
-        preg_match_all('/(\w+)\s*=\s*["\']([^"\']*)["\']/', $attrs, $attrMatches, PREG_SET_ORDER);
-        foreach ($attrMatches as $attr) {
-            $attrName = strtolower($attr[1]);
-            $attrValue = $attr[2];
-            
-            // Only allow safe attributes for video tags
-            if (in_array($attrName, ['src', 'width', 'height', 'preload', 'poster', 'class', 'style', 'controls', 'muted', 'playsinline', 'loop', 'autoplay'])) {
-                $safeAttrs[] = $attrName . '="' . htmlspecialchars($attrValue, ENT_QUOTES, 'UTF-8') . '"';
-            }
-        }
-        
-        // Handle boolean attributes like controls, muted, playsinline, loop, autoplay
+        $allowedAttrs = ['src', 'width', 'height', 'preload', 'poster', 'class', 'style', 'controls', 'muted', 'playsinline', 'loop', 'autoplay'];
         $booleanAttrs = ['controls', 'muted', 'playsinline', 'loop', 'autoplay'];
-        foreach ($booleanAttrs as $boolAttr) {
-            if (stripos($attrs, $boolAttr) !== false && !in_array($boolAttr, array_map(function($a) { return explode('=', $a)[0]; }, $safeAttrs))) {
-                $safeAttrs[] = $boolAttr;
-            }
-        }
+        $safeAttrsString = sanitizeAttributes($attrs, $allowedAttrs, $booleanAttrs);
         
-        $videoTag = '<video ' . implode(' ', $safeAttrs) . '></video>';
+        $videoTag = '<video ' . $safeAttrsString . '></video>';
         $protectedElements[$protectedIndex] = $videoTag;
         $protectedIndex++;
         return $placeholder;
@@ -265,41 +235,23 @@ function parseMarkdown($text) {
         $attrs = $matches[1];
         $placeholder = "\x00PAUDIO" . $protectedIndex . "\x00";
 
-        // Sanitize attributes: only allow safe attributes
-        $safeAttrs = [];
-
-        // Extract and sanitize individual attributes
-        preg_match_all('/(\w+)\s*=\s*["\']([^"\']*)["\']/', $attrs, $attrMatches, PREG_SET_ORDER);
-        foreach ($attrMatches as $attr) {
-            $attrName = strtolower($attr[1]);
-            $attrValue = $attr[2];
-
-            // Only allow safe attributes for audio tags
-            if (in_array($attrName, ['src', 'preload', 'class', 'style', 'controls', 'muted', 'loop', 'autoplay'])) {
-                $safeAttrs[] = $attrName . '="' . htmlspecialchars($attrValue, ENT_QUOTES, 'UTF-8') . '"';
-            }
-        }
-
-        // Handle boolean attributes like controls, muted, loop, autoplay
+        $allowedAttrs = ['src', 'preload', 'class', 'style', 'controls', 'muted', 'loop', 'autoplay'];
         $booleanAttrs = ['controls', 'muted', 'loop', 'autoplay'];
-        foreach ($booleanAttrs as $boolAttr) {
-            if (stripos($attrs, $boolAttr) !== false && !in_array($boolAttr, array_map(function($a) { return explode('=', $a)[0]; }, $safeAttrs))) {
-                $safeAttrs[] = $boolAttr;
-            }
-        }
+        $safeAttrsString = sanitizeAttributes($attrs, $allowedAttrs, $booleanAttrs);
 
-        $audioTag = '<audio ' . implode(' ', $safeAttrs) . '></audio>';
+        $audioTag = '<audio ' . $safeAttrsString . '></audio>';
         $protectedElements[$protectedIndex] = $audioTag;
         $protectedIndex++;
         return $placeholder;
     }, $text);
     
-    // Now escape HTML to prevent XSS
+    // STEP 5: Escape HTML to prevent XSS attacks
     $html = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
     
-    // Helper function to apply inline styles (bold, italic, code, etc.)
+    // STEP 6: Process inline markdown styles (bold, italic, code, etc.)
+    // This helper applies inline formatting after HTML escaping
     $applyInlineStyles = function($text) use (&$protectedElements, &$protectedMathInline) {
-        // First, protect inline code content from other replacements
+        // Protect inline code from other formatting
         $protectedCode = [];
         $codeIndex = 0;
         $text = preg_replace_callback('/`([^`]+)`/', function($matches) use (&$protectedCode, &$codeIndex) {
@@ -309,10 +261,10 @@ function parseMarkdown($text) {
             return $placeholder;
         }, $text);
         
-        // Handle angle bracket URLs <https://example.com>
+        // Auto-link URLs in angle brackets: <https://example.com>
         $text = preg_replace('/&lt;(https?:\/\/[^>]+)&gt;/', '<a href="$1" target="_blank" rel="noopener">$1</a>', $text);
         
-        // Bold and italic
+        // Bold and italic (order matters: do *** and ___ before ** and __)
         $text = preg_replace('/\*\*\*([^\*]+)\*\*\*/', '<strong><em>$1</em></strong>', $text);
         $text = preg_replace('/___([^_]+)___/', '<strong><em>$1</em></strong>', $text);
         $text = preg_replace('/\*\*([^\*]+)\*\*/', '<strong>$1</strong>', $text);
@@ -320,7 +272,7 @@ function parseMarkdown($text) {
         $text = preg_replace('/\*([^\*]+)\*/', '<em>$1</em>', $text);
         $text = preg_replace('/_([^_]+)_/', '<em>$1</em>', $text);
         
-        // Strikethrough
+        // Strikethrough: ~~text~~
         $text = preg_replace('/~~([^~]+)~~/', '<del>$1</del>', $text);
         
         // Restore protected code elements
@@ -348,28 +300,29 @@ function parseMarkdown($text) {
         return $text;
     };
     
-    // Process line by line for block-level elements
+    // STEP 7: Process block-level elements (headers, lists, tables, etc.)
     $lines = explode("\n", $html);
     $result = [];
     $currentParagraph = [];
     $paragraphStartLine = -1;
     
+    // Helper: Flush accumulated paragraph lines into a <p> tag
     $flushParagraph = function() use (&$currentParagraph, &$result, &$paragraphStartLine, $applyInlineStyles) {
         if (count($currentParagraph) > 0) {
-            // Process line breaks according to GitHub Flavored Markdown rules
+            // GitHub Flavored Markdown: single line breaks become <br>
             $processedLines = [];
             for ($i = 0; $i < count($currentParagraph); $i++) {
                 $line = $currentParagraph[$i];
                 if ($i < count($currentParagraph) - 1) {
-                    // Check if line ends with 2+ spaces
+                    // Check if line ends with 2+ spaces (manual line break)
                     if (preg_match('/\s{2,}$/', $line)) {
                         $processedLines[] = preg_replace('/\s{2,}$/', '', $line) . '<br>';
                     } else {
-                        // GitHub style: single line breaks become <br>
+                        // Normal line: add <br> for GFM compatibility
                         $processedLines[] = $line . '<br>';
                     }
                 } else {
-                    // Last line - no <br> needed
+                    // Last line in paragraph: no <br> needed
                     $processedLines[] = $line;
                 }
             }
@@ -452,17 +405,14 @@ function parseMarkdown($text) {
                 );
             }
             
-            // Handle blank lines based on context:
-            // - If next is a block element: keep extra blank lines (blankLineCount - 1)
-            //   because the block element already provides one line of spacing
-            // - If next is regular text or nothing: keep all blank lines
+            // Preserve blank lines based on context:
+            // - Before block elements: keep (count - 1) blank lines (block has natural spacing)
+            // - Before text: keep all blank lines
             if ($isNextBlockElement) {
-                // Keep only extra blank lines (subtract 1 for the natural block spacing)
                 for ($bl = 0; $bl < ($blankLineCount - 1); $bl++) {
                     $result[] = '<p class="blank-line">&nbsp;</p>';
                 }
             } else {
-                // Keep all blank lines for text-to-text spacing
                 for ($bl = 0; $bl < $blankLineCount; $bl++) {
                     $result[] = '<p class="blank-line">&nbsp;</p>';
                 }
@@ -571,20 +521,19 @@ function parseMarkdown($text) {
             continue;
         }
         
-        // Helper function to parse nested lists
-        $parseNestedList = function($startIndex, $isTaskList = false, $expectedMarker = null) use (&$lines, $applyInlineStyles, &$parseNestedList) {
+        // Helper: Parse nested lists (supports task lists, ordered, and unordered)
+        $parseNestedList = function($startIndex, $isTaskList = false) use (&$lines, $applyInlineStyles, &$parseNestedList) {
             $listItems = [];
             $currentIndex = $startIndex;
             $baseIndent = null;
-            $baseMarkerType = null; // 'bullet' or 'number'
+            $baseMarkerType = null; // 'bullet' (-, *, +) or 'number' (1.)
             
             while ($currentIndex < count($lines)) {
                 $currentLine = $lines[$currentIndex];
                 
-                // Skip blank lines within lists - they should not break the list
+                // Handle blank lines within lists (don't break the list if continuation follows)
                 if (trim($currentLine) === '' && $baseIndent !== null) {
-                    // Only skip blank lines if we've already started a list
-                    // Look ahead to see if there's another list item of the same type
+                    // Look ahead to see if list continues after blank line(s)
                     $lookAheadIndex = $currentIndex + 1;
                     $foundContinuation = false;
                     
@@ -611,27 +560,24 @@ function parseMarkdown($text) {
                             }
                         }
                         
-                        // If we found a list item of the same type and indentation (baseIndent)
+                        // Check if it's a list item with same type and indentation
                         if ($lookMatch && $baseIndent !== null && strlen($lookMatches[1]) === $baseIndent && 
                             ($isTaskList || $lookMarkerType === $baseMarkerType)) {
                             $foundContinuation = true;
                         }
                         
-                        // Stop looking after we find non-blank content
-                        break;
+                        break; // Stop after finding non-blank content
                     }
                     
                     if ($foundContinuation) {
-                        // Skip this blank line and continue parsing
-                        $currentIndex++;
+                        $currentIndex++; // Skip blank line and continue
                         continue;
                     } else {
-                        // No continuation found, end the list
-                        break;
+                        break; // End of list
                     }
                 }
                 
-                // Check if this is a list item
+                // Parse list item (task list or regular list)
                 if ($isTaskList) {
                     $listMatch = preg_match('/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/', $currentLine, $matches);
                     $marker = null;
@@ -639,28 +585,26 @@ function parseMarkdown($text) {
                 } else {
                     $listMatch = preg_match('/^(\s*)([\*\-\+]|\d+\.)\s+(.+)$/', $currentLine, $matches);
                     $marker = isset($matches[2]) ? $matches[2] : null;
-                    // Determine marker type: number (1.) or bullet (-, *, +)
                     $markerType = ($marker && preg_match('/\d+\./', $marker)) ? 'number' : 'bullet';
                 }
                 
                 if (!$listMatch) {
-                    break; // Not a list item, end of list
+                    break; // Not a list item
                 }
                 
                 $indent = strlen($matches[1]);
-                $content = $isTaskList ? $matches[3] : $matches[3];
+                $content = $matches[3];
                 
-                // If this is the first item, set the base indentation and marker type
+                // First item: establish base indentation and marker type
                 if ($baseIndent === null) {
                     $baseIndent = $indent;
                     $baseMarkerType = $markerType;
                 }
                 
-                // If marker type changed at SAME indentation level at root (indent=0),
-                // treat it as nested under the last item (Poznote-specific behavior)
+                // Special behavior: Marker type change at root level (indent=0) creates nested list
+                // Example: * item1 \n 1. nested1 \n 2. nested2 \n * item2
                 if (!$isTaskList && $indent === 0 && $baseIndent === 0 && 
                     $markerType !== $baseMarkerType && count($listItems) > 0) {
-                    // Collect all consecutive items with this different marker type
                     $nestedItems = [];
                     $nestedListTag = ($markerType === 'number') ? 'ol' : 'ul';
                     $tempIndex = $currentIndex;

@@ -13,6 +13,7 @@
         "confirm_action": "确认操作",
         "confirmation": "确认",
         "save": "保存",
+        "untitled": "无标题",
         "login": {
             "fields": {
                 "username": "用户名",
@@ -248,7 +249,7 @@
             "upload_section_title": "上传新附件",
             "drag_drop_info": "您可以将文件拖放到下方:",
             "all_types_accepted": "接受所有文件类型 (最大 200MB)",
-            "upload_button": "上传文件",
+            "upload_button": "添加",
             "current_attachments": "当前附件",
             "loading_attachments": "正在加载附件...",
             "preview_alt": "预览",
@@ -273,6 +274,10 @@
         "list": {
             "title": "包含附件的笔记",
             "no_attachments": "目前没有笔记包含附件。",
+            "back_to_notes": "返回笔记",
+            "manage_attachments": "管理附件",
+            "attachment_count_singular": "1个附件",
+            "attachment_count_plural": "{{count}}个附件",
             "hint": "在笔记工具栏中使用回形针按钮向笔记添加附件。",
             "filter_placeholder": "按笔记标题或附件名称过滤...",
             "no_filter_results": "没有与您的搜索匹配的笔记。",
@@ -287,6 +292,11 @@
     },
     "settings": {
         "title": "设置",
+        "categories": {
+            "actions": "操作",
+            "display": "显示",
+            "about": "关于"
+        },
         "sections": {
             "account_display": "账户与显示",
             "notes_folders": "笔记与文件夹",
@@ -1904,12 +1914,12 @@
             "push": {
                 "title": "推送到 GitHub",
                 "description": "将您的笔记导出到 GitHub。更新现有文件并删除 Poznote 中不再存在的文件。",
-                "button": "Push"
+                "button": "推送"
             },
             "pull": {
                 "title": "从 GitHub 拉取",
                 "description": "从 GitHub 导入笔记。更新现有笔记并将 GitHub 上不再存在的笔记移至回收站。",
-                "button": "Pull"
+                "button": "拉取"
             }
         },
         "messages": {

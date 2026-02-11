@@ -1,0 +1,303 @@
+/* ============================================
+   Dark Mode - Layout, Sidebar & Navigation
+   ============================================ */
+
+/* Main containers */
+html[data-theme='dark'] #left_col,
+html[data-theme='dark'] #right_col,
+body.dark-mode #left_col,
+body.dark-mode #right_col {
+    background-color: var(--dm-bg);
+    color: var(--dm-text);
+}
+
+/* Sidebar header */
+html[data-theme='dark'] .sidebar-title,
+body.dark-mode .sidebar-title {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .workspace-title-text,
+body.dark-mode .workspace-title-text {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .workspace-burger-icon,
+body.dark-mode .workspace-burger-icon {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .workspace-dropdown-icon,
+body.dark-mode .workspace-dropdown-icon {
+    color: var(--dm-text-muted);
+}
+
+/* ============================================
+   Search Bar
+   ============================================ */
+
+html[data-theme='dark'] .searchbar-input,
+body.dark-mode .searchbar-input {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .searchbar-input::placeholder,
+body.dark-mode .searchbar-input::placeholder {
+    color: #808080;
+}
+
+html[data-theme='dark'] .searchbar-icon,
+body.dark-mode .searchbar-icon {
+    color: var(--dm-text);
+}
+
+/* Search options toggle button */
+html[data-theme='dark'] .searchbar-options-toggle,
+body.dark-mode .searchbar-options-toggle {
+    color: #808080;
+}
+
+html[data-theme='dark'] .searchbar-options-toggle:hover,
+body.dark-mode .searchbar-options-toggle:hover {
+    color: #5cb3e9;
+}
+
+html[data-theme='dark'] .searchbar-options-toggle.active,
+body.dark-mode .searchbar-options-toggle.active {
+    color: #5cb3e9;
+}
+
+/* Search type buttons */
+html[data-theme='dark'] .searchbar-type-btn,
+body.dark-mode .searchbar-type-btn {
+    color: #808080;
+}
+
+html[data-theme='dark'] .searchbar-type-btn:hover,
+body.dark-mode .searchbar-type-btn:hover {
+    color: #5cb3e9;
+}
+
+html[data-theme='dark'] .searchbar-type-btn:hover i,
+body.dark-mode .searchbar-type-btn:hover i {
+    color: #5cb3e9;
+}
+
+html[data-theme='dark'] .searchbar-type-btn:hover i::before,
+body.dark-mode .searchbar-type-btn:hover i::before {
+    color: #5cb3e9;
+}
+
+html[data-theme='dark'] .searchbar-type-btn.active,
+body.dark-mode .searchbar-type-btn.active {
+    color: #5cb3e9 !important;
+}
+
+html[data-theme='dark'] .searchbar-type-btn.active i,
+body.dark-mode .searchbar-type-btn.active i,
+html[data-theme='dark'] .searchbar-type-btn.active i.fa,
+body.dark-mode .searchbar-type-btn.active i.fa,
+html[data-theme='dark'] .searchbar-type-btn.active i.fa-file-alt,
+body.dark-mode .searchbar-type-btn.active i.fa-file-alt,
+html[data-theme='dark'] .searchbar-type-btn.active i.fa-tag,
+body.dark-mode .searchbar-type-btn.active i.fa-tag {
+    color: #5cb3e9 !important;
+}
+
+html[data-theme='dark'] .searchbar-type-btn.active i::before,
+body.dark-mode .searchbar-type-btn.active i::before,
+html[data-theme='dark'] .searchbar-type-btn.active i.fa::before,
+body.dark-mode .searchbar-type-btn.active i.fa::before,
+html[data-theme='dark'] .searchbar-type-btn.active i.fa-file-alt::before,
+body.dark-mode .searchbar-type-btn.active i.fa-file-alt::before,
+html[data-theme='dark'] .searchbar-type-btn.active i.fa-tag::before,
+body.dark-mode .searchbar-type-btn.active i.fa-tag::before {
+    color: #5cb3e9 !important;
+}
+
+/* Ensure filters don't desaturate search type icons */
+html[data-theme='dark'] .searchbar-type-btn i,
+body.dark-mode .searchbar-type-btn i,
+html[data-theme='dark'] .searchbar-type-btn i::before,
+body.dark-mode .searchbar-type-btn i::before,
+html[data-theme='dark'] .searchbar-type-btn.active i,
+body.dark-mode .searchbar-type-btn.active i,
+html[data-theme='dark'] .searchbar-type-btn.active i::before,
+body.dark-mode .searchbar-type-btn.active i::before {
+    filter: none !important;
+}
+
+/* ============================================
+   System Folders & Favorites
+   ============================================ */
+
+/* System folders container - hidden (replaced by Home page) */
+html[data-theme='dark'] .system-folders-container,
+body.dark-mode .system-folders-container {
+    display: none !important;
+}
+
+/* System menu dropdown */
+html[data-theme='dark'] .system-menu-dropdown,
+body.dark-mode .system-menu-dropdown {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme='dark'] .system-menu-item,
+body.dark-mode .system-menu-item {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .system-menu-item:hover,
+body.dark-mode .system-menu-item:hover {
+    background-color: var(--dm-surface);
+}
+
+html[data-theme='dark'] .system-menu-item span:not(.menu-item-count),
+body.dark-mode .system-menu-item span:not(.menu-item-count) {
+    color: var(--dm-text);
+}
+
+/* Favorites */
+html[data-theme='dark'] .favorites-separator,
+body.dark-mode .favorites-separator {
+    background: var(--dm-border);
+}
+
+html[data-theme='dark'] .favorites-toggle-btn,
+body.dark-mode .favorites-toggle-btn {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .favorites-toggle-btn:hover,
+body.dark-mode .favorites-toggle-btn:hover {
+    background: #3a3a3a;
+    border-color: #606060;
+}
+
+html[data-theme='dark'] .favorites-toggle-btn i,
+body.dark-mode .favorites-toggle-btn i {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] #folder-favorites,
+body.dark-mode #folder-favorites {
+    border-bottom-color: var(--dm-border);
+}
+
+html[data-theme='dark'] #folder-favorites .note-title::before,
+body.dark-mode #folder-favorites .note-title::before {
+    color: var(--dm-text);
+}
+
+/* ============================================
+   Folders
+   ============================================ */
+
+html[data-theme='dark'] .folder-header,
+body.dark-mode .folder-header {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .folder-header h2,
+body.dark-mode .folder-header h2 {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .folder-toggle,
+body.dark-mode .folder-toggle {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .folder-name,
+body.dark-mode .folder-name {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .folder-icon,
+body.dark-mode .folder-icon {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .folder-note-count,
+body.dark-mode .folder-note-count {
+    color: #999;
+}
+
+/* System folder note count - blue like in light mode */
+html[data-theme='dark'] .system-folder .folder-note-count,
+body.dark-mode .system-folder .folder-note-count {
+    color: #5b9bd5;
+}
+
+/* ============================================
+   Notes List
+   ============================================ */
+
+html[data-theme='dark'] .links_arbo_left,
+body.dark-mode .links_arbo_left {
+    background-color: transparent !important;
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .links_arbo_left:hover,
+body.dark-mode .links_arbo_left:hover {
+    background-color: var(--dm-surface);
+}
+
+html[data-theme='dark'] .links_arbo_left.active,
+body.dark-mode .links_arbo_left.active {
+    background-color: #1e3a5f;
+    border-left: 3px solid var(--dm-accent);
+}
+
+html[data-theme='dark'] .note-title,
+body.dark-mode .note-title {
+    color: var(--dm-text);
+}
+
+/* Subheading and dates */
+html[data-theme='dark'] .note-subline,
+body.dark-mode .note-subline {
+    color: #999;
+}
+
+html[data-theme='dark'] .lastupdated,
+body.dark-mode .lastupdated {
+    color: #999 !important;
+}
+
+/* ============================================
+   Resize Handle & Toggle Sidebar
+   ============================================ */
+
+html[data-theme='dark'] .resize-handle,
+body.dark-mode .resize-handle {
+    background-color: var(--dm-bg);
+    border-right: 1px solid var(--dm-surface);
+}
+
+html[data-theme='dark'] .resize-handle:hover,
+body.dark-mode .resize-handle:hover {
+    background-color: var(--dm-surface);
+    border-right: 1px solid #3a3a3a;
+}
+
+html[data-theme='dark'] .toggle-sidebar-btn,
+body.dark-mode .toggle-sidebar-btn {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .toggle-sidebar-btn:hover,
+body.dark-mode .toggle-sidebar-btn:hover {
+    background: #333;
+    color: var(--dm-accent);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}

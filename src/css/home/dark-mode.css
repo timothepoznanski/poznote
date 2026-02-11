@@ -1,0 +1,91 @@
+/**
+ * Home - Dark Mode
+ *
+ * Dark mode overrides for the home page layout, header,
+ * workspace name, notes count, cards, card icons, and debug info.
+ * (Search and alert dark mode styles are in their respective sub-files.)
+ */
+
+/* Dark mode - base */
+html[data-theme='dark'] .home-page,
+body.dark-mode .home-page {
+    background: #252526;
+}
+
+html[data-theme='dark'] .home-header,
+body.dark-mode .home-header {
+    color: #e5e7eb;
+    border-bottom-color: #374151;
+}
+
+html[data-theme='dark'] .home-workspace-name,
+body.dark-mode .home-workspace-name {
+    color: #e5e7eb;
+}
+
+html[data-theme='dark'] .home-notes-count,
+body.dark-mode .home-notes-count {
+    color: #9ca3af;
+    background: #374151;
+}
+
+/* Dark mode - cards */
+html[data-theme='dark'] .home-card,
+body.dark-mode .home-card {
+    background: #333333;
+    border-color: #374151;
+}
+
+html[data-theme='dark'] .home-card:hover,
+body.dark-mode .home-card:hover {
+    border-color: #007DB8;
+}
+
+html[data-theme='dark'] .home-card-title,
+body.dark-mode .home-card-title {
+    color: #e5e7eb;
+}
+
+html[data-theme='dark'] .home-card-count,
+body.dark-mode .home-card-count {
+    color: #9ca3af;
+}
+
+html[data-theme='dark'] .home-card-icon,
+body.dark-mode .home-card-icon {
+    background: rgba(0, 125, 184, 0.2);
+}
+
+/* Dark mode - special card icons */
+html[data-theme='dark'] .home-card-icon-shared,
+body.dark-mode .home-card-icon-shared {
+    background: rgba(0, 125, 184, 0.2);
+}
+
+html[data-theme='dark'] .home-card-icon-favorites,
+body.dark-mode .home-card-icon-favorites {
+    background: rgba(255, 193, 7, 0.2);
+}
+
+html[data-theme='dark'] .home-card-icon-trash,
+body.dark-mode .home-card-icon-trash {
+    background: rgba(255, 152, 0, 0.2);
+}
+
+/* Dark mode - debug info */
+html[data-theme='dark'] .debug-info,
+body.dark-mode .debug-info {
+    background: #252525 !important;
+    border-color: #374151 !important;
+    color: #e5e7eb;
+}
+
+html[data-theme='dark'] .debug-info h4,
+body.dark-mode .debug-info h4 {
+    color: #e5e7eb;
+}
+
+html[data-theme='dark'] .debug-info pre,
+body.dark-mode .debug-info pre {
+    color: #d1d5db;
+}

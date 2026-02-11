@@ -5,10 +5,10 @@
 require 'auth.php';
 requireAuth();
 
-@ob_start();
-include 'functions.php';
+ob_start();
+require_once 'functions.php';
 require_once 'config.php';
-include 'db_connect.php';
+require_once 'db_connect.php';
 
 $pageWorkspace = trim(getWorkspaceFilter());
 $currentLang = getUserLanguage();
@@ -101,12 +101,32 @@ try {
 $shared_notes_count = 0;
 try {
     if (isset($con)) {
-        $query = "SELECT COUNT(*) as cnt FROM shared_notes sn INNER JOIN entries e ON sn.note_id = e.id WHERE e.trash = 0";
+        $workspaceClauseF = !empty($pageWorkspace) ? "WHERE f.workspace = ?" : "";
+        $workspaceClauseE = !empty($pageWorkspace) ? "AND e.workspace = ?" : "";
+        
+        $query = "
+            WITH RECURSIVE shared_hierarchy(id) AS (
+                SELECT sf.folder_id FROM shared_folders sf 
+                INNER JOIN folders f ON sf.folder_id = f.id 
+                $workspaceClauseF
+                UNION ALL
+                SELECT f.id FROM folders f
+                INNER JOIN shared_hierarchy sh ON f.parent_id = sh.id
+            )
+            SELECT COUNT(DISTINCT e.id) as cnt
+            FROM entries e
+            LEFT JOIN shared_notes sn ON e.id = sn.note_id
+            WHERE e.trash = 0 
+            $workspaceClauseE
+            AND (sn.note_id IS NOT NULL OR e.folder_id IN (SELECT id FROM shared_hierarchy))
+        ";
+        
         $params = [];
         if (!empty($pageWorkspace)) {
-            $query .= " AND e.workspace = ?";
+            $params[] = $pageWorkspace;
             $params[] = $pageWorkspace;
         }
+        
         $stmtShared = $con->prepare($query);
         $stmtShared->execute($params);
         $shared_notes_count = (int)$stmtShared->fetchColumn();
@@ -119,12 +139,29 @@ try {
 $shared_folders_count = 0;
 try {
     if (isset($con)) {
-        $query = "SELECT COUNT(*) as cnt FROM shared_folders sf INNER JOIN folders f ON sf.folder_id = f.id";
+        $workspaceClauseF = !empty($pageWorkspace) ? "WHERE f.workspace = ?" : "";
+        $workspaceClauseF2 = !empty($pageWorkspace) ? "AND f.workspace = ?" : "";
+        
+        $query = "
+            WITH RECURSIVE shared_hierarchy(id) AS (
+                SELECT sf.folder_id FROM shared_folders sf 
+                INNER JOIN folders f ON sf.folder_id = f.id 
+                $workspaceClauseF
+                UNION ALL
+                SELECT f.id FROM folders f
+                INNER JOIN shared_hierarchy sh ON f.parent_id = sh.id
+            )
+            SELECT COUNT(DISTINCT f.id) as cnt FROM folders f
+            WHERE f.id IN (SELECT id FROM shared_hierarchy)
+            $workspaceClauseF2
+        ";
+        
         $params = [];
         if (!empty($pageWorkspace)) {
-            $query .= " WHERE f.workspace = ?";
+            $params[] = $pageWorkspace;
             $params[] = $pageWorkspace;
         }
+        
         $stmtSharedFolders = $con->prepare($query);
         $stmtSharedFolders->execute($params);
         $shared_folders_count = (int)$stmtSharedFolders->fetchColumn();
@@ -202,7 +239,7 @@ try {
         $kanban_boards_count = (int)$stmtKanban->fetchColumn();
     }
 } catch (Exception $e) {
-    $total_notes_count = 0;
+    $kanban_boards_count = 0;
 }
 
 // Count total folders
@@ -242,10 +279,32 @@ try {
     <link type="text/css" rel="stylesheet" href="css/light.min.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/solid.min.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/regular.min.css?v=<?php echo $cache_v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/modals.css?v=<?php echo $cache_v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/home.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/base.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/attachments.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/link-modal.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/share-modal.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/alerts-utilities.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/responsive.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/home/base.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/home/search.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/home/alerts.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/home/cards.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/home/buttons.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/home/fontawesome.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/home/dark-mode.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/home/responsive.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $cache_v; ?>"/>
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
 </head>
 <body class="home-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
@@ -310,18 +369,18 @@ try {
                         if (debugDiv.style.display === 'none') {
                             debugDiv.style.display = 'block';
                             copyBtn.style.display = 'inline-block';
-                            toggleText.textContent = '<?php echo addslashes(t_h('github_sync.debug.hide')); ?>';
+                            toggleText.textContent = <?php echo json_encode(t_h('github_sync.debug.hide')); ?>;
                         } else {
                             debugDiv.style.display = 'none';
                             copyBtn.style.display = 'none';
-                            toggleText.textContent = '<?php echo addslashes(t_h('github_sync.debug.show')); ?>';
+                            toggleText.textContent = <?php echo json_encode(t_h('github_sync.debug.show')); ?>;
                         }
                     });
 
                     copyBtn?.addEventListener('click', function() {
                         navigator.clipboard.writeText(debugContent).then(function() {
                             const originalHTML = copyBtn.innerHTML;
-                            copyBtn.innerHTML = '<i class="fas fa-check"></i> <?php echo addslashes(t_h('github_sync.debug.copied')); ?>';
+                            copyBtn.innerHTML = '<i class="fas fa-check"></i> ' + <?php echo json_encode(t_h('github_sync.debug.copied')); ?>;
                             setTimeout(function() {
                                 copyBtn.innerHTML = originalHTML;
                             }, 2000);

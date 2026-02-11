@@ -3,7 +3,7 @@ require 'auth.php';
 requireAuth();
 
 require_once 'config.php';
-include 'db_connect.php';
+require_once 'db_connect.php';
 require_once 'functions.php';
 
 // Get note ID from URL parameter
@@ -21,10 +21,10 @@ if (!$note_id) {
 // Get note details from database
 try {
     if ($workspace) {
-        $stmt = $con->prepare("SELECT heading, folder, folder_id, created, updated, favorite, tags, attachments, type FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
+        $stmt = $con->prepare("SELECT heading, folder, folder_id, created, updated, favorite, tags, attachments, type, workspace FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
         $stmt->execute([$note_id, $workspace]);
     } else {
-        $stmt = $con->prepare("SELECT heading, folder, folder_id, created, updated, favorite, tags, attachments, type FROM entries WHERE id = ? AND trash = 0");
+        $stmt = $con->prepare("SELECT heading, folder, folder_id, created, updated, favorite, tags, attachments, type, workspace FROM entries WHERE id = ? AND trash = 0");
         $stmt->execute([$note_id]);
     }
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -62,35 +62,12 @@ function formatDateString($dateStr) {
 $createdText = formatDateString($note['created']);
 $updatedText = formatDateString($note['updated']);
 
-// Build full folder path (including parent folders)
+// Build full folder path using the shared helper function
 $folderText = t('modals.folder.no_folder', [], 'No folder');
 if (!empty($note['folder_id'])) {
-    try {
-        $folderPath = [];
-        $currentFolderId = (int)$note['folder_id'];
-        $maxDepth = 50; // Prevent infinite loops
-        $depth = 0;
-        
-        while ($currentFolderId && $depth < $maxDepth) {
-            $folderStmt = $con->prepare("SELECT id, name, parent_id FROM folders WHERE id = ?");
-            $folderStmt->execute([$currentFolderId]);
-            $folderData = $folderStmt->fetch(PDO::FETCH_ASSOC);
-            
-            if ($folderData) {
-                array_unshift($folderPath, $folderData['name']);
-                $currentFolderId = $folderData['parent_id'] ? (int)$folderData['parent_id'] : null;
-            } else {
-                break;
-            }
-            $depth++;
-        }
-        
-        if (!empty($folderPath)) {
-            $folderText = implode(' / ', $folderPath);
-        }
-    } catch (PDOException $e) {
-        // Fallback to simple folder name if path building fails
-        $folderText = $note['folder'] ?: t('modals.folder.no_folder', [], 'No folder');
+    $folderPath = getFolderPath($note['folder_id'], $con);
+    if (!empty($folderPath)) {
+        $folderText = $folderPath;
     }
 } elseif (!empty($note['folder'])) {
     // Fallback for old data that might not have folder_id
@@ -141,7 +118,16 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
     <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/info.css">
     <link rel="stylesheet" href="css/modal-alerts.css">
-    <link rel="stylesheet" href="css/dark-mode.css">
+    <link rel="stylesheet" href="css/dark-mode/variables.css">
+    <link rel="stylesheet" href="css/dark-mode/layout.css">
+    <link rel="stylesheet" href="css/dark-mode/menus.css">
+    <link rel="stylesheet" href="css/dark-mode/editor.css">
+    <link rel="stylesheet" href="css/dark-mode/modals.css">
+    <link rel="stylesheet" href="css/dark-mode/components.css">
+    <link rel="stylesheet" href="css/dark-mode/pages.css">
+    <link rel="stylesheet" href="css/dark-mode/markdown.css">
+    <link rel="stylesheet" href="css/dark-mode/kanban.css">
+    <link rel="stylesheet" href="css/dark-mode/icons.css">
     <script src="js/theme-manager.js"></script>
 </head>
 <body data-note-id="<?php echo $note_id; ?>" data-workspace="<?php echo htmlspecialchars($workspace ?? '', ENT_QUOTES, 'UTF-8'); ?>">
@@ -188,9 +174,9 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
                 <div class="info-label"><?php echo t_h('info.labels.favorite', [], 'Favorite:'); ?></div>
                 <div class="info-value">
                     <?php if ($isFavorite): ?>
-                        <span class="favorite-yes"></i> <?php echo t_h('common.yes', [], 'Yes'); ?></span>
+                        <span class="favorite-yes"><?php echo t_h('common.yes', [], 'Yes'); ?></span>
                     <?php else: ?>
-                        <span class="favorite-no"></i> <?php echo t_h('common.no', [], 'No'); ?></span>
+                        <span class="favorite-no"><?php echo t_h('common.no', [], 'No'); ?></span>
                     <?php endif; ?>
                 </div>
             </div>

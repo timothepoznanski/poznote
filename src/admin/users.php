@@ -7,6 +7,7 @@
  * This is about user profiles that each have their own data space.
  */
 
+// === Authentication & Authorization ===
 require_once __DIR__ . '/../auth.php';
 requireAuth();
 require_once __DIR__ . '/../functions.php';
@@ -19,21 +20,21 @@ if (!isCurrentUserAdmin()) {
     exit;
 }
 
+// === Dependencies ===
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../users/db_master.php';
-
-
 require_once __DIR__ . '/../version_helper.php';
 
+// === Initialize Variables ===
 $currentLang = getUserLanguage();
-$message = '';
 $error = '';
 
-// Handle actions
+// === Handle Form Actions ===
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
     
     switch ($action) {
+        // Create new user profile
         case 'create':
             $username = trim($_POST['username'] ?? '');
             $email = trim($_POST['email'] ?? '');
@@ -46,12 +47,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result = createUserProfile($username, $email);
             
             if ($result['success']) {
-                // Succès, on ne met pas de message
+                // Redirect to refresh the page and show the new user
+                header('Location: ' . $_SERVER['PHP_SELF']);
+                exit;
             } else {
                 $error = $result['error'];
             }
             break;
             
+        // Update existing user profile (username, email, OIDC subject)
         case 'update_profile':
             $userId = (int)($_POST['user_id'] ?? 0);
             $username = trim($_POST['username'] ?? '');
@@ -69,16 +73,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'oidc_subject' => $oidcSubject
             ]);
             
-            if (!$result['success']) {
+            if ($result['success']) {
+                // Redirect to refresh the page
+                header('Location: ' . $_SERVER['PHP_SELF']);
+                exit;
+            } else {
                 $error = $result['error'];
             }
             break;
             
-
-            
+        // Delete user profile and all associated data
         case 'delete':
             $userId = (int)($_POST['user_id'] ?? 0);
-            $deleteData = true; // Always delete data when deleting a user now
+            $deleteData = true; // Always delete data when deleting a user
             
             // Cannot delete yourself
             if ($userId === getCurrentUserId()) {
@@ -89,36 +96,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result = deleteUserProfile($userId, $deleteData);
             
             if ($result['success']) {
-                // Success, no message
+                // Redirect to refresh the page
+                header('Location: ' . $_SERVER['PHP_SELF']);
+                exit;
             } else {
                 $error = $result['error'];
             }
             break;
+            
+        // Toggle user status or admin role
         case 'toggle_status':
             $userId = (int)($_POST['user_id'] ?? 0);
             $field = $_POST['field'] ?? '';
             $value = $_POST['value'] ?? 0;
             
-            // Cannot modify yourself for some fields
-            if ($userId === getCurrentUserId() && ($field === 'is_admin' || $field === 'active')) {
+            // Cannot modify yourself
+            if ($userId === getCurrentUserId()) {
                 $error = t('multiuser.admin.errors.cannot_change_self', [], 'You cannot change your own status/role');
                 break;
             }
             
-            $data = [];
+            // Only allow toggling is_admin and active fields
             if ($field === 'is_admin' || $field === 'active') {
-                $data[$field] = (int)$value;
-            } elseif ($field === 'username' || $field === 'email') {
-                $data[$field] = trim((string)$value);
-                if ($field === 'username' && empty($data[$field])) {
-                    $error = t('multiuser.admin.errors.username_required', [], 'Username is required');
-                    break;
-                }
-            }
-
-            if (!empty($data)) {
+                $data = [$field => (int)$value];
                 $result = updateUserProfile($userId, $data);
-                if (!$result['success']) {
+                
+                if ($result['success']) {
+                    // Redirect to refresh the page
+                    header('Location: ' . $_SERVER['PHP_SELF']);
+                    exit;
+                } else {
                     $error = $result['error'];
                 }
             }
@@ -126,12 +133,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Get list of user profiles
+// === Get User List ===
 $users = listAllUserProfiles();
 
 ?>
 <?php 
-// Cache version based on app version to force reload on updates
+// Cache busting: version based on app version to force reload on updates
 $v = getAppVersion();
 ?>
 <!DOCTYPE html>
@@ -149,40 +156,55 @@ $v = getAppVersion();
     <link type="text/css" rel="stylesheet" href="../css/regular.min.css?v=<?php echo $v; ?>"/>
     <link rel="stylesheet" href="../css/settings.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/users.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/dark-mode/variables.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/dark-mode/layout.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/dark-mode/menus.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/dark-mode/editor.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/dark-mode/modals.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/dark-mode/components.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/dark-mode/pages.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/dark-mode/markdown.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/dark-mode/kanban.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/dark-mode/icons.css?v=<?php echo $v; ?>">
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
 
     <script>
-    function toggleUserStatus(userId, field, newValue) {
+    /**
+     * Helper function to submit a form via POST
+     * @param {Object} formData - Key-value pairs for form fields
+     */
+    function submitForm(formData) {
         const form = document.createElement('form');
         form.method = 'POST';
         form.style.display = 'none';
         
-        const actionInput = document.createElement('input');
-        actionInput.name = 'action';
-        actionInput.value = 'toggle_status';
-        form.appendChild(actionInput);
-        
-        const idInput = document.createElement('input');
-        idInput.name = 'user_id';
-        idInput.value = userId;
-        form.appendChild(idInput);
-        
-        const fieldInput = document.createElement('input');
-        fieldInput.name = 'field';
-        fieldInput.value = field;
-        form.appendChild(fieldInput);
-        
-        const valueInput = document.createElement('input');
-        valueInput.name = 'value';
-        valueInput.value = newValue;
-        form.appendChild(valueInput);
+        for (const [name, value] of Object.entries(formData)) {
+            const input = document.createElement('input');
+            input.name = name;
+            input.value = value;
+            form.appendChild(input);
+        }
         
         document.body.appendChild(form);
         form.submit();
     }
 
+    /**
+     * Toggle user status (admin, active) via AJAX-style form submission
+     */
+    function toggleUserStatus(userId, field, newValue) {
+        submitForm({
+            action: 'toggle_status',
+            user_id: userId,
+            field: field,
+            value: newValue
+        });
+    }
+
+    /**
+     * Open the rename/edit user modal with current user data
+     */
     function renameUser(userId, currentUsername, currentEmail, currentOidcSubject) {
         document.getElementById('rename_user_id').value = userId;
         document.getElementById('rename_username').value = currentUsername;
@@ -192,50 +214,26 @@ $v = getAppVersion();
         setTimeout(() => document.getElementById('rename_username').focus(), 100);
     }
     
+    /**
+     * Submit the rename form with updated user profile data
+     */
     function submitRename() {
-        const userId = document.getElementById('rename_user_id').value;
-        const newUsername = document.getElementById('rename_username').value;
-        const newEmail = document.getElementById('rename_email').value;
-        const newOidcSubject = document.getElementById('rename_oidc_subject').value;
-        
-        // We handle multiple updates by submitting them sequentially or updating the logic
-        // For simplicity, we'll just update one for now or add a new action
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.style.display = 'none';
-        
-        const actionInput = document.createElement('input');
-        actionInput.name = 'action';
-        actionInput.value = 'update_profile'; // New action
-        form.appendChild(actionInput);
-        
-        const idInput = document.createElement('input');
-        idInput.name = 'user_id';
-        idInput.value = userId;
-        form.appendChild(idInput);
-        
-        const usernameInput = document.createElement('input');
-        usernameInput.name = 'username';
-        usernameInput.value = newUsername;
-        form.appendChild(usernameInput);
-        
-        const emailInput = document.createElement('input');
-        emailInput.name = 'email';
-        emailInput.value = newEmail;
-        form.appendChild(emailInput);
-        
-        const oidcSubjectInput = document.createElement('input');
-        oidcSubjectInput.name = 'oidc_subject';
-        oidcSubjectInput.value = newOidcSubject;
-        form.appendChild(oidcSubjectInput);
-        
-        document.body.appendChild(form);
-        form.submit();
+        submitForm({
+            action: 'update_profile',
+            user_id: document.getElementById('rename_user_id').value,
+            username: document.getElementById('rename_username').value,
+            email: document.getElementById('rename_email').value,
+            oidc_subject: document.getElementById('rename_oidc_subject').value
+        });
     }
     </script>
 </head>
 <body>
+    <!-- ========================================
+         ADMIN CONTAINER - User Management
+         ======================================== -->
     <div class="admin-container">
+        <!-- Header with navigation and actions -->
         <div class="admin-header">
             <div>
                 <div class="admin-nav" style="justify-content: center;">
@@ -255,14 +253,12 @@ $v = getAppVersion();
             </div>
         </div>
         
-        <?php if ($message): ?>
-            <div class="message message-success"><?php echo htmlspecialchars($message); ?></div>
-        <?php endif; ?>
-        
+        <!-- Error Messages -->
         <?php if ($error): ?>
             <div class="message message-error"><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
         
+        <!-- Users Table -->
         <div class="table-responsive">
             <table class="users-table">
                 <thead>
@@ -336,14 +332,14 @@ $v = getAppVersion();
     
                             <td class="text-center <?php echo ($user['id'] === getCurrentUserId()) ? 'hide-on-mobile' : ''; ?>" data-label="<?php echo t_h('multiuser.admin.actions', [], 'Actions'); ?>">
                                 <div class="actions actions-center">
-                                    <button class="btn btn-secondary btn-small" title="<?php echo t_h('multiuser.admin.edit_user', [], 'Edit User'); ?>" 
-                                            onclick="renameUser(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($user['email'] ?? '', ENT_QUOTES); ?>', '<?php echo htmlspecialchars($user['oidc_subject'] ?? '', ENT_QUOTES); ?>')">
+                                        <button class="btn btn-secondary btn-small" title="<?php echo t_h('multiuser.admin.edit_user', [], 'Edit User'); ?>" 
+                                            onclick="renameUser(<?php echo (int)$user['id']; ?>, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($user['email'] ?? ''), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($user['oidc_subject'] ?? ''), ENT_QUOTES); ?>)">
                                         <i class="fas fa-edit"></i>
                                     </button>
 
                                     <?php if ($user['id'] !== getCurrentUserId()): ?>
                                         <button class="btn btn-danger btn-small" title="<?php echo t_h('common.delete', [], 'Delete'); ?>" 
-                                                onclick="openDeleteModal(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>')">
+                                            onclick="openDeleteModal(<?php echo (int)$user['id']; ?>, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>)">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     <?php else: ?>
@@ -358,9 +354,11 @@ $v = getAppVersion();
                 </tbody>
             </table>
         </div>
-
-        </div>
     </div>
+    
+    <!-- ========================================
+         MODALS
+         ======================================== -->
     
     <!-- Create User Modal -->
     <div class="modal" id="createModal">
@@ -376,8 +374,6 @@ $v = getAppVersion();
                     <input type="email" id="create_email" name="email" placeholder="<?php echo t_h('multiuser.admin.email', [], 'Email'); ?>">
                 </div>
                 
-
-                
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('createModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
                     <button type="submit" class="btn btn-primary"><?php echo t_h('common.create', [], 'Create'); ?></button>
@@ -386,9 +382,7 @@ $v = getAppVersion();
         </div>
     </div>
     
-
-    
-    <!-- Rename User Modal -->
+    <!-- Rename/Edit User Modal -->
     <div class="modal" id="renameModal">
         <div class="modal-content">
             <h2 class="modal-title"><?php echo t_h('multiuser.admin.edit_user', [], 'Edit User Profile'); ?></h2>
@@ -434,25 +428,24 @@ $v = getAppVersion();
             </form>
         </div>
     </div>
-    <!-- Custom Status Modal -->
-    <div class="modal" id="statusModal">
-        <div class="modal-content">
-            <h2 class="modal-title" id="statusModalTitle"></h2>
-            <p id="statusModalMessage" style="white-space: pre-wrap; margin-bottom: 25px;"></p>
-            <div class="form-actions">
-                <button type="button" class="btn btn-secondary" id="statusModalCancelBtn" onclick="closeModal('statusModal')"></button>
-                <button type="button" class="btn btn-primary" id="statusModalConfirmBtn"></button>
-            </div>
-        </div>
-    </div>
     
+    <!-- ========================================
+         JAVASCRIPT - Modal & Form Handlers
+         ======================================== -->
     <script>
+        // === Modal Management ===
+        
+        /**
+         * Open the create user modal
+         */
         function openCreateModal() {
             document.getElementById('createModal').classList.add('active');
+            setTimeout(() => document.getElementById('create_username').focus(), 100);
         }
         
-
-        
+        /**
+         * Open the delete user confirmation modal
+         */
         function openDeleteModal(userId, username) {
             document.getElementById('delete_user_id').value = userId;
             const messageTemplate = <?php echo json_encode(t('multiuser.admin.confirm_delete', ['username' => 'NAME_HOLDER'], 'Are you sure you want to delete user "NAME_HOLDER"?')); ?>;
@@ -460,13 +453,16 @@ $v = getAppVersion();
             document.getElementById('deleteModal').classList.add('active');
         }
         
+        /**
+         * Close a modal by ID
+         */
         function closeModal(modalId) {
             document.getElementById(modalId).classList.remove('active');
         }
         
-
+        // === Event Listeners ===
         
-        // Close modal on outside click
+        // Close modal when clicking outside
         document.querySelectorAll('.modal').forEach(modal => {
             modal.addEventListener('click', function(e) {
                 if (e.target === this) {
@@ -475,7 +471,7 @@ $v = getAppVersion();
             });
         });
         
-        // Close modal on Escape key
+        // Close modal when pressing Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 document.querySelectorAll('.modal.active').forEach(modal => {
@@ -483,34 +479,6 @@ $v = getAppVersion();
                 });
             }
         });
-
-        function showAlert(title, message, onOk = null) {
-            document.getElementById('statusModalTitle').textContent = title;
-            document.getElementById('statusModalMessage').textContent = message;
-            document.getElementById('statusModalConfirmBtn').style.display = 'none';
-            document.getElementById('statusModalCancelBtn').textContent = 'OK';
-            document.getElementById('statusModalCancelBtn').onclick = () => {
-                closeModal('statusModal');
-                if (onOk) onOk();
-            };
-            document.getElementById('statusModal').classList.add('active');
-        }
-
-        function showConfirm(title, message, onConfirm) {
-            document.getElementById('statusModalTitle').textContent = title;
-            document.getElementById('statusModalMessage').textContent = message;
-            document.getElementById('statusModalConfirmBtn').style.display = 'inline-flex';
-            document.getElementById('statusModalConfirmBtn').textContent = 'OK';
-            document.getElementById('statusModalCancelBtn').style.display = 'inline-flex';
-            document.getElementById('statusModalCancelBtn').textContent = 'Annuler';
-            document.getElementById('statusModalCancelBtn').onclick = () => closeModal('statusModal');
-            
-            document.getElementById('statusModalConfirmBtn').onclick = () => {
-                closeModal('statusModal');
-                onConfirm();
-            };
-            document.getElementById('statusModal').classList.add('active');
-        }
     </script>
 </body>
 </html>

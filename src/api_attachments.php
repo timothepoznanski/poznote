@@ -20,28 +20,23 @@ ini_set('log_errors', 1);
 error_reporting(E_ALL);
 
 require_once 'config.php';
-include 'functions.php';
-include 'db_connect.php';
+require_once 'functions.php';
+require_once 'db_connect.php';
 
 // Get the correct attachments directory path
 $attachments_dir = getAttachmentsPath();
 
-// Enhanced directory creation and permissions handling
-if (!file_exists($attachments_dir)) {
-    if (!mkdir($attachments_dir, 0755, true)) {
-        error_log("Failed to create attachments directory: $attachments_dir");
-        echo json_encode(['success' => false, 'message' => 'Failed to create attachments directory']);
-        exit;
-    }
-    // Set permissions after creation (owner can write, others can read/execute)
-    chmod($attachments_dir, 0755);
-    error_log("Created attachments directory: $attachments_dir");
+// Create directory if needed
+if (!createDirectoryWithPermissions($attachments_dir)) {
+    error_log("Failed to create attachments directory: $attachments_dir");
+    echo json_encode(['success' => false, 'message' => 'Failed to create attachments directory']);
+    exit;
 }
 
 // Verify directory is writable
 if (!is_writable($attachments_dir)) {
     error_log("Attachments directory is not writable: $attachments_dir");
-    // Try to fix permissions (owner-writable only for better security)
+    // Try to fix permissions
     if (!chmod($attachments_dir, 0755)) {
         error_log("Failed to set writable permissions on: $attachments_dir");
     }
@@ -377,14 +372,17 @@ function handleDownload() {
                     // Set headers for file download/viewing
                     $file_type = $attachment['file_type'] ?? mime_content_type($file_path);
                     
+                    // Sanitize filename for Content-Disposition header
+                    $safeFilename = str_replace(['"', "\r", "\n"], '', $attachment['original_filename']);
+                    
                     // For PDFs and images, allow inline viewing
                     if (strpos($file_type, 'application/pdf') !== false || strpos($file_type, 'image/') !== false) {
                         header('Content-Type: ' . $file_type);
-                        header('Content-Disposition: inline; filename="' . $attachment['original_filename'] . '"');
+                        header('Content-Disposition: inline; filename="' . $safeFilename . '"');
                     } else {
                         // For other files, force download
                         header('Content-Type: application/octet-stream');
-                        header('Content-Disposition: attachment; filename="' . $attachment['original_filename'] . '"');
+                        header('Content-Disposition: attachment; filename="' . $safeFilename . '"');
                     }
                     
                     header('Content-Description: File Transfer');

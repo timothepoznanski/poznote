@@ -2,9 +2,9 @@
 require 'auth.php';
 requireApiAuth();
 
-include 'functions.php';
+require_once 'functions.php';
 require_once 'config.php';
-include 'db_connect.php';
+require_once 'db_connect.php';
 
 // First, check if there are any attachments at all
 $checkQuery = "SELECT COUNT(*) as count FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
@@ -38,7 +38,13 @@ if (!$hasAttachments) {
         <title>Poznote - Attachments Export</title>
         <link rel="stylesheet" href="css/fontawesome.min.css">
         <link rel="stylesheet" href="css/light.min.css">
-        <link href="css/modals.css" rel="stylesheet">
+        <link href="css/modals/base.css" rel="stylesheet">
+        <link href="css/modals/specific-modals.css" rel="stylesheet">
+        <link href="css/modals/attachments.css" rel="stylesheet">
+        <link href="css/modals/link-modal.css" rel="stylesheet">
+        <link href="css/modals/share-modal.css" rel="stylesheet">
+        <link href="css/modals/alerts-utilities.css" rel="stylesheet">
+        <link href="css/modals/responsive.css" rel="stylesheet">
         <link rel="stylesheet" href="css/export-attachments.css">
     </head>
     <body class="ai-page">

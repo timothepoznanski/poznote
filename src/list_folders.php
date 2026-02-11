@@ -3,8 +3,8 @@ require 'auth.php';
 requireAuth();
 
 require_once 'config.php';
-include 'db_connect.php';
-include 'functions.php';
+require_once 'db_connect.php';
+require_once 'functions.php';
 
 // Respect optional workspace parameter
 $workspace = isset($_GET['workspace']) ? trim($_GET['workspace']) : (isset($_POST['workspace']) ? trim($_POST['workspace']) : '');
@@ -47,9 +47,30 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="css/light.min.css"/>
 	<link type="text/css" rel="stylesheet" href="css/solid.min.css"/>
 	<link type="text/css" rel="stylesheet" href="css/regular.min.css"/>
-	<link type="text/css" rel="stylesheet" href="css/modals.css"/>
-	<link type="text/css" rel="stylesheet" href="css/shared.css"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/base.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/attachments.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/link-modal.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/share-modal.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/alerts-utilities.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/responsive.css"/>
+	<link type="text/css" rel="stylesheet" href="css/shared/base.css"/>
+	<link type="text/css" rel="stylesheet" href="css/shared/notes-list.css"/>
+	<link type="text/css" rel="stylesheet" href="css/shared/buttons-modal.css"/>
+	<link type="text/css" rel="stylesheet" href="css/shared/folders-grid.css"/>
+	<link type="text/css" rel="stylesheet" href="css/shared/fontawesome.css"/>
+	<link type="text/css" rel="stylesheet" href="css/shared/dark-mode.css"/>
+	<link type="text/css" rel="stylesheet" href="css/shared/responsive.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/menus.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/editor.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/modals.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/components.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/pages.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css"/>
 	<style>
 		.folder-item {
 			cursor: pointer;

@@ -1,0 +1,132 @@
+/**
+ * System Folders
+ *
+ * System folder container (hidden), system menu dropdown,
+ * and system folder icon-only display.
+ */
+
+/* Container pour les dossiers système - maintenant masqué (remplacé par page Home) */
+.system-folders-container {
+    display: none !important;
+}
+
+/* Conteneur du menu système avec menu déroulant */
+.system-menu-container {
+    position: relative;
+}
+
+/* Menu déroulant du système */
+.system-menu-dropdown {
+    position: fixed;
+    margin-top: 8px;
+    background: white;
+    border: 1px solid #d3d6db;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    max-width: 250px;
+    z-index: 10000;
+    overflow: visible;
+}
+
+/* Items du menu déroulant */
+.system-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    gap: 12px;
+}
+
+.system-menu-item:hover {
+    background-color: #f5f7fa;
+}
+
+.system-menu-item i {
+    font-size: 14px;
+    color: #007DB8;
+    width: 20px;
+    text-align: center;
+}
+
+.system-menu-item span:not(.menu-item-count) {
+    flex: 1;
+    font-size: 14px;
+    color: #333;
+}
+
+.system-menu-item .menu-item-count {
+    font-size: 12px;
+    color: #5b9bd5;
+    font-weight: 600;
+    min-width: 20px;
+    text-align: right;
+}
+
+/* Icône ellipsis-v */
+.system-folder .fa-ellipsis-v.folder-icon {
+    font-size: clamp(11px, 2vw, 14px) !important;
+    margin-right: 0 !important;
+    color: #007DB8;
+}
+
+/* Dossiers système: affichage en icônes uniquement */
+.system-folder .folder-toggle {
+    padding: 3px;
+    justify-content: center;
+    width: auto;
+    flex: 0 1 auto;
+    min-width: 0;
+    position: relative;
+    z-index: 2;
+}
+
+/* Cacher le nom des dossiers système */
+.system-folder .folder-name {
+    display: none !important;
+}
+
+/* Icônes des dossiers système */
+.system-folder .fa-trash.folder-icon,
+.system-folder .fa-tags.folder-icon,
+.system-folder .fa-cloud.folder-icon,
+.system-folder .fa-star-light.folder-icon,
+.system-folder .fa-paperclip.folder-icon,
+.system-folder .fa-eye.folder-icon,
+.system-folder .fa-cog.folder-icon,
+.system-folder .fa-search.folder-icon {
+    font-size: clamp(11px, 2vw, 14px) !important;
+    margin-right: 0 !important;
+    color: #007DB8;
+}
+
+/* Afficher le compteur à droite de l'icône - toujours visible */
+.system-folder .folder-note-count {
+    display: inline-block !important;
+    opacity: 1 !important;
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+    color: #5b9bd5;
+    padding: 1px 4px;
+    font-size: 9px;
+    font-weight: 600;
+    min-width: 14px;
+    text-align: center;
+    line-height: 1.2;
+    margin-left: -2px;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+/* Effet hover sur les icônes système */
+.system-folder .folder-toggle:hover {
+    background-color: transparent;
+}
+
+.system-folder .folder-toggle:hover .folder-icon {
+    color: #005a8a;
+    transform: scale(1.15);
+}

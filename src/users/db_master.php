@@ -13,6 +13,9 @@ if (!defined('SQLITE_DATABASE')) {
     require_once __DIR__ . '/../config.php';
 }
 
+// Include utility functions (createDirectoryWithPermissions, etc.)
+require_once __DIR__ . '/../functions.php';
+
 // Include auto-migration to ensure multi-user structure exists
 require_once __DIR__ . '/../auto_migrate.php';
 
@@ -32,9 +35,7 @@ function getMasterConnection(): PDO {
     try {
         $dbPath = MASTER_DATABASE;
         $dbDir = dirname($dbPath);
-        if (!is_dir($dbDir)) {
-            mkdir($dbDir, 0755, true);
-        }
+        createDirectoryWithPermissions($dbDir);
         
         $masterCon = new PDO('sqlite:' . $dbPath);
         $masterCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -68,28 +69,22 @@ function initializeMasterDatabase(PDO $con): void {
         )
     ");
     
-    // Migration: Add email column if missing
+    // Migration: Add missing columns
     try {
         $cols = $con->query("PRAGMA table_info(users)")->fetchAll(PDO::FETCH_ASSOC);
         $existingColumns = array_column($cols, 'name');
+        
         if (!in_array('email', $existingColumns)) {
             $con->exec("ALTER TABLE users ADD COLUMN email TEXT");
             $con->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email) WHERE email IS NOT NULL AND email != ''");
         }
-    } catch (Exception $e) {
-        error_log("Failed to add email column: " . $e->getMessage());
-    }
-    
-    // Migration: Add oidc_subject column if missing
-    try {
-        $cols = $con->query("PRAGMA table_info(users)")->fetchAll(PDO::FETCH_ASSOC);
-        $existingColumns = array_column($cols, 'name');
+        
         if (!in_array('oidc_subject', $existingColumns)) {
             $con->exec("ALTER TABLE users ADD COLUMN oidc_subject TEXT");
             $con->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_oidc_subject ON users(oidc_subject) WHERE oidc_subject IS NOT NULL AND oidc_subject != ''");
         }
     } catch (Exception $e) {
-        error_log("Failed to add oidc_subject column: " . $e->getMessage());
+        error_log("Failed to add columns: " . $e->getMessage());
     }
     
     // Global settings table
@@ -297,7 +292,7 @@ function createUserProfile(string $username, string $email = null): array {
  */
 function updateUserProfile(int $id, array $data): array {
     try {
-        $con = getMasterConnection();
+        $masterCon = getMasterConnection();
         
         $allowedFields = ['username', 'email', 'active', 'is_admin', 'oidc_subject'];
         $updates = [];
@@ -318,18 +313,36 @@ function updateUserProfile(int $id, array $data): array {
         $params[] = $id;
         
         $sql = "UPDATE users SET " . implode(', ', $updates) . " WHERE id = ?";
-        $stmt = $con->prepare($sql);
+        $stmt = $masterCon->prepare($sql);
         $stmt->execute($params);
+        
+        // If updating the current user, refresh the session data
+        $isCurrentUser = (isset($_SESSION['user_id']) && (int)$_SESSION['user_id'] === $id);
+        if ($isCurrentUser) {
+            $stmt = $masterCon->prepare("SELECT * FROM users WHERE id = ?");
+            $stmt->execute([$id]);
+            $updatedUser = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($updatedUser) {
+                $_SESSION['user'] = $updatedUser;
+            }
+        }
         
         // If username or email was updated, sync to local DB
         if (isset($data['username']) || isset($data['email'])) {
             require_once __DIR__ . '/UserDataManager.php';
             $udm = new UserDataManager($id);
+            
+            // If it's the current user, we can reuse the global $con to avoid 
+            // SQLite lock contention which causes several seconds of delay.
+            // The global $con is provided by db_connect.php and points to the user's DB.
+            global $con; 
+            $useCon = ($isCurrentUser && isset($con)) ? $con : null;
+            
             if (isset($data['username'])) {
-                $udm->syncUsername($data['username']);
+                $udm->syncUsername($data['username'], $useCon);
             }
             if (isset($data['email'])) {
-                $udm->syncEmail($data['email']);
+                $udm->syncEmail($data['email'], $useCon);
             }
         }
         
@@ -432,6 +445,13 @@ function setGlobalSetting(string $key, $value): bool {
 function registerSharedLink(string $token, int $userId, string $targetType, int $targetId): bool {
     try {
         $con = getMasterConnection();
+        
+        // Ensure availability before inserting
+        if (!isTokenAvailable($token, $userId, $targetType, $targetId)) {
+            error_log("Token registration denied: collision with existing token ownership.");
+            return false;
+        }
+
         $stmt = $con->prepare("
             INSERT OR REPLACE INTO shared_links (token, user_id, target_type, target_id)
             VALUES (?, ?, ?, ?)
@@ -439,6 +459,32 @@ function registerSharedLink(string $token, int $userId, string $targetType, int 
         return $stmt->execute([$token, $userId, $targetType, $targetId]);
     } catch (Exception $e) {
         error_log("Failed to register shared link: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Check if a token is available for use.
+ * Returns true if the token is not used by anyone, 
+ * or if it is already used by the SAME user for the SAME item.
+ */
+function isTokenAvailable(string $token, int $userId, string $targetType, int $targetId): bool {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("SELECT user_id, target_type, target_id FROM shared_links WHERE token = ? LIMIT 1");
+        $stmt->execute([$token]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$row) {
+            return true;
+        }
+        
+        // It's available if it's the exact same item
+        return (int)$row['user_id'] === $userId && 
+               $row['target_type'] === $targetType && 
+               (int)$row['target_id'] === $targetId;
+    } catch (Exception $e) {
+        error_log("Failed to check token availability: " . $e->getMessage());
         return false;
     }
 }

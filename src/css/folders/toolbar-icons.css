@@ -1,0 +1,83 @@
+/**
+ * Toolbar Icon Colors
+ *
+ * Blue color states for toolbar buttons: attachments, favorites,
+ * share, markdown view/help/split.
+ */
+
+/* When attachments exist, make the paperclip icon blue */
+.btn-attachment.has-attachments i.fa-paperclip,
+.btn-attachment.has-attachments .fa-paperclip {
+    color: #007DB8 !important;
+}
+
+/* Blue color for favorite star when marked as favorite */
+.toolbar-btn.btn-favorite.is-favorite i.fa-star,
+.toolbar-btn.btn-favorite.is-favorite i.fa-star-light,
+.toolbar-btn.btn-favorite.is-favorite .fa-star,
+.toolbar-btn.btn-favorite.is-favorite .fa-star-light,
+.toolbar-btn.btn-share.is-shared i.fa-cloud,
+.toolbar-btn.btn-share.is-shared .fa-cloud,
+.toolbar-btn.btn-attachment.has-attachments i {
+    color: #007DB8 !important;
+    filter: none !important;
+}
+
+/* Blue color for markdown view mode toggle button */
+.toolbar-btn.markdown-view-mode-btn i,
+.toolbar-btn.markdown-view-mode-btn [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+}
+
+.toolbar-btn.markdown-view-mode-btn:hover i,
+.toolbar-btn.markdown-view-mode-btn:hover [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+    transform: scale(1.18);
+}
+
+/* Blue color for markdown help button */
+.toolbar-btn.markdown-help-btn i,
+.toolbar-btn.markdown-help-btn [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+}
+
+.toolbar-btn.markdown-help-btn:hover i,
+.toolbar-btn.markdown-help-btn:hover [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+    transform: scale(1.18);
+}
+
+/* Blue color for markdown split view button */
+.toolbar-btn.markdown-split-btn i,
+.toolbar-btn.markdown-split-btn [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+}
+
+.toolbar-btn.markdown-split-btn:hover i,
+.toolbar-btn.markdown-split-btn:hover [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+    transform: scale(1.18);
+}
+
+/* Add slash through icon when in split mode (active state) */
+.toolbar-btn.markdown-split-btn.active {
+    position: relative;
+}
+
+.toolbar-btn.markdown-split-btn.active::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 24px;
+    height: 2px;
+    background-color: #007DB8;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    pointer-events: none;
+}

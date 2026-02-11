@@ -132,7 +132,6 @@ class NotesController {
             $this->sendSuccess(['notes' => $notes]);
             
         } catch (Exception $e) {
-            error_log("Error in NotesController::index: " . $e->getMessage());
             $this->sendError(500, 'Database error occurred');
         }
     }
@@ -217,10 +216,10 @@ class NotesController {
             if ($id !== null && is_numeric($id)) {
                 $noteId = (int)$id;
                 if ($useWorkspaceFilter) {
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
+                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
                     $stmt->execute([$noteId, $workspace]);
                 } else {
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated FROM entries WHERE id = ? AND trash = 0");
+                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id FROM entries WHERE id = ? AND trash = 0");
                     $stmt->execute([$noteId]);
                 }
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -235,10 +234,10 @@ class NotesController {
                 
                 if (is_numeric($reference)) {
                     $refId = (int)$reference;
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
+                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
                     $stmt->execute([$refId, $workspace]);
                 } else {
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ? ORDER BY updated DESC LIMIT 1");
+                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ? ORDER BY updated DESC LIMIT 1");
                     $stmt->execute(['%' . $reference . '%', $workspace]);
                 }
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -253,22 +252,24 @@ class NotesController {
             $noteId = (int)$row['id'];
             
             // Get file content
+            $content = '';
             $filename = getEntryFilename($noteId, $noteType);
             
-            // Security check
-            $realPath = realpath($filename);
-            $expectedDir = realpath(getEntriesPath());
-            
-            if ($realPath === false || $expectedDir === false || strpos($realPath, $expectedDir) !== 0) {
-                $this->sendError(403, 'Invalid file path');
-                return;
-            }
-            
-            $content = '';
-            if (file_exists($filename) && is_readable($filename)) {
-                $content = file_get_contents($filename);
-                if ($content === false) {
-                    $content = '';
+            // Security check - only check realpath if file exists
+            if (file_exists($filename)) {
+                $realPath = realpath($filename);
+                $expectedDir = realpath(getEntriesPath());
+                
+                if ($realPath === false || $expectedDir === false || strpos($realPath, $expectedDir) !== 0) {
+                    $this->sendError(403, 'Invalid file path');
+                    return;
+                }
+                
+                if (is_readable($filename)) {
+                    $content = file_get_contents($filename);
+                    if ($content === false) {
+                        $content = '';
+                    }
                 }
             }
             
@@ -282,6 +283,7 @@ class NotesController {
                     'tags' => $row['tags'] ?? '',
                     'folder' => $row['folder'] ?? null,
                     'folder_id' => $row['folder_id'] ? (int)$row['folder_id'] : null,
+                    'linked_note_id' => $row['linked_note_id'] ? (int)$row['linked_note_id'] : null,
                     'created' => $row['created'] ?? null,
                     'updated' => $row['updated'] ?? null,
                     'content' => $content
@@ -289,7 +291,6 @@ class NotesController {
             ], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
             
         } catch (Exception $e) {
-            error_log('Error in NotesController::show: ' . $e->getMessage());
             $this->sendError(500, 'Database error occurred');
         }
     }
@@ -315,9 +316,6 @@ class NotesController {
             return;
         }
         
-        // DEBUG logging
-        error_log("NotesController::create - Input received: " . json_encode($input));
-        
         $originalHeading = isset($input['heading']) ? trim($input['heading']) : '';
         $tags = isset($input['tags']) ? trim($input['tags']) : '';
         $folder = isset($input['folder_name']) ? trim($input['folder_name']) : null;
@@ -327,7 +325,6 @@ class NotesController {
             ? trim($input['workspace']) 
             : getFirstWorkspaceName();
         
-        error_log("NotesController::create - workspace after processing: " . $workspace);
         $entry = $input['content'] ?? $input['entry'] ?? '';
         $entrycontent = $input['entrycontent'] ?? $entry;
         $type = isset($input['type']) ? trim($input['type']) : 'note';
@@ -346,15 +343,7 @@ class NotesController {
             
             // Validate and clean tags
             if (!empty($tags)) {
-                $tagsArray = array_map('trim', explode(',', str_replace(' ', ',', $tags)));
-                $validTags = [];
-                foreach ($tagsArray as $tag) {
-                    if (!empty($tag)) {
-                        $tag = str_replace(' ', '_', $tag);
-                        $validTags[] = $tag;
-                    }
-                }
-                $tags = implode(', ', $validTags);
+                $tags = $this->sanitizeTags($tags);
             }
             
             // Get folder_id if folder name is provided
@@ -407,7 +396,6 @@ class NotesController {
                 $checkLinkedNote = $this->con->prepare("SELECT id FROM entries WHERE id = ? AND trash = 0");
                 $checkLinkedNote->execute([$linked_note_id]);
                 if (!$checkLinkedNote->fetch()) {
-                    error_log("NotesController::create - Linked note not found: $linked_note_id");
                     $this->sendError(404, 'Linked note not found');
                     return;
                 }
@@ -417,11 +405,9 @@ class NotesController {
                 $checkExistingLink->execute([$linked_note_id]);
                 $existingLink = $checkExistingLink->fetch();
                 if ($existingLink) {
-                    error_log("NotesController::create - Linked note already exists for target: $linked_note_id, existing link ID: " . $existingLink['id']);
                     $this->sendError(400, 'A linked note already exists for this note');
                     return;
                 }
-                error_log("NotesController::create - No existing link found for target: $linked_note_id, creating new link");
             }
             
             $stmt = $this->con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, linked_note_id, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -447,9 +433,7 @@ class NotesController {
                 // Create the file
                 $filename = getEntryFilename($id, $type);
                 $entriesDir = dirname($filename);
-                if (!is_dir($entriesDir)) {
-                    mkdir($entriesDir, 0755, true);
-                }
+                createDirectoryWithPermissions($entriesDir);
                 
                 if (!empty($entry)) {
                     // Sanitize HTML content to prevent XSS attacks
@@ -466,9 +450,6 @@ class NotesController {
                     }
                     
                     $write_result = file_put_contents($filename, $contentToSave);
-                    if ($write_result === false) {
-                        error_log("Failed to write file for note ID $id: $filename");
-                    }
                     
                     // Update the entry content in database with sanitized version
                     $updateStmt = $this->con->prepare("UPDATE entries SET entry = ? WHERE id = ?");
@@ -493,7 +474,6 @@ class NotesController {
             }
             
         } catch (Exception $e) {
-            error_log('Error in NotesController::create: ' . $e->getMessage());
             $this->sendError(500, 'Database error occurred');
         }
     }
@@ -569,15 +549,7 @@ class NotesController {
             
             // Validate tags
             if ($tags !== null && !empty($tags)) {
-                $tagsArray = array_map('trim', explode(',', str_replace(' ', ',', $tags)));
-                $validTags = [];
-                foreach ($tagsArray as $tag) {
-                    if (!empty($tag)) {
-                        $tag = str_replace(' ', '_', $tag);
-                        $validTags[] = $tag;
-                    }
-                }
-                $tags = implode(', ', $validTags);
+                $tags = $this->sanitizeTags($tags);
             }
             
             // Check heading uniqueness if changed
@@ -610,9 +582,7 @@ class NotesController {
             if ($entry !== null) {
                 $filename = getEntryFilename($noteId, $noteType);
                 $entriesDir = dirname($filename);
-                if (!is_dir($entriesDir)) {
-                    mkdir($entriesDir, 0755, true);
-                }
+                createDirectoryWithPermissions($entriesDir);
                 
                 // Sanitize HTML content to prevent XSS attacks
                 $contentToSave = $entry;
@@ -711,7 +681,6 @@ class NotesController {
             }
             
         } catch (Exception $e) {
-            error_log('Error in NotesController::update: ' . $e->getMessage());
             $this->sendError(500, 'Database error occurred');
         }
     }
@@ -803,7 +772,6 @@ class NotesController {
             }
             
         } catch (Exception $e) {
-            error_log('Error in NotesController::delete: ' . $e->getMessage());
             $this->sendError(500, 'Database error occurred');
         }
     }
@@ -974,7 +942,6 @@ class NotesController {
             }
             
         } catch (Exception $e) {
-            error_log('Error in NotesController::restore: ' . $e->getMessage());
             $this->sendError(500, 'Database error occurred');
         }
     }
@@ -1020,18 +987,7 @@ class NotesController {
             }
             
             // Convert tags array to string
-            $tags_string = '';
-            if (is_array($tags) && count($tags) > 0) {
-                $valid_tags = [];
-                foreach ($tags as $tag) {
-                    $tag = trim($tag);
-                    if (!empty($tag)) {
-                        $tag = str_replace(' ', '_', $tag);
-                        $valid_tags[] = $tag;
-                    }
-                }
-                $tags_string = implode(', ', $valid_tags);
-            }
+            $tags_string = $this->sanitizeTags($tags);
             
             // Update tags
             if ($workspace) {
@@ -1051,7 +1007,6 @@ class NotesController {
             ]);
             
         } catch (Exception $e) {
-            error_log('Error in NotesController::updateTags: ' . $e->getMessage());
             $this->sendError(500, 'Database error occurred');
         }
     }
@@ -1092,9 +1047,7 @@ class NotesController {
             // Write file
             $filename = getEntryFilename($noteId, $noteType);
             $entriesDir = dirname($filename);
-            if (!is_dir($entriesDir)) {
-                mkdir($entriesDir, 0755, true);
-            }
+            createDirectoryWithPermissions($entriesDir);
             
             $write_result = file_put_contents($filename, $content);
             if ($write_result === false) {
@@ -1113,7 +1066,6 @@ class NotesController {
             }
             
         } catch (Exception $e) {
-            error_log('Error in NotesController::beaconSave: ' . $e->getMessage());
             $this->sendError(500, 'Server error');
         }
     }
@@ -1180,48 +1132,66 @@ class NotesController {
     }
     
     /**
-     * POST /api/v1/notes/{id}/duplicate
-     * Duplicate a note
+     * Clone a note with optional overrides for folder, heading prefix, etc.
+     * Shared logic for duplicate() and createTemplate().
+     *
+     * @param string $id         Source note ID
+     * @param array  $options    Optional overrides:
+     *   'headingPrefix'  => string  Prefix prepended to heading (default: '')
+     *   'folderId'       => int     Override target folder_id (omit to keep original)
+     *   'folderName'     => string  Override target folder name (omit to keep original)
+     *   'autoShare'      => bool    Auto-share if folder is shared (default: true)
+     *   'successMessage' => string  Message in response
+     *   'extraResponse'  => array   Extra keys merged into response
      */
-    public function duplicate(string $id): void {
+    private function cloneNote(string $id, array $options = []): void {
+        $headingPrefix  = $options['headingPrefix'] ?? '';
+        $overrideFolder = array_key_exists('folderId', $options);
+        $autoShare      = $options['autoShare'] ?? true;
+        $successMessage = $options['successMessage'] ?? 'Note cloned successfully';
+        $extraResponse  = $options['extraResponse'] ?? [];
+
         try {
-            // Get the original note
             $stmt = $this->con->prepare("SELECT heading, entry, tags, folder, folder_id, workspace, type, attachments FROM entries WHERE id = ? AND trash = 0");
             $stmt->execute([$id]);
             $originalNote = $stmt->fetch(PDO::FETCH_ASSOC);
-            
+
             if (!$originalNote) {
                 $this->sendError(404, 'Note not found');
                 return;
             }
-            
+
+            $workspace  = $originalNote['workspace'];
+            $folderId   = $overrideFolder ? ($options['folderId'] ?? null) : $originalNote['folder_id'];
+            $folderName = $overrideFolder ? ($options['folderName'] ?? null) : $originalNote['folder'];
+
             // Generate unique heading
             $originalHeading = $originalNote['heading'] ?: t('index.note.new_note', [], 'New note');
-            $newHeading = generateUniqueTitle($originalHeading, null, $originalNote['workspace'], $originalNote['folder_id']);
-            
+            $newHeading = generateUniqueTitle($headingPrefix . $originalHeading, null, $workspace, $folderId);
+
             // Duplicate attachments
             $newAttachments = null;
             $attachmentIdMapping = [];
             $originalAttachments = $originalNote['attachments'] ? json_decode($originalNote['attachments'], true) : [];
-            
+
             if (!empty($originalAttachments)) {
                 $attachmentsDir = getAttachmentsPath();
                 $duplicatedAttachments = [];
-                
+
                 foreach ($originalAttachments as $attachment) {
                     $originalFilePath = $attachmentsDir . '/' . $attachment['filename'];
-                    
+
                     if (file_exists($originalFilePath)) {
                         $fileExtension = pathinfo($attachment['filename'], PATHINFO_EXTENSION);
                         $newFilename = uniqid() . '_' . time() . '.' . $fileExtension;
                         $newFilePath = $attachmentsDir . '/' . $newFilename;
                         $oldAttachmentId = $attachment['id'];
                         $newAttachmentId = uniqid();
-                        
+
                         if (copy($originalFilePath, $newFilePath)) {
                             chmod($newFilePath, 0644);
                             $attachmentIdMapping[$oldAttachmentId] = $newAttachmentId;
-                            
+
                             $duplicatedAttachments[] = [
                                 'id' => $newAttachmentId,
                                 'filename' => $newFilename,
@@ -1233,10 +1203,10 @@ class NotesController {
                         }
                     }
                 }
-                
+
                 $newAttachments = !empty($duplicatedAttachments) ? json_encode($duplicatedAttachments) : null;
             }
-            
+
             // Read original content and update attachment references
             $originalFilename = getEntryFilename($id, $originalNote['type']);
             $content = '';
@@ -1246,28 +1216,28 @@ class NotesController {
                     $content = str_replace($oldId, $newId, $content);
                 }
             }
-            
+
             // Insert new note
             $insertStmt = $this->con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, attachments, created, updated, trash, favorite) VALUES (?, '', ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0, 0)");
             $insertStmt->execute([
                 $newHeading,
                 $originalNote['tags'],
-                $originalNote['folder'],
-                $originalNote['folder_id'],
-                $originalNote['workspace'],
+                $folderName,
+                $folderId,
+                $workspace,
                 $originalNote['type'],
                 $newAttachments
             ]);
-            
+
             $newId = $this->con->lastInsertId();
-            
-            // If folder is shared, auto-share the duplicated note
+
+            // Auto-share if folder is shared
             $wasShared = false;
-            if ($originalNote['folder_id']) {
+            if ($autoShare && $folderId) {
                 $sharedFolderStmt = $this->con->prepare("SELECT id, theme, indexable FROM shared_folders WHERE folder_id = ? LIMIT 1");
-                $sharedFolderStmt->execute([$originalNote['folder_id']]);
+                $sharedFolderStmt->execute([$folderId]);
                 $sharedFolder = $sharedFolderStmt->fetch(PDO::FETCH_ASSOC);
-                
+
                 if ($sharedFolder) {
                     $noteToken = bin2hex(random_bytes(16));
                     $insertShareStmt = $this->con->prepare("INSERT INTO shared_notes (note_id, token, theme, indexable) VALUES (?, ?, ?, ?)");
@@ -1275,23 +1245,35 @@ class NotesController {
                     $wasShared = true;
                 }
             }
-            
-            // Create new file
+
+            // Write file
             $newFilename = getEntryFilename($newId, $originalNote['type']);
-            file_put_contents($newFilename, $content);
-            chmod($newFilename, 0644);
-            
+            if (!empty($content)) {
+                file_put_contents($newFilename, $content);
+                chmod($newFilename, 0644);
+            }
+
             http_response_code(201);
-            $this->sendSuccess([
+            $this->sendSuccess(array_merge([
                 'id' => $newId,
                 'heading' => $newHeading,
-                'message' => 'Note duplicated successfully',
+                'message' => $successMessage,
                 'share_delta' => $wasShared ? 1 : 0
-            ]);
-            
+            ], $extraResponse));
+
         } catch (Exception $e) {
-            $this->sendError(500, 'Error duplicating note: ' . $e->getMessage());
+            $this->sendError(500, $successMessage . ' failed: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * POST /api/v1/notes/{id}/duplicate
+     * Duplicate a note
+     */
+    public function duplicate(string $id): void {
+        $this->cloneNote($id, [
+            'successMessage' => 'Note duplicated successfully',
+        ]);
     }
     
     /**
@@ -1300,117 +1282,40 @@ class NotesController {
      */
     public function createTemplate(string $id): void {
         try {
-            // Get the original note
-            $stmt = $this->con->prepare("SELECT heading, entry, tags, folder, folder_id, workspace, type, attachments FROM entries WHERE id = ? AND trash = 0");
+            // Get note workspace to find/create Templates folder
+            $stmt = $this->con->prepare("SELECT workspace FROM entries WHERE id = ? AND trash = 0");
             $stmt->execute([$id]);
-            $originalNote = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            if (!$originalNote) {
+            $noteData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$noteData) {
                 $this->sendError(404, 'Note not found');
                 return;
             }
-            
+
+            $workspace = $noteData['workspace'];
+
             // Get or create the "Templates" folder
-            $workspace = $originalNote['workspace'];
-            $templatesFolderId = null;
-            
-            // Check if Templates folder exists
             $folderStmt = $this->con->prepare("SELECT id FROM folders WHERE name = 'Templates' AND workspace = ? AND parent_id IS NULL");
             $folderStmt->execute([$workspace]);
             $templatesFolder = $folderStmt->fetch(PDO::FETCH_ASSOC);
-            
+
             if ($templatesFolder) {
                 $templatesFolderId = (int)$templatesFolder['id'];
             } else {
-                // Create the Templates folder
                 $createFolderStmt = $this->con->prepare("INSERT INTO folders (name, workspace, parent_id, created) VALUES ('Templates', ?, NULL, datetime('now'))");
                 $createFolderStmt->execute([$workspace]);
                 $templatesFolderId = (int)$this->con->lastInsertId();
             }
-            
-            // Generate unique heading for template
-            $originalHeading = $originalNote['heading'] ?: t('index.note.new_note', [], 'New note');
-            $templateHeading = '[Template] ' . $originalHeading;
-            $newHeading = generateUniqueTitle($templateHeading, null, $workspace, $templatesFolderId);
-            
-            // Duplicate attachments
-            $newAttachments = null;
-            $attachmentIdMapping = [];
-            $originalAttachments = $originalNote['attachments'] ? json_decode($originalNote['attachments'], true) : [];
-            
-            if (!empty($originalAttachments)) {
-                $attachmentsDir = getAttachmentsPath();
-                $duplicatedAttachments = [];
-                
-                foreach ($originalAttachments as $attachment) {
-                    $originalFilePath = $attachmentsDir . '/' . $attachment['filename'];
-                    
-                    if (file_exists($originalFilePath)) {
-                        $fileExtension = pathinfo($attachment['filename'], PATHINFO_EXTENSION);
-                        $newFilename = uniqid() . '_' . time() . '.' . $fileExtension;
-                        $newFilePath = $attachmentsDir . '/' . $newFilename;
-                        $oldAttachmentId = $attachment['id'];
-                        $newAttachmentId = uniqid();
-                        
-                        if (copy($originalFilePath, $newFilePath)) {
-                            chmod($newFilePath, 0644);
-                            $attachmentIdMapping[$oldAttachmentId] = $newAttachmentId;
-                            
-                            $duplicatedAttachments[] = [
-                                'id' => $newAttachmentId,
-                                'filename' => $newFilename,
-                                'original_filename' => $attachment['original_filename'],
-                                'file_size' => $attachment['file_size'],
-                                'file_type' => $attachment['file_type'],
-                                'uploaded_at' => date('Y-m-d H:i:s')
-                            ];
-                        }
-                    }
-                }
-                
-                $newAttachments = !empty($duplicatedAttachments) ? json_encode($duplicatedAttachments) : null;
-            }
-            
-            // Read original content and update attachment references
-            $originalFilename = getEntryFilename($id, $originalNote['type']);
-            $content = '';
-            if (file_exists($originalFilename)) {
-                $content = file_get_contents($originalFilename);
-                foreach ($attachmentIdMapping as $oldId => $newId) {
-                    $content = str_replace($oldId, $newId, $content);
-                }
-            }
-            
-            // Insert new note in Templates folder
-            $insertStmt = $this->con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, attachments, created, updated, trash, favorite) VALUES (?, '', ?, 'Templates', ?, ?, ?, ?, datetime('now'), datetime('now'), 0, 0)");
-            $insertStmt->execute([
-                $newHeading,
-                $originalNote['tags'],
-                $templatesFolderId,
-                $workspace,
-                $originalNote['type'],
-                $newAttachments
+
+            $this->cloneNote($id, [
+                'headingPrefix' => '[Template] ',
+                'folderId' => $templatesFolderId,
+                'folderName' => 'Templates',
+                'autoShare' => false,
+                'successMessage' => 'Template created successfully',
+                'extraResponse' => ['folder_id' => $templatesFolderId],
             ]);
-            
-            $newId = $this->con->lastInsertId();
-            
-            // Write content to file
-            $newFilename = getEntryFilename($newId, $originalNote['type']);
-            if (!empty($content)) {
-                file_put_contents($newFilename, $content);
-                chmod($newFilename, 0644);
-            }
-            
-            http_response_code(201);
-            $this->sendSuccess([
-                'id' => $newId,
-                'heading' => $newHeading,
-                'folder_id' => $templatesFolderId,
-                'message' => 'Template created successfully'
-            ]);
-            
         } catch (Exception $e) {
-            error_log("Error creating template: " . $e->getMessage());
             $this->sendError(500, 'Error creating template: ' . $e->getMessage());
         }
     }
@@ -1676,11 +1581,31 @@ class NotesController {
             ]);
             
         } catch (Exception $e) {
-            error_log('Error in NotesController::search: ' . $e->getMessage());
             $this->sendError(500, 'Search error occurred');
         }
     }
     
+    /**
+     * Sanitize and normalize a tags value (string or array) into a clean comma-separated string.
+     */
+    private function sanitizeTags($tags): string {
+        if (empty($tags)) return '';
+        if (is_array($tags)) {
+            $tagsArray = $tags;
+        } else {
+            $tagsArray = array_map('trim', explode(',', str_replace(' ', ',', $tags)));
+        }
+        $validTags = [];
+        foreach ($tagsArray as $tag) {
+            $tag = is_string($tag) ? trim($tag) : '';
+            if (!empty($tag)) {
+                $tag = str_replace(' ', '_', $tag);
+                $validTags[] = $tag;
+            }
+        }
+        return implode(', ', $validTags);
+    }
+
     /**
      * Send a success response
      */

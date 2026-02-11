@@ -69,9 +69,10 @@ function getLatestNote($con, $workspace_filter) {
         $stmt_right->execute([$workspace_filter]);
         $latest_note = $stmt_right->fetch(PDO::FETCH_ASSOC);
         
-        if($latest_note) {
+        if ($latest_note) {
             $default_note_folder = $latest_note["folder"] ?: null;
-            // Reset statement to be used in display loop (workspace filtered)
+            // Re-execute query so $res_right is a fresh PDOStatement for the display loop
+            // (PDO cursors cannot be reset after fetch)
             $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND workspace = ? ORDER BY updated DESC LIMIT 1");
             $stmt_right->execute([$workspace_filter]);
             $res_right = $stmt_right;
@@ -87,7 +88,7 @@ function getLatestNote($con, $workspace_filter) {
 /**
  * Prépare les requêtes pour les résultats de recherche
  */
-function prepareSearchResults($con, $is_search_mode, $note, $where_clause, $search_params, $workspace_filter) {
+function prepareSearchResults($con, $is_search_mode, &$note, $where_clause, $search_params, $workspace_filter) {
     $res_right = null;
     
     if ($is_search_mode) {
@@ -104,7 +105,8 @@ function prepareSearchResults($con, $is_search_mode, $note, $where_clause, $sear
             $selected_note_result = $stmt_right->fetch(PDO::FETCH_ASSOC);
             
             if ($selected_note_result) {
-                // Reset statement for display loop
+                $note = $selected_note_result['id'];
+                // Re-execute: PDO cursors cannot be reset after fetch
                 $stmt_right = $con->prepare($query_right_with_note);
                 $stmt_right->execute($search_params_with_note);
                 $res_right = $stmt_right;
@@ -115,7 +117,8 @@ function prepareSearchResults($con, $is_search_mode, $note, $where_clause, $sear
                 $stmt_right->execute($search_params);
                 $search_result = $stmt_right->fetch(PDO::FETCH_ASSOC);
                 if ($search_result) {
-                    // Reset statement for display loop
+                    $note = $search_result['id'];
+                    // Re-execute: PDO cursors cannot be reset after fetch
                     $stmt_right = $con->prepare($query_right_secure);
                     $stmt_right->execute($search_params);
                     $res_right = $stmt_right;
@@ -130,7 +133,8 @@ function prepareSearchResults($con, $is_search_mode, $note, $where_clause, $sear
             $stmt_right->execute($search_params);
             $search_result = $stmt_right->fetch(PDO::FETCH_ASSOC);
             if ($search_result) {
-                // Reset statement for display loop
+                $note = $search_result['id'];
+                // Re-execute: PDO cursors cannot be reset after fetch
                 $stmt_right = $con->prepare($query_right_secure);
                 $stmt_right->execute($search_params);
                 $res_right = $stmt_right;

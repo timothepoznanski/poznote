@@ -1,0 +1,52 @@
+/**
+ * Restore & Import - Drag & Drop
+ *
+ * File drag-and-drop interaction states and overlay.
+ */
+
+/* Drag and Drop styles */
+.form-group {
+    position: relative;
+    border: 2px solid transparent;
+    padding: 10px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.form-group.drag-over {
+    background-color: #e3f2fd;
+    border: 2px dashed #2196F3 !important;
+}
+
+.form-group.drag-over input[type="file"],
+.form-group.drag-over label,
+.form-group.drag-over small {
+    opacity: 0.3;
+}
+
+/* Drop overlay */
+.drop-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(227, 242, 253, 0.95);
+    border-radius: 8px;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.drop-overlay-text {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #2196F3;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+    white-space: nowrap;
+}

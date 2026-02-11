@@ -1,6 +1,16 @@
 // Markdown handler for Poznote
 // Simple markdown parser and renderer
 
+// Shared utility: escape HTML special characters
+function _mdEscapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 // Helper function to normalize content from contentEditable
 function normalizeContentEditableText(element) {
     // More robust content extraction that handles contentEditable quirks
@@ -79,14 +89,7 @@ function initMermaid(retryCount) {
         }
         return;
     }
-    function escapeHtml(str) {
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-    }
+    var escapeHtml = _mdEscapeHtml;
 
     function renderMermaidError(node, err, source) {
         var msg = 'Mermaid: syntax error.';
@@ -291,6 +294,8 @@ function initMermaid(retryCount) {
 
 function parseMarkdown(text) {
     if (!text) return '';
+
+    var escapeHtml = _mdEscapeHtml;
 
     function tryParseInternalNoteId(url) {
         if (!url) return null;
@@ -725,53 +730,13 @@ function parseMarkdown(text) {
             continue;
         }
 
-        // Headers
-        if (line.match(/^######\s+(.+)$/)) {
+        // Headers (h1-h6)
+        var headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
+        if (headingMatch) {
             flushParagraph();
-            let lineNum = i;
-            result.push(line.replace(/^######\s+(.+)$/, function (match, content) {
-                return '<h6 data-line="' + lineNum + '">' + applyInlineStyles(content) + '</h6>';
-            }));
-            continue;
-        }
-        if (line.match(/^#####\s+(.+)$/)) {
-            flushParagraph();
-            let lineNum = i;
-            result.push(line.replace(/^#####\s+(.+)$/, function (match, content) {
-                return '<h5 data-line="' + lineNum + '">' + applyInlineStyles(content) + '</h5>';
-            }));
-            continue;
-        }
-        if (line.match(/^####\s+(.+)$/)) {
-            flushParagraph();
-            let lineNum = i;
-            result.push(line.replace(/^####\s+(.+)$/, function (match, content) {
-                return '<h4 data-line="' + lineNum + '">' + applyInlineStyles(content) + '</h4>';
-            }));
-            continue;
-        }
-        if (line.match(/^###\s+(.+)$/)) {
-            flushParagraph();
-            let lineNum = i;
-            result.push(line.replace(/^###\s+(.+)$/, function (match, content) {
-                return '<h3 data-line="' + lineNum + '">' + applyInlineStyles(content) + '</h3>';
-            }));
-            continue;
-        }
-        if (line.match(/^##\s+(.+)$/)) {
-            flushParagraph();
-            let lineNum = i;
-            result.push(line.replace(/^##\s+(.+)$/, function (match, content) {
-                return '<h2 data-line="' + lineNum + '">' + applyInlineStyles(content) + '</h2>';
-            }));
-            continue;
-        }
-        if (line.match(/^#\s+(.+)$/)) {
-            flushParagraph();
-            let lineNum = i;
-            result.push(line.replace(/^#\s+(.+)$/, function (match, content) {
-                return '<h1 data-line="' + lineNum + '">' + applyInlineStyles(content) + '</h1>';
-            }));
+            var level = headingMatch[1].length;
+            var content = headingMatch[2];
+            result.push('<h' + level + ' data-line="' + i + '">' + applyInlineStyles(content) + '</h' + level + '>');
             continue;
         }
 
@@ -1146,6 +1111,37 @@ function parseMarkdown(text) {
 }
 
 /**
+ * Render markdown content into a preview div, with optional post-processing
+ * (Mermaid, math, syntax highlighting, interactivity).
+ */
+function renderMarkdownPreview(previewDiv, markdownContent, noteId, options) {
+    options = options || {};
+    var placeholder = options.placeholder || (window.t ? window.t('editor.messages.preview_mode_hint', null, 'You are in preview mode. Switch to edit mode using the button in the toolbar to start writing markdown.') : 'You are in preview mode. Switch to edit mode using the button in the toolbar to start writing markdown.');
+    var postProcess = options.postProcess !== false;
+    var delay = options.delay || 100;
+
+    if (markdownContent.trim() === '') {
+        previewDiv.innerHTML = '<div class="markdown-preview-placeholder">' + placeholder + '</div>';
+        previewDiv.classList.add('empty');
+    } else {
+        previewDiv.innerHTML = parseMarkdown(markdownContent);
+        previewDiv.classList.remove('empty');
+        if (postProcess && noteId) {
+            setTimeout(function () {
+                initMermaid();
+                if (typeof renderMathInElement === 'function') {
+                    renderMathInElement(previewDiv);
+                }
+                if (typeof applySyntaxHighlighting === 'function') {
+                    applySyntaxHighlighting(previewDiv);
+                }
+                setupPreviewInteractivity(noteId);
+            }, delay);
+        }
+    }
+}
+
+/**
  * Initialize markdown note functionality
  */
 function initializeMarkdownNote(noteId) {
@@ -1245,13 +1241,7 @@ function initializeMarkdownNote(noteId) {
     var previewDiv = document.createElement('div');
     previewDiv.className = 'markdown-preview';
     // Set preview content or placeholder if empty
-    if (isEmpty) {
-        previewDiv.innerHTML = '<div class="markdown-preview-placeholder">' + window.t('editor.messages.preview_mode_hint', null, 'You are in preview mode. Switch to edit mode using the button in the toolbar to start writing markdown.') + '</div>';
-        previewDiv.classList.add('empty');
-    } else {
-        previewDiv.innerHTML = parseMarkdown(markdownContent);
-        previewDiv.classList.remove('empty');
-    }
+    renderMarkdownPreview(previewDiv, markdownContent, noteId, { postProcess: false });
 
     // Create container for editor
     var editorContainer = document.createElement('div');
@@ -1528,6 +1518,9 @@ function switchToPreviewMode(noteId) {
     var noteEntry = document.getElementById('entry' + noteId);
     if (!noteEntry) return;
 
+    // Read previous content BEFORE we overwrite the attribute below
+    var previousContent = noteEntry.getAttribute('data-markdown-content') || '';
+
     var previewDiv = noteEntry.querySelector('.markdown-preview');
     var editorDiv = noteEntry.querySelector('.markdown-editor');
     var editorContainer = noteEntry.querySelector('.markdown-editor-container');
@@ -1547,25 +1540,7 @@ function switchToPreviewMode(noteId) {
     var markdownContent = normalizeContentEditableText(editorDiv);
     var isEmpty = markdownContent.trim() === '';
 
-    if (isEmpty) {
-        previewDiv.innerHTML = '<div class="markdown-preview-placeholder">' + window.t('editor.messages.preview_mode_hint', null, 'You are in preview mode. Switch to edit mode using the button in the toolbar to start writing markdown.') + '</div>';
-        previewDiv.classList.add('empty');
-    } else {
-        previewDiv.innerHTML = parseMarkdown(markdownContent);
-        previewDiv.classList.remove('empty');
-        setTimeout(function () {
-            initMermaid();
-            if (typeof renderMathInElement === 'function') {
-                renderMathInElement(previewDiv);
-            }
-            // Apply syntax highlighting to code blocks
-            if (typeof applySyntaxHighlighting === 'function') {
-                applySyntaxHighlighting(previewDiv);
-            }
-            // Setup checkbox handlers (not click-to-navigate since we're in preview mode)
-            setupPreviewInteractivity(noteId);
-        }, 100);
-    }
+    renderMarkdownPreview(previewDiv, markdownContent, noteId);
 
     noteEntry.setAttribute('data-markdown-content', markdownContent);
 
@@ -1628,12 +1603,8 @@ function switchToPreviewMode(noteId) {
         console.warn('Could not save view mode to localStorage:', e);
     }
 
-    // Check if content has actually changed before triggering save
-    var previousContent = noteEntry.getAttribute('data-markdown-content') || '';
-    var currentContent = markdownContent;
-
     // Only mark as edited and trigger save if content has changed
-    if (previousContent !== currentContent) {
+    if (previousContent !== markdownContent) {
         if (typeof window.markNoteAsModified === 'function') {
             window.markNoteAsModified();
         }
@@ -1804,25 +1775,9 @@ function switchToSplitMode(noteId) {
     var markdownContent = normalizeContentEditableText(editorDiv);
     var isEmpty = markdownContent.trim() === '';
 
-    if (isEmpty) {
-        previewDiv.innerHTML = '<div class="markdown-preview-placeholder">' + window.t('editor.messages.split_preview_placeholder', null, 'Preview will appear here as you type...') + '</div>';
-        previewDiv.classList.add('empty');
-    } else {
-        previewDiv.innerHTML = parseMarkdown(markdownContent);
-        previewDiv.classList.remove('empty');
-        setTimeout(function () {
-            initMermaid();
-            if (typeof renderMathInElement === 'function') {
-                renderMathInElement(previewDiv);
-            }
-            // Apply syntax highlighting to code blocks
-            if (typeof applySyntaxHighlighting === 'function') {
-                applySyntaxHighlighting(previewDiv);
-            }
-            // Setup checkbox and click-to-navigate handlers
-            setupPreviewInteractivity(noteId);
-        }, 100);
-    }
+    renderMarkdownPreview(previewDiv, markdownContent, noteId, {
+        placeholder: window.t ? window.t('editor.messages.split_preview_placeholder', null, 'Preview will appear here as you type...') : 'Preview will appear here as you type...'
+    });
 
     noteEntry.setAttribute('data-markdown-content', markdownContent);
 
@@ -1937,27 +1892,10 @@ function setupSplitModePreviewUpdate(noteId) {
             var content = normalizeContentEditableText(editorDiv);
             var isEmpty = content.trim() === '';
 
-            if (isEmpty) {
-                previewDiv.innerHTML = '<div class="markdown-preview-placeholder">Preview will appear here as you type...</div>';
-                previewDiv.classList.add('empty');
-            } else {
-                previewDiv.innerHTML = parseMarkdown(content);
-                previewDiv.classList.remove('empty');
-
-                // Re-initialize Mermaid and Math
-                setTimeout(function () {
-                    initMermaid();
-                    if (typeof renderMathInElement === 'function') {
-                        renderMathInElement(previewDiv);
-                    }
-                    // Apply syntax highlighting to code blocks
-                    if (typeof applySyntaxHighlighting === 'function') {
-                        applySyntaxHighlighting(previewDiv);
-                    }
-                    // Re-attach checkbox and click-to-navigate handlers
-                    setupPreviewInteractivity(noteId);
-                }, 50);
-            }
+            renderMarkdownPreview(previewDiv, content, noteId, {
+                placeholder: 'Preview will appear here as you type...',
+                delay: 50
+            });
         }, 300); // 300ms debounce
     };
 
@@ -2038,22 +1976,7 @@ function toggleMarkdownCheckbox(checkbox, lineNumber) {
     // If in split mode, update the preview (but preserve checkbox states that just changed)
     if (noteEntry.classList.contains('markdown-split-mode') && previewDiv) {
         // Re-render the preview
-        previewDiv.innerHTML = parseMarkdown(newContent);
-        previewDiv.classList.remove('empty');
-
-        // Re-initialize Mermaid and Math
-        setTimeout(function () {
-            initMermaid();
-            if (typeof renderMathInElement === 'function') {
-                renderMathInElement(previewDiv);
-            }
-            // Apply syntax highlighting to code blocks
-            if (typeof applySyntaxHighlighting === 'function') {
-                applySyntaxHighlighting(previewDiv);
-            }
-            // Re-attach checkbox and click-to-navigate handlers
-            setupPreviewInteractivity(noteId);
-        }, 50);
+        renderMarkdownPreview(previewDiv, newContent, noteId, { delay: 50 });
     }
 }
 

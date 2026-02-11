@@ -1,0 +1,190 @@
+/**
+ * Checklist Styles
+ * 
+ * Complete checklist functionality including checkbox styles, text editing,
+ * checked states, nested lists, and hierarchical numbered lists.
+ */
+
+/* ===== CHECKLIST STYLES ===== */
+.checklist {
+    list-style: none;
+    padding-left: 0;
+    /* margin: 8px 0; */
+}
+
+.checklist-item {
+    display: flex;
+    align-items: flex-start;
+    /* gap: 8px; */
+    /* margin-left: 8px; */
+    line-height: 1.6;
+}
+
+.checklist-checkbox {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin-top: 3px;
+    /* Prevent checkbox from being editable */
+    pointer-events: auto;
+}
+
+.checklist-text {
+    cursor: text;
+    flex: 1;
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+    padding: 0;
+    margin-left: 8px;
+    font-size: var(--note-font-size, 15px);
+    min-height: 1.6em;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.checklist-text:focus {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+}
+
+.checklist-text:empty:before {
+    content: attr(data-placeholder);
+    color: #999;
+    pointer-events: none;
+}
+
+/* Legacy support for old input-based checklists */
+.checklist-input {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+    flex: 1;
+    min-width: 0;
+}
+
+.checklist-input:focus {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+}
+
+/* Remove focus styles from all checklist-related elements */
+.checklist * {
+    outline: none !important;
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+}
+
+.checklist *:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+}
+
+/* Checked state styles */
+.checklist-item-checked .checklist-text,
+.checklist-checkbox:checked+.checklist-text {
+    text-decoration: line-through;
+    opacity: 0.6;
+    color: #999;
+}
+
+/* Legacy support */
+.checklist-checkbox:checked+.checklist-input {
+    text-decoration: line-through;
+    opacity: 0.6;
+    color: #999;
+}
+
+/* Dark mode */
+html[data-theme='dark'] .checklist-item-checked .checklist-text,
+html[data-theme='dark'] .checklist-checkbox:checked+.checklist-text,
+body.dark-mode .checklist-item-checked .checklist-text,
+body.dark-mode .checklist-checkbox:checked+.checklist-text {
+    color: #666;
+}
+
+/* Nested checklist indentation */
+.checklist-item .checklist {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    padding-left: 24px !important;
+}
+
+/* Support multiple levels of nesting */
+.checklist-item .checklist .checklist-item .checklist {
+    padding-left: 24px !important;
+}
+
+/* Ensure checklist-item can contain nested lists properly */
+.checklist-item {
+    flex-wrap: wrap;
+}
+
+.checklist-item>.checklist {
+    flex-basis: 100%;
+    margin-left: 0;
+}
+
+/* ===== NESTED BULLET/NUMBERED LIST STYLES ===== */
+/* Ensure proper indentation for nested lists created via Tab key */
+.noteentry ul ul,
+.noteentry ul ol,
+.noteentry ol ul,
+.noteentry ol ol {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    padding-left: 24px;
+}
+
+/* Ensure list items can contain nested lists properly */
+.noteentry li>ul,
+.noteentry li>ol {
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+/* ===== HIERARCHICAL NUMBERED LISTS (1.1, 1.2, 2.1, etc.) ===== */
+/* Reset default list styling for ordered lists in notes */
+.noteentry ol {
+    counter-reset: item;
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.noteentry ol>li {
+    counter-increment: item;
+    display: block;
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
+.noteentry ol>li::before {
+    content: counters(item, ".") ". ";
+    font-weight: normal;
+    margin-right: 4px;
+}
+
+/* Ensure nested ol also uses hierarchical numbering */
+.noteentry ol ol {
+    counter-reset: item;
+    padding-left: 24px;
+}
+
+/* Add spacing to bullet list items as well (exclude checklists) */
+.noteentry ul:not(.checklist):not(.task-list)>li:not(.checklist-item):not(.task-list-item) {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}

@@ -27,7 +27,8 @@ function initializeWorkspacesAndLabels($con) {
     }
 
     if (!isset($labels) || !is_array($labels)) {
-        // Labels table is optional in some installs; default to empty labels map
+        // Labels table is not yet implemented; defaults to empty map.
+        // When implemented, $labels should map workspace names to display labels.
         $labels = [];
     }
 }

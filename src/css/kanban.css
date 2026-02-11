@@ -453,9 +453,66 @@
 
 .kanban-inline-view .kanban-board {
     flex: 1;
-    padding: 20px;
+    padding: 20px 40px;
     overflow-x: auto;
     overflow-y: hidden;
+    scroll-behavior: smooth;
+}
+
+/* Scroll Buttons */
+.kanban-board-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.kanban-scroll-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--bg-primary, #ffffff);
+    color: var(--text-primary, #1e293b);
+    border: 1px solid var(--border-color, #e2e8f0);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 101;
+    transition: all 0.2s ease;
+    opacity: 0;
+    pointer-events: none;
+    font-size: 0.7rem;
+}
+
+.kanban-board-wrapper:hover .kanban-scroll-btn {
+    opacity: 0.7;
+    pointer-events: auto;
+}
+
+.kanban-board-wrapper:hover .kanban-scroll-btn:hover {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.1);
+    background: var(--bg-hover, #f1f5f9);
+}
+
+.kanban-scroll-btn.left {
+    left: 8px;
+}
+
+.kanban-scroll-btn.right {
+    right: 8px;
+}
+
+body.dark-mode .kanban-scroll-btn {
+    background: var(--bg-tertiary, #2a2a4a);
+    color: var(--text-primary, #e2e8f0);
+    border-color: var(--border-color, #3a3a5a);
 }
 
 /* Dark mode support for inline view */
@@ -484,6 +541,10 @@ body.dark-mode .kanban-inline-header .kanban-title {
 
 /* Responsive for inline view */
 @media (max-width: 800px) {
+    .kanban-scroll-btn {
+        display: none !important;
+    }
+
     .kanban-inline-header {
         padding: 12px 16px;
         flex-wrap: wrap;

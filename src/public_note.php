@@ -1,95 +1,191 @@
 <?php
+/**
+ * Public Note Display
+ * Displays a shared note with optional password protection and theme support
+ */
+
 require_once 'config.php';
 require_once 'db_connect.php';
 require_once 'functions.php';
 require_once 'markdown_parser.php';
 
-// Support token via query param or pretty URL (/token or /workspace/token)
-$token = $_GET['token'] ?? '';
-if (empty($token)) {
-    // Try PATH_INFO (if PHP is configured to populate it)
-    $pathToken = '';
-    if (!empty($_SERVER['PATH_INFO'])) {
-        $p = trim($_SERVER['PATH_INFO'], '/');
-        if ($p !== '') {
-            // If workspace prefix present, strip it
-            if (preg_match('#^workspace/([^/]+)$#', $p, $m)) {
-                $pathToken = $m[1];
-            } else {
-                $parts = explode('/', $p);
-                $pathToken = end($parts);
-            }
-        }
-    }
+// ============================================================================
+// TOKEN EXTRACTION
+// ============================================================================
+// Support token via query param (?token=xxx) or pretty URL (/token or /workspace/token)
 
-    // If PATH_INFO didn't work, examine REQUEST_URI while stripping script dir
-    if (empty($pathToken) && !empty($_SERVER['REQUEST_URI'])) {
-        $uri = $_SERVER['REQUEST_URI'];
-        $uri = preg_replace('/\?.*$/', '', $uri);
+function extractTokenFromPath($path) {
+    if (empty($path)) {
+        return '';
+    }
+    
+    $path = trim($path, '/');
+    if ($path === '' || $path === 'index.php') {
+        return '';
+    }
+    
+    // Check for workspace/token pattern
+    if (preg_match('#^workspace/([^/]+)$#', $path, $matches)) {
+        return $matches[1];
+    }
+    
+    // Get last segment if it's not a file (no dot)
+    $parts = explode('/', $path);
+    $last = end($parts);
+    if ($last && strpos($last, '.') === false) {
+        return $last;
+    }
+    
+    return '';
+}
+
+$token = $_GET['token'] ?? '';
+$folderToken = $_GET['folder_token'] ?? '';
+$noteIdParam = $_GET['id'] ?? '';
+
+if (empty($token) && (empty($folderToken) || empty($noteIdParam))) {
+    // Try PATH_INFO first
+    if (!empty($_SERVER['PATH_INFO'])) {
+        $token = extractTokenFromPath($_SERVER['PATH_INFO']);
+    }
+    
+    // Fallback to REQUEST_URI
+    if (empty($token) && !empty($_SERVER['REQUEST_URI'])) {
+        $uri = preg_replace('/\?.*$/', '', $_SERVER['REQUEST_URI']);
         $scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+        
         if ($scriptDir && strpos($uri, $scriptDir) === 0) {
             $uri = substr($uri, strlen($scriptDir));
         }
-        $uri = trim($uri, '/');
-        if ($uri !== '' && $uri !== 'index.php') {
-            if (preg_match('#^workspace/([^/]+)$#', $uri, $m)) {
-                $pathToken = $m[1];
-            } else {
-                $parts = explode('/', $uri);
-                // If the URL points to a static file (has a dot) skip
-                $last = end($parts);
-                if ($last && strpos($last, '.') === false) {
-                    $pathToken = $last;
-                }
-            }
-        }
+        
+        $token = extractTokenFromPath($uri);
     }
-
-    if (!empty($pathToken)) {
-        $token = $pathToken;
-    }
-
-    if (empty($token)) {
+    
+    if (empty($token) && (empty($folderToken) || empty($noteIdParam))) {
         http_response_code(400);
-        echo 'Token missing';
+        echo 'Token or folder authorization missing';
         exit;
     }
 }
 
+// ============================================================================
+// DATABASE: FETCH SHARED NOTE DATA
+// ============================================================================
+
 try {
-    $stmt = $con->prepare('SELECT note_id, created, theme, indexable, password FROM shared_notes WHERE token = ?');
-    $stmt->execute([$token]);
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (!$row) {
+    $sharedNote = null;
+    $isFolderShared = false;
+
+    if (!empty($token)) {
+        $stmt = $con->prepare('SELECT note_id, created, theme, indexable, password FROM shared_notes WHERE token = ?');
+        $stmt->execute([$token]);
+        $sharedNote = $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // Fallback: Check if authorized via shared folder
+    if (!$sharedNote && !empty($folderToken) && !empty($noteIdParam)) {
+        $stmt = $con->prepare('SELECT folder_id, theme, indexable, password FROM shared_folders WHERE token = ?');
+        $stmt->execute([$folderToken]);
+        $sharedFolder = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($sharedFolder) {
+            $rootFolderId = $sharedFolder['folder_id'];
+            
+            // Verify note exists and belongs to this folder or its descendants
+            // We need to fetch the workspace to be safe or just trust the folder tree
+            $stmt = $con->prepare('SELECT id, folder_id FROM entries WHERE id = ? AND trash = 0');
+            $stmt->execute([$noteIdParam]);
+            $noteEntry = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($noteEntry) {
+                $noteFolderId = (int)$noteEntry['folder_id'];
+                
+                // Check if it's the root or a descendant
+                if ($noteFolderId === (int)$rootFolderId) {
+                    $isFolderShared = true;
+                } else {
+                    // Fetch all folders in the workspace of the root folder
+                    $stmt = $con->prepare('SELECT workspace FROM folders WHERE id = ?');
+                    $stmt->execute([$rootFolderId]);
+                    $workspaceResult = $stmt->fetch(PDO::FETCH_ASSOC);
+                    
+                    if ($workspaceResult) {
+                        $ws = $workspaceResult['workspace'];
+                        $stmt = $con->prepare('SELECT id, parent_id FROM folders WHERE workspace = ?');
+                        $stmt->execute([$ws]);
+                        $allFoldersPool = [];
+                        while ($f = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                            $allFoldersPool[$f['id']] = $f;
+                        }
+                        
+                        // Recursive check
+                        function isDescendantOf($targetId, $folderToSearch, $pool) {
+                            $current = $pool[$folderToSearch] ?? null;
+                            while ($current && $current['parent_id'] !== null) {
+                                if ((int)$current['parent_id'] === (int)$targetId) return true;
+                                $current = $pool[$current['parent_id']] ?? null;
+                            }
+                            return false;
+                        }
+                        
+                        if (isDescendantOf($rootFolderId, $noteFolderId, $allFoldersPool)) {
+                            $isFolderShared = true;
+                        }
+                    }
+                }
+
+                if ($isFolderShared) {
+                    $sharedNote = [
+                        'note_id' => $noteEntry['id'],
+                        'created' => date('Y-m-d H:i:s'), // Mock
+                        'theme' => $sharedFolder['theme'], // Inherit folder theme
+                        'indexable' => $sharedFolder['indexable'],
+                        'password' => $sharedFolder['password'] // Inherit folder password
+                    ];
+                    // Override token for session consistency if needed
+                    $token = $folderToken . '_note_' . $noteIdParam; 
+                }
+            }
+        }
+    }
+    
+    if (!$sharedNote) {
         http_response_code(404);
-        echo 'Shared note not found';
+        echo 'Shared note not found or access denied';
         exit;
     }
 
-    $note_id = $row['note_id'];
-    $indexable = isset($row['indexable']) ? (int)$row['indexable'] : 0;
-    $storedPassword = $row['password'];
+    $note_id = $sharedNote['note_id'];
+    $indexable = isset($sharedNote['indexable']) ? (int)$sharedNote['indexable'] : 0;
+    $storedPassword = $sharedNote['password'];
+    $sharedTheme = $sharedNote['theme'] ?? '';
 
-    // Check if password protection is enabled
+    // ============================================================================
+    // PASSWORD PROTECTION
+    // ============================================================================
+    
     if (!empty($storedPassword)) {
         session_start();
         $sessionKey = 'public_note_auth_' . $token;
         
-        // Check if password was submitted
+        // If accessed via a shared folder, also check the folder's session key
+        $folderSessionKey = !empty($folderToken) ? ('public_folder_auth_' . $folderToken) : '';
+        
+        $passwordError = false;
+        
+        // Handle password submission
         if (isset($_POST['note_password'])) {
-            $submittedPassword = $_POST['note_password'];
-            if (password_verify($submittedPassword, $storedPassword)) {
-                // Password correct, store in session
+            if (password_verify($_POST['note_password'], $storedPassword)) {
                 $_SESSION[$sessionKey] = true;
+                if ($folderSessionKey) $_SESSION[$folderSessionKey] = true;
             } else {
-                // Password incorrect
                 $passwordError = true;
             }
         }
         
-        // If not authenticated, show password form
-        if (!isset($_SESSION[$sessionKey]) || $_SESSION[$sessionKey] !== true) {
-            // Show password entry form
+        // Display password form if not authenticated (check both keys)
+        $isAuthenticated = !empty($_SESSION[$sessionKey]) || ($folderSessionKey && !empty($_SESSION[$folderSessionKey]));
+        if (!$isAuthenticated) {
             ?>
             <!doctype html>
             <html>
@@ -109,11 +205,8 @@ try {
                         background: #f5f5f5;
                     }
                     .password-container {
-                        /* background: white; */
                         padding: 40px;
                         border-radius: 8px;
-                        justify-items: center;
-                        /* box-shadow: 0 2px 10px rgba(0,0,0,0.1); */
                         max-width: 400px;
                         width: 90%;
                     }
@@ -165,7 +258,7 @@ try {
                 <div class="password-container">
                     <div class="lock-icon">🔒</div>
                     <h2>Password Protected</h2>
-                    <?php if (isset($passwordError)): ?>
+                    <?php if ($passwordError): ?>
                         <div class="error">Incorrect password. Please try again.</div>
                     <?php endif; ?>
                     <form method="POST">
@@ -180,9 +273,14 @@ try {
         }
     }
 
+    // ============================================================================
+    // DATABASE: FETCH NOTE CONTENT
+    // ============================================================================
+    
     $stmt = $con->prepare('SELECT heading, entry, created, updated, type FROM entries WHERE id = ?');
     $stmt->execute([$note_id]);
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
+    
     if (!$note) {
         http_response_code(404);
         echo 'Note not found';
@@ -194,29 +292,36 @@ try {
     exit;
 }
 
-// Render read-only page
-// If a file was saved for this note, prefer using it so we preserve the exact content (images, formatting).
+// ============================================================================
+// CONTENT LOADING
+// ============================================================================
+// Load content from file if available, otherwise from database
+
 $htmlFile = getEntryFilename($note_id, $note['type'] ?? 'note');
 $content = '';
+
 if (is_readable($htmlFile)) {
     $content = file_get_contents($htmlFile);
 } else {
-    // Fallback to DB field if no file exists
     $content = $note['entry'] ?? '';
 }
 
-// If this is markdown, we might want to add an "Add task" input at the bottom if it contains a tasklist
-if (isset($note['type']) && $note['type'] === 'markdown') {
-    if (strpos($content, 'class="task-list"') !== false) {
-        $addTaskHtml = '<div class="public-markdown-task-add-container" style="margin-top: 20px; padding: 10px; border-top: 1px solid #eee;">';
-        $addTaskHtml .= '<input type="text" class="task-input public-markdown-task-add-input" placeholder="'.t('tasklist.input_placeholder', [], 'Add a task...').'" />';
-        $addTaskHtml .= '</div>';
-        $content .= $addTaskHtml;
-    }
+// ============================================================================
+// CONTENT RENDERING BY TYPE
+// ============================================================================
+
+$noteType = $note['type'] ?? 'note';
+
+// Markdown with tasklist: add task input
+if ($noteType === 'markdown' && strpos($content, 'class="task-list"') !== false) {
+    $addTaskHtml = '<div class="public-markdown-task-add-container" style="margin-top: 20px; padding: 10px; border-top: 1px solid #eee;">';
+    $addTaskHtml .= '<input type="text" class="task-input public-markdown-task-add-input" placeholder="'.t('tasklist.input_placeholder', [], 'Add a task...').'" />';
+    $addTaskHtml .= '</div>';
+    $content .= $addTaskHtml;
 }
 
-// If this is a tasklist type, try to parse the stored JSON and render a readable task list
-if (isset($note['type']) && $note['type'] === 'tasklist') {
+// Tasklist: parse JSON and render tasks
+if ($noteType === 'tasklist') {
     $decoded = json_decode($content, true);
     if (is_array($decoded)) {
         // Sort tasks: uncompleted first, then completed
@@ -250,26 +355,28 @@ if (isset($note['type']) && $note['type'] === 'tasklist') {
         $tasksHtml .= '</div></div>';
         $content = $tasksHtml;
     } else {
-        // If JSON parse fails, escape raw content
         $content = '<pre>' . htmlspecialchars($content, ENT_QUOTES) . '</pre>';
     }
 }
 
-// If this is a markdown type, parse the markdown content and render it as HTML
-if (isset($note['type']) && $note['type'] === 'markdown') {
-    // The content is raw markdown, we need to convert it to HTML
+// Markdown: convert to HTML
+if ($noteType === 'markdown') {
     $content = parseMarkdown($content);
 }
 
+// ============================================================================
+// URL REWRITING FOR ATTACHMENTS
+// ============================================================================
+
 $baseUrl = '//' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
-// If the app is in a subdirectory, ensure the base includes the script dir
 $scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+
 if ($scriptDir && $scriptDir !== '/') {
     $baseUrl .= $scriptDir;
 }
 
-// Replace src and href references that point to relative attachments path
-// This handles both legacy "data/attachments/" and multi-user "data/users/ID/attachments/"
+// Convert relative attachment paths to absolute URLs
+// Handles: data/attachments/ and data/users/ID/attachments/
 $content = preg_replace_callback('#(src|href)=(["\']?)(/?data/(?:users/\d+/)?attachments/)([^"\'\s>]+)(["\']?)#i', function($m) use ($baseUrl) {
     $attr = $m[1];
     $quote = $m[2] ?: '';
@@ -282,8 +389,7 @@ $content = preg_replace_callback('#(src|href)=(["\']?)(/?data/(?:users/\d+/)?att
     return $attr . '=' . $quote . $url . $quote;
 }, $content);
 
-// Also handle API attachment URLs (used by videos and images inserted via slash menu)
-// Convert relative API URLs to absolute URLs
+// Convert API attachment URLs to absolute URLs
 $content = preg_replace_callback('#(src|href)=(["\']?)(/?api/v1/notes/\d+/attachments/[^"\'\s>]+)(["\']?)#i', function($m) use ($baseUrl) {
     $attr = $m[1];
     $quote = $m[2] ?: '';
@@ -294,7 +400,11 @@ $content = preg_replace_callback('#(src|href)=(["\']?)(/?api/v1/notes/\d+/attach
     return $attr . '=' . $quote . $url . $quote;
 }, $content);
 
-// Protect video and iframe tags before sanitization (especially important for HTML notes)
+// ============================================================================
+// XSS SANITIZATION
+// ============================================================================
+// Protect media elements, sanitize scripts, then restore protected elements
+
 $protectedElements = [];
 $protectedIndex = 0;
 
@@ -322,7 +432,7 @@ $content = preg_replace_callback('/<iframe\s+([^>]+)>\s*<\/iframe>/is', function
     return $placeholder;
 }, $content);
 
-// Light sanitization: remove <script>...</script> blocks and inline event handlers (on*) to reduce XSS risk
+// Remove script tags and inline event handlers
 $content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $content);
 $content = preg_replace_callback('#<([a-zA-Z0-9]+)([^>]*)>#', function($m) {
     $tag = $m[1];
@@ -338,15 +448,22 @@ $content = preg_replace_callback('/\x00P(VIDEO|AUDIO|IFRAME)(\d+)\x00/', functio
     return isset($protectedElements[$index]) ? $protectedElements[$index] : $matches[0];
 }, $content);
 
-?>
-<?php
-// Determine theme: prefer stored theme on the shared link, else URL param, else default 'light'
+// ============================================================================
+// THEME DETERMINATION
+// ============================================================================
+// Priority: 1) Stored theme 2) URL parameter 3) Default (light)
+
 $theme = 'light';
-if (!empty($row['theme']) && in_array($row['theme'], ['dark', 'light'])) {
-    $theme = $row['theme'];
+
+if (!empty($sharedTheme) && in_array($sharedTheme, ['dark', 'light'])) {
+    $theme = $sharedTheme;
 } elseif (isset($_GET['theme']) && in_array($_GET['theme'], ['dark', 'light'])) {
     $theme = $_GET['theme'];
 }
+
+// ============================================================================
+// HTML OUTPUT
+// ============================================================================
 ?>
 <!doctype html>
 <html data-theme="<?php echo htmlspecialchars($theme); ?>">
@@ -396,7 +513,16 @@ if (!empty($row['theme']) && in_array($row['theme'], ['dark', 'light'])) {
     <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/solid.min.css">
     <link rel="stylesheet" href="css/light.min.css">
-    <link rel="stylesheet" href="css/dark-mode.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode.css') ? filemtime(__DIR__ . '/css/dark-mode.css') : '1'; ?>">
+    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/variables.css') ? filemtime(__DIR__ . '/css/dark-mode/variables.css') : '1'; ?>">
+    <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/layout.css') ? filemtime(__DIR__ . '/css/dark-mode/layout.css') : '1'; ?>">
+    <link rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/menus.css') ? filemtime(__DIR__ . '/css/dark-mode/menus.css') : '1'; ?>">
+    <link rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/editor.css') ? filemtime(__DIR__ . '/css/dark-mode/editor.css') : '1'; ?>">
+    <link rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/modals.css') ? filemtime(__DIR__ . '/css/dark-mode/modals.css') : '1'; ?>">
+    <link rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/components.css') ? filemtime(__DIR__ . '/css/dark-mode/components.css') : '1'; ?>">
+    <link rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/pages.css') ? filemtime(__DIR__ . '/css/dark-mode/pages.css') : '1'; ?>">
+    <link rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/markdown.css') ? filemtime(__DIR__ . '/css/dark-mode/markdown.css') : '1'; ?>">
+    <link rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/kanban.css') ? filemtime(__DIR__ . '/css/dark-mode/kanban.css') : '1'; ?>">
+    <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/icons.css') ? filemtime(__DIR__ . '/css/dark-mode/icons.css') : '1'; ?>">
     <link rel="stylesheet" href="css/public_note.css?v=<?php echo filemtime(__DIR__ . '/css/public_note.css'); ?>">
     <link rel="stylesheet" href="css/modal-alerts.css">
     <link rel="stylesheet" href="css/tasks.css">

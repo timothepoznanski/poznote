@@ -1,0 +1,221 @@
+/* ============================================
+   Modal System - Alerts & Utilities
+   Alert banners, text helpers, margins, misc
+   ============================================ */
+
+/* ============================================
+   Alert Banners
+   ============================================ */
+
+.alert {
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.error-content {
+    text-align: center;
+    padding: 20px;
+    color: #d32f2f;
+}
+
+.error-content i {
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+/* ============================================
+   Modal Footer Buttons
+   ============================================ */
+
+.modal-footer .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.modal-footer .btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.modal-footer .btn-primary {
+    background: #007DB8;
+    color: white;
+}
+
+.modal-footer .btn:hover {
+    opacity: 0.9;
+}
+
+/* Disabled & Danger in modals */
+.modal .btn-disabled {
+    background: #cccccc !important;
+    color: #888888 !important;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: not-allowed !important;
+    opacity: 0.6;
+}
+
+.modal .btn-disabled:hover {
+    background: #cccccc !important;
+    cursor: not-allowed !important;
+}
+
+.modal .btn-danger {
+    background: #e04b4b !important;
+    color: #fff !important;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    opacity: 1;
+}
+
+.modal .btn-danger:hover {
+    background: #c43b3b !important;
+}
+
+/* ============================================
+   Utility: Hidden
+   ============================================ */
+
+.initially-hidden {
+    display: none;
+}
+
+/* ============================================
+   Text Utilities
+   ============================================ */
+
+.text-danger {
+    color: #dc3545;
+}
+
+.text-muted {
+    color: #6c757d;
+}
+
+.text-small {
+    font-size: 14px;
+}
+
+.text-small-muted {
+    color: #6c757d;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+/* ============================================
+   Margin Utilities
+   ============================================ */
+
+.mt-8 {
+    margin-top: 8px;
+}
+
+.mt-10 {
+    margin-top: 10px;
+}
+
+.mt-12 {
+    margin-top: 12px;
+}
+
+.mt-16 {
+    margin-top: 16px;
+}
+
+.mb-10 {
+    margin-bottom: 10px;
+}
+
+.mb-15 {
+    margin-bottom: 15px;
+}
+
+/* ============================================
+   Delete Folder Message
+   ============================================ */
+
+.delete-folder-message {
+    margin: 15px 0;
+}
+
+.delete-folder-main-message {
+    margin-bottom: 10px;
+}
+
+.delete-folder-details {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.delete-folder-note {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* ============================================
+   Misc Modal Helpers
+   ============================================ */
+
+.modal-info-message {
+    margin-top: 12px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.modal-body-spaced {
+    margin-bottom: 10px;
+}
+
+.new-folder-input {
+    width: 100%;
+    padding: 8px 12px;
+    margin-bottom: 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
+}
+
+.timezone-select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.default-font-size-info {
+    display: block;
+}
+
+.backup-warning-text {
+    color: #dc3545;
+}

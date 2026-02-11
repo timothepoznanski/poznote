@@ -60,11 +60,11 @@ class WorkspacesController {
             return;
         }
         
-        if (!preg_match('/^[A-Za-z0-9_-]+$/', $name)) {
+        if (!preg_match('/^[\p{L}0-9 _-]+$/u', $name)) {
             http_response_code(400);
             echo json_encode([
                 'success' => false,
-                'message' => 'Invalid name: use letters, numbers, dash or underscore only'
+                'message' => 'Invalid name: use letters (including accented), numbers, spaces, dash or underscore only'
             ]);
             return;
         }
@@ -116,11 +116,11 @@ class WorkspacesController {
             return;
         }
         
-        if (!preg_match('/^[A-Za-z0-9_-]+$/', $newName)) {
+        if (!preg_match('/^[\p{L}0-9 _-]+$/u', $newName)) {
             http_response_code(400);
             echo json_encode([
                 'success' => false,
-                'message' => 'Invalid new name: use letters, numbers, dash or underscore only'
+                'message' => 'Invalid new name: use letters (including accented), numbers, spaces, dash or underscore only'
             ]);
             return;
         }

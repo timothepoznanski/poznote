@@ -153,7 +153,7 @@ class SystemController {
             return ['success' => true, 'valid' => true, 'message' => 'No password configured'];
         }
         
-        if ($password === $configuredPassword) {
+        if (hash_equals($configuredPassword, $password)) {
             // Set session flag
             $_SESSION['settings_authenticated'] = true;
             return ['success' => true, 'valid' => true];
@@ -170,7 +170,62 @@ class SystemController {
         $workspace = $_GET['workspace'] ?? null;
         
         try {
-            $query = "SELECT 
+            // 1. Get all shared folders to check if notes are shared via folder
+            $sharedFoldersQuery = "SELECT sf.folder_id, sf.token, f.name as folder_name, f.workspace 
+                FROM shared_folders sf 
+                INNER JOIN folders f ON sf.folder_id = f.id";
+            $sfStmt = $this->con->prepare($sharedFoldersQuery);
+            $sfStmt->execute();
+            $sharedFolders = $sfStmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Create a map of folder_id => folder info
+            $sharedFolderMap = [];
+            foreach ($sharedFolders as $sf) {
+                // filter by workspace if requested
+                if ($workspace && $sf['workspace'] !== $workspace) continue;
+                $sharedFolderMap[$sf['folder_id']] = [
+                    'token' => $sf['token'],
+                    'name' => $sf['folder_name']
+                ];
+            }
+
+            // 2. Get all folders to build hierarchy and identifies descendant shares
+            $folderQuery = "SELECT id, name, parent_id, workspace FROM folders";
+            $fParams = [];
+            if ($workspace) {
+                $folderQuery .= " WHERE workspace = ?";
+                $fParams[] = $workspace;
+            }
+            $stmtF = $this->con->prepare($folderQuery);
+            $stmtF->execute($fParams);
+            $allFoldersPool = [];
+            while ($f = $stmtF->fetch(PDO::FETCH_ASSOC)) {
+                $allFoldersPool[$f['id']] = $f;
+            }
+
+            // Identify all shared folder IDs (direct or descendants)
+            $allSharedFolderIds = [];
+            foreach ($sharedFolderMap as $fid => $info) {
+                $allSharedFolderIds[] = (int)$fid;
+                
+                // Recursive helper to get descendants
+                $getDescendants = function($parentId, $pool) use (&$getDescendants) {
+                    $ids = [];
+                    foreach ($pool as $id => $f) {
+                        if ($f['parent_id'] !== null && (int)$f['parent_id'] === (int)$parentId) {
+                            $ids[] = (int)$id;
+                            $ids = array_merge($ids, $getDescendants($id, $pool));
+                        }
+                    }
+                    return $ids;
+                };
+                
+                $allSharedFolderIds = array_merge($allSharedFolderIds, $getDescendants($fid, $allFoldersPool));
+            }
+            $allSharedFolderIds = array_unique($allSharedFolderIds);
+
+            // 3. Get notes that are explicitly shared
+            $explicitQuery = "SELECT 
                 sn.id as share_id,
                 sn.note_id,
                 sn.token,
@@ -186,37 +241,66 @@ class SystemController {
             FROM shared_notes sn
             INNER JOIN entries e ON sn.note_id = e.id
             WHERE e.trash = 0";
-            $params = [];
             
+            $explicitParams = [];
             if ($workspace) {
-                $query .= " AND e.workspace = ?";
-                $params[] = $workspace;
+                $explicitQuery .= " AND e.workspace = ?";
+                $explicitParams[] = $workspace;
             }
             
-            $query .= " ORDER BY sn.created DESC";
+            $stmt = $this->con->prepare($explicitQuery);
+            $stmt->execute($explicitParams);
+            $explicitNotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 4. Get notes that are shared via folder
+            $folderNotes = [];
+            if (!empty($allSharedFolderIds)) {
+                $placeholders = implode(',', array_fill(0, count($allSharedFolderIds), '?'));
+                $folderNoteQuery = "SELECT 
+                    NULL as share_id,
+                    e.id as note_id,
+                    sn.token as token,
+                    NULL as theme,
+                    NULL as indexable,
+                    0 as hasPassword,
+                    e.created as shared_date,
+                    e.heading,
+                    e.folder,
+                    e.folder_id,
+                    e.workspace,
+                    e.updated
+                FROM entries e
+                LEFT JOIN shared_notes sn ON e.id = sn.note_id
+                WHERE e.folder_id IN ($placeholders) AND e.trash = 0";
+                
+                $stmt = $this->con->prepare($folderNoteQuery);
+                $stmt->execute(array_values($allSharedFolderIds));
+                $folderNotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }
+
+            // Merge and deduplicate by note_id
+            $shared_notes = [];
+            $seenNoteIds = [];
             
-            $stmt = $this->con->prepare($query);
-            $stmt->execute($params);
-            $shared_notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            // Get all shared folders to check if notes are shared via folder
-            $sharedFoldersQuery = "SELECT sf.folder_id, sf.token, f.name as folder_name 
-                FROM shared_folders sf 
-                INNER JOIN folders f ON sf.folder_id = f.id";
-            $sfStmt = $this->con->prepare($sharedFoldersQuery);
-            $sfStmt->execute();
-            $sharedFolders = $sfStmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            // Create a map of folder_id => folder info
-            $sharedFolderMap = [];
-            foreach ($sharedFolders as $sf) {
-                $sharedFolderMap[$sf['folder_id']] = [
-                    'token' => $sf['token'],
-                    'name' => $sf['folder_name']
-                ];
+            // Prioritize explicit shares (they have tokens and settings)
+            foreach ($explicitNotes as $note) {
+                $shared_notes[] = $note;
+                $seenNoteIds[$note['note_id']] = true;
             }
             
-            // Build URLs for each shared note
+            foreach ($folderNotes as $note) {
+                if (!isset($seenNoteIds[$note['note_id']])) {
+                    $shared_notes[] = $note;
+                    $seenNoteIds[$note['note_id']] = true;
+                }
+            }
+            
+            // Sort by date desc
+            usort($shared_notes, function($a, $b) {
+                return strcmp($b['shared_date'], $a['shared_date']);
+            });
+
+            // Build URLs and path for each shared note
             $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
             $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
             if ($scriptDir === '/' || $scriptDir === '\\' || $scriptDir === '.') {
@@ -226,23 +310,40 @@ class SystemController {
             $scriptDir = rtrim($scriptDir, '/\\');
             // Remove /api/v1 from the path
             $scriptDir = preg_replace('#/api/v1$#', '', $scriptDir);
-            $base = '//' . $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '');
+            $base = ($_SERVER['HTTPS'] ?? '') === 'on' ? 'https://' : 'http://';
+            $base .= $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '');
             
             foreach ($shared_notes as &$note) {
                 $token = $note['token'];
-                $note['url'] = $base . '/' . rawurlencode($token);
-                $note['url_query'] = $base . '/public_note.php?token=' . rawurlencode($token);
-                $note['url_workspace'] = $base . '/workspace/' . rawurlencode($token);
+                if ($token) {
+                    $note['url'] = $base . '/' . rawurlencode($token);
+                    $note['url_query'] = $base . '/public_note.php?token=' . rawurlencode($token);
+                    $note['url_workspace'] = $base . '/workspace/' . rawurlencode($token);
+                }
                 
-                // Check if this note is in a shared folder
-                $folderId = $note['folder_id'] ?? null;
-                if ($folderId && isset($sharedFolderMap[$folderId])) {
-                    $note['shared_via_folder'] = true;
-                    $note['shared_folder_name'] = $sharedFolderMap[$folderId]['name'];
-                    $note['shared_folder_token'] = $sharedFolderMap[$folderId]['token'];
-                    $note['shared_folder_url'] = $base . '/folder/' . rawurlencode($sharedFolderMap[$folderId]['token']);
-                } else {
-                    $note['shared_via_folder'] = false;
+                // Add full folder path
+                $note['folder_path'] = getFolderPath($note['folder_id'], $this->con);
+                
+                // Check if this note is in a shared folder (direct or ancestor)
+                $note['shared_via_folder'] = false;
+                $currId = $note['folder_id'] ?? null;
+                $maxDepth = 20;
+                $depth = 0;
+                while ($currId !== null && isset($allFoldersPool[$currId]) && $depth < $maxDepth) {
+                    if (isset($sharedFolderMap[$currId])) {
+                        $note['shared_via_folder'] = true;
+                        $note['shared_folder_name'] = $sharedFolderMap[$currId]['name'];
+                        $note['shared_folder_token'] = $sharedFolderMap[$currId]['token'];
+                        $note['shared_folder_url'] = $base . '/folder/' . rawurlencode($sharedFolderMap[$currId]['token']);
+                        
+                        // If no explicit token, build URL via folder token
+                        if (!$note['token']) {
+                            $note['url'] = $base . '/public_note.php?id=' . $note['note_id'] . '&folder_token=' . rawurlencode($note['shared_folder_token']);
+                        }
+                        break;
+                    }
+                    $currId = $allFoldersPool[$currId]['parent_id'];
+                    $depth++;
                 }
             }
             
