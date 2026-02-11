@@ -9,10 +9,12 @@ RUN apk add --no-cache \
     sqlite-dev \
     libzip-dev \
     libzip \
+    curl-dev \
+    ca-certificates \
     supervisor \
     && docker-php-ext-configure zip \
-    && docker-php-ext-install pdo pdo_sqlite zip \
-    && apk del --no-cache sqlite-dev libzip-dev
+    && docker-php-ext-install pdo pdo_sqlite zip curl \
+    && apk del --no-cache sqlite-dev libzip-dev curl-dev
 
 # Copy configuration files
 RUN mkdir -p /etc/nginx/http.d /usr/local/etc/php-fpm.d /usr/local/etc/php /etc/supervisor/conf.d

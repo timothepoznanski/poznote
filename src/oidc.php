@@ -99,16 +99,19 @@ function oidc_http_request($url, $method = 'GET', $headers = [], $body = null, $
     $respBody = @file_get_contents($url, false, $ctx);
     $status = 0;
     if (isset($http_response_header) && is_array($http_response_header)) {
+        // Use the LAST HTTP status line to get the final response status
+        // (after any redirects like 301/302)
         foreach ($http_response_header as $line) {
             if (preg_match('#^HTTP/\S+\s+(\d+)#', $line, $m)) {
                 $status = (int)$m[1];
-                break;
             }
         }
     }
 
     if ($respBody === false) {
-        return ['ok' => false, 'status' => $status, 'headers' => [], 'body' => '', 'error' => 'http request failed'];
+        $lastErr = error_get_last();
+        $errMsg = $lastErr ? $lastErr['message'] : 'http request failed';
+        return ['ok' => false, 'status' => $status, 'headers' => [], 'body' => '', 'error' => $errMsg];
     }
 
     return ['ok' => $status >= 200 && $status < 300, 'status' => $status, 'headers' => [], 'body' => $respBody, 'error' => null];
@@ -142,7 +145,11 @@ function oidc_get_provider_config() {
 
     $resp = oidc_http_request($discoveryUrl, 'GET', ['Accept: application/json']);
     if (!$resp['ok']) {
-        throw new Exception('Failed to fetch OIDC discovery document');
+        $detail = 'URL=' . $discoveryUrl . ', status=' . ($resp['status'] ?? 'none');
+        if (!empty($resp['error'])) {
+            $detail .= ', error=' . $resp['error'];
+        }
+        throw new Exception('Failed to fetch OIDC discovery document (' . $detail . ')');
     }
 
     $cfg = json_decode($resp['body'], true);
