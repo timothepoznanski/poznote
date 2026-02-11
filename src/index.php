@@ -862,17 +862,17 @@ $body_classes = trim($extra_body_classes);
 <script src="js/events-navigation.js?v=<?php echo $v; ?>"></script>
 <script src="js/events-rich-text-editing.js?v=<?php echo $v; ?>"></script>
 <script src="js/events-text-selection.js?v=<?php echo $v; ?>"></script>
-<script src="js/utils.js"></script>
-<script src="js/search-highlight.js"></script>
+<script src="js/utils.js?v=<?php echo $v; ?>"></script>
+<script src="js/search-highlight.js?v=<?php echo $v; ?>"></script>
 <script src="js/slash-command.js?v=<?php echo $v; ?>"></script>
-<script src="js/share.js"></script>
+<script src="js/share.js?v=<?php echo $v; ?>"></script>
 <script src="js/folder-hierarchy.js?v=<?php echo $v; ?>"></script>
 <script src="js/math-renderer.js?v=<?php echo $v; ?>"></script>
 <script src="js/modals-events.js?v=<?php echo $v; ?>"></script>
 <script src="js/index-events.js?v=<?php echo $v; ?>"></script>
 <script src="js/main.js?v=<?php echo $v; ?>"></script>
-<script src="js/resize-column.js"></script>
-<script src="js/unified-search.js"></script>
+<script src="js/resize-column.js?v=<?php echo $v; ?>"></script>
+<script src="js/unified-search.js?v=<?php echo $v; ?>"></script>
 <script src="js/clickable-tags.js?v=<?php echo $v; ?>"></script>
 <script src="js/font-size-settings.js?v=<?php echo $v; ?>"></script>
 <script src="js/background-settings.js?v=<?php echo $v; ?>"></script>
