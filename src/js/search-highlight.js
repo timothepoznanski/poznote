@@ -74,15 +74,21 @@ function highlightSearchTerms() {
         return;
     }
     
-    // Check if we're in notes search mode
+    // Check if we're in notes or tags search mode
     var isNotesActive = isNotesSearchActive();
-    if (!isNotesActive) {
-        return; // Only highlight in notes search mode
+    var isTagsActive = (function() {
+        var tagsBtn = document.getElementById('search-tags-btn') || document.getElementById('search-tags-btn-mobile');
+        return (tagsBtn && tagsBtn.classList.contains('active')) || 
+               (window.searchManager && window.searchManager.currentSearchType === 'tags');
+    })();
+
+    if (!isNotesActive && !isTagsActive) {
+        return; // Only highlight in notes or tags search mode
     }
     
     // Check if we already have highlights for this exact term
     // If so, just ensure the active state is preserved - don't recreate everything
-    var existingHighlights = document.querySelectorAll('.search-highlight');
+    var existingHighlights = document.querySelectorAll('.search-highlight, .tag-highlight');
     var termUnchanged = window.searchNavigation && searchTerm === window.searchNavigation.lastTerm;
     
     if (termUnchanged && existingHighlights.length > 0) {
@@ -376,8 +382,9 @@ function clearSearchHighlights(skipResetNavigation) {
     }
 
     // Remove active highlight class from all elements
-    document.querySelectorAll('.search-highlight-active').forEach(function(el) {
+    document.querySelectorAll('.search-highlight-active, .tag-highlight').forEach(function(el) {
         el.classList.remove('search-highlight-active');
+        el.classList.remove('tag-highlight');
     });
 
     var highlights = document.querySelectorAll('.search-highlight');

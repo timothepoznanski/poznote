@@ -105,10 +105,7 @@ function applyHighlightsWithRetries() {
 
     // Reapply only the highlights relevant to the active search type
     if (activeType === 'tags') {
-        // Clear any note content highlights so tags are the only visible highlights
-        if (typeof clearSearchHighlights === 'function') {
-            try { clearSearchHighlights(); } catch (e) { /* ignore */ }
-        }
+        // Enforce tag highlighting with word-search logic for navigation support
         if (typeof window.highlightMatchingTags === 'function') {
             try {
                 var desktopTagsTerm = (document.getElementById('search-tags-hidden') && document.getElementById('search-tags-hidden').value) || '';
@@ -117,6 +114,11 @@ function applyHighlightsWithRetries() {
                 var term = desktopTagsTerm && desktopTagsTerm.trim() ? desktopTagsTerm.trim() : (mobileTagsTerm && mobileTagsTerm.trim() ? mobileTagsTerm.trim() : visible.trim());
                 window.highlightMatchingTags(term);
             } catch (e) { /* ignore */ }
+        }
+        // In tags-only mode, we still call highlightSearchTerms() to initialize word-search navigation
+        // even if it finds 0 matches in content, so that Entrée works for tags.
+        if (typeof highlightSearchTerms === 'function') {
+            try { highlightSearchTerms(); } catch (e) { /* ignore */ }
         }
     } else if (activeType === 'notes') {
         // Clear any tag UI highlights so notes highlights are the only visible highlights
@@ -143,9 +145,9 @@ function applyHighlightsWithRetries() {
                 try { highlightSearchTerms(); } catch (e) {}
             }
         } else if (activeType === 'tags') {
-            // Clear any note highlights before highlighting tags
-            if (typeof clearSearchHighlights === 'function') {
-                try { clearSearchHighlights(); } catch (e) {}
+            // Re-apply both for tags mode to ensure navigation logic is initialized
+            if (typeof highlightSearchTerms === 'function') {
+                try { highlightSearchTerms(); } catch (e) {}
             }
             if (typeof window.highlightMatchingTags === 'function') {
                 try {
