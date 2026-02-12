@@ -477,6 +477,9 @@ $body_classes = trim($extra_body_classes);
                     if (!empty($folder_filter)) {
                         $home_params[] = 'folder=' . urlencode($folder_filter);
                     }
+                    if ($search_combined) {
+                        $home_params[] = 'search_combined=1';
+                    }
 
                     // Always preserve workspace parameter 
                     if (!empty($workspace_filter)) {
