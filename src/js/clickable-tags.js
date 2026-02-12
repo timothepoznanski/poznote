@@ -289,16 +289,30 @@ function highlightMatchingTags(searchTerm, _attempt = 0) {
         const text = (el.textContent || '').trim().toLowerCase();
         const isMatch = tokens.some(tok => text === tok || text.includes(tok));
         const wrapper = el.closest('.clickable-tag-wrapper');
+        const target = wrapper || el;
+
         if (isMatch) {
-            if (wrapper) wrapper.classList.add('tag-highlight');
-            else el.classList.add('tag-highlight');
+            target.classList.add('tag-highlight');
             matched++;
         } else {
-            if (wrapper) wrapper.classList.remove('tag-highlight');
-            else el.classList.remove('tag-highlight');
+            target.classList.remove('tag-highlight');
+            target.classList.remove('search-highlight-active');
         }
     });
-    // debug logs removed
+
+    // Refresh navigation list if highlighter is available
+    if (typeof updateHighlightsList === 'function') {
+        updateHighlightsList();
+        
+        // If we have a pending scroll from a new search, and we just found tag matches
+        // (but no content matches were found yet, or we're in unified mode), trigger the scroll.
+        if (window.searchNavigation && window.searchNavigation.pendingAutoScroll && window.searchNavigation.highlights.length > 0) {
+            // Use the standard scroll function if available
+            if (typeof scrollToFirstHighlight === 'function') {
+                scrollToFirstHighlight();
+            }
+        }
+    }
 }
 
 // Expose helper so other modules can call it after AJAX reinit
