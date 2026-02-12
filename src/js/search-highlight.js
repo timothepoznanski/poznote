@@ -145,7 +145,9 @@ function highlightSearchTerms() {
                 // Apply first highlight as active and mark scroll as done
                 nav.pendingAutoScroll = false;
                 nav.currentHighlightIndex = 0;
-                nav.highlights[0].classList.add('search-highlight-active');
+                
+                // Use navigateToHighlight to ensure consistent orange class and scroll behavior
+                navigateToHighlight(0, true);
             } else if (nav.currentHighlightIndex >= 0) {
                 // Restore previous active highlight
                 var idx = Math.min(nav.currentHighlightIndex, nav.highlights.length - 1);
@@ -160,6 +162,21 @@ function highlightSearchTerms() {
  * @returns {boolean} True if in notes search mode
  */
 function isNotesSearchActive() {
+    // Check combined mode first (Unified Search)
+    try {
+        var combinedModeInput = document.getElementById('search-combined-mode');
+        var combinedModeInputMobile = document.getElementById('search-combined-mode-mobile');
+        if ((combinedModeInput && combinedModeInput.value === '1') || 
+            (combinedModeInputMobile && combinedModeInputMobile.value === '1')) {
+            return true;
+        }
+        if (window.searchManager && typeof window.searchManager.isCombinedModeActive === 'function') {
+            if (window.searchManager.isCombinedModeActive(false) || window.searchManager.isCombinedModeActive(true)) {
+                return true;
+            }
+        }
+    } catch (e) { /* ignore */ }
+
     // Method 1: Check button state
     var notesBtn = document.getElementById('search-notes-btn') || document.getElementById('search-notes-btn-mobile');
     if (notesBtn && notesBtn.classList.contains('active')) {
@@ -357,6 +374,11 @@ function clearSearchHighlights(skipResetNavigation) {
         // Always clear the highlights array of DOM nodes as they are about to be destroyed/normalized
         window.searchNavigation.highlights = [];
     }
+
+    // Remove active highlight class from all elements
+    document.querySelectorAll('.search-highlight-active').forEach(function(el) {
+        el.classList.remove('search-highlight-active');
+    });
 
     var highlights = document.querySelectorAll('.search-highlight');
     for (var i = 0; i < highlights.length; i++) {
@@ -626,8 +648,8 @@ window.searchNavigation = {
  * Update the list of available highlights in the current view
  */
 function updateHighlightsList() {
-    // Get both standard highlights and input overlays
-    var highlights = Array.from(document.querySelectorAll('.search-highlight, .input-highlight-overlay'));
+    // Get standard highlights, input overlays, and matching tags
+    var highlights = Array.from(document.querySelectorAll('.search-highlight, .input-highlight-overlay, .tag-highlight'));
     
     // Sort highlights by their position in the DOM (vertical position first, then horizontal)
     highlights.sort(function(a, b) {
@@ -658,17 +680,22 @@ function navigateToHighlight(index, smooth) {
     if (!target) return;
     
     // Remove active class from ALL highlight elements in the DOM to be safe
-    document.querySelectorAll('.search-highlight-active, .input-highlight-overlay.search-highlight-active').forEach(h => {
+    document.querySelectorAll('.search-highlight-active, .input-highlight-overlay.search-highlight-active, .tag-highlight.search-highlight-active').forEach(h => {
         h.classList.remove('search-highlight-active');
     });
     
     // Add active class
     target.classList.add('search-highlight-active');
     
-    // Scroll to the target
+    // Scroll to the target with improved scrolling settings
     if (typeof target.scrollIntoView === 'function') {
         const behavior = (smooth === false) ? 'auto' : 'smooth';
-        target.scrollIntoView({ behavior: behavior, block: 'center' });
+        try {
+            target.scrollIntoView({ behavior: behavior, block: 'center', inline: 'nearest' });
+        } catch (e) {
+            // Fallback for older browsers
+            target.scrollIntoView(behavior === 'smooth');
+        }
     }
     
     window.searchNavigation.currentHighlightIndex = index;
