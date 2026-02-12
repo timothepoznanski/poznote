@@ -708,12 +708,25 @@ function navigateToHighlight(index, smooth) {
     
     // Scroll to the target with improved scrolling settings
     if (typeof target.scrollIntoView === 'function') {
-        const behavior = (smooth === false) ? 'auto' : 'smooth';
+        const isMobile = window.innerWidth <= 800;
+        let behavior = (smooth === false) ? 'auto' : 'smooth';
+        
+        // On mobile, use a larger initial delay to ensure horizontal transitions 
+        // are underway/finished, and prefer 'auto' behavior for the vertical scroll 
+        // to avoid conflicts between horizontal/vertical smooth animations.
+        const initialDelay = isMobile ? 250 : 50;
+        if (isMobile && smooth) behavior = 'auto';
+
         try {
             // First, ensure the note content is loaded if it's a content highlight
             // then use a small delay to allow any dynamic content adjustments
             setTimeout(() => {
-                target.scrollIntoView({ behavior: behavior, block: 'center', inline: 'nearest' });
+                // On mobile, inline: 'start' ensures the target's column is aligned to the screen
+                target.scrollIntoView({ 
+                    behavior: behavior, 
+                    block: 'center', 
+                    inline: isMobile ? 'start' : 'nearest' 
+                });
                 
                 // Secondary check: if the target is still not well-positioned (async styles/images)
                 // perform a second centering call after a slightly longer delay
@@ -723,10 +736,14 @@ function navigateToHighlight(index, smooth) {
                     const isCentered = rect.top > (viewHeight * 0.2) && rect.top < (viewHeight * 0.8);
                     
                     if (!isCentered) {
-                        target.scrollIntoView({ behavior: 'auto', block: 'center', inline: 'nearest' });
+                        target.scrollIntoView({ 
+                            behavior: 'auto', 
+                            block: 'center', 
+                            inline: isMobile ? 'start' : 'nearest' 
+                        });
                     }
-                }, 300);
-            }, 50);
+                }, isMobile ? 500 : 300);
+            }, initialDelay);
         } catch (e) {
             // Fallback for older browsers
             target.scrollIntoView(behavior === 'smooth');
@@ -884,7 +901,15 @@ function _performNoteNavigation(noteList) {
  */
 function scrollToFirstHighlight() {
     // Increased timeout to ensure note content and highlights are fully rendered 
-    // before attempting to scroll to avoid inaccurate positioning
+    // before attempting to scroll to avoid inaccurate positioning.
+    const isMobile = window.innerWidth <= 800;
+    const delay = isMobile ? 800 : 400;
+
+    // On mobile, explicitly start the horizontal transition to the right column immediately
+    if (isMobile && typeof window.scrollToRightColumn === 'function') {
+        window.scrollToRightColumn();
+    }
+
     setTimeout(function() {
         updateHighlightsList();
         
@@ -896,5 +921,5 @@ function scrollToFirstHighlight() {
             // which now handles the double-check for scroll position accuracy
             navigateToHighlight(0, true);
         }
-    }, 400);
+    }, delay);
 }

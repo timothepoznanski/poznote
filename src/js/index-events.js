@@ -809,12 +809,17 @@
     window.scrollToRightColumn = function () {
         if (window.innerWidth < 800) {
             const scrollAmount = window.innerWidth;
-            document.documentElement.scrollLeft = scrollAmount;
-            document.body.scrollLeft = scrollAmount;
-            window.scrollTo({
-                left: scrollAmount,
-                behavior: 'smooth'
-            });
+            
+            // Use window.scrollTo as primary method for horizontal viewport scroll on mobile
+            if (typeof window.scrollTo === 'function') {
+                window.scrollTo({
+                    left: scrollAmount,
+                    behavior: 'smooth'
+                });
+            } else {
+                document.documentElement.scrollLeft = scrollAmount;
+                document.body.scrollLeft = scrollAmount;
+            }
         } else {
             const rightCol = document.getElementById('right_col');
             if (rightCol) {
