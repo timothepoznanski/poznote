@@ -879,7 +879,9 @@
             "select_target": "Seleccionar carpeta padre...",
             "root": "Raíz (Nivel superior)",
             "hint": "Esto moverá la carpeta y todas sus notas como subcarpeta. Seleccione \"Raíz\" para moverla al nivel superior.",
-            "move": "Mover carpeta"
+            "move": "Mover carpeta",
+            "workspace": "Espacio de trabajo de destino",
+            "parent": "Carpeta padre de destino"
         }
     },
     "notes_list": {

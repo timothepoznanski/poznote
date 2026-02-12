@@ -886,6 +886,14 @@ class SearchManager {
     }
     this.updateHiddenInputs(isMobile);
     this.hideSpecialFolders(isMobile);
+    
+    // On mobile, start the horizontal transition to the right column early.
+    // This ensures that for the FIRST search of the session, the container is 
+    // already moving when the AJAX result arrives.
+    if (isMobile && typeof window.scrollToRightColumn === 'function') {
+        window.scrollToRightColumn();
+    }
+    
     this.performAjaxSearch(elements.form, isMobile);
     }
 
@@ -1145,7 +1153,12 @@ class SearchManager {
 
             // Restore focus/caret if requested. Try immediate, then retry after short delays
             try {
-                if (this.focusAfterAjax) {
+                const isMobile = window.innerWidth <= 800;
+                // On mobile, if we have matches and are scrolling to the first match, 
+                // skip focus restoration to avoid snapping back to the left column.
+                const hasMatches = window.searchNavigation && window.searchNavigation.highlights && window.searchNavigation.highlights.length > 0;
+                
+                if (this.focusAfterAjax && !(isMobile && hasMatches)) {
                     const restore = () => {
                         const desktopInput = this.getElements(false).searchInput;
                         const mobileInput = this.getElements(true).searchInput;

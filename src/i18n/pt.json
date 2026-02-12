@@ -878,7 +878,9 @@
             "select_target": "Selecionar pasta pai...",
             "root": "Raiz (Nível superior)",
             "hint": "Isso moverá a pasta e todas as suas notas como subpasta. Selecione \"Raiz\" para movê-la para o nível superior.",
-            "move": "Mover pasta"
+            "move": "Mover pasta",
+            "workspace": "Espaço de trabalho de destino",
+            "parent": "Pasta pai de destino"
         }
     },
     "notes_list": {

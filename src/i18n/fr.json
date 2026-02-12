@@ -901,7 +901,9 @@
             "select_target": "Sélectionner le dossier parent...",
             "root": "Racine (Niveau supérieur)",
             "hint": "Ceci déplacera le dossier et toutes ses notes en tant que sous-dossier. Sélectionnez \"Racine\" pour le déplacer au niveau supérieur.",
-            "move": "Déplacer le dossier"
+            "move": "Déplacer le dossier",
+            "workspace": "Workspace de destination",
+            "parent": "Dossier parent de destination"
         }
     },
     "notes_list": {

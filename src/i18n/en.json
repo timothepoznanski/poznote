@@ -299,7 +299,9 @@
             "select_target": "Select parent folder...",
             "root": "Root (Top Level)",
             "hint": "This will move the folder and all its notes as a subfolder. Select \"Root\" to move it to the top level.",
-            "move": "Move Folder"
+            "move": "Move Folder",
+            "workspace": "Target Workspace",
+            "parent": "Target Parent Folder"
         },
         "workspaces": {
             "move_notes_title": "Move notes from",

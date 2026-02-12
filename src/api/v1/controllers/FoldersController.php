@@ -755,7 +755,8 @@ class FoldersController {
         $folderId = (int)$id;
         $data = $this->getInputData();
         
-        $workspace = isset($data['workspace']) ? trim((string)$data['workspace']) : null;
+        $workspaceParam = isset($data['workspace']) ? trim((string)$data['workspace']) : null;
+        $targetWorkspace = isset($data['target_workspace']) ? trim((string)$data['target_workspace']) : null;
         $newParentId = $data['new_parent_folder_id'] ?? $data['new_parent_id'] ?? $data['parent_id'] ?? null;
         if ($newParentId !== null) $newParentId = (int)$newParentId;
         $newParentPath = isset($data['new_parent_folder']) ? trim((string)$data['new_parent_folder']) : null;
@@ -770,13 +771,14 @@ class FoldersController {
             return;
         }
         
-        if ($workspace === null || $workspace === '') {
-            $workspace = (string)$folder['workspace'];
+        $originalWorkspace = (string)$folder['workspace'];
+        if ($targetWorkspace === null || $targetWorkspace === '') {
+            $targetWorkspace = $originalWorkspace;
         }
         
         // Validate workspace
-        if (!$this->validateWorkspace($workspace)) {
-            $this->sendError('Workspace not found', 404);
+        if (!$this->validateWorkspace($targetWorkspace)) {
+            $this->sendError('Target workspace not found', 404);
             return;
         }
         
@@ -793,14 +795,14 @@ class FoldersController {
                     $this->sendError('New parent folder not found', 404);
                     return;
                 }
-                if ((string)$pRow['workspace'] !== $workspace) {
-                    $this->sendError('New parent folder must be in the same workspace', 400);
+                if ((string)$pRow['workspace'] !== $targetWorkspace) {
+                    $this->sendError('New parent folder must be in the target workspace', 400);
                     return;
                 }
                 $targetParentId = (int)$pRow['id'];
             }
         } elseif ($newParentPath !== null && $newParentPath !== '') {
-            $resolvedParent = resolveFolderPathToId($workspace, $newParentPath, false, $this->db);
+            $resolvedParent = resolveFolderPathToId($targetWorkspace, $newParentPath, false, $this->db);
             if ($resolvedParent === null) {
                 $this->sendError('New parent folder not found', 404);
                 return;
@@ -831,13 +833,13 @@ class FoldersController {
             }
         }
         
-        // Check uniqueness under target parent
+        // Check uniqueness under target parent in target workspace
         if ($targetParentId === null) {
             $cStmt = $this->db->prepare('SELECT COUNT(*) FROM folders WHERE workspace = ? AND parent_id IS NULL AND name = ? AND id != ?');
-            $cStmt->execute([$workspace, $folderName, $folderId]);
+            $cStmt->execute([$targetWorkspace, $folderName, $folderId]);
         } else {
             $cStmt = $this->db->prepare('SELECT COUNT(*) FROM folders WHERE workspace = ? AND parent_id = ? AND name = ? AND id != ?');
-            $cStmt->execute([$workspace, $targetParentId, $folderName, $folderId]);
+            $cStmt->execute([$targetWorkspace, $targetParentId, $folderName, $folderId]);
         }
         
         if ((int)$cStmt->fetchColumn() > 0) {
@@ -845,13 +847,41 @@ class FoldersController {
             return;
         }
         
-        // Update folder
-        $uStmt = $this->db->prepare('UPDATE folders SET parent_id = ? WHERE id = ?');
-        $uStmt->execute([$targetParentId, $folderId]);
+        // Update folder and its contents recursively
+        try {
+            // Get all affected folder IDs before starting the update
+            $allAffectedFolderIds = $this->getAllFolderIds($folderId, $originalWorkspace);
+            
+            $this->db->beginTransaction();
+            
+            foreach ($allAffectedFolderIds as $fid) {
+                if ($fid === $folderId) {
+                    // Main folder: update parent_id AND workspace
+                    $uStmt = $this->db->prepare('UPDATE folders SET parent_id = ?, workspace = ? WHERE id = ?');
+                    $uStmt->execute([$targetParentId, $targetWorkspace, $fid]);
+                } else {
+                    // Subfolder: only update workspace
+                    $uStmt = $this->db->prepare('UPDATE folders SET workspace = ? WHERE id = ?');
+                    $uStmt->execute([$targetWorkspace, $fid]);
+                }
+                
+                // Update all notes in this specific folder
+                $nStmt = $this->db->prepare('UPDATE entries SET workspace = ? WHERE folder_id = ?');
+                $nStmt->execute([$targetWorkspace, $fid]);
+            }
+            
+            $this->db->commit();
+        } catch (Exception $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            $this->sendError('Failed to move folder: ' . $e->getMessage(), 500);
+            return;
+        }
         
-        // Compute new path
+        // Compute new path for the response in target workspace
         $pathStmt = $this->db->prepare('SELECT id, name, parent_id FROM folders WHERE workspace = ?');
-        $pathStmt->execute([$workspace]);
+        $pathStmt->execute([$targetWorkspace]);
         $rows = $pathStmt->fetchAll(PDO::FETCH_ASSOC);
         
         $byId = [];
@@ -870,7 +900,7 @@ class FoldersController {
             'folder' => [
                 'id' => $folderId,
                 'name' => $folderName,
-                'workspace' => $workspace,
+                'workspace' => $targetWorkspace,
                 'parent_id' => $targetParentId,
                 'path' => $this->computeFolderPath($folderId, $byId),
             ]

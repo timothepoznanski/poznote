@@ -1060,47 +1060,81 @@ function showMoveEntireFolderDialog(folderId, folderName) {
     document.getElementById('moveFolderSourceName').textContent = folderName;
     document.getElementById('moveFolderSourceName').dataset.folderId = folderId;
 
-    // Populate target folder dropdown
-    var select = document.getElementById('moveFolderTargetSelect');
-    if (!select) {
-        console.error('moveFolderTargetSelect element not found');
+    // Populate target elements
+    var wsSelect = document.getElementById('moveFolderWorkspaceSelect');
+    var folderSelect = document.getElementById('moveFolderTargetSelect');
+    if (!wsSelect || !folderSelect) {
+        console.error('Workspace or folder select element not found');
         return;
     }
 
-    select.innerHTML = '';
+    wsSelect.innerHTML = '';
+    folderSelect.innerHTML = '';
 
-    // Add "Root" option
-    var rootOption = document.createElement('option');
-    rootOption.value = '';
-    rootOption.textContent = window.t ? window.t('modals.move_folder.root', null, 'Root (Top Level)') : 'Root (Top Level)';
-    select.appendChild(rootOption);
+    // Function to populate folders based on workspace
+    var populateFolders = function (workspace, currentFolderId) {
+        folderSelect.innerHTML = '';
 
-    // Get all folders using RESTful API
-    fetch('/api/v1/notes?get_folders=1&workspace=' + encodeURIComponent(selectedWorkspace))
-        .then(function (response) { return response.json(); })
-        .then(function (data) {
-            if (data.success && data.folders) {
-                for (var targetFolderId in data.folders) {
-                    if (!data.folders.hasOwnProperty(targetFolderId)) continue;
-                    var folderData = data.folders[targetFolderId];
+        // Add "Root" option
+        var rootOption = document.createElement('option');
+        rootOption.value = '';
+        rootOption.textContent = window.t ? window.t('modals.move_folder.root', null, 'Root (Top Level)') : 'Root (Top Level)';
+        folderSelect.appendChild(rootOption);
 
-                    // Don't include the source folder itself or Favorites
-                    if (targetFolderId != folderId && targetFolderId !== 'favorites') {
-                        var option = document.createElement('option');
-                        option.value = targetFolderId;
-                        // Use full path if available, fallback to name
-                        option.textContent = folderData.path || folderData.name;
-                        select.appendChild(option);
+        // Get folders for the selected workspace
+        fetch('/api/v1/notes?get_folders=1&workspace=' + encodeURIComponent(workspace))
+            .then(function (response) { return response.json(); })
+            .then(function (data) {
+                if (data.success && data.folders) {
+                    for (var targetFolderId in data.folders) {
+                        if (!data.folders.hasOwnProperty(targetFolderId)) continue;
+                        var folderData = data.folders[targetFolderId];
+
+                        // Don't include the source folder itself or Favorites
+                        // In cross-workspace move, we can include folders with same ID if they are in different workspaces,
+                        // but since IDs are global (auto-increment), sourceFolderId is safe to exclude.
+                        if (targetFolderId != currentFolderId && targetFolderId !== 'favorites') {
+                            var option = document.createElement('option');
+                            option.value = targetFolderId;
+                            // Use full path if available, fallback to name
+                            option.textContent = folderData.path || folderData.name;
+                            folderSelect.appendChild(option);
+                        }
                     }
                 }
+            })
+            .catch(function (error) {
+                console.error('Error loading folders:', error);
+            });
+    };
+
+    // Populate workspaces
+    fetch('/api/v1/workspaces')
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+            if (data.success && data.workspaces) {
+                data.workspaces.forEach(function (ws) {
+                    var option = document.createElement('option');
+                    option.value = ws.name;
+                    option.textContent = ws.name;
+                    if (ws.name === selectedWorkspace) {
+                        option.selected = true;
+                    }
+                    wsSelect.appendChild(option);
+                });
+
+                // Initial folders population for current workspace
+                populateFolders(wsSelect.value, folderId);
             }
         })
         .catch(function (error) {
-            showNotificationPopup(
-                (window.t ? window.t('folders.errors.load_prefix', { error: String(error) }, 'Error loading folders: {{error}}') : ('Error loading folders: ' + error)),
-                'error'
-            );
+            console.error('Error loading workspaces:', error);
         });
+
+    // Update folders when workspace changes
+    wsSelect.onchange = function () {
+        populateFolders(wsSelect.value, folderId);
+    };
 }
 
 function executeMoveFolderToSubfolder() {
@@ -1108,6 +1142,7 @@ function executeMoveFolderToSubfolder() {
     var sourceFolderId = sourceFolderElement.dataset.folderId;
     var sourceFolderName = sourceFolderElement.textContent;
     var targetFolderId = document.getElementById('moveFolderTargetSelect').value;
+    var targetWorkspace = document.getElementById('moveFolderWorkspaceSelect').value;
 
     // Empty value means move to root
     var targetParentId = targetFolderId === '' ? null : parseInt(targetFolderId);
@@ -1121,7 +1156,8 @@ function executeMoveFolderToSubfolder() {
     // Prepare the request data
     var requestData = {
         folder_id: parseInt(sourceFolderId),
-        workspace: selectedWorkspace
+        workspace: selectedWorkspace,
+        target_workspace: targetWorkspace
     };
 
     // Only add new_parent_folder_id if not moving to root

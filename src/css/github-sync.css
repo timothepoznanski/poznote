@@ -65,13 +65,12 @@
 }
 
 .github-sync-footer-note {
-    margin: 0px auto 40px;
-    padding: 0px 24px 15px;
+    margin: 20px auto 0px auto;
+    padding: 0px 0px 15px;
     text-align: center;
     color: #71717a;
     font-size: 0.9rem;
     line-height: 1.6;
-    /* border-top: 1px solid #eee; */
     max-width: 700px;
 }
 
@@ -261,6 +260,9 @@
     border-radius: 10px;
     padding: 24px;
     text-align: center;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
 }
 
 .sync-action-icon {
@@ -609,8 +611,58 @@ body.dark-mode .limitations-note {
     color: #aaa;
 }
 
+.github-sync-nav {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 24px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.github-sync-nav .sync-form {
+    display: inline-block;
+    margin: 0;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
+    .github-sync-nav {
+        gap: 12px;
+        padding: 0;
+        justify-content: center;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap;
+    }
+
+    .github-sync-nav .btn {
+        flex: 0 1 auto !important;
+        width: auto !important;
+        min-width: 140px !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        padding: 8px 16px !important;
+        text-align: center !important;
+        min-height: 36px !important;
+        line-height: 1.2 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+        margin-bottom: 5px !important;
+    }
+
+    .github-sync-nav .sync-form {
+        flex: 0 1 auto;
+        display: flex;
+    }
+
+    .github-sync-nav .sync-form .btn {
+        width: auto !important;
+        margin: 0;
+    }
+
     .github-sync-header h1 {
         font-size: 1.4rem;
     }
