@@ -691,7 +691,23 @@ function navigateToHighlight(index, smooth) {
     if (typeof target.scrollIntoView === 'function') {
         const behavior = (smooth === false) ? 'auto' : 'smooth';
         try {
-            target.scrollIntoView({ behavior: behavior, block: 'center', inline: 'nearest' });
+            // First, ensure the note content is loaded if it's a content highlight
+            // then use a small delay to allow any dynamic content adjustments
+            setTimeout(() => {
+                target.scrollIntoView({ behavior: behavior, block: 'center', inline: 'nearest' });
+                
+                // Secondary check: if the target is still not well-positioned (async styles/images)
+                // perform a second centering call after a slightly longer delay
+                setTimeout(() => {
+                    const rect = target.getBoundingClientRect();
+                    const viewHeight = window.innerHeight;
+                    const isCentered = rect.top > (viewHeight * 0.2) && rect.top < (viewHeight * 0.8);
+                    
+                    if (!isCentered) {
+                        target.scrollIntoView({ behavior: 'auto', block: 'center', inline: 'nearest' });
+                    }
+                }, 300);
+            }, 50);
         } catch (e) {
             // Fallback for older browsers
             target.scrollIntoView(behavior === 'smooth');
@@ -848,10 +864,8 @@ function _performNoteNavigation(noteList) {
  * Automatically scroll to the first highlight
  */
 function scrollToFirstHighlight() {
-    // Do NOT clear pendingAutoScroll here - let highlightSearchTerms handle it
-    // This avoids race conditions with the retry mechanism
-    
-    // Wait for content to be fully rendered, then scroll to first highlight
+    // Increased timeout to ensure note content and highlights are fully rendered 
+    // before attempting to scroll to avoid inaccurate positioning
     setTimeout(function() {
         updateHighlightsList();
         
@@ -859,20 +873,9 @@ function scrollToFirstHighlight() {
             // Mark that we've handled the auto-scroll
             window.searchNavigation.pendingAutoScroll = false;
             
-            // Set index and apply active class
-            window.searchNavigation.currentHighlightIndex = 0;
-            
-            // Remove any existing active class first
-            document.querySelectorAll('.search-highlight-active').forEach(function(el) {
-                el.classList.remove('search-highlight-active');
-            });
-            
-            // Apply active class to first highlight
-            var firstHighlight = window.searchNavigation.highlights[0];
-            if (firstHighlight) {
-                firstHighlight.classList.add('search-highlight-active');
-                firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+            // Set index and apply active class via the standard navigation function
+            // which now handles the double-check for scroll position accuracy
+            navigateToHighlight(0, true);
         }
-    }, 200);
+    }, 400);
 }
