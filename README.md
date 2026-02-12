@@ -1297,6 +1297,14 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/folders/34/move
 ```
 
+Move to another workspace (recursive):
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"target_workspace": "New Workspace", "parent_id": null}' \
+  http://YOUR_SERVER/api/v1/folders/34/move
+```
+
 **Update Folder Icon**
 
 Set a custom icon:

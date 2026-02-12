@@ -1066,7 +1066,10 @@ paths:
   /folders/{id}/move:
     post:
       tags: [Folders]
-      summary: Move folder to new parent
+      summary: Move folder and its contents
+      description: |
+        Moves a folder to a new parent folder or to a different workspace.
+        This operation is **recursive**: all subfolders and notes within the folder will be moved to the target workspace.
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
         - name: id
@@ -1083,9 +1086,20 @@ paths:
                 parent_id:
                   type: integer
                   nullable: true
+                  description: ID of the new parent folder. Use `null` to move to the root level.
+                target_workspace:
+                  type: string
+                  nullable: true
+                  description: Name of the target workspace. If omitted, the folder remains in its current workspace.
       responses:
         '200':
-          description: Folder moved
+          description: Folder and all its contents moved successfully
+        '400':
+          description: Invalid request (e.g., target parent is in a different workspace)
+        '404':
+          description: Folder or target workspace not found
+        '409':
+          description: Conflict (e.g., folder with same name exists or move would create a cycle)
 
   /folders/{id}/empty:
     post:
