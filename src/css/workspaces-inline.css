@@ -74,3 +74,39 @@
 .workspace-list .btn[disabled] {
     opacity: 0.65;
 }
+
+.workspaces-nav {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+    .workspaces-nav {
+        gap: 12px;
+        padding: 0;
+        justify-content: center;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap;
+    }
+
+    .workspaces-nav .btn {
+        flex: 0 1 auto !important;
+        width: auto !important;
+        min-width: 140px !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        padding: 8px 16px !important;
+        text-align: center !important;
+        min-height: 36px !important;
+        line-height: 1.2 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+        margin-bottom: 5px !important;
+    }
+}

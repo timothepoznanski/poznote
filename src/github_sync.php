@@ -141,7 +141,7 @@ try {
 <body class="home-page">
     <div class="home-container github-sync-container">
 
-        <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 24px; justify-content: center;">
+        <div class="github-sync-nav">
             <a id="backToHomeLink" href="home.php" class="btn btn-secondary">
                 <?php echo t_h('common.back_to_home', [], 'Back to Home', $currentLang); ?>
             </a>
@@ -152,9 +152,9 @@ try {
                 <?php echo t_h('common.back_to_settings', [], 'Back to Settings', $currentLang); ?>
             </a>
             <?php if ($configStatus['enabled'] && $configStatus['configured']): ?>
-            <form method="post" class="sync-form" style="display:inline-block;">
+            <form method="post" class="sync-form">
                 <input type="hidden" name="action" value="test">
-                <button type="submit" class="btn btn-secondary">
+                <button type="submit" class="btn btn-primary">
                     <?php echo t_h('github_sync.test.button'); ?>
                 </button>
             </form>

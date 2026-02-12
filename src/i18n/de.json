@@ -879,7 +879,9 @@
             "select_target": "Übergeordneten Ordner auswählen...",
             "root": "Wurzel (Oberste Ebene)",
             "hint": "Dies verschiebt den Ordner und alle seine Notizen als Unterordner. Wählen Sie \"Wurzel\", um ihn auf die oberste Ebene zu verschieben.",
-            "move": "Ordner verschieben"
+            "move": "Ordner verschieben",
+            "workspace": "Ziel-Workspace",
+            "parent": "Ziel-Überordner"
         }
     },
     "notes_list": {
