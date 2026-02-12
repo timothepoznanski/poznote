@@ -83,6 +83,7 @@ body {
     overflow-y: hidden !important;
     -ms-overflow-style: none !important;  /* IE and Edge */
     scrollbar-width: none !important;  /* Firefox */
+    scroll-behavior: smooth !important;
     display: flex !important;
     flex-direction: row !important;
 }

@@ -807,19 +807,16 @@
      * On desktop: uses scrollIntoView
      */
     window.scrollToRightColumn = function () {
-        if (window.innerWidth < 800) {
+        if (window.innerWidth <= 800) {
             const scrollAmount = window.innerWidth;
-            
-            // Use window.scrollTo as primary method for horizontal viewport scroll on mobile
-            if (typeof window.scrollTo === 'function') {
-                window.scrollTo({
-                    left: scrollAmount,
-                    behavior: 'smooth'
-                });
-            } else {
-                document.documentElement.scrollLeft = scrollAmount;
-                document.body.scrollLeft = scrollAmount;
-            }
+            // With scroll-behavior: smooth !important in CSS, 
+            // these simple assignments will trigger the sliding animation.
+            document.documentElement.scrollLeft = scrollAmount;
+            document.body.scrollLeft = scrollAmount;
+            window.scrollTo({
+                left: scrollAmount,
+                behavior: 'smooth'
+            });
         } else {
             const rightCol = document.getElementById('right_col');
             if (rightCol) {
@@ -838,7 +835,9 @@
      * On desktop: uses scrollIntoView
      */
     window.scrollToLeftColumn = function () {
-        if (window.innerWidth < 800) {
+        if (window.innerWidth <= 800) {
+            // With scroll-behavior: smooth !important in CSS, 
+            // these simple assignments will trigger the sliding animation.
             document.documentElement.scrollLeft = 0;
             document.body.scrollLeft = 0;
             window.scrollTo({
