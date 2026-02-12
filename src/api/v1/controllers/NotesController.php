@@ -1418,32 +1418,355 @@ class NotesController {
     }
     
     /**
-     * Convert HTML to Markdown (basic implementation)
+     * POST /api/v1/notes/{id}/convert
+     * Convert note between markdown and HTML
+     */
+    public function convert(string $id): void {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $targetType = isset($input['target']) ? strtolower(trim($input['target'])) : '';
+        
+        if (!in_array($targetType, ['html', 'markdown'], true)) {
+            $this->sendError(400, 'Invalid target type. Use "html" or "markdown"');
+            return;
+        }
+        
+        try {
+            $stmt = $this->con->prepare('SELECT id, heading, type, attachments, folder_id FROM entries WHERE id = ? AND trash = 0');
+            $stmt->execute([$id]);
+            $note = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$note) {
+                $this->sendError(404, 'Note not found');
+                return;
+            }
+            
+            $currentType = $note['type'] ?? 'note';
+            
+            // Validate conversion
+            if ($targetType === 'html' && $currentType !== 'markdown') {
+                $this->sendError(400, 'Only markdown notes can be converted to HTML');
+                return;
+            }
+            
+            if ($targetType === 'markdown' && !in_array($currentType, ['note', 'html'], true)) {
+                $this->sendError(400, 'Only HTML notes can be converted to markdown');
+                return;
+            }
+            
+            $currentFilePath = getEntryFilename($id, $currentType);
+            
+            if (!file_exists($currentFilePath) || !is_readable($currentFilePath)) {
+                $this->sendError(404, 'Note file not found');
+                return;
+            }
+            
+            $content = file_get_contents($currentFilePath);
+            $attachments = $note['attachments'] ? json_decode($note['attachments'], true) : [];
+            $attachmentsToRemove = [];
+            $attachmentsDir = getAttachmentsPath();
+            
+            // Convert content
+            if ($targetType === 'markdown') {
+                // Converting HTML to markdown: extract base64 images and save as attachments
+                
+                // Find all base64 images in HTML: <img src="data:image/...;base64,...">
+                $content = preg_replace_callback(
+                    '/<img[^>]*src=["\']data:image\/([a-zA-Z0-9+]+);base64,([^"\']+)["\'][^>]*(?:alt=["\']([^"\']*)["\'])?[^>]*\/?>/is',
+                    function($matches) use ($id, $attachmentsDir, &$attachments) {
+                        $imageType = strtolower($matches[1]);
+                        $base64Data = $matches[2];
+                        $altText = isset($matches[3]) ? $matches[3] : '';
+                        
+                        $extensionMap = [
+                            'jpeg' => 'jpg', 'png' => 'png', 'gif' => 'gif',
+                            'webp' => 'webp', 'svg+xml' => 'svg', 'bmp' => 'bmp'
+                        ];
+                        $extension = $extensionMap[$imageType] ?? 'png';
+                        $mimeType = 'image/' . ($imageType === 'svg+xml' ? 'svg+xml' : $imageType);
+                        
+                        $imageData = base64_decode($base64Data);
+                        if ($imageData === false) return $matches[0];
+                        
+                        $attachmentId = uniqid();
+                        $filename = $attachmentId . '_' . time() . '.' . $extension;
+                        $filePath = $attachmentsDir . '/' . $filename;
+                        
+                        if (file_put_contents($filePath, $imageData) === false) return $matches[0];
+                        chmod($filePath, 0644);
+                        
+                        $originalFilename = !empty($altText) ? $altText . '.' . $extension : $filename;
+                        $attachments[] = [
+                            'id' => $attachmentId, 'filename' => $filename,
+                            'original_filename' => $originalFilename,
+                            'file_size' => strlen($imageData), 'file_type' => $mimeType,
+                            'uploaded_at' => date('Y-m-d H:i:s')
+                        ];
+                        
+                        return '<img src="/api/v1/notes/' . $id . '/attachments/' . $attachmentId . '" alt="' . htmlspecialchars($altText) . '">';
+                    },
+                    $content
+                );
+                
+                // Also handle case where alt comes before src
+                $content = preg_replace_callback(
+                    '/<img[^>]*alt=["\']([^"\']*)["\'][^>]*src=["\']data:image\/([a-zA-Z0-9+]+);base64,([^"\']+)["\'][^>]*\/?>/is',
+                    function($matches) use ($id, $attachmentsDir, &$attachments) {
+                        $altText = $matches[1];
+                        $imageType = strtolower($matches[2]);
+                        $base64Data = $matches[3];
+                        
+                        $extensionMap = [
+                            'jpeg' => 'jpg', 'png' => 'png', 'gif' => 'gif',
+                            'webp' => 'webp', 'svg+xml' => 'svg', 'bmp' => 'bmp'
+                        ];
+                        $extension = $extensionMap[$imageType] ?? 'png';
+                        $mimeType = 'image/' . ($imageType === 'svg+xml' ? 'svg+xml' : $imageType);
+                        
+                        $imageData = base64_decode($base64Data);
+                        if ($imageData === false) return $matches[0];
+                        
+                        $attachmentId = uniqid();
+                        $filename = $attachmentId . '_' . time() . '.' . $extension;
+                        $filePath = $attachmentsDir . '/' . $filename;
+                        
+                        if (file_put_contents($filePath, $imageData) === false) return $matches[0];
+                        chmod($filePath, 0644);
+                        
+                        $originalFilename = !empty($altText) ? $altText . '.' . $extension : $filename;
+                        $attachments[] = [
+                            'id' => $attachmentId, 'filename' => $filename,
+                            'original_filename' => $originalFilename,
+                            'file_size' => strlen($imageData), 'file_type' => $mimeType,
+                            'uploaded_at' => date('Y-m-d H:i:s')
+                        ];
+                        
+                        return '<img src="/api/v1/notes/' . $id . '/attachments/' . $attachmentId . '" alt="' . htmlspecialchars($altText) . '">';
+                    },
+                    $content
+                );
+                
+                $convertedContent = $this->htmlToMarkdown($content);
+                $newType = 'markdown';
+            } else {
+                // Converting markdown to HTML: embed image attachments as base64
+                $content = preg_replace_callback(
+                    '/!\[([^\]]*)\]\(\/api\/v1\/notes\/' . preg_quote($id, '/') . '\/attachments\/([a-zA-Z0-9]+)\)/',
+                    function($matches) use ($attachments, $attachmentsDir, &$attachmentsToRemove) {
+                        $altText = $matches[1];
+                        $attachmentId = $matches[2];
+                        
+                        foreach ($attachments as $attachment) {
+                            if (isset($attachment['id']) && $attachment['id'] === $attachmentId) {
+                                $filePath = $attachmentsDir . '/' . $attachment['filename'];
+                                if (file_exists($filePath) && is_readable($filePath)) {
+                                    $mimeType = $attachment['file_type'] ?? '';
+                                    if (strpos($mimeType, 'image/') === 0) {
+                                        $fileContent = file_get_contents($filePath);
+                                        $base64 = base64_encode($fileContent);
+                                        $dataUri = 'data:' . $mimeType . ';base64,' . $base64;
+                                        $attachmentsToRemove[] = $attachmentId;
+                                        return '![' . $altText . '](' . $dataUri . ')';
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                        return $matches[0];
+                    },
+                    $content
+                );
+                
+                require_once __DIR__ . '/../../../markdown_parser.php';
+                $convertedContent = parseMarkdown($content);
+                $newType = 'note';
+                
+                // Remove embedded image attachments from the note and delete files
+                if (!empty($attachmentsToRemove)) {
+                    $remainingAttachments = [];
+                    foreach ($attachments as $attachment) {
+                        if (in_array($attachment['id'], $attachmentsToRemove)) {
+                            $filePath = $attachmentsDir . '/' . $attachment['filename'];
+                            if (file_exists($filePath)) {
+                                unlink($filePath);
+                            }
+                        } else {
+                            $remainingAttachments[] = $attachment;
+                        }
+                    }
+                    $attachments = $remainingAttachments;
+                }
+            }
+            
+            // Create new file with converted content
+            $newFilePath = getEntryFilename($id, $newType);
+            if (file_put_contents($newFilePath, $convertedContent) === false) {
+                $this->sendError(500, 'Failed to save converted note');
+                return;
+            }
+            chmod($newFilePath, 0644);
+            
+            // Update database
+            $attachmentsJson = !empty($attachments) ? json_encode($attachments) : null;
+            $updateStmt = $this->con->prepare("UPDATE entries SET type = ?, attachments = ?, updated = datetime('now') WHERE id = ?");
+            $updateStmt->execute([$newType, $attachmentsJson, $id]);
+            
+            // Delete old file if extension changed
+            if ($currentFilePath !== $newFilePath && file_exists($currentFilePath)) {
+                unlink($currentFilePath);
+            }
+            
+            $this->sendSuccess([
+                'id' => $id,
+                'type' => $newType,
+                'message' => 'Note converted successfully'
+            ]);
+            
+        } catch (Exception $e) {
+            $this->sendError(500, 'Error converting note: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Convert HTML to Markdown
+     * Handles: headers, bold, italic, strikethrough, links, images, line breaks,
+     * paragraphs, lists (ordered/unordered/checklists), code blocks, inline code,
+     * blockquotes, callouts, toggle blocks, tables, horizontal rules, audio/video.
      */
     private function htmlToMarkdown(string $html): string {
-        // Basic HTML to Markdown conversion
         $md = $html;
         
-        // Headers
-        $md = preg_replace('/<h1[^>]*>(.*?)<\/h1>/is', "# $1\n\n", $md);
-        $md = preg_replace('/<h2[^>]*>(.*?)<\/h2>/is', "## $1\n\n", $md);
-        $md = preg_replace('/<h3[^>]*>(.*?)<\/h3>/is', "### $1\n\n", $md);
-        $md = preg_replace('/<h4[^>]*>(.*?)<\/h4>/is', "#### $1\n\n", $md);
-        $md = preg_replace('/<h5[^>]*>(.*?)<\/h5>/is', "##### $1\n\n", $md);
-        $md = preg_replace('/<h6[^>]*>(.*?)<\/h6>/is', "###### $1\n\n", $md);
+        // Remove copy buttons from code blocks first
+        $md = preg_replace('/<button[^>]*class="[^"]*code-block-copy-btn[^"]*"[^>]*>.*?<\/button>/is', '', $md);
         
-        // Bold and italic
-        $md = preg_replace('/<strong[^>]*>(.*?)<\/strong>/is', "**$1**", $md);
-        $md = preg_replace('/<b[^>]*>(.*?)<\/b>/is', "**$1**", $md);
-        $md = preg_replace('/<em[^>]*>(.*?)<\/em>/is', "*$1*", $md);
-        $md = preg_replace('/<i[^>]*>(.*?)<\/i>/is', "*$1*", $md);
+        // Remove SVG icons (callout icons, etc.)
+        $md = preg_replace('/<svg[^>]*>.*?<\/svg>/is', '', $md);
         
-        // Links
-        $md = preg_replace('/<a[^>]*href=["\']([^"\']*)["\'][^>]*>(.*?)<\/a>/is', "[$2]($1)", $md);
+        // ---- Code blocks (must be processed FIRST to protect content) ----
         
-        // Images
-        $md = preg_replace('/<img[^>]*src=["\']([^"\']*)["\'][^>]*alt=["\']([^"\']*)["\'][^>]*\/?>/is', "![$2]($1)", $md);
-        $md = preg_replace('/<img[^>]*src=["\']([^"\']*)["\'][^>]*\/?>/is', "![]($1)", $md);
+        // Handle <pre><code class="language-xxx">...</code></pre>
+        $md = preg_replace_callback('/<pre[^>]*>\s*<code[^>]*(?:class=["\'][^"\']*language-([a-zA-Z0-9_+-]+)[^"\']*["\'])[^>]*>(.*?)<\/code>\s*<\/pre>/is', function($matches) {
+            $lang = $matches[1];
+            $code = html_entity_decode($matches[2], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $code = strip_tags($code);
+            return "\n\n```" . $lang . "\n" . trim($code) . "\n```\n\n";
+        }, $md);
+        
+        // Handle <pre><code>...</code></pre> without language
+        $md = preg_replace_callback('/<pre[^>]*>\s*<code[^>]*>(.*?)<\/code>\s*<\/pre>/is', function($matches) {
+            $code = html_entity_decode($matches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $code = strip_tags($code);
+            return "\n\n```\n" . trim($code) . "\n```\n\n";
+        }, $md);
+        
+        // Handle <pre>...</pre> without <code> tag
+        $md = preg_replace_callback('/<pre[^>]*>(.*?)<\/pre>/is', function($matches) {
+            $code = html_entity_decode($matches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $code = strip_tags($code);
+            return "\n\n```\n" . trim($code) . "\n```\n\n";
+        }, $md);
+        
+        // ---- Toggle blocks (<details class="toggle-block">) ----
+        $md = preg_replace_callback('/<details[^>]*class="[^"]*toggle-block[^"]*"[^>]*>\s*<summary[^>]*>(.*?)<\/summary>\s*(?:<div[^>]*class="[^"]*toggle-content[^"]*"[^>]*>(.*?)<\/div>)?\s*<\/details>/is', function($matches) {
+            $summary = strip_tags(trim($matches[1]));
+            $content = isset($matches[2]) ? trim($matches[2]) : '';
+            $innerMd = $content ? $this->htmlToMarkdown($content) : '';
+            return "\n\n<details>\n<summary>" . $summary . "</summary>\n\n" . $innerMd . "\n\n</details>\n\n";
+        }, $md);
+        
+        // Handle generic <details>/<summary>
+        $md = preg_replace_callback('/<details[^>]*>\s*<summary[^>]*>(.*?)<\/summary>(.*?)<\/details>/is', function($matches) {
+            $summary = strip_tags(trim($matches[1]));
+            $content = trim($matches[2]);
+            $innerMd = $content ? $this->htmlToMarkdown($content) : '';
+            return "\n\n<details>\n<summary>" . $summary . "</summary>\n\n" . $innerMd . "\n\n</details>\n\n";
+        }, $md);
+        
+        // ---- Callouts (<aside class="callout callout-xxx">) ----
+        $md = preg_replace_callback('/<aside[^>]*class="[^"]*callout\s+callout-([a-z]+)[^"]*"[^>]*>\s*<div[^>]*class="[^"]*callout-title[^"]*"[^>]*>.*?<span[^>]*class="[^"]*callout-title-text[^"]*"[^>]*>(.*?)<\/span>\s*<\/div>\s*<div[^>]*class="[^"]*callout-body[^"]*"[^>]*>(.*?)<\/div>\s*<\/aside>/is', function($matches) {
+            $type = $matches[1];
+            $title = strip_tags(trim($matches[2]));
+            $body = trim($matches[3]);
+            $innerMd = $body ? $this->htmlToMarkdown($body) : '';
+            $lines = "> [!" . strtoupper($type) . "] " . $title . "\n";
+            foreach (explode("\n", $innerMd) as $line) {
+                $lines .= "> " . $line . "\n";
+            }
+            return "\n\n" . rtrim($lines) . "\n\n";
+        }, $md);
+        
+        // ---- Tables ----
+        $md = preg_replace_callback('/<table[^>]*>(.*?)<\/table>/is', function($matches) {
+            $tableHtml = $matches[1];
+            $rows = [];
+            preg_match_all('/<tr[^>]*>(.*?)<\/tr>/is', $tableHtml, $rowMatches);
+            foreach ($rowMatches[1] as $rowHtml) {
+                $cells = [];
+                preg_match_all('/<(?:th|td)[^>]*>(.*?)<\/(?:th|td)>/is', $rowHtml, $cellMatches);
+                foreach ($cellMatches[1] as $cellHtml) {
+                    $cells[] = trim(strip_tags($cellHtml));
+                }
+                if (!empty($cells)) $rows[] = $cells;
+            }
+            if (empty($rows)) return '';
+            $result = "\n\n";
+            $result .= "| " . implode(" | ", $rows[0]) . " |\n";
+            $result .= "| " . implode(" | ", array_fill(0, count($rows[0]), '---')) . " |\n";
+            for ($i = 1; $i < count($rows); $i++) {
+                while (count($rows[$i]) < count($rows[0])) $rows[$i][] = '';
+                $result .= "| " . implode(" | ", $rows[$i]) . " |\n";
+            }
+            return $result . "\n";
+        }, $md);
+        
+        // ---- Checklists / Task lists ----
+        $md = preg_replace_callback('/<li[^>]*class="[^"]*task-item[^"]*"[^>]*>.*?<input[^>]*type=["\']checkbox["\'][^>]*(checked)?[^>]*\/?>\s*(.*?)<\/li>/is', function($matches) {
+            $checked = !empty($matches[1]);
+            $text = strip_tags(trim($matches[2]));
+            return ($checked ? "- [x] " : "- [ ] ") . $text . "\n";
+        }, $md);
+        
+        $md = preg_replace_callback('/<li[^>]*>\s*<input[^>]*type=["\']checkbox["\'][^>]*(checked)?[^>]*\/?>\s*(.*?)<\/li>/is', function($matches) {
+            $checked = !empty($matches[1]);
+            $text = strip_tags(trim($matches[2]));
+            return ($checked ? "- [x] " : "- [ ] ") . $text . "\n";
+        }, $md);
+        
+        // ---- Ordered lists ----
+        $md = preg_replace_callback('/<ol[^>]*>(.*?)<\/ol>/is', function($matches) {
+            $items = [];
+            preg_match_all('/<li[^>]*>(.*?)<\/li>/is', $matches[1], $liMatches);
+            $i = 1;
+            foreach ($liMatches[1] as $liContent) {
+                $items[] = $i . ". " . strip_tags(trim($liContent));
+                $i++;
+            }
+            return "\n\n" . implode("\n", $items) . "\n\n";
+        }, $md);
+        
+        // ---- Unordered lists ----
+        $md = preg_replace_callback('/<ul[^>]*>(.*?)<\/ul>/is', function($matches) {
+            $items = [];
+            preg_match_all('/<li[^>]*>(.*?)<\/li>/is', $matches[1], $liMatches);
+            foreach ($liMatches[1] as $liContent) {
+                $text = strip_tags(trim($liContent));
+                if (!empty($text)) $items[] = "- " . $text;
+            }
+            return "\n\n" . implode("\n", $items) . "\n\n";
+        }, $md);
+        
+        // ---- Headers ----
+        $md = preg_replace('/<h1[^>]*>(.*?)<\/h1>/is', "\n\n# $1\n\n", $md);
+        $md = preg_replace('/<h2[^>]*>(.*?)<\/h2>/is', "\n\n## $1\n\n", $md);
+        $md = preg_replace('/<h3[^>]*>(.*?)<\/h3>/is', "\n\n### $1\n\n", $md);
+        $md = preg_replace('/<h4[^>]*>(.*?)<\/h4>/is', "\n\n#### $1\n\n", $md);
+        $md = preg_replace('/<h5[^>]*>(.*?)<\/h5>/is', "\n\n##### $1\n\n", $md);
+        $md = preg_replace('/<h6[^>]*>(.*?)<\/h6>/is', "\n\n###### $1\n\n", $md);
+        
+        // ---- Structural elements (Paragraphs, Divs, Line breaks) ----
+        // Doing this before inline formatting prevents bold/italic from wrapping across blocks
+        
+        // Horizontal rule
+        $md = preg_replace('/<hr\s*\/?>/i', "\n\n---\n\n", $md);
         
         // Line breaks
         $md = preg_replace('/<br\s*\/?>/i', "\n", $md);
@@ -1451,57 +1774,123 @@ class NotesController {
         // Paragraphs
         $md = preg_replace('/<p[^>]*>(.*?)<\/p>/is', "$1\n\n", $md);
         
-        // Lists
-        $md = preg_replace('/<li[^>]*>(.*?)<\/li>/is', "- $1\n", $md);
-        $md = preg_replace('/<\/?[ou]l[^>]*>/i', "\n", $md);
+        // Divs
+        $md = preg_replace('/<div[^>]*>(.*?)<\/div>/is', "$1\n", $md);
         
-        // Remove copy buttons from code blocks first
-        $md = preg_replace('/<button[^>]*class="[^"]*code-block-copy-btn[^"]*"[^>]*>.*?<\/button>/is', '', $md);
-        
-        // Code blocks (must be processed before inline code)
-        // Handle <pre><code>...</code></pre> with any attributes and whitespace
-        $md = preg_replace_callback('/<pre[^>]*>\s*<code[^>]*>(.*?)<\/code>\s*<\/pre>/is', function($matches) {
-            $code = html_entity_decode($matches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
-            return "\n```\n" . trim($code) . "\n```\n";
+        // ---- Inline formatting ----
+        // Bold: handles both <strong> and <b>, avoids double wrapping
+        $md = preg_replace_callback('/<(?:strong|b)[^>]*>(.*?)<\/(?:strong|b)>/is', function($matches) {
+            $inner = $matches[1];
+            // Keep nested formatting but strip others
+            $inner = strip_tags($inner, '<em><i><code><a><del><s><strike><u><mark><span>');
+            preg_match('/^(\s*)(.*?)(\s*)$/s', $inner, $parts);
+            $text = $parts[2];
+            if ($text === '') return $parts[1] . $parts[3];
+            return $parts[1] . '**' . $text . '**' . $parts[3];
         }, $md);
         
-        // Handle <pre>...</pre> without <code> tag
-        $md = preg_replace_callback('/<pre[^>]*>(.*?)<\/pre>/is', function($matches) {
-            $code = html_entity_decode($matches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
-            return "\n```\n" . trim($code) . "\n```\n";
+        // Italic: handles both <em> and <i>, avoids double wrapping
+        $md = preg_replace_callback('/<(?:em|i)[^>]*>(.*?)<\/(?:em|i)>/is', function($matches) {
+            if (isset($matches[0]) && strpos($matches[0], 'class="fa') !== false) return ''; // Skip FontAwesome
+            $inner = $matches[1];
+            $inner = strip_tags($inner, '<strong><b><code><a><del><s><strike><u><mark><span>');
+            preg_match('/^(\s*)(.*?)(\s*)$/s', $inner, $parts);
+            $text = $parts[2];
+            if ($text === '') return $parts[1] . $parts[3];
+            return $parts[1] . '*' . $text . '*' . $parts[3];
         }, $md);
         
-        // Handle standalone <code> blocks that might contain newlines (multi-line code without pre)
+        // Strikethrough: handles del, s, strike
+        $md = preg_replace_callback('/<(?:del|s|strike)[^>]*>(.*?)<\/(?:del|s|strike)>/is', function($matches) {
+            $inner = strip_tags($matches[1], '<strong><b><em><i><code><a><u><mark><span>');
+            preg_match('/^(\s*)(.*?)(\s*)$/s', $inner, $parts);
+            $text = $parts[2];
+            if ($text === '') return $parts[1] . $parts[3];
+            return $parts[1] . '~~' . $text . '~~' . $parts[3];
+        }, $md);
+        
+        $md = preg_replace('/<u[^>]*>(.*?)<\/u>/is', "<u>$1</u>", $md);
+        
+        $md = preg_replace_callback('/<mark[^>]*>(.*?)<\/mark>/is', function($matches) {
+            $inner = strip_tags($matches[1], '<strong><b><em><i><code><a><u><span>');
+            preg_match('/^(\s*)(.*?)(\s*)$/s', $inner, $parts);
+            $text = $parts[2];
+            if ($text === '') return $parts[1] . $parts[3];
+            return $parts[1] . '==' . $text . '==' . $parts[3];
+        }, $md);
+        
+        // Colors & Backgrounds (preserves span with style)
+        // Detect spans with style and keep them if they have color or background
+        $md = preg_replace_callback('/<span[^>]*style=["\']([^"\']*(?:color|background)[^"\']*)["\'][^>]*>(.*?)<\/span>/is', function($matches) {
+            $style = $matches[1];
+            $inner = $matches[2];
+            return '<span style="' . $style . '">' . $inner . '</span>';
+        }, $md);
+        
+        // ---- Links & Media ----
+        
+        // Inline code
         $md = preg_replace_callback('/<code[^>]*>(.*?)<\/code>/is', function($matches) {
             $code = $matches[1];
-            // If the code contains newlines, treat it as a code block
-            if (strpos($code, "\n") !== false || strlen($code) > 80) {
+            if (strpos($code, "\n") !== false || strlen($code) > 100) {
                 $code = html_entity_decode($code, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-                return "\n```\n" . trim($code) . "\n```\n";
+                $code = strip_tags($code);
+                return "\n\n```\n" . trim($code) . "\n```\n\n";
             }
-            // Otherwise, inline code with single backticks
-            return "`" . $code . "`";
+            return "`" . html_entity_decode(strip_tags($code), ENT_QUOTES | ENT_HTML5, 'UTF-8') . "`";
         }, $md);
         
-        // Blockquote
-        $md = preg_replace('/<blockquote[^>]*>(.*?)<\/blockquote>/is', "> $1\n", $md);
+        // Links
+        $md = preg_replace('/<a[^>]*href=["\']([^"\']*)["\'][^>]*>(.*?)<\/a>/is', "[$2]($1)", $md);
         
-        // Horizontal rule
-        $md = preg_replace('/<hr\s*\/?>/i', "\n---\n", $md);
+        // Images
+        $md = preg_replace('/<img[^>]*alt=["\']([^"\']*)["\'][^>]*src=["\']([^"\']*)["\'][^>]*\/?>/is', "![$1]($2)", $md);
+        $md = preg_replace('/<img[^>]*src=["\']([^"\']*)["\'][^>]*alt=["\']([^"\']*)["\'][^>]*\/?>/is', "![$2]($1)", $md);
+        $md = preg_replace('/<img[^>]*src=["\']([^"\']*)["\'][^>]*\/?>/is', "![]($1)", $md);
         
-        // Remove remaining HTML tags
-        $md = strip_tags($md);
+        // Audio / Video / Iframe
+        $md = preg_replace('/<audio[^>]*src=["\']([^"\']*)["\'][^>]*>.*?<\/audio>/is', '[$1]($1)', $md);
+        $md = preg_replace('/<video[^>]*src=["\']([^"\']*)["\'][^>]*>.*?<\/video>/is', '[$1]($1)', $md);
+        $md = preg_replace('/<iframe[^>]*src=["\']([^"\']*)["\'][^>]*>.*?<\/iframe>/is', '[$1]($1)', $md);
         
-        // Convert HTML entities to normal characters
+        // Blockquotes
+        $md = preg_replace_callback('/<blockquote[^>]*>(.*?)<\/blockquote>/is', function($matches) {
+            $inner = trim(strip_tags($matches[1], '<strong><b><em><i><code><a><u><mark><span>'));
+            $lines = explode("\n", $inner);
+            $quoted = '';
+            foreach ($lines as $line) {
+                $quoted .= "> " . trim($line) . "\n";
+            }
+            return "\n\n" . rtrim($quoted) . "\n\n";
+        }, $md);
+        
+        // ---- Cleanup ----
+        
+        // Remove span tags WITHOUT style attribute (keep those with style)
+        $md = preg_replace_callback('/<span([^>]*)>(.*?)<\/span>/is', function($matches) {
+            $attrs = $matches[1];
+            $inner = $matches[2];
+            if (stripos($attrs, 'style=') !== false) {
+                return '<span' . $attrs . '>' . $inner . '</span>';
+            }
+            return $inner;
+        }, $md);
+        
+        // Remove remaining HTML tags (keep details/summary/u/span)
+        $md = strip_tags($md, '<details><summary><u><span>');
+        
+        // ---- Convert HTML entities ----
         $md = html_entity_decode($md, ENT_QUOTES | ENT_HTML5, 'UTF-8');
         
-        // Replace non-breaking spaces with regular spaces
-        $md = str_replace("\xC2\xA0", ' ', $md);  // UTF-8 non-breaking space
+        // Replace non-breaking spaces
+        $md = str_replace("\xC2\xA0", ' ', $md);
+        // Remove zero-width spaces
+        $md = str_replace("\xE2\x80\x8B", '', $md);
         
         // Clean up lines that are only whitespace
         $md = preg_replace('/^[ \t]+$/m', '', $md);
         
-        // Clean up whitespace
+        // Clean up excessive newlines
         $md = preg_replace('/\n{3,}/', "\n\n", $md);
         $md = trim($md);
         

@@ -324,6 +324,12 @@
                     showExportModal(noteId, filename, title, noteType);
                 }
                 break;
+            case 'show-convert-modal':
+                if (noteId && typeof showConvertNoteModal === 'function') {
+                    const convertTo = target.dataset.convertTo;
+                    showConvertNoteModal(noteId, convertTo);
+                }
+                break;
             case 'delete-note':
                 if (noteId && typeof deleteNote === 'function') {
                     deleteNote(noteId);

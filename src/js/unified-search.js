@@ -841,10 +841,10 @@ class SearchManager {
             return;
         }
 
-        // If the search term is the same as the last one, and we're searching notes
-        // (or in combined/unified mode), navigate through highlights instead of re-submitting search.
+        // If the search term is the same as the last one, navigate through highlights 
+        // regardless of search type (notes, tags, or combined).
         const isCombined = this.isCombinedModeActive(isMobile);
-        if (searchValue === this.lastSearchTerm && (activeType === 'notes' || isCombined)) {
+        if (searchValue === this.lastSearchTerm) {
             if (e.shiftKey && typeof navigateToPreviousHighlight === 'function') {
                 navigateToPreviousHighlight();
                 return;
@@ -1129,8 +1129,8 @@ class SearchManager {
             }
 
             // Scroll to the first highlight after AJAX search results are loaded
-            const isCombinedAfterAjax = this.isCombinedModeActive(false) || this.isCombinedModeActive(true);
-            if ((this.currentSearchType === 'notes' || isCombinedAfterAjax) && typeof scrollToFirstHighlight === 'function') {
+            // Works for notes, tags, and combined mode
+            if (typeof scrollToFirstHighlight === 'function') {
                 scrollToFirstHighlight();
             }
 

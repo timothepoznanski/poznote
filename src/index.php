@@ -477,6 +477,9 @@ $body_classes = trim($extra_body_classes);
                     if (!empty($folder_filter)) {
                         $home_params[] = 'folder=' . urlencode($folder_filter);
                     }
+                    if ($search_combined) {
+                        $home_params[] = 'search_combined=1';
+                    }
 
                     // Always preserve workspace parameter 
                     if (!empty($workspace_filter)) {
@@ -603,6 +606,13 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-duplicate"><i class="fa-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-move"><i class="fa-folder-open"></i> '.t_h('common.move', [], 'Move').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-download"><i class="fa-download"></i> '.t_h('common.download', [], 'Download').'</button>';
+
+                    // Convert button (only for markdown and note types, with appropriate icon)
+                    if ($note_type === 'markdown') {
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-convert"><i class="fas fa-sync-alt"></i> '.t_h('common.convert', [], 'Convert').'</button>';
+                    } elseif ($note_type === 'note') {
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-convert"><i class="fas fa-sync-alt"></i> '.t_h('common.convert', [], 'Convert').'</button>';
+                    }
                     
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-open-new-tab"><i class="fa-external-link"></i> '.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-trash"><i class="fa-trash"></i> '.t_h('common.delete', [], 'Delete').'</button>';
@@ -674,6 +684,13 @@ $body_classes = trim($extra_body_classes);
                     
                     // Download button
                     echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="'.t_h('common.download', [], 'Download').'" data-action="show-export-modal" data-note-id="'.$row['id'].'" data-filename="'.htmlspecialchars($filename, ENT_QUOTES).'" data-title="'.htmlspecialchars($title_safe, ENT_QUOTES).'" data-note-type="'.$note_type.'"><i class="fas fa-download"></i></button>';
+
+                    // Convert button (only for markdown and note types)
+                    if ($note_type === 'markdown') {
+                        echo '<button type="button" class="toolbar-btn btn-convert note-action-btn" data-action="show-convert-modal" data-note-id="'.$row['id'].'" data-convert-to="html" title="'.t_h('index.toolbar.convert_to_html', [], 'Convert to HTML').'"><i class="fas fa-sync-alt"></i></button>';
+                    } elseif ($note_type === 'note') {
+                        echo '<button type="button" class="toolbar-btn btn-convert note-action-btn" data-action="show-convert-modal" data-note-id="'.$row['id'].'" data-convert-to="markdown" title="'.t_h('index.toolbar.convert_to_markdown', [], 'Convert to Markdown').'"><i class="fas fa-sync-alt"></i></button>';
+                    }
                     
                     echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" data-action="delete-note" data-note-id="'.$row['id'].'" title="'.t_h('common.delete', [], 'Delete').'"><i class="fas fa-trash"></i></button>';
                     

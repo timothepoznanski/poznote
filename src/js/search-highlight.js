@@ -74,15 +74,21 @@ function highlightSearchTerms() {
         return;
     }
     
-    // Check if we're in notes search mode
+    // Check if we're in notes or tags search mode
     var isNotesActive = isNotesSearchActive();
-    if (!isNotesActive) {
-        return; // Only highlight in notes search mode
+    var isTagsActive = (function() {
+        var tagsBtn = document.getElementById('search-tags-btn') || document.getElementById('search-tags-btn-mobile');
+        return (tagsBtn && tagsBtn.classList.contains('active')) || 
+               (window.searchManager && window.searchManager.currentSearchType === 'tags');
+    })();
+
+    if (!isNotesActive && !isTagsActive) {
+        return; // Only highlight in notes or tags search mode
     }
     
     // Check if we already have highlights for this exact term
     // If so, just ensure the active state is preserved - don't recreate everything
-    var existingHighlights = document.querySelectorAll('.search-highlight');
+    var existingHighlights = document.querySelectorAll('.search-highlight, .tag-highlight');
     var termUnchanged = window.searchNavigation && searchTerm === window.searchNavigation.lastTerm;
     
     if (termUnchanged && existingHighlights.length > 0) {
@@ -96,15 +102,14 @@ function highlightSearchTerms() {
             if (nav.pendingAutoScroll && nav.highlights.length > 0) {
                 nav.pendingAutoScroll = false;
                 nav.currentHighlightIndex = 0;
-                // Apply orange without scroll (scroll handled separately)
-                nav.highlights.forEach(function(h) { h.classList.remove('search-highlight-active'); });
-                nav.highlights[0].classList.add('search-highlight-active');
+                // Use navigateToHighlight to ensure consistent orange class and scroll behavior
+                navigateToHighlight(0, true);
             } else if (nav.currentHighlightIndex >= 0 && nav.highlights.length > 0) {
                 // Ensure the active highlight has the orange class
                 var idx = Math.min(nav.currentHighlightIndex, nav.highlights.length - 1);
                 var hasActive = document.querySelector('.search-highlight-active');
                 if (!hasActive) {
-                    nav.highlights[idx].classList.add('search-highlight-active');
+                    navigateToHighlight(idx, false); // Restore active highlight
                 }
             }
         }
@@ -132,7 +137,20 @@ function highlightSearchTerms() {
         totalHighlights += highlightInElement(elementsToHighlight[i], searchWords);
     }
 
-    // Refresh the list of highlights to include the new DOM elements
+    // In unified/combined mode, also highlight matching tags before building the navigation list
+    var isCombined = (function() {
+        var comb = document.getElementById('search-combined-mode') || document.getElementById('search-combined-mode-mobile');
+        return (comb && comb.value === '1') || (window.searchManager && (window.searchManager.isCombinedModeActive(false) || window.searchManager.isCombinedModeActive(true)));
+    })();
+    
+    if (isCombined && typeof window.highlightMatchingTags === 'function') {
+        try {
+            // Use the same search term as words
+            window.highlightMatchingTags(searchTerm);
+        } catch (e) { /* ignore */ }
+    }
+
+    // Refresh the list of highlights to include the new DOM elements (words, titles, overlays, AND tags)
     updateHighlightsList();
 
     // Apply active highlight state
@@ -376,8 +394,9 @@ function clearSearchHighlights(skipResetNavigation) {
     }
 
     // Remove active highlight class from all elements
-    document.querySelectorAll('.search-highlight-active').forEach(function(el) {
+    document.querySelectorAll('.search-highlight-active, .tag-highlight').forEach(function(el) {
         el.classList.remove('search-highlight-active');
+        el.classList.remove('tag-highlight');
     });
 
     var highlights = document.querySelectorAll('.search-highlight');
@@ -691,7 +710,23 @@ function navigateToHighlight(index, smooth) {
     if (typeof target.scrollIntoView === 'function') {
         const behavior = (smooth === false) ? 'auto' : 'smooth';
         try {
-            target.scrollIntoView({ behavior: behavior, block: 'center', inline: 'nearest' });
+            // First, ensure the note content is loaded if it's a content highlight
+            // then use a small delay to allow any dynamic content adjustments
+            setTimeout(() => {
+                target.scrollIntoView({ behavior: behavior, block: 'center', inline: 'nearest' });
+                
+                // Secondary check: if the target is still not well-positioned (async styles/images)
+                // perform a second centering call after a slightly longer delay
+                setTimeout(() => {
+                    const rect = target.getBoundingClientRect();
+                    const viewHeight = window.innerHeight;
+                    const isCentered = rect.top > (viewHeight * 0.2) && rect.top < (viewHeight * 0.8);
+                    
+                    if (!isCentered) {
+                        target.scrollIntoView({ behavior: 'auto', block: 'center', inline: 'nearest' });
+                    }
+                }, 300);
+            }, 50);
         } catch (e) {
             // Fallback for older browsers
             target.scrollIntoView(behavior === 'smooth');
@@ -848,10 +883,8 @@ function _performNoteNavigation(noteList) {
  * Automatically scroll to the first highlight
  */
 function scrollToFirstHighlight() {
-    // Do NOT clear pendingAutoScroll here - let highlightSearchTerms handle it
-    // This avoids race conditions with the retry mechanism
-    
-    // Wait for content to be fully rendered, then scroll to first highlight
+    // Increased timeout to ensure note content and highlights are fully rendered 
+    // before attempting to scroll to avoid inaccurate positioning
     setTimeout(function() {
         updateHighlightsList();
         
@@ -859,20 +892,9 @@ function scrollToFirstHighlight() {
             // Mark that we've handled the auto-scroll
             window.searchNavigation.pendingAutoScroll = false;
             
-            // Set index and apply active class
-            window.searchNavigation.currentHighlightIndex = 0;
-            
-            // Remove any existing active class first
-            document.querySelectorAll('.search-highlight-active').forEach(function(el) {
-                el.classList.remove('search-highlight-active');
-            });
-            
-            // Apply active class to first highlight
-            var firstHighlight = window.searchNavigation.highlights[0];
-            if (firstHighlight) {
-                firstHighlight.classList.add('search-highlight-active');
-                firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+            // Set index and apply active class via the standard navigation function
+            // which now handles the double-check for scroll position accuracy
+            navigateToHighlight(0, true);
         }
-    }, 200);
+    }, 400);
 }

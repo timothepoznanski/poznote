@@ -32,6 +32,7 @@
             }
         },
         "download": "下载",
+        "convert": "转换",
         "create": "创建",
         "delete": "删除",
         "duplicate": "复制",
@@ -824,6 +825,20 @@
             "delete_link_only": "仅删除此链接",
             "delete_link_and_target": "删除笔记及其所有链接"
         },
+        "convert": {
+            "title": "转换笔记",
+            "message": "您确定要转换此笔记吗？",
+            "to_html_title": "转换为 HTML",
+            "to_html_message": "这将把您的 Markdown 笔记转换为 HTML 格式。",
+            "to_html_warning": "在转换此笔记之前，您可以先复制一份以防转换不符合您的预期。",
+            "to_markdown_title": "转换为 Markdown",
+            "to_markdown_message": "这将把您的 HTML 笔记转换为 Markdown 格式。嵌入的图片将保存为附件。",
+            "to_markdown_warning": "在转换此笔记之前，您可以先复制一份以防转换不符合您的预期。",
+            "converting": "正在转换笔记...",
+            "success": "笔记转换成功！",
+            "error": "转换笔记失败",
+            "duplicate_button": "复制"
+        },
         "export": {
             "title": "导出笔记",
             "markdown": {
@@ -1020,7 +1035,9 @@
             "create_task_list": "创建任务列表出错",
             "create_task_list_prefix": "创建任务列表出错: ",
             "create_markdown_note": "创建 Markdown 笔记出错",
-            "create_markdown_note_prefix": "创建 Markdown 笔记出错: "
+            "create_markdown_note_prefix": "创建 Markdown 笔记出错: ",
+            "conversion_failed_prefix": "转换失败: {{error}}",
+            "network_error_converting": "转换笔记时网络错误"
         },
         "toolbar": {
             "favorite_add": "添加到收藏",
@@ -1028,6 +1045,8 @@
             "public_note": "共享笔记",
             "attachments_with_count": "附件 ({{count}})",
             "menu_actions": "菜单操作",
+            "convert_to_html": "转换为 HTML",
+            "convert_to_markdown": "转换为 Markdown",
             "share_note": "共享笔记"
         },
         "share_modal": {

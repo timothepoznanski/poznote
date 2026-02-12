@@ -31,6 +31,7 @@
             }
         },
         "download": "Télécharger",
+        "convert": "Convertir",
         "create": "Créer",
         "delete": "Supprimer",
         "duplicate": "Dupliquer",
@@ -859,6 +860,20 @@
             "error": "Impossible de charger les listes de tâches.",
             "confirm": "Déplacer la tâche"
         },
+        "convert": {
+            "title": "Convertir la note",
+            "message": "Êtes-vous sûr de vouloir convertir cette note ?",
+            "to_html_title": "Convertir en HTML",
+            "to_html_message": "Cela convertira votre note Markdown en format HTML.",
+            "to_html_warning": "Avant de convertir cette note, vous pouvez la dupliquer pour conserver une copie au cas où la conversion ne serait pas satisfaisante.",
+            "to_markdown_title": "Convertir en Markdown",
+            "to_markdown_message": "Cela convertira votre note HTML en format Markdown. Les images intégrées seront enregistrées comme pièces jointes.",
+            "to_markdown_warning": "Avant de convertir cette note, vous pouvez la dupliquer pour conserver une copie au cas où la conversion ne serait pas satisfaisante.",
+            "converting": "Conversion en cours...",
+            "success": "Note convertie avec succès !",
+            "error": "Échec de la conversion de la note",
+            "duplicate_button": "Dupliquer"
+        },
         "note_sort": {
             "title": "Ordre de tri des notes",
             "description": "Choisissez l’ordre d’affichage des notes dans la liste :",
@@ -1054,7 +1069,9 @@
             "create_task_list": "Erreur lors de la création de la liste de tâches",
             "create_task_list_prefix": "Erreur lors de la création de la liste de tâches : ",
             "create_markdown_note": "Erreur lors de la création de la note Markdown",
-            "create_markdown_note_prefix": "Erreur lors de la création de la note Markdown : "
+            "create_markdown_note_prefix": "Erreur lors de la création de la note Markdown : ",
+            "conversion_failed_prefix": "Échec de la conversion : {{error}}",
+            "network_error_converting": "Erreur réseau lors de la conversion de la note"
         },
         "toolbar": {
             "favorite_add": "Ajouter aux favoris",
@@ -1062,6 +1079,8 @@
             "public_note": "Partager la note",
             "attachments_with_count": "Pièces jointes ({{count}})",
             "menu_actions": "Actions du menu",
+            "convert_to_html": "Convertir en HTML",
+            "convert_to_markdown": "Convertir en Markdown",
             "share_note": "Partager la note"
         },
         "share_modal": {

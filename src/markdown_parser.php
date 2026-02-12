@@ -268,16 +268,24 @@ function parseMarkdown($text) {
         // Auto-link URLs in angle brackets: <https://example.com>
         $text = preg_replace('/&lt;(https?:\/\/[^>]+)&gt;/', '<a href="$1" target="_blank" rel="noopener">$1</a>', $text);
         
-        // Bold and italic (order matters: do *** and ___ before ** and __)
-        $text = preg_replace('/\*\*\*([^\*]+)\*\*\*/', '<strong><em>$1</em></strong>', $text);
-        $text = preg_replace('/___([^_]+)___/', '<strong><em>$1</em></strong>', $text);
-        $text = preg_replace('/\*\*([^\*]+)\*\*/', '<strong>$1</strong>', $text);
-        $text = preg_replace('/__([^_]+)__/', '<strong>$1</strong>', $text);
-        $text = preg_replace('/\*([^\*]+)\*/', '<em>$1</em>', $text);
-        $text = preg_replace('/_([^_]+)_/', '<em>$1</em>', $text);
+        // Bold and italic (handling nesting better by avoiding [^*] which stops at the first asterisk)
+        // Triple formatting (Bold + Italic)
+        $text = preg_replace('/\*\*\*(.*?)\*\*\*/s', '<strong><em>$1</em></strong>', $text);
+        $text = preg_replace('/___(.*?)___/s', '<strong><em>$1</em></strong>', $text);
+        
+        // Bold
+        $text = preg_replace('/\*\*(.*?)\*\*/s', '<strong>$1</strong>', $text);
+        $text = preg_replace('/__(.*?)__/s', '<strong>$1</strong>', $text);
+        
+        // Italic (use lookahead/lookbehind to ensure we don't match double asterisks)
+        $text = preg_replace('/(?<!\*)\*(?!\*)(.*?)(?<!\*)\*(?!\*)/s', '<em>$1</em>', $text);
+        $text = preg_replace('/(?<!_)_(?!_)(.*?)(?<!_)_(?!_)/s', '<em>$1</em>', $text);
         
         // Strikethrough: ~~text~~
-        $text = preg_replace('/~~([^~]+)~~/', '<del>$1</del>', $text);
+        $text = preg_replace('/~~(.*?)~~/s', '<del>$1</del>', $text);
+        
+        // Highlights: ==text==
+        $text = preg_replace('/==(.*?)==/s', '<mark>$1</mark>', $text);
         
         // Restore protected code elements
         $text = preg_replace_callback('/\x00CODE(\d+)\x00/', function($matches) use ($protectedCode) {
