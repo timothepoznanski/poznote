@@ -31,6 +31,8 @@ body.dark-mode .noteentry .search-highlight {
 
 .search-highlight.search-highlight-active,
 .input-highlight-overlay.search-highlight-active,
+.tag-highlight.search-highlight-active,
+.clickable-tag-wrapper.tag-highlight.search-highlight-active,
 .search-highlight-active,
 html[data-theme='dark'] .search-highlight-active,
 body.dark-mode .search-highlight-active,
@@ -43,6 +45,12 @@ body.dark-mode .noteentry .search-highlight-active {
     z-index: 1000 !important;
     border: 1px solid #d35400 !important;
     border-radius: 2px;
+}
+
+/* Ensure text color inside tags follows the active highlight style */
+.search-highlight-active .clickable-tag,
+.search-highlight-active .tag-delete-button {
+    color: #000000 !important;
 }
 
 @keyframes highlightPulse {

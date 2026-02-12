@@ -102,15 +102,14 @@ function highlightSearchTerms() {
             if (nav.pendingAutoScroll && nav.highlights.length > 0) {
                 nav.pendingAutoScroll = false;
                 nav.currentHighlightIndex = 0;
-                // Apply orange without scroll (scroll handled separately)
-                nav.highlights.forEach(function(h) { h.classList.remove('search-highlight-active'); });
-                nav.highlights[0].classList.add('search-highlight-active');
+                // Use navigateToHighlight to ensure consistent orange class and scroll behavior
+                navigateToHighlight(0, true);
             } else if (nav.currentHighlightIndex >= 0 && nav.highlights.length > 0) {
                 // Ensure the active highlight has the orange class
                 var idx = Math.min(nav.currentHighlightIndex, nav.highlights.length - 1);
                 var hasActive = document.querySelector('.search-highlight-active');
                 if (!hasActive) {
-                    nav.highlights[idx].classList.add('search-highlight-active');
+                    navigateToHighlight(idx, false); // Restore active highlight
                 }
             }
         }
@@ -138,7 +137,20 @@ function highlightSearchTerms() {
         totalHighlights += highlightInElement(elementsToHighlight[i], searchWords);
     }
 
-    // Refresh the list of highlights to include the new DOM elements
+    // In unified/combined mode, also highlight matching tags before building the navigation list
+    var isCombined = (function() {
+        var comb = document.getElementById('search-combined-mode') || document.getElementById('search-combined-mode-mobile');
+        return (comb && comb.value === '1') || (window.searchManager && (window.searchManager.isCombinedModeActive(false) || window.searchManager.isCombinedModeActive(true)));
+    })();
+    
+    if (isCombined && typeof window.highlightMatchingTags === 'function') {
+        try {
+            // Use the same search term as words
+            window.highlightMatchingTags(searchTerm);
+        } catch (e) { /* ignore */ }
+    }
+
+    // Refresh the list of highlights to include the new DOM elements (words, titles, overlays, AND tags)
     updateHighlightsList();
 
     // Apply active highlight state
