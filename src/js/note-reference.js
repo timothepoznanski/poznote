@@ -511,7 +511,14 @@
         const workspace = getCurrentWorkspace();
         const isMobile = window.innerWidth <= 800;
         
-        // Add scroll parameter for mobile to trigger auto-scroll to note content
+        // Use AJAX load if available for a smoother experience
+        if (typeof window.loadNoteDirectly === 'function') {
+            const url = `index.php?note=${noteId}&workspace=${encodeURIComponent(workspace)}`;
+            window.loadNoteDirectly(url, noteId, null);
+            return;
+        }
+        
+        // Fallback to full page reload
         const scrollParam = isMobile ? '&scroll=1' : '';
         window.location.href = `index.php?note=${noteId}&workspace=${encodeURIComponent(workspace)}${scrollParam}`;
     };

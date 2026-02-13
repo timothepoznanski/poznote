@@ -72,7 +72,7 @@ function parseMarkdown($text) {
     $protectedMathBlocks = [];
     $mathBlockIndex = 0;
     
-    $text = preg_replace_callback('/\$\$(.+?)\$\$/s', function($matches) use (&$protectedMathBlocks, &$mathBlockIndex) {
+    $text = preg_replace_callback('/(?<!\\\\)\$\$(.+?)(?<!\\\\)\$\$/s', function($matches) use (&$protectedMathBlocks, &$mathBlockIndex) {
         $math = trim($matches[1]);
         $placeholder = "\x00MATHBLOCK" . $mathBlockIndex . "\x00";
         $protectedMathBlocks[$mathBlockIndex] = $math;
@@ -84,7 +84,10 @@ function parseMarkdown($text) {
     $protectedMathInline = [];
     $mathInlineIndex = 0;
     
-    $text = preg_replace_callback('/(?<!\$)\$(?!\$)(.+?)\$/', function($matches) use (&$protectedMathInline, &$mathInlineIndex) {
+    // Only match $ if not preceded by \ or $ (to allow escaping and avoid matching $$)
+    // and if not followed by a space (opening) and content doesn't end with a space (closing)
+    // also ensures it's not followed by a digit to avoid matching currency like $10 and $20
+    $text = preg_replace_callback('/(?<![\\\\$])\$(?!\\$)([^\s$](?:[^$]*?[^\s$])?)\$(?!\\d)/', function($matches) use (&$protectedMathInline, &$mathInlineIndex) {
         $math = trim($matches[1]);
         $placeholder = "\x00MATHINLINE" . $mathInlineIndex . "\x00";
         $protectedMathInline[$mathInlineIndex] = $math;
@@ -251,6 +254,9 @@ function parseMarkdown($text) {
     
     // STEP 5: Escape HTML to prevent XSS attacks
     $html = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+    
+    // Unescape escaped dollar signs after HTML escaping
+    $html = str_replace('\\$', '$', $html);
     
     // STEP 6: Process inline markdown styles (bold, italic, code, etc.)
     // This helper applies inline formatting after HTML escaping

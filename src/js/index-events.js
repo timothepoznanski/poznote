@@ -430,7 +430,7 @@
     /**
      * Track opened note and process note references
      */
-    function trackAndProcessNotes() {
+    window.trackAndProcessNotes = function() {
         // Track the currently opened note for recent notes list
         var noteEntry = document.querySelector('.noteentry[data-note-id]');
         if (noteEntry && typeof window.trackNoteOpened === 'function') {
@@ -648,7 +648,9 @@
         // Initialize tasklists and markdown notes
         initializeTasklists();
         initializeMarkdownNotes();
-        trackAndProcessNotes();
+        if (typeof window.trackAndProcessNotes === 'function') {
+            window.trackAndProcessNotes();
+        }
         checkForDrafts();
         
         // Close all toggle blocks on page load (toggles should always start closed)

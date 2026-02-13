@@ -1257,6 +1257,11 @@ function reinitializeNoteContent() {
         reinitializeClickableTagsAfterAjax();
     }
 
+    // Process note references [[Note Title]] and track opened note
+    if (typeof window.trackAndProcessNotes === 'function') {
+        window.trackAndProcessNotes();
+    }
+
     // Re-initialize image click handlers
     reinitializeImageClickHandlers();
     

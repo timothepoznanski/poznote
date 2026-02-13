@@ -315,7 +315,7 @@ function parseMarkdown(text) {
     let mathBlockIndex = 0;
 
     // Protect display math $$...$$
-    text = text.replace(/\$\$(.+?)\$\$/gs, function (match, math) {
+    text = text.replace(/(?<!\\)\$\$(.+?)(?<!\\)\$\$/gs, function (match, math) {
         let placeholder = '\x00MATHBLOCK' + mathBlockIndex + '\x00';
         protectedMathBlocks[mathBlockIndex] = math.trim();
         mathBlockIndex++;
@@ -326,7 +326,10 @@ function parseMarkdown(text) {
     let protectedMathInline = [];
     let mathInlineIndex = 0;
 
-    text = text.replace(/(?<!\$)\$(?!\$)(.+?)\$/g, function (match, math) {
+    // Only match $ if not preceded by \ or $ (to allow escaping and avoid matching $$)
+    // and if not followed by a space (opening) and content doesn't end with a space (closing)
+    // also ensures it's not followed by a digit to avoid matching currency like $10 and $20
+    text = text.replace(/(?<![\\$])\$(?!\$)([^\s$](?:[^\$]*?[^\s$])?)\$(?!\d)/g, function (match, math) {
         let placeholder = '\x00MATHINLINE' + mathInlineIndex + '\x00';
         protectedMathInline[mathInlineIndex] = math.trim();
         mathInlineIndex++;
@@ -540,7 +543,8 @@ function parseMarkdown(text) {
     let html = text
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+        .replace(/>/g, '&gt;')
+        .replace(/\\(\$)/g, '$1');
 
     // Helper function to apply inline styles (bold, italic, code, etc.)
     function applyInlineStyles(text) {
