@@ -441,6 +441,81 @@ function requireApiAuth() {
 }
 
 /**
+ * Require API authentication for user-accessible non-data endpoints
+ * Similar to requireApiAuth but doesn't require X-User-ID header
+ * Used for /users/me, /users/profiles, /system/version
+ */
+function requireApiAuthUser() {
+    // For API endpoints, check session first
+    if (isAuthenticated()) {
+        return;
+    }
+    
+    // Check if Basic Auth is disabled
+    $basicAuthDisabled = defined('OIDC_DISABLE_BASIC_AUTH') && OIDC_DISABLE_BASIC_AUTH;
+    
+    // If no session, try HTTP Basic Auth
+    if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW'])) {
+        $msg = api_t('auth.api.authentication_required', [], 'Authentication required');
+        header('HTTP/1.1 401 Unauthorized');
+        if (!$basicAuthDisabled) {
+            header('WWW-Authenticate: Basic realm="Poznote API"');
+        }
+        header('Content-Type: application/json');
+        echo json_encode(['error' => $msg]);
+        exit;
+    }
+    
+    if ($basicAuthDisabled) {
+        $msg = api_t('auth.api.basic_auth_disabled', [], 'Basic authentication is disabled');
+        header('HTTP/1.1 403 Forbidden');
+        header('Content-Type: application/json');
+        echo json_encode(['error' => $msg]);
+        exit;
+    }
+    
+    // Validate credentials using database profiles
+    require_once __DIR__ . '/users/db_master.php';
+    $authUser = getUserProfileByUsername($_SERVER['PHP_AUTH_USER']);
+    
+    if (!$authUser || !$authUser['active']) {
+        $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
+        header('HTTP/1.1 401 Unauthorized');
+        header('Content-Type: application/json');
+        echo json_encode(['error' => $msg]);
+        exit;
+    }
+
+    $isValid = false;
+    if ((bool)$authUser['is_admin']) {
+        if ($_SERVER['PHP_AUTH_PW'] === AUTH_PASSWORD) {
+            $isValid = true;
+        }
+    } else {
+        if ($_SERVER['PHP_AUTH_PW'] === AUTH_USER_PASSWORD) {
+            $isValid = true;
+        }
+    }
+    
+    if (!$isValid) {
+        $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
+        header('HTTP/1.1 401 Unauthorized');
+        header('Content-Type: application/json');
+        echo json_encode(['error' => $msg]);
+        exit;
+    }
+    
+    // Set up session with the authenticated user
+    $_SESSION['authenticated'] = true;
+    $_SESSION['user_id'] = (int)$authUser['id'];
+    $_SESSION['user'] = [
+        'id' => $authUser['id'],
+        'username' => $authUser['username'],
+        'is_admin' => (bool)$authUser['is_admin']
+    ];
+}
+
+/**
  * Get current user info
  */
 function getCurrentUser() {

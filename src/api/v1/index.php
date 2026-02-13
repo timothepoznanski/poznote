@@ -67,9 +67,12 @@ if ($isPublicApiEndpoint) {
         // Authentication failed, but that's ok for public attachments
         // Controller will check if note is publicly shared
     }
-} elseif ($isAdminEndpoint || $isPublicProfilesEndpoint || $isMeEndpoint || $isLookupEndpoint || $isSystemEndpoint || $isSharedEndpoint) {
+} elseif ($isAdminEndpoint) {
     // Admin endpoints only need credential validation, not X-User-ID
     requireApiAuthAdmin();
+} elseif ($isPublicProfilesEndpoint || $isMeEndpoint || $isLookupEndpoint || $isSystemEndpoint || $isSharedEndpoint) {
+    // User endpoints only need credential validation, not X-User-ID
+    requireApiAuthUser();
 } else {
     // Data endpoints require X-User-ID to know which user's data to access
     requireApiAuth();
