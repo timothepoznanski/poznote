@@ -1235,9 +1235,7 @@ function sanitizeHtml($html) {
         // Remove data: protocol (except for images which we'll handle separately)
         '/data:(?!image\/)/i',
         // Remove vbscript: protocol
-        '/vbscript:/i',
-        // Remove on* event handlers
-        '/\s*on\w+\s*=/i'
+        '/vbscript:/i'
     ];
     
     // Note: We don't do regex-based removal here because it's blind to context
