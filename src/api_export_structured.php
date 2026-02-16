@@ -330,8 +330,9 @@ if (filesize($zipFileName) == 0) {
 }
 
 // Send file to browser
+$downloadFileName = 'poznote_structured_' . $safeWorkspaceName . '_' . $dateStr . '.zip';
 header('Content-Type: application/zip');
-header('Content-Disposition: attachment; filename="poznote_structured_export.zip"');
+header('Content-Disposition: attachment; filename="' . $downloadFileName . '"');
 header('Content-Length: ' . filesize($zipFileName));
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: 0');
