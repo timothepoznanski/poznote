@@ -143,14 +143,9 @@ try {
     } else {
         // For markdown notes, convert markdown to HTML first
         if ($noteType === 'markdown') {
-            // Convert images to base64 only for HTML export (download), not for print (inline)
-            $embedImages = ($disposition === 'attachment');
             // Use the shared parseMarkdown function from markdown_parser.php
+            // Images will remain as attachment URLs - exportAsHtmlZip will handle them
             $content = parseMarkdown($content);
-            // Convert local images to base64 if needed for download
-            if ($embedImages) {
-                $content = convertImagesToBase64InHtml($content);
-            }
         }
         // For tasklist notes, convert stored JSON to HTML before styling
         elseif ($noteType === 'tasklist') {

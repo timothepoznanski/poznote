@@ -321,9 +321,16 @@ $body_classes = trim($extra_body_classes);
                 <i class="fas fa-caret-down workspace-dropdown-icon"></i>
             </div>
             <div class="sidebar-title-actions">
-                <button class="sidebar-home" data-action="navigate-to-home" title="<?php echo t_h('sidebar.home', [], 'Home'); ?>"><i class="fas fa-home"></i></button>
-                <button class="sidebar-settings" data-action="navigate-to-settings" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>"><i class="fas fa-cog"></i><span class="update-badge update-badge-hidden"></span></button>
-                <button class="sidebar-plus" data-action="toggle-create-menu" title="<?php echo t_h('sidebar.create'); ?>"><i class="fas fa-plus-circle"></i></button>
+                <button class="sidebar-home" data-action="navigate-to-home" title="<?php echo t_h('sidebar.home', [], 'Home'); ?>">
+                    <i class="fas fa-home"></i>
+                </button>
+                <button class="sidebar-settings" data-action="navigate-to-settings" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>">
+                    <i class="fas fa-cog"></i>
+                    <span class="update-badge update-badge-hidden"></span>
+                </button>
+                <button class="sidebar-plus" data-action="toggle-create-menu" title="<?php echo t_h('sidebar.create'); ?>">
+                    <i class="fas fa-plus-circle"></i>
+                </button>
             </div>
 
             <div class="workspace-menu" id="workspaceMenu"></div>
@@ -585,44 +592,6 @@ $body_classes = trim($extra_body_classes);
                         $checkExistingLink->execute([$row['id']]);
                         $hasLinkedNote = (bool)$checkExistingLink->fetch();
                     }
-
-                    // Mobile overflow menu button (shown only on mobile via CSS)
-                    // Marked as note-action-btn so it can be hidden during text selection (hide-on-selection)
-                    echo '<button type="button" class="toolbar-btn mobile-more-btn note-action-btn" title="'.t_h('common.menu', [], 'Menu').'" data-action="toggle-mobile-toolbar-menu" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>';
-
-                    // Mobile dropdown menu (actions moved here on mobile)
-                    echo '<div class="dropdown-menu mobile-toolbar-menu" hidden role="menu" aria-label="'.t_h('index.toolbar.menu_actions', [], 'Menu actions').'">';
-
-                    // Search and replace button (only for note and markdown types, shown in mobile menu)
-                    if ($note_type === 'note' || $note_type === 'markdown') {
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-search-replace"><i class="fa-search"></i> '.t_h('editor.toolbar.search_replace', [], 'Search and replace').'</button>';
-                    }
-
-                    // Task list actions (only for tasklist notes, shown in mobile menu)
-                    if ($note_type === 'tasklist') {
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="clear-completed-tasks" data-note-id="' . $row['id'] . '"><i class="fa-check-square"></i> '.t_h('tasklist.clear_completed', [], 'Clear completed tasks').'</button>';
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="uncheck-all-tasks" data-note-id="' . $row['id'] . '"><i class="fa-square"></i> '.t_h('tasklist.uncheck_all', [], 'Uncheck all tasks').'</button>';
-                    }
-                    
-                    if ($note_type !== 'linked' && !$hasLinkedNote) {
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-create-linked-note"><i class="fa-link"></i> '.t_h('editor.toolbar.create_linked_note').'</button>';
-                    }
-
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-duplicate"><i class="fa-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-move"><i class="fa-folder-open"></i> '.t_h('common.move', [], 'Move').'</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-download"><i class="fa-download"></i> '.t_h('common.download', [], 'Download').'</button>';
-
-                    // Convert button (only for markdown and note types, with appropriate icon)
-                    if ($note_type === 'markdown') {
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-convert"><i class="fas fa-sync-alt"></i> '.t_h('index.toolbar.convert_to_html', [], 'Convert to HTML').'</button>';
-                    } elseif ($note_type === 'note') {
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-convert"><i class="fas fa-sync-alt"></i> '.t_h('index.toolbar.convert_to_markdown', [], 'Convert to Markdown').'</button>';
-                    }
-                    
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-open-new-tab"><i class="fa-external-link"></i> '.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-trash"><i class="fa-trash"></i> '.t_h('common.delete', [], 'Delete').'</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-info"><i class="fa-info-circle"></i> '.t_h('common.information', [], 'Information').'</button>';
-                    echo '</div>';
                         
                     // Generate dates safely for JavaScript with robust encoding
                     $created_raw = $row['created'] ?? '';
@@ -700,6 +669,45 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" data-action="delete-note" data-note-id="'.$row['id'].'" title="'.t_h('common.delete', [], 'Delete').'"><i class="fas fa-trash"></i></button>';
                     
                     echo '<button type="button" class="toolbar-btn btn-info note-action-btn" title="'.t_h('common.information', [], 'Information').'" data-action="show-note-info" data-note-id="'.$row['id'].'" data-created="'.htmlspecialchars($final_created, ENT_QUOTES).'" data-updated="'.htmlspecialchars($final_updated, ENT_QUOTES).'" data-folder="'.htmlspecialchars($folder_name, ENT_QUOTES).'" data-favorite="'.$is_favorite.'" data-tags="'.htmlspecialchars($tags_data, ENT_QUOTES).'" data-attachments-count="'.$attachments_count.'"><i class="fas fa-info-circle"></i></button>';
+                
+                    // Overflow menu button (3 dots - shown on both mobile and desktop)
+                    // Marked as note-action-btn so it can be hidden during text selection (hide-on-selection)
+                    echo '<div class="toolbar-menu-anchor">';
+                    echo '<button type="button" class="toolbar-btn mobile-more-btn note-action-btn" title="'.t_h('common.menu', [], 'Menu').'" data-action="toggle-mobile-toolbar-menu" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>';
+
+                    // Dropdown menu (actions moved here - visible on both mobile and desktop)
+                    echo '<div class="dropdown-menu mobile-toolbar-menu" hidden role="menu" aria-label="'.t_h('index.toolbar.menu_actions', [], 'Menu actions').'">';
+
+                    // Search and replace button (only for note and markdown types, shown in mobile menu)
+                    if ($note_type === 'note' || $note_type === 'markdown') {
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-search-replace"><i class="fa-search"></i> '.t_h('editor.toolbar.search_replace', [], 'Search and replace').'</button>';
+                    }
+
+                    // Task list actions (only for tasklist notes, shown in mobile menu)
+                    if ($note_type === 'tasklist') {
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="clear-completed-tasks" data-note-id="' . $row['id'] . '"><i class="fa-check-square"></i> '.t_h('tasklist.clear_completed', [], 'Clear completed tasks').'</button>';
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="uncheck-all-tasks" data-note-id="' . $row['id'] . '"><i class="fa-square"></i> '.t_h('tasklist.uncheck_all', [], 'Uncheck all tasks').'</button>';
+                    }
+                    
+                    if ($note_type !== 'linked' && !$hasLinkedNote) {
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-create-linked-note"><i class="fa-link"></i> '.t_h('editor.toolbar.create_linked_note').'</button>';
+                    }
+
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-duplicate"><i class="fa-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-move"><i class="fa-folder-open"></i> '.t_h('common.move', [], 'Move').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-download"><i class="fa-download"></i> '.t_h('common.download', [], 'Download').'</button>';
+
+                    // Convert button (only for markdown and note types, with appropriate icon)
+                    if ($note_type === 'markdown') {
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-convert"><i class="fas fa-sync-alt"></i> '.t_h('index.toolbar.convert_to_html', [], 'Convert to HTML').'</button>';
+                    } elseif ($note_type === 'note') {
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-convert"><i class="fas fa-sync-alt"></i> '.t_h('index.toolbar.convert_to_markdown', [], 'Convert to Markdown').'</button>';
+                    }
+                    
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-open-new-tab"><i class="fa-external-link"></i> '.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-info"><i class="fa-info-circle"></i> '.t_h('common.information', [], 'Information').'</button>';
+                    echo '</div>';
+                    echo '</div>';
                 
                     echo '</div>';
                     

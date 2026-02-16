@@ -25,11 +25,6 @@
     display: none !important;
 }
 
-/* Mobile overflow menu button (only visible on mobile) */
-.mobile-more-btn {
-    display: none !important;
-}
-
 /* Hide emoji buttons when emoji icons are disabled */
 .emoji-hidden .btn-emoji {
     display: none !important;
@@ -44,6 +39,24 @@
     .btn-checklist,
     .btn-separator,
     .btn-note-reference {
+        display: none !important;
+    }
+
+    /* Hide individual action buttons in toolbar on desktop - they're in the menu */
+    .note-edit-toolbar .btn-duplicate,
+    .note-edit-toolbar .btn-move,
+    .note-edit-toolbar .btn-create-linked-note,
+    .note-edit-toolbar .btn-download,
+    .note-edit-toolbar .btn-convert,
+    .note-edit-toolbar .btn-info,
+    .note-edit-toolbar .btn-open-new-tab,
+    .note-edit-toolbar .btn-search-replace {
+        display: none !important;
+    }
+
+    /* Hide tasklist menu items on desktop */
+    .mobile-toolbar-menu [data-action="clear-completed-tasks"],
+    .mobile-toolbar-menu [data-action="uncheck-all-tasks"] {
         display: none !important;
     }
 }

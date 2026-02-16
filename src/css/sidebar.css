@@ -115,6 +115,112 @@
     outline-offset: 2px;
 }
 
+/* Sidebar menu button (hamburger) */
+/* Sidebar action buttons (Home, Settings, Create) - visible on all screens */
+.sidebar-home,
+.sidebar-settings,
+.sidebar-plus {
+    background: transparent;
+    border: none;
+    color: #6c757d !important;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    position: relative;
+}
+
+.sidebar-home:hover,
+.sidebar-settings:hover,
+.sidebar-plus:hover {
+    background: rgba(0, 125, 184, 0.1);
+}
+
+.sidebar-home:focus,
+.sidebar-settings:focus,
+.sidebar-plus:focus {
+    outline: 2px solid #007DB8;
+    outline-offset: 2px;
+}
+
+/* Hide mobile burger menu completely */
+.sidebar-menu-btn {
+    display: none !important;
+}
+
+/* Sidebar dropdown menu */
+.sidebar-menu-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e6eef8;
+    box-shadow: 0 8px 24px rgba(15, 120, 230, 0.08);
+    border-radius: 8px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 60;
+    min-width: 180px;
+    margin-top: 4px;
+}
+
+.sidebar-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: background-color 0.2s;
+    font-family: 'Inter', sans-serif;
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    border-radius: 6px;
+}
+
+.sidebar-menu-item:hover {
+    background: #f6fbff;
+    color: #007DB8;
+}
+
+.sidebar-menu-item i {
+    font-size: 18px;
+    color: #007DB8;
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar-menu-item span {
+    flex: 1;
+}
+
+/* Update badge in menu item */
+.sidebar-menu-item .update-badge {
+    position: relative;
+    top: auto;
+    right: auto;
+    background: #ef4444;
+    color: white;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    font-size: 8px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+}
+
+.sidebar-menu-item .update-badge.update-badge-hidden {
+    display: none;
+}
+
 /* Réduire la taille des icônes Font Awesome dans la sidebar */
 .sidebar-title-actions i,
 .sidebar-title-actions [class*="fa-"],

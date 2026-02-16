@@ -11,6 +11,11 @@
     position: relative;
 }
 
+.note-edit-toolbar .toolbar-menu-anchor {
+    position: relative;
+    display: inline-flex;
+}
+
 /* Color palette popup (desktop) - same appearance as mobile palette */
 .color-palette-popup {
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
@@ -414,4 +419,22 @@ a.links_arbo_left.selected-note {
 .icon_save {
     color: #007DB8;
     font-size: 1.1em;
+}
+
+/* Desktop styles for toolbar menu (3 dots menu) */
+@media (min-width: 800px) {
+    /* Show the more button (3 dots) on desktop */
+    .note-edit-toolbar .mobile-more-btn {
+        display: inline-flex !important;
+    }
+
+    /* Ensure dropdown menu displays correctly on desktop */
+    .note-edit-toolbar .mobile-toolbar-menu {
+        position: absolute;
+        right: 0;
+        left: auto;
+        top: 100%;
+        margin-top: 4px;
+        min-width: 220px;
+    }
 }

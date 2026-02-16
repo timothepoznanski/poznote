@@ -125,6 +125,11 @@
                     toggleCreateMenu();
                 }
                 break;
+            case 'toggle-sidebar-menu':
+                if (typeof toggleSidebarMenu === 'function') {
+                    toggleSidebarMenu(e);
+                }
+                break;
 
             // Mobile navigation
             case 'scroll-to-left-column':
@@ -703,8 +708,53 @@
      * Note: Despite the name "toggle", this function only redirects
      */
     window.toggleCreateMenu = function () {
+        closeSidebarMenu();
         var workspace = (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || '';
         window.location.href = 'create.php?workspace=' + encodeURIComponent(workspace);
+    };
+
+    /**
+     * Close the sidebar menu dropdown
+     */
+    function closeSidebarMenu() {
+        var menu = document.getElementById('sidebarMenu');
+        if (menu) {
+            menu.style.display = 'none';
+        }
+    }
+
+    /**
+     * Toggle the sidebar menu dropdown
+     */
+    window.toggleSidebarMenu = function (event) {
+        if (event) event.stopPropagation();
+        
+        var menu = document.getElementById('sidebarMenu');
+        if (!menu) return;
+        
+        var isVisible = menu.style.display !== 'none';
+        
+        if (isVisible) {
+            menu.style.display = 'none';
+        } else {
+            // Close create menu if open
+            var createMenu = document.querySelector('.create-menu');
+            if (createMenu) {
+                createMenu.style.display = 'none';
+            }
+            
+            menu.style.display = 'block';
+            
+            // Close menu when clicking elsewhere
+            setTimeout(function () {
+                document.addEventListener('click', function closeSidebarMenuHandler(e) {
+                    if (!menu.contains(e.target) && !e.target.closest('.sidebar-menu-btn')) {
+                        menu.style.display = 'none';
+                        document.removeEventListener('click', closeSidebarMenuHandler);
+                    }
+                });
+            }, 10);
+        }
     };
 
     /**
