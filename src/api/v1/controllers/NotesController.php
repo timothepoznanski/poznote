@@ -1477,7 +1477,6 @@ class NotesController {
             
             $content = file_get_contents($currentFilePath);
             $attachments = $note['attachments'] ? json_decode($note['attachments'], true) : [];
-            $attachmentsToRemove = [];
             $attachmentsDir = getAttachmentsPath();
             
             // Convert content
@@ -1563,53 +1562,16 @@ class NotesController {
                 $convertedContent = $this->htmlToMarkdown($content);
                 $newType = 'markdown';
             } else {
-                // Converting markdown to HTML: embed image attachments as base64
-                $content = preg_replace_callback(
-                    '/!\[([^\]]*)\]\(\/api\/v1\/notes\/' . preg_quote($id, '/') . '\/attachments\/([a-zA-Z0-9]+)\)/',
-                    function($matches) use ($attachments, $attachmentsDir, &$attachmentsToRemove) {
-                        $altText = $matches[1];
-                        $attachmentId = $matches[2];
-                        
-                        foreach ($attachments as $attachment) {
-                            if (isset($attachment['id']) && $attachment['id'] === $attachmentId) {
-                                $filePath = $attachmentsDir . '/' . $attachment['filename'];
-                                if (file_exists($filePath) && is_readable($filePath)) {
-                                    $mimeType = $attachment['file_type'] ?? '';
-                                    if (strpos($mimeType, 'image/') === 0) {
-                                        $fileContent = file_get_contents($filePath);
-                                        $base64 = base64_encode($fileContent);
-                                        $dataUri = 'data:' . $mimeType . ';base64,' . $base64;
-                                        $attachmentsToRemove[] = $attachmentId;
-                                        return '![' . $altText . '](' . $dataUri . ')';
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                        return $matches[0];
-                    },
-                    $content
-                );
+                // Converting markdown to HTML: keep attachments as attachments (don't convert to base64)
+                // The parseMarkdown function will convert markdown image syntax to HTML img tags
+                // and keep the attachment URLs intact
                 
                 require_once __DIR__ . '/../../../markdown_parser.php';
                 $convertedContent = parseMarkdown($content);
                 $newType = 'note';
                 
-                // Remove embedded image attachments from the note and delete files
-                if (!empty($attachmentsToRemove)) {
-                    $remainingAttachments = [];
-                    foreach ($attachments as $attachment) {
-                        if (in_array($attachment['id'], $attachmentsToRemove)) {
-                            $filePath = $attachmentsDir . '/' . $attachment['filename'];
-                            if (file_exists($filePath)) {
-                                unlink($filePath);
-                            }
-                        } else {
-                            $remainingAttachments[] = $attachment;
-                        }
-                    }
-                    $attachments = $remainingAttachments;
-                }
+                // Note: Attachments are preserved during conversion
+                // No files are deleted, all attachments remain available
             }
             
             // Create new file with converted content
