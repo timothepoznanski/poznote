@@ -5,6 +5,48 @@
  * general rules, placeholders, and utility classes.
  */
 
+/* Indicateur de sauvegarde en cours (petite disquette rouge en haut à droite) */
+.save-indicator {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 99999;
+    color: #ff0000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.save-indicator i {
+    font-size: 11px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+/* Responsive mobile */
+@media screen and (max-width: 768px) {
+    .save-indicator {
+        top: 10px;
+        right: 10px;
+    }
+    
+    .save-indicator i {
+        font-size: 10px;
+    }
+}
+
+/* Responsive mobile */
+@media screen and (max-width: 768px) {
+    .save-indicator {
+        top: 10px;
+        right: 10px;
+    }
+    
+    .save-indicator i {
+        font-size: 14px;
+    }
+}
+
 /* File upload styling */
 .accepted-types {
     font-size: 0.85em;

@@ -313,7 +313,8 @@ function _updateUIAfterSave(timeText, titleChanged) {
         updateNoteTitleInLeftColumn();
     }
     
-    // Update last saved content for change detection
+    // Update last saved content for change detection FIRST (before hiding indicator)
+    // to prevent race conditions where an event might re-trigger the indicator
     var elements = getNoteElements(noteid);
     if (elements.entry) {
         lastSavedContent = elements.entry.innerHTML;
@@ -325,13 +326,9 @@ function _updateUIAfterSave(timeText, titleChanged) {
         lastSavedTags = elements.tags.value;
     }
     
-    updateConnectionStatus(true);
-    
-    // Remove unsaved changes indicator from page title
-    if (document.title.startsWith('🔴 ')) {
-        document.title = document.title.substring(3);
-    } else if (document.title.startsWith('🔴')) {
-        document.title = document.title.substring(2);
+    // Clear draft from localStorage
+    if (typeof window.clearDraft === 'function') {
+        window.clearDraft(noteid);
     }
     
     // Mark note as saved (remove from pending refresh list)
@@ -339,9 +336,19 @@ function _updateUIAfterSave(timeText, titleChanged) {
         notesNeedingRefresh.delete(String(noteid));
     }
     
-    // Clear draft from localStorage after successful save
-    if (typeof window.clearDraft === 'function') {
-        window.clearDraft(noteid);
+    updateConnectionStatus(true);
+    
+    // NOW hide save indicator after all state is updated
+    var saveIndicator = document.getElementById('save-indicator');
+    if (saveIndicator) {
+        saveIndicator.style.display = 'none';
+    }
+    
+    // Remove red dot from page title
+    if (document.title.startsWith('🔴 ')) {
+        document.title = document.title.substring(3);
+    } else if (document.title.startsWith('🔴')) {
+        document.title = document.title.substring(2);
     }
     
     // Refresh tags count in sidebar after successful save

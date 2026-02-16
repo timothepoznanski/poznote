@@ -157,6 +157,12 @@ function markNoteAsModified() {
             document.title = '🔴 ' + document.title;
         }
 
+        // Show save indicator (red floppy disk in top right)
+        const saveIndicator = document.getElementById('save-indicator');
+        if (saveIndicator) {
+            saveIndicator.style.display = 'flex';
+        }
+
         // Debounced server save (3s delay for better performance)
         clearTimeout(saveTimeout);
         const currentNoteId = noteid; // Capture current note ID
