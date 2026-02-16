@@ -859,21 +859,26 @@
     };
 
     /**
-     * Check URL parameters and auto-scroll to note if scroll=1 is present
+     * Check URL parameters and auto-scroll to note if scroll=1 is present or if a note ID is in the URL
      * Used on mobile after creating/loading a note
      */
     function checkAndScrollToNote() {
         const isMobile = window.innerWidth <= 800;
         if (isMobile) {
             const urlParams = new URLSearchParams(window.location.search);
-            const shouldScroll = urlParams.has('scroll') && urlParams.get('scroll') === '1';
+            const hasScrollParam = urlParams.has('scroll') && urlParams.get('scroll') === '1';
+            const hasNoteParam = urlParams.has('note');
 
-            if (shouldScroll) {
+            if (hasScrollParam || hasNoteParam) {
                 setTimeout(function () {
                     scrollToRightColumn();
-                    urlParams.delete('scroll');
-                    const newUrl = window.location.pathname + '?' + urlParams.toString();
-                    window.history.replaceState({}, '', newUrl);
+                    
+                    // Only remove the scroll parameter, keep note parameter
+                    if (hasScrollParam) {
+                        urlParams.delete('scroll');
+                        const newUrl = window.location.pathname + '?' + urlParams.toString();
+                        window.history.replaceState({}, '', newUrl);
+                    }
                 }, 100);
             }
         }
