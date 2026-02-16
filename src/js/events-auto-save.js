@@ -70,8 +70,10 @@ function updateConnectionStatus(online) {
 
 /**
  * Warn user before leaving page with unsaved changes
+ * Uses multiple events for better mobile compatibility
  */
 function setupPageUnloadWarning() {
+    // Desktop and some mobile browsers
     window.addEventListener('beforeunload', (e) => {
         const currentNoteId = window.noteid;
         
@@ -94,6 +96,40 @@ function setupPageUnloadWarning() {
             e.preventDefault();
             e.returnValue = message;
             return message;
+        }
+    });
+
+    // Mobile Safari and some Android browsers (more reliable than beforeunload)
+    window.addEventListener('pagehide', (e) => {
+        const currentNoteId = window.noteid;
+        
+        if (hasUnsavedChanges(currentNoteId)) {
+            // Force immediate save before leaving (synchronous for pagehide)
+            if (isOnline) {
+                try {
+                    emergencySave(currentNoteId);
+                } catch (err) {
+                    console.error('[Poznote Auto-Save] Emergency save via pagehide failed:', err);
+                }
+            }
+        }
+    });
+
+    // Additional fallback for visibility changes (tab switching, app backgrounding)
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+            const currentNoteId = window.noteid;
+            
+            if (hasUnsavedChanges(currentNoteId)) {
+                // Force immediate save when page becomes hidden
+                if (isOnline) {
+                    try {
+                        emergencySave(currentNoteId);
+                    } catch (err) {
+                        console.error('[Poznote Auto-Save] Emergency save via visibilitychange failed:', err);
+                    }
+                }
+            }
         }
     });
 }

@@ -12,25 +12,42 @@ ob_start();
 // Get the correct entries path using our centralized function
 $rootPath = getEntriesPath();
 
-$zip = new ZipArchive();
-// Create ZIP file in temporary directory with proper permissions
-$tempDir = sys_get_temp_dir();
-$zipFileName = $tempDir . '/poznote_structured_' . uniqid() . '.zip';
-
 // Debug: Check if entries directory exists
 if (!$rootPath) {
     ob_end_clean();
     die('Entries directory not found in any expected location');
 }
 
+$fileCount = 0;
+$workspace = $_GET['workspace'] ?? null;
+
+// Get workspace name if workspace is specified
+$workspaceName = 'all';
+if ($workspace !== null) {
+    $stmt_ws = $con->prepare('SELECT name FROM workspaces WHERE name = ?');
+    $stmt_ws->execute([$workspace]);
+    $ws_row = $stmt_ws->fetch(PDO::FETCH_ASSOC);
+    if ($ws_row) {
+        $workspaceName = $ws_row['name'];
+    }
+}
+
+// Generate filename with workspace name and date
+$tempDir = sys_get_temp_dir();
+$dateStr = date('Y-m-d_His');
+// Sanitize workspace name: replace spaces and special characters with underscores
+$safeWorkspaceName = preg_replace('/\s+/', '_', $workspaceName); // Replace spaces with underscores
+$safeWorkspaceName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $safeWorkspaceName); // Replace other special chars
+$safeWorkspaceName = preg_replace('/_+/', '_', $safeWorkspaceName); // Replace multiple underscores with single
+$safeWorkspaceName = trim($safeWorkspaceName, '_'); // Remove leading/trailing underscores
+$zipFileName = $tempDir . '/poznote_structured_' . $safeWorkspaceName . '_' . $dateStr . '.zip';
+
+$zip = new ZipArchive();
 $result = $zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 if ($result !== TRUE) {
     ob_end_clean();
     die('Cannot create ZIP file. Error code: ' . $result);
 }
-
-$fileCount = 0;
-$workspace = $_GET['workspace'] ?? null;
 
 // Build folder hierarchy to understand the structure
 function buildFolderTree($con, $workspace = null) {
@@ -125,7 +142,13 @@ $allFolders = $folderTree['folders'];
 // Create README in the root explaining the structure
 $readmeContent = "# Poznote Structured Export\n\n";
 $readmeContent .= "This archive contains your Poznote notes organized in folders matching your Poznote folder structure.\n\n";
-$readmeContent .= "Export date: " . date('Y-m-d H:i:s') . "\n\n";
+
+// Add workspace name
+$readmeContent .= "**Workspace:** " . $workspaceName . "\n\n";
+
+// Add export date
+$readmeContent .= "**Export date:** " . date('Y-m-d H:i:s') . "\n\n";
+
 $readmeContent .= "## Structure\n\n";
 $readmeContent .= "- Each folder from Poznote is represented as a directory in this archive\n";
 $readmeContent .= "- Notes are saved with their original type (.html or .md)\n";

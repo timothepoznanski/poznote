@@ -837,6 +837,66 @@
      * On desktop: uses scrollIntoView
      */
     window.scrollToLeftColumn = function () {
+        // Check for unsaved changes before navigating away
+        if (typeof hasUnsavedChanges === 'function' && typeof window.noteid !== 'undefined') {
+            if (hasUnsavedChanges(window.noteid)) {
+                // Get translation function or use default message
+                const message = typeof tr === 'function' 
+                    ? tr('autosave.unsaved_changes_warning', {}, '⚠️ You have unsaved changes. Are you sure you want to leave?')
+                    : '⚠️ You have unsaved changes. Are you sure you want to leave?';
+                
+                const title = typeof tr === 'function'
+                    ? tr('autosave.unsaved_changes_title', {}, 'Unsaved Changes')
+                    : 'Unsaved Changes';
+                
+                // Use styled modal instead of native confirm
+                if (window.modalAlert && typeof window.modalAlert.confirm === 'function') {
+                    window.modalAlert.confirm(message, title).then(function(isConfirmed) {
+                        if (!isConfirmed) {
+                            return; // User cancelled, don't navigate
+                        }
+                        
+                        // User confirmed, try to save before leaving
+                        if (typeof emergencySave === 'function') {
+                            try {
+                                emergencySave(window.noteid);
+                            } catch (err) {
+                                console.error('[Poznote] Emergency save failed:', err);
+                            }
+                        }
+                        
+                        // Now perform the navigation
+                        performScroll();
+                    });
+                } else {
+                    // Fallback to native confirm if modal system not available
+                    if (!confirm(message)) {
+                        return; // User cancelled, don't navigate
+                    }
+                    
+                    // User confirmed, try to save before leaving
+                    if (typeof emergencySave === 'function') {
+                        try {
+                            emergencySave(window.noteid);
+                        } catch (err) {
+                            console.error('[Poznote] Emergency save failed:', err);
+                        }
+                    }
+                    
+                    performScroll();
+                }
+                return; // Exit early since we'll call performScroll() in callback
+            }
+        }
+        
+        // No unsaved changes, perform scroll immediately
+        performScroll();
+    };
+    
+    /**
+     * Helper function to perform the actual scroll action
+     */
+    function performScroll() {
         if (window.innerWidth <= 800) {
             // With scroll-behavior: smooth !important in CSS, 
             // these simple assignments will trigger the sliding animation.
@@ -856,7 +916,7 @@
                 });
             }
         }
-    };
+    }
 
     /**
      * Check URL parameters and auto-scroll to note if scroll=1 is present or if a note ID is in the URL

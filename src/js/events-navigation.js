@@ -36,12 +36,25 @@ function setupBrowserNavigationHandler() {
 
         // Check for unsaved changes before navigating
         if (hasUnsavedChanges(currentNoteId)) {
-            handleUnsavedChanges(currentNoteId, 'autosave.confirm_navigation', 
-                "⚠️ Unsaved Changes\n\n" +
-                "You have unsaved changes that will be lost.\n" +
-                "Save before navigating away?");
+            var result = handleUnsavedChanges(currentNoteId, 'autosave.confirm_navigation', 
+                "You have unsaved changes that will be lost.\nSave before navigating away?");
+            
+            // If result is a Promise (using modal), wait for it
+            if (result && typeof result.then === 'function') {
+                result.then(function(confirmed) {
+                    // Continue navigation regardless of choice
+                    performPopstateNavigation();
+                });
+                return; // Stop here, navigation will continue in callback
+            }
+            // If synchronous (fallback confirm), continue immediately
         }
 
+        // No unsaved changes or after save, perform navigation
+        performPopstateNavigation();
+    });
+    
+    function performPopstateNavigation() {
         // Handle URL-based navigation (browser back/forward)
         var url = new URL(window.location.href);
         var noteParam = url.searchParams.get('note');
@@ -53,7 +66,7 @@ function setupBrowserNavigationHandler() {
         } else {
             window.location.reload();
         }
-    });
+    }
 }
 
 /**
@@ -152,30 +165,56 @@ function checkUnsavedBeforeLeaving(targetNoteId) {
  * @param {string|number} noteId - Current note ID with unsaved changes
  * @param {string} translationKey - Translation key for the message
  * @param {string} fallbackMessage - Fallback message if translation not found
- * @returns {boolean} True if user confirmed save, false otherwise
+ * @returns {boolean|Promise<boolean>} True if user confirmed save, false otherwise (or Promise if using modal)
  */
 function handleUnsavedChanges(noteId, translationKey, fallbackMessage) {
     var message = tr(translationKey, {}, fallbackMessage);
+    var title = tr('autosave.unsaved_changes_title', {}, 'Unsaved Changes');
 
-    if (confirm(message)) {
-        // Force immediate save
-        clearTimeout(saveTimeout);
-        saveTimeout = null;
+    // Use styled modal if available
+    if (window.modalAlert && typeof window.modalAlert.confirm === 'function') {
+        return window.modalAlert.confirm(message, title).then(function(confirmed) {
+            if (confirmed) {
+                // Force immediate save
+                clearTimeout(saveTimeout);
+                saveTimeout = null;
 
-        // Immediate server save if online
-        if (isOnline) {
-            saveToServerDebounced();
+                // Immediate server save if online
+                if (isOnline) {
+                    saveToServerDebounced();
+                }
+
+                // Clear refresh flag after short delay to let save complete
+                setTimeout(function() {
+                    notesNeedingRefresh.delete(String(noteId));
+                }, 500);
+
+                return true;
+            }
+            return false;
+        });
+    } else {
+        // Fallback to native confirm (synchronous)
+        if (confirm(message)) {
+            // Force immediate save
+            clearTimeout(saveTimeout);
+            saveTimeout = null;
+
+            // Immediate server save if online
+            if (isOnline) {
+                saveToServerDebounced();
+            }
+
+            // Clear refresh flag after short delay to let save complete
+            setTimeout(function() {
+                notesNeedingRefresh.delete(String(noteId));
+            }, 500);
+
+            return true;
         }
 
-        // Clear refresh flag after short delay to let save complete
-        setTimeout(function() {
-            notesNeedingRefresh.delete(String(noteId));
-        }, 500);
-
-        return true;
+        return false;
     }
-
-    return false;
 }
 
 // Expose navigation functions globally
