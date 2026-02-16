@@ -359,17 +359,14 @@ class GitHubSync {
                         }
                     }
                     
-                    // Check if this is a note file or an attachment file
-                    $extension = pathinfo($path, PATHINFO_EXTENSION);
-                    $isNoteFile = in_array($extension, self::SUPPORTED_NOTE_EXTENSIONS);
-                    $isAttachmentFile = strpos($path, '/attachments/') !== false;
-                    
-                    // Only process notes and attachments
-                    if (!$isNoteFile && !$isAttachmentFile) continue;
-                    
-                    // If this file is not in our expected paths, delete it
+                    // Delete any file not in our expected paths (complete overwrite)
                     if (!in_array($path, $expectedPaths)) {
-                        $fileType = $isNoteFile ? "note" : "attachment";
+                        $extension = pathinfo($path, PATHINFO_EXTENSION);
+                        $isNoteFile = in_array($extension, self::SUPPORTED_NOTE_EXTENSIONS);
+                        $isAttachmentFile = strpos($path, '/attachments/') !== false;
+                        $isMetadataFile = basename($path) === '.metadata.json';
+                        
+                        $fileType = $isNoteFile ? "note" : ($isAttachmentFile ? "attachment" : ($isMetadataFile ? "metadata" : "file"));
                         $results['debug'][] = "Deleting orphaned {$fileType}: " . $path;
                         $deleteResult = $this->deleteFile($path, "Deleted from Poznote");
                         
