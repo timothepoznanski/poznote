@@ -449,6 +449,11 @@ function restoreDraft(noteId, content, title, tags) {
         if (typeof window.convertNoteAudioToIframes === 'function') {
             window.convertNoteAudioToIframes();
         }
+        
+        // Fix existing audio iframes to use audio_player.php
+        if (typeof window.fixAudioIframes === 'function') {
+            window.fixAudioIframes();
+        }
     }
     
     if (titleInput && title) {

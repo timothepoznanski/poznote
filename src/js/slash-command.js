@@ -3553,6 +3553,9 @@
                         var wsParam = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace)
                             ? '?workspace=' + encodeURIComponent(selectedWorkspace)
                             : '';
+                        var workspaceQuery = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace)
+                            ? '&workspace=' + encodeURIComponent(selectedWorkspace)
+                            : '';
                         var attachmentId = data.attachment_id;
                         var fileUrl = '/api/v1/notes/' + noteId + '/attachments/' + attachmentId + wsParam;
 
@@ -3561,8 +3564,8 @@
                         if (isVideo) {
                             mediaHtml = '<video class="note-video-embed" contenteditable="false" width="560" height="315" controls preload="metadata" playsinline src="' + fileUrl + '"></video>';
                         } else {
-                            // Audio: use native <audio> with contenteditable="false" (works in Chrome)
-                            mediaHtml = '<audio class="note-audio-embed" controls preload="metadata" contenteditable="false" src="' + fileUrl + '"></audio>';
+                            var audioPlayerUrl = '/audio_player.php?note=' + noteId + '&attachment=' + attachmentId + workspaceQuery;
+                            mediaHtml = '<iframe class="note-audio-embed" contenteditable="false" scrolling="no" frameborder="0" allow="autoplay" data-is-audio="true" data-audio-src="' + fileUrl + '" src="' + audioPlayerUrl + '"></iframe>';
                         }
 
                         if (editableElement) {

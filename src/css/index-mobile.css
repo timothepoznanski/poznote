@@ -258,8 +258,8 @@ body::-webkit-scrollbar {
 */
 .noteentry table,
 .markdown-preview table,
-.noteentry iframe,
-.markdown-preview iframe {
+.noteentry iframe:not([data-is-audio]):not(.note-audio-embed),
+.markdown-preview iframe:not([data-is-audio]):not(.note-audio-embed) {
     width: 100% !important;
     max-width: 100%;
 }
@@ -269,8 +269,8 @@ body::-webkit-scrollbar {
     table-layout: fixed;
 }
 
-.noteentry iframe,
-.markdown-preview iframe {
+.noteentry iframe:not([data-is-audio]):not(.note-audio-embed),
+.markdown-preview iframe:not([data-is-audio]):not(.note-audio-embed) {
     height: auto !important;
     aspect-ratio: 16 / 9;
     border: none;
