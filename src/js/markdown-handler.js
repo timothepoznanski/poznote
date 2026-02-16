@@ -2036,6 +2036,14 @@ function setupPreviewInteractivity(noteId) {
     var previewDiv = noteEntry.querySelector('.markdown-preview');
     if (!previewDiv) return;
 
+    if (typeof window.processNoteReferences === 'function') {
+        try {
+            window.processNoteReferences(previewDiv);
+        } catch (e) {
+            console.error('Error processing note references in markdown preview:', e);
+        }
+    }
+
     var isInSplitMode = noteEntry.classList.contains('markdown-split-mode');
 
     // Setup checkbox click handlers
