@@ -1227,6 +1227,21 @@ function reinitializeNoteContent() {
     if (typeof window.reinitializeAutoSaveState === 'function') {
         window.reinitializeAutoSaveState();
     }
+    
+    // Convert base64 images in HTML notes to attachments (migration)
+    try {
+        var noteEntries = document.querySelectorAll('.noteentry[data-note-type="note"], .noteentry:not([data-note-type])');
+        noteEntries.forEach(function(entry) {
+            if (typeof window.convertBase64ImagesToAttachments === 'function') {
+                // Small delay to ensure DOM is stable
+                setTimeout(function() {
+                    window.convertBase64ImagesToAttachments(entry);
+                }, 100);
+            }
+        });
+    } catch (e) {
+        // Silently continue if error
+    }
 
     // Re-initialize search highlighting if in search mode.
     // Prefer the centralized helper which knows about notes/tags/folders.

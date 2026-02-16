@@ -1,72 +1,140 @@
 // Attached file and image drag management
-
-// Maximum size for inline base64 images (in bytes) - images larger than this will be compressed
-var MAX_IMAGE_SIZE_BYTES = 500 * 1024; // 500KB
-var IMAGE_COMPRESSION_QUALITY = 0.8; // JPEG quality for compression
-var MAX_IMAGE_DIMENSION = 1920; // Max width/height in pixels
+// All images (HTML and Markdown notes) are now uploaded as attachments for consistency
 
 /**
- * Compress an image if it's too large
- * @param {string} dataUrl - The original base64 data URL
- * @param {function} callback - Called with the (possibly compressed) data URL
+ * Convert base64 images in loaded notes to attachments
+ * This function is called after a note is loaded to migrate legacy base64 images
+ * @param {HTMLElement} noteEntry - The note entry element to process
  */
-function compressImageIfNeeded(dataUrl, callback) {
-    // Check if the image is small enough already
-    var sizeInBytes = Math.ceil((dataUrl.length - 22) * 3 / 4); // Approximate base64 size
+function convertBase64ImagesToAttachments(noteEntry) {
+    if (!noteEntry) return;
     
-    if (sizeInBytes <= MAX_IMAGE_SIZE_BYTES) {
-        callback(dataUrl);
+    // Only process HTML notes (not markdown, not excalidraw)
+    var noteType = noteEntry.getAttribute('data-note-type');
+    if (noteType === 'markdown' || noteType === 'excalidraw' || noteType === 'tasklist') {
         return;
     }
     
-    // Need to compress - create an image to get dimensions
-    var img = new Image();
-    img.onload = function() {
-        var canvas = document.createElement('canvas');
-        var ctx = canvas.getContext('2d');
-        
-        // Calculate new dimensions while maintaining aspect ratio
-        var width = img.width;
-        var height = img.height;
-        
-        if (width > MAX_IMAGE_DIMENSION || height > MAX_IMAGE_DIMENSION) {
-            if (width > height) {
-                height = Math.round(height * MAX_IMAGE_DIMENSION / width);
-                width = MAX_IMAGE_DIMENSION;
-            } else {
-                width = Math.round(width * MAX_IMAGE_DIMENSION / height);
-                height = MAX_IMAGE_DIMENSION;
-            }
-        }
-        
-        canvas.width = width;
-        canvas.height = height;
-        
-        // Draw and compress
-        ctx.drawImage(img, 0, 0, width, height);
-        
-        // Try JPEG compression first (much smaller for photos)
-        var compressedUrl = canvas.toDataURL('image/jpeg', IMAGE_COMPRESSION_QUALITY);
-        
-        // If original was PNG with transparency, keep as PNG but resize
-        if (dataUrl.indexOf('data:image/png') === 0) {
-            var pngUrl = canvas.toDataURL('image/png');
-            // Use PNG only if it's not much larger than JPEG (for transparency)
-            if (pngUrl.length < compressedUrl.length * 1.5) {
-                compressedUrl = pngUrl;
-            }
-        }
-        
-        callback(compressedUrl);
-    };
+    var noteId = noteEntry.id ? noteEntry.id.replace('entry', '') : null;
+    if (!noteId || noteId === '' || noteId === 'search') return;
     
-    img.onerror = function() {
-        // If compression fails, use original
-        callback(dataUrl);
-    };
+    // Find all base64 images in the note
+    var base64Images = noteEntry.querySelectorAll('img[src^="data:image/"]');
+    if (base64Images.length === 0) return;
     
-    img.src = dataUrl;
+    // Convert each image
+    var conversionPromises = [];
+    
+    base64Images.forEach(function(img, index) {
+        var src = img.getAttribute('src');
+        if (!src || !src.startsWith('data:image/')) return;
+        
+        // Parse the data URL
+        var matches = src.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
+        if (!matches) return;
+        
+        var mimeSubtype = matches[1];
+        var base64Data = matches[2];
+        
+        // Convert base64 to blob
+        try {
+            var byteCharacters = atob(base64Data);
+            var byteNumbers = new Array(byteCharacters.length);
+            for (var i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            var byteArray = new Uint8Array(byteNumbers);
+            var mimeType = 'image/' + (mimeSubtype === 'svg+xml' ? 'svg+xml' : mimeSubtype);
+            var blob = new Blob([byteArray], { type: mimeType });
+            
+            // Determine file extension
+            var extensionMap = {
+                'jpeg': 'jpg', 'png': 'png', 'gif': 'gif',
+                'webp': 'webp', 'svg+xml': 'svg', 'bmp': 'bmp'
+            };
+            var extension = extensionMap[mimeSubtype.toLowerCase()] || 'png';
+            
+            // Create a File object
+            var altText = img.getAttribute('alt') || '';
+            var fileName = altText ? altText + '.' + extension : 'image_' + Date.now() + '_' + index + '.' + extension;
+            var file = new File([blob], fileName, { type: mimeType });
+            
+            // Add a loading indicator to the image
+            img.style.opacity = '0.5';
+            img.style.border = '2px dashed #ccc';
+            
+            // Upload as attachment
+            var formData = new FormData();
+            formData.append('note_id', noteId);
+            formData.append('file', file);
+            if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) {
+                formData.append('workspace', selectedWorkspace);
+            }
+            
+            var promise = fetch('/api/v1/notes/' + noteId + '/attachments', {
+                method: 'POST',
+                body: formData
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    // Replace the src with the attachment URL
+                    var newSrc = '/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id;
+                    img.setAttribute('src', newSrc);
+                    img.setAttribute('loading', 'lazy');
+                    img.setAttribute('decoding', 'async');
+                    img.style.opacity = '';
+                    img.style.border = '';
+                    return true;
+                } else {
+                    img.style.opacity = '';
+                    img.style.border = '';
+                    return false;
+                }
+            })
+            .catch(function(error) {
+                img.style.opacity = '';
+                img.style.border = '';
+                return false;
+            });
+            
+            conversionPromises.push(promise);
+        } catch (e) {
+            // Silently continue if error processing image
+        }
+    });
+    
+    // After all conversions complete, save the note
+    if (conversionPromises.length > 0) {
+        Promise.all(conversionPromises).then(function(results) {
+            var successCount = results.filter(function(r) { return r === true; }).length;
+            if (successCount > 0) {
+                // Update attachment count in menu
+                if (typeof updateAttachmentCountInMenu === 'function') {
+                    updateAttachmentCountInMenu(noteId);
+                }
+                
+                // Mark note as modified and save
+                window.noteid = noteId;
+                if (typeof window.markNoteAsModified === 'function') {
+                    window.markNoteAsModified();
+                }
+                
+                // Trigger save after a short delay
+                setTimeout(function() {
+                    if (typeof saveNoteToServer === 'function') {
+                        saveNoteToServer();
+                    } else if (typeof window.saveNoteImmediately === 'function') {
+                        window.saveNoteImmediately();
+                    }
+                }, 200);
+            }
+        });
+    }
 }
+
+// Expose function globally for use in note-loader-common.js
+window.convertBase64ImagesToAttachments = convertBase64ImagesToAttachments;
 
 /**
  * Use global translation function from globals.js
@@ -582,66 +650,119 @@ function replaceLoadingText(oldText, newText, dropTarget) {
 }
 
 function handleHTMLImageInsert(file, dropTarget) {
-    // Code existant pour les notes HTML
-    var reader = new FileReader();
-    reader.onload = function (ev) {
-        var originalDataUrl = ev.target.result;
-        
-        // Compress large images to improve performance
-        compressImageIfNeeded(originalDataUrl, function(dataUrl) {
-            // Add lazy loading and async decoding for better performance with many images
-            var imgHtml = '<img src="' + dataUrl + '" alt="image" loading="lazy" decoding="async" />';
+    // Get the note ID from the drop target
+    var noteId = dropTarget.id.replace('entry', '');
+    
+    if (!noteId || noteId === '' || noteId === 'search') {
+        if (typeof showNotificationPopup === 'function') {
+            showNotificationPopup('Cannot upload image: note ID not found', 'error');
+        }
+        return;
+    }
 
-            // Get the note ID from the drop target
-            var targetNoteId = dropTarget.id.replace('entry', '');
+    // Insert a placeholder while uploading
+    var placeholderHtml = '<img src="" alt="' + tr('attachments.upload.uploading', {}, 'Uploading...') + '" class="image-uploading-placeholder" style="opacity: 0.5; min-width: 100px; min-height: 100px; background: #f0f0f0; border: 2px dashed #ccc;" />';
+    
+    var sel = window.getSelection();
+    var inserted = false;
+    var placeholderImg = null;
 
-            var sel = window.getSelection();
-            var inserted = false;
+    if (sel && sel.rangeCount) {
+        var range = sel.getRangeAt(0);
+        var container = range.commonAncestorContainer;
+        var noteEntry = container.nodeType === 1 ?
+            container.closest('.noteentry') :
+            container.parentElement.closest('.noteentry');
 
-            if (sel && sel.rangeCount) {
-                var range = sel.getRangeAt(0);
-                var container = range.commonAncestorContainer;
-                var noteEntry = container.nodeType === 1 ?
-                    container.closest('.noteentry') :
-                    container.parentElement.closest('.noteentry');
+        if (noteEntry === dropTarget) {
+            inserted = insertHTMLAtSelection(placeholderHtml);
+            placeholderImg = dropTarget.querySelector('.image-uploading-placeholder');
+        }
+    }
 
-                if (noteEntry === dropTarget) {
-                    inserted = insertHTMLAtSelection(imgHtml);
-                }
-            }
+    if (!inserted && dropTarget) {
+        dropTarget.insertAdjacentHTML('beforeend', placeholderHtml);
+        placeholderImg = dropTarget.querySelector('.image-uploading-placeholder');
+    }
 
-            if (!inserted && dropTarget) {
-                dropTarget.innerHTML += imgHtml;
+    // Upload the file as attachment
+    var formData = new FormData();
+    formData.append('note_id', noteId);
+    formData.append('file', file);
+    if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) {
+        formData.append('workspace', selectedWorkspace);
+    }
+
+    fetch('/api/v1/notes/' + noteId + '/attachments', {
+        method: 'POST',
+        body: formData
+    })
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        if (data.success) {
+            // Replace placeholder with actual image
+            var imgSrc = '/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id;
+            
+            if (placeholderImg) {
+                placeholderImg.src = imgSrc;
+                placeholderImg.alt = file.name;
+                placeholderImg.classList.remove('image-uploading-placeholder');
+                placeholderImg.style.opacity = '';
+                placeholderImg.style.minWidth = '';
+                placeholderImg.style.minHeight = '';
+                placeholderImg.style.background = '';
+                placeholderImg.style.border = '';
+                placeholderImg.setAttribute('loading', 'lazy');
+                placeholderImg.setAttribute('decoding', 'async');
             }
 
             // Update the global noteid to the target note for proper saving
-            if (targetNoteId && targetNoteId !== '' && targetNoteId !== 'search') {
-                window.noteid = targetNoteId;
-            }
+            window.noteid = noteId;
 
             // Trigger automatic save after image insertion
             if (typeof window.markNoteAsModified === 'function') {
-                window.markNoteAsModified(); // Mark note as edited
+                window.markNoteAsModified();
             }
 
             // Re-initialize image click handlers for the newly inserted image
             if (typeof reinitializeImageClickHandlers === 'function') {
-                setTimeout(function () {
+                setTimeout(function() {
                     reinitializeImageClickHandlers();
                 }, 50);
             }
 
-            // Trigger immediate save after a short delay to allow DOM to update
-            setTimeout(function () {
+            // Update attachment count in menu
+            updateAttachmentCountInMenu(noteId);
+
+            // Save after a short delay
+            setTimeout(function() {
                 if (typeof saveNoteToServer === 'function') {
-                    saveNoteToServer(); // Direct call to save function
+                    saveNoteToServer();
                 } else if (typeof window.saveNoteImmediately === 'function') {
-                    window.saveNoteImmediately(); // Fallback to saveNoteImmediately
+                    window.saveNoteImmediately();
                 }
             }, 100);
-        });
-    };
-    reader.readAsDataURL(file);
+        } else {
+            // Remove placeholder on error
+            if (placeholderImg) {
+                placeholderImg.remove();
+            }
+            if (typeof showNotificationPopup === 'function') {
+                showNotificationPopup('Upload failed: ' + data.message, 'error');
+            }
+        }
+    })
+    .catch(function(error) {
+        // Remove placeholder on error
+        if (placeholderImg) {
+            placeholderImg.remove();
+        }
+        if (typeof showNotificationPopup === 'function') {
+            showNotificationPopup('Upload failed: ' + error.message, 'error');
+        }
+    });
 }
 
 function insertHTMLAtSelection(html) {

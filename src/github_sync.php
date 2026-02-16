@@ -181,14 +181,9 @@ try {
                         <td class="text-center status-success"><i class="fas fa-check"></i></td>
                     </tr>
                     <tr>
-                        <td><?php echo t_h('github_sync.limitations.attachments'); ?></td>
-                        <td class="text-center status-error"><i class="fas fa-times"></i></td>
-                        <td class="text-center status-error"><i class="fas fa-times"></i></td>
-                    </tr>
-                    <tr>
-                        <td><?php echo t_h('github_sync.limitations.embedded_images'); ?></td>
-                        <td class="text-center status-success"><i class="fas fa-check"></i> *</td>
-                        <td class="text-center status-error"><i class="fas fa-times"></i></td>
+                        <td><?php echo t_h('github_sync.limitations.attachments'); ?> (images, files, etc.)</td>
+                        <td class="text-center status-success"><i class="fas fa-check"></i></td>
+                        <td class="text-center status-success"><i class="fas fa-check"></i></td>
                     </tr>
                     <tr>
                         <td><?php echo t_h('github_sync.limitations.metadata'); ?></td>
@@ -198,10 +193,6 @@ try {
                 </tbody>
             </table>
         </div>
-        
-        <p class="limitations-note">
-            <strong>*</strong> <?php echo t_h('github_sync.limitations.embedded_note'); ?>
-        </p>
 
         <?php if ($message): ?>
         <div class="alert alert-success">

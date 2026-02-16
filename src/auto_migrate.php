@@ -441,3 +441,196 @@ function renameOldDirectories(string $dataDir): void {
 
 // Run migration check
 checkAndMigrateToMultiUser();
+
+/**
+ * Run versioned data migrations
+ * This system allows running one-time migrations on the database
+ */
+function runDataMigrations(): void {
+    // Skip if we're not connected to a database yet
+    if (!isset($GLOBALS['con']) || !$GLOBALS['con']) {
+        return;
+    }
+    
+    $con = $GLOBALS['con'];
+    
+    try {
+        // Create migrations table if it doesn't exist
+        $con->exec("
+            CREATE TABLE IF NOT EXISTS _migrations (
+                version TEXT PRIMARY KEY,
+                executed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                description TEXT
+            )
+        ");
+        
+        // Define all migrations
+        $migrations = [
+            '2026_02_base64_to_attachments' => [
+                'description' => 'Convert base64 images in HTML notes to attachments',
+                'function' => 'migrateBase64ImagesToAttachments'
+            ]
+        ];
+        
+        // Run each migration if not already executed
+        foreach ($migrations as $version => $migration) {
+            $stmt = $con->prepare("SELECT version FROM _migrations WHERE version = ?");
+            $stmt->execute([$version]);
+            
+            if (!$stmt->fetch()) {
+                error_log("Poznote: Running migration: {$migration['description']}");
+                
+                // Execute migration function
+                if (function_exists($migration['function'])) {
+                    call_user_func($migration['function'], $con);
+                    
+                    // Mark as executed
+                    $stmt = $con->prepare("INSERT INTO _migrations (version, description) VALUES (?, ?)");
+                    $stmt->execute([$version, $migration['description']]);
+                    
+                    error_log("Poznote: Migration {$version} completed successfully");
+                } else {
+                    error_log("Poznote: Migration function {$migration['function']} not found");
+                }
+            }
+        }
+    } catch (Exception $e) {
+        error_log("Poznote: Error running migrations: " . $e->getMessage());
+    }
+}
+
+/**
+ * Migration: Convert base64 images in HTML notes to attachments
+ * This improves performance and reduces database size
+ */
+function migrateBase64ImagesToAttachments($con): void {
+    try {
+        require_once __DIR__ . '/functions.php';
+        
+        // Get all HTML notes (type='note' or type is NULL/empty)
+        $stmt = $con->prepare("
+            SELECT id, entry, attachments 
+            FROM entries 
+            WHERE (type = 'note' OR type IS NULL OR type = '') 
+            AND trash = 0
+        ");
+        $stmt->execute();
+        $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $totalConverted = 0;
+        $notesProcessed = 0;
+        
+        foreach ($notes as $note) {
+            $noteId = $note['id'];
+            $content = $note['entry'] ?? '';
+            
+            // Skip if no base64 images found
+            if (stripos($content, 'data:image/') === false) {
+                continue;
+            }
+            
+            // Get existing attachments
+            $existingAttachments = !empty($note['attachments']) ? json_decode($note['attachments'], true) : [];
+            if (!is_array($existingAttachments)) {
+                $existingAttachments = [];
+            }
+            
+            $newAttachments = [];
+            $attachmentsPath = getAttachmentsPath();
+            
+            // Pattern 1: src before alt
+            $content = preg_replace_callback(
+                '/<img[^>]*src=["\']data:image\/([a-zA-Z0-9+]+);base64,([^"\']+)["\'][^>]*(?:alt=["\']([^"\']*)["\'])?[^>]*\/?>/is',
+                function($matches) use ($noteId, $attachmentsPath, &$newAttachments, &$totalConverted) {
+                    return convertBase64ImageToAttachment($matches[1], $matches[2], $matches[3] ?? '', $noteId, $attachmentsPath, $newAttachments, $totalConverted);
+                },
+                $content
+            );
+            
+            // Pattern 2: alt before src
+            $content = preg_replace_callback(
+                '/<img[^>]*alt=["\']([^"\']*)["\'][^>]*src=["\']data:image\/([a-zA-Z0-9+]+);base64,([^"\']+)["\'][^>]*\/?>/is',
+                function($matches) use ($noteId, $attachmentsPath, &$newAttachments, &$totalConverted) {
+                    return convertBase64ImageToAttachment($matches[2], $matches[3], $matches[1], $noteId, $attachmentsPath, $newAttachments, $totalConverted);
+                },
+                $content
+            );
+            
+            // If images were converted, update the note
+            if (!empty($newAttachments)) {
+                $updatedAttachments = array_merge($existingAttachments, $newAttachments);
+                $attachmentsJson = json_encode($updatedAttachments);
+                
+                // Read current content from file and update it
+                $filename = getEntryFilename($noteId, 'note');
+                if (file_exists($filename)) {
+                    file_put_contents($filename, $content);
+                }
+                
+                // Update database
+                $updateStmt = $con->prepare("UPDATE entries SET entry = ?, attachments = ? WHERE id = ?");
+                $updateStmt->execute([$content, $attachmentsJson, $noteId]);
+                
+                $notesProcessed++;
+            }
+        }
+        
+        if ($totalConverted > 0) {
+            error_log("Poznote: Converted {$totalConverted} base64 images in {$notesProcessed} notes to attachments");
+        }
+    } catch (Exception $e) {
+        error_log("Poznote: Error in base64 to attachments migration: " . $e->getMessage());
+        throw $e;
+    }
+}
+
+/**
+ * Helper function to convert a single base64 image to attachment
+ */
+function convertBase64ImageToAttachment($imageType, $base64Data, $altText, $noteId, $attachmentsPath, &$newAttachments, &$totalConverted) {
+    $imageType = strtolower($imageType);
+    
+    $extensionMap = [
+        'jpeg' => 'jpg', 'png' => 'png', 'gif' => 'gif',
+        'webp' => 'webp', 'svg+xml' => 'svg', 'bmp' => 'bmp'
+    ];
+    $extension = $extensionMap[$imageType] ?? 'png';
+    $mimeType = 'image/' . ($imageType === 'svg+xml' ? 'svg+xml' : $imageType);
+    
+    $imageData = base64_decode($base64Data);
+    if ($imageData === false) {
+        // Return original if decode fails
+        return '<img src="data:image/' . $imageType . ';base64,' . $base64Data . '" alt="' . htmlspecialchars($altText) . '">';
+    }
+    
+    $attachmentId = uniqid();
+    $filename = $attachmentId . '_' . time() . '.' . $extension;
+    $filePath = $attachmentsPath . '/' . $filename;
+    
+    // Ensure attachments directory exists
+    if (!is_dir($attachmentsPath)) {
+        mkdir($attachmentsPath, 0755, true);
+    }
+    
+    if (file_put_contents($filePath, $imageData) === false) {
+        // Return original if write fails
+        return '<img src="data:image/' . $imageType . ';base64,' . $base64Data . '" alt="' . htmlspecialchars($altText) . '">';
+    }
+    chmod($filePath, 0644);
+    
+    $originalFilename = !empty($altText) ? $altText . '.' . $extension : $filename;
+    $newAttachments[] = [
+        'id' => $attachmentId,
+        'filename' => $filename,
+        'original_filename' => $originalFilename,
+        'file_size' => strlen($imageData),
+        'file_type' => $mimeType,
+        'uploaded_at' => date('Y-m-d H:i:s')
+    ];
+    
+    $totalConverted++;
+    
+    return '<img src="/api/v1/notes/' . $noteId . '/attachments/' . $attachmentId . '" alt="' . htmlspecialchars($altText) . '" loading="lazy" decoding="async">';
+}
+
+// Note: Data migrations are run from db_connect.php after database connection is established
