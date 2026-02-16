@@ -45,9 +45,18 @@ define('OIDC_END_SESSION_ENDPOINT', _env('POZNOTE_OIDC_END_SESSION_ENDPOINT', ''
 define('OIDC_DISABLE_NORMAL_LOGIN', filter_var(_env('POZNOTE_OIDC_DISABLE_NORMAL_LOGIN', false), FILTER_VALIDATE_BOOL));
 // Optional: disable HTTP Basic Auth for API when OIDC is enabled (force OIDC-only authentication)
 define('OIDC_DISABLE_BASIC_AUTH', filter_var(_env('POZNOTE_OIDC_DISABLE_BASIC_AUTH', false), FILTER_VALIDATE_BOOL));
+// Optional: claim name containing user groups (default: 'groups')
+define('OIDC_GROUPS_CLAIM', trim(_env('POZNOTE_OIDC_GROUPS_CLAIM', 'groups')));
+// Optional: comma-separated list of allowed groups from the configured claim
+// If empty, group-based access control is disabled
+define('OIDC_ALLOWED_GROUPS', _env('POZNOTE_OIDC_ALLOWED_GROUPS', ''));
+// Optional: auto-create user profiles on first successful OIDC login
+// Recommended when using OIDC group restrictions for access control
+define('OIDC_AUTO_CREATE_USERS', filter_var(_env('POZNOTE_OIDC_AUTO_CREATE_USERS', false), FILTER_VALIDATE_BOOL));
 // Optional: comma-separated list of allowed users (email addresses or usernames)
 // If not set, all authenticated users from the identity provider can access the application
 // Example: 'user1@example.com,user2@example.com' or 'user1,user2'
+// Deprecated: prefer POZNOTE_OIDC_ALLOWED_GROUPS + POZNOTE_OIDC_AUTO_CREATE_USERS
 define('OIDC_ALLOWED_USERS', _env('POZNOTE_OIDC_ALLOWED_USERS', ''));
 
 // ============================================================

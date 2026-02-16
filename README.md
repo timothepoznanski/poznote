@@ -415,21 +415,25 @@ Poznote supports OpenID Connect (authorization code + PKCE) for single sign-on i
 
 #### How it works
 
-1. **Pre-requisite**: An administrator must first create a user profile with a username matching the OIDC user's `preferred_username` or `email`.
+1. Optionally restrict access by OIDC group membership.
 2. The login page displays a "Continue with [Provider Name]" button.
 3. Clicking the button redirects users to your identity provider.
-4. After successful authentication, Poznote matches the OIDC identity to an existing user profile and creates a session.
+4. After successful authentication, Poznote links the OIDC identity to an existing profile (by `sub`, then `preferred_username`, then `email`) and can auto-create a profile if enabled.
 
 #### Configuration
 
 Add the OIDC variables to your `.env` file (see `.env.template`). If `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN` is `true`, the standard login form will be hidden.
 
-#### Access Control Example
+#### Access Control Example (Groups + Auto-Provision)
 
-Restrict access to specific users by email address or username:
+Restrict access to specific groups and auto-create users at first login:
 ```bash
-POZNOTE_OIDC_ALLOWED_USERS=alice@example.com,bob@example.com,charlie@company.org
+POZNOTE_OIDC_GROUPS_CLAIM=groups
+POZNOTE_OIDC_ALLOWED_GROUPS=poznote
+POZNOTE_OIDC_AUTO_CREATE_USERS=true
 ```
+
+`POZNOTE_OIDC_ALLOWED_USERS` remains available for backward compatibility, but group-based access is recommended.
 
 </details>
 
