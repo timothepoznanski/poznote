@@ -143,14 +143,59 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 50);
     };
 
-    // Listen for note content changes via mutation observer  
-    const contentDiv = document.querySelector('.noteentry');
-    if (contentDiv) {
-        const observer = new MutationObserver(handleNoteLoad);
-        observer.observe(contentDiv, { childList: true, subtree: true });
+    // Listen for note content changes via mutation observer (e.g., for checklists and image deletions)
+    const rightCol = document.getElementById('right_col');
+    if (rightCol) {
+        const observer = new MutationObserver(function (mutations) {
+            // Restore checklist values when new content loads (via existing helper)
+            handleNoteLoad();
+
+            // Detect image deletions from DOM (keyboard or external)
+            if (window.isLoadingNote) return;
+
+            mutations.forEach(function (mutation) {
+                if (!mutation.removedNodes) return;
+
+                mutation.removedNodes.forEach(function (node) {
+                    if (node.nodeType !== 1) return; // Only element nodes
+
+                    // Find all images within removed nodes
+                    const imgs = node.tagName === 'IMG' ? [node] : node.querySelectorAll('img');
+                    imgs.forEach(function (img) {
+                        // Only handle if it was actually in an active noteentry and NOT marked as manually deleted
+                        const noteEntry = mutation.target.closest('.noteentry');
+                        if (noteEntry && document.body.contains(noteEntry) && !img._manuallyDeleted) {
+                            // Extract attachment info and call API
+                            const src = img.getAttribute('src');
+                            if (src) {
+                                const match = src.match(/\/api\/v1\/notes\/(\d+)\/attachments\/([a-fA-F0-9_-]+)/);
+                                if (match) {
+                                    const noteId = match[1];
+                                    const attachmentId = match[2];
+
+                                    // Only delete if the image belongs to the note it's being deleted from
+                                    const noteIdMatch = noteEntry.id.match(/entry(\d+)/);
+                                    const activeNoteId = noteIdMatch ? noteIdMatch[1] : null;
+
+                                    if (activeNoteId && noteId === activeNoteId) {
+                                        // Call the existing deleteAttachment function if available
+                                        if (typeof window.deleteAttachment === 'function') {
+                                            const oldNoteId = window.currentNoteIdForAttachments;
+                                            window.currentNoteIdForAttachments = noteId;
+                                            window.deleteAttachment(attachmentId);
+                                            window.currentNoteIdForAttachments = oldNoteId;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
+            });
+        });
+
+        observer.observe(rightCol, { childList: true, subtree: true });
     }
-
-
 });
 
 // Global functions available for HTML (compatibility)

@@ -100,17 +100,21 @@ $settings = [
     'hide_folder_actions' => null,
     'hide_folder_counts' => null,
     'note_list_sort' => 'updated_desc',
-    'notes_without_folders_after_folders' => false
+    'notes_without_folders_after_folders' => false,
+    'hide_inline_attachment_images' => '1'
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'hide_inline_attachment_images')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
 } catch (Exception $e) {
     // Use defaults if error
 }
+
+// Extract hide_inline_attachment_images setting (with invertLogic: '1' = show, '0' or null = hide)
+$hide_inline_images = ($settings['hide_inline_attachment_images'] === '0' || $settings['hide_inline_attachment_images'] === 'false');
 
 // Extract settings with proper defaults
 $note_font_size = $settings['note_font_size'];
@@ -756,20 +760,55 @@ $body_classes = trim($extra_body_classes);
                     if (!empty($row['attachments'])) {
                         $attachments_data = json_decode($row['attachments'], true);
                         if (is_array($attachments_data) && !empty($attachments_data)) {
+                            // Get note content to check for inline images
+                            $note_content = $row['entry'] ?? '';
+                            
                             echo '<div class="note-attachments-row">';
                             // Make paperclip clickable to open attachments for this note (preserve workspace behavior via JS)
                             echo '<button type="button" class="icon-attachment-btn" title="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'" data-action="show-attachment-dialog" data-note-id="'.$row['id'].'" aria-label="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'"><span class="fas fa-paperclip icon_attachment"></span></button>';
                             echo '<span class="note-attachments-list">';
                             $attachment_links = [];
+                            $visible_links_count = 0;
                             foreach ($attachments_data as $attachment) {
                                 if (isset($attachment['id']) && isset($attachment['original_filename'])) {
                                     $original_filename = (string)$attachment['original_filename'];
                                     $safe_filename = htmlspecialchars($original_filename, ENT_QUOTES);
-                                    $attachment_links[] = '<a href="#" class="attachment-link" data-action="download-attachment" data-attachment-id="'.$attachment['id'].'" data-note-id="'.$row['id'].'" title="'.t_h('attachments.actions.download', ['filename' => $original_filename], 'Download {{filename}}').'">'.$safe_filename.'</a>';
+                                    
+                                    // Check if this is an image attachment to hide IF it's in the content and setting is disabled
+                                    $is_inline_image = false;
+                                    if ($hide_inline_images) {
+                                        $mime_type = $attachment['mime_type'] ?? '';
+                                        $is_image = strpos($mime_type, 'image/') === 0;
+                                        // Also check extension as fallback
+                                        if (!$is_image && isset($attachment['original_filename'])) {
+                                            $ext = strtolower(pathinfo($attachment['original_filename'], PATHINFO_EXTENSION));
+                                            $is_image = in_array($ext, ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp']);
+                                        }
+
+                                        if ($is_image) {
+                                            $attachment_id_pattern = 'attachments/' . $attachment['id'];
+                                            // Check in raw content
+                                            $is_inline_image = (strpos($note_content, $attachment_id_pattern) !== false);
+                                            
+                                            // If not found, try with escaped version just in case (e.g. for some specific editors)
+                                            if (!$is_inline_image) {
+                                                $is_inline_image = (strpos($note_content, urlencode($attachment_id_pattern)) !== false);
+                                            }
+                                        }
+                                    }
+                                    
+                                    $link_style = $is_inline_image ? ' style="display: none;"' : '';
+                                    $link_attr = $is_inline_image ? ' data-is-inline-image="true"' : '';
+                                    $attachment_links[] = '<a href="#" class="attachment-link"' . $link_attr . $link_style . ' data-action="download-attachment" data-attachment-id="'.$attachment['id'].'" data-note-id="'.$row['id'].'" title="'.t_h('attachments.actions.download', ['filename' => $original_filename], 'Download {{filename}}').'">'.$safe_filename.'</a>';
+                                    if (!$is_inline_image) $visible_links_count++;
                                 }
                             }
                             echo implode(' ', $attachment_links);
                             echo '</span>';
+                            // Hide the entire row if no visible links
+                            if ($hide_inline_images && $visible_links_count === 0) {
+                                echo '<script>document.currentScript.parentElement.style.display = "none";</script>';
+                            }
                             echo '</div>';
                         }
                     }

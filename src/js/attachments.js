@@ -398,6 +398,16 @@ function updateAttachmentCountInMenu(noteId) {
                     var existingAttachmentsRow = noteElement.querySelector('.note-attachments-row');
 
                     if (hasAttachments && data.attachments && data.attachments.length > 0) {
+                        // Check if setting to hide inline images is enabled
+                        var hideInlineImages = document.body.classList.contains('hide-inline-attachment-images');
+                        
+                        // Get the note content to check for inline images
+                        var noteContent = '';
+                        var noteEntry = document.getElementById('entry' + noteId);
+                        if (noteEntry) {
+                            noteContent = noteEntry.innerHTML || '';
+                        }
+                        
                         // Create or update the attachments row
                         if (!existingAttachmentsRow) {
                             // Create new attachments row
@@ -423,18 +433,49 @@ function updateAttachmentCountInMenu(noteId) {
                         attachmentsHtml += '<span class="note-attachments-list">';
 
                         var attachmentLinks = [];
+                        var visibleLinksCount = 0;
                         for (var j = 0; j < data.attachments.length; j++) {
                             var attachment = data.attachments[j];
                             if (attachment.id && attachment.original_filename) {
+                                // Check if this is an image to hide only if it's already in the content
+                                var isActuallyInline = false;
+                                if (hideInlineImages) {
+                                    var mimeType = attachment.mime_type || '';
+                                    var isImage = mimeType.startsWith('image/');
+                                    
+                                    // Fallback to extension check
+                                    if (!isImage && attachment.original_filename) {
+                                        var ext = attachment.original_filename.split('.').pop().toLowerCase();
+                                        isImage = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].indexOf(ext) !== -1;
+                                    }
+
+                                    if (isImage) {
+                                        // Look for the attachment ID specifically in the content
+                                        var pattern = 'attachments/' + attachment.id;
+                                        isActuallyInline = noteContent.indexOf(pattern) !== -1 || 
+                                                           noteContent.indexOf(encodeURIComponent(pattern)) !== -1;
+                                    }
+                                }
+                                
                                 var safeFilename = attachment.original_filename.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
                                 var dlTitle = tr('attachments.actions.download', { filename: safeFilename }, 'Download {{filename}}');
-                                attachmentLinks.push('<a href="#" class="attachment-link" onclick="downloadAttachment(\'' + attachment.id + '\', \'' + noteId + '\')" title="' + dlTitle + '">' + safeFilename + '</a>');
+                                var linkStyle = isActuallyInline ? ' style="display: none;"' : '';
+                                var linkAttr = isActuallyInline ? ' data-is-inline-image="true"' : '';
+                                attachmentLinks.push('<a href="#" class="attachment-link"' + linkAttr + linkStyle + ' onclick="downloadAttachment(\'' + attachment.id + '\', \'' + noteId + '\')" title="' + dlTitle + '">' + safeFilename + '</a>');
+                                if (!isActuallyInline) visibleLinksCount++;
                             }
                         }
                         attachmentsHtml += attachmentLinks.join(' ');
                         attachmentsHtml += '</span>';
 
                         existingAttachmentsRow.innerHTML = attachmentsHtml;
+                        
+                        // Hide the entire row if no visible links
+                        if (hideInlineImages && visibleLinksCount === 0) {
+                            existingAttachmentsRow.style.display = 'none';
+                        } else {
+                            existingAttachmentsRow.style.display = '';
+                        }
                     } else if (existingAttachmentsRow) {
                         // Remove the attachments row if no attachments
                         existingAttachmentsRow.parentNode.removeChild(existingAttachmentsRow);

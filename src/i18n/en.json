@@ -93,7 +93,8 @@
             "show_folder_actions": "Show folder actions",
             "kanban_on_folder_click": "Open Kanban view on folder click",
             "index_icon_scale": "Index icon scaling",
-            "note_content_width": "Note content width"
+            "note_content_width": "Note content width",
+            "show_inline_attachment_images": "Show image attachments"
         },
         "badges": {
             "font_size_default": "default ({{size}}px)",
@@ -185,7 +186,11 @@
             "preview_alt": "Preview",
             "uploaded_prefix": "Uploaded: ",
             "open_in_new_tab": "Open in new tab",
-            "pdf_label": "PDF"
+            "pdf_label": "PDF",
+            "settings_banner": {
+                "message": "Image attachments are hidden from the note's list (but not from the list here) because the 'Show image attachments' setting is disabled.",
+                "action": "Change setting"
+            }
         },
         "modals": {
             "delete": {

@@ -1078,6 +1078,7 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
     $imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico'];
     $importedImages = []; // Maps original filename (lowercase) to stored attachment info
     $importedImagesCount = 0;
+    $attachmentIdMap = []; // Maps attachment IDs from exported notes to stored attachment info
     
     for ($i = 0; $i < $zip->numFiles; $i++) {
         $stat = $zip->statIndex($i);
@@ -1115,25 +1116,48 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
             continue;
         }
         
-        // Get the original filename (basename only, for matching with ![[filename]])
-        $originalFilename = basename($fileName);
-        
-        // Generate unique filename for storage
-        $uniqueFilename = uniqid() . '_' . time() . '.' . $fileExtension;
-        $targetPath = $attachmentsPath . '/' . $uniqueFilename;
-        
-        // Save the image
-        if (file_put_contents($targetPath, $imageContent) !== false) {
-            chmod($targetPath, 0644);
+        // Check if this is from an attachments/ folder (Poznote export)
+        if (preg_match('#^attachments/([a-zA-Z0-9_]+)\.#', $fileName, $matches)) {
+            $attachmentId = $matches[1];
             
-            // Store mapping using lowercase key for case-insensitive matching
-            $importedImages[strtolower($originalFilename)] = [
-                'unique_filename' => $uniqueFilename,
-                'original_filename' => $originalFilename,
-                'file_size' => strlen($imageContent),
-                'file_type' => 'image/' . ($fileExtension === 'jpg' ? 'jpeg' : $fileExtension)
-            ];
-            $importedImagesCount++;
+            // Generate unique filename for storage
+            $uniqueFilename = uniqid() . '_' . time() . '.' . $fileExtension;
+            $targetPath = $attachmentsPath . '/' . $uniqueFilename;
+            
+            // Save the image
+            if (file_put_contents($targetPath, $imageContent) !== false) {
+                chmod($targetPath, 0644);
+                
+                // Store mapping by attachment ID for Poznote exports
+                $attachmentIdMap[$attachmentId] = [
+                    'unique_filename' => $uniqueFilename,
+                    'file_size' => strlen($imageContent),
+                    'file_type' => 'image/' . ($fileExtension === 'jpg' ? 'jpeg' : $fileExtension)
+                ];
+                $importedImagesCount++;
+            }
+        } else {
+            // Regular image (Obsidian-style or loose images)
+            // Get the original filename (basename only, for matching with ![[filename]])
+            $originalFilename = basename($fileName);
+            
+            // Generate unique filename for storage
+            $uniqueFilename = uniqid() . '_' . time() . '.' . $fileExtension;
+            $targetPath = $attachmentsPath . '/' . $uniqueFilename;
+            
+            // Save the image
+            if (file_put_contents($targetPath, $imageContent) !== false) {
+                chmod($targetPath, 0644);
+                
+                // Store mapping using lowercase key for case-insensitive matching
+                $importedImages[strtolower($originalFilename)] = [
+                    'unique_filename' => $uniqueFilename,
+                    'original_filename' => $originalFilename,
+                    'file_size' => strlen($imageContent),
+                    'file_type' => 'image/' . ($fileExtension === 'jpg' ? 'jpeg' : $fileExtension)
+                ];
+                $importedImagesCount++;
+            }
         }
     }
     
@@ -1328,6 +1352,70 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
                     }
                     
                     // Image not found, keep original
+                    return $matches[0];
+                }, $content);
+                
+                // Handle Poznote-exported markdown images: ![alt](attachments/{attachmentId}.ext)
+                if (!empty($attachmentIdMap)) {
+                    $content = preg_replace_callback('/!\[([^\]]*)\]\(attachments\/([a-zA-Z0-9_]+)(?:\.[^)]+)?\)/i', function($matches) use ($noteId, $attachmentIdMap, &$noteAttachments) {
+                        $altText = $matches[1];
+                        $oldAttachmentId = $matches[2];
+                        
+                        if (isset($attachmentIdMap[$oldAttachmentId])) {
+                            $imageInfo = $attachmentIdMap[$oldAttachmentId];
+                            
+                            // Add to note's attachments with a new ID
+                            $newAttachmentId = uniqid();
+                            $noteAttachments[] = [
+                                'id' => $newAttachmentId,
+                                'filename' => $imageInfo['unique_filename'],
+                                'original_filename' => 'attachment.' . pathinfo($imageInfo['unique_filename'], PATHINFO_EXTENSION),
+                                'file_size' => $imageInfo['file_size'],
+                                'file_type' => $imageInfo['file_type'],
+                                'uploaded_at' => date('Y-m-d H:i:s')
+                            ];
+                            
+                            // Convert to API path
+                            return '![' . $altText . '](/api/v1/notes/' . $noteId . '/attachments/' . $newAttachmentId . ')';
+                        }
+                        
+                        // Attachment not found, keep original
+                        return $matches[0];
+                    }, $content);
+                }
+                
+                // Update the note's attachments in the database if any were added
+                if (!empty($noteAttachments)) {
+                    $attachmentsJson = json_encode($noteAttachments);
+                    $updateStmt = $con->prepare("UPDATE entries SET attachments = ? WHERE id = ?");
+                    $updateStmt->execute([$attachmentsJson, $noteId]);
+                }
+            } else if ($noteType === 'note' && !empty($attachmentIdMap)) {
+                // For HTML notes, handle Poznote-exported attachments: attachments/{attachmentId}.ext
+                $content = preg_replace_callback('#(src|href)=(["\']?)attachments/([a-zA-Z0-9_]+)(?:\.[^"\'>\s]+)?\2#i', function($matches) use ($noteId, $attachmentIdMap, &$noteAttachments) {
+                    $attr = $matches[1];
+                    $quote = $matches[2];
+                    $oldAttachmentId = $matches[3];
+                    
+                    if (isset($attachmentIdMap[$oldAttachmentId])) {
+                        $imageInfo = $attachmentIdMap[$oldAttachmentId];
+                        
+                        // Add to note's attachments with a new ID
+                        $newAttachmentId = uniqid();
+                        $noteAttachments[] = [
+                            'id' => $newAttachmentId,
+                            'filename' => $imageInfo['unique_filename'],
+                            'original_filename' => 'attachment.' . pathinfo($imageInfo['unique_filename'], PATHINFO_EXTENSION),
+                            'file_size' => $imageInfo['file_size'],
+                            'file_type' => $imageInfo['file_type'],
+                            'uploaded_at' => date('Y-m-d H:i:s')
+                        ];
+                        
+                        // Return full src/href attribute with API URL
+                        return $attr . '=' . $quote . '/api/v1/notes/' . $noteId . '/attachments/' . $newAttachmentId . $quote;
+                    }
+                    
+                    // Attachment not found, keep original
                     return $matches[0];
                 }, $content);
                 

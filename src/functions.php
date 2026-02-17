@@ -784,10 +784,41 @@ function restoreEntriesFromDir($sourceDir) {
             
             // Include both HTML and Markdown files
             if ($extension === 'html' || $extension === 'md') {
-                $targetFile = $entriesPath . '/' . basename($relativePath);
-                if (copy($filePath, $targetFile)) {
-                    chmod($targetFile, 0644);
-                    $importedCount++;
+                $content = file_get_contents($filePath);
+                
+                if ($content !== false) {
+                    // Get note ID from filename (e.g., "123.html" -> "123")
+                    $noteId = pathinfo($relativePath, PATHINFO_FILENAME);
+                    
+                    // Convert relative attachment paths back to API URLs
+                    if ($extension === 'html') {
+                        // Convert ../attachments/{attachmentId}.ext to /api/v1/notes/{noteId}/attachments/{attachmentId}
+                        $content = preg_replace(
+                            '#\.\./attachments/([a-zA-Z0-9_]+)(?:\.[a-zA-Z0-9]+)?#',
+                            '/api/v1/notes/' . $noteId . '/attachments/$1',
+                            $content
+                        );
+                    } else if ($extension === 'md') {
+                        // Convert ![alt](../attachments/{attachmentId}.ext) to ![alt](/api/v1/notes/{noteId}/attachments/{attachmentId})
+                        $content = preg_replace(
+                            '#\!\[([^\]]*)\]\(\.\./attachments/([a-zA-Z0-9_]+)(?:\.[a-zA-Z0-9]+)?\)#',
+                            '![$1](/api/v1/notes/' . $noteId . '/attachments/$2)',
+                            $content
+                        );
+                    }
+                    
+                    $targetFile = $entriesPath . '/' . basename($relativePath);
+                    if (file_put_contents($targetFile, $content) !== false) {
+                        chmod($targetFile, 0644);
+                        $importedCount++;
+                    }
+                } else {
+                    // If reading fails, just copy the file as-is
+                    $targetFile = $entriesPath . '/' . basename($relativePath);
+                    if (copy($filePath, $targetFile)) {
+                        chmod($targetFile, 0644);
+                        $importedCount++;
+                    }
                 }
             }
         }
@@ -806,6 +837,23 @@ function restoreAttachmentsFromDir($sourceDir) {
         return ['success' => false, 'error' => 'Cannot find attachments directory'];
     }
     
+    // Read metadata file to get original filenames
+    $metadataFile = $sourceDir . '/poznote_attachments_metadata.json';
+    $idToFilenameMap = [];
+    
+    if (file_exists($metadataFile)) {
+        $metadataContent = file_get_contents($metadataFile);
+        $metadata = json_decode($metadataContent, true);
+        
+        if (is_array($metadata)) {
+            foreach ($metadata as $item) {
+                if (isset($item['attachment_data']['id']) && isset($item['attachment_data']['filename'])) {
+                    $idToFilenameMap[$item['attachment_data']['id']] = $item['attachment_data']['filename'];
+                }
+            }
+        }
+    }
+    
     $files = new RecursiveIteratorIterator(
         new RecursiveDirectoryIterator($sourceDir), 
         RecursiveIteratorIterator::LEAVES_ONLY
@@ -817,13 +865,26 @@ function restoreAttachmentsFromDir($sourceDir) {
         if (!$file->isDir()) {
             $filePath = $file->getRealPath();
             $relativePath = substr($filePath, strlen($sourceDir) + 1);
+            $basename = basename($relativePath);
             
             // Skip metadata file
-            if (basename($relativePath) === 'poznote_attachments_metadata.json') {
+            if ($basename === 'poznote_attachments_metadata.json') {
                 continue;
             }
             
-            $targetFile = $attachmentsPath . '/' . basename($relativePath);
+            // Check if this file is named with an attachment ID (e.g., "abc123.jpg")
+            // Extract ID without extension
+            $filenameWithoutExt = pathinfo($basename, PATHINFO_FILENAME);
+            
+            // If we have a mapping for this ID, use the real filename
+            if (isset($idToFilenameMap[$filenameWithoutExt])) {
+                $targetFilename = $idToFilenameMap[$filenameWithoutExt];
+            } else {
+                // Otherwise, use the original basename (for backwards compatibility)
+                $targetFilename = $basename;
+            }
+            
+            $targetFile = $attachmentsPath . '/' . $targetFilename;
             if (copy($filePath, $targetFile)) {
                 chmod($targetFile, 0644);
                 $importedCount++;

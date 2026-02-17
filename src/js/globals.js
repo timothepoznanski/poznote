@@ -53,6 +53,27 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(function(){});
     } catch(e){}
+
+    // Apply hide inline attachment images setting
+    try {
+        fetch('/api/v1/settings/hide_inline_attachment_images', {
+            method: 'GET',
+            credentials: 'same-origin'
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(j) {
+            // With invertLogic: '1' = show (don't hide), '0' or null = hide
+            var hideImages = j && j.success && (j.value === '0' || j.value === 'false');
+            if (hideImages) document.body.classList.add('hide-inline-attachment-images');
+            else document.body.classList.remove('hide-inline-attachment-images');
+        })
+        .catch(function(){
+            // On error, default to hiding images  
+            document.body.classList.add('hide-inline-attachment-images');
+        });
+    } catch(e){
+        document.body.classList.add('hide-inline-attachment-images');
+    }
 });
 
 // Centralized mobile detection: use CSS breakpoint (max-width: 800px)

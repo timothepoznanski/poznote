@@ -182,6 +182,29 @@ if ($_POST) {
                 // non-fatal
             }
 
+            // Delete workspace backgrounds folder
+            try {
+                $currentUser = getCurrentUser();
+                $user_id = $currentUser['id'];
+                // Sanitize workspace name for filesystem use
+                $sanitized_name = preg_replace('/[^\p{L}0-9_\-]/u', '_', $name);
+                $workspace_backgrounds_dir = __DIR__ . '/data/users/' . $user_id . '/backgrounds/' . $sanitized_name;
+                
+                if (is_dir($workspace_backgrounds_dir)) {
+                    // Delete all files in the workspace backgrounds directory
+                    $files = glob($workspace_backgrounds_dir . '/*');
+                    foreach ($files as $file) {
+                        if (is_file($file)) {
+                            @unlink($file);
+                        }
+                    }
+                    // Remove the directory itself
+                    @rmdir($workspace_backgrounds_dir);
+                }
+            } catch (Exception $e) {
+                // Non-fatal: don't block workspace deletion if background cleanup fails
+            }
+
             // Update workspace settings if necessary
         try {
                 $resetStmt = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');

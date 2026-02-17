@@ -294,7 +294,7 @@ if ($isAdmin) {
         </div>
 
         <!-- DISPLAY CATEGORY -->
-        <h2 class="settings-category-title"><?php echo t_h('settings.categories.display'); ?></h2>
+        <h2 class="settings-category-title" id="display"><?php echo t_h('settings.categories.display'); ?></h2>
         <div class="home-grid">
 
             <?php if ($isAdmin): ?>
@@ -417,6 +417,15 @@ if ($isAdmin) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.note_content_width', [], 'Note Content Width'); ?></span>
                     <span id="note-width-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+            <!-- Show Image Attachments -->
+            <div class="home-card" id="show-inline-attachment-images-card">
+                <div class="home-card-icon"><i class="fas fa-image"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.show_inline_attachment_images', [], 'Show image attachments'); ?></span>
+                    <span id="show-inline-attachment-images-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
                 </div>
             </div>
 

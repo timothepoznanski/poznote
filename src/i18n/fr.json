@@ -264,7 +264,11 @@
             "preview_alt": "Aperçu",
             "uploaded_prefix": "Téléversé : ",
             "open_in_new_tab": "Ouvrir dans un nouvel onglet",
-            "pdf_label": "PDF"
+            "pdf_label": "PDF",
+            "settings_banner": {
+                "message": "Les images en pièces jointes sont masquées de la liste de la note (mais pas de la liste ici) car le paramètre 'Afficher les pièces jointes images' est désactivé.",
+                "action": "Modifier le réglage"
+            }
         },
         "modals": {
             "delete": {
@@ -442,7 +446,8 @@
             "show_folder_actions": "Afficher les actions de dossier",
             "kanban_on_folder_click": "Ouvrir la vue Kanban au clic sur dossier",
             "index_icon_scale": "Taille des icônes (Index)",
-            "note_content_width": "Largeur du contenu de la note"
+            "note_content_width": "Largeur du contenu de la note",
+            "show_inline_attachment_images": "Afficher les pièces jointes images"
         },
         "badges": {
             "font_size_default": "par défaut ({{size}}px)",

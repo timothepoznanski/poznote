@@ -254,7 +254,11 @@
             "loading_attachments": "Carregando anexos...",
             "preview_alt": "Pré-visualização",
             "uploaded_prefix": "Enviado: ",
-            "open_in_new_tab": "Abrir em nova aba"
+            "open_in_new_tab": "Abrir em nova aba",
+            "settings_banner": {
+                "message": "Os anexos de imagem estão ocultos na lista da nota (mas não nesta lista) porque a configuração 'Mostrar anexos de imagem' está desativada.",
+                "action": "Alterar configuração"
+            }
         },
         "modals": {
             "delete": {
@@ -423,7 +427,8 @@
             "show_folder_actions": "Mostrar Ações da Pasta",
             "kanban_on_folder_click": "Abrir visualização Kanban ao clicar na pasta",
             "index_icon_scale": "Escala de ícones do índice",
-            "note_content_width": "Largura do conteúdo da nota"
+            "note_content_width": "Largura do conteúdo da nota",
+            "show_inline_attachment_images": "Mostrar anexos de imagem"
         },
         "badges": {
             "font_size_default": "padrão ({{size}}px)",

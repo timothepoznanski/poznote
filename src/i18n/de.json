@@ -255,7 +255,11 @@
             "loading_attachments": "Anhänge werden geladen...",
             "preview_alt": "Vorschau",
             "uploaded_prefix": "Hochgeladen: ",
-            "open_in_new_tab": "In neuem Tab öffnen"
+            "open_in_new_tab": "In neuem Tab öffnen",
+            "settings_banner": {
+                "message": "Bildanhänge werden in der Notizliste ausgeblendet (aber nicht hier in der Liste), da die Einstellung 'Bild-Anhänge anzeigen' deaktiviert ist.",
+                "action": "Einstellung ändern"
+            }
         },
         "modals": {
             "delete": {
@@ -424,7 +428,8 @@
             "show_folder_actions": "Ordner-Aktionen anzeigen",
             "kanban_on_folder_click": "Kanban-Ansicht beim Klicken auf Ordner öffnen",
             "index_icon_scale": "Skalierung der Index-Symbole",
-            "note_content_width": "Breite des Notizinhalts"
+            "note_content_width": "Breite des Notizinhalts",
+            "show_inline_attachment_images": "Bild-Anhänge anzeigen"
         },
         "badges": {
             "font_size_default": "Standard ({{size}}px)",
