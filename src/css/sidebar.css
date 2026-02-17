@@ -125,9 +125,16 @@
     color: #6c757d !important;
     font-size: 1.2rem;
     cursor: pointer;
-    padding: 6px;
+    padding: 6px 8px;
     border-radius: 6px;
     position: relative;
+    min-width: 38px;
+    min-height: 38px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
 }
 
 .sidebar-home:hover,
@@ -210,7 +217,7 @@
     width: 12px;
     height: 12px;
     font-size: 8px;
-    font-weight: bold;
+    /* font-weight: bold; */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -228,14 +235,14 @@
 .sidebar-home [class*="fa-"],
 .sidebar-settings i,
 .sidebar-settings [class*="fa-"] {
-    font-size: 0.7em !important;
+    font-size: 0.875em !important;
 }
 
 /* Icône plus-circle un peu plus grande */
 .sidebar-plus i,
 .sidebar-plus [class*="fa-"],
 .sidebar-plus .fa-plus-circle {
-    font-size: 1em !important;
+    font-size: 0.875em !important;
     color: #6c757d !important;
 }
 

@@ -32,6 +32,14 @@
     outline: none;
 }
 
+/* Match toolbar button sizing for main navigation buttons */
+.btn-toolbar-size {
+    min-width: 38px;
+    min-height: 38px;
+    padding: 6px 8px;
+    line-height: 1.2;
+}
+
 .btn:hover {
     opacity: 0.8;
 }

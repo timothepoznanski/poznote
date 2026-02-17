@@ -320,7 +320,7 @@ try {
         </div>
 
         <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-            <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary">
+            <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary btn-toolbar-size">
                 <?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?>
             </a>
         </div>

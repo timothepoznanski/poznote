@@ -8,6 +8,57 @@
     let currentBackgroundUrl = null;
     let pendingFile = null;
 
+    var OPACITY_DEFAULT = 25;
+    var OPACITY_MIN = 5;
+    var OPACITY_MAX = 25;
+
+    function buildOpacitySettingKey(workspace) {
+        return 'background_opacity_' + workspace;
+    }
+
+    function normalizeOpacity(value) {
+        var parsed = parseInt(value, 10);
+        if (isNaN(parsed)) return OPACITY_DEFAULT;
+        if (parsed < OPACITY_MIN) return OPACITY_MIN;
+        if (parsed > OPACITY_MAX) return OPACITY_MAX;
+        return parsed;
+    }
+
+    function getBackgroundOpacity(workspace, callback) {
+        var key = buildOpacitySettingKey(workspace);
+        fetch('/api/v1/settings/' + encodeURIComponent(key), {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' },
+            credentials: 'same-origin'
+        })
+            .then(function(r) { return r.json(); })
+            .then(function(j) {
+                if (j && j.success) {
+                    callback(normalizeOpacity(j.value));
+                } else {
+                    callback(OPACITY_DEFAULT);
+                }
+            })
+            .catch(function() { callback(OPACITY_DEFAULT); });
+    }
+
+    function setBackgroundOpacity(workspace, opacity, callback) {
+        var key = buildOpacitySettingKey(workspace);
+        fetch('/api/v1/settings/' + encodeURIComponent(key), {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ value: String(opacity) })
+        })
+            .then(function(r) { return r.json(); })
+            .then(function(j) {
+                if (callback) callback(!!(j && j.success));
+            })
+            .catch(function() {
+                if (callback) callback(false);
+            });
+    }
+
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
         initWorkspaceBackgroundButtons();
@@ -104,9 +155,14 @@
         pendingFile = null;
 
         // Load current settings for this workspace
-        const savedOpacity = localStorage.getItem('backgroundOpacity_' + workspace) || '25';
-        opacityInput.value = savedOpacity;
-        document.getElementById('backgroundOpacityValue').textContent = savedOpacity;
+        opacityInput.value = OPACITY_DEFAULT;
+        document.getElementById('backgroundOpacityValue').textContent = OPACITY_DEFAULT;
+
+        getBackgroundOpacity(workspace, function(savedOpacity) {
+            opacityInput.value = savedOpacity;
+            document.getElementById('backgroundOpacityValue').textContent = savedOpacity;
+            updatePreviewOpacity(savedOpacity);
+        });
 
         // Check if background exists for this workspace
         fetch('api_upload_background.php?workspace=' + encodeURIComponent(workspace))
@@ -115,7 +171,8 @@
                 if (data.success && data.exists) {
                     currentBackgroundUrl = data.url;
                     preview.style.backgroundImage = `url('${data.url}')`;
-                    const previewOpacity = Math.min(savedOpacity, 25);
+                    const currentOpacity = normalizeOpacity(opacityInput.value);
+                    const previewOpacity = Math.min(currentOpacity, OPACITY_MAX);
                     preview.style.opacity = previewOpacity / 100;
                     preview.querySelector('.no-background-text').style.display = 'none';
                     removeBtn.style.display = 'inline-block';
@@ -193,7 +250,7 @@
 
     function saveWorkspaceBackground() {
         const opacityInput = document.getElementById('backgroundOpacityInput');
-        const opacity = opacityInput.value;
+        const opacity = normalizeOpacity(opacityInput.value);
 
         if (!currentWorkspace) {
             closeBackgroundModal();
@@ -201,18 +258,26 @@
         }
 
         // Save opacity for this workspace
-        localStorage.setItem('backgroundOpacity_' + currentWorkspace, opacity);
+        setBackgroundOpacity(currentWorkspace, opacity, function(success) {
+            if (!success) {
+                if (typeof window.showError === 'function') {
+                    window.showError('Error saving opacity setting');
+                } else {
+                    alert('Error saving opacity setting');
+                }
+            }
 
-        // If there's a pending file, upload it
-        if (pendingFile) {
-            uploadWorkspaceBackground(pendingFile, opacity);
-        } else if (currentBackgroundUrl === null) {
-            // Remove background
-            deleteWorkspaceBackground(opacity);
-        } else {
-            // Just close the modal (opacity already saved)
-            closeBackgroundModal();
-        }
+            // If there's a pending file, upload it
+            if (pendingFile) {
+                uploadWorkspaceBackground(pendingFile, opacity);
+            } else if (currentBackgroundUrl === null) {
+                // Remove background
+                deleteWorkspaceBackground(opacity);
+            } else {
+                // Just close the modal (opacity already saved)
+                closeBackgroundModal();
+            }
+        });
     }
 
     function uploadWorkspaceBackground(file, opacity) {

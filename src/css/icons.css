@@ -110,8 +110,15 @@
 /* Apply default gray filter (rgb(55, 53, 47)) to all icons not on hover */
 /* Exclude folder icons with custom colors from the filter */
 [class*="fa-"]:not(.folder-icon[data-icon-color]) {
-    filter: brightness(0) saturate(100%) invert(21%) sepia(8%) saturate(1075%) hue-rotate(17deg) brightness(94%) contrast(89%);
+    filter: brightness(0) saturate(100%) invert(21%) sepia(8%) saturate(1075%) hue-rotate(17deg) brightness(90%) contrast(92%);
     transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+/* Keep sidebar icons crisp (avoid thick-looking filter) */
+.sidebar-home [class*="fa-"],
+.sidebar-settings [class*="fa-"],
+.sidebar-plus [class*="fa-"] {
+    filter: none !important;
 }
 
 [class*="fa-"]:not(.folder-icon[data-icon-color]):hover {

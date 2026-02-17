@@ -25,6 +25,21 @@
     flex: 1;
     min-width: 0;
     line-height: 1.4;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 6px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.note-attachments-list::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
 }
 
 /* Attachment Link */
@@ -34,9 +49,11 @@
     font-size: 14px;
     transition: color 0.2s;
     cursor: pointer;
-    display: inline-block;
-    margin: 2px 4px 2px 8px;
-    word-break: break-word;
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin: 2px 4px;
+    white-space: nowrap;
 }
 
 .attachment-link:hover {

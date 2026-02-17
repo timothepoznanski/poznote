@@ -19,6 +19,10 @@
     border-bottom: 1px solid var(--border-color, #e0e0e0);
 }
 
+#foldersList .shared-folder-icon {
+    background: transparent !important;
+}
+
 .note-name-container {
     flex: 0 0 auto;
     min-width: 200px;

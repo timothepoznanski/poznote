@@ -205,7 +205,7 @@ if ($isAdmin) {
         ?>
 
         <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
-            <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary">
+            <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary btn-toolbar-size">
                 <?php echo t_h('common.back_to_notes'); ?>
             </a>
         </div>
