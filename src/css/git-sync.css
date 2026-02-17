@@ -1,17 +1,17 @@
 /* GitHub Sync Page Styles */
 
-.github-sync-container {
+.git-sync-container {
     max-width: 900px;
     margin-bottom: 40px;
 }
 
-.github-sync-header {
+.git-sync-header {
     text-align: center;
     margin: 0px 0 20px;
     padding: 0 20px;
 }
 
-.github-sync-header h1 {
+.git-sync-header h1 {
     font-size: 1.8rem;
     font-weight: 600;
     margin-bottom: 10px;
@@ -21,11 +21,11 @@
     gap: 12px;
 }
 
-.github-sync-header h1 i {
+.git-sync-header h1 i {
     font-size: 1.6rem;
 }
 
-.github-sync-description {
+.git-sync-description {
     color: #666;
     font-size: 0.95rem;
     max-width: 600px;
@@ -64,7 +64,7 @@
     border: 1px solid #ffeeba;
 }
 
-.github-sync-footer-note {
+.git-sync-footer-note {
     margin: 20px auto 0px auto;
     padding: 0px 0px 15px;
     text-align: center;
@@ -74,13 +74,13 @@
     max-width: 700px;
 }
 
-.github-sync-footer-note strong {
+.git-sync-footer-note strong {
     color: #ef4444;
     font-weight: 600;
 }
 
 /* Sections */
-.github-sync-section {
+.git-sync-section {
     background: #fff;
     border-radius: 12px;
     border: 1px solid #e5e7eb;
@@ -88,11 +88,11 @@
     margin: 20px 0;
 }
 
-.github-sync-section:last-of-type {
+.git-sync-section:last-of-type {
     margin-bottom: 40px;
 }
 
-.github-sync-section h2 {
+.git-sync-section h2 {
     font-size: 1.1rem;
     font-weight: 600;
     margin: 0 0 20px;
@@ -102,7 +102,7 @@
     color: #333;
 }
 
-.github-sync-section h2 i {
+.git-sync-section h2 i {
     color: #6366f1;
     width: 24px;
 }
@@ -447,16 +447,16 @@
 }
 
 /* Dark Mode */
-body.dark-mode .github-sync-section {
+body.dark-mode .git-sync-section {
     background: #252526;
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
-body.dark-mode .github-sync-section h2 {
+body.dark-mode .git-sync-section h2 {
     color: #e0e0e0;
 }
 
-body.dark-mode .github-sync-description {
+body.dark-mode .git-sync-description {
     color: #aaa;
 }
 
@@ -554,14 +554,14 @@ body.dark-mode .alert-warning {
     border-color: rgba(255, 193, 7, 0.3);
 }
 
-body.dark-mode .github-sync-footer-note,
-html[data-theme='dark'] .github-sync-footer-note {
+body.dark-mode .git-sync-footer-note,
+html[data-theme='dark'] .git-sync-footer-note {
     border-top-color: #333;
     color: #999;
 }
 
-body.dark-mode .github-sync-footer-note strong,
-html[data-theme='dark'] .github-sync-footer-note strong {
+body.dark-mode .git-sync-footer-note strong,
+html[data-theme='dark'] .git-sync-footer-note strong {
     color: #f1716d;
 }
 
@@ -611,7 +611,7 @@ body.dark-mode .limitations-note {
     color: #aaa;
 }
 
-.github-sync-nav {
+.git-sync-nav {
     display: flex;
     gap: 12px;
     align-items: center;
@@ -620,14 +620,14 @@ body.dark-mode .limitations-note {
     flex-wrap: wrap;
 }
 
-.github-sync-nav .sync-form {
+.git-sync-nav .sync-form {
     display: inline-block;
     margin: 0;
 }
 
 /* Responsive */
 @media (max-width: 600px) {
-    .github-sync-nav {
+    .git-sync-nav {
         gap: 12px;
         padding: 0;
         justify-content: center;
@@ -636,7 +636,7 @@ body.dark-mode .limitations-note {
         flex-wrap: wrap;
     }
 
-    .github-sync-nav .btn {
+    .git-sync-nav .btn {
         flex: 0 1 auto !important;
         width: auto !important;
         min-width: 140px !important;
@@ -653,21 +653,21 @@ body.dark-mode .limitations-note {
         margin-bottom: 5px !important;
     }
 
-    .github-sync-nav .sync-form {
+    .git-sync-nav .sync-form {
         flex: 0 1 auto;
         display: flex;
     }
 
-    .github-sync-nav .sync-form .btn {
+    .git-sync-nav .sync-form .btn {
         width: auto !important;
         margin: 0;
     }
 
-    .github-sync-header h1 {
+    .git-sync-header h1 {
         font-size: 1.4rem;
     }
     
-    .github-sync-section {
+    .git-sync-section {
         padding: 16px;
     }
     

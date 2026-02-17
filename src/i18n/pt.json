@@ -323,7 +323,7 @@
             "workspaces": "Espaços de trabalho",
             "backup_export": "Backup / Exportar",
             "restore_import": "Restaurar / Importar",
-            "github_sync": "Sincronização GitHub",
+            "git_sync": "Sincronização {{provider}}",
             "check_updates": "Verificar atualizações",
             "api_docs": "Documentação da API",
             "documentation": "Repositório Github",
@@ -1794,12 +1794,12 @@
             }
         }
     },
-    "github_sync": {
-        "title": "Sincronização GitHub",
-        "description": "Envie suas notas para o GitHub ou baixe notas de um repositório existente. Um repositório equivale a um perfil. Os espaços de trabalho serão pastas na raiz do repositório.",
+    "git_sync": {
+        "title": "Sincronização {{provider}}",
+        "description": "Envie suas notas para o {{provider}} ou baixe notas de um repositório existente. Um repositório equivale a um perfil. Os espaços de trabalho serão pastas na raiz do repositório.",
         "warning": "Não utilize esta funcionalidade como a sua única solução de backup.\nConsidere configurar exportações ZIP manuais ou automáticas das suas notas.",
-        "confirm_push": "Enviar notas do espaço de trabalho \"{{workspace}}\" para o GitHub? Updates existing files and deletes files that no longer exist in Poznote.",
-        "confirm_pull": "Recuperar notas do espaço de trabalho \"{{workspace}}\" do GitHub? Import notes from GitHub. Updates existing notes and moves to trash notes that no longer exist on GitHub.",
+        "confirm_push": "Enviar notas do espaço de trabalho \"{{workspace}}\" para o {{provider}}? Updates existing files and deletes files that no longer exist in Poznote.",
+        "confirm_pull": "Recuperar notas do espaço de trabalho \"{{workspace}}\" do {{provider}}? Import notes from {{provider}}. Updates existing notes and moves to trash notes that no longer exist on {{provider}}.",
         "config": {
             "title": "Configuração",
             "status": "Status",
@@ -1811,7 +1811,7 @@
             "token_missing": "Não configurado",
             "not_configured": "Não configurado",
             "not_configured_yet": "A configurar",
-            "hint": "A sincronização com GitHub está desativada. Defina POZNOTE_GITHUB_SYNC_ENABLED=true no seu arquivo .env para ativá-la."
+            "hint": "A sincronização com {{provider}} está desativada. Defina POZNOTE_GIT_SYNC_ENABLED=true no seu arquivo .env para ativá-la."
         },
         "test": {
             "title": "Testar conexão",
@@ -1831,13 +1831,13 @@
             "target_workspace": "Espaço de trabalho de destino",
             "all_workspaces": "Todos os espaços de trabalho",
             "push": {
-                "title": "Enviar para GitHub",
-                "description": "Exporta suas notas para o GitHub. Atualiza arquivos existentes e exclui arquivos que não existem mais no Poznote.",
+                "title": "Enviar para {{provider}}",
+                "description": "Exporta suas notas para o {{provider}}. Atualiza arquivos existentes e exclui arquivos que não existem mais no Poznote.",
                 "button": "Enviar"
             },
             "pull": {
-                "title": "Recuperar do GitHub",
-                "description": "Importa notas do GitHub. Atualiza notas existentes e move para a lixeira notas que não existem mais no GitHub.",
+                "title": "Recuperar do {{provider}}",
+                "description": "Importa notas do {{provider}}. Atualiza notas existentes e move para a lixeira notas que não existem mais no {{provider}}.",
                 "button": "Recuperar"
             }
         },
@@ -1865,14 +1865,14 @@
             "attachments": "Anexos de arquivo",
             "embedded_images": "Imagens",
             "metadata": "Metadados (tags, data, ID)",
-            "embedded_note": "Imagens incorporadas são preservadas em HTML mas não exibidas no GitHub"
+            "embedded_note": "Imagens incorporadas são preservadas em HTML mas não exibidas no {{provider}}"
         },
         "not_configured": {
-            "title": "Sincronização com GitHub não configurada",
-            "description": "Para usar a sincronização com GitHub, você deve configurar suas credenciais do GitHub no arquivo .env.",
+            "title": "Sincronização com {{provider}} não configurada",
+            "description": "Para usar a sincronização com {{provider}}, você deve configurar suas credenciais do {{provider}} no arquivo .env.",
             "steps_title": "Instruções de configuração",
-            "step1": "Crie um token de acesso pessoal do GitHub em github.com/settings/tokens com o escopo 'repo'",
-            "step2": "Crie um repositório do GitHub (público ou privado) para suas notas",
+            "step1": "Crie um token de acesso pessoal do {{provider}} em com o escopo 'repo'",
+            "step2": "Crie um repositório do {{provider}} (público ou privado) para suas notas",
             "step3": "Adicione a configuração ao seu arquivo .env",
             "step4": "Reinicie a aplicação para que as alterações entrem em vigor"
         }

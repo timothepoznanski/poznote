@@ -14,44 +14,46 @@ $pageWorkspace = trim(getWorkspaceFilter());
 $currentLang = getUserLanguage();
 
 // GitHub Sync Logic
-require_once 'GitHubSync.php';
-$githubSync = new GitHubSync($con);
-$githubEnabled = GitHubSync::isEnabled() && $githubSync->isConfigured();
+require_once 'GitSync.php';
+$gitSync = new GitSync($con);
+$gitEnabled = GitSync::isEnabled() && $gitSync->isConfigured();
 $isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
-$showGitHubSync = $githubEnabled && $isAdmin; // For processing actions
-$showGitHubTiles = $isAdmin; // Always show tiles for admin, even if not configured
+$showGitSync = $gitEnabled && $isAdmin; // For processing actions
+$showGitTiles = $isAdmin; // Always show tiles for admin, even if not configured
+$gitProviderParams = ['provider' => getGitProviderName()];
+$gitIcon = (defined('GIT_PROVIDER') && GIT_PROVIDER === 'forgejo') ? 'fas fa-code-branch' : 'fab fa-github';
 
 $syncMessage = '';
 $syncError = '';
 $syncResult = null;
 
-if ($showGitHubSync && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sync_action'])) {
+if ($showGitSync && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sync_action'])) {
     $action = $_POST['sync_action'];
     $workspace = $_POST['workspace'] ?? null;
     if ($workspace === '') $workspace = null;
     
     if ($action === 'push') {
-        $syncResult = $githubSync->pushNotes($workspace);
+        $syncResult = $gitSync->pushNotes($workspace);
         if ($syncResult['success']) {
-            $syncMessage = t('github_sync.messages.push_success', [
+            $syncMessage = t('git_sync.messages.push_success', array_merge($gitProviderParams, [
                 'count' => $syncResult['pushed'],
                 'deleted' => $syncResult['deleted'] ?? 0,
                 'errors' => count($syncResult['errors'])
-            ]);
+            ]));
         } else {
-            $syncError = t('github_sync.messages.push_error', ['error' => $syncResult['errors'][0]['error'] ?? 'Unknown error']);
+            $syncError = t('git_sync.messages.push_error', array_merge($gitProviderParams, ['error' => $syncResult['errors'][0]['error'] ?? 'Unknown error']));
         }
     } else if ($action === 'pull') {
-        $syncResult = $githubSync->pullNotes($workspace);
+        $syncResult = $gitSync->pullNotes($workspace);
         if ($syncResult['success']) {
-            $syncMessage = t('github_sync.messages.pull_success', [
+            $syncMessage = t('git_sync.messages.pull_success', array_merge($gitProviderParams, [
                 'pulled' => $syncResult['pulled'],
                 'updated' => $syncResult['updated'],
                 'deleted' => $syncResult['deleted'] ?? 0,
                 'errors' => count($syncResult['errors'])
-            ]);
+            ]));
         } else {
-            $syncError = t('github_sync.messages.pull_error', ['error' => $syncResult['errors'][0]['error'] ?? 'Unknown error']);
+            $syncError = t('git_sync.messages.pull_error', array_merge($gitProviderParams, ['error' => $syncResult['errors'][0]['error'] ?? 'Unknown error']));
         }
     }
 }
@@ -348,10 +350,10 @@ try {
             <div style="grid-column: 1 / -1; margin-bottom: 20px;">
                 <div style="display: flex; gap: 10px; margin-bottom: 10px; justify-content: center;">
                     <button id="debug-toggle-btn" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;">
-                        <i class="fas fa-bug"></i> <span id="debug-toggle-text"><?php echo t_h('github_sync.debug.show'); ?></span>
+                        <i class="fas fa-bug"></i> <span id="debug-toggle-text"><?php echo t_h('git_sync.debug.show'); ?></span>
                     </button>
                     <button id="debug-copy-btn" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px; display: none;">
-                        <i class="fas fa-copy"></i> <?php echo t_h('github_sync.debug.copy'); ?>
+                        <i class="fas fa-copy"></i> <?php echo t_h('git_sync.debug.copy'); ?>
                     </button>
                 </div>
                 <div id="debug-info" class="debug-info" style="display: none; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 15px; max-height: 250px; overflow-y: auto;">
@@ -370,18 +372,18 @@ try {
                         if (debugDiv.style.display === 'none') {
                             debugDiv.style.display = 'block';
                             copyBtn.style.display = 'inline-block';
-                            toggleText.textContent = <?php echo json_encode(t_h('github_sync.debug.hide')); ?>;
+                            toggleText.textContent = <?php echo json_encode(t_h('git_sync.debug.hide')); ?>;
                         } else {
                             debugDiv.style.display = 'none';
                             copyBtn.style.display = 'none';
-                            toggleText.textContent = <?php echo json_encode(t_h('github_sync.debug.show')); ?>;
+                            toggleText.textContent = <?php echo json_encode(t_h('git_sync.debug.show')); ?>;
                         }
                     });
 
                     copyBtn?.addEventListener('click', function() {
                         navigator.clipboard.writeText(debugContent).then(function() {
                             const originalHTML = copyBtn.innerHTML;
-                            copyBtn.innerHTML = '<i class="fas fa-check"></i> ' + <?php echo json_encode(t_h('github_sync.debug.copied')); ?>;
+                            copyBtn.innerHTML = '<i class="fas fa-check"></i> ' + <?php echo json_encode(t_h('git_sync.debug.copied')); ?>;
                             setTimeout(function() {
                                 copyBtn.innerHTML = originalHTML;
                             }, 2000);
@@ -480,8 +482,8 @@ try {
                 </div>
             </a>
 
-            <?php if ($showGitHubTiles): ?>
-                <?php if ($githubEnabled): ?>
+            <?php if ($showGitTiles): ?>
+                <?php if ($gitEnabled): ?>
                     <!-- GitHub Push (Enabled) -->
                     <form method="post" class="home-card home-card-green" onclick="handleSyncClick(this);">
                         <input type="hidden" name="sync_action" value="push">
@@ -490,7 +492,7 @@ try {
                             <i class="fa-upload"></i>
                         </div>
                         <div class="home-card-content">
-                            <span class="home-card-title"><?php echo t_h('github_sync.actions.push.button', [], 'Push'); ?></span>
+                            <span class="home-card-title"><?php echo t_h('git_sync.actions.push.button', $gitProviderParams, 'Push'); ?></span>
                             <span class="home-card-count"><?php echo htmlspecialchars($pageWorkspace ?: 'All'); ?></span>
                         </div>
                     </form>
@@ -503,30 +505,30 @@ try {
                             <i class="fa-download"></i>
                         </div>
                         <div class="home-card-content">
-                            <span class="home-card-title"><?php echo t_h('github_sync.actions.pull.button', [], 'Pull'); ?></span>
+                            <span class="home-card-title"><?php echo t_h('git_sync.actions.pull.button', $gitProviderParams, 'Pull'); ?></span>
                             <span class="home-card-count"><?php echo htmlspecialchars($pageWorkspace ?: 'All'); ?></span>
                         </div>
                     </form>
                 <?php else: ?>
                     <!-- GitHub Push (Disabled) -->
-                    <a href="github_sync.php" class="home-card home-card-green">
+                    <a href="git_sync.php" class="home-card home-card-green">
                         <div class="home-card-icon">
                             <i class="fa-upload"></i>
                         </div>
                         <div class="home-card-content">
-                            <span class="home-card-title"><?php echo t_h('github_sync.actions.push.button', [], 'Push'); ?></span>
-                            <span class="home-card-count" style="color: #6b7280; font-size: 0.85em;"><?php echo t_h('github_sync.config.not_configured_yet', [], 'Not configured yet'); ?></span>
+                            <span class="home-card-title"><?php echo t_h('git_sync.actions.push.button', $gitProviderParams, 'Push'); ?></span>
+                            <span class="home-card-count" style="color: #6b7280; font-size: 0.85em;"><?php echo t_h('git_sync.config.not_configured_yet', $gitProviderParams, 'Not configured yet'); ?></span>
                         </div>
                     </a>
 
                     <!-- GitHub Pull (Disabled) -->
-                    <a href="github_sync.php" class="home-card home-card-green">
+                    <a href="git_sync.php" class="home-card home-card-green">
                         <div class="home-card-icon">
                             <i class="fa-download"></i>
                         </div>
                         <div class="home-card-content">
-                            <span class="home-card-title"><?php echo t_h('github_sync.actions.pull.button', [], 'Pull'); ?></span>
-                            <span class="home-card-count" style="color: #6b7280; font-size: 0.85em;"><?php echo t_h('github_sync.config.not_configured_yet', [], 'Not configured yet'); ?></span>
+                            <span class="home-card-title"><?php echo t_h('git_sync.actions.pull.button', $gitProviderParams, 'Pull'); ?></span>
+                            <span class="home-card-count" style="color: #6b7280; font-size: 0.85em;"><?php echo t_h('git_sync.config.not_configured_yet', $gitProviderParams, 'Not configured yet'); ?></span>
                         </div>
                     </a>
                 <?php endif; ?>
@@ -551,6 +553,8 @@ try {
     <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
 
     <script>
+    const gitProvider = '<?php echo getGitProviderName(); ?>';
+    
     function handleSyncClick(card) {
         if (card.classList.contains('is-loading')) return;
         
@@ -560,12 +564,12 @@ try {
         let confirmMsg = '';
         if (action === 'push') {
             confirmMsg = window.t ? 
-                window.t('github_sync.confirm_push', { workspace: workspaceName }, 'Push all notes to GitHub?') : 
-                'Push all notes to GitHub?';
+                window.t('git_sync.confirm_push', { workspace: workspaceName, provider: gitProvider }, `Push all notes to ${gitProvider}?`) : 
+                `Push all notes to ${gitProvider}?`;
         } else if (action === 'pull') {
             confirmMsg = window.t ? 
-                window.t('github_sync.confirm_pull', { workspace: workspaceName }, 'Pull all notes from GitHub? This may overwrite local changes.') : 
-                'Pull all notes from GitHub? This may overwrite local changes.';
+                window.t('git_sync.confirm_pull', { workspace: workspaceName, provider: gitProvider }, `Pull all notes from ${gitProvider}? This may overwrite local changes.`) : 
+                `Pull all notes from ${gitProvider}? This may overwrite local changes.`;
         }
         
         if (confirmMsg) {

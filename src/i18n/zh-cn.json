@@ -326,7 +326,7 @@
             "user_management": "用户管理",
             "backup_export": "备份 / 导出",
             "restore_import": "还原 / 导入",
-            "github_sync": "GitHub 同步",
+            "git_sync": "{{provider}} 同步",
             "check_updates": "检查更新",
             "api_docs": "API 文档",
             "documentation": "Github 仓库",
@@ -1909,12 +1909,12 @@
             }
         }
     },
-    "github_sync": {
-        "title": "GitHub 同步",
-        "description": "将您的笔记推送到 GitHub 或从现有仓库拉取笔记。一个仓库相当于一个用户资料。工作区将作为仓库根目录下的文件夹。",
+    "git_sync": {
+        "title": "{{provider}} 同步",
+        "description": "将您的笔记推送到 {{provider}} 或从现有仓库拉取笔记。一个仓库相当于一个用户资料。工作区将作为仓库根目录下的文件夹。",
         "warning": "不要将此功能作为唯一的备份解决方案。\n请考虑为您的笔记设置手动或自动 ZIP 导出。",
-        "confirm_push": "将工作区 \"{{workspace}}\" 的笔记推送到 GitHub 吗？Updates existing files and deletes files that no longer exist in Poznote.",
-        "confirm_pull": "从 GitHub 拉取工作区 \"{{workspace}}\" 的笔记吗？Import notes from GitHub. Updates existing notes and moves to trash notes that no longer exist on GitHub.",
+        "confirm_push": "将工作区 \"{{workspace}}\" 的笔记推送到 {{provider}} 吗？Updates existing files and deletes files that no longer exist in Poznote.",
+        "confirm_pull": "从 {{provider}} 拉取工作区 \"{{workspace}}\" 的笔记吗？Import notes from {{provider}}. Updates existing notes and moves to trash notes that no longer exist on {{provider}}.",
         "config": {
             "title": "配置",
             "status": "状态",
@@ -1926,7 +1926,7 @@
             "token_missing": "未配置",
             "not_configured": "未配置",
             "not_configured_yet": "待配置",
-            "hint": "GitHub 同步已禁用。在您的 .env 文件中设置 POZNOTE_GITHUB_SYNC_ENABLED=true 来启用它。"
+            "hint": "{{provider}} 同步已禁用。在您的 .env 文件中设置 POZNOTE_GIT_SYNC_ENABLED=true 来启用它。"
         },
         "test": {
             "title": "测试连接",
@@ -1946,13 +1946,13 @@
             "target_workspace": "目标工作区",
             "all_workspaces": "所有工作区",
             "push": {
-                "title": "推送到 GitHub",
-                "description": "将您的笔记导出到 GitHub。更新现有文件并删除 Poznote 中不再存在的文件。",
+                "title": "推送到 {{provider}}",
+                "description": "将您的笔记导出到 {{provider}}。更新现有文件并删除 Poznote 中不再存在的文件。",
                 "button": "推送"
             },
             "pull": {
-                "title": "从 GitHub 拉取",
-                "description": "从 GitHub 导入笔记。更新现有笔记并将 GitHub 上不再存在的笔记移至回收站。",
+                "title": "从 {{provider}} 拉取",
+                "description": "从 {{provider}} 导入笔记。更新现有笔记并将 {{provider}} 上不再存在的笔记移至回收站。",
                 "button": "拉取"
             }
         },
@@ -1980,14 +1980,14 @@
             "attachments": "文件附件",
             "embedded_images": "图片",
             "metadata": "元数据（标签、日期、ID）",
-            "embedded_note": "嵌入的图片保存在HTML中但不会在GitHub上显示"
+            "embedded_note": "嵌入的图片保存在HTML中但不会在{{provider}}上显示"
         },
         "not_configured": {
-            "title": "GitHub 同步未配置",
-            "description": "要使用 GitHub 同步，您需要在 .env 文件中配置 GitHub 凭据。",
+            "title": "{{provider}} 同步未配置",
+            "description": "要使用 {{provider}} 同步，您需要在 .env 文件中配置 {{provider}} 凭据。",
             "steps_title": "配置指南",
-            "step1": "在 github.com/settings/tokens 创建 GitHub 个人访问令牌，带有 'repo' 范围",
-            "step2": "为您的笔记创建一个 GitHub 仓库（公开或私有）",
+            "step1": "在 创建 {{provider}} 个人访问令牌，带有 'repo' 范围",
+            "step2": "为您的笔记创建一个 {{provider}} 仓库（公开或私有）",
             "step3": "将配置添加到您的 .env 文件",
             "step4": "重启应用程序以使更改生效"
         }

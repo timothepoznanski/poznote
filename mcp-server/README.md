@@ -57,9 +57,12 @@ The MCP server is a bridge between VS Code Copilot and your Poznote instance.
 - `share_note` — Enable public sharing for a note and get the public URL
 - `unshare_note` — Disable public sharing for a note
 - `get_note_share_status` — Get the current sharing status and public URL for a note
-- `get_github_sync_status` — Get the current status of GitHub synchronization
-- `github_push` — Force push local notes to the configured GitHub repository
-- `github_pull` — Force pull notes from the configured GitHub repository
+- `get_git_sync_status` — Get the current status of Git synchronization (GitHub/Forgejo)
+- `git_push` — Force push local notes to the configured Git repository
+- `git_pull` — Force pull notes from the configured Git repository
+- `get_github_sync_status` — (Legacy) Get the current status of GitHub synchronization
+- `github_push` — (Legacy) Force push local notes to GitHub
+- `github_pull` — (Legacy) Force pull notes from GitHub
 - `get_system_info` — Get version information about the Poznote installation
 - `list_backups` — List all available system backups
 - `create_backup` — Trigger the creation of a new system backup

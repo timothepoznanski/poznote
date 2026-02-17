@@ -50,6 +50,7 @@ Password: `poznote`
 - [Update application](#update-application)
 - [Multi-users](#multi-users)
 - [Backup / Export](#backup--export)
+- [Git Synchronization](#git-synchronization)
 - [Restore / Import](#restore--import)
 - [Offline View](#offline-view)
 - [Multiple Instances](#multiple-instances)
@@ -688,6 +689,49 @@ bash backup-poznote.sh '<poznote_url>' '<admin_username>' '<admin_password>' '<t
 6. Automatically manages retention (keeps only the specified number of recent backups)
 
 **Note:** Each user's backups are stored in separate folders (`backups-poznote-Nina`, `backups-poznote-Tim`, etc.)
+
+</details>
+
+## Git Synchronization
+
+Poznote supports automatic and manual synchronization with Git providers like **GitHub** or **Forgejo**. This allows you to keep a versioned history of your notes and sync them across multiple instances.
+
+<details>
+<summary><strong>How to configure Git Sync</strong></summary>
+<br>
+
+To enable Git synchronization, you need to configure the following variables in your `.env` file:
+
+```bash
+# Enable Git Sync
+POZNOTE_GIT_SYNC_ENABLED=true
+
+# Provider: 'github' or 'forgejo'
+POZNOTE_GIT_PROVIDER=github
+
+# Your Personal Access Token (PAT)
+POZNOTE_GIT_TOKEN=ghp_your_token
+
+# Repository (format: username/repo)
+POZNOTE_GIT_REPO=yourname/notes-backup
+
+# Branch (default: main)
+POZNOTE_GIT_BRANCH=main
+
+# API Base URL (Required for Forgejo)
+# Example: http://your-instance:3000/api/v1
+POZNOTE_GIT_API_BASE=
+```
+
+> 💡 **Note:** For GitHub, the API Base URL is automatically set to `https://api.github.com`. For Forgejo, ensure you include the `/api/v1` suffix.
+
+#### Automatic Sync
+
+When enabled, Poznote will automatically:
+- **Pull** changes from the repository upon login.
+- **Push** changes (commits) to the repository whenever a note is created, updated, or deleted.
+
+You can also trigger manual push/pull from the **Sync Status** page (accessible via the cloud icon in the header).
 
 </details>
 

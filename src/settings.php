@@ -267,12 +267,12 @@ if ($isAdmin) {
 
             <?php if ($isAdmin): ?>
             <!-- GitHub Sync -->
-            <div class="home-card settings-card-clickable" id="github-sync-card" data-href="github_sync.php">
+            <div class="home-card settings-card-clickable" id="git-sync-card" data-href="git_sync.php">
                 <div class="home-card-icon">
-                    <i class="fab fa-github"></i>
+                    <i class="<?php echo (defined('GIT_PROVIDER') && GIT_PROVIDER === 'forgejo') ? 'fas fa-code-branch' : 'fab fa-github'; ?>"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.github_sync', [], 'GitHub Sync'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('settings.cards.git_sync', ['provider' => getGitProviderName()], 'GitHub Sync'); ?></span>
                 </div>
             </div>
 

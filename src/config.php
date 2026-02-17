@@ -68,17 +68,31 @@ define('DISABLE_SETTINGS_ACCESS', filter_var(_env('POZNOTE_DISABLE_SETTINGS_ACCE
 define('SETTINGS_PASSWORD', _env('POZNOTE_SETTINGS_PASSWORD', ''));
 
 // ============================================================
-// GITHUB SYNC CONFIGURATION
+// GIT SYNC CONFIGURATION (GitHub, Forgejo)
 // ============================================================
-// Enable or disable GitHub synchronization
-define('GITHUB_SYNC_ENABLED', filter_var(_env('POZNOTE_GITHUB_SYNC_ENABLED', false), FILTER_VALIDATE_BOOL));
-// GitHub Personal Access Token
-define('GITHUB_TOKEN', _env('POZNOTE_GITHUB_TOKEN', ''));
-// GitHub repository (owner/repo format)
-define('GITHUB_REPO', _env('POZNOTE_GITHUB_REPO', ''));
-// GitHub branch to sync with
-define('GITHUB_BRANCH', _env('POZNOTE_GITHUB_BRANCH', 'main'));
+// Enable or disable Git synchronization
+define('GIT_SYNC_ENABLED', filter_var(_env('POZNOTE_GIT_SYNC_ENABLED', _env('POZNOTE_GITHUB_SYNC_ENABLED', false)), FILTER_VALIDATE_BOOL));
+// Git provider: 'github', 'forgejo'
+define('GIT_PROVIDER', _env('POZNOTE_GIT_PROVIDER', 'github'));
+// Git API base URL (optional, defaults to provider default)
+// For GitHub: https://api.github.com
+// For Forgejo: http://your-instance.com/api/v1
+define('GIT_API_BASE', _env('POZNOTE_GIT_API_BASE', ''));
+// Personal Access Token
+define('GIT_TOKEN', _env('POZNOTE_GIT_TOKEN', _env('POZNOTE_GITHUB_TOKEN', '')));
+// Repository (owner/repo format)
+define('GIT_REPO', _env('POZNOTE_GIT_REPO', _env('POZNOTE_GITHUB_REPO', '')));
+// Branch to sync with
+define('GIT_BRANCH', _env('POZNOTE_GIT_BRANCH', _env('POZNOTE_GITHUB_BRANCH', 'main')));
 // Commit author name
-define('GITHUB_AUTHOR_NAME', _env('POZNOTE_GITHUB_AUTHOR_NAME', 'Poznote'));
+define('GIT_AUTHOR_NAME', _env('POZNOTE_GIT_AUTHOR_NAME', _env('POZNOTE_GITHUB_AUTHOR_NAME', 'Poznote')));
 // Commit author email
-define('GITHUB_AUTHOR_EMAIL', _env('POZNOTE_GITHUB_AUTHOR_EMAIL', 'poznote@localhost'));
+define('GIT_AUTHOR_EMAIL', _env('POZNOTE_GIT_AUTHOR_EMAIL', _env('POZNOTE_GITHUB_AUTHOR_EMAIL', 'poznote@localhost')));
+
+// Deprecated: old GitHub specific constants (maintained for backward compatibility)
+define('GITHUB_SYNC_ENABLED', GIT_SYNC_ENABLED);
+define('GITHUB_TOKEN', GIT_TOKEN);
+define('GITHUB_REPO', GIT_REPO);
+define('GITHUB_BRANCH', GIT_BRANCH);
+define('GITHUB_AUTHOR_NAME', GIT_AUTHOR_NAME);
+define('GITHUB_AUTHOR_EMAIL', GIT_AUTHOR_EMAIL);

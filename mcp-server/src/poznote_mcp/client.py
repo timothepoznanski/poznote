@@ -399,23 +399,35 @@ class PoznoteClient:
             return data.get("share")
         return None
 
-    def get_github_status(self, user_id: str | int | None = None) -> dict | None:
-        """Get GitHub synchronization status"""
-        response = self.client.get("/github-sync/status", headers=self._headers_for_user(user_id))
+    def get_git_status(self, user_id: str | int | None = None) -> dict | None:
+        """Get Git synchronization status"""
+        response = self.client.get("/git-sync/status", headers=self._headers_for_user(user_id))
         response.raise_for_status()
         return response.json()
+
+    def git_push(self, user_id: str | int | None = None) -> dict:
+        """Force push notes to Git provider"""
+        response = self.client.post("/git-sync/push", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        return response.json()
+
+    def git_pull(self, user_id: str | int | None = None) -> dict:
+        """Force pull notes from Git provider"""
+        response = self.client.post("/git-sync/pull", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        return response.json()
+
+    def get_github_status(self, user_id: str | int | None = None) -> dict | None:
+        """Get GitHub synchronization status (Legacy)"""
+        return self.get_git_status(user_id=user_id)
 
     def github_push(self, user_id: str | int | None = None) -> dict:
-        """Force push notes to GitHub"""
-        response = self.client.post("/github-sync/push", headers=self._headers_for_user(user_id))
-        response.raise_for_status()
-        return response.json()
+        """Force push notes to GitHub (Legacy)"""
+        return self.git_push(user_id=user_id)
 
     def github_pull(self, user_id: str | int | None = None) -> dict:
-        """Force pull notes from GitHub"""
-        response = self.client.post("/github-sync/pull", headers=self._headers_for_user(user_id))
-        response.raise_for_status()
-        return response.json()
+        """Force pull notes from GitHub (Legacy)"""
+        return self.git_pull(user_id=user_id)
 
     def get_system_version(self) -> dict:
         """Get Poznote version information"""
