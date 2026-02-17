@@ -224,8 +224,8 @@ while ($row = $res_notes->fetch(PDO::FETCH_ASSOC)) {
     // Create a safe filename from the heading
     $safeHeading = sanitizeFilename($heading);
     
-    // Handle duplicate filenames by appending the note ID
-    $noteFileName = $zipFolderPath . $safeHeading . '_' . $noteId . '.' . $fileExtension;
+    // Set the filename
+    $noteFileName = $zipFolderPath . $safeHeading . '.' . $fileExtension;
     
     // Get the note content from the file
     $entryFilePath = getEntryFilename($noteId, $noteType);

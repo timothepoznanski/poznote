@@ -572,8 +572,7 @@ class NotesController {
                 $checkStmt = $this->con->prepare($checkQuery);
                 $checkStmt->execute($params);
                 if ($checkStmt->fetchColumn()) {
-                    $this->sendError(409, t('api.errors.duplicate_title_in_folder', [], 'Another note with the same title exists in this folder.'));
-                    return;
+                    $heading = generateUniqueTitle($heading, $noteId, $workspace, $folder_id);
                 }
             }
             

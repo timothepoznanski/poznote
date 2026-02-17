@@ -218,7 +218,8 @@ function saveNoteToServer() {
     .then(function(response) { return response.json(); })
     .then(function(data) {
         if (data.success) {
-            handleSaveResponse(JSON.stringify({date: new Date().toLocaleDateString(), title: headi, original_title: headi}));
+            var responseTitle = (data.note && data.note.heading) ? data.note.heading : headi;
+            handleSaveResponse(JSON.stringify({date: new Date().toLocaleDateString(), title: responseTitle, original_title: headi}));
             
             // Update linked notes in the list if any were updated
             if (data.note && data.updated_linked_notes && data.updated_linked_notes.length > 0) {
