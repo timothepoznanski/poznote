@@ -43,8 +43,30 @@ The MCP server is a bridge between VS Code Copilot and your Poznote instance.
 - `update_note` — Update an existing note
 - `delete_note` — Delete a note by ID
 - `create_folder` — Create a new folder
+- `list_folders` — List all folders from a workspace
+- `list_workspaces` — List all available workspaces
+- `list_tags` — List all unique tags used in notes
+- `get_trash` — List all notes currently in the trash
+- `empty_trash` — Permanently delete all notes in the trash
+- `restore_note` — Restore a note from the trash
+- `duplicate_note` — Create a duplicate of an existing note
+- `toggle_favorite` — Toggle the favorite status of a note
+- `list_attachments` — List all attachments for a specific note
+- `move_note_to_folder` — Move a note to a specific folder
+- `remove_note_from_folder` — Remove a note from its current folder (moves it to root)
+- `share_note` — Enable public sharing for a note and get the public URL
+- `unshare_note` — Disable public sharing for a note
+- `get_note_share_status` — Get the current sharing status and public URL for a note
+- `get_github_sync_status` — Get the current status of GitHub synchronization
+- `github_push` — Force push local notes to the configured GitHub repository
+- `github_pull` — Force pull notes from the configured GitHub repository
+- `get_system_info` — Get version information about the Poznote installation
+- `list_backups` — List all available system backups
+- `create_backup` — Trigger the creation of a new system backup
+- `restore_backup` — Restore a backup file (replaces current user data)
+- `get_app_setting` — Get the value of a specific application setting
 
-All tools accept an optional `user_id` argument to target a specific user profile. When provided, the MCP server sends the `X-User-ID` header for that request, allowing you to create or read notes across different profiles without changing the global MCP environment.
+Most tools accept an optional `user_id` argument to target a specific user profile. When provided, the MCP server sends the `X-User-ID` header for that request, allowing you to create or read notes across different profiles without changing the global MCP environment. The exceptions are the system-level tools `get_system_info`, `list_backups`, and `create_backup`, which do not take `user_id`.
 
 ---
 
@@ -115,7 +137,7 @@ ssh -L 8045:localhost:8045 user@your-server
 
 ## Security Considerations
 
-⚠️ **Important:** The MCP server does **not implement authentication** for incoming requests. Anyone with network access to the MCP endpoint can read, create, modify, and delete your notes.
+⚠️ **Important:** The MCP server does **not implement authentication** for incoming requests, so do not leave it exposed on a public network. It is safe when you keep it secured (localhost binding, SSH tunnel, or authenticated reverse proxy), which is the default installation behavior.
 
 ### Recommended Security Setup
 
