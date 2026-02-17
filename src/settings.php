@@ -192,7 +192,7 @@ if ($isAdmin) {
       data-txt-not-defined="<?php echo t_h('common.not_defined'); ?>"
       data-txt-saved="<?php echo t_h('common.saved'); ?>"
       data-txt-error="<?php echo t_h('common.error'); ?>"
-      data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+    data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <div class="home-container">
 
         <?php 
@@ -205,7 +205,7 @@ if ($isAdmin) {
         ?>
 
         <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
-            <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary">
+            <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary btn-toolbar-size">
                 <?php echo t_h('common.back_to_notes'); ?>
             </a>
         </div>
@@ -267,12 +267,12 @@ if ($isAdmin) {
 
             <?php if ($isAdmin): ?>
             <!-- GitHub Sync -->
-            <div class="home-card settings-card-clickable" id="github-sync-card" data-href="github_sync.php">
+            <div class="home-card settings-card-clickable" id="git-sync-card" data-href="git_sync.php">
                 <div class="home-card-icon">
-                    <i class="fab fa-github"></i>
+                    <i class="<?php echo (defined('GIT_PROVIDER') && GIT_PROVIDER === 'forgejo') ? 'fas fa-code-branch' : 'fab fa-github'; ?>"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.github_sync', [], 'GitHub Sync'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('settings.cards.git_sync', ['provider' => getGitProviderName()], 'GitHub Sync'); ?></span>
                 </div>
             </div>
 
@@ -294,7 +294,7 @@ if ($isAdmin) {
         </div>
 
         <!-- DISPLAY CATEGORY -->
-        <h2 class="settings-category-title"><?php echo t_h('settings.categories.display'); ?></h2>
+        <h2 class="settings-category-title" id="display"><?php echo t_h('settings.categories.display'); ?></h2>
         <div class="home-grid">
 
             <?php if ($isAdmin): ?>
@@ -343,6 +343,17 @@ if ($isAdmin) {
                         <span id="font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                         <span id="sidebar-font-size-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                     </div>
+                </div>
+            </div>
+
+            <!-- Index Icon Scale -->
+            <div class="home-card" id="index-icon-scale-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.index_icon_scale', [], 'Index icon scaling'); ?></span>
+                    <span id="index-icon-scale-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                 </div>
             </div>
 
@@ -406,6 +417,15 @@ if ($isAdmin) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.note_content_width', [], 'Note Content Width'); ?></span>
                     <span id="note-width-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+            <!-- Show Image Attachments -->
+            <div class="home-card" id="show-inline-attachment-images-card">
+                <div class="home-card-icon"><i class="fas fa-image"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.show_inline_attachment_images', [], 'Show image attachments'); ?></span>
+                    <span id="show-inline-attachment-images-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
                 </div>
             </div>
 
@@ -489,6 +509,7 @@ if ($isAdmin) {
     <script src="js/ui.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/font-size-settings.js"></script>
+    <script src="js/index-icon-scale-settings.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/index-icon-scale-settings.js') ?: time(); ?>"></script>
     <script src="js/note-width-settings.js"></script>
     <script src="js/background-settings.js"></script>
     <script src="js/copy-code-on-focus.js"></script>

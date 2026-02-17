@@ -264,7 +264,11 @@
             "preview_alt": "Aperçu",
             "uploaded_prefix": "Téléversé : ",
             "open_in_new_tab": "Ouvrir dans un nouvel onglet",
-            "pdf_label": "PDF"
+            "pdf_label": "PDF",
+            "settings_banner": {
+                "message": "Les images en pièces jointes sont masquées de la liste de la note (mais pas de la liste ici) car le paramètre 'Afficher les pièces jointes images' est désactivé.",
+                "action": "Modifier le réglage"
+            }
         },
         "modals": {
             "delete": {
@@ -338,7 +342,7 @@
             "user_management": "Gestion des utilisateurs",
             "backup_export": "Sauvegarde / Export",
             "restore_import": "Restauration / Import",
-            "github_sync": "Synchronisation GitHub",
+            "git_sync": "Synchronisation {{provider}}",
             "check_updates": "Vérifier les mises à jour",
             "api_docs": "Documentation API",
             "documentation": "Repository Github",
@@ -441,7 +445,9 @@
             "notes_without_folders_after": "Afficher les notes après les dossiers",
             "show_folder_actions": "Afficher les actions de dossier",
             "kanban_on_folder_click": "Ouvrir la vue Kanban au clic sur dossier",
-            "note_content_width": "Largeur du contenu de la note"
+            "index_icon_scale": "Taille des icônes (Index)",
+            "note_content_width": "Largeur du contenu de la note",
+            "show_inline_attachment_images": "Afficher les pièces jointes images"
         },
         "badges": {
             "font_size_default": "par défaut ({{size}}px)",
@@ -523,6 +529,9 @@
     "tags": {
         "add_single": "Ajouter un tag...",
         "add_multiple": "Ajouter des tags...",
+        "list_all": "Liste de tous les tags",
+        "manage_note_tags": "Gérer les tags de la note",
+        "modal_title": "Gérer les tags",
         "search": {
             "placeholder": "Filtrer les tags...",
             "results_one": "1 tag trouvé pour \"{{term}}\"",
@@ -725,6 +734,10 @@
             "label": "Largeur maximale (px) :",
             "full_width": "Pleine largeur",
             "default_value": "{{width}} px est la valeur par défaut"
+        },
+        "index_icon_scale": {
+            "title": "Taille des icônes (Index)",
+            "description": "Ajustez la taille des icônes sur la page index (facteur d'échelle) :"
         },
         "confirm": {
             "title": "Confirmer l’action",
@@ -1931,12 +1944,12 @@
             }
         }
     },
-    "github_sync": {
-        "title": "Synchronisation GitHub",
-        "description": "Poussez vos notes vers GitHub ou récupérez des notes depuis un dépôt existant. Un dépôt correspond à un profil utilisateur. Les espaces de travail seront organisés en dossiers à la racine du dépôt.",
+    "git_sync": {
+        "title": "Synchronisation {{provider}}",
+        "description": "Poussez vos notes vers {{provider}} ou récupérez des notes depuis un dépôt existant. Un dépôt correspond à un profil utilisateur. Les espaces de travail seront organisés en dossiers à la racine du dépôt.",
         "warning": "Ne vous servez pas de cette fonctionnalité comme seule solution de sauvegarde.\nPensez à mettre en place des exports manuels ou automatiques de fichiers ZIP de vos notes.",
-        "confirm_push": "Pousser les notes de l’espace « {{workspace}} » vers GitHub ? Met à jour les fichiers existants et supprime ceux qui n'existent plus dans Poznote.",
-        "confirm_pull": "Récupérer les notes de l’espace « {{workspace}} » depuis GitHub ? Importe les notes depuis GitHub. Met à jour les notes existantes et déplace vers la corbeille celles qui n'existent plus sur GitHub.",
+        "confirm_push": "Pousser les notes de l’espace « {{workspace}} » vers {{provider}} ? Met à jour les fichiers existants et supprime ceux qui n'existent plus dans Poznote.",
+        "confirm_pull": "Récupérer les notes de l’espace « {{workspace}} » depuis {{provider}} ? Importe les notes depuis {{provider}}. Met à jour les notes existantes et déplace vers la corbeille celles qui n'existent plus sur {{provider}}.",
         "config": {
             "title": "Configuration",
             "status": "Statut",
@@ -1948,7 +1961,7 @@
             "token_missing": "Non configuré",
             "not_configured": "Non configuré",
             "not_configured_yet": "À configurer",
-            "hint": "La synchronisation GitHub est désactivée. Définissez POZNOTE_GITHUB_SYNC_ENABLED=true dans votre fichier .env pour l'activer."
+            "hint": "La synchronisation {{provider}} est désactivée. Définissez POZNOTE_GIT_SYNC_ENABLED=true dans votre fichier .env pour l'activer."
         },
         "test": {
             "title": "Tester la connexion",
@@ -1968,13 +1981,13 @@
             "target_workspace": "Espace de travail cible",
             "all_workspaces": "Tous les espaces de travail",
             "push": {
-                "title": "Envoyer vers GitHub",
-                "description": "Exporte vos notes vers GitHub. Met à jour les fichiers existants et supprime les fichiers qui n'existent plus dans Poznote.",
+                "title": "Envoyer vers {{provider}}",
+                "description": "Exporte vos notes vers {{provider}}. Met à jour les fichiers existants et supprime les fichiers qui n'existent plus dans Poznote.",
                 "button": "Envoyer"
             },
             "pull": {
-                "title": "Récupérer depuis GitHub",
-                "description": "Importe les notes depuis GitHub. Met à jour les notes existantes et déplace dans la corbeille les notes qui n'existent plus sur GitHub.",
+                "title": "Récupérer depuis {{provider}}",
+                "description": "Importe les notes depuis {{provider}}. Met à jour les notes existantes et déplace dans la corbeille les notes qui n'existent plus sur {{provider}}.",
                 "button": "Récupérer"
             }
         },
@@ -2002,14 +2015,14 @@
             "attachments": "Pièces jointes",
             "embedded_images": "Images",
             "metadata": "Métadonnées (tags, date, ID)",
-            "embedded_note": "Les images intégrées sont conservées dans le HTML mais pas affichées sur GitHub"
+            "embedded_note": "Les images intégrées sont conservées dans le HTML mais pas affichées sur {{provider}}"
         },
         "not_configured": {
-            "title": "Synchronisation GitHub non configurée",
-            "description": "Pour utiliser la synchronisation GitHub, vous devez configurer vos identifiants GitHub dans le fichier .env.",
+            "title": "Synchronisation {{provider}} non configurée",
+            "description": "Pour utiliser la synchronisation {{provider}}, vous devez configurer vos identifiants {{provider}} dans le fichier .env.",
             "steps_title": "Instructions de configuration",
-            "step1": "Créez un jeton d'accès personnel GitHub sur github.com/settings/tokens avec le scope 'repo'",
-            "step2": "Créez un dépôt GitHub (public ou privé) pour vos notes",
+            "step1": "Créez un jeton d'accès personnel {{provider}} sur avec le scope 'repo'",
+            "step2": "Créez un dépôt {{provider}} (public ou privé) pour vos notes",
             "step3": "Ajoutez la configuration dans votre fichier .env",
             "step4": "Redémarrez l'application pour que les changements prennent effet"
         }

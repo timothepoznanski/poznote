@@ -32,6 +32,18 @@ if (!$note) {
     exit;
 }
 
+// Fetch the setting for inline images
+$hide_inline_images_setting_is_disabled = false;
+try {
+    $stmt_setting = $con->prepare("SELECT value FROM settings WHERE key = 'hide_inline_attachment_images' LIMIT 1");
+    $stmt_setting->execute();
+    $hide_inline_setting = $stmt_setting->fetchColumn();
+    // '0' or 'false' means it's disabled in UI, which hides them in note list
+    $hide_inline_images_setting_is_disabled = ($hide_inline_setting === '0' || $hide_inline_setting === 'false');
+} catch (Exception $e) {
+    // Ignore error
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -66,6 +78,52 @@ if (!$note) {
     <link rel="stylesheet" href="css/dark-mode/kanban.css">
     <link rel="stylesheet" href="css/dark-mode/icons.css">
     <script src="js/theme-manager.js"></script>
+    <style>
+        .settings-banner-info {
+            background-color: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+        [data-theme="dark"] .settings-banner-info {
+            background-color: #1e293b;
+            border-color: #334155;
+            color: #94a3b8;
+        }
+        .settings-banner-link {
+            color: #2563eb;
+            text-decoration: underline;
+            font-weight: 500;
+            margin-left: auto;
+            white-space: nowrap;
+        }
+        [data-theme="dark"] .settings-banner-link {
+            color: #60a5fa;
+        }
+        .settings-banner-link:hover {
+            color: #1d4ed8;
+        }
+        [data-theme="dark"] .settings-banner-link:hover {
+            color: #93c5fd;
+        }
+        @media (max-width: 600px) {
+            .settings-banner-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .settings-banner-link {
+                margin-left: 0;
+                margin-top: 4px;
+            }
+        }
+    </style>
 </head>
 <body data-note-id="<?php echo $note_id; ?>" 
       data-workspace="<?php echo $workspace ? htmlspecialchars($workspace, ENT_QUOTES) : ''; ?>"
@@ -112,6 +170,13 @@ if (!$note) {
         </a>
 
         <br><br>
+
+        <?php if ($hide_inline_images_setting_is_disabled): ?>
+        <div class="settings-banner-info">
+            <span><?php echo t_h('attachments.page.settings_banner.message'); ?></span>
+            <a href="settings.php#display" class="settings-banner-link"><?php echo t_h('attachments.page.settings_banner.action'); ?></a>
+        </div>
+        <?php endif; ?>
 
         <!-- Upload Section -->
         <div class="settings-section">

@@ -689,8 +689,8 @@ def get_note_share_status(note_id: int, user_id: Optional[int] = None) -> str:
 
 
 @mcp.tool()
-def get_github_sync_status(user_id: Optional[int] = None) -> str:
-    """Get the current status of GitHub synchronization
+def get_git_sync_status(user_id: Optional[int] = None) -> str:
+    """Get the current status of Git synchronization (GitHub or Forgejo)
     
     Args:
         user_id: User profile ID to access (optional, overrides default)
@@ -698,13 +698,13 @@ def get_github_sync_status(user_id: Optional[int] = None) -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    status = client.get_github_status(user_id=user_id)
+    status = client.get_git_status(user_id=user_id)
     return json.dumps(status, indent=2, ensure_ascii=False)
 
 
 @mcp.tool()
-def github_push(user_id: Optional[int] = None) -> str:
-    """Force push local notes to the configured GitHub repository
+def git_push(user_id: Optional[int] = None) -> str:
+    """Force push local notes to the configured Git repository
     
     Args:
         user_id: User profile ID to access (optional, overrides default)
@@ -712,13 +712,13 @@ def github_push(user_id: Optional[int] = None) -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    result = client.github_push(user_id=user_id)
+    result = client.git_push(user_id=user_id)
     return json.dumps(result, indent=2, ensure_ascii=False)
 
 
 @mcp.tool()
-def github_pull(user_id: Optional[int] = None) -> str:
-    """Force pull notes from the configured GitHub repository
+def git_pull(user_id: Optional[int] = None) -> str:
+    """Force pull notes from the configured Git repository
     
     Args:
         user_id: User profile ID to access (optional, overrides default)
@@ -726,8 +726,26 @@ def github_pull(user_id: Optional[int] = None) -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    result = client.github_pull(user_id=user_id)
+    result = client.git_pull(user_id=user_id)
     return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def get_github_sync_status(user_id: Optional[int] = None) -> str:
+    """Get the current status of GitHub synchronization (Legacy - use get_git_sync_status)"""
+    return get_git_sync_status(user_id=user_id)
+
+
+@mcp.tool()
+def github_push(user_id: Optional[int] = None) -> str:
+    """Force push local notes to the configured GitHub repository (Legacy - use git_push)"""
+    return git_push(user_id=user_id)
+
+
+@mcp.tool()
+def github_pull(user_id: Optional[int] = None) -> str:
+    """Force pull notes from the configured GitHub repository (Legacy - use git_pull)"""
+    return git_pull(user_id=user_id)
 
 
 @mcp.tool()

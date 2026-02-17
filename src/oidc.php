@@ -486,78 +486,290 @@ function oidc_claims_to_display_user($claims) {
     return 'oidc-user';
 }
 
-function oidc_is_user_allowed($claims) {
-    // Extract potential user identifiers
-    $email = $claims['email'] ?? null;
-    $preferredUsername = $claims['preferred_username'] ?? null;
-    $sub = $claims['sub'] ?? null;
-    
-    // Get configured allowed users
+function oidc_parse_csv_list($raw) {
+    if (!is_string($raw) || trim($raw) === '') {
+        return [];
+    }
+
+    $items = array_map('trim', explode(',', $raw));
+    $items = array_filter($items, function ($item) {
+        return $item !== '';
+    });
+
+    return array_values($items);
+}
+
+function oidc_get_claim_values($claims, $claimName) {
+    if (!is_string($claimName) || $claimName === '') {
+        return [];
+    }
+
+    $raw = $claims[$claimName] ?? null;
+    if (is_array($raw)) {
+        $values = [];
+        foreach ($raw as $item) {
+            if (is_string($item) && trim($item) !== '') {
+                $values[] = trim($item);
+            }
+        }
+        return array_values($values);
+    }
+
+    if (is_string($raw) && trim($raw) !== '') {
+        // Support providers that emit groups as comma or whitespace-separated string
+        if (str_contains($raw, ',')) {
+            return oidc_parse_csv_list($raw);
+        }
+
+        $parts = preg_split('/\s+/', trim($raw));
+        if (!is_array($parts)) {
+            return [trim($raw)];
+        }
+
+        $values = array_filter(array_map('trim', $parts), function ($item) {
+            return $item !== '';
+        });
+        return array_values($values);
+    }
+
+    return [];
+}
+
+function oidc_user_is_in_allowed_groups($claims) {
+    $allowedGroups = oidc_parse_csv_list(defined('OIDC_ALLOWED_GROUPS') ? OIDC_ALLOWED_GROUPS : '');
+    if (empty($allowedGroups)) {
+        return true;
+    }
+
+    $claimName = defined('OIDC_GROUPS_CLAIM') && OIDC_GROUPS_CLAIM !== '' ? OIDC_GROUPS_CLAIM : 'groups';
+    $userGroups = oidc_get_claim_values($claims, $claimName);
+    if (empty($userGroups)) {
+        return false;
+    }
+
+    $allowedMap = [];
+    foreach ($allowedGroups as $group) {
+        $allowedMap[strtolower($group)] = true;
+    }
+
+    foreach ($userGroups as $group) {
+        if (isset($allowedMap[strtolower($group)])) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function oidc_user_is_in_legacy_allowed_users($claims) {
     $allowedUsers = defined('OIDC_ALLOWED_USERS') ? OIDC_ALLOWED_USERS : '';
-    
-    // If allowlist is not configured, allow all authenticated users
-    // Use empty() to also handle false/null from misconfigured env vars
+
+    // If legacy allowlist is not configured, allow all users for this specific check
     if (empty($allowedUsers)) {
         return true;
     }
-    
-    // Parse the allowed users list
-    $allowedUsersList = array_map('trim', explode(',', $allowedUsers));
-    $allowedUsersList = array_filter($allowedUsersList, function($u) { return $u !== ''; });
-    
-    // Check if email matches
-    if (is_string($email) && in_array(strtolower($email), array_map('strtolower', $allowedUsersList), true)) {
+
+    $allowedUsersList = oidc_parse_csv_list($allowedUsers);
+    $allowedUsersLower = array_map('strtolower', $allowedUsersList);
+
+    $email = $claims['email'] ?? null;
+    if (is_string($email) && in_array(strtolower($email), $allowedUsersLower, true)) {
         return true;
     }
-    
-    // Check if preferred_username matches
-    if (is_string($preferredUsername) && in_array(strtolower($preferredUsername), array_map('strtolower', $allowedUsersList), true)) {
+
+    $preferredUsername = $claims['preferred_username'] ?? null;
+    if (is_string($preferredUsername) && in_array(strtolower($preferredUsername), $allowedUsersLower, true)) {
         return true;
     }
-    
-    // Check if sub matches (for providers that use sub as username)
+
+    $sub = $claims['sub'] ?? null;
     if (is_string($sub) && in_array($sub, $allowedUsersList, true)) {
         return true;
     }
-    
-    // User is not in allowlist
+
     return false;
+}
+
+function oidc_is_user_allowed($claims) {
+    // Group-based access control (recommended)
+    if (!oidc_user_is_in_allowed_groups($claims)) {
+        return false;
+    }
+
+    // Legacy user allowlist (still supported for backward compatibility)
+    if (!oidc_user_is_in_legacy_allowed_users($claims)) {
+        return false;
+    }
+
+    return true;
+}
+
+function oidc_is_auto_create_users_enabled() {
+    return defined('OIDC_AUTO_CREATE_USERS') && OIDC_AUTO_CREATE_USERS === true;
+}
+
+function oidc_build_username_candidates($claims) {
+    $preferredUsername = $claims['preferred_username'] ?? null;
+    $nickname = $claims['nickname'] ?? null;
+    $name = $claims['name'] ?? null;
+    $email = $claims['email'] ?? null;
+    $sub = $claims['sub'] ?? null;
+
+    $candidates = [];
+
+    if (is_string($preferredUsername) && trim($preferredUsername) !== '') {
+        $candidates[] = trim($preferredUsername);
+    }
+    if (is_string($nickname) && trim($nickname) !== '') {
+        $candidates[] = trim($nickname);
+    }
+    if (is_string($email) && str_contains($email, '@')) {
+        $emailLocalPart = trim(explode('@', $email, 2)[0]);
+        if ($emailLocalPart !== '') {
+            $candidates[] = $emailLocalPart;
+        }
+    }
+    if (is_string($name) && trim($name) !== '') {
+        $candidates[] = trim($name);
+    }
+    if (is_string($sub) && trim($sub) !== '') {
+        $candidates[] = trim($sub);
+    }
+
+    return $candidates;
+}
+
+function oidc_normalize_username($value) {
+    if (!is_string($value) || trim($value) === '') {
+        return 'oidc-user';
+    }
+
+    $value = strtolower(trim($value));
+    $value = preg_replace('/[^a-z0-9._-]+/i', '-', $value) ?? 'oidc-user';
+    $value = trim($value, '-._');
+
+    if ($value === '') {
+        return 'oidc-user';
+    }
+
+    if (strlen($value) > 60) {
+        $value = substr($value, 0, 60);
+        $value = rtrim($value, '-._');
+        if ($value === '') {
+            return 'oidc-user';
+        }
+    }
+
+    return $value;
+}
+
+function oidc_generate_available_username($claims) {
+    require_once __DIR__ . '/users/db_master.php';
+
+    $baseCandidates = oidc_build_username_candidates($claims);
+    if (empty($baseCandidates)) {
+        $baseCandidates = ['oidc-user'];
+    }
+
+    foreach ($baseCandidates as $candidate) {
+        $base = oidc_normalize_username($candidate);
+        if (!getUserProfileByUsername($base)) {
+            return $base;
+        }
+
+        for ($i = 2; $i <= 500; $i++) {
+            $suffix = '-' . $i;
+            $truncatedBase = substr($base, 0, max(1, 60 - strlen($suffix)));
+            $truncatedBase = rtrim($truncatedBase, '-._');
+            if ($truncatedBase === '') {
+                $truncatedBase = 'oidc-user';
+            }
+
+            $attempt = $truncatedBase . $suffix;
+            if (!getUserProfileByUsername($attempt)) {
+                return $attempt;
+            }
+        }
+    }
+
+    return 'oidc-user-' . bin2hex(random_bytes(3));
+}
+
+function oidc_find_or_provision_user($claims) {
+    require_once __DIR__ . '/users/db_master.php';
+
+    $sub = $claims['sub'] ?? '';
+    $email = $claims['email'] ?? '';
+    $preferredUsername = $claims['preferred_username'] ?? '';
+
+    $user = null;
+
+    if (is_string($sub) && $sub !== '') {
+        $user = getUserProfileByOidcSubject($sub);
+    }
+
+    if (!$user && is_string($preferredUsername) && $preferredUsername !== '') {
+        $user = getUserProfileByUsername($preferredUsername);
+    }
+
+    if (!$user && is_string($email) && $email !== '') {
+        $user = getUserProfileByEmail($email);
+    }
+
+    if (!$user) {
+        if (!oidc_is_auto_create_users_enabled()) {
+            $identifier = $preferredUsername ?: $email ?: ($sub ?: 'unknown');
+            throw new Exception('No user profile found for "' . $identifier . '". Please contact an administrator to create your profile.');
+        }
+
+        $username = oidc_generate_available_username($claims);
+        $newEmail = (is_string($email) && trim($email) !== '') ? trim($email) : null;
+        $creation = createUserProfile($username, $newEmail);
+        if (empty($creation['success']) || empty($creation['user_id'])) {
+            $error = $creation['error'] ?? 'unknown error';
+            throw new Exception('Failed to auto-create user profile: ' . $error);
+        }
+
+        $user = getUserProfileById((int)$creation['user_id']);
+        if (!$user) {
+            throw new Exception('Failed to load auto-created user profile');
+        }
+    }
+
+    if (!$user['active']) {
+        throw new Exception('Your user profile is disabled. Please contact an administrator.');
+    }
+
+    if (is_string($sub) && $sub !== '') {
+        $existingBySub = getUserProfileByOidcSubject($sub);
+        if ($existingBySub && (int)$existingBySub['id'] !== (int)$user['id']) {
+            throw new Exception('OIDC subject is already linked to another user profile.');
+        }
+        if (($user['oidc_subject'] ?? '') !== $sub) {
+            updateUserOidcSubject((int)$user['id'], $sub);
+            $user['oidc_subject'] = $sub;
+        }
+    }
+
+    if (is_string($email) && $email !== '' && ($user['email'] ?? '') !== $email) {
+        // Only auto-sync email when target email is unused or already on this same user.
+        $existingByEmail = getUserProfileByEmail($email);
+        if (!$existingByEmail || (int)$existingByEmail['id'] === (int)$user['id']) {
+            updateUserProfile((int)$user['id'], ['email' => $email]);
+            $user['email'] = $email;
+        }
+    }
+
+    return $user;
 }
 
 function oidc_finish_login($claims, $tokens) {
     // Check if user is allowed to access the application
     if (!oidc_is_user_allowed($claims)) {
-        throw new Exception('User not authorized to access this application');
+        throw new Exception('User not authorized to access this application (group or allowlist restriction)');
     }
-    
-    // Find user profile based on OIDC claims
-    // Note: Profiles must be pre-created by an admin before OIDC users can log in
-    require_once __DIR__ . '/users/db_master.php';
-    
-    $email = $claims['email'] ?? '';
-    $preferredUsername = $claims['preferred_username'] ?? '';
-    
-    // Try to find existing user by preferred_username first
-    $user = null;
-    if ($preferredUsername) {
-        $user = getUserProfileByUsername($preferredUsername);
-    }
-    
-    // If not found, try by email
-    if (!$user && $email) {
-        $user = getUserProfileByEmail($email);
-    }
-    
-    // User profile must exist (no automatic creation)
-    if (!$user) {
-        $identifier = $preferredUsername ?: $email ?: ($claims['sub'] ?? 'unknown');
-        throw new Exception('No user profile found for "' . $identifier . '". Please contact an administrator to create your profile.');
-    }
-    
-    // Check if user is active
-    if (!$user['active']) {
-        throw new Exception('Your user profile is disabled. Please contact an administrator.');
-    }
+
+    $user = oidc_find_or_provision_user($claims);
     
     // Set up session with user profile
     $_SESSION['authenticated'] = true;
@@ -579,6 +791,7 @@ function oidc_finish_login($claims, $tokens) {
         'email' => $claims['email'] ?? null,
         'name' => $claims['name'] ?? null,
         'preferred_username' => $claims['preferred_username'] ?? null,
+        'groups' => oidc_get_claim_values($claims, defined('OIDC_GROUPS_CLAIM') && OIDC_GROUPS_CLAIM !== '' ? OIDC_GROUPS_CLAIM : 'groups'),
         'iss' => $claims['iss'] ?? null,
     ];
 

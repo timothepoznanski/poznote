@@ -812,47 +812,79 @@
                             });
                     }
                 } else {
-                    // Handle HTML image insertion
-                    const reader = new FileReader();
-                    reader.onload = function (ev) {
-                        const originalDataUrl = ev.target.result;
+                    // Handle HTML image insertion via attachment upload
+                    const noteEntry = container.closest('.noteentry');
+                    if (!noteEntry) {
+                        if (typeof showNotificationPopup === 'function') {
+                            showNotificationPopup('Cannot upload image: note not found', 'error');
+                        }
+                        return;
+                    }
 
-                        // Use compression function if available (from attachments.js)
-                        const processImage = function (dataUrl) {
-                            // Add lazy loading and async decoding for better performance
-                            const imgHtml = '<img src="' + dataUrl + '" alt="image" loading="lazy" decoding="async" />';
+                    const noteId = noteEntry.id.replace('entry', '');
+                    if (!noteId || noteId === '' || noteId === 'search') {
+                        if (typeof showNotificationPopup === 'function') {
+                            showNotificationPopup('Cannot upload image: note ID not found', 'error');
+                        }
+                        return;
+                    }
 
-                            // Insert at cursor using the same method as drag-and-drop
-                            const inserted = insertHTMLAtSelection(imgHtml);
+                    // Insert a placeholder while uploading
+                    const placeholderHtml = '<img src="" alt="Uploading..." class="image-uploading-placeholder" style="opacity: 0.5; min-width: 100px; min-height: 100px; background: #f0f0f0; border: 2px dashed #ccc;" />';
+                    const inserted = insertHTMLAtSelection(placeholderHtml);
+                    let placeholderImg = noteEntry.querySelector('.image-uploading-placeholder');
 
-                            if (!inserted) {
-                                // Fallback: insert at end of note
-                                const noteEntry = container.closest('.noteentry');
-                                if (noteEntry) {
-                                    noteEntry.innerHTML += imgHtml;
-                                }
+                    if (!inserted) {
+                        noteEntry.insertAdjacentHTML('beforeend', placeholderHtml);
+                        placeholderImg = noteEntry.querySelector('.image-uploading-placeholder');
+                    }
+
+                    // Upload the file as attachment
+                    const formData = new FormData();
+                    formData.append('note_id', noteId);
+                    formData.append('file', file);
+                    if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) {
+                        formData.append('workspace', selectedWorkspace);
+                    }
+
+                    fetch('/api/v1/notes/' + noteId + '/attachments', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Replace placeholder with actual image
+                            const imgSrc = '/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id;
+                            
+                            if (placeholderImg) {
+                                placeholderImg.src = imgSrc;
+                                placeholderImg.alt = file.name;
+                                placeholderImg.classList.remove('image-uploading-placeholder');
+                                placeholderImg.style.opacity = '';
+                                placeholderImg.style.minWidth = '';
+                                placeholderImg.style.minHeight = '';
+                                placeholderImg.style.background = '';
+                                placeholderImg.style.border = '';
+                                placeholderImg.setAttribute('loading', 'lazy');
+                                placeholderImg.setAttribute('decoding', 'async');
                             }
 
-                            // Get note ID for saving
-                            const noteEntry = container.closest('.noteentry');
-                            if (noteEntry) {
-                                const targetNoteId = noteEntry.id.replace('entry', '');
-                                if (targetNoteId && targetNoteId !== '' && targetNoteId !== 'search') {
-                                    window.noteid = targetNoteId;
-                                }
-                            }
+                            window.noteid = noteId;
 
-                            // Mark note as modified
                             if (typeof window.markNoteAsModified === 'function') {
                                 window.markNoteAsModified();
                             }
 
-                            // Re-initialize image click handlers
                             if (typeof reinitializeImageClickHandlers === 'function') {
                                 setTimeout(() => reinitializeImageClickHandlers(), 50);
                             }
 
-                            // Save after insertion
+                            // Update attachment count
+                            if (typeof updateAttachmentCountInMenu === 'function') {
+                                updateAttachmentCountInMenu(noteId);
+                            }
+
                             setTimeout(() => {
                                 if (typeof saveNoteToServer === 'function') {
                                     saveNoteToServer();
@@ -860,16 +892,23 @@
                                     window.saveNoteImmediately();
                                 }
                             }, 100);
-                        };
-
-                        // Compress if function available, otherwise use original
-                        if (typeof compressImageIfNeeded === 'function') {
-                            compressImageIfNeeded(originalDataUrl, processImage);
                         } else {
-                            processImage(originalDataUrl);
+                            if (placeholderImg) {
+                                placeholderImg.remove();
+                            }
+                            if (typeof showNotificationPopup === 'function') {
+                                showNotificationPopup('Upload failed: ' + data.message, 'error');
+                            }
                         }
-                    };
-                    reader.readAsDataURL(file);
+                    })
+                    .catch(error => {
+                        if (placeholderImg) {
+                            placeholderImg.remove();
+                        }
+                        if (typeof showNotificationPopup === 'function') {
+                            showNotificationPopup('Upload failed: ' + error.message, 'error');
+                        }
+                    });
                 }
             }
 
@@ -3514,6 +3553,9 @@
                         var wsParam = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace)
                             ? '?workspace=' + encodeURIComponent(selectedWorkspace)
                             : '';
+                        var workspaceQuery = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace)
+                            ? '&workspace=' + encodeURIComponent(selectedWorkspace)
+                            : '';
                         var attachmentId = data.attachment_id;
                         var fileUrl = '/api/v1/notes/' + noteId + '/attachments/' + attachmentId + wsParam;
 
@@ -3522,8 +3564,8 @@
                         if (isVideo) {
                             mediaHtml = '<video class="note-video-embed" contenteditable="false" width="560" height="315" controls preload="metadata" playsinline src="' + fileUrl + '"></video>';
                         } else {
-                            // Audio: use native <audio> with contenteditable="false" (works in Chrome)
-                            mediaHtml = '<audio class="note-audio-embed" controls preload="metadata" contenteditable="false" src="' + fileUrl + '"></audio>';
+                            var audioPlayerUrl = '/audio_player.php?note=' + noteId + '&attachment=' + attachmentId + workspaceQuery;
+                            mediaHtml = '<iframe class="note-audio-embed" contenteditable="false" scrolling="no" frameborder="0" allow="autoplay" data-is-audio="true" data-audio-src="' + fileUrl + '" src="' + audioPlayerUrl + '"></iframe>';
                         }
 
                         if (editableElement) {

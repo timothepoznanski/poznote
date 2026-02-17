@@ -12,25 +12,42 @@ ob_start();
 // Get the correct entries path using our centralized function
 $rootPath = getEntriesPath();
 
-$zip = new ZipArchive();
-// Create ZIP file in temporary directory with proper permissions
-$tempDir = sys_get_temp_dir();
-$zipFileName = $tempDir . '/poznote_structured_' . uniqid() . '.zip';
-
 // Debug: Check if entries directory exists
 if (!$rootPath) {
     ob_end_clean();
     die('Entries directory not found in any expected location');
 }
 
+$fileCount = 0;
+$workspace = $_GET['workspace'] ?? null;
+
+// Get workspace name if workspace is specified
+$workspaceName = 'all';
+if ($workspace !== null) {
+    $stmt_ws = $con->prepare('SELECT name FROM workspaces WHERE name = ?');
+    $stmt_ws->execute([$workspace]);
+    $ws_row = $stmt_ws->fetch(PDO::FETCH_ASSOC);
+    if ($ws_row) {
+        $workspaceName = $ws_row['name'];
+    }
+}
+
+// Generate filename with workspace name and date
+$tempDir = sys_get_temp_dir();
+$dateStr = date('Y-m-d_His');
+// Sanitize workspace name: replace spaces and special characters with underscores
+$safeWorkspaceName = preg_replace('/\s+/', '_', $workspaceName); // Replace spaces with underscores
+$safeWorkspaceName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $safeWorkspaceName); // Replace other special chars
+$safeWorkspaceName = preg_replace('/_+/', '_', $safeWorkspaceName); // Replace multiple underscores with single
+$safeWorkspaceName = trim($safeWorkspaceName, '_'); // Remove leading/trailing underscores
+$zipFileName = $tempDir . '/poznote_structured_' . $safeWorkspaceName . '_' . $dateStr . '.zip';
+
+$zip = new ZipArchive();
 $result = $zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 if ($result !== TRUE) {
     ob_end_clean();
     die('Cannot create ZIP file. Error code: ' . $result);
 }
-
-$fileCount = 0;
-$workspace = $_GET['workspace'] ?? null;
 
 // Build folder hierarchy to understand the structure
 function buildFolderTree($con, $workspace = null) {
@@ -125,7 +142,13 @@ $allFolders = $folderTree['folders'];
 // Create README in the root explaining the structure
 $readmeContent = "# Poznote Structured Export\n\n";
 $readmeContent .= "This archive contains your Poznote notes organized in folders matching your Poznote folder structure.\n\n";
-$readmeContent .= "Export date: " . date('Y-m-d H:i:s') . "\n\n";
+
+// Add workspace name
+$readmeContent .= "**Workspace:** " . $workspaceName . "\n\n";
+
+// Add export date
+$readmeContent .= "**Export date:** " . date('Y-m-d H:i:s') . "\n\n";
+
 $readmeContent .= "## Structure\n\n";
 $readmeContent .= "- Each folder from Poznote is represented as a directory in this archive\n";
 $readmeContent .= "- Notes are saved with their original type (.html or .md)\n";
@@ -133,6 +156,31 @@ $readmeContent .= "- Markdown files include YAML front matter with metadata (tit
 $readmeContent .= "- Notes without a folder are placed in the 'Uncategorized' directory\n\n";
 
 $zip->addFromString('README.md', $readmeContent);
+
+// Build a mapping of note IDs to their attachment extensions for URL conversion
+$noteAttachments = [];
+$query_attachments = 'SELECT id, attachments FROM entries WHERE trash = 0 AND attachments IS NOT NULL AND attachments != \'\' AND attachments != \'[]\'';
+$att_params = [];
+if ($workspace !== null) {
+    $query_attachments .= ' AND workspace = ?';
+    $att_params[] = $workspace;
+}
+$stmt_att = $con->prepare($query_attachments);
+$stmt_att->execute($att_params);
+
+while ($row_att = $stmt_att->fetch(PDO::FETCH_ASSOC)) {
+    $attachments = json_decode($row_att['attachments'], true);
+    if (is_array($attachments)) {
+        $attachmentExtensions = [];
+        foreach ($attachments as $attachment) {
+            if (isset($attachment['id']) && isset($attachment['filename'])) {
+                $ext = pathinfo($attachment['filename'], PATHINFO_EXTENSION);
+                $attachmentExtensions[$attachment['id']] = $ext ? '.' . $ext : '';
+            }
+        }
+        $noteAttachments[$row_att['id']] = $attachmentExtensions;
+    }
+}
 
 // Query all notes (excluding trash)
 $query_notes = 'SELECT * FROM entries WHERE trash = 0';
@@ -148,6 +196,7 @@ $res_notes = $stmt_notes;
 
 // Track folders that have been created in the ZIP to avoid duplicates
 $createdFolders = [];
+$allNoteAttachments = []; // Collect all attachments to add to ZIP later
 
 // Process each note
 while ($row = $res_notes->fetch(PDO::FETCH_ASSOC)) {
@@ -175,8 +224,8 @@ while ($row = $res_notes->fetch(PDO::FETCH_ASSOC)) {
     // Create a safe filename from the heading
     $safeHeading = sanitizeFilename($heading);
     
-    // Handle duplicate filenames by appending the note ID
-    $noteFileName = $zipFolderPath . $safeHeading . '_' . $noteId . '.' . $fileExtension;
+    // Set the filename
+    $noteFileName = $zipFolderPath . $safeHeading . '.' . $fileExtension;
     
     // Get the note content from the file
     $entryFilePath = getEntryFilename($noteId, $noteType);
@@ -187,12 +236,66 @@ while ($row = $res_notes->fetch(PDO::FETCH_ASSOC)) {
         // For Markdown files, add front matter with metadata
         if ($fileExtension === 'md') {
             $content = addFrontMatterToMarkdown($content, $row, $con);
+            
+            // Convert Markdown image URLs if this note has attachments
+            if (isset($noteAttachments[$noteId])) {
+                $content = preg_replace_callback(
+                    '#\!\[([^\]]*)\]\(/api/v1/notes/' . preg_quote($noteId, '#') . '/attachments/([a-zA-Z0-9_]+)\)#',
+                    function($matches) use ($noteAttachments, $noteId) {
+                        $altText = $matches[1];
+                        $attachmentId = $matches[2];
+                        $extension = $noteAttachments[$noteId][$attachmentId] ?? '';
+                        return '![' . $altText . '](../attachments/' . $attachmentId . $extension . ')';
+                    },
+                    $content
+                );
+            }
         } else {
             $content = removeCopyButtonsFromHtml($content);
+            
+            // Convert HTML image URLs if this note has attachments
+            if (isset($noteAttachments[$noteId])) {
+                $content = preg_replace_callback(
+                    '#/api/v1/notes/' . preg_quote($noteId, '#') . '/attachments/([a-zA-Z0-9_]+)#',
+                    function($matches) use ($noteAttachments, $noteId) {
+                        $attachmentId = $matches[1];
+                        $extension = $noteAttachments[$noteId][$attachmentId] ?? '';
+                        return '../attachments/' . $attachmentId . $extension;
+                    },
+                    $content
+                );
+            }
         }
         
         $zip->addFromString($noteFileName, $content);
         $fileCount++;
+        
+        // Collect attachments for this note
+        if (isset($noteAttachments[$noteId])) {
+            $attachmentsData = json_decode($row['attachments'], true);
+            if (is_array($attachmentsData)) {
+                foreach ($attachmentsData as $attachment) {
+                    if (isset($attachment['id']) && isset($attachment['filename'])) {
+                        $allNoteAttachments[$attachment['id']] = $attachment['filename'];
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Add attachments to ZIP in the attachments/ folder
+if (!empty($allNoteAttachments)) {
+    $attachmentsPath = getAttachmentsPath();
+    
+    foreach ($allNoteAttachments as $attachmentId => $filename) {
+        $attachmentFile = $attachmentsPath . '/' . $filename;
+        
+        if (file_exists($attachmentFile) && is_readable($attachmentFile)) {
+            $ext = pathinfo($filename, PATHINFO_EXTENSION);
+            $zipAttachmentName = 'attachments/' . $attachmentId . ($ext ? '.' . $ext : '');
+            $zip->addFile($attachmentFile, $zipAttachmentName);
+        }
     }
 }
 
@@ -307,8 +410,9 @@ if (filesize($zipFileName) == 0) {
 }
 
 // Send file to browser
+$downloadFileName = 'poznote_structured_' . $safeWorkspaceName . '_' . $dateStr . '.zip';
 header('Content-Type: application/zip');
-header('Content-Disposition: attachment; filename="poznote_structured_export.zip"');
+header('Content-Disposition: attachment; filename="' . $downloadFileName . '"');
 header('Content-Length: ' . filesize($zipFileName));
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: 0');

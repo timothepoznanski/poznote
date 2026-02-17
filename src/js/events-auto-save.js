@@ -70,8 +70,10 @@ function updateConnectionStatus(online) {
 
 /**
  * Warn user before leaving page with unsaved changes
+ * Uses multiple events for better mobile compatibility
  */
 function setupPageUnloadWarning() {
+    // Desktop and some mobile browsers
     window.addEventListener('beforeunload', (e) => {
         const currentNoteId = window.noteid;
         
@@ -94,6 +96,40 @@ function setupPageUnloadWarning() {
             e.preventDefault();
             e.returnValue = message;
             return message;
+        }
+    });
+
+    // Mobile Safari and some Android browsers (more reliable than beforeunload)
+    window.addEventListener('pagehide', (e) => {
+        const currentNoteId = window.noteid;
+        
+        if (hasUnsavedChanges(currentNoteId)) {
+            // Force immediate save before leaving (synchronous for pagehide)
+            if (isOnline) {
+                try {
+                    emergencySave(currentNoteId);
+                } catch (err) {
+                    console.error('[Poznote Auto-Save] Emergency save via pagehide failed:', err);
+                }
+            }
+        }
+    });
+
+    // Additional fallback for visibility changes (tab switching, app backgrounding)
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+            const currentNoteId = window.noteid;
+            
+            if (hasUnsavedChanges(currentNoteId)) {
+                // Force immediate save when page becomes hidden
+                if (isOnline) {
+                    try {
+                        emergencySave(currentNoteId);
+                    } catch (err) {
+                        console.error('[Poznote Auto-Save] Emergency save via visibilitychange failed:', err);
+                    }
+                }
+            }
         }
     });
 }
@@ -155,6 +191,12 @@ function markNoteAsModified() {
         // Visual indicator: add red dot to page title
         if (!document.title.startsWith('🔴')) {
             document.title = '🔴 ' + document.title;
+        }
+
+        // Show save indicator (red floppy disk in top right)
+        const saveIndicator = document.getElementById('save-indicator');
+        if (saveIndicator) {
+            saveIndicator.style.display = 'flex';
         }
 
         // Debounced server save (3s delay for better performance)
@@ -448,6 +490,11 @@ function restoreDraft(noteId, content, title, tags) {
         // Convert any restored <audio> elements to iframes for contenteditable
         if (typeof window.convertNoteAudioToIframes === 'function') {
             window.convertNoteAudioToIframes();
+        }
+        
+        // Fix existing audio iframes to use audio_player.php
+        if (typeof window.fixAudioIframes === 'function') {
+            window.fixAudioIframes();
         }
     }
     

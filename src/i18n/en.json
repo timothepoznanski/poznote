@@ -55,7 +55,7 @@
             "user_management": "User Management",
             "backup_export": "Backup / Export",
             "restore_import": "Restore / Import",
-            "github_sync": "GitHub Sync",
+            "git_sync": "{{provider}} Sync",
             "check_updates": "Check for Updates",
             "api_docs": "API Documentation",
             "documentation": "Github Repository",
@@ -92,7 +92,9 @@
             "notes_without_folders_after": "Show notes after folders",
             "show_folder_actions": "Show folder actions",
             "kanban_on_folder_click": "Open Kanban view on folder click",
-            "note_content_width": "Note content width"
+            "index_icon_scale": "Index icon scaling",
+            "note_content_width": "Note content width",
+            "show_inline_attachment_images": "Show image attachments"
         },
         "badges": {
             "font_size_default": "default ({{size}}px)",
@@ -109,6 +111,13 @@
         "insert_order_bottom": "Bottom",
         "clear_completed": "Clear completed tasks",
         "no_completed_tasks": "No completed tasks to clear."
+    },
+    "tags": {
+        "add_single": "Add tag...",
+        "add_multiple": "Add tags...",
+        "list_all": "List all tags",
+        "manage_note_tags": "Manage note tags",
+        "modal_title": "Manage tags"
     },
     "download": "Download",
     "convert": "Convert",
@@ -184,7 +193,11 @@
             "preview_alt": "Preview",
             "uploaded_prefix": "Uploaded: ",
             "open_in_new_tab": "Open in new tab",
-            "pdf_label": "PDF"
+            "pdf_label": "PDF",
+            "settings_banner": {
+                "message": "Image attachments are hidden from the note's list (but not from the list here) because the 'Show image attachments' setting is disabled.",
+                "action": "Change setting"
+            }
         },
         "modals": {
             "delete": {
@@ -256,6 +269,10 @@
             "label": "Maximum width (px):",
             "full_width": "Full Width",
             "default_value": "{{width}} px is the Default value"
+        },
+        "index_icon_scale": {
+            "title": "Index icon scaling",
+            "description": "Adjust the size of icons on the index page (scale factor):"
         },
         "confirm": {
             "title": "Confirm Action",
@@ -1274,12 +1291,12 @@
         "apple-alt": "apple",
         "award": "award"
     },
-    "github_sync": {
-        "title": "GitHub Sync",
-        "description": "Push your notes to GitHub or pull notes from an existing repository. One repository is equal to one profile. Workspaces will be folders at the root of the repo.",
+    "git_sync": {
+        "title": "{{provider}} Sync",
+        "description": "Push your notes to {{provider}} or pull notes from an existing repository. One repository is equal to one profile. Workspaces will be folders at the root of the repo.",
         "warning": "Do not use this feature as your only backup solution.\nConsider setting up manual or automatic ZIP exports of your notes.",
-        "confirm_push": "Push notes of workspace \"{{workspace}}\" to GitHub? Updates existing files and deletes files that no longer exist in Poznote.",
-        "confirm_pull": "Pull notes for workspace \"{{workspace}}\" from GitHub? Import notes from GitHub. Updates existing notes and moves to trash notes that no longer exist on GitHub.",
+        "confirm_push": "Push notes of workspace \"{{workspace}}\" to {{provider}}? Updates existing files and deletes files that no longer exist in Poznote.",
+        "confirm_pull": "Pull notes for workspace \"{{workspace}}\" from {{provider}}? Import notes from {{provider}}. Updates existing notes and moves to trash notes that no longer exist on {{provider}}.",
         "config": {
             "title": "Configuration",
             "status": "Status",
@@ -1291,7 +1308,7 @@
             "token_missing": "Not configured",
             "not_configured": "Not configured",
             "not_configured_yet": "To configure",
-            "hint": "GitHub sync is disabled. Set POZNOTE_GITHUB_SYNC_ENABLED=true in your .env file to enable it."
+            "hint": "{{provider}} sync is disabled. Set POZNOTE_GIT_SYNC_ENABLED=true in your .env file to enable it."
         },
         "test": {
             "title": "Test Connection",
@@ -1311,13 +1328,13 @@
             "target_workspace": "Target Workspace",
             "all_workspaces": "All workspaces",
             "push": {
-                "title": "Push to GitHub",
-                "description": "Export your notes to GitHub. Updates existing files and deletes files that no longer exist in Poznote.",
+                "title": "Push to {{provider}}",
+                "description": "Export your notes to {{provider}}. Updates existing files and deletes files that no longer exist in Poznote.",
                 "button": "Push"
             },
             "pull": {
-                "title": "Pull from GitHub",
-                "description": "Import notes from GitHub. Updates existing notes and moves to trash notes that no longer exist on GitHub.",
+                "title": "Pull from {{provider}}",
+                "description": "Import notes from {{provider}}. Updates existing notes and moves to trash notes that no longer exist on {{provider}}.",
                 "button": "Pull"
             }
         },
@@ -1345,14 +1362,14 @@
             "attachments": "File attachments",
             "embedded_images": "Images",
             "metadata": "Metadata (tags, date, ID)",
-            "embedded_note": "Embedded images are preserved in HTML but not displayed on GitHub"
+            "embedded_note": "Embedded images are preserved in HTML but not displayed on {{provider}}"
         },
         "not_configured": {
-            "title": "GitHub Sync Not Configured",
-            "description": "To use GitHub synchronization, you need to configure your GitHub credentials in the .env file.",
+            "title": "{{provider}} Sync Not Configured",
+            "description": "To use {{provider}} synchronization, you need to configure your {{provider}} credentials in the .env file.",
             "steps_title": "Setup Instructions",
-            "step1": "Create a GitHub Personal Access Token at github.com/settings/tokens with 'repo' scope",
-            "step2": "Create a GitHub repository (public or private) for your notes",
+            "step1": "Create a {{provider}} Personal Access Token at with 'repo' scope",
+            "step2": "Create a {{provider}} repository (public or private) for your notes",
             "step3": "Add the configuration to your .env file",
             "step4": "Restart the application for changes to take effect"
         }

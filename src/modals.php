@@ -91,6 +91,26 @@
     </div>
 </div>
 
+<!-- Index Icon Scale Settings Modal -->
+<div id="indexIconScaleModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><?php echo t_h('modals.index_icon_scale.title', [], 'Index Icon Scaling'); ?></h3>
+        </div>
+        <div class="modal-body">
+            <p><?php echo t_h('modals.index_icon_scale.description', [], 'Adjust the size of icons on the index page:'); ?></p>
+            <div style="display: flex; flex-direction: column; gap: 10px; align-items: center; margin: 20px 0;">
+                <input type="range" id="indexIconScaleInput" min="0.5" max="2.0" step="0.1" value="1.0" style="width: 100%;">
+                <span id="indexIconScaleValue" style="font-weight: bold; font-size: 1.2em;">1.0x</span>
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" id="cancelIndexIconScaleBtn" class="btn btn-cancel"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" id="saveIndexIconScaleBtn" class="btn btn-primary"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 
 <!-- Confirmation Modal -->
 <div id="confirmModal" class="modal">
@@ -142,14 +162,13 @@
         <!-- Workspace selection -->
         <div class="form-group">
             <label for="workspaceSelect"><?php echo t_h('modals.move_note_folder.workspace_destination'); ?></label>
-        <select id="workspaceSelect" class="workspace-select" data-action="on-workspace-change">
+            <select id="workspaceSelect" class="workspace-select" data-action="on-workspace-change">
                 <!-- Workspaces will be loaded here -->
             </select>
         </div>
         
-        <div><?php echo t_h('modals.move_note_folder.target_folder'); ?></div>
-
         <div class="form-group">
+            <label for="moveNoteTargetSelect"><?php echo t_h('modals.move_note_folder.target_folder'); ?></label>
             <select id="moveNoteTargetSelect" class="workspace-select">
                 <!-- Options will be populated dynamically -->
             </select>
@@ -830,6 +849,27 @@
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" id="cancelBackgroundBtn"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" id="saveBackgroundBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
+<!-- Note Tags Modal -->
+<div id="tagsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><?php echo t_h('tags.modal_title', [], 'Manage tags'); ?></h3>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="tagsModalNoteId" />
+            <div id="tagsModalTagsList" class="tags-modal-list">
+                <!-- Tags will be dynamically loaded here as a list -->
+            </div>
+            <div class="tags-modal-input-wrapper">
+                <input type="text" id="tagsModalInput" placeholder="<?php echo t_h('tags.add_single'); ?>" autocomplete="off" />
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-tags-modal"><?php echo t_h('common.close'); ?></button>
         </div>
     </div>
 </div>

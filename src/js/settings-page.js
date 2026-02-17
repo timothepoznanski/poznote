@@ -168,6 +168,15 @@
         });
     }
 
+    function refreshIndexIconScaleBadge() {
+        var badge = document.getElementById('index-icon-scale-badge');
+        if (badge) {
+            var scale = localStorage.getItem('index_icon_scale') || '1.0';
+            badge.textContent = parseFloat(scale).toFixed(1) + 'x';
+            badge.className = 'setting-status enabled';
+        }
+    }
+
     function refreshNoteWidthBadge() {
         getSetting('center_note_content', function (value) {
             var badge = document.getElementById('note-width-badge');
@@ -416,6 +425,7 @@
         setupToggleCard('folder-counts-card', 'folder-counts-status', 'hide_folder_counts', true);
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
+        setupToggleCard('show-inline-attachment-images-card', 'show-inline-attachment-images-status', 'hide_inline_attachment_images', true);
 
         // Card click handlers for modal settings
         var languageCard = document.getElementById('language-card');
@@ -479,6 +489,12 @@
         var fontSizeCard = document.getElementById('font-size-card');
         if (fontSizeCard && typeof window.showNoteFontSizePrompt === 'function') {
             fontSizeCard.addEventListener('click', window.showNoteFontSizePrompt);
+        }
+
+        // Index icon scale card - delegates to index-icon-scale-settings.js
+        var indexIconScaleCard = document.getElementById('index-icon-scale-card');
+        if (indexIconScaleCard && typeof window.showIndexIconScalePrompt === 'function') {
+            indexIconScaleCard.addEventListener('click', window.showIndexIconScalePrompt);
         }
 
         // Save note sort modal button
@@ -569,6 +585,7 @@
         refreshToolbarModeBadge();
         refreshTimezoneBadge();
         refreshNoteWidthBadge();
+        refreshIndexIconScaleBadge();
 
         // Search functionality - filters settings cards
         var searchInput = document.getElementById('home-search-input');
@@ -639,5 +656,7 @@
     window.refreshToolbarModeBadge = refreshToolbarModeBadge;
     window.refreshTimezoneBadge = refreshTimezoneBadge;
     window.refreshNoteWidthBadge = refreshNoteWidthBadge;
+    window.getSetting = getSetting;
+    window.setSetting = setSetting;
 
 })();

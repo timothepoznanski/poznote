@@ -79,17 +79,14 @@
     transform: scale(1.18);
 }
 
-/* Blue color for markdown split view button */
+/* Markdown split view button - normal icon color (not blue) */
 .toolbar-btn.markdown-split-btn i,
 .toolbar-btn.markdown-split-btn [class*="fa-"] {
-    color:#007DB8 !important;
-    filter: none !important;
+    /* Use default icon color */
 }
 
 .toolbar-btn.markdown-split-btn:hover i,
 .toolbar-btn.markdown-split-btn:hover [class*="fa-"] {
-    color: #007DB8 !important;
-    filter: none !important;
     transform: scale(1.18);
 }
 
@@ -105,7 +102,7 @@
     left: 50%;
     width: 24px;
     height: 2px;
-    background-color: #007DB8;
+    background-color: #666;
     transform: translate(-50%, -50%) rotate(-45deg);
     pointer-events: none;
 }
@@ -113,8 +110,15 @@
 /* Apply default gray filter (rgb(55, 53, 47)) to all icons not on hover */
 /* Exclude folder icons with custom colors from the filter */
 [class*="fa-"]:not(.folder-icon[data-icon-color]) {
-    filter: brightness(0) saturate(100%) invert(21%) sepia(8%) saturate(1075%) hue-rotate(17deg) brightness(94%) contrast(89%);
+    filter: brightness(0) saturate(100%) invert(21%) sepia(8%) saturate(1075%) hue-rotate(17deg) brightness(90%) contrast(92%);
     transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+/* Keep sidebar icons crisp (avoid thick-looking filter) */
+.sidebar-home [class*="fa-"],
+.sidebar-settings [class*="fa-"],
+.sidebar-plus [class*="fa-"] {
+    filter: none !important;
 }
 
 [class*="fa-"]:not(.folder-icon[data-icon-color]):hover {
@@ -160,19 +164,21 @@
 /* Make markdown toggle icons blue */
 .markdown-edit-btn .fa-markdown,
 .markdown-preview-btn .fa-eye,
-.markdown-view-mode-btn i,
-.markdown-split-btn.active i,
-.markdown-split-btn.active [class*="fa-"] {
+.markdown-view-mode-btn i {
     color: #007DB8 !important;
     filter: none !important;
 }
 
 .markdown-edit-btn:hover .fa-markdown,
 .markdown-preview-btn:hover .fa-eye,
-.markdown-view-mode-btn:hover i,
-.markdown-split-btn:hover i {
+.markdown-view-mode-btn:hover i {
     color: #007DB8 !important;
     filter: none !important;
+    transform: scale(1.18);
+}
+
+/* Split view button - normal icon color */
+.markdown-split-btn:hover i {
     transform: scale(1.18);
 }
 

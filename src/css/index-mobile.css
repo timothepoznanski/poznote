@@ -140,6 +140,11 @@ body::-webkit-scrollbar {
     order: -1 !important; /* Put it first in the toolbar */
 }
 
+/* Mobile menu button in toolbar - always last */
+.mobile-more-btn {
+    order: 999 !important; /* Put it last in the toolbar */
+}
+
 .emoji-picker {
     width: 95vw;
     max-width: 280px;
@@ -183,6 +188,7 @@ body::-webkit-scrollbar {
 .note-edit-toolbar .btn-favorite:not(.hide-on-selection),
 .note-edit-toolbar .btn-share:not(.hide-on-selection),
 .note-edit-toolbar .btn-attachment:not(.hide-on-selection),
+.note-edit-toolbar .btn-trash:not(.hide-on-selection),
 .note-edit-toolbar .markdown-view-mode-btn:not(.hide-on-selection),
 .note-edit-toolbar .markdown-help-btn:not(.hide-on-selection),
 .note-edit-toolbar .mobile-more-btn:not(.hide-on-selection) {
@@ -258,8 +264,8 @@ body::-webkit-scrollbar {
 */
 .noteentry table,
 .markdown-preview table,
-.noteentry iframe,
-.markdown-preview iframe {
+.noteentry iframe:not([data-is-audio]):not(.note-audio-embed),
+.markdown-preview iframe:not([data-is-audio]):not(.note-audio-embed) {
     width: 100% !important;
     max-width: 100%;
 }
@@ -269,8 +275,8 @@ body::-webkit-scrollbar {
     table-layout: fixed;
 }
 
-.noteentry iframe,
-.markdown-preview iframe {
+.noteentry iframe:not([data-is-audio]):not(.note-audio-embed),
+.markdown-preview iframe:not([data-is-audio]):not(.note-audio-embed) {
     height: auto !important;
     aspect-ratio: 16 / 9;
     border: none;

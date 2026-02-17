@@ -50,6 +50,7 @@ Password: `poznote`
 - [Update application](#update-application)
 - [Multi-users](#multi-users)
 - [Backup / Export](#backup--export)
+- [Git Synchronization](#git-synchronization)
 - [Restore / Import](#restore--import)
 - [Offline View](#offline-view)
 - [Multiple Instances](#multiple-instances)
@@ -415,21 +416,25 @@ Poznote supports OpenID Connect (authorization code + PKCE) for single sign-on i
 
 #### How it works
 
-1. **Pre-requisite**: An administrator must first create a user profile with a username matching the OIDC user's `preferred_username` or `email`.
+1. Optionally restrict access by OIDC group membership.
 2. The login page displays a "Continue with [Provider Name]" button.
 3. Clicking the button redirects users to your identity provider.
-4. After successful authentication, Poznote matches the OIDC identity to an existing user profile and creates a session.
+4. After successful authentication, Poznote links the OIDC identity to an existing profile (by `sub`, then `preferred_username`, then `email`) and can auto-create a profile if enabled.
 
 #### Configuration
 
 Add the OIDC variables to your `.env` file (see `.env.template`). If `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN` is `true`, the standard login form will be hidden.
 
-#### Access Control Example
+#### Access Control Example (Groups + Auto-Provision)
 
-Restrict access to specific users by email address or username:
+Restrict access to specific groups and auto-create users at first login:
 ```bash
-POZNOTE_OIDC_ALLOWED_USERS=alice@example.com,bob@example.com,charlie@company.org
+POZNOTE_OIDC_GROUPS_CLAIM=groups
+POZNOTE_OIDC_ALLOWED_GROUPS=poznote
+POZNOTE_OIDC_AUTO_CREATE_USERS=true
 ```
+
+`POZNOTE_OIDC_ALLOWED_USERS` remains available for backward compatibility, but group-based access is recommended.
 
 </details>
 
@@ -684,6 +689,49 @@ bash backup-poznote.sh '<poznote_url>' '<admin_username>' '<admin_password>' '<t
 6. Automatically manages retention (keeps only the specified number of recent backups)
 
 **Note:** Each user's backups are stored in separate folders (`backups-poznote-Nina`, `backups-poznote-Tim`, etc.)
+
+</details>
+
+## Git Synchronization
+
+Poznote supports automatic and manual synchronization with Git providers like **GitHub** or **Forgejo**. This allows you to keep a versioned history of your notes and sync them across multiple instances.
+
+<details>
+<summary><strong>How to configure Git Sync</strong></summary>
+<br>
+
+To enable Git synchronization, you need to configure the following variables in your `.env` file:
+
+```bash
+# Enable Git Sync
+POZNOTE_GIT_SYNC_ENABLED=true
+
+# Provider: 'github' or 'forgejo'
+POZNOTE_GIT_PROVIDER=github
+
+# Your Personal Access Token (PAT)
+POZNOTE_GIT_TOKEN=ghp_your_token
+
+# Repository (format: username/repo)
+POZNOTE_GIT_REPO=yourname/notes-backup
+
+# Branch (default: main)
+POZNOTE_GIT_BRANCH=main
+
+# API Base URL (Required for Forgejo)
+# Example: http://your-instance:3000/api/v1
+POZNOTE_GIT_API_BASE=
+```
+
+> 💡 **Note:** For GitHub, the API Base URL is automatically set to `https://api.github.com`. For Forgejo, ensure you include the `/api/v1` suffix.
+
+#### Automatic Sync
+
+When enabled, Poznote will automatically:
+- **Pull** changes from the repository upon login.
+- **Push** changes (commits) to the repository whenever a note is created, updated, or deleted.
+
+You can also trigger manual push/pull from the **Sync Status** page (accessible via the cloud icon in the header).
 
 </details>
 

@@ -328,6 +328,11 @@ try {
         $con->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('schema_version', '$CURRENT_SCHEMA_VERSION')");
     }
     // --- End schema versioning ---
+    
+    // Run data migrations (convert base64 images to attachments, etc.)
+    if (function_exists('runDataMigrations')) {
+        runDataMigrations();
+    }
 
     // Ensure required data directories exist
     // $dbDir points to data/database, so we need to go up one level to get data/

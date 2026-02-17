@@ -200,8 +200,28 @@ $query_notes = "SELECT * FROM entries WHERE trash = 0 AND folder_id IN ($placeho
 $stmt = $con->prepare($query_notes);
 $stmt->execute($targetFolderIds);
 
+// Build a mapping of note IDs to their attachment extensions for URL conversion
+$noteAttachments = [];
+$stmt_attachments = $con->prepare("SELECT id, attachments FROM entries WHERE trash = 0 AND folder_id IN ($placeholders) AND attachments IS NOT NULL AND attachments != '' AND attachments != '[]'");
+$stmt_attachments->execute($targetFolderIds);
+
+while ($row_att = $stmt_attachments->fetch(PDO::FETCH_ASSOC)) {
+    $attachments = json_decode($row_att['attachments'], true);
+    if (is_array($attachments)) {
+        $attachmentExtensions = [];
+        foreach ($attachments as $attachment) {
+            if (isset($attachment['id']) && isset($attachment['filename'])) {
+                $ext = pathinfo($attachment['filename'], PATHINFO_EXTENSION);
+                $attachmentExtensions[$attachment['id']] = $ext ? '.' . $ext : '';
+            }
+        }
+        $noteAttachments[$row_att['id']] = $attachmentExtensions;
+    }
+}
+
 // Track folders that have been created in the ZIP to avoid duplicates
 $createdFolders = [];
+$allNoteAttachments = []; // Collect all attachments to add to ZIP later
 
 // Process each note
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -228,9 +248,63 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         
         if ($fileExtension === 'md') {
             $content = addFrontMatterToMarkdown($content, $row, $con);
+            
+            // Convert Markdown image URLs if this note has attachments
+            if (isset($noteAttachments[$noteId])) {
+                $content = preg_replace_callback(
+                    '#\!\[([^\]]*)\]\(/api/v1/notes/' . preg_quote($noteId, '#') . '/attachments/([a-zA-Z0-9_]+)\)#',
+                    function($matches) use ($noteAttachments, $noteId) {
+                        $altText = $matches[1];
+                        $attachmentId = $matches[2];
+                        $extension = $noteAttachments[$noteId][$attachmentId] ?? '';
+                        return '![' . $altText . '](attachments/' . $attachmentId . $extension . ')';
+                    },
+                    $content
+                );
+            }
+        } else if ($fileExtension === 'html') {
+            // Convert HTML image URLs if this note has attachments
+            if (isset($noteAttachments[$noteId])) {
+                $content = preg_replace_callback(
+                    '#/api/v1/notes/' . preg_quote($noteId, '#') . '/attachments/([a-zA-Z0-9_]+)#',
+                    function($matches) use ($noteAttachments, $noteId) {
+                        $attachmentId = $matches[1];
+                        $extension = $noteAttachments[$noteId][$attachmentId] ?? '';
+                        return 'attachments/' . $attachmentId . $extension;
+                    },
+                    $content
+                );
+            }
         }
         
         $zip->addFromString($noteFileName, $content);
+        
+        // Collect attachments for this note
+        if (isset($noteAttachments[$noteId])) {
+            $attachmentsData = json_decode($row['attachments'], true);
+            if (is_array($attachmentsData)) {
+                foreach ($attachmentsData as $attachment) {
+                    if (isset($attachment['id']) && isset($attachment['filename'])) {
+                        $allNoteAttachments[$attachment['id']] = $attachment['filename'];
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Add attachments to ZIP in the attachments/ folder
+if (!empty($allNoteAttachments)) {
+    $attachmentsPath = getAttachmentsPath();
+    
+    foreach ($allNoteAttachments as $attachmentId => $filename) {
+        $attachmentFile = $attachmentsPath . '/' . $filename;
+        
+        if (file_exists($attachmentFile) && is_readable($attachmentFile)) {
+            $ext = pathinfo($filename, PATHINFO_EXTENSION);
+            $zipAttachmentName = 'attachments/' . $attachmentId . ($ext ? '.' . $ext : '');
+            $zip->addFile($attachmentFile, $zipAttachmentName);
+        }
     }
 }
 

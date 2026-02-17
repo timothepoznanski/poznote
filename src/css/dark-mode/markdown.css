@@ -161,13 +161,9 @@ body.dark-mode .toolbar-btn.markdown-view-mode-btn:hover [class*="fa-"] {
 html[data-theme='dark'] .markdown-edit-btn .fa-markdown,
 html[data-theme='dark'] .markdown-preview-btn .fa-eye,
 html[data-theme='dark'] .markdown-view-mode-btn i,
-html[data-theme='dark'] .markdown-split-btn.active i,
-html[data-theme='dark'] .markdown-split-btn.active [class*="fa-"],
 body.dark-mode .markdown-edit-btn .fa-markdown,
 body.dark-mode .markdown-preview-btn .fa-eye,
-body.dark-mode .markdown-view-mode-btn i,
-body.dark-mode .markdown-split-btn.active i,
-body.dark-mode .markdown-split-btn.active [class*="fa-"] {
+body.dark-mode .markdown-view-mode-btn i {
     color: #007DB8 !important;
     filter: none !important;
 }
@@ -175,13 +171,17 @@ body.dark-mode .markdown-split-btn.active [class*="fa-"] {
 html[data-theme='dark'] .markdown-edit-btn:hover .fa-markdown,
 html[data-theme='dark'] .markdown-preview-btn:hover .fa-eye,
 html[data-theme='dark'] .markdown-view-mode-btn:hover i,
-html[data-theme='dark'] .markdown-split-btn:hover i,
 body.dark-mode .markdown-edit-btn:hover .fa-markdown,
 body.dark-mode .markdown-preview-btn:hover .fa-eye,
-body.dark-mode .markdown-view-mode-btn:hover i,
-body.dark-mode .markdown-split-btn:hover i {
+body.dark-mode .markdown-view-mode-btn:hover i {
     color: #007DB8 !important;
     filter: none !important;
+    transform: scale(1.18);
+}
+
+/* Split view button - normal color */
+html[data-theme='dark'] .markdown-split-btn:hover i,
+body.dark-mode .markdown-split-btn:hover i {
     transform: scale(1.18);
 }
 
@@ -203,26 +203,16 @@ body.dark-mode .toolbar-btn.markdown-help-btn:hover [class*="fa-"] {
     transform: scale(1.18);
 }
 
-/* Markdown split view button when active */
-html[data-theme='dark'] .toolbar-btn.markdown-split-btn.active i,
-html[data-theme='dark'] .toolbar-btn.markdown-split-btn.active [class*="fa-"],
-body.dark-mode .toolbar-btn.markdown-split-btn.active i,
-body.dark-mode .toolbar-btn.markdown-split-btn.active [class*="fa-"] {
-    color: #007DB8 !important;
-    filter: none !important;
-}
-
+/* Markdown split view button - normal color */
 html[data-theme='dark'] .toolbar-btn.markdown-split-btn:hover i,
 html[data-theme='dark'] .toolbar-btn.markdown-split-btn:hover [class*="fa-"],
 body.dark-mode .toolbar-btn.markdown-split-btn:hover i,
 body.dark-mode .toolbar-btn.markdown-split-btn:hover [class*="fa-"] {
-    color: #007DB8 !important;
-    filter: none !important;
     transform: scale(1.18);
 }
 
 /* Slash through icon when active (in split mode) */
 html[data-theme='dark'] .toolbar-btn.markdown-split-btn.active::after,
 body.dark-mode .toolbar-btn.markdown-split-btn.active::after {
-    background-color: #007DB8;
+    background-color: #999;
 }

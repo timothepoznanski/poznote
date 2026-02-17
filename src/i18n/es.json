@@ -255,7 +255,11 @@
             "loading_attachments": "Cargando adjuntos...",
             "preview_alt": "Vista previa",
             "uploaded_prefix": "Subido: ",
-            "open_in_new_tab": "Abrir en nueva pestaña"
+            "open_in_new_tab": "Abrir en nueva pestaña",
+            "settings_banner": {
+                "message": "Los archivos adjuntos de imagen están ocultos en la lista de la nota (pero no en esta lista) porque el ajuste 'Mostrar archivos adjuntos de imagen' está desactivado.",
+                "action": "Cambiar ajuste"
+            }
         },
         "modals": {
             "delete": {
@@ -320,7 +324,7 @@
             "workspaces": "Espacios de trabajo",
             "backup_export": "Copia de seguridad / Exportar",
             "restore_import": "Restaurar / Importar",
-            "github_sync": "Sincronización GitHub",
+            "git_sync": "Sincronización {{provider}}",
             "check_updates": "Buscar actualizaciones",
             "api_docs": "Documentación de API",
             "documentation": "Repositorio Github",
@@ -423,7 +427,9 @@
             "notes_without_folders_after": "Mostrar notas después de las carpetas",
             "show_folder_actions": "Mostrar acciones de carpeta",
             "kanban_on_folder_click": "Abrir vista Kanban al hacer clic en la carpeta",
-            "note_content_width": "Ancho del contenido de la nota"
+            "index_icon_scale": "Escalado de iconos del índice",
+            "note_content_width": "Ancho del contenido de la nota",
+            "show_inline_attachment_images": "Mostrar archivos adjuntos de imagen"
         },
         "badges": {
             "font_size_default": "predeterminado ({{size}}px)",
@@ -501,6 +507,9 @@
     "tags": {
         "add_single": "Agregar etiqueta...",
         "add_multiple": "Agregar etiquetas...",
+        "list_all": "Listar todas las etiquetas",
+        "manage_note_tags": "Gestionar etiquetas de la nota",
+        "modal_title": "Gestionar etiquetas",
         "search": {
             "placeholder": "Filtrar etiquetas...",
             "results_one": "1 etiqueta encontrada para \"{{term}}\"",
@@ -703,6 +712,10 @@
             "label": "Ancho máximo (px):",
             "full_width": "Ancho total",
             "default_value": "{{width}} px es el valor predeterminado"
+        },
+        "index_icon_scale": {
+            "title": "Escalado de iconos del índice",
+            "description": "Ajuste el tamaño de los iconos en la página del índice (factor de escala):"
         },
         "confirm": {
             "title": "Confirmar acción",
@@ -1777,12 +1790,12 @@
             }
         }
     },
-    "github_sync": {
-        "title": "Sincronización GitHub",
-        "description": "Envíe sus notas a GitHub o extraiga notas de un repositorio existente. Un repositorio equivale a un perfil. Los espacios de trabajo serán carpetas en la raíz del repositorio.",
+    "git_sync": {
+        "title": "Sincronización {{provider}}",
+        "description": "Envíe sus notas a {{provider}} o extraiga notas de un repositorio existente. Un repositorio equivale a un perfil. Los espacios de trabajo serán carpetas en la raíz del repositorio.",
         "warning": "No utilice esta función como su única solución de copia de seguridad.\nConsidere configurar exportaciones ZIP manuales o automáticas de sus notas.",
-        "confirm_push": "¿Enviar notas del espacio de trabajo \"{{workspace}}\" a GitHub? Updates existing files and deletes files that no longer exist in Poznote.",
-        "confirm_pull": "¿Recuperar notas del espacio de trabajo \"{{workspace}}\" de GitHub? Import notes from GitHub. Updates existing notes and moves to trash notes that no longer exist on GitHub.",
+        "confirm_push": "¿Enviar notas del espacio de trabajo \"{{workspace}}\" a {{provider}}? Updates existing files and deletes files that no longer exist in Poznote.",
+        "confirm_pull": "¿Recuperar notas del espacio de trabajo \"{{workspace}}\" de {{provider}}? Import notes from {{provider}}. Updates existing notes and moves to trash notes that no longer exist on {{provider}}.",
         "config": {
             "title": "Configuración",
             "status": "Estado",
@@ -1794,7 +1807,7 @@
             "token_missing": "No configurado",
             "not_configured": "No configurado",
             "not_configured_yet": "A configurar",
-            "hint": "La sincronización con GitHub está desactivada. Establece POZNOTE_GITHUB_SYNC_ENABLED=true en tu archivo .env para activarla."
+            "hint": "La sincronización con {{provider}} está desactivada. Establece POZNOTE_GIT_SYNC_ENABLED=true en tu archivo .env para activarla."
         },
         "test": {
             "title": "Probar conexión",
@@ -1814,13 +1827,13 @@
             "target_workspace": "Espacio de trabajo de destino",
             "all_workspaces": "Todos los espacios de trabajo",
             "push": {
-                "title": "Enviar a GitHub",
-                "description": "Exporta tus notas a GitHub. Actualiza archivos existentes y elimina archivos que ya no existen en Poznote.",
+                "title": "Enviar a {{provider}}",
+                "description": "Exporta tus notas a {{provider}}. Actualiza archivos existentes y elimina archivos que ya no existen en Poznote.",
                 "button": "Enviar"
             },
             "pull": {
-                "title": "Recuperar de GitHub",
-                "description": "Importa notas desde GitHub. Actualiza notas existentes y mueve a la papelera notas que ya no existen en GitHub.",
+                "title": "Recuperar de {{provider}}",
+                "description": "Importa notas desde {{provider}}. Actualiza notas existentes y mueve a la papelera notas que ya no existen en {{provider}}.",
                 "button": "Recuperar"
             }
         },
@@ -1848,14 +1861,14 @@
             "attachments": "Archivos adjuntos",
             "embedded_images": "Imágenes",
             "metadata": "Metadatos (etiquetas, fecha, ID)",
-            "embedded_note": "Las imágenes incrustadas se conservan en HTML pero no se muestran en GitHub"
+            "embedded_note": "Las imágenes incrustadas se conservan en HTML pero no se muestran en {{provider}}"
         },
         "not_configured": {
-            "title": "Sincronización con GitHub no configurada",
-            "description": "Para usar la sincronización con GitHub, debes configurar tus credenciales de GitHub en el archivo .env.",
+            "title": "Sincronización con {{provider}} no configurada",
+            "description": "Para usar la sincronización con {{provider}}, debes configurar tus credenciales de {{provider}} en el archivo .env.",
             "steps_title": "Instrucciones de configuración",
-            "step1": "Crea un token de acceso personal de GitHub en github.com/settings/tokens con el alcance 'repo'",
-            "step2": "Crea un repositorio de GitHub (público o privado) para tus notas",
+            "step1": "Crea un token de acceso personal de {{provider}} en con el alcance 'repo'",
+            "step2": "Crea un repositorio de {{provider}} (público o privado) para tus notas",
             "step3": "Agrega la configuración a tu archivo .env",
             "step4": "Reinicia la aplicación para que los cambios surtan efecto"
         }

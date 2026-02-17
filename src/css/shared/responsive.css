@@ -90,6 +90,17 @@
         padding: 10px;
     }
 
+    #foldersList {
+        max-width: 100%;
+        margin: 0;
+        width: 100%;
+    }
+
+    #foldersList .shared-note-item {
+        align-items: flex-start !important;
+        justify-content: flex-start !important;
+    }
+
     /* Simplified mobile layout */
     .shared-note-item {
         flex-direction: column;

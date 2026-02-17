@@ -255,7 +255,11 @@
             "loading_attachments": "Anhänge werden geladen...",
             "preview_alt": "Vorschau",
             "uploaded_prefix": "Hochgeladen: ",
-            "open_in_new_tab": "In neuem Tab öffnen"
+            "open_in_new_tab": "In neuem Tab öffnen",
+            "settings_banner": {
+                "message": "Bildanhänge werden in der Notizliste ausgeblendet (aber nicht hier in der Liste), da die Einstellung 'Bild-Anhänge anzeigen' deaktiviert ist.",
+                "action": "Einstellung ändern"
+            }
         },
         "modals": {
             "delete": {
@@ -320,7 +324,7 @@
             "workspaces": "Arbeitsbereiche",
             "backup_export": "Sicherung / Export",
             "restore_import": "Wiederherstellen / Importieren",
-            "github_sync": "GitHub-Synchronisierung",
+            "git_sync": "{{provider}}-Synchronisierung",
             "check_updates": "Nach Updates suchen",
             "api_docs": "API-Dokumentation",
             "documentation": "Github Repository",
@@ -423,7 +427,9 @@
             "notes_without_folders_after": "Notizen nach Ordnern anzeigen",
             "show_folder_actions": "Ordner-Aktionen anzeigen",
             "kanban_on_folder_click": "Kanban-Ansicht beim Klicken auf Ordner öffnen",
-            "note_content_width": "Breite des Notizinhalts"
+            "index_icon_scale": "Skalierung der Index-Symbole",
+            "note_content_width": "Breite des Notizinhalts",
+            "show_inline_attachment_images": "Bild-Anhänge anzeigen"
         },
         "badges": {
             "font_size_default": "Standard ({{size}}px)",
@@ -501,6 +507,9 @@
     "tags": {
         "add_single": "Tag hinzufügen...",
         "add_multiple": "Tags hinzufügen...",
+        "list_all": "Alle Tags auflisten",
+        "manage_note_tags": "Notiz-Tags verwalten",
+        "modal_title": "Tags verwalten",
         "search": {
             "placeholder": "Tags filtern...",
             "results_one": "1 Tag für \"{{term}}\" gefunden",
@@ -703,6 +712,10 @@
             "label": "Maximale Breite (px):",
             "full_width": "Volle Breite",
             "default_value": "{{width}} px ist der Standardwert"
+        },
+        "index_icon_scale": {
+            "title": "Skalierung der Index-Symbole",
+            "description": "Passen Sie die Größe der Symbole auf der Indexseite an (Skalierungsfaktor):"
         },
         "confirm": {
             "title": "Aktion bestätigen",
@@ -1777,12 +1790,12 @@
             }
         }
     },
-    "github_sync": {
-        "title": "GitHub-Synchronisierung",
-        "description": "Übertragen Sie Ihre Notizen zu GitHub oder ziehen Sie Notizen aus einem bestehenden Repository. Ein Repository entspricht einem Profil. Arbeitsbereiche werden als Ordner im Repository-Stammverzeichnis abgelegt.",
+    "git_sync": {
+        "title": "{{provider}}-Synchronisierung",
+        "description": "Übertragen Sie Ihre Notizen zu {{provider}} oder ziehen Sie Notizen aus einem bestehenden Repository. Ein Repository entspricht einem Profil. Arbeitsbereiche werden als Ordner im Repository-Stammverzeichnis abgelegt.",
         "warning": "Verwenden Sie diese Funktion nicht als einzige Backup-Lösung.\nErwägen Sie die Einrichtung manueller oder automatischer ZIP-Exporte Ihrer Notizen.",
-        "confirm_push": "Notizen des Workspace \"{{workspace}}\" zu GitHub pushen? Updates existing files and deletes files that no longer exist in Poznote.",
-        "confirm_pull": "Pull notes for workspace \"{{workspace}}\" from GitHub? Import notes from GitHub. Updates existing notes and moves to trash notes that no longer exist on GitHub.",
+        "confirm_push": "Notizen des Workspace \"{{workspace}}\" zu {{provider}} pushen? Updates existing files and deletes files that no longer exist in Poznote.",
+        "confirm_pull": "Pull notes for workspace \"{{workspace}}\" from {{provider}}? Import notes from {{provider}}. Updates existing notes and moves to trash notes that no longer exist on {{provider}}.",
         "config": {
             "title": "Konfiguration",
             "status": "Status",
@@ -1794,7 +1807,7 @@
             "token_missing": "Nicht konfiguriert",
             "not_configured": "Nicht konfiguriert",
             "not_configured_yet": "Zu konfigurieren",
-            "hint": "Die GitHub-Synchronisierung ist deaktiviert. Setzen Sie POZNOTE_GITHUB_SYNC_ENABLED=true in Ihrer .env-Datei, um sie zu aktivieren."
+            "hint": "Die {{provider}}-Synchronisierung ist deaktiviert. Setzen Sie POZNOTE_GIT_SYNC_ENABLED=true in Ihrer .env-Datei, um sie zu aktivieren."
         },
         "test": {
             "title": "Verbindung testen",
@@ -1814,13 +1827,13 @@
             "target_workspace": "Zielarbeitsbereich",
             "all_workspaces": "Alle Arbeitsbereiche",
             "push": {
-                "title": "An GitHub senden",
-                "description": "Exportiert Ihre Notizen nach GitHub. Aktualisiert vorhandene Dateien und löscht Dateien, die in Poznote nicht mehr vorhanden sind.",
+                "title": "An {{provider}} senden",
+                "description": "Exportiert Ihre Notizen nach {{provider}}. Aktualisiert vorhandene Dateien und löscht Dateien, die in Poznote nicht mehr vorhanden sind.",
                 "button": "Senden"
             },
             "pull": {
-                "title": "Von GitHub abrufen",
-                "description": "Importiert Notizen von GitHub. Aktualisiert vorhandene Notizen und verschiebt Notizen, die auf GitHub nicht mehr vorhanden sind, in den Papierkorb.",
+                "title": "Von {{provider}} abrufen",
+                "description": "Importiert Notizen von {{provider}}. Aktualisiert vorhandene Notizen und verschiebt Notizen, die auf {{provider}} nicht mehr vorhanden sind, in den Papierkorb.",
                 "button": "Abrufen"
             }
         },
@@ -1848,14 +1861,14 @@
             "attachments": "Dateianhänge",
             "embedded_images": "Bilder",
             "metadata": "Metadaten (Tags, Datum, ID)",
-            "embedded_note": "Eingebettete Bilder werden in HTML beibehalten, aber nicht auf GitHub angezeigt"
+            "embedded_note": "Eingebettete Bilder werden in HTML beibehalten, aber nicht auf {{provider}} angezeigt"
         },
         "not_configured": {
-            "title": "GitHub-Synchronisierung nicht konfiguriert",
-            "description": "Um die GitHub-Synchronisierung zu verwenden, müssen Sie Ihre GitHub-Anmeldedaten in der .env-Datei konfigurieren.",
+            "title": "{{provider}}-Synchronisierung nicht konfiguriert",
+            "description": "Um die {{provider}}-Synchronisierung zu verwenden, müssen Sie Ihre {{provider}}-Anmeldedaten in der .env-Datei konfigurieren.",
             "steps_title": "Konfigurationsanleitung",
-            "step1": "Erstellen Sie ein persönliches GitHub-Zugriffstoken unter github.com/settings/tokens mit dem Bereich 'repo'",
-            "step2": "Erstellen Sie ein GitHub-Repository (öffentlich oder privat) für Ihre Notizen",
+            "step1": "Erstellen Sie ein persönliches {{provider}}-Zugriffstoken unter mit dem Bereich 'repo'",
+            "step2": "Erstellen Sie ein {{provider}}-Repository (öffentlich oder privat) für Ihre Notizen",
             "step3": "Fügen Sie die Konfiguration zu Ihrer .env-Datei hinzu",
             "step4": "Starten Sie die Anwendung neu, damit die Änderungen wirksam werden"
         }

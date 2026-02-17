@@ -65,16 +65,35 @@ function convertNoteAudioToIframes() {
                 return;
             }
 
+            // Parse the audio URL to build audio_player.php URL
+            // Expected format: /api/v1/notes/{noteId}/attachments/{attachmentId}?workspace={workspace}
+            var iframeSrc = src;
+            var match = src.match(/\/api\/v1\/notes\/(\d+)\/attachments\/([^?]+)(\?.*)?/);
+            if (match) {
+                var noteId = match[1];
+                var attachmentId = encodeURIComponent(decodeURIComponent(match[2]));
+                var queryString = match[3] || '';
+                
+                // Build audio_player.php URL
+                iframeSrc = '/audio_player.php?note=' + noteId + '&attachment=' + attachmentId;
+                if (queryString) {
+                    // Append workspace parameter if present
+                    iframeSrc += queryString.replace('?', '&');
+                }
+            }
+
             // Create iframe wrapper
             var iframe = document.createElement('iframe');
-            iframe.setAttribute('src', src);
+            iframe.setAttribute('src', iframeSrc);
             iframe.setAttribute('data-audio-src', src);
             iframe.setAttribute('data-is-audio', 'true');
-            iframe.style.width = '100%';
+            iframe.setAttribute('scrolling', 'no');
+            iframe.setAttribute('frameborder', '0');
+            iframe.setAttribute('allow', 'autoplay');
+            iframe.classList.add('note-audio-embed');
             iframe.style.height = '54px';
             iframe.style.border = 'none';
-            iframe.style.display = 'block';
-            iframe.style.margin = '10px 0';
+            // Width, display, margin, background, and other styles are handled by CSS
 
             // Mark both original and iframe
             audio.setAttribute('data-converted-to-iframe', 'true');
@@ -148,11 +167,64 @@ function showSaveInProgressNotification(onCompleteCallback) {
     }, 3000);
 }
 
+// Fix existing audio iframes to use audio_player.php instead of direct file URLs
+function fixAudioIframes() {
+    try {
+        var iframes = document.querySelectorAll('.noteentry iframe[data-is-audio], .noteentry iframe.note-audio-embed');
+        iframes.forEach(function (iframe) {
+            var src = iframe.getAttribute('src');
+            if (!src) {
+                return;
+            }
+
+            iframe.setAttribute('data-is-audio', 'true');
+            iframe.classList.add('note-audio-embed');
+            iframe.setAttribute('scrolling', 'no');
+            iframe.setAttribute('frameborder', '0');
+            iframe.setAttribute('allow', 'autoplay');
+
+            // Skip if already pointing to audio_player.php
+            if (src.indexOf('/audio_player.php') !== -1) {
+                return;
+            }
+
+            // Parse the audio URL to build audio_player.php URL
+            // Expected format: /api/v1/notes/{noteId}/attachments/{attachmentId}?workspace={workspace}
+            var match = src.match(/\/api\/v1\/notes\/(\d+)\/attachments\/([^?]+)(\?.*)?/);
+            if (match) {
+                var noteId = match[1];
+                var attachmentId = encodeURIComponent(decodeURIComponent(match[2]));
+                var queryString = match[3] || '';
+                
+                // Build audio_player.php URL
+                var newSrc = '/audio_player.php?note=' + noteId + '&attachment=' + attachmentId;
+                if (queryString) {
+                    // Append workspace parameter if present
+                    newSrc += queryString.replace('?', '&');
+                }
+
+                // Update iframe src
+                iframe.setAttribute('src', newSrc);
+                iframe.setAttribute('data-audio-src', src);
+                
+                // Remove inline width styles to let CSS handle sizing
+                iframe.style.width = '';
+                iframe.style.display = '';
+                iframe.style.margin = '';
+                iframe.style.background = '';
+            }
+        });
+    } catch (e) {
+        console.error('[Audio] Error fixing audio iframes:', e);
+    }
+}
+
 // Expose utilities globally
 window.updateident = updateident;
 window.updateidhead = updateidhead;
 window.extractNoteIdFromEntry = extractNoteIdFromEntry;
 window.convertNoteAudioToIframes = convertNoteAudioToIframes;
+window.fixAudioIframes = fixAudioIframes;
 window.showSaveInProgressNotification = showSaveInProgressNotification;
 
 // Check if element or its direct children are title/tag fields

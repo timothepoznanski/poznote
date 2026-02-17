@@ -146,6 +146,27 @@ function createCompleteBackup($userId = null) {
     // Add all note entries (HTML and Markdown) from user's data
     $entriesPath = $userDataManager->getUserEntriesPath();
     if ($entriesPath && is_dir($entriesPath)) {
+        // First, build a mapping of note IDs to their attachment extensions
+        $noteAttachments = [];
+        $query = "SELECT id, attachments FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
+        $attachmentsResult = $tempCon->query($query);
+        
+        if ($attachmentsResult) {
+            while ($row = $attachmentsResult->fetch(PDO::FETCH_ASSOC)) {
+                $attachments = json_decode($row['attachments'], true);
+                if (is_array($attachments)) {
+                    $attachmentExtensions = [];
+                    foreach ($attachments as $attachment) {
+                        if (isset($attachment['id']) && isset($attachment['filename'])) {
+                            $ext = pathinfo($attachment['filename'], PATHINFO_EXTENSION);
+                            $attachmentExtensions[$attachment['id']] = $ext ? '.' . $ext : '';
+                        }
+                    }
+                    $noteAttachments[$row['id']] = $attachmentExtensions;
+                }
+            }
+        }
+        
         $files = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($entriesPath), 
             RecursiveIteratorIterator::LEAVES_ONLY
@@ -159,14 +180,27 @@ function createCompleteBackup($userId = null) {
                 
                 // Include both HTML and Markdown files
                 if ($extension === 'html' || $extension === 'md') {
-                    if ($extension === 'html') {
-                        $content = file_get_contents($filePath);
-                        if ($content !== false) {
+                    $content = file_get_contents($filePath);
+                    if ($content !== false) {
+                        // Get note ID from filename (e.g., "123.html" -> "123")
+                        $noteId = pathinfo($relativePath, PATHINFO_FILENAME);
+                        
+                        if ($extension === 'html') {
+                            // Remove copy buttons from HTML
                             $content = removeCopyButtonsFromHtml($content);
-                            $zip->addFromString('entries/' . $relativePath, $content);
-                        } else {
-                            $zip->addFile($filePath, 'entries/' . $relativePath);
+                            
+                            // Convert API URLs to relative paths if this note has attachments
+                            if (isset($noteAttachments[$noteId])) {
+                                $content = convertApiUrlsToRelativePaths($content, $noteAttachments[$noteId], $noteId);
+                            }
+                        } else if ($extension === 'md') {
+                            // Convert Markdown image URLs to relative paths if this note has attachments
+                            if (isset($noteAttachments[$noteId])) {
+                                $content = convertMarkdownApiUrlsToRelativePaths($content, $noteAttachments[$noteId], $noteId);
+                            }
                         }
+                        
+                        $zip->addFromString('entries/' . $relativePath, $content);
                     } else {
                         $zip->addFile($filePath, 'entries/' . $relativePath);
                     }
@@ -264,6 +298,24 @@ function createCompleteBackup($userId = null) {
     // Add attachments from user's data
     $attachmentsPath = $userDataManager->getUserAttachmentsPath();
     if ($attachmentsPath && is_dir($attachmentsPath)) {
+        // Build a mapping from attachment filenames to IDs for proper naming in ZIP
+        $query = "SELECT id, attachments FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
+        $attachmentsQueryResult = $tempCon->query($query);
+        $filenameToIdMap = [];
+        
+        if ($attachmentsQueryResult) {
+            while ($row = $attachmentsQueryResult->fetch(PDO::FETCH_ASSOC)) {
+                $attachments = json_decode($row['attachments'], true);
+                if (is_array($attachments)) {
+                    foreach ($attachments as $attachment) {
+                        if (isset($attachment['id']) && isset($attachment['filename'])) {
+                            $filenameToIdMap[$attachment['filename']] = $attachment['id'];
+                        }
+                    }
+                }
+            }
+        }
+        
         $files = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($attachmentsPath), 
             RecursiveIteratorIterator::LEAVES_ONLY
@@ -276,7 +328,19 @@ function createCompleteBackup($userId = null) {
                 
                 // Skip hidden files
                 if (!str_starts_with($relativePath, '.')) {
-                    $zip->addFile($filePath, 'attachments/' . $relativePath);
+                    // Get the base filename
+                    $filename = basename($relativePath);
+                    
+                    // If this file is mapped to an attachment ID, use ID.ext as the name in the ZIP
+                    if (isset($filenameToIdMap[$filename])) {
+                        $attachmentId = $filenameToIdMap[$filename];
+                        $ext = pathinfo($filename, PATHINFO_EXTENSION);
+                        $zipPath = 'attachments/' . $attachmentId . ($ext ? '.' . $ext : '');
+                        $zip->addFile($filePath, $zipPath);
+                    } else {
+                        // Otherwise, just add it with its original name (shouldn't normally happen)
+                        $zip->addFile($filePath, 'attachments/' . $relativePath);
+                    }
                 }
             }
         }
@@ -363,6 +427,63 @@ function removeCopyButtonsFromHtml($html) {
     }
 
     return $dom->saveHTML();
+}
+
+/**
+ * Convert API URLs to relative paths for offline viewing
+ * Converts /api/v1/notes/{noteId}/attachments/{attachmentId} to attachments/{attachmentId}.ext
+ * 
+ * @param string $html HTML content with API URLs
+ * @param array $attachmentExtensions Mapping of attachment IDs to file extensions
+ * @param int $noteId The note ID to match in URLs
+ * @return string HTML with relative attachment paths
+ */
+function convertApiUrlsToRelativePaths($html, $attachmentExtensions, $noteId) {
+    if (empty($html)) {
+        return $html;
+    }
+    
+    // Convert /api/v1/notes/{noteId}/attachments/{attachmentId} to attachments/{attachmentId}.ext
+    $html = preg_replace_callback(
+        '#/api/v1/notes/' . preg_quote($noteId, '#') . '/attachments/([a-zA-Z0-9_]+)#',
+        function($matches) use ($attachmentExtensions) {
+            $attachmentId = $matches[1];
+            $extension = $attachmentExtensions[$attachmentId] ?? '';
+            return '../attachments/' . $attachmentId . $extension;
+        },
+        $html
+    );
+    
+    return $html;
+}
+
+/**
+ * Convert API URLs to relative paths in Markdown files
+ * Converts ![text](/api/v1/notes/{noteId}/attachments/{attachmentId}) to ![text](../attachments/{attachmentId}.ext)
+ * 
+ * @param string $markdown Markdown content with API URLs
+ * @param array $attachmentExtensions Mapping of attachment IDs to file extensions
+ * @param int $noteId The note ID to match in URLs
+ * @return string Markdown with relative attachment paths
+ */
+function convertMarkdownApiUrlsToRelativePaths($markdown, $attachmentExtensions, $noteId) {
+    if (empty($markdown)) {
+        return $markdown;
+    }
+    
+    // Convert ![alt](/api/v1/notes/{noteId}/attachments/{attachmentId}) to ![alt](../attachments/{attachmentId}.ext)
+    $markdown = preg_replace_callback(
+        '#\!\[([^\]]*)\]\(/api/v1/notes/' . preg_quote($noteId, '#') . '/attachments/([a-zA-Z0-9_]+)\)#',
+        function($matches) use ($attachmentExtensions) {
+            $altText = $matches[1];
+            $attachmentId = $matches[2];
+            $extension = $attachmentExtensions[$attachmentId] ?? '';
+            return '![' . $altText . '](../attachments/' . $attachmentId . $extension . ')';
+        },
+        $markdown
+    );
+    
+    return $markdown;
 }
 ?>
 

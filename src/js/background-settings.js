@@ -4,6 +4,40 @@
 (function() {
     'use strict';
 
+    var OPACITY_DEFAULT = 25;
+    var OPACITY_MIN = 5;
+    var OPACITY_MAX = 25;
+
+    function buildOpacitySettingKey(workspace) {
+        return 'background_opacity_' + workspace;
+    }
+
+    function normalizeOpacity(value) {
+        var parsed = parseInt(value, 10);
+        if (isNaN(parsed)) return OPACITY_DEFAULT;
+        if (parsed < OPACITY_MIN) return OPACITY_MIN;
+        if (parsed > OPACITY_MAX) return OPACITY_MAX;
+        return parsed;
+    }
+
+    function getBackgroundOpacity(workspace, callback) {
+        var key = buildOpacitySettingKey(workspace);
+        fetch('/api/v1/settings/' + encodeURIComponent(key), {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' },
+            credentials: 'same-origin'
+        })
+            .then(function(r) { return r.json(); })
+            .then(function(j) {
+                if (j && j.success) {
+                    callback(normalizeOpacity(j.value));
+                } else {
+                    callback(OPACITY_DEFAULT);
+                }
+            })
+            .catch(function() { callback(OPACITY_DEFAULT); });
+    }
+
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
         // Only load background image on index.php
@@ -86,23 +120,22 @@
 
     function loadBackgroundImage() {
         const workspace = getCurrentWorkspace();
-        const storageKey = 'backgroundOpacity_' + workspace;
-        const savedOpacity = localStorage.getItem(storageKey) || '25';
-
-        // Check if background exists for this workspace
-        fetch('api_upload_background.php?workspace=' + encodeURIComponent(workspace))
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.exists) {
-                    applyBackgroundSettings(data.url, savedOpacity);
-                } else {
-                    // No background for this workspace
+        getBackgroundOpacity(workspace, function(savedOpacity) {
+            // Check if background exists for this workspace
+            fetch('api_upload_background.php?workspace=' + encodeURIComponent(workspace))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.exists) {
+                        applyBackgroundSettings(data.url, savedOpacity);
+                    } else {
+                        // No background for this workspace
+                        applyBackgroundSettings(null, savedOpacity);
+                    }
+                })
+                .catch(error => {
                     applyBackgroundSettings(null, savedOpacity);
-                }
-            })
-            .catch(error => {
-                applyBackgroundSettings(null, savedOpacity);
-            });
+                });
+        });
     }
 
     // Expose function for external use (when workspace changes)

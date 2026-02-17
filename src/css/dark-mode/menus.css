@@ -321,3 +321,39 @@ html[data-theme='dark'] .note-edit-toolbar .mobile-toolbar-item i,
 body.dark-mode .note-edit-toolbar .mobile-toolbar-item i {
     color: var(--dm-accent);
 }
+
+/* ============================================
+   Generic Dropdown Menus
+   ============================================ */
+
+html[data-theme='dark'] .dropdown-menu,
+body.dark-mode .dropdown-menu {
+    background-color: var(--dm-bg);
+    border-color: var(--dm-border);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme='dark'] .dropdown-item,
+body.dark-mode .dropdown-item {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .dropdown-item:hover,
+body.dark-mode .dropdown-item:hover {
+    background-color: var(--dm-surface);
+}
+
+html[data-theme='dark'] .dropdown-item i,
+body.dark-mode .dropdown-item i {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .dropdown-item:hover i,
+body.dark-mode .dropdown-item:hover i {
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .dropdown-divider,
+body.dark-mode .dropdown-divider {
+    background-color: var(--dm-border);
+}

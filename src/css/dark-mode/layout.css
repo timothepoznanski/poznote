@@ -32,6 +32,40 @@ body.dark-mode .workspace-dropdown-icon {
     color: var(--dm-text-muted);
 }
 
+/* Sidebar menu button */
+html[data-theme='dark'] .sidebar-menu-btn,
+body.dark-mode .sidebar-menu-btn {
+    color: #5cb3e9;
+}
+
+html[data-theme='dark'] .sidebar-menu-btn:hover,
+body.dark-mode .sidebar-menu-btn:hover {
+    background: rgba(92, 179, 233, 0.1);
+}
+
+/* Sidebar dropdown menu */
+html[data-theme='dark'] .sidebar-menu-dropdown,
+body.dark-mode .sidebar-menu-dropdown {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .sidebar-menu-item,
+body.dark-mode .sidebar-menu-item {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .sidebar-menu-item:hover,
+body.dark-mode .sidebar-menu-item:hover {
+    background: rgba(92, 179, 233, 0.1);
+    color: #5cb3e9;
+}
+
+html[data-theme='dark'] .sidebar-menu-item i,
+body.dark-mode .sidebar-menu-item i {
+    color: #5cb3e9;
+}
+
 /* ============================================
    Search Bar
    ============================================ */

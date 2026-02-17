@@ -100,17 +100,21 @@ $settings = [
     'hide_folder_actions' => null,
     'hide_folder_counts' => null,
     'note_list_sort' => 'updated_desc',
-    'notes_without_folders_after_folders' => false
+    'notes_without_folders_after_folders' => false,
+    'hide_inline_attachment_images' => '1'
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'hide_inline_attachment_images')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
 } catch (Exception $e) {
     // Use defaults if error
 }
+
+// Extract hide_inline_attachment_images setting (with invertLogic: '1' = show, '0' or null = hide)
+$hide_inline_images = ($settings['hide_inline_attachment_images'] === '0' || $settings['hide_inline_attachment_images'] === 'false');
 
 // Extract settings with proper defaults
 $note_font_size = $settings['note_font_size'];
@@ -278,6 +282,11 @@ $body_classes = trim($extra_body_classes);
 ?>
 
 <body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?>>
+    <!-- Indicateur de sauvegarde en cours -->
+    <div id="save-indicator" class="save-indicator" style="display: none;">
+        <i class="fas fa-save"></i>
+    </div>
+    
     <!-- Global error handler (external for CSP compliance) -->
     <script src="js/error-handler.js?v=<?php echo $v; ?>"></script>
 
@@ -316,9 +325,16 @@ $body_classes = trim($extra_body_classes);
                 <i class="fas fa-caret-down workspace-dropdown-icon"></i>
             </div>
             <div class="sidebar-title-actions">
-                <button class="sidebar-home" data-action="navigate-to-home" title="<?php echo t_h('sidebar.home', [], 'Home'); ?>"><i class="fas fa-home"></i></button>
-                <button class="sidebar-settings" data-action="navigate-to-settings" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>"><i class="fas fa-cog"></i><span class="update-badge update-badge-hidden"></span></button>
-                <button class="sidebar-plus" data-action="toggle-create-menu" title="<?php echo t_h('sidebar.create'); ?>"><i class="fas fa-plus-circle"></i></button>
+                <button class="sidebar-home" data-action="navigate-to-home" title="<?php echo t_h('sidebar.home', [], 'Home'); ?>">
+                    <i class="far fa-home"></i>
+                </button>
+                <button class="sidebar-settings" data-action="navigate-to-settings" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>">
+                    <i class="far fa-cog"></i>
+                    <span class="update-badge update-badge-hidden"></span>
+                </button>
+                <button class="sidebar-plus" data-action="toggle-create-menu" title="<?php echo t_h('sidebar.create'); ?>">
+                    <i class="far fa-plus-circle"></i>
+                </button>
             </div>
 
             <div class="workspace-menu" id="workspaceMenu"></div>
@@ -580,44 +596,6 @@ $body_classes = trim($extra_body_classes);
                         $checkExistingLink->execute([$row['id']]);
                         $hasLinkedNote = (bool)$checkExistingLink->fetch();
                     }
-
-                    // Mobile overflow menu button (shown only on mobile via CSS)
-                    // Marked as note-action-btn so it can be hidden during text selection (hide-on-selection)
-                    echo '<button type="button" class="toolbar-btn mobile-more-btn note-action-btn" title="'.t_h('common.menu', [], 'Menu').'" data-action="toggle-mobile-toolbar-menu" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>';
-
-                    // Mobile dropdown menu (actions moved here on mobile)
-                    echo '<div class="dropdown-menu mobile-toolbar-menu" hidden role="menu" aria-label="'.t_h('index.toolbar.menu_actions', [], 'Menu actions').'">';
-
-                    // Search and replace button (only for note and markdown types, shown in mobile menu)
-                    if ($note_type === 'note' || $note_type === 'markdown') {
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-search-replace"><i class="fa-search"></i> '.t_h('editor.toolbar.search_replace', [], 'Search and replace').'</button>';
-                    }
-
-                    // Task list actions (only for tasklist notes, shown in mobile menu)
-                    if ($note_type === 'tasklist') {
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="clear-completed-tasks" data-note-id="' . $row['id'] . '"><i class="fa-check-square"></i> '.t_h('tasklist.clear_completed', [], 'Clear completed tasks').'</button>';
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="uncheck-all-tasks" data-note-id="' . $row['id'] . '"><i class="fa-square"></i> '.t_h('tasklist.uncheck_all', [], 'Uncheck all tasks').'</button>';
-                    }
-                    
-                    if ($note_type !== 'linked' && !$hasLinkedNote) {
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-create-linked-note"><i class="fa-link"></i> '.t_h('editor.toolbar.create_linked_note').'</button>';
-                    }
-
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-duplicate"><i class="fa-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-move"><i class="fa-folder-open"></i> '.t_h('common.move', [], 'Move').'</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-download"><i class="fa-download"></i> '.t_h('common.download', [], 'Download').'</button>';
-
-                    // Convert button (only for markdown and note types, with appropriate icon)
-                    if ($note_type === 'markdown') {
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-convert"><i class="fas fa-sync-alt"></i> '.t_h('common.convert', [], 'Convert').'</button>';
-                    } elseif ($note_type === 'note') {
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-convert"><i class="fas fa-sync-alt"></i> '.t_h('common.convert', [], 'Convert').'</button>';
-                    }
-                    
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-open-new-tab"><i class="fa-external-link"></i> '.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-trash"><i class="fa-trash"></i> '.t_h('common.delete', [], 'Delete').'</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-info"><i class="fa-info-circle"></i> '.t_h('common.information', [], 'Information').'</button>';
-                    echo '</div>';
                         
                     // Generate dates safely for JavaScript with robust encoding
                     $created_raw = $row['created'] ?? '';
@@ -696,6 +674,45 @@ $body_classes = trim($extra_body_classes);
                     
                     echo '<button type="button" class="toolbar-btn btn-info note-action-btn" title="'.t_h('common.information', [], 'Information').'" data-action="show-note-info" data-note-id="'.$row['id'].'" data-created="'.htmlspecialchars($final_created, ENT_QUOTES).'" data-updated="'.htmlspecialchars($final_updated, ENT_QUOTES).'" data-folder="'.htmlspecialchars($folder_name, ENT_QUOTES).'" data-favorite="'.$is_favorite.'" data-tags="'.htmlspecialchars($tags_data, ENT_QUOTES).'" data-attachments-count="'.$attachments_count.'"><i class="fas fa-info-circle"></i></button>';
                 
+                    // Overflow menu button (3 dots - shown on both mobile and desktop)
+                    // Marked as note-action-btn so it can be hidden during text selection (hide-on-selection)
+                    echo '<div class="toolbar-menu-anchor">';
+                    echo '<button type="button" class="toolbar-btn mobile-more-btn note-action-btn" title="'.t_h('common.menu', [], 'Menu').'" data-action="toggle-mobile-toolbar-menu" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>';
+
+                    // Dropdown menu (actions moved here - visible on both mobile and desktop)
+                    echo '<div class="dropdown-menu mobile-toolbar-menu" hidden role="menu" aria-label="'.t_h('index.toolbar.menu_actions', [], 'Menu actions').'">';
+
+                    // Search and replace button (only for note and markdown types, shown in mobile menu)
+                    if ($note_type === 'note' || $note_type === 'markdown') {
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-search-replace"><i class="fa-search"></i> '.t_h('editor.toolbar.search_replace', [], 'Search and replace').'</button>';
+                    }
+
+                    // Task list actions (only for tasklist notes, shown in mobile menu)
+                    if ($note_type === 'tasklist') {
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="clear-completed-tasks" data-note-id="' . $row['id'] . '"><i class="fa-check-square"></i> '.t_h('tasklist.clear_completed', [], 'Clear completed tasks').'</button>';
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="uncheck-all-tasks" data-note-id="' . $row['id'] . '"><i class="fa-square"></i> '.t_h('tasklist.uncheck_all', [], 'Uncheck all tasks').'</button>';
+                    }
+                    
+                    if ($note_type !== 'linked' && !$hasLinkedNote) {
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-create-linked-note"><i class="fa-link"></i> '.t_h('editor.toolbar.create_linked_note').'</button>';
+                    }
+
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-duplicate"><i class="fa-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-move"><i class="fa-folder-open"></i> '.t_h('common.move', [], 'Move').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-download"><i class="fa-download"></i> '.t_h('common.download', [], 'Download').'</button>';
+
+                    // Convert button (only for markdown and note types, with appropriate icon)
+                    if ($note_type === 'markdown') {
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-convert"><i class="fas fa-sync-alt"></i> '.t_h('index.toolbar.convert_to_html', [], 'Convert to HTML').'</button>';
+                    } elseif ($note_type === 'note') {
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-convert"><i class="fas fa-sync-alt"></i> '.t_h('index.toolbar.convert_to_markdown', [], 'Convert to Markdown').'</button>';
+                    }
+                    
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-open-new-tab"><i class="fa-external-link"></i> '.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-info"><i class="fa-info-circle"></i> '.t_h('common.information', [], 'Information').'</button>';
+                    echo '</div>';
+                    echo '</div>';
+                
                     echo '</div>';
                     
                     // Search and replace bar (hidden by default) - inside note-header
@@ -733,7 +750,15 @@ $body_classes = trim($extra_body_classes);
                     echo '<span class="fas fa-folder icon_folder cursor-pointer" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" title="'.t_h('settings.folder.change_folder', [], 'Change folder').'"></span>';
                     echo '<span class="folder_name cursor-pointer" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" title="'.t_h('settings.folder.change_folder', [], 'Change folder').'">'.htmlspecialchars($folder_path, ENT_QUOTES).'</span>';
                     echo '</div>';
-                    echo '<span class="fas fa-tag icon_tag" data-action="navigate-tags"></span>';
+                    
+                    echo '<div class="tag-actions-dropdown">';
+                    echo '<span class="fas fa-tag icon_tag cursor-pointer" data-action="toggle-tags-menu" data-note-id="'.$row['id'].'"></span>';
+                    echo '<div id="tags-menu-'.$row['id'].'" class="dropdown-menu tags-actions-menu" hidden>';
+                    echo '<button type="button" class="dropdown-item" data-action="navigate-tags"><i class="fas fa-tags"></i> ' . t_h('tags.list_all', [], 'List all tags') . '</button>';
+                    echo '<button type="button" class="dropdown-item" data-action="show-tag-edit-modal" data-note-id="'.$row['id'].'"><i class="fas fa-edit"></i> ' . t_h('tags.manage_note_tags', [], 'Manage note tags') . '</button>';
+                    echo '</div>';
+                    echo '</div>';
+
                     echo '<span class="name_tags">'
                         .'<input type="hidden" id="tags'.$row['id'].'" value="'.htmlspecialchars(str_replace(',', ' ', $row['tags'] ?? ''), ENT_QUOTES).'"/>'
                     .'</span>';
@@ -743,20 +768,55 @@ $body_classes = trim($extra_body_classes);
                     if (!empty($row['attachments'])) {
                         $attachments_data = json_decode($row['attachments'], true);
                         if (is_array($attachments_data) && !empty($attachments_data)) {
+                            // Get note content to check for inline images
+                            $note_content = $row['entry'] ?? '';
+                            
                             echo '<div class="note-attachments-row">';
                             // Make paperclip clickable to open attachments for this note (preserve workspace behavior via JS)
                             echo '<button type="button" class="icon-attachment-btn" title="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'" data-action="show-attachment-dialog" data-note-id="'.$row['id'].'" aria-label="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'"><span class="fas fa-paperclip icon_attachment"></span></button>';
                             echo '<span class="note-attachments-list">';
                             $attachment_links = [];
+                            $visible_links_count = 0;
                             foreach ($attachments_data as $attachment) {
                                 if (isset($attachment['id']) && isset($attachment['original_filename'])) {
                                     $original_filename = (string)$attachment['original_filename'];
                                     $safe_filename = htmlspecialchars($original_filename, ENT_QUOTES);
-                                    $attachment_links[] = '<a href="#" class="attachment-link" data-action="download-attachment" data-attachment-id="'.$attachment['id'].'" data-note-id="'.$row['id'].'" title="'.t_h('attachments.actions.download', ['filename' => $original_filename], 'Download {{filename}}').'">'.$safe_filename.'</a>';
+                                    
+                                    // Check if this is an image attachment to hide IF it's in the content and setting is disabled
+                                    $is_inline_image = false;
+                                    if ($hide_inline_images) {
+                                        $mime_type = $attachment['mime_type'] ?? '';
+                                        $is_image = strpos($mime_type, 'image/') === 0;
+                                        // Also check extension as fallback
+                                        if (!$is_image && isset($attachment['original_filename'])) {
+                                            $ext = strtolower(pathinfo($attachment['original_filename'], PATHINFO_EXTENSION));
+                                            $is_image = in_array($ext, ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp']);
+                                        }
+
+                                        if ($is_image) {
+                                            $attachment_id_pattern = 'attachments/' . $attachment['id'];
+                                            // Check in raw content
+                                            $is_inline_image = (strpos($note_content, $attachment_id_pattern) !== false);
+                                            
+                                            // If not found, try with escaped version just in case (e.g. for some specific editors)
+                                            if (!$is_inline_image) {
+                                                $is_inline_image = (strpos($note_content, urlencode($attachment_id_pattern)) !== false);
+                                            }
+                                        }
+                                    }
+                                    
+                                    $link_style = $is_inline_image ? ' style="display: none;"' : '';
+                                    $link_attr = $is_inline_image ? ' data-is-inline-image="true"' : '';
+                                    $attachment_links[] = '<a href="#" class="attachment-link"' . $link_attr . $link_style . ' data-action="download-attachment" data-attachment-id="'.$attachment['id'].'" data-note-id="'.$row['id'].'" title="'.t_h('attachments.actions.download', ['filename' => $original_filename], 'Download {{filename}}').'">'.$safe_filename.'</a>';
+                                    if (!$is_inline_image) $visible_links_count++;
                                 }
                             }
                             echo implode(' ', $attachment_links);
                             echo '</span>';
+                            // Hide the entire row if no visible links
+                            if ($hide_inline_images && $visible_links_count === 0) {
+                                echo '<script>document.currentScript.parentElement.style.display = "none";</script>';
+                            }
                             echo '</div>';
                         }
                     }
@@ -881,6 +941,7 @@ $body_classes = trim($extra_body_classes);
 <script src="js/notes.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/attachments.js"></script>
+<script src="js/tags-modal.js"></script>
 <!-- Event management modules -->
 <script src="js/events-utils.js?v=<?php echo $v; ?>"></script>
 <script src="js/events-auto-save.js?v=<?php echo $v; ?>"></script>
@@ -901,6 +962,7 @@ $body_classes = trim($extra_body_classes);
 <script src="js/unified-search.js?v=<?php echo $v; ?>"></script>
 <script src="js/clickable-tags.js?v=<?php echo $v; ?>"></script>
 <script src="js/font-size-settings.js?v=<?php echo $v; ?>"></script>
+<script src="js/index-icon-scale-settings.js?v=<?php echo $v; ?>&m=<?php echo @filemtime('js/index-icon-scale-settings.js') ?: time(); ?>"></script>
 <script src="js/background-settings.js?v=<?php echo $v; ?>"></script>
 <script src="js/tasklist.js?v=<?php echo $v; ?>"></script>
 <script src="js/excalidraw.js?v=<?php echo $v; ?>"></script>

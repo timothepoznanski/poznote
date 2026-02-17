@@ -95,7 +95,7 @@ require_once __DIR__ . '/controllers/FolderShareController.php';
 require_once __DIR__ . '/controllers/SettingsController.php';
 require_once __DIR__ . '/controllers/BackupController.php';
 require_once __DIR__ . '/controllers/SystemController.php';
-require_once __DIR__ . '/controllers/GitHubSyncController.php';
+require_once __DIR__ . '/controllers/GitSyncController.php';
 require_once __DIR__ . '/controllers/PublicController.php';
 
 /**
@@ -237,7 +237,7 @@ $folderShareController = new FolderShareController($con);
 $settingsController = new SettingsController($con);
 $backupController = new BackupController($con);
 $systemController = new SystemController($con);
-$githubSyncController = new GitHubSyncController($con);
+$gitSyncController = new GitSyncController($con);
 $publicController = new PublicController($con);
 
 // ======================
@@ -592,27 +592,47 @@ $router->get('/shared', function($params) use ($systemController) {
 });
 
 // ======================
-// GitHub Sync Routes
+// Git Sync Routes
 // ======================
 
-// Get GitHub sync status
-$router->get('/github-sync/status', function($params) use ($githubSyncController) {
-    $githubSyncController->status();
+// Get Git sync status
+$router->get('/git-sync/status', function($params) use ($gitSyncController) {
+    $gitSyncController->status();
 });
 
-// Test GitHub connection
-$router->post('/github-sync/test', function($params) use ($githubSyncController) {
-    $githubSyncController->test();
+// Legacy GitHub sync status
+$router->get('/github-sync/status', function($params) use ($gitSyncController) {
+    $gitSyncController->status();
 });
 
-// Push notes to GitHub
-$router->post('/github-sync/push', function($params) use ($githubSyncController) {
-    $githubSyncController->push();
+// Test Git connection
+$router->post('/git-sync/test', function($params) use ($gitSyncController) {
+    $gitSyncController->test();
 });
 
-// Pull notes from GitHub
-$router->post('/github-sync/pull', function($params) use ($githubSyncController) {
-    $githubSyncController->pull();
+// Legacy GitHub connection test
+$router->post('/github-sync/test', function($params) use ($gitSyncController) {
+    $gitSyncController->test();
+});
+
+// Push notes to Git
+$router->post('/git-sync/push', function($params) use ($gitSyncController) {
+    $gitSyncController->push();
+});
+
+// Legacy GitHub push
+$router->post('/github-sync/push', function($params) use ($gitSyncController) {
+    $gitSyncController->push();
+});
+
+// Pull notes from Git
+$router->post('/git-sync/pull', function($params) use ($gitSyncController) {
+    $gitSyncController->pull();
+});
+
+// Legacy GitHub pull
+$router->post('/github-sync/pull', function($params) use ($gitSyncController) {
+    $gitSyncController->pull();
 });
 
 // ======================

@@ -79,6 +79,8 @@ $isFavorite = (int)$note['favorite'] === 1;
 // Build full path of the note with appropriate extension
 $noteType = $note['type'] ?? 'note';
 $fullPath = getEntryFilename($note_id, $noteType);
+// Convert absolute path to relative path starting with "data/"
+$fullPath = str_replace(__DIR__ . '/', '', $fullPath);
 
 // Process tags
 $tags = [];

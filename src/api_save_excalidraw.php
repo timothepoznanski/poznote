@@ -31,8 +31,8 @@ $heading = trim($_POST['heading'] ?? '') ?: 'New note';
 $diagram_data = $_POST['diagram_data'] ?? '';
 $preview_image = $_FILES['preview_image'] ?? null;
 
-// Convert preview image to base64 HTML if provided
-$base64_image = '';
+// Save preview image as attachment if provided
+$attachmentId = null;
 $mime_type = '';
 if ($preview_image && $preview_image['error'] === UPLOAD_ERR_OK) {
     // Validate it's an image
@@ -46,9 +46,9 @@ if ($preview_image && $preview_image['error'] === UPLOAD_ERR_OK) {
         exit;
     }
     
-    // Convert image to base64
+    // Read image data for later saving as attachment
     $image_data = file_get_contents($preview_image['tmp_name']);
-    $base64_image = base64_encode($image_data);
+    $attachmentId = uniqid();
 }
 
 // If note_id is 0, we need to create a new note
@@ -146,24 +146,88 @@ if ($note_id > 0) {
         }
     }
     
+    // Handle attachment if preview image was provided
+    if ($attachmentId && isset($image_data)) {
+        // Get existing attachments
+        $stmt = $con->prepare("SELECT attachments FROM entries WHERE id = ?");
+        $stmt->execute([$note_id]);
+        $noteData = $stmt->fetch(PDO::FETCH_ASSOC);
+        $existingAttachments = $noteData && $noteData['attachments'] ? json_decode($noteData['attachments'], true) : [];
+        if (!is_array($existingAttachments)) $existingAttachments = [];
+        
+        // Find and remove old Excalidraw preview image
+        $attachmentsPath = getAttachmentsPath();
+        $oldAttachmentId = null;
+        
+        // Extract old attachment ID from existing HTML
+        if (!empty($existing_content) && preg_match('/<img[^>]+src="\/api\/v1\/notes\/' . preg_quote($note_id, '/') . '\/attachments\/([a-zA-Z0-9_]+)"[^>]*data-is-excalidraw="true"/', $existing_content, $matches)) {
+            $oldAttachmentId = $matches[1];
+        }
+        
+        // Remove old attachment if found
+        if ($oldAttachmentId) {
+            $updatedAttachments = [];
+            foreach ($existingAttachments as $attachment) {
+                if (isset($attachment['id']) && $attachment['id'] === $oldAttachmentId) {
+                    // Delete the old file
+                    $oldFilePath = $attachmentsPath . '/' . $attachment['filename'];
+                    if (file_exists($oldFilePath)) {
+                        @unlink($oldFilePath);
+                    }
+                } else {
+                    $updatedAttachments[] = $attachment;
+                }
+            }
+            $existingAttachments = $updatedAttachments;
+        }
+        
+        // Save new image as attachment
+        $extension = ($mime_type === 'image/png') ? 'png' : (($mime_type === 'image/jpeg') ? 'jpg' : 'gif');
+        $filename = $attachmentId . '_' . time() . '.' . $extension;
+        $filePath = $attachmentsPath . '/' . $filename;
+        
+        if (file_put_contents($filePath, $image_data) !== false) {
+            chmod($filePath, 0644);
+            
+            // Add to attachments list
+            $existingAttachments[] = [
+                'id' => $attachmentId,
+                'filename' => $filename,
+                'original_filename' => 'excalidraw_preview.' . $extension,
+                'file_size' => strlen($image_data),
+                'file_type' => $mime_type,
+                'uploaded_at' => date('Y-m-d H:i:s')
+            ];
+            
+            // Update attachments in database
+            $updateStmt = $con->prepare("UPDATE entries SET attachments = ? WHERE id = ?");
+            $updateStmt->execute([json_encode($existingAttachments), $note_id]);
+        }
+    }
+    
     // Generate new Excalidraw HTML content
     $excalidraw_placeholder = t('editor.excalidraw.placeholder_outside', [], '…');
     $excalidraw_placeholder = htmlspecialchars($excalidraw_placeholder, ENT_QUOTES);
 
-    if (!empty($base64_image)) {
-        // ... (preserving existing class/style logic) ...
+    if ($attachmentId) {
+        // Build img classes preserving border settings
+        $img_classes = 'excalidraw-image';
+        if (!empty($existing_img_classes)) {
+            if (strpos($existing_img_classes, 'img-with-border-no-padding') !== false) {
+                $img_classes .= ' img-with-border-no-padding';
+            } elseif (strpos($existing_img_classes, 'img-with-border') !== false) {
+                $img_classes .= ' img-with-border';
+            }
+        }
         
         // Build style attribute
         $img_style = !empty($existing_img_style) ? ' style="' . htmlspecialchars($existing_img_style) . '"' : '';
         
-        // Build the core container without placeholders initially
+        // Build the core container with attachment URL instead of base64
         $new_excalidraw_html = '<div class="excalidraw-container" contenteditable="false">';
-        $new_excalidraw_html .= '<img src="data:' . $mime_type . ';base64,' . $base64_image . '" alt="Excalidraw diagram" class="' . $img_classes . '" data-is-excalidraw="true" data-excalidraw-note-id="' . $note_id . '"' . $img_style . ' />';
+        $new_excalidraw_html .= '<img src="/api/v1/notes/' . $note_id . '/attachments/' . $attachmentId . '" alt="Excalidraw diagram" class="' . $img_classes . '" data-is-excalidraw="true" data-excalidraw-note-id="' . $note_id . '"' . $img_style . ' />';
         $new_excalidraw_html .= '<div class="excalidraw-data" style="display: none;">' . htmlspecialchars($diagram_data, ENT_QUOTES) . '</div>';
         $new_excalidraw_html .= '</div>';
-
-        // Wrap with placeholders ONLY for new insertions (handled in main save logic)
-        // Note: For existing diagram update, we preserve/replace patterns.
     } else {
         // If no image, create a placeholder with just the diagram data
         $new_excalidraw_html = '<div class="excalidraw-container" contenteditable="false">';
@@ -254,10 +318,72 @@ function saveEmbeddedDiagram() {
             $html_content = file_get_contents($html_file);
         }
         
-        // Extract preview image data (remove data:image/png;base64, prefix)
-        $image_data = '';
+        // Save preview image as attachment if provided
+        $attachmentId = null;
         if (!empty($preview_image_base64) && strpos($preview_image_base64, 'data:image/png;base64,') === 0) {
-            $image_data = substr($preview_image_base64, strlen('data:image/png;base64,'));
+            $base64_data = substr($preview_image_base64, strlen('data:image/png;base64,'));
+            $image_data = base64_decode($base64_data);
+            
+            if ($image_data !== false) {
+                // Get existing attachments
+                $stmt = $con->prepare("SELECT attachments FROM entries WHERE id = ?");
+                $stmt->execute([$note_id]);
+                $noteData = $stmt->fetch(PDO::FETCH_ASSOC);
+                $existingAttachments = $noteData && $noteData['attachments'] ? json_decode($noteData['attachments'], true) : [];
+                if (!is_array($existingAttachments)) $existingAttachments = [];
+                
+                // Find and remove old Excalidraw image for this diagram
+                $attachmentsPath = getAttachmentsPath();
+                $oldAttachmentId = null;
+                
+                // Extract old attachment ID from existing HTML for this specific diagram
+                $diagram_pattern = '/<div[^>]*id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<img[^>]+src="\/api\/v1\/notes\/' . preg_quote($note_id, '/') . '\/attachments\/([a-zA-Z0-9_]+)"[^>]*>.*?<\/div>/s';
+                $diagram_pattern_alt = '/<div[^>]*class="excalidraw-container"[^>]*id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<img[^>]+src="\/api\/v1\/notes\/' . preg_quote($note_id, '/') . '\/attachments\/([a-zA-Z0-9_]+)"[^>]*>.*?<\/div>/s';
+                
+                if (preg_match($diagram_pattern, $html_content, $matches) || preg_match($diagram_pattern_alt, $html_content, $matches)) {
+                    $oldAttachmentId = $matches[1];
+                }
+                
+                // Remove old attachment if found
+                if ($oldAttachmentId) {
+                    $updatedAttachments = [];
+                    foreach ($existingAttachments as $attachment) {
+                        if (isset($attachment['id']) && $attachment['id'] === $oldAttachmentId) {
+                            // Delete the old file
+                            $oldFilePath = $attachmentsPath . '/' . $attachment['filename'];
+                            if (file_exists($oldFilePath)) {
+                                @unlink($oldFilePath);
+                            }
+                        } else {
+                            $updatedAttachments[] = $attachment;
+                        }
+                    }
+                    $existingAttachments = $updatedAttachments;
+                }
+                
+                // Save new image as attachment
+                $attachmentId = uniqid();
+                $filename = $attachmentId . '_' . time() . '.png';
+                $filePath = $attachmentsPath . '/' . $filename;
+                
+                if (file_put_contents($filePath, $image_data) !== false) {
+                    chmod($filePath, 0644);
+                    
+                    // Add to attachments list
+                    $existingAttachments[] = [
+                        'id' => $attachmentId,
+                        'filename' => $filename,
+                        'original_filename' => 'excalidraw_' . $diagram_id . '.png',
+                        'file_size' => strlen($image_data),
+                        'file_type' => 'image/png',
+                        'uploaded_at' => date('Y-m-d H:i:s')
+                    ];
+                    
+                    // Update attachments in database
+                    $updateStmt = $con->prepare("UPDATE entries SET attachments = ? WHERE id = ?");
+                    $updateStmt->execute([json_encode($existingAttachments), $note_id]);
+                }
+            }
         }
         
         // Extract existing image classes and style to preserve border settings
@@ -315,8 +441,9 @@ function saveEmbeddedDiagram() {
         // Keep all attributes on a single line for consistent regex matching
         $diagram_html_core = '<div class="excalidraw-container" id="' . htmlspecialchars($diagram_id) . '" style="cursor: pointer; text-align: center;" data-diagram-id="' . htmlspecialchars($diagram_id) . '" data-excalidraw="' . htmlspecialchars($diagram_data) . '">';
         
-        if (!empty($image_data)) {
-            $diagram_html_core .= '<img src="data:image/png;base64,' . $image_data . '" class="' . $img_classes . '" data-is-excalidraw="true"' . $img_style_attr . ' alt="Excalidraw diagram" />';
+        if ($attachmentId) {
+            // Use attachment URL instead of base64
+            $diagram_html_core .= '<img src="/api/v1/notes/' . $note_id . '/attachments/' . $attachmentId . '" class="' . $img_classes . '" data-is-excalidraw="true"' . $img_style_attr . ' alt="Excalidraw diagram" />';
         } else {
             $diagram_html_core .= '<i class="fa fa-draw-polygon" style="font-size: 48px; color: #666; margin-bottom: 10px;"></i>
                               <p style="color: #666; font-size: 16px; margin: 0;">Excalidraw diagram</p>';

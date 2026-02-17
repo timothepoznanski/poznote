@@ -850,6 +850,8 @@ window.reinitializeClickableTagsAfterAjax = initializeClickableTags; // Alias fo
 window.refreshTagsCount = refreshTagsCount;
 window.highlightMatchingTags = highlightMatchingTags;
 window.redirectToTag = redirectToTag;
+window.convertTagsToEditable = convertTagsToEditable;
+window.triggerAutoSaveForNote = triggerAutoSaveForNote;
 
 // Listen for i18n loaded event to update tag input placeholders
 document.addEventListener('poznote:i18n:loaded', function() {

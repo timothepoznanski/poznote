@@ -504,8 +504,8 @@ class NotesController {
         }
         
         try {
-            // Get current note
-            $stmt = $this->con->prepare("SELECT id, heading, type, workspace, folder, folder_id FROM entries WHERE id = ? AND trash = 0");
+            // Get current note (including attachments for base64 image conversion)
+            $stmt = $this->con->prepare("SELECT id, heading, type, workspace, folder, folder_id, attachments FROM entries WHERE id = ? AND trash = 0");
             $stmt->execute([$noteId]);
             $note = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -572,8 +572,7 @@ class NotesController {
                 $checkStmt = $this->con->prepare($checkQuery);
                 $checkStmt->execute($params);
                 if ($checkStmt->fetchColumn()) {
-                    $this->sendError(409, t('api.errors.duplicate_title_in_folder', [], 'Another note with the same title exists in this folder.'));
-                    return;
+                    $heading = generateUniqueTitle($heading, $noteId, $workspace, $folder_id);
                 }
             }
             
@@ -587,9 +586,24 @@ class NotesController {
                 // Sanitize HTML content to prevent XSS attacks
                 $contentToSave = $entry;
                 
-                // For HTML notes (type='note'), sanitize the content
+                // For HTML notes (type='note'), sanitize and convert base64 images to attachments
                 if ($noteType === 'note' && !empty($entry)) {
                     $contentToSave = sanitizeHtml($entry);
+                    
+                    // Convert any base64 images to attachments for performance
+                    $existingAttachments = $note['attachments'] ? json_decode($note['attachments'], true) : [];
+                    if (!is_array($existingAttachments)) $existingAttachments = [];
+                    
+                    $conversionResult = $this->convertBase64ImagesToAttachments($contentToSave, $noteId, $existingAttachments);
+                    $contentToSave = $conversionResult['content'];
+                    
+                    // Update attachments in database if new images were converted
+                    if (!empty($conversionResult['new_attachments'])) {
+                        $updatedAttachments = array_merge($existingAttachments, $conversionResult['new_attachments']);
+                        $attachmentsJson = json_encode($updatedAttachments);
+                        $attachStmt = $this->con->prepare("UPDATE entries SET attachments = ? WHERE id = ?");
+                        $attachStmt->execute([$attachmentsJson, $noteId]);
+                    }
                 }
                 
                 // For markdown notes, clean HTML if needed
@@ -1462,7 +1476,6 @@ class NotesController {
             
             $content = file_get_contents($currentFilePath);
             $attachments = $note['attachments'] ? json_decode($note['attachments'], true) : [];
-            $attachmentsToRemove = [];
             $attachmentsDir = getAttachmentsPath();
             
             // Convert content
@@ -1548,53 +1561,16 @@ class NotesController {
                 $convertedContent = $this->htmlToMarkdown($content);
                 $newType = 'markdown';
             } else {
-                // Converting markdown to HTML: embed image attachments as base64
-                $content = preg_replace_callback(
-                    '/!\[([^\]]*)\]\(\/api\/v1\/notes\/' . preg_quote($id, '/') . '\/attachments\/([a-zA-Z0-9]+)\)/',
-                    function($matches) use ($attachments, $attachmentsDir, &$attachmentsToRemove) {
-                        $altText = $matches[1];
-                        $attachmentId = $matches[2];
-                        
-                        foreach ($attachments as $attachment) {
-                            if (isset($attachment['id']) && $attachment['id'] === $attachmentId) {
-                                $filePath = $attachmentsDir . '/' . $attachment['filename'];
-                                if (file_exists($filePath) && is_readable($filePath)) {
-                                    $mimeType = $attachment['file_type'] ?? '';
-                                    if (strpos($mimeType, 'image/') === 0) {
-                                        $fileContent = file_get_contents($filePath);
-                                        $base64 = base64_encode($fileContent);
-                                        $dataUri = 'data:' . $mimeType . ';base64,' . $base64;
-                                        $attachmentsToRemove[] = $attachmentId;
-                                        return '![' . $altText . '](' . $dataUri . ')';
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                        return $matches[0];
-                    },
-                    $content
-                );
+                // Converting markdown to HTML: keep attachments as attachments (don't convert to base64)
+                // The parseMarkdown function will convert markdown image syntax to HTML img tags
+                // and keep the attachment URLs intact
                 
                 require_once __DIR__ . '/../../../markdown_parser.php';
                 $convertedContent = parseMarkdown($content);
                 $newType = 'note';
                 
-                // Remove embedded image attachments from the note and delete files
-                if (!empty($attachmentsToRemove)) {
-                    $remainingAttachments = [];
-                    foreach ($attachments as $attachment) {
-                        if (in_array($attachment['id'], $attachmentsToRemove)) {
-                            $filePath = $attachmentsDir . '/' . $attachment['filename'];
-                            if (file_exists($filePath)) {
-                                unlink($filePath);
-                            }
-                        } else {
-                            $remainingAttachments[] = $attachment;
-                        }
-                    }
-                    $attachments = $remainingAttachments;
-                }
+                // Note: Attachments are preserved during conversion
+                // No files are deleted, all attachments remain available
             }
             
             // Create new file with converted content
@@ -1993,6 +1969,83 @@ class NotesController {
             }
         }
         return implode(', ', $validTags);
+    }
+    
+    /**
+     * Convert base64 images in HTML content to attachments
+     * @param string $content HTML content with potential base64 images
+     * @param int $noteId Note ID for attachment URLs
+     * @param array $existingAttachments Existing attachments array
+     * @return array ['content' => modified HTML, 'new_attachments' => array of new attachments]
+     */
+    private function convertBase64ImagesToAttachments(string $content, int $noteId, array $existingAttachments): array {
+        $newAttachments = [];
+        $attachmentsDir = getAttachmentsPath();
+        
+        // Pattern 1: src before alt - <img src="data:image/...;base64,..." alt="...">
+        $content = preg_replace_callback(
+            '/<img[^>]*src=["\']data:image\/([a-zA-Z0-9+]+);base64,([^"\']+)["\'][^>]*(?:alt=["\']([^"\']*)["\'])?[^>]*\/?>/is',
+            function($matches) use ($noteId, $attachmentsDir, &$newAttachments) {
+                return $this->processBase64Image($matches[1], $matches[2], $matches[3] ?? '', $noteId, $attachmentsDir, $newAttachments);
+            },
+            $content
+        );
+        
+        // Pattern 2: alt before src - <img alt="..." src="data:image/...;base64,...">
+        $content = preg_replace_callback(
+            '/<img[^>]*alt=["\']([^"\']*)["\'][^>]*src=["\']data:image\/([a-zA-Z0-9+]+);base64,([^"\']+)["\'][^>]*\/?>/is',
+            function($matches) use ($noteId, $attachmentsDir, &$newAttachments) {
+                return $this->processBase64Image($matches[2], $matches[3], $matches[1], $noteId, $attachmentsDir, $newAttachments);
+            },
+            $content
+        );
+        
+        return [
+            'content' => $content,
+            'new_attachments' => $newAttachments
+        ];
+    }
+    
+    /**
+     * Process a single base64 image and convert to attachment
+     */
+    private function processBase64Image(string $imageType, string $base64Data, string $altText, int $noteId, string $attachmentsDir, array &$newAttachments): string {
+        $imageType = strtolower($imageType);
+        
+        $extensionMap = [
+            'jpeg' => 'jpg', 'png' => 'png', 'gif' => 'gif',
+            'webp' => 'webp', 'svg+xml' => 'svg', 'bmp' => 'bmp'
+        ];
+        $extension = $extensionMap[$imageType] ?? 'png';
+        $mimeType = 'image/' . ($imageType === 'svg+xml' ? 'svg+xml' : $imageType);
+        
+        $imageData = base64_decode($base64Data);
+        if ($imageData === false) {
+            // Return original if decode fails
+            return '<img src="data:image/' . $imageType . ';base64,' . $base64Data . '" alt="' . htmlspecialchars($altText) . '">';
+        }
+        
+        $attachmentId = uniqid();
+        $filename = $attachmentId . '_' . time() . '.' . $extension;
+        $filePath = $attachmentsDir . '/' . $filename;
+        
+        if (file_put_contents($filePath, $imageData) === false) {
+            // Return original if write fails
+            return '<img src="data:image/' . $imageType . ';base64,' . $base64Data . '" alt="' . htmlspecialchars($altText) . '">';
+        }
+        chmod($filePath, 0644);
+        
+        $originalFilename = !empty($altText) ? $altText . '.' . $extension : $filename;
+        $newAttachments[] = [
+            'id' => $attachmentId,
+            'filename' => $filename,
+            'original_filename' => $originalFilename,
+            'file_size' => strlen($imageData),
+            'file_type' => $mimeType,
+            'uploaded_at' => date('Y-m-d H:i:s')
+        ];
+        
+        return '<img src="/api/v1/notes/' . $noteId . '/attachments/' . $attachmentId . '" alt="' . htmlspecialchars($altText) . '" loading="lazy" decoding="async">';
     }
 
     /**

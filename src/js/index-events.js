@@ -69,6 +69,50 @@
 
         const isHidden = menu.hasAttribute('hidden');
         closeTasklistActionsMenus();
+        closeTagsMenus(); // Close other types of menus
+
+        if (isHidden) {
+            menu.hidden = false;
+            if (triggerEl) triggerEl.setAttribute('aria-expanded', 'true');
+
+            setTimeout(() => {
+                document.addEventListener('click', function closeMenu(e) {
+                    if (!menu.contains(e.target) && !(triggerEl && triggerEl.contains(e.target))) {
+                        menu.hidden = true;
+                        if (triggerEl) triggerEl.setAttribute('aria-expanded', 'false');
+                        document.removeEventListener('click', closeMenu);
+                    }
+                });
+            }, 0);
+        }
+    }
+
+    /**
+     * Close all open tags action menus
+     */
+    function closeTagsMenus() {
+        const openMenus = document.querySelectorAll('.tags-actions-menu:not([hidden])');
+        openMenus.forEach(menu => {
+            menu.hidden = true;
+            const btn = menu.parentElement?.querySelector('[data-action="toggle-tags-menu"]');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+        });
+    }
+
+    /**
+     * Toggle a tags actions menu and attach outside click listener
+     * @param {string} noteId - The note ID
+     * @param {HTMLElement} triggerEl - The element that triggered the toggle
+     */
+    function toggleTagsMenu(noteId, triggerEl) {
+        if (!noteId) return;
+
+        const menu = document.getElementById(`tags-menu-${noteId}`);
+        if (!menu) return;
+
+        const isHidden = menu.hasAttribute('hidden');
+        closeTasklistActionsMenus(); // Close other types of menus
+        closeTagsMenus();
 
         if (isHidden) {
             menu.hidden = false;
@@ -123,6 +167,11 @@
             case 'toggle-create-menu':
                 if (typeof toggleCreateMenu === 'function') {
                     toggleCreateMenu();
+                }
+                break;
+            case 'toggle-sidebar-menu':
+                if (typeof toggleSidebarMenu === 'function') {
+                    toggleSidebarMenu(e);
                 }
                 break;
 
@@ -273,6 +322,25 @@
                 break;
             case 'toggle-tasklist-actions':
                 toggleTasklistActionsMenu(noteId, target);
+                break;
+            case 'toggle-tags-menu':
+                toggleTagsMenu(noteId, target);
+                break;
+            case 'show-tag-edit-modal':
+                if (noteId && typeof showNoteTagsModal === 'function') {
+                    showNoteTagsModal(noteId);
+                }
+                break;
+            case 'close-tags-modal':
+                const tagsModal = document.getElementById('tagsModal');
+                if (tagsModal) {
+                    tagsModal.style.display = 'none';
+                    // Clean up modal content
+                    const container = document.getElementById('tagsModalTagsList');
+                    if (container) container.innerHTML = '';
+                    const tagInput = document.getElementById('tagsModalInput');
+                    if (tagInput) tagInput.value = '';
+                }
                 break;
 
             // Note actions with noteId
@@ -703,8 +771,53 @@
      * Note: Despite the name "toggle", this function only redirects
      */
     window.toggleCreateMenu = function () {
+        closeSidebarMenu();
         var workspace = (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || '';
         window.location.href = 'create.php?workspace=' + encodeURIComponent(workspace);
+    };
+
+    /**
+     * Close the sidebar menu dropdown
+     */
+    function closeSidebarMenu() {
+        var menu = document.getElementById('sidebarMenu');
+        if (menu) {
+            menu.style.display = 'none';
+        }
+    }
+
+    /**
+     * Toggle the sidebar menu dropdown
+     */
+    window.toggleSidebarMenu = function (event) {
+        if (event) event.stopPropagation();
+        
+        var menu = document.getElementById('sidebarMenu');
+        if (!menu) return;
+        
+        var isVisible = menu.style.display !== 'none';
+        
+        if (isVisible) {
+            menu.style.display = 'none';
+        } else {
+            // Close create menu if open
+            var createMenu = document.querySelector('.create-menu');
+            if (createMenu) {
+                createMenu.style.display = 'none';
+            }
+            
+            menu.style.display = 'block';
+            
+            // Close menu when clicking elsewhere
+            setTimeout(function () {
+                document.addEventListener('click', function closeSidebarMenuHandler(e) {
+                    if (!menu.contains(e.target) && !e.target.closest('.sidebar-menu-btn')) {
+                        menu.style.display = 'none';
+                        document.removeEventListener('click', closeSidebarMenuHandler);
+                    }
+                });
+            }, 10);
+        }
     };
 
     /**
@@ -837,6 +950,66 @@
      * On desktop: uses scrollIntoView
      */
     window.scrollToLeftColumn = function () {
+        // Check for unsaved changes before navigating away
+        if (typeof hasUnsavedChanges === 'function' && typeof window.noteid !== 'undefined') {
+            if (hasUnsavedChanges(window.noteid)) {
+                // Get translation function or use default message
+                const message = typeof tr === 'function' 
+                    ? tr('autosave.unsaved_changes_warning', {}, '⚠️ You have unsaved changes. Are you sure you want to leave?')
+                    : '⚠️ You have unsaved changes. Are you sure you want to leave?';
+                
+                const title = typeof tr === 'function'
+                    ? tr('autosave.unsaved_changes_title', {}, 'Unsaved Changes')
+                    : 'Unsaved Changes';
+                
+                // Use styled modal instead of native confirm
+                if (window.modalAlert && typeof window.modalAlert.confirm === 'function') {
+                    window.modalAlert.confirm(message, title).then(function(isConfirmed) {
+                        if (!isConfirmed) {
+                            return; // User cancelled, don't navigate
+                        }
+                        
+                        // User confirmed, try to save before leaving
+                        if (typeof emergencySave === 'function') {
+                            try {
+                                emergencySave(window.noteid);
+                            } catch (err) {
+                                console.error('[Poznote] Emergency save failed:', err);
+                            }
+                        }
+                        
+                        // Now perform the navigation
+                        performScroll();
+                    });
+                } else {
+                    // Fallback to native confirm if modal system not available
+                    if (!confirm(message)) {
+                        return; // User cancelled, don't navigate
+                    }
+                    
+                    // User confirmed, try to save before leaving
+                    if (typeof emergencySave === 'function') {
+                        try {
+                            emergencySave(window.noteid);
+                        } catch (err) {
+                            console.error('[Poznote] Emergency save failed:', err);
+                        }
+                    }
+                    
+                    performScroll();
+                }
+                return; // Exit early since we'll call performScroll() in callback
+            }
+        }
+        
+        // No unsaved changes, perform scroll immediately
+        performScroll();
+    };
+    
+    /**
+     * Helper function to perform the actual scroll action
+     */
+    function performScroll() {
         if (window.innerWidth <= 800) {
             // With scroll-behavior: smooth !important in CSS, 
             // these simple assignments will trigger the sliding animation.
@@ -856,7 +1029,7 @@
                 });
             }
         }
-    };
+    }
 
     /**
      * Check URL parameters and auto-scroll to note if scroll=1 is present

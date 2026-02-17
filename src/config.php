@@ -45,9 +45,18 @@ define('OIDC_END_SESSION_ENDPOINT', _env('POZNOTE_OIDC_END_SESSION_ENDPOINT', ''
 define('OIDC_DISABLE_NORMAL_LOGIN', filter_var(_env('POZNOTE_OIDC_DISABLE_NORMAL_LOGIN', false), FILTER_VALIDATE_BOOL));
 // Optional: disable HTTP Basic Auth for API when OIDC is enabled (force OIDC-only authentication)
 define('OIDC_DISABLE_BASIC_AUTH', filter_var(_env('POZNOTE_OIDC_DISABLE_BASIC_AUTH', false), FILTER_VALIDATE_BOOL));
+// Optional: claim name containing user groups (default: 'groups')
+define('OIDC_GROUPS_CLAIM', trim(_env('POZNOTE_OIDC_GROUPS_CLAIM', 'groups')));
+// Optional: comma-separated list of allowed groups from the configured claim
+// If empty, group-based access control is disabled
+define('OIDC_ALLOWED_GROUPS', _env('POZNOTE_OIDC_ALLOWED_GROUPS', ''));
+// Optional: auto-create user profiles on first successful OIDC login
+// Recommended when using OIDC group restrictions for access control
+define('OIDC_AUTO_CREATE_USERS', filter_var(_env('POZNOTE_OIDC_AUTO_CREATE_USERS', false), FILTER_VALIDATE_BOOL));
 // Optional: comma-separated list of allowed users (email addresses or usernames)
 // If not set, all authenticated users from the identity provider can access the application
 // Example: 'user1@example.com,user2@example.com' or 'user1,user2'
+// Deprecated: prefer POZNOTE_OIDC_ALLOWED_GROUPS + POZNOTE_OIDC_AUTO_CREATE_USERS
 define('OIDC_ALLOWED_USERS', _env('POZNOTE_OIDC_ALLOWED_USERS', ''));
 
 // ============================================================
@@ -59,17 +68,21 @@ define('DISABLE_SETTINGS_ACCESS', filter_var(_env('POZNOTE_DISABLE_SETTINGS_ACCE
 define('SETTINGS_PASSWORD', _env('POZNOTE_SETTINGS_PASSWORD', ''));
 
 // ============================================================
-// GITHUB SYNC CONFIGURATION
+// GIT SYNC CONFIGURATION (GitHub, Forgejo)
 // ============================================================
-// Enable or disable GitHub synchronization
-define('GITHUB_SYNC_ENABLED', filter_var(_env('POZNOTE_GITHUB_SYNC_ENABLED', false), FILTER_VALIDATE_BOOL));
-// GitHub Personal Access Token
-define('GITHUB_TOKEN', _env('POZNOTE_GITHUB_TOKEN', ''));
-// GitHub repository (owner/repo format)
-define('GITHUB_REPO', _env('POZNOTE_GITHUB_REPO', ''));
-// GitHub branch to sync with
-define('GITHUB_BRANCH', _env('POZNOTE_GITHUB_BRANCH', 'main'));
+// Enable or disable Git synchronization
+define('GIT_SYNC_ENABLED', filter_var(_env('POZNOTE_GIT_SYNC_ENABLED', false), FILTER_VALIDATE_BOOL));
+// Git provider: 'github', 'forgejo'
+define('GIT_PROVIDER', _env('POZNOTE_GIT_PROVIDER', 'github'));
+// Git API base URL (optional, defaults to provider default)
+define('GIT_API_BASE', _env('POZNOTE_GIT_API_BASE', ''));
+// Personal Access Token
+define('GIT_TOKEN', _env('POZNOTE_GIT_TOKEN', ''));
+// Repository (owner/repo format)
+define('GIT_REPO', _env('POZNOTE_GIT_REPO', ''));
+// Branch to sync with
+define('GIT_BRANCH', _env('POZNOTE_GIT_BRANCH', 'main'));
 // Commit author name
-define('GITHUB_AUTHOR_NAME', _env('POZNOTE_GITHUB_AUTHOR_NAME', 'Poznote'));
+define('GIT_AUTHOR_NAME', _env('POZNOTE_GIT_AUTHOR_NAME', 'Poznote'));
 // Commit author email
-define('GITHUB_AUTHOR_EMAIL', _env('POZNOTE_GITHUB_AUTHOR_EMAIL', 'poznote@localhost'));
+define('GIT_AUTHOR_EMAIL', _env('POZNOTE_GIT_AUTHOR_EMAIL', 'poznote@localhost'));

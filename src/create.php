@@ -61,10 +61,11 @@ $currentLang = getUserLanguage();
     <link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $cache_v; ?>"/>
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
 </head>
-<body class="home-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+<body class="home-page" 
+    data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <div class="home-container">
         <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-            <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary">
+            <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary btn-toolbar-size">
                 <?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?>
             </a>
         </div>

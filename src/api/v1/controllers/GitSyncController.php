@@ -1,15 +1,15 @@
 <?php
 /**
- * GitHubSyncController - RESTful API controller for GitHub sync operations
+ * GitSyncController - RESTful API controller for Git sync operations
  * 
  * Endpoints:
- *   GET  /api/v1/github-sync/status   - Get sync status and configuration
- *   POST /api/v1/github-sync/test     - Test GitHub connection
- *   POST /api/v1/github-sync/push     - Push notes to GitHub
- *   POST /api/v1/github-sync/pull     - Pull notes from GitHub
+ *   GET  /api/v1/git-sync/status   - Get sync status and configuration
+ *   POST /api/v1/git-sync/test     - Test Git connection
+ *   POST /api/v1/git-sync/push     - Push notes to Git
+ *   POST /api/v1/git-sync/pull     - Pull notes from Git
  */
 
-class GitHubSyncController {
+class GitSyncController {
     private $con;
     
     public function __construct($con) {
@@ -17,22 +17,22 @@ class GitHubSyncController {
     }
     
     /**
-     * GET /api/v1/github-sync/status
+     * GET /api/v1/git-sync/status
      * Get sync status and configuration (without sensitive data)
      */
     public function status() {
-        require_once dirname(__DIR__, 3) . '/GitHubSync.php';
+        require_once dirname(__DIR__, 3) . '/GitSync.php';
         
-        if (!GitHubSync::isEnabled()) {
+        if (!GitSync::isEnabled()) {
             echo json_encode([
                 'success' => true,
                 'enabled' => false,
-                'message' => 'GitHub sync is not enabled'
+                'message' => 'Git sync is not enabled'
             ]);
             return;
         }
         
-        $sync = new GitHubSync($this->con, $_SESSION['user_id'] ?? null);
+        $sync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
         $config = $sync->getConfigStatus();
         $lastSync = $sync->getLastSyncInfo();
         
@@ -45,40 +45,40 @@ class GitHubSyncController {
     }
     
     /**
-     * POST /api/v1/github-sync/test
-     * Test GitHub connection
+     * POST /api/v1/git-sync/test
+     * Test Git connection
      */
     public function test() {
-        require_once dirname(__DIR__, 3) . '/GitHubSync.php';
+        require_once dirname(__DIR__, 3) . '/GitSync.php';
         
-        if (!GitHubSync::isEnabled()) {
+        if (!GitSync::isEnabled()) {
             http_response_code(403);
             echo json_encode([
                 'success' => false,
-                'error' => 'GitHub sync is not enabled'
+                'error' => 'Git sync is not enabled'
             ]);
             return;
         }
         
-        $sync = new GitHubSync($this->con, $_SESSION['user_id'] ?? null);
+        $sync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
         $result = $sync->testConnection();
         
         echo json_encode($result);
     }
     
     /**
-     * POST /api/v1/github-sync/push
-     * Push notes to GitHub
+     * POST /api/v1/git-sync/push
+     * Push notes to Git
      * Body: { "workspace": "optional_workspace_filter" }
      */
     public function push() {
-        require_once dirname(__DIR__, 3) . '/GitHubSync.php';
+        require_once dirname(__DIR__, 3) . '/GitSync.php';
         
-        if (!GitHubSync::isEnabled()) {
+        if (!GitSync::isEnabled()) {
             http_response_code(403);
             echo json_encode([
                 'success' => false,
-                'error' => 'GitHub sync is not enabled'
+                'error' => 'Git sync is not enabled'
             ]);
             return;
         }
@@ -86,25 +86,25 @@ class GitHubSyncController {
         $input = json_decode(file_get_contents('php://input'), true);
         $workspace = $input['workspace'] ?? null;
         
-        $sync = new GitHubSync($this->con, $_SESSION['user_id'] ?? null);
+        $sync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
         $result = $sync->pushNotes($workspace);
         
         echo json_encode($result);
     }
     
     /**
-     * POST /api/v1/github-sync/pull
-     * Pull notes from GitHub
+     * POST /api/v1/git-sync/pull
+     * Pull notes from Git
      * Body: { "workspace": "target_workspace" }
      */
     public function pull() {
-        require_once dirname(__DIR__, 3) . '/GitHubSync.php';
+        require_once dirname(__DIR__, 3) . '/GitSync.php';
         
-        if (!GitHubSync::isEnabled()) {
+        if (!GitSync::isEnabled()) {
             http_response_code(403);
             echo json_encode([
                 'success' => false,
-                'error' => 'GitHub sync is not enabled'
+                'error' => 'Git sync is not enabled'
             ]);
             return;
         }
@@ -112,7 +112,7 @@ class GitHubSyncController {
         $input = json_decode(file_get_contents('php://input'), true);
         $workspace = $input['workspace'] ?? 'Poznote';
         
-        $sync = new GitHubSync($this->con, $_SESSION['user_id'] ?? null);
+        $sync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
         $result = $sync->pullNotes($workspace);
         
         echo json_encode($result);

@@ -500,8 +500,13 @@ function parseMarkdown(text) {
             // Synchronized with PHP's ALLOWED_IFRAME_DOMAINS via window object
             const allowedDomains = window.ALLOWED_IFRAME_DOMAINS || [];
 
-            // Check if the src matches any allowed domain
-            const isAllowed = allowedDomains.some(domain =>
+            // Check if the src matches any allowed domain or local audio player
+            const isLocalAudioPlayer =
+                src.startsWith('/audio_player.php') ||
+                src.startsWith('./audio_player.php') ||
+                src.startsWith('../audio_player.php');
+
+            const isAllowed = isLocalAudioPlayer || allowedDomains.some(domain =>
                 src.includes('//' + domain) || src.includes('.' + domain)
             );
 
@@ -2030,6 +2035,14 @@ function setupPreviewInteractivity(noteId) {
 
     var previewDiv = noteEntry.querySelector('.markdown-preview');
     if (!previewDiv) return;
+
+    if (typeof window.processNoteReferences === 'function') {
+        try {
+            window.processNoteReferences(previewDiv);
+        } catch (e) {
+            console.error('Error processing note references in markdown preview:', e);
+        }
+    }
 
     var isInSplitMode = noteEntry.classList.contains('markdown-split-mode');
 
