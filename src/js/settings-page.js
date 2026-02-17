@@ -168,6 +168,15 @@
         });
     }
 
+    function refreshIndexIconScaleBadge() {
+        var badge = document.getElementById('index-icon-scale-badge');
+        if (badge) {
+            var scale = localStorage.getItem('index_icon_scale') || '1.0';
+            badge.textContent = parseFloat(scale).toFixed(1) + 'x';
+            badge.className = 'setting-status enabled';
+        }
+    }
+
     function refreshNoteWidthBadge() {
         getSetting('center_note_content', function (value) {
             var badge = document.getElementById('note-width-badge');
@@ -481,6 +490,12 @@
             fontSizeCard.addEventListener('click', window.showNoteFontSizePrompt);
         }
 
+        // Index icon scale card - delegates to index-icon-scale-settings.js
+        var indexIconScaleCard = document.getElementById('index-icon-scale-card');
+        if (indexIconScaleCard && typeof window.showIndexIconScalePrompt === 'function') {
+            indexIconScaleCard.addEventListener('click', window.showIndexIconScalePrompt);
+        }
+
         // Save note sort modal button
         var saveNoteSortBtn = document.getElementById('saveNoteSortModalBtn');
         if (saveNoteSortBtn) {
@@ -569,6 +584,7 @@
         refreshToolbarModeBadge();
         refreshTimezoneBadge();
         refreshNoteWidthBadge();
+        refreshIndexIconScaleBadge();
 
         // Search functionality - filters settings cards
         var searchInput = document.getElementById('home-search-input');
@@ -639,5 +655,7 @@
     window.refreshToolbarModeBadge = refreshToolbarModeBadge;
     window.refreshTimezoneBadge = refreshTimezoneBadge;
     window.refreshNoteWidthBadge = refreshNoteWidthBadge;
+    window.getSetting = getSetting;
+    window.setSetting = setSetting;
 
 })();

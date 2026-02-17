@@ -91,6 +91,26 @@
     </div>
 </div>
 
+<!-- Index Icon Scale Settings Modal -->
+<div id="indexIconScaleModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><?php echo t_h('modals.index_icon_scale.title', [], 'Index Icon Scaling'); ?></h3>
+        </div>
+        <div class="modal-body">
+            <p><?php echo t_h('modals.index_icon_scale.description', [], 'Adjust the size of icons on the index page:'); ?></p>
+            <div style="display: flex; flex-direction: column; gap: 10px; align-items: center; margin: 20px 0;">
+                <input type="range" id="indexIconScaleInput" min="0.5" max="2.0" step="0.1" value="1.0" style="width: 100%;">
+                <span id="indexIconScaleValue" style="font-weight: bold; font-size: 1.2em;">1.0x</span>
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" id="cancelIndexIconScaleBtn" class="btn btn-cancel"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" id="saveIndexIconScaleBtn" class="btn btn-primary"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 
 <!-- Confirmation Modal -->
 <div id="confirmModal" class="modal">

@@ -425,6 +425,7 @@
             "notes_without_folders_after": "在文件夹后显示笔记",
             "show_folder_actions": "显示文件夹操作",
             "kanban_on_folder_click": "点击文件夹时打开看板视图",
+            "index_icon_scale": "索引页图标缩放",
             "note_content_width": "笔记内容宽度"
         },
         "badges": {
@@ -710,6 +711,10 @@
             "label": "最大宽度 (px)：",
             "full_width": "全宽",
             "default_value": "{{width}} px 是默认值"
+        },
+        "index_icon_scale": {
+            "title": "索引页图标缩放",
+            "description": "调整索引页上图标的大小（缩放因子）："
         },
         "confirm": {
             "title": "确认操作",

@@ -423,6 +423,7 @@
             "notes_without_folders_after": "Mostrar notas después de las carpetas",
             "show_folder_actions": "Mostrar acciones de carpeta",
             "kanban_on_folder_click": "Abrir vista Kanban al hacer clic en la carpeta",
+            "index_icon_scale": "Escalado de iconos del índice",
             "note_content_width": "Ancho del contenido de la nota"
         },
         "badges": {
@@ -703,6 +704,10 @@
             "label": "Ancho máximo (px):",
             "full_width": "Ancho total",
             "default_value": "{{width}} px es el valor predeterminado"
+        },
+        "index_icon_scale": {
+            "title": "Escalado de iconos del índice",
+            "description": "Ajuste el tamaño de los iconos en la página del índice (factor de escala):"
         },
         "confirm": {
             "title": "Confirmar acción",

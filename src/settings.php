@@ -192,7 +192,7 @@ if ($isAdmin) {
       data-txt-not-defined="<?php echo t_h('common.not_defined'); ?>"
       data-txt-saved="<?php echo t_h('common.saved'); ?>"
       data-txt-error="<?php echo t_h('common.error'); ?>"
-      data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+    data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <div class="home-container">
 
         <?php 
@@ -346,6 +346,17 @@ if ($isAdmin) {
                 </div>
             </div>
 
+            <!-- Index Icon Scale -->
+            <div class="home-card" id="index-icon-scale-card">
+                <div class="home-card-icon">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.index_icon_scale', [], 'Index icon scaling'); ?></span>
+                    <span id="index-icon-scale-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
             <!-- Timezone -->
             <div class="home-card" id="timezone-card">
                 <div class="home-card-icon"><i class="fal fa-clock"></i></div>
@@ -489,6 +500,7 @@ if ($isAdmin) {
     <script src="js/ui.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/font-size-settings.js"></script>
+    <script src="js/index-icon-scale-settings.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/index-icon-scale-settings.js') ?: time(); ?>"></script>
     <script src="js/note-width-settings.js"></script>
     <script src="js/background-settings.js"></script>
     <script src="js/copy-code-on-focus.js"></script>

@@ -441,6 +441,7 @@
             "notes_without_folders_after": "Afficher les notes après les dossiers",
             "show_folder_actions": "Afficher les actions de dossier",
             "kanban_on_folder_click": "Ouvrir la vue Kanban au clic sur dossier",
+            "index_icon_scale": "Taille des icônes (Index)",
             "note_content_width": "Largeur du contenu de la note"
         },
         "badges": {
@@ -725,6 +726,10 @@
             "label": "Largeur maximale (px) :",
             "full_width": "Pleine largeur",
             "default_value": "{{width}} px est la valeur par défaut"
+        },
+        "index_icon_scale": {
+            "title": "Taille des icônes (Index)",
+            "description": "Ajustez la taille des icônes sur la page index (facteur d'échelle) :"
         },
         "confirm": {
             "title": "Confirmer l’action",

@@ -422,6 +422,7 @@
             "notes_without_folders_after": "Mostrar notas após as pastas",
             "show_folder_actions": "Mostrar Ações da Pasta",
             "kanban_on_folder_click": "Abrir visualização Kanban ao clicar na pasta",
+            "index_icon_scale": "Escala de ícones do índice",
             "note_content_width": "Largura do conteúdo da nota"
         },
         "badges": {
@@ -702,6 +703,10 @@
             "label": "Largura máxima (px):",
             "full_width": "Largura total",
             "default_value": "{{width}} px é o valor Padrão"
+        },
+        "index_icon_scale": {
+            "title": "Escala de ícones do índice",
+            "description": "Ajuste o tamanho dos ícones na página do índice (fator de escala):"
         },
         "confirm": {
             "title": "Confirmar Ação",

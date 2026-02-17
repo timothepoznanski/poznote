@@ -307,7 +307,8 @@ try {
     <link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $cache_v; ?>"/>
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
 </head>
-<body class="home-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+<body class="home-page" 
+    data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <div class="home-container">
         <?php $currentUser = getCurrentUser(); ?>
         <div class="home-header">

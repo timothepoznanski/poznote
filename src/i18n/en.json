@@ -92,6 +92,7 @@
             "notes_without_folders_after": "Show notes after folders",
             "show_folder_actions": "Show folder actions",
             "kanban_on_folder_click": "Open Kanban view on folder click",
+            "index_icon_scale": "Index icon scaling",
             "note_content_width": "Note content width"
         },
         "badges": {
@@ -256,6 +257,10 @@
             "label": "Maximum width (px):",
             "full_width": "Full Width",
             "default_value": "{{width}} px is the Default value"
+        },
+        "index_icon_scale": {
+            "title": "Index icon scaling",
+            "description": "Adjust the size of icons on the index page (scale factor):"
         },
         "confirm": {
             "title": "Confirm Action",

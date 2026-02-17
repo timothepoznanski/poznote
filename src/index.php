@@ -914,6 +914,7 @@ $body_classes = trim($extra_body_classes);
 <script src="js/unified-search.js?v=<?php echo $v; ?>"></script>
 <script src="js/clickable-tags.js?v=<?php echo $v; ?>"></script>
 <script src="js/font-size-settings.js?v=<?php echo $v; ?>"></script>
+<script src="js/index-icon-scale-settings.js?v=<?php echo $v; ?>&m=<?php echo @filemtime('js/index-icon-scale-settings.js') ?: time(); ?>"></script>
 <script src="js/background-settings.js?v=<?php echo $v; ?>"></script>
 <script src="js/tasklist.js?v=<?php echo $v; ?>"></script>
 <script src="js/excalidraw.js?v=<?php echo $v; ?>"></script>

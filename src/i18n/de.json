@@ -423,6 +423,7 @@
             "notes_without_folders_after": "Notizen nach Ordnern anzeigen",
             "show_folder_actions": "Ordner-Aktionen anzeigen",
             "kanban_on_folder_click": "Kanban-Ansicht beim Klicken auf Ordner öffnen",
+            "index_icon_scale": "Skalierung der Index-Symbole",
             "note_content_width": "Breite des Notizinhalts"
         },
         "badges": {
@@ -703,6 +704,10 @@
             "label": "Maximale Breite (px):",
             "full_width": "Volle Breite",
             "default_value": "{{width}} px ist der Standardwert"
+        },
+        "index_icon_scale": {
+            "title": "Skalierung der Index-Symbole",
+            "description": "Passen Sie die Größe der Symbole auf der Indexseite an (Skalierungsfaktor):"
         },
         "confirm": {
             "title": "Aktion bestätigen",
