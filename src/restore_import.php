@@ -1355,25 +1355,37 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
                     return $matches[0];
                 }, $content);
                 
-                // Handle Poznote-exported markdown images: ![alt](attachments/{attachmentId}.ext)
+                // Handle Poznote-exported markdown images: (../)attachments/{attachmentId}.ext
                 if (!empty($attachmentIdMap)) {
-                    $content = preg_replace_callback('/!\[([^\]]*)\]\(attachments\/([a-zA-Z0-9_]+)(?:\.[^)]+)?\)/i', function($matches) use ($noteId, $attachmentIdMap, &$noteAttachments) {
+                    $content = preg_replace_callback('/!\[([^\]]*)\]\((?:\.\.\/|\.\/|\/)*attachments\/([a-zA-Z0-9_]+)(?:\.[^)]+)?\)/i', function($matches) use ($noteId, $attachmentIdMap, &$noteAttachments) {
                         $altText = $matches[1];
                         $oldAttachmentId = $matches[2];
                         
                         if (isset($attachmentIdMap[$oldAttachmentId])) {
                             $imageInfo = $attachmentIdMap[$oldAttachmentId];
                             
-                            // Add to note's attachments with a new ID
-                            $newAttachmentId = uniqid();
-                            $noteAttachments[] = [
-                                'id' => $newAttachmentId,
-                                'filename' => $imageInfo['unique_filename'],
-                                'original_filename' => 'attachment.' . pathinfo($imageInfo['unique_filename'], PATHINFO_EXTENSION),
-                                'file_size' => $imageInfo['file_size'],
-                                'file_type' => $imageInfo['file_type'],
-                                'uploaded_at' => date('Y-m-d H:i:s')
-                            ];
+                            // Add to note's attachments with a new ID if not already added
+                            $alreadyAdded = false;
+                            $newAttachmentId = null;
+                            foreach ($noteAttachments as $att) {
+                                if ($att['filename'] === $imageInfo['unique_filename']) {
+                                    $alreadyAdded = true;
+                                    $newAttachmentId = $att['id'];
+                                    break;
+                                }
+                            }
+                            
+                            if (!$alreadyAdded) {
+                                $newAttachmentId = uniqid();
+                                $noteAttachments[] = [
+                                    'id' => $newAttachmentId,
+                                    'filename' => $imageInfo['unique_filename'],
+                                    'original_filename' => 'attachment.' . pathinfo($imageInfo['unique_filename'], PATHINFO_EXTENSION),
+                                    'file_size' => $imageInfo['file_size'],
+                                    'file_type' => $imageInfo['file_type'],
+                                    'uploaded_at' => date('Y-m-d H:i:s')
+                                ];
+                            }
                             
                             // Convert to API path
                             return '![' . $altText . '](/api/v1/notes/' . $noteId . '/attachments/' . $newAttachmentId . ')';
@@ -1391,8 +1403,8 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
                     $updateStmt->execute([$attachmentsJson, $noteId]);
                 }
             } else if ($noteType === 'note' && !empty($attachmentIdMap)) {
-                // For HTML notes, handle Poznote-exported attachments: attachments/{attachmentId}.ext
-                $content = preg_replace_callback('#(src|href)=(["\']?)attachments/([a-zA-Z0-9_]+)(?:\.[^"\'>\s]+)?\2#i', function($matches) use ($noteId, $attachmentIdMap, &$noteAttachments) {
+                // For HTML notes, handle Poznote-exported attachments: (../)attachments/{attachmentId}.ext
+                $content = preg_replace_callback('#(src|href)=(["\']?)(?:\.\.\/|\.\/|\/)*attachments/([a-zA-Z0-9_]+)(?:\.[^"\'>\s]+)?\2#i', function($matches) use ($noteId, $attachmentIdMap, &$noteAttachments) {
                     $attr = $matches[1];
                     $quote = $matches[2];
                     $oldAttachmentId = $matches[3];
@@ -1400,16 +1412,28 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
                     if (isset($attachmentIdMap[$oldAttachmentId])) {
                         $imageInfo = $attachmentIdMap[$oldAttachmentId];
                         
-                        // Add to note's attachments with a new ID
-                        $newAttachmentId = uniqid();
-                        $noteAttachments[] = [
-                            'id' => $newAttachmentId,
-                            'filename' => $imageInfo['unique_filename'],
-                            'original_filename' => 'attachment.' . pathinfo($imageInfo['unique_filename'], PATHINFO_EXTENSION),
-                            'file_size' => $imageInfo['file_size'],
-                            'file_type' => $imageInfo['file_type'],
-                            'uploaded_at' => date('Y-m-d H:i:s')
-                        ];
+                        // Add to note's attachments with a new ID if not already added
+                        $alreadyAdded = false;
+                        $newAttachmentId = null;
+                        foreach ($noteAttachments as $att) {
+                            if ($att['filename'] === $imageInfo['unique_filename']) {
+                                $alreadyAdded = true;
+                                $newAttachmentId = $att['id'];
+                                break;
+                            }
+                        }
+                        
+                        if (!$alreadyAdded) {
+                            $newAttachmentId = uniqid();
+                            $noteAttachments[] = [
+                                'id' => $newAttachmentId,
+                                'filename' => $imageInfo['unique_filename'],
+                                'original_filename' => 'attachment.' . pathinfo($imageInfo['unique_filename'], PATHINFO_EXTENSION),
+                                'file_size' => $imageInfo['file_size'],
+                                'file_type' => $imageInfo['file_type'],
+                                'uploaded_at' => date('Y-m-d H:i:s')
+                            ];
+                        }
                         
                         // Return full src/href attribute with API URL
                         return $attr . '=' . $quote . '/api/v1/notes/' . $noteId . '/attachments/' . $newAttachmentId . $quote;
