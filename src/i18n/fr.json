@@ -529,6 +529,9 @@
     "tags": {
         "add_single": "Ajouter un tag...",
         "add_multiple": "Ajouter des tags...",
+        "list_all": "Liste de tous les tags",
+        "manage_note_tags": "Gérer les tags de la note",
+        "modal_title": "Gérer les tags",
         "search": {
             "placeholder": "Filtrer les tags...",
             "results_one": "1 tag trouvé pour \"{{term}}\"",

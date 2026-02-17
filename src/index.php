@@ -750,7 +750,15 @@ $body_classes = trim($extra_body_classes);
                     echo '<span class="fas fa-folder icon_folder cursor-pointer" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" title="'.t_h('settings.folder.change_folder', [], 'Change folder').'"></span>';
                     echo '<span class="folder_name cursor-pointer" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" title="'.t_h('settings.folder.change_folder', [], 'Change folder').'">'.htmlspecialchars($folder_path, ENT_QUOTES).'</span>';
                     echo '</div>';
-                    echo '<span class="fas fa-tag icon_tag" data-action="navigate-tags"></span>';
+                    
+                    echo '<div class="tag-actions-dropdown">';
+                    echo '<span class="fas fa-tag icon_tag cursor-pointer" data-action="toggle-tags-menu" data-note-id="'.$row['id'].'"></span>';
+                    echo '<div id="tags-menu-'.$row['id'].'" class="dropdown-menu tags-actions-menu" hidden>';
+                    echo '<button type="button" class="dropdown-item" data-action="navigate-tags"><i class="fas fa-tags"></i> ' . t_h('tags.list_all', [], 'List all tags') . '</button>';
+                    echo '<button type="button" class="dropdown-item" data-action="show-tag-edit-modal" data-note-id="'.$row['id'].'"><i class="fas fa-edit"></i> ' . t_h('tags.manage_note_tags', [], 'Manage note tags') . '</button>';
+                    echo '</div>';
+                    echo '</div>';
+
                     echo '<span class="name_tags">'
                         .'<input type="hidden" id="tags'.$row['id'].'" value="'.htmlspecialchars(str_replace(',', ' ', $row['tags'] ?? ''), ENT_QUOTES).'"/>'
                     .'</span>';
@@ -933,6 +941,7 @@ $body_classes = trim($extra_body_classes);
 <script src="js/notes.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/attachments.js"></script>
+<script src="js/tags-modal.js"></script>
 <!-- Event management modules -->
 <script src="js/events-utils.js?v=<?php echo $v; ?>"></script>
 <script src="js/events-auto-save.js?v=<?php echo $v; ?>"></script>

@@ -506,6 +506,9 @@
     "tags": {
         "add_single": "添加标签...",
         "add_multiple": "添加多个标签...",
+        "list_all": "列出所有标签",
+        "manage_note_tags": "管理笔记标签",
+        "modal_title": "管理标签",
         "search": {
             "placeholder": "筛选标签...",
             "results_one": "找到 1 个关于 \"{{term}}\" 的标签",

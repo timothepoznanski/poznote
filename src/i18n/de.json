@@ -507,6 +507,9 @@
     "tags": {
         "add_single": "Tag hinzufügen...",
         "add_multiple": "Tags hinzufügen...",
+        "list_all": "Alle Tags auflisten",
+        "manage_note_tags": "Notiz-Tags verwalten",
+        "modal_title": "Tags verwalten",
         "search": {
             "placeholder": "Tags filtern...",
             "results_one": "1 Tag für \"{{term}}\" gefunden",

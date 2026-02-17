@@ -506,6 +506,9 @@
     "tags": {
         "add_single": "Adicionar etiqueta...",
         "add_multiple": "Adicionar etiquetas...",
+        "list_all": "Listar todas as etiquetas",
+        "manage_note_tags": "Gerir etiquetas da nota",
+        "modal_title": "Gerir etiquetas",
         "search": {
             "placeholder": "Filtrar etiquetas...",
             "results_one": "1 etiqueta encontrada para \"{{term}}\"",

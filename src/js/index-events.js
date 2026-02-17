@@ -69,6 +69,50 @@
 
         const isHidden = menu.hasAttribute('hidden');
         closeTasklistActionsMenus();
+        closeTagsMenus(); // Close other types of menus
+
+        if (isHidden) {
+            menu.hidden = false;
+            if (triggerEl) triggerEl.setAttribute('aria-expanded', 'true');
+
+            setTimeout(() => {
+                document.addEventListener('click', function closeMenu(e) {
+                    if (!menu.contains(e.target) && !(triggerEl && triggerEl.contains(e.target))) {
+                        menu.hidden = true;
+                        if (triggerEl) triggerEl.setAttribute('aria-expanded', 'false');
+                        document.removeEventListener('click', closeMenu);
+                    }
+                });
+            }, 0);
+        }
+    }
+
+    /**
+     * Close all open tags action menus
+     */
+    function closeTagsMenus() {
+        const openMenus = document.querySelectorAll('.tags-actions-menu:not([hidden])');
+        openMenus.forEach(menu => {
+            menu.hidden = true;
+            const btn = menu.parentElement?.querySelector('[data-action="toggle-tags-menu"]');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+        });
+    }
+
+    /**
+     * Toggle a tags actions menu and attach outside click listener
+     * @param {string} noteId - The note ID
+     * @param {HTMLElement} triggerEl - The element that triggered the toggle
+     */
+    function toggleTagsMenu(noteId, triggerEl) {
+        if (!noteId) return;
+
+        const menu = document.getElementById(`tags-menu-${noteId}`);
+        if (!menu) return;
+
+        const isHidden = menu.hasAttribute('hidden');
+        closeTasklistActionsMenus(); // Close other types of menus
+        closeTagsMenus();
 
         if (isHidden) {
             menu.hidden = false;
@@ -278,6 +322,25 @@
                 break;
             case 'toggle-tasklist-actions':
                 toggleTasklistActionsMenu(noteId, target);
+                break;
+            case 'toggle-tags-menu':
+                toggleTagsMenu(noteId, target);
+                break;
+            case 'show-tag-edit-modal':
+                if (noteId && typeof showNoteTagsModal === 'function') {
+                    showNoteTagsModal(noteId);
+                }
+                break;
+            case 'close-tags-modal':
+                const tagsModal = document.getElementById('tagsModal');
+                if (tagsModal) {
+                    tagsModal.style.display = 'none';
+                    // Clean up modal content
+                    const container = document.getElementById('tagsModalTagsList');
+                    if (container) container.innerHTML = '';
+                    const tagInput = document.getElementById('tagsModalInput');
+                    if (tagInput) tagInput.value = '';
+                }
                 break;
 
             // Note actions with noteId

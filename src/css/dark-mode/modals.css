@@ -198,6 +198,15 @@ body.dark-mode #moveNotesModal select:focus {
 }
 
 /* ============================================
+   Move Note to Folder Modal (#moveNoteFolderModal)
+   ============================================ */
+
+html[data-theme='dark'] #moveNoteFolderModal .modal-content label,
+body.dark-mode #moveNoteFolderModal .modal-content label {
+    color: #c8c8c8;
+}
+
+/* ============================================
    Rename Modal
    ============================================ */
 

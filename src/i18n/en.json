@@ -112,6 +112,13 @@
         "clear_completed": "Clear completed tasks",
         "no_completed_tasks": "No completed tasks to clear."
     },
+    "tags": {
+        "add_single": "Add tag...",
+        "add_multiple": "Add tags...",
+        "list_all": "List all tags",
+        "manage_note_tags": "Manage note tags",
+        "modal_title": "Manage tags"
+    },
     "download": "Download",
     "convert": "Convert",
     "create": "Create",

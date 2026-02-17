@@ -162,14 +162,13 @@
         <!-- Workspace selection -->
         <div class="form-group">
             <label for="workspaceSelect"><?php echo t_h('modals.move_note_folder.workspace_destination'); ?></label>
-        <select id="workspaceSelect" class="workspace-select" data-action="on-workspace-change">
+            <select id="workspaceSelect" class="workspace-select" data-action="on-workspace-change">
                 <!-- Workspaces will be loaded here -->
             </select>
         </div>
         
-        <div><?php echo t_h('modals.move_note_folder.target_folder'); ?></div>
-
         <div class="form-group">
+            <label for="moveNoteTargetSelect"><?php echo t_h('modals.move_note_folder.target_folder'); ?></label>
             <select id="moveNoteTargetSelect" class="workspace-select">
                 <!-- Options will be populated dynamically -->
             </select>
@@ -850,6 +849,27 @@
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" id="cancelBackgroundBtn"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" id="saveBackgroundBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
+<!-- Note Tags Modal -->
+<div id="tagsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><?php echo t_h('tags.modal_title', [], 'Manage tags'); ?></h3>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="tagsModalNoteId" />
+            <div id="tagsModalTagsList" class="tags-modal-list">
+                <!-- Tags will be dynamically loaded here as a list -->
+            </div>
+            <div class="tags-modal-input-wrapper">
+                <input type="text" id="tagsModalInput" placeholder="<?php echo t_h('tags.add_single'); ?>" autocomplete="off" />
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-tags-modal"><?php echo t_h('common.close'); ?></button>
         </div>
     </div>
 </div>

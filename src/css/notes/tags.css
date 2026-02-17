@@ -65,10 +65,25 @@
     align-items: center;
 }
 
+/* Tag Actions Dropdown */
+.tag-actions-dropdown {
+    position: relative;
+    display: inline-flex;
+    margin-right: 8px;
+    align-self: center;
+    line-height: 1;
+}
+
+.tags-actions-menu {
+    left: 0 !important;
+    right: auto !important;
+    margin-top: 5px;
+}
+
 /* Tag Icon */
 .fa-tag.icon_tag {
     font-size: 14px;
-    margin-right: 4px;
+    margin-right: 0 !important;
     flex-shrink: 0;
     align-self: center;
     line-height: 1;
@@ -242,4 +257,92 @@
     outline: none;
     background: rgba(0, 125, 184, 0.1);
     border-radius: 4px;
+}
+
+/* Tags Modal List Styles */
+.tags-modal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.tags-modal-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #f8fafc;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+.tags-modal-item-name {
+    font-size: 14px;
+    color: #334155;
+    flex-grow: 1;
+    margin-right: 10px;
+    outline: none;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.tags-modal-item-name:focus {
+    background: rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.tags-modal-item-delete {
+    color: #94a3b8;
+    cursor: pointer;
+    transition: color 0.2s;
+    font-size: 16px;
+}
+
+.tags-modal-item-delete:hover {
+    color: #ef4444;
+}
+
+.tags-modal-input-wrapper {
+    margin-top: 10px;
+}
+
+#tagsModalInput {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+#tagsModalInput:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+/* Dark Mode support for Tags Modal */
+html[data-theme='dark'] .tags-modal-item {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+html[data-theme='dark'] .tags-modal-item-name {
+    color: #e2e8f0;
+}
+
+html[data-theme='dark'] .tags-modal-item-name:focus {
+    background: rgba(74, 158, 255, 0.2);
+    box-shadow: 0 0 0 1px #4a9eff;
+}
+
+html[data-theme='dark'] #tagsModalInput {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
 }
