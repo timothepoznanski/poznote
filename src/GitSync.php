@@ -318,18 +318,11 @@ class GitSync {
                 }
             }
             
-            // Build the path in the repository — keyed by note ID so renames never create duplicates
-            $workspace = $note['workspace'] ?? 'Poznote';
-            $folderPath = $this->getFolderPath($note['folder_id']);
-            $repoPath = $workspace . '/' . ltrim(($folderPath ? $folderPath . '/' : '') . $noteId . '.' . $repoExtension, '/');
-
-            // Add front matter
-            if ($noteType === 'markdown' || $noteType === 'tasklist' || $noteType === 'excalidraw') {
-                $content = $this->addFrontMatter($content, $note);
-            }
+            // Path = entries/{id}.{ext} — independent of title, workspace or folder
+            $repoPath = 'entries/' . $noteId . '.' . $repoExtension;
 
             // Push to Git
-            $pushResult = $this->pushFile($repoPath, $content, "Update: {$note['heading']}");
+            $pushResult = $this->pushFile($repoPath, $content, "Update note {$noteId}");
 
             if (!$pushResult['success']) {
                 return $pushResult;
@@ -369,6 +362,9 @@ class GitSync {
                 }
             }
             
+            // Keep metadata.json in sync so tags/folder/workspace/type survive a pull
+            $this->pushMetadata();
+
             return $pushResult;
             
         } catch (Exception $e) {
@@ -392,8 +388,7 @@ class GitSync {
             $localExtension = ($type === 'markdown') ? 'md' : 'html';
             $repoExtension  = ($type === 'tasklist' || $type === 'excalidraw') ? 'json' : $localExtension;
 
-            $folderPath = $this->getFolderPath($folderId);
-            $repoPath   = ($workspace ?: 'Poznote') . '/' . ltrim(($folderPath ? $folderPath . '/' : '') . $noteId . '.' . $repoExtension, '/');
+            $repoPath = 'entries/' . $noteId . '.' . $repoExtension;
 
             return $this->deleteFile($repoPath, 'Deleted: ' . ($heading ?: "note #{$noteId}"));
         } catch (Exception $e) {
@@ -446,13 +441,13 @@ class GitSync {
         }
 
         $results = [
-            'success'             => true,
-            'pushed'              => 0,
-            'attachments_pushed'  => 0,
-            'deleted'             => 0,
-            'skipped'             => 0,
-            'errors'              => [],
-            'debug'               => [],
+            'success'            => true,
+            'pushed'             => 0,
+            'attachments_pushed' => 0,
+            'deleted'            => 0,
+            'skipped'            => 0,
+            'errors'             => [],
+            'debug'              => [],
         ];
 
         try {
@@ -460,188 +455,107 @@ class GitSync {
             $entriesPath     = getEntriesPath();
             $attachmentsPath = getAttachmentsPath();
 
-            // ── 1. Get current remote tree (SHA map for skip optimisation) ──
+            // ── 1. Build remote SHA map ──
             $tree   = $this->getRepoTree();
             $shaMap = [];
             if (is_array($tree) && !isset($tree['error'])) {
                 foreach ($tree as $item) {
-                    if ($item['type'] === 'blob') {
-                        $shaMap[$item['path']] = $item['sha'];
-                    }
+                    if ($item['type'] === 'blob') $shaMap[$item['path']] = $item['sha'];
                 }
             }
 
-            // ── 2. Fetch all local notes ──
-            $query  = "SELECT id, heading, type, folder_id, tags, workspace, created, updated, favorite, attachments
-                       FROM entries WHERE trash = 0";
-            $params = [];
-            if ($workspaceFilter) {
-                $query   .= " AND workspace = ?";
-                $params[] = $workspaceFilter;
-            }
-            $stmt  = $this->con->prepare($query);
-            $stmt->execute($params);
-            $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            // ── 2. Scan local directories ──
+            $entryFiles      = is_dir($entriesPath)     ? array_values(array_filter(array_diff(scandir($entriesPath),     ['.', '..']), fn($f) => is_file($entriesPath     . '/' . $f))) : [];
+            $attachmentFiles = is_dir($attachmentsPath) ? array_values(array_filter(array_diff(scandir($attachmentsPath), ['.', '..']), fn($f) => is_file($attachmentsPath . '/' . $f))) : [];
 
-            // ── 3. Calculate totals for progress ──
-            $totalNotes = count($notes);
-            $totalAttachments = 0;
-            foreach ($notes as $note) {
-                if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
-                    $atts = json_decode($note['attachments'], true);
-                    if (is_array($atts)) {
-                        $totalAttachments += count($atts);
-                    }
-                }
-            }
-            
-            // Estimates (notes + attachments + cleanup phase)
-            $totalSteps = $totalNotes + $totalAttachments + 5; 
+            $totalSteps  = count($entryFiles) + count($attachmentFiles) + 5;
             $currentStep = 0;
-            $this->updateProgress(0, $totalSteps, "Starting push...");
+            $this->updateProgress(0, $totalSteps, 'Starting push...');
 
-            // ── 4. Push every note + its attachments ──
-            $expectedPaths = [];                    // every path that SHOULD be on remote
-            $metadataByWs  = [];                    // workspace → filename → metadata
+            $expectedPaths = [];
 
-            foreach ($notes as $note) {
+            // ── 3. Push entries/ ──
+            foreach ($entryFiles as $filename) {
                 $currentStep++;
-                $this->updateProgress($currentStep, $totalSteps, "Pushing: " . ($note['heading'] ?: 'Untitled'));
-                
-                $noteId   = $note['id'];
-                $noteType = $note['type'] ?? 'note';
+                $this->updateProgress($currentStep, $totalSteps, "Pushing: {$filename}");
 
-                // Local file extension
-                $localExt = ($noteType === 'markdown') ? 'md' : 'html';
-                // Repository file extension
-                $repoExt  = ($noteType === 'tasklist' || $noteType === 'excalidraw') ? 'json' : $localExt;
-
-                $filePath = $entriesPath . '/' . $noteId . '.' . $localExt;
-
-                if (!file_exists($filePath)) {
-                    $results['debug'][]  = "Skipped note {$noteId} ({$note['heading']}): file not found on disk";
-                    $results['skipped']++;
-                    continue;
-                }
-
-                $content   = file_get_contents($filePath);
-                $workspace = $note['workspace'] ?? 'Poznote';
-                $folder    = $this->getFolderPath($note['folder_id']);
-                // Path keyed by note ID — immune to title renames
-                $repoPath  = $workspace . '/' . ltrim(($folder ? $folder . '/' : '') . $noteId . '.' . $repoExt, '/');
-
-                // Transform local attachment links → relative Git links
-                if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
-                    $atts = json_decode($note['attachments'], true);
-                    if (is_array($atts)) {
-                        $content = $this->transformLinksForGitHub($content, $noteId, $atts);
-                    }
-                }
-
-                // Add front matter / metadata comment for all note types
-                $content = $this->addFrontMatter($content, $note);
-
+                $repoPath        = 'entries/' . $filename;
                 $expectedPaths[] = $repoPath;
-                $results['debug'][] = "Pushing note: {$repoPath}";
+                $content         = file_get_contents($entriesPath . '/' . $filename);
 
-                $pushResult = $this->pushFile($repoPath, $content, "Update: {$note['heading']}", $shaMap);
+                $pushResult = $this->pushFile($repoPath, $content, "Update: {$filename}", $shaMap);
                 if ($pushResult['success']) {
                     if (!empty($pushResult['skipped'])) {
                         $results['skipped']++;
-                        $results['debug'][] = "  → unchanged (skipped)";
+                        $results['debug'][] = "  {$repoPath} → unchanged";
                     } else {
                         $results['pushed']++;
-                        $results['debug'][] = "  → pushed";
+                        $results['debug'][] = "  {$repoPath} → pushed";
                     }
                 } else {
-                    $results['errors'][] = ['note_id' => $noteId, 'path' => $repoPath, 'error' => $pushResult['error']];
-                    $results['debug'][]  = "  → ERROR: " . $pushResult['error'];
+                    $results['errors'][] = ['path' => $repoPath, 'error' => $pushResult['error']];
+                    $results['debug'][]  = "  {$repoPath} → ERROR: " . $pushResult['error'];
                 }
+            }
 
-                // ── Attachments for this note ──
-                if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
-                    $atts = json_decode($note['attachments'], true);
-                    if (is_array($atts)) {
-                        if (!isset($metadataByWs[$workspace])) {
-                            $metadataByWs[$workspace] = [];
-                        }
-                        foreach ($atts as $att) {
-                            if (empty($att['filename'])) continue;
-                            
-                            $currentStep++;
-                            $this->updateProgress($currentStep, $totalSteps, "Pushing attachment: " . $att['filename']);
+            // ── 4. Push attachments/ ──
+            foreach ($attachmentFiles as $filename) {
+                $currentStep++;
+                $this->updateProgress($currentStep, $totalSteps, "Pushing attachment: {$filename}");
 
-                            $attFile = $attachmentsPath . '/' . $att['filename'];
-                            if (!file_exists($attFile)) {
-                                $results['debug'][] = "  Attachment not found on disk: {$att['filename']}";
-                                continue;
-                            }
-                            $attRepoPath     = $workspace . '/attachments/' . $att['filename'];
-                            $expectedPaths[] = $attRepoPath;
+                $repoPath        = 'attachments/' . $filename;
+                $expectedPaths[] = $repoPath;
+                $content         = file_get_contents($attachmentsPath . '/' . $filename);
 
-                            // Store metadata (note_path for pull reconstruction — stable across re-creations)
-                            $metadataByWs[$workspace][$att['filename']] = [
-                                'id'                => $att['id']                ?? uniqid(),
-                                'original_filename' => $att['original_filename'] ?? $att['filename'],
-                                'file_size'         => $att['file_size']         ?? filesize($attFile),
-                                'file_type'         => $att['file_type']         ?? 'application/octet-stream',
-                                'uploaded_at'       => $att['uploaded_at']       ?? date('Y-m-d H:i:s'),
-                                'note_path'         => $repoPath,
-                            ];
-
-                            $attContent    = file_get_contents($attFile);
-                            $attPushResult = $this->pushFile($attRepoPath, $attContent,
-                                "Update attachment: {$att['original_filename']}", $shaMap);
-
-                            if ($attPushResult['success']) {
-                                if (!empty($attPushResult['skipped'])) {
-                                    $results['debug'][] = "  Attachment unchanged: {$att['filename']}";
-                                } else {
-                                    $results['attachments_pushed']++;
-                                    $results['debug'][] = "  Attachment pushed: {$att['filename']}";
-                                }
-                            } else {
-                                $results['debug'][]  = "  Attachment ERROR: {$att['filename']} — " . $attPushResult['error'];
-                                $results['errors'][] = ['attachment' => $att['filename'], 'error' => $attPushResult['error']];
-                            }
-                        }
+                $pushResult = $this->pushFile($repoPath, $content, "Update attachment: {$filename}", $shaMap);
+                if ($pushResult['success']) {
+                    if (!empty($pushResult['skipped'])) {
+                        $results['debug'][] = "  {$repoPath} → unchanged";
+                    } else {
+                        $results['attachments_pushed']++;
+                        $results['debug'][] = "  {$repoPath} → pushed";
                     }
+                } else {
+                    $results['errors'][] = ['path' => $repoPath, 'error' => $pushResult['error']];
+                    $results['debug'][]  = "  {$repoPath} → ERROR: " . $pushResult['error'];
                 }
             }
 
-            // ── 4. Push .metadata.json for each workspace ──
-            foreach ($metadataByWs as $ws => $meta) {
-                $metaPath        = $ws . '/attachments/.metadata.json';
-                $expectedPaths[] = $metaPath;
-                $metaContent     = json_encode($meta, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-                $metaResult      = $this->pushFile($metaPath, $metaContent, "Update attachments metadata", $shaMap);
-                $results['debug'][] = "Metadata for {$ws}: " . ($metaResult['success'] ? (empty($metaResult['skipped']) ? 'pushed' : 'unchanged') : 'ERROR: ' . $metaResult['error']);
+            // ── 5. Push metadata.json ──
+            $this->updateProgress($currentStep, $totalSteps, 'Pushing metadata...');
+            $expectedPaths[] = 'metadata.json';
+            $metaResult = $this->pushMetadata($shaMap);
+            if ($metaResult['success']) {
+                if (empty($metaResult['skipped'])) {
+                    $results['pushed']++;
+                    $results['debug'][] = '  metadata.json → pushed';
+                } else {
+                    $results['debug'][] = '  metadata.json → unchanged';
+                }
+            } else {
+                $results['errors'][] = ['path' => 'metadata.json', 'error' => $metaResult['error'] ?? 'unknown'];
+                $results['debug'][]  = '  metadata.json → ERROR: ' . ($metaResult['error'] ?? 'unknown');
             }
 
-            // ── 5. Delete remote files that no longer exist locally ──
-            $this->updateProgress($currentStep, $totalSteps, "Cleaning up remote orphans...");
+            // ── 6. Delete remote orphans ──
+            $this->updateProgress($currentStep, $totalSteps, 'Cleaning up remote orphans...');
             foreach ($shaMap as $remotePath => $_sha) {
-                // If a workspace filter is active, only touch files in that workspace
-                if ($workspaceFilter && strpos($remotePath, $workspaceFilter . '/') !== 0) {
-                    continue;
-                }
                 if (!in_array($remotePath, $expectedPaths)) {
                     $currentStep++;
-                    $this->updateProgress($currentStep, $totalSteps, "Deleting: " . $remotePath);
-                    $results['debug'][] = "Deleting orphan: {$remotePath}";
-                    $delResult = $this->deleteFile($remotePath, "Deleted from Poznote");
+                    $this->updateProgress($currentStep, $totalSteps, "Deleting: {$remotePath}");
+                    $delResult = $this->deleteFile($remotePath, 'Deleted from Poznote');
                     if ($delResult['success']) {
                         $results['deleted']++;
-                        $results['debug'][] = "  → deleted";
+                        $results['debug'][] = "  {$remotePath} → deleted";
                     } else {
-                        $results['debug'][]  = "  → delete ERROR: " . $delResult['error'];
                         $results['errors'][] = ['path' => $remotePath, 'error' => $delResult['error']];
+                        $results['debug'][]  = "  {$remotePath} → delete ERROR: " . $delResult['error'];
                     }
                 }
             }
 
             // ── 6. Save sync info ──
-            $this->updateProgress($totalSteps, $totalSteps, "Push complete!");
+            $this->updateProgress($totalSteps, $totalSteps, 'Push complete!');
             $this->saveSyncInfo([
                 'timestamp'   => date('c'),
                 'action'      => 'push',
@@ -649,15 +563,13 @@ class GitSync {
                 'attachments' => $results['attachments_pushed'],
                 'deleted'     => $results['deleted'],
                 'errors'      => count($results['errors']),
-                'workspace'   => $workspaceFilter,
             ]);
-            
             $this->clearProgress();
 
         } catch (Exception $e) {
             $this->clearProgress();
-            $results['success']    = false;
-            $results['errors'][]   = ['error' => $e->getMessage()];
+            $results['success']  = false;
+            $results['errors'][] = ['error' => $e->getMessage()];
         }
 
         return $results;
@@ -687,6 +599,9 @@ class GitSync {
             return ['success' => false, 'error' => 'Database connection required'];
         }
 
+        // Note: $workspaceTarget is kept for API compatibility but ignored —
+        // all entries and attachments are pulled regardless of workspace.
+
         $results = [
             'success' => true,
             'pulled'  => 0,
@@ -701,181 +616,204 @@ class GitSync {
             $entriesPath     = getEntriesPath();
             $attachmentsPath = getAttachmentsPath();
 
-            // ── 1. Get full remote tree ──
+            // ── 1. Get remote tree ──
             $tree = $this->getRepoTree();
             if (isset($tree['error'])) {
                 return ['success' => false, 'error' => $tree['error']];
             }
 
             // ── 2. Categorise remote files ──
-            $noteFiles       = [];   // path → extension
-            $attachmentFiles = [];   // workspace → [ {path, filename} ]
-            $metadataByWs    = [];   // workspace → parsed metadata array
-
+            $noteFiles       = [];   // ['entries/183.html', ...]
+            $attachmentFiles = [];   // ['attachments/foo.png', ...]
+            $hasMetadata     = false;
             foreach ($tree as $item) {
                 if ($item['type'] !== 'blob') continue;
                 $path = $item['path'];
-
-                // .metadata.json
-                if (preg_match('#^([^/]+)/attachments/\.metadata\.json$#', $path, $m)) {
-                    $ws = $m[1];
-                    if ($workspaceTarget && $ws !== $workspaceTarget) continue;
-                    $raw = $this->getFileContent($path);
-                    if (!isset($raw['error'])) {
-                        $parsed = json_decode($raw['content'], true);
-                        if (is_array($parsed)) {
-                            $metadataByWs[$ws] = $parsed;
-                            $results['debug'][] = "Loaded metadata for workspace {$ws}: " . count($parsed) . " entries";
-                        }
-                    }
-                    continue;
-                }
-
-                // Attachment file
-                if (preg_match('#^([^/]+)/attachments/(.+)$#', $path, $m)) {
-                    $ws       = $m[1];
-                    $filename = $m[2];
-                    if ($workspaceTarget && $ws !== $workspaceTarget) continue;
-                    $attachmentFiles[$ws][] = ['path' => $path, 'filename' => $filename];
-                    continue;
-                }
-
-                // Note file
-                $ext = pathinfo($path, PATHINFO_EXTENSION);
-                if (in_array($ext, self::SUPPORTED_NOTE_EXTENSIONS)) {
-                    // Determine workspace from first path segment
-                    $ws = explode('/', $path)[0];
-                    if ($workspaceTarget && $ws !== $workspaceTarget) continue;
-                    $noteFiles[$path] = $ext;
+                if ($path === 'metadata.json') {
+                    $hasMetadata = true;
+                } elseif (strpos($path, 'entries/') === 0) {
+                    $ext = pathinfo($path, PATHINFO_EXTENSION);
+                    if (in_array($ext, self::SUPPORTED_NOTE_EXTENSIONS)) $noteFiles[] = $path;
+                } elseif (strpos($path, 'attachments/') === 0) {
+                    $attachmentFiles[] = $path;
                 }
             }
 
-            // ── 3. Download & upsert every note ──
-            $pulledPaths = [];   // track which paths we processed (for deletion step)
-
-            // Calculate totals for progress reporting
-            $totalNotes = count($noteFiles);
-            $totalAttachments = 0;
-            foreach ($attachmentFiles as $ws => $atts) {
-                $totalAttachments += count($atts);
-            }
-            $totalSteps = $totalNotes + $totalAttachments + 10; // estimates
+            $totalSteps  = count($noteFiles) + count($attachmentFiles) + 5;
             $currentStep = 0;
-            $this->updateProgress(0, $totalSteps, "Starting pull...");
+            $this->updateProgress(0, $totalSteps, 'Starting pull...');
 
-            // ── 3. Download & upsert every note (single transaction for performance + lock reduction) ──
+            // ── 2b. Download metadata.json ──
+            $metadata      = [];   // note metadata keyed by note id
+            $foldersSource = [];   // folder list to recreate
+            if ($hasMetadata) {
+                $raw = $this->getFileContent('metadata.json');
+                if (!isset($raw['error'])) {
+                    $parsed = json_decode($raw['content'], true);
+                    if (is_array($parsed)) {
+                        // Support both old format (flat) and new format (notes + folders)
+                        if (isset($parsed['notes'])) {
+                            $metadata      = $parsed['notes'];
+                            $foldersSource = $parsed['folders'] ?? [];
+                        } else {
+                            $metadata = $parsed; // legacy flat format
+                        }
+                        $results['debug'][] = 'Loaded metadata.json (' . count($metadata) . ' notes, ' . count($foldersSource) . ' folders)';
+                    }
+                }
+            }
+
+            // ── 2c. Recreate folders (parents before children) ──
+            if (!empty($foldersSource)) {
+                // Insert in multiple passes: root folders first, then children
+                $toInsert = $foldersSource;
+                $maxPasses = 10;
+                while (!empty($toInsert) && $maxPasses-- > 0) {
+                    $remaining = [];
+                    foreach ($toInsert as $folder) {
+                        // If it has a parent, make sure the parent exists first
+                        if ($folder['parent_id'] !== null) {
+                            $chk = $this->con->prepare('SELECT id FROM folders WHERE id = ?');
+                            $chk->execute([$folder['parent_id']]);
+                            if (!$chk->fetch()) {
+                                $remaining[] = $folder; // parent not yet inserted, retry later
+                                continue;
+                            }
+                        }
+                        // INSERT OR IGNORE preserves existing folders
+                        $this->con->prepare(
+                            'INSERT OR IGNORE INTO folders (id, name, workspace, parent_id, icon, icon_color) VALUES (?, ?, ?, ?, ?, ?)'
+                        )->execute([
+                            $folder['id'],
+                            $folder['name'],
+                            $folder['workspace'] ?? 'Poznote',
+                            $folder['parent_id'],
+                            $folder['icon'],
+                            $folder['icon_color'],
+                        ]);
+                        $results['debug'][] = "  Folder #{$folder['id']} '{$folder['name']}' → restored";
+                    }
+                    $toInsert = $remaining;
+                }
+                if (!empty($toInsert)) {
+                    $results['debug'][] = '  WARNING: ' . count($toInsert) . ' folder(s) could not be inserted (circular parent_id?)';
+                }
+            }
+
+            $pulledNoteIds = [];
+
+            // ── 3. Download & upsert entries ──
             $this->con->beginTransaction();
             try {
-            foreach ($noteFiles as $path => $ext) {
-                $currentStep++;
-                $this->updateProgress($currentStep, $totalSteps, "Downloading note: " . basename($path));
-                $results['debug'][] = "Processing note: {$path}";
+                foreach ($noteFiles as $path) {
+                    $currentStep++;
+                    $filename = basename($path);
+                    $this->updateProgress($currentStep, $totalSteps, "Downloading: {$filename}");
 
-                $raw = $this->getFileContent($path);
-                if (isset($raw['error'])) {
-                    $results['debug'][]  = "  ERROR fetching: " . $raw['error'];
-                    $results['errors'][] = ['path' => $path, 'error' => $raw['error']];
+                    $noteId = (int) pathinfo($filename, PATHINFO_FILENAME);
+                    if ($noteId <= 0) {
+                        $results['debug'][] = "  Skipped {$filename}: not an ID-based filename";
+                        continue;
+                    }
+
+                    $raw = $this->getFileContent($path);
+                    if (isset($raw['error'])) {
+                        $results['errors'][] = ['path' => $path, 'error' => $raw['error']];
+                        $results['debug'][]  = "  ERROR fetching {$filename}: " . $raw['error'];
+                        continue;
+                    }
+
+                    $content = $raw['content'];
+
+                    // Write to disk
+                    if (!is_dir($entriesPath)) mkdir($entriesPath, 0755, true);
+                    file_put_contents($entriesPath . '/' . $filename, $content);
+
+                    // Upsert DB
+                    $meta      = $metadata[(string) $noteId] ?? [];
+                    $checkStmt = $this->con->prepare('SELECT id FROM entries WHERE id = ?');
+                    $checkStmt->execute([$noteId]);
+                    if ($checkStmt->fetch()) {
+                        // Build dynamic UPDATE — apply metadata fields whenever available
+                        $setClauses = ['entry = ?', 'trash = 0', 'updated = ?'];
+                        $params     = [$content, $meta['updated'] ?? gmdate('Y-m-d H:i:s')];
+                        if (isset($meta['heading']))     { $setClauses[] = 'heading = ?';     $params[] = $meta['heading']; }
+                        if (isset($meta['tags']))        { $setClauses[] = 'tags = ?';        $params[] = $meta['tags']; }
+                        if (isset($meta['folder_id']))   { $setClauses[] = 'folder_id = ?';   $params[] = $meta['folder_id']; }
+                        if (isset($meta['folder']))      { $setClauses[] = 'folder = ?';      $params[] = $meta['folder']; }
+                        if (isset($meta['workspace']))   { $setClauses[] = 'workspace = ?';   $params[] = $meta['workspace']; }
+                        if (isset($meta['type']))        { $setClauses[] = 'type = ?';        $params[] = $meta['type']; }
+                        if (isset($meta['attachments'])) { $setClauses[] = 'attachments = ?'; $params[] = $meta['attachments']; }
+                        if (isset($meta['favorite']))    { $setClauses[] = 'favorite = ?';    $params[] = (int) $meta['favorite']; }
+                        if (isset($meta['created']))     { $setClauses[] = 'created = ?';     $params[] = $meta['created']; }
+                        $params[] = $noteId;
+                        $this->con->prepare('UPDATE entries SET ' . implode(', ', $setClauses) . ' WHERE id = ?')
+                                  ->execute($params);
+                        $results['updated']++;
+                        $results['debug'][] = "  {$filename} → updated";
+                    } else {
+                        $ext         = pathinfo($filename, PATHINFO_EXTENSION);
+                        $type        = $meta['type']        ?? (($ext === 'md') ? 'markdown' : 'note');
+                        $heading     = $meta['heading']     ?? $this->extractHeadingFromContent($content, $ext);
+                        $tags        = $meta['tags']        ?? '';
+                        $folderId    = $meta['folder_id']   ?? null;
+                        $folder      = $meta['folder']      ?? 'Default';
+                        $workspace   = $meta['workspace']   ?? 'Poznote';
+                        $attachments = $meta['attachments'] ?? null;
+                        $favorite    = (int) ($meta['favorite'] ?? 0);
+                        $created     = $meta['created']     ?? gmdate('Y-m-d H:i:s');
+                        $updated     = $meta['updated']     ?? gmdate('Y-m-d H:i:s');
+                        $this->con->prepare(
+                            'INSERT INTO entries (id, heading, entry, type, workspace, tags, folder_id, folder, attachments, favorite, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                        )->execute([$noteId, $heading, $content, $type, $workspace, $tags, $folderId, $folder, $attachments, $favorite, $created, $updated]);
+                        $results['pulled']++;
+                        $results['debug'][] = "  {$filename} → created (heading: {$heading})";
+                    }
+
+                    $pulledNoteIds[] = $noteId;
+                }
+                $this->con->commit();
+            } catch (Exception $transEx) {
+                $this->con->rollBack();
+                $results['errors'][] = ['path' => 'transaction', 'error' => $transEx->getMessage()];
+                $results['debug'][]  = 'Transaction rolled back: ' . $transEx->getMessage();
+            }
+
+            // ── 4. Download attachments ──
+            if (!is_dir($attachmentsPath)) mkdir($attachmentsPath, 0755, true);
+            foreach ($attachmentFiles as $path) {
+                $currentStep++;
+                $filename  = basename($path);
+                $localFile = $attachmentsPath . '/' . $filename;
+                if (file_exists($localFile)) {
+                    $this->updateProgress($currentStep, $totalSteps, "Attachment exists: {$filename}");
+                    $results['debug'][] = "  Attachment already exists: {$filename}";
                     continue;
                 }
-
-                $noteData = $this->parseNoteFromGitHub($path, $raw['content'], $ext);
-                if (empty($noteData['workspace'])) {
-                    $noteData['workspace'] = $workspaceTarget ?: 'Poznote';
+                $this->updateProgress($currentStep, $totalSteps, "Downloading attachment: {$filename}");
+                $raw = $this->getFileContent($path);
+                if (isset($raw['error'])) {
+                    $results['errors'][] = ['attachment' => $filename, 'error' => $raw['error']];
+                    $results['debug'][]  = "  Attachment ERROR {$filename}: " . $raw['error'];
+                    continue;
                 }
-
-                $ws       = $noteData['workspace'];
-                $wsMeta   = $metadataByWs[$ws] ?? [];
-
-                $existing = $this->findExistingNote($noteData);
-                try {
-                    if ($existing) {
-                        // Restore from trash if it was deleted locally but exists on remote
-                        if (!empty($existing['trash'])) {
-                            $stmtRestore = $this->con->prepare("UPDATE entries SET trash = 0 WHERE id = ?");
-                            $stmtRestore->execute([$existing['id']]);
-                            $results['debug'][] = "  → restored from trash (id={$existing['id']})";
-                        }
-                        $this->updateNote($existing['id'], $noteData, $raw['content'], $entriesPath, $wsMeta, $path);
-                        $results['updated']++;
-                        $results['debug'][] = "  → updated (id={$existing['id']})";
-                        $pulledPaths[] = $path;
-                    } else {
-                        $newId = $this->createNote($noteData, $raw['content'], $entriesPath, $wsMeta, $path);
-                        $results['pulled']++;
-                        $results['debug'][] = "  → created (id={$newId})";
-                        $pulledPaths[] = $path;
-                    }
-                } catch (Exception $e) {
-                    $results['debug'][]  = "  → EXCEPTION: " . $e->getMessage();
-                    $results['errors'][] = ['path' => $path, 'error' => $e->getMessage()];
-                }
-            }
-                $this->con->commit();
-            } catch (Exception $transactionEx) {
-                $this->con->rollBack();
-                $results['debug'][]  = "Transaction rolled back: " . $transactionEx->getMessage();
-                $results['errors'][] = ['path' => 'transaction', 'error' => $transactionEx->getMessage()];
+                file_put_contents($localFile, $raw['content']);
+                $results['debug'][] = "  Attachment saved: {$filename}";
             }
 
-            // ── 4. Download every attachment (before note upsert so files exist on disk) ──
-            foreach ($attachmentFiles as $ws => $atts) {
-                if (!is_dir($attachmentsPath)) {
-                    mkdir($attachmentsPath, 0755, true);
-                }
-                foreach ($atts as $attInfo) {
-                    $currentStep++;
-                    $localFile = $attachmentsPath . '/' . $attInfo['filename'];
-                    // Skip download if file already exists locally
-                    if (file_exists($localFile)) {
-                        $this->updateProgress($currentStep, $totalSteps, "Attachment already exists: " . $attInfo['filename']);
-                        $results['debug'][] = "Attachment already exists, skipping: {$attInfo['filename']}";
-                        continue;
-                    }
-                    $this->updateProgress($currentStep, $totalSteps, "Downloading attachment: " . $attInfo['filename']);
-                    $raw = $this->getFileContent($attInfo['path']);
-                    if (isset($raw['error'])) {
-                        $results['debug'][]  = "Attachment ERROR {$attInfo['filename']}: " . $raw['error'];
-                        $results['errors'][] = ['attachment' => $attInfo['filename'], 'error' => $raw['error']];
-                        continue;
-                    }
-                    file_put_contents($localFile, $raw['content']);
-                    $results['debug'][] = "Attachment saved: {$attInfo['filename']}";
-                }
-            }
-
-            // ── 5. Trash local notes not present on remote ──
-            $query  = "SELECT id, heading, type, folder_id, workspace FROM entries WHERE trash = 0";
-            $params = [];
-            if ($workspaceTarget) {
-                $query   .= " AND workspace = ?";
-                $params[] = $workspaceTarget;
-            }
-            $stmt       = $this->con->prepare($query);
-            $stmt->execute($params);
-            $localNotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            $this->updateProgress($currentStep, $totalSteps, "Cleaning up local notes...");
-            foreach ($localNotes as $note) {
-                $currentStep++;
-                $this->updateProgress($currentStep, $totalSteps, "Checking local note: " . ($note['heading'] ?: 'Untitled'));
-                $noteType  = $note['type'] ?? 'note';
-                $localExt  = ($noteType === 'markdown') ? 'md' : 'html';
-                $repoExt   = ($noteType === 'tasklist' || $noteType === 'excalidraw') ? 'json' : $localExt;
-                $ws        = $note['workspace'] ?? 'Poznote';
-                $folder    = $this->getFolderPath($note['folder_id']);
-                $safeTitle = $this->sanitizeFileName($note['heading'] ?: 'Untitled');
-                $expected  = $ws . '/' . ltrim(($folder ? $folder . '/' : '') . $safeTitle . '.' . $repoExt, '/');
-
-                if (!in_array($expected, $pulledPaths)) {
-                    $delStmt = $this->con->prepare("UPDATE entries SET trash = 1 WHERE id = ?");
-                    $delStmt->execute([$note['id']]);
+            // ── 5. Trash local notes not on remote ──
+            $this->updateProgress($currentStep, $totalSteps, 'Cleaning up local notes...');
+            $localIds = $this->con->query('SELECT id FROM entries WHERE trash = 0')->fetchAll(PDO::FETCH_COLUMN);
+            foreach ($localIds as $localId) {
+                if (!in_array((int) $localId, $pulledNoteIds)) {
+                    $this->con->prepare('UPDATE entries SET trash = 1 WHERE id = ?')->execute([$localId]);
                     $results['deleted']++;
-                    $results['debug'][] = "Trashed local note not on remote: {$expected} (id={$note['id']})";
+                    $results['debug'][] = "  Trashed local note id={$localId} (not on remote)";
                 }
             }
 
             // ── 6. Save sync info ──
-            $this->updateProgress($totalSteps, $totalSteps, "Pull complete!");
+            $this->updateProgress($totalSteps, $totalSteps, 'Pull complete!');
             $this->saveSyncInfo([
                 'timestamp' => date('c'),
                 'action'    => 'pull',
@@ -883,9 +821,7 @@ class GitSync {
                 'updated'   => $results['updated'],
                 'deleted'   => $results['deleted'],
                 'errors'    => count($results['errors']),
-                'workspace' => $workspaceTarget,
             ]);
-            
             $this->clearProgress();
 
         } catch (Exception $e) {
@@ -980,6 +916,12 @@ class GitSync {
             if (isset($existingFile['sha']) && is_string($existingFile['sha'])) {
                 $sha = $existingFile['sha'];
                 $fileExists = true;
+
+                // Skip push if content is identical
+                $localSha = $this->calculateGitSha($content);
+                if ($localSha === $sha) {
+                    return ['success' => true, 'sha' => $sha, 'skipped' => true];
+                }
             } elseif (isset($existingFile['error']) && ($existingFile['status'] ?? 0) != 404) {
                 // Non-404 error on the check → real problem
                 return [
@@ -1132,7 +1074,77 @@ class GitSync {
         
         return $data ?: [];
     }
-    
+
+    /**
+     * Build the full metadata array from the DB (all non-trashed notes).
+     */
+    private function buildMetadata() {
+        if (!$this->con) return [];
+
+        // Notes
+        $stmt  = $this->con->query(
+            'SELECT id, heading, tags, folder_id, folder, workspace, type, attachments, favorite, created, updated FROM entries WHERE trash = 0'
+        );
+        $notes = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $notes[(string) $row['id']] = [
+                'heading'     => $row['heading']     ?? '',
+                'tags'        => $row['tags']         ?? '',
+                'folder_id'   => $row['folder_id'] !== null ? (int) $row['folder_id'] : null,
+                'folder'      => $row['folder']       ?? '',
+                'workspace'   => $row['workspace']    ?? 'Poznote',
+                'type'        => $row['type']          ?? 'note',
+                'attachments' => $row['attachments']  ?? null,
+                'favorite'    => (int) ($row['favorite'] ?? 0),
+                'created'     => $row['created']      ?? null,
+                'updated'     => $row['updated']      ?? null,
+            ];
+        }
+
+        // Folders (full list so the hierarchy can be restored)
+        $fstmt   = $this->con->query(
+            'SELECT id, name, workspace, parent_id, icon, icon_color FROM folders ORDER BY id'
+        );
+        $folders = [];
+        foreach ($fstmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $folders[] = [
+                'id'         => (int)  $row['id'],
+                'name'       => $row['name'],
+                'workspace'  => $row['workspace'],
+                'parent_id'  => $row['parent_id'] !== null ? (int) $row['parent_id'] : null,
+                'icon'       => $row['icon'],
+                'icon_color' => $row['icon_color'],
+            ];
+        }
+
+        return ['notes' => $notes, 'folders' => $folders];
+    }
+
+    /**
+     * Push metadata.json to the repository.
+     * @param array|null $shaMap Optional SHA map for skip-if-unchanged optimisation.
+     */
+    private function pushMetadata($shaMap = null) {
+        $content = json_encode($this->buildMetadata(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        return $this->pushFile('metadata.json', $content, 'Update metadata', $shaMap);
+    }
+
+    /**
+     * Extract a heading from note content for use when creating notes pulled from remote.
+     */
+    private function extractHeadingFromContent($content, $ext) {
+        if ($ext === 'md') {
+            foreach (explode("\n", $content) as $line) {
+                $line = trim($line);
+                if ($line !== '') return ltrim($line, '# ');
+            }
+            return 'Untitled';
+        }
+        if (preg_match('/<h1[^>]*>(.*?)<\/h1>/si', $content, $m)) return strip_tags($m[1]);
+        if (preg_match('/<title[^>]*>(.*?)<\/title>/si', $content, $m)) return strip_tags($m[1]);
+        return 'Untitled';
+    }
+
     /**
      * Get folder path for a note by building path from folder hierarchy
      * @param int|null $folderId Folder ID to build path from

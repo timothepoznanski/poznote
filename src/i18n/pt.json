@@ -1786,6 +1786,7 @@
         "auto_pull_complete": "Sincronização Git concluída. Atualizando a página...",
         "auto_pull_no_changes": "Sincronização Git concluída. Nenhuma alteração encontrada.",
         "pulling": "Puxando alterações...",
+        "starting": "Sincronizando...",
         "config": {
             "title": "Configuração",
             "status": "Status",

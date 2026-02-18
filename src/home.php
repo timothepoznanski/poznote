@@ -634,7 +634,7 @@ try {
         // Show progress bar modal
         const progressBar = window.modalAlert.showProgressBar(
             title, 
-            "<?php echo addslashes(t_h('git_sync.starting', [], 'Starting sync...')); ?>"
+            "<?php echo addslashes(t_h('git_sync.starting', [], 'Syncing...')); ?>"
         );
 
         let progressInterval = setInterval(async () => {

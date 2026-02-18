@@ -1283,6 +1283,7 @@
         "auto_pull_complete": "Git pull complete. Refreshing page...",
         "auto_pull_no_changes": "Git pull complete. No changes found.",
         "pulling": "Pulling changes...",
+        "starting": "Syncing...",
         "config": {
             "title": "Configuration",
             "status": "Status",

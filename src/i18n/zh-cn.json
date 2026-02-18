@@ -1901,6 +1901,7 @@
         "auto_pull_complete": "Git 同步完成。正在刷新页面...",
         "auto_pull_no_changes": "Git 同步完成。未发现更改。",
         "pulling": "正在拉取更改...",
+        "starting": "同步中...",
         "config": {
             "title": "配置",
             "status": "状态",

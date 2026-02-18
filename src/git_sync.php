@@ -487,7 +487,7 @@ try {
             confirmPush: <?php echo json_encode(tp('git_sync.confirm_push')); ?>,
             confirmPull: <?php echo json_encode(tp('git_sync.confirm_pull')); ?>,
             allWorkspaces: <?php echo json_encode(tp('git_sync.actions.all_workspaces')); ?>,
-            starting: <?php echo json_encode(t('git_sync.starting', [], 'Starting sync...')); ?>,
+            starting: <?php echo json_encode(t('git_sync.starting', [], 'Syncing...')); ?>,
             completed: <?php echo json_encode(t('git_sync.completed', [], 'Completed!')); ?>
         };
 
