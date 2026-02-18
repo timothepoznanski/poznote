@@ -337,7 +337,7 @@ $body_classes = trim($extra_body_classes);
                     <i class="far fa-home"></i>
                 </button>
                 <button class="sidebar-settings" data-action="navigate-to-settings" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>">
-                    <i class="far fa-cog"></i>
+                    <i class="far fa-cog" style="margin: 0 5px;"></i>
                     <span class="update-badge update-badge-hidden"></span>
                 </button>
                 <button class="sidebar-plus" data-action="toggle-create-menu" title="<?php echo t_h('sidebar.create'); ?>">

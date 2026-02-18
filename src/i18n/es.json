@@ -1793,10 +1793,10 @@
     },
     "git_sync": {
         "title": "Sincronización {{provider}}",
-        "description": "Envíe sus notas a {{provider}} o extraiga notas de un repositorio existente. Un repositorio equivale a un perfil. Los espacios de trabajo serán carpetas en la raíz del repositorio.",
+        "description": "Haga una copia de seguridad de sus notas y archivos adjuntos en {{provider}}. Los archivos se almacenan como archivos planos con un metadata.json que conserva etiquetas, carpetas, fechas y adjuntos.",
         "warning": "No utilice esta función como su única solución de copia de seguridad.\nConsidere configurar exportaciones ZIP manuales o automáticas de sus notas.",
-        "confirm_push": "¿Enviar notas del espacio de trabajo \"{{workspace}}\" a {{provider}}? Updates existing files and deletes files that no longer exist in Poznote.",
-        "confirm_pull": "¿Recuperar notas del espacio de trabajo \"{{workspace}}\" de {{provider}}? Import notes from {{provider}}. Updates existing notes and moves to trash notes that no longer exist on {{provider}}.",
+        "confirm_push": "¿Enviar todas las notas y archivos adjuntos a {{provider}}? Los archivos existentes se actualizarán y los archivos que ya no están en Poznote se eliminarán del repositorio.",
+        "confirm_pull": "¿Extraer todas las notas y archivos adjuntos de {{provider}}? Los datos locales serán reemplazados por la versión remota. Las notas no encontradas en {{provider}} se moverán a la papelera.",
         "confirm_auto_pull": "Se ha iniciado una nueva sesión. ¿Quieres extraer los cambios de {{provider}}?",
         "auto_pull_complete": "Sincronización Git completa. Actualizando la página...",
         "auto_pull_no_changes": "Sincronización Git completa. No se encontraron cambios.",
@@ -1834,12 +1834,12 @@
             "all_workspaces": "Todos los espacios de trabajo",
             "push": {
                 "title": "Enviar a {{provider}}",
-                "description": "Exporta tus notas a {{provider}}. Actualiza archivos existentes y elimina archivos que ya no existen en Poznote.",
+                "description": "Exporta todas tus notas y archivos adjuntos a {{provider}} como archivos planos. Actualiza los archivos existentes y elimina los que ya no existen en Poznote.",
                 "button": "Enviar a {{provider}}"
             },
             "pull": {
                 "title": "Recuperar de {{provider}}",
-                "description": "Importa notas desde {{provider}}. Actualiza notas existentes y mueve a la papelera notas que ya no existen en {{provider}}.",
+                "description": "Importa todas las notas y archivos adjuntos desde {{provider}}. Reemplaza el contenido local y mueve a la papelera las notas que no están en el repositorio.",
                 "button": "Recuperar de {{provider}}"
             }
         },

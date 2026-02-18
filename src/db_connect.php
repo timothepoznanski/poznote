@@ -249,9 +249,7 @@ try {
             if (!in_array('type', $existingColumns)) {
                 $con->exec("ALTER TABLE entries ADD COLUMN type TEXT DEFAULT 'note'");
             }
-            if (!in_array('linked_note_id', $existingColumns)) {
-                $con->exec("ALTER TABLE entries ADD COLUMN linked_note_id INTEGER REFERENCES entries(id) ON DELETE SET NULL");
-            }
+
         } catch (Exception $e) {
             error_log('Could not add missing columns to entries: ' . $e->getMessage());
         }
@@ -330,6 +328,17 @@ try {
         $con->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('schema_version', '$CURRENT_SCHEMA_VERSION')");
     }
     // --- End schema versioning ---
+
+    // Always ensure linked_note_id column exists (may have been removed and re-added)
+    try {
+        $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
+        $existingColumns = array_column($cols, 'name');
+        if (!in_array('linked_note_id', $existingColumns)) {
+            $con->exec("ALTER TABLE entries ADD COLUMN linked_note_id INTEGER REFERENCES entries(id) ON DELETE SET NULL");
+        }
+    } catch (Exception $e) {
+        error_log('Could not add linked_note_id column: ' . $e->getMessage());
+    }
     
     // Run data migrations (convert base64 images to attachments, etc.)
     if (function_exists('runDataMigrations')) {

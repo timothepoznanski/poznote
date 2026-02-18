@@ -1912,10 +1912,10 @@
     },
     "git_sync": {
         "title": "{{provider}} 同步",
-        "description": "将您的笔记推送到 {{provider}} 或从现有仓库拉取笔记。一个仓库相当于一个用户资料。工作区将作为仓库根目录下的文件夹。",
+        "description": "将您的笔记和附件备份到 {{provider}}。文件以扁平文件形式存储，并附带保存标签、文件夹、日期和附件的 metadata.json。",
         "warning": "不要将此功能作为唯一的备份解决方案。\n请考虑为您的笔记设置手动或自动 ZIP 导出。",
-        "confirm_push": "将工作区 \"{{workspace}}\" 的笔记推送到 {{provider}} 吗？Updates existing files and deletes files that no longer exist in Poznote.",
-        "confirm_pull": "从 {{provider}} 拉取工作区 \"{{workspace}}\" 的笔记吗？Import notes from {{provider}}. Updates existing notes and moves to trash notes that no longer exist on {{provider}}.",
+        "confirm_push": "将所有笔记和附件推送到 {{provider}} 吗？现有文件将被更新，Poznote 中不再存在的文件将从仓库中删除。",
+        "confirm_pull": "从 {{provider}} 拉取所有笔记和附件吗？本地数据将被远程版本覆盖。在 {{provider}} 上找不到的笔记将被移至回收站。",
         "confirm_auto_pull": "新会话已开始。您想要从 {{provider}} 拉取更改吗？",
         "auto_pull_complete": "Git 同步完成。正在刷新页面...",
         "auto_pull_no_changes": "Git 同步完成。未发现更改。",
@@ -1953,12 +1953,12 @@
             "all_workspaces": "所有工作区",
             "push": {
                 "title": "推送到 {{provider}}",
-                "description": "将您的笔记导出到 {{provider}}。更新现有文件并删除 Poznote 中不再存在的文件。",
+                "description": "将您的所有笔记和附件作为扁平文件导出到 {{provider}}。更新现有文件并删除 Poznote 中不再存在的文件。",
                 "button": "推送到 {{provider}}"
             },
             "pull": {
                 "title": "从 {{provider}} 拉取",
-                "description": "从 {{provider}} 导入笔记。更新现有笔记并将 {{provider}} 上不再存在的笔记移至回收站。",
+                "description": "从 {{provider}} 导入所有笔记和附件。覆盖本地内容，并将仓库中不存在的笔记移至回收站。",
                 "button": "从 {{provider}} 拉取"
             }
         },

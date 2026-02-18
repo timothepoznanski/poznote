@@ -101,8 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             break;
             
         case 'push':
-            $workspace = $_POST['workspace'] ?? null;
-            $result = $gitSync->pushNotes($workspace);
+            $result = $gitSync->pushNotes();
             if ($result['success']) {
                 $message = tp('git_sync.messages.push_success', [
                     'count' => $result['pushed'],
@@ -121,12 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             break;
             
         case 'pull':
-            $workspace = $_POST['workspace'] ?? null;
-            // If empty string, convert to null for all workspaces
-            if ($workspace === '') {
-                $workspace = null;
-            }
-            $result = $gitSync->pullNotes($workspace);
+            $result = $gitSync->pullNotes();
             if ($result['success']) {
                 $message = tp('git_sync.messages.pull_success', [
                     'pulled' => $result['pulled'],
@@ -157,17 +151,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 }
 
-// Get workspaces for dropdown
-$workspaces = [];
-try {
-    $stmt = $con->query("SELECT name FROM workspaces ORDER BY name");
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $workspaces[] = $row['name'];
-    }
-} catch (Exception $e) {
-    // If workspaces table doesn't exist or query fails, continue with empty list
-    // User can still sync with all workspaces using default option
-}
 
 ?>
 <!DOCTYPE html>
@@ -259,7 +242,7 @@ try {
                     </tr>
                     <tr>
                         <td><?php echo tp_h('git_sync.limitations.metadata'); ?></td>
-                        <td class="text-center status-error"><i class="fas fa-times"></i></td>
+                        <td class="text-center status-success"><i class="fas fa-check"></i></td>
                         <td class="text-center status-success"><i class="fas fa-check"></i></td>
                     </tr>
                 </tbody>
@@ -427,15 +410,6 @@ try {
                     <p><?php echo tp_h('git_sync.actions.push.description'); ?></p>
                     <form method="post" class="sync-form">
                         <input type="hidden" name="action" value="push">
-                        <div class="form-group">
-                            <label for="push-workspace"><?php echo tp_h('git_sync.actions.workspace'); ?></label>
-                            <select name="workspace" id="push-workspace">
-                                <option value=""><?php echo tp_h('git_sync.actions.all_workspaces'); ?></option>
-                                <?php foreach ($workspaces as $ws): ?>
-                                <option value="<?php echo htmlspecialchars($ws); ?>"><?php echo htmlspecialchars($ws); ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-upload"></i> <span><?php echo tp_h('git_sync.actions.push.button'); ?></span>
                         </button>
@@ -448,18 +422,6 @@ try {
                     <p><?php echo tp_h('git_sync.actions.pull.description'); ?></p>
                     <form method="post" class="sync-form">
                         <input type="hidden" name="action" value="pull">
-                        <div class="form-group">
-                            <label for="pull-workspace"><?php echo tp_h('git_sync.actions.target_workspace'); ?></label>
-                            <select name="workspace" id="pull-workspace">
-                                <option value=""><?php echo tp_h('git_sync.actions.all_workspaces'); ?></option>
-                                <?php foreach ($workspaces as $ws): ?>
-                                <option value="<?php echo htmlspecialchars($ws); ?>"><?php echo htmlspecialchars($ws); ?></option>
-                                <?php endforeach; ?>
-                                <?php if (empty($workspaces)): ?>
-                                <option value="Poznote">Poznote</option>
-                                <?php endif; ?>
-                            </select>
-                        </div>
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-download"></i> <span><?php echo tp_h('git_sync.actions.pull.button'); ?></span>
                         </button>
@@ -485,7 +447,6 @@ try {
         const i18n = {
             confirmPush: <?php echo json_encode(tp('git_sync.confirm_push')); ?>,
             confirmPull: <?php echo json_encode(tp('git_sync.confirm_pull')); ?>,
-            allWorkspaces: <?php echo json_encode(tp('git_sync.actions.all_workspaces')); ?>,
             starting: <?php echo json_encode(t('git_sync.starting', [], 'Syncing...')); ?>,
             completed: <?php echo json_encode(t('git_sync.completed', [], 'Completed!')); ?>
         };
@@ -502,16 +463,8 @@ try {
                 // Prevent default submission
                 e.preventDefault();
                 
-                // Get selected workspace name for confirmation message
-                const workspaceSelect = form.querySelector('select[name="workspace"]');
-                const workspaceValue = workspaceSelect ? workspaceSelect.value : "";
-                const workspaceText = (workspaceSelect && workspaceSelect.value) ? 
-                    (workspaceSelect.options[workspaceSelect.selectedIndex].text) : 
-                    i18n.allWorkspaces;
-                
                 // Build confirmation message
-                let confirmMsg = (action === 'push' ? i18n.confirmPush : i18n.confirmPull)
-                    .replace('{{workspace}}', workspaceText);
+                const confirmMsg = action === 'push' ? i18n.confirmPush : i18n.confirmPull;
                 
                 // Show modal and wait for user response
                 window.modalAlert.confirm(confirmMsg).then(function(confirmed) {
@@ -543,7 +496,7 @@ try {
                             headers: {
                                 'Content-Type': 'application/json',
                             },
-                            body: JSON.stringify({ workspace: workspaceValue })
+                            body: JSON.stringify({})
                         })
                         .then(response => response.json())
                         .then(data => {

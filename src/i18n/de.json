@@ -1793,10 +1793,10 @@
     },
     "git_sync": {
         "title": "{{provider}}-Synchronisierung",
-        "description": "Übertragen Sie Ihre Notizen zu {{provider}} oder ziehen Sie Notizen aus einem bestehenden Repository. Ein Repository entspricht einem Profil. Arbeitsbereiche werden als Ordner im Repository-Stammverzeichnis abgelegt.",
+        "description": "Sichern Sie Ihre Notizen und Anhänge auf {{provider}}. Dateien werden als flache Dateien gespeichert mit einer metadata.json, die Tags, Ordner, Daten und Anhänge enthält.",
         "warning": "Verwenden Sie diese Funktion nicht als einzige Backup-Lösung.\nErwägen Sie die Einrichtung manueller oder automatischer ZIP-Exporte Ihrer Notizen.",
-        "confirm_push": "Notizen des Workspace \"{{workspace}}\" zu {{provider}} pushen? Updates existing files and deletes files that no longer exist in Poznote.",
-        "confirm_pull": "Pull notes for workspace \"{{workspace}}\" from {{provider}}? Import notes from {{provider}}. Updates existing notes and moves to trash notes that no longer exist on {{provider}}.",
+        "confirm_push": "Alle Notizen und Anhänge zu {{provider}} pushen? Vorhandene Dateien werden aktualisiert und Dateien, die nicht mehr in Poznote vorhanden sind, werden aus dem Repository gelöscht.",
+        "confirm_pull": "Alle Notizen und Anhänge von {{provider}} pullen? Lokale Daten werden mit der Remote-Version überschrieben. Notizen, die auf {{provider}} nicht gefunden werden, werden in den Papierkorb verschoben.",
         "confirm_auto_pull": "Eine neue Sitzung wurde gestartet. Möchten Sie Änderungen von {{provider}} abrufen?",
         "auto_pull_complete": "Git-Synchronisation abgeschlossen. Seite wird aktualisiert...",
         "auto_pull_no_changes": "Git-Synchronisation abgeschlossen. Keine Änderungen gefunden.",
@@ -1834,12 +1834,12 @@
             "all_workspaces": "Alle Arbeitsbereiche",
             "push": {
                 "title": "An {{provider}} senden",
-                "description": "Exportiert Ihre Notizen nach {{provider}}. Aktualisiert vorhandene Dateien und löscht Dateien, die in Poznote nicht mehr vorhanden sind.",
+                "description": "Exportiert alle Notizen und Anhänge als flache Dateien zu {{provider}}. Aktualisiert vorhandene Dateien und entfernt Dateien, die in Poznote nicht mehr vorhanden sind.",
                 "button": "An {{provider}} senden"
             },
             "pull": {
                 "title": "Von {{provider}} abrufen",
-                "description": "Importiert Notizen von {{provider}}. Aktualisiert vorhandene Notizen und verschiebt Notizen, die auf {{provider}} nicht mehr vorhanden sind, in den Papierkorb.",
+                "description": "Importiert alle Notizen und Anhänge von {{provider}}. Überschreibt lokale Inhalte und verschiebt Notizen, die nicht im Repository vorhanden sind, in den Papierkorb.",
                 "button": "Von {{provider}} abrufen"
             }
         },

@@ -1951,10 +1951,10 @@
     },
     "git_sync": {
         "title": "Synchronisation {{provider}}",
-        "description": "Poussez vos notes vers {{provider}} ou récupérez des notes depuis un dépôt existant. Un dépôt correspond à un profil utilisateur. Les espaces de travail seront organisés en dossiers à la racine du dépôt.",
+        "description": "Sauvegardez vos notes et pièces jointes sur {{provider}}. Les fichiers sont stockés à plat avec un fichier metadata.json qui préserve les tags, dossiers, dates et pièces jointes.",
         "warning": "Ne vous servez pas de cette fonctionnalité comme seule solution de sauvegarde.\nPensez à mettre en place des exports manuels ou automatiques de fichiers ZIP de vos notes.",
-        "confirm_push": "Pousser les notes de l’espace « {{workspace}} » vers {{provider}} ? Met à jour les fichiers existants et supprime ceux qui n'existent plus dans Poznote.",
-        "confirm_pull": "Récupérer les notes de l’espace « {{workspace}} » depuis {{provider}} ? Importe les notes depuis {{provider}}. Met à jour les notes existantes et déplace vers la corbeille celles qui n'existent plus sur {{provider}}.",
+        "confirm_push": "Pousser toutes les notes et pièces jointes vers {{provider}} ? Les fichiers existants seront mis à jour et les fichiers absents de Poznote seront supprimés du dépôt.",
+        "confirm_pull": "Récupérer toutes les notes et pièces jointes depuis {{provider}} ? Les données locales seront écrasées par la version distante. Les notes absentes sur {{provider}} seront déplacées dans la corbeille.",
         "confirm_auto_pull": "Une nouvelle session a commencé. Voulez-vous récupérer les changements depuis {{provider}} ?",
         "auto_pull_complete": "Synchronisation Git terminée. Rafraîchissement de la page...",
         "auto_pull_no_changes": "Synchronisation Git terminée. Aucun changement trouvé.",
@@ -2000,12 +2000,12 @@
             "all_workspaces": "Tous les espaces de travail",
             "push": {
                 "title": "Envoyer vers {{provider}}",
-                "description": "Exporte vos notes vers {{provider}}. Met à jour les fichiers existants et supprime les fichiers qui n'existent plus dans Poznote.",
+                "description": "Exporte toutes les notes et pièces jointes vers {{provider}} sous forme de fichiers plats. Met à jour les fichiers existants et supprime ceux qui n'existent plus dans Poznote.",
                 "button": "Envoyer ({{provider}})"
             },
             "pull": {
                 "title": "Récupérer depuis {{provider}}",
-                "description": "Importe les notes depuis {{provider}}. Met à jour les notes existantes et déplace dans la corbeille les notes qui n'existent plus sur {{provider}}.",
+                "description": "Importe toutes les notes et pièces jointes depuis {{provider}}. Écrase le contenu local et déplace dans la corbeille les notes absentes du dépôt.",
                 "button": "Récupérer ({{provider}})"
             }
         },
