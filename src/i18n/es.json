@@ -1830,12 +1830,12 @@
             "push": {
                 "title": "Enviar a {{provider}}",
                 "description": "Exporta tus notas a {{provider}}. Actualiza archivos existentes y elimina archivos que ya no existen en Poznote.",
-                "button": "Enviar"
+                "button": "Enviar a {{provider}}"
             },
             "pull": {
                 "title": "Recuperar de {{provider}}",
                 "description": "Importa notas desde {{provider}}. Actualiza notas existentes y mueve a la papelera notas que ya no existen en {{provider}}.",
-                "button": "Recuperar"
+                "button": "Recuperar de {{provider}}"
             }
         },
         "messages": {

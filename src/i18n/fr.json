@@ -1978,18 +1978,18 @@
         },
         "actions": {
             "title": "Actions de synchronisation",
-            "workspace": "Espace de travail",
+            "workspace": "Workspace: {{workspace}}",
             "target_workspace": "Espace de travail cible",
             "all_workspaces": "Tous les espaces de travail",
             "push": {
                 "title": "Envoyer vers {{provider}}",
                 "description": "Exporte vos notes vers {{provider}}. Met à jour les fichiers existants et supprime les fichiers qui n'existent plus dans Poznote.",
-                "button": "Envoyer"
+                "button": "Envoyer ({{provider}})"
             },
             "pull": {
                 "title": "Récupérer depuis {{provider}}",
                 "description": "Importe les notes depuis {{provider}}. Met à jour les notes existantes et déplace dans la corbeille les notes qui n'existent plus sur {{provider}}.",
-                "button": "Récupérer"
+                "button": "Récupérer ({{provider}})"
             }
         },
         "messages": {

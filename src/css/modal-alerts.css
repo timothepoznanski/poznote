@@ -95,6 +95,11 @@
     min-width: 80px;
 }
 
+.alert-modal-button:focus {
+    outline: none;
+    box-shadow: none;
+}
+
 .alert-modal-button.primary {
     background: var(--primary-color, #007bff);
     color: white;
@@ -164,11 +169,11 @@ html[data-theme='dark'] .alert-modal-button.primary:hover,
         margin: 20px;
         width: calc(100% - 40px);
     }
-    
+
     .alert-modal-footer {
         flex-direction: column;
     }
-    
+
     .alert-modal-button {
         width: 100%;
     }
@@ -180,7 +185,8 @@ html[data-theme='dark'] .alert-modal-button.primary:hover,
 }
 
 .spinner-overlay {
-    pointer-events: none; /* Prevent interaction with background */
+    pointer-events: none;
+    /* Prevent interaction with background */
 }
 
 .spinner-icon {
@@ -199,8 +205,13 @@ html[data-theme='dark'] .alert-modal-button.primary:hover,
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Dark mode spinner */

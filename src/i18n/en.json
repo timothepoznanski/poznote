@@ -1325,18 +1325,18 @@
         },
         "actions": {
             "title": "Sync Actions",
-            "workspace": "Workspace",
+            "workspace": "Workspace: {{workspace}}",
             "target_workspace": "Target Workspace",
             "all_workspaces": "All workspaces",
             "push": {
                 "title": "Push to {{provider}}",
                 "description": "Export your notes to {{provider}}. Updates existing files and deletes files that no longer exist in Poznote.",
-                "button": "Push"
+                "button": "Push ({{provider}})"
             },
             "pull": {
                 "title": "Pull from {{provider}}",
                 "description": "Import notes from {{provider}}. Updates existing notes and moves to trash notes that no longer exist on {{provider}}.",
-                "button": "Pull"
+                "button": "Pull ({{provider}})"
             }
         },
         "messages": {

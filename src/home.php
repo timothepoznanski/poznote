@@ -484,7 +484,7 @@ try {
 
             <?php if ($showGitTiles): ?>
                 <?php if ($gitEnabled): ?>
-                    <!-- GitHub Push (Enabled) -->
+                    <!-- Git Push (Enabled) -->
                     <form method="post" class="home-card home-card-green" onclick="handleSyncClick(this);">
                         <input type="hidden" name="sync_action" value="push">
                         <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($pageWorkspace); ?>">
@@ -493,11 +493,11 @@ try {
                         </div>
                         <div class="home-card-content">
                             <span class="home-card-title"><?php echo t_h('git_sync.actions.push.button', $gitProviderParams, 'Push'); ?></span>
-                            <span class="home-card-count"><?php echo htmlspecialchars($pageWorkspace ?: 'All'); ?></span>
+                            <span class="home-card-count">Workspace: <?php echo htmlspecialchars($pageWorkspace ?: 'All'); ?></span>
                         </div>
                     </form>
 
-                    <!-- GitHub Pull (Enabled) -->
+                    <!-- Git Pull (Enabled) -->
                     <form method="post" class="home-card home-card-green" onclick="handleSyncClick(this);">
                         <input type="hidden" name="sync_action" value="pull">
                         <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($pageWorkspace); ?>">
@@ -506,11 +506,11 @@ try {
                         </div>
                         <div class="home-card-content">
                             <span class="home-card-title"><?php echo t_h('git_sync.actions.pull.button', $gitProviderParams, 'Pull'); ?></span>
-                            <span class="home-card-count"><?php echo htmlspecialchars($pageWorkspace ?: 'All'); ?></span>
+                            <span class="home-card-count">Workspace: <?php echo htmlspecialchars($pageWorkspace ?: 'All'); ?></span>
                         </div>
                     </form>
                 <?php else: ?>
-                    <!-- GitHub Push (Disabled) -->
+                    <!-- Git Push (Disabled) -->
                     <a href="git_sync.php" class="home-card home-card-green">
                         <div class="home-card-icon">
                             <i class="fa-upload"></i>
@@ -521,7 +521,7 @@ try {
                         </div>
                     </a>
 
-                    <!-- GitHub Pull (Disabled) -->
+                    <!-- Git Pull (Disabled) -->
                     <a href="git_sync.php" class="home-card home-card-green">
                         <div class="home-card-icon">
                             <i class="fa-download"></i>

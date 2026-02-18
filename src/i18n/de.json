@@ -1830,12 +1830,12 @@
             "push": {
                 "title": "An {{provider}} senden",
                 "description": "Exportiert Ihre Notizen nach {{provider}}. Aktualisiert vorhandene Dateien und löscht Dateien, die in Poznote nicht mehr vorhanden sind.",
-                "button": "Senden"
+                "button": "An {{provider}} senden"
             },
             "pull": {
                 "title": "Von {{provider}} abrufen",
                 "description": "Importiert Notizen von {{provider}}. Aktualisiert vorhandene Notizen und verschiebt Notizen, die auf {{provider}} nicht mehr vorhanden sind, in den Papierkorb.",
-                "button": "Abrufen"
+                "button": "Von {{provider}} abrufen"
             }
         },
         "messages": {

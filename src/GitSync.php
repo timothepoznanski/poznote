@@ -8,7 +8,7 @@
 
 class GitSync {
     // Supported file extensions
-    const SUPPORTED_NOTE_EXTENSIONS = ['md', 'html', 'txt', 'markdown', 'json'];
+    const SUPPORTED_NOTE_EXTENSIONS = ['md', 'html', 'txt', 'markdown', 'json', 'excalidraw'];
     const MARKDOWN_EXTENSIONS = ['md', 'markdown', 'txt'];
     
     private $token;
@@ -253,8 +253,15 @@ class GitSync {
             foreach ($notes as $note) {
                 $noteId = $note['id'];
                 $noteType = $note['type'] ?? 'note';
-                $extension = ($noteType === 'markdown') ? 'md' : 'html';
-                $filePath = $entriesPath . '/' . $noteId . '.' . $extension;
+                
+                // Determine extensions
+                $localExtension = ($noteType === 'markdown') ? 'md' : 'html';
+                $repoExtension = $localExtension;
+                if ($noteType === 'tasklist' || $noteType === 'excalidraw') {
+                    $repoExtension = 'json';
+                }
+                
+                $filePath = $entriesPath . '/' . $noteId . '.' . $localExtension;
                 
                 if (!file_exists($filePath)) {
                     $results['skipped']++;
@@ -279,7 +286,7 @@ class GitSync {
                 $safeTitle = $this->sanitizeFileName($note['heading'] ?: 'Untitled');
                 
                 // Add workspace as top-level folder
-                $repoPath = $workspace . '/' . trim($folderPath . '/' . $safeTitle . '.' . $extension, '/');
+                $repoPath = $workspace . '/' . trim($folderPath . '/' . $safeTitle . '.' . $repoExtension, '/');
                 
                 $results['debug'][] = "Pushing: " . $repoPath;
                 $results['debug'][] = "Workspace: {$workspace}, Folder: {$folderPath}, Title: {$safeTitle}";
@@ -287,8 +294,8 @@ class GitSync {
                 // Track this path as expected
                 $expectedPaths[] = $repoPath;
                 
-                // Add front matter for markdown files
-                if ($noteType === 'markdown') {
+                // Add front matter to preserve metadata in Git
+                if ($noteType === 'markdown' || $noteType === 'tasklist' || $noteType === 'excalidraw') {
                     $content = $this->addFrontMatter($content, $note);
                 }
                 
@@ -683,13 +690,13 @@ class GitSync {
             
             foreach ($localNotes as $note) {
                 $noteType = $note['type'] ?? 'note';
-                $extension = ($noteType === 'markdown') ? 'md' : 'html';
+                $repoExtension = ($noteType === 'markdown') ? 'md' : (($noteType === 'tasklist' || $noteType === 'excalidraw') ? 'json' : 'html');
                 
                 // Build expected path on GitHub
                 $workspace = $note['workspace'] ?? 'Poznote';
                 $folderPath = $this->getFolderPath($note['folder_id']);
                 $safeTitle = $this->sanitizeFileName($note['heading'] ?: 'Untitled');
-                $expectedPath = $workspace . '/' . trim($folderPath . '/' . $safeTitle . '.' . $extension, '/');
+                $expectedPath = $workspace . '/' . trim($folderPath . '/' . $safeTitle . '.' . $repoExtension, '/');
                 
                 // If this note's path is not in GitHub, move it to trash
                 if (!in_array($expectedPath, $githubNotePaths)) {
@@ -1088,6 +1095,7 @@ class GitSync {
         
         $frontMatter .= "updated: " . ($note['updated'] ?? date('Y-m-d H:i:s')) . "\n";
         $frontMatter .= "poznote_id: " . $note['id'] . "\n";
+        $frontMatter .= "type: " . ($note['type'] ?? 'note') . "\n";
         $frontMatter .= "---\n\n";
         
         return $frontMatter . $content;
@@ -1132,7 +1140,7 @@ class GitSync {
         $filename = pathinfo($path, PATHINFO_FILENAME);
         
         $data = [
-            'type' => in_array($extension, self::MARKDOWN_EXTENSIONS) ? 'markdown' : 'note',
+            'type' => in_array($extension, self::MARKDOWN_EXTENSIONS) ? 'markdown' : ($extension === 'json' ? 'tasklist' : 'note'),
             'heading' => $filename,
             'tags' => '',
             'folder_path' => $folderPath,
@@ -1156,6 +1164,10 @@ class GitSync {
             
             if (preg_match('/^poznote_id:\s*(\d+)$/m', $frontMatter, $m)) {
                 $data['poznote_id'] = intval($m[1]);
+            }
+
+            if (preg_match('/^type:\s*(\w+)$/m', $frontMatter, $m)) {
+                $data['type'] = trim($m[1]);
             }
         }
         
