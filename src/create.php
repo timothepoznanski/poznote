@@ -104,6 +104,16 @@ $currentLang = getUserLanguage();
                 </div>
             </a>
 
+            <!-- Linked Note -->
+            <a href="#" class="home-card" data-create-type="linked" title="<?php echo t_h('modals.create.linked.title', [], 'Linked Note'); ?>">
+                <div class="home-card-icon">
+                    <i class="fas fa-link"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('modals.create.linked.title', [], 'Linked Note'); ?></span>
+                </div>
+            </a>
+
             <!-- Template -->
             <a href="#" class="home-card" data-create-type="template" title="<?php echo t_h('modals.create.template.title', [], 'Template'); ?>">
                 <div class="home-card-icon">
@@ -157,6 +167,7 @@ $currentLang = getUserLanguage();
     <script src="js/ui.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/utils.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/template-selector.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="js/linked-note-selector.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/modals-events.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/notes.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/folder-hierarchy.js?v=<?php echo $cache_v; ?>"></script>

@@ -45,6 +45,7 @@
     /* Hide individual action buttons in toolbar on desktop - they're in the menu */
     .note-edit-toolbar .btn-duplicate,
     .note-edit-toolbar .btn-move,
+    .note-edit-toolbar .btn-create-linked-note,
     .note-edit-toolbar .btn-download,
     .note-edit-toolbar .btn-convert,
     .note-edit-toolbar .btn-info,

@@ -164,6 +164,11 @@
                     closeTemplateNoteSelectorModal();
                 }
                 break;
+            case 'close-linked-selector-modal':
+                if (typeof closeLinkedNoteSelectorModal === 'function') {
+                    closeLinkedNoteSelectorModal();
+                }
+                break;
         }
     }
 

@@ -345,6 +345,12 @@
             "task_list": {
                 "title": "Task List"
             },
+            "linked": {
+                "title": "Linked Note",
+                "default_heading": "{{note}}",
+                "success": "Linked note created successfully",
+                "error": "Error creating linked note"
+            },
             "subfolder": {
                 "title": "Subfolder"
             },
@@ -373,6 +379,17 @@
             "title": "Change Folder Icon",
             "reset": "Restore default behavior",
             "search_placeholder": "Search icons..."
+        },
+        "linked_selector": {
+            "title": "Select Note to Link",
+            "search_placeholder": "Search notes...",
+            "recent_label": "Recent notes"
+        },
+        "delete_linked_note": {
+            "title": "Delete Linked Note",
+            "message": "What do you want to delete?",
+            "delete_link_only": "Delete this link only",
+            "delete_link_and_target": "Delete the note and all its links"
         },
         "convert": {
             "title": "Convert Note",
@@ -541,6 +558,7 @@
         },
         "errors": {
             "workspace_not_found": "Workspace not found",
+            "linked_note_already_exists": "A linked note already exists for this note",
             "method_not_allowed": "Method not allowed",
             "invalid_action": "Invalid action",
             "internal_server_error": "Internal server error",
@@ -719,6 +737,7 @@
             "add_separator": "Add separator",
             "insert_note_reference": "Insert note reference",
             "open_in_new_tab": "Open in new tab",
+            "create_linked_note": "Create linked note",
             "search_replace": "Search and replace"
         },
         "link": {
@@ -1279,7 +1298,7 @@
         "warning": "Do not use this feature as your only backup solution.\nConsider setting up manual or automatic ZIP exports of your notes.",
         "confirm_push": "Push notes of workspace \"{{workspace}}\" to {{provider}}? Updates existing files and deletes files that no longer exist in Poznote.",
         "confirm_pull": "Pull notes for workspace \"{{workspace}}\" from {{provider}}? Import notes from {{provider}}. Updates existing notes and moves to trash notes that no longer exist on {{provider}}.",
-        "confirm_auto_pull_warning": "A new session started. Do you want to pull changes from {{provider}}?\n\nWARNING: This will overwrite ALL local data!",
+        "confirm_auto_pull": "A new session started. Do you want to pull changes from {{provider}}?",
         "auto_pull_complete": "Git pull complete. Refreshing page...",
         "auto_pull_no_changes": "Git pull complete. No changes found.",
         "pulling": "Pulling changes...",
@@ -1336,7 +1355,7 @@
         "messages": {
             "connection_success": "Connection successful! Connected to {{repo}}",
             "connection_error": "Connection failed: {{error}}",
-            "push_success": "Successfully pushed {{count}} notes and {{attachments}} attachments, deleted {{deleted}} files ({{errors}} errors)",
+            "push_success": "Successfully pushed {{count}} notes, deleted {{deleted}} files ({{errors}} errors)",
             "push_error": "Push failed: {{error}}",
             "pull_success": "Successfully pulled {{pulled}} new notes, updated {{updated}} existing notes, deleted {{deleted}} notes ({{errors}} errors)",
             "pull_error": "Pull failed: {{error}}"

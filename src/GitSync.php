@@ -416,30 +416,22 @@ class GitSync {
         }
     }
     
-    // =========================================================================
-    // PUSH  — overwrite remote with local
-    // =========================================================================
-
     /**
-     * Push all local notes and attachments to Git.
-     * Strategy: local is the source of truth.
-     *   1. Build the full set of files that SHOULD exist on remote.
-     *   2. Push every file (skip if SHA unchanged to save API calls).
-     *   3. Delete every remote file that is no longer in the local set.
-     *
-     * @param string|null $workspaceFilter Only push this workspace (null = all)
-     * @return array Results
+     * Push all notes to Git repository repository
+     * @param string|null $workspaceFilter Optional workspace to filter by
+     * @return array Results with success status, counts, and errors
      */
     public function pushNotes($workspaceFilter = null) {
-        set_time_limit(0);
+        set_time_limit(0); 
 
         if (!$this->isConfigured()) {
             return ['success' => false, 'error' => 'Git sync is not configured'];
         }
+        
         if (!$this->con) {
             return ['success' => false, 'error' => 'Database connection required'];
         }
-
+        
         $results = [
             'success'            => true,
             'pushed'             => 0,
@@ -449,7 +441,7 @@ class GitSync {
             'errors'             => [],
             'debug'              => [],
         ];
-
+        
         try {
             require_once __DIR__ . '/functions.php';
             $entriesPath     = getEntriesPath();
@@ -458,7 +450,7 @@ class GitSync {
             // ── 1. Build remote SHA map ──
             $tree   = $this->getRepoTree();
             $shaMap = [];
-            if (is_array($tree) && !isset($tree['error'])) {
+            if (isset($tree) && is_array($tree) && !isset($tree['error'])) {
                 foreach ($tree as $item) {
                     if ($item['type'] === 'blob') $shaMap[$item['path']] = $item['sha'];
                 }
@@ -485,7 +477,7 @@ class GitSync {
 
                 $pushResult = $this->pushFile($repoPath, $content, "Update: {$filename}", $shaMap);
                 if ($pushResult['success']) {
-                    if (!empty($pushResult['skipped'])) {
+                    if (isset($pushResult['skipped']) && $pushResult['skipped']) {
                         $results['skipped']++;
                         $results['debug'][] = "  {$repoPath} → unchanged";
                     } else {
@@ -519,7 +511,25 @@ class GitSync {
                     $results['errors'][] = ['path' => $repoPath, 'error' => $pushResult['error']];
                     $results['debug'][]  = "  {$repoPath} → ERROR: " . $pushResult['error'];
                 }
+                
+                $results['debug'][] = "";
             }
+            
+            // Push metadata files for each workspace
+            foreach ($attachmentMetadataByWorkspace as $workspace => $metadata) {
+                if (empty($metadata)) continue;
+                
+                $metadataPath = $workspace . '/attachments/.metadata.json';
+                $metadataContent = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                $expectedPaths[] = $metadataPath;
+                
+                $results['debug'][] = "Pushing metadata file for workspace: " . $workspace;
+                $metadataPushResult = $this->pushFile(
+                    $metadataPath,
+                    $metadataContent,
+                    "Update attachments metadata",
+                    $shaMap
+                );
 
             // ── 5. Push metadata.json ──
             $this->updateProgress($currentStep, $totalSteps, 'Pushing metadata...');
@@ -571,23 +581,14 @@ class GitSync {
             $results['success']  = false;
             $results['errors'][] = ['error' => $e->getMessage()];
         }
-
+        
         return $results;
     }
-
-    // =========================================================================
-    // PULL  — overwrite local with remote
-    // =========================================================================
-
+    
     /**
-     * Pull all notes and attachments from Git.
-     * Strategy: remote is the source of truth.
-     *   1. Download every note file → upsert in DB + disk.
-     *   2. Download every attachment file → save to disk.
-     *   3. Trash every local note whose path no longer exists on remote.
-     *
-     * @param string|null $workspaceTarget Only pull into this workspace (null = all)
-     * @return array Results
+     * Pull notes from GitHub repository
+     * @param string|null $workspaceTarget Optional workspace to pull into
+     * @return array Results with success status, counts, and errors
      */
     public function pullNotes($workspaceTarget = null) {
         set_time_limit(0);
@@ -595,6 +596,7 @@ class GitSync {
         if (!$this->isConfigured()) {
             return ['success' => false, 'error' => 'Git sync is not configured'];
         }
+        
         if (!$this->con) {
             return ['success' => false, 'error' => 'Database connection required'];
         }
@@ -604,13 +606,13 @@ class GitSync {
 
         $results = [
             'success' => true,
-            'pulled'  => 0,
+            'pulled' => 0,
             'updated' => 0,
             'deleted' => 0,
-            'errors'  => [],
-            'debug'   => [],
+            'errors' => [],
+            'debug' => []
         ];
-
+        
         try {
             require_once __DIR__ . '/functions.php';
             $entriesPath     = getEntriesPath();
@@ -618,6 +620,7 @@ class GitSync {
 
             // ── 1. Get remote tree ──
             $tree = $this->getRepoTree();
+            
             if (isset($tree['error'])) {
                 return ['success' => false, 'error' => $tree['error']];
             }
@@ -829,9 +832,10 @@ class GitSync {
             $results['success']  = false;
             $results['errors'][] = ['error' => $e->getMessage()];
         }
-
+        
         return $results;
     }
+    
     /**
      * Delete a file from GitHub repository
      * @param string $path File path in repository
@@ -1256,47 +1260,24 @@ class GitSync {
      * @return string Content with front matter prepended
      */
     private function addFrontMatter($content, $note) {
-        $noteType = $note['type'] ?? 'note';
-
-        if ($noteType === 'note') {
-            // HTML notes: use an HTML comment block so the file stays valid HTML
-            // Strip any existing comment front matter first
-            $content = preg_replace('/^<!--poznote\n.*?\n-->\n*/s', '', $content);
-
-            $meta  = "<!--poznote\n";
-            $meta .= "title: " . json_encode($note['heading'] ?: 'Untitled') . "\n";
-            if (!empty($note['tags'])) {
-                $tags  = array_map('trim', explode(',', $note['tags']));
-                $meta .= "tags: [" . implode(', ', array_map('json_encode', $tags)) . "]\n";
-            }
-            $meta .= "created: " . ($note['created'] ?? date('Y-m-d H:i:s')) . "\n";
-            $meta .= "updated: " . ($note['updated'] ?? date('Y-m-d H:i:s')) . "\n";
-            $meta .= "favorite: " . (empty($note['favorite']) ? '0' : '1') . "\n";
-            $meta .= "poznote_id: " . $note['id'] . "\n";
-            $meta .= "type: note\n";
-            $meta .= "-->\n";
-            return $meta . $content;
-        }
-
-        // Markdown / tasklist / excalidraw: YAML front matter
         // Check if content already has front matter
         if (preg_match('/^---\s*\n/', $content)) {
             return $content;
         }
-
-        $frontMatter  = "---\n";
+        
+        $frontMatter = "---\n";
         $frontMatter .= "title: " . json_encode($note['heading'] ?: 'Untitled') . "\n";
+        
         if (!empty($note['tags'])) {
-            $tags         = array_map('trim', explode(',', $note['tags']));
+            $tags = array_map('trim', explode(',', $note['tags']));
             $frontMatter .= "tags: [" . implode(', ', array_map('json_encode', $tags)) . "]\n";
         }
-        $frontMatter .= "created: " . ($note['created'] ?? date('Y-m-d H:i:s')) . "\n";
+        
         $frontMatter .= "updated: " . ($note['updated'] ?? date('Y-m-d H:i:s')) . "\n";
-        $frontMatter .= "favorite: " . (empty($note['favorite']) ? '0' : '1') . "\n";
         $frontMatter .= "poznote_id: " . $note['id'] . "\n";
-        $frontMatter .= "type: " . $noteType . "\n";
+        $frontMatter .= "type: " . ($note['type'] ?? 'note') . "\n";
         $frontMatter .= "---\n\n";
-
+        
         return $frontMatter . $content;
     }
     
@@ -1314,69 +1295,63 @@ class GitSync {
      * @return array Parsed note data with workspace, folder, title, etc.
      */
     private function parseNoteFromGitHub($path, $content, $extension) {
+        // Split path into segments
         $pathParts = explode('/', $path);
-
+        
+        // If file is at root (no slash), use default workspace
         if (count($pathParts) === 1) {
-            $workspace  = 'Poznote';
+            $workspace = 'Poznote';
             $folderPath = '';
         } else {
+            // First part is the workspace
             $workspace = $pathParts[0];
-            $folderPath = count($pathParts) > 2
-                ? implode('/', array_slice($pathParts, 1, -1))
-                : '';
+            
+            // Build folder path from middle segments (exclude workspace and filename)
+            if (count($pathParts) > 2) {
+                // Get all parts except first (workspace) and last (filename)
+                $folderPath = implode('/', array_slice($pathParts, 1, -1));
+            } else {
+                // File is directly in workspace folder
+                $folderPath = '';
+            }
         }
-
+        
+        // Extract filename without extension
         $filename = pathinfo($path, PATHINFO_FILENAME);
-
+        
         $data = [
-            'type'        => in_array($extension, self::MARKDOWN_EXTENSIONS) ? 'markdown' : ($extension === 'json' ? 'tasklist' : 'note'),
-            'heading'     => $filename,
-            'tags'        => '',
+            'type' => in_array($extension, self::MARKDOWN_EXTENSIONS) ? 'markdown' : ($extension === 'json' ? 'tasklist' : 'note'),
+            'heading' => $filename,
+            'tags' => '',
             'folder_path' => $folderPath,
-            'workspace'   => $workspace,
+            'workspace' => $workspace
         ];
+        
+        // Parse front matter for markdown-like files
+        if (in_array($extension, self::MARKDOWN_EXTENSIONS) && preg_match('/^---\s*\n(.+?)\n---\s*\n/s', $content, $matches)) {
+            $frontMatter = $matches[1];
+            
+            if (preg_match('/^title:\s*(.+)$/m', $frontMatter, $m)) {
+                $data['heading'] = trim($m[1], "\" '\n");
+            }
+            
+            if (preg_match('/^tags:\s*\[(.+)\]$/m', $frontMatter, $m)) {
+                $tags = array_map(function($t) {
+                    return trim($t, "\" '\n");
+                }, explode(',', $m[1]));
+                $data['tags'] = implode(', ', $tags);
+            }
+            
+            if (preg_match('/^poznote_id:\s*(\d+)$/m', $frontMatter, $m)) {
+                $data['poznote_id'] = intval($m[1]);
+            }
 
-        // ── YAML front matter (markdown / tasklist / excalidraw) ──
-        if (preg_match('/^---\s*\n(.+?)\n---\s*\n/s', $content, $matches)) {
-            $this->parseFrontMatterBlock($matches[1], $data);
+            if (preg_match('/^type:\s*(\w+)$/m', $frontMatter, $m)) {
+                $data['type'] = trim($m[1]);
+            }
         }
-
-        // ── HTML comment front matter (HTML notes) ──
-        if (preg_match('/^<!--poznote\n(.+?)\n-->/s', $content, $matches)) {
-            $this->parseFrontMatterBlock($matches[1], $data);
-        }
-
+        
         return $data;
-    }
-
-    /**
-     * Parse a YAML-like front matter block (key: value lines) into $data.
-     */
-    private function parseFrontMatterBlock($block, array &$data) {
-        if (preg_match('/^title:\s*(.+)$/m', $block, $m)) {
-            $data['heading'] = trim($m[1], "\" '\n");
-        }
-        if (preg_match('/^tags:\s*\[(.+)\]$/m', $block, $m)) {
-            $tags = array_map(function($t) {
-                return trim($t, "\" '\n");
-            }, explode(',', $m[1]));
-            $data['tags'] = implode(', ', array_filter($tags));
-        }
-        if (preg_match('/^created:\s*(.+)$/m', $block, $m)) {
-            $data['created'] = trim($m[1]);
-        }
-        if (preg_match('/^updated:\s*(.+)$/m', $block, $m)) {
-            $data['updated'] = trim($m[1]);
-        }
-        if (preg_match('/^favorite:\s*(\d)$/m', $block, $m)) {
-            $data['favorite'] = (int)$m[1];
-        }
-        if (preg_match('/^poznote_id:\s*(\d+)$/m', $block, $m)) {
-            $data['poznote_id'] = intval($m[1]);
-        }
-        if (preg_match('/^type:\s*(\w+)$/m', $block, $m)) {
-            $data['type'] = trim($m[1]);
-        }
     }
     
     /**
@@ -1436,11 +1411,7 @@ class GitSync {
      * @return string Content without front matter
      */
     private function removeFrontMatter($content) {
-        // Strip YAML front matter (--- ... ---)
-        $content = preg_replace('/^---\s*\n.+?\n---\s*\n\n?/s', '', $content);
-        // Strip HTML comment front matter (<!--poznote ... -->)
-        $content = preg_replace('/^<!--poznote\n.*?\n-->\n*/s', '', $content);
-        return $content;
+        return preg_replace('/^---\s*\n.+?\n---\s*\n/s', '', $content);
     }
     
     /**
@@ -1451,7 +1422,7 @@ class GitSync {
      * @param array $attachmentMetadata Attachment metadata from .metadata.json
      * @return int New note ID
      */
-    private function createNote($noteData, $content, $entriesPath, $attachmentMetadata = [], $notePath = null) {
+    private function createNote($noteData, $content, $entriesPath, $attachmentMetadata = []) {
         $now = date('Y-m-d H:i:s');
         
         $cleanContent = $this->removeFrontMatter($content);
@@ -1464,18 +1435,14 @@ class GitSync {
             $folderName = $this->extractFolderName($noteData['folder_path']);
         }
         
-        // Reconstruct attachments column from content + metadata (matched by note_path)
-        $attachmentsJson = $this->reconstructAttachmentsFromContent($cleanContent, $attachmentMetadata, $notePath);
+        // Reconstruct attachments column from content
+        $attachmentsJson = $this->reconstructAttachmentsFromContent($cleanContent, $attachmentMetadata);
         
         $stmt = $this->con->prepare("
             INSERT INTO entries (heading, entry, type, tags, workspace, folder, folder_id, created, updated, trash, favorite, attachments)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, ?)
         ");
-
-        $created  = $noteData['created']  ?? $now;
-        $updated  = $noteData['updated']  ?? $now;
-        $favorite = $noteData['favorite'] ?? 0;
-
+        
         $stmt->execute([
             $noteData['heading'],
             $noteData['type'] === 'markdown' ? '' : $cleanContent,
@@ -1484,20 +1451,12 @@ class GitSync {
             $noteData['workspace'],
             $folderName,
             $folderId,
-            $created,
-            $updated,
-            $favorite,
+            $now,
+            $now,
             $attachmentsJson
         ]);
         
         $noteId = $this->con->lastInsertId();
-        
-        // Re-reconstruct attachments now that we have the real noteId (note_path matching is stable)
-        $attachmentsJson = $this->reconstructAttachmentsFromContent($cleanContent, $attachmentMetadata, $notePath);
-        if ($attachmentsJson !== null) {
-            $attStmt = $this->con->prepare("UPDATE entries SET attachments = ? WHERE id = ?");
-            $attStmt->execute([$attachmentsJson, $noteId]);
-        }
         
         // Transform attachment links from GitHub to local format
         $transformedContent = $this->transformLinksForLocal($cleanContent, $noteId, $attachmentMetadata);
@@ -1510,7 +1469,7 @@ class GitSync {
         
         // Save file
         $extension = ($noteData['type'] === 'markdown') ? 'md' : 'html';
-        $filePath  = $entriesPath . '/' . $noteId . '.' . $extension;
+        $filePath = $entriesPath . '/' . $noteId . '.' . $extension;
         file_put_contents($filePath, $transformedContent);
         
         return $noteId;
@@ -1526,7 +1485,7 @@ class GitSync {
      * @param array $attachmentMetadata Attachment metadata from .metadata.json
      * @return bool Success status
      */
-    private function updateNote($noteId, $noteData, $content, $entriesPath, $attachmentMetadata = [], $notePath = null) {
+    private function updateNote($noteId, $noteData, $content, $entriesPath, $attachmentMetadata = []) {
         $now = date('Y-m-d H:i:s');
         
         $cleanContent = $this->removeFrontMatter($content);
@@ -1539,8 +1498,8 @@ class GitSync {
             $folderName = $this->extractFolderName($noteData['folder_path']);
         }
 
-        // Reconstruct attachments column from content + metadata (matched by note_path)
-        $attachmentsJson = $this->reconstructAttachmentsFromContent($cleanContent, $attachmentMetadata, $notePath);
+        // Reconstruct attachments column from content
+        $attachmentsJson = $this->reconstructAttachmentsFromContent($cleanContent, $attachmentMetadata);
         
         // Transform attachment links from GitHub to local format
         $transformedContent = $this->transformLinksForLocal($cleanContent, $noteId, $attachmentMetadata);
@@ -1551,49 +1510,40 @@ class GitSync {
             WHERE id = ?
         ");
         
-        $updated  = $noteData['updated']  ?? $now;
-        $favorite = $noteData['favorite'] ?? 0;
-
         $stmt->execute([
             $noteData['heading'],
             $noteData['type'] === 'markdown' ? '' : $transformedContent,
             $noteData['type'],
             $noteData['tags'],
             $noteData['workspace'],
-            $updated,
+            $now,
             $folderName,
             $folderId,
             $attachmentsJson,
-            $favorite,
             $noteId
         ]);
         
         // Update file
         $extension = ($noteData['type'] === 'markdown') ? 'md' : 'html';
-        $filePath  = $entriesPath . '/' . $noteId . '.' . $extension;
+        $filePath = $entriesPath . '/' . $noteId . '.' . $extension;
         file_put_contents($filePath, $transformedContent);
         
         return true;
     }
     
     /**
-     * Reconstruct attachments column from note content and metadata.
-     * Matches attachments by:
-     *   1. Filename referenced in the note content (src/href/markdown links)
-     *   2. note_path stored in metadata (stable key — survives note deletion/re-creation)
-     *
-     * @param string      $content            Note content (local links, front matter stripped)
-     * @param array       $attachmentMetadata Metadata from .metadata.json
-     * @param string|null $notePath           Repo path of the note (e.g. "Poznote/My Note.html")
-     * @return string|null JSON encoded attachments array, or null if none found
+     * Reconstruct attachments column from note content and metadata
+     * Scans the note content for attachment references and rebuilds the attachments JSON
+     * @param string $content Note content
+     * @param array $attachmentMetadata Metadata from .metadata.json file
+     * @return string JSON encoded attachments array
      */
-    private function reconstructAttachmentsFromContent($content, $attachmentMetadata, $notePath = null) {
+    private function reconstructAttachmentsFromContent($content, $attachmentMetadata) {
         if (empty($attachmentMetadata)) {
             return null;
         }
         
         $attachments = [];
-        $addedFilenames = [];
         
         // Extract all unique filenames referenced in the content
         // Match both HTML src/href and Markdown image syntax
@@ -1618,7 +1568,7 @@ class GitSync {
             }
         }
         
-        // Build attachments array using metadata for content-referenced files
+        // Build attachments array using metadata
         foreach ($referencedFiles as $filename => $unused) {
             if (isset($attachmentMetadata[$filename])) {
                 $metadata = $attachmentMetadata[$filename];
@@ -1630,26 +1580,6 @@ class GitSync {
                     'file_type' => $metadata['file_type'],
                     'uploaded_at' => $metadata['uploaded_at']
                 ];
-                $addedFilenames[$filename] = true;
-            }
-        }
-        
-        // Also include attachments linked to this note by note_path in metadata.
-        // note_path is stable across note deletion/re-creation (unlike note_id which changes).
-        if ($notePath !== null) {
-            foreach ($attachmentMetadata as $filename => $metadata) {
-                if (isset($addedFilenames[$filename])) continue;
-                if (isset($metadata['note_path']) && $metadata['note_path'] === $notePath) {
-                    $attachments[] = [
-                        'id'                => $metadata['id'],
-                        'filename'          => $filename,
-                        'original_filename' => $metadata['original_filename'],
-                        'file_size'         => $metadata['file_size'],
-                        'file_type'         => $metadata['file_type'],
-                        'uploaded_at'       => $metadata['uploaded_at']
-                    ];
-                    $addedFilenames[$filename] = true;
-                }
             }
         }
         

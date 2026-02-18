@@ -74,7 +74,6 @@ if ($showGitSync && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sync_
         if ($syncResult['success']) {
             $syncMessage = t('git_sync.messages.push_success', array_merge($gitProviderParams, [
                 'count' => $syncResult['pushed'],
-                'attachments' => $syncResult['attachments_pushed'] ?? 0,
                 'deleted' => $syncResult['deleted'] ?? 0,
                 'errors' => count($syncResult['errors'])
             ]));
