@@ -382,6 +382,133 @@ function handleCodeBlockEnter(e, selection) {
 }
 
 /**
+ * Handle Enter key in markdown editor for list/task continuation.
+ * When pressing Enter on a line starting with "- " or "- [ ] ", auto-continues the list.
+ * Pressing Enter on an empty list item (just the prefix) exits the list.
+ * @param {Event} e - The keyboard event
+ * @param {Selection} selection - The current selection
+ * @returns {boolean} True if the event was handled
+ */
+function handleMarkdownListEnter(e, selection) {
+    if (!selection.rangeCount) return false;
+
+    var range = selection.getRangeAt(0);
+    if (!range.collapsed) return false;
+
+    var startContainer = range.startContainer;
+    if (startContainer.nodeType !== Node.TEXT_NODE) return false;
+
+    var parent = startContainer.parentElement;
+    if (!parent) return false;
+
+    // Determine if we're inside a .markdown-editor
+    var markdownEditor = null;
+    if (parent.classList && parent.classList.contains('markdown-editor')) {
+        markdownEditor = parent;
+    } else if (parent.tagName === 'DIV' && parent.parentElement &&
+               parent.parentElement.classList && parent.parentElement.classList.contains('markdown-editor')) {
+        markdownEditor = parent.parentElement;
+    }
+    if (!markdownEditor) return false;
+
+    // Get the current line element and its full text
+    var lineElement = null;
+    var lineText = '';
+    var cursorOffset = range.startOffset;
+
+    if (parent === markdownEditor) {
+        // Text node directly in the editor (e.g. very first line)
+        lineText = startContainer.textContent;
+        lineElement = null;
+    } else {
+        // Text node inside a line <div>
+        lineElement = parent;
+        lineText = parent.textContent;
+        // Cursor offset may need adjusting if there are sibling text nodes before this one
+        var offsetAdjust = 0;
+        for (var i = 0; i < parent.childNodes.length; i++) {
+            if (parent.childNodes[i] === startContainer) break;
+            offsetAdjust += (parent.childNodes[i].textContent || '').length;
+        }
+        cursorOffset = offsetAdjust + range.startOffset;
+    }
+
+    // Match task item prefix first, then plain bullet
+    var taskMatch = lineText.match(/^(- \[[ xX]\] )/);
+    var bulletMatch = !taskMatch && lineText.match(/^(- )/);
+
+    if (!taskMatch && !bulletMatch) return false;
+
+    var prefix = taskMatch ? taskMatch[1] : bulletMatch[1];
+    // Task items always continue as unchecked; bullets continue as bullets
+    var newPrefix = taskMatch ? '- [ ] ' : '- ';
+
+    e.preventDefault();
+
+    // Empty list item: just the prefix with nothing after — exit the list
+    if (lineText === prefix) {
+        if (lineElement) {
+            lineElement.innerHTML = '<br>';
+            setCursorPosition(lineElement, 0, false);
+        } else {
+            var emptyDiv = document.createElement('div');
+            emptyDiv.innerHTML = '<br>';
+            var afterEmpty = startContainer.nextSibling;
+            if (afterEmpty) {
+                markdownEditor.insertBefore(emptyDiv, afterEmpty);
+            } else {
+                markdownEditor.appendChild(emptyDiv);
+            }
+            markdownEditor.removeChild(startContainer);
+            setCursorPosition(emptyDiv, 0, false);
+        }
+        triggerNoteSave();
+        return true;
+    }
+
+    // Split line at cursor: keep text before cursor on current line, move rest to new line
+    var textBeforeCursor = lineText.slice(0, cursorOffset);
+    var textAfterCursor = lineText.slice(cursorOffset);
+    var newLineContent = newPrefix + textAfterCursor;
+
+    var newDiv = document.createElement('div');
+    if (newLineContent === '') {
+        newDiv.innerHTML = '<br>';
+    } else {
+        newDiv.textContent = newLineContent;
+    }
+
+    if (lineElement) {
+        lineElement.textContent = textBeforeCursor || '';
+        if (!textBeforeCursor) lineElement.innerHTML = '<br>';
+        markdownEditor.insertBefore(newDiv, lineElement.nextSibling);
+    } else {
+        startContainer.textContent = textBeforeCursor;
+        var insertAfter = startContainer.nextSibling;
+        if (insertAfter) {
+            markdownEditor.insertBefore(newDiv, insertAfter);
+        } else {
+            markdownEditor.appendChild(newDiv);
+        }
+    }
+
+    // Place cursor right after the new prefix
+    if (newDiv.firstChild && newDiv.firstChild.nodeType === Node.TEXT_NODE) {
+        var newRange = document.createRange();
+        newRange.setStart(newDiv.firstChild, newPrefix.length);
+        newRange.collapse(true);
+        var newSel = window.getSelection();
+        newSel.removeAllRanges();
+        newSel.addRange(newRange);
+    } else {
+        setCursorPosition(newDiv, 0, false);
+    }
+
+    triggerNoteSave();
+    return true;
+}
+
+/**
  * Handle keyboard events in the note entry area
  * @param {Event} e - The keyboard event
  */
@@ -413,7 +540,12 @@ function handleNoteEntryKeydown(e) {
                 return;
             }
         }
-        
+
+        // Handle Enter key in markdown list (bullet or task continuation)
+        if (handleMarkdownListEnter(e, selection)) {
+            return;
+        }
+
         // Handle Enter key in blockquote
         handleBlockquoteEnter(e, selection);
     }
