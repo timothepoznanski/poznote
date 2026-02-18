@@ -17,11 +17,11 @@
      */
     function closeAllNoteActionMenus() {
         var openMenus = document.querySelectorAll('.note-actions-menu.show');
-        openMenus.forEach(function(menu) {
+        openMenus.forEach(function (menu) {
             menu.classList.remove('show');
         });
         var openToggles = document.querySelectorAll('.note-actions-toggle.open');
-        openToggles.forEach(function(btn) {
+        openToggles.forEach(function (btn) {
             btn.classList.remove('open');
         });
     }
@@ -34,7 +34,7 @@
     function getFolderData(element) {
         var folderId = element.getAttribute('data-folder-id');
         var folderName = element.getAttribute('data-folder-name');
-        
+
         return {
             id: folderId ? parseInt(folderId, 10) : null,
             name: folderName
@@ -133,16 +133,16 @@
             if (searchInNotes) searchInNotes.value = '1';
             if (searchInTags) searchInTags.value = '';
             if (searchInput) {
-                searchInput.placeholder = window.t 
-                    ? window.t('search.placeholder_notes', null, 'Search for one or more words...') 
+                searchInput.placeholder = window.t
+                    ? window.t('search.placeholder_notes', null, 'Search for one or more words...')
                     : 'Search for one or more words...';
             }
         } else if (searchType === 'tags') {
             if (searchInNotes) searchInNotes.value = '';
             if (searchInTags) searchInTags.value = '1';
             if (searchInput) {
-                searchInput.placeholder = window.t 
-                    ? window.t('search.placeholder_tags', null, 'Search for one or more tags...') 
+                searchInput.placeholder = window.t
+                    ? window.t('search.placeholder_tags', null, 'Search for one or more tags...')
                     : 'Search for one or more tags...';
             }
         }
@@ -185,42 +185,42 @@
         if (!folderData.id) return;
 
         var actionMap = {
-            'create-note-in-folder': function() {
+            'create-note-in-folder': function () {
                 if (typeof window.showCreateNoteInFolderModal === 'function') {
                     window.showCreateNoteInFolderModal(folderData.id, folderData.name);
                 }
             },
-            'move-folder-files': function() {
+            'move-folder-files': function () {
                 if (typeof window.showMoveFolderFilesDialog === 'function') {
                     window.showMoveFolderFilesDialog(folderData.id, folderData.name);
                 }
             },
-            'move-entire-folder': function() {
+            'move-entire-folder': function () {
                 if (typeof window.showMoveEntireFolderDialog === 'function') {
                     window.showMoveEntireFolderDialog(folderData.id, folderData.name);
                 }
             },
-            'download-folder': function() {
+            'download-folder': function () {
                 if (typeof window.downloadFolder === 'function') {
                     window.downloadFolder(folderData.id, folderData.name);
                 }
             },
-            'rename-folder': function() {
+            'rename-folder': function () {
                 if (typeof window.editFolderName === 'function') {
                     window.editFolderName(folderData.id, folderData.name);
                 }
             },
-            'delete-folder': function() {
+            'delete-folder': function () {
                 if (typeof window.deleteFolder === 'function') {
                     window.deleteFolder(folderData.id, folderData.name);
                 }
             },
-            'change-folder-icon': function() {
+            'change-folder-icon': function () {
                 if (typeof window.showChangeFolderIconModal === 'function') {
                     window.showChangeFolderIconModal(folderData.id, folderData.name);
                 }
             },
-            'share-folder': function() {
+            'share-folder': function () {
                 if (typeof window.openPublicFolderShareModal === 'function') {
                     window.openPublicFolderShareModal(folderData.id);
                 }
@@ -330,42 +330,42 @@
 
         // Simple actions that just call global functions
         var simpleActions = {
-            'toggle-search-bar': function() {
+            'toggle-search-bar': function () {
                 event.preventDefault();
                 event.stopPropagation();
                 if (typeof window.toggleSearchBar === 'function') {
                     window.toggleSearchBar();
                 }
             },
-            'toggle-system-menu': function() {
+            'toggle-system-menu': function () {
                 event.preventDefault();
                 event.stopPropagation();
                 if (typeof window.toggleSystemMenu === 'function') {
                     window.toggleSystemMenu();
                 }
             },
-            'clear-search': function() {
+            'clear-search': function () {
                 event.preventDefault();
                 event.stopPropagation();
                 if (typeof window.clearUnifiedSearch === 'function') {
                     window.clearUnifiedSearch();
                 }
             },
-            'toggle-favorites': function() {
+            'toggle-favorites': function () {
                 event.preventDefault();
                 event.stopPropagation();
                 if (typeof window.toggleFavorites === 'function') {
                     window.toggleFavorites(actionElement);
                 }
             },
-            'close-kanban-view': function() {
+            'close-kanban-view': function () {
                 event.preventDefault();
                 event.stopPropagation();
                 if (typeof window.closeKanbanView === 'function') {
                     window.closeKanbanView();
                 }
             },
-            'toggle-folder-actions-menu': function() {
+            'toggle-folder-actions-menu': function () {
                 event.preventDefault();
                 event.stopPropagation();
                 var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
@@ -373,7 +373,7 @@
                     window.toggleFolderActionsMenu(folderId);
                 }
             },
-            'toggle-sort-submenu': function() {
+            'toggle-sort-submenu': function () {
                 event.preventDefault();
                 event.stopPropagation();
                 var chevron = actionElement.querySelector('.sort-chevron');
@@ -387,7 +387,7 @@
                     }
                 }
             },
-            'toggle-note-actions-menu': function() {
+            'toggle-note-actions-menu': function () {
                 event.preventDefault();
                 event.stopPropagation();
                 var noteId = actionElement.getAttribute('data-note-id');
@@ -395,11 +395,52 @@
                 var menu = document.getElementById('note-actions-menu-' + noteId);
                 if (!menu) return;
                 var isOpen = menu.classList.contains('show');
+
                 // Close all other open note menus first
                 closeAllNoteActionMenus();
+
                 if (!isOpen) {
+                    // Reset any previously applied manual positioning
+                    menu.style.top = '';
+                    menu.style.bottom = '';
+                    menu.style.left = '';
+                    menu.style.right = '0';
+
+                    // Show it first to get its dimensions
                     menu.classList.add('show');
                     actionElement.classList.add('open');
+
+                    // Smart positioning to detect window boundaries
+                    var rect = menu.getBoundingClientRect();
+                    var windowHeight = window.innerHeight;
+                    var windowWidth = window.innerWidth;
+
+                    // Vertical check
+                    if (rect.bottom > windowHeight) {
+                        // Not enough space below, open upwards
+                        menu.style.top = 'auto';
+                        menu.style.bottom = '100%';
+                        menu.style.marginTop = '0';
+                        menu.style.marginBottom = '2px';
+                    } else {
+                        // Enough space below, ensure default
+                        menu.style.top = '100%';
+                        menu.style.bottom = 'auto';
+                        menu.style.marginTop = '2px';
+                        menu.style.marginBottom = '0';
+                    }
+
+                    // Horizontal check (ensure it doesn't go off-screen to the right)
+                    if (rect.right > windowWidth) {
+                        var offset = rect.right - windowWidth + 10;
+                        menu.style.right = offset + 'px';
+                    }
+
+                    // Minimal check to ensure it doesn't go off-screen to the left
+                    if (rect.left < 0) {
+                        menu.style.left = '0';
+                        menu.style.right = 'auto';
+                    }
                 }
             }
         };
@@ -419,7 +460,7 @@
         // Folder menu actions
         var folderMenuActions = [
             'create-note-in-folder', 'move-folder-files', 'move-entire-folder',
-            'download-folder', 'rename-folder', 'delete-folder', 
+            'download-folder', 'rename-folder', 'delete-folder',
             'change-folder-icon', 'share-folder'
         ];
         if (folderMenuActions.indexOf(action) !== -1) {
@@ -588,7 +629,7 @@
         document.addEventListener('dblclick', handleNotesListDblClick);
 
         // Close note action menus when clicking outside or on a menu item
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (!e.target.closest('.note-actions') || e.target.closest('.note-actions-menu-item')) {
                 closeAllNoteActionMenus();
             }

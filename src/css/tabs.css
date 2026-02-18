@@ -42,7 +42,8 @@
     flex-shrink: 0;
     transition: background 0.1s ease;
     position: relative;
-    bottom: -1px; /* overlap the bar's bottom border for active state */
+    bottom: -1px;
+    /* overlap the bar's bottom border for active state */
 }
 
 .app-tab:hover {
@@ -140,9 +141,10 @@
     position: relative;
 }
 
-.note-list-item > a {
+.note-list-item>a {
     flex: 1;
-    min-width: 0; /* allow text truncation */
+    min-width: 0;
+    /* allow text truncation */
 }
 
 .note-actions {
@@ -161,7 +163,8 @@
     border-radius: 4px;
     font-size: 0.8rem;
     line-height: 1;
-    display: none; /* hidden until parent row is hovered */
+    display: none;
+    /* hidden until parent row is hovered */
     align-items: center;
     justify-content: center;
     transition: background 0.15s ease, color 0.15s ease;
@@ -184,16 +187,30 @@
     margin-top: 2px;
     background: white;
     border: 1px solid #d1d5db;
-    border-radius: 6px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    min-width: 170px;
-    padding: 4px 0;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    min-width: 180px;
+    padding: 6px 0;
     z-index: 10000;
     display: none;
+    opacity: 0;
 }
 
 .note-actions-menu.show {
     display: block;
+    animation: noteMenuFadeIn 0.2s ease-out forwards;
+}
+
+@keyframes noteMenuFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .note-actions-menu-item {

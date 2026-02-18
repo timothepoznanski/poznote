@@ -1476,7 +1476,7 @@ function executeEmptyFolder(folderId, folderName) {
 
 // Functions for moving individual notes individuelles vers des dossiers
 
-function showMoveFolderDialog(noteId) {
+function showMoveFolderDialog(noteId, forcedFolderId, forcedFolderName) {
     // Check if a valid note is selected
     if (!noteId || noteId == -1 || noteId == '' || noteId == null || noteId === undefined) {
         showNotificationPopup(
@@ -1488,11 +1488,30 @@ function showMoveFolderDialog(noteId) {
     noteid = noteId; // Set the current note ID
 
     // Store noteId in the modal dataset for later use
-    document.getElementById('moveNoteFolderModal').dataset.noteId = noteId;
+    var modal = document.getElementById('moveNoteFolderModal');
+    if (modal) modal.dataset.noteId = noteId;
 
     // Get current folder of the note
-    var currentFolderId = document.getElementById('folderId' + noteId).value;
-    var currentFolder = document.getElementById('folder' + noteId).value;
+    // Try provided arguments first, then data attributes from the triggering element (if available), then fallback to hidden inputs
+    var currentFolderId = forcedFolderId;
+    var currentFolder = forcedFolderName;
+
+    if (currentFolderId === undefined || currentFolderId === null) {
+        // Fallback to data attributes if event target is available
+        var target = event && event.target ? event.target.closest('[data-action]') : null;
+        if (target) {
+            currentFolderId = target.dataset.folderId;
+            currentFolder = target.dataset.folder;
+        }
+    }
+
+    if (currentFolderId === undefined || currentFolderId === null) {
+        // Final fallback to hidden inputs in the main column (original behavior)
+        var folderIdEl = document.getElementById('folderId' + noteId);
+        var folderEl = document.getElementById('folder' + noteId);
+        currentFolderId = folderIdEl ? folderIdEl.value : '';
+        currentFolder = folderEl ? folderEl.value : '';
+    }
 
     // Load workspaces first
     loadWorkspacesForMoveModal(function () {

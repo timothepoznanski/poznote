@@ -43,7 +43,7 @@
     // ============================================================
     // Tasklist Actions Menu Handlers
     // ============================================================
-    
+
     /**
      * Close all open tasklist action menus
      */
@@ -381,7 +381,9 @@
                 break;
             case 'show-move-folder-dialog':
                 if (noteId && typeof showMoveFolderDialog === 'function') {
-                    showMoveFolderDialog(noteId);
+                    const fId = target.dataset.folderId;
+                    const fName = target.dataset.folder;
+                    showMoveFolderDialog(noteId, fId, fName);
                 }
                 break;
             case 'show-export-modal':
@@ -498,7 +500,7 @@
     /**
      * Track opened note and process note references
      */
-    window.trackAndProcessNotes = function() {
+    window.trackAndProcessNotes = function () {
         // Track the currently opened note for recent notes list
         var noteEntry = document.querySelector('.noteentry[data-note-id]');
         if (noteEntry && typeof window.trackNoteOpened === 'function') {
@@ -591,7 +593,7 @@
             }
         }
     }
-    
+
     // Expose initializePageConfig globally so it can be called from main.js
     window.initializePageConfig = initializePageConfig;
 
@@ -646,7 +648,7 @@
         if (e.target.closest('button, a, input, textarea, select, [contenteditable="true"], .search-replace-bar, .mobile-toolbar-menu, .note-edit-toolbar, .note-tags-row, summary, details')) {
             return;
         }
-        
+
         // Also ignore if clicking on a toggle block (details/summary elements)
         if (e.target.tagName === 'SUMMARY' || e.target.tagName === 'DETAILS' || e.target.closest('.toggle-block')) {
             return;
@@ -720,11 +722,11 @@
             window.trackAndProcessNotes();
         }
         checkForDrafts();
-        
+
         // Close all toggle blocks on page load (toggles should always start closed)
         try {
             const toggleBlocks = document.querySelectorAll('details.toggle-block');
-            toggleBlocks.forEach(function(toggle) {
+            toggleBlocks.forEach(function (toggle) {
                 toggle.removeAttribute('open');
             });
         } catch (e) {
@@ -791,12 +793,12 @@
      */
     window.toggleSidebarMenu = function (event) {
         if (event) event.stopPropagation();
-        
+
         var menu = document.getElementById('sidebarMenu');
         if (!menu) return;
-        
+
         var isVisible = menu.style.display !== 'none';
-        
+
         if (isVisible) {
             menu.style.display = 'none';
         } else {
@@ -805,9 +807,9 @@
             if (createMenu) {
                 createMenu.style.display = 'none';
             }
-            
+
             menu.style.display = 'block';
-            
+
             // Close menu when clicking elsewhere
             setTimeout(function () {
                 document.addEventListener('click', function closeSidebarMenuHandler(e) {
@@ -954,21 +956,21 @@
         if (typeof hasUnsavedChanges === 'function' && typeof window.noteid !== 'undefined') {
             if (hasUnsavedChanges(window.noteid)) {
                 // Get translation function or use default message
-                const message = typeof tr === 'function' 
+                const message = typeof tr === 'function'
                     ? tr('autosave.unsaved_changes_warning', {}, '⚠️ You have unsaved changes. Are you sure you want to leave?')
                     : '⚠️ You have unsaved changes. Are you sure you want to leave?';
-                
+
                 const title = typeof tr === 'function'
                     ? tr('autosave.unsaved_changes_title', {}, 'Unsaved Changes')
                     : 'Unsaved Changes';
-                
+
                 // Use styled modal instead of native confirm
                 if (window.modalAlert && typeof window.modalAlert.confirm === 'function') {
-                    window.modalAlert.confirm(message, title).then(function(isConfirmed) {
+                    window.modalAlert.confirm(message, title).then(function (isConfirmed) {
                         if (!isConfirmed) {
                             return; // User cancelled, don't navigate
                         }
-                        
+
                         // User confirmed, try to save before leaving
                         if (typeof emergencySave === 'function') {
                             try {
@@ -977,7 +979,7 @@
                                 console.error('[Poznote] Emergency save failed:', err);
                             }
                         }
-                        
+
                         // Now perform the navigation
                         performScroll();
                     });
@@ -986,7 +988,7 @@
                     if (!confirm(message)) {
                         return; // User cancelled, don't navigate
                     }
-                    
+
                     // User confirmed, try to save before leaving
                     if (typeof emergencySave === 'function') {
                         try {
@@ -995,17 +997,17 @@
                             console.error('[Poznote] Emergency save failed:', err);
                         }
                     }
-                    
+
                     performScroll();
                 }
                 return; // Exit early since we'll call performScroll() in callback
             }
         }
-        
+
         // No unsaved changes, perform scroll immediately
         performScroll();
     };
-    
+
     /**
      * Helper function to perform the actual scroll action
      */
