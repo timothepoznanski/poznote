@@ -13,6 +13,11 @@
 (function () {
     'use strict';
 
+    /** Helper to check if tabs are enabled via global config */
+    function _areTabsEnabled() {
+        return !window.POZNOTE_CONFIG || window.POZNOTE_CONFIG.enableInternalTabs !== false;
+    }
+
     // ── State ──────────────────────────────────────────────────────────────
 
     /** @type {Array<{id: string, noteId: string, title: string}>} */
@@ -107,6 +112,11 @@
         if (!rightPane) return;
 
         var bar = document.getElementById('app-tab-bar');
+
+        if (!_areTabsEnabled()) {
+            if (bar) bar.style.display = 'none';
+            return;
+        }
         if (!bar) {
             bar = document.createElement('div');
             bar.id = 'app-tab-bar';
@@ -167,6 +177,12 @@
      * If the note is not currently displayed, loads it via AJAX.
      */
     function openInNewTab(noteId, title) {
+        if (!_areTabsEnabled()) {
+            // Fallback to old behavior: open in new browser tab
+            var url = _buildUrl(noteId);
+            window.open(url, '_blank');
+            return;
+        }
         noteId = String(noteId);
         var newTab = { id: _generateId(), noteId: noteId, title: title || 'Untitled' };
         tabs.push(newTab);
@@ -255,6 +271,7 @@
      * @param {string|number} noteId
      */
     function _onNoteLoaded(noteId) {
+        if (!_areTabsEnabled()) return;
         noteId = String(noteId);
 
         if (_pendingTabSwitch !== null) {
@@ -360,6 +377,10 @@
 
             _saveToStorage();
             render();
+            return;
+        }
+
+        if (!_areTabsEnabled()) {
             return;
         }
 

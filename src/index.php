@@ -101,11 +101,12 @@ $settings = [
     'hide_folder_counts' => null,
     'note_list_sort' => 'updated_desc',
     'notes_without_folders_after_folders' => false,
-    'hide_inline_attachment_images' => '1'
+    'hide_inline_attachment_images' => '1',
+    'enable_internal_tabs' => '1'
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'hide_inline_attachment_images')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'hide_inline_attachment_images', 'enable_internal_tabs')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -146,7 +147,12 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     $v = getAppVersion();
     ?>
     <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
-    <script>window.ALLOWED_IFRAME_DOMAINS = <?php echo json_encode(ALLOWED_IFRAME_DOMAINS); ?>;</script>
+    <script>
+        window.ALLOWED_IFRAME_DOMAINS = <?php echo json_encode(ALLOWED_IFRAME_DOMAINS); ?>;
+        window.POZNOTE_CONFIG = {
+            enableInternalTabs: <?php echo ($settings['enable_internal_tabs'] === '0' || $settings['enable_internal_tabs'] === 'false') ? 'false' : 'true'; ?>
+        };
+    </script>
     <meta name="color-scheme" content="dark light">
     <link type="text/css" rel="stylesheet" href="css/fontawesome.min.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/light.min.css?v=<?php echo $v; ?>"/>

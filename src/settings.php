@@ -429,6 +429,15 @@ if ($isAdmin) {
                 </div>
             </div>
 
+            <!-- Enable Internal Tabs -->
+            <div class="home-card" id="enable-internal-tabs-card">
+                <div class="home-card-icon"><i class="fas fa-clone"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.enable_internal_tabs', [], 'Enable internal tabs'); ?></span>
+                    <span id="enable-internal-tabs-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
+                </div>
+            </div>
+
         </div>
 
         <!-- ABOUT CATEGORY -->

@@ -19,7 +19,7 @@
     }
 
     // Use global translation function from globals.js
-    const tr = window.t || function(key, vars, fallback) {
+    const tr = window.t || function (key, vars, fallback) {
         return fallback || key;
     };
 
@@ -104,12 +104,12 @@
         function refresh() {
             getSetting(settingKey, function (value) {
                 var enabled = isSettingEnabled(value, invertLogic);
-                
+
                 if (status) {
                     status.textContent = enabled ? txt.enabled : txt.disabled;
                     status.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled');
                 }
-                
+
                 // Special handling for folder actions visibility
                 if (cardId === 'folder-actions-card') {
                     document.body.classList.toggle('folder-actions-always-visible', enabled);
@@ -158,7 +158,7 @@
             { id: 'sidebar-font-size-badge', key: 'sidebar_font_size', default: '13', i18nKey: 'display.badges.sidebar_font_size', fallback: 'Sidebar: ' }
         ];
 
-        fontBadges.forEach(function(config) {
+        fontBadges.forEach(function (config) {
             var badge = document.getElementById(config.id);
             if (badge) {
                 var size = localStorage.getItem(config.key) || config.default;
@@ -209,7 +209,7 @@
         getSetting('note_list_sort', function (value) {
             var badge = document.getElementById('note-sort-badge');
             if (!badge) return;
-            
+
             var sortValue = value || 'updated_desc';
             var sortLabel;
 
@@ -235,11 +235,11 @@
         getSetting('tasklist_insert_order', function (value) {
             var badge = document.getElementById('tasklist-insert-order-badge');
             if (!badge) return;
-            
+
             var order = (value === 'top' || value === 'bottom') ? value : 'bottom';
             var isTop = order === 'top';
-            
-            badge.textContent = isTop 
+
+            badge.textContent = isTop
                 ? tr('tasklist.insert_order_top', {}, 'Top')
                 : tr('tasklist.insert_order_bottom', {}, 'Bottom');
             badge.className = 'setting-status enabled';
@@ -259,7 +259,7 @@
         getSetting('toolbar_mode', function (value) {
             var badge = document.getElementById('toolbar-mode-badge');
             if (!badge) return;
-            
+
             var modeValue = value || 'both';
             var modeLabel;
 
@@ -346,10 +346,10 @@
             backLink.addEventListener('click', function () {
                 var href = backLink.getAttribute('data-href') || 'index.php';
                 try {
-                    var workspace = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) 
-                        ? selectedWorkspace 
-                        : (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) 
-                            ? window.selectedWorkspace 
+                    var workspace = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace)
+                        ? selectedWorkspace
+                        : (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace)
+                            ? window.selectedWorkspace
                             : null;
                     if (workspace && workspace !== '') {
                         var url = new URL(href, window.location.origin);
@@ -383,7 +383,7 @@
         clickableCards.forEach(function (card) {
             // Skip if already handled in navCards
             if (card.id && navCards[card.id]) return;
-            
+
             card.addEventListener('click', function () {
                 var href = card.getAttribute('data-href');
                 if (href) {
@@ -426,6 +426,7 @@
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
         setupToggleCard('show-inline-attachment-images-card', 'show-inline-attachment-images-status', 'hide_inline_attachment_images', true);
+        setupToggleCard('enable-internal-tabs-card', 'enable-internal-tabs-status', 'enable_internal_tabs', true);
 
         // Card click handlers for modal settings
         var languageCard = document.getElementById('language-card');
@@ -468,8 +469,8 @@
             themeModeCard.addEventListener('click', function () {
                 var modal = document.getElementById('themeModal');
                 if (!modal) return;
-                var currentMode = (typeof window.getCurrentThemeMode === 'function') 
-                    ? window.getCurrentThemeMode() 
+                var currentMode = (typeof window.getCurrentThemeMode === 'function')
+                    ? window.getCurrentThemeMode()
                     : 'system';
                 var radios = document.getElementsByName('themeChoice');
                 for (var i = 0; i < radios.length; i++) {
@@ -601,16 +602,16 @@
             noResults.style.textAlign = 'center';
             noResults.style.padding = '40px 20px';
             noResults.style.color = '#6b7280';
-            noResults.innerHTML = '<i class="fas fa-search" style="font-size: 24px; display: block; margin-bottom: 10px; opacity: 0.5;"></i>' 
+            noResults.innerHTML = '<i class="fas fa-search" style="font-size: 24px; display: block; margin-bottom: 10px; opacity: 0.5;"></i>'
                 + tr('public.no_filter_results', {}, 'No results found.');
             grid.appendChild(noResults);
 
             // Filter cards based on search term
-            searchInput.addEventListener('input', function() {
+            searchInput.addEventListener('input', function () {
                 var term = this.value.toLowerCase().trim();
                 var visibleCount = 0;
 
-                cards.forEach(function(card) {
+                cards.forEach(function (card) {
                     var titleEl = card.querySelector('.home-card-title');
                     var title = titleEl ? titleEl.textContent.toLowerCase() : '';
                     var statusEl = card.querySelector('.setting-status');
@@ -625,7 +626,7 @@
             });
 
             // Keyboard shortcut: press "/" to focus search
-            document.addEventListener('keydown', function(e) {
+            document.addEventListener('keydown', function (e) {
                 if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
                     e.preventDefault();
                     searchInput.focus();
