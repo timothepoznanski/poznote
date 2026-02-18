@@ -421,8 +421,10 @@ $body_classes = trim($extra_body_classes);
 
 
 
-    <!-- RIGHT COLUMN -->	
-    <div id="right_col">
+    <!-- RIGHT PANE (Persists during note loads) -->
+    <div id="right_pane">
+        <!-- RIGHT COLUMN -->	
+        <div id="right_col">
             
         <?php        
             // Array to collect tasklist and markdown IDs for initialization
@@ -922,7 +924,8 @@ $body_classes = trim($extra_body_classes);
                 }
             }
         ?>        
-    </div>
+        </div> <!-- Close right_col -->
+    </div> <!-- Close right_pane -->
     
     <!-- Data for initialization (used by index-events.js) -->
     <?php if (!empty($tasklist_ids)): ?>
@@ -932,8 +935,6 @@ $body_classes = trim($extra_body_classes);
     <?php if (!empty($markdown_ids)): ?>
     <script type="application/json" id="markdown-init-data"><?php echo json_encode($markdown_ids); ?></script>
     <?php endif; ?>
-        
-    </div>  <!-- Close main-container -->
     
 </body>
 <!-- Modules refactorisés de script.js -->

@@ -61,7 +61,7 @@
     border: none !important;
     box-shadow: none !important;
     outline: none !important;
-    -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;
     touch-action: manipulation !important;
 }
 
@@ -81,15 +81,18 @@
 body {
     overflow-x: auto !important;
     overflow-y: hidden !important;
-    -ms-overflow-style: none !important;  /* IE and Edge */
-    scrollbar-width: none !important;  /* Firefox */
+    -ms-overflow-style: none !important;
+    /* IE and Edge */
+    scrollbar-width: none !important;
+    /* Firefox */
     scroll-behavior: smooth !important;
     display: flex !important;
     flex-direction: row !important;
 }
 
 body::-webkit-scrollbar {
-    display: none !important;  /* Chrome, Safari and Opera */
+    display: none !important;
+    /* Chrome, Safari and Opera */
 }
 
 #left_col {
@@ -97,16 +100,28 @@ body::-webkit-scrollbar {
     max-width: 100% !important;
     min-width: 100% !important;
     flex-shrink: 0 !important;
-    -ms-overflow-style: none !important;  /* IE and Edge */
-    scrollbar-width: none !important;  /* Firefox */
-    overflow: -moz-scrollbars-none !important;  /* Firefox legacy */
+    -ms-overflow-style: none !important;
+    /* IE and Edge */
+    scrollbar-width: none !important;
+    /* Firefox */
+    overflow: -moz-scrollbars-none !important;
+    /* Firefox legacy */
     overflow-y: auto !important;
 }
 
+#right_pane,
 #right_col {
     width: 100% !important;
     min-width: 100% !important;
     flex-shrink: 0 !important;
+}
+
+#right_pane {
+    overflow: hidden !important;
+    height: 100vh !important;
+}
+
+#right_col {
     overflow-y: auto !important;
 }
 
@@ -137,12 +152,14 @@ body::-webkit-scrollbar {
 /* Mobile home button in toolbar */
 .mobile-home-btn {
     display: flex !important;
-    order: -1 !important; /* Put it first in the toolbar */
+    order: -1 !important;
+    /* Put it first in the toolbar */
 }
 
 /* Mobile menu button in toolbar - always last */
 .mobile-more-btn {
-    order: 999 !important; /* Put it last in the toolbar */
+    order: 999 !important;
+    /* Put it last in the toolbar */
 }
 
 .emoji-picker {
@@ -334,4 +351,3 @@ div[contentEditable=true][data-ph-mobile]:empty:before {
 .system-folder .fa-search.folder-icon {
     font-size: 14px !important;
 }
-

@@ -61,7 +61,7 @@
             if (!raw) return null;
             var data = JSON.parse(raw);
             if (Array.isArray(data.tabs)) return data;
-        } catch (e) {}
+        } catch (e) { }
         return null;
     }
 
@@ -93,7 +93,7 @@
     function _buildUrl(noteId) {
         var workspace = _getWorkspace();
         return 'index.php?workspace=' + encodeURIComponent(workspace) +
-               '&note=' + encodeURIComponent(noteId);
+            '&note=' + encodeURIComponent(noteId);
     }
 
     // ── Render ─────────────────────────────────────────────────────────────
@@ -103,15 +103,32 @@
      * Called after every state change and after AJAX note loads.
      */
     function render() {
-        var rightCol = document.getElementById('right_col');
-        if (!rightCol) return;
+        var rightPane = document.getElementById('right_pane') || document.getElementById('right_col');
+        if (!rightPane) return;
 
-        // Remove existing tab bar
-        var existing = document.getElementById('app-tab-bar');
-        if (existing) existing.parentNode.removeChild(existing);
+        var bar = document.getElementById('app-tab-bar');
+        if (!bar) {
+            bar = document.createElement('div');
+            bar.id = 'app-tab-bar';
 
-        var bar = document.createElement('div');
-        bar.id = 'app-tab-bar';
+            // Event delegation on the bar (only once)
+            bar.addEventListener('click', function (e) {
+                var closeBtn = e.target.closest('.app-tab-close');
+                if (closeBtn) {
+                    var tabEl = closeBtn.closest('.app-tab');
+                    if (tabEl) closeTab(tabEl.getAttribute('data-tab-id'));
+                    return;
+                }
+                var tabEl = e.target.closest('.app-tab');
+                if (tabEl) switchToTab(tabEl.getAttribute('data-tab-id'));
+            });
+
+            // Prepend to right_pane so it sits above #right_col
+            rightPane.insertBefore(bar, rightPane.firstChild);
+        }
+
+        // Clear existing tabs
+        bar.innerHTML = '';
 
         tabs.forEach(function (tab) {
             var el = document.createElement('div');
@@ -133,20 +150,13 @@
             bar.appendChild(el);
         });
 
-        // Event delegation on the bar
-        bar.addEventListener('click', function (e) {
-            var closeBtn = e.target.closest('.app-tab-close');
-            if (closeBtn) {
-                var tabEl = closeBtn.closest('.app-tab');
-                if (tabEl) closeTab(tabEl.getAttribute('data-tab-id'));
-                return;
+        // Ensure active tab is visible if bar overflowed
+        if (activeTabId) {
+            var activeEl = bar.querySelector('.app-tab.active');
+            if (activeEl && typeof activeEl.scrollIntoView === 'function') {
+                activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
             }
-            var tabEl = e.target.closest('.app-tab');
-            if (tabEl) switchToTab(tabEl.getAttribute('data-tab-id'));
-        });
-
-        // Prepend to right_col so it sits above the notecard
-        rightCol.insertBefore(bar, rightCol.firstChild);
+        }
     }
 
     // ── Public API ─────────────────────────────────────────────────────────
@@ -312,7 +322,7 @@
                 var config = JSON.parse(configEl.textContent);
                 currentNoteId = config.noteId ? String(config.noteId) : null;
             }
-        } catch (e) {}
+        } catch (e) { }
 
         // Try to restore from localStorage
         var stored = _loadFromStorage();
