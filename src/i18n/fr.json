@@ -1976,10 +1976,10 @@
         },
         "auto_sync": {
             "title": "Synchronisation automatique",
-            "push_label": "Envoyer automatiquement lors de l'enregistrement",
-            "push_description": "Pousse la version de la note vers le dépôt Git dès qu'elle est sauvegardée dans Poznote.",
+            "push_label": "Envoyer automatiquement à la sortie",
+            "push_description": "Lorsque vous quittez une note (changement de note ou fermeture de l'onglet), sa dernière version est automatiquement poussée vers le dépôt Git, si elle a été modifiée durant la session.",
             "pull_label": "Récupérer automatiquement au chargement",
-            "pull_description": "Tente de récupérer les nouvelles notes depuis le dépôt Git lors de l'ouverture de Poznote.",
+            "pull_description": "Une fois par session, demande si vous souhaitez récupérer les données depuis le dépôt Git. Met à jour les notes existantes, importe les nouvelles, et déplace dans la corbeille les notes locales absentes du remote.",
             "saving": "Configuration enregistrée"
         },
         "test": {

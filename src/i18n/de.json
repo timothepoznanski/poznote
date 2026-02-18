@@ -1816,6 +1816,14 @@
             "not_configured_yet": "Zu konfigurieren",
             "hint": "Die {{provider}}-Synchronisierung ist deaktiviert. Setzen Sie POZNOTE_GIT_SYNC_ENABLED=true in Ihrer .env-Datei, um sie zu aktivieren."
         },
+        "auto_sync": {
+            "title": "Automatische Synchronisierung",
+            "push_label": "Automatisch beim Verlassen pushen",
+            "push_description": "Wenn Sie eine Notiz verlassen (Notizwechsel oder Tab schließen), wird ihre neueste Version automatisch in das Git-Repository übertragen, sofern sie während der Sitzung geändert wurde.",
+            "pull_label": "Automatisch beim Laden abrufen",
+            "pull_description": "Fragt einmal pro Sitzung, ob aus dem Git-Repository abgerufen werden soll. Aktualisiert vorhandene Notizen, importiert neue und verschiebt lokale Notizen, die im Remote nicht gefunden werden, in den Papierkorb.",
+            "saving": "Konfiguration gespeichert"
+        },
         "test": {
             "title": "Verbindung testen",
             "button": "Verbindung testen"

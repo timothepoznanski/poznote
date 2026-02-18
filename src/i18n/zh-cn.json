@@ -1935,6 +1935,14 @@
             "not_configured_yet": "待配置",
             "hint": "{{provider}} 同步已禁用。在您的 .env 文件中设置 POZNOTE_GIT_SYNC_ENABLED=true 来启用它。"
         },
+        "auto_sync": {
+            "title": "自动同步",
+            "push_label": "离开时自动推送",
+            "push_description": "离开笔记时（切换笔记或关闭标签页），若本次会话中对笔记进行了修改，其最新版本将自动推送到 Git 仓库。",
+            "pull_label": "加载时自动拉取",
+            "pull_description": "每次会话询问一次是否从 Git 仓库拉取数据。更新现有笔记，导入新笔记，并将远程仓库中未找到的本地笔记移至回收站。",
+            "saving": "配置已保存"
+        },
         "test": {
             "title": "测试连接",
             "button": "测试连接"

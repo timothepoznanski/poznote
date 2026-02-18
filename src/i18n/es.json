@@ -1816,6 +1816,14 @@
             "not_configured_yet": "A configurar",
             "hint": "La sincronización con {{provider}} está desactivada. Establece POZNOTE_GIT_SYNC_ENABLED=true en tu archivo .env para activarla."
         },
+        "auto_sync": {
+            "title": "Sincronización Automática",
+            "push_label": "Enviar automáticamente al salir",
+            "push_description": "Al salir de una nota (cambio de nota o cierre de pestaña), su versión más reciente se envía automáticamente al repositorio Git, si fue modificada durante la sesión.",
+            "pull_label": "Recuperar automáticamente al cargar",
+            "pull_description": "Una vez por sesión, pregunta si deseas recuperar datos del repositorio Git. Actualiza las notas existentes, importa las nuevas y mueve a la papelera las notas locales no encontradas en el repositorio remoto.",
+            "saving": "Configuración guardada"
+        },
         "test": {
             "title": "Probar conexión",
             "button": "Probar conexión"

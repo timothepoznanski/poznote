@@ -527,6 +527,7 @@ class NotesController {
             if ($folder_id === 0) $folder_id = null;
             $workspace = isset($input['workspace']) ? trim($input['workspace']) : $note['workspace'];
             $folder = $note['folder'];
+            $gitPushRequested = !empty($input['git_push']);
             
             // Validate workspace if changed
             if ($workspace && $workspace !== $note['workspace']) {
@@ -681,6 +682,12 @@ class NotesController {
                     }
                 }
                 
+                // Trigger Git sync if requested, capture result for response
+                $gitPushResult = null;
+                if ($gitPushRequested || $triggerSync) {
+                    $gitPushResult = $this->triggerGitSyncWithResult($noteId, 'push');
+                }
+
                 $response = [
                     'note' => [
                         'id' => $noteId,
@@ -688,18 +695,18 @@ class NotesController {
                         'updated' => $now_utc
                     ]
                 ];
-                
+
                 // Include updated linked note IDs if any
                 if (!empty($updatedLinkedNotes)) {
                     $response['updated_linked_notes'] = $updatedLinkedNotes;
                 }
-                
-                $this->sendSuccess($response);
 
-                // Trigger auto Git sync only if explicitly requested
-                if ($triggerSync) {
-                    $this->triggerGitSync($noteId, 'push');
+                // Include git_push result if it was requested
+                if ($gitPushRequested) {
+                    $response['git_push'] = $gitPushResult ?? ['triggered' => false, 'reason' => 'not configured or disabled'];
                 }
+
+                $this->sendSuccess($response);
             } else {
                 $this->sendError(500, 'Database error while updating note');
             }
@@ -2093,29 +2100,43 @@ class NotesController {
      * Trigger automatic Git synchronization if enabled
      */
     private function triggerGitSync(int $noteId, string $action = 'push'): void {
+        $this->triggerGitSyncWithResult($noteId, $action);
+    }
+
+    /**
+     * Trigger Git sync and return a result array for inclusion in the API response.
+     */
+    private function triggerGitSyncWithResult(int $noteId, string $action = 'push'): array {
         try {
             $gitSyncFile = dirname(__DIR__, 3) . '/GitSync.php';
-            if (file_exists($gitSyncFile)) {
-                require_once $gitSyncFile;
-                // GitSync constructor handles its own requirements
-                $gitSync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
-                if ($gitSync->isAutoPushEnabled()) {
-                    if ($action === 'push') {
-                        $gitSync->pushNote($noteId);
-                    } elseif ($action === 'delete') {
-                        // For deletion, we need headings from database (trash=1 is fine here)
-                        $stmt = $this->con->prepare("SELECT heading, folder_id, workspace, type FROM entries WHERE id = ?");
-                        $stmt->execute([$noteId]);
-                        $note = $stmt->fetch(PDO::FETCH_ASSOC);
-                        if ($note) {
-                            $gitSync->deleteNoteInGit($note['heading'], $note['folder_id'], $note['workspace'], $note['type']);
-                        }
-                    }
-                }
+            if (!file_exists($gitSyncFile)) {
+                return ['triggered' => false, 'reason' => 'GitSync not found'];
             }
+            require_once $gitSyncFile;
+            $gitSync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
+            if (!$gitSync->isAutoPushEnabled()) {
+                return ['triggered' => false, 'reason' => 'not configured or disabled'];
+            }
+            if ($action === 'push') {
+                $result = $gitSync->pushNote($noteId);
+                return [
+                    'triggered' => true,
+                    'success'   => $result['success'] ?? false,
+                    'error'     => $result['error'] ?? null,
+                ];
+            } elseif ($action === 'delete') {
+                $stmt = $this->con->prepare("SELECT heading, folder_id, workspace, type FROM entries WHERE id = ?");
+                $stmt->execute([$noteId]);
+                $note = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($note) {
+                    $gitSync->deleteNoteInGit($note['heading'], $note['folder_id'], $note['workspace'], $note['type']);
+                }
+                return ['triggered' => true, 'success' => true];
+            }
+            return ['triggered' => false, 'reason' => 'unknown action'];
         } catch (Exception $e) {
-            // Silently log error to not block main API response
             error_log("Git auto-sync error: " . $e->getMessage());
+            return ['triggered' => true, 'success' => false, 'error' => $e->getMessage()];
         }
     }
 }

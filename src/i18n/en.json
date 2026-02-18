@@ -1319,10 +1319,10 @@
         },
         "auto_sync": {
             "title": "Automatic Synchronization",
-            "push_label": "Automatically push on save",
-            "push_description": "Pushes the note version to the Git repository as soon as it is saved in Poznote.",
+            "push_label": "Automatically push on exit",
+            "push_description": "When leaving a note (switching notes or closing the tab), its latest version is automatically pushed to the Git repository, if it was modified during the session.",
             "pull_label": "Automatically pull on load",
-            "pull_description": "Attempts to pull new notes from the Git repository when Poznote is opened.",
+            "pull_description": "Once per session, asks whether to pull from the Git repository. Updates existing notes, imports new ones, and moves to trash any local notes not found on the remote.",
             "saving": "Configuration saved"
         },
         "test": {
