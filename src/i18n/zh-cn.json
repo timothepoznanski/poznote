@@ -286,6 +286,7 @@
             "hint": "在笔记工具栏中使用回形针按钮向笔记添加附件。",
             "filter_placeholder": "按笔记标题或附件名称过滤...",
             "no_filter_results": "没有与您的搜索匹配的笔记。",
+            "show_thumbnails": "在此列表显示缩略图",
             "download": "下载"
         }
     },

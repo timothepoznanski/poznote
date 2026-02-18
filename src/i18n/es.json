@@ -257,7 +257,7 @@
             "uploaded_prefix": "Subido: ",
             "open_in_new_tab": "Abrir en nueva pestaña",
             "settings_banner": {
-                "message": "Los archivos adjuntos de imagen están ocultos en la lista de la nota (pero no en esta lista) porque el ajuste 'Mostrar archivos adjuntos de imagen' está desactivado.",
+                "message": "Los archivos adjuntos de imagen están ocultos en la lista de la nota (pero no en esta lista) porque el ajuste 'Mostrar adjuntos de imagen' está desactivado.",
                 "action": "Cambiar ajuste"
             }
         },
@@ -284,7 +284,8 @@
             "attachment_count_plural": "{{count}} archivos adjuntos",
             "hint": "Añada archivos adjuntos a sus notas usando el botón del clip en la barra de herramientas.",
             "filter_placeholder": "Filtrar por título de nota o nombre de archivo adjunto...",
-            "no_filter_results": "Ninguna nota coincide con su búsqueda.",
+            "no_filter_results": "Ninguna note coincide con su búsqueda.",
+            "show_thumbnails": "Mostrar miniaturas en esta lista",
             "download": "Descargar"
         }
     },
@@ -429,7 +430,7 @@
             "kanban_on_folder_click": "Abrir vista Kanban al hacer clic en la carpeta",
             "index_icon_scale": "Escalado de iconos del índice",
             "note_content_width": "Ancho del contenido de la nota",
-            "show_inline_attachment_images": "Mostrar archivos adjuntos de imagen"
+            "show_inline_attachment_images": "Mostrar adjuntos de imagen"
         },
         "badges": {
             "font_size_default": "predeterminado ({{size}}px)",

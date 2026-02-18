@@ -350,7 +350,8 @@ html[data-theme='dark'] .users-table td {
 }
 
 .form-group input:not([type="checkbox"]),
-.form-group select {
+.form-group select,
+.form-group textarea {
     width: 100%;
     padding: 10px 12px;
     border: 1px solid var(--border-color, #ddd);
@@ -358,6 +359,7 @@ html[data-theme='dark'] .users-table td {
     font-size: 14px;
     background: var(--bg-color, #fff);
     color: var(--text-color, #333);
+    box-sizing: border-box;
 }
 
 .form-group input:not([type="checkbox"]):focus,
@@ -639,8 +641,10 @@ input.admin-toggle:disabled:checked+.slider {
     }
 
     .modal-content {
-        padding: 20px;
-        width: 95%;
+        padding: 20px 25px 20px 20px;
+        width: calc(100% - 40px);
+        margin: 20px;
+        box-sizing: border-box;
     }
 }
 

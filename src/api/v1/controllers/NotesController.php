@@ -88,9 +88,10 @@ class NotesController {
                 $stmtSetting = $this->con->prepare('SELECT value FROM settings WHERE key = ?');
                 $stmtSetting->execute(['notes_without_folders_after_folders']);
                 $settingValue = $stmtSetting->fetchColumn();
-                $notes_without_folders_after = ($settingValue === '1' || $settingValue === 'true');
+                $notes_without_folders_after = ($settingValue !== '0' && $settingValue !== 'false' && $settingValue !== false);
             } catch (Exception $e) {
                 // ignore
+                $notes_without_folders_after = true; // default
             }
             
             $folder_null_case = $notes_without_folders_after ? '1' : '0';
@@ -1390,7 +1391,7 @@ class NotesController {
         $workspace = $_GET['workspace'] ?? null;
         
         try {
-            $query = "SELECT id, heading, attachments, updated 
+            $query = "SELECT id, heading, entry, attachments, updated 
                       FROM entries 
                       WHERE trash = 0 
                       AND attachments IS NOT NULL 
@@ -1416,6 +1417,7 @@ class NotesController {
                     $notes[] = [
                         'id' => $row['id'],
                         'heading' => $row['heading'],
+                        'entry' => $row['entry'],
                         'attachments' => $attachments,
                         'updated' => $row['updated']
                     ];

@@ -100,7 +100,7 @@ $settings = [
     'hide_folder_actions' => null,
     'hide_folder_counts' => null,
     'note_list_sort' => 'updated_desc',
-    'notes_without_folders_after_folders' => false,
+    'notes_without_folders_after_folders' => '1',
     'hide_inline_attachment_images' => '1'
 ];
 
@@ -260,7 +260,7 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
 // Load note list sort preference using previously loaded settings
 $note_list_sort_type = 'updated_desc'; // default
 $pref = $settings['note_list_sort'];
-$notes_without_folders_after = ($settings['notes_without_folders_after_folders'] === '1' || $settings['notes_without_folders_after_folders'] === 'true');
+$notes_without_folders_after = ($settings['notes_without_folders_after_folders'] !== '0' && $settings['notes_without_folders_after_folders'] !== 'false' && $settings['notes_without_folders_after_folders'] !== false);
 
 $folder_null_case = $notes_without_folders_after ? '1' : '0';
 $folder_case = $notes_without_folders_after ? '0' : '1';

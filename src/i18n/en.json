@@ -222,7 +222,8 @@
             "attachment_count_plural": "{{count}} attachments",
             "hint": "Add attachments to your notes using the paperclip button in the toolbar.",
             "filter_placeholder": "Filter by note title or attachment name...",
-            "no_filter_results": "No notes match your search."
+            "no_filter_results": "No notes match your search.",
+            "show_thumbnails": "Show thumbnails in this list"
         }
     },
     "modals": {

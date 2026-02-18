@@ -85,6 +85,15 @@ body.attachments-page {
     gap: 15px;
 }
 
+.filter-options-bar {
+    max-width: 900px;
+    margin: -20px auto 20px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+}
+
 .filter-input-wrapper {
     position: relative;
     flex: 1;
@@ -344,7 +353,7 @@ body.attachments-page {
         scrollbar-width: auto !important;
         -ms-overflow-style: scrollbar !important;
     }
-    
+
     body {
         overflow: auto !important;
         overflow-y: scroll !important;
@@ -356,41 +365,41 @@ body.attachments-page {
         scrollbar-width: auto !important;
         -ms-overflow-style: scrollbar !important;
     }
-    
+
     body.attachments-page {
         padding: 10px;
     }
-    
+
     .attachments-container {
         padding: 10px;
         padding-bottom: 20px;
     }
-    
+
     .attachments-header {
         font-size: 1.8em;
         margin-top: 20px;
         margin-bottom: 15px;
     }
-    
+
     .attachments-buttons-container {
         justify-content: center;
         margin: 15px 10px;
     }
-    
+
     .attachment-item {
         flex-wrap: wrap;
         gap: 8px;
     }
-    
+
     .attachment-filename {
         flex-basis: 100%;
         order: 2;
     }
-    
+
     .attachment-size {
         order: 3;
     }
-    
+
     .btn-download {
         order: 4;
     }
@@ -457,22 +466,69 @@ body.attachments-page {
 }
 
 /* Font Awesome icon definitions */
-.fa-spinner::before { content: "\f110"; }
-.fa-exclamation-triangle::before { content: "\f071"; }
-.fa-times::before { content: "\f00d"; }
-.fa-paperclip::before { content: "\f0c6"; }
-.fa-download::before { content: "\f019"; }
-.fa-file::before { content: "\f15b"; }
-.fa-file-image::before { content: "\f1c5"; }
-.fa-file-pdf::before { content: "\f1c1"; }
-.fa-file-word::before { content: "\f1c2"; }
-.fa-file-excel::before { content: "\f1c3"; }
-.fa-file-powerpoint::before { content: "\f1c4"; }
-.fa-file-alt::before { content: "\f15c"; }
-.fa-file-archive::before { content: "\f1c6"; }
-.fa-file-code::before { content: "\f1c9"; }
-.fa-file-video::before { content: "\f1c8"; }
-.fa-file-audio::before { content: "\f1c7"; }
+.fa-spinner::before {
+    content: "\f110";
+}
+
+.fa-exclamation-triangle::before {
+    content: "\f071";
+}
+
+.fa-times::before {
+    content: "\f00d";
+}
+
+.fa-paperclip::before {
+    content: "\f0c6";
+}
+
+.fa-download::before {
+    content: "\f019";
+}
+
+.fa-file::before {
+    content: "\f15b";
+}
+
+.fa-file-image::before {
+    content: "\f1c5";
+}
+
+.fa-file-pdf::before {
+    content: "\f1c1";
+}
+
+.fa-file-word::before {
+    content: "\f1c2";
+}
+
+.fa-file-excel::before {
+    content: "\f1c3";
+}
+
+.fa-file-powerpoint::before {
+    content: "\f1c4";
+}
+
+.fa-file-alt::before {
+    content: "\f15c";
+}
+
+.fa-file-archive::before {
+    content: "\f1c6";
+}
+
+.fa-file-code::before {
+    content: "\f1c9";
+}
+
+.fa-file-video::before {
+    content: "\f1c8";
+}
+
+.fa-file-audio::before {
+    content: "\f1c7";
+}
 
 .fa-spinner,
 .fa-exclamation-triangle,
@@ -506,83 +562,132 @@ body.attachments-page {
 }
 
 @keyframes fa-spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Attachment list grouping styles */
 .attachment-row {
-	padding: 16px 0;
-	border-bottom: 1px solid var(--border-color, #e0e0e0);
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-color, #e0e0e0);
 }
 
 .attachment-row:last-child {
-	border-bottom: none;
+    border-bottom: none;
 }
 
 .attachment-note-name {
-	display: block;
-	font-weight: 500;
-	color: var(--link-color, #007bff);
-	text-decoration: none;
-	margin-bottom: 8px;
+    display: block;
+    font-weight: 500;
+    color: var(--link-color, #007bff);
+    text-decoration: none;
+    margin-bottom: 8px;
 }
 
 .attachment-note-name:hover {
-	text-decoration: underline;
+    text-decoration: underline;
 }
 
 .attachment-files-list {
-	margin-left: 20px;
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .attachment-file-item {
-	color: var(--text-muted, #666);
-	font-size: 14px;
-	display: flex;
-	align-items: center;
-	gap: 8px;
+    color: var(--text-muted, #666);
+    font-size: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.attachment-file-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.attachment-image-preview {
+    margin-top: 5px;
+}
+
+.attachment-image-preview img {
+    max-width: 150px;
+    max-height: 150px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color, #e0e0e0);
+    background: #f8f9fa;
+    display: block;
+}
+
+[data-theme="dark"] .attachment-image-preview img {
+    background: #1e1e1e;
 }
 
 .attachment-file-item .fa-paperclip {
-	font-size: 12px;
+    font-size: 12px;
+    margin-top: 3px;
 }
 
 .attachment-file-link {
-	color: var(--text-muted, #666);
-	text-decoration: none;
-	cursor: pointer;
+    color: var(--text-muted, #666);
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .attachment-file-link:hover {
-	color: var(--link-color, #007bff);
-	text-decoration: underline;
+    color: var(--link-color, #007bff);
+    text-decoration: underline;
 }
 
 .attachment-count {
-	color: var(--text-muted, #666);
-	font-size: 13px;
-	margin-left: 8px;
-	font-weight: normal;
+    color: var(--text-muted, #666);
+    font-size: 13px;
+    margin-left: 8px;
+    font-weight: normal;
 }
 
 .attachments-list-container {
-	max-width: 900px;
-	margin: 0 auto;
+    max-width: 900px;
+    margin: 0 auto;
 }
 
 @media (max-width: 600px) {
-	.attachment-files-list {
-		margin-left: 10px;
-	}
+    .attachment-files-list {
+        margin-left: 10px;
+    }
 }
 
 /* ===========================================
    UTILITY CLASSES FOR INLINE STYLE EXTRACTION
    =========================================== */
+
+/* Toggle Checkbox Styles */
+.toggle-checkbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 10px;
+    user-select: none;
+}
+
+.toggle-checkbox input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.toggle-label {
+    font-weight: 500;
+}
 
 /* Hidden by default */
 .initially-hidden {

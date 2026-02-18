@@ -284,6 +284,7 @@
             "hint": "Adicione anexos às suas notas usando o botão de clipe na barra de ferramentas.",
             "filter_placeholder": "Filtrar por título da nota ou nome do anexo...",
             "no_filter_results": "Nenhuma nota corresponde à sua pesquisa.",
+            "show_thumbnails": "Mostrar miniaturas nesta lista",
             "download": "Baixar"
         }
     },

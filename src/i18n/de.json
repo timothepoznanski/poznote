@@ -257,7 +257,7 @@
             "uploaded_prefix": "Hochgeladen: ",
             "open_in_new_tab": "In neuem Tab öffnen",
             "settings_banner": {
-                "message": "Bildanhänge werden in der Notizliste ausgeblendet (aber nicht hier in der Liste), da die Einstellung 'Bild-Anhänge anzeigen' deaktiviert ist.",
+                "message": "Bildanhänge werden in der Notizliste ausgeblendet (aber nicht hier in der Liste), da die Einstellung 'Bildanhänge anzeigen' deaktiviert ist.",
                 "action": "Einstellung ändern"
             }
         },
@@ -285,6 +285,7 @@
             "hint": "Fügen Sie Ihren Notizen Anhänge hinzu, indem Sie auf das Büroklammer-Symbol in der Symbolleiste klicken.",
             "filter_placeholder": "Nach Notizentitel oder Anhangsname filtern...",
             "no_filter_results": "Keine Notizen entsprechen Ihrer Suche.",
+            "show_thumbnails": "Vorschaubilder in dieser Liste anzeigen",
             "download": "Herunterladen"
         }
     },
@@ -429,7 +430,7 @@
             "kanban_on_folder_click": "Kanban-Ansicht beim Klicken auf Ordner öffnen",
             "index_icon_scale": "Skalierung der Index-Symbole",
             "note_content_width": "Breite des Notizinhalts",
-            "show_inline_attachment_images": "Bild-Anhänge anzeigen"
+            "show_inline_attachment_images": "Bildanhänge anzeigen"
         },
         "badges": {
             "font_size_default": "Standard ({{size}}px)",

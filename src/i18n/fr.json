@@ -266,7 +266,7 @@
             "open_in_new_tab": "Ouvrir dans un nouvel onglet",
             "pdf_label": "PDF",
             "settings_banner": {
-                "message": "Les images en pièces jointes sont masquées de la liste de la note (mais pas de la liste ici) car le paramètre 'Afficher les pièces jointes images' est désactivé.",
+                "message": "Les images en pièces jointes sont masquées de la liste de la note (mais pas de la liste ici) car le paramètre 'Afficher les images jointes' est désactivé.",
                 "action": "Modifier le réglage"
             }
         },
@@ -294,6 +294,7 @@
             "hint": "Ajoutez des pièces jointes à vos notes en utilisant le bouton trombone dans la barre d'outils.",
             "filter_placeholder": "Filtrer par titre de note ou nom de pièce jointe...",
             "no_filter_results": "Aucune note ne correspond à votre recherche.",
+            "show_thumbnails": "Afficher les miniatures dans cette liste",
             "download": "Télécharger"
         }
     },
@@ -447,7 +448,7 @@
             "kanban_on_folder_click": "Ouvrir la vue Kanban au clic sur dossier",
             "index_icon_scale": "Taille des icônes (Index)",
             "note_content_width": "Largeur du contenu de la note",
-            "show_inline_attachment_images": "Afficher les pièces jointes images"
+            "show_inline_attachment_images": "Afficher les images jointes"
         },
         "badges": {
             "font_size_default": "par défaut ({{size}}px)",
