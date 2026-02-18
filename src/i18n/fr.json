@@ -650,7 +650,6 @@
             "insert_checklist": "Insérer une checklist",
             "add_separator": "Ajouter un séparateur",
             "insert_note_reference": "Insérer une référence de note",
-            "create_linked_note": "Créer une note liée",
             "open_in_new_tab": "Ouvrir dans un nouvel onglet"
         },
         "link": {
@@ -765,11 +764,6 @@
             "target_folder": "Sélectionnez le dossier cible :",
             "enter_folder_name": "Veuillez saisir un nom de dossier"
         },
-        "git_sync": {
-            "confirm_auto_pull": "Une nouvelle session a démarré. Voulez-vous récupérer les modifications depuis {{provider}} ?",
-            "auto_pull_complete": "Synchronisation Git terminée. Actualisation de la page...",
-            "auto_pull_no_changes": "Synchronisation Git terminée. Aucune modification trouvée."
-        },
         "move_folder_files": {
             "title": "Déplacer tous les fichiers",
             "prompt_prefix": "Déplacer tous les fichiers depuis",
@@ -803,12 +797,6 @@
             "task_list": {
                 "title": "Liste de tâches"
             },
-            "linked": {
-                "title": "Note liée",
-                "default_heading": "{{note}}",
-                "success": "Note liée créée avec succès",
-                "error": "Erreur lors de la création de la note liée"
-            },
             "subfolder": {
                 "title": "Sous-dossier"
             },
@@ -837,17 +825,6 @@
             "title": "Changer l'icône du dossier",
             "reset": "Reset",
             "search_placeholder": "Rechercher des icônes..."
-        },
-        "linked_selector": {
-            "title": "Sélectionner une note à lier",
-            "search_placeholder": "Rechercher des notes...",
-            "recent_label": "Notes récentes"
-        },
-        "delete_linked_note": {
-            "title": "Supprimer la note liée",
-            "message": "Que voulez-vous supprimer ?",
-            "delete_link_only": "Supprimer uniquement ce lien",
-            "delete_link_and_target": "Supprimer la note et tous ses liens"
         },
         "export": {
             "title": "Exporter la note",
@@ -1036,7 +1013,6 @@
         },
         "errors": {
             "workspace_not_found": "Espace de travail introuvable",
-            "linked_note_already_exists": "Un lien existe déjà pour cette note",
             "method_not_allowed": "Méthode non autorisée",
             "invalid_action": "Action invalide",
             "internal_server_error": "Erreur interne du serveur",
@@ -1955,9 +1931,9 @@
         "warning": "Ne vous servez pas de cette fonctionnalité comme seule solution de sauvegarde.\nPensez à mettre en place des exports manuels ou automatiques de fichiers ZIP de vos notes.",
         "confirm_push": "Pousser les notes de l’espace « {{workspace}} » vers {{provider}} ? Met à jour les fichiers existants et supprime ceux qui n'existent plus dans Poznote.",
         "confirm_pull": "Récupérer les notes de l’espace « {{workspace}} » depuis {{provider}} ? Importe les notes depuis {{provider}}. Met à jour les notes existantes et déplace vers la corbeille celles qui n'existent plus sur {{provider}}.",
-        "confirm_auto_pull": "Une nouvelle session a commencé. Voulez-vous récupérer les changements depuis {{provider}} ?",
-        "auto_pull_complete": "Synchronisation Git terminée. Rafraîchissement de la page...",
-        "auto_pull_no_changes": "Synchronisation Git terminée. Aucun changement trouvé.",
+        "confirm_auto_pull_warning": "Une nouvelle session a démarré. Voulez-vous récupérer les modifications depuis {{provider}} ?\n\nATTENTION : Cela écrasera TOUTES vos données locales !",
+        "auto_pull_complete": "Synchronisation Git terminée. Actualisation de la page...",
+        "auto_pull_no_changes": "Synchronisation Git terminée. Aucune modification trouvée.",
         "pulling": "Récupération des changements...",
         "config": {
             "title": "Configuration",
@@ -2011,7 +1987,7 @@
         "messages": {
             "connection_success": "Connexion réussie ! Connecté à {{repo}}",
             "connection_error": "Échec de la connexion : {{error}}",
-            "push_success": "{{count}} notes envoyées avec succès, {{deleted}} fichiers supprimés ({{errors}} erreurs)",
+            "push_success": "{{count}} notes et {{attachments}} pièces jointes envoyées avec succès, {{deleted}} fichiers supprimés ({{errors}} erreurs)",
             "push_error": "Échec de l'envoi : {{error}}",
             "pull_success": "{{pulled}} nouvelles notes récupérées, {{updated}} notes existantes mises à jour, {{deleted}} notes supprimées ({{errors}} erreurs)",
             "pull_error": "Échec de la récupération : {{error}}"

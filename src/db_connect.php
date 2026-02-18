@@ -247,9 +247,6 @@ try {
             if (!in_array('type', $existingColumns)) {
                 $con->exec("ALTER TABLE entries ADD COLUMN type TEXT DEFAULT 'note'");
             }
-            if (!in_array('linked_note_id', $existingColumns)) {
-                $con->exec("ALTER TABLE entries ADD COLUMN linked_note_id INTEGER REFERENCES entries(id) ON DELETE SET NULL");
-            }
         } catch (Exception $e) {
             error_log('Could not add missing columns to entries: ' . $e->getMessage());
         }

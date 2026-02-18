@@ -632,7 +632,6 @@
             "insert_checklist": "插入清单",
             "add_separator": "添加分隔符",
             "insert_note_reference": "插入笔记引用",
-            "create_linked_note": "创建链接笔记",
             "open_in_new_tab": "在新标签页中打开",
             "search_replace": "查找替换",
             "split_view": "切换分屏视图",
@@ -795,12 +794,6 @@
             "task_list": {
                 "title": "任务列表"
             },
-            "linked": {
-                "title": "链接笔记",
-                "default_heading": "{{note}}",
-                "success": "链接笔记创建成功",
-                "error": "创建链接笔记时出错"
-            },
             "subfolder": {
                 "title": "子文件夹"
             },
@@ -829,17 +822,6 @@
             "title": "更改文件夹图标",
             "reset": "恢复默认行为",
             "search_placeholder": "搜索图标..."
-        },
-        "linked_selector": {
-            "title": "选择要链接的笔记",
-            "search_placeholder": "搜索笔记...",
-            "recent_label": "最近的笔记"
-        },
-        "delete_linked_note": {
-            "title": "删除链接笔记",
-            "message": "您想删除什么？",
-            "delete_link_only": "仅删除此链接",
-            "delete_link_and_target": "删除笔记及其所有链接"
         },
         "convert": {
             "title": "转换笔记",
@@ -998,7 +980,6 @@
         },
         "errors": {
             "workspace_not_found": "未找到工作区",
-            "linked_note_already_exists": "此笔记已存在链接笔记",
             "method_not_allowed": "方法不允许",
             "invalid_action": "无效操作",
             "internal_server_error": "服务器内部错误",
@@ -1916,7 +1897,7 @@
         "warning": "不要将此功能作为唯一的备份解决方案。\n请考虑为您的笔记设置手动或自动 ZIP 导出。",
         "confirm_push": "将工作区 \"{{workspace}}\" 的笔记推送到 {{provider}} 吗？Updates existing files and deletes files that no longer exist in Poznote.",
         "confirm_pull": "从 {{provider}} 拉取工作区 \"{{workspace}}\" 的笔记吗？Import notes from {{provider}}. Updates existing notes and moves to trash notes that no longer exist on {{provider}}.",
-        "confirm_auto_pull": "新会话已开始。您想要从 {{provider}} 拉取更改吗？",
+        "confirm_auto_pull_warning": "新会话已开始。您想要从 {{provider}} 拉取更改吗？\n\n警告：这将覆盖所有本地数据！",
         "auto_pull_complete": "Git 同步完成。正在刷新页面...",
         "auto_pull_no_changes": "Git 同步完成。未发现更改。",
         "pulling": "正在拉取更改...",
@@ -1964,7 +1945,7 @@
         "messages": {
             "connection_success": "连接成功！已连接到 {{repo}}",
             "connection_error": "连接失败：{{error}}",
-            "push_success": "成功推送 {{count}} 条笔记，删除 {{deleted}} 个文件（{{errors}} 个错误）",
+            "push_success": "成功推送 {{count}} 条笔记和 {{attachments}} 个附件，删除 {{deleted}} 个文件（{{errors}} 个错误）",
             "push_error": "推送失败：{{error}}",
             "pull_success": "拉取 {{pulled}} 条新笔记并更新 {{updated}} 条现有笔记，删除 {{deleted}} 条笔记（{{errors}} 个错误）",
             "pull_error": "拉取失败：{{error}}"

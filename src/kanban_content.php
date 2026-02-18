@@ -52,24 +52,16 @@ try {
     $subfolders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Get notes directly in parent folder (using 'entries' table and 'trash' column)
-    $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type, n.linked_note_id FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.updated DESC");
+    $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.updated DESC");
     $stmt->execute([$folder_id]);
     $parentNotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     /**
-     * Load a text snippet for a note (resolves linked notes).
+     * Load a text snippet for a note.
      * Modifies the note array in-place, adding an 'entry' key.
      */
     $loadNoteSnippet = function (&$note) use ($con) {
-        // For linked notes, load the target note's content
-        if (($note['type'] ?? 'note') === 'linked' && !empty($note['linked_note_id'])) {
-            $targetStmt = $con->prepare("SELECT type FROM entries WHERE id = ?");
-            $targetStmt->execute([$note['linked_note_id']]);
-            $targetNote = $targetStmt->fetch(PDO::FETCH_ASSOC);
-            $filename = $targetNote ? getEntryFilename($note['linked_note_id'], $targetNote['type'] ?? 'note') : '';
-        } else {
-            $filename = getEntryFilename($note['id'], $note['type'] ?? 'note');
-        }
+        $filename = getEntryFilename($note['id'], $note['type'] ?? 'note');
 
         if ($filename && file_exists($filename)) {
             $content = file_get_contents($filename);
@@ -88,7 +80,7 @@ try {
     // Get notes for each subfolder
     $subfolderNotes = [];
     foreach ($subfolders as $subfolder) {
-        $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type, n.linked_note_id FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.updated DESC");
+        $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.updated DESC");
         $stmt->execute([$subfolder['id']]);
         $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         

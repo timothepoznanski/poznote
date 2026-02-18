@@ -221,17 +221,6 @@ function saveNoteToServer() {
             var responseTitle = (data.note && data.note.heading) ? data.note.heading : headi;
             handleSaveResponse(JSON.stringify({date: new Date().toLocaleDateString(), title: responseTitle, original_title: headi}));
             
-            // Update linked notes in the list if any were updated
-            if (data.note && data.updated_linked_notes && data.updated_linked_notes.length > 0) {
-                var newTitle = data.note.heading;
-                data.updated_linked_notes.forEach(function(linkedNoteId) {
-                    var linkElements = document.querySelectorAll('.links_arbo_left[data-note-db-id="' + linkedNoteId + '"]');
-                    linkElements.forEach(function(linkElement) {
-                        updateTitleInElement(linkElement, newTitle);
-                    });
-                });
-            }
-            
             // Refresh tags count in sidebar after successful save
             if (typeof window.refreshTagsCount === 'function') {
                 window.refreshTagsCount();
@@ -364,48 +353,9 @@ function _updateUIAfterSave(timeText, titleChanged) {
 
 /**
  * Delete a note (move to trash)
- * Handles both regular notes and linked notes
  * @param {string|number} noteId - The note ID to delete
  */
 function deleteNote(noteId) {
-    // Check if the selected link in the list is a linked note
-    // (since linked notes redirect to their target, we need to check the list item)
-    const selectedLinks = document.querySelectorAll('.links_arbo_left.selected-note');
-    let isLinkedNote = false;
-    let linkedNoteDbId = null;
-    let linkedNoteTargetId = null;
-    
-    for (let link of selectedLinks) {
-        const linkType = link.getAttribute('data-note-type');
-        if (linkType === 'linked') {
-            isLinkedNote = true;
-            linkedNoteDbId = link.getAttribute('data-note-db-id');
-            linkedNoteTargetId = link.getAttribute('data-linked-note-id');
-            break;
-        }
-    }
-    
-    // If we clicked on a linked note, show the special modal
-    if (isLinkedNote && linkedNoteDbId) {
-        showDeleteLinkedNoteModal(linkedNoteDbId, linkedNoteTargetId);
-        return;
-    }
-    
-    // Also check if this is a linked note in the DOM (fallback for other cases)
-    const noteCard = document.getElementById('note' + noteId);
-    if (noteCard) {
-        const noteEntry = noteCard.querySelector('.noteentry');
-        const noteType = noteEntry ? noteEntry.getAttribute('data-note-type') : null;
-        const linkedNoteId = noteEntry ? noteEntry.getAttribute('data-linked-note-id') : null;
-        
-        // If this is a linked note (either by type or by having a linked_note_id), show the modal
-        if (noteType === 'linked' || linkedNoteId) {
-            // Show special modal for linked notes
-            showDeleteLinkedNoteModal(noteId, linkedNoteId);
-            return;
-        }
-    }
-    
     const workspace = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? pageWorkspace : null;
     
     // Build query params for RESTful API
@@ -555,16 +505,7 @@ function updateNoteTitleInLeftColumn() {
 function updateTitleInElement(linkElement, newTitle) {
     var titleSpan = linkElement.querySelector('.note-title');
     if (titleSpan) {
-        // Check if there's an icon (for linked notes) and preserve it
-        var icon = titleSpan.querySelector('.note-type-icon-inline');
-        if (icon) {
-            // Clear content but keep the icon
-            titleSpan.textContent = '';
-            titleSpan.appendChild(icon.cloneNode(true));
-            titleSpan.appendChild(document.createTextNode(' ' + newTitle));
-        } else {
-            titleSpan.textContent = newTitle;
-        }
+        titleSpan.textContent = newTitle;
         
         var href = linkElement.getAttribute('href');
         if (href) {
@@ -600,192 +541,6 @@ function openNoteInNewTab(noteId) {
 }
 
 // ============================================================
-// LINKED NOTES MANAGEMENT
-// ============================================================
-
-/**
- * Fetch the linked note target ID from the API
- * @param {string|number} linkedNoteId - The linked note ID
- * @param {HTMLElement} modal - The modal element
- * @param {HTMLElement} deleteTargetBtn - The delete target button
- */
-function fetchLinkedNoteTarget(linkedNoteId, modal, deleteTargetBtn) {
-    const workspace = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? pageWorkspace : null;
-    
-    let url = '/api/v1/notes/' + linkedNoteId;
-    if (workspace) {
-        url += '?workspace=' + encodeURIComponent(workspace);
-    }
-    
-    fetch(url, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-    })
-    .then(function(response) { return response.json(); })
-    .then(function(data) {
-        if (data && data.note && data.note.linked_note_id) {
-            modal.dataset.linkedNoteTargetId = data.note.linked_note_id;
-            if (deleteTargetBtn) {
-                deleteTargetBtn.disabled = false;
-                deleteTargetBtn.style.opacity = '1';
-            }
-        } else {
-            // No target ID found - disable the button
-            delete modal.dataset.linkedNoteTargetId;
-            if (deleteTargetBtn) {
-                deleteTargetBtn.disabled = true;
-                deleteTargetBtn.style.opacity = '0.5';
-            }
-            console.error('Note does not have a linked_note_id:', data);
-        }
-        modal.style.display = 'flex';
-    })
-    .catch(function(error) {
-        console.error('Error fetching linked note data:', error);
-        // Disable the button on error
-        delete modal.dataset.linkedNoteTargetId;
-        if (deleteTargetBtn) {
-            deleteTargetBtn.disabled = true;
-            deleteTargetBtn.style.opacity = '0.5';
-        }
-        modal.style.display = 'flex';
-    });
-}
-
-/**
- * Show modal for deleting a linked note
- * Allows choosing between deleting only the link or the target note too
- * @param {string|number} linkedNoteId - The linked note ID
- * @param {string|number|null} targetId - The target note ID (optional, will be fetched if not provided)
- */
-function showDeleteLinkedNoteModal(linkedNoteId, targetId) {
-    const modal = document.getElementById('deleteLinkedNoteModal');
-    if (!modal) return;
-    
-    // Store the note ID for later use
-    modal.dataset.linkedNoteId = linkedNoteId;
-    
-    let linkedNoteTargetId = targetId || null;
-    
-    // If not provided, try to find it in the DOM
-    if (!linkedNoteTargetId) {
-        // Method 1: Try to get from the link in the sidebar by data-note-db-id
-        const linkByDbId = document.querySelector('.links_arbo_left[data-note-db-id="' + linkedNoteId + '"]');
-        if (linkByDbId) {
-            linkedNoteTargetId = linkByDbId.getAttribute('data-linked-note-id');
-        }
-        
-        // Method 2: Try to get from the link in the sidebar by data-note-id
-        if (!linkedNoteTargetId) {
-            const linkByNoteId = document.querySelector('.links_arbo_left[data-note-id="' + linkedNoteId + '"]');
-            if (linkByNoteId) {
-                linkedNoteTargetId = linkByNoteId.getAttribute('data-linked-note-id');
-            }
-        }
-        
-        // Method 3: Try to get from the currently loaded note entry
-        if (!linkedNoteTargetId) {
-            const noteEntry = document.getElementById('entry' + linkedNoteId);
-            if (noteEntry) {
-                linkedNoteTargetId = noteEntry.getAttribute('data-linked-note-id');
-            }
-        }
-        
-        // Method 4: Try to get from the note card in DOM (for backward compatibility)
-        if (!linkedNoteTargetId) {
-            const noteCard = document.getElementById('note' + linkedNoteId);
-            if (noteCard) {
-                const noteEntry = noteCard.querySelector('.noteentry');
-                linkedNoteTargetId = noteEntry ? noteEntry.getAttribute('data-linked-note-id') : null;
-            }
-        }
-    }
-    
-    // Store the target ID if found
-    const deleteTargetBtn = document.getElementById('deleteLinkedNoteAndTargetBtn');
-    if (linkedNoteTargetId) {
-        modal.dataset.linkedNoteTargetId = linkedNoteTargetId;
-        if (deleteTargetBtn) {
-            deleteTargetBtn.disabled = false;
-            deleteTargetBtn.style.opacity = '1';
-        }
-        modal.style.display = 'flex';
-    } else {
-        // If we still don't have the target ID, fetch it from the API
-        console.warn('Could not find linked_note_id in DOM for note ID:', linkedNoteId, '- fetching from API');
-        fetchLinkedNoteTarget(linkedNoteId, modal, deleteTargetBtn);
-    }
-}
-
-/**
- * Delete only the linked note (bookmark), keeping the target note
- * @param {string|number} linkedNoteId - The linked note ID to delete
- */
-function deleteLinkedNoteOnly(linkedNoteId) {
-    const workspace = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? pageWorkspace : null;
-    
-    let url = "/api/v1/notes/" + linkedNoteId + "?permanent=false";
-    if (workspace) {
-        url += "&workspace=" + encodeURIComponent(workspace);
-    }
-    
-    fetch(url, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" }
-    })
-    .then(function(response) { return response.json(); })
-    .then(function(data) {
-        if (data && data.success) {
-            closeModal('deleteLinkedNoteModal');
-            redirectToWorkspace();
-            return;
-        }
-        
-        if (data && (data.error || data.message)) {
-            showNotificationPopup('Deletion error: ' + (data.error || data.message), 'error');
-        } else {
-            showNotificationPopup('Deletion error: Unknown error', 'error');
-        }
-    })
-    .catch(function(error) {
-        showNotificationPopup('Network error while deleting: ' + error.message, 'error');
-    });
-}
-
-/**
- * Delete the target note and all its links
- * The backend automatically deletes all linked notes that reference the target
- * @param {string|number} linkedNoteId - The linked note ID
- * @param {string|number} targetNoteId - The target note ID to delete
- */
-function deleteLinkedNoteAndTarget(linkedNoteId, targetNoteId) {
-    const workspace = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? pageWorkspace : null;
-    
-    // Delete the target note - this will automatically delete all linked notes that reference it
-    let url = "/api/v1/notes/" + targetNoteId + "?permanent=false";
-    if (workspace) {
-        url += "&workspace=" + encodeURIComponent(workspace);
-    }
-    
-    fetch(url, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" }
-    })
-    .then(function(response) { return response.json(); })
-    .then(function(data) {
-        if (data && data.success) {
-            closeModal('deleteLinkedNoteModal');
-            redirectToWorkspace();
-        } else {
-            throw new Error(data.error || data.message || 'Unknown error');
-        }
-    })
-    .catch(function(error) {
-        showNotificationPopup('Deletion error: ' + error.message, 'error');
-    });
-}
-
-// ============================================================
 // GLOBAL EXPORTS & EVENT LISTENERS
 // ============================================================
 
@@ -793,42 +548,3 @@ function deleteLinkedNoteAndTarget(linkedNoteId, targetNoteId) {
 window.saveNoteToServer = saveNoteToServer;
 window.deleteNote = deleteNote;
 window.openNoteInNewTab = openNoteInNewTab;
-window.showDeleteLinkedNoteModal = showDeleteLinkedNoteModal;
-window.deleteLinkedNoteOnly = deleteLinkedNoteOnly;
-window.deleteLinkedNoteAndTarget = deleteLinkedNoteAndTarget;
-
-// Event listeners for delete linked note modal
-document.addEventListener('DOMContentLoaded', function() {
-    const deleteLinkedNoteOnlyBtn = document.getElementById('deleteLinkedNoteOnlyBtn');
-    const deleteLinkedNoteAndTargetBtn = document.getElementById('deleteLinkedNoteAndTargetBtn');
-
-    if (deleteLinkedNoteOnlyBtn) {
-        deleteLinkedNoteOnlyBtn.addEventListener('click', function() {
-            const modal = document.getElementById('deleteLinkedNoteModal');
-            const linkedNoteId = modal.dataset.linkedNoteId;
-            if (linkedNoteId) {
-                deleteLinkedNoteOnly(linkedNoteId);
-            }
-        });
-    }
-
-    if (deleteLinkedNoteAndTargetBtn) {
-        deleteLinkedNoteAndTargetBtn.addEventListener('click', function() {
-            const modal = document.getElementById('deleteLinkedNoteModal');
-            const linkedNoteId = modal.dataset.linkedNoteId;
-            const linkedNoteTargetId = modal.dataset.linkedNoteTargetId;
-            
-            if (!linkedNoteId) {
-                showNotificationPopup('Error: Linked note ID not found', 'error');
-                return;
-            }
-            
-            if (!linkedNoteTargetId) {
-                showNotificationPopup('Error: Target note ID not found. Cannot delete target note.', 'error');
-                return;
-            }
-            
-            deleteLinkedNoteAndTarget(linkedNoteId, linkedNoteTargetId);
-        });
-    }
-});

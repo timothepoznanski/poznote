@@ -67,6 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             if ($result['success']) {
                 $message = tp('git_sync.messages.push_success', [
                     'count' => $result['pushed'],
+                    'attachments' => $result['attachments_pushed'] ?? 0,
                     'deleted' => $result['deleted'] ?? 0,
                     'errors' => count($result['errors'])
                 ]);

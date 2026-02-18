@@ -1963,13 +1963,6 @@ function executeCreateAction() {
                 console.error('openTemplateNoteSelectorModal function not found');
             }
             break;
-        case 'linked':
-            if (typeof openLinkedNoteSelectorModal === 'function') {
-                openLinkedNoteSelectorModal();
-            } else {
-                console.error('openLinkedNoteSelectorModal function not found');
-            }
-            break;
         case 'subfolder':
             if (targetFolderId) {
                 var folderKey = 'folder_' + targetFolderId;

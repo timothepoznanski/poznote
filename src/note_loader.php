@@ -19,13 +19,6 @@ function loadNoteData($con, &$note, $workspace_filter) {
         $note_data = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if($note_data) {
-            // Check if this is a linked note - redirect to the target note
-            if ($note_data['type'] === 'linked' && !empty($note_data['linked_note_id'])) {
-                $linked_note_id = intval($note_data['linked_note_id']);
-                header("Location: index.php?note=" . $linked_note_id . "&workspace=" . urlencode($workspace_filter));
-                exit;
-            }
-            
             $current_note_folder = $note_data["folder"] ?: null;
             // Prepare result for right column (ensure it's in the workspace)
             $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND id = ? AND workspace = ?");

@@ -628,7 +628,6 @@
             "insert_checklist": "Inserir lista de tarefas",
             "add_separator": "Adicionar separador",
             "insert_note_reference": "Inserir referência de nota",
-            "create_linked_note": "Criar nota vinculada",
             "open_in_new_tab": "Abrir em nova aba"
         },
         "link": {
@@ -776,12 +775,6 @@
             "task_list": {
                 "title": "Lista de Tarefas"
             },
-            "linked": {
-                "title": "Nota vinculada",
-                "default_heading": "{{note}}",
-                "success": "Nota vinculada criada com sucesso",
-                "error": "Erro ao criar nota vinculada"
-            },
             "subfolder": {
                 "title": "Subpasta"
             },
@@ -810,17 +803,6 @@
             "title": "Alterar ícone da pasta",
             "reset": "Restaurar comportamento padrão",
             "search_placeholder": "Pesquisar ícones..."
-        },
-        "linked_selector": {
-            "title": "Selecionar nota para vincular",
-            "search_placeholder": "Pesquisar notas...",
-            "recent_label": "Notas recentes"
-        },
-        "delete_linked_note": {
-            "title": "Excluir nota vinculada",
-            "message": "O que você deseja excluir?",
-            "delete_link_only": "Excluir apenas este vínculo",
-            "delete_link_and_target": "Excluir a nota e todos os seus vínculos"
         },
         "convert": {
             "title": "Converter nota",
@@ -1000,7 +982,6 @@
         },
         "errors": {
             "workspace_not_found": "Espaço de trabalho não encontrado",
-            "linked_note_already_exists": "Já existe uma nota vinculada para esta nota",
             "method_not_allowed": "Método não permitido",
             "invalid_action": "Ação inválida",
             "internal_server_error": "Erro interno do servidor",
@@ -1801,7 +1782,7 @@
         "warning": "Não utilize esta funcionalidade como a sua única solução de backup.\nConsidere configurar exportações ZIP manuais ou automáticas das suas notas.",
         "confirm_push": "Enviar notas do espaço de trabalho \"{{workspace}}\" para o {{provider}}? Updates existing files and deletes files that no longer exist in Poznote.",
         "confirm_pull": "Recuperar notas do espaço de trabalho \"{{workspace}}\" do {{provider}}? Import notes from {{provider}}. Updates existing notes and moves to trash notes that no longer exist on {{provider}}.",
-        "confirm_auto_pull": "Uma nova sessão foi iniciada. Deseja puxar as alterações de {{provider}}?",
+        "confirm_auto_pull_warning": "Uma nova sessão foi iniciada. Deseja puxar as alterações de {{provider}}?\n\nAVISO: Isso substituirá TODOS os dados locais!",
         "auto_pull_complete": "Sincronização Git concluída. Atualizando a página...",
         "auto_pull_no_changes": "Sincronização Git concluída. Nenhuma alteração encontrada.",
         "pulling": "Puxando alterações...",
@@ -1849,7 +1830,7 @@
         "messages": {
             "connection_success": "Conexão bem-sucedida! Conectado a {{repo}}",
             "connection_error": "Erro de conexão: {{error}}",
-            "push_success": "{{count}} notas enviadas com sucesso, {{deleted}} arquivos excluídos ({{errors}} erros)",
+            "push_success": "{{count}} notas e {{attachments}} anexos enviados com sucesso, {{deleted}} arquivos excluídos ({{errors}} erros)",
             "push_error": "Erro ao enviar: {{error}}",
             "pull_success": "{{pulled}} novas notas recuperadas, {{updated}} notas existentes atualizadas, {{deleted}} notas excluídas ({{errors}} erros)",
             "pull_error": "Erro ao recuperar: {{error}}"

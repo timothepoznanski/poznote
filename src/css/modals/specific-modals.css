@@ -53,11 +53,6 @@
     margin-top: 12px;
 }
 
-/* Delete linked note modal: align buttons left */
-#deleteLinkedNoteModal .modal-buttons {
-    justify-content: flex-start;
-}
-
 /* ============================================
    Font Size Modal (#fontSizeModal)
    ============================================ */

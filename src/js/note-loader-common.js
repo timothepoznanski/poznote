@@ -568,11 +568,6 @@ function updateSelectedNote(clickedLink) {
                     link.classList.add('selected-note');
                 }
             });
-
-            // If we clicked on a linked note, also mark the linked note itself as selected
-            if (clickedNoteType === 'linked') {
-                clickedLink.classList.add('selected-note');
-            }
         } else {
             // Fallback to the clicked link only if no data-note-id
             clickedLink.classList.add('selected-note');
@@ -587,11 +582,6 @@ function updateSelectedNote(clickedLink) {
                         link.classList.add('selected-note');
                     }
                 });
-
-                // Re-apply selection to the linked note if applicable
-                if (clickedNoteType === 'linked' && !clickedLink.classList.contains('selected-note')) {
-                    clickedLink.classList.add('selected-note');
-                }
             } else if (clickedLink && !clickedLink.classList.contains('selected-note')) {
                 clickedLink.classList.add('selected-note');
             }

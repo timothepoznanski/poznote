@@ -298,11 +298,6 @@
                     openNoteReferenceModal();
                 }
                 break;
-            case 'create-linked-note':
-                if (typeof createLinkedNoteFromCurrent === 'function') {
-                    createLinkedNoteFromCurrent();
-                }
-                break;
             case 'open-search-replace-modal':
                 if (noteId && typeof openSearchReplaceModal === 'function') {
                     openSearchReplaceModal(noteId);

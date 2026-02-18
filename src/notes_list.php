@@ -165,20 +165,10 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             }
         }
         
-        // Add icon for linked notes
-        $noteIcon = '';
         $noteType = $row1['type'] ?? 'note';
-        $linkedNoteIdAttr = '';
-        if ($noteType === 'linked') {
-            $noteIcon = '<i class="fas fa-link note-type-icon-inline"></i> ';
-            // Add the linked_note_id attribute if available
-            if (!empty($row1['linked_note_id'])) {
-                $linkedNoteIdAttr = " data-linked-note-id='" . intval($row1['linked_note_id']) . "'";
-            }
-        }
         
-        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "'" . $linkedNoteIdAttr . " data-folder-id='$folderId' data-folder='$folderName' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note'>";
-        echo "<span class='note-title'>" . $noteIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
+        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "' data-folder-id='$folderId' data-folder='$folderName' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note'>";
+        echo "<span class='note-title'>" . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
         echo "</a>";
         echo "<div id=pxbetweennotes></div>";
     }
@@ -282,15 +272,10 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         $noteClass = 'links_arbo_left note-without-folder';
         $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
         
-        // Add icon for linked notes
-        $noteIcon = '';
         $noteType = $row1['type'] ?? 'note';
-        if ($noteType === 'linked') {
-            $noteIcon = '<i class="fas fa-link note-type-icon-inline"></i> ';
-        }
         
         echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "' data-folder-id='' data-folder='' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note'>";
-        echo "<span class='note-title'>" . $noteIcon . htmlspecialchars(($row1["heading"] ?: t('index.note.new_note', [], 'New note')), ENT_QUOTES) . "</span>";
+        echo "<span class='note-title'>" . htmlspecialchars(($row1["heading"] ?: t('index.note.new_note', [], 'New note')), ENT_QUOTES) . "</span>";
         echo "</a>";
         echo "<div id=pxbetweennotes></div>";
     }
@@ -312,17 +297,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         $noteClass = 'links_arbo_left note-without-folder';
         $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
         
-        // Add icon for linked notes
-        $noteIcon = '';
         $noteType = $row1['type'] ?? 'note';
-        if ($noteType === 'linked') {
-            $noteIcon = '<i class="fas fa-link note-type-icon-inline"></i> ';
-        }
         
         echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "' data-folder-id='' data-folder='' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note'>";
-        echo "<span class='note-title'>" . $noteIcon . htmlspecialchars(($row1["heading"] ?: t('index.note.new_note', [], 'New note')), ENT_QUOTES) . "</span>";
-        echo "</a>";
-        echo "<div id=pxbetweennotes></div>";
-    }
-}
-?>
+        echo "<span class='note-title'>"

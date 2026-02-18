@@ -217,10 +217,10 @@ class NotesController {
             if ($id !== null && is_numeric($id)) {
                 $noteId = (int)$id;
                 if ($useWorkspaceFilter) {
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
+                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
                     $stmt->execute([$noteId, $workspace]);
                 } else {
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id FROM entries WHERE id = ? AND trash = 0");
+                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated FROM entries WHERE id = ? AND trash = 0");
                     $stmt->execute([$noteId]);
                 }
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -235,10 +235,10 @@ class NotesController {
                 
                 if (is_numeric($reference)) {
                     $refId = (int)$reference;
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
+                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
                     $stmt->execute([$refId, $workspace]);
                 } else {
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ? ORDER BY updated DESC LIMIT 1");
+                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ? ORDER BY updated DESC LIMIT 1");
                     $stmt->execute(['%' . $reference . '%', $workspace]);
                 }
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -284,7 +284,6 @@ class NotesController {
                     'tags' => $row['tags'] ?? '',
                     'folder' => $row['folder'] ?? null,
                     'folder_id' => $row['folder_id'] ? (int)$row['folder_id'] : null,
-                    'linked_note_id' => $row['linked_note_id'] ? (int)$row['linked_note_id'] : null,
                     'created' => $row['created'] ?? null,
                     'updated' => $row['updated'] ?? null,
                     'content' => $content
@@ -329,7 +328,6 @@ class NotesController {
         $entry = $input['content'] ?? $input['entry'] ?? '';
         $entrycontent = $input['entrycontent'] ?? $entry;
         $type = isset($input['type']) ? trim($input['type']) : 'note';
-        $linked_note_id = isset($input['linked_note_id']) ? (int)$input['linked_note_id'] : null;
         
         try {
             // Validate workspace if provided
@@ -369,51 +367,27 @@ class NotesController {
             if ($originalHeading === '') {
                 $heading = generateUniqueTitle(t('index.note.new_note', [], 'New note'), null, $workspace, $folder_id);
             } else {
-                // For linked notes, don't check uniqueness - multiple links can have the same title
-                if ($type === 'linked') {
-                    $heading = $originalHeading;
+                // Check uniqueness for regular notes
+                if ($folder_id !== null) {
+                    $check = $this->con->prepare("SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND folder_id = ? AND workspace = ?");
+                    $check->execute([$originalHeading, $folder_id, $workspace]);
                 } else {
-                    // Check uniqueness for regular notes
-                    if ($folder_id !== null) {
-                        $check = $this->con->prepare("SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND folder_id = ? AND workspace = ?");
-                        $check->execute([$originalHeading, $folder_id, $workspace]);
-                    } else {
-                        $check = $this->con->prepare("SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND folder_id IS NULL AND workspace = ?");
-                        $check->execute([$originalHeading, $workspace]);
-                    }
-                    if ($check->fetchColumn() > 0) {
-                        $heading = generateUniqueTitle($originalHeading, null, $workspace, $folder_id);
-                    } else {
-                        $heading = $originalHeading;
-                    }
+                    $check = $this->con->prepare("SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND folder_id IS NULL AND workspace = ?");
+                    $check->execute([$originalHeading, $workspace]);
+                }
+                if ($check->fetchColumn() > 0) {
+                    $heading = generateUniqueTitle($originalHeading, null, $workspace, $folder_id);
+                } else {
+                    $heading = $originalHeading;
                 }
             }
             
             // Create the note
             $now_utc = gmdate('Y-m-d H:i:s', time());
             
-            // Validate linked_note_id if provided
-            if ($linked_note_id !== null) {
-                $checkLinkedNote = $this->con->prepare("SELECT id FROM entries WHERE id = ? AND trash = 0");
-                $checkLinkedNote->execute([$linked_note_id]);
-                if (!$checkLinkedNote->fetch()) {
-                    $this->sendError(404, 'Linked note not found');
-                    return;
-                }
-                
-                // Check if a linked note already exists for this target
-                $checkExistingLink = $this->con->prepare("SELECT id FROM entries WHERE linked_note_id = ? AND trash = 0");
-                $checkExistingLink->execute([$linked_note_id]);
-                $existingLink = $checkExistingLink->fetch();
-                if ($existingLink) {
-                    $this->sendError(400, 'A linked note already exists for this note');
-                    return;
-                }
-            }
+            $stmt = $this->con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
             
-            $stmt = $this->con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, linked_note_id, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            
-            if ($stmt->execute([$heading, $entrycontent, $tags, $folder, $folder_id, $workspace, $type, $linked_note_id, $now_utc, $now_utc])) {
+            if ($stmt->execute([$heading, $entrycontent, $tags, $folder, $folder_id, $workspace, $type, $now_utc, $now_utc])) {
                 $id = $this->con->lastInsertId();
                 
                 // If folder is shared, auto-share the new note
@@ -470,9 +444,6 @@ class NotesController {
                     ],
                     'share_delta' => $wasShared ? 1 : 0
                 ]);
-
-                // Trigger auto Git sync
-                $this->triggerGitSync((int)$id, 'push');
             } else {
                 $this->sendError(500, 'Error while creating the note');
             }
@@ -492,9 +463,8 @@ class NotesController {
      *   - tags: Comma-separated tags
      *   - folder_id: Folder ID
      *   - workspace: Workspace name
-     * @param bool $triggerSync Whether to trigger Git sync (defaults to false)
      */
-    public function update(string $id, bool $triggerSync = false): void {
+    public function update(string $id): void {
         if (!is_numeric($id)) {
             $this->sendError(400, 'Invalid note ID');
             return;
@@ -665,22 +635,6 @@ class NotesController {
             $stmt = $this->con->prepare($sql);
             
             if ($stmt->execute($updateParams)) {
-                $updatedLinkedNotes = [];
-                
-                // If the heading changed, update linked notes that point to this note
-                if ($heading !== $note['heading']) {
-                    // Get IDs of linked notes before updating
-                    $linkIdsStmt = $this->con->prepare("SELECT id FROM entries WHERE linked_note_id = ? AND trash = 0");
-                    $linkIdsStmt->execute([$noteId]);
-                    $linkedNoteIds = $linkIdsStmt->fetchAll(PDO::FETCH_COLUMN);
-                    
-                    if (!empty($linkedNoteIds)) {
-                        $linkStmt = $this->con->prepare("UPDATE entries SET heading = ?, updated = ? WHERE linked_note_id = ? AND trash = 0");
-                        $linkStmt->execute([$heading, $now_utc, $noteId]);
-                        $updatedLinkedNotes = $linkedNoteIds;
-                    }
-                }
-                
                 $response = [
                     'note' => [
                         'id' => $noteId,
@@ -689,17 +643,7 @@ class NotesController {
                     ]
                 ];
                 
-                // Include updated linked note IDs if any
-                if (!empty($updatedLinkedNotes)) {
-                    $response['updated_linked_notes'] = $updatedLinkedNotes;
-                }
-                
                 $this->sendSuccess($response);
-
-                // Trigger auto Git sync only if explicitly requested
-                if ($triggerSync) {
-                    $this->triggerGitSync($noteId, 'push');
-                }
             } else {
                 $this->sendError(500, 'Database error while updating note');
             }
@@ -753,24 +697,6 @@ class NotesController {
                     return;
                 }
                 
-                // First, find and delete all linked notes that reference this note
-                $linkedNotesStmt = $this->con->prepare("SELECT id FROM entries WHERE linked_note_id = ?");
-                $linkedNotesStmt->execute([$noteId]);
-                $linkedNotes = $linkedNotesStmt->fetchAll(PDO::FETCH_ASSOC);
-                
-                $deletedLinkedCount = 0;
-                foreach ($linkedNotes as $linkedNote) {
-                    $linkedId = $linkedNote['id'];
-                    if ($workspace) {
-                        $delStmt = $this->con->prepare("UPDATE entries SET trash = 1, updated = datetime('now') WHERE id = ? AND workspace = ?");
-                        $delStmt->execute([$linkedId, $workspace]);
-                    } else {
-                        $delStmt = $this->con->prepare("UPDATE entries SET trash = 1, updated = datetime('now') WHERE id = ?");
-                        $delStmt->execute([$linkedId]);
-                    }
-                    $deletedLinkedCount++;
-                }
-                
                 // Then delete the main note
                 if ($workspace) {
                     $stmt = $this->con->prepare("UPDATE entries SET trash = 1, updated = datetime('now') WHERE id = ? AND workspace = ?");
@@ -786,13 +712,9 @@ class NotesController {
                         'note' => [
                             'id' => $noteId,
                             'heading' => $note['heading'],
-                            'action' => 'moved_to_trash',
-                            'deleted_linked_count' => $deletedLinkedCount
+                            'action' => 'moved_to_trash'
                         ]
                     ]);
-
-                    // Trigger auto Git sync (delete from Git because it's in trash)
-                    $this->triggerGitSync($noteId, 'delete');
                 } else {
                     $this->sendError(500, 'Failed to move note to trash');
                 }
@@ -807,46 +729,6 @@ class NotesController {
      * Helper for permanent deletion
      */
     private function permanentDelete(int $noteId, array $note, ?string $workspace): void {
-        // First, find and permanently delete all linked notes that reference this note
-        $linkedNotesStmt = $this->con->prepare("SELECT id, type, attachments FROM entries WHERE linked_note_id = ?");
-        $linkedNotesStmt->execute([$noteId]);
-        $linkedNotes = $linkedNotesStmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        $deletedLinkedCount = 0;
-        foreach ($linkedNotes as $linkedNote) {
-            $linkedId = $linkedNote['id'];
-            
-            // Delete linked note's file
-            $linkedNoteType = $linkedNote['type'] ?? 'note';
-            $linked_file_path = getEntryFilename($linkedId, $linkedNoteType);
-            if (file_exists($linked_file_path)) {
-                unlink($linked_file_path);
-            }
-            
-            // Delete linked note's attachments
-            $linkedAttachments = $linkedNote['attachments'] ? json_decode($linkedNote['attachments'], true) : [];
-            if (is_array($linkedAttachments) && !empty($linkedAttachments)) {
-                foreach ($linkedAttachments as $attachment) {
-                    if (isset($attachment['filename'])) {
-                        $attachment_file = getAttachmentsPath() . '/' . $attachment['filename'];
-                        if (file_exists($attachment_file)) {
-                            unlink($attachment_file);
-                        }
-                    }
-                }
-            }
-            
-            // Delete linked note from database
-            if ($workspace) {
-                $delStmt = $this->con->prepare("DELETE FROM entries WHERE id = ? AND workspace = ?");
-                $delStmt->execute([$linkedId, $workspace]);
-            } else {
-                $delStmt = $this->con->prepare("DELETE FROM entries WHERE id = ?");
-                $delStmt->execute([$linkedId]);
-            }
-            $deletedLinkedCount++;
-        }
-        
         // Delete attachments of the main note
         $attachments = $note['attachments'] ? json_decode($note['attachments'], true) : [];
         $deleted_attachments = [];
@@ -880,9 +762,6 @@ class NotesController {
             $png_deleted = unlink($png_file_path);
         }
 
-        // Trigger auto Git sync
-        $this->triggerGitSync($noteId, 'delete');
-
         // Delete database entry
         if ($workspace) {
             $stmt = $this->con->prepare("DELETE FROM entries WHERE id = ? AND workspace = ?");
@@ -900,8 +779,7 @@ class NotesController {
                     'heading' => $note['heading'],
                     'file_deleted' => $file_deleted,
                     'png_file_deleted' => $png_deleted,
-                    'attachments_deleted' => $deleted_attachments,
-                    'linked_notes_deleted' => $deletedLinkedCount
+                    'attachments_deleted' => $deleted_attachments
                 ]
             ]);
         } else {
@@ -967,9 +845,6 @@ class NotesController {
                         'heading' => $note['heading']
                     ]
                 ]);
-
-                // Trigger auto Git sync
-                $this->triggerGitSync($noteId, 'push');
             } else {
                 $this->sendError(500, 'Failed to restore note');
             }
@@ -1094,9 +969,6 @@ class NotesController {
             
             if ($stmt->execute([$content, $now_utc, $noteId])) {
                 $this->sendSuccess(['id' => $noteId]);
-                
-                // Trigger auto Git sync on emergency save (leaving page)
-                $this->triggerGitSync($noteId, 'push');
             } else {
                 $this->sendError(500, 'Database error');
             }
@@ -2087,35 +1959,5 @@ class NotesController {
             'success' => false,
             'error' => $message
         ]);
-    }
-
-    /**
-     * Trigger automatic Git synchronization if enabled
-     */
-    private function triggerGitSync(int $noteId, string $action = 'push'): void {
-        try {
-            $gitSyncFile = dirname(__DIR__, 3) . '/GitSync.php';
-            if (file_exists($gitSyncFile)) {
-                require_once $gitSyncFile;
-                // GitSync constructor handles its own requirements
-                $gitSync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
-                if ($gitSync->isAutoPushEnabled()) {
-                    if ($action === 'push') {
-                        $gitSync->pushNote($noteId);
-                    } elseif ($action === 'delete') {
-                        // For deletion, we need headings from database (trash=1 is fine here)
-                        $stmt = $this->con->prepare("SELECT heading, folder_id, workspace, type FROM entries WHERE id = ?");
-                        $stmt->execute([$noteId]);
-                        $note = $stmt->fetch(PDO::FETCH_ASSOC);
-                        if ($note) {
-                            $gitSync->deleteNoteInGit($note['heading'], $note['folder_id'], $note['workspace'], $note['type']);
-                        }
-                    }
-                }
-            }
-        } catch (Exception $e) {
-            // Silently log error to not block main API response
-            error_log("Git auto-sync error: " . $e->getMessage());
-        }
     }
 }
