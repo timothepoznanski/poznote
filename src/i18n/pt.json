@@ -1798,7 +1798,7 @@
     "git_sync": {
         "title": "Sincronização {{provider}}",
         "description": "Faça backup das suas notas e anexos no {{provider}}. Os arquivos são armazenados como arquivos simples com um metadata.json que preserva tags, pastas, datas e anexos.",
-        "warning": "Não utilize esta funcionalidade como a sua única solução de backup.\nConsidere configurar exportações ZIP manuais ou automáticas das suas notas.",
+        "warning": "Não dependa desta funcionalidade como única solução de backup.\nExporte seus dados regularmente usando o recurso de backup nas Configurações.",
         "confirm_push": "Enviar todas as notas e anexos para o {{provider}}? Os arquivos existentes serão atualizados e os arquivos que não existem mais no Poznote serão removidos do repositório.",
         "confirm_pull": "Baixar todas as notas e anexos do {{provider}}? Os dados locais serão substituídos pela versão remota. As notas não encontradas no {{provider}} serão movidas para a lixeira.",
         "confirm_auto_pull": "Uma nova sessão foi iniciada. Deseja puxar as alterações de {{provider}}?",

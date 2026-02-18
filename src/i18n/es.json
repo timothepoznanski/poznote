@@ -1794,7 +1794,7 @@
     "git_sync": {
         "title": "Sincronización {{provider}}",
         "description": "Haga una copia de seguridad de sus notas y archivos adjuntos en {{provider}}. Los archivos se almacenan como archivos planos con un metadata.json que conserva etiquetas, carpetas, fechas y adjuntos.",
-        "warning": "No utilice esta función como su única solución de copia de seguridad.\nConsidere configurar exportaciones ZIP manuales o automáticas de sus notas.",
+        "warning": "No confíe únicamente en esta función como solución de copia de seguridad.\nExporte sus datos regularmente desde la función de copia de seguridad en los Ajustes.",
         "confirm_push": "¿Enviar todas las notas y archivos adjuntos a {{provider}}? Los archivos existentes se actualizarán y los archivos que ya no están en Poznote se eliminarán del repositorio.",
         "confirm_pull": "¿Extraer todas las notas y archivos adjuntos de {{provider}}? Los datos locales serán reemplazados por la versión remota. Las notas no encontradas en {{provider}} se moverán a la papelera.",
         "confirm_auto_pull": "Se ha iniciado una nueva sesión. ¿Quieres extraer los cambios de {{provider}}?",

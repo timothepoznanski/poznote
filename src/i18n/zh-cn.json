@@ -1913,7 +1913,7 @@
     "git_sync": {
         "title": "{{provider}} 同步",
         "description": "将您的笔记和附件备份到 {{provider}}。文件以扁平文件形式存储，并附带保存标签、文件夹、日期和附件的 metadata.json。",
-        "warning": "不要将此功能作为唯一的备份解决方案。\n请考虑为您的笔记设置手动或自动 ZIP 导出。",
+        "warning": "请勿将此功能作为唯一的备份方案。\n请定期使用设置中的备份功能导出您的数据。",
         "confirm_push": "将所有笔记和附件推送到 {{provider}} 吗？现有文件将被更新，Poznote 中不再存在的文件将从仓库中删除。",
         "confirm_pull": "从 {{provider}} 拉取所有笔记和附件吗？本地数据将被远程版本覆盖。在 {{provider}} 上找不到的笔记将被移至回收站。",
         "confirm_auto_pull": "新会话已开始。您想要从 {{provider}} 拉取更改吗？",
