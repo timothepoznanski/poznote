@@ -22,6 +22,7 @@ let lastSavedTags = null;
 // Network and sync state
 let isOnline = navigator.onLine;
 let notesNeedingRefresh = new Set();
+let needsGitPush = false; // Tracks if a Git push is needed for the current note
 
 // ============================================================================
 // SETUP & INITIALIZATION
@@ -35,12 +36,12 @@ function setupAutoSaveCheck() {
     // Setup online event listener
     window.addEventListener('online', () => {
         isOnline = true;
-        
+
         // Try to sync any pending changes
         if (noteid !== -1 && noteid !== 'search' && noteid !== null && noteid !== undefined) {
             const draftKey = 'poznote_draft_' + noteid;
             const draft = localStorage.getItem(draftKey);
-            
+
             if (draft && draft !== lastSavedContent) {
                 clearTimeout(saveTimeout);
                 saveTimeout = setTimeout(() => {
@@ -76,7 +77,7 @@ function setupPageUnloadWarning() {
     // Desktop and some mobile browsers
     window.addEventListener('beforeunload', (e) => {
         const currentNoteId = window.noteid;
-        
+
         if (hasUnsavedChanges(currentNoteId)) {
             // Force immediate save before leaving
             if (isOnline) {
@@ -96,13 +97,20 @@ function setupPageUnloadWarning() {
             e.preventDefault();
             e.returnValue = message;
             return message;
+        } else if (isOnline && needsGitPush && currentNoteId && currentNoteId !== -1 && currentNoteId !== 'search') {
+            // No unsaved UI changes, but Git push is pending
+            try {
+                emergencySave(currentNoteId);
+            } catch (err) {
+                console.error('[Poznote Auto-Save] Emergency Git push failed:', err);
+            }
         }
     });
 
     // Mobile Safari and some Android browsers (more reliable than beforeunload)
     window.addEventListener('pagehide', (e) => {
         const currentNoteId = window.noteid;
-        
+
         if (hasUnsavedChanges(currentNoteId)) {
             // Force immediate save before leaving (synchronous for pagehide)
             if (isOnline) {
@@ -112,6 +120,13 @@ function setupPageUnloadWarning() {
                     console.error('[Poznote Auto-Save] Emergency save via pagehide failed:', err);
                 }
             }
+        } else if (isOnline && needsGitPush && currentNoteId && currentNoteId !== -1 && currentNoteId !== 'search') {
+            // No unsaved UI changes, but Git push is pending
+            try {
+                emergencySave(currentNoteId);
+            } catch (err) {
+                console.error('[Poznote Auto-Save] Emergency Git push via pagehide failed:', err);
+            }
         }
     });
 
@@ -119,7 +134,7 @@ function setupPageUnloadWarning() {
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'hidden') {
             const currentNoteId = window.noteid;
-            
+
             if (hasUnsavedChanges(currentNoteId)) {
                 // Force immediate save when page becomes hidden
                 if (isOnline) {
@@ -128,6 +143,13 @@ function setupPageUnloadWarning() {
                     } catch (err) {
                         console.error('[Poznote Auto-Save] Emergency save via visibilitychange failed:', err);
                     }
+                }
+            } else if (isOnline && needsGitPush && currentNoteId && currentNoteId !== -1 && currentNoteId !== 'search') {
+                // No unsaved UI changes, but Git push is pending
+                try {
+                    emergencySave(currentNoteId);
+                } catch (err) {
+                    console.error('[Poznote Auto-Save] Emergency Git push via visibilitychange failed:', err);
                 }
             }
         }
@@ -212,13 +234,29 @@ function markNoteAsModified() {
 
     // If title or tags changed, check immediately; otherwise use idle callback
     if (titleChanged || tagsChanged) {
+        // Mark as needing git push since user modified content
+        needsGitPush = true;
         checkContentAndSave();
     } else {
         // Schedule during browser idle time to avoid blocking typing
         if (window.requestIdleCallback) {
-            window.requestIdleCallback(checkContentAndSave, { timeout: 500 });
+            window.requestIdleCallback(() => {
+                // Check if content actually changed before setting flag
+                const currentContent = entryElem ? entryElem.innerHTML : '';
+                if (currentContent !== lastSavedContent) {
+                    needsGitPush = true;
+                }
+                checkContentAndSave();
+            }, { timeout: 500 });
         } else {
-            setTimeout(checkContentAndSave, 0);
+            setTimeout(() => {
+                // Check if content actually changed before setting flag
+                const currentContent = entryElem ? entryElem.innerHTML : '';
+                if (currentContent !== lastSavedContent) {
+                    needsGitPush = true;
+                }
+                checkContentAndSave();
+            }, 0);
         }
     }
 }
@@ -286,7 +324,7 @@ function saveToServerDebounced() {
     // Check that the note elements still exist (user might have navigated away)
     const titleInput = document.getElementById("inp" + noteid);
     const entryElem = document.getElementById("entry" + noteid);
-    
+
     if (!titleInput || !entryElem) {
         return;
     }
@@ -341,6 +379,11 @@ function hasUnsavedChanges(noteId) {
         return true;
     }
 
+    // Check if Git push is pending (even if saved locally/remote DB)
+    if (needsGitPush) {
+        return false; // Don't block navigation, just trigger emergencySave via other means
+    }
+
     return false;
 }
 
@@ -355,6 +398,11 @@ function hasUnsavedChanges(noteId) {
  */
 function emergencySave(noteId) {
     if (!noteId || noteId === -1 || noteId === 'search') {
+        return;
+    }
+
+    // Skip if no changes need saving or syncing
+    if (!needsGitPush && typeof hasUnsavedChanges === 'function' && !hasUnsavedChanges(noteId)) {
         return;
     }
 
@@ -381,7 +429,7 @@ function emergencySave(noteId) {
         ];
 
         const isDefaultPlaceholder = placeholderPatterns.some(pattern => pattern.test(titleInput.placeholder));
-        
+
         if (isDefaultPlaceholder) {
             headi = titleInput.placeholder;
         }
@@ -394,7 +442,7 @@ function emergencySave(noteId) {
     // Get folder_id from hidden input field
     const folderIdElem = document.getElementById("folderId" + noteId);
     let folder_id = null;
-    
+
     if (folderIdElem && folderIdElem.value !== '') {
         folder_id = parseInt(folderIdElem.value);
         // Ensure it's a valid number, not NaN or 0
@@ -409,7 +457,8 @@ function emergencySave(noteId) {
         tags: tags,
         folder: folder,
         folder_id: folder_id,
-        workspace: (window.selectedWorkspace || getSelectedWorkspace())
+        workspace: (window.selectedWorkspace || getSelectedWorkspace()),
+        git_push: needsGitPush // Push only if changes were made since load
     };
 
     // Strategy 1: Try fetch with keepalive (most reliable)
@@ -450,7 +499,7 @@ function emergencySave(noteId) {
         const formData = new FormData();
         formData.append('content', ent);
         formData.append('workspace', window.selectedWorkspace || getSelectedWorkspace());
-        
+
         xhr.open('POST', '/api/v1/notes/' + noteId + '/beacon', false);
         xhr.send(formData);
     } catch (xhrErr) {
@@ -476,7 +525,7 @@ function restoreDraft(noteId, content, title, tags) {
 
     if (entryElem && content) {
         const noteType = entryElem.getAttribute('data-note-type') || 'note';
-        
+
         if (noteType === 'note') {
             // Fix drafts that stored escaped media tags
             content = content
@@ -484,24 +533,24 @@ function restoreDraft(noteId, content, title, tags) {
                 .replace(/&lt;video\s+([^&]+)&gt;\s*&lt;\/video&gt;/gi, '<video $1></video>')
                 .replace(/&lt;iframe\s+([^&]+)&gt;\s*&lt;\/iframe&gt;/gi, '<iframe $1></iframe>');
         }
-        
+
         entryElem.innerHTML = content;
 
         // Convert any restored <audio> elements to iframes for contenteditable
         if (typeof window.convertNoteAudioToIframes === 'function') {
             window.convertNoteAudioToIframes();
         }
-        
+
         // Fix existing audio iframes to use audio_player.php
         if (typeof window.fixAudioIframes === 'function') {
             window.fixAudioIframes();
         }
     }
-    
+
     if (titleInput && title) {
         titleInput.value = title;
     }
-    
+
     if (tagsInput && tags) {
         tagsInput.value = tags;
     }
@@ -529,7 +578,7 @@ function reinitializeAutoSaveState() {
     // Get current note ID from the DOM
     let currentNoteId = null;
     const entryElem = document.querySelector('[id^="entry"]:not([id*="search"])');
-    
+
     if (entryElem) {
         currentNoteId = extractNoteIdFromEntry(entryElem);
     }
@@ -554,6 +603,9 @@ function reinitializeAutoSaveState() {
 
         // Remove from refresh list if present
         notesNeedingRefresh.delete(String(currentNoteId));
+
+        // Reset git push flag since we just loaded fresh content
+        needsGitPush = false;
     }
 }
 

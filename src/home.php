@@ -632,6 +632,7 @@ try {
                 searchInput?.focus();
             }
         });
+
     });
     </script>
 </body>

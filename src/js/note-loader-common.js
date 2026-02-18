@@ -18,20 +18,20 @@ function applyHighlightsWithRetries() {
     try {
         var combinedModeInput = document.getElementById('search-combined-mode');
         var combinedModeInputMobile = document.getElementById('search-combined-mode-mobile');
-        isCombinedMode = (combinedModeInput && combinedModeInput.value === '1') || 
-                         (combinedModeInputMobile && combinedModeInputMobile.value === '1');
-        
+        isCombinedMode = (combinedModeInput && combinedModeInput.value === '1') ||
+            (combinedModeInputMobile && combinedModeInputMobile.value === '1');
+
         // Also check via SearchManager if available
         if (!isCombinedMode && window.searchManager && typeof window.searchManager.isCombinedModeActive === 'function') {
             isCombinedMode = window.searchManager.isCombinedModeActive(false) || window.searchManager.isCombinedModeActive(true);
         }
     } catch (e) { /* ignore */ }
-    
+
     // In combined mode, apply BOTH highlights
     if (isCombinedMode) {
-        var searchTerm = (document.getElementById('unified-search') && document.getElementById('unified-search').value) || 
-                        (document.getElementById('unified-search-mobile') && document.getElementById('unified-search-mobile').value) || '';
-        
+        var searchTerm = (document.getElementById('unified-search') && document.getElementById('unified-search').value) ||
+            (document.getElementById('unified-search-mobile') && document.getElementById('unified-search-mobile').value) || '';
+
         // Apply notes highlighting
         if (typeof highlightSearchTerms === 'function') {
             try { highlightSearchTerms(); } catch (e) { /* ignore */ }
@@ -40,33 +40,33 @@ function applyHighlightsWithRetries() {
         if (typeof window.highlightMatchingTags === 'function') {
             try { window.highlightMatchingTags(searchTerm.trim()); } catch (e) { /* ignore */ }
         }
-        
+
         // Delayed retries for combined mode
-        setTimeout(function() {
+        setTimeout(function () {
             if (typeof highlightSearchTerms === 'function') {
-                try { highlightSearchTerms(); } catch (e) {}
+                try { highlightSearchTerms(); } catch (e) { }
             }
             if (typeof window.highlightMatchingTags === 'function') {
-                try { window.highlightMatchingTags(searchTerm.trim()); } catch (e) {}
+                try { window.highlightMatchingTags(searchTerm.trim()); } catch (e) { }
             }
             if (typeof updateAllOverlayPositions === 'function') {
-                try { updateAllOverlayPositions(); } catch (e) {}
+                try { updateAllOverlayPositions(); } catch (e) { }
             }
         }, 100);
-        setTimeout(function() {
+        setTimeout(function () {
             if (typeof highlightSearchTerms === 'function') {
-                try { highlightSearchTerms(); } catch (e) {}
+                try { highlightSearchTerms(); } catch (e) { }
             }
             if (typeof window.highlightMatchingTags === 'function') {
-                try { window.highlightMatchingTags(searchTerm.trim()); } catch (e) {}
+                try { window.highlightMatchingTags(searchTerm.trim()); } catch (e) { }
             }
             if (typeof updateAllOverlayPositions === 'function') {
-                try { updateAllOverlayPositions(); } catch (e) {}
+                try { updateAllOverlayPositions(); } catch (e) { }
             }
         }, 250);
         return;
     }
-    
+
     // Determine active search type (prefer SearchManager if available)
     var activeType = null;
     try {
@@ -139,15 +139,15 @@ function applyHighlightsWithRetries() {
     }
 
     // Delayed retries to handle layout/async changes and overlay positioning
-    setTimeout(function() {
+    setTimeout(function () {
         if (activeType === 'notes') {
             if (typeof highlightSearchTerms === 'function') {
-                try { highlightSearchTerms(); } catch (e) {}
+                try { highlightSearchTerms(); } catch (e) { }
             }
         } else if (activeType === 'tags') {
             // Re-apply both for tags mode to ensure navigation logic is initialized
             if (typeof highlightSearchTerms === 'function') {
-                try { highlightSearchTerms(); } catch (e) {}
+                try { highlightSearchTerms(); } catch (e) { }
             }
             if (typeof window.highlightMatchingTags === 'function') {
                 try {
@@ -157,18 +157,18 @@ function applyHighlightsWithRetries() {
             }
         }
         if (typeof updateAllOverlayPositions === 'function') {
-            try { updateAllOverlayPositions(); } catch (e) {}
+            try { updateAllOverlayPositions(); } catch (e) { }
         }
     }, 100);
-    setTimeout(function() {
+    setTimeout(function () {
         if (activeType === 'notes') {
             if (typeof highlightSearchTerms === 'function') {
-                try { highlightSearchTerms(); } catch (e) {}
+                try { highlightSearchTerms(); } catch (e) { }
             }
         } else if (activeType === 'tags') {
             // Clear any note highlights before highlighting tags
             if (typeof clearSearchHighlights === 'function') {
-                try { clearSearchHighlights(); } catch (e) {}
+                try { clearSearchHighlights(); } catch (e) { }
             }
             if (typeof window.highlightMatchingTags === 'function') {
                 try {
@@ -178,7 +178,7 @@ function applyHighlightsWithRetries() {
             }
         }
         if (typeof updateAllOverlayPositions === 'function') {
-            try { updateAllOverlayPositions(); } catch (e) {}
+            try { updateAllOverlayPositions(); } catch (e) { }
         }
     }, 300);
 }
@@ -233,13 +233,13 @@ function loadNoteCommon(url, noteId, options) {
         finalUrl = url + separator + '_refresh=' + Date.now();
     }
 
-    var clearLoading = function() {
+    var clearLoading = function () {
         if (typeof options.onLoadingComplete === 'function') {
             options.onLoadingComplete();
         }
     };
 
-    var handleError = function() {
+    var handleError = function () {
         hideNoteLoadingState();
         if (isMobileDevice()) {
             document.body.classList.remove('note-open');
@@ -251,7 +251,7 @@ function loadNoteCommon(url, noteId, options) {
     xhr.open('GET', finalUrl, true);
     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
-    xhr.onreadystatechange = function() {
+    xhr.onreadystatechange = function () {
         try {
             if (xhr.readyState === 4) {
                 clearLoading();
@@ -297,7 +297,7 @@ function loadNoteCommon(url, noteId, options) {
                                 }
 
                                 // Small delay to ensure the loading animation is visible
-                                setTimeout(function() {
+                                setTimeout(function () {
                                     hideNoteLoadingState();
                                     // Update selection after load if not done before
                                     if (!options.updateSelectionBeforeLoad && options.clickedLink) {
@@ -336,7 +336,7 @@ function loadNoteCommon(url, noteId, options) {
         }
     };
 
-    xhr.onerror = function() {
+    xhr.onerror = function () {
         clearLoading();
         console.error('Network error during note loading');
         showNotificationPopup('Network error - please check your connection', 'error');
@@ -347,7 +347,7 @@ function loadNoteCommon(url, noteId, options) {
         }
     };
 
-    xhr.ontimeout = function() {
+    xhr.ontimeout = function () {
         clearLoading();
         console.error('Request timeout during note loading');
         showNotificationPopup('Request timeout - please try again', 'error');
@@ -368,7 +368,7 @@ function loadNoteCommon(url, noteId, options) {
  * @param {Event} event - The click event
  * @param {HTMLElement} clickedElement - The actual clicked link element (optional)
  */
-window.loadNoteDirectly = function(url, noteId, event, clickedElement) {
+window.loadNoteDirectly = function (url, noteId, event, clickedElement) {
     try {
         // Check for unsaved changes in current note before proceeding
         var currentNoteId = window.noteid;
@@ -376,10 +376,16 @@ window.loadNoteDirectly = function(url, noteId, event, clickedElement) {
             if (window.hasUnsavedChanges(currentNoteId)) {
                 // Show save in progress notification
                 if (typeof window.showSaveInProgressNotification === 'function') {
-                    window.showSaveInProgressNotification(function() {
+                    window.showSaveInProgressNotification(function () {
                         window.loadNoteDirectly(url, noteId, null);
                     });
                     return false;
+                }
+            } else {
+                // No unsaved UI changes, but if auto-push is enabled, 
+                // we should trigger a push for the note we're leaving
+                if (typeof window.emergencySave === 'function') {
+                    window.emergencySave(currentNoteId);
                 }
             }
         }
@@ -426,13 +432,13 @@ window.loadNoteDirectly = function(url, noteId, event, clickedElement) {
             updateSelectionBeforeLoad: false,
             reinitClickHandlers: true,
             xhrTimeout: 10000,
-            onLoadingComplete: function() {
+            onLoadingComplete: function () {
                 window.isLoadingNote = false;
             },
-            onContentLoaded: function(loadedNoteId, originalUrl) {
+            onContentLoaded: function (loadedNoteId, originalUrl) {
                 // If this was a forced refresh, skip auto-draft restore
                 if (needsRefresh && typeof checkForUnsavedDraft === 'function') {
-                    setTimeout(function() {
+                    setTimeout(function () {
                         checkForUnsavedDraft(loadedNoteId, true); // true = skip auto restore
                     }, 100);
 
@@ -449,7 +455,7 @@ window.loadNoteDirectly = function(url, noteId, event, clickedElement) {
                 if (isMobileDevice() && loadedNoteId && typeof scrollToRightColumn === 'function') {
                     const shouldScroll = sessionStorage.getItem('shouldScrollToNote');
                     if (shouldScroll === 'true') {
-                        setTimeout(function() {
+                        setTimeout(function () {
                             scrollToRightColumn();
                             sessionStorage.removeItem('shouldScrollToNote');
                         }, 100);
@@ -490,7 +496,7 @@ function loadNoteViaAjax(url, noteId, clickedLink, fromHistory) {
         updateSelectionBeforeLoad: true,
         reinitClickHandlers: false,
         xhrTimeout: 0,
-        onLoadingComplete: function() {
+        onLoadingComplete: function () {
             isNoteLoading = false;
         },
         onContentLoaded: null
@@ -532,7 +538,7 @@ function hideNoteLoadingState() {
     if (rightColumn) {
         rightColumn.classList.remove('note-fade-out');
         rightColumn.classList.add('note-loading-state');
-        
+
         // Remove fade-in class after animation completes
         setTimeout(() => {
             rightColumn.classList.remove('note-loading-state');
@@ -554,7 +560,7 @@ function updateSelectedNote(clickedLink) {
     if (clickedLink) {
         const noteId = clickedLink.getAttribute('data-note-id');
         const clickedNoteType = clickedLink.getAttribute('data-note-type');
-        
+
         if (noteId) {
             // Find all links with the same note ID (including in favorites)
             document.querySelectorAll('.links_arbo_left').forEach(link => {
@@ -562,7 +568,7 @@ function updateSelectedNote(clickedLink) {
                     link.classList.add('selected-note');
                 }
             });
-            
+
             // If we clicked on a linked note, also mark the linked note itself as selected
             if (clickedNoteType === 'linked') {
                 clickedLink.classList.add('selected-note');
@@ -571,7 +577,7 @@ function updateSelectedNote(clickedLink) {
             // Fallback to the clicked link only if no data-note-id
             clickedLink.classList.add('selected-note');
         }
-        
+
         // Ensure the selection persists by re-applying it after a short delay
         // This helps in case other scripts interfere with the selection
         setTimeout(() => {
@@ -581,7 +587,7 @@ function updateSelectedNote(clickedLink) {
                         link.classList.add('selected-note');
                     }
                 });
-                
+
                 // Re-apply selection to the linked note if applicable
                 if (clickedNoteType === 'linked' && !clickedLink.classList.contains('selected-note')) {
                     clickedLink.classList.add('selected-note');
@@ -628,28 +634,28 @@ function reinitializeImageClickHandlers() {
     // Remove any leftover resize handles that might have been saved in HTML
     const leftoverHandles = document.querySelectorAll('.image-resize-handle');
     leftoverHandles.forEach(handle => handle.remove());
-    
+
     // Find all images in the note content
     const allImages = document.querySelectorAll('img');
 
     // Use event delegation on document level (only set once)
     if (!imageClickHandlerInitialized) {
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             // Check if the click target or any parent is an image
             const img = event.target.tagName === 'IMG' ? event.target : event.target.closest('img');
-            
+
             if (img && img.tagName === 'IMG') {
                 handleImageClick(event);
             }
         }, true); // Use capture phase
-        
+
         imageClickHandlerInitialized = true;
     }
-    
+
     // Ensure all images are clickable
     allImages.forEach((img) => {
         img.style.cursor = 'pointer';
-        
+
         // Remove existing tooltip event listeners to avoid duplicates
         const oldListeners = img._tooltipListeners;
         if (oldListeners) {
@@ -657,37 +663,37 @@ function reinitializeImageClickHandlers() {
             img.removeEventListener('mousemove', oldListeners.mousemove);
             img.removeEventListener('mouseleave', oldListeners.mouseleave);
         }
-        
+
         // Add hover tooltip for images with links (not on public pages)
         if (!window.isPublicNotePage) {
             let currentToast;
-            
-            const mouseenterHandler = function(e) {
+
+            const mouseenterHandler = function (e) {
                 // Check if link still exists at the time of hover
                 const parentLink = img.closest('a[data-image-link]');
                 if (parentLink && parentLink.href) {
                     currentToast = showImageLinkToast(parentLink.href, e.clientX, e.clientY);
                 }
             };
-            
-            const mousemoveHandler = function(e) {
+
+            const mousemoveHandler = function (e) {
                 // Update toast position as mouse moves
                 if (currentToast) {
                     updateImageLinkToastPosition(currentToast, e.clientX, e.clientY);
                 }
             };
-            
-            const mouseleaveHandler = function() {
+
+            const mouseleaveHandler = function () {
                 if (currentToast) {
                     hideImageLinkToast(currentToast);
                     currentToast = null;
                 }
             };
-            
+
             img.addEventListener('mouseenter', mouseenterHandler);
             img.addEventListener('mousemove', mousemoveHandler);
             img.addEventListener('mouseleave', mouseleaveHandler);
-            
+
             // Store listeners for cleanup
             img._tooltipListeners = {
                 mouseenter: mouseenterHandler,
@@ -734,8 +740,8 @@ function buildImageMenuHTML(img) {
 
     // Check if this is a markdown note (to exclude certain options for markdown)
     const isMarkdownNote = img.closest('.markdown-preview') !== null ||
-                           img.closest('.markdown-editor') !== null ||
-                           img.closest('.note-entry[data-note-format="markdown"]') !== null;
+        img.closest('.markdown-editor') !== null ||
+        img.closest('.note-entry[data-note-format="markdown"]') !== null;
 
     // Helper function for translations
     const t = window.t || ((key, params, fallback) => fallback);
@@ -877,7 +883,7 @@ function createImageSubmenu(menu, img) {
     // Store reference for cleanup
     menu._associatedSubmenu = submenu;
 
-    linkParent.addEventListener('mouseenter', function() {
+    linkParent.addEventListener('mouseenter', function () {
         submenu.style.display = 'block';
 
         // Position submenu like slash menu does
@@ -908,7 +914,7 @@ function createImageSubmenu(menu, img) {
         }
     });
 
-    linkParent.addEventListener('mouseleave', function(e) {
+    linkParent.addEventListener('mouseleave', function (e) {
         // Don't hide if moving to submenu
         const relatedTarget = e.relatedTarget;
         if (!relatedTarget || (!submenu.contains(relatedTarget) && relatedTarget !== submenu)) {
@@ -924,7 +930,7 @@ function createImageSubmenu(menu, img) {
         }
     });
 
-    submenu.addEventListener('mouseleave', function(e) {
+    submenu.addEventListener('mouseleave', function (e) {
         const relatedTarget = e.relatedTarget;
         if (!relatedTarget || (!linkParent.contains(relatedTarget) && relatedTarget !== linkParent)) {
             submenu.style.display = 'none';
@@ -936,7 +942,7 @@ function createImageSubmenu(menu, img) {
     });
 
     // Add click handlers to submenu items
-    submenu.addEventListener('click', function(e) {
+    submenu.addEventListener('click', function (e) {
         const action = e.target.closest('.image-menu-item')?.getAttribute('data-action');
         handleImageMenuAction(action, img, e);
         removeImageMenu(menu);
@@ -1075,7 +1081,7 @@ function handleImageClick(event) {
     adjustImageMenuPosition(menu, clickX, clickY);
 
     // Handle menu item clicks
-    menu.addEventListener('click', function(e) {
+    menu.addEventListener('click', function (e) {
         const action = e.target.closest('.image-menu-item')?.getAttribute('data-action');
 
         // Ignore click on link-submenu parent (handled by hover)
@@ -1174,7 +1180,7 @@ function downloadImage(imageSrc) {
 function translateCalloutTitles() {
     try {
         const callouts = document.querySelectorAll('.callout');
-        callouts.forEach(function(callout) {
+        callouts.forEach(function (callout) {
             // Get callout type from class name
             let calloutType = null;
             const classList = callout.className.split(' ');
@@ -1184,16 +1190,16 @@ function translateCalloutTitles() {
                     break;
                 }
             }
-            
+
             if (!calloutType) return;
-            
+
             // Find the title text element
             const titleTextElement = callout.querySelector('.callout-title-text');
             if (!titleTextElement) return;
-            
+
             // Get current text
             const currentText = titleTextElement.textContent.trim();
-            
+
             // List of possible English titles (in case the content is in English)
             const englishTitles = {
                 'note': 'Note',
@@ -1202,7 +1208,7 @@ function translateCalloutTitles() {
                 'warning': 'Warning',
                 'caution': 'Caution'
             };
-            
+
             // Only translate if it's the default title (not a custom title)
             const expectedEnglishTitle = englishTitles[calloutType];
             if (expectedEnglishTitle && currentText === expectedEnglishTitle) {
@@ -1227,14 +1233,14 @@ function reinitializeNoteContent() {
     if (typeof window.reinitializeAutoSaveState === 'function') {
         window.reinitializeAutoSaveState();
     }
-    
+
     // Convert base64 images in HTML notes to attachments (migration)
     try {
         var noteEntries = document.querySelectorAll('.noteentry[data-note-type="note"], .noteentry:not([data-note-type])');
-        noteEntries.forEach(function(entry) {
+        noteEntries.forEach(function (entry) {
             if (typeof window.convertBase64ImagesToAttachments === 'function') {
                 // Small delay to ensure DOM is stable
-                setTimeout(function() {
+                setTimeout(function () {
                     window.convertBase64ImagesToAttachments(entry);
                 }, 100);
             }
@@ -1247,18 +1253,18 @@ function reinitializeNoteContent() {
     // Prefer the centralized helper which knows about notes/tags/folders.
     if (isSearchMode) {
         if (typeof applyHighlightsWithRetries === 'function') {
-            try { 
-                setTimeout(function() { 
-                    try { 
-                        applyHighlightsWithRetries(); 
+            try {
+                setTimeout(function () {
+                    try {
+                        applyHighlightsWithRetries();
                         if (window.searchNavigation && window.searchNavigation.pendingAutoScroll && typeof scrollToFirstHighlight === 'function') {
                             scrollToFirstHighlight();
                         }
-                    } catch(e){} 
-                }, 60); 
-            } catch (e) {}
+                    } catch (e) { }
+                }, 60);
+            } catch (e) { }
         } else if (typeof highlightSearchTerms === 'function') {
-            setTimeout(function() {
+            setTimeout(function () {
                 highlightSearchTerms();
                 if (window.searchNavigation && window.searchNavigation.pendingAutoScroll && typeof scrollToFirstHighlight === 'function') {
                     scrollToFirstHighlight();
@@ -1279,7 +1285,7 @@ function reinitializeNoteContent() {
 
     // Re-initialize image click handlers
     reinitializeImageClickHandlers();
-    
+
     // Re-initialize note drag and drop events
     if (typeof setupNoteDragDropEvents === 'function') {
         setupNoteDragDropEvents();
@@ -1301,13 +1307,13 @@ function reinitializeNoteContent() {
     // is replaced with the interactive task list UI when notes are loaded via AJAX.
     try {
         const taskEntries = document.querySelectorAll('[data-note-type="tasklist"]');
-        taskEntries.forEach(function(entry) {
+        taskEntries.forEach(function (entry) {
             const idAttr = entry.id || '';
             if (!idAttr) return;
             const noteId = idAttr.replace('entry', '');
             if (typeof initializeTaskList === 'function') {
                 // Call initializeTaskList after a short delay to ensure the DOM is stable
-                setTimeout(function() {
+                setTimeout(function () {
                     try {
                         initializeTaskList(noteId, 'tasklist');
                     } catch (e) {
@@ -1324,13 +1330,13 @@ function reinitializeNoteContent() {
     // is replaced with the interactive markdown editor/preview UI when notes are loaded via AJAX.
     try {
         const markdownEntries = document.querySelectorAll('[data-note-type="markdown"]');
-        markdownEntries.forEach(function(entry) {
+        markdownEntries.forEach(function (entry) {
             const idAttr = entry.id || '';
             if (!idAttr) return;
             const noteId = idAttr.replace('entry', '');
             if (typeof initializeMarkdownNote === 'function') {
                 // Call initializeMarkdownNote after a short delay to ensure the DOM is stable
-                setTimeout(function() {
+                setTimeout(function () {
                     try {
                         initializeMarkdownNote(noteId);
                     } catch (e) {
@@ -1357,25 +1363,25 @@ function reinitializeNoteContent() {
     if (typeof window.convertNoteAudioToIframes === 'function') {
         window.convertNoteAudioToIframes();
     }
-    
+
     // Fix existing audio iframes to use audio_player.php
     if (typeof window.fixAudioIframes === 'function') {
         window.fixAudioIframes();
     }
-    
+
     // Translate callout titles to the current language
     translateCalloutTitles();
-    
+
     // Close all toggle blocks on page load (toggles should always start closed)
     try {
         const toggleBlocks = document.querySelectorAll('details.toggle-block');
-        toggleBlocks.forEach(function(toggle) {
+        toggleBlocks.forEach(function (toggle) {
             toggle.removeAttribute('open');
         });
     } catch (e) {
         console.error('Error closing toggle blocks:', e);
     }
-    
+
     // On mobile, ensure the right column is properly displayed only when a specific note is selected
     if (isMobileDevice()) {
         const urlParams = new URLSearchParams(window.location.search);
@@ -1384,7 +1390,7 @@ function reinitializeNoteContent() {
         const tagsSearchParam = urlParams.get('tags_search');
         const unifiedSearchParam = urlParams.get('unified_search');
         const isInSearchMode = searchParam || tagsSearchParam || unifiedSearchParam;
-        
+
         // If a specific note is selected, open the note pane on mobile.
         // Previously this avoided opening during search mode; that prevented selecting notes while searching.
         if (noteParam) {
@@ -1420,13 +1426,13 @@ function reinitializeNoteContent() {
  */
 function deleteImage(img) {
     if (!img) return;
-    
+
     // Show confirmation modal
     if (typeof window.modalAlert !== 'undefined' && typeof window.modalAlert.confirm === 'function') {
         window.modalAlert.confirm(
             (window.t ? window.t('editor.images.delete_confirm.message', {}, 'Are you sure you want to delete this image? This action cannot be undone.') : 'Are you sure you want to delete this image? This action cannot be undone.'),
             (window.t ? window.t('editor.images.delete_confirm.title', {}, 'Delete Image') : 'Delete Image')
-        ).then(function(confirmed) {
+        ).then(function (confirmed) {
             if (confirmed) {
                 performImageDeletion(img);
             }
@@ -1444,7 +1450,7 @@ function deleteImage(img) {
  */
 function performImageDeletion(img) {
     if (!img) return;
-    
+
     try {
         // Mark image as manually deleted to avoid double deletion from observer
         img._manuallyDeleted = true;
@@ -1457,7 +1463,7 @@ function performImageDeletion(img) {
             if (attachmentMatch) {
                 const noteId = attachmentMatch[1];
                 const attachmentId = attachmentMatch[2];
-                
+
                 // Only delete if the image belongs to the note it's being deleted from
                 const noteEntry = img.closest('.noteentry');
                 const noteIdMatch = noteEntry?.id.match(/entry(\d+)/);
@@ -1489,30 +1495,30 @@ function performImageDeletion(img) {
         // Find the container (could be excalidraw-container or just the img itself)
         const container = img.closest('.excalidraw-container');
         const elementToRemove = container || img;
-        
+
         // Remove the element from DOM
         elementToRemove.remove();
-        
+
         // Clean up any following empty elements or line breaks
         const nextElement = elementToRemove.nextElementSibling;
-        if (nextElement && (nextElement.tagName === 'BR' || 
-                          (nextElement.tagName === 'DIV' && nextElement.innerHTML.trim() === '') ||
-                          nextElement.innerHTML === '&nbsp;')) {
+        if (nextElement && (nextElement.tagName === 'BR' ||
+            (nextElement.tagName === 'DIV' && nextElement.innerHTML.trim() === '') ||
+            nextElement.innerHTML === '&nbsp;')) {
             nextElement.remove();
         }
-        
+
         // Trigger note update to save changes
         if (typeof window.markNoteAsModified === 'function') {
             window.markNoteAsModified(); // Mark note as edited
         }
-        
+
         // Trigger automatic save after a short delay
-        setTimeout(function() {
+        setTimeout(function () {
             if (typeof window.saveNoteImmediately === 'function') {
                 window.saveNoteImmediately(); // Save to server
             }
         }, 100);
-        
+
     } catch (error) {
         console.warn('Error deleting image:', error);
     }
@@ -1523,11 +1529,11 @@ function performImageDeletion(img) {
  */
 function toggleImageBorder(img) {
     if (!img) return;
-    
+
     try {
         // Check if image currently has the border class
         const hasBorderClass = img.classList.contains('img-with-border');
-        
+
         if (hasBorderClass) {
             // Remove border class
             img.classList.remove('img-with-border');
@@ -1537,19 +1543,19 @@ function toggleImageBorder(img) {
             // Add border class (with padding, rounded corners, and #ddd border)
             img.classList.add('img-with-border');
         }
-        
+
         // Trigger note update to save changes
         if (typeof window.markNoteAsModified === 'function') {
             window.markNoteAsModified(); // Mark note as edited
         }
-        
+
         // Trigger automatic save after a short delay
-        setTimeout(function() {
+        setTimeout(function () {
             if (typeof window.saveNoteImmediately === 'function') {
                 window.saveNoteImmediately(); // Save to server
             }
         }, 100);
-        
+
     } catch (error) {
         console.warn('Error toggling image border:', error);
     }
@@ -1560,11 +1566,11 @@ function toggleImageBorder(img) {
  */
 function toggleImageBorderNoPadding(img) {
     if (!img) return;
-    
+
     try {
         // Check if image currently has the no-padding border class
         const hasBorderClass = img.classList.contains('img-with-border-no-padding');
-        
+
         if (hasBorderClass) {
             // Remove border class
             img.classList.remove('img-with-border-no-padding');
@@ -1574,19 +1580,19 @@ function toggleImageBorderNoPadding(img) {
             // Add border class without padding
             img.classList.add('img-with-border-no-padding');
         }
-        
+
         // Trigger note update to save changes
         if (typeof window.markNoteAsModified === 'function') {
             window.markNoteAsModified(); // Mark note as edited
         }
-        
+
         // Trigger automatic save after a short delay
-        setTimeout(function() {
+        setTimeout(function () {
             if (typeof window.saveNoteImmediately === 'function') {
                 window.saveNoteImmediately(); // Save to server
             }
         }, 100);
-        
+
     } catch (error) {
         console.warn('Error toggling image border without padding:', error);
     }
@@ -1597,17 +1603,17 @@ function toggleImageBorderNoPadding(img) {
  */
 function addOrEditImageLink(img) {
     if (!img) return;
-    
+
     try {
         // Check if the image is already wrapped in a link
         const existingLink = img.closest('a');
         const currentUrl = existingLink ? existingLink.href : '';
-        
+
         // Show modal instead of prompt
-        showImageLinkModal(currentUrl, function(url) {
+        showImageLinkModal(currentUrl, function (url) {
             // If user cancelled or provided empty string
             if (url === null || url === undefined) return;
-            
+
             // If empty string, remove link if it exists
             if (url.trim() === '') {
                 if (existingLink) {
@@ -1615,14 +1621,14 @@ function addOrEditImageLink(img) {
                 }
                 return;
             }
-            
+
             // Validate and sanitize URL
             let finalUrl = url.trim();
             if (!finalUrl.match(/^https?:\/\//i)) {
                 // Add https:// if no protocol specified
                 finalUrl = 'https://' + finalUrl;
             }
-            
+
             if (existingLink) {
                 // Update existing link
                 existingLink.href = finalUrl;
@@ -1635,24 +1641,24 @@ function addOrEditImageLink(img) {
                 link.setAttribute('target', '_blank');
                 link.setAttribute('rel', 'noopener noreferrer');
                 link.setAttribute('data-image-link', 'true'); // Mark this as an image link
-                
+
                 // Wrap the image in the link
                 img.parentNode.insertBefore(link, img);
                 link.appendChild(img);
             }
-            
+
             // Mark note as modified and save
             if (typeof window.markNoteAsModified === 'function') {
                 window.markNoteAsModified();
             }
-            
-            setTimeout(function() {
+
+            setTimeout(function () {
                 if (typeof window.saveNoteImmediately === 'function') {
                     window.saveNoteImmediately();
                 }
             }, 100);
         }, existingLink ? 'edit' : 'add');
-        
+
     } catch (error) {
         console.warn('Error adding/editing image link:', error);
     }
@@ -1664,7 +1670,7 @@ function addOrEditImageLink(img) {
 function showImageLinkModal(defaultUrl, callback, mode) {
     const t = window.t || ((key, params, fallback) => fallback);
     const isEdit = mode === 'edit';
-    
+
     // Create modal if it doesn't exist
     let modal = document.getElementById('imageLinkModal');
     if (!modal) {
@@ -1689,36 +1695,36 @@ function showImageLinkModal(defaultUrl, callback, mode) {
         `;
         document.body.insertAdjacentHTML('beforeend', modalHtml);
         modal = document.getElementById('imageLinkModal');
-        
+
         // Add event listeners
         const input = document.getElementById('imageLinkModalInput');
         const confirmBtn = document.getElementById('imageLinkModalConfirmBtn');
-        
-        input.addEventListener('keypress', function(e) {
+
+        input.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 confirmImageLinkModal();
             }
         });
-        
+
         confirmBtn.addEventListener('click', confirmImageLinkModal);
     }
-    
+
     // Update modal content
     const titleEl = document.getElementById('imageLinkModalTitle');
     const inputEl = document.getElementById('imageLinkModalInput');
-    
-    titleEl.textContent = isEdit 
+
+    titleEl.textContent = isEdit
         ? t('image_menu.link_modal.title_edit', null, 'Edit Image Link')
         : t('image_menu.link_modal.title_add', null, 'Add Link to Image');
-    
+
     inputEl.value = defaultUrl || '';
-    
+
     // Store callback
     window.imageLinkModalCallback = callback;
-    
+
     // Show modal
     modal.style.display = 'flex';
-    
+
     // Focus input
     setTimeout(() => inputEl.focus(), 100);
 }
@@ -1740,9 +1746,9 @@ function closeImageLinkModal() {
 function confirmImageLinkModal() {
     const inputValue = document.getElementById('imageLinkModalInput').value;
     const callback = window.imageLinkModalCallback;
-    
+
     closeImageLinkModal();
-    
+
     if (callback) {
         callback(inputValue);
     }
@@ -1753,27 +1759,27 @@ function confirmImageLinkModal() {
  */
 function removeImageLink(img) {
     if (!img) return;
-    
+
     try {
         const link = img.closest('a');
         if (link) {
             // Replace the link with just the image
             link.parentNode.insertBefore(img, link);
             link.remove();
-            
+
             // Mark note as modified and save
             if (typeof window.markNoteAsModified === 'function') {
                 window.markNoteAsModified();
             }
-            
-            setTimeout(function() {
+
+            setTimeout(function () {
                 if (typeof window.saveNoteImmediately === 'function') {
                     window.saveNoteImmediately();
                 }
             }, 100);
-            
+
             // Reinitialize image click handlers to remove old event listeners
-            setTimeout(function() {
+            setTimeout(function () {
                 reinitializeImageClickHandlers();
             }, 150);
         }
@@ -1787,21 +1793,21 @@ function removeImageLink(img) {
  */
 function enableImageResize(img) {
     if (!img) return;
-    
+
     // Remove any existing resize handles first
     const existingHandles = document.querySelectorAll('.image-resize-handle');
     existingHandles.forEach(handle => handle.remove());
-    
+
     // Create resize handle
     const resizeHandle = document.createElement('div');
     resizeHandle.className = 'image-resize-handle';
     resizeHandle.innerHTML = '⤡';
-    
+
     // Position the image as relative so the handle can be positioned absolutely
     const originalPosition = img.style.position;
     img.style.position = 'relative';
     img.style.display = 'inline-block';
-    
+
     // Create a wrapper if the image doesn't have one OR if parent doesn't have the resize wrapper class
     let wrapper = img.parentElement;
     if (!wrapper || !wrapper.classList.contains('image-resize-wrapper')) {
@@ -1817,72 +1823,72 @@ function enableImageResize(img) {
         wrapper.style.position = 'relative';
         wrapper.style.display = 'inline-block';
     }
-    
+
     // Add the handle to the wrapper
     wrapper.appendChild(resizeHandle);
-    
+
     // Store original dimensions
     const originalWidth = img.width || img.naturalWidth;
     const aspectRatio = img.naturalHeight / img.naturalWidth;
-    
+
     let isResizing = false;
     let startX, startWidth;
-    
+
     // Mouse down on handle
-    resizeHandle.addEventListener('mousedown', function(e) {
+    resizeHandle.addEventListener('mousedown', function (e) {
         e.preventDefault();
         e.stopPropagation();
         isResizing = true;
         startX = e.clientX;
         startWidth = img.offsetWidth;
-        
+
         document.body.style.cursor = 'nwse-resize';
         document.body.style.userSelect = 'none';
     });
-    
+
     // Mouse move
     document.addEventListener('mousemove', function handleMouseMove(e) {
         if (!isResizing) return;
-        
+
         const deltaX = e.clientX - startX;
         const newWidth = Math.max(50, startWidth + deltaX); // Minimum 50px
-        
+
         img.style.width = newWidth + 'px';
         img.style.height = 'auto';
         img.setAttribute('width', Math.round(newWidth));
-        
+
         // Update wrapper size
         wrapper.style.width = newWidth + 'px';
     });
-    
+
     // Mouse up
     document.addEventListener('mouseup', function handleMouseUp(e) {
         if (!isResizing) return;
-        
+
         isResizing = false;
         document.body.style.cursor = '';
         document.body.style.userSelect = '';
-        
+
         // Save the final width
         const finalWidth = Math.round(img.offsetWidth);
         img.setAttribute('width', finalWidth);
         img.removeAttribute('height'); // Let browser calculate height from aspect ratio
-        
+
         // Remove the handle immediately to prevent it from being saved
         resizeHandle.remove();
-        
+
         // Trigger note save
         if (typeof window.markNoteAsModified === 'function') {
             window.markNoteAsModified();
         }
-        
-        setTimeout(function() {
+
+        setTimeout(function () {
             if (typeof window.saveNoteImmediately === 'function') {
                 window.saveNoteImmediately();
             }
         }, 100);
     });
-    
+
     // Click outside to remove handle
     setTimeout(() => {
         document.addEventListener('click', function closeResize(e) {
@@ -1903,7 +1909,7 @@ function showImageLinkToast(url, mouseX, mouseY) {
     if (existingToast) {
         existingToast.remove();
     }
-    
+
     // Create toast
     const toast = document.createElement('div');
     toast.className = 'image-link-toast';
@@ -1922,16 +1928,16 @@ function showImageLinkToast(url, mouseX, mouseY) {
     toast.style.whiteSpace = 'nowrap';
     toast.style.overflow = 'hidden';
     toast.style.textOverflow = 'ellipsis';
-    
+
     // Position near mouse cursor (offset slightly to not block the image)
     toast.style.left = (mouseX + 15) + 'px';
     toast.style.top = (mouseY + 15) + 'px';
-    
+
     // Add URL (no icon)
     toast.innerHTML = `<span>${url}</span>`;
-    
+
     document.body.appendChild(toast);
-    
+
     return toast;
 }
 
@@ -1949,7 +1955,7 @@ function updateImageLinkToastPosition(toast, mouseX, mouseY) {
  */
 function hideImageLinkToast(toast) {
     if (!toast) return;
-    
+
     if (toast.parentNode) {
         toast.parentNode.removeChild(toast);
     }

@@ -1916,6 +1916,10 @@
         "warning": "不要将此功能作为唯一的备份解决方案。\n请考虑为您的笔记设置手动或自动 ZIP 导出。",
         "confirm_push": "将工作区 \"{{workspace}}\" 的笔记推送到 {{provider}} 吗？Updates existing files and deletes files that no longer exist in Poznote.",
         "confirm_pull": "从 {{provider}} 拉取工作区 \"{{workspace}}\" 的笔记吗？Import notes from {{provider}}. Updates existing notes and moves to trash notes that no longer exist on {{provider}}.",
+        "confirm_auto_pull": "新会话已开始。您想要从 {{provider}} 拉取更改吗？",
+        "auto_pull_complete": "Git 同步完成。正在刷新页面...",
+        "auto_pull_no_changes": "Git 同步完成。未发现更改。",
+        "pulling": "正在拉取更改...",
         "config": {
             "title": "配置",
             "status": "状态",

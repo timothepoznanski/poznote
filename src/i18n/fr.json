@@ -59,7 +59,6 @@
         "apply": "Appliquer",
         "at": "à",
         "kanban": "Kanban",
-        "scroll_left": "Faire défiler à gauche",
         "scroll_right": "Faire défiler à droite"
     },
     "kanban": {
@@ -765,6 +764,11 @@
             "workspace_destination": "Sélectionnez l’espace de travail de destination :",
             "target_folder": "Sélectionnez le dossier cible :",
             "enter_folder_name": "Veuillez saisir un nom de dossier"
+        },
+        "git_sync": {
+            "confirm_auto_pull": "Une nouvelle session a démarré. Voulez-vous récupérer les modifications depuis {{provider}} ?",
+            "auto_pull_complete": "Synchronisation Git terminée. Actualisation de la page...",
+            "auto_pull_no_changes": "Synchronisation Git terminée. Aucune modification trouvée."
         },
         "move_folder_files": {
             "title": "Déplacer tous les fichiers",
@@ -1951,6 +1955,10 @@
         "warning": "Ne vous servez pas de cette fonctionnalité comme seule solution de sauvegarde.\nPensez à mettre en place des exports manuels ou automatiques de fichiers ZIP de vos notes.",
         "confirm_push": "Pousser les notes de l’espace « {{workspace}} » vers {{provider}} ? Met à jour les fichiers existants et supprime ceux qui n'existent plus dans Poznote.",
         "confirm_pull": "Récupérer les notes de l’espace « {{workspace}} » depuis {{provider}} ? Importe les notes depuis {{provider}}. Met à jour les notes existantes et déplace vers la corbeille celles qui n'existent plus sur {{provider}}.",
+        "confirm_auto_pull": "Une nouvelle session a commencé. Voulez-vous récupérer les changements depuis {{provider}} ?",
+        "auto_pull_complete": "Synchronisation Git terminée. Rafraîchissement de la page...",
+        "auto_pull_no_changes": "Synchronisation Git terminée. Aucun changement trouvé.",
+        "pulling": "Récupération des changements...",
         "config": {
             "title": "Configuration",
             "status": "Statut",
@@ -1963,6 +1971,14 @@
             "not_configured": "Non configuré",
             "not_configured_yet": "À configurer",
             "hint": "La synchronisation {{provider}} est désactivée. Définissez POZNOTE_GIT_SYNC_ENABLED=true dans votre fichier .env pour l'activer."
+        },
+        "auto_sync": {
+            "title": "Synchronisation automatique",
+            "push_label": "Envoyer automatiquement lors de l'enregistrement",
+            "push_description": "Pousse la version de la note vers le dépôt Git dès qu'elle est sauvegardée dans Poznote.",
+            "pull_label": "Récupérer automatiquement au chargement",
+            "pull_description": "Tente de récupérer les nouvelles notes depuis le dépôt Git lors de l'ouverture de Poznote.",
+            "saving": "Configuration enregistrée"
         },
         "test": {
             "title": "Tester la connexion",

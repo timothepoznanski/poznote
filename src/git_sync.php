@@ -97,6 +97,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             // Refresh last sync info
             $lastSync = $gitSync->getLastSyncInfo();
             break;
+            
+        case 'update_auto_settings':
+            $autoPush = isset($_POST['auto_push']) ? true : false;
+            $autoPull = isset($_POST['auto_pull']) ? true : false;
+            $gitSync->setAutoPushEnabled($autoPush);
+            $gitSync->setAutoPullEnabled($autoPull);
+            // Re-fetch config status to update badges
+            $configStatus = $gitSync->getConfigStatus();
+            $message = tp('git_sync.auto_sync.saving');
+            break;
     }
 }
 
@@ -322,6 +332,35 @@ try {
             <div class="config-hint">
                 <i class="fas fa-info-circle"></i>
                 <?php echo tp_h('git_sync.config.hint'); ?>
+            </div>
+            <?php else: ?>
+            <div class="auto-sync-settings">
+                <h4><?php echo tp_h('git_sync.auto_sync.title'); ?></h4>
+                <form method="post" class="auto-sync-form">
+                    <input type="hidden" name="action" value="update_auto_settings">
+                    
+                    <div class="form-check">
+                        <label class="switch">
+                            <input type="checkbox" name="auto_push" onchange="this.form.submit()" <?php echo ($configStatus['autoPush'] ?? false) ? 'checked' : ''; ?>>
+                            <span class="slider round"></span>
+                        </label>
+                        <div class="check-label">
+                            <span class="label-title"><?php echo tp_h('git_sync.auto_sync.push_label'); ?></span>
+                            <span class="label-desc"><?php echo tp_h('git_sync.auto_sync.push_description'); ?></span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-check">
+                        <label class="switch">
+                            <input type="checkbox" name="auto_pull" onchange="this.form.submit()" <?php echo ($configStatus['autoPull'] ?? false) ? 'checked' : ''; ?>>
+                            <span class="slider round"></span>
+                        </label>
+                        <div class="check-label">
+                            <span class="label-title"><?php echo tp_h('git_sync.auto_sync.pull_label'); ?></span>
+                            <span class="label-desc"><?php echo tp_h('git_sync.auto_sync.pull_description'); ?></span>
+                        </div>
+                    </div>
+                </form>
             </div>
             <?php endif; ?>
         </div>

@@ -1797,6 +1797,10 @@
         "warning": "Verwenden Sie diese Funktion nicht als einzige Backup-Lösung.\nErwägen Sie die Einrichtung manueller oder automatischer ZIP-Exporte Ihrer Notizen.",
         "confirm_push": "Notizen des Workspace \"{{workspace}}\" zu {{provider}} pushen? Updates existing files and deletes files that no longer exist in Poznote.",
         "confirm_pull": "Pull notes for workspace \"{{workspace}}\" from {{provider}}? Import notes from {{provider}}. Updates existing notes and moves to trash notes that no longer exist on {{provider}}.",
+        "confirm_auto_pull": "Eine neue Sitzung wurde gestartet. Möchten Sie Änderungen von {{provider}} abrufen?",
+        "auto_pull_complete": "Git-Synchronisation abgeschlossen. Seite wird aktualisiert...",
+        "auto_pull_no_changes": "Git-Synchronisation abgeschlossen. Keine Änderungen gefunden.",
+        "pulling": "Änderungen abrufen...",
         "config": {
             "title": "Konfiguration",
             "status": "Status",

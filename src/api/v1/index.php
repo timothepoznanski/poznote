@@ -276,7 +276,9 @@ $router->post('/notes', function($params) use ($notesController) {
 
 // Update a note
 $router->patch('/notes/{id}', function($params) use ($notesController) {
-    $notesController->update($params['id']);
+    $input = json_decode(file_get_contents('php://input'), true);
+    $triggerSync = isset($input['git_push']) && $input['git_push'] === true;
+    $notesController->update($params['id'], $triggerSync);
 });
 
 // Delete a note

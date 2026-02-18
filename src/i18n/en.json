@@ -1298,6 +1298,10 @@
         "warning": "Do not use this feature as your only backup solution.\nConsider setting up manual or automatic ZIP exports of your notes.",
         "confirm_push": "Push notes of workspace \"{{workspace}}\" to {{provider}}? Updates existing files and deletes files that no longer exist in Poznote.",
         "confirm_pull": "Pull notes for workspace \"{{workspace}}\" from {{provider}}? Import notes from {{provider}}. Updates existing notes and moves to trash notes that no longer exist on {{provider}}.",
+        "confirm_auto_pull": "A new session started. Do you want to pull changes from {{provider}}?",
+        "auto_pull_complete": "Git pull complete. Refreshing page...",
+        "auto_pull_no_changes": "Git pull complete. No changes found.",
+        "pulling": "Pulling changes...",
         "config": {
             "title": "Configuration",
             "status": "Status",
@@ -1310,6 +1314,14 @@
             "not_configured": "Not configured",
             "not_configured_yet": "To configure",
             "hint": "{{provider}} sync is disabled. Set POZNOTE_GIT_SYNC_ENABLED=true in your .env file to enable it."
+        },
+        "auto_sync": {
+            "title": "Automatic Synchronization",
+            "push_label": "Automatically push on save",
+            "push_description": "Pushes the note version to the Git repository as soon as it is saved in Poznote.",
+            "pull_label": "Automatically pull on load",
+            "pull_description": "Attempts to pull new notes from the Git repository when Poznote is opened.",
+            "saving": "Configuration saved"
         },
         "test": {
             "title": "Test Connection",

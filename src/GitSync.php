@@ -90,7 +90,9 @@ class GitSync {
             'hasToken' => !empty($this->token),
             'authorName' => $this->authorName,
             'provider' => $this->provider,
-            'apiBase' => $this->apiBase
+            'apiBase' => $this->apiBase,
+            'autoPush' => $this->isAutoPushEnabled(),
+            'autoPull' => $this->isAutoPullEnabled()
         ];
     }
     
@@ -166,6 +168,202 @@ class GitSync {
         }
         
         return null;
+    }
+    
+    /**
+     * Check if automatic push (on save) is enabled
+     * @return bool
+     */
+    public function isAutoPushEnabled() {
+        if (!$this->con) return false;
+        try {
+            $stmt = $this->con->prepare("SELECT value FROM settings WHERE key = 'git_sync_auto_push'");
+            $stmt->execute();
+            $val = $stmt->fetchColumn();
+            return $val === '1' || $val === 'true';
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Check if automatic pull (on load) is enabled
+     * @return bool
+     */
+    public function isAutoPullEnabled() {
+        if (!$this->con) return false;
+        try {
+            $stmt = $this->con->prepare("SELECT value FROM settings WHERE key = 'git_sync_auto_pull'");
+            $stmt->execute();
+            $val = $stmt->fetchColumn();
+            return $val === '1' || $val === 'true';
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Enable or disable automatic push
+     * @param bool $enabled
+     */
+    public function setAutoPushEnabled($enabled) {
+        if (!$this->con) return false;
+        try {
+            $stmt = $this->con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('git_sync_auto_push', ?)");
+            return $stmt->execute([$enabled ? '1' : '0']);
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Enable or disable automatic pull
+     * @param bool $enabled
+     */
+    public function setAutoPullEnabled($enabled) {
+        if (!$this->con) return false;
+        try {
+            $stmt = $this->con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('git_sync_auto_pull', ?)");
+            return $stmt->execute([$enabled ? '1' : '0']);
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Push a single note to Git repository
+     * @param int $noteId Note ID to push
+     * @return array Result
+     */
+    public function pushNote($noteId) {
+        if (!$this->isConfigured()) {
+            return ['success' => false, 'error' => 'Git sync is not configured'];
+        }
+        
+        if (!$this->con) {
+            return ['success' => false, 'error' => 'Database connection required'];
+        }
+        
+        try {
+            $stmt = $this->con->prepare("SELECT id, heading, type, folder_id, tags, workspace, updated, attachments FROM entries WHERE id = ? AND trash = 0");
+            $stmt->execute([$noteId]);
+            $note = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$note) {
+                return ['success' => false, 'error' => 'Note not found or in trash'];
+            }
+            
+            require_once __DIR__ . '/functions.php';
+            $entriesPath = getEntriesPath();
+            $attachmentsPath = getAttachmentsPath();
+            
+            $noteType = $note['type'] ?? 'note';
+            $localExtension = ($noteType === 'markdown') ? 'md' : 'html';
+            $repoExtension = $localExtension;
+            if ($noteType === 'tasklist' || $noteType === 'excalidraw') {
+                $repoExtension = 'json';
+            }
+            
+            $filePath = $entriesPath . '/' . $noteId . '.' . $localExtension;
+            if (!file_exists($filePath)) {
+                return ['success' => false, 'error' => 'File not found on disk'];
+            }
+            
+            $content = file_get_contents($filePath);
+            
+            // Transform attachment links for GitHub
+            if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
+                $attachments = json_decode($note['attachments'], true);
+                if (is_array($attachments)) {
+                    $content = $this->transformLinksForGitHub($content, $noteId, $attachments);
+                }
+            }
+            
+            // Build the path in the repository
+            $workspace = $note['workspace'] ?? 'Poznote';
+            $folderPath = $this->getFolderPath($note['folder_id']);
+            $safeTitle = $this->sanitizeFileName($note['heading'] ?: 'Untitled');
+            $repoPath = $workspace . '/' . trim($folderPath . '/' . $safeTitle . '.' . $repoExtension, '/');
+            
+            // Add front matter
+            if ($noteType === 'markdown' || $noteType === 'tasklist' || $noteType === 'excalidraw') {
+                $content = $this->addFrontMatter($content, $note);
+            }
+            
+            // Push to Git
+            $pushResult = $this->pushFile($repoPath, $content, "Update: {$note['heading']}");
+            
+            if (!$pushResult['success']) {
+                return $pushResult;
+            }
+            
+            // Push attachments if any
+            if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
+                $attachments = json_decode($note['attachments'], true);
+                if (is_array($attachments) && count($attachments) > 0) {
+                    $workspaceMetadata = []; // We might want to update the metadata file too
+                    
+                    foreach ($attachments as $attachment) {
+                        if (!isset($attachment['filename'])) continue;
+                        
+                        $attachmentFile = $attachmentsPath . '/' . $attachment['filename'];
+                        if (!file_exists($attachmentFile)) continue;
+                        
+                        $attachmentContent = file_get_contents($attachmentFile);
+                        $attachmentRepoPath = $workspace . '/attachments/' . $attachment['filename'];
+                        
+                        $this->pushFile($attachmentRepoPath, $attachmentContent, "Update attachment: {$attachment['original_filename']}");
+                        
+                        $workspaceMetadata[$attachment['filename']] = [
+                            'id' => $attachment['id'] ?? uniqid(),
+                            'original_filename' => $attachment['original_filename'] ?? $attachment['filename'],
+                            'file_size' => $attachment['file_size'] ?? filesize($attachmentFile),
+                            'file_type' => $attachment['file_type'] ?? 'application/octet-stream',
+                            'uploaded_at' => $attachment['uploaded_at'] ?? date('Y-m-d H:i:s')
+                        ];
+                    }
+                    
+                    // Update metadata file for this workspace
+                    if (!empty($workspaceMetadata)) {
+                        // Actually, we'd need to download existing metadata first to merge...
+                        // For now let's just push the note. Full manual sync will fix metadata.
+                    }
+                }
+            }
+            
+            return $pushResult;
+            
+        } catch (Exception $e) {
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+    
+    /**
+     * Delete a single note from Git repository
+     * @param string $heading Note heading
+     * @param int|null $folderId Folder ID
+     * @param string $workspace Workspace name
+     * @param string $type Note type
+     * @return array Result
+     */
+    public function deleteNoteInGit($heading, $folderId, $workspace, $type) {
+        if (!$this->isConfigured()) return ['success' => false, 'error' => 'not_configured'];
+        
+        try {
+            $localExtension = ($type === 'markdown') ? 'md' : 'html';
+            $repoExtension = $localExtension;
+            if ($type === 'tasklist' || $type === 'excalidraw') {
+                $repoExtension = 'json';
+            }
+            
+            $folderPath = $this->getFolderPath($folderId);
+            $safeTitle = $this->sanitizeFileName($heading ?: 'Untitled');
+            $repoPath = ($workspace ?: 'Poznote') . '/' . trim($folderPath . '/' . $safeTitle . '.' . $repoExtension, '/');
+            
+            return $this->deleteFile($repoPath, "Deleted: {$heading}");
+        } catch (Exception $e) {
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
     }
     
     /**
