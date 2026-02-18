@@ -1000,8 +1000,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Trigger only once per session (when opening Poznote)
         if (!lastPull) {
             const confirmMsg = window.t ? 
-                window.t('git_sync.confirm_auto_pull_warning', { provider: gitProvider }, `A new session started. Do you want to pull changes from ${gitProvider}?\n\nWARNING: This will overwrite ALL local data!`) : 
-                `A new session started. Do you want to pull changes from ${gitProvider}?\n\nWARNING: This will overwrite ALL local data!`;
+                window.t('git_sync.confirm_auto_pull_warning', { provider: gitProvider }, `A new session started. Do you want to pull changes from ${gitProvider}?\n\nLocal notes not found on ${gitProvider} will be moved to trash.`) : 
+                `A new session started. Do you want to pull changes from ${gitProvider}?\n\nLocal notes not found on ${gitProvider} will be moved to trash.`;
             
             if (typeof window.modalAlert !== 'undefined') {
                 window.modalAlert.confirm(confirmMsg).then(function(confirmed) {

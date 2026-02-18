@@ -1798,6 +1798,7 @@
         "confirm_push": "Alle Notizen und Anhänge zu {{provider}} pushen? Vorhandene Dateien werden aktualisiert und Dateien, die nicht mehr in Poznote vorhanden sind, werden aus dem Repository gelöscht.",
         "confirm_pull": "Alle Notizen und Anhänge von {{provider}} pullen? Lokale Daten werden mit der Remote-Version überschrieben. Notizen, die auf {{provider}} nicht gefunden werden, werden in den Papierkorb verschoben.",
         "confirm_auto_pull": "Eine neue Sitzung wurde gestartet. Möchten Sie Änderungen von {{provider}} abrufen?",
+        "confirm_auto_pull_warning": "Eine neue Sitzung wurde gestartet. Möchten Sie Änderungen von {{provider}} abrufen?\n\nLokale Notizen, die nicht auf {{provider}} gefunden werden, werden in den Papierkorb verschoben.",
         "auto_pull_complete": "Git-Synchronisation abgeschlossen. Seite wird aktualisiert...",
         "auto_pull_no_changes": "Git-Synchronisation abgeschlossen. Keine Änderungen gefunden.",
         "pulling": "Änderungen abrufen...",

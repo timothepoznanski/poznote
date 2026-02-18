@@ -1299,6 +1299,7 @@
         "confirm_push": "Push all notes and attachments to {{provider}}? Existing files will be updated and files no longer in Poznote will be removed from the repository.",
         "confirm_pull": "Pull all notes and attachments from {{provider}}? Local data will be overwritten with the remote version. Notes not found on {{provider}} will be moved to trash.",
         "confirm_auto_pull": "A new session started. Do you want to pull changes from {{provider}}?",
+        "confirm_auto_pull_warning": "A new session started. Do you want to pull changes from {{provider}}?\n\nLocal notes not found on {{provider}} will be moved to trash.",
         "auto_pull_complete": "Git pull complete. Refreshing page...",
         "auto_pull_no_changes": "Git pull complete. No changes found.",
         "pulling": "Pulling changes...",

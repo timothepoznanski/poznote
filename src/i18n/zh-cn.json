@@ -1917,6 +1917,7 @@
         "confirm_push": "将所有笔记和附件推送到 {{provider}} 吗？现有文件将被更新，Poznote 中不再存在的文件将从仓库中删除。",
         "confirm_pull": "从 {{provider}} 拉取所有笔记和附件吗？本地数据将被远程版本覆盖。在 {{provider}} 上找不到的笔记将被移至回收站。",
         "confirm_auto_pull": "新会话已开始。您想要从 {{provider}} 拉取更改吗？",
+        "confirm_auto_pull_warning": "新会话已开始。您想要从 {{provider}} 拉取更改吗？\n\n在 {{provider}} 上未找到的本地笔记将被移至回收站。",
         "auto_pull_complete": "Git 同步完成。正在刷新页面...",
         "auto_pull_no_changes": "Git 同步完成。未发现更改。",
         "pulling": "正在拉取更改...",

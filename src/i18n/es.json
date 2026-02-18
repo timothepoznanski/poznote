@@ -1798,6 +1798,7 @@
         "confirm_push": "¿Enviar todas las notas y archivos adjuntos a {{provider}}? Los archivos existentes se actualizarán y los archivos que ya no están en Poznote se eliminarán del repositorio.",
         "confirm_pull": "¿Extraer todas las notas y archivos adjuntos de {{provider}}? Los datos locales serán reemplazados por la versión remota. Las notas no encontradas en {{provider}} se moverán a la papelera.",
         "confirm_auto_pull": "Se ha iniciado una nueva sesión. ¿Quieres extraer los cambios de {{provider}}?",
+        "confirm_auto_pull_warning": "Se ha iniciado una nueva sesión. ¿Quieres extraer los cambios de {{provider}}?\n\nLas notas locales no encontradas en {{provider}} se moverán a la papelera.",
         "auto_pull_complete": "Sincronización Git completa. Actualizando la página...",
         "auto_pull_no_changes": "Sincronización Git completa. No se encontraron cambios.",
         "pulling": "Extrayendo cambios...",

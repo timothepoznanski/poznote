@@ -1956,6 +1956,7 @@
         "confirm_push": "Pousser toutes les notes et pièces jointes vers {{provider}} ? Les fichiers existants seront mis à jour et les fichiers absents de Poznote seront supprimés du dépôt.",
         "confirm_pull": "Récupérer toutes les notes et pièces jointes depuis {{provider}} ? Les données locales seront écrasées par la version distante. Les notes absentes sur {{provider}} seront déplacées dans la corbeille.",
         "confirm_auto_pull": "Une nouvelle session a commencé. Voulez-vous récupérer les changements depuis {{provider}} ?",
+        "confirm_auto_pull_warning": "Une nouvelle session a commencé. Voulez-vous récupérer les changements depuis {{provider}} ?\n\nLes notes locales absentes de {{provider}} seront déplacées dans la corbeille.",
         "auto_pull_complete": "Synchronisation Git terminée. Rafraîchissement de la page...",
         "auto_pull_no_changes": "Synchronisation Git terminée. Aucun changement trouvé.",
         "pulling": "Récupération des changements...",
