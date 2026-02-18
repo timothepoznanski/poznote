@@ -194,6 +194,8 @@ class GitSync {
      * @return array Results with success status, counts, and errors
      */
     public function pushNotes($workspaceFilter = null) {
+        set_time_limit(0); 
+
         if (!$this->isConfigured()) {
             return ['success' => false, 'error' => 'Git sync is not configured'];
         }
@@ -212,8 +214,20 @@ class GitSync {
         ];
         
         try {
+            // Get all files currently on Git provider
+            $tree = $this->getRepoTree();
+            $shaMap = [];
+            if (isset($tree) && is_array($tree) && !isset($tree['error'])) {
+                foreach ($tree as $item) {
+                    if ($item['type'] === 'blob') {
+                        $shaMap[$item['path']] = $item['sha'];
+                    }
+                }
+            }
+
             // Get all notes
             $query = "SELECT id, heading, type, folder_id, tags, workspace, updated, attachments FROM entries WHERE trash = 0";
+
             $params = [];
             
             if ($workspaceFilter) {
@@ -278,13 +292,20 @@ class GitSync {
                     $content = $this->addFrontMatter($content, $note);
                 }
                 
-                // Push to GitHub
-                $pushResult = $this->pushFile($repoPath, $content, "Update: {$note['heading']}");
+                // Push to Git
+                $pushResult = $this->pushFile($repoPath, $content, "Update: {$note['heading']}", $shaMap);
+
                 
                 if ($pushResult['success']) {
-                    $results['pushed']++;
-                    $results['debug'][] = "Pushed successfully";
+                    if (isset($pushResult['skipped']) && $pushResult['skipped']) {
+                        $results['skipped']++;
+                        $results['debug'][] = "Already up to date (skipped push)";
+                    } else {
+                        $results['pushed']++;
+                        $results['debug'][] = "Pushed successfully";
+                    }
                 } else {
+
                     $results['debug'][] = "Push failed: " . $pushResult['error'];
                     $results['errors'][] = [
                         'note_id' => $noteId,
@@ -329,12 +350,19 @@ class GitSync {
                             $attachmentPushResult = $this->pushFile(
                                 $attachmentRepoPath, 
                                 $attachmentContent, 
-                                "Update attachment: {$attachment['original_filename']}"
+                                "Update attachment: {$attachment['original_filename']}",
+                                $shaMap
                             );
+
                             
                             if ($attachmentPushResult['success']) {
-                                $results['debug'][] = "Pushed attachment: " . $attachment['filename'];
+                                if (isset($attachmentPushResult['skipped']) && $attachmentPushResult['skipped']) {
+                                    $results['debug'][] = "Attachment already up to date: " . $attachment['filename'];
+                                } else {
+                                    $results['debug'][] = "Pushed attachment: " . $attachment['filename'];
+                                }
                             } else {
+
                                 $results['debug'][] = "Failed to push attachment: " . $attachmentPushResult['error'];
                                 $results['errors'][] = [
                                     'note_id' => $noteId,
@@ -361,12 +389,19 @@ class GitSync {
                 $metadataPushResult = $this->pushFile(
                     $metadataPath,
                     $metadataContent,
-                    "Update attachments metadata"
+                    "Update attachments metadata",
+                    $shaMap
                 );
+
                 
                 if ($metadataPushResult['success']) {
-                    $results['debug'][] = "Pushed metadata file successfully";
+                    if (isset($metadataPushResult['skipped']) && $metadataPushResult['skipped']) {
+                        $results['debug'][] = "Metadata file already up to date";
+                    } else {
+                        $results['debug'][] = "Pushed metadata file successfully";
+                    }
                 } else {
+
                     $results['debug'][] = "Failed to push metadata file: " . $metadataPushResult['error'];
                     $results['errors'][] = [
                         'workspace' => $workspace,
@@ -376,10 +411,9 @@ class GitSync {
                 $results['debug'][] = "";
             }
             
-            // Get all files currently on GitHub
-            $tree = $this->getRepoTree();
-            
-            if (!isset($tree['error'])) {
+            // Process deletions using the tree we got at the beginning
+            if (isset($tree) && !isset($tree['error'])) {
+
                 foreach ($tree as $item) {
                     if ($item['type'] !== 'blob') continue;
                     
@@ -446,6 +480,8 @@ class GitSync {
      * @return array Results with success status, counts, and errors
      */
     public function pullNotes($workspaceTarget = null) {
+        set_time_limit(0);
+
         if (!$this->isConfigured()) {
             return ['success' => false, 'error' => 'Git sync is not configured'];
         }
@@ -731,19 +767,57 @@ class GitSync {
     }
     
     /**
+     * Calculate Git blob SHA1 for content
+     */
+    private function calculateGitSha($content) {
+        return sha1("blob " . strlen($content) . "\0" . $content);
+    }
+    
+    /**
      * Push a single file to Git provider
+
      * @param string $path File path in repository
      * @param string $content File content
      * @param string $message Commit message
      * @return array Result with success status, SHA, and error if applicable
      */
-    private function pushFile($path, $content, $message) {
+    private function pushFile($path, $content, $message, $shaMap = null) {
+
         $encodedPath = implode('/', array_map('rawurlencode', explode('/', $path)));
         $endpoint = "/repos/{$this->repo}/contents/{$encodedPath}";
         
-        // Try to get the existing file to get its SHA
-        $existingFile = $this->apiRequest('GET', $endpoint . "?ref={$this->branch}");
+        // Determine if file exists (has a SHA) or is new
+        $sha = null;
+        $fileExists = false;
         
+        if ($shaMap !== null) {
+            // Use the provided tree map to avoid GET requests
+            if (isset($shaMap[$path])) {
+                $sha = $shaMap[$path];
+                $fileExists = true;
+                
+                // Compare content SHA to skip unnecessary pushes
+                $localSha = $this->calculateGitSha($content);
+                if ($localSha === $sha) {
+                    return ['success' => true, 'sha' => $sha, 'skipped' => true];
+                }
+            }
+        } else {
+            // Fallback to manual check if map not provided
+            $existingFile = $this->apiRequest('GET', $endpoint . "?ref={$this->branch}");
+            
+            if (isset($existingFile['sha']) && is_string($existingFile['sha'])) {
+                $sha = $existingFile['sha'];
+                $fileExists = true;
+            } elseif (isset($existingFile['error']) && ($existingFile['status'] ?? 0) != 404) {
+                // Non-404 error on the check → real problem
+                return [
+                    'success' => false,
+                    'error' => "Pre-check failed: " . $existingFile['error'] . " (HTTP " . ($existingFile['status'] ?? '?') . ")"
+                ];
+            }
+        }
+
         $body = [
             'message' => $message,
             'content' => base64_encode($content),
@@ -754,25 +828,10 @@ class GitSync {
             ]
         ];
         
-        // Determine if file exists (has a SHA) or is new
-        $sha = null;
-        $fileExists = false;
-        
-        if (isset($existingFile['sha']) && is_string($existingFile['sha'])) {
-            $sha = $existingFile['sha'];
-            $fileExists = true;
-        }
-        
         if ($fileExists && $sha) {
             // File exists → PUT with SHA (works for both GitHub and Forgejo)
             $body['sha'] = $sha;
             $response = $this->apiRequest('PUT', $endpoint, $body);
-        } elseif (isset($existingFile['error']) && ($existingFile['status'] ?? 0) != 404) {
-            // Non-404 error on the check → real problem
-            return [
-                'success' => false,
-                'error' => "Pre-check failed: " . $existingFile['error'] . " (HTTP " . ($existingFile['status'] ?? '?') . ")"
-            ];
         } else {
             // File does not exist → create it
             // Forgejo/Gitea uses POST for creation, GitHub uses PUT
@@ -782,6 +841,7 @@ class GitSync {
                 $response = $this->apiRequest('PUT', $endpoint, $body);
             }
         }
+
         
         // Extract SHA from response
         if (isset($response['content']['sha'])) {
