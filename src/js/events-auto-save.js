@@ -461,8 +461,16 @@ function emergencySave(noteId) {
         git_push: needsGitPush // Push only if changes were made since load
     };
 
+    // Capture the flag value used in this request, then reset it optimistically
+    // so that a concurrent regular save doesn't also trigger a second push.
+    const gitPushRequested = needsGitPush;
+    if (gitPushRequested) {
+        needsGitPush = false;
+    }
+
     // Strategy 1: Try fetch with keepalive (most reliable)
     try {
+        console.log('[Poznote Auto-Save] Saving note', noteId, '| git_push:', gitPushRequested);
         fetch("/api/v1/notes/" + noteId, {
             method: "PATCH",
             headers: {
@@ -471,12 +479,33 @@ function emergencySave(noteId) {
             },
             body: JSON.stringify(updates),
             keepalive: true
+        }).then(res => res.json()).then(data => {
+            if (gitPushRequested) {
+                if (data.git_push) {
+                    if (data.git_push.triggered) {
+                        if (data.git_push.success) {
+                            console.log('[Poznote Git] Auto-push success for note', noteId);
+                        } else {
+                            console.warn('[Poznote Git] Auto-push failed for note', noteId, '-', data.git_push.error || 'unknown error');
+                            // Restore flag so next save retries
+                            needsGitPush = true;
+                        }
+                    } else {
+                        console.warn('[Poznote Git] Auto-push not triggered:', data.git_push.reason || 'not configured or disabled');
+                    }
+                } else {
+                    console.warn('[Poznote Git] git_push requested but no git_push info in response. Check server logs.');
+                }
+            }
         }).catch(err => {
             console.error('[Poznote Auto-Save] Emergency fetch failed:', err);
+            // Restore flag on network failure so next save retries
+            if (gitPushRequested) { needsGitPush = true; }
         });
         return; // Exit if fetch was attempted successfully
     } catch (err) {
         console.error('[Poznote Auto-Save] Fetch strategy failed:', err);
+        if (gitPushRequested) { needsGitPush = true; }
     }
 
     // Strategy 2: Fallback to sendBeacon with FormData

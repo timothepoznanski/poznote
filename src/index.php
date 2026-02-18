@@ -761,10 +761,6 @@ $body_classes = trim($extra_body_classes);
                             // Get note content to check for inline images
                             $note_content = $row['entry'] ?? '';
                             
-                            echo '<div class="note-attachments-row">';
-                            // Make paperclip clickable to open attachments for this note (preserve workspace behavior via JS)
-                            echo '<button type="button" class="icon-attachment-btn" title="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'" data-action="show-attachment-dialog" data-note-id="'.$row['id'].'" aria-label="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'"><span class="fas fa-paperclip icon_attachment"></span></button>';
-                            echo '<span class="note-attachments-list">';
                             $attachment_links = [];
                             $visible_links_count = 0;
                             foreach ($attachments_data as $attachment) {
@@ -801,12 +797,13 @@ $body_classes = trim($extra_body_classes);
                                     if (!$is_inline_image) $visible_links_count++;
                                 }
                             }
+                            $row_style = ($hide_inline_images && $visible_links_count === 0) ? ' style="display: none;"' : '';
+                            echo '<div class="note-attachments-row"' . $row_style . '>';
+                            // Make paperclip clickable to open attachments for this note (preserve workspace behavior via JS)
+                            echo '<button type="button" class="icon-attachment-btn" title="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'" data-action="show-attachment-dialog" data-note-id="'.$row['id'].'" aria-label="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'"><span class="fas fa-paperclip icon_attachment"></span></button>';
+                            echo '<span class="note-attachments-list">';
                             echo implode(' ', $attachment_links);
                             echo '</span>';
-                            // Hide the entire row if no visible links
-                            if ($hide_inline_images && $visible_links_count === 0) {
-                                echo '<script>document.currentScript.parentElement.style.display = "none";</script>';
-                            }
                             echo '</div>';
                         }
                     }
@@ -981,38 +978,18 @@ document.addEventListener('DOMContentLoaded', function() {
         // Trigger only once per session (when opening Poznote)
         if (!lastPull) {
             const confirmMsg = window.t ? 
-                window.t('git_sync.confirm_auto_pull', { provider: gitProvider }, `A new session started. Do you want to pull changes from ${gitProvider}?`) : 
-                `A new session started. Do you want to pull changes from ${gitProvider}?`;
+                window.t('git_sync.confirm_auto_pull_warning', { provider: gitProvider }, `A new session started. Do you want to pull changes from ${gitProvider}?\n\nWARNING: This will overwrite ALL local data!`) : 
+                `A new session started. Do you want to pull changes from ${gitProvider}?\n\nWARNING: This will overwrite ALL local data!`;
             
-            // Wait for modalAlert to be ready
             if (typeof window.modalAlert !== 'undefined') {
                 window.modalAlert.confirm(confirmMsg).then(function(confirmed) {
                     if (confirmed) {
-                        const spinnerMsg = window.t ? window.t('git_sync.pulling', {}, 'Pulling changes...') : 'Pulling changes...';
-                        const spinner = window.modalAlert.showSpinner(spinnerMsg);
-
-                        fetch('api/v1/git-sync/pull', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ workspace: ws })
-                        })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (spinner && spinner.close) spinner.close();
-                            if (data.success) {
-                                sessionStorage.setItem('last_git_pull_' + ws, now);
-                                if (data.pulled > 0 || data.updated > 0 || data.deleted > 0) {
-                                    window.modalAlert.alert(window.t ? window.t('git_sync.auto_pull_complete', {}, 'Git pull complete. Refreshing page...') : 'Git pull complete. Refreshing page...');
-                                    setTimeout(() => window.location.reload(), 1500);
-                                } else {
-                                    window.modalAlert.alert(window.t ? window.t('git_sync.auto_pull_no_changes', {}, 'Git pull complete. No changes found.') : 'Git pull complete. No changes found.');
-                                }
-                            }
-                        })
-                        .catch(err => {
-                            if (spinner && spinner.close) spinner.close();
-                            console.error('Git Auto-Pull Error:', err);
-                        });
+                        // Mark as handled for this session
+                        sessionStorage.setItem('last_git_pull_' + ws, now);
+                        // Redirect to home.php with auto_pull parameter
+                        const homeUrl = new URL('home.php', window.location.href);
+                        homeUrl.searchParams.set('auto_pull', '1');
+                        window.location.href = homeUrl.toString();
                     } else {
                         // User declined, mark as handled for this session so we don't ask again
                         sessionStorage.setItem('last_git_pull_' + ws, now);

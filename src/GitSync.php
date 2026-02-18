@@ -44,6 +44,45 @@ class GitSync {
         
         $this->con = $con;
         $this->userId = $userId;
+
+        // Initialize progress only if it doesn't exist to avoid resetting on mid-sync requests
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+    }
+
+    /**
+     * Update sync progress in session
+     * @param int $current Current item being processed
+     * @param int $total Total number of items
+     * @param string $message Action message
+     */
+    public function updateProgress($current, $total, $message = '') {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        $_SESSION['git_sync_progress'] = [
+            'current' => $current,
+            'total' => $total,
+            'percentage' => $total > 0 ? min(100, round(($current / $total) * 100)) : 0,
+            'message' => $message,
+            'timestamp' => time()
+        ];
+        
+        // Write and close to release lock for other potential requests (polling)
+        session_write_close();
+    }
+
+    /**
+     * Clear progress from session
+     */
+    public function clearProgress() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        unset($_SESSION['git_sync_progress']);
+        session_write_close();
     }
 
     /**
@@ -279,20 +318,19 @@ class GitSync {
                 }
             }
             
-            // Build the path in the repository
+            // Build the path in the repository — keyed by note ID so renames never create duplicates
             $workspace = $note['workspace'] ?? 'Poznote';
             $folderPath = $this->getFolderPath($note['folder_id']);
-            $safeTitle = $this->sanitizeFileName($note['heading'] ?: 'Untitled');
-            $repoPath = $workspace . '/' . trim($folderPath . '/' . $safeTitle . '.' . $repoExtension, '/');
-            
+            $repoPath = $workspace . '/' . ltrim(($folderPath ? $folderPath . '/' : '') . $noteId . '.' . $repoExtension, '/');
+
             // Add front matter
             if ($noteType === 'markdown' || $noteType === 'tasklist' || $noteType === 'excalidraw') {
                 $content = $this->addFrontMatter($content, $note);
             }
-            
+
             // Push to Git
             $pushResult = $this->pushFile($repoPath, $content, "Update: {$note['heading']}");
-            
+
             if (!$pushResult['success']) {
                 return $pushResult;
             }
@@ -340,27 +378,24 @@ class GitSync {
     
     /**
      * Delete a single note from Git repository
-     * @param string $heading Note heading
+     * @param int $noteId Note ID
      * @param int|null $folderId Folder ID
      * @param string $workspace Workspace name
      * @param string $type Note type
+     * @param string $heading Note heading (used only for the commit message)
      * @return array Result
      */
-    public function deleteNoteInGit($heading, $folderId, $workspace, $type) {
+    public function deleteNoteInGit($noteId, $folderId, $workspace, $type, $heading = '') {
         if (!$this->isConfigured()) return ['success' => false, 'error' => 'not_configured'];
-        
+
         try {
             $localExtension = ($type === 'markdown') ? 'md' : 'html';
-            $repoExtension = $localExtension;
-            if ($type === 'tasklist' || $type === 'excalidraw') {
-                $repoExtension = 'json';
-            }
-            
+            $repoExtension  = ($type === 'tasklist' || $type === 'excalidraw') ? 'json' : $localExtension;
+
             $folderPath = $this->getFolderPath($folderId);
-            $safeTitle = $this->sanitizeFileName($heading ?: 'Untitled');
-            $repoPath = ($workspace ?: 'Poznote') . '/' . trim($folderPath . '/' . $safeTitle . '.' . $repoExtension, '/');
-            
-            return $this->deleteFile($repoPath, "Deleted: {$heading}");
+            $repoPath   = ($workspace ?: 'Poznote') . '/' . ltrim(($folderPath ? $folderPath . '/' : '') . $noteId . '.' . $repoExtension, '/');
+
+            return $this->deleteFile($repoPath, 'Deleted: ' . ($heading ?: "note #{$noteId}"));
         } catch (Exception $e) {
             return ['success' => false, 'error' => $e->getMessage()];
         }
@@ -448,11 +483,31 @@ class GitSync {
             $stmt->execute($params);
             $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // ── 3. Push every note + its attachments ──
+            // ── 3. Calculate totals for progress ──
+            $totalNotes = count($notes);
+            $totalAttachments = 0;
+            foreach ($notes as $note) {
+                if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
+                    $atts = json_decode($note['attachments'], true);
+                    if (is_array($atts)) {
+                        $totalAttachments += count($atts);
+                    }
+                }
+            }
+            
+            // Estimates (notes + attachments + cleanup phase)
+            $totalSteps = $totalNotes + $totalAttachments + 5; 
+            $currentStep = 0;
+            $this->updateProgress(0, $totalSteps, "Starting push...");
+
+            // ── 4. Push every note + its attachments ──
             $expectedPaths = [];                    // every path that SHOULD be on remote
             $metadataByWs  = [];                    // workspace → filename → metadata
 
             foreach ($notes as $note) {
+                $currentStep++;
+                $this->updateProgress($currentStep, $totalSteps, "Pushing: " . ($note['heading'] ?: 'Untitled'));
+                
                 $noteId   = $note['id'];
                 $noteType = $note['type'] ?? 'note';
 
@@ -472,8 +527,8 @@ class GitSync {
                 $content   = file_get_contents($filePath);
                 $workspace = $note['workspace'] ?? 'Poznote';
                 $folder    = $this->getFolderPath($note['folder_id']);
-                $safeTitle = $this->sanitizeFileName($note['heading'] ?: 'Untitled');
-                $repoPath  = $workspace . '/' . ltrim(($folder ? $folder . '/' : '') . $safeTitle . '.' . $repoExt, '/');
+                // Path keyed by note ID — immune to title renames
+                $repoPath  = $workspace . '/' . ltrim(($folder ? $folder . '/' : '') . $noteId . '.' . $repoExt, '/');
 
                 // Transform local attachment links → relative Git links
                 if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
@@ -512,6 +567,10 @@ class GitSync {
                         }
                         foreach ($atts as $att) {
                             if (empty($att['filename'])) continue;
+                            
+                            $currentStep++;
+                            $this->updateProgress($currentStep, $totalSteps, "Pushing attachment: " . $att['filename']);
+
                             $attFile = $attachmentsPath . '/' . $att['filename'];
                             if (!file_exists($attFile)) {
                                 $results['debug'][] = "  Attachment not found on disk: {$att['filename']}";
@@ -560,12 +619,15 @@ class GitSync {
             }
 
             // ── 5. Delete remote files that no longer exist locally ──
+            $this->updateProgress($currentStep, $totalSteps, "Cleaning up remote orphans...");
             foreach ($shaMap as $remotePath => $_sha) {
                 // If a workspace filter is active, only touch files in that workspace
                 if ($workspaceFilter && strpos($remotePath, $workspaceFilter . '/') !== 0) {
                     continue;
                 }
                 if (!in_array($remotePath, $expectedPaths)) {
+                    $currentStep++;
+                    $this->updateProgress($currentStep, $totalSteps, "Deleting: " . $remotePath);
                     $results['debug'][] = "Deleting orphan: {$remotePath}";
                     $delResult = $this->deleteFile($remotePath, "Deleted from Poznote");
                     if ($delResult['success']) {
@@ -579,6 +641,7 @@ class GitSync {
             }
 
             // ── 6. Save sync info ──
+            $this->updateProgress($totalSteps, $totalSteps, "Push complete!");
             $this->saveSyncInfo([
                 'timestamp'   => date('c'),
                 'action'      => 'push',
@@ -588,8 +651,11 @@ class GitSync {
                 'errors'      => count($results['errors']),
                 'workspace'   => $workspaceFilter,
             ]);
+            
+            $this->clearProgress();
 
         } catch (Exception $e) {
+            $this->clearProgress();
             $results['success']    = false;
             $results['errors'][]   = ['error' => $e->getMessage()];
         }
@@ -687,7 +753,22 @@ class GitSync {
             // ── 3. Download & upsert every note ──
             $pulledPaths = [];   // track which paths we processed (for deletion step)
 
+            // Calculate totals for progress reporting
+            $totalNotes = count($noteFiles);
+            $totalAttachments = 0;
+            foreach ($attachmentFiles as $ws => $atts) {
+                $totalAttachments += count($atts);
+            }
+            $totalSteps = $totalNotes + $totalAttachments + 10; // estimates
+            $currentStep = 0;
+            $this->updateProgress(0, $totalSteps, "Starting pull...");
+
+            // ── 3. Download & upsert every note (single transaction for performance + lock reduction) ──
+            $this->con->beginTransaction();
+            try {
             foreach ($noteFiles as $path => $ext) {
+                $currentStep++;
+                $this->updateProgress($currentStep, $totalSteps, "Downloading note: " . basename($path));
                 $results['debug'][] = "Processing note: {$path}";
 
                 $raw = $this->getFileContent($path);
@@ -708,6 +789,12 @@ class GitSync {
                 $existing = $this->findExistingNote($noteData);
                 try {
                     if ($existing) {
+                        // Restore from trash if it was deleted locally but exists on remote
+                        if (!empty($existing['trash'])) {
+                            $stmtRestore = $this->con->prepare("UPDATE entries SET trash = 0 WHERE id = ?");
+                            $stmtRestore->execute([$existing['id']]);
+                            $results['debug'][] = "  → restored from trash (id={$existing['id']})";
+                        }
                         $this->updateNote($existing['id'], $noteData, $raw['content'], $entriesPath, $wsMeta, $path);
                         $results['updated']++;
                         $results['debug'][] = "  → updated (id={$existing['id']})";
@@ -723,6 +810,12 @@ class GitSync {
                     $results['errors'][] = ['path' => $path, 'error' => $e->getMessage()];
                 }
             }
+                $this->con->commit();
+            } catch (Exception $transactionEx) {
+                $this->con->rollBack();
+                $results['debug'][]  = "Transaction rolled back: " . $transactionEx->getMessage();
+                $results['errors'][] = ['path' => 'transaction', 'error' => $transactionEx->getMessage()];
+            }
 
             // ── 4. Download every attachment (before note upsert so files exist on disk) ──
             foreach ($attachmentFiles as $ws => $atts) {
@@ -730,8 +823,15 @@ class GitSync {
                     mkdir($attachmentsPath, 0755, true);
                 }
                 foreach ($atts as $attInfo) {
+                    $currentStep++;
                     $localFile = $attachmentsPath . '/' . $attInfo['filename'];
-                    // Always overwrite — remote is source of truth
+                    // Skip download if file already exists locally
+                    if (file_exists($localFile)) {
+                        $this->updateProgress($currentStep, $totalSteps, "Attachment already exists: " . $attInfo['filename']);
+                        $results['debug'][] = "Attachment already exists, skipping: {$attInfo['filename']}";
+                        continue;
+                    }
+                    $this->updateProgress($currentStep, $totalSteps, "Downloading attachment: " . $attInfo['filename']);
                     $raw = $this->getFileContent($attInfo['path']);
                     if (isset($raw['error'])) {
                         $results['debug'][]  = "Attachment ERROR {$attInfo['filename']}: " . $raw['error'];
@@ -754,7 +854,10 @@ class GitSync {
             $stmt->execute($params);
             $localNotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+            $this->updateProgress($currentStep, $totalSteps, "Cleaning up local notes...");
             foreach ($localNotes as $note) {
+                $currentStep++;
+                $this->updateProgress($currentStep, $totalSteps, "Checking local note: " . ($note['heading'] ?: 'Untitled'));
                 $noteType  = $note['type'] ?? 'note';
                 $localExt  = ($noteType === 'markdown') ? 'md' : 'html';
                 $repoExt   = ($noteType === 'tasklist' || $noteType === 'excalidraw') ? 'json' : $localExt;
@@ -772,6 +875,7 @@ class GitSync {
             }
 
             // ── 6. Save sync info ──
+            $this->updateProgress($totalSteps, $totalSteps, "Pull complete!");
             $this->saveSyncInfo([
                 'timestamp' => date('c'),
                 'action'    => 'pull',
@@ -781,8 +885,11 @@ class GitSync {
                 'errors'    => count($results['errors']),
                 'workspace' => $workspaceTarget,
             ]);
+            
+            $this->clearProgress();
 
         } catch (Exception $e) {
+            $this->clearProgress();
             $results['success']  = false;
             $results['errors'][] = ['error' => $e->getMessage()];
         }
@@ -1035,23 +1142,23 @@ class GitSync {
         if (!$folderId || !$this->con) {
             return '';
         }
-        
+
         $path = [];
         $currentId = $folderId;
-        
+
         while ($currentId) {
-            $stmt = $this->con->prepare("SELECT name, parent_id FROM folders WHERE id = ?");
+            $stmt = $this->con->prepare("SELECT id, parent_id FROM folders WHERE id = ?");
             $stmt->execute([$currentId]);
             $folder = $stmt->fetch(PDO::FETCH_ASSOC);
-            
+
             if ($folder) {
-                array_unshift($path, $this->sanitizeFileName($folder['name']));
+                array_unshift($path, (string)$folder['id']);
                 $currentId = $folder['parent_id'];
             } else {
                 break;
             }
         }
-        
+
         return implode('/', $path);
     }
     
@@ -1276,8 +1383,9 @@ class GitSync {
         }
         
         // First try by poznote_id if available (most reliable method)
+        // Search in both active and trashed notes
         if (isset($noteData['poznote_id'])) {
-            $stmt = $this->con->prepare("SELECT id, heading, type, workspace FROM entries WHERE id = ? AND trash = 0");
+            $stmt = $this->con->prepare("SELECT id, heading, type, workspace, trash FROM entries WHERE id = ?");
             $stmt->execute([$noteData['poznote_id']]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($row) {
@@ -1285,12 +1393,12 @@ class GitSync {
             }
         }
         
-        // Fallback: search by title and workspace (ordered by most recent)
+        // Fallback: search by title and workspace (ordered by active first, then most recent)
         $stmt = $this->con->prepare("
-            SELECT id, heading, type, workspace 
+            SELECT id, heading, type, workspace, trash
             FROM entries 
-            WHERE heading = ? AND workspace = ? AND trash = 0 
-            ORDER BY updated DESC 
+            WHERE heading = ? AND workspace = ?
+            ORDER BY trash ASC, updated DESC 
             LIMIT 1
         ");
         $stmt->execute([$noteData['heading'], $noteData['workspace']]);
@@ -1425,9 +1533,9 @@ class GitSync {
         // Transform attachment links from GitHub to local format
         $transformedContent = $this->transformLinksForLocal($cleanContent, $noteId, $attachmentMetadata);
 
-        // Update all necessary fields including heading, type, workspace, attachments, and favorite
+        // Update all necessary fields including heading, type, workspace, attachments, favorite and ensure note is not in trash
         $stmt = $this->con->prepare("
-            UPDATE entries SET heading = ?, entry = ?, type = ?, tags = ?, workspace = ?, updated = ?, folder = ?, folder_id = ?, attachments = ?, favorite = ?
+            UPDATE entries SET heading = ?, entry = ?, type = ?, tags = ?, workspace = ?, updated = ?, folder = ?, folder_id = ?, attachments = ?, favorite = ?, trash = 0
             WHERE id = ?
         ");
         

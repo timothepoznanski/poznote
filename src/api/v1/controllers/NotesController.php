@@ -463,8 +463,9 @@ class NotesController {
      *   - tags: Comma-separated tags
      *   - folder_id: Folder ID
      *   - workspace: Workspace name
+     *   - git_push: If true, push note to Git after saving
      */
-    public function update(string $id): void {
+    public function update(string $id, bool $triggerSync = false): void {
         if (!is_numeric($id)) {
             $this->sendError(400, 'Invalid note ID');
             return;
@@ -642,7 +643,36 @@ class NotesController {
                         'updated' => $now_utc
                     ]
                 ];
-                
+
+                // Trigger Git push if requested (auto-push on save)
+                if ($triggerSync) {
+                    try {
+                        require_once __DIR__ . '/../../../GitSync.php';
+                        $userId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
+                        $gitSync = new GitSync($this->con, $userId);
+                        if ($gitSync->isConfigured() && $gitSync->isAutoPushEnabled()) {
+                            error_log('[Poznote Git] Auto-push triggered for note ' . $noteId);
+                            $pushResult = $gitSync->pushNote($noteId);
+                            $response['git_push'] = [
+                                'triggered' => true,
+                                'success' => $pushResult['success'] ?? false,
+                                'error' => $pushResult['error'] ?? null,
+                            ];
+                            if ($pushResult['success']) {
+                                error_log('[Poznote Git] Auto-push success for note ' . $noteId);
+                            } else {
+                                error_log('[Poznote Git] Auto-push failed for note ' . $noteId . ': ' . ($pushResult['error'] ?? 'unknown error'));
+                            }
+                        } else {
+                            error_log('[Poznote Git] Auto-push skipped for note ' . $noteId . ': not configured or disabled');
+                            $response['git_push'] = ['triggered' => false, 'reason' => 'not configured or auto-push disabled'];
+                        }
+                    } catch (Exception $gitEx) {
+                        error_log('[Poznote Git] Auto-push exception for note ' . $noteId . ': ' . $gitEx->getMessage());
+                        $response['git_push'] = ['triggered' => true, 'success' => false, 'error' => $gitEx->getMessage()];
+                    }
+                }
+
                 $this->sendSuccess($response);
             } else {
                 $this->sendError(500, 'Database error while updating note');

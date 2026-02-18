@@ -24,8 +24,45 @@ $gitProviderParams = ['provider' => getGitProviderName()];
 $gitIcon = (defined('GIT_PROVIDER') && GIT_PROVIDER === 'forgejo') ? 'fas fa-code-branch' : 'fab fa-github';
 
 $syncMessage = '';
+$syncWarning = '';
 $syncError = '';
 $syncResult = null;
+
+// Handle result from AJAX sync session
+if (isset($_SESSION['last_sync_result'])) {
+    $lastSync = $_SESSION['last_sync_result'];
+    $action = $lastSync['action'];
+    $syncResult = $lastSync['result'];
+    unset($_SESSION['last_sync_result']);
+
+    $syncErrorCount = count($syncResult['errors'] ?? []);
+    if ($syncResult['success']) {
+        if ($action === 'push') {
+            $syncMessage = t('git_sync.messages.push_success', array_merge($gitProviderParams, [
+                'count' => $syncResult['pushed'],
+                'attachments' => $syncResult['attachments_pushed'] ?? 0,
+                'deleted' => $syncResult['deleted'] ?? 0,
+                'errors' => $syncErrorCount
+            ]));
+        } else {
+            $syncMessage = t('git_sync.messages.pull_success', array_merge($gitProviderParams, [
+                'pulled' => $syncResult['pulled'],
+                'updated' => $syncResult['updated'],
+                'deleted' => $syncResult['deleted'] ?? 0,
+                'errors' => $syncErrorCount
+            ]));
+        }
+        // Downgrade to warning if there were partial errors
+        if ($syncErrorCount > 0) {
+            $syncWarning = $syncMessage;
+            $syncMessage = '';
+        }
+    } else {
+        $syncError = t('git_sync.messages.' . $action . '_error', array_merge($gitProviderParams, [
+            'error' => $syncResult['errors'][0]['error'] ?? 'Unknown error'
+        ]));
+    }
+}
 
 if ($showGitSync && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sync_action'])) {
     $action = $_POST['sync_action'];
@@ -341,6 +378,11 @@ try {
                 <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($syncMessage); ?>
             </div>
             <?php endif; ?>
+            <?php if ($syncWarning): ?>
+            <div class="alert alert-warning" style="grid-column: 1 / -1; margin-bottom: 10px;">
+                <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($syncWarning); ?>
+            </div>
+            <?php endif; ?>
             <?php if ($syncError): ?>
             <div class="alert alert-error" style="grid-column: 1 / -1; margin-bottom: 10px;">
                 <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($syncError); ?>
@@ -557,8 +599,6 @@ try {
     const gitProvider = '<?php echo getGitProviderName(); ?>';
     
     function handleSyncClick(card) {
-        if (card.classList.contains('is-loading')) return;
-        
         const action = card.querySelector('input[name="sync_action"]')?.value;
         const workspaceName = card.querySelector('input[name="workspace"]')?.value || 'All';
         
@@ -585,29 +625,64 @@ try {
     }
 
     function executeSync(card) {
-        card.classList.add('is-loading');
-        const icon = card.querySelector('.home-card-icon i');
-        if (icon) {
-            icon.className = 'fa-spinner fa-spin';
-        }
-        card.submit();
+        const action = card.querySelector('input[name="sync_action"]')?.value;
+        const workspace = card.querySelector('input[name="workspace"]')?.value || "";
+        const title = card.querySelector('.home-card-title')?.textContent || "Sync";
+
+        if (!action) return;
+
+        // Show progress bar modal
+        const progressBar = window.modalAlert.showProgressBar(
+            title, 
+            "<?php echo addslashes(t_h('git_sync.starting', [], 'Starting sync...')); ?>"
+        );
+
+        let progressInterval = setInterval(async () => {
+            try {
+                const response = await fetch('api/v1/git-sync/progress');
+                const data = await response.json();
+                if (data.success && data.progress) {
+                    progressBar.update(data.progress.percentage, data.progress.message);
+                }
+            } catch (e) {
+                console.error("Error polling progress:", e);
+            }
+        }, 500);
+
+        // Execute the sync
+        fetch('api/v1/git-sync/' + action, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ workspace: workspace })
+        })
+        .then(response => response.json())
+        .then(data => {
+            clearInterval(progressInterval);
+            
+            if (data.success) {
+                progressBar.update(100, "<?php echo addslashes(t_h('git_sync.completed', [], 'Completed!')); ?>");
+                setTimeout(() => {
+                    progressBar.close();
+                    window.location.reload();
+                }, 500);
+            } else {
+                progressBar.close();
+                window.location.reload();
+            }
+        })
+        .catch(err => {
+            clearInterval(progressInterval);
+            progressBar.close();
+            window.modalAlert.alert("Connection error: " + err.message, 'error', title);
+        });
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('home-search-input');
-        const cards = document.querySelectorAll('.home-grid .home-card');
-        const grid = document.querySelector('.home-grid');
-        
-        // Create no results message if it doesn't exist
-        let noResults = document.createElement('div');
-        noResults.className = 'home-no-results';
-        noResults.style.display = 'none';
-        noResults.style.gridColumn = '1 / -1';
-        noResults.style.textAlign = 'center';
-        noResults.style.padding = '40px 20px';
-        noResults.style.color = '#6b7280';
-        noResults.innerHTML = '<i class="fas fa-search" style="font-size: 24px; display: block; margin-bottom: 10px; opacity: 0.5;"></i><?php echo addslashes(t_h('public.no_filter_results', [], 'No results found.')); ?>';
-        grid.appendChild(noResults);
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('home-search');
+        const cards = document.querySelectorAll('.home-card');
+        const noResults = document.getElementById('no-results');
 
         searchInput?.addEventListener('input', function() {
             const term = this.value.toLowerCase().trim();
@@ -634,6 +709,16 @@ try {
             }
         });
 
+        // Trigger auto pull if parameter is present
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('auto_pull') === '1') {
+            const pullCard = Array.from(cards).find(card => card.querySelector('input[name="sync_action"]')?.value === 'pull');
+            if (pullCard) {
+                // Clear the parameter so it doesn't trigger again on manual refresh
+                window.history.replaceState({}, document.title, window.location.pathname);
+                executeSync(pullCard);
+            }
+        }
     });
     </script>
 </body>

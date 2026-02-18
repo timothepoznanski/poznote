@@ -300,4 +300,9 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         $noteType = $row1['type'] ?? 'note';
         
         echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "' data-folder-id='' data-folder='' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note'>";
-        echo "<span class='note-title'>"
+        echo "<span class='note-title'>" . htmlspecialchars(($row1["heading"] ?: t('index.note.new_note', [], 'New note')), ENT_QUOTES) . "</span>";
+        echo "</a>";
+        echo "<div id=pxbetweennotes></div>";
+    }
+}
+?>

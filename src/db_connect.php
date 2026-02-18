@@ -87,8 +87,10 @@ try {
     
     $con = new PDO('sqlite:' . $dbPath);
     $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $con->exec('PRAGMA busy_timeout = 5000');
+    $con->exec('PRAGMA journal_mode = WAL');
+    $con->exec('PRAGMA busy_timeout = 30000');
     $con->exec('PRAGMA foreign_keys = ON');
+    $con->exec('PRAGMA synchronous = NORMAL');
         
     // Register custom SQLite function to remove accents for accent-insensitive search
     $con->sqliteCreateFunction('remove_accents', function($text) {

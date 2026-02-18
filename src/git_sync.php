@@ -45,8 +45,47 @@ function tp_h($key, $vars = []) {
 
 // Handle form submissions
 $message = '';
+$warning = '';
 $error = '';
 $result = null;
+
+// Handle result from AJAX sync session
+if (isset($_SESSION['last_sync_result'])) {
+    $lastSync = $_SESSION['last_sync_result'];
+    $action = $lastSync['action'];
+    $result = $lastSync['result'];
+    unset($_SESSION['last_sync_result']);
+
+    $errorCount = count($result['errors'] ?? []);
+    if ($result['success']) {
+        if ($action === 'push') {
+            $message = tp('git_sync.messages.push_success', [
+                'count' => $result['pushed'],
+                'attachments' => $result['attachments_pushed'] ?? 0,
+                'deleted' => $result['deleted'] ?? 0,
+                'errors' => $errorCount
+            ]);
+        } else if ($action === 'pull') {
+            $message = tp('git_sync.messages.pull_success', [
+                'pulled' => $result['pulled'],
+                'updated' => $result['updated'],
+                'deleted' => $result['deleted'] ?? 0,
+                'errors' => $errorCount
+            ]);
+        }
+        // Downgrade to warning if there were partial errors
+        if ($errorCount > 0) {
+            $warning = $message;
+            $message = '';
+        }
+    } else {
+        $error = tp('git_sync.messages.' . $action . '_error', [
+            'error' => $result['errors'][0]['error'] ?? 'Unknown error'
+        ]);
+    }
+    // Refresh last sync info since we have new results
+    $lastSyncInfo = $gitSync->getLastSyncInfo();
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
@@ -71,6 +110,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     'deleted' => $result['deleted'] ?? 0,
                     'errors' => count($result['errors'])
                 ]);
+                if (count($result['errors']) > 0) {
+                    $warning = $message;
+                    $message = '';
+                }
             } else {
                 $error = tp('git_sync.messages.push_error', ['error' => $result['errors'][0]['error'] ?? 'Unknown error']);
             }
@@ -92,6 +135,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     'deleted' => $result['deleted'] ?? 0,
                     'errors' => count($result['errors'])
                 ]);
+                if (count($result['errors']) > 0) {
+                    $warning = $message;
+                    $message = '';
+                }
             } else {
                 $error = tp('git_sync.messages.pull_error', ['error' => $result['errors'][0]['error'] ?? 'Unknown error']);
             }
@@ -224,6 +271,13 @@ try {
         <div class="alert alert-success">
             <i class="fas fa-check-circle"></i>
             <?php echo htmlspecialchars($message); ?>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($warning): ?>
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <?php echo htmlspecialchars($warning); ?>
         </div>
         <?php endif; ?>
 
@@ -425,17 +479,6 @@ try {
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
     <script>
-    /**
-     * Git Sync Form Handler
-     * 
-     * Purpose: Show confirmation dialog before push/pull operations and display loading state
-     * 
-     * Flow:
-     * 1. User submits push/pull form
-     * 2. Show confirmation modal
-     * 3. If confirmed: mark form as confirmed, show spinner, submit
-     * 4. If cancelled: do nothing
-     */
     document.addEventListener('DOMContentLoaded', function() {
         const syncForms = document.querySelectorAll('form.sync-form');
         
@@ -443,7 +486,9 @@ try {
         const i18n = {
             confirmPush: <?php echo json_encode(tp('git_sync.confirm_push')); ?>,
             confirmPull: <?php echo json_encode(tp('git_sync.confirm_pull')); ?>,
-            allWorkspaces: <?php echo json_encode(tp('git_sync.actions.all_workspaces')); ?>
+            allWorkspaces: <?php echo json_encode(tp('git_sync.actions.all_workspaces')); ?>,
+            starting: <?php echo json_encode(t('git_sync.starting', [], 'Starting sync...')); ?>,
+            completed: <?php echo json_encode(t('git_sync.completed', [], 'Completed!')); ?>
         };
 
         syncForms.forEach(form => {
@@ -455,44 +500,72 @@ try {
             if (action !== 'push' && action !== 'pull') return;
             
             form.addEventListener('submit', function(e) {
-                // If already confirmed by user, allow form submission
-                if (form.dataset.confirmed === 'true') {
-                    return;
-                }
-                
-                // Prevent default submission to show confirmation first
+                // Prevent default submission
                 e.preventDefault();
                 
                 // Get selected workspace name for confirmation message
                 const workspaceSelect = form.querySelector('select[name="workspace"]');
-                const workspaceName = (workspaceSelect && workspaceSelect.value) ? 
+                const workspaceValue = workspaceSelect ? workspaceSelect.value : "";
+                const workspaceText = (workspaceSelect && workspaceSelect.value) ? 
                     (workspaceSelect.options[workspaceSelect.selectedIndex].text) : 
                     i18n.allWorkspaces;
                 
                 // Build confirmation message
                 let confirmMsg = (action === 'push' ? i18n.confirmPush : i18n.confirmPull)
-                    .replace('{{workspace}}', workspaceName);
+                    .replace('{{workspace}}', workspaceText);
                 
                 // Show modal and wait for user response
                 window.modalAlert.confirm(confirmMsg).then(function(confirmed) {
                     if (confirmed) {
-                        // Mark as confirmed to bypass this handler on next submit
-                        form.dataset.confirmed = 'true';
+                        const title = (action === 'push' ? "Push" : "Pull");
                         
-                        // Show loading spinner on button
-                        // Note: We can't rely on the submit event firing again,
-                        // so we manually update the button here
-                        const button = form.querySelector('button[type="submit"]');
-                        if (button) {
-                            const icon = button.querySelector('i');
-                            if (icon) {
-                                icon.className = 'fas fa-spinner fa-spin';
+                        // Show progress bar modal
+                        const progressBar = window.modalAlert.showProgressBar(
+                            title, 
+                            i18n.starting
+                        );
+
+                        // Polling setup
+                        let progressInterval = setInterval(async () => {
+                            try {
+                                const response = await fetch('api/v1/git-sync/progress');
+                                const data = await response.json();
+                                if (data.success && data.progress) {
+                                    progressBar.update(data.progress.percentage, data.progress.message);
+                                }
+                            } catch (e) {
+                                console.error("Error polling progress:", e);
                             }
-                            button.disabled = true;
-                        }
-                        
-                        // Submit the form
-                        form.submit();
+                        }, 500);
+
+                        // Execute the sync
+                        fetch('api/v1/git-sync/' + action, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ workspace: workspaceValue })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            clearInterval(progressInterval);
+                            
+                            if (data.success) {
+                                progressBar.update(100, i18n.completed);
+                                setTimeout(() => {
+                                    progressBar.close();
+                                    window.location.reload();
+                                }, 500);
+                            } else {
+                                progressBar.close();
+                                window.location.reload();
+                            }
+                        })
+                        .catch(err => {
+                            clearInterval(progressInterval);
+                            progressBar.close();
+                            window.location.reload();
+                        });
                     }
                 });
             });

@@ -637,6 +637,11 @@ $router->post('/github-sync/pull', function($params) use ($gitSyncController) {
     $gitSyncController->pull();
 });
 
+// Git sync progress
+$router->get('/git-sync/progress', function($params) use ($gitSyncController) {
+    $gitSyncController->progress();
+});
+
 // ======================
 // User Profile Routes
 // ======================
