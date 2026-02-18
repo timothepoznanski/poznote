@@ -95,6 +95,11 @@
     min-width: 80px;
 }
 
+.alert-modal-button:focus {
+    outline: none;
+    box-shadow: none;
+}
+
 .alert-modal-button.primary {
     background: var(--primary-color, #007bff);
     color: white;
@@ -164,11 +169,11 @@ html[data-theme='dark'] .alert-modal-button.primary:hover,
         margin: 20px;
         width: calc(100% - 40px);
     }
-    
+
     .alert-modal-footer {
         flex-direction: column;
     }
-    
+
     .alert-modal-button {
         width: 100%;
     }
@@ -180,7 +185,44 @@ html[data-theme='dark'] .alert-modal-button.primary:hover,
 }
 
 .spinner-overlay {
-    pointer-events: none; /* Prevent interaction with background */
+    pointer-events: none;
+    /* Prevent interaction with background */
+}
+
+/* Base animation for indeterminate progress bars */
+@keyframes indeterminate-progress {
+    0% { left: -30%; width: 30%; }
+    50% { left: 40%; width: 60%; }
+    100% { left: 100%; width: 30%; }
+}
+
+/* Progress Bar Modal */
+.progress-modal {
+    text-align: center;
+}
+
+.progress-container {
+    width: 100%;
+    height: 12px;
+    background: var(--border-color, #e0e0e0);
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 15px 0;
+    position: relative;
+}
+
+.progress-bar-inner {
+    height: 100%;
+    background: var(--primary-color, #007bff);
+    width: 0%;
+    position: absolute;
+    left: 0;
+    transition: width 0.3s ease;
+}
+
+html[data-theme='dark'] .progress-container,
+.dark-mode .progress-container {
+    background: var(--border-color-dark, #4a5568);
 }
 
 .spinner-icon {
@@ -199,8 +241,13 @@ html[data-theme='dark'] .alert-modal-button.primary:hover,
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Dark mode spinner */

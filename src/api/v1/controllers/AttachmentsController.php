@@ -58,11 +58,11 @@ class AttachmentsController {
         
         try {
             if ($workspace) {
-                $query = "SELECT attachments FROM entries WHERE id = ? AND workspace = ?";
+                $query = "SELECT entry, attachments FROM entries WHERE id = ? AND workspace = ?";
                 $stmt = $this->con->prepare($query);
                 $stmt->execute([$noteId, $workspace]);
             } else {
-                $query = "SELECT attachments FROM entries WHERE id = ?";
+                $query = "SELECT entry, attachments FROM entries WHERE id = ?";
                 $stmt = $this->con->prepare($query);
                 $stmt->execute([$noteId]);
             }
@@ -70,7 +70,8 @@ class AttachmentsController {
             
             if ($result) {
                 $attachments = $result['attachments'] ? json_decode($result['attachments'], true) : [];
-                echo json_encode(['success' => true, 'attachments' => $attachments]);
+                $entry = $result['entry'] ?? '';
+                echo json_encode(['success' => true, 'attachments' => $attachments, 'entry' => $entry]);
             } else {
                 http_response_code(404);
                 echo json_encode(['success' => false, 'message' => 'Note not found']);

@@ -2505,32 +2505,34 @@
             // and doesn't interfere with the immediate execution's side effects (like modals)
             setTimeout(() => {
                 actionToExecute();
+                
+                // Re-focus after insertion to avoid caret jumping on focus (skip if keepSlash)
+                if (!shouldKeepSlash) {
+                    if (savedEditableElement) {
+                        try {
+                            savedEditableElement.focus();
+                        } catch (e) { }
+                    } else if (savedNoteEntry) {
+                        try {
+                            savedNoteEntry.focus();
+                        } catch (e) { }
+                    }
+                }
+
                 window._slashCommandSavedRange = null;
                 window._slashCommandInputCursor = null;
                 window._slashCommandSavedEditableElement = null;
+                savedNoteEntry = null;
+                savedEditableElement = null;
             }, 0);
         } catch (e) {
             console.error('Error executing command:', e);
             window._slashCommandSavedRange = null;
             window._slashCommandInputCursor = null;
             window._slashCommandSavedEditableElement = null;
+            savedNoteEntry = null;
+            savedEditableElement = null;
         }
-
-        // Re-focus after insertion to avoid caret jumping on focus (skip if keepSlash)
-        if (!shouldKeepSlash) {
-            if (savedEditableElement) {
-                try {
-                    savedEditableElement.focus();
-                } catch (e) { }
-            } else if (savedNoteEntry) {
-                try {
-                    savedNoteEntry.focus();
-                } catch (e) { }
-            }
-        }
-
-        savedNoteEntry = null;
-        savedEditableElement = null;
     }
 
     // Prevent menu click from losing editor focus

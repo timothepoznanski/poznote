@@ -59,7 +59,6 @@
         "apply": "Appliquer",
         "at": "à",
         "kanban": "Kanban",
-        "scroll_left": "Faire défiler à gauche",
         "scroll_right": "Faire défiler à droite"
     },
     "kanban": {
@@ -266,7 +265,7 @@
             "open_in_new_tab": "Ouvrir dans un nouvel onglet",
             "pdf_label": "PDF",
             "settings_banner": {
-                "message": "Les images en pièces jointes sont masquées de la liste de la note (mais pas de la liste ici) car le paramètre 'Afficher les pièces jointes images' est désactivé.",
+                "message": "Les images en pièces jointes sont masquées de la liste de la note (mais pas de la liste ici) car le paramètre 'Afficher les images jointes' est désactivé.",
                 "action": "Modifier le réglage"
             }
         },
@@ -294,6 +293,7 @@
             "hint": "Ajoutez des pièces jointes à vos notes en utilisant le bouton trombone dans la barre d'outils.",
             "filter_placeholder": "Filtrer par titre de note ou nom de pièce jointe...",
             "no_filter_results": "Aucune note ne correspond à votre recherche.",
+            "show_thumbnails": "Afficher les miniatures dans cette liste",
             "download": "Télécharger"
         }
     },
@@ -447,7 +447,7 @@
             "kanban_on_folder_click": "Ouvrir la vue Kanban au clic sur dossier",
             "index_icon_scale": "Taille des icônes (Index)",
             "note_content_width": "Largeur du contenu de la note",
-            "show_inline_attachment_images": "Afficher les pièces jointes images"
+            "show_inline_attachment_images": "Afficher les images jointes"
         },
         "badges": {
             "font_size_default": "par défaut ({{size}}px)",
@@ -764,6 +764,11 @@
             "workspace_destination": "Sélectionnez l’espace de travail de destination :",
             "target_folder": "Sélectionnez le dossier cible :",
             "enter_folder_name": "Veuillez saisir un nom de dossier"
+        },
+        "git_sync": {
+            "confirm_auto_pull": "Une nouvelle session a démarré. Voulez-vous récupérer les modifications depuis {{provider}} ?",
+            "auto_pull_complete": "Synchronisation Git terminée. Actualisation de la page...",
+            "auto_pull_no_changes": "Synchronisation Git terminée. Aucune modification trouvée."
         },
         "move_folder_files": {
             "title": "Déplacer tous les fichiers",
@@ -1946,10 +1951,16 @@
     },
     "git_sync": {
         "title": "Synchronisation {{provider}}",
-        "description": "Poussez vos notes vers {{provider}} ou récupérez des notes depuis un dépôt existant. Un dépôt correspond à un profil utilisateur. Les espaces de travail seront organisés en dossiers à la racine du dépôt.",
-        "warning": "Ne vous servez pas de cette fonctionnalité comme seule solution de sauvegarde.\nPensez à mettre en place des exports manuels ou automatiques de fichiers ZIP de vos notes.",
-        "confirm_push": "Pousser les notes de l’espace « {{workspace}} » vers {{provider}} ? Met à jour les fichiers existants et supprime ceux qui n'existent plus dans Poznote.",
-        "confirm_pull": "Récupérer les notes de l’espace « {{workspace}} » depuis {{provider}} ? Importe les notes depuis {{provider}}. Met à jour les notes existantes et déplace vers la corbeille celles qui n'existent plus sur {{provider}}.",
+        "description": "Sauvegardez vos notes et pièces jointes sur {{provider}}. Les fichiers sont stockés à plat avec un fichier metadata.json qui préserve les tags, dossiers, dates et pièces jointes.",
+        "warning": "Ne vous fiez pas à cette fonctionnalité comme seule solution de sauvegarde.\nExportez régulièrement vos données via la fonctionnalité de sauvegarde dans les Paramètres.",
+        "confirm_push": "Pousser toutes les notes et pièces jointes vers {{provider}} ? Les fichiers existants seront mis à jour et les fichiers absents de Poznote seront supprimés du dépôt.",
+        "confirm_pull": "Récupérer toutes les notes et pièces jointes depuis {{provider}} ? Les données locales seront écrasées par la version distante. Les notes absentes sur {{provider}} seront déplacées dans la corbeille.",
+        "confirm_auto_pull": "Une nouvelle session a commencé. Voulez-vous récupérer les changements depuis {{provider}} ?",
+        "confirm_auto_pull_warning": "Une nouvelle session a commencé. Voulez-vous récupérer les changements depuis {{provider}} ?\n\nLes notes locales absentes de {{provider}} seront déplacées dans la corbeille.",
+        "auto_pull_complete": "Synchronisation Git terminée. Rafraîchissement de la page...",
+        "auto_pull_no_changes": "Synchronisation Git terminée. Aucun changement trouvé.",
+        "pulling": "Récupération des changements...",
+        "starting": "Synchronisation...",
         "config": {
             "title": "Configuration",
             "status": "Statut",
@@ -1962,6 +1973,14 @@
             "not_configured": "Non configuré",
             "not_configured_yet": "À configurer",
             "hint": "La synchronisation {{provider}} est désactivée. Définissez POZNOTE_GIT_SYNC_ENABLED=true dans votre fichier .env pour l'activer."
+        },
+        "auto_sync": {
+            "title": "Synchronisation automatique",
+            "push_label": "Envoyer automatiquement à la sortie",
+            "push_description": "Lorsque vous quittez une note (changement de note ou fermeture de l'onglet), sa dernière version est automatiquement poussée vers le dépôt Git, si elle a été modifiée durant la session.",
+            "pull_label": "Récupérer automatiquement au chargement",
+            "pull_description": "Une fois par session, demande si vous souhaitez récupérer les données depuis le dépôt Git. Met à jour les notes existantes, importe les nouvelles, et déplace dans la corbeille les notes locales absentes du remote.",
+            "saving": "Configuration enregistrée"
         },
         "test": {
             "title": "Tester la connexion",
@@ -1977,18 +1996,18 @@
         },
         "actions": {
             "title": "Actions de synchronisation",
-            "workspace": "Espace de travail",
+            "workspace": "Workspace: {{workspace}}",
             "target_workspace": "Espace de travail cible",
             "all_workspaces": "Tous les espaces de travail",
             "push": {
                 "title": "Envoyer vers {{provider}}",
-                "description": "Exporte vos notes vers {{provider}}. Met à jour les fichiers existants et supprime les fichiers qui n'existent plus dans Poznote.",
-                "button": "Envoyer"
+                "description": "Exporte toutes les notes et pièces jointes vers {{provider}} sous forme de fichiers plats. Met à jour les fichiers existants et supprime ceux qui n'existent plus dans Poznote.",
+                "button": "Envoyer ({{provider}})"
             },
             "pull": {
                 "title": "Récupérer depuis {{provider}}",
-                "description": "Importe les notes depuis {{provider}}. Met à jour les notes existantes et déplace dans la corbeille les notes qui n'existent plus sur {{provider}}.",
-                "button": "Récupérer"
+                "description": "Importe toutes les notes et pièces jointes depuis {{provider}}. Écrase le contenu local et déplace dans la corbeille les notes absentes du dépôt.",
+                "button": "Récupérer ({{provider}})"
             }
         },
         "messages": {

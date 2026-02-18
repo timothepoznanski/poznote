@@ -1033,20 +1033,24 @@
 
     /**
      * Check URL parameters and auto-scroll to note if scroll=1 is present
+     * or if a note ID is present in the URL (mobile only).
      * Used on mobile after creating/loading a note
      */
     function checkAndScrollToNote() {
         const isMobile = window.innerWidth <= 800;
         if (isMobile) {
             const urlParams = new URLSearchParams(window.location.search);
-            const shouldScroll = urlParams.has('scroll') && urlParams.get('scroll') === '1';
+            const hasScrollFlag = urlParams.has('scroll') && urlParams.get('scroll') === '1';
+            const hasNoteId = urlParams.has('note') && urlParams.get('note');
 
-            if (shouldScroll) {
+            if (hasScrollFlag || hasNoteId) {
                 setTimeout(function () {
                     scrollToRightColumn();
-                    urlParams.delete('scroll');
-                    const newUrl = window.location.pathname + '?' + urlParams.toString();
-                    window.history.replaceState({}, '', newUrl);
+                    if (hasScrollFlag) {
+                        urlParams.delete('scroll');
+                        const newUrl = window.location.pathname + '?' + urlParams.toString();
+                        window.history.replaceState({}, '', newUrl);
+                    }
                 }, 100);
             }
         }

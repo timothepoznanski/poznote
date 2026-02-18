@@ -9,6 +9,18 @@ require_once 'db_connect.php';
 
 $pageWorkspace = trim(getWorkspaceFilter());
 $currentLang = getUserLanguage();
+
+// Get the current setting for inline images in list
+$showInlineInList = true;
+try {
+    $stmt = $con->prepare("SELECT value FROM settings WHERE key = 'show_inline_attachments_in_list' LIMIT 1");
+    $stmt->execute();
+    $val = $stmt->fetchColumn();
+    // Default is shown, so only '0' or 'false' means hidden
+    if ($val === '0' || $val === 'false') {
+        $showInlineInList = false;
+    }
+} catch (Exception $e) {}
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
@@ -60,6 +72,17 @@ $currentLang = getUserLanguage();
 				</button>
 			</div>
 			<div id="filterStats" class="filter-stats"></div>
+		</div>
+
+		<div class="filter-options-bar">
+			<label class="toggle-checkbox">
+				<input type="checkbox" id="showThumbnailsToggle" checked>
+				<span class="toggle-label"><?php echo t_h('attachments.list.show_thumbnails', [], 'Show thumbnails in this list'); ?></span>
+			</label>
+			<label class="toggle-checkbox">
+				<input type="checkbox" id="showImagesToggle" <?php echo $showInlineInList ? 'checked' : ''; ?>>
+				<span class="toggle-label"><?php echo t_h('display.cards.show_inline_attachment_images', [], 'Show image attachments'); ?></span>
+			</label>
 		</div>
 		
 		<div class="shared-content">
