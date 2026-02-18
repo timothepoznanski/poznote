@@ -13,6 +13,20 @@
     // =====================================================
 
     /**
+     * Close all open note action dropdown menus
+     */
+    function closeAllNoteActionMenus() {
+        var openMenus = document.querySelectorAll('.note-actions-menu.show');
+        openMenus.forEach(function(menu) {
+            menu.classList.remove('show');
+        });
+        var openToggles = document.querySelectorAll('.note-actions-toggle.open');
+        openToggles.forEach(function(btn) {
+            btn.classList.remove('open');
+        });
+    }
+
+    /**
      * Extract folder data from an action element
      * @param {HTMLElement} element - The element containing data attributes
      * @returns {{id: number|null, name: string|null}} Folder data
@@ -372,6 +386,21 @@
                         chevron.style.transform = isVisible ? 'rotate(0deg)' : 'rotate(90deg)';
                     }
                 }
+            },
+            'toggle-note-actions-menu': function() {
+                event.preventDefault();
+                event.stopPropagation();
+                var noteId = actionElement.getAttribute('data-note-id');
+                if (!noteId) return;
+                var menu = document.getElementById('note-actions-menu-' + noteId);
+                if (!menu) return;
+                var isOpen = menu.classList.contains('show');
+                // Close all other open note menus first
+                closeAllNoteActionMenus();
+                if (!isOpen) {
+                    menu.classList.add('show');
+                    actionElement.classList.add('open');
+                }
             }
         };
 
@@ -444,6 +473,7 @@
             case 'sort-folder':
                 handleFolderSort(event, actionElement);
                 break;
+
         }
     }
 
@@ -556,6 +586,13 @@
 
         // Double-click event delegation
         document.addEventListener('dblclick', handleNotesListDblClick);
+
+        // Close note action menus when clicking outside or on a menu item
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.note-actions') || e.target.closest('.note-actions-menu-item')) {
+                closeAllNoteActionMenus();
+            }
+        });
     }
 
 
@@ -583,31 +620,42 @@
         var folderContent = document.getElementById(folderContentId);
         if (!folderContent) return;
 
-        // Get all notes (only direct children to avoid subfolder notes)
-        var notes = Array.from(folderContent.querySelectorAll(':scope > a.links_arbo_left'));
-        if (notes.length === 0) return;
+        // Get all note wrapper items (only direct children to avoid subfolder notes)
+        // Notes are wrapped in .note-list-item divs; fall back to bare <a> for compatibility
+        var noteItems = Array.from(folderContent.querySelectorAll(':scope > .note-list-item'));
+        if (noteItems.length === 0) {
+            noteItems = Array.from(folderContent.querySelectorAll(':scope > a.links_arbo_left'));
+        }
+        if (noteItems.length === 0) return;
 
-        // Sort the notes array based on sort type
-        notes.sort(function (a, b) {
+        // Helper: get the <a> link from a note item (wrapper div or bare anchor)
+        function getNoteLink(item) {
+            return item.tagName === 'A' ? item : item.querySelector('a.links_arbo_left');
+        }
+
+        // Sort the items array based on sort type
+        noteItems.sort(function (a, b) {
+            var linkA = getNoteLink(a);
+            var linkB = getNoteLink(b);
             var valA, valB;
 
             switch (sortType) {
                 case 'alphabet':
-                    valA = (a.querySelector('.note-title').textContent || '').toLowerCase();
-                    valB = (b.querySelector('.note-title').textContent || '').toLowerCase();
+                    valA = ((linkA && linkA.querySelector('.note-title')) ? linkA.querySelector('.note-title').textContent : '').toLowerCase();
+                    valB = ((linkB && linkB.querySelector('.note-title')) ? linkB.querySelector('.note-title').textContent : '').toLowerCase();
                     return valA.localeCompare(valB);
 
                 case 'created':
                     // Descending order (newest first)
-                    valA = a.getAttribute('data-created') || '';
-                    valB = b.getAttribute('data-created') || '';
+                    valA = (linkA && linkA.getAttribute('data-created')) || '';
+                    valB = (linkB && linkB.getAttribute('data-created')) || '';
                     return valA < valB ? 1 : (valA > valB ? -1 : 0);
 
                 case 'modified':
                 default:
                     // Descending order (newest first)
-                    valA = a.getAttribute('data-updated') || '';
-                    valB = b.getAttribute('data-updated') || '';
+                    valA = (linkA && linkA.getAttribute('data-updated')) || '';
+                    valB = (linkB && linkB.getAttribute('data-updated')) || '';
                     return valA < valB ? 1 : (valA > valB ? -1 : 0);
             }
         });
@@ -618,15 +666,15 @@
         // Use document fragment for better performance
         var fragment = document.createDocumentFragment();
 
-        // Reorder notes with spacers
-        notes.forEach(function (note) {
-            // Remove existing spacer after this note
-            var next = note.nextElementSibling;
+        // Reorder note items with spacers
+        noteItems.forEach(function (item) {
+            // Remove existing spacer after this item
+            var next = item.nextElementSibling;
             if (next && next.id === 'pxbetweennotes') {
                 next.remove();
             }
 
-            fragment.appendChild(note);
+            fragment.appendChild(item);
 
             // Add spacer between notes
             var spacer = document.createElement('div');

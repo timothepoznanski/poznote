@@ -272,6 +272,12 @@ function loadNoteCommon(url, noteId, options) {
 
                                 currentRightColumn.innerHTML = rightColumn.innerHTML;
 
+                                // Update tab state and re-render tab bar
+                                if (window.tabManager) {
+                                    window.tabManager._onNoteLoaded(noteId);
+                                    window.tabManager.render();
+                                }
+
                                 // Clear Kanban view flags if requested
                                 if (options.clearKanbanFlags) {
                                     window._isKanbanViewActive = false;

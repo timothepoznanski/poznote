@@ -177,9 +177,17 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             }
         }
         
+        echo "<div class='note-list-item'>";
         echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "'" . $linkedNoteIdAttr . " data-folder-id='$folderId' data-folder='$folderName' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note'>";
         echo "<span class='note-title'>" . $noteIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
         echo "</a>";
+        echo "<div class='note-actions'>";
+        echo "<button class='note-actions-toggle' data-action='toggle-note-actions-menu' data-note-id='" . $noteDbId . "' title='Note actions'><i class='fas fa-ellipsis-v'></i></button>";
+        echo "<div class='note-actions-menu' id='note-actions-menu-" . $noteDbId . "'>";
+        echo "<div class='note-actions-menu-item' data-action='open-note-new-tab' data-note-id='" . $noteDbId . "'><i class='fas fa-external-link'></i><span>Open in new tab</span></div>";
+        echo "</div>";
+        echo "</div>";
+        echo "</div>";
         echo "<div id=pxbetweennotes></div>";
     }
     
@@ -286,9 +294,17 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
             $noteIcon = '<i class="fas fa-link note-type-icon-inline"></i> ';
         }
         
+        echo "<div class='note-list-item'>";
         echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "' data-folder-id='' data-folder='' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note'>";
         echo "<span class='note-title'>" . $noteIcon . htmlspecialchars(($row1["heading"] ?: t('index.note.new_note', [], 'New note')), ENT_QUOTES) . "</span>";
         echo "</a>";
+        echo "<div class='note-actions'>";
+        echo "<button class='note-actions-toggle' data-action='toggle-note-actions-menu' data-note-id='" . $noteDbId . "' title='Note actions'><i class='fas fa-ellipsis-v'></i></button>";
+        echo "<div class='note-actions-menu' id='note-actions-menu-" . $noteDbId . "'>";
+        echo "<div class='note-actions-menu-item' data-action='open-note-new-tab' data-note-id='" . $noteDbId . "'><i class='fas fa-external-link'></i><span>Open in new tab</span></div>";
+        echo "</div>";
+        echo "</div>";
+        echo "</div>";
         echo "<div id=pxbetweennotes></div>";
     }
 }
@@ -316,9 +332,17 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
             $noteIcon = '<i class="fas fa-link note-type-icon-inline"></i> ';
         }
         
+        echo "<div class='note-list-item'>";
         echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "' data-folder-id='' data-folder='' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note'>";
         echo "<span class='note-title'>" . $noteIcon . htmlspecialchars(($row1["heading"] ?: t('index.note.new_note', [], 'New note')), ENT_QUOTES) . "</span>";
         echo "</a>";
+        echo "<div class='note-actions'>";
+        echo "<button class='note-actions-toggle' data-action='toggle-note-actions-menu' data-note-id='" . $noteDbId . "' title='Note actions'><i class='fas fa-ellipsis-v'></i></button>";
+        echo "<div class='note-actions-menu' id='note-actions-menu-" . $noteDbId . "'>";
+        echo "<div class='note-actions-menu-item' data-action='open-note-new-tab' data-note-id='" . $noteDbId . "'><i class='fas fa-external-link'></i><span>Open in new tab</span></div>";
+        echo "</div>";
+        echo "</div>";
+        echo "</div>";
         echo "<div id=pxbetweennotes></div>";
     }
 }

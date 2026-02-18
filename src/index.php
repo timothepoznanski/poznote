@@ -188,6 +188,7 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <link type="text/css" rel="stylesheet" href="css/drag-drop.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/icons.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/misc.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/tabs.css?v=<?php echo $v; ?>"/>
     <link rel="stylesheet" href="css/index-mobile.css?v=<?php echo $v; ?>" media="(max-width: 800px)">
     <link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/base.css?v=<?php echo $v; ?>"/>
@@ -972,6 +973,7 @@ $body_classes = trim($extra_body_classes);
 <script src="js/notes-list-events.js?v=<?php echo $v; ?>"></script>
 <script src="js/folder-icon.js?v=<?php echo $v; ?>"></script>
 <script src="js/kanban.js?v=<?php echo $v; ?>"></script>
+<script src="js/tabs.js?v=<?php echo $v; ?>"></script>
 
 <?php if ($note && is_numeric($note)): ?>
 <!-- Data for draft check (used by index-events.js) -->
