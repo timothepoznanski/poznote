@@ -406,12 +406,42 @@
         _init();
     }
 
+    /**
+     * Called when a note is deleted.
+     * Removes all tabs associated with this noteId.
+     */
+    function closeTabsByNoteId(noteId) {
+        noteId = String(noteId);
+        var originalLength = tabs.length;
+        var newTabs = tabs.filter(function (tab) {
+            return tab.noteId !== noteId;
+        });
+
+        if (newTabs.length === tabs.length) return; // nothing changed
+
+        tabs = newTabs;
+
+        if (tabs.length === 0) {
+            activeTabId = null;
+        } else if (activeTabId) {
+            // If the active tab was one of the deleted ones, switch to another
+            var stillExists = _findTabById(activeTabId);
+            if (!stillExists) {
+                activeTabId = tabs[0].id;
+            }
+        }
+
+        _saveToStorage();
+        render();
+    }
+
     // ── Expose ─────────────────────────────────────────────────────────────
 
     window.tabManager = {
         openInNewTab: openInNewTab,
         switchToTab: switchToTab,
         closeTab: closeTab,
+        closeTabsByNoteId: closeTabsByNoteId,
         render: render,
         _onNoteLoaded: _onNoteLoaded
     };
