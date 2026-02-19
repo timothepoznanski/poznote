@@ -15,6 +15,8 @@
 
     /** Helper to check if tabs are enabled via global config */
     function _areTabsEnabled() {
+        // Always disabled on mobile (viewport ≤ 800px)
+        if (window.innerWidth <= 800) return false;
         return !window.POZNOTE_CONFIG || window.POZNOTE_CONFIG.enableInternalTabs !== false;
     }
 
