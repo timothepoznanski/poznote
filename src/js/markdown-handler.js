@@ -27,11 +27,13 @@ function normalizeContentEditableText(element) {
                 var textContent = node.textContent || node.nodeValue || '';
                 parts.push(textContent);
             } else if (node.nodeType === Node.ELEMENT_NODE) {
-                if (node.tagName === 'DIV') {
-                    // DIV usually represents a line
+                if (node.tagName === 'DIV' || node.tagName === 'P' || node.tagName === 'LI' ||
+                    node.tagName === 'H1' || node.tagName === 'H2' || node.tagName === 'H3' ||
+                    node.tagName === 'H4' || node.tagName === 'H5' || node.tagName === 'H6') {
+                    // Block elements usually represent a line
                     var divText = node.textContent || '';
                     if (divText === '' && node.querySelector('br')) {
-                        // Empty div with BR = empty line
+                        // Empty block with BR = empty line
                         parts.push('');
                     } else {
                         parts.push(divText);
@@ -46,15 +48,13 @@ function normalizeContentEditableText(element) {
             }
         }
 
-        // Join parts, but be careful about newlines
-        // If a text node already contains \n, we shouldn't add another one
+        // Join parts, ensuring exactly one newline between parts
         content = '';
         for (var j = 0; j < parts.length; j++) {
             var part = parts[j];
             if (j > 0) {
-                // Only add a newline separator if the previous part doesn't already end with one
-                var prevPart = parts[j - 1];
-                if (!prevPart.endsWith('\n')) {
+                // If the content doesn't already end with a newline, add one
+                if (!content.endsWith('\n')) {
                     content += '\n';
                 }
             }
@@ -1163,29 +1163,34 @@ function initializeMarkdownNote(noteId) {
 
     // Only treat as corrupted if we have ESCAPED HTML (not real elements)
     if (hasEscapedEditor && hasEscapedPreview) {
-        var cleanContent = '';
+        // Create a temporary element to safely decode the escaped HTML
+        var tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlContent;
 
-        // Extract content from escaped HTML
-        // Look for the content between the escaped editor tags
-        var editorMatch = htmlContent.match(/&lt;div class="markdown-editor"[^&]*&gt;([^&]*?)&lt;\/div&gt;/);
-        if (editorMatch) {
-            cleanContent = editorMatch[1];
-            // Decode any HTML entities in the content
-            var tempDiv = document.createElement('div');
-            tempDiv.innerHTML = cleanContent;
-            cleanContent = tempDiv.textContent || tempDiv.innerText || '';
+        // The browser's innerHTML parsing of escaped HTML will put the escaped string as text content
+        var decodedHtml = tempDiv.textContent || tempDiv.innerText || '';
+
+        // Now decodedHtml is something like '<div class="markdown-editor">...</div>'
+        // We can parse THIS as HTML to extract the content correctly
+        tempDiv.innerHTML = decodedHtml;
+        var recreatedEditor = tempDiv.querySelector('.markdown-editor');
+
+        if (recreatedEditor) {
+            // Use our robust normalization function which preserves line breaks
+            markdownContent = normalizeContentEditableText(recreatedEditor);
+        } else {
+            // Fallback: if we couldn't find the editor div, just use textContent
+            markdownContent = tempDiv.textContent || '';
         }
 
         // Clear the corrupted HTML and restore clean content
         noteEntry.innerHTML = '';
-        noteEntry.textContent = cleanContent;
+        noteEntry.textContent = markdownContent;
 
         // Update the data attribute with clean content
-        noteEntry.setAttribute('data-markdown-content', cleanContent);
-
-        // Use the clean content for initialization
-        markdownContent = cleanContent;
+        noteEntry.setAttribute('data-markdown-content', markdownContent);
     } else if (existingEditor && existingPreview) {
+
         // Real markdown elements exist - extract content and re-initialize
 
         // Extract the markdown content from the existing editor
@@ -2069,7 +2074,7 @@ function setupPreviewInteractivity(noteId) {
         lineElements.forEach(function (element) {
             // Skip checkboxes (they have their own handler)
             if (element.classList.contains('markdown-task-checkbox')) return;
-            
+
             // Skip details and summary elements (they have native toggle functionality)
             if (element.tagName === 'DETAILS' || element.tagName === 'SUMMARY') return;
 

@@ -5,21 +5,21 @@ class SearchManager {
         this.isMobile = false;
         this.currentSearchType = 'notes';
         this.lastSearchTerm = '';
-    // When set, skip restore from recent user toggle (ms since epoch).
-    this._suppressUntil = 0;
-    // When set, skip restore from URL during initialization (used after AJAX)
-    this.suppressURLRestore = false;
-    // Focus handling after AJAX: when true, reinitializeAfterAjax will restore focus
-    this.focusAfterAjax = false;
-    this.focusCaretPos = null;
+        // When set, skip restore from recent user toggle (ms since epoch).
+        this._suppressUntil = 0;
+        // When set, skip restore from URL during initialization (used after AJAX)
+        this.suppressURLRestore = false;
+        // Focus handling after AJAX: when true, reinitializeAfterAjax will restore focus
+        this.focusAfterAjax = false;
+        this.focusCaretPos = null;
         this.eventHandlers = new Map();
-    // Track which handlers are attached to which DOM element to avoid
-    // attaching multiple handlers to the same icon element (desktop vs mobile)
-    this._iconElementMap = new WeakMap();
-        
+        // Track which handlers are attached to which DOM element to avoid
+        // attaching multiple handlers to the same icon element (desktop vs mobile)
+        this._iconElementMap = new WeakMap();
+
         // Initialize both desktop and mobile
         this.initializeSearch();
-        
+
         // Listen for i18n loaded event to update placeholders with translations
         document.addEventListener('poznote:i18n:loaded', () => {
             this.updatePlaceholder(false); // Desktop
@@ -32,7 +32,7 @@ class SearchManager {
      */
     getElements(isMobile = this.isMobile) {
         const suffix = isMobile ? '-mobile' : '';
-        
+
         return {
             form: document.getElementById(`unified-search-form${suffix}`),
             searchInput: document.getElementById(`unified-search${suffix}`),
@@ -77,7 +77,7 @@ class SearchManager {
         // Check if there's an active search
         const urlParams = new URLSearchParams(window.location.search);
         const hasActiveSearch = Boolean(urlParams.get('search') || urlParams.get('tags_search'));
-        
+
         // Show or hide system folders container based on search state
         if (hasActiveSearch) {
             this.hideSystemFoldersContainer();
@@ -89,15 +89,15 @@ class SearchManager {
         if (!this.suppressURLRestore) {
             this.restoreSearchStateFromURL(isMobile);
         }
-        
+
         // Initialize combined mode state from hidden input
         this.restoreCombinedModeState(isMobile);
-        
+
         // Initialize last search term from current input value
         if (elements.searchInput && elements.searchInput.value) {
             this.lastSearchTerm = elements.searchInput.value.trim();
         }
-        
+
         this.updateInterface(isMobile);
     }
 
@@ -107,14 +107,14 @@ class SearchManager {
     restoreCombinedModeState(isMobile) {
         const elements = this.getElements(isMobile);
         if (!elements.typeIconsContainer || !elements.optionsToggle) return;
-        
+
         // Check if combined mode is enabled - first from URL, then localStorage, then from hidden input
         let isCombined = false;
-        
+
         // Check URL parameters first (highest priority - preserves state during navigation)
         const urlParams = new URLSearchParams(window.location.search);
         const urlCombined = urlParams.get('search_combined');
-        
+
         if (urlCombined === '1') {
             isCombined = true;
         } else if (urlCombined === '0') {
@@ -138,7 +138,7 @@ class SearchManager {
                 isCombined = true;
             }
         }
-        
+
         if (isCombined) {
             // Hide icons and update toggle state
             elements.typeIconsContainer.classList.add('hidden');
@@ -189,21 +189,21 @@ class SearchManager {
     restoreSearchStateFromURL(isMobile) {
         const urlParams = new URLSearchParams(window.location.search);
         const elements = this.getElements(isMobile);
-        
+
         // Check URL preferences and explicit search params
         const preserveNotes = urlParams.get('preserve_notes') === '1';
         const preserveTags = urlParams.get('preserve_tags') === '1';
         const hasTagsSearchParam = urlParams.get('tags_search') && urlParams.get('tags_search').trim() !== '';
         const hasNotesSearchParam = urlParams.get('search') && urlParams.get('search').trim() !== '';
-        
+
         // Check hidden field values: flags vs term-bearing inputs
         const hasNotesFlag = elements.hiddenInputs.notesFlag?.value === '1';
         const hasTagsFlag = elements.hiddenInputs.tagsFlag?.value === '1';
-        
-    // If a recent user toggle was performed, avoid restoring from URL
-    if (this._suppressUntil && Date.now() < this._suppressUntil) return;
 
-    // Determine active search type
+        // If a recent user toggle was performed, avoid restoring from URL
+        if (this._suppressUntil && Date.now() < this._suppressUntil) return;
+
+        // Determine active search type
         // Prefer explicit URL params (tags_search / search) if present
         if (hasTagsSearchParam || preserveTags || hasTagsFlag) {
             this.setActiveSearchType('tags', isMobile);
@@ -221,9 +221,9 @@ class SearchManager {
     setActiveSearchType(searchType, isMobile) {
         if (!this.searchTypes.includes(searchType)) return;
         // start tracing removed; keep behavior unchanged
-        
+
         const elements = this.getElements(isMobile);
-        
+
         // If leaving a previous search type, clear highlights of that type
         const prev = this.currentSearchType;
         if (prev === 'notes' && searchType !== 'notes' && typeof clearSearchHighlights === 'function') {
@@ -240,34 +240,34 @@ class SearchManager {
                 button.classList.remove('active');
             }
         });
-        
+
         // Set active state
         const activeButton = elements.buttons[searchType];
         if (activeButton) {
             activeButton.classList.add('active');
         }
-    // Persist state even if buttons are absent
-    this.currentSearchType = searchType;
-    // Expose last active search type globally for other modules (used by applyHighlightsWithRetries)
-    try { window._lastActiveSearchType = searchType; } catch (e) { /* ignore */ }
-    // update UI
-    this.updateInterface(isMobile);
+        // Persist state even if buttons are absent
+        this.currentSearchType = searchType;
+        // Expose last active search type globally for other modules (used by applyHighlightsWithRetries)
+        try { window._lastActiveSearchType = searchType; } catch (e) { /* ignore */ }
+        // update UI
+        this.updateInterface(isMobile);
 
-    // If switching into 'notes' search, (re-)apply highlights now that state is set
-    if (searchType === 'notes' && typeof highlightSearchTerms === 'function') {
-        try { highlightSearchTerms(); } catch (e) { /* ignore */ }
-    }
-    // If switching into 'tags' search, attempt to highlight matching tag UI elements
-    if (searchType === 'tags' && typeof window.highlightMatchingTags === 'function') {
-        try {
-            // Prefer hidden term if present, else visible input
-            var hiddenTerm = elements.hiddenInputs.tagsTerm?.value || '';
-            var visibleTerm = elements.searchInput?.value || '';
-            var term = hiddenTerm && hiddenTerm.trim() ? hiddenTerm.trim() : visibleTerm.trim();
-            // Call highlightMatchingTags immediately and ensure retries if tags are created asynchronously
-            window.highlightMatchingTags(term);
-        } catch (e) { /* ignore */ }
-    }
+        // If switching into 'notes' search, (re-)apply highlights now that state is set
+        if (searchType === 'notes' && typeof highlightSearchTerms === 'function') {
+            try { highlightSearchTerms(); } catch (e) { /* ignore */ }
+        }
+        // If switching into 'tags' search, attempt to highlight matching tag UI elements
+        if (searchType === 'tags' && typeof window.highlightMatchingTags === 'function') {
+            try {
+                // Prefer hidden term if present, else visible input
+                var hiddenTerm = elements.hiddenInputs.tagsTerm?.value || '';
+                var visibleTerm = elements.searchInput?.value || '';
+                var term = hiddenTerm && hiddenTerm.trim() ? hiddenTerm.trim() : visibleTerm.trim();
+                // Call highlightMatchingTags immediately and ensure retries if tags are created asynchronously
+                window.highlightMatchingTags(term);
+            } catch (e) { /* ignore */ }
+        }
     }
 
     /**
@@ -275,7 +275,7 @@ class SearchManager {
      */
     updateInterface(isMobile) {
         this.updatePlaceholder(isMobile);
-    this.updateIcon(isMobile);
+        this.updateIcon(isMobile);
         // Hide or show special folders (Trash, Tags) depending on active search type
         this.hideSpecialFolders(isMobile);
         this.updateHiddenInputs(isMobile);
@@ -303,22 +303,22 @@ class SearchManager {
             const selectors = ['.folder-header[data-folder="Trash"]', '.folder-header[data-folder="Tags"]'];
             selectors.forEach(sel => {
                 document.querySelectorAll(sel).forEach(el => {
-                            if ((activeType === 'notes' || activeType === 'tags') && isSearching) {
-                                el.classList.add('search-hidden');
+                    if ((activeType === 'notes' || activeType === 'tags') && isSearching) {
+                        el.classList.add('search-hidden');
                         // also hide its content pane if present
                         const folderToggle = el.querySelector('[data-folder-id]');
                         if (folderToggle) {
                             const folderId = folderToggle.getAttribute('data-folder-id');
                             const folderContent = document.getElementById(folderId);
-                                    if (folderContent) folderContent.classList.add('search-hidden');
+                            if (folderContent) folderContent.classList.add('search-hidden');
                         }
                     } else {
-                                el.classList.remove('search-hidden');
+                        el.classList.remove('search-hidden');
                         const folderToggle = el.querySelector('[data-folder-id]');
                         if (folderToggle) {
                             const folderId = folderToggle.getAttribute('data-folder-id');
                             const folderContent = document.getElementById(folderId);
-                                    if (folderContent) folderContent.classList.remove('search-hidden');
+                            if (folderContent) folderContent.classList.remove('search-hidden');
                         }
                     }
                 });
@@ -367,7 +367,7 @@ class SearchManager {
             notes: (window.t ? window.t('search.placeholder_notes', null, 'Search for one or more words (use "quotes" for exact phrases)...') : 'Search for one or more words (use "quotes" for exact phrases)...'),
             tags: (window.t ? window.t('search.placeholder_tags', null, 'Search for one or more tags...') : 'Search for one or more tags...')
         };
-        
+
         if (elements.searchInput) {
             elements.searchInput.placeholder = placeholders[activeType] || placeholders.notes;
             elements.searchInput.disabled = false;
@@ -453,17 +453,17 @@ class SearchManager {
      */
     isCombinedModeActive(isMobile) {
         const elements = this.getElements(isMobile);
-        
+
         // Check the hidden input value first (most reliable)
         if (elements.hiddenInputs.combinedMode?.value === '1') {
             return true;
         }
-        
+
         // Fallback: check if type icons container is hidden
         if (elements.typeIconsContainer?.classList.contains('hidden')) {
             return true;
         }
-        
+
         // Also check via CSS class on container
         const container = elements.container;
         if (container) {
@@ -472,7 +472,7 @@ class SearchManager {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -482,9 +482,9 @@ class SearchManager {
     toggleCombinedMode(isMobile) {
         const elements = this.getElements(isMobile);
         if (!elements.typeIconsContainer || !elements.optionsToggle) return;
-        
+
         const isHidden = elements.typeIconsContainer.classList.contains('hidden');
-        
+
         if (isHidden) {
             // Show icons - switch to single mode
             elements.typeIconsContainer.classList.remove('hidden');
@@ -508,21 +508,21 @@ class SearchManager {
             // Save state to localStorage
             try { localStorage.setItem('poznote_combined_search_mode', '1'); } catch (e) { /* ignore */ }
         }
-        
+
         // Update hidden inputs and placeholder
         this.updateHiddenInputs(isMobile);
         this.updatePlaceholderForCombinedMode(isMobile);
-        
+
         // If there's a search term, perform search immediately
         if (elements.searchInput?.value.trim()) {
             const searchValue = elements.searchInput.value.trim();
             const activeType = this.getActiveSearchType(isMobile);
-            
+
             if (!this.validateSearchTerms(searchValue, activeType, isMobile)) {
                 elements.searchInput?.focus();
                 return;
             }
-            
+
             this.performAjaxSearch(elements.form, isMobile);
         }
     }
@@ -533,14 +533,14 @@ class SearchManager {
     applyCombinedModeHighlighting(isMobile) {
         const elements = this.getElements(isMobile);
         const searchTerm = elements.searchInput?.value?.trim() || '';
-        
+
         if (!searchTerm) return;
-        
+
         // Apply notes highlighting
         if (typeof highlightSearchTerms === 'function') {
             try { highlightSearchTerms(); } catch (e) { /* ignore */ }
         }
-        
+
         // Apply tags highlighting
         if (typeof window.highlightMatchingTags === 'function') {
             try { window.highlightMatchingTags(searchTerm); } catch (e) { /* ignore */ }
@@ -553,9 +553,9 @@ class SearchManager {
     updatePlaceholderForCombinedMode(isMobile) {
         const elements = this.getElements(isMobile);
         if (!elements.searchInput) return;
-        
+
         const isCombinedMode = this.isCombinedModeActive(isMobile);
-        
+
         if (isCombinedMode) {
             const placeholder = window.t ? window.t('search.placeholder_combined', null, 'Search in notes and tags...') : 'Search in notes and tags...';
             elements.searchInput.placeholder = placeholder;
@@ -586,19 +586,19 @@ class SearchManager {
     setupOptionsToggleListeners(isMobile) {
         const elements = this.getElements(isMobile);
         if (!elements.optionsToggle) return;
-        
+
         const handlerKey = `options-toggle-${isMobile ? 'mobile' : 'desktop'}`;
         const existingHandler = this.eventHandlers.get(handlerKey);
         if (existingHandler) {
             elements.optionsToggle.removeEventListener('click', existingHandler);
         }
-        
+
         const handler = (e) => {
             e.preventDefault();
             e.stopPropagation();
             this.toggleCombinedMode(isMobile);
         };
-        
+
         this.eventHandlers.set(handlerKey, handler);
         elements.optionsToggle.addEventListener('click', handler);
     }
@@ -654,9 +654,9 @@ class SearchManager {
             // duplicate execution. We also remove their entries from
             // this.eventHandlers so the global registry stays consistent.
             for (const [hk, fn] of elementHandlers.entries()) {
-                try { iconWrapper.removeEventListener('click', fn); } catch (e) {}
+                try { iconWrapper.removeEventListener('click', fn); } catch (e) { }
                 elementHandlers.delete(hk);
-                try { this.eventHandlers.delete(hk); } catch (e) {}
+                try { this.eventHandlers.delete(hk); } catch (e) { }
             }
         }
 
@@ -667,7 +667,7 @@ class SearchManager {
                     if (e._unifiedSearchHandled) return;
                     e._unifiedSearchHandled = true;
                 }
-            } catch (err) {}
+            } catch (err) { }
             // Determine the actual view the click originated from. Use the
             // event target's closest container to figure out whether this
             // should be treated as a mobile or desktop toggle. This handles
@@ -712,20 +712,20 @@ class SearchManager {
             // Persist the new type and update UI. Record a short-lived user
             // action so restore/reinit won't overwrite it. Use the effective
             // view (mobile/desktop) we just detected.
-            try { this._suppressUntil = Date.now() + 250; } catch (e) {}
+            try { this._suppressUntil = Date.now() + 250; } catch (e) { }
             this.setActiveSearchType(next, effectiveIsMobile);
 
             // Trigger behavior similar to clicking the pill
             if (elements.searchInput?.value.trim()) {
                 const searchValue = elements.searchInput.value.trim();
-                
+
                 // Validate search terms before auto-searching (use the NEW 'next' type)
                 if (!this.validateSearchTerms(searchValue, next, effectiveIsMobile)) {
                     // Validation failed, don't proceed with search
                     elements.searchInput?.focus();
                     return;
                 }
-                
+
                 this.updateHiddenInputs(effectiveIsMobile);
                 this.hideSpecialFolders(effectiveIsMobile);
                 this.performAjaxSearch(elements.form, effectiveIsMobile);
@@ -768,7 +768,7 @@ class SearchManager {
      */
     setupButtonListeners(isMobile) {
         const elements = this.getElements(isMobile);
-        
+
         this.searchTypes.forEach(type => {
             const button = elements.buttons[type];
             if (!button) return;
@@ -793,7 +793,7 @@ class SearchManager {
     handleButtonClick(searchType, isMobile) {
         const elements = this.getElements(isMobile);
         const button = elements.buttons[searchType];
-        
+
         if (!button || button.classList.contains('active')) {
             return; // Already active, do nothing
         }
@@ -808,14 +808,14 @@ class SearchManager {
         // Handle search if there's content
         if (elements.searchInput?.value.trim()) {
             const searchValue = elements.searchInput.value.trim();
-            
+
             // Validate search terms before auto-searching (use the NEW searchType, not the current one)
             if (!this.validateSearchTerms(searchValue, searchType, isMobile)) {
                 // Validation failed, don't proceed with search
                 elements.searchInput?.focus();
                 return;
             }
-            
+
             // Auto-search if there's content and validation passed
             this.updateHiddenInputs(isMobile);
             this.hideSpecialFolders(isMobile);
@@ -830,7 +830,7 @@ class SearchManager {
      */
     handleSearchSubmit(e, isMobile) {
         e.preventDefault();
-        
+
         const elements = this.getElements(isMobile);
         const searchValue = elements.searchInput?.value.trim() || '';
         const activeType = this.getActiveSearchType(isMobile);
@@ -853,12 +853,12 @@ class SearchManager {
                 return;
             }
         }
-        
+
         // Reset navigation state for new search
         if (window.searchNavigation) {
             window.searchNavigation.currentHighlightIndex = -1;
         }
-        
+
         this.lastSearchTerm = searchValue;
 
         // Validate that exactly one search type is active
@@ -875,26 +875,26 @@ class SearchManager {
         this.hideSystemFoldersContainer();
 
         // Update hidden inputs and hide special folders immediately so UI reflects search
-    // debug info removed
-    // Save caret pos and request focus restoration after AJAX
-    try {
-        this.focusAfterAjax = true;
-        this.focusCaretPos = elements.searchInput && typeof elements.searchInput.selectionStart === 'number' ? elements.searchInput.selectionStart : null;
-    } catch (e) {
-        this.focusAfterAjax = false;
-        this.focusCaretPos = null;
-    }
-    this.updateHiddenInputs(isMobile);
-    this.hideSpecialFolders(isMobile);
-    
-    // On mobile, start the horizontal transition to the right column early.
-    // This ensures that for the FIRST search of the session, the container is 
-    // already moving when the AJAX result arrives.
-    if (isMobile && typeof window.scrollToRightColumn === 'function') {
-        window.scrollToRightColumn();
-    }
-    
-    this.performAjaxSearch(elements.form, isMobile);
+        // debug info removed
+        // Save caret pos and request focus restoration after AJAX
+        try {
+            this.focusAfterAjax = true;
+            this.focusCaretPos = elements.searchInput && typeof elements.searchInput.selectionStart === 'number' ? elements.searchInput.selectionStart : null;
+        } catch (e) {
+            this.focusAfterAjax = false;
+            this.focusCaretPos = null;
+        }
+        this.updateHiddenInputs(isMobile);
+        this.hideSpecialFolders(isMobile);
+
+        // On mobile, start the horizontal transition to the right column early.
+        // This ensures that for the FIRST search of the session, the container is 
+        // already moving when the AJAX result arrives.
+        if (isMobile && typeof window.scrollToRightColumn === 'function') {
+            window.scrollToRightColumn();
+        }
+
+        this.performAjaxSearch(elements.form, isMobile);
     }
 
     /**
@@ -905,7 +905,7 @@ class SearchManager {
         if (this.isCombinedModeActive(isMobile)) {
             return true;
         }
-        
+
         const elements = this.getElements(isMobile);
         // If explicit buttons exist in the DOM (older UI with pills), use them
         const buttonsExist = Object.values(elements.buttons).some(b => b !== null && b !== undefined);
@@ -942,10 +942,10 @@ class SearchManager {
 
         // Parse search terms with support for quoted phrases
         const searchTerms = this.parseSearchTermsForValidation(searchValue);
-        
+
         // Check if all terms are single characters (excluding quoted phrases)
         const allSingleChar = searchTerms.every(term => term.length === 1);
-        
+
         if (allSingleChar && searchTerms.length > 0) {
             this.showValidationError(
                 isMobile,
@@ -955,7 +955,7 @@ class SearchManager {
             );
             return false;
         }
-        
+
         return true;
     }
 
@@ -966,7 +966,7 @@ class SearchManager {
         const terms = [];
         const pattern = /"([^"]+)"|\S+/g;
         let match;
-        
+
         while ((match = pattern.exec(search)) !== null) {
             // If match[1] exists, it's a quoted phrase (consider it as valid term)
             if (match[1]) {
@@ -976,7 +976,7 @@ class SearchManager {
                 terms.push(match[0]);
             }
         }
-        
+
         return terms;
     }
 
@@ -987,16 +987,16 @@ class SearchManager {
         try {
             // Hide any validation errors since we're performing a valid search
             this.hideValidationError(isMobile);
-            
+
             const elements = this.getElements(isMobile);
             const searchValue = elements.searchInput?.value.trim() || '';
-            
+
             // Ensure lastSearchTerm is updated when search is initiated through any means
             this.lastSearchTerm = searchValue;
-            
+
             const formData = new FormData(form);
             const params = new URLSearchParams();
-            
+
             for (const [key, value] of formData.entries()) {
                 params.append(key, value);
             }
@@ -1011,9 +1011,9 @@ class SearchManager {
                 },
                 body: params.toString()
             })
-            .then(response => response.text())
-            .then(html => this.handleAjaxResponse(html, params.toString(), searchState))
-            .catch(() => form.submit());
+                .then(response => response.text())
+                .then(html => this.handleAjaxResponse(html, params.toString(), searchState))
+                .catch(() => form.submit());
 
         } catch (error) {
             form.submit();
@@ -1039,30 +1039,61 @@ class SearchManager {
             }
 
             if (newRight) {
-                const currentRight = document.getElementById('right_col');
-                if (currentRight) currentRight.innerHTML = newRight.innerHTML;
+                const currentRightColumn = document.getElementById('right_col');
+                if (currentRightColumn) {
+                    // Preserve the tab bar if it exists, only replace content below it
+                    var existingTabBar = document.getElementById('app-tab-bar');
+                    if (existingTabBar) {
+                        // Build new content in a fragment (avoids reflows per node)
+                        var frag = document.createDocumentFragment();
+                        var srcNodes = newRight.childNodes;
+                        for (var i = 0; i < srcNodes.length; i++) {
+                            var imported = document.importNode(srcNodes[i], true);
+                            if (imported.id !== 'app-tab-bar') {
+                                frag.appendChild(imported);
+                            }
+                        }
+                        // Remove everything after the tab bar
+                        while (existingTabBar.nextSibling) {
+                            currentRightColumn.removeChild(existingTabBar.nextSibling);
+                        }
+                        // Remove everything before the tab bar too
+                        while (currentRightColumn.firstChild && currentRightColumn.firstChild !== existingTabBar) {
+                            currentRightColumn.removeChild(currentRightColumn.firstChild);
+                        }
+                        // Append all new content at once
+                        currentRightColumn.appendChild(frag);
+                    } else {
+                        currentRightColumn.innerHTML = newRight.innerHTML;
+                    }
+                }
+            }
+
+            // Extract the note ID from the displayed note in right column for tab synchronization
+            let displayedNoteId = null;
+            try {
+                const rightCol = document.getElementById('right_col');
+                if (rightCol) {
+                    const noteCard = rightCol.querySelector('.notecard[id^="note"]');
+                    if (noteCard && noteCard.id) {
+                        const match = noteCard.id.match(/^note(\d+)$/);
+                        if (match && match[1]) {
+                            displayedNoteId = match[1];
+                        }
+                    }
+                }
+            } catch (e) { /* ignore */ }
+
+            // Update tab state and re-render tab bar
+            if (displayedNoteId && window.tabManager) {
+                window.tabManager._onNoteLoaded(displayedNoteId);
+                window.tabManager.render();
+            } else if (window.tabManager) {
+                window.tabManager.render();
             }
 
             // Update URL
             try {
-                // Extract the note ID from the displayed note in right column
-                let displayedNoteId = null;
-                try {
-                    const rightCol = document.getElementById('right_col');
-                    if (rightCol) {
-                        const noteCard = rightCol.querySelector('.notecard[id^="note"]');
-                        if (noteCard && noteCard.id) {
-                            // Extract ID from "note123" format
-                            const match = noteCard.id.match(/^note(\d+)$/);
-                            if (match && match[1]) {
-                                displayedNoteId = match[1];
-                            }
-                        }
-                    }
-                } catch (e) {
-                    // ignore
-                }
-
                 // Add the displayed note ID to the URL params
                 const urlParams = new URLSearchParams(formParams);
                 if (displayedNoteId) {
@@ -1071,7 +1102,7 @@ class SearchManager {
 
                 const newUrl = window.location.pathname + '?' + urlParams.toString();
                 history.pushState({}, '', newUrl);
-                
+
                 // Update global search mode flag so reinitialized code knows we're in search
                 try {
                     const newParams = new URLSearchParams(urlParams.toString());
@@ -1157,7 +1188,7 @@ class SearchManager {
                 // On mobile, if we have matches and are scrolling to the first match, 
                 // skip focus restoration to avoid snapping back to the left column.
                 const hasMatches = window.searchNavigation && window.searchNavigation.highlights && window.searchNavigation.highlights.length > 0;
-                
+
                 if (this.focusAfterAjax && !(isMobile && hasMatches)) {
                     const restore = () => {
                         const desktopInput = this.getElements(false).searchInput;
@@ -1199,7 +1230,7 @@ class SearchManager {
 
                     const activeType = this.getActiveSearchType();
                     const isCombinedMode = this.isCombinedModeActive(false) || this.isCombinedModeActive(true);
-                    
+
                     // In combined mode, apply BOTH notes and tags highlighting
                     if (isCombinedMode) {
                         // Highlight notes
@@ -1307,26 +1338,26 @@ class SearchManager {
      * Restore search state
      */
     restoreSearchState(state) {
-    if (!state) return;
-    if (this._suppressUntil && Date.now() < this._suppressUntil) return;
+        if (!state) return;
+        if (this._suppressUntil && Date.now() < this._suppressUntil) return;
 
         // Restore desktop state immediately to avoid intermediate UI reset
         if (state.desktop.notes) this.setActiveSearchType('notes', false);
         else if (state.desktop.tags) this.setActiveSearchType('tags', false);
-        
+
         // Restore combined mode for desktop
         this.restoreCombinedModeFromState(state.desktop, false);
 
         // Restore mobile state immediately
         if (state.mobile.notes) this.setActiveSearchType('notes', true);
         else if (state.mobile.tags) this.setActiveSearchType('tags', true);
-        
+
         // Restore combined mode for mobile
         this.restoreCombinedModeFromState(state.mobile, true);
 
-    this.ensureAtLeastOneButtonActive();
+        this.ensureAtLeastOneButtonActive();
     }
-    
+
     /**
      * Restore combined mode from saved state
      */
@@ -1334,7 +1365,7 @@ class SearchManager {
         if (!state) return;
         const elements = this.getElements(isMobile);
         if (!elements.typeIconsContainer || !elements.optionsToggle) return;
-        
+
         if (state.combinedMode) {
             elements.typeIconsContainer.classList.add('hidden');
             elements.optionsToggle.classList.remove('active');
@@ -1359,7 +1390,7 @@ class SearchManager {
     ensureAtLeastOneButtonActive() {
         [false, true].forEach(isMobile => {
             const elements = this.getElements(isMobile);
-            const hasActive = this.searchTypes.some(type => 
+            const hasActive = this.searchTypes.some(type =>
                 elements.buttons[type]?.classList.contains('active')
             );
 
@@ -1403,17 +1434,17 @@ class SearchManager {
         // Build URL preserving workspace, folder, and search type
         const urlParams = new URLSearchParams(window.location.search);
         const newParams = new URLSearchParams();
-        
+
         const currentWorkspace = urlParams.get('workspace') ||
-                                (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : null) ||
-                                (typeof window.selectedWorkspace !== 'undefined' ? window.selectedWorkspace : null) ||
-                                '';
-        
+            (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : null) ||
+            (typeof window.selectedWorkspace !== 'undefined' ? window.selectedWorkspace : null) ||
+            '';
+
         // Always preserve workspace parameter if it exists, regardless of its name
         if (currentWorkspace) {
             newParams.set('workspace', currentWorkspace);
         }
-        
+
         const currentFolder = urlParams.get('folder');
         if (currentFolder) {
             newParams.set('folder', currentFolder);
@@ -1429,9 +1460,9 @@ class SearchManager {
         // Try to detect if we're in mobile mode first
         const mobileContainer = document.querySelector('.unified-search-container.mobile');
         const isMobile = mobileContainer && mobileContainer.offsetParent !== null;
-        
+
         let activeSearchType = this.getActiveSearchType(isMobile);
-        
+
         // If we couldn't determine the type from the current view, try the other view
         if (activeSearchType === 'notes' && !isMobile) {
             // Check if mobile view has an active type different from notes
@@ -1446,7 +1477,7 @@ class SearchManager {
                 activeSearchType = desktopActiveType;
             }
         }
-        
+
         // Set the appropriate preserve parameter based on active search type
         if (activeSearchType === 'tags') {
             newParams.set('preserve_tags', '1');
@@ -1459,7 +1490,7 @@ class SearchManager {
         window.location.href = newUrl;
     }
 
-    
+
 
     /**
      * Show validation error
@@ -1496,7 +1527,7 @@ class SearchManager {
      */
     hideValidationError(isMobile) {
         const elements = this.getElements(isMobile);
-        
+
         const errorMessage = elements.container?.querySelector('.search-validation-error');
         if (errorMessage) {
             errorMessage.remove();
@@ -1512,26 +1543,26 @@ class SearchManager {
 let searchManager;
 
 // Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     searchManager = new SearchManager();
-    
+
     // Make searchManager globally accessible
     window.searchManager = searchManager;
-    
+
     // Handle browser back button
-    window.addEventListener('popstate', function(event) {
+    window.addEventListener('popstate', function (event) {
         const urlParams = new URLSearchParams(window.location.search);
         const hasSearch = urlParams.get('search') || urlParams.get('tags_search');
         const preserveNotes = urlParams.get('preserve_notes');
         const preserveTags = urlParams.get('preserve_tags');
-        
+
         if (hasSearch && (preserveNotes || preserveTags)) {
             return; // Let page reload to restore search
         }
     });
 
     // Highlight search terms on page load
-    setTimeout(function() {
+    setTimeout(function () {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('search') && typeof highlightSearchTerms === 'function') {
             highlightSearchTerms();
@@ -1547,11 +1578,11 @@ function clearUnifiedSearch() {
 }
 
 // Global functions for external scripts
-window.saveCurrentSearchState = function() {
+window.saveCurrentSearchState = function () {
     return searchManager ? searchManager.saveCurrentSearchState() : null;
 };
 
-window.reinitializeSearchAfterWorkspaceChange = function() {
+window.reinitializeSearchAfterWorkspaceChange = function () {
     if (searchManager) {
         searchManager.initializeSearch();
     }

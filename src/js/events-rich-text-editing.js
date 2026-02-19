@@ -383,7 +383,7 @@ function handleCodeBlockEnter(e, selection) {
 
 /**
  * Handle Enter key in markdown editor for list/task continuation.
- * When pressing Enter on a line starting with "- " or "- [ ] ", auto-continues the list.
+ * When pressing Enter on a line starting with "- ", "- [ ] ", or a numbered list item (e.g., "1. "), auto-continues the list.
  * Pressing Enter on an empty list item (just the prefix) exits the list.
  * @param {Event} e - The keyboard event
  * @param {Selection} selection - The current selection
@@ -406,7 +406,7 @@ function handleMarkdownListEnter(e, selection) {
     if (parent.classList && parent.classList.contains('markdown-editor')) {
         markdownEditor = parent;
     } else if (parent.tagName === 'DIV' && parent.parentElement &&
-               parent.parentElement.classList && parent.parentElement.classList.contains('markdown-editor')) {
+        parent.parentElement.classList && parent.parentElement.classList.contains('markdown-editor')) {
         markdownEditor = parent.parentElement;
     }
     if (!markdownEditor) return false;
@@ -433,15 +433,27 @@ function handleMarkdownListEnter(e, selection) {
         cursorOffset = offsetAdjust + range.startOffset;
     }
 
-    // Match task item prefix first, then plain bullet
+    // Match task item prefix first, then plain bullet, then numbered list
     var taskMatch = lineText.match(/^(- \[[ xX]\] )/);
     var bulletMatch = !taskMatch && lineText.match(/^(- )/);
+    var numberedMatch = !taskMatch && !bulletMatch && lineText.match(/^(\d+\. )/);
 
-    if (!taskMatch && !bulletMatch) return false;
+    if (!taskMatch && !bulletMatch && !numberedMatch) return false;
 
-    var prefix = taskMatch ? taskMatch[1] : bulletMatch[1];
-    // Task items always continue as unchecked; bullets continue as bullets
-    var newPrefix = taskMatch ? '- [ ] ' : '- ';
+    var prefix = '';
+    var newPrefix = '';
+
+    if (taskMatch) {
+        prefix = taskMatch[1];
+        newPrefix = '- [ ] ';
+    } else if (bulletMatch) {
+        prefix = bulletMatch[1];
+        newPrefix = '- ';
+    } else if (numberedMatch) {
+        prefix = numberedMatch[1];
+        var currentNumber = parseInt(prefix);
+        newPrefix = (currentNumber + 1) + '. ';
+    }
 
     e.preventDefault();
 
