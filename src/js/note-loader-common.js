@@ -279,6 +279,8 @@ function loadNoteCommon(url, noteId, options) {
                                     for (var i = 0; i < srcNodes.length; i++) {
                                         var imported = document.importNode(srcNodes[i], true);
                                         if (imported.id !== 'app-tab-bar') {
+                                            // Insert hidden so it doesn't flash before hideNoteLoadingState runs
+                                            if (imported.nodeType === 1) imported.classList.add('note-fade-out');
                                             frag.appendChild(imported);
                                         }
                                     }
