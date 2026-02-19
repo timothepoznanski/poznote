@@ -8,6 +8,7 @@
         "back_to_notes": "Zurück zu den Notizen",
         "back_to_settings": "Zurück zu den Einstellungen",
         "close": "Schließen",
+        "disable": "disable",
         "cancel": "Abbrechen",
         "confirm": "Bestätigen",
         "confirmation": "Bestätigung",
@@ -1845,12 +1846,12 @@
             "push": {
                 "title": "An {{provider}} senden",
                 "description": "Exportiert alle Notizen und Anhänge als flache Dateien zu {{provider}}. Aktualisiert vorhandene Dateien und entfernt Dateien, die in Poznote nicht mehr vorhanden sind.",
-                "button": "An {{provider}} senden"
+                "button": "Senden"
             },
             "pull": {
                 "title": "Von {{provider}} abrufen",
                 "description": "Importiert alle Notizen und Anhänge von {{provider}}. Überschreibt lokale Inhalte und verschiebt Notizen, die nicht im Repository vorhanden sind, in den Papierkorb.",
-                "button": "Von {{provider}} abrufen"
+                "button": "Abrufen"
             }
         },
         "messages": {

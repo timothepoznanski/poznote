@@ -8,6 +8,7 @@
         "back_to_notes": "Retour aux notes",
         "back_to_settings": "Retour aux paramètres",
         "close": "Fermer",
+        "disable": "disable",
         "cancel": "Annuler",
         "confirm": "Confirmer",
         "confirm_action": "Confirmer l'action",
@@ -2003,12 +2004,12 @@
             "push": {
                 "title": "Envoyer vers {{provider}}",
                 "description": "Exporte toutes les notes et pièces jointes vers {{provider}} sous forme de fichiers plats. Met à jour les fichiers existants et supprime ceux qui n'existent plus dans Poznote.",
-                "button": "Envoyer ({{provider}})"
+                "button": "Envoyer"
             },
             "pull": {
                 "title": "Récupérer depuis {{provider}}",
                 "description": "Importe toutes les notes et pièces jointes depuis {{provider}}. Écrase le contenu local et déplace dans la corbeille les notes absentes du dépôt.",
-                "button": "Récupérer ({{provider}})"
+                "button": "Récupérer"
             }
         },
         "messages": {

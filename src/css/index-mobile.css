@@ -162,29 +162,63 @@ body::-webkit-scrollbar {
     /* Put it last in the toolbar */
 }
 
-/* Mobile title horizontal scroll invece di ellipsis */
-a.links_arbo_left,
-.folder-header,
-.folder-toggle {
-    display: block !important;
+/* Mobile title horizontal scroll instead of ellipsis */
+.folder-toggle,
+.note-list-item {
+    display: flex !important;
+    width: 100% !important;
+    align-items: center !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+}
+
+/* Allow name parts to scroll horizontally, but NOT push everything to the right if short */
+.folder-name,
+.note-title,
+.shared-folder-name {
+    flex: 0 1 auto !important;
+    min-width: 0 !important;
     overflow-x: auto !important;
-    overflow-y: hidden !important;
     white-space: nowrap !important;
     text-overflow: clip !important;
-    /* Hide scrollbar for cleaner look but still allow scrolling */
+    display: inline-block !important; /* Ensure block-level properties inside flex container */
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+/* Note count should stay pinned next to folder name */
+.folder-note-count {
+    flex: 0 0 auto !important;
+    margin-left: 6px !important;
+    margin-right: 4px !important;
+    display: inline-block !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* Push actions to the far right */
+.folder-actions,
+.note-actions {
+    margin-left: auto !important;
+    flex: 0 0 auto !important;
+    display: inline-flex !important;
+}
+
+/* Ensure note link takes available space in note-list-item */
+.note-list-item > a.links_arbo_left {
+    flex: 1 !important;
+    min-width: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    overflow: visible !important;
 }
 
 /* Specific overrides for notes inside folders and the editor title */
 .note-in-folder a.links_arbo_left .note-title,
 a.links_arbo_left .note-title,
-.folder-name,
-.shared-folder-name,
-.note-name,
 .css-title {
     display: inline-block !important;
-    overflow: visible !important;
+    overflow-x: auto !important;
     white-space: nowrap !important;
     text-overflow: clip !important;
     width: auto !important;
@@ -192,8 +226,9 @@ a.links_arbo_left .note-title,
 }
 
 a.links_arbo_left::-webkit-scrollbar,
-.folder-header::-webkit-scrollbar,
-.folder-toggle::-webkit-scrollbar {
+.folder-toggle::-webkit-scrollbar,
+.folder-name::-webkit-scrollbar,
+.note-title::-webkit-scrollbar {
     display: none !important;
 }
 

@@ -311,12 +311,11 @@ body.sidebar-collapsed .toggle-sidebar-btn i {
     color: var(--text-main, #333);
 }
 
-/* Hide favorites folder content when collapsed */
-.folder-header[data-folder="Favorites"].favorites-collapsed .folder-content,
-.folder-header[data-folder="Favorites"].favorites-collapsed #folder-favorites {
+/* Hide favorites folder when collapsed */
+.folder-header[data-folder="Favorites"].favorites-collapsed {
     display: none !important;
 }
 
-.folder-header[data-folder="Favorites"].favorites-collapsed .folder-toggle {
-    opacity: 0.5;
+.favorites-toggle-btn.collapsed i {
+    transform: rotate(180deg);
 }
