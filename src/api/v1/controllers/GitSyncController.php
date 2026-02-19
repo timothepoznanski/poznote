@@ -84,10 +84,19 @@ class GitSyncController {
         }
         
         $input = json_decode(file_get_contents('php://input'), true);
-        $workspace = $input['workspace'] ?? null;
+        $workspace = isset($input['workspace']) ? $input['workspace'] : null;
+        if ($workspace === '') $workspace = null;
         
         $sync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
         $result = $sync->pushNotes($workspace);
+        
+        // Store result in session for display after page reload if requested
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        $_SESSION['last_sync_result'] = [
+            'action' => 'push',
+            'workspace' => $workspace,
+            'result' => $result
+        ];
         
         echo json_encode($result);
     }
@@ -110,11 +119,45 @@ class GitSyncController {
         }
         
         $input = json_decode(file_get_contents('php://input'), true);
-        $workspace = $input['workspace'] ?? 'Poznote';
+        $workspace = isset($input['workspace']) ? $input['workspace'] : null;
+        if ($workspace === '') $workspace = null;
         
         $sync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
         $result = $sync->pullNotes($workspace);
         
+        // Store result in session for display after page reload if requested
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        $_SESSION['last_sync_result'] = [
+            'action' => 'pull',
+            'workspace' => $workspace,
+            'result' => $result
+        ];
+        
         echo json_encode($result);
+    }
+    
+    /**
+     * GET /api/v1/git-sync/progress
+     * Get current sync progress from session
+     */
+    public function progress() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        $progress = $_SESSION['git_sync_progress'] ?? null;
+        
+        // If progress is older than 30 seconds, consider it stale
+        if ($progress && (time() - ($progress['timestamp'] ?? 0) > 30)) {
+            unset($_SESSION['git_sync_progress']);
+            $progress = null;
+        }
+        
+        echo json_encode([
+            'success' => true,
+            'progress' => $progress
+        ]);
+        
+        session_write_close();
     }
 }

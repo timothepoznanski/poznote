@@ -94,7 +94,8 @@
             "kanban_on_folder_click": "Open Kanban view on folder click",
             "index_icon_scale": "Index icon scaling",
             "note_content_width": "Note content width",
-            "show_inline_attachment_images": "Show image attachments"
+            "show_inline_attachment_images": "Show image attachments",
+            "enable_internal_tabs": "Enable internal tabs"
         },
         "badges": {
             "font_size_default": "default ({{size}}px)",
@@ -222,7 +223,8 @@
             "attachment_count_plural": "{{count}} attachments",
             "hint": "Add attachments to your notes using the paperclip button in the toolbar.",
             "filter_placeholder": "Filter by note title or attachment name...",
-            "no_filter_results": "No notes match your search."
+            "no_filter_results": "No notes match your search.",
+            "show_thumbnails": "Show thumbnails in this list"
         }
     },
     "modals": {
@@ -1293,10 +1295,16 @@
     },
     "git_sync": {
         "title": "{{provider}} Sync",
-        "description": "Push your notes to {{provider}} or pull notes from an existing repository. One repository is equal to one profile. Workspaces will be folders at the root of the repo.",
-        "warning": "Do not use this feature as your only backup solution.\nConsider setting up manual or automatic ZIP exports of your notes.",
-        "confirm_push": "Push notes of workspace \"{{workspace}}\" to {{provider}}? Updates existing files and deletes files that no longer exist in Poznote.",
-        "confirm_pull": "Pull notes for workspace \"{{workspace}}\" from {{provider}}? Import notes from {{provider}}. Updates existing notes and moves to trash notes that no longer exist on {{provider}}.",
+        "description": "Back up your notes and attachments to {{provider}}. Files are stored as flat files with a metadata.json that preserves tags, folders, dates and attachments.",
+        "warning": "Do not rely on this feature as your sole backup.\nRegularly export your data using the backup feature in Settings.",
+        "confirm_push": "Push all notes and attachments to {{provider}}? Existing files will be updated and files no longer in Poznote will be removed from the repository.",
+        "confirm_pull": "Pull all notes and attachments from {{provider}}? Local data will be overwritten with the remote version. Notes not found on {{provider}} will be moved to trash.",
+        "confirm_auto_pull": "A new session started. Do you want to pull changes from {{provider}}?",
+        "confirm_auto_pull_warning": "A new session started. Do you want to pull changes from {{provider}}?\n\nLocal notes not found on {{provider}} will be moved to trash.",
+        "auto_pull_complete": "Git pull complete. Refreshing page...",
+        "auto_pull_no_changes": "Git pull complete. No changes found.",
+        "pulling": "Pulling changes...",
+        "starting": "Syncing...",
         "config": {
             "title": "Configuration",
             "status": "Status",
@@ -1309,6 +1317,14 @@
             "not_configured": "Not configured",
             "not_configured_yet": "To configure",
             "hint": "{{provider}} sync is disabled. Set POZNOTE_GIT_SYNC_ENABLED=true in your .env file to enable it."
+        },
+        "auto_sync": {
+            "title": "Automatic Synchronization",
+            "push_label": "Automatically push on exit",
+            "push_description": "When leaving a note (switching notes or closing the tab), its latest version is automatically pushed to the Git repository, if it was modified during the session.",
+            "pull_label": "Automatically pull on load",
+            "pull_description": "Once per session, asks whether to pull from the Git repository. Updates existing notes, imports new ones, and moves to trash any local notes not found on the remote.",
+            "saving": "Configuration saved"
         },
         "test": {
             "title": "Test Connection",
@@ -1324,18 +1340,18 @@
         },
         "actions": {
             "title": "Sync Actions",
-            "workspace": "Workspace",
+            "workspace": "Workspace: {{workspace}}",
             "target_workspace": "Target Workspace",
             "all_workspaces": "All workspaces",
             "push": {
                 "title": "Push to {{provider}}",
-                "description": "Export your notes to {{provider}}. Updates existing files and deletes files that no longer exist in Poznote.",
-                "button": "Push"
+                "description": "Exports all your notes and attachments to {{provider}} as flat files. Updates existing files and removes files that no longer exist in Poznote.",
+                "button": "Push ({{provider}})"
             },
             "pull": {
                 "title": "Pull from {{provider}}",
-                "description": "Import notes from {{provider}}. Updates existing notes and moves to trash notes that no longer exist on {{provider}}.",
-                "button": "Pull"
+                "description": "Imports all notes and attachments from {{provider}}. Overwrites local content and moves to trash any notes not present in the repository.",
+                "button": "Pull ({{provider}})"
             }
         },
         "messages": {

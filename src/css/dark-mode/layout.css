@@ -5,8 +5,10 @@
 /* Main containers */
 html[data-theme='dark'] #left_col,
 html[data-theme='dark'] #right_col,
+html[data-theme='dark'] #right_pane,
 body.dark-mode #left_col,
-body.dark-mode #right_col {
+body.dark-mode #right_col,
+body.dark-mode #right_pane {
     background-color: var(--dm-bg);
     color: var(--dm-text);
 }

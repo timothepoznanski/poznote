@@ -1,0 +1,275 @@
+/**
+ * In-App Tab Bar
+ *
+ * Shown at the top of #right_col when one or more notes are open as tabs.
+ * Behaves like browser tabs: sidebar navigation updates the active tab,
+ * "open in new tab" creates an additional tab.
+ */
+
+#app-tab-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    padding: 6px 8px 0;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    overflow-x: auto;
+    flex-shrink: 0;
+    min-height: 38px;
+    /* Hide scrollbar but keep scrollability */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+#app-tab-bar::-webkit-scrollbar {
+    display: none;
+}
+
+.app-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 8px 5px 12px;
+    border-radius: 6px 6px 0 0;
+    background: #f3f4f6;
+    cursor: pointer;
+    max-width: 200px;
+    min-width: 80px;
+    border: 1px solid #e5e7eb;
+    border-bottom: none;
+    font-size: 0.825rem;
+    user-select: none;
+    flex-shrink: 0;
+    transition: background 0.1s ease;
+    position: relative;
+    bottom: -1px;
+    /* overlap the bar's bottom border for active state */
+}
+
+.app-tab:hover {
+    background: #e9ecef;
+}
+
+.app-tab.active {
+    background: #fff;
+    border-color: #d1d5db;
+    font-weight: 500;
+    z-index: 1;
+}
+
+.app-tab-title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #374151;
+}
+
+.app-tab.active .app-tab-title {
+    color: #111827;
+}
+
+.app-tab-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 1px 4px;
+    color: #9ca3af;
+    font-size: 1rem;
+    line-height: 1;
+    border-radius: 3px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.app-tab-close:hover {
+    background: rgba(0, 0, 0, 0.08);
+    color: #374151;
+}
+
+/* ── Dark mode ── */
+
+[data-theme="dark"] #app-tab-bar {
+    background: #1e1e1e;
+    border-color: #3a3a3a;
+}
+
+[data-theme="dark"] .app-tab {
+    background: #252525;
+    border-color: #3a3a3a;
+}
+
+[data-theme="dark"] .app-tab:hover {
+    background: #2e2e2e;
+}
+
+/* Active tab: blue top accent + noticeably lighter bg + bright text */
+[data-theme="dark"] .app-tab.active {
+    background: #383838;
+    border-color: #4b5563;
+    border-top: 2px solid #007DB8;
+}
+
+[data-theme="dark"] .app-tab-title {
+    color: #7a7a7a;
+}
+
+[data-theme="dark"] .app-tab.active .app-tab-title {
+    color: #f0f0f0;
+}
+
+[data-theme="dark"] .app-tab-close {
+    color: #555;
+}
+
+[data-theme="dark"] .app-tab.active .app-tab-close {
+    color: #888;
+}
+
+[data-theme="dark"] .app-tab-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e5e7eb;
+}
+
+/* ── Note actions (3-dot menu in sidebar) ── */
+
+.note-list-item {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.note-list-item>a {
+    flex: 1;
+    min-width: 0;
+    /* allow text truncation */
+}
+
+.note-actions {
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.note-actions-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 3px 6px;
+    color: #9ca3af;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    line-height: 1;
+    display: none;
+    /* hidden until parent row is hovered */
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.note-list-item:hover .note-actions-toggle,
+.note-actions-toggle.open {
+    display: flex;
+}
+
+.note-actions-toggle:hover {
+    background: rgba(107, 114, 128, 0.12);
+    color: #374151;
+}
+
+.note-actions-menu {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 2px;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    min-width: 180px;
+    padding: 6px 0;
+    z-index: 10000;
+    display: none;
+    opacity: 0;
+}
+
+.note-actions-menu.show {
+    display: block;
+    animation: noteMenuFadeIn 0.2s ease-out forwards;
+}
+
+@keyframes noteMenuFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.note-actions-menu-item {
+    padding: 8px 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #374151;
+    font-size: 0.875rem;
+    transition: background-color 0.15s ease;
+    white-space: nowrap;
+}
+
+.note-actions-menu-item:hover {
+    background-color: #f3f4f6;
+}
+
+.note-actions-menu-item i {
+    font-size: 0.85em;
+    color: #6b7280;
+    width: 14px;
+    text-align: center;
+}
+
+.note-actions-menu-item:hover i {
+    color: #374151;
+}
+
+/* ── Note actions dark mode ── */
+
+[data-theme="dark"] .note-actions-toggle {
+    color: #555;
+}
+
+[data-theme="dark"] .note-actions-toggle:hover,
+[data-theme="dark"] .note-actions-toggle.open {
+    background: rgba(255, 255, 255, 0.08);
+    color: #aaa;
+}
+
+[data-theme="dark"] .note-actions-menu {
+    background: #2a2a2a;
+    border-color: #3a3a3a;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .note-actions-menu-item {
+    color: #d1d5db;
+}
+
+[data-theme="dark"] .note-actions-menu-item:hover {
+    background-color: #383838;
+}
+
+[data-theme="dark"] .note-actions-menu-item i {
+    color: #9ca3af;
+}
+
+[data-theme="dark"] .note-actions-menu-item:hover i {
+    color: #e5e7eb;
+}

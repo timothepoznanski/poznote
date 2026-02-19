@@ -257,7 +257,7 @@
             "uploaded_prefix": "Hochgeladen: ",
             "open_in_new_tab": "In neuem Tab öffnen",
             "settings_banner": {
-                "message": "Bildanhänge werden in der Notizliste ausgeblendet (aber nicht hier in der Liste), da die Einstellung 'Bild-Anhänge anzeigen' deaktiviert ist.",
+                "message": "Bildanhänge werden in der Notizliste ausgeblendet (aber nicht hier in der Liste), da die Einstellung 'Bildanhänge anzeigen' deaktiviert ist.",
                 "action": "Einstellung ändern"
             }
         },
@@ -285,6 +285,7 @@
             "hint": "Fügen Sie Ihren Notizen Anhänge hinzu, indem Sie auf das Büroklammer-Symbol in der Symbolleiste klicken.",
             "filter_placeholder": "Nach Notizentitel oder Anhangsname filtern...",
             "no_filter_results": "Keine Notizen entsprechen Ihrer Suche.",
+            "show_thumbnails": "Vorschaubilder in dieser Liste anzeigen",
             "download": "Herunterladen"
         }
     },
@@ -429,7 +430,8 @@
             "kanban_on_folder_click": "Kanban-Ansicht beim Klicken auf Ordner öffnen",
             "index_icon_scale": "Skalierung der Index-Symbole",
             "note_content_width": "Breite des Notizinhalts",
-            "show_inline_attachment_images": "Bild-Anhänge anzeigen"
+            "show_inline_attachment_images": "Bildanhänge anzeigen",
+            "enable_internal_tabs": "Interne Tabs aktivieren"
         },
         "badges": {
             "font_size_default": "Standard ({{size}}px)",
@@ -1792,10 +1794,16 @@
     },
     "git_sync": {
         "title": "{{provider}}-Synchronisierung",
-        "description": "Übertragen Sie Ihre Notizen zu {{provider}} oder ziehen Sie Notizen aus einem bestehenden Repository. Ein Repository entspricht einem Profil. Arbeitsbereiche werden als Ordner im Repository-Stammverzeichnis abgelegt.",
-        "warning": "Verwenden Sie diese Funktion nicht als einzige Backup-Lösung.\nErwägen Sie die Einrichtung manueller oder automatischer ZIP-Exporte Ihrer Notizen.",
-        "confirm_push": "Notizen des Workspace \"{{workspace}}\" zu {{provider}} pushen? Updates existing files and deletes files that no longer exist in Poznote.",
-        "confirm_pull": "Pull notes for workspace \"{{workspace}}\" from {{provider}}? Import notes from {{provider}}. Updates existing notes and moves to trash notes that no longer exist on {{provider}}.",
+        "description": "Sichern Sie Ihre Notizen und Anhänge auf {{provider}}. Dateien werden als flache Dateien gespeichert mit einer metadata.json, die Tags, Ordner, Daten und Anhänge enthält.",
+        "warning": "Verlassen Sie sich nicht ausschließlich auf diese Funktion als Backup-Lösung.\nExportieren Sie Ihre Daten regelmäßig über die Backup-Funktion in den Einstellungen.",
+        "confirm_push": "Alle Notizen und Anhänge zu {{provider}} pushen? Vorhandene Dateien werden aktualisiert und Dateien, die nicht mehr in Poznote vorhanden sind, werden aus dem Repository gelöscht.",
+        "confirm_pull": "Alle Notizen und Anhänge von {{provider}} pullen? Lokale Daten werden mit der Remote-Version überschrieben. Notizen, die auf {{provider}} nicht gefunden werden, werden in den Papierkorb verschoben.",
+        "confirm_auto_pull": "Eine neue Sitzung wurde gestartet. Möchten Sie Änderungen von {{provider}} abrufen?",
+        "confirm_auto_pull_warning": "Eine neue Sitzung wurde gestartet. Möchten Sie Änderungen von {{provider}} abrufen?\n\nLokale Notizen, die nicht auf {{provider}} gefunden werden, werden in den Papierkorb verschoben.",
+        "auto_pull_complete": "Git-Synchronisation abgeschlossen. Seite wird aktualisiert...",
+        "auto_pull_no_changes": "Git-Synchronisation abgeschlossen. Keine Änderungen gefunden.",
+        "pulling": "Änderungen abrufen...",
+        "starting": "Synchronisierung...",
         "config": {
             "title": "Konfiguration",
             "status": "Status",
@@ -1808,6 +1816,14 @@
             "not_configured": "Nicht konfiguriert",
             "not_configured_yet": "Zu konfigurieren",
             "hint": "Die {{provider}}-Synchronisierung ist deaktiviert. Setzen Sie POZNOTE_GIT_SYNC_ENABLED=true in Ihrer .env-Datei, um sie zu aktivieren."
+        },
+        "auto_sync": {
+            "title": "Automatische Synchronisierung",
+            "push_label": "Automatisch beim Verlassen pushen",
+            "push_description": "Wenn Sie eine Notiz verlassen (Notizwechsel oder Tab schließen), wird ihre neueste Version automatisch in das Git-Repository übertragen, sofern sie während der Sitzung geändert wurde.",
+            "pull_label": "Automatisch beim Laden abrufen",
+            "pull_description": "Fragt einmal pro Sitzung, ob aus dem Git-Repository abgerufen werden soll. Aktualisiert vorhandene Notizen, importiert neue und verschiebt lokale Notizen, die im Remote nicht gefunden werden, in den Papierkorb.",
+            "saving": "Konfiguration gespeichert"
         },
         "test": {
             "title": "Verbindung testen",
@@ -1828,13 +1844,13 @@
             "all_workspaces": "Alle Arbeitsbereiche",
             "push": {
                 "title": "An {{provider}} senden",
-                "description": "Exportiert Ihre Notizen nach {{provider}}. Aktualisiert vorhandene Dateien und löscht Dateien, die in Poznote nicht mehr vorhanden sind.",
-                "button": "Senden"
+                "description": "Exportiert alle Notizen und Anhänge als flache Dateien zu {{provider}}. Aktualisiert vorhandene Dateien und entfernt Dateien, die in Poznote nicht mehr vorhanden sind.",
+                "button": "An {{provider}} senden"
             },
             "pull": {
                 "title": "Von {{provider}} abrufen",
-                "description": "Importiert Notizen von {{provider}}. Aktualisiert vorhandene Notizen und verschiebt Notizen, die auf {{provider}} nicht mehr vorhanden sind, in den Papierkorb.",
-                "button": "Abrufen"
+                "description": "Importiert alle Notizen und Anhänge von {{provider}}. Überschreibt lokale Inhalte und verschiebt Notizen, die nicht im Repository vorhanden sind, in den Papierkorb.",
+                "button": "Von {{provider}} abrufen"
             }
         },
         "messages": {

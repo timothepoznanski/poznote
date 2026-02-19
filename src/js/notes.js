@@ -204,8 +204,10 @@ function saveNoteToServer() {
         tags: tags,
         folder_id: folderId,
         workspace: selectedWorkspace || getSelectedWorkspace()
+        // git_push is intentionally omitted here: the push is triggered only
+        // when leaving the note (note switch or page unload), via emergencySave.
     };
-    
+
     // Use RESTful API: PATCH /api/v1/notes/{id}
     fetch("/api/v1/notes/" + noteid, {
         method: "PATCH",
@@ -590,12 +592,17 @@ function openNoteInNewTab(noteId) {
         console.error('No note ID provided');
         return;
     }
-    
-    // Build URL with note ID and current workspace
+
+    if (window.tabManager) {
+        var titleEl = document.getElementById('inp' + noteId);
+        var title = (titleEl && titleEl.value.trim()) || 'Untitled';
+        window.tabManager.openInNewTab(noteId, title);
+        return;
+    }
+
+    // Fallback: open in a real browser tab
     var workspace = selectedWorkspace || getSelectedWorkspace();
     var url = 'index.php?workspace=' + encodeURIComponent(workspace) + '&note=' + encodeURIComponent(noteId);
-    
-    // Open in new tab
     window.open(url, '_blank');
 }
 

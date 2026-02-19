@@ -286,6 +286,7 @@
             "hint": "在笔记工具栏中使用回形针按钮向笔记添加附件。",
             "filter_placeholder": "按笔记标题或附件名称过滤...",
             "no_filter_results": "没有与您的搜索匹配的笔记。",
+            "show_thumbnails": "在此列表显示缩略图",
             "download": "下载"
         }
     },
@@ -431,7 +432,8 @@
             "kanban_on_folder_click": "点击文件夹时打开看板视图",
             "index_icon_scale": "索引页图标缩放",
             "note_content_width": "笔记内容宽度",
-            "show_inline_attachment_images": "显示图片附件"
+            "show_inline_attachment_images": "显示图片附件",
+            "enable_internal_tabs": "启用内部标签页"
         },
         "badges": {
             "font_size_default": "默认 ({{size}}px)",
@@ -1911,10 +1913,16 @@
     },
     "git_sync": {
         "title": "{{provider}} 同步",
-        "description": "将您的笔记推送到 {{provider}} 或从现有仓库拉取笔记。一个仓库相当于一个用户资料。工作区将作为仓库根目录下的文件夹。",
-        "warning": "不要将此功能作为唯一的备份解决方案。\n请考虑为您的笔记设置手动或自动 ZIP 导出。",
-        "confirm_push": "将工作区 \"{{workspace}}\" 的笔记推送到 {{provider}} 吗？Updates existing files and deletes files that no longer exist in Poznote.",
-        "confirm_pull": "从 {{provider}} 拉取工作区 \"{{workspace}}\" 的笔记吗？Import notes from {{provider}}. Updates existing notes and moves to trash notes that no longer exist on {{provider}}.",
+        "description": "将您的笔记和附件备份到 {{provider}}。文件以扁平文件形式存储，并附带保存标签、文件夹、日期和附件的 metadata.json。",
+        "warning": "请勿将此功能作为唯一的备份方案。\n请定期使用设置中的备份功能导出您的数据。",
+        "confirm_push": "将所有笔记和附件推送到 {{provider}} 吗？现有文件将被更新，Poznote 中不再存在的文件将从仓库中删除。",
+        "confirm_pull": "从 {{provider}} 拉取所有笔记和附件吗？本地数据将被远程版本覆盖。在 {{provider}} 上找不到的笔记将被移至回收站。",
+        "confirm_auto_pull": "新会话已开始。您想要从 {{provider}} 拉取更改吗？",
+        "confirm_auto_pull_warning": "新会话已开始。您想要从 {{provider}} 拉取更改吗？\n\n在 {{provider}} 上未找到的本地笔记将被移至回收站。",
+        "auto_pull_complete": "Git 同步完成。正在刷新页面...",
+        "auto_pull_no_changes": "Git 同步完成。未发现更改。",
+        "pulling": "正在拉取更改...",
+        "starting": "同步中...",
         "config": {
             "title": "配置",
             "status": "状态",
@@ -1927,6 +1935,14 @@
             "not_configured": "未配置",
             "not_configured_yet": "待配置",
             "hint": "{{provider}} 同步已禁用。在您的 .env 文件中设置 POZNOTE_GIT_SYNC_ENABLED=true 来启用它。"
+        },
+        "auto_sync": {
+            "title": "自动同步",
+            "push_label": "离开时自动推送",
+            "push_description": "离开笔记时（切换笔记或关闭标签页），若本次会话中对笔记进行了修改，其最新版本将自动推送到 Git 仓库。",
+            "pull_label": "加载时自动拉取",
+            "pull_description": "每次会话询问一次是否从 Git 仓库拉取数据。更新现有笔记，导入新笔记，并将远程仓库中未找到的本地笔记移至回收站。",
+            "saving": "配置已保存"
         },
         "test": {
             "title": "测试连接",
@@ -1947,13 +1963,13 @@
             "all_workspaces": "所有工作区",
             "push": {
                 "title": "推送到 {{provider}}",
-                "description": "将您的笔记导出到 {{provider}}。更新现有文件并删除 Poznote 中不再存在的文件。",
-                "button": "推送"
+                "description": "将您的所有笔记和附件作为扁平文件导出到 {{provider}}。更新现有文件并删除 Poznote 中不再存在的文件。",
+                "button": "推送到 {{provider}}"
             },
             "pull": {
                 "title": "从 {{provider}} 拉取",
-                "description": "从 {{provider}} 导入笔记。更新现有笔记并将 {{provider}} 上不再存在的笔记移至回收站。",
-                "button": "拉取"
+                "description": "从 {{provider}} 导入所有笔记和附件。覆盖本地内容，并将仓库中不存在的笔记移至回收站。",
+                "button": "从 {{provider}} 拉取"
             }
         },
         "messages": {
