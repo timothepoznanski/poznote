@@ -284,6 +284,7 @@
             "hint": "Adicione anexos às suas notas usando o botão de clipe na barra de ferramentas.",
             "filter_placeholder": "Filtrar por título da nota ou nome do anexo...",
             "no_filter_results": "Nenhuma nota corresponde à sua pesquisa.",
+            "show_thumbnails": "Mostrar miniaturas nesta lista",
             "download": "Baixar"
         }
     },
@@ -1797,10 +1798,16 @@
     },
     "git_sync": {
         "title": "Sincronização {{provider}}",
-        "description": "Envie suas notas para o {{provider}} ou baixe notas de um repositório existente. Um repositório equivale a um perfil. Os espaços de trabalho serão pastas na raiz do repositório.",
-        "warning": "Não utilize esta funcionalidade como a sua única solução de backup.\nConsidere configurar exportações ZIP manuais ou automáticas das suas notas.",
-        "confirm_push": "Enviar notas do espaço de trabalho \"{{workspace}}\" para o {{provider}}? Updates existing files and deletes files that no longer exist in Poznote.",
-        "confirm_pull": "Recuperar notas do espaço de trabalho \"{{workspace}}\" do {{provider}}? Import notes from {{provider}}. Updates existing notes and moves to trash notes that no longer exist on {{provider}}.",
+        "description": "Faça backup das suas notas e anexos no {{provider}}. Os arquivos são armazenados como arquivos simples com um metadata.json que preserva tags, pastas, datas e anexos.",
+        "warning": "Não dependa desta funcionalidade como única solução de backup.\nExporte seus dados regularmente usando o recurso de backup nas Configurações.",
+        "confirm_push": "Enviar todas as notas e anexos para o {{provider}}? Os arquivos existentes serão atualizados e os arquivos que não existem mais no Poznote serão removidos do repositório.",
+        "confirm_pull": "Baixar todas as notas e anexos do {{provider}}? Os dados locais serão substituídos pela versão remota. As notas não encontradas no {{provider}} serão movidas para a lixeira.",
+        "confirm_auto_pull": "Uma nova sessão foi iniciada. Deseja puxar as alterações de {{provider}}?",
+        "confirm_auto_pull_warning": "Uma nova sessão foi iniciada. Deseja puxar as alterações de {{provider}}?\n\nNotas locais não encontradas em {{provider}} serão movidas para a lixeira.",
+        "auto_pull_complete": "Sincronização Git concluída. Atualizando a página...",
+        "auto_pull_no_changes": "Sincronização Git concluída. Nenhuma alteração encontrada.",
+        "pulling": "Puxando alterações...",
+        "starting": "Sincronizando...",
         "config": {
             "title": "Configuração",
             "status": "Status",
@@ -1813,6 +1820,14 @@
             "not_configured": "Não configurado",
             "not_configured_yet": "A configurar",
             "hint": "A sincronização com {{provider}} está desativada. Defina POZNOTE_GIT_SYNC_ENABLED=true no seu arquivo .env para ativá-la."
+        },
+        "auto_sync": {
+            "title": "Sincronização Automática",
+            "push_label": "Enviar automaticamente ao sair",
+            "push_description": "Ao sair de uma nota (troca de nota ou fechamento da aba), sua versão mais recente é automaticamente enviada para o repositório Git, se foi modificada durante a sessão.",
+            "pull_label": "Recuperar automaticamente ao carregar",
+            "pull_description": "Uma vez por sessão, pergunta se deseja recuperar dados do repositório Git. Atualiza as notas existentes, importa as novas e move para a lixeira as notas locais não encontradas no repositório remoto.",
+            "saving": "Configuração salva"
         },
         "test": {
             "title": "Testar conexão",
@@ -1833,13 +1848,13 @@
             "all_workspaces": "Todos os espaços de trabalho",
             "push": {
                 "title": "Enviar para {{provider}}",
-                "description": "Exporta suas notas para o {{provider}}. Atualiza arquivos existentes e exclui arquivos que não existem mais no Poznote.",
-                "button": "Enviar"
+                "description": "Exporta todas as suas notas e anexos para o {{provider}} como arquivos simples. Atualiza os arquivos existentes e remove os que não existem mais no Poznote.",
+                "button": "Enviar para {{provider}}"
             },
             "pull": {
                 "title": "Recuperar do {{provider}}",
-                "description": "Importa notas do {{provider}}. Atualiza notas existentes e move para a lixeira notas que não existem mais no {{provider}}.",
-                "button": "Recuperar"
+                "description": "Importa todas as notas e anexos do {{provider}}. Substitui o conteúdo local e move para a lixeira as notas ausentes do repositório.",
+                "button": "Recuperar de {{provider}}"
             }
         },
         "messages": {

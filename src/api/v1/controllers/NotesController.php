@@ -88,9 +88,10 @@ class NotesController {
                 $stmtSetting = $this->con->prepare('SELECT value FROM settings WHERE key = ?');
                 $stmtSetting->execute(['notes_without_folders_after_folders']);
                 $settingValue = $stmtSetting->fetchColumn();
-                $notes_without_folders_after = ($settingValue === '1' || $settingValue === 'true');
+                $notes_without_folders_after = ($settingValue !== '0' && $settingValue !== 'false' && $settingValue !== false);
             } catch (Exception $e) {
                 // ignore
+                $notes_without_folders_after = true; // default
             }
             
             $folder_null_case = $notes_without_folders_after ? '1' : '0';
@@ -469,6 +470,9 @@ class NotesController {
                     ],
                     'share_delta' => $wasShared ? 1 : 0
                 ]);
+
+                // Trigger auto Git sync
+                $this->triggerGitSync((int)$id, 'push');
             } else {
                 $this->sendError(500, 'Error while creating the note');
             }
@@ -488,8 +492,9 @@ class NotesController {
      *   - tags: Comma-separated tags
      *   - folder_id: Folder ID
      *   - workspace: Workspace name
+     *   - git_push: If true, push note to Git after saving
      */
-    public function update(string $id): void {
+    public function update(string $id, bool $triggerSync = false): void {
         if (!is_numeric($id)) {
             $this->sendError(400, 'Invalid note ID');
             return;
@@ -522,6 +527,7 @@ class NotesController {
             if ($folder_id === 0) $folder_id = null;
             $workspace = isset($input['workspace']) ? trim($input['workspace']) : $note['workspace'];
             $folder = $note['folder'];
+            $gitPushRequested = !empty($input['git_push']);
             
             // Validate workspace if changed
             if ($workspace && $workspace !== $note['workspace']) {
@@ -676,6 +682,12 @@ class NotesController {
                     }
                 }
                 
+                // Trigger Git sync if requested, capture result for response
+                $gitPushResult = null;
+                if ($gitPushRequested || $triggerSync) {
+                    $gitPushResult = $this->triggerGitSyncWithResult($noteId, 'push');
+                }
+
                 $response = [
                     'note' => [
                         'id' => $noteId,
@@ -683,12 +695,17 @@ class NotesController {
                         'updated' => $now_utc
                     ]
                 ];
-                
+
                 // Include updated linked note IDs if any
                 if (!empty($updatedLinkedNotes)) {
                     $response['updated_linked_notes'] = $updatedLinkedNotes;
                 }
-                
+
+                // Include git_push result if it was requested
+                if ($gitPushRequested) {
+                    $response['git_push'] = $gitPushResult ?? ['triggered' => false, 'reason' => 'not configured or disabled'];
+                }
+
                 $this->sendSuccess($response);
             } else {
                 $this->sendError(500, 'Database error while updating note');
@@ -777,9 +794,12 @@ class NotesController {
                             'id' => $noteId,
                             'heading' => $note['heading'],
                             'action' => 'moved_to_trash',
-                            'linked_notes_deleted' => $deletedLinkedCount
+                            'deleted_linked_count' => $deletedLinkedCount
                         ]
                     ]);
+
+                    // Trigger auto Git sync (delete from Git because it's in trash)
+                    $this->triggerGitSync($noteId, 'delete');
                 } else {
                     $this->sendError(500, 'Failed to move note to trash');
                 }
@@ -867,6 +887,9 @@ class NotesController {
             $png_deleted = unlink($png_file_path);
         }
 
+        // Trigger auto Git sync
+        $this->triggerGitSync($noteId, 'delete');
+
         // Delete database entry
         if ($workspace) {
             $stmt = $this->con->prepare("DELETE FROM entries WHERE id = ? AND workspace = ?");
@@ -951,6 +974,9 @@ class NotesController {
                         'heading' => $note['heading']
                     ]
                 ]);
+
+                // Trigger auto Git sync
+                $this->triggerGitSync($noteId, 'push');
             } else {
                 $this->sendError(500, 'Failed to restore note');
             }
@@ -1075,6 +1101,9 @@ class NotesController {
             
             if ($stmt->execute([$content, $now_utc, $noteId])) {
                 $this->sendSuccess(['id' => $noteId]);
+                
+                // Trigger auto Git sync on emergency save (leaving page)
+                $this->triggerGitSync($noteId, 'push');
             } else {
                 $this->sendError(500, 'Database error');
             }
@@ -1390,7 +1419,7 @@ class NotesController {
         $workspace = $_GET['workspace'] ?? null;
         
         try {
-            $query = "SELECT id, heading, attachments, updated 
+            $query = "SELECT id, heading, entry, attachments, updated 
                       FROM entries 
                       WHERE trash = 0 
                       AND attachments IS NOT NULL 
@@ -1416,6 +1445,7 @@ class NotesController {
                     $notes[] = [
                         'id' => $row['id'],
                         'heading' => $row['heading'],
+                        'entry' => $row['entry'],
                         'attachments' => $attachments,
                         'updated' => $row['updated']
                     ];
@@ -2064,5 +2094,49 @@ class NotesController {
             'success' => false,
             'error' => $message
         ]);
+    }
+
+    /**
+     * Trigger automatic Git synchronization if enabled
+     */
+    private function triggerGitSync(int $noteId, string $action = 'push'): void {
+        $this->triggerGitSyncWithResult($noteId, $action);
+    }
+
+    /**
+     * Trigger Git sync and return a result array for inclusion in the API response.
+     */
+    private function triggerGitSyncWithResult(int $noteId, string $action = 'push'): array {
+        try {
+            $gitSyncFile = dirname(__DIR__, 3) . '/GitSync.php';
+            if (!file_exists($gitSyncFile)) {
+                return ['triggered' => false, 'reason' => 'GitSync not found'];
+            }
+            require_once $gitSyncFile;
+            $gitSync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
+            if (!$gitSync->isAutoPushEnabled()) {
+                return ['triggered' => false, 'reason' => 'not configured or disabled'];
+            }
+            if ($action === 'push') {
+                $result = $gitSync->pushNote($noteId);
+                return [
+                    'triggered' => true,
+                    'success'   => $result['success'] ?? false,
+                    'error'     => $result['error'] ?? null,
+                ];
+            } elseif ($action === 'delete') {
+                $stmt = $this->con->prepare("SELECT heading, folder_id, workspace, type FROM entries WHERE id = ?");
+                $stmt->execute([$noteId]);
+                $note = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($note) {
+                    $gitSync->deleteNoteInGit($note['heading'], $note['folder_id'], $note['workspace'], $note['type']);
+                }
+                return ['triggered' => true, 'success' => true];
+            }
+            return ['triggered' => false, 'reason' => 'unknown action'];
+        } catch (Exception $e) {
+            error_log("Git auto-sync error: " . $e->getMessage());
+            return ['triggered' => true, 'success' => false, 'error' => $e->getMessage()];
+        }
     }
 }

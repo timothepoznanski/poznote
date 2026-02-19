@@ -162,6 +162,41 @@ body::-webkit-scrollbar {
     /* Put it last in the toolbar */
 }
 
+/* Mobile title horizontal scroll invece di ellipsis */
+a.links_arbo_left,
+.folder-header,
+.folder-toggle {
+    display: block !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: clip !important;
+    /* Hide scrollbar for cleaner look but still allow scrolling */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Specific overrides for notes inside folders and the editor title */
+.note-in-folder a.links_arbo_left .note-title,
+a.links_arbo_left .note-title,
+.folder-name,
+.shared-folder-name,
+.note-name,
+.css-title {
+    display: inline-block !important;
+    overflow: visible !important;
+    white-space: nowrap !important;
+    text-overflow: clip !important;
+    width: auto !important;
+    max-width: none !important;
+}
+
+a.links_arbo_left::-webkit-scrollbar,
+.folder-header::-webkit-scrollbar,
+.folder-toggle::-webkit-scrollbar {
+    display: none !important;
+}
+
 .emoji-picker {
     width: 95vw;
     max-width: 280px;

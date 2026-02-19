@@ -123,6 +123,78 @@ class ModalAlert {
     }
 
     /**
+     * Show a Loading Progress Bar modal
+     * @param {string} message - The message to display
+     * @param {string} title - Optional title
+     * @returns {Object} - Object with close method
+     */
+    showProgressBar(message = null, title = null) {
+        if (message === null) message = tr('common.loading', {}, 'Loading...');
+        if (title === null) title = tr('common.please_wait', {}, 'Please wait');
+
+        const overlay = document.createElement('div');
+        overlay.className = 'alert-modal-overlay spinner-overlay'; // Re-use spinner overlay logic
+        
+        const modal = document.createElement('div');
+        modal.className = 'alert-modal progress-modal';
+        
+        const header = document.createElement('div');
+        header.className = 'alert-modal-header';
+        
+        const titleElement = document.createElement('h3');
+        titleElement.className = 'alert-modal-title';
+        titleElement.innerHTML = `${title}`;
+        
+        const body = document.createElement('div');
+        body.className = 'alert-modal-body';
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.textContent = message;
+        messageDiv.style.marginBottom = '15px';
+        messageDiv.style.whiteSpace = 'pre-wrap';
+
+        const progressContainer = document.createElement('div');
+        progressContainer.className = 'progress-container';
+        
+        const progressInner = document.createElement('div');
+        progressInner.className = 'progress-bar-inner';
+        
+        // Assemble modal
+        progressContainer.appendChild(progressInner);
+        body.appendChild(messageDiv);
+        body.appendChild(progressContainer);
+        
+        header.appendChild(titleElement);
+        modal.appendChild(header);
+        modal.appendChild(body);
+        overlay.appendChild(modal);
+        
+        // Add to DOM
+        document.body.appendChild(overlay);
+        
+        // Show with animation
+        requestAnimationFrame(() => {
+            overlay.classList.add('show');
+        });
+
+        // Return close and update functions
+        return {
+            update: (percent, msg) => {
+                if (msg !== undefined) messageDiv.textContent = msg;
+                if (percent !== undefined) progressInner.style.width = percent + '%';
+            },
+            close: () => {
+                overlay.classList.remove('show');
+                setTimeout(() => {
+                    if (overlay.parentNode) {
+                        overlay.parentNode.removeChild(overlay);
+                    }
+                }, 300);
+            }
+        };
+    }
+
+    /**
      * Show a custom modal
      * @param {Object} config - Modal configuration
      */

@@ -45,8 +45,47 @@ function tp_h($key, $vars = []) {
 
 // Handle form submissions
 $message = '';
+$warning = '';
 $error = '';
 $result = null;
+
+// Handle result from AJAX sync session
+if (isset($_SESSION['last_sync_result'])) {
+    $lastSync = $_SESSION['last_sync_result'];
+    $action = $lastSync['action'];
+    $result = $lastSync['result'];
+    unset($_SESSION['last_sync_result']);
+
+    $errorCount = count($result['errors'] ?? []);
+    if ($result['success']) {
+        if ($action === 'push') {
+            $message = tp('git_sync.messages.push_success', [
+                'count' => $result['pushed'],
+                'attachments' => $result['attachments_pushed'] ?? 0,
+                'deleted' => $result['deleted'] ?? 0,
+                'errors' => $errorCount
+            ]);
+        } else if ($action === 'pull') {
+            $message = tp('git_sync.messages.pull_success', [
+                'pulled' => $result['pulled'],
+                'updated' => $result['updated'],
+                'deleted' => $result['deleted'] ?? 0,
+                'errors' => $errorCount
+            ]);
+        }
+        // Downgrade to warning if there were partial errors
+        if ($errorCount > 0) {
+            $warning = $message;
+            $message = '';
+        }
+    } else {
+        $error = tp('git_sync.messages.' . $action . '_error', [
+            'error' => $result['errors'][0]['error'] ?? 'Unknown error'
+        ]);
+    }
+    // Refresh last sync info since we have new results
+    $lastSyncInfo = $gitSync->getLastSyncInfo();
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
@@ -62,14 +101,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             break;
             
         case 'push':
-            $workspace = $_POST['workspace'] ?? null;
-            $result = $gitSync->pushNotes($workspace);
+            $result = $gitSync->pushNotes();
             if ($result['success']) {
                 $message = tp('git_sync.messages.push_success', [
                     'count' => $result['pushed'],
                     'deleted' => $result['deleted'] ?? 0,
                     'errors' => count($result['errors'])
                 ]);
+                if (count($result['errors']) > 0) {
+                    $warning = $message;
+                    $message = '';
+                }
             } else {
                 $error = tp('git_sync.messages.push_error', ['error' => $result['errors'][0]['error'] ?? 'Unknown error']);
             }
@@ -78,12 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             break;
             
         case 'pull':
-            $workspace = $_POST['workspace'] ?? null;
-            // If empty string, convert to null for all workspaces
-            if ($workspace === '') {
-                $workspace = null;
-            }
-            $result = $gitSync->pullNotes($workspace);
+            $result = $gitSync->pullNotes();
             if ($result['success']) {
                 $message = tp('git_sync.messages.pull_success', [
                     'pulled' => $result['pulled'],
@@ -91,26 +128,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     'deleted' => $result['deleted'] ?? 0,
                     'errors' => count($result['errors'])
                 ]);
+                if (count($result['errors']) > 0) {
+                    $warning = $message;
+                    $message = '';
+                }
             } else {
                 $error = tp('git_sync.messages.pull_error', ['error' => $result['errors'][0]['error'] ?? 'Unknown error']);
             }
             // Refresh last sync info
             $lastSync = $gitSync->getLastSyncInfo();
             break;
+            
+        case 'update_auto_settings':
+            $autoPush = isset($_POST['auto_push']) ? true : false;
+            $autoPull = isset($_POST['auto_pull']) ? true : false;
+            $gitSync->setAutoPushEnabled($autoPush);
+            $gitSync->setAutoPullEnabled($autoPull);
+            // Re-fetch config status to update badges
+            $configStatus = $gitSync->getConfigStatus();
+            $message = tp('git_sync.auto_sync.saving');
+            break;
     }
 }
 
-// Get workspaces for dropdown
-$workspaces = [];
-try {
-    $stmt = $con->query("SELECT name FROM workspaces ORDER BY name");
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $workspaces[] = $row['name'];
-    }
-} catch (Exception $e) {
-    // If workspaces table doesn't exist or query fails, continue with empty list
-    // User can still sync with all workspaces using default option
-}
 
 ?>
 <!DOCTYPE html>
@@ -202,7 +242,7 @@ try {
                     </tr>
                     <tr>
                         <td><?php echo tp_h('git_sync.limitations.metadata'); ?></td>
-                        <td class="text-center status-error"><i class="fas fa-times"></i></td>
+                        <td class="text-center status-success"><i class="fas fa-check"></i></td>
                         <td class="text-center status-success"><i class="fas fa-check"></i></td>
                     </tr>
                 </tbody>
@@ -213,6 +253,13 @@ try {
         <div class="alert alert-success">
             <i class="fas fa-check-circle"></i>
             <?php echo htmlspecialchars($message); ?>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($warning): ?>
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <?php echo htmlspecialchars($warning); ?>
         </div>
         <?php endif; ?>
 
@@ -323,6 +370,35 @@ try {
                 <i class="fas fa-info-circle"></i>
                 <?php echo tp_h('git_sync.config.hint'); ?>
             </div>
+            <?php else: ?>
+            <div class="auto-sync-settings">
+                <h4><?php echo tp_h('git_sync.auto_sync.title'); ?></h4>
+                <form method="post" class="auto-sync-form">
+                    <input type="hidden" name="action" value="update_auto_settings">
+                    
+                    <div class="form-check">
+                        <label class="switch">
+                            <input type="checkbox" name="auto_push" onchange="this.form.submit()" <?php echo ($configStatus['autoPush'] ?? false) ? 'checked' : ''; ?>>
+                            <span class="slider round"></span>
+                        </label>
+                        <div class="check-label">
+                            <span class="label-title"><?php echo tp_h('git_sync.auto_sync.push_label'); ?></span>
+                            <span class="label-desc"><?php echo tp_h('git_sync.auto_sync.push_description'); ?></span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-check">
+                        <label class="switch">
+                            <input type="checkbox" name="auto_pull" onchange="this.form.submit()" <?php echo ($configStatus['autoPull'] ?? false) ? 'checked' : ''; ?>>
+                            <span class="slider round"></span>
+                        </label>
+                        <div class="check-label">
+                            <span class="label-title"><?php echo tp_h('git_sync.auto_sync.pull_label'); ?></span>
+                            <span class="label-desc"><?php echo tp_h('git_sync.auto_sync.pull_description'); ?></span>
+                        </div>
+                    </div>
+                </form>
+            </div>
             <?php endif; ?>
         </div>
 
@@ -334,15 +410,6 @@ try {
                     <p><?php echo tp_h('git_sync.actions.push.description'); ?></p>
                     <form method="post" class="sync-form">
                         <input type="hidden" name="action" value="push">
-                        <div class="form-group">
-                            <label for="push-workspace"><?php echo tp_h('git_sync.actions.workspace'); ?></label>
-                            <select name="workspace" id="push-workspace">
-                                <option value=""><?php echo tp_h('git_sync.actions.all_workspaces'); ?></option>
-                                <?php foreach ($workspaces as $ws): ?>
-                                <option value="<?php echo htmlspecialchars($ws); ?>"><?php echo htmlspecialchars($ws); ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-upload"></i> <span><?php echo tp_h('git_sync.actions.push.button'); ?></span>
                         </button>
@@ -355,18 +422,6 @@ try {
                     <p><?php echo tp_h('git_sync.actions.pull.description'); ?></p>
                     <form method="post" class="sync-form">
                         <input type="hidden" name="action" value="pull">
-                        <div class="form-group">
-                            <label for="pull-workspace"><?php echo tp_h('git_sync.actions.target_workspace'); ?></label>
-                            <select name="workspace" id="pull-workspace">
-                                <option value=""><?php echo tp_h('git_sync.actions.all_workspaces'); ?></option>
-                                <?php foreach ($workspaces as $ws): ?>
-                                <option value="<?php echo htmlspecialchars($ws); ?>"><?php echo htmlspecialchars($ws); ?></option>
-                                <?php endforeach; ?>
-                                <?php if (empty($workspaces)): ?>
-                                <option value="Poznote">Poznote</option>
-                                <?php endif; ?>
-                            </select>
-                        </div>
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-download"></i> <span><?php echo tp_h('git_sync.actions.pull.button'); ?></span>
                         </button>
@@ -385,17 +440,6 @@ try {
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
     <script>
-    /**
-     * Git Sync Form Handler
-     * 
-     * Purpose: Show confirmation dialog before push/pull operations and display loading state
-     * 
-     * Flow:
-     * 1. User submits push/pull form
-     * 2. Show confirmation modal
-     * 3. If confirmed: mark form as confirmed, show spinner, submit
-     * 4. If cancelled: do nothing
-     */
     document.addEventListener('DOMContentLoaded', function() {
         const syncForms = document.querySelectorAll('form.sync-form');
         
@@ -403,7 +447,8 @@ try {
         const i18n = {
             confirmPush: <?php echo json_encode(tp('git_sync.confirm_push')); ?>,
             confirmPull: <?php echo json_encode(tp('git_sync.confirm_pull')); ?>,
-            allWorkspaces: <?php echo json_encode(tp('git_sync.actions.all_workspaces')); ?>
+            starting: <?php echo json_encode(t('git_sync.starting', [], 'Syncing...')); ?>,
+            completed: <?php echo json_encode(t('git_sync.completed', [], 'Completed!')); ?>
         };
 
         syncForms.forEach(form => {
@@ -415,44 +460,64 @@ try {
             if (action !== 'push' && action !== 'pull') return;
             
             form.addEventListener('submit', function(e) {
-                // If already confirmed by user, allow form submission
-                if (form.dataset.confirmed === 'true') {
-                    return;
-                }
-                
-                // Prevent default submission to show confirmation first
+                // Prevent default submission
                 e.preventDefault();
                 
-                // Get selected workspace name for confirmation message
-                const workspaceSelect = form.querySelector('select[name="workspace"]');
-                const workspaceName = (workspaceSelect && workspaceSelect.value) ? 
-                    (workspaceSelect.options[workspaceSelect.selectedIndex].text) : 
-                    i18n.allWorkspaces;
-                
                 // Build confirmation message
-                let confirmMsg = (action === 'push' ? i18n.confirmPush : i18n.confirmPull)
-                    .replace('{{workspace}}', workspaceName);
+                const confirmMsg = action === 'push' ? i18n.confirmPush : i18n.confirmPull;
                 
                 // Show modal and wait for user response
                 window.modalAlert.confirm(confirmMsg).then(function(confirmed) {
                     if (confirmed) {
-                        // Mark as confirmed to bypass this handler on next submit
-                        form.dataset.confirmed = 'true';
+                        const title = (action === 'push' ? "Push" : "Pull");
                         
-                        // Show loading spinner on button
-                        // Note: We can't rely on the submit event firing again,
-                        // so we manually update the button here
-                        const button = form.querySelector('button[type="submit"]');
-                        if (button) {
-                            const icon = button.querySelector('i');
-                            if (icon) {
-                                icon.className = 'fas fa-spinner fa-spin';
+                        // Show progress bar modal
+                        const progressBar = window.modalAlert.showProgressBar(
+                            title, 
+                            i18n.starting
+                        );
+
+                        // Polling setup
+                        let progressInterval = setInterval(async () => {
+                            try {
+                                const response = await fetch('api/v1/git-sync/progress');
+                                const data = await response.json();
+                                if (data.success && data.progress) {
+                                    progressBar.update(data.progress.percentage, data.progress.message);
+                                }
+                            } catch (e) {
+                                console.error("Error polling progress:", e);
                             }
-                            button.disabled = true;
-                        }
-                        
-                        // Submit the form
-                        form.submit();
+                        }, 500);
+
+                        // Execute the sync
+                        fetch('api/v1/git-sync/' + action, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({})
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            clearInterval(progressInterval);
+                            
+                            if (data.success) {
+                                progressBar.update(100, i18n.completed);
+                                setTimeout(() => {
+                                    progressBar.close();
+                                    window.location.reload();
+                                }, 500);
+                            } else {
+                                progressBar.close();
+                                window.location.reload();
+                            }
+                        })
+                        .catch(err => {
+                            clearInterval(progressInterval);
+                            progressBar.close();
+                            window.location.reload();
+                        });
                     }
                 });
             });

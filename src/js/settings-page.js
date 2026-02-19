@@ -86,24 +86,27 @@
     // ========== Toggle Cards ==========
 
     // Helper function to determine if a setting is enabled
-    function isSettingEnabled(value, invertLogic) {
+    function isSettingEnabled(value, invertLogic, defaultValue) {
+        if (value === null && defaultValue !== undefined) {
+            return defaultValue;
+        }
         var enabled = value === '1' || value === 'true';
-        if (invertLogic) {
-            // For hide_* settings: null or '1' means show (enabled)
-            enabled = value === '1' || value === 'true' || value === null;
+        if (invertLogic && value === null) {
+            // Default for hide_* settings: null means show (enabled)
+            enabled = true;
         }
         return enabled;
     }
 
     // Setup a toggle card that toggles a boolean setting
-    function setupToggleCard(cardId, statusId, settingKey, invertLogic) {
+    function setupToggleCard(cardId, statusId, settingKey, invertLogic, defaultValue) {
         var txt = getTranslations();
         var card = document.getElementById(cardId);
         var status = document.getElementById(statusId);
 
         function refresh() {
             getSetting(settingKey, function (value) {
-                var enabled = isSettingEnabled(value, invertLogic);
+                var enabled = isSettingEnabled(value, invertLogic, defaultValue);
 
                 if (status) {
                     status.textContent = enabled ? txt.enabled : txt.disabled;
@@ -120,7 +123,7 @@
         if (card) {
             card.addEventListener('click', function () {
                 getSetting(settingKey, function (currentValue) {
-                    var currently = isSettingEnabled(currentValue, invertLogic);
+                    var currently = isSettingEnabled(currentValue, invertLogic, defaultValue);
                     var toSet = currently ? '0' : '1';
                     setSetting(settingKey, toSet, function () {
                         refresh();
