@@ -163,8 +163,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     const imgs = node.tagName === 'IMG' ? [node] : node.querySelectorAll('img');
                     imgs.forEach(function (img) {
                         // Only handle if it was actually in an active noteentry and NOT marked as manually deleted
+                        // AND it's not currently being wrapped for resizing
                         const noteEntry = mutation.target.closest('.noteentry');
-                        if (noteEntry && document.body.contains(noteEntry) && !img._manuallyDeleted) {
+
+                        // ONLY auto-delete for standard HTML notes.
+                        // Markdown and Tasklist notes re-render their DOM from state, so removal from DOM doesn't mean deletion.
+                        const noteType = noteEntry ? (noteEntry.getAttribute('data-note-type') || 'note') : null;
+
+                        if (noteEntry && noteType === 'note' && document.body.contains(noteEntry) && !img._manuallyDeleted && !img._isResizing) {
                             // Extract attachment info and call API
                             const src = img.getAttribute('src');
                             if (src) {
@@ -180,10 +186,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     if (activeNoteId && noteId === activeNoteId) {
                                         // Call the existing deleteAttachment function if available
                                         if (typeof window.deleteAttachment === 'function') {
-                                            const oldNoteId = window.currentNoteIdForAttachments;
-                                            window.currentNoteIdForAttachments = noteId;
-                                            window.deleteAttachment(attachmentId);
-                                            window.currentNoteIdForAttachments = oldNoteId;
+                                            window.deleteAttachment(attachmentId, noteId);
                                         }
                                     }
                                 }

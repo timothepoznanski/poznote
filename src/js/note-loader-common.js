@@ -1869,6 +1869,10 @@ function enableImageResize(img) {
     img.style.position = 'relative';
     img.style.display = 'inline-block';
 
+    // Set a flag to prevent the MutationObserver in main.js from thinking this is a deletion
+    // during the wrapping process (which involves moving the image in the DOM)
+    img._isResizing = true;
+
     // Create a wrapper if the image doesn't have one OR if parent doesn't have the resize wrapper class
     let wrapper = img.parentElement;
     if (!wrapper || !wrapper.classList.contains('image-resize-wrapper')) {
@@ -1885,8 +1889,18 @@ function enableImageResize(img) {
         wrapper.style.display = 'inline-block';
     }
 
+    // Reset the flag after a short delay to ensure the MutationObserver has processed the move
+    setTimeout(function () {
+        delete img._isResizing;
+    }, 100);
+
     // Add the handle to the wrapper
     wrapper.appendChild(resizeHandle);
+
+    // Trigger modification indicator immediately
+    if (typeof window.markNoteAsModified === 'function') {
+        window.markNoteAsModified();
+    }
 
     // Store original dimensions
     const originalWidth = img.width || img.naturalWidth;
@@ -1905,6 +1919,11 @@ function enableImageResize(img) {
 
         document.body.style.cursor = 'nwse-resize';
         document.body.style.userSelect = 'none';
+
+        // Mark as modified on actual resize start too
+        if (typeof window.markNoteAsModified === 'function') {
+            window.markNoteAsModified();
+        }
     });
 
     // Mouse move
@@ -1933,12 +1952,32 @@ function enableImageResize(img) {
         // Save the final width
         const finalWidth = Math.round(img.offsetWidth);
         img.setAttribute('width', finalWidth);
+        img.style.width = finalWidth + 'px';
         img.removeAttribute('height'); // Let browser calculate height from aspect ratio
 
-        // Remove the handle immediately to prevent it from being saved
-        resizeHandle.remove();
+        // Clean up: remove the handle
+        if (resizeHandle && resizeHandle.parentNode) {
+            resizeHandle.remove();
+        }
 
-        // Trigger note save
+        // Clean up: remove the wrapper but preserve the image with its new size
+        const currentWrapper = img.parentElement;
+        if (currentWrapper && currentWrapper.classList.contains('image-resize-wrapper')) {
+            const parent = currentWrapper.parentNode;
+            if (parent) {
+                parent.insertBefore(img, currentWrapper);
+                parent.removeChild(currentWrapper);
+            }
+        }
+
+        // Revert style changes made ONLY for positioning the handle
+        img.style.position = (originalPosition === 'static' ? '' : originalPosition);
+        if (img.style.display === 'inline-block' && !img.getAttribute('style').includes('display: inline-block')) {
+            // Only revert display if we added it and it's not in the inline style attribute already
+            // Actually, keeping inline-block is usually safer for resized images.
+        }
+
+        // Trigger note save and modification indicator
         if (typeof window.markNoteAsModified === 'function') {
             window.markNoteAsModified();
         }
