@@ -163,11 +163,18 @@ body {
 
 /* RIGHT COLUMN */
 
-#right_col {
+#right_pane {
     flex: 1;
     min-width: 400px;
     height: 100vh;
+    display: flex;
+    flex-direction: column;
     background-color: #FFFFFF;
+    overflow: hidden;
+}
+
+#right_col {
+    flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
     box-sizing: border-box;

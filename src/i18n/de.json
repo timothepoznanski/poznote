@@ -430,7 +430,8 @@
             "kanban_on_folder_click": "Kanban-Ansicht beim Klicken auf Ordner öffnen",
             "index_icon_scale": "Skalierung der Index-Symbole",
             "note_content_width": "Breite des Notizinhalts",
-            "show_inline_attachment_images": "Bildanhänge anzeigen"
+            "show_inline_attachment_images": "Bildanhänge anzeigen",
+            "enable_internal_tabs": "Interne Tabs aktivieren"
         },
         "badges": {
             "font_size_default": "Standard ({{size}}px)",

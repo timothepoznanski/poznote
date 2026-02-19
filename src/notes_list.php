@@ -21,6 +21,67 @@ try {
 } catch (Exception $e) {
     $favorites_count = 0;
 }
+
+/**
+ * Helper to render the note actions menu (3-dot menu in sidebar)
+ * Contains the same actions as the note toolbar
+ */
+function renderNoteActionsMenu($noteId, $noteData, $folderId, $folderName) {
+    $noteType = $noteData['type'] ?? 'note';
+    $title = $noteData['heading'] ?: t('index.note.new_note', [], 'New note');
+    $isFavorite = intval($noteData['favorite'] ?? 0);
+    $favoriteClass = $isFavorite ? ' is-favorite' : '';
+    $favoriteTitle = $isFavorite ? t_h('index.toolbar.favorite_remove') : t_h('index.toolbar.favorite_add');
+    
+    // Attachments count
+    $attachmentsCount = 0;
+    if (!empty($noteData['attachments'])) {
+        $attachments = json_decode($noteData['attachments'], true);
+        if (is_array($attachments)) $attachmentsCount = count($attachments);
+    }
+    
+    // Metadata for info modal and download
+    $created = $noteData['created'] ?? '';
+    $updated = $noteData['updated'] ?? '';
+    $tags = $noteData['tags'] ?? '';
+    $filename = getEntryFilename($noteId, $noteType);
+
+    $attachmentsClass = $attachmentsCount > 0 ? ' has-attachments' : '';
+
+    echo "<div class='note-actions'>";
+    echo "<button class='note-actions-toggle' data-action='toggle-note-actions-menu' data-note-id='$noteId' title='" . t_h('common.menu', [], 'Menu') . "'><i class='fas fa-ellipsis-v'></i></button>";
+    echo "<div class='note-actions-menu' id='note-actions-menu-$noteId'>";
+    
+    // Favorite
+    echo "<div class='note-actions-menu-item$favoriteClass' data-action='toggle-favorite' data-note-id='$noteId'><i class='fas fa-star'></i><span>$favoriteTitle</span></div>";
+    
+    // Open in new tab
+    echo "<div class='note-actions-menu-item' data-action='open-note-new-tab' data-note-id='$noteId'><i class='fas fa-external-link'></i><span>" . t_h('editor.toolbar.open_in_new_tab') . "</span></div>";
+    
+    // Duplicate
+    echo "<div class='note-actions-menu-item' data-action='duplicate-note' data-note-id='$noteId'><i class='fas fa-copy'></i><span>" . t_h('common.duplicate') . "</span></div>";
+    
+    // Move
+    echo "<div class='note-actions-menu-item' data-action='show-move-folder-dialog' data-note-id='$noteId' data-folder-id='$folderId' data-folder='" . htmlspecialchars($folderName, ENT_QUOTES) . "'><i class='fas fa-folder-open'></i><span>" . t_h('common.move', [], 'Move') . "</span></div>";
+    
+    // Share
+    echo "<div class='note-actions-menu-item' data-action='open-share-modal' data-note-id='$noteId'><i class='fas fa-cloud'></i><span>" . t_h('index.toolbar.public_note', [], 'Share note') . "</span></div>";
+    
+    // Attachments
+    echo "<div class='note-actions-menu-item$attachmentsClass' data-action='show-attachment-dialog' data-note-id='$noteId'><i class='fas fa-paperclip'></i><span>" . t_h('common.attachments', [], 'Attachments') . "</span></div>";
+    
+    // Download (requires data-filename, data-title, data-note-type for showExportModal)
+    echo "<div class='note-actions-menu-item' data-action='show-export-modal' data-note-id='$noteId' data-filename='" . htmlspecialchars($filename, ENT_QUOTES) . "' data-title='" . htmlspecialchars($title, ENT_QUOTES) . "' data-note-type='$noteType'><i class='fas fa-download'></i><span>" . t_h('common.download', [], 'Download') . "</span></div>";
+    
+    // Information
+    echo "<div class='note-actions-menu-item' data-action='show-note-info' data-note-id='$noteId' data-created='" . htmlspecialchars($created, ENT_QUOTES) . "' data-updated='" . htmlspecialchars($updated, ENT_QUOTES) . "' data-folder='" . htmlspecialchars($folderName, ENT_QUOTES) . "' data-favorite='$isFavorite' data-tags='" . htmlspecialchars($tags, ENT_QUOTES) . "' data-attachments-count='$attachmentsCount'><i class='fas fa-info-circle'></i><span>" . t_h('common.information', [], 'Information') . "</span></div>";
+    
+    // Delete
+    echo "<div class='note-actions-menu-item text-danger' data-action='delete-note' data-note-id='$noteId'><i class='fas fa-trash'></i><span>" . t_h('common.delete', [], 'Delete') . "</span></div>";
+    
+    echo "</div>"; // .note-actions-menu
+    echo "</div>"; // .note-actions
+}
 ?>
 
 <!-- Notes list display -->
@@ -177,9 +238,12 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             }
         }
         
+        echo "<div class='note-list-item'>";
         echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "'" . $linkedNoteIdAttr . " data-folder-id='$folderId' data-folder='$folderName' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note'>";
         echo "<span class='note-title'>" . $noteIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
         echo "</a>";
+        renderNoteActionsMenu($noteDbId, $row1, $folderId, $folderName);
+        echo "</div>";
         echo "<div id=pxbetweennotes></div>";
     }
     
@@ -289,9 +353,12 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
             $noteIcon = '<i class="fas fa-link note-type-icon-inline"></i> ';
         }
         
+        echo "<div class='note-list-item'>";
         echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "' data-folder-id='' data-folder='' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note'>";
         echo "<span class='note-title'>" . $noteIcon . htmlspecialchars(($row1["heading"] ?: t('index.note.new_note', [], 'New note')), ENT_QUOTES) . "</span>";
         echo "</a>";
+        renderNoteActionsMenu($noteDbId, $row1, '', '');
+        echo "</div>";
         echo "<div id=pxbetweennotes></div>";
     }
 }
@@ -319,9 +386,12 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
             $noteIcon = '<i class="fas fa-link note-type-icon-inline"></i> ';
         }
         
+        echo "<div class='note-list-item'>";
         echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "' data-folder-id='' data-folder='' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note'>";
         echo "<span class='note-title'>" . $noteIcon . htmlspecialchars(($row1["heading"] ?: t('index.note.new_note', [], 'New note')), ENT_QUOTES) . "</span>";
         echo "</a>";
+        renderNoteActionsMenu($noteDbId, $row1, '', '');
+        echo "</div>";
         echo "<div id=pxbetweennotes></div>";
     }
 }

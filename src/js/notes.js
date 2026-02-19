@@ -592,12 +592,17 @@ function openNoteInNewTab(noteId) {
         console.error('No note ID provided');
         return;
     }
-    
-    // Build URL with note ID and current workspace
+
+    if (window.tabManager) {
+        var titleEl = document.getElementById('inp' + noteId);
+        var title = (titleEl && titleEl.value.trim()) || 'Untitled';
+        window.tabManager.openInNewTab(noteId, title);
+        return;
+    }
+
+    // Fallback: open in a real browser tab
     var workspace = selectedWorkspace || getSelectedWorkspace();
     var url = 'index.php?workspace=' + encodeURIComponent(workspace) + '&note=' + encodeURIComponent(noteId);
-    
-    // Open in new tab
     window.open(url, '_blank');
 }
 

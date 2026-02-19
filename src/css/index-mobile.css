@@ -109,10 +109,19 @@ body::-webkit-scrollbar {
     overflow-y: auto !important;
 }
 
+#right_pane,
 #right_col {
     width: 100% !important;
     min-width: 100% !important;
     flex-shrink: 0 !important;
+}
+
+#right_pane {
+    overflow: hidden !important;
+    height: 100vh !important;
+}
+
+#right_col {
     overflow-y: auto !important;
 }
 

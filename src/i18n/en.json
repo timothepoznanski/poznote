@@ -94,7 +94,8 @@
             "kanban_on_folder_click": "Open Kanban view on folder click",
             "index_icon_scale": "Index icon scaling",
             "note_content_width": "Note content width",
-            "show_inline_attachment_images": "Show image attachments"
+            "show_inline_attachment_images": "Show image attachments",
+            "enable_internal_tabs": "Enable internal tabs"
         },
         "badges": {
             "font_size_default": "default ({{size}}px)",
