@@ -49,6 +49,7 @@ function renderNoteActionsMenu($noteId, $noteData, $folderId, $folderName) {
     $attachmentsClass = $attachmentsCount > 0 ? ' has-attachments' : '';
 
     echo "<div class='note-actions'>";
+    echo "<button class='note-actions-item' data-action='open-note-new-tab' data-note-id='$noteId' title='" . t_h('editor.toolbar.open_in_new_tab') . "'><i class='fas fa-external-link'></i></button>";
     echo "<button class='note-actions-toggle' data-action='toggle-note-actions-menu' data-note-id='$noteId' title='" . t_h('common.menu', [], 'Menu') . "'><i class='fas fa-ellipsis-v'></i></button>";
     echo "<div class='note-actions-menu' id='note-actions-menu-$noteId'>";
     

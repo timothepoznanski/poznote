@@ -42,26 +42,26 @@ function _createNoteOfType(noteType) {
         workspace: selectedWorkspace || getSelectedWorkspace(),
         type: noteType
     };
-    
+
     // Use RESTful API: POST /api/v1/notes
     fetch("/api/v1/notes", {
         method: "POST",
         headers: { "Content-Type": "application/json", 'X-Requested-With': 'XMLHttpRequest' },
         body: JSON.stringify(noteData)
     })
-    .then(function(response) { return response.json(); })
-    .then(function(data) {
-        if(data.success && data.note) {
-            window.scrollTo(0, 0);
-            var ws = encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
-            window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
-        } else {
-            showNotificationPopup(data.error || 'Error creating ' + noteType, 'error');
-        }
-    })
-    .catch(function(error) {
-        showNotificationPopup('Network error: ' + error.message, 'error');
-    });
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+            if (data.success && data.note) {
+                window.scrollTo(0, 0);
+                var ws = encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
+                window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
+            } else {
+                showNotificationPopup(data.error || 'Error creating ' + noteType, 'error');
+            }
+        })
+        .catch(function (error) {
+            showNotificationPopup('Network error: ' + error.message, 'error');
+        });
 }
 
 /**
@@ -97,7 +97,7 @@ function createMarkdownNote() {
  */
 function _isDefaultPlaceholder(placeholder) {
     if (!placeholder) return false;
-    return DEFAULT_NOTE_TITLE_PATTERNS.some(function(pattern) {
+    return DEFAULT_NOTE_TITLE_PATTERNS.some(function (pattern) {
         return pattern.test(placeholder);
     });
 }
@@ -111,19 +111,19 @@ function _isDefaultPlaceholder(placeholder) {
  */
 function _getNoteTitle(titleInput, defaultTitle) {
     if (!titleInput) return defaultTitle || '';
-    
+
     var title = titleInput.value || '';
-    
+
     // If title is empty, check if placeholder should be used
     if (title === '' && _isDefaultPlaceholder(titleInput.placeholder)) {
         title = titleInput.placeholder;
     }
-    
+
     // If still empty, use default
     if (title === '' && defaultTitle) {
         title = defaultTitle;
     }
-    
+
     return title;
 }
 
@@ -149,23 +149,23 @@ function saveNoteToServer() {
     if (!titleInput || !entryElem) {
         return;
     }
-    
+
     // Get title (using placeholder if appropriate)
     var headi = _getNoteTitle(titleInput);
-    
+
     // If title is empty, don't save to avoid "heading is required" error
     if (headi === '' || headi.trim() === '') {
         return;
     }
-    
+
     // Serialize checklist data before saving
     serializeChecklists(entryElem);
-    
+
     var ent = cleanSearchHighlightsFromElement(entryElem);
     ent = ent.replace(/<br\s*[\/]?>/gi, "&nbsp;<br>");
-    
+
     var entcontent = getTextContentFromElement(entryElem);
-    
+
     // Check if this is a task list note or markdown note
     var noteType = entryElem.getAttribute('data-note-type') || 'note';
     if (noteType === 'tasklist') {
@@ -186,7 +186,7 @@ function saveNoteToServer() {
         // The HTML already contains the image and hidden data, so save as-is
         // This allows text to be added around the Excalidraw diagram
     }
-    
+
     var tags = tagsElem ? tagsElem.value : '';
     var folderIdElem = document.getElementById('folderId' + noteid);
     var folderId = null;
@@ -211,51 +211,51 @@ function saveNoteToServer() {
     // Use RESTful API: PATCH /api/v1/notes/{id}
     fetch("/api/v1/notes/" + noteid, {
         method: "PATCH",
-        headers: { 
+        headers: {
             "Content-Type": "application/json",
             'X-Requested-With': 'XMLHttpRequest'
         },
         body: JSON.stringify(updates)
     })
-    .then(function(response) { return response.json(); })
-    .then(function(data) {
-        if (data.success) {
-            var responseTitle = (data.note && data.note.heading) ? data.note.heading : headi;
-            handleSaveResponse(JSON.stringify({date: new Date().toLocaleDateString(), title: responseTitle, original_title: headi}));
-            
-            // Update linked notes in the list if any were updated
-            if (data.note && data.updated_linked_notes && data.updated_linked_notes.length > 0) {
-                var newTitle = data.note.heading;
-                data.updated_linked_notes.forEach(function(linkedNoteId) {
-                    var linkElements = document.querySelectorAll('.links_arbo_left[data-note-db-id="' + linkedNoteId + '"]');
-                    linkElements.forEach(function(linkElement) {
-                        updateTitleInElement(linkElement, newTitle);
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+            if (data.success) {
+                var responseTitle = (data.note && data.note.heading) ? data.note.heading : headi;
+                handleSaveResponse(JSON.stringify({ date: new Date().toLocaleDateString(), title: responseTitle, original_title: headi }));
+
+                // Update linked notes in the list if any were updated
+                if (data.note && data.updated_linked_notes && data.updated_linked_notes.length > 0) {
+                    var newTitle = data.note.heading;
+                    data.updated_linked_notes.forEach(function (linkedNoteId) {
+                        var linkElements = document.querySelectorAll('.links_arbo_left[data-note-db-id="' + linkedNoteId + '"]');
+                        linkElements.forEach(function (linkElement) {
+                            updateTitleInElement(linkElement, newTitle);
+                        });
                     });
-                });
+                }
+
+                // Refresh tags count in sidebar after successful save
+                if (typeof window.refreshTagsCount === 'function') {
+                    window.refreshTagsCount();
+                }
+
+                // Refresh Kanban view if active
+                if (typeof window.refreshKanbanView === 'function') {
+                    window.refreshKanbanView();
+                }
+            } else {
+                // Show user-visible error notification
+                if (typeof showNotificationPopup === 'function') {
+                    showNotificationPopup(data.error || data.message || 'Error saving note', 'error');
+                }
             }
-            
-            // Refresh tags count in sidebar after successful save
-            if (typeof window.refreshTagsCount === 'function') {
-                window.refreshTagsCount();
-            }
-            
-            // Refresh Kanban view if active
-            if (typeof window.refreshKanbanView === 'function') {
-                window.refreshKanbanView();
-            }
-        } else {
-            // Show user-visible error notification
+        })
+        .catch(function (error) {
+            console.error('[Poznote Auto-Save] Network error:', error.message);
             if (typeof showNotificationPopup === 'function') {
-                showNotificationPopup(data.error || data.message || 'Error saving note', 'error');
+                showNotificationPopup('Network error: ' + error.message, 'error');
             }
-        }
-    })
-    .catch(function(error) {
-        console.error('[Poznote Auto-Save] Network error:', error.message);
-        if (typeof showNotificationPopup === 'function') {
-            showNotificationPopup('Network error: ' + error.message, 'error');
-        }
-    });
+        });
 }
 
 /**
@@ -265,40 +265,40 @@ function saveNoteToServer() {
 function handleSaveResponse(data) {
     var timeText = 'Saved today';
     var titleChanged = false;
-    
+
     // Get current title before processing response
     var elements = getNoteElements(noteid);
     var currentTitle = elements.title ? elements.title.value : '';
-    
+
     // Check if title changed from last saved version
     if (typeof lastSavedTitle !== 'undefined' && currentTitle !== lastSavedTitle) {
         titleChanged = true;
     }
-    
+
     try {
         var jsonData = JSON.parse(data);
-        
+
         // Handle error response
         if (jsonData.status === 'error') {
             console.error('[Poznote Auto-Save] Save error:', jsonData.message);
             return;
         }
-        
+
         // Handle success response with metadata
         if (jsonData.date && jsonData.title) {
             timeText = jsonData.date;
-            
+
             // Check if server modified the title for uniqueness
             if (elements.title && jsonData.title !== jsonData.original_title) {
                 elements.title.value = jsonData.title;
                 titleChanged = true;
             }
         }
-    } catch(e) {
+    } catch (e) {
         // Normal response (not JSON)
         timeText = (data === '1') ? 'Saved today' : data;
     }
-    
+
     // Update UI after successful save
     _updateUIAfterSave(timeText, titleChanged);
 }
@@ -311,11 +311,11 @@ function handleSaveResponse(data) {
  */
 function _updateUIAfterSave(timeText, titleChanged) {
     updateLastSavedTime(timeText);
-    
+
     if (titleChanged) {
         updateNoteTitleInLeftColumn();
     }
-    
+
     // Update last saved content for change detection FIRST (before hiding indicator)
     // to prevent race conditions where an event might re-trigger the indicator
     var elements = getNoteElements(noteid);
@@ -328,32 +328,32 @@ function _updateUIAfterSave(timeText, titleChanged) {
     if (elements.tags) {
         lastSavedTags = elements.tags.value;
     }
-    
+
     // Clear draft from localStorage
     if (typeof window.clearDraft === 'function') {
         window.clearDraft(noteid);
     }
-    
+
     // Mark note as saved (remove from pending refresh list)
     if (typeof notesNeedingRefresh !== 'undefined') {
         notesNeedingRefresh.delete(String(noteid));
     }
-    
+
     updateConnectionStatus(true);
-    
+
     // NOW hide save indicator after all state is updated
     var saveIndicator = document.getElementById('save-indicator');
     if (saveIndicator) {
         saveIndicator.style.display = 'none';
     }
-    
+
     // Remove red dot from page title
     if (document.title.startsWith('🔴 ')) {
         document.title = document.title.substring(3);
     } else if (document.title.startsWith('🔴')) {
         document.title = document.title.substring(2);
     }
-    
+
     // Refresh tags count in sidebar after successful save
     if (typeof window.refreshTagsCount === 'function') {
         window.refreshTagsCount();
@@ -376,7 +376,7 @@ function deleteNote(noteId) {
     let isLinkedNote = false;
     let linkedNoteDbId = null;
     let linkedNoteTargetId = null;
-    
+
     for (let link of selectedLinks) {
         const linkType = link.getAttribute('data-note-type');
         if (linkType === 'linked') {
@@ -386,20 +386,20 @@ function deleteNote(noteId) {
             break;
         }
     }
-    
+
     // If we clicked on a linked note, show the special modal
     if (isLinkedNote && linkedNoteDbId) {
         showDeleteLinkedNoteModal(linkedNoteDbId, linkedNoteTargetId);
         return;
     }
-    
+
     // Also check if this is a linked note in the DOM (fallback for other cases)
     const noteCard = document.getElementById('note' + noteId);
     if (noteCard) {
         const noteEntry = noteCard.querySelector('.noteentry');
         const noteType = noteEntry ? noteEntry.getAttribute('data-note-type') : null;
         const linkedNoteId = noteEntry ? noteEntry.getAttribute('data-linked-note-id') : null;
-        
+
         // If this is a linked note (either by type or by having a linked_note_id), show the modal
         if (noteType === 'linked' || linkedNoteId) {
             // Show special modal for linked notes
@@ -407,36 +407,39 @@ function deleteNote(noteId) {
             return;
         }
     }
-    
+
     const workspace = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? pageWorkspace : null;
-    
+
     // Build query params for RESTful API
     let url = "/api/v1/notes/" + noteId + "?permanent=false";
     if (workspace) {
         url += "&workspace=" + encodeURIComponent(workspace);
     }
-    
+
     // Use RESTful API: DELETE /api/v1/notes/{id}
     fetch(url, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" }
     })
-    .then(function(response) { return response.json(); })
-    .then(function(data) {
-        if (data && data.success) {
-            redirectToWorkspace();
-            return;
-        }
-        
-        if (data && (data.error || data.message)) {
-            showNotificationPopup('Deletion error: ' + (data.error || data.message), 'error');
-        } else {
-            showNotificationPopup('Deletion error: Unknown error', 'error');
-        }
-    })
-    .catch(function(error) {
-        showNotificationPopup('Network error while deleting: ' + error.message, 'error');
-    });
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+            if (data && data.success) {
+                if (window.tabManager && typeof window.tabManager.closeTabByNoteId === 'function') {
+                    window.tabManager.closeTabByNoteId(noteId);
+                }
+                redirectToWorkspace();
+                return;
+            }
+
+            if (data && (data.error || data.message)) {
+                showNotificationPopup('Deletion error: ' + (data.error || data.message), 'error');
+            } else {
+                showNotificationPopup('Deletion error: Unknown error', 'error');
+            }
+        })
+        .catch(function (error) {
+            showNotificationPopup('Network error while deleting: ' + error.message, 'error');
+        });
 }
 
 /**
@@ -463,17 +466,17 @@ function redirectToWorkspace() {
  */
 function cleanSearchHighlightsFromElement(element) {
     if (!element) return "";
-    
+
     var clonedElement = element.cloneNode(true);
     var highlights = clonedElement.querySelectorAll('.search-highlight');
-    
+
     for (var i = 0; i < highlights.length; i++) {
         var highlight = highlights[i];
         var parent = highlight.parentNode;
         parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
         parent.normalize();
     }
-    
+
     return clonedElement.innerHTML;
 }
 
@@ -484,17 +487,17 @@ function cleanSearchHighlightsFromElement(element) {
  */
 function getTextContentFromElement(element) {
     if (!element) return "";
-    
+
     var clonedElement = element.cloneNode(true);
     var highlights = clonedElement.querySelectorAll('.search-highlight');
-    
+
     for (var i = 0; i < highlights.length; i++) {
         var highlight = highlights[i];
         var parent = highlight.parentNode;
         parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
         parent.normalize();
     }
-    
+
     return clonedElement.textContent || "";
 }
 
@@ -518,23 +521,23 @@ function updateLastSavedTime(timeText) {
  * Updates all instances of the current note in the UI
  */
 function updateNoteTitleInLeftColumn() {
-    if(noteid === 'search' || noteid === -1 || noteid === null || noteid === undefined) return;
-    
+    if (noteid === 'search' || noteid === -1 || noteid === null || noteid === undefined) return;
+
     var elements = getNoteElements(noteid);
     if (!elements.title) return;
-    
+
     // Get title using helper function (handles placeholder logic)
     var newTitle = _getNoteTitle(elements.title, 'Note sans titre').trim();
-    
+
     // Search elements to update
     var elementsToUpdate = [];
-    
+
     // Method 1: by data-note-db-id
     var noteLinksById = document.querySelectorAll('.links_arbo_left[data-note-db-id="' + noteid + '"]');
     for (var i = 0; i < noteLinksById.length; i++) {
         elementsToUpdate.push(noteLinksById[i]);
     }
-    
+
     // Method 2: selected notes (all instances of the same note)
     if (elementsToUpdate.length === 0) {
         var selectedNotes = document.querySelectorAll('.links_arbo_left.selected-note');
@@ -542,7 +545,7 @@ function updateNoteTitleInLeftColumn() {
             elementsToUpdate.push(selectedNotes[i]);
         }
     }
-    
+
     // Update all found elements
     for (var i = 0; i < elementsToUpdate.length; i++) {
         updateTitleInElement(elementsToUpdate[i], newTitle);
@@ -567,14 +570,14 @@ function updateTitleInElement(linkElement, newTitle) {
         } else {
             titleSpan.textContent = newTitle;
         }
-        
+
         var href = linkElement.getAttribute('href');
         if (href) {
             var url = new URL(href, window.location.origin);
             url.searchParams.set('note', newTitle);
             linkElement.setAttribute('href', url.toString());
         }
-        
+
         linkElement.setAttribute('data-note-id', newTitle);
     }
 }
@@ -618,45 +621,45 @@ function openNoteInNewTab(noteId) {
  */
 function fetchLinkedNoteTarget(linkedNoteId, modal, deleteTargetBtn) {
     const workspace = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? pageWorkspace : null;
-    
+
     let url = '/api/v1/notes/' + linkedNoteId;
     if (workspace) {
         url += '?workspace=' + encodeURIComponent(workspace);
     }
-    
+
     fetch(url, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
     })
-    .then(function(response) { return response.json(); })
-    .then(function(data) {
-        if (data && data.note && data.note.linked_note_id) {
-            modal.dataset.linkedNoteTargetId = data.note.linked_note_id;
-            if (deleteTargetBtn) {
-                deleteTargetBtn.disabled = false;
-                deleteTargetBtn.style.opacity = '1';
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+            if (data && data.note && data.note.linked_note_id) {
+                modal.dataset.linkedNoteTargetId = data.note.linked_note_id;
+                if (deleteTargetBtn) {
+                    deleteTargetBtn.disabled = false;
+                    deleteTargetBtn.style.opacity = '1';
+                }
+            } else {
+                // No target ID found - disable the button
+                delete modal.dataset.linkedNoteTargetId;
+                if (deleteTargetBtn) {
+                    deleteTargetBtn.disabled = true;
+                    deleteTargetBtn.style.opacity = '0.5';
+                }
+                console.error('Note does not have a linked_note_id:', data);
             }
-        } else {
-            // No target ID found - disable the button
+            modal.style.display = 'flex';
+        })
+        .catch(function (error) {
+            console.error('Error fetching linked note data:', error);
+            // Disable the button on error
             delete modal.dataset.linkedNoteTargetId;
             if (deleteTargetBtn) {
                 deleteTargetBtn.disabled = true;
                 deleteTargetBtn.style.opacity = '0.5';
             }
-            console.error('Note does not have a linked_note_id:', data);
-        }
-        modal.style.display = 'flex';
-    })
-    .catch(function(error) {
-        console.error('Error fetching linked note data:', error);
-        // Disable the button on error
-        delete modal.dataset.linkedNoteTargetId;
-        if (deleteTargetBtn) {
-            deleteTargetBtn.disabled = true;
-            deleteTargetBtn.style.opacity = '0.5';
-        }
-        modal.style.display = 'flex';
-    });
+            modal.style.display = 'flex';
+        });
 }
 
 /**
@@ -668,12 +671,12 @@ function fetchLinkedNoteTarget(linkedNoteId, modal, deleteTargetBtn) {
 function showDeleteLinkedNoteModal(linkedNoteId, targetId) {
     const modal = document.getElementById('deleteLinkedNoteModal');
     if (!modal) return;
-    
+
     // Store the note ID for later use
     modal.dataset.linkedNoteId = linkedNoteId;
-    
+
     let linkedNoteTargetId = targetId || null;
-    
+
     // If not provided, try to find it in the DOM
     if (!linkedNoteTargetId) {
         // Method 1: Try to get from the link in the sidebar by data-note-db-id
@@ -681,7 +684,7 @@ function showDeleteLinkedNoteModal(linkedNoteId, targetId) {
         if (linkByDbId) {
             linkedNoteTargetId = linkByDbId.getAttribute('data-linked-note-id');
         }
-        
+
         // Method 2: Try to get from the link in the sidebar by data-note-id
         if (!linkedNoteTargetId) {
             const linkByNoteId = document.querySelector('.links_arbo_left[data-note-id="' + linkedNoteId + '"]');
@@ -689,7 +692,7 @@ function showDeleteLinkedNoteModal(linkedNoteId, targetId) {
                 linkedNoteTargetId = linkByNoteId.getAttribute('data-linked-note-id');
             }
         }
-        
+
         // Method 3: Try to get from the currently loaded note entry
         if (!linkedNoteTargetId) {
             const noteEntry = document.getElementById('entry' + linkedNoteId);
@@ -697,7 +700,7 @@ function showDeleteLinkedNoteModal(linkedNoteId, targetId) {
                 linkedNoteTargetId = noteEntry.getAttribute('data-linked-note-id');
             }
         }
-        
+
         // Method 4: Try to get from the note card in DOM (for backward compatibility)
         if (!linkedNoteTargetId) {
             const noteCard = document.getElementById('note' + linkedNoteId);
@@ -707,7 +710,7 @@ function showDeleteLinkedNoteModal(linkedNoteId, targetId) {
             }
         }
     }
-    
+
     // Store the target ID if found
     const deleteTargetBtn = document.getElementById('deleteLinkedNoteAndTargetBtn');
     if (linkedNoteTargetId) {
@@ -730,33 +733,33 @@ function showDeleteLinkedNoteModal(linkedNoteId, targetId) {
  */
 function deleteLinkedNoteOnly(linkedNoteId) {
     const workspace = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? pageWorkspace : null;
-    
+
     let url = "/api/v1/notes/" + linkedNoteId + "?permanent=false";
     if (workspace) {
         url += "&workspace=" + encodeURIComponent(workspace);
     }
-    
+
     fetch(url, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" }
     })
-    .then(function(response) { return response.json(); })
-    .then(function(data) {
-        if (data && data.success) {
-            closeModal('deleteLinkedNoteModal');
-            redirectToWorkspace();
-            return;
-        }
-        
-        if (data && (data.error || data.message)) {
-            showNotificationPopup('Deletion error: ' + (data.error || data.message), 'error');
-        } else {
-            showNotificationPopup('Deletion error: Unknown error', 'error');
-        }
-    })
-    .catch(function(error) {
-        showNotificationPopup('Network error while deleting: ' + error.message, 'error');
-    });
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+            if (data && data.success) {
+                closeModal('deleteLinkedNoteModal');
+                redirectToWorkspace();
+                return;
+            }
+
+            if (data && (data.error || data.message)) {
+                showNotificationPopup('Deletion error: ' + (data.error || data.message), 'error');
+            } else {
+                showNotificationPopup('Deletion error: Unknown error', 'error');
+            }
+        })
+        .catch(function (error) {
+            showNotificationPopup('Network error while deleting: ' + error.message, 'error');
+        });
 }
 
 /**
@@ -767,29 +770,32 @@ function deleteLinkedNoteOnly(linkedNoteId) {
  */
 function deleteLinkedNoteAndTarget(linkedNoteId, targetNoteId) {
     const workspace = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? pageWorkspace : null;
-    
+
     // Delete the target note - this will automatically delete all linked notes that reference it
     let url = "/api/v1/notes/" + targetNoteId + "?permanent=false";
     if (workspace) {
         url += "&workspace=" + encodeURIComponent(workspace);
     }
-    
+
     fetch(url, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" }
     })
-    .then(function(response) { return response.json(); })
-    .then(function(data) {
-        if (data && data.success) {
-            closeModal('deleteLinkedNoteModal');
-            redirectToWorkspace();
-        } else {
-            throw new Error(data.error || data.message || 'Unknown error');
-        }
-    })
-    .catch(function(error) {
-        showNotificationPopup('Deletion error: ' + error.message, 'error');
-    });
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+            if (data && data.success) {
+                if (window.tabManager && typeof window.tabManager.closeTabByNoteId === 'function') {
+                    window.tabManager.closeTabByNoteId(targetNoteId);
+                }
+                closeModal('deleteLinkedNoteModal');
+                redirectToWorkspace();
+            } else {
+                throw new Error(data.error || data.message || 'Unknown error');
+            }
+        })
+        .catch(function (error) {
+            showNotificationPopup('Deletion error: ' + error.message, 'error');
+        });
 }
 
 // ============================================================
@@ -805,12 +811,12 @@ window.deleteLinkedNoteOnly = deleteLinkedNoteOnly;
 window.deleteLinkedNoteAndTarget = deleteLinkedNoteAndTarget;
 
 // Event listeners for delete linked note modal
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const deleteLinkedNoteOnlyBtn = document.getElementById('deleteLinkedNoteOnlyBtn');
     const deleteLinkedNoteAndTargetBtn = document.getElementById('deleteLinkedNoteAndTargetBtn');
 
     if (deleteLinkedNoteOnlyBtn) {
-        deleteLinkedNoteOnlyBtn.addEventListener('click', function() {
+        deleteLinkedNoteOnlyBtn.addEventListener('click', function () {
             const modal = document.getElementById('deleteLinkedNoteModal');
             const linkedNoteId = modal.dataset.linkedNoteId;
             if (linkedNoteId) {
@@ -820,21 +826,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (deleteLinkedNoteAndTargetBtn) {
-        deleteLinkedNoteAndTargetBtn.addEventListener('click', function() {
+        deleteLinkedNoteAndTargetBtn.addEventListener('click', function () {
             const modal = document.getElementById('deleteLinkedNoteModal');
             const linkedNoteId = modal.dataset.linkedNoteId;
             const linkedNoteTargetId = modal.dataset.linkedNoteTargetId;
-            
+
             if (!linkedNoteId) {
                 showNotificationPopup('Error: Linked note ID not found', 'error');
                 return;
             }
-            
+
             if (!linkedNoteTargetId) {
                 showNotificationPopup('Error: Target note ID not found. Cannot delete target note.', 'error');
                 return;
             }
-            
+
             deleteLinkedNoteAndTarget(linkedNoteId, linkedNoteTargetId);
         });
     }

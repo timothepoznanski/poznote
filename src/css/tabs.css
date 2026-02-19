@@ -158,7 +158,8 @@
     align-items: center;
 }
 
-.note-actions-toggle {
+.note-actions-toggle,
+.note-actions-item {
     background: none;
     border: none;
     cursor: pointer;
@@ -175,11 +176,13 @@
 }
 
 .note-list-item:hover .note-actions-toggle,
+.note-list-item:hover .note-actions-item,
 .note-actions-toggle.open {
     display: flex;
 }
 
-.note-actions-toggle:hover {
+.note-actions-toggle:hover,
+.note-actions-item:hover {
     background: rgba(107, 114, 128, 0.12);
     color: #374151;
 }
@@ -246,12 +249,14 @@
 
 /* ── Note actions dark mode ── */
 
-[data-theme="dark"] .note-actions-toggle {
+[data-theme="dark"] .note-actions-toggle,
+[data-theme="dark"] .note-actions-item {
     color: #555;
 }
 
 [data-theme="dark"] .note-actions-toggle:hover,
-[data-theme="dark"] .note-actions-toggle.open {
+[data-theme="dark"] .note-actions-toggle.open,
+[data-theme="dark"] .note-actions-item:hover {
     background: rgba(255, 255, 255, 0.08);
     color: #aaa;
 }
