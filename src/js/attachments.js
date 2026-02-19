@@ -8,34 +8,34 @@
  */
 function convertBase64ImagesToAttachments(noteEntry) {
     if (!noteEntry) return;
-    
+
     // Only process HTML notes (not markdown, not excalidraw)
     var noteType = noteEntry.getAttribute('data-note-type');
     if (noteType === 'markdown' || noteType === 'excalidraw' || noteType === 'tasklist') {
         return;
     }
-    
+
     var noteId = noteEntry.id ? noteEntry.id.replace('entry', '') : null;
     if (!noteId || noteId === '' || noteId === 'search') return;
-    
+
     // Find all base64 images in the note
     var base64Images = noteEntry.querySelectorAll('img[src^="data:image/"]');
     if (base64Images.length === 0) return;
-    
+
     // Convert each image
     var conversionPromises = [];
-    
-    base64Images.forEach(function(img, index) {
+
+    base64Images.forEach(function (img, index) {
         var src = img.getAttribute('src');
         if (!src || !src.startsWith('data:image/')) return;
-        
+
         // Parse the data URL
         var matches = src.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
         if (!matches) return;
-        
+
         var mimeSubtype = matches[1];
         var base64Data = matches[2];
-        
+
         // Convert base64 to blob
         try {
             var byteCharacters = atob(base64Data);
@@ -46,23 +46,23 @@ function convertBase64ImagesToAttachments(noteEntry) {
             var byteArray = new Uint8Array(byteNumbers);
             var mimeType = 'image/' + (mimeSubtype === 'svg+xml' ? 'svg+xml' : mimeSubtype);
             var blob = new Blob([byteArray], { type: mimeType });
-            
+
             // Determine file extension
             var extensionMap = {
                 'jpeg': 'jpg', 'png': 'png', 'gif': 'gif',
                 'webp': 'webp', 'svg+xml': 'svg', 'bmp': 'bmp'
             };
             var extension = extensionMap[mimeSubtype.toLowerCase()] || 'png';
-            
+
             // Create a File object
             var altText = img.getAttribute('alt') || '';
             var fileName = altText ? altText + '.' + extension : 'image_' + Date.now() + '_' + index + '.' + extension;
             var file = new File([blob], fileName, { type: mimeType });
-            
+
             // Add a loading indicator to the image
             img.style.opacity = '0.5';
             img.style.border = '2px dashed #ccc';
-            
+
             // Upload as attachment
             var formData = new FormData();
             formData.append('note_id', noteId);
@@ -70,58 +70,58 @@ function convertBase64ImagesToAttachments(noteEntry) {
             if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) {
                 formData.append('workspace', selectedWorkspace);
             }
-            
+
             var promise = fetch('/api/v1/notes/' + noteId + '/attachments', {
                 method: 'POST',
                 body: formData
             })
-            .then(function(response) { return response.json(); })
-            .then(function(data) {
-                if (data.success) {
-                    // Replace the src with the attachment URL
-                    var newSrc = '/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id;
-                    img.setAttribute('src', newSrc);
-                    img.setAttribute('loading', 'lazy');
-                    img.setAttribute('decoding', 'async');
-                    img.style.opacity = '';
-                    img.style.border = '';
-                    return true;
-                } else {
+                .then(function (response) { return response.json(); })
+                .then(function (data) {
+                    if (data.success) {
+                        // Replace the src with the attachment URL
+                        var newSrc = '/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id;
+                        img.setAttribute('src', newSrc);
+                        img.setAttribute('loading', 'lazy');
+                        img.setAttribute('decoding', 'async');
+                        img.style.opacity = '';
+                        img.style.border = '';
+                        return true;
+                    } else {
+                        img.style.opacity = '';
+                        img.style.border = '';
+                        return false;
+                    }
+                })
+                .catch(function (error) {
                     img.style.opacity = '';
                     img.style.border = '';
                     return false;
-                }
-            })
-            .catch(function(error) {
-                img.style.opacity = '';
-                img.style.border = '';
-                return false;
-            });
-            
+                });
+
             conversionPromises.push(promise);
         } catch (e) {
             // Silently continue if error processing image
         }
     });
-    
+
     // After all conversions complete, save the note
     if (conversionPromises.length > 0) {
-        Promise.all(conversionPromises).then(function(results) {
-            var successCount = results.filter(function(r) { return r === true; }).length;
+        Promise.all(conversionPromises).then(function (results) {
+            var successCount = results.filter(function (r) { return r === true; }).length;
             if (successCount > 0) {
                 // Update attachment count in menu
                 if (typeof updateAttachmentCountInMenu === 'function') {
                     updateAttachmentCountInMenu(noteId);
                 }
-                
+
                 // Mark note as modified and save
                 window.noteid = noteId;
                 if (typeof window.markNoteAsModified === 'function') {
                     window.markNoteAsModified();
                 }
-                
+
                 // Trigger save after a short delay
-                setTimeout(function() {
+                setTimeout(function () {
                     if (typeof saveNoteToServer === 'function') {
                         saveNoteToServer();
                     } else if (typeof window.saveNoteImmediately === 'function') {
@@ -140,7 +140,7 @@ window.convertBase64ImagesToAttachments = convertBase64ImagesToAttachments;
  * Use global translation function from globals.js
  * This avoids code duplication across files
  */
-var tr = window.t || function(key, vars, fallback) {
+var tr = window.t || function (key, vars, fallback) {
     return fallback || key;
 };
 
@@ -274,6 +274,7 @@ function loadAttachments(noteId) {
 
 function displayAttachments(attachments) {
     var container = document.getElementById('attachmentsList');
+    if (!container) return;
 
     if (attachments.length === 0) {
         container.innerHTML = '<p>' + tr('attachments.empty', {}, 'No attachments') + '</p>';
@@ -317,14 +318,16 @@ function downloadAttachment(attachmentId, noteId) {
     window.open('/api/v1/notes/' + noteIdToUse + '/attachments/' + attachmentId, '_blank');
 }
 
-function deleteAttachment(attachmentId) {
+function deleteAttachment(attachmentId, noteId) {
     // NOTE: confirmation removed - delete immediately when called
-    if (!currentNoteIdForAttachments) {
+    var noteIdToUse = noteId || currentNoteIdForAttachments;
+
+    if (!noteIdToUse) {
         showNotificationPopup(tr('attachments.errors.no_note_selected', {}, 'No note selected'), 'error');
         return;
     }
 
-    fetch('/api/v1/notes/' + currentNoteIdForAttachments + '/attachments/' + attachmentId, {
+    fetch('/api/v1/notes/' + noteIdToUse + '/attachments/' + attachmentId, {
         method: 'DELETE',
         headers: { 'Accept': 'application/json' },
         credentials: 'same-origin'
@@ -332,8 +335,8 @@ function deleteAttachment(attachmentId) {
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data.success) {
-                loadAttachments(currentNoteIdForAttachments);
-                updateAttachmentCountInMenu(currentNoteIdForAttachments);
+                loadAttachments(noteIdToUse);
+                updateAttachmentCountInMenu(noteIdToUse);
             } else {
                 showNotificationPopup(tr('attachments.errors.deletion_failed', { error: data.message }, 'Deletion failed: {{error}}'), 'error');
             }
@@ -400,14 +403,14 @@ function updateAttachmentCountInMenu(noteId) {
                     if (hasAttachments && data.attachments && data.attachments.length > 0) {
                         // Check if setting to hide inline images is enabled
                         var hideInlineImages = document.body.classList.contains('hide-inline-attachment-images');
-                        
+
                         // Get the note content to check for inline images
                         var noteContent = '';
                         var noteEntry = document.getElementById('entry' + noteId);
                         if (noteEntry) {
                             noteContent = noteEntry.innerHTML || '';
                         }
-                        
+
                         // Create or update the attachments row
                         if (!existingAttachmentsRow) {
                             // Create new attachments row
@@ -442,7 +445,7 @@ function updateAttachmentCountInMenu(noteId) {
                                 if (hideInlineImages) {
                                     var mimeType = attachment.mime_type || '';
                                     var isImage = mimeType.startsWith('image/');
-                                    
+
                                     // Fallback to extension check
                                     if (!isImage && attachment.original_filename) {
                                         var ext = attachment.original_filename.split('.').pop().toLowerCase();
@@ -452,11 +455,11 @@ function updateAttachmentCountInMenu(noteId) {
                                     if (isImage) {
                                         // Look for the attachment ID specifically in the content
                                         var pattern = 'attachments/' + attachment.id;
-                                        isActuallyInline = noteContent.indexOf(pattern) !== -1 || 
-                                                           noteContent.indexOf(encodeURIComponent(pattern)) !== -1;
+                                        isActuallyInline = noteContent.indexOf(pattern) !== -1 ||
+                                            noteContent.indexOf(encodeURIComponent(pattern)) !== -1;
                                     }
                                 }
-                                
+
                                 var safeFilename = attachment.original_filename.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
                                 var dlTitle = tr('attachments.actions.download', { filename: safeFilename }, 'Download {{filename}}');
                                 var linkStyle = isActuallyInline ? ' style="display: none;"' : '';
@@ -469,7 +472,7 @@ function updateAttachmentCountInMenu(noteId) {
                         attachmentsHtml += '</span>';
 
                         existingAttachmentsRow.innerHTML = attachmentsHtml;
-                        
+
                         // Hide the entire row if no visible links
                         if (hideInlineImages && visibleLinksCount === 0) {
                             existingAttachmentsRow.style.display = 'none';
@@ -693,7 +696,7 @@ function replaceLoadingText(oldText, newText, dropTarget) {
 function handleHTMLImageInsert(file, dropTarget) {
     // Get the note ID from the drop target
     var noteId = dropTarget.id.replace('entry', '');
-    
+
     if (!noteId || noteId === '' || noteId === 'search') {
         if (typeof showNotificationPopup === 'function') {
             showNotificationPopup('Cannot upload image: note ID not found', 'error');
@@ -703,7 +706,7 @@ function handleHTMLImageInsert(file, dropTarget) {
 
     // Insert a placeholder while uploading
     var placeholderHtml = '<img src="" alt="' + tr('attachments.upload.uploading', {}, 'Uploading...') + '" class="image-uploading-placeholder" style="opacity: 0.5; min-width: 100px; min-height: 100px; background: #f0f0f0; border: 2px dashed #ccc;" />';
-    
+
     var sel = window.getSelection();
     var inserted = false;
     var placeholderImg = null;
@@ -738,72 +741,72 @@ function handleHTMLImageInsert(file, dropTarget) {
         method: 'POST',
         body: formData
     })
-    .then(function(response) {
-        return response.json();
-    })
-    .then(function(data) {
-        if (data.success) {
-            // Replace placeholder with actual image
-            var imgSrc = '/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id;
-            
-            if (placeholderImg) {
-                placeholderImg.src = imgSrc;
-                placeholderImg.alt = file.name;
-                placeholderImg.classList.remove('image-uploading-placeholder');
-                placeholderImg.style.opacity = '';
-                placeholderImg.style.minWidth = '';
-                placeholderImg.style.minHeight = '';
-                placeholderImg.style.background = '';
-                placeholderImg.style.border = '';
-                placeholderImg.setAttribute('loading', 'lazy');
-                placeholderImg.setAttribute('decoding', 'async');
-            }
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            if (data.success) {
+                // Replace placeholder with actual image
+                var imgSrc = '/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id;
 
-            // Update the global noteid to the target note for proper saving
-            window.noteid = noteId;
-
-            // Trigger automatic save after image insertion
-            if (typeof window.markNoteAsModified === 'function') {
-                window.markNoteAsModified();
-            }
-
-            // Re-initialize image click handlers for the newly inserted image
-            if (typeof reinitializeImageClickHandlers === 'function') {
-                setTimeout(function() {
-                    reinitializeImageClickHandlers();
-                }, 50);
-            }
-
-            // Update attachment count in menu
-            updateAttachmentCountInMenu(noteId);
-
-            // Save after a short delay
-            setTimeout(function() {
-                if (typeof saveNoteToServer === 'function') {
-                    saveNoteToServer();
-                } else if (typeof window.saveNoteImmediately === 'function') {
-                    window.saveNoteImmediately();
+                if (placeholderImg) {
+                    placeholderImg.src = imgSrc;
+                    placeholderImg.alt = file.name;
+                    placeholderImg.classList.remove('image-uploading-placeholder');
+                    placeholderImg.style.opacity = '';
+                    placeholderImg.style.minWidth = '';
+                    placeholderImg.style.minHeight = '';
+                    placeholderImg.style.background = '';
+                    placeholderImg.style.border = '';
+                    placeholderImg.setAttribute('loading', 'lazy');
+                    placeholderImg.setAttribute('decoding', 'async');
                 }
-            }, 100);
-        } else {
+
+                // Update the global noteid to the target note for proper saving
+                window.noteid = noteId;
+
+                // Trigger automatic save after image insertion
+                if (typeof window.markNoteAsModified === 'function') {
+                    window.markNoteAsModified();
+                }
+
+                // Re-initialize image click handlers for the newly inserted image
+                if (typeof reinitializeImageClickHandlers === 'function') {
+                    setTimeout(function () {
+                        reinitializeImageClickHandlers();
+                    }, 50);
+                }
+
+                // Update attachment count in menu
+                updateAttachmentCountInMenu(noteId);
+
+                // Save after a short delay
+                setTimeout(function () {
+                    if (typeof saveNoteToServer === 'function') {
+                        saveNoteToServer();
+                    } else if (typeof window.saveNoteImmediately === 'function') {
+                        window.saveNoteImmediately();
+                    }
+                }, 100);
+            } else {
+                // Remove placeholder on error
+                if (placeholderImg) {
+                    placeholderImg.remove();
+                }
+                if (typeof showNotificationPopup === 'function') {
+                    showNotificationPopup('Upload failed: ' + data.message, 'error');
+                }
+            }
+        })
+        .catch(function (error) {
             // Remove placeholder on error
             if (placeholderImg) {
                 placeholderImg.remove();
             }
             if (typeof showNotificationPopup === 'function') {
-                showNotificationPopup('Upload failed: ' + data.message, 'error');
+                showNotificationPopup('Upload failed: ' + error.message, 'error');
             }
-        }
-    })
-    .catch(function(error) {
-        // Remove placeholder on error
-        if (placeholderImg) {
-            placeholderImg.remove();
-        }
-        if (typeof showNotificationPopup === 'function') {
-            showNotificationPopup('Upload failed: ' + error.message, 'error');
-        }
-    });
+        });
 }
 
 function insertHTMLAtSelection(html) {
