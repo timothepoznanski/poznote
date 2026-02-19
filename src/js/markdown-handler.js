@@ -19,47 +19,48 @@ function normalizeContentEditableText(element) {
     // Try to walk through the DOM structure to better preserve formatting
     if (element.childNodes.length > 0) {
         var parts = [];
+
         for (var i = 0; i < element.childNodes.length; i++) {
             var node = element.childNodes[i];
+
             if (node.nodeType === Node.TEXT_NODE) {
                 // Preserve newlines that are already in the text node
-                // This is important for pasted content on macOS which may contain literal \n characters
                 var textContent = node.textContent || node.nodeValue || '';
                 parts.push(textContent);
             } else if (node.nodeType === Node.ELEMENT_NODE) {
-                if (node.tagName === 'DIV' || node.tagName === 'P' || node.tagName === 'LI' ||
-                    node.tagName === 'H1' || node.tagName === 'H2' || node.tagName === 'H3' ||
-                    node.tagName === 'H4' || node.tagName === 'H5' || node.tagName === 'H6') {
-                    // Block elements usually represent a line
+                var tagName = node.tagName;
+
+                if (['DIV', 'P', 'LI', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'].indexOf(tagName) !== -1) {
+                    // Block elements
                     var divText = node.textContent || '';
-                    if (divText === '' && node.querySelector('br')) {
-                        // Empty block with BR = empty line
-                        parts.push('');
+                    var isEmpty = (divText === '' && node.querySelector('br'));
+
+                    // Ensure preceding newline check
+                    if (parts.length > 0) {
+                        var lastPart = parts[parts.length - 1];
+                        if (lastPart && !lastPart.endsWith('\n')) {
+                            parts.push('\n');
+                        }
+                    }
+
+                    if (isEmpty) {
+                        parts.push('\n');
                     } else {
                         parts.push(divText);
+                        parts.push('\n');
                     }
-                } else if (node.tagName === 'BR') {
+                } else if (tagName === 'BR') {
                     // BR = line break
-                    parts.push('');
+                    parts.push('\n');
                 } else {
-                    // Other elements, get their text content
+                    // Other inline elements, get their text content
                     parts.push(node.textContent || '');
                 }
             }
         }
 
-        // Join parts, ensuring exactly one newline between parts
-        content = '';
-        for (var j = 0; j < parts.length; j++) {
-            var part = parts[j];
-            if (j > 0) {
-                // If the content doesn't already end with a newline, add one
-                if (!content.endsWith('\n')) {
-                    content += '\n';
-                }
-            }
-            content += part;
-        }
+        // Join parts simply - logic is now handled during pushed parts
+        content = parts.join('');
     } else {
         // Fallback to innerText/textContent
         content = element.innerText || element.textContent || '';
@@ -68,9 +69,8 @@ function normalizeContentEditableText(element) {
     // Handle different line ending styles
     content = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
-    // Fix excessive blank lines (but preserve intentional double line breaks)
-    // Replace 3+ consecutive newlines with exactly 2 newlines
-    content = content.replace(/\n{3,}/g, '\n\n');
+    // Fix excessive blank lines logic REMOVED to preserve user's intentional empty lines
+    // content = content.replace(/\n{3,}/g, '\n\n');
 
     // Remove trailing newlines (but preserve intentional spacing)
     content = content.replace(/\n+$/, '');
