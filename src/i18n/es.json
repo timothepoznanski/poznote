@@ -429,7 +429,8 @@
             "kanban_on_folder_click": "Abrir vista Kanban al hacer clic en la carpeta",
             "index_icon_scale": "Escalado de iconos del índice",
             "note_content_width": "Ancho del contenido de la nota",
-            "show_inline_attachment_images": "Mostrar archivos adjuntos de imagen"
+            "show_inline_attachment_images": "Mostrar archivos adjuntos de imagen",
+            "enable_internal_tabs": "Activar pestañas internas"
         },
         "badges": {
             "font_size_default": "predeterminado ({{size}}px)",
