@@ -298,7 +298,10 @@ $body_classes = trim($extra_body_classes);
     </div>
     
     <!-- Global error handler (external for CSP compliance) -->
-    <script>window.POZNOTE_CONFIG = { enableInternalTabs: <?php echo ($settings['enable_internal_tabs'] === '1' || $settings['enable_internal_tabs'] === 'true') ? 'true' : 'false'; ?> };</script>
+    <script>window.POZNOTE_CONFIG = { 
+        enableInternalTabs: <?php echo ($settings['enable_internal_tabs'] === '1' || $settings['enable_internal_tabs'] === 'true') ? 'true' : 'false'; ?>,
+        gitSyncAutoPush: <?php echo ($showGitSync && $gitSync->isAutoPushEnabled()) ? 'true' : 'false'; ?>
+    };</script>
     <script src="js/error-handler.js?v=<?php echo $v; ?>"></script>
 
     <!-- Workspace data for JavaScript (CSP compliant) -->

@@ -97,7 +97,7 @@ function setupPageUnloadWarning() {
             e.preventDefault();
             e.returnValue = message;
             return message;
-        } else if (isOnline && needsGitPush && currentNoteId && currentNoteId !== -1 && currentNoteId !== 'search') {
+        } else if (isOnline && needsGitPush && (window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.gitSyncAutoPush === true) && currentNoteId && currentNoteId !== -1 && currentNoteId !== 'search') {
             // No unsaved UI changes, but Git push is pending
             try {
                 emergencySave(currentNoteId);
@@ -120,7 +120,7 @@ function setupPageUnloadWarning() {
                     console.error('[Poznote Auto-Save] Emergency save via pagehide failed:', err);
                 }
             }
-        } else if (isOnline && needsGitPush && currentNoteId && currentNoteId !== -1 && currentNoteId !== 'search') {
+        } else if (isOnline && needsGitPush && (window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.gitSyncAutoPush === true) && currentNoteId && currentNoteId !== -1 && currentNoteId !== 'search') {
             // No unsaved UI changes, but Git push is pending
             try {
                 emergencySave(currentNoteId);
@@ -144,7 +144,7 @@ function setupPageUnloadWarning() {
                         console.error('[Poznote Auto-Save] Emergency save via visibilitychange failed:', err);
                     }
                 }
-            } else if (isOnline && needsGitPush && currentNoteId && currentNoteId !== -1 && currentNoteId !== 'search') {
+            } else if (isOnline && needsGitPush && (window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.gitSyncAutoPush === true) && currentNoteId && currentNoteId !== -1 && currentNoteId !== 'search') {
                 // No unsaved UI changes, but Git push is pending
                 try {
                     emergencySave(currentNoteId);
@@ -483,6 +483,8 @@ function emergencySave(noteId) {
         }
     }
 
+    const gitPushRequested = needsGitPush && (window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.gitSyncAutoPush === true);
+
     const updates = {
         heading: headi,
         content: ent,
@@ -490,13 +492,11 @@ function emergencySave(noteId) {
         folder: folder,
         folder_id: folder_id,
         workspace: (window.selectedWorkspace || getSelectedWorkspace()),
-        git_push: needsGitPush // Push only if changes were made since load
+        git_push: gitPushRequested
     };
 
-    // Capture the flag value used in this request, then reset it optimistically
-    // so that a concurrent regular save doesn't also trigger a second push.
-    const gitPushRequested = needsGitPush;
-    if (gitPushRequested) {
+    // Reset the flag optimistically if a push was requested
+    if (needsGitPush) {
         needsGitPush = false;
     }
 
