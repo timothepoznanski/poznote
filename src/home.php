@@ -535,7 +535,7 @@ try {
                         </div>
                         <div class="home-card-content">
                             <span class="home-card-title"><?php echo t_h('git_sync.actions.push.button', $gitProviderParams, 'Push'); ?></span>
-                            <span class="home-card-count">Workspace: <?php echo htmlspecialchars($pageWorkspace ?: 'All'); ?></span>
+                            <span class="home-card-count"><?php echo htmlspecialchars(getGitProviderName()); ?></span>
                         </div>
                     </form>
 
@@ -548,7 +548,7 @@ try {
                         </div>
                         <div class="home-card-content">
                             <span class="home-card-title"><?php echo t_h('git_sync.actions.pull.button', $gitProviderParams, 'Pull'); ?></span>
-                            <span class="home-card-count">Workspace: <?php echo htmlspecialchars($pageWorkspace ?: 'All'); ?></span>
+                            <span class="home-card-count"><?php echo htmlspecialchars(getGitProviderName()); ?></span>
                         </div>
                     </form>
                 <?php else: ?>

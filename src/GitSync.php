@@ -612,11 +612,26 @@ class GitSync {
                             $metadata = $parsed; // legacy flat format
                         }
                         $results['debug'][] = 'Loaded metadata.json (' . count($metadata) . ' notes, ' . count($foldersSource) . ' folders)';
+
+                        // ── 2d. Ensure workspaces exist ──
+                        $workspacesToEnsure = ['Poznote']; // Always ensure default
+                        foreach ($metadata as $m) if (isset($m['workspace'])) $workspacesToEnsure[] = $m['workspace'];
+                        foreach ($foldersSource as $f) if (isset($f['workspace'])) $workspacesToEnsure[] = $f['workspace'];
+                        $workspacesToEnsure = array_unique(array_filter($workspacesToEnsure));
+                        
+                        foreach ($workspacesToEnsure as $wsName) {
+                            $wsStmt = $this->con->prepare('INSERT OR IGNORE INTO workspaces (name) VALUES (?)');
+                            $wsStmt->execute([$wsName]);
+                            if ($wsStmt->rowCount() > 0) {
+                                $results['debug'][] = "  Workspace '{$wsName}' → created";
+                            }
+                        }
                     }
                 }
             }
 
             // ── 2c. Recreate folders (parents before children) ──
+            $folderIdMap = []; // Map remote folder ID to local folder ID
             if (!empty($foldersSource)) {
                 // Insert in multiple passes: root folders first, then children
                 $toInsert = $foldersSource;
@@ -624,27 +639,76 @@ class GitSync {
                 while (!empty($toInsert) && $maxPasses-- > 0) {
                     $remaining = [];
                     foreach ($toInsert as $folder) {
-                        // If it has a parent, make sure the parent exists first
-                        if ($folder['parent_id'] !== null) {
+                        $remoteId = (int)$folder['id'];
+                        
+                        // Resolve parent ID if it was mapped from a different remote ID
+                        $parentId = $folder['parent_id'] !== null ? (int)$folder['parent_id'] : null;
+                        if ($parentId !== null && isset($folderIdMap[$parentId])) {
+                            $parentId = $folderIdMap[$parentId];
+                        }
+
+                        // Check if this folder already exists locally
+                        $existingId = null;
+                        
+                        // Try by ID first
+                        $chk = $this->con->prepare('SELECT id FROM folders WHERE id = ?');
+                        $chk->execute([$remoteId]);
+                        $res = $chk->fetch();
+                        if ($res) {
+                            $existingId = (int)$res['id'];
+                        } else {
+                            // Try by Name/Workspace/resolved Parent to avoid duplicate names
+                            $chk = $this->con->prepare('SELECT id FROM folders WHERE name = ? AND workspace = ? AND (parent_id = ? OR (parent_id IS NULL AND ? IS NULL))');
+                            $chk->execute([$folder['name'], $folder['workspace'] ?? 'Poznote', $parentId, $parentId]);
+                            $res = $chk->fetch();
+                            if ($res) $existingId = (int)$res['id'];
+                        }
+
+                        if ($existingId) {
+                            $folderIdMap[$remoteId] = $existingId;
+                            $results['debug'][] = "  Folder #{$remoteId} '{$folder['name']}' → already exists as #{$existingId}";
+                            continue;
+                        }
+
+                        // Parent must exist locally before we can insert a child folder
+                        if ($parentId !== null) {
                             $chk = $this->con->prepare('SELECT id FROM folders WHERE id = ?');
-                            $chk->execute([$folder['parent_id']]);
+                            $chk->execute([$parentId]);
                             if (!$chk->fetch()) {
-                                $remaining[] = $folder; // parent not yet inserted, retry later
+                                $remaining[] = $folder; // Wait for parent in next pass
                                 continue;
                             }
                         }
-                        // INSERT OR IGNORE preserves existing folders
-                        $this->con->prepare(
-                            'INSERT OR IGNORE INTO folders (id, name, workspace, parent_id, icon, icon_color) VALUES (?, ?, ?, ?, ?, ?)'
-                        )->execute([
-                            $folder['id'],
-                            $folder['name'],
-                            $folder['workspace'] ?? 'Poznote',
-                            $folder['parent_id'],
-                            $folder['icon'],
-                            $folder['icon_color'],
-                        ]);
-                        $results['debug'][] = "  Folder #{$folder['id']} '{$folder['name']}' → restored";
+
+                        // Insert new folder with explicit ID if available, fallback to auto-increment
+                        try {
+                            $this->con->prepare(
+                                'INSERT INTO folders (id, name, workspace, parent_id, icon, icon_color) VALUES (?, ?, ?, ?, ?, ?)'
+                            )->execute([
+                                $remoteId,
+                                $folder['name'],
+                                $folder['workspace'] ?? 'Poznote',
+                                $parentId,
+                                $folder['icon'] ?? null,
+                                $folder['icon_color'] ?? null,
+                            ]);
+                            $folderIdMap[$remoteId] = $remoteId;
+                            $results['debug'][] = "  Folder #{$remoteId} '{$folder['name']}' → restored";
+                        } catch (Exception $e) {
+                            // If explicit ID is taken (ID conflict but name mismatch), let SQLite choose a new ID
+                            $this->con->prepare(
+                                'INSERT INTO folders (name, workspace, parent_id, icon, icon_color) VALUES (?, ?, ?, ?, ?)'
+                            )->execute([
+                                $folder['name'],
+                                $folder['workspace'] ?? 'Poznote',
+                                $parentId,
+                                $folder['icon'] ?? null,
+                                $folder['icon_color'] ?? null,
+                            ]);
+                            $newId = (int)$this->con->lastInsertId();
+                            $folderIdMap[$remoteId] = $newId;
+                            $results['debug'][] = "  Folder #{$remoteId} '{$folder['name']}' → restored as #{$newId} (ID was taken)";
+                        }
                     }
                     $toInsert = $remaining;
                 }
@@ -683,7 +747,29 @@ class GitSync {
                     file_put_contents($entriesPath . '/' . $filename, $content);
 
                     // Upsert DB
-                    $meta      = $metadata[(string) $noteId] ?? [];
+                    $meta = $metadata[(string) $noteId] ?? [];
+
+                    // Robust folder_id resolution: ensure the folder exists locally
+                    if (isset($meta['folder_id']) && $meta['folder_id'] !== null) {
+                        $remoteFid = (int)$meta['folder_id'];
+                        if (isset($folderIdMap[$remoteFid])) {
+                            // Map remote ID to resolved local ID
+                            $meta['folder_id'] = $folderIdMap[$remoteFid];
+                        } else {
+                            // Not in metadata list? Verify it exists in DB anyway
+                            $fchk = $this->con->prepare('SELECT id FROM folders WHERE id = ?');
+                            $fchk->execute([$remoteFid]);
+                            if (!$fchk->fetch()) {
+                                // Missing folder ID: try to match by name as a fallback
+                                $fname = $meta['folder']    ?? 'Default';
+                                $fws   = $meta['workspace'] ?? 'Poznote';
+                                $fchk2 = $this->con->prepare('SELECT id FROM folders WHERE name = ? AND workspace = ? LIMIT 1');
+                                $fchk2->execute([$fname, $fws]);
+                                $fres = $fchk2->fetch();
+                                $meta['folder_id'] = $fres ? (int)$fres['id'] : null;
+                            }
+                        }
+                    }
                     $checkStmt = $this->con->prepare('SELECT id FROM entries WHERE id = ?');
                     $checkStmt->execute([$noteId]);
                     if ($checkStmt->fetch()) {

@@ -8,6 +8,7 @@
         "back_to_notes": "Voltar para as Notas",
         "back_to_settings": "Voltar para as Configurações",
         "close": "Fechar",
+        "disable": "disable",
         "cancel": "Cancelar",
         "confirm": "Confirmar",
         "confirmation": "Confirmação",
@@ -1849,12 +1850,12 @@
             "push": {
                 "title": "Enviar para {{provider}}",
                 "description": "Exporta todas as suas notas e anexos para o {{provider}} como arquivos simples. Atualiza os arquivos existentes e remove os que não existem mais no Poznote.",
-                "button": "Enviar para {{provider}}"
+                "button": "Enviar"
             },
             "pull": {
                 "title": "Recuperar do {{provider}}",
                 "description": "Importa todas as notas e anexos do {{provider}}. Substitui o conteúdo local e move para a lixeira as notas ausentes do repositório.",
-                "button": "Recuperar de {{provider}}"
+                "button": "Recuperar"
             }
         },
         "messages": {

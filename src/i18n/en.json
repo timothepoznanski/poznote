@@ -11,6 +11,7 @@
         "rename": "Rename",
         "move": "Move",
         "close": "Close",
+        "disable": "disable",
         "enabled": "Enabled",
         "disabled": "Disabled",
         "not_defined": "Not defined",
@@ -1346,12 +1347,12 @@
             "push": {
                 "title": "Push to {{provider}}",
                 "description": "Exports all your notes and attachments to {{provider}} as flat files. Updates existing files and removes files that no longer exist in Poznote.",
-                "button": "Push ({{provider}})"
+                "button": "Push"
             },
             "pull": {
                 "title": "Pull from {{provider}}",
                 "description": "Imports all notes and attachments from {{provider}}. Overwrites local content and moves to trash any notes not present in the repository.",
-                "button": "Pull ({{provider}})"
+                "button": "Pull"
             }
         },
         "messages": {

@@ -1013,18 +1013,42 @@ document.addEventListener('DOMContentLoaded', function() {
                 `A new session started. Do you want to pull changes from ${gitProvider}?\n\nLocal notes not found on ${gitProvider} will be moved to trash.`;
             
             if (typeof window.modalAlert !== 'undefined') {
-                window.modalAlert.confirm(confirmMsg).then(function(confirmed) {
-                    if (confirmed) {
-                        // Mark as handled for this session
-                        sessionStorage.setItem('last_git_pull_' + ws, now);
-                        // Redirect to home.php with auto_pull parameter
-                        const homeUrl = new URL('home.php', window.location.href);
-                        homeUrl.searchParams.set('auto_pull', '1');
-                        window.location.href = homeUrl.toString();
-                    } else {
-                        // User declined, mark as handled for this session so we don't ask again
-                        sessionStorage.setItem('last_git_pull_' + ws, now);
-                    }
+                window.modalAlert.showModal({
+                    type: 'confirm',
+                    message: confirmMsg,
+                    alertType: 'warning',
+                    title: window.t ? window.t('common.confirmation', {}, 'Confirmation') : 'Confirmation',
+                    buttons: [
+                        { 
+                            text: window.t ? window.t('common.cancel', {}, 'Cancel') : 'Cancel', 
+                            type: 'secondary', 
+                            action: () => {
+                                // User declined, mark as handled for this session so we don't ask again
+                                sessionStorage.setItem('last_git_pull_' + ws, now);
+                            } 
+                        },
+                        { 
+                            text: window.t ? window.t('common.disable', {}, 'disable') : 'disable', 
+                            type: 'secondary', 
+                            action: () => {
+                                // Mark as handled and go to git_sync.php
+                                sessionStorage.setItem('last_git_pull_' + ws, now);
+                                window.location.href = 'git_sync.php';
+                            } 
+                        },
+                        { 
+                            text: window.t ? window.t('common.confirm', {}, 'Confirm') : 'Confirm', 
+                            type: 'primary', 
+                            action: () => {
+                                // Mark as handled for this session
+                                sessionStorage.setItem('last_git_pull_' + ws, now);
+                                // Redirect to home.php with auto_pull parameter
+                                const homeUrl = new URL('home.php', window.location.href);
+                                homeUrl.searchParams.set('auto_pull', '1');
+                                window.location.href = homeUrl.toString();
+                            } 
+                        }
+                    ]
                 });
             }
         }
