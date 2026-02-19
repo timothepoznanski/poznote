@@ -173,6 +173,8 @@
                 activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
             }
         }
+
+        updateOpenInNewTabButtons();
     }
 
     // ── Public API ─────────────────────────────────────────────────────────
@@ -190,6 +192,21 @@
             return;
         }
         noteId = String(noteId);
+
+        // Check if tab already exists for this note
+        var existingTab = null;
+        for (var i = 0; i < tabs.length; i++) {
+            if (tabs[i].noteId === noteId) {
+                existingTab = tabs[i];
+                break;
+            }
+        }
+
+        if (existingTab) {
+            switchToTab(existingTab.id);
+            return;
+        }
+
         var newTab = { id: _generateId(), noteId: noteId, title: title || 'Untitled' };
         tabs.push(newTab);
         activeTabId = newTab.id;
@@ -233,10 +250,10 @@
     /**
      * Called when a tab's × button is clicked.
      * Removes the tab and switches to the closest neighbour.
-     * The last remaining tab cannot be closed.
+     * The last remaining tab cannot be closed unless force is true.
      */
-    function closeTab(tabId) {
-        if (tabs.length <= 1) return; // cannot close the last tab
+    function closeTab(tabId, force) {
+        if (!force && tabs.length <= 1) return; // cannot close the last tab via UI
         var idx = _indexById(tabId);
         if (idx === -1) return;
 
@@ -271,6 +288,20 @@
     }
 
     /**
+     * Close all tabs associated with a specific note ID.
+     * Used when a note is deleted.
+     */
+    function closeTabByNoteId(noteId) {
+        noteId = String(noteId);
+        // Iterate backwards to avoid index shifting issues
+        for (var i = tabs.length - 1; i >= 0; i--) {
+            if (tabs[i].noteId === noteId) {
+                closeTab(tabs[i].id, true); // true = force close even if it's the last one
+            }
+        }
+    }
+
+    /**
      * Hook called from loadNoteCommon immediately after innerHTML replacement.
      * Decides whether to update the active tab's note (regular navigation)
      * or just confirm the tab switch (tab click).
@@ -296,7 +327,21 @@
         // Regular sidebar navigation (or initial load via AJAX)
         var title = _readTitle(noteId, 'Untitled');
 
-        if (activeTabId !== null) {
+        // Check if an existing tab already has this noteId (from a previous session or manual nav)
+        // If so, just activate it
+        var existingTabWithNote = null;
+        for (var i = 0; i < tabs.length; i++) {
+            if (tabs[i].noteId === noteId) {
+                existingTabWithNote = tabs[i];
+                break;
+            }
+        }
+
+        if (existingTabWithNote) {
+            // Found existing tab for this note - make it active
+            activeTabId = existingTabWithNote.id;
+            existingTabWithNote.title = title; // Update title just in case
+        } else if (activeTabId !== null) {
             // Update the active tab to the new note
             var tab = _findTabById(activeTabId);
             if (tab) {
@@ -406,43 +451,73 @@
         _init();
     }
 
+    // ── Expose ─────────────────────────────────────────────────────────────
+
     /**
-     * Called when a note is deleted.
-     * Removes all tabs associated with this noteId.
+     * Check if a note is currently open in a tab
+     * @param {string|number} noteId
+     * @returns {boolean}
      */
-    function closeTabsByNoteId(noteId) {
+    function isNoteOpen(noteId) {
+        if (!_areTabsEnabled()) return false;
         noteId = String(noteId);
-        var originalLength = tabs.length;
-        var newTabs = tabs.filter(function (tab) {
-            return tab.noteId !== noteId;
-        });
-
-        if (newTabs.length === tabs.length) return; // nothing changed
-
-        tabs = newTabs;
-
-        if (tabs.length === 0) {
-            activeTabId = null;
-        } else if (activeTabId) {
-            // If the active tab was one of the deleted ones, switch to another
-            var stillExists = _findTabById(activeTabId);
-            if (!stillExists) {
-                activeTabId = tabs[0].id;
-            }
+        for (var i = 0; i < tabs.length; i++) {
+            if (tabs[i].noteId === noteId) return true;
         }
-
-        _saveToStorage();
-        render();
+        return false;
     }
 
-    // ── Expose ─────────────────────────────────────────────────────────────
+    // ── Update UI for "Open in new tab" buttons ────────────────────────────
+
+    function updateOpenInNewTabButtons() {
+        if (!_areTabsEnabled()) return;
+
+        // Selector to find all relevant buttons:
+        // 1. Sidebar/Toolbar buttons with data-action="open-note-new-tab"
+        // 2. Toolbar menu proxy items with data-selector=".btn-open-new-tab"
+        var selector = '[data-action="open-note-new-tab"], [data-selector=".btn-open-new-tab"]';
+        var elements = document.querySelectorAll(selector);
+
+        elements.forEach(function (el) {
+            var noteId = el.getAttribute('data-note-id');
+
+            // If no direct note-id (e.g. toolbar menu items), try to find parent note card
+            if (!noteId) {
+                var card = el.closest('.notecard');
+                if (card && card.id && card.id.startsWith('note')) {
+                    noteId = card.id.replace('note', '');
+                }
+            }
+
+            if (noteId) {
+                var isOpen = false;
+                // Manual check instead of calling isNoteOpen to avoid potential scope issues
+                for (var i = 0; i < tabs.length; i++) {
+                    if (tabs[i].noteId === String(noteId)) {
+                        isOpen = true;
+                        break;
+                    }
+                }
+
+                // General hiding logic - if open, hide. Else reset to default.
+                // This covers:
+                // - Sidebar menu items (.note-actions-menu-item)
+                // - Sidebar icon buttons (.note-actions-item)
+                // - Toolbar icon buttons (.toolbar-btn)
+                // - Toolbar menu items (.dropdown-item)
+                el.style.display = isOpen ? 'none' : '';
+            }
+        });
+    }
 
     window.tabManager = {
         openInNewTab: openInNewTab,
         switchToTab: switchToTab,
         closeTab: closeTab,
-        closeTabsByNoteId: closeTabsByNoteId,
+        closeTabByNoteId: closeTabByNoteId,
+        isNoteOpen: isNoteOpen,
         render: render,
+        updateUI: updateOpenInNewTabButtons, // Expose for external calls
         _onNoteLoaded: _onNoteLoaded
     };
 

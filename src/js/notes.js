@@ -424,8 +424,8 @@ function deleteNote(noteId) {
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data && data.success) {
-                if (window.tabManager) {
-                    window.tabManager.closeTabsByNoteId(noteId);
+                if (window.tabManager && typeof window.tabManager.closeTabByNoteId === 'function') {
+                    window.tabManager.closeTabByNoteId(noteId);
                 }
                 redirectToWorkspace();
                 return;
@@ -746,9 +746,6 @@ function deleteLinkedNoteOnly(linkedNoteId) {
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data && data.success) {
-                if (window.tabManager) {
-                    window.tabManager.closeTabsByNoteId(linkedNoteId);
-                }
                 closeModal('deleteLinkedNoteModal');
                 redirectToWorkspace();
                 return;
@@ -787,9 +784,8 @@ function deleteLinkedNoteAndTarget(linkedNoteId, targetNoteId) {
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data && data.success) {
-                if (window.tabManager) {
-                    window.tabManager.closeTabsByNoteId(linkedNoteId);
-                    window.tabManager.closeTabsByNoteId(targetNoteId);
+                if (window.tabManager && typeof window.tabManager.closeTabByNoteId === 'function') {
+                    window.tabManager.closeTabByNoteId(targetNoteId);
                 }
                 closeModal('deleteLinkedNoteModal');
                 redirectToWorkspace();

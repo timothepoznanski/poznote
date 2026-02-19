@@ -88,7 +88,8 @@
 /* Blank lines to preserve spacing in markdown */
 .markdown-preview p.blank-line {
     margin: 0;
-    min-height: 1.6em; /* Match the line-height */
+    min-height: 1.6em;
+    /* Match the line-height */
     line-height: 1.6;
 }
 
@@ -179,7 +180,7 @@
     border-radius: 8px;
     margin: 1em 0;
     background: #000;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .markdown-preview audio,
@@ -192,6 +193,7 @@
 }
 
 @media screen and (max-width: 768px) {
+
     .markdown-preview audio,
     .markdown-preview .note-audio-embed {
         max-width: 240px;
@@ -442,6 +444,12 @@
 
 #right_col:has(.noteentry.markdown-split-mode) {
     overflow: hidden !important;
+}
+
+/* Fix for toolbar space in split view with tabs */
+body.has-internal-tabs .innernote:has(.noteentry.markdown-split-mode) .note-header {
+    top: 0 !important;
+    position: relative !important;
 }
 
 .noteentry.markdown-split-mode .markdown-editor-container,

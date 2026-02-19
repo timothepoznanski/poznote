@@ -410,6 +410,10 @@
                     menu.classList.add('show');
                     actionElement.classList.add('open');
 
+                    if (window.tabManager && typeof window.tabManager.updateUI === 'function') {
+                        window.tabManager.updateUI();
+                    }
+
                     // Smart positioning to detect window boundaries
                     var rect = menu.getBoundingClientRect();
                     var windowHeight = window.innerHeight;
