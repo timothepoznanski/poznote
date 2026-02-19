@@ -523,7 +523,7 @@ function emergencySave(noteId) {
                             needsGitPush = true;
                         }
                     } else {
-                        console.warn('[Poznote Git] Auto-push not triggered:', data.git_push.reason || 'not configured or disabled');
+                        // console.warn('[Poznote Git] Auto-push not triggered:', data.git_push.reason || 'not configured or disabled');
                     }
                 } else {
                     console.warn('[Poznote Git] git_push requested but no git_push info in response. Check server logs.');
