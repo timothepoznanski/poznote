@@ -123,7 +123,7 @@ function renderNoteActionsMenu($noteId, $noteData, $folderId, $folderName) {
 /**
  * Recursive function to display folders and their subfolders
  */
-function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined = false) {
+function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined = false, $displayUncategorizedFirst = true) {
     $folderName = $folderData['name'];
     $notes = $folderData['notes'];
     
@@ -202,55 +202,104 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         echo "<div class='folder-content' id='$folderDomId' style='display: $folder_display;'>";
     }
     
-    // Display notes in folder
-    foreach($notes as $row1) {
-        $isSelected = ($note == $row1["id"]) ? 'selected-note' : '';
-        
-        // Generate note link
-        $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"], $search_combined);
-        
-        $noteClass = empty($folder_filter) ? 'links_arbo_left note-in-folder' : 'links_arbo_left';
-        if ($depth > 0) $noteClass .= ' note-in-subfolder';
-        $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
-        
-        // Translate default note titles (New note, Nouvelle note, etc.)
-        $noteTitle = $row1["heading"] ?: t('index.note.new_note', [], 'New note');
-        
-        // Check if the title matches a default note pattern in any supported language
-        if (preg_match('/^(?:New note|Nouvelle note|Neue Notiz|Nueva nota|Nova nota)( \(\d+\))?$/', $noteTitle)) {
-            // Default title - translate to current language
-            if (preg_match('/^(?:New note|Nouvelle note|Neue Notiz|Nueva nota|Nova nota) \((\d+)\)$/', $noteTitle, $matches)) {
-                $noteTitle = t('index.note.new_note_numbered', ['number' => $matches[1]], 'New note (' . $matches[1] . ')');
-            } else {
-                $noteTitle = t('index.note.new_note', [], 'New note');
+    // Display notes in folder (before subfolders if displayUncategorizedFirst is true)
+    if ($displayUncategorizedFirst) {
+        foreach($notes as $row1) {
+            $isSelected = ($note == $row1["id"]) ? 'selected-note' : '';
+            
+            // Generate note link
+            $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"], $search_combined);
+            
+            $noteClass = empty($folder_filter) ? 'links_arbo_left note-in-folder' : 'links_arbo_left';
+            if ($depth > 0) $noteClass .= ' note-in-subfolder';
+            $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
+            
+            // Translate default note titles (New note, Nouvelle note, etc.)
+            $noteTitle = $row1["heading"] ?: t('index.note.new_note', [], 'New note');
+            
+            // Check if the title matches a default note pattern in any supported language
+            if (preg_match('/^(?:New note|Nouvelle note|Neue Notiz|Nueva nota|Nova nota)( \(\d+\))?$/', $noteTitle)) {
+                // Default title - translate to current language
+                if (preg_match('/^(?:New note|Nouvelle note|Neue Notiz|Nueva nota|Nova nota) \((\d+)\)$/', $noteTitle, $matches)) {
+                    $noteTitle = t('index.note.new_note_numbered', ['number' => $matches[1]], 'New note (' . $matches[1] . ')');
+                } else {
+                    $noteTitle = t('index.note.new_note', [], 'New note');
+                }
             }
-        }
-        
-        // Add icon for linked notes
-        $noteIcon = '';
-        $noteType = $row1['type'] ?? 'note';
-        $linkedNoteIdAttr = '';
-        if ($noteType === 'linked') {
-            $noteIcon = '<i class="fas fa-link note-type-icon-inline"></i> ';
-            // Add the linked_note_id attribute if available
-            if (!empty($row1['linked_note_id'])) {
-                $linkedNoteIdAttr = " data-linked-note-id='" . intval($row1['linked_note_id']) . "'";
+            
+            // Add icon for linked notes
+            $noteIcon = '';
+            $noteType = $row1['type'] ?? 'note';
+            $linkedNoteIdAttr = '';
+            if ($noteType === 'linked') {
+                $noteIcon = '<i class="fas fa-link note-type-icon-inline"></i> ';
+                // Add the linked_note_id attribute if available
+                if (!empty($row1['linked_note_id'])) {
+                    $linkedNoteIdAttr = " data-linked-note-id='" . intval($row1['linked_note_id']) . "'";
+                }
             }
+            
+            echo "<div class='note-list-item'>";
+            echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "'" . $linkedNoteIdAttr . " data-folder-id='$folderId' data-folder='$folderName' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note'>";
+            echo "<span class='note-title'>" . $noteIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
+            echo "</a>";
+            renderNoteActionsMenu($noteDbId, $row1, $folderId, $folderName);
+            echo "</div>";
+            echo "<div id=pxbetweennotes></div>";
         }
-        
-        echo "<div class='note-list-item'>";
-        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "'" . $linkedNoteIdAttr . " data-folder-id='$folderId' data-folder='$folderName' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note'>";
-        echo "<span class='note-title'>" . $noteIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
-        echo "</a>";
-        renderNoteActionsMenu($noteDbId, $row1, $folderId, $folderName);
-        echo "</div>";
-        echo "<div id=pxbetweennotes></div>";
     }
     
     // Recursively display subfolders
     if (isset($folderData['children']) && !empty($folderData['children'])) {
         foreach ($folderData['children'] as $childId => $childData) {
-            displayFolderRecursive($childId, $childData, $depth + 1, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined);
+            displayFolderRecursive($childId, $childData, $depth + 1, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined, $displayUncategorizedFirst);
+        }
+    }
+
+    // Display notes in folder (after subfolders if displayUncategorizedFirst is false)
+    if (!$displayUncategorizedFirst) {
+        foreach($notes as $row1) {
+            $isSelected = ($note == $row1["id"]) ? 'selected-note' : '';
+            
+            // Generate note link
+            $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"], $search_combined);
+            
+            $noteClass = empty($folder_filter) ? 'links_arbo_left note-in-folder' : 'links_arbo_left';
+            if ($depth > 0) $noteClass .= ' note-in-subfolder';
+            $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
+            
+            // Translate default note titles (New note, Nouvelle note, etc.)
+            $noteTitle = $row1["heading"] ?: t('index.note.new_note', [], 'New note');
+            
+            // Check if the title matches a default note pattern in any supported language
+            if (preg_match('/^(?:New note|Nouvelle note|Neue Notiz|Nueva nota|Nova nota)( \(\d+\))?$/', $noteTitle)) {
+                // Default title - translate to current language
+                if (preg_match('/^(?:New note|Nouvelle note|Neue Notiz|Nueva nota|Nova nota) \((\d+)\)$/', $noteTitle, $matches)) {
+                    $noteTitle = t('index.note.new_note_numbered', ['number' => $matches[1]], 'New note (' . $matches[1] . ')');
+                } else {
+                    $noteTitle = t('index.note.new_note', [], 'New note');
+                }
+            }
+            
+            // Add icon for linked notes
+            $noteIcon = '';
+            $noteType = $row1['type'] ?? 'note';
+            $linkedNoteIdAttr = '';
+            if ($noteType === 'linked') {
+                $noteIcon = '<i class="fas fa-link note-type-icon-inline"></i> ';
+                // Add the linked_note_id attribute if available
+                if (!empty($row1['linked_note_id'])) {
+                    $linkedNoteIdAttr = " data-linked-note-id='" . intval($row1['linked_note_id']) . "'";
+                }
+            }
+            
+            echo "<div class='note-list-item'>";
+            echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "'" . $linkedNoteIdAttr . " data-folder-id='$folderId' data-folder='$folderName' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note'>";
+            echo "<span class='note-title'>" . $noteIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
+            echo "</a>";
+            renderNoteActionsMenu($noteDbId, $row1, $folderId, $folderName);
+            echo "</div>";
+            echo "<div id=pxbetweennotes></div>";
         }
     }
     
@@ -302,7 +351,7 @@ foreach($hierarchicalFolders as $folderId => $folderData) {
 // Display Favorites folder first
 if ($favoritesFolder && $favorites_count > 0) {
     foreach($favoritesFolder as $folderId => $folderData) {
-        displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined);
+        displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined, $displayUncategorizedFirst);
     }
     
     // Add separator with toggle button after favorites
@@ -365,7 +414,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
 
 // Display regular folders and notes hierarchically
 foreach($regularFolders as $folderId => $folderData) {
-    displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined);
+    displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined, $displayUncategorizedFirst);
 }
 
 // Display uncategorized notes (notes without folder) at the END if NOT sorting by date (i.e., alphabetical sort)

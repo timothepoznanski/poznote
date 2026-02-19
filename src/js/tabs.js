@@ -117,8 +117,10 @@
 
         if (!_areTabsEnabled()) {
             if (bar) bar.style.display = 'none';
+            document.body.classList.remove('has-internal-tabs');
             return;
         }
+        document.body.classList.add('has-internal-tabs');
         if (!bar) {
             bar = document.createElement('div');
             bar.id = 'app-tab-bar';

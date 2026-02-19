@@ -16,6 +16,10 @@
     overflow-x: auto;
     flex-shrink: 0;
     min-height: 38px;
+    /* Sticky position */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
     /* Hide scrollbar but keep scrollability */
     -ms-overflow-style: none;
     scrollbar-width: none;

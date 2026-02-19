@@ -435,7 +435,39 @@ function emergencySave(noteId) {
         }
     }
 
-    const ent = entryElem.innerHTML.replace(/<br\s*[\/]?>/gi, "&nbsp;<br>");
+    // Get note type to determine how to extract content
+    const noteType = entryElem.getAttribute('data-note-type') || 'note';
+    let ent = "";
+
+    if (noteType === 'tasklist') {
+        // For task list notes, save the JSON data
+        if (typeof getTaskListData === 'function') {
+            ent = getTaskListData(noteId) || '';
+        } else {
+            ent = entryElem.innerHTML;
+        }
+    } else if (noteType === 'markdown') {
+        // For markdown notes, save the raw markdown content
+        if (typeof getMarkdownContentForNote === 'function') {
+            const markdownContent = getMarkdownContentForNote(noteId);
+            if (markdownContent !== null) {
+                ent = markdownContent;
+            } else {
+                ent = entryElem.innerHTML;
+            }
+        } else {
+            ent = entryElem.innerHTML;
+        }
+    } else {
+        // Regular HTML note
+        if (typeof cleanSearchHighlightsFromElement === 'function') {
+            ent = cleanSearchHighlightsFromElement(entryElem);
+        } else {
+            ent = entryElem.innerHTML;
+        }
+        ent = ent.replace(/<br\s*[\/]?>/gi, "&nbsp;<br>");
+    }
+
     const tags = tagsElem ? tagsElem.value : '';
     const folder = folderElem ? folderElem.value : null;
 

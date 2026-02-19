@@ -264,6 +264,11 @@
     gap: 8px;
 }
 
+body.has-internal-tabs .note-header {
+    top: 44px;
+    /* Push down to make room for sticky tab bar */
+}
+
 /* Only apply header background if no workspace background image is set */
 body:not(.has-background-image) .note-header {
     background: #fff;
@@ -423,6 +428,7 @@ a.links_arbo_left.selected-note {
 
 /* Desktop styles for toolbar menu (3 dots menu) */
 @media (min-width: 800px) {
+
     /* Show the more button (3 dots) on desktop */
     .note-edit-toolbar .mobile-more-btn {
         display: inline-flex !important;

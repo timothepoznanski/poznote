@@ -580,6 +580,10 @@ function hideNoteLoadingState() {
     const rightColumn = document.getElementById('right_col');
     if (!rightColumn) return;
 
+    // Always remove from the main container first, in case it was added there 
+    // by showNoteLoadingState (e.g. if the tab bar was missing at that time).
+    rightColumn.classList.remove('note-fade-out');
+
     const tabBar = document.getElementById('app-tab-bar');
     if (tabBar) {
         // Animate only siblings after the tab bar
@@ -588,8 +592,8 @@ function hideNoteLoadingState() {
             if (node.nodeType === 1) {
                 node.classList.remove('note-fade-out');
                 node.classList.add('note-loading-state');
-                (function(el) {
-                    setTimeout(function() { el.classList.remove('note-loading-state'); }, 150);
+                (function (el) {
+                    setTimeout(function () { el.classList.remove('note-loading-state'); }, 150);
                 })(node);
             }
             node = node.nextSibling;
