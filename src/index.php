@@ -108,13 +108,12 @@ $settings = [
     'hide_folder_actions' => null,
     'hide_folder_counts' => null,
     'note_list_sort' => 'updated_desc',
-    'notes_without_folders_after_folders' => false,
-    'hide_inline_attachment_images' => '1',
-    'enable_internal_tabs' => '1'
+    'notes_without_folders_after_folders' => '1',
+    'hide_inline_attachment_images' => '1'
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'hide_inline_attachment_images', 'enable_internal_tabs')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'hide_inline_attachment_images')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -155,12 +154,7 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     $v = getAppVersion();
     ?>
     <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
-    <script>
-        window.ALLOWED_IFRAME_DOMAINS = <?php echo json_encode(ALLOWED_IFRAME_DOMAINS); ?>;
-        window.POZNOTE_CONFIG = {
-            enableInternalTabs: <?php echo ($settings['enable_internal_tabs'] === '0' || $settings['enable_internal_tabs'] === 'false') ? 'false' : 'true'; ?>
-        };
-    </script>
+    <script>window.ALLOWED_IFRAME_DOMAINS = <?php echo json_encode(ALLOWED_IFRAME_DOMAINS); ?>;</script>
     <meta name="color-scheme" content="dark light">
     <link type="text/css" rel="stylesheet" href="css/fontawesome.min.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/light.min.css?v=<?php echo $v; ?>"/>
@@ -202,7 +196,6 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <link type="text/css" rel="stylesheet" href="css/drag-drop.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/icons.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/misc.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/tabs.css?v=<?php echo $v; ?>"/>
     <link rel="stylesheet" href="css/index-mobile.css?v=<?php echo $v; ?>" media="(max-width: 800px)">
     <link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/base.css?v=<?php echo $v; ?>"/>
@@ -326,7 +319,7 @@ $body_classes = trim($extra_body_classes);
     $search_params = $search_conditions['search_params'];
     
     // Secure prepared queries
-    $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, created, updated, type, linked_note_id, tags, attachments FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
+    $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, created, updated, type, linked_note_id FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
     $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
     ?>
 
@@ -435,10 +428,8 @@ $body_classes = trim($extra_body_classes);
 
 
 
-    <!-- RIGHT PANE (Persists during note loads) -->
-    <div id="right_pane">
-        <!-- RIGHT COLUMN -->	
-        <div id="right_col">
+    <!-- RIGHT COLUMN -->	
+    <div id="right_col">
             
         <?php        
             // Array to collect tasklist and markdown IDs for initialization
@@ -935,8 +926,7 @@ $body_classes = trim($extra_body_classes);
                 }
             }
         ?>        
-        </div> <!-- Close right_col -->
-    </div> <!-- Close right_pane -->
+    </div>
     
     <!-- Data for initialization (used by index-events.js) -->
     <?php if (!empty($tasklist_ids)): ?>
@@ -946,6 +936,8 @@ $body_classes = trim($extra_body_classes);
     <?php if (!empty($markdown_ids)): ?>
     <script type="application/json" id="markdown-init-data"><?php echo json_encode($markdown_ids); ?></script>
     <?php endif; ?>
+        
+    </div>  <!-- Close main-container -->
     
 </body>
 <!-- Modules refactorisés de script.js -->
@@ -985,7 +977,6 @@ $body_classes = trim($extra_body_classes);
 <script src="js/notes-list-events.js?v=<?php echo $v; ?>"></script>
 <script src="js/folder-icon.js?v=<?php echo $v; ?>"></script>
 <script src="js/kanban.js?v=<?php echo $v; ?>"></script>
-<script src="js/tabs.js?v=<?php echo $v; ?>"></script>
 
 <?php if ($note && is_numeric($note)): ?>
 <!-- Data for draft check (used by index-events.js) -->
@@ -1013,42 +1004,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 `A new session started. Do you want to pull changes from ${gitProvider}?\n\nLocal notes not found on ${gitProvider} will be moved to trash.`;
             
             if (typeof window.modalAlert !== 'undefined') {
-                window.modalAlert.showModal({
-                    type: 'confirm',
-                    message: confirmMsg,
-                    alertType: 'warning',
-                    title: window.t ? window.t('common.confirmation', {}, 'Confirmation') : 'Confirmation',
-                    buttons: [
-                        { 
-                            text: window.t ? window.t('common.cancel', {}, 'Cancel') : 'Cancel', 
-                            type: 'secondary', 
-                            action: () => {
-                                // User declined, mark as handled for this session so we don't ask again
-                                sessionStorage.setItem('last_git_pull_' + ws, now);
-                            } 
-                        },
-                        { 
-                            text: window.t ? window.t('common.disable', {}, 'disable') : 'disable', 
-                            type: 'secondary', 
-                            action: () => {
-                                // Mark as handled and go to git_sync.php
-                                sessionStorage.setItem('last_git_pull_' + ws, now);
-                                window.location.href = 'git_sync.php';
-                            } 
-                        },
-                        { 
-                            text: window.t ? window.t('common.confirm', {}, 'Confirm') : 'Confirm', 
-                            type: 'primary', 
-                            action: () => {
-                                // Mark as handled for this session
-                                sessionStorage.setItem('last_git_pull_' + ws, now);
-                                // Redirect to home.php with auto_pull parameter
-                                const homeUrl = new URL('home.php', window.location.href);
-                                homeUrl.searchParams.set('auto_pull', '1');
-                                window.location.href = homeUrl.toString();
-                            } 
-                        }
-                    ]
+                window.modalAlert.confirm(confirmMsg).then(function(confirmed) {
+                    if (confirmed) {
+                        // Mark as handled for this session
+                        sessionStorage.setItem('last_git_pull_' + ws, now);
+                        // Redirect to home.php with auto_pull parameter
+                        const homeUrl = new URL('home.php', window.location.href);
+                        homeUrl.searchParams.set('auto_pull', '1');
+                        window.location.href = homeUrl.toString();
+                    } else {
+                        // User declined, mark as handled for this session so we don't ask again
+                        sessionStorage.setItem('last_git_pull_' + ws, now);
+                    }
                 });
             }
         }
