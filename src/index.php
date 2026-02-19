@@ -47,6 +47,14 @@ require_once 'note_loader.php';
 require_once 'favorites_handler.php';
 require_once 'folders_display.php';
 
+// GitHub Sync Logic
+require_once 'GitSync.php';
+$gitSync = new GitSync($con);
+$gitEnabled = GitSync::isEnabled() && $gitSync->isConfigured();
+$isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
+$showGitSync = $gitEnabled && $isAdmin;
+$gitProvider = function_exists('getGitProviderName') ? getGitProviderName() : 'Git';
+
 // Check if we need to redirect to include workspace from database settings
 // Only redirect if no workspace parameter is present in GET
 if (!isset($_GET['workspace']) && !isset($_POST['workspace'])) {
@@ -267,7 +275,7 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
 // Load note list sort preference using previously loaded settings
 $note_list_sort_type = 'updated_desc'; // default
 $pref = $settings['note_list_sort'];
-$notes_without_folders_after = ($settings['notes_without_folders_after_folders'] === '1' || $settings['notes_without_folders_after_folders'] === 'true');
+$notes_without_folders_after = ($settings['notes_without_folders_after_folders'] !== '0' && $settings['notes_without_folders_after_folders'] !== 'false' && $settings['notes_without_folders_after_folders'] !== false);
 
 $folder_null_case = $notes_without_folders_after ? '1' : '0';
 $folder_case = $notes_without_folders_after ? '0' : '1';
@@ -336,7 +344,7 @@ $body_classes = trim($extra_body_classes);
                     <i class="far fa-home"></i>
                 </button>
                 <button class="sidebar-settings" data-action="navigate-to-settings" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>">
-                    <i class="far fa-cog"></i>
+                    <i class="far fa-cog" style="margin: 0 5px;"></i>
                     <span class="update-badge update-badge-hidden"></span>
                 </button>
                 <button class="sidebar-plus" data-action="toggle-create-menu" title="<?php echo t_h('sidebar.create'); ?>">
@@ -780,10 +788,6 @@ $body_classes = trim($extra_body_classes);
                             // Get note content to check for inline images
                             $note_content = $row['entry'] ?? '';
                             
-                            echo '<div class="note-attachments-row">';
-                            // Make paperclip clickable to open attachments for this note (preserve workspace behavior via JS)
-                            echo '<button type="button" class="icon-attachment-btn" title="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'" data-action="show-attachment-dialog" data-note-id="'.$row['id'].'" aria-label="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'"><span class="fas fa-paperclip icon_attachment"></span></button>';
-                            echo '<span class="note-attachments-list">';
                             $attachment_links = [];
                             $visible_links_count = 0;
                             foreach ($attachments_data as $attachment) {
@@ -820,12 +824,13 @@ $body_classes = trim($extra_body_classes);
                                     if (!$is_inline_image) $visible_links_count++;
                                 }
                             }
+                            $row_style = ($hide_inline_images && $visible_links_count === 0) ? ' style="display: none;"' : '';
+                            echo '<div class="note-attachments-row"' . $row_style . '>';
+                            // Make paperclip clickable to open attachments for this note (preserve workspace behavior via JS)
+                            echo '<button type="button" class="icon-attachment-btn" title="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'" data-action="show-attachment-dialog" data-note-id="'.$row['id'].'" aria-label="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'"><span class="fas fa-paperclip icon_attachment"></span></button>';
+                            echo '<span class="note-attachments-list">';
                             echo implode(' ', $attachment_links);
                             echo '</span>';
-                            // Hide the entire row if no visible links
-                            if ($hide_inline_images && $visible_links_count === 0) {
-                                echo '<script>document.currentScript.parentElement.style.display = "none";</script>';
-                            }
                             echo '</div>';
                         }
                     }
@@ -987,4 +992,53 @@ $body_classes = trim($extra_body_classes);
 <script type="application/json" id="current-note-data"><?php echo json_encode(['noteId' => (string)$note]); ?></script>
 <?php endif; ?>
 
+
+<?php if ($showGitSync && $gitSync->isAutoPullEnabled()): ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const runAutoPull = function() {
+        // Prevent double execution if fallback fires
+        if (window.hasRunAutoPull) return;
+        window.hasRunAutoPull = true;
+
+        const gitProvider = '<?php echo htmlspecialchars($gitProvider, ENT_QUOTES); ?>';
+        const ws = <?php echo json_encode($workspace_filter ?: 'Poznote'); ?>;
+        const lastPull = sessionStorage.getItem('last_git_pull_' + ws);
+        const now = Date.now();
+
+        // Trigger only once per session (when opening Poznote)
+        if (!lastPull) {
+            const confirmMsg = window.t ? 
+                window.t('git_sync.confirm_auto_pull_warning', { provider: gitProvider }, `A new session started. Do you want to pull changes from ${gitProvider}?\n\nLocal notes not found on ${gitProvider} will be moved to trash.`) : 
+                `A new session started. Do you want to pull changes from ${gitProvider}?\n\nLocal notes not found on ${gitProvider} will be moved to trash.`;
+            
+            if (typeof window.modalAlert !== 'undefined') {
+                window.modalAlert.confirm(confirmMsg).then(function(confirmed) {
+                    if (confirmed) {
+                        // Mark as handled for this session
+                        sessionStorage.setItem('last_git_pull_' + ws, now);
+                        // Redirect to home.php with auto_pull parameter
+                        const homeUrl = new URL('home.php', window.location.href);
+                        homeUrl.searchParams.set('auto_pull', '1');
+                        window.location.href = homeUrl.toString();
+                    } else {
+                        // User declined, mark as handled for this session so we don't ask again
+                        sessionStorage.setItem('last_git_pull_' + ws, now);
+                    }
+                });
+            }
+        }
+    };
+
+    // Attempt to wait for translations
+    if (window.POZNOTE_I18N && window.POZNOTE_I18N.strings && Object.keys(window.POZNOTE_I18N.strings).length > 0) {
+        runAutoPull();
+    } else {
+        document.addEventListener('poznote:i18n:loaded', runAutoPull, { once: true });
+        // Fallback to avoid waiting forever (1s)
+        setTimeout(runAutoPull, 1000);
+    }
+});
+</script>
+<?php endif; ?>
 </html>

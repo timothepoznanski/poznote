@@ -32,14 +32,16 @@ if (!$note) {
     exit;
 }
 
-// Fetch the setting for inline images
-$hide_inline_images_setting_is_disabled = false;
+// Fetch the setting for inline images in list views
+$showInlineInList = true;
 try {
-    $stmt_setting = $con->prepare("SELECT value FROM settings WHERE key = 'hide_inline_attachment_images' LIMIT 1");
+    $stmt_setting = $con->prepare("SELECT value FROM settings WHERE key = 'show_inline_attachments_in_list' LIMIT 1");
     $stmt_setting->execute();
-    $hide_inline_setting = $stmt_setting->fetchColumn();
-    // '0' or 'false' means it's disabled in UI, which hides them in note list
-    $hide_inline_images_setting_is_disabled = ($hide_inline_setting === '0' || $hide_inline_setting === 'false');
+    $val = $stmt_setting->fetchColumn();
+    // Default is shown, so only '0' or 'false' means hidden
+    if ($val === '0' || $val === 'false') {
+        $showInlineInList = false;
+    }
 } catch (Exception $e) {
     // Ignore error
 }
@@ -112,6 +114,40 @@ try {
         [data-theme="dark"] .settings-banner-link:hover {
             color: #93c5fd;
         }
+        
+        /* Toggle Checkbox Styles */
+        .toggle-checkbox {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            gap: 10px;
+            user-select: none;
+        }
+        .toggle-checkbox input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .toggle-label {
+            font-weight: 500;
+        }
+
+        .file-icon-placeholder {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f1f5f9;
+            border-radius: 4px;
+            color: #94a3b8;
+            font-size: 24px;
+        }
+        [data-theme="dark"] .file-icon-placeholder {
+            background-color: #1e293b;
+            color: #64748b;
+        }
+
         @media (max-width: 600px) {
             .settings-banner-info {
                 flex-direction: column;
@@ -171,12 +207,12 @@ try {
 
         <br><br>
 
-        <?php if ($hide_inline_images_setting_is_disabled): ?>
         <div class="settings-banner-info">
-            <span><?php echo t_h('attachments.page.settings_banner.message'); ?></span>
-            <a href="settings.php#display" class="settings-banner-link"><?php echo t_h('attachments.page.settings_banner.action'); ?></a>
+            <label class="toggle-checkbox">
+                <input type="checkbox" id="showInlineImagesToggle" <?php echo $showInlineInList ? 'checked' : ''; ?>>
+                <span class="toggle-label"><?php echo t_h('display.cards.show_inline_attachment_images', [], 'Show image attachments'); ?></span>
+            </label>
         </div>
-        <?php endif; ?>
 
         <!-- Upload Section -->
         <div class="settings-section">

@@ -257,7 +257,7 @@
             "uploaded_prefix": "Subido: ",
             "open_in_new_tab": "Abrir en nueva pestaña",
             "settings_banner": {
-                "message": "Los archivos adjuntos de imagen están ocultos en la lista de la nota (pero no en esta lista) porque el ajuste 'Mostrar archivos adjuntos de imagen' está desactivado.",
+                "message": "Los archivos adjuntos de imagen están ocultos en la lista de la nota (pero no en esta lista) porque el ajuste 'Mostrar adjuntos de imagen' está desactivado.",
                 "action": "Cambiar ajuste"
             }
         },
@@ -284,7 +284,8 @@
             "attachment_count_plural": "{{count}} archivos adjuntos",
             "hint": "Añada archivos adjuntos a sus notas usando el botón del clip en la barra de herramientas.",
             "filter_placeholder": "Filtrar por título de nota o nombre de archivo adjunto...",
-            "no_filter_results": "Ninguna nota coincide con su búsqueda.",
+            "no_filter_results": "Ninguna note coincide con su búsqueda.",
+            "show_thumbnails": "Mostrar miniaturas en esta lista",
             "download": "Descargar"
         }
     },
@@ -429,7 +430,7 @@
             "kanban_on_folder_click": "Abrir vista Kanban al hacer clic en la carpeta",
             "index_icon_scale": "Escalado de iconos del índice",
             "note_content_width": "Ancho del contenido de la nota",
-            "show_inline_attachment_images": "Mostrar archivos adjuntos de imagen"
+            "show_inline_attachment_images": "Mostrar adjuntos de imagen"
         },
         "badges": {
             "font_size_default": "predeterminado ({{size}}px)",
@@ -1792,10 +1793,16 @@
     },
     "git_sync": {
         "title": "Sincronización {{provider}}",
-        "description": "Envíe sus notas a {{provider}} o extraiga notas de un repositorio existente. Un repositorio equivale a un perfil. Los espacios de trabajo serán carpetas en la raíz del repositorio.",
-        "warning": "No utilice esta función como su única solución de copia de seguridad.\nConsidere configurar exportaciones ZIP manuales o automáticas de sus notas.",
-        "confirm_push": "¿Enviar notas del espacio de trabajo \"{{workspace}}\" a {{provider}}? Updates existing files and deletes files that no longer exist in Poznote.",
-        "confirm_pull": "¿Recuperar notas del espacio de trabajo \"{{workspace}}\" de {{provider}}? Import notes from {{provider}}. Updates existing notes and moves to trash notes that no longer exist on {{provider}}.",
+        "description": "Haga una copia de seguridad de sus notas y archivos adjuntos en {{provider}}. Los archivos se almacenan como archivos planos con un metadata.json que conserva etiquetas, carpetas, fechas y adjuntos.",
+        "warning": "No confíe únicamente en esta función como solución de copia de seguridad.\nExporte sus datos regularmente desde la función de copia de seguridad en los Ajustes.",
+        "confirm_push": "¿Enviar todas las notas y archivos adjuntos a {{provider}}? Los archivos existentes se actualizarán y los archivos que ya no están en Poznote se eliminarán del repositorio.",
+        "confirm_pull": "¿Extraer todas las notas y archivos adjuntos de {{provider}}? Los datos locales serán reemplazados por la versión remota. Las notas no encontradas en {{provider}} se moverán a la papelera.",
+        "confirm_auto_pull": "Se ha iniciado una nueva sesión. ¿Quieres extraer los cambios de {{provider}}?",
+        "confirm_auto_pull_warning": "Se ha iniciado una nueva sesión. ¿Quieres extraer los cambios de {{provider}}?\n\nLas notas locales no encontradas en {{provider}} se moverán a la papelera.",
+        "auto_pull_complete": "Sincronización Git completa. Actualizando la página...",
+        "auto_pull_no_changes": "Sincronización Git completa. No se encontraron cambios.",
+        "pulling": "Extrayendo cambios...",
+        "starting": "Sincronizando...",
         "config": {
             "title": "Configuración",
             "status": "Estado",
@@ -1808,6 +1815,14 @@
             "not_configured": "No configurado",
             "not_configured_yet": "A configurar",
             "hint": "La sincronización con {{provider}} está desactivada. Establece POZNOTE_GIT_SYNC_ENABLED=true en tu archivo .env para activarla."
+        },
+        "auto_sync": {
+            "title": "Sincronización Automática",
+            "push_label": "Enviar automáticamente al salir",
+            "push_description": "Al salir de una nota (cambio de nota o cierre de pestaña), su versión más reciente se envía automáticamente al repositorio Git, si fue modificada durante la sesión.",
+            "pull_label": "Recuperar automáticamente al cargar",
+            "pull_description": "Una vez por sesión, pregunta si deseas recuperar datos del repositorio Git. Actualiza las notas existentes, importa las nuevas y mueve a la papelera las notas locales no encontradas en el repositorio remoto.",
+            "saving": "Configuración guardada"
         },
         "test": {
             "title": "Probar conexión",
@@ -1828,13 +1843,13 @@
             "all_workspaces": "Todos los espacios de trabajo",
             "push": {
                 "title": "Enviar a {{provider}}",
-                "description": "Exporta tus notas a {{provider}}. Actualiza archivos existentes y elimina archivos que ya no existen en Poznote.",
-                "button": "Enviar"
+                "description": "Exporta todas tus notas y archivos adjuntos a {{provider}} como archivos planos. Actualiza los archivos existentes y elimina los que ya no existen en Poznote.",
+                "button": "Enviar a {{provider}}"
             },
             "pull": {
                 "title": "Recuperar de {{provider}}",
-                "description": "Importa notas desde {{provider}}. Actualiza notas existentes y mueve a la papelera notas que ya no existen en {{provider}}.",
-                "button": "Recuperar"
+                "description": "Importa todas las notas y archivos adjuntos desde {{provider}}. Reemplaza el contenido local y mueve a la papelera las notas que no están en el repositorio.",
+                "button": "Recuperar de {{provider}}"
             }
         },
         "messages": {

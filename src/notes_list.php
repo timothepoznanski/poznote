@@ -273,7 +273,10 @@ try {
     $stmtSetting = $con->prepare('SELECT value FROM settings WHERE key = ?');
     $stmtSetting->execute(['notes_without_folders_after_folders']);
     $settingValue = $stmtSetting->fetchColumn();
-    if ($settingValue === '1' || $settingValue === 'true') {
+    // Enable if setting is not set or not '0' (defaultFolders first)
+    if ($settingValue === '0' || $settingValue === 'false' || $settingValue === false) {
+        $displayUncategorizedFirst = true; // notes without folders BEFORE folders
+    } else {
         $displayUncategorizedFirst = false; // notes without folders AFTER folders
     }
 } catch (Exception $e) {

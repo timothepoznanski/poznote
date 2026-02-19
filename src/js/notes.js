@@ -204,8 +204,10 @@ function saveNoteToServer() {
         tags: tags,
         folder_id: folderId,
         workspace: selectedWorkspace || getSelectedWorkspace()
+        // git_push is intentionally omitted here: the push is triggered only
+        // when leaving the note (note switch or page unload), via emergencySave.
     };
-    
+
     // Use RESTful API: PATCH /api/v1/notes/{id}
     fetch("/api/v1/notes/" + noteid, {
         method: "PATCH",

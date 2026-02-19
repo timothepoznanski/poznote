@@ -21,29 +21,29 @@ document.addEventListener('DOMContentLoaded', function () {
     if (typeof setupAttachmentEvents === 'function') setupAttachmentEvents();
     if (typeof setupLinkEvents === 'function') setupLinkEvents();
     if (typeof setupFocusEvents === 'function') setupFocusEvents();
-    
+
     // Drag & drop system (files, notes, folders)
     if (typeof setupDragDropEvents === 'function') setupDragDropEvents();
     if (typeof setupNoteDragDropEvents === 'function') setupNoteDragDropEvents();
     if (typeof setupFolderDragDropEvents === 'function') setupFolderDragDropEvents();
-    
+
     // Navigation system (note-to-note navigation, history)
     if (typeof initializeAutoSaveSystem === 'function') initializeAutoSaveSystem();
     if (typeof setupPageUnloadWarning === 'function') setupPageUnloadWarning();
-    
+
     // Text selection and formatting toolbar
-    initTextSelectionHandlers();
-    
+    if (typeof initTextSelectionHandlers === 'function') initTextSelectionHandlers();
+
     // Chrome fix: Convert <audio> elements to iframes inside contenteditable notes
     if (typeof window.convertNoteAudioToIframes === 'function') {
         window.convertNoteAudioToIframes();
     }
-    
+
     // Fix existing audio iframes to use audio_player.php
     if (typeof window.fixAudioIframes === 'function') {
         window.fixAudioIframes();
     }
-    
+
     // Ensure embedded media has correct attributes
     try {
         var mediaEls = document.querySelectorAll('.noteentry video, .noteentry iframe');
