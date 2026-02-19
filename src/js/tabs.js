@@ -154,13 +154,15 @@
             titleSpan.textContent = tab.title || 'Untitled';
             titleSpan.title = tab.title || 'Untitled';
 
-            var closeBtn = document.createElement('button');
-            closeBtn.className = 'app-tab-close';
-            closeBtn.setAttribute('aria-label', 'Close tab');
-            closeBtn.textContent = '×';
-
             el.appendChild(titleSpan);
-            el.appendChild(closeBtn);
+
+            if (tabs.length > 1) {
+                var closeBtn = document.createElement('button');
+                closeBtn.className = 'app-tab-close';
+                closeBtn.setAttribute('aria-label', 'Close tab');
+                closeBtn.textContent = '×';
+                el.appendChild(closeBtn);
+            }
             bar.appendChild(el);
         });
 
