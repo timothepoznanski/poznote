@@ -59,7 +59,7 @@ function renderNoteActionsMenu($noteId, $noteData, $folderId, $folderName) {
     echo "<div class='note-actions-menu-item' data-action='open-note-new-tab' data-note-id='$noteId'><i class='fas fa-external-link'></i><span>" . t_h('editor.toolbar.open_in_new_tab') . "</span></div>";
     
     // Duplicate
-    echo "<div class='note-actions-menu-item' data-action='duplicate-note' data-note-id='$noteId'><i class='fas fa-copy'></i><span>" . t_h('common.duplicate') . "</span></div>";
+    echo "<div class='note-actions-menu-item' data-action='duplicate-note' data-note-id='$noteId'><i class='fas fa-copy'></i><span>" . t_h('common.duplicate', [], 'Duplicate') . "</span></div>";
     
     // Move
     echo "<div class='note-actions-menu-item' data-action='show-move-folder-dialog' data-note-id='$noteId' data-folder-id='$folderId' data-folder='" . htmlspecialchars($folderName, ENT_QUOTES) . "'><i class='fas fa-folder-open'></i><span>" . t_h('common.move', [], 'Move') . "</span></div>";

@@ -158,10 +158,10 @@
     background: none;
     border: none;
     cursor: pointer;
-    padding: 3px 6px;
-    color: #9ca3af;
+    padding: 4px 8px;
+    color: #6b7280;
     border-radius: 4px;
-    font-size: 0.8rem;
+    font-size: 0.85em;
     line-height: 1;
     display: none;
     /* hidden until parent row is hovered */

@@ -109,11 +109,12 @@ $settings = [
     'hide_folder_counts' => null,
     'note_list_sort' => 'updated_desc',
     'notes_without_folders_after_folders' => '1',
-    'hide_inline_attachment_images' => '1'
+    'hide_inline_attachment_images' => '1',
+    'enable_internal_tabs' => '0'
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'hide_inline_attachment_images')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'hide_inline_attachment_images', 'enable_internal_tabs')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -195,6 +196,7 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <link type="text/css" rel="stylesheet" href="css/slash-commands.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/drag-drop.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/icons.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/tabs.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/misc.css?v=<?php echo $v; ?>"/>
     <link rel="stylesheet" href="css/index-mobile.css?v=<?php echo $v; ?>" media="(max-width: 800px)">
     <link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $v; ?>"/>
@@ -296,6 +298,7 @@ $body_classes = trim($extra_body_classes);
     </div>
     
     <!-- Global error handler (external for CSP compliance) -->
+    <script>window.POZNOTE_CONFIG = { enableInternalTabs: <?php echo ($settings['enable_internal_tabs'] === '1' || $settings['enable_internal_tabs'] === 'true') ? 'true' : 'false'; ?> };</script>
     <script src="js/error-handler.js?v=<?php echo $v; ?>"></script>
 
     <!-- Workspace data for JavaScript (CSP compliant) -->
@@ -977,6 +980,7 @@ $body_classes = trim($extra_body_classes);
 <script src="js/notes-list-events.js?v=<?php echo $v; ?>"></script>
 <script src="js/folder-icon.js?v=<?php echo $v; ?>"></script>
 <script src="js/kanban.js?v=<?php echo $v; ?>"></script>
+<script src="js/tabs.js?v=<?php echo $v; ?>"></script>
 
 <?php if ($note && is_numeric($note)): ?>
 <!-- Data for draft check (used by index-events.js) -->

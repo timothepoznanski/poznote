@@ -5,6 +5,13 @@
  * at 600px breakpoint.
  */
 
+/* Hide desktop-only settings on mobile */
+@media (max-width: 800px) {
+    #enable-internal-tabs-card {
+        display: none !important;
+    }
+}
+
 @media (max-width: 600px) {
     .home-container {
         padding: 20px 15px;
