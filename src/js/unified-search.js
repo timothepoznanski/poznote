@@ -890,9 +890,10 @@ class SearchManager {
         // On mobile, start the horizontal transition to the right column early.
         // This ensures that for the FIRST search of the session, the container is 
         // already moving when the AJAX result arrives.
-        if (isMobile && typeof window.scrollToRightColumn === 'function') {
-            window.scrollToRightColumn();
-        }
+        // Disabled per user request to not auto-open the first note on mobile
+        // if (isMobile && typeof window.scrollToRightColumn === 'function') {
+        //    window.scrollToRightColumn();
+        // }
 
         this.performAjaxSearch(elements.form, isMobile);
     }
@@ -1096,7 +1097,10 @@ class SearchManager {
             try {
                 // Add the displayed note ID to the URL params
                 const urlParams = new URLSearchParams(formParams);
-                if (displayedNoteId) {
+                const isMobileView = window.innerWidth <= 800;
+
+                // On mobile, do not add the note id to the url so it doesn't trigger auto-scroll
+                if (displayedNoteId && !isMobileView) {
                     urlParams.set('note', displayedNoteId);
                 }
 

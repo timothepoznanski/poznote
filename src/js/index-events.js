@@ -1044,10 +1044,15 @@
             const urlParams = new URLSearchParams(window.location.search);
             const hasScrollFlag = urlParams.has('scroll') && urlParams.get('scroll') === '1';
             const hasNoteId = urlParams.has('note') && urlParams.get('note');
+            const isSearch = urlParams.has('search') || urlParams.has('tags_search') || window.isSearchMode;
 
-            if (hasScrollFlag || hasNoteId) {
+            if (hasScrollFlag || (hasNoteId && !isSearch)) {
                 setTimeout(function () {
-                    scrollToRightColumn();
+                    if (typeof window.scrollToRightColumn === 'function') {
+                        window.scrollToRightColumn();
+                    } else if (typeof scrollToRightColumn === 'function') {
+                        scrollToRightColumn();
+                    }
                     if (hasScrollFlag) {
                         urlParams.delete('scroll');
                         const newUrl = window.location.pathname + '?' + urlParams.toString();
