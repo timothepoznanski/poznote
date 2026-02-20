@@ -297,11 +297,13 @@ $body_classes = trim($extra_body_classes);
         <i class="fas fa-save"></i>
     </div>
     
-    <!-- Global error handler (external for CSP compliance) -->
-    <script>window.POZNOTE_CONFIG = { 
-        enableInternalTabs: <?php echo ($settings['enable_internal_tabs'] === '1' || $settings['enable_internal_tabs'] === 'true') ? 'true' : 'false'; ?>,
-        gitSyncAutoPush: <?php echo ($showGitSync && $gitSync->isAutoPushEnabled()) ? 'true' : 'false'; ?>
-    };</script>
+    <!-- Global configuration (CSP compliant) -->
+    <script type="application/json" id="poznote-config"><?php
+        echo json_encode([
+            'enableInternalTabs' => ($settings['enable_internal_tabs'] === '1' || $settings['enable_internal_tabs'] === 'true'),
+            'gitSyncAutoPush' => ($showGitSync && $gitSync->isAutoPushEnabled())
+        ], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP) ?: '{}';
+    ?></script>
     <script src="js/error-handler.js?v=<?php echo $v; ?>"></script>
 
     <!-- Workspace data for JavaScript (CSP compliant) -->
