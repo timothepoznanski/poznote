@@ -342,6 +342,43 @@ function deleteAttachment(attachmentId, noteId) {
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data.success) {
+                // Remove the attachment from the note editor DOM (HTML notes)
+                var noteEntry = document.getElementById('entry' + noteIdToUse);
+                if (noteEntry && document.body.contains(noteEntry)) {
+                    var noteType = noteEntry.getAttribute('data-note-type') || 'note';
+
+                    if (noteType === 'note') {
+                        var imgs = noteEntry.querySelectorAll('img[src*="' + attachmentId + '"]');
+                        var removedAny = false;
+                        imgs.forEach(function (img) {
+                            img._manuallyDeleted = true; // prevent MutationObserver from triggering deleteAttachment again
+                            img.parentNode.removeChild(img);
+                            removedAny = true;
+                        });
+                        if (removedAny && typeof window.markNoteAsModified === 'function') {
+                            window.markNoteAsModified();
+                        }
+                    } else if (noteType === 'markdown') {
+                        var editor = noteEntry.querySelector('.markdown-editor');
+                        if (editor) {
+                            var walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null, false);
+                            var node;
+                            var regex = new RegExp('!?(?:\\[[^\\]]*\\])?\\([^)]*' + attachmentId + '[^)]*\\)', 'gi');
+                            var markdownRemoved = false;
+                            while (node = walker.nextNode()) {
+                                if (node.nodeValue.includes(attachmentId)) {
+                                    node.nodeValue = node.nodeValue.replace(regex, '');
+                                    markdownRemoved = true;
+                                }
+                            }
+                            if (markdownRemoved) {
+                                var inputEvent = new Event('input', { bubbles: true });
+                                editor.dispatchEvent(inputEvent);
+                            }
+                        }
+                    }
+                }
+
                 if (typeof window.setNeedsGitPush === 'function') {
                     window.setNeedsGitPush(true);
                 }

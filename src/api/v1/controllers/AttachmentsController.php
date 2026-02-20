@@ -401,13 +401,13 @@ class AttachmentsController {
         }
         
         try {
-            // Get current attachments
+            // Get current attachments and note content
             if ($workspace) {
-                $query = "SELECT attachments FROM entries WHERE id = ? AND workspace = ?";
+                $query = "SELECT attachments, entry, type FROM entries WHERE id = ? AND workspace = ?";
                 $stmt = $this->con->prepare($query);
                 $stmt->execute([$noteId, $workspace]);
             } else {
-                $query = "SELECT attachments FROM entries WHERE id = ?";
+                $query = "SELECT attachments, entry, type FROM entries WHERE id = ?";
                 $stmt = $this->con->prepare($query);
                 $stmt->execute([$noteId]);
             }
@@ -434,16 +434,56 @@ class AttachmentsController {
                         unlink($file_to_delete);
                     }
                     
+                    // Clean up inline references from note content to prevent 404s
+                    $entry = $result['entry'] ?? '';
+                    $content_changed = false;
+                    
+                    if (!empty($entry)) {
+                        // Remove HTML <img> tags referencing this attachment
+                        $html_pattern = '/<img[^>]*src=[\'"][^\'"]*' . preg_quote($attachmentId, '/') . '[^\'"]*[\'"][^>]*>/i';
+                        $new_entry = preg_replace($html_pattern, '', $entry, -1, $count1);
+                        
+                        // Remove Markdown references: ![alt](...attachmentId...) or [...](...attachmentId...)
+                        $md_pattern = '/!?(?:\[[^\]]*\])?\([^)]*' . preg_quote($attachmentId, '/') . '[^)]*\)/i';
+                        $new_entry = preg_replace($md_pattern, '', $new_entry, -1, $count2);
+                        
+                        if ($count1 > 0 || $count2 > 0) {
+                            $entry = $new_entry;
+                            $content_changed = true;
+                            
+                            // Also update the physical file if it exists, since index.php prioritizes it
+                            if (function_exists('getEntryFilename')) {
+                                $noteType = $result['type'] ?? 'note';
+                                $filename = getEntryFilename($noteId, $noteType);
+                                if ($filename && file_exists($filename)) {
+                                    file_put_contents($filename, $entry);
+                                }
+                            }
+                        }
+                    }
+                    
                     // Update database
                     $attachments_json = json_encode($updated_attachments);
                     if ($workspace) {
-                        $update_query = "UPDATE entries SET attachments = ? WHERE id = ? AND workspace = ?";
-                        $update_stmt = $this->con->prepare($update_query);
-                        $success = $update_stmt->execute([$attachments_json, $noteId, $workspace]);
+                        if ($content_changed) {
+                            $update_query = "UPDATE entries SET attachments = ?, entry = ? WHERE id = ? AND workspace = ?";
+                            $update_stmt = $this->con->prepare($update_query);
+                            $success = $update_stmt->execute([$attachments_json, $entry, $noteId, $workspace]);
+                        } else {
+                            $update_query = "UPDATE entries SET attachments = ? WHERE id = ? AND workspace = ?";
+                            $update_stmt = $this->con->prepare($update_query);
+                            $success = $update_stmt->execute([$attachments_json, $noteId, $workspace]);
+                        }
                     } else {
-                        $update_query = "UPDATE entries SET attachments = ? WHERE id = ?";
-                        $update_stmt = $this->con->prepare($update_query);
-                        $success = $update_stmt->execute([$attachments_json, $noteId]);
+                        if ($content_changed) {
+                            $update_query = "UPDATE entries SET attachments = ?, entry = ? WHERE id = ?";
+                            $update_stmt = $this->con->prepare($update_query);
+                            $success = $update_stmt->execute([$attachments_json, $entry, $noteId]);
+                        } else {
+                            $update_query = "UPDATE entries SET attachments = ? WHERE id = ?";
+                            $update_stmt = $this->con->prepare($update_query);
+                            $success = $update_stmt->execute([$attachments_json, $noteId]);
+                        }
                     }
                     
                     if ($success) {
