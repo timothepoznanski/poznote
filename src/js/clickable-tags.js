@@ -41,9 +41,9 @@ function refreshTagsCount() {
     // Get current workspace from URL or default
     const urlParams = new URLSearchParams(window.location.search);
     const workspace = urlParams.get('workspace') || '';
-    
+
     const url = '/api/v1/tags' + (workspace ? ('?workspace=' + encodeURIComponent(workspace)) : '');
-    
+
     fetch(url, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
         .then(r => r.json())
         .then(data => {
@@ -88,12 +88,12 @@ function extractNoteIdFromContainer(container) {
     if (titleInput) {
         return titleInput.id.replace('inp', '');
     }
-    
+
     const tagsInput = container.querySelector('input[id^="tags"]');
     if (tagsInput) {
         return tagsInput.id.replace('tags', '');
     }
-    
+
     return null;
 }
 
@@ -104,45 +104,45 @@ function extractNoteIdFromContainer(container) {
 function convertTagsToEditable(noteId) {
     const tagsInput = document.getElementById('tags' + noteId);
     const nameTagsContainer = tagsInput ? tagsInput.closest('.name_tags') : null;
-    
+
     if (!tagsInput || !nameTagsContainer) {
         return;
     }
-    
+
     const tagsValue = tagsInput.value.trim();
-    
+
     // Remove existing editable container if it exists
     const existingContainer = nameTagsContainer.querySelector('.editable-tags-container');
     if (existingContainer) {
         existingContainer.remove();
     }
-    
+
     // Create editable tags container
     const editableContainer = document.createElement('div');
     editableContainer.className = 'editable-tags-container';
-    
+
     // Add existing tags as clickable elements
     if (tagsValue) {
         const tags = tagsValue.split(/[,\s]+/).filter(tag => tag.trim() !== '');
-        
+
         tags.forEach(tag => {
             addTagElement(editableContainer, tag.trim(), noteId);
         });
     }
-    
+
     // Add input field for adding new tags
     const tagInput = document.createElement('input');
     tagInput.className = 'tag-input';
     tagInput.type = 'text';
-    tagInput.placeholder = tagsValue 
-        ? (window.t ? window.t('tags.add_single', null, 'Add tag...') : 'Add tag...') 
+    tagInput.placeholder = tagsValue
+        ? (window.t ? window.t('tags.add_single', null, 'Add tag...') : 'Add tag...')
         : (window.t ? window.t('tags.add_multiple', null, 'Add tags...') : 'Add tags...');
     tagInput.setAttribute('autocomplete', 'off');
     tagInput.setAttribute('autocorrect', 'off');
     tagInput.setAttribute('spellcheck', 'false');
-    
+
     // Prevent line breaks
-    tagInput.addEventListener('keypress', function(e) {
+    tagInput.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
             e.preventDefault();
             e.stopPropagation();
@@ -150,12 +150,12 @@ function convertTagsToEditable(noteId) {
         }
         // Space key will be handled in keydown to create tag
     });
-    
-    tagInput.addEventListener('keydown', function(e) {
+
+    tagInput.addEventListener('keydown', function (e) {
         handleTagInput(e, noteId, editableContainer);
     });
     // Show suggestions while typing
-    tagInput.addEventListener('input', function(e) {
+    tagInput.addEventListener('input', function (e) {
         try {
             showTagSuggestions(tagInput, editableContainer, window.selectedWorkspace || window.pageWorkspace, noteId);
         } catch (err) {
@@ -163,28 +163,28 @@ function convertTagsToEditable(noteId) {
         }
     });
     // Show suggestions on focus
-    tagInput.addEventListener('focus', function() {
-        try { 
-            showTagSuggestions(tagInput, editableContainer, window.selectedWorkspace || window.pageWorkspace, noteId); 
-        } catch(e) {
+    tagInput.addEventListener('focus', function () {
+        try {
+            showTagSuggestions(tagInput, editableContainer, window.selectedWorkspace || window.pageWorkspace, noteId);
+        } catch (e) {
             console.warn('Failed to show tag suggestions on focus:', e);
         }
     });
-    
+
     // Handle blur: hide suggestions and process any remaining text
-    tagInput.addEventListener('blur', function(e) {
+    tagInput.addEventListener('blur', function (e) {
         // Hide suggestions after a short delay to allow mousedown on suggestions
         setTimeout(() => {
             const dropdown = editableContainer.querySelector('.tag-suggestions');
             if (dropdown) dropdown.style.display = 'none';
         }, 150);
-        
+
         // Process any remaining text in the input
         handleTagInputBlur(e, noteId, editableContainer);
     });
-    
+
     editableContainer.appendChild(tagInput);
-    
+
     // Add the editable container to the name_tags element
     nameTagsContainer.appendChild(editableContainer);
     nameTagsContainer.classList.add('showing-editable-tags');
@@ -303,7 +303,7 @@ function highlightMatchingTags(searchTerm, _attempt = 0) {
     // Refresh navigation list if highlighter is available
     if (typeof updateHighlightsList === 'function') {
         updateHighlightsList();
-        
+
         // If we have a pending scroll from a new search, and we just found tag matches
         // (but no content matches were found yet, or we're in unified mode), trigger the scroll.
         if (window.searchNavigation && window.searchNavigation.pendingAutoScroll && window.searchNavigation.highlights.length > 0) {
@@ -344,7 +344,7 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
             item.textContent = tag;
             item.style.padding = '6px 8px';
             item.style.cursor = 'pointer';
-            item.addEventListener('mousedown', function(e) {
+            item.addEventListener('mousedown', function (e) {
                 e.preventDefault();
                 addTagElement(container, tag, noteId);
                 inputEl.value = '';
@@ -359,10 +359,10 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
 
         // Position the dropdown under the input
         dd.style.display = 'block';
-        
+
         // Check if we're in mobile view (horizontal scrolling container)
         const isMobile = window.innerWidth <= 800;
-        
+
         if (isMobile) {
             // Mobile: calculate position relative to container with scroll offset
             const containerRect = container.getBoundingClientRect();
@@ -377,28 +377,28 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
         // Note: No item is highlighted by default, user must use arrow keys to highlight
         // Reset highlight index whenever suggestions are rebuilt
         inputEl._highlightedIdx = -1;
-        
+
         // Only add navigation handler once per input element
         if (!inputEl.hasNavigationHandler) {
             inputEl.addEventListener('keydown', function navHandler(ev) {
                 const items = dd.querySelectorAll('.tag-suggestion-item');
                 if (!items || items.length === 0) return;
                 if (ev.key === 'ArrowDown') {
-                    ev.preventDefault(); 
+                    ev.preventDefault();
                     inputEl._highlightedIdx = Math.min(inputEl._highlightedIdx + 1, items.length - 1);
                     items.forEach((it, i) => {
                         it.classList.toggle('highlighted', i === inputEl._highlightedIdx);
                         it.style.background = i === inputEl._highlightedIdx ? '#f0f7ff' : '';
                     });
                 } else if (ev.key === 'ArrowUp') {
-                    ev.preventDefault(); 
+                    ev.preventDefault();
                     inputEl._highlightedIdx = Math.max(inputEl._highlightedIdx - 1, 0);
                     items.forEach((it, i) => {
                         it.classList.toggle('highlighted', i === inputEl._highlightedIdx);
                         it.style.background = i === inputEl._highlightedIdx ? '#f0f7ff' : '';
                     });
                 } else if (ev.key === 'Enter' && inputEl._highlightedIdx >= 0) {
-                    ev.preventDefault(); 
+                    ev.preventDefault();
                     ev.stopPropagation();
                     // Dispatch mousedown to reuse the same handler which also triggers save
                     items[inputEl._highlightedIdx].dispatchEvent(new MouseEvent('mousedown'));
@@ -413,7 +413,7 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
 }
 
 // Close suggestions when clicking outside
-document.addEventListener('click', function(e) {
+document.addEventListener('click', function (e) {
     document.querySelectorAll('.tag-suggestions').forEach(dd => {
         if (!dd.contains(e.target)) dd.style.display = 'none';
     });
@@ -432,30 +432,30 @@ document.addEventListener('click', function(e) {
 function addTagElement(container, tagText, noteId) {
     const tagWrapper = document.createElement('span');
     tagWrapper.className = 'clickable-tag-wrapper';
-    
+
     const tagElement = document.createElement('span');
     tagElement.className = 'clickable-tag';
     tagElement.textContent = tagText;
     tagElement.setAttribute('data-tag', tagText);
-    tagElement.addEventListener('click', function(e) {
+    tagElement.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
         redirectToTag(tagText);
     });
-    
+
     const deleteButton = document.createElement('span');
     deleteButton.className = 'tag-delete-button';
     deleteButton.innerHTML = '×';
     deleteButton.title = 'Remove tag';
-    deleteButton.addEventListener('click', function(e) {
+    deleteButton.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
         removeTagElement(tagWrapper, noteId);
     });
-    
+
     tagWrapper.appendChild(tagElement);
     tagWrapper.appendChild(deleteButton);
-    
+
     // Insert before the input field
     const inputField = container.querySelector('.tag-input');
     container.insertBefore(tagWrapper, inputField);
@@ -480,7 +480,7 @@ function removeTagElement(tagWrapper, noteId) {
  */
 function tagExistsInContainer(container, tagText) {
     const existingTags = container.querySelectorAll('.clickable-tag');
-    return Array.from(existingTags).some(tag => 
+    return Array.from(existingTags).some(tag =>
         tag.textContent.toLowerCase() === tagText.toLowerCase()
     );
 }
@@ -499,10 +499,10 @@ function handleTagInput(e, noteId, container) {
     if (e.key === ' ' || e.key === 'Enter' || e.key === ',') {
         e.preventDefault(); // Prevents default behavior
         e.stopPropagation(); // Prevents event propagation
-        
+
         const input = e.target;
         let tagText = input.value.trim();
-        
+
         if (tagText && tagText !== '') {
             // Check if there's a visible suggestions dropdown
             const suggestionsDropdown = container.querySelector('.tag-suggestions');
@@ -520,26 +520,26 @@ function handleTagInput(e, noteId, container) {
                 // For space, comma, or Enter with no highlighted item, hide suggestions and allow creating the typed tag
                 suggestionsDropdown.style.display = 'none';
             }
-            
+
             // Split by spaces to allow multiple tags at once
             const tags = tagText.split(/\s+/).filter(tag => tag.trim() !== '');
-            
+
             tags.forEach(singleTag => {
                 const trimmedTag = singleTag.trim();
                 if (trimmedTag && !tagExistsInContainer(container, trimmedTag)) {
                     addTagElement(container, trimmedTag, noteId);
                 }
             });
-            
+
             input.value = '';
             updateTagsInput(noteId, container);
-            
+
             // Keep focus on input to continue typing
             setTimeout(() => {
                 input.focus();
             }, 10);
         }
-        
+
         return false;
     } else if (e.key === 'Backspace' && e.target.value === '') {
         // If backspace on empty input, remove last tag
@@ -560,7 +560,7 @@ function handleTagInput(e, noteId, container) {
 function handleTagInputBlur(e, noteId, container) {
     const input = e.target;
     let tagText = input.value.trim();
-    
+
     if (tagText && tagText !== '') {
         // Check if there's a visible suggestions dropdown
         const suggestionsDropdown = container.querySelector('.tag-suggestions');
@@ -568,17 +568,17 @@ function handleTagInputBlur(e, noteId, container) {
             // Hide suggestions and process the typed text
             suggestionsDropdown.style.display = 'none';
         }
-        
+
         // Split by spaces to allow multiple tags at once
         const tags = tagText.split(/\s+/).filter(tag => tag.trim() !== '');
-        
+
         tags.forEach(singleTag => {
             const trimmedTag = singleTag.trim();
             if (trimmedTag && !tagExistsInContainer(container, trimmedTag)) {
                 addTagElement(container, trimmedTag, noteId);
             }
         });
-        
+
         input.value = '';
         updateTagsInput(noteId, container);
     }
@@ -599,23 +599,23 @@ function showTagError(input, message) {
     if (existingError) {
         existingError.remove();
     }
-    
+
     // Create error message element
     const errorDiv = document.createElement('div');
     errorDiv.className = 'tag-error-message';
     errorDiv.textContent = message;
     errorDiv.style.cssText = 'color: #dc3545; font-size: 12px; margin-top: 2px; position: absolute; z-index: 1000; background: white; padding: 2px 5px; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);';
-    
+
     // Insert after input
     input.parentNode.insertBefore(errorDiv, input.nextSibling);
-    
+
     // Remove error after 3 seconds
     setTimeout(() => {
         if (errorDiv && errorDiv.parentNode) {
             errorDiv.remove();
         }
     }, 3000);
-    
+
     // Clear the input
     input.value = '';
 }
@@ -628,12 +628,12 @@ function showTagError(input, message) {
 function updateTagsInput(noteId, container) {
     const tagsInput = document.getElementById('tags' + noteId);
     if (!tagsInput) return;
-    
+
     const tagElements = container.querySelectorAll('.clickable-tag');
     const tags = Array.from(tagElements).map(tag => tag.textContent);
-    
+
     tagsInput.value = tags.join(' ');
-    
+
     // Update the placeholder based on whether there are tags
     const tagInput = container.querySelector('.tag-input');
     if (tagInput) {
@@ -641,10 +641,10 @@ function updateTagsInput(noteId, container) {
             ? (window.t ? window.t('tags.add_single', null, 'Add tag...') : 'Add tag...')
             : (window.t ? window.t('tags.add_multiple', null, 'Add tags...') : 'Add tags...');
     }
-    
+
     // Trigger auto-save for this specific note (without changing global noteid)
     triggerAutoSaveForNote(noteId);
-    
+
     // Trigger the input change event to notify any other listeners
     const changeEvent = new Event('input', { bubbles: true });
     tagsInput.dispatchEvent(changeEvent);
@@ -660,8 +660,8 @@ function updateTagsInput(noteId, container) {
  */
 function triggerAutoSaveForNote(targetNoteId) {
     if (targetNoteId == 'search' || targetNoteId == -1 || targetNoteId === null || targetNoteId === undefined) return;
-    
-    
+
+
     // Use dedicated function that doesn't depend on global noteid
     updateNoteById(targetNoteId);
 }
@@ -672,23 +672,23 @@ function triggerAutoSaveForNote(targetNoteId) {
  */
 function updateNoteById(noteId) {
     if (noteId == 'search' || noteId == -1 || noteId === null || noteId === undefined) return;
-    
+
     // Get elements for this specific note
     var entryElem = document.getElementById("entry" + noteId);
     var titleInput = document.getElementById("inp" + noteId);
     var tagsElem = document.getElementById("tags" + noteId);
-    
+
     var currentContent = entryElem ? entryElem.innerHTML : '';
     var currentTitle = titleInput ? titleInput.value : '';
     var currentTags = tagsElem ? tagsElem.value : '';
-    
-    
+
+
     // Save to localStorage immediately
     try {
         if (entryElem) {
             var draftKey = 'poznote_draft_' + noteId;
             localStorage.setItem(draftKey, currentContent);
-            
+
             if (titleInput) {
                 localStorage.setItem('poznote_title_' + noteId, currentTitle);
             }
@@ -699,7 +699,7 @@ function updateNoteById(noteId) {
     } catch (err) {
         // Silently ignore localStorage errors (quota exceeded, private browsing, etc.)
     }
-    
+
     // Initialize lastSaved variables if this is the current note to prevent infinite loops
     if (window.noteid == noteId) {
         // Initialize the global lastSaved variables to prevent markNoteAsModified() infinite loops
@@ -713,7 +713,12 @@ function updateNoteById(noteId) {
             lastSavedTags = currentTags;
         }
     }
-    
+
+    // Mark as needing git push, since we are updating user content (tags)
+    if (typeof window.setNeedsGitPush === 'function') {
+        window.setNeedsGitPush(true);
+    }
+
     // For tags modification, save immediately without visual indicator or delay
     // Tags are saved instantly like titles, no red dot needed
     saveNoteToServerById(noteId);
@@ -724,11 +729,11 @@ function updateNoteById(noteId) {
  * @param {string} noteId - The ID of the note to save
  */
 function saveNoteToServerById(noteId) {
-    
+
     // Temporarily set global noteid for saveNoteToServer compatibility
     var originalNoteid = window.noteid;
     window.noteid = noteId;
-    
+
     try {
         // Call the existing saveNoteToServer function
         if (typeof saveNoteToServer === 'function') {
@@ -747,7 +752,7 @@ function saveNoteToServerById(noteId) {
 // ============================================
 
 // Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     initializeClickableTags();
 });
 
@@ -773,7 +778,7 @@ function getCurrentWorkspace() {
     } catch (e) {
         console.warn('Error reading URL params:', e);
     }
-    
+
     // 2. Check global variables (set by PHP)
     const workspaceVars = [
         typeof pageWorkspace !== 'undefined' && pageWorkspace !== 'undefined' ? pageWorkspace : null,
@@ -781,17 +786,17 @@ function getCurrentWorkspace() {
         typeof window.selectedWorkspace !== 'undefined' ? window.selectedWorkspace : null,
         typeof window.pageWorkspace !== 'undefined' && window.pageWorkspace !== 'undefined' ? window.pageWorkspace : null
     ];
-    
+
     for (const workspace of workspaceVars) {
         if (workspace) return workspace;
     }
-    
+
     // 3. Fallback: try workspace selector
     const wsSelector = document.getElementById('workspaceSelector');
     if (wsSelector && wsSelector.value) {
         return wsSelector.value;
     }
-    
+
     return '';
 }
 
@@ -801,21 +806,21 @@ function getCurrentWorkspace() {
  */
 function redirectToTag(tag) {
     const currentWorkspace = getCurrentWorkspace();
-    
+
     // Get current search parameters
     let urlParams = new URLSearchParams(window.location.search);
     let currentTagsSearch = urlParams.get('tags_search') || '';
-    
+
     // Parse the current tags (space or comma separated)
     let currentTags = [];
     if (currentTagsSearch.trim()) {
         currentTags = currentTagsSearch.split(/[\s,]+/).filter(t => t.trim() !== '');
     }
-    
+
     // Check if the clicked tag is already in the search
     const tagIndex = currentTags.findIndex(t => t.toLowerCase() === tag.toLowerCase());
     let newTagsSearch = '';
-    
+
     if (tagIndex > -1) {
         // Tag is already selected - remove it
         currentTags.splice(tagIndex, 1);
@@ -825,7 +830,7 @@ function redirectToTag(tag) {
         currentTags.push(tag);
         newTagsSearch = currentTags.join(' ');
     }
-    
+
     // Build URL with updated tags parameter
     let finalUrl;
     if (newTagsSearch.trim()) {
@@ -835,7 +840,7 @@ function redirectToTag(tag) {
         // If no tags left, clear the search (like clicking the clear search button)
         finalUrl = 'index.php?workspace=' + encodeURIComponent(currentWorkspace);
     }
-    
+
     // Navigate to the URL
     window.location.href = finalUrl;
 }
@@ -854,9 +859,9 @@ window.convertTagsToEditable = convertTagsToEditable;
 window.triggerAutoSaveForNote = triggerAutoSaveForNote;
 
 // Listen for i18n loaded event to update tag input placeholders
-document.addEventListener('poznote:i18n:loaded', function() {
+document.addEventListener('poznote:i18n:loaded', function () {
     // Update all tag input placeholders with translations
-    document.querySelectorAll('.tag-input').forEach(function(input) {
+    document.querySelectorAll('.tag-input').forEach(function (input) {
         const container = input.closest('.editable-tags-container');
         if (container) {
             const tagElements = container.querySelectorAll('.clickable-tag');
