@@ -210,7 +210,7 @@ try {
         <div class="settings-banner-info">
             <label class="toggle-checkbox">
                 <input type="checkbox" id="showInlineImagesToggle" <?php echo $showInlineInList ? 'checked' : ''; ?>>
-                <span class="toggle-label"><?php echo t_h('display.cards.show_inline_attachment_images', [], 'Show image attachments'); ?></span>
+                <span class="toggle-label"><?php echo t_h('attachments.page.show_inline_attachment_images_desc', [], 'Show image attachments that are automatically created when an image is inserted into the note'); ?></span>
             </label>
         </div>
 

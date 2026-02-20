@@ -258,6 +258,7 @@
             "uploaded_prefix": "已上传: ",
             "open_in_new_tab": "在新标签页中打开",
             "pdf_label": "PDF",
+            "show_inline_attachment_images_desc": "显示插入图片到笔记时自动创建的图片附件",
             "settings_banner": {
                 "message": "图片附件在笔记列表中已隐藏（但在此列表中不隐藏），因为“显示图片附件”设置已禁用。",
                 "action": "更改设置"
@@ -433,7 +434,7 @@
             "kanban_on_folder_click": "点击文件夹时打开看板视图",
             "index_icon_scale": "索引页图标缩放",
             "note_content_width": "笔记内容宽度",
-            "show_inline_attachment_images": "显示插入图片到笔记时自动创建的图片附件",
+            "show_inline_attachment_images": "显示图片附件",
             "enable_internal_tabs": "启用内部标签页"
         },
         "badges": {

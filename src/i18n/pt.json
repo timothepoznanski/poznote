@@ -256,6 +256,7 @@
             "preview_alt": "Pré-visualização",
             "uploaded_prefix": "Enviado: ",
             "open_in_new_tab": "Abrir em nova aba",
+            "show_inline_attachment_images_desc": "Mostrar anexos de imagem que são anexos criados automaticamente ao inserir uma imagem na nota",
             "settings_banner": {
                 "message": "Os anexos de imagem estão ocultos na lista da nota (mas não nesta lista) porque a configuração 'Mostrar anexos de imagem' está desativada.",
                 "action": "Alterar configuração"
@@ -430,7 +431,7 @@
             "kanban_on_folder_click": "Abrir visualização Kanban ao clicar na pasta",
             "index_icon_scale": "Escala de ícones do índice",
             "note_content_width": "Largura do conteúdo da nota",
-            "show_inline_attachment_images": "Mostrar anexos de imagem que são anexos criados automaticamente ao inserir uma imagem na nota",
+            "show_inline_attachment_images": "Mostrar anexos de imagem",
             "enable_internal_tabs": "Ativar guias internas"
         },
         "badges": {
