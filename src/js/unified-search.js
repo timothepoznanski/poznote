@@ -887,13 +887,6 @@ class SearchManager {
         this.updateHiddenInputs(isMobile);
         this.hideSpecialFolders(isMobile);
 
-        // On mobile, start the horizontal transition to the right column early.
-        // This ensures that for the FIRST search of the session, the container is 
-        // already moving when the AJAX result arrives.
-        // Disabled per user request to not auto-open the first note on mobile
-        // if (isMobile && typeof window.scrollToRightColumn === 'function') {
-        //    window.scrollToRightColumn();
-        // }
 
         this.performAjaxSearch(elements.form, isMobile);
     }
