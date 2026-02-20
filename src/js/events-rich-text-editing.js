@@ -88,10 +88,12 @@ function setupNoteEditingEvents() {
     // Keyboard shortcuts
     document.body.addEventListener('keydown', handleNoteEntryKeydown);
 
-    // Title field handlers - use delegation to handle all title fields
+    // Title and Tags fields handlers - use delegation to handle all title/tags fields
     document.body.addEventListener('blur', function (e) {
         if (e.target.classList && e.target.classList.contains('css-title')) {
             handleTitleBlur(e);
+        } else if (e.target.classList && e.target.classList.contains('tags')) {
+            handleTagsBlur(e);
         }
     }, true); // Use capture phase
 
@@ -629,13 +631,35 @@ function handleTitleBlur(e) {
         window.updateidhead(e.target);
     }
     // Mark as needing Git push (title change = note modified)
-    if (typeof needsGitPush !== 'undefined') {
+    if (typeof window.setNeedsGitPush === 'function') {
+        window.setNeedsGitPush(true);
+    } else if (typeof needsGitPush !== 'undefined') {
         needsGitPush = true;
     }
     // Immediate save for title changes (no debounce)
     if (typeof window.saveNoteToServer === 'function') {
         window.saveNoteToServer();
     }
+}
+
+/**
+ * Save note when tags field loses focus
+ * @param {Event} e - The blur event
+ */
+function handleTagsBlur(e) {
+    if (e.target.id && e.target.id.startsWith('tags')) {
+        var id = e.target.id.substring(4); // Remove 'tags' prefix
+        if (id) {
+            window.noteid = id;
+        }
+    }
+    // Mark as needing Git push (tags change = note modified)
+    if (typeof window.setNeedsGitPush === 'function') {
+        window.setNeedsGitPush(true);
+    } else if (typeof needsGitPush !== 'undefined') {
+        needsGitPush = true;
+    }
+    triggerNoteSave();
 }
 
 /**
@@ -651,7 +675,9 @@ function handleTitleKeydown(e) {
             window.updateidhead(e.target);
         }
         // Mark as needing Git push (title change = note modified)
-        if (typeof needsGitPush !== 'undefined') {
+        if (typeof window.setNeedsGitPush === 'function') {
+            window.setNeedsGitPush(true);
+        } else if (typeof needsGitPush !== 'undefined') {
             needsGitPush = true;
         }
         // Immediate save for title changes (no debounce)

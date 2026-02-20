@@ -680,3 +680,4 @@ window.hasUnsavedChanges = hasUnsavedChanges;
 window.clearDraft = clearDraft;
 window.reinitializeAutoSaveState = reinitializeAutoSaveState;
 window.updateConnectionStatus = updateConnectionStatus;
+window.setNeedsGitPush = function (v) { needsGitPush = v; };

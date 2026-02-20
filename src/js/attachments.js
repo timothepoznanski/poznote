@@ -114,8 +114,11 @@ function convertBase64ImagesToAttachments(noteEntry) {
                     updateAttachmentCountInMenu(noteId);
                 }
 
-                // Mark note as modified and save
+                // Mark note as modified and flag for git push
                 window.noteid = noteId;
+                if (typeof window.setNeedsGitPush === 'function') {
+                    window.setNeedsGitPush(true);
+                }
                 if (typeof window.markNoteAsModified === 'function') {
                     window.markNoteAsModified();
                 }
@@ -240,6 +243,10 @@ function uploadAttachment() {
                     uploadButtonContainer.classList.remove('show');
                 }
 
+                if (typeof window.setNeedsGitPush === 'function') {
+                    window.setNeedsGitPush(true);
+                }
+
                 loadAttachments(currentNoteIdForAttachments);
                 updateAttachmentCountInMenu(currentNoteIdForAttachments);
             } else {
@@ -335,6 +342,9 @@ function deleteAttachment(attachmentId, noteId) {
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data.success) {
+                if (typeof window.setNeedsGitPush === 'function') {
+                    window.setNeedsGitPush(true);
+                }
                 loadAttachments(noteIdToUse);
                 updateAttachmentCountInMenu(noteIdToUse);
             } else {
@@ -579,6 +589,10 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
                     loadAttachments(noteId);
                 }
 
+                if (typeof window.setNeedsGitPush === 'function') {
+                    window.setNeedsGitPush(true);
+                }
+
                 // Trigger automatic save after a short delay
                 setTimeout(function () {
                     if (typeof window.saveNoteImmediately === 'function') {
@@ -778,6 +792,9 @@ function handleHTMLImageInsert(file, dropTarget) {
                 window.noteid = noteId;
 
                 // Trigger automatic save after image insertion
+                if (typeof window.setNeedsGitPush === 'function') {
+                    window.setNeedsGitPush(true);
+                }
                 if (typeof window.markNoteAsModified === 'function') {
                     window.markNoteAsModified();
                 }
