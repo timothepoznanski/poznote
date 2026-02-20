@@ -23,7 +23,7 @@ function getFolderById(id) {
 function updateFolderCache(folders) {
     folderMap.clear();
     if (Array.isArray(folders)) {
-        folders.forEach(function(folder) {
+        folders.forEach(function (folder) {
             if (folder && folder.id !== undefined) {
                 folderMap.set(parseInt(folder.id), folder);
             }
@@ -35,24 +35,25 @@ function updateFolderCache(folders) {
 function getSelectedWorkspace() {
     // Return workspace from global variable (set by PHP from URL/database)
     // No more localStorage dependency
-    return selectedWorkspace || (typeof window.selectedWorkspace !== 'undefined' ? window.selectedWorkspace : '') || '';
+    var _dataWorkspace = document.body ? document.body.getAttribute('data-workspace') : null;
+    return selectedWorkspace || (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace ? window.selectedWorkspace : '') || _dataWorkspace || '';
 }
 
 // Apply global preferences on load
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     try {
         fetch('/api/v1/settings/emoji_icons_enabled', {
             method: 'GET',
             credentials: 'same-origin'
         })
-        .then(function(r) { return r.json(); })
-        .then(function(j) {
-            var enabled = j && j.success && (j.value === '1' || j.value === 'true');
-            if (!enabled) document.body.classList.add('emoji-hidden');
-            else document.body.classList.remove('emoji-hidden');
-        })
-        .catch(function(){});
-    } catch(e){}
+            .then(function (r) { return r.json(); })
+            .then(function (j) {
+                var enabled = j && j.success && (j.value === '1' || j.value === 'true');
+                if (!enabled) document.body.classList.add('emoji-hidden');
+                else document.body.classList.remove('emoji-hidden');
+            })
+            .catch(function () { });
+    } catch (e) { }
 
     // Apply hide inline attachment images setting
     try {
@@ -60,18 +61,18 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'GET',
             credentials: 'same-origin'
         })
-        .then(function(r) { return r.json(); })
-        .then(function(j) {
-            // With invertLogic: '1' = show (don't hide), '0' or null = hide
-            var hideImages = j && j.success && (j.value === '0' || j.value === 'false');
-            if (hideImages) document.body.classList.add('hide-inline-attachment-images');
-            else document.body.classList.remove('hide-inline-attachment-images');
-        })
-        .catch(function(){
-            // On error, default to hiding images  
-            document.body.classList.add('hide-inline-attachment-images');
-        });
-    } catch(e){
+            .then(function (r) { return r.json(); })
+            .then(function (j) {
+                // With invertLogic: '1' = show (don't hide), '0' or null = hide
+                var hideImages = j && j.success && (j.value === '0' || j.value === 'false');
+                if (hideImages) document.body.classList.add('hide-inline-attachment-images');
+                else document.body.classList.remove('hide-inline-attachment-images');
+            })
+            .catch(function () {
+                // On error, default to hiding images  
+                document.body.classList.add('hide-inline-attachment-images');
+            });
+    } catch (e) {
         document.body.classList.add('hide-inline-attachment-images');
     }
 });
@@ -84,7 +85,7 @@ function isMobileDevice() {
 
 // --- i18n (client-side) ---
 // Loads merged translations from api_i18n.php and exposes window.t(key, vars, fallback)
-(function() {
+(function () {
     if (window.t && window.loadPoznoteI18n) return;
 
     window.POZNOTE_I18N = window.POZNOTE_I18N || { lang: 'en', strings: {} };
@@ -100,7 +101,7 @@ function isMobileDevice() {
         return (typeof cur === 'string') ? cur : null;
     }
 
-    window.t = function(key, vars, fallback) {
+    window.t = function (key, vars, fallback) {
         var str = getByPath(window.POZNOTE_I18N && window.POZNOTE_I18N.strings, key);
         if (str == null) str = (fallback != null ? String(fallback) : String(key));
         if (vars && typeof vars === 'object') {
@@ -112,7 +113,7 @@ function isMobileDevice() {
         return str;
     };
 
-    window.applyI18nToDom = function(root) {
+    window.applyI18nToDom = function (root) {
         try {
             root = root || document;
             var nodes = root.querySelectorAll('[data-i18n]');
@@ -138,20 +139,20 @@ function isMobileDevice() {
         }
     };
 
-    window.loadPoznoteI18n = function() {
+    window.loadPoznoteI18n = function () {
         return fetch('api/v1/system/i18n', { credentials: 'same-origin' })
-            .then(function(r) { return r.json(); })
-            .then(function(j) {
+            .then(function (r) { return r.json(); })
+            .then(function (j) {
                 if (j && j.success && j.strings) {
                     window.POZNOTE_I18N = { lang: j.lang || 'en', strings: j.strings };
                     window.applyI18nToDom(document);
-                    try { document.dispatchEvent(new CustomEvent('poznote:i18n:loaded', { detail: window.POZNOTE_I18N })); } catch(e) {}
+                    try { document.dispatchEvent(new CustomEvent('poznote:i18n:loaded', { detail: window.POZNOTE_I18N })); } catch (e) { }
                 }
             })
-            .catch(function(){});
+            .catch(function () { });
     };
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         window.loadPoznoteI18n();
     });
 })();

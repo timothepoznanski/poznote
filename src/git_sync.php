@@ -22,6 +22,7 @@ require_once 'GitSync.php';
 $currentLang = getUserLanguage();
 $currentUser = getCurrentUser();
 $username = htmlspecialchars($currentUser['display_name'] ?: $currentUser['username']);
+$pageWorkspace = trim(getWorkspaceFilter());
 
 // Initialize GitSync
 $gitSync = new GitSync($con, $_SESSION['user_id'] ?? null);
@@ -193,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $cache_v; ?>">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
-<body class="home-page">
+<body class="home-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <div class="home-container git-sync-container">
 
         <div class="git-sync-nav">

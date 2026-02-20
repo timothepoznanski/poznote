@@ -467,8 +467,9 @@
     function updateBackLink() {
         try {
             // Use workspace from PHP (set as global variable)
-            var workspace = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace :
-                (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : null;
+            var workspace = (typeof getSelectedWorkspace === 'function') ? getSelectedWorkspace() :
+                (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace :
+                    (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : null;
             if (workspace) {
                 var a = document.getElementById('backToNotesLink');
                 if (a) {

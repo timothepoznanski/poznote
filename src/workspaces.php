@@ -7,6 +7,7 @@ require_once 'db_connect.php';
 require_once 'functions.php';
 
 $currentLang = getUserLanguage();
+$pageWorkspace = trim(getWorkspaceFilter());
 
 // Ensure workspaces table exists
 $con->exec("CREATE TABLE IF NOT EXISTS workspaces (name TEXT PRIMARY KEY)");
@@ -480,6 +481,7 @@ try {
     <link rel="stylesheet" href="css/workspaces-inline.css?v=<?php echo $cache_v; ?>">
 </head>
 <body data-workspaces="<?php echo htmlspecialchars(json_encode($workspaces, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP), ENT_QUOTES, 'UTF-8'); ?>"
+      data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
       data-txt-last-opened="<?php echo htmlspecialchars(t('workspaces.default.last_opened', [], 'Last workspace opened', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
       <?php if (!empty($clearSelectedWorkspace) && !$isAjax): ?>
       data-clear-workspace="<?php echo htmlspecialchars(json_encode($workspaces[0] ?? ''), ENT_QUOTES, 'UTF-8'); ?>"
