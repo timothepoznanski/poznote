@@ -201,6 +201,8 @@ class AttachmentsController {
                     }
                     
                     if ($success) {
+                        $this->triggerGitSync((int)$noteId, 'push', $unique_filename);
+                        
                         http_response_code(201);
                         echo json_encode([
                             'success' => true, 
@@ -487,6 +489,7 @@ class AttachmentsController {
                     }
                     
                     if ($success) {
+                        $this->triggerGitSync((int)$noteId, 'delete', $attachment['filename']);
                         echo json_encode(['success' => true, 'message' => 'Attachment deleted successfully']);
                     } else {
                         http_response_code(500);
@@ -503,6 +506,45 @@ class AttachmentsController {
         } catch (Exception $e) {
             http_response_code(500);
             echo json_encode(['success' => false, 'message' => 'Error deleting attachment: ' . $e->getMessage()]);
+        }
+    }
+    
+    /**
+     * Trigger automatic Git synchronization if enabled
+     */
+    private function triggerGitSync(int $noteId, string $action = 'push', string $filename = ''): void {
+        error_log("[Poznote Git] AttachmentsController: triggerGitSync called for note $noteId with action $action, filename $filename");
+        try {
+            $gitSyncFile = dirname(__DIR__, 3) . '/GitSync.php';
+            if (!file_exists($gitSyncFile)) {
+                error_log("[Poznote Git] AttachmentsController: GitSync.php not found at $gitSyncFile");
+                return;
+            }
+            require_once $gitSyncFile;
+            $gitSync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
+            if (!$gitSync->isAutoPushEnabled()) {
+                error_log("[Poznote Git] AttachmentsController: Auto-push is not enabled");
+                return;
+            }
+            if ($action === 'push') {
+                if ($filename) {
+                    error_log("[Poznote Git] AttachmentsController: Calling gitSync->pushAttachment($filename)");
+                    $gitSync->pushAttachment($filename, "Added attachment {$filename} to note {$noteId}");
+                }
+                error_log("[Poznote Git] AttachmentsController: Calling gitSync->pushNote($noteId)");
+                $result = $gitSync->pushNote($noteId);
+                error_log("[Poznote Git] AttachmentsController: Result: " . json_encode($result));
+            } elseif ($action === 'delete') {
+                if ($filename) {
+                    error_log("[Poznote Git] AttachmentsController: Calling gitSync->deleteAttachmentInGit($filename)");
+                    $gitSync->deleteAttachmentInGit($filename, "Deleted attachment {$filename} from note {$noteId}");
+                }
+                error_log("[Poznote Git] AttachmentsController: Calling gitSync->pushNote($noteId)");
+                $result = $gitSync->pushNote($noteId);
+                error_log("[Poznote Git] AttachmentsController: Result: " . json_encode($result));
+            }
+        } catch (Exception $e) {
+            error_log("[Poznote Git] AttachmentsController error: " . $e->getMessage());
         }
     }
 }

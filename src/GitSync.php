@@ -361,6 +361,41 @@ class GitSync {
             return ['success' => false, 'error' => $e->getMessage()];
         }
     }
+
+    /**
+     * Push a single attachment to Git repository
+     * @param string $filename Attachment filename
+     * @param string $message Commit message
+     * @return array Result
+     */
+    public function pushAttachment($filename, $message = '') {
+        if (!$this->isConfigured()) return ['success' => false, 'error' => 'not_configured'];
+        try {
+            require_once __DIR__ . '/functions.php';
+            $attachmentsPath = getAttachmentsPath();
+            $filePath = $attachmentsPath . '/' . $filename;
+            if (!file_exists($filePath)) return ['success' => false, 'error' => 'Attachment file not found'];
+            $content = file_get_contents($filePath);
+            return $this->pushFile('attachments/' . $filename, $content, $message ?: "Update attachment: {$filename}");
+        } catch (Exception $e) {
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Delete a single attachment from Git repository
+     * @param string $filename Attachment filename
+     * @param string $message Commit message
+     * @return array Result
+     */
+    public function deleteAttachmentInGit($filename, $message = '') {
+        if (!$this->isConfigured()) return ['success' => false, 'error' => 'not_configured'];
+        try {
+            return $this->deleteFile('attachments/' . $filename, $message ?: "Deleted attachment: {$filename}");
+        } catch (Exception $e) {
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
     
     /**
      * Save sync info to database
