@@ -628,7 +628,7 @@ class GitSync {
                         if ($folder['parent_id'] !== null) {
                             $chk = $this->con->prepare('SELECT id FROM folders WHERE id = ?');
                             $chk->execute([$folder['parent_id']]);
-                            if (!$chk->fetch()) {
+                            if ($chk->fetchColumn() === false) {
                                 $remaining[] = $folder; // parent not yet inserted, retry later
                                 continue;
                             }
@@ -656,7 +656,6 @@ class GitSync {
             $pulledNoteIds = [];
 
             // ── 3. Download & upsert entries ──
-            $this->con->beginTransaction();
             try {
                 foreach ($noteFiles as $path) {
                     $currentStep++;
@@ -683,53 +682,60 @@ class GitSync {
                     file_put_contents($entriesPath . '/' . $filename, $content);
 
                     // Upsert DB
-                    $meta      = $metadata[(string) $noteId] ?? [];
-                    $checkStmt = $this->con->prepare('SELECT id FROM entries WHERE id = ?');
-                    $checkStmt->execute([$noteId]);
-                    if ($checkStmt->fetch()) {
-                        // Build dynamic UPDATE — apply metadata fields whenever available
-                        $setClauses = ['entry = ?', 'trash = 0', 'updated = ?'];
-                        $params     = [$content, $meta['updated'] ?? gmdate('Y-m-d H:i:s')];
-                        if (isset($meta['heading']))     { $setClauses[] = 'heading = ?';     $params[] = $meta['heading']; }
-                        if (isset($meta['tags']))        { $setClauses[] = 'tags = ?';        $params[] = $meta['tags']; }
-                        if (isset($meta['folder_id']))   { $setClauses[] = 'folder_id = ?';   $params[] = $meta['folder_id']; }
-                        if (isset($meta['folder']))      { $setClauses[] = 'folder = ?';      $params[] = $meta['folder']; }
-                        if (isset($meta['workspace']))   { $setClauses[] = 'workspace = ?';   $params[] = $meta['workspace']; }
-                        if (isset($meta['type']))        { $setClauses[] = 'type = ?';        $params[] = $meta['type']; }
-                        if (isset($meta['attachments'])) { $setClauses[] = 'attachments = ?'; $params[] = $meta['attachments']; }
-                        if (isset($meta['favorite']))    { $setClauses[] = 'favorite = ?';    $params[] = (int) $meta['favorite']; }
-                        if (isset($meta['created']))     { $setClauses[] = 'created = ?';     $params[] = $meta['created']; }
-                        $params[] = $noteId;
-                        $this->con->prepare('UPDATE entries SET ' . implode(', ', $setClauses) . ' WHERE id = ?')
-                                  ->execute($params);
-                        $results['updated']++;
-                        $results['debug'][] = "  {$filename} → updated";
-                    } else {
-                        $ext         = pathinfo($filename, PATHINFO_EXTENSION);
-                        $type        = $meta['type']        ?? (($ext === 'md') ? 'markdown' : 'note');
-                        $heading     = $meta['heading']     ?? $this->extractHeadingFromContent($content, $ext);
-                        $tags        = $meta['tags']        ?? '';
-                        $folderId    = $meta['folder_id']   ?? null;
-                        $folder      = $meta['folder']      ?? 'Default';
-                        $workspace   = $meta['workspace']   ?? 'Poznote';
-                        $attachments = $meta['attachments'] ?? null;
-                        $favorite    = (int) ($meta['favorite'] ?? 0);
-                        $created     = $meta['created']     ?? gmdate('Y-m-d H:i:s');
-                        $updated     = $meta['updated']     ?? gmdate('Y-m-d H:i:s');
-                        $this->con->prepare(
-                            'INSERT INTO entries (id, heading, entry, type, workspace, tags, folder_id, folder, attachments, favorite, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-                        )->execute([$noteId, $heading, $content, $type, $workspace, $tags, $folderId, $folder, $attachments, $favorite, $created, $updated]);
-                        $results['pulled']++;
-                        $results['debug'][] = "  {$filename} → created (heading: {$heading})";
-                    }
+                    try {
+                        $this->con->beginTransaction();
+                        $meta      = $metadata[(string) $noteId] ?? [];
+                        $checkStmt = $this->con->prepare('SELECT id FROM entries WHERE id = ?');
+                        $checkStmt->execute([$noteId]);
+                        if ($checkStmt->fetch()) {
+                            // Build dynamic UPDATE — apply metadata fields whenever available
+                            $setClauses = ['entry = ?', 'trash = 0', 'updated = ?'];
+                            $params     = [$content, $meta['updated'] ?? gmdate('Y-m-d H:i:s')];
+                            if (isset($meta['heading']))     { $setClauses[] = 'heading = ?';     $params[] = $meta['heading']; }
+                            if (isset($meta['tags']))        { $setClauses[] = 'tags = ?';        $params[] = $meta['tags']; }
+                            if (isset($meta['folder_id']))   { $setClauses[] = 'folder_id = ?';   $params[] = $meta['folder_id']; }
+                            if (isset($meta['folder']))      { $setClauses[] = 'folder = ?';      $params[] = $meta['folder']; }
+                            if (isset($meta['workspace']))   { $setClauses[] = 'workspace = ?';   $params[] = $meta['workspace']; }
+                            if (isset($meta['type']))        { $setClauses[] = 'type = ?';        $params[] = $meta['type']; }
+                            if (isset($meta['attachments'])) { $setClauses[] = 'attachments = ?'; $params[] = $meta['attachments']; }
+                            if (isset($meta['favorite']))    { $setClauses[] = 'favorite = ?';    $params[] = (int) $meta['favorite']; }
+                            if (isset($meta['created']))     { $setClauses[] = 'created = ?';     $params[] = $meta['created']; }
+                            $params[] = $noteId;
+                            $this->con->prepare('UPDATE entries SET ' . implode(', ', $setClauses) . ' WHERE id = ?')
+                                      ->execute($params);
+                            $results['updated']++;
+                            $results['debug'][] = "  {$filename} → updated";
+                        } else {
+                            $ext         = pathinfo($filename, PATHINFO_EXTENSION);
+                            $type        = $meta['type']        ?? (($ext === 'md') ? 'markdown' : 'note');
+                            $heading     = $meta['heading']     ?? $this->extractHeadingFromContent($content, $ext);
+                            $tags        = $meta['tags']        ?? '';
+                            $folderId    = $meta['folder_id']   ?? null;
+                            $folder      = $meta['folder']      ?? 'Default';
+                            $workspace   = $meta['workspace']   ?? 'Poznote';
+                            $attachments = $meta['attachments'] ?? null;
+                            $favorite    = (int) ($meta['favorite'] ?? 0);
+                            $created     = $meta['created']     ?? gmdate('Y-m-d H:i:s');
+                            $updated     = $meta['updated']     ?? gmdate('Y-m-d H:i:s');
+                            $this->con->prepare(
+                                'INSERT INTO entries (id, heading, entry, type, workspace, tags, folder_id, folder, attachments, favorite, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                            )->execute([$noteId, $heading, $content, $type, $workspace, $tags, $folderId, $folder, $attachments, $favorite, $created, $updated]);
+                            $results['pulled']++;
+                            $results['debug'][] = "  {$filename} → created (heading: {$heading})";
+                        }
 
-                    $pulledNoteIds[] = $noteId;
+                        $pulledNoteIds[] = $noteId;
+                        $this->con->commit();
+                    } catch (Exception $transEx) {
+                        $this->con->rollBack();
+                        $results['errors'][] = ['path' => $filename, 'error' => $transEx->getMessage()];
+                        $results['debug'][]  = "  Transaction rolled back for $filename: " . $transEx->getMessage();
+                    }
                 }
-                $this->con->commit();
-            } catch (Exception $transEx) {
-                $this->con->rollBack();
-                $results['errors'][] = ['path' => 'transaction', 'error' => $transEx->getMessage()];
-                $results['debug'][]  = 'Transaction rolled back: ' . $transEx->getMessage();
+            } catch (Exception $e) {
+                // Handle any general exceptions from HTTP requests or loops
+                $results['errors'][] = ['path' => 'loop', 'error' => $e->getMessage()];
+                $results['debug'][]  = 'Error during pull loop: ' . $e->getMessage();
             }
 
             // ── 4. Download attachments ──
