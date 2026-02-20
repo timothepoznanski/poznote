@@ -612,6 +612,29 @@ class GitSync {
                             $metadata = $parsed; // legacy flat format
                         }
                         $results['debug'][] = 'Loaded metadata.json (' . count($metadata) . ' notes, ' . count($foldersSource) . ' folders)';
+                        
+                        // Ensure workspaces listed in metadata exist
+                        $uniqueWorkspaces = [];
+                        foreach ($metadata as $meta) {
+                            if (!empty($meta['workspace'])) {
+                                $uniqueWorkspaces[$meta['workspace']] = true;
+                            }
+                        }
+                        foreach ($foldersSource as $folder) {
+                            if (!empty($folder['workspace'])) {
+                                $uniqueWorkspaces[$folder['workspace']] = true;
+                            }
+                        }
+                        if (!empty($uniqueWorkspaces)) {
+                            try {
+                                $wsStmt = $this->con->prepare('INSERT OR IGNORE INTO workspaces (name) VALUES (?)');
+                                foreach (array_keys($uniqueWorkspaces) as $ws) {
+                                    $wsStmt->execute([$ws]);
+                                }
+                            } catch (Exception $e) {
+                                $results['debug'][] = '  WARNING: Could not recreate workspaces: ' . $e->getMessage();
+                            }
+                        }
                     }
                 }
             }
