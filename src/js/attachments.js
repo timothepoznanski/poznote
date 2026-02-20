@@ -681,8 +681,20 @@ function replaceLoadingText(oldText, newText, dropTarget) {
         for (var i = 0; i < textNodes.length; i++) {
             var textNode = textNodes[i];
             var text = textNode.textContent;
-            if (text.indexOf(oldText) !== -1) {
+            var index = text.indexOf(oldText);
+            if (index !== -1) {
                 textNode.textContent = text.replace(oldText, newText);
+
+                // Placer le curseur après le texte inséré sans le sélectionner
+                try {
+                    var sel = window.getSelection();
+                    var newRange = document.createRange();
+                    newRange.setStart(textNode, index + newText.length);
+                    newRange.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(newRange);
+                } catch (e) { }
+
                 break; // On remplace seulement la première occurrence
             }
         }
