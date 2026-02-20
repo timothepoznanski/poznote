@@ -95,7 +95,7 @@
             "kanban_on_folder_click": "Open Kanban view on folder click",
             "index_icon_scale": "Index icon scaling",
             "note_content_width": "Note content width",
-            "show_inline_attachment_images": "Show image attachments",
+            "show_inline_attachment_images": "Show image attachments that are automatically created when an image is inserted into the note",
             "enable_internal_tabs": "Enable internal tabs"
         },
         "badges": {

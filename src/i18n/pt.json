@@ -430,7 +430,7 @@
             "kanban_on_folder_click": "Abrir visualização Kanban ao clicar na pasta",
             "index_icon_scale": "Escala de ícones do índice",
             "note_content_width": "Largura do conteúdo da nota",
-            "show_inline_attachment_images": "Mostrar anexos de imagem",
+            "show_inline_attachment_images": "Mostrar anexos de imagem que são anexos criados automaticamente ao inserir uma imagem na nota",
             "enable_internal_tabs": "Ativar guias internas"
         },
         "badges": {

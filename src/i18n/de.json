@@ -431,7 +431,7 @@
             "kanban_on_folder_click": "Kanban-Ansicht beim Klicken auf Ordner öffnen",
             "index_icon_scale": "Skalierung der Index-Symbole",
             "note_content_width": "Breite des Notizinhalts",
-            "show_inline_attachment_images": "Bildanhänge anzeigen",
+            "show_inline_attachment_images": "Bildanhänge anzeigen, die automatisch erstellt werden, wenn ein Bild in die Notiz eingefügt wird",
             "enable_internal_tabs": "Interne Tabs aktivieren"
         },
         "badges": {
