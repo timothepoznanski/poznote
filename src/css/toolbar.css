@@ -265,7 +265,7 @@
 }
 
 body.has-internal-tabs .note-header {
-    top: 44px;
+    top: 39px;
     /* Push down to make room for sticky tab bar */
 }
 
