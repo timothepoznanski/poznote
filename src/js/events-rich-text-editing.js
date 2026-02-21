@@ -630,12 +630,6 @@ function handleTitleBlur(e) {
     if (window.updateidhead) {
         window.updateidhead(e.target);
     }
-    // Mark as needing Git push (title change = note modified)
-    if (typeof window.setNeedsGitPush === 'function') {
-        window.setNeedsGitPush(true);
-    } else if (typeof needsGitPush !== 'undefined') {
-        needsGitPush = true;
-    }
     // Immediate save for title changes (no debounce)
     if (typeof window.saveNoteToServer === 'function') {
         window.saveNoteToServer();
@@ -653,12 +647,6 @@ function handleTagsBlur(e) {
             window.noteid = id;
         }
     }
-    // Mark as needing Git push (tags change = note modified)
-    if (typeof window.setNeedsGitPush === 'function') {
-        window.setNeedsGitPush(true);
-    } else if (typeof needsGitPush !== 'undefined') {
-        needsGitPush = true;
-    }
     triggerNoteSave();
 }
 
@@ -673,12 +661,6 @@ function handleTitleKeydown(e) {
         // Update noteid before saving and moving to content
         if (window.updateidhead) {
             window.updateidhead(e.target);
-        }
-        // Mark as needing Git push (title change = note modified)
-        if (typeof window.setNeedsGitPush === 'function') {
-            window.setNeedsGitPush(true);
-        } else if (typeof needsGitPush !== 'undefined') {
-            needsGitPush = true;
         }
         // Immediate save for title changes (no debounce)
         if (typeof window.saveNoteToServer === 'function') {

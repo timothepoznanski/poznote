@@ -72,6 +72,13 @@ function performFavoriteToggle(noteId) {
         })
         .then(function (data) {
             if (data.success) {
+                // Mark note for auto-push since we toggled favorite (if auto-push enabled)
+                if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                    // LOG: Clic sur l'étoile de favoris
+                    // console.log('[Poznote Auto-Push] Favorite toggled - marking for push');
+                    window.setNeedsAutoPush(true);
+                }
+                
                 // If note was added to favorites (is_favorite = 1), open the Favorites folder
                 if (data.is_favorite === 1) {
                     localStorage.setItem('folder_folder-favorites', 'open');
@@ -100,6 +107,13 @@ function duplicateNote(noteId) {
         })
         .then(function (data) {
             if (data.success && data.id) {
+                // Mark note for auto-push since we duplicated a note (if auto-push enabled)
+                if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                    // LOG: Duplication d'une note (menu contextuel ou raccourci)
+                    // console.log('[Poznote Auto-Push] Note duplicated - marking for push');
+                    window.setNeedsAutoPush(true);
+                }
+                
                 // Update shared count if note was auto-shared
                 if (data.share_delta && typeof updateSharedCount === 'function') {
                     updateSharedCount(data.share_delta);
@@ -1734,6 +1748,13 @@ function moveNoteToFolder() {
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data && data.success) {
+                // Mark note for auto-push since we moved a note (if auto-push enabled)
+                if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                    // LOG: Déplacement d'une note vers un autre dossier (drag & drop ou menu)
+                    // console.log('[Poznote Auto-Push] Note moved to folder - marking for push');
+                    window.setNeedsAutoPush(true);
+                }
+                
                 // Update shared count if notes were shared/unshared
                 if (data.share_delta && typeof updateSharedCount === 'function') {
                     updateSharedCount(data.share_delta);
@@ -2037,7 +2058,15 @@ function createNoteOfType(noteType, globalFnNames) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ folder_id: targetFolderId, workspace: selectedWorkspace, type: noteType })
             }).then(function (r) { return r.json(); }).then(function (data) {
-                if (data.success && data.note) window.location.href = 'index.php?note=' + data.note.id;
+                if (data.success && data.note) {
+                    // Mark note for auto-push since we created a note (if auto-push enabled)
+                    if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                        // LOG: Création nouvelle note dans un dossier (bouton + ou raccourci)
+                        // console.log('[Poznote Auto-Push] Note created - marking for push');
+                        window.setNeedsAutoPush(true);
+                    }
+                    window.location.href = 'index.php?note=' + data.note.id;
+                }
             });
         }
 
@@ -2060,7 +2089,15 @@ function createNoteOfType(noteType, globalFnNames) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ workspace: selectedWorkspace, type: noteType })
             }).then(function (r) { return r.json(); }).then(function (data) {
-                if (data.success && data.note) window.location.href = 'index.php?note=' + data.note.id;
+                if (data.success && data.note) {
+                    // Mark note for auto-push since we created a note (if auto-push enabled)
+                    if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                        // LOG: Création nouvelle note sans dossier spécifique (fallback)
+                        // console.log('[Poznote Auto-Push] Note created - marking for push');
+                        window.setNeedsAutoPush(true);
+                    }
+                    window.location.href = 'index.php?note=' + data.note.id;
+                }
             });
         }
     }

@@ -151,8 +151,6 @@ try {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         trash INTEGER DEFAULT 0,
         heading TEXT,
-        subheading TEXT,
-        location TEXT,
         entry TEXT,
         created DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated DATETIME,
@@ -218,7 +216,7 @@ try {
     )');
 
     // --- Schema versioning: skip migrations & indexes if already up to date ---
-    $CURRENT_SCHEMA_VERSION = 3;
+    $CURRENT_SCHEMA_VERSION = 4;
     $currentVersion = 0;
     try {
         $svStmt = $con->query("SELECT value FROM settings WHERE key = 'schema_version'");
@@ -239,12 +237,6 @@ try {
             $existingColumns = array_column($cols, 'name');
             if (!in_array('folder_id', $existingColumns)) {
                 $con->exec("ALTER TABLE entries ADD COLUMN folder_id INTEGER REFERENCES folders(id) ON DELETE SET NULL");
-            }
-            if (!in_array('location', $existingColumns)) {
-                $con->exec("ALTER TABLE entries ADD COLUMN location TEXT");
-            }
-            if (!in_array('subheading', $existingColumns)) {
-                $con->exec("ALTER TABLE entries ADD COLUMN subheading TEXT");
             }
             if (!in_array('type', $existingColumns)) {
                 $con->exec("ALTER TABLE entries ADD COLUMN type TEXT DEFAULT 'note'");
@@ -292,6 +284,28 @@ try {
             }
         } catch (Exception $e) {
             error_log('Could not add missing columns to shared_notes: ' . $e->getMessage());
+        }
+
+        // === REMOVE LEGACY COLUMNS === (Schema version 4)
+        // Remove unused subheading and location columns from entries table
+        if ($currentVersion < 4) {
+            try {
+                $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
+                $existingColumns = array_column($cols, 'name');
+                
+                // Remove subheading column if it exists (requires SQLite 3.35.0+)
+                if (in_array('subheading', $existingColumns)) {
+                    $con->exec("ALTER TABLE entries DROP COLUMN subheading");
+                }
+                
+                // Remove location column if it exists (requires SQLite 3.35.0+)
+                if (in_array('location', $existingColumns)) {
+                    $con->exec("ALTER TABLE entries DROP COLUMN location");
+                }
+            } catch (Exception $e) {
+                // Silently ignore errors (older SQLite versions don't support DROP COLUMN)
+                error_log('Could not remove legacy columns from entries: ' . $e->getMessage());
+            }
         }
 
         // === INDEXES ===

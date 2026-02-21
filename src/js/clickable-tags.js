@@ -55,7 +55,13 @@ function refreshTagsCount() {
             }
         })
         .catch(err => {
-            console.error('Error refreshing tags count:', err);
+            // Ignore fetch errors during page navigation (Failed to fetch during unload)
+            // These are expected when the page is navigating away
+            if (err.message && err.message.includes('Failed to fetch')) {
+                console.debug('[Poznote] Tags count refresh aborted (page navigation in progress)');
+            } else {
+                console.error('Error refreshing tags count:', err);
+            }
         });
 }
 
@@ -712,11 +718,6 @@ function updateNoteById(noteId) {
         if (typeof lastSavedTags === 'undefined' || lastSavedTags === null) {
             lastSavedTags = currentTags;
         }
-    }
-
-    // Mark as needing git push, since we are updating user content (tags)
-    if (typeof window.setNeedsGitPush === 'function') {
-        window.setNeedsGitPush(true);
     }
 
     // For tags modification, save immediately without visual indicator or delay

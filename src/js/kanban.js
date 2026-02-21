@@ -154,6 +154,13 @@
                     updateColumnCounts();
                     showError('Failed to move note');
                 } else {
+                    // Mark note for auto-push since we moved a note (if auto-push enabled)
+                    if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                        // LOG: Déplacement d'une note par drag & drop dans la vue Kanban
+                        // console.log('[Poznote Auto-Push] Note moved in Kanban - marking for push');
+                        window.setNeedsAutoPush(true);
+                    }
+                    
                     // Success: refresh the sidebar to stay in sync with the new note location
                     if (typeof window.refreshNotesListAfterFolderAction === 'function') {
                         window.refreshNotesListAfterFolderAction();

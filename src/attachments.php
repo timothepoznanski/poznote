@@ -6,6 +6,13 @@ require_once 'config.php';
 require_once 'functions.php';
 require_once 'db_connect.php';
 
+// GitHub Sync Logic
+require_once 'GitSync.php';
+$gitSync = new GitSync($con);
+$gitEnabled = GitSync::isEnabled() && $gitSync->isConfigured();
+$isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
+$showGitSync = $gitEnabled && $isAdmin;
+
 // Get note ID from URL
 $note_id = isset($_GET['note_id']) ? (int)$_GET['note_id'] : 0;
 $workspace = isset($_GET['workspace']) ? trim($_GET['workspace']) : null;
@@ -53,7 +60,12 @@ try {
     <title><?php echo htmlspecialchars($note['heading']); ?> - Poznote</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
-    <script src="js/theme-init.js"></script>
+    <?php 
+    $v = @file_get_contents('version.txt');
+    if ($v === false) $v = time();
+    $v = urlencode(trim($v));
+    ?>
+    <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
     <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/attachments/base.css">
@@ -192,6 +204,15 @@ try {
           t('attachments.size.units.mb', [], 'MB'),
           t('attachments.size.units.gb', [], 'GB'),
       ]), ENT_QUOTES); ?>">
+    
+    <!-- Global configuration (CSP compliant) -->
+    <script type="application/json" id="poznote-config"><?php
+        echo json_encode([
+            'gitSyncAutoPush' => ($showGitSync && $gitSync->isAutoPushEnabled())
+        ], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP) ?: '{}';
+    ?></script>
+    <script src="js/error-handler.js?v=<?php echo $v; ?>"></script>
+    
     <div class="settings-container">
         <?php 
             $back_params = [];

@@ -413,13 +413,12 @@ window.loadNoteDirectly = function (url, noteId, event, clickedElement) {
                     });
                     return false;
                 }
-            } else {
-                // No unsaved UI changes, but if auto-push is enabled, 
-                // we should trigger a push for the note we're leaving
-                if (typeof window.emergencySave === 'function') {
-                    window.emergencySave(currentNoteId);
-                }
             }
+        }
+        
+        // Trigger background git push if needed when leaving a note
+        if (typeof window.triggerBackgroundPush === 'function') {
+            window.triggerBackgroundPush();
         }
 
         // Prevent default link behavior

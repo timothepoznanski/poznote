@@ -116,8 +116,8 @@ function convertBase64ImagesToAttachments(noteEntry) {
 
                 // Mark note as modified and flag for git push
                 window.noteid = noteId;
-                if (typeof window.setNeedsGitPush === 'function') {
-                    window.setNeedsGitPush(true);
+                if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                    window.setNeedsAutoPush(true);
                 }
                 if (typeof window.markNoteAsModified === 'function') {
                     window.markNoteAsModified();
@@ -243,8 +243,8 @@ function uploadAttachment() {
                     uploadButtonContainer.classList.remove('show');
                 }
 
-                if (typeof window.setNeedsGitPush === 'function') {
-                    window.setNeedsGitPush(true);
+                if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                    window.setNeedsAutoPush(true);
                 }
 
                 loadAttachments(currentNoteIdForAttachments);
@@ -379,8 +379,8 @@ function deleteAttachment(attachmentId, noteId) {
                     }
                 }
 
-                if (typeof window.setNeedsGitPush === 'function') {
-                    window.setNeedsGitPush(true);
+                if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                    window.setNeedsAutoPush(true);
                 }
                 loadAttachments(noteIdToUse);
                 updateAttachmentCountInMenu(noteIdToUse);
@@ -626,8 +626,8 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
                     loadAttachments(noteId);
                 }
 
-                if (typeof window.setNeedsGitPush === 'function') {
-                    window.setNeedsGitPush(true);
+                if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                    window.setNeedsAutoPush(true);
                 }
 
                 // Trigger automatic save after a short delay
@@ -829,8 +829,8 @@ function handleHTMLImageInsert(file, dropTarget) {
                 window.noteid = noteId;
 
                 // Trigger automatic save after image insertion
-                if (typeof window.setNeedsGitPush === 'function') {
-                    window.setNeedsGitPush(true);
+                if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                    window.setNeedsAutoPush(true);
                 }
                 if (typeof window.markNoteAsModified === 'function') {
                     window.markNoteAsModified();
