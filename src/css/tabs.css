@@ -9,7 +9,7 @@
 #app-tab-bar {
     display: flex;
     align-items: flex-end;
-    gap: 2px;
+    gap: 5px;
     padding: 6px 8px 0;
     background: #fff;
     border-bottom: 1px solid #e5e7eb;
@@ -57,6 +57,7 @@
 .app-tab.active {
     background: #fff;
     border-color: #d1d5db;
+    border-top: 2px solid #007DB8;
     font-weight: 500;
     z-index: 1;
 }
