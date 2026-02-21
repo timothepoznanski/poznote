@@ -22,14 +22,6 @@ try {
     $favorites_count = 0;
 }
 
-/**
- * Helper to render the note actions menu (3-dot menu in sidebar)
- * Contains the same actions as the note toolbar
- */
-function renderNoteActionsMenu($noteId, $noteData, $folderId, $folderName) {
-    // Menu removed - double-click on note opens in new tab
-    return;
-}
 ?>
 
 <!-- Notes list display -->
@@ -191,7 +183,6 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "'" . $linkedNoteIdAttr . " data-folder-id='$folderId' data-folder='$folderName' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note' data-dblaction='open-note-new-tab'>";
             echo "<span class='note-title'>" . $noteIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
             echo "</a>";
-            renderNoteActionsMenu($noteDbId, $row1, $folderId, $folderName);
             echo "</div>";
             echo "<div id=pxbetweennotes></div>";
         }
@@ -245,7 +236,6 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "'" . $linkedNoteIdAttr . " data-folder-id='$folderId' data-folder='$folderName' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note' data-dblaction='open-note-new-tab'>";
             echo "<span class='note-title'>" . $noteIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
             echo "</a>";
-            renderNoteActionsMenu($noteDbId, $row1, $folderId, $folderName);
             echo "</div>";
             echo "<div id=pxbetweennotes></div>";
         }
@@ -354,7 +344,6 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "' data-folder-id='' data-folder='' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note' data-dblaction='open-note-new-tab'>";
         echo "<span class='note-title'>" . $noteIcon . htmlspecialchars(($row1["heading"] ?: t('index.note.new_note', [], 'New note')), ENT_QUOTES) . "</span>";
         echo "</a>";
-        renderNoteActionsMenu($noteDbId, $row1, '', '');
         echo "</div>";
         echo "<div id=pxbetweennotes></div>";
     }
@@ -387,7 +376,6 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "' data-folder-id='' data-folder='' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note' data-dblaction='open-note-new-tab'>";
         echo "<span class='note-title'>" . $noteIcon . htmlspecialchars(($row1["heading"] ?: t('index.note.new_note', [], 'New note')), ENT_QUOTES) . "</span>";
         echo "</a>";
-        renderNoteActionsMenu($noteDbId, $row1, '', '');
         echo "</div>";
         echo "<div id=pxbetweennotes></div>";
     }
