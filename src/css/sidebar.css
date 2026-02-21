@@ -70,20 +70,25 @@
     position: relative;
 }
 
+.sidebar-howto,
 .sidebar-home {
     background: transparent;
     border: none;
-    color: #007DB8;
+    color: #007DB8 !important;
     font-size: 1.3rem;
     cursor: pointer;
     padding: 6px;
     border-radius: 6px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .sidebar-settings {
     background: transparent;
     border: none;
-    color: #007DB8;
+    color: #007DB8 !important;
     font-size: 1.3rem;
     cursor: pointer;
     padding: 6px;
@@ -102,12 +107,14 @@
 }
 
 /* Hover and focus states for sidebar buttons */
+.sidebar-howto:hover,
 .sidebar-home:hover,
 .sidebar-settings:hover,
 .sidebar-plus:hover {
     background: rgba(0, 125, 184, 0.1);
 }
 
+.sidebar-howto:focus,
 .sidebar-home:focus,
 .sidebar-settings:focus,
 .sidebar-plus:focus {
@@ -117,6 +124,7 @@
 
 /* Sidebar menu button (hamburger) */
 /* Sidebar action buttons (Home, Settings, Create) - visible on all screens */
+.sidebar-howto,
 .sidebar-home,
 .sidebar-settings,
 .sidebar-plus {
@@ -137,12 +145,18 @@
     line-height: 1;
 }
 
+.sidebar-howto {
+    font-size: 1.15rem;
+}
+
+.sidebar-howto:hover,
 .sidebar-home:hover,
 .sidebar-settings:hover,
 .sidebar-plus:hover {
     background: rgba(0, 125, 184, 0.1);
 }
 
+.sidebar-howto:focus,
 .sidebar-home:focus,
 .sidebar-settings:focus,
 .sidebar-plus:focus {

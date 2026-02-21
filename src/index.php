@@ -339,11 +339,14 @@ $body_classes = trim($extra_body_classes);
                 <i class="fas fa-caret-down workspace-dropdown-icon"></i>
             </div>
             <div class="sidebar-title-actions">
+                <a href="https://poznote.com/howto.html" target="_blank" class="sidebar-howto" title="<?php echo t_h('sidebar.howto', [], 'How-to'); ?>">
+                    <i class="far fa-lightbulb"></i>
+                </a>
                 <button class="sidebar-home" data-action="navigate-to-home" title="<?php echo t_h('sidebar.home', [], 'Home'); ?>">
                     <i class="far fa-home"></i>
                 </button>
                 <button class="sidebar-settings" data-action="navigate-to-settings" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>">
-                    <i class="far fa-cog" style="margin: 0 5px;"></i>
+                    <i class="far fa-cog"></i>
                     <span class="update-badge update-badge-hidden"></span>
                 </button>
                 <button class="sidebar-plus" data-action="toggle-create-menu" title="<?php echo t_h('sidebar.create'); ?>">

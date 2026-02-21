@@ -115,10 +115,13 @@
 }
 
 /* Keep sidebar icons crisp (avoid thick-looking filter) */
+.sidebar-howto [class*="fa-"],
 .sidebar-home [class*="fa-"],
 .sidebar-settings [class*="fa-"],
 .sidebar-plus [class*="fa-"] {
     filter: none !important;
+    color: inherit;
+    font-size: inherit;
 }
 
 [class*="fa-"]:not(.folder-icon[data-icon-color]):hover {
