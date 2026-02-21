@@ -430,7 +430,6 @@
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
         setupToggleCard('show-inline-attachment-images-card', 'show-inline-attachment-images-status', 'hide_inline_attachment_images', true);
-        setupToggleCard('enable-internal-tabs-card', 'enable-internal-tabs-status', 'enable_internal_tabs', true);
 
         // Card click handlers for modal settings
         var languageCard = document.getElementById('language-card');

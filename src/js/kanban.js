@@ -232,6 +232,28 @@
                 board.scrollBy({ left: scrollAmount, behavior: 'smooth' });
             }
         });
+
+        // Kanban Add Card Button
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-action="create-kanban-note"]');
+            if (!btn) return;
+
+            // Stop propagation to avoid triggering other click handlers
+            e.stopPropagation();
+            e.preventDefault();
+
+            const folderId = btn.dataset.folderId;
+            const folderName = btn.dataset.folderName;
+
+            // Use the create modal function if available
+            if (typeof window.showCreateModal === 'function') {
+                window.showCreateModal(folderId, folderName);
+            } else if (typeof window.showCreateNoteInFolderModal === 'function') {
+                window.showCreateNoteInFolderModal(folderId, folderName);
+            } else {
+                console.error('Kanban: No create modal function available');
+            }
+        });
     }
 
     /**

@@ -164,6 +164,42 @@
     font-size: 1.1rem;
 }
 
+.kanban-column-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.kanban-add-card-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    min-height: 26px;
+    border: none;
+    background: transparent;
+    color: #6c757d;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1.2rem;
+    padding: 4px 5px;
+    box-sizing: border-box;
+}
+
+.kanban-add-card-btn:hover {
+    background: rgba(0, 125, 184, 0.1);
+}
+
+.kanban-add-card-btn:focus {
+    outline: 2px solid #007DB8;
+    outline-offset: 2px;
+}
+
+.kanban-add-card-btn i {
+    font-size: 1.2rem;
+}
+
 .kanban-column-count {
     display: inline-flex;
     align-items: center;

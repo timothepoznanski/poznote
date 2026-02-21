@@ -434,8 +434,7 @@
             "kanban_on_folder_click": "点击文件夹时打开看板视图",
             "index_icon_scale": "索引页图标缩放",
             "note_content_width": "笔记内容宽度",
-            "show_inline_attachment_images": "显示图片附件",
-            "enable_internal_tabs": "启用内部标签页"
+            "show_inline_attachment_images": "显示图片附件"
         },
         "badges": {
             "font_size_default": "默认 ({{size}}px)",
