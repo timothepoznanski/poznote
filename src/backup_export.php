@@ -13,6 +13,7 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
 }
 
 $currentLang = getUserLanguage();
+$pageWorkspace = trim(getWorkspaceFilter());
 
 $message = '';
 $error = '';
@@ -517,7 +518,7 @@ function convertMarkdownApiUrlsToRelativePaths($markdown, $attachmentExtensions,
     <script src="js/globals.js"></script>
     <script src="js/theme-manager.js"></script>
 </head>
-<body>
+<body data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <div class="backup-container">
         <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
             <a id="backToNotesLink" href="index.php" class="btn btn-secondary">

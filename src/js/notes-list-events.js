@@ -9,6 +9,14 @@
     'use strict';
 
     // =====================================================
+    // DOUBLE-CLICK DETECTION
+    // =====================================================
+
+    var clickTimer = null;
+    var lastClickedElement = null;
+    var DOUBLE_CLICK_DELAY = 200; // milliseconds
+
+    // =====================================================
     // HELPER FUNCTIONS
     // =====================================================
 
@@ -501,13 +509,37 @@
                 break;
 
             case 'load-note':
+                event.preventDefault(); // Always prevent default navigation
+                
                 var noteLink = actionElement.getAttribute('href');
                 var noteId = actionElement.getAttribute('data-note-db-id');
-                if (noteLink && noteId && typeof window.loadNoteDirectly === 'function') {
-                    var result = window.loadNoteDirectly(noteLink, noteId, event, actionElement);
-                    if (result === false) {
-                        event.preventDefault();
+                
+                if (!noteLink || !noteId || typeof window.loadNoteDirectly !== 'function') {
+                    break;
+                }
+                
+                // Check if this is a double-click (same element clicked within delay)
+                if (clickTimer !== null && lastClickedElement === actionElement) {
+                    // Double-click detected - open in new tab
+                    clearTimeout(clickTimer);
+                    clickTimer = null;
+                    lastClickedElement = null;
+                    
+                    if (typeof openNoteInNewTab === 'function') {
+                        openNoteInNewTab(noteId);
                     }
+                } else {
+                    // First click - start timer to load note
+                    if (clickTimer !== null) {
+                        clearTimeout(clickTimer);
+                    }
+                    
+                    lastClickedElement = actionElement;
+                    clickTimer = setTimeout(function() {
+                        clickTimer = null;
+                        lastClickedElement = null;
+                        window.loadNoteDirectly(noteLink, noteId, event, actionElement);
+                    }, DOUBLE_CLICK_DELAY);
                 }
                 break;
 
@@ -537,6 +569,12 @@
             var folderData = getFolderData(actionElement);
             if (folderData.id && folderData.name && typeof window.editFolderName === 'function') {
                 window.editFolderName(folderData.id, folderData.name);
+            }
+        } else if (action === 'open-note-new-tab') {
+            event.preventDefault();
+            var noteId = actionElement.getAttribute('data-note-id');
+            if (noteId && typeof openNoteInNewTab === 'function') {
+                openNoteInNewTab(noteId);
             }
         }
     }

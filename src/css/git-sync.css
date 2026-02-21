@@ -121,56 +121,7 @@
     border-bottom: 1px solid #eee;
 }
 
-/* Limitations Table */
-.limitations-table-wrapper {
-    margin: 20px 0;
-}
 
-.limitations-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.limitations-table thead tr {
-    background-color: #f8f9fa;
-}
-
-.limitations-table th,
-.limitations-table td {
-    padding: 8px;
-    border: 1px solid #dee2e6;
-}
-
-.limitations-table th {
-    text-align: center;
-    font-weight: 600;
-}
-
-.limitations-table tbody tr:nth-child(even) {
-    background-color: #f8f9fa;
-}
-
-.limitations-table .text-center {
-    text-align: center;
-}
-
-.limitations-table .status-success,
-.limitations-table .status-success i,
-.limitations-table .status-success svg {
-    color: #28a745 !important;
-}
-
-.limitations-table .status-error,
-.limitations-table .status-error i,
-.limitations-table .status-error svg {
-    color: #dc3545 !important;
-}
-
-.limitations-note {
-    margin: 0 0 20px 0;
-    font-size: 12px;
-    font-style: italic;
-}
 
 .config-item:last-child {
     border-bottom: none;
@@ -589,27 +540,7 @@ body.dark-mode .repo-link {
     color: #a5b4fc;
 }
 
-html[data-theme='dark'] .limitations-table thead tr,
-body.dark-mode .limitations-table thead tr {
-    background-color: #333333;
-}
 
-html[data-theme='dark'] .limitations-table th,
-html[data-theme='dark'] .limitations-table td,
-body.dark-mode .limitations-table th,
-body.dark-mode .limitations-table td {
-    border-color: #444;
-    color: #e0e0e0;
-}
-
-html[data-theme='dark'] .limitations-table tbody tr:nth-child(even),
-body.dark-mode .limitations-table tbody tr:nth-child(even) {
-    background-color: #333333;
-}
-
-body.dark-mode .limitations-note {
-    color: #aaa;
-}
 
 .git-sync-nav {
     display: flex;

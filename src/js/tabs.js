@@ -15,9 +15,8 @@
 
     /** Helper to check if tabs are enabled via global config */
     function _areTabsEnabled() {
-        // Always disabled on mobile (viewport ≤ 800px)
-        if (window.innerWidth <= 800) return false;
-        return !window.POZNOTE_CONFIG || window.POZNOTE_CONFIG.enableInternalTabs !== false;
+        // Disabled on mobile (viewport ≤ 800px)
+        return window.innerWidth > 800;
     }
 
     // ── State ──────────────────────────────────────────────────────────────
@@ -185,12 +184,7 @@
      * If the note is not currently displayed, loads it via AJAX.
      */
     function openInNewTab(noteId, title) {
-        if (!_areTabsEnabled()) {
-            // Fallback to old behavior: open in new browser tab
-            var url = _buildUrl(noteId);
-            window.open(url, '_blank');
-            return;
-        }
+        // Internal tabs are always enabled (except on mobile where this won't be called)
         noteId = String(noteId);
 
         // Check if tab already exists for this note

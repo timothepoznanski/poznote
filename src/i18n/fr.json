@@ -265,6 +265,7 @@
             "uploaded_prefix": "Téléversé : ",
             "open_in_new_tab": "Ouvrir dans un nouvel onglet",
             "pdf_label": "PDF",
+            "show_inline_attachment_images_desc": "Afficher les pièces jointes images qui sont des pièces jointes automatiquement créées lorsque l'on insère une image dans la note",
             "settings_banner": {
                 "message": "Les images en pièces jointes sont masquées de la liste de la note (mais pas de la liste ici) car le paramètre 'Afficher les images jointes' est désactivé.",
                 "action": "Modifier le réglage"
@@ -448,8 +449,7 @@
             "kanban_on_folder_click": "Ouvrir la vue Kanban au clic sur dossier",
             "index_icon_scale": "Taille des icônes (Index)",
             "note_content_width": "Largeur du contenu de la note",
-            "show_inline_attachment_images": "Afficher les pièces jointes images",
-            "enable_internal_tabs": "Activer les onglets internes"
+            "show_inline_attachment_images": "Afficher les pièces jointes images"
         },
         "badges": {
             "font_size_default": "par défaut ({{size}}px)",

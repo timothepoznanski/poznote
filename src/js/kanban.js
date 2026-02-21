@@ -154,6 +154,13 @@
                     updateColumnCounts();
                     showError('Failed to move note');
                 } else {
+                    // Mark note for auto-push since we moved a note (if auto-push enabled)
+                    if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                        // LOG: Déplacement d'une note par drag & drop dans la vue Kanban
+                        // console.log('[Poznote Auto-Push] Note moved in Kanban - marking for push');
+                        window.setNeedsAutoPush(true);
+                    }
+                    
                     // Success: refresh the sidebar to stay in sync with the new note location
                     if (typeof window.refreshNotesListAfterFolderAction === 'function') {
                         window.refreshNotesListAfterFolderAction();
@@ -223,6 +230,28 @@
                 board.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
             } else if (btn.classList.contains('right')) {
                 board.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        });
+
+        // Kanban Add Card Button
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-action="create-kanban-note"]');
+            if (!btn) return;
+
+            // Stop propagation to avoid triggering other click handlers
+            e.stopPropagation();
+            e.preventDefault();
+
+            const folderId = btn.dataset.folderId;
+            const folderName = btn.dataset.folderName;
+
+            // Use the create modal function if available
+            if (typeof window.showCreateModal === 'function') {
+                window.showCreateModal(folderId, folderName);
+            } else if (typeof window.showCreateNoteInFolderModal === 'function') {
+                window.showCreateNoteInFolderModal(folderId, folderName);
+            } else {
+                console.error('Kanban: No create modal function available');
             }
         });
     }

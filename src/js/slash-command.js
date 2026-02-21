@@ -335,28 +335,28 @@
     }
 
     // Insert bold text
-    function insertBold() { 
-        insertInlineElement('strong'); 
+    function insertBold() {
+        insertInlineElement('strong');
     }
 
     // Insert italic text
-    function insertItalic() { 
-        insertInlineElement('em'); 
+    function insertItalic() {
+        insertInlineElement('em');
     }
 
     // Insert highlighted text
-    function insertHighlight() { 
-        insertInlineElement('mark'); 
+    function insertHighlight() {
+        insertInlineElement('mark');
     }
 
     // Insert strikethrough text
-    function insertStrikethrough() { 
-        insertInlineElement('s'); 
+    function insertStrikethrough() {
+        insertInlineElement('s');
     }
 
     // Insert inline code
-    function insertCode() { 
-        insertInlineElement('code'); 
+    function insertCode() {
+        insertInlineElement('code');
     }
 
     // Insert colored text
@@ -374,14 +374,14 @@
         // Create code block (pre > code structure)
         const pre = document.createElement('pre');
         const code = document.createElement('code');
-        
+
         // Add language class if specified
         if (language) {
             code.className = 'language-' + language;
             code.setAttribute('data-language', language);
             pre.setAttribute('data-language', language);
         }
-        
+
         // Add a line break inside code element for cursor positioning
         const br = document.createElement('br');
         code.appendChild(br);
@@ -419,7 +419,7 @@
             selection.addRange(newRange);
 
             if (language && typeof window.applySyntaxHighlighting === 'function') {
-                setTimeout(function() {
+                setTimeout(function () {
                     window.applySyntaxHighlighting(pre);
                 }, 10);
             }
@@ -706,6 +706,12 @@
                         const textNode = document.createTextNode(loadingText);
                         range.insertNode(textNode);
 
+                        // Collapse range to end of inserted node to avoid selection
+                        range.setStartAfter(textNode);
+                        range.collapse(true);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+
                         // Trigger input event
                         editor.dispatchEvent(new Event('input', { bubbles: true }));
 
@@ -737,8 +743,20 @@
                                     for (let i = 0; i < textNodes.length; i++) {
                                         const textNode = textNodes[i];
                                         const text = textNode.textContent;
-                                        if (text.indexOf(loadingText) !== -1) {
+                                        const index = text.indexOf(loadingText);
+                                        if (index !== -1) {
                                             textNode.textContent = text.replace(loadingText, imageMarkdown);
+
+                                            // Move cursor after the inserted markdown
+                                            try {
+                                                const sel = window.getSelection();
+                                                const newRange = document.createRange();
+                                                newRange.setStart(textNode, index + imageMarkdown.length);
+                                                newRange.collapse(true);
+                                                sel.removeAllRanges();
+                                                sel.addRange(newRange);
+                                            } catch (e) { }
+
                                             break;
                                         }
                                     }
@@ -851,64 +869,64 @@
                         method: 'POST',
                         body: formData
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Replace placeholder with actual image
-                            const imgSrc = '/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id;
-                            
-                            if (placeholderImg) {
-                                placeholderImg.src = imgSrc;
-                                placeholderImg.alt = file.name;
-                                placeholderImg.classList.remove('image-uploading-placeholder');
-                                placeholderImg.style.opacity = '';
-                                placeholderImg.style.minWidth = '';
-                                placeholderImg.style.minHeight = '';
-                                placeholderImg.style.background = '';
-                                placeholderImg.style.border = '';
-                                placeholderImg.setAttribute('loading', 'lazy');
-                                placeholderImg.setAttribute('decoding', 'async');
-                            }
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Replace placeholder with actual image
+                                const imgSrc = '/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id;
 
-                            window.noteid = noteId;
-
-                            if (typeof window.markNoteAsModified === 'function') {
-                                window.markNoteAsModified();
-                            }
-
-                            if (typeof reinitializeImageClickHandlers === 'function') {
-                                setTimeout(() => reinitializeImageClickHandlers(), 50);
-                            }
-
-                            // Update attachment count
-                            if (typeof updateAttachmentCountInMenu === 'function') {
-                                updateAttachmentCountInMenu(noteId);
-                            }
-
-                            setTimeout(() => {
-                                if (typeof saveNoteToServer === 'function') {
-                                    saveNoteToServer();
-                                } else if (typeof window.saveNoteImmediately === 'function') {
-                                    window.saveNoteImmediately();
+                                if (placeholderImg) {
+                                    placeholderImg.src = imgSrc;
+                                    placeholderImg.alt = file.name;
+                                    placeholderImg.classList.remove('image-uploading-placeholder');
+                                    placeholderImg.style.opacity = '';
+                                    placeholderImg.style.minWidth = '';
+                                    placeholderImg.style.minHeight = '';
+                                    placeholderImg.style.background = '';
+                                    placeholderImg.style.border = '';
+                                    placeholderImg.setAttribute('loading', 'lazy');
+                                    placeholderImg.setAttribute('decoding', 'async');
                                 }
-                            }, 100);
-                        } else {
+
+                                window.noteid = noteId;
+
+                                if (typeof window.markNoteAsModified === 'function') {
+                                    window.markNoteAsModified();
+                                }
+
+                                if (typeof reinitializeImageClickHandlers === 'function') {
+                                    setTimeout(() => reinitializeImageClickHandlers(), 50);
+                                }
+
+                                // Update attachment count
+                                if (typeof updateAttachmentCountInMenu === 'function') {
+                                    updateAttachmentCountInMenu(noteId);
+                                }
+
+                                setTimeout(() => {
+                                    if (typeof saveNoteToServer === 'function') {
+                                        saveNoteToServer();
+                                    } else if (typeof window.saveNoteImmediately === 'function') {
+                                        window.saveNoteImmediately();
+                                    }
+                                }, 100);
+                            } else {
+                                if (placeholderImg) {
+                                    placeholderImg.remove();
+                                }
+                                if (typeof showNotificationPopup === 'function') {
+                                    showNotificationPopup('Upload failed: ' + data.message, 'error');
+                                }
+                            }
+                        })
+                        .catch(error => {
                             if (placeholderImg) {
                                 placeholderImg.remove();
                             }
                             if (typeof showNotificationPopup === 'function') {
-                                showNotificationPopup('Upload failed: ' + data.message, 'error');
+                                showNotificationPopup('Upload failed: ' + error.message, 'error');
                             }
-                        }
-                    })
-                    .catch(error => {
-                        if (placeholderImg) {
-                            placeholderImg.remove();
-                        }
-                        if (typeof showNotificationPopup === 'function') {
-                            showNotificationPopup('Upload failed: ' + error.message, 'error');
-                        }
-                    });
+                        });
                 }
             }
 
@@ -1085,7 +1103,7 @@
                     // Capture insertion position now (selection is already restored by deleteSlashText)
                     const insertionStart = (typeof input.selectionStart === 'number') ? input.selectionStart : Math.max(0, slashOffset);
                     const insertionEnd = (typeof input.selectionEnd === 'number') ? input.selectionEnd : insertionStart;
-                    
+
                     const dateInput = document.createElement('input');
                     dateInput.type = 'date';
                     dateInput.style.position = 'fixed';
@@ -1686,7 +1704,7 @@
                                             range.collapse(false);
                                             const node = document.createTextNode(linkMarkdown);
                                             range.insertNode(node);
-                                            
+
                                             const newRange = document.createRange();
                                             newRange.setStart(node, linkMarkdown.length);
                                             newRange.collapse(true);
@@ -2307,7 +2325,7 @@
                 input.dispatchEvent(new Event('input', { bubbles: true }));
                 return;
             }
-            
+
             // Handle contenteditable elements
             if (!slashTextNode || slashOffset < 0 || !slashTextNode.parentNode) {
                 return;
@@ -2505,7 +2523,7 @@
             // and doesn't interfere with the immediate execution's side effects (like modals)
             setTimeout(() => {
                 actionToExecute();
-                
+
                 // Re-focus after insertion to avoid caret jumping on focus (skip if keepSlash)
                 if (!shouldKeepSlash) {
                     if (savedEditableElement) {
@@ -2545,7 +2563,7 @@
     function handleMenuClick(e) {
         e.preventDefault();
         e.stopPropagation();
-        
+
         const item = e.target.closest && e.target.closest('.slash-command-item');
         if (!item) return;
 
@@ -3165,7 +3183,7 @@
         // Handle slash menu in title inputs (notecards) and task inputs
         document.addEventListener('input', function (e) {
             const target = e.target;
-            
+
             // Check if this is a title input field or a task list input
             const isTitleInput = target.tagName === 'INPUT' && target.classList.contains('css-title');
             // Restrict to the "new task" input only, excluding existing task editing inputs
@@ -3174,7 +3192,7 @@
             if (isTitleInput || isTaskInput) {
                 const value = target.value;
                 const pos = target.selectionStart;
-                
+
                 // Check if the last character typed is a slash
                 if (pos > 0 && value[pos - 1] === '/') {
                     // Don't show if we're deleting

@@ -184,10 +184,17 @@ document.addEventListener('DOMContentLoaded', function () {
                                     const activeNoteId = noteIdMatch ? noteIdMatch[1] : null;
 
                                     if (activeNoteId && noteId === activeNoteId) {
-                                        // Call the existing deleteAttachment function if available
-                                        if (typeof window.deleteAttachment === 'function') {
-                                            window.deleteAttachment(attachmentId, noteId);
-                                        }
+                                        // Defer execution a brief moment to check if the browser simply re-inserted it
+                                        // (e.g., during a paragraph split or rich text operation that moves elements)
+                                        setTimeout(function () {
+                                            const stillExists = document.querySelector('img[src*="' + attachmentId + '"]');
+                                            if (!stillExists) {
+                                                // Call the existing deleteAttachment function if available
+                                                if (typeof window.deleteAttachment === 'function') {
+                                                    window.deleteAttachment(attachmentId, noteId);
+                                                }
+                                            }
+                                        }, 100);
                                     }
                                 }
                             }

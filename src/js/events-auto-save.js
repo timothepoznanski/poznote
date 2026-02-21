@@ -22,7 +22,57 @@ let lastSavedTags = null;
 // Network and sync state
 let isOnline = navigator.onLine;
 let notesNeedingRefresh = new Set();
-let needsGitPush = false; // Tracks if a Git push is needed for the current note
+
+// ============================================================================
+// AUTO-PUSH FLAG MANAGEMENT (localStorage only - single source of truth)
+// ============================================================================
+
+/**
+ * Get current note ID (helper)
+ */
+function getCurrentNoteId() {
+    const id = noteid || window.noteid;
+    return (id && id !== -1 && id !== 'search') ? id : null;
+}
+
+/**
+ * Get the auto-push flag from localStorage
+ */
+function getAutoPushFlag() {
+    const id = getCurrentNoteId();
+    if (!id) return false;
+    
+    try {
+        return localStorage.getItem('poznote_needs_auto_push_' + id) === 'true';
+    } catch (e) {
+        return false;
+    }
+}
+
+/**
+ * Set the auto-push flag in localStorage
+ */
+function setAutoPushFlag(value) {
+    const id = getCurrentNoteId();
+    if (!id) return;
+    
+    // Only log and update if value actually changes
+    const currentValue = getAutoPushFlag();
+    if (currentValue === value) return;
+    
+    // LOG: Affiche TRUE quand une modification nécessite un push, FALSE lors du reset après push
+    // console.log('[Poznote Auto-Push] Flag set to', value ? 'TRUE' : 'FALSE');
+    
+    try {
+        if (value) {
+            localStorage.setItem('poznote_needs_auto_push_' + id, 'true');
+        } else {
+            localStorage.removeItem('poznote_needs_auto_push_' + id);
+        }
+    } catch (e) {
+        // Ignore localStorage errors
+    }
+}
 
 // ============================================================================
 // SETUP & INITIALIZATION
@@ -33,6 +83,7 @@ let needsGitPush = false; // Tracks if a Git push is needed for the current note
  * Modern auto-save: local storage + debounced server sync
  */
 function setupAutoSaveCheck() {
+    
     // Setup online event listener
     window.addEventListener('online', () => {
         isOnline = true;
@@ -46,7 +97,7 @@ function setupAutoSaveCheck() {
                 clearTimeout(saveTimeout);
                 saveTimeout = setTimeout(() => {
                     saveToServerDebounced();
-                }, 1000); // Shorter delay when coming back online
+                }, 1000);
             }
         }
         updateConnectionStatus(true);
@@ -97,13 +148,6 @@ function setupPageUnloadWarning() {
             e.preventDefault();
             e.returnValue = message;
             return message;
-        } else if (isOnline && needsGitPush && (window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.gitSyncAutoPush === true) && currentNoteId && currentNoteId !== -1 && currentNoteId !== 'search') {
-            // No unsaved UI changes, but Git push is pending
-            try {
-                emergencySave(currentNoteId);
-            } catch (err) {
-                console.error('[Poznote Auto-Save] Emergency Git push failed:', err);
-            }
         }
     });
 
@@ -112,20 +156,12 @@ function setupPageUnloadWarning() {
         const currentNoteId = window.noteid;
 
         if (hasUnsavedChanges(currentNoteId)) {
-            // Force immediate save before leaving (synchronous for pagehide)
             if (isOnline) {
                 try {
                     emergencySave(currentNoteId);
                 } catch (err) {
                     console.error('[Poznote Auto-Save] Emergency save via pagehide failed:', err);
                 }
-            }
-        } else if (isOnline && needsGitPush && (window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.gitSyncAutoPush === true) && currentNoteId && currentNoteId !== -1 && currentNoteId !== 'search') {
-            // No unsaved UI changes, but Git push is pending
-            try {
-                emergencySave(currentNoteId);
-            } catch (err) {
-                console.error('[Poznote Auto-Save] Emergency Git push via pagehide failed:', err);
             }
         }
     });
@@ -136,20 +172,12 @@ function setupPageUnloadWarning() {
             const currentNoteId = window.noteid;
 
             if (hasUnsavedChanges(currentNoteId)) {
-                // Force immediate save when page becomes hidden
                 if (isOnline) {
                     try {
                         emergencySave(currentNoteId);
                     } catch (err) {
                         console.error('[Poznote Auto-Save] Emergency save via visibilitychange failed:', err);
                     }
-                }
-            } else if (isOnline && needsGitPush && (window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.gitSyncAutoPush === true) && currentNoteId && currentNoteId !== -1 && currentNoteId !== 'search') {
-                // No unsaved UI changes, but Git push is pending
-                try {
-                    emergencySave(currentNoteId);
-                } catch (err) {
-                    console.error('[Poznote Auto-Save] Emergency Git push via visibilitychange failed:', err);
                 }
             }
         }
@@ -234,27 +262,15 @@ function markNoteAsModified() {
 
     // If title or tags changed, check immediately; otherwise use idle callback
     if (titleChanged || tagsChanged) {
-        // Mark as needing git push since user modified content
-        needsGitPush = true;
         checkContentAndSave();
     } else {
         // Schedule during browser idle time to avoid blocking typing
         if (window.requestIdleCallback) {
             window.requestIdleCallback(() => {
-                // Check if content actually changed before setting flag
-                const currentContent = entryElem ? entryElem.innerHTML : '';
-                if (currentContent !== lastSavedContent) {
-                    needsGitPush = true;
-                }
                 checkContentAndSave();
             }, { timeout: 500 });
         } else {
             setTimeout(() => {
-                // Check if content actually changed before setting flag
-                const currentContent = entryElem ? entryElem.innerHTML : '';
-                if (currentContent !== lastSavedContent) {
-                    needsGitPush = true;
-                }
                 checkContentAndSave();
             }, 0);
         }
@@ -342,8 +358,9 @@ function saveToServerDebounced() {
     const titleChanged = currentTitle !== lastSavedTitle;
     const tagsChanged = currentTags !== lastSavedTags;
 
+    // Skip save if no changes
     if (!contentChanged && !titleChanged && !tagsChanged) {
-        return; // No changes detected
+        return;
     }
 
     // Trigger server save
@@ -379,11 +396,6 @@ function hasUnsavedChanges(noteId) {
         return true;
     }
 
-    // Check if Git push is pending (even if saved locally/remote DB)
-    if (needsGitPush) {
-        return false; // Don't block navigation, just trigger emergencySave via other means
-    }
-
     return false;
 }
 
@@ -401,8 +413,8 @@ function emergencySave(noteId) {
         return;
     }
 
-    // Skip if no changes need saving or syncing
-    if (!needsGitPush && typeof hasUnsavedChanges === 'function' && !hasUnsavedChanges(noteId)) {
+    // Skip if no changes need saving
+    if (typeof hasUnsavedChanges === 'function' && !hasUnsavedChanges(noteId)) {
         return;
     }
 
@@ -483,26 +495,17 @@ function emergencySave(noteId) {
         }
     }
 
-    const gitPushRequested = needsGitPush && (window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.gitSyncAutoPush === true);
-
     const updates = {
         heading: headi,
         content: ent,
         tags: tags,
         folder: folder,
         folder_id: folder_id,
-        workspace: (window.selectedWorkspace || getSelectedWorkspace()),
-        git_push: gitPushRequested
+        workspace: (window.selectedWorkspace || getSelectedWorkspace())
     };
-
-    // Reset the flag optimistically if a push was requested
-    if (needsGitPush) {
-        needsGitPush = false;
-    }
 
     // Strategy 1: Try fetch with keepalive (most reliable)
     try {
-        console.log('[Poznote Auto-Save] Saving note', noteId, '| git_push:', gitPushRequested);
         fetch("/api/v1/notes/" + noteId, {
             method: "PATCH",
             headers: {
@@ -511,33 +514,12 @@ function emergencySave(noteId) {
             },
             body: JSON.stringify(updates),
             keepalive: true
-        }).then(res => res.json()).then(data => {
-            if (gitPushRequested) {
-                if (data.git_push) {
-                    if (data.git_push.triggered) {
-                        if (data.git_push.success) {
-                            console.log('[Poznote Git] Auto-push success for note', noteId);
-                        } else {
-                            console.warn('[Poznote Git] Auto-push failed for note', noteId, '-', data.git_push.error || 'unknown error');
-                            // Restore flag so next save retries
-                            needsGitPush = true;
-                        }
-                    } else {
-                        // console.warn('[Poznote Git] Auto-push not triggered:', data.git_push.reason || 'not configured or disabled');
-                    }
-                } else {
-                    console.warn('[Poznote Git] git_push requested but no git_push info in response. Check server logs.');
-                }
-            }
         }).catch(err => {
             console.error('[Poznote Auto-Save] Emergency fetch failed:', err);
-            // Restore flag on network failure so next save retries
-            if (gitPushRequested) { needsGitPush = true; }
         });
-        return; // Exit if fetch was attempted successfully
+        return;
     } catch (err) {
         console.error('[Poznote Auto-Save] Fetch strategy failed:', err);
-        if (gitPushRequested) { needsGitPush = true; }
     }
 
     // Strategy 2: Fallback to sendBeacon with FormData
@@ -665,9 +647,56 @@ function reinitializeAutoSaveState() {
         // Remove from refresh list if present
         notesNeedingRefresh.delete(String(currentNoteId));
 
-        // Reset git push flag since we just loaded fresh content
-        needsGitPush = false;
+        // Reset auto-push flag since we just loaded fresh content
+        setAutoPushFlag(false);
     }
+}
+
+// ============================================================================
+// BACKGROUND GIT PUSH
+// ============================================================================
+
+/**
+ * Trigger a background git push without blocking the UI
+ * Called when changing notes if auto-push flag is set
+ */
+function triggerBackgroundPush() {
+    if (!getAutoPushFlag()) return;
+    if (!window.POZNOTE_CONFIG?.gitSyncAutoPush) {
+        setAutoPushFlag(false);
+        return;
+    }
+    
+    // Reset flag before push
+    setAutoPushFlag(false);
+    
+    // Trigger push in background using keepalive for reliability
+    // LOG: Déclenché avant chaque navigation vers une autre note (via loadNoteDirectly)
+    // console.log('[Poznote Auto-Push] Starting background push...');
+    
+    fetch('/api/v1/git-sync/push', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            workspace: window.selectedWorkspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : null)
+        }),
+        keepalive: true
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            // LOG: Confirmation que le push Git a réussi en arrière-plan
+            // console.log('[Poznote Auto-Push] Push completed successfully');
+        } else {
+            // console.warn('[Poznote Auto-Push] Push failed:', data.error || 'unknown error');
+        }
+    })
+    .catch(err => {
+        // console.warn('[Poznote Auto-Push] Push error:', err);
+    });
 }
 
 // ============================================================================
@@ -680,3 +709,6 @@ window.hasUnsavedChanges = hasUnsavedChanges;
 window.clearDraft = clearDraft;
 window.reinitializeAutoSaveState = reinitializeAutoSaveState;
 window.updateConnectionStatus = updateConnectionStatus;
+window.setNeedsAutoPush = setAutoPushFlag;
+window.triggerBackgroundPush = triggerBackgroundPush;
+window.emergencySave = emergencySave;

@@ -27,6 +27,7 @@ require_once __DIR__ . '/../version_helper.php';
 
 // === Initialize Variables ===
 $currentLang = getUserLanguage();
+$pageWorkspace = trim(getWorkspaceFilter());
 $error = '';
 
 // === Handle Form Actions ===
@@ -228,7 +229,7 @@ $v = getAppVersion();
     }
     </script>
 </head>
-<body>
+<body data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <!-- ========================================
          ADMIN CONTAINER - User Management
          ======================================== -->

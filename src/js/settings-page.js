@@ -346,20 +346,21 @@
         // Back to Notes link - preserves workspace parameter if available
         var backLink = document.getElementById('backToNotesLink');
         if (backLink) {
-            backLink.addEventListener('click', function () {
-                var href = backLink.getAttribute('data-href') || 'index.php';
+            backLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                var href = backLink.getAttribute('href') || 'index.php';
                 try {
-                    var workspace = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace)
-                        ? selectedWorkspace
-                        : (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace)
-                            ? window.selectedWorkspace
-                            : null;
+                    var workspace = document.body.getAttribute('data-workspace') ||
+                        (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ||
+                        (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ||
+                        null;
+
                     if (workspace && workspace !== '') {
-                        var url = new URL(href, window.location.origin);
+                        var url = new URL(href, window.location.href);
                         url.searchParams.set('workspace', workspace);
                         href = url.toString();
                     }
-                } catch (e) {
+                } catch (err) {
                     // Use default href if URL parsing fails
                 }
                 window.location = href;
@@ -429,7 +430,6 @@
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
         setupToggleCard('show-inline-attachment-images-card', 'show-inline-attachment-images-status', 'hide_inline_attachment_images', true);
-        setupToggleCard('enable-internal-tabs-card', 'enable-internal-tabs-status', 'enable_internal_tabs', true);
 
         // Card click handlers for modal settings
         var languageCard = document.getElementById('language-card');

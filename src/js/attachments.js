@@ -114,8 +114,11 @@ function convertBase64ImagesToAttachments(noteEntry) {
                     updateAttachmentCountInMenu(noteId);
                 }
 
-                // Mark note as modified and save
+                // Mark note as modified and flag for git push
                 window.noteid = noteId;
+                if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                    window.setNeedsAutoPush(true);
+                }
                 if (typeof window.markNoteAsModified === 'function') {
                     window.markNoteAsModified();
                 }
@@ -240,6 +243,10 @@ function uploadAttachment() {
                     uploadButtonContainer.classList.remove('show');
                 }
 
+                if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                    window.setNeedsAutoPush(true);
+                }
+
                 loadAttachments(currentNoteIdForAttachments);
                 updateAttachmentCountInMenu(currentNoteIdForAttachments);
             } else {
@@ -335,6 +342,46 @@ function deleteAttachment(attachmentId, noteId) {
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data.success) {
+                // Remove the attachment from the note editor DOM (HTML notes)
+                var noteEntry = document.getElementById('entry' + noteIdToUse);
+                if (noteEntry && document.body.contains(noteEntry)) {
+                    var noteType = noteEntry.getAttribute('data-note-type') || 'note';
+
+                    if (noteType === 'note') {
+                        var imgs = noteEntry.querySelectorAll('img[src*="' + attachmentId + '"]');
+                        var removedAny = false;
+                        imgs.forEach(function (img) {
+                            img._manuallyDeleted = true; // prevent MutationObserver from triggering deleteAttachment again
+                            img.parentNode.removeChild(img);
+                            removedAny = true;
+                        });
+                        if (removedAny && typeof window.markNoteAsModified === 'function') {
+                            window.markNoteAsModified();
+                        }
+                    } else if (noteType === 'markdown') {
+                        var editor = noteEntry.querySelector('.markdown-editor');
+                        if (editor) {
+                            var walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null, false);
+                            var node;
+                            var regex = new RegExp('!?(?:\\[[^\\]]*\\])?\\([^)]*' + attachmentId + '[^)]*\\)', 'gi');
+                            var markdownRemoved = false;
+                            while (node = walker.nextNode()) {
+                                if (node.nodeValue.includes(attachmentId)) {
+                                    node.nodeValue = node.nodeValue.replace(regex, '');
+                                    markdownRemoved = true;
+                                }
+                            }
+                            if (markdownRemoved) {
+                                var inputEvent = new Event('input', { bubbles: true });
+                                editor.dispatchEvent(inputEvent);
+                            }
+                        }
+                    }
+                }
+
+                if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                    window.setNeedsAutoPush(true);
+                }
                 loadAttachments(noteIdToUse);
                 updateAttachmentCountInMenu(noteIdToUse);
             } else {
@@ -579,6 +626,10 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
                     loadAttachments(noteId);
                 }
 
+                if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                    window.setNeedsAutoPush(true);
+                }
+
                 // Trigger automatic save after a short delay
                 setTimeout(function () {
                     if (typeof window.saveNoteImmediately === 'function') {
@@ -681,8 +732,20 @@ function replaceLoadingText(oldText, newText, dropTarget) {
         for (var i = 0; i < textNodes.length; i++) {
             var textNode = textNodes[i];
             var text = textNode.textContent;
-            if (text.indexOf(oldText) !== -1) {
+            var index = text.indexOf(oldText);
+            if (index !== -1) {
                 textNode.textContent = text.replace(oldText, newText);
+
+                // Placer le curseur après le texte inséré sans le sélectionner
+                try {
+                    var sel = window.getSelection();
+                    var newRange = document.createRange();
+                    newRange.setStart(textNode, index + newText.length);
+                    newRange.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(newRange);
+                } catch (e) { }
+
                 break; // On remplace seulement la première occurrence
             }
         }
@@ -766,6 +829,9 @@ function handleHTMLImageInsert(file, dropTarget) {
                 window.noteid = noteId;
 
                 // Trigger automatic save after image insertion
+                if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                    window.setNeedsAutoPush(true);
+                }
                 if (typeof window.markNoteAsModified === 'function') {
                     window.markNoteAsModified();
                 }

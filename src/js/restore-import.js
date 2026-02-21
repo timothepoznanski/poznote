@@ -234,8 +234,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Update Back to Notes link with current workspace from PHP
     try {
-        const workspace = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace :
-            (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : null;
+        const workspace = (typeof getSelectedWorkspace === 'function') ? getSelectedWorkspace() :
+            (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace :
+                (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : null;
         if (workspace) {
             const backLink = document.getElementById('backToNotesLink');
             if (backLink) backLink.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(workspace));

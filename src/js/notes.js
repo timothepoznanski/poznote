@@ -204,8 +204,6 @@ function saveNoteToServer() {
         tags: tags,
         folder_id: folderId,
         workspace: selectedWorkspace || getSelectedWorkspace()
-        // git_push is intentionally omitted here: the push is triggered only
-        // when leaving the note (note switch or page unload), via emergencySave.
     };
 
     // Use RESTful API: PATCH /api/v1/notes/{id}
@@ -222,6 +220,13 @@ function saveNoteToServer() {
             if (data.success) {
                 var responseTitle = (data.note && data.note.heading) ? data.note.heading : headi;
                 handleSaveResponse(JSON.stringify({ date: new Date().toLocaleDateString(), title: responseTitle, original_title: headi }));
+
+                // Mark note as needing auto-push since it was successfully saved (if auto-push enabled)
+                if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                    // LOG: Déclenché après chaque auto-save réussi (contenu, titre, tags modifiés)
+                    // console.log('[Poznote Auto-Push] Note saved to server - marking for push');
+                    window.setNeedsAutoPush(true);
+                }
 
                 // Update linked notes in the list if any were updated
                 if (data.note && data.updated_linked_notes && data.updated_linked_notes.length > 0) {
@@ -424,6 +429,13 @@ function deleteNote(noteId) {
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data && data.success) {
+                // Mark note for auto-push since we deleted a note (if auto-push enabled)
+                if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                    // LOG: Suppression d'une note via la corbeille
+                    // console.log('[Poznote Auto-Push] Note deleted - marking for push');
+                    window.setNeedsAutoPush(true);
+                }
+                
                 if (window.tabManager && typeof window.tabManager.closeTabByNoteId === 'function') {
                     window.tabManager.closeTabByNoteId(noteId);
                 }

@@ -3,6 +3,15 @@
  * Catches JavaScript errors and unhandled promise rejections for debugging
  */
 
+// Load configuration from JSON element (CSP compliant)
+try {
+    var configEl = document.getElementById('poznote-config');
+    window.POZNOTE_CONFIG = configEl ? JSON.parse(configEl.textContent) : {};
+} catch(e) {
+    console.warn('Failed to load POZNOTE_CONFIG:', e);
+    window.POZNOTE_CONFIG = {};
+}
+
 (function() {
     'use strict';
 

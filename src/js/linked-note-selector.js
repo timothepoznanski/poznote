@@ -4,9 +4,21 @@
 (function() {
     'use strict';
 
-    // Use global translation function from globals.js
-    const tr = window.t || function(key, vars, fallback) {
-        return fallback || key;
+    // Use global translation function from globals.js - always call window.t dynamically
+    const tr = function(key, vars, fallback) {
+        if (typeof window.t === 'function') {
+            return window.t(key, vars, fallback);
+        }
+        // Fallback: do basic variable substitution
+        let str = fallback || key;
+        if (vars && typeof vars === 'object') {
+            for (const k in vars) {
+                if (Object.prototype.hasOwnProperty.call(vars, k)) {
+                    str = str.split('{{' + k + '}}').join(String(vars[k]));
+                }
+            }
+        }
+        return str;
     };
 
     // Track recently opened notes in localStorage
@@ -165,11 +177,14 @@
             const workspace = (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : '') || '';
             const folderId = (typeof selectedFolderId !== 'undefined' && selectedFolderId) || window.targetFolderId || null;
             
+            // Ensure noteHeading has a valid value
+            const validHeading = noteHeading && noteHeading.trim() ? noteHeading.trim() : tr('index.note.untitled', {}, 'Untitled');
+            
             // Create request data
             const requestData = {
                 type: 'linked',
                 linked_note_id: noteId,
-                heading: tr('modals.create.linked.default_heading', { note: noteHeading }, 'Link to {{note}}'),
+                heading: tr('modals.create.linked.default_heading', { note: validHeading }, 'Link to {{note}}'),
                 workspace: workspace
             };
             

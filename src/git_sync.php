@@ -22,6 +22,7 @@ require_once 'GitSync.php';
 $currentLang = getUserLanguage();
 $currentUser = getCurrentUser();
 $username = htmlspecialchars($currentUser['display_name'] ?: $currentUser['username']);
+$pageWorkspace = trim(getWorkspaceFilter());
 
 // Initialize GitSync
 $gitSync = new GitSync($con, $_SESSION['user_id'] ?? null);
@@ -193,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $cache_v; ?>">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
-<body class="home-page">
+<body class="home-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <div class="home-container git-sync-container">
 
         <div class="git-sync-nav">
@@ -220,34 +221,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             <p class="git-sync-description"><?php echo tp_h('git_sync.description'); ?></p>
         </div>
 
-        <div class="limitations-table-wrapper">
-            <table class="limitations-table">
-                <thead>
-                    <tr>
-                        <th><?php echo tp_h('git_sync.limitations.element'); ?></th>
-                        <th><?php echo tp_h('git_sync.limitations.html_notes'); ?></th>
-                        <th><?php echo tp_h('git_sync.limitations.markdown_notes'); ?></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><?php echo tp_h('git_sync.limitations.text_content'); ?></td>
-                        <td class="text-center status-success"><i class="fas fa-check"></i></td>
-                        <td class="text-center status-success"><i class="fas fa-check"></i></td>
-                    </tr>
-                    <tr>
-                        <td><?php echo tp_h('git_sync.limitations.attachments'); ?> (images, files, etc.)</td>
-                        <td class="text-center status-success"><i class="fas fa-check"></i></td>
-                        <td class="text-center status-success"><i class="fas fa-check"></i></td>
-                    </tr>
-                    <tr>
-                        <td><?php echo tp_h('git_sync.limitations.metadata'); ?></td>
-                        <td class="text-center status-success"><i class="fas fa-check"></i></td>
-                        <td class="text-center status-success"><i class="fas fa-check"></i></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+
 
         <?php if ($message): ?>
         <div class="alert alert-success">

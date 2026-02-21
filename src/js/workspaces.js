@@ -5,7 +5,7 @@
 var selectedWorkspace = '';
 
 // Use global translation function from globals.js
-var wsTr = window.t || function(key, vars, fallback) {
+var wsTr = window.t || function (key, vars, fallback) {
     return fallback || key;
 };
 
@@ -184,7 +184,7 @@ function displayWorkspaceMenu(menu, workspaces) {
         var isCurrent = workspace.name === currentWorkspace;
         var currentClass = isCurrent ? ' current-workspace' : '';
         var icon = isCurrent ? 'fa-check-light-full' : 'fa-layer-group';
-        var safeName = workspace.name.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        var safeName = workspace.name.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
         menuHtml += '<div class="workspace-menu-item' + currentClass + '" data-workspace-name="' + safeName + '">';
         menuHtml += '<i class="' + icon + '"></i>';
@@ -581,7 +581,7 @@ function handleDeleteButtonClick(e) {
                     if (json && json.success) {
                         showAjaxAlert(wsTr('workspaces.alerts.deleted_success', {}, 'Workspace deleted successfully'), 'success');
                         closeDeleteModal();
-                        
+
                         // If the deleted workspace was the current one, find another workspace and save it
                         if (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace === workspaceName) {
                             var newWorkspace = null;
@@ -597,7 +597,7 @@ function handleDeleteButtonClick(e) {
                                 saveLastOpenedWorkspace(newWorkspace);
                             }
                         }
-                        
+
                         // Update the default workspace dropdown if needed
                         if (typeof window.loadDefaultWorkspaceSetting === 'function') {
                             window.loadDefaultWorkspaceSetting();
@@ -686,7 +686,7 @@ function handleCreateWorkspace(event) {
                 showAjaxAlert(wsTr('workspaces.alerts.error_prefix', { error: (json.error || wsTr('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error: {{error}}'), 'danger');
             }
         })
-.catch(function (err) {
+        .catch(function (err) {
             if (createBtn) createBtn.disabled = false;
             console.error('Error creating workspace:', err);
             showAjaxAlert(wsTr('workspaces.alerts.create_error', {}, 'Error creating workspace'), 'danger');
@@ -766,14 +766,14 @@ function handleMoveButtonClick(e) {
                     confirmBtn.disabled = false;
                     if (json && json.success) {
                         showAjaxAlert(wsTr('workspaces.move.moved_to', { count: (json.moved || 0), target: json.target }, 'Moved {{count}} notes to {{target}}'), 'success');
-                        
+
                         // Update counts in the displayed workspace list
                         updateWorkspaceNoteCounts(source, json.target, parseInt(json.moved || 0, 10));
                         // Persist the selected workspace so returning to notes shows destination
                         if (typeof saveLastOpenedWorkspace === 'function') {
                             saveLastOpenedWorkspace(json.target);
                         }
-                        
+
                         // Update Back to Notes links to include the workspace param
                         updateBackToNotesLinks(json.target);
                         closeMoveModal();
@@ -792,7 +792,7 @@ function handleMoveButtonClick(e) {
 // Helper function to update workspace note counts in UI
 function updateWorkspaceNoteCounts(sourceWorkspace, targetWorkspace, movedCount) {
     if (!movedCount) return;
-    
+
     function adjustCountFor(name, delta) {
         var rows = document.querySelectorAll('.ws-name-row');
         for (var i = 0; i < rows.length; i++) {
@@ -812,7 +812,7 @@ function updateWorkspaceNoteCounts(sourceWorkspace, targetWorkspace, movedCount)
             }
         }
     }
-    
+
     adjustCountFor(sourceWorkspace.trim(), -movedCount);
     adjustCountFor(targetWorkspace.trim(), movedCount);
 }
@@ -956,8 +956,9 @@ function initializeWorkspacesPage() {
 
     // Update back link with current workspace from PHP
     var backLink = document.getElementById('backToNotesLink');
-    if (backLink && typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) {
-        backLink.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(window.selectedWorkspace));
+    var ws = (typeof getSelectedWorkspace === 'function') ? getSelectedWorkspace() : (window.selectedWorkspace || document.body.getAttribute('data-workspace') || '');
+    if (backLink && ws) {
+        backLink.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(ws));
     }
 
     // Initialize default workspace dropdown

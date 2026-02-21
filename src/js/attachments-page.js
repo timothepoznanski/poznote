@@ -196,6 +196,18 @@
                     fileInput.value = '';
                     document.getElementById('selectedFileName').style.display = 'none';
                     document.getElementById('uploadBtn').disabled = true;
+                    
+                    // Mark that this note needs an auto-push (if auto-push enabled)
+                    if (window.POZNOTE_CONFIG?.gitSyncAutoPush) {
+                        try {
+                            localStorage.setItem('poznote_needs_auto_push_' + noteId, 'true');
+                            // LOG: Sur la page attachments.php après upload - écrit directement dans localStorage
+                            // console.log('[Poznote Auto-Push] Flag stored in localStorage for note', noteId, '(attachment uploaded)');
+                        } catch (e) {
+                            // console.warn('[Poznote Auto-Push] Failed to store flag in localStorage:', e);
+                        }
+                    }
+                    
                     loadAttachments();
                 } else {
                     showNotification(TXT.uploadFailedPrefix.replace('{{error}}', response.message || ''), 'error');
@@ -413,6 +425,18 @@
             .then(function (data) {
                 if (data.success) {
                     showNotification(TXT.deletedSuccess, 'success');
+                    
+                    // Mark that this note needs an auto-push (if auto-push enabled)
+                    if (window.POZNOTE_CONFIG?.gitSyncAutoPush) {
+                        try {
+                            localStorage.setItem('poznote_needs_auto_push_' + noteId, 'true');
+                            // LOG: Sur la page attachments.php après suppression - écrit directement dans localStorage
+                            // console.log('[Poznote Auto-Push] Flag stored in localStorage for note', noteId, '(attachment deleted)');
+                        } catch (e) {
+                            // console.warn('[Poznote Auto-Push] Failed to store flag in localStorage:', e);
+                        }
+                    }
+                    
                     loadAttachments();
                 } else {
                     showNotification(TXT.deleteFailedPrefix.replace('{{error}}', data.message || ''), 'error');
@@ -467,8 +491,9 @@
     function updateBackLink() {
         try {
             // Use workspace from PHP (set as global variable)
-            var workspace = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace :
-                (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : null;
+            var workspace = (typeof getSelectedWorkspace === 'function') ? getSelectedWorkspace() :
+                (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace :
+                    (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : null;
             if (workspace) {
                 var a = document.getElementById('backToNotesLink');
                 if (a) {

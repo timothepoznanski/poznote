@@ -109,12 +109,11 @@ $settings = [
     'hide_folder_counts' => null,
     'note_list_sort' => 'updated_desc',
     'notes_without_folders_after_folders' => '1',
-    'hide_inline_attachment_images' => '1',
-    'enable_internal_tabs' => '0'
+    'hide_inline_attachment_images' => '1'
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'hide_inline_attachment_images', 'enable_internal_tabs')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'hide_inline_attachment_images')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -297,11 +296,12 @@ $body_classes = trim($extra_body_classes);
         <i class="fas fa-save"></i>
     </div>
     
-    <!-- Global error handler (external for CSP compliance) -->
-    <script>window.POZNOTE_CONFIG = { 
-        enableInternalTabs: <?php echo ($settings['enable_internal_tabs'] === '1' || $settings['enable_internal_tabs'] === 'true') ? 'true' : 'false'; ?>,
-        gitSyncAutoPush: <?php echo ($showGitSync && $gitSync->isAutoPushEnabled()) ? 'true' : 'false'; ?>
-    };</script>
+    <!-- Global configuration (CSP compliant) -->
+    <script type="application/json" id="poznote-config"><?php
+        echo json_encode([
+            'gitSyncAutoPush' => ($showGitSync && $gitSync->isAutoPushEnabled())
+        ], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP) ?: '{}';
+    ?></script>
     <script src="js/error-handler.js?v=<?php echo $v; ?>"></script>
 
     <!-- Workspace data for JavaScript (CSP compliant) -->

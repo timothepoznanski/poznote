@@ -95,8 +95,7 @@
             "kanban_on_folder_click": "Open Kanban view on folder click",
             "index_icon_scale": "Index icon scaling",
             "note_content_width": "Note content width",
-            "show_inline_attachment_images": "Show image attachments",
-            "enable_internal_tabs": "Enable internal tabs"
+            "show_inline_attachment_images": "Show image attachments"
         },
         "badges": {
             "font_size_default": "default ({{size}}px)",
@@ -196,6 +195,7 @@
             "uploaded_prefix": "Uploaded: ",
             "open_in_new_tab": "Open in new tab",
             "pdf_label": "PDF",
+            "show_inline_attachment_images_desc": "Show image attachments that are automatically created when an image is inserted into the note",
             "settings_banner": {
                 "message": "Image attachments are hidden from the note's list (but not from the list here) because the 'Show image attachments' setting is disabled.",
                 "action": "Change setting"

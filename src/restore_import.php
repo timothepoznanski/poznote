@@ -11,6 +11,7 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
 }
 
 $currentLang = getUserLanguage();
+$pageWorkspace = trim(getWorkspaceFilter());
 
 // Variables for specific section messages
 $restore_message = '';
@@ -1653,7 +1654,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
     <script src="js/globals.js"></script>
     <script src="js/theme-manager.js"></script>
 </head>
-<body>
+<body data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <div class="backup-container">
         <div class="navigation-buttons" style="justify-content: center;">
             <a id="backToNotesLink" href="index.php" class="btn btn-secondary">

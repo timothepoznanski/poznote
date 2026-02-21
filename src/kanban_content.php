@@ -196,7 +196,16 @@ try {
                     <div class="kanban-column-title">
                         <span><?php echo t_h('kanban.uncategorized', [], 'Uncategorized'); ?></span>
                     </div>
-                    <span class="kanban-column-count"><?php echo count($parentNotes); ?></span>
+                    <div class="kanban-column-header-actions">
+                        <button class="kanban-add-card-btn" 
+                                data-action="create-kanban-note" 
+                                data-folder-id="<?php echo $folder_id; ?>" 
+                                data-folder-name="<?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?>" 
+                                title="<?php echo t_h('kanban.add_note', [], 'Add note'); ?>">
+                            <i class="far fa-plus-circle"></i>
+                        </button>
+                        <span class="kanban-column-count"><?php echo count($parentNotes); ?></span>
+                    </div>
                 </div>
                 <div class="kanban-column-content" data-folder-id="<?php echo $folder_id; ?>">
                     <?php foreach ($parentNotes as $note): ?>
@@ -227,7 +236,16 @@ try {
                               data-folder-name="<?php echo htmlspecialchars($subfolder['name'], ENT_QUOTES); ?>"
                               style="cursor: pointer;"><?php echo htmlspecialchars($subfolder['name'], ENT_QUOTES); ?></span>
                     </div>
-                    <span class="kanban-column-count"><?php echo count($subfolderNotes[$subfolder['id']] ?? []); ?></span>
+                    <div class="kanban-column-header-actions">
+                        <button class="kanban-add-card-btn" 
+                                data-action="create-kanban-note" 
+                                data-folder-id="<?php echo $subfolder['id']; ?>" 
+                                data-folder-name="<?php echo htmlspecialchars($subfolder['name'], ENT_QUOTES); ?>" 
+                                title="<?php echo t_h('kanban.add_note', [], 'Add note'); ?>">
+                            <i class="far fa-plus-circle"></i>
+                        </button>
+                        <span class="kanban-column-count"><?php echo count($subfolderNotes[$subfolder['id']] ?? []); ?></span>
+                    </div>
                 </div>
                 <div class="kanban-column-content" data-folder-id="<?php echo $subfolder['id']; ?>">
                     <?php foreach ($subfolderNotes[$subfolder['id']] ?? [] as $note): ?>

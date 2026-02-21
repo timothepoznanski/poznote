@@ -9,13 +9,13 @@
 #app-tab-bar {
     display: flex;
     align-items: flex-end;
-    gap: 2px;
+    gap: 5px;
     padding: 6px 8px 0;
     background: #fff;
     border-bottom: 1px solid #e5e7eb;
     overflow-x: auto;
     flex-shrink: 0;
-    min-height: 38px;
+    min-height: 32px;
     /* Sticky position */
     position: sticky;
     top: 0;
@@ -57,6 +57,7 @@
 .app-tab.active {
     background: #fff;
     border-color: #d1d5db;
+    border-top: 2px solid #007DB8;
     font-weight: 500;
     z-index: 1;
 }
