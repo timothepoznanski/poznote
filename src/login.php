@@ -208,19 +208,28 @@ if (isset($_GET['oidc_error'])) {
                 <?php endif; ?>
             </div>
             
-            <div class="form-group remember-me-group">
-                <label class="remember-me-label">
-                    <input type="checkbox" name="remember_me" value="1" id="remember_me">
-                    <span><?php echo t_h('login.remember_me', [], 'Remember me for 30 days', $currentLang ?? 'en'); ?></span>
-                </label>
-            </div>
-            
+            <input type="hidden" name="remember_me" value="0" id="remember_me_hidden">
             <button type="submit" class="login-button"><?php echo t_h('login.button', [], 'Login', $currentLang ?? 'en'); ?></button>
         </form>
         <?php endif; ?>
 
         <?php if (function_exists('oidc_is_enabled') && oidc_is_enabled()): ?>
-            <a class="login-button oidc-button" href="oidc_login.php"<?php if (!$showNormalLogin): ?> autofocus<?php endif; ?>><?php echo t_h('login.oidc_button', ['provider' => (defined('OIDC_PROVIDER_NAME') ? OIDC_PROVIDER_NAME : 'SSO')], 'Continue with SSO', $currentLang ?? 'en'); ?></a>
+            <?php if ($showNormalLogin): ?>
+                <div class="oidc-divider">
+                    <span><?php echo t_h('login.or', [], 'or', $currentLang ?? 'en'); ?></span>
+                </div>
+            <?php endif; ?>
+            
+            <a class="login-button oidc-button" href="#" id="oidc-login-btn"<?php if (!$showNormalLogin): ?> autofocus<?php endif; ?>><?php echo t_h('login.oidc_button', ['provider' => (defined('OIDC_PROVIDER_NAME') ? OIDC_PROVIDER_NAME : 'SSO')], 'Continue with SSO', $currentLang ?? 'en'); ?></a>
+        <?php endif; ?>
+        
+        <?php if ($showNormalLogin || (function_exists('oidc_is_enabled') && oidc_is_enabled())): ?>
+        <div class="form-group remember-me-group remember-me-unified">
+            <label class="remember-me-label">
+                <input type="checkbox" name="remember_me" value="1" id="remember_me">
+                <span><?php echo t_h('login.remember_me', [], 'Remember me for 30 days', $currentLang ?? 'en'); ?></span>
+            </label>
+        </div>
         <?php endif; ?>
 
         <?php if ($oidcError): ?>
@@ -237,7 +246,8 @@ if (isset($_GET['oidc_error'])) {
     $loginConfig = [
         'focusOidc' => !$showNormalLogin && function_exists('oidc_is_enabled') && oidc_is_enabled(),
         'showPasswordTitle' => t('login.show_password', [], 'Show password', $currentLang ?? 'en'),
-        'hidePasswordTitle' => t('login.hide_password', [], 'Hide password', $currentLang ?? 'en')
+        'hidePasswordTitle' => t('login.hide_password', [], 'Hide password', $currentLang ?? 'en'),
+        'oidcEnabled' => function_exists('oidc_is_enabled') && oidc_is_enabled()
     ];
     ?>
     <script type="application/json" id="login-config"><?php echo json_encode($loginConfig); ?></script>
