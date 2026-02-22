@@ -166,6 +166,49 @@ input[type="password"]::placeholder {
     user-select: none;
 }
 
+.remember-me-unified {
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.remember-me-unified .remember-me-label {
+    justify-content: center;
+}
+
+.oidc-divider {
+    text-align: center;
+    margin: 1.25rem 0;
+    position: relative;
+}
+
+.oidc-divider::before,
+.oidc-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 42%;
+    height: 1px;
+    background: #e2e8f0;
+}
+
+.oidc-divider::before {
+    left: 0;
+}
+
+.oidc-divider::after {
+    right: 0;
+}
+
+.oidc-divider span {
+    color: #718096;
+    font-size: 0.875rem;
+    font-weight: 500;
+    background: white;
+    padding: 0 0.75rem;
+    position: relative;
+}
+
 .login-button {
     width: 100%;
     padding: 0.875rem 1rem;
@@ -407,6 +450,16 @@ html[data-theme='dark'] .admin-warning code {
 html[data-theme='dark'] .language-select option {
     background: #333333;
     color: #e0e0e0;
+}
+
+html[data-theme='dark'] .oidc-divider::before,
+html[data-theme='dark'] .oidc-divider::after {
+    background: #4a5568;
+}
+
+html[data-theme='dark'] .oidc-divider span {
+    color: #a0aec0;
+    background: #252526;
 }
 
 /* Responsive Design */

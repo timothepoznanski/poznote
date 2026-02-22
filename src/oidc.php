@@ -799,8 +799,48 @@ function oidc_finish_login($claims, $tokens) {
         $_SESSION['oidc_id_token'] = $tokens['id_token'];
     }
 
+    // Handle "Remember Me" functionality if requested
+    $rememberMe = isset($_SESSION['oidc_remember_me']) && $_SESSION['oidc_remember_me'] === true;
+    if ($rememberMe) {
+        // Use the same Remember Me mechanism as standard authentication
+        // This creates a persistent cookie that lasts 30 days
+        $configured_port = $_ENV['HTTP_WEB_PORT'] ?? '8040';
+        $timestamp = time();
+        $secretToUse = $user['is_admin'] ? AUTH_PASSWORD : AUTH_USER_PASSWORD;
+        $actualUsername = $user['username'];
+        
+        // Format: actual_username:user_id:timestamp:hash
+        $hash = hash('sha256', $actualUsername . $user['id'] . $timestamp . $secretToUse);
+        $token = base64_encode($actualUsername . ':' . $user['id'] . ':' . $timestamp . ':' . $hash);
+        
+        // Detect if behind a reverse proxy (HTTPS termination)
+        $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+                 || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+                 || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on')
+                 || (!empty($_SERVER['HTTP_X_FORWARDED_PORT']) && $_SERVER['HTTP_X_FORWARDED_PORT'] === '443');
+        
+        // Allow override via environment variable
+        $forceSecureCookies = getenv('POZNOTE_FORCE_SECURE_COOKIES');
+        if ($forceSecureCookies !== false && $forceSecureCookies !== '') {
+            $isSecure = filter_var($forceSecureCookies, FILTER_VALIDATE_BOOLEAN);
+        }
+        
+        $cookieName = 'poznote_remember_' . $configured_port;
+        $cookieDuration = 30 * 24 * 60 * 60; // 30 days
+        
+        setcookie(
+            $cookieName,
+            $token,
+            time() + $cookieDuration,
+            '/',
+            '',
+            $isSecure,
+            true
+        );
+    }
+
     // Clear transient values
-    unset($_SESSION['oidc_state'], $_SESSION['oidc_nonce'], $_SESSION['oidc_code_verifier']);
+    unset($_SESSION['oidc_state'], $_SESSION['oidc_nonce'], $_SESSION['oidc_code_verifier'], $_SESSION['oidc_remember_me']);
 }
 
 function oidc_logout_redirect_url() {
