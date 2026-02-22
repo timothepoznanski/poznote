@@ -76,7 +76,7 @@
         if (!themeToggle) return;
         const icon = themeToggle.querySelector('i');
         if (icon) {
-            icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            icon.className = theme === 'dark' ? 'lucide lucide-sun' : 'lucide lucide-moon';
         }
     }
 

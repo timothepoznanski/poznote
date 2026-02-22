@@ -1811,7 +1811,7 @@ class NotesController {
         
         // Italic: handles both <em> and <i>, avoids double wrapping
         $md = preg_replace_callback('/<(?:em|i)[^>]*>(.*?)<\/(?:em|i)>/is', function($matches) {
-            if (isset($matches[0]) && strpos($matches[0], 'class="fa') !== false) return ''; // Skip FontAwesome
+            if (isset($matches[0]) && preg_match('/class=["\"][^"\"]*(?:\blucide\b|\blucide-)/', $matches[0])) return ''; // Skip Lucide icons
             $inner = $matches[1];
             $inner = strip_tags($inner, '<strong><b><code><a><del><s><strike><u><mark><span>');
             preg_match('/^(\s*)(.*?)(\s*)$/s', $inner, $parts);

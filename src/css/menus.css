@@ -134,7 +134,7 @@
     margin-left: 8px;
 }
 
-.newbutton[style] .fa-times-circle {
+.newbutton[style] .lucide-times-circle {
     color: #d32f2f;
     font-size: 22px;
     display: flex;
@@ -364,7 +364,7 @@
 }
 
 /* Make delete icon red in actions menu */
-.actions-menu-item .fa-trash {
+.actions-menu-item .lucide-trash-2 {
     color: #ff0000 !important;
     filter: none !important;
 }

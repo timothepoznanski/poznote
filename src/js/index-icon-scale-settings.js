@@ -104,12 +104,12 @@ function applyIndexIconScale(scale) {
     styleTag.innerHTML = `
         /* Sidebar: home / settings / create */
         .sidebar-home i,
-        .sidebar-home [class*="fa-"],
+        .sidebar-home [class*="lucide-"],
         .sidebar-settings i,
-        .sidebar-settings [class*="fa-"],
+        .sidebar-settings [class*="lucide-"],
         .sidebar-plus i,
-        .sidebar-plus [class*="fa-"],
-        .sidebar-plus .fa-plus-circle {
+        .sidebar-plus [class*="lucide-"],
+        .sidebar-plus .lucide-plus-circle {
             font-size: ${1.0 * s}em !important;
         }
 
@@ -123,7 +123,7 @@ function applyIndexIconScale(scale) {
             min-width: ${38 * s}px !important;
             min-height: ${38 * s}px !important;
         }
-        .toolbar-btn i, .toolbar-btn [class*="fa-"] {
+        .toolbar-btn i, .toolbar-btn [class*="lucide-"] {
             font-size: ${0.75 * s}em !important;
         }
     `;

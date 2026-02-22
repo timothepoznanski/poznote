@@ -359,7 +359,7 @@ if ($noteType === 'tasklist') {
             $tasksHtml .= '<span class="task-text" data-text="'.$text.'">'.$text.'</span>';
             $tasksHtml .= '<div class="task-actions">';
 
-            $tasksHtml .= '<button class="task-action-btn public-task-delete-btn" title="Delete"><i class="fas fa-trash"></i></button>';
+            $tasksHtml .= '<button class="task-action-btn public-task-delete-btn" title="Delete"><i class="lucide lucide-trash-2"></i></button>';
             $tasksHtml .= '</div>';
             $tasksHtml .= '</div>';
         }
@@ -522,9 +522,7 @@ if (!empty($sharedTheme) && in_array($sharedTheme, ['dark', 'light'])) {
         })();
     </script>
     <script src="js/public-note-theme-init.js"></script>
-    <link rel="stylesheet" href="css/fontawesome.min.css">
-    <link rel="stylesheet" href="css/solid.min.css">
-    <link rel="stylesheet" href="css/light.min.css">
+    <link rel="stylesheet" href="css/lucide.css">
     <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/variables.css') ? filemtime(__DIR__ . '/css/dark-mode/variables.css') : '1'; ?>">
     <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/layout.css') ? filemtime(__DIR__ . '/css/dark-mode/layout.css') : '1'; ?>">
     <link rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/menus.css') ? filemtime(__DIR__ . '/css/dark-mode/menus.css') : '1'; ?>">
@@ -553,7 +551,7 @@ if (!empty($sharedTheme) && in_array($sharedTheme, ['dark', 'light'])) {
         <div class="public-note-header">
             <h1><?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?></h1>
             <button id="themeToggle" class="theme-toggle-btn" title="Toggle theme">
-                <i class="fas fa-moon"></i>
+                <i class="lucide lucide-moon"></i>
             </button>
         </div>
         <div class="content"><?php echo $content; ?></div>

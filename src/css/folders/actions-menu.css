@@ -58,12 +58,12 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 }
 
 .folder-actions-toggle i {
-    font-size: 1.2em;
+    font-size: 0.8em;
 }
 
-/* Réduire les icônes Font Awesome dans folder-actions-toggle */
-.folder-actions-toggle i[class*="fa-"],
-.folder-actions-toggle [class*="fa-"] {
+/* Reduce Lucide icon size in folder-actions-toggle */
+.folder-actions-toggle i[class*="lucide-"],
+.folder-actions-toggle [class*="lucide-"] {
     font-size: 0.85em !important;
 }
 
@@ -85,7 +85,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 }
 
 .folder-kanban-icon i,
-.folder-kanban-icon [class*="fa-"] {
+.folder-kanban-icon [class*="lucide-"] {
     font-size: 0.75em !important;
 }
 
@@ -125,9 +125,9 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 }
 
 .folder-actions-menu-item i {
-    font-size: 1em;
+    font-size: 0.85em;
     color: #6b7280;
-    width: 16px;
+    width: 14px;
 }
 
 .folder-actions-menu-item:hover i {

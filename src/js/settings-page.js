@@ -251,8 +251,8 @@
             if (card) {
                 var icon = card.querySelector('.home-card-icon i');
                 if (icon) {
-                    icon.classList.toggle('fa-arrow-up', isTop);
-                    icon.classList.toggle('fa-arrow-down', !isTop);
+                    icon.classList.toggle('lucide-arrow-up', isTop);
+                    icon.classList.toggle('lucide-arrow-down', !isTop);
                 }
             }
         });
@@ -605,7 +605,7 @@
             noResults.style.textAlign = 'center';
             noResults.style.padding = '40px 20px';
             noResults.style.color = '#6b7280';
-            noResults.innerHTML = '<i class="fas fa-search" style="font-size: 24px; display: block; margin-bottom: 10px; opacity: 0.5;"></i>'
+            noResults.innerHTML = '<i class="lucide lucide-search" style="font-size: 24px; display: block; margin-bottom: 10px; opacity: 0.5;"></i>'
                 + tr('public.no_filter_results', {}, 'No results found.');
             grid.appendChild(noResults);
 

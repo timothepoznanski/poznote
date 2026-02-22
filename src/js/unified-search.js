@@ -392,11 +392,11 @@ class SearchManager {
 
         const activeType = this.getActiveSearchType(isMobile);
         const iconMap = {
-            notes: 'fa-file-alt',
-            tags: 'fa-tags'
+            notes: 'lucide-file-text',
+            tags: 'lucide-tags'
         };
 
-        iconSpan.className = iconMap[activeType] || 'fa-search';
+        iconSpan.className = iconMap[activeType] || 'lucide-search';
     }
 
     /**

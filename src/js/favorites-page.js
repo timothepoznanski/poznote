@@ -137,7 +137,7 @@
             if (note.folder) {
                 var badge = document.createElement('span');
                 badge.className = 'folder-badge';
-                badge.innerHTML = '<i class="fas fa-folder"></i> ';
+                badge.innerHTML = '<i class="lucide lucide-folder"></i> ';
                 badge.appendChild(document.createTextNode(note.folder));
                 titleLine.appendChild(badge);
             }
@@ -150,7 +150,7 @@
 
             var starBtn = document.createElement('button');
             starBtn.className = 'btn-unfavorite';
-            starBtn.innerHTML = '<i class="fas fa-star"></i>';
+            starBtn.innerHTML = '<i class="lucide lucide-star"></i>';
             starBtn.title = 'Remove from favorites';
             starBtn.onclick = function () { toggleFavorite(note.id); };
 

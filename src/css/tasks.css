@@ -286,34 +286,9 @@
     justify-content: center;
 }
 
-.task-icon-trash::before {
-    content: "\f2ed";
-}
-
-.task-icon-star::before {
-    content: "\f005";
-}
-
-.task-icon-trash,
-.task-icon-star {
-    font-family: "Font Awesome 5 Pro";
-    font-style: normal;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    display: inline-block;
-    font-variant: normal;
-    text-rendering: auto;
-    line-height: 1;
-    font-size: 0.875em;
-    vertical-align: middle;
-}
-
 /* Red star icon for important tasks */
-.task-item.important .task-icon-star {
-    color: #ff0000 !important;
-}
-
-.task-item.important .fa-star {
+.task-item.important .task-icon-star,
+.task-item.important .lucide-star {
     color: #ff0000 !important;
 }
 
@@ -321,16 +296,6 @@
     color: #ff0000 !important;
 }
 
-/* Ensure Font Awesome glyphs render correctly inside tasklist notes
-     even when `.noteentry` applies a global font-family (e.g. Inter). */
-.noteentry[data-note-type="tasklist"] .task-item i,
-.noteentry[data-note-type="tasklist"] .task-item i::before {
-    font-family: "Font Awesome 5 Pro" !important;
-    font-style: normal !important;
-    font-variant: normal;
-    text-transform: none;
-    /* Do not force font-weight here; let Font Awesome CSS decide the correct variant */
-}
 
 /* Tasklist note styles - Hide separator and table buttons for tasklist notes */
 .innernote[data-tasklist-note="true"] .btn-separator,

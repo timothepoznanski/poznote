@@ -160,6 +160,9 @@ if ($note_id > 0) {
     
     <!-- Modal alerts system -->
     <script src="js/modal-alerts.js"></script>
+    <script>
+        window.EXCALIDRAW_ASSET_PATH = window.EXCALIDRAW_ASSET_PATH || 'js/excalidraw-dist/';
+    </script>
     <!-- Excalidraw Bundle (compiled with Vite) -->
     <script src="js/excalidraw-dist/excalidraw-bundle.iife.js"></script>
 </head>

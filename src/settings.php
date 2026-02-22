@@ -14,13 +14,12 @@ if (defined('DISABLE_SETTINGS_ACCESS') && DISABLE_SETTINGS_ACCESS === true) {
     <head>
         <meta charset="utf-8"/>
         <title><?php echo t_h('common.access_denied', [], 'Access Denied', $currentLang); ?></title>
-        <link rel="stylesheet" href="css/fontawesome.min.css">
-        <link rel="stylesheet" href="css/all.css">
+        <link rel="stylesheet" href="css/lucide.css">
         <link rel="stylesheet" href="css/access-denied.css">
     </head>
     <body class="access-denied-page">
         <div class="access-denied-modal">
-            <i class="fas fa-lock"></i>
+            <i class="lucide lucide-lock"></i>
             <h1><?php echo t_h('common.access_denied', [], 'Access Denied', $currentLang); ?></h1>
             <p><?php echo t_h('settings.disabled_message', [], 'Access to settings is disabled by administrator.', $currentLang); ?></p>
             <button id="access-denied-return-btn"><?php echo t_h('settings.password.cancel', [], 'Return to Home', $currentLang); ?></button>
@@ -48,8 +47,7 @@ if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
             <title><?php echo t_h('settings.password.title', [], 'Settings Access', $currentLang); ?> - Poznote</title>
             <meta name="color-scheme" content="dark light">
             <script src="js/theme-init.js"></script>
-            <link rel="stylesheet" href="css/fontawesome.min.css">
-            <link rel="stylesheet" href="css/light.min.css">
+            <link rel="stylesheet" href="css/lucide.css">
             <link rel="stylesheet" href="css/settings-password.css">
             <link rel="stylesheet" href="css/dark-mode/variables.css">
             <link rel="stylesheet" href="css/dark-mode/layout.css">
@@ -154,16 +152,14 @@ if ($isAdmin) {
     <title><?php echo getPageTitle(); ?></title>
     <meta name="color-scheme" content="dark light">
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
-    <link rel="stylesheet" href="css/fontawesome.min.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/all.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/light.min.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/home/base.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/home/search.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/home/alerts.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/home/cards.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/home/buttons.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/home/fontawesome.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/home/dark-mode.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/home/responsive.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/settings.css?v=<?php echo $cache_v; ?>">
@@ -212,7 +208,7 @@ if ($isAdmin) {
 
         <div class="home-search-container">
             <div class="home-search-wrapper">
-                <i class="fas fa-search home-search-icon"></i>
+                <i class="lucide lucide-search home-search-icon"></i>
                 <input type="text" id="home-search-input" class="home-search-input" placeholder="<?php echo t_h('search.placeholder'); ?>" autocomplete="off">
             </div>
         </div>
@@ -224,7 +220,7 @@ if ($isAdmin) {
             <!-- Workspaces -->
             <div class="home-card settings-card-clickable" id="workspaces-card" data-href="workspaces.php">
                 <div class="home-card-icon">
-                    <i class="fas fa-layer-group"></i>
+                    <i class="lucide lucide-layers"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.workspaces', [], 'Workspaces'); ?></span>
@@ -236,7 +232,7 @@ if ($isAdmin) {
             <!-- User Management (Admin only) -->
             <div class="home-card settings-card-clickable" id="users-admin-card" data-href="admin/users.php">
                 <div class="home-card-icon">
-                    <i class="fas fa-users-cog"></i>
+                    <i class="lucide lucide-users-cog"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.user_management', [], 'User Management'); ?></span>
@@ -248,7 +244,7 @@ if ($isAdmin) {
             <!-- Backup / Export -->
             <div class="home-card" id="backup-export-card">
                 <div class="home-card-icon">
-                    <i class="fas fa-upload"></i>
+                    <i class="lucide lucide-upload"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?></span>
@@ -258,7 +254,7 @@ if ($isAdmin) {
             <!-- Restore / Import -->
             <div class="home-card" id="restore-import-card">
                 <div class="home-card-icon">
-                    <i class="fas fa-download"></i>
+                    <i class="lucide lucide-download"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?></span>
@@ -269,7 +265,7 @@ if ($isAdmin) {
             <!-- GitHub Sync -->
             <div class="home-card settings-card-clickable" id="git-sync-card" data-href="git_sync.php">
                 <div class="home-card-icon">
-                    <i class="<?php echo (defined('GIT_PROVIDER') && GIT_PROVIDER === 'forgejo') ? 'fas fa-code-branch' : 'fab fa-github'; ?>"></i>
+                    <i class="<?php echo (defined('GIT_PROVIDER') && GIT_PROVIDER === 'forgejo') ? 'lucide lucide-git-branch' : 'lucide lucide-github'; ?>"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.git_sync', ['provider' => getGitProviderName()], 'GitHub Sync'); ?></span>
@@ -282,7 +278,7 @@ if ($isAdmin) {
             <!-- Check for Updates -->
             <div class="home-card" id="check-updates-card">
                 <div class="home-card-icon">
-                    <i class="fas fa-sync-alt"></i>
+                    <i class="lucide lucide-refresh-cw-alt"></i>
                     <span class="update-badge update-badge-hidden"></span>
                 </div>
                 <div class="home-card-content">
@@ -301,7 +297,7 @@ if ($isAdmin) {
             <!-- Login Display -->
             <div class="home-card" id="login-display-card">
                 <div class="home-card-icon">
-                    <i class="fas fa-user"></i>
+                    <i class="lucide lucide-user"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.login_display', [], 'Login page title'); ?></span>
@@ -313,7 +309,7 @@ if ($isAdmin) {
             <!-- Language -->
             <div class="home-card" id="language-card">
                 <div class="home-card-icon">
-                    <i class="fal fa-flag"></i>
+                    <i class="lucide lucide-flag"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.language.label'); ?></span>
@@ -324,7 +320,7 @@ if ($isAdmin) {
             <!-- Theme Mode -->
             <div class="home-card" id="theme-mode-card">
                 <div class="home-card-icon">
-                    <i class="fas fa-sun"></i>
+                    <i class="lucide lucide-sun"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.theme_mode', [], 'Theme'); ?></span>
@@ -335,7 +331,7 @@ if ($isAdmin) {
             <!-- Font Size -->
             <div class="home-card" id="font-size-card">
                 <div class="home-card-icon">
-                    <i class="fas fa-text-height"></i>
+                    <i class="lucide lucide-type-height"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.note_font_size', [], 'Font size'); ?></span>
@@ -349,7 +345,7 @@ if ($isAdmin) {
             <!-- Index Icon Scale -->
             <div class="home-card" id="index-icon-scale-card">
                 <div class="home-card-icon">
-                    <i class="fas fa-expand-arrows-alt"></i>
+                    <i class="lucide lucide-maximize-2"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.index_icon_scale', [], 'Index icon scaling'); ?></span>
@@ -359,7 +355,7 @@ if ($isAdmin) {
 
             <!-- Timezone -->
             <div class="home-card" id="timezone-card">
-                <div class="home-card-icon"><i class="fal fa-clock"></i></div>
+                <div class="home-card-icon"><i class="lucide lucide-clock"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.timezone', [], 'Timezone'); ?></span>
                     <span id="timezone-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
@@ -368,7 +364,7 @@ if ($isAdmin) {
 
             <!-- Note Sort Order -->
             <div class="home-card" id="note-sort-card">
-                <div class="home-card-icon"><i class="fas fa-sort-amount-down"></i></div>
+                <div class="home-card-icon"><i class="lucide lucide-arrow-up-down-amount-down"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.note_sort_order', [], 'Note sorting'); ?></span>
                     <span id="note-sort-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
@@ -377,7 +373,7 @@ if ($isAdmin) {
 
             <!-- Tasklist Insert Order -->
             <div class="home-card" id="tasklist-insert-order-card">
-                <div class="home-card-icon"><i class="fas fa-arrow-down"></i></div>
+                <div class="home-card-icon"><i class="lucide lucide-arrow-down"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.tasklist_insert_order', [], 'Task list insert order'); ?></span>
                     <span id="tasklist-insert-order-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
@@ -386,7 +382,7 @@ if ($isAdmin) {
 
             <!-- Show Note Created -->
             <div class="home-card" id="show-created-card">
-                <div class="home-card-icon"><i class="fas fa-calendar-alt"></i></div>
+                <div class="home-card-icon"><i class="lucide lucide-calendar-alt"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.show_note_created', [], 'Show creation date'); ?></span>
                     <span id="show-created-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
@@ -395,7 +391,7 @@ if ($isAdmin) {
 
             <!-- Show Folder Counts -->
             <div class="home-card" id="folder-counts-card">
-                <div class="home-card-icon"><i class="fas fa-hashtag"></i></div>
+                <div class="home-card-icon"><i class="lucide lucide-hash"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.show_folder_counts', [], 'Show folder note counts'); ?></span>
                     <span id="folder-counts-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
@@ -404,7 +400,7 @@ if ($isAdmin) {
 
             <!-- Notes Without Folders Position -->
             <div class="home-card" id="notes-without-folders-card">
-                <div class="home-card-icon"><i class="fas fa-folder-tree"></i></div>
+                <div class="home-card-icon"><i class="lucide lucide-folder-tree"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.notes_without_folders_after', [], 'Show notes after folders'); ?></span>
                     <span id="notes-without-folders-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
@@ -413,7 +409,7 @@ if ($isAdmin) {
 
             <!-- Note Width -->
             <div class="home-card desktop-only" id="note-width-card">
-                <div class="home-card-icon"><i class="fas fa-arrows-h"></i></div>
+                <div class="home-card-icon"><i class="lucide lucide-move-horizontal"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.note_content_width', [], 'Note Content Width'); ?></span>
                     <span id="note-width-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
@@ -422,7 +418,7 @@ if ($isAdmin) {
 
             <!-- Show Image Attachments -->
             <div class="home-card" id="show-inline-attachment-images-card">
-                <div class="home-card-icon"><i class="fas fa-image"></i></div>
+                <div class="home-card-icon"><i class="lucide lucide-image"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.show_inline_attachment_images', [], 'Show image attachments'); ?></span>
                     <span id="show-inline-attachment-images-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
@@ -438,7 +434,7 @@ if ($isAdmin) {
             <!-- Version -->
             <a href="https://github.com/timothepoznanski/poznote/releases" target="_blank" class="home-card" id="version-card" title="<?php echo t_h('home.version', [], 'Version'); ?>">
                 <div class="home-card-icon">
-                    <i class="fas fa-info-circle"></i>
+                    <i class="lucide lucide-info-circle"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('home.version', [], 'Version'); ?></span>
@@ -449,7 +445,7 @@ if ($isAdmin) {
             <!-- Github repository -->
             <div class="home-card" id="github-card">
                 <div class="home-card-icon">
-                    <i class="fas fa-code-branch"></i>
+                    <i class="lucide lucide-code-branch"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.documentation', [], 'Github Repository'); ?></span>
@@ -460,7 +456,7 @@ if ($isAdmin) {
             <!-- API Documentation -->
             <div class="home-card" id="api-docs-card">
                 <div class="home-card-icon">
-                    <i class="fas fa-code"></i>
+                    <i class="lucide lucide-code"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.api_docs', [], 'API Documentation'); ?></span>
@@ -471,7 +467,7 @@ if ($isAdmin) {
             <!-- News -->
             <div class="home-card" id="news-card">
                 <div class="home-card-icon">
-                    <i class="fas fa-newspaper"></i>
+                    <i class="lucide lucide-newspaper"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.news', [], 'Poznote Blog'); ?></span>
@@ -481,7 +477,7 @@ if ($isAdmin) {
             <!-- Poznote Website -->
             <div class="home-card" id="website-card">
                 <div class="home-card-icon">
-                    <i class="fas fa-globe"></i>
+                    <i class="lucide lucide-globe"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.website', [], 'Poznote Website'); ?></span>
@@ -491,7 +487,7 @@ if ($isAdmin) {
             <!-- Support Developer -->
             <div class="home-card home-card-red" id="support-card">
                 <div class="home-card-icon">
-                    <i class="fas fa-heart heart-blink"></i>
+                    <i class="lucide lucide-heart heart-blink"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.support', [], 'Support Developer'); ?></span>

@@ -19,8 +19,7 @@ $currentLang = getUserLanguage();
 	<title><?php echo getPageTitle(); ?></title>
 	<meta name="color-scheme" content="dark light">
 	<script src="js/theme-init.js"></script>
-	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
-	<link type="text/css" rel="stylesheet" href="css/light.min.css"/>
+	<link type="text/css" rel="stylesheet" href="css/lucide.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/base.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/attachments.css"/>
@@ -68,7 +67,7 @@ $currentLang = getUserLanguage();
 					placeholder="<?php echo t_h('public.filter_placeholder', [], 'Filter by title or folder name...'); ?>"
 				/>
 				<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
-					<i class="fa fa-times"></i>
+					<i class="lucide lucide-x"></i>
 				</button>
 			</div>
 			<div id="filterStats" class="filter-stats initially-hidden"></div>
@@ -76,7 +75,7 @@ $currentLang = getUserLanguage();
 		
 		<div class="favorites-content">
 			<div id="loadingSpinner" class="loading-spinner">
-				<i class="fa fa-spinner fa-spin"></i>
+				<i class="lucide lucide-loader-2 lucide-spin"></i>
 				<?php echo t_h('common.loading', [], 'Loading...'); ?>
 			</div>
 			<div id="favoritesNotesContainer"></div>

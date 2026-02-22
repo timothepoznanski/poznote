@@ -455,9 +455,7 @@ try {
     ?>
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
-    <link rel="stylesheet" href="css/fontawesome.min.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/solid.min.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/light.min.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/workspaces.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modals/base.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modals/specific-modals.css?v=<?php echo $cache_v; ?>">

@@ -119,9 +119,7 @@ if (isset($_GET['oidc_error'])) {
     <title><?php echo htmlspecialchars($login_display_name !== '' ? $login_display_name : t_h('app.name', [], 'Poznote', $currentLang ?? 'en')); ?></title>
     <meta name="color-scheme" content="dark light">
     <script src="js/theme-init.js"></script>
-    <link rel="stylesheet" href="css/fontawesome.min.css">
-    <link rel="stylesheet" href="css/all.min.css">
-    <link rel="stylesheet" href="css/light.min.css">
+    <link rel="stylesheet" href="css/lucide.css">
     <link rel="stylesheet" href="css/login.css">
     <link rel="stylesheet" href="css/dark-mode/variables.css">
     <link rel="stylesheet" href="css/dark-mode/layout.css">
@@ -200,7 +198,7 @@ if (isset($_GET['oidc_error'])) {
                 <div class="password-wrapper">
                     <input type="password" id="password" name="password" placeholder="<?php echo t_h('login.fields.password', [], 'Password', $currentLang ?? 'en'); ?>" required autocomplete="current-password">
                     <button type="button" class="password-toggle" id="togglePassword" title="<?php echo t_h('login.show_password', [], 'Show password', $currentLang ?? 'en'); ?>">
-                        <i class="fa fa-eye"></i>
+                        <i class="lucide lucide-eye"></i>
                     </button>
                 </div>
                 <?php if ($error): ?>

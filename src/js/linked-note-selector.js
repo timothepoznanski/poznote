@@ -74,7 +74,7 @@
         const recentLabel = document.querySelector('#linkedNoteSelectorModal .note-reference-recent-label');
         if (!listContainer) return;
         
-        listContainer.innerHTML = '<div class="note-reference-loading"><i class="fa-spinner fa-spin"></i> ' + tr('common.loading', {}, 'Loading...') + '</div>';
+        listContainer.innerHTML = '<div class="note-reference-loading"><i class="lucide lucide-loader-2 lucide-spin"></i> ' + tr('common.loading', {}, 'Loading...') + '</div>';
         
         try {
             // Get current workspace from global (set by PHP)
@@ -140,7 +140,7 @@
                 item.setAttribute('data-note-heading', note.heading || tr('index.note.untitled', {}, 'Untitled'));
                 
                 const icon = document.createElement('i');
-                icon.className = 'fa fa-file-alt note-reference-icon';
+                icon.className = 'lucide lucide-file-text note-reference-icon';
                 
                 const heading = document.createElement('span');
                 heading.className = 'note-reference-heading';

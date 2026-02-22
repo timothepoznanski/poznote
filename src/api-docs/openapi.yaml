@@ -144,7 +144,7 @@ components:
         icon:
           type: string
           nullable: true
-          example: "fa-folder"
+          example: "lucide-folder"
 
     Workspace:
       type: object
@@ -1135,7 +1135,7 @@ paths:
               properties:
                 icon:
                   type: string
-                  example: "fa-folder-open"
+                  example: "lucide-folder-open"
       responses:
         '200':
           description: Icon updated

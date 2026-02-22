@@ -122,11 +122,11 @@
         // Change icon: moon for dark mode, sun for light mode, desktop for system
         if (icon) {
             if (mode === 'dark') {
-                icon.className = 'fa fa-moon';
+                icon.className = 'lucide lucide-moon';
             } else if (mode === 'light') {
-                icon.className = 'fa fa-sun';
+                icon.className = 'lucide lucide-sun';
             } else {
-                icon.className = 'fal fa-desktop';
+                icon.className = 'lucide lucide-monitor';
             }
         }
     }

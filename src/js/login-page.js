@@ -33,8 +33,8 @@
                     // Toggle icon
                     var icon = this.querySelector('i');
                     if (icon) {
-                        icon.classList.toggle('fa-eye');
-                        icon.classList.toggle('fa-eye-slash');
+                        icon.classList.toggle('lucide-eye');
+                        icon.classList.toggle('lucide-eye-off');
                     }
 
                     // Toggle title

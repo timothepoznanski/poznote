@@ -55,14 +55,13 @@ $currentLang = getUserLanguage();
 	<title><?php echo getPageTitle(); ?></title>
 	<meta name="color-scheme" content="dark light">
 	<script src="js/theme-init.js"></script>
-	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
-	<link type="text/css" rel="stylesheet" href="css/light.min.css"/>
+	<link type="text/css" rel="stylesheet" href="css/lucide.css"/>
 	<link type="text/css" rel="stylesheet" href="css/home/base.css"/>
 	<link type="text/css" rel="stylesheet" href="css/home/search.css"/>
 	<link type="text/css" rel="stylesheet" href="css/home/alerts.css"/>
 	<link type="text/css" rel="stylesheet" href="css/home/cards.css"/>
 	<link type="text/css" rel="stylesheet" href="css/home/buttons.css"/>
-	<link type="text/css" rel="stylesheet" href="css/home/fontawesome.css"/>
+	<link type="text/css" rel="stylesheet" href="css/lucide.css"/>
 	<link type="text/css" rel="stylesheet" href="css/home/dark-mode.css"/>
 	<link type="text/css" rel="stylesheet" href="css/home/responsive.css"/>
 	<link type="text/css" rel="stylesheet" href="css/list_tags.css"/>

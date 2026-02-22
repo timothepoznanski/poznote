@@ -308,19 +308,19 @@
                 } else if (isVideo) {
                     previewContent = '<div class="video-thumbnail" onclick="downloadAttachment(\'' + attachment.id + '\')">' +
                         '<video src="' + fileUrl + '#t=0.1" muted playsinline preload="metadata"></video>' +
-                        '<div class="video-overlay"><i class="fa fa-play"></i></div>' +
+                        '<div class="video-overlay"><i class="lucide lucide-play"></i></div>' +
                         '</div>';
                 }
             }
 
             // Fallback for no preview or if disabled
             if (!previewContent) {
-                var iconClass = 'fa-file';
-                if (isImage) iconClass = 'fa-file-image';
-                else if (isPDF) iconClass = 'fa-file-pdf';
-                else if (isVideo) iconClass = 'fa-file-video';
+                var iconClass = 'lucide lucide-file';
+                if (isImage) iconClass = 'lucide lucide-file-image';
+                else if (isPDF) iconClass = 'lucide lucide-file-text';
+                else if (isVideo) iconClass = 'lucide lucide-file-video';
 
-                previewContent = '<div class="file-icon-placeholder"><i class="fas ' + iconClass + '"></i></div>';
+                previewContent = '<div class="file-icon-placeholder"><i class="' + iconClass + '"></i></div>';
             }
 
             html += '<div class="attachment-card">' +

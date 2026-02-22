@@ -70,8 +70,7 @@ $currentLang = getUserLanguage();
     <title><?php echo getPageTitle(); ?></title>
     <meta name="color-scheme" content="dark light">
     <script src="js/theme-init.js"></script>
-    <link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
-    <link type="text/css" rel="stylesheet" href="css/light.min.css"/>
+    <link type="text/css" rel="stylesheet" href="css/lucide.css"/>
     <link type="text/css" rel="stylesheet" href="css/modals/base.css"/>
     <link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css"/>
     <link type="text/css" rel="stylesheet" href="css/modals/attachments.css"/>
@@ -99,7 +98,7 @@ $currentLang = getUserLanguage();
             <div class="trash-search-notice">
                 <?php echo t_h('trash.search.results_for', ['term' => htmlspecialchars($search, ENT_QUOTES)], 'Results for "{{term}}"'); ?>
                 <span class="trash-clear-search">
-                    <i class="fas fa-times"></i>
+                    <i class="lucide lucide-x"></i>
                 </span>
             </div>
         <?php endif; ?>
@@ -131,7 +130,7 @@ $currentLang = getUserLanguage();
                 </form>
                 <?php if (!empty($search)): ?>
                     <button id="clearTrashSearchBtn" class="clear-filter-btn">
-                        <i class="fas fa-times"></i>
+                        <i class="lucide lucide-x"></i>
                     </button>
                 <?php endif; ?>
             </div>
@@ -204,8 +203,8 @@ $currentLang = getUserLanguage();
                 echo '<div id="note' . $id . '" class="trash-notecard">'
                     . '<div class="trash-innernote">'
                     . '<div class="trash-action-icons">'
-                    . '<i title="' . t_h('trash.actions.restore_note_tooltip', [], 'Restore this note') . '" class="fas fa-trash-restore-alt" data-noteid="' . $id . '"></i>'
-                    . '<i title="' . t_h('trash.actions.delete_permanently_tooltip', [], 'Delete permanently') . '" class="fas fa-trash" data-noteid="' . $id . '"></i>'
+                    . '<i title="' . t_h('trash.actions.restore_note_tooltip', [], 'Restore this note') . '" class="lucide lucide-trash-2-restore-alt" data-noteid="' . $id . '"></i>'
+                    . '<i title="' . t_h('trash.actions.delete_permanently_tooltip', [], 'Delete permanently') . '" class="lucide lucide-trash-2" data-noteid="' . $id . '"></i>'
                     . '</div>'
                     . '<div class="lastupdated">' . $lastModifiedLabel . '</div>'
                     . '<h3 class="css-title">' . htmlspecialchars($heading, ENT_QUOTES) . '</h3>'

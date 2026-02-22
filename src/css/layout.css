@@ -217,8 +217,8 @@ body {
     bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
-    width: 8px;
-    height: 20px;
+    width: 16px;
+    height: 24px;
     background: #fff;
     border: 1px solid #ccc;
     border-radius: 0 4px 4px 0;
@@ -249,7 +249,19 @@ body {
 
 .toggle-sidebar-btn i {
     transition: transform 0.3s ease;
-    font-size: 0.75em;
+    width: 12px;
+    height: 12px;
+}
+
+.toggle-sidebar-btn .lucide,
+.toggle-sidebar-btn [class*="lucide-"] {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background-color: currentColor;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    filter: none !important;
 }
 
 /* Collapsed state */

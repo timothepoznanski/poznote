@@ -291,7 +291,7 @@
         navigator.clipboard.writeText(url)
             .then(function() {
                 var originalHTML = button.innerHTML;
-                button.innerHTML = '<i class="fa-check"></i>';
+                button.innerHTML = '<i class="lucide lucide-check"></i>';
                 button.classList.add('copied');
                 setTimeout(function() {
                     button.innerHTML = originalHTML;
@@ -308,7 +308,7 @@
                 document.body.removeChild(input);
                 
                 var originalHTML = button.innerHTML;
-                button.innerHTML = '<i class="fa-check"></i>';
+                button.innerHTML = '<i class="lucide lucide-check"></i>';
                 setTimeout(function() {
                     button.innerHTML = originalHTML;
                 }, 2000);
@@ -446,7 +446,7 @@
                 }
                 
                 var pathIcon = document.createElement('i');
-                pathIcon.className = 'fas fa-folder';
+                pathIcon.className = 'lucide lucide-folder';
                 pathIcon.style.marginRight = '4px';
                 folderBadge.appendChild(pathIcon);
                 
@@ -499,10 +499,10 @@
                 var passwordBtn = document.createElement('button');
                 passwordBtn.className = 'btn btn-sm btn-password';
                 if (note.hasPassword) {
-                    passwordBtn.innerHTML = '<i class="fa-lock"></i>';
+                    passwordBtn.innerHTML = '<i class="lucide lucide-lock"></i>';
                     passwordBtn.title = config.txtPasswordProtected;
                 } else {
-                    passwordBtn.innerHTML = '<i class="fa-lock-open"></i>';
+                    passwordBtn.innerHTML = '<i class="lucide lucide-lock-open"></i>';
                     passwordBtn.title = config.txtAddPasswordTitle;
                 }
                 (function(nId, hasPwd) {
@@ -515,7 +515,7 @@
             
             var openBtn = document.createElement('button');
             openBtn.className = 'btn btn-sm btn-secondary';
-            openBtn.innerHTML = '<i class="fa-external-link"></i>';
+            openBtn.innerHTML = '<i class="lucide lucide-external-link"></i>';
             openBtn.title = config.txtOpen;
             if (note.url) {
                 (function(url) {
@@ -532,7 +532,7 @@
             if (note.share_id) {
                 var revokeBtn = document.createElement('button');
                 revokeBtn.className = 'btn btn-sm btn-danger';
-                revokeBtn.innerHTML = '<i class="fa-ban"></i>';
+                revokeBtn.innerHTML = '<i class="lucide lucide-ban"></i>';
                 revokeBtn.title = config.txtRevoke;
                 (function(nId) {
                     revokeBtn.addEventListener('click', function() {

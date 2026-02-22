@@ -312,69 +312,29 @@ body.trash-page {
     color: #d32f2f;
 }
 
-.fa-arrow-circle-left::before {
-    content: "\f060";
-}
-
-.trash-empty-button::before {
-    content: "\f51a";
-}
-
-.fa-trash::before {
-    content: "\f2ed";
-}
-
-.fa-trash-restore-alt::before {
-    content: "\f2ea";
-}
-
-.fa-arrow-circle-left,
-.trash-empty-button {
-    font-family: "Font Awesome 5 Pro";
-    font-weight: 300;
-    font-style: normal;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    display: inline-block;
-    font-variant: normal;
-    text-rendering: auto;
-    line-height: 1;
-    font-size: 0.875em;
-    vertical-align: middle;
-}
-
-.fa-trash,
-.fa-trash-restore-alt,
-.fa-times {
-    font-family: "Font Awesome 5 Pro";
-    font-weight: 300;
-    /* Light */
-    font-style: normal;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    display: inline-block;
-    font-variant: normal;
-    text-rendering: auto;
+.lucide-trash-2,
+.lucide-trash-2-restore-alt,
+.lucide-x {
     line-height: 1;
     cursor: pointer;
     vertical-align: middle;
 }
 
-.fa-trash {
+.lucide-trash-2 {
     transition: color 0.1s ease;
     font-size: 0.95em;
 }
 
-.fa-trash:hover {
+.lucide-trash-2:hover {
     color: #ff0000 !important;
 }
 
-.fa-trash-restore-alt {
+.lucide-trash-2-restore-alt {
     transition: color 0.2s ease;
     font-size: 0.95em;
 }
 
-.fa-trash-restore-alt:hover {
+.lucide-trash-2-restore-alt:hover {
     color: #22c55e !important;
 }
 
@@ -515,8 +475,8 @@ body.trash-page {
     }
 
     /* Larger trash action icons on mobile for better touch targets */
-    .fa-trash,
-    .fa-trash-restore-alt {
+    .lucide-trash-2,
+    .lucide-trash-2-restore-alt {
         width: 1.5em !important;
         height: 1.5em !important;
     }

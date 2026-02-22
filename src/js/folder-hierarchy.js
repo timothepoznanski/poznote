@@ -31,11 +31,11 @@ function showCreateDropdown(folderId, folderName, event) {
 
     var html = '';
     html += '<div class="dropdown-item" onclick="showCreateNoteInFolderModal(' + folderId + ', \'' + escapeForJs(folderName) + '\'); closeCreateDropdown();">';
-    html += '<i class="fa fa-file"></i> Note';
+    html += '<i class="lucide lucide-file"></i> Note';
     html += '</div>';
     // Allow subfolder creation for all folders
     html += '<div class="dropdown-item" onclick="createSubfolder(\'' + folderKey + '\'); closeCreateDropdown();">';
-    html += '<i class="fa fa-folder"></i> Subfolder';
+    html += '<i class="lucide lucide-folder"></i> Subfolder';
     html += '</div>';
 
     dropdown.innerHTML = html;
@@ -197,11 +197,11 @@ function displayFolderBreadcrumb(folderId) {
         }
 
         var parts = path.split('/');
-        var html = '<i class="fa fa-folder-open"></i> ';
+        var html = '<i class="lucide lucide-folder-open"></i> ';
 
         parts.forEach(function (part, index) {
             if (index > 0) {
-                html += ' <i class="fa fa-chevron-right"></i> ';
+                html += ' <i class="lucide lucide-chevron-right"></i> ';
             }
             html += '<span class="breadcrumb-item">' + escapeHtml(part) + '</span>';
         });

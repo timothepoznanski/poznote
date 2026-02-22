@@ -36,8 +36,7 @@ if (!$hasAttachments) {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Poznote - Attachments Export</title>
-        <link rel="stylesheet" href="css/fontawesome.min.css">
-        <link rel="stylesheet" href="css/light.min.css">
+        <link rel="stylesheet" href="css/lucide.css">
         <link href="css/modals/base.css" rel="stylesheet">
         <link href="css/modals/specific-modals.css" rel="stylesheet">
         <link href="css/modals/attachments.css" rel="stylesheet">
@@ -57,14 +56,14 @@ if (!$hasAttachments) {
             <div class="summary-content">
                 <div class="empty-state-container">
                     <div class="empty-state-icon">
-                        <i class="fa-paperclip"></i>
+                        <i class="lucide lucide-paperclip"></i>
                     </div>
                     <h2 class="empty-state-title">No attachments found</h2>
                     <p class="empty-state-description">
                         There are currently no attachments in your notes.
                     </p>
                     <p class="empty-state-description">
-                        To add attachments to your notes, use the <strong><i class="fa-paperclip"></i></strong> button in the note editor.
+                        To add attachments to your notes, use the <strong><i class="lucide lucide-paperclip"></i></strong> button in the note editor.
                     </p>
                 </div>
             </div>
@@ -74,7 +73,7 @@ if (!$hasAttachments) {
                     Back to notes
                 </a>
                 <a href="backup_export.php" class="btn btn-secondary">
-                    <i class="fa-download"></i> Other export options
+                    <i class="lucide lucide-download"></i> Other export options
                 </a>
             </div>
         </div>

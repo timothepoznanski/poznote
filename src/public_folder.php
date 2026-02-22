@@ -243,9 +243,7 @@ $noteBaseUrl = $protocol . '://' . $host;
     <meta name="robots" content="noindex, nofollow">
     <?php endif; ?>
     <title><?php echo htmlspecialchars($folder['name']); ?> - Shared Folder</title>
-    <link rel="stylesheet" href="/css/fontawesome.min.css">
-    <link rel="stylesheet" href="/css/solid.min.css">
-    <link rel="stylesheet" href="/css/light.min.css">
+    <link rel="stylesheet" href="/css/lucide.css">
     <link rel="stylesheet" href="/css/dark-mode/variables.css">
     <link rel="stylesheet" href="/css/dark-mode/layout.css">
     <link rel="stylesheet" href="/css/dark-mode/menus.css">
@@ -264,21 +262,21 @@ $noteBaseUrl = $protocol . '://' . $host;
       data-txt-view-kanban="<?php echo t_h('public_folder.view_kanban', [], 'View as Kanban'); ?>">
     <div class="header-controls">
         <button id="viewToggle" class="view-toggle" onclick="toggleView()" title="<?php echo t_h('public_folder.view_kanban', [], 'View as Kanban'); ?>">
-            <i class="fas fa-columns" id="viewIcon"></i>
+            <i class="lucide lucide-columns-2" id="viewIcon"></i>
         </button>
         <button class="theme-toggle" onclick="toggleTheme()">
-            <i class="fas fa-moon" id="themeIcon"></i>
+            <i class="lucide lucide-moon" id="themeIcon"></i>
         </button>
     </div>
 
-    <h1><i class="fas fa-folder-open"></i> <?php echo htmlspecialchars($folder['name']); ?></h1>
+    <h1><i class="lucide lucide-folder-open"></i> <?php echo htmlspecialchars($folder['name']); ?></h1>
 
     <?php if (!empty($sharedNotes)): ?>
         <div class="public-folder-filter">
             <div class="filter-input-wrapper">
                 <input type="text" id="folderFilterInput" class="filter-input" placeholder="<?php echo t_h('public_folder.filter_placeholder', [], 'Search notes'); ?>" autocomplete="off" />
                 <button id="clearFilterBtn" class="clear-filter-btn" type="button" aria-label="Clear search" style="display: none;">
-                    <i class="fas fa-times"></i>
+                    <i class="lucide lucide-x"></i>
                 </button>
             </div>
             <div id="folderFilterStats" class="filter-stats" style="display: none;"></div>
@@ -287,7 +285,7 @@ $noteBaseUrl = $protocol . '://' . $host;
 
     <?php if (empty($sharedNotes)): ?>
         <div id="folderEmptyMessage" class="empty-folder">
-            <i class="fas fa-folder-open"></i>
+            <i class="lucide lucide-folder-open"></i>
             <p>This folder is empty</p>
         </div>
     <?php else: ?>
@@ -309,7 +307,7 @@ $noteBaseUrl = $protocol . '://' . $host;
             <?php foreach ($notesByFolder as $fid => $fNotes): ?>
                 <?php if (!empty($fNotes)): ?>
                     <div class="public-folder-group">
-                        <h2 class="public-folder-group-title"><i class="fas fa-folder"></i> <?php echo htmlspecialchars($folderNames[$fid] ?? 'Subfolder'); ?></h2>
+                        <h2 class="public-folder-group-title"><i class="lucide lucide-folder"></i> <?php echo htmlspecialchars($folderNames[$fid] ?? 'Subfolder'); ?></h2>
                         <ul class="notes-list">
                             <?php foreach ($fNotes as $note): ?>
                                 <?php renderPublicNoteItem($note, $noteBaseUrl, $token); ?>
@@ -326,7 +324,7 @@ $noteBaseUrl = $protocol . '://' . $host;
                 <?php if (!empty($kanbanData[$folder_id])): ?>
                 <div class="kanban-col">
                     <div class="kanban-col-header">
-                        <span class="kanban-col-title"><i class="fas fa-inbox"></i> <?php echo t_h('kanban.uncategorized', [], 'Uncategorized'); ?></span>
+                        <span class="kanban-col-title"><i class="lucide lucide-inbox"></i> <?php echo t_h('kanban.uncategorized', [], 'Uncategorized'); ?></span>
                         <span class="kanban-col-count"><?php echo count($kanbanData[$folder_id]); ?></span>
                     </div>
                     <div class="kanban-col-cards">
@@ -347,7 +345,7 @@ $noteBaseUrl = $protocol . '://' . $host;
                     <?php if (!empty($kanbanData[$sf['id']])): ?>
                     <div class="kanban-col">
                         <div class="kanban-col-header">
-                            <span class="kanban-col-title"><i class="fas fa-folder"></i> <?php echo htmlspecialchars($sf['name']); ?></span>
+                            <span class="kanban-col-title"><i class="lucide lucide-folder"></i> <?php echo htmlspecialchars($sf['name']); ?></span>
                             <span class="kanban-col-count"><?php echo count($kanbanData[$sf['id']]); ?></span>
                         </div>
                         <div class="kanban-col-cards">
@@ -367,7 +365,7 @@ $noteBaseUrl = $protocol . '://' . $host;
         </div>
 
         <div id="folderNoResults" class="empty-folder is-hidden">
-            <i class="fas fa-search"></i>
+            <i class="lucide lucide-search"></i>
             <p><?php echo t_h('public_folder.no_filter_results', [], 'No results.'); ?></p>
         </div>
     <?php endif; ?>
@@ -389,7 +387,7 @@ $noteBaseUrl = $protocol . '://' . $host;
         ?>
         <li class="public-note-item" data-title="<?php echo htmlspecialchars($noteTitleLower, ENT_QUOTES, 'UTF-8'); ?>">
             <a class="public-note-link" href="<?php echo htmlspecialchars($noteUrl); ?>" target="_blank" rel="noopener">
-                <i class="fas fa-file-alt"></i>
+                <i class="lucide lucide-file-alt"></i>
                 <span class="public-note-title"><?php echo htmlspecialchars($noteTitle); ?></span>
             </a>
         </li>

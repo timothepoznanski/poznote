@@ -411,13 +411,6 @@ div[contentEditable=true][data-ph-mobile]:empty:before {
 }
 
 /* System folder icons sizing */
-.system-folder .fa-trash.folder-icon,
-.system-folder .fa-tags.folder-icon,
-.system-folder .fa-cloud.folder-icon,
-.system-folder .fa-star-light.folder-icon,
-.system-folder .fa-paperclip.folder-icon,
-.system-folder .fa-eye.folder-icon,
-.system-folder .fa-cog.folder-icon,
-.system-folder .fa-search.folder-icon {
+.system-folder [class*="lucide-"].folder-icon {
     font-size: 14px !important;
 }

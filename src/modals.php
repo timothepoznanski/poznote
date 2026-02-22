@@ -322,7 +322,7 @@
                 <!-- Notes section -->
                 <div class="create-section" id="notesSection">
                     <div class="create-note-option" data-type="html" data-action="select-create-type">
-                        <i class="fa fa-file-alt"></i>
+                        <i class="lucide lucide-file-text"></i>
                         <div>
                             <span><?php 
                                 $title = t_h('modals.create.note.title', [], 'Note');
@@ -337,7 +337,7 @@
                         </div>
                     </div>
                     <div class="create-note-option" data-type="markdown" data-action="select-create-type">
-                        <i class="fa fa-markdown"></i>
+                        <i class="lucide lucide-file-code"></i>
                         <div>
                             <span><?php 
                                 $title = t_h('modals.create.markdown.title', [], 'Markdown Note');
@@ -352,25 +352,25 @@
                         </div>
                     </div>
                     <div class="create-note-option" data-type="list" data-action="select-create-type">
-                        <i class="fa fa-list-ul"></i>
+                        <i class="lucide lucide-list"></i>
                         <div>
                             <span><?php echo t_h('modals.create.task_list.title', [], 'Task List'); ?></span>
                         </div>
                     </div>
                     <div class="create-note-option initially-hidden" data-type="subfolder" data-action="select-create-type" id="subfolderOption">
-                        <i class="fal fa-folder-plus"></i>
+                        <i class="lucide lucide-folder-plus"></i>
                         <div>
                             <span><?php echo t_h('modals.create.subfolder.title', [], 'Subfolder'); ?></span>
                         </div>
                     </div>
                     <div class="create-note-option" data-type="template" data-action="select-create-type">
-                        <i class="fas fa-copy"></i>
+                        <i class="lucide lucide-copy"></i>
                         <div>
                             <span><?php echo t_h('modals.create.template.title', [], 'Template'); ?></span>
                         </div>
                     </div>
                     <div class="create-note-option" data-type="linked" data-action="select-create-type">
-                        <i class="fa fa-link"></i>
+                        <i class="lucide lucide-link"></i>
                         <div>
                             <span><?php echo t_h('modals.create.linked.title', [], 'Linked Note'); ?></span>
                         </div>
@@ -380,19 +380,19 @@
                 <!-- Other items section (only shown when creating from main button) -->
                 <div class="create-section mt-12" id="otherSection">
                     <div class="create-note-option" data-type="folder" data-action="select-create-type">
-                        <i class="fa fa-folder"></i>
+                        <i class="lucide lucide-folder"></i>
                         <div>
                             <span><?php echo t_h('modals.create.folder.title', [], 'Folder'); ?></span>
                         </div>
                     </div>
                     <div class="create-note-option mt-12" data-type="kanban" data-action="select-create-type">
-                        <i class="fa fa-columns"></i>
+                        <i class="lucide lucide-columns-2"></i>
                         <div>
                             <span><?php echo t_h('modals.create.kanban.title', [], 'Kanban Structure'); ?></span>
                         </div>
                     </div>
                     <div class="create-note-option mt-12" data-type="workspace" data-action="select-create-type">
-                        <i class="fa fa-layer-group"></i>
+                        <i class="lucide lucide-layers"></i>
                         <div>
                             <span><?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?></span>
                         </div>
@@ -414,7 +414,7 @@
             <div class="export-options">
                 <!-- Markdown export option (shown only for markdown notes) -->
                 <div class="export-option export-option-markdown initially-hidden" data-action="select-export-type" data-type="markdown">
-                    <i class="fal fa-file-alt"></i>
+                    <i class="lucide lucide-file-alt"></i>
                     <div>
                         <span><?php echo t_h('modals.export.markdown.title', [], 'Export as Markdown'); ?></span>
                         <p><?php echo t_h('modals.export.markdown.description', [], 'Download as MD file with metadata (title, tags, folder) in YAML frontmatter'); ?></p>
@@ -422,7 +422,7 @@
                 </div>
                 <!-- HTML export option (shown only for non-markdown notes) -->
                 <div class="export-option export-option-html" data-action="select-export-type" data-type="html">
-                    <i class="fal fa-file-code"></i>
+                    <i class="lucide lucide-file-code"></i>
                     <div>
                         <span><?php echo t_h('modals.export.html.title', [], 'Export as HTML'); ?></span>
                         <p><?php echo t_h('modals.export.html.description', [], 'Download as HTML file with all formatting preserved'); ?></p>
@@ -431,7 +431,7 @@
 
                 <!-- JSON export option (shown only for tasklist notes) -->
                 <div class="export-option export-option-json initially-hidden" data-action="select-export-type" data-type="json">
-                    <i class="fal fa-file-code"></i>
+                    <i class="lucide lucide-file-code"></i>
                     <div>
                         <span><?php echo t_h('modals.export.json.title', [], 'Download as JSON'); ?></span>
                         <p><?php echo t_h('modals.export.json.description', [], 'Download the raw tasklist data as a JSON file'); ?></p>
@@ -439,7 +439,7 @@
                 </div>
 
                 <div class="export-option export-option-print" data-action="select-export-type" data-type="print">
-                    <i class="fal fa-print"></i>
+                    <i class="lucide lucide-printer"></i>
                     <div>
                         <span><?php echo t_h('modals.export.print.title', [], 'Print to PDF (Browser)'); ?></span>
                         <p><?php echo t_h('modals.export.print.description', [], 'Use browser\'s native print dialog to save as PDF'); ?></p>
@@ -631,7 +631,7 @@
 <!-- Note Reference Modal -->
 <div id="noteReferenceModal" class="modal">
     <div class="modal-content note-reference-modal-content">
-        <h3><i class="fa-link"></i> <?php echo t_h('editor.toolbar.insert_note_reference', [], 'Insert note reference'); ?></h3>
+        <h3><i class="lucide lucide-link"></i> <?php echo t_h('editor.toolbar.insert_note_reference', [], 'Insert note reference'); ?></h3>
         <div class="note-reference-search">
             <input type="text" id="noteReferenceSearch" placeholder="<?php echo t_h('note_reference.modal.search_placeholder', [], 'Search for a note...'); ?>" autocomplete="off">
         </div>
@@ -754,7 +754,7 @@
             <div class="note-reference-recent-label"><?php echo t_h('modals.template_selector.recent_label', [], 'Recent notes'); ?></div>
             <div id="templateNoteList" class="note-reference-list">
                 <div class="note-reference-loading">
-                    <i class="fa-spinner fa-spin"></i> <?php echo t_h('common.loading', [], 'Loading...'); ?>
+                    <i class="lucide lucide-loader-2 lucide-spin"></i> <?php echo t_h('common.loading', [], 'Loading...'); ?>
                 </div>
             </div>
         </div>
@@ -777,7 +777,7 @@
             <div class="note-reference-recent-label"><?php echo t_h('modals.linked_selector.recent_label', [], 'Recent notes'); ?></div>
             <div id="linkedNoteList" class="note-reference-list">
                 <div class="note-reference-loading">
-                    <i class="fa-spinner fa-spin"></i> <?php echo t_h('common.loading', [], 'Loading...'); ?>
+                    <i class="lucide lucide-loader-2 lucide-spin"></i> <?php echo t_h('common.loading', [], 'Loading...'); ?>
                 </div>
             </div>
         </div>

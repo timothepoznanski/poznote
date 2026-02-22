@@ -142,17 +142,11 @@
     color: #007DB8 !important;
 }
 
-.searchbar-type-btn.active i,
-.searchbar-type-btn.active i.fa,
-.searchbar-type-btn.active i.fa-file-alt,
-.searchbar-type-btn.active i.fa-tag {
+.searchbar-type-btn.active i {
     color: #007DB8 !important;
 }
 
-.searchbar-type-btn.active i::before,
-.searchbar-type-btn.active i.fa::before,
-.searchbar-type-btn.active i.fa-file-alt::before,
-.searchbar-type-btn.active i.fa-tag::before {
+.searchbar-type-btn.active i::before {
     color: #007DB8 !important;
 }
 
@@ -162,12 +156,6 @@
 }
 
 .searchbar-type-btn i::before {
-    color: inherit;
-}
-
-.searchbar-type-btn i.fa,
-.searchbar-type-btn i.fa-file-alt,
-.searchbar-type-btn i.fa-tag {
     color: inherit;
 }
 

@@ -242,20 +242,25 @@
     display: none;
 }
 
-/* Réduire la taille des icônes Font Awesome dans la sidebar */
+/* Reduce the size of Lucide icons in the sidebar */
 .sidebar-title-actions i,
-.sidebar-title-actions [class*="fa-"],
+.sidebar-title-actions [class*="lucide-"],
 .sidebar-home i,
-.sidebar-home [class*="fa-"],
+.sidebar-home [class*="lucide-"],
 .sidebar-settings i,
-.sidebar-settings [class*="fa-"] {
+.sidebar-settings [class*="lucide-"] {
     font-size: 0.875em !important;
+}
+
+.sidebar-howto .lucide-lightbulb {
+    transform: scale(1.08);
+    transform-origin: center;
 }
 
 /* Icône plus-circle un peu plus grande */
 .sidebar-plus i,
-.sidebar-plus [class*="fa-"],
-.sidebar-plus .fa-plus-circle {
+.sidebar-plus [class*="lucide-"],
+.sidebar-plus .lucide-plus-circle {
     font-size: 0.875em !important;
     color: #6c757d !important;
 }
@@ -534,8 +539,8 @@
     color: #007DB8;
 }
 
-/* Override for Font Awesome icons in create menu */
-.create-menu-item i[class*="fa-"],
-.create-menu-item [class*="fa-"] {
+/* Override for Lucide icons in create menu */
+.create-menu-item i[class*="lucide-"],
+.create-menu-item [class*="lucide-"] {
     font-size: 18px !important;
 }
