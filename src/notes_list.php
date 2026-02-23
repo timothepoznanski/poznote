@@ -88,7 +88,8 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
 
         if ($customIcon) {
             // Use custom icon - don't toggle between open/closed
-            $chevron_icon = $customIcon;
+            // Convert Font Awesome icons to Lucide format for backward compatibility
+            $chevron_icon = convertFontAwesomeToLucide($customIcon);
         } else {
             // Use default icons that toggle
             $chevron_icon = $should_be_open ? 'lucide lucide-folder-open' : 'lucide lucide-folder';

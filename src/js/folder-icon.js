@@ -227,16 +227,109 @@ let selectedIconClass = null;
 let selectedIconColor = '';
 
 /**
+ * Mapping from Lucide icon names to Font Awesome icon names (used in translations)
+ */
+const LUCIDE_TO_FA_MAPPING = {
+    'map-pin': 'map-marker-alt',
+    'calendar': 'calendar-alt',
+    'cake': 'birthday-cake',
+    'mail': 'envelope',
+    'video': 'film',
+    'trending-up': 'chart-line',
+    'bar-chart': 'chart-bar',
+    'list-todo': 'tasks',
+    'file-text': 'file-alt',
+    'gamepad-2': 'gamepad',
+    'pizza': 'pizza-slice',
+    'utensils-crossed': 'utensils',
+    'briefcase-medical': 'medkit',
+    'activity': 'heartbeat',
+    'bike': 'bicycle',
+    'tree-deciduous': 'tree',
+    'sprout': 'seedling',
+    'paw-print': 'paw',
+    'flask-conical': 'flask',
+    'flame': 'fire',
+    'zap': 'bolt',
+    'layers': 'layer-group',
+    'at-sign': 'at',
+    'hash': 'hashtag',
+    'help-circle': 'question-circle',
+    'x-circle': 'times-circle',
+    'apple': 'apple-alt',
+    'candy': 'candy-cane',
+    'badge-check': 'certificate',
+    'network': 'chart-network',
+    'pie-chart': 'chart-pie',
+    'crown': 'chess',
+    'clipboard-list': 'clipboard-list',
+    'boxes': 'cubes',
+    'monitor': 'desktop',
+    'scroll': 'diploma',
+    'message-circle': 'comment',
+    'globe': 'globe-americas',
+    'mountain': 'hiking',
+    'shapes': 'icons',
+    'id-card': 'id-badge',
+    'factory': 'industry',
+    'swords': 'sword',
+    'banknote': 'money',
+    'passport': 'passport',
+    'pepper': 'pepper-hot',
+    'piggy-bank': 'piggy-bank',
+    'plane-takeoff': 'plane-departure',
+    'receipt': 'receipt',
+    'bot': 'robot',
+    'person-standing': 'user',
+    'satellite-dish': 'satellite-dish',
+    'school': 'school',
+    'shopping-bag': 'shopping-bag',
+    'signpost': 'directions',
+    'git-branch': 'code-branch',
+    'flower': 'spa',
+    'stamp': 'stamp',
+    'stethoscope': 'stethoscope',
+    'store': 'store',
+    'waves': 'wave',
+    'refresh-cw': 'sync',
+    'gauge': 'tachometer',
+    'drama': 'theater-masks',
+    'tools': 'tools',
+    'tractor': 'tractor',
+    'trash-alt': 'trash',
+    'tree-alt': 'tree',
+    'umbrella-beach': 'umbrella-beach',
+    'utensil-spoon': 'utensil-spoon',
+    'vial': 'vial',
+    'walking': 'walking',
+    'wallet': 'wallet',
+    'warehouse': 'warehouse',
+    'weight': 'weight',
+    'wifi': 'wifi',
+    'wind': 'wind',
+    'yen-sign': 'yen-sign',
+    'columns': 'columns'
+};
+
+/**
  * Get translated name for an icon
  */
 function getIconTranslation(iconClass) {
-    const iconKey = iconClass
-        .replace(/\blucide\b/g, '')
-        .trim()
-        .split(/\s+/)
-        .map(cls => cls.replace(/^lucide-/, ''))
-        .filter(Boolean)[0] || iconClass;
-    const translationKey = `icon_names.${iconKey}`;
+    // Extract icon name from class (e.g., "lucide-briefcase" -> "briefcase")
+    let iconKey = iconClass;
+    
+    // Remove "lucide-" prefix or "lucide " prefix
+    iconKey = iconKey.replace(/^lucide-/, '').replace(/^lucide\s+/, '');
+    
+    // If it's a space-separated class list, get the first icon name
+    const parts = iconKey.trim().split(/\s+/);
+    iconKey = parts[0] || iconClass;
+    
+    // Try to map Lucide name to Font Awesome name for translations
+    const faIconKey = LUCIDE_TO_FA_MAPPING[iconKey] || iconKey;
+    const translationKey = `icon_names.${faIconKey}`;
+    
+    // Call window.t with the translation key
     return window.t ? window.t(translationKey, null, iconKey.replace(/-/g, ' ')) : iconKey.replace(/-/g, ' ');
 }
 

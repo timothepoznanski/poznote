@@ -144,7 +144,8 @@ $currentLang = getUserLanguage();
 			foreach($folders as $folder) {
 				$folder_id = htmlspecialchars($folder['id'], ENT_QUOTES);
 				$folder_name = htmlspecialchars($folder['name'], ENT_QUOTES);
-				$folder_icon = !empty($folder['icon']) ? htmlspecialchars($folder['icon'], ENT_QUOTES) : 'lucide-folder';
+				$folder_icon_raw = !empty($folder['icon']) ? $folder['icon'] : null;
+				$folder_icon = $folder_icon_raw ? htmlspecialchars(convertFontAwesomeToLucide($folder_icon_raw), ENT_QUOTES) : 'lucide-folder';
 				$icon_color = !empty($folder['icon_color']) ? htmlspecialchars($folder['icon_color'], ENT_QUOTES) : '';
 				$note_count = (int)$folder['note_count'];
 				
