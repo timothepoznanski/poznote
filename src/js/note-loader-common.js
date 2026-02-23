@@ -486,10 +486,10 @@ window.loadNoteDirectly = function (url, noteId, event, clickedElement) {
                 if (isMobileDevice() && loadedNoteId && typeof scrollToRightColumn === 'function') {
                     const shouldScroll = sessionStorage.getItem('shouldScrollToNote');
                     if (shouldScroll === 'true') {
-                        setTimeout(function () {
+                        requestAnimationFrame(function () {
                             scrollToRightColumn();
                             sessionStorage.removeItem('shouldScrollToNote');
-                        }, 100);
+                        });
                     }
                 }
             }

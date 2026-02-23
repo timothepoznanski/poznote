@@ -918,6 +918,45 @@
     // Mobile Navigation Helpers
     // ============================================================
 
+    function isReducedMotionPreferred() {
+        return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    }
+
+    function setHorizontalScroll(left) {
+        const scrollRoot = document.scrollingElement || document.documentElement;
+        scrollRoot.scrollLeft = left;
+        document.body.scrollLeft = left;
+        window.scrollTo({
+            left: left,
+            behavior: 'auto'
+        });
+    }
+
+    function animateHorizontalScroll(targetLeft, durationMs) {
+        const scrollRoot = document.scrollingElement || document.documentElement;
+        const startLeft = scrollRoot.scrollLeft;
+        const delta = targetLeft - startLeft;
+
+        if (durationMs <= 0 || delta === 0) {
+            setHorizontalScroll(targetLeft);
+            return;
+        }
+
+        const startTime = performance.now();
+
+        function step(now) {
+            const progress = Math.min(1, (now - startTime) / durationMs);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            setHorizontalScroll(startLeft + delta * eased);
+
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            }
+        }
+
+        requestAnimationFrame(step);
+    }
+
     /**
      * Scroll to the right column (note editor area)
      * On mobile: uses horizontal scroll
@@ -926,14 +965,8 @@
     window.scrollToRightColumn = function () {
         if (window.innerWidth <= 800) {
             const scrollAmount = window.innerWidth;
-            // With scroll-behavior: smooth !important in CSS, 
-            // these simple assignments will trigger the sliding animation.
-            document.documentElement.scrollLeft = scrollAmount;
-            document.body.scrollLeft = scrollAmount;
-            window.scrollTo({
-                left: scrollAmount,
-                behavior: 'smooth'
-            });
+            const duration = isReducedMotionPreferred() ? 0 : 260;
+            animateHorizontalScroll(scrollAmount, duration);
         } else {
             const rightCol = document.getElementById('right_col');
             if (rightCol) {
@@ -1013,14 +1046,8 @@
      */
     function performScroll() {
         if (window.innerWidth <= 800) {
-            // With scroll-behavior: smooth !important in CSS, 
-            // these simple assignments will trigger the sliding animation.
-            document.documentElement.scrollLeft = 0;
-            document.body.scrollLeft = 0;
-            window.scrollTo({
-                left: 0,
-                behavior: 'smooth'
-            });
+            const duration = isReducedMotionPreferred() ? 0 : 260;
+            animateHorizontalScroll(0, duration);
         } else {
             const leftCol = document.getElementById('left_col');
             if (leftCol) {
@@ -1047,7 +1074,7 @@
             const isSearch = urlParams.has('search') || urlParams.has('tags_search') || window.isSearchMode;
 
             if (hasScrollFlag || (hasNoteId && !isSearch)) {
-                setTimeout(function () {
+                requestAnimationFrame(function () {
                     if (typeof window.scrollToRightColumn === 'function') {
                         window.scrollToRightColumn();
                     } else if (typeof scrollToRightColumn === 'function') {
@@ -1058,7 +1085,7 @@
                         const newUrl = window.location.pathname + '?' + urlParams.toString();
                         window.history.replaceState({}, '', newUrl);
                     }
-                }, 100);
+                });
             }
         }
     }
