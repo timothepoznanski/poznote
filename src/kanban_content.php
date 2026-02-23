@@ -159,7 +159,8 @@ try {
         <div class="kanban-inline-header">
             <h1 class="kanban-title">
                 <?php 
-                $pFolderIcon = $parentFolder['icon'] ?? 'lucide-folder';
+                $pFolderIconRaw = $parentFolder['icon'] ?? null;
+                $pFolderIcon = $pFolderIconRaw ? convertFontAwesomeToLucide($pFolderIconRaw) : 'lucide-folder';
                 $pIconColor = $parentFolder['icon_color'] ?? '';
                 $pIconStyle = $pIconColor ? "style=\"color: {$pIconColor} !important;\"" : '';
                 ?>
@@ -221,7 +222,8 @@ try {
                 <div class="kanban-column-header">
                     <div class="kanban-column-title">
                         <?php 
-                        $folderIcon = $subfolder['icon'] ?? 'lucide-folder';
+                        $folderIconRaw = $subfolder['icon'] ?? null;
+                        $folderIcon = $folderIconRaw ? convertFontAwesomeToLucide($folderIconRaw) : 'lucide-folder';
                         $iconColor = $subfolder['icon_color'] ?? '';
                         $iconStyle = $iconColor ? "style=\"color: {$iconColor} !important;\"" : '';
                         ?>
