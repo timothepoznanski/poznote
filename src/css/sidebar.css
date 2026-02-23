@@ -252,11 +252,6 @@
     font-size: 0.875em !important;
 }
 
-.sidebar-howto .lucide-lightbulb {
-    transform: scale(1.08);
-    transform-origin: center;
-}
-
 /* Icône plus-circle un peu plus grande */
 .sidebar-plus i,
 .sidebar-plus [class*="lucide-"],
