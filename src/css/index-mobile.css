@@ -85,7 +85,7 @@ body {
     /* IE and Edge */
     scrollbar-width: none !important;
     /* Firefox */
-    scroll-behavior: smooth !important;
+    scroll-behavior: auto !important;
     display: flex !important;
     flex-direction: row !important;
 }
