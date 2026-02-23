@@ -1288,6 +1288,16 @@ class NotesController {
 
             $newId = $this->con->lastInsertId();
 
+            // Update note ID references in attachment URLs
+            // Replace /api/v1/notes/{oldNoteId}/attachments/ with /api/v1/notes/{newNoteId}/attachments/
+            if (!empty($content) && !empty($attachmentIdMapping)) {
+                $content = str_replace(
+                    '/api/v1/notes/' . $id . '/attachments/',
+                    '/api/v1/notes/' . $newId . '/attachments/',
+                    $content
+                );
+            }
+
             // Auto-share if folder is shared
             $wasShared = false;
             if ($autoShare && $folderId) {
