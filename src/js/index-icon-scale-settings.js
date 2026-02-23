@@ -102,7 +102,9 @@ function applyIndexIconScale(scale) {
     
     const s = parseFloat(scale);
     styleTag.innerHTML = `
-        /* Sidebar: home / settings / create */
+        /* Sidebar: howto / home / settings / create */
+        .sidebar-howto i,
+        .sidebar-howto [class*="lucide-"],
         .sidebar-home i,
         .sidebar-home [class*="lucide-"],
         .sidebar-settings i,
