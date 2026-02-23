@@ -106,7 +106,7 @@ function renderTagsList(noteId, tagsValue) {
         };
         
         const delBtn = document.createElement('span');
-        delBtn.className = 'tags-modal-item-delete fas fa-times';
+        delBtn.className = 'tags-modal-item-delete lucide lucide-x';
         delBtn.onclick = function() {
             removeTagFromModal(noteId, tag);
         };

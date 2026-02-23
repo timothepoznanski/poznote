@@ -27,11 +27,7 @@ $currentLang = getUserLanguage();
     $cache_v = urlencode(trim($cache_v));
     ?>
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
-    <link type="text/css" rel="stylesheet" href="css/fontawesome.min.css?v=<?php echo $cache_v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/light.min.css?v=<?php echo $cache_v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/solid.min.css?v=<?php echo $cache_v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/regular.min.css?v=<?php echo $cache_v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/brands.min.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/base.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/attachments.css?v=<?php echo $cache_v; ?>"/>
@@ -44,7 +40,7 @@ $currentLang = getUserLanguage();
     <link type="text/css" rel="stylesheet" href="css/home/alerts.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/home/cards.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/home/buttons.css?v=<?php echo $cache_v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/home/fontawesome.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/home/dark-mode.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/home/responsive.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>"/>
@@ -75,7 +71,7 @@ $currentLang = getUserLanguage();
             <!-- Note -->
             <a href="#" class="home-card" data-create-type="html" title="<?php echo t_h('modals.create.note.title', [], 'Note'); ?>">
                 <div class="home-card-icon">
-                    <i class="fas fa-file-alt"></i>
+                    <i class="lucide lucide-file-alt"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('modals.create.note.title', [], 'Note'); ?></span>
@@ -86,7 +82,7 @@ $currentLang = getUserLanguage();
             <!-- Markdown Note -->
             <a href="#" class="home-card" data-create-type="markdown" title="<?php echo t_h('modals.create.markdown.title', [], 'Markdown Note'); ?>">
                 <div class="home-card-icon">
-                    <i class="fab fa-markdown"></i>
+                    <i class="lucide lucide-file-code"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('modals.create.markdown.title', [], 'Markdown Note'); ?></span>
@@ -97,7 +93,7 @@ $currentLang = getUserLanguage();
             <!-- Task List -->
             <a href="#" class="home-card" data-create-type="list" title="<?php echo t_h('modals.create.task_list.title', [], 'Task List'); ?>">
                 <div class="home-card-icon">
-                    <i class="fas fa-list-ul"></i>
+                    <i class="lucide lucide-list-ul"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('modals.create.task_list.title', [], 'Task List'); ?></span>
@@ -107,7 +103,7 @@ $currentLang = getUserLanguage();
             <!-- Linked Note -->
             <a href="#" class="home-card" data-create-type="linked" title="<?php echo t_h('modals.create.linked.title', [], 'Linked Note'); ?>">
                 <div class="home-card-icon">
-                    <i class="fas fa-link"></i>
+                    <i class="lucide lucide-link"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('modals.create.linked.title', [], 'Linked Note'); ?></span>
@@ -117,7 +113,7 @@ $currentLang = getUserLanguage();
             <!-- Template -->
             <a href="#" class="home-card" data-create-type="template" title="<?php echo t_h('modals.create.template.title', [], 'Template'); ?>">
                 <div class="home-card-icon">
-                    <i class="fas fa-copy"></i>
+                    <i class="lucide lucide-copy"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('modals.create.template.title', [], 'Template'); ?></span>
@@ -127,7 +123,7 @@ $currentLang = getUserLanguage();
             <!-- Folder -->
             <a href="#" class="home-card" data-create-type="folder" title="<?php echo t_h('modals.create.folder.title', [], 'Folder'); ?>">
                 <div class="home-card-icon">
-                    <i class="fas fa-folder"></i>
+                    <i class="lucide lucide-folder"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('modals.create.folder.title', [], 'Folder'); ?></span>
@@ -137,7 +133,7 @@ $currentLang = getUserLanguage();
             <!-- Kanban Structure -->
             <a href="#" class="home-card" data-create-type="kanban" title="<?php echo t_h('modals.create.kanban.title', [], 'Kanban Structure'); ?>">
                 <div class="home-card-icon">
-                    <i class="fas fa-columns"></i>
+                    <i class="lucide lucide-columns-2"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('modals.create.kanban.title', [], 'Kanban Structure'); ?></span>
@@ -147,7 +143,7 @@ $currentLang = getUserLanguage();
             <!-- Workspace -->
             <a href="#" class="home-card" data-create-type="workspace" title="<?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?>">
                 <div class="home-card-icon">
-                    <i class="fas fa-layer-group"></i>
+                    <i class="lucide lucide-layers"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?></span>

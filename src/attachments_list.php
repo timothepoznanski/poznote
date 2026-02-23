@@ -31,13 +31,12 @@ try {
 	<title><?php echo getPageTitle(); ?></title>
 	<meta name="color-scheme" content="dark light">
 	<script src="js/theme-init.js"></script>
-	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
-	<link type="text/css" rel="stylesheet" href="css/light.min.css"/>
+	<link type="text/css" rel="stylesheet" href="css/lucide.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/base.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/notes-list.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/buttons-modal.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/folders-grid.css"/>
-	<link type="text/css" rel="stylesheet" href="css/shared/fontawesome.css"/>
+	<link type="text/css" rel="stylesheet" href="css/lucide.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/dark-mode.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/responsive.css"/>
 	<link type="text/css" rel="stylesheet" href="css/attachments_list.css"/>
@@ -68,7 +67,7 @@ try {
 			<div class="filter-input-wrapper">
 				<input type="text" id="filterInput" class="filter-input" placeholder="<?php echo t_h('attachments.list.filter_placeholder', [], 'Filter by note title or attachment name...'); ?>"/>
 				<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
-					<i class="fa-times"></i>
+					<i class="lucide lucide-x"></i>
 				</button>
 			</div>
 			<div id="filterStats" class="filter-stats"></div>
@@ -87,12 +86,12 @@ try {
 		
 		<div class="shared-content">
 			<div id="loadingSpinner" class="loading-spinner">
-				<i class="fa-spinner fa-spin"></i>
+				<i class="lucide lucide-loader-2 lucide-spin"></i>
 				<?php echo t_h('common.loading', [], 'Loading...'); ?>
 			</div>
 			<div id="attachmentsContainer" class="attachments-list-container"></div>
 			<div id="emptyMessage" class="empty-message initially-hidden">
-				<i class="fa-paperclip"></i>
+				<i class="lucide lucide-paperclip"></i>
 				<p><?php echo t_h('attachments.list.no_attachments', [], 'No notes with attachments yet.'); ?></p>
 			</div>
 		</div>

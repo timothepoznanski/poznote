@@ -6,7 +6,7 @@ function toggleTheme() {
     html.setAttribute('data-theme', next);
     var icon = document.getElementById('themeIcon');
     if (icon) {
-        icon.className = next === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        icon.className = next === 'dark' ? 'lucide lucide-sun' : 'lucide lucide-moon';
     }
 }
 
@@ -24,7 +24,7 @@ function toggleView() {
             // Switch to List
             list.classList.remove('is-hidden');
             kanban.classList.add('is-hidden');
-            if (icon) icon.className = 'fas fa-columns';
+            if (icon) icon.className = 'lucide lucide-columns-2';
             if (toggleBtn) toggleBtn.title = body.getAttribute('data-txt-view-kanban') || 'View as Kanban';
             body.classList.remove('view-kanban');
             // Show filter stats if active
@@ -33,7 +33,7 @@ function toggleView() {
             // Switch to Kanban
             list.classList.add('is-hidden');
             kanban.classList.remove('is-hidden');
-            if (icon) icon.className = 'fas fa-list';
+            if (icon) icon.className = 'lucide lucide-list';
             if (toggleBtn) toggleBtn.title = body.getAttribute('data-txt-view-notes') || 'View as list';
             body.classList.add('view-kanban');
             // Re-apply filter to kanban cards
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var html = document.documentElement;
     var icon = document.getElementById('themeIcon');
     if (icon && html.getAttribute('data-theme') === 'dark') {
-        icon.className = 'fas fa-sun';
+        icon.className = 'lucide lucide-sun';
     }
 
     var filterInput = document.getElementById('folderFilterInput');

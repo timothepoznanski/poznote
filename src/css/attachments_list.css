@@ -465,111 +465,6 @@ body.attachments-page {
     background-color: #666666 !important;
 }
 
-/* Font Awesome icon definitions */
-.fa-spinner::before {
-    content: "\f110";
-}
-
-.fa-exclamation-triangle::before {
-    content: "\f071";
-}
-
-.fa-times::before {
-    content: "\f00d";
-}
-
-.fa-paperclip::before {
-    content: "\f0c6";
-}
-
-.fa-download::before {
-    content: "\f019";
-}
-
-.fa-file::before {
-    content: "\f15b";
-}
-
-.fa-file-image::before {
-    content: "\f1c5";
-}
-
-.fa-file-pdf::before {
-    content: "\f1c1";
-}
-
-.fa-file-word::before {
-    content: "\f1c2";
-}
-
-.fa-file-excel::before {
-    content: "\f1c3";
-}
-
-.fa-file-powerpoint::before {
-    content: "\f1c4";
-}
-
-.fa-file-alt::before {
-    content: "\f15c";
-}
-
-.fa-file-archive::before {
-    content: "\f1c6";
-}
-
-.fa-file-code::before {
-    content: "\f1c9";
-}
-
-.fa-file-video::before {
-    content: "\f1c8";
-}
-
-.fa-file-audio::before {
-    content: "\f1c7";
-}
-
-.fa-spinner,
-.fa-exclamation-triangle,
-.fa-times,
-.fa-paperclip,
-.fa-download,
-.fa-file,
-.fa-file-image,
-.fa-file-pdf,
-.fa-file-word,
-.fa-file-excel,
-.fa-file-powerpoint,
-.fa-file-alt,
-.fa-file-archive,
-.fa-file-code,
-.fa-file-video,
-.fa-file-audio {
-    font-family: "Font Awesome 5 Pro";
-    font-weight: 300;
-    font-style: normal;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    display: inline-block;
-    font-variant: normal;
-    text-rendering: auto;
-    line-height: 1;
-}
-
-.fa-spin {
-    animation: fa-spin 2s infinite linear;
-}
-
-@keyframes fa-spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
 
 /* Attachment list grouping styles */
 .attachment-row {
@@ -632,7 +527,7 @@ body.attachments-page {
     background: #1e1e1e;
 }
 
-.attachment-file-item .fa-paperclip {
+.attachment-file-item .lucide-paperclip {
     font-size: 12px;
     margin-top: 3px;
 }

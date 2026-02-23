@@ -1,0 +1,1327 @@
+{
+  "metadata": {
+    "description": "Font Awesome to Lucide icon mapping for poznote-dev project",
+    "totalUniqueIcons": 235,
+    "generatedDate": "2026-02-22",
+    "prefixes": {
+      "fas": "Font Awesome Solid",
+      "far": "Font Awesome Regular",
+      "fal": "Font Awesome Light",
+      "fab": "Font Awesome Brands"
+    }
+  },
+  "iconMappings": {
+    "fa-align-left": {
+      "lucide": "align-left",
+      "files": ["src/js/slash-command.js"]
+    },
+    "fa-anchor": {
+      "lucide": "anchor",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-apple-alt": {
+      "lucide": "apple",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-archive": {
+      "lucide": "archive",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-arrow-down": {
+      "lucide": "arrow-down",
+      "files": ["src/js/tasklist.js", "src/js/settings-page.js", "src/settings.php"]
+    },
+    "fa-arrow-left": {
+      "lucide": "arrow-left",
+      "files": ["src/kanban_content.php", "src/js/slash-command.js"]
+    },
+    "fa-arrow-right": {
+      "lucide": "arrow-right",
+      "files": ["src/js/tasklist.js"]
+    },
+    "fa-arrows-h": {
+      "lucide": "move-horizontal",
+      "files": ["src/settings.php"]
+    },
+    "fa-arrow-up": {
+      "lucide": "arrow-up",
+      "files": ["src/js/tasklist.js", "src/js/settings-page.js"]
+    },
+    "fa-at": {
+      "lucide": "at-sign",
+      "files": ["src/index.php", "src/js/slash-command.js", "src/js/folder-icon.js"]
+    },
+    "fa-atom": {
+      "lucide": "atom",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-award": {
+      "lucide": "award",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-ban": {
+      "lucide": "ban",
+      "files": ["src/list_shared_folders.php", "src/js/shared-page.js"]
+    },
+    "fa-bell": {
+      "lucide": "bell",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-bicycle": {
+      "lucide": "bike",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-binoculars": {
+      "lucide": "binoculars",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-birthday-cake": {
+      "lucide": "cake",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-bold": {
+      "lucide": "bold",
+      "files": ["src/index.php", "src/js/slash-command.js"]
+    },
+    "fa-bolt": {
+      "lucide": "zap",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-book": {
+      "lucide": "book",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-bookmark": {
+      "lucide": "bookmark",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-book-open": {
+      "lucide": "book-open",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-box": {
+      "lucide": "box",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-briefcase": {
+      "lucide": "briefcase",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-briefcase-medical": {
+      "lucide": "briefcase-medical",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-broom": {
+      "lucide": "brush",
+      "files": ["src/index.php"]
+    },
+    "fa-brush": {
+      "lucide": "paintbrush",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-bug": {
+      "lucide": "bug",
+      "files": ["src/git_sync.php", "src/js/folder-icon.js", "src/home.php"]
+    },
+    "fa-building": {
+      "lucide": "building",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-bus": {
+      "lucide": "bus",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-calculator": {
+      "lucide": "calculator",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-calendar-alt": {
+      "lucide": "calendar",
+      "files": ["src/folders_display.php", "src/js/slash-command.js", "src/js/folder-icon.js", "src/settings.php"]
+    },
+    "fa-calendar-plus": {
+      "lucide": "calendar-plus",
+      "files": ["src/folders_display.php"]
+    },
+    "fa-camera": {
+      "lucide": "camera",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-candy-cane": {
+      "lucide": "candy",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-car": {
+      "lucide": "car",
+      "files": ["src/index.php", "src/js/slash-command.js", "src/js/folder-icon.js"]
+    },
+    "fa-caret-down": {
+      "lucide": "chevron-down",
+      "files": ["src/index.php", "src/js/slash-command.js"]
+    },
+    "fa-certificate": {
+      "lucide": "badge-check",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-chart-bar": {
+      "lucide": "bar-chart-2",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-chart-line": {
+      "lucide": "line-chart",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-chart-network": {
+      "lucide": "network",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-chart-pie": {
+      "lucide": "pie-chart",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-check": {
+      "lucide": "check",
+      "files": ["src/git_sync.php", "src/index.php", "src/js/workspaces.js", "src/js/shared-page.js", "src/home.php"]
+    },
+    "fa-check-circle": {
+      "lucide": "check-circle",
+      "files": ["src/git_sync.php", "src/home.php"]
+    },
+    "fa-check-light-full": {
+      "lucide": "check",
+      "files": ["src/js/workspaces.js"],
+      "note": "Custom icon, map to check"
+    },
+    "fa-check-square": {
+      "lucide": "check-square",
+      "files": ["src/index.php"]
+    },
+    "fa-chess": {
+      "lucide": "crown",
+      "files": ["src/js/folder-icon.js"],
+      "note": "No direct chess icon in Lucide"
+    },
+    "fa-chevron-down": {
+      "lucide": "chevron-down",
+      "files": ["src/js/restore-import.js"]
+    },
+    "fa-chevron-left": {
+      "lucide": "chevron-left",
+      "files": ["src/kanban_content.php", "src/index.php"]
+    },
+    "fa-chevron-right": {
+      "lucide": "chevron-right",
+      "files": ["src/kanban_content.php", "src/index.php", "src/js/note-loader-common.js", "src/js/folder-hierarchy.js", "src/js/slash-command.js"]
+    },
+    "fa-chevron-up": {
+      "lucide": "chevron-up",
+      "files": ["src/js/restore-import.js", "src/notes_list.php"]
+    },
+    "fa-circle": {
+      "lucide": "circle",
+      "files": ["src/js/slash-command.js"]
+    },
+    "fa-clipboard": {
+      "lucide": "clipboard",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-clipboard-list": {
+      "lucide": "clipboard-list",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-clock": {
+      "lucide": "clock",
+      "files": ["src/js/folder-icon.js", "src/settings.php"]
+    },
+    "fa-cloud": {
+      "lucide": "cloud",
+      "files": ["src/folders_display.php", "src/index.php", "src/js/folder-icon.js"]
+    },
+    "fa-cloud-sun": {
+      "lucide": "cloud-sun",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-code": {
+      "lucide": "code",
+      "files": ["src/git_sync.php", "src/index.php", "src/js/slash-command.js", "src/js/folder-icon.js", "src/home.php", "src/settings.php"]
+    },
+    "fa-code-branch": {
+      "lucide": "git-branch",
+      "files": ["src/git_sync.php", "src/home.php", "src/settings.php"]
+    },
+    "fa-coffee": {
+      "lucide": "coffee",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-cog": {
+      "lucide": "settings",
+      "files": ["src/index.php", "src/js/workspaces.js", "src/js/folder-icon.js"]
+    },
+    "fa-coins": {
+      "lucide": "coins",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-columns": {
+      "lucide": "columns",
+      "files": ["src/modals.php", "src/folders_display.php", "src/js/public_folder.js", "src/js/folder-icon.js", "src/js/markdown-handler.js", "src/create.php", "src/public_folder.php"]
+    },
+    "fa-comment": {
+      "lucide": "message-circle",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-compass": {
+      "lucide": "compass",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-copy": {
+      "lucide": "copy",
+      "files": ["src/modals.php", "src/git_sync.php", "src/index.php", "src/js/folder-icon.js", "src/home.php", "src/create.php"]
+    },
+    "fa-credit-card": {
+      "lucide": "credit-card",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-crown": {
+      "lucide": "crown",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-cube": {
+      "lucide": "box",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-cubes": {
+      "lucide": "boxes",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-database": {
+      "lucide": "database",
+      "files": ["src/js/slash-command.js", "src/js/folder-icon.js"]
+    },
+    "fa-desktop": {
+      "lucide": "monitor",
+      "files": ["src/js/theme-manager.js", "src/js/folder-icon.js"]
+    },
+    "fa-diploma": {
+      "lucide": "scroll",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-dna": {
+      "lucide": "dna",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-dollar-sign": {
+      "lucide": "dollar-sign",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-download": {
+      "lucide": "download",
+      "files": ["src/git_sync.php", "src/folders_display.php", "src/index.php", "src/js/note-loader-common.js", "src/js/folder-icon.js", "src/home.php", "src/api_export_attachments.php", "src/settings.php"]
+    },
+    "fa-dragon": {
+      "lucide": "flame",
+      "files": ["src/js/folder-icon.js"],
+      "note": "No dragon icon in Lucide"
+    },
+    "fa-draw-polygon": {
+      "lucide": "pentagon",
+      "files": ["src/api_save_excalidraw.php"]
+    },
+    "fa-drum": {
+      "lucide": "drum",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-dumbbell": {
+      "lucide": "dumbbell",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-edit": {
+      "lucide": "pencil",
+      "files": ["src/folders_display.php", "src/admin/users.php", "src/index.php", "src/js/note-loader-common.js", "src/js/markdown-handler.js"]
+    },
+    "fa-elephant": {
+      "lucide": "squirrel",
+      "files": ["src/js/folder-icon.js"],
+      "note": "No elephant icon in Lucide, using substitute"
+    },
+    "fa-ellipsis-v": {
+      "lucide": "more-vertical",
+      "files": ["src/folders_display.php", "src/index.php", "src/notes_list.php"]
+    },
+    "fa-envelope": {
+      "lucide": "mail",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-eraser": {
+      "lucide": "eraser",
+      "files": ["src/index.php"]
+    },
+    "fa-euro-sign": {
+      "lucide": "euro",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-exclamation-circle": {
+      "lucide": "alert-circle",
+      "files": ["src/git_sync.php", "src/home.php"]
+    },
+    "fa-exclamation-triangle": {
+      "lucide": "alert-triangle",
+      "files": ["src/git_sync.php", "src/kanban_content.php", "src/admin/users.php", "src/js/attachments-list.js", "src/js/workspaces.js", "src/js/utils.js", "src/home.php"]
+    },
+    "fa-expand": {
+      "lucide": "expand",
+      "files": ["src/js/note-loader-common.js", "src/settings.php"]
+    },
+    "fa-expand-arrows-alt": {
+      "lucide": "maximize-2",
+      "files": ["src/settings.php"]
+    },
+    "fa-external-link": {
+      "lucide": "external-link",
+      "files": ["src/index.php", "src/list_shared_folders.php", "src/js/shared-page.js"]
+    },
+    "fa-eye": {
+      "lucide": "eye",
+      "files": ["src/login.php", "src/js/login-page.js", "src/js/attachments.js", "src/js/folder-icon.js"]
+    },
+    "fa-eye-slash": {
+      "lucide": "eye-off",
+      "files": ["src/js/login-page.js"]
+    },
+    "fa-feather": {
+      "lucide": "feather",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-file": {
+      "lucide": "file",
+      "files": ["src/modals.php", "src/js/folder-hierarchy.js", "src/js/linked-note-selector.js", "src/js/attachments-page.js", "src/js/unified-search.js", "src/js/template-selector.js", "src/js/slash-command.js", "src/js/folder-icon.js", "src/notes_list.php", "src/create.php", "src/public_folder.php"]
+    },
+    "fa-file-alt": {
+      "lucide": "file-text",
+      "files": ["src/modals.php", "src/js/linked-note-selector.js", "src/js/unified-search.js", "src/js/template-selector.js", "src/js/folder-icon.js", "src/notes_list.php", "src/create.php", "src/public_folder.php"]
+    },
+    "fa-file-code": {
+      "lucide": "file-code",
+      "files": ["src/modals.php", "src/js/slash-command.js", "src/js/folder-icon.js"]
+    },
+    "fa-file-contract": {
+      "lucide": "file-signature",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-file-image": {
+      "lucide": "file-image",
+      "files": ["src/js/attachments-page.js"]
+    },
+    "fa-file-invoice": {
+      "lucide": "file-badge",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-file-pdf": {
+      "lucide": "file",
+      "files": ["src/js/attachments-page.js"],
+      "note": "No specific PDF icon in Lucide"
+    },
+    "fa-file-video": {
+      "lucide": "file-video",
+      "files": ["src/js/attachments-page.js"]
+    },
+    "fa-fill-drip": {
+      "lucide": "paint-bucket",
+      "files": ["src/index.php", "src/js/slash-command.js"]
+    },
+    "fa-film": {
+      "lucide": "film",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-fingerprint": {
+      "lucide": "fingerprint",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-fire": {
+      "lucide": "flame",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-flag": {
+      "lucide": "flag",
+      "files": ["src/js/folder-icon.js", "src/settings.php"]
+    },
+    "fa-flask": {
+      "lucide": "flask-conical",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-folder": {
+      "lucide": "folder",
+      "files": ["src/modals.php", "src/kanban_content.php", "src/folders_display.php", "src/index.php", "src/list_shared_folders.php", "src/js/folder-hierarchy.js", "src/js/utils.js", "src/js/shared-page.js", "src/js/events-drag-drop.js", "src/js/note-reference.js", "src/js/folder-icon.js", "src/js/favorites-page.js", "src/home.php", "src/list_folders.php", "src/notes_list.php", "src/settings.php", "src/create.php", "src/public_folder.php"]
+    },
+    "fa-folder-open": {
+      "lucide": "folder-open",
+      "files": ["src/folders_display.php", "src/index.php", "src/js/folder-hierarchy.js", "src/js/utils.js", "src/js/folder-icon.js", "src/home.php", "src/notes_list.php", "src/public_folder.php"]
+    },
+    "fa-folder-plus": {
+      "lucide": "folder-plus",
+      "files": ["src/modals.php"]
+    },
+    "fa-folder-tree": {
+      "lucide": "folders",
+      "files": ["src/js/folder-icon.js", "src/settings.php"]
+    },
+    "fa-gamepad": {
+      "lucide": "gamepad-2",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-gem": {
+      "lucide": "gem",
+      "files": ["src/js/slash-command.js", "src/js/folder-icon.js"]
+    },
+    "fa-gift": {
+      "lucide": "gift",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-github": {
+      "lucide": "github",
+      "files": ["src/git_sync.php", "src/home.php", "src/settings.php"],
+      "note": "Brand icon - fab fa-github"
+    },
+    "fa-glasses": {
+      "lucide": "glasses",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-globe": {
+      "lucide": "globe",
+      "files": ["src/js/folder-icon.js", "src/settings.php"]
+    },
+    "fa-globe-americas": {
+      "lucide": "globe",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-globe-asia": {
+      "lucide": "globe",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-globe-europe": {
+      "lucide": "globe",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-graduation-cap": {
+      "lucide": "graduation-cap",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-grip-vertical": {
+      "lucide": "grip-vertical",
+      "files": ["src/js/tasklist.js"]
+    },
+    "fa-guitar": {
+      "lucide": "guitar",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-hamburger": {
+      "lucide": "sandwich",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-hammer": {
+      "lucide": "hammer",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-hard-hat": {
+      "lucide": "hard-hat",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-hashtag": {
+      "lucide": "hash",
+      "files": ["src/js/folder-icon.js", "src/settings.php"]
+    },
+    "fa-headphones": {
+      "lucide": "headphones",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-headset": {
+      "lucide": "headset",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-heart": {
+      "lucide": "heart",
+      "files": ["src/js/folder-icon.js", "src/settings.php"]
+    },
+    "fa-heartbeat": {
+      "lucide": "heart-pulse",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-hiking": {
+      "lucide": "footprints",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-home": {
+      "lucide": "home",
+      "files": ["src/index.php", "src/js/folder-icon.js", "src/notes_list.php"]
+    },
+    "fa-hospital": {
+      "lucide": "hospital",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-icons": {
+      "lucide": "shapes",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-id-badge": {
+      "lucide": "id-card",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-id-card": {
+      "lucide": "id-card",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-image": {
+      "lucide": "image",
+      "files": ["src/js/excalidraw-dist/excalidraw-bundle.iife.js", "src/js/slash-command.js", "src/js/folder-icon.js", "src/settings.php"]
+    },
+    "fa-inbox": {
+      "lucide": "inbox",
+      "files": ["src/js/folder-icon.js", "src/public_folder.php"]
+    },
+    "fa-industry": {
+      "lucide": "factory",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-infinity": {
+      "lucide": "infinity",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-info-circle": {
+      "lucide": "info",
+      "files": ["src/git_sync.php", "src/index.php", "src/js/slash-command.js", "src/settings.php"]
+    },
+    "fa-italic": {
+      "lucide": "italic",
+      "files": ["src/index.php", "src/js/slash-command.js"]
+    },
+    "fa-jedi": {
+      "lucide": "swords",
+      "files": ["src/js/folder-icon.js"],
+      "note": "No Jedi icon in Lucide"
+    },
+    "fa-key": {
+      "lucide": "key",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-laptop": {
+      "lucide": "laptop",
+      "files": ["src/js/slash-command.js", "src/js/folder-icon.js"]
+    },
+    "fa-laptop-code": {
+      "lucide": "laptop",
+      "files": ["src/js/slash-command.js", "src/js/folder-icon.js"]
+    },
+    "fa-layer-group": {
+      "lucide": "layers",
+      "files": ["src/modals.php", "src/js/workspaces.js", "src/js/folder-icon.js", "src/home.php", "src/settings.php", "src/create.php"]
+    },
+    "fa-leaf": {
+      "lucide": "leaf",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-lightbulb": {
+      "lucide": "lightbulb",
+      "files": ["src/index.php", "src/js/folder-icon.js"]
+    },
+    "fa-lightbulb-dollar": {
+      "lucide": "lightbulb",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-link": {
+      "lucide": "link",
+      "files": ["src/modals.php", "src/index.php", "src/js/note-loader-common.js", "src/js/slash-command.js", "src/notes_list.php", "src/create.php"]
+    },
+    "fa-list": {
+      "lucide": "list",
+      "files": ["src/modals.php", "src/index.php", "src/js/slash-command.js", "src/js/public_folder.js", "src/create.php"]
+    },
+    "fa-list-check": {
+      "lucide": "list-todo",
+      "files": ["src/index.php", "src/js/slash-command.js"]
+    },
+    "fa-list-ol": {
+      "lucide": "list-ordered",
+      "files": ["src/index.php", "src/js/slash-command.js"]
+    },
+    "fa-list-ul": {
+      "lucide": "list",
+      "files": ["src/modals.php", "src/index.php", "src/js/slash-command.js", "src/create.php"]
+    },
+    "fa-lock": {
+      "lucide": "lock",
+      "files": ["src/list_shared_folders.php", "src/js/shared-page.js", "src/js/folder-icon.js", "src/settings.php"]
+    },
+    "fa-lock-open": {
+      "lucide": "lock-open",
+      "files": ["src/list_shared_folders.php", "src/js/shared-page.js"]
+    },
+    "fa-magnet": {
+      "lucide": "magnet",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-map": {
+      "lucide": "map",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-map-marker-alt": {
+      "lucide": "map-pin",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-markdown": {
+      "lucide": "file-code-2",
+      "files": ["src/modals.php", "src/js/markdown-handler.js", "src/create.php"],
+      "note": "Brand icon - fab fa-markdown, no direct Lucide equivalent"
+    },
+    "fa-maximize": {
+      "lucide": "maximize",
+      "files": ["src/js/note-loader-common.js"]
+    },
+    "fa-medal": {
+      "lucide": "medal",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-medkit": {
+      "lucide": "briefcase-medical",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-microphone": {
+      "lucide": "mic",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-microscope": {
+      "lucide": "microscope",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-minus": {
+      "lucide": "minus",
+      "files": ["src/index.php", "src/js/slash-command.js"]
+    },
+    "fa-money-bill": {
+      "lucide": "banknote",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-moon": {
+      "lucide": "moon",
+      "files": ["src/js/theme-manager.js", "src/js/public_folder.js", "src/js/folder-icon.js", "src/js/public-note.js", "src/public_note.php", "src/public_folder.php"]
+    },
+    "fa-mountain": {
+      "lucide": "mountain",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-mug-hot": {
+      "lucide": "cup-soda",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-music": {
+      "lucide": "music",
+      "files": ["src/js/slash-command.js", "src/js/folder-icon.js"]
+    },
+    "fa-network-wired": {
+      "lucide": "network",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-newspaper": {
+      "lucide": "newspaper",
+      "files": ["src/settings.php"]
+    },
+    "fa-paint-brush": {
+      "lucide": "paintbrush",
+      "files": ["src/index.php", "src/js/slash-command.js", "src/js/folder-icon.js"]
+    },
+    "fa-palette": {
+      "lucide": "palette",
+      "files": ["src/folders_display.php", "src/index.php", "src/js/slash-command.js", "src/js/folder-icon.js"]
+    },
+    "fa-paperclip": {
+      "lucide": "paperclip",
+      "files": ["src/index.php", "src/js/attachments-list.js", "src/js/attachments.js", "src/home.php", "src/api_export_attachments.php", "src/attachments_list.php"]
+    },
+    "fa-passport": {
+      "lucide": "book-user",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-paw": {
+      "lucide": "paw-print",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-pen": {
+      "lucide": "pen",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-pencil-alt": {
+      "lucide": "pencil",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-pepper-hot": {
+      "lucide": "flame",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-phone": {
+      "lucide": "phone",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-piggy-bank": {
+      "lucide": "piggy-bank",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-pizza-slice": {
+      "lucide": "pizza",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-plane": {
+      "lucide": "plane",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-plane-alt": {
+      "lucide": "plane",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-plane-departure": {
+      "lucide": "plane-takeoff",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-play": {
+      "lucide": "play",
+      "files": ["src/js/attachments-page.js"]
+    },
+    "fa-plug": {
+      "lucide": "plug",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-plus": {
+      "lucide": "plus",
+      "files": ["src/kanban_content.php", "src/folders_display.php", "src/admin/users.php", "src/index.php", "src/js/index-icon-scale-settings.js", "src/js/slash-command.js"]
+    },
+    "fa-plus-circle": {
+      "lucide": "plus-circle",
+      "files": ["src/kanban_content.php", "src/folders_display.php", "src/index.php", "src/js/index-icon-scale-settings.js"]
+    },
+    "fa-print": {
+      "lucide": "printer",
+      "files": ["src/modals.php", "src/js/folder-icon.js"]
+    },
+    "fa-project-diagram": {
+      "lucide": "workflow",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-puzzle-piece": {
+      "lucide": "puzzle",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-question-circle": {
+      "lucide": "help-circle",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-receipt": {
+      "lucide": "receipt",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-robot": {
+      "lucide": "bot",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-rocket": {
+      "lucide": "rocket",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-running": {
+      "lucide": "person-standing",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-satellite": {
+      "lucide": "satellite",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-satellite-dish": {
+      "lucide": "satellite-dish",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-save": {
+      "lucide": "save",
+      "files": ["src/index.php"]
+    },
+    "fa-school": {
+      "lucide": "school",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-screwdriver": {
+      "lucide": "wrench",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-scroll": {
+      "lucide": "scroll",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-search": {
+      "lucide": "search",
+      "files": ["src/index.php", "src/js/unified-search.js", "src/js/settings-page.js", "src/home.php", "src/settings.php", "src/public_folder.php"]
+    },
+    "fa-seedling": {
+      "lucide": "sprout",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-server": {
+      "lucide": "server",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-share": {
+      "lucide": "share",
+      "files": ["src/folders_display.php", "src/home.php"]
+    },
+    "fa-share-alt": {
+      "lucide": "share-2",
+      "files": ["src/home.php"]
+    },
+    "fa-shield": {
+      "lucide": "shield",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-shield-alt": {
+      "lucide": "shield",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-shopping-bag": {
+      "lucide": "shopping-bag",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-shopping-cart": {
+      "lucide": "shopping-cart",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-sign": {
+      "lucide": "signpost",
+      "files": ["src/js/workspaces.js", "src/js/folder-icon.js", "src/home.php"]
+    },
+    "fa-sign-out-alt": {
+      "lucide": "log-out",
+      "files": ["src/js/workspaces.js", "src/home.php"]
+    },
+    "fa-sitemap": {
+      "lucide": "git-fork",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-smile": {
+      "lucide": "smile",
+      "files": ["src/index.php", "src/js/slash-command.js", "src/js/folder-icon.js"]
+    },
+    "fa-snowflake": {
+      "lucide": "snowflake",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-snowman": {
+      "lucide": "snowflake",
+      "files": ["src/js/folder-icon.js"],
+      "note": "No snowman in Lucide"
+    },
+    "fa-solar-panel": {
+      "lucide": "panel-top",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-sort-alpha-down": {
+      "lucide": "arrow-down-a-z",
+      "files": ["src/folders_display.php"]
+    },
+    "fa-sort-amount-down": {
+      "lucide": "arrow-down-wide-narrow",
+      "files": ["src/folders_display.php", "src/settings.php"]
+    },
+    "fa-spa": {
+      "lucide": "flower-2",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-space-shuttle": {
+      "lucide": "rocket",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-spin": {
+      "lucide": null,
+      "files": ["src/modals.php", "src/favorites.php", "src/js/restore-import.js", "src/js/linked-note-selector.js", "src/js/workspaces.js", "src/js/template-selector.js", "src/js/utils.js", "src/js/note-reference.js", "src/shared.php", "src/attachments_list.php"],
+      "note": "Animation class, not an icon - use CSS animation instead"
+    },
+    "fa-spinner": {
+      "lucide": "loader-2",
+      "files": ["src/modals.php", "src/favorites.php", "src/js/restore-import.js", "src/js/linked-note-selector.js", "src/js/workspaces.js", "src/js/template-selector.js", "src/js/utils.js", "src/js/note-reference.js", "src/shared.php", "src/attachments_list.php"]
+    },
+    "fa-square": {
+      "lucide": "square",
+      "files": ["src/index.php", "src/js/note-loader-common.js"]
+    },
+    "fa-stamp": {
+      "lucide": "stamp",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-star": {
+      "lucide": "star",
+      "files": ["src/index.php", "src/js/tasklist.js", "src/js/folder-icon.js", "src/js/favorites-page.js", "src/home.php", "src/notes_list.php"]
+    },
+    "fa-stethoscope": {
+      "lucide": "stethoscope",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-sticky-note": {
+      "lucide": "sticky-note",
+      "files": ["src/home.php"]
+    },
+    "fa-store": {
+      "lucide": "store",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-store-alt": {
+      "lucide": "store",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-strikethrough": {
+      "lucide": "strikethrough",
+      "files": ["src/index.php", "src/js/slash-command.js"]
+    },
+    "fa-suitcase": {
+      "lucide": "briefcase",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-sun": {
+      "lucide": "sun",
+      "files": ["src/js/theme-manager.js", "src/js/public_folder.js", "src/js/folder-icon.js", "src/js/public-note.js", "src/settings.php"]
+    },
+    "fa-sun-cloud": {
+      "lucide": "cloud-sun",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-swimmer": {
+      "lucide": "waves",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-sync": {
+      "lucide": "refresh-cw",
+      "files": ["src/index.php", "src/js/folder-icon.js", "src/settings.php"]
+    },
+    "fa-sync-alt": {
+      "lucide": "refresh-cw",
+      "files": ["src/index.php", "src/settings.php"]
+    },
+    "fa-syringe": {
+      "lucide": "syringe",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-table": {
+      "lucide": "table",
+      "files": ["src/index.php", "src/js/slash-command.js", "src/js/folder-icon.js"]
+    },
+    "fa-tablet": {
+      "lucide": "tablet",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-tachometer-alt": {
+      "lucide": "gauge",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-tag": {
+      "lucide": "tag",
+      "files": ["src/index.php", "src/js/unified-search.js", "src/js/folder-icon.js", "src/home.php", "src/notes_list.php"]
+    },
+    "fa-tags": {
+      "lucide": "tags",
+      "files": ["src/index.php", "src/js/unified-search.js", "src/js/folder-icon.js", "src/home.php"]
+    },
+    "fa-tasks": {
+      "lucide": "list-checks",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-terminal": {
+      "lucide": "terminal",
+      "files": ["src/index.php", "src/js/slash-command.js", "src/js/folder-icon.js"]
+    },
+    "fa-text-height": {
+      "lucide": "text",
+      "files": ["src/index.php", "src/js/slash-command.js", "src/settings.php"]
+    },
+    "fa-theater-masks": {
+      "lucide": "drama",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-thumbs-up": {
+      "lucide": "thumbs-up",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-times": {
+      "lucide": "x",
+      "files": ["src/favorites.php", "src/index.php", "src/list_shared_folders.php", "src/js/tags-modal.js", "src/js/slash-command.js", "src/js/folder-icon.js", "src/trash.php", "src/list_folders.php", "src/shared.php", "src/public_folder.php", "src/attachments_list.php"]
+    },
+    "fa-times-circle": {
+      "lucide": "x-circle",
+      "files": ["src/js/slash-command.js", "src/js/folder-icon.js"]
+    },
+    "fa-toilet-paper": {
+      "lucide": "roll",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-toolbox": {
+      "lucide": "wrench",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-tools": {
+      "lucide": "wrench",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-tooth": {
+      "lucide": "smile",
+      "files": ["src/js/folder-icon.js"],
+      "note": "No tooth icon in Lucide"
+    },
+    "fa-tractor": {
+      "lucide": "tractor",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-trash": {
+      "lucide": "trash-2",
+      "files": ["src/folders_display.php", "src/admin/users.php", "src/index.php", "src/js/tasklist.js", "src/js/note-loader-common.js", "src/js/trash.js", "src/js/attachments.js", "src/js/folder-icon.js", "src/public_note.php", "src/trash.php", "src/home.php"]
+    },
+    "fa-trash-alt": {
+      "lucide": "trash",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-trash-restore-alt": {
+      "lucide": "archive-restore",
+      "files": ["src/js/trash.js", "src/trash.php"]
+    },
+    "fa-tree": {
+      "lucide": "tree-deciduous",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-tree-alt": {
+      "lucide": "tree-pine",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-trophy": {
+      "lucide": "trophy",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-truck": {
+      "lucide": "truck",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-tv": {
+      "lucide": "tv",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-umbrella": {
+      "lucide": "umbrella",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-umbrella-beach": {
+      "lucide": "umbrella",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-underline": {
+      "lucide": "underline",
+      "files": ["src/index.php"]
+    },
+    "fa-university": {
+      "lucide": "landmark",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-upload": {
+      "lucide": "upload",
+      "files": ["src/git_sync.php", "src/js/folder-icon.js", "src/home.php", "src/settings.php"]
+    },
+    "fa-user": {
+      "lucide": "user",
+      "files": ["src/js/folder-icon.js", "src/home.php", "src/settings.php"]
+    },
+    "fa-user-graduate": {
+      "lucide": "graduation-cap",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-users": {
+      "lucide": "users",
+      "files": ["src/js/folder-icon.js", "src/settings.php"]
+    },
+    "fa-users-cog": {
+      "lucide": "users-cog",
+      "files": ["src/settings.php"]
+    },
+    "fa-utensils": {
+      "lucide": "utensils",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-utensil-spoon": {
+      "lucide": "utensils",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-vial": {
+      "lucide": "test-tube",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-video": {
+      "lucide": "video",
+      "files": ["src/js/slash-command.js", "src/js/folder-icon.js"]
+    },
+    "fa-w-16": {
+      "lucide": null,
+      "files": ["src/js/excalidraw-dist/excalidraw-bundle.iife.js"],
+      "note": "Internal excalidraw class, not a standard FA icon"
+    },
+    "fa-walking": {
+      "lucide": "footprints",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-wallet": {
+      "lucide": "wallet",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-warehouse": {
+      "lucide": "warehouse",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-water": {
+      "lucide": "waves",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-weight": {
+      "lucide": "weight",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-wifi": {
+      "lucide": "wifi",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-wind": {
+      "lucide": "wind",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-wrench": {
+      "lucide": "wrench",
+      "files": ["src/js/folder-icon.js"]
+    },
+    "fa-yen-sign": {
+      "lucide": "japanese-yen",
+      "files": ["src/js/folder-icon.js"]
+    }
+  },
+  "prefixUsage": {
+    "fas": {
+      "description": "Font Awesome Solid - most common usage",
+      "examples": ["fas fa-save", "fas fa-folder", "fas fa-home"]
+    },
+    "far": {
+      "description": "Font Awesome Regular",
+      "examples": ["far fa-lightbulb", "far fa-home", "far fa-cog", "far fa-plus-circle"]
+    },
+    "fal": {
+      "description": "Font Awesome Light",
+      "examples": ["fal fa-flag", "fal fa-clock", "fal fa-video", "fal fa-music"]
+    },
+    "fab": {
+      "description": "Font Awesome Brands",
+      "examples": ["fab fa-github", "fab fa-markdown"]
+    }
+  },
+  "iconsByFile": {
+    "src/index.php": [
+      "fa-at", "fa-bold", "fa-broom", "fa-car", "fa-caret-down", "fa-check",
+      "fa-check-square", "fa-chevron-left", "fa-chevron-right", "fa-cloud",
+      "fa-code", "fa-cog", "fa-copy", "fa-download", "fa-edit", "fa-ellipsis-v",
+      "fa-eraser", "fa-external-link", "fa-fill-drip", "fa-folder",
+      "fa-folder-open", "fa-home", "fa-info-circle", "fa-italic", "fa-lightbulb",
+      "fa-link", "fa-list", "fa-list-check", "fa-list-ol", "fa-list-ul",
+      "fa-minus", "fa-paint-brush", "fa-palette", "fa-paperclip", "fa-plus",
+      "fa-plus-circle", "fa-save", "fa-search", "fa-smile", "fa-square",
+      "fa-star", "fa-strikethrough", "fa-sync", "fa-sync-alt", "fa-table",
+      "fa-tag", "fa-tags", "fa-terminal", "fa-text-height", "fa-times",
+      "fa-trash", "fa-underline"
+    ],
+    "src/home.php": [
+      "fa-bug", "fa-check", "fa-check-circle", "fa-code", "fa-code-branch",
+      "fa-copy", "fa-download", "fa-exclamation-circle", "fa-exclamation-triangle",
+      "fa-folder-open", "fa-github", "fa-layer-group", "fa-paperclip",
+      "fa-search", "fa-share", "fa-share-alt", "fa-sign", "fa-sign-out-alt",
+      "fa-star", "fa-sticky-note", "fa-tag", "fa-tags", "fa-trash", "fa-upload",
+      "fa-user"
+    ],
+    "src/settings.php": [
+      "fa-arrow-down", "fa-arrows-h", "fa-calendar-alt", "fa-clock", "fa-code",
+      "fa-code-branch", "fa-download", "fa-expand", "fa-expand-arrows-alt",
+      "fa-flag", "fa-folder", "fa-folder-tree", "fa-github", "fa-globe",
+      "fa-hashtag", "fa-heart", "fa-image", "fa-layer-group", "fa-lock",
+      "fa-newspaper", "fa-search", "fa-sort-amount-down", "fa-sun", "fa-sync",
+      "fa-sync-alt", "fa-text-height", "fa-upload", "fa-user", "fa-users",
+      "fa-users-cog"
+    ],
+    "src/js/folder-icon.js": [
+      "fa-anchor", "fa-apple-alt", "fa-archive", "fa-at", "fa-atom", "fa-award",
+      "fa-bell", "fa-bicycle", "fa-binoculars", "fa-birthday-cake", "fa-bolt",
+      "fa-book", "fa-bookmark", "fa-book-open", "fa-box", "fa-briefcase",
+      "fa-briefcase-medical", "fa-brush", "fa-bug", "fa-building", "fa-bus",
+      "fa-calculator", "fa-calendar-alt", "fa-camera", "fa-candy-cane", "fa-car",
+      "fa-certificate", "fa-chart-bar", "fa-chart-line", "fa-chart-network",
+      "fa-chart-pie", "fa-chess", "fa-clipboard", "fa-clipboard-list", "fa-clock",
+      "fa-cloud", "fa-cloud-sun", "fa-code", "fa-coffee", "fa-cog", "fa-coins",
+      "fa-columns", "fa-comment", "fa-compass", "fa-copy", "fa-credit-card",
+      "fa-crown", "fa-cube", "fa-cubes", "fa-database", "fa-desktop", "fa-diploma",
+      "fa-dna", "fa-dollar-sign", "fa-download", "fa-dragon", "fa-drum",
+      "fa-dumbbell", "fa-elephant", "fa-envelope", "fa-euro-sign", "fa-eye",
+      "fa-feather", "fa-file", "fa-file-alt", "fa-file-code", "fa-file-contract",
+      "fa-file-invoice", "fa-film", "fa-fingerprint", "fa-fire", "fa-flag",
+      "fa-flask", "fa-folder", "fa-folder-open", "fa-folder-tree", "fa-gamepad",
+      "fa-gem", "fa-gift", "fa-glasses", "fa-globe", "fa-globe-americas",
+      "fa-globe-asia", "fa-globe-europe", "fa-graduation-cap", "fa-guitar",
+      "fa-hamburger", "fa-hammer", "fa-hard-hat", "fa-hashtag", "fa-headphones",
+      "fa-headset", "fa-heart", "fa-heartbeat", "fa-hiking", "fa-home",
+      "fa-hospital", "fa-icons", "fa-id-badge", "fa-id-card", "fa-image",
+      "fa-inbox", "fa-industry", "fa-infinity", "fa-jedi", "fa-key", "fa-laptop",
+      "fa-laptop-code", "fa-layer-group", "fa-leaf", "fa-lightbulb",
+      "fa-lightbulb-dollar", "fa-lock", "fa-magnet", "fa-map", "fa-map-marker-alt",
+      "fa-medal", "fa-medkit", "fa-microphone", "fa-microscope", "fa-money-bill",
+      "fa-moon", "fa-mountain", "fa-mug-hot", "fa-music", "fa-network-wired",
+      "fa-paint-brush", "fa-palette", "fa-passport", "fa-paw", "fa-pen",
+      "fa-pencil-alt", "fa-pepper-hot", "fa-phone", "fa-piggy-bank",
+      "fa-pizza-slice", "fa-plane", "fa-plane-alt", "fa-plane-departure",
+      "fa-plug", "fa-print", "fa-project-diagram", "fa-puzzle-piece",
+      "fa-question-circle", "fa-receipt", "fa-robot", "fa-rocket", "fa-running",
+      "fa-satellite", "fa-satellite-dish", "fa-school", "fa-screwdriver",
+      "fa-scroll", "fa-seedling", "fa-server", "fa-shield", "fa-shield-alt",
+      "fa-shopping-bag", "fa-shopping-cart", "fa-sign", "fa-sitemap", "fa-smile",
+      "fa-snowflake", "fa-snowman", "fa-solar-panel", "fa-spa", "fa-space-shuttle",
+      "fa-stamp", "fa-star", "fa-stethoscope", "fa-store", "fa-store-alt",
+      "fa-suitcase", "fa-sun", "fa-sun-cloud", "fa-swimmer", "fa-sync",
+      "fa-syringe", "fa-table", "fa-tablet", "fa-tachometer-alt", "fa-tag",
+      "fa-tags", "fa-tasks", "fa-terminal", "fa-theater-masks", "fa-thumbs-up",
+      "fa-times", "fa-times-circle", "fa-toilet-paper", "fa-toolbox", "fa-tools",
+      "fa-tooth", "fa-tractor", "fa-trash", "fa-trash-alt", "fa-tree",
+      "fa-tree-alt", "fa-trophy", "fa-truck", "fa-tv", "fa-umbrella",
+      "fa-umbrella-beach", "fa-university", "fa-upload", "fa-user",
+      "fa-user-graduate", "fa-users", "fa-utensils", "fa-utensil-spoon",
+      "fa-vial", "fa-video", "fa-walking", "fa-wallet", "fa-warehouse",
+      "fa-water", "fa-weight", "fa-wifi", "fa-wind", "fa-wrench", "fa-yen-sign"
+    ]
+  },
+  "statistics": {
+    "totalUniqueIcons": 235,
+    "iconsByCategory": {
+      "navigation": ["fa-home", "fa-chevron-left", "fa-chevron-right", "fa-chevron-up", "fa-chevron-down", "fa-arrow-left", "fa-arrow-right", "fa-arrow-up", "fa-arrow-down"],
+      "editor": ["fa-bold", "fa-italic", "fa-underline", "fa-strikethrough", "fa-code", "fa-terminal", "fa-link", "fa-list", "fa-list-ul", "fa-list-ol", "fa-table", "fa-eraser"],
+      "files": ["fa-file", "fa-file-alt", "fa-file-code", "fa-folder", "fa-folder-open", "fa-folder-plus", "fa-copy", "fa-save", "fa-download", "fa-upload"],
+      "actions": ["fa-plus", "fa-minus", "fa-times", "fa-check", "fa-search", "fa-edit", "fa-trash", "fa-sync"],
+      "status": ["fa-check-circle", "fa-exclamation-circle", "fa-exclamation-triangle", "fa-info-circle", "fa-spinner"],
+      "social": ["fa-share", "fa-share-alt", "fa-cloud", "fa-github"],
+      "ui": ["fa-ellipsis-v", "fa-caret-down", "fa-expand", "fa-columns", "fa-sun", "fa-moon", "fa-star"]
+    }
+  },
+  "notesForImplementation": {
+    "animationClasses": {
+      "fa-spin": "This is an animation class, not an icon. Replace with CSS animation on Lucide icons.",
+      "implementation": "Add 'animate-spin' class or custom CSS keyframe animation"
+    },
+    "brandIcons": {
+      "fa-github": "Use Lucide's 'github' icon or keep as SVG",
+      "fa-markdown": "Use Lucide's 'file-code-2' as closest alternative"
+    },
+    "noDirectEquivalent": [
+      "fa-chess (use crown)",
+      "fa-dragon (use flame)",
+      "fa-elephant (use custom or squirrel)",
+      "fa-jedi (use swords)",
+      "fa-snowman (use snowflake)",
+      "fa-tooth (use smile)",
+      "fa-w-16 (internal excalidraw class)"
+    ]
+  }
+}

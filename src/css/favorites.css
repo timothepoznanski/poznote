@@ -241,44 +241,6 @@ body.favorites-page {
     color: #9cc6ef;
 }
 
-/* Font Awesome icon definitions */
-.fa-star::before {
-    content: "\f005";
-}
-
-.fa-folder::before {
-    content: "\f07b";
-}
-
-.fa-times::before {
-    content: "\f00d";
-}
-
-.fa-spinner::before {
-    content: "\f110";
-}
-
-.fa-star,
-.fa-folder,
-.fa-times,
-.fa-spinner,
-.fas {
-    font-family: "Font Awesome 5 Pro";
-    font-weight: 900;
-    /* Use Solid for most icons on this page */
-    font-style: normal;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    display: inline-block;
-    font-variant: normal;
-    text-rendering: auto;
-    line-height: 1;
-}
-
 .clear-filter-btn:hover {
     color: #007DB8;
-}
-
-.fas.fa-folder {
-    font-weight: 900;
 }

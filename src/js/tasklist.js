@@ -205,7 +205,7 @@ function renderTasks(tasks, noteId) {
     if (!Array.isArray(tasks)) return '';
 
     return tasks.map(task => {
-        const starClass = 'fa-star';
+        const starClass = 'lucide lucide-star';
         const favBtnClass = task.important ? 'task-important-btn btn-favorite is-favorite' : 'task-important-btn btn-favorite';
         const title = task.important ? 'Remove important' : 'Mark as important';
         const moveTitle = window.t ? window.t('tasklist.move_to_list', null, 'Move to another list') : 'Move to another list';
@@ -216,13 +216,13 @@ function renderTasks(tasks, noteId) {
             // Completed tasks: show delete and drag buttons
             buttonsHtml = `
             <button class="task-delete-btn" onclick="deleteTask(${task.id}, ${task.noteId || 'null'})">
-                <i class="fa-trash"></i>
+                <i class="lucide lucide-trash-2"></i>
             </button>
             <button class="task-move-btn" title="${moveTitle}" onclick="openMoveTaskModal(${task.id}, ${task.noteId || 'null'})">
-                <i class="fa-arrow-right"></i>
+                <i class="lucide-arrow-right"></i>
             </button>
             <div class="task-drag-handle" title="${window.t ? window.t('tasklist.drag_to_reorder', null, 'Drag to reorder') : 'Drag to reorder'}">
-                <i class="fa-grip-vertical"></i>
+                <i class="lucide-grip-vertical"></i>
             </div>`;
         } else {
             // Incomplete tasks: show favorite and drag buttons
@@ -231,10 +231,10 @@ function renderTasks(tasks, noteId) {
                 <i class="${starClass}"></i>
             </button>
             <button class="task-move-btn" title="${moveTitle}" onclick="openMoveTaskModal(${task.id}, ${task.noteId || 'null'})">
-                <i class="fa-arrow-right"></i>
+                <i class="lucide-arrow-right"></i>
             </button>
             <div class="task-drag-handle" title="${window.t ? window.t('tasklist.drag_to_reorder', null, 'Drag to reorder') : 'Drag to reorder'}">
-                <i class="fa-grip-vertical"></i>
+                <i class="lucide-grip-vertical"></i>
             </div>`;
         }
         
@@ -1055,13 +1055,13 @@ function updateTaskInsertOrderButton(orderValue) {
         if (currentOrder === 'top') {
             btn.classList.add('active');
             if (icon) {
-                icon.className = 'fa-arrow-up';
+                icon.className = 'lucide-arrow-up';
             }
             btn.title = window.t ? window.t('tasklist.add_to_top', null, 'Add new tasks at the top') : 'Add new tasks at the top';
         } else {
             btn.classList.remove('active');
             if (icon) {
-                icon.className = 'fa-arrow-down';
+                icon.className = 'lucide-arrow-down';
             }
             btn.title = window.t ? window.t('tasklist.add_to_bottom', null, 'Add new tasks at the bottom') : 'Add new tasks at the bottom';
         }

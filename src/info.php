@@ -116,8 +116,7 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
     <title><?php echo t_h('info.page_title', [], 'Note Information'); ?> - <?php echo htmlspecialchars($title); ?></title>
     <meta name="color-scheme" content="dark light">
     <script src="js/theme-init.js"></script>
-    <link rel="stylesheet" href="css/fontawesome.min.css">
-    <link rel="stylesheet" href="css/light.min.css">
+    <link rel="stylesheet" href="css/lucide.css">
     <link rel="stylesheet" href="css/info.css">
     <link rel="stylesheet" href="css/modal-alerts.css">
     <link rel="stylesheet" href="css/dark-mode/variables.css">

@@ -32,14 +32,14 @@ try {
         <div class="unified-search-container">
             <div class="searchbar-row searchbar-icon-row">
                 <button type="button" id="search-options-toggle" class="searchbar-options-toggle" title="<?php echo t_h('search.toggle_options', [], 'Toggle search options'); ?>">
-                    <i class="fas fa-ellipsis-v"></i>
+                    <i class="lucide lucide-more-vertical"></i>
                 </button>
                 <div class="searchbar-type-icons<?php echo !isset($search_combined) || $search_combined !== false ? ' hidden' : ''; ?>" id="searchbar-type-icons">
                     <button type="button" id="search-notes-btn" class="searchbar-type-btn searchbar-type-notes active" data-search-type="notes" title="<?php echo t_h('search.search_in_notes', [], 'Search in notes'); ?>">
-                        <i class="fas fa-file-alt"></i>
+                        <i class="lucide lucide-file-alt"></i>
                     </button>
                     <button type="button" id="search-tags-btn" class="searchbar-type-btn searchbar-type-tags" data-search-type="tags" title="<?php echo t_h('search.search_in_tags', [], 'Search in tags'); ?>">
-                        <i class="fas fa-tag"></i>
+                        <i class="lucide lucide-tag"></i>
                     </button>
                 </div>
                 <div class="searchbar-input-wrapper">
@@ -91,7 +91,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             $chevron_icon = $customIcon;
         } else {
             // Use default icons that toggle
-            $chevron_icon = $should_be_open ? 'fas fa-folder-open' : 'fas fa-folder';
+            $chevron_icon = $should_be_open ? 'lucide lucide-folder-open' : 'lucide lucide-folder';
         }
         
         $folder_display = $should_be_open ? 'block' : 'none';
@@ -111,7 +111,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         
         // Use an empty star icon for the Favorites pseudo-folder
         if ($folderName === 'Favorites') {
-            echo "<i class='fas fa-star folder-icon'></i>";
+            echo "<i class='lucide lucide-star folder-icon'></i>";
         } else {
             // All folder icons open kanban view
             $iconStyle = $customIconColor ? " style='color: " . htmlspecialchars($customIconColor, ENT_QUOTES) . " !important;'" : "";
@@ -172,7 +172,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             $noteType = $row1['type'] ?? 'note';
             $linkedNoteIdAttr = '';
             if ($noteType === 'linked') {
-                $noteIcon = '<i class="fas fa-link note-type-icon-inline"></i> ';
+                $noteIcon = '<i class="lucide lucide-link note-type-icon-inline"></i> ';
                 // Add the linked_note_id attribute if available
                 if (!empty($row1['linked_note_id'])) {
                     $linkedNoteIdAttr = " data-linked-note-id='" . intval($row1['linked_note_id']) . "'";
@@ -225,7 +225,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             $noteType = $row1['type'] ?? 'note';
             $linkedNoteIdAttr = '';
             if ($noteType === 'linked') {
-                $noteIcon = '<i class="fas fa-link note-type-icon-inline"></i> ';
+                $noteIcon = '<i class="lucide lucide-link note-type-icon-inline"></i> ';
                 // Add the linked_note_id attribute if available
                 if (!empty($row1['linked_note_id'])) {
                     $linkedNoteIdAttr = " data-linked-note-id='" . intval($row1['linked_note_id']) . "'";
@@ -295,7 +295,7 @@ if ($favoritesFolder && $favorites_count > 0) {
     // Add separator with toggle button after favorites
     echo '<div class="favorites-separator">';
     echo '<button type="button" class="favorites-toggle-btn favorites-expanded" data-action="toggle-favorites" title="' . t_h('notes_list.favorites.toggle', [], 'Show/hide favorites') . '">';
-    echo '<i class="fas fa-chevron-up"></i>';
+    echo '<i class="lucide lucide-chevron-up"></i>';
     echo '</button>';
     echo '</div>';
 }
@@ -304,7 +304,7 @@ if ($favoritesFolder && $favorites_count > 0) {
 if (empty($folder_filter)) {
     echo '<div id="root-drop-zone" class="root-drop-zone initially-hidden">';
     echo '<div class="drop-zone-content">';
-    echo '<i class="fas fa-home drop-zone-icon"></i>';
+    echo '<i class="lucide lucide-home drop-zone-icon"></i>';
     echo '<span class="drop-zone-text">' . t_h('notes_list.drop_zone.remove_from_folder', [], 'Drop here to remove from folder') . '</span>';
     echo '</div>';
     echo '</div>';
@@ -338,7 +338,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         $noteType = $row1['type'] ?? 'note';
         $linkedNoteIdAttr = '';
         if ($noteType === 'linked') {
-            $noteIcon = '<i class="fas fa-link note-type-icon-inline"></i> ';
+            $noteIcon = '<i class="lucide lucide-link note-type-icon-inline"></i> ';
             // Add the linked_note_id attribute if available
             if (!empty($row1['linked_note_id'])) {
                 $linkedNoteIdAttr = " data-linked-note-id='" . intval($row1['linked_note_id']) . "'";
@@ -375,7 +375,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         $noteType = $row1['type'] ?? 'note';
         $linkedNoteIdAttr = '';
         if ($noteType === 'linked') {
-            $noteIcon = '<i class="fas fa-link note-type-icon-inline"></i> ';
+            $noteIcon = '<i class="lucide lucide-link note-type-icon-inline"></i> ';
             // Add the linked_note_id attribute if available
             if (!empty($row1['linked_note_id'])) {
                 $linkedNoteIdAttr = " data-linked-note-id='" . intval($row1['linked_note_id']) . "'";

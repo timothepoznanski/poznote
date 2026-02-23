@@ -1288,6 +1288,16 @@ class NotesController {
 
             $newId = $this->con->lastInsertId();
 
+            // Update note ID references in attachment URLs
+            // Replace /api/v1/notes/{oldNoteId}/attachments/ with /api/v1/notes/{newNoteId}/attachments/
+            if (!empty($content) && !empty($attachmentIdMapping)) {
+                $content = str_replace(
+                    '/api/v1/notes/' . $id . '/attachments/',
+                    '/api/v1/notes/' . $newId . '/attachments/',
+                    $content
+                );
+            }
+
             // Auto-share if folder is shared
             $wasShared = false;
             if ($autoShare && $folderId) {
@@ -1811,7 +1821,7 @@ class NotesController {
         
         // Italic: handles both <em> and <i>, avoids double wrapping
         $md = preg_replace_callback('/<(?:em|i)[^>]*>(.*?)<\/(?:em|i)>/is', function($matches) {
-            if (isset($matches[0]) && strpos($matches[0], 'class="fa') !== false) return ''; // Skip FontAwesome
+            if (isset($matches[0]) && preg_match('/class=["\"][^"\"]*(?:\blucide\b|\blucide-)/', $matches[0])) return ''; // Skip Lucide icons
             $inner = $matches[1];
             $inner = strip_tags($inner, '<strong><b><code><a><del><s><strike><u><mark><span>');
             preg_match('/^(\s*)(.*?)(\s*)$/s', $inner, $parts);

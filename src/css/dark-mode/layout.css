@@ -133,23 +133,15 @@ body.dark-mode .searchbar-type-btn.active {
 
 html[data-theme='dark'] .searchbar-type-btn.active i,
 body.dark-mode .searchbar-type-btn.active i,
-html[data-theme='dark'] .searchbar-type-btn.active i.fa,
-body.dark-mode .searchbar-type-btn.active i.fa,
-html[data-theme='dark'] .searchbar-type-btn.active i.fa-file-alt,
-body.dark-mode .searchbar-type-btn.active i.fa-file-alt,
-html[data-theme='dark'] .searchbar-type-btn.active i.fa-tag,
-body.dark-mode .searchbar-type-btn.active i.fa-tag {
+html[data-theme='dark'] .searchbar-type-btn.active i[class*="lucide-"],
+body.dark-mode .searchbar-type-btn.active i[class*="lucide-"] {
     color: #5cb3e9 !important;
 }
 
 html[data-theme='dark'] .searchbar-type-btn.active i::before,
 body.dark-mode .searchbar-type-btn.active i::before,
-html[data-theme='dark'] .searchbar-type-btn.active i.fa::before,
-body.dark-mode .searchbar-type-btn.active i.fa::before,
-html[data-theme='dark'] .searchbar-type-btn.active i.fa-file-alt::before,
-body.dark-mode .searchbar-type-btn.active i.fa-file-alt::before,
-html[data-theme='dark'] .searchbar-type-btn.active i.fa-tag::before,
-body.dark-mode .searchbar-type-btn.active i.fa-tag::before {
+html[data-theme='dark'] .searchbar-type-btn.active i[class*="lucide-"]::before,
+body.dark-mode .searchbar-type-btn.active i[class*="lucide-"]::before {
     color: #5cb3e9 !important;
 }
 

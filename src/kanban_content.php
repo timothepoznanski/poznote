@@ -159,11 +159,11 @@ try {
         <div class="kanban-inline-header">
             <h1 class="kanban-title">
                 <?php 
-                $pFolderIcon = $parentFolder['icon'] ?? 'fa-folder';
+                $pFolderIcon = $parentFolder['icon'] ?? 'lucide-folder';
                 $pIconColor = $parentFolder['icon_color'] ?? '';
                 $pIconStyle = $pIconColor ? "style=\"color: {$pIconColor} !important;\"" : '';
                 ?>
-                <i class="fas <?php echo htmlspecialchars($pFolderIcon); ?> folder-icon" 
+                <i class="<?php echo htmlspecialchars($pFolderIcon); ?> folder-icon" 
                    data-action="open-folder-icon-picker" 
                    data-folder-id="<?php echo $folder_id; ?>" 
                    data-folder-name="<?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?>"
@@ -180,10 +180,10 @@ try {
         <div class="kanban-board-wrapper">
             <!-- Scroll Buttons -->
             <button class="kanban-scroll-btn left" id="kanbanScrollLeft" title="<?php echo t_h('common.scroll_left', [], 'Scroll Left'); ?>">
-                <i class="fas fa-chevron-left"></i>
+                <i class="lucide lucide-chevron-left"></i>
             </button>
             <button class="kanban-scroll-btn right" id="kanbanScrollRight" title="<?php echo t_h('common.scroll_right', [], 'Scroll Right'); ?>">
-                <i class="fas fa-chevron-right"></i>
+                <i class="lucide lucide-chevron-right"></i>
             </button>
 
             <!-- Kanban Board -->
@@ -202,7 +202,7 @@ try {
                                 data-folder-id="<?php echo $folder_id; ?>" 
                                 data-folder-name="<?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?>" 
                                 title="<?php echo t_h('kanban.add_note', [], 'Add note'); ?>">
-                            <i class="far fa-plus-circle"></i>
+                            <i class="lucide lucide-plus-circle"></i>
                         </button>
                         <span class="kanban-column-count"><?php echo count($parentNotes); ?></span>
                     </div>
@@ -221,11 +221,11 @@ try {
                 <div class="kanban-column-header">
                     <div class="kanban-column-title">
                         <?php 
-                        $folderIcon = $subfolder['icon'] ?? 'fa-folder';
+                        $folderIcon = $subfolder['icon'] ?? 'lucide-folder';
                         $iconColor = $subfolder['icon_color'] ?? '';
                         $iconStyle = $iconColor ? "style=\"color: {$iconColor} !important;\"" : '';
                         ?>
-                        <i class="fas <?php echo htmlspecialchars($folderIcon); ?> folder-icon" 
+                        <i class="<?php echo htmlspecialchars($folderIcon); ?> folder-icon" 
                            data-action="open-folder-icon-picker" 
                            data-folder-id="<?php echo $subfolder['id']; ?>" 
                            data-folder-name="<?php echo htmlspecialchars($subfolder['name'], ENT_QUOTES); ?>"
@@ -242,7 +242,7 @@ try {
                                 data-folder-id="<?php echo $subfolder['id']; ?>" 
                                 data-folder-name="<?php echo htmlspecialchars($subfolder['name'], ENT_QUOTES); ?>" 
                                 title="<?php echo t_h('kanban.add_note', [], 'Add note'); ?>">
-                            <i class="far fa-plus-circle"></i>
+                            <i class="lucide lucide-plus-circle"></i>
                         </button>
                         <span class="kanban-column-count"><?php echo count($subfolderNotes[$subfolder['id']] ?? []); ?></span>
                     </div>
@@ -286,13 +286,13 @@ try {
     // Graceful error handling in inline view
     ?>
     <div class="kanban-error" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-secondary, #64748b); padding: 40px; text-align: center;">
-        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px; color: #f59e0b;"></i>
+        <i class="lucide lucide-alert-triangle-triangle" style="font-size: 3rem; margin-bottom: 20px; color: #f59e0b;"></i>
         <h2 style="font-size: 1.5rem; margin-bottom: 10px;"><?php echo t_h('common.error', [], 'Error'); ?></h2>
         <p style="margin-bottom: 20px; color: var(--text-tertiary, #94a3b8); max-width: 400px;">
             <?php echo htmlspecialchars($e->getMessage()); ?>
         </p>
         <button type="button" class="btn btn-primary" onclick="window.closeKanbanView ? window.closeKanbanView() : window.location.reload();">
-            <i class="fas fa-arrow-left"></i> <?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?>
+            <i class="lucide lucide-arrow-left"></i> <?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?>
         </button>
     </div>
     <?php

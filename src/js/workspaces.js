@@ -133,7 +133,7 @@ function toggleWorkspaceMenu(event) {
 }
 
 function loadAndShowWorkspaceMenu(menu) {
-    menu.innerHTML = '<div class="workspace-menu-item"><i class="fa-spinner fa-spin"></i>' + wsTr('workspaces.menu.loading', {}, 'Loading workspaces...') + '</div>';
+    menu.innerHTML = '<div class="workspace-menu-item"><i class="lucide lucide-loader-2 lucide-spin"></i>' + wsTr('workspaces.menu.loading', {}, 'Loading workspaces...') + '</div>';
     menu.style.display = 'block';
 
     fetch('/api/v1/workspaces', {
@@ -146,11 +146,11 @@ function loadAndShowWorkspaceMenu(menu) {
             if (data.success) {
                 displayWorkspaceMenu(menu, data.workspaces);
             } else {
-                menu.innerHTML = '<div class="workspace-menu-item"><i class="fa-exclamation-triangle"></i>' + wsTr('workspaces.menu.error_loading', {}, 'Error loading workspaces') + '</div>';
+                menu.innerHTML = '<div class="workspace-menu-item"><i class="lucide lucide-alert-triangle"></i>' + wsTr('workspaces.menu.error_loading', {}, 'Error loading workspaces') + '</div>';
             }
         })
         .catch(function (error) {
-            menu.innerHTML = '<div class="workspace-menu-item"><i class="fa-exclamation-triangle"></i>' + wsTr('workspaces.menu.error_loading', {}, 'Error loading workspaces') + '</div>';
+            menu.innerHTML = '<div class="workspace-menu-item"><i class="lucide lucide-alert-triangle"></i>' + wsTr('workspaces.menu.error_loading', {}, 'Error loading workspaces') + '</div>';
         });
 }
 
@@ -183,7 +183,7 @@ function displayWorkspaceMenu(menu, workspaces) {
         var workspace = workspaces[i];
         var isCurrent = workspace.name === currentWorkspace;
         var currentClass = isCurrent ? ' current-workspace' : '';
-        var icon = isCurrent ? 'fa-check-light-full' : 'fa-layer-group';
+        var icon = isCurrent ? 'lucide-check-circle' : 'lucide-layers';
         var safeName = workspace.name.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
         menuHtml += '<div class="workspace-menu-item' + currentClass + '" data-workspace-name="' + safeName + '">';
@@ -197,13 +197,13 @@ function displayWorkspaceMenu(menu, workspaces) {
 
     // Manage workspaces
     menuHtml += '<div class="workspace-menu-item" id="manage-workspaces-item">';
-    menuHtml += '<i class="fa-cog"></i>';
+    menuHtml += '<i class="lucide lucide-settings"></i>';
     menuHtml += '<span>' + wsTr('settings.cards.workspaces', {}, 'Workspaces') + '</span>';
     menuHtml += '</div>';
 
     // Logout
     menuHtml += '<div class="workspace-menu-item" id="logout-item">';
-    menuHtml += '<i class="fa-sign-out-alt"></i>';
+    menuHtml += '<i class="lucide lucide-log-out"></i>';
     menuHtml += '<span>' + wsTr('workspaces.menu.logout', {}, 'Logout') + '</span>';
     menuHtml += '</div>';
 

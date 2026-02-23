@@ -571,7 +571,7 @@ function handleFolderDragStart(e) {
     // Create a custom drag image
     var dragImage = document.createElement('div');
     dragImage.style.cssText = 'position: absolute; top: -1000px; padding: 10px 15px; background: rgba(0, 123, 255, 0.15); border: 2px solid rgba(0, 123, 255, 0.4); border-radius: 8px; font-weight: 500; color: #007bff; display: flex; align-items: center; gap: 8px;';
-    dragImage.innerHTML = '<i class="fa-folder"></i> ' + (folderName || 'Folder');
+    dragImage.innerHTML = '<i class="lucide lucide-folder"></i> ' + (folderName || 'Folder');
     document.body.appendChild(dragImage);
 
     try {

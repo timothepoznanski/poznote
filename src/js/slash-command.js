@@ -7,25 +7,25 @@
 
     // Available languages for code blocks (used by HTML and Markdown menus)
     var CODE_BLOCK_LANGUAGES = [
-        { id: 'code-javascript', icon: 'fa-code', iconColor: '#f7df1e', label: 'JavaScript', lang: 'javascript' },
-        { id: 'code-typescript', icon: 'fa-code', iconColor: '#3178c6', label: 'TypeScript', lang: 'typescript' },
-        { id: 'code-python', icon: 'fa-code', iconColor: '#3776ab', label: 'Python', lang: 'python' },
-        { id: 'code-html', icon: 'fa-code', iconColor: '#e34f26', label: 'HTML', lang: 'html' },
-        { id: 'code-css', icon: 'fa-code', iconColor: '#1572b6', label: 'CSS', lang: 'css' },
-        { id: 'code-json', icon: 'fa-code', iconColor: '#292929', label: 'JSON', lang: 'json' },
-        { id: 'code-bash', icon: 'fa-terminal', iconColor: '#4eaa25', label: 'Bash', lang: 'bash' },
-        { id: 'code-powershell', icon: 'fa-terminal', iconColor: '#012456', label: 'PowerShell', lang: 'powershell' },
-        { id: 'code-sql', icon: 'fa-database', iconColor: '#336791', label: 'SQL', lang: 'sql' },
-        { id: 'code-php', icon: 'fa-code', iconColor: '#777bb4', label: 'PHP', lang: 'php' },
-        { id: 'code-java', icon: 'fa-code', iconColor: '#007396', label: 'Java', lang: 'java' },
-        { id: 'code-csharp', icon: 'fa-code', iconColor: '#239120', label: 'C#', lang: 'csharp' },
-        { id: 'code-cpp', icon: 'fa-code', iconColor: '#00599c', label: 'C++', lang: 'cpp' },
-        { id: 'code-go', icon: 'fa-code', iconColor: '#00add8', label: 'Go', lang: 'go' },
-        { id: 'code-rust', icon: 'fa-code', iconColor: '#b7410e', label: 'Rust', lang: 'rust' },
-        { id: 'code-ruby', icon: 'fa-gem', iconColor: '#cc342d', label: 'Ruby', lang: 'ruby' },
-        { id: 'code-yaml', icon: 'fa-file-code', iconColor: '#cb171e', label: 'YAML', lang: 'yaml' },
-        { id: 'code-xml', icon: 'fa-file-code', iconColor: '#0060ac', label: 'XML', lang: 'xml' },
-        { id: 'code-markdown', icon: 'fa-file-code', iconColor: '#083fa1', label: 'Markdown', lang: 'markdown' }
+        { id: 'code-javascript', icon: 'lucide-code', iconColor: '#f7df1e', label: 'JavaScript', lang: 'javascript' },
+        { id: 'code-typescript', icon: 'lucide-code', iconColor: '#3178c6', label: 'TypeScript', lang: 'typescript' },
+        { id: 'code-python', icon: 'lucide-code', iconColor: '#3776ab', label: 'Python', lang: 'python' },
+        { id: 'code-html', icon: 'lucide-code', iconColor: '#e34f26', label: 'HTML', lang: 'html' },
+        { id: 'code-css', icon: 'lucide-code', iconColor: '#1572b6', label: 'CSS', lang: 'css' },
+        { id: 'code-json', icon: 'lucide-code', iconColor: '#292929', label: 'JSON', lang: 'json' },
+        { id: 'code-bash', icon: 'lucide-terminal', iconColor: '#4eaa25', label: 'Bash', lang: 'bash' },
+        { id: 'code-powershell', icon: 'lucide-terminal', iconColor: '#012456', label: 'PowerShell', lang: 'powershell' },
+        { id: 'code-sql', icon: 'lucide-database', iconColor: '#336791', label: 'SQL', lang: 'sql' },
+        { id: 'code-php', icon: 'lucide-code', iconColor: '#777bb4', label: 'PHP', lang: 'php' },
+        { id: 'code-java', icon: 'lucide-code', iconColor: '#007396', label: 'Java', lang: 'java' },
+        { id: 'code-csharp', icon: 'lucide-code', iconColor: '#239120', label: 'C#', lang: 'csharp' },
+        { id: 'code-cpp', icon: 'lucide-code', iconColor: '#00599c', label: 'C++', lang: 'cpp' },
+        { id: 'code-go', icon: 'lucide-code', iconColor: '#00add8', label: 'Go', lang: 'go' },
+        { id: 'code-rust', icon: 'lucide-code', iconColor: '#b7410e', label: 'Rust', lang: 'rust' },
+        { id: 'code-ruby', icon: 'lucide-gem', iconColor: '#cc342d', label: 'Ruby', lang: 'ruby' },
+        { id: 'code-yaml', icon: 'lucide-file-code', iconColor: '#cb171e', label: 'YAML', lang: 'yaml' },
+        { id: 'code-xml', icon: 'lucide-file-code', iconColor: '#0060ac', label: 'XML', lang: 'xml' },
+        { id: 'code-markdown', icon: 'lucide-file-code', iconColor: '#083fa1', label: 'Markdown', lang: 'markdown' }
     ];
 
     // Available callout / quote types
@@ -1072,7 +1072,7 @@
         return [
             {
                 id: 'emoji',
-                icon: 'fa-smile',
+                icon: 'lucide-smile',
                 label: t('slash_menu.emoji', null, 'Emoji'),
                 action: function () {
                     const input = savedEditableElement;
@@ -1094,7 +1094,7 @@
             },
             {
                 id: 'date',
-                icon: 'fa-calendar-alt',
+                icon: 'lucide-calendar-alt',
                 label: t('slash_menu.date', null, 'Date'),
                 action: function () {
                     const input = savedEditableElement;
@@ -1167,7 +1167,7 @@
         return {
             excalidraw: {
                 id: 'excalidraw',
-                icon: 'fal fa-paint-brush',
+                icon: 'lucide lucide-paint-brush',
                 label: t('slash_menu.excalidraw', null, 'Excalidraw'),
                 mobileHidden: true,
                 action: function () {
@@ -1178,7 +1178,7 @@
             },
             emoji: {
                 id: 'emoji',
-                icon: 'fa-smile',
+                icon: 'lucide-smile',
                 label: t('slash_menu.emoji', null, 'Emoji'),
                 mobileHidden: true,
                 action: function () {
@@ -1191,7 +1191,7 @@
             },
             noteReference: {
                 id: 'note-reference',
-                icon: 'fa fa-at',
+                icon: 'lucide lucide-at',
                 label: t('slash_menu.link_to_note', null, 'Link to note'),
                 action: function () {
                     if (typeof window.openNoteReferenceModal === 'function') {
@@ -1201,13 +1201,13 @@
             },
             image: {
                 id: 'image',
-                icon: 'fa fa-image',
+                icon: 'lucide lucide-image',
                 label: t('slash_menu.image', null, 'Image'),
                 action: function () { insertImage(); }
             },
             cancel: {
                 id: 'open-keyboard',
-                icon: 'fa-times-circle',
+                icon: 'lucide-times-circle',
                 label: t('slash_menu.cancel', null, 'Cancel'),
                 mobileOnly: true,
                 keepSlash: true,
@@ -1231,7 +1231,7 @@
         return [
             {
                 id: 'normal',
-                icon: 'fa-align-left',
+                icon: 'lucide-align-left',
                 label: t('slash_menu.back_to_normal', null, 'Back to normal text'),
                 action: function () {
                     insertNormalText();
@@ -1239,7 +1239,7 @@
             },
             {
                 id: 'title',
-                icon: 'fa-text-height',
+                icon: 'lucide-text-height',
                 label: t('slash_menu.title', null, 'Title'),
                 submenu: [
                     { id: 'h1', label: t('slash_menu.heading_1', null, 'Heading 1'), action: () => insertHeading(1) },
@@ -1249,38 +1249,38 @@
             },
             {
                 id: 'format',
-                icon: 'fa-bold',
+                icon: 'lucide-bold',
                 label: t('slash_menu.format_text', null, 'Format text'),
                 submenu: [
-                    { id: 'bold', icon: 'fa-bold', label: t('slash_menu.bold', null, 'Bold'), action: () => insertBold() },
-                    { id: 'italic', icon: 'fa-italic', label: t('slash_menu.italic', null, 'Italic'), action: () => insertItalic() },
-                    { id: 'highlight', icon: 'fa-fill-drip', label: t('slash_menu.highlight', null, 'Highlight'), action: () => insertHighlight() },
-                    { id: 'strikethrough', icon: 'fa-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => insertStrikethrough() }
+                    { id: 'bold', icon: 'lucide-bold', label: t('slash_menu.bold', null, 'Bold'), action: () => insertBold() },
+                    { id: 'italic', icon: 'lucide-italic', label: t('slash_menu.italic', null, 'Italic'), action: () => insertItalic() },
+                    { id: 'highlight', icon: 'lucide-fill-drip', label: t('slash_menu.highlight', null, 'Highlight'), action: () => insertHighlight() },
+                    { id: 'strikethrough', icon: 'lucide-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => insertStrikethrough() }
                 ]
             },
             {
                 id: 'color',
-                icon: 'fa-palette',
+                icon: 'lucide-palette',
                 label: t('slash_menu.color', null, 'Color'),
                 submenu: [
-                    { id: 'red', icon: 'fa-circle', iconColor: '#e74c3c', label: t('slash_menu.color_red', null, 'Red'), action: () => insertColor('#e74c3c') },
-                    { id: 'blue', icon: 'fa-circle', iconColor: '#3498db', label: t('slash_menu.color_blue', null, 'Blue'), action: () => insertColor('#3498db') },
-                    { id: 'green', icon: 'fa-circle', iconColor: '#2ecc71', label: t('slash_menu.color_green', null, 'Green'), action: () => insertColor('#2ecc71') },
-                    { id: 'yellow', icon: 'fa-circle', iconColor: '#f1c40f', label: t('slash_menu.color_yellow', null, 'Yellow'), action: () => insertColor('#f1c40f') },
-                    { id: 'purple', icon: 'fa-circle', iconColor: '#9b59b6', label: t('slash_menu.color_purple', null, 'Purple'), action: () => insertColor('#9b59b6') },
-                    { id: 'orange', icon: 'fa-circle', iconColor: '#e67e22', label: t('slash_menu.color_orange', null, 'Orange'), action: () => insertColor('#e67e22') },
-                    { id: 'black', icon: 'fa-circle', iconColor: '#000000', label: t('slash_menu.color_black', null, 'Black'), action: () => insertColor('inherit') }
+                    { id: 'red', icon: 'lucide-circle', iconColor: '#e74c3c', label: t('slash_menu.color_red', null, 'Red'), action: () => insertColor('#e74c3c') },
+                    { id: 'blue', icon: 'lucide-circle', iconColor: '#3498db', label: t('slash_menu.color_blue', null, 'Blue'), action: () => insertColor('#3498db') },
+                    { id: 'green', icon: 'lucide-circle', iconColor: '#2ecc71', label: t('slash_menu.color_green', null, 'Green'), action: () => insertColor('#2ecc71') },
+                    { id: 'yellow', icon: 'lucide-circle', iconColor: '#f1c40f', label: t('slash_menu.color_yellow', null, 'Yellow'), action: () => insertColor('#f1c40f') },
+                    { id: 'purple', icon: 'lucide-circle', iconColor: '#9b59b6', label: t('slash_menu.color_purple', null, 'Purple'), action: () => insertColor('#9b59b6') },
+                    { id: 'orange', icon: 'lucide-circle', iconColor: '#e67e22', label: t('slash_menu.color_orange', null, 'Orange'), action: () => insertColor('#e67e22') },
+                    { id: 'black', icon: 'lucide-circle', iconColor: '#000000', label: t('slash_menu.color_black', null, 'Black'), action: () => insertColor('inherit') }
                 ]
             },
             {
                 id: 'code',
-                icon: 'fa-code',
+                icon: 'lucide-code',
                 label: t('slash_menu.code', null, 'Code'),
                 submenu: [
-                    { id: 'inline-code', icon: 'fa-terminal', label: t('slash_menu.inline_code', null, 'Inline code'), action: () => insertCode() },
+                    { id: 'inline-code', icon: 'lucide-terminal', label: t('slash_menu.inline_code', null, 'Inline code'), action: () => insertCode() },
                     {
                         id: 'block-languages',
-                        icon: 'fa-laptop-code',
+                        icon: 'lucide-laptop-code',
                         label: t('slash_menu.block_languages', null, 'Block Languages'),
                         submenu: CODE_BLOCK_LANGUAGES.map(function (l) {
                             return { id: l.id, icon: l.icon, iconColor: l.iconColor, label: l.label, action: function () { insertCodeBlock(l.lang); } };
@@ -1290,14 +1290,14 @@
             },
             {
                 id: 'list',
-                icon: 'fa-list-ul',
+                icon: 'lucide-list-ul',
                 label: t('slash_menu.list', null, 'List'),
                 submenu: [
-                    { id: 'bullets', icon: 'fa-list-ul', label: t('slash_menu.bullet_list', null, 'Bullet list'), action: () => insertList(false) },
-                    { id: 'numbers', icon: 'fa-list-ol', label: t('slash_menu.numbered_list', null, 'Numbered list'), action: () => insertList(true) },
+                    { id: 'bullets', icon: 'lucide-list-ul', label: t('slash_menu.bullet_list', null, 'Bullet list'), action: () => insertList(false) },
+                    { id: 'numbers', icon: 'lucide-list-ol', label: t('slash_menu.numbered_list', null, 'Numbered list'), action: () => insertList(true) },
                     {
                         id: 'checklist',
-                        icon: 'fa-list-check',
+                        icon: 'lucide-list-check',
                         label: t('slash_menu.checklist', null, 'Checklist'),
                         action: () => {
                             if (typeof window.insertChecklist === 'function') {
@@ -1309,7 +1309,7 @@
             },
             {
                 id: 'quote',
-                icon: 'fa-info-circle',
+                icon: 'lucide-info-circle',
                 label: t('slash_menu.quote', null, 'Quote'),
                 submenu: CALLOUT_TYPES.map(function (c) {
                     return { id: c.id, label: t(c.labelKey, null, c.fallback), action: function () { insertCallout(c.id); } };
@@ -1317,12 +1317,12 @@
             },
             {
                 id: 'insert',
-                icon: 'fa-plus',
+                icon: 'lucide-plus',
                 label: t('slash_menu.insert', null, 'Insert'),
                 submenu: [
                     {
                         id: 'toggle',
-                        icon: 'fa-caret-down',
+                        icon: 'lucide-caret-down',
                         label: t('slash_menu.toggle', null, 'Toggle'),
                         action: function () {
                             insertToggle();
@@ -1330,7 +1330,7 @@
                     },
                     {
                         id: 'date',
-                        icon: 'fa-calendar-alt',
+                        icon: 'lucide-calendar-alt',
                         label: t('slash_menu.date', null, 'Date'),
                         mobileHidden: true,
                         action: function () {
@@ -1341,7 +1341,7 @@
                     common.emoji,
                     {
                         id: 'table',
-                        icon: 'fa-table',
+                        icon: 'lucide-table',
                         label: t('slash_menu.table', null, 'Table'),
                         action: function () {
                             if (typeof window.toggleTablePicker === 'function') {
@@ -1351,7 +1351,7 @@
                     },
                     {
                         id: 'separator',
-                        icon: 'fa-minus',
+                        icon: 'lucide-minus',
                         label: t('slash_menu.separator', null, 'Separator'),
                         action: function () {
                             if (typeof window.insertSeparator === 'function') {
@@ -1363,12 +1363,12 @@
             },
             {
                 id: 'link-menu',
-                icon: 'fa-link',
+                icon: 'lucide-link',
                 label: t('slash_menu.link', null, 'Link'),
                 submenu: [
                     {
                         id: 'link',
-                        icon: 'fa fa-link',
+                        icon: 'lucide lucide-link',
                         label: t('slash_menu.link', null, 'Link'),
                         action: function () {
                             if (typeof window.showLinkModal === 'function') {
@@ -1461,13 +1461,13 @@
             },
             {
                 id: 'media',
-                icon: 'fa-image',
+                icon: 'lucide-image',
                 label: t('slash_menu.media', null, 'Media'),
                 submenu: [
                     common.image,
                     {
                         id: 'youtube-video',
-                        icon: 'fa fa-video',
+                        icon: 'lucide lucide-video',
                         label: t('slash_menu.youtube', null, 'YouTube'),
                         action: function () {
                             if (typeof window.insertYouTubeVideo === 'function') {
@@ -1477,12 +1477,12 @@
                     },
                     {
                         id: 'streaming-videos',
-                        icon: 'fa-video',
+                        icon: 'lucide-video',
                         label: t('slash_menu.streaming_videos', null, 'Streaming videos'),
                         submenu: [
                             {
                                 id: 'bilibili-video',
-                                icon: 'fa fa-video',
+                                icon: 'lucide lucide-video',
                                 label: t('slash_menu.bilibili', null, 'Bilibili'),
                                 action: function () {
                                     if (typeof window.insertStreamingVideo === 'function') {
@@ -1494,7 +1494,7 @@
                     },
                     {
                         id: 'mp4-video',
-                        icon: 'fal fa-video',
+                        icon: 'lucide lucide-video',
                         label: t('slash_menu.mp4_video', null, 'MP4 video'),
                         action: function () {
                             if (typeof window.insertMp4Video === 'function') {
@@ -1504,7 +1504,7 @@
                     },
                     {
                         id: 'audio-file',
-                        icon: 'fal fa-music',
+                        icon: 'lucide lucide-music',
                         label: t('slash_menu.audio', null, 'Audio'),
                         action: function () {
                             if (typeof window.insertAudioFile === 'function') {
@@ -1527,7 +1527,7 @@
         return [
             {
                 id: 'title',
-                icon: 'fa-text-height',
+                icon: 'lucide-text-height',
                 label: t('slash_menu.title', null, 'Title'),
                 submenu: [
                     { id: 'h1', label: t('slash_menu.heading_1', null, 'Heading 1'), action: () => insertMarkdownPrefixAtLineStart('# ') },
@@ -1537,23 +1537,23 @@
             },
             {
                 id: 'format',
-                icon: 'fa-bold',
+                icon: 'lucide-bold',
                 label: t('slash_menu.format_text', null, 'Format text'),
                 submenu: [
-                    { id: 'bold', icon: 'fa-bold', label: t('slash_menu.bold', null, 'Bold'), action: () => wrapMarkdownSelection('**', '**', 2) },
-                    { id: 'italic', icon: 'fa-italic', label: t('slash_menu.italic', null, 'Italic'), action: () => wrapMarkdownSelection('*', '*', 1) },
-                    { id: 'strikethrough', icon: 'fa-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => wrapMarkdownSelection('~~', '~~', 2) }
+                    { id: 'bold', icon: 'lucide-bold', label: t('slash_menu.bold', null, 'Bold'), action: () => wrapMarkdownSelection('**', '**', 2) },
+                    { id: 'italic', icon: 'lucide-italic', label: t('slash_menu.italic', null, 'Italic'), action: () => wrapMarkdownSelection('*', '*', 1) },
+                    { id: 'strikethrough', icon: 'lucide-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => wrapMarkdownSelection('~~', '~~', 2) }
                 ]
             },
             {
                 id: 'code',
-                icon: 'fa-code',
+                icon: 'lucide-code',
                 label: t('slash_menu.code', null, 'Code'),
                 submenu: [
-                    { id: 'inline-code', icon: 'fa-terminal', label: t('slash_menu.inline_code', null, 'Inline code'), action: () => wrapMarkdownSelection('`', '`', 1) },
+                    { id: 'inline-code', icon: 'lucide-terminal', label: t('slash_menu.inline_code', null, 'Inline code'), action: () => wrapMarkdownSelection('`', '`', 1) },
                     {
                         id: 'block-languages',
-                        icon: 'fa-laptop-code',
+                        icon: 'lucide-laptop-code',
                         label: t('slash_menu.block_languages', null, 'Block Languages'),
                         submenu: CODE_BLOCK_LANGUAGES.map(function (l) {
                             return { id: l.id, icon: l.icon, iconColor: l.iconColor, label: l.label, action: function () { insertMarkdownAtCursor('```' + l.lang + '\n\n```\n', -5); } };
@@ -1563,17 +1563,17 @@
             },
             {
                 id: 'list',
-                icon: 'fa-list-ul',
+                icon: 'lucide-list-ul',
                 label: t('slash_menu.list', null, 'List'),
                 submenu: [
-                    { id: 'bullets', icon: 'fa-list-ul', label: t('slash_menu.bullet_list', null, 'Bullet list'), action: () => insertMarkdownPrefixAtLineStart('- ') },
-                    { id: 'numbers', icon: 'fa-list-ol', label: t('slash_menu.numbered_list', null, 'Numbered list'), action: () => insertMarkdownPrefixAtLineStart('1. ') },
-                    { id: 'checklist', icon: 'fa-list-check', label: t('slash_menu.checklist', null, 'Checklist'), action: () => insertMarkdownPrefixAtLineStart('- [ ] ') }
+                    { id: 'bullets', icon: 'lucide-list-ul', label: t('slash_menu.bullet_list', null, 'Bullet list'), action: () => insertMarkdownPrefixAtLineStart('- ') },
+                    { id: 'numbers', icon: 'lucide-list-ol', label: t('slash_menu.numbered_list', null, 'Numbered list'), action: () => insertMarkdownPrefixAtLineStart('1. ') },
+                    { id: 'checklist', icon: 'lucide-list-check', label: t('slash_menu.checklist', null, 'Checklist'), action: () => insertMarkdownPrefixAtLineStart('- [ ] ') }
                 ]
             },
             {
                 id: 'quote',
-                icon: 'fa-info-circle',
+                icon: 'lucide-info-circle',
                 label: t('slash_menu.quote', null, 'Quote'),
                 submenu: CALLOUT_TYPES.map(function (c) {
                     var prefix = c.id === 'plain' ? '> ' : '> ' + c.fallback + '\n> ';
@@ -1582,26 +1582,26 @@
             },
             {
                 id: 'color',
-                icon: 'fa-palette',
+                icon: 'lucide-palette',
                 label: t('slash_menu.color', null, 'Color'),
                 submenu: [
-                    { id: 'red', icon: 'fa-circle', iconColor: '#e74c3c', label: t('slash_menu.color_red', null, 'Red'), action: () => wrapMarkdownSelection('<span style="color:#e74c3c">', '</span>') },
-                    { id: 'blue', icon: 'fa-circle', iconColor: '#3498db', label: t('slash_menu.color_blue', null, 'Blue'), action: () => wrapMarkdownSelection('<span style="color:#3498db">', '</span>') },
-                    { id: 'green', icon: 'fa-circle', iconColor: '#2ecc71', label: t('slash_menu.color_green', null, 'Green'), action: () => wrapMarkdownSelection('<span style="color:#2ecc71">', '</span>') },
-                    { id: 'yellow', icon: 'fa-circle', iconColor: '#f1c40f', label: t('slash_menu.color_yellow', null, 'Yellow'), action: () => wrapMarkdownSelection('<span style="color:#f1c40f">', '</span>') },
-                    { id: 'purple', icon: 'fa-circle', iconColor: '#9b59b6', label: t('slash_menu.color_purple', null, 'Purple'), action: () => wrapMarkdownSelection('<span style="color:#9b59b6">', '</span>') },
-                    { id: 'orange', icon: 'fa-circle', iconColor: '#e67e22', label: t('slash_menu.color_orange', null, 'Orange'), action: () => wrapMarkdownSelection('<span style="color:#e67e22">', '</span>') },
-                    { id: 'bg-yellow', icon: 'fa-fill-drip', iconColor: '#f1c40f', label: t('slash_menu.bg_yellow', null, 'Yellow background'), action: () => wrapMarkdownSelection('<span style="background-color:#f1c40f">', '</span>') }
+                    { id: 'red', icon: 'lucide-circle', iconColor: '#e74c3c', label: t('slash_menu.color_red', null, 'Red'), action: () => wrapMarkdownSelection('<span style="color:#e74c3c">', '</span>') },
+                    { id: 'blue', icon: 'lucide-circle', iconColor: '#3498db', label: t('slash_menu.color_blue', null, 'Blue'), action: () => wrapMarkdownSelection('<span style="color:#3498db">', '</span>') },
+                    { id: 'green', icon: 'lucide-circle', iconColor: '#2ecc71', label: t('slash_menu.color_green', null, 'Green'), action: () => wrapMarkdownSelection('<span style="color:#2ecc71">', '</span>') },
+                    { id: 'yellow', icon: 'lucide-circle', iconColor: '#f1c40f', label: t('slash_menu.color_yellow', null, 'Yellow'), action: () => wrapMarkdownSelection('<span style="color:#f1c40f">', '</span>') },
+                    { id: 'purple', icon: 'lucide-circle', iconColor: '#9b59b6', label: t('slash_menu.color_purple', null, 'Purple'), action: () => wrapMarkdownSelection('<span style="color:#9b59b6">', '</span>') },
+                    { id: 'orange', icon: 'lucide-circle', iconColor: '#e67e22', label: t('slash_menu.color_orange', null, 'Orange'), action: () => wrapMarkdownSelection('<span style="color:#e67e22">', '</span>') },
+                    { id: 'bg-yellow', icon: 'lucide-fill-drip', iconColor: '#f1c40f', label: t('slash_menu.bg_yellow', null, 'Yellow background'), action: () => wrapMarkdownSelection('<span style="background-color:#f1c40f">', '</span>') }
                 ]
             },
             {
                 id: 'insert',
-                icon: 'fa-plus',
+                icon: 'lucide-plus',
                 label: t('slash_menu.insert', null, 'Insert'),
                 submenu: [
                     {
                         id: 'toggle',
-                        icon: 'fa-caret-down',
+                        icon: 'lucide-caret-down',
                         label: t('slash_menu.toggle', null, 'Toggle'),
                         action: function () {
                             // Automatically add empty lines before and after for better spacing
@@ -1610,7 +1610,7 @@
                     },
                     {
                         id: 'date',
-                        icon: 'fa-calendar-alt',
+                        icon: 'lucide-calendar-alt',
                         label: t('slash_menu.date', null, 'Date'),
                         mobileHidden: true,
                         action: function () {
@@ -1620,7 +1620,7 @@
                     common.emoji,
                     {
                         id: 'table',
-                        icon: 'fa-table',
+                        icon: 'lucide-table',
                         label: t('slash_menu.table', null, 'Table'),
                         action: function () {
                             insertMarkdownAtCursor('| Column | Column |\n| --- | --- |\n|  |  |\n', 0);
@@ -1628,7 +1628,7 @@
                     },
                     {
                         id: 'separator',
-                        icon: 'fa-minus',
+                        icon: 'lucide-minus',
                         label: t('slash_menu.separator', null, 'Separator'),
                         action: function () {
                             insertMarkdownAtCursor('\n---\n', 0);
@@ -1638,12 +1638,12 @@
             },
             {
                 id: 'link-menu',
-                icon: 'fa-link',
+                icon: 'lucide-link',
                 label: t('slash_menu.link', null, 'Link'),
                 submenu: [
                     {
                         id: 'link',
-                        icon: 'fa fa-link',
+                        icon: 'lucide lucide-link',
                         label: t('slash_menu.link', null, 'Link'),
                         action: function () {
                             if (typeof window.showLinkModal === 'function') {
@@ -1731,13 +1731,13 @@
             },
             {
                 id: 'media',
-                icon: 'fa-image',
+                icon: 'lucide-image',
                 label: t('slash_menu.media', null, 'Media'),
                 submenu: [
                     common.image,
                     {
                         id: 'youtube-video',
-                        icon: 'fa fa-video',
+                        icon: 'lucide lucide-video',
                         label: t('slash_menu.youtube', null, 'YouTube'),
                         action: function () {
                             if (typeof window.insertYouTubeVideoMarkdown === 'function') {
@@ -1747,12 +1747,12 @@
                     },
                     {
                         id: 'streaming-videos',
-                        icon: 'fa-video',
+                        icon: 'lucide-video',
                         label: t('slash_menu.streaming_videos', null, 'Streaming videos'),
                         submenu: [
                             {
                                 id: 'bilibili-video',
-                                icon: 'fa fa-video',
+                                icon: 'lucide lucide-video',
                                 label: t('slash_menu.bilibili', null, 'Bilibili'),
                                 action: function () {
                                     if (typeof window.insertStreamingVideoMarkdown === 'function') {
@@ -1764,7 +1764,7 @@
                     },
                     {
                         id: 'mp4-video',
-                        icon: 'fal fa-video',
+                        icon: 'lucide lucide-video',
                         label: t('slash_menu.mp4_video', null, 'MP4 video'),
                         action: function () {
                             if (typeof window.insertMp4VideoMarkdown === 'function') {
@@ -1774,7 +1774,7 @@
                     },
                     {
                         id: 'audio-file',
-                        icon: 'fal fa-music',
+                        icon: 'lucide lucide-music',
                         label: t('slash_menu.audio', null, 'Audio'),
                         action: function () {
                             if (typeof window.insertAudioFileMarkdown === 'function') {
@@ -1908,11 +1908,11 @@
             .map((cmd, idx) => {
                 const selectedClass = idx === selectedIndex ? ' selected' : '';
                 const hasSubmenu = cmd.submenu && cmd.submenu.length > 0;
-                const submenuIndicator = hasSubmenu ? '<i class="fa fa-chevron-right slash-command-submenu-indicator"></i>' : '';
+                const submenuIndicator = hasSubmenu ? '<i class="lucide lucide-chevron-right slash-command-submenu-indicator"></i>' : '';
                 const iconStyle = cmd.iconColor ? ' style="color: ' + cmd.iconColor + ';"' : '';
                 return (
                     '<div class="slash-command-item' + selectedClass + '" data-command-id="' + cmd.id + '" data-has-submenu="' + hasSubmenu + '">' +
-                    '<i class="slash-command-icon fa ' + cmd.icon + '"' + iconStyle + '></i>' +
+                    '<i class="slash-command-icon ' + cmd.icon + '"' + iconStyle + '></i>' +
                     '<span class="slash-command-label">' + escapeHtml(cmd.label) + '</span>' +
                     submenuIndicator +
                     '</div>'
@@ -1931,7 +1931,7 @@
         // Add back button on mobile
         if (isMobile) {
             html += '<div class="slash-command-item slash-command-back" data-action="back">' +
-                '<i class="fa fa-arrow-left" style="margin-right: 8px; width: 16px; display: inline-block; text-align: center;"></i>' +
+                '<i class="lucide lucide-arrow-left" style="margin-right: 8px; width: 16px; display: inline-block; text-align: center;"></i>' +
                 '<span class="slash-command-label">' + escapeHtml(t('slash_menu.back', null, 'Back')) + '</span>' +
                 '</div>';
         }
@@ -1941,11 +1941,9 @@
             .map((item, idx) => {
                 const selectedClass = idx === selectedSubmenuIndex ? ' selected' : '';
                 const hasSubmenu = item.submenu && item.submenu.length > 0;
-                const submenuIndicator = hasSubmenu ? '<i class="fa fa-chevron-right slash-command-submenu-indicator"></i>' : '';
+                const submenuIndicator = hasSubmenu ? '<i class="lucide lucide-chevron-right slash-command-submenu-indicator"></i>' : '';
                 const iconStyle = item.iconColor ? ' style="margin-right: 8px; width: 16px; display: inline-block; text-align: center; color: ' + item.iconColor + ';"' : ' style="margin-right: 8px; width: 16px; display: inline-block; text-align: center;"';
-                // If icon already has fa/fab/fal/fas prefix, use as-is, otherwise add 'fa '
-                const iconClass = item.icon && (item.icon.startsWith('fa ') || item.icon.startsWith('fab ') || item.icon.startsWith('fal ') || item.icon.startsWith('fas ')) ? item.icon : 'fa ' + item.icon;
-                const iconHtml = item.icon ? '<i class="slash-command-icon ' + iconClass + '"' + iconStyle + '></i>' : '';
+                const iconHtml = item.icon ? '<i class="slash-command-icon ' + item.icon + '"' + iconStyle + '></i>' : '';
                 return (
                     '<div class="slash-command-item' + selectedClass + '" data-submenu-id="' + item.id + '" data-has-sub-submenu="' + hasSubmenu + '">' +
                     iconHtml +
@@ -1969,7 +1967,7 @@
         // Add back button on mobile
         if (isMobile) {
             html += '<div class="slash-command-item slash-command-back" data-action="back-sub">' +
-                '<i class="fa fa-arrow-left" style="margin-right: 8px; width: 16px; display: inline-block; text-align: center;"></i>' +
+                '<i class="lucide lucide-arrow-left" style="margin-right: 8px; width: 16px; display: inline-block; text-align: center;"></i>' +
                 '<span class="slash-command-label">' + escapeHtml(t('slash_menu.back', null, 'Back')) + '</span>' +
                 '</div>';
         }
@@ -1978,7 +1976,7 @@
             .map((item, idx) => {
                 const selectedClass = idx === selectedSubSubmenuIndex ? ' selected' : '';
                 const iconStyle = item.iconColor ? ' style="margin-right: 8px; color: ' + item.iconColor + ';"' : ' style="margin-right: 8px;"';
-                // If icon already has fa/fab/fal/fas prefix, use as-is, otherwise it should already be complete
+                // If icon already has fa/fab/fal/prefix, use as-is, otherwise it should already be complete
                 const iconHtml = item.icon ? '<i class="slash-command-icon ' + item.icon + '"' + iconStyle + '></i>' : '';
                 return (
                     '<div class="slash-command-item' + selectedClass + '" data-sub-submenu-id="' + item.id + '">' +

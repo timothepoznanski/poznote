@@ -15,7 +15,7 @@
 }
 
 /* Folder Icon */
-.fa-folder.icon_folder {
+.lucide-folder.icon_folder {
     font-size: 14px;
     margin-right: 8px;
     flex-shrink: 0;
@@ -23,21 +23,6 @@
     line-height: 1;
     color: #6c757d;
     cursor: pointer;
-}
-
-.fa-folder.icon_folder::before {
-    font-family: "Font Awesome 5 Pro";
-    font-weight: 300;
-    content: "\f07b";
-    font-style: normal;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    display: inline-block;
-    font-variant: normal;
-    text-rendering: auto;
-    line-height: 1;
-    font-size: 1em;
-    vertical-align: middle;
 }
 
 /* Folder Name badge */
@@ -81,7 +66,7 @@
 }
 
 /* Tag Icon */
-.fa-tag.icon_tag {
+.lucide-tag.icon_tag {
     font-size: 14px;
     margin-right: 0 !important;
     flex-shrink: 0;
@@ -91,23 +76,8 @@
     color: #6c757d;
 }
 
-.fa-tag.icon_tag:hover {
+.lucide-tag.icon_tag:hover {
     opacity: 0.7;
-}
-
-.fa-tag.icon_tag::before {
-    font-family: "Font Awesome 5 Pro";
-    font-weight: 300;
-    content: "\f02c";
-    font-style: normal;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    display: inline-block;
-    font-variant: normal;
-    text-rendering: auto;
-    line-height: 1;
-    font-size: 0.875em;
-    vertical-align: middle;
 }
 
 /* Name Tags container */

@@ -168,15 +168,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $cache_v = urlencode(trim($cache_v));
     ?>
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
-    <link rel="stylesheet" href="css/fontawesome.min.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/all.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/light.min.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/home/base.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/home/search.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/home/alerts.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/home/cards.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/home/buttons.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/home/fontawesome.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/home/dark-mode.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/home/responsive.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/settings.css?v=<?php echo $cache_v; ?>">
@@ -225,21 +223,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         <?php if ($message): ?>
         <div class="alert alert-success">
-            <i class="fas fa-check-circle"></i>
+            <i class="lucide lucide-check-circle"></i>
             <?php echo htmlspecialchars($message); ?>
         </div>
         <?php endif; ?>
 
         <?php if ($warning): ?>
         <div class="alert alert-warning">
-            <i class="fas fa-exclamation-triangle"></i>
+            <i class="lucide lucide-alert-triangle-triangle"></i>
             <?php echo htmlspecialchars($warning); ?>
         </div>
         <?php endif; ?>
 
         <?php if ($error): ?>
         <div class="alert alert-error">
-            <i class="fas fa-exclamation-circle"></i>
+            <i class="lucide lucide-alert-triangle-circle"></i>
             <?php echo htmlspecialchars($error); ?>
         </div>
         <?php endif; ?>
@@ -247,10 +245,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         <?php if ($result && isset($result['debug']) && !empty($result['debug'])): ?>
         <div style="margin: 20px 0; display: flex; gap: 10px; justify-content: center;">
             <button id="debug-toggle-btn" class="btn btn-secondary" style="font-size: 12px;">
-                <i class="fas fa-bug"></i> <span id="debug-toggle-text"><?php echo tp_h('git_sync.debug.show'); ?></span>
+                <i class="lucide lucide-bug"></i> <span id="debug-toggle-text"><?php echo tp_h('git_sync.debug.show'); ?></span>
             </button>
             <button id="debug-copy-btn" class="btn btn-secondary" style="font-size: 12px; display: none;">
-                <i class="fas fa-copy"></i> <?php echo tp_h('git_sync.debug.copy'); ?>
+                <i class="lucide lucide-copy"></i> <?php echo tp_h('git_sync.debug.copy'); ?>
             </button>
         </div>
         <div id="debug-info" class="debug-info" style="display: none; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 15px; margin: 20px 0; max-height: 300px; overflow-y: auto;">
@@ -279,7 +277,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             navigator.clipboard.writeText(debugContent).then(function() {
                 const btn = document.getElementById('debug-copy-btn');
                 const originalHTML = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i> ' + <?php echo json_encode(tp_h('git_sync.debug.copied')); ?>;
+                btn.innerHTML = '<i class="lucide lucide-check"></i> ' + <?php echo json_encode(tp_h('git_sync.debug.copied')); ?>;
                 setTimeout(function() {
                     btn.innerHTML = originalHTML;
                 }, 2000);
@@ -314,7 +312,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                                 : rtrim($configStatus['apiBase'], '/api/v1') . "/" . htmlspecialchars($configStatus['repo']);
                             ?>
                             <a href="<?php echo $repoUrl; ?>" target="_blank" class="repo-link">
-                                <i class="<?php echo ($provider === 'github' ? 'fab fa-github' : 'fas fa-code-branch'); ?>"></i> <?php echo htmlspecialchars($configStatus['repo']); ?>
+                                <i class="<?php echo ($provider === 'github' ? 'lucide lucide-github' : 'lucide lucide-git-branch'); ?>"></i> <?php echo htmlspecialchars($configStatus['repo']); ?>
                             </a>
                         <?php else: ?>
                             <span class="not-configured"><?php echo tp_h('git_sync.config.not_configured'); ?></span>
@@ -341,7 +339,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             
             <?php if (!$configStatus['enabled']): ?>
             <div class="config-hint">
-                <i class="fas fa-info-circle"></i>
+                <i class="lucide lucide-info-circle"></i>
                 <?php echo tp_h('git_sync.config.hint'); ?>
             </div>
             <?php else: ?>
@@ -385,7 +383,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     <form method="post" class="sync-form">
                         <input type="hidden" name="action" value="push">
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-upload"></i> <span><?php echo tp_h('git_sync.actions.push.button'); ?></span>
+                            <i class="lucide lucide-upload"></i> <span><?php echo tp_h('git_sync.actions.push.button'); ?></span>
                         </button>
                     </form>
                 </div>
@@ -397,7 +395,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     <form method="post" class="sync-form">
                         <input type="hidden" name="action" value="pull">
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-download"></i> <span><?php echo tp_h('git_sync.actions.pull.button'); ?></span>
+                            <i class="lucide lucide-download"></i> <span><?php echo tp_h('git_sync.actions.pull.button'); ?></span>
                         </button>
                     </form>
                 </div>

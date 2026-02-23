@@ -1624,8 +1624,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
     <script src="js/theme-init.js"></script>
-    <link rel="stylesheet" href="css/fontawesome.min.css">
-    <link rel="stylesheet" href="css/light.min.css">
+    <link rel="stylesheet" href="css/lucide.css">
     <link rel="stylesheet" href="css/restore_import/base.css">
     <link rel="stylesheet" href="css/restore_import/cards.css">
     <link rel="stylesheet" href="css/restore_import/forms-buttons.css">

@@ -64,8 +64,8 @@
     text-align: right;
 }
 
-/* Icône ellipsis-v */
-.system-folder .fa-ellipsis-v.folder-icon {
+/* Ellipsis icon */
+.system-folder .lucide-more-vertical.folder-icon {
     font-size: clamp(11px, 2vw, 14px) !important;
     margin-right: 0 !important;
     color: #007DB8;
@@ -87,15 +87,8 @@
     display: none !important;
 }
 
-/* Icônes des dossiers système */
-.system-folder .fa-trash.folder-icon,
-.system-folder .fa-tags.folder-icon,
-.system-folder .fa-cloud.folder-icon,
-.system-folder .fa-star-light.folder-icon,
-.system-folder .fa-paperclip.folder-icon,
-.system-folder .fa-eye.folder-icon,
-.system-folder .fa-cog.folder-icon,
-.system-folder .fa-search.folder-icon {
+/* System folder icons */
+.system-folder [class*="lucide-"].folder-icon {
     font-size: clamp(11px, 2vw, 14px) !important;
     margin-right: 0 !important;
     color: #007DB8;

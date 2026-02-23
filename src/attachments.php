@@ -66,8 +66,7 @@ try {
     $v = urlencode(trim($v));
     ?>
     <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
-    <link rel="stylesheet" href="css/fontawesome.min.css">
-    <link rel="stylesheet" href="css/light.min.css">
+    <link rel="stylesheet" href="css/lucide.css">
     <link rel="stylesheet" href="css/attachments/base.css">
     <link rel="stylesheet" href="css/attachments/upload.css">
     <link rel="stylesheet" href="css/attachments/display.css">

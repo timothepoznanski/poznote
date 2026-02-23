@@ -29,12 +29,12 @@
 }
 
 /* Spin animation */
-.fa-spin {
-    -webkit-animation: fa-spin 2s infinite linear;
-    animation: fa-spin 2s infinite linear;
+.lucide-spin {
+    -webkit-animation: lucide-spin 2s infinite linear;
+    animation: lucide-spin 2s infinite linear;
 }
 
-@-webkit-keyframes fa-spin {
+@-webkit-keyframes lucide-spin {
     0% {
         -webkit-transform: rotate(0deg);
     }
@@ -43,7 +43,7 @@
     }
 }
 
-@keyframes fa-spin {
+@keyframes lucide-spin {
     0% {
         transform: rotate(0deg);
     }

@@ -124,8 +124,8 @@ body.dark-mode .markdown-preview li.task-list-item input[type="checkbox"]:checke
    ============================================ */
 
 /* Keep active toolbar icons with their original colors */
-html[data-theme='dark'] .toolbar-btn.save-modified .fa-save,
-body.dark-mode .toolbar-btn.save-modified .fa-save {
+html[data-theme='dark'] .toolbar-btn.save-modified .lucide-save,
+body.dark-mode .toolbar-btn.save-modified .lucide-save {
     filter: none !important;
 }
 
@@ -141,38 +141,38 @@ body.dark-mode .toolbar-btn.has-attachments i {
 
 /* Markdown view mode toggle button */
 html[data-theme='dark'] .toolbar-btn.markdown-view-mode-btn i,
-html[data-theme='dark'] .toolbar-btn.markdown-view-mode-btn [class*="fa-"],
+html[data-theme='dark'] .toolbar-btn.markdown-view-mode-btn [class*="lucide-"],
 body.dark-mode .toolbar-btn.markdown-view-mode-btn i,
-body.dark-mode .toolbar-btn.markdown-view-mode-btn [class*="fa-"] {
+body.dark-mode .toolbar-btn.markdown-view-mode-btn [class*="lucide-"] {
     color: #007DB8 !important;
     filter: none !important;
 }
 
 html[data-theme='dark'] .toolbar-btn.markdown-view-mode-btn:hover i,
-html[data-theme='dark'] .toolbar-btn.markdown-view-mode-btn:hover [class*="fa-"],
+html[data-theme='dark'] .toolbar-btn.markdown-view-mode-btn:hover [class*="lucide-"],
 body.dark-mode .toolbar-btn.markdown-view-mode-btn:hover i,
-body.dark-mode .toolbar-btn.markdown-view-mode-btn:hover [class*="fa-"] {
+body.dark-mode .toolbar-btn.markdown-view-mode-btn:hover [class*="lucide-"] {
     color: #007DB8 !important;
     filter: none !important;
     transform: scale(1.18);
 }
 
 /* Markdown toggle icons (legacy support) */
-html[data-theme='dark'] .markdown-edit-btn .fa-markdown,
-html[data-theme='dark'] .markdown-preview-btn .fa-eye,
+html[data-theme='dark'] .markdown-edit-btn [class*="lucide-"],
+html[data-theme='dark'] .markdown-preview-btn [class*="lucide-"],
 html[data-theme='dark'] .markdown-view-mode-btn i,
-body.dark-mode .markdown-edit-btn .fa-markdown,
-body.dark-mode .markdown-preview-btn .fa-eye,
+body.dark-mode .markdown-edit-btn [class*="lucide-"],
+body.dark-mode .markdown-preview-btn [class*="lucide-"],
 body.dark-mode .markdown-view-mode-btn i {
     color: #007DB8 !important;
     filter: none !important;
 }
 
-html[data-theme='dark'] .markdown-edit-btn:hover .fa-markdown,
-html[data-theme='dark'] .markdown-preview-btn:hover .fa-eye,
+html[data-theme='dark'] .markdown-edit-btn:hover [class*="lucide-"],
+html[data-theme='dark'] .markdown-preview-btn:hover [class*="lucide-"],
 html[data-theme='dark'] .markdown-view-mode-btn:hover i,
-body.dark-mode .markdown-edit-btn:hover .fa-markdown,
-body.dark-mode .markdown-preview-btn:hover .fa-eye,
+body.dark-mode .markdown-edit-btn:hover [class*="lucide-"],
+body.dark-mode .markdown-preview-btn:hover [class*="lucide-"],
 body.dark-mode .markdown-view-mode-btn:hover i {
     color: #007DB8 !important;
     filter: none !important;
@@ -187,17 +187,17 @@ body.dark-mode .markdown-split-btn:hover i {
 
 /* Markdown help button */
 html[data-theme='dark'] .toolbar-btn.markdown-help-btn i,
-html[data-theme='dark'] .toolbar-btn.markdown-help-btn [class*="fa-"],
+html[data-theme='dark'] .toolbar-btn.markdown-help-btn [class*="lucide-"],
 body.dark-mode .toolbar-btn.markdown-help-btn i,
-body.dark-mode .toolbar-btn.markdown-help-btn [class*="fa-"] {
+body.dark-mode .toolbar-btn.markdown-help-btn [class*="lucide-"] {
     color: #007DB8 !important;
     filter: none !important;
 }
 
 html[data-theme='dark'] .toolbar-btn.markdown-help-btn:hover i,
-html[data-theme='dark'] .toolbar-btn.markdown-help-btn:hover [class*="fa-"],
+html[data-theme='dark'] .toolbar-btn.markdown-help-btn:hover [class*="lucide-"],
 body.dark-mode .toolbar-btn.markdown-help-btn:hover i,
-body.dark-mode .toolbar-btn.markdown-help-btn:hover [class*="fa-"] {
+body.dark-mode .toolbar-btn.markdown-help-btn:hover [class*="lucide-"] {
     color: #007DB8 !important;
     filter: none !important;
     transform: scale(1.18);
@@ -205,9 +205,9 @@ body.dark-mode .toolbar-btn.markdown-help-btn:hover [class*="fa-"] {
 
 /* Markdown split view button - normal color */
 html[data-theme='dark'] .toolbar-btn.markdown-split-btn:hover i,
-html[data-theme='dark'] .toolbar-btn.markdown-split-btn:hover [class*="fa-"],
+html[data-theme='dark'] .toolbar-btn.markdown-split-btn:hover [class*="lucide-"],
 body.dark-mode .toolbar-btn.markdown-split-btn:hover i,
-body.dark-mode .toolbar-btn.markdown-split-btn:hover [class*="fa-"] {
+body.dark-mode .toolbar-btn.markdown-split-btn:hover [class*="lucide-"] {
     transform: scale(1.18);
 }
 

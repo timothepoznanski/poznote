@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Management of restore and permanent delete buttons
     document.addEventListener('click', function (e) {
-        if (e.target.classList.contains('fa-trash-restore-alt')) {
+        if (e.target.classList.contains('lucide-undo-2')) {
             e.preventDefault();
             const noteid = e.target.getAttribute('data-noteid');
             if (noteid) {
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        if (e.target.classList.contains('fa-trash')) {
+        if (e.target.classList.contains('lucide-trash-2')) {
             e.preventDefault();
             const noteid = e.target.getAttribute('data-noteid');
             if (noteid) {

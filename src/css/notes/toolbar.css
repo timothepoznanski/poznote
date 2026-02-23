@@ -46,33 +46,33 @@
 }
 
 /* Save icon - red when modified */
-.toolbar-btn.save-modified i.fa-save {
+.toolbar-btn.save-modified i.lucide-save {
     color: #ff0000 !important;
 }
 
-.toolbar-btn.save-modified:hover i.fa-save,
-.toolbar-btn.save-modified:focus i.fa-save {
+.toolbar-btn.save-modified:hover i.lucide-save,
+.toolbar-btn.save-modified:focus i.lucide-save {
     color: #ff0000 !important;
 }
 
 /* Save icon - inherit color when not modified */
-.toolbar-btn:not(.save-modified) i.fa-save {
+.toolbar-btn:not(.save-modified) i.lucide-save {
     color: inherit;
 }
 
 /* Palette & fill-drip icons - inherit by default, colored on hover */
-.toolbar-btn i.fa-palette,
-.toolbar-btn i.fa-fill-drip {
+.toolbar-btn i.lucide-palette,
+.toolbar-btn i.lucide-fill-drip {
     color: inherit !important;
 }
 
-.toolbar-btn:hover i.fa-palette,
-.toolbar-btn:focus i.fa-palette {
+.toolbar-btn:hover i.lucide-palette,
+.toolbar-btn:focus i.lucide-palette {
     color: #ff2222 !important;
 }
 
-.toolbar-btn:hover i.fa-fill-drip,
-.toolbar-btn:focus i.fa-fill-drip {
+.toolbar-btn:hover i.lucide-fill-drip,
+.toolbar-btn:focus i.lucide-fill-drip {
     color: #ffe066 !important;
 }
 

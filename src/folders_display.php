@@ -356,7 +356,7 @@ function generateFolderActions($folderId, $folderName, $con, $workspace_filter, 
     if ($folderName !== FAVORITES_FOLDER_NAME) {
         // Create three-dot menu
         $actions .= "<div class='folder-actions-toggle' data-action='toggle-folder-actions-menu' data-folder-id='$folderId' title='" . t_h('notes_list.folder_actions.menu', [], 'Actions') . "'>";
-        $actions .= "<i class='fa-ellipsis-v'></i>";
+        $actions .= "<i class='lucide lucide-more-vertical'></i>";
         $actions .= "</div>";
         
         // Create dropdown menu
@@ -364,34 +364,34 @@ function generateFolderActions($folderId, $folderName, $con, $workspace_filter, 
         
         // Create note action
         $actions .= "<div class='folder-actions-menu-item' data-action='create-note-in-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-        $actions .= "<i class='fa-plus-circle'></i>";
+        $actions .= "<i class='lucide lucide-plus-circle'></i>";
         $actions .= "<span>" . t_h('notes_list.folder_actions.create', [], 'Create note') . "</span>";
         $actions .= "</div>";
         
         // Kanban view action
         $actions .= "<div class='folder-actions-menu-item kanban-view-action' data-action='open-kanban-view' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-        $actions .= "<i class='fal fa-columns'></i>";
+        $actions .= "<i class='lucide lucide-columns-2'></i>";
         $actions .= "<span>" . t_h('notes_list.folder_actions.kanban_view', [], 'Kanban view') . "</span>";
         $actions .= "</div>";
         
         // Move all files action (only if folder has notes)
         if ($noteCount > 0) {
             $actions .= "<div class='folder-actions-menu-item' data-action='move-folder-files' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-            $actions .= "<i class='fa-folder-open'></i>";
+            $actions .= "<i class='lucide lucide-folder-open'></i>";
             $actions .= "<span>" . t_h('notes_list.folder_actions.move_all_files', [], 'Move all files') . "</span>";
             $actions .= "</div>";
         }
         
         // Move folder action
         $actions .= "<div class='folder-actions-menu-item' data-action='move-entire-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-        $actions .= "<i class='fa-share'></i>";
+        $actions .= "<i class='lucide lucide-share-2'></i>";
         $actions .= "<span>" . t_h('notes_list.folder_actions.move_folder', [], 'Move to subfolder') . "</span>";
         $actions .= "</div>";
         
         // Download folder action (only if folder has notes)
         if ($noteCount > 0) {
             $actions .= "<div class='folder-actions-menu-item' data-action='download-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-            $actions .= "<i class='fa-download'></i>";
+            $actions .= "<i class='lucide lucide-download'></i>";
             $actions .= "<span>" . t_h('notes_list.folder_actions.download_folder', [], 'Download folder') . "</span>";
             $actions .= "</div>";
         }
@@ -399,33 +399,33 @@ function generateFolderActions($folderId, $folderName, $con, $workspace_filter, 
         // Share folder action
         if ($isShared) {
             $actions .= "<div class='folder-actions-menu-item shared' data-action='share-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-            $actions .= "<i class='fa-cloud'></i>";
+            $actions .= "<i class='lucide lucide-cloud'></i>";
             $actions .= "<span>" . t_h('notes_list.folder_actions.is_public', [], 'Is public') . "</span>";
             $actions .= "</div>";
         } else {
             $actions .= "<div class='folder-actions-menu-item' data-action='share-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-            $actions .= "<i class='fa-cloud'></i>";
+            $actions .= "<i class='lucide lucide-cloud'></i>";
             $actions .= "<span>" . t_h('notes_list.folder_actions.share_folder', [], 'Make public') . "</span>";
             $actions .= "</div>";
         }
         
         // Rename folder action
         $actions .= "<div class='folder-actions-menu-item' data-action='rename-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-        $actions .= "<i class='fa-edit'></i>";
+        $actions .= "<i class='lucide lucide-pencil'></i>";
         $actions .= "<span>" . t_h('notes_list.folder_actions.rename_folder', [], 'Rename') . "</span>";
         $actions .= "</div>";
         
         // Change folder icon action
         $actions .= "<div class='folder-actions-menu-item' data-action='change-folder-icon' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-        $actions .= "<i class='fa-palette'></i>";
+        $actions .= "<i class='lucide lucide-palette'></i>";
         $actions .= "<span>" . t_h('notes_list.folder_actions.change_icon', [], 'Change icon') . "</span>";
         $actions .= "</div>";
         
         // Sort Options Definition
         $sortTypes = [
-            'alphabet' => ['icon' => 'fal fa-sort-alpha-down', 'label' => t_h('sort.alphabet', [], 'Name')],
-            'created' => ['icon' => 'fal fa-calendar-plus', 'label' => t_h('sort.created', [], 'Date Created')],
-            'modified' => ['icon' => 'fal fa-calendar-alt', 'label' => t_h('sort.modified', [], 'Date Modified')]
+            'alphabet' => ['icon' => 'lucide lucide-arrow-down-a-z', 'label' => t_h('sort.alphabet', [], 'Name')],
+            'created' => ['icon' => 'lucide lucide-calendar-plus', 'label' => t_h('sort.created', [], 'Date Created')],
+            'modified' => ['icon' => 'lucide lucide-calendar', 'label' => t_h('sort.modified', [], 'Date Modified')]
         ];
 
         // Determine active label
@@ -433,7 +433,7 @@ function generateFolderActions($folderId, $folderName, $con, $workspace_filter, 
 
         // Sort Submenu Toggle (Accordion style)
         $actions .= "<div class='folder-actions-menu-item' data-action='toggle-sort-submenu' data-folder-id='$folderId'>";
-        $actions .= "<i class='fal fa-sort-amount-down'></i>";
+        $actions .= "<i class='lucide lucide-arrow-up-down-amount-down'></i>";
         $actions .= "<span class='sort-header-label'>" . $currentLabel . "</span>";
         $actions .= "</div>";
 
@@ -453,7 +453,7 @@ function generateFolderActions($folderId, $folderName, $con, $workspace_filter, 
         
         // Delete folder action
         $actions .= "<div class='folder-actions-menu-item danger' data-action='delete-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-        $actions .= "<i class='fa-trash'></i>";
+        $actions .= "<i class='lucide lucide-trash-2'></i>";
         $actions .= "<span>" . t_h('notes_list.folder_actions.delete_folder', [], 'Delete') . "</span>";
         $actions .= "</div>";
         

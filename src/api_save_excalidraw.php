@@ -445,7 +445,7 @@ function saveEmbeddedDiagram() {
             // Use attachment URL instead of base64
             $diagram_html_core .= '<img src="/api/v1/notes/' . $note_id . '/attachments/' . $attachmentId . '" class="' . $img_classes . '" data-is-excalidraw="true"' . $img_style_attr . ' alt="Excalidraw diagram" />';
         } else {
-            $diagram_html_core .= '<i class="fa fa-draw-polygon" style="font-size: 48px; color: #666; margin-bottom: 10px;"></i>
+            $diagram_html_core .= '<i class="lucide lucide-draw-polygon" style="font-size: 48px; color: #666; margin-bottom: 10px;"></i>
                               <p style="color: #666; font-size: 16px; margin: 0;">Excalidraw diagram</p>';
         }
         

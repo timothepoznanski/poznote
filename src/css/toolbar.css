@@ -322,9 +322,9 @@ body:not(.has-background-image) .note-header {
     box-sizing: border-box;
 }
 
-/* Réduire la taille des icônes Font Awesome dans la toolbar */
+/* Reduce the size of Lucide icons in the toolbar */
 .toolbar-btn i,
-.toolbar-btn [class*="fa-"] {
+.toolbar-btn [class*="lucide-"] {
     font-size: 0.75em !important;
 }
 

@@ -132,7 +132,7 @@ async function loadAttachments() {
     } catch (error) {
         if (spinner) spinner.style.display = 'none';
         if (container) {
-            container.innerHTML = '<div class="error-message"><i class="fa-exclamation-triangle"></i> Error: ' + escapeHtml(error.message) + '</div>';
+            container.innerHTML = '<div class="error-message"><i class="lucide lucide-alert-triangle"></i> Error: ' + escapeHtml(error.message) + '</div>';
         }
     }
 }
@@ -203,7 +203,7 @@ function renderRows() {
             }
 
             return `<div class="attachment-file-item">
-                <i class="fa-paperclip"></i>
+                <i class="lucide lucide-paperclip"></i>
                 <div class="attachment-file-content">
                     <a href="#" class="attachment-file-link" data-attachment-id="${att.id}" data-note-id="${row.noteId}" title="${escapeHtml(att.filename)}">${escapeHtml(att.filename)}</a>
                     ${preview}

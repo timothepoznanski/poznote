@@ -1309,16 +1309,16 @@ function toggleFolder(folderId) {
         content.style.display = 'block';
         // show open folder icon (only if not custom and not favorites)
         if (icon && !isFavoritesFolder && !isCustomIcon) {
-            icon.classList.remove('fa-folder');
-            icon.classList.add('fa-folder-open');
+            icon.classList.remove('lucide-folder');
+            icon.classList.add('lucide-folder-open');
         }
         localStorage.setItem('folder_' + folderId, 'open');
     } else {
         content.style.display = 'none';
         // show closed folder icon (only if not custom and not favorites)
         if (icon && !isFavoritesFolder && !isCustomIcon) {
-            icon.classList.remove('fa-folder-open');
-            icon.classList.add('fa-folder');
+            icon.classList.remove('lucide-folder-open');
+            icon.classList.add('lucide-folder');
         }
         localStorage.setItem('folder_' + folderId, 'closed');
     }
@@ -1402,15 +1402,15 @@ function restoreFolderStates() {
             // User explicitly opened this folder - keep it open
             folderContent.style.display = 'block';
             if (icon && !isFavoritesFolder && !isCustomIcon) {
-                icon.classList.remove('fa-folder');
-                icon.classList.add('fa-folder-open');
+                icon.classList.remove('lucide-folder');
+                icon.classList.add('lucide-folder-open');
             }
         } else if (savedState === 'closed') {
             // User explicitly closed this folder - keep it closed
             folderContent.style.display = 'none';
             if (icon && !isFavoritesFolder && !isCustomIcon) {
-                icon.classList.remove('fa-folder-open');
-                icon.classList.add('fa-folder');
+                icon.classList.remove('lucide-folder-open');
+                icon.classList.add('lucide-folder');
             }
         }
         // If no saved state exists, leave the folder as it was set by PHP logic
@@ -2397,7 +2397,7 @@ function openKanbanView(folderId, folderName) {
     }
 
     // Show loading state
-    rightCol.innerHTML = '<div class="kanban-loading" style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-secondary);"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-right: 12px;"></i> ' +
+    rightCol.innerHTML = '<div class="kanban-loading" style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-secondary);"><i class="lucide lucide-loader-2 lucide-spin" style="font-size: 2rem; margin-right: 12px;"></i> ' +
         (window.t ? window.t('common.loading', null, 'Loading...') : 'Loading...') + '</div>';
 
     // Build AJAX URL
@@ -2452,7 +2452,7 @@ function openKanbanView(folderId, folderName) {
         .catch(function (error) {
             console.error('Failed to load Kanban view:', error);
             rightCol.innerHTML = '<div class="kanban-error" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-secondary);">' +
-                '<i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 16px; color: #f59e0b;"></i>' +
+                '<i class="lucide lucide-alert-triangle-triangle" style="font-size: 3rem; margin-bottom: 16px; color: #f59e0b;"></i>' +
                 '<p>' + (window.t ? window.t('common.error', null, 'Error') : 'Error') + '</p>' +
                 '<button onclick="closeKanbanView()" class="btn btn-primary" style="margin-top: 16px;">' +
                 (window.t ? window.t('common.back_to_notes', null, 'Back to Notes') : 'Back to Notes') + '</button></div>';

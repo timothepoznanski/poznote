@@ -276,7 +276,7 @@
         item.innerHTML = `
             <div class="note-reference-item-content">
                 <span class="note-reference-item-title">${escapeHtml(heading)}</span>
-                ${folder ? `<span class="note-reference-item-folder"><i class="fa-folder"></i> ${escapeHtml(folder)}</span>` : ''}
+                ${folder ? `<span class="note-reference-item-folder"><i class="lucide lucide-folder"></i> ${escapeHtml(folder)}</span>` : ''}
             </div>
         `;
         
@@ -297,7 +297,7 @@
         const recentLabel = document.querySelector('.note-reference-recent-label');
         if (!listContainer) return;
         
-        listContainer.innerHTML = '<div class="note-reference-loading"><i class="fa-spinner fa-spin"></i> ' + tr('note_reference.loading', {}, 'Loading...') + '</div>';
+        listContainer.innerHTML = '<div class="note-reference-loading"><i class="lucide lucide-loader-2 lucide-spin"></i> ' + tr('note_reference.loading', {}, 'Loading...') + '</div>';
         
         try {
             const workspace = getCurrentWorkspace();

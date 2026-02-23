@@ -304,10 +304,10 @@ function displayAttachments(attachments) {
         html += '</div>';
         html += '<div class="attachment-actions">';
         html += '<button onclick="downloadAttachment(\'' + attachment.id + '\')" title="' + titleView + '">';
-        html += '<i class="fa-eye"></i>';
+        html += '<i class="lucide lucide-eye"></i>';
         html += '</button>';
         html += '<button onclick="deleteAttachment(\'' + attachment.id + '\')" title="' + titleDelete + '" class="delete-btn">';
-        html += '<i class="fa-trash"></i>';
+        html += '<i class="lucide lucide-trash-2"></i>';
         html += '</button>';
         html += '</div>';
         html += '</div>';
@@ -411,7 +411,7 @@ function updateAttachmentCountInMenu(noteId) {
                     var attachmentItems = menu.querySelectorAll('.dropdown-item');
                     for (var i = 0; i < attachmentItems.length; i++) {
                         var item = attachmentItems[i];
-                        if (item.innerHTML.includes('fa-paperclip')) {
+                        if (item.innerHTML.includes('lucide-paperclip')) {
                             if (hasAttachments) {
                                 item.classList.add('has-attachments');
                             } else {
@@ -479,7 +479,7 @@ function updateAttachmentCountInMenu(noteId) {
 
                         // Build the HTML content
                         var openAttachmentsLabel = tr('attachments.actions.open_attachments', {}, 'Open attachments');
-                        var attachmentsHtml = '<button type="button" class="icon-attachment-btn" title="' + openAttachmentsLabel + '" onclick="showAttachmentDialog(\'' + noteId + '\')" aria-label="' + openAttachmentsLabel + '"><span class="fa-paperclip icon_attachment"></span></button>';
+                        var attachmentsHtml = '<button type="button" class="icon-attachment-btn" title="' + openAttachmentsLabel + '" onclick="showAttachmentDialog(\'' + noteId + '\')" aria-label="' + openAttachmentsLabel + '"><span class="lucide lucide-paperclip icon_attachment"></span></button>';
                         attachmentsHtml += '<span class="note-attachments-list">';
 
                         var attachmentLinks = [];

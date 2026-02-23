@@ -345,10 +345,10 @@ function toggleAdvancedImport() {
 
     if (advancedOptions.style.display === 'none') {
         advancedOptions.style.display = 'block';
-        toggleButton.innerHTML = '<i class="fa-chevron-up"></i> ' + tr('restore_import.advanced.hide', 'Hide Advanced Import Options');
+        toggleButton.innerHTML = '<i class="lucide lucide-chevron-up"></i> ' + tr('restore_import.advanced.hide', 'Hide Advanced Import Options');
     } else {
         advancedOptions.style.display = 'none';
-        toggleButton.innerHTML = '<i class="fa-chevron-down"></i> ' + tr('restore_import.advanced.show', 'Show Advanced Import Options');
+        toggleButton.innerHTML = '<i class="lucide lucide-chevron-down"></i> ' + tr('restore_import.advanced.show', 'Show Advanced Import Options');
     }
 }
 
@@ -874,7 +874,7 @@ async function runRepair(btn) {
     showStatusConfirm(confirmTitle, confirmMsg, async () => {
         const originalHtml = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + tr('multiuser.admin.processing', 'Processing...');
+        btn.innerHTML = '<i class="lucide lucide-loader-2 lucide-spin"></i> ' + tr('multiuser.admin.processing', 'Processing...');
 
         try {
             const response = await fetch('/api/v1/admin/repair', {

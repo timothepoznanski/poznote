@@ -808,11 +808,11 @@ function buildImageMenuHTML(img) {
 
     let menuHTML = `
         <div class="image-menu-item" data-action="view-large">
-            <i class="fa-expand"></i>
+            <i class="lucide-maximize-2"></i>
             ${t('image_menu.view_large', null, 'View Large')}
         </div>
         <div class="image-menu-item" data-action="download">
-            <i class="fa-download"></i>
+            <i class="lucide lucide-download"></i>
             ${t('image_menu.download', null, 'Download')}
         </div>
     `;
@@ -821,7 +821,7 @@ function buildImageMenuHTML(img) {
     if (!isMobile && !isMarkdownNote) {
         menuHTML += `
         <div class="image-menu-item" data-action="resize">
-            <i class="fa-maximize"></i>
+            <i class="lucide-maximize"></i>
             ${t('image_menu.resize', null, 'Resize')}
         </div>
     `;
@@ -831,7 +831,7 @@ function buildImageMenuHTML(img) {
     if (isExcalidraw && excalidrawNoteId && !isMobile) {
         menuHTML = `
             <div class="image-menu-item" data-action="edit-excalidraw" data-note-id="${excalidrawNoteId}">
-                <i class="fa-edit"></i>
+                <i class="lucide lucide-pencil"></i>
                 ${t('image_menu.edit', null, 'Edit')}
             </div>
         ` + menuHTML;
@@ -841,7 +841,7 @@ function buildImageMenuHTML(img) {
     if (isEmbeddedExcalidraw && diagramId && !isMobile) {
         menuHTML = `
             <div class="image-menu-item" data-action="edit-embedded-excalidraw" data-diagram-id="${diagramId}">
-                <i class="fa-edit"></i>
+                <i class="lucide lucide-pencil"></i>
                 ${t('image_menu.edit', null, 'Edit')}
             </div>
         ` + menuHTML;
@@ -854,7 +854,7 @@ function buildImageMenuHTML(img) {
     if (!existingLink) {
         menuHTML += `
             <div class="image-menu-item" data-action="add-link">
-                <i class="fas fa-link"></i>
+                <i class="lucide lucide-link"></i>
                 ${t('image_menu.add_link', null, 'Ajouter un lien')}
             </div>
         `;
@@ -886,9 +886,9 @@ function buildImageMenuHTML(img) {
         // Add link submenu parent
         menuHTML += `
             <div class="image-menu-item image-menu-parent" data-action="link-submenu" data-submenu-html="${encodeURIComponent(linkSubmenuHTML)}">
-                <i class="fas fa-link"></i>
+                <i class="lucide lucide-link"></i>
                 ${t('image_menu.links', null, 'Liens')}
-                <i class="fas fa-chevron-right" style="margin-left: auto; font-size: 10px;"></i>
+                <i class="lucide lucide-chevron-right" style="margin-left: auto; font-size: 10px;"></i>
             </div>
         `;
     }
@@ -899,11 +899,11 @@ function buildImageMenuHTML(img) {
         const hasBorderNoPadding = img.classList.contains('img-with-border-no-padding');
         menuHTML += `
             <div class="image-menu-item" data-action="toggle-border">
-                <i class="fal fa-square"></i>
+                <i class="lucide lucide-square"></i>
                 ${hasBorder ? t('image_menu.remove_border', null, 'Remove Border') : t('image_menu.add_border', null, 'Add Border')}
             </div>
             <div class="image-menu-item" data-action="toggle-border-no-padding">
-                <i class="fal fa-square"></i>
+                <i class="lucide lucide-square"></i>
                 ${hasBorderNoPadding ? t('image_menu.remove_border_no_padding', null, 'Remove Border without padding') : t('image_menu.add_border_no_padding', null, 'Add Border without padding')}
             </div>
         `;
@@ -911,7 +911,7 @@ function buildImageMenuHTML(img) {
         // Add Delete option at the end
         menuHTML += `
             <div class="image-menu-item" data-action="delete-image" style="color: #dc3545;">
-                <i class="fas fa-trash"></i>
+                <i class="lucide lucide-trash-2"></i>
                 ${t('image_menu.delete_image', null, 'Delete Image')}
             </div>
         `;
@@ -968,7 +968,7 @@ function createImageSubmenu(menu, img) {
         submenu.style.left = Math.max(padding, x) + 'px';
         submenu.style.top = Math.max(padding, y) + 'px';
 
-        const chevron = linkParent.querySelector('.fa-chevron-right');
+        const chevron = linkParent.querySelector('.lucide-chevron-right');
         if (chevron) {
             chevron.style.transform = 'rotate(90deg)';
         }
@@ -981,7 +981,7 @@ function createImageSubmenu(menu, img) {
             setTimeout(() => {
                 if (!submenu.matches(':hover')) {
                     submenu.style.display = 'none';
-                    const chevron = linkParent.querySelector('.fa-chevron-right');
+                    const chevron = linkParent.querySelector('.lucide-chevron-right');
                     if (chevron) {
                         chevron.style.transform = '';
                     }
@@ -994,7 +994,7 @@ function createImageSubmenu(menu, img) {
         const relatedTarget = e.relatedTarget;
         if (!relatedTarget || (!linkParent.contains(relatedTarget) && relatedTarget !== linkParent)) {
             submenu.style.display = 'none';
-            const chevron = linkParent.querySelector('.fa-chevron-right');
+            const chevron = linkParent.querySelector('.lucide-chevron-right');
             if (chevron) {
                 chevron.style.transform = '';
             }

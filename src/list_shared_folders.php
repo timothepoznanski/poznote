@@ -107,11 +107,7 @@ $currentLang = getUserLanguage();
 	<title><?php echo getPageTitle(); ?></title>
 	<meta name="color-scheme" content="dark light">
 	<script src="js/theme-init.js"></script>
-	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
-	<link type="text/css" rel="stylesheet" href="css/solid.min.css"/>
-	<link type="text/css" rel="stylesheet" href="css/regular.min.css"/>
-	<link type="text/css" rel="stylesheet" href="css/brands.min.css"/>
-	<link type="text/css" rel="stylesheet" href="css/light.min.css"/>
+	<link type="text/css" rel="stylesheet" href="css/lucide.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/base.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/attachments.css"/>
@@ -123,7 +119,7 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="css/shared/notes-list.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/buttons-modal.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/folders-grid.css"/>
-	<link type="text/css" rel="stylesheet" href="css/shared/fontawesome.css"/>
+	<link type="text/css" rel="stylesheet" href="css/lucide.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/dark-mode.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/responsive.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css"/>
@@ -174,7 +170,7 @@ $currentLang = getUserLanguage();
 					placeholder="<?php echo t_h('shared_folders.filter_placeholder', [], 'Filter by folder name...'); ?>"
 				/>
 				<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
-					<i class="fa-times"></i>
+					<i class="lucide lucide-x"></i>
 				</button>
 			</div>
 			<div id="filterStats" class="filter-stats initially-hidden"></div>
@@ -193,7 +189,7 @@ $currentLang = getUserLanguage();
 				$folder_id = htmlspecialchars($folder['folder_id'] ?? '', ENT_QUOTES);
 				$folder_name = htmlspecialchars($folder['folder_name'] ?? '', ENT_QUOTES);
 				$folder_path = htmlspecialchars($folder['folder_path'] ?? '', ENT_QUOTES);
-				$folder_icon = !empty($folder['folder_icon']) ? htmlspecialchars($folder['folder_icon'], ENT_QUOTES) : 'fa-folder';
+				$folder_icon = !empty($folder['folder_icon']) ? htmlspecialchars($folder['folder_icon'], ENT_QUOTES) : 'lucide-folder';
 				$token = htmlspecialchars($folder['token'] ?? '', ENT_QUOTES);
 				$has_password = !empty($folder['password']);
 				$indexable = (int)$folder['indexable'] === 1;
@@ -212,7 +208,7 @@ $currentLang = getUserLanguage();
 				
 				// Folder name container
 				echo '<div class="note-name-container">';
-				echo '<span class="folder-name-path" title="' . $folder_path . '"><i class="fas fa-folder"></i> ' . $folder_path . ' (' . $note_count . ')</span>';
+				echo '<span class="folder-name-path" title="' . $folder_path . '"><i class="lucide lucide-folder"></i> ' . $folder_path . ' (' . $note_count . ')</span>';
 				echo '</div>';
 				
 				// Token (editable if direct)
@@ -224,18 +220,18 @@ $currentLang = getUserLanguage();
 				// Password button
 				if ($is_direct) {
 					if ($has_password) {
-						echo '<button class="btn btn-sm btn-password" data-folder-id="' . $folder_id . '" data-has-password="1" title="' . t_h('public.password_protected', [], 'Password protected') . '"><i class="fa-lock"></i></button>';
+						echo '<button class="btn btn-sm btn-password" data-folder-id="' . $folder_id . '" data-has-password="1" title="' . t_h('public.password_protected', [], 'Password protected') . '"><i class="lucide lucide-lock"></i></button>';
 					} else {
-						echo '<button class="btn btn-sm btn-password" data-folder-id="' . $folder_id . '" data-has-password="0" title="' . t_h('public.add_password_title', [], 'Add password protection') . '"><i class="fa-lock-open"></i></button>';
+						echo '<button class="btn btn-sm btn-password" data-folder-id="' . $folder_id . '" data-has-password="0" title="' . t_h('public.add_password_title', [], 'Add password protection') . '"><i class="lucide lucide-lock-open"></i></button>';
 					}
 				}
 				
 				// Open button
-				echo '<button class="btn btn-sm btn-secondary btn-open" data-url="' . htmlspecialchars($public_url, ENT_QUOTES) . '" title="' . t_h('public.actions.open', [], 'Open public view') . '"><i class="fa-external-link"></i></button>';
+				echo '<button class="btn btn-sm btn-secondary btn-open" data-url="' . htmlspecialchars($public_url, ENT_QUOTES) . '" title="' . t_h('public.actions.open', [], 'Open public view') . '"><i class="lucide lucide-external-link"></i></button>';
 				
 				// Revoke button
 				if ($is_direct) {
-					echo '<button class="btn btn-sm btn-danger btn-revoke" data-folder-id="' . $folder_id . '" title="' . t_h('public.actions.revoke', [], 'Revoke') . '"><i class="fa-ban"></i></button>';
+					echo '<button class="btn btn-sm btn-danger btn-revoke" data-folder-id="' . $folder_id . '" title="' . t_h('public.actions.revoke', [], 'Revoke') . '"><i class="lucide lucide-ban"></i></button>';
 				}
 				
 				echo '</div>';

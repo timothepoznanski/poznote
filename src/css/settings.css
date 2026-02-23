@@ -73,9 +73,6 @@
     cursor: pointer;
 }
 
-/* Ensure font awesome icons work if not covered by home.css */
-/* home.css covers most, but let's ensure compatibility */
-
 /* Settings Category Titles */
 .settings-category-title {
     font-size: 1.1rem;

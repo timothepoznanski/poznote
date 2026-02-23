@@ -21,7 +21,7 @@ $isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
 $showGitSync = $gitEnabled && $isAdmin; // For processing actions
 $showGitTiles = $isAdmin; // Always show tiles for admin, even if not configured
 $gitProviderParams = ['provider' => getGitProviderName()];
-$gitIcon = (defined('GIT_PROVIDER') && GIT_PROVIDER === 'forgejo') ? 'fas fa-code-branch' : 'fab fa-github';
+$gitIcon = (defined('GIT_PROVIDER') && GIT_PROVIDER === 'forgejo') ? 'lucide lucide-git-branch' : 'lucide lucide-github';
 
 $syncMessage = '';
 $syncWarning = '';
@@ -314,10 +314,7 @@ try {
     $cache_v = urlencode(trim($cache_v));
     ?>
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
-    <link type="text/css" rel="stylesheet" href="css/fontawesome.min.css?v=<?php echo $cache_v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/light.min.css?v=<?php echo $cache_v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/solid.min.css?v=<?php echo $cache_v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/regular.min.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/base.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/attachments.css?v=<?php echo $cache_v; ?>"/>
@@ -330,7 +327,7 @@ try {
     <link type="text/css" rel="stylesheet" href="css/home/alerts.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/home/cards.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/home/buttons.css?v=<?php echo $cache_v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/home/fontawesome.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/home/dark-mode.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/home/responsive.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>"/>
@@ -352,9 +349,9 @@ try {
         <?php $currentUser = getCurrentUser(); ?>
         <div class="home-header">
             <div class="home-info-line">
-                <span class="home-info-username"><i class="fa-user home-info-icon"></i><?php echo htmlspecialchars($currentUser['username'] ?? 'User', ENT_QUOTES); ?></span>
+                <span class="home-info-username"><i class="lucide lucide-user home-info-icon"></i><?php echo htmlspecialchars($currentUser['username'] ?? 'User', ENT_QUOTES); ?></span>
                 <span class="home-info-dash">-</span>
-                <span class="home-workspace-name"><i class="fa-layer-group home-info-icon"></i><?php echo htmlspecialchars($pageWorkspace ?: 'Poznote', ENT_QUOTES); ?></span>
+                <span class="home-workspace-name"><i class="lucide lucide-layers home-info-icon"></i><?php echo htmlspecialchars($pageWorkspace ?: 'Poznote', ENT_QUOTES); ?></span>
             </div>
         </div>
 
@@ -366,7 +363,7 @@ try {
 
         <div class="home-search-container">
             <div class="home-search-wrapper">
-                <i class="fas fa-search home-search-icon"></i>
+                <i class="lucide lucide-search home-search-icon"></i>
                 <input type="text" id="home-search-input" class="home-search-input" placeholder="Filtrer" autocomplete="off">
             </div>
         </div>
@@ -374,17 +371,17 @@ try {
         <div class="home-grid">
             <?php if ($syncMessage): ?>
             <div class="alert alert-success" style="grid-column: 1 / -1; margin-bottom: 10px;">
-                <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($syncMessage); ?>
+                <i class="lucide lucide-check-circle"></i> <?php echo htmlspecialchars($syncMessage); ?>
             </div>
             <?php endif; ?>
             <?php if ($syncWarning): ?>
             <div class="alert alert-warning" style="grid-column: 1 / -1; margin-bottom: 10px;">
-                <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($syncWarning); ?>
+                <i class="lucide lucide-alert-triangle-triangle"></i> <?php echo htmlspecialchars($syncWarning); ?>
             </div>
             <?php endif; ?>
             <?php if ($syncError): ?>
             <div class="alert alert-error" style="grid-column: 1 / -1; margin-bottom: 10px;">
-                <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($syncError); ?>
+                <i class="lucide lucide-alert-triangle-circle"></i> <?php echo htmlspecialchars($syncError); ?>
             </div>
             <?php endif; ?>
 
@@ -392,10 +389,10 @@ try {
             <div style="grid-column: 1 / -1; margin-bottom: 20px;">
                 <div style="display: flex; gap: 10px; margin-bottom: 10px; justify-content: center;">
                     <button id="debug-toggle-btn" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;">
-                        <i class="fas fa-bug"></i> <span id="debug-toggle-text"><?php echo t_h('git_sync.debug.show'); ?></span>
+                        <i class="lucide lucide-bug"></i> <span id="debug-toggle-text"><?php echo t_h('git_sync.debug.show'); ?></span>
                     </button>
                     <button id="debug-copy-btn" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px; display: none;">
-                        <i class="fas fa-copy"></i> <?php echo t_h('git_sync.debug.copy'); ?>
+                        <i class="lucide lucide-copy"></i> <?php echo t_h('git_sync.debug.copy'); ?>
                     </button>
                 </div>
                 <div id="debug-info" class="debug-info" style="display: none; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 15px; max-height: 250px; overflow-y: auto;">
@@ -425,7 +422,7 @@ try {
                     copyBtn?.addEventListener('click', function() {
                         navigator.clipboard.writeText(debugContent).then(function() {
                             const originalHTML = copyBtn.innerHTML;
-                            copyBtn.innerHTML = '<i class="fas fa-check"></i> ' + <?php echo json_encode(t_h('git_sync.debug.copied')); ?>;
+                            copyBtn.innerHTML = '<i class="lucide lucide-check"></i> ' + <?php echo json_encode(t_h('git_sync.debug.copied')); ?>;
                             setTimeout(function() {
                                 copyBtn.innerHTML = originalHTML;
                             }, 2000);
@@ -439,7 +436,7 @@ try {
             <!-- Notes -->
             <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('common.notes', [], 'Notes'); ?>">
                 <div class="home-card-icon">
-                    <i class="fa-sticky-note"></i>
+                    <i class="lucide lucide-sticky-note"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('common.notes', [], 'Notes'); ?></span>
@@ -450,7 +447,7 @@ try {
             <!-- Tags -->
             <a href="list_tags.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?>">
                 <div class="home-card-icon">
-                    <i class="fa-tags"></i>
+                    <i class="lucide lucide-tags"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?></span>
@@ -461,7 +458,7 @@ try {
             <!-- Favorites -->
             <a href="favorites.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('notes_list.system_folders.favorites', [], 'Favorites'); ?>">
                 <div class="home-card-icon home-card-icon-favorites">
-                    <i class="fa-star"></i>
+                    <i class="lucide lucide-star"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('notes_list.system_folders.favorites', [], 'Favorites'); ?></span>
@@ -472,7 +469,7 @@ try {
             <!-- Folders -->
             <a href="list_folders.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('home.folders', [], 'Folders'); ?>">
                 <div class="home-card-icon home-card-icon-kanban">
-                    <i class="fa-folder-open"></i>
+                    <i class="lucide lucide-folder-open"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('home.folders', [], 'Folders'); ?></span>
@@ -483,7 +480,7 @@ try {
             <!-- Shared Notes -->
             <a href="shared.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('home.shared_notes', [], 'Shared Notes'); ?>">
                 <div class="home-card-icon home-card-icon-shared">
-                    <i class="fa-share-alt"></i>
+                    <i class="lucide lucide-share-2"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('home.shared_notes', [], 'Shared Notes'); ?></span>
@@ -494,7 +491,7 @@ try {
             <!-- Shared Folders -->
             <a href="list_shared_folders.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('home.shared_folders', [], 'Shared Folders'); ?>">
                 <div class="home-card-icon home-card-icon-shared">
-                    <i class="fa-folder-open"></i>
+                    <i class="lucide lucide-folder-open"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('home.shared_folders', [], 'Shared Folders'); ?></span>
@@ -505,7 +502,7 @@ try {
             <!-- Trash -->
             <a href="trash.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?>">
                 <div class="home-card-icon home-card-icon-trash">
-                    <i class="fa-trash"></i>
+                    <i class="lucide lucide-trash-2"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?></span>
@@ -516,7 +513,7 @@ try {
             <!-- Attachments -->
             <a href="attachments_list.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?>">
                 <div class="home-card-icon">
-                    <i class="fa-paperclip"></i>
+                    <i class="lucide lucide-paperclip"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?></span>
@@ -531,7 +528,7 @@ try {
                         <input type="hidden" name="sync_action" value="push">
                         <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($pageWorkspace); ?>">
                         <div class="home-card-icon">
-                            <i class="fa-upload"></i>
+                            <i class="lucide lucide-upload"></i>
                         </div>
                         <div class="home-card-content">
                             <span class="home-card-title"><?php echo t_h('git_sync.actions.push.button', $gitProviderParams, 'Push'); ?></span>
@@ -544,7 +541,7 @@ try {
                         <input type="hidden" name="sync_action" value="pull">
                         <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($pageWorkspace); ?>">
                         <div class="home-card-icon">
-                            <i class="fa-download"></i>
+                            <i class="lucide lucide-download"></i>
                         </div>
                         <div class="home-card-content">
                             <span class="home-card-title"><?php echo t_h('git_sync.actions.pull.button', $gitProviderParams, 'Pull'); ?></span>
@@ -555,7 +552,7 @@ try {
                     <!-- Git Push (Disabled) -->
                     <a href="git_sync.php" class="home-card home-card-green">
                         <div class="home-card-icon">
-                            <i class="fa-upload"></i>
+                            <i class="lucide lucide-upload"></i>
                         </div>
                         <div class="home-card-content">
                             <span class="home-card-title"><?php echo t_h('git_sync.actions.push.button', $gitProviderParams, 'Push'); ?></span>
@@ -566,7 +563,7 @@ try {
                     <!-- Git Pull (Disabled) -->
                     <a href="git_sync.php" class="home-card home-card-green">
                         <div class="home-card-icon">
-                            <i class="fa-download"></i>
+                            <i class="lucide lucide-download"></i>
                         </div>
                         <div class="home-card-content">
                             <span class="home-card-title"><?php echo t_h('git_sync.actions.pull.button', $gitProviderParams, 'Pull'); ?></span>
@@ -579,7 +576,7 @@ try {
             <!-- Logout -->
             <a href="logout.php" class="home-card home-card-logout" title="<?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?>">
                 <div class="home-card-icon">
-                    <i class="fa-sign-out-alt"></i>
+                    <i class="lucide lucide-log-out"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?></span>

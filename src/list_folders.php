@@ -43,10 +43,7 @@ $currentLang = getUserLanguage();
 	<title><?php echo getPageTitle(); ?></title>
 	<meta name="color-scheme" content="dark light">
 	<script src="js/theme-init.js"></script>
-	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
-	<link type="text/css" rel="stylesheet" href="css/light.min.css"/>
-	<link type="text/css" rel="stylesheet" href="css/solid.min.css"/>
-	<link type="text/css" rel="stylesheet" href="css/regular.min.css"/>
+	<link type="text/css" rel="stylesheet" href="css/lucide.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/base.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/attachments.css"/>
@@ -58,7 +55,7 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="css/shared/notes-list.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/buttons-modal.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/folders-grid.css"/>
-	<link type="text/css" rel="stylesheet" href="css/shared/fontawesome.css"/>
+	<link type="text/css" rel="stylesheet" href="css/lucide.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/dark-mode.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/responsive.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css"/>
@@ -130,7 +127,7 @@ $currentLang = getUserLanguage();
 					placeholder="<?php echo t_h('folders.filter_placeholder', [], 'Filter by folder name...'); ?>"
 				/>
 				<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
-					<i class="fa-times"></i>
+					<i class="lucide lucide-x"></i>
 				</button>
 			</div>
 			<div id="filterStats" class="filter-stats initially-hidden"></div>
@@ -147,7 +144,7 @@ $currentLang = getUserLanguage();
 			foreach($folders as $folder) {
 				$folder_id = htmlspecialchars($folder['id'], ENT_QUOTES);
 				$folder_name = htmlspecialchars($folder['name'], ENT_QUOTES);
-				$folder_icon = !empty($folder['icon']) ? htmlspecialchars($folder['icon'], ENT_QUOTES) : 'fa-folder';
+				$folder_icon = !empty($folder['icon']) ? htmlspecialchars($folder['icon'], ENT_QUOTES) : 'lucide-folder';
 				$icon_color = !empty($folder['icon_color']) ? htmlspecialchars($folder['icon_color'], ENT_QUOTES) : '';
 				$note_count = (int)$folder['note_count'];
 				
@@ -158,7 +155,7 @@ $currentLang = getUserLanguage();
 				echo '<div class="note-name-container" style="display: flex; align-items: center; gap: 12px; flex: 1;">';
 				$icon_style = $icon_color ? 'style="color: ' . $icon_color . ' !important;"' : '';
 				echo '<div class="shared-folder-icon" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--icon-bg, rgba(0, 123, 255, 0.1)); border-radius: 8px;">';
-				echo '<i class="fas ' . $folder_icon . '" ' . $icon_style . '></i>';
+				echo '<i class="' . $folder_icon . '" ' . $icon_style . '></i>';
 				echo '</div>';
 				echo '<span class="folder-name-text" style="font-weight: 500; font-size: 16px;">' . $folder_name . ' <span style="font-size: 14px; color: var(--text-muted); font-weight: 400;">(' . $note_count . ')</span></span>';
 				echo '</div>';

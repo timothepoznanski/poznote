@@ -85,7 +85,7 @@ textarea:focus {
 }
 
 .noteentry,
-.noteentry *:not(.fa):not(.fab):not(.fas):not(.far):not(.fal):not(.fad):not(i):not([class*="fa-"]):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) {
+.noteentry *:not(.lucide):not([class*="lucide-"]):not(i):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) {
     font-size: var(--note-font-size, 15px) !important;
 }
 

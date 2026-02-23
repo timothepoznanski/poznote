@@ -495,8 +495,7 @@ function convertMarkdownApiUrlsToRelativePaths($markdown, $attachmentExtensions,
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
     <script src="js/theme-init.js"></script>
-    <link rel="stylesheet" href="css/fontawesome.min.css">
-    <link rel="stylesheet" href="css/light.min.css">
+    <link rel="stylesheet" href="css/lucide.css">
     <link rel="stylesheet" href="css/backup_export.css">
     <link rel="stylesheet" href="css/modals/base.css">
     <link rel="stylesheet" href="css/modals/specific-modals.css">

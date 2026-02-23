@@ -150,11 +150,7 @@ $v = getAppVersion();
     <title><?php echo getPageTitle(); ?></title>
     <meta name="color-scheme" content="dark light">
     <script src="../js/theme-init.js?v=<?php echo $v; ?>"></script>
-    <link rel="stylesheet" href="../css/fontawesome.min.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/light.min.css?v=<?php echo $v; ?>">
-    <link type="text/css" rel="stylesheet" href="../css/brands.min.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="../css/solid.min.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="../css/regular.min.css?v=<?php echo $v; ?>"/>
+    <link rel="stylesheet" href="../css/lucide.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/settings.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/users.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/dark-mode/variables.css?v=<?php echo $v; ?>">
@@ -245,7 +241,7 @@ $v = getAppVersion();
                         <?php echo t_h('common.back_to_settings'); ?>
                     </a>
                     <button class="btn btn-primary" onclick="openCreateModal()">
-                        <i class="fas fa-plus"></i> <?php echo t_h('multiuser.admin.create_user', [], 'Create Profile'); ?>
+                        <i class="lucide-plus"></i> <?php echo t_h('multiuser.admin.create_user', [], 'Create Profile'); ?>
                     </button>
                 </div>
                 <p class="email-note">
@@ -335,17 +331,17 @@ $v = getAppVersion();
                                 <div class="actions actions-center">
                                         <button class="btn btn-secondary btn-small" title="<?php echo t_h('multiuser.admin.edit_user', [], 'Edit User'); ?>" 
                                             onclick="renameUser(<?php echo (int)$user['id']; ?>, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($user['email'] ?? ''), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($user['oidc_subject'] ?? ''), ENT_QUOTES); ?>)">
-                                        <i class="fas fa-edit"></i>
+                                        <i class="lucide-pencil"></i>
                                     </button>
 
                                     <?php if ($user['id'] !== getCurrentUserId()): ?>
                                         <button class="btn btn-danger btn-small" title="<?php echo t_h('common.delete', [], 'Delete'); ?>" 
                                             onclick="openDeleteModal(<?php echo (int)$user['id']; ?>, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>)">
-                                            <i class="fas fa-trash"></i>
+                                            <i class="lucide-trash-2"></i>
                                         </button>
                                     <?php else: ?>
                                         <button class="btn btn-danger btn-small disabled" title="<?php echo t_h('multiuser.admin.errors.cannot_delete_self', [], 'You cannot delete your own profile'); ?>" disabled>
-                                            <i class="fas fa-trash"></i>
+                                            <i class="lucide-trash-2"></i>
                                         </button>
                                     <?php endif; ?>
                                 </div>
@@ -418,7 +414,7 @@ $v = getAppVersion();
                 <input type="hidden" name="user_id" id="delete_user_id">
                 
                 <p class="delete-warning">
-                    <i class="fas fa-exclamation-triangle"></i> 
+                    <i class="lucide-alert-triangle"></i> 
                     <?php echo t_h('multiuser.admin.delete_warning_all_data', [], 'All user data (notes, attachments, etc.) will be permanently deleted.'); ?>
                 </p>
                 

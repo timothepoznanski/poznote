@@ -1343,16 +1343,16 @@ function initializeMarkdownNote(noteId) {
             var currentMode;
             if (startInSplitMode) {
                 currentMode = 'split';
-                viewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
+                viewModeBtn.innerHTML = '<i class="lucide lucide-file-code"></i>';
                 viewModeBtn.title = window.t('editor.toolbar.switch_to_preview', null, 'Switch to preview mode');
                 viewModeBtn.style.display = 'none'; // Hide in split mode
             } else if (startInEditMode) {
                 currentMode = 'edit';
-                viewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
+                viewModeBtn.innerHTML = '<i class="lucide lucide-file-code"></i>';
                 viewModeBtn.title = window.t('editor.toolbar.switch_to_preview', null, 'Switch to preview mode');
             } else {
                 currentMode = 'preview';
-                viewModeBtn.innerHTML = '<i class="fa-edit"></i>';
+                viewModeBtn.innerHTML = '<i class="lucide lucide-pencil"></i>';
                 viewModeBtn.title = window.t('editor.toolbar.switch_to_edit', null, 'Switch to edit mode');
             }
 
@@ -1372,7 +1372,7 @@ function initializeMarkdownNote(noteId) {
             var splitBtn = document.createElement('button');
             splitBtn.type = 'button';
             splitBtn.className = 'toolbar-btn markdown-split-btn note-action-btn';
-            splitBtn.innerHTML = '<i class="fa-columns"></i>';
+            splitBtn.innerHTML = '<i class="lucide lucide-columns-2"></i>';
             splitBtn.title = window.t('editor.toolbar.split_view', null, 'Toggle split view');
             splitBtn.onclick = function (e) {
                 e.preventDefault();
@@ -1405,19 +1405,19 @@ function initializeMarkdownNote(noteId) {
             var currentMode;
             if (startInSplitMode) {
                 currentMode = 'split';
-                existingViewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
+                existingViewModeBtn.innerHTML = '<i class="lucide lucide-file-code"></i>';
                 existingViewModeBtn.title = window.t('editor.toolbar.switch_to_preview', null, 'Switch to preview mode');
                 existingViewModeBtn.classList.remove('active');
                 existingViewModeBtn.style.display = 'none'; // Hide in split mode
             } else if (startInEditMode) {
                 currentMode = 'edit';
-                existingViewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
+                existingViewModeBtn.innerHTML = '<i class="lucide lucide-file-code"></i>';
                 existingViewModeBtn.title = window.t('editor.toolbar.switch_to_preview', null, 'Switch to preview mode');
                 existingViewModeBtn.classList.remove('active');
                 existingViewModeBtn.style.display = '';
             } else {
                 currentMode = 'preview';
-                existingViewModeBtn.innerHTML = '<i class="fa-edit"></i>';
+                existingViewModeBtn.innerHTML = '<i class="lucide lucide-pencil"></i>';
                 existingViewModeBtn.title = window.t('editor.toolbar.switch_to_edit', null, 'Switch to edit mode');
                 existingViewModeBtn.classList.remove('active');
                 existingViewModeBtn.style.display = '';
@@ -1740,12 +1740,12 @@ function updateViewModeButton(noteId, mode) {
     viewModeBtn.setAttribute('data-current-mode', mode);
 
     if (mode === 'edit') {
-        viewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
+        viewModeBtn.innerHTML = '<i class="lucide lucide-file-code"></i>';
         viewModeBtn.title = window.t('editor.toolbar.switch_to_preview', null, 'Switch to preview mode');
         viewModeBtn.classList.remove('active');
         viewModeBtn.style.display = '';
     } else if (mode === 'preview') {
-        viewModeBtn.innerHTML = '<i class="fa-edit"></i>';
+        viewModeBtn.innerHTML = '<i class="lucide lucide-pencil"></i>';
         viewModeBtn.title = window.t('editor.toolbar.switch_to_edit', null, 'Switch to edit mode');
         viewModeBtn.classList.remove('active');
         viewModeBtn.style.display = '';
