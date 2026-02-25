@@ -11,6 +11,27 @@ function _mdEscapeHtml(str) {
         .replace(/'/g, '&#039;');
 }
 
+// Helper function to auto-format plain URLs to markdown links
+function autoLinkUrls(text) {
+    if (!text) return text;
+    
+    // Match standalone URLs (not already in markdown format)
+    var urlRegex = /(https?:\/\/[^\s<>"\[\]]+)/g;
+    
+    return text.replace(urlRegex, function(match, url, offset) {
+        // Check if URL is already part of markdown link syntax by looking at context
+        var beforeUrl = text.substring(Math.max(0, offset - 2), offset);
+        
+        // Don't convert if already in markdown format ']('
+        if (beforeUrl === '](') {
+            return url;
+        }
+        
+        // Convert to markdown link
+        return '[' + url + '](' + url + ')';
+    });
+}
+
 // Helper function to normalize content from contentEditable
 function normalizeContentEditableText(element) {
     // More robust content extraction that handles contentEditable quirks
@@ -1281,6 +1302,9 @@ function initializeMarkdownNote(noteId) {
 
         // Normalize line endings
         text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+        
+        // Auto-format plain URLs to markdown links
+        text = autoLinkUrls(text);
 
         document.execCommand('insertText', false, text);
     });
