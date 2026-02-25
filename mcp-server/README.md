@@ -2,15 +2,20 @@
 
 MCP (Model Context Protocol) server for Poznote — enables AI-powered note management through natural language.
 
-This server supports **HTTP transport only** (MCP *streamable-http*).
+This server supports **HTTP transport only** (MCP `streamable-http`).
 
-> **Note:** This MCP server is intended to be used with VS Code Copilot MCP. For advanced options, see the official VS Code MCP documentation: https://code.visualstudio.com/docs/copilot/customization/mcp-servers
->
-> **Legacy Documentation:** For alternative installation methods, manual setup, and development instructions, see [README-old-method.md](README-old-method.md).
+## Quick Start
+
+Choose your preferred AI assistant:
+
+- **🤖 [VS Code Copilot](VSCODE-COPILOT.md)** — Integrate Poznote into your editor
+- **💬 [Claude CLI](CLAUDE-CLI.md)** — Use Poznote from the command line
+
+---
 
 ## How It Works
 
-The MCP server is a bridge between VS Code Copilot and your Poznote instance.
+The MCP server acts as a bridge between AI assistants and your Poznote instance.
 
 ### Components
 
@@ -25,7 +30,7 @@ The MCP server is a bridge between VS Code Copilot and your Poznote instance.
 
 ### Communication flow
 
-1. VS Code Copilot connects to the MCP Server
+1. AI assistant (VS Code Copilot or Claude CLI) connects to the MCP Server
 2. MCP server calls Poznote REST API
 3. Results are returned to the AI assistant
 
@@ -73,11 +78,13 @@ Most tools accept an optional `user_id` argument to target a specific user profi
 
 ---
 
-## Installation & Setup
+## Server Installation
 
-The MCP server is integrated into the official Poznote `docker-compose.yml`.
+The MCP server is included in the official Poznote `docker-compose.yml` and runs automatically.
 
 ### Configuration
+
+Configure these environment variables in your `.env` or `docker-compose.yml`:
 
 ```bash
 # MCP Server port (default: 8045)
@@ -96,103 +103,99 @@ POZNOTE_MCP_WORKSPACE=Poznote
 POZNOTE_MCP_DEBUG=false
 ```
 
-To disable the MCP server, comment out the `mcp-server` service in `docker-compose.yml` and remove the existing container.
+### Start the Server
 
-### VS Code Configuration
-
-Add to your `mcp.json`:
-
-**Local installation:**
-```json
-{
-  "servers": {
-    "poznote": {
-      "type": "http",
-      "url": "http://localhost:8045/mcp"
-    }
-  }
-}
-```
-
-**Remote server (via SSH tunnel):**
-```json
-{
-  "servers": {
-    "poznote": {
-      "type": "http",
-      "url": "http://localhost:8045/mcp"
-    }
-  }
-}
-```
-
-Then establish the SSH tunnel:
 ```bash
-ssh -L 8045:localhost:8045 user@your-server
+docker-compose up -d
 ```
 
-`mcp.json` location:
-- **Windows:** `C:\Users\YOUR-USERNAME\AppData\Roaming\Code\User\mcp.json`
-- **Linux:** `~/.config/Code/User/mcp.json`
-- **macOS:** `~/Library/Application Support/Code/User/mcp.json`
+### Verify Installation
+
+```bash
+# Check container is running
+docker ps | grep mcp-server
+
+# Test the endpoint
+curl http://localhost:8045/mcp
+```
+
+To disable the MCP server, comment out the `mcp-server` service in `docker-compose.yml`.
+
+---
+
+## Client Setup
+
+Configure your AI assistant to connect to the MCP server:
+
+### **VS Code Copilot**
+Complete setup guide: **[VSCODE-COPILOT.md](VSCODE-COPILOT.md)**
+
+### **Claude CLI**
+Complete setup guide: **[CLAUDE-CLI.md](CLAUDE-CLI.md)**
 
 ---
 
 ## Security Considerations
 
-⚠️ **Important:** The MCP server does **not implement authentication** for incoming requests, so do not leave it exposed on a public network. It is safe when you keep it secured (localhost binding, SSH tunnel, or authenticated reverse proxy), which is the default installation behavior.
+⚠️ **Important:** The MCP server does **not implement authentication** for incoming requests.
 
-### Recommended Security Setup
+### Default Security (Recommended)
 
-**For local development only:**
-
-The default `docker-compose.yml` configuration binds the MCP server to `127.0.0.1` (localhost only):
+The default configuration binds the MCP server to `127.0.0.1` (localhost only):
 
 ```yaml
 ports:
   - "127.0.0.1:${POZNOTE_MCP_PORT:-8045}:8045"
 ```
 
-This ensures the MCP server is only accessible from the host machine.
+This ensures the MCP server is only accessible from your local machine.
 
-**For remote access from VS Code:**
+### Remote Access
 
-Use SSH port forwarding to securely connect:
+For remote access, use SSH port forwarding:
 
 ```bash
 ssh -L 8045:localhost:8045 user@your-server
 ```
 
-Then configure `mcp.json` to use localhost:
+Then configure your client to connect to `http://localhost:8045/mcp`.
 
-```json
-{
-  "servers": {
-    "poznote": {
-      "type": "http",
-      "url": "http://localhost:8045/mcp"
-    }
-  }
-}
-```
+### Production Environments
 
-**For production environments:**
-
-If you need to expose the MCP server over a network, add a reverse proxy with authentication:
-Or use a VPN solution (Tailscale, WireGuard, etc.) to restrict access.
+If you must expose the MCP server over a network, use:
+- Reverse proxy with authentication (nginx, Caddy)
+- VPN solution (Tailscale, WireGuard)
 
 ### Authentication Flow
 
-While the MCP server itself has no authentication, it authenticates to the Poznote API using Basic Auth credentials configured via environment variables (`POZNOTE_USERNAME` and `POZNOTE_PASSWORD`). This protects the Poznote instance but not the MCP endpoint itself.
+The MCP server authenticates to the Poznote API using credentials from environment variables (`POZNOTE_USERNAME` / `POZNOTE_PASSWORD`). This protects your Poznote instance, but not the MCP endpoint itself.
 
 ---
 
-## Example Prompts
+## Usage Examples
 
-Once configured in VS Code, you can interact with Poznote using natural language:
+Once configured, interact with Poznote using natural language:
 
-- "List all notes in workspace 'Poznote' of my Poznote instance"
-- "Search for notes about 'MCP'"
-- "Create a markdown note titled 'Birds' about birds"
-- "Update note 100041 with new content"
-- "Create a folder 'Test' in workspace 'Workspace1'"
+```
+List all notes in workspace 'Poznote'
+Search for notes about 'MCP'
+Create a note titled 'Meeting Notes' about the discussion
+Update note 123 with new content
+Move note 456 to folder 'Projects'
+```
+
+For detailed usage examples and troubleshooting:
+- VS Code Copilot: [VSCODE-COPILOT.md](VSCODE-COPILOT.md#usage-examples)
+- Claude CLI: [CLAUDE-CLI.md](CLAUDE-CLI.md#usage-examples)
+
+---
+
+## Support & Resources
+
+- **[VS Code Copilot Setup →](VSCODE-COPILOT.md)**
+- **[Claude CLI Setup →](CLAUDE-CLI.md)**
+
+For issues:
+- Check MCP server logs: `docker logs poznote-mcp-server`
+- Verify Poznote API is accessible
+- See client-specific troubleshooting guides
