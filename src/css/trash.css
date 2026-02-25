@@ -313,7 +313,7 @@ body.trash-page {
 }
 
 .lucide-trash-2,
-.lucide-trash-2-restore-alt,
+.lucide-undo-2,
 .lucide-x {
     line-height: 1;
     cursor: pointer;
@@ -329,12 +329,12 @@ body.trash-page {
     color: #ff0000 !important;
 }
 
-.lucide-trash-2-restore-alt {
+.lucide-undo-2 {
     transition: color 0.2s ease;
     font-size: 0.95em;
 }
 
-.lucide-trash-2-restore-alt:hover {
+.lucide-undo-2:hover {
     color: #22c55e !important;
 }
 
@@ -476,7 +476,7 @@ body.trash-page {
 
     /* Larger trash action icons on mobile for better touch targets */
     .lucide-trash-2,
-    .lucide-trash-2-restore-alt {
+    .lucide-undo-2 {
         width: 1.5em !important;
         height: 1.5em !important;
     }

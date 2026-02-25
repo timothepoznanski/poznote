@@ -3015,7 +3015,14 @@
         const isDeleting = e.inputType && e.inputType.startsWith('delete');
 
         if (lastChar === '/' && !isDeleting) {
-            showSlashMenu();
+            // Check if we're typing a URL - don't open menu in that case
+            const textBeforeSlash = textBefore.substring(0, textBefore.length - 1);
+            // Detect URL pattern: when typing / directly after : or :/ (protocol)
+            const isUrl = /:$/.test(textBeforeSlash) || /:\/$/.test(textBeforeSlash);
+            
+            if (!isUrl) {
+                showSlashMenu();
+            }
         } else if (slashMenuElement) {
             // If menu is open, update filter from editor
             setTimeout(updateFilterFromEditor, 0);
@@ -3196,7 +3203,14 @@
                     // Don't show if we're deleting
                     const isDeleting = e.inputType && e.inputType.startsWith('delete');
                     if (!isDeleting) {
-                        showSlashMenuForInput(target, pos);
+                        // Check if we're typing a URL - don't open menu in that case
+                        const textBeforeSlash = value.substring(0, pos - 1);
+                        // Detect URL pattern: when typing / directly after : or :/ (protocol)
+                        const isUrl = /:$/.test(textBeforeSlash) || /:\/$/.test(textBeforeSlash);
+                        
+                        if (!isUrl) {
+                            showSlashMenuForInput(target, pos);
+                        }
                     }
                 }
                 // Update filter if menu is already open
