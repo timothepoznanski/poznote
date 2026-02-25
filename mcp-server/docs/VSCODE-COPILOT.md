@@ -313,15 +313,15 @@ ports:
 
 ## Resources
 
-- [Main MCP Server Documentation](README.md)
+- [Main MCP Server Documentation](MCP-SERVER.md)
 - [VS Code MCP Official Documentation](https://code.visualstudio.com/docs/copilot/customization/mcp-servers)
 - [Claude CLI Setup](CLAUDE-CLI.md)
-- [Security Considerations](README.md#security-considerations)
+- [Security Considerations](MCP-SERVER.md#security-considerations)
 
 ## Support
 
 For issues or questions:
-- Check the [main README](README.md)
+- Check the [main MCP documentation](MCP-SERVER.md)
 - Review MCP server logs: `docker logs poznote-mcp-server`
 - Verify Poznote API is accessible
 - Check VS Code output panel for errors

@@ -298,13 +298,13 @@ claude "List notes for user 2 in Poznote"
 
 ## Related Documentation
 
-- [Main MCP Server Documentation](README.md)
+- [Main MCP Server Documentation](MCP-SERVER.md)
 - [VS Code Copilot Setup](VSCODE-COPILOT.md)
-- [Security Considerations](README.md#security-considerations)
+- [Security Considerations](MCP-SERVER.md#security-considerations)
 
 ## Support
 
 For issues or questions:
-- Check the [main README](README.md)
+- Check the [main MCP documentation](MCP-SERVER.md)
 - Review MCP server logs: `docker logs poznote-mcp-server`
 - Verify Poznote API is accessible
