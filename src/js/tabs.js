@@ -36,6 +36,11 @@
 
     // ── Helpers ────────────────────────────────────────────────────────────
 
+    /** Get translated default title for new/untitled notes */
+    function _getDefaultTitle() {
+        return window.t ? window.t('index.note.new_note', null, 'New note') : 'New note';
+    }
+
     function _getWorkspace() {
         if (window.selectedWorkspace) return window.selectedWorkspace;
         try {
@@ -92,8 +97,13 @@
     /** Read a note's current title from the DOM, fallback to stored value. */
     function _readTitle(noteId, fallback) {
         var el = document.getElementById('inp' + noteId);
-        if (el && el.value.trim()) return el.value.trim();
-        return fallback || 'Untitled';
+        if (el) {
+            // First try the value (user-entered title)
+            if (el.value.trim()) return el.value.trim();
+            // If value is empty, try the placeholder (default title like "Nouvelle note (10)")
+            if (el.placeholder && el.placeholder.trim()) return el.placeholder.trim();
+        }
+        return fallback || _getDefaultTitle();
     }
 
     function _buildUrl(noteId) {
@@ -150,8 +160,8 @@
 
             var titleSpan = document.createElement('span');
             titleSpan.className = 'app-tab-title';
-            titleSpan.textContent = tab.title || 'Untitled';
-            titleSpan.title = tab.title || 'Untitled';
+            titleSpan.textContent = tab.title || _getDefaultTitle();
+            titleSpan.title = tab.title || _getDefaultTitle();
 
             el.appendChild(titleSpan);
 
@@ -201,7 +211,7 @@
             return;
         }
 
-        var newTab = { id: _generateId(), noteId: noteId, title: title || 'Untitled' };
+        var newTab = { id: _generateId(), noteId: noteId, title: title || _getDefaultTitle() };
         tabs.push(newTab);
         activeTabId = newTab.id;
         _saveToStorage();
@@ -319,7 +329,7 @@
         }
 
         // Regular sidebar navigation (or initial load via AJAX)
-        var title = _readTitle(noteId, 'Untitled');
+        var title = _readTitle(noteId, _getDefaultTitle());
 
         // Check if an existing tab already has this noteId (from a previous session or manual nav)
         // If so, just activate it
@@ -362,7 +372,7 @@
         var changed = false;
         tabs.forEach(function (tab) {
             if (tab.noteId === noteId) {
-                tab.title = e.target.value.trim() || 'Untitled';
+                tab.title = e.target.value.trim() || _getDefaultTitle();
                 changed = true;
             }
         });
@@ -415,7 +425,7 @@
                     var activeTab = _findTabById(activeTabId);
                     if (activeTab) {
                         activeTab.noteId = currentNoteId;
-                        activeTab.title = _readTitle(currentNoteId, 'Untitled');
+                        activeTab.title = _readTitle(currentNoteId, _getDefaultTitle());
                     }
                 }
             }
@@ -431,7 +441,7 @@
 
         // No stored tabs — create first tab from the current note
         if (currentNoteId) {
-            var title = _readTitle(currentNoteId, 'Untitled');
+            var title = _readTitle(currentNoteId, _getDefaultTitle());
             tabs = [{ id: _generateId(), noteId: currentNoteId, title: title }];
             activeTabId = tabs[0].id;
             _saveToStorage();
@@ -444,6 +454,52 @@
     } else {
         _init();
     }
+
+    // Re-render tabs when i18n is loaded to update default titles
+    document.addEventListener('poznote:i18n:loaded', function () {
+        if (_areTabsEnabled() && tabs.length > 0) {
+            // Update tabs that have default titles to use the translated version
+            // Pattern to detect default titles in all languages: "New note", "Nouvelle note (5)", etc.
+            var defaultTitlePattern = /^(?:New note|Nouvelle note|Neue Notiz|Nueva nota|Nova nota|Untitled)(?: \((\d+)\))?$/;
+            var changed = false;
+            var newDefaultTitle = _getDefaultTitle();
+            
+            tabs.forEach(function (tab) {
+                var match = defaultTitlePattern.exec(tab.title);
+                if (match) {
+                    var number = match[1]; // Captured number, e.g., "10" from "New note (10)"
+                    var freshTitle;
+                    
+                    // For active tab or if note is in DOM, read from DOM (has the most accurate info)
+                    if (tab.id === activeTabId || document.getElementById('inp' + tab.noteId)) {
+                        freshTitle = _readTitle(tab.noteId, null);
+                    }
+                    
+                    // If we couldn't read from DOM, construct the title
+                    if (!freshTitle) {
+                        if (number) {
+                            // Construct numbered title with current language
+                            freshTitle = window.t 
+                                ? window.t('index.note.new_note_numbered', {number: number}, 'New note ({{number}})')
+                                : 'New note (' + number + ')';
+                        } else {
+                            freshTitle = newDefaultTitle;
+                        }
+                    }
+                    
+                    if (freshTitle !== tab.title) {
+                        tab.title = freshTitle;
+                        changed = true;
+                    }
+                }
+            });
+            
+            if (changed) {
+                _saveToStorage();
+            }
+            render();
+        }
+    });
 
     // ── Expose ─────────────────────────────────────────────────────────────
 

@@ -610,7 +610,18 @@ function openNoteInNewTab(noteId) {
 
     if (window.tabManager) {
         var titleEl = document.getElementById('inp' + noteId);
-        var title = (titleEl && titleEl.value.trim()) || 'Untitled';
+        var defaultTitle = window.t ? window.t('index.note.new_note', null, 'New note') : 'New note';
+        var title = defaultTitle;
+        if (titleEl) {
+            // First try the value (user-entered title)
+            if (titleEl.value.trim()) {
+                title = titleEl.value.trim();
+            } 
+            // If value is empty, try the placeholder (default title like "Nouvelle note (10)")
+            else if (titleEl.placeholder && titleEl.placeholder.trim()) {
+                title = titleEl.placeholder.trim();
+            }
+        }
         window.tabManager.openInNewTab(noteId, title);
         return;
     }
