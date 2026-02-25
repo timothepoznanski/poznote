@@ -926,7 +926,7 @@ Poznote includes a Model Context Protocol (MCP) server that enables AI assistant
 - "List all notes in my Poznote workspace"
 - "Update note 42 with new information"
 
-For installation, configuration, and setup instructions, see the [MCP Server README](mcp-server/README.md).
+For installation, configuration, and setup instructions, see the [MCP Server documentation](docs/MCP-SERVER.md).
 
 ## Poznote Extension
 
