@@ -330,6 +330,7 @@ try {
     <link type="text/css" rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/home/dark-mode.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/home/responsive.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/settings.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $cache_v; ?>"/>
@@ -367,7 +368,7 @@ try {
                 <input type="text" id="home-search-input" class="home-search-input" placeholder="Filtrer" autocomplete="off">
             </div>
         </div>
-        
+
         <div class="home-grid">
             <?php if ($syncMessage): ?>
             <div class="alert alert-success" style="grid-column: 1 / -1; margin-bottom: 10px;">
@@ -432,6 +433,10 @@ try {
                 </script>
             </div>
             <?php endif; ?>
+        </div>
+
+        <h2 class="settings-category-title"><?php echo t_h('home.dashboard', [], 'Dashboard'); ?></h2>
+        <div class="home-grid">
 
             <!-- Notes -->
             <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('common.notes', [], 'Notes'); ?>">
@@ -521,6 +526,11 @@ try {
                 </div>
             </a>
 
+        </div>
+
+        <h2 class="settings-category-title"><?php echo t_h('settings.categories.actions', [], 'Actions'); ?></h2>
+        <div class="home-grid">
+
             <?php if ($showGitTiles): ?>
                 <?php if ($gitEnabled): ?>
                     <!-- Git Push (Enabled) -->
@@ -580,6 +590,74 @@ try {
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?></span>
+                </div>
+            </a>
+
+        </div>
+
+        <h2 class="settings-category-title"><?php echo t_h('settings.categories.about', [], 'About'); ?></h2>
+        <div class="home-grid">
+
+            <!-- Version -->
+            <a href="https://github.com/timothepoznanski/poznote/releases" target="_blank" class="home-card" id="version-card" title="<?php echo t_h('home.version', [], 'Version'); ?>">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-info-circle"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('home.version', [], 'Version'); ?></span>
+                    <span class="home-card-count"><?php echo htmlspecialchars(trim(@file_get_contents('version.txt') ?: 'Unknown'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
+                </div>
+            </a>
+
+            <!-- Github repository -->
+            <a href="https://github.com/timothepoznanski/poznote" target="_blank" class="home-card" id="github-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-code-branch"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.documentation', [], 'Github Repository'); ?></span>
+                </div>
+            </a>
+
+            <?php if ($isAdmin): ?>
+            <!-- API Documentation -->
+            <a href="api-docs/" class="home-card" id="api-docs-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-code"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.api_docs', [], 'API Documentation'); ?></span>
+                </div>
+            </a>
+            <?php endif; ?>
+
+            <!-- News -->
+            <a href="https://poznote.com/news.html" target="_blank" class="home-card" id="news-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-newspaper"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.news', [], 'Poznote Blog'); ?></span>
+                </div>
+            </a>
+
+            <!-- Poznote Website -->
+            <a href="https://poznote.com" target="_blank" class="home-card" id="website-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-globe"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.website', [], 'Poznote Website'); ?></span>
+                </div>
+            </a>
+
+            <!-- Support Developer -->
+            <a href="https://ko-fi.com/timothepoznanski" target="_blank" class="home-card home-card-red" id="support-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-heart heart-blink"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.support', [], 'Support Developer'); ?></span>
                 </div>
             </a>
         </div>
