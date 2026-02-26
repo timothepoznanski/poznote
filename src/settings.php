@@ -200,9 +200,12 @@ if ($isAdmin) {
             $back_href = 'index.php' . (!empty($back_params) ? '?' . implode('&', $back_params) : '');
         ?>
 
-        <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
-            <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary btn-toolbar-size">
+        <div style="display: flex; justify-content: center; gap: 10px;">
+            <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary go-to-nav-btn">
                 <?php echo t_h('common.back_to_notes'); ?>
+            </a>
+            <a id="backToHomeLink" href="home.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary go-to-nav-btn">
+                <?php echo t_h('common.back_to_home', [], 'Back to Home', $currentLang); ?>
             </a>
         </div>
 
@@ -241,26 +244,6 @@ if ($isAdmin) {
             </div>
             <?php endif; ?>
 
-            <!-- Backup / Export -->
-            <div class="home-card" id="backup-export-card">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-upload"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?></span>
-                </div>
-            </div>
-
-            <!-- Restore / Import -->
-            <div class="home-card" id="restore-import-card">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-download"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?></span>
-                </div>
-            </div>
-
             <?php if ($isAdmin): ?>
             <!-- GitHub Sync -->
             <div class="home-card settings-card-clickable" id="git-sync-card" data-href="git_sync.php">
@@ -286,6 +269,26 @@ if ($isAdmin) {
                 </div>
             </div>
             <?php endif; ?>
+
+            <!-- Backup / Export -->
+            <a href="backup_export.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="backup-export-card" title="<?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?>">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-upload"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?></span>
+                </div>
+            </a>
+
+            <!-- Restore / Import -->
+            <a href="restore_import.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="restore-import-card" title="<?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?>">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-download"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?></span>
+                </div>
+            </a>
 
         </div>
 

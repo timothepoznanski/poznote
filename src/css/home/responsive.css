@@ -24,6 +24,7 @@
     .home-search-container {
         justify-content: center;
         padding: 0;
+        margin-top: 20px;
     }
 
     .home-search-wrapper {
@@ -54,7 +55,17 @@
     }
 }
 
+@media (min-width: 801px) {
+    .home-search-container {
+        display: none;
+    }
+}
+
 @media (min-width: 1024px) {
+    .home-container {
+        max-width: 1200px;
+    }
+
     .home-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
     }

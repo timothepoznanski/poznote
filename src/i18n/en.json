@@ -16,9 +16,9 @@
         "disabled": "Disabled",
         "not_defined": "Not defined",
         "loading": "Loading...",
-        "back_to_notes": "Back to Notes",
-        "back_to_home": "Back to Home",
-        "back_to_settings": "Back to Settings",
+        "back_to_notes": "Go to Notes",
+        "back_to_home": "Go to Home",
+        "back_to_settings": "Go to Settings",
         "back": "Back",
         "error": "Error",
         "success": "Success",
@@ -49,7 +49,7 @@
             "heading": "Settings Protected",
             "placeholder": "Enter password",
             "submit": "Access Settings",
-            "cancel": "Back to Home"
+            "cancel": "Go to Home"
         },
         "cards": {
             "workspaces": "Workspaces",
@@ -130,7 +130,7 @@
     "info": {
         "page_title": "Note Information",
         "actions": {
-            "back_to_note": "Back to note"
+            "back_to_note": "Go to note"
         },
         "labels": {
             "note_title": "Note title:",
@@ -218,7 +218,7 @@
         "list": {
             "title": "Notes with attachments",
             "no_attachments": "No notes with attachments yet.",
-            "back_to_notes": "Back to notes",
+            "back_to_notes": "Go to notes",
             "manage_attachments": "Manage attachments",
             "attachment_count_singular": "1 attachment",
             "attachment_count_plural": "{{count}} attachments",
@@ -718,7 +718,7 @@
             "insert": "Insert"
         },
         "toolbar": {
-            "back_to_notes": "Back to notes",
+            "back_to_notes": "Go to notes",
             "bold": "Bold",
             "italic": "Italic",
             "underline": "Underline",
@@ -1422,7 +1422,7 @@
     },
     "git_sync": {
         "title": "{{provider}} Sync",
-        "description": "Back up your notes and attachments to {{provider}}. Files are stored as flat files with a metadata.json that preserves tags, folders, dates and attachments.",
+        "description": "Synchronize your notes and attachments to {{provider}}. Files are stored as flat files with a metadata.json that preserves tags, folders, dates and attachments.",
         "warning": "Do not rely on this feature as your sole backup.\nRegularly export your data using the backup feature in Settings.",
         "confirm_push": "Push all notes and attachments to {{provider}}? Existing files will be updated and files no longer in Poznote will be removed from the repository.",
         "confirm_pull": "Pull all notes and attachments from {{provider}}? Local data will be overwritten with the remote version. Notes not found on {{provider}} will be moved to trash.",

@@ -348,17 +348,13 @@ try {
     data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <div class="home-container">
         <?php $currentUser = getCurrentUser(); ?>
-        <div class="home-header">
-            <div class="home-info-line">
-                <span class="home-info-username"><i class="lucide lucide-user home-info-icon"></i><?php echo htmlspecialchars($currentUser['username'] ?? 'User', ENT_QUOTES); ?></span>
-                <span class="home-info-dash">-</span>
-                <span class="home-workspace-name"><i class="lucide lucide-layers home-info-icon"></i><?php echo htmlspecialchars($pageWorkspace ?: 'Poznote', ENT_QUOTES); ?></span>
-            </div>
-        </div>
 
-        <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-            <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary btn-toolbar-size">
+        <div style="display: flex; justify-content: center; gap: 10px;">
+            <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary go-to-nav-btn">
                 <?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?>
+            </a>
+            <a href="settings.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary go-to-nav-btn">
+                <?php echo t_h('common.back_to_settings', [], 'Back to Settings', $currentLang); ?>
             </a>
         </div>
 
@@ -444,7 +440,7 @@ try {
                     <i class="lucide lucide-sticky-note"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('common.notes', [], 'Notes'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('common.notes', [], 'Notes') . ($pageWorkspace ? ' (' . htmlspecialchars($pageWorkspace) . ')' : ''); ?></span>
                     <span class="home-card-count"><?php echo $total_notes_count; ?></span>
                 </div>
             </a>
@@ -583,6 +579,16 @@ try {
                 <?php endif; ?>
             <?php endif; ?>
 
+            <!-- Support Developer -->
+            <a href="https://ko-fi.com/timothepoznanski" target="_blank" class="home-card home-card-red" id="support-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-heart heart-blink"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.support', [], 'Support Developer'); ?></span>
+                </div>
+            </a>
+
             <!-- Logout -->
             <a href="logout.php" class="home-card home-card-logout" title="<?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?>">
                 <div class="home-card-icon">
@@ -661,15 +667,6 @@ try {
                 </div>
             </a>
 
-            <!-- Support Developer -->
-            <a href="https://ko-fi.com/timothepoznanski" target="_blank" class="home-card home-card-red" id="support-card">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-heart heart-blink"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.support', [], 'Support Developer'); ?></span>
-                </div>
-            </a>
         </div>
 
     </div>

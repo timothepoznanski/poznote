@@ -4,9 +4,9 @@
     },
     "common": {
         "notes": "Notizen",
-        "back_to_home": "Zurück zur Startseite",
-        "back_to_notes": "Zurück zu den Notizen",
-        "back_to_settings": "Zurück zu den Einstellungen",
+        "back_to_home": "Zur Startseite gehen",
+        "back_to_notes": "Zu den Notizen gehen",
+        "back_to_settings": "Zu den Einstellungen gehen",
         "close": "Schließen",
         "disable": "disable",
         "cancel": "Abbrechen",
@@ -1844,7 +1844,7 @@
     },
     "git_sync": {
         "title": "{{provider}}-Synchronisierung",
-        "description": "Sichern Sie Ihre Notizen und Anhänge auf {{provider}}. Dateien werden als flache Dateien gespeichert mit einer metadata.json, die Tags, Ordner, Daten und Anhänge enthält.",
+        "description": "Synchronisieren Sie Ihre Notizen und Anhänge auf {{provider}}. Dateien werden als flache Dateien gespeichert mit einer metadata.json, die Tags, Ordner, Daten und Anhänge enthält.",
         "warning": "Verlassen Sie sich nicht ausschließlich auf diese Funktion als Backup-Lösung.\nExportieren Sie Ihre Daten regelmäßig über die Backup-Funktion in den Einstellungen.",
         "confirm_push": "Alle Notizen und Anhänge zu {{provider}} pushen? Vorhandene Dateien werden aktualisiert und Dateien, die nicht mehr in Poznote vorhanden sind, werden aus dem Repository gelöscht.",
         "confirm_pull": "Alle Notizen und Anhänge von {{provider}} pullen? Lokale Daten werden mit der Remote-Version überschrieben. Notizen, die auf {{provider}} nicht gefunden werden, werden in den Papierkorb verschoben.",

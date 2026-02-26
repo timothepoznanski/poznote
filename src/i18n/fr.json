@@ -4,9 +4,9 @@
     },
     "common": {
         "notes": "Notes",
-        "back_to_home": "Retour à l'accueil",
-        "back_to_notes": "Retour aux notes",
-        "back_to_settings": "Retour aux paramètres",
+        "back_to_home": "Aller à l'accueil",
+        "back_to_notes": "Aller aux notes",
+        "back_to_settings": "Aller aux paramètres",
         "close": "Fermer",
         "disable": "disable",
         "cancel": "Annuler",
@@ -2000,7 +2000,7 @@
     },
     "git_sync": {
         "title": "Synchronisation {{provider}}",
-        "description": "Sauvegardez vos notes et pièces jointes sur {{provider}}. Les fichiers sont stockés à plat avec un fichier metadata.json qui préserve les tags, dossiers, dates et pièces jointes.",
+        "description": "Synchronisez vos notes et pièces jointes sur {{provider}}. Les fichiers sont stockés à plat avec un fichier metadata.json qui préserve les tags, dossiers, dates et pièces jointes.",
         "warning": "Ne vous fiez pas à cette fonctionnalité comme seule solution de sauvegarde.\nExportez régulièrement vos données via la fonctionnalité de sauvegarde dans les Paramètres.",
         "confirm_push": "Pousser toutes les notes et pièces jointes vers {{provider}} ? Les fichiers existants seront mis à jour et les fichiers absents de Poznote seront supprimés du dépôt.",
         "confirm_pull": "Récupérer toutes les notes et pièces jointes depuis {{provider}} ? Les données locales seront écrasées par la version distante. Les notes absentes sur {{provider}} seront déplacées dans la corbeille.",

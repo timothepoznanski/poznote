@@ -1,5 +1,10 @@
 /* GitHub Sync Page Styles */
 
+/* Remove gray background for git sync page */
+body.git-sync-page {
+    background: #fff;
+}
+
 .git-sync-container {
     max-width: 900px;
     margin-bottom: 40px;
@@ -549,6 +554,27 @@ body.dark-mode .repo-link {
     margin-bottom: 24px;
     justify-content: center;
     flex-wrap: wrap;
+}
+
+.git-sync-nav .btn.btn-toolbar-size {
+    min-width: 38px;
+    min-height: 38px;
+    padding: 6px 8px;
+    line-height: 1.2;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.git-sync-nav .btn.btn-secondary {
+    background: #6c757d;
+    color: white !important;
+}
+
+.git-sync-nav .btn.btn-secondary:hover {
+    background: #5a6268;
+    color: white !important;
+    text-decoration: none;
 }
 
 .git-sync-nav .sync-form {

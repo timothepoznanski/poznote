@@ -144,7 +144,7 @@ function loadAndShowWorkspaceMenu(menu) {
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data.success) {
-                displayWorkspaceMenu(menu, data.workspaces);
+                displayWorkspaceMenu(menu, data.workspaces, data.username);
             } else {
                 menu.innerHTML = '<div class="workspace-menu-item"><i class="lucide lucide-alert-triangle"></i>' + wsTr('workspaces.menu.error_loading', {}, 'Error loading workspaces') + '</div>';
             }
@@ -154,10 +154,19 @@ function loadAndShowWorkspaceMenu(menu) {
         });
 }
 
-function displayWorkspaceMenu(menu, workspaces) {
+function displayWorkspaceMenu(menu, workspaces, username) {
     // Use window.selectedWorkspace first (set by PHP), then fall back to selectedWorkspace variable
     var currentWorkspace = (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : (selectedWorkspace || '');
     var menuHtml = '';
+
+    // Add username at the top if available
+    if (username) {
+        menuHtml += '<div class="workspace-menu-item workspace-menu-username">';
+        menuHtml += '<i class="lucide lucide-user"></i>';
+        menuHtml += '<span>' + username.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') + '</span>';
+        menuHtml += '</div>';
+        menuHtml += '<div class="workspace-menu-divider"></div>';
+    }
 
     // Check if current workspace exists in the list
     var workspaceExists = false;
@@ -192,21 +201,6 @@ function displayWorkspaceMenu(menu, workspaces) {
         menuHtml += '</div>';
     }
 
-    // Add separator and extra items
-    menuHtml += '<div class="workspace-menu-divider"></div>';
-
-    // Manage workspaces
-    menuHtml += '<div class="workspace-menu-item" id="manage-workspaces-item">';
-    menuHtml += '<i class="lucide lucide-settings"></i>';
-    menuHtml += '<span>' + wsTr('settings.cards.workspaces', {}, 'Workspaces') + '</span>';
-    menuHtml += '</div>';
-
-    // Logout
-    menuHtml += '<div class="workspace-menu-item" id="logout-item">';
-    menuHtml += '<i class="lucide lucide-log-out"></i>';
-    menuHtml += '<span>' + wsTr('workspaces.menu.logout', {}, 'Logout') + '</span>';
-    menuHtml += '</div>';
-
     menu.innerHTML = menuHtml;
 
     // Add event listeners using delegation
@@ -215,21 +209,6 @@ function displayWorkspaceMenu(menu, workspaces) {
             switchToWorkspace(this.getAttribute('data-workspace-name'));
         });
     });
-
-    // Add listeners for extra items
-    var manageItem = menu.querySelector('#manage-workspaces-item');
-    if (manageItem) {
-        manageItem.addEventListener('click', function () {
-            window.location.href = 'workspaces.php';
-        });
-    }
-
-    var logoutItem = menu.querySelector('#logout-item');
-    if (logoutItem) {
-        logoutItem.addEventListener('click', function () {
-            window.location.href = 'logout.php';
-        });
-    }
 }
 
 function switchToWorkspace(workspaceName) {

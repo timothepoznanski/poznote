@@ -192,23 +192,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $cache_v; ?>">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
-<body class="home-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+<body class="home-page git-sync-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <div class="home-container git-sync-container">
 
         <div class="git-sync-nav">
-            <a id="backToHomeLink" href="home.php" class="btn btn-secondary">
+            <a id="backToHomeLink" href="home.php" class="btn btn-secondary go-to-nav-btn">
                 <?php echo t_h('common.back_to_home', [], 'Back to Home', $currentLang); ?>
             </a>
-            <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
+            <a id="backToNotesLink" href="index.php" class="btn btn-secondary go-to-nav-btn">
                 <?php echo t_h('common.back_to_notes', [], 'Back to Notes', $currentLang); ?>
             </a>
-            <a id="backToSettingsLink" href="settings.php" class="btn btn-secondary">
+            <a id="backToSettingsLink" href="settings.php" class="btn btn-secondary go-to-nav-btn">
                 <?php echo t_h('common.back_to_settings', [], 'Back to Settings', $currentLang); ?>
             </a>
             <?php if ($configStatus['enabled'] && $configStatus['configured']): ?>
             <form method="post" class="sync-form">
                 <input type="hidden" name="action" value="test">
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary btn-toolbar-size">
                     <?php echo tp_h('git_sync.test.button'); ?>
                 </button>
             </form>
@@ -375,31 +375,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         </div>
 
         <?php if ($configStatus['enabled'] && $configStatus['configured']): ?>
-        <div class="sync-actions-grid">
-                <!-- Push to Git -->
-                <div class="sync-action-card">
-                    <h3><?php echo tp_h('git_sync.actions.push.title'); ?></h3>
-                    <p><?php echo tp_h('git_sync.actions.push.description'); ?></p>
-                    <form method="post" class="sync-form">
-                        <input type="hidden" name="action" value="push">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="lucide lucide-upload"></i> <span><?php echo tp_h('git_sync.actions.push.button'); ?></span>
-                        </button>
-                    </form>
-                </div>
-                
-                <!-- Pull from Git -->
-                <div class="sync-action-card">
-                    <h3><?php echo tp_h('git_sync.actions.pull.title'); ?></h3>
-                    <p><?php echo tp_h('git_sync.actions.pull.description'); ?></p>
-                    <form method="post" class="sync-form">
-                        <input type="hidden" name="action" value="pull">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="lucide lucide-download"></i> <span><?php echo tp_h('git_sync.actions.pull.button'); ?></span>
-                        </button>
-                    </form>
-                </div>
-            </div>
+        <div class="alert alert-warning" style="justify-content: center; text-align: center; margin-top: 20px;">
+            <i class="lucide lucide-info-circle"></i>
+            <span>
+                <strong><?php echo t_h('git_sync.actions.home_hint', [], 'Push and Pull can be done from Home.', $currentLang); ?></strong>
+                <a href="home.php" style="margin-left: 8px; font-weight: 600; text-decoration: underline; color: inherit;">
+                    <?php echo t_h('common.back_to_home', [], 'Back to Home', $currentLang); ?>
+                </a>
+            </span>
+        </div>
         <?php endif; ?>
 
         <div class="git-sync-footer-note">
