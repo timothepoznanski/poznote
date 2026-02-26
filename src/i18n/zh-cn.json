@@ -4,9 +4,9 @@
     },
     "common": {
         "notes": "笔记",
-        "back_to_home": "返回主页",
-        "back_to_notes": "返回笔记",
-        "back_to_settings": "返回设置",
+        "back_to_home": "前往主页",
+        "back_to_notes": "前往笔记",
+        "back_to_settings": "前往设置",
         "close": "关闭",
         "disable": "disable",
         "cancel": "取消",
@@ -303,7 +303,8 @@
         "categories": {
             "actions": "操作",
             "display": "显示",
-            "about": "关于"
+            "about": "关于",
+            "documentation": "文档"
         },
         "sections": {
             "account_display": "账户与显示",
@@ -463,6 +464,7 @@
     },
     "home": {
         "title": "首页",
+        "dashboard": "仪表盘",
         "folders": "文件夹",
         "shared_notes": "共享笔记",
         "shared_folders": "共享文件夹",
@@ -802,6 +804,9 @@
                 "default_heading": "{{note}}",
                 "success": "链接笔记创建成功",
                 "error": "创建链接笔记时出错"
+            },
+            "template": {
+                "title": "模板"
             },
             "subfolder": {
                 "title": "子文件夹"
@@ -1963,7 +1968,7 @@
     },
     "git_sync": {
         "title": "{{provider}} 同步",
-        "description": "将您的笔记和附件备份到 {{provider}}。文件以扁平文件形式存储，并附带保存标签、文件夹、日期和附件的 metadata.json。",
+        "description": "将您的笔记和附件同步到 {{provider}}。文件以扁平文件形式存储，并附带保存标签、文件夹、日期和附件的 metadata.json。",
         "warning": "请勿将此功能作为唯一的备份方案。\n请定期使用设置中的备份功能导出您的数据。",
         "confirm_push": "将所有笔记和附件推送到 {{provider}} 吗？现有文件将被更新，Poznote 中不再存在的文件将从仓库中删除。",
         "confirm_pull": "从 {{provider}} 拉取所有笔记和附件吗？本地数据将被远程版本覆盖。在 {{provider}} 上找不到的笔记将被移至回收站。",

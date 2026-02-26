@@ -117,6 +117,9 @@ if ($cache_v === false) {
 }
 $cache_v = urlencode(trim($cache_v));
 
+$app_version_display = trim(@file_get_contents('version.txt') ?: 'Unknown');
+$app_version_display = htmlspecialchars($app_version_display, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
 // Count workspaces
 $workspaces_count = 0;
 try {
@@ -200,9 +203,12 @@ if ($isAdmin) {
             $back_href = 'index.php' . (!empty($back_params) ? '?' . implode('&', $back_params) : '');
         ?>
 
-        <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
-            <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary btn-toolbar-size">
+        <div style="display: flex; justify-content: center; gap: 10px;">
+            <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary go-to-nav-btn">
                 <?php echo t_h('common.back_to_notes'); ?>
+            </a>
+            <a id="backToHomeLink" href="home.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary go-to-nav-btn">
+                <?php echo t_h('common.back_to_home', [], 'Back to Home', $currentLang); ?>
             </a>
         </div>
 
@@ -241,26 +247,6 @@ if ($isAdmin) {
             </div>
             <?php endif; ?>
 
-            <!-- Backup / Export -->
-            <div class="home-card" id="backup-export-card">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-upload"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?></span>
-                </div>
-            </div>
-
-            <!-- Restore / Import -->
-            <div class="home-card" id="restore-import-card">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-download"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?></span>
-                </div>
-            </div>
-
             <?php if ($isAdmin): ?>
             <!-- GitHub Sync -->
             <div class="home-card settings-card-clickable" id="git-sync-card" data-href="git_sync.php">
@@ -283,9 +269,30 @@ if ($isAdmin) {
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.check_updates', [], 'Check for Updates'); ?></span>
+                    <span class="setting-status enabled"><?php echo $app_version_display; ?></span>
                 </div>
             </div>
             <?php endif; ?>
+
+            <!-- Backup / Export -->
+            <a href="backup_export.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="backup-export-card" title="<?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?>">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-upload"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?></span>
+                </div>
+            </a>
+
+            <!-- Restore / Import -->
+            <a href="restore_import.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="restore-import-card" title="<?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?>">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-download"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?></span>
+                </div>
+            </a>
 
         </div>
 
@@ -422,75 +429,6 @@ if ($isAdmin) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.show_inline_attachment_images', [], 'Show image attachments'); ?></span>
                     <span id="show-inline-attachment-images-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- ABOUT CATEGORY -->
-        <h2 class="settings-category-title"><?php echo t_h('settings.categories.about'); ?></h2>
-        <div class="home-grid">
-
-            <!-- Version -->
-            <a href="https://github.com/timothepoznanski/poznote/releases" target="_blank" class="home-card" id="version-card" title="<?php echo t_h('home.version', [], 'Version'); ?>">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-info-circle"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('home.version', [], 'Version'); ?></span>
-                    <span class="home-card-count"><?php echo htmlspecialchars(trim(@file_get_contents('version.txt') ?: 'Unknown'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
-                </div>
-            </a>
-
-            <!-- Github repository -->
-            <div class="home-card" id="github-card">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-code-branch"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.documentation', [], 'Github Repository'); ?></span>
-                </div>
-            </div>
-
-            <?php if ($isAdmin): ?>
-            <!-- API Documentation -->
-            <div class="home-card" id="api-docs-card">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-code"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.api_docs', [], 'API Documentation'); ?></span>
-                </div>
-            </div>
-            <?php endif; ?>
-
-            <!-- News -->
-            <div class="home-card" id="news-card">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-newspaper"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.news', [], 'Poznote Blog'); ?></span>
-                </div>
-            </div>
-
-            <!-- Poznote Website -->
-            <div class="home-card" id="website-card">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-globe"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.website', [], 'Poznote Website'); ?></span>
-                </div>
-            </div>
-
-            <!-- Support Developer -->
-            <div class="home-card home-card-red" id="support-card">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-heart heart-blink"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.support', [], 'Support Developer'); ?></span>
                 </div>
             </div>
 

@@ -2065,7 +2065,8 @@ function createNoteOfType(noteType, globalFnNames) {
                         // console.log('[Poznote Auto-Push] Note created - marking for push');
                         window.setNeedsAutoPush(true);
                     }
-                    window.location.href = 'index.php?note=' + data.note.id;
+                    var markdownSplitParamInFolder = noteType === 'markdown' ? '&md_split=1' : '';
+                    window.location.href = 'index.php?note=' + data.note.id + markdownSplitParamInFolder;
                 }
             });
         }
@@ -2096,7 +2097,8 @@ function createNoteOfType(noteType, globalFnNames) {
                         // console.log('[Poznote Auto-Push] Note created - marking for push');
                         window.setNeedsAutoPush(true);
                     }
-                    window.location.href = 'index.php?note=' + data.note.id;
+                    var markdownSplitParam = noteType === 'markdown' ? '&md_split=1' : '';
+                    window.location.href = 'index.php?note=' + data.note.id + markdownSplitParam;
                 }
             });
         }

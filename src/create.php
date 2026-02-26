@@ -8,6 +8,7 @@ requireAuth();
 ob_start();
 require_once 'functions.php';
 require_once 'config.php';
+require_once 'db_connect.php';
 
 $pageWorkspace = trim(getWorkspaceFilter());
 $currentLang = getUserLanguage();

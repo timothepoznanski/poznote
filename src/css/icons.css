@@ -79,10 +79,10 @@
     pointer-events: none;
 }
 
-/* Apply default gray filter (rgb(55, 53, 47)) to all icons not on hover */
+/* Apply default gray filter (lighter gray) to all icons not on hover */
 /* Exclude folder icons with custom colors from the filter */
 [class*="lucide-"]:not(.folder-icon[data-icon-color]) {
-    filter: brightness(0) saturate(100%) invert(21%) sepia(8%) saturate(1075%) hue-rotate(17deg) brightness(90%) contrast(92%);
+    filter: brightness(0) saturate(100%) invert(50%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(85%);
     transition: transform 0.2s ease, filter 0.2s ease;
 }
 

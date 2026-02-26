@@ -1656,10 +1656,10 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
 <body data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <div class="backup-container">
         <div class="navigation-buttons" style="justify-content: center;">
-            <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
+            <a id="backToNotesLink" href="index.php" class="btn btn-secondary go-to-nav-btn">
                 <?php echo t_h('common.back_to_notes'); ?>
             </a>
-            <a href="settings.php" class="btn btn-secondary">
+            <a href="settings.php" class="btn btn-secondary go-to-nav-btn">
                 <?php echo t_h('common.back_to_settings'); ?>
             </a>
         </div>

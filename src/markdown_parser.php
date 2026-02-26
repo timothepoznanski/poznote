@@ -289,6 +289,25 @@ function parseMarkdown($text) {
         
         // Strikethrough: ~~text~~
         $text = preg_replace('/~~(.*?)~~/s', '<del>$1</del>', $text);
+
+        // Auto-link plain URLs like GitHub-style markdown behavior
+        $text = preg_replace_callback('/(^|[\s(])((?:https?:\/\/)[^\s<]+)/m', function($matches) {
+            $prefix = $matches[1];
+            $url = $matches[2];
+            $trailing = '';
+
+            while ($url !== '' && preg_match('/[),.;!?]$/', $url)) {
+                $trailing = substr($url, -1) . $trailing;
+                $url = substr($url, 0, -1);
+            }
+
+            if ($url === '') {
+                return $matches[0];
+            }
+
+            $safeUrl = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+            return $prefix . '<a href="' . $safeUrl . '" target="_blank" rel="noopener">' . $safeUrl . '</a>' . $trailing;
+        }, $text);
         
         // Highlights: ==text==
         $text = preg_replace('/==(.*?)==/s', '<mark>$1</mark>', $text);

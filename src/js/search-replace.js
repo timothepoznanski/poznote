@@ -265,6 +265,13 @@
                 return;
             }
 
+            // Skip hidden containers (e.g. markdown editor while preview is visible)
+            try {
+                if (window.getComputedStyle(node).display === 'none') {
+                    return;
+                }
+            } catch (e) { /* ignore */ }
+
             // Process child nodes
             const children = Array.from(node.childNodes);
             children.forEach(child => highlightMatches(child, regex, noteId));
@@ -315,7 +322,54 @@
         // Add active class to current
         const match = state.matches[index];
         match.classList.add('active');
-        match.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        const noteEntry = getNoteEntry(noteId);
+        const isMobile = window.innerWidth <= 800;
+        const behavior = isMobile ? 'auto' : 'smooth';
+        const inSplitMode = !!(noteEntry && noteEntry.classList.contains('markdown-split-mode'));
+
+        if (inSplitMode) {
+            // In split mode, scroll only the local pane to avoid hiding sticky toolbar/search bar
+            let pane = null;
+            let current = match.parentElement;
+            while (current && current !== noteEntry) {
+                const style = window.getComputedStyle(current);
+                const canScroll = (style.overflowY === 'auto' || style.overflowY === 'scroll') &&
+                    current.scrollHeight > current.clientHeight;
+                if (canScroll) {
+                    pane = current;
+                    break;
+                }
+                current = current.parentElement;
+            }
+
+            if (pane) {
+                const paneRect = pane.getBoundingClientRect();
+                const matchRect = match.getBoundingClientRect();
+                let targetTop = pane.scrollTop + (matchRect.top - paneRect.top) - 16;
+                const maxTop = Math.max(0, pane.scrollHeight - pane.clientHeight);
+                targetTop = Math.max(0, Math.min(targetTop, maxTop));
+                pane.scrollTo({ top: targetTop, behavior });
+                return;
+            }
+        }
+
+        // Normal mode: keep match below sticky tab bar + note header/search bar
+        let stickyOffset = 0;
+        const tabBar = document.getElementById('app-tab-bar');
+        if (tabBar) {
+            stickyOffset += tabBar.offsetHeight;
+        }
+        const noteCard = match.closest('.notecard');
+        if (noteCard) {
+            const noteHeader = noteCard.querySelector('.note-header');
+            if (noteHeader) {
+                stickyOffset += noteHeader.offsetHeight;
+            }
+        }
+
+        match.style.scrollMarginTop = (stickyOffset + 12) + 'px';
+        match.scrollIntoView({ behavior, block: 'start', inline: 'nearest' });
     }
 
     /**

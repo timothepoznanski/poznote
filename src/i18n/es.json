@@ -4,9 +4,9 @@
     },
     "common": {
         "notes": "Notas",
-        "back_to_home": "Volver al inicio",
-        "back_to_notes": "Volver a las notas",
-        "back_to_settings": "Volver a la configuración",
+        "back_to_home": "Ir al inicio",
+        "back_to_notes": "Ir a las notas",
+        "back_to_settings": "Ir a la configuración",
         "close": "Cerrar",
         "disable": "disable",
         "cancel": "Cancelar",
@@ -302,7 +302,8 @@
         "categories": {
             "actions": "Acciones",
             "display": "Pantalla",
-            "about": "Acerca de"
+            "about": "Acerca de",
+            "documentation": "Documentación"
         },
         "sections": {
             "account_display": "Cuenta y Visualización",
@@ -461,6 +462,7 @@
     },
     "home": {
         "title": "Inicio",
+        "dashboard": "Panel",
         "folders": "Carpetas",
         "shared_notes": "Notas compartidas",
         "shared_folders": "Carpetas compartidas",
@@ -573,6 +575,10 @@
         "markdown_placeholder_mobile": "Escribe tu markdown aquí...",
         "excalidraw": {
             "placeholder_outside": "Escribe fuera del diagrama aquí…"
+        },
+        "messages": {
+            "preview_mode_hint": "Estás en modo de vista previa. Cambia al modo de edición usando el botón en la barra de herramientas para comenzar a escribir markdown.",
+            "split_preview_placeholder": "La vista previa aparecerá aquí mientras escribes..."
         },
         "images": {
             "delete_confirm": {
@@ -784,6 +790,9 @@
                 "default_heading": "{{note}}",
                 "success": "Nota vinculada creada con éxito",
                 "error": "Error al crear la nota vinculada"
+            },
+            "template": {
+                "title": "Plantilla"
             },
             "subfolder": {
                 "title": "Subcarpeta"
@@ -1844,7 +1853,7 @@
     },
     "git_sync": {
         "title": "Sincronización {{provider}}",
-        "description": "Haga una copia de seguridad de sus notas y archivos adjuntos en {{provider}}. Los archivos se almacenan como archivos planos con un metadata.json que conserva etiquetas, carpetas, fechas y adjuntos.",
+        "description": "Sincroniza tus notas y archivos adjuntos en {{provider}}. Los archivos se almacenan como archivos planos con un metadata.json que conserva etiquetas, carpetas, fechas y adjuntos.",
         "warning": "No confíe únicamente en esta función como solución de copia de seguridad.\nExporte sus datos regularmente desde la función de copia de seguridad en los Ajustes.",
         "confirm_push": "¿Enviar todas las notas y archivos adjuntos a {{provider}}? Los archivos existentes se actualizarán y los archivos que ya no están en Poznote se eliminarán del repositorio.",
         "confirm_pull": "¿Extraer todas las notas y archivos adjuntos de {{provider}}? Los datos locales serán reemplazados por la versión remota. Las notas no encontradas en {{provider}} se moverán a la papelera.",

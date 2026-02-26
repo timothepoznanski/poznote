@@ -25,9 +25,14 @@ class WorkspacesController {
             $stmt = $this->con->query("SELECT name, created FROM workspaces ORDER BY name");
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
+            // Get current user
+            $currentUser = getCurrentUser();
+            $username = $currentUser['username'] ?? null;
+            
             echo json_encode([
                 'success' => true,
-                'workspaces' => $rows
+                'workspaces' => $rows,
+                'username' => $username
             ]);
         } catch (Exception $e) {
             http_response_code(500);

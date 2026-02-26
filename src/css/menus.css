@@ -86,7 +86,7 @@
     display: flex;
     align-items: center;
     transition: background-color 0.2s;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: none;
     font-size: 14px;
 }
 
@@ -114,6 +114,17 @@
 
 .workspace-menu-item.current-workspace i {
     color: #007DB8;
+}
+
+.workspace-menu-username {
+    cursor: default;
+    font-weight: 400;
+    color: var(--text-color, #333);
+    border-bottom: none;
+}
+
+.workspace-menu-username:hover {
+    background-color: transparent;
 }
 
 .workspace-menu-divider {
