@@ -576,6 +576,10 @@
         "excalidraw": {
             "placeholder_outside": "Hier außerhalb des Diagramms schreiben…"
         },
+        "messages": {
+            "preview_mode_hint": "Sie befinden sich im Vorschaumodus. Wechseln Sie mit der Schaltfläche in der Symbolleiste in den Bearbeitungsmodus, um mit dem Schreiben von Markdown zu beginnen.",
+            "split_preview_placeholder": "Die Vorschau wird hier beim Tippen angezeigt..."
+        },
         "images": {
             "delete_confirm": {
                 "title": "Bild löschen",

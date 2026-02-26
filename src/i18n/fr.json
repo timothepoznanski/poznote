@@ -597,6 +597,10 @@
         "excalidraw": {
             "placeholder_outside": "Écrivez en dehors du diagramme ici…"
         },
+        "messages": {
+            "preview_mode_hint": "Vous êtes en mode prévisualisation. Utilisez le bouton dans la barre d'outils pour passer en mode édition et commencer à écrire en markdown.",
+            "split_preview_placeholder": "La prévisualisation s'affichera ici au fur et à mesure que vous tapez..."
+        },
         "images": {
             "delete_confirm": {
                 "title": "Supprimer l’image",

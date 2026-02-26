@@ -1240,9 +1240,27 @@ function initializeMarkdownNote(noteId) {
     var isEmpty = markdownContent.trim() === '';
     var startInEditMode;
     var startInSplitMode = false;
+    var forceSplitForNewMarkdown = false;
 
-    // Always start in edit mode for empty notes (new notes)
-    if (isEmpty) {
+    try {
+        var params = new URLSearchParams(window.location.search || '');
+        forceSplitForNewMarkdown = params.get('md_split') === '1';
+        
+        // Clean up the URL parameter after reading it
+        if (forceSplitForNewMarkdown) {
+            params.delete('md_split');
+            var newUrl = window.location.pathname + '?' + params.toString();
+            window.history.replaceState({}, '', newUrl);
+        }
+    } catch (e) {
+        forceSplitForNewMarkdown = false;
+    }
+
+    // Always start in edit mode for empty notes (new notes), unless force split is set
+    if (isEmpty && forceSplitForNewMarkdown) {
+        startInSplitMode = true;
+        startInEditMode = false;
+    } else if (isEmpty) {
         startInEditMode = true;
     } else if (savedMode && savedMode === 'split') {
         startInSplitMode = true;
@@ -1283,6 +1301,21 @@ function initializeMarkdownNote(noteId) {
         const mobilePh = window.t('editor.markdown_placeholder_mobile', null, 'Write your markdown here...');
         const desktopPh = window.t('editor.markdown_placeholder', null, 'Write your markdown or use / to open commands menu here...');
         editorDiv.setAttribute('data-ph', isMobileViewport ? mobilePh : desktopPh);
+
+        var liveContent = normalizeContentEditableText(editorDiv);
+        if (liveContent.trim() === '') {
+            var placeholderText;
+            if (noteEntry.classList.contains('markdown-split-mode')) {
+                placeholderText = window.t('editor.messages.split_preview_placeholder', null, 'Preview will appear here as you type...');
+            } else {
+                placeholderText = window.t('editor.messages.preview_mode_hint', null, 'You are in preview mode. Switch to edit mode using the button in the toolbar to start writing markdown.');
+            }
+
+            renderMarkdownPreview(previewDiv, liveContent, noteId, {
+                postProcess: false,
+                placeholder: placeholderText
+            });
+        }
     });
 
     editorContainer.appendChild(editorDiv);
@@ -1910,7 +1943,7 @@ function setupSplitModePreviewUpdate(noteId) {
             var isEmpty = content.trim() === '';
 
             renderMarkdownPreview(previewDiv, content, noteId, {
-                placeholder: 'Preview will appear here as you type...',
+                placeholder: window.t ? window.t('editor.messages.split_preview_placeholder', null, 'Preview will appear here as you type...') : 'Preview will appear here as you type...',
                 delay: 50
             });
         }, 300); // 300ms debounce

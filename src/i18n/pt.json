@@ -575,6 +575,10 @@
         "excalidraw": {
             "placeholder_outside": "Escreva fora do diagrama aqui…"
         },
+        "messages": {
+            "preview_mode_hint": "Você está no modo de visualização. Mude para o modo de edição usando o botão na barra de ferramentas para começar a escrever markdown.",
+            "split_preview_placeholder": "A visualização aparecerá aqui conforme você digita..."
+        },
         "images": {
             "delete_confirm": {
                 "title": "Excluir Imagem",

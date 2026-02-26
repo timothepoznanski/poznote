@@ -685,6 +685,10 @@
         "excalidraw": {
             "placeholder_outside": "…"
         },
+        "messages": {
+            "preview_mode_hint": "You are in preview mode. Switch to edit mode using the button in the toolbar to start writing markdown.",
+            "split_preview_placeholder": "Preview will appear here as you type..."
+        },
         "images": {
             "delete_confirm": {
                 "title": "Delete image",
