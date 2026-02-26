@@ -24,7 +24,7 @@ RUN addgroup -g 1000 mcp && adduser -u 1000 -G mcp -s /bin/sh -D mcp
 WORKDIR /app
 
 # Copy project files for installation
-COPY pyproject.toml README.md ./
+COPY pyproject.toml ./
 COPY src/ ./src/
 
 # Install Python dependencies
