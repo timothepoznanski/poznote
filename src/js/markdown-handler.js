@@ -11,27 +11,6 @@ function _mdEscapeHtml(str) {
         .replace(/'/g, '&#039;');
 }
 
-// Helper function to auto-format plain URLs to markdown links
-function autoLinkUrls(text) {
-    if (!text) return text;
-    
-    // Match standalone URLs (not already in markdown format)
-    var urlRegex = /(https?:\/\/[^\s<>"\[\]]+)/g;
-    
-    return text.replace(urlRegex, function(match, url, offset) {
-        // Check if URL is already part of markdown link syntax by looking at context
-        var beforeUrl = text.substring(Math.max(0, offset - 2), offset);
-        
-        // Don't convert if already in markdown format ']('
-        if (beforeUrl === '](') {
-            return url;
-        }
-        
-        // Convert to markdown link
-        return '[' + url + '](' + url + ')';
-    });
-}
-
 // Helper function to normalize content from contentEditable
 function normalizeContentEditableText(element) {
     // More robust content extraction that handles contentEditable quirks
@@ -574,6 +553,19 @@ function parseMarkdown(text) {
 
     // Helper function to apply inline styles (bold, italic, code, etc.)
     function applyInlineStyles(text) {
+        function linkifyPlainUrls(input) {
+            var urlRegex = /(^|[\s(])((?:https?:\/\/)[^\s<]+)/g;
+            return input.replace(urlRegex, function (match, prefix, url) {
+                var trailing = '';
+                while (/[),.;!?]$/.test(url)) {
+                    trailing = url.slice(-1) + trailing;
+                    url = url.slice(0, -1);
+                }
+                if (!url) return match;
+                return prefix + '<a href="' + url + '" target="_blank" rel="noopener">' + url + '</a>' + trailing;
+            });
+        }
+
         // First, protect inline code content from other replacements
         let protectedCode = [];
         let codeIndex = 0;
@@ -597,6 +589,9 @@ function parseMarkdown(text) {
 
         // Strikethrough
         text = text.replace(/~~([^~]+)~~/g, '<del>$1</del>');
+
+        // Auto-link plain URLs like GitHub-style markdown behavior
+        text = linkifyPlainUrls(text);
 
         // Restore protected code elements
         text = text.replace(/\x00CODE(\d+)\x00/g, function (match, index) {
@@ -1302,9 +1297,6 @@ function initializeMarkdownNote(noteId) {
 
         // Normalize line endings
         text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-        
-        // Auto-format plain URLs to markdown links
-        text = autoLinkUrls(text);
 
         document.execCommand('insertText', false, text);
     });

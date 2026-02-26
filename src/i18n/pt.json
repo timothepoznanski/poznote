@@ -301,7 +301,8 @@
         "categories": {
             "actions": "Ações",
             "display": "Tela",
-            "about": "Sobre"
+            "about": "Sobre",
+            "documentation": "Documentação"
         },
         "sections": {
             "account_display": "Conta e Exibição",
@@ -460,6 +461,7 @@
     },
     "home": {
         "title": "Início",
+        "dashboard": "Painel",
         "folders": "Pastas",
         "shared_notes": "Notas compartilhadas",
         "shared_folders": "Pastas compartilhadas",

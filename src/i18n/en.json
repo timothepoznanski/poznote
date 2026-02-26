@@ -42,7 +42,8 @@
         "categories": {
             "actions": "Actions",
             "display": "Display",
-            "about": "About"
+            "about": "About",
+            "documentation": "Documentation"
         },
         "password": {
             "title": "Settings Access",
@@ -1193,6 +1194,7 @@
     },
     "home": {
         "title": "Home",
+        "dashboard": "Dashboard",
         "folders": "Folders",
         "shared_notes": "Shared Notes",
         "shared_folders": "Shared Folders",

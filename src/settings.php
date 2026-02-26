@@ -117,6 +117,9 @@ if ($cache_v === false) {
 }
 $cache_v = urlencode(trim($cache_v));
 
+$app_version_display = trim(@file_get_contents('version.txt') ?: 'Unknown');
+$app_version_display = htmlspecialchars($app_version_display, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
 // Count workspaces
 $workspaces_count = 0;
 try {
@@ -266,6 +269,7 @@ if ($isAdmin) {
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.check_updates', [], 'Check for Updates'); ?></span>
+                    <span class="setting-status enabled"><?php echo $app_version_display; ?></span>
                 </div>
             </div>
             <?php endif; ?>

@@ -311,7 +311,8 @@
         "categories": {
             "actions": "Actions",
             "display": "Affichage",
-            "about": "À propos"
+            "about": "À propos",
+            "documentation": "Documentation"
         },
         "password": {
             "title": "Accès aux Paramètres",
@@ -480,6 +481,7 @@
     },
     "home": {
         "title": "Accueil",
+        "dashboard": "Tableau de bord",
         "folders": "Dossiers",
         "shared_notes": "Notes partagées",
         "shared_folders": "Dossiers partagés",

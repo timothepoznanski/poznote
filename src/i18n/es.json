@@ -302,7 +302,8 @@
         "categories": {
             "actions": "Acciones",
             "display": "Pantalla",
-            "about": "Acerca de"
+            "about": "Acerca de",
+            "documentation": "Documentación"
         },
         "sections": {
             "account_display": "Cuenta y Visualización",
@@ -461,6 +462,7 @@
     },
     "home": {
         "title": "Inicio",
+        "dashboard": "Panel",
         "folders": "Carpetas",
         "shared_notes": "Notas compartidas",
         "shared_folders": "Carpetas compartidas",

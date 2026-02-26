@@ -302,7 +302,8 @@
         "categories": {
             "actions": "Aktionen",
             "display": "Anzeige",
-            "about": "Über"
+            "about": "Über",
+            "documentation": "Dokumentation"
         },
         "sections": {
             "account_display": "Konto & Anzeige",
@@ -461,6 +462,7 @@
     },
     "home": {
         "title": "Startseite",
+        "dashboard": "Dashboard",
         "folders": "Ordner",
         "shared_notes": "Geteilte Notizen",
         "shared_folders": "Geteilte Ordner",

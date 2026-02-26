@@ -601,16 +601,16 @@ try {
 
         </div>
 
-        <h2 class="settings-category-title"><?php echo t_h('settings.categories.about', [], 'About'); ?></h2>
+        <h2 class="settings-category-title"><?php echo t_h('settings.categories.documentation', [], 'Documentation'); ?></h2>
         <div class="home-grid">
 
             <!-- Version -->
-            <a href="https://github.com/timothepoznanski/poznote/releases" target="_blank" class="home-card" id="version-card" title="<?php echo t_h('home.version', [], 'Version'); ?>">
+            <a href="https://github.com/timothepoznanski/poznote/releases" target="_blank" class="home-card" id="version-card" title="<?php echo t_h('settings.cards.release_notes', [], 'Release notes'); ?>">
                 <div class="home-card-icon">
                     <i class="lucide lucide-info-circle"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('home.version', [], 'Version'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('settings.cards.release_notes', [], 'Release notes'); ?></span>
                     <span class="home-card-count"><?php echo htmlspecialchars(trim(@file_get_contents('version.txt') ?: 'Unknown'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
                 </div>
             </a>
