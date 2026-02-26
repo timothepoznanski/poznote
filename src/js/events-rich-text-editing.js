@@ -417,10 +417,19 @@ function handleMarkdownListEnter(e, selection) {
     var lineElement = null;
     var lineText = '';
     var cursorOffset = range.startOffset;
+    var fullText = '';
+    var lineStart = 0;
+    var lineEnd = 0;
 
     if (parent === markdownEditor) {
-        // Text node directly in the editor (e.g. very first line)
-        lineText = startContainer.textContent;
+        // Text node directly in the editor (single text node containing all lines)
+        fullText = startContainer.textContent || '';
+        lineStart = fullText.lastIndexOf('\n', Math.max(0, cursorOffset - 1)) + 1;
+        lineEnd = fullText.indexOf('\n', cursorOffset);
+        if (lineEnd === -1) {
+            lineEnd = fullText.length;
+        }
+        lineText = fullText.slice(lineStart, lineEnd);
         lineElement = null;
     } else {
         // Text node inside a line <div>
@@ -465,57 +474,68 @@ function handleMarkdownListEnter(e, selection) {
             lineElement.innerHTML = '<br>';
             setCursorPosition(lineElement, 0, false);
         } else {
-            var emptyDiv = document.createElement('div');
-            emptyDiv.innerHTML = '<br>';
-            var afterEmpty = startContainer.nextSibling;
-            if (afterEmpty) {
-                markdownEditor.insertBefore(emptyDiv, afterEmpty);
-            } else {
-                markdownEditor.appendChild(emptyDiv);
+            var newTextAfterExit = fullText.slice(0, lineStart) + fullText.slice(lineEnd);
+            startContainer.textContent = newTextAfterExit;
+            try {
+                var exitRange = document.createRange();
+                exitRange.setStart(startContainer, lineStart);
+                exitRange.collapse(true);
+                var exitSel = window.getSelection();
+                exitSel.removeAllRanges();
+                exitSel.addRange(exitRange);
+            } catch (e) {
+                // Fall back to default cursor placement if the range fails
             }
-            markdownEditor.removeChild(startContainer);
-            setCursorPosition(emptyDiv, 0, false);
         }
         triggerNoteSave();
         return true;
     }
 
     // Split line at cursor: keep text before cursor on current line, move rest to new line
-    var textBeforeCursor = lineText.slice(0, cursorOffset);
-    var textAfterCursor = lineText.slice(cursorOffset);
+    var textBeforeCursor = lineText.slice(0, cursorOffset - (parent === markdownEditor ? lineStart : 0));
+    var textAfterCursor = lineText.slice(cursorOffset - (parent === markdownEditor ? lineStart : 0));
     var newLineContent = newPrefix + textAfterCursor;
 
-    var newDiv = document.createElement('div');
-    if (newLineContent === '') {
-        newDiv.innerHTML = '<br>';
-    } else {
-        newDiv.textContent = newLineContent;
-    }
-
     if (lineElement) {
+        var newDiv = document.createElement('div');
+        if (newLineContent === '') {
+            newDiv.innerHTML = '<br>';
+        } else {
+            newDiv.textContent = newLineContent;
+        }
+
         lineElement.textContent = textBeforeCursor || '';
         if (!textBeforeCursor) lineElement.innerHTML = '<br>';
         markdownEditor.insertBefore(newDiv, lineElement.nextSibling);
-    } else {
-        startContainer.textContent = textBeforeCursor;
-        var insertAfter = startContainer.nextSibling;
-        if (insertAfter) {
-            markdownEditor.insertBefore(newDiv, insertAfter);
-        } else {
-            markdownEditor.appendChild(newDiv);
-        }
-    }
 
-    // Place cursor right after the new prefix
-    if (newDiv.firstChild && newDiv.firstChild.nodeType === Node.TEXT_NODE) {
-        var newRange = document.createRange();
-        newRange.setStart(newDiv.firstChild, newPrefix.length);
-        newRange.collapse(true);
-        var newSel = window.getSelection();
-        newSel.removeAllRanges();
-        newSel.addRange(newRange);
+        // Place cursor right after the new prefix
+        if (newDiv.firstChild && newDiv.firstChild.nodeType === Node.TEXT_NODE) {
+            var newRange = document.createRange();
+            newRange.setStart(newDiv.firstChild, newPrefix.length);
+            newRange.collapse(true);
+            var newSel = window.getSelection();
+            newSel.removeAllRanges();
+            newSel.addRange(newRange);
+        } else {
+            setCursorPosition(newDiv, 0, false);
+        }
     } else {
-        setCursorPosition(newDiv, 0, false);
+        var insertText = '\n' + newPrefix;
+        var newFullText = fullText.slice(0, cursorOffset) + insertText + fullText.slice(cursorOffset);
+        startContainer.textContent = newFullText;
+
+        // Place cursor right after the new prefix
+        try {
+            var caretOffset = cursorOffset + insertText.length;
+            var textRange = document.createRange();
+            textRange.setStart(startContainer, caretOffset);
+            textRange.collapse(true);
+            var textSel = window.getSelection();
+            textSel.removeAllRanges();
+            textSel.addRange(textRange);
+        } catch (e) {
+            // Fall back to default cursor placement if the range fails
+        }
     }
 
     triggerNoteSave();
