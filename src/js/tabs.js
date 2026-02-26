@@ -112,6 +112,74 @@
             '&note=' + encodeURIComponent(noteId);
     }
 
+    function _isSearchFilteringActive() {
+        try {
+            var urlParams = new URLSearchParams(window.location.search || '');
+            var urlSearch = (urlParams.get('search') || '').trim();
+            var urlTags = (urlParams.get('tags_search') || '').trim();
+            if (urlSearch || urlTags) return true;
+        } catch (e) { /* ignore */ }
+
+        var searchInputs = [
+            document.getElementById('unified-search'),
+            document.getElementById('unified-search-mobile'),
+            document.getElementById('search-notes-hidden'),
+            document.getElementById('search-notes-hidden-mobile'),
+            document.getElementById('search-tags-hidden'),
+            document.getElementById('search-tags-hidden-mobile')
+        ];
+
+        for (var i = 0; i < searchInputs.length; i++) {
+            var input = searchInputs[i];
+            if (input && input.value && input.value.trim()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    function _isElementVisibleForSearch(el) {
+        if (!el) return false;
+        if (el.classList.contains('search-hidden') || el.closest('.search-hidden')) return false;
+
+        try {
+            var style = window.getComputedStyle(el);
+            if (style.display === 'none' || style.visibility === 'hidden') return false;
+        } catch (e) { /* ignore */ }
+
+        return !(el.offsetWidth === 0 && el.offsetHeight === 0);
+    }
+
+    function _isNoteVisibleInSidebar(noteId) {
+        noteId = String(noteId);
+        var noteLinks = document.querySelectorAll('[data-action="load-note"][data-note-id]');
+        for (var i = 0; i < noteLinks.length; i++) {
+            var el = noteLinks[i];
+            if (String(el.getAttribute('data-note-id')) === noteId && _isElementVisibleForSearch(el)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function _applySearchTabVisibility() {
+        var bar = document.getElementById('app-tab-bar');
+        if (!bar) return;
+
+        var hideFilteredTabs = _isSearchFilteringActive();
+        var tabElements = bar.querySelectorAll('.app-tab[data-tab-id]');
+
+        for (var i = 0; i < tabElements.length; i++) {
+            var tabEl = tabElements[i];
+            var tab = _findTabById(tabEl.getAttribute('data-tab-id'));
+            if (!tab) continue;
+
+            var shouldHideTab = hideFilteredTabs && !_isNoteVisibleInSidebar(tab.noteId);
+            tabEl.style.display = shouldHideTab ? 'none' : '';
+        }
+    }
+
     // ── Render ─────────────────────────────────────────────────────────────
 
     /**
@@ -174,6 +242,8 @@
             }
             bar.appendChild(el);
         });
+
+        _applySearchTabVisibility();
 
         // Ensure active tab is visible if bar overflowed
         if (activeTabId) {
@@ -521,6 +591,8 @@
 
     function updateOpenInNewTabButtons() {
         if (!_areTabsEnabled()) return;
+
+        _applySearchTabVisibility();
 
         // Selector to find all relevant buttons:
         // 1. Sidebar/Toolbar buttons with data-action="open-note-new-tab"
