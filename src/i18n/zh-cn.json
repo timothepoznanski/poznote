@@ -803,6 +803,9 @@
                 "success": "链接笔记创建成功",
                 "error": "创建链接笔记时出错"
             },
+            "template": {
+                "title": "模板"
+            },
             "subfolder": {
                 "title": "子文件夹"
             },

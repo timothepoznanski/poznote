@@ -785,6 +785,9 @@
                 "success": "Verknüpfte Notiz erfolgreich erstellt",
                 "error": "Fehler beim Erstellen der verknüpften Notiz"
             },
+            "template": {
+                "title": "Vorlage"
+            },
             "subfolder": {
                 "title": "Unterordner"
             },

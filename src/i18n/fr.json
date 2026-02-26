@@ -811,6 +811,9 @@
                 "success": "Note liée créée avec succès",
                 "error": "Erreur lors de la création de la note liée"
             },
+            "template": {
+                "title": "Modèle"
+            },
             "subfolder": {
                 "title": "Sous-dossier"
             },

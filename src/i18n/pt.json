@@ -784,6 +784,9 @@
                 "success": "Nota vinculada criada com sucesso",
                 "error": "Erro ao criar nota vinculada"
             },
+            "template": {
+                "title": "Modelo"
+            },
             "subfolder": {
                 "title": "Subpasta"
             },

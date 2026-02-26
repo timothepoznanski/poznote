@@ -785,6 +785,9 @@
                 "success": "Nota vinculada creada con éxito",
                 "error": "Error al crear la nota vinculada"
             },
+            "template": {
+                "title": "Plantilla"
+            },
             "subfolder": {
                 "title": "Subcarpeta"
             },

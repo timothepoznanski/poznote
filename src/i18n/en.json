@@ -353,6 +353,9 @@
                 "success": "Linked note created successfully",
                 "error": "Error creating linked note"
             },
+            "template": {
+                "title": "Template"
+            },
             "subfolder": {
                 "title": "Subfolder"
             },
