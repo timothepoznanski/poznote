@@ -335,9 +335,6 @@ $body_classes = trim($extra_body_classes);
                 <i class="lucide lucide-caret-down workspace-dropdown-icon"></i>
             </div>
             <div class="sidebar-title-actions">
-                <a href="https://poznote.com/howto.html" target="_blank" class="sidebar-howto" title="<?php echo t_h('sidebar.howto', [], 'How-to'); ?>">
-                    <i class="lucide lucide-lightbulb"></i>
-                </a>
                 <button class="sidebar-home" data-action="navigate-to-home" title="<?php echo t_h('sidebar.home', [], 'Home'); ?>">
                     <i class="lucide lucide-home"></i>
                 </button>

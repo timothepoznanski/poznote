@@ -619,6 +619,16 @@ try {
                 </div>
             </a>
 
+            <!-- How-to -->
+            <a href="https://poznote.com/howto.html" target="_blank" class="home-card" id="howto-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-lightbulb"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('sidebar.howto', [], 'How-to'); ?></span>
+                </div>
+            </a>
+
             <?php if ($isAdmin): ?>
             <!-- API Documentation -->
             <a href="api-docs/" class="home-card" id="api-docs-card">
