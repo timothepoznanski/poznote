@@ -363,6 +363,13 @@ function highlightInElement(element, searchWords) {
                 parent.removeChild(node);
             }
         } else if (node.nodeType === 1 && !node.classList.contains('search-highlight')) { // Node.ELEMENT_NODE
+            // Skip hidden containers (e.g. markdown editor while preview is visible)
+            // to avoid generating hidden highlights that break navigation/scroll.
+            try {
+                if (window.getComputedStyle(node).display === 'none') {
+                    return;
+                }
+            } catch (e) { /* ignore */ }
             // Process child nodes (but don't process already highlighted spans)
             var children = [];
             for (var childIdx = 0; childIdx < node.childNodes.length; childIdx++) {
@@ -670,6 +677,23 @@ function updateHighlightsList() {
     // Get standard highlights, input overlays, and matching tags
     var highlights = Array.from(document.querySelectorAll('.search-highlight, .input-highlight-overlay, .tag-highlight'));
 
+    // Exclude highlights inside hidden containers (markdown editor in preview mode, etc.)
+    highlights = highlights.filter(function (el) {
+        if (el.classList.contains('input-highlight-overlay')) return true;
+
+        try {
+            var current = el;
+            while (current && current !== document.body) {
+                if (window.getComputedStyle(current).display === 'none') {
+                    return false;
+                }
+                current = current.parentElement;
+            }
+        } catch (e) { /* keep highlight if style lookup fails */ }
+
+        return true;
+    });
+
     // Sort highlights by their position in the DOM (vertical position first, then horizontal)
     highlights.sort(function (a, b) {
         var rectA = a.getBoundingClientRect();
@@ -706,49 +730,73 @@ function navigateToHighlight(index, smooth) {
     // Add active class
     target.classList.add('search-highlight-active');
 
-    // Scroll to the target with improved scrolling settings
-    if (typeof target.scrollIntoView === 'function') {
-        const isMobile = window.innerWidth <= 800;
-        let behavior = (smooth === false) ? 'auto' : 'smooth';
+    // Scroll to the target.
+    const isMobile = window.innerWidth <= 800;
+    const behavior = (smooth === false || isMobile) ? 'auto' : 'smooth';
+    const initialDelay = isMobile ? 250 : 50;
 
-        // On mobile, use a larger initial delay to ensure horizontal transitions 
-        // are underway/finished, and prefer 'auto' behavior for the vertical scroll 
-        // to avoid conflicts between horizontal/vertical smooth animations.
-        const initialDelay = isMobile ? 250 : 50;
-        if (isMobile && smooth) behavior = 'auto';
-
+    setTimeout(() => {
         try {
-            // First, ensure the note content is loaded if it's a content highlight
-            // then use a small delay to allow any dynamic content adjustments
-            setTimeout(() => {
-                // On mobile, inline: 'start' ensures the target's column is aligned to the screen
+            var noteEntry = target.closest('.noteentry');
+            var inSplitMode = !!(noteEntry && noteEntry.classList.contains('markdown-split-mode'));
+
+            if (inSplitMode) {
+                // In split view, keep toolbar stable by scrolling only the local pane
+                // (preview/editor) instead of outer containers.
+                var pane = null;
+                var current = target.parentElement;
+                while (current && current !== noteEntry) {
+                    var style = window.getComputedStyle(current);
+                    var canScroll = (style.overflowY === 'auto' || style.overflowY === 'scroll') &&
+                        current.scrollHeight > current.clientHeight;
+                    if (canScroll) {
+                        pane = current;
+                        break;
+                    }
+                    current = current.parentElement;
+                }
+
+                if (pane) {
+                    var paneRect = pane.getBoundingClientRect();
+                    var targetRect = target.getBoundingClientRect();
+                    var desired = pane.scrollTop + (targetRect.top - paneRect.top) - 16;
+                    var maxTop = Math.max(0, pane.scrollHeight - pane.clientHeight);
+                    desired = Math.max(0, Math.min(desired, maxTop));
+                    pane.scrollTo({ top: desired, behavior: behavior });
+                } else if (typeof target.scrollIntoView === 'function') {
+                    target.scrollIntoView({
+                        behavior: behavior,
+                        block: 'nearest',
+                        inline: isMobile ? 'start' : 'nearest'
+                    });
+                }
+            } else if (typeof target.scrollIntoView === 'function') {
+                var stickyOffset = 0;
+                var tabBar = document.getElementById('app-tab-bar');
+                if (tabBar) {
+                    stickyOffset += tabBar.offsetHeight;
+                }
+                var noteCard = target.closest('.notecard');
+                if (noteCard) {
+                    var noteHeader = noteCard.querySelector('.note-header');
+                    if (noteHeader) {
+                        stickyOffset += noteHeader.offsetHeight;
+                    }
+                }
+
+                // Keep the match below sticky UI to avoid hiding the note toolbar.
+                target.style.scrollMarginTop = (stickyOffset + 12) + 'px';
+
                 target.scrollIntoView({
                     behavior: behavior,
-                    block: 'center',
+                    block: 'start',
                     inline: isMobile ? 'start' : 'nearest'
                 });
-
-                // Secondary check: if the target is still not well-positioned (async styles/images)
-                // perform a second centering call after a slightly longer delay
-                setTimeout(() => {
-                    const rect = target.getBoundingClientRect();
-                    const viewHeight = window.innerHeight;
-                    const isCentered = rect.top > (viewHeight * 0.2) && rect.top < (viewHeight * 0.8);
-
-                    if (!isCentered) {
-                        target.scrollIntoView({
-                            behavior: 'auto',
-                            block: 'center',
-                            inline: isMobile ? 'start' : 'nearest'
-                        });
-                    }
-                }, isMobile ? 500 : 300);
-            }, initialDelay);
+            }
         } catch (e) {
-            // Fallback for older browsers
-            target.scrollIntoView(behavior === 'smooth');
+            try { target.scrollIntoView(behavior === 'smooth'); } catch (_) { /* ignore */ }
         }
-    }
+    }, initialDelay);
 
     window.searchNavigation.currentHighlightIndex = index;
 }
