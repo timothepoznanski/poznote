@@ -108,21 +108,17 @@ $settings = [
     'hide_folder_actions' => null,
     'hide_folder_counts' => null,
     'note_list_sort' => 'updated_desc',
-    'notes_without_folders_after_folders' => '1',
-    'hide_inline_attachment_images' => '1'
+    'notes_without_folders_after_folders' => '1'
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'hide_inline_attachment_images')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
 } catch (Exception $e) {
     // Use defaults if error
 }
-
-// Extract hide_inline_attachment_images setting (with invertLogic: '1' = show, '0' or null = hide)
-$hide_inline_images = ($settings['hide_inline_attachment_images'] === '0' || $settings['hide_inline_attachment_images'] === 'false');
 
 // Extract settings with proper defaults
 $note_font_size = $settings['note_font_size'];
@@ -187,6 +183,7 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <link type="text/css" rel="stylesheet" href="css/folders/table-picker.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/folders/system-folders.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/emoji-picker.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/calendar.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/table-picker.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/slash-commands.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/drag-drop.css?v=<?php echo $v; ?>"/>
@@ -221,6 +218,7 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/calendar.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="js/katex/katex.min.css?v=<?php echo $v; ?>"/>
     <style>:root { --note-font-size: <?php echo htmlspecialchars($note_font_size, ENT_QUOTES); ?>px; --sidebar-font-size: <?php echo htmlspecialchars($sidebar_font_size, ENT_QUOTES); ?>px; --note-max-width: <?php echo htmlspecialchars($note_max_width, ENT_QUOTES); ?>px; }</style>
     <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
@@ -574,11 +572,30 @@ $body_classes = trim($extra_body_classes);
 
                 
                     // Favorite / Share / Attachment buttons
+                    // Calculate visible attachments count (excluding inline images that are already visible in the note)
                     $attachments_count = 0;
+                    $visible_attachments_count = 0;
                     if (!empty($row['attachments'])) {
                         $attachments_data = json_decode($row['attachments'], true);
                         if (is_array($attachments_data)) {
                             $attachments_count = count($attachments_data);
+                            $note_content_for_count = $row['entry'] ?? '';
+                            foreach ($attachments_data as $att) {
+                                if (isset($att['id'])) {
+                                    $is_inline = false;
+                                    $mime = $att['mime_type'] ?? '';
+                                    $is_img = strpos($mime, 'image/') === 0;
+                                    if (!$is_img && isset($att['original_filename'])) {
+                                        $ext = strtolower(pathinfo($att['original_filename'], PATHINFO_EXTENSION));
+                                        $is_img = in_array($ext, ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp']);
+                                    }
+                                    if ($is_img) {
+                                        $pattern = 'attachments/' . $att['id'];
+                                        $is_inline = (strpos($note_content_for_count, $pattern) !== false || strpos($note_content_for_count, urlencode($pattern)) !== false);
+                                    }
+                                    if (!$is_inline) $visible_attachments_count++;
+                                }
+                            }
                         }
                     }
                 
@@ -594,7 +611,7 @@ $body_classes = trim($extra_body_classes);
                     // Share button
                     echo '<button type="button" class="toolbar-btn btn-share note-action-btn'.$share_class.'" title="'.t_h('index.toolbar.share_note', [], 'Share note').'" data-action="open-share-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-cloud"></i></button>';
                     
-                    echo '<button type="button" class="toolbar-btn btn-attachment note-action-btn'.($attachments_count > 0 ? ' has-attachments' : '').'" title="'.t_h('index.toolbar.attachments_with_count', ['count' => $attachments_count], 'Attachments ({{count}})').'" data-action="show-attachment-dialog" data-note-id="'.$row['id'].'"><i class="lucide lucide-paperclip"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-attachment note-action-btn'.($visible_attachments_count > 0 ? ' has-attachments' : '').'" title="'.t_h('index.toolbar.attachments_with_count', ['count' => $visible_attachments_count], 'Attachments ({{count}})').'" data-action="show-attachment-dialog" data-note-id="'.$row['id'].'"><i class="lucide lucide-paperclip"></i></button>';
                     
                     // Open in new tab button
                     echo '<button type="button" class="toolbar-btn btn-open-new-tab note-action-btn" title="'.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'" data-action="open-note-new-tab" data-note-id="'.$row['id'].'"><i class="lucide lucide-external-link"></i></button>';
@@ -788,26 +805,25 @@ $body_classes = trim($extra_body_classes);
                                     $original_filename = (string)$attachment['original_filename'];
                                     $safe_filename = htmlspecialchars($original_filename, ENT_QUOTES);
                                     
-                                    // Check if this is an image attachment to hide IF it's in the content and setting is disabled
+                                    // Check if this is an image attachment that's displayed inline in the note content
+                                    // Inline images (pasted) should be hidden from the attachments list
                                     $is_inline_image = false;
-                                    if ($hide_inline_images) {
-                                        $mime_type = $attachment['mime_type'] ?? '';
-                                        $is_image = strpos($mime_type, 'image/') === 0;
-                                        // Also check extension as fallback
-                                        if (!$is_image && isset($attachment['original_filename'])) {
-                                            $ext = strtolower(pathinfo($attachment['original_filename'], PATHINFO_EXTENSION));
-                                            $is_image = in_array($ext, ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp']);
-                                        }
+                                    $mime_type = $attachment['mime_type'] ?? '';
+                                    $is_image = strpos($mime_type, 'image/') === 0;
+                                    // Also check extension as fallback
+                                    if (!$is_image && isset($attachment['original_filename'])) {
+                                        $ext = strtolower(pathinfo($attachment['original_filename'], PATHINFO_EXTENSION));
+                                        $is_image = in_array($ext, ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp']);
+                                    }
 
-                                        if ($is_image) {
-                                            $attachment_id_pattern = 'attachments/' . $attachment['id'];
-                                            // Check in raw content
-                                            $is_inline_image = (strpos($note_content, $attachment_id_pattern) !== false);
-                                            
-                                            // If not found, try with escaped version just in case (e.g. for some specific editors)
-                                            if (!$is_inline_image) {
-                                                $is_inline_image = (strpos($note_content, urlencode($attachment_id_pattern)) !== false);
-                                            }
+                                    if ($is_image) {
+                                        $attachment_id_pattern = 'attachments/' . $attachment['id'];
+                                        // Check in raw content
+                                        $is_inline_image = (strpos($note_content, $attachment_id_pattern) !== false);
+                                        
+                                        // If not found, try with escaped version just in case (e.g. for some specific editors)
+                                        if (!$is_inline_image) {
+                                            $is_inline_image = (strpos($note_content, urlencode($attachment_id_pattern)) !== false);
                                         }
                                     }
                                     
@@ -817,7 +833,7 @@ $body_classes = trim($extra_body_classes);
                                     if (!$is_inline_image) $visible_links_count++;
                                 }
                             }
-                            $row_style = ($hide_inline_images && $visible_links_count === 0) ? ' style="display: none;"' : '';
+                            $row_style = ($visible_links_count === 0) ? ' style="display: none;"' : '';
                             echo '<div class="note-attachments-row"' . $row_style . '>';
                             // Make paperclip clickable to open attachments for this note (preserve workspace behavior via JS)
                             echo '<button type="button" class="icon-attachment-btn" title="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'" data-action="show-attachment-dialog" data-note-id="'.$row['id'].'" aria-label="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'"><span class="lucide lucide-paperclip icon_attachment"></span></button>';
@@ -980,6 +996,46 @@ $body_classes = trim($extra_body_classes);
 <script src="js/folder-icon.js?v=<?php echo $v; ?>"></script>
 <script src="js/kanban.js?v=<?php echo $v; ?>"></script>
 <script src="js/tabs.js?v=<?php echo $v; ?>"></script>
+<!-- Calendar translations -->
+<script>
+window.calendarTranslations = {
+    months: [
+        <?php echo json_encode(t('calendar.months.january')); ?>,
+        <?php echo json_encode(t('calendar.months.february')); ?>,
+        <?php echo json_encode(t('calendar.months.march')); ?>,
+        <?php echo json_encode(t('calendar.months.april')); ?>,
+        <?php echo json_encode(t('calendar.months.may')); ?>,
+        <?php echo json_encode(t('calendar.months.june')); ?>,
+        <?php echo json_encode(t('calendar.months.july')); ?>,
+        <?php echo json_encode(t('calendar.months.august')); ?>,
+        <?php echo json_encode(t('calendar.months.september')); ?>,
+        <?php echo json_encode(t('calendar.months.october')); ?>,
+        <?php echo json_encode(t('calendar.months.november')); ?>,
+        <?php echo json_encode(t('calendar.months.december')); ?>
+    ],
+    weekdays: [
+        <?php echo json_encode(t('calendar.weekdays.monday')); ?>,
+        <?php echo json_encode(t('calendar.weekdays.tuesday')); ?>,
+        <?php echo json_encode(t('calendar.weekdays.wednesday')); ?>,
+        <?php echo json_encode(t('calendar.weekdays.thursday')); ?>,
+        <?php echo json_encode(t('calendar.weekdays.friday')); ?>,
+        <?php echo json_encode(t('calendar.weekdays.saturday')); ?>,
+        <?php echo json_encode(t('calendar.weekdays.sunday')); ?>
+    ],
+    previousMonth: <?php echo json_encode(t('calendar.buttons.previous_month')); ?>,
+    nextMonth: <?php echo json_encode(t('calendar.buttons.next_month')); ?>,
+    today: <?php echo json_encode(t('calendar.buttons.today')); ?>,
+    showCalendar: <?php echo json_encode(t('calendar.buttons.show_calendar')); ?>,
+    hideCalendar: <?php echo json_encode(t('calendar.buttons.hide_calendar')); ?>,
+    modal: {
+        title: <?php echo json_encode(t('calendar.modal.title')); ?>,
+        open: <?php echo json_encode(t('calendar.modal.open')); ?>,
+        open_all: <?php echo json_encode(t('calendar.modal.open_all')); ?>,
+        close: <?php echo json_encode(t('calendar.modal.close')); ?>
+    }
+};
+</script>
+<script src="js/calendar.js?v=<?php echo $v; ?>"></script>
 
 <?php if ($note && is_numeric($note)): ?>
 <!-- Data for draft check (used by index-events.js) -->

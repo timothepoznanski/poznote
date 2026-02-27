@@ -1,0 +1,373 @@
+/**
+ * Mini Calendar Component Styles
+ * Calendar displayed at the bottom of the left sidebar
+ */
+
+/* Wrapper for scrollable content in left column */
+.notes-list-scrollable-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+    /* Hide scrollbars but keep scroll functionality */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.notes-list-scrollable-content::-webkit-scrollbar {
+    display: none;
+}
+
+/* Calendar container - fixed at bottom of left column */
+.mini-calendar-container {
+    position: sticky;
+    bottom: -16px;
+    left: 0;
+    right: 0;
+    margin: 16px -16px -16px -16px;
+    background: #ffffff;
+    border-top: 1px solid #e6eef8;
+    padding: 12px 16px 16px 16px;
+    z-index: 10;
+}
+
+#mini-calendar {
+    font-size: 11px;
+    max-width: 100%;
+    margin: 0;
+}
+
+/* Calendar header with navigation */
+.mini-calendar-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+/* Calendar header when collapsed */
+.mini-calendar-header.mini-calendar-collapsed {
+    justify-content: center;
+    margin-bottom: 0;
+}
+
+/* Reduce container height when collapsed */
+.mini-calendar-container:has(.mini-calendar-collapsed) {
+    padding: 2px 16px;
+}
+
+.mini-calendar-month-year {
+    flex: 1;
+    text-align: center;
+    font-weight: 600;
+    font-size: 12px;
+    color: #1f2937;
+}
+
+.mini-calendar-nav,
+.mini-calendar-today,
+.mini-calendar-toggle {
+    background: transparent;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    transition: background-color 0.2s, color 0.2s;
+    flex-shrink: 0;
+}
+
+.mini-calendar-nav:hover,
+.mini-calendar-today:hover,
+.mini-calendar-toggle:hover {
+    background: rgba(0, 125, 184, 0.1);
+    color: #007DB8;
+}
+
+.mini-calendar-nav i,
+.mini-calendar-today i,
+.mini-calendar-toggle i {
+    font-size: 13px;
+}
+
+/* Weekdays header */
+.mini-calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+    margin-bottom: 6px;
+}
+
+.mini-calendar-weekday {
+    text-align: center;
+    font-weight: 600;
+    font-size: 10px;
+    color: #6b7280;
+    padding: 4px 2px;
+}
+
+/* Days grid */
+.mini-calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+}
+
+.mini-calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    position: relative;
+    padding: 2px;
+}
+
+.mini-calendar-day:not(.mini-calendar-day-empty):hover {
+    background: #f6fbff;
+}
+
+.mini-calendar-day-empty {
+    cursor: default;
+}
+
+.mini-calendar-day-number {
+    font-size: 11px;
+    color: #1f2937;
+    font-weight: 500;
+    line-height: 1;
+}
+
+/* Today indicator */
+.mini-calendar-day-today {
+    background: rgba(11, 120, 230, 0.1);
+    border: 1px solid #0b78e6;
+}
+
+.mini-calendar-day-today .mini-calendar-day-number {
+    color: #0b78e6;
+    font-weight: 700;
+}
+
+/* Note dots indicator */
+.mini-calendar-dots {
+    display: flex;
+    gap: 2px;
+    margin-top: 2px;
+    min-height: 4px;
+    justify-content: center;
+}
+
+.mini-calendar-dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #0b78e6;
+}
+
+.mini-calendar-dot-more {
+    font-size: 8px;
+    color: #0b78e6;
+    font-weight: 600;
+    line-height: 1;
+}
+
+/* Days with notes */
+.mini-calendar-day-has-notes:hover {
+    background: rgba(11, 120, 230, 0.08);
+}
+
+.mini-calendar-day-has-notes .mini-calendar-day-number {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    .mini-calendar-container {
+        display: none; /* Hide on mobile to save space */
+    }
+}
+
+/* When left column is narrow, reduce calendar size */
+@media (max-width: 1024px) {
+    #mini-calendar {
+        font-size: 10px;
+        max-width: 240px;
+    }
+
+    .mini-calendar-day-number {
+        font-size: 10px;
+    }
+
+    .mini-calendar-month-year {
+        font-size: 11px;
+    }
+
+    .mini-calendar-dot {
+        width: 2px;
+        height: 2px;
+    }
+
+    .mini-calendar-nav,
+    .mini-calendar-today {
+        width: 18px;
+        height: 18px;
+    }
+
+    .mini-calendar-nav i,
+    .mini-calendar-today i {
+        font-size: 12px;
+    }
+}
+
+/* Modal for calendar notes list */
+.calendar-notes-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+}
+
+.calendar-notes-modal {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 100%;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-notes-modal .modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e6eef8;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.calendar-notes-modal .modal-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+
+.calendar-notes-modal .modal-body {
+    padding: 16px 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.calendar-notes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.calendar-note-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.calendar-note-item:hover {
+    background: #f3f4f6;
+    border-color: #0b78e6;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.calendar-note-title {
+    flex: 1;
+    color: #1f2937;
+    font-size: 14px;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: 12px;
+}
+
+.calendar-note-open-btn {
+    background: #0b78e6;
+    color: #ffffff;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    flex-shrink: 0;
+}
+
+.calendar-note-open-btn:hover {
+    background: #0961c4;
+}
+
+.calendar-notes-modal .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #e6eef8;
+    display: flex;
+    flex-direction: row !important;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.calendar-notes-modal .btn-open-all {
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.calendar-notes-modal .btn-open-all:hover {
+    background: #2563eb;
+}
+
+.calendar-notes-modal .btn-close-red {
+    background: #dc2626;
+    color: #ffffff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.calendar-notes-modal .btn-close-red:hover {
+    background: #b91c1c;
+}

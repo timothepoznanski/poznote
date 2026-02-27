@@ -95,8 +95,7 @@
             "show_folder_actions": "Show folder actions",
             "kanban_on_folder_click": "Open Kanban view on folder click",
             "index_icon_scale": "Index icon scaling",
-            "note_content_width": "Note content width",
-            "show_inline_attachment_images": "Show image attachments"
+            "note_content_width": "Note content width"
         },
         "badges": {
             "font_size_default": "default ({{size}}px)",
@@ -195,12 +194,7 @@
             "preview_alt": "Preview",
             "uploaded_prefix": "Uploaded: ",
             "open_in_new_tab": "Open in new tab",
-            "pdf_label": "PDF",
-            "show_inline_attachment_images_desc": "Show image attachments that are automatically created when an image is inserted into the note",
-            "settings_banner": {
-                "message": "Image attachments are hidden from the note's list (but not from the list here) because the 'Show image attachments' setting is disabled.",
-                "action": "Change setting"
-            }
+            "pdf_label": "PDF"
         },
         "modals": {
             "delete": {
@@ -226,7 +220,8 @@
             "hint": "Add attachments to your notes using the paperclip button in the toolbar.",
             "filter_placeholder": "Filter by note title or attachment name...",
             "no_filter_results": "No notes match your search.",
-            "show_thumbnails": "Show thumbnails in this list"
+            "show_thumbnails": "Show thumbnails in this list",
+            "show_inline_images": "Also show images already visible in the note content"
         }
     },
     "modals": {
@@ -1531,5 +1526,43 @@
         "alphabet": "Name",
         "created": "Date Created",
         "modified": "Date Modified"
+    },
+    "calendar": {
+        "months": {
+            "january": "January",
+            "february": "February",
+            "march": "March",
+            "april": "April",
+            "may": "May",
+            "june": "June",
+            "july": "July",
+            "august": "August",
+            "september": "September",
+            "october": "October",
+            "november": "November",
+            "december": "December"
+        },
+        "weekdays": {
+            "monday": "M",
+            "tuesday": "T",
+            "wednesday": "W",
+            "thursday": "T",
+            "friday": "F",
+            "saturday": "S",
+            "sunday": "S"
+        },
+        "buttons": {
+            "previous_month": "Previous month",
+            "next_month": "Next month",
+            "today": "Today",
+            "show_calendar": "Show calendar",
+            "hide_calendar": "Hide calendar"
+        },
+        "modal": {
+            "title": "Notes from",
+            "open": "Open",
+            "open_all": "Open All",
+            "close": "Close"
+        }
     }
 }

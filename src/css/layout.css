@@ -36,6 +36,8 @@ body {
     box-sizing: border-box;
     background: #f8f9fa;
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
     /* Hide scrollbars but keep scroll functionality for all screen sizes */
     -ms-overflow-style: none;
     /* IE and Edge */
@@ -190,7 +192,7 @@ body {
 /* Toggle sidebar and collapsed state */
 
 .resize-handle {
-    width: 3px;
+    /* width: 3px; */
     height: 100vh;
     background: #f8f9fa;
     cursor: col-resize;
@@ -214,11 +216,11 @@ body {
 /* Toggle sidebar button */
 .toggle-sidebar-btn {
     position: absolute;
-    bottom: 10px;
+    bottom: 0px;
     left: 50%;
-    transform: translateX(-50%);
+    /* transform: translateX(-50%); */
     width: 16px;
-    height: 24px;
+    height: 25px;
     background: #fff;
     border: 1px solid #ccc;
     border-radius: 0 4px 4px 0;
@@ -309,7 +311,7 @@ body.sidebar-collapsed .toggle-sidebar-btn i {
     left: 100%;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: 16px;
+    width: 13px;
     height: 16px;
     border: 1px solid #ccc;
     background: var(--bg-main, #fff);

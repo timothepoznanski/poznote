@@ -257,12 +257,7 @@
             "preview_alt": "预览",
             "uploaded_prefix": "已上传: ",
             "open_in_new_tab": "在新标签页中打开",
-            "pdf_label": "PDF",
-            "show_inline_attachment_images_desc": "显示插入图片到笔记时自动创建的图片附件",
-            "settings_banner": {
-                "message": "图片附件在笔记列表中已隐藏（但在此列表中不隐藏），因为“显示图片附件”设置已禁用。",
-                "action": "更改设置"
-            }
+            "pdf_label": "PDF"
         },
         "modals": {
             "delete": {
@@ -289,6 +284,7 @@
             "filter_placeholder": "按笔记标题或附件名称过滤...",
             "no_filter_results": "没有与您的搜索匹配的笔记。",
             "show_thumbnails": "在此列表显示缩略图",
+            "show_inline_images": "同时显示笔记内容中已可见的图片",
             "download": "下载"
         }
     },
@@ -434,8 +430,7 @@
             "show_folder_actions": "显示文件夹操作",
             "kanban_on_folder_click": "点击文件夹时打开看板视图",
             "index_icon_scale": "索引页图标缩放",
-            "note_content_width": "笔记内容宽度",
-            "show_inline_attachment_images": "显示图片附件"
+            "note_content_width": "笔记内容宽度"
         },
         "badges": {
             "font_size_default": "默认 ({{size}}px)",
@@ -2068,5 +2063,43 @@
         "alphabet": "名称",
         "created": "创建日期",
         "modified": "修改日期"
+    },
+    "calendar": {
+        "months": {
+            "january": "一月",
+            "february": "二月",
+            "march": "三月",
+            "april": "四月",
+            "may": "五月",
+            "june": "六月",
+            "july": "七月",
+            "august": "八月",
+            "september": "九月",
+            "october": "十月",
+            "november": "十一月",
+            "december": "十二月"
+        },
+        "weekdays": {
+            "monday": "一",
+            "tuesday": "二",
+            "wednesday": "三",
+            "thursday": "四",
+            "friday": "五",
+            "saturday": "六",
+            "sunday": "日"
+        },
+        "buttons": {
+            "previous_month": "上个月",
+            "next_month": "下个月",
+            "today": "今天",
+            "show_calendar": "显示日历",
+            "hide_calendar": "隐藏日历"
+        },
+        "modal": {
+            "title": "笔记来自",
+            "open": "打开",
+            "open_all": "全部打开",
+            "close": "关闭"
+        }
     }
 }

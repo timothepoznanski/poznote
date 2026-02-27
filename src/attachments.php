@@ -109,22 +109,6 @@ try {
             border-color: #334155;
             color: #94a3b8;
         }
-        .settings-banner-link {
-            color: #2563eb;
-            text-decoration: underline;
-            font-weight: 500;
-            margin-left: auto;
-            white-space: nowrap;
-        }
-        [data-theme="dark"] .settings-banner-link {
-            color: #60a5fa;
-        }
-        .settings-banner-link:hover {
-            color: #1d4ed8;
-        }
-        [data-theme="dark"] .settings-banner-link:hover {
-            color: #93c5fd;
-        }
         
         /* Toggle Checkbox Styles */
         .toggle-checkbox {
@@ -164,10 +148,6 @@ try {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 8px;
-            }
-            .settings-banner-link {
-                margin-left: 0;
-                margin-top: 4px;
             }
         }
     </style>
@@ -230,7 +210,7 @@ try {
         <div class="settings-banner-info">
             <label class="toggle-checkbox">
                 <input type="checkbox" id="showInlineImagesToggle" <?php echo $showInlineInList ? 'checked' : ''; ?>>
-                <span class="toggle-label"><?php echo t_h('attachments.page.show_inline_attachment_images_desc', [], 'Show image attachments that are automatically created when an image is inserted into the note'); ?></span>
+                <span class="toggle-label"><?php echo t_h('attachments.list.show_inline_images', [], 'Also show images already visible in the note content'); ?></span>
             </label>
         </div>
 

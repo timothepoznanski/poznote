@@ -403,7 +403,36 @@ function updateAttachmentCountInMenu(noteId) {
         .then(function (data) {
             if (data.success) {
                 var count = data.attachments.length;
-                var hasAttachments = count > 0;
+
+                // Get the note content to check for inline images
+                var noteContent = '';
+                var noteEntry = document.getElementById('entry' + noteId);
+                if (noteEntry) {
+                    noteContent = noteEntry.innerHTML || '';
+                }
+
+                // Calculate visible attachments count (excluding inline images)
+                var visibleLinksCount = 0;
+                for (var j = 0; j < data.attachments.length; j++) {
+                    var attachment = data.attachments[j];
+                    if (attachment.id && attachment.original_filename) {
+                        var isActuallyInline = false;
+                        var mimeType = attachment.mime_type || '';
+                        var isImage = mimeType.startsWith('image/');
+                        if (!isImage && attachment.original_filename) {
+                            var ext = attachment.original_filename.split('.').pop().toLowerCase();
+                            isImage = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].indexOf(ext) !== -1;
+                        }
+                        if (isImage) {
+                            var pattern = 'attachments/' + attachment.id;
+                            isActuallyInline = noteContent.indexOf(pattern) !== -1 ||
+                                noteContent.indexOf(encodeURIComponent(pattern)) !== -1;
+                        }
+                        if (!isActuallyInline) visibleLinksCount++;
+                    }
+                }
+
+                var hasVisibleAttachments = visibleLinksCount > 0;
 
                 // Update dropdown menu
                 var menu = document.getElementById('note-menu-' + noteId);
@@ -412,7 +441,7 @@ function updateAttachmentCountInMenu(noteId) {
                     for (var i = 0; i < attachmentItems.length; i++) {
                         var item = attachmentItems[i];
                         if (item.innerHTML.includes('lucide-paperclip')) {
-                            if (hasAttachments) {
+                            if (hasVisibleAttachments) {
                                 item.classList.add('has-attachments');
                             } else {
                                 item.classList.remove('has-attachments');
@@ -424,7 +453,7 @@ function updateAttachmentCountInMenu(noteId) {
                 // Update settings button
                 var settingsBtn = document.getElementById('settings-btn-' + noteId);
                 if (settingsBtn) {
-                    if (hasAttachments) {
+                    if (hasVisibleAttachments) {
                         settingsBtn.classList.add('has-attachments');
                     } else {
                         settingsBtn.classList.remove('has-attachments');
@@ -435,11 +464,24 @@ function updateAttachmentCountInMenu(noteId) {
                 var attachmentBtns = document.querySelectorAll('.btn-attachment[onclick*="' + noteId + '"]');
                 for (var i = 0; i < attachmentBtns.length; i++) {
                     var btn = attachmentBtns[i];
-                    if (hasAttachments) {
+                    if (hasVisibleAttachments) {
                         btn.classList.add('has-attachments');
                     } else {
                         btn.classList.remove('has-attachments');
                     }
+                }
+
+                // Also update toolbar attachment button
+                var toolbarAttachmentBtn = document.querySelector('.btn-attachment[data-note-id="' + noteId + '"]');
+                if (toolbarAttachmentBtn) {
+                    if (hasVisibleAttachments) {
+                        toolbarAttachmentBtn.classList.add('has-attachments');
+                    } else {
+                        toolbarAttachmentBtn.classList.remove('has-attachments');
+                    }
+                    // Update count in title
+                    var attachmentTitle = tr('index.toolbar.attachments_with_count', { count: visibleLinksCount }, 'Attachments ({{count}})');
+                    toolbarAttachmentBtn.setAttribute('title', attachmentTitle);
                 }
 
                 // Update the attachments row in the notes list (left column)
@@ -447,17 +489,7 @@ function updateAttachmentCountInMenu(noteId) {
                 if (noteElement) {
                     var existingAttachmentsRow = noteElement.querySelector('.note-attachments-row');
 
-                    if (hasAttachments && data.attachments && data.attachments.length > 0) {
-                        // Check if setting to hide inline images is enabled
-                        var hideInlineImages = document.body.classList.contains('hide-inline-attachment-images');
-
-                        // Get the note content to check for inline images
-                        var noteContent = '';
-                        var noteEntry = document.getElementById('entry' + noteId);
-                        if (noteEntry) {
-                            noteContent = noteEntry.innerHTML || '';
-                        }
-
+                    if (count > 0 && data.attachments && data.attachments.length > 0) {
                         // Create or update the attachments row
                         if (!existingAttachmentsRow) {
                             // Create new attachments row
@@ -483,36 +515,35 @@ function updateAttachmentCountInMenu(noteId) {
                         attachmentsHtml += '<span class="note-attachments-list">';
 
                         var attachmentLinks = [];
-                        var visibleLinksCount = 0;
-                        for (var j = 0; j < data.attachments.length; j++) {
-                            var attachment = data.attachments[j];
-                            if (attachment.id && attachment.original_filename) {
-                                // Check if this is an image to hide only if it's already in the content
-                                var isActuallyInline = false;
-                                if (hideInlineImages) {
-                                    var mimeType = attachment.mime_type || '';
-                                    var isImage = mimeType.startsWith('image/');
+                        var visibleLinksCountForRow = 0;
+                        for (var k = 0; k < data.attachments.length; k++) {
+                            var att = data.attachments[k];
+                            if (att.id && att.original_filename) {
+                                // Check if this is an image that's displayed inline in the note content
+                                // Inline images (pasted) are hidden from the attachments list
+                                var isInline = false;
+                                var mime = att.mime_type || '';
+                                var isImg = mime.startsWith('image/');
 
-                                    // Fallback to extension check
-                                    if (!isImage && attachment.original_filename) {
-                                        var ext = attachment.original_filename.split('.').pop().toLowerCase();
-                                        isImage = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].indexOf(ext) !== -1;
-                                    }
-
-                                    if (isImage) {
-                                        // Look for the attachment ID specifically in the content
-                                        var pattern = 'attachments/' + attachment.id;
-                                        isActuallyInline = noteContent.indexOf(pattern) !== -1 ||
-                                            noteContent.indexOf(encodeURIComponent(pattern)) !== -1;
-                                    }
+                                // Fallback to extension check
+                                if (!isImg && att.original_filename) {
+                                    var extCheck = att.original_filename.split('.').pop().toLowerCase();
+                                    isImg = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].indexOf(extCheck) !== -1;
                                 }
 
-                                var safeFilename = attachment.original_filename.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+                                if (isImg) {
+                                    // Look for the attachment ID specifically in the content
+                                    var patternCheck = 'attachments/' + att.id;
+                                    isInline = noteContent.indexOf(patternCheck) !== -1 ||
+                                        noteContent.indexOf(encodeURIComponent(patternCheck)) !== -1;
+                                }
+
+                                var safeFilename = att.original_filename.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
                                 var dlTitle = tr('attachments.actions.download', { filename: safeFilename }, 'Download {{filename}}');
-                                var linkStyle = isActuallyInline ? ' style="display: none;"' : '';
-                                var linkAttr = isActuallyInline ? ' data-is-inline-image="true"' : '';
-                                attachmentLinks.push('<a href="#" class="attachment-link"' + linkAttr + linkStyle + ' onclick="downloadAttachment(\'' + attachment.id + '\', \'' + noteId + '\')" title="' + dlTitle + '">' + safeFilename + '</a>');
-                                if (!isActuallyInline) visibleLinksCount++;
+                                var linkStyle = isInline ? ' style="display: none;"' : '';
+                                var linkAttr = isInline ? ' data-is-inline-image="true"' : '';
+                                attachmentLinks.push('<a href="#" class="attachment-link"' + linkAttr + linkStyle + ' onclick="downloadAttachment(\'' + att.id + '\', \'' + noteId + '\')" title="' + dlTitle + '">' + safeFilename + '</a>');
+                                if (!isInline) visibleLinksCountForRow++;
                             }
                         }
                         attachmentsHtml += attachmentLinks.join(' ');
@@ -521,7 +552,7 @@ function updateAttachmentCountInMenu(noteId) {
                         existingAttachmentsRow.innerHTML = attachmentsHtml;
 
                         // Hide the entire row if no visible links
-                        if (hideInlineImages && visibleLinksCount === 0) {
+                        if (visibleLinksCountForRow === 0) {
                             existingAttachmentsRow.style.display = 'none';
                         } else {
                             existingAttachmentsRow.style.display = '';

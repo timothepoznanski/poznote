@@ -57,8 +57,3 @@ a:active { color: #2E8CFA; } */
 .note-bottom-space {
     height: 30px;
 }
-
-/* Hide attachment links for images that are already inline in the note content */
-body.hide-inline-attachment-images .attachment-link[data-is-inline-image="true"] {
-    display: none !important;
-}

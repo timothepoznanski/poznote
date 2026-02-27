@@ -64,29 +64,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    const showImagesToggle = document.getElementById('showImagesToggle');
-    if (showImagesToggle) {
-        showImagesToggle.addEventListener('change', function () {
-            const isChecked = this.checked;
-            // Key: 'show_inline_attachments_in_list'. Logic: '1' SHOWS everything, '0' HIDES inline ones.
-            const valToSet = isChecked ? '1' : '0';
-
-            fetch('/api/v1/settings/show_inline_attachments_in_list', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                credentials: 'same-origin',
-                body: JSON.stringify({ value: valToSet })
-            })
-                .then(r => r.json())
-                .then(result => {
-                    if (result && result.success) {
-                        window.location.reload();
-                    }
-                })
-                .catch(e => console.error('Error saving setting:', e));
-        });
-    }
-
     loadAttachments();
 });
 

@@ -256,12 +256,7 @@
             "loading_attachments": "Cargando adjuntos...",
             "preview_alt": "Vista previa",
             "uploaded_prefix": "Subido: ",
-            "open_in_new_tab": "Abrir en nueva pestaña",
-            "show_inline_attachment_images_desc": "Mostrar adjuntos de imagen que son adjuntos creados automáticamente al insertar una imagen en la nota",
-            "settings_banner": {
-                "message": "Los archivos adjuntos de imagen están ocultos en la lista de la nota (pero no en esta lista) porque el ajuste 'Mostrar adjuntos de imagen' está desactivado.",
-                "action": "Cambiar ajuste"
-            }
+            "open_in_new_tab": "Abrir en nueva pestaña"
         },
         "modals": {
             "delete": {
@@ -288,6 +283,7 @@
             "filter_placeholder": "Filtrar por título de nota o nombre de archivo adjunto...",
             "no_filter_results": "Ninguna note coincide con su búsqueda.",
             "show_thumbnails": "Mostrar miniaturas en esta lista",
+            "show_inline_images": "Mostrar también las imágenes ya visibles en el contenido de la nota",
             "download": "Descargar"
         }
     },
@@ -432,8 +428,7 @@
             "show_folder_actions": "Mostrar acciones de carpeta",
             "kanban_on_folder_click": "Abrir vista Kanban al hacer clic en la carpeta",
             "index_icon_scale": "Escalado de iconos del índice",
-            "note_content_width": "Ancho del contenido de la nota",
-            "show_inline_attachment_images": "Mostrar archivos adjuntos de imagen"
+            "note_content_width": "Ancho del contenido de la nota"
         },
         "badges": {
             "font_size_default": "predeterminado ({{size}}px)",
@@ -1953,5 +1948,43 @@
         "alphabet": "Nombre",
         "created": "Fecha de creación",
         "modified": "Fecha de modificación"
+    },
+    "calendar": {
+        "months": {
+            "january": "Enero",
+            "february": "Febrero",
+            "march": "Marzo",
+            "april": "Abril",
+            "may": "Mayo",
+            "june": "Junio",
+            "july": "Julio",
+            "august": "Agosto",
+            "september": "Septiembre",
+            "october": "Octubre",
+            "november": "Noviembre",
+            "december": "Diciembre"
+        },
+        "weekdays": {
+            "monday": "L",
+            "tuesday": "M",
+            "wednesday": "M",
+            "thursday": "J",
+            "friday": "V",
+            "saturday": "S",
+            "sunday": "D"
+        },
+        "buttons": {
+            "previous_month": "Mes anterior",
+            "next_month": "Mes siguiente",
+            "today": "Hoy",
+            "show_calendar": "Mostrar calendario",
+            "hide_calendar": "Ocultar calendario"
+        },
+        "modal": {
+            "title": "Notas del",
+            "open": "Abrir",
+            "open_all": "Abrir todo",
+            "close": "Cerrar"
+        }
     }
 }
