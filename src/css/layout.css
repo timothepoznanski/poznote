@@ -311,7 +311,7 @@ body.sidebar-collapsed .toggle-sidebar-btn i {
     left: 100%;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: 16px;
+    width: 13px;
     height: 16px;
     border: 1px solid #ccc;
     background: var(--bg-main, #fff);
