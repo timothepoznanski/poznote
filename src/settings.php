@@ -423,15 +423,6 @@ if ($isAdmin) {
                 </div>
             </div>
 
-            <!-- Show Image Attachments -->
-            <div class="home-card" id="show-inline-attachment-images-card">
-                <div class="home-card-icon"><i class="lucide lucide-image"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.show_inline_attachment_images', [], 'Show image attachments'); ?></span>
-                    <span id="show-inline-attachment-images-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
-                </div>
-            </div>
-
         </div>
 
     </div>

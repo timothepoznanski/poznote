@@ -256,12 +256,7 @@
             "loading_attachments": "Anhänge werden geladen...",
             "preview_alt": "Vorschau",
             "uploaded_prefix": "Hochgeladen: ",
-            "open_in_new_tab": "In neuem Tab öffnen",
-            "show_inline_attachment_images_desc": "Bildanhänge anzeigen, die automatisch erstellt werden, wenn ein Bild in die Notiz eingefügt wird",
-            "settings_banner": {
-                "message": "Bildanhänge werden in der Notizliste ausgeblendet (aber nicht hier in der Liste), da die Einstellung 'Bildanhänge anzeigen' deaktiviert ist.",
-                "action": "Einstellung ändern"
-            }
+            "open_in_new_tab": "In neuem Tab öffnen"
         },
         "modals": {
             "delete": {
@@ -288,6 +283,7 @@
             "filter_placeholder": "Nach Notizentitel oder Anhangsname filtern...",
             "no_filter_results": "Keine Notizen entsprechen Ihrer Suche.",
             "show_thumbnails": "Vorschaubilder in dieser Liste anzeigen",
+            "show_inline_images": "Auch Bilder anzeigen, die bereits im Notizinhalt sichtbar sind",
             "download": "Herunterladen"
         }
     },
@@ -432,8 +428,7 @@
             "show_folder_actions": "Ordner-Aktionen anzeigen",
             "kanban_on_folder_click": "Kanban-Ansicht beim Klicken auf Ordner öffnen",
             "index_icon_scale": "Skalierung der Index-Symbole",
-            "note_content_width": "Breite des Notizinhalts",
-            "show_inline_attachment_images": "Bildanhänge anzeigen"
+            "note_content_width": "Breite des Notizinhalts"
         },
         "badges": {
             "font_size_default": "Standard ({{size}}px)",
