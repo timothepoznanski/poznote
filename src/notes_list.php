@@ -25,6 +25,7 @@ try {
 ?>
 
 <!-- Notes list display -->
+<div class="notes-list-scrollable-content">
 
 <!-- Search bar container - always visible -->
 <div class="contains_forms_search" id="search-bar-container" style="display: block;">
@@ -392,3 +393,11 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
     }
 }
 ?>
+</div><!-- End of notes-list-scrollable-content -->
+
+<!-- Mini Calendar Component -->
+<div class="mini-calendar-container">
+    <div id="mini-calendar">
+        <!-- Calendar will be rendered here by JavaScript -->
+    </div>
+</div>

@@ -187,6 +187,7 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <link type="text/css" rel="stylesheet" href="css/folders/table-picker.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/folders/system-folders.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/emoji-picker.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/calendar.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/table-picker.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/slash-commands.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/drag-drop.css?v=<?php echo $v; ?>"/>
@@ -221,6 +222,7 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/calendar.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="js/katex/katex.min.css?v=<?php echo $v; ?>"/>
     <style>:root { --note-font-size: <?php echo htmlspecialchars($note_font_size, ENT_QUOTES); ?>px; --sidebar-font-size: <?php echo htmlspecialchars($sidebar_font_size, ENT_QUOTES); ?>px; --note-max-width: <?php echo htmlspecialchars($note_max_width, ENT_QUOTES); ?>px; }</style>
     <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
@@ -980,6 +982,43 @@ $body_classes = trim($extra_body_classes);
 <script src="js/folder-icon.js?v=<?php echo $v; ?>"></script>
 <script src="js/kanban.js?v=<?php echo $v; ?>"></script>
 <script src="js/tabs.js?v=<?php echo $v; ?>"></script>
+<!-- Calendar translations -->
+<script>
+window.calendarTranslations = {
+    months: [
+        <?php echo json_encode(t('calendar.months.january')); ?>,
+        <?php echo json_encode(t('calendar.months.february')); ?>,
+        <?php echo json_encode(t('calendar.months.march')); ?>,
+        <?php echo json_encode(t('calendar.months.april')); ?>,
+        <?php echo json_encode(t('calendar.months.may')); ?>,
+        <?php echo json_encode(t('calendar.months.june')); ?>,
+        <?php echo json_encode(t('calendar.months.july')); ?>,
+        <?php echo json_encode(t('calendar.months.august')); ?>,
+        <?php echo json_encode(t('calendar.months.september')); ?>,
+        <?php echo json_encode(t('calendar.months.october')); ?>,
+        <?php echo json_encode(t('calendar.months.november')); ?>,
+        <?php echo json_encode(t('calendar.months.december')); ?>
+    ],
+    weekdays: [
+        <?php echo json_encode(t('calendar.weekdays.monday')); ?>,
+        <?php echo json_encode(t('calendar.weekdays.tuesday')); ?>,
+        <?php echo json_encode(t('calendar.weekdays.wednesday')); ?>,
+        <?php echo json_encode(t('calendar.weekdays.thursday')); ?>,
+        <?php echo json_encode(t('calendar.weekdays.friday')); ?>,
+        <?php echo json_encode(t('calendar.weekdays.saturday')); ?>,
+        <?php echo json_encode(t('calendar.weekdays.sunday')); ?>
+    ],
+    previousMonth: <?php echo json_encode(t('calendar.buttons.previous_month')); ?>,
+    nextMonth: <?php echo json_encode(t('calendar.buttons.next_month')); ?>,
+    today: <?php echo json_encode(t('calendar.buttons.today')); ?>,
+    modal: {
+        title: <?php echo json_encode(t('calendar.modal.title')); ?>,
+        open: <?php echo json_encode(t('calendar.modal.open')); ?>,
+        close: <?php echo json_encode(t('calendar.modal.close')); ?>
+    }
+};
+</script>
+<script src="js/calendar.js?v=<?php echo $v; ?>"></script>
 
 <?php if ($note && is_numeric($note)): ?>
 <!-- Data for draft check (used by index-events.js) -->

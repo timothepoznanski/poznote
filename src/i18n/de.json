@@ -1953,5 +1953,40 @@
         "alphabet": "Name",
         "created": "Erstellungsdatum",
         "modified": "Änderungsdatum"
+    },
+    "calendar": {
+        "months": {
+            "january": "Januar",
+            "february": "Februar",
+            "march": "März",
+            "april": "April",
+            "may": "Mai",
+            "june": "Juni",
+            "july": "Juli",
+            "august": "August",
+            "september": "September",
+            "october": "Oktober",
+            "november": "November",
+            "december": "Dezember"
+        },
+        "weekdays": {
+            "monday": "M",
+            "tuesday": "D",
+            "wednesday": "M",
+            "thursday": "D",
+            "friday": "F",
+            "saturday": "S",
+            "sunday": "S"
+        },
+        "buttons": {
+            "previous_month": "Vorheriger Monat",
+            "next_month": "Nächster Monat",
+            "today": "Heute"
+        },
+        "modal": {
+            "title": "Notizen vom",
+            "open": "Öffnen",
+            "close": "Schließen"
+        }
     }
 }

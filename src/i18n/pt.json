@@ -1957,5 +1957,40 @@
         "alphabet": "Nome",
         "created": "Data de criação",
         "modified": "Data de modificação"
+    },
+    "calendar": {
+        "months": {
+            "january": "Janeiro",
+            "february": "Fevereiro",
+            "march": "Março",
+            "april": "Abril",
+            "may": "Maio",
+            "june": "Junho",
+            "july": "Julho",
+            "august": "Agosto",
+            "september": "Setembro",
+            "october": "Outubro",
+            "november": "Novembro",
+            "december": "Dezembro"
+        },
+        "weekdays": {
+            "monday": "S",
+            "tuesday": "T",
+            "wednesday": "Q",
+            "thursday": "Q",
+            "friday": "S",
+            "saturday": "S",
+            "sunday": "D"
+        },
+        "buttons": {
+            "previous_month": "Mês anterior",
+            "next_month": "Próximo mês",
+            "today": "Hoje"
+        },
+        "modal": {
+            "title": "Notas de",
+            "open": "Abrir",
+            "close": "Fechar"
+        }
     }
 }

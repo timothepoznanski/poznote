@@ -1531,5 +1531,40 @@
         "alphabet": "Name",
         "created": "Date Created",
         "modified": "Date Modified"
+    },
+    "calendar": {
+        "months": {
+            "january": "January",
+            "february": "February",
+            "march": "March",
+            "april": "April",
+            "may": "May",
+            "june": "June",
+            "july": "July",
+            "august": "August",
+            "september": "September",
+            "october": "October",
+            "november": "November",
+            "december": "December"
+        },
+        "weekdays": {
+            "monday": "M",
+            "tuesday": "T",
+            "wednesday": "W",
+            "thursday": "T",
+            "friday": "F",
+            "saturday": "S",
+            "sunday": "S"
+        },
+        "buttons": {
+            "previous_month": "Previous month",
+            "next_month": "Next month",
+            "today": "Today"
+        },
+        "modal": {
+            "title": "Notes from",
+            "open": "Open",
+            "close": "Close"
+        }
     }
 }

@@ -1,0 +1,164 @@
+/**
+ * Dark Mode Styles for Mini Calendar Component
+ */
+
+:root[data-theme='dark'] .mini-calendar-container,
+body.dark-mode .mini-calendar-container {
+    background: var(--dm-surface, #333333);
+    border-top-color: var(--dm-border, #404040);
+}
+
+:root[data-theme='dark'] .mini-calendar-month-year,
+body.dark-mode .mini-calendar-month-year {
+    color: var(--dm-text, #e0e0e0);
+}
+
+:root[data-theme='dark'] .mini-calendar-nav,
+:root[data-theme='dark'] .mini-calendar-today,
+body.dark-mode .mini-calendar-nav,
+body.dark-mode .mini-calendar-today {
+    color: var(--dm-text-muted, #a0a0a0);
+}
+
+:root[data-theme='dark'] .mini-calendar-nav:hover,
+:root[data-theme='dark'] .mini-calendar-today:hover,
+body.dark-mode .mini-calendar-nav:hover,
+body.dark-mode .mini-calendar-today:hover {
+    background: rgba(74, 158, 255, 0.15);
+    color: var(--dm-accent, #4a9eff);
+}
+
+:root[data-theme='dark'] .mini-calendar-weekday,
+body.dark-mode .mini-calendar-weekday {
+    color: var(--dm-text-muted, #a0a0a0);
+}
+
+:root[data-theme='dark'] .mini-calendar-day:not(.mini-calendar-day-empty):hover,
+body.dark-mode .mini-calendar-day:not(.mini-calendar-day-empty):hover {
+    background: rgba(74, 158, 255, 0.1);
+}
+
+:root[data-theme='dark'] .mini-calendar-day-number,
+body.dark-mode .mini-calendar-day-number {
+    color: var(--dm-text, #e0e0e0);
+}
+
+/* Today indicator in dark mode */
+:root[data-theme='dark'] .mini-calendar-day-today,
+body.dark-mode .mini-calendar-day-today {
+    background: rgba(74, 158, 255, 0.2);
+    border: 1px solid var(--dm-accent, #4a9eff);
+}
+
+:root[data-theme='dark'] .mini-calendar-day-today .mini-calendar-day-number,
+body.dark-mode .mini-calendar-day-today .mini-calendar-day-number {
+    color: var(--dm-accent, #4a9eff);
+    font-weight: 700;
+}
+
+/* Note dots in dark mode */
+:root[data-theme='dark'] .mini-calendar-dot,
+body.dark-mode .mini-calendar-dot {
+    background: var(--dm-accent, #4a9eff);
+}
+
+:root[data-theme='dark'] .mini-calendar-dot-more,
+body.dark-mode .mini-calendar-dot-more {
+    color: var(--dm-accent, #4a9eff);
+}
+
+/* Days with notes in dark mode */
+:root[data-theme='dark'] .mini-calendar-day-has-notes:hover,
+body.dark-mode .mini-calendar-day-has-notes:hover {
+    background: rgba(74, 158, 255, 0.15);
+}
+
+:root[data-theme='dark'] .mini-calendar-day-has-notes .mini-calendar-day-number,
+body.dark-mode .mini-calendar-day-has-notes .mini-calendar-day-number {
+    font-weight: 600;
+    color: var(--dm-text, #e0e0e0);
+}
+
+/* Tooltip in dark mode */
+:root[data-theme='dark'] .mini-calendar-tooltip,
+body.dark-mode .mini-calendar-tooltip {
+    background: var(--dm-surface, #333333);
+    border-color: var(--dm-border, #404040);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+:root[data-theme='dark'] .mini-calendar-tooltip-title,
+body.dark-mode .mini-calendar-tooltip-title {
+    color: var(--dm-text, #e0e0e0);
+}
+
+:root[data-theme='dark'] .mini-calendar-tooltip-list li,
+body.dark-mode .mini-calendar-tooltip-list li {
+    color: var(--dm-text-muted, #a0a0a0);
+}
+
+:root[data-theme='dark'] .mini-calendar-tooltip-list li:before,
+body.dark-mode .mini-calendar-tooltip-list li:before {
+    color: var(--dm-accent, #4a9eff);
+}
+
+/* Modal in dark mode */
+:root[data-theme='dark'] .calendar-notes-modal,
+body.dark-mode .calendar-notes-modal {
+    background: var(--dm-surface, #333333);
+}
+
+:root[data-theme='dark'] .calendar-notes-modal .modal-header,
+body.dark-mode .calendar-notes-modal .modal-header {
+    border-bottom-color: var(--dm-border, #404040);
+}
+
+:root[data-theme='dark'] .calendar-notes-modal .modal-title,
+body.dark-mode .calendar-notes-modal .modal-title {
+    color: var(--dm-text, #e0e0e0);
+}
+
+
+:root[data-theme='dark'] .calendar-notes-modal .modal-footer,
+body.dark-mode .calendar-notes-modal .modal-footer {
+    border-top-color: var(--dm-border, #404040);
+}
+
+:root[data-theme='dark'] .calendar-note-item,
+body.dark-mode .calendar-note-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--dm-border, #404040);
+}
+
+:root[data-theme='dark'] .calendar-note-item:hover,
+body.dark-mode .calendar-note-item:hover {
+    background: rgba(74, 158, 255, 0.1);
+    border-color: var(--dm-accent, #4a9eff);
+}
+
+:root[data-theme='dark'] .calendar-note-title,
+body.dark-mode .calendar-note-title {
+    color: var(--dm-text, #e0e0e0);
+}
+
+:root[data-theme='dark'] .calendar-note-open-btn,
+body.dark-mode .calendar-note-open-btn {
+    background: var(--dm-accent, #4a9eff);
+    color: #ffffff;
+}
+
+:root[data-theme='dark'] .calendar-note-open-btn:hover,
+body.dark-mode .calendar-note-open-btn:hover {
+    background: #3a8eef;
+}
+
+:root[data-theme='dark'] .calendar-notes-modal .btn-close-red,
+body.dark-mode .calendar-notes-modal .btn-close-red {
+    background: #ef4444;
+    color: #ffffff;
+}
+
+:root[data-theme='dark'] .calendar-notes-modal .btn-close-red:hover,
+body.dark-mode .calendar-notes-modal .btn-close-red:hover {
+    background: #dc2626;
+}

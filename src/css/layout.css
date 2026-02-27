@@ -36,6 +36,8 @@ body {
     box-sizing: border-box;
     background: #f8f9fa;
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
     /* Hide scrollbars but keep scroll functionality for all screen sizes */
     -ms-overflow-style: none;
     /* IE and Edge */
@@ -190,7 +192,7 @@ body {
 /* Toggle sidebar and collapsed state */
 
 .resize-handle {
-    width: 3px;
+    /* width: 3px; */
     height: 100vh;
     background: #f8f9fa;
     cursor: col-resize;
