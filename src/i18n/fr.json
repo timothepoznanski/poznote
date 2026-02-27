@@ -2137,11 +2137,14 @@
         "buttons": {
             "previous_month": "Mois précédent",
             "next_month": "Mois suivant",
-            "today": "Aujourd'hui"
+            "today": "Aujourd'hui",
+            "show_calendar": "Afficher le calendrier",
+            "hide_calendar": "Masquer le calendrier"
         },
         "modal": {
             "title": "Notes du",
             "open": "Ouvrir",
+            "open_all": "Tout ouvrir",
             "close": "Fermer"
         }
     }

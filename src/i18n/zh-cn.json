@@ -2096,11 +2096,14 @@
         "buttons": {
             "previous_month": "上个月",
             "next_month": "下个月",
-            "today": "今天"
+            "today": "今天",
+            "show_calendar": "显示日历",
+            "hide_calendar": "隐藏日历"
         },
         "modal": {
             "title": "笔记来自",
             "open": "打开",
+            "open_all": "全部打开",
             "close": "关闭"
         }
     }

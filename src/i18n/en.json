@@ -1559,11 +1559,14 @@
         "buttons": {
             "previous_month": "Previous month",
             "next_month": "Next month",
-            "today": "Today"
+            "today": "Today",
+            "show_calendar": "Show calendar",
+            "hide_calendar": "Hide calendar"
         },
         "modal": {
             "title": "Notes from",
             "open": "Open",
+            "open_all": "Open All",
             "close": "Close"
         }
     }

@@ -47,6 +47,17 @@
     margin-bottom: 8px;
 }
 
+/* Calendar header when collapsed */
+.mini-calendar-header.mini-calendar-collapsed {
+    justify-content: center;
+    margin-bottom: 0;
+}
+
+/* Reduce container height when collapsed */
+.mini-calendar-container:has(.mini-calendar-collapsed) {
+    padding: 2px 16px;
+}
+
 .mini-calendar-month-year {
     flex: 1;
     text-align: center;
@@ -56,7 +67,8 @@
 }
 
 .mini-calendar-nav,
-.mini-calendar-today {
+.mini-calendar-today,
+.mini-calendar-toggle {
     background: transparent;
     border: none;
     color: #6c757d;
@@ -73,13 +85,15 @@
 }
 
 .mini-calendar-nav:hover,
-.mini-calendar-today:hover {
+.mini-calendar-today:hover,
+.mini-calendar-toggle:hover {
     background: rgba(0, 125, 184, 0.1);
     color: #007DB8;
 }
 
 .mini-calendar-nav i,
-.mini-calendar-today i {
+.mini-calendar-today i,
+.mini-calendar-toggle i {
     font-size: 13px;
 }
 
@@ -321,7 +335,25 @@
     padding: 16px 24px;
     border-top: 1px solid #e6eef8;
     display: flex;
+    flex-direction: row !important;
     justify-content: flex-end;
+    gap: 12px;
+}
+
+.calendar-notes-modal .btn-open-all {
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.calendar-notes-modal .btn-open-all:hover {
+    background: #2563eb;
 }
 
 .calendar-notes-modal .btn-close-red {

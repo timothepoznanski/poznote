@@ -216,11 +216,11 @@ body {
 /* Toggle sidebar button */
 .toggle-sidebar-btn {
     position: absolute;
-    bottom: 10px;
+    bottom: 0px;
     left: 50%;
-    transform: translateX(-50%);
+    /* transform: translateX(-50%); */
     width: 16px;
-    height: 24px;
+    height: 25px;
     background: #fff;
     border: 1px solid #ccc;
     border-radius: 0 4px 4px 0;

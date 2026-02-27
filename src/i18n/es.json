@@ -1981,11 +1981,14 @@
         "buttons": {
             "previous_month": "Mes anterior",
             "next_month": "Mes siguiente",
-            "today": "Hoy"
+            "today": "Hoy",
+            "show_calendar": "Mostrar calendario",
+            "hide_calendar": "Ocultar calendario"
         },
         "modal": {
             "title": "Notas del",
             "open": "Abrir",
+            "open_all": "Abrir todo",
             "close": "Cerrar"
         }
     }

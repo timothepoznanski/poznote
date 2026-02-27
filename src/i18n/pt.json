@@ -1985,11 +1985,14 @@
         "buttons": {
             "previous_month": "Mês anterior",
             "next_month": "Próximo mês",
-            "today": "Hoje"
+            "today": "Hoje",
+            "show_calendar": "Mostrar calendário",
+            "hide_calendar": "Ocultar calendário"
         },
         "modal": {
             "title": "Notas de",
             "open": "Abrir",
+            "open_all": "Abrir tudo",
             "close": "Fechar"
         }
     }

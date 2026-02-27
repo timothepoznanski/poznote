@@ -10,6 +10,7 @@ class MiniCalendar {
         this.currentYear = this.currentDate.getFullYear();
         this.notesData = {};
         this.translations = window.calendarTranslations || this.getDefaultTranslations();
+        this.isVisible = localStorage.getItem('calendarVisible') === 'true';
         this.init();
     }
 
@@ -111,6 +112,15 @@ class MiniCalendar {
     }
 
     /**
+     * Toggle calendar visibility
+     */
+    toggleVisibility() {
+        this.isVisible = !this.isVisible;
+        localStorage.setItem('calendarVisible', this.isVisible);
+        this.render();
+    }
+
+    /**
      * Render the calendar
      */
     render() {
@@ -125,48 +135,66 @@ class MiniCalendar {
         // Adjust firstDay to start on Monday (0 = Monday, 6 = Sunday)
         const adjustedFirstDay = firstDay === 0 ? 6 : firstDay - 1;
 
-        let html = `
-            <div class="mini-calendar-header">
-                <button class="mini-calendar-nav" data-action="prev-month" title="${this.translations.previousMonth}">
-                    <i class="lucide lucide-chevron-left"></i>
-                </button>
-                <div class="mini-calendar-month-year">
-                    ${this.getMonthName(this.currentMonth)} ${this.currentYear}
-                </div>
-                <button class="mini-calendar-nav" data-action="next-month" title="${this.translations.nextMonth}">
-                    <i class="lucide lucide-chevron-right"></i>
-                </button>
-                <button class="mini-calendar-today" data-action="today" title="${this.translations.today}">
-                    <i class="lucide lucide-calendar"></i>
-                </button>
-            </div>
-            <div class="mini-calendar-weekdays">
-                ${this.translations.weekdays.map(day => `<div class="mini-calendar-weekday">${day}</div>`).join('')}
-            </div>
-            <div class="mini-calendar-days">
-        `;
+        let html = '';
 
-        // Add empty cells for days before the first day of the month
-        for (let i = 0; i < adjustedFirstDay; i++) {
-            html += '<div class="mini-calendar-day mini-calendar-day-empty"></div>';
-        }
-
-        // Add days of the month
-        for (let day = 1; day <= daysInMonth; day++) {
-            const notesCount = this.getNotesCount(this.currentYear, this.currentMonth, day);
-            const isToday = isCurrentMonth && day === today.getDate();
-            const todayClass = isToday ? ' mini-calendar-day-today' : '';
-            const hasNotesClass = notesCount > 0 ? ' mini-calendar-day-has-notes' : '';
-
-            html += `
-                <div class="mini-calendar-day${todayClass}${hasNotesClass}" data-day="${day}" data-notes-count="${notesCount}">
-                    <span class="mini-calendar-day-number">${day}</span>
-                    ${this.renderNoteDots(notesCount)}
+        if (!this.isVisible) {
+            // When hidden, show only the toggle button
+            html = `
+                <div class="mini-calendar-header mini-calendar-collapsed">
+                    <button class="mini-calendar-toggle" data-action="toggle" title="${this.translations.showCalendar || 'Show calendar'}">
+                        <i class="lucide lucide-calendar"></i>
+                    </button>
                 </div>
             `;
-        }
+        } else {
+            // When visible, show full calendar
+            html = `
+                <div class="mini-calendar-header">
+                    <button class="mini-calendar-nav" data-action="prev-month" title="${this.translations.previousMonth}">
+                        <i class="lucide lucide-chevron-left"></i>
+                    </button>
+                    <div class="mini-calendar-month-year">
+                        ${this.getMonthName(this.currentMonth)} ${this.currentYear}
+                    </div>
+                    <button class="mini-calendar-nav" data-action="next-month" title="${this.translations.nextMonth}">
+                        <i class="lucide lucide-chevron-right"></i>
+                    </button>
+                    <button class="mini-calendar-today" data-action="today" title="${this.translations.today}">
+                        <i class="lucide lucide-calendar"></i>
+                    </button>
+                    <button class="mini-calendar-toggle" data-action="toggle" title="${this.translations.hideCalendar || 'Hide calendar'}">
+                        <i class="lucide lucide-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="mini-calendar-content">
+                    <div class="mini-calendar-weekdays">
+                        ${this.translations.weekdays.map(day => `<div class="mini-calendar-weekday">${day}</div>`).join('')}
+                    </div>
+                    <div class="mini-calendar-days">
+            `;
 
-        html += '</div>';
+            // Add empty cells for days before the first day of the month
+            for (let i = 0; i < adjustedFirstDay; i++) {
+                html += '<div class="mini-calendar-day mini-calendar-day-empty"></div>';
+            }
+
+            // Add days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const notesCount = this.getNotesCount(this.currentYear, this.currentMonth, day);
+                const isToday = isCurrentMonth && day === today.getDate();
+                const todayClass = isToday ? ' mini-calendar-day-today' : '';
+                const hasNotesClass = notesCount > 0 ? ' mini-calendar-day-has-notes' : '';
+
+                html += `
+                    <div class="mini-calendar-day${todayClass}${hasNotesClass}" data-day="${day}" data-notes-count="${notesCount}">
+                        <span class="mini-calendar-day-number">${day}</span>
+                        ${this.renderNoteDots(notesCount)}
+                    </div>
+                `;
+            }
+
+            html += '</div></div>';
+        }
 
         container.innerHTML = html;
     }
@@ -215,6 +243,9 @@ class MiniCalendar {
                     break;
                 case 'today':
                     this.goToToday();
+                    break;
+                case 'toggle':
+                    this.toggleVisibility();
                     break;
             }
         });
@@ -298,6 +329,7 @@ class MiniCalendar {
                         </div>
                     </div>
                     <div class="modal-footer">
+                        <button class="btn-open-all" data-action="open-all">${this.translations.modal.open_all}</button>
                         <button class="btn-close-red" data-action="close-modal">${this.translations.modal.close}</button>
                     </div>
                 </div>
@@ -322,6 +354,19 @@ class MiniCalendar {
         // Close modal on close button click
         modal.querySelectorAll('[data-action="close-modal"]').forEach(btn => {
             btn.addEventListener('click', () => {
+                modal.remove();
+            });
+        });
+
+        // Open all notes when clicking "Open All" button
+        modal.querySelectorAll('[data-action="open-all"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                notes.forEach(note => {
+                    if (window.tabManager) {
+                        window.tabManager.openInNewTab(note.id, note.title || 'Untitled');
+                    }
+                });
+                // Close modal after opening all notes
                 modal.remove();
             });
         });

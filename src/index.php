@@ -1011,9 +1011,12 @@ window.calendarTranslations = {
     previousMonth: <?php echo json_encode(t('calendar.buttons.previous_month')); ?>,
     nextMonth: <?php echo json_encode(t('calendar.buttons.next_month')); ?>,
     today: <?php echo json_encode(t('calendar.buttons.today')); ?>,
+    showCalendar: <?php echo json_encode(t('calendar.buttons.show_calendar')); ?>,
+    hideCalendar: <?php echo json_encode(t('calendar.buttons.hide_calendar')); ?>,
     modal: {
         title: <?php echo json_encode(t('calendar.modal.title')); ?>,
         open: <?php echo json_encode(t('calendar.modal.open')); ?>,
+        open_all: <?php echo json_encode(t('calendar.modal.open_all')); ?>,
         close: <?php echo json_encode(t('calendar.modal.close')); ?>
     }
 };
