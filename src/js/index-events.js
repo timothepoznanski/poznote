@@ -876,7 +876,7 @@
                 if (data.success && data.note) {
                     window.scrollTo(0, 0);
                     var ws = encodeURIComponent(window.selectedWorkspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : ''));
-                    window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1&md_split=1";
+                    window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
                 } else {
                     showNotificationPopup(data.error || (window.t ? window.t('index.errors.create_markdown_note', null, 'Error creating markdown note') : 'Error creating markdown note'), 'error');
                 }

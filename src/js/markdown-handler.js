@@ -1256,13 +1256,26 @@ function initializeMarkdownNote(noteId) {
         forceSplitForNewMarkdown = false;
     }
 
-    // Always start in edit mode for empty notes (new notes), unless force split is set
-    if (isEmpty && forceSplitForNewMarkdown) {
+    // Check if we're in mobile viewport
+    var isMobileViewportCheck = false;
+    try {
+        isMobileViewportCheck = (window.matchMedia && window.matchMedia('(max-width: 800px)').matches);
+    } catch (e) {
+        isMobileViewportCheck = false;
+    }
+
+    // Default behavior for new notes:
+    // - Desktop: split mode (edit + preview side by side)
+    // - Mobile: edit mode only
+    // IMPORTANT: Never use split mode on mobile
+    if (isEmpty && !isMobileViewportCheck) {
+        // New notes on desktop: start in split mode
         startInSplitMode = true;
         startInEditMode = false;
     } else if (isEmpty) {
+        // New notes on mobile: start in edit mode
         startInEditMode = true;
-    } else if (savedMode && savedMode === 'split') {
+    } else if (savedMode && savedMode === 'split' && !isMobileViewportCheck) {
         startInSplitMode = true;
         startInEditMode = false;
     } else if (savedMode && (savedMode === 'edit' || savedMode === 'preview')) {
@@ -1417,37 +1430,39 @@ function initializeMarkdownNote(noteId) {
 
             // Create markdown help button
 
-            // Create split view button
-            var splitBtn = document.createElement('button');
-            splitBtn.type = 'button';
-            splitBtn.className = 'toolbar-btn markdown-split-btn note-action-btn';
-            splitBtn.innerHTML = '<i class="lucide lucide-columns-2"></i>';
-            splitBtn.title = window.t('editor.toolbar.split_view', null, 'Toggle split view');
-            splitBtn.onclick = function (e) {
-                e.preventDefault();
-                e.stopPropagation();
+            // Create split view button (only on desktop, not on mobile)
+            if (!isMobileViewport) {
+                var splitBtn = document.createElement('button');
+                splitBtn.type = 'button';
+                splitBtn.className = 'toolbar-btn markdown-split-btn note-action-btn';
+                splitBtn.innerHTML = '<i class="lucide lucide-columns-2"></i>';
+                splitBtn.title = window.t('editor.toolbar.split_view', null, 'Toggle split view');
+                splitBtn.onclick = function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
 
-                var noteEntry = document.getElementById('entry' + noteId);
-                if (noteEntry && noteEntry.classList.contains('markdown-split-mode')) {
-                    exitSplitMode(noteId);
-                    splitBtn.classList.remove('active');
-                } else {
-                    switchToSplitMode(noteId);
+                    var noteEntry = document.getElementById('entry' + noteId);
+                    if (noteEntry && noteEntry.classList.contains('markdown-split-mode')) {
+                        exitSplitMode(noteId);
+                        splitBtn.classList.remove('active');
+                    } else {
+                        switchToSplitMode(noteId);
+                        splitBtn.classList.add('active');
+                    }
+                };
+
+                // Set initial state based on split mode
+                if (startInSplitMode) {
                     splitBtn.classList.add('active');
                 }
-            };
 
-            // Set initial state based on split mode
-            if (startInSplitMode) {
-                splitBtn.classList.add('active');
-            }
-
-            // Insert split button before favorite button (star)
-            var favoriteBtn = toolbar.querySelector('.btn-favorite');
-            if (favoriteBtn) {
-                toolbar.insertBefore(splitBtn, favoriteBtn);
-            } else {
-                toolbar.appendChild(splitBtn);
+                // Insert split button before favorite button (star)
+                var favoriteBtn = toolbar.querySelector('.btn-favorite');
+                if (favoriteBtn) {
+                    toolbar.insertBefore(splitBtn, favoriteBtn);
+                } else {
+                    toolbar.appendChild(splitBtn);
+                }
             }
         } else {
             // Update existing button based on current state
@@ -1806,6 +1821,18 @@ function updateViewModeButton(noteId, mode) {
 
 // Switch to split view mode (editor on left, preview on right)
 function switchToSplitMode(noteId) {
+    // Never allow split mode on mobile
+    var isMobileViewport = false;
+    try {
+        isMobileViewport = (window.matchMedia && window.matchMedia('(max-width: 800px)').matches);
+    } catch (e) {
+        isMobileViewport = false;
+    }
+
+    if (isMobileViewport) {
+        return; // Exit early on mobile
+    }
+
     var noteEntry = document.getElementById('entry' + noteId);
     if (!noteEntry) return;
 
