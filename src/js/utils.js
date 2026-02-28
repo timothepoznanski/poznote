@@ -2626,7 +2626,64 @@ function showInfoModal(title, message, reloadAfter = false) {
     modal.style.display = 'flex';
 }
 
+/**
+ * Open all notes in a folder in separate tabs
+ * @param {number} folderId - The folder ID
+ * @param {string} folderName - The folder name
+ */
+function openAllFolderNotesInTabs(folderId, folderName) {
+    // Check if tabs are enabled
+    if (!window.tabManager || !window.tabManager.openInNewTab) {
+        console.error('Tab manager not available');
+        showInfoModal(
+            window.t ? window.t('common.error', null, 'Error') : 'Error',
+            window.t ? window.t('notes_list.folder_actions.tabs_not_available', null, 'Tabs are not available on mobile devices') : 'Tabs are not available on mobile devices'
+        );
+        return;
+    }
+
+    // Find all notes in the folder
+    // Notes have class 'links_arbo_left' and data-folder-id attribute
+    var noteLinks = document.querySelectorAll('.links_arbo_left[data-folder-id="' + folderId + '"]');
+
+    if (noteLinks.length === 0) {
+        showInfoModal(
+            window.t ? window.t('notes_list.folder_actions.no_notes_title', null, 'No notes') : 'No notes',
+            window.t ? window.t('notes_list.folder_actions.no_notes_in_folder', null, 'This folder contains no notes') : 'This folder contains no notes'
+        );
+        return;
+    }
+
+    // Limit the number of tabs to avoid overwhelming the browser
+    var maxTabs = 20;
+    if (noteLinks.length > maxTabs) {
+        var message = window.t
+            ? window.t('notes_list.folder_actions.too_many_notes', {count: noteLinks.length, max: maxTabs}, 'This folder contains {count} notes. Only the first {max} will be opened to avoid overwhelming your browser.')
+            : 'This folder contains ' + noteLinks.length + ' notes. Only the first ' + maxTabs + ' will be opened to avoid overwhelming your browser.';
+
+        if (!confirm(message)) {
+            return;
+        }
+    }
+
+    // Open each note in a new tab
+    var notesToOpen = Array.from(noteLinks).slice(0, maxTabs);
+    notesToOpen.forEach(function(noteLink, index) {
+        var noteId = noteLink.getAttribute('data-note-id');
+        var noteTitleElement = noteLink.querySelector('.note-title');
+        var noteTitle = noteTitleElement ? noteTitleElement.textContent.trim() : noteLink.textContent.trim();
+
+        if (noteId) {
+            // Add a small delay between opening tabs to avoid overwhelming the browser
+            setTimeout(function() {
+                window.tabManager.openInNewTab(noteId, noteTitle);
+            }, index * 100); // 100ms delay between each tab
+        }
+    });
+}
+
 // Export to window
 window.openKanbanView = openKanbanView;
+window.openAllFolderNotesInTabs = openAllFolderNotesInTabs;
 window.showInfoModal = showInfoModal;
 window.toggleFavorites = toggleFavorites;

@@ -923,6 +923,7 @@
             "menu": "Aktionen",
             "create": "Erstellen",
             "kanban_view": "Kanban-Ansicht",
+            "open_all_in_tabs": "Alle Notizen öffnen",
             "move_all_files": "Dateien verschieben",
             "rename_folder": "Ordner umbenennen",
             "delete_folder": "Ordner löschen",
@@ -930,7 +931,11 @@
             "download_folder": "Herunterladen",
             "change_icon": "Symbol ändern",
             "is_public": "Ist geteilt",
-            "share_folder": "Teilen"
+            "share_folder": "Teilen",
+            "tabs_not_available": "Tabs sind auf Mobilgeräten nicht verfügbar",
+            "no_notes_title": "Keine Notizen",
+            "no_notes_in_folder": "Dieser Ordner enthält keine Notizen",
+            "too_many_notes": "Dieser Ordner enthält {{count}} Notizen. Nur die ersten {{max}} werden geöffnet, um Ihren Browser nicht zu überlasten."
         }
     },
     "update": {

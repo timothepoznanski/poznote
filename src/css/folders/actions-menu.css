@@ -214,3 +214,10 @@ body.dark-mode .folder-actions-menu-item.active i {
 .default-folder .folder-edit-btn {
     display: none !important;
 }
+
+/* Hide "Open all notes" action on mobile (viewport ≤ 800px) */
+@media (max-width: 800px) {
+    .folder-actions-menu-item.open-all-tabs-action {
+        display: none !important;
+    }
+}

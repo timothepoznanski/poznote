@@ -950,6 +950,7 @@
             "menu": "Actions",
             "create": "Créer",
             "kanban_view": "Vue Kanban",
+            "open_all_in_tabs": "Ouvrir toutes les notes",
             "move_all_files": "Déplacer les fichiers",
             "move_folder": "Déplacer le dossier",
             "rename_folder": "Renommer le dossier",
@@ -957,7 +958,11 @@
             "download_folder": "Télécharger",
             "change_icon": "Changer l'icône",
             "is_public": "Est partagé",
-            "share_folder": "Partager"
+            "share_folder": "Partager",
+            "tabs_not_available": "Les onglets ne sont pas disponibles sur les appareils mobiles",
+            "no_notes_title": "Aucune note",
+            "no_notes_in_folder": "Ce dossier ne contient aucune note",
+            "too_many_notes": "Ce dossier contient {{count}} notes. Seules les {{max}} premières seront ouvertes pour ne pas surcharger votre navigateur."
         }
     },
     "update": {

@@ -916,6 +916,7 @@
             "menu": "操作",
             "create": "创建",
             "kanban_view": "看板视图",
+            "open_all_in_tabs": "打开所有笔记",
             "move_all_files": "移动文件",
             "move_folder": "移动文件夹",
             "rename_folder": "重命名文件夹",
@@ -923,7 +924,11 @@
             "download_folder": "下载",
             "change_icon": "更改图标",
             "is_public": "已共享",
-            "share_folder": "共享"
+            "share_folder": "共享",
+            "tabs_not_available": "移动设备上不支持标签页",
+            "no_notes_title": "无笔记",
+            "no_notes_in_folder": "此文件夹不包含笔记",
+            "too_many_notes": "此文件夹包含 {{count}} 条笔记。为避免浏览器负担过重，仅打开前 {{max}} 条。"
         }
     },
     "update": {

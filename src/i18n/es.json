@@ -923,6 +923,7 @@
             "menu": "Acciones",
             "create": "Crear",
             "kanban_view": "Vista Kanban",
+            "open_all_in_tabs": "Abrir todas las notas",
             "move_all_files": "Mover los archivos",
             "rename_folder": "Renombrar carpeta",
             "delete_folder": "Eliminar carpeta",
@@ -930,7 +931,11 @@
             "change_icon": "Cambiar icono",
             "download_folder": "Descargar",
             "is_public": "Es compartida",
-            "share_folder": "Compartir"
+            "share_folder": "Compartir",
+            "tabs_not_available": "Las pestañas no están disponibles en dispositivos móviles",
+            "no_notes_title": "Sin notas",
+            "no_notes_in_folder": "Esta carpeta no contiene notas",
+            "too_many_notes": "Esta carpeta contiene {{count}} notas. Solo se abrirán las primeras {{max}} para no sobrecargar su navegador."
         }
     },
     "update": {

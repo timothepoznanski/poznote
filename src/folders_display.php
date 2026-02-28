@@ -373,6 +373,14 @@ function generateFolderActions($folderId, $folderName, $con, $workspace_filter, 
         $actions .= "<i class='lucide lucide-columns-2'></i>";
         $actions .= "<span>" . t_h('notes_list.folder_actions.kanban_view', [], 'Kanban view') . "</span>";
         $actions .= "</div>";
+
+        // Open all notes in tabs action (only if folder has notes, hidden on mobile)
+        if ($noteCount > 0) {
+            $actions .= "<div class='folder-actions-menu-item open-all-tabs-action' data-action='open-all-notes-in-tabs' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
+            $actions .= "<i class='lucide lucide-layers'></i>";
+            $actions .= "<span>" . t_h('notes_list.folder_actions.open_all_in_tabs', [], 'Open all notes') . "</span>";
+            $actions .= "</div>";
+        }
         
         // Move all files action (only if folder has notes)
         if ($noteCount > 0) {
