@@ -445,25 +445,34 @@ function handleMarkdownListEnter(e, selection) {
     }
 
     // Match task item prefix first, then plain bullet, then numbered list
-    var taskMatch = lineText.match(/^(- \[[ xX]\] )/);
-    var bulletMatch = !taskMatch && lineText.match(/^(- )/);
-    var numberedMatch = !taskMatch && !bulletMatch && lineText.match(/^(\d+\. )/);
+    // Capture optional leading spaces (indentation)
+    var taskMatch = lineText.match(/^(\s*)(- \[[ xX]\] )/);
+    var bulletMatch = !taskMatch && lineText.match(/^(\s*)(- )/);
+    var numberedMatch = !taskMatch && !bulletMatch && lineText.match(/^(\s*)(\d+\. )/);
 
     if (!taskMatch && !bulletMatch && !numberedMatch) return false;
 
+    var indent = '';
+    var marker = '';
     var prefix = '';
     var newPrefix = '';
 
     if (taskMatch) {
-        prefix = taskMatch[1];
-        newPrefix = '- [ ] ';
+        indent = taskMatch[1];
+        marker = taskMatch[2];
+        prefix = indent + marker;
+        newPrefix = indent + '- [ ] ';
     } else if (bulletMatch) {
-        prefix = bulletMatch[1];
-        newPrefix = '- ';
+        indent = bulletMatch[1];
+        marker = bulletMatch[2];
+        prefix = indent + marker;
+        newPrefix = indent + '- ';
     } else if (numberedMatch) {
-        prefix = numberedMatch[1];
-        var currentNumber = parseInt(prefix);
-        newPrefix = (currentNumber + 1) + '. ';
+        indent = numberedMatch[1];
+        marker = numberedMatch[2];
+        prefix = indent + marker;
+        var currentNumber = parseInt(marker);
+        newPrefix = indent + (currentNumber + 1) + '. ';
     }
 
     e.preventDefault();
