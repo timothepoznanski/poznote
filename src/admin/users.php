@@ -117,8 +117,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
             }
             
-            // Only allow toggling is_admin and active fields
-            if ($field === 'is_admin' || $field === 'active') {
+            // Only allow toggling active field
+            if ($field === 'active') {
                 $data = [$field => (int)$value];
                 $result = updateUserProfile($userId, $data);
                 
@@ -263,7 +263,6 @@ $v = getAppVersion();
                         <th class="text-center col-id"><?php echo t_h('multiuser.admin.id', [], 'ID'); ?></th>
                         <th><?php echo t_h('multiuser.admin.username', [], 'User'); ?></th>
                         <th><?php echo t_h('multiuser.admin.email', [], 'Email'); ?></th>
-                        <th class="text-center"><?php echo t_h('multiuser.admin.administrator', [], 'Administrator'); ?></th>
                         <th class="text-center"><?php echo t_h('multiuser.admin.status', [], 'Status'); ?></th>
                         <th class="text-center"><?php echo t_h('multiuser.admin.actions', [], 'Actions'); ?></th>
                     </tr>
@@ -287,22 +286,6 @@ $v = getAppVersion();
                                 </div>
                             </td>
     
-                            <td class="text-center" data-label="<?php echo t_h('multiuser.admin.administrator', [], 'Administrator'); ?>">
-                                <?php if ($user['id'] === getCurrentUserId()): ?>
-                                    <label class="toggle-switch disabled" title="<?php echo t_h('multiuser.admin.errors.cannot_change_self', [], 'You cannot change your own status/role'); ?>">
-                                        <input type="checkbox" class="admin-toggle" 
-                                               <?php echo $user['is_admin'] ? 'checked' : ''; ?> disabled>
-                                        <span class="slider"></span>
-                                    </label>
-                                <?php else: ?>
-                                    <label class="toggle-switch" title="<?php echo t_h('multiuser.admin.toggle_admin', [], 'Toggle Admin Role'); ?>">
-                                        <input type="checkbox" class="admin-toggle" 
-                                               <?php echo $user['is_admin'] ? 'checked' : ''; ?>
-                                               onchange="toggleUserStatus(<?php echo $user['id']; ?>, 'is_admin', this.checked ? 1 : 0)">
-                                        <span class="slider"></span>
-                                    </label>
-                                <?php endif; ?>
-                            </td>
                             <td class="text-center" data-label="<?php echo t_h('multiuser.admin.status', [], 'Status'); ?>">
     
                                 <?php if ($user['id'] === getCurrentUserId()): ?>
