@@ -392,7 +392,7 @@ function generateFolderActions($folderId, $folderName, $con, $workspace_filter, 
         
         // Move folder action
         $actions .= "<div class='folder-actions-menu-item' data-action='move-entire-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-        $actions .= "<i class='lucide lucide-share-2'></i>";
+        $actions .= "<i class='lucide lucide-folder-output'></i>";
         $actions .= "<span>" . t_h('notes_list.folder_actions.move_folder', [], 'Move to subfolder') . "</span>";
         $actions .= "</div>";
         
