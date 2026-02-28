@@ -324,7 +324,7 @@
             "workspaces": "Arbeitsbereiche",
             "backup_export": "Sicherung / Export",
             "restore_import": "Wiederherstellen / Importieren",
-            "git_sync": "{{provider}}-Synchronisierung",
+            "git_sync": "Git-Synchronisierung",
             "check_updates": "Nach Updates suchen",
             "api_docs": "API-Dokumentation",
             "documentation": "Github Repository",

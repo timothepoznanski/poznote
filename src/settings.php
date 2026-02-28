@@ -254,7 +254,7 @@ if ($isAdmin) {
                     <i class="<?php echo (defined('GIT_PROVIDER') && GIT_PROVIDER === 'forgejo') ? 'lucide lucide-git-branch' : 'lucide lucide-github'; ?>"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.git_sync', ['provider' => getGitProviderName()], 'GitHub Sync'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?></span>
                 </div>
             </div>
 

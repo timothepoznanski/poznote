@@ -326,7 +326,7 @@
             "user_management": "用户管理",
             "backup_export": "备份 / 导出",
             "restore_import": "还原 / 导入",
-            "git_sync": "{{provider}} 同步",
+            "git_sync": "Git 同步",
             "check_updates": "检查更新",
             "api_docs": "API 文档",
             "documentation": "Github 仓库",

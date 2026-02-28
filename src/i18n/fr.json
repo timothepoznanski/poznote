@@ -341,7 +341,7 @@
             "user_management": "Gestion des utilisateurs",
             "backup_export": "Sauvegarde / Export",
             "restore_import": "Restauration / Import",
-            "git_sync": "Synchronisation {{provider}}",
+            "git_sync": "Synchronisation Git",
             "check_updates": "Vérifier les mises à jour",
             "api_docs": "Documentation API",
             "documentation": "Repository Github",

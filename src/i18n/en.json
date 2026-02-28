@@ -57,7 +57,7 @@
             "user_management": "User Management",
             "backup_export": "Backup / Export",
             "restore_import": "Restore / Import",
-            "git_sync": "{{provider}} Sync",
+            "git_sync": "Git Sync",
             "check_updates": "Check for Updates",
             "api_docs": "API Documentation",
             "documentation": "Github Repository",
