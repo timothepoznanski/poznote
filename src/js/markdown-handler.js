@@ -1264,12 +1264,16 @@ function initializeMarkdownNote(noteId) {
         isMobileViewportCheck = false;
     }
 
-    // Always start in edit mode for empty notes (new notes), unless force split is set
+    // Default behavior for new notes:
+    // - Desktop: split mode (edit + preview side by side)
+    // - Mobile: edit mode only
     // IMPORTANT: Never use split mode on mobile
-    if (isEmpty && forceSplitForNewMarkdown && !isMobileViewportCheck) {
+    if (isEmpty && !isMobileViewportCheck) {
+        // New notes on desktop: start in split mode
         startInSplitMode = true;
         startInEditMode = false;
     } else if (isEmpty) {
+        // New notes on mobile: start in edit mode
         startInEditMode = true;
     } else if (savedMode && savedMode === 'split' && !isMobileViewportCheck) {
         startInSplitMode = true;
