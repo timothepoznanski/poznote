@@ -326,7 +326,7 @@
             "user_management": "用户管理",
             "backup_export": "备份 / 导出",
             "restore_import": "还原 / 导入",
-            "git_sync": "{{provider}} 同步",
+            "git_sync": "Git 同步",
             "check_updates": "检查更新",
             "api_docs": "API 文档",
             "documentation": "Github 仓库",
@@ -1963,7 +1963,7 @@
     },
     "git_sync": {
         "title": "{{provider}} 同步",
-        "description": "将您的笔记和附件同步到 {{provider}}。文件以扁平文件形式存储，并附带保存标签、文件夹、日期和附件的 metadata.json。",
+        "description": "将您的笔记和附件同步到 GitHub 或 Forgejo。文件以扁平文件形式存储，并附带保存标签、文件夹、日期和附件的 metadata.json。",
         "warning": "请勿将此功能作为唯一的备份方案。\n请定期使用设置中的备份功能导出您的数据。",
         "confirm_push": "将所有笔记和附件推送到 {{provider}} 吗？现有文件将被更新，Poznote 中不再存在的文件将从仓库中删除。",
         "confirm_pull": "从 {{provider}} 拉取所有笔记和附件吗？本地数据将被远程版本覆盖。在 {{provider}} 上找不到的笔记将被移至回收站。",

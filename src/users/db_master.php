@@ -112,6 +112,13 @@ function initializeMasterDatabase(PDO $con): void {
     $con->exec("CREATE INDEX IF NOT EXISTS idx_shared_links_token ON shared_links(token)");
     $con->exec("CREATE INDEX IF NOT EXISTS idx_shared_links_user ON shared_links(user_id)");
     
+    // Enforce that only user ID 1 is admin
+    try {
+        $con->exec("UPDATE users SET is_admin = 0 WHERE id != 1 AND is_admin = 1");
+    } catch (Exception $e) {
+        error_log("Failed to enforce admin policy: " . $e->getMessage());
+    }
+    
     // Create default user if none exist
     createDefaultUserIfNeeded($con);
 }
@@ -294,7 +301,7 @@ function updateUserProfile(int $id, array $data): array {
     try {
         $masterCon = getMasterConnection();
         
-        $allowedFields = ['username', 'email', 'active', 'is_admin', 'oidc_subject'];
+        $allowedFields = ['username', 'email', 'active', 'oidc_subject'];
         $updates = [];
         $params = [];
         

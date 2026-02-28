@@ -300,8 +300,11 @@ class AttachmentsController {
                 if ($authUser && $authUser['active']) {
                     if ((bool)$authUser['is_admin'] && $_SERVER['PHP_AUTH_PW'] === AUTH_PASSWORD) {
                         $isAuthenticated = true;
-                    } elseif (!$authUser['is_admin'] && $_SERVER['PHP_AUTH_PW'] === AUTH_USER_PASSWORD) {
-                        $isAuthenticated = true;
+                    } elseif (!$authUser['is_admin']) {
+                        $expectedUserPassword = getUserSpecificPassword($authUser['username']);
+                        if ($_SERVER['PHP_AUTH_PW'] === $expectedUserPassword) {
+                            $isAuthenticated = true;
+                        }
                     }
                 }
             }

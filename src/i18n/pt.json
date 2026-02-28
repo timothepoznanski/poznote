@@ -323,7 +323,7 @@
             "workspaces": "Espaços de trabalho",
             "backup_export": "Backup / Exportar",
             "restore_import": "Restaurar / Importar",
-            "git_sync": "Sincronização {{provider}}",
+            "git_sync": "Sincronização Git",
             "check_updates": "Verificar atualizações",
             "api_docs": "Documentação da API",
             "documentation": "Repositório Github",
@@ -1852,7 +1852,7 @@
     },
     "git_sync": {
         "title": "Sincronização {{provider}}",
-        "description": "Sincronize suas notas e anexos no {{provider}}. Os arquivos são armazenados como arquivos simples com um metadata.json que preserva tags, pastas, datas e anexos.",
+        "description": "Sincronize suas notas e anexos no GitHub ou Forgejo. Os arquivos são armazenados como arquivos simples com um metadata.json que preserva tags, pastas, datas e anexos.",
         "warning": "Não dependa desta funcionalidade como única solução de backup.\nExporte seus dados regularmente usando o recurso de backup nas Configurações.",
         "confirm_push": "Enviar todas as notas e anexos para o {{provider}}? Os arquivos existentes serão atualizados e os arquivos que não existem mais no Poznote serão removidos do repositório.",
         "confirm_pull": "Baixar todas as notas e anexos do {{provider}}? Os dados locais serão substituídos pela versão remota. As notas não encontradas no {{provider}} serão movidas para a lixeira.",

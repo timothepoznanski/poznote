@@ -324,7 +324,7 @@
             "workspaces": "Arbeitsbereiche",
             "backup_export": "Sicherung / Export",
             "restore_import": "Wiederherstellen / Importieren",
-            "git_sync": "{{provider}}-Synchronisierung",
+            "git_sync": "Git-Synchronisierung",
             "check_updates": "Nach Updates suchen",
             "api_docs": "API-Dokumentation",
             "documentation": "Github Repository",
@@ -1848,7 +1848,7 @@
     },
     "git_sync": {
         "title": "{{provider}}-Synchronisierung",
-        "description": "Synchronisieren Sie Ihre Notizen und Anhänge auf {{provider}}. Dateien werden als flache Dateien gespeichert mit einer metadata.json, die Tags, Ordner, Daten und Anhänge enthält.",
+        "description": "Synchronisieren Sie Ihre Notizen und Anhänge auf GitHub oder Forgejo. Dateien werden als flache Dateien gespeichert mit einer metadata.json, die Tags, Ordner, Daten und Anhänge enthält.",
         "warning": "Verlassen Sie sich nicht ausschließlich auf diese Funktion als Backup-Lösung.\nExportieren Sie Ihre Daten regelmäßig über die Backup-Funktion in den Einstellungen.",
         "confirm_push": "Alle Notizen und Anhänge zu {{provider}} pushen? Vorhandene Dateien werden aktualisiert und Dateien, die nicht mehr in Poznote vorhanden sind, werden aus dem Repository gelöscht.",
         "confirm_pull": "Alle Notizen und Anhänge von {{provider}} pullen? Lokale Daten werden mit der Remote-Version überschrieben. Notizen, die auf {{provider}} nicht gefunden werden, werden in den Papierkorb verschoben.",

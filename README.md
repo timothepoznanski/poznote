@@ -379,24 +379,17 @@ Additional settings are available through the Poznote web interface and are stor
 <summary><strong>Traditional Authentication</strong></summary>
 <br>
 
-Poznote uses a global password model. You define your administrator and standard user passwords in the `.env` file, and users log in using their database-managed usernames.
+Poznote uses a password model based on the `.env` file. You define your administrator and standard user passwords in the `.env` file, and users log in with their username and password.
 
 #### Authentication Model
 
-- **Global Authentication**: Uses `POZNOTE_PASSWORD` and `POZNOTE_PASSWORD_USER` environment variables in your `.env`.
+- **Global Authentication**: Uses `POZNOTE_PASSWORD` (admin) and `POZNOTE_PASSWORD_USER` (standard users) defined in your `.env` file.
+- **User-Specific Passwords**: You can set individual passwords for standard users using `POZNOTE_PASSWORD_{USERNAME}` in your `.env`.
 - **User Profiles**: Each user has a unique profile (username) with isolated data.
 - **Automatic Profile Selection**: The system automatically selects the correct profile when you log in based on your credentials.
 - **First Account**: On a new installation or migration, the first user created is always an administrator named `admin_change_me`.
 
-```bash
-# Global Administrator password
-# Used for all accounts with administrator role
-POZNOTE_PASSWORD=your_secure_password
 
-# Global Standard User password (optional)
-# Used for all accounts with standard user role
-POZNOTE_PASSWORD_USER=your_user_password
-```
 
 #### Login Flow
 
@@ -564,8 +557,10 @@ You can install beta versions by modifying your `docker-compose.yml` to use a sp
 Poznote features a multi-user architecture with isolated data space for each user (ideal for families, teams, or personal personas).
 
 - **Data Isolation**: Each user has their own separate notes, workspaces, tags, folders and attachments.
-- **Global Passwords**: Access is managed via role-based global passwords defined in `.env`.
+- **Global Passwords**: Access is managed via passwords defined in the `.env` file, with optional per-user passwords.
 - **User Management**: Administrators can manage profiles via the Settings panel.
+
+> ⚠️ **Warning:** It is not possible to share notes between users. Each user has their own isolated space. The only way to share notes or a profile is to share a common account.
 
 ### Architecture & Structure
 

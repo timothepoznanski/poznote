@@ -806,8 +806,9 @@ function oidc_finish_login($claims, $tokens) {
         // This creates a persistent cookie that lasts 30 days
         $configured_port = $_ENV['HTTP_WEB_PORT'] ?? '8040';
         $timestamp = time();
-        $secretToUse = $user['is_admin'] ? AUTH_PASSWORD : AUTH_USER_PASSWORD;
         $actualUsername = $user['username'];
+        $expectedUserPassword = getUserSpecificPassword($actualUsername);
+        $secretToUse = $user['is_admin'] ? AUTH_PASSWORD : $expectedUserPassword;
         
         // Format: actual_username:user_id:timestamp:hash
         $hash = hash('sha256', $actualUsername . $user['id'] . $timestamp . $secretToUse);
