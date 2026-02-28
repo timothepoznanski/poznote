@@ -219,6 +219,9 @@ function switchToWorkspace(workspaceName) {
 
     closeWorkspaceMenus();
     updateWorkspaceNameInHeaders(workspaceName);
+
+    // Remember the old workspace for tab saving
+    var oldWorkspace = selectedWorkspace;
     selectedWorkspace = workspaceName;
 
     // Save last opened workspace to database
@@ -233,6 +236,11 @@ function switchToWorkspace(workspaceName) {
 
     // Clear the right column when switching workspace
     clearRightColumn();
+
+    // Switch tabs: save old workspace's tabs, load new workspace's tabs
+    if (window.tabManager && typeof window.tabManager.switchWorkspace === 'function') {
+        window.tabManager.switchWorkspace(oldWorkspace);
+    }
 
     var url = new URL(window.location.href);
     url.searchParams.delete('note');
@@ -316,6 +324,29 @@ function refreshLeftColumnForWorkspace(workspaceName) {
                 } catch (error) {
                     console.error('Error reinitializing after workspace change:', error);
                 }
+
+                // Re-highlight the currently active note in the sidebar
+                // (after a short delay to ensure DOM is fully ready)
+                var selectActiveNote = function () {
+                    var activeNoteId = null;
+                    // Try to get the active note from tab manager
+                    if (window.tabManager && typeof window.tabManager.getActiveNoteId === 'function') {
+                        activeNoteId = window.tabManager.getActiveNoteId();
+                    }
+                    // Fallback to global noteid
+                    if (!activeNoteId && typeof noteid !== 'undefined' && noteid > 0) {
+                        activeNoteId = String(noteid);
+                    }
+                    if (activeNoteId) {
+                        var noteLink = document.querySelector('a.links_arbo_left[data-note-id="' + activeNoteId + '"]');
+                        if (noteLink && typeof updateSelectedNote === 'function') {
+                            updateSelectedNote(noteLink);
+                        }
+                    }
+                };
+                // Run immediately and with delays to handle async note loading
+                setTimeout(selectActiveNote, 100);
+                setTimeout(selectActiveNote, 500);
             }
         })
         .catch(function (err) {
