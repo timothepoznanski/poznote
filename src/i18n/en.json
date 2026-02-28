@@ -1426,7 +1426,7 @@
     },
     "git_sync": {
         "title": "{{provider}} Sync",
-        "description": "Synchronize your notes and attachments to {{provider}}. Files are stored as flat files with a metadata.json that preserves tags, folders, dates and attachments.",
+        "description": "Synchronize your notes and attachments to GitHub or Forgejo. Files are stored as flat files with a metadata.json that preserves tags, folders, dates and attachments.",
         "warning": "Do not rely on this feature as your sole backup.\nRegularly export your data using the backup feature in Settings.",
         "confirm_push": "Push all notes and attachments to {{provider}}? Existing files will be updated and files no longer in Poznote will be removed from the repository.",
         "confirm_pull": "Pull all notes and attachments from {{provider}}? Local data will be overwritten with the remote version. Notes not found on {{provider}} will be moved to trash.",
