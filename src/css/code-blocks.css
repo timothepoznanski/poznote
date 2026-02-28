@@ -195,7 +195,7 @@ code *[style*="color"],
 .noteentry code *[style*="color"],
 .noteentry .code-block *[style*="color"] {
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
-    font-size :inherit;
+    font-size: inherit;
     /* inherit font size from parent */
 }
 
@@ -267,4 +267,39 @@ code *[style*="color"],
     word-wrap: break-word !important;
     overflow-wrap: break-word !important;
     max-width: 100%;
+}
+
+/* ============================================
+   Code block NO WRAP mode (horizontal scroll)
+   Applied when body has .code-block-no-wrap class
+   ============================================ */
+body.code-block-no-wrap .code-block,
+body.code-block-no-wrap pre.code-block,
+body.code-block-no-wrap .noteentry pre {
+    white-space: pre !important;
+    word-wrap: normal !important;
+    overflow-wrap: normal !important;
+    overflow-x: auto !important;
+}
+
+body.code-block-no-wrap .noteentry pre code,
+body.code-block-no-wrap pre.code-block code {
+    white-space: pre !important;
+    word-wrap: normal !important;
+    overflow-wrap: normal !important;
+}
+
+body.code-block-no-wrap .noteentry span[style*='Segoe UI Mono'],
+body.code-block-no-wrap .noteentry div[style*='Segoe UI Mono'],
+body.code-block-no-wrap .noteentry span[style*='Consolas'],
+body.code-block-no-wrap .noteentry div[style*='Consolas'],
+body.code-block-no-wrap .noteentry span[style*='Monaco'],
+body.code-block-no-wrap .noteentry div[style*='Monaco'],
+body.code-block-no-wrap .noteentry span[style*='Courier New'],
+body.code-block-no-wrap .noteentry div[style*='Courier New'],
+body.code-block-no-wrap .noteentry span[style*='monospace'],
+body.code-block-no-wrap .noteentry div[style*='monospace'] {
+    white-space: pre !important;
+    word-wrap: normal !important;
+    overflow-wrap: normal !important;
 }

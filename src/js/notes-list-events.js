@@ -320,6 +320,27 @@
     }
 
     /**
+     * Handle opening all notes in a folder in tabs
+     * @param {Event} event - The click event
+     * @param {HTMLElement} element - The action element
+     */
+    function handleOpenAllNotesInTabs(event, element) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        var folderData = getFolderData(element);
+
+        // Close folder actions menu
+        if (folderData.id && typeof window.closeFolderActionsMenu === 'function') {
+            window.closeFolderActionsMenu(folderData.id);
+        }
+
+        if (folderData.id && typeof window.openAllFolderNotesInTabs === 'function') {
+            window.openAllFolderNotesInTabs(folderData.id, folderData.name);
+        }
+    }
+
+    /**
      * Main click event handler using event delegation
      * @param {Event} event - The click event
      */
@@ -549,6 +570,10 @@
 
             case 'sort-folder':
                 handleFolderSort(event, actionElement);
+                break;
+
+            case 'open-all-notes-in-tabs':
+                handleOpenAllNotesInTabs(event, actionElement);
                 break;
 
         }

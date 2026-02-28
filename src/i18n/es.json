@@ -428,7 +428,8 @@
             "show_folder_actions": "Mostrar acciones de carpeta",
             "kanban_on_folder_click": "Abrir vista Kanban al hacer clic en la carpeta",
             "index_icon_scale": "Escalado de iconos del índice",
-            "note_content_width": "Ancho del contenido de la nota"
+            "note_content_width": "Ancho del contenido de la nota",
+            "code_block_word_wrap": "Ajuste de línea en bloques de código"
         },
         "badges": {
             "font_size_default": "predeterminado ({{size}}px)",
@@ -922,6 +923,7 @@
             "menu": "Acciones",
             "create": "Crear",
             "kanban_view": "Vista Kanban",
+            "open_all_in_tabs": "Abrir todas las notas",
             "move_all_files": "Mover los archivos",
             "rename_folder": "Renombrar carpeta",
             "delete_folder": "Eliminar carpeta",
@@ -929,7 +931,11 @@
             "change_icon": "Cambiar icono",
             "download_folder": "Descargar",
             "is_public": "Es compartida",
-            "share_folder": "Compartir"
+            "share_folder": "Compartir",
+            "tabs_not_available": "Las pestañas no están disponibles en dispositivos móviles",
+            "no_notes_title": "Sin notas",
+            "no_notes_in_folder": "Esta carpeta no contiene notas",
+            "too_many_notes": "Esta carpeta contiene {{count}} notas. Solo se abrirán las primeras {{max}} para no sobrecargar su navegador."
         }
     },
     "update": {

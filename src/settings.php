@@ -423,6 +423,15 @@ if ($isAdmin) {
                 </div>
             </div>
 
+            <!-- Code Block Word Wrap -->
+            <div class="home-card" id="code-wrap-card">
+                <div class="home-card-icon"><i class="lucide lucide-code"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.code_block_word_wrap', [], 'Code block word wrap'); ?></span>
+                    <span id="code-wrap-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
+                </div>
+            </div>
+
         </div>
 
     </div>

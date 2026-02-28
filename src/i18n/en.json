@@ -95,7 +95,8 @@
             "show_folder_actions": "Show folder actions",
             "kanban_on_folder_click": "Open Kanban view on folder click",
             "index_icon_scale": "Index icon scaling",
-            "note_content_width": "Note content width"
+            "note_content_width": "Note content width",
+            "code_block_word_wrap": "Code block word wrap"
         },
         "badges": {
             "font_size_default": "default ({{size}}px)",
@@ -474,6 +475,7 @@
             "menu": "Actions",
             "create": "Create",
             "kanban_view": "Kanban view",
+            "open_all_in_tabs": "Open all notes",
             "move_all_files": "Move all files",
             "rename_folder": "Rename folder",
             "delete_folder": "Delete folder",
@@ -481,7 +483,11 @@
             "change_icon": "Change icon",
             "download_folder": "Download",
             "is_public": "Is shared",
-            "share_folder": "Share"
+            "share_folder": "Share",
+            "tabs_not_available": "Tabs are not available on mobile devices",
+            "no_notes_title": "No notes",
+            "no_notes_in_folder": "This folder contains no notes",
+            "too_many_notes": "This folder contains {{count}} notes. Only the first {{max}} will be opened to avoid overwhelming your browser."
         }
     },
     "update": {

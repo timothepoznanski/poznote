@@ -2164,66 +2164,67 @@ function adjustMenuPosition(menu) {
     menu.style.marginBottom = '';
     menu.style.left = '';
     menu.style.right = '';
+    menu.style.maxHeight = '';
+    menu.style.overflowY = '';
 
-    // Get menu position and dimensions
-    var rect = menu.getBoundingClientRect();
+    // Get the parent toggle button to position relative to it
+    var toggleButton = menu.previousElementSibling;
+    if (!toggleButton) {
+        return;
+    }
+
+    var toggleRect = toggleButton.getBoundingClientRect();
     var viewportHeight = window.innerHeight;
     var viewportWidth = window.innerWidth;
 
+    // Position menu below the toggle button by default (fixed positioning)
+    var topPosition = toggleRect.bottom + 4;
+    var leftPosition = toggleRect.left;
+
+    menu.style.top = topPosition + 'px';
+    menu.style.left = leftPosition + 'px';
+
+    // Now get the menu's dimensions after positioning
+    var rect = menu.getBoundingClientRect();
+
     // Check vertical overflow
     if (rect.bottom > viewportHeight) {
-        // Calculate space above and below
-        // The menu is currently positioned below the parent (default CSS)
-        // Parent top is roughly rect.top - margin
+        // Try positioning above instead
+        var topAltPosition = toggleRect.top - rect.height - 4;
 
-        // We will flip to top if there is more space above or if it simply fits better
-        menu.style.top = 'auto';
-        menu.style.bottom = '100%';
-        menu.style.marginTop = '0';
-        menu.style.marginBottom = '4px';
-
-        // Re-check if it now overflows the top
-        var newRect = menu.getBoundingClientRect();
-        if (newRect.top < 0) {
-            // It overflows top too. 
-            // Revert to bottom if there's more space below, or just cap height.
-            // For simplicity, if it overflows top after flipping, revert to bottom and set max-height
-            menu.style.top = '';
-            menu.style.bottom = '';
-            menu.style.marginTop = '';
-            menu.style.marginBottom = '';
-
-            // Re-read rect
+        if (topAltPosition >= 0) {
+            // Fits above
+            menu.style.top = topAltPosition + 'px';
             rect = menu.getBoundingClientRect();
-
-            // Constrain height to available space
-            var availableHeight = viewportHeight - rect.top - 10;
-            if (availableHeight < 100) {
-                // Not enough space below, force top with max-height?
-                // Or just use fixed positioning (which is complex with scrolling parents)
-                // Let's set max-height to fit below
-                menu.style.maxHeight = Math.max(100, availableHeight) + 'px';
-                menu.style.overflowY = 'auto';
-            } else {
-                menu.style.maxHeight = availableHeight + 'px';
-                menu.style.overflowY = 'auto';
-            }
+        } else {
+            // Doesn't fit above either, constrain height below
+            var availableHeight = viewportHeight - topPosition - 10;
+            menu.style.maxHeight = Math.max(100, availableHeight) + 'px';
+            menu.style.overflowY = 'auto';
+            rect = menu.getBoundingClientRect();
         }
     }
 
-    // Refresh rect after vertical adjustments
-    rect = menu.getBoundingClientRect();
-
     // Check horizontal overflow
-    // Logic: Default CSS is usually 'right: 0' (aligned right).
-    // If rect.left < 0, it overflows left. Switch to 'left: 0'.
+    var leftCol = document.getElementById('left_col');
+    if (leftCol) {
+        var leftColRect = leftCol.getBoundingClientRect();
+
+        // If menu overflows right edge of left column, align to right edge of toggle button
+        if (rect.right > leftColRect.right) {
+            leftPosition = toggleRect.right - rect.width;
+            menu.style.left = Math.max(leftColRect.left, leftPosition) + 'px';
+        }
+    }
+
+    // Also check viewport overflow
+    rect = menu.getBoundingClientRect();
+    if (rect.right > viewportWidth) {
+        leftPosition = viewportWidth - rect.width - 10;
+        menu.style.left = Math.max(0, leftPosition) + 'px';
+    }
     if (rect.left < 0) {
-        menu.style.right = 'auto';
-        menu.style.left = '0';
-    } else if (rect.right > viewportWidth) {
-        // If rect.right > viewportWidth, it overflows right. Switch to 'right: 0'.
-        menu.style.left = 'auto';
-        menu.style.right = '0';
+        menu.style.left = '10px';
     }
 }
 
@@ -2625,7 +2626,64 @@ function showInfoModal(title, message, reloadAfter = false) {
     modal.style.display = 'flex';
 }
 
+/**
+ * Open all notes in a folder in separate tabs
+ * @param {number} folderId - The folder ID
+ * @param {string} folderName - The folder name
+ */
+function openAllFolderNotesInTabs(folderId, folderName) {
+    // Check if tabs are enabled
+    if (!window.tabManager || !window.tabManager.openInNewTab) {
+        console.error('Tab manager not available');
+        showInfoModal(
+            window.t ? window.t('common.error', null, 'Error') : 'Error',
+            window.t ? window.t('notes_list.folder_actions.tabs_not_available', null, 'Tabs are not available on mobile devices') : 'Tabs are not available on mobile devices'
+        );
+        return;
+    }
+
+    // Find all notes in the folder
+    // Notes have class 'links_arbo_left' and data-folder-id attribute
+    var noteLinks = document.querySelectorAll('.links_arbo_left[data-folder-id="' + folderId + '"]');
+
+    if (noteLinks.length === 0) {
+        showInfoModal(
+            window.t ? window.t('notes_list.folder_actions.no_notes_title', null, 'No notes') : 'No notes',
+            window.t ? window.t('notes_list.folder_actions.no_notes_in_folder', null, 'This folder contains no notes') : 'This folder contains no notes'
+        );
+        return;
+    }
+
+    // Limit the number of tabs to avoid overwhelming the browser
+    var maxTabs = 20;
+    if (noteLinks.length > maxTabs) {
+        var message = window.t
+            ? window.t('notes_list.folder_actions.too_many_notes', {count: noteLinks.length, max: maxTabs}, 'This folder contains {count} notes. Only the first {max} will be opened to avoid overwhelming your browser.')
+            : 'This folder contains ' + noteLinks.length + ' notes. Only the first ' + maxTabs + ' will be opened to avoid overwhelming your browser.';
+
+        if (!confirm(message)) {
+            return;
+        }
+    }
+
+    // Open each note in a new tab
+    var notesToOpen = Array.from(noteLinks).slice(0, maxTabs);
+    notesToOpen.forEach(function(noteLink, index) {
+        var noteId = noteLink.getAttribute('data-note-id');
+        var noteTitleElement = noteLink.querySelector('.note-title');
+        var noteTitle = noteTitleElement ? noteTitleElement.textContent.trim() : noteLink.textContent.trim();
+
+        if (noteId) {
+            // Add a small delay between opening tabs to avoid overwhelming the browser
+            setTimeout(function() {
+                window.tabManager.openInNewTab(noteId, noteTitle);
+            }, index * 100); // 100ms delay between each tab
+        }
+    });
+}
+
 // Export to window
 window.openKanbanView = openKanbanView;
+window.openAllFolderNotesInTabs = openAllFolderNotesInTabs;
 window.showInfoModal = showInfoModal;
 window.toggleFavorites = toggleFavorites;

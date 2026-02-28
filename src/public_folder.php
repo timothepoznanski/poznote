@@ -274,7 +274,7 @@ $noteBaseUrl = $protocol . '://' . $host;
     <?php if (!empty($sharedNotes)): ?>
         <div class="public-folder-filter">
             <div class="filter-input-wrapper">
-                <input type="text" id="folderFilterInput" class="filter-input" placeholder="<?php echo t_h('public_folder.filter_placeholder', [], 'Search notes'); ?>" autocomplete="off" />
+                <input type="text" id="folderFilterInput" class="filter-input" placeholder="<?php echo t_h('public_folder.filter_placeholder', [], 'Filter notes'); ?>" autocomplete="off" />
                 <button id="clearFilterBtn" class="clear-filter-btn" type="button" aria-label="Clear search" style="display: none;">
                     <i class="lucide lucide-x"></i>
                 </button>

@@ -108,11 +108,12 @@ $settings = [
     'hide_folder_actions' => null,
     'hide_folder_counts' => null,
     'note_list_sort' => 'updated_desc',
-    'notes_without_folders_after_folders' => '1'
+    'notes_without_folders_after_folders' => '1',
+    'code_block_word_wrap' => '1'
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -258,6 +259,9 @@ if ($settings['hide_folder_counts'] === '0' || $settings['hide_folder_counts'] =
 }
 if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $width_value !== 'false') {
     $extra_body_classes .= ' center-note-content';
+}
+if ($settings['code_block_word_wrap'] === '0' || $settings['code_block_word_wrap'] === 'false') {
+    $extra_body_classes .= ' code-block-no-wrap';
 }
 
 // Load note list sort preference using previously loaded settings
@@ -680,7 +684,7 @@ $body_classes = trim($extra_body_classes);
                     
                     // Individual action buttons
                     echo '<button type="button" class="toolbar-btn btn-duplicate note-action-btn" data-action="duplicate-note" data-note-id="'.$row['id'].'" title="'.t_h('common.duplicate', [], 'Duplicate').'"><i class="lucide lucide-copy"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-move note-action-btn" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" title="'.t_h('common.move', [], 'Move').'"><i class="lucide lucide-folder-open"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-move note-action-btn" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" title="'.t_h('common.move', [], 'Move').'"><i class="lucide lucide-folder-output"></i></button>';
                     
                     // Create linked note button (hidden for linked notes and notes that already have a link)
                     if ($note_type !== 'linked' && !$hasLinkedNote) {
@@ -725,7 +729,7 @@ $body_classes = trim($extra_body_classes);
                     }
 
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-duplicate"><i class="lucide lucide-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-move"><i class="lucide lucide-folder-open"></i> '.t_h('common.move', [], 'Move').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-move"><i class="lucide lucide-folder-output"></i> '.t_h('common.move', [], 'Move').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-download"><i class="lucide lucide-download"></i> '.t_h('common.download', [], 'Download').'</button>';
 
                     // Convert button (only for markdown and note types, with appropriate icon)

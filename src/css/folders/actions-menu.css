@@ -91,10 +91,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 
 /* Dropdown menu for folder actions */
 .folder-actions-menu {
-    position: absolute;
-    right: 0;
-    top: 100%;
-    margin-top: 4px;
+    position: fixed;
     background: white;
     border: 1px solid #d1d5db;
     border-radius: 6px;
@@ -216,4 +213,11 @@ body.dark-mode .folder-actions-menu-item.active i {
 /* Hide edit button for system folders to prevent renaming */
 .default-folder .folder-edit-btn {
     display: none !important;
+}
+
+/* Hide "Open all notes" action on mobile (viewport ≤ 800px) */
+@media (max-width: 800px) {
+    .folder-actions-menu-item.open-all-tabs-action {
+        display: none !important;
+    }
 }

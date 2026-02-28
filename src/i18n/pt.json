@@ -427,7 +427,8 @@
             "show_folder_actions": "Mostrar Ações da Pasta",
             "kanban_on_folder_click": "Abrir visualização Kanban ao clicar na pasta",
             "index_icon_scale": "Escala de ícones do índice",
-            "note_content_width": "Largura do conteúdo da nota"
+            "note_content_width": "Largura do conteúdo da nota",
+            "code_block_word_wrap": "Quebra de linha em blocos de código"
         },
         "badges": {
             "font_size_default": "padrão ({{size}}px)",
@@ -921,6 +922,7 @@
             "menu": "Ações",
             "create": "Criar",
             "kanban_view": "Visualização Kanban",
+            "open_all_in_tabs": "Abrir todas as notas",
             "move_all_files": "Mover os arquivos",
             "rename_folder": "Renomear pasta",
             "delete_folder": "Excluir pasta",
@@ -928,7 +930,11 @@
             "download_folder": "Baixar",
             "change_icon": "Alterar ícone",
             "is_public": "É compartilhada",
-            "share_folder": "Compartilhar"
+            "share_folder": "Compartilhar",
+            "tabs_not_available": "As abas não estão disponíveis em dispositivos móveis",
+            "no_notes_title": "Sem notas",
+            "no_notes_in_folder": "Esta pasta não contém notas",
+            "too_many_notes": "Esta pasta contém {{count}} notas. Apenas as primeiras {{max}} serão abertas para não sobrecarregar seu navegador."
         }
     },
     "update": {

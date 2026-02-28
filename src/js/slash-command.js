@@ -2197,6 +2197,45 @@
         }
     }
 
+    // Update the .selected class on main menu items without rebuilding DOM
+    function updateSelectedClass() {
+        if (!slashMenuElement) return;
+        const items = slashMenuElement.querySelectorAll('.slash-command-item');
+        items.forEach((el, idx) => {
+            if (idx === selectedIndex) {
+                el.classList.add('selected');
+            } else {
+                el.classList.remove('selected');
+            }
+        });
+    }
+
+    // Update the .selected class on submenu items without rebuilding DOM
+    function updateSubmenuSelectedClass() {
+        if (!submenuElement) return;
+        const items = submenuElement.querySelectorAll('.slash-command-item:not(.slash-command-back)');
+        items.forEach((el, idx) => {
+            if (idx === selectedSubmenuIndex) {
+                el.classList.add('selected');
+            } else {
+                el.classList.remove('selected');
+            }
+        });
+    }
+
+    // Update the .selected class on sub-submenu items without rebuilding DOM
+    function updateSubSubmenuSelectedClass() {
+        if (!subSubmenuElement) return;
+        const items = subSubmenuElement.querySelectorAll('.slash-command-item:not(.slash-command-back)');
+        items.forEach((el, idx) => {
+            if (idx === selectedSubSubmenuIndex) {
+                el.classList.add('selected');
+            } else {
+                el.classList.remove('selected');
+            }
+        });
+    }
+
     // Update slash menu content based on current filter text
     function updateMenuContent() {
         if (!slashMenuElement) return;
@@ -2210,6 +2249,9 @@
     // Display submenu (level 2) for a command with subcommands
     function showSubmenu(cmd, parentItem) {
         if (!cmd.submenu || !cmd.submenu.length) return;
+
+        // If this submenu is already displayed, don't recreate it
+        if (submenuElement && currentSubmenu === cmd.submenu) return;
 
         hideSubmenu();
 
@@ -2256,6 +2298,9 @@
     // Display sub-submenu (level 3) for nested menu items
     function showSubSubmenu(item, parentItem) {
         if (!item.submenu || !item.submenu.length) return;
+
+        // If this sub-submenu is already displayed, don't recreate it
+        if (subSubmenuElement && currentSubSubmenu === item.submenu) return;
 
         hideSubSubmenu();
 
@@ -2672,6 +2717,14 @@
         const item = e.target.closest && e.target.closest('.slash-command-item');
         if (!item) return;
 
+        // Sync selectedIndex with hovered item
+        const items = slashMenuElement ? slashMenuElement.querySelectorAll('.slash-command-item') : [];
+        const hoveredIdx = Array.prototype.indexOf.call(items, item);
+        if (hoveredIdx >= 0 && hoveredIdx !== selectedIndex) {
+            selectedIndex = hoveredIdx;
+            updateSelectedClass();
+        }
+
         const hasSubmenu = item.getAttribute('data-has-submenu') === 'true';
         const commandId = item.getAttribute('data-command-id');
 
@@ -2725,7 +2778,7 @@
                     e.preventDefault();
                     if (currentSubSubmenu.length) {
                         selectedSubSubmenuIndex = (selectedSubSubmenuIndex + 1) % currentSubSubmenu.length;
-                        subSubmenuElement.innerHTML = buildSubSubmenuHTML(currentSubSubmenu);
+                        updateSubSubmenuSelectedClass();
                     }
                     break;
 
@@ -2733,7 +2786,7 @@
                     e.preventDefault();
                     if (currentSubSubmenu.length) {
                         selectedSubSubmenuIndex = (selectedSubSubmenuIndex - 1 + currentSubSubmenu.length) % currentSubSubmenu.length;
-                        subSubmenuElement.innerHTML = buildSubSubmenuHTML(currentSubSubmenu);
+                        updateSubSubmenuSelectedClass();
                     }
                     break;
 
@@ -2772,7 +2825,7 @@
                     e.preventDefault();
                     if (currentSubmenu.length) {
                         selectedSubmenuIndex = (selectedSubmenuIndex + 1) % currentSubmenu.length;
-                        submenuElement.innerHTML = buildSubmenuHTML(currentSubmenu);
+                        updateSubmenuSelectedClass();
                     }
                     break;
 
@@ -2780,7 +2833,7 @@
                     e.preventDefault();
                     if (currentSubmenu.length) {
                         selectedSubmenuIndex = (selectedSubmenuIndex - 1 + currentSubmenu.length) % currentSubmenu.length;
-                        submenuElement.innerHTML = buildSubmenuHTML(currentSubmenu);
+                        updateSubmenuSelectedClass();
                     }
                     break;
 
@@ -2830,7 +2883,7 @@
                 e.preventDefault();
                 if (filteredCommands.length) {
                     selectedIndex = (selectedIndex + 1) % filteredCommands.length;
-                    updateMenuContent();
+                    updateSelectedClass();
                 }
                 break;
 
@@ -2838,7 +2891,7 @@
                 e.preventDefault();
                 if (filteredCommands.length) {
                     selectedIndex = (selectedIndex - 1 + filteredCommands.length) % filteredCommands.length;
-                    updateMenuContent();
+                    updateSelectedClass();
                 }
                 break;
 
@@ -3019,7 +3072,7 @@
             const textBeforeSlash = textBefore.substring(0, textBefore.length - 1);
             // Detect URL pattern: when typing / directly after : or :/ (protocol)
             const isUrl = /:$/.test(textBeforeSlash) || /:\/$/.test(textBeforeSlash);
-            
+
             if (!isUrl) {
                 showSlashMenu();
             }
@@ -3207,7 +3260,7 @@
                         const textBeforeSlash = value.substring(0, pos - 1);
                         // Detect URL pattern: when typing / directly after : or :/ (protocol)
                         const isUrl = /:$/.test(textBeforeSlash) || /:\/$/.test(textBeforeSlash);
-                        
+
                         if (!isUrl) {
                             showSlashMenuForInput(target, pos);
                         }

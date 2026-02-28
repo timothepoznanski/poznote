@@ -202,8 +202,68 @@
             bar = document.createElement('div');
             bar.id = 'app-tab-bar';
 
+            // Drag-to-scroll functionality
+            var isDragging = false;
+            var hasDragged = false;
+            var startX = 0;
+            var scrollLeft = 0;
+
+            bar.addEventListener('mousedown', function (e) {
+                // Don't start dragging on close button
+                if (e.target.closest('.app-tab-close')) return;
+
+                isDragging = true;
+                hasDragged = false;
+                startX = e.pageX - bar.offsetLeft;
+                scrollLeft = bar.scrollLeft;
+                bar.style.cursor = 'grabbing';
+                bar.style.userSelect = 'none';
+            });
+
+            document.addEventListener('mousemove', function (e) {
+                if (!isDragging) return;
+                e.preventDefault();
+                var x = e.pageX - bar.offsetLeft;
+                var walk = (x - startX) * 1.5; // Scroll speed multiplier
+
+                // If moved more than 5px, consider it a drag
+                if (Math.abs(walk) > 5) {
+                    hasDragged = true;
+                }
+
+                bar.scrollLeft = scrollLeft - walk;
+            });
+
+            document.addEventListener('mouseup', function () {
+                if (isDragging) {
+                    isDragging = false;
+                    bar.style.cursor = '';
+                    bar.style.userSelect = '';
+
+                    // Reset hasDragged after a short delay to allow click event to check it
+                    setTimeout(function () {
+                        hasDragged = false;
+                    }, 10);
+                }
+            });
+
+            bar.addEventListener('mouseleave', function () {
+                if (isDragging) {
+                    isDragging = false;
+                    bar.style.cursor = '';
+                    bar.style.userSelect = '';
+                }
+            });
+
             // Event delegation on the bar (only once)
             bar.addEventListener('click', function (e) {
+                // Don't process click if we just finished dragging
+                if (hasDragged) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
+
                 var closeBtn = e.target.closest('.app-tab-close');
                 if (closeBtn) {
                     var tabEl = closeBtn.closest('.app-tab');
@@ -533,43 +593,103 @@
             var defaultTitlePattern = /^(?:New note|Nouvelle note|Neue Notiz|Nueva nota|Nova nota|Untitled)(?: \((\d+)\))?$/;
             var changed = false;
             var newDefaultTitle = _getDefaultTitle();
-            
+
             tabs.forEach(function (tab) {
                 var match = defaultTitlePattern.exec(tab.title);
                 if (match) {
                     var number = match[1]; // Captured number, e.g., "10" from "New note (10)"
                     var freshTitle;
-                    
+
                     // For active tab or if note is in DOM, read from DOM (has the most accurate info)
                     if (tab.id === activeTabId || document.getElementById('inp' + tab.noteId)) {
                         freshTitle = _readTitle(tab.noteId, null);
                     }
-                    
+
                     // If we couldn't read from DOM, construct the title
                     if (!freshTitle) {
                         if (number) {
                             // Construct numbered title with current language
-                            freshTitle = window.t 
-                                ? window.t('index.note.new_note_numbered', {number: number}, 'New note ({{number}})')
+                            freshTitle = window.t
+                                ? window.t('index.note.new_note_numbered', { number: number }, 'New note ({{number}})')
                                 : 'New note (' + number + ')';
                         } else {
                             freshTitle = newDefaultTitle;
                         }
                     }
-                    
+
                     if (freshTitle !== tab.title) {
                         tab.title = freshTitle;
                         changed = true;
                     }
                 }
             });
-            
+
             if (changed) {
                 _saveToStorage();
             }
             render();
         }
     });
+
+    // ── Workspace switch ──────────────────────────────────────────────────
+
+    /**
+     * Called when the user switches to a different workspace.
+     * Saves the current workspace's tabs under the old workspace key,
+     * clears the in-memory state, then loads the new workspace's tabs.
+     * @param {string} [oldWorkspace] - The workspace we are leaving (to save tabs under its key).
+     *                                   If not provided, uses the current _getWorkspace().
+     */
+    function switchWorkspace(oldWorkspace) {
+        // Save current tabs for the old workspace explicitly
+        if (oldWorkspace) {
+            try {
+                localStorage.setItem('poznote_tabs_' + oldWorkspace, JSON.stringify({
+                    tabs: tabs,
+                    activeTabId: activeTabId
+                }));
+            } catch (e) { /* ignore */ }
+        } else {
+            _saveToStorage();
+        }
+
+        // Reset in-memory state
+        tabs = [];
+        activeTabId = null;
+        _pendingTabSwitch = null;
+
+        // Load tabs for the new workspace (selectedWorkspace is now updated)
+        var stored = _loadFromStorage();
+        if (stored && stored.tabs.length > 0) {
+            tabs = stored.tabs;
+            activeTabId = stored.activeTabId || null;
+
+            // Validate activeTabId
+            if (activeTabId && !_findTabById(activeTabId)) {
+                activeTabId = tabs[0].id;
+            }
+        }
+
+        // Re-render with new workspace's tabs (or empty if none stored)
+        render();
+
+        // Refresh calendar for new workspace
+        if (window.miniCalendar && typeof window.miniCalendar.refresh === 'function') {
+            window.miniCalendar.refresh();
+        }
+
+        // Load the active tab's note if we have one
+        if (activeTabId) {
+            var activeTab = _findTabById(activeTabId);
+            if (activeTab && activeTab.noteId) {
+                _pendingTabSwitch = activeTabId;
+                var url = _buildUrl(activeTab.noteId);
+                if (typeof window.loadNoteDirectly === 'function') {
+                    window.loadNoteDirectly(url, activeTab.noteId, null, null);
+                }
+            }
+        }
+    }
 
     // ── Expose ─────────────────────────────────────────────────────────────
 
@@ -632,15 +752,27 @@
         });
     }
 
+    /**
+     * Get the note ID of the currently active tab, or null.
+     * @returns {string|null}
+     */
+    function getActiveNoteId() {
+        if (!activeTabId) return null;
+        var tab = _findTabById(activeTabId);
+        return tab ? tab.noteId : null;
+    }
+
     window.tabManager = {
         openInNewTab: openInNewTab,
         switchToTab: switchToTab,
         closeTab: closeTab,
         closeTabByNoteId: closeTabByNoteId,
         isNoteOpen: isNoteOpen,
+        getActiveNoteId: getActiveNoteId,
         render: render,
         updateUI: updateOpenInNewTabButtons, // Expose for external calls
-        _onNoteLoaded: _onNoteLoaded
+        _onNoteLoaded: _onNoteLoaded,
+        switchWorkspace: switchWorkspace
     };
 
 })();

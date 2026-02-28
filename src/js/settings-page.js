@@ -87,7 +87,7 @@
 
     // Helper function to determine if a setting is enabled
     function isSettingEnabled(value, invertLogic, defaultValue) {
-        if (value === null && defaultValue !== undefined) {
+        if ((value === null || value === '') && defaultValue !== undefined) {
             return defaultValue;
         }
         var enabled = value === '1' || value === 'true';
@@ -429,6 +429,7 @@
         setupToggleCard('folder-counts-card', 'folder-counts-status', 'hide_folder_counts', true);
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
+        setupToggleCard('code-wrap-card', 'code-wrap-status', 'code_block_word_wrap', false, true);
 
         // Card click handlers for modal settings
         var languageCard = document.getElementById('language-card');
