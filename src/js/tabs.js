@@ -202,8 +202,68 @@
             bar = document.createElement('div');
             bar.id = 'app-tab-bar';
 
+            // Drag-to-scroll functionality
+            var isDragging = false;
+            var hasDragged = false;
+            var startX = 0;
+            var scrollLeft = 0;
+
+            bar.addEventListener('mousedown', function (e) {
+                // Don't start dragging on close button
+                if (e.target.closest('.app-tab-close')) return;
+
+                isDragging = true;
+                hasDragged = false;
+                startX = e.pageX - bar.offsetLeft;
+                scrollLeft = bar.scrollLeft;
+                bar.style.cursor = 'grabbing';
+                bar.style.userSelect = 'none';
+            });
+
+            document.addEventListener('mousemove', function (e) {
+                if (!isDragging) return;
+                e.preventDefault();
+                var x = e.pageX - bar.offsetLeft;
+                var walk = (x - startX) * 1.5; // Scroll speed multiplier
+
+                // If moved more than 5px, consider it a drag
+                if (Math.abs(walk) > 5) {
+                    hasDragged = true;
+                }
+
+                bar.scrollLeft = scrollLeft - walk;
+            });
+
+            document.addEventListener('mouseup', function () {
+                if (isDragging) {
+                    isDragging = false;
+                    bar.style.cursor = '';
+                    bar.style.userSelect = '';
+
+                    // Reset hasDragged after a short delay to allow click event to check it
+                    setTimeout(function () {
+                        hasDragged = false;
+                    }, 10);
+                }
+            });
+
+            bar.addEventListener('mouseleave', function () {
+                if (isDragging) {
+                    isDragging = false;
+                    bar.style.cursor = '';
+                    bar.style.userSelect = '';
+                }
+            });
+
             // Event delegation on the bar (only once)
             bar.addEventListener('click', function (e) {
+                // Don't process click if we just finished dragging
+                if (hasDragged) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
+
                 var closeBtn = e.target.closest('.app-tab-close');
                 if (closeBtn) {
                     var tabEl = closeBtn.closest('.app-tab');

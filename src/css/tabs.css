@@ -23,6 +23,8 @@
     /* Hide scrollbar but keep scrollability */
     -ms-overflow-style: none;
     scrollbar-width: none;
+    /* Drag-to-scroll cursor */
+    cursor: grab;
 }
 
 #app-tab-bar::-webkit-scrollbar {
