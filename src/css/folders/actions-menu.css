@@ -91,10 +91,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 
 /* Dropdown menu for folder actions */
 .folder-actions-menu {
-    position: absolute;
-    right: 0;
-    top: 100%;
-    margin-top: 4px;
+    position: fixed;
     background: white;
     border: 1px solid #d1d5db;
     border-radius: 6px;
