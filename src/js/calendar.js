@@ -10,7 +10,9 @@ class MiniCalendar {
         this.currentYear = this.currentDate.getFullYear();
         this.notesData = {};
         this.translations = window.calendarTranslations || this.getDefaultTranslations();
-        this.isVisible = localStorage.getItem('calendarVisible') === 'true';
+        // Default to visible if not set in localStorage
+        const storedVisibility = localStorage.getItem('calendarVisible');
+        this.isVisible = storedVisibility === null ? true : storedVisibility === 'true';
         this.init();
     }
 
@@ -46,6 +48,13 @@ class MiniCalendar {
         } catch (error) {
             console.error('Error fetching calendar data:', error);
         }
+    }
+
+    /**
+     * Refresh calendar data (useful when switching workspaces)
+     */
+    refresh() {
+        this.fetchNotesData();
     }
 
     /**
@@ -407,7 +416,10 @@ class MiniCalendar {
     }
 }
 
+// Expose MiniCalendar class globally
+window.MiniCalendar = MiniCalendar;
+
 // Initialize calendar when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    new MiniCalendar();
+    window.miniCalendar = new MiniCalendar();
 });

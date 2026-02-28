@@ -321,6 +321,11 @@ function refreshLeftColumnForWorkspace(workspaceName) {
                     if (typeof window.initializeNoteClickHandlers === 'function') {
                         window.initializeNoteClickHandlers();
                     }
+
+                    // Reinitialize calendar
+                    if (window.MiniCalendar) {
+                        window.miniCalendar = new window.MiniCalendar();
+                    }
                 } catch (error) {
                     console.error('Error reinitializing after workspace change:', error);
                 }

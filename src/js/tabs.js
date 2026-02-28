@@ -613,6 +613,11 @@
         // Re-render with new workspace's tabs (or empty if none stored)
         render();
 
+        // Refresh calendar for new workspace
+        if (window.miniCalendar && typeof window.miniCalendar.refresh === 'function') {
+            window.miniCalendar.refresh();
+        }
+
         // Load the active tab's note if we have one
         if (activeTabId) {
             var activeTab = _findTabById(activeTabId);
