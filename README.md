@@ -567,6 +567,8 @@ Poznote features a multi-user architecture with isolated data space for each use
 - **Global Passwords**: Access is managed via role-based global passwords defined in `.env`.
 - **User Management**: Administrators can manage profiles via the Settings panel.
 
+> ⚠️ **Warning:** It is not possible to share notes between users. Each user has their own isolated space. The only way to share notes or a profile is to share a common account. Note also that all non-admin users share the same global password.
+
 ### Architecture & Structure
 
 Poznote uses a master database (`data/master.db`) to track profiles and global settings, and individual databases for each user.
