@@ -54,8 +54,7 @@ function _createNoteOfType(noteType) {
             if (data.success && data.note) {
                 window.scrollTo(0, 0);
                 var ws = encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
-                var markdownSplitParam = noteType === 'markdown' ? '&md_split=1' : '';
-                window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1" + markdownSplitParam;
+                window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
             } else {
                 showNotificationPopup(data.error || 'Error creating ' + noteType, 'error');
             }
