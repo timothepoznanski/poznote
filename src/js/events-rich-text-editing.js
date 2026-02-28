@@ -543,6 +543,136 @@ function handleMarkdownListEnter(e, selection) {
 }
 
 /**
+ * Handle Tab key in markdown lists (bullet, numbered, task lists)
+ * Indent with Tab, outdent with Shift+Tab
+ * @param {Event} e - The keyboard event
+ * @param {Selection} selection - The current selection
+ * @returns {boolean} True if handled, false otherwise
+ */
+function handleMarkdownListTab(e, selection) {
+    if (!selection.rangeCount) return false;
+
+    var range = selection.getRangeAt(0);
+    if (!range.collapsed) return false;
+
+    var startContainer = range.startContainer;
+    if (startContainer.nodeType !== Node.TEXT_NODE) return false;
+
+    var parent = startContainer.parentElement;
+    if (!parent) return false;
+
+    // Determine if we're inside a .markdown-editor
+    var markdownEditor = null;
+    if (parent.classList && parent.classList.contains('markdown-editor')) {
+        markdownEditor = parent;
+    } else if (parent.tagName === 'DIV' && parent.parentElement &&
+        parent.parentElement.classList && parent.parentElement.classList.contains('markdown-editor')) {
+        markdownEditor = parent.parentElement;
+    }
+    if (!markdownEditor) return false;
+
+    // Get the current line element and its full text
+    var lineElement = null;
+    var lineText = '';
+    var cursorOffset = range.startOffset;
+    var fullText = '';
+    var lineStart = 0;
+    var lineEnd = 0;
+
+    if (parent === markdownEditor) {
+        // Text node directly in the editor (single text node containing all lines)
+        fullText = startContainer.textContent || '';
+        lineStart = fullText.lastIndexOf('\n', Math.max(0, cursorOffset - 1)) + 1;
+        lineEnd = fullText.indexOf('\n', cursorOffset);
+        if (lineEnd === -1) {
+            lineEnd = fullText.length;
+        }
+        lineText = fullText.slice(lineStart, lineEnd);
+        lineElement = null;
+    } else {
+        // Text node inside a line <div>
+        lineElement = parent;
+        lineText = parent.textContent;
+        // Cursor offset may need adjusting if there are sibling text nodes before this one
+        var offsetAdjust = 0;
+        for (var i = 0; i < parent.childNodes.length; i++) {
+            if (parent.childNodes[i] === startContainer) break;
+            offsetAdjust += (parent.childNodes[i].textContent || '').length;
+        }
+        cursorOffset = offsetAdjust + range.startOffset;
+    }
+
+    // Match indented task items, plain task items, bullets, or numbered lists
+    var indentMatch = lineText.match(/^(\s*)(- \[[ xX]\] |- |\d+\. )/);
+
+    if (!indentMatch) return false;
+
+    var currentIndent = indentMatch[1];
+    var listMarker = indentMatch[2];
+    var restOfLine = lineText.slice(currentIndent.length + listMarker.length);
+
+    e.preventDefault();
+
+    var newIndent;
+    if (e.shiftKey) {
+        // Shift+Tab: outdent (remove up to 2 spaces)
+        if (currentIndent.length >= 2) {
+            newIndent = currentIndent.slice(2);
+        } else if (currentIndent.length === 1) {
+            newIndent = '';
+        } else {
+            // Already at leftmost position
+            return true;
+        }
+    } else {
+        // Tab: indent (add 2 spaces)
+        newIndent = '  ' + currentIndent;
+    }
+
+    var newLineText = newIndent + listMarker + restOfLine;
+
+    if (lineElement) {
+        // Update the line element
+        lineElement.textContent = newLineText;
+
+        // Restore cursor position (adjust for indent change)
+        var indentDiff = newIndent.length - currentIndent.length;
+        var newCursorPos = cursorOffset + indentDiff;
+
+        if (lineElement.firstChild && lineElement.firstChild.nodeType === Node.TEXT_NODE) {
+            var newRange = document.createRange();
+            newRange.setStart(lineElement.firstChild, newCursorPos);
+            newRange.collapse(true);
+            var newSel = window.getSelection();
+            newSel.removeAllRanges();
+            newSel.addRange(newRange);
+        }
+    } else {
+        // Update the full text node
+        var newFullText = fullText.slice(0, lineStart) + newLineText + fullText.slice(lineEnd);
+        startContainer.textContent = newFullText;
+
+        // Restore cursor position
+        var indentDiff = newIndent.length - currentIndent.length;
+        var newCursorPos = cursorOffset + indentDiff;
+
+        try {
+            var textRange = document.createRange();
+            textRange.setStart(startContainer, newCursorPos);
+            textRange.collapse(true);
+            var textSel = window.getSelection();
+            textSel.removeAllRanges();
+            textSel.addRange(textRange);
+        } catch (err) {
+            // Fall back to default cursor placement if the range fails
+        }
+    }
+
+    triggerNoteSave();
+    return true;
+}
+
+/**
  * Handle keyboard events in the note entry area
  * @param {Event} e - The keyboard event
  */
@@ -582,6 +712,13 @@ function handleNoteEntryKeydown(e) {
 
         // Handle Enter key in blockquote
         handleBlockquoteEnter(e, selection);
+    }
+
+    // Handle Tab key in markdown list (indent/outdent)
+    if (e.key === 'Tab') {
+        if (handleMarkdownListTab(e, selection)) {
+            return;
+        }
     }
 
     // Handle ArrowDown navigation to checklist
