@@ -41,6 +41,8 @@ define('OIDC_SCOPES', _env('POZNOTE_OIDC_SCOPES', 'openid profile email'));
 define('OIDC_REDIRECT_URI', _env('POZNOTE_OIDC_REDIRECT_URI', ''));
 // Optional: specify provider end-session endpoint (if your provider supports RP-initiated logout)
 define('OIDC_END_SESSION_ENDPOINT', _env('POZNOTE_OIDC_END_SESSION_ENDPOINT', ''));
+// Optional: where to redirect after OIDC logout (default: login page)
+define('OIDC_POST_LOGOUT_REDIRECT_URI', _env('POZNOTE_OIDC_POST_LOGOUT_REDIRECT_URI', ''));
 // Optional: disable normal login when OIDC is enabled (force SSO-only login)
 define('OIDC_DISABLE_NORMAL_LOGIN', filter_var(_env('POZNOTE_OIDC_DISABLE_NORMAL_LOGIN', false), FILTER_VALIDATE_BOOL));
 // Optional: disable HTTP Basic Auth for API when OIDC is enabled (force OIDC-only authentication)

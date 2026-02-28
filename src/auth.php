@@ -92,6 +92,15 @@ function getAuthConfig($key, $default) {
 define("AUTH_PASSWORD", getAuthConfig('POZNOTE_PASSWORD', 'admin'));
 define("AUTH_USER_PASSWORD", getAuthConfig('POZNOTE_PASSWORD_USER', 'user'));
 
+function getUserSpecificPassword($username) {
+    if (empty($username)) return AUTH_USER_PASSWORD;
+    // Replace non-alphanumeric chars to make it a valid env var suffix
+    $sanitized = preg_replace('/[^a-zA-Z0-9_]/', '_', $username);
+    $key = 'POZNOTE_PASSWORD_' . strtoupper($sanitized);
+    $customPassword = getAuthConfig($key, null);
+    return $customPassword !== null ? $customPassword : AUTH_USER_PASSWORD;
+}
+
 // Remember me cookie settings
 define("REMEMBER_ME_COOKIE", 'poznote_remember_' . ($configured_port ?? '8040'));
 define("REMEMBER_ME_DURATION", 30 * 24 * 60 * 60); // 30 days
@@ -150,7 +159,8 @@ function isAuthenticated() {
                     $user = getUserProfileById((int)$userId);
                     
                     if ($user && $user['active'] && $user['username'] === $username) {
-                        $secretToUse = $user['is_admin'] ? AUTH_PASSWORD : AUTH_USER_PASSWORD;
+                        $expectedUserPassword = getUserSpecificPassword($user['username']);
+                        $secretToUse = $user['is_admin'] ? AUTH_PASSWORD : $expectedUserPassword;
                         $expectedHash = hash('sha256', $username . $userId . $timestamp . $secretToUse);
                         
                         if (hash_equals($expectedHash, $hash)) {
@@ -259,7 +269,8 @@ function authenticate($username, $password, $rememberMe = false) {
         }
     } else {
         // Regular profiles MUST use the user password
-        if ($password === AUTH_USER_PASSWORD) {
+        $expectedUserPassword = getUserSpecificPassword($user['username']);
+        if ($password === $expectedUserPassword) {
             $authenticated = true;
         } else {
             error_log("Poznote Auth: User password mismatch for user '$username'");
@@ -275,8 +286,9 @@ function authenticate($username, $password, $rememberMe = false) {
         // Set remember me cookie if requested
         if ($rememberMe) {
             $timestamp = time();
-            $secretToUse = $isProfileAdmin ? AUTH_PASSWORD : AUTH_USER_PASSWORD;
             $actualUsername = $user['username'];
+            $expectedUserPassword = getUserSpecificPassword($actualUsername);
+            $secretToUse = $isProfileAdmin ? AUTH_PASSWORD : $expectedUserPassword;
             
             // Format: actual_username:user_id:timestamp:hash
             $hash = hash('sha256', $actualUsername . $userId . $timestamp . $secretToUse);
@@ -373,7 +385,8 @@ function requireApiAuth() {
             $isAdminCreds = true;
         }
     } else {
-        if ($_SERVER['PHP_AUTH_PW'] === AUTH_USER_PASSWORD) {
+        $expectedUserPassword = getUserSpecificPassword($authUser['username']);
+        if ($_SERVER['PHP_AUTH_PW'] === $expectedUserPassword) {
             $isUserCreds = true;
         }
     }
@@ -492,7 +505,8 @@ function requireApiAuthUser() {
             $isValid = true;
         }
     } else {
-        if ($_SERVER['PHP_AUTH_PW'] === AUTH_USER_PASSWORD) {
+        $expectedUserPassword = getUserSpecificPassword($authUser['username']);
+        if ($_SERVER['PHP_AUTH_PW'] === $expectedUserPassword) {
             $isValid = true;
         }
     }
