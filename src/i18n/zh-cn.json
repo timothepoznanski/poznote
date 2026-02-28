@@ -430,7 +430,8 @@
             "show_folder_actions": "显示文件夹操作",
             "kanban_on_folder_click": "点击文件夹时打开看板视图",
             "index_icon_scale": "索引页图标缩放",
-            "note_content_width": "笔记内容宽度"
+            "note_content_width": "笔记内容宽度",
+            "code_block_word_wrap": "代码块自动换行"
         },
         "badges": {
             "font_size_default": "默认 ({{size}}px)",

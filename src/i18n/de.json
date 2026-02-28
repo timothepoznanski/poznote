@@ -428,7 +428,8 @@
             "show_folder_actions": "Ordner-Aktionen anzeigen",
             "kanban_on_folder_click": "Kanban-Ansicht beim Klicken auf Ordner öffnen",
             "index_icon_scale": "Skalierung der Index-Symbole",
-            "note_content_width": "Breite des Notizinhalts"
+            "note_content_width": "Breite des Notizinhalts",
+            "code_block_word_wrap": "Codeblock-Zeilenumbruch"
         },
         "badges": {
             "font_size_default": "Standard ({{size}}px)",

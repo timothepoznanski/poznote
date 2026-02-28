@@ -108,11 +108,12 @@ $settings = [
     'hide_folder_actions' => null,
     'hide_folder_counts' => null,
     'note_list_sort' => 'updated_desc',
-    'notes_without_folders_after_folders' => '1'
+    'notes_without_folders_after_folders' => '1',
+    'code_block_word_wrap' => '1'
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -258,6 +259,9 @@ if ($settings['hide_folder_counts'] === '0' || $settings['hide_folder_counts'] =
 }
 if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $width_value !== 'false') {
     $extra_body_classes .= ' center-note-content';
+}
+if ($settings['code_block_word_wrap'] === '0' || $settings['code_block_word_wrap'] === 'false') {
+    $extra_body_classes .= ' code-block-no-wrap';
 }
 
 // Load note list sort preference using previously loaded settings

@@ -427,7 +427,8 @@
             "show_folder_actions": "Mostrar Ações da Pasta",
             "kanban_on_folder_click": "Abrir visualização Kanban ao clicar na pasta",
             "index_icon_scale": "Escala de ícones do índice",
-            "note_content_width": "Largura do conteúdo da nota"
+            "note_content_width": "Largura do conteúdo da nota",
+            "code_block_word_wrap": "Quebra de linha em blocos de código"
         },
         "badges": {
             "font_size_default": "padrão ({{size}}px)",

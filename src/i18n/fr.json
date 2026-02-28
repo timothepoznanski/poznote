@@ -445,7 +445,8 @@
             "show_folder_actions": "Afficher les actions de dossier",
             "kanban_on_folder_click": "Ouvrir la vue Kanban au clic sur dossier",
             "index_icon_scale": "Taille des icônes (Index)",
-            "note_content_width": "Largeur du contenu de la note"
+            "note_content_width": "Largeur du contenu de la note",
+            "code_block_word_wrap": "Retour à la ligne des blocs de code"
         },
         "badges": {
             "font_size_default": "par défaut ({{size}}px)",

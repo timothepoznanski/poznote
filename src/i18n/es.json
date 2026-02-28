@@ -428,7 +428,8 @@
             "show_folder_actions": "Mostrar acciones de carpeta",
             "kanban_on_folder_click": "Abrir vista Kanban al hacer clic en la carpeta",
             "index_icon_scale": "Escalado de iconos del índice",
-            "note_content_width": "Ancho del contenido de la nota"
+            "note_content_width": "Ancho del contenido de la nota",
+            "code_block_word_wrap": "Ajuste de línea en bloques de código"
         },
         "badges": {
             "font_size_default": "predeterminado ({{size}}px)",

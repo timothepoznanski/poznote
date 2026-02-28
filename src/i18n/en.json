@@ -95,7 +95,8 @@
             "show_folder_actions": "Show folder actions",
             "kanban_on_folder_click": "Open Kanban view on folder click",
             "index_icon_scale": "Index icon scaling",
-            "note_content_width": "Note content width"
+            "note_content_width": "Note content width",
+            "code_block_word_wrap": "Code block word wrap"
         },
         "badges": {
             "font_size_default": "default ({{size}}px)",
