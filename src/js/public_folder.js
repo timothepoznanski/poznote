@@ -45,15 +45,84 @@ function toggleView() {
 function applyFilterToKanban() {
     var filterInput = document.getElementById('folderFilterInput');
     if (!filterInput) return;
-    
+
     var filterText = filterInput.value.trim().toLowerCase();
     var cards = document.querySelectorAll('.kanban-public-card');
-    
+
     cards.forEach(function(card) {
         var title = card.querySelector('.kanban-card-title').textContent.toLowerCase();
         var isVisible = !filterText || title.indexOf(filterText) !== -1;
         card.style.display = isVisible ? '' : 'none';
     });
+}
+
+function applyFilter() {
+    var filterInput = document.getElementById('folderFilterInput');
+    var clearFilterBtn = document.getElementById('clearFilterBtn');
+    var stats = document.getElementById('folderFilterStats');
+    var listItems = Array.prototype.slice.call(document.querySelectorAll('.public-note-item'));
+    var emptyMessage = document.getElementById('folderEmptyMessage');
+    var noResultsMessage = document.getElementById('folderNoResults');
+
+    if (!filterInput) return;
+
+    var filterText = filterInput.value.trim().toLowerCase();
+    var visibleCount = 0;
+
+    listItems.forEach(function(item) {
+        var title = item.getAttribute('data-title') || '';
+        var isVisible = !filterText || title.indexOf(filterText) !== -1;
+        item.style.display = isVisible ? '' : 'none';
+        if (isVisible) {
+            visibleCount += 1;
+        }
+    });
+
+    // Hide empty folder groups
+    var groups = document.querySelectorAll('.public-folder-group');
+    groups.forEach(function(group) {
+        var groupItems = group.querySelectorAll('.public-note-item');
+        var groupHasVisible = false;
+        for (var i = 0; i < groupItems.length; i++) {
+            if (groupItems[i].style.display !== 'none') {
+                groupHasVisible = true;
+                break;
+            }
+        }
+        group.style.display = groupHasVisible ? '' : 'none';
+    });
+
+    // Also filter Kanban if it exists
+    applyFilterToKanban();
+
+    if (filterText) {
+        if (clearFilterBtn) {
+            clearFilterBtn.style.display = 'flex';
+        }
+        if (stats) {
+            stats.textContent = visibleCount + ' / ' + listItems.length;
+            stats.style.display = visibleCount < listItems.length ? 'inline-flex' : 'none';
+        }
+        if (noResultsMessage) {
+            noResultsMessage.classList.toggle('is-hidden', visibleCount !== 0);
+        }
+        if (emptyMessage) {
+            emptyMessage.classList.add('is-hidden');
+        }
+    } else {
+        if (clearFilterBtn) {
+            clearFilterBtn.style.display = 'none';
+        }
+        if (stats) {
+            stats.style.display = 'none';
+        }
+        if (noResultsMessage) {
+            noResultsMessage.classList.add('is-hidden');
+        }
+        if (emptyMessage && listItems.length === 0) {
+            emptyMessage.classList.remove('is-hidden');
+        }
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -65,73 +134,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var filterInput = document.getElementById('folderFilterInput');
     var clearFilterBtn = document.getElementById('clearFilterBtn');
-    var stats = document.getElementById('folderFilterStats');
-    var listItems = Array.prototype.slice.call(document.querySelectorAll('.public-note-item'));
-    var emptyMessage = document.getElementById('folderEmptyMessage');
-    var noResultsMessage = document.getElementById('folderNoResults');
 
-    if (!filterInput || listItems.length === 0) {
+    if (!filterInput) {
         return;
-    }
-
-    function applyFilter() {
-        var filterText = filterInput.value.trim().toLowerCase();
-        var visibleCount = 0;
-
-        listItems.forEach(function(item) {
-            var title = item.getAttribute('data-title') || '';
-            var isVisible = !filterText || title.indexOf(filterText) !== -1;
-            item.style.display = isVisible ? '' : 'none';
-            if (isVisible) {
-                visibleCount += 1;
-            }
-        });
-
-        // Hide empty folder groups
-        var groups = document.querySelectorAll('.public-folder-group');
-        groups.forEach(function(group) {
-            var groupItems = group.querySelectorAll('.public-note-item');
-            var groupHasVisible = false;
-            for (var i = 0; i < groupItems.length; i++) {
-                if (groupItems[i].style.display !== 'none') {
-                    groupHasVisible = true;
-                    break;
-                }
-            }
-            group.style.display = groupHasVisible ? '' : 'none';
-        });
-
-        // Also filter Kanban if it exists
-        applyFilterToKanban();
-
-        if (filterText) {
-            if (clearFilterBtn) {
-                clearFilterBtn.style.display = 'flex';
-            }
-            if (stats) {
-                stats.textContent = visibleCount + ' / ' + listItems.length;
-                stats.style.display = visibleCount < listItems.length ? 'inline-flex' : 'none';
-            }
-            if (noResultsMessage) {
-                noResultsMessage.classList.toggle('is-hidden', visibleCount !== 0);
-            }
-            if (emptyMessage) {
-                emptyMessage.classList.add('is-hidden');
-            }
-        } else {
-            if (clearFilterBtn) {
-                clearFilterBtn.style.display = 'none';
-            }
-            if (stats) {
-                stats.style.display = 'none';
-            }
-            if (noResultsMessage) {
-                noResultsMessage.classList.add('is-hidden');
-            }
-            if (emptyMessage && listItems.length === 0) {
-                emptyMessage.classList.remove('is-hidden');
-            }
-        }
     }
 
     filterInput.addEventListener('input', applyFilter);
