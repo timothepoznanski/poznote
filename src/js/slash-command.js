@@ -58,6 +58,11 @@
     let savedEditableElement = null;
     let activeCommands = null;
 
+    // Touch tracking for distinguishing tap from scroll
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isTouchMoving = false;
+
 
     // Remove accents from a string for search
     function removeAccents(str) {
@@ -2037,6 +2042,8 @@
         try {
             subSubmenuElement.removeEventListener('mousedown', handleMenuMouseDown);
             subSubmenuElement.removeEventListener('click', handleSubSubmenuClick);
+            subSubmenuElement.removeEventListener('touchstart', handleTouchStart);
+            subSubmenuElement.removeEventListener('touchmove', handleTouchMove);
             subSubmenuElement.removeEventListener('touchend', handleSubSubmenuTouchEnd);
         } catch (e) { }
 
@@ -2060,6 +2067,8 @@
         try {
             submenuElement.removeEventListener('mousedown', handleMenuMouseDown);
             submenuElement.removeEventListener('click', handleSubmenuClick);
+            submenuElement.removeEventListener('touchstart', handleTouchStart);
+            submenuElement.removeEventListener('touchmove', handleTouchMove);
             submenuElement.removeEventListener('touchend', handleSubmenuTouchEnd);
             submenuElement.removeEventListener('mouseover', handleSubmenuMouseOver);
         } catch (e) { }
@@ -2291,6 +2300,8 @@
 
         submenuElement.addEventListener('mousedown', handleMenuMouseDown);
         submenuElement.addEventListener('click', handleSubmenuClick);
+        submenuElement.addEventListener('touchstart', handleTouchStart, { passive: true });
+        submenuElement.addEventListener('touchmove', handleTouchMove, { passive: true });
         submenuElement.addEventListener('touchend', handleSubmenuTouchEnd);
         submenuElement.addEventListener('mouseover', handleSubmenuMouseOver);
     }
@@ -2340,6 +2351,8 @@
 
         subSubmenuElement.addEventListener('mousedown', handleMenuMouseDown);
         subSubmenuElement.addEventListener('click', handleSubSubmenuClick);
+        subSubmenuElement.addEventListener('touchstart', handleTouchStart, { passive: true });
+        subSubmenuElement.addEventListener('touchmove', handleTouchMove, { passive: true });
         subSubmenuElement.addEventListener('touchend', handleSubSubmenuTouchEnd);
     }
 
@@ -2652,8 +2665,35 @@
         if (subSubmenuId) executeCommand(subSubmenuId, false, true);
     }
 
+    // Touch handlers for mobile - distinguish tap from scroll
+    function handleTouchStart(e) {
+        const touch = e.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        isTouchMoving = false;
+    }
+
+    function handleTouchMove(e) {
+        if (!e.touches || !e.touches[0]) return;
+
+        const touch = e.touches[0];
+        const deltaX = Math.abs(touch.clientX - touchStartX);
+        const deltaY = Math.abs(touch.clientY - touchStartY);
+
+        // If finger moved more than 10px, consider it a scroll
+        if (deltaX > 10 || deltaY > 10) {
+            isTouchMoving = true;
+        }
+    }
+
     // Touch handlers for Firefox mobile compatibility
     function handleSubmenuTouchEnd(e) {
+        // Ignore if user was scrolling
+        if (isTouchMoving) {
+            isTouchMoving = false;
+            return;
+        }
+
         const item = e.target.closest && e.target.closest('.slash-command-item');
         if (!item) return;
 
@@ -2675,6 +2715,12 @@
 
     // Handle touch end on sub-submenu item (mobile support)
     function handleSubSubmenuTouchEnd(e) {
+        // Ignore if user was scrolling
+        if (isTouchMoving) {
+            isTouchMoving = false;
+            return;
+        }
+
         const item = e.target.closest && e.target.closest('.slash-command-item');
         if (!item) return;
 

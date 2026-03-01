@@ -1,5 +1,15 @@
 /* Syntax Highlighting - Highlight.js GitHub Themes */
 
+/* Force monospace font for all highlight.js elements */
+.hljs,
+code.hljs,
+pre code.hljs,
+.hljs *,
+.noteentry .hljs,
+.noteentry .hljs * {
+    font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
+}
+
 /* Base styles for code blocks */
 pre code.hljs {
     display: block;
