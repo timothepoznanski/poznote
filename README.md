@@ -57,7 +57,6 @@ Password: `poznote`
 - [MCP Server](#mcp-server)
 - [Poznote Extension](#poznote-extension)
 - [API Documentation](#api-documentation)
-- [Use Poznote in the Cloud](#use-poznote-in-the-cloud)
 - [Tech Stack](#tech-stack)
 
 ## Install
@@ -212,14 +211,6 @@ docker compose up -d
 
 </details>
 
-<a id="cloud"></a>
-<details>
-<summary><strong>☁️ Cloud</strong></summary>
-<br>
-
-**See section [Use Poznote in the Cloud](#use-poznote-in-the-cloud)**
-
-</details>
 
 ## Access
 
@@ -1718,22 +1709,6 @@ curl -X POST -u 'username:password' \
 ```
 
 </details>
-
-## Use Poznote in the Cloud
-
-<p align="center">
-  <img src="images/railway-template.png" alt="Railway Template" width="100%">
-</p>
-
-If you:
-
-- Want access from anywhere (phone, tablet, computer) with almost zero setup
-- Have no experience with server management or don't want to manage server and security
-- Don't know how to use command line or don't want to use command line
-- Prefer one-click updates or automatic updates
-- Are okay with approximately $5/month (Cloud provider fees)
-
-**👉 [View Poznote Cloud Install and Manage Guide](docs/POZNOTE-CLOUD.md)**
 
 ## Tech Stack
 
