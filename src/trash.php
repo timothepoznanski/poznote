@@ -79,6 +79,12 @@ $currentLang = getUserLanguage();
     <link type="text/css" rel="stylesheet" href="css/modals/alerts-utilities.css"/>
     <link type="text/css" rel="stylesheet" href="css/modals/responsive.css"/>
     <link type="text/css" rel="stylesheet" href="css/trash.css"/>
+    <link type="text/css" rel="stylesheet" href="css/notes/noteentry.css"/>
+    <link type="text/css" rel="stylesheet" href="css/checklists.css"/>
+    <link type="text/css" rel="stylesheet" href="css/tasks.css"/>
+    <link type="text/css" rel="stylesheet" href="css/markdown.css"/>
+    <link type="text/css" rel="stylesheet" href="css/code-blocks.css"/>
+    <link type="text/css" rel="stylesheet" href="css/syntax-highlight.css"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/menus.css"/>
