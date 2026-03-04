@@ -620,6 +620,7 @@ function updateSelectedNote(clickedLink) {
     if (clickedLink) {
         const noteId = clickedLink.getAttribute('data-note-id');
         const clickedNoteType = clickedLink.getAttribute('data-note-type');
+        const linkedSourceNoteId = clickedLink.getAttribute('data-linked-note-id');
 
         if (noteId) {
             // Find all links with the same note ID (including in favorites)
@@ -632,6 +633,17 @@ function updateSelectedNote(clickedLink) {
             // If we clicked on a linked note, also mark the linked note itself as selected
             if (clickedNoteType === 'linked') {
                 clickedLink.classList.add('selected-note');
+
+                // Also mark the source note itself as selected
+                if (linkedSourceNoteId) {
+                    document.querySelectorAll('.links_arbo_left').forEach(link => {
+                        const linkNoteId = link.getAttribute('data-note-id');
+                        const linkDbId = link.getAttribute('data-note-db-id');
+                        if (linkNoteId === linkedSourceNoteId || linkDbId === linkedSourceNoteId) {
+                            link.classList.add('selected-note');
+                        }
+                    });
+                }
             }
         } else {
             // Fallback to the clicked link only if no data-note-id
@@ -651,6 +663,17 @@ function updateSelectedNote(clickedLink) {
                 // Re-apply selection to the linked note if applicable
                 if (clickedNoteType === 'linked' && !clickedLink.classList.contains('selected-note')) {
                     clickedLink.classList.add('selected-note');
+                }
+
+                // Re-apply selection to the source note for linked notes
+                if (clickedNoteType === 'linked' && linkedSourceNoteId) {
+                    document.querySelectorAll('.links_arbo_left').forEach(link => {
+                        const linkNoteId = link.getAttribute('data-note-id');
+                        const linkDbId = link.getAttribute('data-note-db-id');
+                        if ((linkNoteId === linkedSourceNoteId || linkDbId === linkedSourceNoteId) && !link.classList.contains('selected-note')) {
+                            link.classList.add('selected-note');
+                        }
+                    });
                 }
             } else if (clickedLink && !clickedLink.classList.contains('selected-note')) {
                 clickedLink.classList.add('selected-note');
