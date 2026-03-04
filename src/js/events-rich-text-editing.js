@@ -326,6 +326,53 @@ function handleBlockquoteEnter(e, selection) {
 }
 
 /**
+ * Handle Backspace in empty blockquote/callout - remove block container
+ * @param {Event} e - The keyboard event
+ * @param {Selection} selection - The current selection
+ * @returns {boolean} True if handled
+ */
+function handleEmptyQuoteBackspace(e, selection) {
+    if (!selection || selection.rangeCount === 0) return false;
+
+    var range = selection.getRangeAt(0);
+    if (!range.collapsed) return false;
+
+    var container = range.startContainer.nodeType === 3
+        ? range.startContainer.parentElement
+        : range.startContainer;
+
+    if (!container || !container.closest) return false;
+
+    var blockquote = container.closest('blockquote');
+    var callout = container.closest('aside.callout');
+    var block = blockquote || callout;
+
+    if (!block) return false;
+    if (!isCursorAtStart(selection)) return false;
+
+    var checkContentElement = callout ? (callout.querySelector('.callout-body') || callout) : blockquote;
+    var normalizedText = (checkContentElement.textContent || '').replace(/[\s\u200B-\u200D\uFEFF\u00A0]/g, '');
+    var hasMediaContent = !!checkContentElement.querySelector('img, video, audio, iframe, table, pre, code, ul, ol, li, hr, details, .excalidraw-wrapper');
+
+    if (normalizedText !== '' || hasMediaContent) return false;
+
+    e.preventDefault();
+
+    var replacement = document.createElement('div');
+    replacement.innerHTML = '<br>';
+
+    if (block.parentElement) {
+        block.parentElement.insertBefore(replacement, block);
+        block.remove();
+        setCursorPosition(replacement, 0, false);
+        triggerNoteSave();
+        return true;
+    }
+
+    return false;
+}
+
+/**
  * Handle arrow down navigation from note entry to checklist
  * @param {Event} e - The keyboard event
  * @param {HTMLElement} noteentry - The note entry element
@@ -697,6 +744,13 @@ function handleNoteEntryKeydown(e) {
     }
 
     var selection = window.getSelection();
+
+    // Handle Backspace in empty quote/callout blocks
+    if (e.key === 'Backspace') {
+        if (handleEmptyQuoteBackspace(e, selection)) {
+            return;
+        }
+    }
 
     // Handle Enter key in code block
     if (e.key === 'Enter' && !e.shiftKey) {
