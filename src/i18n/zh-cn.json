@@ -1531,7 +1531,25 @@
         "add_password_title": "添加密码保护",
         "change_password_title": "修改密码",
         "password_remove_hint": "留空则移除密码保护。",
-        "enter_new_password": "输入新密码"
+        "enter_new_password": "输入新密码",
+        "protection": {
+            "title": "受密码保护",
+            "note_heading": "受密码保护",
+            "folder_heading": "受密码保护的文件夹",
+            "error_incorrect": "密码错误，请重试。",
+            "additional_password_required": "此笔记需要额外密码。请输入下一个密码以继续。",
+            "placeholder": "输入密码",
+            "unlock": "解锁"
+        },
+        "errors": {
+            "token_missing": "缺少令牌",
+            "token_or_folder_auth_missing": "缺少令牌或文件夹授权",
+            "shared_folder_not_found": "未找到共享文件夹",
+            "shared_note_not_found_or_denied": "未找到共享笔记或访问被拒绝",
+            "folder_not_found": "未找到文件夹",
+            "note_not_found": "未找到笔记",
+            "server_error": "服务器错误"
+        }
     },
     "public_folder": {
         "filter_placeholder": "搜索笔记",

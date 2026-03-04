@@ -1573,7 +1573,25 @@
         "add_password_title": "Ajouter une protection par mot de passe",
         "change_password_title": "Modifier le mot de passe",
         "password_remove_hint": "Laissez vide pour supprimer la protection par mot de passe.",
-        "enter_new_password": "Entrez un nouveau mot de passe"
+        "enter_new_password": "Entrez un nouveau mot de passe",
+        "protection": {
+            "title": "Protégé par mot de passe",
+            "note_heading": "Protégé par mot de passe",
+            "folder_heading": "Dossier protégé par mot de passe",
+            "error_incorrect": "Mot de passe incorrect. Veuillez réessayer.",
+            "additional_password_required": "Cette note nécessite un mot de passe supplémentaire. Veuillez entrer le mot de passe suivant pour continuer.",
+            "placeholder": "Entrez le mot de passe",
+            "unlock": "Déverrouiller"
+        },
+        "errors": {
+            "token_missing": "Token manquant",
+            "token_or_folder_auth_missing": "Jeton ou autorisation du dossier manquant",
+            "shared_folder_not_found": "Dossier partagé introuvable",
+            "shared_note_not_found_or_denied": "Note partagée introuvable ou accès refusé",
+            "folder_not_found": "Dossier introuvable",
+            "note_not_found": "Note introuvable",
+            "server_error": "Erreur serveur"
+        }
     },
     "public_folder": {
         "filter_placeholder": "Rechercher des notes",

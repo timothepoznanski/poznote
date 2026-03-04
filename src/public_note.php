@@ -9,6 +9,8 @@ require_once 'db_connect.php';
 require_once 'functions.php';
 require_once 'markdown_parser.php';
 
+$currentLang = getUserLanguage();
+
 // Build CSP frame-src directive from allowed domains
 $frameSrcDomains = "'self'";
 foreach (ALLOWED_IFRAME_DOMAINS as $domain) {
@@ -74,7 +76,7 @@ if (empty($token) && (empty($folderToken) || empty($noteIdParam))) {
     
     if (empty($token) && (empty($folderToken) || empty($noteIdParam))) {
         http_response_code(400);
-        echo 'Token or folder authorization missing';
+        echo t_h('public.errors.token_or_folder_auth_missing', [], 'Token or folder authorization missing', $currentLang);
         exit;
     }
 }
@@ -162,7 +164,7 @@ try {
     
     if (!$sharedNote) {
         http_response_code(404);
-        echo 'Shared note not found or access denied';
+        echo t_h('public.errors.shared_note_not_found_or_denied', [], 'Shared note not found or access denied', $currentLang);
         exit;
     }
 
@@ -171,40 +173,121 @@ try {
     $storedPassword = $sharedNote['password'];
     $sharedTheme = $sharedNote['theme'] ?? '';
 
+    $stmt = $con->prepare('SELECT folder_id FROM entries WHERE id = ? AND trash = 0');
+    $stmt->execute([$note_id]);
+    $noteFolderData = $stmt->fetch(PDO::FETCH_ASSOC);
+    $noteFolderId = $noteFolderData ? (int)$noteFolderData['folder_id'] : null;
+
+    $protectedFolderContext = null;
+    if ($noteFolderId !== null) {
+        $stmt = $con->prepare(
+            'WITH RECURSIVE folder_path(id, parent_id, depth) AS (
+                SELECT f.id, f.parent_id, 0
+                FROM folders f
+                WHERE f.id = ?
+                UNION ALL
+                SELECT parent.id, parent.parent_id, folder_path.depth + 1
+                FROM folders parent
+                INNER JOIN folder_path ON folder_path.parent_id = parent.id
+            )
+            SELECT sf.token, sf.password, folder_path.depth
+            FROM folder_path
+            INNER JOIN shared_folders sf ON sf.folder_id = folder_path.id
+            WHERE sf.password IS NOT NULL AND sf.password != ""
+            ORDER BY folder_path.depth ASC
+            LIMIT 1'
+        );
+        $stmt->execute([$noteFolderId]);
+        $protectedFolderContext = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    }
+
     // ============================================================================
     // PASSWORD PROTECTION
     // ============================================================================
     
+    $requiredAuths = [];
+
     if (!empty($storedPassword)) {
+        $requiredAuths[] = [
+            'hash' => $storedPassword,
+            'sessionKey' => 'public_note_auth_' . $token
+        ];
+    }
+
+    if (!empty($protectedFolderContext['password']) && !empty($protectedFolderContext['token'])) {
+        $requiredAuths[] = [
+            'hash' => $protectedFolderContext['password'],
+            'sessionKey' => 'public_folder_auth_' . $protectedFolderContext['token']
+        ];
+    }
+
+    if (!empty($requiredAuths)) {
         session_start();
-        $sessionKey = 'public_note_auth_' . $token;
-        
-        // If accessed via a shared folder, also check the folder's session key
-        $folderSessionKey = !empty($folderToken) ? ('public_folder_auth_' . $folderToken) : '';
+
+        // If accessed via a shared folder, also accept that folder's auth session.
+        if (!empty($folderToken)) {
+            $requiredAuths[] = [
+                'hash' => null,
+                'sessionKey' => 'public_folder_auth_' . $folderToken
+            ];
+        }
+
+        // Deduplicate by session key
+        $uniqueAuths = [];
+        foreach ($requiredAuths as $authDef) {
+            $uniqueAuths[$authDef['sessionKey']] = $authDef;
+        }
+        $requiredAuths = array_values($uniqueAuths);
         
         $passwordError = false;
         
         // Handle password submission
         if (isset($_POST['note_password'])) {
-            if (password_verify($_POST['note_password'], $storedPassword)) {
-                $_SESSION[$sessionKey] = true;
-                if ($folderSessionKey) $_SESSION[$folderSessionKey] = true;
-            } else {
+            $submittedPassword = $_POST['note_password'];
+            $matchedAny = false;
+
+            foreach ($requiredAuths as $authDef) {
+                if (empty($authDef['hash'])) {
+                    continue;
+                }
+                if (password_verify($submittedPassword, $authDef['hash'])) {
+                    $_SESSION[$authDef['sessionKey']] = true;
+                    $matchedAny = true;
+                }
+            }
+
+            if (!$matchedAny) {
                 $passwordError = true;
             }
         }
         
-        // Display password form if not authenticated (check both keys)
-        $isAuthenticated = !empty($_SESSION[$sessionKey]) || ($folderSessionKey && !empty($_SESSION[$folderSessionKey]));
-        if (!$isAuthenticated) {
+        // Display password form if at least one required auth is missing.
+        $allAuthenticated = true;
+        $hasAnyAuthenticated = false;
+        foreach ($requiredAuths as $authDef) {
+            if (!empty($_SESSION[$authDef['sessionKey']])) {
+                $hasAnyAuthenticated = true;
+                continue;
+            }
+            if (empty($_SESSION[$authDef['sessionKey']])) {
+                $allAuthenticated = false;
+            }
+        }
+
+        $additionalPasswordRequired = false;
+        if (!$allAuthenticated && $hasAnyAuthenticated) {
+            $additionalPasswordRequired = true;
+        }
+
+        if (!$allAuthenticated) {
             ?>
             <!doctype html>
-            <html>
+            <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
             <head>
                 <meta charset="utf-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 <meta name="robots" content="noindex, nofollow">
-                <title>Password Protected</title>
+                <title><?php echo t_h('public.protection.title', [], 'Password Protected', $currentLang); ?></title>
                 <style>
                     body {
                         font-family: 'Inter', sans-serif;
@@ -220,6 +303,7 @@ try {
                         border-radius: 8px;
                         max-width: 400px;
                         width: 90%;
+                        text-align: center;
                     }
                     h2 {
                         margin-top: 0;
@@ -237,6 +321,7 @@ try {
                         box-sizing: border-box;
                         font-size: 14px;
                         margin-bottom: 15px;
+                        text-align: left;
                     }
                     button {
                         width: 100%;
@@ -257,6 +342,15 @@ try {
                         margin-bottom: 15px;
                         font-size: 14px;
                     }
+                    .info {
+                        color: #0c5460;
+                        background: #d1ecf1;
+                        border: 1px solid #bee5eb;
+                        border-radius: 6px;
+                        padding: 10px;
+                        margin-bottom: 15px;
+                        font-size: 14px;
+                    }
                     .lock-icon {
                         font-size: 48px;
                         text-align: center;
@@ -268,13 +362,16 @@ try {
             <body>
                 <div class="password-container">
                     <div class="lock-icon">🔒</div>
-                    <h2>Password Protected</h2>
+                    <h2><?php echo t_h('public.protection.note_heading', [], 'Password Protected', $currentLang); ?></h2>
                     <?php if ($passwordError): ?>
-                        <div class="error">Incorrect password. Please try again.</div>
+                        <div class="error"><?php echo t_h('public.protection.error_incorrect', [], 'Incorrect password. Please try again.', $currentLang); ?></div>
+                    <?php endif; ?>
+                    <?php if ($additionalPasswordRequired): ?>
+                        <div class="info"><?php echo t_h('public.protection.additional_password_required', [], 'This note requires an additional password. Please enter the next password to continue.', $currentLang); ?></div>
                     <?php endif; ?>
                     <form method="POST">
-                        <input type="password" name="note_password" placeholder="Enter password" required autofocus>
-                        <button type="submit">Unlock</button>
+                        <input type="password" name="note_password" placeholder="<?php echo t_h('public.protection.placeholder', [], 'Enter password', $currentLang); ?>" required autofocus>
+                        <button type="submit"><?php echo t_h('public.protection.unlock', [], 'Unlock', $currentLang); ?></button>
                     </form>
                 </div>
             </body>
@@ -294,12 +391,12 @@ try {
     
     if (!$note) {
         http_response_code(404);
-        echo 'Note not found';
+        echo t_h('public.errors.note_not_found', [], 'Note not found', $currentLang);
         exit;
     }
 } catch (Exception $e) {
     http_response_code(500);
-    echo 'Server error';
+    echo t_h('public.errors.server_error', [], 'Server error', $currentLang);
     exit;
 }
 

@@ -1171,7 +1171,25 @@
         "add_password_title": "Add password protection",
         "change_password_title": "Change password",
         "password_remove_hint": "Leave empty to remove password protection.",
-        "enter_new_password": "Enter a new password"
+        "enter_new_password": "Enter a new password",
+        "protection": {
+            "title": "Password Protected",
+            "note_heading": "Password Protected",
+            "folder_heading": "Password Protected Folder",
+            "error_incorrect": "Incorrect password. Please try again.",
+            "additional_password_required": "This note requires an additional password. Please enter the next password to continue.",
+            "placeholder": "Enter password",
+            "unlock": "Unlock"
+        },
+        "errors": {
+            "token_missing": "Token missing",
+            "token_or_folder_auth_missing": "Token or folder authorization missing",
+            "shared_folder_not_found": "Shared folder not found",
+            "shared_note_not_found_or_denied": "Shared note not found or access denied",
+            "folder_not_found": "Folder not found",
+            "note_not_found": "Note not found",
+            "server_error": "Server error"
+        }
     },
     "public_folder": {
         "filter_placeholder": "Search notes",

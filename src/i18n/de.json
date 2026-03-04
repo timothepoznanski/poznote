@@ -1529,7 +1529,25 @@
         "add_password_title": "Passwortschutz hinzufügen",
         "change_password_title": "Passwort ändern",
         "password_remove_hint": "Leer lassen, um den Passwortschutz zu entfernen.",
-        "enter_new_password": "Neues Passwort eingeben"
+        "enter_new_password": "Neues Passwort eingeben",
+        "protection": {
+            "title": "Passwortgeschützt",
+            "note_heading": "Passwortgeschützt",
+            "folder_heading": "Passwortgeschützter Ordner",
+            "error_incorrect": "Falsches Passwort. Bitte versuchen Sie es erneut.",
+            "additional_password_required": "Diese Notiz erfordert ein zusätzliches Passwort. Bitte geben Sie das nächste Passwort ein, um fortzufahren.",
+            "placeholder": "Passwort eingeben",
+            "unlock": "Entsperren"
+        },
+        "errors": {
+            "token_missing": "Token fehlt",
+            "token_or_folder_auth_missing": "Token oder Ordnerberechtigung fehlt",
+            "shared_folder_not_found": "Geteilter Ordner nicht gefunden",
+            "shared_note_not_found_or_denied": "Geteilte Notiz nicht gefunden oder Zugriff verweigert",
+            "folder_not_found": "Ordner nicht gefunden",
+            "note_not_found": "Notiz nicht gefunden",
+            "server_error": "Serverfehler"
+        }
     },
     "public_folder": {
         "filter_placeholder": "Notizen suchen",
