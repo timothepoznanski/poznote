@@ -56,7 +56,12 @@
     // Navigate back to notes list
     if (backBtn) {
         backBtn.addEventListener('click', function() {
-            window.location.href = 'index.php';
+            if (typeof window.goBackToNotes === 'function') {
+                window.goBackToNotes();
+            } else {
+                var workspace = config.workspace || '';
+                window.location.href = workspace ? ('index.php?workspace=' + encodeURIComponent(workspace)) : 'index.php';
+            }
         });
     }
 
@@ -74,7 +79,12 @@
     // Navigate to public notes page
     if (publicNotesBtn) {
         publicNotesBtn.addEventListener('click', function() {
-            window.location.href = 'shared.php';
+            if (typeof window.navigateToPage === 'function') {
+                window.navigateToPage('shared.php');
+            } else {
+                var workspace = config.workspace || '';
+                window.location.href = workspace ? ('shared.php?workspace=' + encodeURIComponent(workspace)) : 'shared.php';
+            }
         });
     }
 

@@ -486,7 +486,7 @@ try {
       <?php endif; ?>>
     <div class="settings-container">
         <div class="workspaces-nav">
-            <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
+            <a id="backToNotesLink" href="index.php<?php echo $pageWorkspace !== '' ? ('?workspace=' . urlencode($pageWorkspace)) : ''; ?>" class="btn btn-secondary">
                 <?php echo t_h('common.back_to_notes', [], 'Back to Notes', $currentLang); ?>
             </a>
 

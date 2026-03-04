@@ -249,7 +249,7 @@ $v = getAppVersion();
         <div class="admin-header">
             <div>
                 <div class="admin-nav" style="justify-content: center;">
-                    <a id="backToNotesLink" href="../index.php" class="btn btn-secondary btn-margin-right">
+                    <a id="backToNotesLink" href="../index.php<?php echo $pageWorkspace !== '' ? ('?workspace=' . urlencode($pageWorkspace)) : ''; ?>" class="btn btn-secondary btn-margin-right">
                         <?php echo t_h('common.back_to_notes'); ?>
                     </a>
                     <a href="../settings.php" class="btn btn-secondary btn-margin-right">
