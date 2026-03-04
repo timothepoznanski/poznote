@@ -1550,7 +1550,7 @@
         }
     },
     "public_folder": {
-        "filter_placeholder": "Notizen suchen",
+        "filter_placeholder": "Nach Titeln filtern",
         "no_filter_results": "Keine Ergebnisse."
     },
     "icon_names": {

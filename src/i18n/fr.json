@@ -1594,7 +1594,7 @@
         }
     },
     "public_folder": {
-        "filter_placeholder": "Rechercher des notes",
+        "filter_placeholder": "Filtrer sur les titres",
         "no_filter_results": "Aucun résultat.",
         "view_notes": "Affichage par liste",
         "view_kanban": "Affichage Kanban"

@@ -1550,7 +1550,7 @@
         }
     },
     "public_folder": {
-        "filter_placeholder": "Buscar notas",
+        "filter_placeholder": "Filtrar por títulos",
         "no_filter_results": "Sin resultados."
     },
     "icon_names": {

@@ -1552,7 +1552,7 @@
         }
     },
     "public_folder": {
-        "filter_placeholder": "搜索笔记",
+        "filter_placeholder": "按标题筛选",
         "no_filter_results": "无结果。"
     },
     "icon_names": {

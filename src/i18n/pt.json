@@ -1554,7 +1554,7 @@
         }
     },
     "public_folder": {
-        "filter_placeholder": "Pesquisar notas",
+        "filter_placeholder": "Filtrar por títulos",
         "no_filter_results": "Nenhum resultado."
     },
     "icon_names": {

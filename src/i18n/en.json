@@ -1192,7 +1192,7 @@
         }
     },
     "public_folder": {
-        "filter_placeholder": "Search notes",
+        "filter_placeholder": "Filter by titles",
         "no_filter_results": "No results.",
         "view_notes": "View as list",
         "view_kanban": "View as Kanban"
