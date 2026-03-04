@@ -106,6 +106,23 @@
         return fallback || _getDefaultTitle();
     }
 
+    /** Read a note title from the sidebar list (useful for linked notes). */
+    function _readSidebarTitle(noteId) {
+        noteId = String(noteId);
+
+        var byNoteId = document.querySelector('.links_arbo_left[data-note-id="' + noteId + '"] .note-title');
+        if (byNoteId && byNoteId.textContent && byNoteId.textContent.trim()) {
+            return byNoteId.textContent.trim();
+        }
+
+        var byDbId = document.querySelector('.links_arbo_left[data-note-db-id="' + noteId + '"] .note-title');
+        if (byDbId && byDbId.textContent && byDbId.textContent.trim()) {
+            return byDbId.textContent.trim();
+        }
+
+        return '';
+    }
+
     function _buildUrl(noteId) {
         var workspace = _getWorkspace();
         return 'index.php?workspace=' + encodeURIComponent(workspace) +
@@ -451,7 +468,8 @@
             _pendingTabSwitch = null;
             var switchedTab = _findTabById(activeTabId);
             if (switchedTab && switchedTab.noteId === noteId) {
-                var freshTitle = _readTitle(noteId, switchedTab.title);
+                var sidebarTitleForSwitch = _readSidebarTitle(noteId);
+                var freshTitle = _readTitle(noteId, sidebarTitleForSwitch || switchedTab.title || _getDefaultTitle());
                 switchedTab.title = freshTitle;
             }
             _saveToStorage();
@@ -459,7 +477,8 @@
         }
 
         // Regular sidebar navigation (or initial load via AJAX)
-        var title = _readTitle(noteId, _getDefaultTitle());
+        var sidebarTitle = _readSidebarTitle(noteId);
+        var title = _readTitle(noteId, sidebarTitle || _getDefaultTitle());
 
         // Check if an existing tab already has this noteId (from a previous session or manual nav)
         // If so, just activate it

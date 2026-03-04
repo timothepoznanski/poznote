@@ -621,6 +621,13 @@ function openNoteInNewTab(noteId) {
             else if (titleEl.placeholder && titleEl.placeholder.trim()) {
                 title = titleEl.placeholder.trim();
             }
+        } else {
+            var noteLink = document.querySelector('.links_arbo_left[data-note-id="' + noteId + '"]') ||
+                document.querySelector('.links_arbo_left[data-note-db-id="' + noteId + '"]');
+            var noteTitleEl = noteLink ? noteLink.querySelector('.note-title') : null;
+            if (noteTitleEl && noteTitleEl.textContent && noteTitleEl.textContent.trim()) {
+                title = noteTitleEl.textContent.trim();
+            }
         }
         window.tabManager.openInNewTab(noteId, title);
         return;
