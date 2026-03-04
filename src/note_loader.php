@@ -22,7 +22,12 @@ function loadNoteData($con, &$note, $workspace_filter) {
             // Check if this is a linked note - redirect to the target note
             if ($note_data['type'] === 'linked' && !empty($note_data['linked_note_id'])) {
                 $linked_note_id = intval($note_data['linked_note_id']);
-                header("Location: index.php?note=" . $linked_note_id . "&workspace=" . urlencode($workspace_filter));
+                $selected_linked_note_id = isset($_GET['select_linked_note']) ? intval($_GET['select_linked_note']) : $note_id;
+                $redirect_url = "index.php?note=" . $linked_note_id . "&workspace=" . urlencode($workspace_filter);
+                if ($selected_linked_note_id > 0) {
+                    $redirect_url .= "&select_linked_note=" . $selected_linked_note_id;
+                }
+                header("Location: " . $redirect_url);
                 exit;
             }
             
