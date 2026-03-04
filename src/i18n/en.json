@@ -100,9 +100,9 @@
         },
         "badges": {
             "font_size_default": "default ({{size}}px)",
-            "note_font_size": "N: {{size}}px",
-            "sidebar_font_size": "S: {{size}}px",
-            "code_block_font_size": "C: {{size}}px"
+            "note_font_size": "{{size}}px",
+            "sidebar_font_size": "{{size}}px",
+            "code_block_font_size": "{{size}}px"
         }
     },
     "tasklist": {
