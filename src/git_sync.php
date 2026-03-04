@@ -199,7 +199,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             <a id="backToHomeLink" href="home.php" class="btn btn-secondary go-to-nav-btn">
                 <?php echo t_h('common.back_to_home', [], 'Back to Home', $currentLang); ?>
             </a>
-            <a id="backToNotesLink" href="index.php" class="btn btn-secondary go-to-nav-btn">
+            <a id="backToNotesLink" href="index.php<?php echo $pageWorkspace !== '' ? ('?workspace=' . urlencode($pageWorkspace)) : ''; ?>" class="btn btn-secondary go-to-nav-btn">
                 <?php echo t_h('common.back_to_notes', [], 'Back to Notes', $currentLang); ?>
             </a>
             <a id="backToSettingsLink" href="settings.php" class="btn btn-secondary go-to-nav-btn">

@@ -1533,10 +1533,28 @@
         "add_password_title": "Adicionar proteção por senha",
         "change_password_title": "Alterar senha",
         "password_remove_hint": "Deixe vazio para remover a proteção por senha.",
-        "enter_new_password": "Digite uma nova senha"
+        "enter_new_password": "Digite uma nova senha",
+        "protection": {
+            "title": "Protegido por senha",
+            "note_heading": "Protegido por senha",
+            "folder_heading": "Pasta protegida por senha",
+            "error_incorrect": "Senha incorreta. Tente novamente.",
+            "additional_password_required": "Esta nota exige uma senha adicional. Digite a próxima senha para continuar.",
+            "placeholder": "Digite a senha",
+            "unlock": "Desbloquear"
+        },
+        "errors": {
+            "token_missing": "Token ausente",
+            "token_or_folder_auth_missing": "Token ou autorização da pasta ausente",
+            "shared_folder_not_found": "Pasta compartilhada não encontrada",
+            "shared_note_not_found_or_denied": "Nota compartilhada não encontrada ou acesso negado",
+            "folder_not_found": "Pasta não encontrada",
+            "note_not_found": "Nota não encontrada",
+            "server_error": "Erro do servidor"
+        }
     },
     "public_folder": {
-        "filter_placeholder": "Pesquisar notas",
+        "filter_placeholder": "Filtrar por títulos",
         "no_filter_results": "Nenhum resultado."
     },
     "icon_names": {

@@ -3292,8 +3292,16 @@
             const isTitleInput = target.tagName === 'INPUT' && target.classList.contains('css-title');
             // Restrict to the "new task" input only, excluding existing task editing inputs
             const isTaskInput = target.tagName === 'INPUT' && target.classList.contains('task-input');
+            const isMobileViewport = window.matchMedia && window.matchMedia('(max-width: 800px)').matches;
 
             if (isTitleInput || isTaskInput) {
+                if (isTitleInput && isMobileViewport) {
+                    if (slashMenuElement && savedEditableElement === target) {
+                        hideSlashMenu();
+                    }
+                    return;
+                }
+
                 const value = target.value;
                 const pos = target.selectionStart;
 

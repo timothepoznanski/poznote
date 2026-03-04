@@ -647,16 +647,6 @@ try {
             </a>
             <?php endif; ?>
 
-            <!-- News -->
-            <a href="https://poznote.com/news.html" target="_blank" class="home-card" id="news-card">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-newspaper"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.news', [], 'Poznote Blog'); ?></span>
-                </div>
-            </a>
-
             <!-- Poznote Website -->
             <a href="https://poznote.com" target="_blank" class="home-card" id="website-card">
                 <div class="home-card-icon">

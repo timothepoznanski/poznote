@@ -326,6 +326,53 @@ function handleBlockquoteEnter(e, selection) {
 }
 
 /**
+ * Handle Backspace in empty blockquote/callout - remove block container
+ * @param {Event} e - The keyboard event
+ * @param {Selection} selection - The current selection
+ * @returns {boolean} True if handled
+ */
+function handleEmptyQuoteBackspace(e, selection) {
+    if (!selection || selection.rangeCount === 0) return false;
+
+    var range = selection.getRangeAt(0);
+    if (!range.collapsed) return false;
+
+    var container = range.startContainer.nodeType === 3
+        ? range.startContainer.parentElement
+        : range.startContainer;
+
+    if (!container || !container.closest) return false;
+
+    var blockquote = container.closest('blockquote');
+    var callout = container.closest('aside.callout');
+    var block = blockquote || callout;
+
+    if (!block) return false;
+    if (!isCursorAtStart(selection)) return false;
+
+    var checkContentElement = callout ? (callout.querySelector('.callout-body') || callout) : blockquote;
+    var normalizedText = (checkContentElement.textContent || '').replace(/[\s\u200B-\u200D\uFEFF\u00A0]/g, '');
+    var hasMediaContent = !!checkContentElement.querySelector('img, video, audio, iframe, table, pre, code, ul, ol, li, hr, details, .excalidraw-wrapper');
+
+    if (normalizedText !== '' || hasMediaContent) return false;
+
+    e.preventDefault();
+
+    var replacement = document.createElement('div');
+    replacement.innerHTML = '<br>';
+
+    if (block.parentElement) {
+        block.parentElement.insertBefore(replacement, block);
+        block.remove();
+        setCursorPosition(replacement, 0, false);
+        triggerNoteSave();
+        return true;
+    }
+
+    return false;
+}
+
+/**
  * Handle arrow down navigation from note entry to checklist
  * @param {Event} e - The keyboard event
  * @param {HTMLElement} noteentry - The note entry element
@@ -697,6 +744,13 @@ function handleNoteEntryKeydown(e) {
     }
 
     var selection = window.getSelection();
+
+    // Handle Backspace in empty quote/callout blocks
+    if (e.key === 'Backspace') {
+        if (handleEmptyQuoteBackspace(e, selection)) {
+            return;
+        }
+    }
 
     // Handle Enter key in code block
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -1133,6 +1187,16 @@ function handleImagePaste(items, note) {
 function handleRichTextPaste(htmlData) {
     if (!htmlData || htmlData.trim() === '') return false;
 
+    // If content was copied from a Poznote HTML note, preserve all formatting as-is
+    var poznoteMarker = '<!-- poznote-internal -->';
+    if (htmlData.includes(poznoteMarker)) {
+        var fullHtml = htmlData.replace(poznoteMarker, '');
+        if (!fullHtml || fullHtml.trim() === '') return false;
+        document.execCommand('insertHTML', false, fullHtml);
+        triggerNoteSave();
+        return true;
+    }
+
     var parser = new DOMParser();
     var doc = parser.parseFromString(htmlData, 'text/html');
 
@@ -1181,6 +1245,35 @@ function handleRichTextPaste(htmlData) {
  * Setup paste event handling for rich text and images
  */
 function setupPasteHandling() {
+    // Mark copied HTML as Poznote-internal so the paste handler can preserve all styles
+    document.body.addEventListener('copy', function (e) {
+        try {
+            var note = (e.target && e.target.closest) ? e.target.closest('.noteentry') : null;
+            if (!note) return;
+
+            var isMarkdownNote = note.getAttribute('data-note-type') === 'markdown';
+            if (isMarkdownNote) return;
+
+            var selection = window.getSelection();
+            if (!selection || selection.rangeCount === 0) return;
+
+            // Serialise the selection into HTML
+            var range = selection.getRangeAt(0);
+            var fragment = range.cloneContents();
+            var tempDiv = document.createElement('div');
+            tempDiv.appendChild(fragment);
+            var htmlContent = tempDiv.innerHTML;
+            if (!htmlContent) return;
+
+            // Prepend the marker so the paste handler knows this came from Poznote
+            e.clipboardData.setData('text/html', '<!-- poznote-internal -->' + htmlContent);
+            e.clipboardData.setData('text/plain', selection.toString());
+            e.preventDefault();
+        } catch (err) {
+            console.error('Copy handling error:', err);
+        }
+    });
+
     document.body.addEventListener('paste', function (e) {
         try {
             // Skip paste handling for input fields

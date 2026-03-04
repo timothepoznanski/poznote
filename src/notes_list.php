@@ -22,6 +22,8 @@ try {
     $favorites_count = 0;
 }
 
+$selected_linked_note_id = isset($_GET['select_linked_note']) ? intval($_GET['select_linked_note']) : 0;
+
 ?>
 
 <!-- Notes list display -->
@@ -65,6 +67,7 @@ try {
  * Recursive function to display folders and their subfolders
  */
 function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined = false, $displayUncategorizedFirst = true) {
+    global $selected_linked_note_id;
     $folderName = $folderData['name'];
     $notes = $folderData['notes'];
     
@@ -147,7 +150,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
     // Display notes in folder (before subfolders if displayUncategorizedFirst is true)
     if ($displayUncategorizedFirst) {
         foreach($notes as $row1) {
-            $isSelected = ($note == $row1["id"]) ? 'selected-note' : '';
+            $isSelected = (($note == $row1["id"]) || ($selected_linked_note_id > 0 && $selected_linked_note_id == $row1["id"])) ? 'selected-note' : '';
             
             // Generate note link
             $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"], $search_combined);
@@ -200,7 +203,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
     // Display notes in folder (after subfolders if displayUncategorizedFirst is false)
     if (!$displayUncategorizedFirst) {
         foreach($notes as $row1) {
-            $isSelected = ($note == $row1["id"]) ? 'selected-note' : '';
+            $isSelected = (($note == $row1["id"]) || ($selected_linked_note_id > 0 && $selected_linked_note_id == $row1["id"])) ? 'selected-note' : '';
             
             // Generate note link
             $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"], $search_combined);
@@ -327,7 +330,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
     }
     
     foreach ($sortedUncategorized as $row1) {
-        $isSelected = (isset($note) && $row1["id"] == $note) ? 'selected-note' : '';
+        $isSelected = ((isset($note) && $row1["id"] == $note) || ($selected_linked_note_id > 0 && $selected_linked_note_id == $row1["id"])) ? 'selected-note' : '';
         
         // Generate note link
         $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"], $search_combined);
@@ -364,7 +367,7 @@ foreach($regularFolders as $folderId => $folderData) {
 // Display uncategorized notes (notes without folder) at the END if NOT sorting by date (i.e., alphabetical sort)
 if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder_filter) && !$displayUncategorizedFirst) {
     foreach ($uncategorized_notes as $row1) {
-        $isSelected = (isset($note) && $row1["id"] == $note) ? 'selected-note' : '';
+        $isSelected = ((isset($note) && $row1["id"] == $note) || ($selected_linked_note_id > 0 && $selected_linked_note_id == $row1["id"])) ? 'selected-note' : '';
         
         // Generate note link
         $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"], $search_combined);

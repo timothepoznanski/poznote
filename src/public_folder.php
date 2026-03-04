@@ -4,6 +4,8 @@ require_once 'db_connect.php';
 require_once 'functions.php';
 require_once 'markdown_parser.php';
 
+$currentLang = getUserLanguage();
+
 // Support token via query param or pretty URL
 $token = $_GET['token'] ?? '';
 if (empty($token)) {
@@ -39,7 +41,7 @@ if (empty($token)) {
 
     if (empty($token)) {
         http_response_code(400);
-        echo 'Token missing';
+        echo t_h('public.errors.token_missing', [], 'Token missing', $currentLang);
         exit;
     }
 }
@@ -50,7 +52,7 @@ try {
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$row) {
         http_response_code(404);
-        echo 'Shared folder not found';
+        echo t_h('public.errors.shared_folder_not_found', [], 'Shared folder not found', $currentLang);
         exit;
     }
 
@@ -75,24 +77,24 @@ try {
         if (!isset($_SESSION[$sessionKey]) || $_SESSION[$sessionKey] !== true) {
             ?>
             <!doctype html>
-            <html>
+            <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
             <head>
                 <meta charset="utf-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 <meta name="robots" content="noindex, nofollow">
-                <title>Password Protected</title>
+                <title><?php echo t_h('public.protection.title', [], 'Password Protected', $currentLang); ?></title>
                 <link rel="stylesheet" href="/css/public_folder.css">
             </head>
             <body class="password-page-body">
                 <div class="password-container">
                     <div class="lock-icon">🔒</div>
-                    <h2>Password Protected Folder</h2>
+                    <h2><?php echo t_h('public.protection.folder_heading', [], 'Password Protected Folder', $currentLang); ?></h2>
                     <?php if (isset($passwordError)): ?>
-                        <div class="error">Incorrect password. Please try again.</div>
+                        <div class="error"><?php echo t_h('public.protection.error_incorrect', [], 'Incorrect password. Please try again.', $currentLang); ?></div>
                     <?php endif; ?>
                     <form method="POST">
-                        <input type="password" name="folder_password" placeholder="Enter password" required autofocus>
-                        <button type="submit">Unlock</button>
+                        <input type="password" name="folder_password" placeholder="<?php echo t_h('public.protection.placeholder', [], 'Enter password', $currentLang); ?>" required autofocus>
+                        <button type="submit"><?php echo t_h('public.protection.unlock', [], 'Unlock', $currentLang); ?></button>
                     </form>
                 </div>
             </body>
@@ -108,7 +110,7 @@ try {
     $folder = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$folder) {
         http_response_code(404);
-        echo 'Folder not found';
+        echo t_h('public.errors.folder_not_found', [], 'Folder not found', $currentLang);
         exit;
     }
 
@@ -213,7 +215,7 @@ try {
 
 } catch (Exception $e) {
     http_response_code(500);
-    echo 'Server error';
+    echo t_h('public.errors.server_error', [], 'Server error', $currentLang);
     exit;
 }
 

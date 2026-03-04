@@ -127,6 +127,21 @@
                     var toSet = currently ? '0' : '1';
                     setSetting(settingKey, toSet, function () {
                         refresh();
+
+                        // Special handling for code wrap setting - apply immediately to opener window
+                        if (settingKey === 'code_block_word_wrap') {
+                            try {
+                                if (window.opener && window.opener.document && window.opener.document.body) {
+                                    // toSet === '1' means wrap enabled, so no-wrap should be disabled
+                                    // toSet === '0' means wrap disabled, so no-wrap should be enabled
+                                    var shouldAddNoWrap = (toSet === '0');
+                                    window.opener.document.body.classList.toggle('code-block-no-wrap', shouldAddNoWrap);
+                                }
+                            } catch (e) {
+                                // Safely ignore cross-origin errors
+                            }
+                        }
+
                         reloadOpener();
                     });
                 });
@@ -157,9 +172,9 @@
 
     function refreshFontSizeBadge() {
         var fontBadges = [
-            { id: 'font-size-badge', key: 'note_font_size', default: '15', i18nKey: 'display.badges.note_font_size', fallback: 'N: ' },
-            { id: 'sidebar-font-size-badge', key: 'sidebar_font_size', default: '13', i18nKey: 'display.badges.sidebar_font_size', fallback: 'S: ' },
-            { id: 'code-block-font-size-badge', key: 'code_block_font_size', default: '15', i18nKey: 'display.badges.code_block_font_size', fallback: 'C: ' }
+            { id: 'font-size-badge', key: 'note_font_size', default: '15', i18nKey: 'display.badges.note_font_size', fallback: '' },
+            { id: 'sidebar-font-size-badge', key: 'sidebar_font_size', default: '13', i18nKey: 'display.badges.sidebar_font_size', fallback: '' },
+            { id: 'code-block-font-size-badge', key: 'code_block_font_size', default: '15', i18nKey: 'display.badges.code_block_font_size', fallback: '' }
         ];
 
         fontBadges.forEach(function (config) {

@@ -32,6 +32,7 @@
     justify-items: center;
     max-width: 400px;
     width: 90%;
+    text-align: center;
 }
 
 .password-container h2 {
@@ -52,6 +53,7 @@
     box-sizing: border-box;
     font-size: 14px;
     margin-bottom: 15px;
+    text-align: left;
 }
 
 .password-container button {

@@ -1529,10 +1529,28 @@
         "add_password_title": "Agregar protección con contraseña",
         "change_password_title": "Cambiar contraseña",
         "password_remove_hint": "Dejar vacío para eliminar la protección con contraseña.",
-        "enter_new_password": "Ingrese una nueva contraseña"
+        "enter_new_password": "Ingrese una nueva contraseña",
+        "protection": {
+            "title": "Protegido con contraseña",
+            "note_heading": "Protegido con contraseña",
+            "folder_heading": "Carpeta protegida con contraseña",
+            "error_incorrect": "Contraseña incorrecta. Inténtelo de nuevo.",
+            "additional_password_required": "Esta nota requiere una contraseña adicional. Ingrese la siguiente contraseña para continuar.",
+            "placeholder": "Ingrese la contraseña",
+            "unlock": "Desbloquear"
+        },
+        "errors": {
+            "token_missing": "Falta el token",
+            "token_or_folder_auth_missing": "Falta el token o la autorización de carpeta",
+            "shared_folder_not_found": "Carpeta compartida no encontrada",
+            "shared_note_not_found_or_denied": "Nota compartida no encontrada o acceso denegado",
+            "folder_not_found": "Carpeta no encontrada",
+            "note_not_found": "Nota no encontrada",
+            "server_error": "Error del servidor"
+        }
     },
     "public_folder": {
-        "filter_placeholder": "Buscar notas",
+        "filter_placeholder": "Filtrar por títulos",
         "no_filter_results": "Sin resultados."
     },
     "icon_names": {
