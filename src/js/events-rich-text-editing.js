@@ -1187,6 +1187,16 @@ function handleImagePaste(items, note) {
 function handleRichTextPaste(htmlData) {
     if (!htmlData || htmlData.trim() === '') return false;
 
+    // If content was copied from a Poznote HTML note, preserve all formatting as-is
+    var poznoteMarker = '<!-- poznote-internal -->';
+    if (htmlData.includes(poznoteMarker)) {
+        var fullHtml = htmlData.replace(poznoteMarker, '');
+        if (!fullHtml || fullHtml.trim() === '') return false;
+        document.execCommand('insertHTML', false, fullHtml);
+        triggerNoteSave();
+        return true;
+    }
+
     var parser = new DOMParser();
     var doc = parser.parseFromString(htmlData, 'text/html');
 
@@ -1235,6 +1245,35 @@ function handleRichTextPaste(htmlData) {
  * Setup paste event handling for rich text and images
  */
 function setupPasteHandling() {
+    // Mark copied HTML as Poznote-internal so the paste handler can preserve all styles
+    document.body.addEventListener('copy', function (e) {
+        try {
+            var note = (e.target && e.target.closest) ? e.target.closest('.noteentry') : null;
+            if (!note) return;
+
+            var isMarkdownNote = note.getAttribute('data-note-type') === 'markdown';
+            if (isMarkdownNote) return;
+
+            var selection = window.getSelection();
+            if (!selection || selection.rangeCount === 0) return;
+
+            // Serialise the selection into HTML
+            var range = selection.getRangeAt(0);
+            var fragment = range.cloneContents();
+            var tempDiv = document.createElement('div');
+            tempDiv.appendChild(fragment);
+            var htmlContent = tempDiv.innerHTML;
+            if (!htmlContent) return;
+
+            // Prepend the marker so the paste handler knows this came from Poznote
+            e.clipboardData.setData('text/html', '<!-- poznote-internal -->' + htmlContent);
+            e.clipboardData.setData('text/plain', selection.toString());
+            e.preventDefault();
+        } catch (err) {
+            console.error('Copy handling error:', err);
+        }
+    });
+
     document.body.addEventListener('paste', function (e) {
         try {
             // Skip paste handling for input fields
