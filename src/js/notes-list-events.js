@@ -63,6 +63,43 @@
         }
     }
 
+    /**
+     * Reuse current tab when the opposite side of a linked/source pair is already open.
+     * - linked -> source already open
+     * - source -> one of its linked notes already open
+     * @param {HTMLElement} actionElement - The clicked note link element
+     * @returns {boolean}
+     */
+    function shouldReuseTabForLinkedPair(actionElement) {
+        if (!actionElement) return false;
+        if (!window.tabManager || typeof window.tabManager.isNoteOpen !== 'function') return false;
+
+        var currentType = actionElement.getAttribute('data-note-type');
+
+        // Case 1: clicked note is linked, source tab already open
+        if (currentType === 'linked') {
+            var linkedSourceNoteId = actionElement.getAttribute('data-linked-note-id');
+            return !!(linkedSourceNoteId && window.tabManager.isNoteOpen(linkedSourceNoteId));
+        }
+
+        // Case 2: clicked note is source, one of its linked-note tabs already open
+        var currentNoteId = actionElement.getAttribute('data-note-db-id') || actionElement.getAttribute('data-note-id');
+        if (!currentNoteId) return false;
+
+        var linkedCandidates = document.querySelectorAll(
+            '.links_arbo_left[data-note-type="linked"][data-linked-note-id="' + currentNoteId + '"]'
+        );
+
+        for (var i = 0; i < linkedCandidates.length; i++) {
+            var linkedNoteId = linkedCandidates[i].getAttribute('data-note-db-id') || linkedCandidates[i].getAttribute('data-note-id');
+            if (linkedNoteId && window.tabManager.isNoteOpen(linkedNoteId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     // =====================================================
     // SEARCH BAR MANAGEMENT
     // =====================================================
@@ -545,8 +582,10 @@
                     clearTimeout(clickTimer);
                     clickTimer = null;
                     lastClickedElement = null;
-                    
-                    if (typeof openNoteInNewTab === 'function') {
+
+                    if (shouldReuseTabForLinkedPair(actionElement)) {
+                        window.loadNoteDirectly(noteLink, noteId, event, actionElement);
+                    } else if (typeof openNoteInNewTab === 'function') {
                         openNoteInNewTab(noteId);
                     }
                 } else {
@@ -598,7 +637,11 @@
         } else if (action === 'open-note-new-tab') {
             event.preventDefault();
             var noteId = actionElement.getAttribute('data-note-id');
-            if (noteId && typeof openNoteInNewTab === 'function') {
+
+            var noteLink = actionElement.getAttribute('href');
+            if (noteId && noteLink && shouldReuseTabForLinkedPair(actionElement) && typeof window.loadNoteDirectly === 'function') {
+                window.loadNoteDirectly(noteLink, noteId, event, actionElement);
+            } else if (noteId && typeof openNoteInNewTab === 'function') {
                 openNoteInNewTab(noteId);
             }
         }
