@@ -739,6 +739,40 @@ function parseMarkdown(text) {
         // Empty line - paragraph separator
         if (line.trim() === '') {
             flushParagraph();
+
+            // Preserve consecutive blank lines in preview so intentional spacing stays visible.
+            let blankLineCount = 1;
+            while (i + 1 < lines.length && lines[i + 1].trim() === '') {
+                blankLineCount++;
+                i++;
+            }
+
+            // Avoid adding a full blank placeholder right before block elements,
+            // because those already contribute their own top spacing.
+            let nextNonEmptyIndex = i + 1;
+            let isNextBlockElement = false;
+            if (nextNonEmptyIndex < lines.length) {
+                let nextLine = lines[nextNonEmptyIndex];
+                isNextBlockElement = (
+                    /^\s*```/.test(nextLine) ||                      // Code block fence
+                    /\x00MATHBLOCK\d+\x00/.test(nextLine) ||        // Math block placeholder
+                    /^\x00PTAG\d+\x00/.test(nextLine) ||            // Protected HTML tags
+                    /^#{1,6}\s+/.test(nextLine) ||                   // Headers
+                    /^(\*{3,}|-{3,}|_{3,})$/.test(nextLine.trim()) || // Horizontal rules
+                    /^(&gt;|>)\s/.test(nextLine) ||                  // Blockquotes
+                    /^\s*[\*\-\+]\s+\[([ xX])\]\s+/.test(nextLine) || // Task lists
+                    /^\s*[\*\-\+]\s+/.test(nextLine) ||          // Unordered lists
+                    /^\s*\d+\.\s+/.test(nextLine) ||              // Ordered lists
+                    /^\s*\|.+\|\s*$/.test(nextLine)               // Tables
+                );
+            }
+
+            // A paragraph break already introduces one visual line via paragraph spacing,
+            // so only add placeholders for additional intentional empty lines.
+            let placeholdersToAdd = Math.max(blankLineCount - 1, 0);
+            for (let bl = 0; bl < placeholdersToAdd; bl++) {
+                result.push('<p class="blank-line">&nbsp;</p>');
+            }
             continue;
         }
 
