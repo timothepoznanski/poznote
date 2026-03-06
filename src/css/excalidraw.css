@@ -45,7 +45,7 @@
     gap: 8px;
     padding: 8px 16px;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 400;
     border: 1px solid var(--border-color, #e0e0e0);
     border-radius: 6px;
     background: var(--bg-secondary, #f5f5f5);
@@ -533,7 +533,7 @@ html[data-theme='dark'] #app * {
     border-radius: 6px;
     cursor: pointer;
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 400;
     color: #ffffff;
     transition: all 0.2s;
 }
@@ -641,7 +641,7 @@ html[data-theme='dark'] #app * {
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-weight: 500;
+    font-weight: 400;
     font-family: 'Inter', sans-serif;
 }
 
