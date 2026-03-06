@@ -424,12 +424,6 @@ POZNOTE_OIDC_AUTO_CREATE_USERS=true
 
 ## Update application
 
-> **📘 Docker Versioning**: Poznote supports flexible Docker image versioning. Learn about major/minor version tags in our [Docker Versioning Guide](docs/DOCKER-VERSIONING.md).
-
-<details>
-<summary><strong>Update to the latest version</strong></summary>
-<br>
-
 Navigate to your Poznote directory:
 ```bash
 cd poznote
@@ -466,82 +460,6 @@ docker compose up -d
 ```
 
 Your data is preserved in the `./data` directory and will not be affected by the update.
-
-</details>
-
-<details>
-<summary><strong>Version pinning and automatic updates</strong></summary>
-<br>
-
-Poznote supports multiple Docker image tags for different upgrade strategies:
-
-- **Major version** (`poznote:4`): Auto-upgrade within v4.x.x, no breaking changes
-- **Minor version** (`poznote:4.1`): Auto-upgrade within v4.1.x, patch updates only  
-- **Exact version** (`poznote:4.1.0`): No automatic updates, complete control
-- **Latest** (`poznote:latest`): Always the newest stable release
-
-**Example: Stay on major version 4 with auto-updates**
-
-Edit your `docker-compose.yml`:
-```yaml
-services:
-  poznote:
-    image: ghcr.io/timothepoznanski/poznote:4  # Auto-upgrade to 4.x.x
-    # ... rest of config
-```
-
-Then update with:
-```bash
-docker compose pull && docker compose up -d
-```
-
-**⚠️ Note about Watchtower**: Automated tools like Watchtower only update Docker images, not `docker-compose.yml` or environment variables. For production, manual updates are recommended to ensure configuration compatibility.
-
-For complete details on versioning strategies, automatic updates, and migration between major versions, see the [Docker Versioning Guide](docs/DOCKER-VERSIONING.md).
-
-</details>
-
-<details>
-<summary><strong>Update to Beta version</strong></summary>
-<br>
-
-Occasionally, beta versions will be published as **pre-releases** on GitHub. These versions include more features and fixes than the stable production version, but may not be fully validated yet.
-
-**How to install a beta version:**
-
-You can install beta versions by modifying your `docker-compose.yml` to use a specific version tag instead of `latest`:
-
-1. Download the latest Docker Compose configuration:
-   ```bash
-   curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
-   ```
-
-2. Download the latest .env.template:
-   ```bash
-   curl -o .env.template https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.template
-   ```
-
-3. Review `.env.template` and add any new variables to your `.env` file if needed.
-   ```bash
-   sdiff .env .env.template
-   ```
-
-4. Edit your `docker-compose.yml` file and change the image line to:
-   ```yaml
-   image: ghcr.io/timothepoznanski/poznote:X.X.X-beta
-   ```
-   Replace `X.X.X-beta` with the specific beta version from the [GitHub Releases](https://github.com/timothepoznanski/poznote/releases) page.
-
-5. Update and restart:
-   ```bash
-   docker compose down
-   docker compose pull
-   docker compose up -d
-   ```
-
-> **Note:** Beta versions are marked as "Pre-release" on GitHub and are not automatically suggested for updates in the application.
-
-</details>
 
 ## Multi-users
 
