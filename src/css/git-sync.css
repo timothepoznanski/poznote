@@ -292,7 +292,7 @@ body.git-sync-page {
     border: none;
     border-radius: 8px;
     font-size: 0.95rem;
-    font-weight: 500;
+    font-weight: 400;
     cursor: pointer;
     transition: all 0.2s;
 }
