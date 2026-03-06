@@ -8,7 +8,7 @@
 
 <div align="center">
 
-[![GitHub stars](https://img.shields.io/github/stars/timothepoznanski/poznote?style=flat&logo=github)](https://github.com/timothepoznanski/poznote/stargazers) [![License](https://img.shields.io/github/license/timothepoznanski/poznote?style=flat)](https://github.com/timothepoznanski/poznote/blob/main/LICENCE) [![Docker GHCR](https://img.shields.io/badge/Docker-GHCR-2496ED?style=flat&logo=docker&logoColor=white)](https://github.com/timothepoznanski/poznote/pkgs/container/poznote) [![Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-ff5e5b?logo=ko-fi&logoColor=white)](https://ko-fi.com/timothepoznanski)
+[![GitHub stars](https://img.shields.io/github/stars/timothepoznanski/poznote?style=flat&logo=github)](https://github.com/timothepoznanski/poznote/stargazers) [![License](https://img.shields.io/github/license/timothepoznanski/poznote?style=flat)](https://github.com/timothepoznanski/poznote/blob/main/LICENCE) [![Docker GHCR](https://img.shields.io/badge/Docker-GHCR-2496ED?style=flat&logo=docker&logoColor=white)](https://github.com/timothepoznanski/poznote/pkgs/container/poznote)
 
 </div>
 
@@ -17,11 +17,11 @@ Poznote is a personal note-taking and documentation platform.<br><br>
 </h3>
 
 <p align="center">
-  <img src="images/github.png" alt="Poznote" width="100%">
+  <img src="images/poznote-light.png" alt="Poznote-light" width="100%">
 </p>
 
 <p align="center">
-  <img src="images/poznote.png" alt="Poznote" width="100%">
+  <img src="images/poznote-dark.png" alt="Poznote-dark" width="100%">
 </p>
 
 ## Features
