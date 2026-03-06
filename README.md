@@ -17,11 +17,11 @@ Poznote is a personal note-taking and documentation platform.<br><br>
 </h3>
 
 <p align="center">
-  <img src="images/github.png" alt="Poznote" width="100%">
+  <img src="images/poznote-light.png" alt="Poznote-light" width="100%">
 </p>
 
 <p align="center">
-  <img src="images/poznote.png" alt="Poznote" width="100%">
+  <img src="images/poznote-dark.png" alt="Poznote-dark" width="100%">
 </p>
 
 ## Features
