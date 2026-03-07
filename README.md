@@ -49,7 +49,6 @@ Password: `poznote`
 
 - [Install](#install)
 - [Access](#access)
-- [Troubleshooting Installation](#troubleshooting-installation)
 - [Change Settings](#change-settings)
 - [Authentication](#authentication)
 - [Update application](#update-application)
@@ -216,6 +215,7 @@ docker compose up -d
 
 </details>
 
+> If you encounter installation issues, see the [Troubleshooting Guide](docs/TROUBLESHOOTING.md).
 
 ## Access
 
@@ -228,10 +228,6 @@ After installation, access Poznote in your web browser:
 - Password: `admin`
 - Port: `8040`
 
-## Troubleshooting Installation
-
-If you encounter installation issues, see the [Troubleshooting Guide](docs/TROUBLESHOOTING.md).
-
 ## Change Settings
 
 Poznote configuration is split between two locations:
@@ -242,10 +238,13 @@ Poznote configuration is split between two locations:
 
 System settings can be modified in the `.env` file. Several categories of settings are available:
 
-- **Authentication**
-- **Web Server**
-- **OIDC / SSO Authentication**
-- **Import Limits**
+- **Authentication** - Admin and user passwords
+- **Web Server** - HTTP port configuration
+- **OIDC / SSO Authentication** - OpenID Connect integration
+- **Settings Access Control** - Restrict or password-protect settings page
+- **Import Limits** - Maximum files for imports
+- **Git Sync** - GitHub and Forgejo synchronization
+- **MCP Server** - AI assistant integration
 
 **How to Modify System Settings**
 
@@ -272,7 +271,7 @@ docker compose up -d
 <summary><strong>Application Settings (Settings Page)</strong></summary>
 <br>
 
-Additional settings are available through the Poznote web interface and are stored in the database.
+Additional settings are available through the Poznote web interface and are stored in the database or web browser local storage.
 
 **How to Modify Application Settings**
 
