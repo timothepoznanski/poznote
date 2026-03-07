@@ -848,11 +848,6 @@ Install the extension directly from the Chrome Web Store. Works with Chrome, Edg
 
 **[Install Poznote URL Saver →](https://chrome.google.com/webstore)**
 
-**Benefits:**
-- ✅ Automatic updates
-- ✅ Verified by Google
-- ✅ Easy one-click installation
-
 <details>
 <summary><strong>Alternative: Install from Source (Developer Mode)</strong></summary>
 <br>
