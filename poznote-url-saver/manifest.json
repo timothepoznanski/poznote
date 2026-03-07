@@ -8,7 +8,7 @@
     "tabs",
     "activeTab"
   ],
-  "host_permissions": [
+  "optional_host_permissions": [
     "*://*/api/v1/*"
   ],
   "background": {
