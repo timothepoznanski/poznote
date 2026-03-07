@@ -515,12 +515,13 @@
         <div class="modal-body">
             <p><?php echo t_h('modals.language.description', [], 'Select your preferred language:'); ?></p>
             <div class="radio-options">
+                <label><input type="radio" name="languageChoice" value="zh-cn"> <?php echo t_h('settings.language.chinese_simplified'); ?></label>
                 <label><input type="radio" name="languageChoice" value="en"> <?php echo t_h('settings.language.english'); ?></label>
                 <label><input type="radio" name="languageChoice" value="fr"> <?php echo t_h('settings.language.french'); ?></label>
-                <label><input type="radio" name="languageChoice" value="es"> <?php echo t_h('settings.language.spanish'); ?></label>
-                <label><input type="radio" name="languageChoice" value="pt"> <?php echo t_h('settings.language.portuguese'); ?></label>
                 <label><input type="radio" name="languageChoice" value="de"> <?php echo t_h('settings.language.german'); ?></label>
-                <label><input type="radio" name="languageChoice" value="zh-cn"> <?php echo t_h('settings.language.chinese_simplified'); ?></label>
+                <label><input type="radio" name="languageChoice" value="pt"> <?php echo t_h('settings.language.portuguese'); ?></label>
+                <label><input type="radio" name="languageChoice" value="ru"> <?php echo t_h('settings.language.russian'); ?></label>
+                <label><input type="radio" name="languageChoice" value="es"> <?php echo t_h('settings.language.spanish'); ?></label>
             </div>
         </div>
         <div class="modal-buttons">

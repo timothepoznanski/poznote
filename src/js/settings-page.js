@@ -26,11 +26,13 @@
     // Get language label from code
     function getLanguageLabel(code) {
         switch (code) {
+            case 'zh-cn': return tr('settings.language.chinese_simplified', {}, 'Chinese (Simplified)');
+            case 'en': return tr('settings.language.english', {}, 'English');
             case 'fr': return tr('settings.language.french', {}, 'French');
-            case 'es': return tr('settings.language.spanish', {}, 'Spanish');
-            case 'pt': return tr('settings.language.portuguese', {}, 'Portuguese');
             case 'de': return tr('settings.language.german', {}, 'German');
-            case 'en':
+            case 'pt': return tr('settings.language.portuguese', {}, 'Portuguese');
+            case 'ru': return tr('settings.language.russian', {}, 'Russian');
+            case 'es': return tr('settings.language.spanish', {}, 'Spanish');
             default: return tr('settings.language.english', {}, 'English');
         }
     }
