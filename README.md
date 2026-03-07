@@ -31,9 +31,7 @@ This project started from a simple personal need: a practical way to write, orga
   <img src="images/poznote-dark.png" alt="Poznote-dark" width="100%">
 </p>
 
-## Features
-
-Discover all the [powerful features](https://poznote.com/index.html#features) that make Poznote your perfect note-taking companion!
+Discover all the [features](https://poznote.com/index.html#features) that make Poznote your perfect note-taking companion!
 
 <p align="center">
   <img src="images/poznote-features.png" alt="Poznote Features" width="100%">
