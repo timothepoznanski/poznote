@@ -225,40 +225,43 @@ document.addEventListener('DOMContentLoaded', () => {
     showStatus('⏳ Saving configuration...', 'loading');
 
     try {
-      // Request permission for the Poznote server URL
-      showStatus('⏳ Requesting server access permission...', 'loading');
-      const permissionGranted = await requestHostPermission(formConfig.appUrl);
-
-      if (!permissionGranted) {
-        showStatus('❌ Permission denied. Please allow access to your Poznote server.', 'error');
-        return;
-      }
-
-      // Get user profile ID
-      const userId = await resolveProfileId(formConfig);
-
-      // Get selected folder information
+      // Save basic configuration first (without userId)
       const selectedOption = folderSelect.options[folderSelect.selectedIndex];
       const folderPath = selectedOption
         ? (selectedOption.dataset.path || selectedOption.text.replace(/^📁 /, ''))
         : '';
 
-      // Build complete configuration object
       config = {
         appUrl: formConfig.appUrl,
         username: formConfig.username,
         password: formConfig.password,
-        userId: userId,
         workspace: workspaceSelect.value,
         folder: folderPath,
         folder_id: folderSelect.value
       };
 
-      // Save to Chrome storage
-      chrome.storage.local.set({ poznoteConfig: config }, () => {
-        showStatus('✅ Configuration saved!', 'success');
-        document.getElementById('appUrl').value = config.appUrl;
-      });
+      // Save to Chrome storage immediately
+      await chrome.storage.local.set({ poznoteConfig: config });
+
+      // Request permission for the Poznote server URL
+      showStatus('⏳ Requesting server access permission...', 'loading');
+      const permissionGranted = await requestHostPermission(formConfig.appUrl);
+
+      if (!permissionGranted) {
+        showStatus('⚠️ Configuration saved, but server access denied. You may need to grant permission later.', 'error');
+        return;
+      }
+
+      // Get user profile ID (now that we have permission)
+      showStatus('⏳ Validating credentials...', 'loading');
+      const userId = await resolveProfileId(formConfig);
+      config.userId = userId;
+
+      // Update configuration with userId
+      await chrome.storage.local.set({ poznoteConfig: config });
+
+      showStatus('✅ Configuration saved!', 'success');
+      document.getElementById('appUrl').value = config.appUrl;
     } catch (e) {
       showStatus('❌ Error: ' + e.message, 'error');
     }
