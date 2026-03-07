@@ -761,8 +761,6 @@ The **Poznote URL Saver** is a browser extension that allows you to quickly save
 
 ### Install from Chrome Web Store (Recommended)
 
-[![Available in the Chrome Web Store](https://storage.googleapis.com/web-dev-uploads/image/WlD8wC6g8khYWPJUsQceQkhXSlv1/iNEddTyWiMfLSwFD6qGq.png)](https://chrome.google.com/webstore)
-
 > **Note:** The extension is currently under review by Google and will be available soon on the Chrome Web Store.
 
 Install the extension directly from the Chrome Web Store. Works with Chrome, Edge, Brave, Opera, and any Chromium-based browser.
