@@ -12,16 +12,16 @@
 
 </div>
 
-<h4 align="center">
+<h3 align="center">
 Poznote is a personal note-taking and documentation platform.<br><br>
-<h3>
+</h3>
 This project started from a simple personal need: a practical way to write, organize, and synchronize notes. From the beginning, the priority has been simplicity and ease of use. Advanced features exist, but they should never get in the way of a clear and accessible experience.<br>
 <br>
 <p align="center">
   <a href="https://ko-fi.com/Q5Q61IECOW"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support me on Ko-fi"></a>
 </p>
 
-</h3>
+
 
 <p align="center">
   <img src="images/poznote-light.png" alt="Poznote-light" width="100%">
