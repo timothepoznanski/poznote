@@ -8,9 +8,8 @@
     "tabs",
     "activeTab"
   ],
-  "host_permissions": [
-    "*://*/api/v1/*",
-    "<all_urls>"
+  "optional_host_permissions": [
+    "*://*/api/v1/*"
   ],
   "background": {
     "service_worker": "background.js"

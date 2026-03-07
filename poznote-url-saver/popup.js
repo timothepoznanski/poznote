@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
    */
   fetchWorkspacesBtn.addEventListener('click', async () => {
     const tempConfig = getCurrentFormConfig();
-    
+
     if (!validateRequiredFields(tempConfig)) {
       return;
     }
@@ -148,6 +148,13 @@ document.addEventListener('DOMContentLoaded', () => {
     showStatus('⏳ Fetching workspaces...', 'loading');
 
     try {
+      // Request permission for the Poznote server URL
+      const permissionGranted = await requestHostPermission(tempConfig.appUrl);
+      if (!permissionGranted) {
+        showStatus('❌ Permission denied. Please allow access to your Poznote server.', 'error');
+        return;
+      }
+
       // Get user profile ID
       const userId = await resolveProfileId(tempConfig);
       tempConfig.userId = userId;
@@ -183,12 +190,34 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /**
+   * Request host permission for the configured Poznote server
+   * @param {string} appUrl - The Poznote server URL
+   * @returns {Promise<boolean>} True if permission granted
+   */
+  async function requestHostPermission(appUrl) {
+    try {
+      const url = new URL(appUrl);
+      const origin = `${url.protocol}//${url.host}`;
+      const pattern = `${origin}/api/v1/*`;
+
+      const granted = await chrome.permissions.request({
+        origins: [pattern]
+      });
+
+      return granted;
+    } catch (e) {
+      console.error('Permission request failed:', e);
+      return false;
+    }
+  }
+
+  /**
    * Event handler: Save Configuration button click
    * Saves the current configuration to Chrome storage
    */
   document.getElementById('saveConfig').addEventListener('click', async () => {
     const formConfig = getCurrentFormConfig();
-    
+
     if (!validateRequiredFields(formConfig)) {
       return;
     }
@@ -196,31 +225,43 @@ document.addEventListener('DOMContentLoaded', () => {
     showStatus('⏳ Saving configuration...', 'loading');
 
     try {
-      // Get user profile ID
-      const userId = await resolveProfileId(formConfig);
-
-      // Get selected folder information
+      // Save basic configuration first (without userId)
       const selectedOption = folderSelect.options[folderSelect.selectedIndex];
-      const folderPath = selectedOption 
-        ? (selectedOption.dataset.path || selectedOption.text.replace(/^📁 /, '')) 
+      const folderPath = selectedOption
+        ? (selectedOption.dataset.path || selectedOption.text.replace(/^📁 /, ''))
         : '';
 
-      // Build complete configuration object
       config = {
         appUrl: formConfig.appUrl,
         username: formConfig.username,
         password: formConfig.password,
-        userId: userId,
         workspace: workspaceSelect.value,
         folder: folderPath,
         folder_id: folderSelect.value
       };
 
-      // Save to Chrome storage
-      chrome.storage.local.set({ poznoteConfig: config }, () => {
-        showStatus('✅ Configuration saved!', 'success');
-        document.getElementById('appUrl').value = config.appUrl;
-      });
+      // Save to Chrome storage immediately
+      await chrome.storage.local.set({ poznoteConfig: config });
+
+      // Request permission for the Poznote server URL
+      showStatus('⏳ Requesting server access permission...', 'loading');
+      const permissionGranted = await requestHostPermission(formConfig.appUrl);
+
+      if (!permissionGranted) {
+        showStatus('⚠️ Configuration saved, but server access denied. You may need to grant permission later.', 'error');
+        return;
+      }
+
+      // Get user profile ID (now that we have permission)
+      showStatus('⏳ Validating credentials...', 'loading');
+      const userId = await resolveProfileId(formConfig);
+      config.userId = userId;
+
+      // Update configuration with userId
+      await chrome.storage.local.set({ poznoteConfig: config });
+
+      showStatus('✅ Configuration saved!', 'success');
+      document.getElementById('appUrl').value = config.appUrl;
     } catch (e) {
       showStatus('❌ Error: ' + e.message, 'error');
     }
@@ -232,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
    */
   loadFoldersBtn.addEventListener('click', async () => {
     const formConfig = getCurrentFormConfig();
-    
+
     if (!validateRequiredFields(formConfig)) {
       return;
     }
@@ -240,6 +281,13 @@ document.addEventListener('DOMContentLoaded', () => {
     showStatus('⏳ Loading folders...', 'loading');
 
     try {
+      // Request permission for the Poznote server URL
+      const permissionGranted = await requestHostPermission(formConfig.appUrl);
+      if (!permissionGranted) {
+        showStatus('❌ Permission denied. Please allow access to your Poznote server.', 'error');
+        return;
+      }
+
       // Get or reuse user profile ID
       let userId = config.userId;
       if (!userId) {
@@ -325,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
    */
   async function saveToNote(contentType) {
     const formConfig = getCurrentFormConfig();
-    
+
     if (!validateRequiredFields(formConfig)) {
       return;
     }
@@ -333,6 +381,13 @@ document.addEventListener('DOMContentLoaded', () => {
     showStatus('⏳ Preparing note...', 'loading');
 
     try {
+      // Request permission for the Poznote server URL
+      const permissionGranted = await requestHostPermission(formConfig.appUrl);
+      if (!permissionGranted) {
+        showStatus('❌ Permission denied. Please allow access to your Poznote server.', 'error');
+        return;
+      }
+
       // Get current active tab
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       if (!tab) {

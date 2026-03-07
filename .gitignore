@@ -66,6 +66,7 @@ htmlcov/
 # IDE
 .vscode/
 .idea/
+.claude/
 
 # Environment variables / secrets
 .env

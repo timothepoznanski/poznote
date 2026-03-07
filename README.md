@@ -13,8 +13,15 @@
 </div>
 
 <h3 align="center">
-Poznote is a personal note-taking and documentation platform.<br><br>
+Poznote is a personal note-taking and documentation platform.
 </h3>
+This project started from a simple personal need: a practical way to write, organize, and synchronize notes. From the beginning, the priority has been simplicity and ease of use. Advanced features exist, but they should never get in the way of a clear and accessible experience.<br>
+<br>
+<p align="center">
+  <a href="https://ko-fi.com/Q5Q61IECOW"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support me on Ko-fi"></a>
+</p>
+
+
 
 <p align="center">
   <img src="images/poznote-light.png" alt="Poznote-light" width="100%">
@@ -24,9 +31,7 @@ Poznote is a personal note-taking and documentation platform.<br><br>
   <img src="images/poznote-dark.png" alt="Poznote-dark" width="100%">
 </p>
 
-## Features
-
-Discover all the [powerful features](https://poznote.com/index.html#features) that make Poznote your perfect note-taking companion!
+Discover all the [features here](https://poznote.com/index.html#features).
 
 <p align="center">
   <img src="images/poznote-features.png" alt="Poznote Features" width="100%">
@@ -44,7 +49,6 @@ Password: `poznote`
 
 - [Install](#install)
 - [Access](#access)
-- [Troubleshooting Installation](#troubleshooting-installation)
 - [Change Settings](#change-settings)
 - [Authentication](#authentication)
 - [Update application](#update-application)
@@ -211,6 +215,7 @@ docker compose up -d
 
 </details>
 
+> If you encounter installation issues, see the [Troubleshooting Guide](docs/TROUBLESHOOTING.md).
 
 ## Access
 
@@ -223,95 +228,6 @@ After installation, access Poznote in your web browser:
 - Password: `admin`
 - Port: `8040`
 
-## Troubleshooting Installation
-
-<details>
-<summary><strong>"mkdir() warnings (permission denied) or Connection failed"</strong></summary>
-<br>
-
-If you encounter errors like:
-- `Warning: mkdir(): Permission denied in /var/www/html/db_connect.php`
-- `Connection failed: SQLSTATE[HY000] [14] unable to open database file`
-- The `database` folder is created with `root:root` instead of `www-data:www-data`
-
-This is a known issue with Docker volume mounts in certain environments (Komodo, Portainer, etc.). The container cannot change permissions on mounted volumes in some configurations.
-
-**Solution:** Before starting the container, set the correct permissions on your host machine:
-
-```bash
-# Navigate to your Poznote directory
-cd poznote
-
-# Create the data directory structure with correct permissions
-mkdir -p data/database
-
-# Set ownership to UID 82 (www-data in Alpine Linux)
-sudo chown -R 82:82 data
-
-# Start the container
-docker compose up -d
-```
-
-</details>
-
-<details>
-<summary><strong>"Connection failed: SQLSTATE[HY000]: General error: 8 attempt to write a readonly database"</strong></summary>
-<br>
-
-First, try to stop and restart the container and wait for the database to be initialized (refresh the page).
-
-If that didn't work, stop the container and fix ownership for the `data` folder (adapt UID/GID to your setup, example uses 1000:1000):
-
-```bash
-docker compose down
-sudo chown 1000:1000 -R data
-```
-
-> 💡 **Note:** UID 82 corresponds to the `www-data` user in Alpine Linux, which is used by the Poznote Docker image.
-
-</details>
-
-<details>
-<summary><strong>"This site can't be reached"</strong></summary>
- <br>
-
-If you see "This site can't be reached" in your browser, you may have SELinux enabled. In this case, check the container logs:
-
-```bash
-docker logs poznote-webserver-1
-# or with podman
-podman logs poznote-webserver-1
-```
-
-You'll likely find:
-- `chown: /var/www/html/data: Permission denied`
-
-This occurs when Docker volumes don't have the correct SELinux context, especially when installing from `/root` directory.
-
-**Solution:** We strongly recommend using the `:Z` suffix for Docker volumes and avoiding the `/root` directory to ensure proper functioning on all distributions.
-
-Edit your `docker-compose.yml` to add `:Z` to volume definitions:
-
-```yaml
-volumes:
-  - ./data:/var/www/html/data:Z
-```
-
-Alternatively, install Poznote in a directory outside of `/root`, such as `/opt/poznote` or `~/poznote`.
-
-</details>
-
-<details>
-<summary><strong>"Incorrect username or password"</strong></summary>
-<br>
-
-1. Try to log with "admin" or "admin_change_me" and your password.
-2. Check if the user's role (Admin vs User) matches the password you are using from the `.env` file.
-3. Ensure no extra spaces were added when editing the `.env` variables.
-4. If you can log in as an administrator (admin) but not as a standard user, check if the profile is marked as **active** in the User Management panel.
-
-</details>
-
 ## Change Settings
 
 Poznote configuration is split between two locations:
@@ -322,10 +238,13 @@ Poznote configuration is split between two locations:
 
 System settings can be modified in the `.env` file. Several categories of settings are available:
 
-- **Authentication**
-- **Web Server**
-- **OIDC / SSO Authentication**
-- **Import Limits**
+- **Authentication** - Admin and user passwords
+- **Web Server** - HTTP port configuration
+- **OIDC / SSO Authentication** - OpenID Connect integration
+- **Settings Access Control** - Restrict or password-protect settings page
+- **Import Limits** - Maximum files for imports
+- **Git Sync** - GitHub and Forgejo synchronization
+- **MCP Server** - AI assistant integration
 
 **How to Modify System Settings**
 
@@ -352,7 +271,7 @@ docker compose up -d
 <summary><strong>Application Settings (Settings Page)</strong></summary>
 <br>
 
-Additional settings are available through the Poznote web interface and are stored in the database.
+Additional settings are available through the Poznote web interface and are stored in the database or web browser local storage.
 
 **How to Modify Application Settings**
 
@@ -834,11 +753,25 @@ For installation, configuration, and setup instructions, see the [MCP Server doc
 
 ## Poznote Extension
 
-The **Poznote URL Saver** is a browser extension (Chrome, Edge, Brave, Opera, and any Chromium-based browser) that allows you to quickly save the URL of the current page to your Poznote instance with a single click.
+The **Poznote URL Saver** is a browser extension that allows you to quickly save the URL of the current page to your Poznote instance with a single click.
 
 <p align="center">
   <img src="images/chrome-extension.png" alt="Poznote Chrome Extension" width="50%">
 </p>
+
+### Install from Chrome Web Store (Recommended)
+
+> **Note:** The extension is currently under review by Google and will be available soon on the Chrome Web Store.
+
+Install the extension directly from the Chrome Web Store. Works with Chrome, Edge, Brave, Opera, and any Chromium-based browser.
+
+**[Install Poznote URL Saver →](https://chrome.google.com/webstore)** (Coming soon)
+
+<details>
+<summary><strong>Alternative: Install from Source (Developer Mode)</strong></summary>
+<br>
+
+You can also install the extension manually from source:
 
 1. Get the extension folder (two possibilities):
    - **Download:** [Download the repository as ZIP](https://github.com/timothepoznanski/poznote/archive/refs/heads/main.zip) and extract it
@@ -849,6 +782,10 @@ The **Poznote URL Saver** is a browser extension (Chrome, Edge, Brave, Opera, an
 5. Click **Load unpacked** in the top left
 6. Select the `poznote-url-saver` folder from the Poznote repository
 7. The extension is now installed and ready to use!
+
+> **Note:** Manual installation does not provide automatic updates. You will need to manually download and reinstall the extension to get new versions. For automatic updates, use the Chrome Web Store version.
+
+</details>
 
 ## API Documentation
 
