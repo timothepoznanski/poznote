@@ -1,0 +1,1602 @@
+{
+    "app": {
+        "name": "Poznote"
+    },
+    "common": {
+        "ok": "OK",
+        "cancel": "Отмена",
+        "save": "Сохранить",
+        "delete": "Удалить",
+        "create": "Создать",
+        "rename": "Переименовать",
+        "move": "Переместить",
+        "close": "Закрыть",
+        "disable": "Отключить",
+        "enabled": "Включено",
+        "disabled": "Отключено",
+        "not_defined": "Не определено",
+        "loading": "Загрузка...",
+        "back_to_notes": "К заметкам",
+        "back_to_home": "На главную",
+        "back_to_settings": "В настройки",
+        "back": "Назад",
+        "error": "Ошибка",
+        "success": "Успешно",
+        "warning": "Предупреждение",
+        "notification": "Уведомление",
+        "information": "Информация",
+        "caution": "Осторожно",
+        "tip": "Совет",
+        "important": "Важно",
+        "note": "Примечание",
+        "untitled": "Без названия",
+        "access_denied": "Доступ запрещен",
+        "apply": "Применить",
+        "at": "в",
+        "scroll_left": "Прокрутить влево",
+        "scroll_right": "Прокрутить вправо"
+    },
+    "settings": {
+        "title": "Настройки",
+        "disabled_message": "Доступ к настройкам отключен администратором.",
+        "categories": {
+            "actions": "Действия",
+            "display": "Отображение",
+            "about": "О программе",
+            "documentation": "Документация"
+        },
+        "password": {
+            "title": "Доступ к настройкам",
+            "heading": "Настройки защищены",
+            "placeholder": "Введите пароль",
+            "submit": "Войти в настройки",
+            "cancel": "Назад к заметкам"
+        },
+        "cards": {
+            "workspaces": "Рабочие пространства",
+            "user_management": "Управление пользователями",
+            "backup_export": "Резервное копирование / Экспорт",
+            "restore_import": "Восстановление / Импорт",
+            "git_sync": "Синхронизация с Git",
+            "check_updates": "Проверить обновления",
+            "api_docs": "Документация API",
+            "documentation": "Репозиторий Github",
+            "news": "Блог Poznote",
+            "website": "Сайт Poznote",
+            "support": "Поддержать разработчика",
+            "release_notes": "Примечания к выпуску"
+        },
+        "language": {
+            "label": "Язык",
+            "english": "Английский",
+            "french": "Французский",
+            "spanish": "Испанский",
+            "portuguese": "Португальский",
+            "german": "Немецкий",
+            "chinese_simplified": "Китайский (упрощенный)",
+            "login_page": "Язык страницы входа:",
+            "saved": "Язык сохранен",
+            "save_error": "Не удалось сохранить язык",
+            "reload_hint": "Перезагрузка..."
+        }
+    },
+    "display": {
+        "title": "Отображение",
+        "cards": {
+            "theme_mode": "Тема",
+            "login_display": "Заголовок страницы входа",
+            "note_font_size": "Размер шрифта",
+            "note_sort_order": "Сортировка заметок",
+            "tasklist_insert_order": "Позиция новых задач",
+            "timezone": "Часовой пояс",
+            "show_note_created": "Показывать дату создания",
+            "show_folder_counts": "Показывать количество заметок в папках",
+            "notes_without_folders_after": "Показывать заметки после папок",
+            "show_folder_actions": "Показывать действия с папками",
+            "kanban_on_folder_click": "Открывать канбан при клике на папку",
+            "index_icon_scale": "Масштаб иконок в списке",
+            "note_content_width": "Ширина содержимого заметки",
+            "code_block_word_wrap": "Перенос строк в блоке кода"
+        },
+        "badges": {
+            "font_size_default": "по умолчанию ({{size}}px)",
+            "note_font_size": "{{size}}px",
+            "sidebar_font_size": "{{size}}px",
+            "code_block_font_size": "{{size}}px"
+        }
+    },
+    "tasklist": {
+        "input_placeholder": "Напишите новую задачу и нажмите Enter, чтобы добавить в список...",
+        "drag_to_reorder": "Перетащите, чтобы изменить порядок",
+        "add_to_top": "Добавлять новые задачи в начало",
+        "add_to_bottom": "Добавлять новые задачи в конец",
+        "insert_order_top": "В начало",
+        "insert_order_bottom": "В конец",
+        "clear_completed": "Очистить выполненные задачи",
+        "no_completed_tasks": "Нет выполненных задач для удаления."
+    },
+    "tags": {
+        "add_single": "Добавить тег...",
+        "add_multiple": "Добавить теги...",
+        "list_all": "Список всех тегов",
+        "manage_note_tags": "Управление тегами заметки",
+        "modal_title": "Управление тегами"
+    },
+    "download": "Скачать",
+    "convert": "Конвертировать",
+    "create": "Создать",
+    "edit": "Редактировать",
+    "delete": "Удалить",
+    "favorite": "Избранное",
+    "share": "Поделиться",
+    "info": {
+        "page_title": "Информация о заметке",
+        "actions": {
+            "back_to_note": "Перейти к заметке"
+        },
+        "labels": {
+            "note_title": "Заголовок заметки:",
+            "workspace": "Рабочее пространство:",
+            "folder": "Папка:",
+            "created": "Создано:",
+            "last_modified": "Изменено:",
+            "tags": "Теги:",
+            "favorite": "Избранное:",
+            "attachments": "Вложения:",
+            "note_id": "ID заметки:",
+            "full_path": "Полный путь:"
+        },
+        "attachments": {
+            "count_singular": "1 файл",
+            "count_plural": "{{count}} файлов"
+        },
+        "empty": {
+            "no_tags": "Нет тегов"
+        },
+        "errors": []
+    },
+    "attachments": {
+        "empty": "Нет вложений.",
+        "upload": {
+            "button_uploading": "Загрузка..."
+        },
+        "actions": {
+            "view": "Просмотр",
+            "delete": "Удалить",
+            "open_attachments": "Открыть вложения",
+            "download": "Скачать {{filename}}"
+        },
+        "errors": {
+            "select_file": "Пожалуйста, выберите файл для загрузки.",
+            "no_note_selected": "Заметка не выбрана.",
+            "file_too_large": "Файл слишком большой (максимум: {{maxSize}}).",
+            "http_error": "Ошибка HTTP: {{status}}",
+            "invalid_server_response": "Неверный ответ сервера.",
+            "upload_failed": "Ошибка загрузки: {{error}}",
+            "deletion_failed": "Ошибка удаления: {{error}}",
+            "deletion_failed_generic": "Не удалось удалить.",
+            "loading_failed": "Не удалось загрузить вложения",
+            "loading_error": "Ошибка загрузки вложений",
+            "upload_failed_generic": "Не удалось загрузить. Пожалуйста, попробуйте снова.",
+            "upload_failed_connection": "Не удалось загрузить. Проверьте подключение."
+        },
+        "messages": {
+            "upload_success": "Файл успешно загружен!",
+            "deleted_success": "Вложение успешно удалено"
+        },
+        "page": {
+            "title": "Управление вложениями",
+            "subtitle": "Управление вложениями для заметки:",
+            "upload_section_title": "Выберите новое вложение",
+            "drag_drop_info": "Вы можете перетащить файл ниже:",
+            "all_types_accepted": "Принимаются все типы файлов (макс. 200 МБ)",
+            "upload_button": "Прикрепить",
+            "current_attachments": "Текущие вложения",
+            "loading_attachments": "Загрузка вложений...",
+            "preview_alt": "Превью",
+            "uploaded_prefix": "Загружено: ",
+            "open_in_new_tab": "Открыть в новой вкладке",
+            "pdf_label": "PDF"
+        },
+        "modals": {
+            "delete": {
+                "title": "Удаление вложения",
+                "message": "Вы хотите удалить это вложение? Это действие необратимо."
+            }
+        },
+        "size": {
+            "units": {
+                "bytes": "байт",
+                "kb": "КБ",
+                "mb": "МБ",
+                "gb": "ГБ"
+            }
+        },
+        "list": {
+            "title": "Заметки с вложениями",
+            "no_attachments": "Пока нет заметок с вложениями.",
+            "back_to_notes": "Перейти к заметкам",
+            "manage_attachments": "Управление вложениями",
+            "attachment_count_singular": "1 вложение",
+            "attachment_count_plural": "{{count}} вложений",
+            "hint": "Добавляйте вложения к заметкам с помощью кнопки со скрепкой на панели инструментов.",
+            "filter_placeholder": "Фильтр по заголовку заметки или имени вложения...",
+            "no_filter_results": "Нет заметок, соответствующих запросу.",
+            "show_thumbnails": "Показывать миниатюры в этом списке",
+            "show_inline_images": "Также показывать изображения, уже видимые в содержимом заметки"
+        }
+    },
+    "modals": {
+        "update": {
+            "title": "📱 Версия приложения",
+            "backup_warning": "Сделайте резервную копию ваших данных.",
+            "backup_hint": "<strong>Настройки > Резервное копирование</strong>",
+            "current_version": "Текущая версия:",
+            "latest_available": "Доступная версия:",
+            "view_release_notes": "Посмотреть примечания к выпуску",
+            "self_hosted": "Инструкции для самостоятельного хостинга",
+            "cloud": "Инструкции для облачной версии"
+        },
+        "update_check": {
+            "title": "Проверка обновлений...",
+            "status": "Пожалуйста, подождите, пока мы проверяем обновления..."
+        },
+        "login_display": {
+            "title": "Отображаемое имя на странице входа",
+            "description": "Задайте имя, показываемое на экране входа.",
+            "placeholder": "Отображаемое имя"
+        },
+        "theme": {
+            "title": "Выбор темы",
+            "description": "Выберите предпочтительную тему:"
+        },
+        "language": {
+            "title": "Выбор языка",
+            "description": "Выберите предпочтительный язык:"
+        },
+        "input": {
+            "placeholder": "Введите текст"
+        },
+        "font_size": {
+            "title": "Размер шрифта",
+            "note_label": "Содержимое заметки (px):",
+            "sidebar_label": "Боковая панель (px):",
+            "code_block_label": "Блоки кода (px):",
+            "default_value": "{{size}} пикс. — значение по умолчанию",
+            "preview": "Предпросмотр"
+        },
+        "note_width": {
+            "title": "Ширина содержимого заметки",
+            "description": "Выберите максимальную ширину для содержимого заметок (в пикселях):",
+            "label": "Максимальная ширина (px):",
+            "full_width": "На всю ширину",
+            "default_value": "{{width}} пикс. — значение по умолчанию"
+        },
+        "index_icon_scale": {
+            "title": "Масштаб иконок в списке",
+            "description": "Настройте размер иконок на странице списка (коэффициент масштабирования):"
+        },
+        "confirm": {
+            "title": "Подтверждение действия",
+            "message": "Вы уверены, что хотите продолжить?",
+            "save_and_exit": "Сохранить и выйти",
+            "exit_without_saving": "Выйти без сохранения"
+        },
+        "folder": {
+            "new_title": "Новая папка",
+            "new_placeholder": "Название новой папки",
+            "create": "Создать",
+            "rename_title": "Переименование папки",
+            "rename_placeholder": "Новое название папки",
+            "delete_title": "Удаление папки",
+            "delete_folder": "Удалить папку",
+            "change_folder": "Сменить папку",
+            "move_prefix": "Переместить",
+            "move_suffix": "в:",
+            "move_prompt": "Переместить \"{{title}}\" в:",
+            "no_folder": "Без папки"
+        },
+        "move_note_folder": {
+            "title": "Переместить заметку в папку",
+            "workspace_destination": "Выберите рабочее пространство:",
+            "target_folder": "Выберите целевую папку:",
+            "enter_folder_name": "Пожалуйста, введите название папки"
+        },
+        "move_folder_files": {
+            "title": "Переместить все файлы",
+            "prompt_prefix": "Переместить все файлы из",
+            "prompt_suffix": "в:",
+            "select_target": "Выберите целевую папку...",
+            "hint_move_single": "Чтобы переместить отдельную заметку в другое рабочее пространство, используйте кнопку \"Переместить заметку\" на панели инструментов",
+            "hint_move_all": "Чтобы переместить все заметки из одного рабочего пространства в другое, перейдите в Настройки -> Рабочие пространства",
+            "move_all": "Переместить все файлы"
+        },
+        "move_folder": {
+            "title": "Переместить папку",
+            "prompt_prefix": "Переместить папку",
+            "prompt_suffix": "в:",
+            "select_target": "Выберите родительскую папку...",
+            "root": "Корень (верхний уровень)",
+            "hint": "Это переместит папку и все её заметки как подпапку. Выберите \"Корень\", чтобы переместить на верхний уровень.",
+            "move": "Переместить папку",
+            "workspace": "Целевое рабочее пространство",
+            "parent": "Целевая родительская папка"
+        },
+        "workspaces": {
+            "move_notes_title": "Переместить заметки из",
+            "select_target_workspace": "Выберите целевое рабочее пространство",
+            "rename_title": "Переименовать рабочее пространство",
+            "new_name": "Новое название",
+            "delete_title": "Подтверждение удаления рабочего пространства",
+            "delete_description": "Все заметки и папки будут безвозвратно удалены и не могут быть восстановлены.",
+            "delete_placeholder": "Введите название рабочего пространства для подтверждения",
+            "delete_button": "Удалить рабочее пространство"
+        },
+        "user_settings_info": {
+            "title": "Настройки учетной записи",
+            "message": "Чтобы изменить пароль, отредактировать email, имя пользователя или OIDC Subject (UUID), обратитесь к администратору этого экземпляра Poznote."
+        },
+        "create": {
+            "title_in_folder": "Создать в {{folder}}",
+            "folder_fallback": "папка",
+            "note": {
+                "title": "HTML-заметка",
+                "description": "Не Markdown"
+            },
+            "markdown": {
+                "title": "Заметка Markdown",
+                "description": "Не HTML"
+            },
+            "task_list": {
+                "title": "Список задач"
+            },
+            "linked": {
+                "title": "Связанная заметка",
+                "default_heading": "{{note}}",
+                "success": "Связанная заметка успешно создана",
+                "error": "Ошибка при создании связанной заметки"
+            },
+            "template": {
+                "title": "Шаблон"
+            },
+            "subfolder": {
+                "title": "Подпапка"
+            },
+            "folder": {
+                "title": "Папка"
+            },
+            "kanban": {
+                "title": "Канбан-структура"
+            },
+            "workspace": {
+                "title": "Рабочее пространство"
+            }
+        },
+        "kanban_structure": {
+            "title": "Создать канбан-структуру",
+            "folder_name_label": "Название папки:",
+            "folder_name_placeholder": "Моя канбан-доска",
+            "columns_label": "Количество колонок (1–9):",
+            "error_name_required": "Требуется название папки",
+            "error_columns_range": "Количество колонок должно быть от 1 до 9",
+            "error_folder_exists": "Папка уже существует в этом месте",
+            "error_create": "Не удалось создать канбан-структуру",
+            "error_create_prefix": "Ошибка создания канбан-структуры: {{error}}"
+        },
+        "folder_icon": {
+            "title": "Изменить иконку папки",
+            "reset": "Восстановить поведение по умолчанию",
+            "search_placeholder": "Поиск иконок..."
+        },
+        "linked_selector": {
+            "title": "Выберите заметку для связи",
+            "search_placeholder": "Поиск заметок...",
+            "recent_label": "Недавние заметки"
+        },
+        "delete_linked_note": {
+            "title": "Удалить связанную заметку",
+            "message": "Что вы хотите удалить?",
+            "delete_link_only": "Удалить только эту связь",
+            "delete_link_and_target": "Удалить заметку и все её связи"
+        },
+        "convert": {
+            "title": "Конвертировать заметку",
+            "message": "Вы уверены, что хотите конвертировать эту заметку?",
+            "to_html_title": "Конвертировать в HTML",
+            "to_html_message": "Это конвертирует вашу заметку Markdown в формат HTML.",
+            "to_html_warning": "Перед конвертацией вы можете создать дубликат, чтобы сохранить копию на случай, если результат вас не устроит.",
+            "to_markdown_title": "Конвертировать в Markdown",
+            "to_markdown_message": "Это конвертирует вашу HTML-заметку в формат Markdown. Встроенные изображения будут сохранены как вложения.",
+            "to_markdown_warning": "Перед конвертацией вы можете создать дубликат, чтобы сохранить копию на случай, если результат вас не устроит.",
+            "converting": "Конвертация заметки...",
+            "success": "Заметка успешно конвертирована!",
+            "error": "Ошибка при конвертации заметки",
+            "duplicate_button": "Дублировать"
+        },
+        "export": {
+            "title": "Экспорт заметки",
+            "markdown": {
+                "title": "Экспорт как Markdown",
+                "description": "Скачать как MD-файл с метаданными (заголовок, теги, папка) в YAML frontmatter"
+            },
+            "html": {
+                "title": "Экспорт как HTML",
+                "description": "Скачать как HTML-файл с сохранением всего форматирования"
+            },
+            "json": {
+                "title": "Скачать как JSON",
+                "description": "Скачать сырые данные списка задач в формате JSON"
+            },
+            "print": {
+                "title": "Печать в PDF (браузер)",
+                "description": "Использовать встроенный диалог печати браузера для сохранения в PDF"
+            }
+        },
+        "task_move": {
+            "title": "Переместить задачу",
+            "description": "Выберите список задач, в который нужно переместить эту задачу.",
+            "search_placeholder": "Поиск списков задач...",
+            "loading": "Загрузка...",
+            "empty": "Списки задач не найдены.",
+            "moving": "Перемещение задачи...",
+            "error": "Не удалось загрузить списки задач.",
+            "confirm": "Переместить задачу"
+        },
+        "note_sort": {
+            "title": "Порядок сортировки заметок",
+            "description": "Выберите, как упорядочивать заметки в списке:",
+            "options": {
+                "last_modified": "По дате изменения",
+                "last_created": "По дате создания",
+                "alphabetical": "По алфавиту"
+            }
+        },
+        "timezone": {
+            "title": "Часовой пояс",
+            "description": "Выберите ваш часовой пояс:",
+            "groups": {
+                "europe": "Европа",
+                "america": "Америка",
+                "asia": "Азия",
+                "pacific": "Тихий океан",
+                "africa": "Африка"
+            }
+        }
+    },
+    "notes_list": {
+        "system_folders": {
+            "trash": "Корзина",
+            "tags": "Теги",
+            "favorites": "Избранное",
+            "public": "Общие",
+            "attachments": "Вложения"
+        },
+        "favorites": {
+            "empty": "Пока нет избранных заметок."
+        },
+        "drop_zone": {
+            "remove_from_folder": "Перетащите сюда, чтобы удалить из папки"
+        },
+        "folder_actions": {
+            "menu": "Действия",
+            "create": "Создать",
+            "kanban_view": "Канбан-вид",
+            "open_all_in_tabs": "Открыть все заметки",
+            "move_all_files": "Переместить все файлы",
+            "rename_folder": "Переименовать папку",
+            "delete_folder": "Удалить папку",
+            "move_folder": "Переместить папку",
+            "change_icon": "Изменить иконку",
+            "download_folder": "Скачать",
+            "is_public": "Общая",
+            "share_folder": "Поделиться",
+            "tabs_not_available": "Вкладки недоступны на мобильных устройствах",
+            "no_notes_title": "Нет заметок",
+            "no_notes_in_folder": "В этой папке нет заметок",
+            "too_many_notes": "Эта папка содержит {{count}} заметок. Будет открыто только первые {{max}}, чтобы не перегружать браузер."
+        }
+    },
+    "update": {
+        "new_available": "🎉 Доступно новое обновление!",
+        "description": "Ваши данные будут сохранены во время обновления.",
+        "up_to_date": "✅ Poznote обновлен",
+        "error_loading_version": "Ошибка загрузки версии"
+    },
+    "slash_menu": {
+        "back_to_normal": "Обычный текст",
+        "title": "Заголовок",
+        "heading_1": "Заголовок 1",
+        "heading_2": "Заголовок 2",
+        "heading_3": "Заголовок 3",
+        "format_text": "Форматирование",
+        "red": "Красный",
+        "bold": "Жирный",
+        "italic": "Курсив",
+        "highlight": "Выделение",
+        "strikethrough": "Зачеркнутый",
+        "code": "Код",
+        "inline_code": "Встроенный код",
+        "code_block": "Блок кода",
+        "list": "Список",
+        "bullet_list": "Маркированный список",
+        "numbered_list": "Нумерованный список",
+        "checklist": "Чек-лист",
+        "image": "Изображение",
+        "excalidraw": "Excalidraw",
+        "emoji": "Эмодзи",
+        "table": "Таблица",
+        "separator": "Разделитель",
+        "link_to_note": "Ссылка на заметку",
+        "link": "Ссылка",
+        "cancel": "Отмена",
+        "back": "Назад",
+        "quote": "Цитата",
+        "blockquote": "Цитата",
+        "callout_note": "Примечание",
+        "callout_tip": "Совет",
+        "callout_important": "Важно",
+        "callout_warning": "Предупреждение",
+        "callout_caution": "Осторожно",
+        "toggle": "Скрытый блок",
+        "toggle_placeholder": "Скрытый блок",
+        "toggle_content_placeholder": "Напишите внутри скрытого блока здесь…",
+        "toggle_after_placeholder": "Напишите после скрытого блока здесь…",
+        "code_block_placeholder_before": "Напишите текст здесь…",
+        "code_block_placeholder_after": "Напишите текст здесь…",
+        "youtube_video": "Видео YouTube",
+        "youtube_modal_title": "Вставить видео YouTube",
+        "youtube_url_label": "URL YouTube или ID видео:",
+        "youtube_url_prompt": "Введите URL или ID видео YouTube:",
+        "youtube_help": "Поддерживается: youtube.com/watch?v=ID, youtu.be/ID или просто ID видео",
+        "youtube_insert": "Вставить",
+        "youtube_invalid_url": "Неверный URL YouTube",
+        "mp4_video": "Видео MP4",
+        "mp4_uploading": "Загрузка видео...",
+        "mp4_upload_success": "Видео успешно загружено!",
+        "mp4_no_note": "Заметка не выбрана",
+        "mp4_invalid_file": "Пожалуйста, выберите видео MP4.",
+        "mp4_upload_failed": "Ошибка загрузки: {{error}}",
+        "audio": "Аудио",
+        "audio_uploading": "Загрузка аудио...",
+        "audio_no_note": "Заметка не выбрана",
+        "audio_invalid_file": "Пожалуйста, выберите аудиофайл.",
+        "audio_upload_failed": "Ошибка загрузки: {{error}}",
+        "date": "Дата"
+    },
+    "api": {
+        "settings": {
+            "key_required": "требуется ключ",
+            "invalid_action": "недопустимое действие",
+            "internal_error": "внутренняя ошибка"
+        },
+        "errors": {
+            "workspace_not_found": "Рабочее пространство не найдено",
+            "linked_note_already_exists": "Связанная заметка для этой заметки уже существует",
+            "method_not_allowed": "Метод не разрешен",
+            "invalid_action": "Недопустимое действие",
+            "internal_server_error": "Внутренняя ошибка сервера",
+            "duplicate_title_in_folder": "В этой папке уже есть заметка с таким же названием.",
+            "note_id_required": "требуется note_id",
+            "note_not_found": "Заметка не найдена",
+            "invalid_custom_token": "Недопустимый пользовательский токен.\n\nРазрешены:\n\nбуквы, цифры, -, _, . (4-128 символов)",
+            "token_already_in_use": "Токен уже используется",
+            "no_token_generated": "Токен не сгенерирован",
+            "server_error": "Ошибка сервера: {{error}}"
+        }
+    },
+    "ui": {
+        "login_display": {
+            "prompt": "Отображаемое имя на странице входа (оставьте пустым для очистки):"
+        },
+        "alerts": {
+            "saved": "Сохранено",
+            "save_error": "Ошибка сохранения",
+            "network_error": "Ошибка сети"
+        }
+    },
+    "theme": {
+        "badge": {
+            "dark": "темная тема",
+            "light": "светлая тема",
+            "system": "системная тема"
+        }
+    },
+    "table": {
+        "context_menu": {
+            "insert_row_above": "Вставить строку выше",
+            "insert_row_below": "Вставить строку ниже",
+            "insert_column_left": "Вставить столбец слева",
+            "insert_column_right": "Вставить столбец справа",
+            "delete_row": "Удалить строку",
+            "delete_column": "Удалить столбец",
+            "delete_table": "Удалить таблицу",
+            "errors": {
+                "cannot_delete_last_row": "Нельзя удалить последнюю строку таблицы.",
+                "cannot_delete_last_column": "Нельзя удалить последний столбец таблицы."
+            },
+            "confirm": {
+                "delete_table": "Вы действительно хотите удалить эту таблицу?"
+            }
+        }
+    },
+    "index": {
+        "errors": {
+            "create_task_list": "Ошибка при создании списка задач",
+            "create_task_list_prefix": "Ошибка при создании списка задач: ",
+            "create_markdown_note": "Ошибка при создании заметки Markdown",
+            "create_markdown_note_prefix": "Ошибка при создании заметки Markdown: ",
+            "conversion_failed_prefix": "Ошибка конвертации: {{error}}",
+            "network_error_converting": "Сетевая ошибка при конвертации заметки"
+        },
+        "toolbar": {
+            "favorite_add": "Добавить в избранное",
+            "favorite_remove": "Удалить из избранного",
+            "public_note": "Поделиться заметкой",
+            "attachments_with_count": "Вложения ({{count}})",
+            "menu_actions": "Действия меню",
+            "convert_to_html": "Конвертировать в HTML",
+            "convert_to_markdown": "Конвертировать в Markdown"
+        },
+        "share_modal": {
+            "custom_token": "Пользовательский токен (необязательно)",
+            "custom_token_placeholder": "мой_пользовательский_токен-1",
+            "password": "Пароль (необязательно)",
+            "password_placeholder": "Введите пароль",
+            "indexable": "Разрешить индексацию поисковыми системами",
+            "create_url": "Создать ссылку",
+            "close": "Закрыть",
+            "error_prefix": "Ошибка: ",
+            "unknown_error": "Неизвестная ошибка при создании публичной ссылки",
+            "error_creating": "Ошибка при создании публичной ссылки: "
+        },
+        "public_modal": {
+            "title": "Общая ссылка",
+            "close": "Закрыть",
+            "open": "Открыть",
+            "copy": "Копировать",
+            "revoke": "Отозвать",
+            "renew": "Обновить",
+            "manage": "Изменить",
+            "create_url": "Создать ссылку",
+            "no_link_yet": "Публичной ссылки пока нет",
+            "custom_token": "Пользовательский токен (необязательно)",
+            "custom_token_placeholder": "мой_пользовательский_токен-1",
+            "indexable": "Разрешить индексацию поисковыми системами",
+            "password": "Пароль (необязательно)",
+            "password_placeholder": "Введите пароль",
+            "error_prefix": "Ошибка: ",
+            "unknown_error": "Неизвестная ошибка при создании публичной ссылки",
+            "error_creating": "Ошибка при создании публичной ссылки: "
+        },
+        "folder_share_modal": {
+            "title": "Общая ссылка на папку",
+            "description": "Любой, у кого есть эта ссылка, может просматривать все заметки в этой папке (если не установлен пароль).",
+            "use_https": "HTTPS",
+            "renewed": "Ссылка на общую папку обновлена",
+            "failed_renew": "Ошибка при обновлении ссылки на общую папку",
+            "failed_revoke": "Ошибка при отзыве ссылки на общую папку"
+        },
+        "note": {
+            "new_note": "Новая заметка",
+            "new_note_numbered": "Новая заметка ({{number}})",
+            "title_placeholder": "Заголовок ?"
+        },
+        "editor": {
+            "placeholder_desktop": "Введите текст, используйте / для вызова меню команд, вставьте изображения или перетащите изображение в место курсора.",
+            "placeholder_mobile": "Введите текст или вставьте изображения здесь..."
+        }
+    },
+    "editor": {
+        "markdown_placeholder": "Напишите свой Markdown или используйте /, чтобы открыть меню команд...",
+        "markdown_placeholder_mobile": "Напишите свой Markdown здесь...",
+        "excalidraw": {
+            "placeholder_outside": "…"
+        },
+        "messages": {
+            "preview_mode_hint": "Вы в режиме предпросмотра. Переключитесь в режим редактирования с помощью кнопки на панели инструментов, чтобы начать писать Markdown.",
+            "split_preview_placeholder": "Предпросмотр появится здесь по мере ввода..."
+        },
+        "images": {
+            "delete_confirm": {
+                "title": "Удалить изображение",
+                "message": "Вы уверены, что хотите удалить это изображение? Это действие необратимо."
+            }
+        },
+        "colors": {
+            "black": "Черный",
+            "red": "Красный",
+            "orange": "Оранжевый",
+            "yellow": "Желтый",
+            "green": "Зеленый",
+            "blue": "Синий",
+            "purple": "Фиолетовый",
+            "none": "Нет"
+        },
+        "font_size": {
+            "very_small": "Очень маленький",
+            "small": "Маленький",
+            "normal": "Обычный",
+            "large": "Большой",
+            "very_large": "Очень большой",
+            "huge": "Огромный",
+            "giant": "Гигантский"
+        },
+        "emoji": {
+            "hint_windows": "В Windows нажмите Win + ;, чтобы открыть панель эмодзи"
+        },
+        "table_picker": {
+            "title": "Вставить таблицу",
+            "rows_label": "Строки:",
+            "rows_placeholder": "Строки",
+            "cols_label": "Столбцы:",
+            "cols_placeholder": "Столбцы",
+            "insert": "Вставить"
+        },
+        "toolbar": {
+            "back_to_notes": "К заметкам",
+            "bold": "Жирный",
+            "italic": "Курсив",
+            "underline": "Подчеркнутый",
+            "strikethrough": "Зачеркнутый",
+            "link": "Ссылка",
+            "text_color": "Цвет текста",
+            "highlight": "Выделение",
+            "bullet_list": "Маркированный список",
+            "numbered_list": "Нумерованный список",
+            "font_size": "Размер шрифта",
+            "code_block": "Блок кода",
+            "inline_code": "Встроенный код",
+            "clear_formatting": "Очистить форматирование",
+            "insert_excalidraw": "Вставить диаграмму Excalidraw",
+            "insert_emoji": "Вставить эмодзи",
+            "insert_table": "Вставить таблицу",
+            "insert_checklist": "Вставить чек-лист",
+            "add_separator": "Добавить разделитель",
+            "insert_note_reference": "Вставить ссылку на заметку",
+            "open_in_new_tab": "Открыть в новой вкладке",
+            "create_linked_note": "Создать связанную заметку",
+            "search_replace": "Поиск и замена"
+        },
+        "link": {
+            "add_title": "Добавить ссылку",
+            "title": "Управление ссылкой",
+            "url_label": "URL:",
+            "url_placeholder": "https://example.com",
+            "text_label": "Текст ссылки (необязательно):",
+            "text_placeholder": "Отображаемый текст",
+            "remove": "Удалить ссылку",
+            "cancel": "Отмена",
+            "save": "Сохранить"
+        }
+    },
+    "image_menu": {
+        "view_large": "Увеличить",
+        "download": "Скачать",
+        "resize": "Изменить размер",
+        "edit": "Редактировать",
+        "add_border": "Добавить рамку",
+        "remove_border": "Удалить рамку",
+        "add_border_no_padding": "Добавить рамку без отступа",
+        "remove_border_no_padding": "Удалить рамку без отступа",
+        "delete_image": "Удалить изображение",
+        "links": "Ссылки",
+        "open_link": "Открыть ссылку",
+        "add_link": "Добавить ссылку",
+        "edit_link": "Изменить ссылку",
+        "remove_link": "Удалить ссылку",
+        "link_modal": {
+            "title_add": "Добавить ссылку на изображение",
+            "title_edit": "Изменить ссылку на изображение",
+            "description": "Эта ссылка сделает изображение кликабельным, когда заметка будет опубликована.",
+            "url_label": "Введите URL:",
+            "url_placeholder": "https://www.example.com",
+            "cancel": "Отмена",
+            "ok": "OK"
+        }
+    },
+    "backup_export": {
+        "page": {
+            "title": "Резервное копирование / Экспорт"
+        },
+        "common": {
+            "all_workspaces": "все рабочие пространства"
+        },
+        "sections": {
+            "complete_backup": {
+                "title": "Полное резервное копирование",
+                "description_prefix": "Скачать полную резервную копию, содержащую базу данных, заметки и вложения для",
+                "description_suffix": "в одном ZIP-файле.",
+                "use_cases": "Два варианта использования:",
+                "use_case_restore_label": "Восстановление",
+                "use_case_restore_text": "Импортируйте эту резервную копию, чтобы восстановить данные в случае потери",
+                "use_case_offline_label": "Чтение офлайн",
+                "use_case_offline_text": "Откройте прилагаемый",
+                "use_case_offline_text_suffix": "чтобы просматривать заметки без Poznote",
+                "select_user": "Выберите профиль пользователя:"
+            },
+            "structured_export": {
+                "title": "Структурированный экспорт",
+                "description": "Экспортируйте заметки, организованные в папки, соответствующие структуре папок Poznote. Каждая заметка будет сохранена в каталоге, соответствующем её папке в Poznote, с сохранением полной иерархии. Файлы Markdown включают YAML frontmatter с метаданными.",
+                "warning": "Примечание: этот тип экспорта не предназначен для идеального резервного копирования Poznote.",
+                "select_workspace": "Выберите рабочее пространство:",
+                "loading_workspaces": "Загрузка рабочих пространств..."
+            }
+        },
+        "buttons": {
+            "download_complete_backup": "Скачать полную резервную копию (ZIP)",
+            "download_structured_export": "Скачать структурированный экспорт (ZIP)"
+        },
+        "spinner": {
+            "preparing": "Подготовка резервной копии...",
+            "preparing_long": "Подготовка резервной копии... Это может занять некоторое время."
+        },
+        "errors": {
+            "export_error": "Ошибка экспорта: {{error}}",
+            "complete_backup_error": "Ошибка полного резервного копирования: {{error}}",
+            "cannot_create_zip": "Не удалось создать ZIP-файл",
+            "failed_to_create_db_backup": "Не удалось создать резервную копию базы данных",
+            "failed_to_create_backup_file": "Не удалось создать файл резервной копии"
+        },
+        "dump": {
+            "title": "Дамп базы данных Poznote",
+            "generated_on": "Создано {{date}}"
+        },
+        "index": {
+            "title": "Индекс Poznote"
+        }
+    },
+    "login": {
+        "page": {
+            "title": "Вход"
+        },
+        "redirecting": "Перенаправление...",
+        "show_password": "Показать пароль",
+        "hide_password": "Скрыть пароль",
+        "admin_warning": "Пожалуйста, войдите с именем пользователя <code>{{username}}</code> и вашим паролем (хранится в .env). Затем вы можете переименовать эту учетную запись в настройках для лучшей безопасности.",
+        "fields": {
+            "username": "Имя пользователя",
+            "username_or_email": "Имя пользователя или Email",
+            "password": "Пароль",
+            "profile": "Выберите профиль"
+        },
+        "remember_me": "Запомнить меня на 30 дней",
+        "button": "Войти",
+        "oidc_button": "Продолжить с {{provider}}",
+        "documentation": "Документация Poznote",
+        "no_profiles": "Нет доступных профилей пользователей. Пожалуйста, обратитесь к администратору.",
+        "errors": {
+            "invalid_credentials": "Неверное имя пользователя или пароль.",
+            "oidc_disabled": "Ваша учетная запись отключена администратором. Обратитесь к нему за дополнительной информацией.",
+            "oidc_no_profile": "Не найден профиль пользователя для \"{{identifier}}\". Обратитесь к администратору для создания вашего профиля.",
+            "oidc_failed": "Ошибка входа через SSO. Пожалуйста, попробуйте снова.",
+            "oidc_unauthorized": "У вас нет доступа к этому приложению. Обратитесь к администратору."
+        }
+    },
+    "restore_import": {
+        "page": {
+            "title": "Восстановление / Импорт"
+        },
+        "advanced": {
+            "show": "Показать расширенные параметры импорта",
+            "hide": "Скрыть расширенные параметры импорта"
+        },
+        "messages": {
+            "database_restored": "База данных успешно восстановлена!",
+            "complete_backup_restored": "{{message}}",
+            "notes_imported": "Импортировано {{count}} заметок в рабочее пространство \"{{workspace}}\", папку \"{{folder}}\".",
+            "attachments_imported": "{{message}}",
+            "notes_imported_zip": "Импортировано {{count}} заметок из ZIP в рабочее пространство \"{{workspace}}\", папку \"{{folder}}\"."
+        },
+        "errors": {
+            "complete_restore_form_not_found": "Форма полного восстановления не найдена. Пожалуйста, попробуйте снова.",
+            "form_not_found": "Форма не найдена. Пожалуйста, попробуйте снова.",
+            "select_backup_first": "Сначала выберите файл резервной копии.",
+            "restore_error": "Ошибка восстановления: {{error}}",
+            "no_backup_file_or_upload": "Не предоставлен файл резервной копии или ошибка загрузки.",
+            "complete_restore_error": "Ошибка полного восстановления: {{error}} - {{message}}",
+            "no_complete_backup_file_or_upload": "Не предоставлен файл полной резервной копии или ошибка загрузки.",
+            "import_error": "Ошибка импорта: {{error}}",
+            "no_notes_file_or_upload": "Не предоставлен файл заметок или ошибка загрузки.",
+            "no_attachments_file_or_upload": "Не предоставлен файл вложений или ошибка загрузки.",
+            "no_notes_selected_or_upload": "Не выбраны заметки или ошибка загрузки.",
+            "file_type_zip_only": "Разрешены только ZIP-файлы.",
+            "error_uploading_file": "Ошибка при загрузке файла.",
+            "cannot_find_entries_directory": "Не удалось найти каталог entries.",
+            "cannot_open_zip": "Не удалось открыть ZIP-файл.",
+            "failed_extract_content": "Не удалось извлечь содержимое из {{file}}."
+        },
+        "spinner": {
+            "processing": "Выполняется восстановление...",
+            "processing_long": "Выполняется восстановление... Это может занять некоторое время.",
+            "importing_notes": "Импорт заметок..."
+        },
+        "units": {
+            "bytes": "Байт",
+            "kb": "КБ",
+            "mb": "МБ",
+            "gb": "ГБ"
+        },
+        "direct_copy": {
+            "backup_file_found": "Файл резервной копии найден:",
+            "ready_to_restore": "Готовы к восстановлению?",
+            "replace_all_data_warning": "Это заменит все данные во ВСЕХ рабочих пространствах.",
+            "no_backup_found_prefix": "Файл резервной копии не найден в контейнере по пути",
+            "no_backup_found_hint": "Сначала выполните команду docker cp.",
+            "completed_successfully_prefix": "Восстановление через прямое копирование файла успешно завершено!",
+            "failed_prefix": "Ошибка восстановления через прямое копирование файла:",
+            "backup_not_found_for_restoration": "Файл резервной копии не найден для восстановления.",
+            "buttons": {
+                "yes_restore_direct_copy": "Да, восстановить через прямое копирование"
+            }
+        },
+        "individual_notes": {
+            "default_title_with_date": "Импортированная заметка {{date}}",
+            "file_count_one": "1 заметка",
+            "file_count_many": "{{count}} заметок",
+            "summary": "Будут импортированы {{fileText}} в рабочее пространство Poznote без назначения в папку.",
+            "errors": {
+                "too_many_files": "Выбрано слишком много файлов. Максимум: {{max}}. Выбрано: {{count}}.",
+                "workspace_not_found": "Рабочее пространство не существует",
+                "entries_dir_not_found": "Не удалось найти каталог entries",
+                "upload_error": "Ошибка загрузки",
+                "invalid_file_type": "Неверный тип файла (разрешены только {{allowed}})",
+                "cannot_read_file": "Не удалось прочитать файл"
+            },
+            "summary_with_location": "Будут импортированы {{fileText}} в рабочее пространство \"{{workspace}}\", папку \"{{folder}}\".",
+            "summary_zip_with_location": "Будут извлечены и импортированы все файлы из ZIP-архива в рабочее пространство \"{{workspace}}\", папку \"{{folder}}\"."
+        },
+        "sections": {
+            "restore_from_backup": {
+                "title": "Хотите восстановить из ZIP-файла резервной копии Poznote?",
+                "description": "Восстановите базу данных Poznote из полной резервной копии"
+            },
+            "standard_restore": {
+                "title": "Стандартное восстановление",
+                "description": "Выберите полный ZIP-файл резервной копии.",
+                "helper": "Рекомендуемый максимальный размер: 500 МБ."
+            },
+            "direct_copy_restore": {
+                "title": "Восстановление, если стандартное не работает (тайм-аут при большом ZIP-файле)",
+                "step1": "1. Скопируйте файл в контейнер:",
+                "docker_command": "docker cp /путь/до/backup.zip poznote-webserver-1:/tmp/backup_restore.zip",
+                "step2": "2. Нажмите ниже для восстановления"
+            },
+            "individual_notes": {
+                "title": "Хотите импортировать HTML, Markdown, текстовые файлы или ZIP-архивы?",
+                "description": "Импорт отдельных заметок (HTML, Markdown или ZIP) в определенное рабочее пространство и папку",
+                "workspace": "Целевое рабочее пространство",
+                "loading": "Загрузка...",
+                "folder": "Целевая папка",
+                "optional": "необязательно",
+                "frontmatter_warning": "Если MD-заметка содержит ключ folder в front matter, это значение переопределит выбранное ниже. Поэтому убедитесь, что такая папка уже существует, иначе заметка будет создана в корне рабочего пространства.",
+                "zip_folders_info": "ZIP со структурой папок:",
+                "zip_folders_description": "Если ваш ZIP содержит папки, они будут автоматически созданы как папки в Poznote с сохранением иерархии (включая подпапки).",
+                "no_folder": "Без папки (корневой уровень)",
+                "select_files": "Выбрать файлы",
+                "files_info": "Несколько файлов (макс. {{maxIndividualFiles}}) или один ZIP-файл (макс. {{maxZipFiles}} файлов). Эти ограничения можно изменить,",
+                "files_info_link": "см. документацию",
+                "supported_formats": "Поддерживаются: .html, .md, .markdown, .txt, .json, .zip",
+                "description_html": "Импорт отдельных файлов HTML, Markdown, текст или JSON, или ZIP-архива, содержащего несколько файлов.<br><br>Заголовок будет автоматически создан из имени файла (без расширения), если только в front matter MD-файла не определен ключ title.<br><br><strong>Списки задач:</strong> .json файлы, содержащие массивы задач, и .md файлы с синтаксисом чекбоксов (- [ ] или - [x]) автоматически импортируются как списки задач.",
+                "helper": "Вы можете выбрать несколько файлов одновременно (максимум 50). Поддерживаемые форматы: .html, .md, .markdown, .txt, .json"
+            }
+        },
+        "buttons": {
+            "start_restore": "Начать восстановление",
+            "start_import": "Начать импорт"
+        },
+        "drag_drop": {
+            "individual_notes": "Перетащите файлы сюда",
+            "complete_backup": "Перетащите ZIP-файл резервной копии сюда",
+            "database": "Перетащите SQL-файл сюда",
+            "notes": "Перетащите ZIP-файл с заметками сюда",
+            "attachments": "Перетащите ZIP-файл с вложениями сюда"
+        },
+        "modals": {
+            "import_confirm": {
+                "title": "Вы уверены?",
+                "body": "Это заменит заголовки заметок, теги, поисковый индекс и метаданные, но не фактическое содержимое заметок. Это действие нельзя отменить.",
+                "confirm": "Да, импортировать"
+            },
+            "complete_restore": {
+                "title": "Полное восстановление?",
+                "warning_large_html": "<strong>Предупреждение:</strong> Этот файл имеет размер {{size}} МБ. Стандартная загрузка может быть медленной или завершиться ошибкой для больших файлов.<br><br><strong>Это заменит вашу базу данных, восстановит все заметки и вложения для <span style=\"color: #dc3545; font-weight: bold;\">всех рабочих пространств</span>.</strong>",
+                "warning_html": "<strong>Предупреждение:</strong> Это заменит вашу базу данных, восстановит все заметки и вложения для <span style=\"color: #dc3545; font-weight: bold;\">всех рабочих пространств</span>.",
+                "body_html": "Это заменит вашу базу данных, восстановит все заметки и вложения для <span style=\"color: #dc3545; font-weight: bold;\">всех рабочих пространств</span>.",
+                "confirm": "Да, полное восстановление"
+            },
+            "import_notes": {
+                "title": "Импортировать заметки?",
+                "body": "Будут импортированы все HTML-файлы из ZIP. Файлы будут добавлены к вашей существующей коллекции заметок.",
+                "confirm": "Да, импортировать заметки"
+            },
+            "import_attachments": {
+                "title": "Импортировать вложения?",
+                "body": "Будут импортированы все файлы из ZIP в папку вложений. Файлы будут добавлены к существующим вложениям.",
+                "confirm": "Да, импортировать вложения"
+            },
+            "complete_restore_direct_copy": {
+                "title": "Полное восстановление (прямое копирование)?",
+                "body_html": "Это заменит вашу базу данных, восстановит все заметки и вложения для <span style=\"color: #dc3545; font-weight: bold;\">всех рабочих пространств</span>.",
+                "confirm": "Да, полное восстановление"
+            },
+            "import_individual_notes": {
+                "title": "Импортировать отдельные заметки?",
+                "body": "Будут импортированы заметки в рабочее пространство Poznote.",
+                "confirm": "Да, импортировать заметки"
+            }
+        },
+        "alerts": {
+            "ok": "OK",
+            "no_zip_selected_title": "Не выбран ZIP-файл",
+            "no_zip_selected_restore": "Пожалуйста, выберите полный ZIP-файл резервной копии перед восстановлением.",
+            "no_zip_selected_notes": "Пожалуйста, выберите ZIP-файл, содержащий HTML-заметки, перед импортом.",
+            "no_zip_selected_attachments": "Пожалуйста, выберите ZIP-файл, содержащий вложения, перед импортом.",
+            "no_sql_selected_title": "Не выбран SQL-файл",
+            "no_sql_selected_body": "Пожалуйста, выберите SQL-файл перед импортом базы данных.",
+            "no_files_selected_title": "Не выбраны файлы",
+            "no_files_selected_body": "Пожалуйста, выберите один или несколько файлов HTML или Markdown перед импортом.",
+            "too_many_files_title": "Выбрано слишком много файлов",
+            "too_many_files_body": "Вы можете импортировать не более {{max}} файлов за раз. Выбрано {{count}} файлов. Пожалуйста, выберите меньше файлов и повторите попытку.",
+            "no_file_selected": {
+                "title": "Файл не выбран",
+                "body": "Пожалуйста, выберите файл перед импортом."
+            },
+            "no_workspace_title": "Не выбрано рабочее пространство",
+            "no_workspace_body": "Пожалуйста, выберите рабочее пространство для импортируемых заметок."
+        },
+        "inline": {
+            "standard": {
+                "button": "Начать полное восстановление (стандартное)",
+                "too_large": "⚠️ Размер файла {{size}} МБ. Стандартная загрузка может быть медленной или завершиться ошибкой."
+            }
+        }
+    },
+    "markdown_guide": {
+        "page_title": "Руководство по Markdown",
+        "title": "Руководство по Markdown",
+        "toc": {
+            "label": "Содержание",
+            "title": "Содержание"
+        },
+        "common": {
+            "syntax": "Синтаксис",
+            "result": "Результат"
+        },
+        "sections": {
+            "headers": {
+                "title": "Заголовки",
+                "heading1": "Заголовок 1",
+                "heading2": "Заголовок 2",
+                "heading3": "Заголовок 3"
+            },
+            "text_formatting": {
+                "title": "Форматирование текста",
+                "bold": "жирный текст",
+                "italic": "курсив",
+                "strikethrough": "зачеркнутый",
+                "inline_code": "встроенный код"
+            },
+            "unordered_lists": {
+                "title": "Маркированные списки",
+                "item_one": "Пункт первый",
+                "item_two": "Пункт второй",
+                "nested_item": "Вложенный пункт"
+            },
+            "ordered_lists": {
+                "title": "Нумерованные списки",
+                "first": "Первый",
+                "second": "Второй",
+                "third": "Третий"
+            },
+            "checkboxes": {
+                "title": "Чекбоксы",
+                "unchecked_note": "Неотмеченный пункт (только один пробел!)",
+                "unchecked": "Неотмеченный пункт",
+                "checked": "Отмеченный пункт"
+            },
+            "images": {
+                "title": "Изображения",
+                "alt_text": "Альтернативный текст",
+                "preview": "(предпросмотр изображения)"
+            },
+            "urls": {
+                "title": "Ссылки",
+                "link_text": "Текст ссылки"
+            },
+            "code_blocks": {
+                "title": "Блоки кода"
+            },
+            "quotes": {
+                "title": "Цитаты",
+                "quote_text": "Это цитата",
+                "quote_line2": "на две строки"
+            },
+            "line_breaks": {
+                "title": "Переносы строк",
+                "description": "Одинарный перенос строки в режиме редактирования создает перенос строки в предпросмотре.",
+                "first_line": "Первая строка",
+                "second_line": "Вторая строка"
+            },
+            "horizontal_rule": {
+                "title": "Горизонтальная линия"
+            },
+            "tables": {
+                "title": "Таблицы",
+                "col_name": "Имя",
+                "col_value": "Значение"
+            },
+            "math": {
+                "title": "Математические формулы",
+                "inline": {
+                    "title": "Встроенные формулы"
+                },
+                "block": {
+                    "title": "Выносные формулы"
+                },
+                "examples": {
+                    "title": "Больше примеров"
+                }
+            },
+            "mermaid": {
+                "title": "Диаграммы Mermaid",
+                "node_a": "Пиши Markdown",
+                "node_b": "Нужна диаграмма?",
+                "node_c": "Используй Mermaid",
+                "node_d": "Продолжай писать",
+                "edge_yes": "Да",
+                "edge_no": "Нет"
+            }
+        }
+    },
+    "public": {
+        "button": "Общие заметки",
+        "view_public_notes": "Просмотр общих заметок",
+        "page": {
+            "title": "Общие заметки",
+            "no_public_notes": "Пока нет общих заметок.",
+            "public_hint": "Поделитесь заметкой, нажав кнопку облака на панели инструментов заметки."
+        },
+        "filter_placeholder": "Фильтр по заголовку или названию папки...",
+        "no_filter_results": "Нет заметок, соответствующих запросу.",
+        "table": {
+            "note": "Заметка",
+            "url": "Общая ссылка"
+        },
+        "actions": {
+            "open": "Открыть",
+            "revoke": "Отозвать"
+        },
+        "indexable": "Индексируется",
+        "password_protected": "Защищено паролем",
+        "add_password_title": "Добавить защиту паролем",
+        "change_password_title": "Изменить пароль",
+        "password_remove_hint": "Оставьте пустым, чтобы снять защиту паролем.",
+        "enter_new_password": "Введите новый пароль",
+        "protection": {
+            "title": "Защита паролем",
+            "note_heading": "Защищено паролем",
+            "folder_heading": "Папка защищена паролем",
+            "error_incorrect": "Неверный пароль. Попробуйте снова.",
+            "additional_password_required": "Для этой заметки требуется дополнительный пароль. Введите следующий пароль, чтобы продолжить.",
+            "placeholder": "Введите пароль",
+            "unlock": "Разблокировать"
+        },
+        "errors": {
+            "token_missing": "Отсутствует токен",
+            "token_or_folder_auth_missing": "Отсутствует токен или авторизация папки",
+            "shared_folder_not_found": "Общая папка не найдена",
+            "shared_note_not_found_or_denied": "Общая заметка не найдена или доступ запрещен",
+            "folder_not_found": "Папка не найдена",
+            "note_not_found": "Заметка не найдена",
+            "server_error": "Ошибка сервера"
+        }
+    },
+    "public_folder": {
+        "filter_placeholder": "Фильтр по заголовкам",
+        "no_filter_results": "Нет результатов.",
+        "view_notes": "Как список",
+        "view_kanban": "Как канбан"
+    },
+    "kanban": {
+        "uncategorized": "Без категории",
+        "actions": {
+            "enable": "Включить канбан-вид",
+            "disable": "Отключить канбан-вид",
+            "open": "Открыть канбан-вид"
+        },
+        "notifications": {
+            "activated_title": "Канбан-вид включен",
+            "activated_message": "Эта папка теперь в режиме канбан. Нажмите на её иконку, чтобы открыть доску."
+        },
+        "list": {
+            "filter_placeholder": "Фильтр по названию доски...",
+            "no_boards": "Пока нет канбан-досок.",
+            "hint": "Включите канбан-вид для папки, чтобы увидеть её здесь."
+        }
+    },
+    "sidebar": {
+        "display": "Отображение",
+        "home": "Главная",
+        "settings": "Настройки",
+        "create": "Создать",
+        "toggle": "Скрыть/Показать левую колонку"
+    },
+    "home": {
+        "title": "Главная",
+        "dashboard": "Панель управления",
+        "folders": "Папки",
+        "shared_notes": "Общие заметки",
+        "shared_folders": "Общие папки",
+        "kanban": "Канбан",
+        "note": "заметка",
+        "notes": "заметок",
+        "support_poznote": "Поддержать Poznote",
+        "version": "Версия"
+    },
+    "search": {
+        "placeholder": "Поиск...",
+        "clear": "Очистить поиск",
+        "placeholder_notes": "Поиск по одному или нескольким словам...",
+        "placeholder_tags": "Поиск по одному или нескольким тегам...",
+        "placeholder_combined": "Поиск по заметкам и тегам...",
+        "toggle_options": "Переключить параметры поиска",
+        "validation": {
+            "select_type": "Пожалуйста, выберите хотя бы один параметр поиска (Заметки или Теги)",
+            "single_letter_warning": "Поиск по однобуквенным словам может дать слишком много результатов. Попробуйте использовать более длинные слова для точного поиска."
+        }
+    },
+    "icon_names": {
+        "briefcase": "портфель",
+        "home": "дом",
+        "star": "звезда",
+        "heart": "сердце",
+        "lightbulb": "лампочка",
+        "image": "изображение",
+        "music": "музыка",
+        "book": "книга",
+        "graduation-cap": "выпускник",
+        "code": "код",
+        "rocket": "ракета",
+        "plane": "самолет",
+        "map-marker-alt": "метка",
+        "calendar-alt": "календарь",
+        "clock": "часы",
+        "user": "пользователь",
+        "users": "пользователи",
+        "cog": "настройки",
+        "wrench": "гаечный ключ",
+        "paint-brush": "кисть",
+        "palette": "палитра",
+        "camera": "камера",
+        "shield": "щит",
+        "lock": "замок",
+        "key": "ключ",
+        "envelope": "конверт",
+        "inbox": "входящие",
+        "archive": "архив",
+        "box": "коробка",
+        "shopping-cart": "корзина",
+        "credit-card": "карта",
+        "chart-line": "график",
+        "chart-bar": "диаграмма",
+        "database": "база данных",
+        "server": "сервер",
+        "cloud": "облако",
+        "download": "скачать",
+        "upload": "загрузить",
+        "tasks": "задачи",
+        "clipboard": "буфер обмена",
+        "file-alt": "файл",
+        "copy": "копия",
+        "gamepad": "геймпад",
+        "trophy": "трофей",
+        "gift": "подарок",
+        "birthday-cake": "торт",
+        "coffee": "кофе",
+        "pizza-slice": "пицца",
+        "utensils": "столовые приборы",
+        "medkit": "аптечка",
+        "heartbeat": "пульс",
+        "dumbbell": "гантель",
+        "bicycle": "велосипед",
+        "tree": "дерево",
+        "leaf": "лист",
+        "seedling": "росток",
+        "paw": "лапа",
+        "bug": "жук",
+        "flask": "колба",
+        "atom": "атом",
+        "magnet": "магнит",
+        "fire": "огонь",
+        "sun": "солнце",
+        "moon": "луна",
+        "umbrella": "зонт",
+        "snowflake": "снежинка",
+        "bolt": "молния",
+        "flag": "флаг",
+        "bookmark": "закладка",
+        "thumbs-up": "нравится",
+        "smile": "улыбка",
+        "layer-group": "слои",
+        "terminal": "терминал",
+        "at": "собака",
+        "hashtag": "хэштег",
+        "question-circle": "вопрос",
+        "times-circle": "закрыть",
+        "eye": "глаз",
+        "anchor": "якорь",
+        "apple-alt": "яблоко",
+        "award": "награда",
+        "settings": "настройки",
+        "mail": "почта",
+        "video": "видео",
+        "trending-up": "рост",
+        "list-todo": "список дел",
+        "gamepad-2": "геймпад",
+        "utensils-crossed": "столовые приборы",
+        "briefcase-medical": "медицинский портфель",
+        "activity": "активность",
+        "dumbbell": "гантель",
+        "bike": "велосипед",
+        "tree-deciduous": "лиственное дерево",
+        "sprout": "росток",
+        "paw-print": "отпечаток лапы",
+        "flask-conical": "колба",
+        "flame": "пламя",
+        "zap": "молния",
+        "layers": "слои",
+        "at-sign": "собака",
+        "hash": "хэш",
+        "help-circle": "помощь",
+        "x-circle": "закрыть",
+        "apple": "яблоко",
+        "candy": "конфета",
+        "badge-check": "значок",
+        "network": "сеть",
+        "pie-chart": "круговая диаграмма",
+        "clipboard-list": "список",
+        "boxes": "коробки",
+        "monitor": "монитор",
+        "scroll": "свиток",
+        "dna": "ДНК",
+        "dollar-sign": "доллар",
+        "drum": "барабан",
+        "euro": "евро",
+        "feather": "перо",
+        "file-code": "файл с кодом",
+        "fingerprint": "отпечаток пальца",
+        "gem": "драгоценность",
+        "glasses": "очки",
+        "globe": "земной шар",
+        "guitar": "гитара",
+        "hamburger": "гамбургер",
+        "hammer": "молоток",
+        "hard-hat": "каска",
+        "headphones": "наушники",
+        "headset": "гарнитура",
+        "mountain": "гора",
+        "shapes": "фигуры",
+        "id-card": "удостоверение",
+        "factory": "завод",
+        "infinity": "бесконечность",
+        "swords": "мечи",
+        "laptop": "ноутбук",
+        "map": "карта",
+        "medal": "медаль",
+        "mic": "микрофон",
+        "microscope": "микроскоп",
+        "banknote": "банкнота",
+        "passport": "паспорт",
+        "pen": "ручка",
+        "pencil": "карандаш",
+        "pepper": "перец",
+        "phone": "телефон",
+        "piggy-bank": "копилка",
+        "plane-takeoff": "взлет",
+        "plug": "вилка",
+        "printer": "принтер",
+        "puzzle": "пазл",
+        "receipt": "чек",
+        "bot": "бот",
+        "person-standing": "стоящий человек",
+        "satellite": "спутник",
+        "satellite-dish": "спутниковая тарелка",
+        "shopping-bag": "пакет",
+        "signpost": "указатель",
+        "git-branch": "ветка git",
+        "flower": "цветок",
+        "stamp": "штамп",
+        "waves": "волны",
+        "refresh-cw": "обновить",
+        "syringe": "шприц",
+        "tablet": "планшет",
+        "gauge": "спидометр",
+        "tag": "тег",
+        "tags": "теги",
+        "drama": "драма",
+        "tools": "инструменты",
+        "tractor": "трактор",
+        "trash-alt": "корзина",
+        "tree-alt": "дерево",
+        "truck": "грузовик",
+        "tv": "телевизор",
+        "umbrella-beach": "пляжный зонт",
+        "utensil-spoon": "ложка",
+        "vial": "пробирка",
+        "walking": "ходьба",
+        "warehouse": "склад",
+        "weight": "вес",
+        "wind": "ветер",
+        "columns": "колонки",
+        "message-circle": "сообщение",
+        "bell": "колокольчик",
+        "binoculars": "бинокль",
+        "book-open": "открытая книга",
+        "brush": "кисть",
+        "building": "здание",
+        "bus": "автобус",
+        "calculator": "калькулятор",
+        "car": "автомобиль",
+        "cloud-sun": "облачно",
+        "coins": "монеты",
+        "compass": "компас",
+        "crown": "корона",
+        "film": "пленка",
+        "folder-tree": "дерево папок",
+        "hospital": "больница",
+        "school": "школа",
+        "stethoscope": "стетоскоп",
+        "store": "магазин",
+        "wallet": "бумажник",
+        "wifi": "вайфай",
+        "yen-sign": "йена"
+    },
+    "folder_icon": {
+        "default": "По умолчанию"
+    },
+    "git_sync": {
+        "title": "Синхронизация с {{provider}}",
+        "description": "Синхронизируйте свои заметки и вложения с GitHub или Forgejo. Файлы сохраняются как обычные файлы с metadata.json, который хранит теги, папки, даты и вложения.",
+        "warning": "Не полагайтесь на эту функцию как на единственную резервную копию.\nРегулярно экспортируйте данные с помощью функции резервного копирования в настройках.",
+        "confirm_push": "Отправить все заметки и вложения в {{provider}}? Существующие файлы будут обновлены, а файлы, которых больше нет в Poznote, будут удалены из репозитория.",
+        "confirm_pull": "Загрузить все заметки и вложения из {{provider}}? Локальные данные будут перезаписаны удаленной версией. Заметки, не найденные в {{provider}}, будут перемещены в корзину.",
+        "confirm_auto_pull": "Начата новая сессия. Хотите загрузить изменения из {{provider}}?",
+        "confirm_auto_pull_warning": "Начата новая сессия. Хотите загрузить изменения из {{provider}}?\n\nЛокальные заметки, не найденные в {{provider}}, будут перемещены в корзину.",
+        "auto_pull_complete": "Git pull завершен. Обновление страницы...",
+        "auto_pull_no_changes": "Git pull завершен. Изменений не найдено.",
+        "pulling": "Загрузка изменений...",
+        "starting": "Синхронизация...",
+        "config": {
+            "title": "Конфигурация",
+            "status": "Статус",
+            "repository": "Репозиторий",
+            "branch": "Ветка",
+            "mode": "Режим синхронизации",
+            "token": "Токен доступа",
+            "token_set": "Настроен",
+            "token_missing": "Не настроен",
+            "not_configured": "Не настроено",
+            "not_configured_yet": "Для настройки",
+            "hint": "Синхронизация с {{provider}} отключена. Установите POZNOTE_GIT_SYNC_ENABLED=true в вашем .env файле, чтобы включить её."
+        },
+        "auto_sync": {
+            "title": "Автоматическая синхронизация",
+            "push_label": "Автоматически отправлять при выходе",
+            "push_description": "При выходе из заметки (переключении на другую или закрытии вкладки) её последняя версия автоматически отправляется в Git-репозиторий, если она была изменена во время сессии.",
+            "pull_label": "Автоматически запрашивать загрузку при загрузке",
+            "pull_description": "Один раз за сессию спрашивает, загружать ли изменения из Git-репозитория. Обновляет существующие заметки, импортирует новые и перемещает в корзину локальные заметки, отсутствующие на удаленном сервере.",
+            "saving": "Конфигурация сохранена"
+        },
+        "test": {
+            "title": "Проверка соединения",
+            "button": "Проверить соединение"
+        },
+        "last_sync": {
+            "title": "Последняя синхронизация",
+            "action": "Действие",
+            "time": "Время",
+            "pushed": "Отправлено",
+            "pulled": "Загружено",
+            "notes": "заметок"
+        },
+        "actions": {
+            "title": "Действия синхронизации",
+            "workspace": "Рабочее пространство: {{workspace}}",
+            "target_workspace": "Целевое рабочее пространство",
+            "all_workspaces": "Все рабочие пространства",
+            "push": {
+                "title": "Отправить в {{provider}}",
+                "description": "Экспортирует все ваши заметки и вложения в {{provider}} как обычные файлы. Обновляет существующие файлы и удаляет файлы, которых больше нет в Poznote.",
+                "button": "Отправить"
+            },
+            "pull": {
+                "title": "Загрузить из {{provider}}",
+                "description": "Импортирует все заметки и вложения из {{provider}}. Перезаписывает локальное содержимое и перемещает в корзину заметки, отсутствующие в репозитории.",
+                "button": "Загрузить"
+            }
+        },
+        "messages": {
+            "connection_success": "Соединение успешно! Подключено к {{repo}}",
+            "connection_error": "Ошибка соединения: {{error}}",
+            "push_success": "Успешно отправлено {{count}} заметок, удалено {{deleted}} файлов ({{errors}} ошибок)",
+            "push_error": "Ошибка отправки: {{error}}",
+            "pull_success": "Успешно загружено {{pulled}} новых заметок, обновлено {{updated}} существующих, удалено {{deleted}} заметок ({{errors}} ошибок)",
+            "pull_error": "Ошибка загрузки: {{error}}"
+        },
+        "debug": {
+            "title": "Отладочная информация",
+            "show": "Показать отладочную информацию",
+            "hide": "Скрыть отладочную информацию",
+            "copy": "Копировать",
+            "copied": "Скопировано!"
+        },
+        "limitations": {
+            "title": "Ограничения синхронизации",
+            "element": "Элемент",
+            "html_notes": "HTML-заметки",
+            "markdown_notes": "Заметки Markdown",
+            "text_content": "Текстовое содержимое",
+            "attachments": "Файловые вложения",
+            "embedded_images": "Изображения",
+            "metadata": "Метаданные (теги, дата, ID)",
+            "embedded_note": "Встроенные изображения сохраняются в HTML, но не отображаются на {{provider}}"
+        },
+        "not_configured": {
+            "title": "Синхронизация с {{provider}} не настроена",
+            "description": "Чтобы использовать синхронизацию с {{provider}}, вам нужно настроить учетные данные {{provider}} в файле .env.",
+            "steps_title": "Инструкция по настройке",
+            "step1": "Создайте персональный токен доступа {{provider}} с областью 'repo'",
+            "step2": "Создайте репозиторий {{provider}} (публичный или приватный) для ваших заметок",
+            "step3": "Добавьте конфигурацию в ваш файл .env",
+            "step4": "Перезапустите приложение, чтобы изменения вступили в силу"
+        }
+    },
+    "sort": {
+        "header": "Сортировать по",
+        "alphabet": "Названию",
+        "created": "Дате создания",
+        "modified": "Дате изменения"
+    },
+    "calendar": {
+        "months": {
+            "january": "Январь",
+            "february": "Февраль",
+            "march": "Март",
+            "april": "Апрель",
+            "may": "Май",
+            "june": "Июнь",
+            "july": "Июль",
+            "august": "Август",
+            "september": "Сентябрь",
+            "october": "Октябрь",
+            "november": "Ноябрь",
+            "december": "Декабрь"
+        },
+        "weekdays": {
+            "monday": "П",
+            "tuesday": "В",
+            "wednesday": "С",
+            "thursday": "Ч",
+            "friday": "П",
+            "saturday": "С",
+            "sunday": "В"
+        },
+        "buttons": {
+            "previous_month": "Предыдущий месяц",
+            "next_month": "Следующий месяц",
+            "today": "Сегодня",
+            "show_calendar": "Показать календарь",
+            "hide_calendar": "Скрыть календарь"
+        },
+        "modal": {
+            "title": "Заметки от",
+            "open": "Открыть",
+            "open_all": "Открыть все",
+            "close": "Закрыть"
+        }
+    },
+    "workspace_menu": {
+        "workspaces": "Рабочие пространства",
+        "logout": "Выйти"
+    }
+}
