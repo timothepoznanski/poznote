@@ -834,11 +834,30 @@ For installation, configuration, and setup instructions, see the [MCP Server doc
 
 ## Poznote Extension
 
-The **Poznote URL Saver** is a browser extension (Chrome, Edge, Brave, Opera, and any Chromium-based browser) that allows you to quickly save the URL of the current page to your Poznote instance with a single click.
+The **Poznote URL Saver** is a browser extension that allows you to quickly save the URL of the current page to your Poznote instance with a single click.
 
 <p align="center">
   <img src="images/chrome-extension.png" alt="Poznote Chrome Extension" width="50%">
 </p>
+
+### Install from Chrome Web Store (Recommended)
+
+[![Available in the Chrome Web Store](https://storage.googleapis.com/web-dev-uploads/image/WlD8wC6g8khYWPJUsQceQkhXSlv1/iNEddTyWiMfLSwFD6qGq.png)](https://chrome.google.com/webstore)
+
+Install the extension directly from the Chrome Web Store. Works with Chrome, Edge, Brave, Opera, and any Chromium-based browser.
+
+**[Install Poznote URL Saver →](https://chrome.google.com/webstore)**
+
+**Benefits:**
+- ✅ Automatic updates
+- ✅ Verified by Google
+- ✅ Easy one-click installation
+
+<details>
+<summary><strong>Alternative: Install from Source (Developer Mode)</strong></summary>
+<br>
+
+You can also install the extension manually from source:
 
 1. Get the extension folder (two possibilities):
    - **Download:** [Download the repository as ZIP](https://github.com/timothepoznanski/poznote/archive/refs/heads/main.zip) and extract it
@@ -849,6 +868,10 @@ The **Poznote URL Saver** is a browser extension (Chrome, Edge, Brave, Opera, an
 5. Click **Load unpacked** in the top left
 6. Select the `poznote-url-saver` folder from the Poznote repository
 7. The extension is now installed and ready to use!
+
+> **Note:** Manual installation does not provide automatic updates. You will need to manually download and reinstall the extension to get new versions. For automatic updates, use the Chrome Web Store version.
+
+</details>
 
 ## API Documentation
 
