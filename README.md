@@ -18,12 +18,6 @@ Poznote is a personal note-taking and documentation platform.
 This project started from a simple personal need: a practical way to write, organize, and synchronize my technical and personal notes. From the beginning, the priority has been simplicity and ease of use (I have no patience for bloated interfaces with unnecessary options). Advanced features exist, but they never get in the way of a clear and accessible experience.
 <br>
 <p align="center">
-  <a href="https://ko-fi.com/Q5Q61IECOW"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support me on Ko-fi"></a>
-</p>
-
-
-
-<p align="center">
   <img src="images/poznote-light.png" alt="Poznote-light" width="100%">
 </p>
 
