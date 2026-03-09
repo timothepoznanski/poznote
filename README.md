@@ -1,4 +1,25 @@
 
+<p align="center">
+  <img src="images/poznote.svg" alt="Poznote Logo" width="80">
+</p>
+
+<h1 align="center">Poznote</h1>
+
+<div align="center">
+
+[![GitHub stars](https://img.shields.io/github/stars/timothepoznanski/poznote?style=flat&logo=github)](https://github.com/timothepoznanski/poznote/stargazers) [![License](https://img.shields.io/github/license/timothepoznanski/poznote?style=flat)](https://github.com/timothepoznanski/poznote/blob/main/LICENCE) [![Docker GHCR](https://img.shields.io/badge/Docker-GHCR-2496ED?style=flat&logo=docker&logoColor=white)](https://github.com/timothepoznanski/poznote/pkgs/container/poznote)
+
+</div>
+
+<h3 align="center">
+Poznote is a personal note-taking and documentation platform.
+</h3>
+This project started from a simple personal need: a practical way to write, organize, and synchronize my technical and personal notes. From the beginning, the priority has been simplicity and ease of use (I have no patience for bloated interfaces with unnecessary options). Advanced features exist, but they never get in the way of a clear and accessible experience.
+<br>
+<br>
+<p align="center">
+  <img src="images/poznote-light.png" alt="Poznote-light" width="100%">
+</p>
 
 Discover all the features here:
 
@@ -13,7 +34,7 @@ Discover all the features here:
 - 📂 **Workspaces**
 - 💾 **Built-in Backup**
 - 🗑️ **Trash System**
-- 💻 **Syntax Highlighting**
+- 💻 **Syntax Highlight**
 - 🌐 **REST API**
 - 🔗 **Public Sharing**
 - ✅ **Tasklist**
