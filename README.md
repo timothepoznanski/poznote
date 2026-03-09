@@ -22,31 +22,11 @@ This project started from a simple personal need: a practical way to write, orga
 </p>
 
 
-- 📝 **Rich Text Editor**
-- 🔍 **Powerful Search**
-- 🏷️ **Tag System**
-- 📎 **File Attachments**
-- 📱 **Responsive Design**
-- 🏠 **Self-Hosted**
-- 🔐 **OpenID Connect**
-- 🖥️ **Multi-instance**
-- 📂 **Workspaces**
-- 💾 **Built-in Backup**
-- 🗑️ **Trash System**
-- 💻 **Syntax Highlight**
-- 🌐 **REST API**
-- 🔗 **Public Sharing**
-- ✅ **Tasklist**
-- ⬇️ **Markdown Notes**
-- 🌙 **Dark Mode**
-- 🎨 **Excalidraw Integration**
-- 📊 **Mermaid Diagrams**
-- ➗ **Math Rendering**
-- 🔌 **MCP Server**
-- 👥 **Multi-user**
-- 🌍 **Languages**
-- 📋 **Kanban View**
-- 🐙 **GitHub Synchronization**
+Discover all the [features here](https://poznote.com/index.html#features).
+
+<p align="center">
+  <img src="images/poznote-features.png" alt="Poznote Features" width="100%">
+</p>
 
 ## Table of content
 
