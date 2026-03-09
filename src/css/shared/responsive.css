@@ -83,7 +83,14 @@
     .shared-buttons-container {
         justify-content: center;
         margin: 15px 10px;
-        gap: 30px;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .shared-buttons-container .btn {
+        flex: 1 1 auto;
+        min-width: 120px;
+        margin: 0;
     }
 
     .shared-content {
