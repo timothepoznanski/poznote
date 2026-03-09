@@ -2206,5 +2206,8 @@
             "notice_scan_clean": "Aucune image base64 trouvée. Rien à faire.",
             "notice_scan_found": "{{count}} image(s) intégrée(s) trouvée(s) dans {{notes}} note(s). Utilisez l’étape 2 pour les convertir."
         }
+    },
+    "backlinks": {
+        "title": "Rétroliens"
     }
 }

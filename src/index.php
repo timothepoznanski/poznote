@@ -205,6 +205,7 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <link type="text/css" rel="stylesheet" href="css/excalidraw.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/excalidraw-unified.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/note-reference.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/backlinks.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/search-replace.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/folder-icon-modal.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/kanban.css?v=<?php echo $v; ?>"/>
@@ -1040,6 +1041,7 @@ window.calendarTranslations = {
 };
 </script>
 <script src="js/calendar.js?v=<?php echo $v; ?>"></script>
+<script src="js/backlinks.js?v=<?php echo $v; ?>"></script>
 
 <?php if ($note && is_numeric($note)): ?>
 <!-- Data for draft check (used by index-events.js) -->

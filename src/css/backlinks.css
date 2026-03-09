@@ -1,19 +1,19 @@
 /**
- * Notes - Attachments Row
+ * Backlinks row
  *
- * Styles for the note attachments row, paperclip icon,
- * attachment links, and icon button wrapper.
+ * Mirrors the layout and style of .note-attachments-row exactly.
  */
 
-/* Attachments Row */
-.note-attachments-row {
+/* Row — identical to .note-attachments-row */
+.backlinks-row {
     display: flex;
     align-items: center;
     margin-bottom: 5px;
-    margin-top: 8px;
+    margin-top: 5px;
 }
 
-.lucide-paperclip.icon_attachment {
+/* Icon — identical to .lucide-paperclip.icon_attachment */
+.lucide-link.icon_backlinks {
     font-size: 14px;
     margin-right: 14px;
     flex-shrink: 0;
@@ -21,7 +21,20 @@
     line-height: 1;
 }
 
-.note-attachments-list {
+/* Icon button wrapper — identical to .icon-attachment-btn */
+.icon-backlinks-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+/* Links list — identical to .note-attachments-list */
+.backlinks-links-list {
     flex: 1;
     min-width: 0;
     line-height: 1.4;
@@ -36,14 +49,14 @@
     -ms-overflow-style: none;
 }
 
-.note-attachments-list::-webkit-scrollbar {
+.backlinks-links-list::-webkit-scrollbar {
     width: 0;
     height: 0;
     display: none;
 }
 
-/* Attachment Link */
-.attachment-link {
+/* Individual link — identical to .attachment-link */
+.backlink-link {
     color: #007DB8 !important;
     text-decoration: none;
     font-size: 14px;
@@ -56,30 +69,11 @@
     white-space: nowrap;
 }
 
-.attachment-link:hover {
+.backlink-link:hover {
     color: #005a8b !important;
     text-decoration: underline;
 }
 
-.attachment-link:visited {
+.backlink-link:visited {
     color: #007DB8 !important;
-}
-
-/* Paperclip icon button wrapper */
-.icon-attachment-btn {
-    background: transparent;
-    border: none;
-    padding: 0;
-    margin: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    line-height: 1;
-}
-
-.icon-attachment-btn:focus {
-    outline: 2px solid rgba(0, 125, 184, 0.25);
-    outline-offset: 2px;
-    border-radius: 4px;
 }

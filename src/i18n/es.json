@@ -2048,5 +2048,8 @@
             "notice_scan_clean": "No se encontraron imágenes base64. Nada que hacer.",
             "notice_scan_found": "{{count}} imagen(es) encontrada(s) en {{notes}} nota(s). Usar el paso 2 para convertirlas."
         }
+    },
+    "backlinks": {
+        "title": "Vínculos inversos"
     }
 }

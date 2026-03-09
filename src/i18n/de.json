@@ -2048,5 +2048,8 @@
             "notice_scan_clean": "Keine base64-Bilder gefunden. Nichts zu tun.",
             "notice_scan_found": "{{count}} eingebettete(s) Bild(er) in {{notes}} Notiz(en) gefunden. Schritt 2 zum Konvertieren verwenden."
         }
+    },
+    "backlinks": {
+        "title": "Rückverweise"
     }
 }

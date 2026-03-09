@@ -1627,5 +1627,8 @@
             "notice_scan_clean": "No base64 images found across all users. Nothing to do.",
             "notice_scan_found": "{{count}} inline image(s) found in {{notes}} note(s). Use Step 2 to convert them."
         }
+    },
+    "backlinks": {
+        "title": "Backlinks"
     }
 }

@@ -2052,5 +2052,8 @@
             "notice_scan_clean": "Nenhuma imagem base64 encontrada. Nada a fazer.",
             "notice_scan_found": "{{count}} imagem(ns) encontrada(s) em {{notes}} nota(s). Use o passo 2 para as converter."
         }
+    },
+    "backlinks": {
+        "title": "Backlinks"
     }
 }
