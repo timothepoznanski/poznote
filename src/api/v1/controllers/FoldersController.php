@@ -1245,9 +1245,12 @@ class FoldersController {
             // Source folder was shared, remove shares from moved notes
             foreach ($notes as $note) {
                 // Check if note was actually shared before deleting
-                $checkSharedStmt = $this->db->prepare("SELECT id FROM shared_notes WHERE note_id = ? LIMIT 1");
+                $checkSharedStmt = $this->db->prepare("SELECT token FROM shared_notes WHERE note_id = ? LIMIT 1");
                 $checkSharedStmt->execute([$note['id']]);
-                if ($checkSharedStmt->fetchColumn()) {
+                $existingToken = $checkSharedStmt->fetchColumn();
+                if ($existingToken) {
+                    require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+                    unregisterSharedLink($existingToken);
                     $deleteShareStmt = $this->db->prepare("DELETE FROM shared_notes WHERE note_id = ?");
                     $deleteShareStmt->execute([$note['id']]);
                     $shareDelta--;
@@ -1272,6 +1275,8 @@ class FoldersController {
                         $noteToken = bin2hex(random_bytes(16));
                         $insertShareStmt = $this->db->prepare("INSERT INTO shared_notes (note_id, token, theme, indexable) VALUES (?, ?, ?, ?)");
                         $insertShareStmt->execute([$note['id'], $noteToken, $sharedFolder['theme'], $sharedFolder['indexable']]);
+                        require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+                        registerSharedLink($noteToken, $_SESSION['user_id'], 'note', (int)$note['id']);
                         $shareDelta++;
                     }
                 }
@@ -1388,10 +1393,13 @@ class FoldersController {
                 
                 if ($oldSharedFolderStmt->fetchColumn()) {
                     // Check if note was actually shared
-                    $checkWasSharedStmt = $this->db->prepare("SELECT id FROM shared_notes WHERE note_id = ? LIMIT 1");
+                    $checkWasSharedStmt = $this->db->prepare("SELECT token FROM shared_notes WHERE note_id = ? LIMIT 1");
                     $checkWasSharedStmt->execute([$noteId]);
-                    if ($checkWasSharedStmt->fetchColumn()) {
+                    $existingToken = $checkWasSharedStmt->fetchColumn();
+                    if ($existingToken) {
                         // Old folder was shared, remove the share from this note
+                        require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+                        unregisterSharedLink($existingToken);
                         $deleteShareStmt = $this->db->prepare("DELETE FROM shared_notes WHERE note_id = ?");
                         $deleteShareStmt->execute([$noteId]);
                         $shareDelta = -1;
@@ -1415,6 +1423,8 @@ class FoldersController {
                         $noteToken = bin2hex(random_bytes(16));
                         $insertShareStmt = $this->db->prepare("INSERT INTO shared_notes (note_id, token, theme, indexable) VALUES (?, ?, ?, ?)");
                         $insertShareStmt->execute([$noteId, $noteToken, $sharedFolder['theme'], $sharedFolder['indexable']]);
+                        require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+                        registerSharedLink($noteToken, $_SESSION['user_id'], 'note', (int)$noteId);
                         $shareDelta = 1; // Note was newly shared
                     }
                 }

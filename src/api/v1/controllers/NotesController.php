@@ -427,6 +427,8 @@ class NotesController {
                         $noteToken = bin2hex(random_bytes(16));
                         $insertShareStmt = $this->con->prepare("INSERT INTO shared_notes (note_id, token, theme, indexable) VALUES (?, ?, ?, ?)");
                         $insertShareStmt->execute([$id, $noteToken, $sharedFolder['theme'], $sharedFolder['indexable']]);
+                        require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+                        registerSharedLink($noteToken, $_SESSION['user_id'], 'note', (int)$id);
                         $wasShared = true;
                     }
                 }
@@ -1309,6 +1311,8 @@ class NotesController {
                     $noteToken = bin2hex(random_bytes(16));
                     $insertShareStmt = $this->con->prepare("INSERT INTO shared_notes (note_id, token, theme, indexable) VALUES (?, ?, ?, ?)");
                     $insertShareStmt->execute([$newId, $noteToken, $sharedFolder['theme'], $sharedFolder['indexable']]);
+                    require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+                    registerSharedLink($noteToken, $_SESSION['user_id'], 'note', (int)$newId);
                     $wasShared = true;
                 }
             }
