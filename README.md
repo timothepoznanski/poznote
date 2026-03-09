@@ -21,7 +21,6 @@ This project started from a simple personal need: a practical way to write, orga
   <img src="images/poznote-light.png" alt="Poznote-light" width="100%">
 </p>
 
-Discover all the features here:
 
 - 📝 **Rich Text Editor**
 - 🔍 **Powerful Search**
