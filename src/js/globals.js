@@ -54,27 +54,6 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(function () { });
     } catch (e) { }
-    
-    // Apply hide_support_icon setting
-    try {
-        fetch('/api/v1/settings/hide_support_icon', {
-            method: 'GET',
-            credentials: 'same-origin'
-        })
-            .then(function (r) { return r.json(); })
-            .then(function (j) {
-                var hideSupport = j && j.success && (j.value === '1' || j.value === 'true');
-                var supportBtn = document.querySelector('.sidebar-support');
-                if (supportBtn) {
-                    if (hideSupport) {
-                        supportBtn.style.display = 'none';
-                    } else {
-                        supportBtn.style.display = '';
-                    }
-                }
-            })
-            .catch(function () { });
-    } catch (e) { }
 });
 
 // Centralized mobile detection: use CSS breakpoint (max-width: 800px)
