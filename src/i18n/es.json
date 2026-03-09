@@ -432,7 +432,8 @@
             "kanban_on_folder_click": "Abrir vista Kanban al hacer clic en la carpeta",
             "index_icon_scale": "Escalado de iconos del índice",
             "note_content_width": "Ancho del contenido de la nota",
-            "code_block_word_wrap": "Ajuste de línea en bloques de código"
+            "code_block_word_wrap": "Ajuste de línea en bloques de código",
+            "hide_support_icon": "Ocultar icono de like"
         },
         "badges": {
             "font_size_default": "predeterminado ({{size}}px)",
@@ -457,7 +458,17 @@
         "home": "Inicio",
         "settings": "Configuración",
         "create": "Crear",
-        "toggle": "Mostrar/Ocultar la columna izquierda"
+        "toggle": "Mostrar/Ocultar la columna izquierda",
+        "support": "Dejar un comentario",
+        "support_popup": {
+            "link_label": "Dejar un comentario aquí",
+            "thank_you": "¡Muchas gracias!",
+            "intro_line1": "Poznote es un <strong>proyecto gratuito y de código abierto sin seguimiento ni análisis</strong>, por lo que casi no tengo forma de saber cuánto se usa.",
+            "intro_line2": "Dejar un comentario rápido en la discusión de GitHub realmente me ayudaría a entender si Poznote es útil y vale la pena continuar desarrollándolo."
+        },
+        "support_modal": {
+            "title": "¡Hola!"
+        }
     },
     "home": {
         "title": "Inicio",

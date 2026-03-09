@@ -433,6 +433,15 @@ if ($isAdmin) {
                 </div>
             </div>
 
+            <!-- Hide Support Icon -->
+            <div class="home-card" id="hide-support-icon-card">
+                <div class="home-card-icon"><i class="lucide lucide-thumbs-up"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.hide_support_icon', [], 'Hide support icon'); ?></span>
+                    <span id="hide-support-icon-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
         </div>
 
         <?php if ($isAdmin): ?>

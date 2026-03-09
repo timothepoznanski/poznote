@@ -434,7 +434,8 @@
             "kanban_on_folder_click": "点击文件夹时打开看板视图",
             "index_icon_scale": "索引页图标缩放",
             "note_content_width": "笔记内容宽度",
-            "code_block_word_wrap": "代码块自动换行"
+            "code_block_word_wrap": "代码块自动换行",
+            "hide_support_icon": "隐藏点赞图标"
         },
         "badges": {
             "font_size_default": "默认 ({{size}}px)",
@@ -459,7 +460,17 @@
         "home": "首页",
         "settings": "设置",
         "create": "创建",
-        "toggle": "显示/隐藏左侧边栏"
+        "toggle": "显示/隐藏左侧边栏",
+        "support": "留下评论",
+        "support_popup": {
+            "link_label": "在此留下评论",
+            "thank_you": "非常感谢！",
+            "intro_line1": "Poznote 是一个<strong>免费开源</strong>的项目，且<strong>没有跟踪或分析功能</strong>，因此我几乎无法知道它的使用情况。",
+            "intro_line2": "在 GitHub 讨论中留下快速评论将真正帮助我了解 Poznote 是否有用以及是否值得继续开发。"
+        },
+        "support_modal": {
+            "title": "你好！"
+        }
     },
     "home": {
         "title": "首页",

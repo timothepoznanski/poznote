@@ -99,7 +99,8 @@
             "kanban_on_folder_click": "Open Kanban view on folder click",
             "index_icon_scale": "Index icon scaling",
             "note_content_width": "Note content width",
-            "code_block_word_wrap": "Code block word wrap"
+            "code_block_word_wrap": "Code block word wrap",
+            "hide_support_icon": "Hide like icon"
         },
         "badges": {
             "font_size_default": "default ({{size}}px)",
@@ -1222,7 +1223,17 @@
         "home": "Home",
         "settings": "Settings",
         "create": "Create",
-        "toggle": "Hide/Show left column"
+        "toggle": "Hide/Show left column",
+        "support": "Leave a comment",
+        "support_popup": {
+            "link_label": "Leave a comment here",
+            "thank_you": "Thank you so much!",
+            "intro_line1": "Poznote is a <strong>free and open-source</strong> project with <strong>no tracking or analytics</strong>, so I have almost no way of knowing how widely it's used.",
+            "intro_line2": "Leaving a quick comment in the GitHub discussion would really help me understand if Poznote is useful and worth continuing to develop."
+        },
+        "support_modal": {
+            "title": "Hello!"
+        }
     },
     "home": {
         "title": "Home",
