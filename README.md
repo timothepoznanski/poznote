@@ -22,11 +22,46 @@ This project started from a simple personal need: a practical way to write, orga
   <img src="images/poznote-light.png" alt="Poznote-light" width="100%">
 </p>
 
-Discover all the [features here](https://poznote.com/index.html#features).
+Discover all the features here:
 
-<p align="center">
-  <img src="images/poznote-features.png" alt="Poznote Features" width="100%">
-</p>
+### 🚀 Features
+
+#### ✍️ Editor Capabilities
+- **Hybrid Editing**: Support for both rich **HTML** editing and **Markdown** with real-time rendering.
+- **Excalidraw Integration**: Built-in virtual whiteboard for sketching diagrams and hand-drawn notes directly within your entries.
+- **Advanced Rendering**: 
+  - **Mermaid.js**: Support for flowcharts, sequence diagrams, and Gantt charts.
+  - **LaTeX/KaTeX**: High-quality mathematical formula rendering.
+  - **Syntax Highlighting**: Beautiful code blocks for developers.
+- **Media Support**: Inline image uploads, embedded videos (YouTube, Bilibili), and a dedicated **Audio Player** for voice notes.
+- **Organization Tools**: Checklists, task lists, and interactive tables.
+
+#### 📂 Organization & Navigation
+- **Hierarchical Folders**: Organize notes into nested folders with customizable icons and colors.
+- **Workspaces**: Separate your concerns by switching between different workspaces (e.g., Personal, Work).
+- **Tags & Favorites**: Quickly label notes with tags for easy filtering or mark them as favorites for instant access.
+- **Backlinks & References**: View connections between notes to build a personal knowledge base.
+
+#### 🔄 Sync & Backup
+- **Git Synchronization**: Native support for syncing notes with **GitHub** or **Forgejo**, ensuring version control and multi-device availability.
+- **Automated Backups**: System-wide backup generation and list management.
+- **Export/Import**: Export notes or entire folders as HTML, Markdown, or structured data. Import from backups or other sources via a dedicated restoration tool.
+
+#### 👥 Multi-user & Security
+- **Authentication**: Secure login with "Remember Me" support.
+- **OIDC Support**: Integration with OpenID Connect providers (like Authelia, Keycloak, or Google) for Single Sign-On (SSO).
+- **Multi-user Management**: Admin dashboard to manage users, roles, and access.
+
+#### 🛠️ Additional Tools
+- **Kanban View**: Transform any folder into a Kanban board to manage projects and tasks visually.
+- **MCP Server**: A Model Context Protocol server allowing AI agents (like Claude or Copilot) to interact with your notes securely.
+- **Browser Extension**: A dedicated URL saver extension to quickly clip web pages into your notes.
+- **Calendar Integration**: Visualize your note creation and update history on a calendar.
+
+#### 🌐 Sharing & Search
+- **Public Sharing**: Share individual notes or entire folders via public URLs with customizable themes.
+- **Unified Search**: Powerful search functionality to find content across all notes, headings, and tags instantly.
+- **API Access**: Comprehensive REST API (v1) with OpenAPI documentation for custom integrations.
 
 ## Table of content
 
