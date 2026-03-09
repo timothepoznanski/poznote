@@ -432,8 +432,7 @@
             "kanban_on_folder_click": "Kanban-Ansicht beim Klicken auf Ordner öffnen",
             "index_icon_scale": "Skalierung der Index-Symbole",
             "note_content_width": "Breite des Notizinhalts",
-            "code_block_word_wrap": "Codeblock-Zeilenumbruch",
-            "hide_support_icon": "Like-Symbol ausblenden"
+            "code_block_word_wrap": "Codeblock-Zeilenumbruch"
         },
         "badges": {
             "font_size_default": "Standard ({{size}}px)",
@@ -458,17 +457,7 @@
         "home": "Startseite",
         "settings": "Einstellungen",
         "create": "Erstellen",
-        "toggle": "Linke Spalte ein-/ausblenden",
-        "support": "Kommentar hinterlassen",
-        "support_popup": {
-            "link_label": "Hier einen Kommentar hinterlassen",
-            "thank_you": "Vielen Dank!",
-            "intro_line1": "Poznote ist ein <strong>kostenloses Open-Source-Projekt ohne Tracking oder Analytics</strong>, daher habe ich fast keine Möglichkeit zu wissen, wie weit es genutzt wird.",
-            "intro_line2": "Ein kurzer Kommentar in der GitHub-Diskussion würde mir wirklich helfen zu verstehen, ob Poznote nützlich ist und es sich lohnt, es weiterzuentwickeln."
-        },
-        "support_modal": {
-            "title": "Hallo!"
-        }
+        "toggle": "Linke Spalte ein-/ausblenden"
     },
     "home": {
         "title": "Startseite",

@@ -144,35 +144,6 @@
 
         switch (action) {
             // Sidebar actions
-            case 'show-support-modal': {
-                const overlay = document.getElementById('supportModalOverlay');
-                const closeBtn = document.getElementById('supportModalClose');
-                
-                if (overlay) {
-                    overlay.style.display = 'flex';
-                    requestAnimationFrame(function () {
-                        overlay.classList.add('show');
-                    });
-                    
-                    const closeModal = function () {
-                        overlay.classList.remove('show');
-                        setTimeout(function () {
-                            overlay.style.display = 'none';
-                        }, 200);
-                    };
-                    
-                    if (closeBtn) {
-                        closeBtn.onclick = closeModal;
-                    }
-                    
-                    overlay.onclick = function (ev) {
-                        if (ev.target === overlay) {
-                            closeModal();
-                        }
-                    };
-                }
-                break;
-            }
             case 'toggle-workspace-menu':
                 if (typeof toggleWorkspaceMenu === 'function') {
                     toggleWorkspaceMenu(e);
