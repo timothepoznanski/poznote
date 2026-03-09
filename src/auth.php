@@ -47,9 +47,6 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 // Load config first
 require_once __DIR__ . '/config.php';
 
-// Ensure multi-user migration runs on first access (before any auth checks)
-require_once __DIR__ . '/auto_migrate.php';
-
 // Robust .env parser fallback
 // Search in current directory (src/) and parent directory (project root)
 $envSearchPaths = [__DIR__ . '/.env', dirname(__DIR__) . '/.env'];

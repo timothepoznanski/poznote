@@ -41,6 +41,7 @@
         "disabled_message": "Access to settings is disabled by administrator.",
         "categories": {
             "actions": "Actions",
+            "admin_tools": "Admin Tools",
             "display": "Display",
             "about": "About",
             "documentation": "Documentation"
@@ -64,7 +65,8 @@
             "news": "Poznote Blog",
             "website": "Poznote Website",
             "support": "Support Developer",
-            "release_notes": "Release Notes"
+            "release_notes": "Release Notes",
+            "convert_images": "Base64 Image Converter"
         },
         "language": {
             "label": "Language",
@@ -1298,7 +1300,7 @@
         "utensils": "restaurant",
         "medkit": "medical",
         "heartbeat": "health",
-        "dumbbell": "fitness",
+        "dumbbell": "dumbbell",
         "bicycle": "bicycle",
         "tree": "tree",
         "leaf": "leaf",
@@ -1337,7 +1339,6 @@
         "utensils-crossed": "utensils",
         "briefcase-medical": "medical briefcase",
         "activity": "activity",
-        "dumbbell": "dumbbell",
         "bike": "bike",
         "tree-deciduous": "deciduous tree",
         "sprout": "sprout",
@@ -1599,5 +1600,32 @@
     "workspace_menu": {
         "workspaces": "Workspaces",
         "logout": "Logout"
+    },
+    "admin_tools": {
+        "convert_images": {
+            "title": "Base64 Image Converter",
+            "description": "Finds inline base64-encoded images stored in notes and extracts them as proper attachment files, reducing database size and improving performance. Useful after restoring a backup that was created when notes still contained base64-encoded images.",
+            "step1": "Step 1",
+            "step2": "Step 2",
+            "scan_title": "Scan",
+            "convert_title": "Convert",
+            "scan_desc": "Analyse all notes across every user account and report how many inline base64 images were found.",
+            "scan_no_changes": "No changes are made.",
+            "convert_desc": "Extract every base64 image and save it as a file on disk. Notes are updated to reference the new attachment URL.",
+            "convert_irreversible": "Irreversible — scan first.",
+            "scan_button": "Scan all notes",
+            "convert_button": "Convert all notes",
+            "results_scan": "Scan results",
+            "results_convert": "Conversion results",
+            "stats_notes": "Notes scanned",
+            "stats_images": "Base64 images found",
+            "stats_converted": "Converted",
+            "stats_errors": "Errors",
+            "notice_convert_clean": "No base64 images found. Nothing to convert.",
+            "notice_convert_done": "All {{count}} image(s) converted successfully.",
+            "notice_convert_partial": "{{done}} image(s) converted — {{errors}} error(s) encountered.",
+            "notice_scan_clean": "No base64 images found across all users. Nothing to do.",
+            "notice_scan_found": "{{count}} inline image(s) found in {{notes}} note(s). Use Step 2 to convert them."
+        }
     }
 }

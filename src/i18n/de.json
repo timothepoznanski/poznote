@@ -297,6 +297,7 @@
         "title": "Einstellungen",
         "categories": {
             "actions": "Aktionen",
+            "admin_tools": "Admin-Werkzeuge",
             "display": "Anzeige",
             "about": "Über",
             "documentation": "Dokumentation"
@@ -332,7 +333,8 @@
             "news": "Poznote-Blog",
             "website": "Poznote-Website",
             "support": "Entwickler unterstützen",
-            "release_notes": "Versionshinweise"
+            "release_notes": "Versionshinweise",
+            "convert_images": "Base64-Bild-Konverter"
         }
     },
     "workspaces": {
@@ -1851,9 +1853,9 @@
                 "title": "Master-Datenbank rekonstruieren",
                 "subtitle": "Benutzerprofile und öffentliche Links wiederherstellen",
                 "description": "Die Master-Datenbank (master.db) ist das Herzstück des Systems und enthält Benutzerprofile, öffentliche Links und globale Einstellungen. Wenn diese Datei verloren geht oder beschädigt ist, scannt dieses Tool das Verzeichnis 'data/users', um Konten automatisch neu zu registrieren, ursprüngliche Benutzernamen aus persönlichen Datenbanken wiederherzustellen und alle aktiven öffentlichen Links wiederherzustellen.",
-                "repair_registry": "Rekonstruktion starten",
+                "repair_registry": "Rekonstruktion",
                 "repair_registry_confirm": "Dies scannt alle Benutzerordner und stellt die Master-Datenbank wieder her. Fortfahren?",
-                "repair_registry_success": "Master-Datenbank erfolgreich rekonstruiert:\n- {{scanned}} Ordner gescannt\n- {{added}} Benutzer wiederhergestellt\n- {{links}} geteilte Links neu aufgebaut",
+                "repair_registry_success": "Master-Datenbank erfolgreich rekonstruiert:\n\n- {{scanned}} Ordner gescannt\n- {{added}} Benutzer wiederhergestellt\n- {{links}} geteilte Links neu aufgebaut",
                 "repair_registry_error": "Rekonstruktionsfehler: {{error}}"
             },
             "administrator": "Administrator",
@@ -2019,5 +2021,32 @@
     "workspace_menu": {
         "workspaces": "Arbeitsbereiche",
         "logout": "Abmelden"
+    },
+    "admin_tools": {
+        "convert_images": {
+            "title": "Base64-Bild-Konverter",
+            "description": "Sucht nach base64-kodierten Bildern in Notizen und extrahiert sie als Anhangsdateien, um die Datenbankgröße zu reduzieren. Nützlich nach der Wiederherstellung einer Sicherung, die noch base64-kodierte Bilder enthielt.",
+            "step1": "Schritt 1",
+            "step2": "Schritt 2",
+            "scan_title": "Scannen",
+            "convert_title": "Konvertieren",
+            "scan_desc": "Analysiert alle Notizen aller Benutzerkonten und meldet, wie viele base64-Bilder gefunden wurden.",
+            "scan_no_changes": "Es werden keine Änderungen vorgenommen.",
+            "convert_desc": "Extrahiert jedes base64-Bild und speichert es als Datei. Notizen werden aktualisiert, um auf den neuen Anhang zu verweisen.",
+            "convert_irreversible": "Nicht umkehrbar — zuerst scannen.",
+            "scan_button": "Alle Notizen scannen",
+            "convert_button": "Alle Notizen konvertieren",
+            "results_scan": "Scan-Ergebnisse",
+            "results_convert": "Konvertierungsergebnisse",
+            "stats_notes": "Gescannte Notizen",
+            "stats_images": "Gefundene Base64-Bilder",
+            "stats_converted": "Konvertiert",
+            "stats_errors": "Fehler",
+            "notice_convert_clean": "Keine base64-Bilder gefunden. Nichts zu konvertieren.",
+            "notice_convert_done": "{{count}} Bild(er) erfolgreich konvertiert.",
+            "notice_convert_partial": "{{done}} Bild(er) konvertiert — {{errors}} Fehler.",
+            "notice_scan_clean": "Keine base64-Bilder gefunden. Nichts zu tun.",
+            "notice_scan_found": "{{count}} eingebettete(s) Bild(er) in {{notes}} Notiz(en) gefunden. Schritt 2 zum Konvertieren verwenden."
+        }
     }
 }

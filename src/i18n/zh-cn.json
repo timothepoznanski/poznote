@@ -298,6 +298,7 @@
         "title": "设置",
         "categories": {
             "actions": "操作",
+            "admin_tools": "管理工具",
             "display": "显示",
             "about": "关于",
             "documentation": "文档"
@@ -334,7 +335,8 @@
             "news": "Poznote 博客",
             "website": "Poznote 网站",
             "support": "支持开发者",
-            "release_notes": "发布日志"
+            "release_notes": "发布日志",
+            "convert_images": "Base64图片转换器"
         }
     },
     "workspaces": {
@@ -1911,9 +1913,9 @@
                 "title": "重建主数据库",
                 "subtitle": "",
                 "description": "主数据库 (master.db) 是系统的核心注册表，包含用户资料、公开共享链接和全局设置。如果此文件丢失或损坏，此工具将扫描 'data/users' 目录以自动重新注册账户，并从个人数据库中恢复原始用户名及其所有激活的公开链接。",
-                "repair_registry": "开始重建",
+                "repair_registry": "重建",
                 "repair_registry_confirm": "这将扫描所有用户文件夹并重建主数据库注册表。",
-                "repair_registry_success": "主数据库重建成功：\n- 扫描了 {{scanned}} 个文件夹\n- 恢复了 {{added}} 个用户\n- 重建了 {{links}} 个共享链接",
+                "repair_registry_success": "主数据库重建成功：\n\n- 扫描了 {{scanned}} 个文件夹\n- 恢复了 {{added}} 个用户\n- 重建了 {{links}} 个共享链接",
                 "repair_registry_error": "重建出错: {{error}}"
             },
             "administrator": "管理员",
@@ -2134,5 +2136,32 @@
     "workspace_menu": {
         "workspaces": "工作区",
         "logout": "退出登录"
+    },
+    "admin_tools": {
+        "convert_images": {
+            "title": "Base64图片转换器",
+            "description": "查找存储在笔记中的base64编码图片并将其提取为附件文件，减少数据库大小。在恢复包含base64图片的备份后非常有用。",
+            "step1": "步骤1",
+            "step2": "步骤2",
+            "scan_title": "扫描",
+            "convert_title": "转换",
+            "scan_desc": "分析所有用户账户中的全部笔记，报告发现的base64图片数量。",
+            "scan_no_changes": "不做任何更改。",
+            "convert_desc": "提取每张base64图片并保存为文件，更新笔记以引用新的附件URL。",
+            "convert_irreversible": "不可逆 — 请先扫描。",
+            "scan_button": "扫描所有笔记",
+            "convert_button": "转换所有笔记",
+            "results_scan": "扫描结果",
+            "results_convert": "转换结果",
+            "stats_notes": "已扫描笔记",
+            "stats_images": "发现Base64图片",
+            "stats_converted": "已转换",
+            "stats_errors": "错误",
+            "notice_convert_clean": "未发现base64图片，无需转换。",
+            "notice_convert_done": "{{count}}张图片已成功转换。",
+            "notice_convert_partial": "{{done}}张图片已转换 — 遇到{{errors}}个错误。",
+            "notice_scan_clean": "所有用户中未发现base64图片，无需操作。",
+            "notice_scan_found": "在{{notes}}篇笔记中发现{{count}}张内嵌图片，使用步骤2进行转换。"
+        }
     }
 }

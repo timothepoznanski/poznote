@@ -7,9 +7,6 @@
  * Each user profile has their own isolated database and files.
  */
 
-// Include auto-migration to ensure multi-user structure exists
-require_once __DIR__ . '/auto_migrate.php';
-
 // Ensure shared helpers are available when db_connect is included before functions.php
 if (!function_exists('createDirectoryWithPermissions')) {
     require_once __DIR__ . '/functions.php';
@@ -354,13 +351,8 @@ try {
         error_log('Could not add linked_note_id column: ' . $e->getMessage());
     }
     
-    // Run data migrations (convert base64 images to attachments, etc.)
-    if (function_exists('runDataMigrations')) {
-        runDataMigrations();
-    }
-
     // Ensure required data directories exist
-    // $dbDir points to data/database, so we need to go up one level to get data/
+    // $dbDir points to data/users/{id}/database, so we go up one level to get data/users/{id}/
     $dataDir = dirname($dbDir);
     $requiredDirs = ['attachments', 'database', 'entries'];
     foreach ($requiredDirs as $dir) {

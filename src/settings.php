@@ -435,6 +435,34 @@ if ($isAdmin) {
 
         </div>
 
+        <?php if ($isAdmin): ?>
+        <!-- ADMIN TOOLS CATEGORY -->
+        <h2 class="settings-category-title"><?php echo t_h('settings.categories.admin_tools', [], 'Admin Tools'); ?></h2>
+        <div class="home-grid">
+
+            <!-- Disaster Recovery -->
+            <div class="home-card settings-card-clickable" id="disaster-recovery-card" data-href="admin/disaster-recovery.php">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-database"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('multiuser.admin.maintenance.title', [], 'Disaster Recovery'); ?></span>
+                </div>
+            </div>
+
+            <!-- Base64 Image Converter -->
+            <div class="home-card settings-card-clickable" id="convert-images-card" data-href="admin/convert-images.php">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-image"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.convert_images', [], 'Base64 Image Converter'); ?></span>
+                </div>
+            </div>
+
+        </div>
+        <?php endif; ?>
+
     </div>
 
     <?php include 'modals.php'; ?>

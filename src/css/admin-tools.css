@@ -1,0 +1,225 @@
+/* ─────────────────────────────────────────────────────────
+   Admin Tools — shared styles for convert-images.php
+   and disaster-recovery.php
+   ───────────────────────────────────────────────────────── */
+
+/* ── Disaster Recovery page ── */
+.dr-page {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+}
+.dr-hero {
+    text-align: center;
+    padding: 0px 0 10px;
+}
+.dr-hero h1 {
+    margin: 0 0 8px;
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+.dr-hero p {
+    margin: 0;
+    color: var(--text-secondary, #666);
+    font-size: 0.95rem;
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* ── Convert Images page wrapper ── */
+.ci-page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 20px 64px;
+}
+
+/* ── Hero ── */
+.ci-hero {
+    text-align: center;
+    padding: 0px 0 32px;
+}
+.ci-hero h1 {
+    margin: 0 0 8px;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-color, #1a1a1a);
+}
+.ci-hero p {
+    margin: 0;
+    color: var(--text-muted, #666);
+    font-size: 0.9rem;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* ── Action cards ── */
+.ci-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+@media (max-width: 540px) { .ci-actions { grid-template-columns: 1fr; } }
+
+.ci-card {
+    background: var(--bg-color, #fff);
+    border: 1.5px solid var(--border-color, #e5e7eb);
+    border-radius: 12px;
+    padding: 24px;
+    position: relative;
+    transition: border-color 0.2s;
+}
+.ci-card:hover { border-color: #007cba55; }
+
+.ci-card-step {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #007cba;
+    background: rgba(0, 124, 186, 0.1);
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin-bottom: 10px;
+}
+.ci-card h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 8px;
+    color: var(--text-color, #1a1a1a);
+}
+.ci-card p {
+    font-size: 0.85rem;
+    color: var(--text-muted, #666);
+    line-height: 1.55;
+    margin: 0 0 18px;
+}
+.ci-card p strong { color: var(--text-color, #1a1a1a); }
+
+/* ── Results panel ── */
+.ci-results {
+    background: var(--bg-color, #fff);
+    border: 1.5px solid var(--border-color, #e5e7eb);
+    border-radius: 12px;
+    overflow: hidden;
+}
+.ci-results-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+.ci-results-header i { color: #007cba; }
+.ci-results-header h2 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color, #1a1a1a);
+}
+
+/* ── Stat row ── */
+.ci-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+.ci-stat {
+    padding: 20px 0;
+    text-align: center;
+    border-right: 1px solid var(--border-color, #e5e7eb);
+}
+.ci-stat:last-child { border-right: none; }
+.ci-stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+    color: var(--text-color, #1a1a1a);
+    font-variant-numeric: tabular-nums;
+}
+.ci-stat-value.is-ok   { color: #16a34a; }
+.ci-stat-value.is-warn { color: #d97706; }
+.ci-stat-value.is-err  { color: #dc2626; }
+.ci-stat-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted, #888);
+}
+
+/* ── Table ── */
+.ci-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+.ci-table th {
+    padding: 10px 20px;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted, #888);
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+    background: var(--bg-secondary, #f9f9f9);
+}
+.ci-table td {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border-color, #f0f0f0);
+    color: var(--text-color, #1a1a1a);
+    vertical-align: middle;
+}
+.ci-table tr:last-child td { border-bottom: none; }
+.ci-table .num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted, #666);
+}
+.ci-table .num.has-data { color: var(--text-color, #1a1a1a); font-weight: 500; }
+
+/* ── Status chips ── */
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.chip-ok      { background: #dcfce7; color: #166534; }
+.chip-done    { background: #dbeafe; color: #1d4ed8; }
+.chip-warn    { background: #fef9c3; color: #854d0e; }
+.chip-err     { background: #fee2e2; color: #991b1b; }
+.chip-missing { background: #f3f4f6; color: #6b7280; }
+html[data-theme='dark'] .chip-ok      { background: rgba(34,197,94,.15);  color: #86efac; }
+html[data-theme='dark'] .chip-done    { background: rgba(59,130,246,.15); color: #93c5fd; }
+html[data-theme='dark'] .chip-warn    { background: rgba(234,179,8,.15);  color: #fde047; }
+html[data-theme='dark'] .chip-err     { background: rgba(239,68,68,.15);  color: #fca5a5; }
+html[data-theme='dark'] .chip-missing { background: rgba(156,163,175,.1); color: #9ca3af; }
+
+/* ── Notice banner ── */
+.ci-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 20px;
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+.ci-notice i { flex-shrink: 0; margin-top: 1px; }
+.ci-notice.info    { background: rgba(59,130,246,.08);  color: #1d4ed8; border-top: 1px solid rgba(59,130,246,.2); }
+.ci-notice.success { background: rgba(34,197,94,.08);   color: #166534; border-top: 1px solid rgba(34,197,94,.2); }
+.ci-notice.warning { background: rgba(234,179,8,.08);   color: #854d0e; border-top: 1px solid rgba(234,179,8,.2); }
+html[data-theme='dark'] .ci-notice.info    { color: #93c5fd; }
+html[data-theme='dark'] .ci-notice.success { color: #86efac; }
+html[data-theme='dark'] .ci-notice.warning { color: #fde047; }
+
+.error-list { margin: 6px 0 0; padding-left: 14px; font-size: 0.8rem; opacity: 0.85; }

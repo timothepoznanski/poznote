@@ -370,7 +370,7 @@ $body_classes = trim($extra_body_classes);
             'currentNoteFolder' => null, // Will be set below
             'selectedWorkspace' => $workspace_filter ?? '',
             'userId' => $_SESSION['user_id'] ?? null,
-            'userEntriesPath' => isset($_SESSION['user_id']) ? "data/users/{$_SESSION['user_id']}/entries/" : "data/entries/",
+            'userEntriesPath' => "data/users/{$_SESSION['user_id']}/entries/",
             'defaultNoteSortType' => $note_list_sort_type,
             'isAdmin' => function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()
         ];

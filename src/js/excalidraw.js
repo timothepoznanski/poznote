@@ -468,9 +468,10 @@ function insertHtmlAtCursor(html) {
 // Download Excalidraw diagram as PNG image
 function downloadExcalidrawImage(noteId) {
     // Get the PNG file path for this note
-    let entriesPath = 'data/entries/';
-    if (typeof window.userEntriesPath !== 'undefined' && window.userEntriesPath) {
-        entriesPath = window.userEntriesPath;
+    let entriesPath = window.userEntriesPath;
+    if (!entriesPath) {
+        console.error('userEntriesPath is not defined, cannot download Excalidraw image.');
+        return;
     }
     const pngPath = `${entriesPath}${noteId}.png`;
 

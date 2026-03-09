@@ -296,6 +296,7 @@
         "title": "Configurações",
         "categories": {
             "actions": "Ações",
+            "admin_tools": "Ferramentas de administração",
             "display": "Tela",
             "about": "Sobre",
             "documentation": "Documentação"
@@ -331,7 +332,8 @@
             "news": "Blog do Poznote",
             "website": "Site do Poznote",
             "support": "Apoiar o desenvolvedor",
-            "release_notes": "Notas de versão"
+            "release_notes": "Notas de versão",
+            "convert_images": "Conversor de Imagens Base64"
         }
     },
     "workspaces": {
@@ -1855,9 +1857,9 @@
                 "title": "Reconstruir Base de Dados Master",
                 "subtitle": "Restaurar perfis de utilizador e links de partilha",
                 "description": "A base de dados master (master.db) é o núcleo do sistema, contendo perfis de utilizador, links de partilha públicos e definições globais. Se este ficheiro for perdido ou corrompido, esta ferramenta analisa o diretório 'data/users' para registar novamente as contas, recuperar os nomes originais das bases de dados pessoais e restaurar todos os links de partilha ativos.",
-                "repair_registry": "Iniciar Reconstrução",
+                "repair_registry": "Reconstrução",
                 "repair_registry_confirm": "Isto irá analisar todas as pastas de utilizador e reconstruir a base de dados master. Continuar?",
-                "repair_registry_success": "Base de dados master reconstruída com sucesso:\n- {{scanned}} pastas analisadas\n- {{added}} utilizadores restaurados\n- {{links}} links partilhados reconstruídos",
+                "repair_registry_success": "Base de dados master reconstruída com sucesso:\n\n- {{scanned}} pastas analisadas\n- {{added}} utilizadores restaurados\n- {{links}} links partilhados reconstruídos",
                 "repair_registry_error": "Erro de reconstrução: {{error}}"
             },
             "administrator": "Administrador",
@@ -2023,5 +2025,32 @@
     "workspace_menu": {
         "workspaces": "Espaços de trabalho",
         "logout": "Sair"
+    },
+    "admin_tools": {
+        "convert_images": {
+            "title": "Conversor de Imagens Base64",
+            "description": "Encontra imagens codificadas em base64 armazenadas nas notas e extrai-as como ficheiros de anexo, reduzindo o tamanho da base de dados. Útil após restaurar uma cópia de segurança que continha imagens em base64.",
+            "step1": "Passo 1",
+            "step2": "Passo 2",
+            "scan_title": "Analisar",
+            "convert_title": "Converter",
+            "scan_desc": "Analisa todas as notas de todas as contas de utilizador e indica quantas imagens base64 foram encontradas.",
+            "scan_no_changes": "Nenhuma alteração é feita.",
+            "convert_desc": "Extrai cada imagem base64 e guarda-a como ficheiro. As notas são atualizadas para referenciar o novo URL do anexo.",
+            "convert_irreversible": "Irreversível — analise primeiro.",
+            "scan_button": "Analisar todas as notas",
+            "convert_button": "Converter todas as notas",
+            "results_scan": "Resultados da análise",
+            "results_convert": "Resultados da conversão",
+            "stats_notes": "Notas analisadas",
+            "stats_images": "Imagens Base64 encontradas",
+            "stats_converted": "Convertidas",
+            "stats_errors": "Erros",
+            "notice_convert_clean": "Nenhuma imagem base64 encontrada. Nada a converter.",
+            "notice_convert_done": "{{count}} imagem(ns) convertida(s) com sucesso.",
+            "notice_convert_partial": "{{done}} imagem(ns) convertida(s) — {{errors}} erro(s).",
+            "notice_scan_clean": "Nenhuma imagem base64 encontrada. Nada a fazer.",
+            "notice_scan_found": "{{count}} imagem(ns) encontrada(s) em {{notes}} nota(s). Use o passo 2 para as converter."
+        }
     }
 }
