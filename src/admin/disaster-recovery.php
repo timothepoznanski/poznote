@@ -54,22 +54,6 @@ $pageWorkspace = trim(getWorkspaceFilter());
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <link rel="stylesheet" href="../css/admin-tools.css?v=<?php echo $v; ?>">
     <script src="../js/globals.js?v=<?php echo $v; ?>"></script>
-    <script>
-    // Override loadPoznoteI18n with an absolute URL — globals.js uses a relative
-    // path which breaks when the page is served from the admin/ subdirectory.
-    window.loadPoznoteI18n = function() {
-        return fetch('/api/v1/system/i18n', { credentials: 'same-origin' })
-            .then(function(r) { return r.json(); })
-            .then(function(j) {
-                if (j && j.success && j.strings) {
-                    window.POZNOTE_I18N = { lang: j.lang || 'en', strings: j.strings };
-                    if (typeof window.applyI18nToDom === 'function') window.applyI18nToDom(document);
-                }
-            })
-            .catch(function() {});
-    };
-    window.loadPoznoteI18n();
-    </script>
 </head>
 <body data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
 <div class="admin-container">
@@ -108,53 +92,12 @@ $pageWorkspace = trim(getWorkspaceFilter());
         <h2 class="modal-title" id="statusModalTitle"></h2>
         <p id="statusModalMessage" style="white-space: pre-wrap; margin-bottom: 25px;"></p>
         <div class="form-actions" style="display: flex; gap: 10px; justify-content: flex-end;">
-            <button type="button" class="btn btn-secondary" id="statusModalCancelBtn"></button>
-            <button type="button" class="btn btn-primary" id="statusModalConfirmBtn"></button>
+            <button type="button" class="btn btn-secondary" id="statusModalCancelBtn" style="display: none;"></button>
+            <button type="button" class="btn btn-primary" id="statusModalConfirmBtn" style="display: none;"></button>
         </div>
     </div>
 </div>
 
-<script src="../js/restore-import.js?v=<?php echo $v; ?>"></script>
-<script>
-// Override runRepair to skip the confirmation dialog
-async function runRepair(btn) {
-    const title = tr('multiuser.admin.maintenance.repair_registry', 'Reconstruction');
-    const originalHtml = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = '<i class="lucide lucide-loader-2 lucide-spin"></i> ' + tr('multiuser.admin.processing', 'Processing...');
-
-    try {
-        const response = await fetch('/api/v1/admin/repair', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'same-origin'
-        });
-        const result = await response.json();
-
-        if (result.success) {
-            let successMsg = tr('multiuser.admin.maintenance.repair_registry_success', "System registry repaired successfully:\n\n- {{scanned}} folders scanned\n- {{added}} users restored\n- {{links}} shared links rebuilt");
-            successMsg = successMsg
-                .replace('{{scanned}}', result.stats.users_scanned)
-                .replace('{{added}}', result.stats.users_added)
-                .replace('{{links}}', result.stats.links_rebuilt);
-
-            if (result.stats.errors && result.stats.errors.length > 0) {
-                successMsg += '\n\n' + tr('multiuser.admin.errors_label', 'Errors:') + '\n' + result.stats.errors.join('\n');
-            }
-
-            showStatusAlert(title, successMsg, () => window.location.reload());
-        } else {
-            const errorMsg = tr('multiuser.admin.maintenance.repair_registry_error', 'Repair error: {{error}}');
-            showStatusAlert(title, errorMsg.replace('{{error}}', result.error));
-        }
-    } catch (e) {
-        const networkErrorPrefix = tr('multiuser.admin.network_error', 'Network error: ');
-        showStatusAlert(title, networkErrorPrefix + e.message);
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = originalHtml;
-    }
-}
-</script>
+<script src="../js/disaster-recovery.js?v=<?php echo $v; ?>"></script>
 </body>
 </html>

@@ -830,7 +830,8 @@ function showStatusAlert(title, message, onOk = null) {
     const confirmBtn = document.getElementById('statusModalConfirmBtn');
     const cancelBtn = document.getElementById('statusModalCancelBtn');
 
-    confirmBtn.style.display = 'none';
+    if (confirmBtn) confirmBtn.style.setProperty('display', 'none', 'important');
+    cancelBtn.style.setProperty('display', 'inline-flex', 'important');
     cancelBtn.textContent = 'OK';
     cancelBtn.onclick = () => {
         modal.style.display = 'none';
@@ -850,9 +851,9 @@ function showStatusConfirm(title, message, onConfirm) {
     const confirmBtn = document.getElementById('statusModalConfirmBtn');
     const cancelBtn = document.getElementById('statusModalCancelBtn');
 
-    confirmBtn.style.display = 'inline-flex';
+    confirmBtn.style.setProperty('display', 'inline-flex', 'important');
     confirmBtn.textContent = 'OK';
-    cancelBtn.style.display = 'inline-flex';
+    cancelBtn.style.setProperty('display', 'inline-flex', 'important');
     cancelBtn.textContent = tr('common.cancel', 'Annuler');
 
     cancelBtn.onclick = () => modal.style.display = 'none';
@@ -865,47 +866,5 @@ function showStatusConfirm(title, message, onConfirm) {
 }
 
 /**
- * Maintenance / Disaster Recovery
+ * Maintenance / Backup
  */
-async function runRepair(btn) {
-    const confirmTitle = tr('multiuser.admin.maintenance.repair_registry', 'Reconstruct System Index');
-    const confirmMsg = tr('multiuser.admin.maintenance.repair_registry_confirm', 'This will scan all user folders and rebuild the shared links registry.');
-
-    showStatusConfirm(confirmTitle, confirmMsg, async () => {
-        const originalHtml = btn.innerHTML;
-        btn.disabled = true;
-        btn.innerHTML = '<i class="lucide lucide-loader-2 lucide-spin"></i> ' + tr('multiuser.admin.processing', 'Processing...');
-
-        try {
-            const response = await fetch('/api/v1/admin/repair', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'same-origin'
-            });
-            const result = await response.json();
-
-            if (result.success) {
-                let successMsg = tr('multiuser.admin.maintenance.repair_registry_success', "System registry repaired successfully:\n- {{scanned}} folders scanned\n- {{added}} users restored\n- {{links}} shared links rebuilt");
-                successMsg = successMsg
-                    .replace('{{scanned}}', result.stats.users_scanned)
-                    .replace('{{added}}', result.stats.users_added)
-                    .replace('{{links}}', result.stats.links_rebuilt);
-
-                if (result.stats.errors && result.stats.errors.length > 0) {
-                    successMsg += '\n\n' + tr('multiuser.admin.errors_label', 'Errors:') + '\n' + result.stats.errors.join('\n');
-                }
-
-                showStatusAlert(confirmTitle, successMsg, () => window.location.reload());
-            } else {
-                const errorMsg = tr('multiuser.admin.maintenance.repair_registry_error', 'Repair error: {{error}}');
-                showStatusAlert(confirmTitle, errorMsg.replace('{{error}}', result.error));
-            }
-        } catch (e) {
-            const networkErrorPrefix = tr('multiuser.admin.network_error', 'Network error: ');
-            showStatusAlert(confirmTitle, networkErrorPrefix + e.message);
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = originalHtml;
-        }
-    });
-}
