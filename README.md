@@ -24,16 +24,14 @@ This project started from a simple personal need: a practical way to write, orga
 
 Discover all the features here:
 
-### 🚀 Features
-
 | Category | Description |
 | :--- | :--- |
-| **✍️ Editor** | **Hybrid HTML/Markdown** editing, **Excalidraw** whiteboard, **Mermaid.js** diagrams, **KaTeX** math, **Syntax Highlighting**, Video/Audio players. |
-| **📂 Organization** | **Hierarchical Folders** (icons/colors), **Workspaces**, **Tags**, **Favorites**, **Backlinks** & internal references. |
-| **🔄 Sync & Backup** | **Git Synchronization** (GitHub/Forgejo), **Automated Backups**, **Export/Import** (HTML, Markdown, Structured data). |
-| **👥 Security** | Multi-user support, **OIDC/SSO** (Authelia, Keycloak), Admin dashboard. |
-| **🛠️ Tools** | **Kanban View**, **MCP Server** (AI agent support), **Browser Extension**, **Calendar View**. |
-| **🌐 Sharing & API** | **Public Sharing** (notes/folders), **Search Engine**, **REST API (v1)** with OpenAPI. |
+| **Editor** | Hybrid HTML/Markdown editing, Excalidraw whiteboard, Mermaid.js diagrams, KaTeX math, Syntax Highlighting, Video/Audio players. |
+| **Organization** | Hierarchical Folders, Workspaces, Tags, Favorites, Backlinks & internal references. |
+| **Sync & Backup** | Git Synchronization, Automated Backups, Export/Import. |
+| **Security** | Multi-user support, OIDC/SSO, Admin dashboard. |
+| **Tools** | Kanban View, MCP Server, Browser Extension, Calendar View. |
+| **Sharing & API** | Public Sharing, Search Engine, REST API with OpenAPI. |
 
 ## Table of content
 
