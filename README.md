@@ -22,23 +22,11 @@ This project started from a simple personal need: a practical way to write, orga
   <img src="images/poznote-light.png" alt="Poznote-light" width="100%">
 </p>
 
-<p align="center">
-  <img src="images/poznote-dark.png" alt="Poznote-dark" width="100%">
-</p>
-
 Discover all the [features here](https://poznote.com/index.html#features).
 
 <p align="center">
   <img src="images/poznote-features.png" alt="Poznote Features" width="100%">
 </p>
-
-## Try the Poznote demo
-
-Username: `poznote`
-<br>
-Password: `poznote`
-
-[poznote-demo.up.railway.app](https://poznote-demo.up.railway.app)
 
 ## Table of content
 
