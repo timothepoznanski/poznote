@@ -130,7 +130,7 @@ if ($_POST) {
             $delEntries = $con->prepare('DELETE FROM entries WHERE workspace = ?');
         $delEntries->execute([$name]);
 
-            // Additional cleanup: remove orphan files from data/entries
+            // Additional cleanup: remove orphan files from the user's entries directory
             // Some files can remain on disk if the DB row was missing or inconsistent.
             // Scan the entries directory and remove any <id>.html or <id>.md files that are no longer present in the entries table.
             try {

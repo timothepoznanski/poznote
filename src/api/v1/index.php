@@ -97,6 +97,7 @@ require_once __DIR__ . '/controllers/BackupController.php';
 require_once __DIR__ . '/controllers/SystemController.php';
 require_once __DIR__ . '/controllers/GitSyncController.php';
 require_once __DIR__ . '/controllers/PublicController.php';
+require_once __DIR__ . '/controllers/BacklinksController.php';
 
 /**
  * Simple Router class for handling RESTful routes
@@ -239,6 +240,7 @@ $backupController = new BackupController($con);
 $systemController = new SystemController($con);
 $gitSyncController = new GitSyncController($con);
 $publicController = new PublicController($con);
+$backlinksController = new BacklinksController($con);
 
 // ======================
 // Notes Routes
@@ -252,6 +254,11 @@ $router->get('/notes/resolve', function($params) use ($notesController) {
 // Search notes (must come before /notes/{id})
 $router->get('/notes/search', function($params) use ($notesController) {
     $notesController->search();
+});
+
+// Backlinks for a note (must come before /notes/{id})
+$router->get('/notes/{id}/backlinks', function($params) use ($backlinksController) {
+    $backlinksController->index($params['id']);
 });
 
 // List notes with attachments

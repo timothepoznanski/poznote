@@ -306,6 +306,7 @@
         "disabled_message": "L'accès aux paramètres est désactivé par l'administrateur.",
         "categories": {
             "actions": "Actions",
+            "admin_tools": "Outils d'administration",
             "display": "Affichage",
             "about": "À propos",
             "documentation": "Documentation"
@@ -349,7 +350,8 @@
             "news": "Blog Poznote",
             "website": "Site Poznote",
             "support": "Soutenir le développeur",
-            "release_notes": "Notes de version"
+            "release_notes": "Notes de version",
+            "convert_images": "Convertisseur d’images Base64"
         }
     },
     "workspaces": {
@@ -447,7 +449,8 @@
             "kanban_on_folder_click": "Ouvrir la vue Kanban au clic sur dossier",
             "index_icon_scale": "Taille des icônes (Index)",
             "note_content_width": "Largeur du contenu de la note",
-            "code_block_word_wrap": "Retour à la ligne des blocs de code"
+            "code_block_word_wrap": "Retour à la ligne des blocs de code",
+            "hide_support_icon": "Masquer l'icône like"
         },
         "badges": {
             "font_size_default": "par défaut ({{size}}px)",
@@ -475,7 +478,17 @@
         "home": "Accueil",
         "settings": "Paramètres",
         "create": "Créer",
-        "toggle": "Cacher/Afficher la colonne de gauche"
+        "toggle": "Cacher/Afficher la colonne de gauche",
+        "support": "Laisser un commentaire",
+        "support_popup": {
+            "link_label": "Laisser un commentaire ici",
+            "thank_you": "Merci beaucoup !",
+            "intro_line1": "Poznote est un <strong>projet gratuit et open-source sans tracking ni analytics</strong>, donc je n'ai presque aucun moyen de savoir à quel point il est utilisé.",
+            "intro_line2": "Laisser un petit commentaire dans la discussion GitHub m'aiderait vraiment à comprendre si Poznote est utile et vaut la peine d'être continué."
+        },
+        "support_modal": {
+            "title": "Bonjour !"
+        }
     },
     "home": {
         "title": "Accueil",
@@ -1953,9 +1966,9 @@
                 "title": "Reconstruire la base Master",
                 "subtitle": "",
                 "description": "La base de données principale (master.db) contient les informations des utilisateurs, leurs liens publics et les réglages globaux de Poznote. Si ce fichier est perdu ou corrompu, cet outil scanne vos dossiers 'data/users' pour réinscrire automatiquement les comptes, récupérer leurs vrais noms depuis leurs bases personnelles et rétablir tous les liens de partage publics.",
-                "repair_registry": "Lancer la reconstruction",
+                "repair_registry": "Reconstruction",
                 "repair_registry_confirm": "Cela va scanner tous les dossiers utilisateurs et reconstruire la base de données master.",
-                "repair_registry_success": "Base de données master reconstruite avec succès :\n- {{scanned}} dossiers scannés\n- {{added}} utilisateurs restaurés\n- {{links}} liens de partage reconstruits",
+                "repair_registry_success": "Base de données master reconstruite avec succès :\n\n- {{scanned}} dossiers scannés\n- {{added}} utilisateurs restaurés\n- {{links}} liens de partage reconstruits",
                 "repair_registry_error": "Erreur de reconstruction : {{error}}"
             },
             "administrator": "Administrateur",
@@ -2177,5 +2190,35 @@
     "workspace_menu": {
         "workspaces": "Espaces de travail",
         "logout": "Déconnexion"
+    },
+    "admin_tools": {
+        "convert_images": {
+            "title": "Convertisseur d’images Base64",
+            "description": "Recherche les images encodées en base64 dans les notes et les extrait en fichiers joints, réduisant la taille de la base de données. Utile après la restauration d’une sauvegarde créée lorsque les notes contenaient encore des images en base64.",
+            "step1": "Étape 1",
+            "step2": "Étape 2",
+            "scan_title": "Analyser",
+            "convert_title": "Convertir",
+            "scan_desc": "Analyse toutes les notes de chaque compte utilisateur et indique le nombre d’images base64 trouvées.",
+            "scan_no_changes": "Aucune modification n’est effectuée.",
+            "convert_desc": "Extrait chaque image base64 et l’enregistre sur le disque. Les notes sont mises à jour pour référencer l’URL du nouvel attachement.",
+            "convert_irreversible": "Irréversible — analysez d’abord.",
+            "scan_button": "Analyser toutes les notes",
+            "convert_button": "Convertir toutes les notes",
+            "results_scan": "Résultats de l’analyse",
+            "results_convert": "Résultats de la conversion",
+            "stats_notes": "Notes analysées",
+            "stats_images": "Images Base64 trouvées",
+            "stats_converted": "Converties",
+            "stats_errors": "Erreurs",
+            "notice_convert_clean": "Aucune image base64 trouvée. Rien à convertir.",
+            "notice_convert_done": "{{count}} image(s) convertie(s) avec succès.",
+            "notice_convert_partial": "{{done}} image(s) convertie(s) — {{errors}} erreur(s) rencontrée(s).",
+            "notice_scan_clean": "Aucune image base64 trouvée. Rien à faire.",
+            "notice_scan_found": "{{count}} image(s) intégrée(s) trouvée(s) dans {{notes}} note(s). Utilisez l’étape 2 pour les convertir."
+        }
+    },
+    "backlinks": {
+        "title": "Rétroliens"
     }
 }

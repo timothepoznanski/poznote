@@ -297,6 +297,7 @@
         "title": "Configuración",
         "categories": {
             "actions": "Acciones",
+            "admin_tools": "Herramientas de administración",
             "display": "Pantalla",
             "about": "Acerca de",
             "documentation": "Documentación"
@@ -332,7 +333,8 @@
             "news": "Blog de Poznote",
             "website": "Sitio web de Poznote",
             "support": "Apoyar al desarrollador",
-            "release_notes": "Notas de la versión"
+            "release_notes": "Notas de la versión",
+            "convert_images": "Conversor de Imágenes Base64"
         }
     },
     "workspaces": {
@@ -430,7 +432,8 @@
             "kanban_on_folder_click": "Abrir vista Kanban al hacer clic en la carpeta",
             "index_icon_scale": "Escalado de iconos del índice",
             "note_content_width": "Ancho del contenido de la nota",
-            "code_block_word_wrap": "Ajuste de línea en bloques de código"
+            "code_block_word_wrap": "Ajuste de línea en bloques de código",
+            "hide_support_icon": "Ocultar icono de like"
         },
         "badges": {
             "font_size_default": "predeterminado ({{size}}px)",
@@ -455,7 +458,17 @@
         "home": "Inicio",
         "settings": "Configuración",
         "create": "Crear",
-        "toggle": "Mostrar/Ocultar la columna izquierda"
+        "toggle": "Mostrar/Ocultar la columna izquierda",
+        "support": "Dejar un comentario",
+        "support_popup": {
+            "link_label": "Dejar un comentario aquí",
+            "thank_you": "¡Muchas gracias!",
+            "intro_line1": "Poznote es un <strong>proyecto gratuito y de código abierto sin seguimiento ni análisis</strong>, por lo que casi no tengo forma de saber cuánto se usa.",
+            "intro_line2": "Dejar un comentario rápido en la discusión de GitHub realmente me ayudaría a entender si Poznote es útil y vale la pena continuar desarrollándolo."
+        },
+        "support_modal": {
+            "title": "¡Hola!"
+        }
     },
     "home": {
         "title": "Inicio",
@@ -1851,9 +1864,9 @@
                 "title": "Reconstruir Base Maestra",
                 "subtitle": "Restaurar perfiles de usuario y enlaces compartidos",
                 "description": "La base de datos maestra (master.db) contiene la información de los usuarios, sus enlaces públicos y la configuración global de Poznote. Si este archivo se pierde o se corrompe, esta herramienta escanea sus carpetas 'data/users' para volver a registrar automáticamente las cuentas, recuperar sus nombres de usuario originales de sus bases personales y restablecer todos los enlaces compartidos.",
-                "repair_registry": "Iniciar Reconstrucción",
+                "repair_registry": "Reconstrucción",
                 "repair_registry_confirm": "Esto escaneará todas las carpetas de usuario y reconstruirá la base de datos maestra. ¿Continuar?",
-                "repair_registry_success": "Base de datos maestra reconstruida con éxito:\n- {{scanned}} carpetas escaneadas\n- {{added}} usuarios restaurados\n- {{links}} enlaces compartidos reconstruidos",
+                "repair_registry_success": "Base de datos maestra reconstruida con éxito:\n\n- {{scanned}} carpetas escaneadas\n- {{added}} usuarios restaurados\n- {{links}} enlaces compartidos reconstruidos",
                 "repair_registry_error": "Error de reconstrucción: {{error}}"
             },
             "administrator": "Administrador",
@@ -2019,5 +2032,35 @@
     "workspace_menu": {
         "workspaces": "Espacios de trabajo",
         "logout": "Cerrar sesión"
+    },
+    "admin_tools": {
+        "convert_images": {
+            "title": "Conversor de Imágenes Base64",
+            "description": "Busca imágenes codificadas en base64 almacenadas en las notas y las extrae como archivos adjuntos, reduciendo el tamaño de la base de datos. Útil tras restaurar una copia de seguridad que contenía imágenes en base64.",
+            "step1": "Paso 1",
+            "step2": "Paso 2",
+            "scan_title": "Analizar",
+            "convert_title": "Convertir",
+            "scan_desc": "Analiza todas las notas de cada cuenta de usuario e indica cuántas imágenes base64 se encontraron.",
+            "scan_no_changes": "No se realizan cambios.",
+            "convert_desc": "Extrae cada imagen base64 y la guarda como archivo. Las notas se actualizan para referenciar la nueva URL del adjunto.",
+            "convert_irreversible": "Irreversible — analice primero.",
+            "scan_button": "Analizar todas las notas",
+            "convert_button": "Convertir todas las notas",
+            "results_scan": "Resultados del análisis",
+            "results_convert": "Resultados de la conversión",
+            "stats_notes": "Notas analizadas",
+            "stats_images": "Imágenes Base64 encontradas",
+            "stats_converted": "Convertidas",
+            "stats_errors": "Errores",
+            "notice_convert_clean": "No se encontraron imágenes base64. Nada que convertir.",
+            "notice_convert_done": "{{count}} imagen(es) convertida(s) con éxito.",
+            "notice_convert_partial": "{{done}} imagen(es) convertida(s) — {{errors}} error(es).",
+            "notice_scan_clean": "No se encontraron imágenes base64. Nada que hacer.",
+            "notice_scan_found": "{{count}} imagen(es) encontrada(s) en {{notes}} nota(s). Usar el paso 2 para convertirlas."
+        }
+    },
+    "backlinks": {
+        "title": "Vínculos inversos"
     }
 }

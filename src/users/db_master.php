@@ -16,9 +16,6 @@ if (!defined('SQLITE_DATABASE')) {
 // Include utility functions (createDirectoryWithPermissions, etc.)
 require_once __DIR__ . '/../functions.php';
 
-// Include auto-migration to ensure multi-user structure exists
-require_once __DIR__ . '/../auto_migrate.php';
-
 // Master database path - usually located at the root of the data directory
 define('MASTER_DATABASE', $_ENV['POZNOTE_MASTER_DATABASE'] ?? dirname(SQLITE_DATABASE, 2) . '/master.db');
 

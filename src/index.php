@@ -205,6 +205,7 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <link type="text/css" rel="stylesheet" href="css/excalidraw.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/excalidraw-unified.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/note-reference.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/backlinks.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/search-replace.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/folder-icon-modal.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/kanban.css?v=<?php echo $v; ?>"/>
@@ -337,6 +338,9 @@ $body_classes = trim($extra_body_classes);
                 <i class="lucide lucide-caret-down workspace-dropdown-icon"></i>
             </div>
             <div class="sidebar-title-actions">
+                <button class="sidebar-support" data-action="show-support-modal" title="<?php echo t_h('sidebar.support', [], 'Leave a comment'); ?>">
+                    <i class="lucide lucide-thumbs-up"></i>
+                </button>
                 <button class="sidebar-home" data-action="navigate-to-home" title="<?php echo t_h('sidebar.home', [], 'Home'); ?>">
                     <i class="lucide lucide-home"></i>
                 </button>
@@ -370,7 +374,7 @@ $body_classes = trim($extra_body_classes);
             'currentNoteFolder' => null, // Will be set below
             'selectedWorkspace' => $workspace_filter ?? '',
             'userId' => $_SESSION['user_id'] ?? null,
-            'userEntriesPath' => isset($_SESSION['user_id']) ? "data/users/{$_SESSION['user_id']}/entries/" : "data/entries/",
+            'userEntriesPath' => "data/users/{$_SESSION['user_id']}/entries/",
             'defaultNoteSortType' => $note_list_sort_type,
             'isAdmin' => function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()
         ];
@@ -961,6 +965,38 @@ $body_classes = trim($extra_body_classes);
         
     </div>  <!-- Close main-container -->
     
+    <!-- Support Modal -->
+    <div class="alert-modal-overlay" id="supportModalOverlay" style="display: none;">
+        <div class="alert-modal support-modal">
+            <div class="alert-modal-header">
+                <h3 class="alert-modal-title">
+                    <span class="alert-modal-icon info">
+                        <i class="lucide lucide-thumbs-up"></i>
+                    </span>
+                    <?php echo t_h('sidebar.support_modal.title', [], 'Leave a comment'); ?>
+                </h3>
+            </div>
+            <div class="alert-modal-body">
+                <p style="margin-top: 12px; text-align: center;"><?php echo t('sidebar.support_popup.intro_line1', [], 'Poznote is a free and open-source project with no tracking or analytics, so I have almost no way of knowing how widely it\'s used.'); ?></p>
+                <p style="text-align: center;"><?php echo t('sidebar.support_popup.intro_line2', [], 'Leaving a quick comment in the GitHub discussion would really help me understand if Poznote is useful and worth continuing to develop.'); ?></p>
+                <p style="text-align: center;"><?php echo t_h('sidebar.support_popup.thank_you', [], 'Thank you so much!'); ?></p>
+                <p style="margin-top: 16px; text-align: center;">
+                    <a href="https://github.com/timothepoznanski/poznote/discussions/855" 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       class="support-modal-link">
+                        <?php echo t_h('sidebar.support_popup.link_label', [], 'Leave a comment on GitHub'); ?>
+                    </a>
+                </p>
+            </div>
+            <div class="alert-modal-footer" style="justify-content: center;">
+                <button type="button" class="alert-modal-button primary support-modal-close-btn" id="supportModalClose">
+                    <?php echo t_h('common.close', [], 'Close'); ?>
+                </button>
+            </div>
+        </div>
+    </div>
+    
 </body>
 <!-- Modules refactorisés de script.js -->
 <script src="js/globals.js"></script>
@@ -1040,6 +1076,7 @@ window.calendarTranslations = {
 };
 </script>
 <script src="js/calendar.js?v=<?php echo $v; ?>"></script>
+<script src="js/backlinks.js?v=<?php echo $v; ?>"></script>
 
 <?php if ($note && is_numeric($note)): ?>
 <!-- Data for draft check (used by index-events.js) -->

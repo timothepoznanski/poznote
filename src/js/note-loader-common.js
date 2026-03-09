@@ -1500,6 +1500,11 @@ function reinitializeNoteContent() {
     // Force interface refresh to sync with loaded content - but don't trigger auto-save
     // since content was just loaded from server and is already saved
 
+    // Refresh backlinks panel for the newly loaded note
+    if (typeof window.initBacklinksPanel === 'function') {
+        window.initBacklinksPanel();
+    }
+
     // Mark that note loading is complete
     window.isLoadingNote = false;
 }

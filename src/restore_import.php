@@ -1898,26 +1898,6 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             </div>
         </div>
         
-        <?php if (isCurrentUserAdmin()): ?>
-        <!-- Disaster Recovery Card -->
-        <div class="backup-section">
-            <div class="card-container">
-                <div class="card-header" data-action="toggle-card" data-target="maintenanceContent">
-                    <h3>
-                        <?php echo t_h('multiuser.admin.maintenance.title', [], 'Disaster Recovery'); ?>
-                    </h3>
-                </div>
-                <div class="card-content" id="maintenanceContent">
-                    <p class="admin-subtitle maintenance-description" style="margin-bottom: 20px;"><?php echo t_h('multiuser.admin.maintenance.description', [], 'Poznote stores your notes in individual user folders. The main system index (master.db) tracks which user owns which folder. If you lose this index, this tool will scan your folders to automatically recreate the user accounts and restore all public sharing links.'); ?></p>
-                    
-                    <button type="button" class="btn btn-secondary btn-maintenance" data-action="run-repair">
-                        <?php echo t_h('multiuser.admin.maintenance.repair_registry', [], 'Reconstruct System Index'); ?>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <?php endif; ?>
-        
         <!-- Bottom padding for better spacing -->
         <div class="section-bottom-spacer"></div>
     </div>

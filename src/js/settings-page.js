@@ -144,6 +144,21 @@
                             }
                         }
 
+                        // Special handling for hide_support_icon - apply immediately to opener window
+                        if (settingKey === 'hide_support_icon') {
+                            try {
+                                if (window.opener && window.opener.document) {
+                                    var supportBtn = window.opener.document.querySelector('.sidebar-support');
+                                    if (supportBtn) {
+                                        var shouldHide = (toSet === '1');
+                                        supportBtn.style.display = shouldHide ? 'none' : '';
+                                    }
+                                }
+                            } catch (e) {
+                                // Safely ignore cross-origin errors
+                            }
+                        }
+
                         reloadOpener();
                     });
                 });
@@ -448,6 +463,7 @@
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
         setupToggleCard('code-wrap-card', 'code-wrap-status', 'code_block_word_wrap', false, true);
+        setupToggleCard('hide-support-icon-card', 'hide-support-icon-status', 'hide_support_icon', false);
 
         // Card click handlers for modal settings
         var languageCard = document.getElementById('language-card');

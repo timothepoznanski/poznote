@@ -23,11 +23,7 @@ class AttachmentsController {
      * Get the attachments directory path
      */
     private function getAttachmentsPath() {
-        if (function_exists('getAttachmentsPath')) {
-            return getAttachmentsPath();
-        }
-        // Fallback
-        return __DIR__ . '/../../../../data/attachments';
+        return getAttachmentsPath();
     }
     
     /**
