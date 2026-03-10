@@ -21,8 +21,7 @@ This project started from a simple personal need: a practical way to write, orga
   <img src="images/poznote-light.png" alt="Poznote-light" width="100%">
 </p>
 
-
-Discover all the [features here](https://poznote.com/index.html#features).
+### Features
 
 <p align="center">
   <img src="images/poznote-features.png" alt="Poznote Features" width="100%">
