@@ -243,12 +243,22 @@ body.outline-collapsed .toggle-outline-btn i {
         display: none !important;
     }
 
+    /* On mobile, add smooth transitions */
+    #outline-panel {
+        transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
     /* On mobile, outline is collapsed by default */
     body:not(.outline-mobile-open) #outline-panel {
-        width: 0 !important;
-        min-width: 0 !important;
-        padding: 0;
-        overflow: hidden;
+        position: fixed;
+        right: 0;
+        top: 0;
+        z-index: 1001;
+        width: 80% !important;
+        max-width: 320px !important;
+        transform: translateX(100%);
+        opacity: 0;
+        pointer-events: none;
     }
 
     /* When open on mobile, make it overlay the content */
@@ -260,12 +270,14 @@ body.outline-collapsed .toggle-outline-btn i {
         box-shadow: -4px 0 8px rgba(0, 0, 0, 0.2);
         width: 80% !important;
         max-width: 320px !important;
+        transform: translateX(0);
+        opacity: 1;
+        pointer-events: auto;
     }
 }
 
 /* Overlay backdrop for mobile */
 .outline-mobile-backdrop {
-    display: none;
     position: fixed;
     top: 0;
     left: 0;
@@ -273,8 +285,12 @@ body.outline-collapsed .toggle-outline-btn i {
     bottom: 0;
     background: rgba(0, 0, 0, 0.4);
     z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
 }
 
 body.outline-mobile-open .outline-mobile-backdrop {
-    display: block;
+    opacity: 1;
+    pointer-events: auto;
 }
