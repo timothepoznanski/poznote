@@ -127,8 +127,7 @@ $currentLang = getUserLanguage();
 		} else {
 			foreach($tags_list as $tag) {
 				if (!empty(trim($tag))) {
-					$tag_encoded = urlencode($tag);
-					echo '<div class="tag-item" data-tag="' . htmlspecialchars($tag_encoded, ENT_QUOTES) . '">
+					echo '<div class="tag-item" data-tag="' . htmlspecialchars($tag, ENT_QUOTES) . '">
 						<div class="tag-name">'.htmlspecialchars($tag).'</div>
 					</div>';
 				}
