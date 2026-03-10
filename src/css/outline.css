@@ -1,0 +1,280 @@
+/**
+ * Outline Panel Styles
+ *
+ * Right sidebar showing table of contents / outline
+ * for navigating long HTML and Markdown notes.
+ */
+
+/* OUTLINE PANEL */
+
+#outline-panel {
+    width: var(--outline-width, 280px);
+    min-width: 200px;
+    max-width: 500px;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px;
+    box-sizing: border-box;
+    background: #f8f9fa;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid #dee2e6;
+    /* Hide scrollbars but keep scroll functionality */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+    transition: width 0.3s ease, padding 0.3s ease;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+#outline-panel::-webkit-scrollbar {
+    display: none;
+}
+
+/* Outline header */
+.outline-header {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.outline-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+/* Outline navigation list */
+.outline-nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.outline-nav-item {
+    margin: 0;
+    padding: 0;
+}
+
+.outline-nav-link {
+    display: block;
+    padding: 6px 12px;
+    color: #495057;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-bottom: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.outline-nav-link:hover {
+    background: rgba(0, 125, 184, 0.1);
+    color: #007DB8;
+}
+
+.outline-nav-link.active {
+    background: rgba(0, 125, 184, 0.15);
+    color: #007DB8;
+    font-weight: 500;
+}
+
+/* Heading levels - indentation */
+.outline-nav-link[data-level="1"] {
+    font-weight: 600;
+    padding-left: 12px;
+    font-size: 0.9rem;
+}
+
+.outline-nav-link[data-level="2"] {
+    padding-left: 24px;
+}
+
+.outline-nav-link[data-level="3"] {
+    padding-left: 36px;
+    font-size: 0.85rem;
+}
+
+.outline-nav-link[data-level="4"] {
+    padding-left: 48px;
+    font-size: 0.85rem;
+}
+
+.outline-nav-link[data-level="5"] {
+    padding-left: 60px;
+    font-size: 0.825rem;
+}
+
+.outline-nav-link[data-level="6"] {
+    padding-left: 72px;
+    font-size: 0.825rem;
+}
+
+/* Empty state */
+.outline-empty {
+    padding: 32px 12px;
+    text-align: center;
+    color: #adb5bd;
+    font-size: 0.875rem;
+}
+
+.outline-empty-icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    opacity: 0.5;
+}
+
+.outline-empty-text {
+    margin: 0;
+}
+
+/* Outline resize handle */
+.outline-resize-handle {
+    height: 100vh;
+    background: #f8f9fa;
+    cursor: col-resize;
+    position: relative;
+    flex-shrink: 0;
+    border-left: 1px solid #dee2e6;
+}
+
+/* Extend hover area for easier button access */
+.outline-resize-handle::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -8px;
+    right: -8px;
+    bottom: 0;
+    z-index: 1;
+}
+
+/* Toggle outline button */
+.toggle-outline-btn {
+    position: absolute;
+    bottom: 0px;
+    right: 50%;
+    width: 16px;
+    height: 25px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px 0 0 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-size: 0.875rem;
+    padding: 0;
+    transition: all 0.2s ease;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.outline-resize-handle:hover .toggle-outline-btn,
+.toggle-outline-btn:focus {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.toggle-outline-btn:hover {
+    background: #f8f9fa;
+    color: #007DB8;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-outline-btn i {
+    transition: transform 0.3s ease;
+    width: 12px;
+    height: 12px;
+}
+
+.toggle-outline-btn .lucide,
+.toggle-outline-btn [class*="lucide-"] {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background-color: currentColor;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    filter: none !important;
+}
+
+/* Collapsed state */
+body.outline-collapsed #outline-panel {
+    width: 0 !important;
+    min-width: 0 !important;
+    padding: 0;
+    overflow: hidden;
+}
+
+body.outline-collapsed .outline-resize-handle {
+    cursor: default;
+}
+
+body.outline-collapsed .toggle-outline-btn {
+    right: 3px;
+    border-radius: 4px 0 0 4px;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+body.outline-collapsed .toggle-outline-btn i {
+    transform: rotate(180deg);
+}
+
+/* Mobile: Hide resize handle and toggle button, but keep panel accessible via swipe */
+@media (max-width: 800px) {
+    .outline-resize-handle {
+        display: none !important;
+    }
+
+    .toggle-outline-btn {
+        display: none !important;
+    }
+
+    /* On mobile, outline is collapsed by default */
+    body:not(.outline-mobile-open) #outline-panel {
+        width: 0 !important;
+        min-width: 0 !important;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    /* When open on mobile, make it overlay the content */
+    body.outline-mobile-open #outline-panel {
+        position: fixed;
+        right: 0;
+        top: 0;
+        z-index: 1001;
+        box-shadow: -4px 0 8px rgba(0, 0, 0, 0.2);
+        width: 80% !important;
+        max-width: 320px !important;
+    }
+}
+
+/* Overlay backdrop for mobile */
+.outline-mobile-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+}
+
+body.outline-mobile-open .outline-mobile-backdrop {
+    display: block;
+}

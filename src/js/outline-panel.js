@@ -1,0 +1,637 @@
+/**
+ * Outline Panel
+ *
+ * Extracts headings from HTML/Markdown notes and displays them
+ * in a navigable table of contents sidebar on the right.
+ */
+
+let isResizingOutline = false;
+let currentNoteId = null;
+
+/**
+ * Initialize the outline panel
+ */
+function initOutlinePanel() {
+    const outlineResizeHandle = document.getElementById('outlineResizeHandle');
+    const outlinePanel = document.getElementById('outline-panel');
+
+    if (!outlineResizeHandle || !outlinePanel) {
+        return; // Elements not found
+    }
+
+    // Load saved width from localStorage
+    const savedWidth = localStorage.getItem('outlineWidth');
+    if (savedWidth && parseInt(savedWidth) >= 200 && parseInt(savedWidth) <= 500) {
+        document.documentElement.style.setProperty('--outline-width', savedWidth + 'px');
+        outlinePanel.style.width = savedWidth + 'px';
+    }
+
+    // Load saved collapsed state from localStorage
+    const isMobile = window.innerWidth <= 800;
+
+    if (isMobile) {
+        // On mobile, collapsed by default, can be opened with swipe
+        const isOpen = localStorage.getItem('outlineMobileOpen') === 'true';
+        if (isOpen) {
+            document.body.classList.add('outline-mobile-open');
+        }
+    } else {
+        // On desktop, load saved collapsed state
+        const isCollapsed = localStorage.getItem('outlineCollapsed') === 'true';
+        if (isCollapsed) {
+            document.body.classList.add('outline-collapsed');
+        }
+    }
+
+    // Initialize toggle button
+    initToggleOutline();
+
+    // Initialize resize functionality
+    outlineResizeHandle.addEventListener('mousedown', startResizingOutline);
+    document.addEventListener('mousemove', handleResizeOutline);
+    document.addEventListener('mouseup', stopResizingOutline);
+
+    // Prevent text selection during resize
+    outlineResizeHandle.addEventListener('selectstart', function(e) {
+        e.preventDefault();
+    });
+
+    // Listen for note changes to update outline
+    observeNoteChanges();
+}
+
+/**
+ * Start resizing outline panel
+ */
+function startResizingOutline(e) {
+    // Don't start resizing if clicking on the toggle button
+    if (e.target.closest('.toggle-outline-btn')) {
+        return;
+    }
+
+    e.preventDefault();
+    isResizingOutline = true;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+}
+
+/**
+ * Handle outline panel resize
+ */
+function handleResizeOutline(e) {
+    if (!isResizingOutline) return;
+
+    e.preventDefault();
+    const outlinePanel = document.getElementById('outline-panel');
+    const minWidth = 200;
+    const maxWidth = 500;
+
+    // Calculate new width based on distance from right edge
+    const newWidth = Math.min(Math.max(window.innerWidth - e.clientX, minWidth), maxWidth);
+
+    // Update CSS variable and element width
+    document.documentElement.style.setProperty('--outline-width', newWidth + 'px');
+    if (outlinePanel) {
+        outlinePanel.style.width = newWidth + 'px';
+    }
+}
+
+/**
+ * Stop resizing outline panel
+ */
+function stopResizingOutline() {
+    if (!isResizingOutline) return;
+
+    isResizingOutline = false;
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+
+    // Save the new width to localStorage
+    const outlinePanel = document.getElementById('outline-panel');
+    if (outlinePanel) {
+        const currentWidth = outlinePanel.offsetWidth;
+        localStorage.setItem('outlineWidth', currentWidth);
+    }
+}
+
+/**
+ * Initialize toggle outline button
+ */
+function initToggleOutline() {
+    const toggleBtn = document.getElementById('toggleOutlineBtn');
+    if (!toggleBtn) return;
+
+    toggleBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggleOutline();
+    });
+
+    // Add keyboard support
+    toggleBtn.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleOutline();
+        }
+    });
+}
+
+/**
+ * Toggle outline panel visibility
+ */
+function toggleOutline() {
+    const isMobile = window.innerWidth <= 800;
+
+    if (isMobile) {
+        // On mobile, use overlay mode
+        const isOpen = document.body.classList.toggle('outline-mobile-open');
+        localStorage.setItem('outlineMobileOpen', isOpen);
+    } else {
+        // On desktop, use collapse mode
+        const isCollapsed = document.body.classList.toggle('outline-collapsed');
+        localStorage.setItem('outlineCollapsed', isCollapsed);
+    }
+
+    // Remove focus from the toggle button after click
+    const toggleBtn = document.getElementById('toggleOutlineBtn');
+    if (toggleBtn) {
+        toggleBtn.blur();
+    }
+}
+
+/**
+ * Extract headings from a note element
+ */
+function extractHeadings(noteElement) {
+    if (!noteElement) return [];
+
+    const headings = [];
+
+    // Check if this is a markdown note
+    const markdownEditor = noteElement.querySelector('.markdown-editor');
+    const markdownPreview = noteElement.querySelector('.markdown-preview');
+    const isSplitMode = noteElement.classList.contains('markdown-split-mode');
+
+    // For markdown notes, always extract from source (works for all modes)
+    if (markdownEditor) {
+        const markdownContent = markdownEditor.value || markdownEditor.textContent;
+        if (markdownContent) {
+            const lines = markdownContent.split('\n');
+            lines.forEach((line, lineIndex) => {
+                // Match markdown headings: # Title, ## Title, etc.
+                const match = line.match(/^(#{1,6})\s+(.+)$/);
+                if (match) {
+                    const level = match[1].length;
+                    const text = match[2].trim();
+                    const id = `md-heading-${lineIndex}-${text.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+
+                    // Find corresponding element in preview if available
+                    let previewElement = null;
+                    if (markdownPreview) {
+                        const previewHeadings = markdownPreview.querySelectorAll('h1, h2, h3, h4, h5, h6');
+                        // Try to find matching heading by text content
+                        for (const h of previewHeadings) {
+                            if (h.textContent.trim() === text) {
+                                previewElement = h;
+                                if (!h.id) h.id = id;
+                                break;
+                            }
+                        }
+                    }
+
+                    headings.push({
+                        id: id,
+                        level: level,
+                        text: text,
+                        element: previewElement,
+                        lineNumber: lineIndex,
+                        isMarkdownSource: true,
+                        isSplitMode: isSplitMode,
+                        hasPreview: markdownPreview && markdownPreview.offsetParent !== null
+                    });
+                }
+            });
+            return headings;
+        }
+    }
+
+    // Default: extract from HTML headings (regular HTML notes)
+    const headingElements = noteElement.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    headingElements.forEach((heading, index) => {
+        const level = parseInt(heading.tagName.substring(1)); // h1 -> 1, h2 -> 2, etc.
+        const text = heading.textContent.trim();
+
+        if (text) {
+            // Add an ID to the heading if it doesn't have one (for navigation)
+            if (!heading.id) {
+                heading.id = `heading-${index}-${text.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+            }
+
+            headings.push({
+                id: heading.id,
+                level: level,
+                text: text,
+                element: heading
+            });
+        }
+    });
+
+    return headings;
+}
+
+/**
+ * Render the outline navigation
+ */
+function renderOutline(headings) {
+    const outlineNav = document.getElementById('outline-nav');
+    if (!outlineNav) return;
+
+    // Clear existing outline
+    outlineNav.innerHTML = '';
+
+    if (!headings || headings.length === 0) {
+        // Show empty state
+        outlineNav.innerHTML = `
+            <div class="outline-empty">
+                <div class="outline-empty-icon">📄</div>
+                <p class="outline-empty-text">No headings in this note</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Create navigation items
+    headings.forEach(heading => {
+        const li = document.createElement('li');
+        li.className = 'outline-nav-item';
+
+        const link = document.createElement('a');
+        link.className = 'outline-nav-link';
+        link.setAttribute('data-level', heading.level);
+        link.setAttribute('data-heading-id', heading.id);
+        link.textContent = heading.text;
+        link.href = '#' + heading.id;
+        link.title = heading.text;
+
+        // Handle click to scroll to heading
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            scrollToHeading(heading);
+
+            // Update active state
+            document.querySelectorAll('.outline-nav-link').forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+
+            // On mobile, close the outline panel after selection
+            const isMobile = window.innerWidth <= 800;
+            if (isMobile && document.body.classList.contains('outline-mobile-open')) {
+                // Delay closing slightly to allow scroll animation to start
+                setTimeout(function() {
+                    toggleOutline();
+                }, 200);
+            }
+        });
+
+        li.appendChild(link);
+        outlineNav.appendChild(li);
+    });
+}
+
+/**
+ * Scroll to a heading in the note
+ */
+function scrollToHeading(heading) {
+    const visibleNote = document.querySelector('.notecard:not([style*="display: none"]) .noteentry');
+    if (!visibleNote) return;
+
+    // Handle markdown notes
+    if (heading.isMarkdownSource && heading.lineNumber !== undefined) {
+        const markdownEditor = visibleNote.querySelector('.markdown-editor');
+        const markdownPreview = visibleNote.querySelector('.markdown-preview');
+
+        // Split mode: scroll both editor and preview
+        if (heading.isSplitMode) {
+            // Scroll editor to line
+            if (markdownEditor && markdownEditor.offsetParent !== null) {
+                const lines = (markdownEditor.value || markdownEditor.textContent).split('\n');
+                const lineHeight = parseFloat(getComputedStyle(markdownEditor).lineHeight) || 20;
+                const targetPosition = heading.lineNumber * lineHeight;
+
+                markdownEditor.scrollTop = Math.max(0, targetPosition - 100);
+
+                // Set cursor position
+                if (markdownEditor.setSelectionRange) {
+                    const textBeforeHeading = lines.slice(0, heading.lineNumber).join('\n');
+                    const cursorPosition = textBeforeHeading.length + (heading.lineNumber > 0 ? 1 : 0);
+                    markdownEditor.focus();
+                    markdownEditor.setSelectionRange(cursorPosition, cursorPosition);
+                }
+            }
+
+            // Scroll preview to heading element
+            if (heading.element && markdownPreview && markdownPreview.offsetParent !== null) {
+                const previewRect = markdownPreview.getBoundingClientRect();
+                const headingRect = heading.element.getBoundingClientRect();
+                const scrollTop = markdownPreview.scrollTop;
+                const offset = headingRect.top - previewRect.top + scrollTop - 20;
+
+                markdownPreview.scrollTop = Math.max(0, offset);
+
+                // Highlight the heading in preview
+                heading.element.style.transition = 'background-color 0.3s ease';
+                heading.element.style.backgroundColor = 'rgba(0, 125, 184, 0.1)';
+                setTimeout(() => {
+                    heading.element.style.backgroundColor = '';
+                }, 1000);
+            }
+            return;
+        }
+
+        // Edit mode only (no preview visible)
+        if (markdownEditor && (!markdownPreview || markdownPreview.offsetParent === null)) {
+            const lines = (markdownEditor.value || markdownEditor.textContent).split('\n');
+            const lineHeight = parseFloat(getComputedStyle(markdownEditor).lineHeight) || 20;
+            const targetLinePosition = heading.lineNumber * lineHeight;
+
+            // In edit mode, the main container (right_col) scrolls, not the editor itself
+            const scrollContainer = document.getElementById('right_col');
+
+            if (scrollContainer) {
+                // Calculate the editor's position in the container
+                const containerRect = scrollContainer.getBoundingClientRect();
+                const editorRect = markdownEditor.getBoundingClientRect();
+                const editorOffsetInContainer = editorRect.top - containerRect.top + scrollContainer.scrollTop;
+
+                // Target position = editor position + line position - padding
+                const targetScrollPosition = editorOffsetInContainer + targetLinePosition - 100;
+
+                scrollContainer.scrollTo({
+                    top: Math.max(0, targetScrollPosition),
+                    behavior: 'smooth'
+                });
+            }
+
+            // Set cursor position
+            if (markdownEditor.setSelectionRange) {
+                const textBeforeHeading = lines.slice(0, heading.lineNumber).join('\n');
+                const cursorPosition = textBeforeHeading.length + (heading.lineNumber > 0 ? 1 : 0);
+                markdownEditor.focus();
+                markdownEditor.setSelectionRange(cursorPosition, cursorPosition);
+            }
+            return;
+        }
+
+        // Preview mode only
+        if (markdownPreview && markdownPreview.offsetParent !== null) {
+            // Try to find the heading element in preview if not already set
+            if (!heading.element) {
+                const previewHeadings = markdownPreview.querySelectorAll('h1, h2, h3, h4, h5, h6');
+                for (const h of previewHeadings) {
+                    if (h.textContent.trim() === heading.text) {
+                        heading.element = h;
+                        if (!h.id) h.id = heading.id;
+                        break;
+                    }
+                }
+            }
+
+            if (heading.element) {
+                scrollToElement(heading.element);
+                return;
+            }
+        }
+    }
+
+    // Handle preview mode or HTML notes (scroll to element)
+    const headingElement = heading.element || document.getElementById(heading.id);
+    if (headingElement) {
+        scrollToElement(headingElement);
+    }
+}
+
+/**
+ * Scroll to a specific element with highlighting
+ */
+function scrollToElement(element) {
+    if (!element) return;
+
+    // Find the scroll container (right_col)
+    const scrollContainer = document.getElementById('right_col');
+    if (!scrollContainer) {
+        // Fallback to element scroll
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+    }
+
+    // Calculate position relative to scroll container
+    const containerRect = scrollContainer.getBoundingClientRect();
+    const elementRect = element.getBoundingClientRect();
+    const scrollTop = scrollContainer.scrollTop;
+    const offset = elementRect.top - containerRect.top + scrollTop - 100; // 100px padding to avoid toolbar
+
+    // Smooth scroll
+    scrollContainer.scrollTo({
+        top: offset,
+        behavior: 'smooth'
+    });
+
+    // Briefly highlight the element
+    element.style.transition = 'background-color 0.3s ease';
+    element.style.backgroundColor = 'rgba(0, 125, 184, 0.1)';
+    setTimeout(() => {
+        element.style.backgroundColor = '';
+    }, 1000);
+}
+
+/**
+ * Update outline for currently active note
+ */
+function updateOutlineForCurrentNote() {
+    // Find the currently visible note
+    const visibleNote = document.querySelector('.notecard:not([style*="display: none"]) .noteentry');
+
+    if (!visibleNote) {
+        renderOutline([]);
+        return;
+    }
+
+    // Extract note ID from the element
+    const noteId = visibleNote.id.replace('entry', '');
+
+    // Only update if note has changed
+    if (currentNoteId === noteId) {
+        return;
+    }
+
+    currentNoteId = noteId;
+
+    // Extract headings
+    const headings = extractHeadings(visibleNote);
+
+    // Render outline
+    renderOutline(headings);
+}
+
+/**
+ * Observe note changes in the DOM
+ */
+function observeNoteChanges() {
+    const rightCol = document.getElementById('right_col');
+    if (!rightCol) return;
+
+    // Initial update
+    updateOutlineForCurrentNote();
+
+    // Watch for changes to note content
+    const observer = new MutationObserver(function(mutations) {
+        // Debounce the update
+        clearTimeout(window.outlineUpdateTimeout);
+        window.outlineUpdateTimeout = setTimeout(() => {
+            updateOutlineForCurrentNote();
+        }, 300);
+    });
+
+    // Observe changes to the right column
+    observer.observe(rightCol, {
+        childList: true,
+        subtree: true,
+        characterData: true
+    });
+
+    // Also listen for custom events if notes are loaded dynamically
+    document.addEventListener('noteLoaded', function() {
+        updateOutlineForCurrentNote();
+    });
+
+    // Listen for note visibility changes
+    document.addEventListener('noteVisibilityChanged', function() {
+        updateOutlineForCurrentNote();
+    });
+
+    // Add touch/swipe support for mobile
+    initTouchSupport();
+
+    // Add backdrop click handler for mobile
+    const backdrop = document.getElementById('outlineMobileBackdrop');
+    if (backdrop) {
+        backdrop.addEventListener('click', function() {
+            if (document.body.classList.contains('outline-mobile-open')) {
+                toggleOutline();
+            }
+        });
+    }
+}
+
+/**
+ * Manually trigger outline update (can be called from other scripts)
+ */
+function refreshOutline() {
+    currentNoteId = null; // Force refresh
+    updateOutlineForCurrentNote();
+}
+
+/**
+ * Initialize touch/swipe support for mobile
+ */
+function initTouchSupport() {
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+    let isSwiping = false;
+
+    const minSwipeDistance = 50; // Minimum distance for a swipe
+    const edgeThreshold = 30; // Distance from edge to trigger swipe
+    const maxVerticalDistance = 100; // Max vertical movement allowed for horizontal swipe
+
+    // Swipe from right edge to open outline
+    document.addEventListener('touchstart', function(e) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+
+        // Check if touch started near the right edge
+        const screenWidth = window.innerWidth;
+        if (touchStartX > screenWidth - edgeThreshold) {
+            isSwiping = true;
+        }
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function(_e) {
+        if (!isSwiping) return;
+        // Track movement but don't prevent default to keep scroll working
+    }, { passive: true });
+
+    document.addEventListener('touchend', function(e) {
+        if (!isSwiping) {
+            return;
+        }
+
+        touchEndX = e.changedTouches[0].clientX;
+        touchEndY = e.changedTouches[0].clientY;
+
+        const horizontalDistance = touchStartX - touchEndX;
+        const verticalDistance = Math.abs(touchStartY - touchEndY);
+
+        // Swipe left from right edge (open outline)
+        if (horizontalDistance > minSwipeDistance &&
+            verticalDistance < maxVerticalDistance &&
+            !document.body.classList.contains('outline-mobile-open')) {
+            toggleOutline();
+        }
+
+        isSwiping = false;
+    }, { passive: true });
+
+    // Swipe right on outline panel to close it
+    const outlinePanel = document.getElementById('outline-panel');
+    if (outlinePanel) {
+        let panelTouchStartX = 0;
+        let panelTouchStartY = 0;
+
+        outlinePanel.addEventListener('touchstart', function(e) {
+            panelTouchStartX = e.touches[0].clientX;
+            panelTouchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        outlinePanel.addEventListener('touchend', function(e) {
+            const panelTouchEndX = e.changedTouches[0].clientX;
+            const panelTouchEndY = e.changedTouches[0].clientY;
+
+            const horizontalDistance = panelTouchEndX - panelTouchStartX;
+            const verticalDistance = Math.abs(panelTouchEndY - panelTouchStartY);
+
+            // Swipe right to close
+            if (horizontalDistance > minSwipeDistance &&
+                verticalDistance < maxVerticalDistance &&
+                document.body.classList.contains('outline-mobile-open')) {
+                toggleOutline();
+            }
+        }, { passive: true });
+    }
+}
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    initOutlinePanel();
+});
+
+// Also initialize if DOM is already loaded
+if (document.readyState !== 'loading') {
+    initOutlinePanel();
+}
+
+// Expose functions globally for external access
+window.outlinePanel = {
+    init: initOutlinePanel,
+    refresh: refreshOutline,
+    toggle: toggleOutline,
+    isCollapsed: function() {
+        const isMobile = window.innerWidth <= 800;
+        if (isMobile) {
+            return !document.body.classList.contains('outline-mobile-open');
+        } else {
+            return document.body.classList.contains('outline-collapsed');
+        }
+    },
+    extractHeadings: extractHeadings,
+    renderOutline: renderOutline
+};

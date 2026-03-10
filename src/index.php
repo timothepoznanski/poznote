@@ -160,6 +160,7 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <link type="text/css" rel="stylesheet" href="css/utilities.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/layout.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/sidebar.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/outline.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/toolbar.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/menus.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/searchbars.css?v=<?php echo $v; ?>"/>
@@ -948,9 +949,36 @@ $body_classes = trim($extra_body_classes);
                     }
                 }
             }
-        ?>        
+        ?>
     </div>
-    
+
+    <!-- OUTLINE MOBILE BACKDROP -->
+    <div class="outline-mobile-backdrop" id="outlineMobileBackdrop"></div>
+
+    <!-- OUTLINE RESIZE HANDLE -->
+    <div class="outline-resize-handle" id="outlineResizeHandle">
+        <button
+            id="toggleOutlineBtn"
+            class="toggle-outline-btn"
+            aria-label="Toggle outline panel"
+            title="Toggle outline panel">
+            <i class="lucide lucide-chevron-right"></i>
+        </button>
+    </div>
+
+    <!-- OUTLINE PANEL -->
+    <div id="outline-panel">
+        <div class="outline-header">
+            <h2 class="outline-title">Outline</h2>
+        </div>
+        <ul class="outline-nav" id="outline-nav">
+            <div class="outline-empty">
+                <div class="outline-empty-icon">📄</div>
+                <p class="outline-empty-text">No headings in this note</p>
+            </div>
+        </ul>
+    </div>
+
     <!-- Data for initialization (used by index-events.js) -->
     <?php if (!empty($tasklist_ids)): ?>
     <script type="application/json" id="tasklist-init-data"><?php echo json_encode($tasklist_ids); ?></script>
@@ -987,6 +1015,7 @@ $body_classes = trim($extra_body_classes);
 <script src="js/index-events.js?v=<?php echo $v; ?>"></script>
 <script src="js/main.js?v=<?php echo $v; ?>"></script>
 <script src="js/resize-column.js?v=<?php echo $v; ?>"></script>
+<script src="js/outline-panel.js?v=<?php echo $v; ?>"></script>
 <script src="js/unified-search.js?v=<?php echo $v; ?>"></script>
 <script src="js/clickable-tags.js?v=<?php echo $v; ?>"></script>
 <script src="js/font-size-settings.js?v=<?php echo $v; ?>"></script>
