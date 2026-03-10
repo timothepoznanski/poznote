@@ -539,20 +539,25 @@ function initTouchSupport() {
     let touchEndY = 0;
     let isSwiping = false;
 
-    const minSwipeDistance = 50; // Minimum distance for a swipe
-    const edgeThreshold = 30; // Distance from edge to trigger swipe
+    const minSwipeDistance = 80; // Minimum distance for a swipe (increased to avoid accidental triggers)
     const maxVerticalDistance = 100; // Max vertical movement allowed for horizontal swipe
 
-    // Swipe from right edge to open outline
+    // Swipe from anywhere on the note content area to open outline
     document.addEventListener('touchstart', function(e) {
+        // Don't track swipes that start on the outline panel itself
+        if (e.target.closest('#outline-panel')) {
+            return;
+        }
+
+        // Only enable swipe on the right column (note content area)
+        // Don't enable on left column (sidebar) to avoid conflicts with note navigation
+        if (!e.target.closest('#right_col')) {
+            return;
+        }
+
         touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
-
-        // Check if touch started near the right edge
-        const screenWidth = window.innerWidth;
-        if (touchStartX > screenWidth - edgeThreshold) {
-            isSwiping = true;
-        }
+        isSwiping = true;
     }, { passive: true });
 
     document.addEventListener('touchmove', function(_e) {
