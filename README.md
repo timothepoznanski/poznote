@@ -23,7 +23,7 @@ This project started from a simple personal need: a practical way to write, orga
 
 ### Features
 
-Discover all the [features here](https://poznote.com/index.html#features).
+Discover all the features [here](https://poznote.com/index.html#features).
 
 <p align="center">
   <img src="images/poznote-features.png" alt="Poznote Features" width="100%">
