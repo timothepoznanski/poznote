@@ -1611,6 +1611,13 @@ function switchToEditMode(noteId) {
     } catch (e) {
         console.warn('Could not save view mode to localStorage:', e);
     }
+
+    // Refresh outline panel if available
+    if (window.outlinePanel && window.outlinePanel.refresh) {
+        setTimeout(function() {
+            window.outlinePanel.refresh();
+        }, 100);
+    }
 }
 
 function switchToPreviewMode(noteId) {
@@ -1707,6 +1714,13 @@ function switchToPreviewMode(noteId) {
         if (typeof window.markNoteAsModified === 'function') {
             window.markNoteAsModified();
         }
+    }
+
+    // Refresh outline panel if available
+    if (window.outlinePanel && window.outlinePanel.refresh) {
+        setTimeout(function() {
+            window.outlinePanel.refresh();
+        }, 100);
     }
 }
 
@@ -1948,6 +1962,13 @@ function switchToSplitMode(noteId) {
 
     // Setup live preview update on input
     setupSplitModePreviewUpdate(noteId);
+
+    // Refresh outline panel if available
+    if (window.outlinePanel && window.outlinePanel.refresh) {
+        setTimeout(function() {
+            window.outlinePanel.refresh();
+        }, 100);
+    }
 }
 
 // Exit split view mode (return to edit mode)
@@ -2007,6 +2028,11 @@ function setupSplitModePreviewUpdate(noteId) {
                 placeholder: window.t ? window.t('editor.messages.split_preview_placeholder', null, 'Preview will appear here as you type...') : 'Preview will appear here as you type...',
                 delay: 50
             });
+
+            // Refresh outline panel if available
+            if (window.outlinePanel && window.outlinePanel.refresh) {
+                window.outlinePanel.refresh();
+            }
         }, 300); // 300ms debounce
     };
 
