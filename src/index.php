@@ -969,12 +969,12 @@ $body_classes = trim($extra_body_classes);
     <!-- OUTLINE PANEL -->
     <div id="outline-panel">
         <div class="outline-header">
-            <h2 class="outline-title">Outline</h2>
+            <h2 class="outline-title" data-i18n="common.outline.title">Outline</h2>
         </div>
         <ul class="outline-nav" id="outline-nav">
             <div class="outline-empty">
                 <div class="outline-empty-icon">📄</div>
-                <p class="outline-empty-text">No headings in this note</p>
+                <p class="outline-empty-text" data-i18n="common.outline.no_headings">No headings in this note</p>
             </div>
         </ul>
     </div>

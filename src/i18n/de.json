@@ -58,7 +58,11 @@
         "not_specified": "Nicht angegeben",
         "apply": "Anwenden",
         "at": "um",
-        "kanban": "Kanban"
+        "kanban": "Kanban",
+        "outline": {
+            "title": "Gliederung",
+            "no_headings": "Keine Überschriften in dieser Notiz"
+        }
     },
     "kanban": {
         "title": "Kanban - {{folder}}",

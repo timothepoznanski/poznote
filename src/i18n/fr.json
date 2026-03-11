@@ -60,7 +60,11 @@
         "apply": "Appliquer",
         "at": "à",
         "kanban": "Kanban",
-        "scroll_right": "Faire défiler à droite"
+        "scroll_right": "Faire défiler à droite",
+        "outline": {
+            "title": "Sommaire",
+            "no_headings": "Aucun titre dans cette note"
+        }
     },
     "kanban": {
         "title": "Kanban - {{folder}}",

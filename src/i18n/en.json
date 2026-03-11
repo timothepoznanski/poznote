@@ -34,7 +34,11 @@
         "apply": "Apply",
         "at": "at",
         "scroll_left": "Scroll left",
-        "scroll_right": "Scroll right"
+        "scroll_right": "Scroll right",
+        "outline": {
+            "title": "Outline",
+            "no_headings": "No headings in this note"
+        }
     },
     "settings": {
         "title": "Settings",

@@ -58,6 +58,15 @@ function initOutlinePanel() {
 
     // Listen for note changes to update outline
     observeNoteChanges();
+
+    // Re-apply translations once loaded
+    document.addEventListener('poznote:i18n:loaded', function() {
+        if (typeof window.applyI18nToDom === 'function') {
+            window.applyI18nToDom(outlinePanel);
+        }
+        // Force a re-render to ensure the empty state matches the current language
+        refreshOutline();
+    });
 }
 
 /**
@@ -250,10 +259,11 @@ function renderOutline(headings) {
 
     if (!headings || headings.length === 0) {
         // Show empty state
+        const noHeadingsText = typeof window.t === 'function' ? window.t('common.outline.no_headings', null, 'No headings in this note') : 'No headings in this note';
         outlineNav.innerHTML = `
             <div class="outline-empty">
                 <div class="outline-empty-icon">📄</div>
-                <p class="outline-empty-text">No headings in this note</p>
+                <p class="outline-empty-text">${noHeadingsText}</p>
             </div>
         `;
         return;

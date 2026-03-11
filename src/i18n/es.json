@@ -58,7 +58,11 @@
         "not_specified": "No especificado",
         "apply": "Aplicar",
         "at": "a las",
-        "kanban": "Kanban"
+        "kanban": "Kanban",
+        "outline": {
+            "title": "Esquema",
+            "no_headings": "Sin encabezados en esta nota"
+        }
     },
     "kanban": {
         "title": "Kanban - {{folder}}",
