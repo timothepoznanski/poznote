@@ -8,6 +8,56 @@
 let isResizingOutline = false;
 let currentNoteId = null;
 
+function isPublicOutlinePage() {
+    return !!(window.isPublicNotePage || document.querySelector('.public-note-page .public-note .content'));
+}
+
+function getCurrentOutlineNoteElement() {
+    if (isPublicOutlinePage()) {
+        return document.querySelector('.public-note .content');
+    }
+
+    return document.querySelector('.notecard:not([style*="display: none"]) .noteentry');
+}
+
+function getOutlineScrollContainer() {
+    if (isPublicOutlinePage()) {
+        return document.getElementById('publicNoteMain');
+    }
+
+    return document.getElementById('right_col');
+}
+
+function getOutlineObservationRoot() {
+    if (isPublicOutlinePage()) {
+        return document.querySelector('.public-note .content');
+    }
+
+    return document.getElementById('right_col');
+}
+
+function getOutlineInteractionRoot(target) {
+    if (isPublicOutlinePage()) {
+        return !!target.closest('#publicNoteMain, .public-note');
+    }
+
+    return !!target.closest('#right_col');
+}
+
+function getMarkdownEditorContent(markdownEditor) {
+    if (!markdownEditor) return '';
+
+    if (typeof markdownEditor.value === 'string' && markdownEditor.value !== '') {
+        return markdownEditor.value;
+    }
+
+    if (typeof window.normalizeContentEditableText === 'function') {
+        return window.normalizeContentEditableText(markdownEditor);
+    }
+
+    return markdownEditor.textContent || '';
+}
+
 /**
  * Initialize the outline panel
  */
@@ -58,6 +108,15 @@ function initOutlinePanel() {
 
     // Listen for note changes to update outline
     observeNoteChanges();
+
+    // Re-apply translations once loaded
+    document.addEventListener('poznote:i18n:loaded', function() {
+        if (typeof window.applyI18nToDom === 'function') {
+            window.applyI18nToDom(outlinePanel);
+        }
+        // Force a re-render to ensure the empty state matches the current language
+        refreshOutline();
+    });
 }
 
 /**
@@ -173,7 +232,7 @@ function extractHeadings(noteElement) {
 
     // For markdown notes, always extract from source (works for all modes)
     if (markdownEditor) {
-        const markdownContent = markdownEditor.value || markdownEditor.textContent;
+        const markdownContent = getMarkdownEditorContent(markdownEditor);
         if (markdownContent) {
             const lines = markdownContent.split('\n');
             lines.forEach((line, lineIndex) => {
@@ -250,10 +309,11 @@ function renderOutline(headings) {
 
     if (!headings || headings.length === 0) {
         // Show empty state
+        const noHeadingsText = typeof window.t === 'function' ? window.t('common.outline.no_headings', null, 'No headings in this note') : 'No headings in this note';
         outlineNav.innerHTML = `
             <div class="outline-empty">
                 <div class="outline-empty-icon">📄</div>
-                <p class="outline-empty-text">No headings in this note</p>
+                <p class="outline-empty-text">${noHeadingsText}</p>
             </div>
         `;
         return;
@@ -300,8 +360,16 @@ function renderOutline(headings) {
  * Scroll to a heading in the note
  */
 function scrollToHeading(heading) {
-    const visibleNote = document.querySelector('.notecard:not([style*="display: none"]) .noteentry');
+    const visibleNote = getCurrentOutlineNoteElement();
     if (!visibleNote) return;
+
+    if (isPublicOutlinePage()) {
+        const headingElement = heading.element || document.getElementById(heading.id);
+        if (headingElement) {
+            scrollToElement(headingElement);
+        }
+        return;
+    }
 
     // Handle markdown notes
     if (heading.isMarkdownSource && heading.lineNumber !== undefined) {
@@ -312,7 +380,7 @@ function scrollToHeading(heading) {
         if (heading.isSplitMode) {
             // Scroll editor to line
             if (markdownEditor && markdownEditor.offsetParent !== null) {
-                const lines = (markdownEditor.value || markdownEditor.textContent).split('\n');
+                const lines = getMarkdownEditorContent(markdownEditor).split('\n');
                 const lineHeight = parseFloat(getComputedStyle(markdownEditor).lineHeight) || 20;
                 const targetPosition = heading.lineNumber * lineHeight;
 
@@ -348,12 +416,12 @@ function scrollToHeading(heading) {
 
         // Edit mode only (no preview visible)
         if (markdownEditor && (!markdownPreview || markdownPreview.offsetParent === null)) {
-            const lines = (markdownEditor.value || markdownEditor.textContent).split('\n');
+            const lines = getMarkdownEditorContent(markdownEditor).split('\n');
             const lineHeight = parseFloat(getComputedStyle(markdownEditor).lineHeight) || 20;
             const targetLinePosition = heading.lineNumber * lineHeight;
 
             // In edit mode, the main container (right_col) scrolls, not the editor itself
-            const scrollContainer = document.getElementById('right_col');
+            const scrollContainer = getOutlineScrollContainer();
 
             if (scrollContainer) {
                 // Calculate the editor's position in the container
@@ -415,7 +483,7 @@ function scrollToElement(element) {
     if (!element) return;
 
     // Find the scroll container (right_col)
-    const scrollContainer = document.getElementById('right_col');
+    const scrollContainer = getOutlineScrollContainer();
     if (!scrollContainer) {
         // Fallback to element scroll
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -445,9 +513,9 @@ function scrollToElement(element) {
 /**
  * Update outline for currently active note
  */
-function updateOutlineForCurrentNote() {
+function updateOutlineForCurrentNote(forceUpdate = false) {
     // Find the currently visible note
-    const visibleNote = document.querySelector('.notecard:not([style*="display: none"]) .noteentry');
+    const visibleNote = getCurrentOutlineNoteElement();
 
     if (!visibleNote) {
         renderOutline([]);
@@ -455,10 +523,10 @@ function updateOutlineForCurrentNote() {
     }
 
     // Extract note ID from the element
-    const noteId = visibleNote.id.replace('entry', '');
+    const noteId = isPublicOutlinePage() ? 'public-note' : visibleNote.id.replace('entry', '');
 
-    // Only update if note has changed
-    if (currentNoteId === noteId) {
+    // Only update if note has changed, unless forced
+    if (!forceUpdate && currentNoteId === noteId) {
         return;
     }
 
@@ -475,8 +543,8 @@ function updateOutlineForCurrentNote() {
  * Observe note changes in the DOM
  */
 function observeNoteChanges() {
-    const rightCol = document.getElementById('right_col');
-    if (!rightCol) return;
+    const observationRoot = getOutlineObservationRoot();
+    if (!observationRoot) return;
 
     // Initial update
     updateOutlineForCurrentNote();
@@ -486,26 +554,41 @@ function observeNoteChanges() {
         // Debounce the update
         clearTimeout(window.outlineUpdateTimeout);
         window.outlineUpdateTimeout = setTimeout(() => {
-            updateOutlineForCurrentNote();
+            updateOutlineForCurrentNote(true); // Force update if DOM changes
         }, 300);
     });
 
     // Observe changes to the right column
-    observer.observe(rightCol, {
+    observer.observe(observationRoot, {
         childList: true,
         subtree: true,
         characterData: true
     });
 
-    // Also listen for custom events if notes are loaded dynamically
-    document.addEventListener('noteLoaded', function() {
-        updateOutlineForCurrentNote();
-    });
+    // Handle input events for real-time updates while typing
+    const handleOutlineInput = function(e) {
+        // Only trigger if typing in a note entry or markdown editor
+        if (e.target.closest('.noteentry') || e.target.closest('.markdown-editor')) {
+            clearTimeout(window.outlineUpdateTimeout);
+            window.outlineUpdateTimeout = setTimeout(() => {
+                updateOutlineForCurrentNote(true); // Force update while typing
+            }, 600); // Slightly longer debounce for typing to be less intrusive
+        }
+    };
 
-    // Listen for note visibility changes
-    document.addEventListener('noteVisibilityChanged', function() {
-        updateOutlineForCurrentNote();
-    });
+    document.addEventListener('input', handleOutlineInput);
+
+    // Also listen for custom events if notes are loaded dynamically
+    if (!isPublicOutlinePage()) {
+        document.addEventListener('noteLoaded', function() {
+            updateOutlineForCurrentNote();
+        });
+
+        // Listen for note visibility changes
+        document.addEventListener('noteVisibilityChanged', function() {
+            updateOutlineForCurrentNote();
+        });
+    }
 
     // Add touch/swipe support for mobile
     initTouchSupport();
@@ -542,6 +625,15 @@ function initTouchSupport() {
     const minSwipeDistance = 80; // Minimum distance for a swipe (increased to avoid accidental triggers)
     const maxVerticalDistance = 100; // Max vertical movement allowed for horizontal swipe
 
+    function isHorizontallyScrollableCodeBlock(target) {
+        const codeBlock = target.closest('pre, .code-block');
+        if (!codeBlock) {
+            return false;
+        }
+
+        return codeBlock.scrollWidth > codeBlock.clientWidth;
+    }
+
     // Swipe from anywhere on the note content area to open outline
     document.addEventListener('touchstart', function(e) {
         // Don't track swipes that start on the outline panel itself
@@ -549,9 +641,13 @@ function initTouchSupport() {
             return;
         }
 
-        // Only enable swipe on the right column (note content area)
-        // Don't enable on left column (sidebar) to avoid conflicts with note navigation
-        if (!e.target.closest('#right_col')) {
+        // Only enable swipe on the note content area.
+        if (!getOutlineInteractionRoot(e.target)) {
+            return;
+        }
+
+        // Let horizontally scrollable code blocks handle touch gestures on mobile.
+        if (isHorizontallyScrollableCodeBlock(e.target)) {
             return;
         }
 

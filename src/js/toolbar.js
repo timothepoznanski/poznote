@@ -303,18 +303,28 @@ function toggleYellowHighlight() {
   }
 }
 
-// Helper function to convert font size value to CSS size
-function getFontSizeFromValue(value) {
-  const sizeMap = {
-    '1': '0.75rem',   // Very small
-    '2': '0.875rem',  // Small  
-    '3': '1rem',      // Normal
-    '4': '1.125rem',  // Large
-    '5': '1.5rem',    // Very large
-    '6': '2rem',      // Huge
-    '7': '3rem'       // Giant
-  };
-  return sizeMap[value] || '1rem';
+function applyHtmlBlockStyle(style) {
+  var sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0) return;
+
+  try {
+    document.execCommand('styleWithCSS', false, false);
+  } catch (e) {
+    // ignore
+  }
+
+  var formatTag = style === 'normal' ? 'div' : ('h' + style);
+  var execValues = [formatTag, '<' + formatTag + '>'];
+
+  for (var i = 0; i < execValues.length; i++) {
+    try {
+      if (document.execCommand('formatBlock', false, execValues[i])) {
+        return;
+      }
+    } catch (e) {
+      // Try the next formatBlock syntax
+    }
+  }
 }
 
 function changeFontSize() {
@@ -337,6 +347,9 @@ function changeFontSize() {
     return;
   }
 
+  // Detect if we're in markdown BEFORE opening the popup
+  const savedIsMarkdown = typeof isInMarkdownEditor === 'function' && isInMarkdownEditor();
+
   // Find the font size button to position the popup
   const fontSizeButton = document.querySelector('.btn-text-height');
   if (!fontSizeButton) return;
@@ -345,24 +358,21 @@ function changeFontSize() {
   const popup = document.createElement('div');
   popup.className = 'font-size-popup';
 
-  // Font size options with labels
-  const fontSizes = [
-    { value: '1', key: 'editor.font_size.very_small', fallback: 'Very small', preview: 'Aa' },
-    { value: '2', key: 'editor.font_size.small', fallback: 'Small', preview: 'Aa' },
-    { value: '3', key: 'editor.font_size.normal', fallback: 'Normal', preview: 'Aa' },
-    { value: '4', key: 'editor.font_size.large', fallback: 'Large', preview: 'Aa' },
-    { value: '5', key: 'editor.font_size.very_large', fallback: 'Very large', preview: 'Aa' },
-    { value: '6', key: 'editor.font_size.huge', fallback: 'Huge', preview: 'Aa' },
-    { value: '7', key: 'editor.font_size.giant', fallback: 'Giant', preview: 'Aa' }
+  // Block style options aligned with the slash menu title commands
+  const textStyles = [
+    { value: 'normal', key: 'slash_menu.back_to_normal', fallback: 'Back to normal text', preview: 'Text', previewClass: 'style-normal' },
+    { value: '1', key: 'slash_menu.heading_1', fallback: 'Heading 1', preview: 'H1', previewClass: 'style-h1' },
+    { value: '2', key: 'slash_menu.heading_2', fallback: 'Heading 2', preview: 'H2', previewClass: 'style-h2' },
+    { value: '3', key: 'slash_menu.heading_3', fallback: 'Heading 3', preview: 'H3', previewClass: 'style-h3' }
   ];
 
   // Build popup content
   let popupHTML = '';
-  fontSizes.forEach(size => {
+  textStyles.forEach(style => {
     popupHTML += `
-      <div class="font-size-item" data-size="${size.value}">
-        <span class="size-label">${tr(size.key, size.fallback)}</span>
-        <span class="size-preview size-${size.value}">${size.preview}</span>
+      <div class="font-size-item" data-style="${style.value}">
+        <span class="size-label">${tr(style.key, null, style.fallback)}</span>
+        <span class="size-preview ${style.previewClass}">${style.preview}</span>
       </div>
     `;
   });
@@ -385,15 +395,11 @@ function changeFontSize() {
     popup.classList.add('show');
   }, 10);
 
-  // Add click handlers for font size items
+  // Add click handlers for text style items
   popup.querySelectorAll('.font-size-item').forEach(item => {
     item.addEventListener('click', (e) => {
       e.stopPropagation();
-      const size = item.getAttribute('data-size');
-      const fontSize = getFontSizeFromValue(size);
-
-      // Check if we're in markdown mode
-      const inMarkdown = typeof isInMarkdownEditor === 'function' && isInMarkdownEditor();
+      const style = item.getAttribute('data-style');
 
       // Ensure editor has focus
       const editor = document.querySelector('[contenteditable="true"]');
@@ -405,33 +411,26 @@ function changeFontSize() {
         selection.removeAllRanges();
         selection.addRange(savedRange);
 
-        if (inMarkdown && typeof applyMarkdownFontSize === 'function') {
-          // Use markdown HTML inline style
-          applyMarkdownFontSize(fontSize);
-        } else {
-          // HTML mode - original logic
-          // Apply font size by wrapping selection in span with CSS class instead of inline style
-          const range = selection.getRangeAt(0);
-          const span = document.createElement('span');
-          // Use cssText to set font-size with !important to prevent override
-          span.style.cssText = 'font-size: ' + fontSize + ' !important';
-
-          try {
-            range.surroundContents(span);
-          } catch (surroundErr) {
-            // If surroundContents fails (partial selections), use insertNode
-            const docFrag = range.cloneContents();
-            span.appendChild(docFrag);
-            range.deleteContents();
-            range.insertNode(span);
+        if (savedIsMarkdown) {
+          // Use the markdown-specific heading function
+          if (typeof applyMarkdownHeadingLevel === 'function') {
+            applyMarkdownHeadingLevel(style);
           }
+          // Force refresh outline panel for markdown notes after preview update
+          // Wait 350ms for markdown preview debounce (300ms) + rendering time
+          if (window.outlinePanel && window.outlinePanel.refresh) {
+            setTimeout(() => {
+              window.outlinePanel.refresh();
+            }, 350);
+          }
+        } else {
+          // Use HTML formatBlock
+          applyHtmlBlockStyle(style);
+        }
 
-          // Remove selection (place cursor at the end of modified text)
-          selection.removeAllRanges();
-          const newRange = document.createRange();
-          newRange.setStartAfter(span);
-          newRange.collapse(true);
-          selection.addRange(newRange);
+        const noteentry = editor.closest('.noteentry') || document.querySelector('.noteentry');
+        if (noteentry) {
+          noteentry.dispatchEvent(new Event('input', { bubbles: true }));
         }
       }
 

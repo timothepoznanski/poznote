@@ -23,7 +23,7 @@ This project started from a simple personal need: a practical way to write, orga
 
 ### Features
 
-Discover all the features [here](https://poznote.com/index.html#features).
+Discover all the features [here](https://poznote.com/index.html#features)
 
 <p align="center">
   <img src="images/poznote-features.png" alt="Poznote Features" width="100%">
@@ -43,7 +43,7 @@ Discover all the features [here](https://poznote.com/index.html#features).
 - [Offline View](#offline-view)
 - [Multiple Instances](#multiple-instances)
 - [MCP Server](#mcp-server)
-- [Poznote Extension](#poznote-extension)
+- [Chrome Extension](#poznote-extension)
 - [API Documentation](#api-documentation)
 - [Tech Stack](#tech-stack)
 
@@ -735,7 +735,7 @@ Poznote includes a Model Context Protocol (MCP) server that enables AI assistant
 
 For installation, configuration, and setup instructions, see the [MCP Server documentation](docs/MCP-SERVER.md).
 
-## Poznote Extension
+## Chrome Extension
 
 The **Poznote URL Saver** is a browser extension that allows you to quickly save the URL of the current page to your Poznote instance with a single click.
 
@@ -743,33 +743,7 @@ The **Poznote URL Saver** is a browser extension that allows you to quickly save
   <img src="images/chrome-extension.png" alt="Poznote Chrome Extension" width="50%">
 </p>
 
-### Install from Chrome Web Store (Recommended)
-
-> **Note:** The extension is currently under review by Google and will be available soon on the Chrome Web Store.
-
-Install the extension directly from the Chrome Web Store. Works with Chrome, Edge, Brave, Opera, and any Chromium-based browser.
-
-**[Install Poznote URL Saver →](https://chrome.google.com/webstore)** (Coming soon)
-
-<details>
-<summary><strong>Alternative: Install from Source (Developer Mode)</strong></summary>
-<br>
-
-You can also install the extension manually from source:
-
-1. Get the extension folder (two possibilities):
-   - **Download:** [Download the repository as ZIP](https://github.com/timothepoznanski/poznote/archive/refs/heads/main.zip) and extract it
-   - **Clone:** `git clone https://github.com/timothepoznanski/poznote.git`
-2. Open your browser (Chrome, Edge, or any Chromium-based browser)
-3. Go to the extensions page by typing `chrome://extensions/` in the address bar
-4. Enable **Developer mode** using the toggle switch in the top right corner
-5. Click **Load unpacked** in the top left
-6. Select the `poznote-url-saver` folder from the Poznote repository
-7. The extension is now installed and ready to use!
-
-> **Note:** Manual installation does not provide automatic updates. You will need to manually download and reinstall the extension to get new versions. For automatic updates, use the Chrome Web Store version.
-
-</details>
+Install the extension directly from the Chrome Web Store → [Install extension](https://chromewebstore.google.com/detail/bmjclfamahegmgillaghhmnbkjebipbh?utm_source=item-share-cb)
 
 ## API Documentation
 

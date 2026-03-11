@@ -535,8 +535,8 @@ $body_classes = trim($extra_body_classes);
                     if ($note_type !== 'markdown') {
                         echo '<button type="button" class="toolbar-btn btn-list-ul text-format-btn" title="' . t_h('editor.toolbar.bullet_list') . '" data-action="exec-unordered-list"><i class="lucide lucide-list-ul"></i></button>';
                         echo '<button type="button" class="toolbar-btn btn-list-ol text-format-btn" title="' . t_h('editor.toolbar.numbered_list') . '" data-action="exec-ordered-list"><i class="lucide lucide-list-ol"></i></button>';
-                        echo '<button type="button" class="toolbar-btn btn-text-height text-format-btn" title="' . t_h('editor.toolbar.font_size') . '" data-action="change-font-size"><i class="lucide lucide-type-height"></i></button>';
                     }
+                    echo '<button type="button" class="toolbar-btn btn-text-height text-format-btn" title="' . t_h('slash_menu.title', [], 'Title') . '" data-action="change-font-size"><i class="lucide lucide-type-height"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-code text-format-btn" title="' . t_h('editor.toolbar.code_block') . '" data-action="toggle-code-block"><i class="lucide lucide-code"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-inline-code text-format-btn" title="' . t_h('editor.toolbar.inline_code') . '" data-action="toggle-inline-code"><i class="lucide lucide-terminal"></i></button>';
                     if ($note_type !== 'markdown') {
@@ -969,12 +969,12 @@ $body_classes = trim($extra_body_classes);
     <!-- OUTLINE PANEL -->
     <div id="outline-panel">
         <div class="outline-header">
-            <h2 class="outline-title">Outline</h2>
+            <h2 class="outline-title" data-i18n="common.outline.title">Outline</h2>
         </div>
         <ul class="outline-nav" id="outline-nav">
             <div class="outline-empty">
                 <div class="outline-empty-icon">📄</div>
-                <p class="outline-empty-text">No headings in this note</p>
+                <p class="outline-empty-text" data-i18n="common.outline.no_headings">No headings in this note</p>
             </div>
         </ul>
     </div>

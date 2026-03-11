@@ -235,7 +235,7 @@
     }
 
     /**
-     * Apply markdown heading formatting
+     * Apply markdown heading formatting (toggles heading on/off)
      */
     function applyMarkdownHeading(level) {
         level = Math.max(1, Math.min(6, level || 1));
@@ -280,6 +280,79 @@
         sel.removeAllRanges();
         sel.addRange(newRange);
         document.execCommand('insertText', false, newLine);
+    }
+
+    /**
+     * Apply markdown heading level from toolbar (wraps selected text like bold does)
+     * @param {string|number} style - 'normal' to remove heading, or '1', '2', '3' for heading level
+     */
+    function applyMarkdownHeadingLevel(style) {
+        var sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0) return;
+        
+        var selectedText = sel.toString();
+        if (!selectedText) return;
+        
+        if (style === 'normal') {
+            // For normal text, just remove any heading markers at the start
+            var cleanText = selectedText.replace(/^#{1,6}\s+/, '');
+            document.execCommand('insertText', false, cleanText);
+        } else {
+            // For headings, we need to ensure proper line breaks
+            var level = parseInt(style, 10);
+            if (!level || level < 1 || level > 6) return;
+            
+            var prefix = '#'.repeat(level) + ' ';
+            var range = sel.getRangeAt(0);
+            var container = range.startContainer;
+            
+            // Check if we need line breaks before and after
+            var needsLineBreakBefore = false;
+            var needsLineBreakAfter = false;
+            
+            // Check if there's text before the selection on the same line
+            if (container.nodeType === 3) { // Text node
+                var textContent = container.textContent;
+                var startOffset = range.startOffset;
+                var endOffset = range.endOffset;
+                
+                // Find the start of the current line
+                var lineStart = textContent.lastIndexOf('\n', startOffset - 1);
+                
+                // If there's text between line start and selection start, we need a line break before
+                if (lineStart === -1) {
+                    // We're on the first line
+                    if (startOffset > 0) {
+                        needsLineBreakBefore = true;
+                    }
+                } else {
+                    if (startOffset > lineStart + 1) {
+                        needsLineBreakBefore = true;
+                    }
+                }
+                
+                // Check if there's text after the selection on the same line
+                var lineEnd = textContent.indexOf('\n', endOffset);
+                if (lineEnd === -1) {
+                    // We're on the last line or line doesn't end with \n
+                    if (endOffset < textContent.length) {
+                        needsLineBreakAfter = true;
+                    }
+                } else {
+                    if (endOffset < lineEnd) {
+                        needsLineBreakAfter = true;
+                    }
+                }
+            }
+            
+            // Build the replacement text with appropriate line breaks
+            var replacement = '';
+            if (needsLineBreakBefore) replacement += '\n';
+            replacement += prefix + selectedText;
+            if (needsLineBreakAfter) replacement += '\n';
+            
+            document.execCommand('insertText', false, replacement);
+        }
     }
 
     /**
@@ -348,6 +421,7 @@
     window.applyMarkdownCodeBlock = applyMarkdownCodeBlock;
     window.applyMarkdownLink = applyMarkdownLink;
     window.applyMarkdownHeading = applyMarkdownHeading;
+    window.applyMarkdownHeadingLevel = applyMarkdownHeadingLevel;
     window.toggleMarkdownList = toggleMarkdownList;
     window.applyMarkdownColor = applyMarkdownColor;
     window.applyMarkdownHighlight = applyMarkdownHighlight;

@@ -153,7 +153,8 @@
                 item.addEventListener('click', function() {
                     const noteId = this.getAttribute('data-note-id');
                     const noteHeading = this.getAttribute('data-note-heading');
-                    createLinkedNote(noteId, noteHeading);
+                    // Open folder selector modal
+                    openLinkedNoteFolderSelectorModal(noteId, noteHeading);
                 });
                 
                 listContainer.appendChild(item);
@@ -166,16 +167,158 @@
     }
 
     /**
+     * Open the folder selector modal for the linked note
+     */
+    async function openLinkedNoteFolderSelectorModal(noteId, noteHeading) {
+        const modal = document.getElementById('linkedNoteFolderSelectorModal');
+        const searchInput = document.getElementById('linkedNoteFolderSearch');
+
+        if (!modal || !searchInput) {
+            console.error('Folder selector modal elements not found');
+            // Fallback to creating linked note without folder selection
+            createLinkedNote(noteId, noteHeading, null);
+            return;
+        }
+
+        // Close the note selector modal
+        closeLinkedNoteSelectorModal();
+
+        // Store noteId and noteHeading for later use
+        modal.dataset.noteId = noteId;
+        modal.dataset.noteHeading = noteHeading;
+
+        // Reset search input
+        searchInput.value = '';
+
+        // Load folders list
+        loadLinkedFoldersList();
+
+        // Show modal
+        modal.style.display = 'flex';
+
+        // Focus search input
+        setTimeout(() => searchInput.focus(), 100);
+    }
+
+    /**
+     * Load folders list for linked note folder selection
+     */
+    async function loadLinkedFoldersList(searchQuery = '') {
+        const listContainer = document.getElementById('linkedFolderList');
+        if (!listContainer) return;
+
+        listContainer.innerHTML = '<div class="note-reference-loading"><i class="lucide lucide-loader-2 lucide-spin"></i> ' + tr('common.loading', {}, 'Loading...') + '</div>';
+
+        try {
+            const workspace = (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : '') || '';
+            const response = await fetch(`/api/v1/notes?get_folders=1&workspace=${encodeURIComponent(workspace)}`);
+            const data = await response.json();
+
+            // Convert folders object to array (API returns object with JSON_FORCE_OBJECT)
+            let foldersArray = [];
+            if (data.folders) {
+                if (Array.isArray(data.folders)) {
+                    foldersArray = data.folders;
+                } else {
+                    foldersArray = Object.values(data.folders);
+                }
+            }
+
+            // Filter by search query if provided
+            if (searchQuery.trim()) {
+                const query = searchQuery.toLowerCase().trim();
+                foldersArray = foldersArray.filter(f => {
+                    const name = (f.name || '').toLowerCase();
+                    return name.includes(query);
+                });
+            }
+
+            // Sort folders by name
+            foldersArray.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+            // Render folders list
+            listContainer.innerHTML = '';
+
+            // Add root option first
+            const rootItem = document.createElement('div');
+            rootItem.className = 'note-reference-item';
+            rootItem.setAttribute('data-folder-id', '');
+
+            const rootIcon = document.createElement('i');
+            rootIcon.className = 'lucide lucide-folder note-reference-icon';
+
+            const rootName = document.createElement('span');
+            rootName.className = 'note-reference-heading';
+            rootName.textContent = tr('modals.linked_folder_selector.root', {}, 'Root (No folder)');
+
+            rootItem.appendChild(rootIcon);
+            rootItem.appendChild(rootName);
+
+            rootItem.addEventListener('click', function() {
+                const modal = document.getElementById('linkedNoteFolderSelectorModal');
+                const noteId = modal.dataset.noteId;
+                const noteHeading = modal.dataset.noteHeading;
+                closeLinkedNoteFolderSelectorModal();
+                createLinkedNote(noteId, noteHeading, null);
+            });
+
+            listContainer.appendChild(rootItem);
+
+            // Add folder items
+            foldersArray.forEach(folder => {
+                const item = document.createElement('div');
+                item.className = 'note-reference-item';
+                item.setAttribute('data-folder-id', folder.id);
+
+                const icon = document.createElement('i');
+                icon.className = 'lucide lucide-folder note-reference-icon';
+
+                const name = document.createElement('span');
+                name.className = 'note-reference-heading';
+                // Add indentation for subfolders based on depth
+                const indent = '\u00A0\u00A0\u00A0\u00A0'.repeat(folder.depth || 0);
+                name.textContent = indent + folder.name;
+
+                item.appendChild(icon);
+                item.appendChild(name);
+
+                item.addEventListener('click', function() {
+                    const folderId = this.getAttribute('data-folder-id');
+                    const modal = document.getElementById('linkedNoteFolderSelectorModal');
+                    const noteId = modal.dataset.noteId;
+                    const noteHeading = modal.dataset.noteHeading;
+                    closeLinkedNoteFolderSelectorModal();
+                    createLinkedNote(noteId, noteHeading, folderId);
+                });
+
+                listContainer.appendChild(item);
+            });
+
+        } catch (error) {
+            console.error('Error loading folders:', error);
+            listContainer.innerHTML = '<div class="note-reference-error">' + tr('ui.alerts.network_error', {}, 'Network error') + '</div>';
+        }
+    }
+
+    /**
+     * Close the folder selector modal
+     */
+    function closeLinkedNoteFolderSelectorModal() {
+        const modal = document.getElementById('linkedNoteFolderSelectorModal');
+        if (modal) {
+            modal.style.display = 'none';
+            delete modal.dataset.noteId;
+            delete modal.dataset.noteHeading;
+        }
+    }
+
+    /**
      * Create a linked note to the selected note
      */
-    async function createLinkedNote(noteId, noteHeading) {
+    async function createLinkedNote(noteId, noteHeading, folderId = null) {
         try {
-            // Close the modal
-            closeLinkedNoteSelectorModal();
-            
-            // Get current workspace and folder settings
+            // Get current workspace
             const workspace = (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : '') || '';
-            const folderId = (typeof selectedFolderId !== 'undefined' && selectedFolderId) || window.targetFolderId || null;
             
             // Ensure noteHeading has a valid value
             const validHeading = noteHeading && noteHeading.trim() ? noteHeading.trim() : tr('index.note.untitled', {}, 'Untitled');
@@ -229,7 +372,7 @@
         }
     }
 
-    // Search input handler
+    // Search input handlers
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('linkedNoteSearch');
         if (searchInput) {
@@ -241,11 +384,25 @@
                 }, 300);
             });
         }
+
+        // Folder search input handler
+        const folderSearchInput = document.getElementById('linkedNoteFolderSearch');
+        if (folderSearchInput) {
+            let searchTimeout;
+            folderSearchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    loadLinkedFoldersList(this.value);
+                }, 300);
+            });
+        }
     });
 
     // Expose functions globally
     window.openLinkedNoteSelectorModal = openLinkedNoteSelectorModal;
     window.closeLinkedNoteSelectorModal = closeLinkedNoteSelectorModal;
+    window.openLinkedNoteFolderSelectorModal = openLinkedNoteFolderSelectorModal;
+    window.closeLinkedNoteFolderSelectorModal = closeLinkedNoteFolderSelectorModal;
     
     /**
      * Create a linked note from the current note
@@ -261,7 +418,7 @@
                 }
                 return;
             }
-            
+
             const noteId = selectedNote.id.replace('note', '');
             if (!noteId) {
                 if (typeof showNotificationPopup === 'function') {
@@ -269,50 +426,14 @@
                 }
                 return;
             }
-            
+
             // Get the note title from the input field
             const noteTitleInput = document.getElementById('inp' + noteId);
             const noteHeading = noteTitleInput ? (noteTitleInput.value || noteTitleInput.placeholder || tr('index.note.new_note', {}, 'New note')) : tr('index.note.new_note', {}, 'New note');
-            
-            // Get current workspace
-            const workspace = (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : '') || '';
-            
-            // Create request data
-            const requestData = {
-                type: 'linked',
-                linked_note_id: noteId,
-                heading: noteHeading,
-                workspace: workspace
-            };
-            
-            // Call the backend to create linked note
-            const response = await fetch('/api/v1/notes', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'same-origin',
-                body: JSON.stringify(requestData)
-            });
-            
-            const data = await response.json();
-            
-            if (data.success && data.note && data.note.id) {
-                // Success - redirect to the newly created linked note
-                let url = 'index.php?workspace=' + encodeURIComponent(workspace) + '&note=' + encodeURIComponent(data.note.id) + '&select_linked_note=' + encodeURIComponent(data.note.id);
-                
-                // Add expand_folder parameter to force folder expansion on load
-                if (data.note.folder_id) {
-                    url += '&expand_folder=' + encodeURIComponent(data.note.folder_id);
-                }
-                
-                // Reload the page to show the new note
-                window.location.href = url;
-            } else {
-                // Error
-                const errorMsg = data.error || tr('modals.create.linked.error', {}, 'Error creating linked note');
-                if (typeof showNotificationPopup === 'function') {
-                    showNotificationPopup(errorMsg, 'error');
-                }
-            }
+
+            // Open folder selector modal for this note
+            openLinkedNoteFolderSelectorModal(noteId, noteHeading);
+
         } catch (error) {
             console.error('Error creating linked note from current:', error);
             if (typeof showNotificationPopup === 'function') {

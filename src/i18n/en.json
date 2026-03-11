@@ -1,1634 +1,1667 @@
 {
-    "app": {
-        "name": "Poznote"
-    },
-    "common": {
-        "ok": "OK",
-        "cancel": "Cancel",
-        "save": "Save",
-        "delete": "Delete",
-        "create": "Create",
-        "rename": "Rename",
-        "move": "Move",
-        "close": "Close",
-        "disable": "disable",
-        "enabled": "Enabled",
-        "disabled": "Disabled",
-        "not_defined": "Not defined",
-        "loading": "Loading...",
-        "back_to_notes": "Go to Notes",
-        "back_to_home": "Go to Home",
-        "back_to_settings": "Go to Settings",
-        "back": "Back",
-        "error": "Error",
-        "success": "Success",
-        "warning": "Warning",
-        "notification": "Notification",
-        "information": "Information",
-        "caution": "Caution",
-        "tip": "Tip",
-        "important": "Important",
-        "note": "Note",
-        "untitled": "Untitled",
-        "access_denied": "Access Denied",
-        "apply": "Apply",
-        "at": "at",
-        "scroll_left": "Scroll left",
-        "scroll_right": "Scroll right"
-    },
-    "settings": {
-        "title": "Settings",
-        "disabled_message": "Access to settings is disabled by administrator.",
-        "categories": {
-            "actions": "Actions",
-            "admin_tools": "Admin Tools",
-            "display": "Display",
-            "about": "About",
-            "documentation": "Documentation"
-        },
-        "password": {
-            "title": "Settings Access",
-            "heading": "Settings Protected",
-            "placeholder": "Enter password",
-            "submit": "Access Settings",
-            "cancel": "Back to Notes"
-        },
-        "cards": {
-            "workspaces": "Workspaces",
-            "user_management": "User Management",
-            "backup_export": "Backup / Export",
-            "restore_import": "Restore / Import",
-            "git_sync": "Git Sync",
-            "check_updates": "Check for Updates",
-            "api_docs": "API Documentation",
-            "documentation": "Github Repository",
-            "news": "Poznote Blog",
-            "website": "Poznote Website",
-            "support": "Support Developer",
-            "release_notes": "Release Notes",
-            "convert_images": "Base64 Image Converter"
-        },
-        "language": {
-            "label": "Language",
-            "english": "English",
-            "french": "French",
-            "spanish": "Spanish",
-            "portuguese": "Portuguese",
-            "german": "German",
-            "russian": "Russian",
-            "chinese_simplified": "Chinese Simplified",
-            "login_page": "Login page language:",
-            "saved": "Language saved",
-            "save_error": "Could not save language",
-            "reload_hint": "Reloading..."
-        }
-    },
-    "display": {
-        "title": "Display",
-        "cards": {
-            "theme_mode": "Theme",
-            "login_display": "Login page title",
-            "note_font_size": "Font size",
-            "note_sort_order": "Note sorting",
-            "tasklist_insert_order": "Task list insert order",
-            "timezone": "Timezone",
-            "show_note_created": "Show creation date",
-            "show_folder_counts": "Show folder note counts",
-            "notes_without_folders_after": "Show notes after folders",
-            "show_folder_actions": "Show folder actions",
-            "kanban_on_folder_click": "Open Kanban view on folder click",
-            "index_icon_scale": "Index icon scaling",
-            "note_content_width": "Note content width",
-            "code_block_word_wrap": "Code block word wrap"
-        },
-        "badges": {
-            "font_size_default": "default ({{size}}px)",
-            "note_font_size": "{{size}}px",
-            "sidebar_font_size": "{{size}}px",
-            "code_block_font_size": "{{size}}px"
-        }
-    },
-    "tasklist": {
-        "input_placeholder": "Write a new task and press Enter to add to list...",
-        "drag_to_reorder": "Drag to reorder",
-        "add_to_top": "Add new tasks to top",
-        "add_to_bottom": "Add new tasks to bottom",
-        "insert_order_top": "Top",
-        "insert_order_bottom": "Bottom",
-        "clear_completed": "Clear completed tasks",
-        "no_completed_tasks": "No completed tasks to clear."
-    },
-    "tags": {
-        "add_single": "Add tag...",
-        "add_multiple": "Add tags...",
-        "list_all": "List all tags",
-        "manage_note_tags": "Manage note tags",
-        "modal_title": "Manage tags"
-    },
-    "download": "Download",
-    "convert": "Convert",
-    "create": "Create",
-    "edit": "Edit",
+  "app": {
+    "name": "Poznote"
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "save": "Save",
     "delete": "Delete",
-    "favorite": "Favorite",
-    "share": "Share",
-    "info": {
-        "page_title": "Note Information",
-        "actions": {
-            "back_to_note": "Go to note"
-        },
-        "labels": {
-            "note_title": "Note title:",
-            "workspace": "Workspace:",
-            "folder": "Folder:",
-            "created": "Created:",
-            "last_modified": "Last Modified:",
-            "tags": "Tags:",
-            "favorite": "Favorite:",
-            "attachments": "Attachments:",
-            "note_id": "Note ID:",
-            "full_path": "Full Path:"
-        },
-        "attachments": {
-            "count_singular": "1 file",
-            "count_plural": "{{count}} files"
-        },
-        "empty": {
-            "no_tags": "No tags"
-        },
-        "errors": []
+    "create": "Create",
+    "rename": "Rename",
+    "move": "Move",
+    "close": "Close",
+    "disable": "disable",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "not_defined": "Not defined",
+    "loading": "Loading...",
+    "back_to_notes": "Go to Notes",
+    "back_to_home": "Go to Home",
+    "back_to_settings": "Go to Settings",
+    "back": "Back",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "notification": "Notification",
+    "information": "Information",
+    "caution": "Caution",
+    "tip": "Tip",
+    "important": "Important",
+    "note": "Note",
+    "untitled": "Untitled",
+    "access_denied": "Access Denied",
+    "apply": "Apply",
+    "at": "at",
+    "scroll_left": "Scroll left",
+    "scroll_right": "Scroll right",
+    "outline": {
+      "title": "Outline",
+      "no_headings": "No headings in this note"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "disabled_message": "Access to settings is disabled by administrator.",
+    "categories": {
+      "actions": "Actions",
+      "admin_tools": "Admin Tools",
+      "display": "Display",
+      "about": "About",
+      "documentation": "Documentation"
+    },
+    "password": {
+      "title": "Settings Access",
+      "heading": "Settings Protected",
+      "placeholder": "Enter password",
+      "submit": "Access Settings",
+      "cancel": "Back to Notes"
+    },
+    "cards": {
+      "workspaces": "Workspaces",
+      "user_management": "User Management",
+      "backup_export": "Backup / Export",
+      "restore_import": "Restore / Import",
+      "git_sync": "Git Sync",
+      "check_updates": "Check for Updates",
+      "api_docs": "API Documentation",
+      "documentation": "Github Repository",
+      "news": "Poznote Blog",
+      "website": "Poznote Website",
+      "support": "Support Developer",
+      "install_extension": "Install extension",
+      "release_notes": "Release Notes",
+      "convert_images": "Base64 Image Converter",
+      "orphan_scanner": "Orphan images scanner"
+    },
+    "language": {
+      "label": "Language",
+      "english": "English",
+      "french": "French",
+      "spanish": "Spanish",
+      "portuguese": "Portuguese",
+      "german": "German",
+      "russian": "Russian",
+      "chinese_simplified": "Chinese Simplified",
+      "login_page": "Login page language:",
+      "saved": "Language saved",
+      "save_error": "Could not save language",
+      "reload_hint": "Reloading..."
+    }
+  },
+  "display": {
+    "title": "Display",
+    "cards": {
+      "theme_mode": "Theme",
+      "login_display": "Login page title",
+      "note_font_size": "Font size",
+      "note_sort_order": "Note sorting",
+      "tasklist_insert_order": "Task list insert order",
+      "timezone": "Timezone",
+      "show_note_created": "Show creation date",
+      "show_folder_counts": "Show folder note counts",
+      "notes_without_folders_after": "Show notes after folders",
+      "show_folder_actions": "Show folder actions",
+      "kanban_on_folder_click": "Open Kanban view on folder click",
+      "index_icon_scale": "Index icon scaling",
+      "note_content_width": "Note content width",
+      "code_block_word_wrap": "Code block word wrap"
+    },
+    "badges": {
+      "font_size_default": "default ({{size}}px)",
+      "note_font_size": "{{size}}px",
+      "sidebar_font_size": "{{size}}px",
+      "code_block_font_size": "{{size}}px"
+    }
+  },
+  "tasklist": {
+    "input_placeholder": "Write a new task and press Enter to add to list...",
+    "drag_to_reorder": "Drag to reorder",
+    "add_to_top": "Add new tasks to top",
+    "add_to_bottom": "Add new tasks to bottom",
+    "insert_order_top": "Top",
+    "insert_order_bottom": "Bottom",
+    "clear_completed": "Clear completed tasks",
+    "no_completed_tasks": "No completed tasks to clear."
+  },
+  "tags": {
+    "add_single": "Add tag...",
+    "add_multiple": "Add tags...",
+    "list_all": "List all tags",
+    "manage_note_tags": "Manage note tags",
+    "modal_title": "Manage tags"
+  },
+  "download": "Download",
+  "convert": "Convert",
+  "create": "Create",
+  "edit": "Edit",
+  "delete": "Delete",
+  "favorite": "Favorite",
+  "share": "Share",
+  "info": {
+    "page_title": "Note Information",
+    "actions": {
+      "back_to_note": "Go to note"
+    },
+    "labels": {
+      "note_title": "Note title:",
+      "workspace": "Workspace:",
+      "folder": "Folder:",
+      "created": "Created:",
+      "last_modified": "Last Modified:",
+      "tags": "Tags:",
+      "favorite": "Favorite:",
+      "attachments": "Attachments:",
+      "note_id": "Note ID:",
+      "full_path": "Full Path:"
     },
     "attachments": {
-        "empty": "No attachments.",
-        "upload": {
-            "button_uploading": "Uploading..."
-        },
-        "actions": {
-            "view": "View",
-            "delete": "Delete",
-            "open_attachments": "Open attachments",
-            "download": "Download {{filename}}"
-        },
-        "errors": {
-            "select_file": "Please select a file to upload.",
-            "no_note_selected": "No note selected.",
-            "file_too_large": "The file is too large (max: {{maxSize}}).",
-            "http_error": "HTTP error: {{status}}",
-            "invalid_server_response": "Invalid server response.",
-            "upload_failed": "Upload failed: {{error}}",
-            "deletion_failed": "Deletion failed: {{error}}",
-            "deletion_failed_generic": "Deletion failed.",
-            "loading_failed": "Failed to load attachments",
-            "loading_error": "Error loading attachments",
-            "upload_failed_generic": "Upload failed. Please try again.",
-            "upload_failed_connection": "Upload failed. Please check your connection."
-        },
-        "messages": {
-            "upload_success": "File uploaded successfully!",
-            "deleted_success": "Attachment deleted successfully"
-        },
-        "page": {
-            "title": "Manage attachments",
-            "subtitle": "Manage attachments for note:",
-            "upload_section_title": "Choose a new attachment",
-            "drag_drop_info": "You can drag and drop your file below:",
-            "all_types_accepted": "All file types accepted (max 200 MB)",
-            "upload_button": "Attach",
-            "current_attachments": "Current attachments",
-            "loading_attachments": "Loading attachments...",
-            "preview_alt": "Preview",
-            "uploaded_prefix": "Uploaded: ",
-            "open_in_new_tab": "Open in new tab",
-            "pdf_label": "PDF"
-        },
-        "modals": {
-            "delete": {
-                "title": "Delete attachment",
-                "message": "Do you want to delete this attachment? This action is irreversible."
-            }
-        },
-        "size": {
-            "units": {
-                "bytes": "bytes",
-                "kb": "KB",
-                "mb": "MB",
-                "gb": "GB"
-            }
-        },
-        "list": {
-            "title": "Notes with attachments",
-            "no_attachments": "No notes with attachments yet.",
-            "back_to_notes": "Go to notes",
-            "manage_attachments": "Manage attachments",
-            "attachment_count_singular": "1 attachment",
-            "attachment_count_plural": "{{count}} attachments",
-            "hint": "Add attachments to your notes using the paperclip button in the toolbar.",
-            "filter_placeholder": "Filter by note title or attachment name...",
-            "no_filter_results": "No notes match your search.",
-            "show_thumbnails": "Show thumbnails in this list",
-            "show_inline_images": "Also show images already visible in the note content"
-        }
+      "count_singular": "1 file",
+      "count_plural": "{{count}} files"
+    },
+    "empty": {
+      "no_tags": "No tags"
+    },
+    "errors": []
+  },
+  "attachments": {
+    "empty": "No attachments.",
+    "upload": {
+      "button_uploading": "Uploading..."
+    },
+    "actions": {
+      "view": "View",
+      "delete": "Delete",
+      "open_attachments": "Open attachments",
+      "download": "Download {{filename}}"
+    },
+    "errors": {
+      "select_file": "Please select a file to upload.",
+      "no_note_selected": "No note selected.",
+      "file_too_large": "The file is too large (max: {{maxSize}}).",
+      "http_error": "HTTP error: {{status}}",
+      "invalid_server_response": "Invalid server response.",
+      "upload_failed": "Upload failed: {{error}}",
+      "deletion_failed": "Deletion failed: {{error}}",
+      "deletion_failed_generic": "Deletion failed.",
+      "loading_failed": "Failed to load attachments",
+      "loading_error": "Error loading attachments",
+      "upload_failed_generic": "Upload failed. Please try again.",
+      "upload_failed_connection": "Upload failed. Please check your connection."
+    },
+    "messages": {
+      "upload_success": "File uploaded successfully!",
+      "deleted_success": "Attachment deleted successfully"
+    },
+    "page": {
+      "title": "Manage attachments",
+      "subtitle": "Manage attachments for note:",
+      "upload_section_title": "Choose a new attachment",
+      "drag_drop_info": "You can drag and drop your file below:",
+      "all_types_accepted": "All file types accepted (max 200 MB)",
+      "upload_button": "Attach",
+      "current_attachments": "Current attachments",
+      "loading_attachments": "Loading attachments...",
+      "preview_alt": "Preview",
+      "uploaded_prefix": "Uploaded: ",
+      "open_in_new_tab": "Open in new tab",
+      "pdf_label": "PDF"
     },
     "modals": {
-        "update": {
-            "title": "📱 Application Version",
-            "backup_warning": "Make a backup of your data.",
-            "backup_hint": "<strong>Settings > Backup</strong>",
-            "current_version": "Current version:",
-            "latest_available": "Latest available:",
-            "view_release_notes": "View release notes",
-            "self_hosted": "Self-Hosted Instructions",
-            "cloud": "Cloud Instructions"
-        },
-        "update_check": {
-            "title": "Checking for Updates...",
-            "status": "Please wait while we check for updates..."
-        },
-        "login_display": {
-            "title": "Login display name",
-            "description": "Set the name shown on the login screen.",
-            "placeholder": "Display name"
-        },
-        "theme": {
-            "title": "Theme Selection",
-            "description": "Choose your preferred theme:"
-        },
-        "language": {
-            "title": "Language Selection",
-            "description": "Select your preferred language:"
-        },
-        "input": {
-            "placeholder": "Enter text"
-        },
-        "font_size": {
-            "title": "Font Size",
-            "note_label": "Note content (px):",
-            "sidebar_label": "Sidebar (px):",
-            "code_block_label": "Code blocks (px):",
-            "default_value": "{{size}} px is the Default value",
-            "preview": "Preview"
-        },
-        "note_width": {
-            "title": "Note Content Width",
-            "description": "Select the maximum width for your notes content (in pixels):",
-            "label": "Maximum width (px):",
-            "full_width": "Full Width",
-            "default_value": "{{width}} px is the Default value"
-        },
-        "index_icon_scale": {
-            "title": "Index icon scaling",
-            "description": "Adjust the size of icons on the index page (scale factor):"
-        },
-        "confirm": {
-            "title": "Confirm Action",
-            "message": "Are you sure you want to proceed?",
-            "save_and_exit": "Save and Exit",
-            "exit_without_saving": "Exit without saving"
-        },
-        "folder": {
-            "new_title": "New Folder",
-            "new_placeholder": "New folder name",
-            "create": "Create",
-            "rename_title": "Rename Folder",
-            "rename_placeholder": "New folder name",
-            "delete_title": "Delete Folder",
-            "delete_folder": "Delete Folder",
-            "change_folder": "Change folder",
-            "move_prefix": "Move",
-            "move_suffix": "to:",
-            "move_prompt": "Move \"{{title}}\" to:",
-            "no_folder": "No folder"
-        },
-        "move_note_folder": {
-            "title": "Move Note to Folder",
-            "workspace_destination": "Select Workspace destination:",
-            "target_folder": "Select target folder:",
-            "enter_folder_name": "Please enter a folder name"
-        },
-        "move_folder_files": {
-            "title": "Move All Files",
-            "prompt_prefix": "Move all files from",
-            "prompt_suffix": "to:",
-            "select_target": "Select target folder...",
-            "hint_move_single": "To move a single note to another workspace, use the \"Move note\" button in the toolbar",
-            "hint_move_all": "To move all notes from one workspace to another, go to Settings -> Workspaces",
-            "move_all": "Move All Files"
-        },
-        "move_folder": {
-            "title": "Move Folder",
-            "prompt_prefix": "Move folder",
-            "prompt_suffix": "into:",
-            "select_target": "Select parent folder...",
-            "root": "Root (Top Level)",
-            "hint": "This will move the folder and all its notes as a subfolder. Select \"Root\" to move it to the top level.",
-            "move": "Move Folder",
-            "workspace": "Target Workspace",
-            "parent": "Target Parent Folder"
-        },
-        "workspaces": {
-            "move_notes_title": "Move notes from",
-            "select_target_workspace": "Select target workspace",
-            "rename_title": "Rename workspace",
-            "new_name": "New name",
-            "delete_title": "Confirm delete workspace",
-            "delete_description": "All notes and folders will be permanently deleted and cannot be recovered.",
-            "delete_placeholder": "Type workspace name to confirm",
-            "delete_button": "Delete workspace"
-        },
-        "user_settings_info": {
-            "title": "Account Settings",
-            "message": "To change your password, edit your email, username, or OIDC Subject (UUID), please contact the administrator of this Poznote instance."
-        },
-        "create": {
-            "title_in_folder": "Create in {{folder}}",
-            "folder_fallback": "folder",
-            "note": {
-                "title": "HTML Note",
-                "description": "Not Markdown"
-            },
-            "markdown": {
-                "title": "Markdown note",
-                "description": "Not HTML"
-            },
-            "task_list": {
-                "title": "Task List"
-            },
-            "linked": {
-                "title": "Linked Note",
-                "default_heading": "{{note}}",
-                "success": "Linked note created successfully",
-                "error": "Error creating linked note"
-            },
-            "template": {
-                "title": "Template"
-            },
-            "subfolder": {
-                "title": "Subfolder"
-            },
-            "folder": {
-                "title": "Folder"
-            },
-            "kanban": {
-                "title": "Kanban Structure"
-            },
-            "workspace": {
-                "title": "Workspace"
-            }
-        },
-        "kanban_structure": {
-            "title": "Create Kanban Structure",
-            "folder_name_label": "Folder name:",
-            "folder_name_placeholder": "My Kanban View",
-            "columns_label": "Number of columns (1-9):",
-            "error_name_required": "Folder name is required",
-            "error_columns_range": "Number of columns must be between 1 and 9",
-            "error_folder_exists": "Folder already exists in this location",
-            "error_create": "Failed to create Kanban structure",
-            "error_create_prefix": "Error creating Kanban structure: {{error}}"
-        },
-        "folder_icon": {
-            "title": "Change Folder Icon",
-            "reset": "Restore default behavior",
-            "search_placeholder": "Search icons..."
-        },
-        "linked_selector": {
-            "title": "Select Note to Link",
-            "search_placeholder": "Search notes...",
-            "recent_label": "Recent notes"
-        },
-        "delete_linked_note": {
-            "title": "Delete Linked Note",
-            "message": "What do you want to delete?",
-            "delete_link_only": "Delete this link only",
-            "delete_link_and_target": "Delete the note and all its links"
-        },
-        "convert": {
-            "title": "Convert Note",
-            "message": "Are you sure you want to convert this note?",
-            "to_html_title": "Convert to HTML",
-            "to_html_message": "This will convert your Markdown note to HTML format.",
-            "to_html_warning": "Before converting this note, you may want to duplicate it to keep a copy in case the conversion doesn't meet your expectations.",
-            "to_markdown_title": "Convert to Markdown",
-            "to_markdown_message": "This will convert your HTML note to Markdown format. Embedded images will be saved as attachments.",
-            "to_markdown_warning": "Before converting this note, you may want to duplicate it to keep a copy in case the conversion doesn't meet your expectations.",
-            "converting": "Converting note...",
-            "success": "Note converted successfully!",
-            "error": "Error converting note",
-            "duplicate_button": "Duplicate"
-        },
-        "export": {
-            "title": "Export Note",
-            "markdown": {
-                "title": "Export as Markdown",
-                "description": "Download as MD file with metadata (title, tags, folder) in YAML frontmatter"
-            },
-            "html": {
-                "title": "Export as HTML",
-                "description": "Download as HTML file with all formatting preserved"
-            },
-            "json": {
-                "title": "Download as JSON",
-                "description": "Download the raw tasklist data as a JSON file"
-            },
-            "print": {
-                "title": "Print to PDF (Browser)",
-                "description": "Use browser's native print dialog to save as PDF"
-            }
-        },
-        "task_move": {
-            "title": "Move task",
-            "description": "Choose a task list to move this task to.",
-            "search_placeholder": "Search task lists...",
-            "loading": "Loading...",
-            "empty": "No task lists found.",
-            "moving": "Moving task...",
-            "error": "Could not load task lists.",
-            "confirm": "Move task"
-        },
-        "note_sort": {
-            "title": "Note sort order",
-            "description": "Choose how notes are ordered in the notes list:",
-            "options": {
-                "last_modified": "Last modified",
-                "last_created": "Last created",
-                "alphabetical": "Alphabetical"
-            }
-        },
-        "timezone": {
-            "title": "Timezone",
-            "description": "Select your timezone:",
-            "groups": {
-                "europe": "Europe",
-                "america": "America",
-                "asia": "Asia",
-                "pacific": "Pacific",
-                "africa": "Africa"
-            }
-        }
+      "delete": {
+        "title": "Delete attachment",
+        "message": "Do you want to delete this attachment? This action is irreversible."
+      }
     },
-    "notes_list": {
-        "system_folders": {
-            "trash": "Trash",
-            "tags": "Tags",
-            "favorites": "Favorites",
-            "public": "Shared",
-            "attachments": "Attachments"
-        },
-        "favorites": {
-            "empty": "No favorite notes yet."
-        },
-        "drop_zone": {
-            "remove_from_folder": "Drop here to remove from folder"
-        },
-        "folder_actions": {
-            "menu": "Actions",
-            "create": "Create",
-            "kanban_view": "Kanban view",
-            "open_all_in_tabs": "Open all notes",
-            "move_all_files": "Move all files",
-            "rename_folder": "Rename folder",
-            "delete_folder": "Delete folder",
-            "move_folder": "Move folder",
-            "change_icon": "Change icon",
-            "download_folder": "Download",
-            "is_public": "Is shared",
-            "share_folder": "Share",
-            "tabs_not_available": "Tabs are not available on mobile devices",
-            "no_notes_title": "No notes",
-            "no_notes_in_folder": "This folder contains no notes",
-            "too_many_notes": "This folder contains {{count}} notes. Only the first {{max}} will be opened to avoid overwhelming your browser."
-        }
+    "size": {
+      "units": {
+        "bytes": "bytes",
+        "kb": "KB",
+        "mb": "MB",
+        "gb": "GB"
+      }
     },
+    "list": {
+      "title": "Notes with attachments",
+      "no_attachments": "No notes with attachments yet.",
+      "back_to_notes": "Go to notes",
+      "manage_attachments": "Manage attachments",
+      "attachment_count_singular": "1 attachment",
+      "attachment_count_plural": "{{count}} attachments",
+      "hint": "Add attachments to your notes using the paperclip button in the toolbar.",
+      "filter_placeholder": "Filter by note title or attachment name...",
+      "no_filter_results": "No notes match your search.",
+      "show_thumbnails": "Show thumbnails in this list",
+      "show_inline_images": "Also show images already visible in the note content"
+    }
+  },
+  "modals": {
     "update": {
-        "new_available": "🎉 New update available!",
-        "description": "Your data will be preserved during the update.",
-        "up_to_date": "✅ Poznote is up to date",
-        "error_loading_version": "Error loading version"
+      "title": "📱 Application Version",
+      "backup_warning": "Make a backup of your data.",
+      "backup_hint": "<strong>Settings > Backup</strong>",
+      "current_version": "Current version:",
+      "latest_available": "Latest available:",
+      "view_release_notes": "View release notes",
+      "self_hosted": "Self-Hosted Instructions",
+      "cloud": "Cloud Instructions"
     },
-    "slash_menu": {
-        "back_to_normal": "Back to normal text",
-        "title": "Title",
-        "heading_1": "Heading 1",
-        "heading_2": "Heading 2",
-        "heading_3": "Heading 3",
-        "format_text": "Format text",
-        "red": "Red",
-        "bold": "Bold",
-        "italic": "Italic",
-        "highlight": "Highlight",
-        "strikethrough": "Strikethrough",
-        "code": "Code",
-        "inline_code": "Inline code",
-        "code_block": "Code block",
-        "list": "List",
-        "bullet_list": "Bullet list",
-        "numbered_list": "Numbered list",
-        "checklist": "Checklist",
-        "image": "Image",
-        "excalidraw": "Excalidraw",
-        "emoji": "Emoji",
-        "table": "Table",
-        "separator": "Separator",
-        "link_to_note": "Link to note",
-        "link": "Link",
-        "cancel": "Cancel",
-        "back": "Back",
-        "quote": "Quote",
-        "blockquote": "Blockquote",
-        "callout_note": "Note",
-        "callout_tip": "Tip",
-        "callout_important": "Important",
-        "callout_warning": "Warning",
-        "callout_caution": "Caution",
-        "toggle": "Toggle",
-        "toggle_placeholder": "Toggle",
-        "toggle_content_placeholder": "Write inside the toggle here…",
-        "toggle_after_placeholder": "Write outside the toggle here…",
-        "code_block_placeholder_before": "Write text here…",
-        "code_block_placeholder_after": "Write text here…",
-        "youtube_video": "YouTube video",
-        "youtube_modal_title": "Insert YouTube Video",
-        "youtube_url_label": "YouTube URL or Video ID:",
-        "youtube_url_prompt": "Enter YouTube video URL or ID:",
-        "youtube_help": "Supports: youtube.com/watch?v=ID, youtu.be/ID, or just the video ID",
-        "youtube_insert": "Insert",
-        "youtube_invalid_url": "Invalid YouTube URL",
-        "mp4_video": "MP4 video",
-        "mp4_uploading": "Uploading video...",
-        "mp4_upload_success": "Video uploaded successfully!",
-        "mp4_no_note": "No note selected",
-        "mp4_invalid_file": "Please select an MP4 video.",
-        "mp4_upload_failed": "Upload failed: {{error}}",
-        "audio": "Audio",
-        "audio_uploading": "Uploading audio...",
-        "audio_no_note": "No note selected",
-        "audio_invalid_file": "Please select an audio file.",
-        "audio_upload_failed": "Upload failed: {{error}}",
-        "date": "Date"
+    "update_check": {
+      "title": "Checking for Updates...",
+      "status": "Please wait while we check for updates..."
     },
-    "api": {
-        "settings": {
-            "key_required": "key required",
-            "invalid_action": "invalid action",
-            "internal_error": "internal error"
-        },
-        "errors": {
-            "workspace_not_found": "Workspace not found",
-            "linked_note_already_exists": "A linked note already exists for this note",
-            "method_not_allowed": "Method not allowed",
-            "invalid_action": "Invalid action",
-            "internal_server_error": "Internal server error",
-            "duplicate_title_in_folder": "Another note with the same title exists in this folder.",
-            "note_id_required": "note_id required",
-            "note_not_found": "Note not found",
-            "invalid_custom_token": "Invalid custom token.\n\nAllowed:\n\nletters, numbers, -, _, . (4-128 chars)",
-            "token_already_in_use": "Token already in use",
-            "no_token_generated": "No token generated",
-            "server_error": "Server error: {{error}}"
-        }
-    },
-    "ui": {
-        "login_display": {
-            "prompt": "Login display name (empty to clear):"
-        },
-        "alerts": {
-            "saved": "Saved",
-            "save_error": "Save error",
-            "network_error": "Network error"
-        }
+    "login_display": {
+      "title": "Login display name",
+      "description": "Set the name shown on the login screen.",
+      "placeholder": "Display name"
     },
     "theme": {
-        "badge": {
-            "dark": "dark mode",
-            "light": "light mode",
-            "system": "system mode"
-        }
+      "title": "Theme Selection",
+      "description": "Choose your preferred theme:"
     },
-    "table": {
-        "context_menu": {
-            "insert_row_above": "Insert row above",
-            "insert_row_below": "Insert row below",
-            "insert_column_left": "Insert column left",
-            "insert_column_right": "Insert column right",
-            "delete_row": "Delete row",
-            "delete_column": "Delete column",
-            "delete_table": "Delete table",
-            "errors": {
-                "cannot_delete_last_row": "Cannot delete the last row of the table.",
-                "cannot_delete_last_column": "Cannot delete the last column of the table."
-            },
-            "confirm": {
-                "delete_table": "Do you really want to delete this table?"
-            }
-        }
+    "language": {
+      "title": "Language Selection",
+      "description": "Select your preferred language:"
     },
-    "index": {
-        "errors": {
-            "create_task_list": "Error creating task list",
-            "create_task_list_prefix": "Error creating task list: ",
-            "create_markdown_note": "Error creating markdown note",
-            "create_markdown_note_prefix": "Error creating markdown note: ",
-            "conversion_failed_prefix": "Conversion error: {{error}}",
-            "network_error_converting": "Network error converting note"
-        },
-        "toolbar": {
-            "favorite_add": "Add to favorites",
-            "favorite_remove": "Remove from favorites",
-            "public_note": "Share note",
-            "attachments_with_count": "Attachments ({{count}})",
-            "menu_actions": "Menu actions",
-            "convert_to_html": "Convert to HTML",
-            "convert_to_markdown": "Convert to Markdown"
-        },
-        "share_modal": {
-            "custom_token": "Custom token (optional)",
-            "custom_token_placeholder": "my_custom_token-1",
-            "password": "Password (optional)",
-            "password_placeholder": "Enter a password",
-            "indexable": "Allow indexing by search engines",
-            "create_url": "Create URL",
-            "close": "Close",
-            "error_prefix": "Error: ",
-            "unknown_error": "Unknown error creating public link",
-            "error_creating": "Error creating public link: "
-        },
-        "public_modal": {
-            "title": "Shared URL",
-            "close": "Close",
-            "open": "Open",
-            "copy": "Copy",
-            "revoke": "Revoke",
-            "renew": "Renew",
-            "manage": "Edit",
-            "create_url": "Create url",
-            "no_link_yet": "No public link yet",
-            "custom_token": "Custom token (optional)",
-            "custom_token_placeholder": "my_custom_token-1",
-            "indexable": "Allow indexing by search engines",
-            "password": "Password (optional)",
-            "password_placeholder": "Enter a password",
-            "error_prefix": "Error: ",
-            "unknown_error": "Unknown error creating public link",
-            "error_creating": "Error creating public link: "
-        },
-        "folder_share_modal": {
-            "title": "Shared folder URL",
-            "description": "Anyone with this link can view all notes in this folder (unless password-protected).",
-            "use_https": "HTTPS",
-            "renewed": "Shared folder link renewed",
-            "failed_renew": "Error renewing folder share",
-            "failed_revoke": "Error revoking folder share"
-        },
-        "note": {
-            "new_note": "New note",
-            "new_note_numbered": "New note ({{number}})",
-            "title_placeholder": "Title ?"
-        },
-        "editor": {
-            "placeholder_desktop": "Enter text, use / for command menu, paste images or drop an image at cursor.",
-            "placeholder_mobile": "Enter text or paste images here..."
-        }
+    "input": {
+      "placeholder": "Enter text"
     },
-    "editor": {
-        "markdown_placeholder": "Write your markdown or use / to open the command menu...",
-        "markdown_placeholder_mobile": "Write your markdown here...",
-        "excalidraw": {
-            "placeholder_outside": "…"
-        },
-        "messages": {
-            "preview_mode_hint": "You are in preview mode. Switch to edit mode using the button in the toolbar to start writing markdown.",
-            "split_preview_placeholder": "Preview will appear here as you type..."
-        },
-        "images": {
-            "delete_confirm": {
-                "title": "Delete image",
-                "message": "Are you sure you want to delete this image? This action is irreversible."
-            }
-        },
-        "colors": {
-            "black": "Black",
-            "red": "Red",
-            "orange": "Orange",
-            "yellow": "Yellow",
-            "green": "Green",
-            "blue": "Blue",
-            "purple": "Purple",
-            "none": "None"
-        },
-        "font_size": {
-            "very_small": "Very small",
-            "small": "Small",
-            "normal": "Normal",
-            "large": "Large",
-            "very_large": "Very large",
-            "huge": "Huge",
-            "giant": "Giant"
-        },
-        "emoji": {
-            "hint_windows": "On Windows, press Win + ; to open the emoji picker"
-        },
-        "table_picker": {
-            "title": "Insert table",
-            "rows_label": "Rows:",
-            "rows_placeholder": "Rows",
-            "cols_label": "Columns:",
-            "cols_placeholder": "Columns",
-            "insert": "Insert"
-        },
-        "toolbar": {
-            "back_to_notes": "Go to notes",
-            "bold": "Bold",
-            "italic": "Italic",
-            "underline": "Underline",
-            "strikethrough": "Strikethrough",
-            "link": "Link",
-            "text_color": "Text color",
-            "highlight": "Highlight",
-            "bullet_list": "Bullet list",
-            "numbered_list": "Numbered list",
-            "font_size": "Font size",
-            "code_block": "Code block",
-            "inline_code": "Inline code",
-            "clear_formatting": "Clear formatting",
-            "insert_excalidraw": "Insert Excalidraw diagram",
-            "insert_emoji": "Insert emoji",
-            "insert_table": "Insert table",
-            "insert_checklist": "Insert checklist",
-            "add_separator": "Add separator",
-            "insert_note_reference": "Insert note reference",
-            "open_in_new_tab": "Open in new tab",
-            "create_linked_note": "Create linked note",
-            "search_replace": "Search and replace"
-        },
-        "link": {
-            "add_title": "Add link",
-            "title": "Manage link",
-            "url_label": "URL:",
-            "url_placeholder": "https://example.com",
-            "text_label": "Link text (optional):",
-            "text_placeholder": "Displayed text",
-            "remove": "Remove link",
-            "cancel": "Cancel",
-            "save": "Save"
-        }
+    "font_size": {
+      "title": "Font Size",
+      "note_label": "Note content (px):",
+      "sidebar_label": "Sidebar (px):",
+      "code_block_label": "Code blocks (px):",
+      "default_value": "{{size}} px is the Default value",
+      "preview": "Preview"
     },
-    "image_menu": {
-        "view_large": "View large",
-        "download": "Download",
-        "resize": "Resize",
-        "edit": "Edit",
-        "add_border": "Add border",
-        "remove_border": "Remove border",
-        "add_border_no_padding": "Add border without padding",
-        "remove_border_no_padding": "Remove border without padding",
-        "delete_image": "Delete image",
-        "links": "Links",
-        "open_link": "Open link",
-        "add_link": "Add link",
-        "edit_link": "Edit link",
-        "remove_link": "Remove link",
-        "link_modal": {
-            "title_add": "Add link to image",
-            "title_edit": "Edit image link",
-            "description": "This link will make the image clickable when the note is shared.",
-            "url_label": "Enter URL:",
-            "url_placeholder": "https://www.example.com",
-            "cancel": "Cancel",
-            "ok": "OK"
-        }
+    "note_width": {
+      "title": "Note Content Width",
+      "description": "Select the maximum width for your notes content (in pixels):",
+      "label": "Maximum width (px):",
+      "full_width": "Full Width",
+      "default_value": "{{width}} px is the Default value"
     },
-    "backup_export": {
-        "page": {
-            "title": "Backup / Export"
-        },
-        "common": {
-            "all_workspaces": "all workspaces"
-        },
-        "sections": {
-            "complete_backup": {
-                "title": "Complete Backup",
-                "description_prefix": "Download a complete backup containing database, notes and attachments for",
-                "description_suffix": "in a single ZIP file.",
-                "use_cases": "Two use cases:",
-                "use_case_restore_label": "Restore",
-                "use_case_restore_text": "Import this backup to recover your data in case of loss",
-                "use_case_offline_label": "Offline Reading",
-                "use_case_offline_text": "Open the included",
-                "use_case_offline_text_suffix": "to browse your notes without Poznote",
-                "select_user": "Select user profile:"
-            },
-            "structured_export": {
-                "title": "Structured Export",
-                "description": "Export your notes organized in folders that match your Poznote folder structure. Each note will be saved in a directory that corresponds to its folder in Poznote, preserving the full hierarchy. Markdown files include YAML frontmatter with metadata.",
-                "warning": "Note: This export type is not designed for a perfect Poznote backup.",
-                "select_workspace": "Select workspace:",
-                "loading_workspaces": "Loading workspaces..."
-            }
-        },
-        "buttons": {
-            "download_complete_backup": "Download complete backup (ZIP)",
-            "download_structured_export": "Download structured export (ZIP)"
-        },
-        "spinner": {
-            "preparing": "Preparing backup...",
-            "preparing_long": "Preparing backup... This may take a few moments."
-        },
-        "errors": {
-            "export_error": "Export error: {{error}}",
-            "complete_backup_error": "Complete backup error: {{error}}",
-            "cannot_create_zip": "Cannot create ZIP file",
-            "failed_to_create_db_backup": "Failed to create database backup",
-            "failed_to_create_backup_file": "Failed to create backup file"
-        },
-        "dump": {
-            "title": "Poznote Database Dump",
-            "generated_on": "Generated on {{date}}"
-        },
-        "index": {
-            "title": "Poznote Index"
-        }
+    "index_icon_scale": {
+      "title": "Index icon scaling",
+      "description": "Adjust the size of icons on the index page (scale factor):"
     },
-    "login": {
-        "page": {
-            "title": "Login"
-        },
-        "redirecting": "Redirecting...",
-        "show_password": "Show password",
-        "hide_password": "Hide password",
-        "admin_warning": "Please log in with the username <code>{{username}}</code> and your password (stored in .env). You can then rename this account in settings for better security.",
-        "fields": {
-            "username": "Username",
-            "username_or_email": "Username or Email",
-            "password": "Password",
-            "profile": "Select your profile"
-        },
-        "remember_me": "Remember me for 30 days",
-        "button": "Login",
-        "oidc_button": "Continue with {{provider}}",
-        "documentation": "Poznote documentation",
-        "no_profiles": "No user profiles available. Please contact the administrator.",
-        "errors": {
-            "invalid_credentials": "Incorrect username or password.",
-            "oidc_disabled": "Your account has been disabled by an administrator. Please contact them for more information.",
-            "oidc_no_profile": "No user profile found for \"{{identifier}}\". Please contact an administrator to create your profile.",
-            "oidc_failed": "SSO login failed. Please try again.",
-            "oidc_unauthorized": "You are not authorized to access this application. Please contact your administrator."
-        }
+    "confirm": {
+      "title": "Confirm Action",
+      "message": "Are you sure you want to proceed?",
+      "save_and_exit": "Save and Exit",
+      "exit_without_saving": "Exit without saving"
     },
-    "restore_import": {
-        "page": {
-            "title": "Restore / Import"
-        },
-        "advanced": {
-            "show": "Show Advanced Import Options",
-            "hide": "Hide Advanced Import Options"
-        },
-        "messages": {
-            "database_restored": "Database restored successfully!",
-            "complete_backup_restored": "{{message}}",
-            "notes_imported": "Imported {{count}} note(s) into workspace \"{{workspace}}\", folder \"{{folder}}\".",
-            "attachments_imported": "{{message}}",
-            "notes_imported_zip": "Imported {{count}} note(s) from ZIP into workspace \"{{workspace}}\", folder \"{{folder}}\"."
-        },
-        "errors": {
-            "complete_restore_form_not_found": "Complete restore form not found. Please try again.",
-            "form_not_found": "Form not found. Please try again.",
-            "select_backup_first": "Please select a backup file first.",
-            "restore_error": "Restore error: {{error}}",
-            "no_backup_file_or_upload": "No backup file provided or upload error.",
-            "complete_restore_error": "Complete restore error: {{error}} - {{message}}",
-            "no_complete_backup_file_or_upload": "No complete backup file provided or upload error.",
-            "import_error": "Import error: {{error}}",
-            "no_notes_file_or_upload": "No notes file provided or upload error.",
-            "no_attachments_file_or_upload": "No attachments file provided or upload error.",
-            "no_notes_selected_or_upload": "No notes selected or upload error.",
-            "file_type_zip_only": "Only ZIP files are allowed.",
-            "error_uploading_file": "Error uploading file.",
-            "cannot_find_entries_directory": "Cannot find entries directory.",
-            "cannot_open_zip": "Cannot open ZIP file.",
-            "failed_extract_content": "Failed to extract content from {{file}}."
-        },
-        "spinner": {
-            "processing": "Processing restoration...",
-            "processing_long": "Processing restoration... This may take a few moments.",
-            "importing_notes": "Importing notes..."
-        },
-        "units": {
-            "bytes": "Bytes",
-            "kb": "KB",
-            "mb": "MB",
-            "gb": "GB"
-        },
-        "direct_copy": {
-            "backup_file_found": "Backup file found:",
-            "ready_to_restore": "Ready to restore?",
-            "replace_all_data_warning": "This will replace all data in ALL workspaces.",
-            "no_backup_found_prefix": "No backup file found in container at",
-            "no_backup_found_hint": "Please run the docker cp command first.",
-            "completed_successfully_prefix": "Direct file copy restoration completed successfully!",
-            "failed_prefix": "Direct file copy restoration failed:",
-            "backup_not_found_for_restoration": "Backup file not found for restoration.",
-            "buttons": {
-                "yes_restore_direct_copy": "Yes, Restore from direct copy"
-            }
-        },
-        "individual_notes": {
-            "default_title_with_date": "Imported note {{date}}",
-            "file_count_one": "1 note",
-            "file_count_many": "{{count}} notes",
-            "summary": "This will import {{fileText}} into Poznote workspace without assigning them to a folder.",
-            "errors": {
-                "too_many_files": "Too many files selected. Maximum allowed: {{max}}. You selected: {{count}}.",
-                "workspace_not_found": "Workspace does not exist",
-                "entries_dir_not_found": "Cannot find entries directory",
-                "upload_error": "Upload error",
-                "invalid_file_type": "Invalid file type (only {{allowed}} allowed)",
-                "cannot_read_file": "Cannot read file"
-            },
-            "summary_with_location": "This will import {{fileText}} into workspace \"{{workspace}}\", folder \"{{folder}}\".",
-            "summary_zip_with_location": "This will extract and import all files from ZIP archive into workspace \"{{workspace}}\", folder \"{{folder}}\"."
-        },
-        "sections": {
-            "restore_from_backup": {
-                "title": "Do you want to restore from a Poznote ZIP backup file?",
-                "description": "Restore your Poznote database from a complete backup"
-            },
-            "standard_restore": {
-                "title": "Standard Restore",
-                "description": "Choose a complete backup ZIP file.",
-                "helper": "Recommended max size: 500MB."
-            },
-            "direct_copy_restore": {
-                "title": "Restore when standard restore doesn't work (timeout if zip file is too large)",
-                "step1": "1. Copy the file to the container:",
-                "docker_command": "docker cp /path/to/backup.zip poznote-webserver-1:/tmp/backup_restore.zip",
-                "step2": "2. Click below to restore"
-            },
-            "individual_notes": {
-                "title": "Do you want to import HTML, Markdown, text files or ZIP archives?",
-                "description": "Import individual notes (HTML, Markdown or ZIP) to a specific workspace and folder",
-                "workspace": "Destination workspace",
-                "loading": "Loading...",
-                "folder": "Destination folder",
-                "optional": "optional",
-                "frontmatter_warning": "If an MD note contains a folder key in a front matter, this value will override the one selected below. You must therefore ensure first that the folder already exists, otherwise the note will be created at the root of the workspace.",
-                "zip_folders_info": "ZIP with folder structure:",
-                "zip_folders_description": "If your ZIP contains folders, they will be automatically created as folders in Poznote, preserving their hierarchy (subfolders included).",
-                "no_folder": "No folder (root level)",
-                "select_files": "Select files",
-                "files_info": "Multiple files (max {{maxIndividualFiles}}) or single ZIP file (max {{maxZipFiles}} files). These limits can be changed,",
-                "files_info_link": "see documentation",
-                "supported_formats": "Supported: .html, .md, .markdown, .txt, .json, .zip",
-                "description_html": "Import individual HTML, Markdown, text or JSON files, or a ZIP archive containing multiple files.<br><br>Title will be automatically created from filename (without extension), unless a title key is defined in a front matter for MD files.<br><br><strong>Tasklists:</strong> .json files containing tasks arrays and .md files with checkbox syntax (- [ ] or - [x]) are automatically imported as tasklists.",
-                "helper": "You can select multiple files at once (Maximum 50 files). Supported formats: .html, .md, .markdown, .txt, .json"
-            }
-        },
-        "buttons": {
-            "start_restore": "Start Restore",
-            "start_import": "Start Import"
-        },
-        "drag_drop": {
-            "individual_notes": "Drop files here",
-            "complete_backup": "Drop backup ZIP here",
-            "database": "Drop SQL file here",
-            "notes": "Drop notes ZIP here",
-            "attachments": "Drop attachments ZIP here"
-        },
-        "modals": {
-            "import_confirm": {
-                "title": "Are you sure?",
-                "body": "This will replace note titles, tags, search index and metadata, but not actual note content. This action cannot be undone.",
-                "confirm": "Yes, Import"
-            },
-            "complete_restore": {
-                "title": "Complete restore?",
-                "warning_large_html": "<strong>Warning:</strong> This file is {{size}}MB. Standard upload might be slow or fail for large files.<br><br><strong>This will replace your database, restore all notes and attachments for <span style=\"color: #dc3545; font-weight: bold;\">all workspaces</span>.</strong>",
-                "warning_html": "<strong>Warning:</strong> This will replace your database, restore all notes and attachments for <span style=\"color: #dc3545; font-weight: bold;\">all workspaces</span>.",
-                "body_html": "This will replace your database, restore all notes and attachments for <span style=\"color: #dc3545; font-weight: bold;\">all workspaces</span>.",
-                "confirm": "Yes, Complete restore"
-            },
-            "import_notes": {
-                "title": "Import notes?",
-                "body": "This will import all HTML files from the ZIP. Files will be added to your existing notes collection.",
-                "confirm": "Yes, Import notes"
-            },
-            "import_attachments": {
-                "title": "Import attachments?",
-                "body": "This will import all files from the ZIP to attachments folder. Files will be added to your existing attachments.",
-                "confirm": "Yes, Import attachments"
-            },
-            "complete_restore_direct_copy": {
-                "title": "Complete restore (Direct copy)?",
-                "body_html": "This will replace your database, restore all notes and attachments for <span style=\"color: #dc3545; font-weight: bold;\">all workspaces</span>.",
-                "confirm": "Yes, Complete restore"
-            },
-            "import_individual_notes": {
-                "title": "Import individual notes?",
-                "body": "This will import notes to Poznote workspace.",
-                "confirm": "Yes, Import notes"
-            }
-        },
-        "alerts": {
-            "ok": "OK",
-            "no_zip_selected_title": "No ZIP file selected",
-            "no_zip_selected_restore": "Please select a complete backup ZIP file before proceeding with restore.",
-            "no_zip_selected_notes": "Please select a ZIP file containing HTML notes before proceeding with import.",
-            "no_zip_selected_attachments": "Please select a ZIP file containing attachments before proceeding with import.",
-            "no_sql_selected_title": "No SQL file selected",
-            "no_sql_selected_body": "Please select a SQL file before proceeding with database import.",
-            "no_files_selected_title": "No files selected",
-            "no_files_selected_body": "Please select one or more HTML or Markdown files before proceeding with import.",
-            "too_many_files_title": "Too many files selected",
-            "too_many_files_body": "You can import a maximum of {{max}} files at once. You selected {{count}} files. Please select fewer files and try again.",
-            "no_file_selected": {
-                "title": "No file selected",
-                "body": "Please select a file before proceeding with the import."
-            },
-            "no_workspace_title": "No workspace selected",
-            "no_workspace_body": "Please select a workspace for imported notes."
-        },
-        "inline": {
-            "standard": {
-                "button": "Start complete restore (Standard)",
-                "too_large": "⚠️ File is {{size}}MB. Standard upload might be slow or fail."
-            }
-        }
+    "folder": {
+      "new_title": "New Folder",
+      "new_placeholder": "New folder name",
+      "create": "Create",
+      "rename_title": "Rename Folder",
+      "rename_placeholder": "New folder name",
+      "delete_title": "Delete Folder",
+      "delete_folder": "Delete Folder",
+      "change_folder": "Change folder",
+      "move_prefix": "Move",
+      "move_suffix": "to:",
+      "move_prompt": "Move \"{{title}}\" to:",
+      "no_folder": "No folder"
     },
-    "markdown_guide": {
-        "page_title": "Markdown Guide",
-        "title": "Markdown Guide",
-        "toc": {
-            "label": "Table of Contents",
-            "title": "Table of Contents"
-        },
-        "common": {
-            "syntax": "Syntax",
-            "result": "Result"
-        },
-        "sections": {
-            "headers": {
-                "title": "Headers",
-                "heading1": "Header 1",
-                "heading2": "Header 2",
-                "heading3": "Header 3"
-            },
-            "text_formatting": {
-                "title": "Text formatting",
-                "bold": "bold text",
-                "italic": "italic text",
-                "strikethrough": "strikethrough",
-                "inline_code": "inline code"
-            },
-            "unordered_lists": {
-                "title": "Unordered lists",
-                "item_one": "Item one",
-                "item_two": "Item two",
-                "nested_item": "Nested item"
-            },
-            "ordered_lists": {
-                "title": "Ordered lists",
-                "first": "First",
-                "second": "Second",
-                "third": "Third"
-            },
-            "checkboxes": {
-                "title": "Checkboxes",
-                "unchecked_note": "Unchecked item (only one space!)",
-                "unchecked": "Unchecked item",
-                "checked": "Checked item"
-            },
-            "images": {
-                "title": "Images",
-                "alt_text": "Alt text",
-                "preview": "(image preview)"
-            },
-            "urls": {
-                "title": "URLs",
-                "link_text": "Link text"
-            },
-            "code_blocks": {
-                "title": "Code blocks"
-            },
-            "quotes": {
-                "title": "Quotes",
-                "quote_text": "This is a quote",
-                "quote_line2": "spanning two lines"
-            },
-            "line_breaks": {
-                "title": "Line breaks",
-                "description": "A single line break in edit mode creates a line break in preview.",
-                "first_line": "First line",
-                "second_line": "Second line"
-            },
-            "horizontal_rule": {
-                "title": "Horizontal rule"
-            },
-            "tables": {
-                "title": "Tables",
-                "col_name": "Name",
-                "col_value": "Value"
-            },
-            "math": {
-                "title": "Math Equations",
-                "inline": {
-                    "title": "Inline Equations"
-                },
-                "block": {
-                    "title": "Block Equations"
-                },
-                "examples": {
-                    "title": "More Examples"
-                }
-            },
-            "mermaid": {
-                "title": "Mermaid Diagrams",
-                "node_a": "Write Markdown",
-                "node_b": "Need a diagram?",
-                "node_c": "Use Mermaid",
-                "node_d": "Keep writing",
-                "edge_yes": "Yes",
-                "edge_no": "No"
-            }
-        }
+    "move_note_folder": {
+      "title": "Move Note to Folder",
+      "workspace_destination": "Select Workspace destination:",
+      "target_folder": "Select target folder:",
+      "enter_folder_name": "Please enter a folder name"
     },
-    "public": {
-        "button": "Shared Notes",
-        "view_public_notes": "View shared notes",
-        "page": {
-            "title": "Shared Notes",
-            "no_public_notes": "No shared notes yet.",
-            "public_hint": "Share a note by clicking the cloud button in note toolbar."
-        },
-        "filter_placeholder": "Filter by title or folder name...",
-        "no_filter_results": "No notes match your search.",
-        "table": {
-            "note": "Note",
-            "url": "Shared URL"
-        },
-        "actions": {
-            "open": "Open",
-            "revoke": "Revoke"
-        },
-        "indexable": "Indexable",
-        "password_protected": "Password protected",
-        "add_password_title": "Add password protection",
-        "change_password_title": "Change password",
-        "password_remove_hint": "Leave empty to remove password protection.",
-        "enter_new_password": "Enter a new password",
-        "protection": {
-            "title": "Password Protected",
-            "note_heading": "Password Protected",
-            "folder_heading": "Password Protected Folder",
-            "error_incorrect": "Incorrect password. Please try again.",
-            "additional_password_required": "This note requires an additional password. Please enter the next password to continue.",
-            "placeholder": "Enter password",
-            "unlock": "Unlock"
-        },
-        "errors": {
-            "token_missing": "Token missing",
-            "token_or_folder_auth_missing": "Token or folder authorization missing",
-            "shared_folder_not_found": "Shared folder not found",
-            "shared_note_not_found_or_denied": "Shared note not found or access denied",
-            "folder_not_found": "Folder not found",
-            "note_not_found": "Note not found",
-            "server_error": "Server error"
-        }
+    "move_folder_files": {
+      "title": "Move All Files",
+      "prompt_prefix": "Move all files from",
+      "prompt_suffix": "to:",
+      "select_target": "Select target folder...",
+      "hint_move_single": "To move a single note to another workspace, use the \"Move note\" button in the toolbar",
+      "hint_move_all": "To move all notes from one workspace to another, go to Settings -> Workspaces",
+      "move_all": "Move All Files"
     },
-    "public_folder": {
-        "filter_placeholder": "Filter by titles",
-        "no_filter_results": "No results.",
-        "view_notes": "View as list",
-        "view_kanban": "View as Kanban"
+    "move_folder": {
+      "title": "Move Folder",
+      "prompt_prefix": "Move folder",
+      "prompt_suffix": "into:",
+      "select_target": "Select parent folder...",
+      "root": "Root (Top Level)",
+      "hint": "This will move the folder and all its notes as a subfolder. Select \"Root\" to move it to the top level.",
+      "move": "Move Folder",
+      "workspace": "Target Workspace",
+      "parent": "Target Parent Folder"
     },
-    "kanban": {
-        "uncategorized": "Uncategorized",
-        "actions": {
-            "enable": "Enable Kanban view",
-            "disable": "Disable Kanban view",
-            "open": "Open Kanban view"
-        },
-        "notifications": {
-            "activated_title": "Kanban view enabled",
-            "activated_message": "This folder is now in Kanban mode. Click its icon to open the board."
-        },
-        "list": {
-            "filter_placeholder": "Filter by board name...",
-            "no_boards": "No Kanban boards yet.",
-            "hint": "Enable Kanban view on a folder to see it here."
-        }
+    "workspaces": {
+      "move_notes_title": "Move notes from",
+      "select_target_workspace": "Select target workspace",
+      "rename_title": "Rename workspace",
+      "new_name": "New name",
+      "delete_title": "Confirm delete workspace",
+      "delete_description": "All notes and folders will be permanently deleted and cannot be recovered.",
+      "delete_placeholder": "Type workspace name to confirm",
+      "delete_button": "Delete workspace"
     },
-    "sidebar": {
-        "display": "Display",
-        "home": "Home",
-        "settings": "Settings",
-        "create": "Create",
-        "toggle": "Hide/Show left column"
+    "user_settings_info": {
+      "title": "Account Settings",
+      "message": "To change your password, edit your email, username, or OIDC Subject (UUID), please contact the administrator of this Poznote instance."
     },
-    "home": {
-        "title": "Home",
-        "dashboard": "Dashboard",
-        "folders": "Folders",
-        "shared_notes": "Shared Notes",
-        "shared_folders": "Shared Folders",
-        "kanban": "Kanban",
-        "note": "note",
-        "notes": "notes",
-        "support_poznote": "Support Poznote",
-        "version": "Version"
+    "create": {
+      "title_in_folder": "Create in {{folder}}",
+      "folder_fallback": "folder",
+      "note": {
+        "title": "HTML Note",
+        "description": "Not Markdown"
+      },
+      "markdown": {
+        "title": "Markdown note",
+        "description": "Not HTML"
+      },
+      "task_list": {
+        "title": "Task List"
+      },
+      "linked": {
+        "title": "Linked Note",
+        "default_heading": "{{note}}",
+        "success": "Linked note created successfully",
+        "error": "Error creating linked note"
+      },
+      "template": {
+        "title": "Template"
+      },
+      "subfolder": {
+        "title": "Subfolder"
+      },
+      "folder": {
+        "title": "Folder"
+      },
+      "kanban": {
+        "title": "Kanban Structure"
+      },
+      "workspace": {
+        "title": "Workspace"
+      }
     },
-    "search": {
-        "placeholder": "Search...",
-        "clear": "Clear search",
-        "placeholder_notes": "Search for one or more words...",
-        "placeholder_tags": "Search for one or more tags...",
-        "placeholder_combined": "Search in notes and tags...",
-        "toggle_options": "Toggle search options",
-        "validation": {
-            "select_type": "Please select at least one search option (Notes or Tags)",
-            "single_letter_warning": "Searching with single-letter words can return too many results. Try using longer words for a more precise search."
-        }
-    },
-    "icon_names": {
-        "briefcase": "briefcase",
-        "home": "home",
-        "star": "star",
-        "heart": "heart",
-        "lightbulb": "lightbulb",
-        "image": "image",
-        "music": "music",
-        "book": "book",
-        "graduation-cap": "graduation-cap",
-        "code": "code",
-        "rocket": "rocket",
-        "plane": "plane",
-        "map-marker-alt": "location",
-        "calendar-alt": "calendar",
-        "clock": "clock",
-        "user": "user",
-        "users": "users",
-        "cog": "settings",
-        "wrench": "wrench",
-        "paint-brush": "paint-brush",
-        "palette": "palette",
-        "camera": "camera",
-        "shield": "shield",
-        "lock": "lock",
-        "key": "key",
-        "envelope": "envelope",
-        "inbox": "inbox",
-        "archive": "archive",
-        "box": "box",
-        "shopping-cart": "cart",
-        "credit-card": "card",
-        "chart-line": "chart",
-        "chart-bar": "diagram",
-        "database": "database",
-        "server": "server",
-        "cloud": "cloud",
-        "download": "download",
-        "upload": "upload",
-        "tasks": "tasks",
-        "clipboard": "clipboard",
-        "file-alt": "file",
-        "copy": "copy",
-        "gamepad": "game",
-        "trophy": "trophy",
-        "gift": "gift",
-        "birthday-cake": "cake",
-        "coffee": "coffee",
-        "pizza-slice": "pizza",
-        "utensils": "restaurant",
-        "medkit": "medical",
-        "heartbeat": "health",
-        "dumbbell": "dumbbell",
-        "bicycle": "bicycle",
-        "tree": "tree",
-        "leaf": "leaf",
-        "seedling": "plant",
-        "paw": "pet",
-        "bug": "bug",
-        "flask": "science",
-        "atom": "atom",
-        "magnet": "magnet",
-        "fire": "fire",
-        "sun": "sun",
-        "moon": "moon",
-        "umbrella": "umbrella",
-        "snowflake": "snow",
-        "bolt": "bolt",
-        "flag": "flag",
-        "bookmark": "bookmark",
-        "thumbs-up": "like",
-        "smile": "smile",
-        "layer-group": "layers",
-        "terminal": "terminal",
-        "at": "at",
-        "hashtag": "hashtag",
-        "question-circle": "question",
-        "times-circle": "close",
-        "eye": "eye",
-        "anchor": "anchor",
-        "apple-alt": "apple",
-        "award": "award",
-        "settings": "settings",
-        "mail": "mail",
-        "video": "video",
-        "trending-up": "trending up",
-        "list-todo": "to-do list",
-        "gamepad-2": "gamepad",
-        "utensils-crossed": "utensils",
-        "briefcase-medical": "medical briefcase",
-        "activity": "activity",
-        "bike": "bike",
-        "tree-deciduous": "deciduous tree",
-        "sprout": "sprout",
-        "paw-print": "paw print",
-        "flask-conical": "flask",
-        "flame": "flame",
-        "zap": "zap",
-        "layers": "layers",
-        "at-sign": "at sign",
-        "hash": "hash",
-        "help-circle": "help",
-        "x-circle": "close",
-        "apple": "apple",
-        "candy": "candy",
-        "badge-check": "verified badge",
-        "network": "network",
-        "pie-chart": "pie chart",
-        "clipboard-list": "list",
-        "boxes": "boxes",
-        "monitor": "monitor",
-        "scroll": "scroll",
-        "dna": "DNA",
-        "dollar-sign": "dollar",
-        "drum": "drum",
-        "euro": "euro",
-        "feather": "feather",
-        "file-code": "code file",
-        "fingerprint": "fingerprint",
-        "gem": "gem",
-        "glasses": "glasses",
-        "globe": "globe",
-        "guitar": "guitar",
-        "hamburger": "hamburger",
-        "hammer": "hammer",
-        "hard-hat": "hard hat",
-        "headphones": "headphones",
-        "headset": "headset",
-        "mountain": "mountain",
-        "shapes": "shapes",
-        "id-card": "ID card",
-        "factory": "factory",
-        "infinity": "infinity",
-        "swords": "swords",
-        "laptop": "laptop",
-        "map": "map",
-        "medal": "medal",
-        "mic": "microphone",
-        "microscope": "microscope",
-        "banknote": "banknote",
-        "passport": "passport",
-        "pen": "pen",
-        "pencil": "pencil",
-        "pepper": "pepper",
-        "phone": "phone",
-        "piggy-bank": "piggy bank",
-        "plane-takeoff": "takeoff",
-        "plug": "plug",
-        "printer": "printer",
-        "puzzle": "puzzle",
-        "receipt": "receipt",
-        "bot": "bot",
-        "person-standing": "person standing",
-        "satellite": "satellite",
-        "satellite-dish": "satellite dish",
-        "shopping-bag": "shopping bag",
-        "signpost": "signpost",
-        "git-branch": "git branch",
-        "flower": "flower",
-        "stamp": "stamp",
-        "waves": "waves",
-        "refresh-cw": "refresh",
-        "syringe": "syringe",
-        "tablet": "tablet",
-        "gauge": "gauge",
-        "tag": "tag",
-        "tags": "tags",
-        "drama": "drama",
-        "tools": "tools",
-        "tractor": "tractor",
-        "trash-alt": "trash",
-        "tree-alt": "tree",
-        "truck": "truck",
-        "tv": "TV",
-        "umbrella-beach": "beach umbrella",
-        "utensil-spoon": "spoon",
-        "vial": "vial",
-        "walking": "walking",
-        "warehouse": "warehouse",
-        "weight": "weight",
-        "wind": "wind",
-        "columns": "columns",
-        "message-circle": "message",
-        "bell": "bell",
-        "binoculars": "binoculars",
-        "book-open": "open book",
-        "brush": "brush",
-        "building": "building",
-        "bus": "bus",
-        "calculator": "calculator",
-        "car": "car",
-        "cloud-sun": "cloudy",
-        "coins": "coins",
-        "compass": "compass",
-        "crown": "crown",
-        "film": "film",
-        "folder-tree": "folder tree",
-        "hospital": "hospital",
-        "school": "school",
-        "stethoscope": "stethoscope",
-        "store": "store",
-        "wallet": "wallet",
-        "wifi": "wifi",
-        "yen-sign": "yen"
+    "kanban_structure": {
+      "title": "Create Kanban Structure",
+      "folder_name_label": "Folder name:",
+      "folder_name_placeholder": "My Kanban View",
+      "columns_label": "Number of columns (1-9):",
+      "error_name_required": "Folder name is required",
+      "error_columns_range": "Number of columns must be between 1 and 9",
+      "error_folder_exists": "Folder already exists in this location",
+      "error_create": "Failed to create Kanban structure",
+      "error_create_prefix": "Error creating Kanban structure: {{error}}"
     },
     "folder_icon": {
-        "default": "Default"
+      "title": "Change Folder Icon",
+      "reset": "Restore default behavior",
+      "search_placeholder": "Search icons..."
     },
-    "git_sync": {
-        "title": "{{provider}} Sync",
-        "description": "Synchronize your notes and attachments to GitHub or Forgejo. Files are stored as flat files with a metadata.json that preserves tags, folders, dates and attachments.",
-        "warning": "Do not rely on this feature as your sole backup.\nRegularly export your data using the backup feature in Settings.",
-        "confirm_push": "Push all notes and attachments to {{provider}}? Existing files will be updated and files no longer in Poznote will be removed from the repository.",
-        "confirm_pull": "Pull all notes and attachments from {{provider}}? Local data will be overwritten with the remote version. Notes not found on {{provider}} will be moved to trash.",
-        "confirm_auto_pull": "A new session started. Do you want to pull changes from {{provider}}?",
-        "confirm_auto_pull_warning": "A new session started. Do you want to pull changes from {{provider}}?\n\nLocal notes not found on {{provider}} will be moved to trash.",
-        "auto_pull_complete": "Git pull complete. Refreshing page...",
-        "auto_pull_no_changes": "Git pull complete. No changes found.",
-        "pulling": "Pulling changes...",
-        "starting": "Syncing...",
-        "config": {
-            "title": "Configuration",
-            "status": "Status",
-            "repository": "Repository",
-            "branch": "Branch",
-            "mode": "Sync Mode",
-            "token": "Access Token",
-            "token_set": "Configured",
-            "token_missing": "Not configured",
-            "not_configured": "Not configured",
-            "not_configured_yet": "To configure",
-            "hint": "{{provider}} sync is disabled. Set POZNOTE_GIT_SYNC_ENABLED=true in your .env file to enable it."
-        },
-        "auto_sync": {
-            "title": "Automatic Synchronization",
-            "push_label": "Automatically push on exit",
-            "push_description": "When leaving a note (switching notes or closing the tab), its latest version is automatically pushed to the Git repository, if it was modified during the session.",
-            "pull_label": "Automatically pull on load",
-            "pull_description": "Once per session, asks whether to pull from the Git repository. Updates existing notes, imports new ones, and moves to trash any local notes not found on the remote.",
-            "saving": "Configuration saved"
-        },
-        "test": {
-            "title": "Test Connection",
-            "button": "Test Connection"
-        },
-        "last_sync": {
-            "title": "Last Synchronization",
-            "action": "Action",
-            "time": "Time",
-            "pushed": "Pushed",
-            "pulled": "Pulled",
-            "notes": "notes"
-        },
-        "actions": {
-            "title": "Sync Actions",
-            "workspace": "Workspace: {{workspace}}",
-            "target_workspace": "Target Workspace",
-            "all_workspaces": "All workspaces",
-            "push": {
-                "title": "Push to {{provider}}",
-                "description": "Exports all your notes and attachments to {{provider}} as flat files. Updates existing files and removes files that no longer exist in Poznote.",
-                "button": "Push"
-            },
-            "pull": {
-                "title": "Pull from {{provider}}",
-                "description": "Imports all notes and attachments from {{provider}}. Overwrites local content and moves to trash any notes not present in the repository.",
-                "button": "Pull"
-            }
-        },
-        "messages": {
-            "connection_success": "Connection successful! Connected to {{repo}}",
-            "connection_error": "Connection failed: {{error}}",
-            "push_success": "Successfully pushed {{count}} notes, deleted {{deleted}} files ({{errors}} errors)",
-            "push_error": "Push failed: {{error}}",
-            "pull_success": "Successfully pulled {{pulled}} new notes, updated {{updated}} existing notes, deleted {{deleted}} notes ({{errors}} errors)",
-            "pull_error": "Pull failed: {{error}}"
-        },
-        "debug": {
-            "title": "Debug Info",
-            "show": "Show Debug Info",
-            "hide": "Hide Debug Info",
-            "copy": "Copy Debug",
-            "copied": "Copied!"
-        },
-        "limitations": {
-            "title": "Synchronization Limitations",
-            "element": "Element",
-            "html_notes": "HTML Notes",
-            "markdown_notes": "Markdown Notes",
-            "text_content": "Text content",
-            "attachments": "File attachments",
-            "embedded_images": "Images",
-            "metadata": "Metadata (tags, date, ID)",
-            "embedded_note": "Embedded images are preserved in HTML but not displayed on {{provider}}"
-        },
-        "not_configured": {
-            "title": "{{provider}} Sync Not Configured",
-            "description": "To use {{provider}} synchronization, you need to configure your {{provider}} credentials in the .env file.",
-            "steps_title": "Setup Instructions",
-            "step1": "Create a {{provider}} Personal Access Token at with 'repo' scope",
-            "step2": "Create a {{provider}} repository (public or private) for your notes",
-            "step3": "Add the configuration to your .env file",
-            "step4": "Restart the application for changes to take effect"
-        }
+    "linked_selector": {
+      "title": "Select Note to Link",
+      "search_placeholder": "Search notes...",
+      "recent_label": "Recent notes"
     },
-    "sort": {
-        "header": "Sort by",
-        "alphabet": "Name",
-        "created": "Date Created",
-        "modified": "Date Modified"
+    "linked_folder_selector": {
+      "title": "Choose Folder for Linked Note",
+      "description": "Select the folder where the linked note will be created:",
+      "search_label": "Filter folders",
+      "search_placeholder": "Search folders...",
+      "folder_label": "Destination folder",
+      "root": "Root (No folder)"
     },
-    "calendar": {
-        "months": {
-            "january": "January",
-            "february": "February",
-            "march": "March",
-            "april": "April",
-            "may": "May",
-            "june": "June",
-            "july": "July",
-            "august": "August",
-            "september": "September",
-            "october": "October",
-            "november": "November",
-            "december": "December"
-        },
-        "weekdays": {
-            "monday": "M",
-            "tuesday": "T",
-            "wednesday": "W",
-            "thursday": "T",
-            "friday": "F",
-            "saturday": "S",
-            "sunday": "S"
-        },
-        "buttons": {
-            "previous_month": "Previous month",
-            "next_month": "Next month",
-            "today": "Today",
-            "show_calendar": "Show calendar",
-            "hide_calendar": "Hide calendar"
-        },
-        "modal": {
-            "title": "Notes from",
-            "open": "Open",
-            "open_all": "Open All",
-            "close": "Close"
-        }
+    "delete_linked_note": {
+      "title": "Delete Linked Note",
+      "message": "What do you want to delete?",
+      "delete_link_only": "Delete this link only",
+      "delete_link_and_target": "Delete the note and all its links"
     },
-    "workspace_menu": {
-        "workspaces": "Workspaces",
-        "logout": "Logout"
+    "convert": {
+      "title": "Convert Note",
+      "message": "Are you sure you want to convert this note?",
+      "to_html_title": "Convert to HTML",
+      "to_html_message": "This will convert your Markdown note to HTML format.",
+      "to_html_warning": "Before converting this note, you may want to duplicate it to keep a copy in case the conversion doesn't meet your expectations.",
+      "to_markdown_title": "Convert to Markdown",
+      "to_markdown_message": "This will convert your HTML note to Markdown format. Embedded images will be saved as attachments.",
+      "to_markdown_warning": "Before converting this note, you may want to duplicate it to keep a copy in case the conversion doesn't meet your expectations.",
+      "converting": "Converting note...",
+      "success": "Note converted successfully!",
+      "error": "Error converting note",
+      "duplicate_button": "Duplicate"
     },
-    "admin_tools": {
-        "convert_images": {
-            "title": "Base64 Image Converter",
-            "description": "Finds inline base64-encoded images stored in notes and extracts them as proper attachment files, reducing database size and improving performance. Useful after restoring a backup that was created when notes still contained base64-encoded images.",
-            "step1": "Step 1",
-            "step2": "Step 2",
-            "scan_title": "Scan",
-            "convert_title": "Convert",
-            "scan_desc": "Analyse all notes across every user account and report how many inline base64 images were found.",
-            "scan_no_changes": "No changes are made.",
-            "convert_desc": "Extract every base64 image and save it as a file on disk. Notes are updated to reference the new attachment URL.",
-            "convert_irreversible": "Irreversible — scan first.",
-            "scan_button": "Scan all notes",
-            "convert_button": "Convert all notes",
-            "results_scan": "Scan results",
-            "results_convert": "Conversion results",
-            "stats_notes": "Notes scanned",
-            "stats_images": "Base64 images found",
-            "stats_converted": "Converted",
-            "stats_errors": "Errors",
-            "notice_convert_clean": "No base64 images found. Nothing to convert.",
-            "notice_convert_done": "All {{count}} image(s) converted successfully.",
-            "notice_convert_partial": "{{done}} image(s) converted — {{errors}} error(s) encountered.",
-            "notice_scan_clean": "No base64 images found across all users. Nothing to do.",
-            "notice_scan_found": "{{count}} inline image(s) found in {{notes}} note(s). Use Step 2 to convert them."
-        }
+    "export": {
+      "title": "Export Note",
+      "markdown": {
+        "title": "Export as Markdown",
+        "description": "Download as MD file with metadata (title, tags, folder) in YAML frontmatter"
+      },
+      "html": {
+        "title": "Export as HTML",
+        "description": "Download as HTML file with all formatting preserved"
+      },
+      "json": {
+        "title": "Download as JSON",
+        "description": "Download the raw tasklist data as a JSON file"
+      },
+      "print": {
+        "title": "Print to PDF (Browser)",
+        "description": "Use browser's native print dialog to save as PDF"
+      }
     },
-    "backlinks": {
-        "title": "Backlinks"
+    "task_move": {
+      "title": "Move task",
+      "description": "Choose a task list to move this task to.",
+      "search_placeholder": "Search task lists...",
+      "loading": "Loading...",
+      "empty": "No task lists found.",
+      "moving": "Moving task...",
+      "error": "Could not load task lists.",
+      "confirm": "Move task"
+    },
+    "note_sort": {
+      "title": "Note sort order",
+      "description": "Choose how notes are ordered in the notes list:",
+      "options": {
+        "last_modified": "Last modified",
+        "last_created": "Last created",
+        "alphabetical": "Alphabetical"
+      }
+    },
+    "timezone": {
+      "title": "Timezone",
+      "description": "Select your timezone:",
+      "groups": {
+        "europe": "Europe",
+        "america": "America",
+        "asia": "Asia",
+        "pacific": "Pacific",
+        "africa": "Africa"
+      }
     }
+  },
+  "notes_list": {
+    "system_folders": {
+      "trash": "Trash",
+      "tags": "Tags",
+      "favorites": "Favorites",
+      "public": "Shared",
+      "attachments": "Attachments"
+    },
+    "favorites": {
+      "empty": "No favorite notes yet."
+    },
+    "drop_zone": {
+      "remove_from_folder": "Drop here to remove from folder"
+    },
+    "folder_actions": {
+      "menu": "Actions",
+      "create": "Create",
+      "kanban_view": "Kanban view",
+      "open_all_in_tabs": "Open all notes",
+      "move_all_files": "Move all files",
+      "rename_folder": "Rename folder",
+      "delete_folder": "Delete folder",
+      "move_folder": "Move folder",
+      "change_icon": "Change icon",
+      "download_folder": "Download",
+      "is_public": "Is shared",
+      "share_folder": "Share",
+      "tabs_not_available": "Tabs are not available on mobile devices",
+      "no_notes_title": "No notes",
+      "no_notes_in_folder": "This folder contains no notes",
+      "too_many_notes": "This folder contains {{count}} notes. Only the first {{max}} will be opened to avoid overwhelming your browser."
+    }
+  },
+  "update": {
+    "new_available": "🎉 New update available!",
+    "description": "Your data will be preserved during the update.",
+    "up_to_date": "✅ Poznote is up to date",
+    "error_loading_version": "Error loading version"
+  },
+  "slash_menu": {
+    "back_to_normal": "Back to normal text",
+    "title": "Title",
+    "heading_1": "Heading 1",
+    "heading_2": "Heading 2",
+    "heading_3": "Heading 3",
+    "format_text": "Format text",
+    "red": "Red",
+    "bold": "Bold",
+    "italic": "Italic",
+    "highlight": "Highlight",
+    "strikethrough": "Strikethrough",
+    "code": "Code",
+    "inline_code": "Inline code",
+    "code_block": "Code block",
+    "list": "List",
+    "bullet_list": "Bullet list",
+    "numbered_list": "Numbered list",
+    "checklist": "Checklist",
+    "image": "Image",
+    "excalidraw": "Excalidraw",
+    "emoji": "Emoji",
+    "table": "Table",
+    "separator": "Separator",
+    "link_to_note": "Link to note",
+    "link": "Link",
+    "cancel": "Cancel",
+    "back": "Back",
+    "quote": "Quote",
+    "blockquote": "Blockquote",
+    "callout_note": "Note",
+    "callout_tip": "Tip",
+    "callout_important": "Important",
+    "callout_warning": "Warning",
+    "callout_caution": "Caution",
+    "toggle": "Toggle",
+    "toggle_placeholder": "Toggle",
+    "toggle_content_placeholder": "Write inside the toggle here…",
+    "toggle_after_placeholder": "Write outside the toggle here…",
+    "code_block_placeholder_before": "Write text here…",
+    "code_block_placeholder_after": "Write text here…",
+    "youtube_video": "YouTube video",
+    "youtube_modal_title": "Insert YouTube Video",
+    "youtube_url_label": "YouTube URL or Video ID:",
+    "youtube_url_prompt": "Enter YouTube video URL or ID:",
+    "youtube_help": "Supports: youtube.com/watch?v=ID, youtu.be/ID, or just the video ID",
+    "youtube_insert": "Insert",
+    "youtube_invalid_url": "Invalid YouTube URL",
+    "mp4_video": "MP4 video",
+    "mp4_uploading": "Uploading video...",
+    "mp4_upload_success": "Video uploaded successfully!",
+    "mp4_no_note": "No note selected",
+    "mp4_invalid_file": "Please select an MP4 video.",
+    "mp4_upload_failed": "Upload failed: {{error}}",
+    "audio": "Audio",
+    "audio_uploading": "Uploading audio...",
+    "audio_no_note": "No note selected",
+    "audio_invalid_file": "Please select an audio file.",
+    "audio_upload_failed": "Upload failed: {{error}}",
+    "date": "Date"
+  },
+  "api": {
+    "settings": {
+      "key_required": "key required",
+      "invalid_action": "invalid action",
+      "internal_error": "internal error"
+    },
+    "errors": {
+      "workspace_not_found": "Workspace not found",
+      "linked_note_already_exists": "A linked note already exists for this note",
+      "method_not_allowed": "Method not allowed",
+      "invalid_action": "Invalid action",
+      "internal_server_error": "Internal server error",
+      "duplicate_title_in_folder": "Another note with the same title exists in this folder.",
+      "note_id_required": "note_id required",
+      "note_not_found": "Note not found",
+      "invalid_custom_token": "Invalid custom token.\n\nAllowed:\n\nletters, numbers, -, _, . (4-128 chars)",
+      "token_already_in_use": "Token already in use",
+      "no_token_generated": "No token generated",
+      "server_error": "Server error: {{error}}"
+    }
+  },
+  "ui": {
+    "login_display": {
+      "prompt": "Login display name (empty to clear):"
+    },
+    "alerts": {
+      "saved": "Saved",
+      "save_error": "Save error",
+      "network_error": "Network error"
+    }
+  },
+  "theme": {
+    "badge": {
+      "dark": "dark mode",
+      "light": "light mode",
+      "system": "system mode"
+    }
+  },
+  "table": {
+    "context_menu": {
+      "insert_row_above": "Insert row above",
+      "insert_row_below": "Insert row below",
+      "insert_column_left": "Insert column left",
+      "insert_column_right": "Insert column right",
+      "delete_row": "Delete row",
+      "delete_column": "Delete column",
+      "delete_table": "Delete table",
+      "errors": {
+        "cannot_delete_last_row": "Cannot delete the last row of the table.",
+        "cannot_delete_last_column": "Cannot delete the last column of the table."
+      },
+      "confirm": {
+        "delete_table": "Do you really want to delete this table?"
+      }
+    }
+  },
+  "index": {
+    "errors": {
+      "create_task_list": "Error creating task list",
+      "create_task_list_prefix": "Error creating task list: ",
+      "create_markdown_note": "Error creating markdown note",
+      "create_markdown_note_prefix": "Error creating markdown note: ",
+      "conversion_failed_prefix": "Conversion error: {{error}}",
+      "network_error_converting": "Network error converting note"
+    },
+    "toolbar": {
+      "favorite_add": "Add to favorites",
+      "favorite_remove": "Remove from favorites",
+      "public_note": "Share note",
+      "attachments_with_count": "Attachments ({{count}})",
+      "menu_actions": "Menu actions",
+      "convert_to_html": "Convert to HTML",
+      "convert_to_markdown": "Convert to Markdown"
+    },
+    "share_modal": {
+      "custom_token": "Custom token (optional)",
+      "custom_token_placeholder": "my_custom_token-1",
+      "password": "Password (optional)",
+      "password_placeholder": "Enter a password",
+      "indexable": "Allow indexing by search engines",
+      "create_url": "Create URL",
+      "close": "Close",
+      "error_prefix": "Error: ",
+      "unknown_error": "Unknown error creating public link",
+      "error_creating": "Error creating public link: "
+    },
+    "public_modal": {
+      "title": "Shared URL",
+      "close": "Close",
+      "open": "Open",
+      "copy": "Copy",
+      "revoke": "Revoke",
+      "renew": "Renew",
+      "manage": "Edit",
+      "create_url": "Create url",
+      "no_link_yet": "No public link yet",
+      "custom_token": "Custom token (optional)",
+      "custom_token_placeholder": "my_custom_token-1",
+      "indexable": "Allow indexing by search engines",
+      "password": "Password (optional)",
+      "password_placeholder": "Enter a password",
+      "error_prefix": "Error: ",
+      "unknown_error": "Unknown error creating public link",
+      "error_creating": "Error creating public link: "
+    },
+    "folder_share_modal": {
+      "title": "Shared folder URL",
+      "description": "Anyone with this link can view all notes in this folder (unless password-protected).",
+      "use_https": "HTTPS",
+      "renewed": "Shared folder link renewed",
+      "failed_renew": "Error renewing folder share",
+      "failed_revoke": "Error revoking folder share"
+    },
+    "note": {
+      "new_note": "New note",
+      "new_note_numbered": "New note ({{number}})",
+      "title_placeholder": "Title ?"
+    },
+    "editor": {
+      "placeholder_desktop": "Enter text, use / for command menu, paste images or drop an image at cursor.",
+      "placeholder_mobile": "Enter text or paste images here..."
+    }
+  },
+  "editor": {
+    "markdown_placeholder": "Write your markdown or use / to open the command menu...",
+    "markdown_placeholder_mobile": "Write your markdown here...",
+    "excalidraw": {
+      "placeholder_outside": "…"
+    },
+    "messages": {
+      "preview_mode_hint": "You are in preview mode. Switch to edit mode using the button in the toolbar to start writing markdown.",
+      "split_preview_placeholder": "Preview will appear here as you type..."
+    },
+    "images": {
+      "delete_confirm": {
+        "title": "Delete image",
+        "message": "Are you sure you want to delete this image? This action is irreversible."
+      }
+    },
+    "colors": {
+      "black": "Black",
+      "red": "Red",
+      "orange": "Orange",
+      "yellow": "Yellow",
+      "green": "Green",
+      "blue": "Blue",
+      "purple": "Purple",
+      "none": "None"
+    },
+    "font_size": {
+      "very_small": "Very small",
+      "small": "Small",
+      "normal": "Normal",
+      "large": "Large",
+      "very_large": "Very large",
+      "huge": "Huge",
+      "giant": "Giant"
+    },
+    "emoji": {
+      "hint_windows": "On Windows, press Win + ; to open the emoji picker"
+    },
+    "table_picker": {
+      "title": "Insert table",
+      "rows_label": "Rows:",
+      "rows_placeholder": "Rows",
+      "cols_label": "Columns:",
+      "cols_placeholder": "Columns",
+      "insert": "Insert"
+    },
+    "toolbar": {
+      "back_to_notes": "Go to notes",
+      "bold": "Bold",
+      "italic": "Italic",
+      "underline": "Underline",
+      "strikethrough": "Strikethrough",
+      "link": "Link",
+      "text_color": "Text color",
+      "highlight": "Highlight",
+      "bullet_list": "Bullet list",
+      "numbered_list": "Numbered list",
+      "font_size": "Font size",
+      "code_block": "Code block",
+      "inline_code": "Inline code",
+      "clear_formatting": "Clear formatting",
+      "insert_excalidraw": "Insert Excalidraw diagram",
+      "insert_emoji": "Insert emoji",
+      "insert_table": "Insert table",
+      "insert_checklist": "Insert checklist",
+      "add_separator": "Add separator",
+      "insert_note_reference": "Insert note reference",
+      "open_in_new_tab": "Open in new tab",
+      "create_linked_note": "Create linked note",
+      "search_replace": "Search and replace"
+    },
+    "link": {
+      "add_title": "Add link",
+      "title": "Manage link",
+      "url_label": "URL:",
+      "url_placeholder": "https://example.com",
+      "text_label": "Link text (optional):",
+      "text_placeholder": "Displayed text",
+      "remove": "Remove link",
+      "cancel": "Cancel",
+      "save": "Save"
+    }
+  },
+  "image_menu": {
+    "view_large": "View large",
+    "download": "Download",
+    "resize": "Resize",
+    "edit": "Edit",
+    "add_border": "Add border",
+    "remove_border": "Remove border",
+    "add_border_no_padding": "Add border without padding",
+    "remove_border_no_padding": "Remove border without padding",
+    "delete_image": "Delete image",
+    "links": "Links",
+    "open_link": "Open link",
+    "add_link": "Add link",
+    "edit_link": "Edit link",
+    "remove_link": "Remove link",
+    "link_modal": {
+      "title_add": "Add link to image",
+      "title_edit": "Edit image link",
+      "description": "This link will make the image clickable when the note is shared.",
+      "url_label": "Enter URL:",
+      "url_placeholder": "https://www.example.com",
+      "cancel": "Cancel",
+      "ok": "OK"
+    }
+  },
+  "backup_export": {
+    "page": {
+      "title": "Backup / Export"
+    },
+    "common": {
+      "all_workspaces": "all workspaces"
+    },
+    "sections": {
+      "complete_backup": {
+        "title": "Complete Backup",
+        "description_prefix": "Download a complete backup containing database, notes and attachments for",
+        "description_suffix": "in a single ZIP file.",
+        "use_cases": "Two use cases:",
+        "use_case_restore_label": "Restore",
+        "use_case_restore_text": "Import this backup to recover your data in case of loss",
+        "use_case_offline_label": "Offline Reading",
+        "use_case_offline_text": "Open the included",
+        "use_case_offline_text_suffix": "to browse your notes without Poznote",
+        "select_user": "Select user profile:"
+      },
+      "structured_export": {
+        "title": "Structured Export",
+        "description": "Export your notes organized in folders that match your Poznote folder structure. Each note will be saved in a directory that corresponds to its folder in Poznote, preserving the full hierarchy. Markdown files include YAML frontmatter with metadata.",
+        "warning": "Note: This export type is not designed for a perfect Poznote backup.",
+        "select_workspace": "Select workspace:",
+        "loading_workspaces": "Loading workspaces..."
+      }
+    },
+    "buttons": {
+      "download_complete_backup": "Download complete backup (ZIP)",
+      "download_structured_export": "Download structured export (ZIP)"
+    },
+    "spinner": {
+      "preparing": "Preparing backup...",
+      "preparing_long": "Preparing backup... This may take a few moments."
+    },
+    "errors": {
+      "export_error": "Export error: {{error}}",
+      "complete_backup_error": "Complete backup error: {{error}}",
+      "cannot_create_zip": "Cannot create ZIP file",
+      "failed_to_create_db_backup": "Failed to create database backup",
+      "failed_to_create_backup_file": "Failed to create backup file"
+    },
+    "dump": {
+      "title": "Poznote Database Dump",
+      "generated_on": "Generated on {{date}}"
+    },
+    "index": {
+      "title": "Poznote Index"
+    }
+  },
+  "login": {
+    "page": {
+      "title": "Login"
+    },
+    "redirecting": "Redirecting...",
+    "show_password": "Show password",
+    "hide_password": "Hide password",
+    "admin_warning": "Please log in with the username <code>{{username}}</code> and your password (stored in .env). You can then rename this account in settings for better security.",
+    "fields": {
+      "username": "Username",
+      "username_or_email": "Username or Email",
+      "password": "Password",
+      "profile": "Select your profile"
+    },
+    "remember_me": "Remember me for 30 days",
+    "button": "Login",
+    "oidc_button": "Continue with {{provider}}",
+    "documentation": "Poznote documentation",
+    "no_profiles": "No user profiles available. Please contact the administrator.",
+    "errors": {
+      "invalid_credentials": "Incorrect username or password.",
+      "oidc_disabled": "Your account has been disabled by an administrator. Please contact them for more information.",
+      "oidc_no_profile": "No user profile found for \"{{identifier}}\". Please contact an administrator to create your profile.",
+      "oidc_failed": "SSO login failed. Please try again.",
+      "oidc_unauthorized": "You are not authorized to access this application. Please contact your administrator."
+    }
+  },
+  "restore_import": {
+    "page": {
+      "title": "Restore / Import"
+    },
+    "advanced": {
+      "show": "Show Advanced Import Options",
+      "hide": "Hide Advanced Import Options"
+    },
+    "messages": {
+      "database_restored": "Database restored successfully!",
+      "complete_backup_restored": "{{message}}",
+      "notes_imported": "Imported {{count}} note(s) into workspace \"{{workspace}}\", folder \"{{folder}}\".",
+      "attachments_imported": "{{message}}",
+      "notes_imported_zip": "Imported {{count}} note(s) from ZIP into workspace \"{{workspace}}\", folder \"{{folder}}\"."
+    },
+    "errors": {
+      "complete_restore_form_not_found": "Complete restore form not found. Please try again.",
+      "form_not_found": "Form not found. Please try again.",
+      "select_backup_first": "Please select a backup file first.",
+      "restore_error": "Restore error: {{error}}",
+      "no_backup_file_or_upload": "No backup file provided or upload error.",
+      "complete_restore_error": "Complete restore error: {{error}} - {{message}}",
+      "no_complete_backup_file_or_upload": "No complete backup file provided or upload error.",
+      "import_error": "Import error: {{error}}",
+      "no_notes_file_or_upload": "No notes file provided or upload error.",
+      "no_attachments_file_or_upload": "No attachments file provided or upload error.",
+      "no_notes_selected_or_upload": "No notes selected or upload error.",
+      "file_type_zip_only": "Only ZIP files are allowed.",
+      "error_uploading_file": "Error uploading file.",
+      "cannot_find_entries_directory": "Cannot find entries directory.",
+      "cannot_open_zip": "Cannot open ZIP file.",
+      "failed_extract_content": "Failed to extract content from {{file}}."
+    },
+    "spinner": {
+      "processing": "Processing restoration...",
+      "processing_long": "Processing restoration... This may take a few moments.",
+      "importing_notes": "Importing notes..."
+    },
+    "units": {
+      "bytes": "Bytes",
+      "kb": "KB",
+      "mb": "MB",
+      "gb": "GB"
+    },
+    "direct_copy": {
+      "backup_file_found": "Backup file found:",
+      "ready_to_restore": "Ready to restore?",
+      "replace_all_data_warning": "This will replace all data in ALL workspaces.",
+      "no_backup_found_prefix": "No backup file found in container at",
+      "no_backup_found_hint": "Please run the docker cp command first.",
+      "completed_successfully_prefix": "Direct file copy restoration completed successfully!",
+      "failed_prefix": "Direct file copy restoration failed:",
+      "backup_not_found_for_restoration": "Backup file not found for restoration.",
+      "buttons": {
+        "yes_restore_direct_copy": "Yes, Restore from direct copy"
+      }
+    },
+    "individual_notes": {
+      "default_title_with_date": "Imported note {{date}}",
+      "file_count_one": "1 note",
+      "file_count_many": "{{count}} notes",
+      "summary": "This will import {{fileText}} into Poznote workspace without assigning them to a folder.",
+      "errors": {
+        "too_many_files": "Too many files selected. Maximum allowed: {{max}}. You selected: {{count}}.",
+        "workspace_not_found": "Workspace does not exist",
+        "entries_dir_not_found": "Cannot find entries directory",
+        "upload_error": "Upload error",
+        "invalid_file_type": "Invalid file type (only {{allowed}} allowed)",
+        "cannot_read_file": "Cannot read file"
+      },
+      "summary_with_location": "This will import {{fileText}} into workspace \"{{workspace}}\", folder \"{{folder}}\".",
+      "summary_zip_with_location": "This will extract and import all files from ZIP archive into workspace \"{{workspace}}\", folder \"{{folder}}\"."
+    },
+    "sections": {
+      "restore_from_backup": {
+        "title": "Do you want to restore from a Poznote ZIP backup file?",
+        "description": "Restore your Poznote database from a complete backup"
+      },
+      "standard_restore": {
+        "title": "Standard Restore",
+        "description": "Choose a complete backup ZIP file.",
+        "helper": "Recommended max size: 500MB."
+      },
+      "direct_copy_restore": {
+        "title": "Restore when standard restore doesn't work (timeout if zip file is too large)",
+        "step1": "1. Copy the file to the container:",
+        "docker_command": "docker cp /path/to/backup.zip poznote-webserver-1:/tmp/backup_restore.zip",
+        "step2": "2. Click below to restore"
+      },
+      "individual_notes": {
+        "title": "Do you want to import HTML, Markdown, text files or ZIP archives?",
+        "description": "Import individual notes (HTML, Markdown or ZIP) to a specific workspace and folder",
+        "workspace": "Destination workspace",
+        "loading": "Loading...",
+        "folder": "Destination folder",
+        "optional": "optional",
+        "frontmatter_warning": "If an MD note contains a folder key in a front matter, this value will override the one selected below. You must therefore ensure first that the folder already exists, otherwise the note will be created at the root of the workspace.",
+        "zip_folders_info": "ZIP with folder structure:",
+        "zip_folders_description": "If your ZIP contains folders, they will be automatically created as folders in Poznote, preserving their hierarchy (subfolders included).",
+        "no_folder": "No folder (root level)",
+        "select_files": "Select files",
+        "files_info": "Multiple files (max {{maxIndividualFiles}}) or single ZIP file (max {{maxZipFiles}} files). These limits can be changed,",
+        "files_info_link": "see documentation",
+        "supported_formats": "Supported: .html, .md, .markdown, .txt, .json, .zip",
+        "description_html": "Import individual HTML, Markdown, text or JSON files, or a ZIP archive containing multiple files.<br><br>Title will be automatically created from filename (without extension), unless a title key is defined in a front matter for MD files.<br><br><strong>Tasklists:</strong> .json files containing tasks arrays and .md files with checkbox syntax (- [ ] or - [x]) are automatically imported as tasklists.",
+        "helper": "You can select multiple files at once (Maximum 50 files). Supported formats: .html, .md, .markdown, .txt, .json"
+      }
+    },
+    "buttons": {
+      "start_restore": "Start Restore",
+      "start_import": "Start Import"
+    },
+    "drag_drop": {
+      "individual_notes": "Drop files here",
+      "complete_backup": "Drop backup ZIP here",
+      "database": "Drop SQL file here",
+      "notes": "Drop notes ZIP here",
+      "attachments": "Drop attachments ZIP here"
+    },
+    "modals": {
+      "import_confirm": {
+        "title": "Are you sure?",
+        "body": "This will replace note titles, tags, search index and metadata, but not actual note content. This action cannot be undone.",
+        "confirm": "Yes, Import"
+      },
+      "complete_restore": {
+        "title": "Complete restore?",
+        "warning_large_html": "<strong>Warning:</strong> This file is {{size}}MB. Standard upload might be slow or fail for large files.<br><br><strong>This will replace your database, restore all notes and attachments for <span style=\"color: #dc3545; font-weight: bold;\">all workspaces</span>.</strong>",
+        "warning_html": "<strong>Warning:</strong> This will replace your database, restore all notes and attachments for <span style=\"color: #dc3545; font-weight: bold;\">all workspaces</span>.",
+        "body_html": "This will replace your database, restore all notes and attachments for <span style=\"color: #dc3545; font-weight: bold;\">all workspaces</span>.",
+        "confirm": "Yes, Complete restore"
+      },
+      "import_notes": {
+        "title": "Import notes?",
+        "body": "This will import all HTML files from the ZIP. Files will be added to your existing notes collection.",
+        "confirm": "Yes, Import notes"
+      },
+      "import_attachments": {
+        "title": "Import attachments?",
+        "body": "This will import all files from the ZIP to attachments folder. Files will be added to your existing attachments.",
+        "confirm": "Yes, Import attachments"
+      },
+      "complete_restore_direct_copy": {
+        "title": "Complete restore (Direct copy)?",
+        "body_html": "This will replace your database, restore all notes and attachments for <span style=\"color: #dc3545; font-weight: bold;\">all workspaces</span>.",
+        "confirm": "Yes, Complete restore"
+      },
+      "import_individual_notes": {
+        "title": "Import individual notes?",
+        "body": "This will import notes to Poznote workspace.",
+        "confirm": "Yes, Import notes"
+      }
+    },
+    "alerts": {
+      "ok": "OK",
+      "no_zip_selected_title": "No ZIP file selected",
+      "no_zip_selected_restore": "Please select a complete backup ZIP file before proceeding with restore.",
+      "no_zip_selected_notes": "Please select a ZIP file containing HTML notes before proceeding with import.",
+      "no_zip_selected_attachments": "Please select a ZIP file containing attachments before proceeding with import.",
+      "no_sql_selected_title": "No SQL file selected",
+      "no_sql_selected_body": "Please select a SQL file before proceeding with database import.",
+      "no_files_selected_title": "No files selected",
+      "no_files_selected_body": "Please select one or more HTML or Markdown files before proceeding with import.",
+      "too_many_files_title": "Too many files selected",
+      "too_many_files_body": "You can import a maximum of {{max}} files at once. You selected {{count}} files. Please select fewer files and try again.",
+      "no_file_selected": {
+        "title": "No file selected",
+        "body": "Please select a file before proceeding with the import."
+      },
+      "no_workspace_title": "No workspace selected",
+      "no_workspace_body": "Please select a workspace for imported notes."
+    },
+    "inline": {
+      "standard": {
+        "button": "Start complete restore (Standard)",
+        "too_large": "⚠️ File is {{size}}MB. Standard upload might be slow or fail."
+      }
+    }
+  },
+  "markdown_guide": {
+    "page_title": "Markdown Guide",
+    "title": "Markdown Guide",
+    "toc": {
+      "label": "Table of Contents",
+      "title": "Table of Contents"
+    },
+    "common": {
+      "syntax": "Syntax",
+      "result": "Result"
+    },
+    "sections": {
+      "headers": {
+        "title": "Headers",
+        "heading1": "Header 1",
+        "heading2": "Header 2",
+        "heading3": "Header 3"
+      },
+      "text_formatting": {
+        "title": "Text formatting",
+        "bold": "bold text",
+        "italic": "italic text",
+        "strikethrough": "strikethrough",
+        "inline_code": "inline code"
+      },
+      "unordered_lists": {
+        "title": "Unordered lists",
+        "item_one": "Item one",
+        "item_two": "Item two",
+        "nested_item": "Nested item"
+      },
+      "ordered_lists": {
+        "title": "Ordered lists",
+        "first": "First",
+        "second": "Second",
+        "third": "Third"
+      },
+      "checkboxes": {
+        "title": "Checkboxes",
+        "unchecked_note": "Unchecked item (only one space!)",
+        "unchecked": "Unchecked item",
+        "checked": "Checked item"
+      },
+      "images": {
+        "title": "Images",
+        "alt_text": "Alt text",
+        "preview": "(image preview)"
+      },
+      "urls": {
+        "title": "URLs",
+        "link_text": "Link text"
+      },
+      "code_blocks": {
+        "title": "Code blocks"
+      },
+      "quotes": {
+        "title": "Quotes",
+        "quote_text": "This is a quote",
+        "quote_line2": "spanning two lines"
+      },
+      "line_breaks": {
+        "title": "Line breaks",
+        "description": "A single line break in edit mode creates a line break in preview.",
+        "first_line": "First line",
+        "second_line": "Second line"
+      },
+      "horizontal_rule": {
+        "title": "Horizontal rule"
+      },
+      "tables": {
+        "title": "Tables",
+        "col_name": "Name",
+        "col_value": "Value"
+      },
+      "math": {
+        "title": "Math Equations",
+        "inline": {
+          "title": "Inline Equations"
+        },
+        "block": {
+          "title": "Block Equations"
+        },
+        "examples": {
+          "title": "More Examples"
+        }
+      },
+      "mermaid": {
+        "title": "Mermaid Diagrams",
+        "node_a": "Write Markdown",
+        "node_b": "Need a diagram?",
+        "node_c": "Use Mermaid",
+        "node_d": "Keep writing",
+        "edge_yes": "Yes",
+        "edge_no": "No"
+      }
+    }
+  },
+  "public": {
+    "button": "Shared Notes",
+    "view_public_notes": "View shared notes",
+    "page": {
+      "title": "Shared Notes",
+      "no_public_notes": "No shared notes yet.",
+      "public_hint": "Share a note by clicking the cloud button in note toolbar."
+    },
+    "filter_placeholder": "Filter by title or folder name...",
+    "no_filter_results": "No notes match your search.",
+    "table": {
+      "note": "Note",
+      "url": "Shared URL"
+    },
+    "actions": {
+      "open": "Open",
+      "revoke": "Revoke"
+    },
+    "indexable": "Indexable",
+    "password_protected": "Password protected",
+    "add_password_title": "Add password protection",
+    "change_password_title": "Change password",
+    "password_remove_hint": "Leave empty to remove password protection.",
+    "enter_new_password": "Enter a new password",
+    "protection": {
+      "title": "Password Protected",
+      "note_heading": "Password Protected",
+      "folder_heading": "Password Protected Folder",
+      "error_incorrect": "Incorrect password. Please try again.",
+      "additional_password_required": "This note requires an additional password. Please enter the next password to continue.",
+      "placeholder": "Enter password",
+      "unlock": "Unlock"
+    },
+    "errors": {
+      "token_missing": "Token missing",
+      "token_or_folder_auth_missing": "Token or folder authorization missing",
+      "shared_folder_not_found": "Shared folder not found",
+      "shared_note_not_found_or_denied": "Shared note not found or access denied",
+      "folder_not_found": "Folder not found",
+      "note_not_found": "Note not found",
+      "server_error": "Server error"
+    }
+  },
+  "public_folder": {
+    "filter_placeholder": "Filter by titles",
+    "no_filter_results": "No results.",
+    "view_notes": "View as list",
+    "view_kanban": "View as Kanban"
+  },
+  "kanban": {
+    "uncategorized": "Uncategorized",
+    "actions": {
+      "enable": "Enable Kanban view",
+      "disable": "Disable Kanban view",
+      "open": "Open Kanban view"
+    },
+    "notifications": {
+      "activated_title": "Kanban view enabled",
+      "activated_message": "This folder is now in Kanban mode. Click its icon to open the board."
+    },
+    "list": {
+      "filter_placeholder": "Filter by board name...",
+      "no_boards": "No Kanban boards yet.",
+      "hint": "Enable Kanban view on a folder to see it here."
+    }
+  },
+  "sidebar": {
+    "display": "Display",
+    "home": "Home",
+    "settings": "Settings",
+    "create": "Create",
+    "toggle": "Hide/Show left column"
+  },
+  "home": {
+    "title": "Home",
+    "dashboard": "Dashboard",
+    "folders": "Folders",
+    "shared_notes": "Shared Notes",
+    "shared_folders": "Shared Folders",
+    "kanban": "Kanban",
+    "note": "note",
+    "notes": "notes",
+    "support_poznote": "Support Poznote",
+    "version": "Version"
+  },
+  "search": {
+    "placeholder": "Search...",
+    "clear": "Clear search",
+    "placeholder_notes": "Search for one or more words...",
+    "placeholder_tags": "Search for one or more tags...",
+    "placeholder_combined": "Search in notes and tags...",
+    "toggle_options": "Toggle search options",
+    "validation": {
+      "select_type": "Please select at least one search option (Notes or Tags)",
+      "single_letter_warning": "Searching with single-letter words can return too many results. Try using longer words for a more precise search."
+    }
+  },
+  "icon_names": {
+    "briefcase": "briefcase",
+    "home": "home",
+    "star": "star",
+    "heart": "heart",
+    "lightbulb": "lightbulb",
+    "image": "image",
+    "music": "music",
+    "book": "book",
+    "graduation-cap": "graduation-cap",
+    "code": "code",
+    "rocket": "rocket",
+    "plane": "plane",
+    "map-marker-alt": "location",
+    "calendar-alt": "calendar",
+    "clock": "clock",
+    "user": "user",
+    "users": "users",
+    "cog": "settings",
+    "wrench": "wrench",
+    "paint-brush": "paint-brush",
+    "palette": "palette",
+    "camera": "camera",
+    "shield": "shield",
+    "lock": "lock",
+    "key": "key",
+    "envelope": "envelope",
+    "inbox": "inbox",
+    "archive": "archive",
+    "box": "box",
+    "shopping-cart": "cart",
+    "credit-card": "card",
+    "chart-line": "chart",
+    "chart-bar": "diagram",
+    "database": "database",
+    "server": "server",
+    "cloud": "cloud",
+    "download": "download",
+    "upload": "upload",
+    "tasks": "tasks",
+    "clipboard": "clipboard",
+    "file-alt": "file",
+    "copy": "copy",
+    "gamepad": "game",
+    "trophy": "trophy",
+    "gift": "gift",
+    "birthday-cake": "cake",
+    "coffee": "coffee",
+    "pizza-slice": "pizza",
+    "utensils": "restaurant",
+    "medkit": "medical",
+    "heartbeat": "health",
+    "dumbbell": "dumbbell",
+    "bicycle": "bicycle",
+    "tree": "tree",
+    "leaf": "leaf",
+    "seedling": "plant",
+    "paw": "pet",
+    "bug": "bug",
+    "flask": "science",
+    "atom": "atom",
+    "magnet": "magnet",
+    "fire": "fire",
+    "sun": "sun",
+    "moon": "moon",
+    "umbrella": "umbrella",
+    "snowflake": "snow",
+    "bolt": "bolt",
+    "flag": "flag",
+    "bookmark": "bookmark",
+    "thumbs-up": "like",
+    "smile": "smile",
+    "layer-group": "layers",
+    "terminal": "terminal",
+    "at": "at",
+    "hashtag": "hashtag",
+    "question-circle": "question",
+    "times-circle": "close",
+    "eye": "eye",
+    "anchor": "anchor",
+    "apple-alt": "apple",
+    "award": "award",
+    "settings": "settings",
+    "mail": "mail",
+    "video": "video",
+    "trending-up": "trending up",
+    "list-todo": "to-do list",
+    "gamepad-2": "gamepad",
+    "utensils-crossed": "utensils",
+    "briefcase-medical": "medical briefcase",
+    "activity": "activity",
+    "bike": "bike",
+    "tree-deciduous": "deciduous tree",
+    "sprout": "sprout",
+    "paw-print": "paw print",
+    "flask-conical": "flask",
+    "flame": "flame",
+    "zap": "zap",
+    "layers": "layers",
+    "at-sign": "at sign",
+    "hash": "hash",
+    "help-circle": "help",
+    "x-circle": "close",
+    "apple": "apple",
+    "candy": "candy",
+    "badge-check": "verified badge",
+    "network": "network",
+    "pie-chart": "pie chart",
+    "clipboard-list": "list",
+    "boxes": "boxes",
+    "monitor": "monitor",
+    "scroll": "scroll",
+    "dna": "DNA",
+    "dollar-sign": "dollar",
+    "drum": "drum",
+    "euro": "euro",
+    "feather": "feather",
+    "file-code": "code file",
+    "fingerprint": "fingerprint",
+    "gem": "gem",
+    "glasses": "glasses",
+    "globe": "globe",
+    "guitar": "guitar",
+    "hamburger": "hamburger",
+    "hammer": "hammer",
+    "hard-hat": "hard hat",
+    "headphones": "headphones",
+    "headset": "headset",
+    "mountain": "mountain",
+    "shapes": "shapes",
+    "id-card": "ID card",
+    "factory": "factory",
+    "infinity": "infinity",
+    "swords": "swords",
+    "laptop": "laptop",
+    "map": "map",
+    "medal": "medal",
+    "mic": "microphone",
+    "microscope": "microscope",
+    "banknote": "banknote",
+    "passport": "passport",
+    "pen": "pen",
+    "pencil": "pencil",
+    "pepper": "pepper",
+    "phone": "phone",
+    "piggy-bank": "piggy bank",
+    "plane-takeoff": "takeoff",
+    "plug": "plug",
+    "printer": "printer",
+    "puzzle": "puzzle",
+    "receipt": "receipt",
+    "bot": "bot",
+    "person-standing": "person standing",
+    "satellite": "satellite",
+    "satellite-dish": "satellite dish",
+    "shopping-bag": "shopping bag",
+    "signpost": "signpost",
+    "git-branch": "git branch",
+    "flower": "flower",
+    "stamp": "stamp",
+    "waves": "waves",
+    "refresh-cw": "refresh",
+    "syringe": "syringe",
+    "tablet": "tablet",
+    "gauge": "gauge",
+    "tag": "tag",
+    "tags": "tags",
+    "drama": "drama",
+    "tools": "tools",
+    "tractor": "tractor",
+    "trash-alt": "trash",
+    "tree-alt": "tree",
+    "truck": "truck",
+    "tv": "TV",
+    "umbrella-beach": "beach umbrella",
+    "utensil-spoon": "spoon",
+    "vial": "vial",
+    "walking": "walking",
+    "warehouse": "warehouse",
+    "weight": "weight",
+    "wind": "wind",
+    "columns": "columns",
+    "message-circle": "message",
+    "bell": "bell",
+    "binoculars": "binoculars",
+    "book-open": "open book",
+    "brush": "brush",
+    "building": "building",
+    "bus": "bus",
+    "calculator": "calculator",
+    "car": "car",
+    "cloud-sun": "cloudy",
+    "coins": "coins",
+    "compass": "compass",
+    "crown": "crown",
+    "film": "film",
+    "folder-tree": "folder tree",
+    "hospital": "hospital",
+    "school": "school",
+    "stethoscope": "stethoscope",
+    "store": "store",
+    "wallet": "wallet",
+    "wifi": "wifi",
+    "yen-sign": "yen"
+  },
+  "folder_icon": {
+    "default": "Default"
+  },
+  "git_sync": {
+    "title": "{{provider}} Sync",
+    "description": "Synchronize your notes and attachments to GitHub or Forgejo. Files are stored as flat files with a metadata.json that preserves tags, folders, dates and attachments.",
+    "warning": "Do not rely on this feature as your sole backup.\nRegularly export your data using the backup feature in Settings.",
+    "confirm_push": "Push all notes and attachments to {{provider}}? Existing files will be updated and files no longer in Poznote will be removed from the repository.",
+    "confirm_pull": "Pull all notes and attachments from {{provider}}? Local data will be overwritten with the remote version. Notes not found on {{provider}} will be moved to trash.",
+    "confirm_auto_pull": "A new session started. Do you want to pull changes from {{provider}}?",
+    "confirm_auto_pull_warning": "A new session started. Do you want to pull changes from {{provider}}?\n\nLocal notes not found on {{provider}} will be moved to trash.",
+    "auto_pull_complete": "Git pull complete. Refreshing page...",
+    "auto_pull_no_changes": "Git pull complete. No changes found.",
+    "pulling": "Pulling changes...",
+    "starting": "Syncing...",
+    "config": {
+      "title": "Configuration",
+      "status": "Status",
+      "repository": "Repository",
+      "branch": "Branch",
+      "mode": "Sync Mode",
+      "token": "Access Token",
+      "token_set": "Configured",
+      "token_missing": "Not configured",
+      "not_configured": "Not configured",
+      "not_configured_yet": "To configure",
+      "hint": "{{provider}} sync is disabled. Set POZNOTE_GIT_SYNC_ENABLED=true in your .env file to enable it."
+    },
+    "auto_sync": {
+      "title": "Automatic Synchronization",
+      "push_label": "Automatically push on exit",
+      "push_description": "When leaving a note (switching notes or closing the tab), its latest version is automatically pushed to the Git repository, if it was modified during the session.",
+      "pull_label": "Automatically pull on load",
+      "pull_description": "Once per session, asks whether to pull from the Git repository. Updates existing notes, imports new ones, and moves to trash any local notes not found on the remote.",
+      "saving": "Configuration saved"
+    },
+    "test": {
+      "title": "Test Connection",
+      "button": "Test Connection"
+    },
+    "last_sync": {
+      "title": "Last Synchronization",
+      "action": "Action",
+      "time": "Time",
+      "pushed": "Pushed",
+      "pulled": "Pulled",
+      "notes": "notes"
+    },
+    "actions": {
+      "title": "Sync Actions",
+      "workspace": "Workspace: {{workspace}}",
+      "target_workspace": "Target Workspace",
+      "all_workspaces": "All workspaces",
+      "push": {
+        "title": "Push to {{provider}}",
+        "description": "Exports all your notes and attachments to {{provider}} as flat files. Updates existing files and removes files that no longer exist in Poznote.",
+        "button": "Push"
+      },
+      "pull": {
+        "title": "Pull from {{provider}}",
+        "description": "Imports all notes and attachments from {{provider}}. Overwrites local content and moves to trash any notes not present in the repository.",
+        "button": "Pull"
+      }
+    },
+    "messages": {
+      "connection_success": "Connection successful! Connected to {{repo}}",
+      "connection_error": "Connection failed: {{error}}",
+      "push_success": "Successfully pushed {{count}} notes, deleted {{deleted}} files ({{errors}} errors)",
+      "push_error": "Push failed: {{error}}",
+      "pull_success": "Successfully pulled {{pulled}} new notes, updated {{updated}} existing notes, deleted {{deleted}} notes ({{errors}} errors)",
+      "pull_error": "Pull failed: {{error}}"
+    },
+    "debug": {
+      "title": "Debug Info",
+      "show": "Show Debug Info",
+      "hide": "Hide Debug Info",
+      "copy": "Copy Debug",
+      "copied": "Copied!"
+    },
+    "limitations": {
+      "title": "Synchronization Limitations",
+      "element": "Element",
+      "html_notes": "HTML Notes",
+      "markdown_notes": "Markdown Notes",
+      "text_content": "Text content",
+      "attachments": "File attachments",
+      "embedded_images": "Images",
+      "metadata": "Metadata (tags, date, ID)",
+      "embedded_note": "Embedded images are preserved in HTML but not displayed on {{provider}}"
+    },
+    "not_configured": {
+      "title": "{{provider}} Sync Not Configured",
+      "description": "To use {{provider}} synchronization, you need to configure your {{provider}} credentials in the .env file.",
+      "steps_title": "Setup Instructions",
+      "step1": "Create a {{provider}} Personal Access Token at with 'repo' scope",
+      "step2": "Create a {{provider}} repository (public or private) for your notes",
+      "step3": "Add the configuration to your .env file",
+      "step4": "Restart the application for changes to take effect"
+    }
+  },
+  "sort": {
+    "header": "Sort by",
+    "alphabet": "Name",
+    "created": "Date Created",
+    "modified": "Date Modified"
+  },
+  "calendar": {
+    "months": {
+      "january": "January",
+      "february": "February",
+      "march": "March",
+      "april": "April",
+      "may": "May",
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November",
+      "december": "December"
+    },
+    "weekdays": {
+      "monday": "M",
+      "tuesday": "T",
+      "wednesday": "W",
+      "thursday": "T",
+      "friday": "F",
+      "saturday": "S",
+      "sunday": "S"
+    },
+    "buttons": {
+      "previous_month": "Previous month",
+      "next_month": "Next month",
+      "today": "Today",
+      "show_calendar": "Show calendar",
+      "hide_calendar": "Hide calendar"
+    },
+    "modal": {
+      "title": "Notes from",
+      "open": "Open",
+      "open_all": "Open All",
+      "close": "Close"
+    }
+  },
+  "workspace_menu": {
+    "workspaces": "Workspaces",
+    "logout": "Logout"
+  },
+  "admin_tools": {
+    "convert_images": {
+      "title": "Base64 Image Converter",
+      "description": "Finds inline base64-encoded images stored in notes and extracts them as proper attachment files, reducing database size and improving performance. Useful after restoring a backup that was created when notes still contained base64-encoded images.",
+      "step1": "Step 1",
+      "step2": "Step 2",
+      "scan_title": "Scan",
+      "convert_title": "Convert",
+      "scan_desc": "Analyse all notes across every user account and report how many inline base64 images were found.",
+      "scan_no_changes": "No changes are made.",
+      "convert_desc": "Extract every base64 image and save it as a file on disk. Notes are updated to reference the new attachment URL.",
+      "convert_irreversible": "Irreversible — scan first.",
+      "scan_button": "Scan all notes",
+      "convert_button": "Convert all notes",
+      "results_scan": "Scan results",
+      "results_convert": "Conversion results",
+      "stats_notes": "Notes scanned",
+      "stats_images": "Base64 images found",
+      "stats_converted": "Converted",
+      "stats_errors": "Errors",
+      "notice_convert_clean": "No base64 images found. Nothing to convert.",
+      "notice_convert_done": "All {{count}} image(s) converted successfully.",
+      "notice_convert_partial": "{{done}} image(s) converted — {{errors}} error(s) encountered.",
+      "notice_scan_clean": "No base64 images found across all users. Nothing to do.",
+      "notice_scan_found": "{{count}} inline image(s) found in {{notes}} note(s). Use Step 2 to convert them."
+    },
+    "orphan_scanner": {
+      "title": "Orphan attachments scanner",
+      "description": "This tool scans your attachment folders and identifies files that are no longer referenced in any of your notes (including inline images, which are stored as attachments).",
+      "scan_button": "Scan for orphans",
+      "delete_button": "Delete orphans",
+      "delete_confirm": "Are you sure you want to permanently delete these files?",
+      "table_user_id": "User ID",
+      "table_total_files": "Total Files",
+      "table_orphans_found": "Orphans Found",
+      "table_details": "Files",
+      "orphans_label": "orphans",
+      "deleted_files": "Deleted {{count}} files",
+      "table_user_id_short": "User",
+      "table_orphans_found_short": "Orphans",
+      "view_files": "View {{count}} files",
+      "modal_title": "Orphan Files",
+      "modal_title_user": "Orphan Files - User",
+      "files_label": "files"
+    }
+  },
+  "backlinks": {
+    "title": "Backlinks"
+  }
 }

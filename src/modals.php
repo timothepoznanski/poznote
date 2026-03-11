@@ -771,9 +771,9 @@
 
 <!-- Linked Note Selector Modal -->
 <div id="linkedNoteSelectorModal" class="modal">
-    <div class="modal-content note-reference-modal-content">
+    <div class="modal-content">
         <div class="note-reference-modal-header">
-            <h3><?php echo t_h('modals.linked_selector.title', [], 'Select Note to Link'); ?></h3>
+            <h3 class="modal-title"><?php echo t_h('modals.linked_selector.title', [], 'Select Note to Link'); ?></h3>
         </div>
         <div class="note-reference-search-container">
             <input type="text" id="linkedNoteSearch" placeholder="<?php echo t_h('modals.linked_selector.search_placeholder', [], 'Search notes...'); ?>" class="note-reference-search-input">
@@ -788,6 +788,28 @@
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-linked-selector-modal"><?php echo t_h('common.cancel'); ?></button>
+        </div>
+    </div>
+</div>
+
+<!-- Linked Note Folder Selector Modal -->
+<div id="linkedNoteFolderSelectorModal" class="modal">
+    <div class="modal-content">
+        <div class="note-reference-modal-header">
+            <h3 class="modal-title"><?php echo t_h('modals.linked_folder_selector.title', [], 'Choose Folder for Linked Note'); ?></h3>
+        </div>
+        <div class="note-reference-search-container">
+            <input type="text" id="linkedNoteFolderSearch" placeholder="<?php echo t_h('modals.linked_folder_selector.search_placeholder', [], 'Search folders...'); ?>" class="note-reference-search-input">
+        </div>
+        <div class="note-reference-list-wrapper">
+            <div id="linkedFolderList" class="note-reference-list">
+                <div class="note-reference-loading">
+                    <i class="lucide lucide-loader-2 lucide-spin"></i> <?php echo t_h('common.loading', [], 'Loading...'); ?>
+                </div>
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-linked-folder-selector-modal"><?php echo t_h('common.cancel'); ?></button>
         </div>
     </div>
 </div>

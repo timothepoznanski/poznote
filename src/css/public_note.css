@@ -20,6 +20,27 @@ body {
     font-family: 'Inter', sans-serif;
 }
 
+body.public-note-page {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.public-note-layout {
+    display: flex;
+    align-items: stretch;
+    min-height: 100vh;
+    height: 100vh;
+}
+
+.public-note-main {
+    flex: 1;
+    min-width: 0;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
 .public-note {
     max-width: 900px;
     margin: 18px auto;
@@ -45,6 +66,23 @@ body {
     /* container for note HTML */
     line-height: 1.2;
     white-space: normal;
+}
+
+@media screen and (max-width: 800px) {
+    body.public-note-page {
+        height: auto;
+        overflow: auto;
+    }
+
+    .public-note-layout {
+        min-height: auto;
+        height: auto;
+    }
+
+    .public-note-main {
+        height: auto;
+        overflow: visible;
+    }
 }
 
 .public-note img {
