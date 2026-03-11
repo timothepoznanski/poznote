@@ -118,7 +118,7 @@
     margin-top: 5px;
 }
 
-/* Font size popup (used by toolbar.js -> changeFontSize) */
+/* Text style popup (used by toolbar.js -> changeFontSize) */
 .font-size-popup {
     position: absolute;
     top: calc(100% + 8px);
@@ -177,35 +177,24 @@
     background: #fafafa;
 }
 
-/* Map preview classes to approximate sizes (match JS size map) */
-.font-size-popup .size-1 {
-    font-size: 0.75rem;
+.font-size-popup .style-normal {
+    font-size: 0.95rem;
+    font-weight: 400;
 }
 
-.font-size-popup .size-2 {
-    font-size: 0.875rem;
+.font-size-popup .style-h1 {
+    font-size: 1.45rem;
+    font-weight: 700;
 }
 
-.font-size-popup .size-3 {
-    font-size: 1rem;
+.font-size-popup .style-h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
 }
 
-.font-size-popup .size-4 {
-    font-size: 1.125rem;
-}
-
-.font-size-popup .size-5 {
-    font-size: 1.5rem;
-}
-
-.font-size-popup .size-6 {
-    font-size: 2rem;
-}
-
-.font-size-popup .size-7 {
-    font-size: 3rem;
-    line-height: 1;
-    padding: 2px 6px;
+.font-size-popup .style-h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
 }
 
 .btn-settings {

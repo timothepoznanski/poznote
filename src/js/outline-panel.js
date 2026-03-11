@@ -8,6 +8,20 @@
 let isResizingOutline = false;
 let currentNoteId = null;
 
+function getMarkdownEditorContent(markdownEditor) {
+    if (!markdownEditor) return '';
+
+    if (typeof markdownEditor.value === 'string' && markdownEditor.value !== '') {
+        return markdownEditor.value;
+    }
+
+    if (typeof window.normalizeContentEditableText === 'function') {
+        return window.normalizeContentEditableText(markdownEditor);
+    }
+
+    return markdownEditor.textContent || '';
+}
+
 /**
  * Initialize the outline panel
  */
@@ -182,7 +196,7 @@ function extractHeadings(noteElement) {
 
     // For markdown notes, always extract from source (works for all modes)
     if (markdownEditor) {
-        const markdownContent = markdownEditor.value || markdownEditor.textContent;
+        const markdownContent = getMarkdownEditorContent(markdownEditor);
         if (markdownContent) {
             const lines = markdownContent.split('\n');
             lines.forEach((line, lineIndex) => {
@@ -322,7 +336,7 @@ function scrollToHeading(heading) {
         if (heading.isSplitMode) {
             // Scroll editor to line
             if (markdownEditor && markdownEditor.offsetParent !== null) {
-                const lines = (markdownEditor.value || markdownEditor.textContent).split('\n');
+                const lines = getMarkdownEditorContent(markdownEditor).split('\n');
                 const lineHeight = parseFloat(getComputedStyle(markdownEditor).lineHeight) || 20;
                 const targetPosition = heading.lineNumber * lineHeight;
 
@@ -358,7 +372,7 @@ function scrollToHeading(heading) {
 
         // Edit mode only (no preview visible)
         if (markdownEditor && (!markdownPreview || markdownPreview.offsetParent === null)) {
-            const lines = (markdownEditor.value || markdownEditor.textContent).split('\n');
+            const lines = getMarkdownEditorContent(markdownEditor).split('\n');
             const lineHeight = parseFloat(getComputedStyle(markdownEditor).lineHeight) || 20;
             const targetLinePosition = heading.lineNumber * lineHeight;
 
