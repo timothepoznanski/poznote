@@ -396,6 +396,14 @@
             "search_placeholder": "Search notes...",
             "recent_label": "Recent notes"
         },
+        "linked_folder_selector": {
+            "title": "Choose Folder for Linked Note",
+            "description": "Select the folder where the linked note will be created:",
+            "search_label": "Filter folders",
+            "search_placeholder": "Search folders...",
+            "folder_label": "Destination folder",
+            "root": "Root (No folder)"
+        },
         "delete_linked_note": {
             "title": "Delete Linked Note",
             "message": "What do you want to delete?",

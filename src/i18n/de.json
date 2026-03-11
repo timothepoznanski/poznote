@@ -832,6 +832,14 @@
             "search_placeholder": "Notizen suchen...",
             "recent_label": "Aktuelle Notizen"
         },
+        "linked_folder_selector": {
+            "title": "Ordner für verknüpfte Notiz auswählen",
+            "description": "Wählen Sie den Ordner aus, in dem die verknüpfte Notiz erstellt wird:",
+            "search_label": "Ordner filtern",
+            "search_placeholder": "Ordner suchen...",
+            "folder_label": "Zielordner",
+            "root": "Stamm (Kein Ordner)"
+        },
         "delete_linked_note": {
             "title": "Verknüpfte Notiz löschen",
             "message": "Was möchten Sie löschen?",

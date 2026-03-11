@@ -831,6 +831,14 @@
             "search_placeholder": "Pesquisar notas...",
             "recent_label": "Notas recentes"
         },
+        "linked_folder_selector": {
+            "title": "Escolher pasta para a nota vinculada",
+            "description": "Selecione a pasta onde a nota vinculada será criada:",
+            "search_label": "Filtrar pastas",
+            "search_placeholder": "Pesquisar pastas...",
+            "folder_label": "Pasta de destino",
+            "root": "Raiz (Sem pasta)"
+        },
         "delete_linked_note": {
             "title": "Excluir nota vinculada",
             "message": "O que você deseja excluir?",

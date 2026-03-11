@@ -749,7 +749,7 @@ The **Poznote URL Saver** is a browser extension that allows you to quickly save
 
 Install the extension directly from the Chrome Web Store. Works with Chrome, Edge, Brave, Opera, and any Chromium-based browser.
 
-**[Install Poznote URL Saver →](https://chrome.google.com/webstore)** (Coming soon)
+**[Install Poznote URL Saver →](https://chrome.google.com/webstore)**
 
 <details>
 <summary><strong>Alternative: Install from Source (Developer Mode)</strong></summary>

@@ -832,6 +832,14 @@
             "search_placeholder": "Buscar notas...",
             "recent_label": "Notas recientes"
         },
+        "linked_folder_selector": {
+            "title": "Elegir carpeta para la nota vinculada",
+            "description": "Seleccione la carpeta donde se creará la nota vinculada:",
+            "search_label": "Filtrar carpetas",
+            "search_placeholder": "Buscar carpetas...",
+            "folder_label": "Carpeta de destino",
+            "root": "Raíz (Sin carpeta)"
+        },
         "delete_linked_note": {
             "title": "Eliminar nota vinculada",
             "message": "¿Qué desea eliminar?",

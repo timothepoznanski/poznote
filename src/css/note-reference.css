@@ -6,19 +6,86 @@
 
 /* Note Reference Modal & Links Styles */
 
-/* Modal specific styles */
-.note-reference-modal-content {
-    max-width: 480px;
-    width: 90%;
+.note-reference-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
 }
 
-.note-reference-modal-content .modal-buttons .btn-cancel {
+.note-reference-modal-header .modal-title {
+    margin: 0 !important;
+    flex: 1;
+}
+
+.note-reference-modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted, #666);
+    transition: all 0.2s;
+    border-radius: 50%;
+}
+
+.note-reference-modal-close:hover {
+    color: var(--text-color, #333);
+    background-color: var(--hover-bg, rgba(0, 0, 0, 0.05));
+}
+
+.note-reference-modal-close i {
+    font-size: 20px;
+}
+
+.note-reference-search-container {
+    margin-bottom: 12px;
+}
+
+.note-reference-search-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--input-bg, #fff);
+    color: var(--text-color, #333);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.note-reference-search-input:focus {
+    outline: none;
+    border-color: var(--primary-color, #2196F3);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+.note-reference-list-wrapper {
+    margin-bottom: 20px;
+}
+
+.modal-content .modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.modal-buttons .btn-cancel {
     background-color: #dc3545;
     color: white;
     border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
 
-.note-reference-modal-content .modal-buttons .btn-cancel:hover {
+.modal-buttons .btn-cancel:hover {
     background-color: #c82333;
 }
 
@@ -71,11 +138,11 @@
 
 /* Notes list */
 .note-reference-list {
-    max-height: 320px;
+    max-height: 400px;
     overflow-y: auto;
-    margin-bottom: 16px;
     border-radius: 8px;
     border: 1px solid var(--border-color, #eee);
+    background-color: var(--input-bg, #fff);
 }
 
 .note-reference-loading,
@@ -94,10 +161,10 @@
 .note-reference-item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
+    gap: 12px;
+    padding: 14px 16px;
     cursor: pointer;
-    transition: background-color 0.15s;
+    transition: all 0.15s ease;
     border-bottom: 1px solid var(--border-color, #eee);
 }
 
@@ -107,6 +174,29 @@
 
 .note-reference-item:hover {
     background-color: var(--hover-bg, rgba(33, 150, 243, 0.08));
+    padding-left: 20px;
+}
+
+.note-reference-icon {
+    flex-shrink: 0;
+    color: var(--primary-color, #2196F3);
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+    color: var(--text-muted, #666);
+    font-size: 16px;
+}
+
+.note-reference-heading {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-color, #333);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
 }
 
 .note-reference-item-content {
@@ -121,7 +211,6 @@
     font-size: 14px;
     font-weight: 500;
     color: var(--text-color, #333);
-    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
@@ -172,6 +261,33 @@ span.note-link-broken {
 }
 
 /* Dark mode adjustments */
+[data-theme="dark"] .note-reference-modal-content {
+    background-color: var(--dark-card-bg, #1e1e1e);
+}
+
+[data-theme="dark"] .note-reference-modal-header h3 {
+    color: var(--dark-text-color, #e0e0e0);
+}
+
+[data-theme="dark"] .note-reference-modal-close {
+    color: var(--dark-text-muted, #888);
+}
+
+[data-theme="dark"] .note-reference-modal-close:hover {
+    color: var(--dark-text-color, #e0e0e0);
+}
+
+[data-theme="dark"] .note-reference-search-input {
+    background: var(--dark-input-bg, #333333);
+    border-color: var(--dark-border-color, #444);
+    color: var(--dark-text-color, #e0e0e0);
+}
+
+[data-theme="dark"] .note-reference-search-input:focus {
+    border-color: var(--primary-color, #2196F3);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+}
+
 [data-theme="dark"] .note-reference-search input {
     background: var(--dark-input-bg, #333333);
     border-color: var(--dark-border-color, #444);
@@ -185,10 +301,11 @@ span.note-link-broken {
 
 [data-theme="dark"] .note-reference-list {
     border-color: var(--dark-border-color, #444);
+    background-color: var(--dark-input-bg, #333);
 }
 
 [data-theme="dark"] .note-reference-item {
-    border-bottom-color: var(--dark-border-color, #3a3a3a);
+    border-bottom-color: var(--dark-border-color, #444);
 }
 
 [data-theme="dark"] .note-reference-item:hover {
@@ -197,6 +314,14 @@ span.note-link-broken {
 
 [data-theme="dark"] .note-reference-item-title {
     color: var(--dark-text-color, #e0e0e0);
+}
+
+[data-theme="dark"] .note-reference-heading {
+    color: var(--dark-text-color, #e0e0e0);
+}
+
+[data-theme="dark"] .note-reference-icon {
+    color: var(--dark-text-muted, #888);
 }
 
 [data-theme="dark"] .note-reference-item-folder {

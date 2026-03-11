@@ -861,6 +861,14 @@
             "search_placeholder": "Rechercher des notes...",
             "recent_label": "Notes récentes"
         },
+        "linked_folder_selector": {
+            "title": "Choisir un dossier pour la note liée",
+            "description": "Sélectionnez le dossier où la note liée sera créée :",
+            "search_label": "Filtrer les dossiers",
+            "search_placeholder": "Rechercher des dossiers...",
+            "folder_label": "Dossier de destination",
+            "root": "Racine (Aucun dossier)"
+        },
         "delete_linked_note": {
             "title": "Supprimer la note liée",
             "message": "Que voulez-vous supprimer ?",

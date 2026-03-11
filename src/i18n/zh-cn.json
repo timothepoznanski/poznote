@@ -845,6 +845,14 @@
             "search_placeholder": "搜索笔记...",
             "recent_label": "最近的笔记"
         },
+        "linked_folder_selector": {
+            "title": "选择链接笔记的文件夹",
+            "description": "选择将创建链接笔记的文件夹：",
+            "search_label": "筛选文件夹",
+            "search_placeholder": "搜索文件夹...",
+            "folder_label": "目标文件夹",
+            "root": "根目录（无文件夹）"
+        },
         "delete_linked_note": {
             "title": "删除链接笔记",
             "message": "您想删除什么？",
