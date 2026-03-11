@@ -43,7 +43,7 @@ Discover all the features [here](https://poznote.com/index.html#features)
 - [Offline View](#offline-view)
 - [Multiple Instances](#multiple-instances)
 - [MCP Server](#mcp-server)
-- [Poznote Extension](#poznote-extension)
+- [Chrome Extension](#poznote-extension)
 - [API Documentation](#api-documentation)
 - [Tech Stack](#tech-stack)
 
@@ -735,7 +735,7 @@ Poznote includes a Model Context Protocol (MCP) server that enables AI assistant
 
 For installation, configuration, and setup instructions, see the [MCP Server documentation](docs/MCP-SERVER.md).
 
-## Poznote Extension
+## Chrome Extension
 
 The **Poznote URL Saver** is a browser extension that allows you to quickly save the URL of the current page to your Poznote instance with a single click.
 
