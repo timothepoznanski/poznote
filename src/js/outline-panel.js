@@ -579,6 +579,15 @@ function initTouchSupport() {
     const minSwipeDistance = 80; // Minimum distance for a swipe (increased to avoid accidental triggers)
     const maxVerticalDistance = 100; // Max vertical movement allowed for horizontal swipe
 
+    function isHorizontallyScrollableCodeBlock(target) {
+        const codeBlock = target.closest('pre, .code-block');
+        if (!codeBlock) {
+            return false;
+        }
+
+        return codeBlock.scrollWidth > codeBlock.clientWidth;
+    }
+
     // Swipe from anywhere on the note content area to open outline
     document.addEventListener('touchstart', function(e) {
         // Don't track swipes that start on the outline panel itself
@@ -589,6 +598,11 @@ function initTouchSupport() {
         // Only enable swipe on the right column (note content area)
         // Don't enable on left column (sidebar) to avoid conflicts with note navigation
         if (!e.target.closest('#right_col')) {
+            return;
+        }
+
+        // Let horizontally scrollable code blocks handle touch gestures on mobile.
+        if (isHorizontallyScrollableCodeBlock(e.target)) {
             return;
         }
 
