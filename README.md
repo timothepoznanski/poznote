@@ -743,7 +743,7 @@ The **Poznote URL Saver** is a browser extension that allows you to quickly save
   <img src="images/chrome-extension.png" alt="Poznote Chrome Extension" width="50%">
 </p>
 
-Install the extension directly from the Chrome Web Store → [Install extension](https://chrome.google.com/webstore)
+Install the extension directly from the Chrome Web Store → [Install extension](https://chromewebstore.google.com/detail/bmjclfamahegmgillaghhmnbkjebipbh?utm_source=item-share-cb)
 
 ## API Documentation
 
