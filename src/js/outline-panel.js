@@ -8,6 +8,42 @@
 let isResizingOutline = false;
 let currentNoteId = null;
 
+function isPublicOutlinePage() {
+    return !!(window.isPublicNotePage || document.querySelector('.public-note-page .public-note .content'));
+}
+
+function getCurrentOutlineNoteElement() {
+    if (isPublicOutlinePage()) {
+        return document.querySelector('.public-note .content');
+    }
+
+    return document.querySelector('.notecard:not([style*="display: none"]) .noteentry');
+}
+
+function getOutlineScrollContainer() {
+    if (isPublicOutlinePage()) {
+        return document.getElementById('publicNoteMain');
+    }
+
+    return document.getElementById('right_col');
+}
+
+function getOutlineObservationRoot() {
+    if (isPublicOutlinePage()) {
+        return document.querySelector('.public-note .content');
+    }
+
+    return document.getElementById('right_col');
+}
+
+function getOutlineInteractionRoot(target) {
+    if (isPublicOutlinePage()) {
+        return !!target.closest('#publicNoteMain, .public-note');
+    }
+
+    return !!target.closest('#right_col');
+}
+
 function getMarkdownEditorContent(markdownEditor) {
     if (!markdownEditor) return '';
 
@@ -324,8 +360,16 @@ function renderOutline(headings) {
  * Scroll to a heading in the note
  */
 function scrollToHeading(heading) {
-    const visibleNote = document.querySelector('.notecard:not([style*="display: none"]) .noteentry');
+    const visibleNote = getCurrentOutlineNoteElement();
     if (!visibleNote) return;
+
+    if (isPublicOutlinePage()) {
+        const headingElement = heading.element || document.getElementById(heading.id);
+        if (headingElement) {
+            scrollToElement(headingElement);
+        }
+        return;
+    }
 
     // Handle markdown notes
     if (heading.isMarkdownSource && heading.lineNumber !== undefined) {
@@ -377,7 +421,7 @@ function scrollToHeading(heading) {
             const targetLinePosition = heading.lineNumber * lineHeight;
 
             // In edit mode, the main container (right_col) scrolls, not the editor itself
-            const scrollContainer = document.getElementById('right_col');
+            const scrollContainer = getOutlineScrollContainer();
 
             if (scrollContainer) {
                 // Calculate the editor's position in the container
@@ -439,7 +483,7 @@ function scrollToElement(element) {
     if (!element) return;
 
     // Find the scroll container (right_col)
-    const scrollContainer = document.getElementById('right_col');
+    const scrollContainer = getOutlineScrollContainer();
     if (!scrollContainer) {
         // Fallback to element scroll
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -471,7 +515,7 @@ function scrollToElement(element) {
  */
 function updateOutlineForCurrentNote(forceUpdate = false) {
     // Find the currently visible note
-    const visibleNote = document.querySelector('.notecard:not([style*="display: none"]) .noteentry');
+    const visibleNote = getCurrentOutlineNoteElement();
 
     if (!visibleNote) {
         renderOutline([]);
@@ -479,7 +523,7 @@ function updateOutlineForCurrentNote(forceUpdate = false) {
     }
 
     // Extract note ID from the element
-    const noteId = visibleNote.id.replace('entry', '');
+    const noteId = isPublicOutlinePage() ? 'public-note' : visibleNote.id.replace('entry', '');
 
     // Only update if note has changed, unless forced
     if (!forceUpdate && currentNoteId === noteId) {
@@ -499,8 +543,8 @@ function updateOutlineForCurrentNote(forceUpdate = false) {
  * Observe note changes in the DOM
  */
 function observeNoteChanges() {
-    const rightCol = document.getElementById('right_col');
-    if (!rightCol) return;
+    const observationRoot = getOutlineObservationRoot();
+    if (!observationRoot) return;
 
     // Initial update
     updateOutlineForCurrentNote();
@@ -515,7 +559,7 @@ function observeNoteChanges() {
     });
 
     // Observe changes to the right column
-    observer.observe(rightCol, {
+    observer.observe(observationRoot, {
         childList: true,
         subtree: true,
         characterData: true
@@ -535,14 +579,16 @@ function observeNoteChanges() {
     document.addEventListener('input', handleOutlineInput);
 
     // Also listen for custom events if notes are loaded dynamically
-    document.addEventListener('noteLoaded', function() {
-        updateOutlineForCurrentNote();
-    });
+    if (!isPublicOutlinePage()) {
+        document.addEventListener('noteLoaded', function() {
+            updateOutlineForCurrentNote();
+        });
 
-    // Listen for note visibility changes
-    document.addEventListener('noteVisibilityChanged', function() {
-        updateOutlineForCurrentNote();
-    });
+        // Listen for note visibility changes
+        document.addEventListener('noteVisibilityChanged', function() {
+            updateOutlineForCurrentNote();
+        });
+    }
 
     // Add touch/swipe support for mobile
     initTouchSupport();
@@ -595,9 +641,8 @@ function initTouchSupport() {
             return;
         }
 
-        // Only enable swipe on the right column (note content area)
-        // Don't enable on left column (sidebar) to avoid conflicts with note navigation
-        if (!e.target.closest('#right_col')) {
+        // Only enable swipe on the note content area.
+        if (!getOutlineInteractionRoot(e.target)) {
             return;
         }
 

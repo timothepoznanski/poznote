@@ -298,49 +298,59 @@ body.outline-mobile-open .outline-mobile-backdrop {
 
 /* DARK MODE SUPPORT */
 
-body.dark-mode #outline-panel {
+body.dark-mode #outline-panel,
+html[data-theme='dark'] #outline-panel {
     background: #252526;
     border-left-color: #333;
 }
 
-body.dark-mode .outline-header {
+body.dark-mode .outline-header,
+html[data-theme='dark'] .outline-header {
     border-bottom-color: #333;
 }
 
-body.dark-mode .outline-title {
+body.dark-mode .outline-title,
+html[data-theme='dark'] .outline-title {
     color: #999;
 }
 
-body.dark-mode .outline-nav-link {
+body.dark-mode .outline-nav-link,
+html[data-theme='dark'] .outline-nav-link {
     color: #ccc;
 }
 
-body.dark-mode .outline-nav-link:hover {
+body.dark-mode .outline-nav-link:hover,
+html[data-theme='dark'] .outline-nav-link:hover {
     background: rgba(0, 125, 184, 0.2);
     color: #4db8ff;
 }
 
-body.dark-mode .outline-nav-link.active {
+body.dark-mode .outline-nav-link.active,
+html[data-theme='dark'] .outline-nav-link.active {
     background: rgba(0, 125, 184, 0.25);
     color: #4db8ff;
 }
 
-body.dark-mode .outline-empty {
+body.dark-mode .outline-empty,
+html[data-theme='dark'] .outline-empty {
     color: #666;
 }
 
-body.dark-mode .outline-resize-handle {
+body.dark-mode .outline-resize-handle,
+html[data-theme='dark'] .outline-resize-handle {
     background: #252526;
     border-left-color: #333;
 }
 
-body.dark-mode .toggle-outline-btn {
+body.dark-mode .toggle-outline-btn,
+html[data-theme='dark'] .toggle-outline-btn {
     background: #2d2d2d;
     border-color: #444;
     color: #999;
 }
 
-body.dark-mode .toggle-outline-btn:hover {
+body.dark-mode .toggle-outline-btn:hover,
+html[data-theme='dark'] .toggle-outline-btn:hover {
     background: #3d3d3d;
     color: #4db8ff;
 }

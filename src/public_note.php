@@ -631,6 +631,7 @@ if (!empty($sharedTheme) && in_array($sharedTheme, ['dark', 'light'])) {
     <link rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/kanban.css') ? filemtime(__DIR__ . '/css/dark-mode/kanban.css') : '1'; ?>">
     <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/icons.css') ? filemtime(__DIR__ . '/css/dark-mode/icons.css') : '1'; ?>">
     <link rel="stylesheet" href="css/public_note.css?v=<?php echo filemtime(__DIR__ . '/css/public_note.css'); ?>">
+    <link rel="stylesheet" href="css/outline.css?v=<?php echo filemtime(__DIR__ . '/css/outline.css'); ?>">
     <link rel="stylesheet" href="css/modal-alerts.css">
     <link rel="stylesheet" href="css/tasks.css">
     <link rel="stylesheet" href="css/markdown.css?v=<?php echo filemtime(__DIR__ . '/css/markdown.css'); ?>">
@@ -643,19 +644,48 @@ if (!empty($sharedTheme) && in_array($sharedTheme, ['dark', 'light'])) {
     <script src="js/highlight/powershell.min.js?v=<?php echo file_exists(__DIR__ . '/js/highlight/powershell.min.js') ? filemtime(__DIR__ . '/js/highlight/powershell.min.js') : '1'; ?>"></script>
     <script src="js/syntax-highlight.js?v=<?php echo file_exists(__DIR__ . '/js/syntax-highlight.js') ? filemtime(__DIR__ . '/js/syntax-highlight.js') : '1'; ?>"></script>
 </head>
-<body>
-    <div class="public-note">
-        <div class="public-note-header">
-            <h1><?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?></h1>
-            <button id="themeToggle" class="theme-toggle-btn" title="Toggle theme">
-                <i class="lucide lucide-moon"></i>
+<body class="public-note-page">
+    <div class="public-note-layout">
+        <div class="public-note-main" id="publicNoteMain">
+            <div class="public-note">
+                <div class="public-note-header">
+                    <h1><?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?></h1>
+                    <button id="themeToggle" class="theme-toggle-btn" title="Toggle theme">
+                        <i class="lucide lucide-moon"></i>
+                    </button>
+                </div>
+                <div class="content"><?php echo $content; ?></div>
+            </div>
+        </div>
+
+        <div class="outline-mobile-backdrop" id="outlineMobileBackdrop"></div>
+
+        <div class="outline-resize-handle" id="outlineResizeHandle">
+            <button
+                id="toggleOutlineBtn"
+                class="toggle-outline-btn"
+                aria-label="Toggle outline panel"
+                title="Toggle outline panel">
+                <i class="lucide lucide-chevron-right"></i>
             </button>
         </div>
-        <div class="content"><?php echo $content; ?></div>
+
+        <div id="outline-panel">
+            <div class="outline-header">
+                <h2 class="outline-title">Outline</h2>
+            </div>
+            <ul class="outline-nav" id="outline-nav">
+                <div class="outline-empty">
+                    <div class="outline-empty-icon">📄</div>
+                    <p class="outline-empty-text">No headings in this note</p>
+                </div>
+            </ul>
+        </div>
     </div>
 </body>
 <script src="js/copy-code-on-focus.js"></script>
 <script src="js/modal-alerts.js"></script>
 <script src="js/math-renderer.js?v=<?php echo filemtime(__DIR__ . '/js/math-renderer.js'); ?>"></script>
+<script src="js/outline-panel.js?v=<?php echo filemtime(__DIR__ . '/js/outline-panel.js'); ?>"></script>
 <script src="js/public-note.js?v=<?php echo filemtime(__DIR__ . '/js/public-note.js'); ?>"></script>
 </html>
