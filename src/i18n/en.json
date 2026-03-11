@@ -69,6 +69,7 @@
             "news": "Poznote Blog",
             "website": "Poznote Website",
             "support": "Support Developer",
+            "install_extension": "Install extension",
             "release_notes": "Release Notes",
             "convert_images": "Base64 Image Converter"
         },

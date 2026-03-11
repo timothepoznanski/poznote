@@ -336,6 +336,7 @@
             "news": "Blog do Poznote",
             "website": "Site do Poznote",
             "support": "Apoiar o desenvolvedor",
+            "install_extension": "Instalar extensão",
             "release_notes": "Notas de versão",
             "convert_images": "Conversor de Imagens Base64"
         }

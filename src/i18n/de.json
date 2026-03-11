@@ -337,6 +337,7 @@
             "news": "Poznote-Blog",
             "website": "Poznote-Website",
             "support": "Entwickler unterstützen",
+            "install_extension": "Erweiterung installieren",
             "release_notes": "Versionshinweise",
             "convert_images": "Base64-Bild-Konverter"
         }

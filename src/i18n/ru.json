@@ -69,6 +69,7 @@
             "news": "Блог Poznote",
             "website": "Сайт Poznote",
             "support": "Поддержать разработчика",
+            "install_extension": "Установить расширение",
             "release_notes": "Примечания к выпуску",
             "convert_images": "Конвертер изображений Base64"
         },

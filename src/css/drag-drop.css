@@ -204,6 +204,7 @@ body.dark-mode .drop-zone-content {
     background-color: rgba(0, 123, 255, 0.05) !important;
     border-left: 2px solid rgba(0, 123, 255, 0.3) !important;
     transform: scale(0.98) !important;
+    cursor: grabbing !important;
 }
 
 .links_arbo_left.dragging,
@@ -217,11 +218,13 @@ a.links_arbo_left.dragging,
     transform: scale(0.98) !important;
     z-index: 1000 !important;
     position: relative !important;
+    cursor: grabbing !important;
 }
 
-/* Ensure drag cursor is shown when hovering note links */
+/* Ensure pointer cursor (finger) is shown when hovering note links for clicking,
+   and grab cursor when we specifically want to indicate drag possibility */
 .links_arbo_left[draggable="true"] {
-    cursor: grab;
+    cursor: pointer;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -234,7 +237,7 @@ a.links_arbo_left.dragging,
 
 /* Specific styles for notes in folders */
 .note-in-folder.links_arbo_left[draggable="true"] {
-    cursor: grab !important;
+    cursor: pointer !important;
     -webkit-user-drag: element !important;
     -khtml-user-drag: element !important;
     -moz-user-drag: element !important;
@@ -249,7 +252,7 @@ a.links_arbo_left.dragging,
 
 /* Specific styles for notes without folder */
 .note-without-folder.links_arbo_left[draggable="true"] {
-    cursor: grab !important;
+    cursor: pointer !important;
     -webkit-user-drag: element !important;
     -khtml-user-drag: element !important;
     -moz-user-drag: element !important;

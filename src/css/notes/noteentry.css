@@ -100,6 +100,11 @@ textarea:focus {
     outline: 0;
 }
 
+/* Links in notes */
+.noteentry a {
+    cursor: pointer;
+}
+
 /* Heading styles - higher specificity to override font-size */
 .noteentry h1 {
     font-size: 2em !important;

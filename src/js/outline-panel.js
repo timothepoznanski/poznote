@@ -455,7 +455,7 @@ function scrollToElement(element) {
 /**
  * Update outline for currently active note
  */
-function updateOutlineForCurrentNote() {
+function updateOutlineForCurrentNote(forceUpdate = false) {
     // Find the currently visible note
     const visibleNote = document.querySelector('.notecard:not([style*="display: none"]) .noteentry');
 
@@ -467,8 +467,8 @@ function updateOutlineForCurrentNote() {
     // Extract note ID from the element
     const noteId = visibleNote.id.replace('entry', '');
 
-    // Only update if note has changed
-    if (currentNoteId === noteId) {
+    // Only update if note has changed, unless forced
+    if (!forceUpdate && currentNoteId === noteId) {
         return;
     }
 
@@ -496,7 +496,7 @@ function observeNoteChanges() {
         // Debounce the update
         clearTimeout(window.outlineUpdateTimeout);
         window.outlineUpdateTimeout = setTimeout(() => {
-            updateOutlineForCurrentNote();
+            updateOutlineForCurrentNote(true); // Force update if DOM changes
         }, 300);
     });
 
@@ -506,6 +506,19 @@ function observeNoteChanges() {
         subtree: true,
         characterData: true
     });
+
+    // Handle input events for real-time updates while typing
+    const handleOutlineInput = function(e) {
+        // Only trigger if typing in a note entry or markdown editor
+        if (e.target.closest('.noteentry') || e.target.closest('.markdown-editor')) {
+            clearTimeout(window.outlineUpdateTimeout);
+            window.outlineUpdateTimeout = setTimeout(() => {
+                updateOutlineForCurrentNote(true); // Force update while typing
+            }, 600); // Slightly longer debounce for typing to be less intrusive
+        }
+    };
+
+    document.addEventListener('input', handleOutlineInput);
 
     // Also listen for custom events if notes are loaded dynamically
     document.addEventListener('noteLoaded', function() {
