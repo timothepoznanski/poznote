@@ -23,7 +23,7 @@ This project started from a simple personal need: a practical way to write, orga
 
 ### Features
 
-Discover all the features [here](https://poznote.com/index.html#features).
+Discover all the features [here](https://poznote.com/index.html#features)
 
 <p align="center">
   <img src="images/poznote-features.png" alt="Poznote Features" width="100%">
@@ -743,7 +743,7 @@ The **Poznote URL Saver** is a browser extension that allows you to quickly save
   <img src="images/chrome-extension.png" alt="Poznote Chrome Extension" width="50%">
 </p>
 
-Install the extension directly from the Chrome Web Store. Works with Chrome, Edge, Brave, Opera, and any Chromium-based browser → [Install extension](https://chrome.google.com/webstore)
+Install the extension directly from the Chrome Web Store → [Install extension](https://chrome.google.com/webstore)
 
 ## API Documentation
 
