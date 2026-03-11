@@ -27,6 +27,11 @@
     line-height: 1.6;
 }
 
+html[data-theme='dark'] .dr-hero p,
+body.dark-mode .dr-hero p {
+    color: rgba(255, 255, 255, 0.82);
+}
+
 /* ── Convert Images page wrapper ── */
 .ci-page {
     max-width: 760px;
@@ -223,3 +228,358 @@ html[data-theme='dark'] .ci-notice.success { color: #86efac; }
 html[data-theme='dark'] .ci-notice.warning { color: #fde047; }
 
 .error-list { margin: 6px 0 0; padding-left: 14px; font-size: 0.8rem; opacity: 0.85; }
+
+/* ── Orphan Scanner ── */
+.results-table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin-top: 20px; 
+    color: var(--text-primary); 
+    background: var(--bg-color, #fff);
+    border: 1.5px solid var(--border-color, #e5e7eb);
+    border-radius: 12px;
+    overflow: hidden;
+}
+.results-table th, 
+.results-table td { 
+    padding: 12px 20px; 
+    border-bottom: 1px solid var(--border-color); 
+    text-align: left; 
+}
+.results-table th { 
+    background: var(--bg-secondary, #f9f9f9);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted, #888);
+}
+.results-table tr:last-child td { border-bottom: none; }
+
+.file-list-preview { 
+    font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace;
+    font-size: 0.85em; 
+    color: var(--text-secondary); 
+    max-height: 100px; 
+    overflow-y: auto; 
+}
+
+.deletion-notice {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: rgba(59,130,246,.1);
+    border-left: 3px solid #3b82f6;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #1d4ed8;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+html[data-theme='dark'] .deletion-notice {
+    background: rgba(59,130,246,.15);
+    color: #93c5fd;
+}
+
+.btn-view-files {
+    background: var(--bg-secondary, #f5f5f5);
+    border: 1px solid var(--border-color, #ddd);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: var(--text-primary);
+    transition: all 0.2s;
+}
+
+.btn-view-files:hover {
+    background: var(--hover-bg, #e8e8e8);
+    border-color: #007cba;
+    color: #007cba;
+}
+
+html[data-theme='dark'] .btn-view-files {
+    background: rgba(255,255,255,.05);
+    border-color: rgba(255,255,255,.1);
+}
+
+html[data-theme='dark'] .btn-view-files:hover {
+    background: rgba(255,255,255,.1);
+    border-color: #3b82f6;
+    color: #60a5fa;
+}
+
+/* Modal Styles */
+.orphan-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+
+.orphan-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.orphan-modal-content {
+    position: relative;
+    background: var(--bg-color, #fff);
+    border-radius: 12px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.orphan-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.orphan-modal-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.orphan-modal-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    line-height: 1;
+    color: var(--text-muted, #999);
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.orphan-modal-close:hover {
+    background: var(--hover-bg, #f5f5f5);
+    color: var(--text-primary);
+}
+
+.orphan-modal-body {
+    padding: 20px 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.orphan-files-ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.orphan-files-ul li {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-color, #f0f0f0);
+    font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace;
+    font-size: 0.85rem;
+    word-break: break-all;
+}
+
+.orphan-files-ul li:last-child {
+    border-bottom: none;
+}
+
+.orphan-files-ul li .file-path {
+    color: var(--text-muted, #999);
+    font-size: 0.8rem;
+}
+
+.orphan-files-ul li strong {
+    color: var(--text-primary);
+}
+
+@media (max-width: 640px) {
+    .orphan-modal-content {
+        width: 95%;
+        max-height: 85vh;
+    }
+    
+    .orphan-modal-header {
+        padding: 16px 20px;
+    }
+    
+    .orphan-modal-header h3 {
+        font-size: 1rem;
+    }
+    
+    .orphan-modal-body {
+        padding: 16px 20px;
+    }
+    
+    .orphan-files-ul li {
+        font-size: 0.75rem;
+        padding: 8px 10px;
+    }
+    
+    .btn-view-files {
+        font-size: 0.8rem;
+        padding: 5px 12px;
+    }
+}
+
+.status-badge { 
+    padding: 4px 10px; 
+    border-radius: 999px; 
+    font-size: 0.75rem; 
+    font-weight: 600;
+    display: inline-block;
+}
+.status-clean { 
+    background: #dcfce7; 
+    color: #166534; 
+}
+.status-warning { 
+    background: #fef9c3; 
+    color: #854d0e; 
+}
+.status-deleted { 
+    background: #dbeafe; 
+    color: #1d4ed8; 
+}
+
+html[data-theme='dark'] .status-clean { 
+    background: rgba(34,197,94,.15); 
+    color: #86efac; 
+}
+html[data-theme='dark'] .status-warning { 
+    background: rgba(234,179,8,.15); 
+    color: #fde047; 
+}
+html[data-theme='dark'] .status-deleted { 
+    background: rgba(59,130,246,.15); 
+    color: #93c5fd; 
+}
+
+/* ── Orphan Scanner Buttons ── */
+.orphan-actions {
+    text-align: center;
+    padding: 20px 0;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.orphan-actions .btn {
+    white-space: nowrap;
+    flex: 0 1 auto;
+}
+
+/* ── Responsive Headers ── */
+.header-desktop { display: inline; }
+.header-mobile { display: none; }
+.mobile-only { display: none; }
+
+.orphan-mobile-action {
+    margin-top: 8px;
+}
+
+.orphan-mobile-action .btn-view-files {
+    width: 100%;
+    padding: 6px 10px;
+    font-size: 0.75rem;
+}
+
+/* ── Mobile Responsive ── */
+@media (max-width: 640px) {
+    .dr-hero h1 {
+        font-size: 1.3rem;
+    }
+    
+    .dr-hero p {
+        font-size: 0.85rem;
+        line-height: 1.5;
+    }
+    
+    .orphan-actions {
+        flex-direction: column;
+        gap: 10px;
+        padding: 15px 0;
+    }
+    
+    .orphan-actions form {
+        width: 100%;
+    }
+    
+    .orphan-actions .btn {
+        width: 100%;
+        justify-content: center;
+        font-size: 0.9rem;
+        padding: 12px 16px;
+    }
+    
+    .results-table {
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+    
+    .results-table th,
+    .results-table td {
+        padding: 8px 10px;
+        font-size: 0.75rem;
+    }
+    
+    .results-table th {
+        font-size: 0.65rem;
+        letter-spacing: 0.03em;
+    }
+    
+    /* Hide less important columns on mobile */
+    .results-table .hide-mobile {
+        display: none;
+    }
+    
+    /* Show short headers on mobile */
+    .header-desktop { display: none; }
+    .header-mobile { display: inline; }
+    .mobile-only { display: block; }
+    
+    .status-badge {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+    }
+    
+    .file-list-preview {
+        font-size: 0.75em;
+        max-height: 80px;
+    }
+    
+    .file-chip {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+        max-width: 150px;
+    }
+    
+    .deletion-notice {
+        font-size: 0.75rem;
+        padding: 6px 10px;
+    }
+}

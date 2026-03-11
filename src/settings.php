@@ -460,6 +460,16 @@ if ($isAdmin) {
                 </div>
             </div>
 
+            <!-- Orphan Scanner -->
+            <div class="home-card settings-card-clickable" id="orphan-scanner-card" data-href="admin/orphan-scanner.php">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-scan"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.orphan_scanner', [], 'Orphan attachments scanner'); ?></span>
+                </div>
+            </div>
+
         </div>
         <?php endif; ?>
 
