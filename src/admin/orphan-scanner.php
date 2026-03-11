@@ -121,7 +121,7 @@ function runScanner(bool $doDelete): array {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo t_h('admin_tools.orphan_scanner.title', [], 'Orphan images scanner'); ?></title>
+    <title><?php echo t_h('admin_tools.orphan_scanner.title', [], 'Orphan attachments scanner'); ?></title>
     <meta name="color-scheme" content="dark light">
     <script src="../js/theme-init.js?v=<?php echo $v; ?>"></script>
     <link rel="stylesheet" href="../css/lucide.css?v=<?php echo $v; ?>">
@@ -149,7 +149,7 @@ function runScanner(bool $doDelete): array {
 
     <div class="dr-page">
         <div class="dr-hero">
-            <h1><?php echo t_h('admin_tools.orphan_scanner.title', [], 'Orphan images scanner'); ?></h1>
+            <h1><?php echo t_h('admin_tools.orphan_scanner.title', [], 'Orphan attachments scanner'); ?></h1>
             <p><?php echo t_h('admin_tools.orphan_scanner.description', [], 'This tool scans your attachment folders and identifies files that are no longer referenced in any of your notes.'); ?></p>
         </div>
 
