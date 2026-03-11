@@ -72,7 +72,7 @@
       "install_extension": "Install extension",
       "release_notes": "Release Notes",
       "convert_images": "Base64 Image Converter",
-      "orphan_scanner": "Orphan images scanner"
+        "orphan_scanner": "Orphan attachments scanner"
     },
     "language": {
       "label": "Language",
