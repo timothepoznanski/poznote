@@ -310,6 +310,16 @@ function parseMarkdown(text) {
         return id ? parseInt(id, 10) : null;
     }
 
+    // Protect inline code spans so their content is not consumed by math regexes
+    let protectedRawCode = [];
+    let rawCodeIndex = 0;
+    text = text.replace(/`([^`\n]+)`/g, function (match) {
+        let placeholder = '\x00RAWCODE' + rawCodeIndex + '\x00';
+        protectedRawCode[rawCodeIndex] = match;
+        rawCodeIndex++;
+        return placeholder;
+    });
+
     // Extract and protect math equations first (before HTML escaping)
     let protectedMathBlocks = [];
     let mathBlockIndex = 0;
@@ -334,6 +344,11 @@ function parseMarkdown(text) {
         protectedMathInline[mathInlineIndex] = math.trim();
         mathInlineIndex++;
         return placeholder;
+    });
+
+    // Restore inline code spans (as raw backtick text so processInline renders them normally)
+    text = text.replace(/\x00RAWCODE(\d+)\x00/g, function (match, index) {
+        return protectedRawCode[parseInt(index)] || match;
     });
 
     // Extract and protect images and links from HTML escaping
