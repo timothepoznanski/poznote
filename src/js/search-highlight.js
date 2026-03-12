@@ -45,7 +45,10 @@ function highlightSearchTerms() {
     if (!isNotesSearchActive() && !isTagsSearchActive()) return;
 
     var termUnchanged = window.searchNavigation && searchTerm === window.searchNavigation.lastTerm;
-    var existingHighlights = document.querySelectorAll('.search-highlight, .tag-highlight');
+    // Only consider content highlights (not tag-only highlights) to decide if the content pass
+    // was already done — otherwise combined mode skips content highlighting when tag highlights
+    // already exist from a prior highlightMatchingTags() call.
+    var existingHighlights = document.querySelectorAll('.search-highlight');
 
     if (termUnchanged && existingHighlights.length > 0) {
         updateHighlightsList();
