@@ -68,9 +68,13 @@ function highlightSearchTerms() {
     var searchWords = parseSearchTerms(searchTerm);
     if (!searchWords.length) return;
 
-    document.querySelectorAll('.noteentry, .css-title').forEach(function(el) {
-        highlightInElement(el, searchWords);
-    });
+    // Only highlight note content when in notes or combined mode.
+    // In tags-only mode we skip this to avoid briefly highlighting title text.
+    if (isNotesSearchActive()) {
+        document.querySelectorAll('.noteentry, .css-title').forEach(function(el) {
+            highlightInElement(el, searchWords);
+        });
+    }
 
     if (isCombinedSearchActive() && typeof window.highlightMatchingTags === 'function') {
         try { window.highlightMatchingTags(searchTerm); } catch (e) {}
@@ -486,23 +490,17 @@ function navigateToHighlight(index, smooth) {
                 return;
             }
 
-            // Standard scrollIntoView with sticky header offset (for content highlights)
-            target.style.scrollMarginTop = (stickyOffset + 12) + 'px';
-            target.scrollIntoView({
-                behavior: behavior,
-                block: 'start',
-                inline: isMobile ? 'start' : 'nearest'
-            });
-
-            // Verification pass: re-scroll if element shifted out of view (e.g. images loading)
-            setTimeout(function() {
-                if (!document.body.contains(target)) return;
-                var vRect = target.getBoundingClientRect();
-                if (vRect.top < stickyOffset + 12 || vRect.top > vpH * 0.85) {
-                    target.style.scrollMarginTop = (stickyOffset + 12) + 'px';
-                    target.scrollIntoView({ behavior: 'auto', block: 'center', inline: 'nearest' });
-                }
-            }, 350);
+            // Only scroll if the element is not already visible in the viewport.
+            var rect = target.getBoundingClientRect();
+            var alreadyVisible = rect.top >= stickyOffset + 12 && rect.bottom <= vpH;
+            if (!alreadyVisible) {
+                target.style.scrollMarginTop = (stickyOffset + 12) + 'px';
+                target.scrollIntoView({
+                    behavior: behavior,
+                    block: 'start',
+                    inline: isMobile ? 'start' : 'nearest'
+                });
+            }
         } catch (e) {
             try { target.scrollIntoView(behavior === 'smooth'); } catch (_) {}
         }
