@@ -9,6 +9,44 @@ var isNoteLoading = false;
 var imageClickHandlerInitialized = false;
 
 /**
+ * Ensure the currently active search highlight is visible in the viewport.
+ * Called from retry passes to correct for layout shifts after initial scroll.
+ */
+function ensureActiveHighlightVisible() {
+    try {
+        if (!window.searchNavigation) return;
+        var nav = window.searchNavigation;
+        if (nav.currentHighlightIndex < 0 || !nav.highlights || nav.highlights.length === 0) return;
+        var idx = Math.min(nav.currentHighlightIndex, nav.highlights.length - 1);
+        var target = nav.highlights[idx];
+        if (!target || !document.body.contains(target)) return;
+
+        var rect = target.getBoundingClientRect();
+        var vpHeight = window.innerHeight || document.documentElement.clientHeight;
+
+        // Compute sticky offset
+        var topThreshold = 0;
+        var tabBar = document.getElementById('app-tab-bar');
+        if (tabBar) topThreshold += tabBar.offsetHeight;
+        
+        // For titles, don't include note-header since title is inside it
+        var isInTitle = target.closest('.css-title, .note-header .title');
+        var nc = target.closest('.notecard');
+        if (nc && !isInTitle) {
+            var nh = nc.querySelector('.note-header');
+            if (nh) topThreshold += nh.offsetHeight;
+        }
+        topThreshold += 12;
+
+        var isInView = rect.top >= topThreshold && rect.top <= vpHeight * 0.85;
+        if (!isInView) {
+            target.style.scrollMarginTop = topThreshold + 'px';
+            target.scrollIntoView({ behavior: 'auto', block: 'center', inline: 'nearest' });
+        }
+    } catch (e) { /* ignore */ }
+}
+
+/**
  * Reapply search highlights with a couple of delayed retries to handle layout timing.
  * Centralized helper to avoid duplicated code blocks across loaders.
  */
@@ -63,6 +101,7 @@ function applyHighlightsWithRetries() {
             if (typeof updateAllOverlayPositions === 'function') {
                 try { updateAllOverlayPositions(); } catch (e) { }
             }
+            ensureActiveHighlightVisible();
         }, 250);
         return;
     }
@@ -180,6 +219,7 @@ function applyHighlightsWithRetries() {
         if (typeof updateAllOverlayPositions === 'function') {
             try { updateAllOverlayPositions(); } catch (e) { }
         }
+        ensureActiveHighlightVisible();
     }, 300);
 }
 
