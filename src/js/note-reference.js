@@ -510,14 +510,26 @@
     window.navigateToNote = function(noteId) {
         const workspace = getCurrentWorkspace();
         const isMobile = window.innerWidth <= 800;
-        
+
+        // On desktop with tabs enabled, open in a new tab
+        if (!isMobile && window.tabManager && typeof window.tabManager.openInNewTab === 'function') {
+            // Try to get the note title from the link that was clicked
+            let noteTitle = 'Note';
+            const clickedLink = document.querySelector(`a.note-internal-link[data-note-id="${noteId}"]`);
+            if (clickedLink) {
+                noteTitle = clickedLink.textContent || clickedLink.title || 'Note';
+            }
+            window.tabManager.openInNewTab(noteId, noteTitle);
+            return;
+        }
+
         // Use AJAX load if available for a smoother experience
         if (typeof window.loadNoteDirectly === 'function') {
             const url = `index.php?note=${noteId}&workspace=${encodeURIComponent(workspace)}`;
             window.loadNoteDirectly(url, noteId, null);
             return;
         }
-        
+
         // Fallback to full page reload
         const scrollParam = isMobile ? '&scroll=1' : '';
         window.location.href = `index.php?note=${noteId}&workspace=${encodeURIComponent(workspace)}${scrollParam}`;

@@ -240,7 +240,16 @@ function extractHeadings(noteElement) {
                 const match = line.match(/^(#{1,6})\s+(.+)$/);
                 if (match) {
                     const level = match[1].length;
-                    const text = match[2].trim();
+                    const rawText = match[2].trim();
+                    // Strip inline markdown formatting for display in the outline panel
+                    const text = rawText
+                        .replace(/\*\*(.+?)\*\*/g, '$1')          // bold **text**
+                        .replace(/__(.+?)__/g, '$1')               // bold __text__
+                        .replace(/\*(.+?)\*/g, '$1')               // italic *text*
+                        .replace(/_(.+?)_/g, '$1')                 // italic _text_
+                        .replace(/~~(.+?)~~/g, '$1')               // strikethrough ~~text~~
+                        .replace(/`(.+?)`/g, '$1')                 // inline code `text`
+                        .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1'); // links [text](url)
                     const id = `md-heading-${lineIndex}-${text.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 
                     // Find corresponding element in preview if available
