@@ -154,11 +154,6 @@ function applyHighlightsWithRetries() {
                 window.highlightMatchingTags(term);
             } catch (e) { /* ignore */ }
         }
-        // In tags-only mode, we still call highlightSearchTerms() to initialize word-search navigation
-        // even if it finds 0 matches in content, so that Entrée works for tags.
-        if (typeof highlightSearchTerms === 'function') {
-            try { highlightSearchTerms(); } catch (e) { /* ignore */ }
-        }
     } else if (activeType === 'notes') {
         // Clear any tag UI highlights so notes highlights are the only visible highlights
         if (typeof window.highlightMatchingTags === 'function') {
@@ -184,10 +179,6 @@ function applyHighlightsWithRetries() {
                 try { highlightSearchTerms(); } catch (e) { }
             }
         } else if (activeType === 'tags') {
-            // Re-apply both for tags mode to ensure navigation logic is initialized
-            if (typeof highlightSearchTerms === 'function') {
-                try { highlightSearchTerms(); } catch (e) { }
-            }
             if (typeof window.highlightMatchingTags === 'function') {
                 try {
                     var term2 = (document.getElementById('search-tags-hidden') && document.getElementById('search-tags-hidden').value) || (document.getElementById('unified-search') && document.getElementById('unified-search').value) || '';
@@ -205,10 +196,6 @@ function applyHighlightsWithRetries() {
                 try { highlightSearchTerms(); } catch (e) { }
             }
         } else if (activeType === 'tags') {
-            // Clear any note highlights before highlighting tags
-            if (typeof clearSearchHighlights === 'function') {
-                try { clearSearchHighlights(); } catch (e) { }
-            }
             if (typeof window.highlightMatchingTags === 'function') {
                 try {
                     var term3 = (document.getElementById('search-tags-hidden') && document.getElementById('search-tags-hidden').value) || (document.getElementById('unified-search') && document.getElementById('unified-search').value) || '';
