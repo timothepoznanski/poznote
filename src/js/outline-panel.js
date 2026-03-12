@@ -240,7 +240,16 @@ function extractHeadings(noteElement) {
                 const match = line.match(/^(#{1,6})\s+(.+)$/);
                 if (match) {
                     const level = match[1].length;
-                    const text = match[2].trim();
+                    const rawText = match[2].trim();
+                    // Strip inline markdown formatting for display in the outline panel
+                    const text = rawText
+                        .replace(/\*\*(.+?)\*\*/g, '$1')          // bold **text**
+                        .replace(/__(.+?)__/g, '$1')               // bold __text__
+                        .replace(/\*(.+?)\*/g, '$1')               // italic *text*
+                        .replace(/_(.+?)_/g, '$1')                 // italic _text_
+                        .replace(/~~(.+?)~~/g, '$1')               // strikethrough ~~text~~
+                        .replace(/`(.+?)`/g, '$1')                 // inline code `text`
+                        .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1'); // links [text](url)
                     const id = `md-heading-${lineIndex}-${text.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 
                     // Find corresponding element in preview if available
@@ -551,6 +560,30 @@ function observeNoteChanges() {
 
     // Watch for changes to note content
     const observer = new MutationObserver(function(mutations) {
+        // Skip outline update when all mutations come from search highlighting.
+        // Search adds/removes <span class="search-highlight"> wrappers and text
+        // nodes around them.  Re-rendering the outline during this window can
+        // interfere with the smooth-scroll animation that positions the active
+        // search result in the viewport.
+        var onlySearch = mutations.every(function (m) {
+            if (m.type === 'characterData') return true; // text-node splits
+            if (m.type !== 'childList') return false;
+            var nodes = [];
+            for (var i = 0; i < m.addedNodes.length; i++) nodes.push(m.addedNodes[i]);
+            for (var i = 0; i < m.removedNodes.length; i++) nodes.push(m.removedNodes[i]);
+            return nodes.every(function (n) {
+                if (n.nodeType === 3) return true; // text node
+                if (n.nodeType === 1) {
+                    var cl = n.classList;
+                    return cl && (cl.contains('search-highlight') ||
+                                  cl.contains('tag-highlight') ||
+                                  cl.contains('input-highlight-overlay'));
+                }
+                return false;
+            });
+        });
+        if (onlySearch) return;
+
         // Debounce the update
         clearTimeout(window.outlineUpdateTimeout);
         window.outlineUpdateTimeout = setTimeout(() => {

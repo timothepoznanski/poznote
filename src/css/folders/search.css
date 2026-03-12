@@ -44,7 +44,7 @@ body.dark-mode .noteentry .search-highlight-active {
     box-shadow: 0 0 10px rgba(255, 157, 0, 0.8) !important;
     z-index: 1000 !important;
     border: 1px solid #d35400 !important;
-    border-radius: 2px;
+    border-radius: 4px;
 }
 
 /* Ensure text color inside tags follows the active highlight style */
@@ -87,4 +87,5 @@ body.dark-mode .note-header .input-highlight-overlay.search-highlight-active {
     opacity: 0.9 !important;
     z-index: 10 !important;
     box-shadow: 0 0 5px rgba(255, 157, 0, 0.7) !important;
+    border-radius: 4px;
 }

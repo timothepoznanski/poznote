@@ -1,498 +1,276 @@
 // Search highlighting functions
-// Manages highlighting of search terms in note content
 
-/**
- * Remove accents from text for accent-insensitive search
- * @param {string} text - The text to normalize
- * @returns {string} Text without accents
- */
 function removeAccents(text) {
     if (!text) return '';
-
-    // Convert to lowercase for case-insensitive comparison
-    text = text.toLowerCase();
-
-    // Replace accented characters with their non-accented equivalents
-    var accents = {
-        'á': 'a', 'à': 'a', 'â': 'a', 'ä': 'a', 'ã': 'a', 'å': 'a', 'ā': 'a',
-        'é': 'e', 'è': 'e', 'ê': 'e', 'ë': 'e', 'ē': 'e', 'ė': 'e', 'ę': 'e',
-        'í': 'i', 'ì': 'i', 'î': 'i', 'ï': 'i', 'ī': 'i', 'į': 'i',
-        'ó': 'o', 'ò': 'o', 'ô': 'o', 'ö': 'o', 'õ': 'o', 'ø': 'o', 'ō': 'o',
-        'ú': 'u', 'ù': 'u', 'û': 'u', 'ü': 'u', 'ū': 'u', 'ų': 'u',
-        'ý': 'y', 'ÿ': 'y',
-        'ñ': 'n', 'ń': 'n',
-        'ç': 'c', 'ć': 'c', 'č': 'c',
-        'ş': 's', 'š': 's', 'ś': 's',
-        'ž': 'z', 'ź': 'z', 'ż': 'z',
-        'ł': 'l',
-        'æ': 'ae', 'œ': 'oe'
-    };
-
-    var result = '';
-    for (var i = 0; i < text.length; i++) {
-        var char = text[i];
-        result += accents[char] || char;
-    }
-
-    return result;
+    return text.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/æ/g, 'ae').replace(/œ/g, 'oe')
+        .replace(/ø/g, 'o').replace(/ł/g, 'l');
 }
 
-/**
- * Parse search terms with support for quoted phrases
- * @param {string} search - The search string
- * @returns {Array<string>} Array of search terms (phrases kept as single strings)
- */
 function parseSearchTerms(search) {
     var terms = [];
     var pattern = /"([^"]+)"|\S+/g;
     var match;
-
     while ((match = pattern.exec(search)) !== null) {
-        // If match[1] exists, it's a quoted phrase
-        if (match[1]) {
-            terms.push(match[1]);
-        } else {
-            // Otherwise it's a single word
-            terms.push(match[0]);
-        }
+        terms.push(match[1] || match[0]);
     }
-
     return terms;
+}
+
+// ---------- Search mode helpers ----------
+
+function isCombinedSearchActive() {
+    var comb = document.getElementById('search-combined-mode') || document.getElementById('search-combined-mode-mobile');
+    if (comb && comb.value === '1') return true;
+    return !!(window.searchManager && typeof window.searchManager.isCombinedModeActive === 'function' &&
+        (window.searchManager.isCombinedModeActive(false) || window.searchManager.isCombinedModeActive(true)));
+}
+
+function isTagsSearchActive() {
+    var tagsBtn = document.getElementById('search-tags-btn') || document.getElementById('search-tags-btn-mobile');
+    return (tagsBtn && tagsBtn.classList.contains('active')) ||
+        !!(window.searchManager && window.searchManager.currentSearchType === 'tags');
 }
 
 /**
  * Highlight search terms in all note content areas
  */
 function highlightSearchTerms() {
-    // Get current search terms from the unified search input
     var searchInput = document.getElementById('unified-search') || document.getElementById('unified-search-mobile');
     if (!searchInput) return;
 
     var searchTerm = searchInput.value.trim();
-    if (!searchTerm) {
-        clearSearchHighlights();
+    if (!searchTerm) { clearSearchHighlights(); return; }
+    if (!isNotesSearchActive() && !isTagsSearchActive()) return;
+
+    var termUnchanged = window.searchNavigation && searchTerm === window.searchNavigation.lastTerm;
+    // Only consider content highlights (not tag-only highlights) to decide if the content pass
+    // was already done — otherwise combined mode skips content highlighting when tag highlights
+    // already exist from a prior highlightMatchingTags() call.
+    var existingHighlights = document.querySelectorAll('.search-highlight');
+
+    if (termUnchanged && existingHighlights.length > 0) {
+        updateHighlightsList();
+        if (window.searchNavigation) {
+            var nav = window.searchNavigation;
+            if (nav.pendingAutoScroll && nav.highlights.length > 0) {
+                nav.pendingAutoScroll = false;
+                navigateToHighlight(0, true);
+            } else if (nav.currentHighlightIndex >= 0 && nav.highlights.length > 0 &&
+                       !document.querySelector('.search-highlight-active')) {
+                navigateToHighlight(Math.min(nav.currentHighlightIndex, nav.highlights.length - 1), false);
+            }
+        }
         return;
     }
 
-    // Check if we're in notes or tags search mode
-    var isNotesActive = isNotesSearchActive();
-    var isTagsActive = (function () {
-        var tagsBtn = document.getElementById('search-tags-btn') || document.getElementById('search-tags-btn-mobile');
-        return (tagsBtn && tagsBtn.classList.contains('active')) ||
-            (window.searchManager && window.searchManager.currentSearchType === 'tags');
-    })();
-
-    if (!isNotesActive && !isTagsActive) {
-        return; // Only highlight in notes or tags search mode
-    }
-
-    // Check if we already have highlights for this exact term
-    // If so, just ensure the active state is preserved - don't recreate everything
-    var existingHighlights = document.querySelectorAll('.search-highlight, .tag-highlight');
-    var termUnchanged = window.searchNavigation && searchTerm === window.searchNavigation.lastTerm;
-
-    if (termUnchanged && existingHighlights.length > 0) {
-        // Highlights already exist for this term - just refresh the list and restore active state
-        updateHighlightsList();
-
-        if (window.searchNavigation) {
-            var nav = window.searchNavigation;
-
-            // Check if we need to apply first highlight (pendingAutoScroll)
-            if (nav.pendingAutoScroll && nav.highlights.length > 0) {
-                nav.pendingAutoScroll = false;
-                nav.currentHighlightIndex = 0;
-                // Use navigateToHighlight to ensure consistent orange class and scroll behavior
-                navigateToHighlight(0, true);
-            } else if (nav.currentHighlightIndex >= 0 && nav.highlights.length > 0) {
-                // Ensure the active highlight has the orange class
-                var idx = Math.min(nav.currentHighlightIndex, nav.highlights.length - 1);
-                var hasActive = document.querySelector('.search-highlight-active');
-                if (!hasActive) {
-                    navigateToHighlight(idx, false); // Restore active highlight
-                }
-            }
-        }
-        return; // Skip recreation
-    }
-
-    // Term changed or no existing highlights - do full re-highlighting
-    // Clear existing highlights first. Keep navigation index if search term is same.
     clearSearchHighlights(termUnchanged);
+    if (window.searchNavigation) window.searchNavigation.lastTerm = searchTerm;
 
-    // Set lastTerm AFTER clearSearchHighlights so it doesn't get reset to ''
-    if (window.searchNavigation) {
-        window.searchNavigation.lastTerm = searchTerm;
-    }
-
-    // Parse search terms with support for quoted phrases
     var searchWords = parseSearchTerms(searchTerm);
-    if (searchWords.length === 0) return;
+    if (!searchWords.length) return;
 
-    // Highlight in both note contents and titles
-    var elementsToHighlight = document.querySelectorAll('.noteentry, .css-title');
-    var totalHighlights = 0;
-
-    for (var i = 0; i < elementsToHighlight.length; i++) {
-        totalHighlights += highlightInElement(elementsToHighlight[i], searchWords);
+    // Only highlight note content when in notes or combined mode.
+    // In tags-only mode we skip this to avoid briefly highlighting title text.
+    if (isNotesSearchActive()) {
+        document.querySelectorAll('.noteentry, .css-title').forEach(function(el) {
+            highlightInElement(el, searchWords);
+        });
     }
 
-    // In unified/combined mode, also highlight matching tags before building the navigation list
-    var isCombined = (function () {
-        var comb = document.getElementById('search-combined-mode') || document.getElementById('search-combined-mode-mobile');
-        return (comb && comb.value === '1') || (window.searchManager && (window.searchManager.isCombinedModeActive(false) || window.searchManager.isCombinedModeActive(true)));
-    })();
-
-    if (isCombined && typeof window.highlightMatchingTags === 'function') {
-        try {
-            // Use the same search term as words
-            window.highlightMatchingTags(searchTerm);
-        } catch (e) { /* ignore */ }
+    if (isCombinedSearchActive() && typeof window.highlightMatchingTags === 'function') {
+        try { window.highlightMatchingTags(searchTerm); } catch (e) {}
     }
 
-    // Refresh the list of highlights to include the new DOM elements (words, titles, overlays, AND tags)
     updateHighlightsList();
 
-    // Apply active highlight state
     if (window.searchNavigation) {
         var nav = window.searchNavigation;
-        var hasMatches = nav.highlights.length > 0;
-
-        if (hasMatches) {
+        if (nav.highlights.length > 0) {
             if (nav.pendingAutoScroll) {
-                // Apply first highlight as active and mark scroll as done
                 nav.pendingAutoScroll = false;
-                nav.currentHighlightIndex = 0;
-
-                // Use navigateToHighlight to ensure consistent orange class and scroll behavior
                 navigateToHighlight(0, true);
             } else if (nav.currentHighlightIndex >= 0) {
-                // Restore previous active highlight
-                var idx = Math.min(nav.currentHighlightIndex, nav.highlights.length - 1);
-                nav.highlights[idx].classList.add('search-highlight-active');
+                nav.highlights[Math.min(nav.currentHighlightIndex, nav.highlights.length - 1)]
+                    .classList.add('search-highlight-active');
             }
         }
     }
 }
 
-/**
- * Check if notes search mode is currently active
- * @returns {boolean} True if in notes search mode
- */
 function isNotesSearchActive() {
-    // Check combined mode first (Unified Search)
-    try {
-        var combinedModeInput = document.getElementById('search-combined-mode');
-        var combinedModeInputMobile = document.getElementById('search-combined-mode-mobile');
-        if ((combinedModeInput && combinedModeInput.value === '1') ||
-            (combinedModeInputMobile && combinedModeInputMobile.value === '1')) {
-            return true;
-        }
-        if (window.searchManager && typeof window.searchManager.isCombinedModeActive === 'function') {
-            if (window.searchManager.isCombinedModeActive(false) || window.searchManager.isCombinedModeActive(true)) {
-                return true;
-            }
-        }
-    } catch (e) { /* ignore */ }
+    if (isCombinedSearchActive()) return true;
 
-    // Method 1: Check button state
     var notesBtn = document.getElementById('search-notes-btn') || document.getElementById('search-notes-btn-mobile');
-    if (notesBtn && notesBtn.classList.contains('active')) {
-        return true;
-    }
+    if (notesBtn && notesBtn.classList.contains('active')) return true;
 
-    // Method 2: Check SearchManager if available
     if (window.searchManager) {
         try {
             if (typeof window.searchManager.getActiveSearchType === 'function') {
-                var desktopType = window.searchManager.getActiveSearchType(false);
-                var mobileType = window.searchManager.getActiveSearchType(true);
-                if (desktopType === 'notes' || mobileType === 'notes') {
-                    return true;
-                }
+                var dt = window.searchManager.getActiveSearchType(false);
+                var mt = window.searchManager.getActiveSearchType(true);
+                if (dt === 'notes' || mt === 'notes') return true;
             }
-            if (window.searchManager.currentSearchType === 'notes') {
-                return true;
-            }
-        } catch (e) {
-            // Ignore errors and continue to next method
-        }
-    }
-
-    // Method 3: Check hidden input fields
-    try {
-        var hiddenNotesDesktop = document.getElementById('search-in-notes');
-        var hiddenNotesMobile = document.getElementById('search-in-notes-mobile');
-        if ((hiddenNotesDesktop && hiddenNotesDesktop.value === '1') ||
-            (hiddenNotesMobile && hiddenNotesMobile.value === '1')) {
-            return true;
-        }
-    } catch (e) {
-        // Ignore errors
+            if (window.searchManager.currentSearchType === 'notes') return true;
+        } catch (e) {}
     }
 
     return false;
 }
 
-/**
- * Highlight search words within a specific element
- */
-function highlightInElement(element, searchWords) {
-    var highlightCount = 0;
+// ---------- Text highlighting ----------
 
-    // Special handling for input elements (like note titles)
+/**
+ * Find all non-overlapping match positions for searchWords in normalizedText.
+ * Returns array of {start, end} objects sorted by position.
+ */
+function findMatchPositions(normalizedText, searchWords) {
+    var matches = [];
+    for (var i = 0; i < searchWords.length; i++) {
+        var needle = removeAccents(searchWords[i]);
+        var pos = 0;
+        while (pos < normalizedText.length) {
+            var found = normalizedText.indexOf(needle, pos);
+            if (found === -1) break;
+            matches.push({ start: found, end: found + searchWords[i].length });
+            pos = found + 1;
+        }
+    }
+    matches.sort(function(a, b) { return a.start - b.start; });
+    // Remove overlaps
+    var result = [];
+    for (var i = 0; i < matches.length; i++) {
+        var m = matches[i];
+        if (!result.length || m.start >= result[result.length - 1].end) result.push(m);
+    }
+    return result;
+}
+
+function highlightInElement(element, searchWords) {
+    // Input elements: use overlay highlights
     if (element.tagName === 'INPUT' && element.type === 'text') {
-        // Ensure the input is visible and rendered; if not, skip overlay logic
         var elStyle = window.getComputedStyle(element);
-        var rects = element.getClientRects();
-        if (elStyle.display === 'none' || elStyle.visibility === 'hidden' || element.offsetWidth === 0 || rects.length === 0 || element.offsetParent === null) {
-            return 0; // no overlays for hidden inputs (visible heading will be highlighted instead)
+        if (elStyle.display === 'none' || elStyle.visibility === 'hidden' ||
+            element.offsetWidth === 0 || element.getClientRects().length === 0 ||
+            element.offsetParent === null) {
+            return;
         }
         var inputValue = element.value;
-        var normalizedInputValue = removeAccents(inputValue);
-
-        // Clear any existing overlays for this input
+        var normalizedValue = removeAccents(inputValue);
         clearInputOverlays(element);
-
-        // Find matches for each search word with accent-insensitive matching
         for (var i = 0; i < searchWords.length; i++) {
-            var searchWord = searchWords[i];
-            var normalizedSearchWord = removeAccents(searchWord);
-            var startPos = 0;
-
-            while (startPos < normalizedInputValue.length) {
-                var foundPos = normalizedInputValue.indexOf(normalizedSearchWord, startPos);
-                if (foundPos === -1) break;
-
-                // Get the actual word from the original input (with accents)
-                var actualWord = inputValue.substring(foundPos, foundPos + searchWord.length);
-                createInputOverlay(element, actualWord, foundPos);
-                highlightCount++;
-                startPos = foundPos + 1;
+            var needle = removeAccents(searchWords[i]);
+            var pos = 0;
+            while (pos < normalizedValue.length) {
+                var found = normalizedValue.indexOf(needle, pos);
+                if (found === -1) break;
+                createInputOverlay(element, inputValue.substring(found, found + searchWords[i].length), found);
+                pos = found + 1;
             }
         }
-
-        return highlightCount;
+        return;
     }
 
-    // Function to recursively process text nodes with accent-insensitive matching
+    // Regular elements: wrap matching text nodes in <span class="search-highlight">
     function processTextNodes(node) {
-        if (node.nodeType === 3) { // Node.TEXT_NODE
+        if (node.nodeType === 3) { // TEXT_NODE
             var text = node.textContent;
-            var normalizedText = removeAccents(text);
-            var hasMatch = false;
+            var matches = findMatchPositions(removeAccents(text), searchWords);
+            if (!matches.length) return;
 
-            // Check if any search word matches (accent-insensitive)
-            for (var i = 0; i < searchWords.length; i++) {
-                var normalizedSearchWord = removeAccents(searchWords[i]);
-                if (normalizedText.indexOf(normalizedSearchWord) !== -1) {
-                    hasMatch = true;
-                    break;
-                }
+            var frag = document.createDocumentFragment();
+            var lastIndex = 0;
+            for (var i = 0; i < matches.length; i++) {
+                var m = matches[i];
+                if (m.start > lastIndex) frag.appendChild(document.createTextNode(text.substring(lastIndex, m.start)));
+                var span = document.createElement('span');
+                span.className = 'search-highlight';
+                span.textContent = text.substring(m.start, m.end);
+                frag.appendChild(span);
+                lastIndex = m.end;
             }
-
-            if (hasMatch) {
-                // Build highlighted HTML by finding all matches
-                var fragments = [];
-                var lastIndex = 0;
-
-                // Find all positions where search words match (accent-insensitive)
-                var matches = [];
-                for (var i = 0; i < searchWords.length; i++) {
-                    var normalizedSearchWord = removeAccents(searchWords[i]);
-                    var startPos = 0;
-
-                    while (startPos < normalizedText.length) {
-                        var foundPos = normalizedText.indexOf(normalizedSearchWord, startPos);
-                        if (foundPos === -1) break;
-
-                        matches.push({
-                            start: foundPos,
-                            end: foundPos + searchWords[i].length,
-                            length: searchWords[i].length
-                        });
-                        startPos = foundPos + 1;
-                    }
-                }
-
-                // Sort matches by position and remove overlaps
-                matches.sort(function (a, b) { return a.start - b.start; });
-                var cleanedMatches = [];
-                for (var matchIdx = 0; matchIdx < matches.length; matchIdx++) {
-                    var match = matches[matchIdx];
-                    var overlap = false;
-                    for (var cleanIdx = 0; cleanIdx < cleanedMatches.length; cleanIdx++) {
-                        if (match.start < cleanedMatches[cleanIdx].end && match.end > cleanedMatches[cleanIdx].start) {
-                            overlap = true;
-                            break;
-                        }
-                    }
-                    if (!overlap) {
-                        cleanedMatches.push(match);
-                    }
-                }
-
-                // Build the highlighted HTML
-                var tempDiv = document.createElement('div');
-                lastIndex = 0;
-                for (var matchIdx = 0; matchIdx < cleanedMatches.length; matchIdx++) {
-                    var match = cleanedMatches[matchIdx];
-                    // Add text before match
-                    if (match.start > lastIndex) {
-                        tempDiv.appendChild(document.createTextNode(text.substring(lastIndex, match.start)));
-                    }
-                    // Add highlighted match
-                    var span = document.createElement('span');
-                    span.className = 'search-highlight';
-                    // We remove inline styles to allow CSS classes to handle the color
-                    span.textContent = text.substring(match.start, match.end);
-                    tempDiv.appendChild(span);
-                    highlightCount++;
-                    lastIndex = match.end;
-                }
-                // Add remaining text
-                if (lastIndex < text.length) {
-                    tempDiv.appendChild(document.createTextNode(text.substring(lastIndex)));
-                }
-
-                // Replace the text node with highlighted nodes
-                var parent = node.parentNode;
-                while (tempDiv.firstChild) {
-                    parent.insertBefore(tempDiv.firstChild, node);
-                }
-                parent.removeChild(node);
-            }
-        } else if (node.nodeType === 1 && !node.classList.contains('search-highlight')) { // Node.ELEMENT_NODE
-            // Skip hidden containers (e.g. markdown editor while preview is visible)
-            // to avoid generating hidden highlights that break navigation/scroll.
-            try {
-                if (window.getComputedStyle(node).display === 'none') {
-                    return;
-                }
-            } catch (e) { /* ignore */ }
-            // Process child nodes (but don't process already highlighted spans)
-            var children = [];
-            for (var childIdx = 0; childIdx < node.childNodes.length; childIdx++) {
-                children.push(node.childNodes[childIdx]);
-            }
-            for (var childIdx = 0; childIdx < children.length; childIdx++) {
-                processTextNodes(children[childIdx]);
-            }
+            if (lastIndex < text.length) frag.appendChild(document.createTextNode(text.substring(lastIndex)));
+            node.parentNode.insertBefore(frag, node);
+            node.parentNode.removeChild(node);
+        } else if (node.nodeType === 1 && !node.classList.contains('search-highlight')) { // ELEMENT_NODE
+            // Skip hidden containers (e.g. markdown editor in preview mode)
+            try { if (window.getComputedStyle(node).display === 'none') return; } catch (e) {}
+            Array.from(node.childNodes).forEach(processTextNodes);
         }
     }
 
     processTextNodes(element);
-    return highlightCount;
 }
 
-/**
- * Clear all search highlights
- * @param {boolean} skipResetNavigation - If true, preserve currentHighlightIndex
- */
+// ---------- Highlight clearing ----------
+
 function clearSearchHighlights(skipResetNavigation) {
-    // Reset navigation state
     if (window.searchNavigation) {
         if (!skipResetNavigation) {
             window.searchNavigation.currentHighlightIndex = -1;
             window.searchNavigation.lastTerm = '';
         }
-        // Always clear the highlights array of DOM nodes as they are about to be destroyed/normalized
         window.searchNavigation.highlights = [];
     }
 
-    // Remove active highlight class from all elements
-    document.querySelectorAll('.search-highlight-active, .tag-highlight').forEach(function (el) {
+    document.querySelectorAll('.search-highlight-active, .tag-highlight').forEach(function(el) {
         el.classList.remove('search-highlight-active');
         el.classList.remove('tag-highlight');
     });
 
-    var highlights = document.querySelectorAll('.search-highlight');
-    for (var i = 0; i < highlights.length; i++) {
-        var highlight = highlights[i];
+    document.querySelectorAll('.search-highlight').forEach(function(highlight) {
         var parent = highlight.parentNode;
-        // Replace the highlight span with its text content
         parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
-        // Normalize the parent to merge adjacent text nodes
         parent.normalize();
-    }
+    });
 
-    // Clear input overlays
-    var overlays = document.querySelectorAll('.input-highlight-overlay');
-    for (var i = 0; i < overlays.length; i++) {
-        overlays[i].remove();
-    }
+    document.querySelectorAll('.input-highlight-overlay').forEach(function(o) { o.remove(); });
 
-    // Clean up event listeners if no more overlays exist
     if (window.inputOverlayListeners) {
         window.removeEventListener('scroll', updateAllOverlayPositions, true);
         window.removeEventListener('resize', updateAllOverlayPositions);
         window.inputOverlayListeners = false;
     }
 
-    // Clean up input event listeners
-    var inputsWithListeners = document.querySelectorAll('input[data-overlay-listener]');
-    for (var i = 0; i < inputsWithListeners.length; i++) {
-        inputsWithListeners[i].removeAttribute('data-overlay-listener');
-        // Note: We don't remove the event listener as it's anonymous, but the attribute prevents duplicates
-    }
+    document.querySelectorAll('input[data-overlay-listener]').forEach(function(el) {
+        el.removeAttribute('data-overlay-listener');
+    });
 }
 
-/**
- * Create an overlay highlight for a word in an input element
- */
+// ---------- Input overlay highlights ----------
+
 function createInputOverlay(inputElement, word, startIndex) {
-    // Create a hidden span to measure text width
-    var measurer = document.createElement('span');
-    measurer.style.position = 'absolute';
-    measurer.style.visibility = 'hidden';
-    measurer.style.whiteSpace = 'pre';
-    measurer.style.font = window.getComputedStyle(inputElement).font;
-    document.body.appendChild(measurer);
-
-    // Measure the position of the word
-    var textBefore = inputElement.value.substring(0, startIndex);
-    measurer.textContent = textBefore;
-    var offsetX = measurer.offsetWidth;
-
-    measurer.textContent = word;
-    var wordWidth = measurer.offsetWidth;
-
-    document.body.removeChild(measurer);
-
-    // Create the overlay
     var overlay = document.createElement('div');
     overlay.className = 'input-highlight-overlay';
     overlay.style.position = 'absolute';
-
-    // Add data attribute to link it to the input
     overlay.setAttribute('data-input-id', inputElement.id);
     overlay.setAttribute('data-start-index', startIndex.toString());
     overlay.setAttribute('data-word', word);
-
-    // Position the overlay
-    positionOverlay(overlay, inputElement, offsetX, wordWidth);
-
     document.body.appendChild(overlay);
 
-    // Add input event listener to update overlay when content changes
+    // Use accurate mirror-based measurement; fall back to simple span measurer
+    var rect = measureWordRectInInput(inputElement, startIndex, word);
+    if (rect) {
+        positionOverlay(overlay, inputElement, rect.left - inputElement.getBoundingClientRect().left, rect.width);
+    } else {
+        var m = measureWordOffsetSimple(inputElement, startIndex, word);
+        positionOverlay(overlay, inputElement, m.offsetX, m.wordWidth);
+    }
+
     if (!inputElement.hasAttribute('data-overlay-listener')) {
         inputElement.setAttribute('data-overlay-listener', 'true');
-        inputElement.addEventListener('input', function () {
-            // Delay to allow the input value to update
-            setTimeout(function () {
-                // Re-run highlighting for this specific input
+        inputElement.addEventListener('input', function() {
+            setTimeout(function() {
                 var searchInput = document.getElementById('unified-search') || document.getElementById('unified-search-mobile');
                 if (searchInput && searchInput.value.trim()) {
                     var searchWords = parseSearchTerms(searchInput.value.trim());
-                    if (searchWords.length > 0) {
-                        highlightInElement(inputElement, searchWords);
-                    }
+                    if (searchWords.length > 0) highlightInElement(inputElement, searchWords);
                 }
             }, 50);
         });
     }
 
-    // Update position on scroll or resize
     if (!window.inputOverlayListeners) {
         window.inputOverlayListeners = true;
         window.addEventListener('scroll', updateAllOverlayPositions, true);
@@ -508,53 +286,43 @@ function positionOverlay(overlay, inputElement, offsetX, wordWidth) {
     var inputRect = inputElement.getBoundingClientRect();
     var inputStyle = window.getComputedStyle(inputElement);
 
-    // Calculate padding and borders to position overlay correctly
     var paddingLeft = parseInt(inputStyle.paddingLeft) || 0;
     var borderLeft = parseInt(inputStyle.borderLeftWidth) || 0;
     var borderTop = parseInt(inputStyle.borderTopWidth) || 0;
-
-    // Calculate position accounting for page scroll
     var scrollX = window.pageXOffset || document.documentElement.scrollLeft;
     var scrollY = window.pageYOffset || document.documentElement.scrollTop;
-
-    // Position overlay to align with the input's content area (account for borders)
-    var contentTop = inputRect.top + scrollY + borderTop;
     var overlayHeight = inputElement.clientHeight;
-
-    // Try to align overlay to the text baseline by using the computed line-height
     var computedLineHeight = parseFloat(inputStyle.lineHeight);
     if (!computedLineHeight || isNaN(computedLineHeight)) {
         computedLineHeight = parseFloat(inputStyle.fontSize) || overlayHeight;
     }
-
-    // Clamp line height to available overlay height
     var finalLineHeight = Math.min(computedLineHeight, overlayHeight);
-
-    // Center the overlay vertically on the text line inside the input
     var topOffsetForText = Math.round((overlayHeight - finalLineHeight) / 2);
-    var overlayTop = contentTop + topOffsetForText;
 
     overlay.style.left = (inputRect.left + scrollX + paddingLeft + borderLeft + offsetX) + 'px';
-    overlay.style.top = overlayTop + 'px';
+    overlay.style.top = (inputRect.top + scrollY + borderTop + topOffsetForText) + 'px';
     overlay.style.width = wordWidth + 'px';
     overlay.style.height = finalLineHeight + 'px';
     overlay.style.lineHeight = finalLineHeight + 'px';
 }
 
-/**
- * Measure the bounding rect of a substring inside a text input
- * Creates a hidden mirror element to accurately measure word position
- * @param {HTMLInputElement} inputElement - The input element containing the text
- * @param {number} startIndex - Start position of the word in the input value
- * @param {string} word - The word to measure
- * @returns {Object|null} Object with {left, top, width, height} in viewport coords, or null if failed
- */
+function measureWordOffsetSimple(inputElement, startIndex, word) {
+    var measurer = document.createElement('span');
+    measurer.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;font:' +
+        window.getComputedStyle(inputElement).font;
+    document.body.appendChild(measurer);
+    measurer.textContent = inputElement.value.substring(0, startIndex);
+    var offsetX = measurer.offsetWidth;
+    measurer.textContent = word;
+    var wordWidth = measurer.offsetWidth;
+    document.body.removeChild(measurer);
+    return { offsetX: offsetX, wordWidth: wordWidth };
+}
+
 function measureWordRectInInput(inputElement, startIndex, word) {
     try {
         var inputRect = inputElement.getBoundingClientRect();
         var style = window.getComputedStyle(inputElement);
-
-        // Create a hidden mirror div that matches the input's styling exactly
         var mirror = document.createElement('div');
         mirror.style.position = 'absolute';
         mirror.style.left = (inputRect.left + (window.pageXOffset || document.documentElement.scrollLeft)) + 'px';
@@ -578,86 +346,41 @@ function measureWordRectInInput(inputElement, startIndex, word) {
         mirror.style.height = inputRect.height + 'px';
         mirror.style.lineHeight = style.lineHeight;
 
-        // Build the mirror content: text before + highlighted word + text after
-        var before = document.createTextNode(inputElement.value.substring(0, startIndex));
         var span = document.createElement('span');
         span.textContent = word;
-        span.style.display = 'inline-block';
-        span.style.background = 'transparent';
-        var after = document.createTextNode(inputElement.value.substring(startIndex + word.length));
-
-        mirror.appendChild(before);
+        span.style.cssText = 'display:inline-block;background:transparent';
+        mirror.appendChild(document.createTextNode(inputElement.value.substring(0, startIndex)));
         mirror.appendChild(span);
-        mirror.appendChild(after);
+        mirror.appendChild(document.createTextNode(inputElement.value.substring(startIndex + word.length)));
 
         document.body.appendChild(mirror);
         var rect = span.getBoundingClientRect();
         document.body.removeChild(mirror);
-
         return { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
     } catch (e) {
         return null;
     }
 }
 
-/**
- * Update positions of all overlay highlights
- */
 function updateAllOverlayPositions() {
-    var overlays = document.querySelectorAll('.input-highlight-overlay');
-    for (var i = 0; i < overlays.length; i++) {
-        var overlay = overlays[i];
-        var inputId = overlay.getAttribute('data-input-id');
-        var inputElement = document.getElementById(inputId);
-
-        if (inputElement) {
-            var startIndex = parseInt(overlay.getAttribute('data-start-index'));
-            var word = overlay.getAttribute('data-word');
-
-            // Use the centralized measurement helper to compute bounds for the word
-            var rect = measureWordRectInInput(inputElement, startIndex, word);
-            if (rect) {
-                // Convert rect.left/top (viewport coords) to offsets relative to input's content
-                var inputRect = inputElement.getBoundingClientRect();
-                var offsetX = rect.left - inputRect.left;
-                var wordWidth = rect.width;
-                positionOverlay(overlay, inputElement, offsetX, wordWidth);
-            } else {
-                // Fallback to the older measurer technique if measurement failed
-                var measurer = document.createElement('span');
-                measurer.style.position = 'absolute';
-                measurer.style.visibility = 'hidden';
-                measurer.style.whiteSpace = 'pre';
-                measurer.style.font = window.getComputedStyle(inputElement).font;
-                document.body.appendChild(measurer);
-
-                var textBefore = inputElement.value.substring(0, startIndex);
-                measurer.textContent = textBefore;
-                var offsetX = measurer.offsetWidth;
-
-                measurer.textContent = word;
-                var wordWidth = measurer.offsetWidth;
-
-                document.body.removeChild(measurer);
-
-                positionOverlay(overlay, inputElement, offsetX, wordWidth);
-            }
+    document.querySelectorAll('.input-highlight-overlay').forEach(function(overlay) {
+        var inputElement = document.getElementById(overlay.getAttribute('data-input-id'));
+        if (!inputElement) { overlay.remove(); return; }
+        var startIndex = parseInt(overlay.getAttribute('data-start-index'));
+        var word = overlay.getAttribute('data-word');
+        var rect = measureWordRectInInput(inputElement, startIndex, word);
+        if (rect) {
+            positionOverlay(overlay, inputElement, rect.left - inputElement.getBoundingClientRect().left, rect.width);
         } else {
-            // Input element no longer exists, remove overlay
-            overlay.remove();
+            var m = measureWordOffsetSimple(inputElement, startIndex, word);
+            positionOverlay(overlay, inputElement, m.offsetX, m.wordWidth);
         }
-    }
+    });
 }
 
-/**
- * Clear existing overlays for an input element
- * @param {HTMLInputElement} inputElement - The input element to clear overlays for
- */
 function clearInputOverlays(inputElement) {
-    var overlays = document.querySelectorAll('.input-highlight-overlay[data-input-id="' + inputElement.id + '"]');
-    for (var i = 0; i < overlays.length; i++) {
-        overlays[i].remove();
-    }
+    document.querySelectorAll('.input-highlight-overlay[data-input-id="' + inputElement.id + '"]')
+        .forEach(function(o) { o.remove(); });
 }
 
 /**
@@ -674,47 +397,47 @@ window.searchNavigation = {
  * Update the list of available highlights in the current view
  */
 function updateHighlightsList() {
-    // Get standard highlights, input overlays, and matching tags
     var highlights = Array.from(document.querySelectorAll('.search-highlight, .input-highlight-overlay, .tag-highlight'));
 
-    // Exclude highlights inside hidden containers (markdown editor in preview mode, etc.)
-    highlights = highlights.filter(function (el) {
+    // Exclude highlights inside hidden containers (e.g. markdown editor in preview mode)
+    highlights = highlights.filter(function(el) {
         if (el.classList.contains('input-highlight-overlay')) return true;
-
         try {
             var current = el;
             while (current && current !== document.body) {
-                if (window.getComputedStyle(current).display === 'none') {
-                    return false;
-                }
+                if (window.getComputedStyle(current).display === 'none') return false;
                 current = current.parentElement;
             }
-        } catch (e) { /* keep highlight if style lookup fails */ }
-
+        } catch (e) {}
         return true;
     });
 
-    // Sort highlights by their position in the DOM (vertical position first, then horizontal)
-    highlights.sort(function (a, b) {
-        var rectA = a.getBoundingClientRect();
-        var rectB = b.getBoundingClientRect();
-        var topA = rectA.top + window.scrollY;
-        var topB = rectB.top + window.scrollY;
-
-        if (Math.abs(topA - topB) < 5) { // Same line approximately
-            return rectA.left - rectB.left;
-        }
-        return topA - topB;
+    highlights.sort(function(a, b) {
+        var ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+        var ta = ra.top + window.scrollY, tb = rb.top + window.scrollY;
+        return Math.abs(ta - tb) < 5 ? ra.left - rb.left : ta - tb;
     });
 
     window.searchNavigation.highlights = highlights;
 }
 
 /**
- * Navigate to a specific highlight by index
- * @param {number} index - The index of the highlight to navigate to
- * @param {boolean} smooth - Whether to use smooth scrolling (default: true)
+ * Returns the combined height of sticky UI elements above the given target.
  */
+function getStickyOffset(target) {
+    var offset = 0;
+    var tabBar = document.getElementById('app-tab-bar');
+    if (tabBar) offset += tabBar.offsetHeight;
+    if (!target.closest('.css-title, .note-header .title')) {
+        var noteCard = target.closest('.notecard');
+        if (noteCard) {
+            var noteHeader = noteCard.querySelector('.note-header');
+            if (noteHeader) offset += noteHeader.offsetHeight;
+        }
+    }
+    return offset;
+}
+
 function navigateToHighlight(index, smooth) {
     var highlights = window.searchNavigation.highlights;
     if (!highlights || index < 0 || index >= highlights.length) return;
@@ -722,71 +445,59 @@ function navigateToHighlight(index, smooth) {
     var target = highlights[index];
     if (!target) return;
 
-    // Remove active class from ALL highlight elements in the DOM to be safe
-    document.querySelectorAll('.search-highlight-active, .input-highlight-overlay.search-highlight-active, .tag-highlight.search-highlight-active').forEach(h => {
-        h.classList.remove('search-highlight-active');
-    });
-
-    // Add active class
+    document.querySelectorAll('.search-highlight-active, .input-highlight-overlay.search-highlight-active, .tag-highlight.search-highlight-active')
+        .forEach(function(h) { h.classList.remove('search-highlight-active'); });
     target.classList.add('search-highlight-active');
 
-    // Scroll to the target.
-    const isMobile = window.innerWidth <= 800;
-    const behavior = (smooth === false || isMobile) ? 'auto' : 'smooth';
-    const initialDelay = isMobile ? 250 : 50;
+    var isMobile = window.innerWidth <= 800;
+    var behavior = (smooth === false || isMobile) ? 'auto' : 'smooth';
+    var isTagHighlight = target.classList.contains('tag-highlight') ||
+        !!target.closest('.clickable-tag-wrapper, .note-tags-row');
 
-    setTimeout(() => {
+    setTimeout(function() {
         try {
+            // In split mode, scroll only the inner pane to keep the outer toolbar stable
             var noteEntry = target.closest('.noteentry');
-            var inSplitMode = !!(noteEntry && noteEntry.classList.contains('markdown-split-mode'));
-
-            if (inSplitMode) {
-                // In split view, keep toolbar stable by scrolling only the local pane
-                // (preview/editor) instead of outer containers.
-                var pane = null;
-                var current = target.parentElement;
-                while (current && current !== noteEntry) {
-                    var style = window.getComputedStyle(current);
-                    var canScroll = (style.overflowY === 'auto' || style.overflowY === 'scroll') &&
-                        current.scrollHeight > current.clientHeight;
-                    if (canScroll) {
-                        pane = current;
-                        break;
-                    }
-                    current = current.parentElement;
+            if (noteEntry && noteEntry.classList.contains('markdown-split-mode')) {
+                var pane = target.parentElement;
+                while (pane && pane !== noteEntry) {
+                    var ps = window.getComputedStyle(pane);
+                    if ((ps.overflowY === 'auto' || ps.overflowY === 'scroll') &&
+                        pane.scrollHeight > pane.clientHeight) break;
+                    pane = pane.parentElement;
                 }
-
-                if (pane) {
+                if (pane && pane !== noteEntry) {
                     var paneRect = pane.getBoundingClientRect();
                     var targetRect = target.getBoundingClientRect();
-                    var desired = pane.scrollTop + (targetRect.top - paneRect.top) - 16;
-                    var maxTop = Math.max(0, pane.scrollHeight - pane.clientHeight);
-                    desired = Math.max(0, Math.min(desired, maxTop));
-                    pane.scrollTo({ top: desired, behavior: behavior });
-                } else if (typeof target.scrollIntoView === 'function') {
-                    target.scrollIntoView({
-                        behavior: behavior,
-                        block: 'nearest',
-                        inline: isMobile ? 'start' : 'nearest'
+                    var desired = pane.scrollTop + (targetRect.top - paneRect.top) + (isTagHighlight ? 0 : -16);
+                    pane.scrollTo({
+                        top: Math.max(0, Math.min(desired, pane.scrollHeight - pane.clientHeight)),
+                        behavior: behavior
                     });
+                    return;
                 }
-            } else if (typeof target.scrollIntoView === 'function') {
-                var stickyOffset = 0;
-                var tabBar = document.getElementById('app-tab-bar');
-                if (tabBar) {
-                    stickyOffset += tabBar.offsetHeight;
-                }
-                var noteCard = target.closest('.notecard');
-                if (noteCard) {
-                    var noteHeader = noteCard.querySelector('.note-header');
-                    if (noteHeader) {
-                        stickyOffset += noteHeader.offsetHeight;
-                    }
-                }
+            }
 
-                // Keep the match below sticky UI to avoid hiding the note toolbar.
+            var stickyOffset = getStickyOffset(target);
+            var vpH = window.innerHeight || document.documentElement.clientHeight;
+
+            if (isTagHighlight) {
+                // Tags live in the note header — already visible when the note loads.
+                // Only scroll if the tag is completely outside the viewport (e.g. user scrolled far away).
+                var tagRect = target.getBoundingClientRect();
+                var tagVisible = tagRect.top >= 0 && tagRect.bottom <= vpH;
+                if (!tagVisible) {
+                    target.scrollIntoView({ behavior: behavior, block: 'nearest', inline: 'nearest' });
+                }
+                // No verification pass needed: we either did nothing or brought it barely into view.
+                return;
+            }
+
+            // Only scroll if the element is not already visible in the viewport.
+            var rect = target.getBoundingClientRect();
+            var alreadyVisible = rect.top >= stickyOffset + 12 && rect.bottom <= vpH;
+            if (!alreadyVisible) {
                 target.style.scrollMarginTop = (stickyOffset + 12) + 'px';
-
                 target.scrollIntoView({
                     behavior: behavior,
                     block: 'start',
@@ -794,42 +505,26 @@ function navigateToHighlight(index, smooth) {
                 });
             }
         } catch (e) {
-            try { target.scrollIntoView(behavior === 'smooth'); } catch (_) { /* ignore */ }
+            try { target.scrollIntoView(behavior === 'smooth'); } catch (_) {}
         }
-    }, initialDelay);
+    }, isMobile ? 250 : 50);
 
     window.searchNavigation.currentHighlightIndex = index;
 }
 
-/**
- * Navigate to the previous highlight
- */
 function navigateToPreviousHighlight() {
     updateHighlightsList();
     var highlights = window.searchNavigation.highlights;
-
-    if (highlights.length === 0) return;
-
+    if (!highlights.length) return;
     var prevIndex = window.searchNavigation.currentHighlightIndex - 1;
-
-    if (prevIndex >= 0) {
-        navigateToHighlight(prevIndex, true);
-    } else {
-        // Wrap around to the last one
-        navigateToHighlight(highlights.length - 1, true);
-    }
+    navigateToHighlight(prevIndex >= 0 ? prevIndex : highlights.length - 1, true);
 }
 
-/**
- * Navigate to the next highlight
- */
 function navigateToNextHighlight() {
-    // Refresh the list to ensure we have current DOM elements
     updateHighlightsList();
     var highlights = window.searchNavigation.highlights;
 
-    // If no highlights found in the list, try re-parsing once in case they were lost
-    if (highlights.length === 0) {
+    if (!highlights.length) {
         var searchInput = document.getElementById('unified-search') || document.getElementById('unified-search-mobile');
         var term = searchInput ? searchInput.value.trim() : '';
         if (term) {
@@ -839,139 +534,68 @@ function navigateToNextHighlight() {
         }
     }
 
-    if (highlights.length === 0) {
-        // No highlights in current note, try to go to next note
-        navigateToNextNote();
-        return;
-    }
+    if (!highlights.length) { navigateToNextNote(); return; }
 
     var nextIndex = window.searchNavigation.currentHighlightIndex + 1;
-
-    // If we're at the end or if we haven't started yet (-1 + 1 = 0)
     if (nextIndex < highlights.length) {
-        // Use 'auto' scroll if we are just moving to the next one quickly, 
-        // helps with rapid Enter presses
         navigateToHighlight(nextIndex, true);
     } else {
-        // End of current note reached, go to next note
         navigateToNextNote();
     }
 }
 
-/**
- * Navigate to the next note in the list
- */
 function navigateToNextNote() {
-    // 1. Collect all notes in document order
-    const rawNotes = Array.from(document.querySelectorAll('[data-action="load-note"]'));
-    if (rawNotes.length === 0) return;
+    var allNotes = Array.from(document.querySelectorAll('[data-action="load-note"]'));
+    if (!allNotes.length) return;
 
-    // 2. Identify all unique note instances, favoring visible ones (Desktop vs Mobile)
-    const noteInstances = new Map();
-    rawNotes.forEach(el => {
-        const id = el.getAttribute('data-note-id');
+    // De-duplicate by note ID, preferring visible instances
+    var seen = new Map();
+    allNotes.forEach(function(el) {
+        var id = el.getAttribute('data-note-id');
         if (!id) return;
-
-        // Visibility check: not hidden by class and has dimensions
-        const isHidden = el.classList.contains('search-hidden') ||
-            el.closest('.search-hidden') !== null ||
+        var hidden = el.classList.contains('search-hidden') || !!el.closest('.search-hidden') ||
             (el.offsetWidth === 0 && el.offsetHeight === 0);
-
-        const currentEntry = noteInstances.get(id);
-        if (!currentEntry || (!isHidden && currentEntry.hidden)) {
-            noteInstances.set(id, { element: el, hidden: isHidden });
+        if (!seen.has(id) || (!hidden && seen.get(id).hidden)) {
+            seen.set(id, { el: el, hidden: hidden });
         }
     });
 
-    // 3. Filter to keep only the preferred instances that are NOT hidden
-    const validNotes = rawNotes.filter(el => {
-        const id = el.getAttribute('data-note-id');
-        const instance = noteInstances.get(id);
-        return instance && instance.element === el && !instance.hidden;
-    });
+    var notes = Array.from(seen.values()).filter(function(e) { return !e.hidden; }).map(function(e) { return e.el; });
 
-    if (validNotes.length === 0) {
-        // Try a last resort: if no "visible" notes but some are rendered without search-hidden
-        // (sometimes offsetWidth is 0 for newly loaded sidebar content)
-        const fallbackNotes = rawNotes.filter(el => !el.classList.contains('search-hidden') && !el.closest('.search-hidden'));
-        if (fallbackNotes.length > 0) {
-            // Apply same de-duplication
-            const fallbackMap = new Map();
-            fallbackNotes.forEach(el => {
-                const id = el.getAttribute('data-note-id');
-                if (!fallbackMap.has(id)) fallbackMap.set(id, el);
-            });
-            const deduplicatedFallback = fallbackNotes.filter(el => fallbackMap.get(el.getAttribute('data-note-id')) === el);
-            _performNoteNavigation(deduplicatedFallback);
-        }
-        return;
+    // Fallback: use all non-search-hidden notes if no visible ones found
+    if (!notes.length) {
+        var usedIds = new Set();
+        notes = allNotes.filter(function(el) {
+            var id = el.getAttribute('data-note-id');
+            if (el.classList.contains('search-hidden') || !!el.closest('.search-hidden') || usedIds.has(id)) return false;
+            usedIds.add(id);
+            return true;
+        });
     }
 
-    _performNoteNavigation(validNotes);
-}
+    if (!notes.length) return;
 
-/**
- * Internal helper to perform navigation among a list of notes
- * @param {Array<HTMLElement>} noteList - List of note elements to navigate through
- * @private
- */
-function _performNoteNavigation(noteList) {
-    // Find current position by note ID (robust across sidebars)
-    const currentNoteEl = document.querySelector('.selected-note[data-action="load-note"]');
-    const currentNoteId = currentNoteEl ? currentNoteEl.getAttribute('data-note-id') : null;
-
-    let currentIndex = -1;
-    if (currentNoteId) {
-        currentIndex = noteList.findIndex(el => el.getAttribute('data-note-id') === currentNoteId);
-    }
-
-    // Pick next (wrap around)
-    const nextNote = noteList[currentIndex + 1] || noteList[0];
+    var currentEl = document.querySelector('.selected-note[data-action="load-note"]');
+    var currentId = currentEl ? currentEl.getAttribute('data-note-id') : null;
+    var currentIndex = notes.findIndex(function(el) { return el.getAttribute('data-note-id') === currentId; });
+    var nextNote = notes[currentIndex + 1] || notes[0];
 
     if (nextNote) {
-        // Reset scroll position for new note
         if (window.searchNavigation) {
             window.searchNavigation.currentHighlightIndex = -1;
-        }
-
-        // Trigger load
-        nextNote.click();
-
-        // Flag for auto-scroll after load
-        if (window.searchNavigation) {
             window.searchNavigation.pendingAutoScroll = true;
         }
+        nextNote.click();
     }
 }
 
-/**
- * Automatically scroll to the first highlight
- */
 function scrollToFirstHighlight() {
-    // Increased timeout to ensure note content and highlights are fully rendered 
-    // before attempting to scroll to avoid inaccurate positioning.
-    const isMobile = window.innerWidth <= 800;
-    const delay = isMobile ? 800 : 400;
-
-    // On mobile, explicitly start the horizontal transition to the right column immediately
-    // Disabled to stop auto-opening notes after a search
-    // if (isMobile && typeof window.scrollToRightColumn === 'function') {
-    //     window.scrollToRightColumn();
-    // }
-
-    setTimeout(function () {
+    var isMobile = window.innerWidth <= 800;
+    setTimeout(function() {
         updateHighlightsList();
-
-        if (window.searchNavigation && window.searchNavigation.highlights && window.searchNavigation.highlights.length > 0) {
-            // Mark that we've handled the auto-scroll
+        if (window.searchNavigation && window.searchNavigation.highlights.length > 0) {
             window.searchNavigation.pendingAutoScroll = false;
-
-            // Set index and apply active class via the standard navigation function
-            // which now handles the double-check for scroll position accuracy
-            // On mobile, avoid automatically scrolling the list down to the first result
-            if (!isMobile) {
-                navigateToHighlight(0, true);
-            }
+            if (!isMobile) navigateToHighlight(0, true);
         }
-    }, delay);
+    }, isMobile ? 800 : 400);
 }
