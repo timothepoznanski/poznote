@@ -996,6 +996,7 @@
     "toggle_placeholder": "Toggle",
     "toggle_content_placeholder": "在折叠块内在此输入…",
     "toggle_after_placeholder": "在折叠块外在此输入…",
+    "code_block_normal": "普通代码块",
     "code_block_placeholder_before": "在此处输入文本…",
     "code_block_placeholder_after": "在此处输入文本…",
     "youtube_video": "YouTube 视频",
@@ -1096,6 +1097,7 @@
     "share_modal": {
       "custom_token": "自定义 Token (可选)",
       "custom_token_placeholder": "my_custom_token-1",
+      "custom_token_example": "例如，这将得到：",
       "password": "密码 (可选)",
       "password_placeholder": "输入密码",
       "indexable": "允许搜索引擎索引",
@@ -1118,6 +1120,10 @@
       "custom_token": "自定义 Token (可选)",
       "custom_token_placeholder": "my_custom_token-1",
       "indexable": "允许搜索引擎索引",
+      "tasklist_access": "任务列表公开访问权限",
+      "access_read_only": "只读",
+      "access_check_only": "仅勾选或取消勾选",
+      "access_full": "完全编辑",
       "password": "密码 (可选)",
       "password_placeholder": "输入密码",
       "error_prefix": "错误: ",
@@ -1131,6 +1137,12 @@
       "renewed": "文件夹共享链接已更新",
       "failed_renew": "更新文件夹共享失败",
       "failed_revoke": "撤销文件夹共享失败"
+    },
+    "task_permissions": {
+      "title": "任务列表权限",
+      "read_only": "只读",
+      "check_only": "仅勾选或取消勾选",
+      "full": "完全编辑"
     },
     "note": {
       "new_note": "新笔记",
@@ -1536,12 +1548,16 @@
     "no_filter_results": "没有与您的搜索匹配的笔记。",
     "table": {
       "note": "笔记",
-      "url": "共享 URL"
+      "url": "共享 URL",
+      "folder": "文件夹",
+      "token": "Token",
+      "actions": "操作"
     },
     "actions": {
       "open": "打开",
       "revoke": "撤销"
     },
+    "direct_share": "共享笔记",
     "indexable": "可被索引",
     "password_protected": "受密码保护",
     "add_password_title": "添加密码保护",
@@ -1932,6 +1948,7 @@
         "repair_registry_error": "重建出错: {{error}}"
       },
       "administrator": "管理员",
+      "admin_note": "只有用户1是管理员。其他用户不能拥有管理员权限。",
       "processing": "正在处理...",
       "errors_label": "错误：",
       "network_error": "网络错误：",

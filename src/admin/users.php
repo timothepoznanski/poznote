@@ -261,6 +261,8 @@ $v = getAppVersion();
                 </div>
                 <p class="email-note">
                     <?php echo t_h('multiuser.admin.email_usage_note', [], 'Email addresses are only used for OIDC authentication if configured. Poznote does not send any emails.'); ?>
+                    <br>
+                    <?php echo t_h('multiuser.admin.admin_note', [], 'Only user 1 is an administrator. Other users cannot have administrator privileges.'); ?>
                 </p>
             </div>
         </div>
@@ -292,6 +294,9 @@ $v = getAppVersion();
                                 <div class="user-info">
                                     <div class="user-username">
                                         <?php echo htmlspecialchars($user['username']); ?>
+                                        <?php if ($user['id'] == 1): ?>
+                                            (<?php echo t_h('multiuser.admin.administrator', [], 'Administrator'); ?>)
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </td>

@@ -327,6 +327,20 @@
         }
     }
 
+    function getTaskAccessMode() {
+        const config = getPublicConfig();
+        const accessMode = config && typeof config.taskAccessMode === 'string' ? config.taskAccessMode : 'full';
+        return ['read_only', 'check_only', 'full'].includes(accessMode) ? accessMode : 'full';
+    }
+
+    function canToggleTasks() {
+        return ['check_only', 'full'].includes(getTaskAccessMode());
+    }
+
+    function canFullyEditTasks() {
+        return getTaskAccessMode() === 'full';
+    }
+
     // Task list interaction (Checkboxes)
     document.addEventListener('change', function (e) {
         if (!e.target || !e.target.matches('.task-checkbox, .markdown-task-checkbox')) return;
@@ -334,6 +348,11 @@
         const checkbox = e.target;
         const config = getPublicConfig();
         if (!config || !config.token) return;
+
+        if (!canToggleTasks()) {
+            checkbox.checked = !checkbox.checked;
+            return;
+        }
 
         const isMarkdown = checkbox.classList.contains('markdown-task-checkbox');
         const completed = checkbox.checked;
@@ -385,6 +404,8 @@
      * @param {HTMLInputElement} input - The input element containing the task text
      */
     function handleAddTask(input) {
+        if (!canFullyEditTasks()) return;
+
         const text = input.value.trim();
         if (!text) return;
 
@@ -487,6 +508,7 @@
     document.addEventListener('click', function (e) {
         const deleteBtn = e.target.closest('.public-task-delete-btn');
         if (deleteBtn) {
+            if (!canFullyEditTasks()) return;
             const taskItem = deleteBtn.closest('.task-item');
             const config = getPublicConfig();
             const deleteMessage = config?.i18n?.deleteTask || 'Delete this task?';
@@ -511,6 +533,7 @@
 
         // Click on structured task text to edit
         if (e.target.matches('.task-item .task-text')) {
+            if (!canFullyEditTasks()) return;
             const taskItem = e.target.closest('.task-item');
             const idOrIndex = taskItem.getAttribute('data-index');
             enableInlineEdit(e.target, idOrIndex, false);
@@ -519,6 +542,7 @@
 
         // Click on markdown task text to edit
         if (e.target.matches('.task-list-item .task-text')) {
+            if (!canFullyEditTasks()) return;
             const taskItem = e.target.closest('.task-list-item');
             const idOrIndex = taskItem.getAttribute('data-line');
             enableInlineEdit(e.target, idOrIndex, true);
@@ -532,6 +556,8 @@
      * @param {boolean} isMarkdown - Whether this is a markdown task
      */
     function updateTaskText(idOrIndex, text, isMarkdown = false) {
+        if (!canFullyEditTasks()) return;
+
         const config = getPublicConfig();
         if (!config || !config.token) return;
         const apiBaseUrl = config.apiBaseUrl || 'api/v1';
@@ -557,6 +583,8 @@
      * @param {string|number} index - The task index
      */
     function deleteTask(index) {
+        if (!canFullyEditTasks()) return;
+
         const config = getPublicConfig();
         if (!config || !config.token || index === null) return;
         const apiBaseUrl = config.apiBaseUrl || 'api/v1';

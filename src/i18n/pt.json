@@ -1004,6 +1004,7 @@
     "toggle_placeholder": "Toggle",
     "toggle_content_placeholder": "Escreva dentro do toggle aqui…",
     "toggle_after_placeholder": "Escreva fora do toggle aqui…",
+    "code_block_normal": "Bloco normal",
     "code_block_placeholder_before": "Escreva texto aqui…",
     "code_block_placeholder_after": "Escreva texto aqui…",
     "youtube_video": "Vídeo do YouTube",
@@ -1103,6 +1104,7 @@
     "share_modal": {
       "custom_token": "Token personalizado (opcional)",
       "custom_token_placeholder": "meu_token_personalizado-1",
+      "custom_token_example": "O que dará, por exemplo:",
       "password": "Senha (opcional)",
       "password_placeholder": "Digite uma senha",
       "indexable": "Permitir indexação por motores de busca",
@@ -1125,6 +1127,10 @@
       "custom_token": "Token personalizado (opcional)",
       "custom_token_placeholder": "my_custom_token-1",
       "indexable": "Permitir indexação por motores de busca",
+      "tasklist_access": "Acesso público à lista de tarefas",
+      "access_read_only": "Somente leitura",
+      "access_check_only": "Apenas marcar ou desmarcar",
+      "access_full": "Edição completa",
       "password": "Senha (opcional)",
       "password_placeholder": "Digite uma senha",
       "error_prefix": "Erro: ",
@@ -1138,6 +1144,12 @@
       "renewed": "Link de compartilhamento da pasta renovado",
       "failed_renew": "Falha ao renovar o compartilhamento da pasta",
       "failed_revoke": "Falha ao revogar o compartilhamento da pasta"
+    },
+    "task_permissions": {
+      "title": "Permissões da lista de tarefas",
+      "read_only": "Somente leitura",
+      "check_only": "Apenas marcar ou desmarcar",
+      "full": "Edição completa"
     },
     "note": {
       "new_note": "Nova nota",
@@ -1502,7 +1514,7 @@
       },
       "tables": {
         "title": "Tabelas",
-        "col_name": "Nome",
+        "url": "URL compartilhada",
         "col_value": "Valor"
       },
       "math": {
@@ -1540,12 +1552,16 @@
     "no_filter_results": "Nenhuma nota corresponde à sua pesquisa.",
     "table": {
       "note": "Nota",
-      "url": "URL Compartilhada"
+      "url": "URL Compartilhada",
+      "folder": "Pasta",
+      "token": "Token",
+      "actions": "Ações"
     },
     "actions": {
       "open": "Abrir",
       "revoke": "Revogar"
     },
+    "direct_share": "Nota compartilhada",
     "indexable": "Indexável",
     "password_protected": "Protegido por senha",
     "add_password_title": "Adicionar proteção por senha",
@@ -1878,6 +1894,8 @@
         "repair_registry_error": "Erro de reconstrução: {{error}}"
       },
       "administrator": "Administrador",
+      "email_usage_note": "Os endereços de e-mail são usados apenas para autenticação OIDC, se configurado. Poznote não envia e-mails.",
+      "admin_note": "Apenas o usuário 1 é um administrador. Outros usuários não podem ter privilégios de administrador.",
       "processing": "Processando...",
       "errors_label": "Erros:",
       "network_error": "Erro de rede:",

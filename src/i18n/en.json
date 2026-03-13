@@ -533,6 +533,7 @@
     "strikethrough": "Strikethrough",
     "code": "Code",
     "inline_code": "Inline code",
+    "code_block_normal": "Normal block",
     "code_block": "Code block",
     "list": "List",
     "bullet_list": "Bullet list",
@@ -657,9 +658,14 @@
     "share_modal": {
       "custom_token": "Custom token (optional)",
       "custom_token_placeholder": "my_custom_token-1",
+      "custom_token_example": "This would give for example:",
       "password": "Password (optional)",
       "password_placeholder": "Enter a password",
       "indexable": "Allow indexing by search engines",
+      "tasklist_access": "Public task list access",
+      "access_read_only": "Read only",
+      "access_check_only": "Check or uncheck only",
+      "access_full": "Full edit",
       "create_url": "Create URL",
       "close": "Close",
       "error_prefix": "Error: ",
@@ -692,6 +698,12 @@
       "renewed": "Shared folder link renewed",
       "failed_renew": "Error renewing folder share",
       "failed_revoke": "Error revoking folder share"
+    },
+    "task_permissions": {
+      "title": "Task list permissions",
+      "read_only": "Read only",
+      "check_only": "Check or uncheck only",
+      "full": "Full edit"
     },
     "note": {
       "new_note": "New note",
@@ -1177,12 +1189,16 @@
     "no_filter_results": "No notes match your search.",
     "table": {
       "note": "Note",
-      "url": "Shared URL"
+      "url": "Shared URL",
+      "folder": "Folder",
+      "token": "Token",
+      "actions": "Actions"
     },
     "actions": {
       "open": "Open",
       "revoke": "Revoke"
     },
+    "direct_share": "Shared note",
     "indexable": "Indexable",
     "password_protected": "Password protected",
     "add_password_title": "Add password protection",
@@ -1663,5 +1679,12 @@
   },
   "backlinks": {
     "title": "Backlinks"
+  },
+  "multiuser": {
+    "admin": {
+      "administrator": "Administrator",
+      "email_usage_note": "Email addresses are only used for OIDC authentication if configured. Poznote does not send any emails.",
+      "admin_note": "Only user 1 is an administrator. Other users cannot have administrator privileges."
+    }
   }
 }

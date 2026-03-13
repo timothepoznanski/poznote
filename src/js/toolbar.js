@@ -327,6 +327,62 @@ function applyHtmlBlockStyle(style) {
   }
 }
 
+function getEditorFromRange(range) {
+  if (!range) return null;
+
+  var node = range.commonAncestorContainer;
+  if (node && node.nodeType === 3) {
+    node = node.parentNode;
+  }
+
+  if (!node || !node.closest) return null;
+
+  return node.closest('.noteentry, .markdown-editor, [contenteditable="true"]');
+}
+
+function captureScrollState(editor) {
+  var rightCol = document.getElementById('right_col');
+  var noteCard = editor && editor.closest ? editor.closest('.notecard') : null;
+
+  return {
+    rightCol: rightCol,
+    rightColTop: rightCol ? rightCol.scrollTop : null,
+    rightColLeft: rightCol ? rightCol.scrollLeft : null,
+    noteCard: noteCard,
+    noteCardTop: noteCard ? noteCard.scrollTop : null,
+    noteCardLeft: noteCard ? noteCard.scrollLeft : null,
+    windowX: window.scrollX || window.pageXOffset || 0,
+    windowY: window.scrollY || window.pageYOffset || 0
+  };
+}
+
+function restoreScrollState(scrollState) {
+  if (!scrollState) return;
+
+  if (scrollState.rightCol) {
+    scrollState.rightCol.scrollTop = scrollState.rightColTop;
+    scrollState.rightCol.scrollLeft = scrollState.rightColLeft;
+  }
+
+  if (scrollState.noteCard) {
+    scrollState.noteCard.scrollTop = scrollState.noteCardTop;
+    scrollState.noteCard.scrollLeft = scrollState.noteCardLeft;
+  }
+
+  window.scrollTo(scrollState.windowX, scrollState.windowY);
+}
+
+function focusEditorWithoutScroll(editor, scrollState) {
+  if (!editor) return;
+
+  try {
+    editor.focus({ preventScroll: true });
+  } catch (e) {
+    editor.focus();
+    restoreScrollState(scrollState);
+  }
+}
+
 function changeFontSize() {
   // Close any existing font size popup
   const existingPopup = document.querySelector('.font-size-popup');
@@ -401,15 +457,17 @@ function changeFontSize() {
       e.stopPropagation();
       const style = item.getAttribute('data-style');
 
-      // Ensure editor has focus
-      const editor = document.querySelector('[contenteditable="true"]');
+      // Restore selection on the same editor without changing the current scroll position.
+      const editor = getEditorFromRange(savedRange) || document.querySelector('.noteentry[contenteditable="true"], .markdown-editor, [contenteditable="true"]');
       if (editor && savedRange) {
-        editor.focus();
+        const scrollState = captureScrollState(editor);
+        focusEditorWithoutScroll(editor, scrollState);
 
         // Restore the saved selection
         const selection = window.getSelection();
         selection.removeAllRanges();
         selection.addRange(savedRange);
+        restoreScrollState(scrollState);
 
         if (savedIsMarkdown) {
           // Use the markdown-specific heading function
@@ -432,6 +490,8 @@ function changeFontSize() {
         if (noteentry) {
           noteentry.dispatchEvent(new Event('input', { bubbles: true }));
         }
+
+        requestAnimationFrame(() => restoreScrollState(scrollState));
       }
 
       // Close popup
@@ -512,7 +572,7 @@ function toggleCodeBlock() {
     // Add blank line before only if at first line, after only if at last line
     const brBefore = atFirstLine ? '<br>' : '';
     const brAfter = atLastLine ? '<br>' : '';
-    document.execCommand('insertHTML', false, `${brBefore}<pre class="code-block"><br></pre>${brAfter}`);
+    document.execCommand('insertHTML', false, `${brBefore}<pre class="code-block" data-language="NORMAL"><br></pre>${brAfter}`);
     return;
   }
 
@@ -530,7 +590,7 @@ function toggleCodeBlock() {
   // Add blank line before only if at first line, after only if at last line
   const brBefore = atFirstLine ? '<br>' : '';
   const brAfter = atLastLine ? '<br>' : '';
-  const codeHTML = `${brBefore}<pre class="code-block">${escapedText}</pre>${brAfter}`;
+  const codeHTML = `${brBefore}<pre class="code-block" data-language="NORMAL">${escapedText}</pre>${brAfter}`;
   document.execCommand('insertHTML', false, codeHTML);
 }
 

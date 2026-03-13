@@ -56,12 +56,26 @@
     background: #c43b3b;
 }
 
+.btn-primary {
+    background: #007db8;
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #006994;
+}
+
 .modal-content {
     background-color: var(--modal-bg, #ffffff);
     border-radius: 8px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     max-width: 500px;
     width: 90%;
+}
+
+body.shared-page .modal {
+    padding-top: 56px;
 }
 
 .modal-header {

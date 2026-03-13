@@ -108,3 +108,15 @@
     background-color: rgba(160, 160, 160, 0.25);
     color: #c0c0c0;
 }
+
+[data-theme="dark"] .task-permissions-option {
+    color: #f1f3f5;
+}
+
+[data-theme="dark"] .task-permissions-option span {
+    color: #f1f3f5;
+}
+
+[data-theme="dark"] .task-permissions-option input[type="radio"] {
+    accent-color: #4d9eff;
+}

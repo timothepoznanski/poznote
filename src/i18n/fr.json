@@ -1009,6 +1009,7 @@
     "strikethrough": "Barré",
     "code": "Code",
     "inline_code": "Code en ligne",
+    "code_block_normal": "Block normal",
     "code_block": "Bloc de code",
     "list": "Liste",
     "bullet_list": "Liste à puces",
@@ -1143,9 +1144,14 @@
     "share_modal": {
       "custom_token": "Jeton personnalisé (optionnel)",
       "custom_token_placeholder": "mon_jeton_personnalise-1",
+      "custom_token_example": "Ce qui donnera par exemple :",
       "password": "Mot de passe (optionnel)",
       "password_placeholder": "Saisir un mot de passe",
       "indexable": "Autoriser l'indexation par les moteurs de recherche",
+      "tasklist_access": "Accès public de la liste de tâches",
+      "access_read_only": "Lecture seule",
+      "access_check_only": "Cocher ou décocher uniquement",
+      "access_full": "Modification complète",
       "create_url": "Créer l'URL",
       "close": "Fermer",
       "error_prefix": "Erreur : ",
@@ -1175,6 +1181,12 @@
       "renewed": "Lien de partage du dossier renouvelé",
       "failed_renew": "Échec du renouvellement du partage du dossier",
       "failed_revoke": "Échec de la révocation du partage du dossier"
+    },
+    "task_permissions": {
+      "title": "Permissions de la liste de tâches",
+      "read_only": "Lecture seule",
+      "check_only": "Cocher ou décocher uniquement",
+      "full": "Modification complète"
     },
     "note": {
       "new_note": "Nouvelle note",
@@ -1580,12 +1592,16 @@
     "no_filter_results": "Aucune note ne correspond à votre recherche.",
     "table": {
       "note": "Note",
-      "url": "URL partagée"
+      "url": "URL partagée",
+      "folder": "Dossier",
+      "token": "Jeton",
+      "actions": "Actions"
     },
     "actions": {
       "open": "Ouvrir",
       "revoke": "Révoquer"
     },
+    "direct_share": "Note partagée",
     "indexable": "Indexable",
     "password_protected": "Protégé par mot de passe",
     "add_password_title": "Ajouter une protection par mot de passe",
@@ -1976,6 +1992,7 @@
         "repair_registry_error": "Erreur de reconstruction : {{error}}"
       },
       "administrator": "Administrateur",
+      "admin_note": "Seul l'utilisateur 1 est administrateur. Les autres utilisateurs ne peuvent pas avoir de privilèges d'administrateur.",
       "processing": "Traitement...",
       "errors_label": "Erreurs :",
       "network_error": "Erreur réseau :",

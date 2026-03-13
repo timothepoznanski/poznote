@@ -14,6 +14,14 @@
     max-width: min(var(--modal-max-width), 95%);
 }
 
+#shareModal .modal-content {
+    margin: 0 auto 0 !important;
+}
+
+#shareModal.modal {
+    padding-top: 40px !important;
+}
+
 .modal-content input,
 .modal-content select {
     font-size: 16px !important;

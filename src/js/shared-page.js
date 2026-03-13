@@ -22,7 +22,16 @@
             txtEnterNewPassword: body.getAttribute('data-txt-enter-new-password') || 'Enter new password',
             txtOpen: body.getAttribute('data-txt-open') || 'Open public view',
             txtRevoke: body.getAttribute('data-txt-revoke') || 'Revoke',
+            txtTaskPermissions: body.getAttribute('data-txt-task-permissions') || 'Task list permissions',
+            txtTaskReadOnly: body.getAttribute('data-txt-task-read-only') || 'Read only',
+            txtTaskCheckOnly: body.getAttribute('data-txt-task-check-only') || 'Check or uncheck only',
+            txtTaskFull: body.getAttribute('data-txt-task-full') || 'Full edit',
+            txtDirectShare: body.getAttribute('data-txt-direct-share') || 'Shared directly',
             txtNoFilterResults: body.getAttribute('data-txt-no-filter-results') || 'No notes match your search.',
+            txtTableNote: body.getAttribute('data-txt-table-note') || 'Note',
+            txtTableFolder: body.getAttribute('data-txt-table-folder') || 'Folder',
+            txtTableToken: body.getAttribute('data-txt-table-token') || 'Token',
+            txtTableActions: body.getAttribute('data-txt-table-actions') || 'Actions',
             txtToday: body.getAttribute('data-txt-today') || 'Today',
             txtYesterday: body.getAttribute('data-txt-yesterday') || 'Yesterday',
             txtDaysAgo: body.getAttribute('data-txt-days-ago') || 'days ago',
@@ -223,6 +232,28 @@
             alert(config.txtError + ': ' + error.message);
         });
     }
+
+    function updateAccessMode(noteId, accessMode) {
+        return fetch('/api/v1/notes/' + noteId + '/share', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({
+                access_mode: accessMode
+            })
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            var note = sharedNotes.find(function(n) { return n.note_id === noteId; });
+            if (note) {
+                note.access_mode = data.accessMode || accessMode;
+            }
+        });
+    }
     
     function updateToken(tokenSpan, newToken, originalToken, noteId) {
         if (newToken === originalToken || newToken === '') {
@@ -314,6 +345,21 @@
                 }, 2000);
             });
     }
+
+    function focusEditableToken(tokenSpan) {
+        if (!tokenSpan) return;
+        tokenSpan.focus();
+
+        var range = document.createRange();
+        range.selectNodeContents(tokenSpan);
+        range.collapse(false);
+
+        var selection = window.getSelection();
+        if (selection) {
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+    }
     
     function showPasswordModal(noteId, hasPassword) {
         var modal = document.createElement('div');
@@ -391,6 +437,88 @@
             }
         });
     }
+
+    function showTaskPermissionsModal(note) {
+        var modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'flex';
+
+        var content = document.createElement('div');
+        content.className = 'modal-content';
+
+        var header = document.createElement('div');
+        header.className = 'modal-header';
+        var h3 = document.createElement('h3');
+        h3.textContent = config.txtTaskPermissions;
+        header.appendChild(h3);
+        content.appendChild(header);
+
+        var body = document.createElement('div');
+        body.className = 'modal-body';
+
+        [
+            { value: 'read_only', label: config.txtTaskReadOnly },
+            { value: 'check_only', label: config.txtTaskCheckOnly },
+            { value: 'full', label: config.txtTaskFull }
+        ].forEach(function(option) {
+            var label = document.createElement('label');
+            label.className = 'task-permissions-option';
+
+            var radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = 'taskPermissionsMode';
+            radio.value = option.value;
+            radio.checked = (note.access_mode || 'full') === option.value;
+
+            var text = document.createElement('span');
+            text.textContent = option.label;
+
+            label.appendChild(radio);
+            label.appendChild(text);
+            body.appendChild(label);
+        });
+
+        content.appendChild(body);
+
+        var footer = document.createElement('div');
+        footer.className = 'modal-footer';
+
+        var cancelBtn = document.createElement('button');
+        cancelBtn.className = 'btn btn-secondary';
+        cancelBtn.textContent = config.txtCancel;
+        cancelBtn.addEventListener('click', function() {
+            document.body.removeChild(modal);
+        });
+
+        var saveBtn = document.createElement('button');
+        saveBtn.className = 'btn btn-primary';
+        saveBtn.textContent = config.txtSave;
+        saveBtn.addEventListener('click', function() {
+            var selected = body.querySelector('input[name="taskPermissionsMode"]:checked');
+            var accessMode = selected ? selected.value : 'full';
+
+            updateAccessMode(note.note_id, accessMode)
+                .then(function() {
+                    document.body.removeChild(modal);
+                    loadSharedNotes();
+                })
+                .catch(function(error) {
+                    alert(config.txtError + ': ' + error.message);
+                });
+        });
+
+        footer.appendChild(cancelBtn);
+        footer.appendChild(saveBtn);
+        content.appendChild(footer);
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                document.body.removeChild(modal);
+            }
+        });
+    }
     
     function renderSharedNotes() {
         var container = document.getElementById('sharedNotesContainer');
@@ -415,6 +543,31 @@
         
         var list = document.createElement('div');
         list.className = 'shared-notes-list';
+
+        var header = document.createElement('div');
+        header.className = 'shared-notes-header';
+
+        var headerNote = document.createElement('div');
+        headerNote.className = 'shared-notes-header-cell shared-notes-header-note';
+        headerNote.textContent = config.txtTableNote;
+        header.appendChild(headerNote);
+
+        var headerFolder = document.createElement('div');
+        headerFolder.className = 'shared-notes-header-cell shared-notes-header-folder';
+        headerFolder.textContent = config.txtTableFolder;
+        header.appendChild(headerFolder);
+
+        var headerToken = document.createElement('div');
+        headerToken.className = 'shared-notes-header-cell shared-notes-header-token';
+        headerToken.textContent = config.txtTableToken;
+        header.appendChild(headerToken);
+
+        var headerActions = document.createElement('div');
+        headerActions.className = 'shared-notes-header-cell shared-notes-header-actions';
+        headerActions.textContent = config.txtTableActions;
+        header.appendChild(headerActions);
+
+        list.appendChild(header);
         
         filteredNotes.forEach(function(note) {
             var item = document.createElement('div');
@@ -432,7 +585,11 @@
             noteLink.className = 'note-name';
             noteNameContainer.appendChild(noteLink);
 
-            // Folder badge / path (AFTER title)
+            item.appendChild(noteNameContainer);
+
+            var folderContainer = document.createElement('div');
+            folderContainer.className = 'note-folder-container';
+
             if (note.folder_path && note.folder_path !== 'Default') {
                 var folderBadge = document.createElement('a');
                 folderBadge.className = 'folder-badge';
@@ -452,16 +609,22 @@
                 
                 var pathText = document.createTextNode(note.folder_path);
                 folderBadge.appendChild(pathText);
-                
-                noteNameContainer.appendChild(folderBadge);
+
+                folderContainer.appendChild(folderBadge);
+            } else {
+                folderContainer.classList.add('is-empty');
+                folderContainer.textContent = config.txtDirectShare;
             }
-            
-            item.appendChild(noteNameContainer);
+
+            item.appendChild(folderContainer);
             
             // Token (editable if explicitly shared)
+            var tokenWrap = document.createElement('div');
+            tokenWrap.className = 'note-token-wrap';
             var tokenSpan = document.createElement('span');
             tokenSpan.className = 'note-token';
             if (!note.share_id) {
+                tokenWrap.classList.add('read-only');
                 tokenSpan.classList.add('read-only');
                 tokenSpan.textContent = note.shared_via_folder ? '(' + config.txtViaFolder + ')' : '';
                 tokenSpan.title = note.shared_via_folder ? config.txtViaFolder : '';
@@ -472,6 +635,7 @@
                 tokenSpan.title = config.txtEditToken;
                 tokenSpan.dataset.originalToken = note.token;
                 tokenSpan.dataset.noteId = note.note_id;
+                tokenWrap.classList.add('is-editable');
                 
                 tokenSpan.addEventListener('blur', function() {
                     var newToken = this.textContent.trim();
@@ -486,9 +650,29 @@
                         this.blur();
                     }
                 });
+
+                var editButton = document.createElement('button');
+                editButton.type = 'button';
+                editButton.className = 'note-token-edit-button';
+                editButton.title = config.txtEditToken;
+
+                var editIcon = document.createElement('i');
+                editIcon.className = 'lucide lucide-pencil note-token-edit-icon';
+                editButton.appendChild(editIcon);
+
+                editButton.addEventListener('click', function() {
+                    focusEditableToken(tokenSpan);
+                });
+
+                tokenWrap.appendChild(tokenSpan);
+                tokenWrap.appendChild(editButton);
+            }
+
+            if (!note.share_id) {
+                tokenWrap.appendChild(tokenSpan);
             }
             
-            item.appendChild(tokenSpan);
+            item.appendChild(tokenWrap);
             
             // Actions
             var actionsDiv = document.createElement('div');
@@ -511,6 +695,19 @@
                     });
                 })(note.note_id, note.hasPassword);
                 actionsDiv.appendChild(passwordBtn);
+            }
+
+            if (note.share_id && note.type === 'tasklist') {
+                var permissionsBtn = document.createElement('button');
+                permissionsBtn.className = 'btn btn-sm btn-permissions';
+                permissionsBtn.innerHTML = '<i class="lucide lucide-shield"></i>';
+                permissionsBtn.title = config.txtTaskPermissions;
+                (function(currentNote) {
+                    permissionsBtn.addEventListener('click', function() {
+                        showTaskPermissionsModal(currentNote);
+                    });
+                })(note);
+                actionsDiv.appendChild(permissionsBtn);
             }
             
             var openBtn = document.createElement('button');

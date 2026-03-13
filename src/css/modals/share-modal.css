@@ -9,6 +9,11 @@
 
 #shareModal .modal-content {
     max-width: 790px;
+    margin-top: 0 !important;
+}
+
+#shareModal.modal {
+    padding-top: 40px !important;
 }
 
 #shareModal .share-url {
@@ -66,7 +71,8 @@
 #shareModal .share-custom-label {
     display: block;
     margin: 30px 0 6px 0;
-    font-size: 13px;
+    font-size: 15px;
+    font-weight: 500;
     color: #666;
 }
 
@@ -82,6 +88,20 @@
     box-sizing: border-box;
 }
 
+#shareModal .share-custom-example,
+#folderShareModal .share-custom-example {
+    margin: 0 0 6px 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #777;
+    word-break: break-all;
+}
+
+#shareModal .share-custom-token-highlight,
+#folderShareModal .share-custom-token-highlight {
+    color: #dc3545;
+}
+
 /* Password */
 #shareModal .share-password-wrap {
     margin: 15px 0 12px 0;
@@ -90,7 +110,8 @@
 #shareModal .share-password-label {
     display: block;
     margin: 0 0 6px 0;
-    font-size: 13px;
+    font-size: 15px;
+    font-weight: 500;
     color: #666;
 }
 
@@ -109,6 +130,32 @@
 /* Indexable Toggle */
 #shareModal .share-indexable-wrap {
     margin: 0 0 20px 0;
+}
+
+#shareModal .share-task-access-wrap {
+    margin: 0 0 20px 0;
+    padding: 12px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+#shareModal .share-task-access-label {
+    padding: 0 6px;
+    font-size: 13px;
+    color: #666;
+}
+
+#shareModal .share-task-access-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0;
+    color: #333;
+    cursor: pointer;
+}
+
+#shareModal .share-task-access-option input {
+    margin: 0;
 }
 
 #shareModal .share-indexable-label {
@@ -243,7 +290,7 @@ html[data-theme='dark'] #shareModal .share-url {
 }
 
 html[data-theme='dark'] #shareModal .share-custom-label {
-    color: #a0a0a0;
+    color: #e6e6e6;
 }
 
 html[data-theme='dark'] #shareModal .share-custom-label .optional-text {
@@ -260,7 +307,31 @@ html[data-theme='dark'] #shareModal .share-custom-input::placeholder {
     color: #666;
 }
 
+html[data-theme='dark'] #shareModal .share-custom-example,
+html[data-theme='dark'] #folderShareModal .share-custom-example {
+    color: #d7d7d7;
+}
+
+html[data-theme='dark'] #shareModal .share-password-label {
+    color: #e6e6e6;
+}
+
+html[data-theme='dark'] #shareModal .share-custom-token-highlight,
+html[data-theme='dark'] #folderShareModal .share-custom-token-highlight {
+    color: #ff6b81;
+}
+
 html[data-theme='dark'] #shareModal .share-indexable-label {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] #shareModal .share-task-access-wrap {
+    border-color: #404040;
+    background: #252526;
+}
+
+html[data-theme='dark'] #shareModal .share-task-access-label,
+html[data-theme='dark'] #shareModal .share-task-access-option {
     color: #e0e0e0;
 }
 

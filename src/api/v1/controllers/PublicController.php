@@ -29,6 +29,11 @@ class PublicController {
 
         $sharedNote = $this->validateTokenAndGetNote($token);
         if (!$sharedNote) return;
+
+        if (!$this->canToggleTasks($sharedNote['access_mode'] ?? 'full')) {
+            $this->sendError(403, 'This shared task list is read-only');
+            return;
+        }
         
         $noteId = $sharedNote['note_id'];
         $input = json_decode(file_get_contents('php://input'), true);
@@ -43,6 +48,11 @@ class PublicController {
         $type = $note['type'] ?? 'note';
         $content = $this->getNoteContent($noteId, $type);
         $updatedContent = $content;
+
+        if (!$this->canEditTaskText($sharedNote['access_mode'] ?? 'full') && array_key_exists('text', $input)) {
+            $this->sendError(403, 'This shared task list only allows checking tasks');
+            return;
+        }
         
         if ($type === 'tasklist') {
             $index = (int)$id_or_index;
@@ -115,6 +125,11 @@ class PublicController {
 
         $sharedNote = $this->validateTokenAndGetNote($token);
         if (!$sharedNote) return;
+
+        if (!$this->canFullyEditTasks($sharedNote['access_mode'] ?? 'full')) {
+            $this->sendError(403, 'This shared task list does not allow adding tasks');
+            return;
+        }
         
         $noteId = $sharedNote['note_id'];
         $input = json_decode(file_get_contents('php://input'), true);
@@ -167,6 +182,11 @@ class PublicController {
 
         $sharedNote = $this->validateTokenAndGetNote($token);
         if (!$sharedNote) return;
+
+        if (!$this->canFullyEditTasks($sharedNote['access_mode'] ?? 'full')) {
+            $this->sendError(403, 'This shared task list does not allow deleting tasks');
+            return;
+        }
         
         $noteId = $sharedNote['note_id'];
         $note = $this->getNote($noteId);
@@ -190,7 +210,7 @@ class PublicController {
     }
 
     private function validateTokenAndGetNote(string $token): ?array {
-        $stmt = $this->con->prepare('SELECT note_id, password FROM shared_notes WHERE token = ?');
+        $stmt = $this->con->prepare('SELECT note_id, password, access_mode FROM shared_notes WHERE token = ?');
         $stmt->execute([$token]);
         $sharedNote = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$sharedNote) {
@@ -204,7 +224,24 @@ class PublicController {
                 return null;
             }
         }
+        $sharedNote['access_mode'] = $this->normalizeAccessMode($sharedNote['access_mode'] ?? 'full');
         return $sharedNote;
+    }
+
+    private function normalizeAccessMode(string $accessMode): string {
+        return in_array($accessMode, ['read_only', 'check_only', 'full'], true) ? $accessMode : 'full';
+    }
+
+    private function canToggleTasks(string $accessMode): bool {
+        return in_array($this->normalizeAccessMode($accessMode), ['check_only', 'full'], true);
+    }
+
+    private function canEditTaskText(string $accessMode): bool {
+        return $this->normalizeAccessMode($accessMode) === 'full';
+    }
+
+    private function canFullyEditTasks(string $accessMode): bool {
+        return $this->normalizeAccessMode($accessMode) === 'full';
     }
 
     private function getNote(int $noteId): ?array {

@@ -404,7 +404,7 @@ body.dark-mode #shareModal .share-url {
 
 html[data-theme='dark'] #shareModal .share-custom-label,
 body.dark-mode #shareModal .share-custom-label {
-    color: #a0a0a0;
+    color: #e6e6e6;
 }
 
 html[data-theme='dark'] #shareModal .share-custom-label .optional-text,
@@ -422,6 +422,25 @@ body.dark-mode #shareModal .share-custom-input {
 html[data-theme='dark'] #shareModal .share-custom-input::placeholder,
 body.dark-mode #shareModal .share-custom-input::placeholder {
     color: #666;
+}
+
+html[data-theme='dark'] #shareModal .share-custom-example,
+body.dark-mode #shareModal .share-custom-example,
+html[data-theme='dark'] #folderShareModal .share-custom-example,
+body.dark-mode #folderShareModal .share-custom-example {
+    color: #d7d7d7;
+}
+
+html[data-theme='dark'] #shareModal .share-password-label,
+body.dark-mode #shareModal .share-password-label {
+    color: #e6e6e6;
+}
+
+html[data-theme='dark'] #shareModal .share-custom-token-highlight,
+body.dark-mode #shareModal .share-custom-token-highlight,
+html[data-theme='dark'] #folderShareModal .share-custom-token-highlight,
+body.dark-mode #folderShareModal .share-custom-token-highlight {
+    color: #ff6b81;
 }
 
 html[data-theme='dark'] #shareModal .share-indexable-label,

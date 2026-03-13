@@ -702,7 +702,10 @@ function parseMarkdown(text) {
                         }
                         return match;
                     });
-                    if (codeBlockLang) {
+                    const normalizedCodeBlockLang = codeBlockLang ? codeBlockLang.trim().toLowerCase() : '';
+                    if (normalizedCodeBlockLang === 'normal') {
+                        result.push('<pre data-language="NORMAL"><code data-language="NORMAL">' + codeContent + '</code></pre>');
+                    } else if (codeBlockLang) {
                         result.push('<pre data-language="' + codeBlockLang + '"><code class="language-' + codeBlockLang + '">' + codeContent + '</code></pre>');
                     } else {
                         result.push('<pre><code>' + codeContent + '</code></pre>');
@@ -1161,7 +1164,10 @@ function parseMarkdown(text) {
     // Handle unclosed code block
     if (inCodeBlock && codeBlockContent.length > 0) {
         let codeContent = codeBlockContent.join('\n');
-        if (codeBlockLang) {
+        let normalizedCodeBlockLang = codeBlockLang ? codeBlockLang.trim().toLowerCase() : '';
+        if (normalizedCodeBlockLang === 'normal') {
+            result.push('<pre data-language="NORMAL"><code data-language="NORMAL">' + codeContent + '</code></pre>');
+        } else if (codeBlockLang) {
             result.push('<pre><code class="language-' + codeBlockLang + '">' + codeContent + '</code></pre>');
         } else {
             result.push('<pre><code>' + codeContent + '</code></pre>');
