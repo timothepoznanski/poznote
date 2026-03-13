@@ -198,6 +198,19 @@
         });
     });
 
+    // Edit button click handlers
+    document.querySelectorAll('.note-token-edit-button').forEach(function(editBtn) {
+        editBtn.addEventListener('click', function() {
+            var tokenWrap = this.closest('.note-token-wrap');
+            if (tokenWrap) {
+                var tokenSpan = tokenWrap.querySelector('.folder-token[contenteditable="true"]');
+                if (tokenSpan) {
+                    focusEditableToken(tokenSpan);
+                }
+            }
+        });
+    });
+
     // ============================================
     // API FUNCTIONS
     // ============================================
@@ -455,7 +468,26 @@
     // ============================================
     // UI HELPER FUNCTIONS
     // ============================================
-    
+
+    /**
+     * Focus on an editable token field and place cursor at the end
+     * @param {HTMLElement} tokenSpan - The token span element
+     */
+    function focusEditableToken(tokenSpan) {
+        if (!tokenSpan) return;
+        tokenSpan.focus();
+
+        var range = document.createRange();
+        range.selectNodeContents(tokenSpan);
+        range.collapse(false);
+
+        var selection = window.getSelection();
+        if (selection) {
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+    }
+
     /**
      * Update visibility of the clear filter button
      * Shows button only when filter has text

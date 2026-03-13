@@ -134,17 +134,26 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css"/>
 	<script src="js/theme-manager.js"></script>
 </head>
-<body class="shared-page" 
+<body class="shared-page"
       data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>"
       data-txt-error="<?php echo t_h('common.error', [], 'Error'); ?>"
+      data-txt-untitled="<?php echo t_h('common.untitled', [], 'Untitled'); ?>"
       data-txt-edit-token="<?php echo t_h('public.edit_token', [], 'Click to edit token'); ?>"
       data-txt-token-update-failed="<?php echo t_h('public.token_update_failed', [], 'Failed to update token'); ?>"
+      data-txt-network-error="<?php echo t_h('common.network_error', [], 'Network error'); ?>"
       data-txt-indexable="<?php echo t_h('public.indexable', [], 'Indexable'); ?>"
       data-txt-password-protected="<?php echo t_h('public.password_protected', [], 'Password protected'); ?>"
       data-txt-add-password-title="<?php echo t_h('public.add_password_title', [], 'Add password protection'); ?>"
       data-txt-change-password-title="<?php echo t_h('public.change_password_title', [], 'Change Password'); ?>"
       data-txt-password-remove-hint="<?php echo t_h('public.password_remove_hint', [], 'Leave empty to remove password protection.'); ?>"
       data-txt-enter-new-password="<?php echo t_h('public.enter_new_password', [], 'Enter new password'); ?>"
+      data-txt-open="<?php echo t_h('public.actions.open', [], 'Open public view'); ?>"
+      data-txt-revoke="<?php echo t_h('public.actions.revoke', [], 'Revoke'); ?>"
+      data-txt-direct-share="<?php echo t_h('public.direct_share', [], 'Shared directly'); ?>"
+      data-txt-no-filter-results="<?php echo t_h('public.no_filter_results', [], 'No folders match your search.'); ?>"
+      data-txt-table-folder="<?php echo t_h('public.table.folder', [], 'Folder'); ?>"
+      data-txt-table-token="<?php echo t_h('public.table.token', [], 'Token'); ?>"
+      data-txt-table-actions="<?php echo t_h('public.table.actions', [], 'Actions'); ?>"
       data-txt-cancel="<?php echo t_h('common.cancel', [], 'Cancel'); ?>"
       data-txt-save="<?php echo t_h('common.save', [], 'Save'); ?>"
       data-txt-confirm-revoke="<?php echo t_h('shared_folders.confirm_revoke', [], 'Are you sure you want to revoke sharing for this folder? All notes in this folder will also be unshared.'); ?>">
@@ -185,6 +194,13 @@ $currentLang = getUserLanguage();
 				echo '<p class="empty-hint">' . t_h('shared_folders.page.shared_folders_hint', [], 'Share a folder by clicking the cloud button in the folder toolbar.') . '</p>';
 				echo '</div>';
 			} else {
+				// Table header
+				echo '<div class="shared-notes-header">';
+				echo '<div class="shared-notes-header-cell shared-notes-header-note">' . t_h('public.table.folder', [], 'Folder') . '</div>';
+				echo '<div class="shared-notes-header-cell shared-notes-header-token">' . t_h('public.table.token', [], 'Token') . '</div>';
+				echo '<div class="shared-notes-header-cell shared-notes-header-actions">' . t_h('public.table.actions', [], 'Actions') . '</div>';
+				echo '</div>';
+
 			foreach($shared_folders as $folder) {
 				$folder_id = htmlspecialchars($folder['folder_id'] ?? '', ENT_QUOTES);
 				$folder_name = htmlspecialchars($folder['folder_name'] ?? '', ENT_QUOTES);
@@ -209,12 +225,20 @@ $currentLang = getUserLanguage();
 				
 				// Folder name container
 				echo '<div class="note-name-container">';
-				echo '<span class="folder-name-path" title="' . $folder_path . '"><i class="lucide lucide-folder"></i> ' . $folder_path . ' (' . $note_count . ')</span>';
+				echo '<a href="index.php?folder_id=' . $folder_id . '" class="folder-name-path" title="' . $folder_path . '"><i class="lucide lucide-folder"></i> ' . $folder_path . ' (' . $note_count . ')</a>';
 				echo '</div>';
-				
+
 				// Token (editable if direct)
+				$wrapClass = 'note-token-wrap' . ($is_direct ? ' is-editable' : ' read-only');
+				echo '<div class="' . $wrapClass . '">';
 				echo '<span class="note-token folder-token' . ($is_direct ? '' : ' read-only') . '" ' . ($is_direct ? 'contenteditable="true"' : '') . ' data-folder-id="' . $folder_id . '" data-original-token="' . $token . '" title="' . ($is_direct ? t_h('public.edit_token', [], 'Click to edit token') : '') . '">' . $token . '</span>';
-				
+				if ($is_direct) {
+					echo '<button class="note-token-edit-button" type="button" aria-label="' . t_h('public.edit_token', [], 'Click to edit token') . '">';
+					echo '<i class="lucide lucide-pencil note-token-edit-icon"></i>';
+					echo '</button>';
+				}
+				echo '</div>';
+
 				// Actions (like note-actions)
 				echo '<div class="note-actions">';
 				

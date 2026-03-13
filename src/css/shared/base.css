@@ -159,7 +159,7 @@ body.shared-page {
 }
 
 .shared-content {
-    margin-top: -20px;
+    margin-top: 0;
 }
 
 #sharedNotesContainer {

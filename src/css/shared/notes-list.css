@@ -232,14 +232,20 @@
 
 .folder-name-path {
     font-weight: 500;
-    color: var(--text-color, #333);
+    color: var(--link-color, #007bff);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.folder-name-path:hover {
+    text-decoration: underline;
 }
 
 [data-theme="dark"] .folder-name-path {
-    color: var(--text-color, #eee);
+    color: #5daaff;
 }
 
 .folder-name-path i {
