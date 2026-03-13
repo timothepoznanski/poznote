@@ -1104,6 +1104,7 @@
     "share_modal": {
       "custom_token": "Token personalizado (opcional)",
       "custom_token_placeholder": "meu_token_personalizado-1",
+      "custom_token_example": "O que dará, por exemplo:",
       "password": "Senha (opcional)",
       "password_placeholder": "Digite uma senha",
       "indexable": "Permitir indexação por motores de busca",
@@ -1503,7 +1504,7 @@
       },
       "tables": {
         "title": "Tabelas",
-        "col_name": "Nome",
+        "url": "URL compartilhada",
         "col_value": "Valor"
       },
       "math": {
@@ -1541,7 +1542,9 @@
     "no_filter_results": "Nenhuma nota corresponde à sua pesquisa.",
     "table": {
       "note": "Nota",
-      "url": "URL Compartilhada"
+      "url": "URL Compartilhada",
+      "token": "Token",
+      "actions": "Ações"
     },
     "actions": {
       "open": "Abrir",
@@ -1879,6 +1882,8 @@
         "repair_registry_error": "Erro de reconstrução: {{error}}"
       },
       "administrator": "Administrador",
+      "email_usage_note": "Os endereços de e-mail são usados apenas para autenticação OIDC, se configurado. Poznote não envia e-mails.",
+      "admin_note": "Apenas o usuário 1 é um administrador. Outros usuários não podem ter privilégios de administrador.",
       "processing": "Processando...",
       "errors_label": "Erros:",
       "network_error": "Erro de rede:",
@@ -2090,12 +2095,5 @@
   },
   "backlinks": {
     "title": "Backlinks"
-  },
-  "multiuser": {
-    "admin": {
-      "administrator": "Administrador",
-      "email_usage_note": "Os endereços de e-mail são usados apenas para autenticação OIDC, se configurado. Poznote não envia e-mails.",
-      "admin_note": "Apenas o usuário 1 é um administrador. Outros usuários não podem ter privilégios de administrador."
-    }
   }
 }

@@ -82,6 +82,19 @@
     box-sizing: border-box;
 }
 
+#shareModal .share-custom-example,
+#folderShareModal .share-custom-example {
+    margin: 0 0 6px 0;
+    font-size: 12px;
+    color: #777;
+    word-break: break-all;
+}
+
+#shareModal .share-custom-token-highlight,
+#folderShareModal .share-custom-token-highlight {
+    color: #dc3545;
+}
+
 /* Password */
 #shareModal .share-password-wrap {
     margin: 15px 0 12px 0;
@@ -258,6 +271,16 @@ html[data-theme='dark'] #shareModal .share-custom-input {
 
 html[data-theme='dark'] #shareModal .share-custom-input::placeholder {
     color: #666;
+}
+
+html[data-theme='dark'] #shareModal .share-custom-example,
+html[data-theme='dark'] #folderShareModal .share-custom-example {
+    color: #a0a0a0;
+}
+
+html[data-theme='dark'] #shareModal .share-custom-token-highlight,
+html[data-theme='dark'] #folderShareModal .share-custom-token-highlight {
+    color: #ff6b81;
 }
 
 html[data-theme='dark'] #shareModal .share-indexable-label {

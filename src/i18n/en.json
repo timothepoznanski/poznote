@@ -658,6 +658,7 @@
     "share_modal": {
       "custom_token": "Custom token (optional)",
       "custom_token_placeholder": "my_custom_token-1",
+      "custom_token_example": "This would give for example:",
       "password": "Password (optional)",
       "password_placeholder": "Enter a password",
       "indexable": "Allow indexing by search engines",
@@ -1178,7 +1179,9 @@
     "no_filter_results": "No notes match your search.",
     "table": {
       "note": "Note",
-      "url": "Shared URL"
+      "url": "Shared URL",
+      "token": "Token",
+      "actions": "Actions"
     },
     "actions": {
       "open": "Open",

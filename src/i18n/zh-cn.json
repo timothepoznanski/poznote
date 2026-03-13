@@ -1097,6 +1097,7 @@
     "share_modal": {
       "custom_token": "自定义 Token (可选)",
       "custom_token_placeholder": "my_custom_token-1",
+      "custom_token_example": "例如，这将得到：",
       "password": "密码 (可选)",
       "password_placeholder": "输入密码",
       "indexable": "允许搜索引擎索引",
@@ -1537,7 +1538,9 @@
     "no_filter_results": "没有与您的搜索匹配的笔记。",
     "table": {
       "note": "笔记",
-      "url": "共享 URL"
+      "url": "共享 URL",
+      "token": "Token",
+      "actions": "操作"
     },
     "actions": {
       "open": "打开",
@@ -1933,6 +1936,7 @@
         "repair_registry_error": "重建出错: {{error}}"
       },
       "administrator": "管理员",
+      "admin_note": "只有用户1是管理员。其他用户不能拥有管理员权限。",
       "processing": "正在处理...",
       "errors_label": "错误：",
       "network_error": "网络错误：",
@@ -2195,13 +2199,6 @@
       "modal_title": "孤立文件",
       "modal_title_user": "孤立文件 - 用户",
       "files_label": "文件"
-    }
-  },
-  "multiuser": {
-    "admin": {
-      "administrator": "管理员",
-      "email_usage_note": "电子邮件地址仅在配置后用于OIDC身份验证。Poznote不发送任何电子邮件。",
-      "admin_note": "只有用户1是管理员。其他用户不能拥有管理员权限。"
     }
   }
 }

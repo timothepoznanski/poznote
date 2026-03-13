@@ -405,6 +405,44 @@ function applyProtocolToPublicUrl(url, protocol) {
     return url;
 }
 
+function getPublicShareBaseUrl() {
+    const url = new URL(window.location.href);
+    let path = url.pathname;
+
+    if (/\/[^/]+\.php$/i.test(path)) {
+        path = path.replace(/\/[^/]+\.php$/i, '');
+    }
+
+    path = path.replace(/\/$/, '');
+    return url.origin + path;
+}
+
+function createCustomTokenExampleElement(exampleToken, shareType) {
+    const example = document.createElement('div');
+    const prefix = window.t ? window.t('index.share_modal.custom_token_example', null, 'Example:') : 'Example:';
+    const token = exampleToken || 'my-project-2026';
+    const baseUrl = getPublicShareBaseUrl();
+    const pathPrefix = shareType === 'folder' ? '/folder/' : '/';
+
+    example.className = 'share-custom-example';
+
+    const prefixSpan = document.createElement('span');
+    prefixSpan.textContent = prefix + ' ';
+
+    const urlPrefixSpan = document.createElement('span');
+    urlPrefixSpan.textContent = baseUrl + pathPrefix;
+
+    const tokenSpan = document.createElement('span');
+    tokenSpan.className = 'share-custom-token-highlight';
+    tokenSpan.textContent = token;
+
+    example.appendChild(prefixSpan);
+    example.appendChild(urlPrefixSpan);
+    example.appendChild(tokenSpan);
+
+    return example;
+}
+
 // ===========================
 // Share Modal Display
 // ===========================
@@ -677,6 +715,7 @@ function showShareModal(url, options) {
         input.placeholder = window.t ? window.t('index.share_modal.custom_token_placeholder', null, 'my_custom_token-1') : 'my_custom_token-1';
         input.className = 'share-custom-input';
         inputWrap.appendChild(label);
+        inputWrap.appendChild(createCustomTokenExampleElement('my-project-2026', 'note'));
         inputWrap.appendChild(input);
         content.appendChild(inputWrap);
 
@@ -1288,6 +1327,7 @@ function showFolderShareModal(url, options) {
         input.id = 'shareFolderCustomToken';
         input.placeholder = 'my-folder-link';
         inputWrap.appendChild(label);
+        inputWrap.appendChild(createCustomTokenExampleElement('my-folder-link', 'folder'));
         inputWrap.appendChild(input);
         content.appendChild(inputWrap);
 

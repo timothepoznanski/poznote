@@ -119,11 +119,19 @@
         margin-bottom: 10px;
     }
 
+    .shared-notes-header {
+        display: none;
+    }
+
     .note-name {
         min-width: auto;
         max-width: 100%;
         font-size: 16px;
         white-space: normal;
+    }
+
+    .note-token-wrap {
+        width: 100%;
     }
 
     .note-token {

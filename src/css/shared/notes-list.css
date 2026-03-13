@@ -11,6 +11,39 @@
     margin: 0 auto;
 }
 
+.shared-notes-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 0 0 12px 0;
+    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    margin-bottom: 4px;
+}
+
+.shared-notes-header-cell {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted, #666666);
+}
+
+.shared-notes-header-note {
+    flex: 0 0 auto;
+    min-width: 200px;
+}
+
+.shared-notes-header-token {
+    flex: 1;
+    min-width: 0;
+}
+
+.shared-notes-header-actions {
+    flex: 0 0 auto;
+    min-width: 92px;
+    text-align: right;
+}
+
 .shared-note-item {
     display: flex;
     align-items: center;
@@ -69,8 +102,17 @@
     font-size: 10px;
 }
 
+.note-token-wrap {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .note-token {
     flex: 1;
+    min-width: 0;
     font-family: monospace;
     font-size: 13px;
     color: var(--text-muted, #666666);
@@ -91,6 +133,14 @@
     outline: 2px solid #007bff;
     outline-offset: 2px;
     background-color: rgba(0, 123, 255, 0.05);
+}
+
+.note-token-edit-icon {
+    flex: 0 0 auto;
+    font-size: 14px;
+    color: var(--text-muted, #666666);
+    opacity: 0.8;
+    pointer-events: none;
 }
 
 .note-indexable {
@@ -202,6 +252,8 @@
     flex: 0 0 auto;
     display: flex;
     gap: 8px;
+    min-width: 92px;
+    justify-content: flex-end;
 }
 
 .empty-message {

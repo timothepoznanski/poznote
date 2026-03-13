@@ -23,6 +23,9 @@
             txtOpen: body.getAttribute('data-txt-open') || 'Open public view',
             txtRevoke: body.getAttribute('data-txt-revoke') || 'Revoke',
             txtNoFilterResults: body.getAttribute('data-txt-no-filter-results') || 'No notes match your search.',
+            txtTableNote: body.getAttribute('data-txt-table-note') || 'Note',
+            txtTableToken: body.getAttribute('data-txt-table-token') || 'Token',
+            txtTableActions: body.getAttribute('data-txt-table-actions') || 'Actions',
             txtToday: body.getAttribute('data-txt-today') || 'Today',
             txtYesterday: body.getAttribute('data-txt-yesterday') || 'Yesterday',
             txtDaysAgo: body.getAttribute('data-txt-days-ago') || 'days ago',
@@ -415,6 +418,26 @@
         
         var list = document.createElement('div');
         list.className = 'shared-notes-list';
+
+        var header = document.createElement('div');
+        header.className = 'shared-notes-header';
+
+        var headerNote = document.createElement('div');
+        headerNote.className = 'shared-notes-header-cell shared-notes-header-note';
+        headerNote.textContent = config.txtTableNote;
+        header.appendChild(headerNote);
+
+        var headerToken = document.createElement('div');
+        headerToken.className = 'shared-notes-header-cell shared-notes-header-token';
+        headerToken.textContent = config.txtTableToken;
+        header.appendChild(headerToken);
+
+        var headerActions = document.createElement('div');
+        headerActions.className = 'shared-notes-header-cell shared-notes-header-actions';
+        headerActions.textContent = config.txtTableActions;
+        header.appendChild(headerActions);
+
+        list.appendChild(header);
         
         filteredNotes.forEach(function(note) {
             var item = document.createElement('div');
@@ -459,6 +482,8 @@
             item.appendChild(noteNameContainer);
             
             // Token (editable if explicitly shared)
+            var tokenWrap = document.createElement('div');
+            tokenWrap.className = 'note-token-wrap';
             var tokenSpan = document.createElement('span');
             tokenSpan.className = 'note-token';
             if (!note.share_id) {
@@ -486,9 +511,19 @@
                         this.blur();
                     }
                 });
+
+                var editIcon = document.createElement('i');
+                editIcon.className = 'lucide lucide-pencil note-token-edit-icon';
+                editIcon.title = config.txtEditToken;
+                tokenWrap.appendChild(tokenSpan);
+                tokenWrap.appendChild(editIcon);
+            }
+
+            if (!note.share_id) {
+                tokenWrap.appendChild(tokenSpan);
             }
             
-            item.appendChild(tokenSpan);
+            item.appendChild(tokenWrap);
             
             // Actions
             var actionsDiv = document.createElement('div');

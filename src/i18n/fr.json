@@ -1144,6 +1144,7 @@
     "share_modal": {
       "custom_token": "Jeton personnalisé (optionnel)",
       "custom_token_placeholder": "mon_jeton_personnalise-1",
+      "custom_token_example": "Ce qui donnera par exemple :",
       "password": "Mot de passe (optionnel)",
       "password_placeholder": "Saisir un mot de passe",
       "indexable": "Autoriser l'indexation par les moteurs de recherche",
@@ -1581,7 +1582,9 @@
     "no_filter_results": "Aucune note ne correspond à votre recherche.",
     "table": {
       "note": "Note",
-      "url": "URL partagée"
+      "url": "URL partagée",
+      "token": "Jeton",
+      "actions": "Actions"
     },
     "actions": {
       "open": "Ouvrir",
@@ -1977,6 +1980,7 @@
         "repair_registry_error": "Erreur de reconstruction : {{error}}"
       },
       "administrator": "Administrateur",
+      "admin_note": "Seul l'utilisateur 1 est administrateur. Les autres utilisateurs ne peuvent pas avoir de privilèges d'administrateur.",
       "processing": "Traitement...",
       "errors_label": "Erreurs :",
       "network_error": "Erreur réseau :",
@@ -2244,12 +2248,5 @@
   },
   "backlinks": {
     "title": "Rétroliens"
-  },
-  "multiuser": {
-    "admin": {
-      "administrator": "Administrateur",
-      "email_usage_note": "Les adresses e-mail sont utilisées uniquement pour l'authentification OIDC si configurée. Poznote n'envoie aucun e-mail.",
-      "admin_note": "Seul l'utilisateur 1 est administrateur. Les autres utilisateurs ne peuvent pas avoir de privilèges d'administrateur."
-    }
   }
 }

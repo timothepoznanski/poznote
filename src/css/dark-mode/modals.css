@@ -424,6 +424,20 @@ body.dark-mode #shareModal .share-custom-input::placeholder {
     color: #666;
 }
 
+html[data-theme='dark'] #shareModal .share-custom-example,
+body.dark-mode #shareModal .share-custom-example,
+html[data-theme='dark'] #folderShareModal .share-custom-example,
+body.dark-mode #folderShareModal .share-custom-example {
+    color: #a0a0a0;
+}
+
+html[data-theme='dark'] #shareModal .share-custom-token-highlight,
+body.dark-mode #shareModal .share-custom-token-highlight,
+html[data-theme='dark'] #folderShareModal .share-custom-token-highlight,
+body.dark-mode #folderShareModal .share-custom-token-highlight {
+    color: #ff6b81;
+}
+
 html[data-theme='dark'] #shareModal .share-indexable-label,
 body.dark-mode #shareModal .share-indexable-label {
     color: #e0e0e0;

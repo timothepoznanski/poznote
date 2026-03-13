@@ -1100,6 +1100,7 @@
     "share_modal": {
       "custom_token": "Benutzerdefiniertes Token (optional)",
       "custom_token_placeholder": "mein_benutzerdefiniertes_token-1",
+      "custom_token_example": "Das ergibt zum Beispiel:",
       "password": "Passwort (optional)",
       "password_placeholder": "Geben Sie ein Passwort ein",
       "indexable": "Suchmaschinenindizierung zulassen",
@@ -1537,7 +1538,9 @@
     "no_filter_results": "Keine Notizen entsprechen Ihrer Suche.",
     "table": {
       "note": "Notiz",
-      "url": "Geteilte URL"
+      "url": "Geteilte URL",
+      "token": "Token",
+      "actions": "Aktionen"
     },
     "actions": {
       "open": "Öffnen",
@@ -1875,6 +1878,8 @@
         "repair_registry_error": "Rekonstruktionsfehler: {{error}}"
       },
       "administrator": "Administrator",
+      "email_usage_note": "E-Mail-Adressen werden nur für die OIDC-Authentifizierung verwendet, falls konfiguriert. Poznote sendet keine E-Mails.",
+      "admin_note": "Nur Benutzer 1 ist ein Administrator. Andere Benutzer können keine Administratorrechte haben.",
       "processing": "Verarbeitung...",
       "errors_label": "Fehler:",
       "network_error": "Netzwerkfehler:",
@@ -2086,12 +2091,5 @@
   },
   "backlinks": {
     "title": "Rückverweise"
-  },
-  "multiuser": {
-    "admin": {
-      "administrator": "Administrator",
-      "email_usage_note": "E-Mail-Adressen werden nur für die OIDC-Authentifizierung verwendet, falls konfiguriert. Poznote sendet keine E-Mails.",
-      "admin_note": "Nur Benutzer 1 ist ein Administrator. Andere Benutzer können keine Administratorrechte haben."
-    }
   }
 }
