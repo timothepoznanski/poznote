@@ -214,13 +214,7 @@ After installation, access Poznote in your web browser:
 
 ## Change Settings
 
-Poznote configuration is split between two locations:
-
-<details>
-<summary><strong>System Settings (`.env` file)</strong></summary>
-<br>
-
-System settings can be modified in the `.env` file. Several categories of settings are available:
+Most settings can be modified directly in the application through the settings page, but some system settings can only be changed in the `.env` file and require a container restart.
 
 - **Authentication** - Admin and user passwords
 - **Web Server** - HTTP port configuration
@@ -230,7 +224,7 @@ System settings can be modified in the `.env` file. Several categories of settin
 - **Git Sync** - GitHub and Forgejo synchronization
 - **MCP Server** - AI assistant integration
 
-**How to Modify System Settings**
+### Modify System Settings (`.env`)
 
 Navigate to your Poznote directory:
 ```bash
@@ -242,30 +236,13 @@ Stop the running Poznote container:
 docker compose down
 ```
 
-Edit and modify the `.env` file with your preferred text editor.
+Edit your `.env` file with your preferred text editor.
 
 Save the file and restart Poznote to apply changes:
 ```bash
 docker compose up -d
 ```
 
-</details>
-
-<details>
-<summary><strong>Application Settings (Settings Page)</strong></summary>
-<br>
-
-Additional settings are available through the Poznote web interface and are stored in the database or web browser local storage.
-
-**How to Modify Application Settings**
-
-1. Log in to Poznote
-2. Click on the **Settings** icon (⚙️) in the navigation bar
-3. Modify your preferences directly in the interface
-
-> **Note:** Settings in the web interface are stored in the database and persist across container restarts. Only `.env` file changes require container restart.
-
-</details>
 
 ## Authentication
 
@@ -273,24 +250,12 @@ Additional settings are available through the Poznote web interface and are stor
 <summary><strong>Traditional Authentication</strong></summary>
 <br>
 
-Poznote uses a password model based on the `.env` file. You define your administrator and standard user passwords in the `.env` file, and users log in with their username and password.
+Poznote uses a password model based on the `.env` file. Define your administrator and user passwords, and users log in with their username and password.
 
-#### Authentication Model
+#### Configuration
 
-- **Global Authentication**: Uses `POZNOTE_PASSWORD` (admin) and `POZNOTE_PASSWORD_USER` (standard users) defined in your `.env` file.
-- **User-Specific Passwords**: You can set individual passwords for standard users using `POZNOTE_PASSWORD_{USERNAME}` in your `.env`.
-- **User Profiles**: Each user has a unique profile (username) with isolated data.
-- **Automatic Profile Selection**: The system automatically selects the correct profile when you log in based on your credentials.
-- **First Account**: On a new installation or migration, the first user created is always an administrator named `admin_change_me`.
-
-
-
-#### Login Flow
-
-1. User opens Poznote.
-2. User enters their **username** and **password**.
-3. System automatically selects the appropriate user profile.
-4. User accesses their personal data space.
+- **Global Authentication**: Set `POZNOTE_PASSWORD` (admin) and `POZNOTE_PASSWORD_USER` (standard users) in your `.env` file.
+- **User-Specific Passwords**: Set individual passwords using `POZNOTE_PASSWORD_{USERNAME}` in your `.env`.
 
 </details>
 
@@ -545,8 +510,7 @@ You can also trigger manual push/pull from the **Sync Status** page (accessible 
 ## Restore / Import
 
 **Via Web Interface (Settings > Restore/Import):**
-- **All users** can restore backups to their own profile
-- **Admins** can access additional disaster recovery tools
+- All users can restore backups to their own profile
 - Supports complete backup restoration and individual file imports
 
 **Via API (Administrators only):**
@@ -562,14 +526,6 @@ Upload the complete backup ZIP to restore everything:
 
   - Replaces database, restores all notes, and attachments
   - Works for all workspaces at once
-
-</details>
-
-<details>
-<summary><strong>Disaster Recovery (Reconstruct System Index)</strong></summary>
-<br>
-
-In case of system corruption or loss of the master database, Poznote can reconstruct its entire user index by scanning the data folders. This tool is accessible via Settings > Advanced > Reconstruct System Index.
 
 </details>
 
@@ -611,6 +567,14 @@ Import a ZIP archive containing multiple notes from Obsidian:
   - Poznote automatically imports images if they are at the zip file root
 
 </details>
+
+## Admin Tools
+
+Admins can access additional tools via Settings > Admin Tools:
+
+- **Disaster Recovery** - Reconstruct the entire user index from data folders in case of system corruption or database loss.
+- **Base64 Image Converter** - Convert inline Base64 encoded images to attachments.
+- **Orphan attachments scanner** - Scan and clean up orphaned attachment files.
 
 <a id="import-standard-notes"></a>
 <details>
