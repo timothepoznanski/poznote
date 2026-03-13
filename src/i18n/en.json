@@ -1180,6 +1180,7 @@
     "table": {
       "note": "Note",
       "url": "Shared URL",
+      "folder": "Folder",
       "token": "Token",
       "actions": "Actions"
     },
@@ -1187,6 +1188,7 @@
       "open": "Open",
       "revoke": "Revoke"
     },
+    "direct_share": "Shared note",
     "indexable": "Indexable",
     "password_protected": "Password protected",
     "add_password_title": "Add password protection",

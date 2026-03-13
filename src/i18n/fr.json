@@ -1583,6 +1583,7 @@
     "table": {
       "note": "Note",
       "url": "URL partagée",
+      "folder": "Dossier",
       "token": "Jeton",
       "actions": "Actions"
     },
@@ -1590,6 +1591,7 @@
       "open": "Ouvrir",
       "revoke": "Révoquer"
     },
+    "direct_share": "Note partagée",
     "indexable": "Indexable",
     "password_protected": "Protégé par mot de passe",
     "add_password_title": "Ajouter une protection par mot de passe",

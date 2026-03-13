@@ -1539,6 +1539,7 @@
     "table": {
       "note": "Notiz",
       "url": "Geteilte URL",
+      "folder": "Ordner",
       "token": "Token",
       "actions": "Aktionen"
     },
@@ -1546,6 +1547,7 @@
       "open": "Öffnen",
       "revoke": "Widerrufen"
     },
+    "direct_share": "Geteilte Notiz",
     "indexable": "Indexierbar",
     "password_protected": "Passwortgeschützt",
     "add_password_title": "Passwortschutz hinzufügen",

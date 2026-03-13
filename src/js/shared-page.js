@@ -22,8 +22,10 @@
             txtEnterNewPassword: body.getAttribute('data-txt-enter-new-password') || 'Enter new password',
             txtOpen: body.getAttribute('data-txt-open') || 'Open public view',
             txtRevoke: body.getAttribute('data-txt-revoke') || 'Revoke',
+            txtDirectShare: body.getAttribute('data-txt-direct-share') || 'Shared directly',
             txtNoFilterResults: body.getAttribute('data-txt-no-filter-results') || 'No notes match your search.',
             txtTableNote: body.getAttribute('data-txt-table-note') || 'Note',
+            txtTableFolder: body.getAttribute('data-txt-table-folder') || 'Folder',
             txtTableToken: body.getAttribute('data-txt-table-token') || 'Token',
             txtTableActions: body.getAttribute('data-txt-table-actions') || 'Actions',
             txtToday: body.getAttribute('data-txt-today') || 'Today',
@@ -317,6 +319,21 @@
                 }, 2000);
             });
     }
+
+    function focusEditableToken(tokenSpan) {
+        if (!tokenSpan) return;
+        tokenSpan.focus();
+
+        var range = document.createRange();
+        range.selectNodeContents(tokenSpan);
+        range.collapse(false);
+
+        var selection = window.getSelection();
+        if (selection) {
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+    }
     
     function showPasswordModal(noteId, hasPassword) {
         var modal = document.createElement('div');
@@ -427,6 +444,11 @@
         headerNote.textContent = config.txtTableNote;
         header.appendChild(headerNote);
 
+        var headerFolder = document.createElement('div');
+        headerFolder.className = 'shared-notes-header-cell shared-notes-header-folder';
+        headerFolder.textContent = config.txtTableFolder;
+        header.appendChild(headerFolder);
+
         var headerToken = document.createElement('div');
         headerToken.className = 'shared-notes-header-cell shared-notes-header-token';
         headerToken.textContent = config.txtTableToken;
@@ -455,7 +477,11 @@
             noteLink.className = 'note-name';
             noteNameContainer.appendChild(noteLink);
 
-            // Folder badge / path (AFTER title)
+            item.appendChild(noteNameContainer);
+
+            var folderContainer = document.createElement('div');
+            folderContainer.className = 'note-folder-container';
+
             if (note.folder_path && note.folder_path !== 'Default') {
                 var folderBadge = document.createElement('a');
                 folderBadge.className = 'folder-badge';
@@ -475,11 +501,14 @@
                 
                 var pathText = document.createTextNode(note.folder_path);
                 folderBadge.appendChild(pathText);
-                
-                noteNameContainer.appendChild(folderBadge);
+
+                folderContainer.appendChild(folderBadge);
+            } else {
+                folderContainer.classList.add('is-empty');
+                folderContainer.textContent = config.txtDirectShare;
             }
-            
-            item.appendChild(noteNameContainer);
+
+            item.appendChild(folderContainer);
             
             // Token (editable if explicitly shared)
             var tokenWrap = document.createElement('div');
@@ -487,6 +516,7 @@
             var tokenSpan = document.createElement('span');
             tokenSpan.className = 'note-token';
             if (!note.share_id) {
+                tokenWrap.classList.add('read-only');
                 tokenSpan.classList.add('read-only');
                 tokenSpan.textContent = note.shared_via_folder ? '(' + config.txtViaFolder + ')' : '';
                 tokenSpan.title = note.shared_via_folder ? config.txtViaFolder : '';
@@ -497,6 +527,7 @@
                 tokenSpan.title = config.txtEditToken;
                 tokenSpan.dataset.originalToken = note.token;
                 tokenSpan.dataset.noteId = note.note_id;
+                tokenWrap.classList.add('is-editable');
                 
                 tokenSpan.addEventListener('blur', function() {
                     var newToken = this.textContent.trim();
@@ -512,11 +543,21 @@
                     }
                 });
 
+                var editButton = document.createElement('button');
+                editButton.type = 'button';
+                editButton.className = 'note-token-edit-button';
+                editButton.title = config.txtEditToken;
+
                 var editIcon = document.createElement('i');
                 editIcon.className = 'lucide lucide-pencil note-token-edit-icon';
-                editIcon.title = config.txtEditToken;
+                editButton.appendChild(editIcon);
+
+                editButton.addEventListener('click', function() {
+                    focusEditableToken(tokenSpan);
+                });
+
                 tokenWrap.appendChild(tokenSpan);
-                tokenWrap.appendChild(editIcon);
+                tokenWrap.appendChild(editButton);
             }
 
             if (!note.share_id) {

@@ -4,6 +4,13 @@
  * Mobile responsive styles and utility classes.
  */
 
+/* Desktop spacing */
+@media (min-width: 801px) {
+    .shared-notes-header {
+        margin-top: 20px;
+    }
+}
+
 @media (max-width: 800px) {
     /* Reset complet pour le scroll sur mobile */
     * {
@@ -130,6 +137,12 @@
         white-space: normal;
     }
 
+    .note-name-container,
+    .note-folder-container {
+        min-width: 0;
+        width: 100%;
+    }
+
     .note-token-wrap {
         width: 100%;
     }
@@ -137,6 +150,11 @@
     .note-token {
         width: 100%;
         font-size: 12px;
+    }
+
+    .note-token-edit-button {
+        width: 28px;
+        height: 28px;
     }
 
     .note-actions {

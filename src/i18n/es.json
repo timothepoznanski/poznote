@@ -1538,6 +1538,7 @@
     "table": {
       "note": "Nota",
       "url": "URL Compartida",
+      "folder": "Carpeta",
       "token": "Token",
       "actions": "Acciones"
     },
@@ -1545,6 +1546,7 @@
       "open": "Abrir",
       "revoke": "Revocar"
     },
+    "direct_share": "Nota compartida",
     "indexable": "Indexable",
     "password_protected": "Protegido con contraseña",
     "add_password_title": "Agregar protección con contraseña",

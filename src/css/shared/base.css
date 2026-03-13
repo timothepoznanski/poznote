@@ -161,3 +161,7 @@ body.shared-page {
 .shared-content {
     margin-top: -20px;
 }
+
+#sharedNotesContainer {
+    padding-top: 10px;
+}

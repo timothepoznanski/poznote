@@ -33,6 +33,11 @@
     min-width: 200px;
 }
 
+.shared-notes-header-folder {
+    flex: 0 0 auto;
+    min-width: 200px;
+}
+
 .shared-notes-header-token {
     flex: 1;
     min-width: 0;
@@ -65,8 +70,23 @@
     gap: 8px;
 }
 
+.note-folder-container {
+    flex: 0 0 auto;
+    min-width: 200px;
+    display: flex;
+    align-items: center;
+    min-height: 30px;
+}
+
+.note-folder-container.is-empty {
+    opacity: 0.45;
+    font-size: 11px;
+    color: #6c757d;
+}
+
 .note-name {
     font-weight: 500;
+    font-size: 13px;
     color: var(--link-color, #007bff);
     text-decoration: none;
     overflow: hidden;
@@ -82,15 +102,18 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    font-size: 11px;
+    font-size: 13px;
     color: #6c757d;
     background-color: transparent;
     padding: 0;
     margin-right: 5px;
     border-radius: 0;
     text-decoration: none;
-    max-width: fit-content;
+    max-width: 100%;
     transition: all 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .folder-badge:hover {
@@ -108,6 +131,26 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    padding: 4px 8px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.note-token-wrap.is-editable {
+    background-color: rgba(0, 123, 255, 0.04);
+    border-color: rgba(0, 123, 255, 0.15);
+}
+
+.note-token-wrap.is-editable:hover {
+    background-color: rgba(0, 123, 255, 0.08);
+    border-color: rgba(0, 123, 255, 0.25);
+}
+
+.note-token-wrap.is-editable:focus-within {
+    background-color: rgba(0, 123, 255, 0.05);
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
 }
 
 .note-token {
@@ -120,27 +163,44 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     cursor: text;
-    padding: 4px 8px;
+    padding: 0;
     border-radius: 4px;
-    transition: background-color 0.2s;
-}
-
-.note-token:hover {
-    background-color: rgba(0, 123, 255, 0.1);
+    background: transparent;
+    transition: color 0.2s;
 }
 
 .note-token:focus {
+    outline: none;
+}
+
+.note-token-edit-button {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.note-token-edit-button:hover {
+    background-color: rgba(0, 123, 255, 0.12);
+}
+
+.note-token-edit-button:focus-visible {
     outline: 2px solid #007bff;
-    outline-offset: 2px;
-    background-color: rgba(0, 123, 255, 0.05);
+    outline-offset: 1px;
 }
 
 .note-token-edit-icon {
-    flex: 0 0 auto;
+    display: inline-flex;
     font-size: 14px;
     color: var(--text-muted, #666666);
     opacity: 0.8;
-    pointer-events: none;
 }
 
 .note-indexable {
@@ -152,6 +212,11 @@
     cursor: default;
     background-color: transparent !important;
     opacity: 0.7;
+}
+
+.note-token-wrap.read-only {
+    padding-left: 0;
+    padding-right: 0;
 }
 
 .shared-via-parent {
@@ -198,7 +263,7 @@
 
 .toggle-switch.disabled {
     opacity: 0.5;
-    cursor: not-allowed;
+    font-size: 13px;
 }
 
 .indexable-checkbox[disabled] {

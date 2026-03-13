@@ -1543,6 +1543,7 @@
     "table": {
       "note": "Nota",
       "url": "URL Compartilhada",
+      "folder": "Pasta",
       "token": "Token",
       "actions": "Ações"
     },
@@ -1550,6 +1551,7 @@
       "open": "Abrir",
       "revoke": "Revogar"
     },
+    "direct_share": "Nota compartilhada",
     "indexable": "Indexável",
     "password_protected": "Protegido por senha",
     "add_password_title": "Adicionar proteção por senha",

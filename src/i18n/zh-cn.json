@@ -1539,6 +1539,7 @@
     "table": {
       "note": "笔记",
       "url": "共享 URL",
+      "folder": "文件夹",
       "token": "Token",
       "actions": "操作"
     },
@@ -1546,6 +1547,7 @@
       "open": "打开",
       "revoke": "撤销"
     },
+    "direct_share": "共享笔记",
     "indexable": "可被索引",
     "password_protected": "受密码保护",
     "add_password_title": "添加密码保护",
