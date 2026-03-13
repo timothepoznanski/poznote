@@ -214,13 +214,7 @@ After installation, access Poznote in your web browser:
 
 ## Change Settings
 
-Poznote configuration is split between two locations:
-
-<details>
-<summary><strong>System Settings (`.env` file)</strong></summary>
-<br>
-
-System settings can be modified in the `.env` file. Several categories of settings are available:
+Most settings can be modified directly in the application through the settings page, but some system settings can only be changed in the `.env` file and require a container restart.
 
 - **Authentication** - Admin and user passwords
 - **Web Server** - HTTP port configuration
@@ -230,7 +224,7 @@ System settings can be modified in the `.env` file. Several categories of settin
 - **Git Sync** - GitHub and Forgejo synchronization
 - **MCP Server** - AI assistant integration
 
-**How to Modify System Settings**
+### Modify System Settings (`.env`)
 
 Navigate to your Poznote directory:
 ```bash
@@ -242,30 +236,13 @@ Stop the running Poznote container:
 docker compose down
 ```
 
-Edit and modify the `.env` file with your preferred text editor.
+Edit your `.env` file with your preferred text editor.
 
 Save the file and restart Poznote to apply changes:
 ```bash
 docker compose up -d
 ```
 
-</details>
-
-<details>
-<summary><strong>Application Settings (Settings Page)</strong></summary>
-<br>
-
-Additional settings are available through the Poznote web interface and are stored in the database or web browser local storage.
-
-**How to Modify Application Settings**
-
-1. Log in to Poznote
-2. Click on the **Settings** icon (⚙️) in the navigation bar
-3. Modify your preferences directly in the interface
-
-> **Note:** Settings in the web interface are stored in the database and persist across container restarts. Only `.env` file changes require container restart.
-
-</details>
 
 ## Authentication
 
