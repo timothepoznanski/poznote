@@ -2243,5 +2243,12 @@
   },
   "backlinks": {
     "title": "Rétroliens"
+  },
+  "multiuser": {
+    "admin": {
+      "administrator": "Administrateur",
+      "email_usage_note": "Les adresses e-mail sont utilisées uniquement pour l'authentification OIDC si configurée. Poznote n'envoie aucun e-mail.",
+      "admin_note": "Seul l'utilisateur 1 est administrateur. Les autres utilisateurs ne peuvent pas avoir de privilèges d'administrateur."
+    }
   }
 }

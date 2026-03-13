@@ -2195,5 +2195,12 @@
       "modal_title_user": "孤立文件 - 用户",
       "files_label": "文件"
     }
+  },
+  "multiuser": {
+    "admin": {
+      "administrator": "管理员",
+      "email_usage_note": "电子邮件地址仅在配置后用于OIDC身份验证。Poznote不发送任何电子邮件。",
+      "admin_note": "只有用户1是管理员。其他用户不能拥有管理员权限。"
+    }
   }
 }

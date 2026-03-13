@@ -2085,5 +2085,12 @@
   },
   "backlinks": {
     "title": "Rückverweise"
+  },
+  "multiuser": {
+    "admin": {
+      "administrator": "Administrator",
+      "email_usage_note": "E-Mail-Adressen werden nur für die OIDC-Authentifizierung verwendet, falls konfiguriert. Poznote sendet keine E-Mails.",
+      "admin_note": "Nur Benutzer 1 ist ein Administrator. Andere Benutzer können keine Administratorrechte haben."
+    }
   }
 }
