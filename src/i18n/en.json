@@ -662,6 +662,10 @@
       "password": "Password (optional)",
       "password_placeholder": "Enter a password",
       "indexable": "Allow indexing by search engines",
+      "tasklist_access": "Public task list access",
+      "access_read_only": "Read only",
+      "access_check_only": "Check or uncheck only",
+      "access_full": "Full edit",
       "create_url": "Create URL",
       "close": "Close",
       "error_prefix": "Error: ",
@@ -694,6 +698,12 @@
       "renewed": "Shared folder link renewed",
       "failed_renew": "Error renewing folder share",
       "failed_revoke": "Error revoking folder share"
+    },
+    "task_permissions": {
+      "title": "Task list permissions",
+      "read_only": "Read only",
+      "check_only": "Check or uncheck only",
+      "full": "Full edit"
     },
     "note": {
       "new_note": "New note",

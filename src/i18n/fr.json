@@ -1148,6 +1148,10 @@
       "password": "Mot de passe (optionnel)",
       "password_placeholder": "Saisir un mot de passe",
       "indexable": "Autoriser l'indexation par les moteurs de recherche",
+      "tasklist_access": "Accès public de la liste de tâches",
+      "access_read_only": "Lecture seule",
+      "access_check_only": "Cocher ou décocher uniquement",
+      "access_full": "Modification complète",
       "create_url": "Créer l'URL",
       "close": "Fermer",
       "error_prefix": "Erreur : ",
@@ -1177,6 +1181,12 @@
       "renewed": "Lien de partage du dossier renouvelé",
       "failed_renew": "Échec du renouvellement du partage du dossier",
       "failed_revoke": "Échec de la révocation du partage du dossier"
+    },
+    "task_permissions": {
+      "title": "Permissions de la liste de tâches",
+      "read_only": "Lecture seule",
+      "check_only": "Cocher ou décocher uniquement",
+      "full": "Modification complète"
     },
     "note": {
       "new_note": "Nouvelle note",

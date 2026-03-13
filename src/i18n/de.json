@@ -1123,6 +1123,10 @@
       "custom_token": "Benutzerdefiniertes Token (optional)",
       "custom_token_placeholder": "my_custom_token-1",
       "indexable": "Suchmaschinenindizierung zulassen",
+      "tasklist_access": "Zugriff auf öffentliche Aufgabenliste",
+      "access_read_only": "Nur lesen",
+      "access_check_only": "Nur abhaken oder Häkchen entfernen",
+      "access_full": "Vollständige Bearbeitung",
       "password": "Passwort (optional)",
       "password_placeholder": "Geben Sie ein Passwort ein",
       "error_prefix": "Fehler: ",
@@ -1136,6 +1140,12 @@
       "renewed": "Ordner-Freigabelink erneuert",
       "failed_renew": "Fehler beim Erneuern der Ordnerfreigabe",
       "failed_revoke": "Fehler beim Widerrufen der Ordnerfreigabe"
+    },
+    "task_permissions": {
+      "title": "Berechtigungen der Aufgabenliste",
+      "read_only": "Nur lesen",
+      "check_only": "Nur abhaken oder Häkchen entfernen",
+      "full": "Vollständige Bearbeitung"
     },
     "note": {
       "new_note": "Neue Notiz",

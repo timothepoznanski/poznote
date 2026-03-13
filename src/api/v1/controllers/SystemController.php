@@ -238,11 +238,13 @@ class SystemController {
                 sn.token,
                 sn.theme,
                 sn.indexable,
+                sn.access_mode,
                 CASE WHEN sn.password IS NOT NULL AND sn.password != '' THEN 1 ELSE 0 END as hasPassword,
                 sn.created as shared_date,
                 e.heading,
                 e.folder,
                 e.folder_id,
+                e.type,
                 e.workspace,
                 e.updated
             FROM shared_notes sn
@@ -269,11 +271,13 @@ class SystemController {
                     sn.token as token,
                     NULL as theme,
                     NULL as indexable,
+                    'read_only' as access_mode,
                     0 as hasPassword,
                     e.created as shared_date,
                     e.heading,
                     e.folder,
                     e.folder_id,
+                    e.type,
                     e.workspace,
                     e.updated
                 FROM entries e

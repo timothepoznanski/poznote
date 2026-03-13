@@ -22,6 +22,10 @@
             txtEnterNewPassword: body.getAttribute('data-txt-enter-new-password') || 'Enter new password',
             txtOpen: body.getAttribute('data-txt-open') || 'Open public view',
             txtRevoke: body.getAttribute('data-txt-revoke') || 'Revoke',
+            txtTaskPermissions: body.getAttribute('data-txt-task-permissions') || 'Task list permissions',
+            txtTaskReadOnly: body.getAttribute('data-txt-task-read-only') || 'Read only',
+            txtTaskCheckOnly: body.getAttribute('data-txt-task-check-only') || 'Check or uncheck only',
+            txtTaskFull: body.getAttribute('data-txt-task-full') || 'Full edit',
             txtDirectShare: body.getAttribute('data-txt-direct-share') || 'Shared directly',
             txtNoFilterResults: body.getAttribute('data-txt-no-filter-results') || 'No notes match your search.',
             txtTableNote: body.getAttribute('data-txt-table-note') || 'Note',
@@ -228,6 +232,28 @@
             alert(config.txtError + ': ' + error.message);
         });
     }
+
+    function updateAccessMode(noteId, accessMode) {
+        return fetch('/api/v1/notes/' + noteId + '/share', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({
+                access_mode: accessMode
+            })
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            var note = sharedNotes.find(function(n) { return n.note_id === noteId; });
+            if (note) {
+                note.access_mode = data.accessMode || accessMode;
+            }
+        });
+    }
     
     function updateToken(tokenSpan, newToken, originalToken, noteId) {
         if (newToken === originalToken || newToken === '') {
@@ -411,6 +437,88 @@
             }
         });
     }
+
+    function showTaskPermissionsModal(note) {
+        var modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'flex';
+
+        var content = document.createElement('div');
+        content.className = 'modal-content';
+
+        var header = document.createElement('div');
+        header.className = 'modal-header';
+        var h3 = document.createElement('h3');
+        h3.textContent = config.txtTaskPermissions;
+        header.appendChild(h3);
+        content.appendChild(header);
+
+        var body = document.createElement('div');
+        body.className = 'modal-body';
+
+        [
+            { value: 'read_only', label: config.txtTaskReadOnly },
+            { value: 'check_only', label: config.txtTaskCheckOnly },
+            { value: 'full', label: config.txtTaskFull }
+        ].forEach(function(option) {
+            var label = document.createElement('label');
+            label.className = 'task-permissions-option';
+
+            var radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = 'taskPermissionsMode';
+            radio.value = option.value;
+            radio.checked = (note.access_mode || 'full') === option.value;
+
+            var text = document.createElement('span');
+            text.textContent = option.label;
+
+            label.appendChild(radio);
+            label.appendChild(text);
+            body.appendChild(label);
+        });
+
+        content.appendChild(body);
+
+        var footer = document.createElement('div');
+        footer.className = 'modal-footer';
+
+        var cancelBtn = document.createElement('button');
+        cancelBtn.className = 'btn btn-secondary';
+        cancelBtn.textContent = config.txtCancel;
+        cancelBtn.addEventListener('click', function() {
+            document.body.removeChild(modal);
+        });
+
+        var saveBtn = document.createElement('button');
+        saveBtn.className = 'btn btn-primary';
+        saveBtn.textContent = config.txtSave;
+        saveBtn.addEventListener('click', function() {
+            var selected = body.querySelector('input[name="taskPermissionsMode"]:checked');
+            var accessMode = selected ? selected.value : 'full';
+
+            updateAccessMode(note.note_id, accessMode)
+                .then(function() {
+                    document.body.removeChild(modal);
+                    loadSharedNotes();
+                })
+                .catch(function(error) {
+                    alert(config.txtError + ': ' + error.message);
+                });
+        });
+
+        footer.appendChild(cancelBtn);
+        footer.appendChild(saveBtn);
+        content.appendChild(footer);
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                document.body.removeChild(modal);
+            }
+        });
+    }
     
     function renderSharedNotes() {
         var container = document.getElementById('sharedNotesContainer');
@@ -587,6 +695,19 @@
                     });
                 })(note.note_id, note.hasPassword);
                 actionsDiv.appendChild(passwordBtn);
+            }
+
+            if (note.share_id && note.type === 'tasklist') {
+                var permissionsBtn = document.createElement('button');
+                permissionsBtn.className = 'btn btn-sm btn-permissions';
+                permissionsBtn.innerHTML = '<i class="lucide lucide-shield"></i>';
+                permissionsBtn.title = config.txtTaskPermissions;
+                (function(currentNote) {
+                    permissionsBtn.addEventListener('click', function() {
+                        showTaskPermissionsModal(currentNote);
+                    });
+                })(note);
+                actionsDiv.appendChild(permissionsBtn);
             }
             
             var openBtn = document.createElement('button');

@@ -404,7 +404,7 @@ body.dark-mode #shareModal .share-url {
 
 html[data-theme='dark'] #shareModal .share-custom-label,
 body.dark-mode #shareModal .share-custom-label {
-    color: #a0a0a0;
+    color: #e6e6e6;
 }
 
 html[data-theme='dark'] #shareModal .share-custom-label .optional-text,
@@ -428,7 +428,12 @@ html[data-theme='dark'] #shareModal .share-custom-example,
 body.dark-mode #shareModal .share-custom-example,
 html[data-theme='dark'] #folderShareModal .share-custom-example,
 body.dark-mode #folderShareModal .share-custom-example {
-    color: #a0a0a0;
+    color: #d7d7d7;
+}
+
+html[data-theme='dark'] #shareModal .share-password-label,
+body.dark-mode #shareModal .share-password-label {
+    color: #e6e6e6;
 }
 
 html[data-theme='dark'] #shareModal .share-custom-token-highlight,

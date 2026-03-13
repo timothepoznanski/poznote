@@ -196,6 +196,7 @@ try {
         token TEXT UNIQUE NOT NULL,
         created DATETIME DEFAULT CURRENT_TIMESTAMP,
         expires DATETIME,
+        access_mode TEXT DEFAULT "full",
         FOREIGN KEY(note_id) REFERENCES entries(id) ON DELETE CASCADE
     )');
 
@@ -213,7 +214,7 @@ try {
     )');
 
     // --- Schema versioning: skip migrations & indexes if already up to date ---
-    $CURRENT_SCHEMA_VERSION = 4;
+    $CURRENT_SCHEMA_VERSION = 5;
     $currentVersion = 0;
     try {
         $svStmt = $con->query("SELECT value FROM settings WHERE key = 'schema_version'");
@@ -278,6 +279,9 @@ try {
             }
             if (!in_array('password', $existingColumns)) {
                 $con->exec("ALTER TABLE shared_notes ADD COLUMN password TEXT");
+            }
+            if (!in_array('access_mode', $existingColumns)) {
+                $con->exec("ALTER TABLE shared_notes ADD COLUMN access_mode TEXT DEFAULT 'full'");
             }
         } catch (Exception $e) {
             error_log('Could not add missing columns to shared_notes: ' . $e->getMessage());

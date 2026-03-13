@@ -1122,6 +1122,10 @@
       "custom_token": "Token personalizado (opcional)",
       "custom_token_placeholder": "my_custom_token-1",
       "indexable": "Permitir indexación por motores de búsqueda",
+      "tasklist_access": "Acceso público a la lista de tareas",
+      "access_read_only": "Solo lectura",
+      "access_check_only": "Solo marcar o desmarcar",
+      "access_full": "Edición completa",
       "password": "Contraseña (opcional)",
       "password_placeholder": "Ingrese una contraseña",
       "error_prefix": "Error: ",
@@ -1135,6 +1139,12 @@
       "renewed": "Enlace de carpeta compartida renovado",
       "failed_renew": "Error al renovar el enlace de la carpeta",
       "failed_revoke": "Error al revocar el enlace de la carpeta"
+    },
+    "task_permissions": {
+      "title": "Permisos de la lista de tareas",
+      "read_only": "Solo lectura",
+      "check_only": "Solo marcar o desmarcar",
+      "full": "Edición completa"
     },
     "note": {
       "new_note": "Nueva nota",

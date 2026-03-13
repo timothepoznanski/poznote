@@ -319,6 +319,42 @@
     background: #5a6268;
 }
 
+.btn-permissions {
+    background: #0d6efd;
+    color: white;
+    font-size: 12px;
+    padding: 6px 10px;
+    white-space: nowrap;
+    min-width: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-permissions:hover {
+    background: #0b5ed7;
+}
+
+.task-permissions-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+    color: var(--text-color, #333333);
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+.task-permissions-option span {
+    color: inherit;
+}
+
+.task-permissions-option input[type="radio"] {
+    flex: 0 0 auto;
+    margin: 0;
+    accent-color: #0d6efd;
+}
+
 .note-actions {
     flex: 0 0 auto;
     display: flex;

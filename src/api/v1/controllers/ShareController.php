@@ -23,7 +23,7 @@ class ShareController {
     public function show($noteId) {
         try {
             // Verify note exists
-            $stmt = $this->con->prepare('SELECT id, workspace FROM entries WHERE id = ?');
+            $stmt = $this->con->prepare('SELECT id, workspace, type FROM entries WHERE id = ?');
             $stmt->execute([$noteId]);
             $noteRow = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -34,20 +34,27 @@ class ShareController {
             }
             
             $noteWorkspace = $noteRow['workspace'] ?? '';
+            $noteType = $noteRow['type'] ?? 'note';
             
             // Get share info
-            $stmt = $this->con->prepare('SELECT token, indexable, password FROM shared_notes WHERE note_id = ? LIMIT 1');
+            $stmt = $this->con->prepare('SELECT token, indexable, password, access_mode FROM shared_notes WHERE note_id = ? LIMIT 1');
             $stmt->execute([$noteId]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if (!$row) {
-                echo json_encode(['success' => true, 'public' => false]);
+                echo json_encode([
+                    'success' => true,
+                    'public' => false,
+                    'noteType' => $noteType,
+                    'accessMode' => $this->sanitizeAccessMode('full', $noteType)
+                ]);
                 return;
             }
             
             $token = $row['token'];
             $indexable = isset($row['indexable']) ? (int)$row['indexable'] : 0;
             $hasPassword = !empty($row['password']);
+            $accessMode = $this->sanitizeAccessMode($row['access_mode'] ?? 'full', $noteType);
             
             $urls = $this->buildUrls($token);
             
@@ -59,6 +66,8 @@ class ShareController {
                 'url_workspace' => $urls['workspace'],
                 'indexable' => $indexable,
                 'hasPassword' => $hasPassword,
+                'noteType' => $noteType,
+                'accessMode' => $accessMode,
                 'workspace' => $noteWorkspace
             ]);
             
@@ -78,7 +87,7 @@ class ShareController {
         
         try {
             // Verify note exists
-            $stmt = $this->con->prepare('SELECT id, workspace FROM entries WHERE id = ?');
+            $stmt = $this->con->prepare('SELECT id, workspace, type FROM entries WHERE id = ?');
             $stmt->execute([$noteId]);
             $noteRow = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -89,6 +98,7 @@ class ShareController {
             }
             
             $noteWorkspace = $noteRow['workspace'] ?? '';
+            $noteType = $noteRow['type'] ?? 'note';
             
             // Handle custom token
             $custom = isset($input['custom_token']) ? trim($input['custom_token']) : '';
@@ -118,6 +128,7 @@ class ShareController {
             $indexable = isset($input['indexable']) ? (int)$input['indexable'] : 0;
             $password = isset($input['password']) ? trim($input['password']) : '';
             $hashedPassword = $password !== '' ? password_hash($password, PASSWORD_DEFAULT) : null;
+            $accessMode = $this->sanitizeAccessMode($input['access_mode'] ?? 'full', $noteType);
             
             // Check if share already exists
             $stmt = $this->con->prepare('SELECT id FROM shared_notes WHERE note_id = ? LIMIT 1');
@@ -132,15 +143,15 @@ class ShareController {
             }
 
             if ($existsRow) {
-                $stmt = $this->con->prepare('UPDATE shared_notes SET token = ?, theme = ?, indexable = ?, password = ?, created = CURRENT_TIMESTAMP WHERE note_id = ?');
-                $stmt->execute([$token, $theme, $indexable, $hashedPassword, $noteId]);
+                $stmt = $this->con->prepare('UPDATE shared_notes SET token = ?, theme = ?, indexable = ?, password = ?, access_mode = ?, created = CURRENT_TIMESTAMP WHERE note_id = ?');
+                $stmt->execute([$token, $theme, $indexable, $hashedPassword, $accessMode, $noteId]);
                 
                 if ($oldToken && $oldToken !== $token) {
                     unregisterSharedLink($oldToken);
                 }
             } else {
-                $stmt = $this->con->prepare('INSERT INTO shared_notes (note_id, token, theme, indexable, password) VALUES (?, ?, ?, ?, ?)');
-                $stmt->execute([$noteId, $token, $theme, $indexable, $hashedPassword]);
+                $stmt = $this->con->prepare('INSERT INTO shared_notes (note_id, token, theme, indexable, password, access_mode) VALUES (?, ?, ?, ?, ?, ?)');
+                $stmt->execute([$noteId, $token, $theme, $indexable, $hashedPassword, $accessMode]);
             }
             
             registerSharedLink($token, $_SESSION['user_id'], 'note', (int)$noteId);
@@ -154,6 +165,8 @@ class ShareController {
                 'url' => $urls['path'],
                 'url_query' => $urls['query'],
                 'url_workspace' => $urls['workspace'],
+                'noteType' => $noteType,
+                'accessMode' => $accessMode,
                 'workspace' => $noteWorkspace
             ]);
             
@@ -208,13 +221,16 @@ class ShareController {
         
         try {
             // Verify note exists
-            $stmt = $this->con->prepare('SELECT id FROM entries WHERE id = ?');
+            $stmt = $this->con->prepare('SELECT id, type FROM entries WHERE id = ?');
             $stmt->execute([$noteId]);
-            if (!$stmt->fetch()) {
+            $noteRow = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$noteRow) {
                 http_response_code(404);
                 echo json_encode(['success' => false, 'error' => 'Note not found']);
                 return;
             }
+
+            $noteType = $noteRow['type'] ?? 'note';
             
             $updates = [];
             $params = [];
@@ -229,6 +245,11 @@ class ShareController {
                 $hashedPassword = $password !== '' ? password_hash($password, PASSWORD_DEFAULT) : null;
                 $updates[] = 'password = ?';
                 $params[] = $hashedPassword;
+            }
+
+            if (array_key_exists('access_mode', $input)) {
+                $updates[] = 'access_mode = ?';
+                $params[] = $this->sanitizeAccessMode($input['access_mode'], $noteType);
             }
             
             if (empty($updates)) {
@@ -247,6 +268,9 @@ class ShareController {
             }
             if (array_key_exists('password', $input)) {
                 $response['hasPassword'] = trim($input['password'] ?? '') !== '';
+            }
+            if (array_key_exists('access_mode', $input)) {
+                $response['accessMode'] = $this->sanitizeAccessMode($input['access_mode'], $noteType);
             }
             
             echo json_encode($response);
@@ -279,5 +303,20 @@ class ShareController {
             'path' => $base . '/' . rawurlencode($token),
             'workspace' => $base . '/workspace/' . rawurlencode($token)
         ];
+    }
+
+    private function sanitizeAccessMode($accessMode, string $noteType): string {
+        $allowedModes = ['read_only', 'check_only', 'full'];
+        $normalizedMode = is_string($accessMode) ? trim($accessMode) : '';
+
+        if (!in_array($normalizedMode, $allowedModes, true)) {
+            $normalizedMode = 'full';
+        }
+
+        if ($noteType !== 'tasklist') {
+            return 'full';
+        }
+
+        return $normalizedMode;
     }
 }

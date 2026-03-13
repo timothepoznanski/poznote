@@ -434,6 +434,15 @@ table th {
     cursor: text;
 }
 
+.public-note-page[data-task-access-mode='read_only'] .task-text,
+.public-note-page[data-task-access-mode='check_only'] .task-text {
+    cursor: default;
+}
+
+.public-note-page[data-task-access-mode='read_only'] .task-item input[type="checkbox"] {
+    cursor: default;
+}
+
 /* Important task styling for public view */
 .public-note .content .task-item.important {
     border-color: #ffcccc;

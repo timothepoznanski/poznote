@@ -11,6 +11,16 @@ const MIN_VIEWPORT_MARGIN = 8;
 let currentShareMenuNoteId = null;
 let isShareMenuOpen = false;
 
+function getSelectedShareAccessMode(fallbackMode) {
+    const selectedOption = document.querySelector('input[name="shareTaskAccessMode"]:checked');
+    if (!selectedOption) {
+        return ['read_only', 'check_only', 'full'].includes(fallbackMode) ? fallbackMode : 'full';
+    }
+
+    const accessMode = selectedOption.value;
+    return ['read_only', 'check_only', 'full'].includes(accessMode) ? accessMode : 'full';
+}
+
 // ===========================
 // Helper Functions
 // ===========================
@@ -281,6 +291,7 @@ async function createPublicShare(noteId) {
         // Build request body
         const theme = localStorage.getItem('poznote-theme') || 'light';
         const requestBody = { theme: theme, indexable: indexable };
+        requestBody.access_mode = getSelectedShareAccessMode('full');
         if (customToken) requestBody.custom_token = customToken;
         if (password) requestBody.password = password;
 
@@ -494,6 +505,53 @@ function showShareModal(url, options) {
     const noteId = options && options.noteId ? options.noteId : null;
     const isShared = options && options.shared ? true : false;
     const noteWorkspace = options && options.workspace ? options.workspace : '';
+    const noteType = options && options.noteType ? options.noteType : 'note';
+    const currentAccessMode = options && options.accessMode ? options.accessMode : 'full';
+    const supportsTasklistPermissions = noteType === 'tasklist';
+
+    function appendTasklistAccessModeField() {
+        if (!supportsTasklistPermissions) {
+            return;
+        }
+
+        const fieldset = document.createElement('fieldset');
+        fieldset.className = 'share-task-access-wrap';
+
+        const modes = [
+            {
+                value: 'read_only',
+                label: window.t ? window.t('index.share_modal.access_read_only', null, 'Read only') : 'Read only'
+            },
+            {
+                value: 'check_only',
+                label: window.t ? window.t('index.share_modal.access_check_only', null, 'Check or uncheck only') : 'Check or uncheck only'
+            },
+            {
+                value: 'full',
+                label: window.t ? window.t('index.share_modal.access_full', null, 'Full edit') : 'Full edit'
+            }
+        ];
+
+        modes.forEach(function (mode) {
+            const optionLabel = document.createElement('label');
+            optionLabel.className = 'share-task-access-option';
+
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = 'shareTaskAccessMode';
+            radio.value = mode.value;
+            radio.checked = mode.value === currentAccessMode;
+
+            const text = document.createElement('span');
+            text.textContent = mode.label;
+
+            optionLabel.appendChild(radio);
+            optionLabel.appendChild(text);
+            fieldset.appendChild(optionLabel);
+        });
+
+        content.appendChild(fieldset);
+    }
 
     // Conditionally add buttons based on share status
     if (isShared) {
@@ -522,7 +580,6 @@ function showShareModal(url, options) {
         protocolWrap.appendChild(protocolLabel);
         // Place the toggle above the URL (URL spacing stays consistent)
         content.insertBefore(protocolWrap, urlDiv);
-
         protocolCheckbox.addEventListener('change', function () {
             const nextProto = protocolCheckbox.checked ? 'https' : 'http';
             setPreferredPublicUrlProtocol(nextProto);
@@ -624,7 +681,7 @@ function showShareModal(url, options) {
                         method: 'POST',
                         credentials: 'same-origin',
                         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                        body: JSON.stringify({ theme: theme })
+                        body: JSON.stringify({ theme: theme, access_mode: currentAccessMode })
                     });
                     if (resp.ok) {
                         const ct = resp.headers.get('content-type') || '';
@@ -639,7 +696,13 @@ function showShareModal(url, options) {
                                 if (j.workspace !== undefined) {
                                     // We need to recreate the modal with updated workspace
                                     closeModal('shareModal');
-                                    showShareModal(j.url, { noteId: noteId, shared: true, workspace: j.workspace });
+                                    showShareModal(j.url, {
+                                        noteId: noteId,
+                                        shared: true,
+                                        workspace: j.workspace,
+                                        noteType: j.noteType || noteType,
+                                        accessMode: j.accessMode || currentAccessMode
+                                    });
                                 }
                                 markShareIconShared(noteId, true);
                             }
@@ -695,6 +758,8 @@ function showShareModal(url, options) {
             buttonsDiv.appendChild(cancelBtn);
         }
     } else {
+        appendTasklistAccessModeField();
+
         // If not shared, show Create button
         // Add an optional input for a custom slug/token
         const inputWrap = document.createElement('div');
@@ -814,10 +879,16 @@ async function getPublicShare(noteId) {
             return { 
                 shared: true, 
                 url: data.url, 
-                workspace: data.workspace || '' 
+                workspace: data.workspace || '',
+                noteType: data.noteType || 'note',
+                accessMode: data.accessMode || 'full'
             };
         }
-        return { shared: false };
+        return {
+            shared: false,
+            noteType: data.noteType || 'note',
+            accessMode: data.accessMode || 'full'
+        };
     } catch (error) {
         console.error('Error getting public share:', error);
         return { shared: false };
@@ -837,10 +908,17 @@ async function openPublicShareModal(noteId) {
         showShareModal(shareInfo.url, { 
             noteId: noteId, 
             shared: true, 
-            workspace: shareInfo.workspace 
+            workspace: shareInfo.workspace,
+            noteType: shareInfo.noteType,
+            accessMode: shareInfo.accessMode
         });
     } else {
-        showShareModal('', { noteId: noteId, shared: false });
+        showShareModal('', {
+            noteId: noteId,
+            shared: false,
+            noteType: shareInfo.noteType || 'note',
+            accessMode: shareInfo.accessMode || 'full'
+        });
     }
 }
 

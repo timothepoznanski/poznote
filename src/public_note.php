@@ -90,7 +90,7 @@ try {
     $isFolderShared = false;
 
     if (!empty($token)) {
-        $stmt = $con->prepare('SELECT note_id, created, theme, indexable, password FROM shared_notes WHERE token = ?');
+        $stmt = $con->prepare('SELECT note_id, created, theme, indexable, password, access_mode FROM shared_notes WHERE token = ?');
         $stmt->execute([$token]);
         $sharedNote = $stmt->fetch(PDO::FETCH_ASSOC);
     }
@@ -153,7 +153,8 @@ try {
                         'created' => date('Y-m-d H:i:s'), // Mock
                         'theme' => $sharedFolder['theme'], // Inherit folder theme
                         'indexable' => $sharedFolder['indexable'],
-                        'password' => $sharedFolder['password'] // Inherit folder password
+                        'password' => $sharedFolder['password'], // Inherit folder password
+                        'access_mode' => 'read_only'
                     ];
                     // Override token for session consistency if needed
                     $token = $folderToken . '_note_' . $noteIdParam; 
@@ -172,6 +173,10 @@ try {
     $indexable = isset($sharedNote['indexable']) ? (int)$sharedNote['indexable'] : 0;
     $storedPassword = $sharedNote['password'];
     $sharedTheme = $sharedNote['theme'] ?? '';
+    $taskAccessMode = $sharedNote['access_mode'] ?? 'full';
+    if (!in_array($taskAccessMode, ['read_only', 'check_only', 'full'], true)) {
+        $taskAccessMode = 'full';
+    }
 
     $stmt = $con->prepare('SELECT folder_id FROM entries WHERE id = ? AND trash = 0');
     $stmt->execute([$note_id]);
@@ -440,24 +445,27 @@ if ($noteType === 'tasklist') {
         });
 
         $tasksHtml = '<div class="task-list-container">';
-        // Add item input
-        $tasksHtml .= '<div class="task-input-container">';
-        $tasksHtml .= '<input type="text" class="task-input public-task-add-input" placeholder="'.t('tasklist.input_placeholder', [], 'Add a task...').'" />';
-        $tasksHtml .= '</div>';
+        if ($taskAccessMode === 'full') {
+            $tasksHtml .= '<div class="task-input-container">';
+            $tasksHtml .= '<input type="text" class="task-input public-task-add-input" placeholder="'.t('tasklist.input_placeholder', [], 'Add a task...').'" />';
+            $tasksHtml .= '</div>';
+        }
 
         $tasksHtml .= '<div class="tasks-list">';
         foreach ($decoded as $i => $task) {
             $text = isset($task['text']) ? htmlspecialchars($task['text'], ENT_QUOTES) : '';
             $completed = !empty($task['completed']) ? ' completed' : '';
             $checked = !empty($task['completed']) ? ' checked' : '';
+            $disabled = $taskAccessMode === 'read_only' ? ' disabled' : '';
             $important = !empty($task['important']) ? ' important' : '';
             $tasksHtml .= '<div class="task-item'.$completed.$important.'" data-index="'.$i.'">';
-            $tasksHtml .= '<input type="checkbox" class="task-checkbox" data-index="'.$i.'"'.$checked.' /> ';
+            $tasksHtml .= '<input type="checkbox" class="task-checkbox" data-index="'.$i.'"'.$checked.$disabled.' /> ';
             $tasksHtml .= '<span class="task-text" data-text="'.$text.'">'.$text.'</span>';
-            $tasksHtml .= '<div class="task-actions">';
-
-            $tasksHtml .= '<button class="task-action-btn public-task-delete-btn" title="Delete"><i class="lucide lucide-trash-2"></i></button>';
-            $tasksHtml .= '</div>';
+            if ($taskAccessMode === 'full') {
+                $tasksHtml .= '<div class="task-actions">';
+                $tasksHtml .= '<button class="task-action-btn public-task-delete-btn" title="Delete"><i class="lucide lucide-trash-2"></i></button>';
+                $tasksHtml .= '</div>';
+            }
             $tasksHtml .= '</div>';
         }
         $tasksHtml .= '</div></div>';
@@ -589,6 +597,8 @@ if (!empty($sharedTheme) && in_array($sharedTheme, ['dark', 'light'])) {
         echo json_encode([
             'serverTheme' => $theme, 
             'token' => $token, 
+            'noteType' => $noteType,
+            'taskAccessMode' => $taskAccessMode,
             'apiBaseUrl' => $apiBaseUrl,
             'i18n' => [
                 'addTask' => t('tasklist.input_placeholder', [], 'Add a task...'),
@@ -644,7 +654,7 @@ if (!empty($sharedTheme) && in_array($sharedTheme, ['dark', 'light'])) {
     <script src="js/highlight/powershell.min.js?v=<?php echo file_exists(__DIR__ . '/js/highlight/powershell.min.js') ? filemtime(__DIR__ . '/js/highlight/powershell.min.js') : '1'; ?>"></script>
     <script src="js/syntax-highlight.js?v=<?php echo file_exists(__DIR__ . '/js/syntax-highlight.js') ? filemtime(__DIR__ . '/js/syntax-highlight.js') : '1'; ?>"></script>
 </head>
-<body class="public-note-page">
+<body class="public-note-page" data-task-access-mode="<?php echo htmlspecialchars($taskAccessMode, ENT_QUOTES); ?>">
     <div class="public-note-layout">
         <div class="public-note-main" id="publicNoteMain">
             <div class="public-note">
