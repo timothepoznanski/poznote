@@ -980,6 +980,7 @@
     "strikethrough": "Durchgestrichen",
     "code": "Code",
     "inline_code": "Inline-Code",
+    "code_block_normal": "Normaler Block",
     "code_block": "Code-Block",
     "list": "Liste",
     "bullet_list": "Aufzählung",

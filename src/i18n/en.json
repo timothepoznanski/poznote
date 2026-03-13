@@ -533,6 +533,7 @@
     "strikethrough": "Strikethrough",
     "code": "Code",
     "inline_code": "Inline code",
+    "code_block_normal": "Normal block",
     "code_block": "Code block",
     "list": "List",
     "bullet_list": "Bullet list",

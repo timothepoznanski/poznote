@@ -533,6 +533,7 @@
     "strikethrough": "Зачеркнутый",
     "code": "Код",
     "inline_code": "Встроенный код",
+    "code_block_normal": "Обычный блок",
     "code_block": "Блок кода",
     "list": "Список",
     "bullet_list": "Маркированный список",

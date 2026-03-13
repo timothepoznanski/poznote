@@ -1004,6 +1004,7 @@
     "toggle_placeholder": "Toggle",
     "toggle_content_placeholder": "Escribe dentro del toggle aquí…",
     "toggle_after_placeholder": "Escribe fuera del toggle aquí…",
+    "code_block_normal": "Bloque normal",
     "code_block_placeholder_before": "Escribe texto aquí…",
     "code_block_placeholder_after": "Escribe texto aquí…",
     "youtube_video": "Video de YouTube",

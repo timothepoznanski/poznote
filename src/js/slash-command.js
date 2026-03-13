@@ -369,8 +369,8 @@
         insertInlineElement('span', color !== 'black' ? { color: color } : undefined);
     }
 
-    // Insert a code block with syntax highlighting
-    function insertCodeBlock(language) {
+    // Insert a code block, optionally without syntax highlighting
+    function insertCodeBlock(language, disableHighlight) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
 
@@ -380,11 +380,13 @@
         const pre = document.createElement('pre');
         const code = document.createElement('code');
 
-        // Add language class if specified
+        // Add a badge for the selected mode and only attach a highlight.js class when needed
         if (language) {
-            code.className = 'language-' + language;
-            code.setAttribute('data-language', language);
-            pre.setAttribute('data-language', language);
+            code.setAttribute('data-language', disableHighlight ? 'NORMAL' : language);
+            pre.setAttribute('data-language', disableHighlight ? 'NORMAL' : language);
+            if (!disableHighlight) {
+                code.className = 'language-' + language;
+            }
         }
 
         // Add a line break inside code element for cursor positioning
@@ -412,7 +414,7 @@
                 sel.addRange(newRange);
 
                 // Trigger syntax highlighting if available
-                if (language && typeof window.applySyntaxHighlighting === 'function') {
+                if (language && !disableHighlight && typeof window.applySyntaxHighlighting === 'function') {
                     window.applySyntaxHighlighting(pre);
                 }
 
@@ -423,7 +425,7 @@
             selection.removeAllRanges();
             selection.addRange(newRange);
 
-            if (language && typeof window.applySyntaxHighlighting === 'function') {
+            if (language && !disableHighlight && typeof window.applySyntaxHighlighting === 'function') {
                 setTimeout(function () {
                     window.applySyntaxHighlighting(pre);
                 }, 10);
@@ -1284,11 +1286,25 @@
                 submenu: [
                     { id: 'inline-code', icon: 'lucide-terminal', label: t('slash_menu.inline_code', null, 'Inline code'), action: () => insertCode() },
                     {
+                        id: 'code-normal',
+                        icon: 'lucide-file-code',
+                        label: t('slash_menu.code_block_normal', null, 'Normal block'),
+                        action: function () {
+                            insertCodeBlock('normal', true);
+                        }
+                    },
+                    {
                         id: 'block-languages',
                         icon: 'lucide-laptop-code',
                         label: t('slash_menu.block_languages', null, 'Block Languages'),
                         submenu: CODE_BLOCK_LANGUAGES.map(function (l) {
-                            return { id: l.id, icon: l.icon, iconColor: l.iconColor, label: l.label, action: function () { insertCodeBlock(l.lang); } };
+                            return {
+                                id: l.id,
+                                icon: l.icon,
+                                iconColor: l.iconColor,
+                                label: l.labelKey ? t(l.labelKey, null, l.fallback) : l.label,
+                                action: function () { insertCodeBlock(l.lang, !!l.disableHighlight); }
+                            };
                         })
                     }
                 ]
@@ -1557,11 +1573,25 @@
                 submenu: [
                     { id: 'inline-code', icon: 'lucide-terminal', label: t('slash_menu.inline_code', null, 'Inline code'), action: () => wrapMarkdownSelection('`', '`', 1) },
                     {
+                        id: 'code-normal',
+                        icon: 'lucide-file-code',
+                        label: t('slash_menu.code_block_normal', null, 'Normal block'),
+                        action: function () {
+                            insertMarkdownAtCursor('```normal\n\n```\n', -5);
+                        }
+                    },
+                    {
                         id: 'block-languages',
                         icon: 'lucide-laptop-code',
                         label: t('slash_menu.block_languages', null, 'Block Languages'),
                         submenu: CODE_BLOCK_LANGUAGES.map(function (l) {
-                            return { id: l.id, icon: l.icon, iconColor: l.iconColor, label: l.label, action: function () { insertMarkdownAtCursor('```' + l.lang + '\n\n```\n', -5); } };
+                            return {
+                                id: l.id,
+                                icon: l.icon,
+                                iconColor: l.iconColor,
+                                label: l.labelKey ? t(l.labelKey, null, l.fallback) : l.label,
+                                action: function () { insertMarkdownAtCursor('```' + l.lang + '\n\n```\n', -5); }
+                            };
                         })
                     }
                 ]

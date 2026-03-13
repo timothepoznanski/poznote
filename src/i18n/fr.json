@@ -1009,6 +1009,7 @@
     "strikethrough": "Barré",
     "code": "Code",
     "inline_code": "Code en ligne",
+    "code_block_normal": "Block normal",
     "code_block": "Bloc de code",
     "list": "Liste",
     "bullet_list": "Liste à puces",
