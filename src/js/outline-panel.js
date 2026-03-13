@@ -58,6 +58,10 @@ function getMarkdownEditorContent(markdownEditor) {
     return markdownEditor.textContent || '';
 }
 
+function isMarkdownFence(line) {
+    return /^\s*```/.test(line);
+}
+
 /**
  * Initialize the outline panel
  */
@@ -235,7 +239,18 @@ function extractHeadings(noteElement) {
         const markdownContent = getMarkdownEditorContent(markdownEditor);
         if (markdownContent) {
             const lines = markdownContent.split('\n');
+            let inCodeBlock = false;
+
             lines.forEach((line, lineIndex) => {
+                if (isMarkdownFence(line)) {
+                    inCodeBlock = !inCodeBlock;
+                    return;
+                }
+
+                if (inCodeBlock) {
+                    return;
+                }
+
                 // Match markdown headings: # Title, ## Title, etc.
                 const match = line.match(/^(#{1,6})\s+(.+)$/);
                 if (match) {
