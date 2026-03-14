@@ -16,9 +16,11 @@ Poznote is a personal note-taking and documentation platform.
 </h3>
 This project started from a simple personal need: a practical way to write, organize, and synchronize my technical and personal notes. From the beginning, the priority has been simplicity and ease of use.
 
-<br>
+<br><br>
 
-[Learn more about the project and its background on the Poznote About page](https://poznote.com/about.html)
+<p align="center">
+  <a href="https://poznote.com/about.html">Learn more about the project and its background on the Poznote About page</a>
+</p>
 <br>
 <br>
 <p align="center">
