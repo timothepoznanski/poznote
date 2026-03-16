@@ -22,6 +22,6 @@ export default defineConfig({
     'process.env.NODE_ENV': '"production"',
     'process.env': '{}',
     'global': 'globalThis',
-    'process': '{env: {NODE_ENV: "production"}}'
+    'process': '{"env": {"NODE_ENV": "production"}}'
   }
 })
