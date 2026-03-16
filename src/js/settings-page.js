@@ -419,8 +419,7 @@
             'api-docs-card': 'api-docs/',
             'github-card': 'https://github.com/timothepoznanski/poznote',
             'news-card': 'https://poznote.com/news.html',
-            'website-card': 'https://poznote.com',
-            'support-card': 'https://ko-fi.com/timothepoznanski'
+            'website-card': 'https://poznote.com'
         };
         Object.keys(externalCards).forEach(function (cardId) {
             var card = document.getElementById(cardId);

@@ -579,16 +579,6 @@ try {
                 <?php endif; ?>
             <?php endif; ?>
 
-            <!-- Support Developer -->
-            <a href="https://ko-fi.com/timothepoznanski" target="_blank" class="home-card home-card-red" id="support-card">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-heart heart-blink"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.support', [], 'Support Developer'); ?></span>
-                </div>
-            </a>
-
             <!-- Browser Extension -->
             <a href="https://chromewebstore.google.com/detail/poznote-url-saver/bmjclfamahegmgillaghhmnbkjebipbh" target="_blank" class="home-card" id="extension-card">
                 <div class="home-card-icon">
