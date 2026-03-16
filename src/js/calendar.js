@@ -10,9 +10,9 @@ class MiniCalendar {
         this.currentYear = this.currentDate.getFullYear();
         this.notesData = {};
         this.translations = window.calendarTranslations || this.getDefaultTranslations();
-        // Default to visible if not set in localStorage
+        // Default to hidden until the user explicitly toggles it.
         const storedVisibility = localStorage.getItem('calendarVisible');
-        this.isVisible = storedVisibility === null ? true : storedVisibility === 'true';
+        this.isVisible = storedVisibility === null ? false : storedVisibility === 'true';
         this.init();
     }
 

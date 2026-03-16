@@ -398,6 +398,70 @@ function handleNavigateToChecklist(e, noteentry) {
 }
 
 /**
+ * Insert a line break in the current code block while keeping the caret inside it.
+ * Falls back to manual DOM insertion when execCommand is unavailable.
+ * @param {Selection} selection - The current selection
+ */
+function insertCodeBlockLineBreak(selection) {
+    if (!selection || !selection.rangeCount) return;
+
+    var inserted = false;
+    try {
+        inserted = document.execCommand('insertLineBreak');
+    } catch (err) {
+        inserted = false;
+    }
+
+    if (inserted) {
+        triggerNoteSave();
+        return;
+    }
+
+    var range = selection.getRangeAt(0);
+    range.deleteContents();
+
+    var br = document.createElement('br');
+    range.insertNode(br);
+
+    var newRange = document.createRange();
+    newRange.setStartAfter(br);
+    newRange.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(newRange);
+
+    triggerNoteSave();
+}
+
+/**
+ * Check whether the caret is currently on an empty line inside a code block.
+ * @param {HTMLElement} pre - The containing pre element
+ * @param {Range} range - The current selection range
+ * @returns {boolean} True when the current line is empty or whitespace-only
+ */
+function isCaretOnEmptyCodeBlockLine(pre, range) {
+    if (!pre || !range) return false;
+
+    try {
+        var beforeRange = range.cloneRange();
+        beforeRange.selectNodeContents(pre);
+        beforeRange.setEnd(range.startContainer, range.startOffset);
+
+        var afterRange = range.cloneRange();
+        afterRange.selectNodeContents(pre);
+        afterRange.setStart(range.endContainer, range.endOffset);
+
+        var textBefore = beforeRange.toString();
+        var textAfter = afterRange.toString();
+        var currentLineBefore = textBefore.split('\n').pop() || '';
+        var currentLineAfter = textAfter.split('\n')[0] || '';
+
+        return (currentLineBefore + currentLineAfter).trim() === '';
+    } catch (err) {
+        return false;
+    }
+}
+
+/**
  * Handle Enter key in code block - exit block on Enter
  * @param {Event} e - The keyboard event
  * @param {Selection} selection - The current selection
@@ -416,6 +480,14 @@ function handleCodeBlockEnter(e, selection) {
 
     var noteentry = pre.closest('.noteentry');
     if (!noteentry) return;
+
+    if (typeof isMobileDevice === 'function' && isMobileDevice()) {
+        if (!isCaretOnEmptyCodeBlockLine(pre, range)) {
+            e.preventDefault();
+            insertCodeBlockLineBreak(selection);
+            return;
+        }
+    }
 
     e.preventDefault();
 

@@ -243,9 +243,9 @@ function markNoteAsModified() {
             document.title = '🔴 ' + document.title;
         }
 
-        // Show save indicator (red floppy disk in top right)
+        // Show save indicator on mobile only.
         const saveIndicator = document.getElementById('save-indicator');
-        if (saveIndicator) {
+        if (saveIndicator && window.matchMedia('(max-width: 768px)').matches) {
             saveIndicator.style.display = 'flex';
         }
 

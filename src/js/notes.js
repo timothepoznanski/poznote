@@ -346,7 +346,7 @@ function _updateUIAfterSave(timeText, titleChanged) {
 
     updateConnectionStatus(true);
 
-    // NOW hide save indicator after all state is updated
+    // Hide the mobile save indicator after all state is updated.
     var saveIndicator = document.getElementById('save-indicator');
     if (saveIndicator) {
         saveIndicator.style.display = 'none';

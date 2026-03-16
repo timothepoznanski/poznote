@@ -90,8 +90,9 @@ function initOutlinePanel() {
             document.body.classList.add('outline-mobile-open');
         }
     } else {
-        // On desktop, load saved collapsed state
-        const isCollapsed = localStorage.getItem('outlineCollapsed') === 'true';
+        // On desktop, keep the outline hidden until the user explicitly opens it.
+        const storedCollapsed = localStorage.getItem('outlineCollapsed');
+        const isCollapsed = storedCollapsed === null ? true : storedCollapsed === 'true';
         if (isCollapsed) {
             document.body.classList.add('outline-collapsed');
         }
@@ -182,20 +183,26 @@ function stopResizingOutline() {
  */
 function initToggleOutline() {
     const toggleBtn = document.getElementById('toggleOutlineBtn');
-    if (!toggleBtn) return;
+    const closeButtons = document.querySelectorAll('.outline-close-btn');
 
-    toggleBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        toggleOutline();
-    });
+    function bindOutlineToggleButton(button) {
+        if (!button) return;
 
-    // Add keyboard support
-    toggleBtn.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
             toggleOutline();
-        }
-    });
+        });
+
+        button.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleOutline();
+            }
+        });
+    }
+
+    bindOutlineToggleButton(toggleBtn);
+    closeButtons.forEach(bindOutlineToggleButton);
 }
 
 /**

@@ -291,7 +291,6 @@ $body_classes = trim($extra_body_classes);
 ?>
 
 <body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?>>
-    <!-- Indicateur de sauvegarde en cours -->
     <div id="save-indicator" class="save-indicator" style="display: none;">
         <i class="lucide lucide-save"></i>
     </div>
@@ -970,6 +969,9 @@ $body_classes = trim($extra_body_classes);
     <div id="outline-panel">
         <div class="outline-header">
             <h2 class="outline-title" data-i18n="common.outline.title">Outline</h2>
+            <button type="button" class="outline-close-btn" aria-label="<?php echo t_h('common.close'); ?>" title="<?php echo t_h('common.close'); ?>">
+                <i class="lucide lucide-x"></i>
+            </button>
         </div>
         <ul class="outline-nav" id="outline-nav">
             <div class="outline-empty">

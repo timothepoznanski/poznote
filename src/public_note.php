@@ -683,6 +683,9 @@ if (!empty($sharedTheme) && in_array($sharedTheme, ['dark', 'light'])) {
         <div id="outline-panel">
             <div class="outline-header">
                 <h2 class="outline-title">Outline</h2>
+                <button type="button" class="outline-close-btn" aria-label="<?php echo t_h('common.close'); ?>" title="<?php echo t_h('common.close'); ?>">
+                    <i class="lucide lucide-x"></i>
+                </button>
             </div>
             <ul class="outline-nav" id="outline-nav">
                 <div class="outline-empty">
