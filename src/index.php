@@ -291,7 +291,6 @@ $body_classes = trim($extra_body_classes);
 ?>
 
 <body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?>>
-    <!-- Indicateur de sauvegarde en cours -->
     <div id="save-indicator" class="save-indicator" style="display: none;">
         <i class="lucide lucide-save"></i>
     </div>
