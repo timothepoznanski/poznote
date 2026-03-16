@@ -9,7 +9,7 @@
 
 #outline-panel {
     width: var(--outline-width, 280px);
-    min-width: 200px;
+    min-width: 0;
     max-width: 500px;
     height: 100vh;
     overflow-y: auto;
@@ -34,6 +34,7 @@
 
 /* Outline header */
 .outline-header {
+    position: relative;
     margin-bottom: 16px;
     padding-bottom: 12px;
     /* border-bottom: 1px solid #dee2e6; */
@@ -47,6 +48,35 @@
     letter-spacing: 0.5px;
     margin: 0;
     text-align: center;
+}
+
+.outline-close-btn {
+    position: absolute;
+    top: -2px;
+    right: 0;
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: transparent;
+    color: #6c757d;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.outline-close-btn:hover,
+.outline-close-btn:focus {
+    background: rgba(0, 125, 184, 0.1);
+    color: #007DB8;
+}
+
+.outline-close-btn i {
+    width: 14px;
+    height: 14px;
 }
 
 /* Outline navigation list */

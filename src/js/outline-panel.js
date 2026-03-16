@@ -183,20 +183,26 @@ function stopResizingOutline() {
  */
 function initToggleOutline() {
     const toggleBtn = document.getElementById('toggleOutlineBtn');
-    if (!toggleBtn) return;
+    const closeButtons = document.querySelectorAll('.outline-close-btn');
 
-    toggleBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        toggleOutline();
-    });
+    function bindOutlineToggleButton(button) {
+        if (!button) return;
 
-    // Add keyboard support
-    toggleBtn.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
             toggleOutline();
-        }
-    });
+        });
+
+        button.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleOutline();
+            }
+        });
+    }
+
+    bindOutlineToggleButton(toggleBtn);
+    closeButtons.forEach(bindOutlineToggleButton);
 }
 
 /**
