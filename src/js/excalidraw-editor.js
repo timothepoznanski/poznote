@@ -62,16 +62,7 @@
             if (typeof rawData === 'object') {
                 existingData = rawData;
             } else if (typeof rawData === 'string') {
-                // If the string contains non-JSON characters, try to clean it
-                var cleanedData = rawData.trim();
-                
-                // Look for complete JSON structure that starts with { and ends with }}
-                var jsonMatch = cleanedData.match(/^(\{.*\}\})/);
-                if (jsonMatch) {
-                    cleanedData = jsonMatch[1];
-                }
-                
-                existingData = JSON.parse(cleanedData);
+                existingData = JSON.parse(rawData.trim());
             }
         }
         
