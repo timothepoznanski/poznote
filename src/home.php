@@ -307,13 +307,22 @@ try {
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title><?php echo getPageTitle(); ?></title>
+    <meta name="theme-color" content="#111827">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Poznote">
     <meta name="color-scheme" content="dark light">
     <?php 
     $cache_v = @file_get_contents('version.txt');
     if ($cache_v === false) $cache_v = time();
     $cache_v = urlencode(trim($cache_v));
     ?>
+    <link rel="manifest" href="manifest.webmanifest?v=<?php echo $cache_v; ?>">
+    <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
+    <link rel="apple-touch-icon" href="poznote.png?v=<?php echo $cache_v; ?>">
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="js/pwa.js?v=<?php echo $cache_v; ?>" defer></script>
     <link type="text/css" rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/base.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css?v=<?php echo $cache_v; ?>"/>

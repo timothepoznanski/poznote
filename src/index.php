@@ -150,7 +150,16 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     // Cache version based on app version to force reload on updates
     $v = getAppVersion();
     ?>
+    <meta name="theme-color" content="#111827">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Poznote">
+    <link rel="manifest" href="manifest.webmanifest?v=<?php echo $v; ?>">
+    <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
+    <link rel="apple-touch-icon" href="poznote.png?v=<?php echo $v; ?>">
     <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
+    <script src="js/pwa.js?v=<?php echo $v; ?>" defer></script>
     <script>window.ALLOWED_IFRAME_DOMAINS = <?php echo json_encode(ALLOWED_IFRAME_DOMAINS); ?>;</script>
     <meta name="color-scheme" content="dark light">
     <link type="text/css" rel="stylesheet" href="css/lucide.css?v=<?php echo $v; ?>"/>

@@ -1,0 +1,29 @@
+{
+  "id": "./index.php",
+  "name": "Poznote",
+  "short_name": "Poznote",
+  "description": "Poznote notes and knowledge base",
+  "start_url": "./index.php",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "background_color": "#111827",
+  "theme_color": "#111827",
+  "icons": [
+    {
+      "src": "./poznote.png",
+      "sizes": "676x676",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "launch_handler": {
+    "client_mode": [
+      "focus-existing",
+      "auto"
+    ]
+  }
+}
