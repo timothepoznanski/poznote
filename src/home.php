@@ -349,7 +349,7 @@ try {
     <div class="home-container">
         <?php $currentUser = getCurrentUser(); ?>
 
-        <div style="display: flex; justify-content: center; gap: 10px;">
+        <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 16px;">
             <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary go-to-nav-btn">
                 <?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?>
             </a>
