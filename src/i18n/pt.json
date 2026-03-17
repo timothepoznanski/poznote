@@ -337,9 +337,19 @@
       "website": "Site do Poznote",
       "support": "Apoiar o desenvolvedor",
       "install_extension": "Instalar extensão",
+      "install_app": "Instalar aplicação",
       "release_notes": "Notas de versão",
       "convert_images": "Base64 Image Converter",
       "orphan_scanner": "Scanner de anexos órfãos"
+    },
+    "install_app": {
+      "unavailable": "A instalação não está disponível no momento. No Chrome móvel, abra o menu do navegador e toque em \"Instalar aplicativo\" (ou \"Adicionar à tela inicial\") quando a opção estiver disponível.",
+      "already_installed": "O aplicativo já está instalado neste dispositivo.",
+      "status": {
+        "available": "Disponível",
+        "unavailable": "Indisponível",
+        "installed": "Já instalado"
+      }
     }
   },
   "workspaces": {

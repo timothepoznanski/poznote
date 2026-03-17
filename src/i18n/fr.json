@@ -355,9 +355,19 @@
       "website": "Site Poznote",
       "support": "Soutenir le développeur",
       "install_extension": "Installer l'extension",
+      "install_app": "Installer l'application",
       "release_notes": "Notes de version",
       "convert_images": "Convertisseur d’images Base64",
       "orphan_scanner": "Scanner de pièces jointes orphelines"
+    },
+    "install_app": {
+      "unavailable": "L’installation n’est pas disponible pour le moment. Sur Chrome mobile, ouvrez le menu du navigateur puis appuyez sur \"Installer l’application\" (ou \"Ajouter à l’écran d’accueil\") quand l’option est disponible.",
+      "already_installed": "L’application est déjà installée sur cet appareil.",
+      "status": {
+        "available": "Disponible",
+        "unavailable": "Indisponible",
+        "installed": "Déjà installée"
+      }
     }
   },
   "workspaces": {

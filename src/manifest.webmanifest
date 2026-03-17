@@ -1,9 +1,9 @@
 {
-  "id": "./index.php",
+  "id": "./login.php",
   "name": "Poznote",
   "short_name": "Poznote",
   "description": "Poznote notes and knowledge base",
-  "start_url": "./index.php",
+  "start_url": "./login.php",
   "scope": "./",
   "display": "standalone",
   "display_override": [
@@ -14,8 +14,14 @@
   "theme_color": "#111827",
   "icons": [
     {
-      "src": "./poznote.png",
-      "sizes": "676x676",
+      "src": "./poznote-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./poznote-512.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     }

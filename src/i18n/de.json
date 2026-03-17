@@ -338,9 +338,19 @@
       "website": "Poznote-Website",
       "support": "Entwickler unterstützen",
       "install_extension": "Erweiterung installieren",
+      "install_app": "App installieren",
       "release_notes": "Versionshinweise",
       "convert_images": "Base64 Image Converter",
       "orphan_scanner": "Verwaiste Anhänge-Scanner"
+    },
+    "install_app": {
+      "unavailable": "Die Installation ist derzeit nicht verfügbar. Öffnen Sie auf Chrome Mobile das Browsermenü und tippen Sie auf \"App installieren\" (oder \"Zum Startbildschirm hinzufügen\"), sobald die Option verfügbar ist.",
+      "already_installed": "Die App ist auf diesem Gerät bereits installiert.",
+      "status": {
+        "available": "Verfügbar",
+        "unavailable": "Nicht verfügbar",
+        "installed": "Bereits installiert"
+      }
     }
   },
   "workspaces": {

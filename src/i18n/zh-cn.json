@@ -339,9 +339,19 @@
       "news": "Poznote 博客",
       "website": "Poznote 网站",
       "support": "支持开发者",
+      "install_app": "安装应用",
       "release_notes": "发布日志",
       "convert_images": "Base64 Image Converter",
       "orphan_scanner": "孤立附件扫描器"
+    },
+    "install_app": {
+      "unavailable": "当前无法安装。请在 Chrome 手机版中打开浏览器菜单，然后在可用时点击“安装应用”（或“添加到主屏幕”）。",
+      "already_installed": "该设备已安装此应用。",
+      "status": {
+        "available": "可安装",
+        "unavailable": "不可用",
+        "installed": "已安装"
+      }
     }
   },
   "workspaces": {

@@ -347,8 +347,10 @@
             const data = await response.json();
             
             if (data.success && data.note && data.note.id) {
-                // Success - redirect to the notes list or open the linked note
-                let url = 'index.php?workspace=' + encodeURIComponent(workspace) + '&select_linked_note=' + encodeURIComponent(data.note.id);
+                // Success - open the linked note immediately.
+                // `note` triggers backend linked-note resolution, while `select_linked_note`
+                // keeps the shortcut highlighted in the sidebar.
+                let url = 'index.php?workspace=' + encodeURIComponent(workspace) + '&note=' + encodeURIComponent(data.note.id) + '&select_linked_note=' + encodeURIComponent(data.note.id);
                 
                 // Add expand_folder parameter to force folder expansion on load
                 if (data.note.folder_id) {

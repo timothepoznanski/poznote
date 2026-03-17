@@ -70,9 +70,19 @@
       "website": "Poznote Website",
       "support": "Support Developer",
       "install_extension": "Install extension",
+      "install_app": "Install application",
       "release_notes": "Release Notes",
       "convert_images": "Base64 Image Converter",
         "orphan_scanner": "Orphan attachments scanner"
+    },
+    "install_app": {
+      "unavailable": "Installation is not available right now. On Chrome mobile, open the browser menu then tap \"Install app\" (or \"Add to Home screen\") when available.",
+      "already_installed": "The application is already installed on this device.",
+      "status": {
+        "available": "Available",
+        "unavailable": "Unavailable",
+        "installed": "Already installed"
+      }
     },
     "language": {
       "label": "Language",
