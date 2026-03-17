@@ -100,6 +100,17 @@
     color: var(--primary-color, #2196F3);
 }
 
+.note-reference-description {
+    margin: 0 0 12px;
+    color: var(--text-muted, #666);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.shortcut-selector-description {
+    margin-top: 8px;
+}
+
 /* Search input */
 .note-reference-search {
     position: relative;

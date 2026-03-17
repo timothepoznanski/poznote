@@ -62,6 +62,16 @@
 }
 
 /* Go-to navigation buttons (match list_tags.php visual) */
+.home-nav-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 16px;
+}
+
 .go-to-nav-btn {
     display: inline-block;
     padding: 10px 20px;

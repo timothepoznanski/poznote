@@ -117,8 +117,16 @@ if (isset($_GET['oidc_error'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($login_display_name !== '' ? $login_display_name : t_h('app.name', [], 'Poznote', $currentLang ?? 'en')); ?></title>
+    <meta name="theme-color" content="#111827">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Poznote">
     <meta name="color-scheme" content="dark light">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="apple-touch-icon" href="poznote.png">
     <script src="js/theme-init.js"></script>
+    <script src="js/pwa.js" defer></script>
     <link rel="stylesheet" href="css/lucide.css">
     <link rel="stylesheet" href="css/login.css">
     <link rel="stylesheet" href="css/dark-mode/variables.css">
@@ -131,7 +139,7 @@ if (isset($_GET['oidc_error'])) {
     <link rel="stylesheet" href="css/dark-mode/markdown.css">
     <link rel="stylesheet" href="css/dark-mode/kanban.css">
     <link rel="stylesheet" href="css/dark-mode/icons.css">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
     <script src="js/theme-manager.js"></script>
 </head>
 <body>

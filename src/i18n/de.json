@@ -338,9 +338,19 @@
       "website": "Poznote-Website",
       "support": "Entwickler unterstützen",
       "install_extension": "Erweiterung installieren",
+      "install_app": "App installieren",
       "release_notes": "Versionshinweise",
       "convert_images": "Base64 Image Converter",
       "orphan_scanner": "Verwaiste Anhänge-Scanner"
+    },
+    "install_app": {
+      "unavailable": "Die Installation ist derzeit nicht verfügbar. Öffnen Sie auf Chrome Mobile das Browsermenü und tippen Sie auf \"App installieren\" (oder \"Zum Startbildschirm hinzufügen\"), sobald die Option verfügbar ist.",
+      "already_installed": "Die App ist auf diesem Gerät bereits installiert.",
+      "status": {
+        "available": "Verfügbar",
+        "unavailable": "Nicht verfügbar",
+        "installed": "Bereits installiert"
+      }
     }
   },
   "workspaces": {
@@ -642,7 +652,7 @@
       "insert_checklist": "Checkliste einfügen",
       "add_separator": "Trennlinie hinzufügen",
       "insert_note_reference": "Notiz-Referenz einfügen",
-      "create_linked_note": "Verknüpfte Notiz erstellen",
+      "create_linked_note": "Verknüpfung erstellen",
       "open_in_new_tab": "In neuem Tab öffnen",
       "search_replace": "Suchen und ersetzen"
     },
@@ -796,10 +806,10 @@
         "title": "Aufgabenliste"
       },
       "linked": {
-        "title": "Verknüpfte Notiz",
+        "title": "Verknüpfung",
         "default_heading": "{{note}}",
-        "success": "Verknüpfte Notiz erfolgreich erstellt",
-        "error": "Fehler beim Erstellen der verknüpften Notiz"
+        "success": "Verknüpfung erfolgreich erstellt",
+        "error": "Fehler beim Erstellen der Verknüpfung"
       },
       "template": {
         "title": "Vorlage"
@@ -834,23 +844,30 @@
       "search_placeholder": "Symbole suchen..."
     },
     "linked_selector": {
-      "title": "Notiz zum Verknüpfen auswählen",
+      "title": "Verknüpfung aus einer Notiz erstellen",
+      "description": "Erstellen Sie eine Verknüpfung aus einer Notiz, damit Sie sie in einem anderen Ordner referenzieren können.",
+      "search_placeholder": "Notizen suchen...",
+      "recent_label": "Aktuelle Notizen"
+    },
+    "template_selector": {
+      "title": "Notiz für Vorlage auswählen",
+      "description": "Im Ordner Templates wird eine Notiz erstellt. Danach können Sie sie duplizieren und als Vorlage wiederverwenden.",
       "search_placeholder": "Notizen suchen...",
       "recent_label": "Aktuelle Notizen"
     },
     "linked_folder_selector": {
-      "title": "Ordner für verknüpfte Notiz auswählen",
-      "description": "Wählen Sie den Ordner aus, in dem die verknüpfte Notiz erstellt wird:",
+      "title": "Ordner für die Verknüpfung auswählen",
+      "description": "Wählen Sie den Ordner aus, in dem die Verknüpfung erstellt wird:",
       "search_label": "Ordner filtern",
       "search_placeholder": "Ordner suchen...",
       "folder_label": "Zielordner",
       "root": "Stamm (Kein Ordner)"
     },
     "delete_linked_note": {
-      "title": "Verknüpfte Notiz löschen",
+      "title": "Verknüpfung löschen",
       "message": "Was möchten Sie löschen?",
-      "delete_link_only": "Nur diesen Link löschen",
-      "delete_link_and_target": "Notiz und alle ihre Links löschen"
+      "delete_link_only": "Nur diese Verknüpfung löschen",
+      "delete_link_and_target": "Notiz und alle ihre Verknüpfungen löschen"
     },
     "convert": {
       "title": "Notiz konvertieren",
@@ -1036,7 +1053,7 @@
     },
     "errors": {
       "workspace_not_found": "Arbeitsbereich nicht gefunden",
-      "linked_note_already_exists": "Für diese Notiz existiert bereits eine verknüpfte Notiz",
+      "linked_note_already_exists": "Für diese Notiz existiert bereits eine Verknüpfung",
       "method_not_allowed": "Methode nicht erlaubt",
       "invalid_action": "Ungültige Aktion",
       "internal_server_error": "Interner Serverfehler",

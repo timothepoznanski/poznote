@@ -337,9 +337,19 @@
       "news": "Blog de Poznote",
       "website": "Sitio web de Poznote",
       "support": "Apoyar al desarrollador",
+      "install_app": "Instalar aplicación",
       "release_notes": "Notas de la versión",
       "convert_images": "Base64 Image Converter",
       "orphan_scanner": "Escáner de archivos adjuntos huérfanos"
+    },
+    "install_app": {
+      "unavailable": "La instalación no está disponible ahora mismo. En Chrome móvil, abre el menú del navegador y pulsa \"Instalar aplicación\" (o \"Agregar a la pantalla de inicio\") cuando la opción esté disponible.",
+      "already_installed": "La aplicación ya está instalada en este dispositivo.",
+      "status": {
+        "available": "Disponible",
+        "unavailable": "No disponible",
+        "installed": "Ya instalada"
+      }
     }
   },
   "workspaces": {
@@ -641,7 +651,7 @@
       "insert_checklist": "Insertar lista de verificación",
       "add_separator": "Agregar separador",
       "insert_note_reference": "Insertar referencia de nota",
-      "create_linked_note": "Crear nota vinculada",
+      "create_linked_note": "Crear atajo",
       "open_in_new_tab": "Abrir en nueva pestaña",
       "search_replace": "Buscar y reemplazar"
     },
@@ -795,10 +805,10 @@
         "title": "Lista de tareas"
       },
       "linked": {
-        "title": "Nota vinculada",
+        "title": "Atajo",
         "default_heading": "{{note}}",
-        "success": "Nota vinculada creada con éxito",
-        "error": "Error al crear la nota vinculada"
+        "success": "Atajo creado con éxito",
+        "error": "Error al crear el atajo"
       },
       "template": {
         "title": "Plantilla"
@@ -833,23 +843,30 @@
       "search_placeholder": "Buscar iconos..."
     },
     "linked_selector": {
-      "title": "Seleccionar nota para vincular",
+      "title": "Crear un atajo de una nota",
+      "description": "Cree un atajo de una nota para poder referenciarla en otra carpeta.",
+      "search_placeholder": "Buscar notas...",
+      "recent_label": "Notas recientes"
+    },
+    "template_selector": {
+      "title": "Seleccionar nota para plantilla",
+      "description": "Se creará una nota en la carpeta Templates. Después podrá duplicarla y reutilizarla como plantilla.",
       "search_placeholder": "Buscar notas...",
       "recent_label": "Notas recientes"
     },
     "linked_folder_selector": {
-      "title": "Elegir carpeta para la nota vinculada",
-      "description": "Seleccione la carpeta donde se creará la nota vinculada:",
+      "title": "Elegir carpeta para el atajo",
+      "description": "Seleccione la carpeta donde se creará el atajo:",
       "search_label": "Filtrar carpetas",
       "search_placeholder": "Buscar carpetas...",
       "folder_label": "Carpeta de destino",
       "root": "Raíz (Sin carpeta)"
     },
     "delete_linked_note": {
-      "title": "Eliminar nota vinculada",
+      "title": "Eliminar atajo",
       "message": "¿Qué desea eliminar?",
-      "delete_link_only": "Eliminar solo este vínculo",
-      "delete_link_and_target": "Eliminar la nota y todos sus vínculos"
+      "delete_link_only": "Eliminar solo este atajo",
+      "delete_link_and_target": "Eliminar la nota y todos sus atajos"
     },
     "convert": {
       "title": "Convertir nota",
@@ -1035,7 +1052,7 @@
     },
     "errors": {
       "workspace_not_found": "Espacio de trabajo no encontrado",
-      "linked_note_already_exists": "Ya existe una nota vinculada para esta nota",
+      "linked_note_already_exists": "Ya existe un atajo para esta nota",
       "method_not_allowed": "Método no permitido",
       "invalid_action": "Acción inválida",
       "internal_server_error": "Error interno del servidor",

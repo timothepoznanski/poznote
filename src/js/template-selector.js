@@ -11,6 +11,8 @@
 
     // Track recently opened notes in localStorage
     const RECENT_NOTES_KEY = 'poznote_recent_notes';
+    const RECENT_TEMPLATE_NOTES_LIMIT = 20;
+    const SEARCH_TEMPLATE_NOTES_LIMIT = 20;
 
     /**
      * Get recently opened notes from localStorage
@@ -112,7 +114,7 @@
             }
             
             // Limit displayed notes
-            const displayNotes = notes.slice(0, searchQuery ? 20 : 10);
+            const displayNotes = notes.slice(0, searchQuery ? SEARCH_TEMPLATE_NOTES_LIMIT : RECENT_TEMPLATE_NOTES_LIMIT);
             
             if (displayNotes.length === 0) {
                 listContainer.innerHTML = '<div class="note-reference-empty">' + tr('note_reference.empty.no_notes_found', {}, 'No notes found') + '</div>';
@@ -146,6 +148,23 @@
                 
                 listContainer.appendChild(item);
             });
+
+            const visibleItems = listContainer.querySelectorAll('.note-reference-item');
+            if (visibleItems.length > 4) {
+                let visibleHeight = 0;
+                for (let index = 0; index < 4; index++) {
+                    visibleHeight += visibleItems[index].offsetHeight;
+                }
+                listContainer.style.height = visibleHeight + 'px';
+                listContainer.style.maxHeight = visibleHeight + 'px';
+                listContainer.style.overflowY = 'scroll';
+                listContainer.style.scrollbarGutter = 'stable';
+            } else {
+                listContainer.style.height = '';
+                listContainer.style.maxHeight = '';
+                listContainer.style.overflowY = '';
+                listContainer.style.scrollbarGutter = '';
+            }
             
         } catch (error) {
             console.error('Error loading notes for template:', error);

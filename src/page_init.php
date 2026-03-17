@@ -40,6 +40,9 @@ function initializeSearchParams() {
     $search = $_POST['search'] ?? $_GET['search'] ?? '';
     $tags_search = $_POST['tags_search'] ?? $_GET['tags_search'] ?? '';
     $note = $_GET['note'] ?? '';
+    if ($note === '' && isset($_GET['select_linked_note']) && $_GET['select_linked_note'] !== '') {
+        $note = $_GET['select_linked_note'];
+    }
     $folder_filter = $_GET['folder'] ?? '';
     
     // Handle search type preservation when clearing search

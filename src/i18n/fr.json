@@ -355,9 +355,19 @@
       "website": "Site Poznote",
       "support": "Soutenir le développeur",
       "install_extension": "Installer l'extension",
+      "install_app": "Installer l'application",
       "release_notes": "Notes de version",
       "convert_images": "Convertisseur d’images Base64",
       "orphan_scanner": "Scanner de pièces jointes orphelines"
+    },
+    "install_app": {
+      "unavailable": "L’installation n’est pas disponible pour le moment. Sur Chrome mobile, ouvrez le menu du navigateur puis appuyez sur \"Installer l’application\" (ou \"Ajouter à l’écran d’accueil\") quand l’option est disponible.",
+      "already_installed": "L’application est déjà installée sur cet appareil.",
+      "status": {
+        "available": "Disponible",
+        "unavailable": "Indisponible",
+        "installed": "Déjà installée"
+      }
     }
   },
   "workspaces": {
@@ -664,7 +674,7 @@
       "insert_checklist": "Insérer une checklist",
       "add_separator": "Ajouter un séparateur",
       "insert_note_reference": "Insérer une référence de note",
-      "create_linked_note": "Créer une note liée",
+      "create_linked_note": "Créer un raccourci",
       "open_in_new_tab": "Ouvrir dans un nouvel onglet",
       "search_replace": "Rechercher et remplacer"
     },
@@ -824,10 +834,10 @@
         "title": "Liste de tâches"
       },
       "linked": {
-        "title": "Note liée",
+        "title": "Raccourci",
         "default_heading": "{{note}}",
-        "success": "Note liée créée avec succès",
-        "error": "Erreur lors de la création de la note liée"
+        "success": "Raccourci créé avec succès",
+        "error": "Erreur lors de la création du raccourci"
       },
       "template": {
         "title": "Modèle"
@@ -863,23 +873,30 @@
       "default": "Par défaut"
     },
     "linked_selector": {
-      "title": "Sélectionner une note à lier",
+      "title": "Créer un raccourci d'une note",
+      "description": "Créez un raccourci d'une note afin de pouvoir la référencer dans un autre dossier.",
+      "search_placeholder": "Rechercher des notes...",
+      "recent_label": "Notes récentes"
+    },
+    "template_selector": {
+      "title": "Sélectionner une note pour le modèle",
+      "description": "Une note sera créée dans le dossier Templates. Vous pourrez ensuite la dupliquer et la réutiliser comme modèle.",
       "search_placeholder": "Rechercher des notes...",
       "recent_label": "Notes récentes"
     },
     "linked_folder_selector": {
-      "title": "Choisir un dossier pour la note liée",
-      "description": "Sélectionnez le dossier où la note liée sera créée :",
+      "title": "Choisir un dossier pour le raccourci",
+      "description": "Sélectionnez le dossier où le raccourci sera créé :",
       "search_label": "Filtrer les dossiers",
       "search_placeholder": "Rechercher des dossiers...",
       "folder_label": "Dossier de destination",
       "root": "Racine (Aucun dossier)"
     },
     "delete_linked_note": {
-      "title": "Supprimer la note liée",
+      "title": "Supprimer le raccourci",
       "message": "Que voulez-vous supprimer ?",
-      "delete_link_only": "Supprimer uniquement ce lien",
-      "delete_link_and_target": "Supprimer la note et tous ses liens"
+      "delete_link_only": "Supprimer uniquement ce raccourci",
+      "delete_link_and_target": "Supprimer la note et tous ses raccourcis"
     },
     "export": {
       "title": "Exporter la note",
@@ -1074,7 +1091,7 @@
     },
     "errors": {
       "workspace_not_found": "Espace de travail introuvable",
-      "linked_note_already_exists": "Un lien existe déjà pour cette note",
+      "linked_note_already_exists": "Un raccourci existe déjà pour cette note",
       "method_not_allowed": "Méthode non autorisée",
       "invalid_action": "Action invalide",
       "internal_server_error": "Erreur interne du serveur",

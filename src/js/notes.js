@@ -862,7 +862,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const linkedNoteTargetId = modal.dataset.linkedNoteTargetId;
 
             if (!linkedNoteId) {
-                showNotificationPopup('Error: Linked note ID not found', 'error');
+                showNotificationPopup('Error: Shortcut ID not found', 'error');
                 return;
             }
 

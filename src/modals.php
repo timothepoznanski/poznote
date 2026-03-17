@@ -376,7 +376,7 @@
                     <div class="create-note-option" data-type="linked" data-action="select-create-type">
                         <i class="lucide lucide-link"></i>
                         <div>
-                            <span><?php echo t_h('modals.create.linked.title', [], 'Linked Note'); ?></span>
+                            <span><?php echo t_h('modals.create.linked.title', [], 'Shortcut'); ?></span>
                         </div>
                     </div>
                 </div>
@@ -752,6 +752,7 @@
         <div class="note-reference-modal-header">
             <h3><?php echo t_h('modals.template_selector.title', [], 'Select Note for Template'); ?></h3>
         </div>
+        <p class="note-reference-description"><?php echo t_h('modals.template_selector.description', [], 'A note will be created in a folder Templates. You can then duplicate it and reuse it as a template.'); ?></p>
         <div class="note-reference-search-container">
             <input type="text" id="templateNoteSearch" placeholder="<?php echo t_h('modals.template_selector.search_placeholder', [], 'Search notes...'); ?>" class="note-reference-search-input">
         </div>
@@ -773,8 +774,9 @@
 <div id="linkedNoteSelectorModal" class="modal">
     <div class="modal-content">
         <div class="note-reference-modal-header">
-            <h3 class="modal-title"><?php echo t_h('modals.linked_selector.title', [], 'Select Note to Link'); ?></h3>
+            <h3 class="modal-title"><?php echo t_h('modals.linked_selector.title', [], 'Create a Shortcut from a Note'); ?></h3>
         </div>
+        <p class="note-reference-description shortcut-selector-description"><?php echo t_h('modals.linked_selector.description', [], 'Create a shortcut from a note so you can reference it from another folder.'); ?></p>
         <div class="note-reference-search-container">
             <input type="text" id="linkedNoteSearch" placeholder="<?php echo t_h('modals.linked_selector.search_placeholder', [], 'Search notes...'); ?>" class="note-reference-search-input">
         </div>
@@ -796,7 +798,7 @@
 <div id="linkedNoteFolderSelectorModal" class="modal">
     <div class="modal-content">
         <div class="note-reference-modal-header">
-            <h3 class="modal-title"><?php echo t_h('modals.linked_folder_selector.title', [], 'Choose Folder for Linked Note'); ?></h3>
+            <h3 class="modal-title"><?php echo t_h('modals.linked_folder_selector.title', [], 'Choose Folder for Shortcut'); ?></h3>
         </div>
         <div class="note-reference-search-container">
             <input type="text" id="linkedNoteFolderSearch" placeholder="<?php echo t_h('modals.linked_folder_selector.search_placeholder', [], 'Search folders...'); ?>" class="note-reference-search-input">
@@ -817,13 +819,13 @@
 <!-- Delete Linked Note Modal -->
 <div id="deleteLinkedNoteModal" class="modal">
     <div class="modal-content">
-        <h3><?php echo t_h('modals.delete_linked_note.title', [], 'Delete Linked Note'); ?></h3>
+        <h3><?php echo t_h('modals.delete_linked_note.title', [], 'Delete Shortcut'); ?></h3>
         <div class="modal-body">
             <p><?php echo t_h('modals.delete_linked_note.message', [], 'What do you want to delete?'); ?></p>
         </div>
         <div class="modal-buttons">
-            <button type="button" class="btn-primary" id="deleteLinkedNoteOnlyBtn"><?php echo t_h('modals.delete_linked_note.delete_link_only', [], 'Delete link only'); ?></button>
-            <button type="button" class="btn-danger" id="deleteLinkedNoteAndTargetBtn"><?php echo t_h('modals.delete_linked_note.delete_link_and_target', [], 'Delete link and target note'); ?></button>
+            <button type="button" class="btn-primary" id="deleteLinkedNoteOnlyBtn"><?php echo t_h('modals.delete_linked_note.delete_link_only', [], 'Delete this shortcut only'); ?></button>
+            <button type="button" class="btn-danger" id="deleteLinkedNoteAndTargetBtn"><?php echo t_h('modals.delete_linked_note.delete_link_and_target', [], 'Delete the note and all its shortcuts'); ?></button>
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="deleteLinkedNoteModal"><?php echo t_h('common.cancel'); ?></button>
         </div>
     </div>

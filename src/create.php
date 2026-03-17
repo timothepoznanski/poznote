@@ -102,12 +102,12 @@ $currentLang = getUserLanguage();
             </a>
 
             <!-- Linked Note -->
-            <a href="#" class="home-card" data-create-type="linked" title="<?php echo t_h('modals.create.linked.title', [], 'Linked Note'); ?>">
+            <a href="#" class="home-card" data-create-type="linked" title="<?php echo t_h('modals.create.linked.title', [], 'Shortcut'); ?>">
                 <div class="home-card-icon">
                     <i class="lucide lucide-link"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('modals.create.linked.title', [], 'Linked Note'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('modals.create.linked.title', [], 'Shortcut'); ?></span>
                 </div>
             </a>
 

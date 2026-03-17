@@ -191,8 +191,9 @@
 /* Toggle outline button */
 .toggle-outline-btn {
     position: absolute;
-    bottom: 0px;
+    top: 50%;
     right: 50%;
+    transform: translateY(-50%);
     width: 16px;
     height: 25px;
     background: #fff;
@@ -210,6 +211,12 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     opacity: 1;
     pointer-events: auto;
+}
+
+body:not(.outline-collapsed) .toggle-outline-btn {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
 }
 
 .outline-resize-handle:hover .toggle-outline-btn,
@@ -257,6 +264,7 @@ body.outline-collapsed .toggle-outline-btn {
     right: 3px;
     border-radius: 4px 0 0 4px;
     opacity: 1;
+    visibility: visible;
     pointer-events: auto;
 }
 

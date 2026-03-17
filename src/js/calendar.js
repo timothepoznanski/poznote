@@ -87,6 +87,32 @@ class MiniCalendar {
     }
 
     /**
+     * Get the active locale from the document language.
+     */
+    getCurrentLocale() {
+        return document.documentElement.lang || navigator.language || 'en';
+    }
+
+    /**
+     * Format a YYYY-MM-DD date string using the active locale.
+     */
+    formatDateForModal(dateStr) {
+        const dateParts = dateStr.split('-').map(Number);
+        if (dateParts.length !== 3 || dateParts.some(Number.isNaN)) {
+            return dateStr;
+        }
+
+        const [year, month, day] = dateParts;
+        const date = new Date(year, month - 1, day);
+
+        return new Intl.DateTimeFormat(this.getCurrentLocale(), {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        }).format(date);
+    }
+
+    /**
      * Navigate to previous month
      */
     previousMonth() {
@@ -314,9 +340,7 @@ class MiniCalendar {
      * Show modal with list of notes from a specific date
      */
     showNotesModal(notes, dateStr) {
-        // Format date for display
-        const date = new Date(dateStr);
-        const formattedDate = `${this.getMonthName(date.getMonth())} ${date.getDate()}, ${date.getFullYear()}`;
+        const formattedDate = this.formatDateForModal(dateStr);
 
         // Create modal HTML
         const modalHtml = `

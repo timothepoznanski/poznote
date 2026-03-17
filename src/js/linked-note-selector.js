@@ -23,6 +23,8 @@
 
     // Track recently opened notes in localStorage
     const RECENT_NOTES_KEY = 'poznote_recent_notes';
+    const RECENT_LINKED_NOTES_LIMIT = 20;
+    const SEARCH_LINKED_NOTES_LIMIT = 20;
 
     /**
      * Get recently opened notes from localStorage
@@ -124,7 +126,7 @@
             }
             
             // Limit displayed notes
-            const displayNotes = notes.slice(0, searchQuery ? 20 : 10);
+            const displayNotes = notes.slice(0, searchQuery ? SEARCH_LINKED_NOTES_LIMIT : RECENT_LINKED_NOTES_LIMIT);
             
             if (displayNotes.length === 0) {
                 listContainer.innerHTML = '<div class="note-reference-empty">' + tr('note_reference.empty.no_notes_found', {}, 'No notes found') + '</div>';
@@ -159,6 +161,23 @@
                 
                 listContainer.appendChild(item);
             });
+
+                            const visibleItems = listContainer.querySelectorAll('.note-reference-item');
+                            if (visibleItems.length > 4) {
+                                let visibleHeight = 0;
+                                for (let index = 0; index < 4; index++) {
+                                    visibleHeight += visibleItems[index].offsetHeight;
+                                }
+                                listContainer.style.height = visibleHeight + 'px';
+                                listContainer.style.maxHeight = visibleHeight + 'px';
+                                listContainer.style.overflowY = 'scroll';
+                                listContainer.style.scrollbarGutter = 'stable';
+                            } else {
+                                listContainer.style.height = '';
+                                listContainer.style.maxHeight = '';
+                                listContainer.style.overflowY = '';
+                                listContainer.style.scrollbarGutter = '';
+                            }
             
         } catch (error) {
             console.error('Error loading notes for linking:', error);
@@ -229,12 +248,13 @@
                 const query = searchQuery.toLowerCase().trim();
                 foldersArray = foldersArray.filter(f => {
                     const name = (f.name || '').toLowerCase();
-                    return name.includes(query);
+                    const path = (f.path || '').toLowerCase();
+                    return name.includes(query) || path.includes(query);
                 });
             }
 
-            // Sort folders by name
-            foldersArray.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+            // Sort folders by full path so hierarchy stays readable
+            foldersArray.sort((a, b) => (a.path || a.name || '').localeCompare(b.path || b.name || ''));
 
             // Render folders list
             listContainer.innerHTML = '';
@@ -275,9 +295,8 @@
 
                 const name = document.createElement('span');
                 name.className = 'note-reference-heading';
-                // Add indentation for subfolders based on depth
-                const indent = '\u00A0\u00A0\u00A0\u00A0'.repeat(folder.depth || 0);
-                name.textContent = indent + folder.name;
+                name.textContent = folder.path || folder.name;
+                name.title = folder.path || folder.name;
 
                 item.appendChild(icon);
                 item.appendChild(name);
@@ -293,6 +312,23 @@
 
                 listContainer.appendChild(item);
             });
+
+            const visibleItems = listContainer.querySelectorAll('.note-reference-item');
+            if (visibleItems.length > 4) {
+                let visibleHeight = 0;
+                for (let index = 0; index < 4; index++) {
+                    visibleHeight += visibleItems[index].offsetHeight;
+                }
+                listContainer.style.height = visibleHeight + 'px';
+                listContainer.style.maxHeight = visibleHeight + 'px';
+                listContainer.style.overflowY = 'scroll';
+                listContainer.style.scrollbarGutter = 'stable';
+            } else {
+                listContainer.style.height = '';
+                listContainer.style.maxHeight = '';
+                listContainer.style.overflowY = '';
+                listContainer.style.scrollbarGutter = '';
+            }
 
         } catch (error) {
             console.error('Error loading folders:', error);
@@ -347,8 +383,10 @@
             const data = await response.json();
             
             if (data.success && data.note && data.note.id) {
-                // Success - redirect to the notes list or open the linked note
-                let url = 'index.php?workspace=' + encodeURIComponent(workspace) + '&select_linked_note=' + encodeURIComponent(data.note.id);
+                // Success - open the linked note immediately.
+                // `note` triggers backend linked-note resolution, while `select_linked_note`
+                // keeps the shortcut highlighted in the sidebar.
+                let url = 'index.php?workspace=' + encodeURIComponent(workspace) + '&note=' + encodeURIComponent(data.note.id) + '&select_linked_note=' + encodeURIComponent(data.note.id);
                 
                 // Add expand_folder parameter to force folder expansion on load
                 if (data.note.folder_id) {
@@ -359,7 +397,7 @@
                 window.location.href = url;
             } else {
                 // Error
-                const errorMsg = data.error || tr('modals.create.linked.error', {}, 'Error creating linked note');
+                const errorMsg = data.error || tr('modals.create.linked.error', {}, 'Error creating shortcut');
                 if (typeof showNotificationPopup === 'function') {
                     showNotificationPopup(errorMsg, 'error');
                 }

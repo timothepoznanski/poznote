@@ -307,13 +307,22 @@ try {
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title><?php echo getPageTitle(); ?></title>
+    <meta name="theme-color" content="#111827">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Poznote">
     <meta name="color-scheme" content="dark light">
     <?php 
     $cache_v = @file_get_contents('version.txt');
     if ($cache_v === false) $cache_v = time();
     $cache_v = urlencode(trim($cache_v));
     ?>
+    <link rel="manifest" href="manifest.webmanifest?v=<?php echo $cache_v; ?>">
+    <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
+    <link rel="apple-touch-icon" href="poznote.png?v=<?php echo $cache_v; ?>">
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="js/pwa.js?v=<?php echo $cache_v; ?>" defer></script>
     <link type="text/css" rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/base.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css?v=<?php echo $cache_v; ?>"/>
@@ -349,7 +358,7 @@ try {
     <div class="home-container">
         <?php $currentUser = getCurrentUser(); ?>
 
-        <div style="display: flex; justify-content: center; gap: 10px;">
+        <div class="home-nav-actions" style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 10px;">
             <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary go-to-nav-btn">
                 <?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?>
             </a>
@@ -365,7 +374,7 @@ try {
             </div>
         </div>
 
-        <div class="home-grid">
+        <div class="home-grid" style="margin-top: 16px;">
             <?php if ($syncMessage): ?>
             <div class="alert alert-success" style="grid-column: 1 / -1; margin-bottom: 10px;">
                 <i class="lucide lucide-check-circle"></i> <?php echo htmlspecialchars($syncMessage); ?>
@@ -589,13 +598,14 @@ try {
                 </div>
             </a>
 
-            <!-- Logout -->
-            <a href="logout.php" class="home-card home-card-logout" title="<?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?>">
+            <!-- Install App -->
+            <a href="#" class="home-card" id="install-app-card">
                 <div class="home-card-icon">
-                    <i class="lucide lucide-log-out"></i>
+                    <i class="lucide lucide-smartphone"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('settings.cards.install_app', [], 'Install application'); ?></span>
+                    <span class="home-card-count" id="install-app-status"><?php echo t_h('settings.install_app.status.unavailable', [], 'Unavailable'); ?></span>
                 </div>
             </a>
 
@@ -744,6 +754,67 @@ try {
         const searchInput = document.getElementById('home-search');
         const cards = document.querySelectorAll('.home-card');
         const noResults = document.getElementById('no-results');
+        const installAppCard = document.getElementById('install-app-card');
+        const installAppStatus = document.getElementById('install-app-status');
+
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+        function updateInstallAppStatus() {
+            if (!installAppStatus) return;
+
+            if (isStandalone) {
+                installAppStatus.textContent = <?php echo json_encode(t('settings.install_app.status.installed', [], 'Already installed')); ?>;
+                return;
+            }
+
+            if (typeof window.poznoteCanInstallApp === 'function' && window.poznoteCanInstallApp()) {
+                installAppStatus.textContent = <?php echo json_encode(t('settings.install_app.status.available', [], 'Available')); ?>;
+                return;
+            }
+
+            installAppStatus.textContent = <?php echo json_encode(t('settings.install_app.status.unavailable', [], 'Unavailable')); ?>;
+        }
+
+        updateInstallAppStatus();
+
+        window.addEventListener('poznote:pwa-install-available', () => {
+            updateInstallAppStatus();
+        });
+
+        window.addEventListener('poznote:pwa-installed', () => {
+            updateInstallAppStatus();
+        });
+
+        if (installAppCard) {
+            installAppCard.addEventListener('click', async function(e) {
+                e.preventDefault();
+
+                if (isStandalone) {
+                    const alreadyInstalledMsg = <?php echo json_encode(t('settings.install_app.already_installed', [], 'The application is already installed on this device.')); ?>;
+                    if (window.modalAlert?.alert) {
+                        window.modalAlert.alert(alreadyInstalledMsg, 'info', <?php echo json_encode(t('settings.cards.install_app', [], 'Install application')); ?>);
+                    } else {
+                        alert(alreadyInstalledMsg);
+                    }
+                    return;
+                }
+
+                if (typeof window.poznotePromptInstall === 'function') {
+                    const result = await window.poznotePromptInstall();
+                    if (result.supported) {
+                        updateInstallAppStatus();
+                        return;
+                    }
+                }
+
+                const fallbackInstallMsg = <?php echo json_encode(t('settings.install_app.unavailable', [], 'Installation is not available right now. On Chrome mobile, open the browser menu then tap "Install app" (or "Add to Home screen") when available.')); ?>;
+                if (window.modalAlert?.alert) {
+                    window.modalAlert.alert(fallbackInstallMsg, 'info', <?php echo json_encode(t('settings.cards.install_app', [], 'Install application')); ?>);
+                } else {
+                    alert(fallbackInstallMsg);
+                }
+            });
+        }
 
         searchInput?.addEventListener('input', function() {
             const term = this.value.toLowerCase().trim();

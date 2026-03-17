@@ -339,9 +339,19 @@
       "news": "Poznote 博客",
       "website": "Poznote 网站",
       "support": "支持开发者",
+      "install_app": "安装应用",
       "release_notes": "发布日志",
       "convert_images": "Base64 Image Converter",
       "orphan_scanner": "孤立附件扫描器"
+    },
+    "install_app": {
+      "unavailable": "当前无法安装。请在 Chrome 手机版中打开浏览器菜单，然后在可用时点击“安装应用”（或“添加到主屏幕”）。",
+      "already_installed": "该设备已安装此应用。",
+      "status": {
+        "available": "可安装",
+        "unavailable": "不可用",
+        "installed": "已安装"
+      }
     }
   },
   "workspaces": {
@@ -640,7 +650,7 @@
       "insert_checklist": "插入清单",
       "add_separator": "添加分隔符",
       "insert_note_reference": "插入笔记引用",
-      "create_linked_note": "创建链接笔记",
+      "create_linked_note": "创建快捷方式",
       "open_in_new_tab": "在新标签页中打开",
       "search_replace": "查找替换",
       "split_view": "切换分屏视图",
@@ -808,10 +818,10 @@
         "title": "任务列表"
       },
       "linked": {
-        "title": "链接笔记",
+        "title": "快捷方式",
         "default_heading": "{{note}}",
-        "success": "链接笔记创建成功",
-        "error": "创建链接笔记时出错"
+        "success": "快捷方式创建成功",
+        "error": "创建快捷方式时出错"
       },
       "template": {
         "title": "模板"
@@ -846,23 +856,30 @@
       "search_placeholder": "搜索图标..."
     },
     "linked_selector": {
-      "title": "选择要链接的笔记",
+      "title": "从笔记创建快捷方式",
+      "description": "从一条笔记创建快捷方式，以便在另一个文件夹中引用它。",
+      "search_placeholder": "搜索笔记...",
+      "recent_label": "最近的笔记"
+    },
+    "template_selector": {
+      "title": "选择用于模板的笔记",
+      "description": "系统会在 Templates 文件夹中创建一条笔记。之后您可以复制它，并将其重复用作模板。",
       "search_placeholder": "搜索笔记...",
       "recent_label": "最近的笔记"
     },
     "linked_folder_selector": {
-      "title": "选择链接笔记的文件夹",
-      "description": "选择将创建链接笔记的文件夹：",
+      "title": "选择快捷方式的文件夹",
+      "description": "选择将创建快捷方式的文件夹：",
       "search_label": "筛选文件夹",
       "search_placeholder": "搜索文件夹...",
       "folder_label": "目标文件夹",
       "root": "根目录（无文件夹）"
     },
     "delete_linked_note": {
-      "title": "删除链接笔记",
+      "title": "删除快捷方式",
       "message": "您想删除什么？",
-      "delete_link_only": "仅删除此链接",
-      "delete_link_and_target": "删除笔记及其所有链接"
+      "delete_link_only": "仅删除此快捷方式",
+      "delete_link_and_target": "删除笔记及其所有快捷方式"
     },
     "convert": {
       "title": "转换笔记",
@@ -1027,7 +1044,7 @@
     },
     "errors": {
       "workspace_not_found": "未找到工作区",
-      "linked_note_already_exists": "此笔记已存在链接笔记",
+      "linked_note_already_exists": "此笔记已存在快捷方式",
       "method_not_allowed": "方法不允许",
       "invalid_action": "无效操作",
       "internal_server_error": "服务器内部错误",

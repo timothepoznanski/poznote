@@ -7,9 +7,9 @@
 
 /* Search Bar */
 .home-search-container {
-    /* margin-bottom: 25px; */
     display: flex;
     justify-content: center;
+    margin-bottom: 16px;
 }
 
 .home-search-wrapper {
