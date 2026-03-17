@@ -124,7 +124,7 @@
             }
             
             // Limit displayed notes
-            const displayNotes = notes.slice(0, searchQuery ? 20 : 10);
+            const displayNotes = notes.slice(0, searchQuery ? 20 : 3);
             
             if (displayNotes.length === 0) {
                 listContainer.innerHTML = '<div class="note-reference-empty">' + tr('note_reference.empty.no_notes_found', {}, 'No notes found') + '</div>';
@@ -359,7 +359,7 @@
                 window.location.href = url;
             } else {
                 // Error
-                const errorMsg = data.error || tr('modals.create.linked.error', {}, 'Error creating linked note');
+                const errorMsg = data.error || tr('modals.create.linked.error', {}, 'Error creating shortcut');
                 if (typeof showNotificationPopup === 'function') {
                     showNotificationPopup(errorMsg, 'error');
                 }

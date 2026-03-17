@@ -641,7 +641,7 @@
       "insert_checklist": "Inserir lista de tarefas",
       "add_separator": "Adicionar separador",
       "insert_note_reference": "Inserir referência de nota",
-      "create_linked_note": "Criar nota vinculada",
+      "create_linked_note": "Criar atalho",
       "open_in_new_tab": "Abrir em nova aba",
       "search_replace": "Pesquisar e substituir"
     },
@@ -795,10 +795,10 @@
         "title": "Lista de Tarefas"
       },
       "linked": {
-        "title": "Nota vinculada",
+        "title": "Atalho",
         "default_heading": "{{note}}",
-        "success": "Nota vinculada criada com sucesso",
-        "error": "Erro ao criar nota vinculada"
+        "success": "Atalho criado com sucesso",
+        "error": "Erro ao criar o atalho"
       },
       "template": {
         "title": "Modelo"
@@ -833,7 +833,8 @@
       "search_placeholder": "Pesquisar ícones..."
     },
     "linked_selector": {
-      "title": "Selecionar nota para vincular",
+      "title": "Criar um atalho a partir de uma nota",
+      "description": "Crie um atalho a partir de uma nota para poder referenciá-la em outra pasta.",
       "search_placeholder": "Pesquisar notas...",
       "recent_label": "Notas recentes"
     },
@@ -844,18 +845,18 @@
       "recent_label": "Notas recentes"
     },
     "linked_folder_selector": {
-      "title": "Escolher pasta para a nota vinculada",
-      "description": "Selecione a pasta onde a nota vinculada será criada:",
+      "title": "Escolher pasta para o atalho",
+      "description": "Selecione a pasta onde o atalho será criado:",
       "search_label": "Filtrar pastas",
       "search_placeholder": "Pesquisar pastas...",
       "folder_label": "Pasta de destino",
       "root": "Raiz (Sem pasta)"
     },
     "delete_linked_note": {
-      "title": "Excluir nota vinculada",
+      "title": "Excluir atalho",
       "message": "O que você deseja excluir?",
-      "delete_link_only": "Excluir apenas este vínculo",
-      "delete_link_and_target": "Excluir a nota e todos os seus vínculos"
+      "delete_link_only": "Excluir apenas este atalho",
+      "delete_link_and_target": "Excluir a nota e todos os seus atalhos"
     },
     "convert": {
       "title": "Converter nota",
@@ -1041,7 +1042,7 @@
     },
     "errors": {
       "workspace_not_found": "Espaço de trabalho não encontrado",
-      "linked_note_already_exists": "Já existe uma nota vinculada para esta nota",
+      "linked_note_already_exists": "Já existe um atalho para esta nota",
       "method_not_allowed": "Método não permitido",
       "invalid_action": "Ação inválida",
       "internal_server_error": "Erro interno do servidor",

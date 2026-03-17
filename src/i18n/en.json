@@ -360,10 +360,10 @@
         "title": "Task List"
       },
       "linked": {
-        "title": "Linked Note",
+        "title": "Shortcut",
         "default_heading": "{{note}}",
-        "success": "Linked note created successfully",
-        "error": "Error creating linked note"
+        "success": "Shortcut created successfully",
+        "error": "Error creating shortcut"
       },
       "template": {
         "title": "Template"
@@ -398,7 +398,8 @@
       "search_placeholder": "Search icons..."
     },
     "linked_selector": {
-      "title": "Select Note to Link",
+      "title": "Create a Shortcut from a Note",
+      "description": "Create a shortcut from a note so you can reference it from another folder.",
       "search_placeholder": "Search notes...",
       "recent_label": "Recent notes"
     },
@@ -409,18 +410,18 @@
       "recent_label": "Recent notes"
     },
     "linked_folder_selector": {
-      "title": "Choose Folder for Linked Note",
-      "description": "Select the folder where the linked note will be created:",
+      "title": "Choose Folder for Shortcut",
+      "description": "Select the folder where the shortcut will be created:",
       "search_label": "Filter folders",
       "search_placeholder": "Search folders...",
       "folder_label": "Destination folder",
       "root": "Root (No folder)"
     },
     "delete_linked_note": {
-      "title": "Delete Linked Note",
+      "title": "Delete Shortcut",
       "message": "What do you want to delete?",
-      "delete_link_only": "Delete this link only",
-      "delete_link_and_target": "Delete the note and all its links"
+      "delete_link_only": "Delete this shortcut only",
+      "delete_link_and_target": "Delete the note and all its shortcuts"
     },
     "convert": {
       "title": "Convert Note",
@@ -595,7 +596,7 @@
     },
     "errors": {
       "workspace_not_found": "Workspace not found",
-      "linked_note_already_exists": "A linked note already exists for this note",
+      "linked_note_already_exists": "A shortcut already exists for this note",
       "method_not_allowed": "Method not allowed",
       "invalid_action": "Invalid action",
       "internal_server_error": "Internal server error",
@@ -789,7 +790,7 @@
       "add_separator": "Add separator",
       "insert_note_reference": "Insert note reference",
       "open_in_new_tab": "Open in new tab",
-      "create_linked_note": "Create linked note",
+      "create_linked_note": "Create shortcut",
       "search_replace": "Search and replace"
     },
     "link": {

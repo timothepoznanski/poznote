@@ -397,7 +397,7 @@ class NotesController {
                 $checkLinkedNote = $this->con->prepare("SELECT id FROM entries WHERE id = ? AND trash = 0");
                 $checkLinkedNote->execute([$linked_note_id]);
                 if (!$checkLinkedNote->fetch()) {
-                    $this->sendError(404, 'Linked note not found');
+                    $this->sendError(404, 'Shortcut not found');
                     return;
                 }
                 
@@ -406,7 +406,7 @@ class NotesController {
                 $checkExistingLink->execute([$linked_note_id]);
                 $existingLink = $checkExistingLink->fetch();
                 if ($existingLink) {
-                    $this->sendError(400, 'A linked note already exists for this note');
+                    $this->sendError(400, 'A shortcut already exists for this note');
                     return;
                 }
             }

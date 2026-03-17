@@ -107,6 +107,10 @@
     line-height: 1.5;
 }
 
+.shortcut-selector-description {
+    margin-top: 8px;
+}
+
 /* Search input */
 .note-reference-search {
     position: relative;
