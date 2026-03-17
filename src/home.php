@@ -358,7 +358,7 @@ try {
     <div class="home-container">
         <?php $currentUser = getCurrentUser(); ?>
 
-        <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 16px;">
+        <div class="home-nav-actions" style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 10px;">
             <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary go-to-nav-btn">
                 <?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?>
             </a>
@@ -374,7 +374,7 @@ try {
             </div>
         </div>
 
-        <div class="home-grid">
+        <div class="home-grid" style="margin-top: 16px;">
             <?php if ($syncMessage): ?>
             <div class="alert alert-success" style="grid-column: 1 / -1; margin-bottom: 10px;">
                 <i class="lucide lucide-check-circle"></i> <?php echo htmlspecialchars($syncMessage); ?>
