@@ -229,12 +229,13 @@
                 const query = searchQuery.toLowerCase().trim();
                 foldersArray = foldersArray.filter(f => {
                     const name = (f.name || '').toLowerCase();
-                    return name.includes(query);
+                    const path = (f.path || '').toLowerCase();
+                    return name.includes(query) || path.includes(query);
                 });
             }
 
-            // Sort folders by name
-            foldersArray.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+            // Sort folders by full path so hierarchy stays readable
+            foldersArray.sort((a, b) => (a.path || a.name || '').localeCompare(b.path || b.name || ''));
 
             // Render folders list
             listContainer.innerHTML = '';
@@ -275,9 +276,8 @@
 
                 const name = document.createElement('span');
                 name.className = 'note-reference-heading';
-                // Add indentation for subfolders based on depth
-                const indent = '\u00A0\u00A0\u00A0\u00A0'.repeat(folder.depth || 0);
-                name.textContent = indent + folder.name;
+                name.textContent = folder.path || folder.name;
+                name.title = folder.path || folder.name;
 
                 item.appendChild(icon);
                 item.appendChild(name);
@@ -293,6 +293,19 @@
 
                 listContainer.appendChild(item);
             });
+
+            const visibleItems = listContainer.querySelectorAll('.note-reference-item');
+            if (visibleItems.length > 4) {
+                let maxHeight = 0;
+                for (let index = 0; index < 4; index++) {
+                    maxHeight += visibleItems[index].offsetHeight;
+                }
+                listContainer.style.maxHeight = maxHeight + 'px';
+                listContainer.style.overflowY = 'auto';
+            } else {
+                listContainer.style.maxHeight = '';
+                listContainer.style.overflowY = '';
+            }
 
         } catch (error) {
             console.error('Error loading folders:', error);
