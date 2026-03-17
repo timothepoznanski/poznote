@@ -1,5 +1,6 @@
 (() => {
   let deferredInstallPrompt = null;
+  let isReloadingForServiceWorker = false;
 
   window.poznoteCanInstallApp = () => Boolean(deferredInstallPrompt);
 
@@ -31,9 +32,20 @@
     return;
   }
 
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (isReloadingForServiceWorker) {
+      return;
+    }
+
+    isReloadingForServiceWorker = true;
+    window.location.reload();
+  });
+
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(() => {
-      // Ignore registration failures; the app remains usable without PWA features.
-    });
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+      .then((registration) => registration.update().then(() => registration))
+      .catch(() => {
+        // Ignore registration failures; the app remains usable without PWA features.
+      });
   });
 })();
