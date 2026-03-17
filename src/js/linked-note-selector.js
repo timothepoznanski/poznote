@@ -296,15 +296,19 @@
 
             const visibleItems = listContainer.querySelectorAll('.note-reference-item');
             if (visibleItems.length > 4) {
-                let maxHeight = 0;
+                let visibleHeight = 0;
                 for (let index = 0; index < 4; index++) {
-                    maxHeight += visibleItems[index].offsetHeight;
+                    visibleHeight += visibleItems[index].offsetHeight;
                 }
-                listContainer.style.maxHeight = maxHeight + 'px';
-                listContainer.style.overflowY = 'auto';
+                listContainer.style.height = visibleHeight + 'px';
+                listContainer.style.maxHeight = visibleHeight + 'px';
+                listContainer.style.overflowY = 'scroll';
+                listContainer.style.scrollbarGutter = 'stable';
             } else {
+                listContainer.style.height = '';
                 listContainer.style.maxHeight = '';
                 listContainer.style.overflowY = '';
+                listContainer.style.scrollbarGutter = '';
             }
 
         } catch (error) {

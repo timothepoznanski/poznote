@@ -2,7 +2,7 @@
  * Home - Cards
  *
  * Styles for home page cards including base card, hover/loading states,
- * card icon, color variants (blue default, red/logout, orange, green),
+ * card icon, color variants (blue default, red, orange, green),
  * special icon colors (shared, favorites, trash, kanban),
  * and card content (title, description, count).
  */
@@ -48,25 +48,20 @@
     font-style: normal;
 }
 
-/* Red cards (logout + red variant — merged, identical styles) */
-.home-card-logout .home-card-icon,
+/* Red cards */
 .home-card-red .home-card-icon {
     background: rgba(239, 68, 68, 0.12);
 }
 
-.home-card-logout .home-card-icon i,
 .home-card-red .home-card-icon i {
     color: #ef4444;
 }
 
-html[data-theme='dark'] .home-card-logout .home-card-icon,
-body.dark-mode .home-card-logout .home-card-icon,
 html[data-theme='dark'] .home-card-red .home-card-icon,
 body.dark-mode .home-card-red .home-card-icon {
     background: rgba(239, 68, 68, 0.22);
 }
 
-.home-card-logout:hover,
 .home-card-red:hover {
     border-color: #ef4444;
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);

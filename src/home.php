@@ -609,16 +609,6 @@ try {
                 </div>
             </a>
 
-            <!-- Logout -->
-            <a href="logout.php" class="home-card home-card-logout" title="<?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?>">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-log-out"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?></span>
-                </div>
-            </a>
-
         </div>
 
         <h2 class="settings-category-title"><?php echo t_h('settings.categories.documentation', [], 'Documentation'); ?></h2>
