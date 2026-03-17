@@ -752,6 +752,7 @@
         <div class="note-reference-modal-header">
             <h3><?php echo t_h('modals.template_selector.title', [], 'Select Note for Template'); ?></h3>
         </div>
+        <p class="note-reference-description"><?php echo t_h('modals.template_selector.description', [], 'A note will be created in a folder Templates. You can then duplicate it and reuse it as a template.'); ?></p>
         <div class="note-reference-search-container">
             <input type="text" id="templateNoteSearch" placeholder="<?php echo t_h('modals.template_selector.search_placeholder', [], 'Search notes...'); ?>" class="note-reference-search-input">
         </div>

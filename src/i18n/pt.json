@@ -837,6 +837,12 @@
       "search_placeholder": "Pesquisar notas...",
       "recent_label": "Notas recentes"
     },
+    "template_selector": {
+      "title": "Selecionar nota para modelo",
+      "description": "Uma nota será criada na pasta Templates. Depois, você poderá duplicá-la e reutilizá-la como modelo.",
+      "search_placeholder": "Pesquisar notas...",
+      "recent_label": "Notas recentes"
+    },
     "linked_folder_selector": {
       "title": "Escolher pasta para a nota vinculada",
       "description": "Selecione a pasta onde a nota vinculada será criada:",

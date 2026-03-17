@@ -850,6 +850,12 @@
       "search_placeholder": "搜索笔记...",
       "recent_label": "最近的笔记"
     },
+    "template_selector": {
+      "title": "选择用于模板的笔记",
+      "description": "系统会在 Templates 文件夹中创建一条笔记。之后您可以复制它，并将其重复用作模板。",
+      "search_placeholder": "搜索笔记...",
+      "recent_label": "最近的笔记"
+    },
     "linked_folder_selector": {
       "title": "选择链接笔记的文件夹",
       "description": "选择将创建链接笔记的文件夹：",

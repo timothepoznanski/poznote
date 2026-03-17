@@ -867,6 +867,12 @@
       "search_placeholder": "Rechercher des notes...",
       "recent_label": "Notes récentes"
     },
+    "template_selector": {
+      "title": "Sélectionner une note pour le modèle",
+      "description": "Une note sera créée dans le dossier Templates. Vous pourrez ensuite la dupliquer et la réutiliser comme modèle.",
+      "search_placeholder": "Rechercher des notes...",
+      "recent_label": "Notes récentes"
+    },
     "linked_folder_selector": {
       "title": "Choisir un dossier pour la note liée",
       "description": "Sélectionnez le dossier où la note liée sera créée :",

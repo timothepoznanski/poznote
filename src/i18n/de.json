@@ -838,6 +838,12 @@
       "search_placeholder": "Notizen suchen...",
       "recent_label": "Aktuelle Notizen"
     },
+    "template_selector": {
+      "title": "Notiz für Vorlage auswählen",
+      "description": "Im Ordner Templates wird eine Notiz erstellt. Danach können Sie sie duplizieren und als Vorlage wiederverwenden.",
+      "search_placeholder": "Notizen suchen...",
+      "recent_label": "Aktuelle Notizen"
+    },
     "linked_folder_selector": {
       "title": "Ordner für verknüpfte Notiz auswählen",
       "description": "Wählen Sie den Ordner aus, in dem die verknüpfte Notiz erstellt wird:",

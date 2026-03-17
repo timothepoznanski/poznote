@@ -837,6 +837,12 @@
       "search_placeholder": "Buscar notas...",
       "recent_label": "Notas recientes"
     },
+    "template_selector": {
+      "title": "Seleccionar nota para plantilla",
+      "description": "Se creará una nota en la carpeta Templates. Después podrá duplicarla y reutilizarla como plantilla.",
+      "search_placeholder": "Buscar notas...",
+      "recent_label": "Notas recientes"
+    },
     "linked_folder_selector": {
       "title": "Elegir carpeta para la nota vinculada",
       "description": "Seleccione la carpeta donde se creará la nota vinculada:",

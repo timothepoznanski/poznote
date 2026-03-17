@@ -11,6 +11,8 @@
 
     // Track recently opened notes in localStorage
     const RECENT_NOTES_KEY = 'poznote_recent_notes';
+    const RECENT_TEMPLATE_NOTES_LIMIT = 3;
+    const SEARCH_TEMPLATE_NOTES_LIMIT = 20;
 
     /**
      * Get recently opened notes from localStorage
@@ -112,7 +114,7 @@
             }
             
             // Limit displayed notes
-            const displayNotes = notes.slice(0, searchQuery ? 20 : 10);
+            const displayNotes = notes.slice(0, searchQuery ? SEARCH_TEMPLATE_NOTES_LIMIT : RECENT_TEMPLATE_NOTES_LIMIT);
             
             if (displayNotes.length === 0) {
                 listContainer.innerHTML = '<div class="note-reference-empty">' + tr('note_reference.empty.no_notes_found', {}, 'No notes found') + '</div>';

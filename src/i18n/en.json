@@ -402,6 +402,12 @@
       "search_placeholder": "Search notes...",
       "recent_label": "Recent notes"
     },
+    "template_selector": {
+      "title": "Select Note for Template",
+      "description": "A note will be created in a folder Templates. You can then duplicate it and reuse it as a template.",
+      "search_placeholder": "Search notes...",
+      "recent_label": "Recent notes"
+    },
     "linked_folder_selector": {
       "title": "Choose Folder for Linked Note",
       "description": "Select the folder where the linked note will be created:",
