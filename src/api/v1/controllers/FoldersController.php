@@ -1235,51 +1235,18 @@ class FoldersController {
             }
         }
         
-        // Check if source folder was shared (to unshare all moved notes)
         $shareDelta = 0;
-        $sourceSharedStmt = $this->db->prepare("SELECT id FROM shared_folders WHERE folder_id = ? LIMIT 1");
-        $sourceSharedStmt->execute([$sourceFolderId]);
-        $sourceWasShared = $sourceSharedStmt->fetchColumn() !== false;
-        
-        if ($sourceWasShared && $sourceFolderId != $targetFolderId) {
-            // Source folder was shared, remove shares from moved notes
-            foreach ($notes as $note) {
-                // Check if note was actually shared before deleting
-                $checkSharedStmt = $this->db->prepare("SELECT token FROM shared_notes WHERE note_id = ? LIMIT 1");
-                $checkSharedStmt->execute([$note['id']]);
-                $existingToken = $checkSharedStmt->fetchColumn();
-                if ($existingToken) {
-                    require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
-                    unregisterSharedLink($existingToken);
-                    $deleteShareStmt = $this->db->prepare("DELETE FROM shared_notes WHERE note_id = ?");
-                    $deleteShareStmt->execute([$note['id']]);
-                    $shareDelta--;
-                }
-            }
-        }
-        
-        // If target folder is shared, auto-share all moved notes
-        if ($targetFolderId > 0) {
-            $sharedFolderStmt = $this->db->prepare("SELECT id, theme, indexable FROM shared_folders WHERE folder_id = ? LIMIT 1");
-            $sharedFolderStmt->execute([$targetFolderId]);
-            $sharedFolder = $sharedFolderStmt->fetch(PDO::FETCH_ASSOC);
-            
-            if ($sharedFolder) {
-                foreach ($notes as $note) {
-                    // Check if note is already shared
-                    $checkSharedStmt = $this->db->prepare("SELECT id FROM shared_notes WHERE note_id = ? LIMIT 1");
-                    $checkSharedStmt->execute([$note['id']]);
-                    
-                    if (!$checkSharedStmt->fetchColumn()) {
-                        // Create share for this note
-                        $noteToken = bin2hex(random_bytes(16));
-                        $insertShareStmt = $this->db->prepare("INSERT INTO shared_notes (note_id, token, theme, indexable) VALUES (?, ?, ?, ?)");
-                        $insertShareStmt->execute([$note['id'], $noteToken, $sharedFolder['theme'], $sharedFolder['indexable']]);
-                        require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
-                        registerSharedLink($noteToken, $_SESSION['user_id'], 'note', (int)$note['id']);
-                        $shareDelta++;
-                    }
-                }
+
+        // Remove only legacy implicit shares created by old folder-sharing behavior.
+        foreach ($notes as $note) {
+            $checkSharedStmt = $this->db->prepare("SELECT token FROM shared_notes WHERE note_id = ? AND access_mode IS NULL LIMIT 1");
+            $checkSharedStmt->execute([$note['id']]);
+            $existingToken = $checkSharedStmt->fetchColumn();
+            if ($existingToken) {
+                require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+                unregisterSharedLink($existingToken);
+                $deleteShareStmt = $this->db->prepare("DELETE FROM shared_notes WHERE note_id = ? AND access_mode IS NULL");
+                $deleteShareStmt->execute([$note['id']]);
             }
         }
         
@@ -1385,49 +1352,15 @@ class FoldersController {
         if ($success) {
             $shareDelta = 0; // Track share count change: +1 if shared, -1 if unshared
             
-            // Check if the OLD folder was shared (to unshare the note)
-            $oldFolderId = $currentNote['folder_id'];
-            if ($oldFolderId && $oldFolderId != $targetFolderId) {
-                $oldSharedFolderStmt = $this->db->prepare("SELECT id FROM shared_folders WHERE folder_id = ? LIMIT 1");
-                $oldSharedFolderStmt->execute([$oldFolderId]);
-                
-                if ($oldSharedFolderStmt->fetchColumn()) {
-                    // Check if note was actually shared
-                    $checkWasSharedStmt = $this->db->prepare("SELECT token FROM shared_notes WHERE note_id = ? LIMIT 1");
-                    $checkWasSharedStmt->execute([$noteId]);
-                    $existingToken = $checkWasSharedStmt->fetchColumn();
-                    if ($existingToken) {
-                        // Old folder was shared, remove the share from this note
-                        require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
-                        unregisterSharedLink($existingToken);
-                        $deleteShareStmt = $this->db->prepare("DELETE FROM shared_notes WHERE note_id = ?");
-                        $deleteShareStmt->execute([$noteId]);
-                        $shareDelta = -1;
-                    }
-                }
-            }
-            
-            // If target folder is shared, auto-share the note
-            if ($targetFolderId !== null) {
-                $sharedFolderStmt = $this->db->prepare("SELECT id, theme, indexable FROM shared_folders WHERE folder_id = ? LIMIT 1");
-                $sharedFolderStmt->execute([$targetFolderId]);
-                $sharedFolder = $sharedFolderStmt->fetch(PDO::FETCH_ASSOC);
-                
-                if ($sharedFolder) {
-                    // Check if note is already shared
-                    $checkSharedStmt = $this->db->prepare("SELECT id FROM shared_notes WHERE note_id = ? LIMIT 1");
-                    $checkSharedStmt->execute([$noteId]);
-                    
-                    if (!$checkSharedStmt->fetchColumn()) {
-                        // Create share for this note
-                        $noteToken = bin2hex(random_bytes(16));
-                        $insertShareStmt = $this->db->prepare("INSERT INTO shared_notes (note_id, token, theme, indexable) VALUES (?, ?, ?, ?)");
-                        $insertShareStmt->execute([$noteId, $noteToken, $sharedFolder['theme'], $sharedFolder['indexable']]);
-                        require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
-                        registerSharedLink($noteToken, $_SESSION['user_id'], 'note', (int)$noteId);
-                        $shareDelta = 1; // Note was newly shared
-                    }
-                }
+            // Remove only legacy implicit shares created by old folder-sharing behavior.
+            $checkWasSharedStmt = $this->db->prepare("SELECT token FROM shared_notes WHERE note_id = ? AND access_mode IS NULL LIMIT 1");
+            $checkWasSharedStmt->execute([$noteId]);
+            $existingToken = $checkWasSharedStmt->fetchColumn();
+            if ($existingToken) {
+                require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+                unregisterSharedLink($existingToken);
+                $deleteShareStmt = $this->db->prepare("DELETE FROM shared_notes WHERE note_id = ? AND access_mode IS NULL");
+                $deleteShareStmt->execute([$noteId]);
             }
             
             $this->sendJson([
@@ -1491,25 +1424,15 @@ class FoldersController {
         if ($success) {
             $shareDelta = 0;
             
-            // If old folder was shared, unshare the note
-            $oldFolderId = $currentNote['folder_id'];
-            if ($oldFolderId) {
-                $sharedFolderStmt = $this->db->prepare("SELECT id FROM shared_folders WHERE folder_id = ? LIMIT 1");
-                $sharedFolderStmt->execute([$oldFolderId]);
-                
-                if ($sharedFolderStmt->fetchColumn()) {
-                    // Check if note was actually shared
-                    $checkWasSharedStmt = $this->db->prepare("SELECT token FROM shared_notes WHERE note_id = ? LIMIT 1");
-                    $checkWasSharedStmt->execute([$noteId]);
-                    $existingToken = $checkWasSharedStmt->fetchColumn();
-                    if ($existingToken) {
-                        require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
-                        unregisterSharedLink($existingToken);
-                        $deleteShareStmt = $this->db->prepare("DELETE FROM shared_notes WHERE note_id = ?");
-                        $deleteShareStmt->execute([$noteId]);
-                        $shareDelta = -1;
-                    }
-                }
+            // Remove only legacy implicit shares created by old folder-sharing behavior.
+            $checkWasSharedStmt = $this->db->prepare("SELECT token FROM shared_notes WHERE note_id = ? AND access_mode IS NULL LIMIT 1");
+            $checkWasSharedStmt->execute([$noteId]);
+            $existingToken = $checkWasSharedStmt->fetchColumn();
+            if ($existingToken) {
+                require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+                unregisterSharedLink($existingToken);
+                $deleteShareStmt = $this->db->prepare("DELETE FROM shared_notes WHERE note_id = ? AND access_mode IS NULL");
+                $deleteShareStmt->execute([$noteId]);
             }
             
             $this->sendJson([

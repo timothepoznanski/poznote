@@ -149,6 +149,16 @@
         box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
     }
 
+    .shared-note-item.shared-hierarchy-item {
+        margin-left: calc(var(--shared-indent-level, 0) * 12px);
+        padding-left: calc(12px + var(--shared-indent-level, 0) * 6px);
+        border-left-width: 3px;
+    }
+
+    .shared-note-item.shared-note-child {
+        border-left-width: 3px;
+    }
+
     .shared-notes-header {
         display: none;
     }

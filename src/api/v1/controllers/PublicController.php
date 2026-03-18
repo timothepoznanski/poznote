@@ -210,7 +210,7 @@ class PublicController {
     }
 
     private function validateTokenAndGetNote(string $token): ?array {
-        $stmt = $this->con->prepare('SELECT note_id, password, access_mode FROM shared_notes WHERE token = ?');
+        $stmt = $this->con->prepare('SELECT note_id, password, access_mode FROM shared_notes WHERE token = ? AND access_mode IS NOT NULL');
         $stmt->execute([$token]);
         $sharedNote = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$sharedNote) {

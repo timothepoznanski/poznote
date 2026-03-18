@@ -178,7 +178,7 @@ class SystemController {
         
         try {
             // 1. Get all shared folders to check if notes are shared via folder
-            $sharedFoldersQuery = "SELECT sf.folder_id, sf.token, f.name as folder_name, f.workspace 
+            $sharedFoldersQuery = "SELECT sf.id, sf.folder_id, sf.token, sf.created, sf.indexable, sf.password, sf.allowed_users, f.name as folder_name, f.parent_id, f.workspace 
                 FROM shared_folders sf 
                 INNER JOIN folders f ON sf.folder_id = f.id";
             $sfStmt = $this->con->prepare($sharedFoldersQuery);
@@ -187,6 +187,7 @@ class SystemController {
             
             // Create a map of folder_id => folder info
             $sharedFolderMap = [];
+            $sharedFolderEntries = [];
             foreach ($sharedFolders as $sf) {
                 // filter by workspace if requested
                 if ($workspace && $sf['workspace'] !== $workspace) continue;
@@ -194,6 +195,7 @@ class SystemController {
                     'token' => $sf['token'],
                     'name' => $sf['folder_name']
                 ];
+                $sharedFolderEntries[$sf['folder_id']] = $sf;
             }
 
             // 2. Get all folders to build hierarchy and identifies descendant shares
@@ -248,9 +250,10 @@ class SystemController {
                 e.type,
                 e.workspace,
                 e.updated
-            FROM shared_notes sn
+                        FROM shared_notes sn
             INNER JOIN entries e ON sn.note_id = e.id
-            WHERE e.trash = 0";
+                        WHERE e.trash = 0
+                            AND sn.access_mode IS NOT NULL";
             
             $explicitParams = [];
             if ($workspace) {
@@ -282,7 +285,7 @@ class SystemController {
                     e.workspace,
                     e.updated
                 FROM entries e
-                LEFT JOIN shared_notes sn ON e.id = sn.note_id
+                LEFT JOIN shared_notes sn ON e.id = sn.note_id AND sn.access_mode IS NOT NULL
                 WHERE e.folder_id IN ($placeholders) AND e.trash = 0";
                 
                 $stmt = $this->con->prepare($folderNoteQuery);
@@ -366,9 +369,60 @@ class SystemController {
                 }
             }
             
+            $apiSharedFolders = [];
+            foreach ($allFoldersPool as $fid => $folder) {
+                $directEntry = $sharedFolderEntries[$fid] ?? null;
+                $viaEntry = null;
+
+                $currentFolder = $folder;
+                $maxDepth = 20;
+                $depth = 0;
+                while ($currentFolder['parent_id'] !== null && $depth < $maxDepth) {
+                    $parentId = (int)$currentFolder['parent_id'];
+                    if (isset($sharedFolderEntries[$parentId])) {
+                        $viaEntry = $sharedFolderEntries[$parentId];
+                        break;
+                    }
+                    if (!isset($allFoldersPool[$parentId])) {
+                        break;
+                    }
+                    $currentFolder = $allFoldersPool[$parentId];
+                    $depth++;
+                }
+
+                if (!$directEntry && !$viaEntry) {
+                    continue;
+                }
+
+                $entry = $directEntry ?: $viaEntry;
+                $countStmt = $this->con->prepare('SELECT COUNT(*) FROM entries WHERE folder_id = ? AND trash = 0');
+                $countStmt->execute([$fid]);
+
+                $apiSharedFolders[] = [
+                    'id' => $directEntry ? (int)$directEntry['id'] : null,
+                    'folder_id' => (int)$fid,
+                    'parent_id' => $folder['parent_id'] !== null ? (int)$folder['parent_id'] : null,
+                    'token' => $entry['token'],
+                    'created' => $entry['created'],
+                    'indexable' => isset($entry['indexable']) ? (int)$entry['indexable'] : 0,
+                    'password' => !empty($entry['password']),
+                    'allowed_users' => !empty($entry['allowed_users']) ? json_decode($entry['allowed_users'], true) : null,
+                    'folder_name' => $folder['name'],
+                    'note_count' => (int)$countStmt->fetchColumn(),
+                    'is_direct' => (bool)$directEntry,
+                    'folder_path' => getFolderPath($fid, $this->con),
+                    'public_url' => $base . '/folder/' . rawurlencode($entry['token'])
+                ];
+            }
+
+            usort($apiSharedFolders, function($a, $b) {
+                return strcasecmp($a['folder_path'], $b['folder_path']);
+            });
+
             return [
                 'success' => true,
-                'shared_notes' => $shared_notes
+                'shared_notes' => $shared_notes,
+                'shared_folders' => $apiSharedFolders
             ];
         } catch (Exception $e) {
             http_response_code(500);

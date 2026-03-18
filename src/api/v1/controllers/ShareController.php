@@ -37,7 +37,7 @@ class ShareController {
             $noteType = $noteRow['type'] ?? 'note';
             
             // Get share info
-            $stmt = $this->con->prepare('SELECT token, indexable, password, access_mode, allowed_users FROM shared_notes WHERE note_id = ? LIMIT 1');
+            $stmt = $this->con->prepare('SELECT token, indexable, password, access_mode, allowed_users FROM shared_notes WHERE note_id = ? AND access_mode IS NOT NULL LIMIT 1');
             $stmt->execute([$noteId]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -195,7 +195,7 @@ class ShareController {
             }
             
             // Remove from global registry first
-            $stmtToken = $this->con->prepare('SELECT token FROM shared_notes WHERE note_id = ?');
+            $stmtToken = $this->con->prepare('SELECT token FROM shared_notes WHERE note_id = ? AND access_mode IS NOT NULL');
             $stmtToken->execute([$noteId]);
             $token = $stmtToken->fetchColumn();
             if ($token) {
@@ -203,7 +203,7 @@ class ShareController {
                 unregisterSharedLink($token);
             }
 
-            $stmt = $this->con->prepare('DELETE FROM shared_notes WHERE note_id = ?');
+            $stmt = $this->con->prepare('DELETE FROM shared_notes WHERE note_id = ? AND access_mode IS NOT NULL');
             $stmt->execute([$noteId]);
             
             echo json_encode(['success' => true, 'revoked' => true]);
@@ -296,13 +296,13 @@ class ShareController {
 
             $oldToken = null;
             if (isset($input['custom_token'])) {
-                $stmtToken = $this->con->prepare('SELECT token FROM shared_notes WHERE note_id = ?');
+                $stmtToken = $this->con->prepare('SELECT token FROM shared_notes WHERE note_id = ? AND access_mode IS NOT NULL');
                 $stmtToken->execute([$noteId]);
                 $oldToken = $stmtToken->fetchColumn();
             }
             
             $params[] = $noteId;
-            $sql = 'UPDATE shared_notes SET ' . implode(', ', $updates) . ' WHERE note_id = ?';
+            $sql = 'UPDATE shared_notes SET ' . implode(', ', $updates) . ' WHERE note_id = ? AND access_mode IS NOT NULL';
             $stmt = $this->con->prepare($sql);
             $stmt->execute($params);
 

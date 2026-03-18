@@ -457,7 +457,7 @@ $body_classes = trim($extra_body_classes);
                     // Check if note is shared
                     $is_shared = false;
                     try {
-                        $stmt_shared = $con->prepare('SELECT 1 FROM shared_notes WHERE note_id = ? LIMIT 1');
+                        $stmt_shared = $con->prepare('SELECT 1 FROM shared_notes WHERE note_id = ? AND access_mode IS NOT NULL LIMIT 1');
                         $stmt_shared->execute([$row['id']]);
                         $is_shared = $stmt_shared->fetchColumn() !== false;
                     } catch (Exception $e) {

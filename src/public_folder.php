@@ -235,12 +235,12 @@ try {
 
     // Get all notes in this collection
     // IMPORTANT: Include notes even without individual tokens if they belong to this shared folder hierarchy?
-    // User said "afficher les notes partagées", so we keep the JOIN to shared_notes.
+    // Keep explicit note shares when they exist, but inherited folder access must not create implicit note shares.
     // However, we'll try to be more inclusive in the query.
     $stmt = $con->prepare("
         SELECT e.id, e.heading, e.created, e.type, e.folder_id, sn.token 
         FROM entries e 
-        LEFT JOIN shared_notes sn ON e.id = sn.note_id
+        LEFT JOIN shared_notes sn ON e.id = sn.note_id AND sn.access_mode IS NOT NULL
         WHERE e.folder_id IN ($placeholders) AND e.trash = 0 
         ORDER BY e.created DESC
     ");

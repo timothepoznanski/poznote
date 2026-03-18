@@ -127,6 +127,16 @@
     border-bottom: 1px solid var(--border-color, #e0e0e0);
 }
 
+.shared-note-item.shared-hierarchy-item {
+    margin-left: calc(var(--shared-indent-level, 0) * 22px);
+    padding-left: calc(8px + var(--shared-indent-level, 0) * 10px);
+    border-left: 2px solid rgba(13, 110, 253, 0.14);
+}
+
+.shared-note-item.shared-note-child {
+    border-left-color: rgba(13, 110, 253, 0.22);
+}
+
 #foldersList .shared-folder-icon {
     background: transparent !important;
 }

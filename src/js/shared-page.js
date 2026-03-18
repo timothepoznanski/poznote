@@ -305,6 +305,154 @@
         sharedWithMe.forEach(function(item) { allItems.push(item); });
     }
 
+    function sortByFolderPathAndName(items, getName) {
+        return items.slice().sort(function(a, b) {
+            var pathA = (a.folder_path || '').toLowerCase();
+            var pathB = (b.folder_path || '').toLowerCase();
+            if (pathA !== pathB) {
+                return pathA.localeCompare(pathB);
+            }
+
+            var nameA = getName(a).toLowerCase();
+            var nameB = getName(b).toLowerCase();
+            return nameA.localeCompare(nameB);
+        });
+    }
+
+    function buildAllViewSequence(items) {
+        var folders = [];
+        var notes = [];
+        var standaloneNotes = [];
+        var notesByFolderId = {};
+        var foldersByParentId = {};
+        var foldersById = {};
+        var orderedItems = [];
+
+        items.forEach(function(item) {
+            if (item && item._type === 'note') {
+                delete item._renderAsChildOfFolderId;
+                delete item._hierarchyDepth;
+            }
+
+            if (item && item._type === 'folder') {
+                delete item._hierarchyDepth;
+            }
+
+            if (item._type === 'folder') {
+                folders.push(item);
+                return;
+            }
+
+            if (item._type === 'note') {
+                notes.push(item);
+                return;
+            }
+
+            orderedItems.push(item);
+        });
+
+        folders = sortByFolderPathAndName(folders, function(folder) {
+            return folder.folder_name || '';
+        });
+
+        notes = notes.slice().sort(function(a, b) {
+            var folderPathA = (a.folder_path || '').toLowerCase();
+            var folderPathB = (b.folder_path || '').toLowerCase();
+            if (folderPathA !== folderPathB) {
+                return folderPathA.localeCompare(folderPathB);
+            }
+
+            var headingA = (a.heading || config.txtUntitled).toLowerCase();
+            var headingB = (b.heading || config.txtUntitled).toLowerCase();
+            return headingA.localeCompare(headingB);
+        });
+
+        notes.forEach(function(note) {
+            var folderId = note.folder_id != null ? String(note.folder_id) : '';
+            if (!folderId) {
+                standaloneNotes.push(note);
+                return;
+            }
+
+            if (!notesByFolderId[folderId]) {
+                notesByFolderId[folderId] = [];
+            }
+            notesByFolderId[folderId].push(note);
+        });
+
+        folders.forEach(function(folder) {
+            var folderKey = String(folder.folder_id);
+            var parentKey = folder.parent_id != null ? String(folder.parent_id) : '';
+            foldersById[folderKey] = folder;
+            if (!foldersByParentId[parentKey]) {
+                foldersByParentId[parentKey] = [];
+            }
+            foldersByParentId[parentKey].push(folder);
+        });
+
+        Object.keys(foldersByParentId).forEach(function(parentKey) {
+            foldersByParentId[parentKey] = sortByFolderPathAndName(foldersByParentId[parentKey], function(folder) {
+                return folder.folder_name || '';
+            });
+        });
+
+        function appendFolderBranch(folder, depth) {
+            var folderKey = String(folder.folder_id);
+            folder._hierarchyDepth = depth;
+            orderedItems.push(folder);
+
+            (notesByFolderId[folderKey] || []).forEach(function(note) {
+                note._renderAsChildOfFolderId = folder.folder_id;
+                note._hierarchyDepth = depth + 1;
+                orderedItems.push(note);
+            });
+            delete notesByFolderId[folderKey];
+
+            (foldersByParentId[folderKey] || []).forEach(function(childFolder) {
+                appendFolderBranch(childFolder, depth + 1);
+            });
+        }
+
+        folders.forEach(function(folder) {
+            var parentKey = folder.parent_id != null ? String(folder.parent_id) : '';
+            if (!parentKey || !foldersById[parentKey]) {
+                appendFolderBranch(folder, 0);
+            }
+        });
+
+        Object.keys(notesByFolderId).forEach(function(folderKey) {
+            standaloneNotes = standaloneNotes.concat(notesByFolderId[folderKey]);
+        });
+
+        standaloneNotes = standaloneNotes.slice().sort(function(a, b) {
+            var headingA = (a.heading || config.txtUntitled).toLowerCase();
+            var headingB = (b.heading || config.txtUntitled).toLowerCase();
+            return headingA.localeCompare(headingB);
+        });
+
+        standaloneNotes.forEach(function(note) {
+            delete note._renderAsChildOfFolderId;
+            delete note._hierarchyDepth;
+            orderedItems.push(note);
+        });
+
+        return orderedItems;
+    }
+
+    function applyHierarchyDepth(element, depth, isChildNote) {
+        var normalizedDepth = Number.isFinite(depth) && depth > 0 ? depth : 0;
+        element.style.setProperty('--shared-indent-level', String(normalizedDepth));
+        if (normalizedDepth > 0) {
+            element.classList.add('shared-hierarchy-item');
+        } else {
+            element.classList.remove('shared-hierarchy-item');
+        }
+
+        if (isChildNote) {
+            element.classList.add('shared-note-child');
+        }
+    }
+
     function loadSharedNotes() {
         var spinner = document.getElementById('loadingSpinner');
         var container = document.getElementById('sharedItemsContainer');
@@ -326,6 +474,7 @@
             })
             .then(function(data) {
                 if (data.error) throw new Error(data.error);
+                sharedFolders = data.shared_folders || [];
                 sharedNotes = data.shared_notes || [];
                 return fetch('api/v1/shared/with-me');
             })
@@ -468,10 +617,7 @@
         .then(function(data) {
             if (data.error) throw new Error(data.error);
             if (data.revoked) {
-                sharedFolders = sharedFolders.filter(function(f) { return f.folder_id != folderId; });
-                mergeItems();
-                applyFilter();
-                checkEmpty();
+                loadSharedNotes();
             }
         })
         .catch(function(error) { alert(config.txtError + ': ' + error.message); });
@@ -1272,7 +1418,9 @@
 
         list.appendChild(header);
 
-        filteredItems.forEach(function(item) {
+        var itemsToRender = filterType === 'all' ? buildAllViewSequence(filteredItems) : filteredItems;
+
+        itemsToRender.forEach(function(item) {
             if (item._type === 'note') {
                 list.appendChild(renderNoteItem(item));
             } else if (item._type === 'shared_with_me_note' || item._type === 'shared_with_me_folder') {
@@ -1299,6 +1447,10 @@
         item.className = 'shared-item shared-note-item';
         item.dataset.noteId = note.note_id;
         item.dataset.itemType = 'note';
+        if (note._renderAsChildOfFolderId) {
+            item.dataset.parentFolderId = String(note._renderAsChildOfFolderId);
+        }
+        applyHierarchyDepth(item, note._hierarchyDepth || 0, Boolean(note._renderAsChildOfFolderId));
 
         var nameContainer = document.createElement('div');
         nameContainer.className = 'note-name-container';
@@ -1391,6 +1543,7 @@
         item.dataset.itemType = 'folder';
         item.dataset.hasPassword = folder.password ? '1' : '0';
         if (!folder.is_direct) item.classList.add('shared-via-parent');
+        applyHierarchyDepth(item, folder._hierarchyDepth || 0, false);
 
         var nameContainer = document.createElement('div');
         nameContainer.className = 'note-name-container';

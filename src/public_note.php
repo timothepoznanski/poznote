@@ -143,7 +143,7 @@ try {
     $isFolderShared = false;
 
     if (!empty($token)) {
-        $stmt = $con->prepare('SELECT note_id, created, theme, indexable, password, access_mode, allowed_users FROM shared_notes WHERE token = ?');
+        $stmt = $con->prepare('SELECT note_id, created, theme, indexable, password, access_mode, allowed_users FROM shared_notes WHERE token = ? AND access_mode IS NOT NULL');
         $stmt->execute([$token]);
         $sharedNote = $stmt->fetch(PDO::FETCH_ASSOC);
     }

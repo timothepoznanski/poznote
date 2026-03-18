@@ -146,8 +146,8 @@ class FolderShareController {
             
             registerSharedLink($token, $_SESSION['user_id'], 'folder', (int)$folderId);
             
-            // Auto-share all notes in this folder subtree
-            $sharedCount = $this->shareNotesInFolder($folderId, $folderRow['name'], $theme, $indexable);
+            // Clean up legacy implicit note-share rows from previous folder-sharing behavior.
+            $this->shareNotesInFolder($folderId, $folderRow['name'], $theme, $indexable);
             
             $urls = $this->buildUrls($token);
             
@@ -158,7 +158,7 @@ class FolderShareController {
                 'url' => $urls['path'],
                 'url_query' => $urls['query'],
                 'workspace' => $folderWorkspace,
-                'shared_notes_count' => $sharedCount
+                'shared_notes_count' => 0
             ]);
             
         } catch (Exception $e) {
@@ -196,10 +196,10 @@ class FolderShareController {
             $stmt = $this->con->prepare('DELETE FROM shared_folders WHERE folder_id = ?');
             $stmt->execute([$folderId]);
             
-            // Unshare all notes in this folder subtree
-            $unsharedCount = $this->unshareNotesInFolder($folderId, $folder['name']);
+            // Clean up legacy implicit note-share rows from previous folder-sharing behavior.
+            $this->unshareNotesInFolder($folderId, $folder['name']);
             
-            echo json_encode(['success' => true, 'revoked' => true, 'unshared_notes_count' => $unsharedCount]);
+            echo json_encode(['success' => true, 'revoked' => true, 'unshared_notes_count' => 0]);
             
         } catch (Exception $e) {
             http_response_code(500);
@@ -332,8 +332,10 @@ class FolderShareController {
     }
     
     /**
-     * Auto-share all notes in a folder
-     * @return int Number of notes shared
+     * Legacy cleanup for implicit note shares that used to be created from folder shares.
+     * Explicit note shares are preserved.
+     *
+     * @return int Number of implicit rows removed
      */
     private function shareNotesInFolder($folderId, $folderName, $theme, $indexable) {
         $folderIds = $this->getFolderSubtreeIds($folderId);
@@ -343,34 +345,33 @@ class FolderShareController {
         $stmt = $this->con->prepare('SELECT id FROM entries WHERE (folder_id IN (' . $placeholders . ') OR folder = ?) AND trash = 0');
         $stmt->execute(array_merge($folderIds, [$folderName]));
         $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        $sharedCount = 0;
+
+        $removedCount = 0;
         foreach ($notes as $note) {
             $noteId = $note['id'];
-            
-            // Check if note is already shared
-            $checkStmt = $this->con->prepare('SELECT id FROM shared_notes WHERE note_id = ? LIMIT 1');
-            $checkStmt->execute([$noteId]);
-            
-            if (!$checkStmt->fetchColumn()) {
-                // Create a share for this note
-                $noteToken = bin2hex(random_bytes(16));
-                $insertStmt = $this->con->prepare('INSERT INTO shared_notes (note_id, token, theme, indexable) VALUES (?, ?, ?, ?)');
-                $insertStmt->execute([$noteId, $noteToken, $theme, $indexable]);
 
-                // Register in global registry
+            $checkStmt = $this->con->prepare('SELECT token FROM shared_notes WHERE note_id = ? AND access_mode IS NULL LIMIT 1');
+            $checkStmt->execute([$noteId]);
+            $implicitToken = $checkStmt->fetchColumn();
+
+            if ($implicitToken) {
                 require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
-                registerSharedLink($noteToken, $_SESSION['user_id'], 'note', (int)$noteId);
-                
-                $sharedCount++;
+                unregisterSharedLink($implicitToken);
+
+                $deleteStmt = $this->con->prepare('DELETE FROM shared_notes WHERE note_id = ? AND access_mode IS NULL');
+                $deleteStmt->execute([$noteId]);
+                $removedCount++;
             }
         }
-        return $sharedCount;
+
+        return $removedCount;
     }
     
     /**
-     * Unshare all notes in a folder
-     * @return int Number of notes unshared
+     * Legacy cleanup for implicit note shares that used to be created from folder shares.
+     * Explicit note shares are preserved.
+     *
+     * @return int Number of implicit rows removed
      */
     private function unshareNotesInFolder($folderId, $folderName) {
         $folderIds = $this->getFolderSubtreeIds($folderId);
@@ -383,16 +384,15 @@ class FolderShareController {
         
         $unsharedCount = 0;
         foreach ($notes as $note) {
-            // Check if note was shared before deleting
-            $checkStmt = $this->con->prepare('SELECT token FROM shared_notes WHERE note_id = ? LIMIT 1');
+            // Remove only legacy implicit shares; explicit note shares remain intact.
+            $checkStmt = $this->con->prepare('SELECT token FROM shared_notes WHERE note_id = ? AND access_mode IS NULL LIMIT 1');
             $checkStmt->execute([$note['id']]);
             $token = $checkStmt->fetchColumn();
             if ($token) {
-                // Remove from global registry
                 require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
                 unregisterSharedLink($token);
 
-                $deleteStmt = $this->con->prepare('DELETE FROM shared_notes WHERE note_id = ?');
+                $deleteStmt = $this->con->prepare('DELETE FROM shared_notes WHERE note_id = ? AND access_mode IS NULL');
                 $deleteStmt->execute([$note['id']]);
                 $unsharedCount++;
             }

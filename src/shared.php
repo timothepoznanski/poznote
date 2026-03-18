@@ -78,6 +78,7 @@ foreach ($allFolders as $fid => $f) {
 		$shared_folders[] = [
 			'id'              => $directEntry ? $directEntry['id'] : null,
 			'folder_id'       => $fid,
+			'parent_id'       => $f['parent_id'] !== null ? (int)$f['parent_id'] : null,
 			'token'           => $entry['token'],
 			'created'         => $entry['created'],
 			'indexable'       => $entry['indexable'],

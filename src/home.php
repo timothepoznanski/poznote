@@ -154,7 +154,7 @@ try {
             )
             SELECT COUNT(DISTINCT e.id) as cnt
             FROM entries e
-            LEFT JOIN shared_notes sn ON e.id = sn.note_id
+            LEFT JOIN shared_notes sn ON e.id = sn.note_id AND sn.access_mode IS NOT NULL
             WHERE e.trash = 0 
             $workspaceClauseE
             AND (sn.note_id IS NOT NULL OR e.folder_id IN (SELECT id FROM shared_hierarchy))
