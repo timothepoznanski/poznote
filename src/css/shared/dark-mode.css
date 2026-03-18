@@ -162,7 +162,7 @@
     color: #888888;
 }
 
-[data-theme="dark"] body.shared-page .shared-edit-token-modal .modal-header h3,
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title h3,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-label,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .indexable-label-text,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value,
@@ -177,11 +177,29 @@
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title-link {
     color: #f1f3f5;
+    background: rgba(102, 179, 255, 0.1);
+    border: 1px solid rgba(102, 179, 255, 0.14);
 }
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-url-preview:hover,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title-link:hover {
     color: #f1f3f5;
+}
+
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-modal-content {
+    background: linear-gradient(180deg, #2a2a2a 0%, #242526 100%);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 28px 64px rgba(0, 0, 0, 0.48);
+}
+
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title {
+    background: linear-gradient(180deg, rgba(102, 179, 255, 0.12), rgba(102, 179, 255, 0.02));
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-modal-actions {
+    border-top-color: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.02);
 }
 
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value input,
@@ -218,4 +236,28 @@
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-password-toggle:hover {
     background: #535353;
     color: #ffffff;
+}
+
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .share-protocol-wrap,
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .share-indexable-wrap,
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .share-restrict-users-wrap {
+    border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .share-user-list-container {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .share-user-list-row + .share-user-list-row {
+    border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .share-user-list-message,
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .share-user-list-name {
+    color: #d8dde5;
+}
+
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .share-user-list-message.is-error {
+    color: #ff9f9f;
 }

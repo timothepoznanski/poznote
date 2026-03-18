@@ -859,17 +859,14 @@
         var content = document.createElement('div');
         content.className = 'modal-content shared-edit-token-modal-content';
 
-        var header = document.createElement('div');
-        header.className = 'modal-header';
+        var titleBlock = document.createElement('div');
+        titleBlock.className = 'shared-edit-token-modal-title';
         var title = document.createElement('h3');
         var titleText = document.createElement('span');
         titleText.className = 'shared-edit-token-modal-title-link';
         title.appendChild(titleText);
-        header.appendChild(title);
-        content.appendChild(header);
-
-        var body = document.createElement('div');
-        body.className = 'modal-body';
+        titleBlock.appendChild(title);
+        content.appendChild(titleBlock);
 
         var tokenRow = document.createElement('div');
         tokenRow.className = 'shared-edit-token-field-row';
@@ -908,7 +905,7 @@
         tokenFieldGroup.appendChild(renewBtn);
         tokenValue.appendChild(tokenFieldGroup);
         tokenRow.appendChild(tokenValue);
-        body.appendChild(tokenRow);
+        content.appendChild(tokenRow);
 
         var passwordRow = document.createElement('div');
         passwordRow.className = 'shared-edit-token-field-row';
@@ -970,7 +967,7 @@
         passwordFieldGroup.appendChild(togglePasswordBtn);
         passwordValue.appendChild(passwordFieldGroup);
         passwordRow.appendChild(passwordValue);
-        body.appendChild(passwordRow);
+        content.appendChild(passwordRow);
 
         var permissionsSelect = null;
         if (options.itemType === 'note' && options.noteType === 'tasklist') {
@@ -1008,7 +1005,7 @@
             permissionsSelect.value = options.accessMode || 'full';
             permissionsValue.appendChild(permissionsSelect);
             permissionsRow.appendChild(permissionsValue);
-            body.appendChild(permissionsRow);
+            content.appendChild(permissionsRow);
         }
 
         var protocolWrap = document.createElement('div');
@@ -1038,7 +1035,7 @@
         protocolLabel.appendChild(protocolText);
         protocolLabel.appendChild(protocolToggle);
         protocolWrap.appendChild(protocolLabel);
-        body.appendChild(protocolWrap);
+        content.appendChild(protocolWrap);
 
         var indexableWrap = document.createElement('div');
         indexableWrap.className = 'share-indexable-wrap';
@@ -1067,7 +1064,7 @@
         indexableLabel.appendChild(indexableText);
         indexableLabel.appendChild(indexableToggle);
         indexableWrap.appendChild(indexableLabel);
-        body.appendChild(indexableWrap);
+        content.appendChild(indexableWrap);
 
         // ---- User restriction section ----
         var restrictUsersWrap = document.createElement('div');
@@ -1100,17 +1097,15 @@
 
         var userListContainer = document.createElement('div');
         userListContainer.className = 'share-user-list-container';
-        userListContainer.style.marginTop = '10px';
         userListContainer.style.display = restrictCheckbox.checked ? 'block' : 'none';
 
         var userListLoading = document.createElement('div');
+        userListLoading.className = 'share-user-list-message';
         userListLoading.textContent = config.txtUsersLoading;
-        userListLoading.style.fontSize = '13px';
-        userListLoading.style.color = '#888';
         userListContainer.appendChild(userListLoading);
 
         restrictUsersWrap.appendChild(userListContainer);
-        body.appendChild(restrictUsersWrap);
+        content.appendChild(restrictUsersWrap);
 
         var availableUsers = [];
         var selectedUserIds = (options.allowedUsers && Array.isArray(options.allowedUsers))
@@ -1121,22 +1116,15 @@
             userListContainer.innerHTML = '';
             if (availableUsers.length === 0) {
                 var noUsers = document.createElement('div');
+                noUsers.className = 'share-user-list-message';
                 noUsers.textContent = config.txtNoUsersFound;
-                noUsers.style.fontSize = '13px';
-                noUsers.style.color = '#888';
-                noUsers.style.padding = '6px 0';
                 userListContainer.appendChild(noUsers);
                 return;
             }
 
             availableUsers.forEach(function(user) {
                 var row = document.createElement('label');
-                row.style.display = 'flex';
-                row.style.alignItems = 'center';
-                row.style.gap = '8px';
-                row.style.padding = '4px 0';
-                row.style.cursor = 'pointer';
-                row.style.fontSize = '14px';
+                row.className = 'share-user-list-row';
 
                 var cb = document.createElement('input');
                 cb.type = 'checkbox';
@@ -1153,6 +1141,7 @@
                 });
 
                 var displayName = document.createElement('span');
+                displayName.className = 'share-user-list-name';
                 displayName.textContent = user.username + (user.email ? ' (' + user.email + ')' : '');
 
                 row.appendChild(cb);
@@ -1178,9 +1167,8 @@
             .catch(function() {
                 userListContainer.innerHTML = '';
                 var errMsg = document.createElement('div');
+                errMsg.className = 'share-user-list-message is-error';
                 errMsg.textContent = config.txtError;
-                errMsg.style.fontSize = '13px';
-                errMsg.style.color = '#c00';
                 userListContainer.appendChild(errMsg);
             });
         }
@@ -1200,14 +1188,8 @@
         }
         // ---- End user restriction section ----
 
-        content.appendChild(body);
-
-        var footer = document.createElement('div');
-        footer.className = 'modal-footer shared-edit-token-modal-footer';
-        footer.style.display = 'flex';
-        footer.style.flexWrap = 'nowrap';
-        footer.style.justifyContent = 'flex-end';
-        footer.style.gap = '8px';
+        var actions = document.createElement('div');
+        actions.className = 'shared-edit-token-modal-actions';
 
         var cancelBtn = document.createElement('button');
         cancelBtn.className = 'btn btn-danger';
@@ -1298,9 +1280,9 @@
             }
         });
 
-        footer.appendChild(cancelBtn);
-        footer.appendChild(saveBtn);
-        content.appendChild(footer);
+        actions.appendChild(cancelBtn);
+        actions.appendChild(saveBtn);
+        content.appendChild(actions);
         modal.appendChild(content);
         document.body.appendChild(modal);
         updatePasswordToggleState();
