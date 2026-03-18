@@ -242,6 +242,136 @@ class UsersController {
             ];
         }, $users);
     }
+
+    /**
+     * POST /api/v1/users/me/password - Change current user's password
+     */
+    public function changePassword() {
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
+        
+        $userId = getCurrentUserId();
+        if (!$userId) {
+            http_response_code(401);
+            return ['error' => 'Not authenticated'];
+        }
+        
+        $data = json_decode(file_get_contents('php://input'), true);
+        $currentPassword = $data['current_password'] ?? '';
+        $newPassword = $data['new_password'] ?? '';
+        $confirmPassword = $data['confirm_password'] ?? '';
+        
+        if ($currentPassword === '' || $newPassword === '' || $confirmPassword === '') {
+            http_response_code(400);
+            return ['error' => 'All password fields are required'];
+        }
+        
+        if ($newPassword !== $confirmPassword) {
+            http_response_code(400);
+            return ['error' => 'New passwords do not match'];
+        }
+        
+        if (strlen($newPassword) < 4) {
+            http_response_code(400);
+            return ['error' => 'Password must be at least 4 characters'];
+        }
+        
+        // Verify current password
+        if (!verifyUserPassword($userId, $currentPassword)) {
+            http_response_code(403);
+            return ['error' => 'Current password is incorrect'];
+        }
+        
+        // Set new password hash
+        if (!setUserPasswordHash($userId, $newPassword)) {
+            http_response_code(500);
+            return ['error' => 'Failed to update password'];
+        }
+        
+        return ['success' => true, 'message' => 'Password changed successfully'];
+    }
+
+    /**
+     * GET /api/v1/users/me/password-status - Check if current user has a custom password
+     */
+    public function passwordStatus() {
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
+        
+        $userId = getCurrentUserId();
+        if (!$userId) {
+            http_response_code(401);
+            return ['error' => 'Not authenticated'];
+        }
+        
+        $user = getUserProfileById($userId);
+        
+        return [
+            'has_custom_password' => hasCustomPassword($userId),
+            'password_changed_at' => $user['password_changed_at'] ?? null
+        ];
+    }
+
+    /**
+     * POST /api/v1/admin/users/{id}/reset-password - Admin: set or reset a user's password
+     */
+    public function adminResetPassword($id) {
+        if ($err = $this->requireAdmin()) return $err;
+        
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
+        
+        $user = getUserProfileById((int)$id);
+        if (!$user) {
+            http_response_code(404);
+            return ['error' => 'User not found'];
+        }
+        
+        $data = json_decode(file_get_contents('php://input'), true);
+        $action = $data['action'] ?? 'reset_to_env';
+        
+        if ($action === 'reset_to_env') {
+            // Clear DB hash, revert to environment variable password
+            if (!clearUserPasswordHash((int)$id)) {
+                http_response_code(500);
+                return ['error' => 'Failed to reset password'];
+            }
+            return ['success' => true, 'message' => 'Password reset to environment variable default'];
+        } elseif ($action === 'set_password') {
+            $newPassword = $data['new_password'] ?? '';
+            if (strlen($newPassword) < 4) {
+                http_response_code(400);
+                return ['error' => 'Password must be at least 4 characters'];
+            }
+            if (!setUserPasswordHash((int)$id, $newPassword)) {
+                http_response_code(500);
+                return ['error' => 'Failed to set password'];
+            }
+            return ['success' => true, 'message' => 'Password updated successfully'];
+        }
+        
+        http_response_code(400);
+        return ['error' => 'Invalid action. Use "reset_to_env" or "set_password"'];
+    }
+
+    /**
+     * GET /api/v1/admin/users/{id}/password-status - Admin: check user's password status
+     */
+    public function adminPasswordStatus($id) {
+        if ($err = $this->requireAdmin()) return $err;
+        
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
+        
+        $user = getUserProfileById((int)$id);
+        if (!$user) {
+            http_response_code(404);
+            return ['error' => 'User not found'];
+        }
+        
+        return [
+            'user_id' => (int)$id,
+            'has_custom_password' => hasCustomPassword((int)$id),
+            'password_changed_at' => $user['password_changed_at'] ?? null
+        ];
+    }
+
     /**
      * POST /api/v1/admin/repair - Repair master database (Scan & Rebuild)
      */

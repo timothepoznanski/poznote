@@ -156,8 +156,7 @@ function isAuthenticated() {
                     $user = getUserProfileById((int)$userId);
                     
                     if ($user && $user['active'] && $user['username'] === $username) {
-                        $expectedUserPassword = getUserSpecificPassword($user['username']);
-                        $secretToUse = $user['is_admin'] ? AUTH_PASSWORD : $expectedUserPassword;
+                        $secretToUse = getRememberMeSecret($user);
                         $expectedHash = hash('sha256', $username . $userId . $timestamp . $secretToUse);
                         
                         if (hash_equals($expectedHash, $hash)) {
@@ -255,23 +254,11 @@ function authenticate($username, $password, $rememberMe = false) {
     $userId = (int)$user['id'];
     $isProfileAdmin = (bool)$user['is_admin'];
 
-    // 2. Validate password against the correct global password
-    $authenticated = false;
-    if ($isProfileAdmin) {
-        // Admin profiles MUST use the admin password
-        if ($password === AUTH_PASSWORD) {
-            $authenticated = true;
-        } else {
-            error_log("Poznote Auth: Admin password mismatch for user '$username'");
-        }
-    } else {
-        // Regular profiles MUST use the user password
-        $expectedUserPassword = getUserSpecificPassword($user['username']);
-        if ($password === $expectedUserPassword) {
-            $authenticated = true;
-        } else {
-            error_log("Poznote Auth: User password mismatch for user '$username'");
-        }
+    // 2. Validate password: DB hash takes priority, then env var fallback
+    $authenticated = verifyUserPassword($userId, $password);
+    if (!$authenticated) {
+        $role = $isProfileAdmin ? 'Admin' : 'User';
+        error_log("Poznote Auth: $role password mismatch for user '$username'");
     }
 
     if ($authenticated) {
@@ -284,8 +271,7 @@ function authenticate($username, $password, $rememberMe = false) {
         if ($rememberMe) {
             $timestamp = time();
             $actualUsername = $user['username'];
-            $expectedUserPassword = getUserSpecificPassword($actualUsername);
-            $secretToUse = $isProfileAdmin ? AUTH_PASSWORD : $expectedUserPassword;
+            $secretToUse = getRememberMeSecret($user);
             
             // Format: actual_username:user_id:timestamp:hash
             $hash = hash('sha256', $actualUsername . $userId . $timestamp . $secretToUse);
@@ -377,13 +363,11 @@ function requireApiAuth() {
     $isAdminCreds = false;
     $isUserCreds = false;
     
-    if ((bool)$authUser['is_admin']) {
-        if ($_SERVER['PHP_AUTH_PW'] === AUTH_PASSWORD) {
+    // Verify password: DB hash takes priority, then env var fallback
+    if (verifyUserPassword((int)$authUser['id'], $_SERVER['PHP_AUTH_PW'])) {
+        if ((bool)$authUser['is_admin']) {
             $isAdminCreds = true;
-        }
-    } else {
-        $expectedUserPassword = getUserSpecificPassword($authUser['username']);
-        if ($_SERVER['PHP_AUTH_PW'] === $expectedUserPassword) {
+        } else {
             $isUserCreds = true;
         }
     }
@@ -496,17 +480,7 @@ function requireApiAuthUser() {
         exit;
     }
 
-    $isValid = false;
-    if ((bool)$authUser['is_admin']) {
-        if ($_SERVER['PHP_AUTH_PW'] === AUTH_PASSWORD) {
-            $isValid = true;
-        }
-    } else {
-        $expectedUserPassword = getUserSpecificPassword($authUser['username']);
-        if ($_SERVER['PHP_AUTH_PW'] === $expectedUserPassword) {
-            $isValid = true;
-        }
-    }
+    $isValid = verifyUserPassword((int)$authUser['id'], $_SERVER['PHP_AUTH_PW']);
     
     if (!$isValid) {
         $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
@@ -598,7 +572,7 @@ function requireApiAuthAdmin() {
     require_once __DIR__ . '/users/db_master.php';
     $authUser = getUserProfileByUsername($_SERVER['PHP_AUTH_USER']);
     
-    if (!$authUser || !$authUser['active'] || !(bool)$authUser['is_admin'] || $_SERVER['PHP_AUTH_PW'] !== AUTH_PASSWORD) {
+    if (!$authUser || !$authUser['active'] || !(bool)$authUser['is_admin'] || !verifyUserPassword((int)$authUser['id'], $_SERVER['PHP_AUTH_PW'])) {
         $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
         header('HTTP/1.1 401 Unauthorized');
         header('Content-Type: application/json');

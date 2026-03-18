@@ -73,7 +73,8 @@
       "install_app": "Install application",
       "release_notes": "Release Notes",
       "convert_images": "Base64 Image Converter",
-        "orphan_scanner": "Orphan attachments scanner"
+        "orphan_scanner": "Orphan attachments scanner",
+        "change_password": "Change Password"
     },
     "install_app": {
       "unavailable": "Installation is not available right now. On Chrome mobile, open the browser menu then tap \"Install app\" (or \"Add to Home screen\") when available.",
@@ -1731,7 +1732,46 @@
     "admin": {
       "administrator": "Administrator",
       "email_usage_note": "Email addresses are only used for OIDC authentication if configured. Poznote does not send any emails.",
-      "admin_note": "Only user 1 is an administrator. Other users cannot have administrator privileges."
+      "admin_note": "Only user 1 is an administrator. Other users cannot have administrator privileges.",
+      "password_management": {
+        "manage_password": "Password",
+        "reset_password": "Reset Password",
+        "set_password": "Set Password",
+        "reset_to_default": "Use default password (.env)",
+        "modal_help": "Set a custom password for this account or return to the environment default.",
+        "current_mode": "Current mode",
+        "set_help": "At least 4 characters. This overrides the environment variable password for this user.",
+        "reset_help": "Remove the custom password and fall back to the environment variable default for this user.",
+        "reset_confirm": "Reset password for \"{{username}}\" to the environment variable default?",
+        "set_new_password": "New password for \"{{username}}\":",
+        "reset_success": "Password reset to the default value found in the environment variables.",
+        "set_success": "Password updated successfully.",
+        "status_custom": "Custom",
+        "status_default": "Default",
+        "status_custom_detail": "This user uses a custom password.",
+        "status_default_detail": "This user uses the default password found in the environment variables.",
+        "changed_at_prefix": "Updated:"
+      }
     }
+  },
+  "password": {
+    "status": {
+      "custom": "Custom password",
+      "default": "Default (env)"
+    },
+    "modal": {
+      "title": "Change Password",
+      "description": "Enter your current password and choose a new one.",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm new password"
+    },
+    "errors": {
+      "all_required": "All fields are required",
+      "mismatch": "New passwords do not match",
+      "too_short": "Password must be at least 4 characters",
+      "incorrect_current": "Current password is incorrect"
+    },
+    "success": "Password changed successfully."
   }
 }

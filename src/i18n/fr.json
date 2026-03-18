@@ -358,7 +358,8 @@
       "install_app": "Installer l'application",
       "release_notes": "Notes de version",
       "convert_images": "Convertisseur d’images Base64",
-      "orphan_scanner": "Scanner de pièces jointes orphelines"
+      "orphan_scanner": "Scanner de pièces jointes orphelines",
+      "change_password": "Changer le mot de passe"
     },
     "install_app": {
       "unavailable": "L’installation n’est pas disponible pour le moment. Sur Chrome mobile, ouvrez le menu du navigateur puis appuyez sur \"Installer l’application\" (ou \"Ajouter à l’écran d’accueil\") quand l’option est disponible.",
@@ -1997,6 +1998,24 @@
       "actions": "Actions",
       "not_defined": "non défini",
       "email_usage_note": "Les adresses email sont uniquement utilisées pour la connexion OIDC si configurée. Poznote n'envoie aucun email.",
+      "password_management": {
+        "manage_password": "Mot de passe",
+        "reset_password": "Réinitialiser le mot de passe",
+        "set_password": "Définir un mot de passe",
+        "reset_to_default": "Utiliser le mot de passe par défaut (.env)",
+        "modal_help": "Définissez un mot de passe personnalisé pour ce compte ou revenez au mot de passe par défaut défini dans l'environnement.",
+        "current_mode": "Mode actuel",
+        "set_help": "Au moins 4 caractères. Cela remplace le mot de passe défini dans les variables d'environnement pour cet utilisateur.",
+        "reset_help": "Supprime le mot de passe personnalisé et repasse sur le mot de passe par défaut défini dans l'environnement pour cet utilisateur.",
+        "reset_confirm": "Réinitialiser le mot de passe de \"{{username}}\" vers celui défini dans les variables d'environnement ?",
+        "set_success": "Mot de passe mis à jour avec succès.",
+        "reset_success": "Mot de passe réinitialisé vers la valeur par défaut qui se trouve dans les variables d'environnement.",
+        "status_custom": "Personnalisé",
+        "status_default": "Par défaut",
+        "status_custom_detail": "Cet utilisateur utilise un mot de passe personnalisé.",
+        "status_default_detail": "Cet utilisateur utilise le mot de passe par défaut qui se trouve dans les variables d'environnement.",
+        "changed_at_prefix": "Mise à jour :"
+      },
       "password": "Mot de passe",
       "profile": "Sélectionnez votre profil",
       "confirm_password": "Confirmer le mot de passe",
@@ -2310,5 +2329,25 @@
   },
   "backlinks": {
     "title": "Rétroliens"
+  },
+  "password": {
+    "status": {
+      "custom": "Mot de passe personnalisé",
+      "default": "Par défaut (env)"
+    },
+    "modal": {
+      "title": "Changer le mot de passe",
+      "description": "Entrez votre mot de passe actuel et choisissez-en un nouveau.",
+      "current": "Mot de passe actuel",
+      "new": "Nouveau mot de passe",
+      "confirm": "Confirmer le nouveau mot de passe"
+    },
+    "errors": {
+      "all_required": "Tous les champs sont requis",
+      "mismatch": "Les nouveaux mots de passe ne correspondent pas",
+      "too_short": "Le mot de passe doit contenir au moins 4 caractères",
+      "incorrect_current": "Le mot de passe actuel est incorrect"
+    },
+    "success": "Mot de passe modifié avec succès."
   }
 }

@@ -73,6 +73,16 @@
     cursor: pointer;
 }
 
+#changePasswordModal .change-password-description {
+    color: rgba(255, 255, 255, 0.76);
+    line-height: 1.45;
+}
+
+html[data-theme='light'] #changePasswordModal .change-password-description,
+body:not(.dark-mode) #changePasswordModal .change-password-description {
+    color: #5f6873;
+}
+
 /* Settings Category Titles */
 .settings-category-title {
     font-size: 1.1rem;
