@@ -90,6 +90,22 @@ body.shared-page .modal {
     color: var(--text-color, #333333);
 }
 
+body.shared-page .shared-edit-token-modal .modal-header h3 {
+    min-width: 0;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title-link {
+    display: block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    text-overflow: clip;
+    text-decoration: none;
+    color: var(--text-color, #333333);
+    cursor: default;
+}
+
 .modal-body {
     padding: 20px;
 }
@@ -105,4 +121,158 @@ body.shared-page .modal {
     display: flex;
     gap: 10px;
     justify-content: flex-end;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-modal-content {
+    max-width: 920px;
+}
+
+body.shared-page .shared-edit-token-modal .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-field-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: nowrap;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-field-label {
+    flex: 0 0 170px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-color, #333333);
+    white-space: nowrap;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-field-value {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-field-value input {
+    width: 100%;
+    margin: 0 !important;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-inline-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-inline-group input {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-inline-renew {
+    flex: 0 0 auto;
+    min-width: 48px;
+    padding: 8px 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-password-toggle {
+    flex: 0 0 auto;
+    min-width: 48px;
+    padding: 8px 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+body.shared-page .shared-edit-token-modal .share-indexable-label {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100%;
+    gap: 16px;
+}
+
+body.shared-page .shared-edit-token-modal .indexable-label-text {
+    flex: 1 1 auto;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-modal-footer {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+body.shared-page .shared-edit-token-modal .modal-content > .shared-edit-token-modal-footer > .btn {
+    width: auto !important;
+    min-width: 120px;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    display: inline-flex !important;
+    justify-content: center !important;
+    height: auto !important;
+    white-space: nowrap;
+}
+
+@media (max-width: 680px) {
+    body.shared-page .shared-edit-token-modal .shared-edit-token-modal-content {
+        max-width: 96vw;
+        width: 96vw;
+    }
+
+    body.shared-page .shared-edit-token-modal .modal-body {
+        gap: 16px;
+    }
+
+    body.shared-page .shared-edit-token-modal .shared-edit-token-field-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    body.shared-page .shared-edit-token-modal .shared-edit-token-field-label {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+
+    body.shared-page .shared-edit-token-modal .shared-edit-token-field-value {
+        width: 100%;
+    }
+
+    body.shared-page .shared-edit-token-modal .shared-edit-token-inline-group {
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: nowrap;
+    }
+
+    body.shared-page .shared-edit-token-modal .shared-edit-token-inline-renew,
+    body.shared-page .shared-edit-token-modal .shared-edit-token-password-toggle {
+        width: 48px !important;
+        min-width: 48px;
+        max-width: 48px;
+        align-self: auto;
+    }
+
+    body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title-link {
+        font-size: 14px;
+    }
+
+    body.shared-page .shared-edit-token-modal .share-indexable-label {
+        gap: 12px;
+    }
+
+    body.shared-page .shared-edit-token-modal .shared-edit-token-modal-footer {
+        justify-content: stretch !important;
+    }
+
+    body.shared-page .shared-edit-token-modal .modal-content > .shared-edit-token-modal-footer > .btn {
+        flex: 1 1 0;
+        min-width: 0;
+    }
 }

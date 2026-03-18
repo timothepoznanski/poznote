@@ -236,7 +236,7 @@ class UsersController {
         // Return only public info
         return array_map(function($user) {
             return [
-                'id' => $user['id'],
+                'id' => (int)$user['id'],
                 'username' => $user['username'],
                 'email' => $user['email'] ?? null
             ];

@@ -90,14 +90,14 @@ try {
     $isFolderShared = false;
 
     if (!empty($token)) {
-        $stmt = $con->prepare('SELECT note_id, created, theme, indexable, password, access_mode FROM shared_notes WHERE token = ?');
+        $stmt = $con->prepare('SELECT note_id, created, theme, indexable, password, access_mode, allowed_users FROM shared_notes WHERE token = ?');
         $stmt->execute([$token]);
         $sharedNote = $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     // Fallback: Check if authorized via shared folder
     if (!$sharedNote && !empty($folderToken) && !empty($noteIdParam)) {
-        $stmt = $con->prepare('SELECT folder_id, theme, indexable, password FROM shared_folders WHERE token = ?');
+        $stmt = $con->prepare('SELECT folder_id, theme, indexable, password, allowed_users FROM shared_folders WHERE token = ?');
         $stmt->execute([$folderToken]);
         $sharedFolder = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -154,7 +154,8 @@ try {
                         'theme' => $sharedFolder['theme'], // Inherit folder theme
                         'indexable' => $sharedFolder['indexable'],
                         'password' => $sharedFolder['password'], // Inherit folder password
-                        'access_mode' => 'read_only'
+                        'access_mode' => 'read_only',
+                        'allowed_users' => $sharedFolder['allowed_users'] ?? null
                     ];
                     // Override token for session consistency if needed
                     $token = $folderToken . '_note_' . $noteIdParam; 
@@ -176,6 +177,77 @@ try {
     $taskAccessMode = $sharedNote['access_mode'] ?? 'full';
     if (!in_array($taskAccessMode, ['read_only', 'check_only', 'full'], true)) {
         $taskAccessMode = 'full';
+    }
+
+    // ============================================================================
+    // USER RESTRICTION CHECK
+    // ============================================================================
+    $passedUserRestriction = false; // True when user authenticated via allowed_users
+    $allowedUsersRaw = $sharedNote['allowed_users'] ?? null;
+    if (!empty($allowedUsersRaw)) {
+        $allowedUserIds = is_array($allowedUsersRaw) ? $allowedUsersRaw : json_decode($allowedUsersRaw, true);
+        if (is_array($allowedUserIds) && !empty($allowedUserIds)) {
+            if (session_status() === PHP_SESSION_NONE) {
+                $configured_port = $_ENV['HTTP_WEB_PORT'] ?? '8040';
+                session_name('POZNOTE_SESSION_' . $configured_port);
+                session_start();
+            }
+            $currentUserId = $_SESSION['user_id'] ?? null;
+            // The share owner always has access
+            $isOwner = $currentUserId !== null && (int)$currentUserId === (int)$activeUserId;
+            if (!$isOwner) {
+                if ($currentUserId === null) {
+                    // Not logged in — show login required page
+                    http_response_code(403);
+                    ?>
+                    <!doctype html>
+                    <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
+                    <head>
+                        <meta charset="utf-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1">
+                        <meta name="robots" content="noindex, nofollow">
+                        <title><?php echo t_h('public.login_required_title', [], 'Login Required', $currentLang); ?></title>
+                        <link rel="stylesheet" href="css/public_folder.css">
+                    </head>
+                    <body class="password-page-body">
+                        <div class="password-container">
+                            <div class="lock-icon">🔒</div>
+                            <h2><?php echo t_h('public.login_required_title', [], 'Login Required', $currentLang); ?></h2>
+                            <p><?php echo t_h('public.login_required_message', [], 'This content is restricted to specific users. Please log in to access it.', $currentLang); ?></p>
+                            <a href="login.php" class="btn" style="display:inline-block;margin-top:12px;padding:10px 24px;background:#4a90d9;color:#fff;border-radius:6px;text-decoration:none;"><?php echo t_h('login.login', [], 'Log in', $currentLang); ?></a>
+                        </div>
+                    </body>
+                    </html>
+                    <?php
+                    exit;
+                }
+                if (!in_array((int)$currentUserId, array_map('intval', $allowedUserIds), true)) {
+                    http_response_code(403);
+                    ?>
+                    <!doctype html>
+                    <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
+                    <head>
+                        <meta charset="utf-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1">
+                        <meta name="robots" content="noindex, nofollow">
+                        <title><?php echo t_h('public.access_denied_title', [], 'Access Denied', $currentLang); ?></title>
+                        <link rel="stylesheet" href="css/public_folder.css">
+                    </head>
+                    <body class="password-page-body">
+                        <div class="password-container">
+                            <div class="lock-icon">⛔</div>
+                            <h2><?php echo t_h('public.access_denied_title', [], 'Access Denied', $currentLang); ?></h2>
+                            <p><?php echo t_h('public.access_denied_message', [], 'You do not have permission to view this content.', $currentLang); ?></p>
+                        </div>
+                    </body>
+                    </html>
+                    <?php
+                    exit;
+                }
+            }
+            // User is authorized (owner or in allowed_users list) — remember this
+            $passedUserRestriction = true;
+        }
     }
 
     $stmt = $con->prepare('SELECT folder_id FROM entries WHERE id = ? AND trash = 0');
@@ -219,7 +291,10 @@ try {
         ];
     }
 
-    if (!empty($protectedFolderContext['password']) && !empty($protectedFolderContext['token'])) {
+    // Only enforce folder password when user has NOT been authenticated via allowed_users.
+    // When allowed_users passes (user is owner or explicitly authorized), the folder's
+    // password should not create an additional barrier on a directly-shared note.
+    if (!$passedUserRestriction && !empty($protectedFolderContext['password']) && !empty($protectedFolderContext['token'])) {
         $requiredAuths[] = [
             'hash' => $protectedFolderContext['password'],
             'sessionKey' => 'public_folder_auth_' . $protectedFolderContext['token']
@@ -227,6 +302,10 @@ try {
     }
 
     if (!empty($requiredAuths)) {
+        if (session_status() === PHP_SESSION_NONE) {
+            $configured_port = $_ENV['HTTP_WEB_PORT'] ?? '8040';
+            session_name('POZNOTE_SESSION_' . $configured_port);
+        }
         session_start();
 
         // If accessed via a shared folder, also accept that folder's auth session.

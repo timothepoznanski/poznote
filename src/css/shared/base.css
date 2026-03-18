@@ -95,8 +95,56 @@ body.shared-page {
     max-width: 900px;
     margin: 0 auto 30px auto;
     display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+}
+
+/* Type filter toggle buttons */
+.filter-type-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+}
+
+.filter-type-btn {
+    display: inline-flex;
     align-items: center;
-    gap: 15px;
+    gap: 6px;
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid var(--border-color, #d0d0d0);
+    border-radius: 20px;
+    background: var(--input-bg, #ffffff);
+    color: var(--text-muted, #666666);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.filter-type-btn:hover {
+    border-color: #007DB8;
+    color: #007DB8;
+    background: rgba(0, 125, 184, 0.08);
+}
+
+.filter-type-btn.active {
+    background: #007DB8;
+    color: #ffffff;
+    border-color: #007DB8;
+}
+
+.filter-type-btn i {
+    font-size: 14px;
+}
+
+/* Shared type icon in rows */
+.shared-type-icon {
+    font-size: 14px;
+    color: var(--text-muted, #999);
+    flex-shrink: 0;
+    margin-right: 2px;
 }
 
 .filter-input-wrapper {
@@ -104,6 +152,13 @@ body.shared-page {
     flex: 1;
     display: flex;
     align-items: center;
+}
+
+.filter-search-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
 }
 
 .filter-input {
@@ -149,6 +204,7 @@ body.shared-page {
 }
 
 .filter-stats {
+    flex: 0 0 auto;
     font-size: 13px;
     color: var(--text-muted, #666666);
     white-space: nowrap;

@@ -36,7 +36,7 @@ class FolderShareController {
             $folderWorkspace = $folderRow['workspace'] ?? '';
             
             // Get share info
-            $stmt = $this->con->prepare('SELECT token, indexable, password FROM shared_folders WHERE folder_id = ? LIMIT 1');
+            $stmt = $this->con->prepare('SELECT token, indexable, password, allowed_users FROM shared_folders WHERE folder_id = ? LIMIT 1');
             $stmt->execute([$folderId]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -48,6 +48,7 @@ class FolderShareController {
             $token = $row['token'];
             $indexable = isset($row['indexable']) ? (int)$row['indexable'] : 0;
             $hasPassword = !empty($row['password']);
+            $allowedUsers = !empty($row['allowed_users']) ? json_decode($row['allowed_users'], true) : null;
             
             $urls = $this->buildUrls($token);
             
@@ -58,7 +59,8 @@ class FolderShareController {
                 'url_query' => $urls['query'],
                 'indexable' => $indexable,
                 'hasPassword' => $hasPassword,
-                'workspace' => $folderWorkspace
+                'workspace' => $folderWorkspace,
+                'allowed_users' => $allowedUsers
             ]);
             
         } catch (Exception $e) {
@@ -262,6 +264,18 @@ class FolderShareController {
                 $updates[] = 'password = ?';
                 $params[] = $hashedPassword;
             }
+
+            if (array_key_exists('allowed_users', $input)) {
+                $allowedUsersValue = $input['allowed_users'];
+                if (is_array($allowedUsersValue) && !empty($allowedUsersValue)) {
+                    $sanitized = array_values(array_unique(array_map('intval', $allowedUsersValue)));
+                    $updates[] = 'allowed_users = ?';
+                    $params[] = json_encode($sanitized);
+                } else {
+                    $updates[] = 'allowed_users = ?';
+                    $params[] = null;
+                }
+            }
             
             if (empty($updates)) {
                 echo json_encode(['success' => true, 'message' => 'No changes']);
@@ -301,6 +315,12 @@ class FolderShareController {
             }
             if (array_key_exists('password', $input)) {
                 $response['hasPassword'] = trim($input['password'] ?? '') !== '';
+            }
+            if (array_key_exists('allowed_users', $input)) {
+                $au = $input['allowed_users'];
+                $response['allowed_users'] = (is_array($au) && !empty($au))
+                    ? array_values(array_unique(array_map('intval', $au)))
+                    : null;
             }
             
             echo json_encode($response);

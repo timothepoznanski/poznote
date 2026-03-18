@@ -87,6 +87,10 @@
     border-color: #444444;
 }
 
+[data-theme="dark"] .shared-notes-header-cell {
+    color: #c8d0d8;
+}
+
 [data-theme="dark"] .indexable-label-text {
     color: #e0e0e0;
 }
@@ -96,17 +100,31 @@
 }
 
 [data-theme="dark"] .note-token {
-    color: #a0a0a0;
+    color: #d6dde6;
 }
 
 [data-theme="dark"] .folder-badge {
-    color: #a0a0a0;
-    background-color: rgba(160, 160, 160, 0.15);
+    color: #c6d0da;
+    background-color: transparent;
 }
 
 [data-theme="dark"] .folder-badge:hover {
-    background-color: rgba(160, 160, 160, 0.25);
-    color: #c0c0c0;
+    background-color: transparent;
+    color: inherit;
+}
+
+[data-theme="dark"] .note-actions-placeholder {
+    color: #b9c3cd;
+}
+
+[data-theme="dark"] .shared-header-help {
+    color: #d6dde6;
+}
+
+[data-theme="dark"] .shared-header-help:hover,
+[data-theme="dark"] .shared-header-help:focus,
+[data-theme="dark"] .shared-header-help:focus-visible {
+    color: #ffffff;
 }
 
 [data-theme="dark"] .task-permissions-option {
@@ -119,4 +137,85 @@
 
 [data-theme="dark"] .task-permissions-option input[type="radio"] {
     accent-color: #4d9eff;
+}
+
+/* Type filter buttons - dark mode */
+[data-theme="dark"] .filter-type-btn {
+    background: #333333;
+    color: #b0b0b0;
+    border-color: #555555;
+}
+
+[data-theme="dark"] .filter-type-btn:hover {
+    border-color: #007DB8;
+    color: #4db9eb;
+    background: rgba(0, 125, 184, 0.18);
+}
+
+[data-theme="dark"] .filter-type-btn.active {
+    background: #007DB8;
+    color: #ffffff;
+    border-color: #007DB8;
+}
+
+[data-theme="dark"] .shared-type-icon {
+    color: #888888;
+}
+
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .modal-header h3,
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-label,
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .indexable-label-text,
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value,
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value label,
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value span {
+    color: #f1f3f5;
+}
+
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-url-preview {
+    color: #66b3ff;
+}
+
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title-link {
+    color: #f1f3f5;
+}
+
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-url-preview:hover,
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title-link:hover {
+    color: #f1f3f5;
+}
+
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value input,
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value select,
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .modal-password-input {
+    background-color: #3a3a3a !important;
+    border-color: #707070 !important;
+    color: #f5f7fa !important;
+}
+
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value input::placeholder,
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value select::placeholder,
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .modal-password-input::placeholder {
+    color: #b8bec7 !important;
+    opacity: 1;
+}
+
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value input:focus,
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value select:focus,
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .modal-password-input:focus {
+    border-color: #66b3ff !important;
+    box-shadow: 0 0 0 2px rgba(102, 179, 255, 0.18);
+    outline: none;
+}
+
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-inline-renew,
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-password-toggle {
+    background: #454545;
+    border-color: #6f6f6f;
+    color: #f1f3f5;
+}
+
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-inline-renew:hover,
+[data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-password-toggle:hover {
+    background: #535353;
+    color: #ffffff;
 }

@@ -214,7 +214,7 @@ try {
     )');
 
     // --- Schema versioning: skip migrations & indexes if already up to date ---
-    $CURRENT_SCHEMA_VERSION = 5;
+    $CURRENT_SCHEMA_VERSION = 6;
     $currentVersion = 0;
     try {
         $svStmt = $con->query("SELECT value FROM settings WHERE key = 'schema_version'");
@@ -283,8 +283,22 @@ try {
             if (!in_array('access_mode', $existingColumns)) {
                 $con->exec("ALTER TABLE shared_notes ADD COLUMN access_mode TEXT DEFAULT 'full'");
             }
+            if (!in_array('allowed_users', $existingColumns)) {
+                $con->exec("ALTER TABLE shared_notes ADD COLUMN allowed_users TEXT");
+            }
         } catch (Exception $e) {
             error_log('Could not add missing columns to shared_notes: ' . $e->getMessage());
+        }
+
+        // Add missing columns to shared_folders
+        try {
+            $cols = $con->query("PRAGMA table_info(shared_folders)")->fetchAll(PDO::FETCH_ASSOC);
+            $existingColumns = array_column($cols, 'name');
+            if (!in_array('allowed_users', $existingColumns)) {
+                $con->exec("ALTER TABLE shared_folders ADD COLUMN allowed_users TEXT");
+            }
+        } catch (Exception $e) {
+            error_log('Could not add missing columns to shared_folders: ' . $e->getMessage());
         }
 
         // === REMOVE LEGACY COLUMNS === (Schema version 4)
