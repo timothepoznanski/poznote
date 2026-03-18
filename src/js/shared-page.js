@@ -23,14 +23,8 @@
             txtPasswordPlaceholder: body.getAttribute('data-txt-password-placeholder') || 'Enter a password',
             txtShowPassword: body.getAttribute('data-txt-show-password') || 'Show password',
             txtHidePassword: body.getAttribute('data-txt-hide-password') || 'Hide password',
-            txtNetworkError: body.getAttribute('data-txt-network-error') || 'Network error',
-            txtIndexable: body.getAttribute('data-txt-indexable') || 'Indexable',
-            txtPasswordProtected: body.getAttribute('data-txt-password-protected') || 'Password protected',
-            txtAddPasswordTitle: body.getAttribute('data-txt-add-password-title') || 'Add password protection',
-            txtChangePasswordTitle: body.getAttribute('data-txt-change-password-title') || 'Change Password',
-            txtPasswordRemoveHint: body.getAttribute('data-txt-password-remove-hint') || 'Leave empty to remove password protection.',
-            txtEnterNewPassword: body.getAttribute('data-txt-enter-new-password') || 'Enter new password',
-            txtCopy: body.getAttribute('data-txt-copy') || 'Copy',
+
+
             txtRenew: body.getAttribute('data-txt-renew') || 'Renew',
             txtOpen: body.getAttribute('data-txt-open') || 'Open public view',
             txtRevoke: body.getAttribute('data-txt-revoke') || 'Revoke',
@@ -38,35 +32,30 @@
             txtTaskReadOnly: body.getAttribute('data-txt-task-read-only') || 'Read only',
             txtTaskCheckOnly: body.getAttribute('data-txt-task-check-only') || 'Check or uncheck only',
             txtTaskFull: body.getAttribute('data-txt-task-full') || 'Full edit',
-            txtDirectShare: body.getAttribute('data-txt-direct-share') || 'Shared directly',
+
             txtNoteSharedThroughFolder: body.getAttribute('data-txt-note-shared-through-folder') || 'Note shared through folder',
             txtFolderSharedThroughParent: body.getAttribute('data-txt-folder-shared-through-parent') || 'Folder shared through parent folder',
             txtNoFilterResults: body.getAttribute('data-txt-no-filter-results') || 'No items match your search.',
             txtTableName: body.getAttribute('data-txt-table-name') || 'Name',
-            txtTableNote: body.getAttribute('data-txt-table-note') || 'Note',
             txtTableFolder: body.getAttribute('data-txt-table-folder') || 'Folder',
             txtTableToken: body.getAttribute('data-txt-table-token') || 'Token',
-            txtUrlLabel: body.getAttribute('data-txt-url-label') || 'Shared URL',
+
             txtTokenHelp: body.getAttribute('data-txt-token-help') || 'The token is the unique identifier used in a public share URL. Example: https://your-domain.example/public_note.php?token=my-note-share',
             txtTableActions: body.getAttribute('data-txt-table-actions') || 'Actions',
-            txtToday: body.getAttribute('data-txt-today') || 'Today',
-            txtYesterday: body.getAttribute('data-txt-yesterday') || 'Yesterday',
-            txtDaysAgo: body.getAttribute('data-txt-days-ago') || 'days ago',
+
             txtCancel: body.getAttribute('data-txt-cancel') || 'Cancel',
             txtSave: body.getAttribute('data-txt-save') || 'Save',
             txtViaFolder: body.getAttribute('data-txt-via-folder') || 'Shared via folder',
-            txtConfirmRevokeFolder: body.getAttribute('data-txt-confirm-revoke-folder') || 'Are you sure you want to revoke sharing for this folder?',
-            txtNoShares: body.getAttribute('data-txt-no-shares') || 'No shares yet.',
-            txtNoSharesHint: body.getAttribute('data-txt-no-shares-hint') || 'Share a note or folder by clicking the cloud button in the toolbar.',
+
             txtNoSharedNotes: body.getAttribute('data-txt-no-shared-notes') || 'No shared notes yet.',
             txtNoSharedFolders: body.getAttribute('data-txt-no-shared-folders') || 'No shared folders yet.',
             txtRestrictUsers: body.getAttribute('data-txt-restrict-users') || 'Restrict to specific users',
-            txtRestrictUsersPlaceholder: body.getAttribute('data-txt-restrict-users-placeholder') || 'Select users...',
+
             txtRestrictedBadge: body.getAttribute('data-txt-restricted-badge') || 'Restricted',
             txtRestrictedHelp: body.getAttribute('data-txt-restricted-help') || 'When restricted, only the listed users can access this share after logging in.',
             txtNoUsersFound: body.getAttribute('data-txt-no-users-found') || 'No other users found',
             txtUsersLoading: body.getAttribute('data-txt-users-loading') || 'Loading users...',
-            txtSharedWithMe: body.getAttribute('data-txt-shared-with-me') || 'Shared with me',
+
             txtSharedBy: body.getAttribute('data-txt-shared-by') || 'Shared by',
             txtNoSharedWithMe: body.getAttribute('data-txt-no-shared-with-me') || 'Nothing has been shared with you yet.'
         };
@@ -404,21 +393,6 @@
             applyFilter();
         })
         .catch(function(error) { alert(config.txtError + ': ' + error.message); });
-    }
-
-    function updateNoteAccessMode(noteId, accessMode) {
-        return fetch('/api/v1/notes/' + noteId + '/share', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            credentials: 'same-origin',
-            body: JSON.stringify({ access_mode: accessMode })
-        })
-        .then(function(response) { return response.json(); })
-        .then(function(data) {
-            if (data.error) throw new Error(data.error);
-            var note = sharedNotes.find(function(n) { return n.note_id === noteId; });
-            if (note) note.access_mode = data.accessMode || accessMode;
-        });
     }
 
     function updateNoteShareSettings(noteId, updates) {
@@ -1190,80 +1164,6 @@
             if (event.target === modal) {
                 closeModal();
             }
-        });
-    }
-
-    function showPasswordModal(id, hasPassword, isFolder) {
-        var modal = document.createElement('div');
-        modal.id = 'passwordModal';
-        modal.className = 'modal';
-        modal.style.display = 'flex';
-
-        var content = document.createElement('div');
-        content.className = 'modal-content';
-
-        var header = document.createElement('div');
-        header.className = 'modal-header';
-        var h3 = document.createElement('h3');
-        h3.textContent = hasPassword ? config.txtChangePasswordTitle : config.txtAddPasswordTitle;
-        header.appendChild(h3);
-        content.appendChild(header);
-
-        var body = document.createElement('div');
-        body.className = 'modal-body';
-
-        if (hasPassword) {
-            var removeInfo = document.createElement('p');
-            removeInfo.textContent = config.txtPasswordRemoveHint;
-            removeInfo.style.marginBottom = '15px';
-            removeInfo.style.fontSize = '13px';
-            removeInfo.style.color = '#666';
-            body.appendChild(removeInfo);
-        }
-
-        var passwordInput = document.createElement('input');
-        passwordInput.type = 'password';
-        passwordInput.id = 'modalPasswordInput';
-        passwordInput.placeholder = config.txtEnterNewPassword;
-        passwordInput.className = 'modal-password-input';
-        passwordInput.style.width = '100%';
-        passwordInput.style.padding = '8px 10px';
-        passwordInput.style.borderRadius = '6px';
-        passwordInput.style.border = '1px solid #ddd';
-        passwordInput.style.boxSizing = 'border-box';
-        body.appendChild(passwordInput);
-        content.appendChild(body);
-
-        var footer = document.createElement('div');
-        footer.className = 'modal-footer';
-
-        var cancelBtn = document.createElement('button');
-        cancelBtn.className = 'btn btn-secondary';
-        cancelBtn.textContent = config.txtCancel;
-        cancelBtn.addEventListener('click', function() { document.body.removeChild(modal); });
-
-        var saveBtn = document.createElement('button');
-        saveBtn.className = 'btn btn-primary';
-        saveBtn.textContent = config.txtSave;
-        saveBtn.addEventListener('click', function() {
-            var pw = passwordInput.value.trim();
-            if (isFolder) {
-                updateFolderPassword(id, pw);
-            } else {
-                updateNotePassword(id, pw);
-            }
-            document.body.removeChild(modal);
-        });
-
-        footer.appendChild(cancelBtn);
-        footer.appendChild(saveBtn);
-        content.appendChild(footer);
-        modal.appendChild(content);
-        document.body.appendChild(modal);
-        passwordInput.focus();
-
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) document.body.removeChild(modal);
         });
     }
 

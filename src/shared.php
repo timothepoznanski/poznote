@@ -75,10 +75,6 @@ foreach ($allFolders as $fid => $f) {
 		$stmtNote->execute([$fid]);
 		$noteCount = $stmtNote->fetchColumn();
 
-		$stmtFirstNote = $con->prepare("SELECT id FROM entries WHERE folder_id = ? AND trash = 0 ORDER BY id ASC LIMIT 1");
-		$stmtFirstNote->execute([$fid]);
-		$firstNoteId = $stmtFirstNote->fetchColumn();
-
 		$shared_folders[] = [
 			'id'              => $directEntry ? $directEntry['id'] : null,
 			'folder_id'       => $fid,
@@ -88,12 +84,9 @@ foreach ($allFolders as $fid => $f) {
 			'password'        => !empty($entry['password']),
 			'allowed_users'   => !empty($entry['allowed_users']) ? json_decode($entry['allowed_users'], true) : null,
 			'folder_name'     => $f['name'],
-			'folder_icon'     => $f['icon'],
 			'note_count'      => (int)$noteCount,
 			'is_direct'       => (bool)$directEntry,
-			'shared_via_name' => $viaEntry ? ($allFolders[$viaEntry['folder_id']]['name'] ?? 'Parent') : null,
 			'folder_path'     => getFolderPath($fid, $con),
-			'first_note_id'   => $firstNoteId ? (int)$firstNoteId : null,
 			'public_url'      => '/folder/' . urlencode($entry['token']),
 		];
 	}
@@ -154,13 +147,6 @@ usort($shared_folders, function($a, $b) {
 	data-txt-show-password="<?php echo t_h('login.show_password', [], 'Show password'); ?>"
 	data-txt-hide-password="<?php echo t_h('login.hide_password', [], 'Hide password'); ?>"
       data-txt-network-error="<?php echo t_h('common.network_error', [], 'Network error'); ?>"
-      data-txt-indexable="<?php echo t_h('public.indexable', [], 'Indexable'); ?>"
-      data-txt-password-protected="<?php echo t_h('public.password_protected', [], 'Password protected'); ?>"
-      data-txt-add-password-title="<?php echo t_h('public.add_password_title', [], 'Add password protection'); ?>"
-      data-txt-change-password-title="<?php echo t_h('public.change_password_title', [], 'Change Password'); ?>"
-      data-txt-password-remove-hint="<?php echo t_h('public.password_remove_hint', [], 'Leave empty to remove password protection.'); ?>"
-      data-txt-enter-new-password="<?php echo t_h('public.enter_new_password', [], 'Enter new password'); ?>"
-	data-txt-copy="<?php echo t_h('index.public_modal.copy', [], 'Copy'); ?>"
 	data-txt-renew="<?php echo t_h('index.public_modal.renew_token', [], 'Renew token'); ?>"
       data-txt-open="<?php echo t_h('public.actions.open', [], 'Open public view'); ?>"
       data-txt-revoke="<?php echo t_h('public.actions.revoke', [], 'Revoke'); ?>"
@@ -168,38 +154,27 @@ usort($shared_folders, function($a, $b) {
 	data-txt-task-read-only="<?php echo t_h('index.task_permissions.read_only', [], 'Read only'); ?>"
 	data-txt-task-check-only="<?php echo t_h('index.task_permissions.check_only', [], 'Check or uncheck only'); ?>"
 	data-txt-task-full="<?php echo t_h('index.task_permissions.full', [], 'Full edit'); ?>"
-	data-txt-direct-share="<?php echo t_h('public.direct_share', [], 'Shared directly'); ?>"
 	data-txt-note-shared-through-folder="<?php echo t_h('public.note_shared_through_folder', [], 'Note shared through folder'); ?>"
 	data-txt-folder-shared-through-parent="<?php echo t_h('public.folder_shared_through_parent', [], 'Folder shared through parent folder'); ?>"
       data-txt-no-filter-results="<?php echo t_h('public.no_filter_results', [], 'No notes match your search.'); ?>"
 	data-txt-table-name="<?php echo t_h('public.table.name', [], 'Name'); ?>"
-	data-txt-table-note="<?php echo t_h('public.table.note', [], 'Note'); ?>"
 	data-txt-table-folder="<?php echo t_h('public.table.path', [], 'Path'); ?>"
 	data-txt-table-token="<?php echo t_h('public.table.token', [], 'Token'); ?>"
-	data-txt-url-label="<?php echo t_h('public.table.url', [], 'Shared URL'); ?>"
 	data-txt-token-help="<?php echo t_h('public.token_help', [], 'The token is the unique identifier used in a public share URL. Example: https://your-domain.example/public_note.php?token=my-note-share'); ?>"
 	data-txt-table-actions="<?php echo t_h('public.table.actions', [], 'Actions'); ?>"
-      data-txt-today="<?php echo t_h('common.date.today', [], 'Today'); ?>"
-      data-txt-yesterday="<?php echo t_h('common.date.yesterday', [], 'Yesterday'); ?>"
-      data-txt-days-ago="<?php echo t_h('common.date.days_ago', [], 'days ago'); ?>"
       data-txt-cancel="<?php echo t_h('common.cancel', [], 'Cancel'); ?>"
       data-txt-save="<?php echo t_h('common.save', [], 'Save'); ?>"
       data-txt-via-folder="<?php echo t_h('public.via_folder', [], 'Shared via folder'); ?>"
-      data-txt-confirm-revoke-folder="<?php echo t_h('shared_folders.confirm_revoke', [], 'Are you sure you want to revoke sharing for this folder?'); ?>"
       data-txt-filter-all="<?php echo t_h('public.filter_all', [], 'All'); ?>"
       data-txt-filter-notes="<?php echo t_h('public.filter_notes', [], 'Notes'); ?>"
       data-txt-filter-folders="<?php echo t_h('public.filter_folders', [], 'Folders'); ?>"
-      data-txt-no-shares="<?php echo t_h('public.no_shares', [], 'No shares yet.'); ?>"
-      data-txt-no-shares-hint="<?php echo t_h('public.no_shares_hint', [], 'Share a note or folder by clicking the cloud button in the toolbar.'); ?>"
 	data-txt-no-shared-notes="<?php echo t_h('public.no_shared_notes', [], 'No shared notes yet.'); ?>"
 	data-txt-no-shared-folders="<?php echo t_h('public.no_shared_folders', [], 'No shared folders yet.'); ?>"
       data-txt-restrict-users="<?php echo t_h('public.restrict_users', [], 'Restrict to specific users'); ?>"
-      data-txt-restrict-users-placeholder="<?php echo t_h('public.restrict_users_placeholder', [], 'Select users...'); ?>"
       data-txt-restricted-badge="<?php echo t_h('public.restricted_badge', [], 'Restricted'); ?>"
       data-txt-restricted-help="<?php echo t_h('public.restricted_help', [], 'When restricted, only the listed users can access this share after logging in.'); ?>"
       data-txt-no-users-found="<?php echo t_h('public.no_users_found', [], 'No other users found'); ?>"
       data-txt-users-loading="<?php echo t_h('public.users_loading', [], 'Loading users...'); ?>"
-      data-txt-shared-with-me="<?php echo t_h('public.shared_with_me', [], 'Shared with me'); ?>"
       data-txt-shared-by="<?php echo t_h('public.shared_by', [], 'Shared by'); ?>"
       data-txt-no-shared-with-me="<?php echo t_h('public.no_shared_with_me', [], 'Nothing has been shared with you yet.'); ?>"
       data-txt-login-required-title="<?php echo t_h('public.login_required_title', [], 'Login Required'); ?>"
