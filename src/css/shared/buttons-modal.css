@@ -97,12 +97,19 @@ body.shared-page .shared-edit-token-modal .modal-header h3 {
 body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title-link {
     display: block;
     max-width: 100%;
-    white-space: nowrap;
-    overflow-x: auto;
-    overflow-y: hidden;
-    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
     text-decoration: none;
     color: var(--text-color, #333333);
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.45;
+    letter-spacing: 0;
+    font-family: "JetBrains Mono", "Fira Code", monospace;
+    background: rgba(0, 125, 184, 0.06);
+    border-radius: 6px;
+    padding: 8px 10px;
     cursor: default;
 }
 
@@ -125,6 +132,10 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title-link {
 
 body.shared-page .shared-edit-token-modal .shared-edit-token-modal-content {
     max-width: 920px;
+}
+
+body.shared-page .shared-edit-token-modal {
+    padding-top: 0px;
 }
 
 body.shared-page .shared-edit-token-modal .modal-body {
