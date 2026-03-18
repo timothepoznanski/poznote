@@ -1614,10 +1614,12 @@
       "public_hint": "Partagez une note en cliquant sur le bouton de nuage dans la barre d'outils de la note."
     },
     "filter_placeholder": "Filtrer par nom ou token...",
-    "no_filter_results": "Aucune note ne correspond à votre recherche.",
+    "no_filter_results": "Aucun élément ne correspond à votre recherche.",
     "filter_all": "Tout",
     "filter_notes": "Notes",
     "filter_folders": "Dossiers",
+    "no_shared_notes": "Aucune note partagée pour le moment.",
+    "no_shared_folders": "Aucun dossier partagé pour le moment.",
     "no_shares": "Aucun partage pour le moment.",
     "no_shares_hint": "Partagez une note ou un dossier en cliquant sur le bouton de nuage dans la barre d'outils.",
     "restrict_users": "Restreindre à des utilisateurs spécifiques",

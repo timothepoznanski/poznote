@@ -58,6 +58,8 @@
             txtConfirmRevokeFolder: body.getAttribute('data-txt-confirm-revoke-folder') || 'Are you sure you want to revoke sharing for this folder?',
             txtNoShares: body.getAttribute('data-txt-no-shares') || 'No shares yet.',
             txtNoSharesHint: body.getAttribute('data-txt-no-shares-hint') || 'Share a note or folder by clicking the cloud button in the toolbar.',
+            txtNoSharedNotes: body.getAttribute('data-txt-no-shared-notes') || 'No shared notes yet.',
+            txtNoSharedFolders: body.getAttribute('data-txt-no-shared-folders') || 'No shared folders yet.',
             txtRestrictUsers: body.getAttribute('data-txt-restrict-users') || 'Restrict to specific users',
             txtRestrictUsersPlaceholder: body.getAttribute('data-txt-restrict-users-placeholder') || 'Select users...',
             txtRestrictedBadge: body.getAttribute('data-txt-restricted-badge') || 'Restricted',
@@ -483,7 +485,6 @@
     // ========== Folder API actions ==========
 
     function revokeFolderShare(folderId) {
-        if (!confirm(config.txtConfirmRevokeFolder)) return;
         fetch('/api/v1/folders/' + folderId + '/share', {
             method: 'DELETE',
             headers: { 'Accept': 'application/json' },
@@ -1275,16 +1276,27 @@
         container.innerHTML = '';
 
         if (filteredItems.length === 0) {
-            if (filterType === 'shared_with_me' && !filterText) {
-                var noSharedDiv = document.createElement('div');
-                noSharedDiv.className = 'empty-message';
-                noSharedDiv.innerHTML = '<p>' + config.txtNoSharedWithMe + '</p>';
-                container.appendChild(noSharedDiv);
-            } else if (filterText || filterType !== 'all') {
+            if (emptyMessage) emptyMessage.style.display = 'none';
+            if (filterText) {
                 var noResultsDiv = document.createElement('div');
                 noResultsDiv.className = 'empty-message';
                 noResultsDiv.innerHTML = '<p>' + config.txtNoFilterResults + '</p>';
                 container.appendChild(noResultsDiv);
+            } else if (filterType === 'shared_with_me') {
+                var noSharedDiv = document.createElement('div');
+                noSharedDiv.className = 'empty-message';
+                noSharedDiv.innerHTML = '<p>' + config.txtNoSharedWithMe + '</p>';
+                container.appendChild(noSharedDiv);
+            } else if (filterType === 'notes') {
+                var noNotesDiv = document.createElement('div');
+                noNotesDiv.className = 'empty-message';
+                noNotesDiv.innerHTML = '<p>' + config.txtNoSharedNotes + '</p>';
+                container.appendChild(noNotesDiv);
+            } else if (filterType === 'folders') {
+                var noFoldersDiv = document.createElement('div');
+                noFoldersDiv.className = 'empty-message';
+                noFoldersDiv.innerHTML = '<p>' + config.txtNoSharedFolders + '</p>';
+                container.appendChild(noFoldersDiv);
             } else if (emptyMessage) {
                 emptyMessage.style.display = 'block';
             }

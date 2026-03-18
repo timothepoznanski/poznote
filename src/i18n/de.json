@@ -1567,10 +1567,12 @@
       "public_hint": "Teilen Sie eine Notiz, indem Sie auf die Wolken-Schaltfläche in der Notiz-Symbolleiste klicken."
     },
     "filter_placeholder": "Nach Name oder Token filtern...",
-    "no_filter_results": "Keine Notizen entsprechen Ihrer Suche.",
+    "no_filter_results": "Keine Einträge entsprechen Ihrer Suche.",
     "filter_all": "Alle",
     "filter_notes": "Notizen",
     "filter_folders": "Ordner",
+    "no_shared_notes": "Noch keine geteilten Notizen.",
+    "no_shared_folders": "Noch keine geteilten Ordner.",
     "no_shares": "Noch keine Freigaben.",
     "no_shares_hint": "Teilen Sie eine Notiz oder einen Ordner, indem Sie auf die Cloud-Schaltfläche in der Symbolleiste klicken.",
     "restrict_users": "Auf bestimmte Benutzer beschränken",

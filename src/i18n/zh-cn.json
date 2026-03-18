@@ -1567,10 +1567,12 @@
       "public_hint": "点击笔记工具栏中的云端按钮来共享笔记。"
     },
     "filter_placeholder": "按名称或 Token 过滤...",
-    "no_filter_results": "没有与您的搜索匹配的笔记。",
+    "no_filter_results": "没有与您的搜索匹配的项目。",
     "filter_all": "全部",
     "filter_notes": "笔记",
     "filter_folders": "文件夹",
+    "no_shared_notes": "目前还没有共享笔记。",
+    "no_shared_folders": "目前还没有共享文件夹。",
     "no_shares": "暂无共享。",
     "no_shares_hint": "点击工具栏中的云按钮即可分享笔记或文件夹。",
     "restrict_users": "限制为特定用户",

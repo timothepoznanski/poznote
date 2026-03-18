@@ -146,7 +146,7 @@ class FolderShareController {
             
             registerSharedLink($token, $_SESSION['user_id'], 'folder', (int)$folderId);
             
-            // Auto-share all notes in this folder
+            // Auto-share all notes in this folder subtree
             $sharedCount = $this->shareNotesInFolder($folderId, $folderRow['name'], $theme, $indexable);
             
             $urls = $this->buildUrls($token);
@@ -196,7 +196,7 @@ class FolderShareController {
             $stmt = $this->con->prepare('DELETE FROM shared_folders WHERE folder_id = ?');
             $stmt->execute([$folderId]);
             
-            // Unshare all notes in this folder
+            // Unshare all notes in this folder subtree
             $unsharedCount = $this->unshareNotesInFolder($folderId, $folder['name']);
             
             echo json_encode(['success' => true, 'revoked' => true, 'unshared_notes_count' => $unsharedCount]);
@@ -336,9 +336,12 @@ class FolderShareController {
      * @return int Number of notes shared
      */
     private function shareNotesInFolder($folderId, $folderName, $theme, $indexable) {
-        // Get all notes in this folder
-        $stmt = $this->con->prepare('SELECT id FROM entries WHERE (folder_id = ? OR folder = ?) AND trash = 0');
-        $stmt->execute([$folderId, $folderName]);
+        $folderIds = $this->getFolderSubtreeIds($folderId);
+        $placeholders = implode(', ', array_fill(0, count($folderIds), '?'));
+
+        // Include legacy rows that still store the root folder name in `folder`.
+        $stmt = $this->con->prepare('SELECT id FROM entries WHERE (folder_id IN (' . $placeholders . ') OR folder = ?) AND trash = 0');
+        $stmt->execute(array_merge($folderIds, [$folderName]));
         $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         $sharedCount = 0;
@@ -370,9 +373,12 @@ class FolderShareController {
      * @return int Number of notes unshared
      */
     private function unshareNotesInFolder($folderId, $folderName) {
-        // Get all notes in this folder
-        $stmt = $this->con->prepare('SELECT id FROM entries WHERE (folder_id = ? OR folder = ?) AND trash = 0');
-        $stmt->execute([$folderId, $folderName]);
+        $folderIds = $this->getFolderSubtreeIds($folderId);
+        $placeholders = implode(', ', array_fill(0, count($folderIds), '?'));
+
+        // Include legacy rows that still store the root folder name in `folder`.
+        $stmt = $this->con->prepare('SELECT id FROM entries WHERE (folder_id IN (' . $placeholders . ') OR folder = ?) AND trash = 0');
+        $stmt->execute(array_merge($folderIds, [$folderName]));
         $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         $unsharedCount = 0;
@@ -392,6 +398,29 @@ class FolderShareController {
             }
         }
         return $unsharedCount;
+    }
+
+    /**
+     * Get a folder id plus all descendant folder ids.
+     *
+     * @return int[]
+     */
+    private function getFolderSubtreeIds($folderId) {
+        $stmt = $this->con->prepare(
+            'WITH RECURSIVE folder_tree(id) AS (
+                SELECT id
+                FROM folders
+                WHERE id = ?
+                UNION ALL
+                SELECT child.id
+                FROM folders child
+                INNER JOIN folder_tree parent_tree ON child.parent_id = parent_tree.id
+            )
+            SELECT id FROM folder_tree'
+        );
+        $stmt->execute([$folderId]);
+
+        return array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
     }
     
     /**

@@ -1207,10 +1207,12 @@
       "public_hint": "Share a note by clicking the cloud button in note toolbar."
     },
     "filter_placeholder": "Filter by name or token...",
-    "no_filter_results": "No notes match your search.",
+    "no_filter_results": "No items match your search.",
     "filter_all": "All",
     "filter_notes": "Notes",
     "filter_folders": "Folders",
+    "no_shared_notes": "No shared notes yet.",
+    "no_shared_folders": "No shared folders yet.",
     "no_shares": "No shares yet.",
     "no_shares_hint": "Share a note or folder by clicking the cloud button in the toolbar.",
     "restrict_users": "Restrict to specific users",

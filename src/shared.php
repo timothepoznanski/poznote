@@ -191,6 +191,8 @@ usort($shared_folders, function($a, $b) {
       data-txt-filter-folders="<?php echo t_h('public.filter_folders', [], 'Folders'); ?>"
       data-txt-no-shares="<?php echo t_h('public.no_shares', [], 'No shares yet.'); ?>"
       data-txt-no-shares-hint="<?php echo t_h('public.no_shares_hint', [], 'Share a note or folder by clicking the cloud button in the toolbar.'); ?>"
+	data-txt-no-shared-notes="<?php echo t_h('public.no_shared_notes', [], 'No shared notes yet.'); ?>"
+	data-txt-no-shared-folders="<?php echo t_h('public.no_shared_folders', [], 'No shared folders yet.'); ?>"
       data-txt-restrict-users="<?php echo t_h('public.restrict_users', [], 'Restrict to specific users'); ?>"
       data-txt-restrict-users-placeholder="<?php echo t_h('public.restrict_users_placeholder', [], 'Select users...'); ?>"
       data-txt-restricted-badge="<?php echo t_h('public.restricted_badge', [], 'Restricted'); ?>"

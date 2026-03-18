@@ -267,15 +267,80 @@ try {
                 FROM folders parent
                 INNER JOIN folder_path ON folder_path.parent_id = parent.id
             )
-            SELECT sf.token, sf.password, folder_path.depth
+            SELECT sf.token, sf.password, sf.allowed_users, folder_path.depth
             FROM folder_path
             INNER JOIN shared_folders sf ON sf.folder_id = folder_path.id
-            WHERE sf.password IS NOT NULL AND sf.password != ""
+            WHERE (sf.password IS NOT NULL AND sf.password != "")
+               OR (sf.allowed_users IS NOT NULL AND sf.allowed_users != "")
             ORDER BY folder_path.depth ASC
             LIMIT 1'
         );
         $stmt->execute([$noteFolderId]);
         $protectedFolderContext = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    }
+
+    $folderAllowedUsersRaw = $protectedFolderContext['allowed_users'] ?? null;
+    if (!$passedUserRestriction && !empty($folderAllowedUsersRaw)) {
+        $folderAllowedUserIds = is_array($folderAllowedUsersRaw) ? $folderAllowedUsersRaw : json_decode($folderAllowedUsersRaw, true);
+        if (is_array($folderAllowedUserIds) && !empty($folderAllowedUserIds)) {
+            if (session_status() === PHP_SESSION_NONE) {
+                $configured_port = $_ENV['HTTP_WEB_PORT'] ?? '8040';
+                session_name('POZNOTE_SESSION_' . $configured_port);
+                session_start();
+            }
+            $currentUserId = $_SESSION['user_id'] ?? null;
+            $isOwner = $currentUserId !== null && (int)$currentUserId === (int)$activeUserId;
+            if (!$isOwner) {
+                if ($currentUserId === null) {
+                    http_response_code(403);
+                    ?>
+                    <!doctype html>
+                    <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
+                    <head>
+                        <meta charset="utf-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1">
+                        <meta name="robots" content="noindex, nofollow">
+                        <title><?php echo t_h('public.login_required_title', [], 'Login Required', $currentLang); ?></title>
+                        <link rel="stylesheet" href="css/public_folder.css">
+                    </head>
+                    <body class="password-page-body">
+                        <div class="password-container">
+                            <div class="lock-icon">🔒</div>
+                            <h2><?php echo t_h('public.login_required_title', [], 'Login Required', $currentLang); ?></h2>
+                            <p><?php echo t_h('public.login_required_message', [], 'This content is restricted to specific users. Please log in to access it.', $currentLang); ?></p>
+                            <a href="login.php" class="btn" style="display:inline-block;margin-top:12px;padding:10px 24px;background:#4a90d9;color:#fff;border-radius:6px;text-decoration:none;"><?php echo t_h('login.login', [], 'Log in', $currentLang); ?></a>
+                        </div>
+                    </body>
+                    </html>
+                    <?php
+                    exit;
+                }
+                if (!in_array((int)$currentUserId, array_map('intval', $folderAllowedUserIds), true)) {
+                    http_response_code(403);
+                    ?>
+                    <!doctype html>
+                    <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
+                    <head>
+                        <meta charset="utf-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1">
+                        <meta name="robots" content="noindex, nofollow">
+                        <title><?php echo t_h('public.access_denied_title', [], 'Access Denied', $currentLang); ?></title>
+                        <link rel="stylesheet" href="css/public_folder.css">
+                    </head>
+                    <body class="password-page-body">
+                        <div class="password-container">
+                            <div class="lock-icon">⛔</div>
+                            <h2><?php echo t_h('public.access_denied_title', [], 'Access Denied', $currentLang); ?></h2>
+                            <p><?php echo t_h('public.access_denied_message', [], 'You do not have permission to view this content.', $currentLang); ?></p>
+                        </div>
+                    </body>
+                    </html>
+                    <?php
+                    exit;
+                }
+            }
+            $passedUserRestriction = true;
+        }
     }
 
     // ============================================================================

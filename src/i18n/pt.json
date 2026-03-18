@@ -1571,10 +1571,12 @@
       "public_hint": "Compartilhe uma nota clicando no botão de nuvem na barra de ferramentas da nota."
     },
     "filter_placeholder": "Filtrar por nome ou token...",
-    "no_filter_results": "Nenhuma nota corresponde à sua pesquisa.",
+    "no_filter_results": "Nenhum item corresponde à sua pesquisa.",
     "filter_all": "Tudo",
     "filter_notes": "Notas",
     "filter_folders": "Pastas",
+    "no_shared_notes": "Ainda não há notas compartilhadas.",
+    "no_shared_folders": "Ainda não há pastas compartilhadas.",
     "no_shares": "Nenhum compartilhamento ainda.",
     "no_shares_hint": "Compartilhe uma nota ou pasta clicando no botão de nuvem na barra de ferramentas.",
     "restrict_users": "Restringir a utilizadores específicos",

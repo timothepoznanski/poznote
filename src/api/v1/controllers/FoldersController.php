@@ -1499,9 +1499,12 @@ class FoldersController {
                 
                 if ($sharedFolderStmt->fetchColumn()) {
                     // Check if note was actually shared
-                    $checkWasSharedStmt = $this->db->prepare("SELECT id FROM shared_notes WHERE note_id = ? LIMIT 1");
+                    $checkWasSharedStmt = $this->db->prepare("SELECT token FROM shared_notes WHERE note_id = ? LIMIT 1");
                     $checkWasSharedStmt->execute([$noteId]);
-                    if ($checkWasSharedStmt->fetchColumn()) {
+                    $existingToken = $checkWasSharedStmt->fetchColumn();
+                    if ($existingToken) {
+                        require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+                        unregisterSharedLink($existingToken);
                         $deleteShareStmt = $this->db->prepare("DELETE FROM shared_notes WHERE note_id = ?");
                         $deleteShareStmt->execute([$noteId]);
                         $shareDelta = -1;
