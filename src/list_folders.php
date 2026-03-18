@@ -158,7 +158,7 @@ $currentLang = getUserLanguage();
 				echo '<div class="shared-folder-icon" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--icon-bg, rgba(0, 123, 255, 0.1)); border-radius: 8px;">';
 				echo '<i class="' . $folder_icon . '" ' . $icon_style . '></i>';
 				echo '</div>';
-				echo '<span class="folder-name-text" style="font-weight: 500; font-size: 16px;">' . $folder_name . ' <span style="font-size: 14px; color: var(--text-muted); font-weight: 400;">(' . $note_count . ')</span></span>';
+				echo '<span class="folder-name-text" style="font-weight: 500; font-size: 16px; color: var(--text-color, var(--dm-text, #333333));">' . $folder_name . ' <span style="font-size: 14px; color: var(--text-muted, var(--dm-text-muted, #6c757d)); font-weight: 400;">(' . $note_count . ')</span></span>';
 				echo '</div>';
 				
 

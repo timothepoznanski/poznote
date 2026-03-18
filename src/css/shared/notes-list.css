@@ -378,10 +378,8 @@
 }
 
 .folder-name-text {
-    cursor: help;
-}
     font-size: 13px;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--dm-text, #333333));
     cursor: pointer;
     user-select: none;
 }
