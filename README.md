@@ -214,9 +214,11 @@ After installation, access Poznote in your web browser:
 [http://localhost:8040](http://localhost:8040)
 
 
-- Username: `admin`
-- Password: `admin`
+- Username: `admin_change_me`
+- Password: value of `POZNOTE_PASSWORD` (`admin` in `.env.template` by default)
 - Port: `8040`
+
+Rename the default administrator account after the first login.
 
 ## Change Settings
 
@@ -256,12 +258,51 @@ docker compose up -d
 <summary><strong>Traditional Authentication</strong></summary>
 <br>
 
-Poznote uses a password model based on the `.env` file. Define your administrator and user passwords, and users log in with their username and password.
+Poznote authenticates users against their profile using a username or email address and a password.
+
+#### Password resolution order
+
+When a user signs in, Poznote checks passwords in this order:
+
+1. A custom bcrypt password hash stored in the master database for that user.
+2. Fallback values from `.env`:
+  - `POZNOTE_PASSWORD` for the administrator profile
+  - `POZNOTE_PASSWORD_USER` for standard users
+  - `POZNOTE_PASSWORD_{USERNAME}` for per-user overrides
+
+This means `.env` acts as the default or seed credential source, while a password changed from the interface takes priority afterward.
+
+#### Default account
+
+On a fresh installation, Poznote creates one active administrator profile:
+
+- Username: `admin_change_me`
+- Password: `POZNOTE_PASSWORD`
+
+Rename this account after the first login.
+
+#### Password management
+
+- Users can change their own password from `Settings > Change Password`.
+- Administrators can set a custom password for any user or reset that user back to their `.env` password from `Settings > User Management`.
+- The `Remember me` option keeps the session for 30 days.
+- Changing a password invalidates existing remember-me cookies for that user.
+
 
 #### Configuration
 
-- **Global Authentication**: Set `POZNOTE_PASSWORD` (admin) and `POZNOTE_PASSWORD_USER` (standard users) in your `.env` file.
-- **User-Specific Passwords**: Set individual passwords using `POZNOTE_PASSWORD_{USERNAME}` in your `.env`.
+- **Admin password**: Set `POZNOTE_PASSWORD` in your `.env` file.
+- **Default standard-user password**: Set `POZNOTE_PASSWORD_USER` in your `.env` file.
+- **User-specific passwords**: Set individual defaults using `POZNOTE_PASSWORD_{USERNAME}` in your `.env`.
+
+Example:
+
+```bash
+POZNOTE_PASSWORD=admin-secret
+POZNOTE_PASSWORD_USER=user-secret
+POZNOTE_PASSWORD_ALICE=alice-secret
+POZNOTE_PASSWORD_BOB=bob-secret
+```
 
 </details>
 
@@ -274,14 +315,32 @@ Poznote supports OpenID Connect (authorization code + PKCE) for single sign-on i
 
 #### How it works
 
-1. Optionally restrict access by OIDC group membership.
-2. The login page displays a "Continue with [Provider Name]" button.
-3. Clicking the button redirects users to your identity provider.
-4. After successful authentication, Poznote links the OIDC identity to an existing profile (by `sub`, then `preferred_username`, then `email`) and can auto-create a profile if enabled.
+1. The login page displays a `Continue with [Provider Name]` button when OIDC is enabled.
+2. Users authenticate with the OIDC authorization code flow secured by PKCE.
+3. Access can be restricted with `POZNOTE_OIDC_ALLOWED_GROUPS` and, if needed, the legacy `POZNOTE_OIDC_ALLOWED_USERS` allowlist.
+4. After authentication, Poznote links the identity in this order: `sub` (`oidc_subject`), then `preferred_username`, then `email`.
+5. If no profile matches and `POZNOTE_OIDC_AUTO_CREATE_USERS=true`, Poznote creates one automatically.
+6. If `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true`, the username/password form is hidden and the login page becomes SSO-only.
 
 #### Configuration
 
-Add the OIDC variables to your `.env` file (see `.env.template`). If `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN` is `true`, the standard login form will be hidden.
+Add the OIDC variables to your `.env` file (see `.env.template`).
+
+Minimum required settings:
+
+```bash
+POZNOTE_OIDC_ENABLED=true
+POZNOTE_OIDC_ISSUER=https://your-identity-provider.com
+POZNOTE_OIDC_CLIENT_ID=your_client_id
+```
+
+Notes:
+
+- `POZNOTE_OIDC_DISCOVERY_URL` can be used instead of deriving discovery from the issuer.
+- `POZNOTE_OIDC_CLIENT_SECRET` is optional and mainly needed for confidential clients.
+- `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true` hides the local login form.
+- `POZNOTE_OIDC_DISABLE_BASIC_AUTH=true` rejects HTTP Basic Auth on the API.
+- `POZNOTE_OIDC_GROUPS_CLAIM` defaults to `groups`.
 
 #### Access Control Example (Groups + Auto-Provision)
 
@@ -293,6 +352,8 @@ POZNOTE_OIDC_AUTO_CREATE_USERS=true
 ```
 
 `POZNOTE_OIDC_ALLOWED_USERS` remains available for backward compatibility, but group-based access is recommended.
+
+If auto-provisioning is enabled, Poznote generates a username from the OIDC claims (`preferred_username`, `nickname`, email local part, `name`, then `sub`) and stores the OIDC subject on the created profile.
 
 </details>
 
@@ -340,7 +401,7 @@ Your data is preserved in the `./data` directory and will not be affected by the
 Poznote features a multi-user architecture with isolated data space for each user (ideal for families, teams, or personal personas).
 
 - **Data Isolation**: Each user has their own separate notes, workspaces, tags, folders and attachments.
-- **Global Passwords**: Access is managed via passwords defined in the `.env` file, with optional per-user passwords.
+- **Hybrid Password Model**: Access uses per-profile credentials with custom passwords stored in database, falling back to `.env` defaults when no custom password has been set.
 - **User Management**: Administrators can manage profiles via the Settings panel.
 
 > ⚠️ **Warning:** It is not possible to share notes between users. Each user has their own isolated space. The only way to share notes or a profile is to share a common account.
