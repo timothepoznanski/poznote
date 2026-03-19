@@ -1144,6 +1144,7 @@
       "custom_token": "Benutzerdefiniertes Token (optional)",
       "custom_token_placeholder": "my_custom_token-1",
       "indexable": "Suchmaschinenindizierung zulassen",
+      "indexable_mobile": "Indizierung zulassen",
       "tasklist_access": "Zugriff auf öffentliche Aufgabenliste",
       "access_read_only": "Nur lesen",
       "access_check_only": "Nur abhaken oder Häkchen entfernen",
@@ -1164,7 +1165,7 @@
       "failed_revoke": "Fehler beim Widerrufen der Ordnerfreigabe"
     },
     "task_permissions": {
-      "title": "Berechtigungen der Aufgabenliste",
+      "title": "Berechtigungen",
       "read_only": "Nur lesen",
       "check_only": "Nur abhaken oder Häkchen entfernen",
       "full": "Vollständige Bearbeitung"
@@ -1576,6 +1577,7 @@
     "no_shares": "Noch keine Freigaben.",
     "no_shares_hint": "Teilen Sie eine Notiz oder einen Ordner, indem Sie auf die Cloud-Schaltfläche in der Symbolleiste klicken.",
     "restrict_users": "Auf bestimmte Benutzer beschränken",
+    "restrict_users_mobile": "Beschränken",
     "restrict_users_placeholder": "Benutzer auswählen...",
     "restricted_badge": "Eingeschränkt",
     "restricted_help": "Bei eingeschränktem Zugang können nur die aufgeführten Benutzer nach dem Anmelden auf diesen Share zugreifen.",

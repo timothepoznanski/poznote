@@ -1193,6 +1193,7 @@
       "custom_token": "Token personnalisé (optionnel)",
       "custom_token_placeholder": "my_custom_token-1",
       "indexable": "Autoriser l'indexation par les moteurs de recherche",
+      "indexable_mobile": "Autoriser l'indexation",
       "password": "Mot de passe (optionnel)",
       "password_placeholder": "Saisir un mot de passe",
       "error_prefix": "Erreur : ",
@@ -1209,7 +1210,7 @@
       "failed_revoke": "Échec de la révocation du partage du dossier"
     },
     "task_permissions": {
-      "title": "Permissions de la liste de tâches",
+      "title": "Permissions",
       "read_only": "Lecture seule",
       "check_only": "Cocher ou décocher uniquement",
       "full": "Modification complète"
@@ -1624,6 +1625,7 @@
     "no_shares": "Aucun partage pour le moment.",
     "no_shares_hint": "Partagez une note ou un dossier en cliquant sur le bouton de nuage dans la barre d'outils.",
     "restrict_users": "Restreindre à des utilisateurs spécifiques",
+    "restrict_users_mobile": "Restreindre",
     "restrict_users_placeholder": "Sélectionner des utilisateurs...",
     "restricted_badge": "Restreint",
     "restricted_help": "Quand le partage est restreint, seuls les utilisateurs listés peuvent y accéder après s'être connectés.",

@@ -1148,6 +1148,7 @@
       "custom_token": "Token personalizado (opcional)",
       "custom_token_placeholder": "my_custom_token-1",
       "indexable": "Permitir indexação por motores de busca",
+      "indexable_mobile": "Permitir indexação",
       "tasklist_access": "Acesso público à lista de tarefas",
       "access_read_only": "Somente leitura",
       "access_check_only": "Apenas marcar ou desmarcar",
@@ -1168,7 +1169,7 @@
       "failed_revoke": "Falha ao revogar o compartilhamento da pasta"
     },
     "task_permissions": {
-      "title": "Permissões da lista de tarefas",
+      "title": "Permissões",
       "read_only": "Somente leitura",
       "check_only": "Apenas marcar ou desmarcar",
       "full": "Edição completa"
@@ -1580,6 +1581,7 @@
     "no_shares": "Nenhum compartilhamento ainda.",
     "no_shares_hint": "Compartilhe uma nota ou pasta clicando no botão de nuvem na barra de ferramentas.",
     "restrict_users": "Restringir a utilizadores específicos",
+    "restrict_users_mobile": "Restringir",
     "restrict_users_placeholder": "Selecionar utilizadores...",
     "restricted_badge": "Restrito",
     "restricted_help": "Quando restrito, apenas os utilizadores listados podem aceder a esta partilha após iniciar sessão.",

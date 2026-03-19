@@ -383,6 +383,12 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-modal-actions > .bt
         align-items: flex-start !important;
     }
 
+    body.shared-page .shared-edit-token-modal .indexable-label-text {
+        white-space: normal;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
     body.shared-page .shared-edit-token-modal .share-indexable-label .toggle-switch {
         margin-left: auto;
     }

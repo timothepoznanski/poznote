@@ -706,6 +706,7 @@
       "custom_token": "Custom token (optional)",
       "custom_token_placeholder": "my_custom_token-1",
       "indexable": "Allow indexing by search engines",
+      "indexable_mobile": "Allow indexing",
       "password": "Password (optional)",
       "password_placeholder": "Enter a password",
       "error_prefix": "Error: ",
@@ -722,7 +723,7 @@
       "failed_revoke": "Error revoking folder share"
     },
     "task_permissions": {
-      "title": "Task list permissions",
+      "title": "Permissions",
       "read_only": "Read only",
       "check_only": "Check or uncheck only",
       "full": "Full edit"
@@ -1217,6 +1218,7 @@
     "no_shares": "No shares yet.",
     "no_shares_hint": "Share a note or folder by clicking the cloud button in the toolbar.",
     "restrict_users": "Restrict to specific users",
+    "restrict_users_mobile": "Restrict",
     "restrict_users_placeholder": "Select users...",
     "restricted_badge": "Restricted",
     "restricted_help": "When restricted, only the listed users can access this share after logging in.",

@@ -1141,6 +1141,7 @@
       "custom_token": "自定义 Token (可选)",
       "custom_token_placeholder": "my_custom_token-1",
       "indexable": "允许搜索引擎索引",
+      "indexable_mobile": "允许索引",
       "tasklist_access": "任务列表公开访问权限",
       "access_read_only": "只读",
       "access_check_only": "仅勾选或取消勾选",
@@ -1161,7 +1162,7 @@
       "failed_revoke": "撤销文件夹共享失败"
     },
     "task_permissions": {
-      "title": "任务列表权限",
+      "title": "权限",
       "read_only": "只读",
       "check_only": "仅勾选或取消勾选",
       "full": "完全编辑"
@@ -1576,6 +1577,7 @@
     "no_shares": "暂无共享。",
     "no_shares_hint": "点击工具栏中的云按钮即可分享笔记或文件夹。",
     "restrict_users": "限制为特定用户",
+    "restrict_users_mobile": "限制",
     "restrict_users_placeholder": "选择用户...",
     "restricted_badge": "已限制",
     "restricted_help": "限制后，只有列出的用户登录后才能访问此共享链接。",

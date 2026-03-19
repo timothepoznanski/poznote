@@ -1143,6 +1143,7 @@
       "custom_token": "Token personalizado (opcional)",
       "custom_token_placeholder": "my_custom_token-1",
       "indexable": "Permitir indexación por motores de búsqueda",
+      "indexable_mobile": "Permitir indexación",
       "tasklist_access": "Acceso público a la lista de tareas",
       "access_read_only": "Solo lectura",
       "access_check_only": "Solo marcar o desmarcar",
@@ -1163,7 +1164,7 @@
       "failed_revoke": "Error al revocar el enlace de la carpeta"
     },
     "task_permissions": {
-      "title": "Permisos de la lista de tareas",
+      "title": "Permisos",
       "read_only": "Solo lectura",
       "check_only": "Solo marcar o desmarcar",
       "full": "Edición completa"
@@ -1575,6 +1576,7 @@
     "no_shares": "Sin compartidos aún.",
     "no_shares_hint": "Comparte una nota o carpeta haciendo clic en el botón de nube en la barra de herramientas.",
     "restrict_users": "Restringir a usuarios específicos",
+    "restrict_users_mobile": "Restringir",
     "restrict_users_placeholder": "Seleccionar usuarios...",
     "restricted_badge": "Restringido",
     "restricted_help": "Cuando está restringido, solo los usuarios listados pueden acceder a este enlace tras iniciar sesión.",
