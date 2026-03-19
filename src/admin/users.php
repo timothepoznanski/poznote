@@ -217,11 +217,16 @@ $v = getAppVersion();
     /**
      * Open the rename/edit user modal with current user data
      */
+    function updateRenameModalTitle(username) {
+        document.getElementById('rename_title_user').textContent = username || '';
+    }
+
     function renameUser(userId, currentUsername, currentEmail, currentOidcSubject) {
         document.getElementById('rename_user_id').value = userId;
         document.getElementById('rename_username').value = currentUsername;
         document.getElementById('rename_email').value = currentEmail || '';
         document.getElementById('rename_oidc_subject').value = currentOidcSubject || '';
+        updateRenameModalTitle(currentUsername);
         document.getElementById('renameModal').classList.add('active');
         setTimeout(() => document.getElementById('rename_username').focus(), 100);
     }
@@ -391,20 +396,20 @@ $v = getAppVersion();
     <!-- Rename/Edit User Modal -->
     <div class="modal" id="renameModal">
         <div class="modal-content profile-modal-content">
-            <h2 class="modal-title"><?php echo t_h('multiuser.admin.edit_user', [], 'Edit User Profile'); ?></h2>
+            <h2 class="modal-title"><?php echo t_h('multiuser.admin.edit_user', [], 'Edit User Profile'); ?>&nbsp;: <span id="rename_title_user"></span></h2>
             <div class="form-group profile-modal-fields">
                 <input type="hidden" id="rename_user_id">
-                <label class="profile-modal-label"><?php echo t_h('multiuser.admin.username', [], 'Username'); ?></label>
-                <input type="text" id="rename_username" placeholder="<?php echo t_h('multiuser.admin.username', [], 'Username'); ?>" onkeydown="if(event.key==='Enter') submitRename()">
+                <label class="profile-modal-label"><?php echo t_h('multiuser.admin.username', [], 'Username'); ?>&nbsp;:</label>
+                <input type="text" id="rename_username" placeholder="<?php echo t_h('multiuser.admin.username', [], 'Username'); ?>" oninput="updateRenameModalTitle(this.value)" onkeydown="if(event.key==='Enter') submitRename()">
                 
-                <label class="profile-modal-label"><?php echo t_h('multiuser.admin.email', [], 'Email'); ?></label>
+                <label class="profile-modal-label"><?php echo t_h('multiuser.admin.email', [], 'Email'); ?>&nbsp;:</label>
                 <input type="email" id="rename_email" placeholder="<?php echo t_h('multiuser.admin.email', [], 'Email'); ?>" onkeydown="if(event.key==='Enter') submitRename()">
                 
-                <label class="profile-modal-label"><?php echo t_h('multiuser.admin.oidc_subject', [], 'OIDC Subject (UUID)'); ?></label>
-                <input type="text" id="rename_oidc_subject" placeholder="<?php echo t_h('multiuser.admin.oidc_subject_placeholder', [], 'e.g., 510ec799-02f8-42e0-...');?>" onkeydown="if(event.key==='Enter') submitRename()">
+                <label class="profile-modal-label"><?php echo t_h('multiuser.admin.oidc_subject', [], 'OIDC Subject (UUID)'); ?>&nbsp;:</label>
                 <small class="profile-modal-help">
                     <?php echo t_h('multiuser.admin.oidc_subject_help', [], 'Optional: UUID from your OIDC provider (LLDAP, Authelia, etc.)'); ?>
                 </small>
+                <input type="text" id="rename_oidc_subject" placeholder="<?php echo t_h('multiuser.admin.oidc_subject_placeholder', [], 'e.g., 510ec799-02f8-42e0-...');?>" onkeydown="if(event.key==='Enter') submitRename()">
             </div>
             <div class="form-actions">
                 <button type="button" class="btn btn-danger" onclick="closeModal('renameModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>

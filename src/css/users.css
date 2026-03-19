@@ -348,6 +348,10 @@ html[data-theme='dark'] .users-table td {
     gap: 14px;
 }
 
+.profile-modal-fields input {
+    margin-bottom: 10px;
+}
+
 .profile-modal-label {
     display: block;
     margin-bottom: -6px;
