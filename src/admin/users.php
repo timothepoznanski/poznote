@@ -217,11 +217,16 @@ $v = getAppVersion();
     /**
      * Open the rename/edit user modal with current user data
      */
+    function updateRenameModalTitle(username) {
+        document.getElementById('rename_title_user').textContent = username || '';
+    }
+
     function renameUser(userId, currentUsername, currentEmail, currentOidcSubject) {
         document.getElementById('rename_user_id').value = userId;
         document.getElementById('rename_username').value = currentUsername;
         document.getElementById('rename_email').value = currentEmail || '';
         document.getElementById('rename_oidc_subject').value = currentOidcSubject || '';
+        updateRenameModalTitle(currentUsername);
         document.getElementById('renameModal').classList.add('active');
         setTimeout(() => document.getElementById('rename_username').focus(), 100);
     }
@@ -336,6 +341,12 @@ $v = getAppVersion();
                                             onclick="renameUser(<?php echo (int)$user['id']; ?>, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($user['email'] ?? ''), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($user['oidc_subject'] ?? ''), ENT_QUOTES); ?>)">
                                         <i class="lucide-pencil"></i>
                                     </button>
+                                    
+                                        <button type="button" class="btn btn-secondary btn-small password-action-btn" title="<?php echo t_h('multiuser.admin.password_management.reset_password', [], 'Reset Password'); ?>"
+                                            data-user-id="<?php echo (int)$user['id']; ?>"
+                                            data-username="<?php echo htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?>">
+                                        <i class="lucide-key"></i>
+                                    </button>
 
                                     <?php if ($user['id'] !== getCurrentUserId()): ?>
                                         <button class="btn btn-danger btn-small" title="<?php echo t_h('common.delete', [], 'Delete'); ?>" 
@@ -384,24 +395,24 @@ $v = getAppVersion();
     
     <!-- Rename/Edit User Modal -->
     <div class="modal" id="renameModal">
-        <div class="modal-content">
-            <h2 class="modal-title"><?php echo t_h('multiuser.admin.edit_user', [], 'Edit User Profile'); ?></h2>
-            <div class="form-group">
+        <div class="modal-content profile-modal-content">
+            <h2 class="modal-title"><?php echo t_h('multiuser.admin.edit_user', [], 'Edit User Profile'); ?>&nbsp;: <span id="rename_title_user"></span></h2>
+            <div class="form-group profile-modal-fields">
                 <input type="hidden" id="rename_user_id">
-                <label style="display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--text-muted);"><?php echo t_h('multiuser.admin.username', [], 'Username'); ?></label>
-                <input type="text" id="rename_username" placeholder="<?php echo t_h('multiuser.admin.username', [], 'Username'); ?>" onkeydown="if(event.key==='Enter') submitRename()" style="margin-bottom: 15px;">
+                <label class="profile-modal-label"><?php echo t_h('multiuser.admin.username', [], 'Username'); ?>&nbsp;:</label>
+                <input type="text" id="rename_username" placeholder="<?php echo t_h('multiuser.admin.username', [], 'Username'); ?>" oninput="updateRenameModalTitle(this.value)" onkeydown="if(event.key==='Enter') submitRename()">
                 
-                <label style="display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--text-muted);"><?php echo t_h('multiuser.admin.email', [], 'Email'); ?></label>
-                <input type="email" id="rename_email" placeholder="<?php echo t_h('multiuser.admin.email', [], 'Email'); ?>" onkeydown="if(event.key==='Enter') submitRename()" style="margin-bottom: 15px;">
+                <label class="profile-modal-label"><?php echo t_h('multiuser.admin.email', [], 'Email'); ?>&nbsp;:</label>
+                <input type="email" id="rename_email" placeholder="<?php echo t_h('multiuser.admin.email', [], 'Email'); ?>" onkeydown="if(event.key==='Enter') submitRename()">
                 
-                <label style="display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--text-muted);"><?php echo t_h('multiuser.admin.oidc_subject', [], 'OIDC Subject (UUID)'); ?></label>
-                <input type="text" id="rename_oidc_subject" placeholder="<?php echo t_h('multiuser.admin.oidc_subject_placeholder', [], 'e.g., 510ec799-02f8-42e0-...');?>" onkeydown="if(event.key==='Enter') submitRename()">
-                <small style="display: block; margin-top: 5px; font-size: 0.75rem; color: var(--text-muted);">
+                <label class="profile-modal-label"><?php echo t_h('multiuser.admin.oidc_subject', [], 'OIDC Subject (UUID)'); ?>&nbsp;:</label>
+                <small class="profile-modal-help">
                     <?php echo t_h('multiuser.admin.oidc_subject_help', [], 'Optional: UUID from your OIDC provider (LLDAP, Authelia, etc.)'); ?>
                 </small>
+                <input type="text" id="rename_oidc_subject" placeholder="<?php echo t_h('multiuser.admin.oidc_subject_placeholder', [], 'e.g., 510ec799-02f8-42e0-...');?>" onkeydown="if(event.key==='Enter') submitRename()">
             </div>
             <div class="form-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('renameModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
+                <button type="button" class="btn btn-danger" onclick="closeModal('renameModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
                 <button type="button" class="btn btn-primary" onclick="submitRename()"><?php echo t_h('common.save', [], 'Save'); ?></button>
             </div>
         </div>
@@ -429,6 +440,35 @@ $v = getAppVersion();
         </div>
     </div>
     
+    <!-- Password Management Modal -->
+    <div class="modal" id="passwordModal">
+        <div class="modal-content password-modal-content">
+            <div class="password-modal-header">
+                <div class="password-modal-heading">
+                    <h2 class="modal-title"><?php echo t_h('multiuser.admin.password_management.manage_password', [], 'Password'); ?> : <span id="pw_title_user"></span></h2>
+                    <p id="pw_status_summary" class="password-status-summary"><?php echo t_h('common.loading', [], 'Loading...'); ?></p>
+                </div>
+            </div>
+            <input type="hidden" id="pw_user_id">
+            <div class="password-meta-row">
+                <div id="pw_status" class="password-status-text"></div>
+            </div>
+            
+            <div class="form-group password-form-group">
+                <input type="password" id="pw_new_password" placeholder="<?php echo t_h('multiuser.admin.new_password', [], 'New password'); ?>" autocomplete="new-password">
+            </div>
+            
+            <div id="pw_error" class="password-feedback password-feedback-error" style="display: none;"></div>
+            <div id="pw_success" class="password-feedback password-feedback-success" style="display: none;"></div>
+            
+            <div class="form-actions password-modal-actions">
+                <button type="button" class="btn btn-danger" onclick="closeModal('passwordModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
+                <button type="button" class="btn btn-secondary" id="pw_reset_btn" onclick="resetPasswordToEnv()"><?php echo t_h('multiuser.admin.password_management.reset_to_default', [], 'Reset to default'); ?></button>
+                <button type="button" class="btn btn-primary" id="pw_save_btn" onclick="setNewPassword()"><?php echo t_h('common.save', [], 'Save'); ?></button>
+            </div>
+        </div>
+    </div>
+
     <!-- ========================================
          JAVASCRIPT - Modal & Form Handlers
          ======================================== -->
@@ -460,6 +500,132 @@ $v = getAppVersion();
             document.getElementById(modalId).classList.remove('active');
         }
         
+        // === Password Management ===
+        
+        function setPasswordStatusDisplay(data) {
+            var statusEl = document.getElementById('pw_status');
+            var statusSummary = document.getElementById('pw_status_summary');
+            var statusRow = statusEl ? statusEl.parentElement : null;
+            if (!statusEl || !statusSummary || !statusRow) return;
+
+            if (data && data.has_custom_password) {
+                statusSummary.textContent = <?php echo json_encode(t('multiuser.admin.password_management.status_custom_detail', [], 'This user uses a custom password.')); ?>;
+                statusEl.textContent = data.password_changed_at
+                    ? <?php echo json_encode(t('multiuser.admin.password_management.changed_at_prefix', [], 'Updated:')); ?> + ' ' + data.password_changed_at
+                    : '';
+            } else {
+                statusSummary.textContent = <?php echo json_encode(t('multiuser.admin.password_management.status_default_detail', [], 'This user uses the default password.')); ?>;
+                statusEl.textContent = '';
+            }
+
+            statusRow.style.display = statusEl.textContent.trim() === '' ? 'none' : 'flex';
+        }
+
+        function loadPasswordStatus(userId) {
+            var statusEl = document.getElementById('pw_status');
+            var statusSummary = document.getElementById('pw_status_summary');
+            var statusRow = statusEl ? statusEl.parentElement : null;
+            if (statusEl) statusEl.textContent = <?php echo json_encode(t('common.loading', [], 'Loading...')); ?>;
+            if (statusSummary) {
+                statusSummary.textContent = <?php echo json_encode(t('common.loading', [], 'Loading...')); ?>;
+            }
+            if (statusRow) {
+                statusRow.style.display = 'none';
+            }
+
+            return fetch('/api/v1/admin/users/' + userId + '/password-status', {
+                method: 'GET',
+                headers: { 'Accept': 'application/json' },
+                credentials: 'same-origin'
+            })
+            .then(r => r.json())
+            .then(data => {
+                setPasswordStatusDisplay(data);
+                return data;
+            })
+            .catch(() => {
+                if (statusEl) statusEl.textContent = '';
+                if (statusRow) statusRow.style.display = 'none';
+            });
+        }
+
+        function openPasswordModal(userId, username) {
+            document.getElementById('pw_user_id').value = userId;
+            document.getElementById('pw_title_user').textContent = username;
+            document.getElementById('pw_new_password').value = '';
+            document.getElementById('pw_error').style.display = 'none';
+            document.getElementById('pw_success').style.display = 'none';
+            document.getElementById('passwordModal').classList.add('active');
+            loadPasswordStatus(userId);
+            
+            setTimeout(() => document.getElementById('pw_new_password').focus(), 100);
+        }
+        
+        function setNewPassword() {
+            var userId = document.getElementById('pw_user_id').value;
+            var newPw = document.getElementById('pw_new_password').value;
+            var errorEl = document.getElementById('pw_error');
+            var successEl = document.getElementById('pw_success');
+            
+            errorEl.style.display = 'none';
+            successEl.style.display = 'none';
+            
+            if (!newPw || newPw.length < 4) {
+                errorEl.textContent = <?php echo json_encode(t('password.errors.too_short', [], 'Password must be at least 4 characters')); ?>;
+                errorEl.style.display = 'block';
+                return;
+            }
+            
+            fetch('/api/v1/admin/users/' + userId + '/reset-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({ action: 'set_password', new_password: newPw })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    closeModal('passwordModal');
+                } else {
+                    errorEl.textContent = data.error || 'Error';
+                    errorEl.style.display = 'block';
+                }
+            })
+            .catch(() => {
+                errorEl.textContent = 'Error';
+                errorEl.style.display = 'block';
+            });
+        }
+        
+        function resetPasswordToEnv() {
+            var userId = document.getElementById('pw_user_id').value;
+            var errorEl = document.getElementById('pw_error');
+            var successEl = document.getElementById('pw_success');
+            
+            errorEl.style.display = 'none';
+            successEl.style.display = 'none';
+            
+            fetch('/api/v1/admin/users/' + userId + '/reset-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({ action: 'reset_to_env' })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    closeModal('passwordModal');
+                } else {
+                    errorEl.textContent = data.error || 'Error';
+                    errorEl.style.display = 'block';
+                }
+            })
+            .catch(() => {
+                errorEl.textContent = 'Error';
+                errorEl.style.display = 'block';
+            });
+        }
+
         // === Event Listeners ===
         
         // Close modal when clicking outside
@@ -468,6 +634,12 @@ $v = getAppVersion();
                 if (e.target === this) {
                     this.classList.remove('active');
                 }
+            });
+        });
+
+        document.querySelectorAll('.password-action-btn').forEach(function(button) {
+            button.addEventListener('click', function () {
+                openPasswordModal(this.getAttribute('data-user-id'), this.getAttribute('data-username'));
             });
         });
         

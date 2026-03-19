@@ -73,7 +73,8 @@
       "install_app": "Install application",
       "release_notes": "Release Notes",
       "convert_images": "Base64 Image Converter",
-        "orphan_scanner": "Orphan attachments scanner"
+        "orphan_scanner": "Orphan attachments scanner",
+        "change_password": "Change Password"
     },
     "install_app": {
       "unavailable": "Installation is not available right now. On Chrome mobile, open the browser menu then tap \"Install app\" (or \"Add to Home screen\") when available.",
@@ -673,6 +674,7 @@
       "convert_to_markdown": "Convert to Markdown"
     },
     "share_modal": {
+      "description": "A shared URL creates a public link to this note. Once the URL is created, you will be able to add more options, such as protecting the note with a password or customizing the share URL.",
       "custom_token": "Custom token (optional)",
       "custom_token_placeholder": "my_custom_token-1",
       "custom_token_example": "This would give for example:",
@@ -691,11 +693,13 @@
     },
     "public_modal": {
       "title": "Shared URL",
+      "redirect_info": "This share is now managed from the Shared page, where you can edit its public settings.",
       "close": "Close",
       "open": "Open",
       "copy": "Copy",
       "revoke": "Revoke",
       "renew": "Renew",
+      "renew_token": "Renew token",
       "manage": "Edit",
       "create_url": "Create url",
       "no_link_yet": "No public link yet",
@@ -710,6 +714,7 @@
     },
     "folder_share_modal": {
       "title": "Shared folder URL",
+      "create_description": "A shared URL creates a public link to this folder. Once the URL is created, you will be able to add more options, such as protecting the folder with a password or customizing the share URL.",
       "description": "Anyone with this link can view all notes in this folder (unless password-protected).",
       "use_https": "HTTPS",
       "renewed": "Shared folder link renewed",
@@ -1202,10 +1207,32 @@
       "no_public_notes": "No shared notes yet.",
       "public_hint": "Share a note by clicking the cloud button in note toolbar."
     },
-    "filter_placeholder": "Filter by title or folder name...",
-    "no_filter_results": "No notes match your search.",
+    "filter_placeholder": "Filter by name or token...",
+    "no_filter_results": "No items match your search.",
+    "filter_all": "All",
+    "filter_notes": "Notes",
+    "filter_folders": "Folders",
+    "no_shared_notes": "No shared notes yet.",
+    "no_shared_folders": "No shared folders yet.",
+    "no_shares": "No shares yet.",
+    "no_shares_hint": "Share a note or folder by clicking the cloud button in the toolbar.",
+    "restrict_users": "Restrict to specific users",
+    "restrict_users_placeholder": "Select users...",
+    "restricted_badge": "Restricted",
+    "restricted_help": "When restricted, only the listed users can access this share after logging in.",
+    "no_users_found": "No other users found",
+    "users_loading": "Loading users...",
+    "shared_with_me": "Shared with me",
+    "shared_by": "Shared by",
+    "no_shared_with_me": "Nothing has been shared with you yet.",
+    "login_required_title": "Login Required",
+    "login_required_message": "This content is restricted to specific users. Please log in to access it.",
+    "access_denied_title": "Access Denied",
+    "access_denied_message": "You do not have permission to view this content.",
     "table": {
+      "name": "Name",
       "note": "Note",
+      "path": "Path",
       "url": "Shared URL",
       "folder": "Folder",
       "token": "Token",
@@ -1216,6 +1243,9 @@
       "revoke": "Revoke"
     },
     "direct_share": "Shared note",
+    "note_shared_through_folder": "Note shared through folder",
+    "folder_shared_through_parent": "Folder shared through parent folder",
+    "token_help": "The token is the unique identifier used in a public share URL. Example: https://your-domain.example/my-note-share",
     "indexable": "Indexable",
     "password_protected": "Password protected",
     "add_password_title": "Add password protection",
@@ -1277,6 +1307,7 @@
     "folders": "Folders",
     "shared_notes": "Shared Notes",
     "shared_folders": "Shared Folders",
+    "shares": "Shares",
     "kanban": "Kanban",
     "note": "note",
     "notes": "notes",
@@ -1701,7 +1732,46 @@
     "admin": {
       "administrator": "Administrator",
       "email_usage_note": "Email addresses are only used for OIDC authentication if configured. Poznote does not send any emails.",
-      "admin_note": "Only user 1 is an administrator. Other users cannot have administrator privileges."
+      "admin_note": "Only user 1 is an administrator. Other users cannot have administrator privileges.",
+      "password_management": {
+        "manage_password": "Password",
+        "reset_password": "Reset Password",
+        "set_password": "Set Password",
+        "reset_to_default": "Use default password (.env)",
+        "modal_help": "Set a custom password for this account or return to the environment default.",
+        "current_mode": "Current mode",
+        "set_help": "At least 4 characters. This overrides the environment variable password for this user.",
+        "reset_help": "Remove the custom password and fall back to the environment variable default for this user.",
+        "reset_confirm": "Reset password for \"{{username}}\" to the environment variable default?",
+        "set_new_password": "New password for \"{{username}}\":",
+        "reset_success": "Password reset to the default value found in the environment variables.",
+        "set_success": "Password updated successfully.",
+        "status_custom": "Custom",
+        "status_default": "Default",
+        "status_custom_detail": "This user uses a custom password.",
+        "status_default_detail": "This user uses the default password found in the environment variables.",
+        "changed_at_prefix": "Updated:"
+      }
     }
+  },
+  "password": {
+    "status": {
+      "custom": "Custom password",
+      "default": "Default (env)"
+    },
+    "modal": {
+      "title": "Change Password",
+      "description": "Enter your current password and choose a new one.",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm new password"
+    },
+    "errors": {
+      "all_required": "All fields are required",
+      "mismatch": "New passwords do not match",
+      "too_short": "Password must be at least 4 characters",
+      "incorrect_current": "Current password is incorrect"
+    },
+    "success": "Password changed successfully."
   }
 }

@@ -90,6 +90,30 @@ body.shared-page .modal {
     color: var(--text-color, #333333);
 }
 
+body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title h3 {
+    min-width: 0;
+    margin: 0;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title-link {
+    display: block;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    text-decoration: none;
+    color: var(--text-color, #333333);
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.45;
+    letter-spacing: 0;
+    font-family: "JetBrains Mono", "Fira Code", monospace;
+    background: rgba(0, 125, 184, 0.06);
+    border-radius: 6px;
+    padding: 8px 10px;
+    cursor: default;
+}
+
 .modal-body {
     padding: 20px;
 }
@@ -105,4 +129,290 @@ body.shared-page .modal {
     display: flex;
     gap: 10px;
     justify-content: flex-end;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-modal-content {
+    max-width: 920px;
+    width: min(920px, 100%);
+    max-width: calc(100vw - 32px);
+    max-height: min(820px, calc(100vh - 32px));
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    padding: 18px 20px 20px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2);
+}
+
+body.shared-page .shared-edit-token-modal {
+    padding: 16px;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title {
+    padding: 0 0 14px;
+    margin-bottom: 2px;
+    background: linear-gradient(180deg, rgba(0, 125, 184, 0.08), rgba(0, 125, 184, 0));
+    border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-field-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: nowrap;
+    margin-top: 14px;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-field-label {
+    flex: 0 0 170px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-color, #333333);
+    white-space: nowrap;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-field-value {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-field-value input {
+    width: 100%;
+    margin: 0 !important;
+}
+
+body.shared-page .shared-edit-token-modal .modal-password-input,
+body.shared-page .shared-edit-token-modal .shared-edit-token-field-value select {
+    min-height: 44px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #cfd6de;
+    background: #ffffff;
+    color: var(--text-color, #333333);
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+body.shared-page .shared-edit-token-modal .modal-password-input:focus,
+body.shared-page .shared-edit-token-modal .shared-edit-token-field-value select:focus {
+    border-color: rgba(0, 125, 184, 0.7);
+    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.14);
+    outline: none;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-inline-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-inline-group input {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-inline-renew {
+    flex: 0 0 auto;
+    min-width: 48px;
+    min-height: 44px;
+    padding: 8px 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-password-toggle {
+    flex: 0 0 auto;
+    min-width: 48px;
+    min-height: 44px;
+    padding: 8px 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+body.shared-page .shared-edit-token-modal .share-protocol-wrap,
+body.shared-page .shared-edit-token-modal .share-indexable-wrap,
+body.shared-page .shared-edit-token-modal .share-restrict-users-wrap {
+    margin-top: 2px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(15, 23, 42, 0.1);
+}
+
+body.shared-page .shared-edit-token-modal .share-indexable-label {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100%;
+    gap: 16px;
+    min-width: 0;
+}
+
+body.shared-page .shared-edit-token-modal .indexable-label-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    line-height: 1.45;
+}
+
+body.shared-page .shared-edit-token-modal .share-user-list-container {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    background: rgba(15, 23, 42, 0.025);
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+body.shared-page .shared-edit-token-modal .share-user-list-message {
+    font-size: 13px;
+    color: #6b7280;
+    padding: 4px 0;
+}
+
+body.shared-page .shared-edit-token-modal .share-user-list-message.is-error {
+    color: #c43b3b;
+}
+
+body.shared-page .shared-edit-token-modal .share-user-list-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+body.shared-page .shared-edit-token-modal .share-user-list-row + .share-user-list-row {
+    border-top: 1px solid rgba(15, 23, 42, 0.07);
+}
+
+body.shared-page .shared-edit-token-modal .share-user-list-row input[type="checkbox"] {
+    margin-top: 2px;
+}
+
+body.shared-page .shared-edit-token-modal .share-user-list-name {
+    min-width: 0;
+    line-height: 1.45;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-modal-actions {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    overflow-x: hidden;
+    flex-shrink: 0;
+    position: sticky;
+    bottom: -20px;
+    z-index: 1;
+    margin-top: 16px;
+    margin-left: -20px;
+    margin-right: -20px;
+    margin-bottom: -20px;
+    padding: 14px 20px 20px;
+    border-top: 1px solid var(--border-color, #dee2e6);
+    background: var(--modal-bg, #ffffff);
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-modal-actions > .btn {
+    width: auto !important;
+    min-width: 120px;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    display: inline-flex !important;
+    justify-content: center !important;
+    height: auto !important;
+    white-space: nowrap;
+}
+
+@media (max-width: 680px) {
+    body.shared-page .shared-edit-token-modal .shared-edit-token-modal-content {
+        max-width: none;
+        width: 100%;
+        max-height: calc(100vh - 20px);
+        border-radius: 16px;
+        padding: 16px;
+    }
+
+    body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title {
+        padding-bottom: 12px;
+    }
+
+    body.shared-page .shared-edit-token-modal .shared-edit-token-field-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        margin-top: 16px;
+    }
+
+    body.shared-page .shared-edit-token-modal .shared-edit-token-field-label {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+
+    body.shared-page .shared-edit-token-modal .shared-edit-token-field-value {
+        width: 100%;
+    }
+
+    body.shared-page .shared-edit-token-modal .shared-edit-token-inline-group {
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: nowrap;
+    }
+
+    body.shared-page .shared-edit-token-modal .shared-edit-token-inline-renew,
+    body.shared-page .shared-edit-token-modal .shared-edit-token-password-toggle {
+        width: 48px !important;
+        min-width: 48px;
+        max-width: 48px;
+        align-self: auto;
+    }
+
+    body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title-link {
+        font-size: 14px;
+    }
+
+    body.shared-page .shared-edit-token-modal .share-indexable-label {
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: flex-start !important;
+    }
+
+    body.shared-page .shared-edit-token-modal .share-indexable-label .toggle-switch {
+        margin-left: auto;
+    }
+
+    body.shared-page .shared-edit-token-modal .share-protocol-wrap,
+    body.shared-page .shared-edit-token-modal .share-indexable-wrap,
+    body.shared-page .shared-edit-token-modal .share-restrict-users-wrap {
+        padding-top: 12px;
+    }
+
+    body.shared-page .shared-edit-token-modal .share-user-list-container {
+        max-height: 180px;
+        padding: 10px 12px;
+    }
+
+    body.shared-page .shared-edit-token-modal .shared-edit-token-modal-actions {
+        justify-content: stretch !important;
+        padding-top: 14px;
+        padding-bottom: 16px;
+        bottom: -16px;
+        margin-top: 18px;
+        margin-left: -16px;
+        margin-right: -16px;
+        margin-bottom: -16px;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    body.shared-page .shared-edit-token-modal .shared-edit-token-modal-actions > .btn {
+        flex: 1 1 0;
+        min-width: 0;
+    }
 }

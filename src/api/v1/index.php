@@ -595,6 +595,11 @@ $router->post('/system/verify-password', function($params) use ($systemControlle
     echo json_encode($systemController->verifyPassword());
 });
 
+// List notes/folders shared specifically with the current user by others
+$router->get('/shared/with-me', function($params) use ($systemController) {
+    echo json_encode($systemController->listSharedWithMe());
+});
+
 // List shared notes
 $router->get('/shared', function($params) use ($systemController) {
     echo json_encode($systemController->listShared());
@@ -666,6 +671,16 @@ $router->get('/users/me', function($params) use ($usersController) {
     echo json_encode($usersController->me());
 });
 
+// Change current user's password
+$router->post('/users/me/password', function($params) use ($usersController) {
+    echo json_encode($usersController->changePassword());
+});
+
+// Get current user's password status (custom vs env var)
+$router->get('/users/me/password-status', function($params) use ($usersController) {
+    echo json_encode($usersController->passwordStatus());
+});
+
 // Get user ID by username (admin only, used by backup scripts)
 $router->get('/users/lookup/{username}', function($params) use ($usersController) {
     echo json_encode($usersController->lookup($params['username']));
@@ -706,6 +721,16 @@ $router->post('/admin/repair', function($params) use ($usersController) {
 // Admin: Delete a user profile
 $router->delete('/admin/users/{id}', function($params) use ($usersController) {
     echo json_encode($usersController->delete($params['id'], $_GET));
+});
+
+// Admin: Reset or set a user's password
+$router->post('/admin/users/{id}/reset-password', function($params) use ($usersController) {
+    echo json_encode($usersController->adminResetPassword($params['id']));
+});
+
+// Admin: Get a user's password status
+$router->get('/admin/users/{id}/password-status', function($params) use ($usersController) {
+    echo json_encode($usersController->adminPasswordStatus($params['id']));
 });
 
 // ======================

@@ -178,7 +178,7 @@ class SystemController {
         
         try {
             // 1. Get all shared folders to check if notes are shared via folder
-            $sharedFoldersQuery = "SELECT sf.folder_id, sf.token, f.name as folder_name, f.workspace 
+            $sharedFoldersQuery = "SELECT sf.id, sf.folder_id, sf.token, sf.created, sf.indexable, sf.password, sf.allowed_users, f.name as folder_name, f.parent_id, f.workspace 
                 FROM shared_folders sf 
                 INNER JOIN folders f ON sf.folder_id = f.id";
             $sfStmt = $this->con->prepare($sharedFoldersQuery);
@@ -187,6 +187,7 @@ class SystemController {
             
             // Create a map of folder_id => folder info
             $sharedFolderMap = [];
+            $sharedFolderEntries = [];
             foreach ($sharedFolders as $sf) {
                 // filter by workspace if requested
                 if ($workspace && $sf['workspace'] !== $workspace) continue;
@@ -194,6 +195,7 @@ class SystemController {
                     'token' => $sf['token'],
                     'name' => $sf['folder_name']
                 ];
+                $sharedFolderEntries[$sf['folder_id']] = $sf;
             }
 
             // 2. Get all folders to build hierarchy and identifies descendant shares
@@ -239,6 +241,7 @@ class SystemController {
                 sn.theme,
                 sn.indexable,
                 sn.access_mode,
+                sn.allowed_users,
                 CASE WHEN sn.password IS NOT NULL AND sn.password != '' THEN 1 ELSE 0 END as hasPassword,
                 sn.created as shared_date,
                 e.heading,
@@ -247,9 +250,10 @@ class SystemController {
                 e.type,
                 e.workspace,
                 e.updated
-            FROM shared_notes sn
+                        FROM shared_notes sn
             INNER JOIN entries e ON sn.note_id = e.id
-            WHERE e.trash = 0";
+                        WHERE e.trash = 0
+                            AND sn.access_mode IS NOT NULL";
             
             $explicitParams = [];
             if ($workspace) {
@@ -281,7 +285,7 @@ class SystemController {
                     e.workspace,
                     e.updated
                 FROM entries e
-                LEFT JOIN shared_notes sn ON e.id = sn.note_id
+                LEFT JOIN shared_notes sn ON e.id = sn.note_id AND sn.access_mode IS NOT NULL
                 WHERE e.folder_id IN ($placeholders) AND e.trash = 0";
                 
                 $stmt = $this->con->prepare($folderNoteQuery);
@@ -331,6 +335,13 @@ class SystemController {
                     $note['url_query'] = $base . '/public_note.php?token=' . rawurlencode($token);
                     $note['url_workspace'] = $base . '/workspace/' . rawurlencode($token);
                 }
+
+                // Decode allowed_users JSON
+                if (!empty($note['allowed_users'])) {
+                    $note['allowed_users'] = json_decode($note['allowed_users'], true);
+                } else {
+                    $note['allowed_users'] = null;
+                }
                 
                 // Add full folder path
                 $note['folder_path'] = getFolderPath($note['folder_id'], $this->con);
@@ -358,13 +369,167 @@ class SystemController {
                 }
             }
             
+            $apiSharedFolders = [];
+            foreach ($allFoldersPool as $fid => $folder) {
+                $directEntry = $sharedFolderEntries[$fid] ?? null;
+                $viaEntry = null;
+
+                $currentFolder = $folder;
+                $maxDepth = 20;
+                $depth = 0;
+                while ($currentFolder['parent_id'] !== null && $depth < $maxDepth) {
+                    $parentId = (int)$currentFolder['parent_id'];
+                    if (isset($sharedFolderEntries[$parentId])) {
+                        $viaEntry = $sharedFolderEntries[$parentId];
+                        break;
+                    }
+                    if (!isset($allFoldersPool[$parentId])) {
+                        break;
+                    }
+                    $currentFolder = $allFoldersPool[$parentId];
+                    $depth++;
+                }
+
+                if (!$directEntry && !$viaEntry) {
+                    continue;
+                }
+
+                $entry = $directEntry ?: $viaEntry;
+                $countStmt = $this->con->prepare('SELECT COUNT(*) FROM entries WHERE folder_id = ? AND trash = 0');
+                $countStmt->execute([$fid]);
+
+                $apiSharedFolders[] = [
+                    'id' => $directEntry ? (int)$directEntry['id'] : null,
+                    'folder_id' => (int)$fid,
+                    'parent_id' => $folder['parent_id'] !== null ? (int)$folder['parent_id'] : null,
+                    'token' => $entry['token'],
+                    'created' => $entry['created'],
+                    'indexable' => isset($entry['indexable']) ? (int)$entry['indexable'] : 0,
+                    'password' => !empty($entry['password']),
+                    'allowed_users' => !empty($entry['allowed_users']) ? json_decode($entry['allowed_users'], true) : null,
+                    'folder_name' => $folder['name'],
+                    'note_count' => (int)$countStmt->fetchColumn(),
+                    'is_direct' => (bool)$directEntry,
+                    'folder_path' => getFolderPath($fid, $this->con),
+                    'public_url' => $base . '/folder/' . rawurlencode($entry['token'])
+                ];
+            }
+
+            usort($apiSharedFolders, function($a, $b) {
+                return strcasecmp($a['folder_path'], $b['folder_path']);
+            });
+
             return [
                 'success' => true,
-                'shared_notes' => $shared_notes
+                'shared_notes' => $shared_notes,
+                'shared_folders' => $apiSharedFolders
             ];
         } catch (Exception $e) {
             http_response_code(500);
             return ['success' => false, 'error' => $e->getMessage()];
         }
+    }
+
+    /**
+     * GET /api/v1/shared/with-me
+     * Returns notes and folders from other users that are restricted to the current user.
+     */
+    public function listSharedWithMe() {
+        $currentUserId = (int)$_SESSION['user_id'];
+        if (!$currentUserId) {
+            http_response_code(401);
+            return ['success' => false, 'error' => 'Not authenticated'];
+        }
+
+        require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+        require_once dirname(dirname(dirname(__DIR__))) . '/users/UserDataManager.php';
+
+        $allUsers = getAllUserProfiles();
+
+        $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
+        $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
+        if ($scriptDir === '/' || $scriptDir === '\\' || $scriptDir === '.') {
+            $scriptDir = '';
+        }
+        $scriptDir = rtrim($scriptDir, '/\\');
+        $scriptDir = preg_replace('#/api/v1$#', '', $scriptDir);
+        $base = ($_SERVER['HTTPS'] ?? '') === 'on' ? 'https://' : 'http://';
+        $base .= $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '');
+
+        $results = [];
+
+        foreach ($allUsers as $user) {
+            $ownerId = (int)$user['id'];
+            if ($ownerId === $currentUserId) continue;
+
+            try {
+                $udm = new UserDataManager($ownerId);
+                $dbPath = $udm->getUserDatabasePath();
+                if (!file_exists($dbPath)) continue;
+
+                $ownerCon = new PDO('sqlite:' . $dbPath);
+                $ownerCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                // Check shared_notes
+                $stmt = $ownerCon->prepare(
+                    "SELECT sn.note_id, sn.token, sn.indexable, sn.allowed_users,
+                            e.heading, e.folder_id, e.type, e.workspace
+                     FROM shared_notes sn
+                     INNER JOIN entries e ON sn.note_id = e.id
+                     WHERE e.trash = 0
+                       AND sn.allowed_users IS NOT NULL AND sn.allowed_users != ''"
+                );
+                $stmt->execute();
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $allowedIds = json_decode($row['allowed_users'], true);
+                    if (!is_array($allowedIds) || !in_array($currentUserId, array_map('intval', $allowedIds), true)) {
+                        continue;
+                    }
+                    $results[] = [
+                        '_type'        => 'shared_with_me_note',
+                        'note_id'      => (int)$row['note_id'],
+                        'token'        => $row['token'],
+                        'heading'      => $row['heading'] ?: '',
+                        'note_type'    => $row['type'] ?? 'note',
+                        'folder_id'    => $row['folder_id'],
+                        'workspace'    => $row['workspace'] ?? '',
+                        'owner_id'     => $ownerId,
+                        'owner_name'   => $user['username'],
+                        'url'          => $base . '/' . rawurlencode($row['token']),
+                    ];
+                }
+
+                // Check shared_folders
+                $stmt2 = $ownerCon->prepare(
+                    "SELECT sf.folder_id, sf.token, sf.indexable, sf.allowed_users,
+                            f.name as folder_name, f.workspace
+                     FROM shared_folders sf
+                     INNER JOIN folders f ON sf.folder_id = f.id
+                     WHERE sf.allowed_users IS NOT NULL AND sf.allowed_users != ''"
+                );
+                $stmt2->execute();
+                while ($row = $stmt2->fetch(PDO::FETCH_ASSOC)) {
+                    $allowedIds = json_decode($row['allowed_users'], true);
+                    if (!is_array($allowedIds) || !in_array($currentUserId, array_map('intval', $allowedIds), true)) {
+                        continue;
+                    }
+                    $results[] = [
+                        '_type'        => 'shared_with_me_folder',
+                        'folder_id'    => (int)$row['folder_id'],
+                        'token'        => $row['token'],
+                        'folder_name'  => $row['folder_name'] ?: '',
+                        'workspace'    => $row['workspace'] ?? '',
+                        'owner_id'     => $ownerId,
+                        'owner_name'   => $user['username'],
+                        'url'          => $base . '/folder/' . rawurlencode($row['token']),
+                    ];
+                }
+            } catch (Exception $e) {
+                error_log("listSharedWithMe: could not read DB for user $ownerId: " . $e->getMessage());
+                continue;
+            }
+        }
+
+        return ['success' => true, 'items' => $results];
     }
 }

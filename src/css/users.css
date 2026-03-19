@@ -65,8 +65,10 @@ body.dark-mode {
 .email-note {
     /* font-size: 0.8rem; */
     color: var(--text-muted, #666);
-    margin-top: 5px;
-    margin-bottom: 0;
+    margin-top: 18px;
+    margin-bottom: 18px;
+    line-height: 1.7;
+    text-align: center;
 }
 
 /* Buttons */
@@ -331,9 +333,119 @@ html[data-theme='dark'] .users-table td {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
+.profile-modal-content {
+    max-width: 540px;
+    padding: 34px;
+}
+
+.profile-modal-content .modal-title {
+    margin-bottom: 22px;
+}
+
+.profile-modal-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.profile-modal-fields input {
+    margin-bottom: 10px;
+}
+
+.profile-modal-label {
+    display: block;
+    margin-bottom: -6px;
+    font-size: 0.9rem;
+    color: var(--text-muted, #666);
+}
+
+.profile-modal-help {
+    display: block;
+    margin-top: -2px;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: var(--text-muted, #666);
+}
+
+.password-modal-content {
+    max-width: 460px;
+    padding: 32px;
+}
+
+.password-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin-bottom: 14px;
+}
+
+.password-modal-heading {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.password-status-summary {
+    margin: 0;
+    color: var(--text-muted, #666);
+    font-size: 0.92rem;
+    line-height: 1.45;
+}
+
+.password-meta-row {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.password-section-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-muted, #666);
+    margin-bottom: 6px;
+}
+
+.password-status-text {
+    color: var(--text-muted, #666);
+    font-size: 0.85rem;
+    text-align: left;
+}
+
+.password-form-group {
+    margin-top: 22px;
+    margin-bottom: 34px;
+}
+
+.password-feedback {
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+}
+
+.password-feedback-error {
+    color: #721c24;
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+}
+
+.password-feedback-success {
+    color: #155724;
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+}
+
+.password-modal-content .form-actions .btn {
+    padding: 8px 14px;
+    min-width: 0;
+}
+
 .modal-title {
     font-size: 1.4rem;
-    margin-bottom: 20px;
+    margin-bottom: 0;
     color: var(--text-color, #333);
 }
 
@@ -374,6 +486,54 @@ html[data-theme='dark'] .users-table td {
     gap: 10px;
     justify-content: flex-end;
     margin-top: 20px;
+}
+
+@media (max-width: 640px) {
+    .password-modal-header,
+    .password-meta-row,
+    .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .password-modal-content {
+        padding: 30px 24px 24px;
+    }
+
+    .password-modal-heading {
+        gap: 12px;
+    }
+
+    .password-status-summary {
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+
+    .password-form-group {
+        margin-top: 24px;
+        margin-bottom: 28px;
+    }
+
+    .password-modal-actions {
+        gap: 14px;
+        margin-top: 28px;
+    }
+
+    .password-modal-actions #pw_save_btn {
+        order: 1;
+    }
+
+    .password-modal-actions #pw_reset_btn {
+        order: 2;
+    }
+
+    .password-modal-actions .btn-danger {
+        order: 3;
+    }
+
+    .password-status-text {
+        text-align: left;
+    }
 }
 
 .delete-warning {
@@ -567,12 +727,17 @@ input.admin-toggle:disabled:checked+.slider {
 
     .users-table tr {
         margin-bottom: 25px;
-        border: 1px solid var(--border-color, #ddd) !important;
+        border: 1px solid rgba(120, 120, 120, 0.28) !important;
         border-radius: 8px;
         background: var(--bg-color, #fff);
-        box-shadow: none !important;
-        /* No shadow as requested */
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
         overflow: hidden;
+    }
+
+    html[data-theme='dark'] .users-table tr,
+    body.dark-mode .users-table tr {
+        border-color: rgba(255, 255, 255, 0.18) !important;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) !important;
     }
 
     .users-table td {
@@ -628,12 +793,56 @@ input.admin-toggle:disabled:checked+.slider {
 
     /* Compact Delete Button */
     .actions-center .btn {
-        width: auto !important;
-        min-width: 60px !important;
-        /* Even smaller */
-        max-width: 80px !important;
-        padding: 6px 10px !important;
-        border-radius: 4px;
+        width: 44px !important;
+        min-width: 44px !important;
+        max-width: 44px !important;
+        height: 40px !important;
+        padding: 0 !important;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .actions-center {
+        width: 100%;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .actions-center .btn i {
+        font-size: 15px;
+    }
+
+    html[data-theme='dark'] .users-table td:last-child,
+    body.dark-mode .users-table td:last-child {
+        background: #303033;
+    }
+
+    html[data-theme='dark'] .actions-center .btn,
+    body.dark-mode .actions-center .btn {
+        border-color: rgba(255, 255, 255, 0.06);
+    }
+
+    html[data-theme='dark'] .actions-center .btn-secondary,
+    body.dark-mode .actions-center .btn-secondary {
+        background: #3b3f45;
+        color: #f2f4f8 !important;
+    }
+
+    html[data-theme='dark'] .actions-center .btn-secondary:hover,
+    body.dark-mode .actions-center .btn-secondary:hover {
+        background: #4a5058;
+    }
+
+    html[data-theme='dark'] .actions-center .btn-danger,
+    body.dark-mode .actions-center .btn-danger {
+        background: #c93a4a;
+        color: #fff !important;
+    }
+
+    html[data-theme='dark'] .actions-center .btn-danger:hover,
+    body.dark-mode .actions-center .btn-danger:hover {
+        background: #d94a59;
     }
 
     .users-table td.hide-on-mobile {
@@ -645,6 +854,28 @@ input.admin-toggle:disabled:checked+.slider {
         width: calc(100% - 40px);
         margin: 20px;
         box-sizing: border-box;
+    }
+
+    .profile-modal-content {
+        padding: 28px 24px 24px;
+    }
+
+    .profile-modal-content .modal-title {
+        margin-bottom: 24px;
+        line-height: 1.2;
+    }
+
+    .profile-modal-fields {
+        gap: 16px;
+    }
+
+    .profile-modal-help {
+        margin-top: 2px;
+    }
+
+    #renameModal .form-actions {
+        margin-top: 24px;
+        gap: 12px;
     }
 }
 

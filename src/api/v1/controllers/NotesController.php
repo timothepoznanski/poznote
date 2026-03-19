@@ -416,22 +416,9 @@ class NotesController {
             if ($stmt->execute([$heading, $entrycontent, $tags, $folder, $folder_id, $workspace, $type, $linked_note_id, $now_utc, $now_utc])) {
                 $id = $this->con->lastInsertId();
                 
-                // If folder is shared, auto-share the new note
+                // Notes in a shared folder inherit access through the folder only.
+                // They get their own share link only if explicitly shared later.
                 $wasShared = false;
-                if ($folder_id) {
-                    $sharedFolderStmt = $this->con->prepare("SELECT id, theme, indexable FROM shared_folders WHERE folder_id = ? LIMIT 1");
-                    $sharedFolderStmt->execute([$folder_id]);
-                    $sharedFolder = $sharedFolderStmt->fetch(PDO::FETCH_ASSOC);
-                    
-                    if ($sharedFolder) {
-                        $noteToken = bin2hex(random_bytes(16));
-                        $insertShareStmt = $this->con->prepare("INSERT INTO shared_notes (note_id, token, theme, indexable) VALUES (?, ?, ?, ?)");
-                        $insertShareStmt->execute([$id, $noteToken, $sharedFolder['theme'], $sharedFolder['indexable']]);
-                        require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
-                        registerSharedLink($noteToken, $_SESSION['user_id'], 'note', (int)$id);
-                        $wasShared = true;
-                    }
-                }
                 
                 // Create the file
                 $filename = getEntryFilename($id, $type);
@@ -1300,22 +1287,8 @@ class NotesController {
                 );
             }
 
-            // Auto-share if folder is shared
+            // Notes duplicated into a shared folder inherit access through the folder only.
             $wasShared = false;
-            if ($autoShare && $folderId) {
-                $sharedFolderStmt = $this->con->prepare("SELECT id, theme, indexable FROM shared_folders WHERE folder_id = ? LIMIT 1");
-                $sharedFolderStmt->execute([$folderId]);
-                $sharedFolder = $sharedFolderStmt->fetch(PDO::FETCH_ASSOC);
-
-                if ($sharedFolder) {
-                    $noteToken = bin2hex(random_bytes(16));
-                    $insertShareStmt = $this->con->prepare("INSERT INTO shared_notes (note_id, token, theme, indexable) VALUES (?, ?, ?, ?)");
-                    $insertShareStmt->execute([$newId, $noteToken, $sharedFolder['theme'], $sharedFolder['indexable']]);
-                    require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
-                    registerSharedLink($noteToken, $_SESSION['user_id'], 'note', (int)$newId);
-                    $wasShared = true;
-                }
-            }
 
             // Write file
             $newFilename = getEntryFilename($newId, $originalNote['type']);

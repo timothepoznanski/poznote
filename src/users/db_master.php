@@ -80,6 +80,14 @@ function initializeMasterDatabase(PDO $con): void {
             $con->exec("ALTER TABLE users ADD COLUMN oidc_subject TEXT");
             $con->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_oidc_subject ON users(oidc_subject) WHERE oidc_subject IS NOT NULL AND oidc_subject != ''");
         }
+        
+        if (!in_array('password_hash', $existingColumns)) {
+            $con->exec("ALTER TABLE users ADD COLUMN password_hash TEXT");
+        }
+        
+        if (!in_array('password_changed_at', $existingColumns)) {
+            $con->exec("ALTER TABLE users ADD COLUMN password_changed_at DATETIME");
+        }
     } catch (Exception $e) {
         error_log("Failed to add columns: " . $e->getMessage());
     }
@@ -505,4 +513,100 @@ function unregisterSharedLink(string $token): bool {
         error_log("Failed to unregister shared link: " . $e->getMessage());
         return false;
     }
+}
+
+/**
+ * Get the stored password hash for a user
+ */
+function getUserPasswordHash(int $userId): ?string {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("SELECT password_hash FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $hash = $stmt->fetchColumn();
+        return ($hash !== false && $hash !== null && $hash !== '') ? $hash : null;
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
+/**
+ * Set a new password hash for a user (bcrypt)
+ */
+function setUserPasswordHash(int $userId, string $plainPassword): bool {
+    try {
+        $con = getMasterConnection();
+        $hash = password_hash($plainPassword, PASSWORD_DEFAULT);
+        $stmt = $con->prepare("UPDATE users SET password_hash = ?, password_changed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
+        return $stmt->execute([$hash, $userId]);
+    } catch (Exception $e) {
+        error_log("Failed to set password hash for user $userId: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Clear the stored password hash (revert to environment variable password)
+ */
+function clearUserPasswordHash(int $userId): bool {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("UPDATE users SET password_hash = NULL, password_changed_at = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
+        return $stmt->execute([$userId]);
+    } catch (Exception $e) {
+        error_log("Failed to clear password hash for user $userId: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Verify a password against a user's stored hash or environment variable fallback.
+ * Returns true if password matches.
+ */
+function verifyUserPassword(int $userId, string $password): bool {
+    $user = getUserProfileById($userId);
+    if (!$user) return false;
+
+    // Priority 1: Check DB-stored bcrypt hash
+    $storedHash = getUserPasswordHash($userId);
+    if ($storedHash !== null) {
+        return password_verify($password, $storedHash);
+    }
+
+    // Priority 2: Fall back to environment variable
+    if (!function_exists('getAuthConfig')) {
+        require_once __DIR__ . '/../auth.php';
+    }
+    if ((bool)$user['is_admin']) {
+        return $password === AUTH_PASSWORD;
+    } else {
+        $expected = getUserSpecificPassword($user['username']);
+        return $password === $expected;
+    }
+}
+
+/**
+ * Check if a user has a custom password set (not using env var default)
+ */
+function hasCustomPassword(int $userId): bool {
+    return getUserPasswordHash($userId) !== null;
+}
+
+/**
+ * Get the secret used for remember-me cookie signing.
+ * Uses DB password hash if available, otherwise env var password.
+ */
+function getRememberMeSecret(array $user): string {
+    $storedHash = getUserPasswordHash((int)$user['id']);
+    if ($storedHash !== null) {
+        return $storedHash;
+    }
+    // Fall back to env var password
+    if ((bool)$user['is_admin']) {
+        return defined('AUTH_PASSWORD') ? AUTH_PASSWORD : 'admin';
+    }
+    if (function_exists('getUserSpecificPassword')) {
+        return getUserSpecificPassword($user['username']);
+    }
+    return defined('AUTH_USER_PASSWORD') ? AUTH_USER_PASSWORD : 'user';
 }

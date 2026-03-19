@@ -330,17 +330,13 @@ async function createPublicShare(noteId) {
             markShareIconShared(noteId, true);
             updateSharedCount(1);
 
-            if (typeof showShareModal === 'function') {
-                showShareModal(data.url, { 
-                    noteId: noteId, 
-                    shared: true, 
-                    workspace: data.workspace || '' 
-                });
-            } else if (typeof showLinkModal === 'function') {
-                showLinkModal(data.url, data.url, function () { });
-            } else {
-                window.prompt('Shared URL (read-only):', data.url);
-            }
+            closeModal('shareModal');
+            openSharedManagementPage({
+                itemType: 'note',
+                itemId: noteId,
+                token: extractShareTokenFromUrl(data.url),
+                workspace: data.workspace || ''
+            });
         } else if (data && data.error) {
             const errorMsg = (window.t ? window.t('index.share_modal.error_prefix', null, 'Error: ') : 'Error: ') + data.error;
             if (typeof showNotificationPopup === 'function') {
@@ -428,6 +424,55 @@ function getPublicShareBaseUrl() {
     return url.origin + path;
 }
 
+function extractShareTokenFromUrl(url) {
+    if (!url) return '';
+
+    try {
+        const normalizedUrl = String(url).split('?')[0].replace(/\/+$/, '');
+        return decodeURIComponent(normalizedUrl.substring(normalizedUrl.lastIndexOf('/') + 1));
+    } catch (error) {
+        console.error('Error extracting share token from URL:', error);
+        return '';
+    }
+}
+
+function buildSharedManagementUrl(options) {
+    const sharedUrl = new URL('shared.php', window.location.href);
+    const itemType = options && options.itemType ? options.itemType : 'note';
+    const itemId = options && options.itemId ? options.itemId : null;
+    const token = options && options.token ? options.token : '';
+    const workspace = options && options.workspace ? options.workspace : '';
+    const autoEdit = options && Object.prototype.hasOwnProperty.call(options, 'autoEdit')
+        ? !!options.autoEdit
+        : true;
+
+    if (itemType === 'folder') {
+        sharedUrl.searchParams.set('type', 'folders');
+    }
+    if (token) {
+        sharedUrl.searchParams.set('filter', token);
+    }
+    if (workspace) {
+        sharedUrl.searchParams.set('workspace', workspace);
+    }
+    if (itemId && autoEdit) {
+        sharedUrl.searchParams.set('auto_edit', '1');
+        sharedUrl.searchParams.set('item_type', itemType);
+        sharedUrl.searchParams.set('item_id', String(itemId));
+    }
+
+    return sharedUrl.toString();
+}
+
+function openSharedManagementPage(options) {
+    const targetUrl = buildSharedManagementUrl(options);
+    const popup = window.open(targetUrl, '_blank', 'noopener');
+
+    if (!popup) {
+        window.location.href = targetUrl;
+    }
+}
+
 function createCustomTokenExampleElement(exampleToken, shareType) {
     const example = document.createElement('div');
     const prefix = window.t ? window.t('index.share_modal.custom_token_example', null, 'Example:') : 'Example:';
@@ -482,80 +527,37 @@ function showShareModal(url, options) {
 
     // No close (×) icon for the share modal per UX request
 
-    const h3 = document.createElement('h3');
-    h3.textContent = window.t ? window.t('index.public_modal.title', null, 'Shared URL') : 'Shared URL';
-    content.appendChild(h3);
-
-    const p = document.createElement('p');
-    p.textContent = '';
-    content.appendChild(p);
-
-    // Show the full URL as plain, non-selectable text (no input frame)
-    const urlDiv = document.createElement('div');
-    urlDiv.id = 'shareModalUrl';
-    urlDiv.className = 'share-url';
-    const preferredProto = getPreferredPublicUrlProtocol();
-    urlDiv.textContent = applyProtocolToPublicUrl(url, preferredProto);
-    content.appendChild(urlDiv);
-
-    const buttonsDiv = document.createElement('div');
-    buttonsDiv.className = 'modal-buttons share-modal-buttons';
-
     // Get options
     const noteId = options && options.noteId ? options.noteId : null;
     const isShared = options && options.shared ? true : false;
     const noteWorkspace = options && options.workspace ? options.workspace : '';
     const noteType = options && options.noteType ? options.noteType : 'note';
     const currentAccessMode = options && options.accessMode ? options.accessMode : 'full';
-    const supportsTasklistPermissions = noteType === 'tasklist';
+    const preferredProto = getPreferredPublicUrlProtocol();
 
-    function appendTasklistAccessModeField() {
-        if (!supportsTasklistPermissions) {
-            return;
-        }
+    const h3 = document.createElement('h3');
+    h3.textContent = window.t ? window.t('index.public_modal.title', null, 'Shared URL') : 'Shared URL';
+    content.appendChild(h3);
 
-        const fieldset = document.createElement('fieldset');
-        fieldset.className = 'share-task-access-wrap';
+    const p = document.createElement('p');
+    p.textContent = isShared
+        ? ''
+        : (window.t
+            ? window.t('index.share_modal.description', null, 'A shared URL creates a public link to this note. Anyone with this link can access the shared version of the note.')
+            : 'A shared URL creates a public link to this note. Anyone with this link can access the shared version of the note.');
+    content.appendChild(p);
 
-        const modes = [
-            {
-                value: 'read_only',
-                label: window.t ? window.t('index.share_modal.access_read_only', null, 'Read only') : 'Read only'
-            },
-            {
-                value: 'check_only',
-                label: window.t ? window.t('index.share_modal.access_check_only', null, 'Check or uncheck only') : 'Check or uncheck only'
-            },
-            {
-                value: 'full',
-                label: window.t ? window.t('index.share_modal.access_full', null, 'Full edit') : 'Full edit'
-            }
-        ];
-
-        modes.forEach(function (mode) {
-            const optionLabel = document.createElement('label');
-            optionLabel.className = 'share-task-access-option';
-
-            const radio = document.createElement('input');
-            radio.type = 'radio';
-            radio.name = 'shareTaskAccessMode';
-            radio.value = mode.value;
-            radio.checked = mode.value === currentAccessMode;
-
-            const text = document.createElement('span');
-            text.textContent = mode.label;
-
-            optionLabel.appendChild(radio);
-            optionLabel.appendChild(text);
-            fieldset.appendChild(optionLabel);
-        });
-
-        content.appendChild(fieldset);
-    }
+    const buttonsDiv = document.createElement('div');
+    buttonsDiv.className = 'modal-buttons share-modal-buttons';
 
     // Conditionally add buttons based on share status
     if (isShared) {
-        // Protocol toggle (default: HTTPS)
+        const urlDiv = document.createElement('div');
+        urlDiv.id = 'shareModalUrl';
+        urlDiv.className = 'share-url';
+        urlDiv.textContent = applyProtocolToPublicUrl(url, preferredProto);
+        content.appendChild(urlDiv);
+
         const protocolWrap = document.createElement('div');
         protocolWrap.className = 'share-protocol-wrap';
         const protocolLabel = document.createElement('label');
@@ -578,7 +580,6 @@ function showShareModal(url, options) {
         protocolLabel.appendChild(protocolText);
         protocolLabel.appendChild(toggleSwitch);
         protocolWrap.appendChild(protocolLabel);
-        // Place the toggle above the URL (URL spacing stays consistent)
         content.insertBefore(protocolWrap, urlDiv);
         protocolCheckbox.addEventListener('change', function () {
             const nextProto = protocolCheckbox.checked ? 'https' : 'http';
@@ -586,16 +587,12 @@ function showShareModal(url, options) {
             urlDiv.textContent = applyProtocolToPublicUrl(urlDiv.textContent, nextProto);
         });
 
-        // If shared, show Open, Copy, Revoke, Renew
-        // Open button: opens the URL in a new tab (keeps modal open)
         const openBtn = document.createElement('button');
         openBtn.type = 'button';
         openBtn.className = 'btn-open';
         openBtn.textContent = window.t ? window.t('index.public_modal.open', null, 'Open') : 'Open';
-        // styling handled by CSS classes
         openBtn.onclick = function (ev) {
             try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) { }
-            // Read the current URL from the modal each time so Renew updates are respected
             try {
                 const urlEl = document.getElementById('shareModalUrl');
                 const currentUrl = urlEl ? urlEl.textContent : url;
@@ -603,7 +600,6 @@ function showShareModal(url, options) {
                     window.open(currentUrl, '_blank', 'noopener');
                 }
             } catch (e) {
-                // fallback to original captured url
                 if (url) window.open(url, '_blank', 'noopener');
             }
         };
@@ -614,20 +610,15 @@ function showShareModal(url, options) {
         copyBtn.className = 'btn-primary';
         copyBtn.textContent = window.t ? window.t('index.public_modal.copy', null, 'Copy') : 'Copy';
         copyBtn.onclick = async function (ev) {
-            // Prevent clicks from bubbling to global handlers
             try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) { }
 
-            // Try to copy the URL, then close the modal. Do NOT change the button text.
             try {
-                // Copy from the div's text content (non-selectable but programmatically copyable)
                 await navigator.clipboard.writeText(urlDiv.textContent);
                 closeModal('shareModal');
             } catch (e) {
-                // Fallback: create a temporary textarea, select and execCommand, then remove it
                 try {
                     const ta = document.createElement('textarea');
                     ta.value = urlDiv.textContent;
-                    // Ensure off-screen and not visible
                     ta.style.position = 'fixed';
                     ta.style.left = '-9999px';
                     document.body.appendChild(ta);
@@ -636,7 +627,6 @@ function showShareModal(url, options) {
                     document.body.removeChild(ta);
                     closeModal('shareModal');
                 } catch (err) {
-                    // As last resort, show the prompt then close
                     window.prompt('Copy this URL', urlDiv.textContent);
                     closeModal('shareModal');
                 }
@@ -644,7 +634,6 @@ function showShareModal(url, options) {
         };
         buttonsDiv.appendChild(copyBtn);
 
-        // Add Edit button to open shared.php filtered by this token
         if (noteId) {
             const manageBtn = document.createElement('button');
             manageBtn.type = 'button';
@@ -652,30 +641,27 @@ function showShareModal(url, options) {
             manageBtn.textContent = window.t ? window.t('index.public_modal.manage', null, 'Edit') : 'Edit';
             manageBtn.onclick = function (ev) {
                 try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) { }
-                // Extract token from URL (last part after /)
-                const token = decodeURIComponent(url.split('/').pop());
+                const token = extractShareTokenFromUrl(url);
                 if (token) {
-                    let sharedUrl = 'shared.php?filter=' + encodeURIComponent(token);
-                    if (noteWorkspace) {
-                        sharedUrl += '&workspace=' + encodeURIComponent(noteWorkspace);
-                    }
-                    window.open(sharedUrl, '_blank');
+                    openSharedManagementPage({
+                        itemType: 'note',
+                        itemId: noteId,
+                        token: token,
+                        workspace: noteWorkspace
+                    });
                 }
             };
             buttonsDiv.appendChild(manageBtn);
         }
 
-        // Add Revoke and Renew buttons when options.noteId provided and shared
         if (noteId) {
             const renewBtn = document.createElement('button');
             renewBtn.type = 'button';
             renewBtn.className = 'btn-renew';
             renewBtn.textContent = window.t ? window.t('index.public_modal.renew', null, 'Renew') : 'Renew';
-            // styling handled by CSS classes
             renewBtn.onclick = async function (ev) {
                 try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) { }
                 try {
-                    // Get current theme from localStorage
                     const theme = localStorage.getItem('poznote-theme') || 'light';
                     const resp = await fetch('/api/v1/notes/' + noteId + '/share', {
                         method: 'POST',
@@ -689,12 +675,9 @@ function showShareModal(url, options) {
                             const j = await resp.json();
                             if (j && j.url) {
                                 const nextDisplayUrl = applyProtocolToPublicUrl(j.url, getPreferredPublicUrlProtocol());
-                                // Update displayed URL and workspace
                                 const urlDivEl = document.getElementById('shareModalUrl');
                                 if (urlDivEl) urlDivEl.textContent = nextDisplayUrl;
-                                // Update the workspace variable in modal closure
                                 if (j.workspace !== undefined) {
-                                    // We need to recreate the modal with updated workspace
                                     closeModal('shareModal');
                                     showShareModal(j.url, {
                                         noteId: noteId,
@@ -720,10 +703,8 @@ function showShareModal(url, options) {
             revokeBtn.type = 'button';
             revokeBtn.className = 'btn-cancel';
             revokeBtn.textContent = window.t ? window.t('index.public_modal.revoke', null, 'Revoke') : 'Revoke';
-            // styling handled by CSS classes
             revokeBtn.onclick = async function (ev) {
                 try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) { }
-                // Call API to revoke
                 try {
                     const resp = await fetch('/api/v1/notes/' + noteId + '/share', {
                         method: 'DELETE',
@@ -749,7 +730,6 @@ function showShareModal(url, options) {
             };
             buttonsDiv.appendChild(revokeBtn);
 
-            // Create Close button for shared notes
             const cancelBtn = document.createElement('button');
             cancelBtn.type = 'button';
             cancelBtn.className = 'btn-cancel';
@@ -758,75 +738,6 @@ function showShareModal(url, options) {
             buttonsDiv.appendChild(cancelBtn);
         }
     } else {
-        appendTasklistAccessModeField();
-
-        // If not shared, show Create button
-        // Add an optional input for a custom slug/token
-        const inputWrap = document.createElement('div');
-        inputWrap.className = 'share-custom-wrap';
-        const label = document.createElement('label');
-        const labelText = window.t ? window.t('index.share_modal.custom_token', null, 'Custom token (optional)') : 'Custom token (optional)';
-        // Split label to make "(optional)" red
-        const labelParts = labelText.match(/^(.+?)(\(.*?\))$/);
-        if (labelParts) {
-            label.innerHTML = labelParts[1] + '<span class="optional-text">' + labelParts[2] + '</span>';
-        } else {
-            label.textContent = labelText;
-        }
-        label.className = 'share-custom-label';
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.id = 'shareCustomToken';
-        input.placeholder = window.t ? window.t('index.share_modal.custom_token_placeholder', null, 'my_custom_token-1') : 'my_custom_token-1';
-        input.className = 'share-custom-input';
-        inputWrap.appendChild(label);
-        inputWrap.appendChild(createCustomTokenExampleElement('my-project-2026', 'note'));
-        inputWrap.appendChild(input);
-        content.appendChild(inputWrap);
-
-        // Add password input
-        const passwordWrap = document.createElement('div');
-        passwordWrap.className = 'share-password-wrap';
-        const passwordLabel = document.createElement('label');
-        const passwordLabelText = window.t ? window.t('index.share_modal.password', null, 'Password (optional)') : 'Password (optional)';
-        const passwordLabelParts = passwordLabelText.match(/^(.+?)(\(.*?\))$/);
-        if (passwordLabelParts) {
-            passwordLabel.innerHTML = passwordLabelParts[1] + '<span class="optional-text">' + passwordLabelParts[2] + '</span>';
-        } else {
-            passwordLabel.textContent = passwordLabelText;
-        }
-        passwordLabel.className = 'share-password-label';
-        const passwordInput = document.createElement('input');
-        passwordInput.type = 'password';
-        passwordInput.id = 'sharePassword';
-        passwordInput.placeholder = window.t ? window.t('index.share_modal.password_placeholder', null, 'Enter a password') : 'Enter a password';
-        passwordInput.className = 'share-password-input';
-        passwordWrap.appendChild(passwordLabel);
-        passwordWrap.appendChild(passwordInput);
-        content.appendChild(passwordWrap);
-
-        // Add indexable toggle
-        const indexableWrap = document.createElement('div');
-        indexableWrap.className = 'share-indexable-wrap';
-        const indexableLabel = document.createElement('label');
-        indexableLabel.className = 'share-indexable-label';
-        const indexableText = document.createElement('span');
-        indexableText.textContent = window.t ? window.t('index.share_modal.indexable', null, 'Allow search engine indexing') : 'Allow search engine indexing';
-        indexableText.className = 'indexable-label-text';
-        const toggleSwitch = document.createElement('label');
-        toggleSwitch.className = 'toggle-switch';
-        const indexableCheckbox = document.createElement('input');
-        indexableCheckbox.type = 'checkbox';
-        indexableCheckbox.id = 'shareIndexable';
-        indexableCheckbox.className = 'share-indexable-checkbox';
-        const slider = document.createElement('span');
-        slider.className = 'toggle-slider';
-        toggleSwitch.appendChild(indexableCheckbox);
-        toggleSwitch.appendChild(slider);
-        indexableLabel.appendChild(indexableText);
-        indexableLabel.appendChild(toggleSwitch);
-        indexableWrap.appendChild(indexableLabel);
-        content.appendChild(indexableWrap);
 
         const createBtn = document.createElement('button');
         createBtn.type = 'button';
@@ -836,11 +747,10 @@ function showShareModal(url, options) {
         createBtn.onclick = function () { createPublicShare(noteId); };
         buttonsDiv.appendChild(createBtn);
 
-        // Create Close button for non-shared notes
         const cancelBtn = document.createElement('button');
         cancelBtn.type = 'button';
         cancelBtn.className = 'btn-cancel';
-        cancelBtn.textContent = window.t ? window.t('index.share_modal.close', null, 'Close') : 'Close';
+        cancelBtn.textContent = window.t ? window.t('common.cancel', null, 'Cancel') : 'Cancel';
         cancelBtn.onclick = function () { closeModal('shareModal'); };
         buttonsDiv.appendChild(cancelBtn);
     }
@@ -905,9 +815,21 @@ async function openPublicShareModal(noteId) {
     const shareInfo = await getPublicShare(noteId);
     if (shareInfo.shared && shareInfo.url) {
         markShareIconShared(noteId, true);
-        showShareModal(shareInfo.url, { 
-            noteId: noteId, 
-            shared: true, 
+        const token = extractShareTokenFromUrl(shareInfo.url);
+        if (token) {
+            openSharedManagementPage({
+                itemType: 'note',
+                itemId: noteId,
+                token: token,
+                workspace: shareInfo.workspace,
+                autoEdit: false
+            });
+            return;
+        }
+
+        showShareModal(shareInfo.url, {
+            noteId: noteId,
+            shared: true,
             workspace: shareInfo.workspace,
             noteType: shareInfo.noteType,
             accessMode: shareInfo.accessMode
@@ -1113,14 +1035,6 @@ async function createPublicFolderShare(folderId) {
         }
 
         if (data && data.url) {
-            if (typeof showFolderShareModal === 'function') {
-                showFolderShareModal(data.url, { 
-                    folderId: folderId, 
-                    shared: true, 
-                    workspace: data.workspace || '' 
-                });
-            }
-
             if (data.shared_notes_count && data.shared_notes_count > 0) {
                 updateSharedCount(data.shared_notes_count);
             }
@@ -1130,6 +1044,13 @@ async function createPublicFolderShare(folderId) {
             }
 
             refreshNotesListAfterFolderAction(folderId);
+            closeModal('folderShareModal');
+            openSharedManagementPage({
+                itemType: 'folder',
+                itemId: folderId,
+                token: extractShareTokenFromUrl(data.url),
+                workspace: data.workspace || ''
+            });
         }
 
     } catch (error) {
@@ -1177,6 +1098,18 @@ async function openPublicFolderShareModal(folderId) {
 
     const info = await getPublicFolderShare(folderId);
     if (info.shared && info.url) {
+        const token = extractShareTokenFromUrl(info.url);
+        if (token) {
+            openSharedManagementPage({
+                itemType: 'folder',
+                itemId: folderId,
+                token: token,
+                workspace: info.workspace,
+                autoEdit: false
+            });
+            return;
+        }
+
         showFolderShareModal(info.url, { folderId: folderId, shared: true, workspace: info.workspace });
     } else {
         showFolderShareModal('', { folderId: folderId, shared: false });
@@ -1200,29 +1133,30 @@ function showFolderShareModal(url, options) {
     h3.textContent = window.t ? window.t('index.folder_share_modal.title', null, 'Public Folder URL') : 'Public Folder URL';
     content.appendChild(h3);
 
-    const p = document.createElement('p');
-    p.textContent = window.t ? window.t('index.folder_share_modal.description', null, 'Anyone with this link can view all notes in this folder.') : 'Anyone with this link can view all notes in this folder.';
-    content.appendChild(p);
-
     const folderId = options && options.folderId ? options.folderId : null;
     const shared = options && options.shared;
     const folderWorkspace = options && options.workspace ? options.workspace : '';
 
-    // Show the full URL as plain text
-    const urlDiv = document.createElement('div');
-    urlDiv.id = 'folderShareModalUrl';
-    urlDiv.className = 'share-url';
+    const p = document.createElement('p');
+    p.textContent = shared
+        ? (window.t ? window.t('index.folder_share_modal.description', null, 'Anyone with this link can view all notes in this folder.') : 'Anyone with this link can view all notes in this folder.')
+        : (window.t ? window.t('index.folder_share_modal.create_description', null, 'A shared URL creates a public link to this folder. Once the URL is created, you will be able to add more options, such as protecting the folder with a password or customizing the share URL.') : 'A shared URL creates a public link to this folder. Once the URL is created, you will be able to add more options, such as protecting the folder with a password or customizing the share URL.');
+    content.appendChild(p);
+
     const preferredProto = getPreferredPublicUrlProtocol();
-    if (url) {
-        urlDiv.textContent = applyProtocolToPublicUrl(url, preferredProto);
-    }
-    content.appendChild(urlDiv);
 
     const buttonsDiv = document.createElement('div');
     buttonsDiv.className = 'modal-buttons share-modal-buttons';
 
     if (shared && url) {
-        // Protocol toggle for shared folders
+        const urlDiv = document.createElement('div');
+        urlDiv.id = 'folderShareModalUrl';
+        urlDiv.className = 'share-url';
+        if (url) {
+            urlDiv.textContent = applyProtocolToPublicUrl(url, preferredProto);
+        }
+        content.appendChild(urlDiv);
+
         const protocolWrap = document.createElement('div');
         protocolWrap.className = 'share-protocol-wrap';
         const protocolLabel = document.createElement('label');
@@ -1251,7 +1185,6 @@ function showFolderShareModal(url, options) {
             urlDiv.textContent = applyProtocolToPublicUrl(urlDiv.textContent, nextProto);
         });
 
-        // Open button
         const openBtn = document.createElement('button');
         openBtn.type = 'button';
         openBtn.className = 'btn-open';
@@ -1262,7 +1195,6 @@ function showFolderShareModal(url, options) {
         };
         buttonsDiv.appendChild(openBtn);
 
-        // Copy button
         const copyBtn = document.createElement('button');
         copyBtn.type = 'button';
         copyBtn.className = 'btn-primary';
@@ -1277,7 +1209,6 @@ function showFolderShareModal(url, options) {
         };
         buttonsDiv.appendChild(copyBtn);
 
-        // Add Edit button to open list_shared_folders.php filtered by this token
         if (folderId) {
             const manageBtn = document.createElement('button');
             manageBtn.type = 'button';
@@ -1285,20 +1216,19 @@ function showFolderShareModal(url, options) {
             manageBtn.textContent = window.t ? window.t('index.public_modal.manage', null, 'Edit') : 'Edit';
             manageBtn.onclick = function (ev) {
                 try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) { }
-                // Extract token from URL (last part after /)
-                const token = url.split('/').pop();
+                const token = extractShareTokenFromUrl(url);
                 if (token) {
-                    let sharedUrl = 'list_shared_folders.php?filter=' + encodeURIComponent(token);
-                    if (folderWorkspace) {
-                        sharedUrl += '&workspace=' + encodeURIComponent(folderWorkspace);
-                    }
-                    window.open(sharedUrl, '_blank');
+                    openSharedManagementPage({
+                        itemType: 'folder',
+                        itemId: folderId,
+                        token: token,
+                        workspace: folderWorkspace
+                    });
                 }
             };
             buttonsDiv.appendChild(manageBtn);
         }
 
-        // Renew button
         if (folderId) {
             const renewBtn = document.createElement('button');
             renewBtn.type = 'button';
@@ -1317,12 +1247,9 @@ function showFolderShareModal(url, options) {
                         const data = await resp.json();
                         if (data && data.url) {
                             const nextDisplayUrl = applyProtocolToPublicUrl(data.url, getPreferredPublicUrlProtocol());
-                            // Update displayed URL
                             const urlDivEl = document.getElementById('folderShareModalUrl');
                             if (urlDivEl) urlDivEl.textContent = nextDisplayUrl;
-                            // Update the workspace if needed
                             if (data.workspace !== undefined) {
-                                // Recreate the modal with updated workspace
                                 closeModal('folderShareModal');
                                 showFolderShareModal(data.url, { folderId: folderId, shared: true, workspace: data.workspace });
                             }
@@ -1348,7 +1275,6 @@ function showFolderShareModal(url, options) {
             buttonsDiv.appendChild(renewBtn);
         }
 
-        // Revoke button
         if (folderId) {
             const revokeBtn = document.createElement('button');
             revokeBtn.type = 'button';
@@ -1364,11 +1290,9 @@ function showFolderShareModal(url, options) {
                     });
                     if (resp.ok) {
                         const data = await resp.json();
-                        // Update shared count (negative delta for unshared notes)
                         if (data.unshared_notes_count && typeof updateSharedCount === 'function') {
                             updateSharedCount(-data.unshared_notes_count);
                         }
-                        // Refresh the notes list to update folder actions menu
                         refreshNotesListAfterFolderAction();
                         closeModal('folderShareModal');
                     } else {
@@ -1384,7 +1308,6 @@ function showFolderShareModal(url, options) {
             buttonsDiv.appendChild(revokeBtn);
         }
 
-        // Close button
         const closeBtn = document.createElement('button');
         closeBtn.type = 'button';
         closeBtn.className = 'btn-secondary';
@@ -1394,48 +1317,6 @@ function showFolderShareModal(url, options) {
 
         content.appendChild(buttonsDiv);
     } else {
-        // Not shared - show create button
-        const inputWrap = document.createElement('div');
-        inputWrap.className = 'share-custom-wrap';
-        const label = document.createElement('label');
-        const labelText = window.t ? window.t('index.share_modal.custom_token', null, 'Custom token (optional)') : 'Custom token (optional)';
-        label.innerHTML = labelText.replace('(optional)', '<span class="optional-red">(optional)</span>');
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.id = 'shareFolderCustomToken';
-        input.placeholder = 'my-folder-link';
-        inputWrap.appendChild(label);
-        inputWrap.appendChild(createCustomTokenExampleElement('my-folder-link', 'folder'));
-        inputWrap.appendChild(input);
-        content.appendChild(inputWrap);
-
-        // Indexable checkbox
-        const indexableWrap = document.createElement('div');
-        indexableWrap.className = 'share-indexable-wrap';
-        const indexableLabel = document.createElement('label');
-        const indexableCheckbox = document.createElement('input');
-        indexableCheckbox.type = 'checkbox';
-        indexableCheckbox.id = 'shareFolderIndexable';
-        indexableLabel.appendChild(indexableCheckbox);
-        const indexableText = document.createTextNode(' ' + (window.t ? window.t('index.share_modal.indexable', null, 'Allow search engines') : 'Allow search engines'));
-        indexableLabel.appendChild(indexableText);
-        indexableWrap.appendChild(indexableLabel);
-        content.appendChild(indexableWrap);
-
-        // Password field
-        const passwordWrap = document.createElement('div');
-        passwordWrap.className = 'share-password-wrap';
-        const passwordLabel = document.createElement('label');
-        passwordLabel.textContent = window.t ? window.t('index.share_modal.password', null, 'Password (optional)') : 'Password (optional)';
-        const passwordInput = document.createElement('input');
-        passwordInput.type = 'password';
-        passwordInput.id = 'shareFolderPassword';
-        passwordInput.placeholder = window.t ? window.t('index.share_modal.password_placeholder', null, 'Enter password') : 'Enter password';
-        passwordWrap.appendChild(passwordLabel);
-        passwordWrap.appendChild(passwordInput);
-        content.appendChild(passwordWrap);
-
-        // Create button
         const createBtn = document.createElement('button');
         createBtn.type = 'button';
         createBtn.className = 'btn-primary';
@@ -1443,11 +1324,10 @@ function showFolderShareModal(url, options) {
         createBtn.onclick = function () { createPublicFolderShare(folderId); };
         buttonsDiv.appendChild(createBtn);
 
-        // Cancel button
         const cancelBtn = document.createElement('button');
         cancelBtn.type = 'button';
         cancelBtn.className = 'btn-cancel';
-        cancelBtn.textContent = window.t ? window.t('index.share_modal.close', null, 'Close') : 'Close';
+        cancelBtn.textContent = window.t ? window.t('common.cancel', null, 'Cancel') : 'Cancel';
         cancelBtn.onclick = function () { closeModal('folderShareModal'); };
         buttonsDiv.appendChild(cancelBtn);
 

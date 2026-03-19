@@ -247,6 +247,17 @@ if ($isAdmin) {
             </div>
             <?php endif; ?>
 
+            <!-- Change Password -->
+            <div class="home-card" id="change-password-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-key"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.change_password', [], 'Change Password'); ?></span>
+                    <span id="password-status-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
             <?php if ($isAdmin): ?>
             <!-- GitHub Sync -->
             <div class="home-card settings-card-clickable" id="git-sync-card" data-href="git_sync.php">
@@ -488,5 +499,6 @@ if ($isAdmin) {
     <script src="js/copy-code-on-focus.js"></script>
     <script src="js/modals-events.js"></script>
     <script src="js/settings-page.js"></script>
+    <script src="js/change-password.js?v=<?php echo $cache_v; ?>"></script>
 </body>
 </html>

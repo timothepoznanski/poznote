@@ -36,7 +36,7 @@ class FolderShareController {
             $folderWorkspace = $folderRow['workspace'] ?? '';
             
             // Get share info
-            $stmt = $this->con->prepare('SELECT token, indexable, password FROM shared_folders WHERE folder_id = ? LIMIT 1');
+            $stmt = $this->con->prepare('SELECT token, indexable, password, allowed_users FROM shared_folders WHERE folder_id = ? LIMIT 1');
             $stmt->execute([$folderId]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -48,6 +48,7 @@ class FolderShareController {
             $token = $row['token'];
             $indexable = isset($row['indexable']) ? (int)$row['indexable'] : 0;
             $hasPassword = !empty($row['password']);
+            $allowedUsers = !empty($row['allowed_users']) ? json_decode($row['allowed_users'], true) : null;
             
             $urls = $this->buildUrls($token);
             
@@ -58,7 +59,8 @@ class FolderShareController {
                 'url_query' => $urls['query'],
                 'indexable' => $indexable,
                 'hasPassword' => $hasPassword,
-                'workspace' => $folderWorkspace
+                'workspace' => $folderWorkspace,
+                'allowed_users' => $allowedUsers
             ]);
             
         } catch (Exception $e) {
@@ -144,8 +146,8 @@ class FolderShareController {
             
             registerSharedLink($token, $_SESSION['user_id'], 'folder', (int)$folderId);
             
-            // Auto-share all notes in this folder
-            $sharedCount = $this->shareNotesInFolder($folderId, $folderRow['name'], $theme, $indexable);
+            // Clean up legacy implicit note-share rows from previous folder-sharing behavior.
+            $this->shareNotesInFolder($folderId, $folderRow['name'], $theme, $indexable);
             
             $urls = $this->buildUrls($token);
             
@@ -156,7 +158,7 @@ class FolderShareController {
                 'url' => $urls['path'],
                 'url_query' => $urls['query'],
                 'workspace' => $folderWorkspace,
-                'shared_notes_count' => $sharedCount
+                'shared_notes_count' => 0
             ]);
             
         } catch (Exception $e) {
@@ -194,10 +196,10 @@ class FolderShareController {
             $stmt = $this->con->prepare('DELETE FROM shared_folders WHERE folder_id = ?');
             $stmt->execute([$folderId]);
             
-            // Unshare all notes in this folder
-            $unsharedCount = $this->unshareNotesInFolder($folderId, $folder['name']);
+            // Clean up legacy implicit note-share rows from previous folder-sharing behavior.
+            $this->unshareNotesInFolder($folderId, $folder['name']);
             
-            echo json_encode(['success' => true, 'revoked' => true, 'unshared_notes_count' => $unsharedCount]);
+            echo json_encode(['success' => true, 'revoked' => true, 'unshared_notes_count' => 0]);
             
         } catch (Exception $e) {
             http_response_code(500);
@@ -262,6 +264,18 @@ class FolderShareController {
                 $updates[] = 'password = ?';
                 $params[] = $hashedPassword;
             }
+
+            if (array_key_exists('allowed_users', $input)) {
+                $allowedUsersValue = $input['allowed_users'];
+                if (is_array($allowedUsersValue) && !empty($allowedUsersValue)) {
+                    $sanitized = array_values(array_unique(array_map('intval', $allowedUsersValue)));
+                    $updates[] = 'allowed_users = ?';
+                    $params[] = json_encode($sanitized);
+                } else {
+                    $updates[] = 'allowed_users = ?';
+                    $params[] = null;
+                }
+            }
             
             if (empty($updates)) {
                 echo json_encode(['success' => true, 'message' => 'No changes']);
@@ -302,6 +316,12 @@ class FolderShareController {
             if (array_key_exists('password', $input)) {
                 $response['hasPassword'] = trim($input['password'] ?? '') !== '';
             }
+            if (array_key_exists('allowed_users', $input)) {
+                $au = $input['allowed_users'];
+                $response['allowed_users'] = (is_array($au) && !empty($au))
+                    ? array_values(array_unique(array_map('intval', $au)))
+                    : null;
+            }
             
             echo json_encode($response);
             
@@ -312,66 +332,95 @@ class FolderShareController {
     }
     
     /**
-     * Auto-share all notes in a folder
-     * @return int Number of notes shared
+     * Legacy cleanup for implicit note shares that used to be created from folder shares.
+     * Explicit note shares are preserved.
+     *
+     * @return int Number of implicit rows removed
      */
     private function shareNotesInFolder($folderId, $folderName, $theme, $indexable) {
-        // Get all notes in this folder
-        $stmt = $this->con->prepare('SELECT id FROM entries WHERE (folder_id = ? OR folder = ?) AND trash = 0');
-        $stmt->execute([$folderId, $folderName]);
+        $folderIds = $this->getFolderSubtreeIds($folderId);
+        $placeholders = implode(', ', array_fill(0, count($folderIds), '?'));
+
+        // Include legacy rows that still store the root folder name in `folder`.
+        $stmt = $this->con->prepare('SELECT id FROM entries WHERE (folder_id IN (' . $placeholders . ') OR folder = ?) AND trash = 0');
+        $stmt->execute(array_merge($folderIds, [$folderName]));
         $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        $sharedCount = 0;
+
+        $removedCount = 0;
         foreach ($notes as $note) {
             $noteId = $note['id'];
-            
-            // Check if note is already shared
-            $checkStmt = $this->con->prepare('SELECT id FROM shared_notes WHERE note_id = ? LIMIT 1');
-            $checkStmt->execute([$noteId]);
-            
-            if (!$checkStmt->fetchColumn()) {
-                // Create a share for this note
-                $noteToken = bin2hex(random_bytes(16));
-                $insertStmt = $this->con->prepare('INSERT INTO shared_notes (note_id, token, theme, indexable) VALUES (?, ?, ?, ?)');
-                $insertStmt->execute([$noteId, $noteToken, $theme, $indexable]);
 
-                // Register in global registry
+            $checkStmt = $this->con->prepare('SELECT token FROM shared_notes WHERE note_id = ? AND access_mode IS NULL LIMIT 1');
+            $checkStmt->execute([$noteId]);
+            $implicitToken = $checkStmt->fetchColumn();
+
+            if ($implicitToken) {
                 require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
-                registerSharedLink($noteToken, $_SESSION['user_id'], 'note', (int)$noteId);
-                
-                $sharedCount++;
+                unregisterSharedLink($implicitToken);
+
+                $deleteStmt = $this->con->prepare('DELETE FROM shared_notes WHERE note_id = ? AND access_mode IS NULL');
+                $deleteStmt->execute([$noteId]);
+                $removedCount++;
             }
         }
-        return $sharedCount;
+
+        return $removedCount;
     }
     
     /**
-     * Unshare all notes in a folder
-     * @return int Number of notes unshared
+     * Legacy cleanup for implicit note shares that used to be created from folder shares.
+     * Explicit note shares are preserved.
+     *
+     * @return int Number of implicit rows removed
      */
     private function unshareNotesInFolder($folderId, $folderName) {
-        // Get all notes in this folder
-        $stmt = $this->con->prepare('SELECT id FROM entries WHERE (folder_id = ? OR folder = ?) AND trash = 0');
-        $stmt->execute([$folderId, $folderName]);
+        $folderIds = $this->getFolderSubtreeIds($folderId);
+        $placeholders = implode(', ', array_fill(0, count($folderIds), '?'));
+
+        // Include legacy rows that still store the root folder name in `folder`.
+        $stmt = $this->con->prepare('SELECT id FROM entries WHERE (folder_id IN (' . $placeholders . ') OR folder = ?) AND trash = 0');
+        $stmt->execute(array_merge($folderIds, [$folderName]));
         $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         $unsharedCount = 0;
         foreach ($notes as $note) {
-            // Check if note was shared before deleting
-            $checkStmt = $this->con->prepare('SELECT token FROM shared_notes WHERE note_id = ? LIMIT 1');
+            // Remove only legacy implicit shares; explicit note shares remain intact.
+            $checkStmt = $this->con->prepare('SELECT token FROM shared_notes WHERE note_id = ? AND access_mode IS NULL LIMIT 1');
             $checkStmt->execute([$note['id']]);
             $token = $checkStmt->fetchColumn();
             if ($token) {
-                // Remove from global registry
                 require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
                 unregisterSharedLink($token);
 
-                $deleteStmt = $this->con->prepare('DELETE FROM shared_notes WHERE note_id = ?');
+                $deleteStmt = $this->con->prepare('DELETE FROM shared_notes WHERE note_id = ? AND access_mode IS NULL');
                 $deleteStmt->execute([$note['id']]);
                 $unsharedCount++;
             }
         }
         return $unsharedCount;
+    }
+
+    /**
+     * Get a folder id plus all descendant folder ids.
+     *
+     * @return int[]
+     */
+    private function getFolderSubtreeIds($folderId) {
+        $stmt = $this->con->prepare(
+            'WITH RECURSIVE folder_tree(id) AS (
+                SELECT id
+                FROM folders
+                WHERE id = ?
+                UNION ALL
+                SELECT child.id
+                FROM folders child
+                INNER JOIN folder_tree parent_tree ON child.parent_id = parent_tree.id
+            )
+            SELECT id FROM folder_tree'
+        );
+        $stmt->execute([$folderId]);
+
+        return array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
     }
     
     /**

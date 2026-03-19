@@ -154,7 +154,7 @@ try {
             )
             SELECT COUNT(DISTINCT e.id) as cnt
             FROM entries e
-            LEFT JOIN shared_notes sn ON e.id = sn.note_id
+            LEFT JOIN shared_notes sn ON e.id = sn.note_id AND sn.access_mode IS NOT NULL
             WHERE e.trash = 0 
             $workspaceClauseE
             AND (sn.note_id IS NOT NULL OR e.folder_id IN (SELECT id FROM shared_hierarchy))
@@ -207,6 +207,47 @@ try {
     }
 } catch (Exception $e) {
     $shared_folders_count = 0;
+}
+
+// Count items shared with the current user by other users
+$shared_with_me_count = 0;
+try {
+    require_once __DIR__ . '/users/db_master.php';
+    require_once __DIR__ . '/users/UserDataManager.php';
+    $currentUserId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
+    if ($currentUserId) {
+        $allUsers = getAllUserProfiles();
+        foreach ($allUsers as $otherUser) {
+            if ((int)$otherUser['id'] === $currentUserId) continue;
+            $udm = new UserDataManager((int)$otherUser['id']);
+            $dbPath = $udm->getUserDatabasePath();
+            if (!file_exists($dbPath)) continue;
+            try {
+                $ownerCon = new PDO('sqlite:' . $dbPath);
+                $ownerCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                // Notes restricted to current user
+                $stmt = $ownerCon->query("SELECT allowed_users FROM shared_notes WHERE allowed_users IS NOT NULL AND allowed_users != ''");
+                foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $json) {
+                    $ids = json_decode($json, true);
+                    if (is_array($ids) && in_array($currentUserId, array_map('intval', $ids), true)) {
+                        $shared_with_me_count++;
+                    }
+                }
+                // Folders restricted to current user
+                $stmt2 = $ownerCon->query("SELECT allowed_users FROM shared_folders WHERE allowed_users IS NOT NULL AND allowed_users != ''");
+                foreach ($stmt2->fetchAll(PDO::FETCH_COLUMN) as $json) {
+                    $ids = json_decode($json, true);
+                    if (is_array($ids) && in_array($currentUserId, array_map('intval', $ids), true)) {
+                        $shared_with_me_count++;
+                    }
+                }
+            } catch (Exception $e) {
+                // skip inaccessible DBs
+            }
+        }
+    }
+} catch (Exception $e) {
+    $shared_with_me_count = 0;
 }
 
 // Count for Attachments
@@ -487,25 +528,14 @@ try {
                 </div>
             </a>
             
-            <!-- Shared Notes -->
-            <a href="shared.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('home.shared_notes', [], 'Shared Notes'); ?>">
+            <!-- Shares (Notes + Folders) -->
+            <a href="shared.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('home.shares', [], 'Shares'); ?>">
                 <div class="home-card-icon home-card-icon-shared">
                     <i class="lucide lucide-share-2"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('home.shared_notes', [], 'Shared Notes'); ?></span>
-                    <span class="home-card-count"><?php echo $shared_notes_count; ?></span>
-                </div>
-            </a>
-            
-            <!-- Shared Folders -->
-            <a href="list_shared_folders.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('home.shared_folders', [], 'Shared Folders'); ?>">
-                <div class="home-card-icon home-card-icon-shared">
-                    <i class="lucide lucide-folder-open"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('home.shared_folders', [], 'Shared Folders'); ?></span>
-                    <span class="home-card-count"><?php echo $shared_folders_count; ?></span>
+                    <span class="home-card-title"><?php echo t_h('home.shares', [], 'Shares'); ?></span>
+                    <span class="home-card-count"><?php echo ($shared_notes_count + $shared_folders_count + $shared_with_me_count); ?></span>
                 </div>
             </a>
             

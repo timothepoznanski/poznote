@@ -31,22 +31,92 @@
 .shared-notes-header-note {
     flex: 0 0 auto;
     min-width: 200px;
+    width: 200px;
 }
 
 .shared-notes-header-folder {
     flex: 0 0 auto;
     min-width: 200px;
+    width: 200px;
 }
 
 .shared-notes-header-token {
     flex: 1;
     min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.shared-header-help {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    color: var(--text-muted, #666666);
+    cursor: help;
+}
+
+.shared-header-help i {
+    font-size: 14px;
+}
+
+.shared-header-help-tooltip {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 260px;
+    max-width: 320px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgba(20, 20, 20, 0.94);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: normal;
+    line-height: 1.45;
+    text-transform: none;
+    white-space: normal;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.16s ease, visibility 0.16s ease;
+    z-index: 20;
+}
+
+.shared-header-help:hover .shared-header-help-tooltip,
+.shared-header-help:focus .shared-header-help-tooltip,
+.shared-header-help:focus-visible .shared-header-help-tooltip {
+    opacity: 1;
+    visibility: visible;
 }
 
 .shared-notes-header-actions {
-    flex: 0 0 auto;
-    min-width: 92px;
+    flex: 0 0 130px;
+    width: 130px;
     text-align: right;
+}
+
+.shared-notes-header-restricted {
+    flex: 0 0 100px;
+    width: 100px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.note-restricted-cell {
+    flex: 0 0 100px;
+    width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--primary, #0d6efd);
 }
 
 .shared-note-item {
@@ -57,6 +127,16 @@
     border-bottom: 1px solid var(--border-color, #e0e0e0);
 }
 
+.shared-note-item.shared-hierarchy-item {
+    margin-left: calc(var(--shared-indent-level, 0) * 22px);
+    padding-left: calc(8px + var(--shared-indent-level, 0) * 10px);
+    border-left: 2px solid rgba(13, 110, 253, 0.14);
+}
+
+.shared-note-item.shared-note-child {
+    border-left-color: rgba(13, 110, 253, 0.22);
+}
+
 #foldersList .shared-folder-icon {
     background: transparent !important;
 }
@@ -64,6 +144,7 @@
 .note-name-container {
     flex: 0 0 auto;
     min-width: 200px;
+    width: 200px;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -73,9 +154,11 @@
 .note-folder-container {
     flex: 0 0 auto;
     min-width: 200px;
+    width: 200px;
     display: flex;
     align-items: center;
     min-height: 30px;
+    overflow: hidden;
 }
 
 .note-folder-container.is-empty {
@@ -118,7 +201,7 @@
 
 .folder-badge:hover {
     background-color: transparent;
-    color: var(--link-color, #007bff);
+    color: inherit;
 }
 
 .folder-badge i {
@@ -169,6 +252,17 @@
     transition: color 0.2s;
 }
 
+.public-url-value {
+    cursor: pointer;
+    color: var(--link-color, #007bff);
+    text-decoration: underline;
+}
+
+.public-url-value:hover {
+    color: var(--link-hover-color, #0056b3);
+    text-decoration: underline;
+}
+
 .note-token:focus {
     outline: none;
 }
@@ -212,6 +306,13 @@
     cursor: default;
     background-color: transparent !important;
     opacity: 0.7;
+}
+
+.note-token-wrap.read-only {
+    background-color: transparent;
+    border-color: transparent;
+    padding-left: 0;
+    padding-right: 0;
 }
 
 .note-token-wrap.read-only {
@@ -277,10 +378,8 @@
 }
 
 .folder-name-text {
-    cursor: help;
-}
     font-size: 13px;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--dm-text, #333333));
     cursor: pointer;
     user-select: none;
 }
@@ -356,11 +455,18 @@
 }
 
 .note-actions {
-    flex: 0 0 auto;
+    flex: 0 0 130px;
+    width: 130px;
     display: flex;
     gap: 8px;
-    min-width: 92px;
     justify-content: flex-end;
+}
+
+.note-actions-placeholder {
+    font-size: 12px;
+    font-style: italic;
+    color: var(--text-muted, #666666);
+    text-align: right;
 }
 
 .empty-message {

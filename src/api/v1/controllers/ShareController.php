@@ -37,7 +37,7 @@ class ShareController {
             $noteType = $noteRow['type'] ?? 'note';
             
             // Get share info
-            $stmt = $this->con->prepare('SELECT token, indexable, password, access_mode FROM shared_notes WHERE note_id = ? LIMIT 1');
+            $stmt = $this->con->prepare('SELECT token, indexable, password, access_mode, allowed_users FROM shared_notes WHERE note_id = ? AND access_mode IS NOT NULL LIMIT 1');
             $stmt->execute([$noteId]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -56,6 +56,8 @@ class ShareController {
             $hasPassword = !empty($row['password']);
             $accessMode = $this->sanitizeAccessMode($row['access_mode'] ?? 'full', $noteType);
             
+            $allowedUsers = !empty($row['allowed_users']) ? json_decode($row['allowed_users'], true) : null;
+
             $urls = $this->buildUrls($token);
             
             echo json_encode([
@@ -68,7 +70,8 @@ class ShareController {
                 'hasPassword' => $hasPassword,
                 'noteType' => $noteType,
                 'accessMode' => $accessMode,
-                'workspace' => $noteWorkspace
+                'workspace' => $noteWorkspace,
+                'allowed_users' => $allowedUsers
             ]);
             
         } catch (Exception $e) {
@@ -192,7 +195,7 @@ class ShareController {
             }
             
             // Remove from global registry first
-            $stmtToken = $this->con->prepare('SELECT token FROM shared_notes WHERE note_id = ?');
+            $stmtToken = $this->con->prepare('SELECT token FROM shared_notes WHERE note_id = ? AND access_mode IS NOT NULL');
             $stmtToken->execute([$noteId]);
             $token = $stmtToken->fetchColumn();
             if ($token) {
@@ -200,7 +203,7 @@ class ShareController {
                 unregisterSharedLink($token);
             }
 
-            $stmt = $this->con->prepare('DELETE FROM shared_notes WHERE note_id = ?');
+            $stmt = $this->con->prepare('DELETE FROM shared_notes WHERE note_id = ? AND access_mode IS NOT NULL');
             $stmt->execute([$noteId]);
             
             echo json_encode(['success' => true, 'revoked' => true]);
@@ -213,8 +216,8 @@ class ShareController {
     
     /**
      * PATCH /api/v1/notes/{noteId}/share
-     * Update share settings (indexable, password)
-     * Body: { indexable?, password? }
+     * Update share settings (indexable, password, token, access mode)
+     * Body: { indexable?, password?, custom_token?, access_mode? }
      */
     public function update($noteId) {
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
@@ -234,6 +237,28 @@ class ShareController {
             
             $updates = [];
             $params = [];
+
+            if (isset($input['custom_token'])) {
+                $custom = trim($input['custom_token']);
+                if ($custom !== '') {
+                    if (!preg_match('/^[A-Za-z0-9\-_.]{4,128}$/', $custom)) {
+                        http_response_code(400);
+                        echo json_encode(['success' => false, 'error' => 'Invalid custom token. Allowed: letters, numbers, -, _, . (4-128 chars)']);
+                        return;
+                    }
+
+                    require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+
+                    if (!isTokenAvailable($custom, $_SESSION['user_id'], 'note', (int)$noteId)) {
+                        http_response_code(409);
+                        echo json_encode(['success' => false, 'error' => 'Token already in use']);
+                        return;
+                    }
+
+                    $updates[] = 'token = ?';
+                    $params[] = $custom;
+                }
+            }
             
             if (isset($input['indexable'])) {
                 $updates[] = 'indexable = ?';
@@ -251,18 +276,51 @@ class ShareController {
                 $updates[] = 'access_mode = ?';
                 $params[] = $this->sanitizeAccessMode($input['access_mode'], $noteType);
             }
+
+            if (array_key_exists('allowed_users', $input)) {
+                $allowedUsersValue = $input['allowed_users'];
+                if (is_array($allowedUsersValue) && !empty($allowedUsersValue)) {
+                    $sanitized = array_values(array_unique(array_map('intval', $allowedUsersValue)));
+                    $updates[] = 'allowed_users = ?';
+                    $params[] = json_encode($sanitized);
+                } else {
+                    $updates[] = 'allowed_users = ?';
+                    $params[] = null;
+                }
+            }
             
             if (empty($updates)) {
                 echo json_encode(['success' => true, 'message' => 'No changes']);
                 return;
             }
+
+            $oldToken = null;
+            if (isset($input['custom_token'])) {
+                $stmtToken = $this->con->prepare('SELECT token FROM shared_notes WHERE note_id = ? AND access_mode IS NOT NULL');
+                $stmtToken->execute([$noteId]);
+                $oldToken = $stmtToken->fetchColumn();
+            }
             
             $params[] = $noteId;
-            $sql = 'UPDATE shared_notes SET ' . implode(', ', $updates) . ' WHERE note_id = ?';
+            $sql = 'UPDATE shared_notes SET ' . implode(', ', $updates) . ' WHERE note_id = ? AND access_mode IS NOT NULL';
             $stmt = $this->con->prepare($sql);
             $stmt->execute($params);
+
+            if (isset($input['custom_token'])) {
+                $newToken = trim($input['custom_token']);
+                require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+
+                if ($oldToken && $oldToken !== $newToken) {
+                    unregisterSharedLink($oldToken);
+                }
+
+                registerSharedLink($newToken, $_SESSION['user_id'], 'note', (int)$noteId);
+            }
             
             $response = ['success' => true];
+            if (isset($input['custom_token'])) {
+                $response['token'] = trim($input['custom_token']);
+            }
             if (isset($input['indexable'])) {
                 $response['indexable'] = (int)$input['indexable'];
             }
@@ -271,6 +329,12 @@ class ShareController {
             }
             if (array_key_exists('access_mode', $input)) {
                 $response['accessMode'] = $this->sanitizeAccessMode($input['access_mode'], $noteType);
+            }
+            if (array_key_exists('allowed_users', $input)) {
+                $au = $input['allowed_users'];
+                $response['allowed_users'] = (is_array($au) && !empty($au))
+                    ? array_values(array_unique(array_map('intval', $au)))
+                    : null;
             }
             
             echo json_encode($response);

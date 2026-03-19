@@ -358,7 +358,8 @@
       "install_app": "Installer l'application",
       "release_notes": "Notes de version",
       "convert_images": "Convertisseur d’images Base64",
-      "orphan_scanner": "Scanner de pièces jointes orphelines"
+      "orphan_scanner": "Scanner de pièces jointes orphelines",
+      "change_password": "Changer le mot de passe"
     },
     "install_app": {
       "unavailable": "L’installation n’est pas disponible pour le moment. Sur Chrome mobile, ouvrez le menu du navigateur puis appuyez sur \"Installer l’application\" (ou \"Ajouter à l’écran d’accueil\") quand l’option est disponible.",
@@ -501,6 +502,7 @@
     "folders": "Dossiers",
     "shared_notes": "Notes partagées",
     "shared_folders": "Dossiers partagés",
+    "shares": "Partages",
     "kanban": "Kanban",
     "note": "note",
     "notes": "notes",
@@ -1159,6 +1161,7 @@
       "share_note": "Partager la note"
     },
     "share_modal": {
+      "description": "Une URL de partage crée un lien public vers cette note. Une fois l'URL créée, d'autres options seront proposées, comme protéger la note par mot de passe ou personnaliser l'URL de partage.",
       "custom_token": "Jeton personnalisé (optionnel)",
       "custom_token_placeholder": "mon_jeton_personnalise-1",
       "custom_token_example": "Ce qui donnera par exemple :",
@@ -1177,22 +1180,28 @@
     },
     "public_modal": {
       "title": "URL partagée",
+      "redirect_info": "Ce partage se gère maintenant depuis la page Partagés, où vous pouvez modifier ses réglages publics.",
       "close": "Fermer",
       "open": "Ouvrir",
       "copy": "Copier",
       "revoke": "Révoquer",
       "renew": "Renouveler",
+      "renew_token": "Renouveler le token",
       "manage": "Modifier",
       "create_url": "Créer l'url",
       "no_link_yet": "Aucun lien public pour le moment",
       "custom_token": "Token personnalisé (optionnel)",
       "custom_token_placeholder": "my_custom_token-1",
+      "indexable": "Autoriser l'indexation par les moteurs de recherche",
+      "password": "Mot de passe (optionnel)",
+      "password_placeholder": "Saisir un mot de passe",
       "error_prefix": "Erreur : ",
       "unknown_error": "Erreur inconnue lors de la création du partage public",
       "error_creating": "Erreur lors de la création du partage public : "
     },
     "folder_share_modal": {
       "title": "URL du dossier partagé",
+      "create_description": "Une URL de partage crée un lien public vers ce dossier. Une fois l'URL créée, d'autres options seront proposées, comme protéger le dossier par mot de passe ou personnaliser l'URL de partage.",
       "description": "Toute personne avec ce lien peut voir toutes les notes de ce dossier (sauf si un mot de passe a été configuré).",
       "use_https": "HTTPS",
       "renewed": "Lien de partage du dossier renouvelé",
@@ -1605,10 +1614,32 @@
       "no_public_notes": "Aucune note partagée pour le moment.",
       "public_hint": "Partagez une note en cliquant sur le bouton de nuage dans la barre d'outils de la note."
     },
-    "filter_placeholder": "Filtrer par titre, token ou nom de dossier...",
-    "no_filter_results": "Aucune note ne correspond à votre recherche.",
+    "filter_placeholder": "Filtrer par nom ou token...",
+    "no_filter_results": "Aucun élément ne correspond à votre recherche.",
+    "filter_all": "Tout",
+    "filter_notes": "Notes",
+    "filter_folders": "Dossiers",
+    "no_shared_notes": "Aucune note partagée pour le moment.",
+    "no_shared_folders": "Aucun dossier partagé pour le moment.",
+    "no_shares": "Aucun partage pour le moment.",
+    "no_shares_hint": "Partagez une note ou un dossier en cliquant sur le bouton de nuage dans la barre d'outils.",
+    "restrict_users": "Restreindre à des utilisateurs spécifiques",
+    "restrict_users_placeholder": "Sélectionner des utilisateurs...",
+    "restricted_badge": "Restreint",
+    "restricted_help": "Quand le partage est restreint, seuls les utilisateurs listés peuvent y accéder après s'être connectés.",
+    "no_users_found": "Aucun autre utilisateur trouvé",
+    "users_loading": "Chargement des utilisateurs...",
+    "shared_with_me": "Partagé avec moi",
+    "shared_by": "Partagé par",
+    "no_shared_with_me": "Rien n'a encore été partagé avec vous.",
+    "login_required_title": "Connexion requise",
+    "login_required_message": "Ce contenu est réservé à des utilisateurs spécifiques. Veuillez vous connecter pour y accéder.",
+    "access_denied_title": "Accès refusé",
+    "access_denied_message": "Vous n'avez pas la permission de consulter ce contenu.",
     "table": {
+      "name": "Nom",
       "note": "Note",
+      "path": "Chemin",
       "url": "URL partagée",
       "folder": "Dossier",
       "token": "Jeton",
@@ -1619,6 +1650,9 @@
       "revoke": "Révoquer"
     },
     "direct_share": "Note partagée",
+    "note_shared_through_folder": "Note partagée via le dossier",
+    "folder_shared_through_parent": "Dossier partagé via le dossier parent",
+    "token_help": "Le jeton est l'identifiant unique utilisé dans une URL de partage public. Exemple : https://votre-domaine.exemple/ma-note-partagee",
     "indexable": "Indexable",
     "password_protected": "Protégé par mot de passe",
     "add_password_title": "Ajouter une protection par mot de passe",
@@ -1964,6 +1998,24 @@
       "actions": "Actions",
       "not_defined": "non défini",
       "email_usage_note": "Les adresses email sont uniquement utilisées pour la connexion OIDC si configurée. Poznote n'envoie aucun email.",
+      "password_management": {
+        "manage_password": "Mot de passe",
+        "reset_password": "Réinitialiser le mot de passe",
+        "set_password": "Définir un mot de passe",
+        "reset_to_default": "Utiliser le mot de passe par défaut (.env)",
+        "modal_help": "Définissez un mot de passe personnalisé pour ce compte ou revenez au mot de passe par défaut défini dans l'environnement.",
+        "current_mode": "Mode actuel",
+        "set_help": "Au moins 4 caractères. Cela remplace le mot de passe défini dans les variables d'environnement pour cet utilisateur.",
+        "reset_help": "Supprime le mot de passe personnalisé et repasse sur le mot de passe par défaut défini dans l'environnement pour cet utilisateur.",
+        "reset_confirm": "Réinitialiser le mot de passe de \"{{username}}\" vers celui défini dans les variables d'environnement ?",
+        "set_success": "Mot de passe mis à jour avec succès.",
+        "reset_success": "Mot de passe réinitialisé vers la valeur par défaut qui se trouve dans les variables d'environnement.",
+        "status_custom": "Personnalisé",
+        "status_default": "Par défaut",
+        "status_custom_detail": "Cet utilisateur utilise un mot de passe personnalisé.",
+        "status_default_detail": "Cet utilisateur utilise le mot de passe par défaut qui se trouve dans les variables d'environnement.",
+        "changed_at_prefix": "Mise à jour :"
+      },
       "password": "Mot de passe",
       "profile": "Sélectionnez votre profil",
       "confirm_password": "Confirmer le mot de passe",
@@ -2277,5 +2329,25 @@
   },
   "backlinks": {
     "title": "Rétroliens"
+  },
+  "password": {
+    "status": {
+      "custom": "Mot de passe personnalisé",
+      "default": "Par défaut (env)"
+    },
+    "modal": {
+      "title": "Changer le mot de passe",
+      "description": "Entrez votre mot de passe actuel et choisissez-en un nouveau.",
+      "current": "Mot de passe actuel",
+      "new": "Nouveau mot de passe",
+      "confirm": "Confirmer le nouveau mot de passe"
+    },
+    "errors": {
+      "all_required": "Tous les champs sont requis",
+      "mismatch": "Les nouveaux mots de passe ne correspondent pas",
+      "too_short": "Le mot de passe doit contenir au moins 4 caractères",
+      "incorrect_current": "Le mot de passe actuel est incorrect"
+    },
+    "success": "Mot de passe modifié avec succès."
   }
 }
