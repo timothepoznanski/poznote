@@ -46,6 +46,7 @@ Discover all the features [here](https://poznote.com/index.html#features)
 - [Backup / Export](#backup--export)
 - [Git Synchronization](#git-synchronization)
 - [Restore / Import](#restore--import)
+- [PWA](#pwa)
 - [Offline View](#offline-view)
 - [Multiple Instances](#multiple-instances)
 - [MCP Server](#mcp-server)
@@ -222,15 +223,17 @@ Rename the default administrator account after the first login.
 
 ## Change Settings
 
-Most settings can be modified directly in the application through the settings page, but some system settings can only be changed in the `.env` file and require a container restart.
+Most settings can be modified directly in the application through the settings page. Some system settings can only be changed in the `.env` file and require a container restart.
 
-- **Authentication** - Admin and user passwords
+- **Authentication** - Initial/default passwords and login configuration
 - **Web Server** - HTTP port configuration
 - **OIDC / SSO Authentication** - OpenID Connect integration
 - **Settings Access Control** - Restrict or password-protect settings page
 - **Import Limits** - Maximum files for imports
 - **Git Sync** - GitHub and Forgejo synchronization
 - **MCP Server** - AI assistant integration
+
+Passwords can be changed directly in the application from `Settings > Change Password`. The `.env` authentication variables remain available to define the initial or fallback passwords used when no custom password has been set for a user.
 
 ### Modify System Settings (`.env`)
 
@@ -724,9 +727,28 @@ updated: 2024-01-20 15:45:00
 
 </details>
 
+## PWA
+
+Poznote can be installed as a **Progressive Web App (PWA)** in compatible browsers (Chrome, Edge, Safari on iOS, etc.).
+
+### Install on desktop
+
+1. Open your Poznote URL in the browser.
+2. Use the browser install action (for example **Install app** in the address bar/menu), or use the install button in **Settings** → **PWA Installation**.
+3. Launch Poznote from your applications list like a native app.
+
+### Install on mobile
+
+- **Android (Chrome/Edge):** open menu → **Install app** / **Add to Home screen**
+- **iPhone/iPad (Safari):** tap **Share** → **Add to Home Screen**
+
+### Offline behavior
+
+Poznote can be installed as a PWA, but this does not provide offline access to your notes content. For offline access to your notes, you must use the **Complete Backup** export feature (see section below).
+
 ## Offline View
 
-The **📦 Complete Backup** creates a standalone offline version of your notes. Simply extract the ZIP and open `index.html` in any web browser.
+The **📦 Complete Backup** creates a standalone offline version of your notes. Simply extract the ZIP and open `index.html` in any web browser. This allows you to read your notes offline, but without the full Poznote functionality, it's a read-only export.
 
 ## Multiple Instances
 
