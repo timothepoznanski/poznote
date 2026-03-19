@@ -159,6 +159,14 @@
                     navigateToDisplayOrSettings('settings.php');
                 }
                 break;
+            case 'open-password-settings':
+                if (typeof navigateToDisplayOrSettings === 'function') {
+                    navigateToDisplayOrSettings('settings.php', {
+                        extraParams: { open: 'change-password' },
+                        hash: 'change-password-card'
+                    });
+                }
+                break;
             case 'navigate-to-profile':
                 if (typeof navigateToDisplayOrSettings === 'function') {
                     navigateToDisplayOrSettings('profile.php');
@@ -896,9 +904,11 @@
      * Navigate to a different page while preserving workspace and note context
      * @param {string} page - The target page (e.g., 'settings.php', 'home.php')
      */
-    window.navigateToDisplayOrSettings = function (page) {
+    window.navigateToDisplayOrSettings = function (page, options) {
         var url = page;
         var params = [];
+        var extraParams = options && options.extraParams ? options.extraParams : null;
+        var hash = options && options.hash ? options.hash : '';
 
         if (window.selectedWorkspace) {
             params.push('workspace=' + encodeURIComponent(window.selectedWorkspace));
@@ -913,8 +923,21 @@
             }
         }
 
+        if (extraParams) {
+            Object.keys(extraParams).forEach(function (key) {
+                var value = extraParams[key];
+                if (value !== undefined && value !== null && value !== '') {
+                    params.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
+                }
+            });
+        }
+
         if (params.length > 0) {
             url += '?' + params.join('&');
+        }
+
+        if (hash) {
+            url += '#' + encodeURIComponent(hash);
         }
 
         window.location.href = url;

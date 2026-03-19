@@ -790,7 +790,8 @@
     },
     "user_settings_info": {
       "title": "Kontoeinstellungen",
-      "message": "Um Ihr Passwort zu ändern, Ihre E-Mail, Ihren Benutzernamen oder Ihr OIDC-Subject (UUID) zu bearbeiten, wenden Sie sich bitte an den Administrator dieser Poznote-Instanz."
+      "message": "Sie koennen Ihr Passwort in den Einstellungen aendern. Um Ihre E-Mail, Ihren Benutzernamen oder Ihr OIDC-Subject (UUID) zu bearbeiten, wenden Sie sich bitte an den Administrator dieser Poznote-Instanz.",
+      "change_password_button": "Passwort aendern"
     },
     "create": {
       "title_in_folder": "Erstellen in {{folder}}",
