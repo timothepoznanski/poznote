@@ -19,6 +19,7 @@
             txtCustomTokenPlaceholder: body.getAttribute('data-txt-custom-token-placeholder') || 'my_custom_token-1',
             txtUseHttps: body.getAttribute('data-txt-use-https') || 'HTTPS',
             txtSearchIndexable: body.getAttribute('data-txt-search-indexable') || 'Allow indexing by search engines',
+            txtSearchIndexableMobile: body.getAttribute('data-txt-search-indexable-mobile') || 'Allow indexing',
             txtPasswordLabel: body.getAttribute('data-txt-password-label') || 'Password',
             txtPasswordPlaceholder: body.getAttribute('data-txt-password-placeholder') || 'Enter a password',
             txtShowPassword: body.getAttribute('data-txt-show-password') || 'Show password',
@@ -28,7 +29,7 @@
             txtRenew: body.getAttribute('data-txt-renew') || 'Renew',
             txtOpen: body.getAttribute('data-txt-open') || 'Open public view',
             txtRevoke: body.getAttribute('data-txt-revoke') || 'Revoke',
-            txtTaskPermissions: body.getAttribute('data-txt-task-permissions') || 'Task list permissions',
+            txtTaskPermissions: body.getAttribute('data-txt-task-permissions') || 'Permissions',
             txtTaskReadOnly: body.getAttribute('data-txt-task-read-only') || 'Read only',
             txtTaskCheckOnly: body.getAttribute('data-txt-task-check-only') || 'Check or uncheck only',
             txtTaskFull: body.getAttribute('data-txt-task-full') || 'Full edit',
@@ -50,6 +51,7 @@
             txtNoSharedNotes: body.getAttribute('data-txt-no-shared-notes') || 'No shared notes yet.',
             txtNoSharedFolders: body.getAttribute('data-txt-no-shared-folders') || 'No shared folders yet.',
             txtRestrictUsers: body.getAttribute('data-txt-restrict-users') || 'Restrict to specific users',
+            txtRestrictUsersMobile: body.getAttribute('data-txt-restrict-users-mobile') || 'Restrict',
 
             txtRestrictedBadge: body.getAttribute('data-txt-restricted-badge') || 'Restricted',
             txtRestrictedHelp: body.getAttribute('data-txt-restricted-help') || 'When restricted, only the listed users can access this share after logging in.',
@@ -76,6 +78,14 @@
     var pendingEditorRequest = null;
     var pendingEditorHandled = false;
     var SHARE_PASSWORD_STORAGE_KEY = 'poznote-share-password-cache';
+
+    function isMobileShareModalView() {
+        return !!(window.matchMedia && window.matchMedia('(max-width: 680px)').matches);
+    }
+
+    function getShareModalLabel(desktopText, mobileText) {
+        return isMobileShareModalView() && mobileText ? mobileText : desktopText;
+    }
 
     function loadSharePasswordCache() {
         try {
@@ -1050,7 +1060,7 @@
 
         var indexableText = document.createElement('span');
         indexableText.className = 'indexable-label-text';
-        indexableText.textContent = config.txtSearchIndexable;
+        indexableText.textContent = getShareModalLabel(config.txtSearchIndexable, config.txtSearchIndexableMobile);
 
         var indexableToggle = document.createElement('label');
         indexableToggle.className = 'toggle-switch';
@@ -1080,7 +1090,7 @@
 
         var restrictText = document.createElement('span');
         restrictText.className = 'indexable-label-text';
-        restrictText.textContent = config.txtRestrictUsers;
+        restrictText.textContent = getShareModalLabel(config.txtRestrictUsers, config.txtRestrictUsersMobile);
 
         var restrictToggle = document.createElement('label');
         restrictToggle.className = 'toggle-switch';
