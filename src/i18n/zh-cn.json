@@ -802,7 +802,8 @@
     },
     "user_settings_info": {
       "title": "账户设置",
-      "message": "要更改密码、修改电子邮件、用户名或 OIDC Subject (UUID)，请联系此 Poznote 实例的管理员。"
+      "message": "您可以在设置中更改密码。若要修改电子邮件、用户名或 OIDC Subject (UUID)，请联系此 Poznote 实例的管理员。",
+      "change_password_button": "更改密码"
     },
     "create": {
       "title_in_folder": "在 {{folder}} 中创建",

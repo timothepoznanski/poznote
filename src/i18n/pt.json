@@ -789,7 +789,8 @@
     },
     "user_settings_info": {
       "title": "Configurações da conta",
-      "message": "Para alterar sua senha, editar seu email, nome de usuário ou OIDC Subject (UUID), entre em contato com o administrador desta instância Poznote."
+      "message": "Voce pode alterar sua senha nas Configuracoes. Para editar seu email, nome de usuario ou OIDC Subject (UUID), entre em contato com o administrador desta instancia Poznote.",
+      "change_password_button": "Alterar senha"
     },
     "create": {
       "title_in_folder": "Criar em {{folder}}",

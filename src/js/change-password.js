@@ -101,6 +101,25 @@
         });
     }
 
+    function shouldAutoOpenPasswordModal() {
+        var params = new URLSearchParams(window.location.search || '');
+        return params.get('open') === 'change-password';
+    }
+
+    function clearAutoOpenPasswordModalParam() {
+        if (!window.history || typeof window.history.replaceState !== 'function') {
+            return;
+        }
+
+        var url = new URL(window.location.href);
+        if (url.searchParams.get('open') !== 'change-password') {
+            return;
+        }
+
+        url.searchParams.delete('open');
+        window.history.replaceState({}, '', url.toString());
+    }
+
     function submitPasswordChange() {
         var currentPw = document.getElementById('cpCurrentPassword').value;
         var newPw = document.getElementById('cpNewPassword').value;
@@ -183,6 +202,12 @@
         var card = document.getElementById('change-password-card');
         if (card) {
             card.addEventListener('click', showPasswordModal);
+        }
+
+        if (card && shouldAutoOpenPasswordModal()) {
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            clearAutoOpenPasswordModalParam();
+            showPasswordModal();
         }
     }
 

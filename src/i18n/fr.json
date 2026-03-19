@@ -819,7 +819,8 @@
     },
     "user_settings_info": {
       "title": "Paramètres du compte",
-      "message": "Pour changer votre mot de passe, modifier votre email, nom d’utilisateur ou OIDC Subject (UUID), veuillez contacter l’administrateur de cette instance Poznote."
+      "message": "Vous pouvez changer votre mot de passe depuis les paramètres. Pour modifier votre email, nom d’utilisateur ou OIDC Subject (UUID), veuillez contacter l’administrateur de cette instance Poznote.",
+      "change_password_button": "Changer le mot de passe"
     },
     "create": {
       "title_in_folder": "Créer dans {{folder}}",
