@@ -222,15 +222,17 @@ Rename the default administrator account after the first login.
 
 ## Change Settings
 
-Most settings can be modified directly in the application through the settings page, but some system settings can only be changed in the `.env` file and require a container restart.
+Most settings can be modified directly in the application through the settings page. Some system settings can only be changed in the `.env` file and require a container restart.
 
-- **Authentication** - Admin and user passwords
+- **Authentication** - Initial/default passwords and login configuration
 - **Web Server** - HTTP port configuration
 - **OIDC / SSO Authentication** - OpenID Connect integration
 - **Settings Access Control** - Restrict or password-protect settings page
 - **Import Limits** - Maximum files for imports
 - **Git Sync** - GitHub and Forgejo synchronization
 - **MCP Server** - AI assistant integration
+
+Passwords can be changed directly in the application from `Settings > Change Password`. The `.env` authentication variables remain available to define the initial or fallback passwords used when no custom password has been set for a user.
 
 ### Modify System Settings (`.env`)
 
