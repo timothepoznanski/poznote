@@ -449,16 +449,12 @@
 /* Notes without folder - indent to align with folder items */
 .links_arbo_left.note-without-folder {
     margin-left: 0px !important;
-    padding-left: 4px !important;
+    padding-left: 7px !important;
 }
 
-/* Hover effect: blue background and bold title when hovering over a note */
-.links_arbo_left:hover {
-    background-color: #0b4da6 !important;
-}
-
+/* Hover effect: blue and bold title when hovering over a note */
 .links_arbo_left:hover .note-title {
-    color: #ffffff !important;
+    color: #0b4da6 !important;
     font-weight: 600 !important;
     transition: color 0.2s ease, font-weight 0.2s ease;
 }
