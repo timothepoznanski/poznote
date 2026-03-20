@@ -67,7 +67,9 @@ class GitSync {
     private function getEncryptionKey(): string {
         $secret = getenv('POZNOTE_APP_SECRET');
         if (!$secret) {
-            $keyFile = dirname(__DIR__) . '/data/.app_secret';
+            // __DIR__ in container = /var/www/html (where src/ is mounted)
+            // so data/ is at __DIR__ . '/data/'
+            $keyFile = __DIR__ . '/data/.app_secret';
             if (file_exists($keyFile)) {
                 $secret = trim(file_get_contents($keyFile));
             } else {

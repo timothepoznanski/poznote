@@ -553,7 +553,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 if (apiBaseInput.value === 'https://api.github.com') apiBaseInput.value = '';
             } else {
                 apiBaseInput.readOnly = true;
-                apiBaseInput.style.opacity = '0.5';
+                apiBaseInput.style.opacity = '';
                 apiBaseInput.value = 'https://api.github.com';
             }
         }
@@ -581,20 +581,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             });
         }
         
-        // Clear masked token placeholder on focus
-        const tokenInput = document.getElementById('git_token');
-        if (tokenInput) {
-            tokenInput.addEventListener('focus', function() {
-                if (this.value === '••••••••') {
-                    this.value = '';
-                }
-            });
-            tokenInput.addEventListener('blur', function() {
-                if (this.value === '') {
-                    this.value = '••••••••';
-                }
-            });
-        }
+
     });
     </script>
 </body>
