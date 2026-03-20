@@ -1287,6 +1287,9 @@
       "disable": "Disable Kanban view",
       "open": "Open Kanban view"
     },
+    "add_column": "Add column",
+    "new_column_title": "New Column",
+    "new_column_placeholder": "Column name",
     "notifications": {
       "activated_title": "Kanban view enabled",
       "activated_message": "This folder is now in Kanban mode. Click its icon to open the board."

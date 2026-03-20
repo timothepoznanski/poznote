@@ -79,6 +79,9 @@
       "disable": "Désactiver la vue Kanban",
       "open": "Ouvrir la vue Kanban"
     },
+    "add_column": "Ajouter une colonne",
+    "new_column_title": "Nouvelle colonne",
+    "new_column_placeholder": "Nom de la colonne",
     "notifications": {
       "activated_title": "Vue Kanban activée",
       "activated_message": "Ce dossier est maintenant en mode Kanban. Cliquez sur son icône pour ouvrir le tableau."

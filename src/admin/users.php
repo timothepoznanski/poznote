@@ -228,7 +228,6 @@ $v = getAppVersion();
         document.getElementById('rename_oidc_subject').value = currentOidcSubject || '';
         updateRenameModalTitle(currentUsername);
         document.getElementById('renameModal').classList.add('active');
-        setTimeout(() => document.getElementById('rename_username').focus(), 100);
     }
     
     /**
@@ -480,7 +479,7 @@ $v = getAppVersion();
          */
         function openCreateModal() {
             document.getElementById('createModal').classList.add('active');
-            setTimeout(() => document.getElementById('create_username').focus(), 100);
+
         }
         
         /**
@@ -505,6 +504,7 @@ $v = getAppVersion();
         function setPasswordStatusDisplay(data) {
             var statusEl = document.getElementById('pw_status');
             var statusSummary = document.getElementById('pw_status_summary');
+            var resetBtn = document.getElementById('pw_reset_btn');
             var statusRow = statusEl ? statusEl.parentElement : null;
             if (!statusEl || !statusSummary || !statusRow) return;
 
@@ -513,9 +513,11 @@ $v = getAppVersion();
                 statusEl.textContent = data.password_changed_at
                     ? <?php echo json_encode(t('multiuser.admin.password_management.changed_at_prefix', [], 'Updated:')); ?> + ' ' + data.password_changed_at
                     : '';
+                if (resetBtn) resetBtn.style.display = 'inline-block';
             } else {
                 statusSummary.textContent = <?php echo json_encode(t('multiuser.admin.password_management.status_default_detail', [], 'This user uses the default password.')); ?>;
                 statusEl.textContent = '';
+                if (resetBtn) resetBtn.style.display = 'none';
             }
 
             statusRow.style.display = statusEl.textContent.trim() === '' ? 'none' : 'flex';
@@ -557,8 +559,6 @@ $v = getAppVersion();
             document.getElementById('pw_success').style.display = 'none';
             document.getElementById('passwordModal').classList.add('active');
             loadPasswordStatus(userId);
-            
-            setTimeout(() => document.getElementById('pw_new_password').focus(), 100);
         }
         
         function setNewPassword() {

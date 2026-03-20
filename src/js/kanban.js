@@ -254,6 +254,67 @@
                 console.error('Kanban: No create modal function available');
             }
         });
+
+        // Kanban Add Column Button
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-action="create-kanban-column"]');
+            if (!btn) return;
+
+            e.stopPropagation();
+            e.preventDefault();
+
+            const parentId = btn.dataset.parentId;
+
+            // Use showInputModal to get column name
+            if (typeof window.showInputModal === 'function') {
+                window.showInputModal(
+                    (window.t ? window.t('kanban.new_column_title', null, 'New Column') : 'New Column'),
+                    (window.t ? window.t('kanban.new_column_placeholder', null, 'Column name') : 'Column name'),
+                    '',
+                    async function (columnName) {
+                        if (!columnName) return;
+
+                        let workspace = '';
+                        if (typeof window.getSelectedWorkspace === 'function') {
+                            workspace = window.getSelectedWorkspace();
+                        }
+
+                        try {
+                            const response = await fetch('api/v1/folders', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    folder_name: columnName,
+                                    parent_folder_id: parentId,
+                                    workspace: workspace
+                                }),
+                                credentials: 'same-origin'
+                            });
+
+                            if (!response.ok) throw new Error('HTTP error: ' + response.status);
+
+                            const data = await response.json();
+                            if (data.success) {
+                                // Reload to show the new column
+                                // If inside index.php, we might want a partial refresh, 
+                                // but for now, simple reload is safest and matches others.
+                                if (typeof window.loadKanbanView === 'function') {
+                                    window.loadKanbanView(parentId);
+                                } else {
+                                    window.location.reload();
+                                }
+                            } else {
+                                showError(data.message || 'Failed to create column');
+                            }
+                        } catch (error) {
+                            console.error('Kanban: Error creating column:', error);
+                            showError('Error creating column');
+                        }
+                    },
+                    (window.t ? window.t('common.create', null, 'Create') : 'Create')
+                );
+            }
+        });
     }
 
     /**

@@ -450,11 +450,53 @@
 .kanban-inline-header {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 16px;
     padding: 16px 24px;
     background: var(--bg-primary, #ffffff);
     border-bottom: 1px solid var(--border-color, #e2e8f0);
     flex-shrink: 0;
+}
+
+.kanban-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.kanban-add-column-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--bg-secondary, #f1f5f9);
+    color: var(--text-primary, #1e293b);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.kanban-add-column-btn:hover {
+    background: var(--bg-tertiary, #e2e8f0);
+    border-color: var(--text-secondary, #64748b);
+    transform: translateY(-1px);
+}
+
+.kanban-add-column-btn i {
+    font-size: 1rem;
+}
+
+.kanban-add-column-btn span {
+    display: inline;
+}
+
+@media (max-width: 768px) {
+    .kanban-add-column-btn span {
+        display: none;
+    }
 }
 
 .kanban-inline-header .kanban-back-btn {

@@ -78,9 +78,6 @@
         document.getElementById('cpError').style.display = 'none';
 
         modal.style.display = 'flex';
-        setTimeout(function () {
-            document.getElementById('cpCurrentPassword').focus();
-        }, 100);
 
         // Cancel
         document.getElementById('cpCancelBtn').addEventListener('click', function () {

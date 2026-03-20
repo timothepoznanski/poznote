@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let errorTimeout = null;
     
     // Auto-focus on password input for better UX
-    passwordInput.focus();
+    // passwordInput.focus();
     
     /**
      * Handles form submission and password verification
