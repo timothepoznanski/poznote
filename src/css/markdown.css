@@ -262,6 +262,7 @@
     border: 1px solid #ddd;
     padding: 8px 12px;
     text-align: left;
+    white-space: pre-line;
 }
 
 .markdown-preview table th {

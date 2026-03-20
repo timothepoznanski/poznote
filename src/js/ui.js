@@ -562,10 +562,10 @@ function showLinkModal(defaultUrl, defaultText, callback) {
     }
 
     modal.style.display = 'flex';
-    setTimeout(function () {
+    /* setTimeout(function () {
         urlInput.focus();
         urlInput.select();
-    }, 100);
+    }, 100); */
 }
 
 function createLinkModal() {

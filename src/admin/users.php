@@ -132,8 +132,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
             }
             
-            // Only allow toggling active field
-            if ($field === 'active') {
+            // Only allow toggling active/admin fields
+            if ($field === 'active' || $field === 'is_admin') {
                 $data = [$field => (int)$value];
                 $result = updateUserProfile($userId, $data);
                 
@@ -266,7 +266,7 @@ $v = getAppVersion();
                 <p class="email-note">
                     <?php echo t_h('multiuser.admin.email_usage_note', [], 'Email addresses are only used for OIDC authentication if configured. Poznote does not send any emails.'); ?>
                     <br>
-                    <?php echo t_h('multiuser.admin.admin_note', [], 'Only user 1 is an administrator. Other users cannot have administrator privileges.'); ?>
+                    <?php echo t_h('multiuser.admin.admin_note', [], 'Use the Admin checkbox to grant or revoke administrator privileges for another user.'); ?>
                 </p>
             </div>
         </div>
@@ -284,6 +284,7 @@ $v = getAppVersion();
                         <th class="text-center col-id"><?php echo t_h('multiuser.admin.id', [], 'ID'); ?></th>
                         <th><?php echo t_h('multiuser.admin.username', [], 'User'); ?></th>
                         <th><?php echo t_h('multiuser.admin.email', [], 'Email'); ?></th>
+                        <th class="text-center"><?php echo t_h('multiuser.admin.administrator', [], 'Administrator'); ?></th>
                         <th class="text-center"><?php echo t_h('multiuser.admin.status', [], 'Status'); ?></th>
                         <th class="text-center"><?php echo t_h('multiuser.admin.actions', [], 'Actions'); ?></th>
                     </tr>
@@ -298,7 +299,7 @@ $v = getAppVersion();
                                 <div class="user-info">
                                     <div class="user-username">
                                         <?php echo htmlspecialchars($user['username']); ?>
-                                        <?php if ($user['id'] == 1): ?>
+                                        <?php if ($user['is_admin']): ?>
                                             (<?php echo t_h('multiuser.admin.administrator', [], 'Administrator'); ?>)
                                         <?php endif; ?>
                                     </div>
@@ -308,6 +309,23 @@ $v = getAppVersion();
                                 <div class="user-email <?php echo empty($user['email']) ? 'user-email-empty' : ''; ?>">
                                     <?php echo !empty($user['email']) ? htmlspecialchars($user['email']) : '<em>' . t_h('multiuser.admin.not_defined', [], 'not defined') . '</em>'; ?>
                                 </div>
+                            </td>
+
+                            <td class="text-center" data-label="<?php echo t_h('multiuser.admin.administrator', [], 'Administrator'); ?>">
+                                <input
+                                    type="checkbox"
+                                    <?php echo $user['is_admin'] ? 'checked' : ''; ?>
+                                    <?php echo ($user['id'] === 1 || $user['id'] === getCurrentUserId()) ? 'disabled' : ''; ?>
+                                    title="<?php echo htmlspecialchars(
+                                        $user['id'] === 1
+                                            ? t('multiuser.admin.admin_id_1_locked', [], 'Administrator role cannot be removed from user ID 1')
+                                            : ($user['id'] === getCurrentUserId()
+                                                ? t('multiuser.admin.errors.cannot_change_self', [], 'You cannot change your own status/role')
+                                                : t('multiuser.admin.toggle_admin', [], 'Grant or revoke administrator privileges')),
+                                        ENT_QUOTES,
+                                        'UTF-8'
+                                    ); ?>"
+                                    onchange="toggleUserStatus(<?php echo (int)$user['id']; ?>, 'is_admin', this.checked ? 1 : 0)">
                             </td>
     
                             <td class="text-center" data-label="<?php echo t_h('multiuser.admin.status', [], 'Status'); ?>">
@@ -347,13 +365,15 @@ $v = getAppVersion();
                                         <i class="lucide-key"></i>
                                     </button>
 
-                                    <?php if ($user['id'] !== getCurrentUserId()): ?>
+                                    <?php if ($user['id'] !== 1 && $user['id'] !== getCurrentUserId()): ?>
                                         <button class="btn btn-danger btn-small" title="<?php echo t_h('common.delete', [], 'Delete'); ?>" 
                                             onclick="openDeleteModal(<?php echo (int)$user['id']; ?>, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>)">
                                             <i class="lucide-trash-2"></i>
                                         </button>
                                     <?php else: ?>
-                                        <button class="btn btn-danger btn-small disabled" title="<?php echo t_h('multiuser.admin.errors.cannot_delete_self', [], 'You cannot delete your own profile'); ?>" disabled>
+                                        <button class="btn btn-danger btn-small disabled" title="<?php echo htmlspecialchars($user['id'] === 1
+                                            ? t('multiuser.admin.delete_id_1_locked', [], 'User ID 1 cannot be deleted')
+                                            : t('multiuser.admin.errors.cannot_delete_self', [], 'You cannot delete your own profile'), ENT_QUOTES, 'UTF-8'); ?>" disabled>
                                             <i class="lucide-trash-2"></i>
                                         </button>
                                     <?php endif; ?>

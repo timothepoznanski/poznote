@@ -117,13 +117,6 @@ function initializeMasterDatabase(PDO $con): void {
     $con->exec("CREATE INDEX IF NOT EXISTS idx_shared_links_token ON shared_links(token)");
     $con->exec("CREATE INDEX IF NOT EXISTS idx_shared_links_user ON shared_links(user_id)");
     
-    // Enforce that only user ID 1 is admin
-    try {
-        $con->exec("UPDATE users SET is_admin = 0 WHERE id != 1 AND is_admin = 1");
-    } catch (Exception $e) {
-        error_log("Failed to enforce admin policy: " . $e->getMessage());
-    }
-    
     // Create default user if none exist
     createDefaultUserIfNeeded($con);
 }
@@ -305,13 +298,24 @@ function createUserProfile(string $username, string $email = null): array {
 function updateUserProfile(int $id, array $data): array {
     try {
         $masterCon = getMasterConnection();
+
+        $stmt = $masterCon->prepare("SELECT * FROM users WHERE id = ?");
+        $stmt->execute([$id]);
+        $currentUser = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$currentUser) {
+            return ['success' => false, 'error' => 'User profile not found'];
+        }
         
-        $allowedFields = ['username', 'email', 'active', 'oidc_subject'];
+        $allowedFields = ['username', 'email', 'active', 'is_admin', 'oidc_subject'];
         $updates = [];
         $params = [];
         
         foreach ($data as $key => $value) {
             if (in_array($key, $allowedFields)) {
+                if ($key === 'active' || $key === 'is_admin') {
+                    $value = (int)(bool)$value;
+                }
                 $updates[] = "$key = ?";
                 $params[] = $value;
             }
@@ -319,6 +323,22 @@ function updateUserProfile(int $id, array $data): array {
         
         if (empty($updates)) {
             return ['success' => false, 'error' => 'No valid fields to update'];
+        }
+
+        $newActive = array_key_exists('active', $data) ? (int)(bool)$data['active'] : (int)$currentUser['active'];
+        $newIsAdmin = array_key_exists('is_admin', $data) ? (int)(bool)$data['is_admin'] : (int)$currentUser['is_admin'];
+
+        if ($id === 1 && array_key_exists('is_admin', $data) && $newIsAdmin !== 1) {
+            return ['success' => false, 'error' => 'Cannot remove administrator role from user ID 1'];
+        }
+
+        if ((int)$currentUser['active'] === 1 && (int)$currentUser['is_admin'] === 1 && ($newActive !== 1 || $newIsAdmin !== 1)) {
+            $stmt = $masterCon->query("SELECT COUNT(*) FROM users WHERE is_admin = 1 AND active = 1");
+            $activeAdminCount = (int)$stmt->fetchColumn();
+
+            if ($activeAdminCount <= 1) {
+                return ['success' => false, 'error' => 'Cannot remove or deactivate the last active admin user'];
+            }
         }
         
         $updates[] = "updated_at = CURRENT_TIMESTAMP";
@@ -370,6 +390,10 @@ function updateUserProfile(int $id, array $data): array {
 function deleteUserProfile(int $id, bool $deleteData = false): array {
     try {
         $con = getMasterConnection();
+
+        if ($id === 1) {
+            return ['success' => false, 'error' => 'Cannot delete user ID 1'];
+        }
         
         // Don't allow deleting the last admin
         $stmt = $con->query("SELECT COUNT(*) FROM users WHERE is_admin = 1 AND active = 1");

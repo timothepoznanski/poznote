@@ -163,6 +163,7 @@ body.public-note-page {
     padding: 12px !important;
     min-width: 60px !important;
     text-align: left !important;
+    white-space: pre-line !important;
     background: white !important;
     color: black !important;
 }
@@ -185,6 +186,7 @@ table th {
     padding: 8px !important;
     min-width: 50px !important;
     text-align: left !important;
+    white-space: pre-line !important;
 }
 
 table th {
@@ -208,6 +210,7 @@ table th {
     padding: 8px !important;
     min-width: 50px !important;
     text-align: left !important;
+    white-space: pre-line !important;
 }
 
 .public-note table th,
@@ -229,6 +232,7 @@ table th {
     padding: 8px !important;
     min-width: 50px !important;
     text-align: left !important;
+    white-space: pre-line !important;
 }
 
 .public-note .content table th {

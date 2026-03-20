@@ -743,18 +743,18 @@ function handleMarkdownListTab(e, selection) {
 
     var newIndent;
     if (e.shiftKey) {
-        // Shift+Tab: outdent (remove up to 2 spaces)
-        if (currentIndent.length >= 2) {
-            newIndent = currentIndent.slice(2);
-        } else if (currentIndent.length === 1) {
+        // Shift+Tab: outdent (remove up to 4 spaces)
+        if (currentIndent.length >= 4) {
+            newIndent = currentIndent.slice(4);
+        } else if (currentIndent.length > 0) {
             newIndent = '';
         } else {
             // Already at leftmost position
             return true;
         }
     } else {
-        // Tab: indent (add 2 spaces)
-        newIndent = '  ' + currentIndent;
+        // Tab: indent (add 4 spaces)
+        newIndent = '    ' + currentIndent;
     }
 
     var newLineText = newIndent + listMarker + restOfLine;
@@ -849,10 +849,82 @@ function handleNoteEntryKeydown(e) {
         handleBlockquoteEnter(e, selection);
     }
 
-    // Handle Tab key in markdown list (indent/outdent)
+    // Handle Tab key in markdown list (indent/outdent) or insert tab in editor/code/pre
     if (e.key === 'Tab') {
-        if (handleMarkdownListTab(e, selection)) {
+        const isInList = handleMarkdownListTab(e, selection);
+        if (isInList) {
             return;
+        }
+
+        // If not in a list, check if we're in the markdown editor or a code block
+        var container = selection.rangeCount > 0
+            ? selection.getRangeAt(0).commonAncestorContainer
+            : null;
+
+        if (container) {
+            var checkNode = container.nodeType === 3 ? container.parentElement : container;
+            var inMarkdownEditor = checkNode && checkNode.closest && checkNode.closest('.markdown-editor');
+            var inCodeBlock = checkNode && checkNode.closest && (checkNode.closest('pre') || checkNode.closest('code'));
+
+            if (inMarkdownEditor || inCodeBlock) {
+                e.preventDefault();
+
+                // Insert 4 spaces for Tab
+                var tabString = '    ';
+
+                if (selection.rangeCount) {
+                    var range = selection.getRangeAt(0);
+                    range.deleteContents();
+
+                    var tabNode = document.createTextNode(tabString);
+                    range.insertNode(tabNode);
+
+                    // Move cursor after the inserted spaces
+                    range.setStartAfter(tabNode);
+                    range.setEndAfter(tabNode);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+
+                    // Explicitly trigger input event for the editor
+                    if (inMarkdownEditor) {
+                        const inputEvent = new Event('input', { bubbles: true });
+                        inMarkdownEditor.dispatchEvent(inputEvent);
+                    }
+
+                    triggerNoteSave();
+                }
+                return;
+            }
+        }
+    }
+
+    // Handle Markdown keyboard shortcuts (Ctrl+B, Ctrl+I, etc.)
+    if (e.ctrlKey || e.metaKey) {
+        var container = selection.rangeCount > 0
+            ? selection.getRangeAt(0).commonAncestorContainer
+            : null;
+        var checkNode = container ? (container.nodeType === 3 ? container.parentElement : container) : null;
+        var inMarkdownEditor = checkNode && checkNode.closest && checkNode.closest('.markdown-editor');
+
+        if (inMarkdownEditor) {
+            if (e.key.toLowerCase() === 'b') {
+                e.preventDefault();
+                if (typeof window.applyMarkdownBold === 'function') {
+                    window.applyMarkdownBold();
+                } else if (typeof applyMarkdownBold === 'function') {
+                    applyMarkdownBold();
+                }
+                return;
+            }
+            if (e.key.toLowerCase() === 'i') {
+                e.preventDefault();
+                if (typeof window.applyMarkdownItalic === 'function') {
+                    window.applyMarkdownItalic();
+                } else if (typeof applyMarkdownItalic === 'function') {
+                    applyMarkdownItalic();
+                }
+                return;
+            }
         }
     }
 
