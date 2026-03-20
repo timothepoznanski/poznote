@@ -264,7 +264,6 @@ class GitSync {
             'configured' => $this->isConfigured(),
             'repo' => $this->repo ?: null,
             'branch' => $this->branch,
-            'token' => $this->token,
             'hasToken' => !empty($this->token),
             'authorName' => $this->authorName,
             'authorEmail' => $this->authorEmail,

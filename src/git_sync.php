@@ -357,8 +357,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     
                     <div class="git-field-group">
                         <label class="git-field-label" for="git_token"><?php echo tp_h('git_sync.config.token'); ?></label>
-                        <input type="text" name="git_token" id="git_token" class="git-field-input" 
-                               value="<?php echo htmlspecialchars($configStatus['token'] ?? ''); ?>" 
+                        <input type="password" name="git_token" id="git_token" class="git-field-input" 
+                               value="<?php echo $configStatus['hasToken'] ? '••••••••' : ''; ?>" 
                                placeholder="ghp_xxxx..." autocomplete="off">
                     </div>
                     
@@ -564,6 +564,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             tokenInput.placeholder = provider === 'forgejo'
                 ? 'a1b2c3d4e5f6... (Settings > Applications)'
                 : 'ghp_xxxx... (github.com/settings/tokens)';
+        }
+
+        // Clear masked placeholder on focus so user can type new token
+        const tokenField = document.getElementById('git_token');
+        if (tokenField) {
+            tokenField.addEventListener('focus', function() {
+                if (this.value === '••••••••') {
+                    this.value = '';
+                }
+            });
+            tokenField.addEventListener('blur', function() {
+                if (this.value === '') {
+                    <?php if ($configStatus['hasToken']): ?>
+                    this.value = '••••••••';
+                    <?php endif; ?>
+                }
+            });
         }
 
         if (providerSelect) {
