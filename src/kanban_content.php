@@ -181,7 +181,6 @@ try {
                         data-parent-id="<?php echo $folder_id; ?>" 
                         title="<?php echo t_h('kanban.add_column', [], 'Add column'); ?>">
                     <i class="lucide lucide-plus-circle"></i>
-                    <span><?php echo t_h('kanban.add_column', [], 'Add column'); ?></span>
                 </button>
             </div>
         </div>
