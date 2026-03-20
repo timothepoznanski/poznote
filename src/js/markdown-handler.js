@@ -310,6 +310,18 @@ function parseMarkdown(text) {
         return id ? parseInt(id, 10) : null;
     }
 
+    // Extract and protect fenced code blocks first so they are not processed by other rules
+    let protectedFencedCode = [];
+    let fencedCodeIndex = 0;
+    // Match: ```lang [newline] content [newline] ```
+    // Also match code blocks that are at the very start of the text
+    text = text.replace(/(?:^|\n)(\s*```[^\n]*\n[\s\S]*?\n\s*```)(?=\n|$)/g, function (match, p1) {
+        let placeholder = '\x00FENCEDCODE' + fencedCodeIndex + '\x00';
+        protectedFencedCode[fencedCodeIndex] = match;
+        fencedCodeIndex++;
+        return (match.startsWith('\n') ? '\n' : '') + placeholder;
+    });
+
     // Protect inline code spans so their content is not consumed by math regexes
     let protectedRawCode = [];
     let rawCodeIndex = 0;
@@ -571,6 +583,11 @@ function parseMarkdown(text) {
         .replace(/>/g, '&gt;')
         .replace(/\\(\$)/g, '$1');
 
+    // Restore protected fenced code blocks BEFORE line-by-line processing
+    html = html.replace(/\x00FENCEDCODE(\d+)\x00/g, function (match, index) {
+        return protectedFencedCode[parseInt(index)] || match;
+    });
+
     // Helper function to apply inline styles (bold, italic, code, etc.)
     function applyInlineStyles(text) {
         function linkifyPlainUrls(input) {
@@ -701,22 +718,15 @@ function parseMarkdown(text) {
                         .replace(/&#039;/g, "'");
                     result.push('<div class="mermaid">' + unescapedContent + '</div>');
                 } else {
-                    // Restore span color placeholders inside code blocks to allow coloring
-                    codeContent = codeContent.replace(/\x00PSPAN(\d+)\x00/g, function (match, index) {
-                        let elem = protectedElements[parseInt(index)];
-                        if (elem) {
-                            // Force font-family to inherit so it stays monospace inside code block
-                            return elem.replace(/style="/i, 'style="font-family:inherit; ');
-                        }
-                        return match;
-                    });
+                    let escapedCodeContent = escapeHtml(codeContent);
+                    let escapedCodeBlockLang = escapeHtml(codeBlockLang || '');
                     const normalizedCodeBlockLang = codeBlockLang ? codeBlockLang.trim().toLowerCase() : '';
                     if (normalizedCodeBlockLang === 'normal') {
-                        result.push('<pre data-language="NORMAL"><code data-language="NORMAL">' + codeContent + '</code></pre>');
+                        result.push('<pre data-language="NORMAL"><code data-language="NORMAL">' + escapedCodeContent + '</code></pre>');
                     } else if (codeBlockLang) {
-                        result.push('<pre data-language="' + codeBlockLang + '"><code class="language-' + codeBlockLang + '">' + codeContent + '</code></pre>');
+                        result.push('<pre data-language="' + escapedCodeBlockLang + '"><code class="language-' + escapedCodeBlockLang + '">' + escapedCodeContent + '</code></pre>');
                     } else {
-                        result.push('<pre><code>' + codeContent + '</code></pre>');
+                        result.push('<pre><code>' + escapedCodeContent + '</code></pre>');
                     }
                 }
                 codeBlockContent = [];
