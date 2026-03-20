@@ -54,7 +54,7 @@
 }
 
 .home-card-red .home-card-icon i {
-    color: #ef4444;
+    color: #f87171;
 }
 
 html[data-theme='dark'] .home-card-red .home-card-icon,
@@ -63,7 +63,7 @@ body.dark-mode .home-card-red .home-card-icon {
 }
 
 .home-card-red:hover {
-    border-color: #ef4444;
+    border-color: #f87171;
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
 }
 
@@ -186,7 +186,7 @@ body.dark-mode .home-card-green .home-card-icon {
 
 .home-card-description {
     font-size: 11px;
-    color: #dc3545;
+    /* color: #dc3545; */
     font-weight: 500;
     margin-top: 2px;
     display: block;

@@ -452,9 +452,13 @@
     padding-left: 4px !important;
 }
 
-/* Hover effect: blue and bold title when hovering over a note */
+/* Hover effect: blue background and bold title when hovering over a note */
+.links_arbo_left:hover {
+    background-color: #0b4da6 !important;
+}
+
 .links_arbo_left:hover .note-title {
-    color: #0b4da6 !important;
+    color: #ffffff !important;
     font-weight: 600 !important;
     transition: color 0.2s ease, font-weight 0.2s ease;
 }

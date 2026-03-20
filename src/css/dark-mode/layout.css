@@ -275,7 +275,12 @@ body.dark-mode .links_arbo_left {
 
 html[data-theme='dark'] .links_arbo_left:hover,
 body.dark-mode .links_arbo_left:hover {
-    background-color: var(--dm-surface);
+    background-color: var(--dm-surface) !important;
+}
+
+html[data-theme='dark'] .links_arbo_left:hover .note-title,
+body.dark-mode .links_arbo_left:hover .note-title {
+    color: #5f94f7 !important;
 }
 
 html[data-theme='dark'] .links_arbo_left.active,

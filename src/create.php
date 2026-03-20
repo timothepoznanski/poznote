@@ -76,7 +76,7 @@ $currentLang = getUserLanguage();
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('modals.create.note.title', [], 'Note'); ?></span>
-                    <span class="home-card-description"><?php echo t_h('modals.create.note.description', [], 'Not Markdown'); ?></span>
+                    <span class="home-card-description"><?php echo t_h('modals.create.note.description', [], 'Simple Note'); ?></span>
                 </div>
             </a>
 
@@ -87,7 +87,7 @@ $currentLang = getUserLanguage();
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('modals.create.markdown.title', [], 'Markdown Note'); ?></span>
-                    <span class="home-card-description"><?php echo t_h('modals.create.markdown.description', [], 'Not HTML'); ?></span>
+                    <span class="home-card-description"><?php echo t_h('modals.create.markdown.description', [], 'Rich text'); ?></span>
                 </div>
             </a>
 

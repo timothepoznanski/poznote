@@ -120,7 +120,7 @@
 }
 
 [data-theme="dark"] .app-tab-title {
-    color: #7a7a7a;
+    color: #b0b0b0;
 }
 
 [data-theme="dark"] .app-tab.active .app-tab-title {
@@ -128,11 +128,15 @@
 }
 
 [data-theme="dark"] .app-tab-close {
-    color: #555;
+    color: #888;
+}
+
+[data-theme="dark"] .app-tab:hover .app-tab-title {
+    color: #d1d5db;
 }
 
 [data-theme="dark"] .app-tab.active .app-tab-close {
-    color: #888;
+    color: #bbb;
 }
 
 [data-theme="dark"] .app-tab-close:hover {

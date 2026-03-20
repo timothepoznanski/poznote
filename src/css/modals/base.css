@@ -159,14 +159,14 @@
 }
 
 .modal-buttons button.btn-cancel {
-    background-color: #dc3545;
+    background-color: #6c757d;
     color: white;
-    border: 1px solid #dc3545;
+    border: 1px solid #6c757d;
 }
 
 .modal-buttons button.btn-cancel:hover {
-    background-color: #c82333;
-    border-color: #bd2130;
+    background-color: #5a6268;
+    border-color: #545b62;
 }
 
 .modal-buttons button.btn-success {
