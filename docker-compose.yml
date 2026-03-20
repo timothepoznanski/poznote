@@ -14,7 +14,7 @@
 
 services:
   webserver:
-    image: ghcr.io/timothepoznanski/poznote:4
+    image: ghcr.io/timothepoznanski/poznote:5
     restart: always
     env_file: .env
     environment:
@@ -25,7 +25,7 @@ services:
       - "./data:/var/www/html/data"
 
   mcp-server:
-    image: ghcr.io/timothepoznanski/poznote-mcp:4
+    image: ghcr.io/timothepoznanski/poznote-mcp:5
     container_name: poznote-mcp
     restart: unless-stopped
     environment:

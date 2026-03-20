@@ -123,6 +123,11 @@ try {
             return '';
         }
         
+        // Remove individual code block language tags from class and data-language attributes
+        // This prevents searching for "shell" or "java" matching the language tag but not the content
+        $html = preg_replace('/class="[^"]*language-([^"\s>]+)[^"]*"/i', '', $html);
+        $html = preg_replace('/data-language="[^"]*"/i', '', $html);
+
         // Remove Excalidraw containers with their data-excalidraw attributes and base64 images
         $html = preg_replace(
             '/<div[^>]*class="excalidraw-container"[^>]*>.*?<\/div>/s',

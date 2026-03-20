@@ -58,9 +58,12 @@ function setupBrowserNavigationHandler() {
         // Handle URL-based navigation (browser back/forward)
         var url = new URL(window.location.href);
         var noteParam = url.searchParams.get('note');
+        var kanbanParam = url.searchParams.get('kanban');
 
         if (noteParam && typeof loadNoteFromUrl === 'function') {
             loadNoteFromUrl(window.location.href, true);
+        } else if (kanbanParam && typeof window.openKanbanView === 'function') {
+            window.openKanbanView(parseInt(kanbanParam, 10));
         } else if (!noteParam && url.searchParams.get('workspace')) {
             // Just workspace change, let ui.js handler manage it
         } else {

@@ -339,7 +339,7 @@ body.dark-mode .btn-warning {
 html[data-theme='dark'] .btn-rename,
 body.dark-mode .btn-rename {
     background-color: #ffc107 !important;
-    color: white !important;
+    color: #212529 !important;
     border-color: #ffc107 !important;
 }
 

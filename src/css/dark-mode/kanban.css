@@ -73,6 +73,19 @@ body.dark-mode .kanban-add-card-btn:focus {
     outline-offset: 2px;
 }
 
+html[data-theme='dark'] .kanban-add-column-btn,
+body.dark-mode .kanban-add-column-btn {
+    background: var(--dm-surface);
+    color: var(--dm-text-muted);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .kanban-add-column-btn:hover,
+body.dark-mode .kanban-add-column-btn:hover {
+    background: var(--dm-border);
+    color: #fff;
+}
+
 /* Kanban Cards */
 html[data-theme='dark'] .kanban-card,
 body.dark-mode .kanban-card {

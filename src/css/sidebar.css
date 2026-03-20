@@ -449,7 +449,7 @@
 /* Notes without folder - indent to align with folder items */
 .links_arbo_left.note-without-folder {
     margin-left: 0px !important;
-    padding-left: 4px !important;
+    padding-left: 7px !important;
 }
 
 /* Hover effect: blue and bold title when hovering over a note */

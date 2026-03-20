@@ -334,6 +334,12 @@ body.outline-mobile-open .outline-mobile-backdrop {
     pointer-events: auto;
 }
 
+/* Hide outline panel and resize handle in Kanban view */
+.kanban-page #outline-panel,
+.kanban-page .outline-resize-handle {
+    display: none !important;
+}
+
 /* DARK MODE SUPPORT */
 
 body.dark-mode #outline-panel,
