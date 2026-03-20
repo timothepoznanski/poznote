@@ -61,6 +61,47 @@ class GitSync {
     }
     
     /**
+     * Derive a 32-byte encryption key from the instance secret.
+     * Uses POZNOTE_APP_SECRET env var, or auto-generates and persists a key file.
+     */
+    private function getEncryptionKey(): string {
+        $secret = getenv('POZNOTE_APP_SECRET');
+        if (!$secret) {
+            $keyFile = dirname(__DIR__) . '/data/.app_secret';
+            if (file_exists($keyFile)) {
+                $secret = trim(file_get_contents($keyFile));
+            } else {
+                $secret = bin2hex(random_bytes(32));
+                file_put_contents($keyFile, $secret);
+                chmod($keyFile, 0600);
+            }
+        }
+        return hash('sha256', $secret, true);
+    }
+
+    private function encryptToken(string $plain): string {
+        $key = $this->getEncryptionKey();
+        $iv = random_bytes(12);
+        $tag = '';
+        $cipher = openssl_encrypt($plain, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
+        return 'enc1:' . base64_encode($iv . $tag . $cipher);
+    }
+
+    private function decryptToken(string $stored): string {
+        if (strncmp($stored, 'enc1:', 5) !== 0) {
+            // Legacy plaintext value — return as-is (backward compat)
+            return $stored;
+        }
+        $key = $this->getEncryptionKey();
+        $data = base64_decode(substr($stored, 5));
+        $iv   = substr($data, 0, 12);
+        $tag  = substr($data, 12, 16);
+        $cipher = substr($data, 28);
+        $plain = openssl_decrypt($cipher, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
+        return $plain !== false ? $plain : '';
+    }
+
+    /**
      * Load per-user Git settings from the user's database.
      * Returns an associative array of settings, empty if none found.
      */
@@ -76,7 +117,11 @@ class GitSync {
             $settings = [];
             foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 if ($row['value'] !== null && $row['value'] !== '') {
-                    $settings[$row['key']] = $row['value'];
+                    $value = $row['value'];
+                    if ($row['key'] === 'git_token') {
+                        $value = $this->decryptToken($value);
+                    }
+                    $settings[$row['key']] = $value;
                 }
             }
             return $settings;
@@ -107,7 +152,11 @@ class GitSync {
             $stmt = $this->con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
             foreach ($mapping as $inputKey => $dbKey) {
                 if (array_key_exists($inputKey, $config)) {
-                    $stmt->execute([$dbKey, trim($config[$inputKey])]);
+                    $value = trim($config[$inputKey]);
+                    if ($inputKey === 'token' && $value !== '') {
+                        $value = $this->encryptToken($value);
+                    }
+                    $stmt->execute([$dbKey, $value]);
                 }
             }
             

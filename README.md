@@ -536,44 +536,44 @@ bash backup-poznote.sh '<poznote_url>' '<admin_username>' '<admin_password>' '<t
 
 ## Git Synchronization
 
-Poznote supports automatic and manual synchronization with Git providers like **GitHub** or **Forgejo**. This allows you to keep a versioned history of your notes and sync them across multiple instances.
+Poznote supports automatic and manual synchronization with **GitHub** or **Forgejo**. Each user configures their own repository independently. There is no shared global repository.
 
 <details>
 <summary><strong>How to configure Git Sync</strong></summary>
 <br>
 
-To enable Git synchronization, you need to configure the following variables in your `.env` file:
+**Step 1 — Enable the feature (admin, in `.env`)**
 
 ```bash
-# Enable Git Sync
 POZNOTE_GIT_SYNC_ENABLED=true
-
-# Provider: 'github' or 'forgejo'
-POZNOTE_GIT_PROVIDER=github
-
-# Your Personal Access Token (PAT)
-POZNOTE_GIT_TOKEN=ghp_your_token
-
-# Repository (format: username/repo)
-POZNOTE_GIT_REPO=yourname/notes-backup
-
-# Branch (default: main)
-POZNOTE_GIT_BRANCH=main
-
-# API Base URL (Required for Forgejo)
-# Example: http://your-instance:3000/api/v1
-POZNOTE_GIT_API_BASE=
 ```
 
-> 💡 **Note:** For GitHub, the API Base URL is automatically set to `https://api.github.com`. For Forgejo, ensure you include the `/api/v1` suffix.
+That's the only `.env` setting required. Token, repository, and provider are configured per-user.
 
-#### Automatic Sync
+---
 
-When enabled, Poznote will automatically:
-- **Pull** changes from the repository upon login.
-- **Push** changes (commits) to the repository whenever a note is created, updated, or deleted.
+**Step 2 — Each user configures their own repo (Settings > Git Sync)**
 
-You can also trigger manual push/pull from the **Sync Status** page (accessible via the cloud icon in the header).
+| Field | Description |
+|---|---|
+| Provider | `GitHub` or `Forgejo` |
+| API Base URL | GitHub: auto-filled (read-only). Forgejo: your instance URL, e.g. `https://forgejo.example.com/api/v1` |
+| Access Token | GitHub PAT (`ghp_...`) or Forgejo token (Settings > Applications) |
+| Repository | `owner/repo` format |
+| Branch | Default: `main` |
+| Author Name / Email | Used for commit metadata |
+
+> 🔒 Access tokens are encrypted at rest using AES-256-GCM. Set `POZNOTE_APP_SECRET` in your `.env` (generated with `openssl rand -hex 32`) to ensure the encryption key survives container rebuilds. If not set, a key is auto-generated and stored in `data/.app_secret`.
+
+---
+
+**Automatic sync**
+
+When enabled by the user, Poznote will automatically:
+- **Pull** on login
+- **Push** on every note create, update, or delete
+
+Manual push/pull is also available from the **Sync Status** page (cloud icon in the header).
 
 </details>
 
