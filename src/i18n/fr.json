@@ -79,6 +79,9 @@
       "disable": "Désactiver la vue Kanban",
       "open": "Ouvrir la vue Kanban"
     },
+    "add_column": "Ajouter une colonne",
+    "new_column_title": "Nouvelle colonne",
+    "new_column_placeholder": "Nom de la colonne",
     "notifications": {
       "activated_title": "Vue Kanban activée",
       "activated_message": "Ce dossier est maintenant en mode Kanban. Cliquez sur son icône pour ouvrir le tableau."
@@ -2075,7 +2078,19 @@
       "toggle_admin": "Basculer le rôle Administrateur",
       "click_to_deactivate": "Cliquer pour désactiver",
       "click_to_activate": "Cliquer pour activer",
-      "id": "ID"
+      "confirm_admin": {
+        "title": "Confirmer le passage en Administrateur",
+        "message": "Êtes-vous sûr de vouloir donner les privilèges administrateur à \"{{username}}\" ?",
+        "privileges_title": "L'administrateur pourra :",
+        "privilege_notes": "Exporter les notes de n'importe quel utilisateur dans un fichier ZIP",
+        "privilege_passwords": "Changer les mots de passe de tous les autres utilisateurs",
+        "privilege_admin_panel": "Accéder à ce panneau de gestion des utilisateurs",
+        "confirm_button": "Confirmer le passage admin"
+      },
+      "id": "ID",
+      "admin_id_1_locked": "Le rôle d'administrateur ne peut pas être retiré à l'utilisateur ID 1",
+      "toggle_admin": "Accorder ou révoquer les privilèges d'administrateur",
+      "admin_note": "Utilisez la case à cocher Admin pour accorder ou révoquer les privilèges d'administrateur pour un autre utilisateur."
     },
     "profile": {
       "title": "Mon profil",
@@ -2162,7 +2177,13 @@
       "token_missing": "Non configuré",
       "not_configured": "Non configuré",
       "not_configured_yet": "À configurer",
-      "hint": "La synchronisation {{provider}} est désactivée. Définissez POZNOTE_GIT_SYNC_ENABLED=true dans votre fichier .env pour l'activer."
+      "hint": "La synchronisation {{provider}} est désactivée. Un administrateur doit définir POZNOTE_GIT_SYNC_ENABLED=true dans votre fichier .env pour l'activer.",
+      "hint_enable": "La synchronisation Git est désactivée. Un administrateur doit définir POZNOTE_GIT_SYNC_ENABLED=true dans vos variables d'environnement pour l'activer.",
+      "provider": "Fournisseur",
+      "api_base": "URL de base de l'API",
+      "author_name": "Nom de l'auteur",
+      "author_email": "Email de l'auteur",
+      "save": "Enregistrer la configuration"
     },
     "auto_sync": {
       "title": "Synchronisation automatique",
@@ -2206,7 +2227,9 @@
       "push_success": "{{count}} notes envoyées avec succès, {{deleted}} fichiers supprimés ({{errors}} erreurs)",
       "push_error": "Échec de l'envoi : {{error}}",
       "pull_success": "{{pulled}} nouvelles notes récupérées, {{updated}} notes existantes mises à jour, {{deleted}} notes supprimées ({{errors}} erreurs)",
-      "pull_error": "Échec de la récupération : {{error}}"
+      "pull_error": "Échec de la récupération : {{error}}",
+      "config_saved": "Configuration enregistrée avec succès.",
+      "config_save_error": "Échec de l'enregistrement de la configuration."
     },
     "debug": {
       "title": "Informations de debug",

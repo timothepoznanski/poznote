@@ -1124,6 +1124,11 @@ function addLinkToNote() {
         try { noteentryLink.focus({ preventScroll: true }); } catch (e) { noteentryLink.focus(); }
       }
 
+      // Save range for markdown mode too
+      if (sel && sel.rangeCount > 0) {
+        window.savedRanges.link = sel.getRangeAt(0).cloneRange();
+      }
+
       showLinkModal(existingUrl, existingText, function (url, text) {
         if (url === null) {
           // Remove link - replace with just text

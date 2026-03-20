@@ -175,6 +175,14 @@ try {
                       data-folder-name="<?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?>"
                       style="cursor: pointer;"><?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?></span>
             </h1>
+            <div class="kanban-header-actions">
+                <button class="kanban-add-column-btn" 
+                        data-action="create-kanban-column" 
+                        data-parent-id="<?php echo $folder_id; ?>" 
+                        title="<?php echo t_h('kanban.add_column', [], 'Add column'); ?>">
+                    <i class="lucide lucide-plus-circle"></i>
+                </button>
+            </div>
         </div>
 
         <!-- Kanban Board Wrapper -->

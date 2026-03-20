@@ -1287,6 +1287,9 @@
       "disable": "Disable Kanban view",
       "open": "Open Kanban view"
     },
+    "add_column": "Add column",
+    "new_column_title": "New Column",
+    "new_column_placeholder": "Column name",
     "notifications": {
       "activated_title": "Kanban view enabled",
       "activated_message": "This folder is now in Kanban mode. Click its icon to open the board."
@@ -1560,7 +1563,13 @@
       "token_missing": "Not configured",
       "not_configured": "Not configured",
       "not_configured_yet": "To configure",
-      "hint": "{{provider}} sync is disabled. Set POZNOTE_GIT_SYNC_ENABLED=true in your .env file to enable it."
+      "hint": "{{provider}} sync is disabled. An administrator should set POZNOTE_GIT_SYNC_ENABLED=true in your .env file to enable it.",
+      "hint_enable": "Git sync is disabled. An administrator should set POZNOTE_GIT_SYNC_ENABLED=true in your environment variables to enable it.",
+      "provider": "Provider",
+      "api_base": "API Base URL",
+      "author_name": "Author Name",
+      "author_email": "Author Email",
+      "save": "Save Configuration"
     },
     "auto_sync": {
       "title": "Automatic Synchronization",
@@ -1604,7 +1613,9 @@
       "push_success": "Successfully pushed {{count}} notes, deleted {{deleted}} files ({{errors}} errors)",
       "push_error": "Push failed: {{error}}",
       "pull_success": "Successfully pulled {{pulled}} new notes, updated {{updated}} existing notes, deleted {{deleted}} notes ({{errors}} errors)",
-      "pull_error": "Pull failed: {{error}}"
+      "pull_error": "Pull failed: {{error}}",
+      "config_saved": "Configuration saved successfully.",
+      "config_save_error": "Failed to save configuration."
     },
     "debug": {
       "title": "Debug Info",
@@ -1733,9 +1744,32 @@
   },
   "multiuser": {
     "admin": {
+      "id": "ID",
+      "username": "User",
+      "email": "Email",
       "administrator": "Administrator",
+      "status": "Status",
+      "actions": "Actions",
+      "active": "Active",
+      "inactive": "Inactive",
+      "not_defined": "not defined",
+      "create_user": "Create Profile",
+      "edit_user": "Edit User",
+      "click_to_activate": "Click to activate",
+      "click_to_deactivate": "Click to deactivate",
+      "toggle_admin": "Grant or revoke administrator privileges",
+      "admin_id_1_locked": "Administrator role cannot be removed from user ID 1",
       "email_usage_note": "Email addresses are only used for OIDC authentication if configured. Poznote does not send any emails.",
-      "admin_note": "Only user 1 is an administrator. Other users cannot have administrator privileges.",
+      "admin_note": "Use the Admin checkbox to grant or revoke administrator privileges for another user.",
+      "confirm_admin": {
+        "title": "Confirm Promotion to Administrator",
+        "message": "Are you sure you want to grant administrator privileges to \"{{username}}\" ?",
+        "privileges_title": "The administrator will be able to:",
+        "privilege_notes": "Export notes from any user into a ZIP file",
+        "privilege_passwords": "Change passwords of all other users",
+        "privilege_admin_panel": "Access this user management panel",
+        "confirm_button": "Confirm admin promotion"
+      },
       "password_management": {
         "manage_password": "Password",
         "reset_password": "Reset Password",
@@ -1754,6 +1788,11 @@
         "status_custom_detail": "This user uses a custom password.",
         "status_default_detail": "This user uses the default password found in the environment variables.",
         "changed_at_prefix": "Updated:"
+      },
+      "errors": {
+        "cannot_delete_self": "You cannot delete your own profile",
+        "cannot_change_self": "You cannot change your own status/role",
+        "username_required": "Username is required"
       }
     }
   },

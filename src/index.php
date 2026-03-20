@@ -49,10 +49,10 @@ require_once 'folders_display.php';
 
 // GitHub Sync Logic
 require_once 'GitSync.php';
-$gitSync = new GitSync($con);
+$gitSync = new GitSync($con, $_SESSION['user_id'] ?? null);
 $gitEnabled = GitSync::isEnabled() && $gitSync->isConfigured();
 $isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
-$showGitSync = $gitEnabled && $isAdmin;
+$showGitSync = $gitEnabled; // All users with configured git can sync
 $gitProvider = function_exists('getGitProviderName') ? getGitProviderName() : 'Git';
 
 // Check if we need to redirect to include workspace from database settings
@@ -501,6 +501,9 @@ $body_classes = trim($extra_body_classes);
                     echo '<div class="note-header">';
                     echo '<div class="note-edit-toolbar">';
                     
+                    // Back/Forward navigation buttons (desktop only)
+                    echo '<button type="button" id="note-history-back" class="toolbar-btn btn-history-nav btn-history-back history-disabled" title="' . t_h('editor.toolbar.go_back', [], 'Go back') . '" disabled><i class="lucide lucide-chevron-left"></i></button>';
+                    
                     // Build home URL with search preservation
                     $home_url = 'index.php';
                     $home_params = [];
@@ -712,6 +715,9 @@ $body_classes = trim($extra_body_classes);
                     }
                     
                     echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" data-action="delete-note" data-note-id="'.$row['id'].'" title="'.t_h('common.delete', [], 'Delete').'"><i class="lucide lucide-trash-2"></i></button>';
+                    
+                    // Forward navigation button (desktop only)
+                    echo '<button type="button" id="note-history-forward" class="toolbar-btn btn-history-nav btn-history-forward history-disabled" title="' . t_h('editor.toolbar.go_forward', [], 'Go forward') . '" disabled><i class="lucide lucide-chevron-right"></i></button>';
                     
                     echo '<button type="button" class="toolbar-btn btn-info note-action-btn" title="'.t_h('common.information', [], 'Information').'" data-action="show-note-info" data-note-id="'.$row['id'].'" data-created="'.htmlspecialchars($final_created, ENT_QUOTES).'" data-updated="'.htmlspecialchars($final_updated, ENT_QUOTES).'" data-folder="'.htmlspecialchars($folder_name, ENT_QUOTES).'" data-favorite="'.$is_favorite.'" data-tags="'.htmlspecialchars($tags_data, ENT_QUOTES).'" data-attachments-count="'.$attachments_count.'"><i class="lucide lucide-info-circle"></i></button>';
                 
@@ -1013,6 +1019,7 @@ $body_classes = trim($extra_body_classes);
 <script src="js/events-utils.js?v=<?php echo $v; ?>"></script>
 <script src="js/events-auto-save.js?v=<?php echo $v; ?>"></script>
 <script src="js/events-drag-drop.js?v=<?php echo $v; ?>"></script>
+<script src="js/note-history.js?v=<?php echo $v; ?>"></script>
 <script src="js/events-navigation.js?v=<?php echo $v; ?>"></script>
 <script src="js/events-rich-text-editing.js?v=<?php echo $v; ?>"></script>
 <script src="js/events-text-selection.js?v=<?php echo $v; ?>"></script>

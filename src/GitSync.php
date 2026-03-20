@@ -3,7 +3,8 @@
  * GitSync - Git synchronization for Poznote notes (GitHub, Forgejo)
  * 
  * Handles pushing and pulling notes from a Git repository using the provider's API.
- * All configuration is stored in environment variables for security.
+ * Per-user configuration is stored in the user's database settings table,
+ * with environment variables as fallback defaults.
  */
 
 class GitSync {
@@ -21,34 +22,171 @@ class GitSync {
     private $con;
     
     /**
-     * @var int|null User ID - Reserved for future multi-user support
+     * @var int|null User ID for per-user Git sync configuration
      */
     private $userId;
     
     /**
      * Constructor
-     * @param PDO|null $con Database connection
-     * @param int|null $userId User ID (reserved for future use)
+     * @param PDO|null $con Database connection (user's database)
+     * @param int|null $userId User ID for per-user config
      */
     public function __construct($con = null, $userId = null) {
         require_once __DIR__ . '/config.php';
         
-        $this->token = trim(defined('GIT_TOKEN') ? GIT_TOKEN : '');
-        $this->repo = trim(defined('GIT_REPO') ? GIT_REPO : '');
-        $this->branch = trim(defined('GIT_BRANCH') ? GIT_BRANCH : 'main');
-        $this->authorName = defined('GIT_AUTHOR_NAME') ? GIT_AUTHOR_NAME : 'Poznote';
-        $this->authorEmail = defined('GIT_AUTHOR_EMAIL') ? GIT_AUTHOR_EMAIL : 'poznote@localhost';
-        $this->provider = defined('GIT_PROVIDER') ? GIT_PROVIDER : 'github';
-        
-        $this->apiBase = trim(defined('GIT_API_BASE') && !empty(GIT_API_BASE) ? GIT_API_BASE : $this->getDefaultApiBase());
-        
         $this->con = $con;
         $this->userId = $userId;
+
+        // Load per-user settings from DB, falling back to env vars
+        $userSettings = $this->loadUserGitSettings();
+        
+        // Critical settings: Token and Repo must BE SPECIFIC to each user.
+        // We do NOT use global fallbacks from .env for these to prevent accidental cross-user synchronization.
+        $this->token = trim($userSettings['git_token'] ?? '');
+        $this->repo = trim($userSettings['git_repo'] ?? '');
+        
+        // Per-user settings — no global fallback needed
+        $this->branch = trim($userSettings['git_branch'] ?? 'main');
+        $this->authorName = $userSettings['git_author_name'] ?? 'Poznote';
+        $this->authorEmail = $userSettings['git_author_email'] ?? 'poznote@localhost';
+        $this->provider = $userSettings['git_provider'] ?? 'github';
+        
+        $userApiBase = $userSettings['git_api_base'] ?? null;
+        $this->apiBase = !empty($userApiBase) ? trim($userApiBase) : $this->getDefaultApiBase();
 
         // Initialize progress only if it doesn't exist to avoid resetting on mid-sync requests
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
+    }
+    
+    /**
+     * Derive a 32-byte encryption key from the instance secret.
+     * Uses POZNOTE_APP_SECRET env var, or auto-generates and persists a key file.
+     */
+    private function getEncryptionKey(): string {
+        $secret = getenv('POZNOTE_APP_SECRET');
+        if (!$secret) {
+            // __DIR__ in container = /var/www/html (where src/ is mounted)
+            // so data/ is at __DIR__ . '/data/'
+            $keyFile = __DIR__ . '/data/.app_secret';
+            if (file_exists($keyFile)) {
+                $secret = trim(file_get_contents($keyFile));
+            } else {
+                $secret = bin2hex(random_bytes(32));
+                file_put_contents($keyFile, $secret);
+                chmod($keyFile, 0600);
+            }
+        }
+        return hash('sha256', $secret, true);
+    }
+
+    private function encryptToken(string $plain): string {
+        $key = $this->getEncryptionKey();
+        $iv = random_bytes(12);
+        $tag = '';
+        $cipher = openssl_encrypt($plain, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
+        return 'enc1:' . base64_encode($iv . $tag . $cipher);
+    }
+
+    private function decryptToken(string $stored): string {
+        if (strncmp($stored, 'enc1:', 5) !== 0) {
+            // Legacy plaintext value — return as-is (backward compat)
+            return $stored;
+        }
+        $key = $this->getEncryptionKey();
+        $data = base64_decode(substr($stored, 5));
+        $iv   = substr($data, 0, 12);
+        $tag  = substr($data, 12, 16);
+        $cipher = substr($data, 28);
+        $plain = openssl_decrypt($cipher, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
+        return $plain !== false ? $plain : '';
+    }
+
+    /**
+     * Load per-user Git settings from the user's database.
+     * Returns an associative array of settings, empty if none found.
+     */
+    private function loadUserGitSettings() {
+        if (!$this->con) return [];
+        
+        try {
+            $keys = ['git_token', 'git_repo', 'git_branch', 'git_provider', 'git_api_base', 'git_author_name', 'git_author_email'];
+            $placeholders = implode(',', array_fill(0, count($keys), '?'));
+            $stmt = $this->con->prepare("SELECT key, value FROM settings WHERE key IN ($placeholders)");
+            $stmt->execute($keys);
+            
+            $settings = [];
+            foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                if ($row['value'] !== null && $row['value'] !== '') {
+                    $value = $row['value'];
+                    if ($row['key'] === 'git_token') {
+                        $value = $this->decryptToken($value);
+                    }
+                    $settings[$row['key']] = $value;
+                }
+            }
+            return $settings;
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+    
+    /**
+     * Save per-user Git configuration to the user's database.
+     * @param array $config Associative array with keys: token, repo, branch, provider, api_base, author_name, author_email
+     * @return bool Success
+     */
+    public function saveUserGitConfig($config) {
+        if (!$this->con) return false;
+        
+        $mapping = [
+            'token' => 'git_token',
+            'repo' => 'git_repo',
+            'branch' => 'git_branch',
+            'provider' => 'git_provider',
+            'api_base' => 'git_api_base',
+            'author_name' => 'git_author_name',
+            'author_email' => 'git_author_email',
+        ];
+        
+        try {
+            $stmt = $this->con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
+            foreach ($mapping as $inputKey => $dbKey) {
+                if (array_key_exists($inputKey, $config)) {
+                    $value = trim($config[$inputKey]);
+                    if ($inputKey === 'token' && $value !== '') {
+                        $value = $this->encryptToken($value);
+                    }
+                    $stmt->execute([$dbKey, $value]);
+                }
+            }
+            
+            // Reload instance properties from the saved config
+            $userSettings = $this->loadUserGitSettings();
+            $this->token = trim($userSettings['git_token'] ?? '');
+            $this->repo = trim($userSettings['git_repo'] ?? '');
+            $this->branch = trim($userSettings['git_branch'] ?? 'main');
+            $this->authorName = $userSettings['git_author_name'] ?? 'Poznote';
+            $this->authorEmail = $userSettings['git_author_email'] ?? 'poznote@localhost';
+            $this->provider = $userSettings['git_provider'] ?? 'github';
+            $userApiBase = $userSettings['git_api_base'] ?? null;
+            $this->apiBase = !empty($userApiBase) ? trim($userApiBase) : $this->getDefaultApiBase();
+            
+            return true;
+        } catch (Exception $e) {
+            error_log("GitSync::saveUserGitConfig error: " . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Check if current user has per-user Git config (as opposed to using env vars)
+     * @return bool
+     */
+    public function hasUserConfig() {
+        $settings = $this->loadUserGitSettings();
+        return !empty($settings['git_token']) || !empty($settings['git_repo']);
     }
 
     /**
@@ -128,10 +266,12 @@ class GitSync {
             'branch' => $this->branch,
             'hasToken' => !empty($this->token),
             'authorName' => $this->authorName,
+            'authorEmail' => $this->authorEmail,
             'provider' => $this->provider,
             'apiBase' => $this->apiBase,
             'autoPush' => $this->isAutoPushEnabled(),
-            'autoPull' => $this->isAutoPullEnabled()
+            'autoPull' => $this->isAutoPullEnabled(),
+            'hasUserConfig' => $this->hasUserConfig()
         ];
     }
     

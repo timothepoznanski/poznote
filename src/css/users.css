@@ -143,6 +143,15 @@ body.dark-mode {
     margin-top: 10px;
 }
 
+.btn-cancel-admin {
+    background-color: #dc3545 !important;
+    color: white !important;
+}
+
+.btn-cancel-admin:hover {
+    background-color: #c82333 !important;
+}
+
 .btn.disabled,
 .btn:disabled {
     opacity: 0.5;

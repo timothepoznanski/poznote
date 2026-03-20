@@ -713,6 +713,10 @@ function updateSelectedNote(clickedLink) {
  * Update browser URL without reload
  */
 function updateBrowserUrl(url, noteId) {
+    // Track this note in navigation history
+    if (typeof NoteHistory !== 'undefined' && NoteHistory.push) {
+        NoteHistory.push(noteId);
+    }
     try {
         // Merge existing search params (search, tags_search, workspace, preserve_notes, preserve_tags, search_combined) into the target URL
         const currentParams = new URLSearchParams(window.location.search || '');
@@ -1395,6 +1399,11 @@ function reinitializeNoteContent() {
 
     // Re-initialize image click handlers
     reinitializeImageClickHandlers();
+
+    // Update note history navigation buttons
+    if (typeof NoteHistory !== 'undefined' && NoteHistory.updateButtons) {
+        NoteHistory.updateButtons();
+    }
 
     // Re-initialize note drag and drop events
     if (typeof setupNoteDragDropEvents === 'function') {

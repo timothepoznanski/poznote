@@ -405,10 +405,15 @@ function parseMarkdown(text) {
         return placeholder;
     });
 
-    // Protect details and summary tags
-    text = text.replace(/<(details|summary)([^>]*)>/gi, function (match, tag, attrs) {
+    // Protect details, summary, and br tags
+    text = text.replace(/<(details|summary|br)([^>]*)>/gi, function (match, tag, attrs) {
+        tag = tag.toLowerCase();
         let placeholder = '\x00PTAG' + protectedIndex + '\x00';
-        protectedElements[protectedIndex] = '<' + tag + attrs + '>';
+        if (tag === 'br') {
+            protectedElements[protectedIndex] = '<br>';
+        } else {
+            protectedElements[protectedIndex] = '<' + tag + attrs + '>';
+        }
         protectedIndex++;
         return placeholder;
     });
@@ -607,6 +612,9 @@ function parseMarkdown(text) {
 
         // Auto-link plain URLs like GitHub-style markdown behavior
         text = linkifyPlainUrls(text);
+
+        // Support for <br> in markdown preview while keeping the source text clean
+        text = text.replace(/&lt;br\s*\/??&gt;/gi, '<br>');
 
         // Restore protected code elements
         text = text.replace(/\x00CODE(\d+)\x00/g, function (match, index) {
@@ -1088,8 +1096,8 @@ function parseMarkdown(text) {
             continue;
         }
 
-        // Tables - detect table rows (lines with | separators)
-        if (line.match(/^\s*\|.+\|\s*$/)) {
+        // Tables - detect table rows (supports multiline cells until the row closes with a trailing |)
+        if (line.match(/^\s*\|/)) {
             flushParagraph();
 
             let tableRows = [];
@@ -1097,7 +1105,7 @@ function parseMarkdown(text) {
             let hasHeaderSeparator = false;
 
             // Collect all consecutive table rows
-            while (i < lines.length && lines[i].match(/^\s*\|.+\|\s*$/)) {
+            while (i < lines.length && lines[i].match(/^\s*\|/)) {
                 let currentLine = lines[i].trim();
 
                 // Check if this is a header separator line (|---|---|)
@@ -1107,8 +1115,19 @@ function parseMarkdown(text) {
                     continue;
                 }
 
+                let logicalRow = currentLine;
+                while (!/\|\s*$/.test(logicalRow) && i + 1 < lines.length) {
+                    let nextLine = lines[i + 1].trim();
+                    if (nextLine === '') {
+                        break;
+                    }
+
+                    i++;
+                    logicalRow += '\n' + nextLine;
+                }
+
                 // Parse table cells
-                let cells = currentLine
+                let cells = logicalRow
                     .split('|')
                     .slice(1, -1) // Remove first and last empty elements
                     .map(cell => cell.trim());

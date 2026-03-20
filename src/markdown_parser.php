@@ -143,12 +143,16 @@ function parseMarkdown($text) {
         return $placeholder;
     }, $text);
 
-    // Protect details and summary tags
-    $text = preg_replace_callback('/<(details|summary)([^>]*)>/i', function($matches) use (&$protectedElements, &$protectedIndex) {
-        $tag = $matches[1];
+    // Protect details, summary, and br tags
+    $text = preg_replace_callback('/<(details|summary|br)([^>]*)>/i', function($matches) use (&$protectedElements, &$protectedIndex) {
+        $tag = strtolower($matches[1]);
         $attrs = $matches[2];
         $placeholder = "\x00PTAG" . $protectedIndex . "\x00";
-        $protectedElements[$protectedIndex] = '<' . $tag . $attrs . '>';
+        if ($tag === 'br') {
+            $protectedElements[$protectedIndex] = '<br>';
+        } else {
+            $protectedElements[$protectedIndex] = '<' . $tag . $attrs . '>';
+        }
         $protectedIndex++;
         return $placeholder;
     }, $text);
@@ -311,6 +315,9 @@ function parseMarkdown($text) {
         
         // Highlights: ==text==
         $text = preg_replace('/==(.*?)==/s', '<mark>$1</mark>', $text);
+
+        // Support for <br> (already protected in STEP 4, this ensures literal <br> or <br/> works)
+        $text = str_replace(['&lt;br&gt;', '&lt;br/&gt;', '&lt;br /&gt;'], '<br>', $text);
         
         // Restore protected code elements
         $text = preg_replace_callback('/\x00CODE(\d+)\x00/', function($matches) use ($protectedCode) {
@@ -756,15 +763,15 @@ function parseMarkdown($text) {
             continue;
         }
         
-        // Tables - detect table rows (lines with | separators)
-        if (preg_match('/^\s*\|.+\|\s*$/', $line)) {
+        // Tables - detect table rows (supports multiline cells until the row closes with a trailing |)
+        if (preg_match('/^\s*\|/', $line)) {
             $flushParagraph();
             
             $tableRows = [];
             $hasHeaderSeparator = false;
             
             // Collect all consecutive table rows
-            while ($i < count($lines) && preg_match('/^\s*\|.+\|\s*$/', $lines[$i])) {
+            while ($i < count($lines) && preg_match('/^\s*\|/', $lines[$i])) {
                 $currentLine = trim($lines[$i]);
                 
                 // Check if this is a header separator line (|---|---|)
@@ -773,9 +780,21 @@ function parseMarkdown($text) {
                     $i++;
                     continue;
                 }
+
+                $logicalRow = $currentLine;
+                while (!preg_match('/\|\s*$/', $logicalRow) && $i + 1 < count($lines)) {
+                    $nextLine = trim($lines[$i + 1]);
+
+                    if ($nextLine === '') {
+                        break;
+                    }
+
+                    $i++;
+                    $logicalRow .= "\n" . $nextLine;
+                }
                 
                 // Parse table cells
-                $cells = array_map('trim', array_slice(explode('|', $currentLine), 1, -1));
+                $cells = array_map('trim', array_slice(explode('|', $logicalRow), 1, -1));
                 $tableRows[] = $cells;
                 $i++;
             }

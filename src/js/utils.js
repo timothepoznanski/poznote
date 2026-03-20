@@ -736,16 +736,10 @@ function showUpdateInstructions(hasUpdate = false) {
                     if (availableVersionEl) {
                         availableVersionEl.textContent = data.remote_version || 'unknown';
                     }
-                    // Set release notes link
+                    // Always link to the releases list instead of a specific tag.
                     var releaseNotesHref = document.getElementById('releaseNotesHref');
                     if (releaseNotesHref) {
-                        if (hasUpdate && data.remote_version) {
-                            // If update available, link to new version
-                            releaseNotesHref.href = 'https://github.com/timothepoznanski/poznote/releases/tag/' + data.remote_version;
-                        } else if (data.current_version) {
-                            // If up to date, link to current version
-                            releaseNotesHref.href = 'https://github.com/timothepoznanski/poznote/releases/tag/' + data.current_version;
-                        }
+                        releaseNotesHref.href = 'https://github.com/timothepoznanski/poznote/releases';
                     }
                 } else {
                     // Error
