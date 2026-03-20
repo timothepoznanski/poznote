@@ -209,6 +209,11 @@ function initToggleOutline() {
  * Toggle outline panel visibility
  */
 function toggleOutline() {
+    // Prevent opening outline in Kanban view
+    if (window._isKanbanViewActive) {
+        return;
+    }
+
     const isMobile = window.innerWidth <= 800;
 
     if (isMobile) {
@@ -671,6 +676,11 @@ function refreshOutline() {
  * Initialize touch/swipe support for mobile
  */
 function initTouchSupport() {
+    // Disable touch/swipe for outline in Kanban view
+    if (window._isKanbanViewActive) {
+        return;
+    }
+
     let touchStartX = 0;
     let touchStartY = 0;
     let touchEndX = 0;
