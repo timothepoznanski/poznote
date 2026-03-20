@@ -340,7 +340,9 @@
       "install_app": "Instalar aplicación",
       "release_notes": "Notas de la versión",
       "convert_images": "Base64 Image Converter",
-      "orphan_scanner": "Escáner de archivos adjuntos huérfanos"
+      "orphan_scanner": "Escáner de archivos adjuntos huérfanos",
+      "user_management": "Gestión de usuarios",
+      "change_password": "Cambiar contraseña"
     },
     "install_app": {
       "unavailable": "La instalación no está disponible ahora mismo. En Chrome móvil, abre el menú del navegador y pulsa \"Instalar aplicación\" (o \"Agregar a la pantalla de inicio\") cuando la opción esté disponible.",
@@ -1969,6 +1971,15 @@
       "toggle_admin": "Cambiar rol de administrador",
       "click_to_deactivate": "Haga clic para desactivar",
       "click_to_activate": "Haga clic para activar",
+      "confirm_admin": {
+        "title": "Confirmar ascenso a administrador",
+        "message": "¿Está seguro de que desea conceder privilegios de administrador a \"{{username}}\"?",
+        "privileges_title": "El administrador podrá:",
+        "privilege_notes": "Exportar notas de cualquier usuario en un archivo ZIP",
+        "privilege_passwords": "Cambiar las contraseñas de todos los demás usuarios",
+        "privilege_admin_panel": "Acceder a este panel de gestión de usuarios",
+        "confirm_button": "Confirmar ascenso a administrador"
+      },
       "id": "ID",
       "errors": {
         "username_required": "Se requiere nombre de usuario",
@@ -2000,7 +2011,8 @@
       "token_missing": "No configurado",
       "not_configured": "No configurado",
       "not_configured_yet": "A configurar",
-      "hint": "La sincronización con {{provider}} está desactivada. Establece POZNOTE_GIT_SYNC_ENABLED=true en tu archivo .env para activarla."
+      "hint": "La sincronización con {{provider}} está desactivada. Un administrador debe establecer POZNOTE_GIT_SYNC_ENABLED=true en tu archivo .env para activarla.",
+      "hint_enable": "La sincronización Git está desactivada. Un administrador debe establecer POZNOTE_GIT_SYNC_ENABLED=true en tus variables de entorno para activarla."
     },
     "auto_sync": {
       "title": "Sincronización Automática",
@@ -2170,5 +2182,50 @@
   },
   "backlinks": {
     "title": "Vínculos inversos"
+  },
+  "multiuser": {
+    "admin": {
+      "id": "ID",
+      "username": "Usuario",
+      "email": "Correo electrónico",
+      "administrator": "Administrador",
+      "status": "Estado",
+      "actions": "Acciones",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "not_defined": "no definido",
+      "create_user": "Crear perfil",
+      "edit_user": "Editar usuario",
+      "click_to_activate": "Haga clic para activar",
+      "click_to_deactivate": "Haga clic para desactivar",
+      "toggle_admin": "Conceder o revocar privilegios de administrador",
+      "admin_id_1_locked": "El rol de administrador no se puede eliminar del ID de usuario 1",
+      "admin_note": "Use la casilla de Admin para otorgar o revocar privilegios de administrador a otro usuario.",
+      "errors": {
+        "cannot_delete_self": "No puedes borrar tu propio perfil",
+        "cannot_change_self": "No puedes cambiar tu propio estado/rol",
+        "username_required": "El nombre de usuario es obligatorio"
+      }
+    }
+  },
+  "password": {
+    "status": {
+      "custom": "Contraseña personalizada",
+      "default": "Predeterminado (env)"
+    },
+    "modal": {
+      "title": "Cambiar contraseña",
+      "description": "Introduce tu contraseña actual y elige una nueva.",
+      "current": "Contraseña actual",
+      "new": "Nueva contraseña",
+      "confirm": "Confirmar nueva contraseña"
+    },
+    "errors": {
+      "all_required": "Todos los campos son obligatorios",
+      "mismatch": "Las nuevas contraseñas no coinciden",
+      "too_short": "La contraseña debe tener al menos 4 caracteres",
+      "incorrect_current": "La contraseña actual es incorrecta"
+    },
+    "success": "Contraseña cambiada con éxito."
   }
 }

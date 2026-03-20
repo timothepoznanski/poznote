@@ -49,10 +49,10 @@ require_once 'folders_display.php';
 
 // GitHub Sync Logic
 require_once 'GitSync.php';
-$gitSync = new GitSync($con);
+$gitSync = new GitSync($con, $_SESSION['user_id'] ?? null);
 $gitEnabled = GitSync::isEnabled() && $gitSync->isConfigured();
 $isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
-$showGitSync = $gitEnabled && $isAdmin;
+$showGitSync = $gitEnabled; // All users with configured git can sync
 $gitProvider = function_exists('getGitProviderName') ? getGitProviderName() : 'Git';
 
 // Check if we need to redirect to include workspace from database settings

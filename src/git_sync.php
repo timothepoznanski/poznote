@@ -3,16 +3,11 @@
  * Git Sync Status and Actions Page
  * 
  * Accessible from settings, this page shows Git sync status and allows manual sync operations.
+ * Each user can configure their own Git repository settings.
  */
 
 require 'auth.php';
 requireAuth();
-
-// Check if user is admin - only admins can access Git sync
-if (!isCurrentUserAdmin()) {
-    header('Location: settings.php');
-    exit;
-}
 
 require_once 'config.php';
 require_once 'functions.php';
@@ -148,6 +143,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             // Re-fetch config status to update badges
             $configStatus = $gitSync->getConfigStatus();
             $message = tp('git_sync.auto_sync.saving');
+            break;
+            
+        case 'save_config':
+            $newConfig = [
+                'provider' => $_POST['git_provider'] ?? 'github',
+                'api_base' => $_POST['git_api_base'] ?? '',
+                'token' => $_POST['git_token'] ?? '',
+                'repo' => $_POST['git_repo'] ?? '',
+                'branch' => $_POST['git_branch'] ?? 'main',
+                'author_name' => $_POST['git_author_name'] ?? 'Poznote',
+                'author_email' => $_POST['git_author_email'] ?? 'poznote@localhost',
+            ];
+            // If token field is the masked placeholder, keep existing token
+            if ($newConfig['token'] === '••••••••') {
+                unset($newConfig['token']);
+            }
+            // Do not persist the GitHub default API URL — it is handled automatically
+            if ($newConfig['api_base'] === 'https://api.github.com') {
+                $newConfig['api_base'] = '';
+            }
+            if ($gitSync->saveUserGitConfig($newConfig)) {
+                $message = t('git_sync.messages.config_saved', [], 'Configuration saved successfully.');
+                // Reload config status after save
+                $configStatus = $gitSync->getConfigStatus();
+                $lastSync = $gitSync->getLastSyncInfo();
+            } else {
+                $error = t('git_sync.messages.config_save_error', [], 'Failed to save configuration.');
+            }
+            // Re-determine provider name after config change
+            $provider = $configStatus['provider'] ?? 'github';
+            $providerName = ($provider === 'github') ? 'GitHub' : (($provider === 'forgejo') ? 'Forgejo' : 'Git');
             break;
     }
 }
@@ -288,61 +314,96 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         </script>
         <?php endif; ?>
 
-        <!-- Configuration Status -->
+        <!-- Configuration Form -->
         <div class="git-sync-section">
-            <div class="config-grid">
-                <div class="config-item">
-                    <span class="config-label"><?php echo tp_h('git_sync.config.status'); ?></span>
-                    <span class="config-value">
-                        <?php if ($configStatus['enabled']): ?>
-                            <span class="badge badge-success"><?php echo t_h('common.enabled'); ?></span>
-                        <?php else: ?>
-                            <span class="badge badge-disabled"><?php echo t_h('common.disabled'); ?></span>
-                        <?php endif; ?>
-                    </span>
+            <form method="post" class="git-config-form">
+                <input type="hidden" name="action" value="save_config">
+                
+                <div class="config-grid">
+                    <div class="config-item">
+                        <span class="config-label"><?php echo tp_h('git_sync.config.status'); ?></span>
+                        <span class="config-value">
+                            <?php if ($configStatus['enabled']): ?>
+                                <span class="badge badge-success"><?php echo t_h('common.enabled'); ?></span>
+                            <?php else: ?>
+                                <span class="badge badge-disabled"><?php echo t_h('common.disabled'); ?></span>
+                            <?php endif; ?>
+                        </span>
+                    </div>
+                </div>
+                    
+                <?php if (!$configStatus['enabled']): ?>
+                <div class="config-hint">
+                    <i class="lucide lucide-info"></i>
+                    <?php echo t_h('git_sync.config.hint_enable', [], 'Set POZNOTE_GIT_SYNC_ENABLED=true in your environment to enable Git Sync.'); ?>
+                </div>
+                <?php else: ?>
+                
+                <div class="git-config-fields">
+                    <div class="git-field-group">
+                        <label class="git-field-label" for="git_provider"><?php echo t_h('git_sync.config.provider', [], 'Provider'); ?></label>
+                        <select name="git_provider" id="git_provider" class="git-field-input">
+                            <option value="github" <?php echo ($configStatus['provider'] === 'github') ? 'selected' : ''; ?>>GitHub</option>
+                            <option value="forgejo" <?php echo ($configStatus['provider'] === 'forgejo') ? 'selected' : ''; ?>>Forgejo</option>
+                        </select>
+                    </div>
+                    
+                    <div class="git-field-group" id="api-base-row">
+                        <label class="git-field-label" for="git_api_base"><?php echo t_h('git_sync.config.api_base', [], 'API Base URL'); ?></label>
+                        <input type="text" name="git_api_base" id="git_api_base" class="git-field-input" 
+                               value="<?php echo htmlspecialchars($configStatus['apiBase'] ?? ''); ?>" 
+                               placeholder="http://localhost:3000/api/v1">
+                    </div>
+                    
+                    <div class="git-field-group">
+                        <label class="git-field-label" for="git_token"><?php echo tp_h('git_sync.config.token'); ?></label>
+                        <input type="text" name="git_token" id="git_token" class="git-field-input" 
+                               value="<?php echo htmlspecialchars($configStatus['token'] ?? ''); ?>" 
+                               placeholder="ghp_xxxx..." autocomplete="off">
+                    </div>
+                    
+                    <div class="git-field-group">
+                        <label class="git-field-label" for="git_repo"><?php echo tp_h('git_sync.config.repository'); ?></label>
+                        <input type="text" name="git_repo" id="git_repo" class="git-field-input" 
+                               value="<?php echo htmlspecialchars($configStatus['repo'] ?? ''); ?>" 
+                               placeholder="owner/repo">
+                    </div>
+                    
+                    <div class="git-field-row">
+                        <div class="git-field-group">
+                            <label class="git-field-label" for="git_branch"><?php echo tp_h('git_sync.config.branch'); ?></label>
+                            <input type="text" name="git_branch" id="git_branch" class="git-field-input" 
+                                   value="<?php echo htmlspecialchars($configStatus['branch'] ?? 'main'); ?>" 
+                                   placeholder="main">
+                        </div>
+                        
+                        <div class="git-field-group">
+                            <label class="git-field-label" for="git_author_name"><?php echo t_h('git_sync.config.author_name', [], 'Author Name'); ?></label>
+                            <input type="text" name="git_author_name" id="git_author_name" class="git-field-input" 
+                                   value="<?php echo htmlspecialchars($configStatus['authorName'] ?? 'Poznote'); ?>" 
+                                   placeholder="Poznote">
+                        </div>
+                    </div>
+                    
+                    <div class="git-field-group">
+                        <label class="git-field-label" for="git_author_email"><?php echo t_h('git_sync.config.author_email', [], 'Author Email'); ?></label>
+                        <input type="text" name="git_author_email" id="git_author_email" class="git-field-input" 
+                               value="<?php echo htmlspecialchars($configStatus['authorEmail'] ?? 'poznote@localhost'); ?>" 
+                               placeholder="poznote@localhost">
+                    </div>
+                    
+                    <div class="git-field-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="lucide lucide-save"></i>
+                            <?php echo t_h('git_sync.config.save', [], 'Save Configuration'); ?>
+                        </button>
+                    </div>
                 </div>
                 
-                <div class="config-item">
-                    <span class="config-label"><?php echo tp_h('git_sync.config.repository'); ?></span>
-                    <span class="config-value">
-                        <?php if ($configStatus['repo']): ?>
-                            <?php 
-                            $repoUrl = ($provider === 'github') 
-                                ? "https://github.com/" . htmlspecialchars($configStatus['repo'])
-                                : rtrim($configStatus['apiBase'], '/api/v1') . "/" . htmlspecialchars($configStatus['repo']);
-                            ?>
-                            <a href="<?php echo $repoUrl; ?>" target="_blank" class="repo-link">
-                                <i class="<?php echo ($provider === 'github' ? 'lucide lucide-github' : 'lucide lucide-git-branch'); ?>"></i> <?php echo htmlspecialchars($configStatus['repo']); ?>
-                            </a>
-                        <?php else: ?>
-                            <span class="not-configured"><?php echo tp_h('git_sync.config.not_configured'); ?></span>
-                        <?php endif; ?>
-                    </span>
-                </div>
-                
-                <div class="config-item">
-                    <span class="config-label"><?php echo tp_h('git_sync.config.branch'); ?></span>
-                    <span class="config-value"><?php echo htmlspecialchars($configStatus['branch']); ?></span>
-                </div>
-                
-                <div class="config-item">
-                    <span class="config-label"><?php echo tp_h('git_sync.config.token'); ?></span>
-                    <span class="config-value">
-                        <?php if ($configStatus['hasToken']): ?>
-                            <span class="badge badge-success"><?php echo tp_h('git_sync.config.token_set'); ?></span>
-                        <?php else: ?>
-                            <span class="badge badge-warning"><?php echo tp_h('git_sync.config.token_missing'); ?></span>
-                        <?php endif; ?>
-                    </span>
-                </div>
-            </div>
+                <?php endif; ?>
+            </form>
             
-            <?php if (!$configStatus['enabled']): ?>
-            <div class="config-hint">
-                <i class="lucide lucide-info-circle"></i>
-                <?php echo tp_h('git_sync.config.hint'); ?>
-            </div>
-            <?php else: ?>
+            <?php if ($configStatus['enabled'] && $configStatus['configured']): ?>
             <div class="auto-sync-settings">
                 <h4><?php echo tp_h('git_sync.auto_sync.title'); ?></h4>
                 <form method="post" class="auto-sync-form">
@@ -478,6 +539,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 });
             });
         });
+        
+        // Toggle API base URL field based on provider selection
+        const providerSelect = document.getElementById('git_provider');
+        const apiBaseInput = document.getElementById('git_api_base');
+        
+        function updateApiBaseField(provider) {
+            if (!apiBaseInput) return;
+            if (provider === 'forgejo') {
+                apiBaseInput.readOnly = false;
+                apiBaseInput.style.opacity = '';
+                apiBaseInput.placeholder = 'http://localhost:3000/api/v1';
+                if (apiBaseInput.value === 'https://api.github.com') apiBaseInput.value = '';
+            } else {
+                apiBaseInput.readOnly = true;
+                apiBaseInput.style.opacity = '0.5';
+                apiBaseInput.value = 'https://api.github.com';
+            }
+        }
+
+        function updateTokenPlaceholder(provider) {
+            const tokenInput = document.getElementById('git_token');
+            if (!tokenInput) return;
+            tokenInput.placeholder = provider === 'forgejo'
+                ? 'a1b2c3d4e5f6... (Settings > Applications)'
+                : 'ghp_xxxx... (github.com/settings/tokens)';
+        }
+
+        if (providerSelect) {
+            // Init on page load
+            updateApiBaseField(providerSelect.value);
+            updateTokenPlaceholder(providerSelect.value);
+
+            providerSelect.addEventListener('change', function() {
+                const tokenInput = document.getElementById('git_token');
+                const repoInput = document.getElementById('git_repo');
+                if (tokenInput) tokenInput.value = '';
+                if (repoInput) repoInput.value = '';
+                updateApiBaseField(this.value);
+                updateTokenPlaceholder(this.value);
+            });
+        }
+        
+        // Clear masked token placeholder on focus
+        const tokenInput = document.getElementById('git_token');
+        if (tokenInput) {
+            tokenInput.addEventListener('focus', function() {
+                if (this.value === '••••••••') {
+                    this.value = '';
+                }
+            });
+            tokenInput.addEventListener('blur', function() {
+                if (this.value === '') {
+                    this.value = '••••••••';
+                }
+            });
+        }
     });
     </script>
 </body>

@@ -8,10 +8,9 @@ require_once 'db_connect.php';
 
 // GitHub Sync Logic
 require_once 'GitSync.php';
-$gitSync = new GitSync($con);
+$gitSync = new GitSync($con, $_SESSION['user_id'] ?? null);
 $gitEnabled = GitSync::isEnabled() && $gitSync->isConfigured();
-$isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
-$showGitSync = $gitEnabled && $isAdmin;
+$showGitSync = $gitEnabled;
 
 // Get note ID from URL
 $note_id = isset($_GET['note_id']) ? (int)$_GET['note_id'] : 0;

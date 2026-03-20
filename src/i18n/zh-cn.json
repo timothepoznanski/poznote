@@ -342,7 +342,8 @@
       "install_app": "安装应用",
       "release_notes": "发布日志",
       "convert_images": "Base64 Image Converter",
-      "orphan_scanner": "孤立附件扫描器"
+      "orphan_scanner": "孤立附件扫描器",
+      "change_password": "修改密码"
     },
     "install_app": {
       "unavailable": "当前无法安装。请在 Chrome 手机版中打开浏览器菜单，然后在可用时点击“安装应用”（或“添加到主屏幕”）。",
@@ -1954,6 +1955,13 @@
       "actions": "操作",
       "not_defined": "未定义",
       "email_usage_note": "邮箱地址仅在配置 OIDC 转换身份验证时使用。Poznote 不会发送任何电子邮件。",
+      "id": "ID",
+      "administrator": "管理员",
+      "click_to_activate": "点击激活",
+      "click_to_deactivate": "点击停用",
+      "toggle_admin": "授予或撤销管理员权限",
+      "admin_id_1_locked": "无法移除用户 ID 1 的管理员角色",
+      "admin_note": "使用“管理员”复选框为其他用户授予或撤销管理员权限。",
       "password_management": {
         "manage_password": "密码",
         "reset_password": "重置密码",
@@ -2027,6 +2035,15 @@
       "toggle_admin": "切换管理员角色",
       "click_to_deactivate": "点击停用",
       "click_to_activate": "点击激活",
+      "confirm_admin": {
+        "title": "确认提升为管理员",
+        "message": "您确定要授予 \"{{username}}\" 管理员权限吗？",
+        "privileges_title": "管理员将具有以下权限：",
+        "privilege_notes": "将任何用户的笔记导出到 ZIP 文件中",
+        "privilege_passwords": "更改所有其他用户的密码",
+        "privilege_admin_panel": "访问此用户管理面板",
+        "confirm_button": "确认管理员晋升"
+      },
       "id": "ID"
     },
     "profile": {
@@ -2113,7 +2130,8 @@
       "token_missing": "未配置",
       "not_configured": "未配置",
       "not_configured_yet": "待配置",
-      "hint": "{{provider}} 同步已禁用。在您的 .env 文件中设置 POZNOTE_GIT_SYNC_ENABLED=true 来启用它。"
+      "hint": "{{provider}} 同步已禁用。管理员应在您的 .env 文件中设置 POZNOTE_GIT_SYNC_ENABLED=true 来启用它。",
+      "hint_enable": "Git 同步已禁用。管理员应在您的环境变量中设置 POZNOTE_GIT_SYNC_ENABLED=true 来启用它。"
     },
     "auto_sync": {
       "title": "自动同步",
@@ -2280,5 +2298,25 @@
       "modal_title_user": "孤立文件 - 用户",
       "files_label": "文件"
     }
+  },
+  "password": {
+    "status": {
+      "custom": "自定义密码",
+      "default": "默认 (env)"
+    },
+    "modal": {
+      "title": "修改密码",
+      "description": "输入当前密码并选择新密码。",
+      "current": "当前密码",
+      "new": "新密码",
+      "confirm": "确认新密码"
+    },
+    "errors": {
+      "all_required": "所有字段均为必填项",
+      "mismatch": "新密码不匹配",
+      "too_short": "密码必须至少为 4 个字符",
+      "incorrect_current": "当前密码错误"
+    },
+    "success": "密码修改成功。"
   }
 }

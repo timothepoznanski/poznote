@@ -340,7 +340,9 @@
       "install_app": "Instalar aplicação",
       "release_notes": "Notas de versão",
       "convert_images": "Base64 Image Converter",
-      "orphan_scanner": "Scanner de anexos órfãos"
+      "orphan_scanner": "Scanner de anexos órfãos",
+      "user_management": "Gestão de utilizadores",
+      "change_password": "Mudar palavra-passe"
     },
     "install_app": {
       "unavailable": "A instalação não está disponível no momento. No Chrome móvel, abra o menu do navegador e toque em \"Instalar aplicativo\" (ou \"Adicionar à tela inicial\") quando a opção estiver disponível.",
@@ -1974,6 +1976,15 @@
       "toggle_admin": "Alternar privilégios de administrador",
       "click_to_deactivate": "Clique para desativar",
       "click_to_activate": "Clique para ativar",
+      "confirm_admin": {
+        "title": "Confirmar promoção a administrador",
+        "message": "Tem a certeza que deseja conceder privilégios de administrador a \"{{username}}\"?",
+        "privileges_title": "O administrador terá permissão para:",
+        "privilege_notes": "Exportar notas de qualquer utilizador num ficheiro ZIP",
+        "privilege_passwords": "Alterar as palavras-passe de todos os outros utilizadores",
+        "privilege_admin_panel": "Aceder a este painel de gestão de utilizadores",
+        "confirm_button": "Confirmar promoção a administrador"
+      },
       "id": "ID",
       "errors": {
         "username_required": "O nome de usuário é obrigatório",
@@ -2005,7 +2016,8 @@
       "token_missing": "Não configurado",
       "not_configured": "Não configurado",
       "not_configured_yet": "A configurar",
-      "hint": "A sincronização com {{provider}} está desativada. Defina POZNOTE_GIT_SYNC_ENABLED=true no seu arquivo .env para ativá-la."
+      "hint": "A sincronização com {{provider}} está desativada. Um administrador deve definir POZNOTE_GIT_SYNC_ENABLED=true no seu arquivo .env para ativá-la.",
+      "hint_enable": "A sincronização Git está desativada. Um administrador deve definir POZNOTE_GIT_SYNC_ENABLED=true nas suas variáveis de ambiente para ativá-la."
     },
     "auto_sync": {
       "title": "Sincronização Automática",
@@ -2175,5 +2187,50 @@
   },
   "backlinks": {
     "title": "Backlinks"
+  },
+  "multiuser": {
+    "admin": {
+      "id": "ID",
+      "username": "Usuário",
+      "email": "E-mail",
+      "administrator": "Administrador",
+      "status": "Status",
+      "actions": "Ações",
+      "active": "Ativo",
+      "inactive": "Inactivo",
+      "not_defined": "não definido",
+      "create_user": "Criar perfil",
+      "edit_user": "Editar usuário",
+      "click_to_activate": "Clique para ativar",
+      "click_to_deactivate": "Clique para desativar",
+      "toggle_admin": "Conceder ou revogar privilégios de administrador",
+      "admin_id_1_locked": "O perfil de administrador não pode ser removido do usuário com ID 1",
+      "admin_note": "Use a caixa de seleção Admin para conceder ou revogar privilégios de administrador para outro usuário.",
+      "errors": {
+        "cannot_delete_self": "Você não pode excluir seu próprio perfil",
+        "cannot_change_self": "Você não pode alterar seu próprio status/função",
+        "username_required": "O nome de usuário é obrigatório"
+      }
+    }
+  },
+  "password": {
+    "status": {
+      "custom": "Senha personalizada",
+      "default": "Padrão (env)"
+    },
+    "modal": {
+      "title": "Mudar palavra-passe",
+      "description": "Introduza a sua palavra-passe atual e escolha uma nova.",
+      "current": "Palavra-passe atual",
+      "new": "Nova palavra-passe",
+      "confirm": "Confirmar nova palavra-passe"
+    },
+    "errors": {
+      "all_required": "Todos os campos são obrigatórios",
+      "mismatch": "As novas palavras-passe não coincidem",
+      "too_short": "A palavra-passe deve ter pelo menos 4 caracteres",
+      "incorrect_current": "A palavra-passe atual está incorreta"
+    },
+    "success": "Palavra-passe alterada com sucesso."
   }
 }

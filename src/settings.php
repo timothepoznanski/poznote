@@ -258,8 +258,7 @@ if ($isAdmin) {
                 </div>
             </div>
 
-            <?php if ($isAdmin): ?>
-            <!-- GitHub Sync -->
+            <!-- Git Sync (available to all users) -->
             <div class="home-card settings-card-clickable" id="git-sync-card" data-href="git_sync.php">
                 <div class="home-card-icon">
                     <i class="<?php echo (defined('GIT_PROVIDER') && GIT_PROVIDER === 'forgejo') ? 'lucide lucide-git-branch' : 'lucide lucide-github'; ?>"></i>
@@ -268,8 +267,6 @@ if ($isAdmin) {
                     <span class="home-card-title"><?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?></span>
                 </div>
             </div>
-
-            <?php endif; ?>
 
             <?php if ($isAdmin): ?>
             <!-- Check for Updates -->

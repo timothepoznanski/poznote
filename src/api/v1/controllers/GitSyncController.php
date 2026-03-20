@@ -160,4 +160,34 @@ class GitSyncController {
         
         session_write_close();
     }
+    
+    /**
+     * PUT /api/v1/git-sync/config
+     * Save per-user Git sync configuration
+     * Body: { "provider": "github", "repo": "owner/repo", "token": "...", "branch": "main", "api_base": "", "author_name": "...", "author_email": "..." }
+     */
+    public function saveConfig() {
+        require_once dirname(__DIR__, 3) . '/GitSync.php';
+        
+        if (!GitSync::isEnabled()) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Git sync is not enabled']);
+            return;
+        }
+        
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (!$input) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Invalid JSON body']);
+            return;
+        }
+        
+        $sync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
+        $result = $sync->saveUserGitConfig($input);
+        
+        echo json_encode([
+            'success' => $result,
+            'config' => $sync->getConfigStatus()
+        ]);
+    }
 }

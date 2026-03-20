@@ -433,6 +433,30 @@ body.dark-mode .config-hint {
     color: #a5b4fc;
 }
 
+body.dark-mode .git-field-label {
+    color: #9ca3af;
+}
+
+body.dark-mode .git-field-input {
+    background: #2a2a2e;
+    border-color: #3f3f46;
+    color: #e5e7eb;
+}
+
+body.dark-mode .git-field-input:focus {
+    background: #1f1f23;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+body.dark-mode .git-field-input::placeholder {
+    color: #6b7280;
+}
+
+body.dark-mode select.git-field-input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
 body.dark-mode .sync-action-card {
     background: transparent;
 }
@@ -762,4 +786,82 @@ input:checked+.slider:before {
 
 .slider.round:before {
     border-radius: 50%;
+}
+
+/* Git Config Form */
+.git-config-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 16px;
+}
+
+.git-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+
+.git-field-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #4b5563;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.git-field-input {
+    padding: 10px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    background: #f9fafb;
+    color: #1f2937;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.git-field-input:focus {
+    outline: none;
+    border-color: #6366f1;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.git-field-input::placeholder {
+    color: #9ca3af;
+}
+
+select.git-field-input {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+}
+
+.git-field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.git-field-actions {
+    margin-top: 6px;
+    display: flex;
+}
+
+.git-config-form .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+@media (max-width: 600px) {
+    .git-field-row {
+        grid-template-columns: 1fr;
+    }
 }

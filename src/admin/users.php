@@ -178,6 +178,15 @@ $v = getAppVersion();
     <link rel="stylesheet" href="../css/dark-mode/markdown.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/dark-mode/kanban.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/dark-mode/icons.css?v=<?php echo $v; ?>">
+    <style>
+        .user-current {
+            color: #2E8CFA;
+            font-weight: 600;
+        }
+        [data-theme='dark'] .user-current {
+            color: #4a9eff;
+        }
+    </style>
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
 
@@ -205,13 +214,37 @@ $v = getAppVersion();
     /**
      * Toggle user status (admin, active) via AJAX-style form submission
      */
-    function toggleUserStatus(userId, field, newValue) {
+    function toggleUserStatus(userId, field, newValue, force = false, username = '') {
+        // If promoting to admin and not forced, show confirmation modal
+        if (field === 'is_admin' && newValue === 1 && !force) {
+            openAdminConfirmModal(userId, username);
+            return;
+        }
+
         submitForm({
             action: 'toggle_status',
             user_id: userId,
             field: field,
             value: newValue
         });
+    }
+
+    /**
+     * Open the admin promotion confirmation modal
+     */
+    function openAdminConfirmModal(userId, username) {
+        document.getElementById('admin_confirm_user_id').value = userId;
+        const messageTemplate = <?php echo json_encode(t('multiuser.admin.confirm_admin.message', ['username' => 'NAME_HOLDER'], 'Are you sure you want to grant administrator privileges to "NAME_HOLDER"?')); ?>;
+        document.getElementById('admin_confirm_message').textContent = messageTemplate.replace('NAME_HOLDER', username);
+        document.getElementById('adminConfirmModal').classList.add('active');
+    }
+
+    /**
+     * Confirm admin promotion from modal
+     */
+    function confirmAdminPromotion() {
+        const userId = document.getElementById('admin_confirm_user_id').value;
+        toggleUserStatus(userId, 'is_admin', 1, true);
     }
 
     /**
@@ -291,7 +324,7 @@ $v = getAppVersion();
                 </thead>
                 <tbody>
                     <?php foreach ($users as $user): ?>
-                    <tr>
+                        <tr class="<?php echo ($user['id'] === getCurrentUserId()) ? 'user-current' : ''; ?>">
                             <td class="text-center user-id-cell" data-label="<?php echo t_h('multiuser.admin.id', [], 'ID'); ?>">
                                 <?php echo $user['id']; ?>
                             </td>
@@ -325,7 +358,7 @@ $v = getAppVersion();
                                         ENT_QUOTES,
                                         'UTF-8'
                                     ); ?>"
-                                    onchange="toggleUserStatus(<?php echo (int)$user['id']; ?>, 'is_admin', this.checked ? 1 : 0)">
+                                    onchange="this.checked ? toggleUserStatus(<?php echo (int)$user['id']; ?>, 'is_admin', 1, false, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>) : toggleUserStatus(<?php echo (int)$user['id']; ?>, 'is_admin', 0); if(!this.checked) { /* unchecking is direct */ } else { this.checked = false; }">
                             </td>
     
                             <td class="text-center" data-label="<?php echo t_h('multiuser.admin.status', [], 'Status'); ?>">
@@ -456,6 +489,31 @@ $v = getAppVersion();
                     <button type="submit" class="btn btn-danger"><?php echo t_h('common.delete', [], 'Delete'); ?></button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Admin Promotion Confirmation Modal -->
+    <div class="modal" id="adminConfirmModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <h2 class="modal-title"><?php echo t_h('multiuser.admin.confirm_admin.title', [], 'Confirm Promotion to Administrator'); ?></h2>
+            <p id="admin_confirm_message"></p>
+            
+            <div class="admin-privileges-box" style="background: var(--bg-secondary); padding: 15px; border-radius: 8px; margin: 15px 0; border: 1px solid var(--border-color);">
+                <p style="font-weight: bold; margin-bottom: 10px; color: var(--text-primary);">
+                    <?php echo t_h('multiuser.admin.confirm_admin.privileges_title', [], 'The administrator will be able to:'); ?>
+                </p>
+                <ul style="margin-left: 20px; color: var(--text-secondary); line-height: 1.6;">
+                    <li><i class="lucide-download" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 5px;"></i> <?php echo t_h('multiuser.admin.confirm_admin.privilege_notes', [], 'Export notes from any user into a ZIP file'); ?></li>
+                    <li><i class="lucide-key" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 5px;"></i> <?php echo t_h('multiuser.admin.confirm_admin.privilege_passwords', [], 'Change passwords of all other users'); ?></li>
+                    <li><i class="lucide-users" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 5px;"></i> <?php echo t_h('multiuser.admin.confirm_admin.privilege_admin_panel', [], 'Access this user management panel'); ?></li>
+                </ul>
+            </div>
+
+            <div class="form-actions">
+                <input type="hidden" id="admin_confirm_user_id">
+                <button type="button" class="btn btn-secondary btn-cancel-admin" onclick="closeModal('adminConfirmModal'); location.reload();"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
+                <button type="button" class="btn btn-primary" onclick="confirmAdminPromotion()"><?php echo t_h('multiuser.admin.confirm_admin.confirm_button', [], 'Confirm admin promotion'); ?></button>
+            </div>
         </div>
     </div>
     

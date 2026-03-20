@@ -654,6 +654,11 @@ $router->get('/git-sync/progress', function($params) use ($gitSyncController) {
     $gitSyncController->progress();
 });
 
+// Save per-user Git sync configuration
+$router->put('/git-sync/config', function($params) use ($gitSyncController) {
+    $gitSyncController->saveConfig();
+});
+
 // ======================
 // User Profile Routes
 // ======================

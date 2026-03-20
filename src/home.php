@@ -15,11 +15,11 @@ $currentLang = getUserLanguage();
 
 // GitHub Sync Logic
 require_once 'GitSync.php';
-$gitSync = new GitSync($con);
+$gitSync = new GitSync($con, $_SESSION['user_id'] ?? null);
 $gitEnabled = GitSync::isEnabled() && $gitSync->isConfigured();
 $isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
-$showGitSync = $gitEnabled && $isAdmin; // For processing actions
-$showGitTiles = $isAdmin; // Always show tiles for admin, even if not configured
+$showGitSync = $gitEnabled; // All users with configured git can sync
+$showGitTiles = true; // Show tiles for all users (link to config if not configured)
 $gitProviderParams = ['provider' => getGitProviderName()];
 $gitIcon = (defined('GIT_PROVIDER') && GIT_PROVIDER === 'forgejo') ? 'lucide lucide-git-branch' : 'lucide lucide-github';
 
