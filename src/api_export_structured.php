@@ -206,7 +206,7 @@ while ($row = $res_notes->fetch(PDO::FETCH_ASSOC)) {
     $noteType = $row['type'] ?? 'note';
     
     // Determine file extension
-    $fileExtension = ($noteType === 'markdown') ? 'md' : 'html';
+    $fileExtension = ($noteType === 'markdown' || $noteType === 'tasklist') ? 'md' : 'html';
     
     // Get the folder path in the ZIP
     $zipFolderPath = getFolderZipPath($folder_id, $folderMap);
@@ -235,6 +235,10 @@ while ($row = $res_notes->fetch(PDO::FETCH_ASSOC)) {
         
         // For Markdown files, add front matter with metadata
         if ($fileExtension === 'md') {
+            // Convert tasklist JSON to Markdown checkbox format before adding front matter
+            if ($noteType === 'tasklist') {
+                $content = convertTasklistToMarkdown($content);
+            }
             $content = addFrontMatterToMarkdown($content, $row, $con);
             
             // Convert Markdown image URLs if this note has attachments
@@ -317,6 +321,46 @@ foreach ($allFolders as $folder) {
             $zip->addFromString($zipPath . '.gitkeep', '');
         }
     }
+}
+
+/**
+ * Convert tasklist JSON to Markdown checkbox format
+ */
+function convertTasklistToMarkdown($jsonContent) {
+    // Remove UTF-8 BOM if present
+    $jsonContent = preg_replace('/^\xEF\xBB\xBF/', '', $jsonContent);
+
+    // Parse JSON
+    $tasks = json_decode($jsonContent, true);
+
+    if (!is_array($tasks) || empty($tasks)) {
+        return '';
+    }
+
+    $markdown = '';
+
+    foreach ($tasks as $task) {
+        $text = isset($task['text']) ? trim($task['text']) : '';
+        $completed = !empty($task['completed']);
+        $important = !empty($task['important']);
+
+        // Skip empty tasks
+        if (empty($text)) {
+            continue;
+        }
+
+        // Build checkbox syntax: - [ ] or - [x]
+        $checkbox = $completed ? '[x]' : '[ ]';
+
+        // Add important marker if task is marked as important
+        if ($important) {
+            $markdown .= '- ' . $checkbox . ' **' . $text . '** ⭐' . "\n";
+        } else {
+            $markdown .= '- ' . $checkbox . ' ' . $text . "\n";
+        }
+    }
+
+    return $markdown;
 }
 
 /**
