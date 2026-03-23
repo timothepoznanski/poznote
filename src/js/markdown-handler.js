@@ -417,8 +417,8 @@ function parseMarkdown(text) {
         return placeholder;
     });
 
-    // Protect details, summary, and br tags
-    text = text.replace(/<(details|summary|br)([^>]*)>/gi, function (match, tag, attrs) {
+    // Protect details, summary, br, and underline tags
+    text = text.replace(/<(details|summary|br|u)([^>]*)>/gi, function (match, tag, attrs) {
         tag = tag.toLowerCase();
         let placeholder = '\x00PTAG' + protectedIndex + '\x00';
         if (tag === 'br') {
@@ -429,7 +429,7 @@ function parseMarkdown(text) {
         protectedIndex++;
         return placeholder;
     });
-    text = text.replace(/<\/(details|summary)>/gi, function (match, tag) {
+    text = text.replace(/<\/(details|summary|u)>/gi, function (match, tag) {
         let placeholder = '\x00PTAG' + protectedIndex + '\x00';
         protectedElements[protectedIndex] = '</' + tag + '>';
         protectedIndex++;
@@ -626,6 +626,9 @@ function parseMarkdown(text) {
 
         // Strikethrough
         text = text.replace(/~~([^~]+)~~/g, '<del>$1</del>');
+
+        // Highlight
+        text = text.replace(/==([^=]+)==/g, '<mark>$1</mark>');
 
         // Auto-link plain URLs like GitHub-style markdown behavior
         text = linkifyPlainUrls(text);

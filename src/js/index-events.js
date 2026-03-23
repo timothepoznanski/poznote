@@ -210,8 +210,13 @@
                 }
                 break;
             case 'exec-underline':
-                // Underline not supported in standard markdown, use HTML fallback
-                document.execCommand('underline');
+                if (typeof isInMarkdownEditor === 'function' && isInMarkdownEditor()) {
+                    if (typeof applyMarkdownUnderline === 'function') {
+                        applyMarkdownUnderline();
+                    }
+                } else {
+                    document.execCommand('underline');
+                }
                 break;
             case 'exec-strikethrough':
                 if (typeof isInMarkdownEditor === 'function' && isInMarkdownEditor()) {
