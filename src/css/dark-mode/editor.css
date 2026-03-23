@@ -69,6 +69,7 @@ body.dark-mode .code-block,
 body.dark-mode pre.code-block {
     background-color: #262424 !important;
     border-color: var(--dm-border) !important;
+    color: var(--dm-text-muted) !important;
 }
 
 /* Highlighter inside code blocks: preserve dark background with readable highlight */
@@ -95,7 +96,7 @@ html[data-theme='dark'] .noteentry pre code[class*="language-"],
 html[data-theme='dark'] .noteentry code[class*="language-"],
 body.dark-mode .noteentry pre code[class*="language-"],
 body.dark-mode .noteentry code[class*="language-"] {
-    color: #ffffff !important;
+    color: var(--dm-text-muted) !important;
 }
 
 /* Code block placeholders */

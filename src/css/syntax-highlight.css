@@ -117,7 +117,7 @@ code.hljs {
 
 /* Dark theme - Applied when data-theme="dark" is set on html element */
 html[data-theme="dark"] .hljs {
-    color: #c9d1d9;
+    color: var(--dm-text-muted);
     background: #161b22;
 }
 
@@ -176,7 +176,7 @@ html[data-theme="dark"] .hljs-selector-tag {
 }
 
 html[data-theme="dark"] .hljs-subst {
-    color: #c9d1d9;
+    color: var(--dm-text-muted);
 }
 
 html[data-theme="dark"] .hljs-section {
@@ -189,12 +189,12 @@ html[data-theme="dark"] .hljs-bullet {
 }
 
 html[data-theme="dark"] .hljs-emphasis {
-    color: #c9d1d9;
+    color: var(--dm-text-muted);
     font-style: italic;
 }
 
 html[data-theme="dark"] .hljs-strong {
-    color: #c9d1d9;
+    color: var(--dm-text-muted);
     font-weight: 700;
 }
 
