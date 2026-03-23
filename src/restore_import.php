@@ -612,11 +612,23 @@ function importSingleNoteFile($con, $content, $fileName, $fileExtension, $worksp
 
     // Override folder from front matter if present
     if ($frontMatterData && isset($frontMatterData['folder']) && !empty($frontMatterData['folder'])) {
-        $folderName = $frontMatterData['folder'];
-        $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
-        $fStmt->execute([$folderName, $workspace]);
-        $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
-        $folderId = $folderData ? (int)$folderData['id'] : null;
+        $frontMatterFolder = $frontMatterData['folder'];
+
+        if (strpos($frontMatterFolder, '/') !== false) {
+            // Path-format value (e.g., "1 personal/etsy shop") — resolve the full hierarchy
+            $tempFolderMap = [];
+            $tempCreated = 0;
+            $folderId = createFolderHierarchyFromPath($con, $workspace, $frontMatterFolder, $tempFolderMap, $tempCreated);
+            $segments = explode('/', $frontMatterFolder);
+            $folderName = end($segments);
+        } else {
+            // Simple folder name — look up by name
+            $folderName = $frontMatterFolder;
+            $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
+            $fStmt->execute([$folderName, $workspace]);
+            $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
+            $folderId = $folderData ? (int)$folderData['id'] : null;
+        }
     }
 
     // Insert into database
@@ -1231,7 +1243,8 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
             }
             
             // Create folder hierarchy if path is not empty
-            if (!empty($dirPath) && $dirPath !== '.') {
+            // Skip 'Uncategorized' — it is a placeholder used by structured exports for unfoldered notes
+            if (!empty($dirPath) && $dirPath !== '.' && $dirPath !== 'Uncategorized') {
                 $targetFolderId = $createFolderHierarchy($dirPath);
                 // Get the leaf folder name for legacy support
                 $segments = explode('/', $dirPath);
