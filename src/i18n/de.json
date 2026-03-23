@@ -302,6 +302,7 @@
     "title": "Einstellungen",
     "categories": {
       "actions": "Aktionen",
+      "advanced": "Erweitert",
       "admin_tools": "Admin-Werkzeuge",
       "display": "Anzeige",
       "about": "Über",
@@ -338,6 +339,7 @@
       "news": "Poznote-Blog",
       "website": "Poznote-Website",
       "support": "Entwickler unterstützen",
+      "custom_css": "Benutzerdefinierte CSS-Datei",
       "install_extension": "Erweiterung installieren",
       "install_app": "App installieren",
       "release_notes": "Versionshinweise",
@@ -717,6 +719,13 @@
       "title": "Login-Anzeigename",
       "description": "Legen Sie den Namen fest, der auf dem Login-Bildschirm angezeigt wird.",
       "placeholder": "Anzeigename"
+    },
+    "custom_css": {
+      "title": "Benutzerdefinierte CSS-Datei",
+      "description": "Geben Sie nur den CSS-Dateinamen ein. Die Datei muss im Verzeichnis css abgelegt werden. Leer lassen zum Deaktivieren.",
+      "placeholder": "custom.css",
+      "hint": "Beispiel: custom.css. Poznote lädt die Datei automatisch aus css/custom.css",
+      "validation": "Bitte geben Sie nur einen CSS-Dateinamen wie custom.css ein. Die Datei muss im Verzeichnis css abgelegt werden."
     },
     "theme": {
       "title": "Themenauswahl",

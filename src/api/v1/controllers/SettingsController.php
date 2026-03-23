@@ -11,10 +11,32 @@ class SettingsController {
     private $con;
     
     // Global settings that should be stored in master database
-    private $globalSettings = ['login_display_name'];
+    private $globalSettings = ['login_display_name', 'custom_css_path'];
     
     public function __construct($con) {
         $this->con = $con;
+    }
+
+    private function isGlobalSetting(string $key): bool {
+        return in_array($key, $this->globalSettings, true);
+    }
+
+    private function requireGlobalSettingsAdmin(): void {
+        if (!function_exists('isCurrentUserAdmin') || !isCurrentUserAdmin()) {
+            throw new RuntimeException('admin privileges required', 403);
+        }
+    }
+
+    private function normalizeSettingValue(string $key, $value): string {
+        if ($key === 'custom_css_path') {
+            $normalized = poznoteNormalizeCustomCssPath($value);
+            if ($normalized === '' && trim((string) $value) !== '') {
+                throw new InvalidArgumentException('invalid custom css path', 400);
+            }
+            return $normalized;
+        }
+
+        return is_string($value) ? $value : (string) $value;
     }
     
     /**
@@ -32,7 +54,8 @@ class SettingsController {
         
         try {
             // For global settings, use getGlobalSetting function
-            if (in_array($key, $this->globalSettings)) {
+            if ($this->isGlobalSetting($key)) {
+                $this->requireGlobalSettingsAdmin();
                 require_once dirname(__DIR__, 3) . '/users/db_master.php';
                 $value = getGlobalSetting($key, '');
             } else {
@@ -52,7 +75,11 @@ class SettingsController {
             
         } catch (Exception $e) {
             error_log("SettingsController::show error for key '$key': " . $e->getMessage());
-            http_response_code(500);
+            $statusCode = (int) $e->getCode();
+            if ($statusCode < 400 || $statusCode > 599) {
+                $statusCode = 500;
+            }
+            http_response_code($statusCode);
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
     }
@@ -75,8 +102,11 @@ class SettingsController {
         $value = $input['value'] ?? '';
         
         try {
+            $value = $this->normalizeSettingValue($key, $value);
+
             // For global settings, use setGlobalSetting function
-            if (in_array($key, $this->globalSettings)) {
+            if ($this->isGlobalSetting($key)) {
+                $this->requireGlobalSettingsAdmin();
                 require_once dirname(__DIR__, 3) . '/users/db_master.php';
                 setGlobalSetting($key, $value);
             } else {
@@ -88,7 +118,11 @@ class SettingsController {
             echo json_encode(['success' => true, 'key' => $key, 'value' => $value]);
             
         } catch (Exception $e) {
-            http_response_code(500);
+            $statusCode = (int) $e->getCode();
+            if ($statusCode < 400 || $statusCode > 599) {
+                $statusCode = 500;
+            }
+            http_response_code($statusCode);
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
     }

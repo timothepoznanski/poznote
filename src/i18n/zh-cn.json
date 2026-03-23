@@ -303,6 +303,7 @@
     "title": "设置",
     "categories": {
       "actions": "操作",
+      "advanced": "高级",
       "admin_tools": "管理工具",
       "display": "显示",
       "about": "关于",
@@ -339,6 +340,7 @@
       "documentation": "Github 仓库",
       "news": "Poznote 博客",
       "website": "Poznote 网站",
+      "custom_css": "自定义 CSS 文件",
       "support": "支持开发者",
       "install_app": "安装应用",
       "release_notes": "发布日志",
@@ -717,6 +719,13 @@
       "title": "登录显示名称",
       "description": "设置在登录界面显示的名称。",
       "placeholder": "显示名称"
+    },
+    "custom_css": {
+      "title": "自定义 CSS 文件",
+      "description": "只输入 CSS 文件名。该文件必须放在 css 目录中。留空可禁用。",
+      "placeholder": "custom.css",
+      "hint": "示例：custom.css。Poznote 会自动从 css/custom.css 加载它",
+      "validation": "请只输入 CSS 文件名，例如 custom.css。该文件必须放在 css 目录中。"
     },
     "theme": {
       "title": "主题选择",

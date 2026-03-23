@@ -46,6 +46,7 @@
     "disabled_message": "Access to settings is disabled by administrator.",
     "categories": {
       "actions": "Actions",
+      "advanced": "Advanced",
       "admin_tools": "Admin Tools",
       "display": "Display",
       "about": "About",
@@ -72,6 +73,7 @@
       "support": "Support Developer",
       "install_extension": "Install extension",
       "install_app": "Install application",
+      "custom_css": "Custom CSS path",
       "release_notes": "Release Notes",
       "convert_images": "Base64 Image Converter",
         "orphan_scanner": "Orphan attachments scanner",
@@ -266,6 +268,13 @@
       "title": "Login display name",
       "description": "Set the name shown on the login screen.",
       "placeholder": "Display name"
+    },
+    "custom_css": {
+      "title": "Custom CSS path",
+      "description": "Enter only the CSS filename. The file must be placed in the css directory. Leave empty to disable.",
+      "placeholder": "custom.css",
+      "hint": "Example: custom.css. Poznote will load it automatically from css/custom.css",
+      "validation": "Please enter only a CSS filename like custom.css. The file must be placed in the css directory."
     },
     "theme": {
       "title": "Theme Selection",

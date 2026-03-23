@@ -67,11 +67,28 @@
         })
             .then(function (r) { return r.json(); })
             .then(function (result) {
-                if (callback) callback(result && result.success);
+                if (callback) callback(result && result.success, result);
             })
             .catch(function () {
-                if (callback) callback(false);
+                if (callback) callback(false, null);
             });
+    }
+
+    function isValidCustomCssPath(path) {
+        var normalizedPath = (path || '').trim();
+        if (normalizedPath === '') {
+            return true;
+        }
+
+        if (/^[a-z][a-z0-9+.-]*:/i.test(normalizedPath) || normalizedPath.indexOf('\\') !== -1) {
+            return false;
+        }
+
+        if (normalizedPath.indexOf('..') !== -1 || normalizedPath.indexOf('/') !== -1) {
+            return false;
+        }
+
+        return /^[A-Za-z0-9._-]+\.css$/.test(normalizedPath);
     }
 
     // Reload opener window if it's index.php
@@ -317,7 +334,35 @@
         });
     }
 
+    function refreshCustomCssBadge() {
+        var badge = document.getElementById('custom-css-badge');
+        if (!badge) return;
+
+        var txt = getTranslations();
+        getSetting('custom_css_path', function (value) {
+
+            if (value && value.trim()) {
+                badge.textContent = value.trim();
+                badge.className = 'setting-status enabled';
+            } else {
+                badge.textContent = txt.notDefined;
+                badge.className = 'setting-status disabled';
+            }
+        });
+    }
+
     // ========== Modal Functions ==========
+
+    function showCustomCssModal() {
+        var modal = document.getElementById('customCssModal');
+        var input = document.getElementById('customCssPathInput');
+        if (!modal || !input) return;
+
+        getSetting('custom_css_path', function (value) {
+            input.value = value || '';
+            modal.style.display = 'flex';
+        });
+    }
 
     function showLanguageModal() {
         var modal = document.getElementById('languageModal');
@@ -356,6 +401,15 @@
             }
             modal.style.display = 'flex';
         });
+    }
+
+    function setSectionExpanded(toggleId, gridId, expanded) {
+        var toggle = document.getElementById(toggleId);
+        var grid = document.getElementById(gridId);
+        if (!toggle || !grid) return;
+
+        toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        grid.hidden = !expanded;
     }
 
     // ========== Initialization ==========
@@ -464,6 +518,22 @@
             timezoneCard.addEventListener('click', showTimezonePrompt);
         }
 
+        var advancedToggle = document.getElementById('advanced-settings-toggle');
+        if (advancedToggle) {
+            advancedToggle.addEventListener('click', function () {
+                var isExpanded = advancedToggle.getAttribute('aria-expanded') === 'true';
+                setSectionExpanded('advanced-settings-toggle', 'advanced-settings-grid', !isExpanded);
+            });
+        }
+
+        var adminToolsToggle = document.getElementById('admin-tools-toggle');
+        if (adminToolsToggle) {
+            adminToolsToggle.addEventListener('click', function () {
+                var isExpanded = adminToolsToggle.getAttribute('aria-expanded') === 'true';
+                setSectionExpanded('admin-tools-toggle', 'admin-tools-grid', !isExpanded);
+            });
+        }
+
         // Tasklist insert order card - toggles between top and bottom
         var tasklistInsertOrderCard = document.getElementById('tasklist-insert-order-card');
         if (tasklistInsertOrderCard) {
@@ -504,6 +574,11 @@
         var loginDisplayCard = document.getElementById('login-display-card');
         if (loginDisplayCard && typeof window.showLoginDisplayNamePrompt === 'function') {
             loginDisplayCard.addEventListener('click', window.showLoginDisplayNamePrompt);
+        }
+
+        var customCssCard = document.getElementById('custom-css-card');
+        if (customCssCard) {
+            customCssCard.addEventListener('click', showCustomCssModal);
         }
 
         // Font size card - delegates to font-size-settings.js
@@ -597,6 +672,30 @@
             });
         }
 
+        var saveCustomCssBtn = document.getElementById('saveCustomCssBtn');
+        if (saveCustomCssBtn) {
+            saveCustomCssBtn.addEventListener('click', function () {
+                var input = document.getElementById('customCssPathInput');
+                var value = input ? input.value.trim() : '';
+
+                if (!isValidCustomCssPath(value)) {
+                    alert(tr('modals.custom_css.validation', {}, 'Please enter only a CSS filename like custom.css. The file must be placed in the css directory.'));
+                    return;
+                }
+
+                setSetting('custom_css_path', value, function (success, result) {
+                    if (success) {
+                        try { closeModal('customCssModal'); } catch (e) { }
+                        refreshCustomCssBadge();
+                        reloadOpener();
+                        window.location.reload();
+                    } else {
+                        alert((result && result.error) || tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                    }
+                });
+            });
+        }
+
         // Load all badges on page load
         refreshLanguageBadge();
         refreshLoginDisplayBadge();
@@ -607,11 +706,14 @@
         refreshTimezoneBadge();
         refreshNoteWidthBadge();
         refreshIndexIconScaleBadge();
+        refreshCustomCssBadge();
 
         // Search functionality - filters settings cards
         var searchInput = document.getElementById('home-search-input');
         var cards = document.querySelectorAll('.home-grid .home-card');
         var grid = document.querySelector('.home-grid');
+        var advancedGrid = document.getElementById('advanced-settings-grid');
+        var adminToolsGrid = document.getElementById('admin-tools-grid');
 
         if (searchInput && grid) {
             // Create "no results" message element
@@ -630,6 +732,8 @@
             searchInput.addEventListener('input', function () {
                 var term = this.value.toLowerCase().trim();
                 var visibleCount = 0;
+                var hasAdvancedMatch = false;
+                var hasAdminToolsMatch = false;
 
                 cards.forEach(function (card) {
                     var titleEl = card.querySelector('.home-card-title');
@@ -640,7 +744,29 @@
                     var isMatch = title.includes(term) || status.includes(term);
                     card.style.display = isMatch ? 'flex' : 'none';
                     if (isMatch) visibleCount++;
+                    if (isMatch && advancedGrid && advancedGrid.contains(card)) {
+                        hasAdvancedMatch = true;
+                    }
+                    if (isMatch && adminToolsGrid && adminToolsGrid.contains(card)) {
+                        hasAdminToolsMatch = true;
+                    }
                 });
+
+                if (advancedGrid) {
+                    if (term === '') {
+                        setSectionExpanded('advanced-settings-toggle', 'advanced-settings-grid', false);
+                    } else {
+                        setSectionExpanded('advanced-settings-toggle', 'advanced-settings-grid', hasAdvancedMatch);
+                    }
+                }
+
+                if (adminToolsGrid) {
+                    if (term === '') {
+                        setSectionExpanded('admin-tools-toggle', 'admin-tools-grid', false);
+                    } else {
+                        setSectionExpanded('admin-tools-toggle', 'admin-tools-grid', hasAdminToolsMatch);
+                    }
+                }
 
                 noResults.style.display = (visibleCount === 0) ? 'block' : 'none';
             });
@@ -661,6 +787,7 @@
             refreshNoteSortBadge();
             refreshTasklistInsertOrderBadge();
             refreshToolbarModeBadge();
+            refreshCustomCssBadge();
         });
     });
 
@@ -677,7 +804,9 @@
     window.refreshToolbarModeBadge = refreshToolbarModeBadge;
     window.refreshTimezoneBadge = refreshTimezoneBadge;
     window.refreshNoteWidthBadge = refreshNoteWidthBadge;
+    window.refreshCustomCssBadge = refreshCustomCssBadge;
     window.getSetting = getSetting;
     window.setSetting = setSetting;
+    window.showCustomCssModal = showCustomCssModal;
 
 })();

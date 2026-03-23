@@ -307,6 +307,19 @@ POZNOTE_PASSWORD_ALICE=alice-secret
 POZNOTE_PASSWORD_BOB=bob-secret
 ```
 
+#### Custom CSS Overrides
+
+If you want to adjust fonts, spacing, or other visual details beyond the built-in options, you can load an extra stylesheet on every HTML page.
+
+Configure it in `Settings > Advanced > Custom CSS path`.
+
+Notes:
+
+- Enter only the filename, for example `custom.css`.
+- The file must be placed in `src/css/`, and Poznote will load it as `css/custom.css`.
+- Poznote appends a cache-busting `v=` parameter automatically when the target file exists locally.
+- The stylesheet is injected near the end of `<head>`, so it can override the default application styles.
+
 </details>
 
 <a id="oidc"></a>

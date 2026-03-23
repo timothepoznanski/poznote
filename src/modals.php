@@ -46,6 +46,20 @@
     </div>
 </div>
 
+<!-- Custom CSS Path Modal -->
+<div id="customCssModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.custom_css.title', [], 'Custom CSS path'); ?></h3>
+        <p><?php echo t_h('modals.custom_css.description', [], 'Enter only the CSS filename. The file must be placed in the css directory. Leave empty to disable.'); ?></p>
+        <input type="text" id="customCssPathInput" placeholder="<?php echo t_h('modals.custom_css.placeholder', [], 'custom.css'); ?>" maxlength="255" autocomplete="off" autocapitalize="off" spellcheck="false" />
+        <p><?php echo t_h('modals.custom_css.hint', [], 'Example: custom.css. Poznote will load it automatically from css/custom.css'); ?></p>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="customCssModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveCustomCssBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Font Size Settings Modal -->
 <div id="fontSizeModal" class="modal">
     <div class="modal-content">

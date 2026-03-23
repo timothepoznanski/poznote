@@ -444,9 +444,37 @@ if ($isAdmin) {
         </div>
 
         <?php if ($isAdmin): ?>
+        <!-- ADVANCED CATEGORY -->
+        <div class="settings-accordion">
+        <button type="button" class="settings-category-title settings-category-toggle" id="advanced-settings-toggle" aria-expanded="false" aria-controls="advanced-settings-grid">
+            <span><?php echo t_h('settings.categories.advanced', [], 'Advanced'); ?></span>
+            <i class="lucide lucide-chevron-down settings-category-toggle-icon" aria-hidden="true"></i>
+        </button>
+        <div class="home-grid settings-collapsible-grid" id="advanced-settings-grid" hidden>
+
+            <!-- Custom CSS Path -->
+            <div class="home-card" id="custom-css-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-palette"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.custom_css', [], 'Custom CSS path'); ?></span>
+                    <span id="custom-css-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+        </div>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($isAdmin): ?>
         <!-- ADMIN TOOLS CATEGORY -->
-        <h2 class="settings-category-title"><?php echo t_h('settings.categories.admin_tools', [], 'Admin Tools'); ?></h2>
-        <div class="home-grid">
+        <div class="settings-accordion">
+        <button type="button" class="settings-category-title settings-category-toggle" id="admin-tools-toggle" aria-expanded="false" aria-controls="admin-tools-grid">
+            <span><?php echo t_h('settings.categories.admin_tools', [], 'Admin Tools'); ?></span>
+            <i class="lucide lucide-chevron-down settings-category-toggle-icon" aria-hidden="true"></i>
+        </button>
+        <div class="home-grid settings-collapsible-grid" id="admin-tools-grid" hidden>
 
             <!-- Disaster Recovery -->
             <div class="home-card settings-card-clickable" id="disaster-recovery-card" data-href="admin/disaster-recovery.php">
@@ -478,6 +506,7 @@ if ($isAdmin) {
                 </div>
             </div>
 
+        </div>
         </div>
         <?php endif; ?>
 

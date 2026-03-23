@@ -301,6 +301,7 @@
     "title": "Configurações",
     "categories": {
       "actions": "Ações",
+      "advanced": "Avançado",
       "admin_tools": "Ferramentas de administração",
       "display": "Tela",
       "about": "Sobre",
@@ -337,6 +338,7 @@
       "news": "Blog do Poznote",
       "website": "Site do Poznote",
       "support": "Apoiar o desenvolvedor",
+      "custom_css": "Arquivo CSS personalizado",
       "install_extension": "Instalar extensão",
       "install_app": "Instalar aplicação",
       "release_notes": "Notas de versão",
@@ -716,6 +718,13 @@
       "title": "Nome de exibição do login",
       "description": "Defina o nome mostrado na tela de login.",
       "placeholder": "Nome de exibição"
+    },
+    "custom_css": {
+      "title": "Arquivo CSS personalizado",
+      "description": "Digite apenas o nome do arquivo CSS. O arquivo deve ser colocado no diretório css. Deixe em branco para desativar.",
+      "placeholder": "custom.css",
+      "hint": "Exemplo: custom.css. O Poznote irá carregá-lo automaticamente de css/custom.css",
+      "validation": "Digite apenas um nome de arquivo CSS como custom.css. O arquivo deve ser colocado no diretório css."
     },
     "theme": {
       "title": "Seleção de Tema",

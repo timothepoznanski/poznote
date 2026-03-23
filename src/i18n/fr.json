@@ -314,6 +314,7 @@
     "disabled_message": "L'accès aux paramètres est désactivé par l'administrateur.",
     "categories": {
       "actions": "Actions",
+      "advanced": "Avancé",
       "admin_tools": "Outils d'administration",
       "display": "Affichage",
       "about": "À propos",
@@ -360,6 +361,7 @@
       "support": "Soutenir le développeur",
       "install_extension": "Installer l'extension",
       "install_app": "Installer l'application",
+      "custom_css": "Chemin CSS personnalisé",
       "release_notes": "Notes de version",
       "convert_images": "Convertisseur d’images Base64",
       "orphan_scanner": "Scanner de pièces jointes orphelines",
@@ -741,6 +743,13 @@
       "title": "Nom affiché à la connexion",
       "description": "Définissez le nom affiché sur l’écran de connexion.",
       "placeholder": "Nom affiché"
+    },
+    "custom_css": {
+      "title": "Chemin CSS personnalisé",
+      "description": "Saisissez uniquement le nom du fichier CSS. Le fichier doit être placé dans le répertoire css. Laissez vide pour désactiver.",
+      "placeholder": "custom.css",
+      "hint": "Exemple : custom.css. Poznote le chargera automatiquement depuis css/custom.css",
+      "validation": "Veuillez saisir uniquement un nom de fichier CSS comme custom.css. Le fichier doit être placé dans le répertoire css."
     },
     "theme": {
       "title": "Sélection du thème",
