@@ -62,7 +62,8 @@
     "outline": {
       "title": "Gliederung",
       "no_headings": "Keine Überschriften in dieser Notiz"
-    }
+    },
+    "link_copied": "Link kopiert"
   },
   "kanban": {
     "title": "Kanban - {{folder}}",

@@ -398,3 +398,37 @@ html[data-theme='dark'] .toggle-outline-btn:hover {
     background: #3d3d3d;
     color: #4db8ff;
 }
+
+/* Heading anchor copy toast */
+#heading-copy-toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(0.5rem);
+    background: #333;
+    color: #fff;
+    font-size: 0.82rem;
+    padding: 0.4em 0.9em;
+    border-radius: 6px;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    white-space: nowrap;
+}
+
+#heading-copy-toast.heading-copy-toast--visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+#heading-copy-toast.heading-copy-toast--hidden {
+    opacity: 0;
+    transform: translateX(-50%) translateY(0.5rem);
+}
+
+body.dark-mode #heading-copy-toast,
+html[data-theme='dark'] #heading-copy-toast {
+    background: #555;
+    color: #f0f0f0;
+}

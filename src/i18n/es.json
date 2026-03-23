@@ -62,7 +62,8 @@
     "outline": {
       "title": "Esquema",
       "no_headings": "Sin encabezados en esta nota"
-    }
+    },
+    "link_copied": "Enlace copiado"
   },
   "kanban": {
     "title": "Kanban - {{folder}}",

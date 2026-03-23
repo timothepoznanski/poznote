@@ -38,7 +38,8 @@
     "outline": {
       "title": "Outline",
       "no_headings": "No headings in this note"
-    }
+    },
+    "link_copied": "Link copied"
   },
   "settings": {
     "title": "Settings",

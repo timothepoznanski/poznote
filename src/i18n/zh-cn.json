@@ -62,7 +62,8 @@
     "outline": {
       "title": "大纲",
       "no_headings": "此笔记中没有标题"
-    }
+    },
+    "link_copied": "链接已复制"
   },
   "kanban": {
     "title": "看板 - {{folder}}",

@@ -233,6 +233,56 @@ function toggleOutline() {
     }
 }
 
+let _headingToastTimeout = null;
+
+function showHeadingCopiedToast() {
+    let toast = document.getElementById('heading-copy-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'heading-copy-toast';
+        document.body.appendChild(toast);
+    }
+    const label = (typeof window.t === 'function')
+        ? window.t('common.link_copied', null, 'Link copied')
+        : 'Link copied';
+    toast.textContent = label;
+    toast.classList.remove('heading-copy-toast--hidden');
+    toast.classList.add('heading-copy-toast--visible');
+    clearTimeout(_headingToastTimeout);
+    _headingToastTimeout = setTimeout(function () {
+        toast.classList.remove('heading-copy-toast--visible');
+        toast.classList.add('heading-copy-toast--hidden');
+    }, 2000);
+}
+
+/**
+ * Add a GitHub-style anchor link icon to a heading element.
+ * Shows a clickable '#' link on hover that copies the section URL to the clipboard.
+ */
+function addHeadingAnchorLink(heading) {
+    if (!heading || heading.querySelector('.heading-anchor')) return;
+
+    const anchor = document.createElement('a');
+    anchor.className = 'heading-anchor';
+    anchor.setAttribute('aria-hidden', 'true');
+    anchor.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="12" height="12"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0z"/></svg>';
+
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const url = window.location.href.split('#')[0] + '#' + heading.id;
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(url).then(function () {
+                anchor.classList.add('heading-anchor--copied');
+                setTimeout(function () { anchor.classList.remove('heading-anchor--copied'); }, 2000);
+                showHeadingCopiedToast();
+            });
+        }
+    });
+
+    heading.appendChild(anchor);
+}
+
 /**
  * Extract headings from a note element
  */
@@ -288,6 +338,7 @@ function extractHeadings(noteElement) {
                             if (h.textContent.trim() === text) {
                                 previewElement = h;
                                 if (!h.id) h.id = id;
+                                addHeadingAnchorLink(h);
                                 break;
                             }
                         }
@@ -320,6 +371,8 @@ function extractHeadings(noteElement) {
             if (!heading.id) {
                 heading.id = `heading-${index}-${text.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
             }
+
+            addHeadingAnchorLink(heading);
 
             headings.push({
                 id: heading.id,

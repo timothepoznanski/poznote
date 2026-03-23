@@ -64,7 +64,8 @@
     "outline": {
       "title": "Sommaire",
       "no_headings": "Aucun titre dans cette note"
-    }
+    },
+    "link_copied": "Lien copié"
   },
   "kanban": {
     "title": "Kanban - {{folder}}",
