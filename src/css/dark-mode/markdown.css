@@ -41,6 +41,12 @@ body.dark-mode .markdown-preview code:not([class*="hljs"]):not([class*="language
     color: var(--dm-text);
 }
 
+html[data-theme='dark'] .markdown-preview pre code:not([class*="hljs"]):not([class*="language-"]),
+body.dark-mode .markdown-preview pre code:not([class*="hljs"]):not([class*="language-"]) {
+    background-color: transparent !important;
+    color: var(--dm-text-muted) !important;
+}
+
 html[data-theme='dark'] .markdown-preview pre,
 body.dark-mode .markdown-preview pre {
     background-color: var(--dm-surface);

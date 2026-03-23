@@ -91,6 +91,13 @@ body.dark-mode .noteentry code:not([class*="hljs"]):not([class*="language-"]) {
     border-color: var(--dm-border) !important;
 }
 
+html[data-theme='dark'] .noteentry pre code:not([class*="hljs"]):not([class*="language-"]),
+body.dark-mode .noteentry pre code:not([class*="hljs"]):not([class*="language-"]) {
+    background-color: transparent !important;
+    color: var(--dm-text-muted) !important;
+    border-color: transparent !important;
+}
+
 /* Code blocks with language class - readable text before highlight.js processes */
 html[data-theme='dark'] .noteentry pre code[class*="language-"],
 html[data-theme='dark'] .noteentry code[class*="language-"],
