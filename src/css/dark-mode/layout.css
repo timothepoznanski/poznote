@@ -274,12 +274,22 @@ body.dark-mode .links_arbo_left {
 }
 
 html[data-theme='dark'] .links_arbo_left:hover,
+html[data-theme='dark'] .links_arbo_left.selected-note,
 body.dark-mode .links_arbo_left:hover {
     background-color: var(--dm-surface) !important;
 }
 
 html[data-theme='dark'] .links_arbo_left:hover .note-title,
+html[data-theme='dark'] .links_arbo_left.selected-note .note-title,
 body.dark-mode .links_arbo_left:hover .note-title {
+    color: #5f94f7 !important;
+}
+
+body.dark-mode .links_arbo_left.selected-note {
+    background-color: var(--dm-surface) !important;
+}
+
+body.dark-mode .links_arbo_left.selected-note .note-title {
     color: #5f94f7 !important;
 }
 
