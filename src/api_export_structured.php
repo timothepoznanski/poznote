@@ -373,6 +373,7 @@ function addFrontMatterToMarkdown($content, $metadata, $con) {
     $created = $metadata['created'] ?? '';
     $updated = $metadata['updated'] ?? '';
     $folder_id = $metadata['folder_id'] ?? null;
+    $noteType = $metadata['type'] ?? 'note';
     
     // Parse tags (stored as comma-separated string)
     $tagsList = [];
@@ -399,6 +400,10 @@ function addFrontMatterToMarkdown($content, $metadata, $con) {
     
     if (!empty($folderPath)) {
         $frontMatter .= "folder: " . json_encode($folderPath, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
+    }
+
+    if ($noteType === 'tasklist') {
+        $frontMatter .= "type: tasklist\n";
     }
     
     $frontMatter .= "favorite: " . $favorite . "\n";

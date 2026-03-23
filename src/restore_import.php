@@ -270,6 +270,57 @@ function parseFrontMatter($content) {
 }
 
 /**
+ * Convert Markdown checkbox list content to Poznote tasklist JSON.
+ * Returns JSON string, or null when the content does not look like a tasklist.
+ */
+function convertMarkdownCheckboxListToTasklistJson($markdownContent) {
+    $markdownContent = str_replace(["\r\n", "\r"], "\n", $markdownContent);
+    $trimmedContent = trim($markdownContent);
+
+    if ($trimmedContent === '') {
+        return json_encode([], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    $tasks = [];
+    $lines = explode("\n", $markdownContent);
+
+    foreach ($lines as $line) {
+        if (!preg_match('/^\s*[-*+]\s+\[([ xX])\]\s+(.*)$/u', $line, $matches)) {
+            continue;
+        }
+
+        $text = trim($matches[2]);
+        $important = false;
+
+        if (preg_match('/\s+⭐\s*$/u', $text)) {
+            $important = true;
+            $text = preg_replace('/\s+⭐\s*$/u', '', $text);
+            $text = preg_replace('/^\*\*(.*)\*\*$/us', '$1', trim($text));
+        }
+
+        $text = trim($text);
+        if ($text === '') {
+            continue;
+        }
+
+        $tasks[] = [
+            'id' => (int) (microtime(true) * 10000),
+            'text' => $text,
+            'completed' => strtolower($matches[1]) === 'x',
+            'noteId' => '',
+            'important' => $important,
+        ];
+        usleep(1);
+    }
+
+    if (empty($tasks)) {
+        return null;
+    }
+
+    return json_encode($tasks, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+}
+
+/**
  * Extract Obsidian-style inline tags from markdown content
  * Obsidian tags are formatted as #tag (no space after #)
  * This function looks for tags on the first line(s) of the content
@@ -595,9 +646,21 @@ function importSingleNoteFile($con, $content, $fileName, $fileExtension, $worksp
         $frontMatterData = $parsed['metadata'];
         $content = $parsed['content'];
 
-        $obsidianTagsResult = extractObsidianTags($content);
-        $obsidianTags = $obsidianTagsResult['tags'];
-        $content = $obsidianTagsResult['content'];
+        $frontMatterType = $frontMatterData['type'] ?? null;
+        if ($frontMatterType === 'tasklist') {
+            $tasklistJson = convertMarkdownCheckboxListToTasklistJson($content);
+            if ($tasklistJson !== null) {
+                $noteType = 'tasklist';
+                $content = $tasklistJson;
+                $originalJsonData = json_decode($tasklistJson, true);
+            }
+        }
+
+        if ($noteType === 'markdown') {
+            $obsidianTagsResult = extractObsidianTags($content);
+            $obsidianTags = $obsidianTagsResult['tags'];
+            $content = $obsidianTagsResult['content'];
+        }
     }
 
     // Extract metadata (title, tags, favorite, dates)
