@@ -85,7 +85,7 @@ textarea:focus {
 }
 
 .noteentry,
-.noteentry *:not(.lucide):not([class*="lucide-"]):not(i):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6):not(pre):not(pre *):not(code):not(code *):not(.code-block):not(.code-block *):not(.hljs):not(.hljs *) {
+.noteentry *:not(.lucide):not([class*="lucide-"]):not(i):not(a):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6):not(pre):not(pre *):not(code):not(code *):not(.code-block):not(.code-block *):not(.hljs):not(.hljs *) {
     font-size: var(--note-font-size, 15px) !important;
 }
 
