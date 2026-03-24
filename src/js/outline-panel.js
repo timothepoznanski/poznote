@@ -8,6 +8,9 @@
 let isResizingOutline = false;
 let currentNoteId = null;
 let hasInitializedOutlinePanel = false;
+let hasInitializedHeadingAnchorHandlers = false;
+const HEADING_ANCHOR_SELECTOR = '.heading-anchor';
+const HEADING_ANCHOR_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="12" height="12"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0z"/></svg>';
 
 function isPublicOutlinePage() {
     return !!(window.isPublicNotePage || document.querySelector('.public-note-page .public-note .content'));
@@ -84,6 +87,7 @@ function initOutlinePanel() {
     }
 
     hasInitializedOutlinePanel = true;
+    initHeadingAnchorInteractions();
 
     // Load saved width from localStorage
     const savedWidth = localStorage.getItem('outlineWidth');
@@ -266,22 +270,51 @@ function showHeadingCopiedToast() {
     }, 2000);
 }
 
-/**
- * Add a GitHub-style anchor link icon to a heading element.
- * Shows a clickable '#' link on hover that copies the section URL to the clipboard.
- */
-function addHeadingAnchorLink(heading) {
-    if (!heading || heading.querySelector('.heading-anchor')) return;
+function stripRuntimeHeadingAnchorsFromElement(element) {
+    if (!element) return element;
 
-    const anchor = document.createElement('a');
-    anchor.className = 'heading-anchor';
-    anchor.setAttribute('aria-hidden', 'true');
-    anchor.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="12" height="12"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0z"/></svg>';
+    var anchors = element.querySelectorAll(HEADING_ANCHOR_SELECTOR);
+    for (var i = 0; i < anchors.length; i++) {
+        anchors[i].remove();
+    }
 
-    anchor.addEventListener('click', function (e) {
+    return element;
+}
+
+function getHeadingTextContent(heading) {
+    if (!heading) return '';
+
+    var clone = heading.cloneNode(true);
+    stripRuntimeHeadingAnchorsFromElement(clone);
+    return (clone.textContent || '').trim();
+}
+
+function initHeadingAnchorInteractions() {
+    if (hasInitializedHeadingAnchorHandlers) {
+        return;
+    }
+
+    hasInitializedHeadingAnchorHandlers = true;
+
+    document.addEventListener('mousedown', function (e) {
+        var anchor = e.target.closest(HEADING_ANCHOR_SELECTOR);
+        if (!anchor) return;
+
         e.preventDefault();
         e.stopPropagation();
-        const url = window.location.href.split('#')[0] + '#' + heading.id;
+    }, true);
+
+    document.addEventListener('click', function (e) {
+        var anchor = e.target.closest(HEADING_ANCHOR_SELECTOR);
+        if (!anchor) return;
+
+        var heading = anchor.closest('h1, h2, h3, h4, h5, h6');
+        if (!heading || !heading.id) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        var url = window.location.href.split('#')[0] + '#' + heading.id;
         if (navigator.clipboard) {
             navigator.clipboard.writeText(url).then(function () {
                 anchor.classList.add('heading-anchor--copied');
@@ -289,9 +322,36 @@ function addHeadingAnchorLink(heading) {
                 showHeadingCopiedToast();
             });
         }
-    });
+    }, true);
+}
 
-    heading.appendChild(anchor);
+/**
+ * Add a GitHub-style anchor link icon to a heading element.
+ * Shows a clickable '#' link on hover that copies the section URL to the clipboard.
+ */
+function addHeadingAnchorLink(heading) {
+    if (!heading) return;
+
+    if (!heading.id) {
+        const headingText = getHeadingTextContent(heading);
+        if (!headingText) return;
+        heading.id = 'heading-' + headingText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    }
+
+    let anchor = heading.querySelector(HEADING_ANCHOR_SELECTOR);
+    if (!anchor) {
+        anchor = document.createElement('a');
+        heading.appendChild(anchor);
+    }
+
+    anchor.className = 'heading-anchor';
+    anchor.href = '#' + heading.id;
+    anchor.title = 'Copy section link';
+    anchor.setAttribute('aria-hidden', 'true');
+    anchor.setAttribute('contenteditable', 'false');
+    anchor.setAttribute('draggable', 'false');
+    anchor.setAttribute('data-heading-anchor', 'true');
+    anchor.innerHTML = HEADING_ANCHOR_SVG;
 }
 
 /**
@@ -346,7 +406,7 @@ function extractHeadings(noteElement) {
                         const previewHeadings = markdownPreview.querySelectorAll('h1, h2, h3, h4, h5, h6');
                         // Try to find matching heading by text content
                         for (const h of previewHeadings) {
-                            if (h.textContent.trim() === text) {
+                            if (getHeadingTextContent(h) === text) {
                                 previewElement = h;
                                 if (!h.id) h.id = id;
                                 addHeadingAnchorLink(h);
@@ -375,7 +435,7 @@ function extractHeadings(noteElement) {
     const headingElements = noteElement.querySelectorAll('h1, h2, h3, h4, h5, h6');
     headingElements.forEach((heading, index) => {
         const level = parseInt(heading.tagName.substring(1)); // h1 -> 1, h2 -> 2, etc.
-        const text = heading.textContent.trim();
+        const text = getHeadingTextContent(heading);
 
         if (text) {
             // Add an ID to the heading if it doesn't have one (for navigation)
@@ -735,6 +795,8 @@ function refreshOutline() {
     currentNoteId = null; // Force refresh
     updateOutlineForCurrentNote();
 }
+
+window.stripRuntimeHeadingAnchorsFromElement = stripRuntimeHeadingAnchorsFromElement;
 
 /**
  * Initialize touch/swipe support for mobile

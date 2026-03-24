@@ -2420,6 +2420,18 @@ function openKanbanView(folderId, folderName) {
             window._isKanbanViewActive = true;
             window._kanbanFolderId = folderId;
 
+            // Hide outline panel (sommaire) in Kanban view
+            document.body.classList.add('kanban-active');
+            var isMobileKanban = window.innerWidth <= 800;
+            if (isMobileKanban) {
+                window._outlineWasMobileOpen = document.body.classList.contains('outline-mobile-open');
+                document.body.classList.remove('outline-mobile-open');
+            } else {
+                window._outlineWasCollapsed = document.body.classList.contains('outline-collapsed');
+                document.documentElement.classList.add('outline-collapsed');
+                document.body.classList.add('outline-collapsed');
+            }
+
             // Remove selection from any notes in the sidebar
             document.querySelectorAll('.links_arbo_left.selected-note').forEach(function (el) {
                 el.classList.remove('selected-note');
@@ -2478,6 +2490,20 @@ function closeKanbanView() {
 
     window._isKanbanViewActive = false;
     window._kanbanFolderId = null;
+    document.body.classList.remove('kanban-active');
+
+    // Restore outline panel (sommaire) state
+    var isMobileClose = window.innerWidth <= 800;
+    if (isMobileClose) {
+        if (window._outlineWasMobileOpen) {
+            document.body.classList.add('outline-mobile-open');
+        }
+        window._outlineWasMobileOpen = null;
+    } else if (window._outlineWasCollapsed === false) {
+        document.documentElement.classList.remove('outline-collapsed');
+        document.body.classList.remove('outline-collapsed');
+        window._outlineWasCollapsed = null;
+    }
 
     // Update URL back to normal
     var workspace = getSelectedWorkspace();

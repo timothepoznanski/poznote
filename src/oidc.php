@@ -804,40 +804,15 @@ function oidc_finish_login($claims, $tokens) {
     if ($rememberMe) {
         // Use the same Remember Me mechanism as standard authentication
         // This creates a persistent cookie that lasts 30 days
-        $configured_port = $_ENV['HTTP_WEB_PORT'] ?? '8040';
         $timestamp = time();
         $actualUsername = $user['username'];
-        $expectedUserPassword = getUserSpecificPassword($actualUsername);
-        $secretToUse = $user['is_admin'] ? AUTH_PASSWORD : $expectedUserPassword;
+        $secretToUse = getRememberMeSecret($user);
         
         // Format: actual_username:user_id:timestamp:hash
         $hash = hash('sha256', $actualUsername . $user['id'] . $timestamp . $secretToUse);
         $token = base64_encode($actualUsername . ':' . $user['id'] . ':' . $timestamp . ':' . $hash);
         
-        // Detect if behind a reverse proxy (HTTPS termination)
-        $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-                 || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
-                 || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on')
-                 || (!empty($_SERVER['HTTP_X_FORWARDED_PORT']) && $_SERVER['HTTP_X_FORWARDED_PORT'] === '443');
-        
-        // Allow override via environment variable
-        $forceSecureCookies = getenv('POZNOTE_FORCE_SECURE_COOKIES');
-        if ($forceSecureCookies !== false && $forceSecureCookies !== '') {
-            $isSecure = filter_var($forceSecureCookies, FILTER_VALIDATE_BOOLEAN);
-        }
-        
-        $cookieName = 'poznote_remember_' . $configured_port;
-        $cookieDuration = 30 * 24 * 60 * 60; // 30 days
-        
-        setcookie(
-            $cookieName,
-            $token,
-            time() + $cookieDuration,
-            '/',
-            '',
-            $isSecure,
-            true
-        );
+        setRememberMeCookie($token, time() + REMEMBER_ME_DURATION);
     }
 
     // Clear transient values

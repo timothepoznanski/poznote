@@ -102,6 +102,22 @@ function getUserSpecificPassword($username) {
 define("REMEMBER_ME_COOKIE", 'poznote_remember_' . ($configured_port ?? '8040'));
 define("REMEMBER_ME_DURATION", 30 * 24 * 60 * 60); // 30 days
 
+/**
+ * Set or clear the remember-me cookie with proper security attributes.
+ * Mirrors session cookie settings (secure flag, SameSite=Lax).
+ */
+function setRememberMeCookie(string $value, int $expires): void {
+    $secure = $GLOBALS['isSecure'] ?? false;
+    setcookie(REMEMBER_ME_COOKIE, $value, [
+        'expires'  => $expires,
+        'path'     => '/',
+        'domain'   => '',
+        'secure'   => $secure,
+        'httponly'  => true,
+        'samesite' => 'Lax'
+    ]);
+}
+
 function api_t($key, $vars = [], $default = null) {
     // Lazy-load i18n helpers when auth.php is used standalone
     if (!function_exists('t')) {
@@ -187,7 +203,7 @@ function isAuthenticated() {
                 // This forces the user to re-login and select their profile
                 if ($migrationTimestamp !== null && (int)$timestamp < (int)$migrationTimestamp) {
                     // Cookie was created before migration, invalidate it
-                    setcookie(REMEMBER_ME_COOKIE, '', time() - 3600, '/', '', false, true);
+                    setRememberMeCookie('', time() - 3600);
                     error_log("Poznote: Invalidated pre-migration remember-me cookie");
                     return false;
                 }
@@ -214,7 +230,7 @@ function isAuthenticated() {
                         $newTimestamp = time();
                         $newHash = hash('sha256', $username . $firstUser['id'] . $newTimestamp . AUTH_PASSWORD);
                         $newToken = base64_encode($username . ':' . $firstUser['id'] . ':' . $newTimestamp . ':' . $newHash);
-                        setcookie(REMEMBER_ME_COOKIE, $newToken, time() + REMEMBER_ME_DURATION, '/', '', false, true);
+                        setRememberMeCookie($newToken, time() + REMEMBER_ME_DURATION);
                         
                         return true;
                     }
@@ -226,7 +242,7 @@ function isAuthenticated() {
             }
         }
         // Invalid token, remove it
-        setcookie(REMEMBER_ME_COOKIE, '', time() - 3600, '/', '', false, true);
+        setRememberMeCookie('', time() - 3600);
     }
     
     return false;
@@ -276,7 +292,7 @@ function authenticate($username, $password, $rememberMe = false) {
             // Format: actual_username:user_id:timestamp:hash
             $hash = hash('sha256', $actualUsername . $userId . $timestamp . $secretToUse);
             $token = base64_encode($actualUsername . ':' . $userId . ':' . $timestamp . ':' . $hash);
-            setcookie(REMEMBER_ME_COOKIE, $token, time() + REMEMBER_ME_DURATION, '/', '', false, true);
+            setRememberMeCookie($token, time() + REMEMBER_ME_DURATION);
         }
 
         return true;
@@ -300,7 +316,7 @@ function logout() {
     session_destroy();
     // Remove remember me cookie
     if (isset($_COOKIE[REMEMBER_ME_COOKIE])) {
-        setcookie(REMEMBER_ME_COOKIE, '', time() - 3600, '/', '', false, true);
+        setRememberMeCookie('', time() - 3600);
     }
 
     if (is_string($oidcLogoutUrl) && $oidcLogoutUrl !== '') {

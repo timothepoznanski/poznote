@@ -91,11 +91,8 @@
 }
 
 .markdown-preview .heading-anchor {
-    position: absolute;
-    left: -1.2em;
-    top: 50%;
-    transform: translateY(-50%);
     opacity: 0;
+    margin-left: 0.35em;
     padding: 0 0.2em;
     color: inherit;
     text-decoration: none;
@@ -103,6 +100,9 @@
     display: inline-flex;
     align-items: center;
     line-height: 1;
+    vertical-align: middle;
+    font-size: inherit;
+    cursor: pointer;
 }
 
 .markdown-preview h1:hover .heading-anchor,
@@ -121,6 +121,8 @@
 .markdown-preview .heading-anchor svg {
     fill: currentColor;
     vertical-align: middle;
+    width: 0.8em;
+    height: 0.8em;
 }
 
 .markdown-preview p {

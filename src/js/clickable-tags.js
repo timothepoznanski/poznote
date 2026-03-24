@@ -684,7 +684,11 @@ function updateNoteById(noteId) {
     var titleInput = document.getElementById("inp" + noteId);
     var tagsElem = document.getElementById("tags" + noteId);
 
-    var currentContent = entryElem ? entryElem.innerHTML : '';
+    var currentContent = entryElem
+        ? ((typeof window.getComparableNoteContent === 'function')
+            ? window.getComparableNoteContent(entryElem, noteId)
+            : entryElem.innerHTML)
+        : '';
     var currentTitle = titleInput ? titleInput.value : '';
     var currentTags = tagsElem ? tagsElem.value : '';
 
