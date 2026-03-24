@@ -489,6 +489,10 @@ function cleanSearchHighlightsFromElement(element) {
         parent.normalize();
     }
 
+    if (typeof window.stripRuntimeHeadingAnchorsFromElement === 'function') {
+        window.stripRuntimeHeadingAnchorsFromElement(clonedElement);
+    }
+
     return clonedElement.innerHTML;
 }
 
@@ -510,8 +514,39 @@ function getTextContentFromElement(element) {
         parent.normalize();
     }
 
+    if (typeof window.stripRuntimeHeadingAnchorsFromElement === 'function') {
+        window.stripRuntimeHeadingAnchorsFromElement(clonedElement);
+    }
+
     return clonedElement.textContent || "";
 }
+
+function getComparableNoteContent(entryElem, noteId) {
+    if (!entryElem) return '';
+
+    var noteType = entryElem.getAttribute('data-note-type') || 'note';
+
+    if (noteType === 'tasklist') {
+        if (typeof getTaskListData === 'function') {
+            return getTaskListData(noteId) || '';
+        }
+        return entryElem.innerHTML || '';
+    }
+
+    if (noteType === 'markdown') {
+        if (typeof getMarkdownContentForNote === 'function') {
+            var markdownContent = getMarkdownContentForNote(noteId);
+            if (markdownContent !== null) {
+                return markdownContent;
+            }
+        }
+        return entryElem.innerHTML || '';
+    }
+
+    return cleanSearchHighlightsFromElement(entryElem).replace(/<br\s*[\/]?>/gi, '&nbsp;<br>');
+}
+
+window.getComparableNoteContent = getComparableNoteContent;
 
 // ============================================================
 // UI UPDATE FUNCTIONS

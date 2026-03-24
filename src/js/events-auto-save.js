@@ -225,7 +225,11 @@ function markNoteAsModified() {
 
     // Function to check content and trigger save if needed
     const checkContentAndSave = () => {
-        const currentContent = entryElem ? entryElem.innerHTML : '';
+        const currentContent = entryElem
+            ? ((typeof window.getComparableNoteContent === 'function')
+                ? window.getComparableNoteContent(entryElem, noteid)
+                : entryElem.innerHTML)
+            : '';
         const contentChanged = currentContent !== lastSavedContent;
 
         if (!contentChanged && !titleChanged && !tagsChanged) {
@@ -302,7 +306,9 @@ function saveToLocalStorage() {
                 // Serialize checklist data before saving
                 serializeChecklists(entryElem);
 
-                const content = entryElem.innerHTML;
+                const content = (typeof window.getComparableNoteContent === 'function')
+                    ? window.getComparableNoteContent(entryElem, noteid)
+                    : entryElem.innerHTML;
                 const draftKey = 'poznote_draft_' + noteid;
                 localStorage.setItem(draftKey, content);
 
@@ -579,6 +585,10 @@ function restoreDraft(noteId, content, title, tags) {
 
         entryElem.innerHTML = content;
 
+        if (typeof window.stripRuntimeHeadingAnchorsFromElement === 'function') {
+            window.stripRuntimeHeadingAnchorsFromElement(entryElem);
+        }
+
         // Convert any restored <audio> elements to iframes for contenteditable
         if (typeof window.convertNoteAudioToIframes === 'function') {
             window.convertNoteAudioToIframes();
@@ -633,7 +643,9 @@ function reinitializeAutoSaveState() {
         }
 
         // Initialize lastSaved* variables with current server content (freshly loaded)
-        const entryContent = entryElem.innerHTML;
+        const entryContent = (typeof window.getComparableNoteContent === 'function')
+            ? window.getComparableNoteContent(entryElem, currentNoteId)
+            : entryElem.innerHTML;
         const titleInput = document.getElementById('inp' + currentNoteId);
         const tagsElem = document.getElementById('tags' + currentNoteId);
 
