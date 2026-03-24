@@ -734,7 +734,7 @@ function importNotesZip($uploadedFile) {
         return ['success' => false, 'error' => t('restore_import.errors.cannot_open_zip')];
     }
     
-    $maxFiles = (int)(getenv('POZNOTE_IMPORT_MAX_ZIP_FILES') ?: 300);
+    $maxFiles = (int)(poznoteResolveGlobalSetting('import_max_zip_files', 'POZNOTE_IMPORT_MAX_ZIP_FILES', '300'));
     
     // First pass: count valid files in the ZIP to enforce limit BEFORE importing anything
     $validFileCount = 0;
@@ -1027,7 +1027,7 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         return ['success' => false, 'error' => t('restore_import.errors.cannot_open_zip')];
     }
     
-    $maxFiles = (int)(getenv('POZNOTE_IMPORT_MAX_ZIP_FILES') ?: 300);
+    $maxFiles = (int)(poznoteResolveGlobalSetting('import_max_zip_files', 'POZNOTE_IMPORT_MAX_ZIP_FILES', '300'));
     
     // Track if we started a transaction for cleanup purposes
     $transactionStarted = false;
@@ -1585,7 +1585,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
     }
     
     // Check file count limit
-    $maxFiles = (int)(getenv('POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES') ?: 50);
+    $maxFiles = (int)(poznoteResolveGlobalSetting('import_max_individual_files', 'POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES', '50'));
     $fileCount = count($uploadedFiles['name']);
     
     if ($fileCount > $maxFiles) {
@@ -1933,8 +1933,8 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                     <small class="form-text text-muted form-text-muted-block">
                         <span class="text-danger">
                         <?php 
-                        $maxIndividualFiles = (int)(getenv('POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES') ?: 50);
-                        $maxZipFiles = (int)(getenv('POZNOTE_IMPORT_MAX_ZIP_FILES') ?: 300);
+                        $maxIndividualFiles = (int)(poznoteResolveGlobalSetting('import_max_individual_files', 'POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES', '50'));
+                        $maxZipFiles = (int)(poznoteResolveGlobalSetting('import_max_zip_files', 'POZNOTE_IMPORT_MAX_ZIP_FILES', '300'));
                         echo t_h('restore_import.sections.individual_notes.files_info', ['maxIndividualFiles' => $maxIndividualFiles, 'maxZipFiles' => $maxZipFiles], 'Multiple files (max {{maxIndividualFiles}}) or single ZIP archive (max {{maxZipFiles}} files). These limits can be changed,');
                         echo ' <a href="https://github.com/timothepoznanski/poznote#import-individual-notes" target="_blank" rel="noopener">';
                         echo t_h('restore_import.sections.individual_notes.files_info_link', 'see documentation');
@@ -2091,8 +2091,8 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
     <!-- Configuration for JavaScript -->
     <script type="application/json" id="restore-import-config"><?php
         echo json_encode([
-            'maxIndividualFiles' => (int)(getenv('POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES') ?: 50),
-            'maxZipFiles' => (int)(getenv('POZNOTE_IMPORT_MAX_ZIP_FILES') ?: 300)
+            'maxIndividualFiles' => (int)(poznoteResolveGlobalSetting('import_max_individual_files', 'POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES', '50')),
+            'maxZipFiles' => (int)(poznoteResolveGlobalSetting('import_max_zip_files', 'POZNOTE_IMPORT_MAX_ZIP_FILES', '300'))
         ]);
     ?></script>
     <script src="js/restore-import.js"></script>

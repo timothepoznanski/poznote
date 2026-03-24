@@ -11,7 +11,7 @@ class SettingsController {
     private $con;
     
     // Global settings that should be stored in master database
-    private $globalSettings = ['login_display_name', 'custom_css_path'];
+    private $globalSettings = ['login_display_name', 'custom_css_path', 'git_sync_enabled', 'import_max_individual_files', 'import_max_zip_files'];
     
     public function __construct($con) {
         $this->con = $con;
@@ -34,6 +34,18 @@ class SettingsController {
                 throw new InvalidArgumentException('invalid custom css path', 400);
             }
             return $normalized;
+        }
+
+        if ($key === 'git_sync_enabled') {
+            return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
+        }
+
+        if ($key === 'import_max_individual_files' || $key === 'import_max_zip_files') {
+            $intVal = (int) $value;
+            if ($intVal < 1 || $intVal > 100000) {
+                throw new InvalidArgumentException('value must be between 1 and 100000', 400);
+            }
+            return (string) $intVal;
         }
 
         return is_string($value) ? $value : (string) $value;

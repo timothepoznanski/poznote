@@ -46,7 +46,7 @@
     "disabled_message": "Access to settings is disabled by administrator.",
     "categories": {
       "actions": "Actions",
-      "advanced": "Advanced",
+      "advanced": "Advanced Settings",
       "admin_tools": "Admin Tools",
       "display": "Display",
       "about": "About",
@@ -77,7 +77,9 @@
       "release_notes": "Release Notes",
       "convert_images": "Base64 Image Converter",
         "orphan_scanner": "Orphan attachments scanner",
-        "change_password": "Change Password"
+        "change_password": "Change Password",
+      "import_limits": "Import Limits",
+      "git_sync_toggle": "Git Sync"
     },
     "install_app": {
       "unavailable": "Installation is not available right now. On Chrome mobile, open the browser menu then tap \"Install app\" (or \"Add to Home screen\") when available.",
@@ -275,6 +277,14 @@
       "placeholder": "custom.css",
       "hint": "Example: custom.css. Poznote will load it automatically from css/custom.css",
       "validation": "Please enter only a CSS filename like custom.css. The file must be placed in the css directory."
+    },
+    "import_limits": {
+      "title": "Import Limits",
+      "description": "Configure the maximum number of files allowed during import operations.",
+      "max_individual_files": "Max individual files",
+      "max_zip_files": "Max files in ZIP",
+      "individual_badge": "Individual: {{count}}",
+      "zip_badge": "ZIP: {{count}}"
     },
     "theme": {
       "title": "Theme Selection",
@@ -1573,8 +1583,8 @@
       "token_missing": "Not configured",
       "not_configured": "Not configured",
       "not_configured_yet": "To configure",
-      "hint": "{{provider}} sync is disabled. An administrator should set POZNOTE_GIT_SYNC_ENABLED=true in your .env file to enable it.",
-      "hint_enable": "Git sync is disabled. An administrator should set POZNOTE_GIT_SYNC_ENABLED=true in your environment variables to enable it.",
+      "hint": "{{provider}} sync is disabled. An administrator can enable it in Settings > Advanced Settings.",
+      "hint_enable": "Git sync is disabled. An administrator can enable it in Settings > Advanced Settings.",
       "provider": "Provider",
       "api_base": "API Base URL",
       "author_name": "Author Name",

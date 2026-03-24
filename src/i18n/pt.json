@@ -301,7 +301,7 @@
     "title": "Configurações",
     "categories": {
       "actions": "Ações",
-      "advanced": "Avançado",
+      "advanced": "Configurações avançadas",
       "admin_tools": "Ferramentas de administração",
       "display": "Tela",
       "about": "Sobre",
@@ -311,7 +311,7 @@
       "account_display": "Conta e Exibição",
       "notes_folders": "Notas e Pastas",
       "backup_restore": "Backup, Restauração e Atualizações",
-      "advanced": "Avançado"
+      "advanced": "Configurações avançadas"
     },
     "language": {
       "label": "Idioma",
@@ -345,7 +345,9 @@
       "convert_images": "Base64 Image Converter",
       "orphan_scanner": "Scanner de anexos órfãos",
       "user_management": "Gestão de utilizadores",
-      "change_password": "Mudar palavra-passe"
+      "change_password": "Mudar palavra-passe",
+      "import_limits": "Limites de importação",
+      "git_sync_toggle": "Sincronização Git"
     },
     "install_app": {
       "unavailable": "A instalação não está disponível no momento. No Chrome móvel, abra o menu do navegador e toque em \"Instalar aplicativo\" (ou \"Adicionar à tela inicial\") quando a opção estiver disponível.",
@@ -725,6 +727,14 @@
       "placeholder": "custom.css",
       "hint": "Exemplo: custom.css. O Poznote irá carregá-lo automaticamente de css/custom.css",
       "validation": "Digite apenas um nome de arquivo CSS como custom.css. O arquivo deve ser colocado no diretório css."
+    },
+    "import_limits": {
+      "title": "Limites de importação",
+      "description": "Configure o número máximo de ficheiros permitidos durante as operações de importação.",
+      "max_individual_files": "Máx. ficheiros individuais",
+      "max_zip_files": "Máx. ficheiros no ZIP",
+      "individual_badge": "Individual: {{count}}",
+      "zip_badge": "ZIP: {{count}}"
     },
     "theme": {
       "title": "Seleção de Tema",
@@ -2026,8 +2036,8 @@
       "token_missing": "Não configurado",
       "not_configured": "Não configurado",
       "not_configured_yet": "A configurar",
-      "hint": "A sincronização com {{provider}} está desativada. Um administrador deve definir POZNOTE_GIT_SYNC_ENABLED=true no seu arquivo .env para ativá-la.",
-      "hint_enable": "A sincronização Git está desativada. Um administrador deve definir POZNOTE_GIT_SYNC_ENABLED=true nas suas variáveis de ambiente para ativá-la."
+      "hint": "A sincronização com {{provider}} está desativada. Um administrador pode ativá-la em Configurações > Configurações avançadas.",
+      "hint_enable": "A sincronização Git está desativada. Um administrador pode ativá-la em Configurações > Configurações avançadas."
     },
     "auto_sync": {
       "title": "Sincronização Automática",

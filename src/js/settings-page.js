@@ -351,6 +351,55 @@
         });
     }
 
+    function refreshImportLimitsBadges() {
+        var indBadge = document.getElementById('import-limits-individual-badge');
+        var zipBadge = document.getElementById('import-limits-zip-badge');
+        if (!indBadge && !zipBadge) return;
+
+        getSetting('import_max_individual_files', function (indValue) {
+            var indCount = (indValue && indValue.trim()) ? indValue.trim() : '50';
+            if (indBadge) {
+                indBadge.textContent = tr('modals.import_limits.individual_badge', { count: indCount }, 'Individual: ' + indCount);
+                indBadge.className = 'setting-status enabled';
+            }
+        });
+
+        getSetting('import_max_zip_files', function (zipValue) {
+            var zipCount = (zipValue && zipValue.trim()) ? zipValue.trim() : '300';
+            if (zipBadge) {
+                zipBadge.textContent = tr('modals.import_limits.zip_badge', { count: zipCount }, 'ZIP: ' + zipCount);
+                zipBadge.className = 'setting-status enabled';
+            }
+        });
+    }
+
+    function refreshGitSyncEnabledBadge() {
+        var badge = document.getElementById('git-sync-enabled-status');
+        if (!badge) return;
+
+        var txt = getTranslations();
+        getSetting('git_sync_enabled', function (value) {
+            var enabled = value === '1' || value === 'true';
+            badge.textContent = enabled ? txt.enabled : txt.disabled;
+            badge.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled');
+        });
+    }
+
+    function showImportLimitsModal() {
+        var modal = document.getElementById('importLimitsModal');
+        var indInput = document.getElementById('importMaxIndividualFilesInput');
+        var zipInput = document.getElementById('importMaxZipFilesInput');
+        if (!modal || !indInput || !zipInput) return;
+
+        getSetting('import_max_individual_files', function (indValue) {
+            indInput.value = (indValue && indValue.trim()) ? indValue.trim() : '50';
+            getSetting('import_max_zip_files', function (zipValue) {
+                zipInput.value = (zipValue && zipValue.trim()) ? zipValue.trim() : '300';
+                modal.style.display = 'flex';
+            });
+        });
+    }
+
     // ========== Modal Functions ==========
 
     function showCustomCssModal() {
@@ -410,6 +459,50 @@
 
         toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
         grid.hidden = !expanded;
+    }
+
+    function setupCollapsibleSection(toggleId, gridId) {
+        var toggle = document.getElementById(toggleId);
+        var grid = document.getElementById(gridId);
+        if (!toggle || !grid) return;
+
+        var storageKey = 'settings.section.' + toggleId + '.expanded';
+
+        function restoreSectionState() {
+            try {
+                var savedState = localStorage.getItem(storageKey);
+                if (savedState === 'true' || savedState === 'false') {
+                    setSectionExpanded(toggleId, gridId, savedState === 'true');
+                }
+            } catch (e) {
+                // Ignore storage access errors and keep default markup state
+            }
+        }
+
+        function persistSectionState(expanded) {
+            try {
+                localStorage.setItem(storageKey, expanded ? 'true' : 'false');
+            } catch (e) {
+                // Ignore storage access errors
+            }
+        }
+
+        function toggleSection() {
+            var isExpanded = toggle.getAttribute('aria-expanded') !== 'false';
+            var nextExpanded = !isExpanded;
+            setSectionExpanded(toggleId, gridId, nextExpanded);
+            persistSectionState(nextExpanded);
+        }
+
+        restoreSectionState();
+
+        toggle.addEventListener('click', toggleSection);
+        toggle.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleSection();
+            }
+        });
     }
 
     // ========== Initialization ==========
@@ -495,6 +588,9 @@
             window.restoreUpdateBadge();
         }
 
+        setupCollapsibleSection('advanced', 'advanced-grid');
+        setupCollapsibleSection('admin-tools', 'admin-tools-grid');
+
         // Setup toggle cards
         setupToggleCard('show-created-card', 'show-created-status', 'show_note_created', false);
         setupToggleCard('folder-counts-card', 'folder-counts-status', 'hide_folder_counts', true);
@@ -518,19 +614,24 @@
             timezoneCard.addEventListener('click', showTimezonePrompt);
         }
 
-        var advancedToggle = document.getElementById('advanced-settings-toggle');
-        if (advancedToggle) {
-            advancedToggle.addEventListener('click', function () {
-                var isExpanded = advancedToggle.getAttribute('aria-expanded') === 'true';
-                setSectionExpanded('advanced-settings-toggle', 'advanced-settings-grid', !isExpanded);
-            });
+        // Import limits card - opens modal
+        var importLimitsCard = document.getElementById('import-limits-card');
+        if (importLimitsCard) {
+            importLimitsCard.addEventListener('click', showImportLimitsModal);
         }
 
-        var adminToolsToggle = document.getElementById('admin-tools-toggle');
-        if (adminToolsToggle) {
-            adminToolsToggle.addEventListener('click', function () {
-                var isExpanded = adminToolsToggle.getAttribute('aria-expanded') === 'true';
-                setSectionExpanded('admin-tools-toggle', 'admin-tools-grid', !isExpanded);
+        // Git sync global toggle
+        var gitSyncEnabledCard = document.getElementById('git-sync-enabled-card');
+        if (gitSyncEnabledCard) {
+            gitSyncEnabledCard.addEventListener('click', function () {
+                getSetting('git_sync_enabled', function (currentValue) {
+                    var currently = currentValue === '1' || currentValue === 'true';
+                    var toSet = currently ? '0' : '1';
+                    setSetting('git_sync_enabled', toSet, function () {
+                        refreshGitSyncEnabledBadge();
+                        reloadOpener();
+                    });
+                });
             });
         }
 
@@ -696,6 +797,33 @@
             });
         }
 
+        // Save import limits modal button
+        var saveImportLimitsBtn = document.getElementById('saveImportLimitsBtn');
+        if (saveImportLimitsBtn) {
+            saveImportLimitsBtn.addEventListener('click', function () {
+                var indInput = document.getElementById('importMaxIndividualFilesInput');
+                var zipInput = document.getElementById('importMaxZipFilesInput');
+                var indVal = indInput ? parseInt(indInput.value, 10) : 50;
+                var zipVal = zipInput ? parseInt(zipInput.value, 10) : 300;
+
+                if (isNaN(indVal) || indVal < 1 || indVal > 100000 || isNaN(zipVal) || zipVal < 1 || zipVal > 100000) {
+                    alert(tr('common.error', {}, 'Error'));
+                    return;
+                }
+
+                setSetting('import_max_individual_files', String(indVal), function (s1) {
+                    setSetting('import_max_zip_files', String(zipVal), function (s2) {
+                        if (s1 && s2) {
+                            try { closeModal('importLimitsModal'); } catch (e) { }
+                            refreshImportLimitsBadges();
+                        } else {
+                            alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                        }
+                    });
+                });
+            });
+        }
+
         // Load all badges on page load
         refreshLanguageBadge();
         refreshLoginDisplayBadge();
@@ -707,13 +835,13 @@
         refreshNoteWidthBadge();
         refreshIndexIconScaleBadge();
         refreshCustomCssBadge();
+        refreshImportLimitsBadges();
+        refreshGitSyncEnabledBadge();
 
         // Search functionality - filters settings cards
         var searchInput = document.getElementById('home-search-input');
         var cards = document.querySelectorAll('.home-grid .home-card');
         var grid = document.querySelector('.home-grid');
-        var advancedGrid = document.getElementById('advanced-settings-grid');
-        var adminToolsGrid = document.getElementById('admin-tools-grid');
 
         if (searchInput && grid) {
             // Create "no results" message element
@@ -732,8 +860,6 @@
             searchInput.addEventListener('input', function () {
                 var term = this.value.toLowerCase().trim();
                 var visibleCount = 0;
-                var hasAdvancedMatch = false;
-                var hasAdminToolsMatch = false;
 
                 cards.forEach(function (card) {
                     var titleEl = card.querySelector('.home-card-title');
@@ -744,29 +870,17 @@
                     var isMatch = title.includes(term) || status.includes(term);
                     card.style.display = isMatch ? 'flex' : 'none';
                     if (isMatch) visibleCount++;
-                    if (isMatch && advancedGrid && advancedGrid.contains(card)) {
-                        hasAdvancedMatch = true;
-                    }
-                    if (isMatch && adminToolsGrid && adminToolsGrid.contains(card)) {
-                        hasAdminToolsMatch = true;
-                    }
                 });
 
-                if (advancedGrid) {
-                    if (term === '') {
-                        setSectionExpanded('advanced-settings-toggle', 'advanced-settings-grid', false);
-                    } else {
-                        setSectionExpanded('advanced-settings-toggle', 'advanced-settings-grid', hasAdvancedMatch);
+                // Show/hide category titles based on whether their grids have visible cards
+                document.querySelectorAll('.settings-category-title').forEach(function (title) {
+                    var nextGrid = title.nextElementSibling;
+                    if (nextGrid && nextGrid.classList.contains('home-grid')) {
+                        var hasVisible = nextGrid.querySelector('.home-card[style*="flex"]') !== null;
+                        title.style.display = (term === '' || hasVisible) ? '' : 'none';
+                        nextGrid.style.display = (term === '' || hasVisible) ? '' : 'none';
                     }
-                }
-
-                if (adminToolsGrid) {
-                    if (term === '') {
-                        setSectionExpanded('admin-tools-toggle', 'admin-tools-grid', false);
-                    } else {
-                        setSectionExpanded('admin-tools-toggle', 'admin-tools-grid', hasAdminToolsMatch);
-                    }
-                }
+                });
 
                 noResults.style.display = (visibleCount === 0) ? 'block' : 'none';
             });

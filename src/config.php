@@ -135,11 +135,27 @@ define('SETTINGS_PASSWORD', _env('POZNOTE_SETTINGS_PASSWORD', ''));
 // The preferred source is the Advanced section in settings.php.
 define('CUSTOM_CSS_PATH', poznoteResolveCustomCssPath());
 
+/**
+ * Resolve a global setting from the database with environment variable fallback.
+ */
+function poznoteResolveGlobalSetting(string $dbKey, string $envKey, $default = '') {
+    try {
+        require_once __DIR__ . '/users/db_master.php';
+        $value = getGlobalSetting($dbKey, null);
+        if ($value !== null) {
+            return $value;
+        }
+    } catch (Exception $e) {
+        // Fall back to environment-based configuration when the master DB is unavailable.
+    }
+    return _env($envKey, $default);
+}
+
 // ============================================================
 // GIT SYNC CONFIGURATION (GitHub, Forgejo)
 // ============================================================
-// Enable or disable Git synchronization
-define('GIT_SYNC_ENABLED', filter_var(_env('POZNOTE_GIT_SYNC_ENABLED', false), FILTER_VALIDATE_BOOL));
+// Enable or disable Git synchronization (global setting with env fallback)
+define('GIT_SYNC_ENABLED', filter_var(poznoteResolveGlobalSetting('git_sync_enabled', 'POZNOTE_GIT_SYNC_ENABLED', 'false'), FILTER_VALIDATE_BOOL));
 // Git provider: 'github', 'forgejo'
 define('GIT_PROVIDER', _env('POZNOTE_GIT_PROVIDER', 'github'));
 // Git API base URL (optional, defaults to provider default)

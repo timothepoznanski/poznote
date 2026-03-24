@@ -165,7 +165,7 @@ if ($isAdmin) {
     <link rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/home/dark-mode.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/home/responsive.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/settings.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/settings.css?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('css/settings.css') ?: time(); ?>">
     <link rel="stylesheet" href="css/modals/base.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modals/specific-modals.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modals/attachments.css?v=<?php echo $cache_v; ?>">
@@ -445,12 +445,8 @@ if ($isAdmin) {
 
         <?php if ($isAdmin): ?>
         <!-- ADVANCED CATEGORY -->
-        <div class="settings-accordion">
-        <button type="button" class="settings-category-title settings-category-toggle" id="advanced-settings-toggle" aria-expanded="false" aria-controls="advanced-settings-grid">
-            <span><?php echo t_h('settings.categories.advanced', [], 'Advanced'); ?></span>
-            <i class="lucide lucide-chevron-down settings-category-toggle-icon" aria-hidden="true"></i>
-        </button>
-        <div class="home-grid settings-collapsible-grid" id="advanced-settings-grid" hidden>
+        <h2 class="settings-category-title" id="advanced" role="button" tabindex="0" aria-expanded="false" aria-controls="advanced-grid"><span class="settings-category-label"><?php echo t_h('settings.categories.advanced', [], 'Advanced Settings'); ?></span><i class="lucide lucide-chevron-down settings-category-chevron" aria-hidden="true"></i></h2>
+        <div class="home-grid" id="advanced-grid" hidden>
 
             <!-- Custom CSS Path -->
             <div class="home-card" id="custom-css-card">
@@ -463,18 +459,38 @@ if ($isAdmin) {
                 </div>
             </div>
 
-        </div>
+            <!-- Import Limits -->
+            <div class="home-card" id="import-limits-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-upload"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.import_limits', [], 'Import Limits'); ?></span>
+                    <div>
+                        <span id="import-limits-individual-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                        <span id="import-limits-zip-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Git Sync Global Toggle -->
+            <div class="home-card" id="git-sync-enabled-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-git-branch"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.git_sync_toggle', [], 'Git Sync'); ?></span>
+                    <span id="git-sync-enabled-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
         </div>
         <?php endif; ?>
 
         <?php if ($isAdmin): ?>
         <!-- ADMIN TOOLS CATEGORY -->
-        <div class="settings-accordion">
-        <button type="button" class="settings-category-title settings-category-toggle" id="admin-tools-toggle" aria-expanded="false" aria-controls="admin-tools-grid">
-            <span><?php echo t_h('settings.categories.admin_tools', [], 'Admin Tools'); ?></span>
-            <i class="lucide lucide-chevron-down settings-category-toggle-icon" aria-hidden="true"></i>
-        </button>
-        <div class="home-grid settings-collapsible-grid" id="admin-tools-grid" hidden>
+        <h2 class="settings-category-title" id="admin-tools" role="button" tabindex="0" aria-expanded="false" aria-controls="admin-tools-grid"><span class="settings-category-label"><?php echo t_h('settings.categories.admin_tools', [], 'Admin Tools'); ?></span><i class="lucide lucide-chevron-down settings-category-chevron" aria-hidden="true"></i></h2>
+        <div class="home-grid" id="admin-tools-grid" hidden>
 
             <!-- Disaster Recovery -->
             <div class="home-card settings-card-clickable" id="disaster-recovery-card" data-href="admin/disaster-recovery.php">
@@ -507,7 +523,6 @@ if ($isAdmin) {
             </div>
 
         </div>
-        </div>
         <?php endif; ?>
 
     </div>
@@ -524,7 +539,7 @@ if ($isAdmin) {
     <script src="js/background-settings.js"></script>
     <script src="js/copy-code-on-focus.js"></script>
     <script src="js/modals-events.js"></script>
-    <script src="js/settings-page.js"></script>
+    <script src="js/settings-page.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/settings-page.js') ?: time(); ?>"></script>
     <script src="js/change-password.js?v=<?php echo $cache_v; ?>"></script>
 </body>
 </html>

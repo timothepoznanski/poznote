@@ -7,6 +7,7 @@
 
 let isResizingOutline = false;
 let currentNoteId = null;
+let hasInitializedOutlinePanel = false;
 
 function isPublicOutlinePage() {
     return !!(window.isPublicNotePage || document.querySelector('.public-note-page .public-note .content'));
@@ -62,16 +63,27 @@ function isMarkdownFence(line) {
     return /^\s*```/.test(line);
 }
 
+function setDesktopOutlineCollapsedState(isCollapsed) {
+    document.documentElement.classList.toggle('outline-collapsed', isCollapsed);
+    document.body.classList.toggle('outline-collapsed', isCollapsed);
+}
+
 /**
  * Initialize the outline panel
  */
 function initOutlinePanel() {
+    if (hasInitializedOutlinePanel) {
+        return;
+    }
+
     const outlineResizeHandle = document.getElementById('outlineResizeHandle');
     const outlinePanel = document.getElementById('outline-panel');
 
     if (!outlineResizeHandle || !outlinePanel) {
         return; // Elements not found
     }
+
+    hasInitializedOutlinePanel = true;
 
     // Load saved width from localStorage
     const savedWidth = localStorage.getItem('outlineWidth');
@@ -93,9 +105,7 @@ function initOutlinePanel() {
         // On desktop, keep the outline hidden until the user explicitly opens it.
         const storedCollapsed = localStorage.getItem('outlineCollapsed');
         const isCollapsed = storedCollapsed === null ? true : storedCollapsed === 'true';
-        if (isCollapsed) {
-            document.body.classList.add('outline-collapsed');
-        }
+        setDesktopOutlineCollapsedState(isCollapsed);
     }
 
     // Initialize toggle button
@@ -222,7 +232,8 @@ function toggleOutline() {
         localStorage.setItem('outlineMobileOpen', isOpen);
     } else {
         // On desktop, use collapse mode
-        const isCollapsed = document.body.classList.toggle('outline-collapsed');
+        const isCollapsed = !document.body.classList.contains('outline-collapsed');
+        setDesktopOutlineCollapsedState(isCollapsed);
         localStorage.setItem('outlineCollapsed', isCollapsed);
     }
 
@@ -829,12 +840,9 @@ function initTouchSupport() {
 }
 
 // Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-    initOutlinePanel();
-});
-
-// Also initialize if DOM is already loaded
-if (document.readyState !== 'loading') {
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initOutlinePanel, { once: true });
+} else {
     initOutlinePanel();
 }
 

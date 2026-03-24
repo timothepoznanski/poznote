@@ -743,6 +743,21 @@ if (!empty($sharedTheme) && in_array($sharedTheme, ['dark', 'light'])) {
         })();
     </script>
     <script src="js/public-note-theme-init.js"></script>
+    <script>
+        (function () {
+            try {
+                var isDesktop = window.innerWidth > 800;
+                var storedCollapsed = localStorage.getItem('outlineCollapsed');
+                var shouldCollapseOutline = isDesktop && (storedCollapsed === null || storedCollapsed === 'true');
+
+                if (shouldCollapseOutline) {
+                    document.documentElement.classList.add('outline-collapsed');
+                }
+            } catch (_error) {
+                // Ignore localStorage access errors during early paint.
+            }
+        })();
+    </script>
     <link rel="stylesheet" href="css/lucide.css">
     <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/variables.css') ? filemtime(__DIR__ . '/css/dark-mode/variables.css') : '1'; ?>">
     <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/layout.css') ? filemtime(__DIR__ . '/css/dark-mode/layout.css') : '1'; ?>">

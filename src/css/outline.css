@@ -249,6 +249,7 @@ body:not(.outline-collapsed) .toggle-outline-btn {
 }
 
 /* Collapsed state */
+html.outline-collapsed #outline-panel,
 body.outline-collapsed #outline-panel {
     width: 0 !important;
     min-width: 0 !important;
@@ -256,10 +257,12 @@ body.outline-collapsed #outline-panel {
     overflow: hidden;
 }
 
+html.outline-collapsed .outline-resize-handle,
 body.outline-collapsed .outline-resize-handle {
     cursor: default;
 }
 
+html.outline-collapsed .toggle-outline-btn,
 body.outline-collapsed .toggle-outline-btn {
     right: 3px;
     border-radius: 4px 0 0 4px;
@@ -268,6 +271,7 @@ body.outline-collapsed .toggle-outline-btn {
     pointer-events: auto;
 }
 
+html.outline-collapsed .toggle-outline-btn i,
 body.outline-collapsed .toggle-outline-btn i {
     transform: rotate(180deg);
 }

@@ -60,6 +60,28 @@
     </div>
 </div>
 
+<!-- Import Limits Modal -->
+<div id="importLimitsModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.import_limits.title', [], 'Import Limits'); ?></h3>
+        <p><?php echo t_h('modals.import_limits.description', [], 'Configure the maximum number of files allowed during import operations.'); ?></p>
+        <div class="font-size-controls">
+            <div class="font-size-row">
+                <label for="importMaxIndividualFilesInput"><?php echo t_h('modals.import_limits.max_individual_files', [], 'Max individual files'); ?></label>
+                <input type="number" id="importMaxIndividualFilesInput" min="1" max="100000" step="1" value="50">
+            </div>
+            <div class="font-size-row">
+                <label for="importMaxZipFilesInput"><?php echo t_h('modals.import_limits.max_zip_files', [], 'Max files in ZIP'); ?></label>
+                <input type="number" id="importMaxZipFilesInput" min="1" max="100000" step="1" value="300">
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="importLimitsModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveImportLimitsBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Font Size Settings Modal -->
 <div id="fontSizeModal" class="modal">
     <div class="modal-content">

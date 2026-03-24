@@ -335,7 +335,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 <?php if (!$configStatus['enabled']): ?>
                 <div class="config-hint">
                     <i class="lucide lucide-info"></i>
-                    <?php echo t_h('git_sync.config.hint_enable', [], 'Set POZNOTE_GIT_SYNC_ENABLED=true in your environment to enable Git Sync.'); ?>
+                    <?php echo t_h('git_sync.config.hint_enable', [], 'Git sync is disabled. An administrator can enable it in Settings > Advanced Settings.'); ?>
                 </div>
                 <?php else: ?>
                 

@@ -555,13 +555,9 @@ Poznote supports automatic and manual synchronization with **GitHub** or **Forge
 <summary><strong>How to configure Git Sync</strong></summary>
 <br>
 
-**Step 1 — Enable the feature (admin, in `.env`)**
+**Step 1 — Enable the feature (admin, in Settings > Advanced Settings)**
 
-```bash
-POZNOTE_GIT_SYNC_ENABLED=true
-```
-
-That's the only `.env` setting required. Token, repository, and provider are configured per-user.
+Toggle **Git Sync** to enabled in the **Advanced Settings** section of the Settings page. This will reveal the **Git Sync** menu in the sidebar for all users.
 
 ---
 
@@ -620,7 +616,7 @@ Upload the complete backup ZIP to restore everything:
 Import one or more HTML, Markdown or text notes directly:
 
   - Support `.html`, `.md`, `.markdown` or `.txt` files types
-  - Up to 50 files can be selected at once, configurable via `POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES` in your `.env`
+  - Up to 50 files can be selected at once, configurable in Settings > Advanced Settings > Import Limits
 
 </details>
 
@@ -632,7 +628,7 @@ Import one or more HTML, Markdown or text notes directly:
 Import a ZIP archive containing multiple notes:
 
   - Support `.html`, `.md`, `.markdown` or `.txt` files types
-  - ZIP archives can contain up to 300 files, configurable via `POZNOTE_IMPORT_MAX_ZIP_FILES` in your `.env`
+  - ZIP archives can contain up to 300 files, configurable in Settings > Advanced Settings > Import Limits
   - When importing a ZIP archive, Poznote automatically detects and recreates the folder structure
 
 </details>
@@ -644,7 +640,7 @@ Import a ZIP archive containing multiple notes:
 
 Import a ZIP archive containing multiple notes from Obsidian:
 
-  - ZIP archives can contain up to 300 files, configurable via `POZNOTE_IMPORT_MAX_ZIP_FILES` in your `.env`
+  - ZIP archives can contain up to 300 files, configurable in Settings > Advanced Settings > Import Limits
   - Poznote automatically detects and recreates the folder structure
   - Poznote automatically detects existing tags to create
   - Poznote automatically imports images if they are at the zip file root

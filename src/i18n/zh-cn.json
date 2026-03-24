@@ -303,7 +303,7 @@
     "title": "设置",
     "categories": {
       "actions": "操作",
-      "advanced": "高级",
+      "advanced": "高级设置",
       "admin_tools": "管理工具",
       "display": "显示",
       "about": "关于",
@@ -313,7 +313,7 @@
       "account_display": "账户与显示",
       "notes_folders": "笔记与文件夹",
       "backup_restore": "备份、还原与更新",
-      "advanced": "高级"
+      "advanced": "高级设置"
     },
     "language": {
       "label": "语言",
@@ -346,7 +346,9 @@
       "release_notes": "发布日志",
       "convert_images": "Base64 Image Converter",
       "orphan_scanner": "孤立附件扫描器",
-      "change_password": "修改密码"
+      "change_password": "修改密码",
+      "import_limits": "导入限制",
+      "git_sync_toggle": "Git 同步"
     },
     "install_app": {
       "unavailable": "当前无法安装。请在 Chrome 手机版中打开浏览器菜单，然后在可用时点击“安装应用”（或“添加到主屏幕”）。",
@@ -726,6 +728,14 @@
       "placeholder": "custom.css",
       "hint": "示例：custom.css。Poznote 会自动从 css/custom.css 加载它",
       "validation": "请只输入 CSS 文件名，例如 custom.css。该文件必须放在 css 目录中。"
+    },
+    "import_limits": {
+      "title": "导入限制",
+      "description": "配置导入操作时允许的最大文件数。",
+      "max_individual_files": "最大单个文件数",
+      "max_zip_files": "ZIP 中最大文件数",
+      "individual_badge": "单个: {{count}}",
+      "zip_badge": "ZIP: {{count}}"
     },
     "theme": {
       "title": "主题选择",
@@ -2140,8 +2150,8 @@
       "token_missing": "未配置",
       "not_configured": "未配置",
       "not_configured_yet": "待配置",
-      "hint": "{{provider}} 同步已禁用。管理员应在您的 .env 文件中设置 POZNOTE_GIT_SYNC_ENABLED=true 来启用它。",
-      "hint_enable": "Git 同步已禁用。管理员应在您的环境变量中设置 POZNOTE_GIT_SYNC_ENABLED=true 来启用它。"
+      "hint": "{{provider}} 同步已禁用。管理员可以在设置 > 高级设置中启用它。",
+      "hint_enable": "Git 同步已禁用。管理员可以在设置 > 高级设置中启用它。"
     },
     "auto_sync": {
       "title": "自动同步",

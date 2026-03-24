@@ -159,6 +159,21 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
     <link rel="apple-touch-icon" href="poznote.png?v=<?php echo $v; ?>">
     <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
+    <script>
+        (function () {
+            try {
+                var isDesktop = window.innerWidth > 800;
+                var storedCollapsed = localStorage.getItem('outlineCollapsed');
+                var shouldCollapseOutline = isDesktop && (storedCollapsed === null || storedCollapsed === 'true');
+
+                if (shouldCollapseOutline) {
+                    document.documentElement.classList.add('outline-collapsed');
+                }
+            } catch (_error) {
+                // Ignore localStorage access errors during early paint.
+            }
+        })();
+    </script>
     <script src="js/pwa.js?v=<?php echo $v; ?>" defer></script>
     <script>window.ALLOWED_IFRAME_DOMAINS = <?php echo json_encode(ALLOWED_IFRAME_DOMAINS); ?>;</script>
     <meta name="color-scheme" content="dark light">
@@ -169,7 +184,7 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <link type="text/css" rel="stylesheet" href="css/utilities.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/layout.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/sidebar.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/outline.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/outline.css?v=<?php echo file_exists(__DIR__ . '/css/outline.css') ? filemtime(__DIR__ . '/css/outline.css') : $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/toolbar.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/menus.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/searchbars.css?v=<?php echo $v; ?>"/>
@@ -1031,7 +1046,7 @@ $body_classes = trim($extra_body_classes);
 <script src="js/index-events.js?v=<?php echo $v; ?>"></script>
 <script src="js/main.js?v=<?php echo $v; ?>"></script>
 <script src="js/resize-column.js?v=<?php echo $v; ?>"></script>
-<script src="js/outline-panel.js?v=<?php echo $v; ?>"></script>
+<script src="js/outline-panel.js?v=<?php echo file_exists(__DIR__ . '/js/outline-panel.js') ? filemtime(__DIR__ . '/js/outline-panel.js') : $v; ?>"></script>
 <script src="js/unified-search.js?v=<?php echo $v; ?>"></script>
 <script src="js/clickable-tags.js?v=<?php echo $v; ?>"></script>
 <script src="js/font-size-settings.js?v=<?php echo $v; ?>"></script>
