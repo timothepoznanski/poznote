@@ -537,6 +537,18 @@ table th {
     color: #666;
 }
 
+.public-note .content .heading-anchor {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.45em;
+    vertical-align: middle;
+}
+
+.public-note .content .heading-anchor svg {
+    width: 0.4em;
+    height: 0.4em;
+}
+
 /* Paragraphs */
 .public-note .content p {
     margin: 0;
