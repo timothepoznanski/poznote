@@ -123,10 +123,10 @@ if (isset($_GET['oidc_error'])) {
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Poznote">
     <meta name="color-scheme" content="dark light">
-    <link rel="manifest" href="manifest.webmanifest">
-    <link rel="apple-touch-icon" href="poznote.png">
+    <link rel="manifest" href="pwa/manifest.webmanifest">
+    <link rel="apple-touch-icon" href="pwa/poznote.png">
     <script src="js/theme-init.js"></script>
-    <script src="js/pwa.js" defer></script>
+    <script src="pwa/pwa.js" defer></script>
     <link rel="stylesheet" href="css/lucide.css">
     <link rel="stylesheet" href="css/login.css">
     <link rel="stylesheet" href="css/dark-mode/variables.css">

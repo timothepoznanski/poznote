@@ -42,7 +42,7 @@
   });
 
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+    navigator.serviceWorker.register('pwa/sw.js', { updateViaCache: 'none' })
       .then((registration) => registration.update().then(() => registration))
       .catch(() => {
         // Ignore registration failures; the app remains usable without PWA features.

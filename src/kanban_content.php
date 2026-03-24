@@ -16,13 +16,13 @@ error_reporting(E_ALL);
 
 try {
     // 1. Authentication
-    require 'auth.php';
+    require_once __DIR__ . '/auth.php';
     requireAuth();
 
     // 2. Configuration and Includes
-    require_once 'config.php';
-    include 'functions.php';
-    include 'db_connect.php';
+    require_once __DIR__ . '/config.php';
+    require_once __DIR__ . '/functions.php';
+    require_once __DIR__ . '/db_connect.php';
 
     // 3. Input Validation
     $folder_id = intval($_GET['folder_id'] ?? 0);
@@ -101,6 +101,23 @@ try {
     }
 
     /**
+     * Format a note update date without breaking the whole Kanban view on malformed data.
+     */
+    function formatKanbanDate($updated) {
+        if (empty($updated)) {
+            return '';
+        }
+
+        try {
+            $date = new DateTime($updated, new DateTimeZone('UTC'));
+            $date->setTimezone(new DateTimeZone(getUserTimezone()));
+            return $date->format('d/m H:i');
+        } catch (Exception $e) {
+            return '';
+        }
+    }
+
+    /**
      * Render a single kanban card HTML for a note.
      */
     function renderKanbanCard($note, $folderId) {
@@ -124,13 +141,7 @@ try {
 
             <div class="kanban-card-meta">
                 <span class="kanban-card-date">
-                    <?php 
-                    $updated = $note['updated'] ?? '';
-                    if ($updated) {
-                        $dt = new DateTime($updated);
-                        echo $dt->format('d/m H:i');
-                    }
-                    ?>
+                    <?php echo htmlspecialchars(formatKanbanDate($note['updated'] ?? ''), ENT_QUOTES); ?>
                 </span>
             </div>
 
@@ -296,7 +307,7 @@ try {
     // Graceful error handling in inline view
     ?>
     <div class="kanban-error" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-secondary, #64748b); padding: 40px; text-align: center;">
-        <i class="lucide lucide-alert-triangle-triangle" style="font-size: 3rem; margin-bottom: 20px; color: #f59e0b;"></i>
+        <i class="lucide lucide-alert-triangle" style="font-size: 3rem; margin-bottom: 20px; color: #f59e0b;"></i>
         <h2 style="font-size: 1.5rem; margin-bottom: 10px;"><?php echo t_h('common.error', [], 'Error'); ?></h2>
         <p style="margin-bottom: 20px; color: var(--text-tertiary, #94a3b8); max-width: 400px;">
             <?php echo htmlspecialchars($e->getMessage()); ?>

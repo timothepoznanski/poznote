@@ -155,11 +155,26 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Poznote">
-    <link rel="manifest" href="manifest.webmanifest?v=<?php echo $v; ?>">
+    <link rel="manifest" href="pwa/manifest.webmanifest?v=<?php echo $v; ?>">
     <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
-    <link rel="apple-touch-icon" href="poznote.png?v=<?php echo $v; ?>">
+    <link rel="apple-touch-icon" href="pwa/poznote.png?v=<?php echo $v; ?>">
     <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
-    <script src="js/pwa.js?v=<?php echo $v; ?>" defer></script>
+    <script>
+        (function () {
+            try {
+                var isDesktop = window.innerWidth > 800;
+                var storedCollapsed = localStorage.getItem('outlineCollapsed');
+                var shouldCollapseOutline = isDesktop && (storedCollapsed === null || storedCollapsed === 'true');
+
+                if (shouldCollapseOutline) {
+                    document.documentElement.classList.add('outline-collapsed');
+                }
+            } catch (_error) {
+                // Ignore localStorage access errors during early paint.
+            }
+        })();
+    </script>
+    <script src="pwa/pwa.js?v=<?php echo $v; ?>" defer></script>
     <script>window.ALLOWED_IFRAME_DOMAINS = <?php echo json_encode(ALLOWED_IFRAME_DOMAINS); ?>;</script>
     <meta name="color-scheme" content="dark light">
     <link type="text/css" rel="stylesheet" href="css/lucide.css?v=<?php echo $v; ?>"/>
@@ -169,7 +184,7 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <link type="text/css" rel="stylesheet" href="css/utilities.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/layout.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/sidebar.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/outline.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/outline.css?v=<?php echo file_exists(__DIR__ . '/css/outline.css') ? filemtime(__DIR__ . '/css/outline.css') : $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/toolbar.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/menus.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/searchbars.css?v=<?php echo $v; ?>"/>
@@ -536,9 +551,7 @@ $body_classes = trim($extra_body_classes);
                     // Text formatting buttons (save button removed - auto-save is now automatic)
                     echo '<button type="button" class="toolbar-btn btn-bold text-format-btn" title="' . t_h('editor.toolbar.bold') . '" data-action="exec-bold"><i class="lucide lucide-bold"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-italic text-format-btn" title="' . t_h('editor.toolbar.italic') . '" data-action="exec-italic"><i class="lucide lucide-italic"></i></button>';
-                    if ($note_type !== 'markdown') {
-                        echo '<button type="button" class="toolbar-btn btn-underline text-format-btn" title="' . t_h('editor.toolbar.underline') . '" data-action="exec-underline"><i class="lucide lucide-underline"></i></button>';
-                    }
+                    echo '<button type="button" class="toolbar-btn btn-underline text-format-btn" title="' . t_h('editor.toolbar.underline') . '" data-action="exec-underline"><i class="lucide lucide-underline"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-strikethrough text-format-btn" title="' . t_h('editor.toolbar.strikethrough') . '" data-action="exec-strikethrough"><i class="lucide lucide-strikethrough"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-link text-format-btn" title="' . t_h('editor.toolbar.link') . '" data-action="add-link"><i class="lucide lucide-link"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-color text-format-btn" title="' . t_h('editor.toolbar.text_color') . '" data-action="toggle-red-color"><i class="lucide lucide-palette"></i></button>';
@@ -1033,7 +1046,7 @@ $body_classes = trim($extra_body_classes);
 <script src="js/index-events.js?v=<?php echo $v; ?>"></script>
 <script src="js/main.js?v=<?php echo $v; ?>"></script>
 <script src="js/resize-column.js?v=<?php echo $v; ?>"></script>
-<script src="js/outline-panel.js?v=<?php echo $v; ?>"></script>
+<script src="js/outline-panel.js?v=<?php echo file_exists(__DIR__ . '/js/outline-panel.js') ? filemtime(__DIR__ . '/js/outline-panel.js') : $v; ?>"></script>
 <script src="js/unified-search.js?v=<?php echo $v; ?>"></script>
 <script src="js/clickable-tags.js?v=<?php echo $v; ?>"></script>
 <script src="js/font-size-settings.js?v=<?php echo $v; ?>"></script>

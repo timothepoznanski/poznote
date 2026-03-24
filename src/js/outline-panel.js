@@ -7,6 +7,7 @@
 
 let isResizingOutline = false;
 let currentNoteId = null;
+let hasInitializedOutlinePanel = false;
 
 function isPublicOutlinePage() {
     return !!(window.isPublicNotePage || document.querySelector('.public-note-page .public-note .content'));
@@ -62,16 +63,27 @@ function isMarkdownFence(line) {
     return /^\s*```/.test(line);
 }
 
+function setDesktopOutlineCollapsedState(isCollapsed) {
+    document.documentElement.classList.toggle('outline-collapsed', isCollapsed);
+    document.body.classList.toggle('outline-collapsed', isCollapsed);
+}
+
 /**
  * Initialize the outline panel
  */
 function initOutlinePanel() {
+    if (hasInitializedOutlinePanel) {
+        return;
+    }
+
     const outlineResizeHandle = document.getElementById('outlineResizeHandle');
     const outlinePanel = document.getElementById('outline-panel');
 
     if (!outlineResizeHandle || !outlinePanel) {
         return; // Elements not found
     }
+
+    hasInitializedOutlinePanel = true;
 
     // Load saved width from localStorage
     const savedWidth = localStorage.getItem('outlineWidth');
@@ -93,9 +105,7 @@ function initOutlinePanel() {
         // On desktop, keep the outline hidden until the user explicitly opens it.
         const storedCollapsed = localStorage.getItem('outlineCollapsed');
         const isCollapsed = storedCollapsed === null ? true : storedCollapsed === 'true';
-        if (isCollapsed) {
-            document.body.classList.add('outline-collapsed');
-        }
+        setDesktopOutlineCollapsedState(isCollapsed);
     }
 
     // Initialize toggle button
@@ -222,7 +232,8 @@ function toggleOutline() {
         localStorage.setItem('outlineMobileOpen', isOpen);
     } else {
         // On desktop, use collapse mode
-        const isCollapsed = document.body.classList.toggle('outline-collapsed');
+        const isCollapsed = !document.body.classList.contains('outline-collapsed');
+        setDesktopOutlineCollapsedState(isCollapsed);
         localStorage.setItem('outlineCollapsed', isCollapsed);
     }
 
@@ -231,6 +242,56 @@ function toggleOutline() {
     if (toggleBtn) {
         toggleBtn.blur();
     }
+}
+
+let _headingToastTimeout = null;
+
+function showHeadingCopiedToast() {
+    let toast = document.getElementById('heading-copy-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'heading-copy-toast';
+        document.body.appendChild(toast);
+    }
+    const label = (typeof window.t === 'function')
+        ? window.t('common.link_copied', null, 'Link copied')
+        : 'Link copied';
+    toast.textContent = label;
+    toast.classList.remove('heading-copy-toast--hidden');
+    toast.classList.add('heading-copy-toast--visible');
+    clearTimeout(_headingToastTimeout);
+    _headingToastTimeout = setTimeout(function () {
+        toast.classList.remove('heading-copy-toast--visible');
+        toast.classList.add('heading-copy-toast--hidden');
+    }, 2000);
+}
+
+/**
+ * Add a GitHub-style anchor link icon to a heading element.
+ * Shows a clickable '#' link on hover that copies the section URL to the clipboard.
+ */
+function addHeadingAnchorLink(heading) {
+    if (!heading || heading.querySelector('.heading-anchor')) return;
+
+    const anchor = document.createElement('a');
+    anchor.className = 'heading-anchor';
+    anchor.setAttribute('aria-hidden', 'true');
+    anchor.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="12" height="12"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0z"/></svg>';
+
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const url = window.location.href.split('#')[0] + '#' + heading.id;
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(url).then(function () {
+                anchor.classList.add('heading-anchor--copied');
+                setTimeout(function () { anchor.classList.remove('heading-anchor--copied'); }, 2000);
+                showHeadingCopiedToast();
+            });
+        }
+    });
+
+    heading.appendChild(anchor);
 }
 
 /**
@@ -288,6 +349,7 @@ function extractHeadings(noteElement) {
                             if (h.textContent.trim() === text) {
                                 previewElement = h;
                                 if (!h.id) h.id = id;
+                                addHeadingAnchorLink(h);
                                 break;
                             }
                         }
@@ -320,6 +382,8 @@ function extractHeadings(noteElement) {
             if (!heading.id) {
                 heading.id = `heading-${index}-${text.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
             }
+
+            addHeadingAnchorLink(heading);
 
             headings.push({
                 id: heading.id,
@@ -776,12 +840,9 @@ function initTouchSupport() {
 }
 
 // Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-    initOutlinePanel();
-});
-
-// Also initialize if DOM is already loaded
-if (document.readyState !== 'loading') {
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initOutlinePanel, { once: true });
+} else {
     initOutlinePanel();
 }
 

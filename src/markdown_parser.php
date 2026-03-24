@@ -143,8 +143,8 @@ function parseMarkdown($text) {
         return $placeholder;
     }, $text);
 
-    // Protect details, summary, and br tags
-    $text = preg_replace_callback('/<(details|summary|br)([^>]*)>/i', function($matches) use (&$protectedElements, &$protectedIndex) {
+    // Protect details, summary, br, and underline tags
+    $text = preg_replace_callback('/<(details|summary|br|u)([^>]*)>/i', function($matches) use (&$protectedElements, &$protectedIndex) {
         $tag = strtolower($matches[1]);
         $attrs = $matches[2];
         $placeholder = "\x00PTAG" . $protectedIndex . "\x00";
@@ -157,7 +157,7 @@ function parseMarkdown($text) {
         return $placeholder;
     }, $text);
 
-    $text = preg_replace_callback('/<\/(details|summary)>/i', function($matches) use (&$protectedElements, &$protectedIndex) {
+    $text = preg_replace_callback('/<\/(details|summary|u)>/i', function($matches) use (&$protectedElements, &$protectedIndex) {
         $tag = $matches[1];
         $placeholder = "\x00PTAG" . $protectedIndex . "\x00";
         $protectedElements[$protectedIndex] = '</' . $tag . '>';

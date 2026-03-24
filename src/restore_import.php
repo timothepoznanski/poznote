@@ -270,6 +270,57 @@ function parseFrontMatter($content) {
 }
 
 /**
+ * Convert Markdown checkbox list content to Poznote tasklist JSON.
+ * Returns JSON string, or null when the content does not look like a tasklist.
+ */
+function convertMarkdownCheckboxListToTasklistJson($markdownContent) {
+    $markdownContent = str_replace(["\r\n", "\r"], "\n", $markdownContent);
+    $trimmedContent = trim($markdownContent);
+
+    if ($trimmedContent === '') {
+        return json_encode([], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    $tasks = [];
+    $lines = explode("\n", $markdownContent);
+
+    foreach ($lines as $line) {
+        if (!preg_match('/^\s*[-*+]\s+\[([ xX])\]\s+(.*)$/u', $line, $matches)) {
+            continue;
+        }
+
+        $text = trim($matches[2]);
+        $important = false;
+
+        if (preg_match('/\s+⭐\s*$/u', $text)) {
+            $important = true;
+            $text = preg_replace('/\s+⭐\s*$/u', '', $text);
+            $text = preg_replace('/^\*\*(.*)\*\*$/us', '$1', trim($text));
+        }
+
+        $text = trim($text);
+        if ($text === '') {
+            continue;
+        }
+
+        $tasks[] = [
+            'id' => (int) (microtime(true) * 10000),
+            'text' => $text,
+            'completed' => strtolower($matches[1]) === 'x',
+            'noteId' => '',
+            'important' => $important,
+        ];
+        usleep(1);
+    }
+
+    if (empty($tasks)) {
+        return null;
+    }
+
+    return json_encode($tasks, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+}
+
+/**
  * Extract Obsidian-style inline tags from markdown content
  * Obsidian tags are formatted as #tag (no space after #)
  * This function looks for tags on the first line(s) of the content
@@ -595,9 +646,21 @@ function importSingleNoteFile($con, $content, $fileName, $fileExtension, $worksp
         $frontMatterData = $parsed['metadata'];
         $content = $parsed['content'];
 
-        $obsidianTagsResult = extractObsidianTags($content);
-        $obsidianTags = $obsidianTagsResult['tags'];
-        $content = $obsidianTagsResult['content'];
+        $frontMatterType = $frontMatterData['type'] ?? null;
+        if ($frontMatterType === 'tasklist') {
+            $tasklistJson = convertMarkdownCheckboxListToTasklistJson($content);
+            if ($tasklistJson !== null) {
+                $noteType = 'tasklist';
+                $content = $tasklistJson;
+                $originalJsonData = json_decode($tasklistJson, true);
+            }
+        }
+
+        if ($noteType === 'markdown') {
+            $obsidianTagsResult = extractObsidianTags($content);
+            $obsidianTags = $obsidianTagsResult['tags'];
+            $content = $obsidianTagsResult['content'];
+        }
     }
 
     // Extract metadata (title, tags, favorite, dates)
@@ -683,7 +746,7 @@ function importNotesZip($uploadedFile) {
         return ['success' => false, 'error' => t('restore_import.errors.cannot_open_zip')];
     }
     
-    $maxFiles = (int)(getenv('POZNOTE_IMPORT_MAX_ZIP_FILES') ?: 300);
+    $maxFiles = (int)(poznoteResolveGlobalSetting('import_max_zip_files', 'POZNOTE_IMPORT_MAX_ZIP_FILES', '300'));
     
     // First pass: count valid files in the ZIP to enforce limit BEFORE importing anything
     $validFileCount = 0;
@@ -976,7 +1039,7 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         return ['success' => false, 'error' => t('restore_import.errors.cannot_open_zip')];
     }
     
-    $maxFiles = (int)(getenv('POZNOTE_IMPORT_MAX_ZIP_FILES') ?: 300);
+    $maxFiles = (int)(poznoteResolveGlobalSetting('import_max_zip_files', 'POZNOTE_IMPORT_MAX_ZIP_FILES', '300'));
     
     // Track if we started a transaction for cleanup purposes
     $transactionStarted = false;
@@ -1535,7 +1598,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
     }
     
     // Check file count limit
-    $maxFiles = (int)(getenv('POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES') ?: 50);
+    $maxFiles = (int)(poznoteResolveGlobalSetting('import_max_individual_files', 'POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES', '50'));
     $fileCount = count($uploadedFiles['name']);
     
     if ($fileCount > $maxFiles) {
@@ -1883,8 +1946,8 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                     <small class="form-text text-muted form-text-muted-block">
                         <span class="text-danger">
                         <?php 
-                        $maxIndividualFiles = (int)(getenv('POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES') ?: 50);
-                        $maxZipFiles = (int)(getenv('POZNOTE_IMPORT_MAX_ZIP_FILES') ?: 300);
+                        $maxIndividualFiles = (int)(poznoteResolveGlobalSetting('import_max_individual_files', 'POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES', '50'));
+                        $maxZipFiles = (int)(poznoteResolveGlobalSetting('import_max_zip_files', 'POZNOTE_IMPORT_MAX_ZIP_FILES', '300'));
                         echo t_h('restore_import.sections.individual_notes.files_info', ['maxIndividualFiles' => $maxIndividualFiles, 'maxZipFiles' => $maxZipFiles], 'Multiple files (max {{maxIndividualFiles}}) or single ZIP archive (max {{maxZipFiles}} files). These limits can be changed,');
                         echo ' <a href="https://github.com/timothepoznanski/poznote#import-individual-notes" target="_blank" rel="noopener">';
                         echo t_h('restore_import.sections.individual_notes.files_info_link', 'see documentation');
@@ -2041,8 +2104,8 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
     <!-- Configuration for JavaScript -->
     <script type="application/json" id="restore-import-config"><?php
         echo json_encode([
-            'maxIndividualFiles' => (int)(getenv('POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES') ?: 50),
-            'maxZipFiles' => (int)(getenv('POZNOTE_IMPORT_MAX_ZIP_FILES') ?: 300)
+            'maxIndividualFiles' => (int)(poznoteResolveGlobalSetting('import_max_individual_files', 'POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES', '50')),
+            'maxZipFiles' => (int)(poznoteResolveGlobalSetting('import_max_zip_files', 'POZNOTE_IMPORT_MAX_ZIP_FILES', '300'))
         ]);
     ?></script>
     <script src="js/restore-import.js"></script>

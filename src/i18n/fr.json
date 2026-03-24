@@ -64,7 +64,8 @@
     "outline": {
       "title": "Sommaire",
       "no_headings": "Aucun titre dans cette note"
-    }
+    },
+    "link_copied": "Lien copié"
   },
   "kanban": {
     "title": "Kanban - {{folder}}",
@@ -313,6 +314,7 @@
     "disabled_message": "L'accès aux paramètres est désactivé par l'administrateur.",
     "categories": {
       "actions": "Actions",
+      "advanced": "Paramètres avancés",
       "admin_tools": "Outils d'administration",
       "display": "Affichage",
       "about": "À propos",
@@ -329,7 +331,7 @@
       "account_display": "Compte & Affichage",
       "notes_folders": "Notes & Dossiers",
       "backup_restore": "Sauvegarde, Restauration & Mises à jour",
-      "advanced": "Avancé"
+      "advanced": "Paramètres avancés"
     },
     "language": {
       "label": "Langue",
@@ -359,10 +361,13 @@
       "support": "Soutenir le développeur",
       "install_extension": "Installer l'extension",
       "install_app": "Installer l'application",
+      "custom_css": "Chemin CSS personnalisé",
       "release_notes": "Notes de version",
       "convert_images": "Convertisseur d’images Base64",
       "orphan_scanner": "Scanner de pièces jointes orphelines",
-      "change_password": "Changer le mot de passe"
+      "change_password": "Changer le mot de passe",
+      "import_limits": "Limites d'import",
+      "git_sync_toggle": "Synchronisation Git"
     },
     "install_app": {
       "unavailable": "L’installation n’est pas disponible pour le moment. Sur Chrome mobile, ouvrez le menu du navigateur puis appuyez sur \"Installer l’application\" (ou \"Ajouter à l’écran d’accueil\") quand l’option est disponible.",
@@ -740,6 +745,21 @@
       "title": "Nom affiché à la connexion",
       "description": "Définissez le nom affiché sur l’écran de connexion.",
       "placeholder": "Nom affiché"
+    },
+    "custom_css": {
+      "title": "Chemin CSS personnalisé",
+      "description": "Saisissez uniquement le nom du fichier CSS. Le fichier doit être placé dans le répertoire css. Laissez vide pour désactiver.",
+      "placeholder": "custom.css",
+      "hint": "Exemple : custom.css. Poznote le chargera automatiquement depuis css/custom.css",
+      "validation": "Veuillez saisir uniquement un nom de fichier CSS comme custom.css. Le fichier doit être placé dans le répertoire css."
+    },
+    "import_limits": {
+      "title": "Limites d'import",
+      "description": "Configurez le nombre maximum de fichiers autorisés lors des opérations d'importation.",
+      "max_individual_files": "Max fichiers individuels",
+      "max_zip_files": "Max fichiers dans un ZIP",
+      "individual_badge": "Individuels : {{count}}",
+      "zip_badge": "ZIP : {{count}}"
     },
     "theme": {
       "title": "Sélection du thème",
@@ -2177,8 +2197,8 @@
       "token_missing": "Non configuré",
       "not_configured": "Non configuré",
       "not_configured_yet": "À configurer",
-      "hint": "La synchronisation {{provider}} est désactivée. Un administrateur doit définir POZNOTE_GIT_SYNC_ENABLED=true dans votre fichier .env pour l'activer.",
-      "hint_enable": "La synchronisation Git est désactivée. Un administrateur doit définir POZNOTE_GIT_SYNC_ENABLED=true dans vos variables d'environnement pour l'activer.",
+      "hint": "La synchronisation {{provider}} est désactivée. Un administrateur peut l'activer dans Paramètres > Paramètres avancés.",
+      "hint_enable": "La synchronisation Git est désactivée. Un administrateur peut l'activer dans Paramètres > Paramètres avancés.",
       "provider": "Fournisseur",
       "api_base": "URL de base de l'API",
       "author_name": "Nom de l'auteur",

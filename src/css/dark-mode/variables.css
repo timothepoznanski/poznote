@@ -4,8 +4,8 @@
 
 :root[data-theme='dark'],
 body.dark-mode {
-    --dm-text: #e0e0e0;
-    --dm-text-muted: #a0a0a0;
+    --dm-text: #bebebe;
+    --dm-text-muted: #c5c5c5;
     --dm-bg: #252526;
     --dm-surface: #333333;
     --dm-border: #404040;

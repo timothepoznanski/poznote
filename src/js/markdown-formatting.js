@@ -191,6 +191,13 @@
     }
 
     /**
+     * Apply markdown underline formatting using inline HTML
+     */
+    function applyMarkdownUnderline() {
+        wrapSelectionWithMarkdown('<u>', '</u>');
+    }
+
+    /**
      * Apply markdown inline code formatting
      */
     function applyMarkdownInlineCode() {
@@ -375,22 +382,10 @@
     }
 
     /**
-     * Apply highlight using HTML span tag in markdown
+     * Apply markdown highlight formatting
      */
     function applyMarkdownHighlight(color) {
-        var highlightColor = color || '#f1c40f';
-        
-        var sel = window.getSelection();
-        if (!sel || sel.rangeCount === 0) return;
-
-        var selectedText = sel.toString();
-        
-        // If no selection, do nothing
-        if (!selectedText) return;
-
-        // Apply highlight using span tag as plain text in the markdown editor
-        var highlightedText = '<span style="background-color:' + highlightColor + '">' + selectedText + '</span>';
-        document.execCommand('insertText', false, highlightedText);
+        wrapSelectionWithMarkdown('==', '==');
     }
 
     /**
@@ -417,6 +412,7 @@
     window.applyMarkdownBold = applyMarkdownBold;
     window.applyMarkdownItalic = applyMarkdownItalic;
     window.applyMarkdownStrikethrough = applyMarkdownStrikethrough;
+    window.applyMarkdownUnderline = applyMarkdownUnderline;
     window.applyMarkdownInlineCode = applyMarkdownInlineCode;
     window.applyMarkdownCodeBlock = applyMarkdownCodeBlock;
     window.applyMarkdownLink = applyMarkdownLink;

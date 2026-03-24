@@ -1,10 +1,10 @@
 {
-  "id": "./login.php",
+  "id": "../login.php",
   "name": "Poznote",
   "short_name": "Poznote",
   "description": "Poznote notes and knowledge base",
-  "start_url": "./login.php",
-  "scope": "./",
+  "start_url": "../login.php",
+  "scope": "../",
   "display": "standalone",
   "display_override": [
     "standalone",

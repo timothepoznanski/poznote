@@ -546,6 +546,12 @@ body.dark-mode .public-note .content code:not([class*="hljs"]):not([class*="lang
     color: var(--dm-text);
 }
 
+html[data-theme='dark'] .public-note .content pre code:not([class*="hljs"]):not([class*="language-"]),
+body.dark-mode .public-note .content pre code:not([class*="hljs"]):not([class*="language-"]) {
+    background-color: transparent !important;
+    color: var(--dm-text-muted) !important;
+}
+
 html[data-theme='dark'] .public-note .content pre,
 body.dark-mode .public-note .content pre {
     background-color: transparent !important;

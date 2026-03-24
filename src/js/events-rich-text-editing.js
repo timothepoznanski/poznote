@@ -898,13 +898,52 @@ function handleNoteEntryKeydown(e) {
         }
     }
 
-    // Handle Markdown keyboard shortcuts (Ctrl+B, Ctrl+I, etc.)
+    // Handle note keyboard shortcuts (Ctrl+B, Ctrl+I, Ctrl+K, Ctrl+Shift+S, etc.)
     if (e.ctrlKey || e.metaKey) {
         var container = selection.rangeCount > 0
             ? selection.getRangeAt(0).commonAncestorContainer
             : null;
         var checkNode = container ? (container.nodeType === 3 ? container.parentElement : container) : null;
         var inMarkdownEditor = checkNode && checkNode.closest && checkNode.closest('.markdown-editor');
+        var noteEditor = checkNode && checkNode.closest && checkNode.closest('.noteentry[contenteditable="true"], .markdown-editor');
+
+        if (e.key.toLowerCase() === 'k' && noteEditor) {
+            e.preventDefault();
+            if (typeof window.addLinkToNote === 'function') {
+                window.addLinkToNote();
+            } else if (typeof addLinkToNote === 'function') {
+                addLinkToNote();
+            }
+            return;
+        }
+
+        if (e.shiftKey && e.key.toLowerCase() === 's' && noteEditor) {
+            e.preventDefault();
+            if (inMarkdownEditor) {
+                if (typeof window.applyMarkdownStrikethrough === 'function') {
+                    window.applyMarkdownStrikethrough();
+                } else if (typeof applyMarkdownStrikethrough === 'function') {
+                    applyMarkdownStrikethrough();
+                }
+            } else {
+                document.execCommand('strikeThrough');
+            }
+            return;
+        }
+
+        if (e.key.toLowerCase() === 'u' && noteEditor) {
+            e.preventDefault();
+            if (inMarkdownEditor) {
+                if (typeof window.applyMarkdownUnderline === 'function') {
+                    window.applyMarkdownUnderline();
+                } else if (typeof applyMarkdownUnderline === 'function') {
+                    applyMarkdownUnderline();
+                }
+            } else {
+                document.execCommand('underline');
+            }
+            return;
+        }
 
         if (inMarkdownEditor) {
             if (e.key.toLowerCase() === 'b') {
