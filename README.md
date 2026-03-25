@@ -51,6 +51,7 @@ Discover all the features [here](https://poznote.com/index.html#features)
 - [Multiple Instances](#multiple-instances)
 - [MCP Server](#mcp-server)
 - [Chrome Extension](#poznote-extension)
+- [Note Types Comparison](#note-types-comparison)
 - [API Documentation](#api-documentation)
 - [Tech Stack](#tech-stack)
 
@@ -1581,6 +1582,26 @@ curl -X POST -u 'username:password' \
 ```
 
 </details>
+
+## Note Types Comparison
+
+Poznote supports two primary note formats, each tailored for different workflows.
+
+### HTML Notes (`type: note`)
+*   **Editor:** Direct WYSIWYG (What You See Is What You Get) editing.
+*   **Storage:** Saved as `.html` files in the user data directory. Since they are standard HTML, they can be opened directly in any web browser.
+*   **Exclusive Features:**
+    *   **Excalidraw:** Integrated drawing board for hand-drawn diagrams and sketches.
+    *   **Rich Formatting:** Native support for text colors, highlighting, and standard HTML elements.
+    *   **Interactive UI:** Direct manipulation of elements in the editor.
+
+### Markdown Notes (`type: markdown`)
+*   **Editor:** Markdown syntax editor with real-time preview.
+*   **Storage:** Saved as `.md` files in the user data directory.
+*   **Exclusive Features:**
+    *   **Mermaid Diagrams:** Native support for generating diagrams (flowcharts, sequence, etc.) via ` ```mermaid ` code blocks.
+    *   **Math Equations:** Robust LaTeX support for mathematical formulas using `$ inline $` and `$$ block $$` syntax.
+    *   **Portability:** Standard Markdown format compatible with any external editor or static site generator.
 
 ## Tech Stack
 
