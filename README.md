@@ -228,9 +228,6 @@ Most settings can be modified directly in the application through the settings p
 - **Authentication** - Initial/default passwords and login configuration
 - **Web Server** - HTTP port configuration
 - **OIDC / SSO Authentication** - OpenID Connect integration
-- **Settings Access Control** - Restrict or password-protect settings page
-- **Import Limits** - Maximum files for imports
-- **Git Sync** - GitHub and Forgejo synchronization
 - **MCP Server** - AI assistant integration
 
 Passwords can be changed directly in the application from `Settings > Change Password`. The `.env` authentication variables remain available to define the initial or fallback passwords used when no custom password has been set for a user.
@@ -647,14 +644,6 @@ Import a ZIP archive containing multiple notes from Obsidian:
 
 </details>
 
-## Admin Tools
-
-Admins can access additional tools via Settings > Admin Tools:
-
-- **Disaster Recovery** - Reconstruct the entire user index from data folders in case of system corruption or database loss.
-- **Base64 Image Converter** - Convert inline Base64 encoded images to attachments.
-- **Orphan attachments scanner** - Scan and clean up orphaned attachment files.
-
 <a id="import-standard-notes"></a>
 <details>
 <summary><strong>Import from Standard Notes</strong></summary>
@@ -735,6 +724,14 @@ updated: 2024-01-20 15:45:00
 ```
 
 </details>
+
+## Admin Tools
+
+Admins can access additional tools via Settings > Admin Tools:
+
+- **Disaster Recovery** - Reconstruct the entire user index from data folders in case of system corruption or database loss.
+- **Base64 Image Converter** - Convert inline Base64 encoded images to attachments.
+- **Orphan attachments scanner** - Scan and clean up orphaned attachment files.
 
 ## PWA
 
