@@ -517,6 +517,7 @@ Export individual notes using the **Export** button in the note toolbar:
 For automated scheduled backups via API, you can use the included `backup-poznote.sh` script.
 
 **IMPORTANT:** Only administrators can create backups via the API.
+Use the current password of the admin profile you authenticate with. If that profile has a custom password set in Poznote, the `.env` fallback password is no longer valid for API calls until the custom password is reset.
 
 **Script location:** `backup-poznote.sh` in the `tools` folder of the Poznote repository
 
@@ -547,7 +548,7 @@ bash backup-poznote.sh '<poznote_url>' '<admin_username>' '<admin_password>' '<t
 **Parameters explained:**
 - `'https://poznote.example.com'` - Your Poznote instance URL
 - `'admin'` - Admin username for authentication (must be an admin)
-- `'admin_password'` - Admin password (POZNOTE_PASSWORD from .env)
+- `'admin_password'` - Current admin password for the API profile (custom password or `.env` fallback)
 - `'Nina'` - Target username to backup
 - `'/root/backups'` - Parent directory where backups will be stored (creates `backups-poznote-<username>` folder)
 - `'30'` - Number of backups to keep (older ones are automatically deleted)
