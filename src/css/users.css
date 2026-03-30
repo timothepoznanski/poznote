@@ -458,6 +458,10 @@ html[data-theme='dark'] .users-table td {
     color: var(--text-color, #333);
 }
 
+#createModal .modal-title {
+    margin-bottom: 22px;
+}
+
 /* Forms */
 .form-group {
     margin-bottom: 20px;
