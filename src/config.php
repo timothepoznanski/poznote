@@ -166,6 +166,17 @@ define('GIT_AUTHOR_EMAIL', _env('POZNOTE_GIT_AUTHOR_EMAIL', 'poznote@localhost')
 /**
  * Build the final stylesheet URL, adding cache-busting for local files when possible.
  */
+function poznoteGetAppPathPrefix() {
+    $scriptName = (string) ($_SERVER['SCRIPT_NAME'] ?? '');
+    $scriptDir = rtrim(str_replace('\\', '/', dirname($scriptName)), '/');
+
+    if ($scriptDir === '' || $scriptDir === '.') {
+        return '';
+    }
+
+    return $scriptDir;
+}
+
 function poznoteGetCustomCssHref() {
     if (!defined('CUSTOM_CSS_PATH') || CUSTOM_CSS_PATH === '') {
         return '';
@@ -176,7 +187,7 @@ function poznoteGetCustomCssHref() {
         return '';
     }
 
-    $hrefPath = 'css/' . $filename;
+    $hrefPath = poznoteGetAppPathPrefix() . '/css/' . $filename;
     $absoluteFilePath = __DIR__ . '/css/' . $filename;
     if (!is_file($absoluteFilePath)) {
         return '';
