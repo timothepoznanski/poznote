@@ -464,13 +464,15 @@
       "kanban_on_folder_click": "Ouvrir la vue Kanban au clic sur dossier",
       "index_icon_scale": "Taille des icônes (Index)",
       "note_content_width": "Largeur du contenu de la note",
-      "code_block_word_wrap": "Retour à la ligne des blocs de code"
+      "code_block_word_wrap": "Retour à la ligne des blocs de code",
+      "ui_customization": "Visibilité des éléments"
     },
     "badges": {
       "font_size_default": "par défaut ({{size}}px)",
       "note_font_size": "{{size}}px",
       "sidebar_font_size": "{{size}}px",
       "code_block_font_size": "{{size}}px",
+      "ui_customization_configure": "Configurer",
       "toolbar_mode": {
         "full": "Barre d’outils uniquement",
         "slash": "Commandes slash uniquement",
@@ -750,6 +752,23 @@
       "max_zip_files": "Max fichiers dans un ZIP",
       "individual_badge": "Individuels : {{count}}",
       "zip_badge": "ZIP : {{count}}"
+    },
+    "ui_customization": {
+      "title": "Personnalisation de l'interface",
+      "description": "Afficher ou masquer les éléments de l'interface. Les éléments décochés seront masqués.",
+      "filter_placeholder": "Filtrer les éléments...",
+      "no_results": "Aucun élément correspondant.",
+      "sections": {
+        "home_cards": "Cartes de l'accueil",
+        "create_cards": "Cartes de création",
+        "settings_cards": "Cartes des paramètres",
+        "toolbar": "Barre d'outils",
+        "slash_menu": "Menu slash",
+        "panels": "Autre",
+        "folder_actions": "Actions des dossiers"
+      },
+      "badge_all_visible": "Tout visible",
+      "badge_hidden_count": "{{count}} masqué(s)"
     },
     "theme": {
       "title": "Sélection du thème",

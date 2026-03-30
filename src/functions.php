@@ -370,6 +370,116 @@ function getSetting($key, $default = null) {
     return isset($cache[$key]) ? $cache[$key] : $default;
 }
 
+function poznoteGetNonHideableUiKeys() {
+    return [
+        'card:check-updates-card' => true,
+        'card:github-card' => true,
+        'card:home-support-card' => true,
+        'card:version-card' => true,
+        'card:website-card' => true,
+    ];
+}
+
+function poznoteGetHiddenUiElements() {
+    static $hiddenKeys = null;
+
+    if ($hiddenKeys !== null) {
+        return $hiddenKeys;
+    }
+
+    $hiddenKeys = [];
+    $rawValue = getSetting('hidden_ui_elements', '[]');
+    $decoded = json_decode((string)$rawValue, true);
+    if (!is_array($decoded)) {
+        return $hiddenKeys;
+    }
+
+    $nonHideable = poznoteGetNonHideableUiKeys();
+    foreach ($decoded as $key) {
+        if (!is_string($key) || isset($nonHideable[$key])) {
+            continue;
+        }
+
+        $hiddenKeys[$key] = true;
+    }
+
+    $hiddenKeys = array_keys($hiddenKeys);
+    return $hiddenKeys;
+}
+
+function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
+    $createModalOptionSelectors = [
+        'card:create-note-card' => '.create-note-option[data-type="html"]',
+        'card:create-markdown-note-card' => '.create-note-option[data-type="markdown"]',
+        'card:create-task-list-card' => '.create-note-option[data-type="list"]',
+        'card:create-linked-note-card' => '.create-note-option[data-type="linked"]',
+        'card:create-template-card' => '.create-note-option[data-type="template"]',
+        'card:create-folder-card' => '.create-note-option[data-type="folder"]',
+        'card:create-subfolder-card' => '.create-note-option[data-type="subfolder"]',
+        'card:create-kanban-card' => '.create-note-option[data-type="kanban"]',
+        'card:create-workspace-card' => '.create-note-option[data-type="workspace"]',
+    ];
+
+    $rules = [];
+
+    foreach ($hiddenKeys as $key) {
+        $parts = explode(':', $key, 2);
+        if (count($parts) !== 2) {
+            continue;
+        }
+
+        [$type, $id] = $parts;
+
+        if ($type === 'card') {
+            if ($id === 'ui-customization-card') {
+                continue;
+            }
+
+            $rules[] = '#' . $id . ' { display: none !important; }';
+            if (isset($createModalOptionSelectors[$key])) {
+                $rules[] = '#createModal ' . $createModalOptionSelectors[$key] . ' { display: none !important; }';
+            }
+        } elseif ($type === 'toolbar') {
+            $rules[] = '.note-edit-toolbar .' . $id . ' { display: none !important; }';
+            $rules[] = '.mobile-toolbar-menu [data-selector=".' . $id . '"] { display: none !important; }';
+        } elseif ($type === 'folder') {
+            $rules[] = '.folder-actions-menu-item[data-action="' . $id . '"] { display: none !important; }';
+            if ($id === 'toggle-sort-submenu') {
+                $rules[] = '.sort-submenu { display: none !important; }';
+            }
+        } elseif ($type === 'panel') {
+            if ($id === 'mini-calendar') {
+                $rules[] = '.mini-calendar-container { display: none !important; }';
+            } elseif ($id === 'outline-panel') {
+                $rules[] = '#outline-panel { display: none !important; }';
+                $rules[] = '#outlineResizeHandle { display: none !important; }';
+                $rules[] = '#outlineMobileBackdrop { display: none !important; }';
+            }
+        }
+    }
+
+    return implode("\n", $rules);
+}
+
+function poznoteRenderUiCustomizationBootstrap() {
+    $hiddenKeys = poznoteGetHiddenUiElements();
+    $encodedHiddenKeys = json_encode($hiddenKeys, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
+    if ($encodedHiddenKeys === false) {
+        $encodedHiddenKeys = '[]';
+    }
+
+    echo '<script>window.__POZNOTE_HIDDEN_UI_ELEMENTS__ = ' . $encodedHiddenKeys . ';</script>' . "\n";
+
+    $rules = poznoteBuildUiCustomizationRules($hiddenKeys);
+    if ($rules !== '') {
+        echo '<style id="ui-customization-styles">' . htmlspecialchars($rules, ENT_NOQUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</style>' . "\n";
+    }
+}
+
+function poznoteUsesFolderIconKanban() {
+    return !in_array('panel:folder-icon-kanban', poznoteGetHiddenUiElements(), true);
+}
+
 /**
  * Clean content for search by removing base64 images and other heavy data
  * This is used to keep the database entry column lightweight for search functionality

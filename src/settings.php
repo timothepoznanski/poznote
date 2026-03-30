@@ -88,6 +88,7 @@ if ($isAdmin) {
     <link rel="stylesheet" href="css/modals/share-modal.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modals/alerts-utilities.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modals/responsive.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/modals/ui-customization.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/background-image.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $cache_v; ?>">
@@ -99,6 +100,7 @@ if ($isAdmin) {
     <link rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $cache_v; ?>">
+    <?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
 <body class="home-page"
       data-txt-enabled="<?php echo t_h('common.enabled'); ?>"
@@ -135,8 +137,8 @@ if ($isAdmin) {
         </div>
 
         <!-- ACTIONS CATEGORY -->
-        <h2 class="settings-category-title"><?php echo t_h('settings.categories.actions') . ' (' . $username . ')'; ?></h2>
-        <div class="home-grid">
+        <h2 class="settings-category-title" id="settings-actions-section-title"><?php echo t_h('settings.categories.actions') . ' (' . $username . ')'; ?></h2>
+        <div class="home-grid" id="settings-actions-section-grid">
 
             <!-- Workspaces -->
             <div class="home-card settings-card-clickable" id="workspaces-card" data-href="workspaces.php">
@@ -226,7 +228,7 @@ if ($isAdmin) {
 
         <!-- DISPLAY CATEGORY -->
         <h2 class="settings-category-title" id="display"><?php echo t_h('settings.categories.display') . ' (' . $username . ')'; ?></h2>
-        <div class="home-grid">
+        <div class="home-grid" id="settings-display-section-grid">
 
             <?php if ($isAdmin): ?>
             <!-- Login Display -->
@@ -361,6 +363,15 @@ if ($isAdmin) {
                 </div>
             </div>
 
+            <!-- UI Customization -->
+            <div class="home-card" id="ui-customization-card">
+                <div class="home-card-icon"><i class="lucide lucide-eye-off"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.ui_customization', [], 'UI Customization'); ?></span>
+                    <span id="ui-customization-badge" class="setting-status enabled"><?php echo t_h('display.badges.ui_customization_configure', [], 'Configure'); ?></span>
+                </div>
+            </div>
+
         </div>
 
         <?php if ($isAdmin): ?>
@@ -463,6 +474,7 @@ if ($isAdmin) {
     <script src="js/copy-code-on-focus.js"></script>
     <script src="js/modals-events.js"></script>
     <script src="js/settings-page.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/settings-page.js') ?: time(); ?>"></script>
+    <script src="js/ui-customization.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/change-password.js?v=<?php echo $cache_v; ?>"></script>
 </body>
 </html>

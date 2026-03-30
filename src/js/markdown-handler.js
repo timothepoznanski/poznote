@@ -1474,12 +1474,6 @@ function initializeMarkdownNote(noteId) {
 
     var toolbar = document.querySelector('#note' + noteId + ' .note-edit-toolbar');
     if (toolbar) {
-        // Hide separator button for markdown notes
-        var separatorBtn = toolbar.querySelector('.btn-separator');
-        if (separatorBtn) {
-            separatorBtn.style.display = 'none';
-        }
-
         // Check if view mode toggle button already exists, if not create it
         var existingViewModeBtn = toolbar.querySelector('.markdown-view-mode-btn');
         if (!existingViewModeBtn) {

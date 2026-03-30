@@ -453,10 +453,12 @@
       "kanban_on_folder_click": "点击文件夹时打开看板视图",
       "index_icon_scale": "索引页图标缩放",
       "note_content_width": "笔记内容宽度",
-      "code_block_word_wrap": "代码块自动换行"
+      "code_block_word_wrap": "代码块自动换行",
+      "ui_customization": "元素可见性"
     },
     "badges": {
       "font_size_default": "默认 ({{size}}px)",
+      "ui_customization_configure": "配置",
       "toolbar_mode": {
         "full": "仅工具栏",
         "slash": "仅斜杠命令",
@@ -734,6 +736,23 @@
       "max_zip_files": "ZIP 中最大文件数",
       "individual_badge": "单个: {{count}}",
       "zip_badge": "ZIP: {{count}}"
+    },
+    "ui_customization": {
+      "title": "界面自定义",
+      "description": "显示或隐藏界面元素。未勾选的项目将被隐藏。",
+      "filter_placeholder": "筛选项目...",
+      "no_results": "未找到匹配的项目。",
+      "sections": {
+        "home_cards": "首页卡片",
+        "create_cards": "创建卡片",
+        "settings_cards": "设置卡片",
+        "toolbar": "工具栏",
+        "slash_menu": "斜杠菜单",
+        "panels": "其他",
+        "folder_actions": "文件夹操作"
+      },
+      "badge_all_visible": "全部可见",
+      "badge_hidden_count": "{{count}} 个已隐藏"
     },
     "theme": {
       "title": "主题选择",

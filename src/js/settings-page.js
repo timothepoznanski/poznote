@@ -102,6 +102,16 @@
         }
     }
 
+    function reloadCurrentSettingsPage() {
+        try {
+            if (window.location && window.location.pathname && window.location.pathname.includes('settings.php')) {
+                window.location.reload();
+            }
+        } catch (e) {
+            // Safely ignore reload issues
+        }
+    }
+
     // ========== Toggle Cards ==========
 
     // Helper function to determine if a setting is enabled
@@ -628,6 +638,47 @@
             customCssCard.addEventListener('click', showCustomCssModal);
         }
 
+        // UI Customization card - opens modal
+        var uiCustomizationCard = document.getElementById('ui-customization-card');
+        if (uiCustomizationCard) {
+            uiCustomizationCard.addEventListener('click', showUiCustomizationModal);
+        }
+
+        // Save UI Customization modal button
+        var saveUiCustomBtn = document.getElementById('saveUiCustomizationBtn');
+        if (saveUiCustomBtn) {
+            saveUiCustomBtn.addEventListener('click', function () {
+                var modal = document.getElementById('uiCustomizationModal');
+                if (!modal) return;
+
+                var hidden = [];
+                var checkboxes = modal.querySelectorAll('[data-ui-key]');
+                checkboxes.forEach(function (cb) {
+                    if (!cb.checked) {
+                        hidden.push(cb.getAttribute('data-ui-key'));
+                    }
+                });
+
+                setSetting('hidden_ui_elements', JSON.stringify(hidden), function (success) {
+                    if (success) {
+                        try { closeModal('uiCustomizationModal'); } catch (e) { }
+                        refreshUiCustomizationBadge();
+                        reloadOpener();
+                        reloadCurrentSettingsPage();
+                    } else {
+                        alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                    }
+                });
+            });
+        }
+
+        var uiCustomizationFilterInput = document.getElementById('uiCustomizationFilterInput');
+        if (uiCustomizationFilterInput) {
+            uiCustomizationFilterInput.addEventListener('input', function () {
+                applyUiCustomizationFilter(document.getElementById('uiCustomizationModal'), uiCustomizationFilterInput.value);
+            });
+        }
+
         // Font size card - delegates to font-size-settings.js
         var fontSizeCard = document.getElementById('font-size-card');
         if (fontSizeCard && typeof window.showNoteFontSizePrompt === 'function') {
@@ -783,6 +834,7 @@
         refreshCustomCssBadge();
         refreshImportLimitsBadges();
         refreshGitSyncEnabledBadge();
+        refreshUiCustomizationBadge();
 
         // Search functionality - filters settings cards
         var searchInput = document.getElementById('home-search-input');
@@ -850,6 +902,122 @@
             refreshCustomCssBadge();
         });
     });
+
+    // ========== UI Customization ==========
+
+    function getSupportedUiCustomizationKeys() {
+        var modal = document.getElementById('uiCustomizationModal');
+        var allowed = Object.create(null);
+
+        if (!modal) {
+            return allowed;
+        }
+
+        var checkboxes = modal.querySelectorAll('[data-ui-key]');
+        checkboxes.forEach(function (cb) {
+            allowed[cb.getAttribute('data-ui-key')] = true;
+        });
+
+        return allowed;
+    }
+
+    function parseHiddenUiCustomization(value) {
+        var hidden = [];
+        if (value) {
+            try { hidden = JSON.parse(value); } catch (e) { hidden = []; }
+        }
+        if (!Array.isArray(hidden)) hidden = [];
+
+        var allowed = getSupportedUiCustomizationKeys();
+        return hidden.filter(function (key) {
+            return typeof key === 'string' && allowed[key];
+        });
+    }
+
+    function normalizeUiCustomizationFilterText(value) {
+        var text = String(value || '').toLowerCase().trim();
+
+        if (typeof text.normalize === 'function') {
+            text = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        }
+
+        return text.replace(/\s+/g, ' ');
+    }
+
+    function applyUiCustomizationFilter(modal, value) {
+        if (!modal) return;
+
+        var query = normalizeUiCustomizationFilterText(value);
+        var sections = modal.querySelectorAll('.ui-custom-section');
+        var emptyState = document.getElementById('uiCustomizationFilterEmpty');
+        var anyVisible = false;
+
+        modal.classList.toggle('ui-custom-filtering', query.length > 0);
+
+        sections.forEach(function (section) {
+            var items = section.querySelectorAll('.ui-custom-item');
+            var visibleItems = 0;
+
+            items.forEach(function (item) {
+                var matches = !query || normalizeUiCustomizationFilterText(item.textContent).indexOf(query) !== -1;
+
+                item.hidden = !matches;
+                if (matches) {
+                    visibleItems += 1;
+                }
+            });
+
+            section.hidden = visibleItems === 0;
+            if (visibleItems > 0) {
+                anyVisible = true;
+            }
+        });
+
+        if (emptyState) {
+            emptyState.hidden = anyVisible;
+        }
+    }
+
+    function refreshUiCustomizationBadge() {
+        var badge = document.getElementById('ui-customization-badge');
+        if (!badge) return;
+
+        getSetting('hidden_ui_elements', function (value) {
+            var hidden = parseHiddenUiCustomization(value);
+
+            if (hidden.length === 0) {
+                badge.textContent = tr('modals.ui_customization.badge_all_visible', {}, 'All visible');
+                badge.className = 'setting-status enabled';
+            } else {
+                badge.textContent = tr('modals.ui_customization.badge_hidden_count', { count: hidden.length }, hidden.length + ' hidden');
+                badge.className = 'setting-status disabled';
+            }
+        });
+    }
+
+    function showUiCustomizationModal() {
+        var modal = document.getElementById('uiCustomizationModal');
+        if (!modal) return;
+
+        getSetting('hidden_ui_elements', function (value) {
+            var hidden = parseHiddenUiCustomization(value);
+
+            // Set checkboxes: checked = visible (not in hidden list)
+            var checkboxes = modal.querySelectorAll('[data-ui-key]');
+            checkboxes.forEach(function (cb) {
+                cb.checked = hidden.indexOf(cb.getAttribute('data-ui-key')) === -1;
+            });
+
+            var filterInput = document.getElementById('uiCustomizationFilterInput');
+            if (filterInput) {
+                filterInput.value = '';
+            }
+
+            applyUiCustomizationFilter(modal, '');
+
+            modal.style.display = 'flex';
+        });
+    }
 
     // ========== Global API ==========
     // Expose functions for external access and inline HTML handlers

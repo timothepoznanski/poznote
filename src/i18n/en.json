@@ -112,13 +112,15 @@
       "kanban_on_folder_click": "Open Kanban view on folder click",
       "index_icon_scale": "Index icon scaling",
       "note_content_width": "Note content width",
-      "code_block_word_wrap": "Code block word wrap"
+      "code_block_word_wrap": "Code block word wrap",
+      "ui_customization": "Element visibility"
     },
     "badges": {
       "font_size_default": "default ({{size}}px)",
       "note_font_size": "{{size}}px",
       "sidebar_font_size": "{{size}}px",
-      "code_block_font_size": "{{size}}px"
+      "code_block_font_size": "{{size}}px",
+      "ui_customization_configure": "Configure"
     }
   },
   "tasklist": {
@@ -276,6 +278,23 @@
       "max_zip_files": "Max files in ZIP",
       "individual_badge": "Individual: {{count}}",
       "zip_badge": "ZIP: {{count}}"
+    },
+    "ui_customization": {
+      "title": "UI Customization",
+      "description": "Show or hide interface elements. Unchecked items will be hidden.",
+      "filter_placeholder": "Filter items...",
+      "no_results": "No matching items found.",
+      "sections": {
+        "home_cards": "Home Cards",
+        "create_cards": "Create Cards",
+        "settings_cards": "Settings Cards",
+        "toolbar": "Toolbar",
+        "slash_menu": "Slash Menu",
+        "panels": "Other",
+        "folder_actions": "Folder Actions"
+      },
+      "badge_all_visible": "All visible",
+      "badge_hidden_count": "{{count}} hidden"
     },
     "theme": {
       "title": "Theme Selection",

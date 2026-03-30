@@ -462,6 +462,22 @@
                 e.preventDefault();
                 e.stopImmediatePropagation();
 
+                if (
+                    target.classList &&
+                    target.classList.contains('folder-list-click-action') &&
+                    window.PoznoteUiCustomization &&
+                    typeof window.PoznoteUiCustomization.usesFolderIconKanban === 'function' &&
+                    !window.PoznoteUiCustomization.usesFolderIconKanban()
+                ) {
+                    const iconFolderId = target.dataset.folderId;
+                    const iconFolderName = target.dataset.folderName || '';
+
+                    if (iconFolderId && typeof window.showChangeFolderIconModal === 'function') {
+                        window.showChangeFolderIconModal(parseInt(iconFolderId, 10), iconFolderName);
+                    }
+                    break;
+                }
+
                 const kanbanFolderId = target.dataset.folderId;
                 const kanbanFolderName = target.dataset.folderName || '';
 
