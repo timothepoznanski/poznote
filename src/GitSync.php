@@ -858,10 +858,11 @@ class GitSync {
                 }
             }
 
-            $pulledNoteIds  = [];
-            $downloadedNotes = [];
+            $pulledNoteIds = [];
 
-            // ── 3a. Download entries via HTTP and write to disk ──
+            // ── 3. Download & upsert entries ──
+            // Uses BEGIN IMMEDIATE so SQLite acquires the write lock upfront and waits
+            // up to busy_timeout rather than failing on a deferred lock upgrade.
             try {
                 foreach ($noteFiles as $path) {
                     $currentStep++;
@@ -887,25 +888,12 @@ class GitSync {
                     if (!is_dir($entriesPath)) mkdir($entriesPath, 0755, true);
                     file_put_contents($entriesPath . '/' . $filename, $content);
 
-                    $downloadedNotes[] = ['filename' => $filename, 'noteId' => $noteId, 'content' => $content];
-                }
-            } catch (Exception $e) {
-                // Handle any general exceptions from HTTP requests or loops
-                $results['errors'][] = ['path' => 'loop', 'error' => $e->getMessage()];
-                $results['debug'][]  = 'Error during pull loop: ' . $e->getMessage();
-            }
-
-            // ── 3b. Upsert all downloaded entries in a single transaction ──
-            if (!empty($downloadedNotes)) {
-                try {
-                    $this->con->beginTransaction();
-                    $checkStmt = $this->con->prepare('SELECT id FROM entries WHERE id = ?');
-                    foreach ($downloadedNotes as $note) {
-                        $filename = $note['filename'];
-                        $noteId   = $note['noteId'];
-                        $content  = $note['content'];
-                        $meta     = $metadata[(string) $noteId] ?? [];
-
+                    // Upsert DB — BEGIN IMMEDIATE waits for the write lock (respects busy_timeout)
+                    // instead of failing with SQLITE_BUSY when upgrading a deferred transaction.
+                    try {
+                        $this->con->exec('BEGIN IMMEDIATE');
+                        $meta      = $metadata[(string) $noteId] ?? [];
+                        $checkStmt = $this->con->prepare('SELECT id FROM entries WHERE id = ?');
                         $checkStmt->execute([$noteId]);
                         if ($checkStmt->fetch()) {
                             // Build dynamic UPDATE — apply metadata fields whenever available
@@ -943,16 +931,19 @@ class GitSync {
                             $results['pulled']++;
                             $results['debug'][] = "  {$filename} → created (heading: {$heading})";
                         }
+
                         $pulledNoteIds[] = $noteId;
+                        $this->con->exec('COMMIT');
+                    } catch (Exception $transEx) {
+                        try { $this->con->exec('ROLLBACK'); } catch (Exception $ignored) {}
+                        $results['errors'][] = ['path' => $filename, 'error' => $transEx->getMessage()];
+                        $results['debug'][]  = "  Transaction rolled back for $filename: " . $transEx->getMessage();
                     }
-                    $this->con->commit();
-                } catch (Exception $transEx) {
-                    if ($this->con->inTransaction()) {
-                        $this->con->rollBack();
-                    }
-                    $results['errors'][] = ['path' => 'batch_upsert', 'error' => $transEx->getMessage()];
-                    $results['debug'][]  = '  Batch transaction rolled back: ' . $transEx->getMessage();
                 }
+            } catch (Exception $e) {
+                // Handle any general exceptions from HTTP requests or loops
+                $results['errors'][] = ['path' => 'loop', 'error' => $e->getMessage()];
+                $results['debug'][]  = 'Error during pull loop: ' . $e->getMessage();
             }
 
             // ── 4. Download attachments ──
