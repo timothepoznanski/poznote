@@ -167,11 +167,24 @@ if ($isAdmin) {
                     require_once 'GitSync.php';
                     $gitSyncSettings = new GitSync($con ?? null, $_SESSION['user_id'] ?? null);
                     $settingsGitProvider = $gitSyncSettings->getProvider();
+                    $gitSyncIsConfigured = $gitSyncSettings->isConfigured();
+                    $gitSyncIsEnabled = GitSync::isEnabled();
                     ?>
                     <i class="<?php echo ($settingsGitProvider === 'forgejo') ? 'lucide lucide-git-branch' : 'lucide lucide-github'; ?>"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?></span>
+                    <span class="setting-status <?php echo (!$gitSyncIsEnabled) ? 'disabled' : ($gitSyncIsConfigured ? 'enabled' : 'disabled'); ?>">
+                        <?php
+                        if (!$gitSyncIsEnabled) {
+                            echo t_h('common.disabled', [], 'Disabled');
+                        } elseif ($gitSyncIsConfigured) {
+                            echo t_h('git_sync.config.token_set', [], 'Configured');
+                        } else {
+                            echo t_h('git_sync.config.not_configured', [], 'Not configured');
+                        }
+                        ?>
+                    </span>
                 </div>
             </div>
 
