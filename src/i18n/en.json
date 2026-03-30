@@ -1255,6 +1255,7 @@
     "actions": {
       "open": "Open",
       "copy_url": "Copy URL",
+      "url_copied": "URL copied!",
       "revoke": "Revoke"
     },
     "direct_share": "Shared note",

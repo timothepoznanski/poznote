@@ -181,6 +181,7 @@ usort($shared_folders, function($a, $b) {
       data-txt-shared-by="<?php echo t_h('public.shared_by', [], 'Shared by'); ?>"
       data-txt-no-shared-with-me="<?php echo t_h('public.no_shared_with_me', [], 'Nothing has been shared with you yet.'); ?>"
       data-txt-copy-url="<?php echo t_h('public.actions.copy_url', [], 'Copy URL'); ?>"
+      data-txt-url-copied="<?php echo t_h('public.actions.url_copied', [], 'URL copied!'); ?>"
       data-txt-login-required-title="<?php echo t_h('public.login_required_title', [], 'Login Required'); ?>"
       data-txt-access-denied-title="<?php echo t_h('public.access_denied_title', [], 'Access Denied'); ?>">
 

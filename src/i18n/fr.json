@@ -1664,6 +1664,7 @@
     "actions": {
       "open": "Ouvrir",
       "copy_url": "Copier l'URL",
+      "url_copied": "URL copiée !",
       "revoke": "Révoquer"
     },
     "direct_share": "Note partagée",

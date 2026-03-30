@@ -1255,6 +1255,7 @@
     "actions": {
       "open": "Открыть",
       "copy_url": "Копировать URL",
+      "url_copied": "URL скопирован!",
       "revoke": "Отозвать"
     },
     "direct_share": "Опубликованная заметка",

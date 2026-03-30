@@ -1622,6 +1622,7 @@
     "actions": {
       "open": "Abrir",
       "copy_url": "Copiar URL",
+      "url_copied": "¡URL copiada!",
       "revoke": "Revocar"
     },
     "direct_share": "Nota compartida",

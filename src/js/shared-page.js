@@ -29,6 +29,7 @@
             txtRenew: body.getAttribute('data-txt-renew') || 'Renew',
             txtOpen: body.getAttribute('data-txt-open') || 'Open public view',
             txtCopyUrl: body.getAttribute('data-txt-copy-url') || 'Copy URL',
+            txtUrlCopied: body.getAttribute('data-txt-url-copied') || 'URL copied!',
             txtRevoke: body.getAttribute('data-txt-revoke') || 'Revoke',
             txtTaskPermissions: body.getAttribute('data-txt-task-permissions') || 'Permissions',
             txtTaskReadOnly: body.getAttribute('data-txt-task-read-only') || 'Read only',
@@ -825,9 +826,29 @@
     }
 
     function copyItemUrl(url) {
-        return copyTextToClipboard(url).catch(function() {
+        return copyTextToClipboard(url).then(function() {
+            showCopyToast(getConfig().txtUrlCopied);
+        }).catch(function() {
             window.prompt('Copy this URL', url);
         });
+    }
+
+    function showCopyToast(message) {
+        var existing = document.getElementById('shared-copy-toast');
+        if (existing) existing.remove();
+        var toast = document.createElement('div');
+        toast.id = 'shared-copy-toast';
+        toast.textContent = message;
+        toast.style.cssText = 'position:fixed;top:16px;right:16px;z-index:2147483647;background:#2d3748;color:#e2e8f0;padding:10px 16px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);font-size:14px;font-weight:500;opacity:0;transition:opacity 160ms ease-in-out,transform 160ms ease-in-out;transform:translateY(-6px);pointer-events:none;border:1px solid rgba(255,255,255,0.1);';
+        document.body.appendChild(toast);
+        toast.offsetHeight;
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+        setTimeout(function() {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(-6px)';
+            setTimeout(function() { try { toast.remove(); } catch(e) {} }, 220);
+        }, 1800);
     }
 
     function renderTokenCell(token, fallbackText) {
@@ -1484,6 +1505,18 @@
         actionsDiv.className = 'note-actions';
 
         if (note.share_id) {
+            var openBtn = document.createElement('button');
+            openBtn.className = 'btn btn-sm btn-success';
+            openBtn.innerHTML = '<i class="lucide lucide-external-link"></i>';
+            openBtn.title = config.txtOpen;
+            (function(noteUrl) {
+                openBtn.addEventListener('click', function() {
+                    var normalizedUrl = applyProtocolToPublicUrl(normalizePublicUrl(noteUrl), getPreferredPublicUrlProtocol());
+                    window.open(normalizedUrl, '_blank', 'noopener');
+                });
+            })(note.url);
+            actionsDiv.appendChild(openBtn);
+
             var editTokenBtn = document.createElement('button');
             editTokenBtn.className = 'btn btn-sm btn-primary';
             editTokenBtn.innerHTML = '<i class="lucide lucide-pencil"></i>';
@@ -1494,18 +1527,6 @@
                 });
             })(note);
             actionsDiv.appendChild(editTokenBtn);
-
-            var openBtn = document.createElement('button');
-            openBtn.className = 'btn btn-sm btn-primary';
-            openBtn.innerHTML = '<i class="lucide lucide-external-link"></i>';
-            openBtn.title = config.txtOpen;
-            (function(noteUrl) {
-                openBtn.addEventListener('click', function() {
-                    var normalizedUrl = applyProtocolToPublicUrl(normalizePublicUrl(noteUrl), getPreferredPublicUrlProtocol());
-                    window.open(normalizedUrl, '_blank', 'noopener');
-                });
-            })(note.url);
-            actionsDiv.appendChild(openBtn);
 
             var copyBtn = document.createElement('button');
             copyBtn.className = 'btn btn-sm btn-primary';
@@ -1585,6 +1606,19 @@
         actionsDiv.className = 'note-actions';
 
         if (folder.is_direct) {
+            var openBtn = document.createElement('button');
+            openBtn.className = 'btn btn-sm btn-success';
+            openBtn.innerHTML = '<i class="lucide lucide-external-link"></i>';
+            openBtn.title = config.txtOpen;
+            (function(folderUrl) {
+                openBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    var normalizedUrl = applyProtocolToPublicUrl(normalizePublicUrl(folderUrl), getPreferredPublicUrlProtocol());
+                    window.open(normalizedUrl, '_blank', 'noopener');
+                });
+            })(folder.public_url);
+            actionsDiv.appendChild(openBtn);
+
             var editTokenBtn = document.createElement('button');
             editTokenBtn.className = 'btn btn-sm btn-primary';
             editTokenBtn.innerHTML = '<i class="lucide lucide-pencil"></i>';
@@ -1596,19 +1630,6 @@
                 });
             })(folder);
             actionsDiv.appendChild(editTokenBtn);
-
-            var openBtn = document.createElement('button');
-            openBtn.className = 'btn btn-sm btn-primary';
-            openBtn.innerHTML = '<i class="lucide lucide-external-link"></i>';
-            openBtn.title = config.txtOpen;
-            (function(folderUrl) {
-                openBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    var normalizedUrl = applyProtocolToPublicUrl(normalizePublicUrl(folderUrl), getPreferredPublicUrlProtocol());
-                    window.open(normalizedUrl, '_blank', 'noopener');
-                });
-            })(folder.public_url);
-            actionsDiv.appendChild(openBtn);
 
             var copyBtn = document.createElement('button');
             copyBtn.className = 'btn btn-sm btn-primary';

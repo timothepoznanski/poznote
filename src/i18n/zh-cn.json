@@ -1622,6 +1622,7 @@
     "actions": {
       "open": "打开",
       "copy_url": "复制链接",
+      "url_copied": "链接已复制！",
       "revoke": "撤销"
     },
     "direct_share": "共享笔记",

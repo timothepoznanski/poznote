@@ -1623,6 +1623,7 @@
     "actions": {
       "open": "Öffnen",
       "copy_url": "URL kopieren",
+      "url_copied": "URL kopiert!",
       "revoke": "Widerrufen"
     },
     "direct_share": "Geteilte Notiz",
