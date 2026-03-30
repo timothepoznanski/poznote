@@ -302,7 +302,6 @@
     "title": "Einstellungen",
     "categories": {
       "actions": "Aktionen",
-      "advanced": "Erweiterte Einstellungen",
       "admin_tools": "Admin-Werkzeuge",
       "display": "Anzeige",
       "about": "Über",
@@ -311,8 +310,7 @@
     "sections": {
       "account_display": "Konto & Anzeige",
       "notes_folders": "Notizen & Ordner",
-      "backup_restore": "Sicherung, Wiederherstellung & Updates",
-      "advanced": "Erweiterte Einstellungen"
+      "backup_restore": "Sicherung, Wiederherstellung & Updates"
     },
     "language": {
       "label": "Sprache",
@@ -335,7 +333,7 @@
       "git_sync": "Git-Synchronisierung",
       "check_updates": "Nach Updates suchen",
       "api_docs": "API-Dokumentation",
-      "documentation": "Github Repository",
+      "documentation": "Documentation GitHub",
       "news": "Poznote-Blog",
       "website": "Poznote-Website",
       "support": "Entwickler unterstützen",
@@ -1624,9 +1622,12 @@
     },
     "actions": {
       "open": "Öffnen",
+      "copy_url": "URL kopieren",
       "revoke": "Widerrufen"
     },
     "direct_share": "Geteilte Notiz",
+    "via_folder": "Über Ordner geteilt",
+    "shared_folder_title": "Geteilter Ordner",
     "note_shared_through_folder": "Notiz über Ordner geteilt",
     "folder_shared_through_parent": "Ordner über übergeordneten Ordner geteilt",
     "token_help": "Das Token ist die eindeutige Kennung in einer öffentlichen Freigabe-URL. Beispiel: https://ihre-domain.beispiel/meine-geteilte-notiz",
@@ -2032,8 +2033,8 @@
       "token_missing": "Nicht konfiguriert",
       "not_configured": "Nicht konfiguriert",
       "not_configured_yet": "Zu konfigurieren",
-      "hint": "Die {{provider}}-Synchronisierung ist deaktiviert. Ein Administrator kann sie in Einstellungen > Erweiterte Einstellungen aktivieren.",
-      "hint_enable": "Die Git-Synchronisierung ist deaktiviert. Ein Administrator kann sie in Einstellungen > Erweiterte Einstellungen aktivieren."
+      "hint": "Die {{provider}}-Synchronisierung ist deaktiviert. Ein Administrator kann sie in Einstellungen > Admin-Werkzeuge aktivieren.",
+      "hint_enable": "Die Git-Synchronisierung ist deaktiviert. Ein Administrator kann sie in Einstellungen > Admin-Werkzeuge aktivieren."
     },
     "auto_sync": {
       "title": "Automatische Synchronisierung",

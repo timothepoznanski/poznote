@@ -319,7 +319,7 @@ $noteBaseUrl = $protocol . '://' . $host;
     <?php if ($indexable == 0): ?>
     <meta name="robots" content="noindex, nofollow">
     <?php endif; ?>
-    <title><?php echo htmlspecialchars($folder['name']); ?> - Shared Folder</title>
+    <title><?php echo htmlspecialchars($folder['name']); ?></title>
     <link rel="stylesheet" href="/css/lucide.css">
     <link rel="stylesheet" href="/css/dark-mode/variables.css">
     <link rel="stylesheet" href="/css/dark-mode/layout.css">

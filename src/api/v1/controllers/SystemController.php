@@ -6,7 +6,6 @@
  *   GET  /api/v1/system/version       - Get current version info
  *   GET  /api/v1/system/updates       - Check for updates
  *   GET  /api/v1/system/i18n          - Get translations
- *   POST /api/v1/system/verify-password - Verify settings password
  *   GET  /api/v1/shared               - List shared notes
  */
 
@@ -138,36 +137,6 @@ class SystemController {
             'lang' => $lang,
             'strings' => $merge($en, $active)
         ];
-    }
-    
-    /**
-     * POST /api/v1/system/verify-password
-     */
-    public function verifyPassword() {
-        $input = json_decode(file_get_contents('php://input'), true);
-        $password = $input['password'] ?? '';
-        
-        $configuredPassword = getenv('POZNOTE_SETTINGS_PASSWORD') ?: '';
-        
-        if (empty($configuredPassword)) {
-            return ['success' => true, 'valid' => true, 'message' => 'No password configured'];
-        }
-        
-        if (hash_equals($configuredPassword, $password)) {
-            // Set session flag
-            $_SESSION['settings_authenticated'] = true;
-
-            // Get redirect URL if it exists (will be used by client-side)
-            $redirectUrl = $_SESSION['settings_redirect_after_auth'] ?? '';
-
-            // Clean up redirect URL from session now that authentication succeeded
-            unset($_SESSION['settings_redirect_after_auth']);
-
-            return ['success' => true, 'valid' => true, 'redirect_url' => $redirectUrl];
-        } else {
-            http_response_code(401);
-            return ['success' => false, 'valid' => false, 'error' => 'Invalid password'];
-        }
     }
     
     /**

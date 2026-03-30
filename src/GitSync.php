@@ -20,6 +20,13 @@ class GitSync {
     private $provider;
     private $apiBase;
     private $con;
+
+    /**
+     * Get the configured git provider (github, forgejo, etc.)
+     */
+    public function getProvider(): string {
+        return $this->provider;
+    }
     
     /**
      * @var int|null User ID for per-user Git sync configuration

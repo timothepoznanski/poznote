@@ -25,21 +25,6 @@ require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../users/db_master.php';
 require_once __DIR__ . '/../version_helper.php';
 
-// === Settings Password Protection ===
-// Check if settings require password protection (same as settings.php)
-if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
-    // Session is already started by auth.php
-
-    // Check if user has already authenticated for settings
-    if (!isset($_SESSION['settings_authenticated']) || $_SESSION['settings_authenticated'] !== true) {
-        // Redirect to settings.php which will handle the password authentication
-        // After successful authentication, user will be redirected back here
-        $_SESSION['settings_redirect_after_auth'] = $_SERVER['REQUEST_URI'];
-        header('Location: ../settings.php');
-        exit;
-    }
-}
-
 // === Initialize Variables ===
 $currentLang = getUserLanguage();
 $pageWorkspace = trim(getWorkspaceFilter());

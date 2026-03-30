@@ -590,11 +590,6 @@ $router->get('/system/i18n', function($params) use ($systemController) {
     echo json_encode($systemController->i18n());
 });
 
-// Verify settings password
-$router->post('/system/verify-password', function($params) use ($systemController) {
-    echo json_encode($systemController->verifyPassword());
-});
-
 // List notes/folders shared specifically with the current user by others
 $router->get('/shared/with-me', function($params) use ($systemController) {
     echo json_encode($systemController->listSharedWithMe());

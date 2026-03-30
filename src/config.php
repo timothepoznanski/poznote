@@ -123,14 +123,6 @@ define('OIDC_AUTO_CREATE_USERS', filter_var(_env('POZNOTE_OIDC_AUTO_CREATE_USERS
 // Deprecated: prefer POZNOTE_OIDC_ALLOWED_GROUPS + POZNOTE_OIDC_AUTO_CREATE_USERS
 define('OIDC_ALLOWED_USERS', _env('POZNOTE_OIDC_ALLOWED_USERS', ''));
 
-// ============================================================
-// SETTINGS ACCESS CONTROL
-// ============================================================
-// Option 1: Completely block access to settings
-define('DISABLE_SETTINGS_ACCESS', filter_var(_env('POZNOTE_DISABLE_SETTINGS_ACCESS', false), FILTER_VALIDATE_BOOL));
-// Option 2: Protect settings with a password
-define('SETTINGS_PASSWORD', _env('POZNOTE_SETTINGS_PASSWORD', ''));
-
 // Optional: load an extra stylesheet from src/css/ on every HTML page.
 // The preferred source is the Advanced section in settings.php.
 define('CUSTOM_CSS_PATH', poznoteResolveCustomCssPath());

@@ -28,6 +28,7 @@
 
             txtRenew: body.getAttribute('data-txt-renew') || 'Renew',
             txtOpen: body.getAttribute('data-txt-open') || 'Open public view',
+            txtCopyUrl: body.getAttribute('data-txt-copy-url') || 'Copy URL',
             txtRevoke: body.getAttribute('data-txt-revoke') || 'Revoke',
             txtTaskPermissions: body.getAttribute('data-txt-task-permissions') || 'Permissions',
             txtTaskReadOnly: body.getAttribute('data-txt-task-read-only') || 'Read only',
@@ -1484,7 +1485,7 @@
 
         if (note.share_id) {
             var editTokenBtn = document.createElement('button');
-            editTokenBtn.className = 'btn btn-sm btn-secondary';
+            editTokenBtn.className = 'btn btn-sm btn-primary';
             editTokenBtn.innerHTML = '<i class="lucide lucide-pencil"></i>';
             editTokenBtn.title = config.txtEditToken;
             (function(noteRef) {
@@ -1505,6 +1506,18 @@
                 });
             })(note.url);
             actionsDiv.appendChild(openBtn);
+
+            var copyBtn = document.createElement('button');
+            copyBtn.className = 'btn btn-sm btn-primary';
+            copyBtn.innerHTML = '<i class="lucide lucide-copy"></i>';
+            copyBtn.title = config.txtCopyUrl;
+            (function(noteUrl) {
+                copyBtn.addEventListener('click', function() {
+                    var normalizedUrl = applyProtocolToPublicUrl(normalizePublicUrl(noteUrl), getPreferredPublicUrlProtocol());
+                    copyItemUrl(normalizedUrl);
+                });
+            })(note.url);
+            actionsDiv.appendChild(copyBtn);
         }
 
         if (note.share_id) {
@@ -1573,7 +1586,7 @@
 
         if (folder.is_direct) {
             var editTokenBtn = document.createElement('button');
-            editTokenBtn.className = 'btn btn-sm btn-secondary';
+            editTokenBtn.className = 'btn btn-sm btn-primary';
             editTokenBtn.innerHTML = '<i class="lucide lucide-pencil"></i>';
             editTokenBtn.title = config.txtEditToken;
             (function(folderRef) {
@@ -1596,6 +1609,19 @@
                 });
             })(folder.public_url);
             actionsDiv.appendChild(openBtn);
+
+            var copyBtn = document.createElement('button');
+            copyBtn.className = 'btn btn-sm btn-primary';
+            copyBtn.innerHTML = '<i class="lucide lucide-copy"></i>';
+            copyBtn.title = config.txtCopyUrl;
+            (function(folderUrl) {
+                copyBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    var normalizedUrl = applyProtocolToPublicUrl(normalizePublicUrl(folderUrl), getPreferredPublicUrlProtocol());
+                    copyItemUrl(normalizedUrl);
+                });
+            })(folder.public_url);
+            actionsDiv.appendChild(copyBtn);
         }
 
         if (folder.is_direct) {

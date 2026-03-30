@@ -53,7 +53,7 @@ $gitSync = new GitSync($con, $_SESSION['user_id'] ?? null);
 $gitEnabled = GitSync::isEnabled() && $gitSync->isConfigured();
 $isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
 $showGitSync = $gitEnabled; // All users with configured git can sync
-$gitProvider = function_exists('getGitProviderName') ? getGitProviderName() : 'Git';
+$gitProvider = function_exists('getGitProviderName') ? getGitProviderName($gitSync->getProvider()) : 'Git';
 
 // Check if we need to redirect to include workspace from database settings
 // Only redirect if no workspace parameter is present in GET

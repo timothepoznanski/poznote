@@ -109,9 +109,9 @@
     }
 
     .filter-search-row {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
     }
 
     .filter-type-btn {
@@ -155,6 +155,10 @@
         border-left-width: 3px;
     }
 
+    .shared-note-item.shared-hierarchy-item .note-name-container {
+        padding-left: 0;
+    }
+
     .shared-note-item.shared-note-child {
         border-left-width: 3px;
     }
@@ -175,6 +179,14 @@
     .note-folder-container {
         min-width: 0;
         width: 100%;
+    }
+
+    .note-folder-container,
+    .note-token-wrap,
+    .note-restricted-cell,
+    .note-actions {
+        border-left: none;
+        padding-left: 0;
     }
 
     .note-name-container {
@@ -199,8 +211,8 @@
         width: 100%;
         padding: 10px 12px;
         border-radius: 10px;
-        background: rgba(0, 125, 184, 0.05);
-        border: 1px solid rgba(0, 125, 184, 0.12);
+        background: transparent;
+        border: none;
     }
 
     .note-token {
@@ -231,7 +243,7 @@
         justify-content: flex-end;
         align-items: center;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 6px;
         margin-top: 2px;
     }
 
@@ -240,14 +252,14 @@
         align-items: center;
         justify-content: center;
         flex: 0 0 auto;
-        width: 44px;
-        min-width: 44px;
-        height: 44px;
+        width: 32px;
+        min-width: 32px;
+        height: 32px;
         padding: 0;
     }
 
     .note-actions .btn i {
-        font-size: 16px;
+        font-size: 13px;
         line-height: 1;
     }
 
@@ -262,8 +274,8 @@
     }
 
     [data-theme="dark"] .note-token-wrap {
-        background: rgba(77, 158, 255, 0.08);
-        border-color: rgba(77, 158, 255, 0.18);
+        background: transparent;
+        border-color: transparent;
     }
 
     .empty-message {

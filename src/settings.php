@@ -5,91 +5,6 @@ requireAuth();
 require_once 'config.php';
 require_once 'functions.php';
 
-// Check if settings access is completely disabled
-if (defined('DISABLE_SETTINGS_ACCESS') && DISABLE_SETTINGS_ACCESS === true) {
-    $currentLang = getUserLanguage();
-    ?>
-    <!DOCTYPE html>
-    <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
-    <head>
-        <meta charset="utf-8"/>
-        <title><?php echo t_h('common.access_denied', [], 'Access Denied', $currentLang); ?></title>
-        <link rel="stylesheet" href="css/lucide.css">
-        <link rel="stylesheet" href="css/access-denied.css">
-    </head>
-    <body class="access-denied-page">
-        <div class="access-denied-modal">
-            <i class="lucide lucide-lock"></i>
-            <h1><?php echo t_h('common.access_denied', [], 'Access Denied', $currentLang); ?></h1>
-            <p><?php echo t_h('settings.disabled_message', [], 'Access to settings is disabled by administrator.', $currentLang); ?></p>
-            <button id="access-denied-return-btn"><?php echo t_h('settings.password.cancel', [], 'Return to Home', $currentLang); ?></button>
-        </div>
-        <script src="js/access-denied.js"></script>
-    </body>
-    </html>
-    <?php
-    exit;
-}
-
-// Check if settings require password protection
-if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
-    // Session is already started by auth.php
-    
-    // Check if user has already authenticated for settings
-    if (!isset($_SESSION['settings_authenticated']) || $_SESSION['settings_authenticated'] !== true) {
-        $currentLang = getUserLanguage();
-        ?>
-        <!DOCTYPE html>
-        <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
-        <head>
-            <meta charset="utf-8"/>
-            <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-            <title><?php echo t_h('settings.password.title', [], 'Settings Access', $currentLang); ?> - Poznote</title>
-            <meta name="color-scheme" content="dark light">
-            <script src="js/theme-init.js"></script>
-            <link rel="stylesheet" href="css/lucide.css">
-            <link rel="stylesheet" href="css/settings-password.css">
-            <link rel="stylesheet" href="css/dark-mode/variables.css">
-            <link rel="stylesheet" href="css/dark-mode/layout.css">
-            <link rel="stylesheet" href="css/dark-mode/menus.css">
-            <link rel="stylesheet" href="css/dark-mode/editor.css">
-            <link rel="stylesheet" href="css/dark-mode/modals.css">
-            <link rel="stylesheet" href="css/dark-mode/components.css">
-            <link rel="stylesheet" href="css/dark-mode/pages.css">
-            <link rel="stylesheet" href="css/dark-mode/markdown.css">
-            <link rel="stylesheet" href="css/dark-mode/kanban.css">
-            <link rel="stylesheet" href="css/dark-mode/icons.css">
-            <link rel="icon" href="favicon.ico" type="image/x-icon">
-        </head>
-        <body>
-            <div class="login-container">
-                <div class="login-header">
-                    <h1 class="login-title">Poznote</h1>
-                    <p class="settings-subtitle"><?php echo t_h('settings.password.heading', [], 'Settings Protected', $currentLang); ?></p>
-                </div>
-                
-                <form id="settings-password-form" data-redirect-url="<?php echo isset($_SESSION['settings_redirect_after_auth']) ? htmlspecialchars($_SESSION['settings_redirect_after_auth'], ENT_QUOTES, 'UTF-8') : ''; ?>">
-                    <div class="form-group">
-                        <input type="password" id="settings-password-input" placeholder="<?php echo t_h('settings.password.placeholder', [], 'Enter password', $currentLang); ?>" required autofocus autocomplete="off">
-                        <div id="settings-password-error" class="error"></div>
-                    </div>
-
-                    <button type="submit" id="settings-password-submit" class="login-button">
-                        <?php echo t_h('settings.password.submit', [], 'Access Settings', $currentLang); ?>
-                    </button>
-                    <button type="button" id="settings-password-cancel" class="login-button cancel-button">
-                        <?php echo t_h('settings.password.cancel', [], 'Back to Notes', $currentLang); ?>
-                    </button>
-                </form>
-            </div>
-            <script src="js/settings-password.js"></script>
-        </body>
-        </html>
-        <?php
-        exit;
-    }
-}
-
 require_once 'db_connect.php';
 
 // Include page initialization
@@ -220,7 +135,7 @@ if ($isAdmin) {
         </div>
 
         <!-- ACTIONS CATEGORY -->
-        <h2 class="settings-category-title"><?php echo t_h('settings.categories.actions'); ?></h2>
+        <h2 class="settings-category-title"><?php echo t_h('settings.categories.actions') . ' (' . $username . ')'; ?></h2>
         <div class="home-grid">
 
             <!-- Workspaces -->
@@ -233,19 +148,6 @@ if ($isAdmin) {
                     <span class="setting-status enabled"><?php echo $workspaces_count; ?></span>
                 </div>
             </div>
-
-            <?php if ($isAdmin): ?>
-            <!-- User Management (Admin only) -->
-            <div class="home-card settings-card-clickable" id="users-admin-card" data-href="admin/users.php">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-users-cog"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.user_management', [], 'User Management'); ?></span>
-                    <span class="setting-status enabled"><?php echo $users_count; ?></span>
-                </div>
-            </div>
-            <?php endif; ?>
 
             <!-- Change Password -->
             <div class="home-card" id="change-password-card">
@@ -261,7 +163,12 @@ if ($isAdmin) {
             <!-- Git Sync (available to all users) -->
             <div class="home-card settings-card-clickable" id="git-sync-card" data-href="git_sync.php">
                 <div class="home-card-icon">
-                    <i class="<?php echo (defined('GIT_PROVIDER') && GIT_PROVIDER === 'forgejo') ? 'lucide lucide-git-branch' : 'lucide lucide-github'; ?>"></i>
+                    <?php
+                    require_once 'GitSync.php';
+                    $gitSyncSettings = new GitSync($con ?? null, $_SESSION['user_id'] ?? null);
+                    $settingsGitProvider = $gitSyncSettings->getProvider();
+                    ?>
+                    <i class="<?php echo ($settingsGitProvider === 'forgejo') ? 'lucide lucide-git-branch' : 'lucide lucide-github'; ?>"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?></span>
@@ -305,7 +212,7 @@ if ($isAdmin) {
         </div>
 
         <!-- DISPLAY CATEGORY -->
-        <h2 class="settings-category-title" id="display"><?php echo t_h('settings.categories.display'); ?></h2>
+        <h2 class="settings-category-title" id="display"><?php echo t_h('settings.categories.display') . ' (' . $username . ')'; ?></h2>
         <div class="home-grid">
 
             <?php if ($isAdmin): ?>
@@ -444,18 +351,29 @@ if ($isAdmin) {
         </div>
 
         <?php if ($isAdmin): ?>
-        <!-- ADVANCED CATEGORY -->
-        <h2 class="settings-category-title" id="advanced" role="button" tabindex="0" aria-expanded="false" aria-controls="advanced-grid"><span class="settings-category-label"><?php echo t_h('settings.categories.advanced', [], 'Advanced Settings'); ?></span><i class="lucide lucide-chevron-down settings-category-chevron" aria-hidden="true"></i></h2>
-        <div class="home-grid" id="advanced-grid" hidden>
+        <!-- ADMIN TOOLS CATEGORY -->
+        <h2 class="settings-category-title" id="admin-tools"><?php echo t_h('settings.categories.admin_tools', [], 'Admin Tools'); ?></h2>
+        <div class="home-grid" id="admin-tools-grid">
 
-            <!-- Custom CSS Path -->
-            <div class="home-card" id="custom-css-card">
+            <!-- User Management (Admin only) -->
+            <div class="home-card settings-card-clickable" id="users-admin-card" data-href="admin/users.php">
                 <div class="home-card-icon">
-                    <i class="lucide lucide-palette"></i>
+                    <i class="lucide lucide-users-cog"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.custom_css', [], 'Custom CSS path'); ?></span>
-                    <span id="custom-css-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('settings.cards.user_management', [], 'User Management'); ?></span>
+                    <span class="setting-status enabled"><?php echo $users_count; ?></span>
+                </div>
+            </div>
+
+            <!-- Git Sync Global Toggle -->
+            <div class="home-card" id="git-sync-enabled-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-git-branch"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.git_sync_toggle', [], 'Git Sync'); ?></span>
+                    <span id="git-sync-enabled-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                 </div>
             </div>
 
@@ -473,24 +391,16 @@ if ($isAdmin) {
                 </div>
             </div>
 
-            <!-- Git Sync Global Toggle -->
-            <div class="home-card" id="git-sync-enabled-card">
+            <!-- Custom CSS Path -->
+            <div class="home-card" id="custom-css-card">
                 <div class="home-card-icon">
-                    <i class="lucide lucide-git-branch"></i>
+                    <i class="lucide lucide-palette"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.git_sync_toggle', [], 'Git Sync'); ?></span>
-                    <span id="git-sync-enabled-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('settings.cards.custom_css', [], 'Custom CSS path'); ?></span>
+                    <span id="custom-css-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                 </div>
             </div>
-
-        </div>
-        <?php endif; ?>
-
-        <?php if ($isAdmin): ?>
-        <!-- ADMIN TOOLS CATEGORY -->
-        <h2 class="settings-category-title" id="admin-tools" role="button" tabindex="0" aria-expanded="false" aria-controls="admin-tools-grid"><span class="settings-category-label"><?php echo t_h('settings.categories.admin_tools', [], 'Admin Tools'); ?></span><i class="lucide lucide-chevron-down settings-category-chevron" aria-hidden="true"></i></h2>
-        <div class="home-grid" id="admin-tools-grid" hidden>
 
             <!-- Disaster Recovery -->
             <div class="home-card settings-card-clickable" id="disaster-recovery-card" data-href="admin/disaster-recovery.php">

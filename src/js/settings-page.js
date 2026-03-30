@@ -452,58 +452,7 @@
         });
     }
 
-    function setSectionExpanded(toggleId, gridId, expanded) {
-        var toggle = document.getElementById(toggleId);
-        var grid = document.getElementById(gridId);
-        if (!toggle || !grid) return;
 
-        toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-        grid.hidden = !expanded;
-    }
-
-    function setupCollapsibleSection(toggleId, gridId) {
-        var toggle = document.getElementById(toggleId);
-        var grid = document.getElementById(gridId);
-        if (!toggle || !grid) return;
-
-        var storageKey = 'settings.section.' + toggleId + '.expanded';
-
-        function restoreSectionState() {
-            try {
-                var savedState = localStorage.getItem(storageKey);
-                if (savedState === 'true' || savedState === 'false') {
-                    setSectionExpanded(toggleId, gridId, savedState === 'true');
-                }
-            } catch (e) {
-                // Ignore storage access errors and keep default markup state
-            }
-        }
-
-        function persistSectionState(expanded) {
-            try {
-                localStorage.setItem(storageKey, expanded ? 'true' : 'false');
-            } catch (e) {
-                // Ignore storage access errors
-            }
-        }
-
-        function toggleSection() {
-            var isExpanded = toggle.getAttribute('aria-expanded') !== 'false';
-            var nextExpanded = !isExpanded;
-            setSectionExpanded(toggleId, gridId, nextExpanded);
-            persistSectionState(nextExpanded);
-        }
-
-        restoreSectionState();
-
-        toggle.addEventListener('click', toggleSection);
-        toggle.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                toggleSection();
-            }
-        });
-    }
 
     // ========== Initialization ==========
 
@@ -587,9 +536,6 @@
         if (typeof window.restoreUpdateBadge === 'function') {
             window.restoreUpdateBadge();
         }
-
-        setupCollapsibleSection('advanced', 'advanced-grid');
-        setupCollapsibleSection('admin-tools', 'admin-tools-grid');
 
         // Setup toggle cards
         setupToggleCard('show-created-card', 'show-created-status', 'show_note_created', false);
