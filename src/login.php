@@ -11,6 +11,12 @@ require_once 'functions.php';
 require_once 'oidc.php';
 require_once __DIR__ . '/users/db_master.php';
 
+// Set security headers for login page
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; form-action 'self';");
+header("X-Content-Type-Options: nosniff");
+header("X-Frame-Options: SAMEORIGIN");
+header("Referrer-Policy: strict-origin-when-cross-origin");
+
 $error = '';
 $oidcError = '';
 
@@ -40,12 +46,14 @@ try {
     $currentLang = 'en';
 }
 // Detect language change from selector
+$allowedLangs = ['en', 'fr', 'es', 'de', 'pt', 'zh-cn'];
 if (isset($_GET['lang'])) {
     $requestedLang = strtolower(trim((string)$_GET['lang']));
-    if (preg_match('/^[a-z]{2}(-[a-z]{2})?$/', $requestedLang)) {
+    if (in_array($requestedLang, $allowedLangs, true)) {
         setcookie('login_lang', $requestedLang, [
             'expires' => time() + (86400 * 30),
             'path' => '/',
+            'secure' => $isSecure ?? false,
             'httponly' => true,
             'samesite' => 'Lax'
         ]);
@@ -53,9 +61,14 @@ if (isset($_GET['lang'])) {
     }
 } elseif (isset($_COOKIE['login_lang'])) {
     $cookieLang = strtolower(trim((string)$_COOKIE['login_lang']));
-    if (preg_match('/^[a-z]{2}(-[a-z]{2})?$/', $cookieLang)) {
+    if (in_array($cookieLang, $allowedLangs, true)) {
         $currentLang = $cookieLang;
     }
+}
+
+// Generate CSRF token for login form
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 // If already authenticated, redirect to home
@@ -74,6 +87,11 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
         header('Location: login.php');
         exit;
     }
+    // Validate CSRF token
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
+        $error = t('login.errors.invalid_credentials', [], 'Incorrect username or password.', $currentLang ?? 'en');
+        goto render_page;
+    }
     $username = $_POST['username'];
     $password = $_POST['password'];
     $rememberMe = isset($_POST['remember_me']) && $_POST['remember_me'] === '1';
@@ -89,7 +107,10 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
     } else {
         $error = t('login.errors.invalid_credentials', [], 'Incorrect username or password.', $currentLang ?? 'en');
     }
+    // Regenerate CSRF token after login attempt
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
+render_page:
 
 // OIDC error feedback
 if (isset($_GET['oidc_error'])) {
@@ -199,6 +220,7 @@ if (isset($_GET['oidc_error'])) {
         
         <?php if ($showNormalLogin): ?>
         <form method="POST">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES); ?>">
             <div class="form-group">
                 <input type="text" id="username" name="username" placeholder="<?php echo t_h('login.fields.username_or_email', [], 'Username or Email', $currentLang ?? 'en'); ?>" required autofocus autocomplete="username">
             </div>
