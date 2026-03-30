@@ -63,6 +63,17 @@
         }
     }
 
+    function shouldOpenFolderIconPicker(element) {
+        return !!(
+            element &&
+            element.classList &&
+            element.classList.contains('folder-list-click-action') &&
+            window.PoznoteUiCustomization &&
+            typeof window.PoznoteUiCustomization.usesFolderIconKanban === 'function' &&
+            !window.PoznoteUiCustomization.usesFolderIconKanban()
+        );
+    }
+
     /**
      * Reuse current tab when the opposite side of a linked/source pair is already open.
      * - linked -> source already open
@@ -287,6 +298,13 @@
         event.stopImmediatePropagation();
 
         var folderData = getFolderData(element);
+
+        if (shouldOpenFolderIconPicker(element)) {
+            if (folderData.id && typeof window.showChangeFolderIconModal === 'function') {
+                window.showChangeFolderIconModal(folderData.id, folderData.name);
+            }
+            return;
+        }
 
         // Close folder actions menu if opened from there
         if (folderData.id && typeof window.closeFolderActionsMenu === 'function') {

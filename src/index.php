@@ -588,11 +588,6 @@ $body_classes = trim($extra_body_classes);
                     if ($note_type !== 'markdown' && $note_type !== 'tasklist') {
                         echo '<button type="button" class="toolbar-btn btn-excalidraw note-action-btn" title="' . t_h('editor.toolbar.insert_excalidraw') . '" data-action="insert-excalidraw"><i class="lucide lucide-brush"></i></button>';
                     }
-                
-                    // Hide emoji button for tasklist notes
-                    if ($note_type !== 'tasklist') {
-                        echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn" title="' . t_h('editor.toolbar.insert_emoji') . '" data-action="toggle-emoji-picker"><i class="lucide lucide-smile"></i></button>';
-                    }
                     
                     // Table and separator buttons
                     echo '<button type="button" class="toolbar-btn btn-table note-action-btn" title="' . t_h('editor.toolbar.insert_table') . '" data-action="toggle-table-picker"><i class="lucide lucide-table"></i></button>';
@@ -1103,6 +1098,7 @@ window.calendarTranslations = {
 </script>
 <script src="js/calendar.js?v=<?php echo $v; ?>"></script>
 <script src="js/backlinks.js?v=<?php echo $v; ?>"></script>
+<script src="js/ui-customization.js?v=<?php echo $v; ?>"></script>
 
 <?php if ($note && is_numeric($note)): ?>
 <!-- Data for draft check (used by index-events.js) -->

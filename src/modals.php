@@ -954,3 +954,189 @@
         </div>
     </div>
 </div>
+
+<!-- UI Customization Modal -->
+<div id="uiCustomizationModal" class="modal">
+    <div class="modal-content modal-content-wide">
+        <div class="modal-header">
+            <h3><?php echo t_h('modals.ui_customization.title', [], 'UI Customization'); ?></h3>
+        </div>
+        <div class="modal-body">
+            <p class="ui-custom-description"><?php echo t_h('modals.ui_customization.description', [], 'Show or hide interface elements. Unchecked items will be hidden.'); ?></p>
+            <div class="ui-custom-filter">
+                <input
+                    type="search"
+                    id="uiCustomizationFilterInput"
+                    class="ui-custom-filter-input"
+                    placeholder="<?php echo t_h('modals.ui_customization.filter_placeholder', [], 'Filter items...'); ?>"
+                    autocomplete="off">
+            </div>
+            <div class="ui-custom-sections-scroll">
+                <div class="ui-custom-empty" id="uiCustomizationFilterEmpty" hidden><?php echo t_h('modals.ui_customization.no_results', [], 'No matching items found.'); ?></div>
+
+                <!-- Home Cards Section -->
+                <div class="ui-custom-section">
+                <h4 class="ui-custom-section-title"><?php echo t_h('modals.ui_customization.sections.home_cards', [], 'Home Cards'); ?></h4>
+                <div class="ui-custom-items">
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-notes-card" checked><span><?php echo t_h('common.notes', [], 'Notes'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-tags-card" checked><span><?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-favorites-card" checked><span><?php echo t_h('notes_list.system_folders.favorites', [], 'Favorites'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-folders-card" checked><span><?php echo t_h('home.folders', [], 'Folders'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-shares-card" checked><span><?php echo t_h('home.shares', [], 'Shares'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-trash-card" checked><span><?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-attachments-card" checked><span><?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-git-push-card" checked><span><?php echo t_h('git_sync.actions.push.button', ['provider' => 'Git'], 'Git Push'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-git-pull-card" checked><span><?php echo t_h('git_sync.actions.pull.button', ['provider' => 'Git'], 'Git Pull'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:extension-card" checked><span><?php echo t_h('settings.cards.install_extension', [], 'Install extension'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:install-app-card" checked><span><?php echo t_h('settings.cards.install_app', [], 'Install application'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:api-rest-card" checked><span><?php echo t_h('settings.cards.api_rest', [], 'API REST'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-logout-card" checked><span><?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?></span></label>
+                </div>
+                </div>
+
+                <!-- Create Cards Section -->
+                <div class="ui-custom-section">
+                <h4 class="ui-custom-section-title"><?php echo t_h('modals.ui_customization.sections.create_cards', [], 'Create Cards'); ?></h4>
+                <div class="ui-custom-items">
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-note-card" checked><span><?php echo t_h('modals.create.note.title', [], 'Note'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-markdown-note-card" checked><span><?php echo t_h('modals.create.markdown.title', [], 'Markdown Note'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-task-list-card" checked><span><?php echo t_h('modals.create.task_list.title', [], 'Task List'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-linked-note-card" checked><span><?php echo t_h('modals.create.linked.title', [], 'Shortcut'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-template-card" checked><span><?php echo t_h('modals.create.template.title', [], 'Template'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-folder-card" checked><span><?php echo t_h('modals.create.folder.title', [], 'Folder'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-subfolder-card" checked><span><?php echo t_h('modals.create.subfolder.title', [], 'Subfolder'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-kanban-card" checked><span><?php echo t_h('modals.create.kanban.title', [], 'Kanban Structure'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-workspace-card" checked><span><?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?></span></label>
+                </div>
+                </div>
+
+                <!-- Settings Cards Section -->
+                <div class="ui-custom-section">
+                <h4 class="ui-custom-section-title"><?php echo t_h('modals.ui_customization.sections.settings_cards', [], 'Settings Cards'); ?></h4>
+                <div class="ui-custom-items">
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:workspaces-card" checked><span><?php echo t_h('settings.cards.workspaces', [], 'Workspaces'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:change-password-card" checked><span><?php echo t_h('settings.cards.change_password', [], 'Change Password'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:git-sync-card" checked><span><?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:backup-export-card" checked><span><?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:restore-import-card" checked><span><?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:login-display-card" checked><span><?php echo t_h('display.cards.login_display', [], 'Login page title'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:language-card" checked><span><?php echo t_h('settings.language.label', [], 'Language'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:theme-mode-card" checked><span><?php echo t_h('display.cards.theme_mode', [], 'Theme'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:font-size-card" checked><span><?php echo t_h('display.cards.note_font_size', [], 'Font size'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:index-icon-scale-card" checked><span><?php echo t_h('display.cards.index_icon_scale', [], 'Index icon scaling'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:timezone-card" checked><span><?php echo t_h('display.cards.timezone', [], 'Timezone'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-sort-card" checked><span><?php echo t_h('display.cards.note_sort_order', [], 'Note sorting'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:tasklist-insert-order-card" checked><span><?php echo t_h('display.cards.tasklist_insert_order', [], 'Task list insert order'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:show-created-card" checked><span><?php echo t_h('display.cards.show_note_created', [], 'Show creation date'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:folder-counts-card" checked><span><?php echo t_h('display.cards.show_folder_counts', [], 'Show folder counts'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:notes-without-folders-card" checked><span><?php echo t_h('display.cards.notes_without_folders_after', [], 'Notes without folders'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-width-card" checked><span><?php echo t_h('display.cards.note_content_width', [], 'Note content width'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:code-wrap-card" checked><span><?php echo t_h('display.cards.code_block_word_wrap', [], 'Code block word wrap'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:users-admin-card" checked><span><?php echo t_h('settings.cards.user_management', [], 'User Management'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:git-sync-enabled-card" checked><span><?php echo t_h('settings.cards.git_sync_toggle', [], 'Git Sync'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:import-limits-card" checked><span><?php echo t_h('settings.cards.import_limits', [], 'Import Limits'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:custom-css-card" checked><span><?php echo t_h('settings.cards.custom_css', [], 'Custom CSS path'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:disaster-recovery-card" checked><span><?php echo t_h('multiuser.admin.maintenance.title', [], 'Disaster Recovery'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:convert-images-card" checked><span><?php echo t_h('settings.cards.convert_images', [], 'Base64 Image Converter'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:orphan-scanner-card" checked><span><?php echo t_h('settings.cards.orphan_scanner', [], 'Orphan attachments scanner'); ?></span></label>
+                </div>
+                </div>
+
+                <!-- Toolbar Section -->
+                <div class="ui-custom-section">
+                <h4 class="ui-custom-section-title"><?php echo t_h('modals.ui_customization.sections.toolbar', [], 'Toolbar'); ?></h4>
+                <div class="ui-custom-items">
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-bold" checked><span><?php echo t_h('editor.toolbar.bold', [], 'Bold'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-italic" checked><span><?php echo t_h('editor.toolbar.italic', [], 'Italic'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-underline" checked><span><?php echo t_h('editor.toolbar.underline', [], 'Underline'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-strikethrough" checked><span><?php echo t_h('editor.toolbar.strikethrough', [], 'Strikethrough'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-link" checked><span><?php echo t_h('editor.toolbar.link', [], 'Link'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-color" checked><span><?php echo t_h('editor.toolbar.text_color', [], 'Text color'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-highlight" checked><span><?php echo t_h('editor.toolbar.highlight', [], 'Highlight'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-list-ul" checked><span><?php echo t_h('editor.toolbar.bullet_list', [], 'Bullet list'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-list-ol" checked><span><?php echo t_h('editor.toolbar.numbered_list', [], 'Numbered list'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-text-height" checked><span><?php echo t_h('slash_menu.title', [], 'Title'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-code" checked><span><?php echo t_h('editor.toolbar.code_block', [], 'Code block'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-inline-code" checked><span><?php echo t_h('editor.toolbar.inline_code', [], 'Inline code'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-eraser" checked><span><?php echo t_h('editor.toolbar.clear_formatting', [], 'Clear formatting'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-search-replace" checked><span><?php echo t_h('editor.toolbar.search_replace', [], 'Search and Replace'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-excalidraw" checked><span>Excalidraw</span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-table" checked><span><?php echo t_h('editor.toolbar.insert_table', [], 'Table'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-checklist" checked><span><?php echo t_h('editor.toolbar.insert_checklist', [], 'Checklist'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-separator" checked><span><?php echo t_h('editor.toolbar.add_separator', [], 'Separator'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-note-reference" checked><span><?php echo t_h('editor.toolbar.insert_note_reference', [], 'Note reference'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-favorite" checked><span><?php echo t_h('index.toolbar.favorite_add', [], 'Favorite'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-share" checked><span><?php echo t_h('index.toolbar.share_note', [], 'Share'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-attachment" checked><span><?php echo t_h('modals.attachment.title', [], 'Attachments'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-open-new-tab" checked><span><?php echo t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-duplicate" checked><span><?php echo t_h('common.duplicate', [], 'Duplicate'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-move" checked><span><?php echo t_h('common.move', [], 'Move'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-create-linked-note" checked><span><?php echo t_h('editor.toolbar.create_linked_note', [], 'Create linked note'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-download" checked><span><?php echo t_h('common.download', [], 'Download'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-convert" checked><span><?php echo t_h('modals.convert.title', [], 'Convert'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-trash" checked><span><?php echo t_h('common.delete', [], 'Delete'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-info" checked><span><?php echo t_h('common.information', [], 'Information'); ?></span></label>
+                </div>
+                </div>
+
+                <!-- Slash Menu Section -->
+                <div class="ui-custom-section">
+                <h4 class="ui-custom-section-title"><?php echo t_h('modals.ui_customization.sections.slash_menu', [], 'Slash Menu'); ?></h4>
+                <div class="ui-custom-items">
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:normal" checked><span><?php echo t_h('slash_menu.back_to_normal', [], 'Back to normal text'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:title" checked><span><?php echo t_h('slash_menu.title', [], 'Title'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:format" checked><span><?php echo t_h('slash_menu.format_text', [], 'Format text'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:color" checked><span><?php echo t_h('slash_menu.color', [], 'Color'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:code" checked><span><?php echo t_h('slash_menu.code', [], 'Code'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:list" checked><span><?php echo t_h('slash_menu.list', [], 'List'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:quote" checked><span><?php echo t_h('slash_menu.quote', [], 'Quote'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:media" checked><span><?php echo t_h('slash_menu.media', [], 'Media'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:toggle" checked><span><?php echo t_h('slash_menu.toggle', [], 'Toggle'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:emoji" checked><span><?php echo t_h('slash_menu.emoji', [], 'Emoji'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:date" checked><span><?php echo t_h('slash_menu.date', [], 'Date'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:excalidraw" checked><span>Excalidraw</span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:table" checked><span><?php echo t_h('slash_menu.table', [], 'Table'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:separator" checked><span><?php echo t_h('slash_menu.separator', [], 'Separator'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:note-reference" checked><span><?php echo t_h('slash_menu.link_to_note', [], 'Link to note'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:link" checked><span><?php echo t_h('slash_menu.link', [], 'Link'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:image" checked><span><?php echo t_h('slash_menu.image', [], 'Image'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:audio-file" checked><span><?php echo t_h('slash_menu.audio', [], 'Audio'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:cancel" checked><span><?php echo t_h('slash_menu.cancel', [], 'Cancel'); ?></span></label>
+                </div>
+                </div>
+
+                <!-- Other Section -->
+                <div class="ui-custom-section">
+                <h4 class="ui-custom-section-title"><?php echo t_h('modals.ui_customization.sections.panels', [], 'Other'); ?></h4>
+                <div class="ui-custom-items">
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:folder-icon-kanban" checked><span><?php echo t_h('home.kanban', [], 'Kanban'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:mini-calendar" checked><span><?php echo t_h('common.calendar', [], 'Calendar'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:outline-panel" checked><span><?php echo t_h('common.outline.title', [], 'Outline'); ?></span></label>
+                </div>
+                </div>
+
+                <!-- Folder Actions Section -->
+                <div class="ui-custom-section">
+                <h4 class="ui-custom-section-title"><?php echo t_h('modals.ui_customization.sections.folder_actions', [], 'Folder Actions'); ?></h4>
+                <div class="ui-custom-items">
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:create-note-in-folder" checked><span><?php echo t_h('notes_list.folder_actions.create', [], 'Create note'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:open-kanban-view" checked><span><?php echo t_h('notes_list.folder_actions.kanban_view', [], 'Kanban view'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:open-all-notes-in-tabs" checked><span><?php echo t_h('notes_list.folder_actions.open_all_in_tabs', [], 'Open all notes in tabs'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:move-folder-files" checked><span><?php echo t_h('notes_list.folder_actions.move_all_files', [], 'Move all files'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:move-entire-folder" checked><span><?php echo t_h('notes_list.folder_actions.move_folder', [], 'Move to subfolder'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:download-folder" checked><span><?php echo t_h('notes_list.folder_actions.download_folder', [], 'Download folder'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:share-folder" checked><span><?php echo t_h('notes_list.folder_actions.share_folder', [], 'Make public'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:rename-folder" checked><span><?php echo t_h('notes_list.folder_actions.rename_folder', [], 'Rename'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:change-folder-icon" checked><span><?php echo t_h('notes_list.folder_actions.change_icon', [], 'Change icon'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:toggle-sort-submenu" checked><span><?php echo t_h('sort.header', [], 'Sort by'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:delete-folder" checked><span><?php echo t_h('notes_list.folder_actions.delete_folder', [], 'Delete'); ?></span></label>
+                </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="uiCustomizationModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveUiCustomizationBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>

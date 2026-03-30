@@ -483,11 +483,11 @@ try {
         </div>
 
         <?php $username = htmlspecialchars($currentUser['display_name'] ?: $currentUser['username']); ?>
-        <h2 class="settings-category-title"><?php echo t_h('home.dashboard', [], 'Dashboard') . ' (' . $username . ')'; ?></h2>
-        <div class="home-grid">
+        <h2 class="settings-category-title" id="home-dashboard-section-title"><?php echo t_h('home.dashboard', [], 'Dashboard') . ' (' . $username . ')'; ?></h2>
+        <div class="home-grid" id="home-dashboard-section-grid">
 
             <!-- Notes -->
-            <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('common.notes', [], 'Notes'); ?>">
+            <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="home-notes-card" title="<?php echo t_h('common.notes', [], 'Notes'); ?>">
                 <div class="home-card-icon">
                     <i class="lucide lucide-sticky-note"></i>
                 </div>
@@ -498,7 +498,7 @@ try {
             </a>
 
             <!-- Tags -->
-            <a href="list_tags.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?>">
+            <a href="list_tags.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="home-tags-card" title="<?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?>">
                 <div class="home-card-icon">
                     <i class="lucide lucide-tags"></i>
                 </div>
@@ -509,7 +509,7 @@ try {
             </a>
             
             <!-- Favorites -->
-            <a href="favorites.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('notes_list.system_folders.favorites', [], 'Favorites'); ?>">
+            <a href="favorites.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="home-favorites-card" title="<?php echo t_h('notes_list.system_folders.favorites', [], 'Favorites'); ?>">
                 <div class="home-card-icon home-card-icon-favorites">
                     <i class="lucide lucide-star"></i>
                 </div>
@@ -520,7 +520,7 @@ try {
             </a>
             
             <!-- Folders -->
-            <a href="list_folders.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('home.folders', [], 'Folders'); ?>">
+            <a href="list_folders.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="home-folders-card" title="<?php echo t_h('home.folders', [], 'Folders'); ?>">
                 <div class="home-card-icon home-card-icon-kanban">
                     <i class="lucide lucide-folder-open"></i>
                 </div>
@@ -531,7 +531,7 @@ try {
             </a>
             
             <!-- Shares (Notes + Folders) -->
-            <a href="shared.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('home.shares', [], 'Shares'); ?>">
+            <a href="shared.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="home-shares-card" title="<?php echo t_h('home.shares', [], 'Shares'); ?>">
                 <div class="home-card-icon home-card-icon-shared">
                     <i class="lucide lucide-share-2"></i>
                 </div>
@@ -542,7 +542,7 @@ try {
             </a>
             
             <!-- Trash -->
-            <a href="trash.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?>">
+            <a href="trash.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="home-trash-card" title="<?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?>">
                 <div class="home-card-icon home-card-icon-trash">
                     <i class="lucide lucide-trash-2"></i>
                 </div>
@@ -553,7 +553,7 @@ try {
             </a>
             
             <!-- Attachments -->
-            <a href="attachments_list.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" title="<?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?>">
+            <a href="attachments_list.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="home-attachments-card" title="<?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?>">
                 <div class="home-card-icon">
                     <i class="lucide lucide-paperclip"></i>
                 </div>
@@ -565,13 +565,13 @@ try {
 
         </div>
 
-        <h2 class="settings-category-title"><?php echo t_h('settings.categories.actions', [], 'Actions') . ' (' . $username . ')'; ?></h2>
-        <div class="home-grid">
+        <h2 class="settings-category-title" id="home-actions-section-title"><?php echo t_h('settings.categories.actions', [], 'Actions') . ' (' . $username . ')'; ?></h2>
+        <div class="home-grid" id="home-actions-section-grid">
 
             <?php if ($showGitTiles): ?>
                 <?php if ($gitEnabled): ?>
                     <!-- Git Push (Enabled) -->
-                    <form method="post" class="home-card home-card-green" onclick="handleSyncClick(this);">
+                    <form method="post" class="home-card home-card-green" id="home-git-push-card" onclick="handleSyncClick(this);">
                         <input type="hidden" name="sync_action" value="push">
                         <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($pageWorkspace); ?>">
                         <div class="home-card-icon">
@@ -584,7 +584,7 @@ try {
                     </form>
 
                     <!-- Git Pull (Enabled) -->
-                    <form method="post" class="home-card home-card-green" onclick="handleSyncClick(this);">
+                    <form method="post" class="home-card home-card-green" id="home-git-pull-card" onclick="handleSyncClick(this);">
                         <input type="hidden" name="sync_action" value="pull">
                         <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($pageWorkspace); ?>">
                         <div class="home-card-icon">
@@ -597,7 +597,7 @@ try {
                     </form>
                 <?php else: ?>
                     <!-- Git Push (Disabled) -->
-                    <a href="git_sync.php" class="home-card home-card-green">
+                    <a href="git_sync.php" class="home-card home-card-green" id="home-git-push-card">
                         <div class="home-card-icon">
                             <i class="lucide lucide-upload"></i>
                         </div>
@@ -608,7 +608,7 @@ try {
                     </a>
 
                     <!-- Git Pull (Disabled) -->
-                    <a href="git_sync.php" class="home-card home-card-green">
+                    <a href="git_sync.php" class="home-card home-card-green" id="home-git-pull-card">
                         <div class="home-card-icon">
                             <i class="lucide lucide-download"></i>
                         </div>
@@ -642,7 +642,7 @@ try {
             </a>
 
             <!-- Support Developer -->
-            <a href="https://ko-fi.com/timothepoznanski" target="_blank" class="home-card home-card-red" id="support-card">
+            <a href="https://ko-fi.com/timothepoznanski" target="_blank" class="home-card home-card-red" id="home-support-card">
                 <div class="home-card-icon">
                     <i class="lucide lucide-heart heart-blink"></i>
                 </div>
@@ -652,7 +652,7 @@ try {
             </a>
 
             <!-- Logout -->
-            <a href="logout.php" class="home-card home-card-red" title="<?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?>">
+            <a href="logout.php" class="home-card home-card-red" id="home-logout-card" title="<?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?>">
                 <div class="home-card-icon">
                     <i class="lucide lucide-log-out"></i>
                 </div>
@@ -730,6 +730,7 @@ try {
     <script src="js/workspaces.js"></script>
     <script src="js/navigation.js"></script>
     <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="js/ui-customization.js?v=<?php echo $cache_v; ?>"></script>
 
     <script>
     const gitProvider = '<?php echo getGitProviderName($gitProviderRaw); ?>';

@@ -1073,10 +1073,36 @@
         }
     }
 
+    function isSlashCommandHidden(commandId) {
+        var config = window.PoznoteUiCustomization;
+        return !!(config && config.hiddenKeyMap && config.hiddenKeyMap['slash:' + commandId]);
+    }
+
+    function filterSlashCommands(commands) {
+        return commands.reduce(function (filtered, command) {
+            if (!command || !command.id || isSlashCommandHidden(command.id)) {
+                return filtered;
+            }
+
+            if (Array.isArray(command.submenu)) {
+                var filteredSubmenu = filterSlashCommands(command.submenu);
+                if (filteredSubmenu.length === 0) {
+                    return filtered;
+                }
+
+                filtered.push(Object.assign({}, command, { submenu: filteredSubmenu }));
+                return filtered;
+            }
+
+            filtered.push(command);
+            return filtered;
+        }, []);
+    }
+
     // Return title commands for the slash menu (specific to title field)
     function getTitleSlashCommands() {
         const t = window.t || ((key, params, fallback) => fallback);
-        return [
+        return filterSlashCommands([
             {
                 id: 'emoji',
                 icon: 'lucide-smile',
@@ -1155,17 +1181,17 @@
                     }
                 }
             }
-        ];
+        ]);
     }
 
     // Return slash commands for task items
     function getTaskSlashCommands() {
         const t = window.t || ((key, params, fallback) => fallback);
         const common = getCommonSlashCommands();
-        return [
+        return filterSlashCommands([
             common.noteReference,
             common.cancel
-        ];
+        ]);
     }
 
     // Return slash commands common between HTML and Markdown modes
@@ -1213,7 +1239,7 @@
                 action: function () { insertImage(); }
             },
             cancel: {
-                id: 'open-keyboard',
+                id: 'cancel',
                 icon: 'lucide-times-circle',
                 label: t('slash_menu.cancel', null, 'Cancel'),
                 mobileOnly: true,
@@ -1235,7 +1261,7 @@
     function getSlashCommands() {
         const t = window.t || ((key, params, fallback) => fallback);
         var common = getCommonSlashCommands();
-        return [
+        return filterSlashCommands([
             {
                 id: 'normal',
                 icon: 'lucide-align-left',
@@ -1536,7 +1562,7 @@
                 ]
             },
             common.cancel
-        ];
+        ]);
     }
 
     // Slash command menu items for Markdown notes (edit mode)
@@ -1545,7 +1571,7 @@
     function getMarkdownSlashCommands() {
         const t = window.t || ((key, params, fallback) => fallback);
         var common = getCommonSlashCommands();
-        return [
+        return filterSlashCommands([
             {
                 id: 'title',
                 icon: 'lucide-text-height',
@@ -1820,7 +1846,7 @@
                 ]
             },
             common.cancel
-        ];
+        ]);
     }
 
     // Get current editor context (note type, DOM elements)

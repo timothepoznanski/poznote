@@ -452,10 +452,12 @@
       "kanban_on_folder_click": "Abrir vista Kanban al hacer clic en la carpeta",
       "index_icon_scale": "Escalado de iconos del índice",
       "note_content_width": "Ancho del contenido de la nota",
-      "code_block_word_wrap": "Ajuste de línea en bloques de código"
+      "code_block_word_wrap": "Ajuste de línea en bloques de código",
+      "ui_customization": "Visibilidad de los elementos"
     },
     "badges": {
       "font_size_default": "predeterminado ({{size}}px)",
+      "ui_customization_configure": "Configurar",
       "toolbar_mode": {
         "full": "Solo barra de herramientas",
         "slash": "Solo comando de barra",
@@ -733,6 +735,23 @@
       "max_zip_files": "Máx. archivos en ZIP",
       "individual_badge": "Individual: {{count}}",
       "zip_badge": "ZIP: {{count}}"
+    },
+    "ui_customization": {
+      "title": "Personalización de interfaz",
+      "description": "Mostrar u ocultar elementos de la interfaz. Los elementos no marcados se ocultarán.",
+      "filter_placeholder": "Filtrar elementos...",
+      "no_results": "No se encontraron elementos coincidentes.",
+      "sections": {
+        "home_cards": "Tarjetas de inicio",
+        "create_cards": "Tarjetas de creación",
+        "settings_cards": "Tarjetas de configuración",
+        "toolbar": "Barra de herramientas",
+        "slash_menu": "Menú slash",
+        "panels": "Otros",
+        "folder_actions": "Acciones de carpeta"
+      },
+      "badge_all_visible": "Todo visible",
+      "badge_hidden_count": "{{count}} oculto(s)"
     },
     "theme": {
       "title": "Selección de tema",

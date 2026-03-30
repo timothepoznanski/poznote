@@ -70,7 +70,7 @@ $currentLang = getUserLanguage();
         <div class="home-grid">
 
             <!-- Note -->
-            <a href="#" class="home-card" data-create-type="html" title="<?php echo t_h('modals.create.note.title', [], 'Note'); ?>">
+            <a href="#" class="home-card" id="create-note-card" data-create-type="html" title="<?php echo t_h('modals.create.note.title', [], 'Note'); ?>">
                 <div class="home-card-icon">
                     <i class="lucide lucide-file-alt"></i>
                 </div>
@@ -81,7 +81,7 @@ $currentLang = getUserLanguage();
             </a>
 
             <!-- Markdown Note -->
-            <a href="#" class="home-card" data-create-type="markdown" title="<?php echo t_h('modals.create.markdown.title', [], 'Markdown Note'); ?>">
+            <a href="#" class="home-card" id="create-markdown-note-card" data-create-type="markdown" title="<?php echo t_h('modals.create.markdown.title', [], 'Markdown Note'); ?>">
                 <div class="home-card-icon">
                     <i class="lucide lucide-file-code"></i>
                 </div>
@@ -92,7 +92,7 @@ $currentLang = getUserLanguage();
             </a>
 
             <!-- Task List -->
-            <a href="#" class="home-card" data-create-type="list" title="<?php echo t_h('modals.create.task_list.title', [], 'Task List'); ?>">
+            <a href="#" class="home-card" id="create-task-list-card" data-create-type="list" title="<?php echo t_h('modals.create.task_list.title', [], 'Task List'); ?>">
                 <div class="home-card-icon">
                     <i class="lucide lucide-list-ul"></i>
                 </div>
@@ -102,7 +102,7 @@ $currentLang = getUserLanguage();
             </a>
 
             <!-- Linked Note -->
-            <a href="#" class="home-card" data-create-type="linked" title="<?php echo t_h('modals.create.linked.title', [], 'Shortcut'); ?>">
+            <a href="#" class="home-card" id="create-linked-note-card" data-create-type="linked" title="<?php echo t_h('modals.create.linked.title', [], 'Shortcut'); ?>">
                 <div class="home-card-icon">
                     <i class="lucide lucide-link"></i>
                 </div>
@@ -112,7 +112,7 @@ $currentLang = getUserLanguage();
             </a>
 
             <!-- Template -->
-            <a href="#" class="home-card" data-create-type="template" title="<?php echo t_h('modals.create.template.title', [], 'Template'); ?>">
+            <a href="#" class="home-card" id="create-template-card" data-create-type="template" title="<?php echo t_h('modals.create.template.title', [], 'Template'); ?>">
                 <div class="home-card-icon">
                     <i class="lucide lucide-copy"></i>
                 </div>
@@ -122,7 +122,7 @@ $currentLang = getUserLanguage();
             </a>
 
             <!-- Folder -->
-            <a href="#" class="home-card" data-create-type="folder" title="<?php echo t_h('modals.create.folder.title', [], 'Folder'); ?>">
+            <a href="#" class="home-card" id="create-folder-card" data-create-type="folder" title="<?php echo t_h('modals.create.folder.title', [], 'Folder'); ?>">
                 <div class="home-card-icon">
                     <i class="lucide lucide-folder"></i>
                 </div>
@@ -132,7 +132,7 @@ $currentLang = getUserLanguage();
             </a>
 
             <!-- Kanban Structure -->
-            <a href="#" class="home-card" data-create-type="kanban" title="<?php echo t_h('modals.create.kanban.title', [], 'Kanban Structure'); ?>">
+            <a href="#" class="home-card" id="create-kanban-card" data-create-type="kanban" title="<?php echo t_h('modals.create.kanban.title', [], 'Kanban Structure'); ?>">
                 <div class="home-card-icon">
                     <i class="lucide lucide-columns-2"></i>
                 </div>
@@ -142,7 +142,7 @@ $currentLang = getUserLanguage();
             </a>
 
             <!-- Workspace -->
-            <a href="#" class="home-card" data-create-type="workspace" title="<?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?>">
+            <a href="#" class="home-card" id="create-workspace-card" data-create-type="workspace" title="<?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?>">
                 <div class="home-card-icon">
                     <i class="lucide lucide-layers"></i>
                 </div>
@@ -168,6 +168,7 @@ $currentLang = getUserLanguage();
     <script src="js/modals-events.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/notes.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/folder-hierarchy.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="js/ui-customization.js?v=<?php echo $cache_v; ?>"></script>
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {

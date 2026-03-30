@@ -112,10 +112,12 @@
       "kanban_on_folder_click": "Открывать канбан при клике на папку",
       "index_icon_scale": "Масштаб иконок в списке",
       "note_content_width": "Ширина содержимого заметки",
-      "code_block_word_wrap": "Перенос строк в блоке кода"
+      "code_block_word_wrap": "Перенос строк в блоке кода",
+      "ui_customization": "Видимость элементов"
     },
     "badges": {
       "font_size_default": "по умолчанию ({{size}}px)",
+      "ui_customization_configure": "Настроить",
       "note_font_size": "{{size}}px",
       "sidebar_font_size": "{{size}}px",
       "code_block_font_size": "{{size}}px"
@@ -276,6 +278,23 @@
       "max_zip_files": "Макс. файлов в ZIP",
       "individual_badge": "Отдельные: {{count}}",
       "zip_badge": "ZIP: {{count}}"
+    },
+    "ui_customization": {
+      "title": "Настройка интерфейса",
+      "description": "Показывать или скрывать элементы интерфейса. Неотмеченные элементы будут скрыты.",
+      "filter_placeholder": "Фильтровать элементы...",
+      "no_results": "Подходящие элементы не найдены.",
+      "sections": {
+        "home_cards": "Карточки главной страницы",
+        "create_cards": "Карточки создания",
+        "settings_cards": "Карточки настроек",
+        "toolbar": "Панель инструментов",
+        "slash_menu": "Slash-меню",
+        "panels": "Другое",
+        "folder_actions": "Действия с папками"
+      },
+      "badge_all_visible": "Всё видимо",
+      "badge_hidden_count": "{{count}} скрыто"
     },
     "theme": {
       "title": "Выбор темы",

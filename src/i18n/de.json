@@ -453,10 +453,12 @@
       "kanban_on_folder_click": "Kanban-Ansicht beim Klicken auf Ordner öffnen",
       "index_icon_scale": "Skalierung der Index-Symbole",
       "note_content_width": "Breite des Notizinhalts",
-      "code_block_word_wrap": "Codeblock-Zeilenumbruch"
+      "code_block_word_wrap": "Codeblock-Zeilenumbruch",
+      "ui_customization": "Sichtbarkeit von Elementen"
     },
     "badges": {
       "font_size_default": "Standard ({{size}}px)",
+      "ui_customization_configure": "Konfigurieren",
       "toolbar_mode": {
         "full": "Nur Symbolleiste",
         "slash": "Nur Schrägstrich-Befehl",
@@ -734,6 +736,23 @@
       "max_zip_files": "Max. Dateien im ZIP",
       "individual_badge": "Einzeln: {{count}}",
       "zip_badge": "ZIP: {{count}}"
+    },
+    "ui_customization": {
+      "title": "Oberfläche anpassen",
+      "description": "Oberflächenelemente ein- oder ausblenden. Nicht angehakte Elemente werden ausgeblendet.",
+      "filter_placeholder": "Elemente filtern...",
+      "no_results": "Keine passenden Elemente gefunden.",
+      "sections": {
+        "home_cards": "Startseitenkarten",
+        "create_cards": "Erstellungskarten",
+        "settings_cards": "Einstellungskarten",
+        "toolbar": "Symbolleiste",
+        "slash_menu": "Slash-Menü",
+        "panels": "Sonstiges",
+        "folder_actions": "Ordneraktionen"
+      },
+      "badge_all_visible": "Alle sichtbar",
+      "badge_hidden_count": "{{count}} ausgeblendet"
     },
     "theme": {
       "title": "Themenauswahl",
