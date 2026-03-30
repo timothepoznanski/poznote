@@ -745,6 +745,7 @@ $body_classes = trim($extra_body_classes);
                     // Search and replace button (only for note and markdown types, shown in mobile menu)
                     if ($note_type === 'note' || $note_type === 'markdown') {
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-search-replace"><i class="lucide lucide-search"></i> '.t_h('editor.toolbar.search_replace', [], 'Search and replace').'</button>';
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="insert-audio-file"><i class="lucide lucide-mic"></i> '.t_h('slash_menu.audio', [], 'Audio').'</button>';
                     }
 
                     // Task list actions (only for tasklist notes, shown in mobile menu)

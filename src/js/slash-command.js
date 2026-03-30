@@ -3862,6 +3862,30 @@
     // Expose hideSlashMenu globally
     window.hideSlashMenu = hideSlashMenu;
 
+    window.insertAudioFileWithContext = function (options) {
+        options = options || {};
+
+        const noteEntry = options.noteEntry || savedNoteEntry;
+        const editableElement = options.editableElement || savedEditableElement;
+        const isMarkdown = typeof options.isMarkdown === 'boolean'
+            ? options.isMarkdown
+            : !!(noteEntry && noteEntry.getAttribute && noteEntry.getAttribute('data-note-type') === 'markdown');
+
+        let savedRange = options.savedRange || null;
+        if (savedRange && typeof savedRange.cloneRange === 'function') {
+            savedRange = savedRange.cloneRange();
+        }
+
+        if (!savedRange) {
+            const sel = window.getSelection();
+            if (sel && sel.rangeCount > 0) {
+                savedRange = sel.getRangeAt(0).cloneRange();
+            }
+        }
+
+        insertUploadedAudio(isMarkdown, noteEntry, editableElement, savedRange);
+    };
+
     // Insert YouTube video into HTML note (exposed globally)
     window.insertYouTubeVideo = function () {
         const t = window.t || ((key, params, fallback) => fallback);

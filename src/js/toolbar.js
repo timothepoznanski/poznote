@@ -1697,6 +1697,52 @@ window.insertTable = insertTable;
     if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'true');
   }
 
+  function getMobileToolbarContext(toolbar, rangeToRestore) {
+    const noteCard = toolbar && toolbar.closest ? toolbar.closest('.notecard') : null;
+    const noteEntry = noteCard ? noteCard.querySelector('.noteentry') : null;
+    if (!noteEntry) return null;
+
+    let editableElement = getEditorFromRange(rangeToRestore);
+    if (!editableElement || !noteEntry.contains(editableElement)) {
+      editableElement = noteEntry.querySelector('.markdown-editor')
+        || (noteEntry.matches('[contenteditable="true"]') ? noteEntry : noteEntry.querySelector('[contenteditable="true"]'));
+    }
+
+    return {
+      noteEntry,
+      editableElement,
+      noteType: (noteEntry.getAttribute('data-note-type') || 'note').toLowerCase()
+    };
+  }
+
+  function restoreMobileToolbarRange(editor, rangeToRestore) {
+    if (!editor) return null;
+
+    const scrollState = captureScrollState(editor);
+    focusEditorWithoutScroll(editor, scrollState);
+
+    let nextRange = rangeToRestore && typeof rangeToRestore.cloneRange === 'function'
+      ? rangeToRestore.cloneRange()
+      : rangeToRestore;
+
+    if (!nextRange) {
+      nextRange = document.createRange();
+      nextRange.selectNodeContents(editor);
+      nextRange.collapse(false);
+    }
+
+    try {
+      const selection = window.getSelection();
+      if (selection) {
+        selection.removeAllRanges();
+        selection.addRange(nextRange);
+      }
+    } catch (e) { }
+
+    restoreScrollState(scrollState);
+    return nextRange;
+  }
+
   window.toggleMobileToolbarMenu = function (btn) {
     const toolbar = getToolbarRoot(btn);
     if (!toolbar) return;
@@ -1755,6 +1801,29 @@ window.insertTable = insertTable;
       if (noteId && typeof uncheckAllTasks === 'function') {
         uncheckAllTasks(noteId);
       }
+    }
+  };
+
+  window.triggerMobileToolbarAudioInsert = function (menuItemEl) {
+    const toolbar = getToolbarRoot(menuItemEl);
+    if (!toolbar) return;
+
+    const rangeToRestore = savedMobileToolbarRange;
+    closeMenu(toolbar);
+    savedMobileToolbarRange = null;
+
+    const context = getMobileToolbarContext(toolbar, rangeToRestore);
+    if (!context || !context.editableElement) return;
+    if (context.noteType !== 'note' && context.noteType !== 'markdown') return;
+
+    const restoredRange = restoreMobileToolbarRange(context.editableElement, rangeToRestore);
+    if (typeof window.insertAudioFileWithContext === 'function') {
+      window.insertAudioFileWithContext({
+        noteEntry: context.noteEntry,
+        editableElement: context.editableElement,
+        savedRange: restoredRange,
+        isMarkdown: context.noteType === 'markdown'
+      });
     }
   };
 

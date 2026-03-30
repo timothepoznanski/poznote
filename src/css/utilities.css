@@ -55,6 +55,7 @@
     }
 
     /* Hide tasklist menu items on desktop */
+    .mobile-toolbar-menu [data-action="insert-audio-file"],
     .mobile-toolbar-menu [data-action="clear-completed-tasks"],
     .mobile-toolbar-menu [data-action="uncheck-all-tasks"] {
         display: none !important;
