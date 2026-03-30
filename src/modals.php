@@ -1060,11 +1060,7 @@
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-inline-code" checked><span><?php echo t_h('editor.toolbar.inline_code', [], 'Inline code'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-eraser" checked><span><?php echo t_h('editor.toolbar.clear_formatting', [], 'Clear formatting'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-search-replace" checked><span><?php echo t_h('editor.toolbar.search_replace', [], 'Search and Replace'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-excalidraw" checked><span>Excalidraw</span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-table" checked><span><?php echo t_h('editor.toolbar.insert_table', [], 'Table'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-checklist" checked><span><?php echo t_h('editor.toolbar.insert_checklist', [], 'Checklist'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-separator" checked><span><?php echo t_h('editor.toolbar.add_separator', [], 'Separator'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-note-reference" checked><span><?php echo t_h('editor.toolbar.insert_note_reference', [], 'Note reference'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-favorite" checked><span><?php echo t_h('index.toolbar.favorite_add', [], 'Favorite'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-share" checked><span><?php echo t_h('index.toolbar.share_note', [], 'Share'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-attachment" checked><span><?php echo t_h('modals.attachment.title', [], 'Attachments'); ?></span></label>

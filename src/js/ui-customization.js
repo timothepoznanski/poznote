@@ -28,11 +28,7 @@
         'btn-inline-code': 'format',
         'btn-eraser': 'format',
         'btn-search-replace': 'action',
-        'btn-excalidraw': 'action',
-        'btn-table': 'action',
         'btn-checklist': 'action',
-        'btn-separator': 'action',
-        'btn-note-reference': 'action',
         'btn-favorite': 'action',
         'btn-share': 'action',
         'btn-attachment': 'action',
@@ -60,6 +56,14 @@
 
     var syncScheduled = false;
     var observerStarted = false;
+
+    function getInitialHiddenKeys() {
+        if (!window.__POZNOTE_HIDDEN_UI_ELEMENTS__ || !Array.isArray(window.__POZNOTE_HIDDEN_UI_ELEMENTS__)) {
+            return null;
+        }
+
+        return window.__POZNOTE_HIDDEN_UI_ELEMENTS__.slice();
+    }
 
     function sanitizeHiddenKeys(hidden) {
         if (!Array.isArray(hidden)) {
@@ -276,6 +280,67 @@
     }
 
     function applyHiddenElements() {
+        function applyHiddenKeys(hidden) {
+            hidden = sanitizeHiddenKeys(hidden);
+            publishHiddenKeys(hidden);
+
+            var rules = [];
+
+            hidden.forEach(function (key) {
+                var parts = key.split(':');
+                if (parts.length !== 2) return;
+
+                var type = parts[0];
+                var id = parts[1];
+
+                if (type === 'card') {
+                    if (id === 'ui-customization-card') return;
+                    rules.push('#' + id + ' { display: none !important; }');
+
+                    if (CREATE_MODAL_OPTION_SELECTORS[key]) {
+                        rules.push('#createModal ' + CREATE_MODAL_OPTION_SELECTORS[key] + ' { display: none !important; }');
+                    }
+                } else if (type === 'toolbar') {
+                    rules.push('.note-edit-toolbar .' + id + ' { display: none !important; }');
+                    rules.push('.mobile-toolbar-menu [data-selector=".' + id + '"] { display: none !important; }');
+                } else if (type === 'folder') {
+                    rules.push('.folder-actions-menu-item[data-action="' + id + '"] { display: none !important; }');
+                    if (id === 'toggle-sort-submenu') {
+                        rules.push('.sort-submenu { display: none !important; }');
+                    }
+                } else if (type === 'panel') {
+                    if (id === 'mini-calendar') {
+                        rules.push('.mini-calendar-container { display: none !important; }');
+                    } else if (id === 'outline-panel') {
+                        rules.push('#outline-panel { display: none !important; }');
+                        rules.push('#outlineResizeHandle { display: none !important; }');
+                        rules.push('#outlineMobileBackdrop { display: none !important; }');
+                    }
+                }
+            });
+
+            var existingStyle = document.getElementById('ui-customization-styles');
+            if (rules.length > 0) {
+                if (!existingStyle) {
+                    existingStyle = document.createElement('style');
+                    existingStyle.setAttribute('id', 'ui-customization-styles');
+                    document.head.appendChild(existingStyle);
+                }
+                existingStyle.textContent = rules.join('\n');
+            } else if (existingStyle && existingStyle.parentNode) {
+                existingStyle.parentNode.removeChild(existingStyle);
+            }
+
+            scheduleVisibilitySync();
+            startObserver();
+        }
+
+        var initialHiddenKeys = getInitialHiddenKeys();
+        if (initialHiddenKeys !== null) {
+            applyHiddenKeys(initialHiddenKeys);
+            return;
+        }
+
         fetch('/api/v1/settings/hidden_ui_elements', {
             method: 'GET',
             headers: { 'Accept': 'application/json' },
@@ -292,63 +357,10 @@
                     }
                 }
 
-                hidden = sanitizeHiddenKeys(hidden);
-                publishHiddenKeys(hidden);
-
-                var rules = [];
-
-                hidden.forEach(function (key) {
-                    var parts = key.split(':');
-                    if (parts.length !== 2) return;
-
-                    var type = parts[0];
-                    var id = parts[1];
-
-                    if (type === 'card') {
-                        if (id === 'ui-customization-card') return;
-                        rules.push('#' + id + ' { display: none !important; }');
-
-                        if (CREATE_MODAL_OPTION_SELECTORS[key]) {
-                            rules.push('#createModal ' + CREATE_MODAL_OPTION_SELECTORS[key] + ' { display: none !important; }');
-                        }
-                    } else if (type === 'toolbar') {
-                        rules.push('.note-edit-toolbar .' + id + ' { display: none !important; }');
-                        rules.push('.mobile-toolbar-menu [data-selector=".' + id + '"] { display: none !important; }');
-                    } else if (type === 'folder') {
-                        rules.push('.folder-actions-menu-item[data-action="' + id + '"] { display: none !important; }');
-                        if (id === 'toggle-sort-submenu') {
-                            rules.push('.sort-submenu { display: none !important; }');
-                        }
-                    } else if (type === 'panel') {
-                        if (id === 'mini-calendar') {
-                            rules.push('.mini-calendar-container { display: none !important; }');
-                        } else if (id === 'outline-panel') {
-                            rules.push('#outline-panel { display: none !important; }');
-                            rules.push('#outlineResizeHandle { display: none !important; }');
-                            rules.push('#outlineMobileBackdrop { display: none !important; }');
-                        }
-                    }
-                });
-
-                var existingStyle = document.getElementById('ui-customization-styles');
-                if (existingStyle && existingStyle.parentNode) {
-                    existingStyle.parentNode.removeChild(existingStyle);
-                }
-
-                if (rules.length > 0) {
-                    var style = document.createElement('style');
-                    style.setAttribute('id', 'ui-customization-styles');
-                    style.textContent = rules.join('\n');
-                    document.head.appendChild(style);
-                }
-
-                scheduleVisibilitySync();
-                startObserver();
+                applyHiddenKeys(hidden);
             })
             .catch(function () {
-                publishHiddenKeys([]);
-                scheduleVisibilitySync();
-                startObserver();
+                applyHiddenKeys([]);
             });
     }
 

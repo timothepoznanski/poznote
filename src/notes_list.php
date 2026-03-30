@@ -120,10 +120,13 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         } else {
             $openKanbanTitle = t_h('kanban.actions.open', [], 'Open Kanban view');
             $changeIconTitle = t_h('notes_list.folder_actions.change_icon', [], 'Change icon');
+            $folderIconUsesKanban = function_exists('poznoteUsesFolderIconKanban') ? poznoteUsesFolderIconKanban() : true;
+            $folderIconAction = $folderIconUsesKanban ? 'open-kanban-view' : 'open-folder-icon-picker';
+            $folderIconTitle = $folderIconUsesKanban ? $openKanbanTitle : $changeIconTitle;
             $iconStyle = $customIconColor ? " style='color: " . htmlspecialchars($customIconColor, ENT_QUOTES) . " !important;'" : "";
             $iconColorAttr = $customIconColor ? " data-icon-color='" . htmlspecialchars($customIconColor, ENT_QUOTES) . "'" : "";
             
-            echo "<i class='$chevron_icon folder-icon folder-list-click-action' data-custom-icon='" . ($customIcon ? 'true' : 'false') . "'$iconColorAttr data-action='open-kanban-view' data-folder-id='$folderId' data-folder-name='" . htmlspecialchars($folderName, ENT_QUOTES) . "' data-kanban-title='" . $openKanbanTitle . "' data-change-icon-title='" . $changeIconTitle . "' title='" . $openKanbanTitle . "'$iconStyle></i>";
+            echo "<i class='$chevron_icon folder-icon folder-list-click-action' data-custom-icon='" . ($customIcon ? 'true' : 'false') . "'$iconColorAttr data-action='" . $folderIconAction . "' data-folder-id='$folderId' data-folder-name='" . htmlspecialchars($folderName, ENT_QUOTES) . "' data-kanban-title='" . $openKanbanTitle . "' data-change-icon-title='" . $changeIconTitle . "' title='" . $folderIconTitle . "'$iconStyle></i>";
         }
         
         // Workspace-aware folder handling in UI

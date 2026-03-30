@@ -393,6 +393,7 @@ try {
     <link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $cache_v; ?>"/>
+    <?php poznoteRenderUiCustomizationBootstrap(); ?>
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
 </head>
 <body class="home-page" 

@@ -248,6 +248,7 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <link type="text/css" rel="stylesheet" href="css/dark-mode/calendar.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="js/katex/katex.min.css?v=<?php echo $v; ?>"/>
     <style>:root { --note-font-size: <?php echo htmlspecialchars($note_font_size, ENT_QUOTES); ?>px; --sidebar-font-size: <?php echo htmlspecialchars($sidebar_font_size, ENT_QUOTES); ?>px; --note-max-width: <?php echo htmlspecialchars($note_max_width, ENT_QUOTES); ?>px; }</style>
+    <?php poznoteRenderUiCustomizationBootstrap(); ?>
     <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <script src="js/modal-alerts.js?v=<?php echo $v; ?>"></script>
     <script src="js/toolbar.js?v=<?php echo $v; ?>"></script>
@@ -584,16 +585,8 @@ $body_classes = trim($extra_body_classes);
                         echo '</div>';
                     }
                 
-                    // Excalidraw diagram button - insert at cursor position (hidden for markdown and tasklist notes)
-                    if ($note_type !== 'markdown' && $note_type !== 'tasklist') {
-                        echo '<button type="button" class="toolbar-btn btn-excalidraw note-action-btn" title="' . t_h('editor.toolbar.insert_excalidraw') . '" data-action="insert-excalidraw"><i class="lucide lucide-brush"></i></button>';
-                    }
-                    
-                    // Table and separator buttons
-                    echo '<button type="button" class="toolbar-btn btn-table note-action-btn" title="' . t_h('editor.toolbar.insert_table') . '" data-action="toggle-table-picker"><i class="lucide lucide-table"></i></button>';
+                    // Insert action buttons
                     echo '<button type="button" class="toolbar-btn btn-checklist note-action-btn" title="' . t_h('editor.toolbar.insert_checklist') . '" data-action="insert-checklist"><i class="lucide lucide-list-check"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="' . t_h('editor.toolbar.add_separator') . '" data-action="insert-separator"><i class="lucide lucide-minus"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-note-reference note-action-btn" title="' . t_h('editor.toolbar.insert_note_reference') . '" data-action="open-note-reference-modal"><i class="lucide lucide-at-sign"></i></button>';
 
                 
                     // Favorite / Share / Attachment buttons

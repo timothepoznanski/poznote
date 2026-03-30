@@ -100,6 +100,7 @@ if ($isAdmin) {
     <link rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $cache_v; ?>">
+    <?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
 <body class="home-page"
       data-txt-enabled="<?php echo t_h('common.enabled'); ?>"
