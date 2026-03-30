@@ -67,10 +67,10 @@ if ($isPublicApiEndpoint) {
         // Authentication failed, but that's ok for public attachments
         // Controller will check if note is publicly shared
     }
-} elseif ($isAdminEndpoint) {
+} elseif ($isAdminEndpoint || $isLookupEndpoint) {
     // Admin endpoints only need credential validation, not X-User-ID
     requireApiAuthAdmin();
-} elseif ($isPublicProfilesEndpoint || $isMeEndpoint || $isLookupEndpoint || $isSystemEndpoint || $isSharedEndpoint) {
+} elseif ($isPublicProfilesEndpoint || $isMeEndpoint || $isSystemEndpoint || $isSharedEndpoint) {
     // User endpoints only need credential validation, not X-User-ID
     requireApiAuthUser();
 } else {
@@ -588,11 +588,6 @@ $router->get('/system/updates', function($params) use ($systemController) {
 // Get translations
 $router->get('/system/i18n', function($params) use ($systemController) {
     echo json_encode($systemController->i18n());
-});
-
-// Verify settings password
-$router->post('/system/verify-password', function($params) use ($systemController) {
-    echo json_encode($systemController->verifyPassword());
 });
 
 // List notes/folders shared specifically with the current user by others

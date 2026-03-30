@@ -393,6 +393,11 @@
                     triggerMobileToolbarAction(target, selector);
                 }
                 break;
+            case 'insert-audio-file':
+                if (typeof triggerMobileToolbarAudioInsert === 'function') {
+                    triggerMobileToolbarAudioInsert(target);
+                }
+                break;
             case 'duplicate-note':
                 if (noteId && typeof duplicateNote === 'function') {
                     duplicateNote(noteId);

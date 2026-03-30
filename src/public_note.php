@@ -18,7 +18,7 @@ foreach (ALLOWED_IFRAME_DOMAINS as $domain) {
 }
 
 // Set security headers for public notes
-header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-src {$frameSrcDomains};");
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-src {$frameSrcDomains}; frame-ancestors 'self'; form-action 'self';");
 header("X-Content-Type-Options: nosniff");
 header("X-Frame-Options: SAMEORIGIN");
 
@@ -703,7 +703,7 @@ if (!empty($sharedTheme) && in_array($sharedTheme, ['dark', 'light'])) {
     <?php if ($indexable == 0): ?>
     <meta name="robots" content="noindex, nofollow">
     <?php endif; ?>
-    <title>Shared note - <?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?></title>
+    <title><?php echo htmlspecialchars($note['heading'] ?: t('untitled', [], 'Untitled', $currentLang)); ?></title>
     <script>window.ALLOWED_IFRAME_DOMAINS = <?php echo json_encode(ALLOWED_IFRAME_DOMAINS); ?>;</script>
     <!-- CSP-compliant theme initialization -->
     <script type="application/json" id="public-note-config"><?php 

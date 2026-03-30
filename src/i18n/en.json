@@ -43,21 +43,12 @@
   },
   "settings": {
     "title": "Settings",
-    "disabled_message": "Access to settings is disabled by administrator.",
     "categories": {
       "actions": "Actions",
-      "advanced": "Advanced Settings",
       "admin_tools": "Admin Tools",
       "display": "Display",
       "about": "About",
       "documentation": "Documentation"
-    },
-    "password": {
-      "title": "Settings Access",
-      "heading": "Settings Protected",
-      "placeholder": "Enter password",
-      "submit": "Access Settings",
-      "cancel": "Back to Notes"
     },
     "cards": {
       "workspaces": "Workspaces",
@@ -67,10 +58,10 @@
       "git_sync": "Git Sync",
       "check_updates": "Check for Updates",
       "api_docs": "API Documentation",
-      "documentation": "Github Repository",
+      "documentation": "Documentation GitHub",
       "news": "Poznote Blog",
       "website": "Poznote Website",
-      "support": "Support Developer",
+      "support": "Soutenir Tim",
       "install_extension": "Install extension",
       "install_app": "Install application",
       "custom_css": "Custom CSS path",
@@ -1263,9 +1254,13 @@
     },
     "actions": {
       "open": "Open",
+      "copy_url": "Copy URL",
+      "url_copied": "URL copied!",
       "revoke": "Revoke"
     },
     "direct_share": "Shared note",
+    "via_folder": "Shared via folder",
+    "shared_folder_title": "Shared Folder",
     "note_shared_through_folder": "Note shared through folder",
     "folder_shared_through_parent": "Folder shared through parent folder",
     "token_help": "The token is the unique identifier used in a public share URL. Example: https://your-domain.example/my-note-share",
@@ -1583,8 +1578,8 @@
       "token_missing": "Not configured",
       "not_configured": "Not configured",
       "not_configured_yet": "To configure",
-      "hint": "{{provider}} sync is disabled. An administrator can enable it in Settings > Advanced Settings.",
-      "hint_enable": "Git sync is disabled. An administrator can enable it in Settings > Advanced Settings.",
+      "hint": "{{provider}} sync is disabled. An administrator can enable it in Settings > Admin Tools.",
+      "hint_enable": "Git sync is disabled. An administrator can enable it in Settings > Admin Tools.",
       "provider": "Provider",
       "api_base": "API Base URL",
       "author_name": "Author Name",

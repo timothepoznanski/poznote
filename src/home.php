@@ -20,8 +20,9 @@ $gitEnabled = GitSync::isEnabled() && $gitSync->isConfigured();
 $isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
 $showGitSync = $gitEnabled; // All users with configured git can sync
 $showGitTiles = true; // Show tiles for all users (link to config if not configured)
-$gitProviderParams = ['provider' => getGitProviderName()];
-$gitIcon = (defined('GIT_PROVIDER') && GIT_PROVIDER === 'forgejo') ? 'lucide lucide-git-branch' : 'lucide lucide-github';
+$gitProviderRaw = $gitSync->getProvider();
+$gitProviderParams = ['provider' => getGitProviderName($gitProviderRaw)];
+$gitIcon = ($gitProviderRaw === 'forgejo') ? 'lucide lucide-git-branch' : 'lucide lucide-github';
 
 $syncMessage = '';
 $syncWarning = '';
@@ -481,7 +482,8 @@ try {
             <?php endif; ?>
         </div>
 
-        <h2 class="settings-category-title"><?php echo t_h('home.dashboard', [], 'Dashboard'); ?></h2>
+        <?php $username = htmlspecialchars($currentUser['display_name'] ?: $currentUser['username']); ?>
+        <h2 class="settings-category-title"><?php echo t_h('home.dashboard', [], 'Dashboard') . ' (' . $username . ')'; ?></h2>
         <div class="home-grid">
 
             <!-- Notes -->
@@ -563,7 +565,7 @@ try {
 
         </div>
 
-        <h2 class="settings-category-title"><?php echo t_h('settings.categories.actions', [], 'Actions'); ?></h2>
+        <h2 class="settings-category-title"><?php echo t_h('settings.categories.actions', [], 'Actions') . ' (' . $username . ')'; ?></h2>
         <div class="home-grid">
 
             <?php if ($showGitTiles): ?>
@@ -577,7 +579,7 @@ try {
                         </div>
                         <div class="home-card-content">
                             <span class="home-card-title"><?php echo t_h('git_sync.actions.push.button', $gitProviderParams, 'Push'); ?></span>
-                            <span class="home-card-count"><?php echo htmlspecialchars(getGitProviderName()); ?></span>
+                            <span class="home-card-count"><?php echo htmlspecialchars(getGitProviderName($gitProviderRaw)); ?></span>
                         </div>
                     </form>
 
@@ -590,7 +592,7 @@ try {
                         </div>
                         <div class="home-card-content">
                             <span class="home-card-title"><?php echo t_h('git_sync.actions.pull.button', $gitProviderParams, 'Pull'); ?></span>
-                            <span class="home-card-count"><?php echo htmlspecialchars(getGitProviderName()); ?></span>
+                            <span class="home-card-count"><?php echo htmlspecialchars(getGitProviderName($gitProviderRaw)); ?></span>
                         </div>
                     </form>
                 <?php else: ?>
@@ -639,6 +641,26 @@ try {
                 </div>
             </a>
 
+            <!-- Support Developer -->
+            <a href="https://ko-fi.com/timothepoznanski" target="_blank" class="home-card home-card-red" id="support-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-heart heart-blink"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.support', [], 'Support Developer'); ?></span>
+                </div>
+            </a>
+
+            <!-- Logout -->
+            <a href="logout.php" class="home-card home-card-red" title="<?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?>">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-log-out"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?></span>
+                </div>
+            </a>
+
         </div>
 
         <h2 class="settings-category-title"><?php echo t_h('settings.categories.documentation', [], 'Documentation'); ?></h2>
@@ -655,24 +677,24 @@ try {
                 </div>
             </a>
 
-            <!-- Github repository -->
+            <!-- GitHub documentation -->
             <a href="https://github.com/timothepoznanski/poznote" target="_blank" class="home-card" id="github-card">
                 <div class="home-card-icon">
-                    <i class="lucide lucide-code-branch"></i>
+                    <i class="lucide lucide-github"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.documentation', [], 'Github Repository'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('settings.cards.documentation', [], 'Documentation GitHub'); ?></span>
                 </div>
             </a>
 
             <?php if ($isAdmin): ?>
-            <!-- API Documentation -->
-            <a href="api-docs/" class="home-card" id="api-docs-card">
+            <!-- API REST -->
+            <a href="#" class="home-card" id="api-rest-card">
                 <div class="home-card-icon">
                     <i class="lucide lucide-code"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.api_docs', [], 'API Documentation'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('settings.cards.api_rest', [], 'API REST'); ?></span>
                 </div>
             </a>
             <?php endif; ?>
@@ -690,6 +712,19 @@ try {
         </div>
 
     </div>
+
+    <?php if ($isAdmin): ?>
+    <div id="apiRestModal" class="modal">
+        <div class="modal-content">
+            <h3><?php echo t_h('modals.api_rest.title', [], 'API REST'); ?></h3>
+            <div class="modal-buttons" style="flex-wrap: nowrap; justify-content: space-between;">
+                <button type="button" class="btn-primary" id="openGithubApiDocsBtn" style="flex: 1 1 0;"><?php echo t_h('modals.api_rest.github_option', [], 'GitHub'); ?></button>
+                <button type="button" class="btn-primary" id="openSwaggerApiBtn" style="flex: 1 1 0;"><?php echo t_h('modals.api_rest.swagger_option', [], 'Swagger'); ?></button>
+                <button type="button" class="btn-danger" id="closeApiRestModalBtn" style="flex: 1 1 0;"><?php echo t_h('common.cancel'); ?></button>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
     
     <script src="js/globals.js"></script>
     <script src="js/workspaces.js"></script>
@@ -697,7 +732,7 @@ try {
     <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
 
     <script>
-    const gitProvider = '<?php echo getGitProviderName(); ?>';
+    const gitProvider = '<?php echo getGitProviderName($gitProviderRaw); ?>';
     
     function handleSyncClick(card) {
         const action = card.querySelector('input[name="sync_action"]')?.value;
@@ -786,8 +821,25 @@ try {
         const noResults = document.getElementById('no-results');
         const installAppCard = document.getElementById('install-app-card');
         const installAppStatus = document.getElementById('install-app-status');
+        const apiRestCard = document.getElementById('api-rest-card');
+        const apiRestModal = document.getElementById('apiRestModal');
+        const openGithubApiDocsBtn = document.getElementById('openGithubApiDocsBtn');
+        const openSwaggerApiBtn = document.getElementById('openSwaggerApiBtn');
+        const closeApiRestModalBtn = document.getElementById('closeApiRestModalBtn');
 
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        const githubApiDocsUrl = 'https://github.com/timothepoznanski/poznote/blob/main/docs/API-REST.md';
+        const swaggerApiUrl = 'api-docs/';
+
+        function openApiRestModal() {
+            if (!apiRestModal) return;
+            apiRestModal.style.display = 'flex';
+        }
+
+        function closeApiRestModal() {
+            if (!apiRestModal) return;
+            apiRestModal.style.display = 'none';
+        }
 
         function updateInstallAppStatus() {
             if (!installAppStatus) return;
@@ -842,6 +894,39 @@ try {
                     window.modalAlert.alert(fallbackInstallMsg, 'info', <?php echo json_encode(t('settings.cards.install_app', [], 'Install application')); ?>);
                 } else {
                     alert(fallbackInstallMsg);
+                }
+            });
+        }
+
+        if (apiRestCard) {
+            apiRestCard.addEventListener('click', function(e) {
+                e.preventDefault();
+                openApiRestModal();
+            });
+        }
+
+        if (openGithubApiDocsBtn) {
+            openGithubApiDocsBtn.addEventListener('click', function() {
+                window.open(githubApiDocsUrl, '_blank');
+                closeApiRestModal();
+            });
+        }
+
+        if (openSwaggerApiBtn) {
+            openSwaggerApiBtn.addEventListener('click', function() {
+                closeApiRestModal();
+                window.location.href = swaggerApiUrl;
+            });
+        }
+
+        if (closeApiRestModalBtn) {
+            closeApiRestModalBtn.addEventListener('click', closeApiRestModal);
+        }
+
+        if (apiRestModal) {
+            apiRestModal.addEventListener('click', function(e) {
+                if (e.target === apiRestModal) {
+                    closeApiRestModal();
                 }
             });
         }

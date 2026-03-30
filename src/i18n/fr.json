@@ -311,27 +311,17 @@
   },
   "settings": {
     "title": "Paramètres",
-    "disabled_message": "L'accès aux paramètres est désactivé par l'administrateur.",
     "categories": {
       "actions": "Actions",
-      "advanced": "Paramètres avancés",
       "admin_tools": "Outils d'administration",
       "display": "Affichage",
       "about": "À propos",
       "documentation": "Documentation"
     },
-    "password": {
-      "title": "Accès aux Paramètres",
-      "heading": "Accès Protégé",
-      "placeholder": "Entrez le mot de passe",
-      "submit": "Accéder aux Paramètres",
-      "cancel": "Retour aux Notes"
-    },
     "sections": {
       "account_display": "Compte & Affichage",
       "notes_folders": "Notes & Dossiers",
-      "backup_restore": "Sauvegarde, Restauration & Mises à jour",
-      "advanced": "Paramètres avancés"
+      "backup_restore": "Sauvegarde, Restauration & Mises à jour"
     },
     "language": {
       "label": "Langue",
@@ -355,10 +345,10 @@
       "git_sync": "Synchronisation Git",
       "check_updates": "Vérifier les mises à jour",
       "api_docs": "Documentation API",
-      "documentation": "Repository Github",
+      "documentation": "Documentation GitHub",
       "news": "Blog Poznote",
       "website": "Site Poznote",
-      "support": "Soutenir le développeur",
+      "support": "Soutenir Tim",
       "install_extension": "Installer l'extension",
       "install_app": "Installer l'application",
       "custom_css": "Chemin CSS personnalisé",
@@ -1673,9 +1663,13 @@
     },
     "actions": {
       "open": "Ouvrir",
+      "copy_url": "Copier l'URL",
+      "url_copied": "URL copiée !",
       "revoke": "Révoquer"
     },
     "direct_share": "Note partagée",
+    "via_folder": "Partagé via le dossier",
+    "shared_folder_title": "Dossier partagé",
     "note_shared_through_folder": "Note partagée via le dossier",
     "folder_shared_through_parent": "Dossier partagé via le dossier parent",
     "token_help": "Le jeton est l'identifiant unique utilisé dans une URL de partage public. Exemple : https://votre-domaine.exemple/ma-note-partagee",
@@ -2197,8 +2191,8 @@
       "token_missing": "Non configuré",
       "not_configured": "Non configuré",
       "not_configured_yet": "À configurer",
-      "hint": "La synchronisation {{provider}} est désactivée. Un administrateur peut l'activer dans Paramètres > Paramètres avancés.",
-      "hint_enable": "La synchronisation Git est désactivée. Un administrateur peut l'activer dans Paramètres > Paramètres avancés.",
+      "hint": "La synchronisation {{provider}} est désactivée. Un administrateur peut l'activer dans Paramètres > Outils d'administration.",
+      "hint_enable": "La synchronisation Git est désactivée. Un administrateur peut l'activer dans Paramètres > Outils d'administration.",
       "provider": "Fournisseur",
       "api_base": "URL de base de l'API",
       "author_name": "Nom de l'auteur",

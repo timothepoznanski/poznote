@@ -123,14 +123,6 @@ define('OIDC_AUTO_CREATE_USERS', filter_var(_env('POZNOTE_OIDC_AUTO_CREATE_USERS
 // Deprecated: prefer POZNOTE_OIDC_ALLOWED_GROUPS + POZNOTE_OIDC_AUTO_CREATE_USERS
 define('OIDC_ALLOWED_USERS', _env('POZNOTE_OIDC_ALLOWED_USERS', ''));
 
-// ============================================================
-// SETTINGS ACCESS CONTROL
-// ============================================================
-// Option 1: Completely block access to settings
-define('DISABLE_SETTINGS_ACCESS', filter_var(_env('POZNOTE_DISABLE_SETTINGS_ACCESS', false), FILTER_VALIDATE_BOOL));
-// Option 2: Protect settings with a password
-define('SETTINGS_PASSWORD', _env('POZNOTE_SETTINGS_PASSWORD', ''));
-
 // Optional: load an extra stylesheet from src/css/ on every HTML page.
 // The preferred source is the Advanced section in settings.php.
 define('CUSTOM_CSS_PATH', poznoteResolveCustomCssPath());
@@ -174,6 +166,17 @@ define('GIT_AUTHOR_EMAIL', _env('POZNOTE_GIT_AUTHOR_EMAIL', 'poznote@localhost')
 /**
  * Build the final stylesheet URL, adding cache-busting for local files when possible.
  */
+function poznoteGetAppPathPrefix() {
+    $scriptName = (string) ($_SERVER['SCRIPT_NAME'] ?? '');
+    $scriptDir = rtrim(str_replace('\\', '/', dirname($scriptName)), '/');
+
+    if ($scriptDir === '' || $scriptDir === '.') {
+        return '';
+    }
+
+    return $scriptDir;
+}
+
 function poznoteGetCustomCssHref() {
     if (!defined('CUSTOM_CSS_PATH') || CUSTOM_CSS_PATH === '') {
         return '';
@@ -184,7 +187,7 @@ function poznoteGetCustomCssHref() {
         return '';
     }
 
-    $hrefPath = 'css/' . $filename;
+    $hrefPath = poznoteGetAppPathPrefix() . '/css/' . $filename;
     $absoluteFilePath = __DIR__ . '/css/' . $filename;
     if (!is_file($absoluteFilePath)) {
         return '';

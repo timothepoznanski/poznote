@@ -20,6 +20,13 @@ class GitSync {
     private $provider;
     private $apiBase;
     private $con;
+
+    /**
+     * Get the configured git provider (github, forgejo, etc.)
+     */
+    public function getProvider(): string {
+        return $this->provider;
+    }
     
     /**
      * @var int|null User ID for per-user Git sync configuration
@@ -854,6 +861,8 @@ class GitSync {
             $pulledNoteIds = [];
 
             // ── 3. Download & upsert entries ──
+            // Uses BEGIN IMMEDIATE so SQLite acquires the write lock upfront and waits
+            // up to busy_timeout rather than failing on a deferred lock upgrade.
             try {
                 foreach ($noteFiles as $path) {
                     $currentStep++;
@@ -879,9 +888,10 @@ class GitSync {
                     if (!is_dir($entriesPath)) mkdir($entriesPath, 0755, true);
                     file_put_contents($entriesPath . '/' . $filename, $content);
 
-                    // Upsert DB
+                    // Upsert DB — BEGIN IMMEDIATE waits for the write lock (respects busy_timeout)
+                    // instead of failing with SQLITE_BUSY when upgrading a deferred transaction.
                     try {
-                        $this->con->beginTransaction();
+                        $this->con->exec('BEGIN IMMEDIATE');
                         $meta      = $metadata[(string) $noteId] ?? [];
                         $checkStmt = $this->con->prepare('SELECT id FROM entries WHERE id = ?');
                         $checkStmt->execute([$noteId]);
@@ -923,9 +933,9 @@ class GitSync {
                         }
 
                         $pulledNoteIds[] = $noteId;
-                        $this->con->commit();
+                        $this->con->exec('COMMIT');
                     } catch (Exception $transEx) {
-                        $this->con->rollBack();
+                        try { $this->con->exec('ROLLBACK'); } catch (Exception $ignored) {}
                         $results['errors'][] = ['path' => $filename, 'error' => $transEx->getMessage()];
                         $results['debug'][]  = "  Transaction rolled back for $filename: " . $transEx->getMessage();
                     }

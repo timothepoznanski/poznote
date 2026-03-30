@@ -60,6 +60,7 @@ body.shared-page {
 }
 
 .shared-container {
+    --shared-content-max-width: 980px;
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
@@ -92,7 +93,7 @@ body.shared-page {
 
 /* Filter Bar */
 .shared-filter-bar {
-    max-width: 900px;
+    max-width: var(--shared-content-max-width, 980px);
     margin: 0 auto 30px auto;
     display: flex;
     flex-direction: column;

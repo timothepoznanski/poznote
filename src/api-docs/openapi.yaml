@@ -1,36 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Poznote REST API v1
-  description: |
-    RESTful API for Poznote - Note-taking application with workspaces, folders, tags and attachments support.
-    
-    **Base URL:** `/api/v1`
-    
-    ## Authentication
-    
-    All endpoints support both HTTP Basic Authentication and Session Authentication.
-    - Use HTTP Basic Auth (`-u username:password`) for scripts and automation
-    - Use Session Auth for browser-based access (Swagger UI)
-    
-    ### Multi-User Mode
-    
-    Poznote supports multiple user profiles, each with their own isolated data (notes, folders, attachments, etc.).
-    
-    For endpoints that access **user data** (notes, folders, workspaces, etc.), you must include the `X-User-ID` header to specify which user's data to access:
-    
-    ```bash
-    curl -u admin:password -H "X-User-ID: 1" https://poznote.example.com/api/v1/notes
-    ```
-    
-    **Admin endpoints** (`/admin/*`) and **public endpoints** (`/users/profiles`) do **not** require the `X-User-ID` header.
-    
-    Use `GET /api/v1/users/profiles` to list available user profiles and their IDs.
-
-    **OIDC / SSO (optional):** Poznote can be configured to authenticate users via OpenID Connect for interactive login.
-    - Start the flow: `GET /oidc_login.php`
-    - Callback: `GET /oidc_callback.php`
-    
-    [View complete documentation on GitHub](https://github.com/timothepoznanski/poznote)
+  title: Poznote REST API
   version: 2.0.0
 
 servers:
@@ -1580,24 +1550,6 @@ paths:
                     type: object
                     additionalProperties:
                       type: string
-
-  /system/verify-password:
-    post:
-      tags: [System]
-      summary: Verify settings password
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                password:
-                  type: string
-      responses:
-        '200':
-          description: Password verified
-        '401':
-          description: Invalid password
 
   # ==================
   # Export Endpoints (Legacy - File Downloads)

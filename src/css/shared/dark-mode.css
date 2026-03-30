@@ -87,8 +87,23 @@
     border-color: #444444;
 }
 
+[data-theme="dark"] .shared-notes-header {
+    border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
 [data-theme="dark"] .shared-notes-header-cell {
     color: #c8d0d8;
+}
+
+[data-theme="dark"] .shared-notes-header-folder,
+[data-theme="dark"] .shared-notes-header-token,
+[data-theme="dark"] .shared-notes-header-restricted,
+[data-theme="dark"] .shared-notes-header-actions,
+[data-theme="dark"] .note-folder-container,
+[data-theme="dark"] .note-token-wrap,
+[data-theme="dark"] .note-restricted-cell,
+[data-theme="dark"] .note-actions {
+    border-left-color: #444444;
 }
 
 [data-theme="dark"] .indexable-label-text {
@@ -101,6 +116,31 @@
 
 [data-theme="dark"] .note-token {
     color: #d6dde6;
+}
+
+[data-theme="dark"] .note-token-wrap {
+    border-top-color: transparent;
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+}
+
+[data-theme="dark"] .note-token-wrap.is-editable {
+    border-top-color: transparent;
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+}
+
+[data-theme="dark"] .note-token-wrap.is-editable:hover {
+    border-top-color: transparent;
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+}
+
+[data-theme="dark"] .note-token-wrap.is-editable:focus-within {
+    border-top-color: transparent;
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+    box-shadow: none;
 }
 
 [data-theme="dark"] .folder-badge {

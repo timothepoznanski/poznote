@@ -115,6 +115,22 @@ body.public-note-page {
     }
 }
 
+.public-note iframe:not([data-is-audio]):not(.note-audio-embed) {
+    width: 100% !important;
+    max-width: 50%;
+    height: auto !important;
+    aspect-ratio: 16 / 9;
+    border: none;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+@media screen and (max-width: 768px) {
+    .public-note iframe:not([data-is-audio]):not(.note-audio-embed) {
+        max-width: 100%;
+    }
+}
+
 .public-note iframe[data-is-audio] {
     max-width: 280px;
     width: 100%;

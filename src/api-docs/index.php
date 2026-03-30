@@ -26,6 +26,16 @@ requireAuth();
         .swagger-ui .opblock-tag {
             border-bottom: none;
         }
+        /* Réduire l'espace vide sous le titre */
+        .swagger-ui .info {
+            margin-bottom: 0;
+        }
+        .swagger-ui .info .description {
+            display: none;
+        }
+        .swagger-ui .info .main .url {
+            display: none;
+        }
     </style>
 </head>
 <body>

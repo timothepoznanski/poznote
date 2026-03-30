@@ -33,7 +33,7 @@ if [ $# -lt 5 ] || [ $# -gt 6 ]; then
     echo "Parameters:"
     echo "  URL              - Base URL of your Poznote instance"
     echo "  ADMIN_USERNAME   - Admin username for authentication (required)"
-    echo "  ADMIN_PASSWORD   - Admin password (POZNOTE_PASSWORD from .env)"
+    echo "  ADMIN_PASSWORD   - Current admin password for the API profile (custom password or .env fallback)"
     echo "  TARGET_USERNAME  - Username of the profile to backup"
     echo "  BACKUP_PATH      - Parent directory where backups will be stored"
     echo "  MAX_BACKUPS      - Maximum number of backups to keep (default: 20)"
@@ -81,9 +81,64 @@ log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
 }
 
+print_json_response() {
+    local response="$1"
+
+    if echo "$response" | jq -e '.' > /dev/null 2>&1; then
+        echo "$response" | jq '.'
+    else
+        echo "$response"
+    fi
+}
+
+print_auth_hint() {
+    local response="$1"
+    local error
+    local hint
+
+    error=$(echo "$response" | jq -r '.error // empty' 2>/dev/null)
+    hint=$(echo "$response" | jq -r '.hint // empty' 2>/dev/null)
+
+    if [ "$error" = "Invalid credentials" ]; then
+        log "HINT: Use the current password of the admin profile used for the API call."
+        log "HINT: If that password was changed in Poznote, the original POZNOTE_PASSWORD from .env is no longer accepted for that profile."
+        log "HINT: Reset the profile password in Settings > User Management to fall back to the .env password."
+    elif [ -n "$hint" ]; then
+        log "HINT: $hint"
+    fi
+}
+
 log "Creating backup for: $BASE_URL"
-log "Authenticated as: $USERNAME"
+log "Using credentials for username: $USERNAME"
 log "Target user profile: $TARGET_USERNAME"
+
+# Validate credentials before attempting any backup operation
+log "Verifying API authentication..."
+AUTH_RESPONSE=$(curl -s -u "$USERNAME:$PASSWORD" "$BASE_URL/api/v1/users/me")
+
+if echo "$AUTH_RESPONSE" | jq -e '.error' > /dev/null 2>&1; then
+    log "ERROR: API authentication failed for $USERNAME"
+    print_auth_hint "$AUTH_RESPONSE"
+    print_json_response "$AUTH_RESPONSE"
+    exit 1
+fi
+
+AUTHENTICATED_USERNAME=$(echo "$AUTH_RESPONSE" | jq -r '.username // empty' 2>/dev/null)
+AUTHENTICATED_IS_ADMIN=$(echo "$AUTH_RESPONSE" | jq -r '.is_admin // false' 2>/dev/null)
+
+if [ -z "$AUTHENTICATED_USERNAME" ]; then
+    log "ERROR: Authentication succeeded but the API response was missing the username"
+    print_json_response "$AUTH_RESPONSE"
+    exit 1
+fi
+
+log "Authenticated as: $AUTHENTICATED_USERNAME"
+
+if [ "$AUTHENTICATED_IS_ADMIN" != "true" ]; then
+    log "ERROR: Backup API requires administrator credentials"
+    print_json_response "$AUTH_RESPONSE"
+    exit 1
+fi
 
 # Detect User ID from username
 log "Looking up User ID for $TARGET_USERNAME..."
@@ -94,7 +149,8 @@ LOOKUP_RESPONSE=$(curl -s -u "$USERNAME:$PASSWORD" "$BASE_URL/api/v1/users/looku
 # Check for errors
 if echo "$LOOKUP_RESPONSE" | jq -e '.error' > /dev/null 2>&1; then
     log "ERROR: Failed to lookup user ID for $TARGET_USERNAME"
-    echo "$LOOKUP_RESPONSE" | jq '.'
+    print_auth_hint "$LOOKUP_RESPONSE"
+    print_json_response "$LOOKUP_RESPONSE"
     exit 1
 fi
 

@@ -945,25 +945,32 @@ function handleNoteEntryKeydown(e) {
             return;
         }
 
-        if (inMarkdownEditor) {
-            if (e.key.toLowerCase() === 'b') {
-                e.preventDefault();
+        if (e.key.toLowerCase() === 'b' && noteEditor) {
+            e.preventDefault();
+            if (inMarkdownEditor) {
                 if (typeof window.applyMarkdownBold === 'function') {
                     window.applyMarkdownBold();
                 } else if (typeof applyMarkdownBold === 'function') {
                     applyMarkdownBold();
                 }
-                return;
+            } else {
+                document.execCommand('bold');
             }
-            if (e.key.toLowerCase() === 'i') {
-                e.preventDefault();
+            return;
+        }
+
+        if (e.key.toLowerCase() === 'i' && noteEditor) {
+            e.preventDefault();
+            if (inMarkdownEditor) {
                 if (typeof window.applyMarkdownItalic === 'function') {
                     window.applyMarkdownItalic();
                 } else if (typeof applyMarkdownItalic === 'function') {
                     applyMarkdownItalic();
                 }
-                return;
+            } else {
+                document.execCommand('italic');
             }
+            return;
         }
     }
 

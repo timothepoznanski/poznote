@@ -17,7 +17,7 @@ foreach (ALLOWED_IFRAME_DOMAINS as $domain) {
 // Content-Security-Policy: Restrict where scripts can be loaded from
 // Note: 'unsafe-inline' is needed for the rich text editor, but we sanitize all user input
 // to prevent XSS. In the future, consider using nonces for inline scripts.
-header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-src {$frameSrcDomains};");
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-src {$frameSrcDomains}; frame-ancestors 'self'; form-action 'self';");
 
 // X-XSS-Protection: Enable browser's XSS filter (legacy but still useful)
 header("X-XSS-Protection: 1; mode=block");
@@ -53,7 +53,7 @@ $gitSync = new GitSync($con, $_SESSION['user_id'] ?? null);
 $gitEnabled = GitSync::isEnabled() && $gitSync->isConfigured();
 $isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
 $showGitSync = $gitEnabled; // All users with configured git can sync
-$gitProvider = function_exists('getGitProviderName') ? getGitProviderName() : 'Git';
+$gitProvider = function_exists('getGitProviderName') ? getGitProviderName($gitSync->getProvider()) : 'Git';
 
 // Check if we need to redirect to include workspace from database settings
 // Only redirect if no workspace parameter is present in GET
@@ -745,6 +745,7 @@ $body_classes = trim($extra_body_classes);
                     // Search and replace button (only for note and markdown types, shown in mobile menu)
                     if ($note_type === 'note' || $note_type === 'markdown') {
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-search-replace"><i class="lucide lucide-search"></i> '.t_h('editor.toolbar.search_replace', [], 'Search and replace').'</button>';
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="insert-audio-file"><i class="lucide lucide-mic"></i> '.t_h('slash_menu.audio', [], 'Audio').'</button>';
                     }
 
                     // Task list actions (only for tasklist notes, shown in mobile menu)

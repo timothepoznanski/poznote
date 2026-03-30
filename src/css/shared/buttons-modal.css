@@ -66,6 +66,16 @@
     background: #006994;
 }
 
+.btn-success {
+    background: #2e7d32;
+    color: #fff;
+    border: none;
+}
+
+.btn-success:hover {
+    background: #1b5e20;
+}
+
 .modal-content {
     background-color: var(--modal-bg, #ffffff);
     border-radius: 8px;

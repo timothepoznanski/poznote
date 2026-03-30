@@ -301,7 +301,6 @@
     "title": "Configurações",
     "categories": {
       "actions": "Ações",
-      "advanced": "Configurações avançadas",
       "admin_tools": "Ferramentas de administração",
       "display": "Tela",
       "about": "Sobre",
@@ -310,8 +309,7 @@
     "sections": {
       "account_display": "Conta e Exibição",
       "notes_folders": "Notas e Pastas",
-      "backup_restore": "Backup, Restauração e Atualizações",
-      "advanced": "Configurações avançadas"
+      "backup_restore": "Backup, Restauração e Atualizações"
     },
     "language": {
       "label": "Idioma",
@@ -334,10 +332,10 @@
       "git_sync": "Sincronização Git",
       "check_updates": "Verificar atualizações",
       "api_docs": "Documentação da API",
-      "documentation": "Repositório Github",
+      "documentation": "Documentation GitHub",
       "news": "Blog do Poznote",
       "website": "Site do Poznote",
-      "support": "Apoiar o desenvolvedor",
+      "support": "Soutenir Tim",
       "custom_css": "Arquivo CSS personalizado",
       "install_extension": "Instalar extensão",
       "install_app": "Instalar aplicação",
@@ -1628,9 +1626,13 @@
     },
     "actions": {
       "open": "Abrir",
+      "copy_url": "Copiar URL",
+      "url_copied": "URL copiada!",
       "revoke": "Revogar"
     },
     "direct_share": "Nota compartilhada",
+    "via_folder": "Compartilhado via pasta",
+    "shared_folder_title": "Pasta compartilhada",
     "note_shared_through_folder": "Nota compartilhada via pasta",
     "folder_shared_through_parent": "Pasta compartilhada via pasta pai",
     "token_help": "O token é o identificador único usado em uma URL pública de compartilhamento. Exemplo: https://seu-dominio.exemplo/minha-nota-compartilhada",
@@ -2036,8 +2038,8 @@
       "token_missing": "Não configurado",
       "not_configured": "Não configurado",
       "not_configured_yet": "A configurar",
-      "hint": "A sincronização com {{provider}} está desativada. Um administrador pode ativá-la em Configurações > Configurações avançadas.",
-      "hint_enable": "A sincronização Git está desativada. Um administrador pode ativá-la em Configurações > Configurações avançadas."
+      "hint": "A sincronização com {{provider}} está desativada. Um administrador pode ativá-la em Configurações > Ferramentas de administração.",
+      "hint_enable": "A sincronização Git está desativada. Um administrador pode ativá-la em Configurações > Ferramentas de administração."
     },
     "auto_sync": {
       "title": "Sincronização Automática",

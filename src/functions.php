@@ -83,8 +83,10 @@ function isSecureConnection() {
 /**
  * Get the current Git provider name for display (GitHub or Forgejo)
  */
-function getGitProviderName() {
-    $provider = defined('GIT_PROVIDER') ? GIT_PROVIDER : 'github';
+function getGitProviderName($provider = null) {
+    if ($provider === null) {
+        $provider = defined('GIT_PROVIDER') ? GIT_PROVIDER : 'github';
+    }
     return ($provider === 'github') ? 'GitHub' : (($provider === 'forgejo') ? 'Forgejo' : 'Git');
 }
 

@@ -303,7 +303,6 @@
     "title": "设置",
     "categories": {
       "actions": "操作",
-      "advanced": "高级设置",
       "admin_tools": "管理工具",
       "display": "显示",
       "about": "关于",
@@ -312,8 +311,7 @@
     "sections": {
       "account_display": "账户与显示",
       "notes_folders": "笔记与文件夹",
-      "backup_restore": "备份、还原与更新",
-      "advanced": "高级设置"
+      "backup_restore": "备份、还原与更新"
     },
     "language": {
       "label": "语言",
@@ -337,11 +335,11 @@
       "git_sync": "Git 同步",
       "check_updates": "检查更新",
       "api_docs": "API 文档",
-      "documentation": "Github 仓库",
+      "documentation": "Documentation GitHub",
       "news": "Poznote 博客",
       "website": "Poznote 网站",
       "custom_css": "自定义 CSS 文件",
-      "support": "支持开发者",
+      "support": "Soutenir Tim",
       "install_app": "安装应用",
       "release_notes": "发布日志",
       "convert_images": "Base64 Image Converter",
@@ -1623,9 +1621,13 @@
     },
     "actions": {
       "open": "打开",
+      "copy_url": "复制链接",
+      "url_copied": "链接已复制！",
       "revoke": "撤销"
     },
     "direct_share": "共享笔记",
+    "via_folder": "通过文件夹共享",
+    "shared_folder_title": "共享文件夹",
     "note_shared_through_folder": "笔记通过文件夹共享",
     "folder_shared_through_parent": "文件夹通过父文件夹共享",
     "token_help": "Token 是公开分享 URL 中使用的唯一标识符。示例：https://your-domain.example/my-note-share",
@@ -2150,8 +2152,8 @@
       "token_missing": "未配置",
       "not_configured": "未配置",
       "not_configured_yet": "待配置",
-      "hint": "{{provider}} 同步已禁用。管理员可以在设置 > 高级设置中启用它。",
-      "hint_enable": "Git 同步已禁用。管理员可以在设置 > 高级设置中启用它。"
+      "hint": "{{provider}} 同步已禁用。管理员可以在设置 > 管理工具中启用它。",
+      "hint_enable": "Git 同步已禁用。管理员可以在设置 > 管理工具中启用它。"
     },
     "auto_sync": {
       "title": "自动同步",
