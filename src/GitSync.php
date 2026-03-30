@@ -858,9 +858,10 @@ class GitSync {
                 }
             }
 
-            $pulledNoteIds = [];
+            $pulledNoteIds  = [];
+            $downloadedNotes = [];
 
-            // ── 3. Download & upsert entries ──
+            // ── 3a. Download entries via HTTP and write to disk ──
             try {
                 foreach ($noteFiles as $path) {
                     $currentStep++;
@@ -886,11 +887,25 @@ class GitSync {
                     if (!is_dir($entriesPath)) mkdir($entriesPath, 0755, true);
                     file_put_contents($entriesPath . '/' . $filename, $content);
 
-                    // Upsert DB
-                    try {
-                        $this->con->beginTransaction();
-                        $meta      = $metadata[(string) $noteId] ?? [];
-                        $checkStmt = $this->con->prepare('SELECT id FROM entries WHERE id = ?');
+                    $downloadedNotes[] = ['filename' => $filename, 'noteId' => $noteId, 'content' => $content];
+                }
+            } catch (Exception $e) {
+                // Handle any general exceptions from HTTP requests or loops
+                $results['errors'][] = ['path' => 'loop', 'error' => $e->getMessage()];
+                $results['debug'][]  = 'Error during pull loop: ' . $e->getMessage();
+            }
+
+            // ── 3b. Upsert all downloaded entries in a single transaction ──
+            if (!empty($downloadedNotes)) {
+                try {
+                    $this->con->beginTransaction();
+                    $checkStmt = $this->con->prepare('SELECT id FROM entries WHERE id = ?');
+                    foreach ($downloadedNotes as $note) {
+                        $filename = $note['filename'];
+                        $noteId   = $note['noteId'];
+                        $content  = $note['content'];
+                        $meta     = $metadata[(string) $noteId] ?? [];
+
                         $checkStmt->execute([$noteId]);
                         if ($checkStmt->fetch()) {
                             // Build dynamic UPDATE — apply metadata fields whenever available
@@ -928,19 +943,16 @@ class GitSync {
                             $results['pulled']++;
                             $results['debug'][] = "  {$filename} → created (heading: {$heading})";
                         }
-
                         $pulledNoteIds[] = $noteId;
-                        $this->con->commit();
-                    } catch (Exception $transEx) {
-                        $this->con->rollBack();
-                        $results['errors'][] = ['path' => $filename, 'error' => $transEx->getMessage()];
-                        $results['debug'][]  = "  Transaction rolled back for $filename: " . $transEx->getMessage();
                     }
+                    $this->con->commit();
+                } catch (Exception $transEx) {
+                    if ($this->con->inTransaction()) {
+                        $this->con->rollBack();
+                    }
+                    $results['errors'][] = ['path' => 'batch_upsert', 'error' => $transEx->getMessage()];
+                    $results['debug'][]  = '  Batch transaction rolled back: ' . $transEx->getMessage();
                 }
-            } catch (Exception $e) {
-                // Handle any general exceptions from HTTP requests or loops
-                $results['errors'][] = ['path' => 'loop', 'error' => $e->getMessage()];
-                $results['debug'][]  = 'Error during pull loop: ' . $e->getMessage();
             }
 
             // ── 4. Download attachments ──
