@@ -1261,12 +1261,15 @@ class NotesController {
 
             // Read original content and update attachment references
             $originalFilename = getEntryFilename($id, $originalNote['type']);
-            $content = '';
-            if (file_exists($originalFilename)) {
-                $content = file_get_contents($originalFilename);
-                foreach ($attachmentIdMapping as $oldId => $newId) {
-                    $content = str_replace($oldId, $newId, $content);
+            $content = $originalNote['entry'] ?? '';
+            if (is_readable($originalFilename)) {
+                $fileContent = file_get_contents($originalFilename);
+                if ($fileContent !== false) {
+                    $content = $fileContent;
                 }
+            }
+            foreach ($attachmentIdMapping as $oldId => $newId) {
+                $content = str_replace($oldId, $newId, $content);
             }
 
             // Insert new note
@@ -1302,6 +1305,9 @@ class NotesController {
                 file_put_contents($newFilename, $content);
                 chmod($newFilename, 0644);
             }
+
+            $updateEntryStmt = $this->con->prepare("UPDATE entries SET entry = ? WHERE id = ?");
+            $updateEntryStmt->execute([$content, $newId]);
 
             http_response_code(201);
             $this->sendSuccess(array_merge([
