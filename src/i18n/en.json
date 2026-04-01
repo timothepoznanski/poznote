@@ -1302,7 +1302,7 @@
       "token_missing": "Token missing",
       "token_or_folder_auth_missing": "Token or folder authorization missing",
       "shared_folder_not_found": "Shared folder not found",
-      "shared_note_not_found_or_denied": "Shared note not found or access denied",
+      "shared_note_not_found_or_denied": "Shared note not found or access denied. This can happen after a restore. An administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.",
       "folder_not_found": "Folder not found",
       "note_not_found": "Note not found",
       "server_error": "Server error"

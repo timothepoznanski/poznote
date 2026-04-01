@@ -219,7 +219,7 @@ try {
     
     if (!$sharedNote) {
         http_response_code(404);
-        echo t_h('public.errors.shared_note_not_found_or_denied', [], 'Shared note not found or access denied', $currentLang);
+        echo t_h('public.errors.shared_note_not_found_or_denied', [], 'Shared note not found or access denied. This can happen after a restore. An administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.', $currentLang);
         exit;
     }
 

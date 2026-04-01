@@ -1670,7 +1670,7 @@
       "token_missing": "Token fehlt",
       "token_or_folder_auth_missing": "Token oder Ordnerberechtigung fehlt",
       "shared_folder_not_found": "Geteilter Ordner nicht gefunden",
-      "shared_note_not_found_or_denied": "Geteilte Notiz nicht gefunden oder Zugriff verweigert",
+      "shared_note_not_found_or_denied": "Geteilte Notiz nicht gefunden oder Zugriff verweigert. Das kann nach einer Wiederherstellung passieren. Ein Administrator muss möglicherweise die Master-Datenbank unter Einstellungen > Administrationstools neu aufbauen, um die Freigabelinks zu reparieren.",
       "folder_not_found": "Ordner nicht gefunden",
       "note_not_found": "Notiz nicht gefunden",
       "server_error": "Serverfehler"
