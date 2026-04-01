@@ -6,6 +6,35 @@ require_once 'markdown_parser.php';
 
 $currentLang = getUserLanguage();
 
+function getPublicFolderAppPathPrefix() {
+    $scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\');
+    if ($scriptDir === '' || $scriptDir === '.') {
+        return '';
+    }
+
+    return $scriptDir;
+}
+
+function getPublicFolderStylesheetHref() {
+    $href = getPublicFolderAppPathPrefix() . '/css/public_folder.css';
+    $path = __DIR__ . '/css/public_folder.css';
+    if (file_exists($path)) {
+        $href .= '?v=' . filemtime($path);
+    }
+
+    return $href;
+}
+
+function getPublicFolderThemeInitHref() {
+    $href = getPublicFolderAppPathPrefix() . '/js/theme-init.js';
+    $path = __DIR__ . '/js/theme-init.js';
+    if (file_exists($path)) {
+        $href .= '?v=' . filemtime($path);
+    }
+
+    return $href;
+}
+
 // Support token via query param or pretty URL
 $token = $_GET['token'] ?? '';
 if (empty($token)) {
@@ -78,6 +107,8 @@ try {
             $isOwner = $currentUserId !== null && (int)$currentUserId === (int)$activeUserId;
             if (!$isOwner) {
                 if ($currentUserId === null) {
+                    $appPathPrefix = getPublicFolderAppPathPrefix();
+                    $stylesheetHref = getPublicFolderStylesheetHref();
                     http_response_code(403);
                     ?>
                     <!doctype html>
@@ -87,14 +118,14 @@ try {
                         <meta name="viewport" content="width=device-width, initial-scale=1">
                         <meta name="robots" content="noindex, nofollow">
                         <title><?php echo t_h('public.login_required_title', [], 'Login Required', $currentLang); ?></title>
-                        <link rel="stylesheet" href="css/public_folder.css">
+                        <link rel="stylesheet" href="<?php echo htmlspecialchars($stylesheetHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
                     </head>
                     <body class="password-page-body">
                         <div class="password-container">
                             <div class="lock-icon">🔒</div>
                             <h2><?php echo t_h('public.login_required_title', [], 'Login Required', $currentLang); ?></h2>
                             <p><?php echo t_h('public.login_required_message', [], 'This content is restricted to specific users. Please log in to access it.', $currentLang); ?></p>
-                            <a href="login.php" class="btn" style="display:inline-block;margin-top:12px;padding:10px 24px;background:#4a90d9;color:#fff;border-radius:6px;text-decoration:none;"><?php echo t_h('login.login', [], 'Log in', $currentLang); ?></a>
+                            <a href="<?php echo htmlspecialchars($appPathPrefix . '/login.php', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" class="btn" style="display:inline-block;margin-top:12px;padding:10px 24px;background:#4a90d9;color:#fff;border-radius:6px;text-decoration:none;"><?php echo t_h('login.login', [], 'Log in', $currentLang); ?></a>
                         </div>
                     </body>
                     </html>
@@ -102,6 +133,8 @@ try {
                     exit;
                 }
                 if (!in_array((int)$currentUserId, array_map('intval', $allowedUserIds), true)) {
+                    $appPathPrefix = getPublicFolderAppPathPrefix();
+                    $stylesheetHref = getPublicFolderStylesheetHref();
                     http_response_code(403);
                     ?>
                     <!doctype html>
@@ -111,7 +144,7 @@ try {
                         <meta name="viewport" content="width=device-width, initial-scale=1">
                         <meta name="robots" content="noindex, nofollow">
                         <title><?php echo t_h('public.access_denied_title', [], 'Access Denied', $currentLang); ?></title>
-                        <link rel="stylesheet" href="css/public_folder.css">
+                        <link rel="stylesheet" href="<?php echo htmlspecialchars($stylesheetHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
                     </head>
                     <body class="password-page-body">
                         <div class="password-container">
@@ -150,6 +183,8 @@ try {
         }
         
         if (!isset($_SESSION[$sessionKey]) || $_SESSION[$sessionKey] !== true) {
+            $stylesheetHref = getPublicFolderStylesheetHref();
+            $themeInitHref = getPublicFolderThemeInitHref();
             ?>
             <!doctype html>
             <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
@@ -158,16 +193,16 @@ try {
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 <meta name="robots" content="noindex, nofollow">
                 <title><?php echo t_h('public.protection.title', [], 'Password Protected', $currentLang); ?></title>
-                <link rel="stylesheet" href="/css/public_folder.css">
+                <script src="<?php echo htmlspecialchars($themeInitHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"></script>
+                <link rel="stylesheet" href="<?php echo htmlspecialchars($stylesheetHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
             </head>
             <body class="password-page-body">
                 <div class="password-container">
-                    <div class="lock-icon">🔒</div>
                     <h2><?php echo t_h('public.protection.folder_heading', [], 'Password Protected Folder', $currentLang); ?></h2>
                     <?php if (isset($passwordError)): ?>
                         <div class="error"><?php echo t_h('public.protection.error_incorrect', [], 'Incorrect password. Please try again.', $currentLang); ?></div>
                     <?php endif; ?>
-                    <form method="POST">
+                    <form method="POST" class="password-form">
                         <input type="password" name="folder_password" placeholder="<?php echo t_h('public.protection.placeholder', [], 'Enter password', $currentLang); ?>" required autofocus>
                         <button type="submit"><?php echo t_h('public.protection.unlock', [], 'Unlock', $currentLang); ?></button>
                     </form>

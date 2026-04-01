@@ -611,7 +611,7 @@
     },
     "colors": {
       "black": "Schwarz",
-      "red": "Rot",
+      "shared_note_not_found_or_denied": "Geteilte Notiz nicht gefunden oder Zugriff verweigert.\n\nDas kann nach einer Wiederherstellung passieren.\n\nEin Administrator muss möglicherweise die Master-Datenbank unter Einstellungen > Administrationstools neu aufbauen, um die Freigabelinks zu reparieren.",
       "orange": "Orange",
       "yellow": "Gelb",
       "green": "Grün",
@@ -1976,7 +1976,7 @@
       "maintenance": {
         "title": "Master-Datenbank rekonstruieren",
         "subtitle": "Benutzerprofile und öffentliche Links wiederherstellen",
-        "description": "Die Master-Datenbank (master.db) ist das Herzstück des Systems und enthält Benutzerprofile, öffentliche Links und globale Einstellungen. Wenn diese Datei verloren geht oder beschädigt ist, scannt dieses Tool das Verzeichnis 'data/users', um Konten automatisch neu zu registrieren, ursprüngliche Benutzernamen aus persönlichen Datenbanken wiederherzustellen und alle aktiven öffentlichen Links wiederherzustellen.",
+        "description": "Die Hauptdatenbank (master.db) enthält die Benutzerinformationen, ihre öffentlichen Links und die globalen Einstellungen von Poznote. Wenn diese Datei verloren geht oder beschädigt ist, oder wenn nach einer Wiederherstellung einige öffentliche Links nicht mehr funktionieren, scannt dieses Tool Ihre Ordner 'data/users', um Konten automatisch erneut zu registrieren, ihre echten Namen aus den persönlichen Datenbanken wiederherzustellen und alle öffentlichen Freigabelinks erneut aufzubauen.",
         "repair_registry": "Rekonstruktion",
         "repair_registry_confirm": "Dies scannt alle Benutzerordner und stellt die Master-Datenbank wieder her. Fortfahren?",
         "repair_registry_success": "Master-Datenbank erfolgreich rekonstruiert:\n\n- {{scanned}} Ordner gescannt\n- {{added}} Benutzer wiederhergestellt\n- {{links}} geteilte Links neu aufgebaut",

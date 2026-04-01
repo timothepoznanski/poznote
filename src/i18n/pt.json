@@ -1980,7 +1980,7 @@
       "maintenance": {
         "title": "Reconstruir Base de Dados Master",
         "subtitle": "Restaurar perfis de utilizador e links de partilha",
-        "description": "A base de dados master (master.db) é o núcleo do sistema, contendo perfis de utilizador, links de partilha públicos e definições globais. Se este ficheiro for perdido ou corrompido, esta ferramenta analisa o diretório 'data/users' para registar novamente as contas, recuperar os nomes originais das bases de dados pessoais e restaurar todos os links de partilha ativos.",
+        "description": "A base de dados principal (master.db) contém as informações dos utilizadores, os seus links públicos e as definições globais do Poznote. Se este ficheiro for perdido ou corrompido, ou se alguns links públicos deixarem de funcionar após uma restauração, esta ferramenta analisa as pastas 'data/users' para voltar a registar automaticamente as contas, recuperar os nomes reais a partir das bases de dados pessoais e restaurar todos os links de partilha públicos.",
         "repair_registry": "Reconstrução",
         "repair_registry_confirm": "Isto irá analisar todas as pastas de utilizador e reconstruir a base de dados master. Continuar?",
         "repair_registry_success": "Base de dados master reconstruída com sucesso:\n\n- {{scanned}} pastas analisadas\n- {{added}} utilizadores restaurados\n- {{links}} links partilhados reconstruídos",

@@ -608,7 +608,7 @@
     },
     "colors": {
       "black": "黑色",
-      "red": "红色",
+      "shared_note_not_found_or_denied": "未找到共享笔记或访问被拒绝。\n\n这可能发生在恢复之后。\n\n管理员可能需要在“设置 > 管理工具”中重建主数据库，以修复共享链接。",
       "orange": "橙色",
       "yellow": "黄色",
       "green": "绿色",
@@ -2058,7 +2058,7 @@
       "maintenance": {
         "title": "重建主数据库",
         "subtitle": "",
-        "description": "主数据库 (master.db) 是系统的核心注册表，包含用户资料、公开共享链接和全局设置。如果此文件丢失或损坏，此工具将扫描 'data/users' 目录以自动重新注册账户，并从个人数据库中恢复原始用户名及其所有激活的公开链接。",
+        "description": "主数据库（master.db）包含用户信息、他们的公开链接以及 Poznote 的全局设置。如果此文件丢失或损坏，或者某些公开链接在恢复后不再工作，此工具会扫描您的 'data/users' 目录，自动重新登记账户，从各自的个人数据库中恢复真实名称，并重建所有公开分享链接。",
         "repair_registry": "重建",
         "repair_registry_confirm": "这将扫描所有用户文件夹并重建主数据库注册表。",
         "repair_registry_success": "主数据库重建成功：\n\n- 扫描了 {{scanned}} 个文件夹\n- 恢复了 {{added}} 个用户\n- 重建了 {{links}} 个共享链接",

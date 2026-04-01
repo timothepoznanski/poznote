@@ -73,7 +73,7 @@ $pageWorkspace = trim(getWorkspaceFilter());
         <!-- Hero -->
         <div class="dr-hero">
             <h1><?php echo t_h('multiuser.admin.maintenance.title', [], 'Disaster Recovery'); ?></h1>
-            <p><?php echo t_h('multiuser.admin.maintenance.description', [], 'Poznote stores your notes in individual user folders. The main system index (master.db) tracks which user owns which folder. If you lose this index, this tool will scan your folders to automatically recreate the user accounts and restore all public sharing links.'); ?></p>
+            <p><?php echo t_h('multiuser.admin.maintenance.description', [], 'The main database (master.db) stores user information, their public links, and Poznote\'s global settings. If this file is lost or corrupted, or if some public links stop working after a restore, this tool scans your \"data/users\" folders to automatically re-register accounts, recover their real names from their personal databases, and restore all public sharing links.'); ?></p>
         </div>
 
         <!-- Action -->
