@@ -642,6 +642,17 @@ try {
                 </div>
             </a>
 
+            <!-- GitHub Star -->
+            <a href="https://github.com/timothepoznanski/poznote" target="_blank" class="home-card" id="home-github-star-card" title="<?php echo t_h('settings.cards.github_star', [], 'Star on GitHub'); ?>">
+                <div class="home-card-icon home-card-icon-favorites">
+                    <i class="lucide lucide-star"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.github_star', [], 'Star on GitHub'); ?></span>
+                    <span class="home-card-count">GitHub</span>
+                </div>
+            </a>
+
             <!-- Support Developer -->
             <a href="https://ko-fi.com/timothepoznanski" target="_blank" class="home-card home-card-red" id="home-support-card">
                 <div class="home-card-icon">
