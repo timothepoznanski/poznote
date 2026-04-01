@@ -48,7 +48,7 @@ if (empty($noteId) || !is_numeric($noteId)) {
 
 // Fetch note from database to verify access and get metadata
 try {
-    $stmt = $con->prepare('SELECT id, heading, type, tags FROM entries WHERE id = ? AND trash = 0');
+    $stmt = $con->prepare('SELECT id, heading, type, tags, entry FROM entries WHERE id = ? AND trash = 0');
     $stmt->execute([$noteId]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     
@@ -132,6 +132,10 @@ $downloadFilename .= $extension;
 
 // Read file content
 $content = file_get_contents($filePath);
+
+if ($noteType === 'tasklist') {
+    $content = resolveTasklistStoredContent($content, $row['entry'] ?? '');
+}
 
 // CSS styles for exported notes (separated for better maintainability)
 const EXPORT_STYLES = '

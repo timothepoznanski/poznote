@@ -63,7 +63,7 @@ if (!in_array($disposition, ['attachment', 'inline'], true)) {
 
 try {
     // Fetch note from database with all metadata for front matter and attachments
-    $stmt = $con->prepare('SELECT id, heading, type, tags, favorite, folder_id, created, updated, attachments FROM entries WHERE id = ? AND trash = 0');
+    $stmt = $con->prepare('SELECT id, heading, type, tags, favorite, folder_id, created, updated, attachments, entry FROM entries WHERE id = ? AND trash = 0');
     $stmt->execute([$noteId]);
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
     
@@ -106,6 +106,10 @@ try {
         http_response_code(500);
         echo json_encode(['success' => false, 'error' => 'Cannot read note file']);
         exit;
+    }
+
+    if ($noteType === 'tasklist') {
+        $content = resolveTasklistStoredContent($content, $note['entry'] ?? '');
     }
 
     // JSON export: only for tasklist notes (raw stored JSON)

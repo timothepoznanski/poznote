@@ -586,6 +586,10 @@ if (is_readable($htmlFile)) {
     $content = $note['entry'] ?? '';
 }
 
+if (($note['type'] ?? 'note') === 'tasklist') {
+    $content = resolveTasklistStoredContent($content, $note['entry'] ?? '');
+}
+
 // ============================================================================
 // CONTENT RENDERING BY TYPE
 // ============================================================================

@@ -492,12 +492,12 @@ $body_classes = trim($extra_body_classes);
                     if ($title_json === false) $title_json = '"Note"';
                     
                     if ($note_type === 'tasklist') {
-                        // For task list notes, use the JSON content from file when possible
-                        if (is_readable($filename)) {
-                            $entryfinal = file_get_contents($filename);
-                        } else {
-                            $entryfinal = $row['entry'] ?? '';
+                        // Prefer the first valid JSON representation between file storage and DB.
+                        $fileContent = is_readable($filename) ? file_get_contents($filename) : '';
+                        if ($fileContent === false) {
+                            $fileContent = '';
                         }
+                        $entryfinal = resolveTasklistStoredContent($fileContent, $row['entry'] ?? '');
                         $tasklist_json = htmlspecialchars($entryfinal, ENT_QUOTES);
                     } else {
                         // For all other notes (including Excalidraw), prefer the HTML file content
