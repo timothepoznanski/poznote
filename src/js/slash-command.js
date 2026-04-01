@@ -855,13 +855,14 @@
                     }
 
                     // Insert a placeholder while uploading
-                    const placeholderHtml = '<img src="" alt="Uploading..." class="image-uploading-placeholder" style="opacity: 0.5; min-width: 100px; min-height: 100px; background: #f0f0f0; border: 2px dashed #ccc;" />';
+                    const placeholderId = 'image-upload-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
+                    const placeholderHtml = '<img src="" alt="Uploading..." class="image-uploading-placeholder" data-upload-placeholder-id="' + placeholderId + '" style="opacity: 0.5; min-width: 100px; min-height: 100px; background: #f0f0f0; border: 2px dashed #ccc;" />';
                     const inserted = insertHTMLAtSelection(placeholderHtml);
-                    let placeholderImg = noteEntry.querySelector('.image-uploading-placeholder');
+                    let placeholderImg = noteEntry.querySelector('[data-upload-placeholder-id="' + placeholderId + '"]');
 
                     if (!inserted) {
                         noteEntry.insertAdjacentHTML('beforeend', placeholderHtml);
-                        placeholderImg = noteEntry.querySelector('.image-uploading-placeholder');
+                        placeholderImg = noteEntry.querySelector('[data-upload-placeholder-id="' + placeholderId + '"]');
                     }
 
                     // Upload the file as attachment
@@ -886,6 +887,7 @@
                                     placeholderImg.src = imgSrc;
                                     placeholderImg.alt = file.name;
                                     placeholderImg.classList.remove('image-uploading-placeholder');
+                                    placeholderImg.removeAttribute('data-upload-placeholder-id');
                                     placeholderImg.style.opacity = '';
                                     placeholderImg.style.minWidth = '';
                                     placeholderImg.style.minHeight = '';
