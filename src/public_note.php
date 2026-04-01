@@ -850,7 +850,7 @@ if (!empty($sharedTheme) && in_array($sharedTheme, ['dark', 'light'])) {
                         <i class="lucide lucide-moon"></i>
                     </button>
                 </div>
-                <div class="content"><?php echo $content; ?></div>
+                <div class="content<?php echo $noteType === 'markdown' ? ' public-note-markdown' : ''; ?>"><?php echo $content; ?></div>
             </div>
         </div>
 

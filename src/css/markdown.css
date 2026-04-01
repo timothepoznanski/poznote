@@ -9,12 +9,14 @@
 }
 
 .markdown-preview {
-    /* padding: 5px; */
+    padding: 10px 10px 24px;
+    box-sizing: border-box;
     min-height: 100px;
 }
 
 .markdown-editor {
-    padding: 10px;
+    padding: 10px 10px 24px;
+    box-sizing: border-box;
     min-height: 100px;
     font-family: 'Courier New', Courier, monospace;
     white-space: pre-wrap;
@@ -408,7 +410,7 @@
 /* Placeholder for empty preview */
 .markdown-preview-placeholder {
     color: #999;
-    padding: 10px;
+    padding: 0;
     text-align: left;
     opacity: 0.6;
 }
@@ -514,9 +516,13 @@ body.has-internal-tabs .innernote:has(.noteentry.markdown-split-mode) .note-head
     min-width: 0 !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    padding: 10px 10px 10px 20px !important;
+    padding: 10px 10px 44px 20px !important;
     box-sizing: border-box !important;
     max-height: calc(100vh - 200px) !important;
+}
+
+.noteentry.markdown-split-mode .markdown-editor {
+    padding-bottom: 44px !important;
 }
 
 /* Dark mode border for split view */

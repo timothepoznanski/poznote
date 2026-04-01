@@ -68,6 +68,11 @@ body.public-note-page {
     white-space: normal;
 }
 
+.public-note .content.public-note-markdown {
+    padding-bottom: 16px;
+    box-sizing: border-box;
+}
+
 @media screen and (max-width: 800px) {
     body.public-note-page {
         height: auto;
