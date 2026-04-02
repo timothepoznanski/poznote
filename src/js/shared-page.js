@@ -1573,9 +1573,10 @@
             openBtn.innerHTML = '<i class="lucide lucide-external-link"></i>';
             openBtn.title = config.txtOpen;
             (function(noteUrl) {
-                openBtn.addEventListener('click', function() {
+                openBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
                     var normalizedUrl = applyProtocolToPublicUrl(normalizePublicUrl(noteUrl), getPreferredPublicUrlProtocol());
-                    openUrlWithPwaAwareness(normalizedUrl);
+                    window.open(normalizedUrl, '_blank', 'noopener');
                 });
             })(note.url);
             actionsDiv.appendChild(openBtn);
@@ -1677,7 +1678,7 @@
                 openBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     var normalizedUrl = applyProtocolToPublicUrl(normalizePublicUrl(folderUrl), getPreferredPublicUrlProtocol());
-                    openUrlWithPwaAwareness(normalizedUrl);
+                    window.open(normalizedUrl, '_blank', 'noopener');
                 });
             })(folder.public_url);
             actionsDiv.appendChild(openBtn);
@@ -1777,8 +1778,9 @@
         openBtn.innerHTML = '<i class="lucide lucide-external-link"></i>';
         openBtn.title = config.txtOpen;
         (function(url) {
-            openBtn.addEventListener('click', function() {
-                openUrlWithPwaAwareness(url);
+            openBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                window.open(url, '_blank', 'noopener');
             });
         })(sharedItem.url);
         actionsDiv.appendChild(openBtn);
