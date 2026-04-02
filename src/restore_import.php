@@ -1720,9 +1720,11 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
     <div class="backup-container">
         <div class="navigation-buttons" style="justify-content: center;">
             <a id="backToNotesLink" href="index.php" class="btn btn-secondary go-to-nav-btn">
+                <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
                 <?php echo t_h('common.back_to_notes'); ?>
             </a>
             <a href="settings.php" class="btn btn-secondary go-to-nav-btn">
+                <i class="lucide lucide-settings" style="margin-right: 5px;"></i>
                 <?php echo t_h('common.back_to_settings'); ?>
             </a>
         </div>

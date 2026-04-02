@@ -403,9 +403,11 @@ try {
 
         <div class="home-nav-actions" style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 10px;">
             <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary go-to-nav-btn">
+                <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
                 <?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?>
             </a>
             <a href="settings.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary go-to-nav-btn">
+                <i class="lucide lucide-settings" style="margin-right: 5px;"></i>
                 <?php echo t_h('common.back_to_settings', [], 'Back to Settings', $currentLang); ?>
             </a>
         </div>

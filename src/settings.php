@@ -122,9 +122,11 @@ if ($isAdmin) {
 
         <div style="display: flex; justify-content: center; gap: 10px;">
             <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary go-to-nav-btn">
+                <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
                 <?php echo t_h('common.back_to_notes'); ?>
             </a>
             <a id="backToHomeLink" href="home.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary go-to-nav-btn">
+                <i class="lucide lucide-home" style="margin-right: 5px;"></i>
                 <?php echo t_h('common.back_to_home', [], 'Back to Home', $currentLang); ?>
             </a>
         </div>

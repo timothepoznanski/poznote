@@ -272,13 +272,15 @@ $v = getAppVersion();
             <div>
                 <div class="admin-nav" style="justify-content: center;">
                     <a id="backToNotesLink" href="../index.php<?php echo $pageWorkspace !== '' ? ('?workspace=' . urlencode($pageWorkspace)) : ''; ?>" class="btn btn-secondary btn-margin-right">
+                        <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
                         <?php echo t_h('common.back_to_notes'); ?>
                     </a>
                     <a href="../settings.php" class="btn btn-secondary btn-margin-right">
+                        <i class="lucide lucide-settings" style="margin-right: 5px;"></i>
                         <?php echo t_h('common.back_to_settings'); ?>
                     </a>
                     <button class="btn btn-primary" onclick="openCreateModal()">
-                        <i class="lucide-plus"></i> <?php echo t_h('multiuser.admin.create_user', [], 'Create Profile'); ?>
+                        <i class="lucide lucide-plus" style="margin-right: 5px;"></i> <?php echo t_h('multiuser.admin.create_user', [], 'Create Profile'); ?>
                     </button>
                 </div>
                 <p class="email-note">

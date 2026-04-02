@@ -193,9 +193,11 @@ usort($shared_folders, function($a, $b) {
 	<div class="shared-container">
 		<div class="shared-buttons-container">
 			<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
+				<i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
 				<?php echo t_h('common.back_to_notes'); ?>
 			</button>
 			<button id="backToHomeBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_home', [], 'Back to Home'); ?>">
+				<i class="lucide lucide-home" style="margin-right: 5px;"></i>
 				<?php echo t_h('common.back_to_home', [], 'Back to Home'); ?>
 			</button>
 		</div>
