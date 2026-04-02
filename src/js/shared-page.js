@@ -238,6 +238,69 @@
         window.location.href = 'index.php' + (params.toString() ? '?' + params.toString() : '');
     }
 
+    function isStandalonePwaMode() {
+        try {
+            return !!(
+                (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+                window.navigator.standalone === true
+            );
+        } catch (error) {
+            return false;
+        }
+    }
+
+    function shouldReuseCurrentPwaWindow(targetUrl) {
+        if (!isStandalonePwaMode() || !targetUrl) {
+            return false;
+        }
+
+        try {
+            var resolvedUrl = new URL(String(targetUrl), window.location.href);
+            return resolvedUrl.host === window.location.host;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    function openUrlWithPwaAwareness(targetUrl) {
+        if (!targetUrl) {
+            return;
+        }
+
+        if (shouldReuseCurrentPwaWindow(targetUrl)) {
+            window.location.href = targetUrl;
+            return;
+        }
+
+        var popup = window.open(targetUrl, '_blank', 'noopener');
+        if (!popup) {
+            window.location.href = targetUrl;
+        }
+    }
+
+    function bindPwaAwareLink(linkElement, targetUrl) {
+        if (!linkElement || !targetUrl) {
+            return;
+        }
+
+        if (!shouldReuseCurrentPwaWindow(targetUrl)) {
+            linkElement.target = '_blank';
+            linkElement.rel = 'noopener';
+            return;
+        }
+
+        linkElement.removeAttribute('target');
+        linkElement.removeAttribute('rel');
+        linkElement.addEventListener('click', function(event) {
+            if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+                return;
+            }
+
+            event.preventDefault();
+            window.location.href = targetUrl;
+        });
+    }
+
     // ========== Filter ==========
 
     function updateClearButton() {
@@ -1512,7 +1575,7 @@
             (function(noteUrl) {
                 openBtn.addEventListener('click', function() {
                     var normalizedUrl = applyProtocolToPublicUrl(normalizePublicUrl(noteUrl), getPreferredPublicUrlProtocol());
-                    window.open(normalizedUrl, '_blank', 'noopener');
+                    openUrlWithPwaAwareness(normalizedUrl);
                 });
             })(note.url);
             actionsDiv.appendChild(openBtn);
@@ -1614,7 +1677,7 @@
                 openBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     var normalizedUrl = applyProtocolToPublicUrl(normalizePublicUrl(folderUrl), getPreferredPublicUrlProtocol());
-                    window.open(normalizedUrl, '_blank', 'noopener');
+                    openUrlWithPwaAwareness(normalizedUrl);
                 });
             })(folder.public_url);
             actionsDiv.appendChild(openBtn);
@@ -1684,10 +1747,9 @@
 
         var nameEl = document.createElement('a');
         nameEl.href = sharedItem.url || '#';
-        nameEl.target = '_blank';
-        nameEl.rel = 'noopener';
         nameEl.className = 'note-name';
         nameEl.textContent = isFolder ? (sharedItem.folder_name || config.txtUntitled) : (sharedItem.heading || config.txtUntitled);
+        bindPwaAwareLink(nameEl, sharedItem.url || '');
         nameContainer.appendChild(nameEl);
 
         item.appendChild(nameContainer);
@@ -1716,7 +1778,7 @@
         openBtn.title = config.txtOpen;
         (function(url) {
             openBtn.addEventListener('click', function() {
-                window.open(url, '_blank', 'noopener');
+                openUrlWithPwaAwareness(url);
             });
         })(sharedItem.url);
         actionsDiv.appendChild(openBtn);

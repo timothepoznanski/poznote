@@ -25,6 +25,46 @@ function getSelectedShareAccessMode(fallbackMode) {
 // Helper Functions
 // ===========================
 
+function isStandalonePwaMode() {
+    try {
+        return !!(
+            (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+            window.navigator.standalone === true
+        );
+    } catch (e) {
+        return false;
+    }
+}
+
+function shouldReuseCurrentPwaWindow(targetUrl) {
+    if (!isStandalonePwaMode() || !targetUrl) {
+        return false;
+    }
+
+    try {
+        const resolvedUrl = new URL(String(targetUrl), window.location.href);
+        return resolvedUrl.host === window.location.host;
+    } catch (e) {
+        return false;
+    }
+}
+
+function openUrlWithPwaAwareness(targetUrl) {
+    if (!targetUrl) {
+        return;
+    }
+
+    if (shouldReuseCurrentPwaWindow(targetUrl)) {
+        window.location.href = targetUrl;
+        return;
+    }
+
+    const popup = window.open(targetUrl, '_blank', 'noopener');
+    if (!popup) {
+        window.location.href = targetUrl;
+    }
+}
+
 /**
  * Clear all inline positioning styles from a menu element
  * @param {HTMLElement} element - The menu element to clean
@@ -466,11 +506,7 @@ function buildSharedManagementUrl(options) {
 
 function openSharedManagementPage(options) {
     const targetUrl = buildSharedManagementUrl(options);
-    const popup = window.open(targetUrl, '_blank', 'noopener');
-
-    if (!popup) {
-        window.location.href = targetUrl;
-    }
+    window.location.href = targetUrl;
 }
 
 function createCustomTokenExampleElement(exampleToken, shareType) {
@@ -597,10 +633,10 @@ function showShareModal(url, options) {
                 const urlEl = document.getElementById('shareModalUrl');
                 const currentUrl = urlEl ? urlEl.textContent : url;
                 if (currentUrl) {
-                    window.open(currentUrl, '_blank', 'noopener');
+                    openUrlWithPwaAwareness(currentUrl);
                 }
             } catch (e) {
-                if (url) window.open(url, '_blank', 'noopener');
+                if (url) openUrlWithPwaAwareness(url);
             }
         };
         buttonsDiv.appendChild(openBtn);
@@ -1191,7 +1227,7 @@ function showFolderShareModal(url, options) {
         openBtn.textContent = window.t ? window.t('index.public_modal.open', null, 'Open') : 'Open';
         openBtn.onclick = function () {
             const currentUrl = urlDiv.textContent;
-            if (currentUrl) window.open(currentUrl, '_blank', 'noopener');
+            if (currentUrl) openUrlWithPwaAwareness(currentUrl);
         };
         buttonsDiv.appendChild(openBtn);
 

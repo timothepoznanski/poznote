@@ -1,4 +1,45 @@
 // Public Folder Theme Toggle
+function isStandalonePwaMode() {
+    try {
+        return !!(
+            (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+            window.navigator.standalone === true
+        );
+    } catch (error) {
+        return false;
+    }
+}
+
+function shouldReuseCurrentPwaWindow(targetUrl) {
+    if (!isStandalonePwaMode() || !targetUrl) {
+        return false;
+    }
+
+    try {
+        var resolvedUrl = new URL(String(targetUrl), window.location.href);
+        return resolvedUrl.host === window.location.host;
+    } catch (error) {
+        return false;
+    }
+}
+
+function bindPwaAwarePublicLink(link) {
+    if (!link || !shouldReuseCurrentPwaWindow(link.href)) {
+        return;
+    }
+
+    link.removeAttribute('target');
+    link.removeAttribute('rel');
+    link.addEventListener('click', function(event) {
+        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+            return;
+        }
+
+        event.preventDefault();
+        window.location.href = link.href;
+    });
+}
+
 function toggleTheme() {
     var html = document.documentElement;
     var current = html.getAttribute('data-theme');
@@ -154,4 +195,8 @@ document.addEventListener('DOMContentLoaded', function() {
             applyFilter();
         });
     }
+
+    document.querySelectorAll('.public-note-link, .kanban-public-card').forEach(function(link) {
+        bindPwaAwarePublicLink(link);
+    });
 });
