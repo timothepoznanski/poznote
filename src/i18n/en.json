@@ -61,6 +61,7 @@
       "documentation": "Documentation GitHub",
       "news": "Poznote Blog",
       "website": "Poznote Website",
+      "github_star": "Star on GitHub",
       "support": "Soutenir Tim",
       "install_extension": "Install extension",
       "install_app": "Install application",
@@ -487,7 +488,11 @@
       },
       "html": {
         "title": "Export as HTML",
-        "description": "Download as HTML file with all formatting preserved"
+        "description": "Download a ZIP archive containing the HTML file and all attachments (images, documents, etc.)"
+      },
+      "html_embedded": {
+        "title": "HTML with embedded images",
+        "description": "Download as a single HTML file with images embedded (Base64). Other attachments are not included."
       },
       "json": {
         "title": "Download as JSON",
@@ -1302,7 +1307,7 @@
       "token_missing": "Token missing",
       "token_or_folder_auth_missing": "Token or folder authorization missing",
       "shared_folder_not_found": "Shared folder not found",
-      "shared_note_not_found_or_denied": "Shared note not found or access denied",
+      "shared_note_not_found_or_denied": "Shared note not found or access denied.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.",
       "folder_not_found": "Folder not found",
       "note_not_found": "Note not found",
       "server_error": "Server error"
@@ -1778,6 +1783,15 @@
   },
   "multiuser": {
     "admin": {
+      "maintenance": {
+        "title": "Rebuild Master Database",
+        "subtitle": "Restore user profiles and public sharing links",
+        "description": "The main database (master.db) stores user information, their public links, and Poznote's global settings. If this file is lost or corrupted, or if some public links stop working after a restore, this tool scans your 'data/users' folders to automatically re-register accounts, recover their real names from their personal databases, and restore all public sharing links.",
+        "repair_registry": "Rebuild",
+        "repair_registry_confirm": "This will scan all user folders and rebuild the master database. Continue?",
+        "repair_registry_success": "Master database rebuilt successfully:\n\n- {{scanned}} folders scanned\n- {{added}} users restored\n- {{links}} shared links rebuilt",
+        "repair_registry_error": "Rebuild error: {{error}}"
+      },
       "id": "ID",
       "username": "User",
       "email": "Email",

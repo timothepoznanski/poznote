@@ -217,10 +217,10 @@ class NotesController {
             if ($id !== null && is_numeric($id)) {
                 $noteId = (int)$id;
                 if ($useWorkspaceFilter) {
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
+                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
                     $stmt->execute([$noteId, $workspace]);
                 } else {
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id FROM entries WHERE id = ? AND trash = 0");
+                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, entry FROM entries WHERE id = ? AND trash = 0");
                     $stmt->execute([$noteId]);
                 }
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -235,10 +235,10 @@ class NotesController {
                 
                 if (is_numeric($reference)) {
                     $refId = (int)$reference;
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
+                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
                     $stmt->execute([$refId, $workspace]);
                 } else {
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ? ORDER BY updated DESC LIMIT 1");
+                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, entry FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ? ORDER BY updated DESC LIMIT 1");
                     $stmt->execute(['%' . $reference . '%', $workspace]);
                 }
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -272,6 +272,12 @@ class NotesController {
                         $content = '';
                     }
                 }
+            }
+
+            if ($noteType === 'tasklist') {
+                $content = resolveTasklistStoredContent($content, $row['entry'] ?? '');
+            } elseif ($content === '' && isset($row['entry'])) {
+                $content = (string) ($row['entry'] ?? '');
             }
             
             echo json_encode([
@@ -1255,12 +1261,15 @@ class NotesController {
 
             // Read original content and update attachment references
             $originalFilename = getEntryFilename($id, $originalNote['type']);
-            $content = '';
-            if (file_exists($originalFilename)) {
-                $content = file_get_contents($originalFilename);
-                foreach ($attachmentIdMapping as $oldId => $newId) {
-                    $content = str_replace($oldId, $newId, $content);
+            $content = $originalNote['entry'] ?? '';
+            if (is_readable($originalFilename)) {
+                $fileContent = file_get_contents($originalFilename);
+                if ($fileContent !== false) {
+                    $content = $fileContent;
                 }
+            }
+            foreach ($attachmentIdMapping as $oldId => $newId) {
+                $content = str_replace($oldId, $newId, $content);
             }
 
             // Insert new note
@@ -1296,6 +1305,9 @@ class NotesController {
                 file_put_contents($newFilename, $content);
                 chmod($newFilename, 0644);
             }
+
+            $updateEntryStmt = $this->con->prepare("UPDATE entries SET entry = ? WHERE id = ?");
+            $updateEntryStmt->execute([$content, $newId]);
 
             http_response_code(201);
             $this->sendSuccess(array_merge([

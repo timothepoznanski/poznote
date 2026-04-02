@@ -403,9 +403,11 @@ try {
 
         <div class="home-nav-actions" style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 10px;">
             <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary go-to-nav-btn">
+                <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
                 <?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?>
             </a>
             <a href="settings.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary go-to-nav-btn">
+                <i class="lucide lucide-settings" style="margin-right: 5px;"></i>
                 <?php echo t_h('common.back_to_settings', [], 'Back to Settings', $currentLang); ?>
             </a>
         </div>
@@ -639,6 +641,17 @@ try {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.install_app', [], 'Install application'); ?></span>
                     <span class="home-card-count" id="install-app-status"><?php echo t_h('settings.install_app.status.unavailable', [], 'Unavailable'); ?></span>
+                </div>
+            </a>
+
+            <!-- GitHub Star -->
+            <a href="https://github.com/timothepoznanski/poznote" target="_blank" class="home-card" id="home-github-star-card" title="<?php echo t_h('settings.cards.github_star', [], 'Star on GitHub'); ?>">
+                <div class="home-card-icon home-card-icon-favorites">
+                    <i class="lucide lucide-star"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.github_star', [], 'Star on GitHub'); ?></span>
+                    <span class="home-card-count">GitHub</span>
                 </div>
             </a>
 

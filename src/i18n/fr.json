@@ -348,6 +348,7 @@
       "documentation": "Documentation GitHub",
       "news": "Blog Poznote",
       "website": "Site Poznote",
+      "github_star": "Mettre une étoile sur GitHub",
       "support": "Soutenir Tim",
       "install_extension": "Installer l'extension",
       "install_app": "Installer l'application",
@@ -941,7 +942,11 @@
       },
       "html": {
         "title": "Exporter en HTML",
-        "description": "Télécharger en fichier HTML avec tout le formatage préservé"
+        "description": "Télécharger une archive ZIP contenant le fichier HTML et toutes les pièces jointes (images, documents, etc.)"
+      },
+      "html_embedded": {
+        "title": "HTML avec images intégrées",
+        "description": "Télécharger un seul fichier HTML avec les images intégrées (Base64). Les autres pièces jointes ne sont pas incluses."
       },
       "json": {
         "title": "Télécharger en JSON",
@@ -1711,7 +1716,7 @@
       "token_missing": "Token manquant",
       "token_or_folder_auth_missing": "Jeton ou autorisation du dossier manquant",
       "shared_folder_not_found": "Dossier partagé introuvable",
-      "shared_note_not_found_or_denied": "Note partagée introuvable ou accès refusé",
+      "shared_note_not_found_or_denied": "Note partagée introuvable ou accès refusé.\n\nCela peut arriver après une restauration.\n\nUn administrateur doit peut-être reconstruire la base master dans Paramètres > Outils d'administration afin de réparer les liens de partage.",
       "folder_not_found": "Dossier introuvable",
       "note_not_found": "Note introuvable",
       "server_error": "Erreur serveur"
@@ -2093,7 +2098,7 @@
       "maintenance": {
         "title": "Reconstruire la base Master",
         "subtitle": "",
-        "description": "La base de données principale (master.db) contient les informations des utilisateurs, leurs liens publics et les réglages globaux de Poznote. Si ce fichier est perdu ou corrompu, cet outil scanne vos dossiers 'data/users' pour réinscrire automatiquement les comptes, récupérer leurs vrais noms depuis leurs bases personnelles et rétablir tous les liens de partage publics.",
+        "description": "La base de données principale (master.db) contient les informations des utilisateurs, leurs liens publics et les réglages globaux de Poznote. Si ce fichier est perdu ou corrompu, ou si certains liens publics ne fonctionnent plus après une restauration, cet outil scanne vos dossiers 'data/users' pour réinscrire automatiquement les comptes, récupérer leurs vrais noms depuis leurs bases personnelles et rétablir tous les liens de partage publics.",
         "repair_registry": "Reconstruction",
         "repair_registry_confirm": "Cela va scanner tous les dossiers utilisateurs et reconstruire la base de données master.",
         "repair_registry_success": "Base de données master reconstruite avec succès :\n\n- {{scanned}} dossiers scannés\n- {{added}} utilisateurs restaurés\n- {{links}} liens de partage reconstruits",

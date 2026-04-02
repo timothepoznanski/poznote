@@ -26,8 +26,53 @@ header("X-Frame-Options: SAMEORIGIN");
 // HELPER FUNCTIONS FOR AUTH PAGES
 // ============================================================================
 
-function renderLoginRequiredPage($currentLang) {
-    http_response_code(403);
+function getPublicAppPathPrefix() {
+    $scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\');
+    if ($scriptDir === '' || $scriptDir === '.') {
+        return '';
+    }
+
+    return $scriptDir;
+}
+
+function buildPublicAppHref($path) {
+    if ($path === '') {
+        return getPublicAppPathPrefix() . '/';
+    }
+
+    if (preg_match('#^(?:https?:)?//#i', $path)) {
+        return $path;
+    }
+
+    return getPublicAppPathPrefix() . '/' . ltrim($path, '/');
+}
+
+function getVersionedPublicAppAssetHref($relativePath) {
+    $relativePath = ltrim((string)$relativePath, '/');
+    $href = getPublicAppPathPrefix() . '/' . $relativePath;
+    $path = __DIR__ . '/' . $relativePath;
+
+    if (file_exists($path)) {
+        $href .= '?v=' . filemtime($path);
+    }
+
+    return $href;
+}
+
+function escapePublicStatusText($text) {
+    $decoded = html_entity_decode((string)$text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    return htmlspecialchars($decoded, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}
+
+function renderPublicStatusPage($currentLang, array $options = []) {
+    http_response_code($options['status'] ?? 403);
+
+    $statusStylesheetHref = getVersionedPublicAppAssetHref('css/public_folder.css');
+    $themeInitHref = getVersionedPublicAppAssetHref('js/theme-init.js');
+    $title = $options['title'] ?? t_h('common.error', [], 'Error', $currentLang);
+    $message = $options['message'] ?? '';
+    $hint = $options['hint'] ?? '';
+    $actions = $options['actions'] ?? [];
     ?>
     <!doctype html>
     <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
@@ -35,15 +80,33 @@ function renderLoginRequiredPage($currentLang) {
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="robots" content="noindex, nofollow">
-        <title><?php echo t_h('public.login_required_title', [], 'Login Required', $currentLang); ?></title>
-        <link rel="stylesheet" href="css/public_folder.css">
+        <title><?php echo escapePublicStatusText($title); ?> - Poznote</title>
+        <script src="<?php echo htmlspecialchars($themeInitHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"></script>
+        <link rel="stylesheet" href="<?php echo htmlspecialchars($statusStylesheetHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
     </head>
-    <body class="password-page-body">
-        <div class="password-container">
-            <div class="lock-icon">🔒</div>
-            <h2><?php echo t_h('public.login_required_title', [], 'Login Required', $currentLang); ?></h2>
-            <p><?php echo t_h('public.login_required_message', [], 'This content is restricted to specific users. Please log in to access it.', $currentLang); ?></p>
-            <a href="login.php" class="btn" style="display:inline-block;margin-top:12px;padding:10px 24px;background:#4a90d9;color:#fff;border-radius:6px;text-decoration:none;"><?php echo t_h('login.login', [], 'Log in', $currentLang); ?></a>
+    <body class="status-page-body">
+        <div class="status-page-shell">
+            <main class="status-card" role="main">
+                <h1><?php echo escapePublicStatusText($title); ?></h1>
+                <p class="status-card-message"><?php echo escapePublicStatusText($message); ?></p>
+
+                <?php if ($hint !== ''): ?>
+                    <p class="status-card-hint"><?php echo escapePublicStatusText($hint); ?></p>
+                <?php endif; ?>
+
+                <?php if (!empty($actions)): ?>
+                    <div class="status-card-actions">
+                        <?php foreach ($actions as $action): ?>
+                            <a
+                                href="<?php echo htmlspecialchars(buildPublicAppHref($action['href']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"
+                                class="status-card-action<?php echo !empty($action['secondary']) ? ' secondary' : ''; ?>"
+                            >
+                                <?php echo escapePublicStatusText($action['label']); ?>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </main>
         </div>
     </body>
     </html>
@@ -51,28 +114,43 @@ function renderLoginRequiredPage($currentLang) {
     exit;
 }
 
+function renderLoginRequiredPage($currentLang) {
+    renderPublicStatusPage($currentLang, [
+        'status' => 403,
+        'icon' => '🔒',
+        'badge' => t_h('public.login_required_title', [], 'Login Required', $currentLang),
+        'title' => t_h('public.login_required_title', [], 'Login Required', $currentLang),
+        'message' => t_h('public.login_required_message', [], 'This content is restricted to specific users. Please log in to access it.', $currentLang),
+        'hint' => t_h('public.restricted_help', [], 'When restricted, only the listed users can access this share after logging in.', $currentLang),
+        'actions' => [
+            [
+                'href' => '/login.php',
+                'label' => t_h('common.login.button', [], 'Log in', $currentLang),
+            ],
+            [
+                'href' => '/index.php',
+                'label' => t_h('common.back_to_home', [], 'Go to Home', $currentLang),
+                'secondary' => true,
+            ],
+        ],
+    ]);
+}
+
 function renderAccessDeniedPage($currentLang) {
-    http_response_code(403);
-    ?>
-    <!doctype html>
-    <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="robots" content="noindex, nofollow">
-        <title><?php echo t_h('public.access_denied_title', [], 'Access Denied', $currentLang); ?></title>
-        <link rel="stylesheet" href="css/public_folder.css">
-    </head>
-    <body class="password-page-body">
-        <div class="password-container">
-            <div class="lock-icon">⛔</div>
-            <h2><?php echo t_h('public.access_denied_title', [], 'Access Denied', $currentLang); ?></h2>
-            <p><?php echo t_h('public.access_denied_message', [], 'You do not have permission to view this content.', $currentLang); ?></p>
-        </div>
-    </body>
-    </html>
-    <?php
-    exit;
+    renderPublicStatusPage($currentLang, [
+        'status' => 403,
+        'icon' => '⛔',
+        'badge' => t_h('public.access_denied_title', [], 'Access Denied', $currentLang),
+        'title' => t_h('public.access_denied_title', [], 'Access Denied', $currentLang),
+        'message' => t_h('public.access_denied_message', [], 'You do not have permission to view this content.', $currentLang),
+        'hint' => t_h('public.shared_note_not_found_or_denied', [], 'Shared note not found or access denied. This can happen after a restore. An administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.', $currentLang),
+        'actions' => [
+            [
+                'href' => '/index.php',
+                'label' => t_h('common.back_to_home', [], 'Go to Home', $currentLang),
+            ],
+        ],
+    ]);
 }
 
 // ============================================================================
@@ -128,9 +206,20 @@ if (empty($token) && (empty($folderToken) || empty($noteIdParam))) {
     }
     
     if (empty($token) && (empty($folderToken) || empty($noteIdParam))) {
-        http_response_code(400);
-        echo t_h('public.errors.token_or_folder_auth_missing', [], 'Token or folder authorization missing', $currentLang);
-        exit;
+        renderPublicStatusPage($currentLang, [
+            'status' => 400,
+            'icon' => '⚠️',
+            'badge' => '400',
+            'title' => t_h('public.errors.token_or_folder_auth_missing', [], 'Token or folder authorization missing', $currentLang),
+            'message' => t_h('public.errors.shared_note_not_found_or_denied', [], 'Shared note not found or access denied. This can happen after a restore. An administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.', $currentLang),
+            'hint' => t_h('public.token_help', [], 'The token is the unique identifier used in a public share URL. Example: https://your-domain.example/my-note-share', $currentLang),
+            'actions' => [
+                [
+                    'href' => '/index.php',
+                    'label' => t_h('common.back_to_home', [], 'Go to Home', $currentLang),
+                ],
+            ],
+        ]);
     }
 }
 
@@ -218,9 +307,19 @@ try {
     }
     
     if (!$sharedNote) {
-        http_response_code(404);
-        echo t_h('public.errors.shared_note_not_found_or_denied', [], 'Shared note not found or access denied', $currentLang);
-        exit;
+        renderPublicStatusPage($currentLang, [
+            'status' => 404,
+            'icon' => '🧭',
+            'badge' => '404',
+            'title' => t_h('public.errors.note_not_found', [], 'Note not found', $currentLang),
+            'message' => t_h('public.errors.shared_note_not_found_or_denied', [], 'Shared note not found or access denied. This can happen after a restore. An administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.', $currentLang),
+            'actions' => [
+                [
+                    'href' => '/index.php',
+                    'label' => t_h('common.back_to_home', [], 'Go to Home', $currentLang),
+                ],
+            ],
+        ]);
     }
 
     $note_id = $sharedNote['note_id'];
@@ -399,6 +498,8 @@ try {
         }
 
         if (!$allAuthenticated) {
+            $passwordStylesheetHref = getVersionedPublicAppAssetHref('css/public_folder.css');
+            $passwordThemeInitHref = getVersionedPublicAppAssetHref('js/theme-init.js');
             ?>
             <!doctype html>
             <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
@@ -407,80 +508,11 @@ try {
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 <meta name="robots" content="noindex, nofollow">
                 <title><?php echo t_h('public.protection.title', [], 'Password Protected', $currentLang); ?></title>
-                <style>
-                    body {
-                        font-family: 'Inter', sans-serif;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        min-height: 100vh;
-                        margin: 0;
-                        background: #f5f5f5;
-                    }
-                    .password-container {
-                        padding: 40px;
-                        border-radius: 8px;
-                        max-width: 400px;
-                        width: 90%;
-                        text-align: center;
-                    }
-                    h2 {
-                        margin-top: 0;
-                        color: #333;
-                    }
-                    p {
-                        color: #666;
-                        margin-bottom: 20px;
-                    }
-                    input[type="password"] {
-                        width: 100%;
-                        padding: 12px;
-                        border: 1px solid #ddd;
-                        border-radius: 6px;
-                        box-sizing: border-box;
-                        font-size: 14px;
-                        margin-bottom: 15px;
-                        text-align: left;
-                    }
-                    button {
-                        width: 100%;
-                        padding: 12px;
-                        background: #007bff;
-                        color: white;
-                        border: none;
-                        border-radius: 6px;
-                        font-size: 14px;
-                        cursor: pointer;
-                        font-weight: 500;
-                    }
-                    button:hover {
-                        background: #0056b3;
-                    }
-                    .error {
-                        color: #dc3545;
-                        margin-bottom: 15px;
-                        font-size: 14px;
-                    }
-                    .info {
-                        color: #0c5460;
-                        background: #d1ecf1;
-                        border: 1px solid #bee5eb;
-                        border-radius: 6px;
-                        padding: 10px;
-                        margin-bottom: 15px;
-                        font-size: 14px;
-                    }
-                    .lock-icon {
-                        font-size: 48px;
-                        text-align: center;
-                        margin-bottom: 20px;
-                        color: #007bff;
-                    }
-                </style>
+                <script src="<?php echo htmlspecialchars($passwordThemeInitHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"></script>
+                <link rel="stylesheet" href="<?php echo htmlspecialchars($passwordStylesheetHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
             </head>
-            <body>
+            <body class="password-page-body">
                 <div class="password-container">
-                    <div class="lock-icon">🔒</div>
                     <h2><?php echo t_h('public.protection.note_heading', [], 'Password Protected', $currentLang); ?></h2>
                     <?php if ($passwordError): ?>
                         <div class="error"><?php echo t_h('public.protection.error_incorrect', [], 'Incorrect password. Please try again.', $currentLang); ?></div>
@@ -488,7 +520,7 @@ try {
                     <?php if ($additionalPasswordRequired): ?>
                         <div class="info"><?php echo t_h('public.protection.additional_password_required', [], 'This note requires an additional password. Please enter the next password to continue.', $currentLang); ?></div>
                     <?php endif; ?>
-                    <form method="POST">
+                    <form method="POST" class="password-form">
                         <input type="password" name="note_password" placeholder="<?php echo t_h('public.protection.placeholder', [], 'Enter password', $currentLang); ?>" required autofocus>
                         <button type="submit"><?php echo t_h('public.protection.unlock', [], 'Unlock', $currentLang); ?></button>
                     </form>
@@ -509,14 +541,35 @@ try {
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$note) {
-        http_response_code(404);
-        echo t_h('public.errors.note_not_found', [], 'Note not found', $currentLang);
-        exit;
+        renderPublicStatusPage($currentLang, [
+            'status' => 404,
+            'icon' => '🗒️',
+            'badge' => '404',
+            'title' => t_h('public.errors.note_not_found', [], 'Note not found', $currentLang),
+            'message' => t_h('public.errors.shared_note_not_found_or_denied', [], 'Shared note not found or access denied. This can happen after a restore. An administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.', $currentLang),
+            'actions' => [
+                [
+                    'href' => '/index.php',
+                    'label' => t_h('common.back_to_home', [], 'Go to Home', $currentLang),
+                ],
+            ],
+        ]);
     }
 } catch (Exception $e) {
-    http_response_code(500);
-    echo t_h('public.errors.server_error', [], 'Server error', $currentLang);
-    exit;
+    renderPublicStatusPage($currentLang, [
+        'status' => 500,
+        'icon' => '🛠️',
+        'badge' => '500',
+        'title' => t_h('public.errors.server_error', [], 'Server error', $currentLang),
+        'message' => t_h('common.please_wait', [], 'Please wait...', $currentLang),
+        'hint' => t_h('restore_import.errors.internal_server_error', [], 'Internal server error', $currentLang),
+        'actions' => [
+            [
+                'href' => '/index.php',
+                'label' => t_h('common.back_to_home', [], 'Go to Home', $currentLang),
+            ],
+        ],
+    ]);
 }
 
 // ============================================================================
@@ -531,6 +584,10 @@ if (is_readable($htmlFile)) {
     $content = file_get_contents($htmlFile);
 } else {
     $content = $note['entry'] ?? '';
+}
+
+if (($note['type'] ?? 'note') === 'tasklist') {
+    $content = resolveTasklistStoredContent($content, $note['entry'] ?? '');
 }
 
 // ============================================================================
@@ -793,7 +850,7 @@ if (!empty($sharedTheme) && in_array($sharedTheme, ['dark', 'light'])) {
                         <i class="lucide lucide-moon"></i>
                     </button>
                 </div>
-                <div class="content"><?php echo $content; ?></div>
+                <div class="content<?php echo $noteType === 'markdown' ? ' public-note-markdown' : ''; ?>"><?php echo $content; ?></div>
             </div>
         </div>
 

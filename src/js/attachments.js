@@ -581,6 +581,10 @@ function formatFileSize(bytes) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
+function createUploadPlaceholderId(prefix) {
+    return (prefix || 'upload') + '-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
+}
+
 function handleImageFilesAndInsert(files, dropTarget) {
     if (!files || files.length === 0) return;
 
@@ -609,7 +613,7 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
 
     // Show loading indicator
     var loadingText = '![Uploading ' + file.name + '...]()';
-    insertMarkdownAtCursor(loadingText, dropTarget);
+    var loadingTextNode = insertMarkdownAtCursor(loadingText, dropTarget);
 
     // Trigger initial save for loading text
     if (typeof window.markNoteAsModified === 'function') {
@@ -635,7 +639,7 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
             if (data.success) {
                 // Remplacer le texte de chargement par la syntaxe markdown finale
                 var imageMarkdown = '![' + file.name + '](/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id + ')';
-                replaceLoadingText(loadingText, imageMarkdown, dropTarget);
+                replaceLoadingText(loadingText, imageMarkdown, dropTarget, loadingTextNode);
 
                 // Marquer la note comme modifiée
                 if (typeof window.markNoteAsModified === 'function') {
@@ -669,14 +673,14 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
                 }, 500); // Longer delay for markdown to allow upload completion
             } else {
                 // Remove loading text in case of error
-                replaceLoadingText(loadingText, '', dropTarget);
+                replaceLoadingText(loadingText, '', dropTarget, loadingTextNode);
                 if (typeof showNotificationPopup === 'function') {
                     showNotificationPopup('Upload failed: ' + data.message, 'error');
                 }
             }
         })
         .catch(function (error) {
-            replaceLoadingText(loadingText, '', dropTarget);
+            replaceLoadingText(loadingText, '', dropTarget, loadingTextNode);
             if (typeof showNotificationPopup === 'function') {
                 showNotificationPopup('Upload failed: ' + error.message, 'error');
             }
@@ -688,7 +692,7 @@ function insertMarkdownAtCursor(text, dropTarget) {
     // (dropTarget indicates a drag-and-drop, so we don't check)
     if (!dropTarget && !isCursorInEditableNote()) {
         window.showCursorWarning();
-        return;
+        return null;
     }
 
     // For markdown notes, insert into the markdown editor
@@ -722,7 +726,7 @@ function insertMarkdownAtCursor(text, dropTarget) {
                 sel.removeAllRanges();
                 sel.addRange(range);
 
-                return;
+                return textNode;
             }
         }
 
@@ -739,45 +743,73 @@ function insertMarkdownAtCursor(text, dropTarget) {
         var sel = window.getSelection();
         sel.removeAllRanges();
         sel.addRange(range);
+
+        return newLineNode;
     }
+
+    return null;
 }
 
-function replaceLoadingText(oldText, newText, dropTarget) {
+function replaceLoadingText(oldText, newText, dropTarget, textNodeHint) {
     var editor = dropTarget.querySelector('.markdown-editor');
     if (editor) {
-        // Parcourir les nodes de texte pour remplacer oldText sans perdre les sauts de ligne
-        var walker = document.createTreeWalker(
-            editor,
-            NodeFilter.SHOW_TEXT,
-            null,
-            false
-        );
+        var replaced = false;
 
-        var textNodes = [];
-        var node;
-        while (node = walker.nextNode()) {
-            textNodes.push(node);
-        }
+        if (textNodeHint && textNodeHint.parentNode && editor.contains(textNodeHint)) {
+            var hintedText = textNodeHint.textContent || '';
+            var hintedIndex = hintedText.indexOf(oldText);
 
-        // Chercher et remplacer dans les nodes de texte
-        for (var i = 0; i < textNodes.length; i++) {
-            var textNode = textNodes[i];
-            var text = textNode.textContent;
-            var index = text.indexOf(oldText);
-            if (index !== -1) {
-                textNode.textContent = text.replace(oldText, newText);
+            if (hintedIndex !== -1) {
+                textNodeHint.textContent = hintedText.replace(oldText, newText);
 
-                // Placer le curseur après le texte inséré sans le sélectionner
                 try {
-                    var sel = window.getSelection();
-                    var newRange = document.createRange();
-                    newRange.setStart(textNode, index + newText.length);
-                    newRange.collapse(true);
-                    sel.removeAllRanges();
-                    sel.addRange(newRange);
+                    var hintedSelection = window.getSelection();
+                    var hintedRange = document.createRange();
+                    hintedRange.setStart(textNodeHint, hintedIndex + newText.length);
+                    hintedRange.collapse(true);
+                    hintedSelection.removeAllRanges();
+                    hintedSelection.addRange(hintedRange);
                 } catch (e) { }
 
-                break; // On remplace seulement la première occurrence
+                replaced = true;
+            }
+        }
+
+        // Parcourir les nodes de texte pour remplacer oldText sans perdre les sauts de ligne
+        if (!replaced) {
+            var walker = document.createTreeWalker(
+                editor,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+
+            var textNodes = [];
+            var node;
+            while (node = walker.nextNode()) {
+                textNodes.push(node);
+            }
+
+            // Chercher et remplacer dans les nodes de texte
+            for (var i = 0; i < textNodes.length; i++) {
+                var textNode = textNodes[i];
+                var text = textNode.textContent;
+                var index = text.indexOf(oldText);
+                if (index !== -1) {
+                    textNode.textContent = text.replace(oldText, newText);
+
+                    // Placer le curseur après le texte inséré sans le sélectionner
+                    try {
+                        var sel = window.getSelection();
+                        var newRange = document.createRange();
+                        newRange.setStart(textNode, index + newText.length);
+                        newRange.collapse(true);
+                        sel.removeAllRanges();
+                        sel.addRange(newRange);
+                    } catch (e) { }
+
+                    break; // On remplace seulement la première occurrence
+                }
             }
         }
 
@@ -799,7 +831,8 @@ function handleHTMLImageInsert(file, dropTarget) {
     }
 
     // Insert a placeholder while uploading
-    var placeholderHtml = '<img src="" alt="' + tr('attachments.upload.uploading', {}, 'Uploading...') + '" class="image-uploading-placeholder" style="opacity: 0.5; min-width: 100px; min-height: 100px; background: #f0f0f0; border: 2px dashed #ccc;" />';
+    var placeholderId = createUploadPlaceholderId('image-upload');
+    var placeholderHtml = '<img src="" alt="' + tr('attachments.upload.uploading', {}, 'Uploading...') + '" class="image-uploading-placeholder" data-upload-placeholder-id="' + placeholderId + '" style="opacity: 0.5; min-width: 100px; min-height: 100px; background: #f0f0f0; border: 2px dashed #ccc;" />';
 
     var sel = window.getSelection();
     var inserted = false;
@@ -814,13 +847,13 @@ function handleHTMLImageInsert(file, dropTarget) {
 
         if (noteEntry === dropTarget) {
             inserted = insertHTMLAtSelection(placeholderHtml);
-            placeholderImg = dropTarget.querySelector('.image-uploading-placeholder');
+            placeholderImg = dropTarget.querySelector('[data-upload-placeholder-id="' + placeholderId + '"]');
         }
     }
 
     if (!inserted && dropTarget) {
         dropTarget.insertAdjacentHTML('beforeend', placeholderHtml);
-        placeholderImg = dropTarget.querySelector('.image-uploading-placeholder');
+        placeholderImg = dropTarget.querySelector('[data-upload-placeholder-id="' + placeholderId + '"]');
     }
 
     // Upload the file as attachment
@@ -847,6 +880,7 @@ function handleHTMLImageInsert(file, dropTarget) {
                     placeholderImg.src = imgSrc;
                     placeholderImg.alt = file.name;
                     placeholderImg.classList.remove('image-uploading-placeholder');
+                    placeholderImg.removeAttribute('data-upload-placeholder-id');
                     placeholderImg.style.opacity = '';
                     placeholderImg.style.minWidth = '';
                     placeholderImg.style.minHeight = '';

@@ -47,10 +47,10 @@ if (!$noteId) {
     exit;
 }
 
-if (!in_array($format, ['html', 'markdown', 'json'], true)) {
+if (!in_array($format, ['html', 'markdown', 'json', 'html_embedded'], true)) {
     header('Content-Type: application/json');
     http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'Invalid format. Use "html", "markdown" or "json"']);
+    echo json_encode(['success' => false, 'error' => 'Invalid format. Use "html", "markdown", "json" or "html_embedded"']);
     exit;
 }
 
@@ -63,7 +63,7 @@ if (!in_array($disposition, ['attachment', 'inline'], true)) {
 
 try {
     // Fetch note from database with all metadata for front matter and attachments
-    $stmt = $con->prepare('SELECT id, heading, type, tags, favorite, folder_id, created, updated, attachments FROM entries WHERE id = ? AND trash = 0');
+    $stmt = $con->prepare('SELECT id, heading, type, tags, favorite, folder_id, created, updated, attachments, entry FROM entries WHERE id = ? AND trash = 0');
     $stmt->execute([$noteId]);
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
     
@@ -106,6 +106,10 @@ try {
         http_response_code(500);
         echo json_encode(['success' => false, 'error' => 'Cannot read note file']);
         exit;
+    }
+
+    if ($noteType === 'tasklist') {
+        $content = resolveTasklistStoredContent($content, $note['entry'] ?? '');
     }
 
     // JSON export: only for tasklist notes (raw stored JSON)
@@ -171,11 +175,18 @@ try {
             }
         }
         
+        if ($format === 'html_embedded') {
+            // For embedded HTML, we need to convert images before generating styled HTML
+            // because generateStyledHtml might add classes or wrappers that complicate matching
+            $content = convertImagesToBase64InHtml($content);
+            $disposition = 'attachment';
+        }
+
         // Generate styled HTML
         $htmlContent = generateStyledHtml($content, $note['heading'], $noteType, $note['tags']);
         
         // Export as HTML - create ZIP with attachments if downloading
-        if ($disposition === 'attachment') {
+        if ($disposition === 'attachment' && $format === 'html') {
             exportAsHtmlZip($htmlContent, $note, $con);
         } else {
             exportAsHtml($htmlContent, $note['heading'], $disposition);
@@ -235,15 +246,21 @@ function convertTasklistToMarkdown($jsonContent) {
  * Convert all local images in HTML to base64 data URIs
  */
 function convertImagesToBase64InHtml($html) {
-    return preg_replace_callback('/<img\s+([^>]*?)src="([^"]+)"([^>]*?)>/i', function($matches) {
-        $beforeSrc = $matches[1];
-        $src = $matches[2];
-        $afterSrc = $matches[3];
+    if (empty($html)) return $html;
+    
+    // Pattern to match <img> tags and extract src
+    // Standard Poznote image format: <img src="/api/v1/notes/185/attachments/69ce2ed9a270f" ...>
+    // Or: <img src="api_attachments.php?action=download&id=..." ...>
+    return preg_replace_callback('/<img\s+[^>]*?src=["\']([^"\']+)["\'][^>]*?>/i', function($matches) {
+        $fullTag = $matches[0];
+        $src = $matches[1];
         
-        // Convert to base64 if it's a local image
+        // Convert to base64 if it\'s a local image
         $newSrc = convertImageToBase64($src);
         
-        return '<img ' . $beforeSrc . 'src="' . $newSrc . '"' . $afterSrc . '>';
+        // Replace ONLY the src attribute in the full tag to preserve other attributes (style, class, etc.)
+        // Using preg_replace for safer replacement of the specific src attribute
+        return preg_replace('/(src=["\'])' . preg_quote($src, '/') . '(["\'])/i', '$1' . $newSrc . '$2', $fullTag);
     }, $html);
 }
 
@@ -264,26 +281,60 @@ function convertImageToBase64($imagePath) {
     // Decode HTML entities first (in case URL is already escaped)
     $imagePath = html_entity_decode($imagePath, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     
-    // Case 1: api_attachments.php?action=download&note_id=X&attachment_id=Y
-    // Note: attachments are stored in entries.attachments (JSON), not a separate table.
-    if (stripos($imagePath, 'api_attachments.php') !== false) {
-        $parts = parse_url($imagePath);
-        $queryString = $parts['query'] ?? '';
+    // Normalize path to remove domain if present
+    if (preg_match('#^https?://[^/]+(/.*)$#i', $imagePath, $normMatches)) {
+        $imagePath = $normMatches[1];
+    }
+
+    // Pattern for API V1 links: /api/v1/notes/{note_id}/attachments/{attachment_id}
+    if (preg_match('#/api/v1/notes/(\d+)/attachments/([^/?\#]+)#i', $imagePath, $matches)) {
+        $noteId = (int)$matches[1];
+        $attachmentId = (string)$matches[2];
+        
+        try {
+            $stmt = $con->prepare('SELECT attachments FROM entries WHERE id = ?');
+            $stmt->execute([$noteId]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $attachments = (!empty($row['attachments'])) ? json_decode($row['attachments'], true) : [];
+            if (is_array($attachments)) {
+                foreach ($attachments as $attachment) {
+                    if (isset($attachment['id']) && (string)$attachment['id'] === $attachmentId && !empty($attachment['filename'])) {
+                        $fullPath = $attachmentsPath . '/' . $attachment['filename'];
+                        break;
+                    }
+                }
+            }
+        } catch (Exception $e) {}
+    }
+    // Pattern for attachment links: api_attachments.php?action=download&note_id=X&attachment_id=Y
+    elseif (stripos($imagePath, 'api_attachments.php') !== false) {
+        $queryString = parse_url($imagePath, PHP_URL_QUERY) ?? '';
         $params = [];
         parse_str($queryString, $params);
 
         $noteId = isset($params['note_id']) ? (int)$params['note_id'] : 0;
         $attachmentId = isset($params['attachment_id']) ? (string)$params['attachment_id'] : '';
+        // Also check if id is used instead of attachment_id (common in some internal calls)
+        if ($attachmentId === '' && isset($params['id'])) {
+            $attachmentId = (string)$params['id'];
+        }
         $workspace = isset($params['workspace']) ? (string)$params['workspace'] : null;
 
-        if ($noteId > 0 && $attachmentId !== '') {
+        if ($attachmentId !== '') {
             try {
-                if ($workspace !== null && $workspace !== '') {
-                    $stmt = $con->prepare('SELECT attachments FROM entries WHERE id = ? AND workspace = ?');
-                    $stmt->execute([$noteId, $workspace]);
+                // If noteId is missing, try to infer from context or search (though noteId is preferred)
+                if ($noteId > 0) {
+                    if ($workspace !== null && $workspace !== '') {
+                        $stmt = $con->prepare('SELECT attachments FROM entries WHERE id = ? AND workspace = ?');
+                        $stmt->execute([$noteId, $workspace]);
+                    } else {
+                        $stmt = $con->prepare('SELECT attachments FROM entries WHERE id = ?');
+                        $stmt->execute([$noteId]);
+                    }
                 } else {
-                    $stmt = $con->prepare('SELECT attachments FROM entries WHERE id = ?');
-                    $stmt->execute([$noteId]);
+                    // Fallback: search across all notes for this attachment ID
+                    $stmt = $con->prepare('SELECT attachments FROM entries WHERE attachments LIKE ? LIMIT 1');
+                    $stmt->execute(['%' . $attachmentId . '%']);
                 }
 
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -297,7 +348,7 @@ function convertImageToBase64($imagePath) {
                     }
                 }
             } catch (Exception $e) {
-                return $imagePath;
+                // Silent fail
             }
         }
     }
@@ -318,7 +369,29 @@ function convertImageToBase64($imagePath) {
         $fullPath = $attachmentsPath . '/' . $cleanPath;
     }
     
-    // If no valid path was found, return original
+    // If no valid path was found OR it doesn\'t exist, try a global search by ID
+    if (!$fullPath || !file_exists($fullPath)) {
+        // Look for anything that looks like a 13-character hex ID (Poznote style)
+        if (preg_match('/([a-f0-9]{13})/i', $imagePath, $idMatches)) {
+            $attachmentId = $idMatches[1];
+            try {
+                $stmt = $con->prepare('SELECT attachments FROM entries WHERE attachments LIKE ? LIMIT 1');
+                $stmt->execute(['%' . $attachmentId . '%']);
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                $attachments = (!empty($row['attachments'])) ? json_decode($row['attachments'], true) : [];
+                if (is_array($attachments)) {
+                    foreach ($attachments as $attachment) {
+                        if (isset($attachment['id']) && (string)$attachment['id'] === $attachmentId && !empty($attachment['filename'])) {
+                            $fullPath = $attachmentsPath . '/' . $attachment['filename'];
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception $e) {}
+        }
+    }
+    
+    // If we still don\'t have a path, return original
     if (!$fullPath) {
         return $imagePath;
     }
@@ -374,7 +447,16 @@ function generateStyledHtml($content, $title, $noteType, $tags) {
         $button->parentNode->removeChild($button);
     }
     
-    $cleanContent = $dom->saveHTML();
+    // Save the body content only to avoid XML header or duplicate body/html tags
+    $body = $dom->getElementsByTagName('body')->item(0);
+    $cleanContent = '';
+    if ($body) {
+        foreach ($body->childNodes as $child) {
+            $cleanContent .= $dom->saveHTML($child);
+        }
+    } else {
+        $cleanContent = $dom->saveHTML();
+    }
     
     // Build HTML document
     $html = '<!DOCTYPE html>

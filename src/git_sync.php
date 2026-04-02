@@ -223,12 +223,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         <div class="git-sync-nav">
             <a id="backToHomeLink" href="home.php" class="btn btn-secondary go-to-nav-btn">
+                <i class="lucide lucide-home" style="margin-right: 5px;"></i>
                 <?php echo t_h('common.back_to_home', [], 'Back to Home', $currentLang); ?>
             </a>
             <a id="backToNotesLink" href="index.php<?php echo $pageWorkspace !== '' ? ('?workspace=' . urlencode($pageWorkspace)) : ''; ?>" class="btn btn-secondary go-to-nav-btn">
+                <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
                 <?php echo t_h('common.back_to_notes', [], 'Back to Notes', $currentLang); ?>
             </a>
             <a id="backToSettingsLink" href="settings.php" class="btn btn-secondary go-to-nav-btn">
+                <i class="lucide lucide-settings" style="margin-right: 5px;"></i>
                 <?php echo t_h('common.back_to_settings', [], 'Back to Settings', $currentLang); ?>
             </a>
             <?php if ($configStatus['enabled'] && $configStatus['configured']): ?>

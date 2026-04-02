@@ -335,6 +335,7 @@
       "documentation": "Documentation GitHub",
       "news": "Blog do Poznote",
       "website": "Site do Poznote",
+      "github_star": "Dar uma estrela no GitHub",
       "support": "Soutenir Tim",
       "custom_css": "Arquivo CSS personalizado",
       "install_extension": "Instalar extensão",
@@ -931,7 +932,11 @@
       },
       "html": {
         "title": "Exportar como HTML",
-        "description": "Baixar como arquivo HTML com toda a formatação preservada"
+        "description": "Baixar um arquivo ZIP contendo o arquivo HTML e todos os anexos (imagens, documentos, etc.)"
+      },
+      "html_embedded": {
+        "title": "HTML com imagens incorporadas",
+        "description": "Baixar como um único arquivo HTML com imagens incorporadas (Base64). Outros anexos não estão incluídos."
       },
       "json": {
         "title": "Baixar como JSON",
@@ -1674,7 +1679,7 @@
       "token_missing": "Token ausente",
       "token_or_folder_auth_missing": "Token ou autorização da pasta ausente",
       "shared_folder_not_found": "Pasta compartilhada não encontrada",
-      "shared_note_not_found_or_denied": "Nota compartilhada não encontrada ou acesso negado",
+      "shared_note_not_found_or_denied": "Nota compartilhada não encontrada ou acesso negado. Isso pode acontecer após uma restauração. Um administrador talvez precise reconstruir o banco de dados mestre em Configurações > Ferramentas de administração para reparar os links de compartilhamento.",
       "folder_not_found": "Pasta não encontrada",
       "note_not_found": "Nota não encontrada",
       "server_error": "Erro do servidor"
@@ -1980,7 +1985,7 @@
       "maintenance": {
         "title": "Reconstruir Base de Dados Master",
         "subtitle": "Restaurar perfis de utilizador e links de partilha",
-        "description": "A base de dados master (master.db) é o núcleo do sistema, contendo perfis de utilizador, links de partilha públicos e definições globais. Se este ficheiro for perdido ou corrompido, esta ferramenta analisa o diretório 'data/users' para registar novamente as contas, recuperar os nomes originais das bases de dados pessoais e restaurar todos os links de partilha ativos.",
+        "description": "A base de dados principal (master.db) contém as informações dos utilizadores, os seus links públicos e as definições globais do Poznote. Se este ficheiro for perdido ou corrompido, ou se alguns links públicos deixarem de funcionar após uma restauração, esta ferramenta analisa as pastas 'data/users' para voltar a registar automaticamente as contas, recuperar os nomes reais a partir das bases de dados pessoais e restaurar todos os links de partilha públicos.",
         "repair_registry": "Reconstrução",
         "repair_registry_confirm": "Isto irá analisar todas as pastas de utilizador e reconstruir a base de dados master. Continuar?",
         "repair_registry_success": "Base de dados master reconstruída com sucesso:\n\n- {{scanned}} pastas analisadas\n- {{added}} utilizadores restaurados\n- {{links}} links partilhados reconstruídos",

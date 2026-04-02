@@ -336,6 +336,7 @@
       "documentation": "Documentation GitHub",
       "news": "Blog de Poznote",
       "website": "Sitio web de Poznote",
+      "github_star": "Dar una estrella en GitHub",
       "support": "Soutenir Tim",
       "custom_css": "Archivo CSS personalizado",
       "install_app": "Instalar aplicación",
@@ -610,7 +611,7 @@
     },
     "colors": {
       "black": "Negro",
-      "red": "Rojo",
+      "shared_note_not_found_or_denied": "No se encontró la nota compartida o se denegó el acceso.\n\nEsto puede ocurrir después de una restauración.\n\nEs posible que un administrador deba reconstruir la base de datos maestra en Configuración > Herramientas de administración para reparar los enlaces compartidos.",
       "orange": "Naranja",
       "yellow": "Amarillo",
       "green": "Verde",
@@ -931,7 +932,11 @@
       },
       "html": {
         "title": "Exportar como HTML",
-        "description": "Descargar como archivo HTML con todo el formato preservado"
+        "description": "Descargar un archivo ZIP que contiene el archivo HTML y todos los archivos adjuntos (imágenes, documentos, etc.)"
+      },
+      "html_embedded": {
+        "title": "HTML con imágenes integradas",
+        "description": "Descargar como un único archivo HTML con imágenes integradas (Base64). No se incluyen otros archivos adjuntos."
       },
       "json": {
         "title": "Descargar como JSON",
@@ -1669,7 +1674,7 @@
       "token_missing": "Falta el token",
       "token_or_folder_auth_missing": "Falta el token o la autorización de carpeta",
       "shared_folder_not_found": "Carpeta compartida no encontrada",
-      "shared_note_not_found_or_denied": "Nota compartida no encontrada o acceso denegado",
+      "shared_note_not_found_or_denied": "No se encontró la nota compartida o se denegó el acceso. Esto puede ocurrir después de una restauración. Es posible que un administrador deba reconstruir la base de datos maestra en Configuración > Herramientas de administración para reparar los enlaces compartidos.",
       "folder_not_found": "Carpeta no encontrada",
       "note_not_found": "Nota no encontrada",
       "server_error": "Error del servidor"
@@ -1975,7 +1980,7 @@
       "maintenance": {
         "title": "Reconstruir Base Maestra",
         "subtitle": "Restaurar perfiles de usuario y enlaces compartidos",
-        "description": "La base de datos maestra (master.db) contiene la información de los usuarios, sus enlaces públicos y la configuración global de Poznote. Si este archivo se pierde o se corrompe, esta herramienta escanea sus carpetas 'data/users' para volver a registrar automáticamente las cuentas, recuperar sus nombres de usuario originales de sus bases personales y restablecer todos los enlaces compartidos.",
+        "description": "La base de datos principal (master.db) contiene la información de los usuarios, sus enlaces públicos y la configuración global de Poznote. Si este archivo se pierde o se corrompe, o si algunos enlaces públicos dejan de funcionar después de una restauración, esta herramienta escanea sus carpetas 'data/users' para volver a registrar automáticamente las cuentas, recuperar sus nombres reales desde sus bases personales y restablecer todos los enlaces de compartición públicos.",
         "repair_registry": "Reconstrucción",
         "repair_registry_confirm": "Esto escaneará todas las carpetas de usuario y reconstruirá la base de datos maestra. ¿Continuar?",
         "repair_registry_success": "Base de datos maestra reconstruida con éxito:\n\n- {{scanned}} carpetas escaneadas\n- {{added}} usuarios restaurados\n- {{links}} enlaces compartidos reconstruidos",

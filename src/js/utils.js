@@ -1806,6 +1806,7 @@ function showExportModal(noteId, filename, title, noteType) {
         // Show/hide options based on note type
         var markdownOption = modal.querySelector('.export-option-markdown');
         var htmlOption = modal.querySelector('.export-option-html');
+        var htmlEmbeddedOption = modal.querySelector('.export-option-html-embedded');
         var jsonOption = modal.querySelector('.export-option-json');
         var printOption = modal.querySelector('.export-option-print');
 
@@ -1813,18 +1814,21 @@ function showExportModal(noteId, filename, title, noteType) {
             // For markdown notes: allow MD export, HTML export and print
             if (markdownOption) markdownOption.style.display = 'flex';
             if (htmlOption) htmlOption.style.display = 'flex';
+            if (htmlEmbeddedOption) htmlEmbeddedOption.style.display = 'flex';
             if (jsonOption) jsonOption.style.display = 'none';
             if (printOption) printOption.style.display = 'flex';
         } else if (noteType === 'tasklist') {
             // For tasklist notes: allow MD export (checkbox format), HTML export, JSON export and print
             if (markdownOption) markdownOption.style.display = 'flex';
             if (htmlOption) htmlOption.style.display = 'flex';
+            if (htmlEmbeddedOption) htmlEmbeddedOption.style.display = 'flex';
             if (jsonOption) jsonOption.style.display = 'flex';
             if (printOption) printOption.style.display = 'flex';
         } else {
             // For other notes: show HTML and print options, hide MD and JSON options
             if (markdownOption) markdownOption.style.display = 'none';
             if (htmlOption) htmlOption.style.display = 'flex';
+            if (htmlEmbeddedOption) htmlEmbeddedOption.style.display = 'flex';
             if (jsonOption) jsonOption.style.display = 'none';
             if (printOption) printOption.style.display = 'flex';
         }

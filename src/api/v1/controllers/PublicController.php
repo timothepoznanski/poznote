@@ -46,7 +46,7 @@ class PublicController {
         if (!$note) return;
         
         $type = $note['type'] ?? 'note';
-        $content = $this->getNoteContent($noteId, $type);
+        $content = $this->getNoteContent($noteId, $type, $note['entry'] ?? '');
         $updatedContent = $content;
 
         if (!$this->canEditTaskText($sharedNote['access_mode'] ?? 'full') && array_key_exists('text', $input)) {
@@ -255,13 +255,34 @@ class PublicController {
         return $note;
     }
 
-    private function getNoteContent(int $noteId, string $type): string {
+    private function getNoteContent(int $noteId, string $type, string $databaseContent = ''): string {
         $filename = getEntryFilename($noteId, $type);
+        $fileContent = '';
         if (file_exists($filename) && is_readable($filename)) {
-            return file_get_contents($filename);
+            $fileContent = file_get_contents($filename);
+            if ($fileContent === false) {
+                $fileContent = '';
+            }
         }
-        
-        // Fallback to DB
+
+        if ($type === 'tasklist') {
+            if ($databaseContent === '') {
+                $stmt = $this->con->prepare('SELECT entry FROM entries WHERE id = ?');
+                $stmt->execute([$noteId]);
+                $databaseContent = (string) ($stmt->fetchColumn() ?: '');
+            }
+
+            return resolveTasklistStoredContent($fileContent, $databaseContent);
+        }
+
+        if ($fileContent !== '') {
+            return $fileContent;
+        }
+
+        if ($databaseContent !== '') {
+            return $databaseContent;
+        }
+
         $stmt = $this->con->prepare('SELECT entry FROM entries WHERE id = ?');
         $stmt->execute([$noteId]);
         return $stmt->fetchColumn() ?: '';
