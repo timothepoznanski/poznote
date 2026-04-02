@@ -152,7 +152,10 @@
     .shared-note-item.shared-hierarchy-item {
         margin-left: calc(var(--shared-indent-level, 0) * 12px);
         padding-left: calc(12px + var(--shared-indent-level, 0) * 6px);
-        border-left-width: 3px;
+    }
+
+    .shared-note-item.shared-hierarchy-item::before {
+        display: none;
     }
 
     .shared-note-item.shared-hierarchy-item .note-name-container {
@@ -160,7 +163,7 @@
     }
 
     .shared-note-item.shared-note-child {
-        border-left-width: 3px;
+        border-left: 3px solid rgba(13, 110, 253, 0.22);
     }
 
     .shared-notes-header {
