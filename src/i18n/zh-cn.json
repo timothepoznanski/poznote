@@ -944,7 +944,11 @@
       },
       "html": {
         "title": "导出为 HTML",
-        "description": "下载为保留所有格式的 HTML 文件"
+        "description": "下载包含 HTML 文件和所有附件（图片、文档等）的 ZIP 压缩包"
+      },
+      "html_embedded": {
+        "title": "带嵌入图片的 HTML",
+        "description": "下载包含嵌入图片 (Base64) 的单个 HTML 文件。不包括其他附件。"
       },
       "json": {
         "title": "下载为 JSON",

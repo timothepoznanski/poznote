@@ -942,7 +942,11 @@
       },
       "html": {
         "title": "Exporter en HTML",
-        "description": "Télécharger en fichier HTML avec tout le formatage préservé"
+        "description": "Télécharger une archive ZIP contenant le fichier HTML et toutes les pièces jointes (images, documents, etc.)"
+      },
+      "html_embedded": {
+        "title": "HTML avec images intégrées",
+        "description": "Télécharger un seul fichier HTML avec les images intégrées (Base64). Les autres pièces jointes ne sont pas incluses."
       },
       "json": {
         "title": "Télécharger en JSON",

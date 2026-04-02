@@ -469,6 +469,15 @@
                     </div>
                 </div>
 
+                <!-- HTML Embedded export option -->
+                <div class="export-option export-option-html-embedded" data-action="select-export-type" data-type="html_embedded">
+                    <i class="lucide lucide-file-image"></i>
+                    <div>
+                        <span><?php echo t_h('modals.export.html_embedded.title', [], 'HTML with embedded images'); ?></span>
+                        <p><?php echo t_h('modals.export.html_embedded.description', [], 'Download as a single HTML file with all images embedded (Base64)'); ?></p>
+                    </div>
+                </div>
+
                 <!-- JSON export option (shown only for tasklist notes) -->
                 <div class="export-option export-option-json initially-hidden" data-action="select-export-type" data-type="json">
                     <i class="lucide lucide-file-code"></i>

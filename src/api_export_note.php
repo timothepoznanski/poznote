@@ -47,10 +47,10 @@ if (!$noteId) {
     exit;
 }
 
-if (!in_array($format, ['html', 'markdown', 'json'], true)) {
+if (!in_array($format, ['html', 'markdown', 'json', 'html_embedded'], true)) {
     header('Content-Type: application/json');
     http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'Invalid format. Use "html", "markdown" or "json"']);
+    echo json_encode(['success' => false, 'error' => 'Invalid format. Use "html", "markdown", "json" or "html_embedded"']);
     exit;
 }
 
@@ -178,8 +178,15 @@ try {
         // Generate styled HTML
         $htmlContent = generateStyledHtml($content, $note['heading'], $noteType, $note['tags']);
         
+        // Convert images to base64 if format is html_embedded
+        if ($format === 'html_embedded') {
+            $htmlContent = convertImagesToBase64InHtml($htmlContent);
+            // Also force disposition to attachment if it's not already
+            $disposition = 'attachment';
+        }
+
         // Export as HTML - create ZIP with attachments if downloading
-        if ($disposition === 'attachment') {
+        if ($disposition === 'attachment' && $format === 'html') {
             exportAsHtmlZip($htmlContent, $note, $con);
         } else {
             exportAsHtml($htmlContent, $note['heading'], $disposition);

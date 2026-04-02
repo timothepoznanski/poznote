@@ -488,7 +488,11 @@
       },
       "html": {
         "title": "Export as HTML",
-        "description": "Download as HTML file with all formatting preserved"
+        "description": "Download a ZIP archive containing the HTML file and all attachments (images, documents, etc.)"
+      },
+      "html_embedded": {
+        "title": "HTML with embedded images",
+        "description": "Download as a single HTML file with images embedded (Base64). Other attachments are not included."
       },
       "json": {
         "title": "Download as JSON",

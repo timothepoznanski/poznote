@@ -933,7 +933,11 @@
       },
       "html": {
         "title": "Als HTML exportieren",
-        "description": "Als HTML-Datei mit vollständig erhaltener Formatierung herunterladen"
+        "description": "Laden Sie ein ZIP-Archiv herunter, das die HTML-Datei und alle Anhänge (Bilder, Dokumente usw.) enthält"
+      },
+      "html_embedded": {
+        "title": "HTML mit eingebetteten Bildern",
+        "description": "Als einzelne HTML-Datei mit eingebetteten Bildern (Base64) herunterladen. Andere Anhänge sind nicht enthalten."
       },
       "json": {
         "title": "Als JSON herunterladen",
