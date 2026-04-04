@@ -84,7 +84,7 @@ function buildSearchConditions($search, $tags_search, $folder_filter, $workspace
             // Single word: Optimized search - check heading first (fast with index), then entry (slower)
             // Using CASE to avoid calling search_clean_entry when heading matches
             // Accent-insensitive search using remove_accents function
-            $notes_condition = "(remove_accents(heading) LIKE remove_accents(?) OR (remove_accents(heading) NOT LIKE remove_accents(?) AND remove_accents(search_clean_entry(entry)) LIKE remove_accents(?)))";
+            $notes_condition = "(remove_accents(heading) LIKE remove_accents(?) OR (remove_accents(heading) NOT LIKE remove_accents(?) AND remove_accents(search_clean_entry(entry, type)) LIKE remove_accents(?)))";
             $notes_params[] = '%' . $parsed_terms[0]['value'] . '%';
             $notes_params[] = '%' . $parsed_terms[0]['value'] . '%';
             $notes_params[] = '%' . $parsed_terms[0]['value'] . '%';
@@ -94,7 +94,7 @@ function buildSearchConditions($search, $tags_search, $folder_filter, $workspace
             // Accent-insensitive search using remove_accents function
             $term_conditions = [];
             foreach ($parsed_terms as $term) {
-                $term_conditions[] = "(remove_accents(heading) LIKE remove_accents(?) OR (remove_accents(heading) NOT LIKE remove_accents(?) AND remove_accents(search_clean_entry(entry)) LIKE remove_accents(?)))";
+                $term_conditions[] = "(remove_accents(heading) LIKE remove_accents(?) OR (remove_accents(heading) NOT LIKE remove_accents(?) AND remove_accents(search_clean_entry(entry, type)) LIKE remove_accents(?)))";
                 $notes_params[] = '%' . $term['value'] . '%';
                 $notes_params[] = '%' . $term['value'] . '%';
                 $notes_params[] = '%' . $term['value'] . '%';

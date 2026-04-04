@@ -1456,6 +1456,14 @@ function initializeMarkdownNote(noteId) {
     noteEntry.appendChild(previewDiv);
     noteEntry.contentEditable = false;
 
+    if (typeof window.highlightSearchTerms === 'function') {
+        setTimeout(function () {
+            try {
+                window.highlightSearchTerms(true);
+            } catch (e) {}
+        }, 0);
+    }
+
     // Initialize Mermaid diagrams and Math equations if in preview mode or split mode
     if ((!startInEditMode || startInSplitMode) && !isEmpty) {
         setTimeout(function () {

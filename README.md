@@ -51,7 +51,7 @@ Discover all the features [here](https://poznote.com/index.html#features)
 - [Offline View](#offline-view)
 - [Multiple Instances](#multiple-instances)
 - [MCP Server](#mcp-server)
-- [Chrome Extension](#poznote-extension)
+- [Chrome Extension](#chrome-extension)
 - [API Documentation](#api-documentation)
 - [Tech Stack](#tech-stack)
 
@@ -226,21 +226,27 @@ Rename the default administrator account after the first login.
 
 Poznote supports two primary note formats, each tailored for different workflows.
 
-### HTML Notes
+<details>
+<summary><strong>HTML Notes/strong></summary>
+
 *   **Editor:** Direct WYSIWYG (What You See Is What You Get) editing.
 *   **Storage:** Saved as `.html` files in the user data directory. Since they are standard HTML, they can be opened directly in any web browser.
 *   **Exclusive Features:**
     *   **Excalidraw:** Integrated drawing board for hand-drawn diagrams and sketches.
     *   **Rich Formatting:** Native support for text colors, highlighting, and standard HTML elements.
     *   **Interactive UI:** Direct manipulation of elements in the editor.
+</details>
 
-### Markdown Notes
+<details>
+<summary><strong>Markdown Notes/strong></summary>
+
 *   **Editor:** Markdown syntax editor with real-time preview.
 *   **Storage:** Saved as `.md` files in the user data directory.
 *   **Exclusive Features:**
     *   **Mermaid Diagrams:** Native support for generating diagrams (flowcharts, sequence, etc.) via ` ```mermaid ` code blocks.
     *   **Math Equations:** Robust LaTeX support for mathematical formulas using `$ inline $` and `$$ block $$` syntax.
     *   **Portability:** Standard Markdown format compatible with any external editor or static site generator.
+</details>
 
 ## Change Settings
 

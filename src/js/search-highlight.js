@@ -36,7 +36,7 @@ function isTagsSearchActive() {
 /**
  * Highlight search terms in all note content areas
  */
-function highlightSearchTerms() {
+function highlightSearchTerms(forceReapply) {
     var searchInput = document.getElementById('unified-search') || document.getElementById('unified-search-mobile');
     if (!searchInput) return;
 
@@ -50,7 +50,7 @@ function highlightSearchTerms() {
     // already exist from a prior highlightMatchingTags() call.
     var existingHighlights = document.querySelectorAll('.search-highlight');
 
-    if (termUnchanged && existingHighlights.length > 0) {
+    if (!forceReapply && termUnchanged && existingHighlights.length > 0) {
         updateHighlightsList();
         if (window.searchNavigation) {
             var nav = window.searchNavigation;
@@ -74,7 +74,7 @@ function highlightSearchTerms() {
     // Only highlight note content when in notes or combined mode.
     // In tags-only mode we skip this to avoid briefly highlighting title text.
     if (isNotesSearchActive()) {
-        document.querySelectorAll('.noteentry, .css-title').forEach(function(el) {
+        document.querySelectorAll('.css-title, .noteentry:not([data-note-type="markdown"]), .markdown-editor, .markdown-preview').forEach(function(el) {
             highlightInElement(el, searchWords);
         });
     }
@@ -172,10 +172,57 @@ function highlightInElement(element, searchWords) {
         return;
     }
 
+    function getMarkdownEditorRoot(node) {
+        var current = node;
+        while (current) {
+            if (current.classList && current.classList.contains('markdown-editor')) {
+                return current;
+            }
+            if (current === element) break;
+            current = current.parentNode;
+        }
+
+        if (element.classList && element.classList.contains('markdown-editor')) {
+            return element;
+        }
+
+        return null;
+    }
+
+    function isMarkdownFenceMatch(node, matchStart, matchEnd) {
+        var editorRoot = getMarkdownEditorRoot(node);
+        if (!editorRoot) {
+            return false;
+        }
+
+        try {
+            var beforeRange = document.createRange();
+            beforeRange.setStart(editorRoot, 0);
+            beforeRange.setEnd(node, matchStart);
+            var beforeText = beforeRange.toString();
+
+            var afterRange = document.createRange();
+            afterRange.setStart(node, matchEnd);
+            afterRange.setEnd(editorRoot, editorRoot.childNodes.length);
+            var afterText = afterRange.toString();
+
+            var linePrefix = beforeText.substring(beforeText.lastIndexOf('\n') + 1);
+            var nextLineBreak = afterText.indexOf('\n');
+            var lineSuffix = nextLineBreak === -1 ? afterText : afterText.substring(0, nextLineBreak);
+            var matchedText = node.textContent.substring(matchStart, matchEnd);
+            var fullLine = linePrefix + matchedText + lineSuffix;
+
+            return /^\s*```[a-zA-Z0-9+#*-]+\s*$/.test(fullLine);
+        } catch (e) {
+            return false;
+        }
+    }
+
     // Regular elements: wrap matching text nodes in <span class="search-highlight">
     function processTextNodes(node) {
         if (node.nodeType === 3) { // TEXT_NODE
             var text = node.textContent;
+
             var matches = findMatchPositions(removeAccents(text), searchWords);
             if (!matches.length) return;
 
@@ -184,10 +231,17 @@ function highlightInElement(element, searchWords) {
             for (var i = 0; i < matches.length; i++) {
                 var m = matches[i];
                 if (m.start > lastIndex) frag.appendChild(document.createTextNode(text.substring(lastIndex, m.start)));
-                var span = document.createElement('span');
-                span.className = 'search-highlight';
-                span.textContent = text.substring(m.start, m.end);
-                frag.appendChild(span);
+
+                var isMatchInBadge = isMarkdownFenceMatch(node, m.start, m.end);
+
+                if (isMatchInBadge) {
+                    frag.appendChild(document.createTextNode(text.substring(m.start, m.end)));
+                } else {
+                    var span = document.createElement('span');
+                    span.className = 'search-highlight';
+                    span.textContent = text.substring(m.start, m.end);
+                    frag.appendChild(span);
+                }
                 lastIndex = m.end;
             }
             if (lastIndex < text.length) frag.appendChild(document.createTextNode(text.substring(lastIndex)));
@@ -196,6 +250,7 @@ function highlightInElement(element, searchWords) {
         } else if (node.nodeType === 1 && !node.classList.contains('search-highlight')) { // ELEMENT_NODE
             // Skip hidden containers (e.g. markdown editor in preview mode)
             try { if (window.getComputedStyle(node).display === 'none') return; } catch (e) {}
+
             Array.from(node.childNodes).forEach(processTextNodes);
         }
     }

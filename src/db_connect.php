@@ -117,36 +117,42 @@ try {
         return strtr($text, $accents);
     }, 1);
     
-    // Register custom SQLite function to clean HTML content for search
-    $con->sqliteCreateFunction('search_clean_entry', function($html) {
-        if (empty($html)) {
+    // Register custom SQLite function to clean content for search
+    $con->sqliteCreateFunction('search_clean_entry', function($content, $type = 'note') {
+        if (empty($content)) {
             return '';
         }
         
-        // Remove individual code block language tags from class and data-language attributes
-        // This prevents searching for "shell" or "java" matching the language tag but not the content
-        $html = preg_replace('/class="[^"]*language-([^"\s>]+)[^"]*"/i', '', $html);
-        $html = preg_replace('/data-language="[^"]*"/i', '', $html);
+        if ($type === 'markdown') {
+            // Remove code block markers with language tags (e.g., ```bash)
+            // This prevents language badges from showing up in search results
+            $content = preg_replace('/^```[a-zA-Z0-9+#*-]+\s*$/m', '```', $content);
+        } else {
+            // HTML Note: Remove individual code block language tags from class and data-language attributes
+            // This prevents searching for "shell" or "java" matching the language tag but not the content
+            $content = preg_replace('/class="[^"]*language-([^"\s>]+)[^"]*"/i', '', $content);
+            $content = preg_replace('/data-language="[^"]*"/i', '', $content);
+        }
 
         // Remove Excalidraw containers with their data-excalidraw attributes and base64 images
-        $html = preg_replace(
+        $content = preg_replace(
             '/<div[^>]*class="excalidraw-container"[^>]*>.*?<\/div>/s',
             '[Excalidraw diagram]',
-            $html
+            $content
         );
         
         // Remove any remaining base64 image data
-        $html = preg_replace('/data:image\/[^;]+;base64,[A-Za-z0-9+\/=]+/', '[image]', $html);
+        $content = preg_replace('/data:image\/[^;]+;base64,[A-Za-z0-9+\/=]+/', '[image]', $content);
         
         // Strip remaining HTML tags but keep the text content
-        $text = strip_tags($html);
+        $text = strip_tags($content);
         
         // Clean up extra whitespace
         $text = preg_replace('/\s+/', ' ', $text);
         $text = trim($text);
         
         return $text;
-    }, 1);
+    }, 2);
     
     // Create entries table
     $con->exec('CREATE TABLE IF NOT EXISTS entries (
