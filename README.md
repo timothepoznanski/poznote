@@ -286,7 +286,7 @@ docker compose up -d
 Poznote supports multiple authentication methods including local accounts and external identity providers.
 
 <details>
-<summary><strong>Traditional Authentication</strong></summary>
+<summary><strong>Local Accounts Authentication</strong></summary>
 <br>
 
 Poznote authenticates users against their profile using a username or email address and a password.
@@ -362,22 +362,6 @@ POZNOTE_OIDC_AUTO_CREATE_USERS=true
 `POZNOTE_OIDC_ALLOWED_USERS` remains available for backward compatibility, but group-based access is recommended.
 
 If auto-provisioning is enabled, Poznote generates a username from the OIDC claims (`preferred_username`, `nickname`, email local part, `name`, then `sub`) and stores the OIDC subject on the created profile.
-
-</details>
-
-<details>
-<summary><strong>Password resolution order</strong></summary>
-<br>
-
-When a user signs in, Poznote checks passwords in this order:
-
-1. A custom bcrypt password hash stored in the master database for that user.
-2. Fallback values from `.env`:
-  - `POZNOTE_PASSWORD` for the administrator profile
-  - `POZNOTE_PASSWORD_USER` for standard users
-  - `POZNOTE_PASSWORD_{USERNAME}` for per-user overrides
-
-This means `.env` acts as the default or seed credential source, while a password changed from the interface takes priority afterward.
 
 </details>
 
