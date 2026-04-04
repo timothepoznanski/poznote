@@ -492,6 +492,45 @@ data/
     └── ...
 ```
 
+## Git Synchronization
+
+Poznote supports automatic and manual synchronization with **GitHub** or **Forgejo**. Each user configures their own repository independently. There is no shared global repository.
+
+<details>
+<summary><strong>How to configure Git Sync</strong></summary>
+<br>
+
+**Step 1 — Enable the feature (admin, in Settings > Advanced Settings)**
+
+Toggle **Git Sync** to enabled in the **Advanced Settings** section of the Settings page. This will reveal the **Git Sync** menu in the sidebar for all users.
+
+---
+
+**Step 2 — Each user configures their own repo (Settings > Git Sync)**
+
+| Field | Description |
+|---|---|
+| Provider | `GitHub` or `Forgejo` |
+| API Base URL | GitHub: auto-filled (read-only). Forgejo: your instance URL, e.g. `https://forgejo.example.com/api/v1` |
+| Access Token | GitHub PAT (`ghp_...`) or Forgejo token (Settings > Applications) |
+| Repository | `owner/repo` format |
+| Branch | Default: `main` |
+| Author Name / Email | Used for commit metadata |
+
+> 🔒 Access tokens are encrypted at rest using AES-256-GCM. Set `POZNOTE_APP_SECRET` in your `.env` (generated with `openssl rand -hex 32`) to ensure the encryption key survives container rebuilds. If not set, a key is auto-generated and stored in `data/.app_secret`.
+
+---
+
+**Automatic sync**
+
+When enabled by the user, Poznote will automatically:
+- **Pull** on login
+- **Push** on every note create, update, or delete
+
+Manual push/pull is also available from the **Sync Status** page (cloud icon in the header).
+
+</details>
+
 ## Backup / Export
 
 Poznote includes built-in Backup / Export functionality accessible through Settings.
@@ -602,44 +641,6 @@ bash backup-poznote.sh '<poznote_url>' '<admin_username>' '<admin_password>' '<t
 
 </details>
 
-## Git Synchronization
-
-Poznote supports automatic and manual synchronization with **GitHub** or **Forgejo**. Each user configures their own repository independently. There is no shared global repository.
-
-<details>
-<summary><strong>How to configure Git Sync</strong></summary>
-<br>
-
-**Step 1 — Enable the feature (admin, in Settings > Advanced Settings)**
-
-Toggle **Git Sync** to enabled in the **Advanced Settings** section of the Settings page. This will reveal the **Git Sync** menu in the sidebar for all users.
-
----
-
-**Step 2 — Each user configures their own repo (Settings > Git Sync)**
-
-| Field | Description |
-|---|---|
-| Provider | `GitHub` or `Forgejo` |
-| API Base URL | GitHub: auto-filled (read-only). Forgejo: your instance URL, e.g. `https://forgejo.example.com/api/v1` |
-| Access Token | GitHub PAT (`ghp_...`) or Forgejo token (Settings > Applications) |
-| Repository | `owner/repo` format |
-| Branch | Default: `main` |
-| Author Name / Email | Used for commit metadata |
-
-> 🔒 Access tokens are encrypted at rest using AES-256-GCM. Set `POZNOTE_APP_SECRET` in your `.env` (generated with `openssl rand -hex 32`) to ensure the encryption key survives container rebuilds. If not set, a key is auto-generated and stored in `data/.app_secret`.
-
----
-
-**Automatic sync**
-
-When enabled by the user, Poznote will automatically:
-- **Pull** on login
-- **Push** on every note create, update, or delete
-
-Manual push/pull is also available from the **Sync Status** page (cloud icon in the header).
-
-</details>
 
 ## Restore / Import
 
