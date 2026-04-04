@@ -39,11 +39,11 @@ Discover all the features [here](https://poznote.com/index.html#features)
 
 - [Install](#install)
 - [Access](#access)
-- [Note types](#note-types)
 - [Change Settings](#change-settings)
-- [Authentication](#authentication)
-- [Personalization](#personalization)
 - [Update application](#update-application)
+- [Authentication](#authentication)
+- [Note types](#note-types)
+- [Personalization](#personalization)
 - [Multi-users](#multi-users)
 - [Git Synchronization](#git-synchronization)
 - [Backup / Export](#backup--export)
@@ -225,59 +225,6 @@ After installation, access Poznote in your web browser:
 
 Rename the default administrator account after the first login.
 
-## Note types
-
-Poznote supports two primary note formats, each tailored for different workflows.
-
-<details>
-<summary><strong>HTML Notes</strong></summary>
-&nbsp;
-
-*   **Editor:** Direct WYSIWYG (What You See Is What You Get) editing.
-*   **Storage:** Saved as `.html` files in the user data directory. Since they are standard HTML, they can be opened directly in any web browser.
-*   **Exclusive Features:**
-    *   **Excalidraw:** Integrated drawing board for hand-drawn diagrams and sketches.
-    *   **Rich Formatting:** Native support for text colors, highlighting, and standard HTML elements.
-    *   **Interactive UI:** Direct manipulation of elements in the editor.
-</details>
-
-<details>
-<summary><strong>Markdown Notes</strong></summary>
-&nbsp;
-
-*   **Editor:** Markdown syntax editor with real-time preview.
-*   **Storage:** Saved as `.md` files in the user data directory.
-*   **Exclusive Features:**
-    *   **Mermaid Diagrams:</strong> Native support for generating diagrams (flowcharts, sequence, etc.) via ` ```mermaid ` code blocks.
-    *   **Math Equations:** Robust LaTeX support for mathematical formulas using `$ inline $` and `$$ block $$` syntax.
-    *   **Portability:** Standard Markdown format compatible with any external editor or static site generator.
-</details>
-
-<details>
-<summary><strong>Task Lists</strong></summary>
-&nbsp;
-
-*   **Usage:** Manage tasks and projects with interactive checklists.
-*   **Workflow:** Track progress with checkboxes that can be toggled directly in the editor or the notes list.
-*   **Public Collaboration:** Task lists can be shared via a public URL. If edit permissions are granted, external collaborators can check items off the list without needing a Poznote account.
-</details>
-
-<details>
-<summary><strong>Shortcuts</strong></summary>
-&nbsp;
-
-*   **Functionality:** Create a reference to an existing note in another location.
-*   **Use Case:** Allows a note to be referenced in two different places simultaneously. For example, a note can live in a classification folder while its shortcut appears on a Kanban board for active tracking.
-</details>
-
-<details>
-<summary><strong>Templates</strong></summary>
-&nbsp;
-
-*   **Functionality:** Create pre-filled notes to standardize your documentation.
-*   **Usage:** Notes marked as templates can be duplicated to create new notes with the same structure, tags, and content, saving time on repetitive tasks.
-</details>
-
 ## Change Settings
 
 Most settings can be modified directly in the application through the settings page. Some system settings can only be changed in the `.env` file and require a container restart.
@@ -308,6 +255,44 @@ Save the file and restart Poznote to apply changes:
 docker compose up -d
 ```
 
+## Update application
+
+Navigate to your Poznote directory:
+```bash
+cd poznote
+```
+
+Stop the running container before updating:
+```bash
+docker compose down
+```
+
+Download the latest Docker Compose configuration:
+```bash
+curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
+```
+
+Download the latest .env.template:
+```bash
+curl -o .env.template https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.template
+```
+
+Review `.env.template` and add any new variables to your `.env` file if needed:
+```bash
+sdiff .env .env.template
+```
+
+Download the latest Poznote Webserver and Poznote MCP images:
+```bash
+docker compose pull
+```
+
+Start the updated container:
+```bash
+docker compose up -d
+```
+
+Your data is preserved in the `./data` directory and will not be affected by the update.
 
 ## Authentication
 
@@ -416,6 +401,59 @@ If auto-provisioning is enabled, Poznote generates a username from the OIDC clai
 
 </details>
 
+## Note types
+
+Poznote supports two primary note formats, each tailored for different workflows.
+
+<details>
+<summary><strong>HTML Notes</strong></summary>
+&nbsp;
+
+*   **Editor:** Direct WYSIWYG (What You See Is What You Get) editing.
+*   **Storage:** Saved as `.html` files in the user data directory. Since they are standard HTML, they can be opened directly in any web browser.
+*   **Exclusive Features:**
+    *   **Excalidraw:** Integrated drawing board for hand-drawn diagrams and sketches.
+    *   **Rich Formatting:** Native support for text colors, highlighting, and standard HTML elements.
+    *   **Interactive UI:** Direct manipulation of elements in the editor.
+</details>
+
+<details>
+<summary><strong>Markdown Notes</strong></summary>
+&nbsp;
+
+*   **Editor:** Markdown syntax editor with real-time preview.
+*   **Storage:** Saved as `.md` files in the user data directory.
+*   **Exclusive Features:**
+    *   **Mermaid Diagrams:</strong> Native support for generating diagrams (flowcharts, sequence, etc.) via ` ```mermaid ` code blocks.
+    *   **Math Equations:** Robust LaTeX support for mathematical formulas using `$ inline $` and `$$ block $$` syntax.
+    *   **Portability:** Standard Markdown format compatible with any external editor or static site generator.
+</details>
+
+<details>
+<summary><strong>Task Lists</strong></summary>
+&nbsp;
+
+*   **Usage:** Manage tasks and projects with interactive checklists.
+*   **Workflow:** Track progress with checkboxes that can be toggled directly in the editor or the notes list.
+*   **Public Collaboration:** Task lists can be shared via a public URL. If edit permissions are granted, external collaborators can check items off the list without needing a Poznote account.
+</details>
+
+<details>
+<summary><strong>Shortcuts</strong></summary>
+&nbsp;
+
+*   **Functionality:** Create a reference to an existing note in another location.
+*   **Use Case:** Allows a note to be referenced in two different places simultaneously. For example, a note can live in a classification folder while its shortcut appears on a Kanban board for active tracking.
+</details>
+
+<details>
+<summary><strong>Templates</strong></summary>
+&nbsp;
+
+*   **Functionality:** Create pre-filled notes to standardize your documentation.
+*   **Usage:** Notes marked as templates can be duplicated to create new notes with the same structure, tags, and content, saving time on repetitive tasks.
+</details>
+
 ## Personalization
 
 Poznote offers several built-in personalization options directly from the application, without requiring any configuration file changes.
@@ -477,49 +515,6 @@ Notes:
 - The stylesheet is injected near the end of `<head>`, so it can override the default application styles.
 
 </details>
-
-
-
-
-
-## Update application
-
-Navigate to your Poznote directory:
-```bash
-cd poznote
-```
-
-Stop the running container before updating:
-```bash
-docker compose down
-```
-
-Download the latest Docker Compose configuration:
-```bash
-curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
-```
-
-Download the latest .env.template:
-```bash
-curl -o .env.template https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.template
-```
-
-Review `.env.template` and add any new variables to your `.env` file if needed:
-```bash
-sdiff .env .env.template
-```
-
-Download the latest Poznote Webserver and Poznote MCP images:
-```bash
-docker compose pull
-```
-
-Start the updated container:
-```bash
-docker compose up -d
-```
-
-Your data is preserved in the `./data` directory and will not be affected by the update.
 
 ## Multi-users
 
