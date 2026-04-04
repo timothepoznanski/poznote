@@ -779,13 +779,13 @@ updated: 2024-01-20 15:45:00
 
 Administrators have access to a suite of maintenance and management tools under **Settings > Admin Tools**:
 
-- **User Management** Create, manage, and delete user profiles, or reset passwords.
-- **Git Sync Control** Globally enable or disable Git synchronization features.
-- **Import Limits** Configure the maximum number of files allowed for individual or ZIP imports.
-- **Custom CSS path** Define a global custom stylesheet to override the application's appearance.
-- **Rebuild Master Database** Reconstruct the user index from data folders in case of system corruption or database loss.
-- **Base64 Image Converter** Convert inline Base64 encoded images within notes to proper file attachments.
-- **Orphan attachments scanner** Scan and clean up storage by identifying attachment files that are no longer referenced in any notes.
+- **User Management**: Create, manage, and delete user profiles, or reset passwords.
+- **Git Sync Control**: Globally enable or disable Git synchronization features.
+- **Import Limits**: Configure the maximum number of files allowed for individual or ZIP imports.
+- **Custom CSS path**: Define a global custom stylesheet to override the application's appearance.
+- **Rebuild Master Database**: Reconstruct the user index from data folders in case of system corruption or database loss.
+- **Base64 Image Converter**: Convert inline Base64 encoded images within notes to proper file attachments.
+- **Orphan attachments scanner**: Scan and clean up storage by identifying attachment files that are no longer referenced in any notes.
 
 ## PWA
 
