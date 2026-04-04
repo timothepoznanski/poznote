@@ -418,20 +418,34 @@ If auto-provisioning is enabled, Poznote generates a username from the OIDC clai
 
 ## Personalization
 
-Several parameters can be adjusted directly from the application to personalize your experience. Under **Settings > Display**, you can configure:
+Poznote offers several built-in personalization options directly from the application, without requiring any configuration file changes.
 
-- **Theme:** — switch between light and dark mode
-- **Font size:** Adjust text size for notes, sidebar, and code blocks
-- **Note sorting:** Choose how notes are ordered in the list
-- **Task list insert order:** Control where new tasks are inserted
-- **Show creation date:** Toggle the creation date badge on notes
-- **Show folder note counts:** Display the number of notes in each folder
-- **Show notes after folders:** List notes without folders below the folder list
-- **Index icon scaling:** Resize icons in the note index
-- **Note content width:** Control the max width of the note editor area
-- **Code block word wrap:** Enable or disable word wrap in code blocks
+<details>
+<summary><strong>Display Settings</strong></summary>
+<br>
 
-You can also set a **background image per workspace:** Upload a custom image and adjust its opacity from the Display settings to give each workspace its own visual identity.
+Under **Settings > Display**, you can configure:
+
+- **Theme:** switch between light and dark mode
+- **Font size:** adjust text size for notes, sidebar, and code blocks
+- **Note sorting:** choose how notes are ordered in the list
+- **Task list insert order:** control where new tasks are inserted
+- **Show creation date:** toggle the creation date badge on notes
+- **Show folder note counts:** display the number of notes in each folder
+- **Show notes after folders:** list notes without folders below the folder list
+- **Index icon scaling:** resize icons in the note index
+- **Note content width:** control the max width of the note editor area
+- **Code block word wrap:** enable or disable word wrap in code blocks
+
+</details>
+
+<details>
+<summary><strong>Workspace Background Image</strong></summary>
+<br>
+
+You can set a background image per workspace — upload a custom image and adjust its opacity from the Display settings to give each workspace its own visual identity.
+
+</details>
 
 <details>
 <summary><strong>Element Visibility</strong></summary>
