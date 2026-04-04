@@ -291,6 +291,38 @@ Poznote supports multiple authentication methods including local accounts and ex
 
 Poznote authenticates users against their profile using a username or email address and a password.
 
+
+#### Default account
+
+On a fresh installation, Poznote creates one active administrator profile:
+
+- Username: `admin_change_me`
+- Password: `POZNOTE_PASSWORD`
+
+Rename this account after the first login.
+
+#### Password management
+
+- Users can change their own password from **Settings > Change Password**.
+- Administrators can set a custom password for any user or reset that user back to their `.env` password from **Settings > User Management**.
+- The **Remember me** option keeps the session for 30 days.
+- Changing a password invalidates existing remember-me cookies for that user.
+
+#### Configuration
+
+- **Admin password**: Set `POZNOTE_PASSWORD` in your `.env` file.
+- **Default standard-user password**: Set `POZNOTE_PASSWORD_USER` in your `.env` file.
+- **User-specific passwords**: Set individual defaults using `POZNOTE_PASSWORD_{USERNAME}` in your `.env`.
+
+Example:
+
+```bash
+POZNOTE_PASSWORD=admin-secret
+POZNOTE_PASSWORD_USER=user-secret
+POZNOTE_PASSWORD_ALICE=alice-secret
+POZNOTE_PASSWORD_BOB=bob-secret
+```
+
 #### Password resolution order
 
 When a user signs in, Poznote checks passwords in this order:
@@ -302,15 +334,6 @@ When a user signs in, Poznote checks passwords in this order:
   - `POZNOTE_PASSWORD_{USERNAME}` for per-user overrides
 
 This means `.env` acts as the default or seed credential source, while a password changed from the interface takes priority afterward.
-
-#### Default account
-
-On a fresh installation, Poznote creates one active administrator profile:
-
-- Username: `admin_change_me`
-- Password: `POZNOTE_PASSWORD`
-
-Rename this account after the first login.
 
 </details>
 
