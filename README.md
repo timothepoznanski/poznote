@@ -48,6 +48,7 @@ Discover all the features [here](https://poznote.com/index.html#features)
 - [Git Synchronization](#git-synchronization)
 - [Backup / Export](#backup--export)
 - [Restore / Import](#restore--import)
+- [Public Sharing](#public-sharing)
 - [Admin Tools](#admin-tools)
 - [PWA](#pwa)
 - [Offline View](#offline-view)
@@ -250,6 +251,31 @@ Poznote supports two primary note formats, each tailored for different workflows
     *   **Mermaid Diagrams:</strong> Native support for generating diagrams (flowcharts, sequence, etc.) via ` ```mermaid ` code blocks.
     *   **Math Equations:** Robust LaTeX support for mathematical formulas using `$ inline $` and `$$ block $$` syntax.
     *   **Portability:** Standard Markdown format compatible with any external editor or static site generator.
+</details>
+
+<details>
+<summary><strong>Task Lists</strong></summary>
+&nbsp;
+
+*   **Usage:** Manage tasks and projects with interactive checklists.
+*   **Workflow:** Track progress with checkboxes that can be toggled directly in the editor or the notes list.
+*   **Public Collaboration:** Task lists can be shared via a public URL. If edit permissions are granted, external collaborators can check items off the list without needing a Poznote account.
+</details>
+
+<details>
+<summary><strong>Shortcuts</strong></summary>
+&nbsp;
+
+*   **Functionality:** Create a reference to an existing note in another location.
+*   **Use Case:** Allows a note to be referenced in two different places simultaneously. For example, a note can live in a classification folder while its shortcut appears on a Kanban board for active tracking.
+</details>
+
+<details>
+<summary><strong>Templates</strong></summary>
+&nbsp;
+
+*   **Functionality:** Create pre-filled notes to standardize your documentation.
+*   **Usage:** Notes marked as templates can be duplicated to create new notes with the same structure, tags, and content, saving time on repetitive tasks.
 </details>
 
 ## Change Settings
@@ -777,6 +803,17 @@ updated: 2024-01-20 15:45:00
 ```
 
 </details>
+
+## Public Sharing
+
+Poznote allows you to share individual notes or entire folders with anyone. 
+
+- **Granular Permissions:**
+  - **Standard Notes:** Share in **Read-only** mode with anyone via a public link.
+  - **Task Lists:** Enhanced control with three permission levels: **Read-only**, **Just checkable** (allows checking items without full edit rights), or **Fully modifiable**.
+- **Access Control:** 
+  - **Visibility:** Limit sharing to the public (anyone with the link) or restrict access to registered users of your Poznote instance.
+  - **Password Protection:** Secure your shared content by adding a mandatory password to the public URL for an extra layer of security.
 
 ## Admin Tools
 
