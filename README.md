@@ -381,7 +381,7 @@ Notes:
 - The stylesheet is injected near the end of `<head>`, so it can override the default application styles.
 
 </details>
-<br>
+
 <details>
 <summary><strong>Element Visibility</strong></summary>
 <br>
