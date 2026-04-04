@@ -1,3 +1,57 @@
+// ---------------------------------------------------------------------------
+// Credential encryption using AES-GCM-256 via the Web Crypto API.
+// A random 256-bit key is generated once per installation and stored as raw
+// bytes in chrome.storage.local under the '_ek' key. The password is never
+// written to storage in plain text — only as a { data, iv } ciphertext pair.
+// ---------------------------------------------------------------------------
+
+async function getOrCreateEncryptionKey() {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get(['_ek'], async (result) => {
+      try {
+        if (result._ek) {
+          const rawKey = new Uint8Array(result._ek);
+          const key = await crypto.subtle.importKey(
+            'raw', rawKey, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']
+          );
+          resolve(key);
+        } else {
+          const key = await crypto.subtle.generateKey(
+            { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']
+          );
+          const rawKey = await crypto.subtle.exportKey('raw', key);
+          chrome.storage.local.set({ _ek: Array.from(new Uint8Array(rawKey)) }, () => {
+            resolve(key);
+          });
+        }
+      } catch (e) {
+        reject(e);
+      }
+    });
+  });
+}
+
+async function encryptValue(value) {
+  const key = await getOrCreateEncryptionKey();
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const encoded = new TextEncoder().encode(value);
+  const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoded);
+  return {
+    data: btoa(String.fromCharCode(...new Uint8Array(ciphertext))),
+    iv: btoa(String.fromCharCode(...iv))
+  };
+}
+
+async function decryptValue(encrypted) {
+  const key = await getOrCreateEncryptionKey();
+  const iv = new Uint8Array(atob(encrypted.iv).split('').map(c => c.charCodeAt(0)));
+  const data = new Uint8Array(atob(encrypted.data).split('').map(c => c.charCodeAt(0)));
+  const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data);
+  return new TextDecoder().decode(decrypted);
+}
+
+// ---------------------------------------------------------------------------
+
 document.addEventListener('DOMContentLoaded', () => {
   // DOM elements
   const status = document.getElementById('status');
@@ -5,7 +59,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const folderSelect = document.getElementById('folderSelect');
   const fetchWorkspacesBtn = document.getElementById('fetchWorkspaces');
   const loadFoldersBtn = document.getElementById('loadFolders');
-  
+
+  // Collapsible config panel toggle
+  const configToggle = document.getElementById('configToggle');
+  const configPanel = document.getElementById('configPanel');
+  configToggle.addEventListener('click', () => {
+    const isOpen = configPanel.classList.toggle('open');
+    configToggle.classList.toggle('open', isOpen);
+  });
+
   // Configuration object stored in memory
   let config = {};
 
@@ -69,14 +131,49 @@ document.addEventListener('DOMContentLoaded', () => {
    * Load saved configuration from Chrome storage
    * Populates form fields and select elements with saved values
    */
-  chrome.storage.local.get(['poznoteConfig'], (result) => {
+  function enableActionButtons() {
+    document.getElementById('saveNote').disabled = false;
+    document.getElementById('saveScreenshot').disabled = false;
+  }
+
+  chrome.storage.local.get(['poznoteConfig', '_pendingForm'], async (result) => {
+    // Restore form fields saved just before a permission dialog (popup may close/reopen)
+    const pending = result._pendingForm;
+    if (pending) {
+      chrome.storage.local.remove('_pendingForm');
+      document.getElementById('appUrl').value = pending.appUrl || '';
+      document.getElementById('username').value = pending.username || '';
+      document.getElementById('password').value = pending.password || '';
+    }
+
     if (result.poznoteConfig) {
       config = result.poznoteConfig;
-      
-      // Fill form fields
-      document.getElementById('appUrl').value = config.appUrl || '';
-      document.getElementById('username').value = config.username || '';
-      document.getElementById('password').value = config.password || '';
+
+      if (!pending) {
+        // Fill form fields from saved config
+        document.getElementById('appUrl').value = config.appUrl || '';
+        document.getElementById('username').value = config.username || '';
+
+        // Decrypt password (or migrate legacy plain-text password)
+        let decryptedPassword = '';
+        if (config.password) {
+          if (typeof config.password === 'object' && config.password.data) {
+            try {
+              decryptedPassword = await decryptValue(config.password);
+            } catch (e) {
+              console.error('Failed to decrypt stored password:', e);
+            }
+          } else if (typeof config.password === 'string') {
+            // Legacy plain-text — will be encrypted on next Save Configuration
+            decryptedPassword = config.password;
+          }
+        }
+        document.getElementById('password').value = decryptedPassword;
+        config.password = decryptedPassword; // keep plaintext in memory only
+      } else {
+        // Use the pending form's plaintext password for this session
+        config.password = pending.password || '';
+      }
 
       // Restore workspace selection
       if (config.workspace) {
@@ -103,6 +200,11 @@ document.addEventListener('DOMContentLoaded', () => {
           folderSelect.add(opt);
         }
         folderSelect.value = val;
+      }
+
+      // Enable action buttons only if a valid config with userId is already saved
+      if (config.appUrl && config.username && config.password && config.userId) {
+        enableActionButtons();
       }
     }
   });
@@ -148,8 +250,14 @@ document.addEventListener('DOMContentLoaded', () => {
     showStatus('⏳ Fetching workspaces...', 'loading');
 
     try {
+      // Save form state before permission dialog (popup may close and reopen)
+      await new Promise(resolve => chrome.storage.local.set({
+        _pendingForm: { appUrl: tempConfig.appUrl, username: tempConfig.username, password: tempConfig.password }
+      }, resolve));
+
       // Request permission for the Poznote server URL
       const permissionGranted = await requestHostPermission(tempConfig.appUrl);
+      chrome.storage.local.remove('_pendingForm');
       if (!permissionGranted) {
         showStatus('❌ Permission denied. Please allow access to your Poznote server.', 'error');
         return;
@@ -231,17 +339,23 @@ document.addEventListener('DOMContentLoaded', () => {
         ? (selectedOption.dataset.path || selectedOption.text.replace(/^📁 /, ''))
         : '';
 
+      // Encrypt password before writing to storage
+      const encryptedPassword = await encryptValue(formConfig.password);
+
       config = {
         appUrl: formConfig.appUrl,
         username: formConfig.username,
-        password: formConfig.password,
+        password: encryptedPassword, // { data, iv } — never plain text in storage
         workspace: workspaceSelect.value,
         folder: folderPath,
         folder_id: folderSelect.value
       };
 
-      // Save to Chrome storage immediately
+      // Save to Chrome storage (encrypted)
       await chrome.storage.local.set({ poznoteConfig: config });
+
+      // Keep plain-text password in memory for this session
+      config.password = formConfig.password;
 
       // Request permission for the Poznote server URL
       showStatus('⏳ Requesting server access permission...', 'loading');
@@ -257,11 +371,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const userId = await resolveProfileId(formConfig);
       config.userId = userId;
 
-      // Update configuration with userId
-      await chrome.storage.local.set({ poznoteConfig: config });
+      // Update configuration with userId — re-use the same encrypted password object
+      const configToStore = { ...config, password: encryptedPassword };
+      await chrome.storage.local.set({ poznoteConfig: configToStore });
+      // config.password stays as plaintext in memory
 
       showStatus('✅ Configuration saved!', 'success');
       document.getElementById('appUrl').value = config.appUrl;
+      enableActionButtons();
     } catch (e) {
       showStatus('❌ Error: ' + e.message, 'error');
     }
@@ -281,8 +398,14 @@ document.addEventListener('DOMContentLoaded', () => {
     showStatus('⏳ Loading folders...', 'loading');
 
     try {
+      // Save form state before permission dialog (popup may close and reopen)
+      await new Promise(resolve => chrome.storage.local.set({
+        _pendingForm: { appUrl: formConfig.appUrl, username: formConfig.username, password: formConfig.password }
+      }, resolve));
+
       // Request permission for the Poznote server URL
       const permissionGranted = await requestHostPermission(formConfig.appUrl);
+      chrome.storage.local.remove('_pendingForm');
       if (!permissionGranted) {
         showStatus('❌ Permission denied. Please allow access to your Poznote server.', 'error');
         return;
@@ -420,7 +543,8 @@ document.addEventListener('DOMContentLoaded', () => {
         showStatus('📸 Capturing screenshot...', 'loading');
         try {
           const screenshot = await chrome.tabs.captureVisibleTab(null, { format: 'png' });
-          noteContent = `<p><a href="${pageUrl}" target="_blank">${pageUrl}</a></p><br><p><img src="${screenshot}" alt="Page Screenshot" style="max-width: 100%; height: auto; border: 1px solid #ddd;" /></p>`;
+          noteContent = `<p><a href="${pageUrl}" target="_blank">${pageUrl}</a></p>`;
+          noteContent += `<br><p><img src="${screenshot}" alt="Page Screenshot" style="max-width: 100%; height: auto;" /></p>`;
           contentDescription = 'Screenshot';
         } catch (error) {
           showStatus('❌ Screenshot failed: ' + error.message, 'error');

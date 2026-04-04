@@ -77,7 +77,7 @@ class NotesController {
             // Add search filter if provided
             if ($search !== null && $search !== '') {
                 $sql .= " AND (remove_accents(heading) LIKE remove_accents(?) 
-                         OR remove_accents(search_clean_entry(entry)) LIKE remove_accents(?))";
+                         OR remove_accents(search_clean_entry(entry, type)) LIKE remove_accents(?))";
                 $params[] = '%' . $search . '%';
                 $params[] = '%' . $search . '%';
             }
@@ -1938,11 +1938,11 @@ class NotesController {
         try {
             // Build search query using accent-insensitive search
             $sql = "SELECT id, heading, tags, folder, folder_id, workspace, updated, created, 
-                           SUBSTR(search_clean_entry(entry), 1, 300) as excerpt
+                                                     SUBSTR(search_clean_entry(entry, type), 1, 300) as excerpt
                     FROM entries 
                     WHERE trash = 0 
                     AND (remove_accents(heading) LIKE remove_accents(?) 
-                         OR remove_accents(search_clean_entry(entry)) LIKE remove_accents(?))";
+                                                 OR remove_accents(search_clean_entry(entry, type)) LIKE remove_accents(?))";
             
             $params = ['%' . $query . '%', '%' . $query . '%'];
             

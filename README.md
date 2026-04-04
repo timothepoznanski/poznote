@@ -39,19 +39,22 @@ Discover all the features [here](https://poznote.com/index.html#features)
 
 - [Install](#install)
 - [Access](#access)
-- [Note Types Comparison](#note-types-comparison)
 - [Change Settings](#change-settings)
-- [Authentication](#authentication)
 - [Update application](#update-application)
+- [Authentication](#authentication)
+- [Note types](#note-types)
+- [Personalization](#personalization)
 - [Multi-users](#multi-users)
-- [Backup / Export](#backup--export)
 - [Git Synchronization](#git-synchronization)
+- [Backup / Export](#backup--export)
 - [Restore / Import](#restore--import)
+- [Public Sharing](#public-sharing)
+- [Admin Tools](#admin-tools)
 - [PWA](#pwa)
 - [Offline View](#offline-view)
 - [Multiple Instances](#multiple-instances)
 - [MCP Server](#mcp-server)
-- [Chrome Extension](#poznote-extension)
+- [Chrome Extension](#chrome-extension)
 - [API Documentation](#api-documentation)
 - [Tech Stack](#tech-stack)
 
@@ -222,26 +225,6 @@ After installation, access Poznote in your web browser:
 
 Rename the default administrator account after the first login.
 
-## Note Types Comparison
-
-Poznote supports two primary note formats, each tailored for different workflows.
-
-### HTML Notes
-*   **Editor:** Direct WYSIWYG (What You See Is What You Get) editing.
-*   **Storage:** Saved as `.html` files in the user data directory. Since they are standard HTML, they can be opened directly in any web browser.
-*   **Exclusive Features:**
-    *   **Excalidraw:** Integrated drawing board for hand-drawn diagrams and sketches.
-    *   **Rich Formatting:** Native support for text colors, highlighting, and standard HTML elements.
-    *   **Interactive UI:** Direct manipulation of elements in the editor.
-
-### Markdown Notes
-*   **Editor:** Markdown syntax editor with real-time preview.
-*   **Storage:** Saved as `.md` files in the user data directory.
-*   **Exclusive Features:**
-    *   **Mermaid Diagrams:** Native support for generating diagrams (flowcharts, sequence, etc.) via ` ```mermaid ` code blocks.
-    *   **Math Equations:** Robust LaTeX support for mathematical formulas using `$ inline $` and `$$ block $$` syntax.
-    *   **Portability:** Standard Markdown format compatible with any external editor or static site generator.
-
 ## Change Settings
 
 Most settings can be modified directly in the application through the settings page. Some system settings can only be changed in the `.env` file and require a container restart.
@@ -272,26 +255,55 @@ Save the file and restart Poznote to apply changes:
 docker compose up -d
 ```
 
+## Update application
+
+Navigate to your Poznote directory:
+```bash
+cd poznote
+```
+
+Stop the running container before updating:
+```bash
+docker compose down
+```
+
+Download the latest Docker Compose configuration:
+```bash
+curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
+```
+
+Download the latest .env.template:
+```bash
+curl -o .env.template https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.template
+```
+
+Review `.env.template` and add any new variables to your `.env` file if needed:
+```bash
+sdiff .env .env.template
+```
+
+Download the latest Poznote Webserver and Poznote MCP images:
+```bash
+docker compose pull
+```
+
+Start the updated container:
+```bash
+docker compose up -d
+```
+
+Your data is preserved in the `./data` directory and will not be affected by the update.
 
 ## Authentication
 
+Poznote supports multiple authentication methods including local accounts and external identity providers.
+
 <details>
-<summary><strong>Traditional Authentication</strong></summary>
+<summary><strong>Local Accounts Authentication</strong></summary>
 <br>
 
 Poznote authenticates users against their profile using a username or email address and a password.
 
-#### Password resolution order
-
-When a user signs in, Poznote checks passwords in this order:
-
-1. A custom bcrypt password hash stored in the master database for that user.
-2. Fallback values from `.env`:
-  - `POZNOTE_PASSWORD` for the administrator profile
-  - `POZNOTE_PASSWORD_USER` for standard users
-  - `POZNOTE_PASSWORD_{USERNAME}` for per-user overrides
-
-This means `.env` acts as the default or seed credential source, while a password changed from the interface takes priority afterward.
 
 #### Default account
 
@@ -304,11 +316,10 @@ Rename this account after the first login.
 
 #### Password management
 
-- Users can change their own password from `Settings > Change Password`.
-- Administrators can set a custom password for any user or reset that user back to their `.env` password from `Settings > User Management`.
-- The `Remember me` option keeps the session for 30 days.
+- Users can change their own password from **Settings > Change Password**.
+- Administrators can set a custom password for any user or reset that user back to their `.env` password from **Settings > User Management**.
+- The **Remember me** option keeps the session for 30 days.
 - Changing a password invalidates existing remember-me cookies for that user.
-
 
 #### Configuration
 
@@ -325,18 +336,17 @@ POZNOTE_PASSWORD_ALICE=alice-secret
 POZNOTE_PASSWORD_BOB=bob-secret
 ```
 
-#### Custom CSS Overrides
+#### Password resolution order
 
-If you want to adjust fonts, spacing, or other visual details beyond the built-in options, you can load an extra stylesheet on every HTML page.
+When a user signs in, Poznote checks passwords in this order:
 
-Configure it in `Settings > Advanced > Custom CSS path`.
+1. A custom bcrypt password hash stored in the master database for that user.
+2. Fallback values from `.env`:
+  - `POZNOTE_PASSWORD` for the administrator profile
+  - `POZNOTE_PASSWORD_USER` for standard users
+  - `POZNOTE_PASSWORD_{USERNAME}` for per-user overrides
 
-Notes:
-
-- Enter only the filename, for example `custom.css`.
-- The file must be placed in `src/css/`, and Poznote will load it as `css/custom.css`.
-- Poznote appends a cache-busting `v=` parameter automatically when the target file exists locally.
-- The stylesheet is injected near the end of `<head>`, so it can override the default application styles.
+This means `.env` acts as the default or seed credential source, while a password changed from the interface takes priority afterward.
 
 </details>
 
@@ -391,44 +401,120 @@ If auto-provisioning is enabled, Poznote generates a username from the OIDC clai
 
 </details>
 
-## Update application
+## Note types
 
-Navigate to your Poznote directory:
-```bash
-cd poznote
-```
+Poznote supports two primary note formats, each tailored for different workflows.
 
-Stop the running container before updating:
-```bash
-docker compose down
-```
+<details>
+<summary><strong>HTML Notes</strong></summary>
+&nbsp;
 
-Download the latest Docker Compose configuration:
-```bash
-curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
-```
+*   **Editor:** Direct WYSIWYG (What You See Is What You Get) editing.
+*   **Storage:** Saved as `.html` files in the user data directory. Since they are standard HTML, they can be opened directly in any web browser.
+*   **Exclusive Features:**
+    *   **Excalidraw:** Integrated drawing board for hand-drawn diagrams and sketches.
+    *   **Rich Formatting:** Native support for text colors, highlighting, and standard HTML elements.
+    *   **Interactive UI:** Direct manipulation of elements in the editor.
+</details>
 
-Download the latest .env.template:
-```bash
-curl -o .env.template https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.template
-```
+<details>
+<summary><strong>Markdown Notes</strong></summary>
+&nbsp;
 
-Review `.env.template` and add any new variables to your `.env` file if needed:
-```bash
-sdiff .env .env.template
-```
+*   **Editor:** Markdown syntax editor with real-time preview.
+*   **Storage:** Saved as `.md` files in the user data directory.
+*   **Exclusive Features:**
+    *   **Mermaid Diagrams:</strong> Native support for generating diagrams (flowcharts, sequence, etc.) via ` ```mermaid ` code blocks.
+    *   **Math Equations:** Robust LaTeX support for mathematical formulas using `$ inline $` and `$$ block $$` syntax.
+    *   **Portability:** Standard Markdown format compatible with any external editor or static site generator.
+</details>
 
-Download the latest Poznote Webserver and Poznote MCP images:
-```bash
-docker compose pull
-```
+<details>
+<summary><strong>Task Lists</strong></summary>
+&nbsp;
 
-Start the updated container:
-```bash
-docker compose up -d
-```
+*   **Usage:** Manage tasks and projects with interactive checklists.
+*   **Workflow:** Track progress with checkboxes that can be toggled directly in the editor or the notes list.
+*   **Public Collaboration:** Task lists can be shared via a public URL. If edit permissions are granted, external collaborators can check items off the list without needing a Poznote account.
+</details>
 
-Your data is preserved in the `./data` directory and will not be affected by the update.
+<details>
+<summary><strong>Shortcuts</strong></summary>
+&nbsp;
+
+*   **Functionality:** Create a reference to an existing note in another location.
+*   **Use Case:** Allows a note to be referenced in two different places simultaneously. For example, a note can live in a classification folder while its shortcut appears on a Kanban board for active tracking.
+</details>
+
+<details>
+<summary><strong>Templates</strong></summary>
+&nbsp;
+
+*   **Functionality:** Create pre-filled notes to standardize your documentation.
+*   **Usage:** Notes marked as templates can be duplicated to create new notes with the same structure, tags, and content, saving time on repetitive tasks.
+</details>
+
+## Personalization
+
+Poznote offers several built-in personalization options directly from the application, without requiring any configuration file changes.
+
+<details>
+<summary><strong>Display Settings</strong></summary>
+<br>
+
+Under **Settings > Display**, you can configure:
+
+- **Theme:** switch between light and dark mode
+- **Font size:** adjust text size for notes, sidebar, and code blocks
+- **Note sorting:** choose how notes are ordered in the list
+- **Task list insert order:** control where new tasks are inserted
+- **Show creation date:** toggle the creation date badge on notes
+- **Show folder note counts:** display the number of notes in each folder
+- **Show notes after folders:** list notes without folders below the folder list
+- **Index icon scaling:** resize icons in the note index
+- **Note content width:** control the max width of the note editor area
+- **Code block word wrap:** enable or disable word wrap in code blocks
+
+</details>
+
+<details>
+<summary><strong>Workspace Background Image</strong></summary>
+<br>
+
+You can set a background image per workspace — upload a custom image and adjust its opacity from the Display settings to give each workspace its own visual identity.
+
+</details>
+
+<details>
+<summary><strong>Element Visibility</strong></summary>
+<br>
+
+Poznote allows you to declutter the interface by hiding elements you don't use.
+
+Configure it in **Settings > Appearance > UI Customization**.
+
+- **Granular Control:** Toggle visibility for home cards, toolbar actions, slash menu items, and more.
+- **Per-User:** Each user can have their own unique interface layout.
+- **Searchable:** Easily find the element you want to hide using the filter in the configuration modal.
+
+</details>
+
+<details>
+<summary><strong>Custom CSS Overrides</strong></summary>
+<br>
+
+If you want to adjust fonts, spacing, or other visual details beyond the built-in options, you can load an extra stylesheet on every HTML page.
+
+Configure it in **Settings > Appearance > Custom CSS path**.
+
+Notes:
+
+- Enter only the filename, for example `custom.css`.
+- The file must be placed in `src/css/`, and Poznote will load it as `css/custom.css`.
+- Poznote appends a cache-busting `v=` parameter automatically when the target file exists locally.
+- The stylesheet is injected near the end of `<head>`, so it can override the default application styles.
+
+</details>
 
 ## Multi-users
 
@@ -455,6 +541,45 @@ data/
     ├── 2/                       # User ID 2
     └── ...
 ```
+
+## Git Synchronization
+
+Poznote supports automatic and manual synchronization with **GitHub** or **Forgejo**. Each user configures their own repository independently. There is no shared global repository.
+
+<details>
+<summary><strong>How to configure Git Sync</strong></summary>
+<br>
+
+**Step 1 — Enable the feature (admin, in Settings > Advanced Settings)**
+
+Toggle **Git Sync** to enabled in the **Advanced Settings** section of the Settings page. This will reveal the **Git Sync** menu in the sidebar for all users.
+
+---
+
+**Step 2 — Each user configures their own repo (Settings > Git Sync)**
+
+| Field | Description |
+|---|---|
+| Provider | `GitHub` or `Forgejo` |
+| API Base URL | GitHub: auto-filled (read-only). Forgejo: your instance URL, e.g. `https://forgejo.example.com/api/v1` |
+| Access Token | GitHub PAT (`ghp_...`) or Forgejo token (Settings > Applications) |
+| Repository | `owner/repo` format |
+| Branch | Default: `main` |
+| Author Name / Email | Used for commit metadata |
+
+> 🔒 Access tokens are encrypted at rest using AES-256-GCM. Set `POZNOTE_APP_SECRET` in your `.env` (generated with `openssl rand -hex 32`) to ensure the encryption key survives container rebuilds. If not set, a key is auto-generated and stored in `data/.app_secret`.
+
+---
+
+**Automatic sync**
+
+When enabled by the user, Poznote will automatically:
+- **Pull** on login
+- **Push** on every note create, update, or delete
+
+Manual push/pull is also available from the **Sync Status** page (cloud icon in the header).
+
+</details>
 
 ## Backup / Export
 
@@ -566,54 +691,10 @@ bash backup-poznote.sh '<poznote_url>' '<admin_username>' '<admin_password>' '<t
 
 </details>
 
-## Git Synchronization
-
-Poznote supports automatic and manual synchronization with **GitHub** or **Forgejo**. Each user configures their own repository independently. There is no shared global repository.
-
-<details>
-<summary><strong>How to configure Git Sync</strong></summary>
-<br>
-
-**Step 1 — Enable the feature (admin, in Settings > Advanced Settings)**
-
-Toggle **Git Sync** to enabled in the **Advanced Settings** section of the Settings page. This will reveal the **Git Sync** menu in the sidebar for all users.
-
----
-
-**Step 2 — Each user configures their own repo (Settings > Git Sync)**
-
-| Field | Description |
-|---|---|
-| Provider | `GitHub` or `Forgejo` |
-| API Base URL | GitHub: auto-filled (read-only). Forgejo: your instance URL, e.g. `https://forgejo.example.com/api/v1` |
-| Access Token | GitHub PAT (`ghp_...`) or Forgejo token (Settings > Applications) |
-| Repository | `owner/repo` format |
-| Branch | Default: `main` |
-| Author Name / Email | Used for commit metadata |
-
-> 🔒 Access tokens are encrypted at rest using AES-256-GCM. Set `POZNOTE_APP_SECRET` in your `.env` (generated with `openssl rand -hex 32`) to ensure the encryption key survives container rebuilds. If not set, a key is auto-generated and stored in `data/.app_secret`.
-
----
-
-**Automatic sync**
-
-When enabled by the user, Poznote will automatically:
-- **Pull** on login
-- **Push** on every note create, update, or delete
-
-Manual push/pull is also available from the **Sync Status** page (cloud icon in the header).
-
-</details>
 
 ## Restore / Import
 
-**Via Web Interface (Settings > Restore/Import):**
-- All users can restore backups to their own profile
-- Supports complete backup restoration and individual file imports
-
-**Via API (Administrators only):**
-- Restore via REST API v1 endpoint `POST /api/v1/backups/{filename}/restore`
-- Requires admin credentials
+Poznote provides flexible restoration options through the web interface (**Settings > Restore/Import**) or programmatically via the REST API for administrators. Users can restore their own profile data from a full ZIP backup or import individual files, while administrators can manage restorations across the entire system.
 
 <a id="complete-restore"></a>
 <details>
@@ -747,13 +828,26 @@ updated: 2024-01-20 15:45:00
 
 </details>
 
+## Public Sharing
+
+Poznote allows you to share individual notes or entire folders with anyone. 
+
+  - **Standard Notes:** Share in **Read-only** mode with anyone via a public link.
+  - **Task Lists:** Enhanced control with three permission levels: **Read-only**, **Just checkable** (allows checking items without full edit rights), or **Fully modifiable**.
+  - **Visibility:** Limit sharing to the public (anyone with the link) or restrict access to registered users of your Poznote instance.
+  - **Password Protection:** Secure your shared content by adding a mandatory password to the public URL for an extra layer of security.
+
 ## Admin Tools
 
-Admins can access additional tools via Settings > Admin Tools:
+Administrators have access to a suite of maintenance and management tools under **Settings > Admin Tools**:
 
-- **Disaster Recovery** - Reconstruct the entire user index from data folders in case of system corruption or database loss.
-- **Base64 Image Converter** - Convert inline Base64 encoded images to attachments.
-- **Orphan attachments scanner** - Scan and clean up orphaned attachment files.
+- **User Management:** Create, manage, and delete user profiles, or reset passwords.
+- **Git Sync Control:** Globally enable or disable Git synchronization features.
+- **Import Limits:** Configure the maximum number of files allowed for individual or ZIP imports.
+- **Custom CSS path:** Define a global custom stylesheet to override the application's appearance.
+- **Rebuild Master Database:** Reconstruct the user index from data folders in case of system corruption or database loss.
+- **Base64 Image Converter:** Convert inline Base64 encoded images within notes to proper file attachments.
+- **Orphan attachments scanner:** Scan and clean up storage by identifying attachment files that are no longer referenced in any notes.
 
 ## PWA
 
@@ -818,13 +912,15 @@ For installation, configuration, and setup instructions, see the [MCP Server doc
 
 ## Chrome Extension
 
-The **Poznote URL Saver** is a browser extension that allows you to quickly save the URL of the current page to your Poznote instance with a single click.
+The **Poznote URL Saver** is a browser extension that allows you to quickly save the URL or even a full-page screenshot of the current page to your Poznote instance with a single click.
 
 <p align="center">
   <img src="images/chrome-extension.png" alt="Poznote Chrome Extension" width="50%">
 </p>
 
 Install the extension directly from the Chrome Web Store → [Install extension](https://chromewebstore.google.com/detail/bmjclfamahegmgillaghhmnbkjebipbh?utm_source=item-share-cb)
+
+> ℹ️ **Note:** Version 1.3 of the extension is currently awaiting validation by the Google Chrome Web Store.
 
 ## API Documentation
 
