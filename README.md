@@ -925,6 +925,8 @@ The **Poznote URL Saver** is a browser extension that allows you to quickly save
 
 Install the extension directly from the Chrome Web Store → [Install extension](https://chromewebstore.google.com/detail/bmjclfamahegmgillaghhmnbkjebipbh?utm_source=item-share-cb)
 
+> ℹ️ **Note:** Version 1.3 of the extension is currently awaiting validation by the Google Chrome Web Store.
+
 ## API Documentation
 
 Poznote provides a comprehensive RESTful API v1 for programmatic access to notes, folders, workspaces, tags, attachments, backups, settings, and more.
