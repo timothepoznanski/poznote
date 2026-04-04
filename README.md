@@ -283,6 +283,8 @@ docker compose up -d
 
 ## Authentication
 
+Poznote supports multiple authentication methods including local accounts and external identity providers.
+
 <details>
 <summary><strong>Traditional Authentication</strong></summary>
 <br>
@@ -363,7 +365,25 @@ If auto-provisioning is enabled, Poznote generates a username from the OIDC clai
 
 </details>
 
+<details>
+<summary><strong>Password resolution order</strong></summary>
+<br>
+
+When a user signs in, Poznote checks passwords in this order:
+
+1. A custom bcrypt password hash stored in the master database for that user.
+2. Fallback values from `.env`:
+  - `POZNOTE_PASSWORD` for the administrator profile
+  - `POZNOTE_PASSWORD_USER` for standard users
+  - `POZNOTE_PASSWORD_{USERNAME}` for per-user overrides
+
+This means `.env` acts as the default or seed credential source, while a password changed from the interface takes priority afterward.
+
+</details>
+
 ## Personalization
+
+Customize the look and feel of your Poznote instance to match your preferences and workflow.
 
 <details>
 <summary><strong>Custom CSS Overrides</strong></summary>
@@ -396,23 +416,7 @@ Configure it in **Settings > Appearance > UI Customization**.
 
 </details>
 
-## Technical Details
 
-<details>
-<summary><strong>Password resolution order</strong></summary>
-<br>
-
-When a user signs in, Poznote checks passwords in this order:
-
-1. A custom bcrypt password hash stored in the master database for that user.
-2. Fallback values from `.env`:
-  - `POZNOTE_PASSWORD` for the administrator profile
-  - `POZNOTE_PASSWORD_USER` for standard users
-  - `POZNOTE_PASSWORD_{USERNAME}` for per-user overrides
-
-This means `.env` acts as the default or seed credential source, while a password changed from the interface takes priority afterward.
-
-</details>
 
 ## Update application
 
