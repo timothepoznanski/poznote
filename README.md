@@ -418,7 +418,34 @@ If auto-provisioning is enabled, Poznote generates a username from the OIDC clai
 
 ## Personalization
 
-Customize the look and feel of your Poznote instance to match your preferences and workflow.
+Several parameters can be adjusted directly from the application to personalize your experience. Under **Settings > Display**, you can configure:
+
+- **Theme:** — switch between light and dark mode
+- **Font size:** Adjust text size for notes, sidebar, and code blocks
+- **Note sorting:** Choose how notes are ordered in the list
+- **Task list insert order:** Control where new tasks are inserted
+- **Show creation date:** Toggle the creation date badge on notes
+- **Show folder note counts:** Display the number of notes in each folder
+- **Show notes after folders:** List notes without folders below the folder list
+- **Index icon scaling:** Resize icons in the note index
+- **Note content width:** Control the max width of the note editor area
+- **Code block word wrap:** Enable or disable word wrap in code blocks
+
+You can also set a **background image per workspace:** Upload a custom image and adjust its opacity from the Display settings to give each workspace its own visual identity.
+
+<details>
+<summary><strong>Element Visibility</strong></summary>
+<br>
+
+Poznote allows you to declutter the interface by hiding elements you don't use.
+
+Configure it in **Settings > Appearance > UI Customization**.
+
+- **Granular Control:** Toggle visibility for home cards, toolbar actions, slash menu items, and more.
+- **Per-User:** Each user can have their own unique interface layout.
+- **Searchable:** Easily find the element you want to hide using the filter in the configuration modal.
+
+</details>
 
 <details>
 <summary><strong>Custom CSS Overrides</strong></summary>
@@ -437,19 +464,7 @@ Notes:
 
 </details>
 
-<details>
-<summary><strong>Element Visibility</strong></summary>
-<br>
 
-Poznote allows you to declutter the interface by hiding elements you don't use.
-
-Configure it in **Settings > Appearance > UI Customization**.
-
-- **Granular Control:** Toggle visibility for home cards, toolbar actions, slash menu items, and more.
-- **Per-User:** Each user can have their own unique interface layout.
-- **Searchable:** Easily find the element you want to hide using the filter in the configuration modal.
-
-</details>
 
 
 
