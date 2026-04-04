@@ -229,6 +229,7 @@ Poznote supports two primary note formats, each tailored for different workflows
 <details>
 <summary><strong>HTML Notes</strong></summary>
 
+&nbsp;
 *   **Editor:** Direct WYSIWYG (What You See Is What You Get) editing.
 *   **Storage:** Saved as `.html` files in the user data directory. Since they are standard HTML, they can be opened directly in any web browser.
 *   **Exclusive Features:**
