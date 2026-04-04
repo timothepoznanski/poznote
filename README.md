@@ -777,11 +777,15 @@ updated: 2024-01-20 15:45:00
 
 ## Admin Tools
 
-Admins can access additional tools via Settings > Admin Tools:
+Administrators have access to a suite of maintenance and management tools under **Settings > Admin Tools**:
 
-- **Disaster Recovery** - Reconstruct the entire user index from data folders in case of system corruption or database loss.
-- **Base64 Image Converter** - Convert inline Base64 encoded images to attachments.
-- **Orphan attachments scanner** - Scan and clean up orphaned attachment files.
+- **User Management** Create, manage, and delete user profiles, or reset passwords.
+- **Git Sync Control** Globally enable or disable Git synchronization features.
+- **Import Limits** Configure the maximum number of files allowed for individual or ZIP imports.
+- **Custom CSS path** Define a global custom stylesheet to override the application's appearance.
+- **Rebuild Master Database** Reconstruct the user index from data folders in case of system corruption or database loss.
+- **Base64 Image Converter** Convert inline Base64 encoded images within notes to proper file attachments.
+- **Orphan attachments scanner** Scan and clean up storage by identifying attachment files that are no longer referenced in any notes.
 
 ## PWA
 
