@@ -641,13 +641,7 @@ Manual push/pull is also available from the **Sync Status** page (cloud icon in 
 
 ## Restore / Import
 
-**Via Web Interface (Settings > Restore/Import):**
-- All users can restore backups to their own profile
-- Supports complete backup restoration and individual file imports
-
-**Via API (Administrators only):**
-- Restore via REST API v1 endpoint `POST /api/v1/backups/{filename}/restore`
-- Requires admin credentials
+Poznote provides flexible restoration options through the web interface (**Settings > Restore/Import**) or programmatically via the REST API for administrators. Users can restore their own profile data from a full ZIP backup or import individual files, while administrators can manage restorations across the entire system.
 
 <a id="complete-restore"></a>
 <details>
