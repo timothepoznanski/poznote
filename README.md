@@ -310,42 +310,6 @@ On a fresh installation, Poznote creates one active administrator profile:
 
 Rename this account after the first login.
 
-#### Password management
-
-- Users can change their own password from `Settings > Change Password`.
-- Administrators can set a custom password for any user or reset that user back to their `.env` password from `Settings > User Management`.
-- The `Remember me` option keeps the session for 30 days.
-- Changing a password invalidates existing remember-me cookies for that user.
-
-
-#### Configuration
-
-- **Admin password**: Set `POZNOTE_PASSWORD` in your `.env` file.
-- **Default standard-user password**: Set `POZNOTE_PASSWORD_USER` in your `.env` file.
-- **User-specific passwords**: Set individual defaults using `POZNOTE_PASSWORD_{USERNAME}` in your `.env`.
-
-Example:
-
-```bash
-POZNOTE_PASSWORD=admin-secret
-POZNOTE_PASSWORD_USER=user-secret
-POZNOTE_PASSWORD_ALICE=alice-secret
-POZNOTE_PASSWORD_BOB=bob-secret
-```
-
-#### Custom CSS Overrides
-
-If you want to adjust fonts, spacing, or other visual details beyond the built-in options, you can load an extra stylesheet on every HTML page.
-
-Configure it in `Settings > Advanced > Custom CSS path`.
-
-Notes:
-
-- Enter only the filename, for example `custom.css`.
-- The file must be placed in `src/css/`, and Poznote will load it as `css/custom.css`.
-- Poznote appends a cache-busting `v=` parameter automatically when the target file exists locally.
-- The stylesheet is injected near the end of `<head>`, so it can override the default application styles.
-
 </details>
 
 <a id="oidc"></a>
@@ -396,6 +360,57 @@ POZNOTE_OIDC_AUTO_CREATE_USERS=true
 `POZNOTE_OIDC_ALLOWED_USERS` remains available for backward compatibility, but group-based access is recommended.
 
 If auto-provisioning is enabled, Poznote generates a username from the OIDC claims (`preferred_username`, `nickname`, email local part, `name`, then `sub`) and stores the OIDC subject on the created profile.
+
+</details>
+
+## Personalization
+
+<details>
+<summary><strong>Custom CSS Overrides</strong></summary>
+<br>
+
+If you want to adjust fonts, spacing, or other visual details beyond the built-in options, you can load an extra stylesheet on every HTML page.
+
+Configure it in **Settings > Appearance > Custom CSS path**.
+
+Notes:
+
+- Enter only the filename, for example `custom.css`.
+- The file must be placed in `src/css/`, and Poznote will load it as `css/custom.css`.
+- Poznote appends a cache-busting `v=` parameter automatically when the target file exists locally.
+- The stylesheet is injected near the end of `<head>`, so it can override the default application styles.
+
+</details>
+<br>
+<details>
+<summary><strong>Element Visibility</strong></summary>
+<br>
+
+Poznote allows you to declutter the interface by hiding elements you don't use.
+
+Configure it in **Settings > Appearance > UI Customization**.
+
+- **Granular Control:** Toggle visibility for home cards, toolbar actions, slash menu items, and more.
+- **Per-User:** Each user can have their own unique interface layout.
+- **Searchable:** Easily find the element you want to hide using the filter in the configuration modal.
+
+</details>
+
+## Technical Details
+
+<details>
+<summary><strong>Password resolution order</strong></summary>
+<br>
+
+When a user signs in, Poznote checks passwords in this order:
+
+1. A custom bcrypt password hash stored in the master database for that user.
+2. Fallback values from `.env`:
+  - `POZNOTE_PASSWORD` for the administrator profile
+  - `POZNOTE_PASSWORD_USER` for standard users
+  - `POZNOTE_PASSWORD_{USERNAME}` for per-user overrides
+
+This means `.env` acts as the default or seed credential source, while a password changed from the interface takes priority afterward.
 
 </details>
 
