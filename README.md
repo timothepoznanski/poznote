@@ -808,10 +808,8 @@ updated: 2024-01-20 15:45:00
 
 Poznote allows you to share individual notes or entire folders with anyone. 
 
-- **Granular Permissions:**
   - **Standard Notes:** Share in **Read-only** mode with anyone via a public link.
   - **Task Lists:** Enhanced control with three permission levels: **Read-only**, **Just checkable** (allows checking items without full edit rights), or **Fully modifiable**.
-- **Access Control:** 
   - **Visibility:** Limit sharing to the public (anyone with the link) or restrict access to registered users of your Poznote instance.
   - **Password Protection:** Secure your shared content by adding a mandatory password to the public URL for an extra layer of security.
 
