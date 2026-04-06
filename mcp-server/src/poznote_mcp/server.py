@@ -731,24 +731,6 @@ def git_pull(user_id: Optional[int] = None) -> str:
 
 
 @mcp.tool()
-def get_github_sync_status(user_id: Optional[int] = None) -> str:
-    """Get the current status of GitHub synchronization (Legacy - use get_git_sync_status)"""
-    return get_git_sync_status(user_id=user_id)
-
-
-@mcp.tool()
-def github_push(user_id: Optional[int] = None) -> str:
-    """Force push local notes to the configured GitHub repository (Legacy - use git_push)"""
-    return git_push(user_id=user_id)
-
-
-@mcp.tool()
-def github_pull(user_id: Optional[int] = None) -> str:
-    """Force pull notes from the configured GitHub repository (Legacy - use git_pull)"""
-    return git_pull(user_id=user_id)
-
-
-@mcp.tool()
 def get_system_info() -> str:
     """Get version information about the Poznote installation"""
     client, err = _get_client_or_error()

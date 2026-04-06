@@ -238,69 +238,6 @@
         window.location.href = 'index.php' + (params.toString() ? '?' + params.toString() : '');
     }
 
-    function isStandalonePwaMode() {
-        try {
-            return !!(
-                (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
-                window.navigator.standalone === true
-            );
-        } catch (error) {
-            return false;
-        }
-    }
-
-    function shouldReuseCurrentPwaWindow(targetUrl) {
-        if (!isStandalonePwaMode() || !targetUrl) {
-            return false;
-        }
-
-        try {
-            var resolvedUrl = new URL(String(targetUrl), window.location.href);
-            return resolvedUrl.host === window.location.host;
-        } catch (error) {
-            return false;
-        }
-    }
-
-    function openUrlWithPwaAwareness(targetUrl) {
-        if (!targetUrl) {
-            return;
-        }
-
-        if (shouldReuseCurrentPwaWindow(targetUrl)) {
-            window.location.href = targetUrl;
-            return;
-        }
-
-        var popup = window.open(targetUrl, '_blank', 'noopener');
-        if (!popup) {
-            window.location.href = targetUrl;
-        }
-    }
-
-    function bindPwaAwareLink(linkElement, targetUrl) {
-        if (!linkElement || !targetUrl) {
-            return;
-        }
-
-        if (!shouldReuseCurrentPwaWindow(targetUrl)) {
-            linkElement.target = '_blank';
-            linkElement.rel = 'noopener';
-            return;
-        }
-
-        linkElement.removeAttribute('target');
-        linkElement.removeAttribute('rel');
-        linkElement.addEventListener('click', function(event) {
-            if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
-                return;
-            }
-
-            event.preventDefault();
-            window.location.href = targetUrl;
-        });
-    }
-
     // ========== Filter ==========
 
     function updateClearButton() {
@@ -784,41 +721,6 @@
 
     function buildFolderPublicUrl(token) {
         return new URL('folder/' + encodeURIComponent(token), window.location.origin + '/').href;
-    }
-
-    function getPreferredPublicUrlProtocol() {
-        try {
-            var protocol = localStorage.getItem('poznote-public-url-protocol');
-            if (protocol === 'http' || protocol === 'https') {
-                return protocol;
-            }
-        } catch (error) {
-            // Ignore storage errors.
-        }
-        return 'https';
-    }
-
-    function setPreferredPublicUrlProtocol(protocol) {
-        try {
-            if (protocol === 'http' || protocol === 'https') {
-                localStorage.setItem('poznote-public-url-protocol', protocol);
-            }
-        } catch (error) {
-            // Ignore storage errors.
-        }
-    }
-
-    function applyProtocolToPublicUrl(url, protocol) {
-        if (!url) return url;
-        if (protocol !== 'http' && protocol !== 'https') return url;
-
-        if (/^https?:\/\//i.test(url)) {
-            return protocol + '://' + url.replace(/^https?:\/\//i, '');
-        }
-        if (/^\/\//.test(url)) {
-            return protocol + ':' + url;
-        }
-        return url;
     }
 
     function normalizePublicUrl(url) {

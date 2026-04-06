@@ -76,16 +76,6 @@ function escapeForJs(str) {
 }
 
 /**
- * Escape HTML for safe display
- */
-function escapeHtml(text) {
-    if (!text) return '';
-    var div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-/**
  * Create a subfolder within a parent folder
  * @param {string} parentFolderKey - The parent folder key (e.g., 'folder_123')
  */

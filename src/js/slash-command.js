@@ -2053,16 +2053,6 @@
         return html;
     }
 
-    // Escape HTML special characters to prevent XSS
-    function escapeHtml(text) {
-        return String(text)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-    }
-
     // Position slash menu near the cursor or selection range
     function positionMenu(range) {
         if (!slashMenuElement) return;

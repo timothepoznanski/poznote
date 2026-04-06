@@ -347,7 +347,8 @@
       "orphan_scanner": "孤立附件扫描器",
       "change_password": "修改密码",
       "import_limits": "导入限制",
-      "git_sync_toggle": "Git 同步"
+      "git_sync_toggle": "Git 同步",
+      "mcp_config": "MCP 服务器"
     },
     "install_app": {
       "unavailable": "当前无法安装。请在 Chrome 手机版中打开浏览器菜单，然后在可用时点击“安装应用”（或“添加到主屏幕”）。",
@@ -978,6 +979,17 @@
         "pacific": "太平洋",
         "africa": "非洲"
       }
+    },
+    "mcp_config": {
+      "title": "MCP 服务器配置",
+      "description": "配置 MCP 服务器。用户 ID 和工作区的更改立即生效。",
+      "user_id": "用户",
+      "default_workspace": "默认工作区",
+      "debug": "调试日志",
+      "badge": "ID: {{user_id}} / {{workspace}}",
+      "user_id_tooltip": "MCP 服务器默认使用的 Poznote 用户配置文件。",
+      "default_workspace_tooltip": "工具调用中未指定工作区时，用于列出和创建笔记的默认工作区。",
+      "debug_tooltip": "将日志级别从 INFO 切换为 DEBUG，所有 API 请求和工具调用的详细信息将写入容器日志（docker logs poznote-mcp），便于排查问题。容器重启后生效。"
     }
   },
   "notes_list": {
@@ -2005,9 +2017,9 @@
       "administrator": "管理员",
       "click_to_activate": "点击激活",
       "click_to_deactivate": "点击停用",
-      "toggle_admin": "授予或撤销管理员权限",
+      "toggle_admin": "切换管理员角色",
       "admin_id_1_locked": "无法移除用户 ID 1 的管理员角色",
-      "admin_note": "使用“管理员”复选框为其他用户授予或撤销管理员权限。",
+      "admin_note": "只有用户1是管理员。其他用户不能拥有管理员权限。",
       "password_management": {
         "manage_password": "密码",
         "reset_password": "重置密码",
@@ -2069,8 +2081,6 @@
         "repair_registry_success": "主数据库重建成功：\n\n- 扫描了 {{scanned}} 个文件夹\n- 恢复了 {{added}} 个用户\n- 重建了 {{links}} 个共享链接",
         "repair_registry_error": "重建出错: {{error}}"
       },
-      "administrator": "管理员",
-      "admin_note": "只有用户1是管理员。其他用户不能拥有管理员权限。",
       "processing": "正在处理...",
       "errors_label": "错误：",
       "network_error": "网络错误：",
@@ -2078,9 +2088,6 @@
       "rename_user": "重命名用户",
       "delete_warning_all_data": "所有用户数据（笔记、附件等）都将被永久删除。",
       "access_denied_admin": "拒绝访问。需要管理员权限。",
-      "toggle_admin": "切换管理员角色",
-      "click_to_deactivate": "点击停用",
-      "click_to_activate": "点击激活",
       "confirm_admin": {
         "title": "确认提升为管理员",
         "message": "您确定要授予 \"{{username}}\" 管理员权限吗？",
@@ -2089,8 +2096,7 @@
         "privilege_passwords": "更改所有其他用户的密码",
         "privilege_admin_panel": "访问此用户管理面板",
         "confirm_button": "确认管理员晋升"
-      },
-      "id": "ID"
+      }
     },
     "profile": {
       "title": "我的资料",

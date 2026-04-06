@@ -163,8 +163,6 @@ window.savedRanges = {};
       }
     }
 
-    // trigger optional update callback if present
-    const noteentry = document.querySelector('.noteentry');
   }
 
   // Remove any existing popup

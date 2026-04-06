@@ -24,11 +24,8 @@ services:
       POZNOTE_API_URL: http://webserver:80/api/v1
       POZNOTE_USERNAME: ${POZNOTE_MCP_USERNAME:-admin}
       POZNOTE_PASSWORD: ${POZNOTE_PASSWORD:-admin}
-      POZNOTE_USER_ID: ${POZNOTE_MCP_USER_ID:-1}
-      POZNOTE_DEFAULT_WORKSPACE: ${POZNOTE_MCP_WORKSPACE:-Poznote}
       MCP_HOST: "0.0.0.0"
       MCP_PORT: "8045"
-      POZNOTE_DEBUG: ${POZNOTE_MCP_DEBUG:-true}
     ports:
       - "127.0.0.1:${POZNOTE_MCP_PORT:-8046}:8045"
     depends_on:

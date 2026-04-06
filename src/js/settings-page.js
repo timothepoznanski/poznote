@@ -395,6 +395,102 @@
         });
     }
 
+    function refreshMcpConfigBadge() {
+        var badge = document.getElementById('mcp-config-badge');
+        if (!badge) return;
+
+        getSetting('mcp_user_id', function (userId) {
+            getSetting('mcp_default_workspace', function (workspace) {
+                var uid = (userId && userId.trim()) ? userId.trim() : '1';
+                var ws = (workspace && workspace.trim()) ? workspace.trim() : 'Poznote';
+                badge.textContent = tr('modals.mcp_config.badge', { user_id: uid, workspace: ws }, 'ID: ' + uid + ' / ' + ws);
+                badge.className = 'setting-status enabled';
+            });
+        });
+    }
+
+    function loadMcpWorkspaces(userId, selectedWorkspace, callback) {
+        var wsSelect = document.getElementById('mcpWorkspaceSelect');
+        if (!wsSelect) { if (callback) callback(); return; }
+        fetch('/api/v1/workspaces', {
+            headers: { 'Accept': 'application/json', 'X-User-ID': String(userId) },
+            credentials: 'same-origin'
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            wsSelect.innerHTML = '';
+            var list = (data && data.workspaces && data.workspaces.length) ? data.workspaces : [{ name: selectedWorkspace || 'Poznote' }];
+            list.forEach(function(ws) {
+                var opt = document.createElement('option');
+                opt.value = ws.name;
+                opt.textContent = ws.name;
+                if (ws.name === selectedWorkspace) opt.selected = true;
+                wsSelect.appendChild(opt);
+            });
+            if (!wsSelect.value && wsSelect.options.length > 0) wsSelect.selectedIndex = 0;
+            if (callback) callback();
+        })
+        .catch(function() {
+            wsSelect.innerHTML = '<option value="' + (selectedWorkspace || 'Poznote') + '">' + (selectedWorkspace || 'Poznote') + '</option>';
+            if (callback) callback();
+        });
+    }
+
+    function showMcpConfigModal() {
+        var modal = document.getElementById('mcpConfigModal');
+        if (!modal) return;
+
+        getSetting('mcp_user_id', function(savedUserId) {
+            getSetting('mcp_default_workspace', function(savedWorkspace) {
+                getSetting('mcp_debug', function(debug) {
+                    var dbgInput = document.getElementById('mcpDebugInput');
+                    if (dbgInput) dbgInput.checked = (debug === '1' || debug === 'true');
+
+                    var currentUserId = (savedUserId && savedUserId.trim()) ? parseInt(savedUserId.trim(), 10) : 1;
+                    var currentWorkspace = (savedWorkspace && savedWorkspace.trim()) ? savedWorkspace.trim() : 'Poznote';
+
+                    fetch('/api/v1/admin/users', {
+                        headers: { 'Accept': 'application/json' },
+                        credentials: 'same-origin'
+                    })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        var userSelect = document.getElementById('mcpUserIdSelect');
+                        if (userSelect && data && data.users) {
+                            userSelect.innerHTML = '';
+                            data.users.forEach(function(u) {
+                                var opt = document.createElement('option');
+                                opt.value = u.id;
+                                opt.textContent = u.username;
+                                if (u.id == currentUserId) opt.selected = true;
+                                userSelect.appendChild(opt);
+                            });
+                        }
+                        loadMcpWorkspaces(currentUserId, currentWorkspace, function() {
+                            modal.style.display = 'flex';
+                        });
+                    })
+                    .catch(function() {
+                        loadMcpWorkspaces(currentUserId, currentWorkspace, function() {
+                            modal.style.display = 'flex';
+                        });
+                    });
+
+                    // Reload workspaces when user changes
+                    var userSelect = document.getElementById('mcpUserIdSelect');
+                    if (userSelect && !userSelect._mcpChangeAttached) {
+                        userSelect._mcpChangeAttached = true;
+                        userSelect.addEventListener('change', function() {
+                            var wsSelect = document.getElementById('mcpWorkspaceSelect');
+                            var currentWs = wsSelect ? wsSelect.value : 'Poznote';
+                            loadMcpWorkspaces(parseInt(this.value, 10), currentWs);
+                        });
+                    }
+                });
+            });
+        });
+    }
+
     function showImportLimitsModal() {
         var modal = document.getElementById('importLimitsModal');
         var indInput = document.getElementById('importMaxIndividualFilesInput');
@@ -638,6 +734,12 @@
             customCssCard.addEventListener('click', showCustomCssModal);
         }
 
+        // MCP config card
+        var mcpConfigCard = document.getElementById('mcp-config-card');
+        if (mcpConfigCard) {
+            mcpConfigCard.addEventListener('click', showMcpConfigModal);
+        }
+
         // UI Customization card - opens modal
         var uiCustomizationCard = document.getElementById('ui-customization-card');
         if (uiCustomizationCard) {
@@ -821,6 +923,38 @@
             });
         }
 
+        // Save MCP config modal button
+        var saveMcpConfigBtn = document.getElementById('saveMcpConfigBtn');
+        if (saveMcpConfigBtn) {
+            saveMcpConfigBtn.addEventListener('click', function () {
+                var userIdSelect = document.getElementById('mcpUserIdSelect');
+                var workspaceSelect = document.getElementById('mcpWorkspaceSelect');
+                var debugInput = document.getElementById('mcpDebugInput');
+
+                var userId = userIdSelect ? parseInt(userIdSelect.value, 10) : 1;
+                var workspace = workspaceSelect ? workspaceSelect.value : 'Poznote';
+                var debug = (debugInput && debugInput.checked) ? '1' : '0';
+
+                if (isNaN(userId) || userId < 1) {
+                    alert(tr('common.error', {}, 'Error'));
+                    return;
+                }
+
+                setSetting('mcp_user_id', String(userId), function (s1) {
+                    setSetting('mcp_default_workspace', workspace, function (s2) {
+                        setSetting('mcp_debug', debug, function (s3) {
+                            if (s1 && s2 && s3) {
+                                try { closeModal('mcpConfigModal'); } catch (e) { }
+                                refreshMcpConfigBadge();
+                            } else {
+                                alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                            }
+                        });
+                    });
+                });
+            });
+        }
+
         // Load all badges on page load
         refreshLanguageBadge();
         refreshLoginDisplayBadge();
@@ -834,6 +968,7 @@
         refreshCustomCssBadge();
         refreshImportLimitsBadges();
         refreshGitSyncEnabledBadge();
+        refreshMcpConfigBadge();
         refreshUiCustomizationBadge();
 
         // Search functionality - filters settings cards

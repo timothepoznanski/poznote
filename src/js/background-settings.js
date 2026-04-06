@@ -8,6 +8,11 @@
     var OPACITY_MIN = 5;
     var OPACITY_MAX = 25;
 
+    function isIndexPage() {
+        var path = window.location.pathname;
+        return path.includes('index.php') || path === '/' || path.endsWith('/');
+    }
+
     function buildOpacitySettingKey(workspace) {
         return 'background_opacity_' + workspace;
     }
@@ -41,8 +46,7 @@
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
         // Only load background image on index.php
-        const isIndexPage = window.location.pathname.includes('index.php') || window.location.pathname === '/' || window.location.pathname.endsWith('/');
-        if (isIndexPage) {
+        if (isIndexPage()) {
             loadBackgroundImage();
         }
     });
@@ -87,9 +91,7 @@
         }
         
         // Only apply background on index.php (not on settings.php, etc.)
-        const isIndexPage = window.location.pathname.includes('index.php') || window.location.pathname === '/' || window.location.pathname.endsWith('/');
-        
-        if (url && isIndexPage) {
+        if (url && isIndexPage()) {
             // Create a dedicated background element
             const bgElement = document.createElement('div');
             bgElement.id = 'poznote-background-layer';

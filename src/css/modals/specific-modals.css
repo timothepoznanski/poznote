@@ -97,6 +97,59 @@
     flex: 1;
 }
 
+/* Help icon + tooltip used in settings modals */
+.field-help {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: help;
+    flex-shrink: 0;
+}
+
+.field-help .lucide {
+    width: 14px;
+    height: 14px;
+    opacity: 0.45;
+    transition: opacity 0.15s ease;
+}
+
+.field-help:hover .lucide,
+.field-help:focus .lucide,
+.field-help:focus-visible .lucide {
+    opacity: 0.75;
+}
+
+.field-help-tooltip {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    transform: none;
+    min-width: 220px;
+    max-width: 300px;
+    padding: 8px 11px;
+    border-radius: 6px;
+    background: rgba(20, 20, 20, 0.93);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.5;
+    white-space: normal;
+    text-align: left;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.15s ease, visibility 0.15s ease;
+    z-index: 200;
+}
+
+.field-help:hover .field-help-tooltip,
+.field-help:focus .field-help-tooltip,
+.field-help:focus-visible .field-help-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
 .font-size-controls input {
     width: 100px;
     padding: 8px 10px;

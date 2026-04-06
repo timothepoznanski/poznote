@@ -70,12 +70,12 @@
         });
     };
 
-    // Helper function to escape HTML
-    function escapeHtml(text) {
-        const div = document.createElement('div');
+    // Use global escapeHtml from globals.js, with fallback for standalone pages
+    var escapeHtml = window.escapeHtml || function(text) {
+        var div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
-    }
+    };
 
     // Re-render when content changes (for dynamic note loading)
     function setupMathObserver() {

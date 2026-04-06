@@ -251,6 +251,7 @@ usort($shared_folders, function($a, $b) {
 	</div>
 	
 	<script src="js/navigation.js"></script>
+	<script src="js/pwa-helpers.js"></script>
 	<script src="js/shared-page.js"></script>
 </body>
 </html>

@@ -156,8 +156,6 @@
                 } else {
                     // Mark note for auto-push since we moved a note (if auto-push enabled)
                     if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
-                        // LOG: Déplacement d'une note par drag & drop dans la vue Kanban
-                        // console.log('[Poznote Auto-Push] Note moved in Kanban - marking for push');
                         window.setNeedsAutoPush(true);
                     }
                     
@@ -377,10 +375,6 @@
             console.error(message);
         }
     }
-
-    // Export dummy functions for compatibility with any leftover inline calls
-    window.initKanbanDragDrop = function () { };
-    window.initKanbanCardClicks = function () { };
 
     // Auto-init on load
     if (document.readyState === 'loading') {

@@ -501,4 +501,29 @@ class SystemController {
 
         return ['success' => true, 'items' => $results];
     }
+
+    /**
+     * GET /api/v1/system/mcp-config
+     * Returns MCP server configuration (admin only)
+     */
+    public function mcpConfig() {
+        if (!function_exists('isCurrentUserAdmin') || !isCurrentUserAdmin()) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Admin privileges required']);
+            return;
+        }
+
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
+
+        $userId = (int)(getGlobalSetting('mcp_user_id', '1') ?: '1');
+        $workspace = getGlobalSetting('mcp_default_workspace', 'Poznote') ?: 'Poznote';
+        $debug = getGlobalSetting('mcp_debug', '0') === '1';
+
+        echo json_encode([
+            'success' => true,
+            'mcp_user_id' => $userId,
+            'mcp_default_workspace' => $workspace,
+            'mcp_debug' => $debug,
+        ]);
+    }
 }

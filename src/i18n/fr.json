@@ -358,7 +358,8 @@
       "orphan_scanner": "Scanner de pièces jointes orphelines",
       "change_password": "Changer le mot de passe",
       "import_limits": "Limites d'import",
-      "git_sync_toggle": "Synchronisation Git"
+      "git_sync_toggle": "Synchronisation Git",
+      "mcp_config": "Serveur MCP"
     },
     "install_app": {
       "unavailable": "L’installation n’est pas disponible pour le moment. Sur Chrome mobile, ouvrez le menu du navigateur puis appuyez sur \"Installer l’application\" (ou \"Ajouter à l’écran d’accueil\") quand l’option est disponible.",
@@ -1011,6 +1012,17 @@
       "move": "Déplacer le dossier",
       "workspace": "Workspace de destination",
       "parent": "Dossier parent de destination"
+    },
+    "mcp_config": {
+      "title": "Configuration du serveur MCP",
+      "description": "Configurez le serveur MCP. Les modifications de l'ID utilisateur et de l'espace de travail prennent effet immédiatement.",
+      "user_id": "Utilisateur",
+      "default_workspace": "Espace de travail par défaut",
+      "debug": "Journalisation de débogage",
+      "badge": "ID : {{user_id}} / {{workspace}}",
+      "user_id_tooltip": "Le profil utilisateur Poznote que le serveur MCP utilise par défaut.",
+      "default_workspace_tooltip": "L'espace de travail utilisé pour lister et créer des notes quand aucun espace de travail n'est précisé dans l'appel d'outil.",
+      "debug_tooltip": "Passe le niveau de log de INFO à DEBUG. Chaque requête API et appel d'outil est écrit en détail dans les logs du conteneur (docker logs poznote-mcp). Utile pour diagnostiquer un problème. Prend effet après le redémarrage du conteneur."
     }
   },
   "notes_list": {
@@ -2105,7 +2117,7 @@
         "repair_registry_error": "Erreur de reconstruction : {{error}}"
       },
       "administrator": "Administrateur",
-      "admin_note": "Seul l'utilisateur 1 est administrateur. Les autres utilisateurs ne peuvent pas avoir de privilèges d'administrateur.",
+      "admin_note": "Utilisez la case à cocher Admin pour accorder ou révoquer les privilèges d'administrateur pour un autre utilisateur.",
       "processing": "Traitement...",
       "errors_label": "Erreurs :",
       "network_error": "Erreur réseau :",
@@ -2113,7 +2125,7 @@
       "rename_user": "Renommer l'utilisateur",
       "delete_warning_all_data": "Toutes les données de l'utilisateur (notes, pièces jointes, etc.) seront définitivement supprimées.",
       "access_denied_admin": "Accès refusé. Privilèges administrateur requis.",
-      "toggle_admin": "Basculer le rôle Administrateur",
+      "toggle_admin": "Accorder ou révoquer les privilèges d'administrateur",
       "click_to_deactivate": "Cliquer pour désactiver",
       "click_to_activate": "Cliquer pour activer",
       "confirm_admin": {
@@ -2126,9 +2138,7 @@
         "confirm_button": "Confirmer le passage admin"
       },
       "id": "ID",
-      "admin_id_1_locked": "Le rôle d'administrateur ne peut pas être retiré à l'utilisateur ID 1",
-      "toggle_admin": "Accorder ou révoquer les privilèges d'administrateur",
-      "admin_note": "Utilisez la case à cocher Admin pour accorder ou révoquer les privilèges d'administrateur pour un autre utilisateur."
+      "admin_id_1_locked": "Le rôle d'administrateur ne peut pas être retiré à l'utilisateur ID 1"
     },
     "profile": {
       "title": "Mon profil",

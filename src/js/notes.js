@@ -223,8 +223,6 @@ function saveNoteToServer() {
 
                 // Mark note as needing auto-push since it was successfully saved (if auto-push enabled)
                 if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
-                    // LOG: Déclenché après chaque auto-save réussi (contenu, titre, tags modifiés)
-                    // console.log('[Poznote Auto-Push] Note saved to server - marking for push');
                     window.setNeedsAutoPush(true);
                 }
 
@@ -431,8 +429,6 @@ function deleteNote(noteId) {
             if (data && data.success) {
                 // Mark note for auto-push since we deleted a note (if auto-push enabled)
                 if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
-                    // LOG: Suppression d'une note via la corbeille
-                    // console.log('[Poznote Auto-Push] Note deleted - marking for push');
                     window.setNeedsAutoPush(true);
                 }
                 
@@ -472,12 +468,12 @@ function redirectToWorkspace() {
 // ============================================================
 
 /**
- * Remove search highlights from an element and return clean HTML
+ * Clone an element with search highlights stripped out
  * @param {HTMLElement} element - The element to clean
- * @returns {string} Clean HTML without search highlights
+ * @returns {HTMLElement|null} Cleaned clone
  */
-function cleanSearchHighlightsFromElement(element) {
-    if (!element) return "";
+function stripSearchHighlights(element) {
+    if (!element) return null;
 
     var clonedElement = element.cloneNode(true);
     var highlights = clonedElement.querySelectorAll('.search-highlight');
@@ -493,7 +489,17 @@ function cleanSearchHighlightsFromElement(element) {
         window.stripRuntimeHeadingAnchorsFromElement(clonedElement);
     }
 
-    return clonedElement.innerHTML;
+    return clonedElement;
+}
+
+/**
+ * Remove search highlights from an element and return clean HTML
+ * @param {HTMLElement} element - The element to clean
+ * @returns {string} Clean HTML without search highlights
+ */
+function cleanSearchHighlightsFromElement(element) {
+    var cleaned = stripSearchHighlights(element);
+    return cleaned ? cleaned.innerHTML : "";
 }
 
 /**
@@ -502,23 +508,8 @@ function cleanSearchHighlightsFromElement(element) {
  * @returns {string} Plain text content
  */
 function getTextContentFromElement(element) {
-    if (!element) return "";
-
-    var clonedElement = element.cloneNode(true);
-    var highlights = clonedElement.querySelectorAll('.search-highlight');
-
-    for (var i = 0; i < highlights.length; i++) {
-        var highlight = highlights[i];
-        var parent = highlight.parentNode;
-        parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
-        parent.normalize();
-    }
-
-    if (typeof window.stripRuntimeHeadingAnchorsFromElement === 'function') {
-        window.stripRuntimeHeadingAnchorsFromElement(clonedElement);
-    }
-
-    return clonedElement.textContent || "";
+    var cleaned = stripSearchHighlights(element);
+    return cleaned ? (cleaned.textContent || "") : "";
 }
 
 function getComparableNoteContent(entryElem, noteId) {

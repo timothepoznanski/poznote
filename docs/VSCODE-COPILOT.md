@@ -5,7 +5,7 @@ This guide explains how to configure and use the Poznote MCP server with VS Code
 ## Prerequisites
 
 - Visual Studio Code installed
-- GitHub Copilot subscription and extension enabled
+- **GitHub Copilot subscription:** A paid (or trial) [GitHub Copilot](https://github.com/features/copilot) plan is required, with the Copilot Chat extension enabled in VS Code
 - Poznote MCP server running (via Docker Compose)
 - MCP server accessible on localhost (default port: 8045)
 

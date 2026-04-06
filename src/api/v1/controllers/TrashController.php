@@ -51,36 +51,6 @@ class TrashController {
         return $_POST;
     }
     
-    /**
-     * Get the path to an entry file
-     */
-    private function getEntryFilename(int $id, string $type = 'note'): string {
-        if (function_exists('getEntryFilename')) {
-            return getEntryFilename($id, $type);
-        }
-        
-        // Fallback implementation
-        $ext = match($type) {
-            'tasklist' => '.json',
-            'excalidraw' => '.excalidraw',
-            'markdown' => '.md',
-            default => '.html'
-        };
-        
-        $entriesPath = defined('ENTRIES_PATH') ? ENTRIES_PATH : __DIR__ . '/../../../entries';
-        return $entriesPath . '/' . $id . $ext;
-    }
-    
-    /**
-     * Get attachments path
-     */
-    private function getAttachmentsPath(): string {
-        if (function_exists('getAttachmentsPath')) {
-            return getAttachmentsPath();
-        }
-        return defined('ATTACHMENTS_PATH') ? ATTACHMENTS_PATH : __DIR__ . '/../../../attachments';
-    }
-    
     // ========================================
     // API Endpoints
     // ========================================
@@ -187,7 +157,7 @@ class TrashController {
             // Delete files and attachments
             foreach ($rows as $row) {
                 // Delete note file
-                $filePath = $this->getEntryFilename((int)$row['id'], $row['type'] ?? 'note');
+                $filePath = getEntryFilename((int)$row['id'], $row['type'] ?? 'note');
                 if (file_exists($filePath)) {
                     @unlink($filePath);
                 }
@@ -197,7 +167,7 @@ class TrashController {
                 if (is_array($attachments) && !empty($attachments)) {
                     foreach ($attachments as $attachment) {
                         if (isset($attachment['filename'])) {
-                            $attachmentFile = $this->getAttachmentsPath() . '/' . $attachment['filename'];
+                            $attachmentFile = getAttachmentsPath() . '/' . $attachment['filename'];
                             if (file_exists($attachmentFile)) {
                                 @unlink($attachmentFile);
                             }
@@ -270,7 +240,7 @@ class TrashController {
             if (is_array($attachments) && !empty($attachments)) {
                 foreach ($attachments as $attachment) {
                     if (isset($attachment['filename'])) {
-                        $attachmentFile = $this->getAttachmentsPath() . '/' . $attachment['filename'];
+                        $attachmentFile = getAttachmentsPath() . '/' . $attachment['filename'];
                         if (file_exists($attachmentFile)) {
                             @unlink($attachmentFile);
                         }
@@ -279,7 +249,7 @@ class TrashController {
             }
             
             // Delete note file
-            $filename = $this->getEntryFilename($noteId, $noteType);
+            $filename = getEntryFilename($noteId, $noteType);
             if (file_exists($filename)) {
                 @unlink($filename);
             }

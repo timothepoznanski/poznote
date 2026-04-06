@@ -11,7 +11,7 @@ class SettingsController {
     private $con;
     
     // Global settings that should be stored in master database
-    private $globalSettings = ['login_display_name', 'custom_css_path', 'git_sync_enabled', 'import_max_individual_files', 'import_max_zip_files'];
+    private $globalSettings = ['login_display_name', 'custom_css_path', 'git_sync_enabled', 'import_max_individual_files', 'import_max_zip_files', 'mcp_user_id', 'mcp_default_workspace', 'mcp_debug'];
     
     public function __construct($con) {
         $this->con = $con;
@@ -46,6 +46,22 @@ class SettingsController {
                 throw new InvalidArgumentException('value must be between 1 and 100000', 400);
             }
             return (string) $intVal;
+        }
+
+        if ($key === 'mcp_user_id') {
+            $intVal = (int) $value;
+            if ($intVal < 1) {
+                throw new InvalidArgumentException('mcp_user_id must be a positive integer', 400);
+            }
+            return (string) $intVal;
+        }
+
+        if ($key === 'mcp_debug') {
+            return filter_var($value, FILTER_VALIDATE_BOOLEAN) ? '1' : '0';
+        }
+
+        if ($key === 'mcp_default_workspace') {
+            return substr(trim((string) $value), 0, 255);
         }
 
         return is_string($value) ? $value : (string) $value;

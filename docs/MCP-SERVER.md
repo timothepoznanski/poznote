@@ -8,8 +8,8 @@ This server supports **HTTP transport only** (MCP `streamable-http`).
 
 Choose your preferred AI assistant:
 
-- **🤖 [VS Code Copilot](VSCODE-COPILOT.md)** — Integrate Poznote into your editor
-- **💬 [Claude CLI](CLAUDE-CLI.md)** — Use Poznote from the command line
+- **[VS Code Copilot](VSCODE-COPILOT.md): ** Integrate Poznote into your editor
+- **[Claude CLI](CLAUDE-CLI.md):** Use Poznote from the command line
 
 ---
 
@@ -65,9 +65,6 @@ The MCP server acts as a bridge between AI assistants and your Poznote instance.
 - `get_git_sync_status` — Get the current status of Git synchronization (GitHub/Forgejo)
 - `git_push` — Force push local notes to the configured Git repository
 - `git_pull` — Force pull notes from the configured Git repository
-- `get_github_sync_status` — (Legacy) Get the current status of GitHub synchronization
-- `github_push` — (Legacy) Force push local notes to GitHub
-- `github_pull` — (Legacy) Force pull notes from GitHub
 - `get_system_info` — Get version information about the Poznote installation
 - `list_backups` — List all available system backups
 - `create_backup` — Trigger the creation of a new system backup
@@ -84,24 +81,31 @@ The MCP server is included in the official Poznote `docker-compose.yml` and runs
 
 ### Configuration
 
-Configure these environment variables in your `.env` or `docker-compose.yml`:
+The MCP server requires only two variables in your `.env`:
 
 ```bash
 # MCP Server port (default: 8045)
 POZNOTE_MCP_PORT=8045
 
-# Poznote username for MCP authentication
+# Poznote admin username used by the MCP server to authenticate against the API
 POZNOTE_MCP_USERNAME=admin
-
-# User ID for MCP operations (1 = admin)
-POZNOTE_MCP_USER_ID=1
-
-# Default workspace
-POZNOTE_MCP_WORKSPACE=Poznote
-
-# Enable debug logging (optional)
-POZNOTE_MCP_DEBUG=false
 ```
+
+The remaining parameters — **User ID**, **Default Workspace**, and **Debug mode** — are configured directly inside Poznote and stored in the application database:
+
+> **Settings → Admin Tools → MCP Server**
+
+Changes to User ID and Workspace take effect immediately. Debug mode takes effect after the container restarts.
+
+#### Debug mode
+
+When enabled, the MCP server switches its log level from `INFO` to `DEBUG`. Every HTTP request sent to the Poznote API, every tool call received from the AI assistant, and every response are written in detail to the container logs. Use it to diagnose connection or authentication issues:
+
+```bash
+docker logs -f poznote-mcp
+```
+
+Leave it disabled in normal use — the extra verbosity is not needed day-to-day.
 
 ### Start the Server
 
@@ -135,40 +139,40 @@ Complete setup guide: **[CLAUDE-CLI.md](CLAUDE-CLI.md)**
 
 ---
 
-## Security Considerations
+## Security
 
-⚠️ **Important:** The MCP server does **not implement authentication** for incoming requests.
+The MCP server starts automatically with Poznote and listens on **localhost only** — it is not reachable from the outside. This is the correct, secure default: only your local machine (or an SSH tunnel you set up yourself) can reach it. User ID, default workspace, and debug mode are configured directly in **Settings → Admin Tools → MCP Server**, with no `.env` changes needed.
 
-### Default Security (Recommended)
+### Why localhost-only is both normal and secure
 
-The default configuration binds the MCP server to `127.0.0.1` (localhost only):
+By default, the MCP server listens **only on `127.0.0.1`** (your local machine), never on a public interface:
 
 ```yaml
 ports:
   - "127.0.0.1:${POZNOTE_MCP_PORT:-8045}:8045"
 ```
 
-This ensures the MCP server is only accessible from your local machine.
+This is intentional and the correct setup. The MCP server does not implement its own authentication for incoming connections — any client that can reach the endpoint can read, create, modify, and delete notes. Binding to localhost guarantees that only processes running on the same machine (or SSH tunnels you explicitly set up) can connect. There is nothing to worry about with the default configuration: the server is not reachable from the outside.
 
-### Remote Access
+### Remote access
 
-For remote access, use SSH port forwarding:
+If Poznote runs on a remote server and you want to connect from your workstation, use SSH port forwarding — do **not** expose the port publicly:
 
 ```bash
 ssh -L 8045:localhost:8045 user@your-server
 ```
 
-Then configure your client to connect to `http://localhost:8045/mcp`.
+Then point your AI assistant to `http://localhost:8045/mcp` as usual.
 
-### Production Environments
+### Production environments
 
-If you must expose the MCP server over a network, use:
-- Reverse proxy with authentication (nginx, Caddy)
-- VPN solution (Tailscale, WireGuard)
+If you must route the MCP server through a network, protect it with:
+- A reverse proxy with authentication (nginx, Caddy)
+- A VPN (Tailscale, WireGuard)
 
-### Authentication Flow
+### How the MCP server authenticates to Poznote
 
-The MCP server authenticates to the Poznote API using credentials from environment variables (`POZNOTE_USERNAME` / `POZNOTE_PASSWORD`). This protects your Poznote instance, but not the MCP endpoint itself.
+The MCP server connects to the Poznote REST API using the credentials set in `POZNOTE_MCP_USERNAME` / `POZNOTE_PASSWORD`. Your Poznote instance is always protected regardless of who calls the MCP endpoint.
 
 ---
 

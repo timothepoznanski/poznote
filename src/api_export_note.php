@@ -21,6 +21,7 @@ require_once 'config.php';
 require_once 'functions.php';
 require_once 'db_connect.php';
 require_once 'markdown_parser.php';
+require_once 'export_helpers.php';
 
 // Check authentication (API-friendly)
 requireApiAuth();
@@ -197,49 +198,6 @@ try {
     header('Content-Type: application/json');
     http_response_code(500);
     echo json_encode(['success' => false, 'error' => 'Export failed: ' . $e->getMessage()]);
-}
-
-/**
- * Convert tasklist JSON to Markdown checkbox format
- *
- * @param string $jsonContent JSON string containing tasklist data
- * @return string Markdown formatted tasklist with checkboxes
- */
-function convertTasklistToMarkdown($jsonContent) {
-    // Remove UTF-8 BOM if present
-    $jsonContent = preg_replace('/^\xEF\xBB\xBF/', '', $jsonContent);
-
-    // Parse JSON
-    $tasks = json_decode($jsonContent, true);
-
-    if (!is_array($tasks) || empty($tasks)) {
-        return '';
-    }
-
-    $markdown = '';
-
-    foreach ($tasks as $task) {
-        $text = isset($task['text']) ? trim($task['text']) : '';
-        $completed = !empty($task['completed']);
-        $important = !empty($task['important']);
-
-        // Skip empty tasks
-        if (empty($text)) {
-            continue;
-        }
-
-        // Build checkbox syntax: - [ ] or - [x]
-        $checkbox = $completed ? '[x]' : '[ ]';
-
-        // Add important marker if task is marked as important
-        if ($important) {
-            $markdown .= '- ' . $checkbox . ' **' . $text . '** ⭐' . "\n";
-        } else {
-            $markdown .= '- ' . $checkbox . ' ' . $text . "\n";
-        }
-    }
-
-    return $markdown;
 }
 
 /**
@@ -742,7 +700,7 @@ function generateStyledHtml($content, $title, $noteType, $tags) {
  * Export as HTML file
  */
 function exportAsHtml($htmlContent, $title, $disposition = 'attachment') {
-    $filename = sanitizeFilename($title) . '.html';
+    $filename = sanitizeDownloadFilename($title) . '.html';
     
     header('Content-Type: text/html; charset=utf-8');
     header('Content-Disposition: ' . $disposition . '; filename="' . $filename . '"');
@@ -804,7 +762,7 @@ function exportAsHtmlZip($htmlContent, $note, $con) {
     );
     
     // Add HTML file to ZIP
-    $htmlFilename = sanitizeFilename($title) . '.html';
+    $htmlFilename = sanitizeDownloadFilename($title) . '.html';
     $zip->addFromString($htmlFilename, $htmlContent);
     
     // Add attachments to ZIP
@@ -841,7 +799,7 @@ function exportAsHtmlZip($htmlContent, $note, $con) {
     }
     
     // Send ZIP file
-    $zipFilename = sanitizeFilename($title) . '.zip';
+    $zipFilename = sanitizeDownloadFilename($title) . '.zip';
     $fileSize = filesize($tempZipFile);
     
     header('Content-Type: application/zip');
@@ -856,9 +814,9 @@ function exportAsHtmlZip($htmlContent, $note, $con) {
 }
 
 /**
- * Sanitize filename
+ * Sanitize filename for download
  */
-function sanitizeFilename($filename) {
+function sanitizeDownloadFilename($filename) {
     $filename = preg_replace('/[^a-zA-Z0-9-_ ]/', '', $filename);
     $filename = trim($filename);
     if (empty($filename)) {
@@ -921,7 +879,7 @@ function exportAsMarkdown($content, $note, $con) {
     $markdownContent .= $content;
     
     // Set headers for file download
-    $filename = sanitizeFilename($title) . '.md';
+    $filename = sanitizeDownloadFilename($title) . '.md';
     
     header('Content-Type: text/markdown; charset=utf-8');
     header('Content-Disposition: attachment; filename="' . $filename . '"');
@@ -1024,7 +982,7 @@ function exportAsMarkdownZip($content, $note, $con) {
     }
     
     // Add markdown file to ZIP
-    $mdFilename = sanitizeFilename($title) . '.md';
+    $mdFilename = sanitizeDownloadFilename($title) . '.md';
     $zip->addFromString($mdFilename, $markdownContent);
     
     // Add attachments to ZIP
@@ -1061,7 +1019,7 @@ function exportAsMarkdownZip($content, $note, $con) {
     }
     
     // Send ZIP file
-    $zipFilename = sanitizeFilename($title) . '.zip';
+    $zipFilename = sanitizeDownloadFilename($title) . '.zip';
     $fileSize = filesize($tempZipFile);
     
     header('Content-Type: application/zip');
@@ -1079,7 +1037,7 @@ function exportAsMarkdownZip($content, $note, $con) {
  * Export as JSON file (raw tasklist JSON)
  */
 function exportAsJson($rawJson, $title) {
-    $filename = sanitizeFilename($title) . '.json';
+    $filename = sanitizeDownloadFilename($title) . '.json';
 
     header('Content-Type: application/json; charset=utf-8');
     header('Content-Disposition: attachment; filename="' . $filename . '"');

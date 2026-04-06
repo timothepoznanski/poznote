@@ -68,10 +68,11 @@
       "custom_css": "Custom CSS path",
       "release_notes": "Release Notes",
       "convert_images": "Base64 Image Converter",
-        "orphan_scanner": "Orphan attachments scanner",
-        "change_password": "Change Password",
+      "orphan_scanner": "Orphan attachments scanner",
+      "change_password": "Change Password",
       "import_limits": "Import Limits",
-      "git_sync_toggle": "Git Sync"
+      "git_sync_toggle": "Git Sync",
+      "mcp_config": "MCP Server"
     },
     "install_app": {
       "unavailable": "Installation is not available right now. On Chrome mobile, open the browser menu then tap \"Install app\" (or \"Add to Home screen\") when available.",
@@ -532,6 +533,17 @@
         "pacific": "Pacific",
         "africa": "Africa"
       }
+    },
+    "mcp_config": {
+      "title": "MCP Server Configuration",
+      "description": "Configure the MCP server. Changes to User ID and Workspace take effect immediately.",
+      "user_id": "User",
+      "default_workspace": "Default Workspace",
+      "debug": "Debug Logging",
+      "badge": "ID: {{user_id}} / {{workspace}}",
+      "user_id_tooltip": "The Poznote user profile the MCP server acts as by default.",
+      "default_workspace_tooltip": "The workspace used for listing and creating notes when no workspace is specified in the tool call.",
+      "debug_tooltip": "Switches the log level from INFO to DEBUG. Every API request and tool call is written in detail to the container logs (docker logs poznote-mcp). Useful for troubleshooting. Takes effect after container restart."
     }
   },
   "notes_list": {

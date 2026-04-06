@@ -848,6 +848,7 @@ Administrators have access to a suite of maintenance and management tools under 
 - **Rebuild Master Database:** Reconstruct the user index from data folders in case of system corruption or database loss.
 - **Base64 Image Converter:** Convert inline Base64 encoded images within notes to proper file attachments.
 - **Orphan attachments scanner:** Scan and clean up storage by identifying attachment files that are no longer referenced in any notes.
+- **MCP Server:** Configure the AI assistant integration, set the default User ID, default workspace, and enable debug logging.
 
 ## PWA
 
@@ -908,7 +909,11 @@ Poznote includes a Model Context Protocol (MCP) server that enables AI assistant
 - "List all notes in my Poznote workspace"
 - "Update note 42 with new information"
 
-For installation, configuration, and setup instructions, see the [MCP Server documentation](docs/MCP-SERVER.md).
+<p align="center">
+  <img src="docs/mcp-poznote.gif" alt="Poznote MCP Server demo" width="100%">
+</p>
+
+For setup and usage instructions, see the [MCP Server documentation](docs/MCP-SERVER.md).
 
 ## Chrome Extension
 

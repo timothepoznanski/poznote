@@ -25,46 +25,6 @@ function getSelectedShareAccessMode(fallbackMode) {
 // Helper Functions
 // ===========================
 
-function isStandalonePwaMode() {
-    try {
-        return !!(
-            (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
-            window.navigator.standalone === true
-        );
-    } catch (e) {
-        return false;
-    }
-}
-
-function shouldReuseCurrentPwaWindow(targetUrl) {
-    if (!isStandalonePwaMode() || !targetUrl) {
-        return false;
-    }
-
-    try {
-        const resolvedUrl = new URL(String(targetUrl), window.location.href);
-        return resolvedUrl.host === window.location.host;
-    } catch (e) {
-        return false;
-    }
-}
-
-function openUrlWithPwaAwareness(targetUrl) {
-    if (!targetUrl) {
-        return;
-    }
-
-    if (shouldReuseCurrentPwaWindow(targetUrl)) {
-        window.location.href = targetUrl;
-        return;
-    }
-
-    const popup = window.open(targetUrl, '_blank', 'noopener');
-    if (!popup) {
-        window.location.href = targetUrl;
-    }
-}
-
 /**
  * Clear all inline positioning styles from a menu element
  * @param {HTMLElement} element - The menu element to clean
@@ -395,61 +355,6 @@ async function createPublicShare(noteId) {
             showNotificationPopup(errorMsg, 'error');
         }
     }
-}
-
-// ===========================
-// Public URL Protocol Management
-// ===========================
-
-/**
- * Get the user's preferred protocol (http or https) for public URLs
- * @returns {string} 'http' or 'https' (default: 'https')
- */
-function getPreferredPublicUrlProtocol() {
-    try {
-        const protocol = localStorage.getItem('poznote-public-url-protocol');
-        if (protocol === 'http' || protocol === 'https') {
-            return protocol;
-        }
-    } catch (error) {
-        console.error('Error reading protocol preference:', error);
-    }
-    return 'https';
-}
-
-/**
- * Set the user's preferred protocol for public URLs
- * @param {string} protocol - Either 'http' or 'https'
- */
-function setPreferredPublicUrlProtocol(protocol) {
-    try {
-        if (protocol === 'http' || protocol === 'https') {
-            localStorage.setItem('poznote-public-url-protocol', protocol);
-        }
-    } catch (error) {
-        console.error('Error saving protocol preference:', error);
-    }
-}
-
-/**
- * Apply a protocol to a public URL
- * @param {string} url - The URL to modify
- * @param {string} protocol - Either 'http' or 'https'
- * @returns {string} The URL with the specified protocol
- */
-function applyProtocolToPublicUrl(url, protocol) {
-    if (!url) return url;
-    if (protocol !== 'http' && protocol !== 'https') return url;
-
-    // Replace existing protocol
-    if (/^https?:\/\//i.test(url)) {
-        return protocol + '://' + url.replace(/^https?:\/\//i, '');
-    }
-    // Add protocol if URL starts with //
-    if (/^\/\//.test(url)) {
-        return protocol + ':' + url;
-    }
-    return url;
 }
 
 function getPublicShareBaseUrl() {

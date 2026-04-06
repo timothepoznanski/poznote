@@ -60,6 +60,50 @@
     </div>
 </div>
 
+<!-- MCP Server Configuration Modal -->
+<div id="mcpConfigModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.mcp_config.title', [], 'MCP Server Configuration'); ?></h3>
+        <p><?php echo t_h('modals.mcp_config.description', [], 'Configure the MCP server. Changes to User ID and Workspace take effect immediately.'); ?></p>
+        <div class="font-size-controls">
+            <div class="font-size-row">
+                <label for="mcpUserIdSelect" style="display:flex;align-items:center;gap:6px;">
+                    <?php echo t_h('modals.mcp_config.user_id', [], 'User'); ?>
+                    <span class="field-help" tabindex="0" aria-label="<?php echo t_h('modals.mcp_config.user_id_tooltip', [], ''); ?>">
+                        <i class="lucide lucide-help-circle"></i>
+                        <span class="field-help-tooltip"><?php echo t_h('modals.mcp_config.user_id_tooltip', [], 'The Poznote user profile the MCP server acts as by default.'); ?></span>
+                    </span>
+                </label>
+                <select id="mcpUserIdSelect"></select>
+            </div>
+            <div class="font-size-row">
+                <label for="mcpWorkspaceSelect" style="display:flex;align-items:center;gap:6px;">
+                    <?php echo t_h('modals.mcp_config.default_workspace', [], 'Default Workspace'); ?>
+                    <span class="field-help" tabindex="0" aria-label="<?php echo t_h('modals.mcp_config.default_workspace_tooltip', [], ''); ?>">
+                        <i class="lucide lucide-help-circle"></i>
+                        <span class="field-help-tooltip"><?php echo t_h('modals.mcp_config.default_workspace_tooltip', [], 'The workspace used for listing and creating notes when no workspace is specified in the tool call.'); ?></span>
+                    </span>
+                </label>
+                <select id="mcpWorkspaceSelect"></select>
+            </div>
+            <div class="font-size-row">
+                <label for="mcpDebugInput" style="display:flex;align-items:center;gap:6px;">
+                    <?php echo t_h('modals.mcp_config.debug', [], 'Debug Logging'); ?>
+                    <span class="field-help" tabindex="0" aria-label="<?php echo t_h('modals.mcp_config.debug_tooltip', [], ''); ?>">
+                        <i class="lucide lucide-help-circle"></i>
+                        <span class="field-help-tooltip"><?php echo t_h('modals.mcp_config.debug_tooltip', [], 'Switches the log level from INFO to DEBUG. Every API request and tool call is written in detail to the container logs (docker logs poznote-mcp). Useful for troubleshooting. Takes effect after container restart.'); ?></span>
+                    </span>
+                </label>
+                <input type="checkbox" id="mcpDebugInput">
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="mcpConfigModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveMcpConfigBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Import Limits Modal -->
 <div id="importLimitsModal" class="modal">
     <div class="modal-content">
@@ -1048,6 +1092,7 @@
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:disaster-recovery-card" checked><span><?php echo t_h('multiuser.admin.maintenance.title', [], 'Disaster Recovery'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:convert-images-card" checked><span><?php echo t_h('settings.cards.convert_images', [], 'Base64 Image Converter'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:orphan-scanner-card" checked><span><?php echo t_h('settings.cards.orphan_scanner', [], 'Orphan attachments scanner'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mcp-config-card" checked><span><?php echo t_h('settings.cards.mcp_config', [], 'MCP Server'); ?></span></label>
                 </div>
                 </div>
 

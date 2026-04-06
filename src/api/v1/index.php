@@ -590,6 +590,11 @@ $router->get('/system/i18n', function($params) use ($systemController) {
     echo json_encode($systemController->i18n());
 });
 
+// Get MCP server configuration (admin only)
+$router->get('/system/mcp-config', function($params) use ($systemController) {
+    $systemController->mcpConfig();
+});
+
 // List notes/folders shared specifically with the current user by others
 $router->get('/shared/with-me', function($params) use ($systemController) {
     echo json_encode($systemController->listSharedWithMe());

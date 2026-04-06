@@ -60,9 +60,6 @@ function setAutoPushFlag(value) {
     const currentValue = getAutoPushFlag();
     if (currentValue === value) return;
     
-    // LOG: Affiche TRUE quand une modification nécessite un push, FALSE lors du reset après push
-    // console.log('[Poznote Auto-Push] Flag set to', value ? 'TRUE' : 'FALSE');
-    
     try {
         if (value) {
             localStorage.setItem('poznote_needs_auto_push_' + id, 'true');
@@ -682,10 +679,6 @@ function triggerBackgroundPush() {
     // Reset flag before push
     setAutoPushFlag(false);
     
-    // Trigger push in background using keepalive for reliability
-    // LOG: Déclenché avant chaque navigation vers une autre note (via loadNoteDirectly)
-    // console.log('[Poznote Auto-Push] Starting background push...');
-    
     fetch('/api/v1/git-sync/push', {
         method: 'POST',
         headers: {
@@ -700,14 +693,10 @@ function triggerBackgroundPush() {
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            // LOG: Confirmation que le push Git a réussi en arrière-plan
-            // console.log('[Poznote Auto-Push] Push completed successfully');
-        } else {
-            // console.warn('[Poznote Auto-Push] Push failed:', data.error || 'unknown error');
+            // Push completed successfully
         }
     })
     .catch(err => {
-        // console.warn('[Poznote Auto-Push] Push error:', err);
     });
 }
 

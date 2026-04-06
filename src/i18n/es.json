@@ -346,7 +346,8 @@
       "user_management": "Gestión de usuarios",
       "change_password": "Cambiar contraseña",
       "import_limits": "Límites de importación",
-      "git_sync_toggle": "Sincronización Git"
+      "git_sync_toggle": "Sincronización Git",
+      "mcp_config": "Servidor MCP"
     },
     "install_app": {
       "unavailable": "La instalación no está disponible ahora mismo. En Chrome móvil, abre el menú del navegador y pulsa \"Instalar aplicación\" (o \"Agregar a la pantalla de inicio\") cuando la opción esté disponible.",
@@ -987,6 +988,17 @@
       "move": "Mover carpeta",
       "workspace": "Espacio de trabajo de destino",
       "parent": "Carpeta padre de destino"
+    },
+    "mcp_config": {
+      "title": "Configuración del servidor MCP",
+      "description": "Configure el servidor MCP. Los cambios en el ID de usuario y el espacio de trabajo tienen efecto inmediato.",
+      "user_id": "Usuario",
+      "default_workspace": "Espacio de trabajo predeterminado",
+      "debug": "Registro de depuración",
+      "badge": "ID: {{user_id}} / {{workspace}}",
+      "user_id_tooltip": "El perfil de usuario de Poznote con el que actúa el servidor MCP por defecto.",
+      "default_workspace_tooltip": "El espacio de trabajo utilizado para listar y crear notas cuando no se especifica ninguno en la llamada de herramienta.",
+      "debug_tooltip": "Cambia el nivel de log de INFO a DEBUG. Cada solicitud a la API y llamada de herramienta se escribe en detalle en los logs del contenedor (docker logs poznote-mcp). Útil para diagnosticar problemas. Tiene efecto tras reiniciar el contenedor."
     }
   },
   "notes_list": {
@@ -1977,60 +1989,26 @@
   },
   "multiuser": {
     "admin": {
-      "maintenance": {
-        "title": "Reconstruir Base Maestra",
-        "subtitle": "Restaurar perfiles de usuario y enlaces compartidos",
-        "description": "La base de datos principal (master.db) contiene la información de los usuarios, sus enlaces públicos y la configuración global de Poznote. Si este archivo se pierde o se corrompe, o si algunos enlaces públicos dejan de funcionar después de una restauración, esta herramienta escanea sus carpetas 'data/users' para volver a registrar automáticamente las cuentas, recuperar sus nombres reales desde sus bases personales y restablecer todos los enlaces de compartición públicos.",
-        "repair_registry": "Reconstrucción",
-        "repair_registry_confirm": "Esto escaneará todas las carpetas de usuario y reconstruirá la base de datos maestra. ¿Continuar?",
-        "repair_registry_success": "Base de datos maestra reconstruida con éxito:\n\n- {{scanned}} carpetas escaneadas\n- {{added}} usuarios restaurados\n- {{links}} enlaces compartidos reconstruidos",
-        "repair_registry_error": "Error de reconstrucción: {{error}}"
-      },
-      "administrator": "Administrador",
-      "email_usage_note": "Las direcciones de correo electrónico solo se utilizan para la autenticación OIDC si está configurada. Poznote no envía correos electrónicos.",
-      "admin_note": "Solo el usuario 1 es administrador. Los demás usuarios no pueden tener privilegios de administrador.",
-      "password_management": {
-        "manage_password": "Contraseña",
-        "reset_password": "Restablecer contraseña",
-        "set_password": "Definir contraseña",
-        "reset_to_default": "Usar contraseña por defecto (.env)",
-        "modal_help": "Define una contraseña personalizada para esta cuenta o vuelve a la contraseña por defecto definida en el entorno.",
-        "current_mode": "Modo actual",
-        "set_help": "Al menos 4 caracteres. Esto reemplaza la contraseña definida en las variables de entorno para este usuario.",
-        "reset_help": "Elimina la contraseña personalizada y vuelve a usar la contraseña por defecto definida en las variables de entorno para este usuario.",
-        "reset_confirm": "¿Restablecer la contraseña de \"{{username}}\" a la definida en las variables de entorno?",
-        "set_success": "Contraseña actualizada correctamente.",
-        "reset_success": "Contraseña restablecida al valor por defecto que se encuentra en las variables de entorno.",
-        "status_custom": "Personalizada",
-        "status_default": "Por defecto",
-        "status_custom_detail": "Este usuario usa una contraseña personalizada.",
-        "status_default_detail": "Este usuario usa la contraseña por defecto que se encuentra en las variables de entorno.",
-        "changed_at_prefix": "Actualizado:"
-      },
-      "processing": "Procesando...",
-      "errors_label": "Errores:",
-      "network_error": "Error de red:",
-      "click_to_rename": "Haga clic para renombrar",
-      "rename_user": "Renombrar usuario",
-      "delete_warning_all_data": "Todos los datos del usuario (notas, archivos adjuntos, etc.) se eliminarán permanentemente.",
-      "access_denied_admin": "Acceso denegado. Se requieren privilegios de administrador.",
-      "toggle_admin": "Cambiar rol de administrador",
-      "click_to_deactivate": "Haga clic para desactivar",
-      "click_to_activate": "Haga clic para activar",
-      "confirm_admin": {
-        "title": "Confirmar ascenso a administrador",
-        "message": "¿Está seguro de que desea conceder privilegios de administrador a \"{{username}}\"?",
-        "privileges_title": "El administrador podrá:",
-        "privilege_notes": "Exportar notas de cualquier usuario en un archivo ZIP",
-        "privilege_passwords": "Cambiar las contraseñas de todos los demás usuarios",
-        "privilege_admin_panel": "Acceder a este panel de gestión de usuarios",
-        "confirm_button": "Confirmar ascenso a administrador"
-      },
       "id": "ID",
+      "username": "Usuario",
+      "email": "Correo electrónico",
+      "administrator": "Administrador",
+      "status": "Estado",
+      "actions": "Acciones",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "not_defined": "no definido",
+      "create_user": "Crear perfil",
+      "edit_user": "Editar usuario",
+      "click_to_activate": "Haga clic para activar",
+      "click_to_deactivate": "Haga clic para desactivar",
+      "toggle_admin": "Conceder o revocar privilegios de administrador",
+      "admin_id_1_locked": "El rol de administrador no se puede eliminar del ID de usuario 1",
+      "admin_note": "Use la casilla de Admin para otorgar o revocar privilegios de administrador a otro usuario.",
       "errors": {
-        "username_required": "Se requiere nombre de usuario",
-        "cannot_delete_self": "No puedes eliminar tu propio perfil",
-        "cannot_change_self": "No puedes cambiar tu propio estado o rol"
+        "cannot_delete_self": "No puedes borrar tu propio perfil",
+        "cannot_change_self": "No puedes cambiar tu propio estado/rol",
+        "username_required": "El nombre de usuario es obligatorio"
       }
     }
   },
@@ -2228,31 +2206,6 @@
   },
   "backlinks": {
     "title": "Vínculos inversos"
-  },
-  "multiuser": {
-    "admin": {
-      "id": "ID",
-      "username": "Usuario",
-      "email": "Correo electrónico",
-      "administrator": "Administrador",
-      "status": "Estado",
-      "actions": "Acciones",
-      "active": "Activo",
-      "inactive": "Inactivo",
-      "not_defined": "no definido",
-      "create_user": "Crear perfil",
-      "edit_user": "Editar usuario",
-      "click_to_activate": "Haga clic para activar",
-      "click_to_deactivate": "Haga clic para desactivar",
-      "toggle_admin": "Conceder o revocar privilegios de administrador",
-      "admin_id_1_locked": "El rol de administrador no se puede eliminar del ID de usuario 1",
-      "admin_note": "Use la casilla de Admin para otorgar o revocar privilegios de administrador a otro usuario.",
-      "errors": {
-        "cannot_delete_self": "No puedes borrar tu propio perfil",
-        "cannot_change_self": "No puedes cambiar tu propio estado/rol",
-        "username_required": "El nombre de usuario es obligatorio"
-      }
-    }
   },
   "password": {
     "status": {

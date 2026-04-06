@@ -1028,6 +1028,7 @@ $body_classes = trim($extra_body_classes);
 <script src="js/utils.js?v=<?php echo $v; ?>"></script>
 <script src="js/search-highlight.js?v=<?php echo $v; ?>"></script>
 <script src="js/slash-command.js?v=<?php echo $v; ?>"></script>
+<script src="js/pwa-helpers.js?v=<?php echo $v; ?>"></script>
 <script src="js/share.js?v=<?php echo $v; ?>"></script>
 <script src="js/folder-hierarchy.js?v=<?php echo $v; ?>"></script>
 <script src="js/math-renderer.js?v=<?php echo $v; ?>"></script>
