@@ -6,10 +6,6 @@ Minimal MCP server enabling AI assistants to read, search and write notes.
 Transport:
     - streamable-http (HTTP) only
 
-Resources:
-  - notes: List all notes
-  - note/{id}: Get a specific note with content
-
 Tools:
   - get_note: Get a specific note by its ID with full content
   - search_notes: Search notes by text query
@@ -24,6 +20,7 @@ Usage:
 """
 
 import argparse
+import atexit
 import json
 import logging
 import os
@@ -31,6 +28,7 @@ import socket
 import sys
 from typing import Optional, Union
 
+import httpx
 from mcp.server.fastmcp import FastMCP
 
 from .client import PoznoteClient
@@ -144,7 +142,8 @@ def get_client() -> PoznoteClient:
     global _client
     if _client is None:
         _client = PoznoteClient()
-        logger.info(f"Connected to Poznote API at {_client.base_url}")
+        atexit.register(_client.close)
+        logger.info("Connected to Poznote API at %s", _client.base_url)
     return _client
 
 
@@ -183,6 +182,32 @@ def _get_client_or_error() -> tuple[PoznoteClient | None, str | None]:
     return client, None
 
 
+def _api_error_json(exc: Exception) -> str:
+    """Convert an HTTP/network exception into a clean JSON error for the AI."""
+    if isinstance(exc, httpx.ConnectError):
+        return json.dumps(
+            {"error": "Cannot connect to Poznote API. Is the server running?", "detail": str(exc)},
+            ensure_ascii=False,
+        )
+    if isinstance(exc, httpx.TimeoutException):
+        return json.dumps(
+            {"error": "Poznote API request timed out. Try again or increase timeout.", "detail": str(exc)},
+            ensure_ascii=False,
+        )
+    if isinstance(exc, httpx.HTTPStatusError):
+        status = exc.response.status_code
+        body = exc.response.text[:500] if exc.response.text else ""
+        return json.dumps(
+            {"error": f"Poznote API returned HTTP {status}", "detail": body},
+            ensure_ascii=False,
+        )
+    # Generic httpx error
+    return json.dumps(
+        {"error": f"Poznote API error: {type(exc).__name__}", "detail": str(exc)[:500]},
+        ensure_ascii=False,
+    )
+
+
 # =============================================================================
 # TOOLS - Actions for searching and modifying notes
 # =============================================================================
@@ -199,7 +224,10 @@ def get_note(id: int, workspace: Optional[str] = None, user_id: Optional[int] = 
     client, err = _get_client_or_error()
     if err:
         return err
-    note = client.get_note(id, workspace=workspace, user_id=user_id)
+    try:
+        note = client.get_note(id, workspace=workspace, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     
     if note is None:
         return json.dumps({"error": f"Note {id} not found"}, ensure_ascii=False)
@@ -230,7 +258,10 @@ def list_notes(workspace: Optional[str] = None, limit: int = 50, user_id: Option
     client, err = _get_client_or_error()
     if err:
         return err
-    notes = client.list_notes(workspace=workspace, user_id=user_id)
+    try:
+        notes = client.list_notes(workspace=workspace, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     
     # Limit results if specified
     if limit and len(notes) > limit:
@@ -271,7 +302,10 @@ def search_notes(query: str, workspace: Optional[str] = None, limit: int = 10, u
     client, err = _get_client_or_error()
     if err:
         return err
-    results = client.search_notes(query, limit=limit, workspace=workspace, user_id=user_id)
+    try:
+        results = client.search_notes(query, limit=limit, workspace=workspace, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     
     # Format results
     formatted = []
@@ -337,15 +371,18 @@ def create_note(
                 ensure_ascii=False,
             )
 
-    result = client.create_note(
-        title=title,
-        content=content,
-        tags=tags,
-        folder_name=folder,
-        workspace=workspace,
-        note_type=note_type,
-        user_id=user_id,
-    )
+    try:
+        result = client.create_note(
+            title=title,
+            content=content,
+            tags=tags,
+            folder_name=folder,
+            workspace=workspace,
+            note_type=note_type,
+            user_id=user_id,
+        )
+    except Exception as exc:
+        return _api_error_json(exc)
     
     if result:
         return json.dumps({
@@ -383,14 +420,17 @@ def update_note(
     client, err = _get_client_or_error()
     if err:
         return err
-    result = client.update_note(
-        note_id=id,
-        content=content,
-        title=title,
-        tags=tags,
-        workspace=workspace,
-        user_id=user_id,
-    )
+    try:
+        result = client.update_note(
+            note_id=id,
+            content=content,
+            title=title,
+            tags=tags,
+            workspace=workspace,
+            user_id=user_id,
+        )
+    except Exception as exc:
+        return _api_error_json(exc)
     
     if result:
         return json.dumps({
@@ -414,7 +454,10 @@ def delete_note(id: int, workspace: Optional[str] = None, user_id: Optional[int]
     client, err = _get_client_or_error()
     if err:
         return err
-    success = client.delete_note(id, workspace=workspace, user_id=user_id)
+    try:
+        success = client.delete_note(id, workspace=workspace, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     
     if success:
         return json.dumps({
@@ -446,12 +489,15 @@ def create_folder(
     client, err = _get_client_or_error()
     if err:
         return err
-    result = client.create_folder(
-        folder_name=folder_name,
-        parent_folder_id=parent_folder_id,
-        workspace=workspace,
-        user_id=user_id,
-    )
+    try:
+        result = client.create_folder(
+            folder_name=folder_name,
+            parent_folder_id=parent_folder_id,
+            workspace=workspace,
+            user_id=user_id,
+        )
+    except Exception as exc:
+        return _api_error_json(exc)
     
     if result:
         return json.dumps({
@@ -474,7 +520,10 @@ def list_folders(workspace: Optional[str] = None, user_id: Optional[int] = None)
     client, err = _get_client_or_error()
     if err:
         return err
-    folders = client.list_folders(workspace=workspace, user_id=user_id)
+    try:
+        folders = client.list_folders(workspace=workspace, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     return json.dumps({
         "workspace": workspace or client.default_workspace,
         "count": len(folders),
@@ -492,7 +541,10 @@ def list_workspaces(user_id: Optional[int] = None) -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    workspaces = client.list_workspaces(user_id=user_id)
+    try:
+        workspaces = client.list_workspaces(user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     return json.dumps({
         "count": len(workspaces),
         "workspaces": workspaces,
@@ -509,7 +561,10 @@ def list_tags(user_id: Optional[int] = None) -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    tags = client.list_tags(user_id=user_id)
+    try:
+        tags = client.list_tags(user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     return json.dumps({
         "count": len(tags),
         "tags": tags,
@@ -526,7 +581,10 @@ def get_trash(user_id: Optional[int] = None) -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    notes = client.get_trash(user_id=user_id)
+    try:
+        notes = client.get_trash(user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     return json.dumps({
         "count": len(notes),
         "notes": notes,
@@ -543,7 +601,10 @@ def empty_trash(user_id: Optional[int] = None) -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    success = client.empty_trash(user_id=user_id)
+    try:
+        success = client.empty_trash(user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     return json.dumps({"success": success, "message": "Trash emptied" if success else "Failed to empty trash"}, ensure_ascii=False)
 
 
@@ -558,7 +619,10 @@ def restore_note(id: int, user_id: Optional[int] = None) -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    success = client.restore_note(id, user_id=user_id)
+    try:
+        success = client.restore_note(id, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     return json.dumps({"success": success, "message": f"Note {id} restored" if success else f"Failed to restore note {id}"}, ensure_ascii=False)
 
 
@@ -573,7 +637,10 @@ def duplicate_note(id: int, user_id: Optional[int] = None) -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    note = client.duplicate_note(id, user_id=user_id)
+    try:
+        note = client.duplicate_note(id, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     if note:
         return json.dumps({"success": True, "note": note}, indent=2, ensure_ascii=False)
     else:
@@ -591,7 +658,10 @@ def toggle_favorite(id: int, user_id: Optional[int] = None) -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    success = client.toggle_favorite(id, user_id=user_id)
+    try:
+        success = client.toggle_favorite(id, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     return json.dumps({"success": success, "message": f"Note {id} favorite status toggled"}, ensure_ascii=False)
 
 
@@ -606,7 +676,10 @@ def list_attachments(note_id: int, user_id: Optional[int] = None) -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    attachments = client.list_attachments(note_id, user_id=user_id)
+    try:
+        attachments = client.list_attachments(note_id, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     return json.dumps({
         "note_id": note_id,
         "count": len(attachments),
@@ -626,7 +699,10 @@ def move_note_to_folder(note_id: int, folder_id: int, user_id: Optional[int] = N
     client, err = _get_client_or_error()
     if err:
         return err
-    success = client.move_note_to_folder(note_id, folder_id, user_id=user_id)
+    try:
+        success = client.move_note_to_folder(note_id, folder_id, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     return json.dumps({"success": success, "message": f"Note {note_id} moved to folder {folder_id}" if success else "Failed to move note"}, ensure_ascii=False)
 
 
@@ -641,7 +717,10 @@ def remove_note_from_folder(note_id: int, user_id: Optional[int] = None) -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    success = client.remove_note_from_folder(note_id, user_id=user_id)
+    try:
+        success = client.remove_note_from_folder(note_id, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     return json.dumps({"success": success, "message": f"Note {note_id} removed from folder" if success else "Failed to remove note from folder"}, ensure_ascii=False)
 
 
@@ -656,7 +735,10 @@ def share_note(note_id: int, user_id: Optional[int] = None) -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    share = client.create_note_share(note_id, user_id=user_id)
+    try:
+        share = client.create_note_share(note_id, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     if share:
         return json.dumps({"success": True, "share": share}, indent=2, ensure_ascii=False)
     else:
@@ -674,7 +756,10 @@ def unshare_note(note_id: int, user_id: Optional[int] = None) -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    success = client.delete_note_share(note_id, user_id=user_id)
+    try:
+        success = client.delete_note_share(note_id, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     return json.dumps({"success": success, "message": "Sharing disabled" if success else "Failed to disable sharing"}, ensure_ascii=False)
 
 
@@ -689,7 +774,10 @@ def get_note_share_status(note_id: int, user_id: Optional[int] = None) -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    share = client.get_note_share_status(note_id, user_id=user_id)
+    try:
+        share = client.get_note_share_status(note_id, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     if share:
         return json.dumps({"success": True, "share": share}, indent=2, ensure_ascii=False)
     else:
@@ -706,7 +794,10 @@ def get_git_sync_status(user_id: Optional[int] = None) -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    status = client.get_git_status(user_id=user_id)
+    try:
+        status = client.get_git_status(user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     return json.dumps(status, indent=2, ensure_ascii=False)
 
 
@@ -720,7 +811,10 @@ def git_push(user_id: Optional[int] = None) -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    result = client.git_push(user_id=user_id)
+    try:
+        result = client.git_push(user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     return json.dumps(result, indent=2, ensure_ascii=False)
 
 
@@ -734,7 +828,10 @@ def git_pull(user_id: Optional[int] = None) -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    result = client.git_pull(user_id=user_id)
+    try:
+        result = client.git_pull(user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     return json.dumps(result, indent=2, ensure_ascii=False)
 
 
@@ -744,7 +841,10 @@ def get_system_info() -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    info = client.get_system_version()
+    try:
+        info = client.get_system_version()
+    except Exception as exc:
+        return _api_error_json(exc)
     return json.dumps(info, indent=2, ensure_ascii=False)
 
 
@@ -754,7 +854,10 @@ def list_backups() -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    backups = client.list_backups()
+    try:
+        backups = client.list_backups()
+    except Exception as exc:
+        return _api_error_json(exc)
     return json.dumps({"count": len(backups), "backups": backups}, indent=2, ensure_ascii=False)
 
 
@@ -764,7 +867,10 @@ def create_backup() -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    result = client.create_backup()
+    try:
+        result = client.create_backup()
+    except Exception as exc:
+        return _api_error_json(exc)
     return json.dumps(result, indent=2, ensure_ascii=False)
 
 
@@ -779,7 +885,10 @@ def restore_backup(filename: str, user_id: Optional[int] = None) -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    result = client.restore_backup(filename, user_id=user_id)
+    try:
+        result = client.restore_backup(filename, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     return json.dumps(result, indent=2, ensure_ascii=False)
 
 
@@ -794,8 +903,247 @@ def get_app_setting(key: str, user_id: Optional[int] = None) -> str:
     client, err = _get_client_or_error()
     if err:
         return err
-    setting = client.get_setting(key, user_id=user_id)
+    try:
+        setting = client.get_setting(key, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
     return json.dumps(setting, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def update_app_setting(key: str, value: str, user_id: Optional[int] = None) -> str:
+    """Update the value of a specific application setting
+    
+    Args:
+        key: The setting key to update
+        value: The new value for the setting
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        result = client.update_setting(key, value, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+    return json.dumps(result, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def get_backlinks(note_id: int, user_id: Optional[int] = None) -> str:
+    """Get all notes that link to (reference) a specific note
+    
+    Args:
+        note_id: ID of the note to find backlinks for
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        backlinks = client.get_backlinks(note_id, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+    return json.dumps({
+        "note_id": note_id,
+        "count": len(backlinks),
+        "backlinks": backlinks,
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def convert_note(id: int, target: str, user_id: Optional[int] = None) -> str:
+    """Convert a note between HTML and Markdown formats
+    
+    Args:
+        id: ID of the note to convert
+        target: Target format ('html' or 'markdown')
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    target = target.strip().lower()
+    if target not in {"html", "markdown"}:
+        return json.dumps({"error": "Invalid target format. Use 'html' or 'markdown'."}, ensure_ascii=False)
+
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        result = client.convert_note(id, target, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+    if result:
+        return json.dumps({"success": True, "message": f"Note {id} converted to {target}", "note": result}, indent=2, ensure_ascii=False)
+    else:
+        return json.dumps({"error": f"Failed to convert note {id}"}, ensure_ascii=False)
+
+
+@mcp.tool()
+def rename_folder(
+    folder_id: int,
+    new_name: str,
+    workspace: Optional[str] = None,
+    user_id: Optional[int] = None,
+) -> str:
+    """Rename an existing folder
+    
+    Args:
+        folder_id: ID of the folder to rename
+        new_name: New name for the folder
+        workspace: Workspace name (optional, uses default workspace if not specified)
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    if not new_name:
+        return json.dumps({"error": "new_name is required"}, ensure_ascii=False)
+
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        result = client.rename_folder(folder_id, new_name, workspace=workspace, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+    if result:
+        return json.dumps({"success": True, "message": f"Folder renamed to '{new_name}'", "folder": result}, indent=2, ensure_ascii=False)
+    else:
+        return json.dumps({"error": f"Folder {folder_id} not found or rename failed"}, ensure_ascii=False)
+
+
+@mcp.tool()
+def delete_folder(
+    folder_id: int,
+    workspace: Optional[str] = None,
+    user_id: Optional[int] = None,
+) -> str:
+    """Delete a folder and move its notes to trash
+    
+    Args:
+        folder_id: ID of the folder to delete
+        workspace: Workspace name (optional, uses default workspace if not specified)
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        success = client.delete_folder(folder_id, workspace=workspace, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+    if success:
+        return json.dumps({"success": True, "message": f"Folder {folder_id} deleted"}, indent=2, ensure_ascii=False)
+    else:
+        return json.dumps({"error": f"Folder {folder_id} not found or deletion failed"}, ensure_ascii=False)
+
+
+@mcp.tool()
+def create_workspace(name: str, user_id: Optional[int] = None) -> str:
+    """Create a new workspace
+    
+    Args:
+        name: Name of the new workspace
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    if not name:
+        return json.dumps({"error": "name is required"}, ensure_ascii=False)
+
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        result = client.create_workspace(name, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+    if result:
+        return json.dumps({"success": True, "message": f"Workspace '{name}' created", "workspace": result}, indent=2, ensure_ascii=False)
+    else:
+        return json.dumps({"error": "Failed to create workspace"}, ensure_ascii=False)
+
+
+@mcp.tool()
+def rename_workspace(current_name: str, new_name: str, user_id: Optional[int] = None) -> str:
+    """Rename an existing workspace
+    
+    Args:
+        current_name: Current name of the workspace
+        new_name: New name for the workspace
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    if not new_name:
+        return json.dumps({"error": "new_name is required"}, ensure_ascii=False)
+
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        result = client.rename_workspace(current_name, new_name, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+    if result:
+        return json.dumps({"success": True, "message": f"Workspace renamed from '{current_name}' to '{new_name}'", "workspace": result}, indent=2, ensure_ascii=False)
+    else:
+        return json.dumps({"error": f"Failed to rename workspace '{current_name}'"}, ensure_ascii=False)
+
+
+@mcp.tool()
+def delete_workspace(name: str, user_id: Optional[int] = None) -> str:
+    """Delete a workspace (cannot delete the last remaining workspace)
+    
+    Args:
+        name: Name of the workspace to delete
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        success = client.delete_workspace(name, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+    if success:
+        return json.dumps({"success": True, "message": f"Workspace '{name}' deleted"}, indent=2, ensure_ascii=False)
+    else:
+        return json.dumps({"error": f"Failed to delete workspace '{name}'"}, ensure_ascii=False)
+
+
+@mcp.tool()
+def delete_backup(filename: str) -> str:
+    """Delete a specific backup file
+    
+    Args:
+        filename: Name of the backup file to delete (e.g., poznote_backup_2026-02-02_15-30-00.zip)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        success = client.delete_backup(filename)
+    except Exception as exc:
+        return _api_error_json(exc)
+    if success:
+        return json.dumps({"success": True, "message": f"Backup '{filename}' deleted"}, indent=2, ensure_ascii=False)
+    else:
+        return json.dumps({"error": f"Failed to delete backup '{filename}'"}, ensure_ascii=False)
+
+
+@mcp.tool()
+def list_shared(workspace: Optional[str] = None, user_id: Optional[int] = None) -> str:
+    """List all publicly shared notes and folders
+    
+    Args:
+        workspace: Workspace name to filter by (optional)
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        shared = client.list_shared(workspace=workspace, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+    return json.dumps({
+        "shared_notes_count": len(shared.get("shared_notes", [])),
+        "shared_folders_count": len(shared.get("shared_folders", [])),
+        **shared,
+    }, indent=2, ensure_ascii=False)
 
 
 # =============================================================================
@@ -843,7 +1191,7 @@ def main():
         port = int(os.getenv("MCP_PORT", "8045"))
     
     try:
-        logger.info(f"Starting Poznote MCP Server (HTTP mode on {host}:{port})...")
+        logger.info("Starting Poznote MCP Server (HTTP mode on %s:%s)...", host, port)
         try:
             _assert_port_available(host, port)
         except OSError:

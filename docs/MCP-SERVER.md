@@ -36,10 +36,6 @@ The MCP server acts as a bridge between AI assistants and your Poznote instance.
 
 ## Features
 
-### Resources (read-only)
-- `poznote://notes` : List of available notes
-- `poznote://note/{id}` : Content of a specific note
-
 ### Tools (actions)
 - `get_note` — Get a specific note by ID with full content
 - `list_notes` — List all notes from a workspace
@@ -62,6 +58,14 @@ The MCP server acts as a bridge between AI assistants and your Poznote instance.
 - `share_note` — Enable public sharing for a note and get the public URL
 - `unshare_note` — Disable public sharing for a note
 - `get_note_share_status` — Get the current sharing status and public URL for a note
+- `list_shared` — List all publicly shared notes and folders
+- `get_backlinks` — Get all notes that link to (reference) a specific note
+- `convert_note` — Convert a note between HTML and Markdown formats
+- `rename_folder` — Rename an existing folder
+- `delete_folder` — Delete a folder and move its notes to trash
+- `create_workspace` — Create a new workspace
+- `rename_workspace` — Rename an existing workspace
+- `delete_workspace` — Delete a workspace (cannot delete the last one)
 - `get_git_sync_status` — Get the current status of Git synchronization (GitHub/Forgejo)
 - `git_push` — Force push local notes to the configured Git repository
 - `git_pull` — Force pull notes from the configured Git repository
@@ -69,7 +73,9 @@ The MCP server acts as a bridge between AI assistants and your Poznote instance.
 - `list_backups` — List all available system backups
 - `create_backup` — Trigger the creation of a new system backup
 - `restore_backup` — Restore a backup file (replaces current user data)
+- `delete_backup` — Delete a specific backup file
 - `get_app_setting` — Get the value of a specific application setting
+- `update_app_setting` — Update the value of a specific application setting
 
 Most tools accept an optional `user_id` argument to target a specific user profile. When provided, the MCP server sends the `X-User-ID` header for that request, allowing you to create or read notes across different profiles without changing the global MCP environment. The exceptions are the system-level tools `get_system_info`, `list_backups`, and `create_backup`, which do not take `user_id`.
 
