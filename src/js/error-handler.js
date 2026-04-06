@@ -62,25 +62,4 @@ try {
             // Ignore storage errors
         }
     });
-    
-    // Helper function to check last errors (callable from console)
-    window.checkLastErrors = function() {
-        try {
-            var lastJSError = sessionStorage.getItem('lastJSError');
-            var lastPromiseError = sessionStorage.getItem('lastPromiseError');
-            
-            if (lastJSError) {
-                console.log('Last JavaScript Error:', JSON.parse(lastJSError));
-            }
-            if (lastPromiseError) {
-                console.log('Last Promise Error:', JSON.parse(lastPromiseError));
-            }
-            
-            if (!lastJSError && !lastPromiseError) {
-                console.log('No recent errors found.');
-            }
-        } catch (e) {
-            console.log('Error checking stored errors:', e);
-        }
-    };
 })();

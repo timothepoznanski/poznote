@@ -3,37 +3,9 @@ require_once 'config.php';
 require_once 'db_connect.php';
 require_once 'functions.php';
 require_once 'markdown_parser.php';
+require_once 'public_helpers.php';
 
 $currentLang = getUserLanguage();
-
-function getPublicFolderAppPathPrefix() {
-    $scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\');
-    if ($scriptDir === '' || $scriptDir === '.') {
-        return '';
-    }
-
-    return $scriptDir;
-}
-
-function getPublicFolderStylesheetHref() {
-    $href = getPublicFolderAppPathPrefix() . '/css/public_folder.css';
-    $path = __DIR__ . '/css/public_folder.css';
-    if (file_exists($path)) {
-        $href .= '?v=' . filemtime($path);
-    }
-
-    return $href;
-}
-
-function getPublicFolderThemeInitHref() {
-    $href = getPublicFolderAppPathPrefix() . '/js/theme-init.js';
-    $path = __DIR__ . '/js/theme-init.js';
-    if (file_exists($path)) {
-        $href .= '?v=' . filemtime($path);
-    }
-
-    return $href;
-}
 
 // Support token via query param or pretty URL
 $token = $_GET['token'] ?? '';
@@ -92,76 +64,7 @@ try {
     // ============================================================================
     // USER RESTRICTION CHECK
     // ============================================================================
-    $passedUserRestriction = false; // True when user authenticated via allowed_users
-    $allowedUsersRaw = $row['allowed_users'] ?? null;
-    if (!empty($allowedUsersRaw)) {
-        $allowedUserIds = json_decode($allowedUsersRaw, true);
-        if (is_array($allowedUserIds) && !empty($allowedUserIds)) {
-            if (session_status() === PHP_SESSION_NONE) {
-                $configured_port = $_ENV['HTTP_WEB_PORT'] ?? '8040';
-                session_name('POZNOTE_SESSION_' . $configured_port);
-                session_start();
-            }
-            $currentUserId = $_SESSION['user_id'] ?? null;
-            // The share owner always has access
-            $isOwner = $currentUserId !== null && (int)$currentUserId === (int)$activeUserId;
-            if (!$isOwner) {
-                if ($currentUserId === null) {
-                    $appPathPrefix = getPublicFolderAppPathPrefix();
-                    $stylesheetHref = getPublicFolderStylesheetHref();
-                    http_response_code(403);
-                    ?>
-                    <!doctype html>
-                    <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
-                    <head>
-                        <meta charset="utf-8">
-                        <meta name="viewport" content="width=device-width, initial-scale=1">
-                        <meta name="robots" content="noindex, nofollow">
-                        <title><?php echo t_h('public.login_required_title', [], 'Login Required', $currentLang); ?></title>
-                        <link rel="stylesheet" href="<?php echo htmlspecialchars($stylesheetHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
-                    </head>
-                    <body class="password-page-body">
-                        <div class="password-container">
-                            <div class="lock-icon">🔒</div>
-                            <h2><?php echo t_h('public.login_required_title', [], 'Login Required', $currentLang); ?></h2>
-                            <p><?php echo t_h('public.login_required_message', [], 'This content is restricted to specific users. Please log in to access it.', $currentLang); ?></p>
-                            <a href="<?php echo htmlspecialchars($appPathPrefix . '/login.php', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" class="btn" style="display:inline-block;margin-top:12px;padding:10px 24px;background:#4a90d9;color:#fff;border-radius:6px;text-decoration:none;"><?php echo t_h('login.login', [], 'Log in', $currentLang); ?></a>
-                        </div>
-                    </body>
-                    </html>
-                    <?php
-                    exit;
-                }
-                if (!in_array((int)$currentUserId, array_map('intval', $allowedUserIds), true)) {
-                    $appPathPrefix = getPublicFolderAppPathPrefix();
-                    $stylesheetHref = getPublicFolderStylesheetHref();
-                    http_response_code(403);
-                    ?>
-                    <!doctype html>
-                    <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
-                    <head>
-                        <meta charset="utf-8">
-                        <meta name="viewport" content="width=device-width, initial-scale=1">
-                        <meta name="robots" content="noindex, nofollow">
-                        <title><?php echo t_h('public.access_denied_title', [], 'Access Denied', $currentLang); ?></title>
-                        <link rel="stylesheet" href="<?php echo htmlspecialchars($stylesheetHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
-                    </head>
-                    <body class="password-page-body">
-                        <div class="password-container">
-                            <div class="lock-icon">⛔</div>
-                            <h2><?php echo t_h('public.access_denied_title', [], 'Access Denied', $currentLang); ?></h2>
-                            <p><?php echo t_h('public.access_denied_message', [], 'You do not have permission to view this content.', $currentLang); ?></p>
-                        </div>
-                    </body>
-                    </html>
-                    <?php
-                    exit;
-                }
-            }
-            // User is authorized (owner or in allowed_users list) — remember this
-            $passedUserRestriction = true;
-        }
-    }
+    $passedUserRestriction = checkPublicUserRestriction($row['allowed_users'] ?? null, $activeUserId, $currentLang);
 
     // Only enforce password when user has NOT been authenticated via allowed_users.
     // When allowed_users passes, the password should not create an additional barrier.
@@ -183,8 +86,8 @@ try {
         }
         
         if (!isset($_SESSION[$sessionKey]) || $_SESSION[$sessionKey] !== true) {
-            $stylesheetHref = getPublicFolderStylesheetHref();
-            $themeInitHref = getPublicFolderThemeInitHref();
+            $stylesheetHref = getVersionedPublicAppAssetHref('css/public_folder.css');
+            $themeInitHref = getVersionedPublicAppAssetHref('js/theme-init.js');
             ?>
             <!doctype html>
             <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
@@ -507,6 +410,7 @@ $noteBaseUrl = $protocol . '://' . $host;
     }
     ?>
 
+    <script src="/js/pwa-helpers.js"></script>
     <script src="/js/public_folder.js"></script>
 </body>
 </html>

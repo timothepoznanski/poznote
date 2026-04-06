@@ -1978,60 +1978,26 @@
   },
   "multiuser": {
     "admin": {
-      "maintenance": {
-        "title": "Master-Datenbank rekonstruieren",
-        "subtitle": "Benutzerprofile und öffentliche Links wiederherstellen",
-        "description": "Die Hauptdatenbank (master.db) enthält die Benutzerinformationen, ihre öffentlichen Links und die globalen Einstellungen von Poznote. Wenn diese Datei verloren geht oder beschädigt ist, oder wenn nach einer Wiederherstellung einige öffentliche Links nicht mehr funktionieren, scannt dieses Tool Ihre Ordner 'data/users', um Konten automatisch erneut zu registrieren, ihre echten Namen aus den persönlichen Datenbanken wiederherzustellen und alle öffentlichen Freigabelinks erneut aufzubauen.",
-        "repair_registry": "Rekonstruktion",
-        "repair_registry_confirm": "Dies scannt alle Benutzerordner und stellt die Master-Datenbank wieder her. Fortfahren?",
-        "repair_registry_success": "Master-Datenbank erfolgreich rekonstruiert:\n\n- {{scanned}} Ordner gescannt\n- {{added}} Benutzer wiederhergestellt\n- {{links}} geteilte Links neu aufgebaut",
-        "repair_registry_error": "Rekonstruktionsfehler: {{error}}"
-      },
-      "administrator": "Administrator",
-      "email_usage_note": "E-Mail-Adressen werden nur für die OIDC-Authentifizierung verwendet, falls konfiguriert. Poznote sendet keine E-Mails.",
-      "admin_note": "Nur Benutzer 1 ist ein Administrator. Andere Benutzer können keine Administratorrechte haben.",
-      "password_management": {
-        "manage_password": "Passwort",
-        "reset_password": "Passwort zurücksetzen",
-        "set_password": "Passwort festlegen",
-        "reset_to_default": "Standardpasswort verwenden (.env)",
-        "modal_help": "Legen Sie ein benutzerdefiniertes Passwort für dieses Konto fest oder kehren Sie zum in der Umgebung definierten Standardpasswort zurück.",
-        "current_mode": "Aktueller Modus",
-        "set_help": "Mindestens 4 Zeichen. Dies überschreibt das für diesen Benutzer konfigurierte Umgebungsvariablen-Passwort.",
-        "reset_help": "Entfernt das benutzerdefinierte Passwort und verwendet wieder das in der Umgebung definierte Standardpasswort für diesen Benutzer.",
-        "reset_confirm": "Passwort für \"{{username}}\" auf das in den Umgebungsvariablen definierte Standardpasswort zurücksetzen?",
-        "set_success": "Passwort erfolgreich aktualisiert.",
-        "reset_success": "Passwort auf den Standardwert zurückgesetzt, der in den Umgebungsvariablen hinterlegt ist.",
-        "status_custom": "Benutzerdefiniert",
-        "status_default": "Standard",
-        "status_custom_detail": "Dieser Benutzer verwendet ein benutzerdefiniertes Passwort.",
-        "status_default_detail": "Dieser Benutzer verwendet das Standardpasswort, das in den Umgebungsvariablen hinterlegt ist.",
-        "changed_at_prefix": "Aktualisiert:"
-      },
-      "processing": "Verarbeitung...",
-      "errors_label": "Fehler:",
-      "network_error": "Netzwerkfehler:",
-      "click_to_rename": "Klicken zum Umbenennen",
-      "rename_user": "Benutzer umbenennen",
-      "delete_warning_all_data": "Alle Benutzerdaten (Notizen, Anhänge usw.) werden dauerhaft gelöscht.",
-      "access_denied_admin": "Zugriff verweigert. Administratorrechte erforderlich.",
-      "toggle_admin": "Administratorrolle umschalten",
-      "click_to_deactivate": "Klicken zum Deaktivieren",
-      "click_to_activate": "Klicken zum Aktivieren",
-      "confirm_admin": {
-        "title": "Beförderung zum Administrator bestätigen",
-        "message": "Sind Sie sicher, dass Sie \"{{username}}\" Administratorrechte gewähren möchten?",
-        "privileges_title": "Der Administrator wird berechtigt sein:",
-        "privilege_notes": "Notizen von jedem Benutzer in eine ZIP-Datei exportieren",
-        "privilege_passwords": "Passwörter aller anderen Benutzer ändern",
-        "privilege_admin_panel": "Auf diese Benutzerverwaltung zugreifen",
-        "confirm_button": "Administrator-Beförderung bestätigen"
-      },
       "id": "ID",
+      "username": "Benutzer",
+      "email": "E-Mail",
+      "administrator": "Administrator",
+      "status": "Status",
+      "actions": "Aktionen",
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "not_defined": "nicht festgelegt",
+      "create_user": "Profil erstellen",
+      "edit_user": "Benutzer bearbeiten",
+      "click_to_activate": "Zum Aktivieren klicken",
+      "click_to_deactivate": "Zum Deaktivieren klicken",
+      "toggle_admin": "Administrator-Berechtigungen gewähren oder entziehen",
+      "admin_id_1_locked": "Die Administrator-Rolle kann für Benutzer-ID 1 nicht entfernt werden",
+      "admin_note": "Verwenden Sie das Admin-Kontrollkästchen, um Administrator-Berechtigungen für einen anderen Benutzer zu gewähren oder zu entziehen.",
       "errors": {
-        "username_required": "Benutzername ist erforderlich",
         "cannot_delete_self": "Sie können Ihr eigenes Profil nicht löschen",
-        "cannot_change_self": "Sie können Ihren eigenen Status/Ihre eigene Rolle nicht ändern"
+        "cannot_change_self": "Sie können Ihren eigenen Status/Rolle nicht ändern",
+        "username_required": "Benutzername ist erforderlich"
       }
     }
   },
@@ -2229,31 +2195,6 @@
   },
   "backlinks": {
     "title": "Rückverweise"
-  },
-  "multiuser": {
-    "admin": {
-      "id": "ID",
-      "username": "Benutzer",
-      "email": "E-Mail",
-      "administrator": "Administrator",
-      "status": "Status",
-      "actions": "Aktionen",
-      "active": "Aktiv",
-      "inactive": "Inaktiv",
-      "not_defined": "nicht festgelegt",
-      "create_user": "Profil erstellen",
-      "edit_user": "Benutzer bearbeiten",
-      "click_to_activate": "Zum Aktivieren klicken",
-      "click_to_deactivate": "Zum Deaktivieren klicken",
-      "toggle_admin": "Administrator-Berechtigungen gewähren oder entziehen",
-      "admin_id_1_locked": "Die Administrator-Rolle kann für Benutzer-ID 1 nicht entfernt werden",
-      "admin_note": "Verwenden Sie das Admin-Kontrollkästchen, um Administrator-Berechtigungen für einen anderen Benutzer zu gewähren oder zu entziehen.",
-      "errors": {
-        "cannot_delete_self": "Sie können Ihr eigenes Profil nicht löschen",
-        "cannot_change_self": "Sie können Ihren eigenen Status/Rolle nicht ändern",
-        "username_required": "Benutzername ist erforderlich"
-      }
-    }
   },
   "password": {
     "status": {

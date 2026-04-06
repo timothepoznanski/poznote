@@ -48,6 +48,21 @@ function serializeAndMarkModified(noteentry) {
     }
 }
 
+// Build audio_player.php URL from an API attachment URL
+// Returns the new URL or null if the src doesn't match the expected format
+function buildAudioPlayerUrl(src) {
+    var match = src.match(/\/api\/v1\/notes\/(\d+)\/attachments\/([^?]+)(\?.*)?/);
+    if (!match) return null;
+    var noteId = match[1];
+    var attachmentId = encodeURIComponent(decodeURIComponent(match[2]));
+    var queryString = match[3] || '';
+    var url = '/audio_player.php?note=' + noteId + '&attachment=' + attachmentId;
+    if (queryString) {
+        url += queryString.replace('?', '&');
+    }
+    return url;
+}
+
 // Convert audio tags to iframes in Chrome for contenteditable compatibility
 function convertNoteAudioToIframes() {
     try {
@@ -59,28 +74,11 @@ function convertNoteAudioToIframes() {
             }
 
             var src = audio.getAttribute('src');
-            var controls = audio.hasAttribute('controls');
-
             if (!src) {
                 return;
             }
 
-            // Parse the audio URL to build audio_player.php URL
-            // Expected format: /api/v1/notes/{noteId}/attachments/{attachmentId}?workspace={workspace}
-            var iframeSrc = src;
-            var match = src.match(/\/api\/v1\/notes\/(\d+)\/attachments\/([^?]+)(\?.*)?/);
-            if (match) {
-                var noteId = match[1];
-                var attachmentId = encodeURIComponent(decodeURIComponent(match[2]));
-                var queryString = match[3] || '';
-                
-                // Build audio_player.php URL
-                iframeSrc = '/audio_player.php?note=' + noteId + '&attachment=' + attachmentId;
-                if (queryString) {
-                    // Append workspace parameter if present
-                    iframeSrc += queryString.replace('?', '&');
-                }
-            }
+            var iframeSrc = buildAudioPlayerUrl(src) || src;
 
             // Create iframe wrapper
             var iframe = document.createElement('iframe');
@@ -93,7 +91,6 @@ function convertNoteAudioToIframes() {
             iframe.classList.add('note-audio-embed');
             iframe.style.height = '54px';
             iframe.style.border = 'none';
-            // Width, display, margin, background, and other styles are handled by CSS
 
             // Mark both original and iframe
             audio.setAttribute('data-converted-to-iframe', 'true');
@@ -188,22 +185,8 @@ function fixAudioIframes() {
                 return;
             }
 
-            // Parse the audio URL to build audio_player.php URL
-            // Expected format: /api/v1/notes/{noteId}/attachments/{attachmentId}?workspace={workspace}
-            var match = src.match(/\/api\/v1\/notes\/(\d+)\/attachments\/([^?]+)(\?.*)?/);
-            if (match) {
-                var noteId = match[1];
-                var attachmentId = encodeURIComponent(decodeURIComponent(match[2]));
-                var queryString = match[3] || '';
-                
-                // Build audio_player.php URL
-                var newSrc = '/audio_player.php?note=' + noteId + '&attachment=' + attachmentId;
-                if (queryString) {
-                    // Append workspace parameter if present
-                    newSrc += queryString.replace('?', '&');
-                }
-
-                // Update iframe src
+            var newSrc = buildAudioPlayerUrl(src);
+            if (newSrc) {
                 iframe.setAttribute('src', newSrc);
                 iframe.setAttribute('data-audio-src', src);
                 

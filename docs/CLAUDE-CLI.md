@@ -4,6 +4,10 @@ This guide explains how to configure and use the Poznote MCP server with Claude 
 
 ## Prerequisites
 
+- **Anthropic API key:** Claude CLI requires a paid [Anthropic API key](https://console.anthropic.com/). Set it before using the CLI:
+  ```bash
+  export ANTHROPIC_API_KEY=sk-ant-...
+  ```
 - Claude CLI installed (`npm install -g @anthropic-ai/claude-cli` or similar)
 - Poznote MCP server running (via Docker Compose)
 - MCP server accessible on localhost (default port: 8045)

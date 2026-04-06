@@ -63,11 +63,6 @@ function safeShowNotification(message, type) {
     }
 }
 
-// Function to update preview text with selected font sizes
-function updateFontSizePreview() {
-    // Preview logic removed as per user request to simplify
-}
-
 // Function to load current font size settings
 function loadCurrentFontSizes() {
     // Load note font size from localStorage
@@ -75,7 +70,6 @@ function loadCurrentFontSizes() {
     const fontSizeInput = document.getElementById('fontSizeInput');
     if (fontSizeInput) {
         fontSizeInput.value = noteFontSize;
-        updateFontSizePreview();
     }
 
     // Load sidebar font size from localStorage
@@ -83,7 +77,6 @@ function loadCurrentFontSizes() {
     const sidebarFontSizeInput = document.getElementById('sidebarFontSizeInput');
     if (sidebarFontSizeInput) {
         sidebarFontSizeInput.value = sidebarFontSize;
-        updateFontSizePreview();
     }
 
     // Load code block font size from localStorage
@@ -91,7 +84,6 @@ function loadCurrentFontSizes() {
     const codeBlockFontSizeInput = document.getElementById('codeBlockFontSizeInput');
     if (codeBlockFontSizeInput) {
         codeBlockFontSizeInput.value = codeBlockFontSize;
-        updateFontSizePreview();
     }
 }
 

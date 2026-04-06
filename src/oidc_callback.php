@@ -37,10 +37,7 @@ try {
     unset($_SESSION['oidc_redirect_after']);
 
     // CSP-compliant redirect using external script with JSON config
-    $redirectConfig = ['redirectAfter' => null];
-    if (is_string($redirectAfter) && $redirectAfter !== '' && !preg_match('#^[a-zA-Z][a-zA-Z0-9+.-]*://#', $redirectAfter) && !str_starts_with($redirectAfter, '//')) {
-        $redirectConfig['redirectAfter'] = $redirectAfter;
-    }
+    $redirectConfig = ['redirectAfter' => oidc_sanitize_redirect($redirectAfter)];
     
     echo '<!DOCTYPE html><html><head>';
     echo '<script type="application/json" id="workspace-redirect-data">' . json_encode($redirectConfig) . '</script>';

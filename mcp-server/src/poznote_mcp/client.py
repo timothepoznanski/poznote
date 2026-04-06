@@ -9,6 +9,11 @@ import logging
 
 logger = logging.getLogger("poznote-mcp.client")
 
+# Default timeout for most operations (seconds)
+DEFAULT_TIMEOUT = 30.0
+# Extended timeout for heavy operations (backup/restore/git sync)
+HEAVY_TIMEOUT = 120.0
+
 
 class PoznoteClient:
     """Client for Poznote REST API v1"""
@@ -19,14 +24,15 @@ class PoznoteClient:
         username: str | None = None,
         password: str | None = None,
         workspace: str | None = None,
-        user_id: str | int | None = None,
     ):
         # Default includes Poznote's typical dev port (8040). Users can override with POZNOTE_API_URL.
         self.base_url = (base_url or os.getenv("POZNOTE_API_URL", "http://localhost:8040/api/v1")).rstrip("/")
         self.username = username or os.getenv("POZNOTE_USERNAME", "")
         self.password = password or os.getenv("POZNOTE_PASSWORD", "")
+
+        # User ID is always 1 (admin) — the MCP server runs as the admin user.
+        self.user_id = "1"
         self.default_workspace = workspace or os.getenv("POZNOTE_DEFAULT_WORKSPACE", "Poznote")
-        self.user_id = str(user_id or os.getenv("POZNOTE_USER_ID", "1"))
         
         # Configure HTTP client with Basic Auth
         auth = None
@@ -40,11 +46,15 @@ class PoznoteClient:
             "X-User-ID": self.user_id
         }
         
+        # Transport with automatic retries for transient network errors
+        transport = httpx.HTTPTransport(retries=2)
+        
         self.client = httpx.Client(
             base_url=self.base_url,
             auth=auth,
-            timeout=30.0,
-            headers=headers
+            timeout=DEFAULT_TIMEOUT,
+            headers=headers,
+            transport=transport,
         )
 
     def _headers_for_user(self, user_id: str | int | None) -> dict | None:
@@ -407,27 +417,15 @@ class PoznoteClient:
 
     def git_push(self, user_id: str | int | None = None) -> dict:
         """Force push notes to Git provider"""
-        response = self.client.post("/git-sync/push", headers=self._headers_for_user(user_id))
+        response = self.client.post("/git-sync/push", headers=self._headers_for_user(user_id), timeout=HEAVY_TIMEOUT)
         response.raise_for_status()
         return response.json()
 
     def git_pull(self, user_id: str | int | None = None) -> dict:
         """Force pull notes from Git provider"""
-        response = self.client.post("/git-sync/pull", headers=self._headers_for_user(user_id))
+        response = self.client.post("/git-sync/pull", headers=self._headers_for_user(user_id), timeout=HEAVY_TIMEOUT)
         response.raise_for_status()
         return response.json()
-
-    def get_github_status(self, user_id: str | int | None = None) -> dict | None:
-        """Get GitHub synchronization status (Legacy)"""
-        return self.get_git_status(user_id=user_id)
-
-    def github_push(self, user_id: str | int | None = None) -> dict:
-        """Force push notes to GitHub (Legacy)"""
-        return self.git_push(user_id=user_id)
-
-    def github_pull(self, user_id: str | int | None = None) -> dict:
-        """Force pull notes from GitHub (Legacy)"""
-        return self.git_pull(user_id=user_id)
 
     def get_system_version(self) -> dict:
         """Get Poznote version information"""
@@ -443,7 +441,7 @@ class PoznoteClient:
 
     def create_backup(self) -> dict:
         """Trigger a new full backup"""
-        response = self.client.post("/backups")
+        response = self.client.post("/backups", timeout=HEAVY_TIMEOUT)
         response.raise_for_status()
         return response.json()
 
@@ -454,7 +452,7 @@ class PoznoteClient:
             filename: Name of the backup file to restore
             user_id: User profile ID to access (optional, overrides default)
         """
-        response = self.client.post(f"/backups/{filename}/restore", headers=self._headers_for_user(user_id))
+        response = self.client.post(f"/backups/{filename}/restore", headers=self._headers_for_user(user_id), timeout=HEAVY_TIMEOUT)
         response.raise_for_status()
         return response.json()
 
@@ -463,6 +461,136 @@ class PoznoteClient:
         response = self.client.get(f"/settings/{key}", headers=self._headers_for_user(user_id))
         response.raise_for_status()
         return response.json()
+
+    def update_setting(self, key: str, value: str, user_id: str | int | None = None) -> dict:
+        """Update a specific application setting"""
+        payload = {"value": value}
+        response = self.client.put(f"/settings/{key}", json=payload, headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        return response.json()
+
+    def get_backlinks(self, note_id: int, user_id: str | int | None = None) -> list[dict]:
+        """Get all notes that link to this note"""
+        response = self.client.get(f"/notes/{note_id}/backlinks", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return data.get("backlinks", [])
+        return []
+
+    def convert_note(self, note_id: int, target: str, user_id: str | int | None = None) -> dict | None:
+        """Convert a note between HTML and Markdown formats
+
+        Args:
+            note_id: ID of the note to convert
+            target: Target format ('html' or 'markdown')
+            user_id: User profile ID to access (optional)
+        """
+        payload = {"target": target}
+        response = self.client.post(f"/notes/{note_id}/convert", json=payload, headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return data
+        return None
+
+    def rename_folder(
+        self,
+        folder_id: int,
+        new_name: str,
+        workspace: str | None = None,
+        user_id: str | int | None = None,
+    ) -> dict | None:
+        """Rename an existing folder"""
+        params = {}
+        ws = workspace or self.default_workspace
+        if ws:
+            params["workspace"] = ws
+        payload = {"name": new_name}
+        response = self.client.patch(
+            f"/folders/{folder_id}",
+            json=payload,
+            params=params,
+            headers=self._headers_for_user(user_id),
+        )
+        if response.status_code == 404:
+            return None
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return data.get("folder")
+        return None
+
+    def delete_folder(
+        self,
+        folder_id: int,
+        workspace: str | None = None,
+        user_id: str | int | None = None,
+    ) -> bool:
+        """Delete a folder (moves notes to trash)"""
+        params = {}
+        ws = workspace or self.default_workspace
+        if ws:
+            params["workspace"] = ws
+        response = self.client.delete(
+            f"/folders/{folder_id}",
+            params=params,
+            headers=self._headers_for_user(user_id),
+        )
+        if response.status_code == 404:
+            return False
+        response.raise_for_status()
+        data = response.json()
+        return data.get("success", False)
+
+    def create_workspace(self, name: str, user_id: str | int | None = None) -> dict | None:
+        """Create a new workspace"""
+        payload = {"name": name}
+        response = self.client.post("/workspaces", json=payload, headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return data
+        return None
+
+    def rename_workspace(self, current_name: str, new_name: str, user_id: str | int | None = None) -> dict | None:
+        """Rename an existing workspace"""
+        payload = {"new_name": new_name}
+        response = self.client.patch(f"/workspaces/{current_name}", json=payload, headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return data
+        return None
+
+    def delete_workspace(self, name: str, user_id: str | int | None = None) -> bool:
+        """Delete a workspace (cannot delete the last one)"""
+        response = self.client.delete(f"/workspaces/{name}", headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        return data.get("success", False)
+
+    def delete_backup(self, filename: str) -> bool:
+        """Delete a backup file"""
+        response = self.client.delete(f"/backups/{filename}")
+        response.raise_for_status()
+        data = response.json()
+        return data.get("success", False)
+
+    def list_shared(self, workspace: str | None = None, user_id: str | int | None = None) -> dict:
+        """List all shared notes and folders"""
+        params = {}
+        if workspace:
+            params["workspace"] = workspace
+        response = self.client.get("/shared", params=params, headers=self._headers_for_user(user_id))
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return {
+                "shared_notes": data.get("shared_notes", []),
+                "shared_folders": data.get("shared_folders", []),
+            }
+        return {"shared_notes": [], "shared_folders": []}
     
     def close(self):
         """Close the HTTP client"""

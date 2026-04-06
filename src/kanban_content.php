@@ -287,20 +287,6 @@ try {
             </div>
         </div>
     </div>
-    
-    <script>
-    // Initialize Kanban drag and drop for inline view
-    (function() {
-        if (typeof window.initKanbanDragDrop === 'function') {
-            window.initKanbanDragDrop();
-        }
-        
-        // Initialize card click handlers
-        if (typeof window.initKanbanCardClicks === 'function') {
-            window.initKanbanCardClicks();
-        }
-    })();
-    </script>
     <?php
 
 } catch (Exception $e) {

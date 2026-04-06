@@ -335,16 +335,17 @@ function requireAuth() {
     }
 }
 
-function requireApiAuth() {
-    // For API endpoints, check session first
-    if (isAuthenticated()) {
-        return;
-    }
-    
-    // Check if Basic Auth is disabled
+/**
+ * Authenticate via HTTP Basic Auth headers.
+ * Validates credentials and returns the authenticated user profile.
+ * Sends error response and exits on failure.
+ *
+ * @param bool $requireAdmin If true, non-admin users are rejected with "Invalid credentials".
+ * @return array The authenticated user profile.
+ */
+function authenticateApiBasicAuth(bool $requireAdmin = false): array {
     $basicAuthDisabled = defined('OIDC_DISABLE_BASIC_AUTH') && OIDC_DISABLE_BASIC_AUTH;
     
-    // If no session, try HTTP Basic Auth
     if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW'])) {
         $msg = api_t('auth.api.authentication_required', [], 'Authentication required');
         header('HTTP/1.1 401 Unauthorized');
@@ -364,37 +365,28 @@ function requireApiAuth() {
         exit;
     }
     
-    // Validate credentials using database profiles
     require_once __DIR__ . '/users/db_master.php';
     $authUser = getUserProfileByUsername($_SERVER['PHP_AUTH_USER']);
     
-    if (!$authUser || !$authUser['active']) {
+    if (!$authUser || !$authUser['active'] || ($requireAdmin && !(bool)$authUser['is_admin']) || !verifyUserPassword((int)$authUser['id'], $_SERVER['PHP_AUTH_PW'])) {
         $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
         header('HTTP/1.1 401 Unauthorized');
         header('Content-Type: application/json');
         echo json_encode(['error' => $msg]);
         exit;
     }
+    
+    return $authUser;
+}
 
-    $isAdminCreds = false;
-    $isUserCreds = false;
-    
-    // Verify password: DB hash takes priority, then env var fallback
-    if (verifyUserPassword((int)$authUser['id'], $_SERVER['PHP_AUTH_PW'])) {
-        if ((bool)$authUser['is_admin']) {
-            $isAdminCreds = true;
-        } else {
-            $isUserCreds = true;
-        }
+function requireApiAuth() {
+    // For API endpoints, check session first
+    if (isAuthenticated()) {
+        return;
     }
     
-    if (!$isAdminCreds && !$isUserCreds) {
-        $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
-        header('HTTP/1.1 401 Unauthorized');
-        header('Content-Type: application/json');
-        echo json_encode(['error' => $msg]);
-        exit;
-    }
+    $authUser = authenticateApiBasicAuth();
+    $isAdminCreds = (bool)$authUser['is_admin'];
     
     // For Basic Auth, require X-User-ID header to specify which user profile to use
     // This is needed because with multi-user, each user has their own data
@@ -461,50 +453,7 @@ function requireApiAuthUser() {
         return;
     }
     
-    // Check if Basic Auth is disabled
-    $basicAuthDisabled = defined('OIDC_DISABLE_BASIC_AUTH') && OIDC_DISABLE_BASIC_AUTH;
-    
-    // If no session, try HTTP Basic Auth
-    if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW'])) {
-        $msg = api_t('auth.api.authentication_required', [], 'Authentication required');
-        header('HTTP/1.1 401 Unauthorized');
-        if (!$basicAuthDisabled) {
-            header('WWW-Authenticate: Basic realm="Poznote API"');
-        }
-        header('Content-Type: application/json');
-        echo json_encode(['error' => $msg]);
-        exit;
-    }
-    
-    if ($basicAuthDisabled) {
-        $msg = api_t('auth.api.basic_auth_disabled', [], 'Basic authentication is disabled');
-        header('HTTP/1.1 403 Forbidden');
-        header('Content-Type: application/json');
-        echo json_encode(['error' => $msg]);
-        exit;
-    }
-    
-    // Validate credentials using database profiles
-    require_once __DIR__ . '/users/db_master.php';
-    $authUser = getUserProfileByUsername($_SERVER['PHP_AUTH_USER']);
-    
-    if (!$authUser || !$authUser['active']) {
-        $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
-        header('HTTP/1.1 401 Unauthorized');
-        header('Content-Type: application/json');
-        echo json_encode(['error' => $msg]);
-        exit;
-    }
-
-    $isValid = verifyUserPassword((int)$authUser['id'], $_SERVER['PHP_AUTH_PW']);
-    
-    if (!$isValid) {
-        $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
-        header('HTTP/1.1 401 Unauthorized');
-        header('Content-Type: application/json');
-        echo json_encode(['error' => $msg]);
-        exit;
-    }
+    $authUser = authenticateApiBasicAuth();
     
     // Set up session with the authenticated user
     $_SESSION['authenticated'] = true;
@@ -561,40 +510,7 @@ function requireApiAuthAdmin() {
         return;
     }
     
-    // Check if Basic Auth is disabled
-    $basicAuthDisabled = defined('OIDC_DISABLE_BASIC_AUTH') && OIDC_DISABLE_BASIC_AUTH;
-    
-    // If no session, try HTTP Basic Auth
-    if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW'])) {
-        $msg = api_t('auth.api.authentication_required', [], 'Authentication required');
-        header('HTTP/1.1 401 Unauthorized');
-        if (!$basicAuthDisabled) {
-            header('WWW-Authenticate: Basic realm="Poznote API"');
-        }
-        header('Content-Type: application/json');
-        echo json_encode(['error' => $msg]);
-        exit;
-    }
-    
-    if ($basicAuthDisabled) {
-        $msg = api_t('auth.api.basic_auth_disabled', [], 'Basic authentication is disabled');
-        header('HTTP/1.1 403 Forbidden');
-        header('Content-Type: application/json');
-        echo json_encode(['error' => $msg]);
-        exit;
-    }
-    
-    // Validate credentials using database profiles (must be an admin)
-    require_once __DIR__ . '/users/db_master.php';
-    $authUser = getUserProfileByUsername($_SERVER['PHP_AUTH_USER']);
-    
-    if (!$authUser || !$authUser['active'] || !(bool)$authUser['is_admin'] || !verifyUserPassword((int)$authUser['id'], $_SERVER['PHP_AUTH_PW'])) {
-        $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
-        header('HTTP/1.1 401 Unauthorized');
-        header('Content-Type: application/json');
-        echo json_encode(['error' => $msg]);
-        exit;
-    }
+    $authUser = authenticateApiBasicAuth(requireAdmin: true);
     
     // For admin endpoints, we still need a user context for getCurrentUserId() etc.
     // Use X-User-ID if provided, otherwise use the first admin user

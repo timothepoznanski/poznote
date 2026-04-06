@@ -934,13 +934,6 @@ function getTaskListData(noteId) {
     return JSON.stringify(parseTaskData(noteEntry));
 }
 
-// Utility function to escape HTML
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
 // Convert plain-text URLs into clickable anchor tags safely.
 // Strategy: escape the full text first, then replace URL-like substrings
 // in the escaped string with anchor tags. Anchors include

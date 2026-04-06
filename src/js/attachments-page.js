@@ -201,10 +201,7 @@
                     if (window.POZNOTE_CONFIG?.gitSyncAutoPush) {
                         try {
                             localStorage.setItem('poznote_needs_auto_push_' + noteId, 'true');
-                            // LOG: Sur la page attachments.php après upload - écrit directement dans localStorage
-                            // console.log('[Poznote Auto-Push] Flag stored in localStorage for note', noteId, '(attachment uploaded)');
                         } catch (e) {
-                            // console.warn('[Poznote Auto-Push] Failed to store flag in localStorage:', e);
                         }
                     }
                     
@@ -430,10 +427,7 @@
                     if (window.POZNOTE_CONFIG?.gitSyncAutoPush) {
                         try {
                             localStorage.setItem('poznote_needs_auto_push_' + noteId, 'true');
-                            // LOG: Sur la page attachments.php après suppression - écrit directement dans localStorage
-                            // console.log('[Poznote Auto-Push] Flag stored in localStorage for note', noteId, '(attachment deleted)');
                         } catch (e) {
-                            // console.warn('[Poznote Auto-Push] Failed to store flag in localStorage:', e);
                         }
                     }
                     

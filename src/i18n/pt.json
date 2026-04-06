@@ -1982,60 +1982,26 @@
   },
   "multiuser": {
     "admin": {
-      "maintenance": {
-        "title": "Reconstruir Base de Dados Master",
-        "subtitle": "Restaurar perfis de utilizador e links de partilha",
-        "description": "A base de dados principal (master.db) contém as informações dos utilizadores, os seus links públicos e as definições globais do Poznote. Se este ficheiro for perdido ou corrompido, ou se alguns links públicos deixarem de funcionar após uma restauração, esta ferramenta analisa as pastas 'data/users' para voltar a registar automaticamente as contas, recuperar os nomes reais a partir das bases de dados pessoais e restaurar todos os links de partilha públicos.",
-        "repair_registry": "Reconstrução",
-        "repair_registry_confirm": "Isto irá analisar todas as pastas de utilizador e reconstruir a base de dados master. Continuar?",
-        "repair_registry_success": "Base de dados master reconstruída com sucesso:\n\n- {{scanned}} pastas analisadas\n- {{added}} utilizadores restaurados\n- {{links}} links partilhados reconstruídos",
-        "repair_registry_error": "Erro de reconstrução: {{error}}"
-      },
-      "administrator": "Administrador",
-      "email_usage_note": "Os endereços de e-mail são usados apenas para autenticação OIDC, se configurado. Poznote não envia e-mails.",
-      "admin_note": "Apenas o usuário 1 é um administrador. Outros usuários não podem ter privilégios de administrador.",
-      "password_management": {
-        "manage_password": "Palavra-passe",
-        "reset_password": "Repor palavra-passe",
-        "set_password": "Definir palavra-passe",
-        "reset_to_default": "Usar palavra-passe padrão (.env)",
-        "modal_help": "Defina uma palavra-passe personalizada para esta conta ou volte à palavra-passe padrão definida no ambiente.",
-        "current_mode": "Modo atual",
-        "set_help": "Pelo menos 4 caracteres. Isto substitui a palavra-passe definida nas variáveis de ambiente para este utilizador.",
-        "reset_help": "Remove a palavra-passe personalizada e volta a usar a palavra-passe padrão definida nas variáveis de ambiente para este utilizador.",
-        "reset_confirm": "Repor a palavra-passe de \"{{username}}\" para a definida nas variáveis de ambiente?",
-        "set_success": "Palavra-passe atualizada com sucesso.",
-        "reset_success": "Palavra-passe reposta para o valor padrão que se encontra nas variáveis de ambiente.",
-        "status_custom": "Personalizada",
-        "status_default": "Padrão",
-        "status_custom_detail": "Este utilizador usa uma palavra-passe personalizada.",
-        "status_default_detail": "Este utilizador usa a palavra-passe padrão que se encontra nas variáveis de ambiente.",
-        "changed_at_prefix": "Atualizado:"
-      },
-      "processing": "Processando...",
-      "errors_label": "Erros:",
-      "network_error": "Erro de rede:",
-      "click_to_rename": "Clique para renomear",
-      "rename_user": "Renomear usuário",
-      "delete_warning_all_data": "Todos os dados do usuário (notas, anexos, etc.) serão permanentemente excluídos.",
-      "access_denied_admin": "Acesso negado. Privilégios de administrador necessários.",
-      "toggle_admin": "Alternar privilégios de administrador",
-      "click_to_deactivate": "Clique para desativar",
-      "click_to_activate": "Clique para ativar",
-      "confirm_admin": {
-        "title": "Confirmar promoção a administrador",
-        "message": "Tem a certeza que deseja conceder privilégios de administrador a \"{{username}}\"?",
-        "privileges_title": "O administrador terá permissão para:",
-        "privilege_notes": "Exportar notas de qualquer utilizador num ficheiro ZIP",
-        "privilege_passwords": "Alterar as palavras-passe de todos os outros utilizadores",
-        "privilege_admin_panel": "Aceder a este painel de gestão de utilizadores",
-        "confirm_button": "Confirmar promoção a administrador"
-      },
       "id": "ID",
+      "username": "Usuário",
+      "email": "E-mail",
+      "administrator": "Administrador",
+      "status": "Status",
+      "actions": "Ações",
+      "active": "Ativo",
+      "inactive": "Inactivo",
+      "not_defined": "não definido",
+      "create_user": "Criar perfil",
+      "edit_user": "Editar usuário",
+      "click_to_activate": "Clique para ativar",
+      "click_to_deactivate": "Clique para desativar",
+      "toggle_admin": "Conceder ou revogar privilégios de administrador",
+      "admin_id_1_locked": "O perfil de administrador não pode ser removido do usuário com ID 1",
+      "admin_note": "Use a caixa de seleção Admin para conceder ou revogar privilégios de administrador para outro usuário.",
       "errors": {
-        "username_required": "O nome de usuário é obrigatório",
         "cannot_delete_self": "Você não pode excluir seu próprio perfil",
-        "cannot_change_self": "Você não pode alterar seu próprio status/função"
+        "cannot_change_self": "Você não pode alterar seu próprio status/função",
+        "username_required": "O nome de usuário é obrigatório"
       }
     }
   },
@@ -2233,31 +2199,6 @@
   },
   "backlinks": {
     "title": "Backlinks"
-  },
-  "multiuser": {
-    "admin": {
-      "id": "ID",
-      "username": "Usuário",
-      "email": "E-mail",
-      "administrator": "Administrador",
-      "status": "Status",
-      "actions": "Ações",
-      "active": "Ativo",
-      "inactive": "Inactivo",
-      "not_defined": "não definido",
-      "create_user": "Criar perfil",
-      "edit_user": "Editar usuário",
-      "click_to_activate": "Clique para ativar",
-      "click_to_deactivate": "Clique para desativar",
-      "toggle_admin": "Conceder ou revogar privilégios de administrador",
-      "admin_id_1_locked": "O perfil de administrador não pode ser removido do usuário com ID 1",
-      "admin_note": "Use a caixa de seleção Admin para conceder ou revogar privilégios de administrador para outro usuário.",
-      "errors": {
-        "cannot_delete_self": "Você não pode excluir seu próprio perfil",
-        "cannot_change_self": "Você não pode alterar seu próprio status/função",
-        "username_required": "O nome de usuário é obrigatório"
-      }
-    }
   },
   "password": {
     "status": {

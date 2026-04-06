@@ -7,6 +7,20 @@ function oidc_is_enabled() {
     return defined('OIDC_ENABLED') && OIDC_ENABLED === true && (OIDC_ISSUER !== '' || OIDC_DISCOVERY_URL !== '') && OIDC_CLIENT_ID !== '';
 }
 
+/**
+ * Sanitize a redirect URL to prevent open redirect attacks.
+ * Only allows relative paths within the application.
+ * Returns null if the redirect is invalid.
+ */
+function oidc_sanitize_redirect($redirect) {
+    if (!is_string($redirect)) return null;
+    $redirect = trim($redirect);
+    if ($redirect === '' || preg_match('#^[a-zA-Z][a-zA-Z0-9+.-]*://#', $redirect) || str_starts_with($redirect, '//')) {
+        return null;
+    }
+    return $redirect;
+}
+
 function oidc_base64url_encode($data) {
     return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
 }

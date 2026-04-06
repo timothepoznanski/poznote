@@ -12,6 +12,12 @@ services:
     volumes:
       - "./src:/var/www/html"
       - "./data:/var/www/html/data"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--timeout=5", "-O", "/dev/null", "http://127.0.0.1/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
   mcp-server:
     build:
@@ -24,18 +30,9 @@ services:
       POZNOTE_API_URL: http://webserver:80/api/v1
       POZNOTE_USERNAME: ${POZNOTE_MCP_USERNAME:-admin}
       POZNOTE_PASSWORD: ${POZNOTE_PASSWORD:-admin}
-      POZNOTE_USER_ID: ${POZNOTE_MCP_USER_ID:-1}
-      POZNOTE_DEFAULT_WORKSPACE: ${POZNOTE_MCP_WORKSPACE:-Poznote}
-      MCP_HOST: "0.0.0.0"
-      MCP_PORT: "8045"
-      POZNOTE_DEBUG: ${POZNOTE_MCP_DEBUG:-true}
+      POZNOTE_DEFAULT_WORKSPACE: ${POZNOTE_DEFAULT_WORKSPACE:-Poznote}
+      POZNOTE_DEBUG: ${POZNOTE_DEBUG:-}
     ports:
       - "127.0.0.1:${POZNOTE_MCP_PORT:-8046}:8045"
     depends_on:
       - webserver
-    healthcheck:
-      test: ["CMD", "sh", "-c", "wget --quiet --tries=1 --timeout=5 -O /dev/null http://127.0.0.1:8045/ || exit 0"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s

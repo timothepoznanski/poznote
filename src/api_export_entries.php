@@ -5,6 +5,7 @@ requireApiAuth();
 require_once 'functions.php';
 require_once 'config.php';
 require_once 'db_connect.php';
+require_once 'export_helpers.php';
 
 // Start output buffering to prevent any unwanted output
 ob_start();
@@ -15,13 +16,7 @@ $rootPath = getEntriesPath();
 $zip = new ZipArchive();
 // Create ZIP file in temporary directory with proper permissions
 $tempDir = sys_get_temp_dir();
-$zipFileName = $tempDir . '/entries_' . uniqid() . '.zip';
-
-// Debug: Check if entries directory exists
-if (!$rootPath) {
-    ob_end_clean();
-    die('Entries directory not found in any expected location');
-}
+$zipFileName = $tempDir . '/poznote_export_' . date('Y-m-d_His') . '.zip';
 
 $result = $zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 if ($result !== TRUE) {
@@ -122,81 +117,6 @@ foreach ($files as $name => $file) {
             }
         }
     }
-}
-
-/**
- * Remove code block copy buttons from HTML export
- */
-function removeCopyButtonsFromHtml($html) {
-    if ($html === '' || $html === null) {
-        return $html;
-    }
-
-    $dom = new DOMDocument();
-    libxml_use_internal_errors(true);
-    $dom->loadHTML('<?xml encoding="utf-8" ?>' . $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-    libxml_clear_errors();
-
-    $xpath = new DOMXPath($dom);
-    $copyButtons = $xpath->query("//*[contains(@class, 'code-block-copy-btn')]");
-    foreach ($copyButtons as $button) {
-        $button->parentNode->removeChild($button);
-    }
-
-    return $dom->saveHTML();
-}
-
-/**
- * Add YAML front matter to Markdown content
- */
-function addFrontMatterToMarkdown($content, $metadata, $con) {
-    $title = $metadata['heading'] ?? 'New note';
-    $tags = $metadata['tags'] ?? '';
-    $favorite = !empty($metadata['favorite']) ? 'true' : 'false';
-    $created = $metadata['created'] ?? '';
-    $updated = $metadata['updated'] ?? '';
-    $folder_id = $metadata['folder_id'] ?? null;
-    
-    // Parse tags (stored as comma-separated string)
-    $tagsList = [];
-    if (!empty($tags)) {
-        $tagsList = array_filter(array_map('trim', explode(',', $tags)));
-    }
-    
-    // Get folder path if exists
-    $folderPath = '';
-    if ($folder_id) {
-        $folderPath = getFolderPath($folder_id, $con);
-    }
-    
-    // Build YAML front matter
-    $frontMatter = "---\n";
-    $frontMatter .= "title: " . json_encode($title, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
-    
-    if (!empty($tagsList)) {
-        $frontMatter .= "tags:\n";
-        foreach ($tagsList as $tag) {
-            $frontMatter .= "  - " . json_encode($tag, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
-        }
-    }
-    
-    if (!empty($folderPath)) {
-        $frontMatter .= "folder: " . json_encode($folderPath, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
-    }
-    
-    $frontMatter .= "favorite: " . $favorite . "\n";
-    
-    if (!empty($created)) {
-        $frontMatter .= "created: " . json_encode($created, JSON_UNESCAPED_UNICODE) . "\n";
-    }
-    
-    if (!empty($updated)) {
-        $frontMatter .= "updated: " . json_encode($updated, JSON_UNESCAPED_UNICODE) . "\n";
-    }
-    
-    $frontMatter .= "---\n\n";
-    
-    return $frontMatter . $content;
 }
 
 $zip->close();

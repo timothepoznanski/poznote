@@ -2005,9 +2005,9 @@
       "administrator": "管理员",
       "click_to_activate": "点击激活",
       "click_to_deactivate": "点击停用",
-      "toggle_admin": "授予或撤销管理员权限",
+      "toggle_admin": "切换管理员角色",
       "admin_id_1_locked": "无法移除用户 ID 1 的管理员角色",
-      "admin_note": "使用“管理员”复选框为其他用户授予或撤销管理员权限。",
+      "admin_note": "只有用户1是管理员。其他用户不能拥有管理员权限。",
       "password_management": {
         "manage_password": "密码",
         "reset_password": "重置密码",
@@ -2069,8 +2069,6 @@
         "repair_registry_success": "主数据库重建成功：\n\n- 扫描了 {{scanned}} 个文件夹\n- 恢复了 {{added}} 个用户\n- 重建了 {{links}} 个共享链接",
         "repair_registry_error": "重建出错: {{error}}"
       },
-      "administrator": "管理员",
-      "admin_note": "只有用户1是管理员。其他用户不能拥有管理员权限。",
       "processing": "正在处理...",
       "errors_label": "错误：",
       "network_error": "网络错误：",
@@ -2078,9 +2076,6 @@
       "rename_user": "重命名用户",
       "delete_warning_all_data": "所有用户数据（笔记、附件等）都将被永久删除。",
       "access_denied_admin": "拒绝访问。需要管理员权限。",
-      "toggle_admin": "切换管理员角色",
-      "click_to_deactivate": "点击停用",
-      "click_to_activate": "点击激活",
       "confirm_admin": {
         "title": "确认提升为管理员",
         "message": "您确定要授予 \"{{username}}\" 管理员权限吗？",
@@ -2089,8 +2084,7 @@
         "privilege_passwords": "更改所有其他用户的密码",
         "privilege_admin_panel": "访问此用户管理面板",
         "confirm_button": "确认管理员晋升"
-      },
-      "id": "ID"
+      }
     },
     "profile": {
       "title": "我的资料",

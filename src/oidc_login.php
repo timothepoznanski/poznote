@@ -27,18 +27,7 @@ $rememberMe = isset($_GET['remember_me']) && $_GET['remember_me'] === '1';
 
 // Sanitize and validate redirect parameter to prevent open redirect vulnerabilities
 // Only allow relative paths within the application (no external URLs or protocol-relative URLs)
-if (is_string($redirectAfter)) {
-    $redirectAfter = trim($redirectAfter);
-    
-    // Reject if empty, absolute URL (http://, https://, etc.), or protocol-relative URL (//)
-    if ($redirectAfter === '' || 
-        preg_match('#^[a-zA-Z][a-zA-Z0-9+.-]*://#', $redirectAfter) || 
-        str_starts_with($redirectAfter, '//')) {
-        $redirectAfter = null;
-    }
-} else {
-    $redirectAfter = null;
-}
+$redirectAfter = oidc_sanitize_redirect($redirectAfter);
 
 try {
     // Store remember me preference in session

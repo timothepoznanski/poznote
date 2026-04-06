@@ -68,8 +68,8 @@
       "custom_css": "Custom CSS path",
       "release_notes": "Release Notes",
       "convert_images": "Base64 Image Converter",
-        "orphan_scanner": "Orphan attachments scanner",
-        "change_password": "Change Password",
+      "orphan_scanner": "Orphan attachments scanner",
+      "change_password": "Change Password",
       "import_limits": "Import Limits",
       "git_sync_toggle": "Git Sync"
     },

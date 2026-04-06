@@ -2105,7 +2105,7 @@
         "repair_registry_error": "Erreur de reconstruction : {{error}}"
       },
       "administrator": "Administrateur",
-      "admin_note": "Seul l'utilisateur 1 est administrateur. Les autres utilisateurs ne peuvent pas avoir de privilèges d'administrateur.",
+      "admin_note": "Utilisez la case à cocher Admin pour accorder ou révoquer les privilèges d'administrateur pour un autre utilisateur.",
       "processing": "Traitement...",
       "errors_label": "Erreurs :",
       "network_error": "Erreur réseau :",
@@ -2113,7 +2113,7 @@
       "rename_user": "Renommer l'utilisateur",
       "delete_warning_all_data": "Toutes les données de l'utilisateur (notes, pièces jointes, etc.) seront définitivement supprimées.",
       "access_denied_admin": "Accès refusé. Privilèges administrateur requis.",
-      "toggle_admin": "Basculer le rôle Administrateur",
+      "toggle_admin": "Accorder ou révoquer les privilèges d'administrateur",
       "click_to_deactivate": "Cliquer pour désactiver",
       "click_to_activate": "Cliquer pour activer",
       "confirm_admin": {
@@ -2126,9 +2126,7 @@
         "confirm_button": "Confirmer le passage admin"
       },
       "id": "ID",
-      "admin_id_1_locked": "Le rôle d'administrateur ne peut pas être retiré à l'utilisateur ID 1",
-      "toggle_admin": "Accorder ou révoquer les privilèges d'administrateur",
-      "admin_note": "Utilisez la case à cocher Admin pour accorder ou révoquer les privilèges d'administrateur pour un autre utilisateur."
+      "admin_id_1_locked": "Le rôle d'administrateur ne peut pas être retiré à l'utilisateur ID 1"
     },
     "profile": {
       "title": "Mon profil",

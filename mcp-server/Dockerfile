@@ -1,7 +1,8 @@
 # Dockerfile for Poznote MCP Server
-# Lightweight Python Alpine image for MCP (Model Context Protocol) server
+# Multi-stage build for a minimal Python image
 
-FROM python:3.12-alpine
+# --- Stage 1: Build ---
+FROM python:3.12-alpine AS builder
 
 # Labels
 LABEL org.opencontainers.image.title="Poznote MCP Server"
@@ -10,15 +11,8 @@ LABEL org.opencontainers.image.authors="Timothé Poznanski"
 LABEL org.opencontainers.image.url="https://github.com/timothepoznanski/poznote"
 LABEL org.opencontainers.image.source="https://github.com/timothepoznanski/poznote"
 
-# Install system dependencies
-RUN apk add --no-cache \
-    gcc \
-    musl-dev \
-    libffi-dev \
-    && rm -rf /var/cache/apk/*
-
-# Create non-root user for security
-RUN addgroup -g 1000 mcp && adduser -u 1000 -G mcp -s /bin/sh -D mcp
+# Install build dependencies
+RUN apk add --no-cache gcc musl-dev libffi-dev
 
 # Set working directory
 WORKDIR /app
@@ -31,27 +25,30 @@ COPY src/ ./src/
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir .
 
-# Remove build dependencies to reduce image size
-RUN apk del gcc musl-dev libffi-dev
+# --- Stage 2: Runtime ---
+FROM python:3.12-alpine
+
+# Create non-root user for security
+RUN addgroup -g 1000 mcp && adduser -u 1000 -G mcp -s /bin/sh -D mcp
+
+WORKDIR /app
+
+# Copy installed packages and entrypoint from builder
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=builder /usr/local/bin/poznote-mcp /usr/local/bin/poznote-mcp
 
 # Switch to non-root user
 USER mcp
 
 # Default environment variables (can be overridden)
-ENV POZNOTE_API_URL=http://poznote:80/api/v1
-ENV POZNOTE_USERNAME=admin
-ENV POZNOTE_PASSWORD=admin
-ENV POZNOTE_USER_ID=1
-ENV POZNOTE_DEFAULT_WORKSPACE=Poznote
-ENV MCP_HOST=0.0.0.0
 ENV MCP_PORT=8045
 
 # Expose MCP server port
-EXPOSE 8045
+EXPOSE $MCP_PORT
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:${MCP_PORT}/mcp || exit 1
+    CMD nc -z 127.0.0.1 ${MCP_PORT} || exit 1
 
 # Run the MCP server
-CMD ["sh", "-c", "poznote-mcp serve --host=${MCP_HOST} --port=${MCP_PORT}"]
+CMD ["sh", "-c", "poznote-mcp serve --host=0.0.0.0 --port=${MCP_PORT}"]

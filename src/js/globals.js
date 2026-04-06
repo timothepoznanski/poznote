@@ -62,6 +62,14 @@ function isMobileDevice() {
     return window.innerWidth <= 800;
 }
 
+// Shared HTML escape utility
+function escapeHtml(text) {
+    if (!text) return '';
+    var div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // --- i18n (client-side) ---
 // Loads merged translations from api_i18n.php and exposes window.t(key, vars, fallback)
 (function () {
