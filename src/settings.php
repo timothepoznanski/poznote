@@ -458,17 +458,6 @@ if ($isAdmin) {
                 </div>
             </div>
 
-            <!-- MCP Server Configuration -->
-            <div class="home-card" id="mcp-config-card">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-bot"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.mcp_config', [], 'MCP Server'); ?></span>
-                    <span id="mcp-config-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                </div>
-            </div>
-
         </div>
         <?php endif; ?>
 

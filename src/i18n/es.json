@@ -346,8 +346,7 @@
       "user_management": "Gestión de usuarios",
       "change_password": "Cambiar contraseña",
       "import_limits": "Límites de importación",
-      "git_sync_toggle": "Sincronización Git",
-      "mcp_config": "Servidor MCP"
+      "git_sync_toggle": "Sincronización Git"
     },
     "install_app": {
       "unavailable": "La instalación no está disponible ahora mismo. En Chrome móvil, abre el menú del navegador y pulsa \"Instalar aplicación\" (o \"Agregar a la pantalla de inicio\") cuando la opción esté disponible.",
@@ -988,17 +987,6 @@
       "move": "Mover carpeta",
       "workspace": "Espacio de trabajo de destino",
       "parent": "Carpeta padre de destino"
-    },
-    "mcp_config": {
-      "title": "Configuración del servidor MCP",
-      "description": "Configure el servidor MCP. Los cambios en el ID de usuario y el espacio de trabajo tienen efecto inmediato.",
-      "user_id": "Usuario",
-      "default_workspace": "Espacio de trabajo predeterminado",
-      "debug": "Registro de depuración",
-      "badge": "ID: {{user_id}} / {{workspace}}",
-      "user_id_tooltip": "El perfil de usuario de Poznote con el que actúa el servidor MCP por defecto.",
-      "default_workspace_tooltip": "El espacio de trabajo utilizado para listar y crear notas cuando no se especifica ninguno en la llamada de herramienta.",
-      "debug_tooltip": "Cambia el nivel de log de INFO a DEBUG. Cada solicitud a la API y llamada de herramienta se escribe en detalle en los logs del contenedor (docker logs poznote-mcp). Útil para diagnosticar problemas. Tiene efecto tras reiniciar el contenedor."
     }
   },
   "notes_list": {

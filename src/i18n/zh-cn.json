@@ -347,8 +347,7 @@
       "orphan_scanner": "孤立附件扫描器",
       "change_password": "修改密码",
       "import_limits": "导入限制",
-      "git_sync_toggle": "Git 同步",
-      "mcp_config": "MCP 服务器"
+      "git_sync_toggle": "Git 同步"
     },
     "install_app": {
       "unavailable": "当前无法安装。请在 Chrome 手机版中打开浏览器菜单，然后在可用时点击“安装应用”（或“添加到主屏幕”）。",
@@ -979,17 +978,6 @@
         "pacific": "太平洋",
         "africa": "非洲"
       }
-    },
-    "mcp_config": {
-      "title": "MCP 服务器配置",
-      "description": "配置 MCP 服务器。用户 ID 和工作区的更改立即生效。",
-      "user_id": "用户",
-      "default_workspace": "默认工作区",
-      "debug": "调试日志",
-      "badge": "ID: {{user_id}} / {{workspace}}",
-      "user_id_tooltip": "MCP 服务器默认使用的 Poznote 用户配置文件。",
-      "default_workspace_tooltip": "工具调用中未指定工作区时，用于列出和创建笔记的默认工作区。",
-      "debug_tooltip": "将日志级别从 INFO 切换为 DEBUG，所有 API 请求和工具调用的详细信息将写入容器日志（docker logs poznote-mcp），便于排查问题。容器重启后生效。"
     }
   },
   "notes_list": {

@@ -347,8 +347,7 @@
       "user_management": "Benutzerverwaltung",
       "change_password": "Passwort ändern",
       "import_limits": "Importlimits",
-      "git_sync_toggle": "Git-Synchronisierung",
-      "mcp_config": "MCP-Server"
+      "git_sync_toggle": "Git-Synchronisierung"
     },
     "install_app": {
       "unavailable": "Die Installation ist derzeit nicht verfügbar. Öffnen Sie auf Chrome Mobile das Browsermenü und tippen Sie auf \"App installieren\" (oder \"Zum Startbildschirm hinzufügen\"), sobald die Option verfügbar ist.",
@@ -989,17 +988,6 @@
       "move": "Ordner verschieben",
       "workspace": "Ziel-Workspace",
       "parent": "Ziel-Überordner"
-    },
-    "mcp_config": {
-      "title": "MCP-Server-Konfiguration",
-      "description": "Konfigurieren Sie den MCP-Server. Änderungen an Benutzer-ID und Arbeitsbereich wirken sofort.",
-      "user_id": "Benutzer",
-      "default_workspace": "Standard-Arbeitsbereich",
-      "debug": "Debug-Protokollierung",
-      "badge": "ID: {{user_id}} / {{workspace}}",
-      "user_id_tooltip": "Das Poznote-Benutzerprofil, als das der MCP-Server standardmäßig agiert.",
-      "default_workspace_tooltip": "Der Arbeitsbereich, der zum Auflisten und Erstellen von Notizen verwendet wird, wenn im Tool-Aufruf kein Arbeitsbereich angegeben ist.",
-      "debug_tooltip": "Wechselt den Log-Level von INFO zu DEBUG. Jede API-Anfrage und jeder Tool-Aufruf wird detailliert in die Container-Logs geschrieben (docker logs poznote-mcp). Nützlich zur Fehlersuche. Gilt nach dem Container-Neustart."
     }
   },
   "notes_list": {

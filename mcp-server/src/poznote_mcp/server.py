@@ -29,7 +29,7 @@ import logging
 import os
 import socket
 import sys
-from typing import Optional
+from typing import Optional, Union
 
 from mcp.server.fastmcp import FastMCP
 
@@ -294,7 +294,7 @@ def search_notes(query: str, workspace: Optional[str] = None, limit: int = 10, u
 @mcp.tool()
 def create_note(
     title: str,
-    content: str,
+    content: Union[str, list],
     workspace: str = "Poznote",
     tags: Optional[str] = None,
     folder: Optional[str] = None,
@@ -305,13 +305,17 @@ def create_note(
     
     Args:
         title: Title of the new note
-        content: Content of the note (HTML or Markdown)
+        content: Content of the note (HTML, Markdown, or JSON array for task lists)
         workspace: Workspace name (optional, default: 'Poznote')
         tags: Comma-separated tags (e.g., 'ai, docs, important')
         folder: Folder name to place the note in
-        note_type: Note type/format. Supported: 'note' (HTML, default), 'markdown'.
+        note_type: Note type/format. Supported: 'note' (HTML, default), 'markdown', 'tasklist'.
         user_id: User profile ID to access (optional, overrides default)
     """
+    # Task list notes use a JSON array as content; if the MCP framework
+    # parsed it into a Python list, convert it back to a JSON string.
+    if isinstance(content, list):
+        content = json.dumps(content, ensure_ascii=False)
     client, err = _get_client_or_error()
     if err:
         return err
@@ -324,10 +328,10 @@ def create_note(
         note_type = str(note_type).strip().lower()
         if note_type == "html":
             note_type = "note"
-        if note_type not in {"note", "markdown", "excalidraw"}:
+        if note_type not in {"note", "markdown", "excalidraw", "tasklist"}:
             return json.dumps(
                 {
-                    "error": "Invalid note_type. Use 'note' (HTML), 'markdown', or 'excalidraw'.",
+                    "error": "Invalid note_type. Use 'note' (HTML), 'markdown', 'tasklist', or 'excalidraw'.",
                     "note_type": note_type,
                 },
                 ensure_ascii=False,
@@ -357,7 +361,7 @@ def create_note(
 def update_note(
     id: int,
     workspace: Optional[str] = None,
-    content: Optional[str] = None,
+    content: Optional[Union[str, list]] = None,
     title: Optional[str] = None,
     tags: Optional[str] = None,
     user_id: Optional[int] = None,
@@ -367,11 +371,15 @@ def update_note(
     Args:
         id: ID of the note to update
         workspace: Workspace name (optional, uses default workspace if not specified)
-        content: New content for the note
+        content: New content for the note (string, or JSON array for task lists)
         title: New title for the note
         tags: New tags (comma-separated)
         user_id: User profile ID to access (optional, overrides default)
     """
+    # Task list notes use a JSON array as content; if the MCP framework
+    # parsed it into a Python list, convert it back to a JSON string.
+    if isinstance(content, list):
+        content = json.dumps(content, ensure_ascii=False)
     client, err = _get_client_or_error()
     if err:
         return err

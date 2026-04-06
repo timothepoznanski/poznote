@@ -19,20 +19,15 @@ class PoznoteClient:
         username: str | None = None,
         password: str | None = None,
         workspace: str | None = None,
-        user_id: str | int | None = None,
     ):
         # Default includes Poznote's typical dev port (8040). Users can override with POZNOTE_API_URL.
         self.base_url = (base_url or os.getenv("POZNOTE_API_URL", "http://localhost:8040/api/v1")).rstrip("/")
         self.username = username or os.getenv("POZNOTE_USERNAME", "")
         self.password = password or os.getenv("POZNOTE_PASSWORD", "")
 
-        # Check whether user_id / workspace were explicitly provided (via param or env var).
-        # If not, they will be fetched from the Poznote API settings endpoint.
-        _explicit_user_id = user_id or os.getenv("POZNOTE_USER_ID", "")
-        _explicit_workspace = workspace or os.getenv("POZNOTE_DEFAULT_WORKSPACE", "")
-
-        self.user_id = str(_explicit_user_id) if _explicit_user_id else "1"
-        self.default_workspace = _explicit_workspace if _explicit_workspace else "Poznote"
+        # User ID is always 1 (admin) — the MCP server runs as the admin user.
+        self.user_id = "1"
+        self.default_workspace = workspace or os.getenv("POZNOTE_DEFAULT_WORKSPACE", "Poznote")
         
         # Configure HTTP client with Basic Auth
         auth = None
@@ -52,48 +47,6 @@ class PoznoteClient:
             timeout=30.0,
             headers=headers
         )
-
-        # Fetch remote config from Poznote settings if env vars were not explicitly set.
-        if not _explicit_user_id or not _explicit_workspace:
-            self._load_remote_config(
-                update_user_id=not bool(_explicit_user_id),
-                update_workspace=not bool(_explicit_workspace),
-            )
-
-    def _load_remote_config(self, update_user_id: bool = True, update_workspace: bool = True) -> None:
-        """Fetch MCP configuration from GET /api/v1/system/mcp-config.
-
-        Called once at client initialisation when POZNOTE_USER_ID or
-        POZNOTE_DEFAULT_WORKSPACE env vars are absent.  Falls back silently to
-        the built-in defaults so that the server still starts even if the PHP
-        app is temporarily unavailable.
-        """
-        try:
-            response = self.client.get("/system/mcp-config")
-            if response.status_code == 200:
-                data = response.json()
-                if update_user_id and data.get("mcp_user_id"):
-                    self.user_id = str(data["mcp_user_id"])
-                    self.client.headers.update({"X-User-ID": self.user_id})
-                if update_workspace and data.get("mcp_default_workspace"):
-                    self.default_workspace = data["mcp_default_workspace"]
-                if data.get("mcp_debug"):
-                    import logging as _logging
-                    _logging.getLogger().setLevel(_logging.DEBUG)
-                    logger.debug("Debug logging enabled via remote MCP config.")
-                logger.info(
-                    "Remote MCP config loaded: user_id=%s workspace=%s debug=%s",
-                    self.user_id,
-                    self.default_workspace,
-                    data.get("mcp_debug", False),
-                )
-            else:
-                logger.warning(
-                    "Could not fetch remote MCP config (HTTP %s) – using defaults.",
-                    response.status_code,
-                )
-        except Exception as exc:
-            logger.warning("Could not fetch remote MCP config: %s – using defaults.", exc)
 
     def _headers_for_user(self, user_id: str | int | None) -> dict | None:
         if user_id is None:

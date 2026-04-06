@@ -38,20 +38,14 @@ RUN apk del gcc musl-dev libffi-dev
 USER mcp
 
 # Default environment variables (can be overridden)
-ENV POZNOTE_API_URL=http://poznote:80/api/v1
-ENV POZNOTE_USERNAME=admin
-ENV POZNOTE_PASSWORD=admin
-ENV POZNOTE_USER_ID=1
-ENV POZNOTE_DEFAULT_WORKSPACE=Poznote
-ENV MCP_HOST=0.0.0.0
 ENV MCP_PORT=8045
 
 # Expose MCP server port
-EXPOSE 8045
+EXPOSE $MCP_PORT
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:${MCP_PORT}/mcp || exit 1
+    CMD nc -z 127.0.0.1 ${MCP_PORT} || exit 1
 
 # Run the MCP server
-CMD ["sh", "-c", "poznote-mcp serve --host=${MCP_HOST} --port=${MCP_PORT}"]
+CMD ["sh", "-c", "poznote-mcp serve --host=0.0.0.0 --port=${MCP_PORT}"]
