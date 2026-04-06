@@ -8,7 +8,7 @@ This server supports **HTTP transport only** (MCP `streamable-http`).
 
 Choose your preferred AI assistant:
 
-- **[VS Code Copilot](VSCODE-COPILOT.md): ** Integrate Poznote into your editor
+- **[VS Code Copilot](VSCODE-COPILOT.md):** Integrate Poznote into your editor
 - **[Claude CLI](CLAUDE-CLI.md):** Use Poznote from the command line
 
 ---
@@ -89,17 +89,23 @@ POZNOTE_MCP_PORT=8045
 
 # Poznote admin username used by the MCP server to authenticate against the API
 POZNOTE_MCP_USERNAME=admin
+
+# Default workspace used when no workspace is specified in a tool call
+POZNOTE_DEFAULT_WORKSPACE=Poznote
+
+# Enable debug logging (leave empty to disable)
+POZNOTE_DEBUG=
 ```
 
-The remaining parameters — **User ID**, **Default Workspace**, and **Debug mode** — are configured directly inside Poznote and stored in the application database:
+Changes take effect after restarting the MCP container:
 
-> **Settings → Admin Tools → MCP Server**
-
-Changes to User ID and Workspace take effect immediately. Debug mode takes effect after the container restarts.
+```bash
+docker compose restart mcp-server
+```
 
 #### Debug mode
 
-When enabled, the MCP server switches its log level from `INFO` to `DEBUG`. Every HTTP request sent to the Poznote API, every tool call received from the AI assistant, and every response are written in detail to the container logs. Use it to diagnose connection or authentication issues:
+Set `POZNOTE_DEBUG=1` in your `.env` to switch the log level from `INFO` to `DEBUG`. Every HTTP request sent to the Poznote API, every tool call received from the AI assistant, and every response are written in detail to the container logs. Use it to diagnose connection or authentication issues:
 
 ```bash
 docker logs -f poznote-mcp
@@ -141,7 +147,7 @@ Complete setup guide: **[CLAUDE-CLI.md](CLAUDE-CLI.md)**
 
 ## Security
 
-The MCP server starts automatically with Poznote and listens on **localhost only** — it is not reachable from the outside. This is the correct, secure default: only your local machine (or an SSH tunnel you set up yourself) can reach it. User ID, default workspace, and debug mode are configured directly in **Settings → Admin Tools → MCP Server**, with no `.env` changes needed.
+The MCP server starts automatically with Poznote and listens on **localhost only**, it is not reachable from the outside. This is the correct, secure default: only your local machine (or an SSH tunnel you set up yourself) can reach it. All MCP configuration is done through `.env` variables.
 
 ### Why localhost-only is both normal and secure
 
@@ -152,7 +158,7 @@ ports:
   - "127.0.0.1:${POZNOTE_MCP_PORT:-8045}:8045"
 ```
 
-This is intentional and the correct setup. The MCP server does not implement its own authentication for incoming connections — any client that can reach the endpoint can read, create, modify, and delete notes. Binding to localhost guarantees that only processes running on the same machine (or SSH tunnels you explicitly set up) can connect. There is nothing to worry about with the default configuration: the server is not reachable from the outside.
+This is intentional and the correct setup. The MCP server does not implement its own authentication for incoming connections, any client that can reach the endpoint can read, create, modify, and delete notes. Binding to localhost guarantees that only processes running on the same machine (or SSH tunnels you explicitly set up) can connect. There is nothing to worry about with the default configuration: the server is not reachable from the outside.
 
 ### Remote access
 
