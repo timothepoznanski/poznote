@@ -40,7 +40,7 @@ The MCP server acts as a bridge between AI assistants and your Poznote instance.
 - `get_note` — Get a specific note by ID with full content
 - `list_notes` — List all notes from a workspace
 - `search_notes` — Search notes by text query
-- `create_note` — Create a new note
+- `create_note` — Create a new note (⚠️ si aucun workspace n'est précisé dans le prompt, la note est créée dans le workspace par défaut de l'utilisateur ; spécifiez toujours le workspace cible)
 - `update_note` — Update an existing note
 - `delete_note` — Delete a note by ID
 - `create_folder` — Create a new folder

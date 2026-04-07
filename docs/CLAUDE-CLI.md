@@ -81,7 +81,9 @@ claude "Show me all folders in my Poznote workspace"
 
 ```bash
 # Create a new note
-claude "Create a note in Poznote titled 'Meeting Notes' with content 'Discussion about the new feature'"
+# IMPORTANT : si vous ne précisez pas le workspace, la note sera créée dans le workspace
+# par défaut de l'utilisateur connecté. Précisez toujours le workspace cible.
+claude "Create a note in Poznote titled 'Meeting Notes' in workspace 'Projets' with content 'Discussion about the new feature'"
 
 # Update an existing note
 claude "Update note 456 in Poznote with new content about the deployment process"
