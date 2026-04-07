@@ -40,7 +40,7 @@ The MCP server acts as a bridge between AI assistants and your Poznote instance.
 - `get_note` — Get a specific note by ID with full content
 - `list_notes` — List all notes from a workspace
 - `search_notes` — Search notes by text query
-- `create_note` — Create a new note
+- `create_note` — Create a new note (⚠️ si aucun workspace n'est précisé dans le prompt, la note est créée dans le workspace par défaut de l'utilisateur ; spécifiez toujours le workspace cible)
 - `update_note` — Update an existing note
 - `delete_note` — Delete a note by ID
 - `create_folder` — Create a new folder
@@ -87,7 +87,7 @@ The MCP server is included in the official Poznote `docker-compose.yml` and runs
 
 ### Configuration
 
-The MCP server requires only two variables in your `.env`:
+The MCP server uses these variables from your `.env`:
 
 ```bash
 # MCP Server port (default: 8045)
@@ -96,22 +96,21 @@ POZNOTE_MCP_PORT=8045
 # Poznote admin username used by the MCP server to authenticate against the API
 POZNOTE_MCP_USERNAME=admin
 
-# Default workspace used when no workspace is specified in a tool call
-POZNOTE_DEFAULT_WORKSPACE=Poznote
-
-# Enable debug logging (leave empty to disable)
-POZNOTE_DEBUG=
+# Enable debug logging (`true` or `false` only)
+POZNOTE_DEBUG=false
 ```
 
-Changes take effect after restarting the MCP container:
+Changes to `.env` variables take effect after recreating the MCP container:
 
 ```bash
-docker compose restart mcp-server
+docker compose up -d --force-recreate mcp-server
 ```
+
+A simple `docker compose restart mcp-server` does not reload updated `.env` values.
 
 #### Debug mode
 
-Set `POZNOTE_DEBUG=1` in your `.env` to switch the log level from `INFO` to `DEBUG`. Every HTTP request sent to the Poznote API, every tool call received from the AI assistant, and every response are written in detail to the container logs. Use it to diagnose connection or authentication issues:
+Set `POZNOTE_DEBUG=true` in your `.env` to switch the log level from `INFO` to `DEBUG`. Set it back to `false` for normal use. Only the exact lowercase values `true` and `false` are recognized. Any other value is treated as `false` and a warning is written to the MCP logs. Every HTTP request sent to the Poznote API, every tool call received from the AI assistant, and every response are written in detail to the container logs. Use it to diagnose connection or authentication issues:
 
 ```bash
 docker logs -f poznote-mcp
@@ -212,6 +211,6 @@ For detailed usage examples and troubleshooting:
 - **[Claude CLI Setup →](CLAUDE-CLI.md)**
 
 For issues:
-- Check MCP server logs: `docker logs poznote-mcp-server`
+- Check MCP server logs: `docker logs poznote-mcp`
 - Verify Poznote API is accessible
 - See client-specific troubleshooting guides

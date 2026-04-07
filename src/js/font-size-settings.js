@@ -41,6 +41,7 @@ function showNoteFontSizePrompt() {
 
     // Load current font size settings
     loadCurrentFontSizes();
+    updateFontSizePreview();
 
     // Show modal
     modal.style.display = 'block';
@@ -61,6 +62,24 @@ function safeShowNotification(message, type) {
     } else if (type === 'error') {
         alert(message);
     }
+}
+
+// Keep optional modal preview nodes in sync without requiring them to exist.
+function updateFontSizePreview() {
+    const previewMap = [
+        { inputId: 'fontSizeInput', previewId: 'fontSizePreview' },
+        { inputId: 'sidebarFontSizeInput', previewId: 'sidebarFontSizePreview' },
+        { inputId: 'codeBlockFontSizeInput', previewId: 'codeBlockFontSizePreview' }
+    ];
+
+    previewMap.forEach(function (entry) {
+        const input = document.getElementById(entry.inputId);
+        const preview = document.getElementById(entry.previewId);
+
+        if (input && preview) {
+            preview.style.fontSize = input.value + 'px';
+        }
+    });
 }
 
 // Function to load current font size settings
@@ -85,6 +104,8 @@ function loadCurrentFontSizes() {
     if (codeBlockFontSizeInput) {
         codeBlockFontSizeInput.value = codeBlockFontSize;
     }
+
+    updateFontSizePreview();
 }
 
 // Function to save font size settings

@@ -23,7 +23,6 @@ class PoznoteClient:
         base_url: str | None = None,
         username: str | None = None,
         password: str | None = None,
-        workspace: str | None = None,
     ):
         # Default includes Poznote's typical dev port (8040). Users can override with POZNOTE_API_URL.
         self.base_url = (base_url or os.getenv("POZNOTE_API_URL", "http://localhost:8040/api/v1")).rstrip("/")
@@ -32,7 +31,6 @@ class PoznoteClient:
 
         # User ID is always 1 (admin) — the MCP server runs as the admin user.
         self.user_id = "1"
-        self.default_workspace = workspace or os.getenv("POZNOTE_DEFAULT_WORKSPACE", "Poznote")
         
         # Configure HTTP client with Basic Auth
         auth = None
@@ -61,6 +59,11 @@ class PoznoteClient:
         if user_id is None:
             return None
         return {"X-User-ID": str(user_id)}
+
+    @staticmethod
+    def _set_workspace(target: dict, workspace: str | None) -> None:
+        if workspace:
+            target["workspace"] = workspace
     
     def list_notes(self, workspace: str | None = None, user_id: str | int | None = None) -> list[dict]:
         """
@@ -69,9 +72,7 @@ class PoznoteClient:
         Returns list of notes with: id, heading, tags, folder, workspace, updated, created
         """
         params = {}
-        ws = workspace or self.default_workspace
-        if ws:
-            params["workspace"] = ws
+        self._set_workspace(params, workspace)
         
         response = self.client.get("/notes", params=params, headers=self._headers_for_user(user_id))
         response.raise_for_status()
@@ -88,9 +89,7 @@ class PoznoteClient:
         Returns note with: id, heading, content, tags, folder, workspace, updated, created
         """
         params = {}
-        ws = workspace or self.default_workspace
-        if ws:
-            params["workspace"] = ws
+        self._set_workspace(params, workspace)
         
         response = self.client.get(f"/notes/{note_id}", params=params, headers=self._headers_for_user(user_id))
         
@@ -117,9 +116,7 @@ class PoznoteClient:
         Returns list of matching notes with excerpts
         """
         params = {"q": query, "limit": limit}
-        ws = workspace or self.default_workspace
-        if ws:
-            params["workspace"] = ws
+        self._set_workspace(params, workspace)
         
         response = self.client.get("/notes/search", params=params, headers=self._headers_for_user(user_id))
         response.raise_for_status()
@@ -144,13 +141,11 @@ class PoznoteClient:
         
         Returns the created note with its ID
         """
-        ws = workspace if workspace else self.default_workspace
-        
         payload = {
             "heading": title,
             "content": content,
-            "workspace": ws,
         }
+        self._set_workspace(payload, workspace)
         
         if tags:
             payload["tags"] = tags
@@ -194,9 +189,7 @@ class PoznoteClient:
             return None
         
         params = {}
-        ws = workspace or self.default_workspace
-        if ws:
-            params["workspace"] = ws
+        self._set_workspace(params, workspace)
         
         response = self.client.patch(
             f"/notes/{note_id}",
@@ -227,9 +220,7 @@ class PoznoteClient:
         Returns True if successful, False otherwise
         """
         params = {}
-        ws = workspace or self.default_workspace
-        if ws:
-            params["workspace"] = ws
+        self._set_workspace(params, workspace)
         
         response = self.client.delete(
             f"/notes/{note_id}",
@@ -257,12 +248,10 @@ class PoznoteClient:
         
         Returns the created folder with its ID
         """
-        ws = workspace or self.default_workspace
-        
         payload = {
             "folder_name": folder_name,
-            "workspace": ws,
         }
+        self._set_workspace(payload, workspace)
         
         if parent_folder_id is not None:
             payload["parent_folder_id"] = parent_folder_id
@@ -278,9 +267,7 @@ class PoznoteClient:
     def list_folders(self, workspace: str | None = None, user_id: str | int | None = None) -> list[dict]:
         """List all folders in the specified workspace"""
         params = {}
-        ws = workspace or self.default_workspace
-        if ws:
-            params["workspace"] = ws
+        self._set_workspace(params, workspace)
         
         response = self.client.get("/folders", params=params, headers=self._headers_for_user(user_id))
         response.raise_for_status()
@@ -503,9 +490,7 @@ class PoznoteClient:
     ) -> dict | None:
         """Rename an existing folder"""
         params = {}
-        ws = workspace or self.default_workspace
-        if ws:
-            params["workspace"] = ws
+        self._set_workspace(params, workspace)
         payload = {"name": new_name}
         response = self.client.patch(
             f"/folders/{folder_id}",
@@ -529,9 +514,7 @@ class PoznoteClient:
     ) -> bool:
         """Delete a folder (moves notes to trash)"""
         params = {}
-        ws = workspace or self.default_workspace
-        if ws:
-            params["workspace"] = ws
+        self._set_workspace(params, workspace)
         response = self.client.delete(
             f"/folders/{folder_id}",
             params=params,
@@ -580,8 +563,7 @@ class PoznoteClient:
     def list_shared(self, workspace: str | None = None, user_id: str | int | None = None) -> dict:
         """List all shared notes and folders"""
         params = {}
-        if workspace:
-            params["workspace"] = workspace
+        self._set_workspace(params, workspace)
         response = self.client.get("/shared", params=params, headers=self._headers_for_user(user_id))
         response.raise_for_status()
         data = response.json()

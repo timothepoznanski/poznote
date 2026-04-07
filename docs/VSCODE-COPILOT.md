@@ -109,8 +109,10 @@ Once configured, you can interact with your Poznote instance directly from VS Co
 
 ### Creating and Updating Notes
 
+> **Workspace** : si vous ne précisez pas le workspace dans votre demande, la note sera créée dans le workspace par défaut de l'utilisateur connecté. Indiquez explicitement le workspace souhaité pour éviter toute confusion, par exemple : *"dans le workspace 'Projets'"*.
+
 ```
-@poznote Create a note titled "Meeting Notes" with content about the new feature
+@poznote Create a note titled "Meeting Notes" in workspace "Projets" with content about the new feature
 
 @poznote Update note 456 with new content about the deployment process
 
@@ -156,7 +158,7 @@ If VS Code Copilot cannot connect to the MCP server:
 2. **Verify Docker container status:**
    ```bash
    docker ps | grep mcp-server
-   docker logs poznote-mcp-server
+  docker logs poznote-mcp
    ```
 
 3. **Check port binding:**
@@ -186,22 +188,22 @@ The MCP server authenticates to Poznote using credentials from `docker-compose.y
 ```yaml
 environment:
   POZNOTE_USERNAME: ${POZNOTE_MCP_USERNAME:-admin}
-  POZNOTE_USER_ID: ${POZNOTE_MCP_USER_ID:-1}
-  POZNOTE_DEFAULT_WORKSPACE: ${POZNOTE_MCP_WORKSPACE:-Poznote}
+  POZNOTE_PASSWORD: ${POZNOTE_PASSWORD:-admin}
 ```
 
 ### Debug Mode
 
-Enable debug logging in the MCP server by setting in `docker-compose.yml`:
+Enable debug logging for the MCP server by setting `POZNOTE_DEBUG=true` in your `.env`, then recreate the MCP container:
 
-```yaml
-environment:
-  POZNOTE_DEBUG: "true"
+```bash
+docker compose up -d --force-recreate mcp-server
 ```
+
+Only the exact lowercase values `true` and `false` are recognized. Any other value is treated as `false` and a warning is written to the MCP logs.
 
 Then check the logs:
 ```bash
-docker logs -f poznote-mcp-server
+docker logs -f poznote-mcp
 ```
 
 ## Available MCP Tools
@@ -322,6 +324,6 @@ ports:
 
 For issues or questions:
 - Check the [main MCP documentation](MCP-SERVER.md)
-- Review MCP server logs: `docker logs poznote-mcp-server`
+- Review MCP server logs: `docker logs poznote-mcp`
 - Verify Poznote API is accessible
 - Check VS Code output panel for errors

@@ -81,7 +81,9 @@ claude "Show me all folders in my Poznote workspace"
 
 ```bash
 # Create a new note
-claude "Create a note in Poznote titled 'Meeting Notes' with content 'Discussion about the new feature'"
+# IMPORTANT : si vous ne précisez pas le workspace, la note sera créée dans le workspace
+# par défaut de l'utilisateur connecté. Précisez toujours le workspace cible.
+claude "Create a note in Poznote titled 'Meeting Notes' in workspace 'Projets' with content 'Discussion about the new feature'"
 
 # Update an existing note
 claude "Update note 456 in Poznote with new content about the deployment process"
@@ -202,7 +204,7 @@ If Claude CLI cannot connect to the MCP server:
 2. **Verify Docker container status:**
    ```bash
    docker ps | grep mcp-server
-   docker logs poznote-mcp-server
+  docker logs poznote-mcp
    ```
 
 3. **Check port binding:**
@@ -216,20 +218,20 @@ If Claude CLI cannot connect to the MCP server:
 
 The MCP server authenticates to Poznote using credentials from `docker-compose.yml`. Check these environment variables:
 - `POZNOTE_MCP_USERNAME`
-- `POZNOTE_MCP_USER_ID`
-- `POZNOTE_MCP_WORKSPACE`
+- `POZNOTE_PASSWORD`
 
 ### Debug Mode
 
-Enable debug logging in the MCP server by setting in `docker-compose.yml`:
-```yaml
-environment:
-  POZNOTE_DEBUG: "true"
+Enable debug logging for the MCP server by setting `POZNOTE_DEBUG=true` in your `.env`, then recreate the MCP container:
+```bash
+docker compose up -d --force-recreate mcp-server
 ```
+
+Only the exact lowercase values `true` and `false` are recognized. Any other value is treated as `false` and a warning is written to the MCP logs.
 
 Then check the logs:
 ```bash
-docker logs -f poznote-mcp-server
+docker logs -f poznote-mcp
 ```
 
 ## Security Notes
@@ -310,5 +312,5 @@ claude "List notes for user 2 in Poznote"
 
 For issues or questions:
 - Check the [main MCP documentation](MCP-SERVER.md)
-- Review MCP server logs: `docker logs poznote-mcp-server`
+- Review MCP server logs: `docker logs poznote-mcp`
 - Verify Poznote API is accessible

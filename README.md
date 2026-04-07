@@ -108,7 +108,7 @@ Download the latest Poznote Webserver and Poznote MCP images :
 docker compose pull
 ```
 
-Start Poznote container:
+Start Poznote containers:
 ```powershell
 docker compose up -d
 ```
@@ -156,7 +156,7 @@ Download the latest Poznote Webserver and Poznote MCP images:
 docker compose pull
 ```
 
-Start Poznote container:
+Start Poznote containers:
 ```bash
 docker compose up -d
 ```
@@ -203,7 +203,7 @@ Download the latest Poznote Webserver and Poznote MCP images:
 docker compose pull
 ```
 
-Start Poznote container:
+Start Poznote containers:
 ```bash
 docker compose up -d
 ```
@@ -227,7 +227,7 @@ Rename the default administrator account after the first login.
 
 ## Change Settings
 
-Most settings can be modified directly in the application through the settings page. Some system settings can only be changed in the `.env` file and require a container restart.
+Most settings can be modified directly in the application through the settings page. Some system settings can only be changed in the `.env` file and require recreating the affected containers.
 
 - **Authentication** - Initial/default passwords and login configuration
 - **Web Server** - HTTP port configuration
@@ -243,17 +243,19 @@ Navigate to your Poznote directory:
 cd poznote
 ```
 
-Stop the running Poznote container:
+Stop the running Poznote containers:
 ```bash
 docker compose down
 ```
 
 Edit your `.env` file with your preferred text editor.
 
-Save the file and restart Poznote to apply changes:
+Save the file and start the Poznote containers again to apply changes:
 ```bash
 docker compose up -d
 ```
+
+If you change environment variables for a running service without bringing the stack down first, recreate the affected container instead of using `docker compose restart`. A restart keeps the container's existing environment.
 
 ## Update application
 
@@ -262,7 +264,7 @@ Navigate to your Poznote directory:
 cd poznote
 ```
 
-Stop the running container before updating:
+Stop the running containers before updating:
 ```bash
 docker compose down
 ```
@@ -287,7 +289,7 @@ Download the latest Poznote Webserver and Poznote MCP images:
 docker compose pull
 ```
 
-Start the updated container:
+Start the updated containers:
 ```bash
 docker compose up -d
 ```
@@ -848,7 +850,7 @@ Administrators have access to a suite of maintenance and management tools under 
 - **Rebuild Master Database:** Reconstruct the user index from data folders in case of system corruption or database loss.
 - **Base64 Image Converter:** Convert inline Base64 encoded images within notes to proper file attachments.
 - **Orphan attachments scanner:** Scan and clean up storage by identifying attachment files that are no longer referenced in any notes.
-- **MCP Server:** Configure the AI assistant integration, set the default User ID, default workspace, and enable debug logging.
+- **MCP Server:** Configure the AI assistant integration, set the default User ID, and control debug logging with `POZNOTE_DEBUG=true` or `POZNOTE_DEBUG=false` in `.env`.
 
 ## PWA
 
@@ -914,6 +916,8 @@ Poznote includes a Model Context Protocol (MCP) server that enables AI assistant
 </p>
 
 For setup and usage instructions, see the [MCP Server documentation](docs/MCP-SERVER.md).
+
+Debug logging for the MCP server is controlled with `POZNOTE_DEBUG=true` or `POZNOTE_DEBUG=false` in `.env`. Only the exact lowercase values `true` and `false` are recognized. After changing it, recreate the `mcp-server` container; a simple restart does not reload updated `.env` values.
 
 ## Chrome Extension
 
