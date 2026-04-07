@@ -21,7 +21,6 @@ def _fake_client(**overrides):
     client.base_url = "http://localhost:8040/api/v1"
     client.username = "admin"
     client.password = "secret"
-    client.default_workspace = "Poznote"
     for k, v in overrides.items():
         setattr(client, k, v)
     return client

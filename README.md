@@ -250,10 +250,12 @@ docker compose down
 
 Edit your `.env` file with your preferred text editor.
 
-Save the file and restart Poznote to apply changes:
+Save the file and start Poznote again to apply changes:
 ```bash
 docker compose up -d
 ```
+
+If you change environment variables for a running service without bringing the stack down first, recreate the affected container instead of using `docker compose restart`. A restart keeps the container's existing environment.
 
 ## Update application
 
@@ -848,7 +850,7 @@ Administrators have access to a suite of maintenance and management tools under 
 - **Rebuild Master Database:** Reconstruct the user index from data folders in case of system corruption or database loss.
 - **Base64 Image Converter:** Convert inline Base64 encoded images within notes to proper file attachments.
 - **Orphan attachments scanner:** Scan and clean up storage by identifying attachment files that are no longer referenced in any notes.
-- **MCP Server:** Configure the AI assistant integration, set the default User ID, default workspace, and enable debug logging.
+- **MCP Server:** Configure the AI assistant integration, set the default User ID, and control debug logging with `POZNOTE_DEBUG=true` or `POZNOTE_DEBUG=false` in `.env`.
 
 ## PWA
 
@@ -914,6 +916,8 @@ Poznote includes a Model Context Protocol (MCP) server that enables AI assistant
 </p>
 
 For setup and usage instructions, see the [MCP Server documentation](docs/MCP-SERVER.md).
+
+Debug logging for the MCP server is controlled with `POZNOTE_DEBUG=true` or `POZNOTE_DEBUG=false` in `.env`. After changing it, recreate the `mcp-server` container; a simple restart does not reload updated `.env` values.
 
 ## Chrome Extension
 

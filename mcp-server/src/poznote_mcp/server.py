@@ -33,13 +33,39 @@ from mcp.server.fastmcp import FastMCP
 
 from .client import PoznoteClient
 
+
+def _is_strict_bool_env_value(value: str) -> bool:
+    return value in {"true", "false"}
+
+
+def _env_bool(name: str, default: bool = False) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+
+    if value == "true":
+        return True
+    if value == "false":
+        return False
+    return False
+
+
+_debug_env_value = os.getenv("POZNOTE_DEBUG")
+_debug_enabled = _env_bool("POZNOTE_DEBUG")
+
 # Setup logging
 logging.basicConfig(
-    level=logging.DEBUG if os.getenv("POZNOTE_DEBUG") else logging.INFO,
+    level=logging.DEBUG if _debug_enabled else logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     stream=sys.stderr,
 )
 logger = logging.getLogger("poznote-mcp")
+
+if _debug_env_value is not None and not _is_strict_bool_env_value(_debug_env_value):
+    logger.warning(
+        "Invalid POZNOTE_DEBUG value %r; expected 'true' or 'false'. Falling back to false.",
+        _debug_env_value,
+    )
 
 
 def _is_addr_in_use_error(exc: BaseException) -> bool:
@@ -218,7 +244,7 @@ def get_note(id: int, workspace: Optional[str] = None, user_id: Optional[int] = 
     
     Args:
         id: ID of the note to retrieve
-        workspace: Workspace name (optional, uses default workspace if not specified)
+        workspace: Workspace name (optional)
         user_id: User profile ID to access (optional, overrides default)
     """
     client, err = _get_client_or_error()
@@ -251,7 +277,7 @@ def list_notes(workspace: Optional[str] = None, limit: int = 50, user_id: Option
     """List all notes from a specific workspace
     
     Args:
-        workspace: Workspace name (optional, uses default workspace if not specified)
+        workspace: Workspace name (optional)
         limit: Maximum number of results (default: 50)
         user_id: User profile ID to access (optional, overrides default)
     """
@@ -279,11 +305,14 @@ def list_notes(workspace: Optional[str] = None, limit: int = 50, user_id: Option
             "createdAt": note.get("created"),
         })
     
-    return json.dumps({
-        "workspace": workspace or client.default_workspace,
+    result = {
         "count": len(formatted),
         "notes": formatted,
-    }, indent=2, ensure_ascii=False)
+    }
+    if workspace is not None:
+        result["workspace"] = workspace
+
+    return json.dumps(result, indent=2, ensure_ascii=False)
 
 
 @mcp.tool()
@@ -292,7 +321,7 @@ def search_notes(query: str, workspace: Optional[str] = None, limit: int = 10, u
     
     Args:
         query: Search query (text to find in notes)
-        workspace: Workspace name (optional, uses default workspace if not specified)
+        workspace: Workspace name (optional)
         limit: Maximum number of results (default: 10)
         user_id: User profile ID to access (optional, overrides default)
     """
@@ -329,7 +358,7 @@ def search_notes(query: str, workspace: Optional[str] = None, limit: int = 10, u
 def create_note(
     title: str,
     content: Union[str, list],
-    workspace: str = "Poznote",
+    workspace: Optional[str] = None,
     tags: Optional[str] = None,
     folder: Optional[str] = None,
     note_type: str = "note",
@@ -340,7 +369,7 @@ def create_note(
     Args:
         title: Title of the new note
         content: Content of the note (HTML, Markdown, or JSON array for task lists)
-        workspace: Workspace name (optional, default: 'Poznote')
+        workspace: Workspace name (optional)
         tags: Comma-separated tags (e.g., 'ai, docs, important')
         folder: Folder name to place the note in
         note_type: Note type/format. Supported: 'note' (HTML, default), 'markdown', 'tasklist'.
@@ -407,7 +436,7 @@ def update_note(
     
     Args:
         id: ID of the note to update
-        workspace: Workspace name (optional, uses default workspace if not specified)
+        workspace: Workspace name (optional)
         content: New content for the note (string, or JSON array for task lists)
         title: New title for the note
         tags: New tags (comma-separated)
@@ -448,7 +477,7 @@ def delete_note(id: int, workspace: Optional[str] = None, user_id: Optional[int]
     
     Args:
         id: ID of the note to delete
-        workspace: Workspace name (optional, uses default workspace if not specified)
+        workspace: Workspace name (optional)
         user_id: User profile ID to access (optional, overrides default)
     """
     client, err = _get_client_or_error()
@@ -479,7 +508,7 @@ def create_folder(
     
     Args:
         folder_name: Name of the new folder
-        workspace: Workspace name (optional, uses default workspace if not specified)
+        workspace: Workspace name (optional)
         parent_folder_id: ID of the parent folder (optional, creates folder at root if not specified)
         user_id: User profile ID to access (optional, overrides default)
     """
@@ -514,7 +543,7 @@ def list_folders(workspace: Optional[str] = None, user_id: Optional[int] = None)
     """List all folders from a specific workspace
     
     Args:
-        workspace: Workspace name (optional, uses default workspace if not specified)
+        workspace: Workspace name (optional)
         user_id: User profile ID to access (optional, overrides default)
     """
     client, err = _get_client_or_error()
@@ -524,11 +553,14 @@ def list_folders(workspace: Optional[str] = None, user_id: Optional[int] = None)
         folders = client.list_folders(workspace=workspace, user_id=user_id)
     except Exception as exc:
         return _api_error_json(exc)
-    return json.dumps({
-        "workspace": workspace or client.default_workspace,
+    result = {
         "count": len(folders),
         "folders": folders,
-    }, indent=2, ensure_ascii=False)
+    }
+    if workspace is not None:
+        result["workspace"] = workspace
+
+    return json.dumps(result, indent=2, ensure_ascii=False)
 
 
 @mcp.tool()
@@ -989,7 +1021,7 @@ def rename_folder(
     Args:
         folder_id: ID of the folder to rename
         new_name: New name for the folder
-        workspace: Workspace name (optional, uses default workspace if not specified)
+        workspace: Workspace name (optional)
         user_id: User profile ID to access (optional, overrides default)
     """
     if not new_name:
@@ -1018,7 +1050,7 @@ def delete_folder(
     
     Args:
         folder_id: ID of the folder to delete
-        workspace: Workspace name (optional, uses default workspace if not specified)
+        workspace: Workspace name (optional)
         user_id: User profile ID to access (optional, overrides default)
     """
     client, err = _get_client_or_error()
