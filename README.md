@@ -108,7 +108,7 @@ Download the latest Poznote Webserver and Poznote MCP images :
 docker compose pull
 ```
 
-Start Poznote container:
+Start Poznote containers:
 ```powershell
 docker compose up -d
 ```
@@ -156,7 +156,7 @@ Download the latest Poznote Webserver and Poznote MCP images:
 docker compose pull
 ```
 
-Start Poznote container:
+Start Poznote containers:
 ```bash
 docker compose up -d
 ```
@@ -203,7 +203,7 @@ Download the latest Poznote Webserver and Poznote MCP images:
 docker compose pull
 ```
 
-Start Poznote container:
+Start Poznote containers:
 ```bash
 docker compose up -d
 ```
@@ -227,7 +227,7 @@ Rename the default administrator account after the first login.
 
 ## Change Settings
 
-Most settings can be modified directly in the application through the settings page. Some system settings can only be changed in the `.env` file and require a container restart.
+Most settings can be modified directly in the application through the settings page. Some system settings can only be changed in the `.env` file and require recreating the affected containers.
 
 - **Authentication** - Initial/default passwords and login configuration
 - **Web Server** - HTTP port configuration
@@ -243,14 +243,14 @@ Navigate to your Poznote directory:
 cd poznote
 ```
 
-Stop the running Poznote container:
+Stop the running Poznote containers:
 ```bash
 docker compose down
 ```
 
 Edit your `.env` file with your preferred text editor.
 
-Save the file and start Poznote again to apply changes:
+Save the file and start the Poznote containers again to apply changes:
 ```bash
 docker compose up -d
 ```
@@ -264,7 +264,7 @@ Navigate to your Poznote directory:
 cd poznote
 ```
 
-Stop the running container before updating:
+Stop the running containers before updating:
 ```bash
 docker compose down
 ```
@@ -289,7 +289,7 @@ Download the latest Poznote Webserver and Poznote MCP images:
 docker compose pull
 ```
 
-Start the updated container:
+Start the updated containers:
 ```bash
 docker compose up -d
 ```
@@ -917,7 +917,7 @@ Poznote includes a Model Context Protocol (MCP) server that enables AI assistant
 
 For setup and usage instructions, see the [MCP Server documentation](docs/MCP-SERVER.md).
 
-Debug logging for the MCP server is controlled with `POZNOTE_DEBUG=true` or `POZNOTE_DEBUG=false` in `.env`. After changing it, recreate the `mcp-server` container; a simple restart does not reload updated `.env` values.
+Debug logging for the MCP server is controlled with `POZNOTE_DEBUG=true` or `POZNOTE_DEBUG=false` in `.env`. Only the exact lowercase values `true` and `false` are recognized. After changing it, recreate the `mcp-server` container; a simple restart does not reload updated `.env` values.
 
 ## Chrome Extension
 
