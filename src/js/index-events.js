@@ -883,8 +883,16 @@
             .then(function (data) {
                 if (data.success && data.note) {
                     window.scrollTo(0, 0);
-                    var ws = encodeURIComponent(window.selectedWorkspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : ''));
-                    window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
+                    if (typeof window.navigateToCreatedNoteInInternalTab === 'function') {
+                        window.navigateToCreatedNoteInInternalTab(
+                            data.note.id,
+                            data.note.heading,
+                            data.note.workspace || window.selectedWorkspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '')
+                        );
+                    } else {
+                        var ws = encodeURIComponent(window.selectedWorkspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : ''));
+                        window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
+                    }
                 } else {
                     showNotificationPopup(data.error || (window.t ? window.t('index.errors.create_task_list', null, 'Error creating task list') : 'Error creating task list'), 'error');
                 }
@@ -915,8 +923,16 @@
             .then(function (data) {
                 if (data.success && data.note) {
                     window.scrollTo(0, 0);
-                    var ws = encodeURIComponent(window.selectedWorkspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : ''));
-                    window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
+                    if (typeof window.navigateToCreatedNoteInInternalTab === 'function') {
+                        window.navigateToCreatedNoteInInternalTab(
+                            data.note.id,
+                            data.note.heading,
+                            data.note.workspace || window.selectedWorkspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '')
+                        );
+                    } else {
+                        var ws = encodeURIComponent(window.selectedWorkspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : ''));
+                        window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
+                    }
                 } else {
                     showNotificationPopup(data.error || (window.t ? window.t('index.errors.create_markdown_note', null, 'Error creating markdown note') : 'Error creating markdown note'), 'error');
                 }

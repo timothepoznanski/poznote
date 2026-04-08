@@ -99,7 +99,7 @@ function refreshNotesListAfterFolderAction() {
 
     const url = new URL(window.location.href);
 
-    fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+    return fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
         .then(response => response.text())
         .then(html => {
             const parser = new DOMParser();
