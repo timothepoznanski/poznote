@@ -311,6 +311,22 @@ function applyHtmlBlockStyle(style) {
     // ignore
   }
 
+  // Strip heading-anchor links from the current block before formatBlock.
+  // The <a contenteditable="false"> inside a heading confuses the browser's
+  // formatBlock implementation: instead of replacing e.g. <h2> with <h1> in
+  // place it can create a second heading element, causing the outline to show
+  // duplicates until the page is refreshed.
+  var currentRange = sel.getRangeAt(0);
+  var anchorContainer = currentRange.commonAncestorContainer;
+  if (anchorContainer.nodeType === 3) anchorContainer = anchorContainer.parentNode;
+  var currentHeading = anchorContainer.closest ? anchorContainer.closest('h1,h2,h3,h4,h5,h6') : null;
+  if (currentHeading) {
+    var headingAnchors = currentHeading.querySelectorAll('.heading-anchor');
+    for (var a = 0; a < headingAnchors.length; a++) {
+      headingAnchors[a].remove();
+    }
+  }
+
   var formatTag = style === 'normal' ? 'div' : ('h' + style);
   var execValues = [formatTag, '<' + formatTag + '>'];
 
@@ -482,6 +498,14 @@ function changeFontSize() {
         } else {
           // Use HTML formatBlock
           applyHtmlBlockStyle(style);
+          // Force refresh outline panel after DOM change so it reflects the new
+          // heading tag immediately rather than waiting for the debounced
+          // MutationObserver (which can show a stale or duplicate entry).
+          if (window.outlinePanel && window.outlinePanel.refresh) {
+            setTimeout(() => {
+              window.outlinePanel.refresh();
+            }, 50);
+          }
         }
 
         const noteentry = editor.closest('.noteentry') || document.querySelector('.noteentry');
