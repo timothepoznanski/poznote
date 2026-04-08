@@ -90,6 +90,7 @@ if ($isAdmin) {
     <link rel="stylesheet" href="css/modals/responsive.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modals/ui-customization.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/background-image.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/custom-css.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $cache_v; ?>">

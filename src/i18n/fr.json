@@ -740,11 +740,13 @@
       "placeholder": "Nom affiché"
     },
     "custom_css": {
-      "title": "Chemin CSS personnalisé",
-      "description": "Saisissez uniquement le nom du fichier CSS. Le fichier doit être placé dans le répertoire css. Laissez vide pour désactiver.",
+      "title": "CSS personnalisé",
+      "description": "Téléversez un fichier CSS pour personnaliser l'apparence de Poznote. Le fichier est stocké dans votre volume de données et appliqué à tous les utilisateurs.",
+      "no_file": "Aucun CSS personnalisé chargé",
+      "upload": "Téléverser un fichier CSS",
+      "validation": "Veuillez sélectionner un fichier CSS.",
       "placeholder": "custom.css",
-      "hint": "Exemple : custom.css. Poznote le chargera automatiquement depuis css/custom.css",
-      "validation": "Veuillez saisir uniquement un nom de fichier CSS comme custom.css. Le fichier doit être placé dans le répertoire css."
+      "hint": "Utilisateurs Docker : placez le fichier dans votre volume data/css/ (ex. data/css/custom.css). Sinon, il est chargé depuis css/custom.css dans l'image."
     },
     "import_limits": {
       "title": "Limites d'import",

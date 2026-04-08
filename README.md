@@ -505,16 +505,18 @@ Configure it in **Settings > Appearance > UI Customization**.
 <summary><strong>Custom CSS Overrides</strong></summary>
 <br>
 
-If you want to adjust fonts, spacing, or other visual details beyond the built-in options, you can load an extra stylesheet on every HTML page.
+If you want to adjust fonts, spacing, or other visual details beyond the built-in options, you can upload an extra stylesheet that is applied to every HTML page for all users.
 
-Configure it in **Settings > Appearance > Custom CSS path**.
+Configure it in **Settings > Appearance > Custom CSS**.
 
 Notes:
 
-- Enter only the filename, for example `custom.css`.
-- The file must be placed in `src/css/`, and Poznote will load it as `css/custom.css`.
-- Poznote appends a cache-busting `v=` parameter automatically when the target file exists locally.
+- Click **Upload CSS file** to select a `.css` file from your computer.
+- The file is uploaded and stored in `data/css/` (your Docker volume), so it survives image updates.
+- Click **Remove** to delete the file and disable the custom stylesheet.
+- Poznote appends a cache-busting `v=` parameter automatically.
 - The stylesheet is injected near the end of `<head>`, so it can override the default application styles.
+- Only administrators can upload or remove the custom CSS file.
 
 </details>
 
@@ -846,7 +848,7 @@ Administrators have access to a suite of maintenance and management tools under 
 - **User Management:** Create, manage, and delete user profiles, or reset passwords.
 - **Git Sync Control:** Globally enable or disable Git synchronization features.
 - **Import Limits:** Configure the maximum number of files allowed for individual or ZIP imports.
-- **Custom CSS path:** Define a global custom stylesheet to override the application's appearance.
+- **Custom CSS:** Upload a global custom stylesheet to override the application's appearance. The file is stored in your data volume (`data/css/`) and survives image updates.
 - **Rebuild Master Database:** Reconstruct the user index from data folders in case of system corruption or database loss.
 - **Base64 Image Converter:** Convert inline Base64 encoded images within notes to proper file attachments.
 - **Orphan attachments scanner:** Scan and clean up storage by identifying attachment files that are no longer referenced in any notes.

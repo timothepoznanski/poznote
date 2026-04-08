@@ -49,12 +49,35 @@
 <!-- Custom CSS Path Modal -->
 <div id="customCssModal" class="modal">
     <div class="modal-content">
-        <h3><?php echo t_h('modals.custom_css.title', [], 'Custom CSS path'); ?></h3>
-        <p><?php echo t_h('modals.custom_css.description', [], 'Enter only the CSS filename. The file must be placed in the css directory. Leave empty to disable.'); ?></p>
-        <input type="text" id="customCssPathInput" placeholder="<?php echo t_h('modals.custom_css.placeholder', [], 'custom.css'); ?>" maxlength="255" autocomplete="off" autocapitalize="off" spellcheck="false" />
-        <p><?php echo t_h('modals.custom_css.hint', [], 'Example: custom.css. Poznote will load it automatically from css/custom.css'); ?></p>
+        <h3><?php echo t_h('modals.custom_css.title', [], 'Custom CSS'); ?></h3>
+        <p><?php echo t_h('modals.custom_css.description', [], 'Upload a CSS file to customise Poznote\'s appearance. The file is stored in your data volume and applied to all users.'); ?></p>
+
+        <div class="custom-css-upload-controls">
+            <input type="file" id="customCssFileInput" accept=".css,text/css" style="display:none">
+            
+            <div id="customCssNoFile" class="no-css-text">
+                <?php echo t_h('modals.custom_css.no_file', [], 'No custom CSS loaded'); ?>
+            </div>
+
+            <div id="customCssCurrentFile" class="custom-css-current-file" style="display:none">
+                <i class="lucide lucide-file-code"></i>
+                <span id="customCssFileName"></span>
+            </div>
+
+            <div class="custom-css-actions">
+                <button type="button" class="btn-secondary" id="uploadCustomCssBtn">
+                    <i class="lucide lucide-upload"></i>
+                    <?php echo t_h('modals.custom_css.upload', [], 'Upload CSS file'); ?>
+                </button>
+                <button type="button" class="btn-danger" id="removeCustomCssBtn" style="display:none">
+                    <i class="lucide lucide-trash-2"></i>
+                    <?php echo t_h('common.remove', [], 'Remove'); ?>
+                </button>
+            </div>
+        </div>
+
         <div class="modal-buttons">
-            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="customCssModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-cancel" id="cancelCustomCssBtn"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" id="saveCustomCssBtn"><?php echo t_h('common.save'); ?></button>
         </div>
     </div>

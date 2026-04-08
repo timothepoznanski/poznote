@@ -1400,7 +1400,7 @@ curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
 
 **Global settings (admin only):**
 - `login_display_name`
-- `custom_css_path`
+- `custom_css_path` *(read-only via this API — use `POST /api_upload_css.php` to upload a file or `DELETE /api_upload_css.php` to remove it)*
 - `git_sync_enabled`
 - `import_max_individual_files`
 - `import_max_zip_files`
