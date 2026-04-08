@@ -26,7 +26,7 @@ services:
       dockerfile: Dockerfile
     image: poznote-mcp:dev
     container_name: poznote-mcp-dev
-    restart: unless-stopped
+    restart: always
     environment:
       POZNOTE_API_URL: http://webserver:80/api/v1
       POZNOTE_PASSWORD: ${POZNOTE_PASSWORD:-admin}
