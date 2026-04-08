@@ -119,6 +119,12 @@ body.dark-mode .noteentry.markdown-split-mode .markdown-preview [data-line]:not(
     background-color: rgba(74, 158, 255, 0.1);
 }
 
+html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor,
+body.dark-mode .noteentry.markdown-split-mode .markdown-editor {
+    background-color: transparent !important;
+    color: var(--dm-text);
+}
+
 /* Checked task item text */
 html[data-theme='dark'] .markdown-preview li.task-list-item input[type="checkbox"]:checked+span,
 body.dark-mode .markdown-preview li.task-list-item input[type="checkbox"]:checked+span {

@@ -113,6 +113,7 @@
       "kanban_on_folder_click": "Открывать канбан при клике на папку",
       "index_icon_scale": "Масштаб иконок в списке",
       "note_content_width": "Ширина содержимого заметки",
+      "markdown_split_card_view": "Markdown с рамкой",
       "code_block_word_wrap": "Перенос строк в блоке кода",
       "ui_customization": "Видимость элементов"
     },
@@ -785,6 +786,10 @@
     "messages": {
       "preview_mode_hint": "Вы в режиме предпросмотра. Переключитесь в режим редактирования с помощью кнопки на панели инструментов, чтобы начать писать Markdown.",
       "split_preview_placeholder": "Предпросмотр появится здесь по мере ввода..."
+    },
+    "panes": {
+      "edit": "Редактировать",
+      "preview": "Предпросмотр"
     },
     "images": {
       "delete_confirm": {

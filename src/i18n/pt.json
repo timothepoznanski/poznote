@@ -453,6 +453,7 @@
       "kanban_on_folder_click": "Abrir visualização Kanban ao clicar na pasta",
       "index_icon_scale": "Escala de ícones do índice",
       "note_content_width": "Largura do conteúdo da nota",
+      "markdown_split_card_view": "Markdown com moldura",
       "code_block_word_wrap": "Quebra de linha em blocos de código",
       "ui_customization": "Visibilidade dos elementos"
     },
@@ -602,6 +603,10 @@
     "messages": {
       "preview_mode_hint": "Você está no modo de visualização. Mude para o modo de edição usando o botão na barra de ferramentas para começar a escrever markdown.",
       "split_preview_placeholder": "A visualização aparecerá aqui conforme você digita..."
+    },
+    "panes": {
+      "edit": "Editar",
+      "preview": "Pré-visualização"
     },
     "images": {
       "delete_confirm": {

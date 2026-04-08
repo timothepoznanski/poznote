@@ -454,6 +454,7 @@
       "kanban_on_folder_click": "点击文件夹时打开看板视图",
       "index_icon_scale": "索引页图标缩放",
       "note_content_width": "笔记内容宽度",
+      "markdown_split_card_view": "带边框的 Markdown",
       "code_block_word_wrap": "代码块自动换行",
       "ui_customization": "元素可见性"
     },
@@ -600,6 +601,10 @@
     "messages": {
       "preview_mode_hint": "您处于预览模式。请使用工具栏中的按钮切换到编辑模式开始编写 Markdown。",
       "split_preview_placeholder": "预览将随着您的输入在此处显示..."
+    },
+    "panes": {
+      "edit": "编辑",
+      "preview": "预览"
     },
     "images": {
       "delete_confirm": {

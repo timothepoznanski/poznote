@@ -454,6 +454,7 @@
       "kanban_on_folder_click": "Kanban-Ansicht beim Klicken auf Ordner öffnen",
       "index_icon_scale": "Skalierung der Index-Symbole",
       "note_content_width": "Breite des Notizinhalts",
+      "markdown_split_card_view": "Markdown mit Rahmen",
       "code_block_word_wrap": "Codeblock-Zeilenumbruch",
       "ui_customization": "Sichtbarkeit von Elementen"
     },
@@ -603,6 +604,10 @@
     "messages": {
       "preview_mode_hint": "Sie befinden sich im Vorschaumodus. Wechseln Sie mit der Schaltfläche in der Symbolleiste in den Bearbeitungsmodus, um mit dem Schreiben von Markdown zu beginnen.",
       "split_preview_placeholder": "Die Vorschau wird hier beim Tippen angezeigt..."
+    },
+    "panes": {
+      "edit": "Bearbeiten",
+      "preview": "Vorschau"
     },
     "images": {
       "delete_confirm": {

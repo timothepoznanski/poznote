@@ -363,6 +363,7 @@ try {
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('language', 'en')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_created', '1')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('hide_folder_counts', '0')");
+        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('markdown_split_card_view', '0')");
 
         // === Update schema version ===
         $con->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('schema_version', '$CURRENT_SCHEMA_VERSION')");

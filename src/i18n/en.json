@@ -113,6 +113,7 @@
       "kanban_on_folder_click": "Open Kanban view on folder click",
       "index_icon_scale": "Index icon scaling",
       "note_content_width": "Note content width",
+      "markdown_split_card_view": "Framed markdown",
       "code_block_word_wrap": "Code block word wrap",
       "ui_customization": "Element visibility"
     },
@@ -785,6 +786,10 @@
     "messages": {
       "preview_mode_hint": "You are in preview mode. Switch to edit mode using the button in the toolbar to start writing markdown.",
       "split_preview_placeholder": "Preview will appear here as you type..."
+    },
+    "panes": {
+      "edit": "Edit",
+      "preview": "Preview"
     },
     "images": {
       "delete_confirm": {
