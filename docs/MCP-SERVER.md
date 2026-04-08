@@ -93,9 +93,6 @@ The MCP server uses these variables from your `.env`:
 # MCP Server port (default: 8045)
 POZNOTE_MCP_PORT=8045
 
-# Poznote admin username used by the MCP server to authenticate against the API
-POZNOTE_MCP_USERNAME=admin
-
 # Enable debug logging (`true` or `false` only)
 POZNOTE_DEBUG=false
 ```
@@ -183,7 +180,7 @@ If you must route the MCP server through a network, protect it with:
 
 ### How the MCP server authenticates to Poznote
 
-The MCP server connects to the Poznote REST API using the credentials set in `POZNOTE_MCP_USERNAME` / `POZNOTE_PASSWORD`. Your Poznote instance is always protected regardless of who calls the MCP endpoint.
+The MCP server connects to the Poznote REST API using `POZNOTE_PASSWORD`. Your Poznote instance is always protected regardless of who calls the MCP endpoint.
 
 ---
 

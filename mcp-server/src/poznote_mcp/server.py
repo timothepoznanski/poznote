@@ -184,8 +184,6 @@ def _get_client_or_error() -> tuple[PoznoteClient | None, str | None]:
     missing: list[str] = []
     if not getattr(client, "base_url", None):
         missing.append("POZNOTE_API_URL")
-    if not getattr(client, "username", None):
-        missing.append("POZNOTE_USERNAME")
     if not getattr(client, "password", None):
         missing.append("POZNOTE_PASSWORD")
 
@@ -196,7 +194,6 @@ def _get_client_or_error() -> tuple[PoznoteClient | None, str | None]:
                 "missing": missing,
                 "example": {
                     "POZNOTE_API_URL": "http://localhost:8040/api/v1",
-                    "POZNOTE_USERNAME": "admin",
                     "POZNOTE_PASSWORD": "your-password",
                 },
                 "note": "These are the same credentials as the Poznote web login.",

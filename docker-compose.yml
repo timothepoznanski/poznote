@@ -36,7 +36,6 @@ services:
     restart: unless-stopped
     environment:
       POZNOTE_API_URL: http://webserver:80/api/v1
-      POZNOTE_USERNAME: ${POZNOTE_MCP_USERNAME:-admin}
       POZNOTE_PASSWORD: ${POZNOTE_PASSWORD:-admin}
       POZNOTE_DEBUG: ${POZNOTE_DEBUG:-false}
     ports:

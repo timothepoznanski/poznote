@@ -217,7 +217,6 @@ If Claude CLI cannot connect to the MCP server:
 ### Authentication Errors
 
 The MCP server authenticates to Poznote using credentials from `docker-compose.yml`. Check these environment variables:
-- `POZNOTE_MCP_USERNAME`
 - `POZNOTE_PASSWORD`
 
 ### Debug Mode
