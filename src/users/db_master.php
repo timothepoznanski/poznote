@@ -251,6 +251,12 @@ function createUserProfile(string $username, string $email = null): array {
     try {
         $con = getMasterConnection();
         
+        // Reject purely numeric usernames — they would be ambiguous with user IDs
+        // in the Basic Auth lookup (which accepts both usernames and numeric IDs).
+        if (ctype_digit($username)) {
+            return ['success' => false, 'error' => 'Username cannot be purely numeric'];
+        }
+        
         // Check if username exists
         $stmt = $con->prepare("SELECT id FROM users WHERE username = ?");
         $stmt->execute([$username]);

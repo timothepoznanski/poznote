@@ -366,7 +366,10 @@ function authenticateApiBasicAuth(bool $requireAdmin = false): array {
     }
     
     require_once __DIR__ . '/users/db_master.php';
-    $authUser = getUserProfileByUsername($_SERVER['PHP_AUTH_USER']);
+    $loginIdentifier = $_SERVER['PHP_AUTH_USER'];
+    $authUser = ctype_digit($loginIdentifier)
+        ? getUserProfileById((int)$loginIdentifier)
+        : getUserProfileByUsername($loginIdentifier);
     
     if (!$authUser || !$authUser['active'] || ($requireAdmin && !(bool)$authUser['is_admin']) || !verifyUserPassword((int)$authUser['id'], $_SERVER['PHP_AUTH_PW'])) {
         $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');

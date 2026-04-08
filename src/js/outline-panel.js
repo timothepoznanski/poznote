@@ -341,6 +341,7 @@ function addHeadingAnchorLink(heading) {
     let anchor = heading.querySelector(HEADING_ANCHOR_SELECTOR);
     if (!anchor) {
         anchor = document.createElement('a');
+        anchor.innerHTML = HEADING_ANCHOR_SVG;
         heading.appendChild(anchor);
     }
 
@@ -351,7 +352,6 @@ function addHeadingAnchorLink(heading) {
     anchor.setAttribute('contenteditable', 'false');
     anchor.setAttribute('draggable', 'false');
     anchor.setAttribute('data-heading-anchor', 'true');
-    anchor.innerHTML = HEADING_ANCHOR_SVG;
 }
 
 /**

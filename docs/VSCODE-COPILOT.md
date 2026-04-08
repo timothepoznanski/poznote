@@ -187,7 +187,6 @@ The MCP server authenticates to Poznote using credentials from `docker-compose.y
 
 ```yaml
 environment:
-  POZNOTE_USERNAME: ${POZNOTE_MCP_USERNAME:-admin}
   POZNOTE_PASSWORD: ${POZNOTE_PASSWORD:-admin}
 ```
 

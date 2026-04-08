@@ -21,21 +21,21 @@ class PoznoteClient:
     def __init__(
         self,
         base_url: str | None = None,
-        username: str | None = None,
         password: str | None = None,
     ):
         # Default includes Poznote's typical dev port (8040). Users can override with POZNOTE_API_URL.
         self.base_url = (base_url or os.getenv("POZNOTE_API_URL", "http://localhost:8040/api/v1")).rstrip("/")
-        self.username = username or os.getenv("POZNOTE_USERNAME", "")
         self.password = password or os.getenv("POZNOTE_PASSWORD", "")
 
         # User ID is always 1 (admin) — the MCP server runs as the admin user.
+        # The user ID is used directly as the Basic Auth username (the API accepts numeric IDs).
         self.user_id = "1"
+        self.username = self.user_id
         
         # Configure HTTP client with Basic Auth
         auth = None
-        if self.username and self.password:
-            auth = httpx.BasicAuth(self.username, self.password)
+        if self.password:
+            auth = httpx.BasicAuth(self.user_id, self.password)
         
         # Headers include X-User-ID for multi-user support
         headers = {
