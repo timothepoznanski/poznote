@@ -5,6 +5,7 @@ require_once 'functions.php';
 require_once 'db_connect.php';
 require_once 'users/db_master.php';
 require_once 'users/UserDataManager.php';
+require_once 'version_helper.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
@@ -523,7 +524,7 @@ function convertMarkdownApiUrlsToRelativePaths($markdown, $attachmentExtensions,
     <link rel="stylesheet" href="css/dark-mode/markdown.css">
     <link rel="stylesheet" href="css/dark-mode/kanban.css">
     <link rel="stylesheet" href="css/dark-mode/icons.css">
-    <script src="js/globals.js"></script>
+    <script src="js/globals.js?v=<?php echo getAppVersion(); ?>"></script>
     <script src="js/theme-manager.js"></script>
 </head>
 <body data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">

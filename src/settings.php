@@ -476,7 +476,7 @@ if ($isAdmin) {
     <?php include 'modals.php'; ?>
     <script src="js/modal-alerts.js"></script>
     <script src="js/theme-manager.js"></script>
-    <script src="js/globals.js"></script>
+    <script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/ui.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/font-size-settings.js"></script>

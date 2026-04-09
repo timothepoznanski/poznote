@@ -6,6 +6,7 @@ ob_start();
 require_once 'functions.php';
 require_once 'config.php';
 require_once 'db_connect.php';
+require_once 'version_helper.php';
 
 /**
  * Convert plain-text URLs into safe HTML anchors
@@ -274,7 +275,7 @@ $currentLang = getUserLanguage();
     </div>
     
     <!-- JavaScript modules -->
-    <script src="js/globals.js"></script>
+    <script src="js/globals.js?v=<?php echo getAppVersion(); ?>"></script>
     <script src="js/workspaces.js"></script>
     <script src="js/notes.js"></script>
     <script src="js/ui.js"></script>

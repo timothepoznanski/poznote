@@ -5,6 +5,7 @@ requireAuth();
 require_once 'config.php';
 require_once 'db_connect.php';
 require_once 'functions.php';
+require_once 'version_helper.php';
 
 // Respect optional workspace parameter
 $workspace = isset($_GET['workspace']) ? trim($_GET['workspace']) : (isset($_POST['workspace']) ? trim($_POST['workspace']) : '');
@@ -170,7 +171,7 @@ $currentLang = getUserLanguage();
 		</div>
 	</div>
 	
-	<script src="js/globals.js"></script>
+	<script src="js/globals.js?v=<?php echo getAppVersion(); ?>"></script>
 	<script src="js/navigation.js"></script>
 	<script src="js/list_folders.js"></script>
 </body>

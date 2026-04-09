@@ -1015,7 +1015,7 @@ $body_classes = trim($extra_body_classes);
     
 </body>
 <!-- Modules refactorisés de script.js -->
-<script src="js/globals.js"></script>
+<script src="js/globals.js?v=<?php echo $v; ?>"></script>
 <script src="js/workspaces.js"></script>
 <script src="js/notes.js"></script>
 <script src="js/ui.js"></script>
