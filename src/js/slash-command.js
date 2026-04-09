@@ -57,6 +57,7 @@
     let savedNoteEntry = null;
     let savedEditableElement = null;
     let activeCommands = null;
+    const MARKDOWN_SLASH_CURSOR_HIDDEN_CLASS = 'markdown-slash-cursor-hidden';
 
     // Touch tracking for distinguishing tap from scroll
     let touchStartX = 0;
@@ -68,6 +69,37 @@
     function removeAccents(str) {
         if (!str) return '';
         return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function clearMarkdownSlashCursorHide() {
+        document.removeEventListener('pointermove', handleMarkdownSlashCursorReveal, true);
+        document.removeEventListener('mousemove', handleMarkdownSlashCursorReveal, true);
+
+        if (document.body) {
+            document.body.classList.remove(MARKDOWN_SLASH_CURSOR_HIDDEN_CLASS);
+        }
+    }
+
+    function handleMarkdownSlashCursorReveal(event) {
+        if (event.type === 'pointermove' && event.pointerType && event.pointerType !== 'mouse') {
+            return;
+        }
+
+        clearMarkdownSlashCursorHide();
+    }
+
+    function hideCursorForMarkdownSlashMenu() {
+        const isMobile = window.innerWidth < 768;
+
+        clearMarkdownSlashCursorHide();
+
+        if (isMobile || !document.body) {
+            return;
+        }
+
+        document.body.classList.add(MARKDOWN_SLASH_CURSOR_HIDDEN_CLASS);
+        document.addEventListener('pointermove', handleMarkdownSlashCursorReveal, true);
+        document.addEventListener('mousemove', handleMarkdownSlashCursorReveal, true);
     }
 
     // Get the Markdown editor from the current selection
@@ -2134,6 +2166,8 @@
 
     // Hide slash menu and all its submenus
     function hideSlashMenu() {
+        clearMarkdownSlashCursorHide();
+
         if (!slashMenuElement) return;
 
         hideSubmenu();
@@ -2156,9 +2190,6 @@
         slashTextNode = null;
         slashOffset = -1;
         filterText = '';
-
-        // Restore cursor in case it was hidden
-        document.body.style.cursor = '';
     }
 
     // Show slash menu for an input field (title or task)
@@ -2241,17 +2272,6 @@
         slashMenuElement.addEventListener('mousedown', handleMenuMouseDown);
         slashMenuElement.addEventListener('click', handleMenuClick);
         slashMenuElement.addEventListener('mouseover', handleMenuMouseOver);
-
-        // Hide cursor until mouse moves (desktop only)
-        const isMobile = window.innerWidth < 768;
-        if (!isMobile) {
-            document.body.style.cursor = 'none';
-            const showCursor = () => {
-                document.body.style.cursor = '';
-                document.removeEventListener('mousemove', showCursor);
-            };
-            document.addEventListener('mousemove', showCursor);
-        }
     }
 
     // Update the .selected class on main menu items without rebuilding DOM
@@ -3121,14 +3141,8 @@
             savedEditableElement.blur();
         }
 
-        // Hide cursor until mouse moves (desktop only)
-        if (!isMobile) {
-            document.body.style.cursor = 'none';
-            const showCursor = () => {
-                document.body.style.cursor = '';
-                document.removeEventListener('mousemove', showCursor);
-            };
-            document.addEventListener('mousemove', showCursor);
+        if (ctx.noteType === 'markdown') {
+            hideCursorForMarkdownSlashMenu();
         }
     }
 

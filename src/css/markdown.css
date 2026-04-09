@@ -40,6 +40,11 @@
     color: #999;
 }
 
+body.markdown-slash-cursor-hidden,
+body.markdown-slash-cursor-hidden * {
+    cursor: none !important;
+}
+
 /* Markdown rendered content styles */
 .markdown-preview h1 {
     font-size: 2em;
