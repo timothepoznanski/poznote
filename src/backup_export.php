@@ -5,6 +5,7 @@ require_once 'functions.php';
 require_once 'db_connect.php';
 require_once 'users/db_master.php';
 require_once 'users/UserDataManager.php';
+require_once 'version_helper.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
@@ -147,6 +148,14 @@ function createCompleteBackup($userId = null) {
     // Add all note entries (HTML and Markdown) from user's data
     $entriesPath = $userDataManager->getUserEntriesPath();
     if ($entriesPath && is_dir($entriesPath)) {
+        $noteTypeMap = [];
+        $typesResult = $tempCon->query("SELECT id, type FROM entries WHERE trash = 0");
+        if ($typesResult) {
+            while ($typeRow = $typesResult->fetch(PDO::FETCH_ASSOC)) {
+                $noteTypeMap[(int)$typeRow['id']] = $typeRow['type'] ?? 'note';
+            }
+        }
+
         // First, build a mapping of note IDs to their attachment extensions
         $noteAttachments = [];
         $query = "SELECT id, attachments FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
@@ -184,9 +193,10 @@ function createCompleteBackup($userId = null) {
                     $content = file_get_contents($filePath);
                     if ($content !== false) {
                         // Get note ID from filename (e.g., "123.html" -> "123")
-                        $noteId = pathinfo($relativePath, PATHINFO_FILENAME);
+                        $noteId = (int) pathinfo($relativePath, PATHINFO_FILENAME);
+                        $noteType = $noteTypeMap[$noteId] ?? 'note';
                         
-                        if ($extension === 'html') {
+                        if ($extension === 'html' && $noteType !== 'tasklist') {
                             // Remove copy buttons from HTML
                             $content = removeCopyButtonsFromHtml($content);
                             
@@ -514,7 +524,7 @@ function convertMarkdownApiUrlsToRelativePaths($markdown, $attachmentExtensions,
     <link rel="stylesheet" href="css/dark-mode/markdown.css">
     <link rel="stylesheet" href="css/dark-mode/kanban.css">
     <link rel="stylesheet" href="css/dark-mode/icons.css">
-    <script src="js/globals.js"></script>
+    <script src="js/globals.js?v=<?php echo getAppVersion(); ?>"></script>
     <script src="js/theme-manager.js"></script>
 </head>
 <body data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">

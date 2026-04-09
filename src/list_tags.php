@@ -5,6 +5,7 @@ requireAuth();
 require_once 'config.php';
 require_once 'db_connect.php';
 require_once 'functions.php';
+require_once 'version_helper.php';
 
 // Build query with folder exclusions like in index.php
 $where_conditions = ["trash = 0"];
@@ -137,7 +138,7 @@ $currentLang = getUserLanguage();
 		</div>
 	</div>
 	
-	<script src="js/globals.js"></script>
+	<script src="js/globals.js?v=<?php echo getAppVersion(); ?>"></script>
 	<script src="js/navigation.js"></script>
 	<script src="js/list_tags.js"></script>
 	<script src="js/clickable-tags.js"></script>

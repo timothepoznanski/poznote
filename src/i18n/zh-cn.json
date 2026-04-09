@@ -454,6 +454,7 @@
       "kanban_on_folder_click": "点击文件夹时打开看板视图",
       "index_icon_scale": "索引页图标缩放",
       "note_content_width": "笔记内容宽度",
+      "markdown_split_card_view": "带边框的 Markdown",
       "code_block_word_wrap": "代码块自动换行",
       "ui_customization": "元素可见性"
     },
@@ -601,6 +602,10 @@
       "preview_mode_hint": "您处于预览模式。请使用工具栏中的按钮切换到编辑模式开始编写 Markdown。",
       "split_preview_placeholder": "预览将随着您的输入在此处显示..."
     },
+    "panes": {
+      "edit": "编辑",
+      "preview": "预览"
+    },
     "images": {
       "delete_confirm": {
         "title": "删除图片",
@@ -724,11 +729,13 @@
       "placeholder": "显示名称"
     },
     "custom_css": {
-      "title": "自定义 CSS 文件",
-      "description": "只输入 CSS 文件名。该文件必须放在 css 目录中。留空可禁用。",
+      "title": "自定义 CSS",
+      "description": "上传 CSS 文件以自定义 Poznote 的外观。该文件存储在您的数据卷中，并应用于所有用户。",
+      "no_file": "未加载自定义 CSS",
+      "upload": "上传 CSS 文件",
+      "validation": "请选择一个 CSS 文件。",
       "placeholder": "custom.css",
-      "hint": "示例：custom.css。Poznote 会自动从 css/custom.css 加载它",
-      "validation": "请只输入 CSS 文件名，例如 custom.css。该文件必须放在 css 目录中。"
+      "hint": "Docker 用户：请将文件放入数据卷 data/css/ 文件夹中（例如 data/css/custom.css）。否则将从镜像内的 css/custom.css 加载。"
     },
     "import_limits": {
       "title": "导入限制",

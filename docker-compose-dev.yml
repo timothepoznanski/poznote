@@ -12,6 +12,7 @@ services:
     volumes:
       - "./src:/var/www/html"
       - "./data:/var/www/html/data"
+      - "./docker/nginx/default.conf:/etc/nginx/http.d/default.conf:ro"
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--timeout=5", "-O", "/dev/null", "http://127.0.0.1/api/health"]
       interval: 30s
@@ -25,7 +26,7 @@ services:
       dockerfile: Dockerfile
     image: poznote-mcp:dev
     container_name: poznote-mcp-dev
-    restart: unless-stopped
+    restart: always
     environment:
       POZNOTE_API_URL: http://webserver:80/api/v1
       POZNOTE_PASSWORD: ${POZNOTE_PASSWORD:-admin}

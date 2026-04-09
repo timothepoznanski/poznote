@@ -53,8 +53,16 @@ function _createNoteOfType(noteType) {
         .then(function (data) {
             if (data.success && data.note) {
                 window.scrollTo(0, 0);
-                var ws = encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
-                window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
+                if (typeof window.navigateToCreatedNoteInInternalTab === 'function') {
+                    window.navigateToCreatedNoteInInternalTab(
+                        data.note.id,
+                        data.note.heading,
+                        data.note.workspace || selectedWorkspace || getSelectedWorkspace()
+                    );
+                } else {
+                    var ws = encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
+                    window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
+                }
             } else {
                 showNotificationPopup(data.error || 'Error creating ' + noteType, 'error');
             }

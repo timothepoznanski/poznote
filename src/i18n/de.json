@@ -454,6 +454,7 @@
       "kanban_on_folder_click": "Kanban-Ansicht beim Klicken auf Ordner öffnen",
       "index_icon_scale": "Skalierung der Index-Symbole",
       "note_content_width": "Breite des Notizinhalts",
+      "markdown_split_card_view": "Markdown mit Rahmen",
       "code_block_word_wrap": "Codeblock-Zeilenumbruch",
       "ui_customization": "Sichtbarkeit von Elementen"
     },
@@ -604,6 +605,10 @@
       "preview_mode_hint": "Sie befinden sich im Vorschaumodus. Wechseln Sie mit der Schaltfläche in der Symbolleiste in den Bearbeitungsmodus, um mit dem Schreiben von Markdown zu beginnen.",
       "split_preview_placeholder": "Die Vorschau wird hier beim Tippen angezeigt..."
     },
+    "panes": {
+      "edit": "Bearbeiten",
+      "preview": "Vorschau"
+    },
     "images": {
       "delete_confirm": {
         "title": "Bild löschen",
@@ -724,11 +729,13 @@
       "placeholder": "Anzeigename"
     },
     "custom_css": {
-      "title": "Benutzerdefinierte CSS-Datei",
-      "description": "Geben Sie nur den CSS-Dateinamen ein. Die Datei muss im Verzeichnis css abgelegt werden. Leer lassen zum Deaktivieren.",
+      "title": "Benutzerdefiniertes CSS",
+      "description": "Laden Sie eine CSS-Datei hoch, um das Erscheinungsbild von Poznote anzupassen. Die Datei wird in Ihrem Daten-Volume gespeichert und für alle Benutzer angewendet.",
+      "no_file": "Kein benutzerdefiniertes CSS geladen",
+      "upload": "CSS-Datei hochladen",
+      "validation": "Bitte wählen Sie eine CSS-Datei aus.",
       "placeholder": "custom.css",
-      "hint": "Beispiel: custom.css. Poznote lädt die Datei automatisch aus css/custom.css",
-      "validation": "Bitte geben Sie nur einen CSS-Dateinamen wie custom.css ein. Die Datei muss im Verzeichnis css abgelegt werden."
+      "hint": "Docker-Nutzer: Legen Sie die Datei im Volume-Ordner data/css/ ab (z. B. data/css/custom.css). Andernfalls wird sie aus css/custom.css im Image geladen."
     },
     "import_limits": {
       "title": "Importlimits",

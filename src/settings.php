@@ -90,6 +90,7 @@ if ($isAdmin) {
     <link rel="stylesheet" href="css/modals/responsive.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modals/ui-customization.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/background-image.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/custom-css.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $cache_v; ?>">
@@ -356,6 +357,15 @@ if ($isAdmin) {
                 </div>
             </div>
 
+            <!-- Markdown Split Card View -->
+            <div class="home-card" id="markdown-split-card-view-card">
+                <div class="home-card-icon"><i class="lucide lucide-columns-2"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_split_card_view', [], 'Framed markdown'); ?></span>
+                    <span id="markdown-split-card-view-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
             <!-- Code Block Word Wrap -->
             <div class="home-card" id="code-wrap-card">
                 <div class="home-card-icon"><i class="lucide lucide-code"></i></div>
@@ -466,7 +476,7 @@ if ($isAdmin) {
     <?php include 'modals.php'; ?>
     <script src="js/modal-alerts.js"></script>
     <script src="js/theme-manager.js"></script>
-    <script src="js/globals.js"></script>
+    <script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/ui.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/font-size-settings.js"></script>

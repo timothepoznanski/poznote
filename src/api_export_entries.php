@@ -40,6 +40,7 @@ if ($workspace !== null) {
 $query_right .= ' ORDER BY updated DESC';
 $stmt_right = $con->prepare($query_right);
 $stmt_right->execute($query_params);
+$noteTypeMap = [];
 
 if ($stmt_right) {
     $indexContent .= '<ul>';
@@ -55,6 +56,7 @@ if ($stmt_right) {
         
         // Determine the correct file extension based on note type
         $noteType = $row["type"] ?? 'note';
+        $noteTypeMap[(int) $row['id']] = $noteType;
         $fileExtension = ($noteType === 'markdown') ? 'md' : 'html';
         
         $indexContent .= '<li><a href="./'.$row['id'].'.'.$fileExtension.'">'.$title.'</a> (' . $folder . $tags.')</li>';
@@ -104,10 +106,21 @@ foreach ($files as $name => $file) {
                         $fileCount++;
                     }
                 } else {
-                    // For HTML files, remove copy buttons before adding
+                    $noteId = intval(pathinfo($relativePath, PATHINFO_FILENAME));
+                    $noteType = $noteTypeMap[$noteId] ?? null;
+                    if ($noteType === null) {
+                        $typeStmt = $con->prepare('SELECT type FROM entries WHERE id = ? AND trash = 0');
+                        $typeStmt->execute([$noteId]);
+                        $noteType = $typeStmt->fetchColumn() ?: 'note';
+                        $noteTypeMap[$noteId] = $noteType;
+                    }
+
+                    // Preserve raw tasklist JSON stored in .html files.
                     $content = file_get_contents($filePath);
                     if ($content !== false) {
-                        $content = removeCopyButtonsFromHtml($content);
+                        if ($noteType !== 'tasklist') {
+                            $content = removeCopyButtonsFromHtml($content);
+                        }
                         $zip->addFromString($relativePath, $content);
                     } else {
                         $zip->addFile($filePath, $relativePath);

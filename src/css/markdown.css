@@ -40,6 +40,11 @@
     color: #999;
 }
 
+body.markdown-slash-cursor-hidden,
+body.markdown-slash-cursor-hidden * {
+    cursor: none !important;
+}
+
 /* Markdown rendered content styles */
 .markdown-preview h1 {
     font-size: 2em;
@@ -481,6 +486,7 @@
     align-items: stretch !important;
     overflow: hidden !important;
     height: auto !important;
+    padding: 0 !important;
 }
 
 /* Hide overflow on parent containers when in split mode */
@@ -510,6 +516,14 @@ body.has-internal-tabs .innernote:has(.noteentry.markdown-split-mode) .note-head
     max-height: calc(100vh - 200px) !important;
 }
 
+.noteentry.markdown-split-mode .markdown-editor-container {
+    display: flex !important;
+}
+
+.noteentry.markdown-split-mode .markdown-editor {
+    padding-bottom: 44px !important;
+}
+
 .noteentry.markdown-split-mode .markdown-preview {
     flex: 1 1 50% !important;
     width: 50% !important;
@@ -521,14 +535,63 @@ body.has-internal-tabs .innernote:has(.noteentry.markdown-split-mode) .note-head
     max-height: calc(100vh - 200px) !important;
 }
 
-.noteentry.markdown-split-mode .markdown-editor {
-    padding-bottom: 44px !important;
+/* Dark mode border for split view */
+[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container,
+[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview {
+    background: var(--dm-bg) !important;
 }
 
-/* Dark mode border for split view */
 [data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container,
 [data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor {
     border-right-color: #404040 !important;
+}
+
+body.markdown-split-card-view .noteentry.markdown-split-mode {
+    gap: 16px !important;
+    padding: 6px 2px 10px !important;
+}
+
+body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor-container,
+body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
+    position: relative !important;
+    min-height: 0 !important;
+    box-sizing: border-box !important;
+    max-height: calc(100vh - 220px) !important;
+    border: 1px solid #d9dee7 !important;
+    border-radius: 16px !important;
+    background: #ffffff !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 12px 28px rgba(15, 23, 42, 0.08) !important;
+}
+
+body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor-container {
+    overflow: hidden !important;
+}
+
+body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 18px 18px 44px !important;
+    border-right: none !important;
+    box-sizing: border-box !important;
+    max-height: none !important;
+}
+
+body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
+    min-height: 0 !important;
+    padding: 18px 18px 44px !important;
+}
+
+html[data-theme='dark'] body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor-container,
+html[data-theme='dark'] body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview,
+body.dark-mode.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor-container,
+body.dark-mode.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
+    border-color: var(--dm-border) !important;
+    background: var(--dm-bg) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.28), 0 12px 28px rgba(0, 0, 0, 0.22) !important;
 }
 
 /* Scrollbar styling for split view columns */

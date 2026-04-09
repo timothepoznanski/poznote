@@ -3,6 +3,7 @@ require_once 'auth.php';
 require_once 'config.php';
 require_once 'functions.php';
 require_once 'db_connect.php';
+require_once 'version_helper.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
@@ -495,6 +496,94 @@ function regenerateTasklistIds($con, $noteId, $originalJsonData, &$content) {
     $updateStmt->execute([$content, $noteId]);
 }
 
+function isSequentialArray($value) {
+    if (!is_array($value)) {
+        return false;
+    }
+
+    if ($value === []) {
+        return true;
+    }
+
+    return array_keys($value) === range(0, count($value) - 1);
+}
+
+/**
+ * Normalize imported tasklist payloads stored as raw JSON.
+ * Accepts the native Poznote array format and {"tasks": [...]} wrappers.
+ * Returns a normalized JSON string or null when the content is not a tasklist.
+ */
+function normalizeImportedTasklistJson($content) {
+    if (!is_string($content)) {
+        return null;
+    }
+
+    $normalized = normalizeTasklistJsonContent($content);
+    if ($normalized === '') {
+        return null;
+    }
+
+    $decoded = json_decode($normalized, true);
+    if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
+        return null;
+    }
+
+    if (!isSequentialArray($decoded)) {
+        return null;
+    }
+
+    if ($decoded === []) {
+        return $normalized;
+    }
+
+    $hasTaskMetadata = false;
+
+    foreach ($decoded as $task) {
+        if (!is_array($task) || !array_key_exists('text', $task)) {
+            return null;
+        }
+
+        if (array_key_exists('completed', $task) || array_key_exists('important', $task) || array_key_exists('noteId', $task) || array_key_exists('id', $task)) {
+            $hasTaskMetadata = true;
+        }
+    }
+
+    return $hasTaskMetadata ? $normalized : null;
+}
+
+/**
+ * Detect tasklist imports from raw JSON files or exported HTML tasklist markup.
+ * Returns normalized content and the detected note type.
+ */
+function detectImportedTasklistContent($content, $fileExtension, $noteType) {
+    if ($noteType !== 'note') {
+        return ['content' => $content, 'noteType' => $noteType, 'originalJsonData' => null];
+    }
+
+    $normalizedTasklistJson = normalizeImportedTasklistJson($content);
+    if ($normalizedTasklistJson !== null) {
+        return [
+            'content' => $normalizedTasklistJson,
+            'noteType' => 'tasklist',
+            'originalJsonData' => json_decode($normalizedTasklistJson, true)
+        ];
+    }
+
+    if ($fileExtension === 'html' && stripos($content, 'task-item') !== false && preg_match('/<div[^>]*class="[^"]*task-item[^"]*"/', $content)) {
+        $tasklistJson = extractTaskListFromHTML($content);
+        $decodedTasklist = json_decode($tasklistJson, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decodedTasklist)) {
+            return [
+                'content' => $tasklistJson,
+                'noteType' => 'tasklist',
+                'originalJsonData' => $decodedTasklist
+            ];
+        }
+    }
+
+    return ['content' => $content, 'noteType' => $noteType, 'originalJsonData' => null];
+}
+
 /**
  * Write note content to file with appropriate wrapping.
  * Returns true on success, false on failure.
@@ -585,30 +674,13 @@ function createFolderHierarchyFromPath($con, $workspace, $folderPath, &$folderMa
  * @return array Keys: content, noteType, originalJsonData
  */
 function processNoteFileContent($content, $fileExtension, $noteType) {
-    $originalJsonData = null;
+    $detectedTasklist = detectImportedTasklistContent($content, $fileExtension, $noteType);
+    $content = $detectedTasklist['content'];
+    $noteType = $detectedTasklist['noteType'];
+    $originalJsonData = $detectedTasklist['originalJsonData'];
 
-    // JSON files: detect tasklist or wrap as HTML
-    if ($fileExtension === 'json') {
-        $jsonData = json_decode($content, true);
-        if (json_last_error() === JSON_ERROR_NONE && is_array($jsonData)) {
-            $isTasklist = true;
-            foreach ($jsonData as $item) {
-                if (!is_array($item) || !isset($item['text'])) {
-                    $isTasklist = false;
-                    break;
-                }
-            }
-            if ($isTasklist) {
-                $noteType = 'tasklist';
-                $originalJsonData = $jsonData;
-            } else {
-                $noteType = 'note';
-                $content = '<pre>' . htmlspecialchars($content, ENT_QUOTES, 'UTF-8') . '</pre>';
-            }
-        } else {
-            $noteType = 'note';
-            $content = '<pre>' . htmlspecialchars($content, ENT_QUOTES, 'UTF-8') . '</pre>';
-        }
+    if ($noteType === 'note' && $fileExtension === 'json') {
+        $content = '<pre>' . htmlspecialchars($content, ENT_QUOTES, 'UTF-8') . '</pre>';
     }
 
     // Remove <style> tags from HTML files
@@ -814,24 +886,9 @@ function importNotesZip($uploadedFile) {
         
         // Determine note type based on file extension and content
         $noteType = ($fileExtension === 'md') ? 'markdown' : 'note';
-        
-        // Check if content is valid JSON (indicates tasklist)
-        $trimmedContent = trim($content);
-        if ($noteType === 'note' && $trimmedContent !== '' && 
-            ($trimmedContent[0] === '[' || $trimmedContent[0] === '{')) {
-            // Try to decode as JSON
-            $jsonTest = json_decode($trimmedContent, true);
-            if (json_last_error() === JSON_ERROR_NONE && is_array($jsonTest)) {
-                $noteType = 'tasklist';
-            }
-        } elseif ($noteType === 'note' && strpos($content, 'task-item') !== false) {
-            // Check if HTML content contains task items (exported tasklist)
-            if (preg_match('/<div[^>]*class="[^"]*task-item[^"]*"/', $content)) {
-                $noteType = 'tasklist';
-                // Convert HTML tasklist to JSON
-                $content = extractTaskListFromHTML($content);
-            }
-        }
+        $detectedTasklist = detectImportedTasklistContent($content, $fileExtension, $noteType);
+        $content = $detectedTasklist['content'];
+        $noteType = $detectedTasklist['noteType'];
         
         // Extract title from content
         $title = t('restore_import.import_notes.default_title');
@@ -1726,7 +1783,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
     <link rel="stylesheet" href="css/dark-mode/markdown.css">
     <link rel="stylesheet" href="css/dark-mode/kanban.css">
     <link rel="stylesheet" href="css/dark-mode/icons.css">
-    <script src="js/globals.js"></script>
+    <script src="js/globals.js?v=<?php echo getAppVersion(); ?>"></script>
     <script src="js/theme-manager.js"></script>
 </head>
 <body data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">

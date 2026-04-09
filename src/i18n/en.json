@@ -113,6 +113,7 @@
       "kanban_on_folder_click": "Open Kanban view on folder click",
       "index_icon_scale": "Index icon scaling",
       "note_content_width": "Note content width",
+      "markdown_split_card_view": "Framed markdown",
       "code_block_word_wrap": "Code block word wrap",
       "ui_customization": "Element visibility"
     },
@@ -266,11 +267,13 @@
       "placeholder": "Display name"
     },
     "custom_css": {
-      "title": "Custom CSS path",
-      "description": "Enter only the CSS filename. The file must be placed in the css directory. Leave empty to disable.",
+      "title": "Custom CSS",
+      "description": "Upload a CSS file to customise Poznote's appearance. The file is stored in your data volume and applied to all users.",
+      "no_file": "No custom CSS loaded",
+      "upload": "Upload CSS file",
+      "validation": "Please select a CSS file.",
       "placeholder": "custom.css",
-      "hint": "Example: custom.css. Poznote will load it automatically from css/custom.css",
-      "validation": "Please enter only a CSS filename like custom.css. The file must be placed in the css directory."
+      "hint": "Docker users: place the file in your data/css/ volume folder (e.g. data/css/custom.css). Otherwise it is loaded from css/custom.css inside the image."
     },
     "import_limits": {
       "title": "Import Limits",
@@ -783,6 +786,10 @@
     "messages": {
       "preview_mode_hint": "You are in preview mode. Switch to edit mode using the button in the toolbar to start writing markdown.",
       "split_preview_placeholder": "Preview will appear here as you type..."
+    },
+    "panes": {
+      "edit": "Edit",
+      "preview": "Preview"
     },
     "images": {
       "delete_confirm": {

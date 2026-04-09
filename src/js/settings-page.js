@@ -412,15 +412,44 @@
 
     // ========== Modal Functions ==========
 
+    var pendingCssFile = null;
+    var pendingCssRemove = false;
+
+    function updateCustomCssModalState(filename) {
+        var noFile = document.getElementById('customCssNoFile');
+        var currentFile = document.getElementById('customCssCurrentFile');
+        var fileNameEl = document.getElementById('customCssFileName');
+        var removeBtn = document.getElementById('removeCustomCssBtn');
+        if (filename) {
+            if (noFile) noFile.style.display = 'none';
+            if (currentFile) currentFile.style.display = 'flex';
+            if (fileNameEl) fileNameEl.textContent = filename;
+            if (removeBtn) removeBtn.style.display = 'inline-block';
+        } else {
+            if (noFile) noFile.style.display = 'block';
+            if (currentFile) currentFile.style.display = 'none';
+            if (fileNameEl) fileNameEl.textContent = '';
+            if (removeBtn) removeBtn.style.display = 'none';
+        }
+    }
+
     function showCustomCssModal() {
         var modal = document.getElementById('customCssModal');
-        var input = document.getElementById('customCssPathInput');
-        if (!modal || !input) return;
+        if (!modal) return;
 
-        getSetting('custom_css_path', function (value) {
-            input.value = value || '';
-            modal.style.display = 'flex';
-        });
+        pendingCssFile = null;
+        pendingCssRemove = false;
+
+        fetch('api_upload_css.php', { method: 'GET', credentials: 'same-origin' })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                updateCustomCssModalState(data.exists ? data.filename : null);
+                modal.style.display = 'flex';
+            })
+            .catch(function () {
+                updateCustomCssModalState(null);
+                modal.style.display = 'flex';
+            });
     }
 
     function showLanguageModal() {
@@ -552,6 +581,7 @@
         setupToggleCard('folder-counts-card', 'folder-counts-status', 'hide_folder_counts', true);
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
+        setupToggleCard('markdown-split-card-view-card', 'markdown-split-card-view-status', 'markdown_split_card_view', false, false);
         setupToggleCard('code-wrap-card', 'code-wrap-status', 'code_block_word_wrap', false, true);
 
         // Card click handlers for modal settings
@@ -770,27 +800,93 @@
             });
         }
 
+        // ---- Custom CSS upload modal ----
+        var uploadCustomCssBtn = document.getElementById('uploadCustomCssBtn');
+        var customCssFileInput = document.getElementById('customCssFileInput');
+        var removeCustomCssBtn = document.getElementById('removeCustomCssBtn');
+        var cancelCustomCssBtn = document.getElementById('cancelCustomCssBtn');
         var saveCustomCssBtn = document.getElementById('saveCustomCssBtn');
+
+        if (uploadCustomCssBtn && customCssFileInput) {
+            uploadCustomCssBtn.addEventListener('click', function () {
+                customCssFileInput.click();
+            });
+            customCssFileInput.addEventListener('change', function (e) {
+                var file = e.target.files[0];
+                if (!file) return;
+                if (!file.name.match(/\.css$/i)) {
+                    alert(tr('modals.custom_css.validation', {}, 'Please select a CSS file.'));
+                    customCssFileInput.value = '';
+                    return;
+                }
+                pendingCssFile = file;
+                pendingCssRemove = false;
+                updateCustomCssModalState(file.name);
+            });
+        }
+
+        if (removeCustomCssBtn) {
+            removeCustomCssBtn.addEventListener('click', function () {
+                pendingCssFile = null;
+                pendingCssRemove = true;
+                updateCustomCssModalState(null);
+                if (customCssFileInput) customCssFileInput.value = '';
+            });
+        }
+
+        if (cancelCustomCssBtn) {
+            cancelCustomCssBtn.addEventListener('click', function () {
+                pendingCssFile = null;
+                pendingCssRemove = false;
+                try { closeModal('customCssModal'); } catch (e) { }
+            });
+        }
+
         if (saveCustomCssBtn) {
             saveCustomCssBtn.addEventListener('click', function () {
-                var input = document.getElementById('customCssPathInput');
-                var value = input ? input.value.trim() : '';
-
-                if (!isValidCustomCssPath(value)) {
-                    alert(tr('modals.custom_css.validation', {}, 'Please enter only a CSS filename like custom.css. The file must be placed in the css directory.'));
+                if (pendingCssRemove) {
+                    fetch('api_upload_css.php', { method: 'DELETE', credentials: 'same-origin' })
+                        .then(function (r) { return r.json(); })
+                        .then(function (data) {
+                            if (data.success) {
+                                try { closeModal('customCssModal'); } catch (e) { }
+                                refreshCustomCssBadge();
+                                reloadOpener();
+                                window.location.reload();
+                            } else {
+                                alert(data.error || tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                            }
+                        })
+                        .catch(function () {
+                            alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                        });
                     return;
                 }
 
-                setSetting('custom_css_path', value, function (success, result) {
-                    if (success) {
-                        try { closeModal('customCssModal'); } catch (e) { }
-                        refreshCustomCssBadge();
-                        reloadOpener();
-                        window.location.reload();
-                    } else {
-                        alert((result && result.error) || tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
-                    }
-                });
+                if (pendingCssFile) {
+                    var formData = new FormData();
+                    formData.append('css_file', pendingCssFile);
+                    fetch('api_upload_css.php', { method: 'POST', credentials: 'same-origin', body: formData })
+                        .then(function (r) { return r.json(); })
+                        .then(function (data) {
+                            if (data.success) {
+                                pendingCssFile = null;
+                                try { closeModal('customCssModal'); } catch (e) { }
+                                refreshCustomCssBadge();
+                                reloadOpener();
+                                window.location.reload();
+                            } else {
+                                alert(data.error || tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                            }
+                        })
+                        .catch(function () {
+                            alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                        });
+                    return;
+                }
+
+                // Nothing changed - just close
+                try { closeModal('customCssModal'); } catch (e) { }
             });
         }
 

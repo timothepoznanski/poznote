@@ -187,7 +187,16 @@ function poznoteGetCustomCssHref() {
         return '';
     }
 
-    $hrefPath = poznoteGetAppPathPrefix() . '/css/' . $filename;
+    $prefix = poznoteGetAppPathPrefix();
+
+    // Prefer the user-writable data/css/ directory (accessible via Docker volume).
+    $dataAbsolutePath = __DIR__ . '/data/css/' . $filename;
+    if (is_file($dataAbsolutePath)) {
+        $version = (string) filemtime($dataAbsolutePath);
+        return $prefix . '/data/css/' . $filename . ($version !== '' ? '?v=' . rawurlencode($version) : '');
+    }
+
+    // Fall back to the css/ directory bundled in the image (development / legacy).
     $absoluteFilePath = __DIR__ . '/css/' . $filename;
     if (!is_file($absoluteFilePath)) {
         return '';
@@ -198,7 +207,7 @@ function poznoteGetCustomCssHref() {
         return '';
     }
 
-    return $hrefPath . '?v=' . rawurlencode($version);
+    return $prefix . '/css/' . $filename . '?v=' . rawurlencode($version);
 }
 
 /**

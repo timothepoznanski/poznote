@@ -24,6 +24,163 @@ function saveLastOpenedWorkspace(workspaceName) {
 // Expose globally
 window.saveLastOpenedWorkspace = saveLastOpenedWorkspace;
 
+var PENDING_CREATED_NOTE_OPEN_KEY = 'poznote_pending_created_note_open';
+
+function getDefaultCreatedNoteTitle() {
+    return window.t ? window.t('index.note.new_note', null, 'New note') : 'New note';
+}
+
+function normalizeCreatedNoteWorkspace(workspaceName) {
+    return typeof workspaceName === 'string' ? workspaceName : '';
+}
+
+function buildIndexNoteUrl(noteId, workspaceName) {
+    var params = [];
+    var workspace = normalizeCreatedNoteWorkspace(workspaceName);
+
+    if (workspace) {
+        params.push('workspace=' + encodeURIComponent(workspace));
+    }
+
+    if (noteId) {
+        params.push('note=' + encodeURIComponent(noteId));
+    }
+
+    return 'index.php' + (params.length ? '?' + params.join('&') : '');
+}
+
+function getStoredActiveTabNoteId(workspaceName) {
+    var workspace = workspaceName || 'default';
+
+    try {
+        var raw = localStorage.getItem('poznote_tabs_' + workspace);
+        if (!raw) {
+            return null;
+        }
+
+        var parsed = JSON.parse(raw);
+        if (!parsed || !Array.isArray(parsed.tabs) || !parsed.activeTabId) {
+            return null;
+        }
+
+        for (var i = 0; i < parsed.tabs.length; i++) {
+            var tab = parsed.tabs[i];
+            if (tab && tab.id === parsed.activeTabId && tab.noteId) {
+                return String(tab.noteId);
+            }
+        }
+    } catch (error) {
+        // Ignore storage errors and fall back to normal navigation.
+    }
+
+    return null;
+}
+
+function storePendingCreatedNoteOpen(noteId, noteTitle, workspaceName) {
+    try {
+        sessionStorage.setItem(PENDING_CREATED_NOTE_OPEN_KEY, JSON.stringify({
+            noteId: String(noteId),
+            noteTitle: noteTitle || getDefaultCreatedNoteTitle(),
+            workspace: normalizeCreatedNoteWorkspace(workspaceName)
+        }));
+    } catch (error) {
+        // Ignore storage errors and fall back to normal navigation.
+    }
+}
+
+function consumePendingCreatedNoteOpen() {
+    try {
+        var raw = sessionStorage.getItem(PENDING_CREATED_NOTE_OPEN_KEY);
+        if (!raw) {
+            return null;
+        }
+
+        sessionStorage.removeItem(PENDING_CREATED_NOTE_OPEN_KEY);
+        return JSON.parse(raw);
+    } catch (error) {
+        try {
+            sessionStorage.removeItem(PENDING_CREATED_NOTE_OPEN_KEY);
+        } catch (cleanupError) {
+            // Ignore cleanup errors.
+        }
+        return null;
+    }
+}
+
+function openCreatedNoteWithInternalTabs(noteId, noteTitle) {
+    if (!window.tabManager || window.innerWidth <= 800) {
+        return Promise.resolve(false);
+    }
+
+    var finalTitle = noteTitle || getDefaultCreatedNoteTitle();
+
+    return Promise.resolve(
+        typeof window.refreshNotesListAfterFolderAction === 'function'
+            ? window.refreshNotesListAfterFolderAction()
+            : null
+    ).catch(function (error) {
+        console.error('Error refreshing notes list before opening created note:', error);
+    }).then(function () {
+        window.tabManager.openInNewTab(noteId, finalTitle);
+        return true;
+    });
+}
+
+function navigateToCreatedNoteInInternalTab(noteId, noteTitle, workspaceName) {
+    if (!noteId) {
+        return Promise.resolve(false);
+    }
+
+    var workspace = normalizeCreatedNoteWorkspace(workspaceName);
+
+    if (window.tabManager && window.innerWidth > 800) {
+        return openCreatedNoteWithInternalTabs(noteId, noteTitle);
+    }
+
+    if (window.innerWidth > 800) {
+        var activeNoteId = getStoredActiveTabNoteId(workspace);
+        if (activeNoteId) {
+            storePendingCreatedNoteOpen(noteId, noteTitle, workspace);
+            window.location.href = buildIndexNoteUrl(activeNoteId, workspace);
+            return Promise.resolve(true);
+        }
+    }
+
+    window.location.href = buildIndexNoteUrl(noteId, workspace);
+    return Promise.resolve(true);
+}
+
+window.navigateToCreatedNoteInInternalTab = navigateToCreatedNoteInInternalTab;
+
+function consumePendingCreatedNoteOpenOnLoad(retryCount) {
+    if (window.innerWidth <= 800) {
+        return;
+    }
+
+    var attempts = typeof retryCount === 'number' ? retryCount : 0;
+    if (!window.tabManager) {
+        if (attempts < 20) {
+            window.setTimeout(function () {
+                consumePendingCreatedNoteOpenOnLoad(attempts + 1);
+            }, 50);
+        }
+        return;
+    }
+
+    var pendingRequest = consumePendingCreatedNoteOpen();
+    if (!pendingRequest || !pendingRequest.noteId) {
+        return;
+    }
+
+    openCreatedNoteWithInternalTabs(pendingRequest.noteId, pendingRequest.noteTitle);
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', consumePendingCreatedNoteOpenOnLoad);
+} else {
+    consumePendingCreatedNoteOpenOnLoad();
+}
+
 function startDownload() {
     window.location = 'api_export_entries.php';
 }
@@ -2055,7 +2212,15 @@ function createNoteOfType(noteType, globalFnNames) {
                     if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
                         window.setNeedsAutoPush(true);
                     }
-                    window.location.href = 'index.php?note=' + data.note.id;
+                    if (typeof window.navigateToCreatedNoteInInternalTab === 'function') {
+                        window.navigateToCreatedNoteInInternalTab(
+                            data.note.id,
+                            data.note.heading,
+                            data.note.workspace || selectedWorkspace
+                        );
+                    } else {
+                        window.location.href = 'index.php?note=' + data.note.id;
+                    }
                 }
             });
         }
@@ -2084,7 +2249,15 @@ function createNoteOfType(noteType, globalFnNames) {
                     if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
                         window.setNeedsAutoPush(true);
                     }
-                    window.location.href = 'index.php?note=' + data.note.id;
+                    if (typeof window.navigateToCreatedNoteInInternalTab === 'function') {
+                        window.navigateToCreatedNoteInInternalTab(
+                            data.note.id,
+                            data.note.heading,
+                            data.note.workspace || selectedWorkspace
+                        );
+                    } else {
+                        window.location.href = 'index.php?note=' + data.note.id;
+                    }
                 }
             });
         }

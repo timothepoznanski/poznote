@@ -158,7 +158,7 @@ $currentLang = getUserLanguage();
     
     <?php include 'modals.php'; ?>
     
-    <script src="js/globals.js"></script>
+    <script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/workspaces.js"></script>
     <script src="js/navigation.js"></script>
     <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
