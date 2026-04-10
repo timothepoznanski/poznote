@@ -644,13 +644,13 @@ try {
                 </div>
             </a>
 
-            <!-- GitHub Star -->
-            <a href="https://github.com/timothepoznanski/poznote" target="_blank" class="home-card" id="home-github-star-card" title="<?php echo t_h('settings.cards.github_star', [], 'Star on GitHub'); ?>">
+            <!-- Poznote Guestbook -->
+            <a href="https://github.com/timothepoznanski/poznote/discussions/952" target="_blank" class="home-card" id="home-guestbook-card" title="<?php echo t_h('settings.cards.guestbook', [], 'Poznote Guestbook'); ?>">
                 <div class="home-card-icon home-card-icon-favorites">
                     <i class="lucide lucide-star"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.github_star', [], 'Star on GitHub'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('settings.cards.guestbook', [], 'Poznote Guestbook'); ?></span>
                     <span class="home-card-count">GitHub</span>
                 </div>
             </a>

@@ -355,9 +355,10 @@ const EXPORT_STYLES = '
  * @return string Cleaned HTML content
  */
 function cleanHtmlContent($content) {
-    // Use regex to remove copy buttons (more reliable than DOM manipulation)
-    // Remove elements with class containing 'code-block-copy-btn'
+    // Use regex to remove UI elements (more reliable than DOM manipulation)
+    // Remove elements with class containing 'code-block-copy-btn' or 'code-block-delete-btn'
     $content = preg_replace('/<[^>]*class="[^"]*code-block-copy-btn[^"]*"[^>]*>.*?<\/[^>]+>/is', '', $content);
+    $content = preg_replace('/<[^>]*class="[^"]*code-block-delete-btn[^"]*"[^>]*>.*?<\/[^>]+>/is', '', $content);
     // Also remove button elements that might be copy buttons
     $content = preg_replace('/<button[^>]*class="[^"]*copy[^"]*"[^>]*>.*?<\/button>/is', '', $content);
     

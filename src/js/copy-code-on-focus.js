@@ -6,6 +6,11 @@
 
     var COPY_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
     var CHECK_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+    var DELETE_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>';
+
+    function tl(key, fallback) {
+        return window.t ? window.t(key, {}, fallback) : fallback;
+    }
 
     function setCopyIcon(btn) {
         btn.innerHTML = COPY_ICON_SVG;
@@ -127,6 +132,12 @@
             btn.remove();
         }
         
+        // Remove the delete button from the clone if present
+        var delBtn = clone.querySelector('.code-block-delete-btn');
+        if (delBtn) {
+            delBtn.remove();
+        }
+        
         // Get text content and normalize spaces
         var text = clone.textContent || clone.innerText || '';
         
@@ -157,7 +168,9 @@
             
             // Check if button already exists
             var existingBtn = block.querySelector('.code-block-copy-btn');
+            var existingDelBtn = block.querySelector('.code-block-delete-btn');
             var btn;
+            var delBtn;
             
             if (existingBtn) {
                 btn = existingBtn;
@@ -179,8 +192,27 @@
                 // SVG icon for copy
                 setCopyIcon(btn);
             }
+
+            var deleteBtnLabel = tl('editor.code_block_delete.title', 'Delete code block');
+
+            if (existingDelBtn) {
+                delBtn = existingDelBtn;
+                var newDelBtn = delBtn.cloneNode(true);
+                delBtn.parentNode.replaceChild(newDelBtn, delBtn);
+                delBtn = newDelBtn;
+                delBtn.setAttribute('aria-label', deleteBtnLabel);
+                delBtn.setAttribute('title', deleteBtnLabel);
+                delBtn.innerHTML = DELETE_ICON_SVG;
+            } else {
+                delBtn = document.createElement('button');
+                delBtn.className = 'code-block-delete-btn';
+                delBtn.setAttribute('type', 'button');
+                delBtn.setAttribute('aria-label', deleteBtnLabel);
+                delBtn.setAttribute('title', deleteBtnLabel);
+                delBtn.innerHTML = DELETE_ICON_SVG;
+            }
             
-            // Add/re-attach click handler
+            // Add/re-attach click handler for copy
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -212,10 +244,101 @@
                     showToast('Copy failed — select the code and press Ctrl+C');
                 });
             });
+
+            // Add delete click handler
+            delBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                var confirmTitle = tl('editor.code_block_delete.confirm_title', 'Delete code block');
+                var confirmMsg   = tl('editor.code_block_delete.confirm_message', 'Do you want to delete this code block?');
+
+                var doDelete = function() {
+                    // --- Markdown mode: update source and re-render ---
+                    var markdownPreview = block.closest('.markdown-preview');
+                    if (markdownPreview) {
+                        var noteEntry = markdownPreview.closest('.noteentry');
+                        if (noteEntry) {
+                            var noteId   = noteEntry.id.replace('entry', '');
+                            var editorDiv = noteEntry.querySelector('.markdown-editor');
+                            if (editorDiv) {
+                                // Determine index of this <pre> among all <pre> in the preview
+                                var allPres  = Array.from(markdownPreview.querySelectorAll('pre'));
+                                var preIndex = allPres.indexOf(block);
+                                if (preIndex !== -1) {
+                                    var content = typeof window.getMarkdownContent === 'function'
+                                        ? window.getMarkdownContent(noteId)
+                                        : editorDiv.textContent;
+                                    var lines = content.split('\n');
+                                    // Find the nth fenced code block (``` … ```)
+                                    var blockCount = -1;
+                                    var startLine  = -1;
+                                    var endLine    = -1;
+                                    var inBlock    = false;
+                                    for (var i = 0; i < lines.length; i++) {
+                                        if (/^\s*```/.test(lines[i])) {
+                                            if (!inBlock) {
+                                                blockCount++;
+                                                if (blockCount === preIndex) {
+                                                    startLine = i;
+                                                    inBlock   = true;
+                                                }
+                                            } else {
+                                                if (blockCount === preIndex) {
+                                                    endLine = i;
+                                                    break;
+                                                }
+                                                inBlock = false;
+                                            }
+                                        }
+                                    }
+                                    if (startLine !== -1 && endLine !== -1) {
+                                        lines.splice(startLine, endLine - startLine + 1);
+                                        var newContent = lines.join('\n');
+                                        editorDiv.textContent = newContent;
+                                        noteEntry.setAttribute('data-markdown-content', newContent);
+                                        if (typeof window.markNoteAsModified === 'function') {
+                                            window.markNoteAsModified();
+                                        }
+                                        // Re-render the preview
+                                        if (noteEntry.classList.contains('markdown-split-mode')) {
+                                            editorDiv.dispatchEvent(new Event('input', { bubbles: true }));
+                                        } else if (typeof window.switchToPreviewMode === 'function') {
+                                            window.switchToPreviewMode(noteId);
+                                        }
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // --- Rich-text mode: remove the DOM block directly ---
+                    var noteentry = block.closest('.noteentry') || document.querySelector('.noteentry');
+                    block.remove();
+                    if (typeof window.markNoteAsModified === 'function') {
+                        window.markNoteAsModified();
+                    }
+                    if (noteentry) {
+                        noteentry.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                };
+
+                if (window.modalAlert && typeof window.modalAlert.confirm === 'function') {
+                    window.modalAlert.confirm(confirmMsg, confirmTitle).then(function(confirmed) {
+                        if (confirmed) doDelete();
+                    });
+                } else if (confirm(confirmMsg)) {
+                    doDelete();
+                }
+            });
             
             // Add button to the code block only if it's new
             if (!existingBtn) {
                 block.appendChild(btn);
+            }
+            if (!existingDelBtn) {
+                block.appendChild(delBtn);
             }
         });
     }

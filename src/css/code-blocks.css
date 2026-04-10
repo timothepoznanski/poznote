@@ -42,13 +42,15 @@ pre.code-block,
     box-sizing: border-box;
 }
 
-/* Copy icon for code blocks */
+/* Copy & Delete icon for code blocks */
 .code-block-copy-btn,
 pre.code-block .code-block-copy-btn,
-.noteentry pre .code-block-copy-btn {
+.noteentry pre .code-block-copy-btn,
+.code-block-delete-btn,
+pre.code-block .code-block-delete-btn,
+.noteentry pre .code-block-delete-btn {
     position: absolute;
     top: 8px;
-    right: 8px;
     width: 28px;
     height: 28px;
     background: transparent;
@@ -59,20 +61,41 @@ pre.code-block .code-block-copy-btn,
     align-items: center;
     justify-content: center;
     opacity: 0.4;
-    transition: opacity 0.2s ease, transform 0.1s ease;
+    transition: opacity 0.2s ease, transform 0.1s ease, color 0.1s ease;
     z-index: 10;
     padding: 0;
     font-size: 14px;
     color: #586069;
 }
 
-.code-block-copy-btn:hover {
+.code-block-copy-btn,
+pre.code-block .code-block-copy-btn,
+.noteentry pre .code-block-copy-btn {
+    right: 8px;
+}
+
+.code-block-delete-btn,
+pre.code-block .code-block-delete-btn,
+.noteentry pre .code-block-delete-btn {
+    right: 40px;
+}
+
+.code-block-copy-btn:hover,
+.code-block-delete-btn:hover {
     opacity: 1;
-    color: #24292e;
     transform: scale(1.05);
 }
 
-.code-block-copy-btn:active {
+.code-block-copy-btn:hover {
+    color: #24292e;
+}
+
+.code-block-delete-btn:hover {
+    color: #d73a49;
+}
+
+.code-block-copy-btn:active,
+.code-block-delete-btn:active {
     transform: scale(0.95);
 }
 
@@ -83,7 +106,8 @@ pre.code-block .code-block-copy-btn,
     opacity: 1;
 }
 
-.code-block-copy-btn svg {
+.code-block-copy-btn svg,
+.code-block-delete-btn svg {
     width: 14px;
     height: 14px;
 }
