@@ -1030,7 +1030,7 @@
     "moving": "正在移动...",
     "moved": "成功移动",
     "root": "根目录 (无文件夹)",
-    "filter_placeholder": "按标题或文件夹筛选..."
+    "filter_placeholder": "按标题或标签筛选..."
   },
   "update": {
     "new_available": "🎉 有新版本可用！",

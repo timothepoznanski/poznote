@@ -1063,7 +1063,7 @@
     "moving": "Déplacement...",
     "moved": "Déplacé avec succès",
     "root": "Racine (aucun dossier)",
-    "filter_placeholder": "Filtrer les notes par titre ou dossier..."
+    "filter_placeholder": "Filtrer les notes par titre ou tags..."
   },
   "update": {
     "new_available": "🎉 Nouvelle mise à jour disponible !",

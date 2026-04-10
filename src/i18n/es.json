@@ -1039,7 +1039,7 @@
     "moving": "Moviendo...",
     "moved": "Movido con éxito",
     "root": "Raíz (sin carpeta)",
-    "filter_placeholder": "Filtrar notas por título o carpeta..."
+    "filter_placeholder": "Filtrar notas por título o etiquetas..."
   },
   "update": {
     "new_available": "🎉 ¡Nueva actualización disponible!",
