@@ -580,7 +580,7 @@
     "moving": "Moving...",
     "moved": "Moved successfully",
     "root": "Root (no folder)",
-    "filter_placeholder": "Filter notes by title or folder..."
+    "filter_placeholder": "Filter notes by title or tags..."
   },
   "update": {
     "new_available": "🎉 New update available!",

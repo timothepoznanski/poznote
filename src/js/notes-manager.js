@@ -18,7 +18,7 @@
     };
 
     // ── State ────────────────────────────────────────────────────────────────
-    var allNotes = [];      // [{id, heading, folder, folder_id, updated, workspace}, …]
+    var allNotes = [];      // [{id, heading, folder, folder_id, updated, workspace, tags}, …]
     var allFolders = [];    // [{id, name, parent_id, path}, …]
     var filteredNotes = []; // Currently visible notes after filter
     var selectedIds = new Set();
@@ -97,9 +97,9 @@
             filteredNotes = allNotes.slice();
         } else {
             filteredNotes = allNotes.filter(function (n) {
-                var title  = (n.heading || '').toLowerCase();
-                var folder = (n.folder  || '').toLowerCase();
-                return title.indexOf(q) !== -1 || folder.indexOf(q) !== -1;
+                var title = (n.heading || '').toLowerCase();
+                var tags  = (n.tags   || '').toLowerCase();
+                return title.indexOf(q) !== -1 || tags.indexOf(q) !== -1;
             });
         }
 
@@ -271,6 +271,20 @@
         link.href = 'index.php?note=' + note.id + (cfg.workspace ? '&workspace=' + encodeURIComponent(cfg.workspace) : '');
         link.textContent = note.heading || cfg.txtUntitled;
 
+        // Tags chips
+        var tagsEl = document.createElement('span');
+        tagsEl.className = 'nm-note-tags';
+        if (note.tags) {
+            note.tags.split(',').forEach(function (tag) {
+                tag = tag.trim();
+                if (!tag) return;
+                var chip = document.createElement('span');
+                chip.className = 'nm-tag-chip';
+                chip.textContent = tag;
+                tagsEl.appendChild(chip);
+            });
+        }
+
         // Meta
         var meta = document.createElement('span');
         meta.className = 'nm-note-meta';
@@ -278,6 +292,7 @@
 
         row.appendChild(cb);
         row.appendChild(link);
+        row.appendChild(tagsEl);
         row.appendChild(meta);
         return row;
     }

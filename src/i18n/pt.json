@@ -1039,7 +1039,7 @@
     "moving": "Movendo...",
     "moved": "Movido com sucesso",
     "root": "Raiz (sem pasta)",
-    "filter_placeholder": "Filtrar notas por título ou pasta..."
+    "filter_placeholder": "Filtrar notas por título ou etiquetas..."
   },
   "update": {
     "new_available": "🎉 Nova Atualização Disponível!",

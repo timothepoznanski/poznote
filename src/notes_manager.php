@@ -86,7 +86,7 @@ $currentLang = getUserLanguage();
 					type="text"
 					id="nmFilterInput"
 					class="filter-input"
-					placeholder="<?php echo t_h('notes_manager.filter_placeholder', [], 'Filter notes by title or folder...'); ?>"
+					placeholder="<?php echo t_h('notes_manager.filter_placeholder', [], 'Filter notes by title or tags...'); ?>"
 					autocomplete="off"
 				/>
 				<button id="nmClearFilter" class="clear-filter-btn initially-hidden" title="<?php echo t_h('search.clear', [], 'Clear'); ?>">
