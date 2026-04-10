@@ -570,6 +570,18 @@
       "too_many_notes": "This folder contains {{count}} notes. Only the first {{max}} will be opened to avoid overwhelming your browser."
     }
   },
+  "notes_manager": {
+    "select_folder": "Select a target folder",
+    "move": "Move",
+    "selected": "selected",
+    "select_all": "Select all visible",
+    "deselect_all": "Deselect all",
+    "move_to": "Move to...",
+    "moving": "Moving...",
+    "moved": "Moved successfully",
+    "root": "Root (no folder)",
+    "filter_placeholder": "Filter notes by title or folder..."
+  },
   "update": {
     "new_available": "🎉 New update available!",
     "description": "Your data will be preserved during the update.",

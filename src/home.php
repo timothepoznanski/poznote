@@ -490,7 +490,7 @@ try {
         <div class="home-grid" id="home-dashboard-section-grid">
 
             <!-- Notes -->
-            <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="home-notes-card" title="<?php echo t_h('common.notes', [], 'Notes'); ?>">
+            <a href="notes_manager.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="home-notes-card" title="<?php echo t_h('common.notes', [], 'Notes'); ?>">
                 <div class="home-card-icon">
                     <i class="lucide lucide-sticky-note"></i>
                 </div>

@@ -1020,6 +1020,18 @@
       "too_many_notes": "此文件夹包含 {{count}} 条笔记。为避免浏览器负担过重，仅打开前 {{max}} 条。"
     }
   },
+  "notes_manager": {
+    "select_folder": "选择目标文件夹",
+    "move": "移动",
+    "selected": "已选择",
+    "select_all": "选择全部可见",
+    "deselect_all": "取消全选",
+    "move_to": "移动到...",
+    "moving": "正在移动...",
+    "moved": "成功移动",
+    "root": "根目录 (无文件夹)",
+    "filter_placeholder": "按标题或文件夹筛选..."
+  },
   "update": {
     "new_available": "🎉 有新版本可用！",
     "description": "您的数据在更新过程中将被保留。",

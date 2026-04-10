@@ -1029,6 +1029,18 @@
       "too_many_notes": "Esta carpeta contiene {{count}} notas. Solo se abrirán las primeras {{max}} para no sobrecargar su navegador."
     }
   },
+  "notes_manager": {
+    "select_folder": "Seleccione una carpeta de destino",
+    "move": "Mover",
+    "selected": "seleccionado(s)",
+    "select_all": "Seleccionar todo lo visible",
+    "deselect_all": "Deseleccionar todo",
+    "move_to": "Mover a...",
+    "moving": "Moviendo...",
+    "moved": "Movido con éxito",
+    "root": "Raíz (sin carpeta)",
+    "filter_placeholder": "Filtrar notas por título o carpeta..."
+  },
   "update": {
     "new_available": "🎉 ¡Nueva actualización disponible!",
     "description": "Tus datos serán preservados durante la actualización.",

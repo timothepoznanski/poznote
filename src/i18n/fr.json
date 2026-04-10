@@ -1053,6 +1053,18 @@
       "too_many_notes": "Ce dossier contient {{count}} notes. Seules les {{max}} premières seront ouvertes pour ne pas surcharger votre navigateur."
     }
   },
+  "notes_manager": {
+    "select_folder": "Sélectionnez un dossier de destination",
+    "move": "Déplacer",
+    "selected": "sélectionnée(s)",
+    "select_all": "Tout sélectionner",
+    "deselect_all": "Tout désélectionner",
+    "move_to": "Déplacer vers...",
+    "moving": "Déplacement...",
+    "moved": "Déplacé avec succès",
+    "root": "Racine (aucun dossier)",
+    "filter_placeholder": "Filtrer les notes par titre ou dossier..."
+  },
   "update": {
     "new_available": "🎉 Nouvelle mise à jour disponible !",
     "description": "Vos données seront préservées pendant la mise à jour.",
