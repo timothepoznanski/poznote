@@ -226,16 +226,23 @@ function initLazyThumbnails(container) {
 
     const pendingQueue = [];
     let activeCount = 0;
-    const MAX_CONCURRENT = 4;
+    let scheduledTimer = null;
+    const MAX_CONCURRENT = 2;
+    const DELAY_MS = 150; // min delay between launching requests
 
-    function loadNext() {
-        while (activeCount < MAX_CONCURRENT && pendingQueue.length > 0) {
+    function scheduleNext() {
+        if (scheduledTimer !== null || activeCount >= MAX_CONCURRENT || pendingQueue.length === 0) return;
+        scheduledTimer = setTimeout(() => {
+            scheduledTimer = null;
+            if (activeCount >= MAX_CONCURRENT || pendingQueue.length === 0) return;
             const img = pendingQueue.shift();
             activeCount++;
             img.src = img.dataset.src;
-            img.addEventListener('load', () => { activeCount--; loadNext(); }, { once: true });
-            img.addEventListener('error', () => { activeCount--; loadNext(); }, { once: true });
-        }
+            const done = () => { activeCount--; scheduleNext(); };
+            img.addEventListener('load', done, { once: true });
+            img.addEventListener('error', done, { once: true });
+            scheduleNext(); // schedule the next slot if capacity allows
+        }, DELAY_MS);
     }
 
     thumbObserver = new IntersectionObserver((entries) => {
@@ -243,10 +250,10 @@ function initLazyThumbnails(container) {
             if (entry.isIntersecting) {
                 thumbObserver.unobserve(entry.target);
                 pendingQueue.push(entry.target);
-                loadNext();
+                scheduleNext();
             }
         });
-    }, { rootMargin: '200px' });
+    }, { rootMargin: '50px' });
 
     container.querySelectorAll('img.lazy-thumb').forEach(img => {
         thumbObserver.observe(img);
