@@ -817,12 +817,13 @@ function initTouchSupport() {
     const maxVerticalDistance = 100; // Max vertical movement allowed for horizontal swipe
 
     function isHorizontallyScrollableCodeBlock(target) {
-        const codeBlock = target.closest('pre, .code-block');
-        if (!codeBlock) {
-            return false;
-        }
-
-        return codeBlock.scrollWidth > codeBlock.clientWidth;
+        // Any touch that starts inside a code block should never trigger the
+        // outline/sommaire swipe gesture, regardless of whether the block is
+        // currently overflowing. Without a language label the inner <code>
+        // element has no overflow-x set, so the browser does not take over the
+        // gesture as a native scroll, and the swipe would incorrectly open the
+        // outline. Returning true for any code block avoids this.
+        return !!target.closest('pre, .code-block');
     }
 
     // Swipe from anywhere on the note content area to open outline

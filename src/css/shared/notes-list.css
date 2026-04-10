@@ -223,6 +223,11 @@
     text-decoration: underline;
 }
 
+.shared-password-icon.is-password-protected {
+    filter: none !important;
+    color: #ef4444 !important;
+}
+
 .folder-badge {
     display: inline-flex;
     align-items: center;

@@ -1030,6 +1030,18 @@
       "too_many_notes": "Dieser Ordner enthält {{count}} Notizen. Nur die ersten {{max}} werden geöffnet, um Ihren Browser nicht zu überlasten."
     }
   },
+  "notes_manager": {
+    "select_folder": "Wählen Sie einen Zielordner",
+    "move": "Verschieben",
+    "selected": "ausgewählt",
+    "select_all": "Alle sichtbaren auswählen",
+    "deselect_all": "Alle deselektieren",
+    "move_to": "Verschieben nach...",
+    "moving": "Wird verschoben...",
+    "moved": "Erfolgreich verschoben",
+    "root": "Stammverzeichnis (kein Ordner)",
+    "filter_placeholder": "Notizen nach Titel oder Ordner filtern..."
+  },
   "update": {
     "new_available": "🎉 Neues Update verfügbar!",
     "description": "Ihre Daten werden während des Updates erhalten bleiben.",

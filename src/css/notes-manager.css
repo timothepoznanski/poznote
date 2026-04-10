@@ -1,0 +1,415 @@
+/* Notes Manager page styles */
+
+body.notes-manager-page {
+    margin: 0;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--bg-color, #ffffff);
+    color: var(--text-color, #333333);
+}
+
+.notes-manager-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Title */
+.notes-manager-title {
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+    margin: 10px 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--text-color, #333333);
+}
+
+.notes-manager-workspace-badge {
+    font-size: 14px;
+    font-weight: 500;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: var(--badge-bg, #e0e7ff);
+    color: var(--badge-color, #3730a3);
+}
+
+/* Filter bar */
+.nm-filter-bar {
+    max-width: 900px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nm-filter-icon {
+    position: absolute;
+    left: 10px;
+    color: var(--placeholder-color, #94a3b8);
+    pointer-events: none;
+}
+
+.nm-filter-bar .filter-input-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.nm-filter-bar .filter-input {
+    width: 100%;
+    padding: 10px 40px 10px 36px;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-color, #333333);
+    background-color: var(--input-bg, #ffffff);
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.nm-filter-bar .filter-input:focus {
+    outline: none;
+    border-color: #007DB8;
+    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
+}
+
+.nm-filter-bar .clear-filter-btn {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    padding: 4px 6px;
+    cursor: pointer;
+    color: #666;
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+}
+
+.filter-stats {
+    font-size: 13px;
+    color: var(--muted-color, #6b7280);
+    white-space: nowrap;
+}
+
+/* Bulk action bar */
+.nm-bulk-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-width: 900px;
+    margin: 0 auto 16px;
+    padding: 10px 16px;
+    background: var(--bulk-bar-bg, #eff6ff);
+    border: 1px solid var(--bulk-bar-border, #bfdbfe);
+    border-radius: 8px;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.nm-bulk-bar-hidden {
+    display: none;
+}
+
+.nm-bulk-left,
+.nm-bulk-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.nm-selected-count {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-color, #1e3a5f);
+}
+
+.nm-bulk-btn {
+    font-size: 13px;
+    padding: 6px 16px;
+    font-weight: 500;
+}
+
+#nmMoveBtn {
+    background-color: #007DB8;
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 125, 184, 0.2);
+    padding: 8px 20px;
+    font-size: 14px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+#nmMoveBtn:hover {
+    background-color: #006699;
+    box-shadow: 0 4px 8px rgba(0, 125, 184, 0.3);
+    transform: translateY(-1px);
+}
+
+#nmMoveBtn:active {
+    transform: translateY(0);
+}
+
+/* ── Dark Mode Overrides ────────────────────────────────────────────── */
+:root[data-theme='dark'],
+body.dark-mode {
+    --bg-color: var(--dm-bg, #1e1e1e);
+    --text-color: var(--dm-text, #e3e3e3);
+    --border-color: var(--dm-border, #404040);
+    --border-color-light: #333333;
+    --input-bg: #2d2d2d;
+    --folder-header-bg: #2d2d2d;
+    --folder-header-hover: #383838;
+    --row-hover-bg: #2a2a2a;
+    --row-selected-bg: rgba(0, 125, 184, 0.15);
+    --bulk-bar-bg: #1e3a5f;
+    --bulk-bar-border: #007DB8;
+    --badge-bg: #3730a3;
+    --badge-color: #e0e7ff;
+    --badge-bg-subtle: #404040;
+    --muted-color: #888888;
+}
+
+body.dark-mode .nm-filter-bar .clear-filter-btn {
+    color: #aaa;
+}
+
+body.dark-mode .nm-selected-count {
+    color: #fff;
+}
+
+body.dark-mode .nm-note-link {
+    color: var(--dm-accent, #4a9eff);
+}
+
+body.dark-mode .nm-folder-option:hover {
+    background: #404040;
+}
+
+body.dark-mode .nm-folder-option.nm-selected {
+    background: rgba(0, 125, 184, 0.3);
+    border-color: #007DB8;
+}
+
+/* Content area */
+.nm-content {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* ── Folder section ──────────────────────────────────────────────────── */
+.nm-folder-section {
+    margin-bottom: 8px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.nm-folder-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--folder-header-bg, #f8fafc);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+}
+
+.nm-folder-header:hover {
+    background: var(--folder-header-hover, #f1f5f9);
+}
+
+.nm-folder-chevron {
+    flex-shrink: 0;
+    color: var(--muted-color, #9ca3af);
+    display: flex;
+    align-items: center;
+}
+
+.nm-folder-label {
+    flex: 1;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nm-group-select-btn {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    padding: 4px 6px;
+    cursor: pointer;
+    color: var(--muted-color, #9ca3af);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s, background 0.15s;
+}
+
+.nm-group-select-btn:hover {
+    color: #007DB8;
+    background: rgba(0, 125, 184, 0.08);
+}
+
+.nm-folder-count {
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 1px 8px;
+    border-radius: 10px;
+    background: var(--badge-bg-subtle, #e5e7eb);
+    color: var(--muted-color, #6b7280);
+}
+
+/* ── Note rows ───────────────────────────────────────────────────────── */
+.nm-notes-list {
+    border-top: 1px solid var(--border-color, #e5e7eb);
+}
+
+.nm-note-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border-color-light, #f0f0f0);
+    transition: background 0.1s;
+}
+
+.nm-note-row:last-child {
+    border-bottom: none;
+}
+
+.nm-note-row:hover {
+    background: var(--row-hover-bg, #f9fafb);
+}
+
+.nm-note-row:has(.nm-note-checkbox:checked) {
+    background: var(--row-selected-bg, #eff6ff);
+}
+
+.nm-note-checkbox {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    accent-color: #007DB8;
+    cursor: pointer;
+}
+
+.nm-note-link {
+    flex: 1;
+    font-size: 14px;
+    color: var(--link-color, #007DB8);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nm-note-link:hover {
+    text-decoration: underline;
+}
+
+.nm-note-meta {
+    flex-shrink: 0;
+    font-size: 12px;
+    color: var(--muted-color, #9ca3af);
+}
+
+/* ── Move modal ──────────────────────────────────────────────────────── */
+.nm-folder-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 350px;
+    overflow-y: auto;
+    margin-top: 10px;
+}
+
+.nm-folder-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-color, #333333);
+    transition: background 0.12s;
+}
+
+.nm-folder-option:hover {
+    background: var(--hover-bg, #f3f4f6);
+}
+
+.nm-folder-option-selected {
+    background: var(--selected-bg, #dbeafe);
+    color: var(--selected-color, #1d4ed8);
+    font-weight: 500;
+}
+
+/* ── Loading & Empty ─────────────────────────────────────────────────── */
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    padding: 40px;
+    color: var(--muted-color, #6b7280);
+    font-size: 15px;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 40px;
+    color: var(--muted-color, #6b7280);
+    font-size: 15px;
+}
+
+.error-message {
+    text-align: center;
+    padding: 20px;
+    color: #dc2626;
+    font-size: 14px;
+}
+
+.initially-hidden {
+    display: none;
+}
+
+/* ── Dark mode overrides ─────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+    .nm-folder-header          { background: var(--folder-header-bg, #1e293b); }
+    .nm-folder-header:hover    { background: var(--folder-header-hover, #273549); }
+    .nm-folder-section         { border-color: var(--border-color, #334155); }
+    .nm-notes-list             { border-top-color: var(--border-color, #334155); }
+    .nm-note-row               { border-bottom-color: var(--border-color-light, #2d3748); }
+    .nm-note-row:hover         { background: var(--row-hover-bg, #1e293b); }
+    .nm-note-row:has(.nm-note-checkbox:checked) { background: var(--row-selected-bg, #1e3a5f); }
+    .nm-bulk-bar               { background: var(--bulk-bar-bg, #172035); border-color: var(--bulk-bar-border, #2d4f8e); }
+    .nm-folder-option-selected { background: var(--selected-bg, #1e3a5f); color: var(--selected-color, #93c5fd); }
+    .nm-modal                  { background: var(--modal-bg, #1e293b); }
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+    body.notes-manager-page    { padding: 10px; }
+    .notes-manager-container   { padding: 10px; }
+    .notes-manager-title       { font-size: 20px; }
+    .nm-folder-header          { padding: 10px; }
+    .nm-note-row               { padding: 8px 10px; }
+    .nm-note-meta              { display: none; }
+    .nm-bulk-bar               { flex-direction: column; align-items: flex-start; }
+}

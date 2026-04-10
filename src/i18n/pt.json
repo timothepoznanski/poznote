@@ -1029,6 +1029,18 @@
       "too_many_notes": "Esta pasta contém {{count}} notas. Apenas as primeiras {{max}} serão abertas para não sobrecarregar seu navegador."
     }
   },
+  "notes_manager": {
+    "select_folder": "Selecione uma pasta de destino",
+    "move": "Mover",
+    "selected": "selecionado(s)",
+    "select_all": "Selecionar todos visíveis",
+    "deselect_all": "Desmarcar todos",
+    "move_to": "Mover para...",
+    "moving": "Movendo...",
+    "moved": "Movido com sucesso",
+    "root": "Raiz (sem pasta)",
+    "filter_placeholder": "Filtrar notas por título ou pasta..."
+  },
   "update": {
     "new_available": "🎉 Nova Atualização Disponível!",
     "description": "Seus dados serão preservados durante a atualização.",

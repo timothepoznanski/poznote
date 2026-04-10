@@ -920,7 +920,7 @@
 
         var passwordInput = document.createElement('input');
         passwordInput.type = 'password';
-        passwordInput.value = initialPasswordValue;
+        passwordInput.value = initialPasswordValue || (options.hasPassword ? '********' : '');
         passwordInput.placeholder = config.txtPasswordPlaceholder;
         passwordInput.className = 'modal-password-input';
         passwordInput.style.width = '100%';
@@ -958,6 +958,18 @@
 
         passwordInput.addEventListener('input', function() {
             passwordDirty = true;
+        });
+
+        passwordInput.addEventListener('focus', function() {
+            if (!passwordDirty && options.hasPassword && passwordInput.value === '********') {
+                passwordInput.value = '';
+            }
+        });
+
+        passwordInput.addEventListener('blur', function() {
+            if (!passwordDirty && options.hasPassword && passwordInput.value === '') {
+                passwordInput.value = '********';
+            }
         });
 
         passwordFieldGroup.appendChild(passwordInput);
@@ -1221,6 +1233,10 @@
             var nextProtocol = protocolCheckbox.checked ? 'https' : 'http';
             var nextIndexable = !!indexableCheckbox.checked;
             var nextPassword = passwordInput.value.trim();
+            if (!passwordDirty && options.hasPassword && nextPassword === '********') {
+                nextPassword = undefined; // No change
+                passwordShouldBeSaved = false;
+            }
             var nextAccessMode = permissionsSelect ? permissionsSelect.value : undefined;
             var tokenChanged = !!nextToken && nextToken !== options.token;
             var protocolChanged = nextProtocol !== (options.protocol || getPreferredPublicUrlProtocol());
@@ -1421,6 +1437,10 @@
         return cell;
     }
 
+    function noteHasVisiblePasswordProtection(note) {
+        return !!Number(note && note.hasPassword) || !!note.shared_folder_has_password;
+    }
+
     function renderNoteItem(note) {
         var item = document.createElement('div');
         item.className = 'shared-item shared-note-item';
@@ -1443,6 +1463,17 @@
         noteLink.textContent = note.heading || config.txtUntitled;
         noteLink.className = 'note-name';
         nameContainer.appendChild(noteLink);
+
+        if (noteHasVisiblePasswordProtection(note)) {
+            var lockIcon = document.createElement('i');
+            lockIcon.className = 'lucide lucide-lock shared-password-icon';
+            lockIcon.style.marginLeft = '6px';
+            lockIcon.style.fontSize = '14px';
+            lockIcon.classList.add('is-password-protected'); // Add CSS class for styling
+            lockIcon.style.opacity = '1';
+            lockIcon.title = config.txtPasswordLabel;
+            nameContainer.appendChild(lockIcon);
+        }
 
         item.appendChild(nameContainer);
 
@@ -1550,6 +1581,17 @@
         folderLink.title = folder.folder_path;
         folderLink.textContent = folder.folder_name + ' (' + folder.note_count + ')';
         nameContainer.appendChild(folderLink);
+
+        if (folder.password) {
+            var lockIcon = document.createElement('i');
+            lockIcon.className = 'lucide lucide-lock shared-password-icon';
+            lockIcon.style.marginLeft = '6px';
+            lockIcon.style.fontSize = '14px';
+            lockIcon.classList.add('is-password-protected'); // Add CSS class for styling
+            lockIcon.style.opacity = '1';
+            lockIcon.title = config.txtPasswordLabel;
+            nameContainer.appendChild(lockIcon);
+        }
 
         item.appendChild(nameContainer);
 

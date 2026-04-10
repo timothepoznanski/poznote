@@ -144,6 +144,26 @@ body::-webkit-scrollbar {
     display: none !important;
 }
 
+/* Hide scrollbar inside code blocks on mobile */
+pre::-webkit-scrollbar,
+.code-block::-webkit-scrollbar,
+pre code::-webkit-scrollbar,
+pre code.hljs::-webkit-scrollbar,
+.hljs::-webkit-scrollbar {
+    height: 0 !important;
+    width: 0 !important;
+    background: transparent !important;
+}
+
+pre,
+.code-block,
+pre code,
+pre code.hljs,
+.hljs {
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* IE/Edge */
+}
+
 .notecard {
     margin-left: 3% !important;
     margin-right: 2% !important;

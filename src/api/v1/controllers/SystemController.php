@@ -162,7 +162,8 @@ class SystemController {
                 if ($workspace && $sf['workspace'] !== $workspace) continue;
                 $sharedFolderMap[$sf['folder_id']] = [
                     'token' => $sf['token'],
-                    'name' => $sf['folder_name']
+                    'name' => $sf['folder_name'],
+                    'has_password' => !empty($sf['password'])
                 ];
                 $sharedFolderEntries[$sf['folder_id']] = $sf;
             }
@@ -317,6 +318,7 @@ class SystemController {
                 
                 // Check if this note is in a shared folder (direct or ancestor)
                 $note['shared_via_folder'] = false;
+                $note['shared_folder_has_password'] = false;
                 $currId = $note['folder_id'] ?? null;
                 $maxDepth = 20;
                 $depth = 0;
@@ -325,6 +327,7 @@ class SystemController {
                         $note['shared_via_folder'] = true;
                         $note['shared_folder_name'] = $sharedFolderMap[$currId]['name'];
                         $note['shared_folder_token'] = $sharedFolderMap[$currId]['token'];
+                        $note['shared_folder_has_password'] = $sharedFolderMap[$currId]['has_password'];
                         $note['shared_folder_url'] = $base . '/folder/' . rawurlencode($sharedFolderMap[$currId]['token']);
                         
                         // If no explicit token, build URL via folder token
