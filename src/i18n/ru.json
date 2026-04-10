@@ -63,6 +63,7 @@
       "news": "Блог Poznote",
       "website": "Сайт Poznote",
       "github_star": "Поставить звезду на GitHub",
+      "guestbook": "Гостевая книга Poznote",
       "support": "Soutenir Tim",
       "install_extension": "Установить расширение",
       "install_app": "Установить приложение",
@@ -808,6 +809,11 @@
         "title": "Удалить изображение",
         "message": "Вы уверены, что хотите удалить это изображение? Это действие необратимо."
       }
+    },
+    "code_block_delete": {
+      "title": "Удалить блок кода",
+      "confirm_title": "Удалить блок кода",
+      "confirm_message": "Вы хотите удалить этот блок кода?"
     },
     "colors": {
       "black": "Черный",

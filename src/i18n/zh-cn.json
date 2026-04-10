@@ -339,6 +339,7 @@
       "news": "Poznote 博客",
       "website": "Poznote 网站",
       "github_star": "在 GitHub 上加星",
+      "guestbook": "Poznote 留言板",
       "custom_css": "自定义 CSS 文件",
       "support": "Soutenir Tim",
       "install_app": "安装应用",
@@ -611,6 +612,11 @@
         "title": "删除图片",
         "message": "您确定要删除此图片吗？此操作无法撤销。"
       }
+    },
+    "code_block_delete": {
+      "title": "删除代码块",
+      "confirm_title": "删除代码块",
+      "confirm_message": "是否删除此代码块？"
     },
     "colors": {
       "black": "黑色",

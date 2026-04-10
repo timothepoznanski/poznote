@@ -349,6 +349,7 @@
       "news": "Blog Poznote",
       "website": "Site Poznote",
       "github_star": "Mettre une étoile sur GitHub",
+      "guestbook": "Livre d'or Poznote",
       "support": "Soutenir Tim",
       "install_extension": "Installer l'extension",
       "install_app": "Installer l'application",
@@ -696,6 +697,11 @@
       "remove": "Supprimer le lien",
       "cancel": "Annuler",
       "save": "Enregistrer"
+    },
+    "code_block_delete": {
+      "title": "Supprimer le bloc de code",
+      "confirm_title": "Supprimer le bloc de code",
+      "confirm_message": "Voulez-vous supprimer ce bloc de code ?"
     }
   },
   "info": {

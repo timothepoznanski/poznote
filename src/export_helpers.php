@@ -165,6 +165,11 @@ function removeCopyButtonsFromHtml($html) {
         $button->parentNode->removeChild($button);
     }
 
+    $deleteButtons = $xpath->query("//*[contains(@class, 'code-block-delete-btn')]");
+    foreach ($deleteButtons as $button) {
+        $button->parentNode->removeChild($button);
+    }
+
     return $dom->saveHTML();
 }
 

@@ -336,6 +336,7 @@
       "news": "Blog do Poznote",
       "website": "Site do Poznote",
       "github_star": "Dar uma estrela no GitHub",
+      "guestbook": "Livro de visitas do Poznote",
       "support": "Soutenir Tim",
       "custom_css": "Arquivo CSS personalizado",
       "install_extension": "Instalar extensão",
@@ -613,6 +614,11 @@
         "title": "Excluir Imagem",
         "message": "Tem certeza de que deseja excluir esta imagem? Esta ação não pode ser desfeita."
       }
+    },
+    "code_block_delete": {
+      "title": "Eliminar bloco de código",
+      "confirm_title": "Eliminar bloco de código",
+      "confirm_message": "Deseja eliminar este bloco de código?"
     },
     "colors": {
       "black": "Preto",

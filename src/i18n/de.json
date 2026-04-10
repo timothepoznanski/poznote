@@ -337,6 +337,7 @@
       "news": "Poznote-Blog",
       "website": "Poznote-Website",
       "github_star": "Auf GitHub einen Stern vergeben",
+      "guestbook": "Poznote Gästebuch",
       "support": "Soutenir Tim",
       "custom_css": "Benutzerdefinierte CSS-Datei",
       "install_extension": "Erweiterung installieren",
@@ -614,6 +615,11 @@
         "title": "Bild löschen",
         "message": "Sind Sie sicher, dass Sie dieses Bild löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden."
       }
+    },
+    "code_block_delete": {
+      "title": "Codeblock löschen",
+      "confirm_title": "Codeblock löschen",
+      "confirm_message": "Möchten Sie diesen Codeblock löschen?"
     },
     "colors": {
       "black": "Schwarz",
