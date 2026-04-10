@@ -343,8 +343,24 @@
         });
     }
 
+    // Detect horizontal overflow on code blocks and toggle 'has-x-overflow' class
+    // to avoid reserving scrollbar space when no horizontal scroll is needed.
+    function updateCodeBlockOverflow() {
+        var blocks = document.querySelectorAll('pre code.hljs, pre.code-block, .code-block');
+        blocks.forEach(function(block) {
+            if (block.scrollWidth > block.clientWidth) {
+                block.classList.add('has-x-overflow');
+            } else {
+                block.classList.remove('has-x-overflow');
+            }
+        });
+    }
+
     // Expose the function globally so it can be called after AJAX note loads
-    window.reinitializeCodeCopyButtons = addCopyButtonToCodeBlocks;
+    window.reinitializeCodeCopyButtons = function() {
+        addCopyButtonToCodeBlocks();
+        updateCodeBlockOverflow();
+    };
 
     // Watch for dynamically added code blocks
     function observeCodeBlocks() {
@@ -371,6 +387,7 @@
             
             if (shouldUpdate) {
                 addCopyButtonToCodeBlocks();
+                updateCodeBlockOverflow();
             }
         });
         
@@ -385,12 +402,16 @@
         document.addEventListener('DOMContentLoaded', function () { 
             try { ensureToastContainer(); } catch(e){} 
             addCopyButtonToCodeBlocks();
+            updateCodeBlockOverflow();
             observeCodeBlocks();
+            window.addEventListener('resize', updateCodeBlockOverflow);
         });
     } else {
         try { ensureToastContainer(); } catch(e){}
         addCopyButtonToCodeBlocks();
+        updateCodeBlockOverflow();
         observeCodeBlocks();
+        window.addEventListener('resize', updateCodeBlockOverflow);
     }
 
 })();
