@@ -176,7 +176,7 @@ function renderRows() {
             if (isImage && showThumbnails) {
                 let fileUrl = `/api/v1/notes/${row.noteId}/attachments/${att.id}`;
                 if (workspace) fileUrl += `?workspace=${encodeURIComponent(workspace)}`;
-                preview = `<div class="attachment-image-preview"><img src="${fileUrl}" alt="" loading="lazy"></div>`;
+                preview = `<div class="attachment-image-preview"><img data-src="${fileUrl}" alt="" class="lazy-thumb"></div>`;
             }
 
             return `<div class="attachment-file-item">
@@ -207,11 +207,50 @@ function renderRows() {
 
     container.innerHTML = rowsHtmlArray.join('');
 
+    initLazyThumbnails(container);
+
     // Attach click listeners using event delegation (Only once)
     if (!container.dataset.listenerAttached) {
         container.addEventListener('click', handleAttachmentClick);
         container.dataset.listenerAttached = 'true';
     }
+}
+
+let thumbObserver = null;
+
+function initLazyThumbnails(container) {
+    if (thumbObserver) {
+        thumbObserver.disconnect();
+        thumbObserver = null;
+    }
+
+    const pendingQueue = [];
+    let activeCount = 0;
+    const MAX_CONCURRENT = 4;
+
+    function loadNext() {
+        while (activeCount < MAX_CONCURRENT && pendingQueue.length > 0) {
+            const img = pendingQueue.shift();
+            activeCount++;
+            img.src = img.dataset.src;
+            img.addEventListener('load', () => { activeCount--; loadNext(); }, { once: true });
+            img.addEventListener('error', () => { activeCount--; loadNext(); }, { once: true });
+        }
+    }
+
+    thumbObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                thumbObserver.unobserve(entry.target);
+                pendingQueue.push(entry.target);
+                loadNext();
+            }
+        });
+    }, { rootMargin: '200px' });
+
+    container.querySelectorAll('img.lazy-thumb').forEach(img => {
+        thumbObserver.observe(img);
+    });
 }
 
 function handleAttachmentClick(e) {
