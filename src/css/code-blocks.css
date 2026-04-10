@@ -51,15 +51,15 @@ pre.code-block .code-block-copy-btn,
     right: 8px;
     width: 28px;
     height: 28px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid #e1e4e8;
+    background: transparent;
+    border: none;
     border-radius: 4px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 1;
-    transition: opacity 0.2s ease, background 0.15s ease, transform 0.1s ease;
+    opacity: 0.4;
+    transition: opacity 0.2s ease, transform 0.1s ease;
     z-index: 10;
     padding: 0;
     font-size: 14px;
@@ -67,7 +67,7 @@ pre.code-block .code-block-copy-btn,
 }
 
 .code-block-copy-btn:hover {
-    background: #f0f0f0;
+    opacity: 1;
     color: #24292e;
     transform: scale(1.05);
 }
@@ -77,9 +77,10 @@ pre.code-block .code-block-copy-btn,
 }
 
 .code-block-copy-btn.copied {
-    background: #28a745;
-    color: white;
-    border-color: #28a745;
+    background: transparent;
+    color: #28a745;
+    border: none;
+    opacity: 1;
 }
 
 .code-block-copy-btn svg {
@@ -302,4 +303,53 @@ body.code-block-no-wrap .noteentry div[style*='monospace'] {
     white-space: pre !important;
     word-wrap: normal !important;
     overflow-wrap: normal !important;
+}
+
+/* ── Desktop scrollbar for code blocks ─────────────────────────────────── */
+.noteentry pre::-webkit-scrollbar,
+pre.code-block::-webkit-scrollbar,
+.code-block::-webkit-scrollbar,
+pre code.hljs::-webkit-scrollbar {
+    height: 8px;
+}
+
+.noteentry pre::-webkit-scrollbar-track,
+pre.code-block::-webkit-scrollbar-track,
+.code-block::-webkit-scrollbar-track,
+pre code.hljs::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.noteentry pre::-webkit-scrollbar-thumb,
+pre.code-block::-webkit-scrollbar-thumb,
+.code-block::-webkit-scrollbar-thumb,
+pre code.hljs::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 2px;
+}
+
+.noteentry pre::-webkit-scrollbar-thumb:hover,
+pre.code-block::-webkit-scrollbar-thumb:hover,
+.code-block::-webkit-scrollbar-thumb:hover,
+pre code.hljs::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.30);
+}
+
+html[data-theme='dark'] .noteentry pre::-webkit-scrollbar-thumb,
+html[data-theme='dark'] pre.code-block::-webkit-scrollbar-thumb,
+html[data-theme='dark'] .code-block::-webkit-scrollbar-thumb,
+html[data-theme='dark'] pre code.hljs::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+html[data-theme='dark'] .noteentry pre::-webkit-scrollbar-thumb:hover,
+html[data-theme='dark'] pre.code-block::-webkit-scrollbar-thumb:hover,
+html[data-theme='dark'] .code-block::-webkit-scrollbar-thumb:hover,
+html[data-theme='dark'] pre code.hljs::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+/* Space between last line of code and the scrollbar */
+pre code.hljs {
+    padding-bottom: 20px !important;
 }

@@ -124,10 +124,10 @@ body.dark-mode .code-block-copy-btn,
 body.dark-mode pre.code-block .code-block-copy-btn,
 body.dark-mode .noteentry pre .code-block-copy-btn,
 body.dark-mode .public-note .content pre .code-block-copy-btn {
-    background: rgba(100, 100, 100, 0.95) !important;
-    border-color: #888888 !important;
-    color: #ffffff !important;
-    opacity: 1 !important;
+    background: transparent !important;
+    border: none !important;
+    color: #aaaaaa !important;
+    opacity: 0.4 !important;
 }
 
 html[data-theme='dark'] .code-block-copy-btn svg,
@@ -143,8 +143,9 @@ body.dark-mode .code-block-copy-btn:hover,
 body.dark-mode pre.code-block .code-block-copy-btn:hover,
 body.dark-mode .noteentry pre .code-block-copy-btn:hover,
 body.dark-mode .public-note .content pre .code-block-copy-btn:hover {
-    background: rgba(130, 130, 130, 0.95) !important;
+    background: transparent !important;
     color: #ffffff !important;
+    opacity: 1 !important;
 }
 
 html[data-theme='dark'] .code-block-copy-btn.copied,
@@ -153,9 +154,10 @@ html[data-theme='dark'] .noteentry pre .code-block-copy-btn.copied,
 body.dark-mode .code-block-copy-btn.copied,
 body.dark-mode pre.code-block .code-block-copy-btn.copied,
 body.dark-mode .noteentry pre .code-block-copy-btn.copied {
-    background: #28a745;
-    color: white;
-    border-color: #28a745;
+    background: transparent !important;
+    color: #28a745 !important;
+    border: none !important;
+    opacity: 1 !important;
 }
 
 /* ============================================

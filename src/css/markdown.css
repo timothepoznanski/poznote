@@ -560,7 +560,6 @@ body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
     border: 1px solid #d9dee7 !important;
     border-radius: 16px !important;
     background: #ffffff !important;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 12px 28px rgba(15, 23, 42, 0.08) !important;
 }
 
 body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor-container {
@@ -591,7 +590,6 @@ body.dark-mode.markdown-split-card-view .noteentry.markdown-split-mode .markdown
 body.dark-mode.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
     border-color: var(--dm-border) !important;
     background: var(--dm-bg) !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.28), 0 12px 28px rgba(0, 0, 0, 0.22) !important;
 }
 
 /* Scrollbar styling for split view columns */
