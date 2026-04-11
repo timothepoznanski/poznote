@@ -622,7 +622,6 @@
     },
     "colors": {
       "black": "Negro",
-      "shared_note_not_found_or_denied": "No se encontró la nota compartida o se denegó el acceso.\n\nEsto puede ocurrir después de una restauración.\n\nEs posible que un administrador deba reconstruir la base de datos maestra en Configuración > Herramientas de administración para reparar los enlaces compartidos.",
       "orange": "Naranja",
       "yellow": "Amarillo",
       "green": "Verde",
@@ -1698,9 +1697,9 @@
     "errors": {
       "token_missing": "Falta el token",
       "token_or_folder_auth_missing": "Falta el token o la autorización de carpeta",
-      "shared_folder_not_found": "Carpeta compartida no encontrada",
-      "shared_note_not_found_or_denied": "No se encontró la nota compartida o se denegó el acceso. Esto puede ocurrir después de una restauración. Es posible que un administrador deba reconstruir la base de datos maestra en Configuración > Herramientas de administración para reparar los enlaces compartidos.",
-      "folder_not_found": "Carpeta no encontrada",
+      "shared_folder_not_found": "Carpeta compartida no encontrada.\n\nEsto puede ocurrir después de una restauración.\n\nEs posible que un administrador deba reconstruir la base de datos maestra en Configuración > Herramientas de administración para reparar los enlaces compartidos.",
+      "shared_note_not_found_or_denied": "No se encontró la nota compartida o se denegó el acceso.\n\nEsto puede ocurrir después de una restauración.\n\nEs posible que un administrador deba reconstruir la base de datos maestra en Configuración > Herramientas de administración para reparar los enlaces compartidos.",
+      "folder_not_found": "Carpeta no encontrada.\n\nEsto puede ocurrir después de una restauración.\n\nEs posible que un administrador deba reconstruir la base de datos maestra en Configuración > Herramientas de administración para reparar los enlaces compartidos.",
       "note_not_found": "Nota no encontrada",
       "server_error": "Error del servidor"
     }

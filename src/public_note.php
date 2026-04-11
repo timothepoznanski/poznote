@@ -177,12 +177,14 @@ try {
     }
     
     if (!$sharedNote) {
+        $noteMsg = t_h('public.errors.shared_note_not_found_or_denied', [], "Shared note not found or access denied.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.", $currentLang);
+        [, $noteDetail] = array_pad(explode("\n\n", $noteMsg, 2), 2, '');
         renderPublicStatusPage($currentLang, [
             'status' => 404,
             'icon' => '🧭',
             'badge' => '404',
             'title' => t_h('public.errors.note_not_found', [], 'Note not found', $currentLang),
-            'message' => t_h('public.errors.shared_note_not_found_or_denied', [], 'Shared note not found or access denied. This can happen after a restore. An administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.', $currentLang),
+            'message' => $noteDetail,
             'actions' => [
                 [
                     'href' => '/index.php',
@@ -411,12 +413,14 @@ try {
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$note) {
+        $noteMsg = t_h('public.errors.shared_note_not_found_or_denied', [], "Shared note not found or access denied.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.", $currentLang);
+        [, $noteDetail] = array_pad(explode("\n\n", $noteMsg, 2), 2, '');
         renderPublicStatusPage($currentLang, [
             'status' => 404,
             'icon' => '🗒️',
             'badge' => '404',
             'title' => t_h('public.errors.note_not_found', [], 'Note not found', $currentLang),
-            'message' => t_h('public.errors.shared_note_not_found_or_denied', [], 'Shared note not found or access denied. This can happen after a restore. An administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.', $currentLang),
+            'message' => $noteDetail,
             'actions' => [
                 [
                     'href' => '/index.php',
