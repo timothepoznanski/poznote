@@ -620,7 +620,6 @@
     },
     "colors": {
       "black": "黑色",
-      "shared_note_not_found_or_denied": "未找到共享笔记或访问被拒绝。\n\n这可能发生在恢复之后。\n\n管理员可能需要在“设置 > 管理工具”中重建主数据库，以修复共享链接。",
       "orange": "橙色",
       "yellow": "黄色",
       "green": "绿色",
@@ -1698,9 +1697,9 @@
     "errors": {
       "token_missing": "缺少令牌",
       "token_or_folder_auth_missing": "缺少令牌或文件夹授权",
-      "shared_folder_not_found": "未找到共享文件夹",
-      "shared_note_not_found_or_denied": "未找到共享笔记或访问被拒绝。这可能发生在恢复之后。管理员可能需要在“设置 > 管理工具”中重建主数据库，以修复共享链接。",
-      "folder_not_found": "未找到文件夹",
+      "shared_folder_not_found": "未找到共享文件夹。\n\n这可能发生在恢复之后。\n\n管理员可能需要在“设置 > 管理工具”中重建主数据库，以修复共享链接。",
+      "shared_note_not_found_or_denied": "未找到共享笔记或访问被拒绝。\n\n这可能发生在恢复之后。\n\n管理员可能需要在“设置 > 管理工具”中重建主数据库，以修复共享链接。",
+      "folder_not_found": "未找到文件夹。\n\n这可能发生在恢复之后。\n\n管理员可能需要在“设置 > 管理工具”中重建主数据库，以修复共享链接。",
       "note_not_found": "未找到笔记",
       "server_error": "服务器错误"
     }

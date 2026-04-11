@@ -1703,9 +1703,9 @@
     "errors": {
       "token_missing": "Token ausente",
       "token_or_folder_auth_missing": "Token ou autorização da pasta ausente",
-      "shared_folder_not_found": "Pasta compartilhada não encontrada",
-      "shared_note_not_found_or_denied": "Nota compartilhada não encontrada ou acesso negado. Isso pode acontecer após uma restauração. Um administrador talvez precise reconstruir o banco de dados mestre em Configurações > Ferramentas de administração para reparar os links de compartilhamento.",
-      "folder_not_found": "Pasta não encontrada",
+      "shared_folder_not_found": "Pasta compartilhada não encontrada.\n\nIsso pode acontecer após uma restauração.\n\nUm administrador talvez precise reconstruir o banco de dados mestre em Configurações > Ferramentas de administração para reparar os links de compartilhamento.",
+      "shared_note_not_found_or_denied": "Nota compartilhada não encontrada ou acesso negado.\n\nIsso pode acontecer após uma restauração.\n\nUm administrador talvez precise reconstruir o banco de dados mestre em Configurações > Ferramentas de administração para reparar os links de compartilhamento.",
+      "folder_not_found": "Pasta não encontrada.\n\nIsso pode acontecer após uma restauração.\n\nUm administrador talvez precise reconstruir o banco de dados mestre em Configurações > Ferramentas de administração para reparar os links de compartilhamento.",
       "note_not_found": "Nota não encontrada",
       "server_error": "Erro do servidor"
     }

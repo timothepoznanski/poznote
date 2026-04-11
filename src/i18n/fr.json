@@ -1740,9 +1740,9 @@
     "errors": {
       "token_missing": "Token manquant",
       "token_or_folder_auth_missing": "Jeton ou autorisation du dossier manquant",
-      "shared_folder_not_found": "Dossier partagé introuvable",
+      "shared_folder_not_found": "Dossier partagé introuvable.\n\nCela peut arriver après une restauration.\n\nUn administrateur doit peut-être reconstruire la base master dans Paramètres > Outils d'administration afin de réparer les liens de partage.",
       "shared_note_not_found_or_denied": "Note partagée introuvable ou accès refusé.\n\nCela peut arriver après une restauration.\n\nUn administrateur doit peut-être reconstruire la base master dans Paramètres > Outils d'administration afin de réparer les liens de partage.",
-      "folder_not_found": "Dossier introuvable",
+      "folder_not_found": "Dossier introuvable.\n\nCela peut arriver après une restauration.\n\nUn administrateur doit peut-être reconstruire la base master dans Paramètres > Outils d'administration afin de réparer les liens de partage.",
       "note_not_found": "Note introuvable",
       "server_error": "Erreur serveur"
     }

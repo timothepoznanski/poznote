@@ -852,7 +852,6 @@ Administrators have access to a suite of maintenance and management tools under 
 - **Rebuild Master Database:** Reconstruct the user index from data folders in case of system corruption or database loss.
 - **Base64 Image Converter:** Convert inline Base64 encoded images within notes to proper file attachments.
 - **Orphan attachments scanner:** Scan and clean up storage by identifying attachment files that are no longer referenced in any notes.
-- **MCP Server:** Configure the AI assistant integration, set the default User ID, and control debug logging with `POZNOTE_DEBUG=true` or `POZNOTE_DEBUG=false` in `.env`.
 
 ## PWA
 

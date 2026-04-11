@@ -1331,9 +1331,9 @@
     "errors": {
       "token_missing": "Token missing",
       "token_or_folder_auth_missing": "Token or folder authorization missing",
-      "shared_folder_not_found": "Shared folder not found",
+      "shared_folder_not_found": "Shared folder not found.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.",
       "shared_note_not_found_or_denied": "Shared note not found or access denied.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.",
-      "folder_not_found": "Folder not found",
+      "folder_not_found": "Folder not found.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.",
       "note_not_found": "Note not found",
       "server_error": "Server error"
     }

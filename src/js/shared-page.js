@@ -89,6 +89,32 @@
         return isMobileShareModalView() && mobileText ? mobileText : desktopText;
     }
 
+    function showShareToast(message, parentEl) {
+        var container = parentEl || document.querySelector('.shared-content') || document.body;
+        var existing = container.querySelector('.share-toast');
+        if (existing) existing.remove();
+        var toast = document.createElement('div');
+        toast.className = 'share-toast alert alert-danger';
+        toast.style.position = parentEl ? 'relative' : 'fixed';
+        if (!parentEl) {
+            toast.style.top = '20px';
+            toast.style.left = '50%';
+            toast.style.transform = 'translateX(-50%)';
+            toast.style.zIndex = '10001';
+            toast.style.maxWidth = '400px';
+            toast.style.minWidth = '200px';
+            toast.style.textAlign = 'center';
+            toast.style.boxShadow = '0 4px 16px rgba(220, 53, 69, 0.2)';
+        }
+        toast.textContent = message;
+        if (parentEl) {
+            container.insertBefore(toast, container.firstChild);
+        } else {
+            document.body.appendChild(toast);
+        }
+        setTimeout(function() { if (toast.parentNode) toast.remove(); }, 5000);
+    }
+
     function loadSharePasswordCache() {
         try {
             var rawValue = window.localStorage.getItem(SHARE_PASSWORD_STORAGE_KEY);
@@ -535,7 +561,7 @@
                 checkEmpty();
             }
         })
-        .catch(function(error) { alert(config.txtError + ': ' + error.message); });
+        .catch(function(error) { showShareToast(config.txtError + ': ' + error.message); });
     }
 
     function updateNotePassword(noteId, password) {
@@ -553,7 +579,7 @@
             mergeItems();
             applyFilter();
         })
-        .catch(function(error) { alert(config.txtError + ': ' + error.message); });
+        .catch(function(error) { showShareToast(config.txtError + ': ' + error.message); });
     }
 
     function updateNoteShareSettings(noteId, updates) {
@@ -601,7 +627,7 @@
                 if (Object.prototype.hasOwnProperty.call(updates, 'access_mode')) {
                     sharedNotes[idx].access_mode = updates.access_mode;
                 }
-                if (Object.prototype.hasOwnProperty.call(updates, 'password')) {
+                if (Object.prototype.hasOwnProperty.call(updates, 'password') && updates.password !== undefined) {
                     sharedNotes[idx].hasPassword = updates.password ? 1 : 0;
                 }
                 if (Object.prototype.hasOwnProperty.call(updates, 'allowed_users') && updates.allowed_users !== undefined) {
@@ -632,7 +658,7 @@
                 loadSharedNotes();
             }
         })
-        .catch(function(error) { alert(config.txtError + ': ' + error.message); });
+        .catch(function(error) { showShareToast(config.txtError + ': ' + error.message); });
     }
 
     function updateFolderPassword(folderId, password) {
@@ -647,13 +673,13 @@
             if (data.error) throw new Error(data.error);
             window.location.reload();
         })
-        .catch(function(error) { alert(config.txtError + ': ' + error.message); });
+        .catch(function(error) { showShareToast(config.txtError + ': ' + error.message); });
     }
 
     function updateFolderShareSettings(folderId, updates) {
         var payload = {};
-        if (Object.prototype.hasOwnProperty.call(updates, 'custom_token')) {
-            if (!updates.custom_token || updates.custom_token.length < 4) {
+        if (Object.prototype.hasOwnProperty.call(updates, 'custom_token') && updates.custom_token) {
+            if (updates.custom_token.length < 4) {
                 return Promise.reject(new Error('Token must be at least 4 characters'));
             }
             payload.custom_token = updates.custom_token;
@@ -683,14 +709,14 @@
             if (data.error) throw new Error(data.error);
             var folder = sharedFolders.find(function(f) { return f.folder_id == folderId; });
             if (folder) {
-                if (Object.prototype.hasOwnProperty.call(updates, 'custom_token')) {
+                if (Object.prototype.hasOwnProperty.call(updates, 'custom_token') && updates.custom_token) {
                     folder.token = updates.custom_token;
                     folder.public_url = buildFolderPublicUrl(updates.custom_token);
                 }
                 if (Object.prototype.hasOwnProperty.call(updates, 'indexable')) {
                     folder.indexable = updates.indexable ? 1 : 0;
                 }
-                if (Object.prototype.hasOwnProperty.call(updates, 'password')) {
+                if (Object.prototype.hasOwnProperty.call(updates, 'password') && updates.password !== undefined) {
                     folder.password = updates.password ? 1 : 0;
                 }
                 if (Object.prototype.hasOwnProperty.call(updates, 'allowed_users') && updates.allowed_users !== undefined) {
@@ -1277,7 +1303,7 @@
                     closeModal();
                 })
                 .catch(function(error) {
-                    alert(config.txtError + ': ' + (error.message || config.txtTokenUpdateFailed));
+                    showShareToast(config.txtError + ': ' + (error.message || config.txtTokenUpdateFailed), content);
                     saveBtn.disabled = false;
                 });
         });

@@ -52,9 +52,21 @@ try {
     $stmt->execute([$token]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$row) {
-        http_response_code(404);
-        echo t_h('public.errors.shared_folder_not_found', [], 'Shared folder not found', $currentLang);
-        exit;
+        $statusMsg = t_h('public.errors.shared_folder_not_found', [], "Shared folder not found.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.", $currentLang);
+        [$statusTitle, $statusDetail] = array_pad(explode("\n\n", $statusMsg, 2), 2, '');
+        renderPublicStatusPage($currentLang, [
+            'status' => 404,
+            'icon' => '🧭',
+            'badge' => '404',
+            'title' => rtrim(trim($statusTitle), '.'),
+            'message' => $statusDetail,
+            'actions' => [
+                [
+                    'href' => '/index.php',
+                    'label' => t_h('common.back_to_home', [], 'Go to Home', $currentLang),
+                ],
+            ],
+        ]);
     }
 
     $folder_id = $row['folder_id'];
@@ -122,9 +134,21 @@ try {
     $stmt->execute([$folder_id]);
     $folder = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$folder) {
-        http_response_code(404);
-        echo t_h('public.errors.folder_not_found', [], 'Folder not found', $currentLang);
-        exit;
+        $folderMsg = t_h('public.errors.folder_not_found', [], "Folder not found.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.", $currentLang);
+        [$folderTitle, $folderDetail] = array_pad(explode("\n\n", $folderMsg, 2), 2, '');
+        renderPublicStatusPage($currentLang, [
+            'status' => 404,
+            'icon' => '🧭',
+            'badge' => '404',
+            'title' => rtrim(trim($folderTitle), '.'),
+            'message' => $folderDetail,
+            'actions' => [
+                [
+                    'href' => '/index.php',
+                    'label' => t_h('common.back_to_home', [], 'Go to Home', $currentLang),
+                ],
+            ],
+        ]);
     }
 
     // Faster approach: fetch all folders to build hierarchy in memory
