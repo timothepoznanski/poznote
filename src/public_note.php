@@ -165,7 +165,7 @@ try {
                         'created' => date('Y-m-d H:i:s'), // Mock
                         'theme' => $sharedFolder['theme'], // Inherit folder theme
                         'indexable' => $sharedFolder['indexable'],
-                        'password' => $sharedFolder['password'], // Inherit folder password
+                        'password' => null, // Folder password is enforced via $protectedFolderContext, not as a note-level password
                         'access_mode' => 'read_only',
                         'allowed_users' => $sharedFolder['allowed_users'] ?? null
                     ];
