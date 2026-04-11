@@ -272,6 +272,68 @@ class AttachmentsController {
                     $this->attachmentsDir = $userDataManager->getUserAttachmentsPath();
                 }
             }
+            
+            // If not individually shared, check if note belongs to a shared folder
+            if (!$isPubliclyShared) {
+                $folderToken = $_GET['folder_token'] ?? '';
+                if (!empty($folderToken)) {
+                    $stmt = $masterCon->prepare('SELECT user_id, target_id FROM shared_links WHERE token = ? AND target_type = ? LIMIT 1');
+                    $stmt->execute([$folderToken, 'folder']);
+                    $folderResult = $stmt->fetch(PDO::FETCH_ASSOC);
+                    
+                    if ($folderResult) {
+                        $folderOwnerId = (int)$folderResult['user_id'];
+                        $sharedFolderId = (int)$folderResult['target_id'];
+                        
+                        require_once __DIR__ . '/../../../users/UserDataManager.php';
+                        $userDataManager = new UserDataManager($folderOwnerId);
+                        $dbPath = $userDataManager->getUserDatabasePath();
+                        
+                        $userCon = new PDO('sqlite:' . $dbPath);
+                        $userCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                        $userCon->exec('PRAGMA busy_timeout = 5000');
+                        
+                        // Get the note's folder_id
+                        $stmt = $userCon->prepare('SELECT folder_id FROM entries WHERE id = ? AND trash = 0');
+                        $stmt->execute([$noteId]);
+                        $noteRow = $stmt->fetch(PDO::FETCH_ASSOC);
+                        
+                        if ($noteRow) {
+                            $noteFolderId = (int)$noteRow['folder_id'];
+                            $belongsToSharedFolder = ($noteFolderId === $sharedFolderId);
+                            
+                            // Walk up the folder hierarchy to check ancestors
+                            if (!$belongsToSharedFolder) {
+                                $currentFolderId = $noteFolderId;
+                                $visited = [];
+                                while ($currentFolderId && !isset($visited[$currentFolderId])) {
+                                    $visited[$currentFolderId] = true;
+                                    $stmt = $userCon->prepare('SELECT parent_id FROM folders WHERE id = ?');
+                                    $stmt->execute([$currentFolderId]);
+                                    $folderRow = $stmt->fetch(PDO::FETCH_ASSOC);
+                                    if (!$folderRow || $folderRow['parent_id'] === null) {
+                                        break;
+                                    }
+                                    $parentId = (int)$folderRow['parent_id'];
+                                    if ($parentId === $sharedFolderId) {
+                                        $belongsToSharedFolder = true;
+                                        break;
+                                    }
+                                    $currentFolderId = $parentId;
+                                }
+                            }
+                            
+                            if ($belongsToSharedFolder) {
+                                $isPubliclyShared = true;
+                                $noteOwnerId = $folderOwnerId;
+                                
+                                $this->con = $userCon;
+                                $this->attachmentsDir = $userDataManager->getUserAttachmentsPath();
+                            }
+                        }
+                    }
+                }
+            }
         } catch (Exception $e) {
             // If checking master.db fails, continue with current database
             error_log("Failed to check shared_links: " . $e->getMessage());

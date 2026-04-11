@@ -551,13 +551,21 @@ $content = preg_replace_callback('#(src|href)=(["\']?)(/?data/(?:users/\d+/)?att
 }, $content);
 
 // Convert API attachment URLs to absolute URLs
-$content = preg_replace_callback('#(src|href)=(["\']?)(/?api/v1/notes/\d+/attachments/[^"\'\s>]+)(["\']?)#i', function($m) use ($baseUrl) {
+$content = preg_replace_callback('#(src|href)=(["\']?)(/?api/v1/notes/\d+/attachments/[^"\'\s>]+)(["\']?)#i', function($m) use ($baseUrl, $isFolderShared, $folderToken) {
     $attr = $m[1];
     $quote = $m[2] ?: '';
     $apiPath = $m[3];
     
     // Ensure no duplicate slashes
     $url = rtrim($baseUrl, '/') . '/' . ltrim($apiPath, '/');
+    
+    // Append folder_token for notes shared via a folder so the attachment
+    // controller can verify folder-level access without requiring login
+    if ($isFolderShared && !empty($folderToken)) {
+        $separator = (strpos($url, '?') !== false) ? '&' : '?';
+        $url .= $separator . 'folder_token=' . urlencode($folderToken);
+    }
+    
     return $attr . '=' . $quote . $url . $quote;
 }, $content);
 
