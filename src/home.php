@@ -364,7 +364,6 @@ try {
     <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
     <link rel="apple-touch-icon" href="pwa/poznote.png?v=<?php echo $cache_v; ?>">
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
-    <script src="pwa/pwa.js?v=<?php echo $cache_v; ?>" defer></script>
     <link type="text/css" rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/base.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css?v=<?php echo $cache_v; ?>"/>
@@ -623,27 +622,6 @@ try {
                 <?php endif; ?>
             <?php endif; ?>
 
-            <!-- Browser Extension -->
-            <a href="https://chromewebstore.google.com/detail/poznote-url-saver/bmjclfamahegmgillaghhmnbkjebipbh" target="_blank" class="home-card" id="extension-card">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-chrome"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.install_extension', [], 'Install extension'); ?></span>
-                </div>
-            </a>
-
-            <!-- Install App -->
-            <a href="#" class="home-card" id="install-app-card">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-smartphone"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.install_app', [], 'Install application'); ?></span>
-                    <span class="home-card-count" id="install-app-status"><?php echo t_h('settings.install_app.status.unavailable', [], 'Unavailable'); ?></span>
-                </div>
-            </a>
-
             <!-- Logout -->
             <a href="logout.php" class="home-card home-card-red" id="home-logout-card" title="<?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?>">
                 <div class="home-card-icon">
@@ -813,15 +791,12 @@ try {
         const searchInput = document.getElementById('home-search');
         const cards = document.querySelectorAll('.home-card');
         const noResults = document.getElementById('no-results');
-        const installAppCard = document.getElementById('install-app-card');
-        const installAppStatus = document.getElementById('install-app-status');
         const apiRestCard = document.getElementById('api-rest-card');
         const apiRestModal = document.getElementById('apiRestModal');
         const openGithubApiDocsBtn = document.getElementById('openGithubApiDocsBtn');
         const openSwaggerApiBtn = document.getElementById('openSwaggerApiBtn');
         const closeApiRestModalBtn = document.getElementById('closeApiRestModalBtn');
 
-        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
         const githubApiDocsUrl = 'https://github.com/timothepoznanski/poznote/blob/main/docs/API-REST.md';
         const swaggerApiUrl = 'api-docs/';
 
@@ -833,63 +808,6 @@ try {
         function closeApiRestModal() {
             if (!apiRestModal) return;
             apiRestModal.style.display = 'none';
-        }
-
-        function updateInstallAppStatus() {
-            if (!installAppStatus) return;
-
-            if (isStandalone) {
-                installAppStatus.textContent = <?php echo json_encode(t('settings.install_app.status.installed', [], 'Already installed')); ?>;
-                return;
-            }
-
-            if (typeof window.poznoteCanInstallApp === 'function' && window.poznoteCanInstallApp()) {
-                installAppStatus.textContent = <?php echo json_encode(t('settings.install_app.status.available', [], 'Available')); ?>;
-                return;
-            }
-
-            installAppStatus.textContent = <?php echo json_encode(t('settings.install_app.status.unavailable', [], 'Unavailable')); ?>;
-        }
-
-        updateInstallAppStatus();
-
-        window.addEventListener('poznote:pwa-install-available', () => {
-            updateInstallAppStatus();
-        });
-
-        window.addEventListener('poznote:pwa-installed', () => {
-            updateInstallAppStatus();
-        });
-
-        if (installAppCard) {
-            installAppCard.addEventListener('click', async function(e) {
-                e.preventDefault();
-
-                if (isStandalone) {
-                    const alreadyInstalledMsg = <?php echo json_encode(t('settings.install_app.already_installed', [], 'The application is already installed on this device.')); ?>;
-                    if (window.modalAlert?.alert) {
-                        window.modalAlert.alert(alreadyInstalledMsg, 'info', <?php echo json_encode(t('settings.cards.install_app', [], 'Install application')); ?>);
-                    } else {
-                        alert(alreadyInstalledMsg);
-                    }
-                    return;
-                }
-
-                if (typeof window.poznotePromptInstall === 'function') {
-                    const result = await window.poznotePromptInstall();
-                    if (result.supported) {
-                        updateInstallAppStatus();
-                        return;
-                    }
-                }
-
-                const fallbackInstallMsg = <?php echo json_encode(t('settings.install_app.unavailable', [], 'Installation is not available right now. On Chrome mobile, open the browser menu then tap "Install app" (or "Add to Home screen") when available.')); ?>;
-                if (window.modalAlert?.alert) {
-                    window.modalAlert.alert(fallbackInstallMsg, 'info', <?php echo json_encode(t('settings.cards.install_app', [], 'Install application')); ?>);
-                } else {
-                    alert(fallbackInstallMsg);
-                }
-            });
         }
 
         if (apiRestCard) {
