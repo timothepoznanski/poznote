@@ -1006,9 +1006,9 @@
             <div class="ui-custom-sections-scroll">
                 <div class="ui-custom-empty" id="uiCustomizationFilterEmpty" hidden><?php echo t_h('modals.ui_customization.no_results', [], 'No matching items found.'); ?></div>
 
-                <!-- Home Cards Section -->
+                <!-- Dashboard Cards Section -->
                 <div class="ui-custom-section">
-                <h4 class="ui-custom-section-title"><?php echo t_h('modals.ui_customization.sections.home_cards', [], 'Home Cards'); ?></h4>
+                <h4 class="ui-custom-section-title"><?php echo t_h('modals.ui_customization.sections.home_cards', [], 'Dashboard Cards'); ?></h4>
                 <div class="ui-custom-items">
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-notes-card" checked><span><?php echo t_h('common.notes', [], 'Notes'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-tags-card" checked><span><?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?></span></label>

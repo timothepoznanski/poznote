@@ -4,7 +4,7 @@
   },
   "common": {
     "notes": "Notes",
-    "back_to_home": "Aller à l'accueil",
+    "back_to_home": "Aller au tableau de bord",
     "back_to_notes": "Aller aux notes",
     "back_to_settings": "Aller aux paramètres",
     "close": "Fermer",
@@ -350,7 +350,7 @@
       "website": "Site Poznote",
       "github_star": "Mettre une étoile sur GitHub",
       "guestbook": "Livre d'or Poznote",
-      "support": "Soutenir Tim",
+      "support": "Soutenir Poznote",
       "install_extension": "Installer l'extension",
       "install_app": "Installer l'application",
       "custom_css": "Chemin CSS personnalisé",
@@ -496,13 +496,13 @@
   },
   "sidebar": {
     "display": "Affichage",
-    "home": "Accueil",
+    "home": "Tableau de bord",
     "settings": "Paramètres",
     "create": "Créer",
     "toggle": "Cacher/Afficher la colonne de gauche"
   },
   "home": {
-    "title": "Accueil",
+    "title": "Tableau de bord",
     "dashboard": "Tableau de bord",
     "folders": "Dossiers",
     "shared_notes": "Notes partagées",
@@ -775,7 +775,7 @@
       "filter_placeholder": "Filtrer les éléments...",
       "no_results": "Aucun élément correspondant.",
       "sections": {
-        "home_cards": "Cartes de l'accueil",
+        "home_cards": "Cartes du tableau de bord",
         "create_cards": "Cartes de création",
         "settings_cards": "Cartes des paramètres",
         "toolbar": "Barre d'outils",

@@ -1,6 +1,6 @@
 <?php
 /**
- * Home page - Central hub for system folders navigation
+ * Dashboard page - Central hub for system folders navigation
  */
 require 'auth.php';
 requireAuth();
@@ -621,6 +621,16 @@ try {
                     </a>
                 <?php endif; ?>
             <?php endif; ?>
+
+            <!-- Support Poznote -->
+            <a href="https://ko-fi.com/timothepoznanski" target="_blank" class="home-card home-card-red" id="home-support-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-heart heart-blink"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.support', [], 'Support Poznote'); ?></span>
+                </div>
+            </a>
 
             <!-- Logout -->
             <a href="logout.php" class="home-card home-card-red" id="home-logout-card" title="<?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?>">

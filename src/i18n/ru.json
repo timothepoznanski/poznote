@@ -17,7 +17,7 @@
     "not_defined": "Не определено",
     "loading": "Загрузка...",
     "back_to_notes": "К заметкам",
-    "back_to_home": "На главную",
+    "back_to_home": "На панель",
     "back_to_settings": "В настройки",
     "back": "Назад",
     "error": "Ошибка",
@@ -64,7 +64,7 @@
       "website": "Сайт Poznote",
       "github_star": "Поставить звезду на GitHub",
       "guestbook": "Гостевая книга Poznote",
-      "support": "Soutenir Tim",
+      "support": "Поддержать Poznote",
       "install_extension": "Установить расширение",
       "install_app": "Установить приложение",
       "release_notes": "Примечания к выпуску",
@@ -292,7 +292,7 @@
       "filter_placeholder": "Фильтровать элементы...",
       "no_results": "Подходящие элементы не найдены.",
       "sections": {
-        "home_cards": "Карточки главной страницы",
+        "home_cards": "Карточки панели",
         "create_cards": "Карточки создания",
         "settings_cards": "Карточки настроек",
         "toolbar": "Панель инструментов",
@@ -1377,13 +1377,13 @@
   },
   "sidebar": {
     "display": "Отображение",
-    "home": "Главная",
+    "home": "Панель",
     "settings": "Настройки",
     "create": "Создать",
     "toggle": "Скрыть/Показать левую колонку"
   },
   "home": {
-    "title": "Главная",
+    "title": "Панель",
     "dashboard": "Панель управления",
     "folders": "Папки",
     "shared_notes": "Общие заметки",

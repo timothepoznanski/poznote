@@ -4,7 +4,7 @@
   },
   "common": {
     "notes": "笔记",
-    "back_to_home": "前往主页",
+    "back_to_home": "前往仪表盘",
     "back_to_notes": "前往笔记",
     "back_to_settings": "前往设置",
     "close": "关闭",
@@ -341,7 +341,7 @@
       "github_star": "在 GitHub 上加星",
       "guestbook": "Poznote 留言板",
       "custom_css": "自定义 CSS 文件",
-      "support": "Soutenir Tim",
+      "support": "支持 Poznote",
       "install_app": "安装应用",
       "release_notes": "发布日志",
       "convert_images": "Base64 Image Converter",
@@ -482,13 +482,13 @@
   },
   "sidebar": {
     "display": "显示",
-    "home": "首页",
+    "home": "仪表盘",
     "settings": "设置",
     "create": "创建",
     "toggle": "显示/隐藏左侧边栏"
   },
   "home": {
-    "title": "首页",
+    "title": "仪表盘",
     "dashboard": "仪表盘",
     "folders": "文件夹",
     "shared_notes": "共享笔记",
@@ -758,7 +758,7 @@
       "filter_placeholder": "筛选项目...",
       "no_results": "未找到匹配的项目。",
       "sections": {
-        "home_cards": "首页卡片",
+        "home_cards": "仪表盘卡片",
         "create_cards": "创建卡片",
         "settings_cards": "设置卡片",
         "toolbar": "工具栏",

@@ -4,7 +4,7 @@
   },
   "common": {
     "notes": "Notizen",
-    "back_to_home": "Zur Startseite gehen",
+    "back_to_home": "Zum Dashboard gehen",
     "back_to_notes": "Zu den Notizen gehen",
     "back_to_settings": "Zu den Einstellungen gehen",
     "close": "Schließen",
@@ -338,7 +338,7 @@
       "website": "Poznote-Website",
       "github_star": "Auf GitHub einen Stern vergeben",
       "guestbook": "Poznote Gästebuch",
-      "support": "Soutenir Tim",
+      "support": "Poznote unterstützen",
       "custom_css": "Benutzerdefinierte CSS-Datei",
       "install_extension": "Erweiterung installieren",
       "install_app": "App installieren",
@@ -482,13 +482,13 @@
   },
   "sidebar": {
     "display": "Anzeige",
-    "home": "Startseite",
+    "home": "Dashboard",
     "settings": "Einstellungen",
     "create": "Erstellen",
     "toggle": "Linke Spalte ein-/ausblenden"
   },
   "home": {
-    "title": "Startseite",
+    "title": "Dashboard",
     "dashboard": "Dashboard",
     "folders": "Ordner",
     "shared_notes": "Geteilte Notizen",
@@ -758,7 +758,7 @@
       "filter_placeholder": "Elemente filtern...",
       "no_results": "Keine passenden Elemente gefunden.",
       "sections": {
-        "home_cards": "Startseitenkarten",
+        "home_cards": "Dashboard-Karten",
         "create_cards": "Erstellungskarten",
         "settings_cards": "Einstellungskarten",
         "toolbar": "Symbolleiste",

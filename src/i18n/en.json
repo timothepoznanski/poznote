@@ -17,7 +17,7 @@
     "not_defined": "Not defined",
     "loading": "Loading...",
     "back_to_notes": "Go to Notes",
-    "back_to_home": "Go to Home",
+    "back_to_home": "Go to Dashboard",
     "back_to_settings": "Go to Settings",
     "back": "Back",
     "error": "Error",
@@ -63,7 +63,7 @@
       "website": "Poznote Website",
       "github_star": "Star on GitHub",
       "guestbook": "Poznote Guestbook",
-      "support": "Soutenir Tim",
+      "support": "Support Poznote",
       "install_extension": "Install extension",
       "install_app": "Install application",
       "custom_css": "Custom CSS path",
@@ -292,7 +292,7 @@
       "filter_placeholder": "Filter items...",
       "no_results": "No matching items found.",
       "sections": {
-        "home_cards": "Home Cards",
+        "home_cards": "Dashboard Cards",
         "create_cards": "Create Cards",
         "settings_cards": "Settings Cards",
         "toolbar": "Toolbar",
@@ -1380,13 +1380,13 @@
   },
   "sidebar": {
     "display": "Display",
-    "home": "Home",
+    "home": "Dashboard",
     "settings": "Settings",
     "create": "Create",
     "toggle": "Hide/Show left column"
   },
   "home": {
-    "title": "Home",
+    "title": "Dashboard",
     "dashboard": "Dashboard",
     "folders": "Folders",
     "shared_notes": "Shared Notes",

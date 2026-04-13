@@ -114,8 +114,8 @@ $currentLang = getUserLanguage();
             <button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
                 <?php echo t_h('common.back_to_notes'); ?>
             </button>
-            <button id="backToHomeBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_home', [], 'Back to Home'); ?>">
-                <?php echo t_h('common.back_to_home', [], 'Back to Home'); ?>
+            <button id="backToHomeBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_home', [], 'Back to Dashboard'); ?>">
+                <?php echo t_h('common.back_to_home', [], 'Back to Dashboard'); ?>
             </button>
             <button class="btn btn-danger" id="emptyTrashBtn" title="<?php echo t_h('trash.actions.empty_trash', [], 'Empty trash'); ?>">
                 <?php echo t_h('trash.actions.empty_trash', [], 'Empty trash'); ?>

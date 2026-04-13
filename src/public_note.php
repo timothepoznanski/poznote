@@ -86,7 +86,7 @@ if (empty($token) && (empty($folderToken) || empty($noteIdParam))) {
             'actions' => [
                 [
                     'href' => '/index.php',
-                    'label' => t_h('common.back_to_home', [], 'Go to Home', $currentLang),
+                    'label' => t_h('common.back_to_home', [], 'Go to Dashboard', $currentLang),
                 ],
             ],
         ]);
@@ -188,7 +188,7 @@ try {
             'actions' => [
                 [
                     'href' => '/index.php',
-                    'label' => t_h('common.back_to_home', [], 'Go to Home', $currentLang),
+                    'label' => t_h('common.back_to_home', [], 'Go to Dashboard', $currentLang),
                 ],
             ],
         ]);
@@ -424,7 +424,7 @@ try {
             'actions' => [
                 [
                     'href' => '/index.php',
-                    'label' => t_h('common.back_to_home', [], 'Go to Home', $currentLang),
+                    'label' => t_h('common.back_to_home', [], 'Go to Dashboard', $currentLang),
                 ],
             ],
         ]);
@@ -440,7 +440,7 @@ try {
         'actions' => [
             [
                 'href' => '/index.php',
-                'label' => t_h('common.back_to_home', [], 'Go to Home', $currentLang),
+                'label' => t_h('common.back_to_home', [], 'Go to Dashboard', $currentLang),
             ],
         ],
     ]);
