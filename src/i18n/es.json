@@ -1055,6 +1055,7 @@
     "moving": "Moviendo...",
     "moved": "Movido con éxito",
     "root": "Raíz (sin carpeta)",
+    "filter_folders": "Filtrar carpetas...",
     "filter_placeholder": "Filtrar notas por título o etiquetas..."
   },
   "update": {

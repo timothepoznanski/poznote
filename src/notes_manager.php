@@ -82,12 +82,6 @@ $currentLang = getUserLanguage();
 			</button>
 		</div>
 
-		<h1 class="notes-manager-title">
-			<?php if ($pageWorkspace): ?>
-				<span class="notes-manager-workspace-badge"><?php echo htmlspecialchars($pageWorkspace); ?></span>
-			<?php endif; ?>
-		</h1>
-
 		<!-- Filter bar -->
 		<div class="nm-filter-bar">
 			<div class="filter-input-wrapper">
@@ -166,12 +160,12 @@ $currentLang = getUserLanguage();
 					<!-- Folder options rendered by JS -->
 				</div>
 			</div>
-			<div class="modal-buttons">
-				<button id="nmConfirmMove" class="btn-primary" disabled>
-					<?php echo t_h('notes_manager.move', [], 'Move'); ?>
-				</button>
+			<div class="modal-buttons nm-move-modal-buttons">
 				<button id="nmCancelMove" class="btn-cancel">
 					<?php echo t_h('common.cancel', [], 'Cancel'); ?>
+				</button>
+				<button id="nmConfirmMove" class="btn-primary" disabled>
+					<?php echo t_h('notes_manager.move', [], 'Move'); ?>
 				</button>
 			</div>
 		</div>

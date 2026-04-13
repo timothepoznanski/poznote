@@ -592,6 +592,7 @@
     "moving": "Moving...",
     "moved": "Moved successfully",
     "root": "Root (no folder)",
+    "filter_folders": "Filter folders...",
     "filter_placeholder": "Filter notes by title or tags..."
   },
   "update": {

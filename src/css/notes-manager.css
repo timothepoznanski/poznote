@@ -14,28 +14,6 @@ body.notes-manager-page {
     /* padding: 20px; */
 }
 
-/* Title */
-.notes-manager-title {
-    font-size: 24px;
-    font-weight: 600;
-    text-align: center;
-    margin: 10px 0 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    color: var(--text-color, #333333);
-}
-
-.notes-manager-workspace-badge {
-    font-size: 14px;
-    font-weight: 500;
-    padding: 2px 10px;
-    border-radius: 12px;
-    background: var(--badge-bg, #e0e7ff);
-    color: var(--badge-color, #3730a3);
-}
-
 /* Filter bar */
 .nm-filter-bar {
     max-width: 900px;
@@ -108,8 +86,8 @@ body.notes-manager-page {
     max-width: 900px;
     margin: 0 auto 16px;
     padding: 12px 14px;
-    background: var(--bulk-bar-bg, #f7fbff);
-    border: 1px solid var(--bulk-bar-border, #d6e6f8);
+    background: var(--bulk-bar-bg, #f8fafc);
+    border: 1px solid var(--bulk-bar-border, #dbe3ec);
     border-radius: 10px;
     transition: opacity 0.2s, transform 0.2s;
 }
@@ -133,7 +111,7 @@ body.notes-manager-page {
 .nm-selected-count {
     font-size: 14px;
     font-weight: 600;
-    color: var(--text-color, #1e3a5f);
+    color: var(--text-color, #334155);
 }
 
 #nmBulkBar .nm-bulk-btn {
@@ -146,10 +124,10 @@ body.notes-manager-page {
     min-width: 240px;
     max-width: 100%;
     padding: 9px 12px;
-    border: 1px solid var(--action-border, #bfd4ee);
+    border: 1px solid var(--action-border, #cbd5e1);
     border-radius: 8px;
     background: var(--action-bg, #ffffff);
-    color: var(--action-color, #1e3a5f);
+    color: var(--action-color, #334155);
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
@@ -169,6 +147,20 @@ body.notes-manager-page {
 
 .nm-bulk-select option {
     color: #111827;
+}
+
+:root[data-theme='dark'] .nm-bulk-select,
+body.dark-mode .nm-bulk-select {
+    color-scheme: dark;
+    background: var(--action-bg, #17304d);
+    color: var(--action-color, #eff6ff);
+    border-color: var(--action-border, #2d4f8e);
+}
+
+:root[data-theme='dark'] .nm-bulk-select option,
+body.dark-mode .nm-bulk-select option {
+    background-color: var(--action-bg, #17304d);
+    color: var(--action-color, #eff6ff);
 }
 
 .nm-modal-input {
@@ -199,12 +191,14 @@ body.dark-mode {
     --folder-header-bg: #2d2d2d;
     --folder-header-hover: #383838;
     --row-hover-bg: #2a2a2a;
-    --row-selected-bg: rgba(0, 125, 184, 0.15);
-    --bulk-bar-bg: #1e3a5f;
-    --bulk-bar-border: #007DB8;
-    --action-bg: #17304d;
-    --action-color: #eff6ff;
-    --action-border: #2d4f8e;
+    --row-selected-bg: rgba(148, 163, 184, 0.12);
+    --bulk-bar-bg: #1f2937;
+    --bulk-bar-border: #334155;
+    --action-bg: #1f2937;
+    --action-color: #e5e7eb;
+    --action-border: #475569;
+    --selected-bg: rgba(148, 163, 184, 0.16);
+    --selected-color: #e5e7eb;
     --badge-bg: #3730a3;
     --badge-color: #e0e7ff;
     --badge-bg-subtle: #404040;
@@ -229,12 +223,12 @@ body.dark-mode .nm-tag-chip {
 }
 
 body.dark-mode .nm-folder-option:hover {
-    background: #404040;
+    background: #374151;
 }
 
-body.dark-mode .nm-folder-option.nm-selected {
-    background: rgba(0, 125, 184, 0.3);
-    border-color: #007DB8;
+body.dark-mode .nm-folder-option-selected {
+    background: var(--selected-bg, rgba(148, 163, 184, 0.16));
+    color: var(--selected-color, #e5e7eb);
 }
 
 /* Content area */
@@ -336,7 +330,7 @@ body.dark-mode .nm-folder-option.nm-selected {
 }
 
 .nm-note-row:has(.nm-note-checkbox:checked) {
-    background: var(--row-selected-bg, #eff6ff);
+    background: var(--row-selected-bg, #f1f5f9);
 }
 
 .nm-note-checkbox {
@@ -410,6 +404,11 @@ body.dark-mode .nm-folder-option.nm-selected {
     max-height: 350px;
     overflow-y: auto;
     margin-top: 10px;
+    margin-bottom: 16px;
+}
+
+.nm-move-modal-buttons {
+    margin-top: 8px;
 }
 
 .nm-folder-option {
@@ -429,8 +428,8 @@ body.dark-mode .nm-folder-option.nm-selected {
 }
 
 .nm-folder-option-selected {
-    background: var(--selected-bg, #dbeafe);
-    color: var(--selected-color, #1d4ed8);
+    background: var(--selected-bg, #eef2f6);
+    color: var(--selected-color, #334155);
     font-weight: 500;
 }
 
@@ -471,9 +470,11 @@ body.dark-mode .nm-folder-option.nm-selected {
     .nm-notes-list             { border-top-color: var(--border-color, #334155); }
     .nm-note-row               { border-bottom-color: var(--border-color-light, #2d3748); }
     .nm-note-row:hover         { background: var(--row-hover-bg, #1e293b); }
-    .nm-note-row:has(.nm-note-checkbox:checked) { background: var(--row-selected-bg, #1e3a5f); }
-    .nm-bulk-bar               { background: var(--bulk-bar-bg, #172035); border-color: var(--bulk-bar-border, #2d4f8e); }
-    .nm-folder-option-selected { background: var(--selected-bg, #1e3a5f); color: var(--selected-color, #93c5fd); }
+    .nm-note-row:has(.nm-note-checkbox:checked) { background: var(--row-selected-bg, rgba(148, 163, 184, 0.12)); }
+    .nm-bulk-bar               { background: var(--bulk-bar-bg, #1f2937); border-color: var(--bulk-bar-border, #334155); }
+    .nm-bulk-select            { background: var(--action-bg, #1f2937); color: var(--action-color, #e5e7eb); border-color: var(--action-border, #475569); }
+    .nm-bulk-select option     { background-color: var(--action-bg, #1f2937); color: var(--action-color, #e5e7eb); }
+    .nm-folder-option-selected { background: var(--selected-bg, rgba(148, 163, 184, 0.16)); color: var(--selected-color, #e5e7eb); }
     .nm-modal                  { background: var(--modal-bg, #1e293b); }
 }
 
@@ -481,7 +482,6 @@ body.dark-mode .nm-folder-option.nm-selected {
 @media (max-width: 640px) {
     body.notes-manager-page    { padding: 10px; }
     .notes-manager-container   { padding: 10px; }
-    .notes-manager-title       { font-size: 20px; }
     .nm-folder-header          { padding: 10px; }
     .nm-note-row               { padding: 8px 10px; }
     .nm-note-meta              { display: none; }

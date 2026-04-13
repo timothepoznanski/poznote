@@ -501,15 +501,40 @@
         renderFolderList(this.value.trim().toLowerCase());
     });
 
+    function getSingleCurrentFolderId() {
+        var selectedNotes = getSelectedNotes();
+        if (!selectedNotes.length) return undefined;
+
+        var folderId = selectedNotes[0].folder_id == null ? null : Number(selectedNotes[0].folder_id);
+
+        for (var index = 1; index < selectedNotes.length; index += 1) {
+            var currentFolderId = selectedNotes[index].folder_id == null
+                ? null
+                : Number(selectedNotes[index].folder_id);
+
+            if (currentFolderId !== folderId) {
+                return undefined;
+            }
+        }
+
+        return folderId;
+    }
+
     function renderFolderList(q) {
         nmFolderList.innerHTML = '';
+        var currentFolderId = getSingleCurrentFolderId();
 
         // Root option
-        var rootOpt = buildFolderOption(null, cfg.txtRoot, 'lucide-home', '');
-        nmFolderList.appendChild(rootOpt);
+        if (currentFolderId !== null) {
+            var rootOpt = buildFolderOption(null, cfg.txtRoot, 'lucide-home', '');
+            nmFolderList.appendChild(rootOpt);
+        }
 
         // Filter + sort folders by path
         var visible = allFolders.filter(function (f) {
+            if (currentFolderId !== undefined && Number(f.id) === currentFolderId) {
+                return false;
+            }
             if (!q) return true;
             return (f.path || f.name || '').toLowerCase().indexOf(q) !== -1;
         });
@@ -692,7 +717,6 @@
 
     function performTrash() {
         if (selectedIds.size === 0) return;
-        if (!window.confirm(cfg.txtTrashConfirm)) return;
 
         nmBulkActionSelect.disabled = true;
 

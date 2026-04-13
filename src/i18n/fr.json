@@ -1080,6 +1080,7 @@
     "moving": "Déplacement...",
     "moved": "Déplacé avec succès",
     "root": "Racine (aucun dossier)",
+    "filter_folders": "Filtrer les dossiers...",
     "filter_placeholder": "Filtrer les notes par titre ou tags..."
   },
   "update": {

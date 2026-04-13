@@ -1046,6 +1046,7 @@
     "moving": "正在移动...",
     "moved": "成功移动",
     "root": "根目录 (无文件夹)",
+    "filter_folders": "筛选文件夹...",
     "filter_placeholder": "按标题或标签筛选..."
   },
   "update": {
