@@ -40,8 +40,8 @@
     color: #999;
 }
 
-body.markdown-slash-cursor-hidden,
-body.markdown-slash-cursor-hidden * {
+body.slash-menu-cursor-hidden,
+body.slash-menu-cursor-hidden * {
     cursor: none !important;
 }
 
