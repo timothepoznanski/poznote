@@ -47,6 +47,11 @@
     background: rgba(15, 23, 42, 0.06);
 }
 
+.slash-command-item[data-command-id="cancel"]:hover,
+.slash-command-item[data-command-id="cancel"].selected {
+    background: rgba(239, 68, 68, 0.10);
+}
+
 .slash-command-icon {
     width: 18px;
     min-width: 18px;
@@ -58,6 +63,11 @@
     font-size: 14px;
     color: #111827;
     flex: 1;
+}
+
+.slash-command-item[data-command-id="cancel"] .slash-command-label {
+    color: #dc2626;
+    font-weight: 600;
 }
 
 .slash-command-submenu-indicator {

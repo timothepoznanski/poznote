@@ -816,14 +816,44 @@ function initTouchSupport() {
     const minSwipeDistance = 80; // Minimum distance for a swipe (increased to avoid accidental triggers)
     const maxVerticalDistance = 100; // Max vertical movement allowed for horizontal swipe
 
-    function isHorizontallyScrollableCodeBlock(target) {
+    function getHorizontalGestureExclusionAncestor(target) {
+        if (!(target instanceof Element)) {
+            return null;
+        }
+
         // Any touch that starts inside a code block should never trigger the
         // outline/sommaire swipe gesture, regardless of whether the block is
         // currently overflowing. Without a language label the inner <code>
         // element has no overflow-x set, so the browser does not take over the
         // gesture as a native scroll, and the swipe would incorrectly open the
-        // outline. Returning true for any code block avoids this.
-        return !!target.closest('pre, .code-block');
+        // outline. Returning the closest code block keeps that safeguard.
+        const codeBlock = target.closest('pre, .code-block');
+        if (codeBlock) {
+            return codeBlock;
+        }
+
+        const interactionRoot = isPublicOutlinePage()
+            ? target.closest('#publicNoteMain, .public-note')
+            : target.closest('#right_col');
+
+        let current = target;
+        while (current && current !== interactionRoot) {
+            if (current instanceof HTMLElement) {
+                const computedStyle = window.getComputedStyle(current);
+                const overflowX = computedStyle.overflowX;
+                const canScrollHorizontally =
+                    current.scrollWidth > current.clientWidth + 1 &&
+                    (overflowX === 'auto' || overflowX === 'scroll' || overflowX === 'overlay');
+
+                if (canScrollHorizontally) {
+                    return current;
+                }
+            }
+
+            current = current.parentElement;
+        }
+
+        return null;
     }
 
     // Swipe from anywhere on the note content area to open outline
@@ -838,8 +868,8 @@ function initTouchSupport() {
             return;
         }
 
-        // Let horizontally scrollable code blocks handle touch gestures on mobile.
-        if (isHorizontallyScrollableCodeBlock(e.target)) {
+        // Let nested horizontal scrollers handle their own touch gestures.
+        if (getHorizontalGestureExclusionAncestor(e.target)) {
             return;
         }
 

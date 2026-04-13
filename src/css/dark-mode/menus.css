@@ -19,11 +19,23 @@ body.dark-mode .slash-command-item.selected {
     background: rgba(255, 255, 255, 0.08);
 }
 
+html[data-theme='dark'] .slash-command-item[data-command-id='cancel']:hover,
+html[data-theme='dark'] .slash-command-item[data-command-id='cancel'].selected,
+body.dark-mode .slash-command-item[data-command-id='cancel']:hover,
+body.dark-mode .slash-command-item[data-command-id='cancel'].selected {
+    background: rgba(248, 113, 113, 0.16);
+}
+
 html[data-theme='dark'] .slash-command-item .slash-command-label,
 html[data-theme='dark'] .slash-command-label,
 body.dark-mode .slash-command-item .slash-command-label,
 body.dark-mode .slash-command-label {
     color: #ffffff !important;
+}
+
+html[data-theme='dark'] .slash-command-item[data-command-id='cancel'] .slash-command-label,
+body.dark-mode .slash-command-item[data-command-id='cancel'] .slash-command-label {
+    color: #f87171 !important;
 }
 
 html[data-theme='dark'] .slash-command-icon:not([style*="color"]),
