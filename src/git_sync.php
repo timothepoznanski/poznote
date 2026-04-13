@@ -223,7 +223,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         <div class="git-sync-nav">
             <a id="backToHomeLink" href="home.php" class="btn btn-secondary go-to-nav-btn">
-                <i class="lucide lucide-home" style="margin-right: 5px;"></i>
+    				<i class="lucide lucide-layout-dashboard" style="margin-right: 5px;"></i>
                 <?php echo t_h('common.back_to_home', [], 'Back to Dashboard', $currentLang); ?>
             </a>
             <a id="backToNotesLink" href="index.php<?php echo $pageWorkspace !== '' ? ('?workspace=' . urlencode($pageWorkspace)) : ''; ?>" class="btn btn-secondary go-to-nav-btn">
