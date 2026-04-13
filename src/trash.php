@@ -112,9 +112,11 @@ $currentLang = getUserLanguage();
         
         <div class="trash-buttons-container">
             <button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
+                    <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
                 <?php echo t_h('common.back_to_notes'); ?>
             </button>
             <button id="backToHomeBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_home', [], 'Back to Dashboard'); ?>">
+                    <i class="lucide lucide-layout-dashboard" style="margin-right: 5px;"></i>
                 <?php echo t_h('common.back_to_home', [], 'Back to Dashboard'); ?>
             </button>
             <button class="btn btn-danger" id="emptyTrashBtn" title="<?php echo t_h('trash.actions.empty_trash', [], 'Empty trash'); ?>">
