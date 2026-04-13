@@ -162,7 +162,7 @@ usort($shared_folders, function($a, $b) {
 	data-txt-table-name="<?php echo t_h('public.table.name', [], 'Name'); ?>"
 	data-txt-table-folder="<?php echo t_h('public.table.path', [], 'Path'); ?>"
 	data-txt-table-token="<?php echo t_h('public.table.token', [], 'Token'); ?>"
-	data-txt-token-help="<?php echo t_h('public.token_help', [], 'The token is the unique identifier used in a public share URL. Example: https://your-domain.example/public_note.php?token=my-note-share'); ?>"
+	data-txt-token-help="<?php echo t_h('public.token_help', [], 'The token is the unique part you choose in the public link. For example, using project-2026 gives https://your-domain.example/project-2026 for a note, or https://your-domain.example/folder/project-2026 for a folder.'); ?>"
 	data-txt-table-actions="<?php echo t_h('public.table.actions', [], 'Actions'); ?>"
       data-txt-cancel="<?php echo t_h('common.cancel', [], 'Cancel'); ?>"
       data-txt-save="<?php echo t_h('common.save', [], 'Save'); ?>"
@@ -196,9 +196,9 @@ usort($shared_folders, function($a, $b) {
 				<i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
 				<?php echo t_h('common.back_to_notes'); ?>
 			</button>
-			<button id="backToHomeBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_home', [], 'Back to Home'); ?>">
+			<button id="backToHomeBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_home', [], 'Back to Dashboard'); ?>">
 				<i class="lucide lucide-home" style="margin-right: 5px;"></i>
-				<?php echo t_h('common.back_to_home', [], 'Back to Home'); ?>
+				<?php echo t_h('common.back_to_home', [], 'Back to Dashboard'); ?>
 			</button>
 		</div>
 		

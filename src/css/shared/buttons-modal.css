@@ -183,6 +183,23 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-field-label {
     white-space: nowrap;
 }
 
+body.shared-page .shared-edit-token-modal .shared-edit-token-label-with-help {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-label-with-help .shared-header-help {
+    flex: 0 0 auto;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-label-with-help .shared-header-help-tooltip {
+    left: 0;
+    transform: none;
+    min-width: 240px;
+    max-width: min(320px, calc(100vw - 64px));
+}
+
 body.shared-page .shared-edit-token-modal .shared-edit-token-field-value {
     flex: 1 1 auto;
     min-width: 0;

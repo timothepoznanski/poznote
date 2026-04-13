@@ -43,7 +43,7 @@
             txtTableFolder: body.getAttribute('data-txt-table-folder') || 'Folder',
             txtTableToken: body.getAttribute('data-txt-table-token') || 'Token',
 
-            txtTokenHelp: body.getAttribute('data-txt-token-help') || 'The token is the unique identifier used in a public share URL. Example: https://your-domain.example/public_note.php?token=my-note-share',
+            txtTokenHelp: body.getAttribute('data-txt-token-help') || 'The token is the unique part you choose in the public link. For example, using project-2026 gives https://your-domain.example/project-2026 for a note, or https://your-domain.example/folder/project-2026 for a folder.',
             txtTableActions: body.getAttribute('data-txt-table-actions') || 'Actions',
 
             txtCancel: body.getAttribute('data-txt-cancel') || 'Cancel',
@@ -894,9 +894,26 @@
         var tokenRow = document.createElement('div');
         tokenRow.className = 'shared-edit-token-field-row';
 
-        var tokenLabel = document.createElement('label');
-        tokenLabel.className = 'shared-edit-token-field-label';
-        tokenLabel.textContent = config.txtCustomToken;
+        var tokenLabel = document.createElement('div');
+        tokenLabel.className = 'shared-edit-token-field-label shared-edit-token-label-with-help';
+
+        var tokenLabelText = document.createElement('span');
+        tokenLabelText.className = 'shared-edit-token-label-text';
+        tokenLabelText.textContent = config.txtCustomToken;
+
+        var tokenHelp = document.createElement('span');
+        tokenHelp.className = 'shared-header-help';
+        tokenHelp.tabIndex = 0;
+        tokenHelp.setAttribute('aria-label', config.txtTokenHelp);
+        tokenHelp.innerHTML = '<i class="lucide lucide-help-circle"></i>';
+
+        var tokenHelpTooltip = document.createElement('span');
+        tokenHelpTooltip.className = 'shared-header-help-tooltip';
+        tokenHelpTooltip.textContent = config.txtTokenHelp;
+        tokenHelp.appendChild(tokenHelpTooltip);
+
+        tokenLabel.appendChild(tokenLabelText);
+        tokenLabel.appendChild(tokenHelp);
         tokenRow.appendChild(tokenLabel);
 
         var tokenValue = document.createElement('div');

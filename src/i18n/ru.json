@@ -17,7 +17,7 @@
     "not_defined": "Не определено",
     "loading": "Загрузка...",
     "back_to_notes": "К заметкам",
-    "back_to_home": "На главную",
+    "back_to_home": "На панель",
     "back_to_settings": "В настройки",
     "back": "Назад",
     "error": "Ошибка",
@@ -64,7 +64,7 @@
       "website": "Сайт Poznote",
       "github_star": "Поставить звезду на GitHub",
       "guestbook": "Гостевая книга Poznote",
-      "support": "Soutenir Tim",
+      "support": "Поддержать Poznote",
       "install_extension": "Установить расширение",
       "install_app": "Установить приложение",
       "release_notes": "Примечания к выпуску",
@@ -75,6 +75,8 @@
       "git_sync_toggle": "Синхронизация Git"
     },
     "install_app": {
+      "launching": "Установка сейчас начнется. Пожалуйста, подождите...",
+      "launching_acknowledge": "Понятно",
       "unavailable": "Установка сейчас недоступна. В Chrome на мобильном устройстве откройте меню браузера и нажмите \"Установить приложение\" (или \"Добавить на главный экран\"), когда эта опция станет доступна.",
       "already_installed": "Приложение уже установлено на этом устройстве.",
       "status": {
@@ -290,7 +292,7 @@
       "filter_placeholder": "Фильтровать элементы...",
       "no_results": "Подходящие элементы не найдены.",
       "sections": {
-        "home_cards": "Карточки главной страницы",
+        "home_cards": "Карточки панели",
         "create_cards": "Карточки создания",
         "settings_cards": "Карточки настроек",
         "toolbar": "Панель инструментов",
@@ -572,8 +574,19 @@
     }
   },
   "notes_manager": {
+    "actions": "Массовые действия",
+    "choose_action": "Выберите действие...",
     "select_folder": "Выберите целевую папку",
+    "add_tag": "Добавить тег",
+    "remove_tag": "Удалить тег",
+    "add_favorite": "Добавить в избранное",
+    "remove_favorite": "Убрать из избранного",
+    "move_to_trash": "Переместить в корзину",
+    "trash_confirm": "Переместить выбранные заметки в корзину?",
+    "enter_tag": "Введите хотя бы один тег",
+    "tags_placeholder": "тег1, тег2",
     "move": "Переместить",
+    "applying": "Применение...",
     "selected": "выбрано",
     "select_all": "Выбрать все видимые",
     "deselect_all": "Снять выделение",
@@ -581,6 +594,7 @@
     "moving": "Перемещение...",
     "moved": "Успешно перемещено",
     "root": "Корень (без папки)",
+    "filter_folders": "Фильтр папок...",
     "filter_placeholder": "Фильтр заметок по названию или тегам..."
   },
   "update": {
@@ -1312,7 +1326,7 @@
     "shared_folder_title": "Общая папка",
     "note_shared_through_folder": "Заметка опубликована через папку",
     "folder_shared_through_parent": "Папка опубликована через родительскую папку",
-    "token_help": "Токен — это уникальный идентификатор в публичной ссылке общего доступа. Пример: https://vash-domen.primer/moya-obshchaya-zametka",
+    "token_help": "Токен — это уникальная часть публичной ссылки, которую вы выбираете. Например, если использовать proekt-2026, URL заметки может быть https://vash-domen.primer/proekt-2026, а URL папки — https://vash-domen.primer/folder/proekt-2026.",
     "indexable": "Индексируется",
     "password_protected": "Защищено паролем",
     "add_password_title": "Добавить защиту паролем",
@@ -1363,13 +1377,13 @@
   },
   "sidebar": {
     "display": "Отображение",
-    "home": "Главная",
+    "home": "Панель",
     "settings": "Настройки",
     "create": "Создать",
     "toggle": "Скрыть/Показать левую колонку"
   },
   "home": {
-    "title": "Главная",
+    "title": "Панель",
     "dashboard": "Панель управления",
     "folders": "Папки",
     "shared_notes": "Общие заметки",

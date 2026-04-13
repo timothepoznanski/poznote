@@ -395,6 +395,88 @@
         });
     }
 
+    function isStandaloneMode() {
+        return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    }
+
+    function refreshInstallAppBadge() {
+        var badge = document.getElementById('install-app-status');
+        if (!badge) return;
+
+        if (isStandaloneMode()) {
+            badge.textContent = tr('settings.install_app.status.installed', {}, 'Already installed');
+            badge.className = 'setting-status enabled';
+            return;
+        }
+
+        if (typeof window.poznoteCanInstallApp === 'function' && window.poznoteCanInstallApp()) {
+            badge.textContent = tr('settings.install_app.status.available', {}, 'Available');
+            badge.className = 'setting-status enabled';
+            return;
+        }
+
+        badge.textContent = tr('settings.install_app.status.unavailable', {}, 'Unavailable');
+        badge.className = 'setting-status disabled';
+    }
+
+    function showInstallAppLaunchNotice() {
+        var installStartingMsg = tr('settings.install_app.launching', {}, 'The installation will start. Please wait...');
+        var installStartingTitle = tr('common.please_wait', {}, 'Please wait');
+        var installStartingAcknowledge = tr('settings.install_app.launching_acknowledge', {}, 'Understood');
+
+        if (window.modalAlert && typeof window.modalAlert.showModal === 'function') {
+            window.modalAlert.showModal({
+                type: 'alert',
+                message: installStartingMsg,
+                alertType: 'info',
+                title: installStartingTitle,
+                buttons: [
+                    { text: installStartingAcknowledge, type: 'primary', action: function () { } }
+                ]
+            });
+            return;
+        }
+
+        alert(installStartingMsg);
+    }
+
+    async function handleInstallAppCardClick(event) {
+        if (event) {
+            event.preventDefault();
+        }
+
+        var title = tr('settings.cards.install_app', {}, 'Install application');
+
+        if (isStandaloneMode()) {
+            var alreadyInstalledMsg = tr('settings.install_app.already_installed', {}, 'The application is already installed on this device.');
+            if (window.modalAlert && typeof window.modalAlert.alert === 'function') {
+                window.modalAlert.alert(alreadyInstalledMsg, 'info', title);
+            } else {
+                alert(alreadyInstalledMsg);
+            }
+            return;
+        }
+
+        if (typeof window.poznotePromptInstall === 'function') {
+            var result = await window.poznotePromptInstall();
+            if (result && result.supported) {
+                if (result.outcome === 'accepted') {
+                    showInstallAppLaunchNotice();
+                }
+
+                refreshInstallAppBadge();
+                return;
+            }
+        }
+
+        var fallbackInstallMsg = tr('settings.install_app.unavailable', {}, 'Installation is not available right now. On Chrome mobile, open the browser menu then tap "Install app" (or "Add to Home screen") when available.');
+        if (window.modalAlert && typeof window.modalAlert.alert === 'function') {
+            window.modalAlert.alert(fallbackInstallMsg, 'info', title);
+        } else {
+            alert(fallbackInstallMsg);
+        }
+    }
+
     function showImportLimitsModal() {
         var modal = document.getElementById('importLimitsModal');
         var indInput = document.getElementById('importMaxIndividualFilesInput');
@@ -564,6 +646,14 @@
                 });
             }
         });
+
+        var installAppCard = document.getElementById('install-app-card');
+        if (installAppCard) {
+            refreshInstallAppBadge();
+            installAppCard.addEventListener('click', handleInstallAppCardClick);
+            window.addEventListener('poznote:pwa-install-available', refreshInstallAppBadge);
+            window.addEventListener('poznote:pwa-installed', refreshInstallAppBadge);
+        }
 
         // Check for updates card
         var checkUpdatesCard = document.getElementById('check-updates-card');
@@ -995,6 +1085,7 @@
             refreshNoteSortBadge();
             refreshTasklistInsertOrderBadge();
             refreshToolbarModeBadge();
+            refreshInstallAppBadge();
             refreshCustomCssBadge();
         });
     });

@@ -4,7 +4,7 @@
   },
   "common": {
     "notes": "Notizen",
-    "back_to_home": "Zur Startseite gehen",
+    "back_to_home": "Zum Dashboard gehen",
     "back_to_notes": "Zu den Notizen gehen",
     "back_to_settings": "Zu den Einstellungen gehen",
     "close": "Schließen",
@@ -338,7 +338,7 @@
       "website": "Poznote-Website",
       "github_star": "Auf GitHub einen Stern vergeben",
       "guestbook": "Poznote Gästebuch",
-      "support": "Soutenir Tim",
+      "support": "Poznote unterstützen",
       "custom_css": "Benutzerdefinierte CSS-Datei",
       "install_extension": "Erweiterung installieren",
       "install_app": "App installieren",
@@ -351,6 +351,8 @@
       "git_sync_toggle": "Git-Synchronisierung"
     },
     "install_app": {
+      "launching": "Die Installation wird gestartet. Bitte warten Sie...",
+      "launching_acknowledge": "Verstanden",
       "unavailable": "Die Installation ist derzeit nicht verfügbar. Öffnen Sie auf Chrome Mobile das Browsermenü und tippen Sie auf \"App installieren\" (oder \"Zum Startbildschirm hinzufügen\"), sobald die Option verfügbar ist.",
       "already_installed": "Die App ist auf diesem Gerät bereits installiert.",
       "status": {
@@ -480,13 +482,13 @@
   },
   "sidebar": {
     "display": "Anzeige",
-    "home": "Startseite",
+    "home": "Dashboard",
     "settings": "Einstellungen",
     "create": "Erstellen",
     "toggle": "Linke Spalte ein-/ausblenden"
   },
   "home": {
-    "title": "Startseite",
+    "title": "Dashboard",
     "dashboard": "Dashboard",
     "folders": "Ordner",
     "shared_notes": "Geteilte Notizen",
@@ -756,7 +758,7 @@
       "filter_placeholder": "Elemente filtern...",
       "no_results": "Keine passenden Elemente gefunden.",
       "sections": {
-        "home_cards": "Startseitenkarten",
+        "home_cards": "Dashboard-Karten",
         "create_cards": "Erstellungskarten",
         "settings_cards": "Einstellungskarten",
         "toolbar": "Symbolleiste",
@@ -1036,8 +1038,19 @@
     }
   },
   "notes_manager": {
+    "actions": "Stapelaktionen",
+    "choose_action": "Aktion auswählen...",
     "select_folder": "Wählen Sie einen Zielordner",
+    "add_tag": "Tag hinzufügen",
+    "remove_tag": "Tag entfernen",
+    "add_favorite": "Zu Favoriten hinzufügen",
+    "remove_favorite": "Aus Favoriten entfernen",
+    "move_to_trash": "In den Papierkorb verschieben",
+    "trash_confirm": "Ausgewählte Notizen in den Papierkorb verschieben?",
+    "enter_tag": "Mindestens ein Tag eingeben",
+    "tags_placeholder": "tag1, tag2",
     "move": "Verschieben",
+    "applying": "Wird angewendet...",
     "selected": "ausgewählt",
     "select_all": "Alle sichtbaren auswählen",
     "deselect_all": "Alle deselektieren",
@@ -1045,6 +1058,7 @@
     "moving": "Wird verschoben...",
     "moved": "Erfolgreich verschoben",
     "root": "Stammverzeichnis (kein Ordner)",
+    "filter_folders": "Ordner filtern...",
     "filter_placeholder": "Notizen nach Titel oder Tags filtern..."
   },
   "update": {
@@ -1679,7 +1693,7 @@
     "shared_folder_title": "Geteilter Ordner",
     "note_shared_through_folder": "Notiz über Ordner geteilt",
     "folder_shared_through_parent": "Ordner über übergeordneten Ordner geteilt",
-    "token_help": "Das Token ist die eindeutige Kennung in einer öffentlichen Freigabe-URL. Beispiel: https://ihre-domain.beispiel/meine-geteilte-notiz",
+    "token_help": "Das Token ist der eindeutige Teil, den Sie im öffentlichen Link wählen. Wenn Sie zum Beispiel projekt-2026 verwenden, wird daraus für eine Notiz https://ihre-domain.beispiel/projekt-2026 und für einen Ordner https://ihre-domain.beispiel/folder/projekt-2026.",
     "indexable": "Indexierbar",
     "password_protected": "Passwortgeschützt",
     "add_password_title": "Passwortschutz hinzufügen",

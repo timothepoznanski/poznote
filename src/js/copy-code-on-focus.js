@@ -155,6 +155,40 @@
         return text;
     }
 
+    function ensureCodeBlockActionHost(block) {
+        if (!block || !block.parentNode) return block;
+
+        var host = block.parentElement;
+        if (host && host.classList && host.classList.contains('code-block-actions-host')) {
+            host.style.position = 'relative';
+            host.style.maxWidth = '100%';
+            host.style.boxSizing = 'border-box';
+            return host;
+        }
+
+        host = document.createElement('div');
+        host.className = 'code-block-actions-host';
+        host.style.position = 'relative';
+        host.style.maxWidth = '100%';
+        host.style.boxSizing = 'border-box';
+
+        block.parentNode.insertBefore(host, block);
+        host.appendChild(block);
+
+        return host;
+    }
+
+    function getCodeBlockRemovalTarget(block) {
+        if (!block) return block;
+
+        var host = block.parentElement;
+        if (host && host.classList && host.classList.contains('code-block-actions-host')) {
+            return host;
+        }
+
+        return block;
+    }
+
     // Add copy button to code blocks
     function addCopyButtonToCodeBlocks() {
         // Find all code blocks
@@ -165,10 +199,12 @@
             if (block.tagName.toLowerCase() === 'code' && block.parentElement.tagName.toLowerCase() !== 'pre') {
                 return;
             }
+
+            var actionHost = ensureCodeBlockActionHost(block);
             
             // Check if button already exists
-            var existingBtn = block.querySelector('.code-block-copy-btn');
-            var existingDelBtn = block.querySelector('.code-block-delete-btn');
+            var existingBtn = block.querySelector('.code-block-copy-btn') || actionHost.querySelector('.code-block-copy-btn');
+            var existingDelBtn = block.querySelector('.code-block-delete-btn') || actionHost.querySelector('.code-block-delete-btn');
             var btn;
             var delBtn;
             
@@ -193,6 +229,13 @@
                 setCopyIcon(btn);
             }
 
+            if (btn.parentNode !== actionHost) {
+                if (btn.parentNode) {
+                    btn.parentNode.removeChild(btn);
+                }
+                actionHost.appendChild(btn);
+            }
+
             var deleteBtnLabel = tl('editor.code_block_delete.title', 'Delete code block');
 
             if (existingDelBtn) {
@@ -210,6 +253,13 @@
                 delBtn.setAttribute('aria-label', deleteBtnLabel);
                 delBtn.setAttribute('title', deleteBtnLabel);
                 delBtn.innerHTML = DELETE_ICON_SVG;
+            }
+
+            if (delBtn.parentNode !== actionHost) {
+                if (delBtn.parentNode) {
+                    delBtn.parentNode.removeChild(delBtn);
+                }
+                actionHost.appendChild(delBtn);
             }
             
             // Add/re-attach click handler for copy
@@ -315,7 +365,8 @@
 
                     // --- Rich-text mode: remove the DOM block directly ---
                     var noteentry = block.closest('.noteentry') || document.querySelector('.noteentry');
-                    block.remove();
+                    var removalTarget = getCodeBlockRemovalTarget(block);
+                    removalTarget.remove();
                     if (typeof window.markNoteAsModified === 'function') {
                         window.markNoteAsModified();
                     }
@@ -332,14 +383,6 @@
                     doDelete();
                 }
             });
-            
-            // Add button to the code block only if it's new
-            if (!existingBtn) {
-                block.appendChild(btn);
-            }
-            if (!existingDelBtn) {
-                block.appendChild(delBtn);
-            }
         });
     }
 

@@ -4,7 +4,7 @@
   },
   "common": {
     "notes": "Notas",
-    "back_to_home": "Ir al inicio",
+    "back_to_home": "Ir al panel",
     "back_to_notes": "Ir a las notas",
     "back_to_settings": "Ir a la configuración",
     "close": "Cerrar",
@@ -338,7 +338,7 @@
       "website": "Sitio web de Poznote",
       "github_star": "Dar una estrella en GitHub",
       "guestbook": "Libro de visitas de Poznote",
-      "support": "Soutenir Tim",
+      "support": "Apoyar Poznote",
       "custom_css": "Archivo CSS personalizado",
       "install_app": "Instalar aplicación",
       "release_notes": "Notas de la versión",
@@ -350,6 +350,8 @@
       "git_sync_toggle": "Sincronización Git"
     },
     "install_app": {
+      "launching": "La instalación va a iniciarse. Por favor, espere...",
+      "launching_acknowledge": "Entendido",
       "unavailable": "La instalación no está disponible ahora mismo. En Chrome móvil, abre el menú del navegador y pulsa \"Instalar aplicación\" (o \"Agregar a la pantalla de inicio\") cuando la opción esté disponible.",
       "already_installed": "La aplicación ya está instalada en este dispositivo.",
       "status": {
@@ -479,13 +481,13 @@
   },
   "sidebar": {
     "display": "Pantalla",
-    "home": "Inicio",
+    "home": "Panel",
     "settings": "Configuración",
     "create": "Crear",
     "toggle": "Mostrar/Ocultar la columna izquierda"
   },
   "home": {
-    "title": "Inicio",
+    "title": "Panel",
     "dashboard": "Panel",
     "folders": "Carpetas",
     "shared_notes": "Notas compartidas",
@@ -755,7 +757,7 @@
       "filter_placeholder": "Filtrar elementos...",
       "no_results": "No se encontraron elementos coincidentes.",
       "sections": {
-        "home_cards": "Tarjetas de inicio",
+        "home_cards": "Tarjetas del panel",
         "create_cards": "Tarjetas de creación",
         "settings_cards": "Tarjetas de configuración",
         "toolbar": "Barra de herramientas",
@@ -1035,8 +1037,19 @@
     }
   },
   "notes_manager": {
+    "actions": "Acciones masivas",
+    "choose_action": "Elegir una acción...",
     "select_folder": "Seleccione una carpeta de destino",
+    "add_tag": "Añadir etiqueta",
+    "remove_tag": "Quitar etiqueta",
+    "add_favorite": "Añadir a favoritos",
+    "remove_favorite": "Quitar de favoritos",
+    "move_to_trash": "Mover a la papelera",
+    "trash_confirm": "¿Mover las notas seleccionadas a la papelera?",
+    "enter_tag": "Introduce al menos una etiqueta",
+    "tags_placeholder": "etiqueta1, etiqueta2",
     "move": "Mover",
+    "applying": "Aplicando...",
     "selected": "seleccionado(s)",
     "select_all": "Seleccionar todo lo visible",
     "deselect_all": "Deseleccionar todo",
@@ -1044,6 +1057,7 @@
     "moving": "Moviendo...",
     "moved": "Movido con éxito",
     "root": "Raíz (sin carpeta)",
+    "filter_folders": "Filtrar carpetas...",
     "filter_placeholder": "Filtrar notas por título o etiquetas..."
   },
   "update": {
@@ -1678,7 +1692,7 @@
     "shared_folder_title": "Carpeta compartida",
     "note_shared_through_folder": "Nota compartida mediante carpeta",
     "folder_shared_through_parent": "Carpeta compartida mediante carpeta padre",
-    "token_help": "El token es el identificador único utilizado en una URL pública compartida. Ejemplo: https://tu-dominio.ejemplo/mi-nota-compartida",
+    "token_help": "El token es la parte única que eliges en el enlace público. Por ejemplo, si usas proyecto-2026, la URL de una nota puede ser https://tu-dominio.ejemplo/proyecto-2026 y la de una carpeta https://tu-dominio.ejemplo/folder/proyecto-2026.",
     "indexable": "Indexable",
     "password_protected": "Protegido con contraseña",
     "add_password_title": "Agregar protección con contraseña",

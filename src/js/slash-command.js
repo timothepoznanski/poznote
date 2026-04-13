@@ -57,7 +57,7 @@
     let savedNoteEntry = null;
     let savedEditableElement = null;
     let activeCommands = null;
-    const MARKDOWN_SLASH_CURSOR_HIDDEN_CLASS = 'markdown-slash-cursor-hidden';
+    const SLASH_CURSOR_HIDDEN_CLASS = 'slash-menu-cursor-hidden';
 
     // Touch tracking for distinguishing tap from scroll
     let touchStartX = 0;
@@ -71,35 +71,35 @@
         return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     }
 
-    function clearMarkdownSlashCursorHide() {
-        document.removeEventListener('pointermove', handleMarkdownSlashCursorReveal, true);
-        document.removeEventListener('mousemove', handleMarkdownSlashCursorReveal, true);
+    function clearSlashCursorHide() {
+        document.removeEventListener('pointermove', handleSlashCursorReveal, true);
+        document.removeEventListener('mousemove', handleSlashCursorReveal, true);
 
         if (document.body) {
-            document.body.classList.remove(MARKDOWN_SLASH_CURSOR_HIDDEN_CLASS);
+            document.body.classList.remove(SLASH_CURSOR_HIDDEN_CLASS);
         }
     }
 
-    function handleMarkdownSlashCursorReveal(event) {
+    function handleSlashCursorReveal(event) {
         if (event.type === 'pointermove' && event.pointerType && event.pointerType !== 'mouse') {
             return;
         }
 
-        clearMarkdownSlashCursorHide();
+        clearSlashCursorHide();
     }
 
-    function hideCursorForMarkdownSlashMenu() {
+    function hideCursorForSlashMenu() {
         const isMobile = window.innerWidth < 768;
 
-        clearMarkdownSlashCursorHide();
+        clearSlashCursorHide();
 
         if (isMobile || !document.body) {
             return;
         }
 
-        document.body.classList.add(MARKDOWN_SLASH_CURSOR_HIDDEN_CLASS);
-        document.addEventListener('pointermove', handleMarkdownSlashCursorReveal, true);
-        document.addEventListener('mousemove', handleMarkdownSlashCursorReveal, true);
+        document.body.classList.add(SLASH_CURSOR_HIDDEN_CLASS);
+        document.addEventListener('pointermove', handleSlashCursorReveal, true);
+        document.addEventListener('mousemove', handleSlashCursorReveal, true);
     }
 
     // Get the Markdown editor from the current selection
@@ -2166,7 +2166,7 @@
 
     // Hide slash menu and all its submenus
     function hideSlashMenu() {
-        clearMarkdownSlashCursorHide();
+        clearSlashCursorHide();
 
         if (!slashMenuElement) return;
 
@@ -3141,9 +3141,7 @@
             savedEditableElement.blur();
         }
 
-        if (ctx.noteType === 'markdown') {
-            hideCursorForMarkdownSlashMenu();
-        }
+        hideCursorForSlashMenu();
     }
 
     // Handle user input (/ detection)

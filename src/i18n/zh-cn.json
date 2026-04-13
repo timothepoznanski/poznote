@@ -4,7 +4,7 @@
   },
   "common": {
     "notes": "笔记",
-    "back_to_home": "前往主页",
+    "back_to_home": "前往仪表盘",
     "back_to_notes": "前往笔记",
     "back_to_settings": "前往设置",
     "close": "关闭",
@@ -341,7 +341,7 @@
       "github_star": "在 GitHub 上加星",
       "guestbook": "Poznote 留言板",
       "custom_css": "自定义 CSS 文件",
-      "support": "Soutenir Tim",
+      "support": "支持 Poznote",
       "install_app": "安装应用",
       "release_notes": "发布日志",
       "convert_images": "Base64 Image Converter",
@@ -351,6 +351,8 @@
       "git_sync_toggle": "Git 同步"
     },
     "install_app": {
+      "launching": "安装即将开始，请稍候...",
+      "launching_acknowledge": "明白了",
       "unavailable": "当前无法安装。请在 Chrome 手机版中打开浏览器菜单，然后在可用时点击“安装应用”（或“添加到主屏幕”）。",
       "already_installed": "该设备已安装此应用。",
       "status": {
@@ -480,13 +482,13 @@
   },
   "sidebar": {
     "display": "显示",
-    "home": "首页",
+    "home": "仪表盘",
     "settings": "设置",
     "create": "创建",
     "toggle": "显示/隐藏左侧边栏"
   },
   "home": {
-    "title": "首页",
+    "title": "仪表盘",
     "dashboard": "仪表盘",
     "folders": "文件夹",
     "shared_notes": "共享笔记",
@@ -756,7 +758,7 @@
       "filter_placeholder": "筛选项目...",
       "no_results": "未找到匹配的项目。",
       "sections": {
-        "home_cards": "首页卡片",
+        "home_cards": "仪表盘卡片",
         "create_cards": "创建卡片",
         "settings_cards": "设置卡片",
         "toolbar": "工具栏",
@@ -1026,8 +1028,19 @@
     }
   },
   "notes_manager": {
+    "actions": "批量操作",
+    "choose_action": "选择操作...",
     "select_folder": "选择目标文件夹",
+    "add_tag": "添加标签",
+    "remove_tag": "移除标签",
+    "add_favorite": "添加到收藏",
+    "remove_favorite": "从收藏中移除",
+    "move_to_trash": "移到回收站",
+    "trash_confirm": "将选中的笔记移到回收站？",
+    "enter_tag": "至少输入一个标签",
+    "tags_placeholder": "标签1, 标签2",
     "move": "移动",
+    "applying": "正在应用...",
     "selected": "已选择",
     "select_all": "选择全部可见",
     "deselect_all": "取消全选",
@@ -1035,6 +1048,7 @@
     "moving": "正在移动...",
     "moved": "成功移动",
     "root": "根目录 (无文件夹)",
+    "filter_folders": "筛选文件夹...",
     "filter_placeholder": "按标题或标签筛选..."
   },
   "update": {
@@ -1678,7 +1692,7 @@
     "shared_folder_title": "共享文件夹",
     "note_shared_through_folder": "笔记通过文件夹共享",
     "folder_shared_through_parent": "文件夹通过父文件夹共享",
-    "token_help": "Token 是公开分享 URL 中使用的唯一标识符。示例：https://your-domain.example/my-note-share",
+    "token_help": "Token 是你在公开链接中选择的唯一部分。例如，使用 project-2026 时，笔记链接可以是 https://your-domain.example/project-2026，文件夹链接可以是 https://your-domain.example/folder/project-2026。",
     "indexable": "可被索引",
     "password_protected": "受密码保护",
     "add_password_title": "添加密码保护",

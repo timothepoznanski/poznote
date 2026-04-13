@@ -4,7 +4,7 @@
   },
   "common": {
     "notes": "Notes",
-    "back_to_home": "Aller à l'accueil",
+    "back_to_home": "Aller au tableau de bord",
     "back_to_notes": "Aller aux notes",
     "back_to_settings": "Aller aux paramètres",
     "close": "Fermer",
@@ -350,7 +350,7 @@
       "website": "Site Poznote",
       "github_star": "Mettre une étoile sur GitHub",
       "guestbook": "Livre d'or Poznote",
-      "support": "Soutenir Tim",
+      "support": "Soutenir Poznote",
       "install_extension": "Installer l'extension",
       "install_app": "Installer l'application",
       "custom_css": "Chemin CSS personnalisé",
@@ -362,6 +362,8 @@
       "git_sync_toggle": "Synchronisation Git"
     },
     "install_app": {
+      "launching": "L’installation va se lancer. Veuillez patienter...",
+      "launching_acknowledge": "Compris",
       "unavailable": "L’installation n’est pas disponible pour le moment. Sur Chrome mobile, ouvrez le menu du navigateur puis appuyez sur \"Installer l’application\" (ou \"Ajouter à l’écran d’accueil\") quand l’option est disponible.",
       "already_installed": "L’application est déjà installée sur cet appareil.",
       "status": {
@@ -494,13 +496,13 @@
   },
   "sidebar": {
     "display": "Affichage",
-    "home": "Accueil",
+    "home": "Tableau de bord",
     "settings": "Paramètres",
     "create": "Créer",
     "toggle": "Cacher/Afficher la colonne de gauche"
   },
   "home": {
-    "title": "Accueil",
+    "title": "Tableau de bord",
     "dashboard": "Tableau de bord",
     "folders": "Dossiers",
     "shared_notes": "Notes partagées",
@@ -773,7 +775,7 @@
       "filter_placeholder": "Filtrer les éléments...",
       "no_results": "Aucun élément correspondant.",
       "sections": {
-        "home_cards": "Cartes de l'accueil",
+        "home_cards": "Cartes du tableau de bord",
         "create_cards": "Cartes de création",
         "settings_cards": "Cartes des paramètres",
         "toolbar": "Barre d'outils",
@@ -1060,8 +1062,19 @@
     }
   },
   "notes_manager": {
+    "actions": "Actions groupées",
+    "choose_action": "Choisir une action...",
     "select_folder": "Sélectionnez un dossier de destination",
+    "add_tag": "Ajouter un tag",
+    "remove_tag": "Supprimer un tag",
+    "add_favorite": "Ajouter aux favoris",
+    "remove_favorite": "Retirer des favoris",
+    "move_to_trash": "Mettre à la corbeille",
+    "trash_confirm": "Déplacer les notes sélectionnées dans la corbeille ?",
+    "enter_tag": "Saisissez au moins un tag",
+    "tags_placeholder": "tag1, tag2",
     "move": "Déplacer",
+    "applying": "Application...",
     "selected": "sélectionnée(s)",
     "select_all": "Tout sélectionner",
     "deselect_all": "Tout désélectionner",
@@ -1069,6 +1082,7 @@
     "moving": "Déplacement...",
     "moved": "Déplacé avec succès",
     "root": "Racine (aucun dossier)",
+    "filter_folders": "Filtrer les dossiers...",
     "filter_placeholder": "Filtrer les notes par titre ou tags..."
   },
   "update": {
@@ -1721,7 +1735,7 @@
     "shared_folder_title": "Dossier partagé",
     "note_shared_through_folder": "Note partagée via le dossier",
     "folder_shared_through_parent": "Dossier partagé via le dossier parent",
-    "token_help": "Le jeton est l'identifiant unique utilisé dans une URL de partage public. Exemple : https://votre-domaine.exemple/ma-note-partagee",
+    "token_help": "Le jeton est la partie unique que vous choisissez dans le lien public. Par exemple, avec projet-2026, l'URL d'une note peut devenir https://votre-domaine.exemple/projet-2026, et celle d'un dossier https://votre-domaine.exemple/folder/projet-2026.",
     "indexable": "Indexable",
     "password_protected": "Protégé par mot de passe",
     "add_password_title": "Ajouter une protection par mot de passe",

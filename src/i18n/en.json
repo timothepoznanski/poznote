@@ -17,7 +17,7 @@
     "not_defined": "Not defined",
     "loading": "Loading...",
     "back_to_notes": "Go to Notes",
-    "back_to_home": "Go to Home",
+    "back_to_home": "Go to Dashboard",
     "back_to_settings": "Go to Settings",
     "back": "Back",
     "error": "Error",
@@ -63,7 +63,7 @@
       "website": "Poznote Website",
       "github_star": "Star on GitHub",
       "guestbook": "Poznote Guestbook",
-      "support": "Soutenir Tim",
+      "support": "Support Poznote",
       "install_extension": "Install extension",
       "install_app": "Install application",
       "custom_css": "Custom CSS path",
@@ -75,6 +75,8 @@
       "git_sync_toggle": "Git Sync"
     },
     "install_app": {
+      "launching": "The installation will start. Please wait...",
+      "launching_acknowledge": "Understood",
       "unavailable": "Installation is not available right now. On Chrome mobile, open the browser menu then tap \"Install app\" (or \"Add to Home screen\") when available.",
       "already_installed": "The application is already installed on this device.",
       "status": {
@@ -290,7 +292,7 @@
       "filter_placeholder": "Filter items...",
       "no_results": "No matching items found.",
       "sections": {
-        "home_cards": "Home Cards",
+        "home_cards": "Dashboard Cards",
         "create_cards": "Create Cards",
         "settings_cards": "Settings Cards",
         "toolbar": "Toolbar",
@@ -572,8 +574,19 @@
     }
   },
   "notes_manager": {
+    "actions": "Bulk actions",
+    "choose_action": "Choose an action...",
     "select_folder": "Select a target folder",
+    "add_tag": "Add tag",
+    "remove_tag": "Remove tag",
+    "add_favorite": "Add to favorites",
+    "remove_favorite": "Remove from favorites",
+    "move_to_trash": "Move to trash",
+    "trash_confirm": "Move the selected notes to trash?",
+    "enter_tag": "Enter at least one tag",
+    "tags_placeholder": "tag1, tag2",
     "move": "Move",
+    "applying": "Applying...",
     "selected": "selected",
     "select_all": "Select all visible",
     "deselect_all": "Deselect all",
@@ -581,6 +594,7 @@
     "moving": "Moving...",
     "moved": "Moved successfully",
     "root": "Root (no folder)",
+    "filter_folders": "Filter folders...",
     "filter_placeholder": "Filter notes by title or tags..."
   },
   "update": {
@@ -1312,7 +1326,7 @@
     "shared_folder_title": "Shared Folder",
     "note_shared_through_folder": "Note shared through folder",
     "folder_shared_through_parent": "Folder shared through parent folder",
-    "token_help": "The token is the unique identifier used in a public share URL. Example: https://your-domain.example/my-note-share",
+    "token_help": "The token is the unique part you choose in the public link. For example, using project-2026 gives https://your-domain.example/project-2026 for a note, or https://your-domain.example/folder/project-2026 for a folder.",
     "indexable": "Indexable",
     "password_protected": "Password protected",
     "add_password_title": "Add password protection",
@@ -1366,13 +1380,13 @@
   },
   "sidebar": {
     "display": "Display",
-    "home": "Home",
+    "home": "Dashboard",
     "settings": "Settings",
     "create": "Create",
     "toggle": "Hide/Show left column"
   },
   "home": {
-    "title": "Home",
+    "title": "Dashboard",
     "dashboard": "Dashboard",
     "folders": "Folders",
     "shared_notes": "Shared Notes",

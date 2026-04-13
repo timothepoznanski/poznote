@@ -69,7 +69,11 @@ if ($isAdmin) {
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title><?php echo getPageTitle(); ?></title>
     <meta name="color-scheme" content="dark light">
+    <link rel="manifest" href="pwa/manifest.webmanifest?v=<?php echo $cache_v; ?>">
+    <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
+    <link rel="apple-touch-icon" href="pwa/poznote.png?v=<?php echo $cache_v; ?>">
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="pwa/pwa.js?v=<?php echo $cache_v; ?>" defer></script>
     <link rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/home/base.css?v=<?php echo $cache_v; ?>">
@@ -128,7 +132,7 @@ if ($isAdmin) {
             </a>
             <a id="backToHomeLink" href="home.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary go-to-nav-btn">
                 <i class="lucide lucide-home" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_home', [], 'Back to Home', $currentLang); ?>
+                <?php echo t_h('common.back_to_home', [], 'Back to Dashboard', $currentLang); ?>
             </a>
         </div>
 
@@ -190,6 +194,27 @@ if ($isAdmin) {
                         }
                         ?>
                     </span>
+                </div>
+            </div>
+
+            <!-- Browser Extension -->
+            <a href="https://chromewebstore.google.com/detail/poznote-url-saver/bmjclfamahegmgillaghhmnbkjebipbh" target="_blank" rel="noopener noreferrer" class="home-card" id="extension-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-chrome"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.install_extension', [], 'Install extension'); ?></span>
+                </div>
+            </a>
+
+            <!-- Install App -->
+            <div class="home-card" id="install-app-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-smartphone"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.install_app', [], 'Install application'); ?></span>
+                    <span id="install-app-status" class="setting-status disabled"><?php echo t_h('settings.install_app.status.unavailable', [], 'Unavailable'); ?></span>
                 </div>
             </div>
 

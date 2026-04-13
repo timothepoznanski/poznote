@@ -54,6 +54,16 @@ $currentLang = getUserLanguage();
       data-txt-select-all="<?php echo t_h('notes_manager.select_all', [], 'Select all'); ?>"
       data-txt-deselect-all="<?php echo t_h('notes_manager.deselect_all', [], 'Deselect all'); ?>"
       data-txt-move-to="<?php echo t_h('notes_manager.move_to', [], 'Move to...'); ?>"
+	data-txt-choose-action="<?php echo t_h('notes_manager.choose_action', [], 'Choose an action...'); ?>"
+	data-txt-add-tag="<?php echo t_h('notes_manager.add_tag', [], 'Add tag'); ?>"
+	data-txt-remove-tag="<?php echo t_h('notes_manager.remove_tag', [], 'Remove tag'); ?>"
+	data-txt-add-favorite="<?php echo t_h('notes_manager.add_favorite', [], 'Add to favorites'); ?>"
+	data-txt-remove-favorite="<?php echo t_h('notes_manager.remove_favorite', [], 'Remove from favorites'); ?>"
+	data-txt-trash="<?php echo t_h('notes_manager.move_to_trash', [], 'Move to trash'); ?>"
+	data-txt-trash-confirm="<?php echo t_h('notes_manager.trash_confirm', [], 'Move the selected notes to trash?'); ?>"
+	data-txt-enter-tag="<?php echo t_h('notes_manager.enter_tag', [], 'Enter at least one tag'); ?>"
+	data-txt-tags-placeholder="<?php echo t_h('notes_manager.tags_placeholder', [], 'tag1, tag2'); ?>"
+	data-txt-applying="<?php echo t_h('notes_manager.applying', [], 'Applying...'); ?>"
       data-txt-moving="<?php echo t_h('notes_manager.moving', [], 'Moving...'); ?>"
       data-txt-moved="<?php echo t_h('notes_manager.moved', [], 'Moved successfully'); ?>"
       data-txt-root="<?php echo t_h('notes_manager.root', [], 'Root (no folder)'); ?>">
@@ -66,17 +76,11 @@ $currentLang = getUserLanguage();
 				<i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
 				<?php echo t_h('common.back_to_notes'); ?>
 			</button>
-			<button id="backToHomeBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_home', [], 'Back to Home'); ?>">
+			<button id="backToHomeBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_home', [], 'Back to Dashboard'); ?>">
 				<i class="lucide lucide-home" style="margin-right: 5px;"></i>
-				<?php echo t_h('common.back_to_home', [], 'Back to Home'); ?>
+				<?php echo t_h('common.back_to_home', [], 'Back to Dashboard'); ?>
 			</button>
 		</div>
-
-		<h1 class="notes-manager-title">
-			<?php if ($pageWorkspace): ?>
-				<span class="notes-manager-workspace-badge"><?php echo htmlspecialchars($pageWorkspace); ?></span>
-			<?php endif; ?>
-		</h1>
 
 		<!-- Filter bar -->
 		<div class="nm-filter-bar">
@@ -98,19 +102,31 @@ $currentLang = getUserLanguage();
 
 		<!-- Bulk action bar (hidden by default) -->
 		<div id="nmBulkBar" class="nm-bulk-bar nm-bulk-bar-hidden">
-			<div class="nm-bulk-left">
+			<div class="nm-bulk-count-wrap">
 				<span id="nmSelectedCount" class="nm-selected-count"></span>
+			</div>
+			<div class="nm-bulk-actions">
 				<button id="nmSelectAllBtn" class="btn btn-sm btn-secondary nm-bulk-btn">
 					<?php echo t_h('notes_manager.select_all', [], 'Select all visible'); ?>
 				</button>
 				<button id="nmDeselectAllBtn" class="btn btn-sm btn-secondary nm-bulk-btn">
 					<?php echo t_h('notes_manager.deselect_all', [], 'Deselect all'); ?>
 				</button>
+				<select
+					id="nmBulkActionSelect"
+					class="nm-bulk-select"
+					disabled
+					aria-label="<?php echo t_h('notes_manager.actions', [], 'Bulk actions'); ?>"
+				>
+					<option value=""><?php echo t_h('notes_manager.choose_action', [], 'Choose an action...'); ?></option>
+					<option value="move"><?php echo t_h('notes_manager.move_to', [], 'Move to...'); ?></option>
+					<option value="add-tag"><?php echo t_h('notes_manager.add_tag', [], 'Add tag'); ?></option>
+					<option value="remove-tag"><?php echo t_h('notes_manager.remove_tag', [], 'Remove tag'); ?></option>
+					<option value="add-favorite"><?php echo t_h('notes_manager.add_favorite', [], 'Add to favorites'); ?></option>
+					<option value="remove-favorite"><?php echo t_h('notes_manager.remove_favorite', [], 'Remove from favorites'); ?></option>
+					<option value="trash"><?php echo t_h('notes_manager.move_to_trash', [], 'Move to trash'); ?></option>
+				</select>
 			</div>
-			<div class="nm-bulk-right">
-				<button id="nmMoveBtn" class="btn btn-sm btn-primary nm-bulk-btn">
-					<?php echo t_h('notes_manager.move_to', [], 'Move to...'); ?>
-				</button>
 			</div>
 		</div>
 
@@ -144,11 +160,39 @@ $currentLang = getUserLanguage();
 					<!-- Folder options rendered by JS -->
 				</div>
 			</div>
-			<div class="modal-buttons">
+			<div class="modal-buttons nm-move-modal-buttons">
+				<button id="nmCancelMove" class="btn-cancel">
+					<?php echo t_h('common.cancel', [], 'Cancel'); ?>
+				</button>
 				<button id="nmConfirmMove" class="btn-primary" disabled>
 					<?php echo t_h('notes_manager.move', [], 'Move'); ?>
 				</button>
-				<button id="nmCancelMove" class="btn-cancel">
+			</div>
+		</div>
+	</div>
+
+	<!-- Tag modal -->
+	<div id="nmTagModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="nmTagModalTitle">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 id="nmTagModalTitle">
+					<?php echo t_h('notes_manager.add_tag', [], 'Add tag'); ?>
+				</h3>
+			</div>
+			<div class="modal-body">
+				<input
+					type="text"
+					id="nmTagInput"
+					class="nm-modal-input"
+					placeholder="<?php echo t_h('notes_manager.tags_placeholder', [], 'tag1, tag2'); ?>"
+					autocomplete="off"
+				/>
+			</div>
+			<div class="modal-buttons">
+				<button id="nmConfirmTag" class="btn-primary" disabled>
+					<?php echo t_h('notes_manager.add_tag', [], 'Add tag'); ?>
+				</button>
+				<button id="nmCancelTag" class="btn-cancel">
 					<?php echo t_h('common.cancel', [], 'Cancel'); ?>
 				</button>
 			</div>
