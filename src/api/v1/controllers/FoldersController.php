@@ -211,6 +211,26 @@ class FoldersController {
     }
 
     /**
+     * Normalize stored folder icon classes for API consumers.
+     */
+    private function normalizeFolderIcon(?string $icon): ?string {
+        if (!is_string($icon)) {
+            return null;
+        }
+
+        $icon = trim($icon);
+        if ($icon === '') {
+            return null;
+        }
+
+        if (function_exists('convertFontAwesomeToLucide')) {
+            return convertFontAwesomeToLucide($icon);
+        }
+
+        return $icon;
+    }
+
+    /**
      * Send JSON response
      */
     private function sendJson(array $data, int $code = 200): void {
@@ -275,7 +295,7 @@ class FoldersController {
                 'id' => $id,
                 'name' => (string)$r['name'],
                 'parent_id' => $r['parent_id'] !== null ? (int)$r['parent_id'] : null,
-                'icon' => $r['icon'] ?? null,
+                'icon' => $this->normalizeFolderIcon($r['icon'] ?? null),
                 'icon_color' => $r['icon_color'] ?? null,
                 'created' => $r['created'] ?? null,
             ];
@@ -366,7 +386,7 @@ class FoldersController {
                 'id' => (int)$folder['id'],
                 'name' => $folder['name'],
                 'parent_id' => $folder['parent_id'] !== null ? (int)$folder['parent_id'] : null,
-                'icon' => $folder['icon'],
+                'icon' => $this->normalizeFolderIcon($folder['icon'] ?? null),
                 'icon_color' => $folder['icon_color'],
                 'workspace' => $folder['workspace'],
                 'path' => $this->computeFolderPath($folderId, $foldersById),
@@ -942,7 +962,7 @@ class FoldersController {
             return;
         }
 
-        $iconValue = $icon === '' ? null : $icon;
+        $iconValue = $this->normalizeFolderIcon($icon);
         $iconColorValue = $iconColor === '' ? null : $iconColor;
 
         $stmt = $this->db->prepare("UPDATE folders SET icon = ?, icon_color = ? WHERE id = ?");
