@@ -1692,7 +1692,7 @@
     "shared_folder_title": "Carpeta compartida",
     "note_shared_through_folder": "Nota compartida mediante carpeta",
     "folder_shared_through_parent": "Carpeta compartida mediante carpeta padre",
-    "token_help": "El token es el identificador único utilizado en una URL pública compartida. Ejemplo: https://tu-dominio.ejemplo/mi-nota-compartida",
+    "token_help": "El token es la parte única que eliges en el enlace público. Por ejemplo, si usas proyecto-2026, la URL de una nota puede ser https://tu-dominio.ejemplo/proyecto-2026 y la de una carpeta https://tu-dominio.ejemplo/folder/proyecto-2026.",
     "indexable": "Indexable",
     "password_protected": "Protegido con contraseña",
     "add_password_title": "Agregar protección con contraseña",

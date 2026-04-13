@@ -1692,7 +1692,7 @@
     "shared_folder_title": "共享文件夹",
     "note_shared_through_folder": "笔记通过文件夹共享",
     "folder_shared_through_parent": "文件夹通过父文件夹共享",
-    "token_help": "Token 是公开分享 URL 中使用的唯一标识符。示例：https://your-domain.example/my-note-share",
+    "token_help": "Token 是你在公开链接中选择的唯一部分。例如，使用 project-2026 时，笔记链接可以是 https://your-domain.example/project-2026，文件夹链接可以是 https://your-domain.example/folder/project-2026。",
     "indexable": "可被索引",
     "password_protected": "受密码保护",
     "add_password_title": "添加密码保护",

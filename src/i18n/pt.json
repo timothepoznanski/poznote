@@ -1698,7 +1698,7 @@
     "shared_folder_title": "Pasta compartilhada",
     "note_shared_through_folder": "Nota compartilhada via pasta",
     "folder_shared_through_parent": "Pasta compartilhada via pasta pai",
-    "token_help": "O token é o identificador único usado em uma URL pública de compartilhamento. Exemplo: https://seu-dominio.exemplo/minha-nota-compartilhada",
+    "token_help": "O token é a parte única que você escolhe no link público. Por exemplo, usando projeto-2026, a URL de uma nota pode ficar https://seu-dominio.exemplo/projeto-2026 e a de uma pasta https://seu-dominio.exemplo/folder/projeto-2026.",
     "indexable": "Indexável",
     "password_protected": "Protegido por senha",
     "add_password_title": "Adicionar proteção por senha",

@@ -580,7 +580,7 @@ try {
                             <i class="lucide lucide-upload"></i>
                         </div>
                         <div class="home-card-content">
-                            <span class="home-card-title"><?php echo t_h('git_sync.actions.push.button', $gitProviderParams, 'Push'); ?></span>
+                            <span class="home-card-title">Push</span>
                             <span class="home-card-count"><?php echo htmlspecialchars(getGitProviderName($gitProviderRaw)); ?></span>
                         </div>
                     </form>
@@ -593,7 +593,7 @@ try {
                             <i class="lucide lucide-download"></i>
                         </div>
                         <div class="home-card-content">
-                            <span class="home-card-title"><?php echo t_h('git_sync.actions.pull.button', $gitProviderParams, 'Pull'); ?></span>
+                            <span class="home-card-title">Pull</span>
                             <span class="home-card-count"><?php echo htmlspecialchars(getGitProviderName($gitProviderRaw)); ?></span>
                         </div>
                     </form>
@@ -604,7 +604,7 @@ try {
                             <i class="lucide lucide-upload"></i>
                         </div>
                         <div class="home-card-content">
-                            <span class="home-card-title"><?php echo t_h('git_sync.actions.push.button', $gitProviderParams, 'Push'); ?></span>
+                            <span class="home-card-title">Push</span>
                             <span class="home-card-count" style="color: #6b7280; font-size: 0.85em;"><?php echo t_h('git_sync.config.not_configured_yet', $gitProviderParams, 'Not configured yet'); ?></span>
                         </div>
                     </a>
@@ -615,7 +615,7 @@ try {
                             <i class="lucide lucide-download"></i>
                         </div>
                         <div class="home-card-content">
-                            <span class="home-card-title"><?php echo t_h('git_sync.actions.pull.button', $gitProviderParams, 'Pull'); ?></span>
+                            <span class="home-card-title">Pull</span>
                             <span class="home-card-count" style="color: #6b7280; font-size: 0.85em;"><?php echo t_h('git_sync.config.not_configured_yet', $gitProviderParams, 'Not configured yet'); ?></span>
                         </div>
                     </a>

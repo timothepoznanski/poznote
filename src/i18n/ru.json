@@ -1326,7 +1326,7 @@
     "shared_folder_title": "Общая папка",
     "note_shared_through_folder": "Заметка опубликована через папку",
     "folder_shared_through_parent": "Папка опубликована через родительскую папку",
-    "token_help": "Токен — это уникальный идентификатор в публичной ссылке общего доступа. Пример: https://vash-domen.primer/moya-obshchaya-zametka",
+    "token_help": "Токен — это уникальная часть публичной ссылки, которую вы выбираете. Например, если использовать proekt-2026, URL заметки может быть https://vash-domen.primer/proekt-2026, а URL папки — https://vash-domen.primer/folder/proekt-2026.",
     "indexable": "Индексируется",
     "password_protected": "Защищено паролем",
     "add_password_title": "Добавить защиту паролем",

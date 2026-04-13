@@ -1693,7 +1693,7 @@
     "shared_folder_title": "Geteilter Ordner",
     "note_shared_through_folder": "Notiz über Ordner geteilt",
     "folder_shared_through_parent": "Ordner über übergeordneten Ordner geteilt",
-    "token_help": "Das Token ist die eindeutige Kennung in einer öffentlichen Freigabe-URL. Beispiel: https://ihre-domain.beispiel/meine-geteilte-notiz",
+    "token_help": "Das Token ist der eindeutige Teil, den Sie im öffentlichen Link wählen. Wenn Sie zum Beispiel projekt-2026 verwenden, wird daraus für eine Notiz https://ihre-domain.beispiel/projekt-2026 und für einen Ordner https://ihre-domain.beispiel/folder/projekt-2026.",
     "indexable": "Indexierbar",
     "password_protected": "Passwortgeschützt",
     "add_password_title": "Passwortschutz hinzufügen",

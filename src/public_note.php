@@ -82,7 +82,7 @@ if (empty($token) && (empty($folderToken) || empty($noteIdParam))) {
             'badge' => '400',
             'title' => t_h('public.errors.token_or_folder_auth_missing', [], 'Token or folder authorization missing', $currentLang),
             'message' => t_h('public.errors.shared_note_not_found_or_denied', [], 'Shared note not found or access denied. This can happen after a restore. An administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.', $currentLang),
-            'hint' => t_h('public.token_help', [], 'The token is the unique identifier used in a public share URL. Example: https://your-domain.example/my-note-share', $currentLang),
+            'hint' => t_h('public.token_help', [], 'The token is the unique part you choose in the public link. For example, using project-2026 gives https://your-domain.example/project-2026 for a note, or https://your-domain.example/folder/project-2026 for a folder.', $currentLang),
             'actions' => [
                 [
                     'href' => '/index.php',

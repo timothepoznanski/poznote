@@ -1735,7 +1735,7 @@
     "shared_folder_title": "Dossier partagé",
     "note_shared_through_folder": "Note partagée via le dossier",
     "folder_shared_through_parent": "Dossier partagé via le dossier parent",
-    "token_help": "Le jeton est l'identifiant unique utilisé dans une URL de partage public. Exemple : https://votre-domaine.exemple/ma-note-partagee",
+    "token_help": "Le jeton est la partie unique que vous choisissez dans le lien public. Par exemple, avec projet-2026, l'URL d'une note peut devenir https://votre-domaine.exemple/projet-2026, et celle d'un dossier https://votre-domaine.exemple/folder/projet-2026.",
     "indexable": "Indexable",
     "password_protected": "Protégé par mot de passe",
     "add_password_title": "Ajouter une protection par mot de passe",
