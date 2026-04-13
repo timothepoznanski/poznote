@@ -11,6 +11,17 @@
         txtSelected:    body.getAttribute('data-txt-selected') || 'selected',
         txtSelectAll:   body.getAttribute('data-txt-select-all') || 'Select all visible',
         txtDeselectAll: body.getAttribute('data-txt-deselect-all') || 'Deselect all',
+        txtMove:        body.getAttribute('data-txt-move') || 'Move',
+        txtChooseAction: body.getAttribute('data-txt-choose-action') || 'Choose an action...',
+        txtAddTag:      body.getAttribute('data-txt-add-tag') || 'Add tag',
+        txtRemoveTag:   body.getAttribute('data-txt-remove-tag') || 'Remove tag',
+        txtAddFavorite: body.getAttribute('data-txt-add-favorite') || 'Add to favorites',
+        txtRemoveFavorite: body.getAttribute('data-txt-remove-favorite') || 'Remove from favorites',
+        txtTrash:       body.getAttribute('data-txt-trash') || 'Move to trash',
+        txtTrashConfirm: body.getAttribute('data-txt-trash-confirm') || 'Move the selected notes to trash?',
+        txtEnterTag:    body.getAttribute('data-txt-enter-tag') || 'Enter at least one tag',
+        txtTagsPlaceholder: body.getAttribute('data-txt-tags-placeholder') || 'tag1, tag2',
+        txtApplying:    body.getAttribute('data-txt-applying') || 'Applying...',
         txtMoveTo:      body.getAttribute('data-txt-move-to') || 'Move to...',
         txtMoving:      body.getAttribute('data-txt-moving') || 'Moving...',
         txtMoved:       body.getAttribute('data-txt-moved') || 'Moved successfully',
@@ -24,6 +35,7 @@
     var selectedIds = new Set();
     var filterText = '';
     var movingToFolderId = null; // null = root; number = folder id
+    var currentTagAction = '';
 
     // ── DOM refs ─────────────────────────────────────────────────────────────
     var nmSpinner        = document.getElementById('nmSpinner');
@@ -36,12 +48,17 @@
     var nmSelectedCount  = document.getElementById('nmSelectedCount');
     var nmSelectAllBtn   = document.getElementById('nmSelectAllBtn');
     var nmDeselectAllBtn = document.getElementById('nmDeselectAllBtn');
-    var nmMoveBtn        = document.getElementById('nmMoveBtn');
+    var nmBulkActionSelect = document.getElementById('nmBulkActionSelect');
     var nmMoveModal      = document.getElementById('nmMoveModal');
     var nmFolderSearch   = document.getElementById('nmFolderSearch');
     var nmFolderList     = document.getElementById('nmFolderList');
     var nmConfirmMove    = document.getElementById('nmConfirmMove');
     var nmCancelMove     = document.getElementById('nmCancelMove');
+    var nmTagModal       = document.getElementById('nmTagModal');
+    var nmTagModalTitle  = document.getElementById('nmTagModalTitle');
+    var nmTagInput       = document.getElementById('nmTagInput');
+    var nmConfirmTag     = document.getElementById('nmConfirmTag');
+    var nmCancelTag      = document.getElementById('nmCancelTag');
 
     // ── Helpers ───────────────────────────────────────────────────────────────
     function apiUrl(path) {
@@ -52,11 +69,116 @@
         return cfg.workspace ? '&workspace=' + encodeURIComponent(cfg.workspace) : '';
     }
 
+    function wsQuery() {
+        return cfg.workspace ? '?workspace=' + encodeURIComponent(cfg.workspace) : '';
+    }
+
     function formatDate(dateStr) {
         if (!dateStr) return '';
         var d = new Date(dateStr.replace(' ', 'T') + 'Z');
         if (isNaN(d.getTime())) return dateStr;
         return d.toLocaleDateString();
+    }
+
+    function fetchJson(url, options) {
+        return fetch(url, options).then(function (response) {
+            return response.text().then(function (text) {
+                var data = {};
+                if (text) {
+                    try {
+                        data = JSON.parse(text);
+                    } catch (err) {
+                        throw new Error(response.statusText || cfg.txtError);
+                    }
+                }
+
+                if (!response.ok || data.error) {
+                    throw new Error(data.error || data.message || response.statusText || cfg.txtError);
+                }
+
+                return data;
+            });
+        });
+    }
+
+    function setButtonLoading(button, loadingText) {
+        button.disabled = true;
+        button.innerHTML = '<i class="lucide lucide-loader-2 lucide-spin"></i> ' + escHtml(loadingText);
+    }
+
+    function parseTags(tags) {
+        var source = Array.isArray(tags)
+            ? tags
+            : String(tags || '').replace(/\s+/g, ',').split(',');
+
+        return source.map(function (tag) {
+            tag = typeof tag === 'string' ? tag.trim() : '';
+            return tag ? tag.replace(/\s+/g, '_') : '';
+        }).filter(Boolean);
+    }
+
+    function uniqueTags(tags) {
+        var seen = new Set();
+        return tags.filter(function (tag) {
+            if (seen.has(tag)) return false;
+            seen.add(tag);
+            return true;
+        });
+    }
+
+    function sameTags(left, right) {
+        if (left.length !== right.length) return false;
+        for (var i = 0; i < left.length; i += 1) {
+            if (left[i] !== right[i]) return false;
+        }
+        return true;
+    }
+
+    function joinTags(tags) {
+        return tags.join(', ');
+    }
+
+    function getSelectedNotes() {
+        return Array.from(selectedIds).map(function (id) {
+            return allNotes.find(function (note) { return note.id == id; });
+        }).filter(Boolean);
+    }
+
+    function requestSelectedNotes(buildRequest) {
+        var requests = [];
+        var changedCount = 0;
+
+        getSelectedNotes().forEach(function (note) {
+            var request = buildRequest(note);
+            if (!request) return;
+
+            changedCount += 1;
+            requests.push(fetchJson(request.url, request.options));
+        });
+
+        if (requests.length === 0) {
+            return Promise.resolve({ changedCount: 0, results: [] });
+        }
+
+        return Promise.all(requests).then(function (results) {
+            return { changedCount: changedCount, results: results };
+        });
+    }
+
+    function patchSelectedNotes(buildPayload) {
+        return requestSelectedNotes(function (note) {
+            var payload = buildPayload(note);
+            if (!payload) return null;
+
+            return {
+                url: apiUrl('notes/' + note.id),
+                options: {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }
+            };
+        });
     }
 
     // ── Load data ─────────────────────────────────────────────────────────────
@@ -69,14 +191,11 @@
         var foldersUrl = apiUrl('folders?hierarchical=false' + wsParam());
 
         Promise.all([
-            fetch(notesUrl).then(r => r.json()),
-            fetch(foldersUrl).then(r => r.json())
+            fetchJson(notesUrl),
+            fetchJson(foldersUrl)
         ]).then(function (results) {
             var notesData   = results[0];
             var foldersData = results[1];
-
-            if (notesData.error) throw new Error(notesData.error);
-            if (foldersData.error) throw new Error(foldersData.error);
 
             allNotes   = notesData.notes   || [];
             allFolders = foldersData.folders || [];
@@ -303,8 +422,11 @@
         if (count > 0) {
             nmBulkBar.classList.remove('nm-bulk-bar-hidden');
             nmSelectedCount.textContent = count + ' ' + cfg.txtSelected;
+            nmBulkActionSelect.disabled = false;
         } else {
             nmBulkBar.classList.add('nm-bulk-bar-hidden');
+            nmBulkActionSelect.disabled = true;
+            nmBulkActionSelect.value = '';
         }
     }
 
@@ -320,8 +442,39 @@
         updateBulkBar();
     });
 
+    // ── Bulk actions ──────────────────────────────────────────────────────────
+    nmBulkActionSelect.addEventListener('change', function () {
+        var action = this.value;
+        this.value = '';
+
+        if (!action || selectedIds.size === 0) return;
+
+        if (action === 'move') {
+            openMoveModal();
+            return;
+        }
+
+        if (action === 'add-tag' || action === 'remove-tag') {
+            openTagModal(action);
+            return;
+        }
+
+        if (action === 'add-favorite') {
+            performFavoriteUpdate(1);
+            return;
+        }
+
+        if (action === 'remove-favorite') {
+            performFavoriteUpdate(0);
+            return;
+        }
+
+        if (action === 'trash') {
+            performTrash();
+        }
+    });
+
     // ── Move modal ────────────────────────────────────────────────────────────
-    nmMoveBtn.addEventListener('click', openMoveModal);
     nmCancelMove.addEventListener('click', closeMoveModal);
     nmMoveModal.addEventListener('click', function (e) {
         if (e.target === nmMoveModal) closeMoveModal();
@@ -330,6 +483,7 @@
     function openMoveModal() {
         movingToFolderId = undefined; // nothing selected yet
         nmConfirmMove.disabled = true;
+        nmConfirmMove.textContent = cfg.txtMove;
         renderFolderList('');
         nmFolderSearch.value = '';
         nmMoveModal.style.display = 'flex';
@@ -338,6 +492,9 @@
 
     function closeMoveModal() {
         nmMoveModal.style.display = 'none';
+        movingToFolderId = undefined;
+        nmConfirmMove.disabled = true;
+        nmConfirmMove.textContent = cfg.txtMove;
     }
 
     nmFolderSearch.addEventListener('input', function () {
@@ -386,60 +543,178 @@
     }
 
     nmConfirmMove.addEventListener('click', function () {
-        if (selectedIds.size === 0) return;
+        if (selectedIds.size === 0 || movingToFolderId === undefined) return;
         performMove();
     });
 
     function performMove() {
-        nmConfirmMove.disabled = true;
-        nmConfirmMove.innerHTML = '<i class="lucide lucide-loader-2 lucide-spin"></i> ' + cfg.txtMoving;
+        var targetFolderId = movingToFolderId === null ? null : Number(movingToFolderId);
 
-        var ids = Array.from(selectedIds);
-        var folderId = movingToFolderId; // null = root, number = folder
+        setButtonLoading(nmConfirmMove, cfg.txtMoving);
 
-        var promises = ids.map(function (noteId) {
-            var payload = { folder_id: folderId === null ? 0 : folderId };
-            return fetch(apiUrl('notes/' + noteId), {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            }).then(function (r) { return r.json(); });
-        });
-
-        Promise.all(promises).then(function (results) {
-            closeMoveModal();
-            selectedIds.clear();
-
-            // Update local note data with new folder info
-            allFolders.forEach(function (f) {
-                if (folderId !== null && f.id == folderId) {
-                    results.forEach(function (res, i) {
-                        var noteId = ids[i];
-                        var note = allNotes.find(function (n) { return n.id == noteId; });
-                        if (note) {
-                            note.folder_id = f.id;
-                            note.folder    = f.name;
-                        }
-                    });
-                }
-            });
-            if (folderId === null) {
-                ids.forEach(function (noteId) {
-                    var note = allNotes.find(function (n) { return n.id == noteId; });
-                    if (note) { note.folder_id = null; note.folder = null; }
-                });
+        patchSelectedNotes(function (note) {
+            var currentFolderId = note.folder_id == null ? null : Number(note.folder_id);
+            if (currentFolderId === targetFolderId) {
+                return null;
             }
 
-            // Reset button
-            nmConfirmMove.innerHTML = cfg.txtMoveTo;
-            nmConfirmMove.disabled = true;
-
-            applyFilter();
+            return { folder_id: targetFolderId === null ? 0 : targetFolderId };
+        }).then(function (result) {
+            closeMoveModal();
+            if (result.changedCount > 0) {
+                selectedIds.clear();
+                loadAll();
+            }
             updateBulkBar();
         }).catch(function (err) {
             closeMoveModal();
             alert(cfg.txtError + ': ' + err.message);
-            nmConfirmMove.disabled = false;
+            loadAll();
+        });
+    }
+
+    // ── Tag modal ─────────────────────────────────────────────────────────────
+    nmCancelTag.addEventListener('click', closeTagModal);
+    nmTagModal.addEventListener('click', function (e) {
+        if (e.target === nmTagModal) closeTagModal();
+    });
+
+    nmTagInput.addEventListener('input', function () {
+        nmConfirmTag.disabled = parseTags(this.value).length === 0;
+    });
+
+    nmConfirmTag.addEventListener('click', function () {
+        var inputTags = uniqueTags(parseTags(nmTagInput.value));
+        if (!inputTags.length) {
+            alert(cfg.txtEnterTag);
+            return;
+        }
+
+        performTagUpdate(currentTagAction, inputTags);
+    });
+
+    function openTagModal(action) {
+        currentTagAction = action;
+
+        var label = action === 'add-tag' ? cfg.txtAddTag : cfg.txtRemoveTag;
+        nmTagModalTitle.textContent = label;
+        nmConfirmTag.textContent = label;
+        nmConfirmTag.disabled = true;
+        nmTagInput.value = '';
+        nmTagInput.placeholder = cfg.txtTagsPlaceholder;
+        nmTagModal.style.display = 'flex';
+        nmTagInput.focus();
+    }
+
+    function closeTagModal() {
+        currentTagAction = '';
+        nmTagModal.style.display = 'none';
+        nmTagInput.value = '';
+        nmConfirmTag.disabled = true;
+        nmConfirmTag.textContent = cfg.txtAddTag;
+        nmTagModalTitle.textContent = cfg.txtAddTag;
+    }
+
+    function performTagUpdate(action, inputTags) {
+        if (!action || selectedIds.size === 0) return;
+
+        setButtonLoading(nmConfirmTag, cfg.txtApplying);
+
+        patchSelectedNotes(function (note) {
+            var existingTags = parseTags(note.tags || '');
+            var nextTags = existingTags.slice();
+
+            if (action === 'add-tag') {
+                inputTags.forEach(function (tag) {
+                    if (nextTags.indexOf(tag) === -1) {
+                        nextTags.push(tag);
+                    }
+                });
+            } else {
+                var tagsToRemove = new Set(inputTags);
+                nextTags = existingTags.filter(function (tag) {
+                    return !tagsToRemove.has(tag);
+                });
+            }
+
+            if (sameTags(existingTags, nextTags)) {
+                return null;
+            }
+
+            return { tags: joinTags(nextTags) };
+        }).then(function (result) {
+            closeTagModal();
+            if (result.changedCount > 0) {
+                selectedIds.clear();
+                loadAll();
+            }
+            updateBulkBar();
+        }).catch(function (err) {
+            closeTagModal();
+            alert(cfg.txtError + ': ' + err.message);
+            loadAll();
+        });
+    }
+
+    function performFavoriteUpdate(targetFavorite) {
+        if (selectedIds.size === 0) return;
+
+        nmBulkActionSelect.disabled = true;
+
+        requestSelectedNotes(function (note) {
+            var currentFavorite = Number(note.favorite || 0);
+            if (currentFavorite === targetFavorite) {
+                return null;
+            }
+
+            return {
+                url: apiUrl('notes/' + note.id + '/favorite' + wsQuery()),
+                options: {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: cfg.workspace ? JSON.stringify({ workspace: cfg.workspace }) : '{}'
+                }
+            };
+        }).then(function (result) {
+            if (result.changedCount > 0) {
+                selectedIds.clear();
+                loadAll();
+            } else {
+                nmBulkActionSelect.disabled = false;
+            }
+            updateBulkBar();
+        }).catch(function (err) {
+            nmBulkActionSelect.disabled = false;
+            alert(cfg.txtError + ': ' + err.message);
+            loadAll();
+        });
+    }
+
+    function performTrash() {
+        if (selectedIds.size === 0) return;
+        if (!window.confirm(cfg.txtTrashConfirm)) return;
+
+        nmBulkActionSelect.disabled = true;
+
+        requestSelectedNotes(function (note) {
+            return {
+                url: apiUrl('notes/' + note.id + wsQuery()),
+                options: {
+                    method: 'DELETE'
+                }
+            };
+        }).then(function (result) {
+            if (result.changedCount > 0) {
+                selectedIds.clear();
+                loadAll();
+            } else {
+                nmBulkActionSelect.disabled = false;
+            }
+            updateBulkBar();
+        }).catch(function (err) {
+            nmBulkActionSelect.disabled = false;
+            alert(cfg.txtError + ': ' + err.message);
+            loadAll();
         });
     }
 

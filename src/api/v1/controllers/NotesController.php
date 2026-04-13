@@ -22,6 +22,7 @@ class NotesController {
      *   - folder_id: Filter by folder ID
      *   - sort: Sort order (updated_desc, created_desc, heading_asc)
      *   - get_folders: If set, return folders instead of notes
+    *   - favorite: Filter by favorite status (0 or 1)
      *   - search: Search query to filter notes by heading or content
      */
     public function index(): void {
@@ -51,7 +52,7 @@ class NotesController {
             }
             
             // Build query for notes
-            $sql = "SELECT id, heading, type, tags, folder, folder_id, workspace, updated, created FROM entries WHERE trash = 0";
+            $sql = "SELECT id, heading, type, tags, folder, folder_id, workspace, updated, created, favorite FROM entries WHERE trash = 0";
             $params = [];
             
             if ($workspace) {
