@@ -419,6 +419,27 @@
         badge.className = 'setting-status disabled';
     }
 
+    function showInstallAppLaunchNotice() {
+        var installStartingMsg = tr('settings.install_app.launching', {}, 'The installation will start. Please wait...');
+        var installStartingTitle = tr('common.please_wait', {}, 'Please wait');
+        var installStartingAcknowledge = tr('settings.install_app.launching_acknowledge', {}, 'Understood');
+
+        if (window.modalAlert && typeof window.modalAlert.showModal === 'function') {
+            window.modalAlert.showModal({
+                type: 'alert',
+                message: installStartingMsg,
+                alertType: 'info',
+                title: installStartingTitle,
+                buttons: [
+                    { text: installStartingAcknowledge, type: 'primary', action: function () { } }
+                ]
+            });
+            return;
+        }
+
+        alert(installStartingMsg);
+    }
+
     async function handleInstallAppCardClick(event) {
         if (event) {
             event.preventDefault();
@@ -439,6 +460,10 @@
         if (typeof window.poznotePromptInstall === 'function') {
             var result = await window.poznotePromptInstall();
             if (result && result.supported) {
+                if (result.outcome === 'accepted') {
+                    showInstallAppLaunchNotice();
+                }
+
                 refreshInstallAppBadge();
                 return;
             }

@@ -350,6 +350,8 @@
       "git_sync_toggle": "Sincronização Git"
     },
     "install_app": {
+      "launching": "A instalação vai começar. Por favor, aguarde...",
+      "launching_acknowledge": "Entendi",
       "unavailable": "A instalação não está disponível no momento. No Chrome móvel, abra o menu do navegador e toque em \"Instalar aplicativo\" (ou \"Adicionar à tela inicial\") quando a opção estiver disponível.",
       "already_installed": "O aplicativo já está instalado neste dispositivo.",
       "status": {

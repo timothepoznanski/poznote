@@ -351,6 +351,8 @@
       "git_sync_toggle": "Git 同步"
     },
     "install_app": {
+      "launching": "安装即将开始，请稍候...",
+      "launching_acknowledge": "明白了",
       "unavailable": "当前无法安装。请在 Chrome 手机版中打开浏览器菜单，然后在可用时点击“安装应用”（或“添加到主屏幕”）。",
       "already_installed": "该设备已安装此应用。",
       "status": {
