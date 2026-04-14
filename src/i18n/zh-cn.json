@@ -1320,6 +1320,7 @@
       "download_structured_export": "下载结构化导出 (ZIP)"
     },
     "spinner": {
+      "home_hint": "可从仪表盘执行推送和拉取操作。",
       "preparing": "正在准备备份...",
       "preparing_long": "正在准备备份... 这可能需要一些时间。"
     },

@@ -2090,6 +2090,7 @@
       "workspace": "Arbeitsbereich",
       "target_workspace": "Zielarbeitsbereich",
       "all_workspaces": "Alle Arbeitsbereiche",
+      "home_hint": "Senden und Abrufen können über das Dashboard ausgeführt werden.",
       "push": {
         "title": "An {{provider}} senden",
         "description": "Exportiert alle Notizen und Anhänge als flache Dateien zu {{provider}}. Aktualisiert vorhandene Dateien und entfernt Dateien, die in Poznote nicht mehr vorhanden sind.",

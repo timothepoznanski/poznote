@@ -1674,6 +1674,7 @@
       "workspace": "Workspace: {{workspace}}",
       "target_workspace": "Target Workspace",
       "all_workspaces": "All workspaces",
+      "home_hint": "Push and Pull can be done from Dashboard.",
       "push": {
         "title": "Push to {{provider}}",
         "description": "Exports all your notes and attachments to {{provider}} as flat files. Updates existing files and removes files that no longer exist in Poznote.",

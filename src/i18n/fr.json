@@ -2285,6 +2285,7 @@
       "workspace": "Workspace: {{workspace}}",
       "target_workspace": "Espace de travail cible",
       "all_workspaces": "Tous les espaces de travail",
+      "home_hint": "Les actions d'envoi et de récupération peuvent être effectuées depuis le tableau de bord.",
       "push": {
         "title": "Envoyer vers {{provider}}",
         "description": "Exporte toutes les notes et pièces jointes vers {{provider}} sous forme de fichiers plats. Met à jour les fichiers existants et supprime ceux qui n'existent plus dans Poznote.",

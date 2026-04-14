@@ -2089,6 +2089,7 @@
       "workspace": "Espacio de trabajo",
       "target_workspace": "Espacio de trabajo de destino",
       "all_workspaces": "Todos los espacios de trabajo",
+      "home_hint": "Las acciones de enviar y recuperar se pueden realizar desde el panel.",
       "push": {
         "title": "Enviar a {{provider}}",
         "description": "Exporta todas tus notas y archivos adjuntos a {{provider}} como archivos planos. Actualiza los archivos existentes y elimina los que ya no existen en Poznote.",

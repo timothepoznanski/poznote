@@ -556,7 +556,7 @@ Poznote supports automatic and manual synchronization with **GitHub** or **Forge
 
 **Step 1 — Enable the feature (admin, in Settings > Advanced Settings)**
 
-Toggle **Git Sync** to enabled in the **Advanced Settings** section of the Settings page. This will reveal the **Git Sync** menu in the sidebar for all users.
+Toggle **Git Sync** to enabled in the **Advanced Settings** section of the Settings page. This enables Git Sync globally and makes the user-level **Git Sync** card/configuration available from **Settings**.
 
 ---
 
@@ -581,7 +581,7 @@ When enabled by the user, Poznote will automatically:
 - **Pull** on login
 - **Push** on every note create, update, or delete
 
-Manual push/pull is also available from the **Sync Status** page (cloud icon in the header).
+Manual push/pull is also available from the **Dashboard** via the **Push** and **Pull** cards.
 
 </details>
 
