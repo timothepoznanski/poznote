@@ -69,22 +69,31 @@ class GitSync {
     
     /**
      * Derive a 32-byte encryption key from the instance secret.
-     * Uses POZNOTE_APP_SECRET env var, or auto-generates and persists a key file.
+     * Auto-generates and persists a key in data/.app_secret.
+     * For backward compat, POZNOTE_APP_SECRET env var is still honoured
+     * and its value is migrated to the key file so users can remove it.
      */
     private function getEncryptionKey(): string {
-        $secret = getenv('POZNOTE_APP_SECRET');
-        if (!$secret) {
-            // __DIR__ in container = /var/www/html (where src/ is mounted)
-            // so data/ is at __DIR__ . '/data/'
-            $keyFile = __DIR__ . '/data/.app_secret';
-            if (file_exists($keyFile)) {
-                $secret = trim(file_get_contents($keyFile));
-            } else {
-                $secret = bin2hex(random_bytes(32));
-                file_put_contents($keyFile, $secret);
+        $keyFile = __DIR__ . '/data/.app_secret';
+        $envSecret = getenv('POZNOTE_APP_SECRET');
+
+        if ($envSecret) {
+            // Migrate env-var value to file so users can drop the env var later
+            if (!file_exists($keyFile)) {
+                file_put_contents($keyFile, $envSecret);
                 chmod($keyFile, 0600);
             }
+            return hash('sha256', $envSecret, true);
         }
+
+        if (file_exists($keyFile)) {
+            $secret = trim(file_get_contents($keyFile));
+        } else {
+            $secret = bin2hex(random_bytes(32));
+            file_put_contents($keyFile, $secret);
+            chmod($keyFile, 0600);
+        }
+
         return hash('sha256', $secret, true);
     }
 

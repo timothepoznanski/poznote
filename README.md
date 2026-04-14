@@ -571,7 +571,7 @@ Toggle **Git Sync** to enabled in the **Advanced Settings** section of the Setti
 | Branch | Default: `main` |
 | Author Name / Email | Used for commit metadata |
 
-> 🔒 Access tokens are encrypted at rest using AES-256-GCM. Set `POZNOTE_APP_SECRET` in your `.env` (generated with `openssl rand -hex 32`) to ensure the encryption key survives container rebuilds. If not set, a key is auto-generated and stored in `data/.app_secret`.
+> 🔒 Access tokens are encrypted at rest using AES-256-GCM. An encryption key is automatically generated and stored in `data/.app_secret`.
 
 ---
 
