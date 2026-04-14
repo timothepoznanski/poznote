@@ -686,7 +686,6 @@ function showShareModal(url, options) {
         createBtn.textContent = window.t ? window.t('index.share_modal.create_url', null, 'Create url') : 'Create url';
         // create button styled via CSS class
         createBtn.onclick = function () { createPublicShare(noteId); };
-        buttonsDiv.appendChild(createBtn);
 
         const cancelBtn = document.createElement('button');
         cancelBtn.type = 'button';
@@ -694,6 +693,7 @@ function showShareModal(url, options) {
         cancelBtn.textContent = window.t ? window.t('common.cancel', null, 'Cancel') : 'Cancel';
         cancelBtn.onclick = function () { closeModal('shareModal'); };
         buttonsDiv.appendChild(cancelBtn);
+        buttonsDiv.appendChild(createBtn);
     }
 
     content.appendChild(buttonsDiv);
@@ -1263,7 +1263,6 @@ function showFolderShareModal(url, options) {
         createBtn.className = 'btn-primary';
         createBtn.textContent = window.t ? window.t('index.share_modal.create_url', null, 'Create url') : 'Create url';
         createBtn.onclick = function () { createPublicFolderShare(folderId); };
-        buttonsDiv.appendChild(createBtn);
 
         const cancelBtn = document.createElement('button');
         cancelBtn.type = 'button';
@@ -1271,6 +1270,7 @@ function showFolderShareModal(url, options) {
         cancelBtn.textContent = window.t ? window.t('common.cancel', null, 'Cancel') : 'Cancel';
         cancelBtn.onclick = function () { closeModal('folderShareModal'); };
         buttonsDiv.appendChild(cancelBtn);
+        buttonsDiv.appendChild(createBtn);
 
         content.appendChild(buttonsDiv);
     }
