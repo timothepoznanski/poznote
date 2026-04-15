@@ -72,7 +72,8 @@
       "orphan_scanner": "Сканер потерянных вложений",
       "change_password": "Сменить пароль",
       "import_limits": "Лимиты импорта",
-      "git_sync_toggle": "Синхронизация Git"
+      "git_sync_toggle": "Синхронизация Git",
+      "oidc_config": "OIDC / SSO"
     },
     "install_app": {
       "launching": "Установка сейчас начнется. Пожалуйста, подождите...",
@@ -1889,5 +1890,52 @@
       "incorrect_current": "Текущий пароль неверен"
     },
     "success": "Пароль успешно изменен."
+  },
+  "oidc_admin": {
+    "title": "Настройка OIDC",
+    "description": "Настройте аутентификацию OpenID Connect (SSO). Client ID и Client Secret для безопасности задаются в файле .env.",
+    "saved": "Конфигурация OIDC успешно сохранена.",
+    "error_saving": "Ошибка при сохранении некоторых настроек. Повторите попытку.",
+    "error_csrf": "Недопустимая отправка формы. Повторите попытку.",
+    "deprecated": "Устарело",
+    "section_general": "Общие",
+    "section_credentials": "Учетные данные",
+    "section_advanced": "Дополнительно",
+    "section_access_control": "Контроль доступа",
+    "section_login_behavior": "Поведение входа",
+    "fields": {
+      "enabled": "Включить OIDC-аутентификацию",
+      "provider_name": "Название провайдера",
+      "issuer": "URL issuer",
+      "client_id": "Client ID",
+      "client_secret": "Client Secret",
+      "scopes": "Scopes",
+      "discovery_url": "URL discovery",
+      "redirect_uri": "URI перенаправления",
+      "end_session_endpoint": "Endpoint завершения сессии",
+      "post_logout_redirect_uri": "URI перенаправления после выхода",
+      "groups_claim": "Клейм групп",
+      "allowed_groups": "Разрешенные группы",
+      "auto_create_users": "Автоматически создавать профили пользователей при первом входе через OIDC",
+      "allowed_users": "Разрешенные пользователи",
+      "disable_normal_login": "Отключить вход по имени пользователя/паролю (только SSO)",
+      "disable_basic_auth": "Отключить HTTP Basic Auth для API"
+    },
+    "hints": {
+      "provider_name": "Название, отображаемое на кнопке входа (например, Google, Azure AD, Keycloak)",
+      "issuer": "URL issuer вашего OIDC-провайдера (например, https://accounts.google.com)",
+      "credentials": "Client ID и Client Secret управляются в файле .env.",
+      "scopes": "Scopes через пробел (по умолчанию: openid profile email)",
+      "discovery_url": "Переопределяет URL автоматического discovery (оставьте пустым, чтобы вычислить его из issuer)",
+      "redirect_uri": "Пользовательский URI перенаправления (оставьте пустым для автогенерации)",
+      "end_session_endpoint": "Endpoint выхода IdP для logout, инициированного RP (необязательно)",
+      "post_logout_redirect_uri": "Куда перенаправлять после выхода (по умолчанию: страница входа)",
+      "groups_claim": "Имя claim в токене, содержащего группы пользователя (по умолчанию: groups)",
+      "allowed_groups": "Список разрешенных групп через запятую. Оставьте пустым, чтобы разрешить всех аутентифицированных пользователей.",
+      "auto_create_users": "Рекомендуется при использовании контроля доступа по группам",
+      "allowed_users": "Список email/имен пользователей через запятую. Предпочтительно использовать контроль доступа по группам.",
+      "disable_normal_login": "Если включено, на странице входа будет доступен только вход через OIDC",
+      "disable_basic_auth": "Если включено, API-запросы с HTTP Basic Auth будут отклоняться (403)"
+    }
   }
 }

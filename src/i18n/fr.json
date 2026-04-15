@@ -359,7 +359,8 @@
       "orphan_scanner": "Scanner de pièces jointes orphelines",
       "change_password": "Changer le mot de passe",
       "import_limits": "Limites d'import",
-      "git_sync_toggle": "Synchronisation Git"
+      "git_sync_toggle": "Synchronisation Git",
+      "oidc_config": "OIDC / SSO"
     },
     "install_app": {
       "launching": "L’installation va se lancer. Veuillez patienter...",
@@ -2451,5 +2452,52 @@
       "incorrect_current": "Le mot de passe actuel est incorrect"
     },
     "success": "Mot de passe modifié avec succès."
+  },
+  "oidc_admin": {
+    "title": "Configuration OIDC",
+    "description": "Configurez l'authentification OpenID Connect (SSO). Le Client ID et le Client Secret sont configurés dans le fichier .env pour des raisons de sécurité.",
+    "saved": "Configuration OIDC enregistrée avec succès.",
+    "error_saving": "Erreur lors de l'enregistrement de certains paramètres. Veuillez réessayer.",
+    "error_csrf": "Soumission de formulaire invalide. Veuillez réessayer.",
+    "deprecated": "Obsolète",
+    "section_general": "Général",
+    "section_credentials": "Identifiants",
+    "section_advanced": "Avancé",
+    "section_access_control": "Contrôle d'accès",
+    "section_login_behavior": "Comportement de connexion",
+    "fields": {
+      "enabled": "Activer l'authentification OIDC",
+      "provider_name": "Nom du fournisseur",
+      "issuer": "URL de l'émetteur",
+      "client_id": "Client ID",
+      "client_secret": "Client Secret",
+      "scopes": "Scopes",
+      "discovery_url": "URL de découverte",
+      "redirect_uri": "URI de redirection",
+      "end_session_endpoint": "Endpoint de fin de session",
+      "post_logout_redirect_uri": "URI de redirection post-déconnexion",
+      "groups_claim": "Claim des groupes",
+      "allowed_groups": "Groupes autorisés",
+      "auto_create_users": "Créer automatiquement les profils à la première connexion OIDC",
+      "allowed_users": "Utilisateurs autorisés",
+      "disable_normal_login": "Désactiver la connexion par mot de passe (SSO uniquement)",
+      "disable_basic_auth": "Désactiver l'authentification HTTP Basic pour l'API"
+    },
+    "hints": {
+      "provider_name": "Nom affiché sur le bouton de connexion (ex : Google, Azure AD, Keycloak)",
+      "issuer": "L'URL de l'émetteur de votre fournisseur OIDC (ex : https://accounts.google.com)",
+      "credentials": "Le Client ID et le Client Secret sont gérés dans le fichier .env.",
+      "scopes": "Scopes séparés par des espaces (défaut : openid profile email)",
+      "discovery_url": "Remplacer l'URL de découverte automatique (laisser vide pour dériver de l'émetteur)",
+      "redirect_uri": "URI de redirection personnalisée (laisser vide pour auto-générer)",
+      "end_session_endpoint": "Endpoint de déconnexion du fournisseur pour la déconnexion initiée par le RP (optionnel)",
+      "post_logout_redirect_uri": "Où rediriger après la déconnexion (défaut : page de connexion)",
+      "groups_claim": "Nom du claim contenant les groupes de l'utilisateur (défaut : groups)",
+      "allowed_groups": "Liste de groupes autorisés séparés par des virgules. Laisser vide pour autoriser tous les utilisateurs authentifiés.",
+      "auto_create_users": "Recommandé avec le contrôle d'accès par groupes",
+      "allowed_users": "Emails/noms d'utilisateur séparés par des virgules. Préférez le contrôle d'accès par groupes.",
+      "disable_normal_login": "Lorsqu'activé, seule la connexion OIDC est disponible sur la page de connexion",
+      "disable_basic_auth": "Lorsqu'activé, les requêtes API avec HTTP Basic Auth seront rejetées (403)"
+    }
   }
 }

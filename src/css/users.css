@@ -28,7 +28,7 @@ body.dark-mode {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-    padding-bottom: 120px;
+    /* padding-bottom: 120px; */
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
@@ -895,7 +895,7 @@ input.admin-toggle:disabled:checked+.slider {
 @media screen and (max-width: 480px) {
     .admin-container {
         padding: 10px;
-        padding-bottom: 100px;
+        /* padding-bottom: 100px; */
     }
 
     .maintenance-title {

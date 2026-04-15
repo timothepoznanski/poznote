@@ -348,7 +348,8 @@
       "user_management": "Benutzerverwaltung",
       "change_password": "Passwort ändern",
       "import_limits": "Importlimits",
-      "git_sync_toggle": "Git-Synchronisierung"
+      "git_sync_toggle": "Git-Synchronisierung",
+      "oidc_config": "OIDC / SSO"
     },
     "install_app": {
       "launching": "Die Installation wird gestartet. Bitte warten Sie...",
@@ -2254,5 +2255,52 @@
       "incorrect_current": "Das aktuelle Passwort ist falsch"
     },
     "success": "Passwort erfolgreich geändert."
+  },
+  "oidc_admin": {
+    "title": "OIDC-Konfiguration",
+    "description": "Konfigurieren Sie die OpenID Connect (SSO)-Authentifizierung. Client ID und Client Secret werden aus Sicherheitsgründen in der .env-Datei konfiguriert.",
+    "saved": "OIDC-Konfiguration erfolgreich gespeichert.",
+    "error_saving": "Fehler beim Speichern einiger Einstellungen. Bitte versuchen Sie es erneut.",
+    "error_csrf": "Ungültige Formularübermittlung. Bitte versuchen Sie es erneut.",
+    "deprecated": "Veraltet",
+    "section_general": "Allgemein",
+    "section_credentials": "Anmeldedaten",
+    "section_advanced": "Erweitert",
+    "section_access_control": "Zugriffskontrolle",
+    "section_login_behavior": "Anmeldeverhalten",
+    "fields": {
+      "enabled": "OIDC-Authentifizierung aktivieren",
+      "provider_name": "Anbietername",
+      "issuer": "Issuer-URL",
+      "client_id": "Client ID",
+      "client_secret": "Client Secret",
+      "scopes": "Scopes",
+      "discovery_url": "Discovery-URL",
+      "redirect_uri": "Redirect-URI",
+      "end_session_endpoint": "End-Session-Endpunkt",
+      "post_logout_redirect_uri": "Post-Logout-Redirect-URI",
+      "groups_claim": "Groups-Claim",
+      "allowed_groups": "Erlaubte Gruppen",
+      "auto_create_users": "Benutzerprofile bei der ersten OIDC-Anmeldung automatisch erstellen",
+      "allowed_users": "Erlaubte Benutzer",
+      "disable_normal_login": "Anmeldung mit Benutzername/Passwort deaktivieren (nur SSO)",
+      "disable_basic_auth": "HTTP Basic Auth für die API deaktivieren"
+    },
+    "hints": {
+      "provider_name": "Anzeigename auf dem Login-Button (z. B. Google, Azure AD, Keycloak)",
+      "issuer": "Die Issuer-URL Ihres OIDC-Anbieters (z. B. https://accounts.google.com)",
+      "credentials": "Client ID und Client Secret werden in der .env-Datei verwaltet.",
+      "scopes": "Leerzeichengetrennte Scopes (Standard: openid profile email)",
+      "discovery_url": "Überschreibt die automatische Discovery-URL (leer lassen, um sie aus dem Issuer abzuleiten)",
+      "redirect_uri": "Benutzerdefinierte Redirect-URI (leer lassen für automatische Generierung)",
+      "end_session_endpoint": "Logout-Endpunkt des IdP für RP-initiated Logout (optional)",
+      "post_logout_redirect_uri": "Ziel nach der Abmeldung (Standard: Login-Seite)",
+      "groups_claim": "Name des Token-Claims mit den Benutzergruppen (Standard: groups)",
+      "allowed_groups": "Kommagetrennte Liste erlaubter Gruppen. Leer lassen, um alle authentifizierten Benutzer zuzulassen.",
+      "auto_create_users": "Empfohlen bei gruppenbasierter Zugriffskontrolle",
+      "allowed_users": "Kommagetrennte E-Mails/Benutzernamen. Bevorzugen Sie stattdessen gruppenbasierte Zugriffskontrolle.",
+      "disable_normal_login": "Wenn aktiviert, ist auf der Login-Seite nur die OIDC-Anmeldung verfügbar",
+      "disable_basic_auth": "Wenn aktiviert, werden API-Anfragen mit HTTP Basic Auth abgelehnt (403)"
+    }
   }
 }

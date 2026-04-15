@@ -427,6 +427,19 @@ if ($isAdmin) {
                 </div>
             </div>
 
+            <!-- OIDC Configuration -->
+            <div class="home-card settings-card-clickable" id="oidc-config-card" data-href="admin/oidc.php">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-shield"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.oidc_config', [], 'OIDC / SSO'); ?></span>
+                    <span class="setting-status <?php echo (defined('OIDC_ENABLED') && OIDC_ENABLED) ? 'enabled' : 'disabled'; ?>">
+                        <?php echo (defined('OIDC_ENABLED') && OIDC_ENABLED) ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
+                    </span>
+                </div>
+            </div>
+
             <!-- Git Sync Global Toggle -->
             <div class="home-card" id="git-sync-enabled-card">
                 <div class="home-card-icon">

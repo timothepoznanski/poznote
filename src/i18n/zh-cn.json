@@ -348,7 +348,8 @@
       "orphan_scanner": "孤立附件扫描器",
       "change_password": "修改密码",
       "import_limits": "导入限制",
-      "git_sync_toggle": "Git 同步"
+      "git_sync_toggle": "Git 同步",
+      "oidc_config": "OIDC / SSO"
     },
     "install_app": {
       "launching": "安装即将开始，请稍候...",
@@ -2397,5 +2398,52 @@
       "incorrect_current": "当前密码错误"
     },
     "success": "密码修改成功。"
+  },
+  "oidc_admin": {
+    "title": "OIDC 配置",
+    "description": "配置 OpenID Connect（SSO）认证。出于安全原因，Client ID 和 Client Secret 在 .env 文件中配置。",
+    "saved": "OIDC 配置已成功保存。",
+    "error_saving": "保存部分设置时出错。请重试。",
+    "error_csrf": "无效的表单提交。请重试。",
+    "deprecated": "已弃用",
+    "section_general": "常规",
+    "section_credentials": "凭据",
+    "section_advanced": "高级",
+    "section_access_control": "访问控制",
+    "section_login_behavior": "登录行为",
+    "fields": {
+      "enabled": "启用 OIDC 认证",
+      "provider_name": "提供商名称",
+      "issuer": "Issuer URL",
+      "client_id": "Client ID",
+      "client_secret": "Client Secret",
+      "scopes": "Scopes",
+      "discovery_url": "发现 URL",
+      "redirect_uri": "重定向 URI",
+      "end_session_endpoint": "会话结束端点",
+      "post_logout_redirect_uri": "注销后重定向 URI",
+      "groups_claim": "Groups Claim",
+      "allowed_groups": "允许的组",
+      "auto_create_users": "首次通过 OIDC 登录时自动创建用户资料",
+      "allowed_users": "允许的用户",
+      "disable_normal_login": "禁用用户名/密码登录（仅 SSO）",
+      "disable_basic_auth": "为 API 禁用 HTTP Basic Auth"
+    },
+    "hints": {
+      "provider_name": "登录按钮上显示的名称（例如 Google、Azure AD、Keycloak）",
+      "issuer": "您的 OIDC 提供商的 issuer URL（例如 https://accounts.google.com）",
+      "credentials": "Client ID 和 Client Secret 在 .env 文件中管理。",
+      "scopes": "以空格分隔的 scopes（默认：openid profile email）",
+      "discovery_url": "覆盖自动发现 URL（留空则从 issuer 推导）",
+      "redirect_uri": "自定义重定向 URI（留空则自动生成）",
+      "end_session_endpoint": "用于 RP 发起登出的 IdP 注销端点（可选）",
+      "post_logout_redirect_uri": "注销后重定向到的位置（默认：登录页）",
+      "groups_claim": "包含用户组的令牌 claim 名称（默认：groups）",
+      "allowed_groups": "以逗号分隔的允许组列表。留空则允许所有已认证用户。",
+      "auto_create_users": "使用基于组的访问控制时推荐启用",
+      "allowed_users": "以逗号分隔的邮箱/用户名。建议优先使用基于组的访问控制。",
+      "disable_normal_login": "启用后，登录页上将只提供 OIDC 登录",
+      "disable_basic_auth": "启用后，带有 HTTP Basic Auth 的 API 请求将被拒绝（403）"
+    }
   }
 }
