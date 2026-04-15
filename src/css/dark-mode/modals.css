@@ -534,3 +534,47 @@ body.dark-mode .import-confirm-modal-content p,
 body.dark-mode .custom-alert-content p {
     color: #b0b0b0;
 }
+
+/* Snapshot Modal Dark Mode */
+html[data-theme='dark'] .snapshot-modal-header,
+body.dark-mode .snapshot-modal-header {
+    border-bottom-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .snapshot-close-btn:hover,
+body.dark-mode .snapshot-close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+html[data-theme='dark'] .snapshot-meta,
+body.dark-mode .snapshot-meta {
+    background: transparent;
+    border-bottom: none;
+}
+
+html[data-theme='dark'] .snapshot-meta-item,
+body.dark-mode .snapshot-meta-item {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+html[data-theme='dark'] .snapshot-content-preview,
+body.dark-mode .snapshot-content-preview {
+    border-color: var(--dm-border);
+    background: var(--dm-surface, #1a1a1a);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .snapshot-content-preview:empty::before,
+body.dark-mode .snapshot-content-preview:empty::before {
+    color: #666;
+}
+
+html[data-theme='dark'] .snapshot-modal-actions,
+body.dark-mode .snapshot-modal-actions {
+    border-top-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .snapshot-state > div:first-child,
+body.dark-mode .snapshot-state > div:first-child {
+    opacity: 0.25;
+}

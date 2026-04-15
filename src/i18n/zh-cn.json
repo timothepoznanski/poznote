@@ -65,6 +65,50 @@
     },
     "link_copied": "链接已复制"
   },
+  "snapshot": {
+    "menu_item": "快照",
+    "modal": {
+      "title": "今日快照",
+      "loading": "正在加载快照...",
+      "empty_title": "没有可用快照",
+      "empty_hint": "当天首次打开笔记时会自动创建快照。",
+      "empty_content": "（内容为空）",
+      "take_now": "立即创建快照",
+      "copy_content": "复制内容",
+      "restore_state": "恢复到此状态"
+    },
+    "messages": {
+      "content_copied": "内容已复制",
+      "created_now": "快照已保存"
+    },
+    "errors": {
+      "restore_failed": "无法恢复快照",
+      "create_failed": "无法创建快照",
+      "copy_failed": "复制失败"
+    },
+    "confirm": {
+      "title": "确认",
+      "restore_message": "要将笔记恢复到快照状态吗？当前更改将会丢失。",
+      "restore_button": "恢复到此状态",
+      "take_now_message": "要用笔记当前内容创建或替换今天的快照吗？",
+      "take_now_button": "立即创建快照"
+    },
+    "api": {
+      "invalid_note_id": "无效的笔记 ID",
+      "note_not_found": "未找到笔记",
+      "already_exists": "今天的快照已存在",
+      "create_directory_failed": "无法创建快照目录",
+      "write_file_failed": "无法写入快照文件",
+      "create_failed": "无法创建快照",
+      "not_found_today": "未找到今天的快照",
+      "read_failed": "无法读取快照",
+      "retrieve_failed": "无法获取快照",
+      "invalid_entries_path": "无效的笔记路径",
+      "restore_note_file_failed": "无法恢复笔记文件",
+      "restore_success": "笔记已恢复到快照状态",
+      "restore_failed": "无法恢复快照"
+    }
+  },
   "kanban": {
     "title": "看板 - {{folder}}",
     "view_label": "看板视图",

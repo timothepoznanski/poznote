@@ -67,6 +67,50 @@
     },
     "link_copied": "Lien copié"
   },
+  "snapshot": {
+    "menu_item": "Snapshot",
+    "modal": {
+      "title": "Snapshot du jour",
+      "loading": "Chargement du snapshot...",
+      "empty_title": "Aucun snapshot disponible",
+      "empty_hint": "Un snapshot est créé automatiquement lors de la première ouverture de la note dans la journée.",
+      "empty_content": "(Contenu vide)",
+      "take_now": "Prendre un snapshot maintenant",
+      "copy_content": "Copier le contenu",
+      "restore_state": "Revenir à cet état"
+    },
+    "messages": {
+      "content_copied": "Contenu copié",
+      "created_now": "Snapshot enregistré"
+    },
+    "errors": {
+      "restore_failed": "Échec de la restauration du snapshot",
+      "create_failed": "Impossible de prendre le snapshot",
+      "copy_failed": "Copie impossible"
+    },
+    "confirm": {
+      "title": "Confirmation",
+      "restore_message": "Restaurer la note à l'état du snapshot ? Les modifications actuelles seront perdues.",
+      "restore_button": "Revenir à cet état",
+      "take_now_message": "Créer ou remplacer le snapshot du jour avec le contenu actuel de la note ?",
+      "take_now_button": "Prendre un snapshot maintenant"
+    },
+    "api": {
+      "invalid_note_id": "ID de note invalide",
+      "note_not_found": "Note introuvable",
+      "already_exists": "Un snapshot existe déjà pour aujourd'hui",
+      "create_directory_failed": "Impossible de créer le dossier des snapshots",
+      "write_file_failed": "Impossible d'écrire le fichier snapshot",
+      "create_failed": "Impossible de créer le snapshot",
+      "not_found_today": "Aucun snapshot trouvé pour aujourd'hui",
+      "read_failed": "Impossible de lire le snapshot",
+      "retrieve_failed": "Impossible de récupérer le snapshot",
+      "invalid_entries_path": "Chemin des notes invalide",
+      "restore_note_file_failed": "Impossible de restaurer le fichier de la note",
+      "restore_success": "La note a été restaurée à l'état du snapshot",
+      "restore_failed": "Impossible de restaurer le snapshot"
+    }
+  },
   "kanban": {
     "title": "Kanban - {{folder}}",
     "view_label": "Vue Kanban",

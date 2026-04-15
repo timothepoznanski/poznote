@@ -1103,6 +1103,7 @@
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-create-linked-note" checked><span><?php echo t_h('editor.toolbar.create_linked_note', [], 'Create linked note'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-download" checked><span><?php echo t_h('common.download', [], 'Download'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-convert" checked><span><?php echo t_h('modals.convert.title', [], 'Convert'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-snapshot" checked><span><?php echo t_h('snapshot.menu_item', [], 'Snapshot'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-trash" checked><span><?php echo t_h('common.delete', [], 'Delete'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-info" checked><span><?php echo t_h('common.information', [], 'Information'); ?></span></label>
                 </div>
@@ -1166,6 +1167,51 @@
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="uiCustomizationModal"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" id="saveUiCustomizationBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
+<!-- Snapshot Modal -->
+<div id="snapshotModal" class="modal" style="display:none;">
+    <div class="modal-content snapshot-modal-content">
+        <div class="snapshot-modal-header">
+            <h3><i class="lucide lucide-history"></i> <?php echo t_h('snapshot.modal.title', [], 'Today\'s snapshot'); ?></h3>
+        </div>
+
+        <div id="snapshotLoading" class="snapshot-state">
+            <div><i class="lucide lucide-loader-2 snapshot-spinner"></i></div>
+            <p><?php echo t_h('snapshot.modal.loading', [], 'Loading snapshot...'); ?></p>
+        </div>
+
+        <div id="snapshotNoData" class="snapshot-state" style="display:none;">
+            <div><i class="lucide lucide-alert-circle"></i></div>
+            <p class="snapshot-state-title"><?php echo t_h('snapshot.modal.empty_title', [], 'No snapshot available'); ?></p>
+            <p class="snapshot-state-hint"><?php echo t_h('snapshot.modal.empty_hint', [], 'A snapshot is created automatically when the note is first opened during the day.'); ?></p>
+            <div class="modal-buttons" style="margin-top:20px;">
+                <button type="button" class="btn-cancel snapshot-take-btn" onclick="takeSnapshotNow()"><?php echo t_h('snapshot.modal.take_now', [], 'Take snapshot now'); ?></button>
+                <button type="button" class="btn-danger" onclick="closeSnapshotModal()"><?php echo t_h('common.close'); ?></button>
+            </div>
+        </div>
+
+        <div id="snapshotBody" style="display:none;">
+            <div class="snapshot-meta">
+                <div class="snapshot-meta-item">
+                    <i class="lucide lucide-calendar"></i>
+                    <span id="snapshotDate"></span>
+                </div>
+                <div class="snapshot-meta-item">
+                    <i class="lucide lucide-file-text"></i>
+                    <span id="snapshotHeading"></span>
+                </div>
+            </div>
+            <div class="snapshot-content-wrapper">
+                <div id="snapshotContent" class="snapshot-content-preview" data-empty-text="<?php echo t_h('snapshot.modal.empty_content', [], '(Empty content)'); ?>"></div>
+            </div>
+            <div class="modal-buttons snapshot-modal-actions">
+                <button type="button" class="btn-danger" onclick="closeSnapshotModal()"><?php echo t_h('common.close'); ?></button>
+                <button type="button" class="btn-cancel snapshot-take-btn" onclick="takeSnapshotNow()"><?php echo t_h('snapshot.modal.take_now', [], 'Take snapshot now'); ?></button>
+                <button type="button" class="btn-primary snapshot-restore-btn" onclick="restoreSnapshot()"><?php echo t_h('snapshot.modal.restore_state', [], 'Restore this state'); ?></button>
+            </div>
         </div>
     </div>
 </div>

@@ -65,6 +65,50 @@
     },
     "link_copied": "Link kopiert"
   },
+  "snapshot": {
+    "menu_item": "Schnappschuss",
+    "modal": {
+      "title": "Heutiger Schnappschuss",
+      "loading": "Schnappschuss wird geladen...",
+      "empty_title": "Kein Schnappschuss verfügbar",
+      "empty_hint": "Ein Schnappschuss wird automatisch erstellt, wenn die Notiz tagsüber zum ersten Mal geöffnet wird.",
+      "empty_content": "(Leerer Inhalt)",
+      "take_now": "Jetzt Schnappschuss erstellen",
+      "copy_content": "Inhalt kopieren",
+      "restore_state": "Zu diesem Zustand zurückkehren"
+    },
+    "messages": {
+      "content_copied": "Inhalt kopiert",
+      "created_now": "Schnappschuss gespeichert"
+    },
+    "errors": {
+      "restore_failed": "Schnappschuss konnte nicht wiederhergestellt werden",
+      "create_failed": "Schnappschuss konnte nicht erstellt werden",
+      "copy_failed": "Kopieren fehlgeschlagen"
+    },
+    "confirm": {
+      "title": "Bestätigung",
+      "restore_message": "Die Notiz auf den Stand des Schnappschusses zurücksetzen? Aktuelle Änderungen gehen verloren.",
+      "restore_button": "Zu diesem Zustand zurückkehren",
+      "take_now_message": "Den heutigen Schnappschuss mit dem aktuellen Notizinhalt erstellen oder ersetzen?",
+      "take_now_button": "Jetzt Schnappschuss erstellen"
+    },
+    "api": {
+      "invalid_note_id": "Ungültige Notiz-ID",
+      "note_not_found": "Notiz nicht gefunden",
+      "already_exists": "Für heute existiert bereits ein Schnappschuss",
+      "create_directory_failed": "Schnappschuss-Ordner konnte nicht erstellt werden",
+      "write_file_failed": "Schnappschuss-Datei konnte nicht geschrieben werden",
+      "create_failed": "Schnappschuss konnte nicht erstellt werden",
+      "not_found_today": "Für heute wurde kein Schnappschuss gefunden",
+      "read_failed": "Schnappschuss konnte nicht gelesen werden",
+      "retrieve_failed": "Schnappschuss konnte nicht abgerufen werden",
+      "invalid_entries_path": "Ungültiger Notizpfad",
+      "restore_note_file_failed": "Notizdatei konnte nicht wiederhergestellt werden",
+      "restore_success": "Die Notiz wurde auf den Stand des Schnappschusses zurückgesetzt",
+      "restore_failed": "Schnappschuss konnte nicht wiederhergestellt werden"
+    }
+  },
   "kanban": {
     "title": "Kanban - {{folder}}",
     "view_label": "Kanban-Ansicht",

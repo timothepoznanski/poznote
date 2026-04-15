@@ -65,6 +65,50 @@
     },
     "link_copied": "Enlace copiado"
   },
+  "snapshot": {
+    "menu_item": "Instantánea",
+    "modal": {
+      "title": "Instantánea del día",
+      "loading": "Cargando instantánea...",
+      "empty_title": "No hay instantánea disponible",
+      "empty_hint": "Se crea automáticamente una instantánea cuando la nota se abre por primera vez durante el día.",
+      "empty_content": "(Contenido vacío)",
+      "take_now": "Tomar instantánea ahora",
+      "copy_content": "Copiar contenido",
+      "restore_state": "Volver a este estado"
+    },
+    "messages": {
+      "content_copied": "Contenido copiado",
+      "created_now": "Instantánea guardada"
+    },
+    "errors": {
+      "restore_failed": "No se pudo restaurar la instantánea",
+      "create_failed": "No se pudo crear la instantánea",
+      "copy_failed": "No se pudo copiar"
+    },
+    "confirm": {
+      "title": "Confirmación",
+      "restore_message": "¿Restaurar la nota al estado de la instantánea? Los cambios actuales se perderán.",
+      "restore_button": "Volver a este estado",
+      "take_now_message": "¿Crear o reemplazar la instantánea de hoy con el contenido actual de la nota?",
+      "take_now_button": "Tomar instantánea ahora"
+    },
+    "api": {
+      "invalid_note_id": "ID de nota no válido",
+      "note_not_found": "Nota no encontrada",
+      "already_exists": "Ya existe una instantánea para hoy",
+      "create_directory_failed": "No se pudo crear la carpeta de instantáneas",
+      "write_file_failed": "No se pudo escribir el archivo de instantánea",
+      "create_failed": "No se pudo crear la instantánea",
+      "not_found_today": "No se encontró ninguna instantánea para hoy",
+      "read_failed": "No se pudo leer la instantánea",
+      "retrieve_failed": "No se pudo recuperar la instantánea",
+      "invalid_entries_path": "Ruta de notas no válida",
+      "restore_note_file_failed": "No se pudo restaurar el archivo de la nota",
+      "restore_success": "La nota se restauró al estado de la instantánea",
+      "restore_failed": "No se pudo restaurar la instantánea"
+    }
+  },
   "kanban": {
     "title": "Kanban - {{folder}}",
     "view_label": "Vista Kanban",

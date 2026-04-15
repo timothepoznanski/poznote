@@ -64,6 +64,50 @@
     },
     "link_copied": "Link copiado"
   },
+  "snapshot": {
+    "menu_item": "Instantâneo",
+    "modal": {
+      "title": "Instantâneo do dia",
+      "loading": "Carregando instantâneo...",
+      "empty_title": "Nenhum instantâneo disponível",
+      "empty_hint": "Um instantâneo é criado automaticamente quando a nota é aberta pela primeira vez durante o dia.",
+      "empty_content": "(Conteúdo vazio)",
+      "take_now": "Criar instantâneo agora",
+      "copy_content": "Copiar conteúdo",
+      "restore_state": "Voltar para este estado"
+    },
+    "messages": {
+      "content_copied": "Conteúdo copiado",
+      "created_now": "Instantâneo salvo"
+    },
+    "errors": {
+      "restore_failed": "Não foi possível restaurar o instantâneo",
+      "create_failed": "Não foi possível criar o instantâneo",
+      "copy_failed": "Não foi possível copiar"
+    },
+    "confirm": {
+      "title": "Confirmação",
+      "restore_message": "Restaurar a nota para o estado do instantâneo? As alterações atuais serão perdidas.",
+      "restore_button": "Voltar para este estado",
+      "take_now_message": "Criar ou substituir o instantâneo de hoje com o conteúdo atual da nota?",
+      "take_now_button": "Criar instantâneo agora"
+    },
+    "api": {
+      "invalid_note_id": "ID da nota inválido",
+      "note_not_found": "Nota não encontrada",
+      "already_exists": "Já existe um instantâneo para hoje",
+      "create_directory_failed": "Não foi possível criar a pasta de instantâneos",
+      "write_file_failed": "Não foi possível gravar o arquivo do instantâneo",
+      "create_failed": "Não foi possível criar o instantâneo",
+      "not_found_today": "Nenhum instantâneo encontrado para hoje",
+      "read_failed": "Não foi possível ler o instantâneo",
+      "retrieve_failed": "Não foi possível recuperar o instantâneo",
+      "invalid_entries_path": "Caminho das notas inválido",
+      "restore_note_file_failed": "Não foi possível restaurar o arquivo da nota",
+      "restore_success": "A nota foi restaurada para o estado do instantâneo",
+      "restore_failed": "Não foi possível restaurar o instantâneo"
+    }
+  },
   "kanban": {
     "title": "Kanban - {{folder}}",
     "view_label": "Visualização Kanban",

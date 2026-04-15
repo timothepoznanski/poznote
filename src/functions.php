@@ -442,6 +442,9 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
         } elseif ($type === 'toolbar') {
             $rules[] = '.note-edit-toolbar .' . $id . ' { display: none !important; }';
             $rules[] = '.mobile-toolbar-menu [data-selector=".' . $id . '"] { display: none !important; }';
+            if ($id === 'btn-snapshot') {
+                $rules[] = '.mobile-toolbar-menu [data-action="show-snapshot"] { display: none !important; }';
+            }
         } elseif ($type === 'folder') {
             $rules[] = '.folder-actions-menu-item[data-action="' . $id . '"] { display: none !important; }';
             if ($id === 'toggle-sort-submenu') {
@@ -786,7 +789,23 @@ function normalizeTasklistJsonContent($content) {
             continue;
         }
 
-        $normalized = json_encode(array_values($decoded), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE);
+        $decoded = array_values(array_map(static function ($task) {
+            if (!is_array($task)) {
+                return $task;
+            }
+
+            $task['completed'] = !empty($task['completed']) || !empty($task['checked']) || !empty($task['done']);
+
+            if (!isset($task['text']) && isset($task['content'])) {
+                $task['text'] = (string) $task['content'];
+            }
+
+            unset($task['checked'], $task['done']);
+
+            return $task;
+        }, $decoded));
+
+        $normalized = json_encode($decoded, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE);
         if ($normalized !== false) {
             return $normalized;
         }

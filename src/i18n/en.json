@@ -41,6 +41,50 @@
     },
     "link_copied": "Link copied"
   },
+  "snapshot": {
+    "menu_item": "Snapshot",
+    "modal": {
+      "title": "Today's snapshot",
+      "loading": "Loading snapshot...",
+      "empty_title": "No snapshot available",
+      "empty_hint": "A snapshot is created automatically when the note is first opened during the day.",
+      "empty_content": "(Empty content)",
+      "take_now": "Take snapshot now",
+      "copy_content": "Copy content",
+      "restore_state": "Restore this state"
+    },
+    "messages": {
+      "content_copied": "Content copied",
+      "created_now": "Snapshot saved"
+    },
+    "errors": {
+      "restore_failed": "Failed to restore snapshot",
+      "create_failed": "Failed to take snapshot",
+      "copy_failed": "Copy failed"
+    },
+    "confirm": {
+      "title": "Confirmation",
+      "restore_message": "Restore the note to the snapshot state? Current changes will be lost.",
+      "restore_button": "Restore this state",
+      "take_now_message": "Create or replace today's snapshot with the current note content?",
+      "take_now_button": "Take snapshot now"
+    },
+    "api": {
+      "invalid_note_id": "Invalid note ID",
+      "note_not_found": "Note not found",
+      "already_exists": "Snapshot already exists for today",
+      "create_directory_failed": "Failed to create snapshot directory",
+      "write_file_failed": "Failed to write snapshot file",
+      "create_failed": "Failed to create snapshot",
+      "not_found_today": "No snapshot found for today",
+      "read_failed": "Failed to read snapshot",
+      "retrieve_failed": "Failed to retrieve snapshot",
+      "invalid_entries_path": "Invalid entries path",
+      "restore_note_file_failed": "Failed to restore note file",
+      "restore_success": "Note restored to snapshot state",
+      "restore_failed": "Failed to restore snapshot"
+    }
+  },
   "settings": {
     "title": "Settings",
     "categories": {
