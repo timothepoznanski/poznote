@@ -979,7 +979,7 @@
     "redirecting": "Redirecting...",
     "show_password": "Show password",
     "hide_password": "Hide password",
-    "admin_warning": "Please log in with the username <code>{{username}}</code> and your password (stored in .env). You can then rename this account in settings for better security.",
+      "admin_warning": "Please log in with the username <code>{{username}}</code> and the current password for this account. You can then rename this account in settings for better security.",
     "fields": {
       "username": "Username",
       "username_or_email": "Username or Email",
@@ -1862,19 +1862,19 @@
         "manage_password": "Password",
         "reset_password": "Reset Password",
         "set_password": "Set Password",
-        "reset_to_default": "Use default password (.env)",
-        "modal_help": "Set a custom password for this account or return to the environment default.",
+        "reset_to_default": "Reset to default password",
+        "modal_help": "Set a custom password for this account or reset to the default.",
         "current_mode": "Current mode",
-        "set_help": "At least 4 characters. This overrides the environment variable password for this user.",
-        "reset_help": "Remove the custom password and fall back to the environment variable default for this user.",
-        "reset_confirm": "Reset password for \"{{username}}\" to the environment variable default?",
+        "set_help": "At least 4 characters.",
+        "reset_help": "Remove the custom password and revert to the default password for this user.",
+        "reset_confirm": "Reset password for \"{{username}}\" to the default?",
         "set_new_password": "New password for \"{{username}}\":",
-        "reset_success": "Password reset to the default value found in the environment variables.",
+        "reset_success": "Password reset to default.",
         "set_success": "Password updated successfully.",
         "status_custom": "Custom",
         "status_default": "Default",
         "status_custom_detail": "This user uses a custom password.",
-        "status_default_detail": "This user uses the default password found in the environment variables.",
+        "status_default_detail": "This user uses the default password.",
         "changed_at_prefix": "Updated:"
       },
       "errors": {
@@ -1887,7 +1887,7 @@
   "password": {
     "status": {
       "custom": "Custom password",
-      "default": "Default (env)"
+      "default": "Default"
     },
     "modal": {
       "title": "Change Password",

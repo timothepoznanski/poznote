@@ -26,7 +26,7 @@ The MCP server acts as a bridge between AI assistants and your Poznote instance.
 
 - **`client.py`** — HTTP client for Poznote REST API
   - Performs HTTP requests (GET, POST, PATCH, DELETE)
-  - Handles Basic Auth
+  - Handles Poznote API authentication with the shared MCP service token
 
 ### Communication flow
 
@@ -87,27 +87,26 @@ The MCP server is included in the official Poznote `docker-compose.yml` and runs
 
 ### Configuration
 
-The MCP server uses these variables from your `.env`:
+The MCP server uses defaults from `docker-compose.yml`:
 
 ```bash
-# MCP Server port (default: 8045)
-POZNOTE_MCP_PORT=8045
-
-# Enable debug logging (`true` or `false` only)
-POZNOTE_DEBUG=false
+# MCP Server port defaults to 8045
+# Debug logging defaults to false
 ```
 
-Changes to `.env` variables take effect after recreating the MCP container:
+Poznote generates the MCP service token automatically in `data/.mcp_token`. The `mcp-server` container reads that file through the shared `./data:/var/www/html/data:ro` volume, so there is no password to keep in `.env`.
+
+To override port and debug for one start, recreate the MCP container with inline environment variables:
 
 ```bash
-docker compose up -d --force-recreate mcp-server
+POZNOTE_MCP_PORT=9000 POZNOTE_DEBUG=true docker compose up -d --force-recreate mcp-server
 ```
 
-A simple `docker compose restart mcp-server` does not reload updated `.env` values.
+A simple `docker compose restart mcp-server` does not reload updated environment variables.
 
 #### Debug mode
 
-Set `POZNOTE_DEBUG=true` in your `.env` to switch the log level from `INFO` to `DEBUG`. Set it back to `false` for normal use. Only the exact lowercase values `true` and `false` are recognized. Any other value is treated as `false` and a warning is written to the MCP logs. Every HTTP request sent to the Poznote API, every tool call received from the AI assistant, and every response are written in detail to the container logs. Use it to diagnose connection or authentication issues:
+Set `POZNOTE_DEBUG=true` in the startup command to switch the log level from `INFO` to `DEBUG`. Set it back to `false` for normal use. Only the exact lowercase values `true` and `false` are recognized. Any other value is treated as `false` and a warning is written to the MCP logs. Every HTTP request sent to the Poznote API, every tool call received from the AI assistant, and every response are written in detail to the container logs. Use it to diagnose connection or authentication issues:
 
 ```bash
 docker logs -f poznote-mcp
@@ -149,7 +148,7 @@ Complete setup guide: **[CLAUDE-CLI.md](CLAUDE-CLI.md)**
 
 ## Security
 
-The MCP server starts automatically with Poznote and listens on **localhost only**, it is not reachable from the outside. This is the correct, secure default: only your local machine (or an SSH tunnel you set up yourself) can reach it. All MCP configuration is done through `.env` variables.
+The MCP server starts automatically with Poznote and listens on **localhost only**, it is not reachable from the outside. This is the correct, secure default: only your local machine (or an SSH tunnel you set up yourself) can reach it. The localhost port mapping is defined in `docker-compose.yml`, while the internal MCP service token is generated automatically in `data/.mcp_token`.
 
 ### Why localhost-only is both normal and secure
 
@@ -180,7 +179,7 @@ If you must route the MCP server through a network, protect it with:
 
 ### How the MCP server authenticates to Poznote
 
-The MCP server connects to the Poznote REST API using `POZNOTE_PASSWORD`. Your Poznote instance is always protected regardless of who calls the MCP endpoint.
+The MCP server connects to the Poznote REST API with an internal Bearer token stored in `data/.mcp_token`. Poznote creates this token automatically and the Docker Compose setup mounts `./data` read-only into the MCP container so the token never needs to live in `.env`.
 
 ---
 

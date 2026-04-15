@@ -527,7 +527,7 @@ $v = getAppVersion();
             
             <div class="form-actions password-modal-actions">
                 <button type="button" class="btn btn-danger" onclick="closeModal('passwordModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
-                <button type="button" class="btn btn-secondary" id="pw_reset_btn" onclick="resetPasswordToEnv()"><?php echo t_h('multiuser.admin.password_management.reset_to_default', [], 'Reset to default'); ?></button>
+                <button type="button" class="btn btn-secondary" id="pw_reset_btn" onclick="resetPasswordToDefault()"><?php echo t_h('multiuser.admin.password_management.reset_to_default', [], 'Reset to default'); ?></button>
                 <button type="button" class="btn btn-primary" id="pw_save_btn" onclick="setNewPassword()"><?php echo t_h('common.save', [], 'Save'); ?></button>
             </div>
         </div>
@@ -662,7 +662,7 @@ $v = getAppVersion();
             });
         }
         
-        function resetPasswordToEnv() {
+        function resetPasswordToDefault() {
             var userId = document.getElementById('pw_user_id').value;
             var errorEl = document.getElementById('pw_error');
             var successEl = document.getElementById('pw_success');
@@ -674,7 +674,7 @@ $v = getAppVersion();
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 credentials: 'same-origin',
-                body: JSON.stringify({ action: 'reset_to_env' })
+                body: JSON.stringify({ action: 'reset_to_default' })
             })
             .then(r => r.json())
             .then(data => {

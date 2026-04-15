@@ -349,27 +349,32 @@ class AttachmentsController {
                 $isAuthenticated = true;
             }
             
-            // Check HTTP Basic Auth
-            if (!$isAuthenticated && isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
-                // Validate Basic Auth credentials
-                require_once __DIR__ . '/../../../users/db_master.php';
-                $authUser = getUserProfileByUsername($_SERVER['PHP_AUTH_USER']);
-                
-                if ($authUser && $authUser['active']) {
-                    if ((bool)$authUser['is_admin'] && $_SERVER['PHP_AUTH_PW'] === AUTH_PASSWORD) {
+            // Check API credentials supplied with the request.
+            if (!$isAuthenticated && getApiBearerToken() !== null) {
+                authenticateApiBearerToken();
+                $isAuthenticated = true;
+            }
+
+            if (!$isAuthenticated) {
+                $basicCredentials = getApiBasicCredentials();
+                if ($basicCredentials !== null) {
+                    require_once __DIR__ . '/../../../users/db_master.php';
+                    $loginIdentifier = $basicCredentials['username'];
+                    $authUser = ctype_digit($loginIdentifier)
+                        ? getUserProfileById((int) $loginIdentifier)
+                        : getUserProfileByUsername($loginIdentifier);
+
+                    if ($authUser && $authUser['active'] && verifyUserPassword((int)$authUser['id'], $basicCredentials['password'])) {
                         $isAuthenticated = true;
-                    } elseif (!$authUser['is_admin']) {
-                        $expectedUserPassword = getUserSpecificPassword($authUser['username']);
-                        if ($_SERVER['PHP_AUTH_PW'] === $expectedUserPassword) {
-                            $isAuthenticated = true;
-                        }
                     }
                 }
             }
-            
+
             if (!$isAuthenticated) {
                 http_response_code(401);
-                header('WWW-Authenticate: Basic realm="Poznote API"');
+                if (!(defined('OIDC_DISABLE_BASIC_AUTH') && OIDC_DISABLE_BASIC_AUTH)) {
+                    header('WWW-Authenticate: Basic realm="Poznote API"');
+                }
                 header('Content-Type: application/json');
                 echo json_encode(['error' => 'Authentication required']);
                 exit;

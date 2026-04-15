@@ -60,7 +60,7 @@ if ($isPublicApiEndpoint) {
     // Attachment downloads check authentication conditionally (public shared notes don't need auth)
     // Try to authenticate if credentials provided, but don't require it
     try {
-        if (isset($_SERVER['HTTP_X_USER_ID']) || (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW']))) {
+        if (isset($_SERVER['HTTP_X_USER_ID']) || hasApiAuthCredentials()) {
             @requireApiAuth();
         }
     } catch (Exception $e) {

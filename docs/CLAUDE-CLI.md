@@ -216,14 +216,18 @@ If Claude CLI cannot connect to the MCP server:
 
 ### Authentication Errors
 
-The MCP server authenticates to Poznote using credentials from `docker-compose.yml`. Check these environment variables:
-- `POZNOTE_PASSWORD`
+The MCP server authenticates to Poznote with the shared token stored in `data/.mcp_token`.
+
+Check these points:
+- `./data/.mcp_token` exists on the Poznote host
+- the `mcp-server` service mounts `./data:/var/www/html/data:ro`
+- the webserver container has been recreated at least once after updating to the token-based MCP setup
 
 ### Debug Mode
 
-Enable debug logging for the MCP server by setting `POZNOTE_DEBUG=true` in your `.env`, then recreate the MCP container:
+Enable debug logging for the MCP server by recreating the container with an inline environment variable:
 ```bash
-docker compose up -d --force-recreate mcp-server
+POZNOTE_DEBUG=true docker compose up -d --force-recreate mcp-server
 ```
 
 Only the exact lowercase values `true` and `false` are recognized. Any other value is treated as `false` and a warning is written to the MCP logs.

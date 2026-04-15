@@ -5,10 +5,17 @@ echo "Poznote Initialization Script - Setting up data directory..."
 
 DATA_DIR="/var/www/html/data"
 DB_PATH="$DATA_DIR/database/poznote.db"
+MCP_TOKEN_FILE="${POZNOTE_SERVICE_TOKEN_FILE:-$DATA_DIR/.mcp_token}"
 
 # Ensure data directory exists with correct permissions
 mkdir -p "$DATA_DIR"
 mkdir -p "$DATA_DIR/database"
+
+if [ ! -s "$MCP_TOKEN_FILE" ]; then
+    echo "Creating MCP service token at $MCP_TOKEN_FILE..."
+    umask 077
+    od -An -tx1 -N32 /dev/urandom | tr -d ' \n' > "$MCP_TOKEN_FILE"
+fi
 
 # Ensure data directory and all its contents are owned by www-data
 echo "Setting correct permissions recursively on $DATA_DIR..."
@@ -65,4 +72,9 @@ if [ -f "$MASTER_DB" ]; then
     echo "Master database found, ensuring permissions..."
     chown www-data:www-data "$MASTER_DB"
     chmod 664 "$MASTER_DB"
+fi
+
+if [ -f "$MCP_TOKEN_FILE" ]; then
+    chown www-data:www-data "$MCP_TOKEN_FILE"
+    chmod 644 "$MCP_TOKEN_FILE"
 fi

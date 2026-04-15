@@ -1346,7 +1346,7 @@
     "redirecting": "正在重定向...",
     "show_password": "显示密码",
     "hide_password": "隐藏密码",
-    "admin_warning": "请使用用户名 <code>{{username}}</code> 和您的密码（存储在 .env 中）登录，并在设置中重命名此帐户以提高安全性。",
+      "admin_warning": "请使用用户名 <code>{{username}}</code> 和此帐户的当前密码登录，然后可在设置中重命名此帐户以提高安全性。",
     "fields": {
       "username": "用户名",
       "username_or_email": "用户名或邮箱",
@@ -2051,18 +2051,18 @@
         "manage_password": "密码",
         "reset_password": "重置密码",
         "set_password": "设置密码",
-        "reset_to_default": "使用默认密码 (.env)",
-        "modal_help": "为此账户设置自定义密码，或恢复为环境变量中定义的默认密码。",
+          "reset_to_default": "重置为默认密码",
+          "modal_help": "为此账户设置自定义密码，或恢复为默认密码。",
         "current_mode": "当前模式",
-        "set_help": "至少 4 个字符。这会覆盖该用户当前使用的环境变量密码。",
-        "reset_help": "删除自定义密码，并恢复为该用户在环境变量中定义的默认密码。",
-        "reset_confirm": "将“{{username}}”的密码重置为环境变量中定义的默认值？",
+          "set_help": "至少 4 个字符。",
+          "reset_help": "删除自定义密码，并恢复为该用户的默认密码。",
+          "reset_confirm": "将“{{username}}”的密码重置为默认值？",
         "set_success": "密码更新成功。",
-        "reset_success": "密码已重置为环境变量中的默认值。",
+          "reset_success": "密码已重置为默认值。",
         "status_custom": "自定义",
         "status_default": "默认",
         "status_custom_detail": "该用户使用自定义密码。",
-        "status_default_detail": "该用户使用环境变量中的默认密码。",
+          "status_default_detail": "该用户使用默认密码。",
         "changed_at_prefix": "更新时间："
       },
       "password": "密码",
@@ -2381,7 +2381,7 @@
   "password": {
     "status": {
       "custom": "自定义密码",
-      "default": "默认 (env)"
+      "default": "默认"
     },
     "modal": {
       "title": "修改密码",

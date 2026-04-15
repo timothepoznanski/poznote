@@ -27,7 +27,7 @@
       "oidc_button": "Mit {{provider}} fortfahren",
       "documentation": "Poznote Dokumentation",
       "redirecting": "Weiterleitung...",
-      "admin_warning": "Bitte melden Sie sich mit dem Benutzernamen <code>{{username}}</code> und Ihrem Passwort (in .env gespeichert) an. Sie können dieses Konto dann in den Einstellungen für mehr Sicherheit umbenennen.",
+        "admin_warning": "Bitte melden Sie sich mit dem Benutzernamen <code>{{username}}</code> und dem aktuellen Passwort dieses Kontos an. Sie können dieses Konto dann in den Einstellungen für mehr Sicherheit umbenennen.",
       "errors": {
         "invalid_credentials": "Benutzername oder Passwort ist falsch."
       }
@@ -1346,7 +1346,7 @@
     "redirecting": "Weiterleitung...",
     "show_password": "Passwort anzeigen",
     "hide_password": "Passwort ausblenden",
-    "admin_warning": "Bitte melden Sie sich mit dem Benutzernamen <code>{{username}}</code> und Ihrem Passwort (in .env gespeichert) an und benennen Sie dieses Konto in den Einstellungen für mehr Sicherheit um.",
+      "admin_warning": "Bitte melden Sie sich mit dem Benutzernamen <code>{{username}}</code> und dem aktuellen Passwort dieses Kontos an und benennen Sie dieses Konto in den Einstellungen für mehr Sicherheit um.",
     "fields": {
       "username": "Benutzername",
       "username_or_email": "Benutzername oder E-Mail",
@@ -2238,7 +2238,7 @@
   "password": {
     "status": {
       "custom": "Benutzerdefiniertes Passwort",
-      "default": "Standard (env)"
+      "default": "Standard"
     },
     "modal": {
       "title": "Passwort ändern",

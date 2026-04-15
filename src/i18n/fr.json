@@ -1388,7 +1388,7 @@
     "redirecting": "Redirection...",
     "show_password": "Afficher le mot de passe",
     "hide_password": "Masquer le mot de passe",
-    "admin_warning": "Veuillez vous connecter avec le pseudo <code>{{username}}</code> et votre mot de passe (stocké dans le .env). Vous pourrez renommer ce compte dans les settings pour plus de sécurité.",
+      "admin_warning": "Veuillez vous connecter avec le pseudo <code>{{username}}</code> et le mot de passe actuel de ce compte. Vous pourrez ensuite renommer ce compte dans les réglages pour plus de sécurité.",
     "fields": {
       "username": "Nom d’utilisateur",
       "username_or_email": "Pseudo ou Email",
@@ -2085,18 +2085,18 @@
         "manage_password": "Mot de passe",
         "reset_password": "Réinitialiser le mot de passe",
         "set_password": "Définir un mot de passe",
-        "reset_to_default": "Utiliser le mot de passe par défaut (.env)",
-        "modal_help": "Définissez un mot de passe personnalisé pour ce compte ou revenez au mot de passe par défaut défini dans l'environnement.",
+        "reset_to_default": "Réinitialiser au mot de passe par défaut",
+        "modal_help": "Définissez un mot de passe personnalisé pour ce compte ou réinitialisez-le au mot de passe par défaut.",
         "current_mode": "Mode actuel",
-        "set_help": "Au moins 4 caractères. Cela remplace le mot de passe défini dans les variables d'environnement pour cet utilisateur.",
-        "reset_help": "Supprime le mot de passe personnalisé et repasse sur le mot de passe par défaut défini dans l'environnement pour cet utilisateur.",
-        "reset_confirm": "Réinitialiser le mot de passe de \"{{username}}\" vers celui défini dans les variables d'environnement ?",
+        "set_help": "Au moins 4 caractères.",
+        "reset_help": "Supprime le mot de passe personnalisé et rétablit le mot de passe par défaut pour cet utilisateur.",
+        "reset_confirm": "Réinitialiser le mot de passe de \"{{username}}\" au mot de passe par défaut ?",
         "set_success": "Mot de passe mis à jour avec succès.",
-        "reset_success": "Mot de passe réinitialisé vers la valeur par défaut qui se trouve dans les variables d'environnement.",
+        "reset_success": "Mot de passe réinitialisé au mot de passe par défaut.",
         "status_custom": "Personnalisé",
         "status_default": "Par défaut",
         "status_custom_detail": "Cet utilisateur utilise un mot de passe personnalisé.",
-        "status_default_detail": "Cet utilisateur utilise le mot de passe par défaut qui se trouve dans les variables d'environnement.",
+        "status_default_detail": "Cet utilisateur utilise le mot de passe par défaut.",
         "changed_at_prefix": "Mise à jour :"
       },
       "password": "Mot de passe",
@@ -2435,7 +2435,7 @@
   "password": {
     "status": {
       "custom": "Mot de passe personnalisé",
-      "default": "Par défaut (env)"
+      "default": "Par défaut"
     },
     "modal": {
       "title": "Changer le mot de passe",

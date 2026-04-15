@@ -220,21 +220,20 @@ After installation, access Poznote in your web browser:
 
 
 - Username: `admin_change_me`
-- Password: value of `POZNOTE_PASSWORD` (`admin` in `.env.template` by default)
+- Password: `admin`
 - Port: `8040`
 
-Rename the default administrator account after the first login.
+Rename the default administrator account and change the default password after the first login.
 
 ## Change Settings
 
 Most settings can be modified directly in the application through the settings page. Some system settings can only be changed in the `.env` file and require recreating the affected containers.
 
-- **Authentication** - Initial/default passwords and login configuration
+- **Authentication** - OIDC / SSO login configuration
 - **Web Server** - HTTP port configuration
-- **OIDC / SSO Authentication** - OpenID Connect integration
 - **MCP Server** - AI assistant integration
 
-Passwords can be changed directly in the application from `Settings > Change Password`. The `.env` authentication variables remain available to define the initial or fallback passwords used when no custom password has been set for a user.
+Passwords are managed exclusively through the Poznote web interface from **Settings > Change Password**.
 
 ### Modify System Settings (`.env`)
 
@@ -312,43 +311,25 @@ Poznote authenticates users against their profile using a username or email addr
 On a fresh installation, Poznote creates one active administrator profile:
 
 - Username: `admin_change_me`
-- Password: `POZNOTE_PASSWORD`
+- Password: `admin`
 
-Rename this account after the first login.
+Change the default password and rename the account after the first login.
 
 #### Password management
 
+Passwords are managed exclusively through the Poznote web interface:
+
 - Users can change their own password from **Settings > Change Password**.
-- Administrators can set a custom password for any user or reset that user back to their `.env` password from **Settings > User Management**.
+- Administrators can set a custom password for any user or reset it to the default from **Settings > User Management**.
 - The **Remember me** option keeps the session for 30 days.
 - Changing a password invalidates existing remember-me cookies for that user.
 
-#### Configuration
+#### Default passwords
 
-- **Admin password**: Set `POZNOTE_PASSWORD` in your `.env` file.
-- **Default standard-user password**: Set `POZNOTE_PASSWORD_USER` in your `.env` file.
-- **User-specific passwords**: Set individual defaults using `POZNOTE_PASSWORD_{USERNAME}` in your `.env`.
+- Administrator accounts: `admin`
+- Standard user accounts: `user`
 
-Example:
-
-```bash
-POZNOTE_PASSWORD=admin-secret
-POZNOTE_PASSWORD_USER=user-secret
-POZNOTE_PASSWORD_ALICE=alice-secret
-POZNOTE_PASSWORD_BOB=bob-secret
-```
-
-#### Password resolution order
-
-When a user signs in, Poznote checks passwords in this order:
-
-1. A custom bcrypt password hash stored in the master database for that user.
-2. Fallback values from `.env`:
-  - `POZNOTE_PASSWORD` for the administrator profile
-  - `POZNOTE_PASSWORD_USER` for standard users
-  - `POZNOTE_PASSWORD_{USERNAME}` for per-user overrides
-
-This means `.env` acts as the default or seed credential source, while a password changed from the interface takes priority afterward.
+When a user has not yet changed their password, the default value above is used. Once a password is changed through the interface, a secure bcrypt hash is stored in the database and takes priority.
 
 </details>
 
@@ -918,7 +899,13 @@ Poznote includes a Model Context Protocol (MCP) server that enables AI assistant
 
 For setup and usage instructions, see the [MCP Server documentation](docs/MCP-SERVER.md).
 
-Debug logging for the MCP server is controlled with `POZNOTE_DEBUG=true` or `POZNOTE_DEBUG=false` in `.env`. Only the exact lowercase values `true` and `false` are recognized. After changing it, recreate the `mcp-server` container; a simple restart does not reload updated `.env` values.
+The MCP server uses default settings (port `8045`, debug off). To override:
+
+```bash
+POZNOTE_MCP_PORT=9000 POZNOTE_DEBUG=true docker compose up -d --force-recreate mcp-server
+```
+
+Only the exact lowercase values `true` and `false` are recognized for `POZNOTE_DEBUG`. After changing settings, recreate the container; a simple restart does not reload environment variables.
 
 ## Chrome Extension
 
