@@ -16,7 +16,7 @@ This guide explains how to configure and use the Poznote MCP server with VS Code
 Check that your MCP server container is running:
 
 ```bash
-docker ps | grep mcp-server
+docker ps | grep mcp
 ```
 
 You should see the MCP server running. Note the port number in the output (default is 8045).
@@ -157,7 +157,7 @@ If VS Code Copilot cannot connect to the MCP server:
 
 2. **Verify Docker container status:**
    ```bash
-   docker ps | grep mcp-server
+   docker ps | grep mcp
   docker logs poznote-mcp
    ```
 

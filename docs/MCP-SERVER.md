@@ -124,7 +124,7 @@ docker-compose up -d
 
 ```bash
 # Check container is running
-docker ps | grep mcp-server
+docker ps | grep mcp
 
 # Test the endpoint
 curl http://localhost:8045/mcp
