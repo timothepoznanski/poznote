@@ -444,7 +444,7 @@ function parseMarkdown($text) {
                     preg_match('/^&gt;\s/', $nextLine) ||               // Blockquotes
                     preg_match('/^\s*[\*\-\+]\s+\[([ xX])\]\s+/', $nextLine) || // Task lists
                     preg_match('/^\s*[\*\-\+]\s+/', $nextLine) ||       // Unordered lists
-                    preg_match('/^\s*\d+\.\s+/', $nextLine) ||          // Ordered lists
+                    preg_match('/^\s*\d+(?:\.\d+)*\.\s+/', $nextLine) || // Ordered lists
                     preg_match('/^\s*\|.+\|\s*$/', $nextLine)           // Tables
                 );
             }
@@ -595,10 +595,10 @@ function parseMarkdown($text) {
                             $lookMatch = preg_match('/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/', $lookAheadLine, $lookMatches);
                             $lookMarkerType = null;
                         } else {
-                            $lookMatch = preg_match('/^(\s*)([\*\-\+]|\d+\.)\s+(.+)$/', $lookAheadLine, $lookMatches);
+                            $lookMatch = preg_match('/^(\s*)([\*\-\+]|\d+(?:\.\d+)*\.)\s+(.+)$/', $lookAheadLine, $lookMatches);
                             if ($lookMatch) {
                                 $lookMarker = $lookMatches[2];
-                                $lookMarkerType = preg_match('/\d+\./', $lookMarker) ? 'number' : 'bullet';
+                                $lookMarkerType = preg_match('/\d+(?:\.\d+)*\./', $lookMarker) ? 'number' : 'bullet';
                             } else {
                                 $lookMarkerType = null;
                             }
@@ -627,9 +627,9 @@ function parseMarkdown($text) {
                     $marker = null;
                     $markerType = null;
                 } else {
-                    $listMatch = preg_match('/^(\s*)([\*\-\+]|\d+\.)\s+(.+)$/', $currentLine, $matches);
+                    $listMatch = preg_match('/^(\s*)([\*\-\+]|\d+(?:\.\d+)*\.)\s+(.+)$/', $currentLine, $matches);
                     $marker = isset($matches[2]) ? $matches[2] : null;
-                    $markerType = ($marker && preg_match('/\d+\./', $marker)) ? 'number' : 'bullet';
+                    $markerType = ($marker && preg_match('/\d+(?:\.\d+)*\./', $marker)) ? 'number' : 'bullet';
                 }
                 
                 if (!$listMatch) {
@@ -655,12 +655,12 @@ function parseMarkdown($text) {
                     
                     while ($tempIndex < count($lines)) {
                         $tempLine = $lines[$tempIndex];
-                        if (!preg_match('/^(\s*)([\*\-\+]|\d+\.)\s+(.+)$/', $tempLine, $tempMatches)) {
+                        if (!preg_match('/^(\s*)([\*\-\+]|\d+(?:\.\d+)*\.)\s+(.+)$/', $tempLine, $tempMatches)) {
                             break;
                         }
                         $tempIndent = strlen($tempMatches[1]);
                         $tempMarker = $tempMatches[2];
-                        $tempMarkerType = preg_match('/\d+\./', $tempMarker) ? 'number' : 'bullet';
+                        $tempMarkerType = preg_match('/\d+(?:\.\d+)*\./', $tempMarker) ? 'number' : 'bullet';
                         
                         // Stop if we're back to the base marker type or different indentation
                         if ($tempIndent !== 0 || $tempMarkerType !== $markerType) {
@@ -703,13 +703,13 @@ function parseMarkdown($text) {
                         if ($isTaskList) {
                             $nextMatch = preg_match('/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/', $nextLine, $nextMatches);
                         } else {
-                            $nextMatch = preg_match('/^(\s*)([\*\-\+]|\d+\.)\s+(.+)$/', $nextLine, $nextMatches);
+                            $nextMatch = preg_match('/^(\s*)([\*\-\+]|\d+(?:\.\d+)*\.)\s+(.+)$/', $nextLine, $nextMatches);
                         }
                         
                         if ($nextMatch && strlen($nextMatches[1]) > $indent) {
                             // Parse nested list recursively
                             $nestedResult = $parseNestedList($nextIndex, $isTaskList);
-                            $isOrderedNested = !$isTaskList && preg_match('/\d+\./', $nextMatches[2]);
+                            $isOrderedNested = !$isTaskList && preg_match('/\d+(?:\.\d+)*\./', $nextMatches[2]);
                             $listTag = $isOrderedNested ? 'ol' : 'ul';
                             $listClass = $isTaskList ? ' class="task-list"' : '';
                             $itemHtml .= '<' . $listTag . $listClass . '>' . implode('', $nestedResult['items']) . '</' . $listTag . '>';
@@ -755,7 +755,7 @@ function parseMarkdown($text) {
         }
         
         // Ordered lists
-        if (preg_match('/^\s*\d+\.\s+(.+)$/', $line)) {
+        if (preg_match('/^\s*\d+(?:\.\d+)*\.\s+(.+)$/', $line)) {
             $flushParagraph();
             $listResult = $parseNestedList($i, false);
             $result[] = '<ol>' . implode('', $listResult['items']) . '</ol>';
