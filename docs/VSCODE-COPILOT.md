@@ -61,11 +61,20 @@ If your Poznote instance runs on a remote server, use SSH port forwarding to sec
 
 ### 1. Establish SSH Tunnel
 
+If you prefer the command line, create a classic SSH tunnel:
+
 ```bash
 ssh -L 8045:localhost:8045 user@your-server
 ```
 
 Keep this connection open while using VS Code Copilot with Poznote.
+
+If you are already connected to the remote machine through VS Code Remote SSH, Dev Containers, or Codespaces, you can also create the tunnel directly from VS Code in the `PORTS` view:
+
+1. Open the `PORTS` panel in VS Code.
+2. Forward remote port `8045`.
+3. Keep the forwarded port active while using Copilot.
+4. If VS Code assigns a local port other than `8045`, use that local port in `mcp.json`.
 
 ### 2. Configure VS Code
 
@@ -82,7 +91,7 @@ Use the same `mcp.json` configuration as for local installation:
 }
 ```
 
-The SSH tunnel forwards the remote MCP server to your local machine, so VS Code connects to `localhost`.
+The SSH tunnel or VS Code forwarded port exposes the remote MCP server to your local machine, so VS Code connects to `localhost`.
 
 ## Usage Examples
 
