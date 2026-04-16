@@ -259,7 +259,6 @@
         var container = document.getElementById('attachmentsList');
 
         var showInlineEverything = document.getElementById('showInlineImagesToggle') ? document.getElementById('showInlineImagesToggle').checked : true;
-        var showThumbnails = showInlineEverything; // For this page, we use the same toggle for thumbnails and inline visibility for now, OR should we separate? The user wants same behavior as list.
 
         // Filter out inline attachments if toggle is off
         var visibleAttachments = attachments;
@@ -293,24 +292,21 @@
             }
 
             var previewContent = '';
-            // Only show previews if showThumbnails is true
-            if (showThumbnails) {
-                if (isImage) {
-                    previewContent = '<img src="' + fileUrl + '" alt="' + TXT.previewAlt + '" class="attachment-thumbnail" onclick="previewImage(\'' + fileUrl + '\', \'' + fileName.replace(/'/g, "\\'") + '\')">';
-                } else if (isPDF) {
-                    previewContent = '<div class="pdf-thumbnail" onclick="previewPDF(\'' + fileUrl + '\', \'' + fileName.replace(/'/g, "\\'") + '\')">' +
-                        '<iframe src="' + fileUrl + '" width="60" height="60" frameborder="0" style="pointer-events: none; transform: scale(0.8); transform-origin: top left;"></iframe>' +
-                        '<div class="pdf-overlay"><span>' + TXT.pdfLabel + '</span></div>' +
-                        '</div>';
-                } else if (isVideo) {
-                    previewContent = '<div class="video-thumbnail" onclick="downloadAttachment(\'' + attachment.id + '\')">' +
-                        '<video src="' + fileUrl + '#t=0.1" muted playsinline preload="metadata"></video>' +
-                        '<div class="video-overlay"><i class="lucide lucide-play"></i></div>' +
-                        '</div>';
-                }
+            if (isImage) {
+                previewContent = '<img src="' + fileUrl + '" alt="' + TXT.previewAlt + '" class="attachment-thumbnail" onclick="previewImage(\'' + fileUrl + '\', \'' + fileName.replace(/'/g, "\\'") + '\')">';
+            } else if (isPDF) {
+                previewContent = '<div class="pdf-thumbnail" onclick="previewPDF(\'' + fileUrl + '\', \'' + fileName.replace(/'/g, "\\'") + '\')">' +
+                    '<iframe src="' + fileUrl + '" width="60" height="60" frameborder="0" style="pointer-events: none; transform: scale(0.8); transform-origin: top left;"></iframe>' +
+                    '<div class="pdf-overlay"><span>' + TXT.pdfLabel + '</span></div>' +
+                    '</div>';
+            } else if (isVideo) {
+                previewContent = '<div class="video-thumbnail" onclick="downloadAttachment(\'' + attachment.id + '\')">' +
+                    '<video src="' + fileUrl + '#t=0.1" muted playsinline preload="metadata"></video>' +
+                    '<div class="video-overlay"><i class="lucide lucide-play"></i></div>' +
+                    '</div>';
             }
 
-            // Fallback for no preview or if disabled
+            // Fallback for files without preview support
             if (!previewContent) {
                 var iconClass = 'lucide lucide-file';
                 if (isImage) iconClass = 'lucide lucide-file-image';
