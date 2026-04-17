@@ -18,7 +18,8 @@
 .toolbar-btn.btn-favorite.is-favorite .lucide-star,
 .toolbar-btn.btn-share.is-shared i.lucide-cloud,
 .toolbar-btn.btn-share.is-shared .lucide-cloud,
-.toolbar-btn.btn-attachment.has-attachments i {
+.toolbar-btn.btn-attachment.has-attachments i,
+.toolbar-btn.btn-reminder.has-reminder i {
     color: #007DB8 !important;
     filter: none !important;
 }

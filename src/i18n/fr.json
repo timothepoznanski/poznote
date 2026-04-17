@@ -1082,7 +1082,8 @@
       "attachments": "Pièces jointes"
     },
     "favorites": {
-      "empty": "Aucune note en favoris pour le moment."
+      "empty": "Aucune note en favoris pour le moment.",
+      "filter_placeholder": "Filtrer par titre ou nom de dossier..."
     },
     "drop_zone": {
       "remove_from_folder": "Déposez ici pour retirer du dossier"
@@ -2542,6 +2543,30 @@
       "allowed_users": "Emails/noms d'utilisateur séparés par des virgules. Préférez le contrôle d'accès par groupes.",
       "disable_normal_login": "Lorsqu'activé, seule la connexion OIDC est disponible sur la page de connexion",
       "disable_basic_auth": "Lorsqu'activé, les requêtes API avec HTTP Basic Auth seront rejetées (403)"
+    }
+  },
+  "reminder": {
+    "toolbar_button": "Définir un rappel",
+    "notifications": "Notifications",
+    "no_notifications": "Aucune notification",
+    "dismiss": "Fermer",
+    "dismiss_all": "Tout supprimer",
+    "set_success": "Rappel défini pour",
+    "removed": "Rappel supprimé",
+    "just_now": "À l'instant",
+    "new_notifications": "Vous avez",
+    "notification_s": "notification(s)",
+    "modal": {
+      "title": "Rappel",
+      "date_label": "Date et heure",
+      "in_30min": "30 min",
+      "in_1h": "1 heure",
+      "in_3h": "3 heures",
+      "tomorrow": "Demain",
+      "in_1week": "1 semaine",
+      "remove": "Supprimer le rappel",
+      "select_date": "Veuillez sélectionner une date et une heure",
+      "past_time": "Veuillez sélectionner une date future"
     }
   }
 }

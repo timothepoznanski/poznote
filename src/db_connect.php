@@ -224,8 +224,21 @@ try {
         FOREIGN KEY(folder_id) REFERENCES folders(id) ON DELETE CASCADE
     )');
 
+    // Notifications table for in-app reminders
+    $con->exec('CREATE TABLE IF NOT EXISTS notifications (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        note_id INTEGER,
+        type TEXT NOT NULL DEFAULT "reminder",
+        message TEXT,
+        is_read INTEGER DEFAULT 0,
+        created DATETIME DEFAULT CURRENT_TIMESTAMP,
+        trigger_at DATETIME,
+        dismissed INTEGER DEFAULT 0,
+        FOREIGN KEY(note_id) REFERENCES entries(id) ON DELETE CASCADE
+    )');
+
     // --- Schema versioning: skip migrations & indexes if already up to date ---
-    $CURRENT_SCHEMA_VERSION = 6;
+    $CURRENT_SCHEMA_VERSION = 7;
     $currentVersion = 0;
     try {
         $svStmt = $con->query("SELECT value FROM settings WHERE key = 'schema_version'");
@@ -334,7 +347,20 @@ try {
             }
         }
 
+        // Add reminder_at column to entries
+        try {
+            $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
+            $existingColumns = array_column($cols, 'name');
+            if (!in_array('reminder_at', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN reminder_at DATETIME");
+            }
+        } catch (Exception $e) {
+            error_log('Could not add reminder_at column to entries: ' . $e->getMessage());
+        }
+
         // === INDEXES ===
+        $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_reminder_at ON entries(reminder_at) WHERE reminder_at IS NOT NULL');
+        $con->exec('CREATE INDEX IF NOT EXISTS idx_notifications_trigger ON notifications(trigger_at, dismissed, is_read)');
         $con->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_folders_name_workspace_parent_notnull 
                     ON folders(name, workspace, parent_id) 
                     WHERE parent_id IS NOT NULL');
@@ -366,7 +392,7 @@ try {
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('markdown_split_card_view', '0')");
 
         // === Update schema version ===
-        $con->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('schema_version', '$CURRENT_SCHEMA_VERSION')");
+        $con->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('schema_version', '7')");
     }
     // --- End schema versioning ---
 

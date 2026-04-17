@@ -44,6 +44,7 @@ $currentLang = getUserLanguage();
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
       data-txt-error="<?php echo t_h('common.error', [], 'Error'); ?>"
       data-txt-untitled="<?php echo t_h('common.untitled', [], 'Untitled'); ?>"
+	data-txt-remove-favorite="<?php echo t_h('notes_manager.remove_favorite', [], 'Remove from favorites'); ?>"
       data-txt-no-filter-results="<?php echo t_h('public.no_filter_results', [], 'No notes match your search.'); ?>"
       data-txt-today="<?php echo t_h('common.date.today', [], 'Today'); ?>"
       data-txt-yesterday="<?php echo t_h('common.date.yesterday', [], 'Yesterday'); ?>"
@@ -66,7 +67,7 @@ $currentLang = getUserLanguage();
 					type="text" 
 					id="filterInput" 
 					class="filter-input" 
-					placeholder="<?php echo t_h('public.filter_placeholder', [], 'Filter by title or folder name...'); ?>"
+					placeholder="<?php echo t_h('notes_list.favorites.filter_placeholder', [], 'Filter by title or folder name...'); ?>"
 				/>
 				<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
 					<i class="lucide lucide-x"></i>
@@ -82,7 +83,7 @@ $currentLang = getUserLanguage();
 			</div>
 			<div id="favoritesNotesContainer"></div>
 			<div id="emptyMessage" class="empty-message initially-hidden">
-				<p><?php echo t_h('favorites.empty', [], 'No favorite notes yet.'); ?></p>
+				<p><?php echo t_h('notes_list.favorites.empty', [], 'No favorite notes yet.'); ?></p>
 			</div>
 		</div>
 	</div>

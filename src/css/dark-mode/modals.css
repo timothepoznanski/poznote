@@ -63,6 +63,189 @@ body.dark-mode .modal-buttons button:first-child:hover {
 }
 
 /* ============================================
+   Reminder Modal
+   ============================================ */
+
+html[data-theme='dark'] #reminderModal .modal-content,
+body.dark-mode #reminderModal .modal-content {
+    background: linear-gradient(180deg, #26282d 0%, #202226 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.38);
+}
+
+html[data-theme='dark'] #reminderModal .modal-content h3,
+body.dark-mode #reminderModal .modal-content h3 {
+    color: #f2f5f8;
+}
+
+html[data-theme='dark'] #reminderModal .reminder-datetime-input,
+body.dark-mode #reminderModal .reminder-datetime-input {
+    background: #313338;
+    border-color: #464b53;
+    color: #eef2f7;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    color-scheme: dark;
+}
+
+html[data-theme='dark'] #reminderModal .reminder-datetime-input:focus,
+body.dark-mode #reminderModal .reminder-datetime-input:focus {
+    border-color: var(--dm-accent);
+    box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.18);
+}
+
+html[data-theme='dark'] #reminderModal .reminder-datetime-input::-webkit-calendar-picker-indicator,
+body.dark-mode #reminderModal .reminder-datetime-input::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(1.15);
+    opacity: 0.88;
+}
+
+html[data-theme='dark'] #reminderModal .reminder-quick-btn,
+body.dark-mode #reminderModal .reminder-quick-btn {
+    background: #35383e;
+    border-color: #4a4f57;
+    color: #d7dde5;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+html[data-theme='dark'] #reminderModal .reminder-quick-btn:hover,
+html[data-theme='dark'] #reminderModal .reminder-quick-btn:focus-visible,
+body.dark-mode #reminderModal .reminder-quick-btn:hover,
+body.dark-mode #reminderModal .reminder-quick-btn:focus-visible {
+    background: rgba(74, 158, 255, 0.16);
+    border-color: rgba(74, 158, 255, 0.44);
+    color: #f2f7ff;
+}
+
+html[data-theme='dark'] #reminderModal .reminder-current-info,
+body.dark-mode #reminderModal .reminder-current-info {
+    background: rgba(74, 158, 255, 0.11);
+    border: 1px solid rgba(74, 158, 255, 0.18);
+    color: #78b6ff;
+}
+
+html[data-theme='dark'] #reminderModal .reminder-modal-action,
+body.dark-mode #reminderModal .reminder-modal-action {
+    border-radius: 12px;
+}
+
+html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-cancel,
+body.dark-mode #reminderModal .reminder-modal-actions .btn-cancel {
+    background: #4c5057;
+    border-color: #4c5057;
+    color: #f4f6f8;
+}
+
+html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-cancel:hover,
+body.dark-mode #reminderModal .reminder-modal-actions .btn-cancel:hover {
+    background: #595e67;
+    border-color: #595e67;
+}
+
+html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-primary,
+body.dark-mode #reminderModal .reminder-modal-actions .btn-primary {
+    background: #0e87cb;
+}
+
+html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-primary:hover,
+body.dark-mode #reminderModal .reminder-modal-actions .btn-primary:hover {
+    background: #0b74ae;
+}
+
+html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-danger,
+body.dark-mode #reminderModal .reminder-modal-actions .btn-danger {
+    background: #df3b4c !important;
+}
+
+html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-danger:hover,
+body.dark-mode #reminderModal .reminder-modal-actions .btn-danger:hover {
+    background: #c93242 !important;
+}
+
+/* ============================================
+   Notifications Modal
+   ============================================ */
+
+html[data-theme='dark'] #notificationsModal .modal-content,
+body.dark-mode #notificationsModal .modal-content {
+    background: linear-gradient(180deg, #26282d 0%, #202226 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.38);
+}
+
+html[data-theme='dark'] #notificationsModal .modal-content h3,
+body.dark-mode #notificationsModal .modal-content h3 {
+    color: #f2f5f8;
+}
+
+html[data-theme='dark'] #notificationsModal .notification-item,
+body.dark-mode #notificationsModal .notification-item {
+    background: #2b2f35;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+html[data-theme='dark'] #notificationsModal .notification-item:hover,
+body.dark-mode #notificationsModal .notification-item:hover {
+    background: #31363d;
+}
+
+html[data-theme='dark'] #notificationsModal .notification-item.unread,
+body.dark-mode #notificationsModal .notification-item.unread {
+    background: rgba(74, 158, 255, 0.14);
+    border-color: rgba(74, 158, 255, 0.22);
+}
+
+html[data-theme='dark'] #notificationsModal .notification-item.unread:hover,
+body.dark-mode #notificationsModal .notification-item.unread:hover {
+    background: rgba(74, 158, 255, 0.2);
+}
+
+html[data-theme='dark'] #notificationsModal .notification-icon,
+body.dark-mode #notificationsModal .notification-icon {
+    background: rgba(74, 158, 255, 0.14);
+    color: #7ab8ff;
+}
+
+html[data-theme='dark'] #notificationsModal .notification-heading,
+body.dark-mode #notificationsModal .notification-heading {
+    color: #edf2f7;
+}
+
+html[data-theme='dark'] #notificationsModal .notification-time,
+body.dark-mode #notificationsModal .notification-time {
+    color: #b8c2cf;
+}
+
+html[data-theme='dark'] #notificationsModal .notification-action-btn,
+body.dark-mode #notificationsModal .notification-action-btn {
+    color: #b7c0cb;
+}
+
+html[data-theme='dark'] #notificationsModal .notification-action-btn:hover,
+body.dark-mode #notificationsModal .notification-action-btn:hover {
+    color: #ff7b86;
+    background: rgba(239, 68, 68, 0.14);
+}
+
+html[data-theme='dark'] #notificationsModal .notifications-empty,
+body.dark-mode #notificationsModal .notifications-empty {
+    opacity: 0.72;
+    color: #d2dae4;
+}
+
+html[data-theme='dark'] #notificationsModal .modal-buttons .btn-cancel,
+body.dark-mode #notificationsModal .modal-buttons .btn-cancel {
+    background: #4c5057;
+    border-color: #4c5057;
+    color: #f4f6f8;
+}
+
+html[data-theme='dark'] #notificationsModal .modal-buttons .btn-cancel:hover,
+body.dark-mode #notificationsModal .modal-buttons .btn-cancel:hover {
+    background: #595e67;
+    border-color: #595e67;
+}
+
+/* ============================================
    Move Task Modal
    ============================================ */
 

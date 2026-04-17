@@ -227,7 +227,7 @@ usort($shared_folders, function($a, $b) {
 						type="text" 
 						id="filterInput" 
 						class="filter-input" 
-						placeholder="<?php echo t_h('public.filter_placeholder', [], 'Filter by title or folder name...'); ?>"
+						placeholder="<?php echo t_h('public.filter_placeholder', [], 'Filter by name or token...'); ?>"
 					/>
 					<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
 						<i class="lucide lucide-x"></i>

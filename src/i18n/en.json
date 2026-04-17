@@ -5,6 +5,7 @@
   "common": {
     "ok": "OK",
     "cancel": "Cancel",
+    "confirm": "Confirm",
     "save": "Save",
     "delete": "Delete",
     "create": "Create",
@@ -594,7 +595,8 @@
       "attachments": "Attachments"
     },
     "favorites": {
-      "empty": "No favorite notes yet."
+      "empty": "No favorite notes yet.",
+      "filter_placeholder": "Filter by title or folder name..."
     },
     "drop_zone": {
       "remove_from_folder": "Drop here to remove from folder"
@@ -1994,6 +1996,30 @@
       "allowed_users": "Comma-separated emails/usernames. Prefer group-based access control instead.",
       "disable_normal_login": "When enabled, only OIDC login is available on the login page",
       "disable_basic_auth": "When enabled, API requests with HTTP Basic Auth will be rejected (403)"
+    }
+  },
+  "reminder": {
+    "toolbar_button": "Set reminder",
+    "notifications": "Notifications",
+    "no_notifications": "No notifications",
+    "dismiss": "Dismiss",
+    "dismiss_all": "Delete all",
+    "set_success": "Reminder set for",
+    "removed": "Reminder removed",
+    "just_now": "Just now",
+    "new_notifications": "You have",
+    "notification_s": "notification(s)",
+    "modal": {
+      "title": "Reminder",
+      "date_label": "Date and time",
+      "in_30min": "30 min",
+      "in_1h": "1 hour",
+      "in_3h": "3 hours",
+      "tomorrow": "Tomorrow",
+      "in_1week": "1 week",
+      "remove": "Remove reminder",
+      "select_date": "Please select a date and time",
+      "past_time": "Please select a future time"
     }
   }
 }

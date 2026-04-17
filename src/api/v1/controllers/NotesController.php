@@ -218,10 +218,10 @@ class NotesController {
             if ($id !== null && is_numeric($id)) {
                 $noteId = (int)$id;
                 if ($useWorkspaceFilter) {
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
+                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
                     $stmt->execute([$noteId, $workspace]);
                 } else {
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, entry FROM entries WHERE id = ? AND trash = 0");
+                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, entry FROM entries WHERE id = ? AND trash = 0");
                     $stmt->execute([$noteId]);
                 }
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -236,10 +236,10 @@ class NotesController {
                 
                 if (is_numeric($reference)) {
                     $refId = (int)$reference;
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
+                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
                     $stmt->execute([$refId, $workspace]);
                 } else {
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, entry FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ? ORDER BY updated DESC LIMIT 1");
+                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, entry FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ? ORDER BY updated DESC LIMIT 1");
                     $stmt->execute(['%' . $reference . '%', $workspace]);
                 }
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -294,6 +294,7 @@ class NotesController {
                     'linked_note_id' => $row['linked_note_id'] ? (int)$row['linked_note_id'] : null,
                     'created' => $row['created'] ?? null,
                     'updated' => $row['updated'] ?? null,
+                    'reminder_at' => $row['reminder_at'] ?? null,
                     'content' => $content
                 ]
             ], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);

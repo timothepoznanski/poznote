@@ -2,6 +2,33 @@
 <div id="notificationOverlay" class="notification-overlay"></div>
 <div id="notificationPopup"></div>
 
+<!-- Reminder Modal -->
+<div id="reminderModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('reminder.modal.title', [], 'Reminder'); ?></h3>
+        <div class="reminder-form">
+            <div class="reminder-input-row">
+                <input type="datetime-local" id="reminderDateInput" class="reminder-datetime-input" />
+            </div>
+            <div class="reminder-quick-options">
+                <button type="button" class="reminder-quick-btn" data-minutes="30"><?php echo t_h('reminder.modal.in_30min', [], '30 min'); ?></button>
+                <button type="button" class="reminder-quick-btn" data-hours="1"><?php echo t_h('reminder.modal.in_1h', [], '1 hour'); ?></button>
+                <button type="button" class="reminder-quick-btn" data-days="1"><?php echo t_h('reminder.modal.tomorrow', [], 'Tomorrow'); ?></button>
+                <button type="button" class="reminder-quick-btn" data-days="7"><?php echo t_h('reminder.modal.in_1week', [], '1 week'); ?></button>
+            </div>
+            <div class="reminder-current-info initially-hidden" id="reminderCurrentInfo">
+                <i class="lucide lucide-bell"></i>
+                <span id="reminderCurrentDate"></span>
+            </div>
+        </div>
+        <div class="modal-buttons reminder-modal-actions">
+            <button type="button" class="btn-danger initially-hidden reminder-modal-action" id="reminderRemoveBtn" data-action="remove-reminder"><?php echo t_h('common.delete', [], 'Delete'); ?></button>
+            <button type="button" class="btn-cancel reminder-modal-action" data-action="close-reminder-modal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary reminder-modal-action" id="reminderSaveBtn" data-action="save-reminder"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Update Modal -->
 <div id="updateModal" class="modal">
     <div class="modal-content">
@@ -71,7 +98,7 @@
                 </button>
                 <button type="button" class="btn-danger" id="removeCustomCssBtn" style="display:none">
                     <i class="lucide lucide-trash-2"></i>
-                    <?php echo t_h('common.remove', [], 'Remove'); ?>
+                    <?php echo t_h('common.delete', [], 'Delete'); ?>
                 </button>
             </div>
         </div>

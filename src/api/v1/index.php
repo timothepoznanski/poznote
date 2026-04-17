@@ -99,6 +99,7 @@ require_once __DIR__ . '/controllers/GitSyncController.php';
 require_once __DIR__ . '/controllers/PublicController.php';
 require_once __DIR__ . '/controllers/BacklinksController.php';
 require_once __DIR__ . '/controllers/SnapshotsController.php';
+require_once __DIR__ . '/controllers/RemindersController.php';
 
 /**
  * Simple Router class for handling RESTful routes
@@ -243,6 +244,7 @@ $gitSyncController = new GitSyncController($con);
 $publicController = new PublicController($con);
 $backlinksController = new BacklinksController($con);
 $snapshotsController = new SnapshotsController($con);
+$remindersController = new RemindersController($con);
 
 // ======================
 // Notes Routes
@@ -347,6 +349,50 @@ $router->get('/notes/{id}/snapshot', function($params) use ($snapshotsController
 // Restore a note to its snapshot state
 $router->post('/notes/{id}/snapshot/restore', function($params) use ($snapshotsController) {
     $snapshotsController->restore($params['id']);
+});
+
+// ======================
+// Reminders Routes
+// ======================
+
+// Get reminder for a note
+$router->get('/notes/{id}/reminder', function($params) use ($remindersController) {
+    $remindersController->getReminder($params['id']);
+});
+
+// Set a reminder on a note
+$router->post('/notes/{id}/reminder', function($params) use ($remindersController) {
+    $remindersController->setReminder($params['id']);
+});
+
+// Remove a reminder from a note
+$router->delete('/notes/{id}/reminder', function($params) use ($remindersController) {
+    $remindersController->removeReminder($params['id']);
+});
+
+// List pending notifications
+$router->get('/reminders', function($params) use ($remindersController) {
+    $remindersController->index();
+});
+
+// Get unread notification count (lightweight polling)
+$router->get('/reminders/count', function($params) use ($remindersController) {
+    $remindersController->count();
+});
+
+// Dismiss all notifications
+$router->post('/reminders/dismiss-all', function($params) use ($remindersController) {
+    $remindersController->dismissAll();
+});
+
+// Mark a notification as read
+$router->post('/reminders/{id}/read', function($params) use ($remindersController) {
+    $remindersController->markRead($params['id']);
+});
+
+// Dismiss a notification
+$router->post('/reminders/{id}/dismiss', function($params) use ($remindersController) {
+    $remindersController->dismiss($params['id']);
 });
 
 // Get share status for a note

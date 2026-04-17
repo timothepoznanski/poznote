@@ -96,6 +96,17 @@ $default_note_folder = $note_load_result['default_note_folder'] ?? null;
 $current_note_folder = $note_load_result['current_note_folder'] ?? null;
 $res_right = $note_load_result['res_right'] ?? null;
 
+$notifications_count = 0;
+try {
+    if (isset($con)) {
+        $stmtNotif = $con->prepare("SELECT COUNT(*) as cnt FROM notifications WHERE is_read = 0 AND dismissed = 0 AND trigger_at <= datetime('now')");
+        $stmtNotif->execute();
+        $notifications_count = (int)$stmtNotif->fetchColumn();
+    }
+} catch (Exception $e) {
+    $notifications_count = 0;
+}
+
 // Handle unified search
 $using_unified_search = handleUnifiedSearch();
 
@@ -227,6 +238,7 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <link type="text/css" rel="stylesheet" href="css/modals/alerts-utilities.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/responsive.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/snapshot.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/reminders.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/tasks.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/markdown.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/excalidraw.css?v=<?php echo $v; ?>"/>
@@ -552,7 +564,8 @@ $body_classes = trim($extra_body_classes);
                     }
                 
                     // Home button (mobile only)
-                    echo '<button type="button" class="toolbar-btn btn-home mobile-home-btn" title="' . t_h('editor.toolbar.back_to_notes') . '" data-action="scroll-to-left-column"><i class="lucide lucide-home"></i></button>';
+                    $home_notifications_class = $notifications_count > 0 ? ' has-notifications-dot' : '';
+                    echo '<button type="button" class="toolbar-btn btn-home mobile-home-btn' . $home_notifications_class . '" title="' . t_h('editor.toolbar.back_to_notes') . '" data-action="scroll-to-left-column"><i class="lucide lucide-home"></i><span class="toolbar-notifications-dot" aria-hidden="true"></span></button>';
                     
                     // Text formatting buttons (save button removed - auto-save is now automatic)
                     echo '<button type="button" class="toolbar-btn btn-bold text-format-btn" title="' . t_h('editor.toolbar.bold') . '" data-action="exec-bold"><i class="lucide lucide-bold"></i></button>';
@@ -635,6 +648,11 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="toolbar-btn btn-share note-action-btn'.$share_class.'" title="'.t_h('index.toolbar.share_note', [], 'Share note').'" data-action="open-share-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-cloud"></i></button>';
                     
                     echo '<button type="button" class="toolbar-btn btn-attachment note-action-btn'.($visible_attachments_count > 0 ? ' has-attachments' : '').'" title="'.t_h('index.toolbar.attachments_with_count', ['count' => $visible_attachments_count], 'Attachments ({{count}})').'" data-action="show-attachment-dialog" data-note-id="'.$row['id'].'"><i class="lucide lucide-paperclip"></i></button>';
+                    
+                    // Reminder button
+                    $has_reminder = !empty($row['reminder_at']);
+                    $reminder_class = $has_reminder ? ' has-reminder' : '';
+                    echo '<button type="button" class="toolbar-btn btn-reminder note-action-btn'.$reminder_class.'" title="'.t_h('reminder.toolbar_button', [], 'Set reminder').'" data-action="open-reminder-modal" data-note-id="'.$row['id'].'" data-reminder-at="'.htmlspecialchars($row['reminder_at'] ?? '', ENT_QUOTES).'"><i class="lucide lucide-bell"></i></button>';
                     
                     // Open in new tab button
                     echo '<button type="button" class="toolbar-btn btn-open-new-tab note-action-btn" title="'.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'" data-action="open-note-new-tab" data-note-id="'.$row['id'].'"><i class="lucide lucide-external-link"></i></button>';
@@ -1036,6 +1054,7 @@ $body_classes = trim($extra_body_classes);
 <script src="js/slash-command.js?v=<?php echo $v; ?>"></script>
 <script src="js/pwa-helpers.js?v=<?php echo $v; ?>"></script>
 <script src="js/share.js?v=<?php echo $v; ?>"></script>
+<script src="js/reminders.js?v=<?php echo $v; ?>"></script>
 <script src="js/folder-hierarchy.js?v=<?php echo $v; ?>"></script>
 <script src="js/math-renderer.js?v=<?php echo $v; ?>"></script>
 <script src="js/modals-events.js?v=<?php echo $v; ?>"></script>
