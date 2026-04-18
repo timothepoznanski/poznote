@@ -403,6 +403,17 @@
                     duplicateNote(noteId);
                 }
                 break;
+            case 'show-snapshot':
+                if (noteId && typeof showSnapshotModal === 'function') {
+                    // Close the toolbar menu
+                    var toolbarEl = target.closest('.note-edit-toolbar');
+                    if (toolbarEl) {
+                        var menuEl = toolbarEl.querySelector('.mobile-toolbar-menu');
+                        if (menuEl) menuEl.hidden = true;
+                    }
+                    showSnapshotModal(noteId);
+                }
+                break;
             case 'show-move-folder-dialog':
                 if (noteId && typeof showMoveFolderDialog === 'function') {
                     const fId = target.dataset.folderId;

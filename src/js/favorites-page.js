@@ -7,6 +7,7 @@
             workspace: body.getAttribute('data-workspace') || '',
             txtError: body.getAttribute('data-txt-error') || 'Error',
             txtUntitled: body.getAttribute('data-txt-untitled') || 'Untitled',
+            txtRemoveFavorite: body.getAttribute('data-txt-remove-favorite') || 'Remove from favorites',
             txtNoFilterResults: body.getAttribute('data-txt-no-filter-results') || 'No notes match your search.',
             txtToday: body.getAttribute('data-txt-today') || 'Today',
             txtYesterday: body.getAttribute('data-txt-yesterday') || 'Yesterday',
@@ -148,13 +149,15 @@
             var actions = document.createElement('div');
             actions.className = 'note-actions';
 
-            var starBtn = document.createElement('button');
-            starBtn.className = 'btn-unfavorite';
-            starBtn.innerHTML = '<i class="lucide lucide-star"></i>';
-            starBtn.title = 'Remove from favorites';
-            starBtn.onclick = function () { toggleFavorite(note.id); };
+            var removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'btn-unfavorite';
+            removeBtn.innerHTML = '<i class="lucide lucide-trash-2"></i>';
+            removeBtn.title = config.txtRemoveFavorite;
+            removeBtn.setAttribute('aria-label', config.txtRemoveFavorite);
+            removeBtn.onclick = function () { toggleFavorite(note.id); };
 
-            actions.appendChild(starBtn);
+            actions.appendChild(removeBtn);
             item.appendChild(actions);
 
             list.appendChild(item);

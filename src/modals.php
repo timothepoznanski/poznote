@@ -2,6 +2,33 @@
 <div id="notificationOverlay" class="notification-overlay"></div>
 <div id="notificationPopup"></div>
 
+<!-- Reminder Modal -->
+<div id="reminderModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('reminder.modal.title', [], 'Reminder'); ?></h3>
+        <div class="reminder-form">
+            <div class="reminder-input-row">
+                <input type="datetime-local" id="reminderDateInput" class="reminder-datetime-input" />
+            </div>
+            <div class="reminder-quick-options">
+                <button type="button" class="reminder-quick-btn" data-minutes="30"><?php echo t_h('reminder.modal.in_30min', [], '30 min'); ?></button>
+                <button type="button" class="reminder-quick-btn" data-hours="1"><?php echo t_h('reminder.modal.in_1h', [], '1 hour'); ?></button>
+                <button type="button" class="reminder-quick-btn" data-days="1"><?php echo t_h('reminder.modal.tomorrow', [], 'Tomorrow'); ?></button>
+                <button type="button" class="reminder-quick-btn" data-days="7"><?php echo t_h('reminder.modal.in_1week', [], '1 week'); ?></button>
+            </div>
+            <div class="reminder-current-info initially-hidden" id="reminderCurrentInfo">
+                <i class="lucide lucide-bell"></i>
+                <span id="reminderCurrentDate"></span>
+            </div>
+        </div>
+        <div class="modal-buttons reminder-modal-actions">
+            <button type="button" class="btn-danger initially-hidden reminder-modal-action" id="reminderRemoveBtn" data-action="remove-reminder"><?php echo t_h('common.delete', [], 'Delete'); ?></button>
+            <button type="button" class="btn-cancel reminder-modal-action" data-action="close-reminder-modal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary reminder-modal-action" id="reminderSaveBtn" data-action="save-reminder"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Update Modal -->
 <div id="updateModal" class="modal">
     <div class="modal-content">
@@ -71,7 +98,7 @@
                 </button>
                 <button type="button" class="btn-danger" id="removeCustomCssBtn" style="display:none">
                     <i class="lucide lucide-trash-2"></i>
-                    <?php echo t_h('common.remove', [], 'Remove'); ?>
+                    <?php echo t_h('common.delete', [], 'Delete'); ?>
                 </button>
             </div>
         </div>
@@ -1015,6 +1042,7 @@
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-favorites-card" checked><span><?php echo t_h('notes_list.system_folders.favorites', [], 'Favorites'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-folders-card" checked><span><?php echo t_h('home.folders', [], 'Folders'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-shares-card" checked><span><?php echo t_h('home.shares', [], 'Shares'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-notifications-card" checked><span><?php echo t_h('reminder.notifications', [], 'Notifications'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-trash-card" checked><span><?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-attachments-card" checked><span><?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-git-push-card" checked><span><?php echo t_h('git_sync.actions.push.button', ['provider' => 'Git'], 'Git Push'); ?></span></label>
@@ -1097,12 +1125,14 @@
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-favorite" checked><span><?php echo t_h('index.toolbar.favorite_add', [], 'Favorite'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-share" checked><span><?php echo t_h('index.toolbar.share_note', [], 'Share'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-attachment" checked><span><?php echo t_h('modals.attachment.title', [], 'Attachments'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-reminder" checked><span><?php echo t_h('modals.ui_customization.reminder_bell', [], 'Bell icon (reminder)'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-open-new-tab" checked><span><?php echo t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-duplicate" checked><span><?php echo t_h('common.duplicate', [], 'Duplicate'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-move" checked><span><?php echo t_h('common.move', [], 'Move'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-create-linked-note" checked><span><?php echo t_h('editor.toolbar.create_linked_note', [], 'Create linked note'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-download" checked><span><?php echo t_h('common.download', [], 'Download'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-convert" checked><span><?php echo t_h('modals.convert.title', [], 'Convert'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-snapshot" checked><span><?php echo t_h('snapshot.menu_item', [], 'Snapshot'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-trash" checked><span><?php echo t_h('common.delete', [], 'Delete'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-info" checked><span><?php echo t_h('common.information', [], 'Information'); ?></span></label>
                 </div>
@@ -1166,6 +1196,51 @@
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="uiCustomizationModal"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" id="saveUiCustomizationBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
+<!-- Snapshot Modal -->
+<div id="snapshotModal" class="modal" style="display:none;">
+    <div class="modal-content snapshot-modal-content">
+        <div class="snapshot-modal-header">
+            <h3><i class="lucide lucide-history"></i> <?php echo t_h('snapshot.modal.title', [], 'Today\'s snapshot'); ?></h3>
+        </div>
+
+        <div id="snapshotLoading" class="snapshot-state">
+            <div><i class="lucide lucide-loader-2 snapshot-spinner"></i></div>
+            <p><?php echo t_h('snapshot.modal.loading', [], 'Loading snapshot...'); ?></p>
+        </div>
+
+        <div id="snapshotNoData" class="snapshot-state" style="display:none;">
+            <div><i class="lucide lucide-alert-circle"></i></div>
+            <p class="snapshot-state-title"><?php echo t_h('snapshot.modal.empty_title', [], 'No snapshot available'); ?></p>
+            <p class="snapshot-state-hint"><?php echo t_h('snapshot.modal.empty_hint', [], 'A snapshot is created automatically when the note is first opened during the day.'); ?></p>
+            <div class="modal-buttons" style="margin-top:20px;">
+                <button type="button" class="btn-cancel snapshot-take-btn" onclick="takeSnapshotNow()"><?php echo t_h('snapshot.modal.take_now', [], 'Take snapshot now'); ?></button>
+                <button type="button" class="btn-danger" onclick="closeSnapshotModal()"><?php echo t_h('common.close'); ?></button>
+            </div>
+        </div>
+
+        <div id="snapshotBody" style="display:none;">
+            <div class="snapshot-meta">
+                <div class="snapshot-meta-item">
+                    <i class="lucide lucide-calendar"></i>
+                    <span id="snapshotDate"></span>
+                </div>
+                <div class="snapshot-meta-item">
+                    <i class="lucide lucide-file-text"></i>
+                    <span id="snapshotHeading"></span>
+                </div>
+            </div>
+            <div class="snapshot-content-wrapper">
+                <div id="snapshotContent" class="snapshot-content-preview" data-empty-text="<?php echo t_h('snapshot.modal.empty_content', [], '(Empty content)'); ?>"></div>
+            </div>
+            <div class="modal-buttons snapshot-modal-actions">
+                <button type="button" class="btn-danger" onclick="closeSnapshotModal()"><?php echo t_h('common.close'); ?></button>
+                <button type="button" class="btn-cancel snapshot-take-btn" onclick="takeSnapshotNow()"><?php echo t_h('snapshot.modal.take_now', [], 'Take snapshot now'); ?></button>
+                <button type="button" class="btn-primary snapshot-restore-btn" onclick="restoreSnapshot()"><?php echo t_h('snapshot.modal.restore_state', [], 'Restore this state'); ?></button>
+            </div>
         </div>
     </div>
 </div>

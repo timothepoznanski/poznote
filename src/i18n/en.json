@@ -5,6 +5,7 @@
   "common": {
     "ok": "OK",
     "cancel": "Cancel",
+    "confirm": "Confirm",
     "save": "Save",
     "delete": "Delete",
     "create": "Create",
@@ -41,6 +42,50 @@
     },
     "link_copied": "Link copied"
   },
+  "snapshot": {
+    "menu_item": "Snapshot",
+    "modal": {
+      "title": "Today's snapshot",
+      "loading": "Loading snapshot...",
+      "empty_title": "No snapshot available",
+      "empty_hint": "A snapshot is created automatically when the note is first opened during the day.",
+      "empty_content": "(Empty content)",
+      "take_now": "Take snapshot now",
+      "copy_content": "Copy content",
+      "restore_state": "Restore this state"
+    },
+    "messages": {
+      "content_copied": "Content copied",
+      "created_now": "Snapshot saved"
+    },
+    "errors": {
+      "restore_failed": "Failed to restore snapshot",
+      "create_failed": "Failed to take snapshot",
+      "copy_failed": "Copy failed"
+    },
+    "confirm": {
+      "title": "Confirmation",
+      "restore_message": "Restore the note to the snapshot state? Current changes will be lost.",
+      "restore_button": "Restore this state",
+      "take_now_message": "Create or replace today's snapshot with the current note content?",
+      "take_now_button": "Take snapshot now"
+    },
+    "api": {
+      "invalid_note_id": "Invalid note ID",
+      "note_not_found": "Note not found",
+      "already_exists": "Snapshot already exists for today",
+      "create_directory_failed": "Failed to create snapshot directory",
+      "write_file_failed": "Failed to write snapshot file",
+      "create_failed": "Failed to create snapshot",
+      "not_found_today": "No snapshot found for today",
+      "read_failed": "Failed to read snapshot",
+      "retrieve_failed": "Failed to retrieve snapshot",
+      "invalid_entries_path": "Invalid entries path",
+      "restore_note_file_failed": "Failed to restore note file",
+      "restore_success": "Note restored to snapshot state",
+      "restore_failed": "Failed to restore snapshot"
+    }
+  },
   "settings": {
     "title": "Settings",
     "categories": {
@@ -72,7 +117,8 @@
       "orphan_scanner": "Orphan attachments scanner",
       "change_password": "Change Password",
       "import_limits": "Import Limits",
-      "git_sync_toggle": "Git Sync"
+      "git_sync_toggle": "Git Sync",
+      "oidc_config": "OIDC / SSO"
     },
     "install_app": {
       "launching": "The installation will start. Please wait...",
@@ -289,6 +335,7 @@
     "ui_customization": {
       "title": "UI Customization",
       "description": "Show or hide interface elements. Unchecked items will be hidden.",
+      "reminder_bell": "Bell icon (reminder)",
       "filter_placeholder": "Filter items...",
       "no_results": "No matching items found.",
       "sections": {
@@ -549,7 +596,8 @@
       "attachments": "Attachments"
     },
     "favorites": {
-      "empty": "No favorite notes yet."
+      "empty": "No favorite notes yet.",
+      "filter_placeholder": "Filter by title or folder name..."
     },
     "drop_zone": {
       "remove_from_folder": "Drop here to remove from folder"
@@ -979,7 +1027,7 @@
     "redirecting": "Redirecting...",
     "show_password": "Show password",
     "hide_password": "Hide password",
-    "admin_warning": "Please log in with the username <code>{{username}}</code> and your password (stored in .env). You can then rename this account in settings for better security.",
+      "admin_warning": "Please log in with the username <code>{{username}}</code> and the current password for this account. You can then rename this account in settings for better security.",
     "fields": {
       "username": "Username",
       "username_or_email": "Username or Email",
@@ -1674,6 +1722,7 @@
       "workspace": "Workspace: {{workspace}}",
       "target_workspace": "Target Workspace",
       "all_workspaces": "All workspaces",
+      "home_hint": "Push and Pull can be done from Dashboard.",
       "push": {
         "title": "Push to {{provider}}",
         "description": "Exports all your notes and attachments to {{provider}} as flat files. Updates existing files and removes files that no longer exist in Poznote.",
@@ -1861,19 +1910,19 @@
         "manage_password": "Password",
         "reset_password": "Reset Password",
         "set_password": "Set Password",
-        "reset_to_default": "Use default password (.env)",
-        "modal_help": "Set a custom password for this account or return to the environment default.",
+        "reset_to_default": "Reset to default password",
+        "modal_help": "Set a custom password for this account or reset to the default.",
         "current_mode": "Current mode",
-        "set_help": "At least 4 characters. This overrides the environment variable password for this user.",
-        "reset_help": "Remove the custom password and fall back to the environment variable default for this user.",
-        "reset_confirm": "Reset password for \"{{username}}\" to the environment variable default?",
+        "set_help": "At least 4 characters.",
+        "reset_help": "Remove the custom password and revert to the default password for this user.",
+        "reset_confirm": "Reset password for \"{{username}}\" to the default?",
         "set_new_password": "New password for \"{{username}}\":",
-        "reset_success": "Password reset to the default value found in the environment variables.",
+        "reset_success": "Password reset to default.",
         "set_success": "Password updated successfully.",
         "status_custom": "Custom",
         "status_default": "Default",
         "status_custom_detail": "This user uses a custom password.",
-        "status_default_detail": "This user uses the default password found in the environment variables.",
+        "status_default_detail": "This user uses the default password.",
         "changed_at_prefix": "Updated:"
       },
       "errors": {
@@ -1886,7 +1935,7 @@
   "password": {
     "status": {
       "custom": "Custom password",
-      "default": "Default (env)"
+      "default": "Default"
     },
     "modal": {
       "title": "Change Password",
@@ -1902,5 +1951,76 @@
       "incorrect_current": "Current password is incorrect"
     },
     "success": "Password changed successfully."
+  },
+  "oidc_admin": {
+    "title": "OIDC Configuration",
+    "description": "Configure OpenID Connect (SSO) authentication. Client ID and Client Secret are configured in the .env file for security.",
+    "saved": "OIDC configuration saved successfully.",
+    "error_saving": "Error saving some settings. Please try again.",
+    "error_csrf": "Invalid form submission. Please try again.",
+    "deprecated": "Deprecated",
+    "section_general": "General",
+    "section_credentials": "Credentials",
+    "section_advanced": "Advanced",
+    "section_access_control": "Access Control",
+    "section_login_behavior": "Login Behavior",
+    "fields": {
+      "enabled": "Enable OIDC authentication",
+      "provider_name": "Provider name",
+      "issuer": "Issuer URL",
+      "client_id": "Client ID",
+      "client_secret": "Client Secret",
+      "scopes": "Scopes",
+      "discovery_url": "Discovery URL",
+      "redirect_uri": "Redirect URI",
+      "end_session_endpoint": "End session endpoint",
+      "post_logout_redirect_uri": "Post-logout redirect URI",
+      "groups_claim": "Groups claim",
+      "allowed_groups": "Allowed groups",
+      "auto_create_users": "Auto-create user profiles on first OIDC login",
+      "allowed_users": "Allowed users",
+      "disable_normal_login": "Disable username/password login (SSO only)",
+      "disable_basic_auth": "Disable HTTP Basic Auth for API"
+    },
+    "hints": {
+      "provider_name": "Display name shown on the login button (e.g. Google, Azure AD, Keycloak)",
+      "issuer": "The issuer URL of your OIDC provider (e.g. https://accounts.google.com)",
+      "credentials": "Client ID and Client Secret are managed in the .env file.",
+      "scopes": "Space-separated scopes (default: openid profile email)",
+      "discovery_url": "Override the auto-discovery URL (leave empty to derive from issuer)",
+      "redirect_uri": "Custom redirect URI (leave empty to auto-generate)",
+      "end_session_endpoint": "IdP logout endpoint for RP-initiated logout (optional)",
+      "post_logout_redirect_uri": "Where to redirect after logout (default: login page)",
+      "groups_claim": "Token claim name containing user groups (default: groups)",
+      "allowed_groups": "Comma-separated list of allowed groups. Leave empty to allow all authenticated users.",
+      "auto_create_users": "Recommended when using group-based access control",
+      "allowed_users": "Comma-separated emails/usernames. Prefer group-based access control instead.",
+      "disable_normal_login": "When enabled, only OIDC login is available on the login page",
+      "disable_basic_auth": "When enabled, API requests with HTTP Basic Auth will be rejected (403)"
+    }
+  },
+  "reminder": {
+    "toolbar_button": "Set reminder",
+    "notifications": "Notifications",
+    "no_notifications": "No notifications",
+    "dismiss": "Dismiss",
+    "dismiss_all": "Delete all",
+    "set_success": "Reminder set for",
+    "removed": "Reminder removed",
+    "just_now": "Just now",
+    "new_notifications": "You have",
+    "notification_s": "notification(s)",
+    "modal": {
+      "title": "Reminder",
+      "date_label": "Date and time",
+      "in_30min": "30 min",
+      "in_1h": "1 hour",
+      "in_3h": "3 hours",
+      "tomorrow": "Tomorrow",
+      "in_1week": "1 week",
+      "remove": "Remove reminder",
+      "select_date": "Please select a date and time",
+      "past_time": "Please select a future time"
+    }
   }
 }

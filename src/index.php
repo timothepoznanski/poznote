@@ -96,6 +96,17 @@ $default_note_folder = $note_load_result['default_note_folder'] ?? null;
 $current_note_folder = $note_load_result['current_note_folder'] ?? null;
 $res_right = $note_load_result['res_right'] ?? null;
 
+$notifications_count = 0;
+try {
+    if (isset($con)) {
+        $stmtNotif = $con->prepare("SELECT COUNT(*) as cnt FROM notifications WHERE is_read = 0 AND dismissed = 0 AND trigger_at <= datetime('now')");
+        $stmtNotif->execute();
+        $notifications_count = (int)$stmtNotif->fetchColumn();
+    }
+} catch (Exception $e) {
+    $notifications_count = 0;
+}
+
 // Handle unified search
 $using_unified_search = handleUnifiedSearch();
 
@@ -226,6 +237,8 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <link type="text/css" rel="stylesheet" href="css/modals/share-modal.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/alerts-utilities.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/responsive.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/snapshot.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/reminders.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/tasks.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/markdown.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/excalidraw.css?v=<?php echo $v; ?>"/>
@@ -367,8 +380,9 @@ $body_classes = trim($extra_body_classes);
                 <i class="lucide lucide-caret-down workspace-dropdown-icon"></i>
             </div>
             <div class="sidebar-title-actions">
-                <button class="sidebar-home" data-action="navigate-to-home" title="<?php echo t_h('sidebar.home', [], 'Dashboard'); ?>">
+                <button class="sidebar-home<?php echo $notifications_count > 0 ? ' has-notifications-dot' : ''; ?>" data-action="navigate-to-home" title="<?php echo t_h('sidebar.home', [], 'Dashboard'); ?>">
                     <i class="lucide lucide-layout-dashboard"></i>
+                    <span class="sidebar-notifications-dot" aria-hidden="true"></span>
                 </button>
                 <button class="sidebar-settings" data-action="navigate-to-settings" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>">
                     <i class="lucide lucide-settings"></i>
@@ -635,6 +649,11 @@ $body_classes = trim($extra_body_classes);
                     
                     echo '<button type="button" class="toolbar-btn btn-attachment note-action-btn'.($visible_attachments_count > 0 ? ' has-attachments' : '').'" title="'.t_h('index.toolbar.attachments_with_count', ['count' => $visible_attachments_count], 'Attachments ({{count}})').'" data-action="show-attachment-dialog" data-note-id="'.$row['id'].'"><i class="lucide lucide-paperclip"></i></button>';
                     
+                    // Reminder button
+                    $has_reminder = !empty($row['reminder_at']);
+                    $reminder_class = $has_reminder ? ' has-reminder' : '';
+                    echo '<button type="button" class="toolbar-btn btn-reminder note-action-btn'.$reminder_class.'" title="'.t_h('reminder.toolbar_button', [], 'Set reminder').'" data-action="open-reminder-modal" data-note-id="'.$row['id'].'" data-reminder-at="'.htmlspecialchars($row['reminder_at'] ?? '', ENT_QUOTES).'"><i class="lucide lucide-bell"></i></button>';
+                    
                     // Open in new tab button
                     echo '<button type="button" class="toolbar-btn btn-open-new-tab note-action-btn" title="'.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'" data-action="open-note-new-tab" data-note-id="'.$row['id'].'"><i class="lucide lucide-external-link"></i></button>';
 
@@ -762,6 +781,7 @@ $body_classes = trim($extra_body_classes);
                     }
                     
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-open-new-tab"><i class="lucide lucide-external-link"></i> '.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="show-snapshot" data-note-id="'.$row['id'].'"><i class="lucide lucide-history"></i> '.t_h('snapshot.menu_item', [], 'Snapshot').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-info"><i class="lucide lucide-info"></i> '.t_h('common.information', [], 'Information').'</button>';
                     echo '</div>';
                     echo '</div>';
@@ -1034,6 +1054,7 @@ $body_classes = trim($extra_body_classes);
 <script src="js/slash-command.js?v=<?php echo $v; ?>"></script>
 <script src="js/pwa-helpers.js?v=<?php echo $v; ?>"></script>
 <script src="js/share.js?v=<?php echo $v; ?>"></script>
+<script src="js/reminders.js?v=<?php echo $v; ?>"></script>
 <script src="js/folder-hierarchy.js?v=<?php echo $v; ?>"></script>
 <script src="js/math-renderer.js?v=<?php echo $v; ?>"></script>
 <script src="js/modals-events.js?v=<?php echo $v; ?>"></script>
@@ -1096,11 +1117,20 @@ window.calendarTranslations = {
 </script>
 <script src="js/calendar.js?v=<?php echo $v; ?>"></script>
 <script src="js/backlinks.js?v=<?php echo $v; ?>"></script>
+<script src="js/snapshots.js?v=<?php echo $v; ?>"></script>
 <script src="js/ui-customization.js?v=<?php echo $v; ?>"></script>
 
 <?php if ($note && is_numeric($note)): ?>
 <!-- Data for draft check (used by index-events.js) -->
 <script type="application/json" id="current-note-data"><?php echo json_encode(['noteId' => (string)$note]); ?></script>
+<!-- Create daily snapshot on note load -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof createNoteSnapshot === 'function') {
+        createNoteSnapshot(<?php echo (int)$note; ?>);
+    }
+});
+</script>
 <?php endif; ?>
 
 

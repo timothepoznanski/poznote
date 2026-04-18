@@ -67,6 +67,50 @@
     },
     "link_copied": "Lien copié"
   },
+  "snapshot": {
+    "menu_item": "Snapshot",
+    "modal": {
+      "title": "Snapshot du jour",
+      "loading": "Chargement du snapshot...",
+      "empty_title": "Aucun snapshot disponible",
+      "empty_hint": "Un snapshot est créé automatiquement lors de la première ouverture de la note dans la journée.",
+      "empty_content": "(Contenu vide)",
+      "take_now": "Prendre un snapshot maintenant",
+      "copy_content": "Copier le contenu",
+      "restore_state": "Revenir à cet état"
+    },
+    "messages": {
+      "content_copied": "Contenu copié",
+      "created_now": "Snapshot enregistré"
+    },
+    "errors": {
+      "restore_failed": "Échec de la restauration du snapshot",
+      "create_failed": "Impossible de prendre le snapshot",
+      "copy_failed": "Copie impossible"
+    },
+    "confirm": {
+      "title": "Confirmation",
+      "restore_message": "Restaurer la note à l'état du snapshot ? Les modifications actuelles seront perdues.",
+      "restore_button": "Revenir à cet état",
+      "take_now_message": "Créer ou remplacer le snapshot du jour avec le contenu actuel de la note ?",
+      "take_now_button": "Prendre un snapshot maintenant"
+    },
+    "api": {
+      "invalid_note_id": "ID de note invalide",
+      "note_not_found": "Note introuvable",
+      "already_exists": "Un snapshot existe déjà pour aujourd'hui",
+      "create_directory_failed": "Impossible de créer le dossier des snapshots",
+      "write_file_failed": "Impossible d'écrire le fichier snapshot",
+      "create_failed": "Impossible de créer le snapshot",
+      "not_found_today": "Aucun snapshot trouvé pour aujourd'hui",
+      "read_failed": "Impossible de lire le snapshot",
+      "retrieve_failed": "Impossible de récupérer le snapshot",
+      "invalid_entries_path": "Chemin des notes invalide",
+      "restore_note_file_failed": "Impossible de restaurer le fichier de la note",
+      "restore_success": "La note a été restaurée à l'état du snapshot",
+      "restore_failed": "Impossible de restaurer le snapshot"
+    }
+  },
   "kanban": {
     "title": "Kanban - {{folder}}",
     "view_label": "Vue Kanban",
@@ -359,7 +403,8 @@
       "orphan_scanner": "Scanner de pièces jointes orphelines",
       "change_password": "Changer le mot de passe",
       "import_limits": "Limites d'import",
-      "git_sync_toggle": "Synchronisation Git"
+      "git_sync_toggle": "Synchronisation Git",
+      "oidc_config": "OIDC / SSO"
     },
     "install_app": {
       "launching": "L’installation va se lancer. Veuillez patienter...",
@@ -772,6 +817,7 @@
     "ui_customization": {
       "title": "Personnalisation de l'interface",
       "description": "Afficher ou masquer les éléments de l'interface. Les éléments décochés seront masqués.",
+      "reminder_bell": "Icône cloche (rappel)",
       "filter_placeholder": "Filtrer les éléments...",
       "no_results": "Aucun élément correspondant.",
       "sections": {
@@ -1037,7 +1083,8 @@
       "attachments": "Pièces jointes"
     },
     "favorites": {
-      "empty": "Aucune note en favoris pour le moment."
+      "empty": "Aucune note en favoris pour le moment.",
+      "filter_placeholder": "Filtrer par titre ou nom de dossier..."
     },
     "drop_zone": {
       "remove_from_folder": "Déposez ici pour retirer du dossier"
@@ -1388,7 +1435,7 @@
     "redirecting": "Redirection...",
     "show_password": "Afficher le mot de passe",
     "hide_password": "Masquer le mot de passe",
-    "admin_warning": "Veuillez vous connecter avec le pseudo <code>{{username}}</code> et votre mot de passe (stocké dans le .env). Vous pourrez renommer ce compte dans les settings pour plus de sécurité.",
+      "admin_warning": "Veuillez vous connecter avec le pseudo <code>{{username}}</code> et le mot de passe actuel de ce compte. Vous pourrez ensuite renommer ce compte dans les réglages pour plus de sécurité.",
     "fields": {
       "username": "Nom d’utilisateur",
       "username_or_email": "Pseudo ou Email",
@@ -2085,18 +2132,18 @@
         "manage_password": "Mot de passe",
         "reset_password": "Réinitialiser le mot de passe",
         "set_password": "Définir un mot de passe",
-        "reset_to_default": "Utiliser le mot de passe par défaut (.env)",
-        "modal_help": "Définissez un mot de passe personnalisé pour ce compte ou revenez au mot de passe par défaut défini dans l'environnement.",
+        "reset_to_default": "Réinitialiser au mot de passe par défaut",
+        "modal_help": "Définissez un mot de passe personnalisé pour ce compte ou réinitialisez-le au mot de passe par défaut.",
         "current_mode": "Mode actuel",
-        "set_help": "Au moins 4 caractères. Cela remplace le mot de passe défini dans les variables d'environnement pour cet utilisateur.",
-        "reset_help": "Supprime le mot de passe personnalisé et repasse sur le mot de passe par défaut défini dans l'environnement pour cet utilisateur.",
-        "reset_confirm": "Réinitialiser le mot de passe de \"{{username}}\" vers celui défini dans les variables d'environnement ?",
+        "set_help": "Au moins 4 caractères.",
+        "reset_help": "Supprime le mot de passe personnalisé et rétablit le mot de passe par défaut pour cet utilisateur.",
+        "reset_confirm": "Réinitialiser le mot de passe de \"{{username}}\" au mot de passe par défaut ?",
         "set_success": "Mot de passe mis à jour avec succès.",
-        "reset_success": "Mot de passe réinitialisé vers la valeur par défaut qui se trouve dans les variables d'environnement.",
+        "reset_success": "Mot de passe réinitialisé au mot de passe par défaut.",
         "status_custom": "Personnalisé",
         "status_default": "Par défaut",
         "status_custom_detail": "Cet utilisateur utilise un mot de passe personnalisé.",
-        "status_default_detail": "Cet utilisateur utilise le mot de passe par défaut qui se trouve dans les variables d'environnement.",
+        "status_default_detail": "Cet utilisateur utilise le mot de passe par défaut.",
         "changed_at_prefix": "Mise à jour :"
       },
       "password": "Mot de passe",
@@ -2285,6 +2332,7 @@
       "workspace": "Workspace: {{workspace}}",
       "target_workspace": "Espace de travail cible",
       "all_workspaces": "Tous les espaces de travail",
+      "home_hint": "Les actions d'envoi et de récupération peuvent être effectuées depuis le tableau de bord.",
       "push": {
         "title": "Envoyer vers {{provider}}",
         "description": "Exporte toutes les notes et pièces jointes vers {{provider}} sous forme de fichiers plats. Met à jour les fichiers existants et supprime ceux qui n'existent plus dans Poznote.",
@@ -2434,7 +2482,7 @@
   "password": {
     "status": {
       "custom": "Mot de passe personnalisé",
-      "default": "Par défaut (env)"
+      "default": "Par défaut"
     },
     "modal": {
       "title": "Changer le mot de passe",
@@ -2450,5 +2498,76 @@
       "incorrect_current": "Le mot de passe actuel est incorrect"
     },
     "success": "Mot de passe modifié avec succès."
+  },
+  "oidc_admin": {
+    "title": "Configuration OIDC",
+    "description": "Configurez l'authentification OpenID Connect (SSO). Le Client ID et le Client Secret sont configurés dans le fichier .env pour des raisons de sécurité.",
+    "saved": "Configuration OIDC enregistrée avec succès.",
+    "error_saving": "Erreur lors de l'enregistrement de certains paramètres. Veuillez réessayer.",
+    "error_csrf": "Soumission de formulaire invalide. Veuillez réessayer.",
+    "deprecated": "Obsolète",
+    "section_general": "Général",
+    "section_credentials": "Identifiants",
+    "section_advanced": "Avancé",
+    "section_access_control": "Contrôle d'accès",
+    "section_login_behavior": "Comportement de connexion",
+    "fields": {
+      "enabled": "Activer l'authentification OIDC",
+      "provider_name": "Nom du fournisseur",
+      "issuer": "URL de l'émetteur",
+      "client_id": "Client ID",
+      "client_secret": "Client Secret",
+      "scopes": "Scopes",
+      "discovery_url": "URL de découverte",
+      "redirect_uri": "URI de redirection",
+      "end_session_endpoint": "Endpoint de fin de session",
+      "post_logout_redirect_uri": "URI de redirection post-déconnexion",
+      "groups_claim": "Claim des groupes",
+      "allowed_groups": "Groupes autorisés",
+      "auto_create_users": "Créer automatiquement les profils à la première connexion OIDC",
+      "allowed_users": "Utilisateurs autorisés",
+      "disable_normal_login": "Désactiver la connexion par mot de passe (SSO uniquement)",
+      "disable_basic_auth": "Désactiver l'authentification HTTP Basic pour l'API"
+    },
+    "hints": {
+      "provider_name": "Nom affiché sur le bouton de connexion (ex : Google, Azure AD, Keycloak)",
+      "issuer": "L'URL de l'émetteur de votre fournisseur OIDC (ex : https://accounts.google.com)",
+      "credentials": "Le Client ID et le Client Secret sont gérés dans le fichier .env.",
+      "scopes": "Scopes séparés par des espaces (défaut : openid profile email)",
+      "discovery_url": "Remplacer l'URL de découverte automatique (laisser vide pour dériver de l'émetteur)",
+      "redirect_uri": "URI de redirection personnalisée (laisser vide pour auto-générer)",
+      "end_session_endpoint": "Endpoint de déconnexion du fournisseur pour la déconnexion initiée par le RP (optionnel)",
+      "post_logout_redirect_uri": "Où rediriger après la déconnexion (défaut : page de connexion)",
+      "groups_claim": "Nom du claim contenant les groupes de l'utilisateur (défaut : groups)",
+      "allowed_groups": "Liste de groupes autorisés séparés par des virgules. Laisser vide pour autoriser tous les utilisateurs authentifiés.",
+      "auto_create_users": "Recommandé avec le contrôle d'accès par groupes",
+      "allowed_users": "Emails/noms d'utilisateur séparés par des virgules. Préférez le contrôle d'accès par groupes.",
+      "disable_normal_login": "Lorsqu'activé, seule la connexion OIDC est disponible sur la page de connexion",
+      "disable_basic_auth": "Lorsqu'activé, les requêtes API avec HTTP Basic Auth seront rejetées (403)"
+    }
+  },
+  "reminder": {
+    "toolbar_button": "Définir un rappel",
+    "notifications": "Notifications",
+    "no_notifications": "Aucune notification",
+    "dismiss": "Fermer",
+    "dismiss_all": "Tout supprimer",
+    "set_success": "Rappel défini pour",
+    "removed": "Rappel supprimé",
+    "just_now": "À l'instant",
+    "new_notifications": "Vous avez",
+    "notification_s": "notification(s)",
+    "modal": {
+      "title": "Rappel",
+      "date_label": "Date et heure",
+      "in_30min": "30 min",
+      "in_1h": "1 heure",
+      "in_3h": "3 heures",
+      "tomorrow": "Demain",
+      "in_1week": "1 semaine",
+      "remove": "Supprimer le rappel",
+      "select_date": "Veuillez sélectionner une date et une heure",
+      "past_time": "Veuillez sélectionner une date future"
+    }
   }
 }

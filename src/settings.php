@@ -183,7 +183,7 @@ if ($isAdmin) {
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?></span>
-                    <span class="setting-status <?php echo (!$gitSyncIsEnabled) ? 'disabled' : ($gitSyncIsConfigured ? 'enabled' : 'disabled'); ?>">
+                    <span id="git-sync-status-badge" class="setting-status <?php echo (!$gitSyncIsEnabled) ? 'disabled' : ($gitSyncIsConfigured ? 'enabled' : 'disabled'); ?>">
                         <?php
                         if (!$gitSyncIsEnabled) {
                             echo t_h('common.disabled', [], 'Disabled');
@@ -424,6 +424,19 @@ if ($isAdmin) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.user_management', [], 'User Management'); ?></span>
                     <span class="setting-status enabled"><?php echo $users_count; ?></span>
+                </div>
+            </div>
+
+            <!-- OIDC Configuration -->
+            <div class="home-card settings-card-clickable" id="oidc-config-card" data-href="admin/oidc.php">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-shield"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.oidc_config', [], 'OIDC / SSO'); ?></span>
+                    <span class="setting-status <?php echo (defined('OIDC_ENABLED') && OIDC_ENABLED) ? 'enabled' : 'disabled'; ?>">
+                        <?php echo (defined('OIDC_ENABLED') && OIDC_ENABLED) ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
+                    </span>
                 </div>
             </div>
 

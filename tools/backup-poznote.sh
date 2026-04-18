@@ -33,7 +33,7 @@ if [ $# -lt 5 ] || [ $# -gt 6 ]; then
     echo "Parameters:"
     echo "  URL              - Base URL of your Poznote instance"
     echo "  ADMIN_USERNAME   - Admin username for authentication (required)"
-    echo "  ADMIN_PASSWORD   - Current admin password for the API profile (custom password or .env fallback)"
+    echo "  ADMIN_PASSWORD   - Current admin password for the API profile"
     echo "  TARGET_USERNAME  - Username of the profile to backup"
     echo "  BACKUP_PATH      - Parent directory where backups will be stored"
     echo "  MAX_BACKUPS      - Maximum number of backups to keep (default: 20)"
@@ -101,8 +101,8 @@ print_auth_hint() {
 
     if [ "$error" = "Invalid credentials" ]; then
         log "HINT: Use the current password of the admin profile used for the API call."
-        log "HINT: If that password was changed in Poznote, the original POZNOTE_PASSWORD from .env is no longer accepted for that profile."
-        log "HINT: Reset the profile password in Settings > User Management to fall back to the .env password."
+        log "HINT: If that password was changed in Poznote, the original default password is no longer accepted for that profile."
+        log "HINT: Reset the profile password in Settings > User Management to restore the default password."
     elif [ -n "$hint" ]; then
         log "HINT: $hint"
     fi

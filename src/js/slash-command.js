@@ -414,8 +414,9 @@
 
         // Add a badge for the selected mode and only attach a highlight.js class when needed
         if (language) {
-            code.setAttribute('data-language', disableHighlight ? 'NORMAL' : language);
-            pre.setAttribute('data-language', disableHighlight ? 'NORMAL' : language);
+            const languageBadge = disableHighlight ? 'CODE' : language;
+            code.setAttribute('data-language', languageBadge);
+            pre.setAttribute('data-language', languageBadge);
             if (!disableHighlight) {
                 code.className = 'language-' + language;
             }
@@ -1348,9 +1349,9 @@
                     {
                         id: 'code-normal',
                         icon: 'lucide-file-code',
-                        label: t('slash_menu.code_block_normal', null, 'Normal block'),
+                        label: t('slash_menu.code_block', null, 'Code block'),
                         action: function () {
-                            insertCodeBlock('normal', true);
+                            insertCodeBlock('code', true);
                         }
                     },
                     {
@@ -1635,9 +1636,9 @@
                     {
                         id: 'code-normal',
                         icon: 'lucide-file-code',
-                        label: t('slash_menu.code_block_normal', null, 'Normal block'),
+                        label: t('slash_menu.code_block', null, 'Code block'),
                         action: function () {
-                            insertMarkdownAtCursor('```normal\n\n```\n', -5);
+                            insertMarkdownAtCursor('```code\n\n```\n', -5);
                         }
                     },
                     {

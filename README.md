@@ -29,7 +29,8 @@ This project started from a simple personal need: a practical way to write, orga
 
 ### Features
 
-Discover all the features [here](https://poznote.com/index.html#features)
+Discover all the features [here](https://poznote.com/index.html#features).
+Detailed documentation of advanced features is available in [docs/FEATURES.md](docs/FEATURES.md).
 
 <p align="center">
   <img src="images/poznote-features.png" alt="Poznote Features" width="100%">
@@ -220,21 +221,30 @@ After installation, access Poznote in your web browser:
 
 
 - Username: `admin_change_me`
-- Password: value of `POZNOTE_PASSWORD` (`admin` in `.env.template` by default)
+- Password: `admin`
 - Port: `8040`
 
-Rename the default administrator account after the first login.
+Rename the default administrator account and change the default password after the first login.
 
 ## Change Settings
 
-Most settings can be modified directly in the application through the settings page. Some system settings can only be changed in the `.env` file and require recreating the affected containers.
+Most day-to-day settings are changed from the Poznote interface. Use the `.env` file only for deployment/runtime values that are read when containers start.
 
-- **Authentication** - Initial/default passwords and login configuration
-- **Web Server** - HTTP port configuration
-- **OIDC / SSO Authentication** - OpenID Connect integration
-- **MCP Server** - AI assistant integration
+Use the `.env` file for:
 
-Passwords can be changed directly in the application from `Settings > Change Password`. The `.env` authentication variables remain available to define the initial or fallback passwords used when no custom password has been set for a user.
+- `HTTP_WEB_PORT`
+- `POZNOTE_OIDC_CLIENT_ID`
+- `POZNOTE_OIDC_CLIENT_SECRET`
+- Optional runtime overrides such as `POZNOTE_MCP_PORT` and `POZNOTE_DEBUG`
+
+Use the UI for:
+
+- Admin/global settings such as OIDC provider settings, Git Sync enablement, import limits, and custom CSS upload
+- User/profile settings such as local account passwords, theme, font sizes, note sorting, workspace background, and hidden UI elements
+
+With the default installation files, `.env.template` currently exposes `HTTP_WEB_PORT`, `POZNOTE_OIDC_CLIENT_ID`, and `POZNOTE_OIDC_CLIENT_SECRET`.
+
+If a setting exists in the UI, use the UI as the source of truth. Some legacy environment fallbacks still exist internally for compatibility, but they are not the primary configuration workflow.
 
 ### Modify System Settings (`.env`)
 
@@ -248,16 +258,39 @@ Stop the running Poznote containers:
 docker compose down
 ```
 
-Edit your `.env` file with your preferred text editor.
+Edit your `.env` file with your preferred text editor (e.g., `nano .env` or `notepad .env`).
 
-Save the file and start the Poznote containers again to apply changes:
+Save the file and start the containers again to apply changes:
 ```bash
 docker compose up -d
 ```
 
-If you change environment variables for a running service without bringing the stack down first, recreate the affected container instead of using `docker compose restart`. A restart keeps the container's existing environment.
-
 ## Update application
+
+In most cases, updating Poznote is simple and does not require editing `.env`.
+
+### Simple update (default)
+
+Use this when the release notes do not mention changes to `.env`.
+
+Navigate to your Poznote directory:
+```bash
+cd poznote
+```
+
+Download the latest Poznote Webserver and Poznote MCP images:
+```bash
+docker compose pull
+```
+
+Start the updated containers:
+```bash
+docker compose up -d
+```
+
+### If the release notes mention `.env` changes
+
+When a release explicitly asks you to update `.env`, refresh the reference files and compare them before restarting:
 
 Navigate to your Poznote directory:
 ```bash
@@ -274,7 +307,7 @@ Download the latest Docker Compose configuration:
 curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
 ```
 
-Download the latest .env.template:
+Download the latest `.env.template`:
 ```bash
 curl -o .env.template https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.template
 ```
@@ -312,43 +345,25 @@ Poznote authenticates users against their profile using a username or email addr
 On a fresh installation, Poznote creates one active administrator profile:
 
 - Username: `admin_change_me`
-- Password: `POZNOTE_PASSWORD`
+- Password: `admin`
 
-Rename this account after the first login.
+Change the default password and rename the account after the first login.
 
 #### Password management
 
+Passwords are managed through the Poznote web interface, not through `.env`:
+
 - Users can change their own password from **Settings > Change Password**.
-- Administrators can set a custom password for any user or reset that user back to their `.env` password from **Settings > User Management**.
+- Administrators can set a custom password for any user or reset it to the default from **Settings > User Management**.
 - The **Remember me** option keeps the session for 30 days.
 - Changing a password invalidates existing remember-me cookies for that user.
 
-#### Configuration
+#### Default passwords
 
-- **Admin password**: Set `POZNOTE_PASSWORD` in your `.env` file.
-- **Default standard-user password**: Set `POZNOTE_PASSWORD_USER` in your `.env` file.
-- **User-specific passwords**: Set individual defaults using `POZNOTE_PASSWORD_{USERNAME}` in your `.env`.
+- Administrator accounts: `admin`
+- Standard user accounts: `user`
 
-Example:
-
-```bash
-POZNOTE_PASSWORD=admin-secret
-POZNOTE_PASSWORD_USER=user-secret
-POZNOTE_PASSWORD_ALICE=alice-secret
-POZNOTE_PASSWORD_BOB=bob-secret
-```
-
-#### Password resolution order
-
-When a user signs in, Poznote checks passwords in this order:
-
-1. A custom bcrypt password hash stored in the master database for that user.
-2. Fallback values from `.env`:
-  - `POZNOTE_PASSWORD` for the administrator profile
-  - `POZNOTE_PASSWORD_USER` for standard users
-  - `POZNOTE_PASSWORD_{USERNAME}` for per-user overrides
-
-This means `.env` acts as the default or seed credential source, while a password changed from the interface takes priority afterward.
+When a user has not yet changed their password, the default value above is used. Once a password is changed through the interface, a secure bcrypt hash is stored in the database and takes priority.
 
 </details>
 
@@ -363,41 +378,32 @@ Poznote supports OpenID Connect (authorization code + PKCE) for single sign-on i
 
 1. The login page displays a `Continue with [Provider Name]` button when OIDC is enabled.
 2. Users authenticate with the OIDC authorization code flow secured by PKCE.
-3. Access can be restricted with `POZNOTE_OIDC_ALLOWED_GROUPS` and, if needed, the legacy `POZNOTE_OIDC_ALLOWED_USERS` allowlist.
+3. Access can be restricted with allowed groups and, if needed, a legacy allowed users list.
 4. After authentication, Poznote links the identity in this order: `sub` (`oidc_subject`), then `preferred_username`, then `email`.
-5. If no profile matches and `POZNOTE_OIDC_AUTO_CREATE_USERS=true`, Poznote creates one automatically.
-6. If `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true`, the username/password form is hidden and the login page becomes SSO-only.
+5. If auto-create users is enabled and no profile matches, Poznote creates one automatically.
+6. If "Disable normal login" is enabled, the username/password form is hidden and the login page becomes SSO-only.
 
 #### Configuration
 
-Add the OIDC variables to your `.env` file (see `.env.template`).
+OIDC is configured from the **admin UI**: go to **Settings > Admin Tools > OIDC / SSO**.
 
-Minimum required settings:
+All settings (enabled, issuer, provider name, scopes, access control, login behavior, etc.) are managed from this page and stored in the database.
+
+Only `POZNOTE_OIDC_CLIENT_ID` and `POZNOTE_OIDC_CLIENT_SECRET` remain in the `.env` file for security:
 
 ```bash
-POZNOTE_OIDC_ENABLED=true
-POZNOTE_OIDC_ISSUER=https://your-identity-provider.com
 POZNOTE_OIDC_CLIENT_ID=your_client_id
+POZNOTE_OIDC_CLIENT_SECRET=your_client_secret
 ```
 
-Notes:
-
-- `POZNOTE_OIDC_DISCOVERY_URL` can be used instead of deriving discovery from the issuer.
-- `POZNOTE_OIDC_CLIENT_SECRET` is optional and mainly needed for confidential clients.
-- `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true` hides the local login form.
-- `POZNOTE_OIDC_DISABLE_BASIC_AUTH=true` rejects HTTP Basic Auth on the API.
-- `POZNOTE_OIDC_GROUPS_CLAIM` defaults to `groups`.
+> **Breaking change:** previous OIDC settings in `.env` are no longer read, except `POZNOTE_OIDC_CLIENT_ID` and `POZNOTE_OIDC_CLIENT_SECRET`. After upgrading, re-enter the other OIDC settings from the admin page.
 
 #### Access Control Example (Groups + Auto-Provision)
 
-Restrict access to specific groups and auto-create users at first login:
-```bash
-POZNOTE_OIDC_GROUPS_CLAIM=groups
-POZNOTE_OIDC_ALLOWED_GROUPS=poznote
-POZNOTE_OIDC_AUTO_CREATE_USERS=true
-```
-
-`POZNOTE_OIDC_ALLOWED_USERS` remains available for backward compatibility, but group-based access is recommended.
+From the OIDC admin page, configure:
+- **Groups claim:** `groups`
+- **Allowed groups:** `poznote`
+- **Auto-create users:** enabled
 
 If auto-provisioning is enabled, Poznote generates a username from the OIDC claims (`preferred_username`, `nickname`, email local part, `name`, then `sub`) and stores the OIDC subject on the created profile.
 
@@ -525,7 +531,7 @@ Notes:
 Poznote features a multi-user architecture with isolated data space for each user (ideal for families, teams, or personal personas).
 
 - **Data Isolation**: Each user has their own separate notes, workspaces, tags, folders and attachments.
-- **Hybrid Password Model**: Access uses per-profile credentials with custom passwords stored in database, falling back to `.env` defaults when no custom password has been set.
+- **Hybrid Password Model**: Access uses per-profile credentials with custom passwords stored in the database. Until a password is changed in the UI, built-in defaults are used (`admin` for administrators, `user` for standard users).
 - **User Management**: Administrators can manage profiles via the Settings panel.
 
 > ⚠️ **Warning:** It is not possible to share notes between users. Each user has their own isolated space. The only way to share notes or a profile is to share a common account.
@@ -556,7 +562,7 @@ Poznote supports automatic and manual synchronization with **GitHub** or **Forge
 
 **Step 1 — Enable the feature (admin, in Settings > Advanced Settings)**
 
-Toggle **Git Sync** to enabled in the **Advanced Settings** section of the Settings page. This will reveal the **Git Sync** menu in the sidebar for all users.
+Toggle **Git Sync** to enabled in the **Advanced Settings** section of the Settings page. This enables Git Sync globally and makes the user-level **Git Sync** card/configuration available from **Settings**.
 
 ---
 
@@ -571,7 +577,7 @@ Toggle **Git Sync** to enabled in the **Advanced Settings** section of the Setti
 | Branch | Default: `main` |
 | Author Name / Email | Used for commit metadata |
 
-> 🔒 Access tokens are encrypted at rest using AES-256-GCM. Set `POZNOTE_APP_SECRET` in your `.env` (generated with `openssl rand -hex 32`) to ensure the encryption key survives container rebuilds. If not set, a key is auto-generated and stored in `data/.app_secret`.
+> 🔒 Access tokens are encrypted at rest using AES-256-GCM. An encryption key is automatically generated and stored in `data/.app_secret`.
 
 ---
 
@@ -581,7 +587,7 @@ When enabled by the user, Poznote will automatically:
 - **Pull** on login
 - **Push** on every note create, update, or delete
 
-Manual push/pull is also available from the **Sync Status** page (cloud icon in the header).
+Manual push/pull is also available from the **Dashboard** via the **Push** and **Pull** cards.
 
 </details>
 
@@ -646,7 +652,7 @@ Export individual notes using the **Export** button in the note toolbar:
 For automated scheduled backups via API, you can use the included `backup-poznote.sh` script.
 
 **IMPORTANT:** Only administrators can create backups via the API.
-Use the current password of the admin profile you authenticate with. If that profile has a custom password set in Poznote, the `.env` fallback password is no longer valid for API calls until the custom password is reset.
+Use the current password of the admin profile you authenticate with. On a fresh installation, that is the default admin password (`admin`) until it is changed in Poznote. Once a custom password is set, that custom password is required for API calls.
 
 **Script location:** `backup-poznote.sh` in the `tools` folder of the Poznote repository
 
@@ -677,7 +683,7 @@ bash backup-poznote.sh '<poznote_url>' '<admin_username>' '<admin_password>' '<t
 **Parameters explained:**
 - `'https://poznote.example.com'` - Your Poznote instance URL
 - `'admin'` - Admin username for authentication (must be an admin)
-- `'admin_password'` - Current admin password for the API profile (custom password or `.env` fallback)
+- `'admin_password'` - Current admin password for the API profile (default `admin` until changed, then the custom password)
 - `'Nina'` - Target username to backup
 - `'/root/backups'` - Parent directory where backups will be stored (creates `backups-poznote-<username>` folder)
 - `'30'` - Number of backups to keep (older ones are automatically deleted)
@@ -918,7 +924,15 @@ Poznote includes a Model Context Protocol (MCP) server that enables AI assistant
 
 For setup and usage instructions, see the [MCP Server documentation](docs/MCP-SERVER.md).
 
-Debug logging for the MCP server is controlled with `POZNOTE_DEBUG=true` or `POZNOTE_DEBUG=false` in `.env`. Only the exact lowercase values `true` and `false` are recognized. After changing it, recreate the `mcp-server` container; a simple restart does not reload updated `.env` values.
+The MCP server uses default settings (port `8045`, debug off). To override:
+
+```bash
+POZNOTE_MCP_PORT=9000 POZNOTE_DEBUG=true docker compose up -d --force-recreate mcp-server
+```
+
+These are container/runtime overrides, not Poznote UI settings. You can pass them inline as shown above or place them in `.env` before recreating the `mcp-server` container.
+
+Only the exact lowercase values `true` and `false` are recognized for `POZNOTE_DEBUG`. After changing settings, recreate the container; a simple restart does not reload environment variables.
 
 ## Chrome Extension
 

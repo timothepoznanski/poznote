@@ -42,18 +42,31 @@ class ModalAlert {
      * Show a confirmation modal
      * @param {string} message - The message to display
      * @param {string} title - Optional title
+     * @param {Object} options - Optional modal customisation
      * @returns {Promise<boolean>} - Resolves with true/false
      */
-    confirm(message, title = null) {
+    confirm(message, title = null, options = null) {
         return new Promise((resolve) => {
+            const confirmOptions = options || {};
             const config = {
                 type: 'confirm',
                 message,
-                alertType: 'warning',
+                alertType: confirmOptions.alertType || 'warning',
                 title: title || tr('common.confirmation', {}, 'Confirmation'),
+                modalClass: confirmOptions.modalClass || '',
                 buttons: [
-                    { text: tr('common.cancel', {}, 'Cancel'), type: 'secondary', action: () => resolve(false) },
-                    { text: tr('common.confirm', {}, 'Confirm'), type: 'primary', action: () => resolve(true) }
+                    {
+                        text: confirmOptions.cancelText || tr('common.cancel', {}, 'Cancel'),
+                        type: 'secondary',
+                        extraClass: confirmOptions.cancelButtonClass || '',
+                        action: () => resolve(false)
+                    },
+                    {
+                        text: confirmOptions.confirmText || tr('common.confirm', {}, 'Confirm'),
+                        type: 'primary',
+                        extraClass: confirmOptions.confirmButtonClass || '',
+                        action: () => resolve(true)
+                    }
                 ]
             };
             
@@ -218,6 +231,9 @@ class ModalAlert {
         
         const modal = document.createElement('div');
         modal.className = 'alert-modal';
+        if (config.modalClass) {
+            modal.classList.add(config.modalClass);
+        }
         
         const header = document.createElement('div');
         header.className = 'alert-modal-header';
@@ -247,6 +263,9 @@ class ModalAlert {
         config.buttons.forEach(buttonConfig => {
             const button = document.createElement('button');
             button.className = `alert-modal-button ${buttonConfig.type}`;
+            if (buttonConfig.extraClass) {
+                button.classList.add(buttonConfig.extraClass);
+            }
             button.textContent = buttonConfig.text;
             button.onclick = () => {
                 this.closeModal(overlay);

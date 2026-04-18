@@ -576,7 +576,7 @@ function setUserPasswordHash(int $userId, string $plainPassword): bool {
 }
 
 /**
- * Clear the stored password hash (revert to environment variable password)
+ * Clear the stored password hash (revert to default password)
  */
 function clearUserPasswordHash(int $userId): bool {
     try {
@@ -590,7 +590,7 @@ function clearUserPasswordHash(int $userId): bool {
 }
 
 /**
- * Verify a password against a user's stored hash or environment variable fallback.
+ * Verify a password against a user's stored hash or hardcoded default.
  * Returns true if password matches.
  */
 function verifyUserPassword(int $userId, string $password): bool {
@@ -603,15 +603,11 @@ function verifyUserPassword(int $userId, string $password): bool {
         return password_verify($password, $storedHash);
     }
 
-    // Priority 2: Fall back to environment variable
-    if (!function_exists('getAuthConfig')) {
-        require_once __DIR__ . '/../auth.php';
-    }
+    // Priority 2: Fall back to hardcoded default password
     if ((bool)$user['is_admin']) {
         return $password === AUTH_PASSWORD;
     } else {
-        $expected = getUserSpecificPassword($user['username']);
-        return $password === $expected;
+        return $password === AUTH_USER_PASSWORD;
     }
 }
 
@@ -624,19 +620,16 @@ function hasCustomPassword(int $userId): bool {
 
 /**
  * Get the secret used for remember-me cookie signing.
- * Uses DB password hash if available, otherwise env var password.
+ * Uses DB password hash if available, otherwise hardcoded default password.
  */
 function getRememberMeSecret(array $user): string {
     $storedHash = getUserPasswordHash((int)$user['id']);
     if ($storedHash !== null) {
         return $storedHash;
     }
-    // Fall back to env var password
+    // Fall back to hardcoded default password
     if ((bool)$user['is_admin']) {
         return defined('AUTH_PASSWORD') ? AUTH_PASSWORD : 'admin';
-    }
-    if (function_exists('getUserSpecificPassword')) {
-        return getUserSpecificPassword($user['username']);
     }
     return defined('AUTH_USER_PASSWORD') ? AUTH_USER_PASSWORD : 'user';
 }

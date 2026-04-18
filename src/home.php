@@ -269,6 +269,22 @@ try {
     $attachments_count = 0;
 }
 
+// Count for triggered notifications
+$notifications_count = 0;
+$notifications_unread_count = 0;
+try {
+    if (isset($con)) {
+        $stmtNotif = $con->prepare("\n            SELECT\n                COUNT(*) as total_count,\n                COALESCE(SUM(CASE WHEN is_read = 0 THEN 1 ELSE 0 END), 0) as unread_count\n            FROM notifications\n            WHERE dismissed = 0 AND trigger_at <= datetime('now')\n        ");
+        $stmtNotif->execute();
+        $notifCounts = $stmtNotif->fetch(PDO::FETCH_ASSOC) ?: [];
+        $notifications_count = (int)($notifCounts['total_count'] ?? 0);
+        $notifications_unread_count = (int)($notifCounts['unread_count'] ?? 0);
+    }
+} catch (Exception $e) {
+    $notifications_count = 0;
+    $notifications_unread_count = 0;
+}
+
 // Count favorites for the current workspace
 $favorites_count = 0;
 try {
@@ -392,6 +408,7 @@ try {
     <link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/reminders.css?v=<?php echo $cache_v; ?>"/>
     <?php poznoteRenderUiCustomizationBootstrap(); ?>
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
 </head>
@@ -543,14 +560,15 @@ try {
                 </div>
             </a>
             
-            <!-- Trash -->
-            <a href="trash.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="home-trash-card" title="<?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?>">
-                <div class="home-card-icon home-card-icon-trash">
-                    <i class="lucide lucide-trash-2"></i>
+            <!-- Notifications / Reminders -->
+            <a href="#" class="home-card<?php echo $notifications_unread_count > 0 ? ' has-notifications' : ''; ?>" id="home-notifications-card" data-action="open-notifications-modal" title="<?php echo t_h('reminder.notifications', [], 'Notifications'); ?>">
+                <div class="home-card-icon home-card-icon-notifications">
+                    <i class="lucide lucide-bell"></i>
+                    <span class="home-notifications-dot" aria-hidden="true"></span>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?></span>
-                    <span class="home-card-count"><?php echo $trash_count; ?></span>
+                    <span class="home-card-title"><?php echo t_h('reminder.notifications', [], 'Notifications'); ?></span>
+                    <span class="home-card-count" id="homeNotificationsCount"><?php echo $notifications_count; ?></span>
                 </div>
             </a>
             
@@ -562,6 +580,17 @@ try {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?></span>
                     <span class="home-card-count"><?php echo $attachments_count; ?></span>
+                </div>
+            </a>
+
+            <!-- Trash -->
+            <a href="trash.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="home-trash-card" title="<?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?>">
+                <div class="home-card-icon home-card-icon-trash">
+                    <i class="lucide lucide-trash-2"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?></span>
+                    <span class="home-card-count"><?php echo $trash_count; ?></span>
                 </div>
             </a>
 
@@ -889,6 +918,248 @@ try {
             }
         }
     });
+    </script>
+
+    <!-- Notifications Modal -->
+    <div id="notificationsModal" class="modal">
+        <div class="modal-content">
+            <h3><?php echo t_h('reminder.notifications', [], 'Notifications'); ?></h3>
+            <div class="notifications-modal-body" style="max-height: 60vh; overflow-y: auto; margin: 15px 0;">
+                <div class="notifications-empty" id="notificationsEmpty">
+                    <i class="lucide lucide-inbox"></i>
+                    <p><?php echo t_h('reminder.no_notifications', [], 'No notifications'); ?></p>
+                </div>
+                <div class="notifications-list" id="notificationsList"></div>
+            </div>
+            <div class="modal-buttons">
+                <button type="button" class="btn-danger initially-hidden" id="dismissAllBtn" data-action="dismiss-all-notifications"><?php echo t_h('reminder.dismiss_all', [], 'Delete all'); ?></button>
+                <button type="button" class="btn-cancel" data-action="close-notifications-modal"><?php echo t_h('common.close'); ?></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        const POLL_INTERVAL = 45000;
+
+        function parseReminderDate(value) {
+            if (!value) return null;
+
+            const trimmedValue = String(value).trim();
+            if (!trimmedValue) return null;
+
+            let normalizedValue = trimmedValue;
+
+            if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(trimmedValue)) {
+                normalizedValue = trimmedValue.replace(' ', 'T') + 'Z';
+            } else if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(trimmedValue)) {
+                normalizedValue = trimmedValue.replace(' ', 'T') + ':00Z';
+            } else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(?:\.\d{1,3})?)?$/.test(trimmedValue)) {
+                normalizedValue = trimmedValue + 'Z';
+            }
+
+            const parsedDate = new Date(normalizedValue);
+            return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+        }
+
+        function loadNotifications() {
+            fetch('/api/v1/reminders', {
+                headers: { 'Accept': 'application/json' },
+                credentials: 'same-origin'
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    renderNotifications(data.notifications || []);
+                    updateCount(data.total_count || 0, data.unread_count || 0);
+                }
+            })
+            .catch(e => console.error('Load notifications error:', e));
+        }
+
+        function renderNotifications(notifications) {
+            const list = document.getElementById('notificationsList');
+            const empty = document.getElementById('notificationsEmpty');
+            const dismissAllBtn = document.getElementById('dismissAllBtn');
+            if (!list) return;
+
+            if (notifications.length === 0) {
+                list.innerHTML = '';
+                if (empty) empty.style.display = 'flex';
+                if (dismissAllBtn) dismissAllBtn.classList.add('initially-hidden');
+                return;
+            }
+
+            if (empty) empty.style.display = 'none';
+            if (dismissAllBtn) dismissAllBtn.classList.remove('initially-hidden');
+
+            list.innerHTML = notifications.map(function(n) {
+                const triggerDate = parseReminderDate(n.trigger_at);
+                const timeAgo = triggerDate ? getTimeAgo(triggerDate) : escapeHtml(n.trigger_at || '');
+                const isUnread = !n.is_read;
+                const heading = escapeHtml(n.note_heading || n.message || 'Note');
+
+                return '<div class="notification-item' + (isUnread ? ' unread' : '') + '" data-notification-id="' + n.id + '" data-note-id="' + (n.note_id || '') + '">'
+                    + '<div class="notification-content">'
+                    + '<div class="notification-icon"><i class="lucide lucide-bell"></i></div>'
+                    + '<div class="notification-text">'
+                    + '<div class="notification-heading">' + heading + '</div>'
+                    + '<div class="notification-time">' + timeAgo + '</div>'
+                    + '</div>'
+                    + '</div>'
+                    + '<div class="notification-actions">'
+                    + '<button type="button" class="notification-action-btn" data-action="dismiss-notification" data-notification-id="' + n.id + '" title="<?php echo t_h('reminder.dismiss', [], 'Dismiss'); ?>">'
+                    + '<i class="lucide lucide-x"></i>'
+                    + '</button>'
+                    + '</div>'
+                    + '</div>';
+            }).join('');
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMin = Math.floor(diffMs / 60000);
+            const diffHour = Math.floor(diffMs / 3600000);
+            const diffDay = Math.floor(diffMs / 86400000);
+            if (diffMin < 1) return '<?php echo t_h('reminder.just_now', [], 'Just now'); ?>';
+            if (diffMin < 60) return diffMin + ' min';
+            if (diffHour < 24) return diffHour + 'h';
+            if (diffDay < 7) return diffDay + 'd';
+            return date.toLocaleDateString();
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function updateCount(totalCount, unreadCount) {
+            const el = document.getElementById('homeNotificationsCount');
+            if (el) el.textContent = totalCount;
+            // Update card style
+            const card = document.getElementById('home-notifications-card');
+            if (card) {
+                if (unreadCount > 0) {
+                    card.classList.add('has-notifications');
+                } else {
+                    card.classList.remove('has-notifications');
+                }
+            }
+        }
+
+        function pollCount() {
+            fetch('/api/v1/reminders/count', {
+                headers: { 'Accept': 'application/json' },
+                credentials: 'same-origin'
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) updateCount(data.total_count || 0, data.unread_count || 0);
+            })
+            .catch(function() {});
+        }
+
+        function openNotificationsModal() {
+            const modal = document.getElementById('notificationsModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                loadNotifications();
+            }
+        }
+
+        function closeNotificationsModal() {
+            const modal = document.getElementById('notificationsModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function dismissNotification(id) {
+            fetch('/api/v1/reminders/' + id + '/dismiss', {
+                method: 'POST',
+                headers: { 'Accept': 'application/json' },
+                credentials: 'same-origin'
+            })
+            .then(r => r.json())
+            .then(data => { if (data.success) loadNotifications(); })
+            .catch(e => console.error('Dismiss error:', e));
+        }
+
+        function dismissAllNotifications() {
+            fetch('/api/v1/reminders/dismiss-all', {
+                method: 'POST',
+                headers: { 'Accept': 'application/json' },
+                credentials: 'same-origin'
+            })
+            .then(r => r.json())
+            .then(data => { if (data.success) loadNotifications(); })
+            .catch(e => console.error('Dismiss all error:', e));
+        }
+
+        function openNotificationNote(noteId, notificationId) {
+            if (!noteId) return;
+            if (notificationId) {
+                fetch('/api/v1/reminders/' + notificationId + '/read', {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' },
+                    credentials: 'same-origin'
+                }).catch(function() {});
+            }
+            window.location.href = 'index.php?note=' + noteId;
+        }
+
+        // Event delegation
+        document.addEventListener('click', function(e) {
+            // Backdrop click
+            const modal = document.getElementById('notificationsModal');
+            if (e.target === modal) {
+                closeNotificationsModal();
+                return;
+            }
+
+            const action = e.target.closest('[data-action]')?.dataset.action;
+            switch (action) {
+                case 'open-notifications-modal':
+                    e.preventDefault();
+                    openNotificationsModal();
+                    break;
+                case 'close-notifications-modal':
+                    closeNotificationsModal();
+                    break;
+                case 'dismiss-notification': {
+                    var btn = e.target.closest('[data-action]');
+                    var nid = btn?.dataset.notificationId;
+                    if (nid) { e.stopPropagation(); dismissNotification(nid); }
+                    break;
+                }
+                case 'dismiss-all-notifications':
+                    dismissAllNotifications();
+                    break;
+            }
+
+            // Click on notification item to navigate to note
+            var notifItem = e.target.closest('.notification-item');
+            if (notifItem && !e.target.closest('.notification-action-btn')) {
+                var noteId = notifItem.dataset.noteId;
+                var notifId = notifItem.dataset.notificationId;
+                if (noteId) openNotificationNote(noteId, notifId);
+            }
+        });
+
+        // Close modal on Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeNotificationsModal();
+        });
+
+        // Close on backdrop click
+        document.getElementById('notificationsModal')?.addEventListener('click', function(e) {
+            if (e.target === this) closeNotificationsModal();
+        });
+
+        // Poll periodically
+        pollCount();
+        setInterval(pollCount, POLL_INTERVAL);
+    })();
     </script>
 </body>
 </html>

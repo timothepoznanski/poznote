@@ -36,9 +36,10 @@ services:
     restart: always
     environment:
       POZNOTE_API_URL: http://webserver:80/api/v1
-      POZNOTE_PASSWORD: ${POZNOTE_PASSWORD:-admin}
       POZNOTE_DEBUG: ${POZNOTE_DEBUG:-false}
     ports:
       - "127.0.0.1:${POZNOTE_MCP_PORT:-8045}:8045"
+    volumes:
+      - "./data:/var/www/html/data:ro"
     depends_on:
       - webserver

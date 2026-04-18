@@ -395,6 +395,38 @@
         });
     }
 
+    function refreshGitSyncCardBadge() {
+        var badge = document.getElementById('git-sync-status-badge');
+        if (!badge) return;
+
+        fetch('/api/v1/git-sync/status', {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' },
+            credentials: 'same-origin'
+        })
+            .then(function (r) { return r.json(); })
+            .then(function (j) {
+                if (!j || !j.success) return;
+
+                var enabled = j.enabled === true;
+                var configured = !!(j.config && j.config.configured);
+
+                if (!enabled) {
+                    badge.textContent = tr('common.disabled', {}, 'Disabled');
+                    badge.className = 'setting-status disabled';
+                    return;
+                }
+
+                badge.textContent = configured
+                    ? tr('git_sync.config.token_set', {}, 'Configured')
+                    : tr('git_sync.config.not_configured', {}, 'Not configured');
+                badge.className = 'setting-status ' + (configured ? 'enabled' : 'disabled');
+            })
+            .catch(function () {
+                // Keep the server-rendered status if the refresh request fails.
+            });
+    }
+
     function isStandaloneMode() {
         return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
     }
@@ -705,6 +737,7 @@
                     var toSet = currently ? '0' : '1';
                     setSetting('git_sync_enabled', toSet, function () {
                         refreshGitSyncEnabledBadge();
+                        refreshGitSyncCardBadge();
                         reloadOpener();
                     });
                 });
@@ -1020,6 +1053,7 @@
         refreshCustomCssBadge();
         refreshImportLimitsBadges();
         refreshGitSyncEnabledBadge();
+        refreshGitSyncCardBadge();
         refreshUiCustomizationBadge();
 
         // Search functionality - filters settings cards

@@ -184,19 +184,19 @@ def _get_client_or_error() -> tuple[PoznoteClient | None, str | None]:
     missing: list[str] = []
     if not getattr(client, "base_url", None):
         missing.append("POZNOTE_API_URL")
-    if not getattr(client, "password", None):
-        missing.append("POZNOTE_PASSWORD")
+    if not getattr(client, "service_token", None) and not getattr(client, "password", None):
+        missing.append("POZNOTE_SERVICE_TOKEN_FILE")
 
     if missing:
         return None, json.dumps(
             {
-                "error": "Missing required environment variables for Poznote MCP server.",
+                "error": "Missing required configuration for Poznote MCP server.",
                 "missing": missing,
                 "example": {
                     "POZNOTE_API_URL": "http://localhost:8040/api/v1",
-                    "POZNOTE_PASSWORD": "your-password",
+                    "POZNOTE_SERVICE_TOKEN_FILE": "/var/www/html/data/.mcp_token",
                 },
-                "note": "These are the same credentials as the Poznote web login.",
+                "note": "The shared MCP token file is generated automatically by Poznote and must be mounted into the MCP container.",
             },
             indent=2,
             ensure_ascii=False,

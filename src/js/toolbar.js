@@ -594,7 +594,7 @@ function toggleCodeBlock() {
     // Add blank line before only if at first line, after only if at last line
     const brBefore = atFirstLine ? '<br>' : '';
     const brAfter = atLastLine ? '<br>' : '';
-    document.execCommand('insertHTML', false, `${brBefore}<pre class="code-block" data-language="NORMAL"><br></pre>${brAfter}`);
+    document.execCommand('insertHTML', false, `${brBefore}<pre class="code-block" data-language="CODE"><br></pre>${brAfter}`);
     return;
   }
 
@@ -612,7 +612,7 @@ function toggleCodeBlock() {
   // Add blank line before only if at first line, after only if at last line
   const brBefore = atFirstLine ? '<br>' : '';
   const brAfter = atLastLine ? '<br>' : '';
-  const codeHTML = `${brBefore}<pre class="code-block" data-language="NORMAL">${escapedText}</pre>${brAfter}`;
+  const codeHTML = `${brBefore}<pre class="code-block" data-language="CODE">${escapedText}</pre>${brAfter}`;
   document.execCommand('insertHTML', false, codeHTML);
 }
 

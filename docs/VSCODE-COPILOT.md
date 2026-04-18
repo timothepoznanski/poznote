@@ -16,7 +16,7 @@ This guide explains how to configure and use the Poznote MCP server with VS Code
 Check that your MCP server container is running:
 
 ```bash
-docker ps | grep mcp-server
+docker ps | grep mcp
 ```
 
 You should see the MCP server running. Note the port number in the output (default is 8045).
@@ -61,11 +61,20 @@ If your Poznote instance runs on a remote server, use SSH port forwarding to sec
 
 ### 1. Establish SSH Tunnel
 
+If you prefer the command line, create a classic SSH tunnel:
+
 ```bash
 ssh -L 8045:localhost:8045 user@your-server
 ```
 
 Keep this connection open while using VS Code Copilot with Poznote.
+
+If you are already connected to the remote machine through VS Code Remote SSH, Dev Containers, or Codespaces, you can also create the tunnel directly from VS Code in the `PORTS` view:
+
+1. Open the `PORTS` panel in VS Code.
+2. Forward remote port `8045`.
+3. Keep the forwarded port active while using Copilot.
+4. If VS Code assigns a local port other than `8045`, use that local port in `mcp.json`.
 
 ### 2. Configure VS Code
 
@@ -82,7 +91,7 @@ Use the same `mcp.json` configuration as for local installation:
 }
 ```
 
-The SSH tunnel forwards the remote MCP server to your local machine, so VS Code connects to `localhost`.
+The SSH tunnel or VS Code forwarded port exposes the remote MCP server to your local machine, so VS Code connects to `localhost`.
 
 ## Usage Examples
 
@@ -157,7 +166,7 @@ If VS Code Copilot cannot connect to the MCP server:
 
 2. **Verify Docker container status:**
    ```bash
-   docker ps | grep mcp-server
+   docker ps | grep mcp
   docker logs poznote-mcp
    ```
 
@@ -183,19 +192,19 @@ If VS Code doesn't recognize the Poznote MCP server:
 
 ### Authentication Errors
 
-The MCP server authenticates to Poznote using credentials from `docker-compose.yml`. Check these environment variables:
+The MCP server authenticates to Poznote with the shared token stored in `data/.mcp_token`.
 
-```yaml
-environment:
-  POZNOTE_PASSWORD: ${POZNOTE_PASSWORD:-admin}
-```
+Check these points:
+- `./data/.mcp_token` exists on the Poznote host
+- the `mcp-server` service mounts `./data:/var/www/html/data:ro`
+- the webserver container has been recreated at least once after updating to the token-based MCP setup
 
 ### Debug Mode
 
-Enable debug logging for the MCP server by setting `POZNOTE_DEBUG=true` in your `.env`, then recreate the MCP container:
+Enable debug logging for the MCP server by recreating the container with an inline environment variable:
 
 ```bash
-docker compose up -d --force-recreate mcp-server
+POZNOTE_DEBUG=true docker compose up -d --force-recreate mcp-server
 ```
 
 Only the exact lowercase values `true` and `false` are recognized. Any other value is treated as `false` and a warning is written to the MCP logs.

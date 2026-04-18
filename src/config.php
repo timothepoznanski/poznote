@@ -87,41 +87,58 @@ define('DEFAULT_TIMEZONE', 'Europe/Paris');
 // ============================================================
 // OIDC CONFIGURATION
 // ============================================================
-// Optional OpenID Connect (OIDC) configuration
-// Configured exclusively via .env file for security
-define('OIDC_ENABLED', filter_var(_env('POZNOTE_OIDC_ENABLED', false), FILTER_VALIDATE_BOOL));
-define('OIDC_PROVIDER_NAME', _env('POZNOTE_OIDC_PROVIDER_NAME', 'SSO'));
-// Prefer issuer discovery (https://issuer/.well-known/openid-configuration)
-// Note: rtrim removes trailing slash to normalize the URL
-define('OIDC_ISSUER', rtrim(trim(_env('POZNOTE_OIDC_ISSUER', '')), '/'));
-// Or provide the discovery URL directly
-define('OIDC_DISCOVERY_URL', trim(_env('POZNOTE_OIDC_DISCOVERY_URL', '')));
+// OpenID Connect (OIDC) settings are managed from the admin UI
+// (Settings > OIDC / SSO) and stored in the global_settings table.
+// Client ID and Client Secret remain in .env for security.
+// Breaking change: .env OIDC variables (except CLIENT_ID/SECRET)
+// are no longer read. Configure OIDC from the admin UI.
+
+/**
+ * Resolve an OIDC setting from the database only.
+ */
+function _oidc(string $dbKey, string $default = ''): string {
+    try {
+        require_once __DIR__ . '/users/db_master.php';
+        $val = getGlobalSetting($dbKey, null);
+        if ($val !== null) {
+            return $val;
+        }
+    } catch (Exception $e) {
+        // Return default when the master DB is unavailable.
+    }
+    return $default;
+}
+
+function _oidcBool(string $dbKey, bool $default = false): bool {
+    try {
+        require_once __DIR__ . '/users/db_master.php';
+        $val = getGlobalSetting($dbKey, null);
+        if ($val !== null) {
+            return $val === '1' || $val === 'true';
+        }
+    } catch (Exception $e) {
+        // Return default when the master DB is unavailable.
+    }
+    return $default;
+}
+
+define('OIDC_ENABLED', _oidcBool('oidc_enabled', false));
+define('OIDC_PROVIDER_NAME', _oidc('oidc_provider_name', 'SSO'));
+define('OIDC_ISSUER', rtrim(trim(_oidc('oidc_issuer', '')), '/'));
+define('OIDC_DISCOVERY_URL', trim(_oidc('oidc_discovery_url', '')));
+// Client ID and Client Secret: .env only (not stored in database)
 define('OIDC_CLIENT_ID', trim(_env('POZNOTE_OIDC_CLIENT_ID', '')));
 define('OIDC_CLIENT_SECRET', trim(_env('POZNOTE_OIDC_CLIENT_SECRET', '')));
-define('OIDC_SCOPES', _env('POZNOTE_OIDC_SCOPES', 'openid profile email'));
-// If not set, redirect URI is derived from current request base URL
-define('OIDC_REDIRECT_URI', _env('POZNOTE_OIDC_REDIRECT_URI', ''));
-// Optional: specify provider end-session endpoint (if your provider supports RP-initiated logout)
-define('OIDC_END_SESSION_ENDPOINT', _env('POZNOTE_OIDC_END_SESSION_ENDPOINT', ''));
-// Optional: where to redirect after OIDC logout (default: login page)
-define('OIDC_POST_LOGOUT_REDIRECT_URI', _env('POZNOTE_OIDC_POST_LOGOUT_REDIRECT_URI', ''));
-// Optional: disable normal login when OIDC is enabled (force SSO-only login)
-define('OIDC_DISABLE_NORMAL_LOGIN', filter_var(_env('POZNOTE_OIDC_DISABLE_NORMAL_LOGIN', false), FILTER_VALIDATE_BOOL));
-// Optional: disable HTTP Basic Auth for API when OIDC is enabled (force OIDC-only authentication)
-define('OIDC_DISABLE_BASIC_AUTH', filter_var(_env('POZNOTE_OIDC_DISABLE_BASIC_AUTH', false), FILTER_VALIDATE_BOOL));
-// Optional: claim name containing user groups (default: 'groups')
-define('OIDC_GROUPS_CLAIM', trim(_env('POZNOTE_OIDC_GROUPS_CLAIM', 'groups')));
-// Optional: comma-separated list of allowed groups from the configured claim
-// If empty, group-based access control is disabled
-define('OIDC_ALLOWED_GROUPS', _env('POZNOTE_OIDC_ALLOWED_GROUPS', ''));
-// Optional: auto-create user profiles on first successful OIDC login
-// Recommended when using OIDC group restrictions for access control
-define('OIDC_AUTO_CREATE_USERS', filter_var(_env('POZNOTE_OIDC_AUTO_CREATE_USERS', false), FILTER_VALIDATE_BOOL));
-// Optional: comma-separated list of allowed users (email addresses or usernames)
-// If not set, all authenticated users from the identity provider can access the application
-// Example: 'user1@example.com,user2@example.com' or 'user1,user2'
-// Deprecated: prefer POZNOTE_OIDC_ALLOWED_GROUPS + POZNOTE_OIDC_AUTO_CREATE_USERS
-define('OIDC_ALLOWED_USERS', _env('POZNOTE_OIDC_ALLOWED_USERS', ''));
+define('OIDC_SCOPES', _oidc('oidc_scopes', 'openid profile email'));
+define('OIDC_REDIRECT_URI', _oidc('oidc_redirect_uri', ''));
+define('OIDC_END_SESSION_ENDPOINT', _oidc('oidc_end_session_endpoint', ''));
+define('OIDC_POST_LOGOUT_REDIRECT_URI', _oidc('oidc_post_logout_redirect_uri', ''));
+define('OIDC_DISABLE_NORMAL_LOGIN', _oidcBool('oidc_disable_normal_login', false));
+define('OIDC_DISABLE_BASIC_AUTH', _oidcBool('oidc_disable_basic_auth', false));
+define('OIDC_GROUPS_CLAIM', trim(_oidc('oidc_groups_claim', 'groups')));
+define('OIDC_ALLOWED_GROUPS', _oidc('oidc_allowed_groups', ''));
+define('OIDC_AUTO_CREATE_USERS', _oidcBool('oidc_auto_create_users', false));
+define('OIDC_ALLOWED_USERS', _oidc('oidc_allowed_users', ''));
 
 // Optional: load an extra stylesheet from src/css/ on every HTML page.
 // The preferred source is the Advanced section in settings.php.

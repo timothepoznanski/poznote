@@ -325,15 +325,15 @@ class UsersController {
         }
         
         $data = json_decode(file_get_contents('php://input'), true);
-        $action = $data['action'] ?? 'reset_to_env';
+        $action = $data['action'] ?? 'reset_to_default';
         
-        if ($action === 'reset_to_env') {
-            // Clear DB hash, revert to environment variable password
+        if ($action === 'reset_to_default' || $action === 'reset_to_env') {
+            // Clear DB hash, revert to hardcoded default password
             if (!clearUserPasswordHash((int)$id)) {
                 http_response_code(500);
                 return ['error' => 'Failed to reset password'];
             }
-            return ['success' => true, 'message' => 'Password reset to environment variable default'];
+            return ['success' => true, 'message' => 'Password reset to default'];
         } elseif ($action === 'set_password') {
             $newPassword = $data['new_password'] ?? '';
             if (strlen($newPassword) < 4) {
@@ -348,7 +348,7 @@ class UsersController {
         }
         
         http_response_code(400);
-        return ['error' => 'Invalid action. Use "reset_to_env" or "set_password"'];
+        return ['error' => 'Invalid action. Use "reset_to_default" or "set_password"'];
     }
 
     /**

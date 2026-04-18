@@ -27,7 +27,7 @@
       "oidc_button": "Continuar con {{provider}}",
       "documentation": "Documentación de Poznote",
       "redirecting": "Redirigiendo...",
-      "admin_warning": "Inicie sesión con el nombre de usuario <code>{{username}}</code> y su contraseña (almacenada en .env). Luego podrá cambiar el nombre de esta cuenta en la configuración para mayor seguridad.",
+        "admin_warning": "Inicie sesión con el nombre de usuario <code>{{username}}</code> y la contraseña actual de esta cuenta. Luego podrá cambiar el nombre de esta cuenta en la configuración para mayor seguridad.",
       "errors": {
         "invalid_credentials": "Usuario o contraseña incorrectos."
       }
@@ -64,6 +64,50 @@
       "no_headings": "Sin encabezados en esta nota"
     },
     "link_copied": "Enlace copiado"
+  },
+  "snapshot": {
+    "menu_item": "Instantánea",
+    "modal": {
+      "title": "Instantánea del día",
+      "loading": "Cargando instantánea...",
+      "empty_title": "No hay instantánea disponible",
+      "empty_hint": "Se crea automáticamente una instantánea cuando la nota se abre por primera vez durante el día.",
+      "empty_content": "(Contenido vacío)",
+      "take_now": "Tomar instantánea ahora",
+      "copy_content": "Copiar contenido",
+      "restore_state": "Volver a este estado"
+    },
+    "messages": {
+      "content_copied": "Contenido copiado",
+      "created_now": "Instantánea guardada"
+    },
+    "errors": {
+      "restore_failed": "No se pudo restaurar la instantánea",
+      "create_failed": "No se pudo crear la instantánea",
+      "copy_failed": "No se pudo copiar"
+    },
+    "confirm": {
+      "title": "Confirmación",
+      "restore_message": "¿Restaurar la nota al estado de la instantánea? Los cambios actuales se perderán.",
+      "restore_button": "Volver a este estado",
+      "take_now_message": "¿Crear o reemplazar la instantánea de hoy con el contenido actual de la nota?",
+      "take_now_button": "Tomar instantánea ahora"
+    },
+    "api": {
+      "invalid_note_id": "ID de nota no válido",
+      "note_not_found": "Nota no encontrada",
+      "already_exists": "Ya existe una instantánea para hoy",
+      "create_directory_failed": "No se pudo crear la carpeta de instantáneas",
+      "write_file_failed": "No se pudo escribir el archivo de instantánea",
+      "create_failed": "No se pudo crear la instantánea",
+      "not_found_today": "No se encontró ninguna instantánea para hoy",
+      "read_failed": "No se pudo leer la instantánea",
+      "retrieve_failed": "No se pudo recuperar la instantánea",
+      "invalid_entries_path": "Ruta de notas no válida",
+      "restore_note_file_failed": "No se pudo restaurar el archivo de la nota",
+      "restore_success": "La nota se restauró al estado de la instantánea",
+      "restore_failed": "No se pudo restaurar la instantánea"
+    }
   },
   "kanban": {
     "title": "Kanban - {{folder}}",
@@ -347,7 +391,8 @@
       "user_management": "Gestión de usuarios",
       "change_password": "Cambiar contraseña",
       "import_limits": "Límites de importación",
-      "git_sync_toggle": "Sincronización Git"
+      "git_sync_toggle": "Sincronización Git",
+      "oidc_config": "OIDC / SSO"
     },
     "install_app": {
       "launching": "La instalación va a iniciarse. Por favor, espere...",
@@ -754,6 +799,7 @@
     "ui_customization": {
       "title": "Personalización de interfaz",
       "description": "Mostrar u ocultar elementos de la interfaz. Los elementos no marcados se ocultarán.",
+      "reminder_bell": "Icono de campana (recordatorio)",
       "filter_placeholder": "Filtrar elementos...",
       "no_results": "No se encontraron elementos coincidentes.",
       "sections": {
@@ -1012,7 +1058,8 @@
       "attachments": "Archivos adjuntos"
     },
     "favorites": {
-      "empty": "Aún no hay notas favoritas."
+      "empty": "Aún no hay notas favoritas.",
+      "filter_placeholder": "Filtrar por título o nombre de carpeta..."
     },
     "drop_zone": {
       "remove_from_folder": "Suelta aquí para eliminar de la carpeta"
@@ -1345,7 +1392,7 @@
     "redirecting": "Redirigiendo...",
     "show_password": "Mostrar contraseña",
     "hide_password": "Ocultar contraseña",
-    "admin_warning": "Inicie sesión con el nombre de usuario <code>{{username}}</code> y su contraseña (almacenada en .env). Luego podrá cambiar el nombre de esta cuenta en la configuración para mayor seguridad.",
+      "admin_warning": "Inicie sesión con el nombre de usuario <code>{{username}}</code> y la contraseña actual de esta cuenta. Luego podrá cambiar el nombre de esta cuenta en la configuración para mayor seguridad.",
     "fields": {
       "username": "Nombre de usuario",
       "username_or_email": "Nombre de usuario o correo electrónico",
@@ -2089,6 +2136,7 @@
       "workspace": "Espacio de trabajo",
       "target_workspace": "Espacio de trabajo de destino",
       "all_workspaces": "Todos los espacios de trabajo",
+      "home_hint": "Las acciones de enviar y recuperar se pueden realizar desde el panel.",
       "push": {
         "title": "Enviar a {{provider}}",
         "description": "Exporta todas tus notas y archivos adjuntos a {{provider}} como archivos planos. Actualiza los archivos existentes y elimina los que ya no existen en Poznote.",
@@ -2236,7 +2284,7 @@
   "password": {
     "status": {
       "custom": "Contraseña personalizada",
-      "default": "Predeterminado (env)"
+      "default": "Predeterminado"
     },
     "modal": {
       "title": "Cambiar contraseña",
@@ -2252,5 +2300,76 @@
       "incorrect_current": "La contraseña actual es incorrecta"
     },
     "success": "Contraseña cambiada con éxito."
+  },
+  "oidc_admin": {
+    "title": "Configuración OIDC",
+    "description": "Configure la autenticación OpenID Connect (SSO). El Client ID y el Client Secret se configuran en el archivo .env por motivos de seguridad.",
+    "saved": "La configuración OIDC se guardó correctamente.",
+    "error_saving": "Error al guardar algunos ajustes. Inténtelo de nuevo.",
+    "error_csrf": "Envío de formulario no válido. Inténtelo de nuevo.",
+    "deprecated": "Obsoleto",
+    "section_general": "General",
+    "section_credentials": "Credenciales",
+    "section_advanced": "Avanzado",
+    "section_access_control": "Control de acceso",
+    "section_login_behavior": "Comportamiento de inicio de sesión",
+    "fields": {
+      "enabled": "Activar autenticación OIDC",
+      "provider_name": "Nombre del proveedor",
+      "issuer": "URL del emisor",
+      "client_id": "Client ID",
+      "client_secret": "Client Secret",
+      "scopes": "Scopes",
+      "discovery_url": "URL de descubrimiento",
+      "redirect_uri": "URI de redirección",
+      "end_session_endpoint": "Endpoint de fin de sesión",
+      "post_logout_redirect_uri": "URI de redirección tras cerrar sesión",
+      "groups_claim": "Claim de grupos",
+      "allowed_groups": "Grupos permitidos",
+      "auto_create_users": "Crear perfiles de usuario automáticamente en el primer inicio de sesión OIDC",
+      "allowed_users": "Usuarios permitidos",
+      "disable_normal_login": "Desactivar inicio de sesión con usuario/contraseña (solo SSO)",
+      "disable_basic_auth": "Desactivar HTTP Basic Auth para la API"
+    },
+    "hints": {
+      "provider_name": "Nombre mostrado en el botón de inicio de sesión (p. ej. Google, Azure AD, Keycloak)",
+      "issuer": "La URL del emisor de su proveedor OIDC (p. ej. https://accounts.google.com)",
+      "credentials": "El Client ID y el Client Secret se gestionan en el archivo .env.",
+      "scopes": "Scopes separados por espacios (predeterminado: openid profile email)",
+      "discovery_url": "Sobrescribe la URL de descubrimiento automático (déjelo vacío para derivarla del emisor)",
+      "redirect_uri": "URI de redirección personalizada (déjela vacía para generarla automáticamente)",
+      "end_session_endpoint": "Endpoint de cierre de sesión del IdP para cierre iniciado por el RP (opcional)",
+      "post_logout_redirect_uri": "Adónde redirigir tras cerrar sesión (predeterminado: página de inicio de sesión)",
+      "groups_claim": "Nombre del claim del token que contiene los grupos del usuario (predeterminado: groups)",
+      "allowed_groups": "Lista de grupos permitidos separada por comas. Déjelo vacío para permitir a todos los usuarios autenticados.",
+      "auto_create_users": "Recomendado al usar control de acceso basado en grupos",
+      "allowed_users": "Correos electrónicos/nombres de usuario separados por comas. Se recomienda usar control de acceso por grupos.",
+      "disable_normal_login": "Si está activado, solo el inicio de sesión OIDC estará disponible en la página de acceso",
+      "disable_basic_auth": "Si está activado, las solicitudes API con HTTP Basic Auth se rechazarán (403)"
+    }
+  },
+  "reminder": {
+    "toolbar_button": "Establecer recordatorio",
+    "notifications": "Notificaciones",
+    "no_notifications": "Sin notificaciones",
+    "dismiss": "Cerrar",
+    "dismiss_all": "Eliminar todo",
+    "set_success": "Recordatorio establecido para",
+    "removed": "Recordatorio eliminado",
+    "just_now": "Ahora mismo",
+    "new_notifications": "Tiene",
+    "notification_s": "notificación(es)",
+    "modal": {
+      "title": "Recordatorio",
+      "date_label": "Fecha y hora",
+      "in_30min": "30 min",
+      "in_1h": "1 hora",
+      "in_3h": "3 horas",
+      "tomorrow": "Mañana",
+      "in_1week": "1 semana",
+      "remove": "Eliminar recordatorio",
+      "select_date": "Seleccione una fecha y hora",
+      "past_time": "Seleccione una fecha futura"
+    }
   }
 }

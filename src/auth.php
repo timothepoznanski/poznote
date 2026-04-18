@@ -76,26 +76,19 @@ foreach ($envSearchPaths as $envPath) {
     }
 }
 
-// Authentication configuration - role-based credentials
-// We use ?: and trim() to handle empty shell variables and trailing spaces
+// Authentication configuration - hardcoded defaults for initial/new users
+// Passwords are managed exclusively through the Poznote UI (Settings > Change Password).
+// These defaults are only used as initial passwords for new user accounts.
+define("AUTH_PASSWORD", 'admin');
+define("AUTH_USER_PASSWORD", 'user');
+
+// Helper to read an environment variable with a default value
 function getAuthConfig($key, $default) {
     $val = $_ENV[$key] ?? getenv($key);
     if ($val === false || $val === null || (is_string($val) && trim($val) === '')) {
         return $default;
     }
     return trim((string)$val);
-}
-
-define("AUTH_PASSWORD", getAuthConfig('POZNOTE_PASSWORD', 'admin'));
-define("AUTH_USER_PASSWORD", getAuthConfig('POZNOTE_PASSWORD_USER', 'user'));
-
-function getUserSpecificPassword($username) {
-    if (empty($username)) return AUTH_USER_PASSWORD;
-    // Replace non-alphanumeric chars to make it a valid env var suffix
-    $sanitized = preg_replace('/[^a-zA-Z0-9_]/', '_', $username);
-    $key = 'POZNOTE_PASSWORD_' . strtoupper($sanitized);
-    $customPassword = getAuthConfig($key, null);
-    return $customPassword !== null ? $customPassword : AUTH_USER_PASSWORD;
 }
 
 // Remember me cookie settings
@@ -335,6 +328,197 @@ function requireAuth() {
     }
 }
 
+function getMcpServiceTokenPath(): string {
+    static $tokenPath = null;
+
+    if ($tokenPath !== null) {
+        return $tokenPath;
+    }
+
+    $defaultPath = dirname(SQLITE_DATABASE, 2) . '/.mcp_token';
+    $configuredPath = trim((string) getAuthConfig('POZNOTE_SERVICE_TOKEN_FILE', $defaultPath));
+    $tokenPath = $configuredPath !== '' ? $configuredPath : $defaultPath;
+
+    return $tokenPath;
+}
+
+function getMcpServiceToken(): ?string {
+    static $token = null;
+
+    if (is_string($token) && $token !== '') {
+        return $token;
+    }
+
+    $tokenPath = getMcpServiceTokenPath();
+
+    if (is_file($tokenPath) && is_readable($tokenPath)) {
+        $storedToken = trim((string) @file_get_contents($tokenPath));
+        if ($storedToken !== '') {
+            $token = $storedToken;
+            return $token;
+        }
+    }
+
+    $tokenDir = dirname($tokenPath);
+    if (!is_dir($tokenDir) || !is_writable($tokenDir)) {
+        return null;
+    }
+
+    try {
+        $generatedToken = bin2hex(random_bytes(32));
+    } catch (Throwable $e) {
+        return null;
+    }
+
+    if (@file_put_contents($tokenPath, $generatedToken . PHP_EOL, LOCK_EX) === false) {
+        return null;
+    }
+
+    @chmod($tokenPath, 0644);
+    $token = $generatedToken;
+    return $token;
+}
+
+function getApiAuthorizationHeader(): string {
+    $header = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
+    if (is_string($header) && $header !== '') {
+        return trim($header);
+    }
+
+    if (function_exists('getallheaders')) {
+        foreach (getallheaders() as $name => $value) {
+            if (strcasecmp((string) $name, 'Authorization') === 0) {
+                return trim((string) $value);
+            }
+        }
+    }
+
+    return '';
+}
+
+function getApiBasicCredentials(): ?array {
+    if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
+        return [
+            'username' => (string) $_SERVER['PHP_AUTH_USER'],
+            'password' => (string) $_SERVER['PHP_AUTH_PW'],
+        ];
+    }
+
+    $authorizationHeader = getApiAuthorizationHeader();
+    if (!preg_match('/^Basic\s+(.+)$/i', $authorizationHeader, $matches)) {
+        return null;
+    }
+
+    $decodedValue = base64_decode($matches[1], true);
+    if ($decodedValue === false || strpos($decodedValue, ':') === false) {
+        return null;
+    }
+
+    [$username, $password] = explode(':', $decodedValue, 2);
+    return [
+        'username' => $username,
+        'password' => $password,
+    ];
+}
+
+function getApiBearerToken(): ?string {
+    $authorizationHeader = getApiAuthorizationHeader();
+    if (!preg_match('/^Bearer\s+(.+)$/i', $authorizationHeader, $matches)) {
+        return null;
+    }
+
+    $token = trim($matches[1]);
+    return $token !== '' ? $token : null;
+}
+
+function hasApiAuthCredentials(): bool {
+    return getApiBearerToken() !== null || getApiBasicCredentials() !== null;
+}
+
+function setApiAuthenticatedUser(array $user): void {
+    $_SESSION['authenticated'] = true;
+    $_SESSION['user_id'] = (int) $user['id'];
+    $_SESSION['user'] = [
+        'id' => $user['id'],
+        'username' => $user['username'],
+        'is_admin' => (bool) $user['is_admin']
+    ];
+}
+
+function getDefaultApiAdminProfile(): ?array {
+    require_once __DIR__ . '/users/db_master.php';
+    $profiles = getAllUserProfiles();
+
+    foreach ($profiles as $profile) {
+        if (!(bool) ($profile['is_admin'] ?? false)) {
+            continue;
+        }
+
+        $adminProfile = getUserProfileById((int) $profile['id']);
+        if ($adminProfile && (bool) ($adminProfile['active'] ?? false)) {
+            return $adminProfile;
+        }
+    }
+
+    foreach ($profiles as $profile) {
+        $userProfile = getUserProfileById((int) $profile['id']);
+        if ($userProfile && (bool) ($userProfile['active'] ?? false)) {
+            return $userProfile;
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Authenticate via the internal MCP Bearer token.
+ * Returns null when no Bearer token is provided.
+ */
+function authenticateApiBearerToken(bool $requireAdmin = false): ?array {
+    $providedToken = getApiBearerToken();
+    if ($providedToken === null) {
+        return null;
+    }
+
+    $expectedToken = getMcpServiceToken();
+    if (!is_string($expectedToken) || $expectedToken === '' || !hash_equals($expectedToken, $providedToken)) {
+        $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
+        header('HTTP/1.1 401 Unauthorized');
+        header('Content-Type: application/json');
+        echo json_encode(['error' => $msg]);
+        exit;
+    }
+
+    $authUser = getDefaultApiAdminProfile();
+    if ($authUser === null) {
+        $authUser = [
+            'id' => 1,
+            'username' => 'mcp-service',
+            'is_admin' => true,
+            'active' => true,
+        ];
+    }
+
+    if ($requireAdmin && !(bool) $authUser['is_admin']) {
+        $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
+        header('HTTP/1.1 401 Unauthorized');
+        header('Content-Type: application/json');
+        echo json_encode(['error' => $msg]);
+        exit;
+    }
+
+    return $authUser;
+}
+
+function getApiAuthenticatedUser(bool $requireAdmin = false): array {
+    $bearerUser = authenticateApiBearerToken($requireAdmin);
+    if ($bearerUser !== null) {
+        return $bearerUser;
+    }
+
+    return authenticateApiBasicAuth($requireAdmin);
+}
+
 /**
  * Authenticate via HTTP Basic Auth headers.
  * Validates credentials and returns the authenticated user profile.
@@ -345,8 +529,9 @@ function requireAuth() {
  */
 function authenticateApiBasicAuth(bool $requireAdmin = false): array {
     $basicAuthDisabled = defined('OIDC_DISABLE_BASIC_AUTH') && OIDC_DISABLE_BASIC_AUTH;
+    $basicCredentials = getApiBasicCredentials();
     
-    if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW'])) {
+    if ($basicCredentials === null) {
         $msg = api_t('auth.api.authentication_required', [], 'Authentication required');
         header('HTTP/1.1 401 Unauthorized');
         if (!$basicAuthDisabled) {
@@ -366,12 +551,12 @@ function authenticateApiBasicAuth(bool $requireAdmin = false): array {
     }
     
     require_once __DIR__ . '/users/db_master.php';
-    $loginIdentifier = $_SERVER['PHP_AUTH_USER'];
+    $loginIdentifier = $basicCredentials['username'];
     $authUser = ctype_digit($loginIdentifier)
         ? getUserProfileById((int)$loginIdentifier)
         : getUserProfileByUsername($loginIdentifier);
     
-    if (!$authUser || !$authUser['active'] || ($requireAdmin && !(bool)$authUser['is_admin']) || !verifyUserPassword((int)$authUser['id'], $_SERVER['PHP_AUTH_PW'])) {
+    if (!$authUser || !$authUser['active'] || ($requireAdmin && !(bool)$authUser['is_admin']) || !verifyUserPassword((int)$authUser['id'], $basicCredentials['password'])) {
         $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
         header('HTTP/1.1 401 Unauthorized');
         header('Content-Type: application/json');
@@ -388,7 +573,8 @@ function requireApiAuth() {
         return;
     }
     
-    $authUser = authenticateApiBasicAuth();
+    require_once __DIR__ . '/users/db_master.php';
+    $authUser = getApiAuthenticatedUser();
     $isAdminCreds = (bool)$authUser['is_admin'];
     
     // For Basic Auth, require X-User-ID header to specify which user profile to use
@@ -436,13 +622,7 @@ function requireApiAuth() {
     }
     
     // Set up session with the specified user profile
-    $_SESSION['authenticated'] = true;
-    $_SESSION['user_id'] = (int)$userId;
-    $_SESSION['user'] = [
-        'id' => $user['id'],
-        'username' => $user['username'],
-        'is_admin' => (bool)$user['is_admin']
-    ];
+    setApiAuthenticatedUser($user);
 }
 
 /**
@@ -456,16 +636,34 @@ function requireApiAuthUser() {
         return;
     }
     
-    $authUser = authenticateApiBasicAuth();
-    
-    // Set up session with the authenticated user
-    $_SESSION['authenticated'] = true;
-    $_SESSION['user_id'] = (int)$authUser['id'];
-    $_SESSION['user'] = [
-        'id' => $authUser['id'],
-        'username' => $authUser['username'],
-        'is_admin' => (bool)$authUser['is_admin']
-    ];
+    require_once __DIR__ . '/users/db_master.php';
+    $authUser = getApiAuthenticatedUser();
+
+    $userId = $_SERVER['HTTP_X_USER_ID'] ?? (string) $authUser['id'];
+    $user = getUserProfileById((int) $userId);
+
+    if (!$user) {
+        header('HTTP/1.1 404 Not Found');
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'User profile not found: ' . $userId]);
+        exit;
+    }
+
+    if (!$user['active']) {
+        header('HTTP/1.1 403 Forbidden');
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'User profile is disabled']);
+        exit;
+    }
+
+    if (!(bool) $authUser['is_admin'] && (int) $authUser['id'] !== (int) $userId) {
+        header('HTTP/1.1 403 Forbidden');
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'User credentials can only access their own profile data']);
+        exit;
+    }
+
+    setApiAuthenticatedUser($user);
 }
 
 /**
@@ -513,60 +711,27 @@ function requireApiAuthAdmin() {
         return;
     }
     
-    $authUser = authenticateApiBasicAuth(requireAdmin: true);
+    require_once __DIR__ . '/users/db_master.php';
+    $authUser = getApiAuthenticatedUser(requireAdmin: true);
     
     // For admin endpoints, we still need a user context for getCurrentUserId() etc.
-    // Use X-User-ID if provided, otherwise use the first admin user
+    // Use X-User-ID if provided, otherwise use the authenticated admin profile
     $userId = $_SERVER['HTTP_X_USER_ID'] ?? null;
     
     if ($userId !== null) {
         // Use the specified user
-        require_once __DIR__ . '/users/db_master.php';
         $user = getUserProfileById((int)$userId);
         
         if ($user && $user['active']) {
-            $_SESSION['authenticated'] = true;
-            $_SESSION['user_id'] = (int)$userId;
-            $_SESSION['user'] = [
-                'id' => $user['id'],
-                'username' => $user['username'],
-                'is_admin' => (bool)$user['is_admin']
-            ];
+            setApiAuthenticatedUser($user);
+            return;
         }
+
+        header('HTTP/1.1 404 Not Found');
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'User profile not found: ' . $userId]);
+        exit;
     } else {
-        // No X-User-ID provided, use the first admin user for admin operations
-        require_once __DIR__ . '/users/db_master.php';
-        $profiles = getAllUserProfiles();
-        
-        // Find an admin user
-        $adminUser = null;
-        foreach ($profiles as $profile) {
-            if ($profile['is_admin']) {
-                $adminUser = getUserProfileById($profile['id']);
-                break;
-            }
-        }
-        
-        if ($adminUser) {
-            $_SESSION['authenticated'] = true;
-            $_SESSION['user_id'] = (int)$adminUser['id'];
-            $_SESSION['user'] = [
-                'id' => $adminUser['id'],
-                'username' => $adminUser['username'],
-                'is_admin' => true
-            ];
-        } else if (!empty($profiles)) {
-            // Fallback to first user if no admin exists
-            $firstUser = getUserProfileById($profiles[0]['id']);
-            if ($firstUser) {
-                $_SESSION['authenticated'] = true;
-                $_SESSION['user_id'] = (int)$firstUser['id'];
-                $_SESSION['user'] = [
-                    'id' => $firstUser['id'],
-                    'username' => $firstUser['username'],
-                    'is_admin' => (bool)$firstUser['is_admin']
-                ];
-            }
-        }
+        setApiAuthenticatedUser($authUser);
     }
 }

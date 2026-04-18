@@ -24,7 +24,7 @@
                     badge.textContent = tr('password.status.custom', {}, 'Custom password');
                     badge.className = 'setting-status enabled';
                 } else {
-                    badge.textContent = tr('password.status.default', {}, 'Default (env)');
+                    badge.textContent = tr('password.status.default', {}, 'Default');
                     badge.className = 'setting-status disabled';
                 }
             })

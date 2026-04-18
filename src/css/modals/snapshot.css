@@ -1,0 +1,243 @@
+/* ============================================
+   Snapshot Modal Styles
+   ============================================ */
+
+/* Override base modal centering for snapshot */
+#snapshotModal.modal {
+    padding-top: 0px;
+    align-items: flex-start;
+}
+
+.snapshot-modal-content {
+    max-width: 850px !important;
+    width: 94% !important;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+/* ---- Header ---- */
+.snapshot-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    /* border-bottom: 1px solid #e8e8e8; */
+    flex-shrink: 0;
+}
+
+.snapshot-modal-header h3 {
+    margin: 0 !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 17px;
+}
+
+.snapshot-close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    color: inherit;
+    opacity: 0.5;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.15s, background-color 0.15s;
+}
+
+.snapshot-close-btn:hover {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.06);
+}
+
+.snapshot-close-btn .lucide {
+    width: 18px;
+    height: 18px;
+}
+
+/* ---- Loading / Empty States ---- */
+.snapshot-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    text-align: center;
+}
+
+.snapshot-state > div:first-child {
+    margin-bottom: 16px;
+    opacity: 0.35;
+}
+
+.snapshot-state > div:first-child .lucide {
+    width: 48px;
+    height: 48px;
+}
+
+.snapshot-state p {
+    margin: 0;
+}
+
+.snapshot-state-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 6px !important;
+}
+
+.snapshot-state-hint {
+    font-size: 13px;
+    opacity: 0.55;
+    max-width: 340px;
+    line-height: 1.5;
+}
+
+@keyframes snapshot-spin {
+    to { transform: rotate(360deg); }
+}
+
+.snapshot-spinner {
+    animation: snapshot-spin 1s linear infinite;
+}
+
+/* ---- Meta bar ---- */
+.snapshot-meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 24px 2px;
+    background: transparent;
+    border-bottom: none;
+    font-size: 12px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+
+.snapshot-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #8a8a8a;
+}
+
+.snapshot-meta-item .lucide {
+    width: 13px;
+    height: 13px;
+    opacity: 0.35;
+}
+
+/* ---- Content preview ---- */
+#snapshotBody {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.snapshot-content-wrapper {
+    flex: 1;
+    overflow: hidden;
+    padding: 0 24px;
+    min-height: 0;
+}
+
+.snapshot-content-preview {
+    overflow-y: auto;
+    max-height: calc(85vh - 260px);
+    padding: 20px;
+    margin: 16px 0;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    background: #fcfcfc;
+    font-size: 14px;
+    line-height: 1.7;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.snapshot-content-preview img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.snapshot-content-preview:empty::before {
+    content: attr(data-empty-text);
+    color: #999;
+    font-style: italic;
+}
+
+/* ---- Actions bar ---- */
+.snapshot-modal-actions {
+    padding: 16px 24px !important;
+    margin-top: 0 !important;
+    /* border-top: 1px solid #e8e8e8; */
+    flex-shrink: 0;
+}
+
+.snapshot-restore-btn {
+    display: inline-flex !important;
+    align-items: center;
+}
+
+.snapshot-restore-btn {
+    background-color: #007DB8 !important;
+    border-color: #007DB8 !important;
+    color: white !important;
+}
+
+.snapshot-restore-btn:hover {
+    background-color: #005a8a !important;
+    border-color: #005a8a !important;
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+
+@media (max-width: 768px) {
+    #snapshotModal.modal {
+        padding: 16px 8px;
+    }
+
+    .snapshot-modal-content {
+        width: 100% !important;
+        max-height: 92vh;
+        border-radius: 10px;
+    }
+
+    .snapshot-modal-header {
+        padding: 16px;
+    }
+
+    .snapshot-content-wrapper {
+        padding: 0 16px;
+    }
+
+    .snapshot-content-preview {
+        max-height: calc(92vh - 280px);
+        padding: 14px;
+    }
+
+    .snapshot-modal-actions {
+        padding: 12px 16px !important;
+        flex-direction: column;
+    }
+
+    .snapshot-modal-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .snapshot-meta {
+        padding: 10px 16px;
+        gap: 12px;
+    }
+}

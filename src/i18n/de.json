@@ -27,7 +27,7 @@
       "oidc_button": "Mit {{provider}} fortfahren",
       "documentation": "Poznote Dokumentation",
       "redirecting": "Weiterleitung...",
-      "admin_warning": "Bitte melden Sie sich mit dem Benutzernamen <code>{{username}}</code> und Ihrem Passwort (in .env gespeichert) an. Sie können dieses Konto dann in den Einstellungen für mehr Sicherheit umbenennen.",
+        "admin_warning": "Bitte melden Sie sich mit dem Benutzernamen <code>{{username}}</code> und dem aktuellen Passwort dieses Kontos an. Sie können dieses Konto dann in den Einstellungen für mehr Sicherheit umbenennen.",
       "errors": {
         "invalid_credentials": "Benutzername oder Passwort ist falsch."
       }
@@ -64,6 +64,50 @@
       "no_headings": "Keine Überschriften in dieser Notiz"
     },
     "link_copied": "Link kopiert"
+  },
+  "snapshot": {
+    "menu_item": "Schnappschuss",
+    "modal": {
+      "title": "Heutiger Schnappschuss",
+      "loading": "Schnappschuss wird geladen...",
+      "empty_title": "Kein Schnappschuss verfügbar",
+      "empty_hint": "Ein Schnappschuss wird automatisch erstellt, wenn die Notiz tagsüber zum ersten Mal geöffnet wird.",
+      "empty_content": "(Leerer Inhalt)",
+      "take_now": "Jetzt Schnappschuss erstellen",
+      "copy_content": "Inhalt kopieren",
+      "restore_state": "Zu diesem Zustand zurückkehren"
+    },
+    "messages": {
+      "content_copied": "Inhalt kopiert",
+      "created_now": "Schnappschuss gespeichert"
+    },
+    "errors": {
+      "restore_failed": "Schnappschuss konnte nicht wiederhergestellt werden",
+      "create_failed": "Schnappschuss konnte nicht erstellt werden",
+      "copy_failed": "Kopieren fehlgeschlagen"
+    },
+    "confirm": {
+      "title": "Bestätigung",
+      "restore_message": "Die Notiz auf den Stand des Schnappschusses zurücksetzen? Aktuelle Änderungen gehen verloren.",
+      "restore_button": "Zu diesem Zustand zurückkehren",
+      "take_now_message": "Den heutigen Schnappschuss mit dem aktuellen Notizinhalt erstellen oder ersetzen?",
+      "take_now_button": "Jetzt Schnappschuss erstellen"
+    },
+    "api": {
+      "invalid_note_id": "Ungültige Notiz-ID",
+      "note_not_found": "Notiz nicht gefunden",
+      "already_exists": "Für heute existiert bereits ein Schnappschuss",
+      "create_directory_failed": "Schnappschuss-Ordner konnte nicht erstellt werden",
+      "write_file_failed": "Schnappschuss-Datei konnte nicht geschrieben werden",
+      "create_failed": "Schnappschuss konnte nicht erstellt werden",
+      "not_found_today": "Für heute wurde kein Schnappschuss gefunden",
+      "read_failed": "Schnappschuss konnte nicht gelesen werden",
+      "retrieve_failed": "Schnappschuss konnte nicht abgerufen werden",
+      "invalid_entries_path": "Ungültiger Notizpfad",
+      "restore_note_file_failed": "Notizdatei konnte nicht wiederhergestellt werden",
+      "restore_success": "Die Notiz wurde auf den Stand des Schnappschusses zurückgesetzt",
+      "restore_failed": "Schnappschuss konnte nicht wiederhergestellt werden"
+    }
   },
   "kanban": {
     "title": "Kanban - {{folder}}",
@@ -348,7 +392,8 @@
       "user_management": "Benutzerverwaltung",
       "change_password": "Passwort ändern",
       "import_limits": "Importlimits",
-      "git_sync_toggle": "Git-Synchronisierung"
+      "git_sync_toggle": "Git-Synchronisierung",
+      "oidc_config": "OIDC / SSO"
     },
     "install_app": {
       "launching": "Die Installation wird gestartet. Bitte warten Sie...",
@@ -755,6 +800,7 @@
     "ui_customization": {
       "title": "Oberfläche anpassen",
       "description": "Oberflächenelemente ein- oder ausblenden. Nicht angehakte Elemente werden ausgeblendet.",
+      "reminder_bell": "Glockensymbol (Erinnerung)",
       "filter_placeholder": "Elemente filtern...",
       "no_results": "Keine passenden Elemente gefunden.",
       "sections": {
@@ -1013,7 +1059,8 @@
       "attachments": "Anhänge"
     },
     "favorites": {
-      "empty": "Noch keine Favoriten vorhanden."
+      "empty": "Noch keine Favoriten vorhanden.",
+      "filter_placeholder": "Nach Titel oder Ordnername filtern..."
     },
     "drop_zone": {
       "remove_from_folder": "Hier ablegen, um aus Ordner zu entfernen"
@@ -1346,7 +1393,7 @@
     "redirecting": "Weiterleitung...",
     "show_password": "Passwort anzeigen",
     "hide_password": "Passwort ausblenden",
-    "admin_warning": "Bitte melden Sie sich mit dem Benutzernamen <code>{{username}}</code> und Ihrem Passwort (in .env gespeichert) an und benennen Sie dieses Konto in den Einstellungen für mehr Sicherheit um.",
+      "admin_warning": "Bitte melden Sie sich mit dem Benutzernamen <code>{{username}}</code> und dem aktuellen Passwort dieses Kontos an und benennen Sie dieses Konto in den Einstellungen für mehr Sicherheit um.",
     "fields": {
       "username": "Benutzername",
       "username_or_email": "Benutzername oder E-Mail",
@@ -2090,6 +2137,7 @@
       "workspace": "Arbeitsbereich",
       "target_workspace": "Zielarbeitsbereich",
       "all_workspaces": "Alle Arbeitsbereiche",
+      "home_hint": "Senden und Abrufen können über das Dashboard ausgeführt werden.",
       "push": {
         "title": "An {{provider}} senden",
         "description": "Exportiert alle Notizen und Anhänge als flache Dateien zu {{provider}}. Aktualisiert vorhandene Dateien und entfernt Dateien, die in Poznote nicht mehr vorhanden sind.",
@@ -2237,7 +2285,7 @@
   "password": {
     "status": {
       "custom": "Benutzerdefiniertes Passwort",
-      "default": "Standard (env)"
+      "default": "Standard"
     },
     "modal": {
       "title": "Passwort ändern",
@@ -2253,5 +2301,76 @@
       "incorrect_current": "Das aktuelle Passwort ist falsch"
     },
     "success": "Passwort erfolgreich geändert."
+  },
+  "oidc_admin": {
+    "title": "OIDC-Konfiguration",
+    "description": "Konfigurieren Sie die OpenID Connect (SSO)-Authentifizierung. Client ID und Client Secret werden aus Sicherheitsgründen in der .env-Datei konfiguriert.",
+    "saved": "OIDC-Konfiguration erfolgreich gespeichert.",
+    "error_saving": "Fehler beim Speichern einiger Einstellungen. Bitte versuchen Sie es erneut.",
+    "error_csrf": "Ungültige Formularübermittlung. Bitte versuchen Sie es erneut.",
+    "deprecated": "Veraltet",
+    "section_general": "Allgemein",
+    "section_credentials": "Anmeldedaten",
+    "section_advanced": "Erweitert",
+    "section_access_control": "Zugriffskontrolle",
+    "section_login_behavior": "Anmeldeverhalten",
+    "fields": {
+      "enabled": "OIDC-Authentifizierung aktivieren",
+      "provider_name": "Anbietername",
+      "issuer": "Issuer-URL",
+      "client_id": "Client ID",
+      "client_secret": "Client Secret",
+      "scopes": "Scopes",
+      "discovery_url": "Discovery-URL",
+      "redirect_uri": "Redirect-URI",
+      "end_session_endpoint": "End-Session-Endpunkt",
+      "post_logout_redirect_uri": "Post-Logout-Redirect-URI",
+      "groups_claim": "Groups-Claim",
+      "allowed_groups": "Erlaubte Gruppen",
+      "auto_create_users": "Benutzerprofile bei der ersten OIDC-Anmeldung automatisch erstellen",
+      "allowed_users": "Erlaubte Benutzer",
+      "disable_normal_login": "Anmeldung mit Benutzername/Passwort deaktivieren (nur SSO)",
+      "disable_basic_auth": "HTTP Basic Auth für die API deaktivieren"
+    },
+    "hints": {
+      "provider_name": "Anzeigename auf dem Login-Button (z. B. Google, Azure AD, Keycloak)",
+      "issuer": "Die Issuer-URL Ihres OIDC-Anbieters (z. B. https://accounts.google.com)",
+      "credentials": "Client ID und Client Secret werden in der .env-Datei verwaltet.",
+      "scopes": "Leerzeichengetrennte Scopes (Standard: openid profile email)",
+      "discovery_url": "Überschreibt die automatische Discovery-URL (leer lassen, um sie aus dem Issuer abzuleiten)",
+      "redirect_uri": "Benutzerdefinierte Redirect-URI (leer lassen für automatische Generierung)",
+      "end_session_endpoint": "Logout-Endpunkt des IdP für RP-initiated Logout (optional)",
+      "post_logout_redirect_uri": "Ziel nach der Abmeldung (Standard: Login-Seite)",
+      "groups_claim": "Name des Token-Claims mit den Benutzergruppen (Standard: groups)",
+      "allowed_groups": "Kommagetrennte Liste erlaubter Gruppen. Leer lassen, um alle authentifizierten Benutzer zuzulassen.",
+      "auto_create_users": "Empfohlen bei gruppenbasierter Zugriffskontrolle",
+      "allowed_users": "Kommagetrennte E-Mails/Benutzernamen. Bevorzugen Sie stattdessen gruppenbasierte Zugriffskontrolle.",
+      "disable_normal_login": "Wenn aktiviert, ist auf der Login-Seite nur die OIDC-Anmeldung verfügbar",
+      "disable_basic_auth": "Wenn aktiviert, werden API-Anfragen mit HTTP Basic Auth abgelehnt (403)"
+    }
+  },
+  "reminder": {
+    "toolbar_button": "Erinnerung setzen",
+    "notifications": "Benachrichtigungen",
+    "no_notifications": "Keine Benachrichtigungen",
+    "dismiss": "Schließen",
+    "dismiss_all": "Alle löschen",
+    "set_success": "Erinnerung gesetzt für",
+    "removed": "Erinnerung entfernt",
+    "just_now": "Gerade eben",
+    "new_notifications": "Sie haben",
+    "notification_s": "Benachrichtigung(en)",
+    "modal": {
+      "title": "Erinnerung",
+      "date_label": "Datum und Uhrzeit",
+      "in_30min": "30 Min",
+      "in_1h": "1 Stunde",
+      "in_3h": "3 Stunden",
+      "tomorrow": "Morgen",
+      "in_1week": "1 Woche",
+      "remove": "Erinnerung entfernen",
+      "select_date": "Bitte wählen Sie Datum und Uhrzeit",
+      "past_time": "Bitte wählen Sie einen zukünftigen Zeitpunkt"
+    }
   }
 }

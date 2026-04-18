@@ -16,7 +16,7 @@ def test_list_notes_omits_workspace_filter_when_absent(mock_client_cls):
     http_client.get.return_value = _mock_response({"success": True, "notes": []})
     mock_client_cls.return_value = http_client
 
-    client = PoznoteClient(base_url="http://example.test/api/v1", username="admin", password="secret")
+    client = PoznoteClient(base_url="http://example.test/api/v1", service_token="secret-token")
     client.list_notes()
 
     _, kwargs = http_client.get.call_args
@@ -29,7 +29,7 @@ def test_list_notes_includes_workspace_filter_when_provided(mock_client_cls):
     http_client.get.return_value = _mock_response({"success": True, "notes": []})
     mock_client_cls.return_value = http_client
 
-    client = PoznoteClient(base_url="http://example.test/api/v1", username="admin", password="secret")
+    client = PoznoteClient(base_url="http://example.test/api/v1", service_token="secret-token")
     client.list_notes(workspace="Demo")
 
     _, kwargs = http_client.get.call_args
@@ -42,7 +42,7 @@ def test_create_note_omits_workspace_field_when_absent(mock_client_cls):
     http_client.post.return_value = _mock_response({"success": True, "note": {"id": 1}})
     mock_client_cls.return_value = http_client
 
-    client = PoznoteClient(base_url="http://example.test/api/v1", username="admin", password="secret")
+    client = PoznoteClient(base_url="http://example.test/api/v1", service_token="secret-token")
     client.create_note(title="Test", content="Body")
 
     _, kwargs = http_client.post.call_args
@@ -55,7 +55,7 @@ def test_create_note_includes_workspace_field_when_provided(mock_client_cls):
     http_client.post.return_value = _mock_response({"success": True, "note": {"id": 1}})
     mock_client_cls.return_value = http_client
 
-    client = PoznoteClient(base_url="http://example.test/api/v1", username="admin", password="secret")
+    client = PoznoteClient(base_url="http://example.test/api/v1", service_token="secret-token")
     client.create_note(title="Test", content="Body", workspace="Demo")
 
     _, kwargs = http_client.post.call_args

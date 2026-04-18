@@ -109,6 +109,16 @@
     background: var(--primary-color-dark, #0056b3);
 }
 
+.alert-modal.snapshot-restore-confirm .alert-modal-button.primary,
+.alert-modal-button.primary.snapshot-restore-confirm-button {
+    background: #007DB8;
+}
+
+.alert-modal.snapshot-restore-confirm .alert-modal-button.primary:hover,
+.alert-modal-button.primary.snapshot-restore-confirm-button:hover {
+    background: #005a8a;
+}
+
 .alert-modal-button.secondary {
     background: var(--secondary-color, #6c757d);
     color: white;
@@ -161,6 +171,20 @@ html[data-theme='dark'] .alert-modal-button.primary,
 html[data-theme='dark'] .alert-modal-button.primary:hover,
 .dark-mode .alert-modal-button.primary:hover {
     background-color: #2a4a7f;
+}
+
+html[data-theme='dark'] .alert-modal.snapshot-restore-confirm .alert-modal-button.primary,
+html[data-theme='dark'] .alert-modal-button.primary.snapshot-restore-confirm-button,
+.dark-mode .alert-modal.snapshot-restore-confirm .alert-modal-button.primary,
+.dark-mode .alert-modal-button.primary.snapshot-restore-confirm-button {
+    background-color: #007DB8;
+}
+
+html[data-theme='dark'] .alert-modal.snapshot-restore-confirm .alert-modal-button.primary:hover,
+html[data-theme='dark'] .alert-modal-button.primary.snapshot-restore-confirm-button:hover,
+.dark-mode .alert-modal.snapshot-restore-confirm .alert-modal-button.primary:hover,
+.dark-mode .alert-modal-button.primary.snapshot-restore-confirm-button:hover {
+    background-color: #005a8a;
 }
 
 /* Responsive */

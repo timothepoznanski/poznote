@@ -34,13 +34,13 @@ Poznote provides a comprehensive RESTful API v1 for programmatic access to notes
 
 ## Authentication
 
-All API endpoints (except public ones) require HTTP Basic Authentication.
+All API endpoints (except public ones) require authentication. For user-facing integrations, use HTTP Basic Authentication. Poznote also accepts the internal Bearer token used by the MCP server.
 
 ```bash
 curl -u 'username:password' http://YOUR_SERVER/api/v1/notes
 ```
 
-Use the current password of the profile you authenticate with. If a custom password has been set in Poznote, the `.env` fallback password is no longer valid for API calls until the custom password is reset.
+Use the current password of the profile you authenticate with. Default local passwords are `admin` for administrators and `user` for standard users until they are changed in the Poznote UI.
 
 ### Authentication Levels
 

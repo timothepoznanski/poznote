@@ -60,7 +60,7 @@ if ($isPublicApiEndpoint) {
     // Attachment downloads check authentication conditionally (public shared notes don't need auth)
     // Try to authenticate if credentials provided, but don't require it
     try {
-        if (isset($_SERVER['HTTP_X_USER_ID']) || (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW']))) {
+        if (isset($_SERVER['HTTP_X_USER_ID']) || hasApiAuthCredentials()) {
             @requireApiAuth();
         }
     } catch (Exception $e) {
@@ -98,6 +98,8 @@ require_once __DIR__ . '/controllers/SystemController.php';
 require_once __DIR__ . '/controllers/GitSyncController.php';
 require_once __DIR__ . '/controllers/PublicController.php';
 require_once __DIR__ . '/controllers/BacklinksController.php';
+require_once __DIR__ . '/controllers/SnapshotsController.php';
+require_once __DIR__ . '/controllers/RemindersController.php';
 
 /**
  * Simple Router class for handling RESTful routes
@@ -241,6 +243,8 @@ $systemController = new SystemController($con);
 $gitSyncController = new GitSyncController($con);
 $publicController = new PublicController($con);
 $backlinksController = new BacklinksController($con);
+$snapshotsController = new SnapshotsController($con);
+$remindersController = new RemindersController($con);
 
 // ======================
 // Notes Routes
@@ -326,6 +330,69 @@ $router->post('/notes/{id}/create-template', function($params) use ($notesContro
 // Convert note type (markdown <-> html)
 $router->post('/notes/{id}/convert', function($params) use ($notesController) {
     $notesController->convert($params['id']);
+});
+
+// ======================
+// Snapshots Routes
+// ======================
+
+// Create a daily snapshot for a note
+$router->post('/notes/{id}/snapshot', function($params) use ($snapshotsController) {
+    $snapshotsController->create($params['id']);
+});
+
+// Get today's snapshot for a note
+$router->get('/notes/{id}/snapshot', function($params) use ($snapshotsController) {
+    $snapshotsController->show($params['id']);
+});
+
+// Restore a note to its snapshot state
+$router->post('/notes/{id}/snapshot/restore', function($params) use ($snapshotsController) {
+    $snapshotsController->restore($params['id']);
+});
+
+// ======================
+// Reminders Routes
+// ======================
+
+// Get reminder for a note
+$router->get('/notes/{id}/reminder', function($params) use ($remindersController) {
+    $remindersController->getReminder($params['id']);
+});
+
+// Set a reminder on a note
+$router->post('/notes/{id}/reminder', function($params) use ($remindersController) {
+    $remindersController->setReminder($params['id']);
+});
+
+// Remove a reminder from a note
+$router->delete('/notes/{id}/reminder', function($params) use ($remindersController) {
+    $remindersController->removeReminder($params['id']);
+});
+
+// List pending notifications
+$router->get('/reminders', function($params) use ($remindersController) {
+    $remindersController->index();
+});
+
+// Get unread notification count (lightweight polling)
+$router->get('/reminders/count', function($params) use ($remindersController) {
+    $remindersController->count();
+});
+
+// Dismiss all notifications
+$router->post('/reminders/dismiss-all', function($params) use ($remindersController) {
+    $remindersController->dismissAll();
+});
+
+// Mark a notification as read
+$router->post('/reminders/{id}/read', function($params) use ($remindersController) {
+    $remindersController->markRead($params['id']);
+});
+
+// Dismiss a notification
+$router->post('/reminders/{id}/dismiss', function($params) use ($remindersController) {
+    $remindersController->dismiss($params['id']);
 });
 
 // Get share status for a note

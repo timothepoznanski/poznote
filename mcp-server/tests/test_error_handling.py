@@ -19,8 +19,9 @@ def _fake_client(**overrides):
     """Return a MagicMock PoznoteClient."""
     client = MagicMock()
     client.base_url = "http://localhost:8040/api/v1"
-    client.username = "admin"
-    client.password = "secret"
+    client.username = "1"
+    client.password = ""
+    client.service_token = "secret-token"
     for k, v in overrides.items():
         setattr(client, k, v)
     return client
@@ -137,30 +138,17 @@ class TestMissingEnvVars:
     """Tools must return clear config errors when env vars are missing."""
 
     @patch("poznote_mcp.server.get_client")
-    def test_missing_username(self, mock_get_client):
+    def test_missing_service_token(self, mock_get_client):
         from poznote_mcp.server import list_notes
 
-        client = _fake_client(username="")
+        client = _fake_client(service_token="")
         mock_get_client.return_value = client
 
         result_json = list_notes()
         result = json.loads(result_json)
 
         assert "error" in result
-        assert "POZNOTE_USERNAME" in result.get("missing", [])
-
-    @patch("poznote_mcp.server.get_client")
-    def test_missing_password(self, mock_get_client):
-        from poznote_mcp.server import list_notes
-
-        client = _fake_client(password="")
-        mock_get_client.return_value = client
-
-        result_json = list_notes()
-        result = json.loads(result_json)
-
-        assert "error" in result
-        assert "POZNOTE_PASSWORD" in result.get("missing", [])
+        assert "POZNOTE_SERVICE_TOKEN_FILE" in result.get("missing", [])
 
 
 class TestApiErrorJsonHelper:

@@ -78,6 +78,345 @@ function normalizeContentEditableText(element) {
     return content;
 }
 
+function getSelectionOffsetsInTextElement(element) {
+    var selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) {
+        return null;
+    }
+
+    var range = selection.getRangeAt(0);
+    if (!element.contains(range.startContainer) || !element.contains(range.endContainer)) {
+        return null;
+    }
+
+    var startRange = document.createRange();
+    startRange.selectNodeContents(element);
+    startRange.setEnd(range.startContainer, range.startOffset);
+
+    var endRange = document.createRange();
+    endRange.selectNodeContents(element);
+    endRange.setEnd(range.endContainer, range.endOffset);
+
+    return {
+        start: startRange.toString().length,
+        end: endRange.toString().length
+    };
+}
+
+function setSelectionOffsetsInTextElement(element, startOffset, endOffset) {
+    if (!element) {
+        return;
+    }
+
+    var textLength = (element.textContent || '').length;
+    var safeStart = Math.max(0, Math.min(startOffset, textLength));
+    var safeEnd = Math.max(0, Math.min(endOffset, textLength));
+
+    if (element.childNodes.length === 0) {
+        element.appendChild(document.createTextNode(''));
+    }
+
+    var findNodeAndOffset = function (targetOffset) {
+        var walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
+        var traversed = 0;
+        var textNode;
+
+        while ((textNode = walker.nextNode())) {
+            var nextTraversed = traversed + textNode.textContent.length;
+            if (targetOffset <= nextTraversed) {
+                return {
+                    node: textNode,
+                    offset: targetOffset - traversed
+                };
+            }
+            traversed = nextTraversed;
+        }
+
+        return {
+            node: element,
+            offset: element.childNodes.length
+        };
+    };
+
+    var startPosition = findNodeAndOffset(safeStart);
+    var endPosition = findNodeAndOffset(safeEnd);
+    var range = document.createRange();
+    var selection = window.getSelection();
+
+    try {
+        element.focus({ preventScroll: true });
+    } catch (e) {
+        element.focus();
+    }
+
+    range.setStart(startPosition.node, startPosition.offset);
+    range.setEnd(endPosition.node, endPosition.offset);
+    selection.removeAllRanges();
+    selection.addRange(range);
+}
+
+function getMarkdownLineStartOffsets(text) {
+    var offsets = [0];
+    for (var i = 0; i < text.length; i++) {
+        if (text.charAt(i) === '\n') {
+            offsets.push(i + 1);
+        }
+    }
+    return offsets;
+}
+
+function getMarkdownLineIndexForOffset(lineStarts, offset) {
+    var safeOffset = Math.max(0, offset);
+    var lineIndex = 0;
+
+    while (lineIndex + 1 < lineStarts.length && lineStarts[lineIndex + 1] <= safeOffset) {
+        lineIndex++;
+    }
+
+    return lineIndex;
+}
+
+function getMarkdownIndentWidth(indent) {
+    return (indent || '').replace(/\t/g, '    ').length;
+}
+
+function updateMarkdownEditorContent(editorDiv, noteEntry, noteId, content, selectionStart, selectionEnd) {
+    editorDiv.textContent = content;
+    noteEntry.setAttribute('data-markdown-content', content);
+
+    if (typeof noteid !== 'undefined') {
+        noteid = noteId;
+    }
+    window.noteid = noteId;
+
+    editorDiv.dispatchEvent(new Event('input', { bubbles: true }));
+    setSelectionOffsetsInTextElement(editorDiv, selectionStart, selectionEnd);
+}
+
+function renumberMarkdownOrderedListLines(lines) {
+    var renumberedLines = lines.slice();
+    var orderedContexts = [];
+    var fencePattern = /^[ \t]*```/;
+    var orderedLinePattern = /^([ \t]*)(\d+(?:\.\d+)*)(\.\s+.*)$/;
+    var unorderedLinePattern = /^([ \t]*)(?:[\*\-\+]\s+(?:\[[ xX]\]\s+)?.*)$/;
+    var inFencedCodeBlock = false;
+
+    for (var i = 0; i < renumberedLines.length; i++) {
+        var line = renumberedLines[i];
+        if (fencePattern.test(line)) {
+            inFencedCodeBlock = !inFencedCodeBlock;
+            orderedContexts = [];
+            continue;
+        }
+
+        if (inFencedCodeBlock || line.trim() === '') {
+            continue;
+        }
+
+        var orderedMatch = line.match(orderedLinePattern);
+        if (orderedMatch) {
+            var orderedIndentWidth = getMarkdownIndentWidth(orderedMatch[1]);
+            while (orderedContexts.length > 0 && orderedContexts[orderedContexts.length - 1].indent > orderedIndentWidth) {
+                orderedContexts.pop();
+            }
+
+            if (orderedContexts.length === 0) {
+                orderedContexts.push({ indent: orderedIndentWidth, count: 1 });
+            } else if (orderedContexts[orderedContexts.length - 1].indent === orderedIndentWidth) {
+                orderedContexts[orderedContexts.length - 1].count++;
+            } else {
+                orderedContexts.push({ indent: orderedIndentWidth, count: 1 });
+            }
+
+            renumberedLines[i] = orderedMatch[1] + orderedContexts.map(function (context) {
+                return context.count;
+            }).join('.') + orderedMatch[3];
+            continue;
+        }
+
+        var unorderedMatch = line.match(unorderedLinePattern);
+        if (unorderedMatch) {
+            var unorderedIndentWidth = getMarkdownIndentWidth(unorderedMatch[1]);
+            while (orderedContexts.length > 0 && orderedContexts[orderedContexts.length - 1].indent >= unorderedIndentWidth) {
+                orderedContexts.pop();
+            }
+            continue;
+        }
+
+        var leadingWhitespaceMatch = line.match(/^([ \t]*)/);
+        var otherIndentWidth = getMarkdownIndentWidth(leadingWhitespaceMatch ? leadingWhitespaceMatch[1] : '');
+
+        if (otherIndentWidth === 0) {
+            orderedContexts = [];
+            continue;
+        }
+
+        while (orderedContexts.length > 0 && orderedContexts[orderedContexts.length - 1].indent >= otherIndentWidth) {
+            orderedContexts.pop();
+        }
+    }
+
+    return renumberedLines;
+}
+
+function handleMarkdownOrderedListTab(event, editorDiv, noteEntry, noteId) {
+    if (!event || event.key !== 'Tab' || !editorDiv || !noteEntry) {
+        return false;
+    }
+
+    var selectionOffsets = getSelectionOffsetsInTextElement(editorDiv);
+    if (!selectionOffsets) {
+        return false;
+    }
+
+    var content = normalizeContentEditableText(editorDiv);
+    if (!content) {
+        return false;
+    }
+
+    var orderedLinePattern = /^([ \t]*)(\d+(?:\.\d+)*)(\.\s+.*)$/;
+    var oldLines = content.split('\n');
+    var lines = oldLines.slice();
+    var oldLineStarts = getMarkdownLineStartOffsets(content);
+    var lineTransforms = {};
+    var selectionEndForLineLookup = selectionOffsets.end;
+    var handled = false;
+    var modified = false;
+
+    if (selectionEndForLineLookup > selectionOffsets.start && selectionEndForLineLookup > 0 && content.charAt(selectionEndForLineLookup - 1) === '\n') {
+        selectionEndForLineLookup--;
+    }
+
+    var startLine = getMarkdownLineIndexForOffset(oldLineStarts, selectionOffsets.start);
+    var endLine = getMarkdownLineIndexForOffset(oldLineStarts, selectionEndForLineLookup);
+
+    for (var lineIndex = startLine; lineIndex <= endLine; lineIndex++) {
+        var line = lines[lineIndex];
+        var orderedMatch = line.match(orderedLinePattern);
+        if (!orderedMatch) {
+            continue;
+        }
+
+        handled = true;
+
+        if (event.shiftKey) {
+            var removableIndentMatch = orderedMatch[1].match(/^( {1,4}|\t)/);
+            if (!removableIndentMatch) {
+                continue;
+            }
+
+            lines[lineIndex] = orderedMatch[1].slice(removableIndentMatch[1].length) + orderedMatch[2] + orderedMatch[3];
+            modified = true;
+        } else {
+            lines[lineIndex] = '    ' + line;
+            modified = true;
+        }
+    }
+
+    if (!handled) {
+        return false;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!modified) {
+        return true;
+    }
+
+    lines = renumberMarkdownOrderedListLines(lines);
+
+    for (var transformIndex = startLine; transformIndex <= endLine; transformIndex++) {
+        var oldOrderedMatch = oldLines[transformIndex] ? oldLines[transformIndex].match(orderedLinePattern) : null;
+        var newOrderedMatch = lines[transformIndex] ? lines[transformIndex].match(orderedLinePattern) : null;
+        if (!oldOrderedMatch || !newOrderedMatch) {
+            continue;
+        }
+
+        var oldPrefixMatch = oldLines[transformIndex].match(/^[ \t]*\d+(?:\.\d+)*\.\s+/);
+        var newPrefixMatch = lines[transformIndex].match(/^[ \t]*\d+(?:\.\d+)*\.\s+/);
+
+        lineTransforms[transformIndex] = {
+            oldPrefixLength: oldPrefixMatch ? oldPrefixMatch[0].length : 0,
+            newPrefixLength: newPrefixMatch ? newPrefixMatch[0].length : 0
+        };
+    }
+
+    var newContent = lines.join('\n');
+    var newLineStarts = getMarkdownLineStartOffsets(newContent);
+
+    var translateOffset = function (oldOffset) {
+        var lineIndex = getMarkdownLineIndexForOffset(oldLineStarts, oldOffset);
+        var oldColumn = oldOffset - oldLineStarts[lineIndex];
+        var newLine = lines[lineIndex] || '';
+        var transform = lineTransforms[lineIndex];
+        var newColumn = oldColumn;
+
+        if (transform) {
+            if (oldColumn <= transform.oldPrefixLength) {
+                newColumn = Math.max(0, Math.min(transform.newPrefixLength, oldColumn + (transform.newPrefixLength - transform.oldPrefixLength)));
+            } else {
+                newColumn = transform.newPrefixLength + (oldColumn - transform.oldPrefixLength);
+            }
+        }
+
+        return Math.max(0, Math.min((newLineStarts[lineIndex] || 0) + newColumn, newContent.length));
+    };
+
+    updateMarkdownEditorContent(
+        editorDiv,
+        noteEntry,
+        noteId,
+        newContent,
+        translateOffset(selectionOffsets.start),
+        translateOffset(selectionOffsets.end)
+    );
+
+    return true;
+}
+
+function handleMarkdownOrderedListEnter(event, editorDiv, noteEntry, noteId) {
+    if (!event || event.key !== 'Enter' || event.shiftKey || event.ctrlKey || event.metaKey || event.altKey || !editorDiv || !noteEntry) {
+        return false;
+    }
+
+    var selectionOffsets = getSelectionOffsetsInTextElement(editorDiv);
+    if (!selectionOffsets || selectionOffsets.start !== selectionOffsets.end) {
+        return false;
+    }
+
+    var content = normalizeContentEditableText(editorDiv);
+    if (!content) {
+        return false;
+    }
+
+    var lines = content.split('\n');
+    var lineStarts = getMarkdownLineStartOffsets(content);
+    var lineIndex = getMarkdownLineIndexForOffset(lineStarts, selectionOffsets.start);
+    var currentLine = lines[lineIndex] || '';
+    var currentLineEnd = (lineStarts[lineIndex] || 0) + currentLine.length;
+    var orderedMatch = currentLine.match(/^([ \t]*)(\d+(?:\.\d+)*)(\.\s+)(.*)$/);
+
+    if (!orderedMatch || selectionOffsets.start !== currentLineEnd || orderedMatch[4].trim() === '') {
+        return false;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    lines.splice(lineIndex + 1, 0, orderedMatch[1] + orderedMatch[2] + orderedMatch[3]);
+    lines = renumberMarkdownOrderedListLines(lines);
+
+    var newContent = lines.join('\n');
+    var newLineStarts = getMarkdownLineStartOffsets(newContent);
+    var insertedLine = lines[lineIndex + 1] || '';
+    var insertedPrefixMatch = insertedLine.match(/^[ \t]*\d+(?:\.\d+)*\.\s+/);
+    var caretOffset = (newLineStarts[lineIndex + 1] || newContent.length) + (insertedPrefixMatch ? insertedPrefixMatch[0].length : insertedLine.length);
+
+    updateMarkdownEditorContent(editorDiv, noteEntry, noteId, newContent, caretOffset, caretOffset);
+    return true;
+}
+
 function initMermaid(retryCount) {
     retryCount = retryCount || 0;
     if (typeof mermaid === 'undefined') {
@@ -308,6 +647,11 @@ function parseMarkdown(text) {
         const match = String(url).match(/(?:^|\/)?index\.php\?[^\s#]*\bnote=(\d+)\b|^\?[^\s#]*\bnote=(\d+)\b/);
         const id = match ? (match[1] || match[2]) : null;
         return id ? parseInt(id, 10) : null;
+    }
+
+    function isPlainCodeBlockLanguage(language) {
+        const normalizedLanguage = language ? language.trim().toLowerCase() : '';
+        return normalizedLanguage === 'normal' || normalizedLanguage === 'code';
     }
 
     // Extract and protect fenced code blocks first so they are not processed by other rules
@@ -723,9 +1067,8 @@ function parseMarkdown(text) {
                 } else {
                     let escapedCodeContent = escapeHtml(codeContent);
                     let escapedCodeBlockLang = escapeHtml(codeBlockLang || '');
-                    const normalizedCodeBlockLang = codeBlockLang ? codeBlockLang.trim().toLowerCase() : '';
-                    if (normalizedCodeBlockLang === 'normal') {
-                        result.push('<pre data-language="NORMAL"><code data-language="NORMAL">' + escapedCodeContent + '</code></pre>');
+                    if (isPlainCodeBlockLanguage(codeBlockLang)) {
+                        result.push('<pre data-language="CODE"><code data-language="CODE">' + escapedCodeContent + '</code></pre>');
                     } else if (codeBlockLang) {
                         result.push('<pre data-language="' + escapedCodeBlockLang + '"><code class="language-' + escapedCodeBlockLang + '">' + escapedCodeContent + '</code></pre>');
                     } else {
@@ -801,7 +1144,7 @@ function parseMarkdown(text) {
                     /^(&gt;|>)\s/.test(nextLine) ||                  // Blockquotes
                     /^\s*[\*\-\+]\s+\[([ xX])\]\s+/.test(nextLine) || // Task lists
                     /^\s*[\*\-\+]\s+/.test(nextLine) ||          // Unordered lists
-                    /^\s*\d+\.\s+/.test(nextLine) ||              // Ordered lists
+                    /^\s*\d+(?:\.\d+)*\.\s+/.test(nextLine) ||    // Ordered lists
                     /^\s*\|.+\|\s*$/.test(nextLine)               // Tables
                 );
             }
@@ -932,10 +1275,10 @@ function parseMarkdown(text) {
                         if (isTaskList) {
                             lookMatch = lookAheadLine.match(/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/);
                         } else {
-                            lookMatch = lookAheadLine.match(/^(\s*)([\*\-\+]|\d+\.)\s+(.+)$/);
+                            lookMatch = lookAheadLine.match(/^(\s*)([\*\-\+]|\d+(?:\.\d+)*\.)\s+(.+)$/);
                             if (lookMatch) {
                                 let lookMarker = lookMatch[2];
-                                lookMarkerType = lookMarker.match(/\d+\./) ? 'number' : 'bullet';
+                                lookMarkerType = lookMarker.match(/\d+(?:\.\d+)*\./) ? 'number' : 'bullet';
                             }
                         }
 
@@ -967,10 +1310,10 @@ function parseMarkdown(text) {
                 if (isTaskList) {
                     listMatch = currentLine.match(/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/);
                 } else {
-                    listMatch = currentLine.match(/^(\s*)([\*\-\+]|\d+\.)\s+(.+)$/);
+                    listMatch = currentLine.match(/^(\s*)([\*\-\+]|\d+(?:\.\d+)*\.)\s+(.+)$/);
                     if (listMatch) {
                         marker = listMatch[2];
-                        markerType = marker.match(/\d+\./) ? 'number' : 'bullet';
+                        markerType = marker.match(/\d+(?:\.\d+)*\./) ? 'number' : 'bullet';
                     }
                 }
 
@@ -998,12 +1341,12 @@ function parseMarkdown(text) {
 
                     while (tempIndex < lines.length) {
                         let tempLine = lines[tempIndex];
-                        let tempMatch = tempLine.match(/^(\s*)([\*\-\+]|\d+\.)\s+(.+)$/);
+                        let tempMatch = tempLine.match(/^(\s*)([\*\-\+]|\d+(?:\.\d+)*\.)\s+(.+)$/);
                         if (!tempMatch) break;
 
                         let tempIndent = tempMatch[1].length;
                         let tempMarker = tempMatch[2];
-                        let tempMarkerType = tempMarker.match(/\d+\./) ? 'number' : 'bullet';
+                        let tempMarkerType = tempMarker.match(/\d+(?:\.\d+)*\./) ? 'number' : 'bullet';
 
                         // Stop if we're back to the base marker type or different indentation
                         if (tempIndent !== 0 || tempMarkerType !== markerType) {
@@ -1049,13 +1392,13 @@ function parseMarkdown(text) {
                         if (isTaskList) {
                             nextMatch = nextLine.match(/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/);
                         } else {
-                            nextMatch = nextLine.match(/^(\s*)([\*\-\+]|\d+\.)\s+(.+)$/);
+                            nextMatch = nextLine.match(/^(\s*)([\*\-\+]|\d+(?:\.\d+)*\.)\s+(.+)$/);
                         }
 
                         if (nextMatch && nextMatch[1].length > indent) {
                             // Parse nested list
                             let nestedResult = parseNestedList(nextIndex, isTaskList);
-                            let isOrderedNested = !isTaskList && nextMatch[2].match(/\d+\./);
+                            let isOrderedNested = !isTaskList && nextMatch[2].match(/\d+(?:\.\d+)*\./);
                             let listTag = isOrderedNested ? 'ol' : 'ul';
                             let listClass = isTaskList ? ' class="task-list"' : '';
                             itemHtml += '<' + listTag + listClass + '>' + nestedResult.items.join('') + '</' + listTag + '>';
@@ -1101,7 +1444,7 @@ function parseMarkdown(text) {
         }
 
         // Ordered lists
-        if (line.match(/^\s*\d+\.\s+(.+)$/)) {
+        if (line.match(/^\s*\d+(?:\.\d+)*\.\s+(.+)$/)) {
             flushParagraph();
             let listResult = parseNestedList(i, false);
             result.push('<ol>' + listResult.items.join('') + '</ol>');
@@ -1196,9 +1539,8 @@ function parseMarkdown(text) {
     // Handle unclosed code block
     if (inCodeBlock && codeBlockContent.length > 0) {
         let codeContent = codeBlockContent.join('\n');
-        let normalizedCodeBlockLang = codeBlockLang ? codeBlockLang.trim().toLowerCase() : '';
-        if (normalizedCodeBlockLang === 'normal') {
-            result.push('<pre data-language="NORMAL"><code data-language="NORMAL">' + codeContent + '</code></pre>');
+        if (isPlainCodeBlockLanguage(codeBlockLang)) {
+            result.push('<pre data-language="CODE"><code data-language="CODE">' + codeContent + '</code></pre>');
         } else if (codeBlockLang) {
             result.push('<pre><code class="language-' + codeBlockLang + '">' + codeContent + '</code></pre>');
         } else {
@@ -1854,6 +2196,12 @@ function setupMarkdownEditorListeners(noteId) {
                 preventScroll = false;
             }, 100);
         }
+
+        if (handleMarkdownOrderedListTab(e, editorDiv, noteEntry, noteId)) {
+            return;
+        }
+
+        handleMarkdownOrderedListEnter(e, editorDiv, noteEntry, noteId);
     });
 
     // Prevent unwanted scroll during input

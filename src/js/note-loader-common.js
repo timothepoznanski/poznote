@@ -345,6 +345,10 @@ function loadNoteCommon(url, noteId, options) {
 
                                 reinitializeNoteContent();
 
+                                if (typeof window.createNoteSnapshot === 'function') {
+                                    window.createNoteSnapshot(noteId);
+                                }
+
                                 // Post-content hook for caller-specific logic
                                 if (typeof options.onContentLoaded === 'function') {
                                     options.onContentLoaded(noteId, url);

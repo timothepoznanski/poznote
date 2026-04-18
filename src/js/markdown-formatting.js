@@ -142,7 +142,7 @@
 
         // Toggle list markers for affected lines
         var listMarker = listType === 'ul' ? '- ' : '1. ';
-        var listPattern = listType === 'ul' ? /^[\s]*[-*+]\s+/ : /^[\s]*\d+\.\s+/;
+        var listPattern = listType === 'ul' ? /^[\s]*[-*+]\s+/ : /^[\s]*\d+(?:\.\d+)*\.\s+/;
         
         var modified = false;
         for (var i = startLine; i <= endLine; i++) {
