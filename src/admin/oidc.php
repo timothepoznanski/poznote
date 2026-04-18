@@ -115,6 +115,8 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
     <link rel="stylesheet" href="../css/lucide.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/settings.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/users.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/workspaces.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/modals/alerts-utilities.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/dark-mode/variables.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/dark-mode/layout.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/dark-mode/menus.css?v=<?php echo $v; ?>">
@@ -123,29 +125,18 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
     <link rel="stylesheet" href="../css/dark-mode/components.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/dark-mode/pages.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/dark-mode/icons.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/workspaces-inline.css?v=<?php echo $v; ?>">
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
-    <link rel="stylesheet" href="../css/admin-tools.css?v=<?php echo $v; ?>">
     <style>
-        .oidc-page {
-            max-width: 720px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        .oidc-section {
-            margin-top: 24px;
-            background: var(--card-bg, #fff);
-            border: 1px solid var(--border-color, #e0e0e0);
-            border-radius: 12px;
-            padding: 20px 24px;
-        }
-        html[data-theme='dark'] .oidc-section,
-        body.dark-mode .oidc-section {
-            background: var(--card-bg, #1e1e1e);
-            border-color: var(--border-color, #333);
+        .oidc-page form {
+            margin: 0;
         }
         .oidc-section h2 {
             margin: 0 0 16px;
+            color: var(--text-color, #333);
+            border-bottom: 2px solid #007cba;
+            padding-bottom: 10px;
             font-size: 1.15rem;
             font-weight: 600;
         }
@@ -175,11 +166,11 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
         .oidc-field input[type="text"],
         .oidc-field input[type="url"] {
             width: 100%;
-            padding: 8px 12px;
-            font-size: 0.92rem;
-            border: 1px solid var(--border-color, #d1d5db);
-            border-radius: 8px;
-            background: var(--input-bg, #f9fafb);
+            padding: 10px 12px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #fff;
             color: var(--text-primary, #333);
             box-sizing: border-box;
         }
@@ -199,7 +190,7 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
         }
         .oidc-switch-row {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-between;
             gap: 16px;
         }
@@ -207,6 +198,7 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
             display: flex;
             flex-direction: column;
             gap: 4px;
+            flex: 1 1 auto;
         }
         .oidc-switch-title {
             display: block;
@@ -220,7 +212,7 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
             font-weight: 600;
             letter-spacing: 0.04em;
             text-transform: uppercase;
-            color: var(--text-secondary, #666);
+            color: var(--text-muted, #666);
         }
         .oidc-switch-state.is-enabled {
             color: #1f8f4e;
@@ -251,34 +243,7 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
             justify-content: flex-end;
             gap: 10px;
             margin-top: 24px;
-        }
-        .oidc-alert {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            font-size: 0.92rem;
-        }
-        .oidc-alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .oidc-alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        html[data-theme='dark'] .oidc-alert-success,
-        body.dark-mode .oidc-alert-success {
-            background: #1a3a2a;
-            color: #9fdfb4;
-            border-color: #2a5a3a;
-        }
-        html[data-theme='dark'] .oidc-alert-error,
-        body.dark-mode .oidc-alert-error {
-            background: #3a1a1a;
-            color: #f5a0a0;
-            border-color: #5a2a2a;
+            flex-wrap: wrap;
         }
         .oidc-env-notice {
             display: inline-block;
@@ -295,38 +260,51 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
             background: rgba(46, 140, 250, 0.15);
             color: #6eb5ff;
         }
+        html[data-theme='dark'] .oidc-section h2,
+        body.dark-mode .oidc-section h2 {
+            color: var(--dm-text);
+            border-bottom-color: var(--dm-accent);
+        }
+
+        html[data-theme='dark'] .oidc-switch-state,
+        body.dark-mode .oidc-switch-state {
+            color: var(--dm-text-muted);
+        }
+        @media (max-width: 800px) {
+            .oidc-switch-row {
+                flex-direction: column;
+            }
+
+            .oidc-actions .btn {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body data-workspace="<?php echo h($pageWorkspace); ?>">
-<div class="admin-container">
-
-    <!-- Nav -->
-    <div class="admin-header">
-        <div class="admin-nav" style="justify-content:center;">
-            <a href="../index.php<?php echo $pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>" class="btn btn-secondary btn-margin-right">
+<div class="settings-container oidc-page">
+    <div class="workspaces-nav">
+            <a href="../index.php<?php echo $pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>" class="btn btn-secondary">
                 <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_notes', [], 'Go to Notes'); ?>
+                <?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?>
             </a>
             <a href="../settings.php" class="btn btn-secondary">
                 <i class="lucide lucide-settings" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_settings', [], 'Go to Settings'); ?>
+                <?php echo t_h('common.back_to_settings', [], 'Back to Settings'); ?>
             </a>
-        </div>
     </div>
 
-    <div class="oidc-page">
-        <?php if ($success): ?>
-            <div class="oidc-alert oidc-alert-success"><?php echo h($success); ?></div>
-        <?php endif; ?>
-        <?php if ($error): ?>
-            <div class="oidc-alert oidc-alert-error"><?php echo h($error); ?></div>
-        <?php endif; ?>
+    <?php if ($success || $error): ?>
+        <div class="alert-with-margin alert <?php echo $success ? 'alert-success' : 'alert-danger'; ?>">
+            <?php echo h($success ?: $error); ?>
+        </div>
+    <?php endif; ?>
 
         <form method="POST" action="" autocomplete="off">
             <input type="hidden" name="csrf_token" value="<?php echo h($_SESSION['oidc_csrf_token']); ?>">
 
             <!-- General -->
-            <div class="oidc-section">
+            <div class="settings-section oidc-section">
                 <h2><?php echo t_h('oidc_admin.section_general', [], 'General'); ?></h2>
 
                 <div class="oidc-field">
@@ -366,7 +344,7 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
 
             <div id="oidc-other-sections" <?php echo !$settings['oidc_enabled'] ? 'hidden' : ''; ?>>
                 <!-- Credentials (read-only from .env) -->
-                <div class="oidc-section">
+                <div class="settings-section oidc-section">
                     <h2><?php echo t_h('oidc_admin.section_credentials', [], 'Credentials'); ?> <span class="oidc-env-notice">.env</span></h2>
 
                     <div class="oidc-field">
@@ -375,7 +353,7 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
                 </div>
 
                 <!-- Advanced -->
-                <div class="oidc-section">
+                <div class="settings-section oidc-section">
                     <h2><?php echo t_h('oidc_admin.section_advanced', [], 'Advanced'); ?></h2>
 
                     <div class="oidc-field">
@@ -410,7 +388,7 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
                 </div>
 
                 <!-- Access Control -->
-                <div class="oidc-section">
+                <div class="settings-section oidc-section">
                     <h2><?php echo t_h('oidc_admin.section_access_control', [], 'Access Control'); ?></h2>
 
                     <div class="oidc-field">
@@ -441,7 +419,7 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
                 </div>
 
                 <!-- Login Behavior -->
-                <div class="oidc-section">
+                <div class="settings-section oidc-section">
                     <h2><?php echo t_h('oidc_admin.section_login_behavior', [], 'Login Behavior'); ?></h2>
 
                     <div class="oidc-field">
@@ -467,8 +445,7 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
                 <button type="submit" class="btn btn-primary"><?php echo t_h('common.save', [], 'Save'); ?></button>
             </div>
         </form>
-    </div>
-</div><!-- .admin-container -->
+</div>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     var enabledCheckbox = document.getElementById('oidc_enabled');
