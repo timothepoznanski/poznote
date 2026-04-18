@@ -36,8 +36,8 @@ Poznote natively supports both HTML (Rich Text) and Markdown formats.
 - **Markdown Editing**: You can change a note's type to "Markdown" to use a plain text editor with syntax highlighting.
 - **Rendering**: The rendering engine converts Markdown to HTML in real-time, including support for:
     - **Mermaid** diagrams.
-    - **LaTeX** mathematical formulas (via `$` for inline and `3408045` for blocks).
-- **Export/Import**: You can download any note in Markdown format, even if it was originally written in HTML.
+    - **LaTeX** mathematical formulas (via `$` for inline and `$$` for blocks).
+- **Export**: You can download Markdown and Task List notes in `.md` format. HTML (rich text) notes are exported as HTML.
 
 ## 4. Graphical Editor (Excalidraw)
 Poznote integrates **Excalidraw** for creating diagrams and free-hand drawings.
@@ -52,19 +52,19 @@ Transform any folder into an agile dashboard.
 - **Interaction**: Drag and drop notes between columns to update their status.
 
 ## 6. Notification System
-An integrated notification system keeps you updated on your actions without interrupting your workflow.
+Poznote includes a reminder-based notification system for notes.
 
-- **Success Notifications**: Confirmations after saving, deleting, or successful imports.
-- **Error Notifications**: Alerts for network issues or synchronization conflicts.
-- **Interactivity**: Some notifications allow you to undo an action or reload the page if needed.
+- **Setting a reminder**: Use the bell icon in the note toolbar to set a reminder with a specific date and time. Quick presets (30 min, 1 hour, tomorrow, 1 week) are available.
+- **Triggering**: When the scheduled time is reached, the notification appears in the notifications panel, accessible from the home screen. A dot indicator on the home button signals unread notifications.
+- **Management**: Notifications can be individually dismissed or all cleared at once from the notifications panel.
 
 ## 7. Public Sharing
 Poznote allows you to share your notes with the world via secure public URLs.
 
 - **Sharing Options**:
     - **Read-only**: Visitors can view the note but cannot modify it.
-    - **Task Mode (Check-only)** : Ideal for shared grocery or task lists. Visitors can check/uncheck boxes but cannot edit task text.
-    - **Access complet**: Allows total collaboration on the note.
+    - **Task Mode (Check-only)**: Ideal for shared grocery or task lists. Visitors can check/uncheck boxes but cannot edit task text.
+    - **Full Access**: Allows total collaboration on the note.
 - **Security**: Share links are randomly generated and can be revoked at any time.
 
 ## 8. Task Lists
@@ -73,13 +73,13 @@ The "Task List" is a specialized note type designed for productivity.
 - **Dedicated Interface**: Unlike text notes, it features a quick-add field at the top.
 - **Task Management**:
     - **Reordering**: Drag and drop tasks to change their order.
-    - **Importance**: Mark tasks as "Priority" (star/flame icon).
+    - **Importance**: Mark tasks as important using the star icon.
     - **Cleanup**: An option allows you to delete all completed tasks with one click to keep your list clean.
 
 ## 9. Audio Player
 Poznote features a minimalist integrated audio player.
 
-- **Compatibility**: Supports `.mp3`, `.wav`, `.ogg`, `.m4a` formats.
+- **Compatibility**: Relies on native browser HTML5 audio support (typically `.mp3`, `.wav`, `.ogg`, `.m4a`).
 - **Usage**: Simply upload an audio file as an attachment to a note to play it directly from the interface.
 
 ## 10. Unified Search (Notes & Tags)
