@@ -341,12 +341,17 @@ $router->post('/notes/{id}/snapshot', function($params) use ($snapshotsControlle
     $snapshotsController->create($params['id']);
 });
 
-// Get today's snapshot for a note
+// List available snapshots for a note
+$router->get('/notes/{id}/snapshots', function($params) use ($snapshotsController) {
+    $snapshotsController->listSnapshots($params['id']);
+});
+
+// Get a snapshot for a note (?date=YYYY-MM-DD, defaults to today)
 $router->get('/notes/{id}/snapshot', function($params) use ($snapshotsController) {
     $snapshotsController->show($params['id']);
 });
 
-// Restore a note to its snapshot state
+// Restore a note to a snapshot state (?date=YYYY-MM-DD, defaults to today)
 $router->post('/notes/{id}/snapshot/restore', function($params) use ($snapshotsController) {
     $snapshotsController->restore($params['id']);
 });

@@ -68,8 +68,10 @@
   "snapshot": {
     "menu_item": "快照",
     "modal": {
-      "title": "今日快照",
+      "title": "快照",
       "loading": "正在加载快照...",
+      "history": "历史记录（7天）",
+      "today": "今天",
       "empty_title": "没有可用快照",
       "empty_hint": "当天首次打开笔记时会自动创建快照。",
       "empty_content": "（内容为空）",

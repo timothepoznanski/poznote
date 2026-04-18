@@ -68,8 +68,10 @@
   "snapshot": {
     "menu_item": "Schnappschuss",
     "modal": {
-      "title": "Heutiger Schnappschuss",
+      "title": "Schnappschüsse",
       "loading": "Schnappschuss wird geladen...",
+      "history": "Verlauf (7 Tage)",
+      "today": "Heute",
       "empty_title": "Kein Schnappschuss verfügbar",
       "empty_hint": "Ein Schnappschuss wird automatisch erstellt, wenn die Notiz tagsüber zum ersten Mal geöffnet wird.",
       "empty_content": "(Leerer Inhalt)",

@@ -75,14 +75,24 @@
     background-color: #005a8a;
 }
 
-.btn-cancel {
+.import-confirm-modal-content .btn-cancel {
     background-color: #f8f9fa;
     color: #333;
     border: 1px solid #ddd;
 }
 
-.btn-cancel:hover {
+.import-confirm-modal-content .btn-cancel:hover {
     background-color: #e9ecef;
+}
+
+.import-confirm-modal-content .btn-cancel {
+    background-color: #e04b4b;
+    color: #fff;
+    border: none;
+}
+
+.import-confirm-modal-content .btn-cancel:hover {
+    background-color: #c43b3b;
 }
 
 /* Custom Alert Message */

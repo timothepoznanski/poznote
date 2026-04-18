@@ -9,12 +9,94 @@
 }
 
 .snapshot-modal-content {
-    max-width: 850px !important;
+    max-width: 950px !important;
     width: 94% !important;
     max-height: 85vh;
     display: flex;
     flex-direction: column;
     padding: 0 !important;
+    overflow: hidden;
+}
+
+/* ---- Modal body: sidebar + main panel ---- */
+.snapshot-modal-body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* ---- Date list sidebar ---- */
+.snapshot-date-list {
+    display: flex;
+    flex-direction: column;
+    width: 160px;
+    min-width: 160px;
+    border-right: 1px solid #e5e5e5;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.snapshot-date-list-header {
+    padding: 14px 16px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: #667085;
+    opacity: 0.9;
+}
+
+.snapshot-dates {
+    display: flex;
+    flex-direction: column;
+    padding: 0 8px 12px;
+    gap: 2px;
+}
+
+.snapshot-date-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #344054;
+    font-weight: 500;
+    text-align: left;
+    transition: background-color 0.12s;
+}
+
+.snapshot-date-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.snapshot-date-btn.active {
+    background-color: #007DB8;
+    color: #fff;
+}
+
+.snapshot-date-btn .lucide {
+    width: 14px;
+    height: 14px;
+    opacity: 0.5;
+    flex-shrink: 0;
+}
+
+.snapshot-date-btn.active .lucide {
+    opacity: 0.9;
+}
+
+/* ---- Main panel (right side) ---- */
+.snapshot-main-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
     overflow: hidden;
 }
 
@@ -123,13 +205,13 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    color: #8a8a8a;
+    color: #475467;
 }
 
 .snapshot-meta-item .lucide {
     width: 13px;
     height: 13px;
-    opacity: 0.35;
+    opacity: 0.55;
 }
 
 /* ---- Content preview ---- */
@@ -156,10 +238,20 @@
     border: 1px solid #e5e5e5;
     border-radius: 8px;
     background: #fcfcfc;
+    color: #1f2937;
     font-size: 14px;
     line-height: 1.7;
     word-wrap: break-word;
     overflow-wrap: break-word;
+}
+
+.snapshot-content-preview p,
+.snapshot-content-preview div,
+.snapshot-content-preview li,
+.snapshot-content-preview span,
+.snapshot-content-preview strong,
+.snapshot-content-preview em {
+    color: inherit;
 }
 
 .snapshot-content-preview img {
@@ -215,6 +307,31 @@
 
     .snapshot-modal-header {
         padding: 16px;
+    }
+
+    .snapshot-modal-body {
+        flex-direction: column;
+    }
+
+    .snapshot-date-list {
+        width: 100%;
+        min-width: unset;
+        border-right: none;
+        border-bottom: 1px solid #e5e5e5;
+        max-height: 120px;
+        overflow-y: auto;
+    }
+
+    .snapshot-dates {
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 0 12px 10px;
+    }
+
+    .snapshot-date-btn {
+        width: auto;
+        padding: 6px 10px;
+        font-size: 12px;
     }
 
     .snapshot-content-wrapper {

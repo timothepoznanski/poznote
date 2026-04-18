@@ -23,6 +23,10 @@
         return url;
     }
 
+    function getSnapshotsListUrl(noteId) {
+        return '/api/v1/notes/' + noteId + '/snapshots';
+    }
+
     function rememberPendingSnapshotCreate(noteId, promise) {
         var key = String(noteId);
         pendingSnapshotCreates[key] = promise;
@@ -71,7 +75,8 @@
     };
 
     /**
-     * Show the snapshot modal for the current note
+     * Show the snapshot modal for the current note.
+     * Loads the list of available snapshots and selects the most recent one.
      */
     window.showSnapshotModal = function (noteId) {
         if (!noteId) {
@@ -79,6 +84,98 @@
         }
         if (!noteId || noteId === -1 || noteId === 'search') return;
 
+        var modal = document.getElementById('snapshotModal');
+        var loadingEl = document.getElementById('snapshotLoading');
+        var noSnapshotEl = document.getElementById('snapshotNoData');
+        var snapshotBodyEl = document.getElementById('snapshotBody');
+        var dateListEl = document.getElementById('snapshotDateList');
+
+        if (!modal) return;
+
+        // Store current note id for restore
+        modal.dataset.noteId = noteId;
+        modal.dataset.selectedDate = '';
+
+        // Show modal with loading state
+        modal.style.display = 'flex';
+        if (loadingEl) loadingEl.style.display = 'flex';
+        if (noSnapshotEl) noSnapshotEl.style.display = 'none';
+        if (snapshotBodyEl) snapshotBodyEl.style.display = 'none';
+        if (dateListEl) dateListEl.style.display = 'none';
+
+        waitForPendingSnapshotCreate(noteId)
+        .then(function () {
+            return fetch(getSnapshotsListUrl(noteId), {
+                method: 'GET',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+        })
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+            if (loadingEl) loadingEl.style.display = 'none';
+
+            if (!data.success || !data.snapshots || data.snapshots.length === 0) {
+                if (noSnapshotEl) noSnapshotEl.style.display = 'flex';
+                if (dateListEl) dateListEl.style.display = 'none';
+                return;
+            }
+
+            // Render date list
+            if (dateListEl) dateListEl.style.display = 'flex';
+            renderSnapshotDates(data.snapshots, noteId);
+
+            // Load the most recent snapshot
+            loadSnapshotForDate(noteId, data.snapshots[0].date);
+        })
+        .catch(function () {
+            if (loadingEl) loadingEl.style.display = 'none';
+            if (noSnapshotEl) noSnapshotEl.style.display = 'flex';
+        });
+    };
+
+    /**
+     * Render the list of available snapshot dates in the sidebar.
+     */
+    function renderSnapshotDates(snapshots, noteId) {
+        var container = document.getElementById('snapshotDates');
+        if (!container) return;
+
+        container.innerHTML = '';
+        var today = new Date().toISOString().slice(0, 10);
+
+        snapshots.forEach(function (snap) {
+            var btn = document.createElement('button');
+            btn.className = 'snapshot-date-btn';
+            btn.dataset.date = snap.date;
+            btn.type = 'button';
+
+            var label = snap.date;
+            if (snap.date === today) {
+                label = tr('snapshot.modal.today', 'Today');
+            } else {
+                // Format as readable date (e.g. "Apr 17")
+                try {
+                    var d = new Date(snap.date + 'T00:00:00');
+                    label = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                } catch (e) {
+                    label = snap.date;
+                }
+            }
+
+            btn.innerHTML = '<i class="lucide lucide-calendar"></i> <span>' + escapeHtml(label) + '</span>';
+
+            btn.addEventListener('click', function () {
+                loadSnapshotForDate(noteId, snap.date);
+            });
+
+            container.appendChild(btn);
+        });
+    }
+
+    /**
+     * Load and display the snapshot for a specific date.
+     */
+    function loadSnapshotForDate(noteId, date) {
         var modal = document.getElementById('snapshotModal');
         var contentEl = document.getElementById('snapshotContent');
         var loadingEl = document.getElementById('snapshotLoading');
@@ -89,23 +186,21 @@
 
         if (!modal || !contentEl) return;
 
-        // Store current note id for restore
-        modal.dataset.noteId = noteId;
+        modal.dataset.selectedDate = date;
 
-        // Show modal with loading state
-        modal.style.display = 'flex';
+        // Highlight selected date in the list
+        var allBtns = document.querySelectorAll('#snapshotDates .snapshot-date-btn');
+        allBtns.forEach(function (btn) {
+            btn.classList.toggle('active', btn.dataset.date === date);
+        });
+
+        // Show loading
         if (loadingEl) loadingEl.style.display = 'flex';
-        if (noSnapshotEl) noSnapshotEl.style.display = 'none';
         if (snapshotBodyEl) snapshotBodyEl.style.display = 'none';
 
-        waitForPendingSnapshotCreate(noteId)
-        .then(function () {
-            return fetch(getSnapshotUrl(noteId), {
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
+        fetch(getSnapshotUrl(noteId, 'date=' + encodeURIComponent(date)), {
+            method: 'GET',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
         })
         .then(function (response) { return response.json(); })
         .then(function (data) {
@@ -116,6 +211,7 @@
                 return;
             }
 
+            if (noSnapshotEl) noSnapshotEl.style.display = 'none';
             if (snapshotBodyEl) snapshotBodyEl.style.display = 'flex';
 
             var snapshot = data.snapshot;
@@ -133,7 +229,6 @@
                 contentEl.style.whiteSpace = 'pre-wrap';
                 contentEl.style.fontFamily = 'monospace';
             } else if (snapshot.type === 'tasklist') {
-                // Try to render tasklist JSON nicely
                 try {
                     var tasks = JSON.parse(snapshot.content);
                     var html = '';
@@ -164,7 +259,7 @@
             if (loadingEl) loadingEl.style.display = 'none';
             if (noSnapshotEl) noSnapshotEl.style.display = 'flex';
         });
-    };
+    }
 
     /**
      * Copy snapshot content to clipboard
@@ -259,8 +354,11 @@
         var noteId = modal.dataset.noteId;
         if (!noteId) return;
 
+        var selectedDate = modal.dataset.selectedDate || '';
+        var restoreQuery = selectedDate ? '?date=' + encodeURIComponent(selectedDate) : '';
+
         var confirmRestore = function () {
-            fetch('/api/v1/notes/' + noteId + '/snapshot/restore', {
+            fetch('/api/v1/notes/' + noteId + '/snapshot/restore' + restoreQuery, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -67,8 +67,10 @@
   "snapshot": {
     "menu_item": "Instantâneo",
     "modal": {
-      "title": "Instantâneo do dia",
+      "title": "Instantâneos",
       "loading": "Carregando instantâneo...",
+      "history": "Histórico (7 dias)",
+      "today": "Hoje",
       "empty_title": "Nenhum instantâneo disponível",
       "empty_hint": "Um instantâneo é criado automaticamente quando a nota é aberta pela primeira vez durante o dia.",
       "empty_content": "(Conteúdo vazio)",

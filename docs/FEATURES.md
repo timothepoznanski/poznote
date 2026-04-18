@@ -8,12 +8,13 @@ This document provides a detailed overview of the core features of Poznote.
 3. [HTML ↔ Markdown Conversion](#3-html--markdown-conversion)
 4. [Graphical Editor (Excalidraw)](#4-graphical-editor-excalidraw)
 5. [Kanban View](#5-kanban-view)
-6. [Notification System](#6-notification-system)
-7. [Public Sharing](#7-public-sharing)
-8. [Task Lists](#8-task-lists)
-9. [Audio Player](#9-audio-player)
-10. [Unified Search (Notes & Tags)](#10-unified-search-notes--tags)
-11. [Customization & Interface](#11-customization--interface)
+6. [Snapshots](#6-snapshots)
+7. [Notification System](#7-notification-system)
+8. [Public Sharing](#8-public-sharing)
+9. [Task Lists](#9-task-lists)
+10. [Audio Player](#10-audio-player)
+11. [Unified Search (Notes & Tags)](#11-unified-search-notes--tags)
+12. [Customization & Interface](#12-customization--interface)
 
 ---
 
@@ -51,14 +52,23 @@ Transform any folder into an agile dashboard.
 - **How it works**: Within a folder, subfolders become columns (e.g., To Do, In Progress, Done).
 - **Interaction**: Drag and drop notes between columns to update their status.
 
-## 6. Notification System
+## 6. Snapshots
+Poznote includes a built-in snapshot system for quick note rollback.
+
+- **Automatic capture**: A snapshot is created automatically the first time a note is opened each day.
+- **History view**: The **Snapshot** action in the note toolbar opens a modal where you can browse the available snapshot dates, preview the saved content, and restore the selected state.
+- **Manual update**: The **Take snapshot now** action replaces the snapshot for the current day with the note's latest content.
+- **Retention**: Snapshot history is limited to the last **7 days** per note.
+- **Daily limit**: Poznote keeps **at most one snapshot per day** for each note.
+
+## 7. Notification System
 Poznote includes a reminder-based notification system for notes.
 
 - **Setting a reminder**: Use the bell icon in the note toolbar to set a reminder with a specific date and time. Quick presets (30 min, 1 hour, tomorrow, 1 week) are available.
 - **Triggering**: When the scheduled time is reached, the notification appears in the notifications panel, accessible from the home screen. A dot indicator on the home button signals unread notifications.
 - **Management**: Notifications can be individually dismissed or all cleared at once from the notifications panel.
 
-## 7. Public Sharing
+## 8. Public Sharing
 Poznote allows you to share your notes with the world via secure public URLs.
 
 - **Sharing Options**:
@@ -67,7 +77,7 @@ Poznote allows you to share your notes with the world via secure public URLs.
     - **Full Access**: Allows total collaboration on the note.
 - **Security**: Share links are randomly generated and can be revoked at any time.
 
-## 8. Task Lists
+## 9. Task Lists
 The "Task List" is a specialized note type designed for productivity.
 
 - **Dedicated Interface**: Unlike text notes, it features a quick-add field at the top.
@@ -76,13 +86,13 @@ The "Task List" is a specialized note type designed for productivity.
     - **Importance**: Mark tasks as important using the star icon.
     - **Cleanup**: An option allows you to delete all completed tasks with one click to keep your list clean.
 
-## 9. Audio Player
+## 10. Audio Player
 Poznote features a minimalist integrated audio player.
 
 - **Compatibility**: Relies on native browser HTML5 audio support (typically `.mp3`, `.wav`, `.ogg`, `.m4a`).
 - **Usage**: Simply upload an audio file as an attachment to a note to play it directly from the interface.
 
-## 10. Unified Search (Notes & Tags)
+## 11. Unified Search (Notes & Tags)
 The unified search system helps you find your information instantly.
 
 - **Search Modes**:
@@ -92,7 +102,7 @@ The unified search system helps you find your information instantly.
     - In search mode, use the **Enter** key to jump to the next result in the sidebar list.
     - Real-time search: results refine with every character typed.
 
-## 11. Customization & Interface
+## 12. Customization & Interface
 Adapt Poznote to your visual and functional needs.
 
 - **Interface Customization**: Hide unnecessary elements (toolbar buttons, specific note types) via settings.

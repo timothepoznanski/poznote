@@ -70,8 +70,10 @@
   "snapshot": {
     "menu_item": "Snapshot",
     "modal": {
-      "title": "Snapshot du jour",
+      "title": "Snapshots",
       "loading": "Chargement du snapshot...",
+      "history": "Historique (7 jours)",
+      "today": "Aujourd'hui",
       "empty_title": "Aucun snapshot disponible",
       "empty_hint": "Un snapshot est créé automatiquement lors de la première ouverture de la note dans la journée.",
       "empty_content": "(Contenu vide)",

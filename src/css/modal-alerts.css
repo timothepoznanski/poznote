@@ -120,12 +120,12 @@
 }
 
 .alert-modal-button.secondary {
-    background: var(--secondary-color, #6c757d);
+    background: #e04b4b;
     color: white;
 }
 
 .alert-modal-button.secondary:hover {
-    background: var(--secondary-color-dark, #545b62);
+    background: #c43b3b;
 }
 
 /* Dark mode support */
@@ -171,6 +171,17 @@ html[data-theme='dark'] .alert-modal-button.primary,
 html[data-theme='dark'] .alert-modal-button.primary:hover,
 .dark-mode .alert-modal-button.primary:hover {
     background-color: #2a4a7f;
+}
+
+html[data-theme='dark'] .alert-modal-button.secondary,
+.dark-mode .alert-modal-button.secondary {
+    background-color: #e04b4b;
+    color: #fff;
+}
+
+html[data-theme='dark'] .alert-modal-button.secondary:hover,
+.dark-mode .alert-modal-button.secondary:hover {
+    background-color: #c43b3b;
 }
 
 html[data-theme='dark'] .alert-modal.snapshot-restore-confirm .alert-modal-button.primary,
