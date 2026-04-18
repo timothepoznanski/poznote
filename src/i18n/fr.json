@@ -817,6 +817,7 @@
     "ui_customization": {
       "title": "Personnalisation de l'interface",
       "description": "Afficher ou masquer les éléments de l'interface. Les éléments décochés seront masqués.",
+      "reminder_bell": "Icône cloche (rappel)",
       "filter_placeholder": "Filtrer les éléments...",
       "no_results": "Aucun élément correspondant.",
       "sections": {

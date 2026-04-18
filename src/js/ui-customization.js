@@ -32,6 +32,7 @@
         'btn-favorite': 'action',
         'btn-share': 'action',
         'btn-attachment': 'action',
+        'btn-reminder': 'action',
         'btn-open-new-tab': 'action',
         'btn-duplicate': 'action',
         'btn-move': 'action',

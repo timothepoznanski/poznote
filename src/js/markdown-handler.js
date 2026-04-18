@@ -649,6 +649,11 @@ function parseMarkdown(text) {
         return id ? parseInt(id, 10) : null;
     }
 
+    function isPlainCodeBlockLanguage(language) {
+        const normalizedLanguage = language ? language.trim().toLowerCase() : '';
+        return normalizedLanguage === 'normal' || normalizedLanguage === 'code';
+    }
+
     // Extract and protect fenced code blocks first so they are not processed by other rules
     let protectedFencedCode = [];
     let fencedCodeIndex = 0;
@@ -1062,9 +1067,8 @@ function parseMarkdown(text) {
                 } else {
                     let escapedCodeContent = escapeHtml(codeContent);
                     let escapedCodeBlockLang = escapeHtml(codeBlockLang || '');
-                    const normalizedCodeBlockLang = codeBlockLang ? codeBlockLang.trim().toLowerCase() : '';
-                    if (normalizedCodeBlockLang === 'normal') {
-                        result.push('<pre data-language="NORMAL"><code data-language="NORMAL">' + escapedCodeContent + '</code></pre>');
+                    if (isPlainCodeBlockLanguage(codeBlockLang)) {
+                        result.push('<pre data-language="CODE"><code data-language="CODE">' + escapedCodeContent + '</code></pre>');
                     } else if (codeBlockLang) {
                         result.push('<pre data-language="' + escapedCodeBlockLang + '"><code class="language-' + escapedCodeBlockLang + '">' + escapedCodeContent + '</code></pre>');
                     } else {
@@ -1535,9 +1539,8 @@ function parseMarkdown(text) {
     // Handle unclosed code block
     if (inCodeBlock && codeBlockContent.length > 0) {
         let codeContent = codeBlockContent.join('\n');
-        let normalizedCodeBlockLang = codeBlockLang ? codeBlockLang.trim().toLowerCase() : '';
-        if (normalizedCodeBlockLang === 'normal') {
-            result.push('<pre data-language="NORMAL"><code data-language="NORMAL">' + codeContent + '</code></pre>');
+        if (isPlainCodeBlockLanguage(codeBlockLang)) {
+            result.push('<pre data-language="CODE"><code data-language="CODE">' + codeContent + '</code></pre>');
         } else if (codeBlockLang) {
             result.push('<pre><code class="language-' + codeBlockLang + '">' + codeContent + '</code></pre>');
         } else {

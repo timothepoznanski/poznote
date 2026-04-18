@@ -799,6 +799,7 @@
     "ui_customization": {
       "title": "Personalización de interfaz",
       "description": "Mostrar u ocultar elementos de la interfaz. Los elementos no marcados se ocultarán.",
+      "reminder_bell": "Icono de campana (recordatorio)",
       "filter_placeholder": "Filtrar elementos...",
       "no_results": "No se encontraron elementos coincidentes.",
       "sections": {

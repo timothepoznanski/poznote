@@ -106,7 +106,8 @@
 .reminder-modal-action {
     flex: 1;
     white-space: nowrap;
-    min-height: 54px;
+    min-height: 34px;
+    padding: 10px 14px !important;
     border-radius: 10px;
     font-weight: 600;
 }
@@ -220,6 +221,10 @@
     cursor: pointer;
     transition: background 0.15s;
     gap: 8px;
+}
+
+.notification-item + .notification-item {
+    margin-top: 6px;
 }
 
 .notification-item:hover {
@@ -360,17 +365,17 @@
     color: #6b7280;
 }
 
-.toolbar-btn.btn-home.has-notifications-dot {
+.sidebar-home.has-notifications-dot {
     position: relative;
     overflow: visible;
 }
 
-.toolbar-notifications-dot {
+.sidebar-notifications-dot {
     position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 8px;
-    height: 8px;
+    top: 0;
+    right: 0;
+    width: 13px;
+    height: 13px;
     border-radius: 50%;
     background: #f59e0b;
     display: none;
@@ -378,7 +383,7 @@
     z-index: 1;
 }
 
-.toolbar-btn.btn-home.has-notifications-dot .toolbar-notifications-dot {
+.sidebar-home.has-notifications-dot .sidebar-notifications-dot {
     display: block;
 }
 
@@ -447,6 +452,13 @@
     color: #9ca3af;
     border-radius: 4px;
     flex-shrink: 0;
+    opacity: 0.65;
+    min-width: 32px;
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
 }
 
 #notificationsModal .notification-action-btn:hover {

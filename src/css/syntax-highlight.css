@@ -225,6 +225,13 @@ pre:has(code[data-language])::before {
     pointer-events: none;
 }
 
+pre[data-language="NORMAL"]::before,
+pre[data-language="normal"]::before,
+pre:has(code[data-language="NORMAL"])::before,
+pre:has(code[data-language="normal"])::before {
+    content: "CODE";
+}
+
 pre[data-language],
 pre:has(code[data-language]) {
     position: relative;

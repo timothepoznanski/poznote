@@ -335,6 +335,7 @@
     "ui_customization": {
       "title": "UI Customization",
       "description": "Show or hide interface elements. Unchecked items will be hidden.",
+      "reminder_bell": "Bell icon (reminder)",
       "filter_placeholder": "Filter items...",
       "no_results": "No matching items found.",
       "sections": {

@@ -800,6 +800,7 @@
     "ui_customization": {
       "title": "Personalização da interface",
       "description": "Mostrar ou ocultar elementos da interface. Os itens desmarcados serão ocultados.",
+      "reminder_bell": "Ícone de sino (lembrete)",
       "filter_placeholder": "Filtrar itens...",
       "no_results": "Nenhum item correspondente encontrado.",
       "sections": {

@@ -1042,6 +1042,7 @@
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-favorites-card" checked><span><?php echo t_h('notes_list.system_folders.favorites', [], 'Favorites'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-folders-card" checked><span><?php echo t_h('home.folders', [], 'Folders'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-shares-card" checked><span><?php echo t_h('home.shares', [], 'Shares'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-notifications-card" checked><span><?php echo t_h('reminder.notifications', [], 'Notifications'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-trash-card" checked><span><?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-attachments-card" checked><span><?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-git-push-card" checked><span><?php echo t_h('git_sync.actions.push.button', ['provider' => 'Git'], 'Git Push'); ?></span></label>
@@ -1124,6 +1125,7 @@
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-favorite" checked><span><?php echo t_h('index.toolbar.favorite_add', [], 'Favorite'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-share" checked><span><?php echo t_h('index.toolbar.share_note', [], 'Share'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-attachment" checked><span><?php echo t_h('modals.attachment.title', [], 'Attachments'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-reminder" checked><span><?php echo t_h('modals.ui_customization.reminder_bell', [], 'Bell icon (reminder)'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-open-new-tab" checked><span><?php echo t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-duplicate" checked><span><?php echo t_h('common.duplicate', [], 'Duplicate'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-move" checked><span><?php echo t_h('common.move', [], 'Move'); ?></span></label>

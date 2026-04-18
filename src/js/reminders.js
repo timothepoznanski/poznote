@@ -8,6 +8,9 @@
 // ============================================================================
 
 let reminderNoteId = null;
+let reminderInitialInputValue = '';
+let reminderInitialDisplayText = '';
+let reminderHasInitialReminder = false;
 const REMINDER_NOTIFICATION_POLL_INTERVAL = 45000;
 
 function parseReminderDate(value) {
@@ -30,15 +33,31 @@ function parseReminderDate(value) {
     return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
 }
 
+function toLocalDateTimeInputValue(date) {
+    return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+        .toISOString().slice(0, 16);
+}
+
+function restoreInitialReminderPreview(currentInfo, currentDate) {
+    if (reminderHasInitialReminder && reminderInitialDisplayText) {
+        currentDate.textContent = reminderInitialDisplayText;
+        currentInfo.classList.remove('initially-hidden');
+        return;
+    }
+
+    currentDate.textContent = '';
+    currentInfo.classList.add('initially-hidden');
+}
+
 function updateNotificationIndicators(count) {
     const hasUnreadNotifications = count > 0;
-    document.querySelectorAll('.btn-home').forEach(function(button) {
+    document.querySelectorAll('.sidebar-home').forEach(function(button) {
         button.classList.toggle('has-notifications-dot', hasUnreadNotifications);
     });
 }
 
 function pollNotificationIndicators() {
-    if (!document.querySelector('.btn-home')) {
+    if (!document.querySelector('.sidebar-home')) {
         return;
     }
 
@@ -80,19 +99,30 @@ function syncReminderPreviewFromInput() {
     const dateInput = document.getElementById('reminderDateInput');
     const currentInfo = document.getElementById('reminderCurrentInfo');
     const currentDate = document.getElementById('reminderCurrentDate');
+    const saveBtn = document.getElementById('reminderSaveBtn');
 
-    if (!dateInput || !currentInfo || !currentDate || !dateInput.value) {
+    if (!dateInput || !currentInfo || !currentDate || !saveBtn) {
         return false;
+    }
+
+    const hasChanged = dateInput.value !== reminderInitialInputValue;
+    const canSave = hasChanged && !!dateInput.value;
+    saveBtn.classList.toggle('initially-hidden', !canSave);
+
+    if (!hasChanged || !dateInput.value) {
+        restoreInitialReminderPreview(currentInfo, currentDate);
+        return canSave;
     }
 
     const selectedDate = new Date(dateInput.value);
     if (Number.isNaN(selectedDate.getTime())) {
+        restoreInitialReminderPreview(currentInfo, currentDate);
         return false;
     }
 
     currentDate.textContent = selectedDate.toLocaleString();
     currentInfo.classList.remove('initially-hidden');
-    return true;
+    return canSave;
 }
 
 /**
@@ -108,30 +138,36 @@ function openReminderModal(noteId, currentReminderAt) {
 
     if (!modal || !dateInput) return;
 
+    reminderInitialInputValue = '';
+    reminderInitialDisplayText = '';
+    reminderHasInitialReminder = false;
+
     // Set minimum date to now
     const now = new Date();
-    const localIso = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-        .toISOString().slice(0, 16);
+    const localIso = toLocalDateTimeInputValue(now);
     dateInput.min = localIso;
     dateInput.value = '';
 
     // Show current reminder if exists
     if (currentReminderAt) {
         const reminderDate = parseReminderDate(currentReminderAt);
-        currentDate.textContent = reminderDate ? reminderDate.toLocaleString() : currentReminderAt;
+        reminderInitialDisplayText = reminderDate ? reminderDate.toLocaleString() : currentReminderAt;
+        reminderHasInitialReminder = true;
+        currentDate.textContent = reminderInitialDisplayText;
         currentInfo.classList.remove('initially-hidden');
         removeBtn.classList.remove('initially-hidden');
 
         // Pre-fill with current reminder
         if (reminderDate) {
-            const localReminder = new Date(reminderDate.getTime() - reminderDate.getTimezoneOffset() * 60000);
-            dateInput.value = localReminder.toISOString().slice(0, 16);
+            reminderInitialInputValue = toLocalDateTimeInputValue(reminderDate);
+            dateInput.value = reminderInitialInputValue;
         }
     } else {
         currentInfo.classList.add('initially-hidden');
         removeBtn.classList.add('initially-hidden');
     }
 
+    syncReminderPreviewFromInput();
     modal.style.display = 'flex';
 }
 
@@ -143,6 +179,9 @@ function closeReminderModal() {
     closeReminderPicker();
     if (modal) modal.style.display = 'none';
     reminderNoteId = null;
+    reminderInitialInputValue = '';
+    reminderInitialDisplayText = '';
+    reminderHasInitialReminder = false;
 }
 
 /**
@@ -154,6 +193,10 @@ function saveReminder() {
     const noteId = reminderNoteId;
 
     const dateInput = document.getElementById('reminderDateInput');
+    if (!dateInput || dateInput.value === reminderInitialInputValue) {
+        return;
+    }
+
     if (!dateInput || !dateInput.value) {
         if (typeof showNotification === 'function') {
             showNotification(window.t?.('reminder.modal.select_date') || 'Please select a date and time', 'warning');
@@ -278,8 +321,7 @@ function handleQuickReminder(e) {
         }
     }
 
-    const localIso = new Date(target.getTime() - target.getTimezoneOffset() * 60000)
-        .toISOString().slice(0, 16);
+    const localIso = toLocalDateTimeInputValue(target);
     dateInput.value = localIso;
     syncReminderPreviewFromInput();
 }
@@ -325,6 +367,10 @@ document.addEventListener('keydown', function(e) {
 
 const reminderDateInput = document.getElementById('reminderDateInput');
 if (reminderDateInput) {
+    reminderDateInput.addEventListener('input', function() {
+        syncReminderPreviewFromInput();
+    });
+
     reminderDateInput.addEventListener('change', function() {
         syncReminderPreviewFromInput();
         closeReminderPicker();

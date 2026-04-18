@@ -800,6 +800,7 @@
     "ui_customization": {
       "title": "Oberfläche anpassen",
       "description": "Oberflächenelemente ein- oder ausblenden. Nicht angehakte Elemente werden ausgeblendet.",
+      "reminder_bell": "Glockensymbol (Erinnerung)",
       "filter_placeholder": "Elemente filtern...",
       "no_results": "Keine passenden Elemente gefunden.",
       "sections": {

@@ -380,8 +380,9 @@ $body_classes = trim($extra_body_classes);
                 <i class="lucide lucide-caret-down workspace-dropdown-icon"></i>
             </div>
             <div class="sidebar-title-actions">
-                <button class="sidebar-home" data-action="navigate-to-home" title="<?php echo t_h('sidebar.home', [], 'Dashboard'); ?>">
+                <button class="sidebar-home<?php echo $notifications_count > 0 ? ' has-notifications-dot' : ''; ?>" data-action="navigate-to-home" title="<?php echo t_h('sidebar.home', [], 'Dashboard'); ?>">
                     <i class="lucide lucide-layout-dashboard"></i>
+                    <span class="sidebar-notifications-dot" aria-hidden="true"></span>
                 </button>
                 <button class="sidebar-settings" data-action="navigate-to-settings" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>">
                     <i class="lucide lucide-settings"></i>
@@ -564,8 +565,7 @@ $body_classes = trim($extra_body_classes);
                     }
                 
                     // Home button (mobile only)
-                    $home_notifications_class = $notifications_count > 0 ? ' has-notifications-dot' : '';
-                    echo '<button type="button" class="toolbar-btn btn-home mobile-home-btn' . $home_notifications_class . '" title="' . t_h('editor.toolbar.back_to_notes') . '" data-action="scroll-to-left-column"><i class="lucide lucide-home"></i><span class="toolbar-notifications-dot" aria-hidden="true"></span></button>';
+                    echo '<button type="button" class="toolbar-btn btn-home mobile-home-btn" title="' . t_h('editor.toolbar.back_to_notes') . '" data-action="scroll-to-left-column"><i class="lucide lucide-home"></i></button>';
                     
                     // Text formatting buttons (save button removed - auto-save is now automatic)
                     echo '<button type="button" class="toolbar-btn btn-bold text-format-btn" title="' . t_h('editor.toolbar.bold') . '" data-action="exec-bold"><i class="lucide lucide-bold"></i></button>';

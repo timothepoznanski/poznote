@@ -800,6 +800,7 @@
     "ui_customization": {
       "title": "界面自定义",
       "description": "显示或隐藏界面元素。未勾选的项目将被隐藏。",
+      "reminder_bell": "铃铛图标（提醒）",
       "filter_placeholder": "筛选项目...",
       "no_results": "未找到匹配的项目。",
       "sections": {
