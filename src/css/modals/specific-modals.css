@@ -632,8 +632,15 @@
 }
 
 #confirmModal .modal-buttons .btn-cancel {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border: none !important;
     min-width: 90px !important;
     flex: 0 0 110px !important;
+}
+
+#confirmModal .modal-buttons .btn-cancel:hover {
+    background-color: #c43b3b !important;
 }
 
 @media (max-width: 420px) {
@@ -654,13 +661,13 @@
    ============================================ */
 
 #deleteFolderModal .btn-cancel {
-    background-color: #6c757d !important;
-    color: white !important;
+    background-color: #e04b4b !important;
+    color: #fff !important;
     border: none !important;
 }
 
 #deleteFolderModal .btn-cancel:hover {
-    background-color: #5a6268 !important;
+    background-color: #c43b3b !important;
 }
 
 #deleteFolderModal .btn-danger {
@@ -686,13 +693,13 @@
 }
 
 #deleteConfirmModal .btn-cancel {
-    background-color: #6c757d !important;
-    color: white !important;
+    background-color: #e04b4b !important;
+    color: #fff !important;
     border: none !important;
 }
 
 #deleteConfirmModal .btn-cancel:hover {
-    background-color: #5a6268 !important;
+    background-color: #c43b3b !important;
 }
 
 #deleteConfirmModal .btn-danger {
@@ -718,13 +725,13 @@
 }
 
 #emptyTrashConfirmModal .btn-cancel {
-    background-color: #6c757d !important;
-    color: white !important;
+    background-color: #e04b4b !important;
+    color: #fff !important;
     border: none !important;
 }
 
 #emptyTrashConfirmModal .btn-cancel:hover {
-    background-color: #5a6268 !important;
+    background-color: #c43b3b !important;
 }
 
 #emptyTrashConfirmModal .btn-danger {
@@ -750,13 +757,23 @@
 }
 
 #restoreConfirmModal .btn-cancel {
-    background-color: #6c757d !important;
-    color: white !important;
+    background-color: #e04b4b !important;
+    color: #fff !important;
     border: none !important;
 }
 
 #restoreConfirmModal .btn-cancel:hover {
-    background-color: #5a6268 !important;
+    background-color: #c43b3b !important;
+}
+
+#deleteAttachmentConfirmModal .btn-cancel {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+#deleteAttachmentConfirmModal .btn-cancel:hover {
+    background-color: #c43b3b !important;
 }
 
 #restoreConfirmModal .btn-primary {

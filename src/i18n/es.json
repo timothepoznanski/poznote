@@ -68,8 +68,10 @@
   "snapshot": {
     "menu_item": "Instantánea",
     "modal": {
-      "title": "Instantánea del día",
+      "title": "Instantáneas",
       "loading": "Cargando instantánea...",
+      "history": "Historial (7 días)",
+      "today": "Hoy",
       "empty_title": "No hay instantánea disponible",
       "empty_hint": "Se crea automáticamente una instantánea cuando la nota se abre por primera vez durante el día.",
       "empty_content": "(Contenido vacío)",

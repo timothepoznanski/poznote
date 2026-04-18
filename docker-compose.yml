@@ -14,7 +14,7 @@
 
 services:
   webserver:
-    image: ghcr.io/timothepoznanski/poznote:5
+    image: ghcr.io/timothepoznanski/poznote:6
     restart: always
     env_file: .env
     environment:

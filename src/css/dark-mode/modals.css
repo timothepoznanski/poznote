@@ -718,6 +718,43 @@ body.dark-mode .custom-alert-content p {
     color: #b0b0b0;
 }
 
+html[data-theme='dark'] .import-confirm-modal-content .btn-cancel,
+body.dark-mode .import-confirm-modal-content .btn-cancel,
+html[data-theme='dark'] #confirmModal .btn-cancel,
+body.dark-mode #confirmModal .btn-cancel,
+html[data-theme='dark'] #deleteFolderModal .btn-cancel,
+body.dark-mode #deleteFolderModal .btn-cancel,
+html[data-theme='dark'] #deleteConfirmModal .btn-cancel,
+body.dark-mode #deleteConfirmModal .btn-cancel,
+html[data-theme='dark'] #emptyTrashConfirmModal .btn-cancel,
+body.dark-mode #emptyTrashConfirmModal .btn-cancel,
+html[data-theme='dark'] #restoreConfirmModal .btn-cancel,
+body.dark-mode #restoreConfirmModal .btn-cancel,
+html[data-theme='dark'] #deleteAttachmentConfirmModal .btn-cancel,
+body.dark-mode #deleteAttachmentConfirmModal .btn-cancel {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border-color: #e04b4b !important;
+}
+
+html[data-theme='dark'] .import-confirm-modal-content .btn-cancel:hover,
+body.dark-mode .import-confirm-modal-content .btn-cancel:hover,
+html[data-theme='dark'] #confirmModal .btn-cancel:hover,
+body.dark-mode #confirmModal .btn-cancel:hover,
+html[data-theme='dark'] #deleteFolderModal .btn-cancel:hover,
+body.dark-mode #deleteFolderModal .btn-cancel:hover,
+html[data-theme='dark'] #deleteConfirmModal .btn-cancel:hover,
+body.dark-mode #deleteConfirmModal .btn-cancel:hover,
+html[data-theme='dark'] #emptyTrashConfirmModal .btn-cancel:hover,
+body.dark-mode #emptyTrashConfirmModal .btn-cancel:hover,
+html[data-theme='dark'] #restoreConfirmModal .btn-cancel:hover,
+body.dark-mode #restoreConfirmModal .btn-cancel:hover,
+html[data-theme='dark'] #deleteAttachmentConfirmModal .btn-cancel:hover,
+body.dark-mode #deleteAttachmentConfirmModal .btn-cancel:hover {
+    background-color: #c43b3b !important;
+    border-color: #c43b3b !important;
+}
+
 /* Snapshot Modal Dark Mode */
 html[data-theme='dark'] .snapshot-modal-header,
 body.dark-mode .snapshot-modal-header {
@@ -737,7 +774,7 @@ body.dark-mode .snapshot-meta {
 
 html[data-theme='dark'] .snapshot-meta-item,
 body.dark-mode .snapshot-meta-item {
-    color: rgba(255, 255, 255, 0.55);
+    color: rgba(255, 255, 255, 0.78);
 }
 
 html[data-theme='dark'] .snapshot-content-preview,
@@ -745,6 +782,21 @@ body.dark-mode .snapshot-content-preview {
     border-color: var(--dm-border);
     background: var(--dm-surface, #1a1a1a);
     color: var(--dm-text);
+}
+
+html[data-theme='dark'] .snapshot-content-preview p,
+html[data-theme='dark'] .snapshot-content-preview div,
+html[data-theme='dark'] .snapshot-content-preview li,
+html[data-theme='dark'] .snapshot-content-preview span,
+html[data-theme='dark'] .snapshot-content-preview strong,
+html[data-theme='dark'] .snapshot-content-preview em,
+body.dark-mode .snapshot-content-preview p,
+body.dark-mode .snapshot-content-preview div,
+body.dark-mode .snapshot-content-preview li,
+body.dark-mode .snapshot-content-preview span,
+body.dark-mode .snapshot-content-preview strong,
+body.dark-mode .snapshot-content-preview em {
+    color: inherit;
 }
 
 html[data-theme='dark'] .snapshot-content-preview:empty::before,
@@ -760,4 +812,30 @@ body.dark-mode .snapshot-modal-actions {
 html[data-theme='dark'] .snapshot-state > div:first-child,
 body.dark-mode .snapshot-state > div:first-child {
     opacity: 0.25;
+}
+
+html[data-theme='dark'] .snapshot-date-list,
+body.dark-mode .snapshot-date-list {
+    border-right-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .snapshot-date-btn,
+body.dark-mode .snapshot-date-btn {
+    color: rgba(255, 255, 255, 0.88);
+}
+
+html[data-theme='dark'] .snapshot-date-list-header,
+body.dark-mode .snapshot-date-list-header {
+    color: rgba(255, 255, 255, 0.72);
+}
+
+html[data-theme='dark'] .snapshot-date-btn:hover,
+body.dark-mode .snapshot-date-btn:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme='dark'] .snapshot-date-btn.active,
+body.dark-mode .snapshot-date-btn.active {
+    background-color: #007DB8;
+    color: #fff;
 }

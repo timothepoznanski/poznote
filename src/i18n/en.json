@@ -45,8 +45,10 @@
   "snapshot": {
     "menu_item": "Snapshot",
     "modal": {
-      "title": "Today's snapshot",
+      "title": "Snapshots",
       "loading": "Loading snapshot...",
+      "history": "History (7 days)",
+      "today": "Today",
       "empty_title": "No snapshot available",
       "empty_hint": "A snapshot is created automatically when the note is first opened during the day.",
       "empty_content": "(Empty content)",
