@@ -31,7 +31,7 @@ services:
       start_period: 10s
 
   mcp-server:
-    image: ghcr.io/timothepoznanski/poznote-mcp:5
+    image: ghcr.io/timothepoznanski/poznote-mcp:6
     container_name: poznote-mcp
     restart: always
     environment:
