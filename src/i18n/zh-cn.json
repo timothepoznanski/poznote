@@ -2489,7 +2489,7 @@
       "groups_claim": "包含用户组的令牌 claim 名称（默认：groups）",
       "allowed_groups": "以逗号分隔的允许组列表。留空则允许所有已认证用户。",
       "auto_create_users": "使用基于组的访问控制时推荐启用",
-      "allowed_users": "以逗号分隔的邮箱/用户名。建议优先使用基于组的访问控制。",
+      "allowed_users": "以逗号分隔的邮箱/用户名。留空则允许所有已认证用户。",
       "disable_normal_login": "启用后，登录页上将只提供 OIDC 登录",
       "disable_basic_auth": "启用后，带有 HTTP Basic Auth 的 API 请求将被拒绝（403）"
     }

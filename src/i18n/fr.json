@@ -2543,7 +2543,7 @@
       "groups_claim": "Nom du claim contenant les groupes de l'utilisateur (défaut : groups)",
       "allowed_groups": "Liste de groupes autorisés séparés par des virgules. Laisser vide pour autoriser tous les utilisateurs authentifiés.",
       "auto_create_users": "Recommandé avec le contrôle d'accès par groupes",
-      "allowed_users": "Emails/noms d'utilisateur séparés par des virgules. Préférez le contrôle d'accès par groupes.",
+      "allowed_users": "Emails/noms d'utilisateur séparés par des virgules. Laisser vide pour autoriser tous les utilisateurs authentifiés.",
       "disable_normal_login": "Lorsqu'activé, seule la connexion OIDC est disponible sur la page de connexion",
       "disable_basic_auth": "Lorsqu'activé, les requêtes API avec HTTP Basic Auth seront rejetées (403)"
     }

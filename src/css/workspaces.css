@@ -562,11 +562,6 @@ body {
     display: none;
 }
 
-/* Bottom padding spacer */
-.section-bottom-spacer {
-    padding-bottom: 50px;
-}
-
 /* Buttons container margin */
 .buttons-with-margin {
     margin-top: 12px;

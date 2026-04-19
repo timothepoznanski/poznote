@@ -2345,7 +2345,7 @@
       "groups_claim": "Nombre del claim del token que contiene los grupos del usuario (predeterminado: groups)",
       "allowed_groups": "Lista de grupos permitidos separada por comas. Déjelo vacío para permitir a todos los usuarios autenticados.",
       "auto_create_users": "Recomendado al usar control de acceso basado en grupos",
-      "allowed_users": "Correos electrónicos/nombres de usuario separados por comas. Se recomienda usar control de acceso por grupos.",
+      "allowed_users": "Correos electrónicos/nombres de usuario separados por comas. Déjelo vacío para permitir a todos los usuarios autenticados.",
       "disable_normal_login": "Si está activado, solo el inicio de sesión OIDC estará disponible en la página de acceso",
       "disable_basic_auth": "Si está activado, las solicitudes API con HTTP Basic Auth se rechazarán (403)"
     }

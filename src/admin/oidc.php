@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = t('oidc_admin.error_csrf', [], 'Invalid form submission. Please try again.');
     } else {
         // Save each setting
-        $booleanKeys = ['oidc_enabled', 'oidc_disable_normal_login', 'oidc_disable_basic_auth', 'oidc_auto_create_users'];
+        $booleanKeys = ['oidc_enabled', 'oidc_disable_basic_auth', 'oidc_auto_create_users'];
         $textKeys = ['oidc_provider_name', 'oidc_issuer', 'oidc_scopes', 'oidc_discovery_url', 'oidc_redirect_uri', 'oidc_end_session_endpoint', 'oidc_post_logout_redirect_uri', 'oidc_groups_claim', 'oidc_allowed_groups', 'oidc_allowed_users'];
 
         $allOk = true;
@@ -94,7 +94,6 @@ $settings = [
     'oidc_redirect_uri' => getOidcSetting('oidc_redirect_uri', ''),
     'oidc_end_session_endpoint' => getOidcSetting('oidc_end_session_endpoint', ''),
     'oidc_post_logout_redirect_uri' => getOidcSetting('oidc_post_logout_redirect_uri', ''),
-    'oidc_disable_normal_login' => getOidcSettingBool('oidc_disable_normal_login', false),
     'oidc_disable_basic_auth' => getOidcSettingBool('oidc_disable_basic_auth', false),
     'oidc_groups_claim' => getOidcSetting('oidc_groups_claim', 'groups'),
     'oidc_allowed_groups' => getOidcSetting('oidc_allowed_groups', ''),
@@ -275,8 +274,50 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
                 flex-direction: column;
             }
 
-            .oidc-actions .btn {
-                width: 100%;
+            .settings-container.oidc-page .oidc-actions {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+                justify-content: stretch;
+            }
+
+            .settings-container.oidc-page .oidc-actions .btn,
+            .settings-container.oidc-page .oidc-actions .btn-secondary,
+            .settings-container.oidc-page .oidc-actions .btn-primary {
+                width: 100% !important;
+                max-width: none !important;
+                min-width: 0 !important;
+                margin-bottom: 0 !important;
+                padding: 10px 12px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                box-sizing: border-box !important;
+            }
+
+            .settings-container.oidc-page .workspaces-nav {
+                display: grid !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+                align-items: stretch;
+            }
+
+            .settings-container.oidc-page .workspaces-nav .btn,
+            .settings-container.oidc-page .workspaces-nav .btn-secondary {
+                width: 100% !important;
+                max-width: none !important;
+                min-width: 0 !important;
+                margin-bottom: 0 !important;
+                font-size: 14px !important;
+                font-weight: 500 !important;
+                padding: 10px 12px !important;
+                text-align: center !important;
+                min-height: 36px !important;
+                line-height: 1.2 !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                box-sizing: border-box !important;
             }
         }
     </style>
@@ -413,7 +454,7 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
 
                     <div class="oidc-field">
                         <label for="oidc_allowed_users"><?php echo t_h('oidc_admin.fields.allowed_users', [], 'Allowed users'); ?></label>
-                        <span class="oidc-hint"><?php echo t_h('oidc_admin.hints.allowed_users', [], 'Comma-separated emails/usernames. Prefer group-based access control instead.'); ?></span>
+                        <span class="oidc-hint"><?php echo t_h('oidc_admin.hints.allowed_users', [], 'Comma-separated emails/usernames. Leave empty to allow all authenticated users.'); ?></span>
                         <input type="text" id="oidc_allowed_users" name="oidc_allowed_users" value="<?php echo h($settings['oidc_allowed_users']); ?>" placeholder="">
                     </div>
                 </div>
@@ -423,11 +464,12 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
                     <h2><?php echo t_h('oidc_admin.section_login_behavior', [], 'Login Behavior'); ?></h2>
 
                     <div class="oidc-field">
-                        <div class="oidc-toggle">
-                            <input type="checkbox" id="oidc_disable_normal_login" name="oidc_disable_normal_login" value="1" <?php echo $settings['oidc_disable_normal_login'] ? 'checked' : ''; ?>>
-                            <label for="oidc_disable_normal_login"><?php echo t_h('oidc_admin.fields.disable_normal_login', [], 'Disable username/password login (SSO only)'); ?></label>
-                        </div>
-                        <span class="oidc-hint"><?php echo t_h('oidc_admin.hints.disable_normal_login', [], 'When enabled, only OIDC login is available on the login page'); ?></span>
+                        <span class="oidc-hint">
+                            <?php echo t_h('oidc_admin.hints.disable_normal_login_env', [], 'To disable password login (SSO only), set POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true in your .env file.'); ?>
+                            <?php if (defined('OIDC_DISABLE_NORMAL_LOGIN') && OIDC_DISABLE_NORMAL_LOGIN): ?>
+                                <strong><?php echo t_h('oidc_admin.hints.disable_normal_login_active', [], '(Currently active)'); ?></strong>
+                            <?php endif; ?>
+                        </span>
                     </div>
 
                     <div class="oidc-field">

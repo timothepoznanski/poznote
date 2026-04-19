@@ -839,3 +839,8 @@ body.dark-mode .snapshot-date-btn.active {
     background-color: #007DB8;
     color: #fff;
 }
+
+html[data-theme='dark'] #snapshotModal .snapshot-date-btn [class*="lucide-"],
+body.dark-mode #snapshotModal .snapshot-date-btn [class*="lucide-"] {
+    filter: none !important;
+}
