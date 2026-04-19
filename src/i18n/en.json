@@ -1996,7 +1996,7 @@
       "groups_claim": "Token claim name containing user groups (default: groups)",
       "allowed_groups": "Comma-separated list of allowed groups. Leave empty to allow all authenticated users.",
       "auto_create_users": "Recommended when using group-based access control",
-      "allowed_users": "Comma-separated emails/usernames. Prefer group-based access control instead.",
+      "allowed_users": "Comma-separated emails/usernames. Leave empty to allow all authenticated users.",
       "disable_normal_login": "When enabled, only OIDC login is available on the login page",
       "disable_basic_auth": "When enabled, API requests with HTTP Basic Auth will be rejected (403)"
     }

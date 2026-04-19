@@ -235,6 +235,7 @@ Use the `.env` file for:
 - `HTTP_WEB_PORT`
 - `POZNOTE_OIDC_CLIENT_ID`
 - `POZNOTE_OIDC_CLIENT_SECRET`
+- `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN`
 - Optional runtime overrides such as `POZNOTE_MCP_PORT` and `POZNOTE_DEBUG`
 
 Use the UI for:
@@ -242,7 +243,7 @@ Use the UI for:
 - Admin/global settings such as OIDC provider settings, Git Sync enablement, import limits, and custom CSS upload
 - User/profile settings such as local account passwords, theme, font sizes, note sorting, workspace background, and hidden UI elements
 
-With the default installation files, `.env.template` currently exposes `HTTP_WEB_PORT`, `POZNOTE_OIDC_CLIENT_ID`, and `POZNOTE_OIDC_CLIENT_SECRET`.
+With the default installation files, `.env.template` currently exposes `HTTP_WEB_PORT`, `POZNOTE_OIDC_CLIENT_ID`, `POZNOTE_OIDC_CLIENT_SECRET`, and `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN`.
 
 If a setting exists in the UI, use the UI as the source of truth. Some legacy environment fallbacks still exist internally for compatibility, but they are not the primary configuration workflow.
 
@@ -381,22 +382,25 @@ Poznote supports OpenID Connect (authorization code + PKCE) for single sign-on i
 3. Access can be restricted with allowed groups and, if needed, a legacy allowed users list.
 4. After authentication, Poznote links the identity in this order: `sub` (`oidc_subject`), then `preferred_username`, then `email`.
 5. If auto-create users is enabled and no profile matches, Poznote creates one automatically.
-6. If "Disable normal login" is enabled, the username/password form is hidden and the login page becomes SSO-only.
+6. If `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true`, the username/password form is hidden and the login page becomes SSO-only.
 
 #### Configuration
 
 OIDC is configured from the **admin UI**: go to **Settings > Admin Tools > OIDC / SSO**.
 
-All settings (enabled, issuer, provider name, scopes, access control, login behavior, etc.) are managed from this page and stored in the database.
+Most settings (enabled, issuer, provider name, scopes, access control, allowed groups/users, auto-create users, HTTP Basic Auth behavior, etc.) are managed from this page and stored in the database.
 
-Only `POZNOTE_OIDC_CLIENT_ID` and `POZNOTE_OIDC_CLIENT_SECRET` remain in the `.env` file for security:
+The following settings remain in the `.env` file:
 
 ```bash
 POZNOTE_OIDC_CLIENT_ID=your_client_id
 POZNOTE_OIDC_CLIENT_SECRET=your_client_secret
+POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=false
 ```
 
-> **Breaking change:** previous OIDC settings in `.env` are no longer read, except `POZNOTE_OIDC_CLIENT_ID` and `POZNOTE_OIDC_CLIENT_SECRET`. After upgrading, re-enter the other OIDC settings from the admin page.
+Use `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true` if you want to hide the local username/password form and force SSO-only login.
+
+> **Breaking change:** previous OIDC settings in `.env` are no longer read, except `POZNOTE_OIDC_CLIENT_ID`, `POZNOTE_OIDC_CLIENT_SECRET`, and `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN`. After upgrading, re-enter the other OIDC settings from the admin page.
 
 #### Access Control Example (Groups + Auto-Provision)
 

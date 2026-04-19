@@ -122,6 +122,14 @@ function _oidcBool(string $dbKey, bool $default = false): bool {
     return $default;
 }
 
+function _envBool(string $envKey, bool $default = false): bool {
+    $val = _env($envKey, '');
+    if ($val === '') {
+        return $default;
+    }
+    return in_array(strtolower($val), ['1', 'true', 'yes', 'on'], true);
+}
+
 define('OIDC_ENABLED', _oidcBool('oidc_enabled', false));
 define('OIDC_PROVIDER_NAME', _oidc('oidc_provider_name', 'SSO'));
 define('OIDC_ISSUER', rtrim(trim(_oidc('oidc_issuer', '')), '/'));
@@ -133,7 +141,8 @@ define('OIDC_SCOPES', _oidc('oidc_scopes', 'openid profile email'));
 define('OIDC_REDIRECT_URI', _oidc('oidc_redirect_uri', ''));
 define('OIDC_END_SESSION_ENDPOINT', _oidc('oidc_end_session_endpoint', ''));
 define('OIDC_POST_LOGOUT_REDIRECT_URI', _oidc('oidc_post_logout_redirect_uri', ''));
-define('OIDC_DISABLE_NORMAL_LOGIN', _oidcBool('oidc_disable_normal_login', false));
+// Disable password login (SSO only) — .env only, not in admin UI
+define('OIDC_DISABLE_NORMAL_LOGIN', _envBool('POZNOTE_OIDC_DISABLE_NORMAL_LOGIN', false));
 define('OIDC_DISABLE_BASIC_AUTH', _oidcBool('oidc_disable_basic_auth', false));
 define('OIDC_GROUPS_CLAIM', trim(_oidc('oidc_groups_claim', 'groups')));
 define('OIDC_ALLOWED_GROUPS', _oidc('oidc_allowed_groups', ''));

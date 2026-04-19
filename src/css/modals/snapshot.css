@@ -81,14 +81,24 @@
 }
 
 .snapshot-date-btn .lucide {
-    width: 14px;
-    height: 14px;
-    opacity: 0.5;
+    width: 15px;
+    height: 15px;
+    color: inherit;
+    opacity: 0.72;
     flex-shrink: 0;
 }
 
+#snapshotModal .snapshot-date-btn [class*="lucide-"] {
+    filter: none !important;
+}
+
+.snapshot-date-btn:hover .lucide,
+.snapshot-date-btn:focus-visible .lucide {
+    opacity: 0.88;
+}
+
 .snapshot-date-btn.active .lucide {
-    opacity: 0.9;
+    opacity: 1;
 }
 
 /* ---- Main panel (right side) ---- */

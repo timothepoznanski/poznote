@@ -2346,7 +2346,7 @@
       "groups_claim": "Name des Token-Claims mit den Benutzergruppen (Standard: groups)",
       "allowed_groups": "Kommagetrennte Liste erlaubter Gruppen. Leer lassen, um alle authentifizierten Benutzer zuzulassen.",
       "auto_create_users": "Empfohlen bei gruppenbasierter Zugriffskontrolle",
-      "allowed_users": "Kommagetrennte E-Mails/Benutzernamen. Bevorzugen Sie stattdessen gruppenbasierte Zugriffskontrolle.",
+      "allowed_users": "Kommagetrennte E-Mails/Benutzernamen. Leer lassen, um alle authentifizierten Benutzer zuzulassen.",
       "disable_normal_login": "Wenn aktiviert, ist auf der Login-Seite nur die OIDC-Anmeldung verfügbar",
       "disable_basic_auth": "Wenn aktiviert, werden API-Anfragen mit HTTP Basic Auth abgelehnt (403)"
     }
