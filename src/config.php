@@ -88,10 +88,9 @@ define('DEFAULT_TIMEZONE', 'Europe/Paris');
 // OIDC CONFIGURATION
 // ============================================================
 // OpenID Connect (OIDC) settings are managed from the admin UI
-// (Settings > OIDC / SSO) and stored in the global_settings table.
-// Client ID and Client Secret remain in .env for security.
-// Breaking change: .env OIDC variables (except CLIENT_ID/SECRET)
-// are no longer read. Configure OIDC from the admin UI.
+// (Settings > Admin Tools > OIDC / SSO) and stored in the global_settings table.
+// Client ID, Client Secret, and disable normal login remain in .env.
+// Other .env OIDC variables are no longer read. Configure them from the admin UI.
 
 /**
  * Resolve an OIDC setting from the database only.
