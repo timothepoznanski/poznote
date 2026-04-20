@@ -10,7 +10,9 @@
 // === Authentication & Authorization ===
 require_once __DIR__ . '/../auth.php';
 requireAuth();
+require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../functions.php';
+requireSettingsPassword();
 require_once __DIR__ . '/../db_connect.php';
 
 // Only admins can access this page
@@ -21,7 +23,6 @@ if (!isCurrentUserAdmin()) {
 }
 
 // === Dependencies ===
-require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../users/db_master.php';
 require_once __DIR__ . '/../version_helper.php';
 

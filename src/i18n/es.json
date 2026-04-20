@@ -2373,5 +2373,13 @@
       "select_date": "Seleccione una fecha y hora",
       "past_time": "Seleccione una fecha futura"
     }
+  },
+  "settings_password": {
+    "title": "Ajustes protegidos",
+    "heading": "Acceso a los ajustes",
+    "description": "Se requiere una contraseña para acceder a la página de ajustes.",
+    "placeholder": "Introduzca la contraseña",
+    "unlock": "Desbloquear",
+    "error_incorrect": "Contraseña incorrecta. Inténtelo de nuevo."
   }
 }

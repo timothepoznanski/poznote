@@ -2379,5 +2379,13 @@
       "select_date": "Selecione uma data e hora",
       "past_time": "Selecione uma data futura"
     }
+  },
+  "settings_password": {
+    "title": "Configurações protegidas",
+    "heading": "Acesso às configurações",
+    "description": "Uma senha é necessária para acessar a página de configurações.",
+    "placeholder": "Digite a senha",
+    "unlock": "Desbloquear",
+    "error_incorrect": "Senha incorreta. Tente novamente."
   }
 }

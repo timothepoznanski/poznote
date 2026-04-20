@@ -2517,5 +2517,13 @@
       "select_date": "请选择日期和时间",
       "past_time": "请选择一个未来的时间"
     }
+  },
+  "settings_password": {
+    "title": "设置已保护",
+    "heading": "访问设置",
+    "description": "访问设置页面需要密码。",
+    "placeholder": "请输入密码",
+    "unlock": "解锁",
+    "error_incorrect": "密码错误，请重试。"
   }
 }

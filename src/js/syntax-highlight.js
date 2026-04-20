@@ -6,6 +6,29 @@
 (function() {
     'use strict';
 
+    var searchHighlightRefreshScheduled = false;
+
+    function scheduleSearchHighlightRefresh() {
+        var searchInput = document.getElementById('unified-search') || document.getElementById('unified-search-mobile');
+        if (!searchInput || !searchInput.value || !searchInput.value.trim()) {
+            return;
+        }
+
+        if (typeof window.highlightSearchTerms !== 'function' || searchHighlightRefreshScheduled) {
+            return;
+        }
+
+        searchHighlightRefreshScheduled = true;
+        setTimeout(function() {
+            searchHighlightRefreshScheduled = false;
+            try {
+                window.highlightSearchTerms(true);
+            } catch (e) {
+                console.warn('Search Highlight refresh error:', e);
+            }
+        }, 0);
+    }
+
     /**
      * Apply syntax highlighting to all code blocks in a container
      * @param {HTMLElement} container - The container to search for code blocks (optional, defaults to document)
@@ -20,6 +43,7 @@
 
         // Find all code blocks with a language class
         var codeBlocks = container.querySelectorAll('pre code[class*="language-"]');
+        var highlightedAnyBlock = false;
         
         codeBlocks.forEach(function(codeBlock) {
             // Skip if it's a mermaid block (handled separately)
@@ -53,6 +77,7 @@
 
             try {
                 hljs.highlightElement(codeBlock);
+                highlightedAnyBlock = true;
                 
                 // Restore/set data-language on both pre and code elements
                 if (dataLanguage) {
@@ -65,6 +90,10 @@
                 console.warn('Highlight.js error:', e);
             }
         });
+
+        if (highlightedAnyBlock) {
+            scheduleSearchHighlightRefresh();
+        }
     }
 
     /**
@@ -81,6 +110,7 @@
 
         // Find all code blocks in pre elements
         var codeBlocks = container.querySelectorAll('pre code:not([class*="language-"]):not(.hljs)');
+        var highlightedAnyBlock = false;
         
         codeBlocks.forEach(function(codeBlock) {
             // Skip if the code block is empty or only has zero-width space
@@ -101,11 +131,16 @@
                     codeBlock.innerHTML = result.value;
                     codeBlock.classList.add('hljs');
                     codeBlock.classList.add('language-' + result.language);
+                    highlightedAnyBlock = true;
                 }
             } catch (e) {
                 console.warn('Highlight.js auto-detect error:', e);
             }
         });
+
+        if (highlightedAnyBlock) {
+            scheduleSearchHighlightRefresh();
+        }
     }
 
     /**

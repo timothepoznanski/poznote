@@ -2571,5 +2571,13 @@
       "select_date": "Veuillez sélectionner une date et une heure",
       "past_time": "Veuillez sélectionner une date future"
     }
+  },
+  "settings_password": {
+    "title": "Paramètres protégés",
+    "heading": "Accès aux paramètres",
+    "description": "Un mot de passe est requis pour accéder à la page des paramètres.",
+    "placeholder": "Entrez le mot de passe",
+    "unlock": "Déverrouiller",
+    "error_incorrect": "Mot de passe incorrect. Veuillez réessayer."
   }
 }
