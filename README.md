@@ -27,6 +27,10 @@ This project started from a simple personal need: a practical way to write, orga
   <img src="images/poznote-light.png" alt="Poznote-light" width="100%">
 </p>
 
+### Demo
+
+Try it at https://demo.poznote.com
+
 ### Features
 
 Discover all the features [here](https://poznote.com/index.html#features).
