@@ -16,9 +16,6 @@ Poznote is a personal note-taking and documentation platform.
 </h3>
 
 <br>
-
-
-<br>
 <p align="center">
   <img src="images/poznote-light.png" alt="Poznote-light" width="100%">
 </p>
