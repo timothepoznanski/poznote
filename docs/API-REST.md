@@ -27,7 +27,6 @@ Poznote provides a comprehensive RESTful API v1 for programmatic access to notes
 - [User Profile](#user-profile)
 - [Admin (User Management)](#admin-user-management)
 - [Public / Shared Tasks](#public--shared-tasks)
-- [Calendar](#calendar)
 - [Health Check](#health-check)
 
 ---
@@ -1233,6 +1232,33 @@ curl -u 'username:password' -H "X-User-ID: 1" \
   -o backup.zip
 ```
 
+### Upload Backup
+
+```
+POST /backups/upload
+```
+
+Upload a local backup ZIP to the server's backup directory. The file is stored with a standard timestamped name and its `filename` is returned for use with the restore endpoint.
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  -F "file=@demo.zip" \
+  http://YOUR_SERVER/api/v1/backups/upload
+```
+
+**Response (201):**
+
+```json
+{
+  "success": true,
+  "filename": "poznote_backup_2025-01-05_12-00-00.zip",
+  "size": 102400,
+  "size_mb": 0.1,
+  "restore_url": "/api/v1/backups/poznote_backup_2025-01-05_12-00-00.zip/restore",
+  "download_url": "/api/v1/backups/poznote_backup_2025-01-05_12-00-00.zip"
+}
+```
+
 ### Restore Backup
 
 ```
@@ -1903,49 +1929,6 @@ curl -X DELETE \
 
 ---
 
-## Calendar
-
-Calendar endpoints are used by the mini calendar component. They use session-based authentication (not REST API auth).
-
-### Notes by Date
-
-```
-GET /api/v1/calendar/notes-by-date.php
-```
-
-Returns the number of notes created on each date.
-
-**Query Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `workspace` | string | Workspace filter (optional) |
-
-```bash
-curl -u 'username:password' \
-  "http://YOUR_SERVER/api/v1/calendar/notes-by-date.php?workspace=Personal"
-```
-
-### Notes on Date
-
-```
-GET /api/v1/calendar/notes-on-date.php
-```
-
-Returns all notes created on a specific date.
-
-**Query Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `date` | string | Yes | Date in `YYYY-MM-DD` format |
-| `workspace` | string | No | Workspace filter |
-
-```bash
-curl -u 'username:password' \
-  "http://YOUR_SERVER/api/v1/calendar/notes-on-date.php?date=2025-01-15&workspace=Personal"
-```
-
 ---
 
 ## Health Check
@@ -2069,6 +2052,7 @@ curl http://YOUR_SERVER/api_health.php
 | `GET` | `/backups` | List backups |
 | `POST` | `/backups` | Create backup |
 | `GET` | `/backups/{filename}` | Download backup |
+| `POST` | `/backups/upload` | Upload backup ZIP |
 | `POST` | `/backups/{filename}/restore` | Restore backup |
 | `DELETE` | `/backups/{filename}` | Delete backup |
 

@@ -238,6 +238,63 @@ class BackupController {
     }
     
     /**
+     * POST /api/v1/backups/upload - Upload a backup ZIP and save it in the backups directory
+     */
+    public function upload() {
+        if (empty($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+            $uploadError = $_FILES['file']['error'] ?? -1;
+            http_response_code(400);
+            return ['success' => false, 'error' => 'No valid backup file uploaded', 'upload_error' => $uploadError];
+        }
+
+        $file = $_FILES['file'];
+
+        // Validate extension
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if ($ext !== 'zip') {
+            http_response_code(400);
+            return ['success' => false, 'error' => 'Uploaded file must be a ZIP archive'];
+        }
+
+        // Validate MIME type via finfo (more reliable than browser-supplied type)
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->file($file['tmp_name']);
+        if (!in_array($mime, ['application/zip', 'application/x-zip-compressed', 'application/octet-stream'], true)) {
+            http_response_code(400);
+            return ['success' => false, 'error' => 'Uploaded file does not appear to be a valid ZIP archive'];
+        }
+
+        // Create backups directory if it doesn't exist
+        if (!createDirectoryWithPermissions($this->backupsDir)) {
+            http_response_code(500);
+            return ['success' => false, 'error' => 'Failed to create backups directory'];
+        }
+
+        // Always save with a standard timestamped name so restore() can accept it
+        $userTimezone = getUserTimezone();
+        $dt = new DateTime('now', new DateTimeZone($userTimezone));
+        $timestamp = $dt->format('Y-m-d_H-i-s');
+        $filename = 'poznote_backup_' . $timestamp . '.zip';
+        $destPath = $this->backupsDir . '/' . $filename;
+
+        if (!move_uploaded_file($file['tmp_name'], $destPath)) {
+            http_response_code(500);
+            return ['success' => false, 'error' => 'Failed to save uploaded backup file'];
+        }
+
+        $fileSize = filesize($destPath);
+        http_response_code(201);
+        return [
+            'success'      => true,
+            'filename'     => $filename,
+            'size'         => $fileSize,
+            'size_mb'      => round($fileSize / 1024 / 1024, 2),
+            'restore_url'  => '/api/v1/backups/' . urlencode($filename) . '/restore',
+            'download_url' => '/api/v1/backups/' . urlencode($filename),
+        ];
+    }
+
+    /**
      * POST /api/v1/backups/{filename}/restore - Restore a backup file
      */
     public function restore($filename) {
@@ -256,9 +313,6 @@ class BackupController {
             return ['success' => false, 'error' => 'Backup file not found'];
         }
         
-        // Include restore functions
-        require_once __DIR__ . '/../../restore_import.php';
-        
         // Create a temporary file object that mimics $_FILES structure
         $fileInfo = [
             'name' => $filename,
@@ -268,23 +322,8 @@ class BackupController {
             'size' => filesize($filePath)
         ];
         
-        // Use the existing restoreCompleteBackup function
-        // We need to temporarily copy the file since restoreCompleteBackup expects an uploaded file
-        $tempFile = sys_get_temp_dir() . '/poznote_restore_' . uniqid() . '.zip';
-        if (!copy($filePath, $tempFile)) {
-            http_response_code(500);
-            return ['success' => false, 'error' => 'Failed to prepare backup for restoration'];
-        }
-        
-        $fileInfo['tmp_name'] = $tempFile;
-        
         try {
-            $result = restoreCompleteBackup($fileInfo);
-            
-            // Clean up temp file
-            if (file_exists($tempFile)) {
-                @unlink($tempFile);
-            }
+            $result = restoreCompleteBackup($fileInfo, true);
             
             if ($result['success']) {
                 return [
@@ -301,11 +340,6 @@ class BackupController {
                 ];
             }
         } catch (Exception $e) {
-            // Clean up temp file on error
-            if (file_exists($tempFile)) {
-                @unlink($tempFile);
-            }
-            
             http_response_code(500);
             return [
                 'success' => false,

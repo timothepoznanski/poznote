@@ -375,11 +375,60 @@ else
     # Use range request to avoid downloading the full ZIP
     expect_status "GET /backups/{filename} (download check)" "200" \
       "${AUTH[@]}" "${DATA_H[@]}" -r 0-0 "${API}/backups/${BACKUP_FILE}" || true
+    if expect_status "POST /backups/{filename}/restore" "200" \
+      "${AUTH[@]}" "${DATA_H[@]}" -X POST \
+      "${API}/backups/${BACKUP_FILE}/restore"; then
+      if [[ "$LAST_BODY" =~ ^[[:space:]]*\{ ]]; then
+        echo -e "  ${GREEN}PASS${RESET}        Restore response is JSON"
+        (( PASS++ )) || true
+      else
+        echo -e "  ${RED}FAIL${RESET}        Restore response is not JSON"
+        (( FAIL++ )) || true
+        $VERBOSE && [[ -n "$LAST_BODY" ]] && echo "         $(printf '%s' "$LAST_BODY" | head -c 300)"
+      fi
+    fi
     expect_status "DELETE /backups/{filename}" "200" \
       "${AUTH[@]}" "${DATA_H[@]}" -X DELETE \
       "${API}/backups/${BACKUP_FILE}" || true
   else
     echo -e "  ${YELLOW}WARN${RESET}  Could not parse backup filename – skipping backup sub-tests"
+  fi
+
+  # Upload-restore: upload a local ZIP then restore it in two steps
+  if $SKIP_DESTRUCTIVE; then
+    skip_test "POST /backups/upload (upload ZIP) — skipped with -s"
+    skip_test "POST /backups/{filename}/restore (after upload) — skipped with -s"
+  else
+    # Create a backup to have a ZIP to upload
+    expect_status "POST /backups (for upload test)" "201" \
+      "${AUTH[@]}" "${DATA_H[@]}" -X POST "${API}/backups" || true
+    UR_BACKUP_FILE=$(json_field "backup_file" "$LAST_BODY")
+    if [[ -n "$UR_BACKUP_FILE" && "$UR_BACKUP_FILE" != "null" ]]; then
+      # Download the backup so we have a local ZIP to upload
+      curl -s "${AUTH[@]}" "${DATA_H[@]}" \
+        "${API}/backups/${UR_BACKUP_FILE}" -o /tmp/_ur_backup.zip 2>/dev/null || true
+      if [[ -s /tmp/_ur_backup.zip ]]; then
+        # Step 1: upload
+        expect_status "POST /backups/upload (upload ZIP)" "201" \
+          "${AUTH[@]}" -H "X-User-ID: ${USER_ID}" \
+          -X POST -F "file=@/tmp/_ur_backup.zip" \
+          "${API}/backups/upload" || true
+        UPLOADED_FILE=$(json_field "filename" "$LAST_BODY")
+        # Step 2: restore the uploaded file
+        if [[ -n "$UPLOADED_FILE" && "$UPLOADED_FILE" != "null" ]]; then
+          expect_status "POST /backups/{filename}/restore (after upload)" "200" \
+            "${AUTH[@]}" "${DATA_H[@]}" -X POST \
+            "${API}/backups/${UPLOADED_FILE}/restore" || true
+          silent_delete "${API}/backups/${UPLOADED_FILE}"
+        fi
+      else
+        echo -e "  ${YELLOW}WARN${RESET}  Could not download backup ZIP – skipping upload test"
+      fi
+      rm -f /tmp/_ur_backup.zip
+      silent_delete "${API}/backups/${UR_BACKUP_FILE}"
+    else
+      echo -e "  ${YELLOW}WARN${RESET}  Could not create backup for upload test"
+    fi
   fi
 fi
 
