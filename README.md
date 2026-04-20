@@ -23,11 +23,12 @@ Poznote is a personal note-taking and documentation platform.
 ### Features
 
 Discover all the features [here](https://poznote.com/index.html#features).
-Detailed documentation of advanced features is available in [docs/FEATURES.md](docs/FEATURES.md).
 
 <p align="center">
   <img src="images/poznote-features.png" alt="Poznote Features" width="100%">
 </p>
+
+Detailed documentation of advanced features is available in [docs/FEATURES.md](docs/FEATURES.md).
 
 ### Demo
 
